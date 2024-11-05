@@ -15,6 +15,33 @@ require (
 )
 
 require (
+	github.com/RoaringBitmap/roaring v1.9.1 // indirect
+	github.com/anacrolix/generics v0.0.0-20230113004304-d6428d516633 // indirect
+	github.com/anacrolix/log v0.15.2 // indirect
+	github.com/anacrolix/missinggo v1.3.0 // indirect
+	github.com/anacrolix/missinggo/v2 v2.8.0 // indirect
+	github.com/anacrolix/multiless v0.3.0 // indirect
+	github.com/anacrolix/stm v0.2.0 // indirect
+	github.com/anacrolix/upnp v0.1.4 // indirect
+	github.com/benbjohnson/immutable v0.2.0 // indirect
+	github.com/bits-and-blooms/bitset v1.12.0 // indirect
+	github.com/bits-and-blooms/bloom/v3 v3.7.0 // indirect
+	github.com/bradfitz/iter v0.0.0-20191230175014-e8f45d346db8 // indirect
+	github.com/edsrzf/mmap-go v1.1.0 // indirect
+	github.com/google/btree v1.1.2 // indirect
+	github.com/huandu/xstrings v1.5.0 // indirect
+	github.com/mschoch/smat v0.2.0 // indirect
+	github.com/ncruces/go-sqlite3 v0.20.0 // indirect
+	github.com/ncruces/julianday v1.0.0 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
+	github.com/ryszard/goskiplist v0.0.0-20150312221310-2dfbae5fcf46 // indirect
+	github.com/tetratelabs/wazero v1.8.1 // indirect
+	go.etcd.io/bbolt v1.3.9 // indirect
+	golang.org/x/exp v0.0.0-20240823005443-9b4947da3948 // indirect
+	golang.org/x/time v0.5.0 // indirect
+)
+
+require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fsnotify/fsnotify v1.8.0 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
@@ -23,6 +50,7 @@ require (
 	github.com/google/pprof v0.0.0-20241029153458-d1b30febd7db // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
+	github.com/james-lawrence/torrent v0.0.0-20241023003325-8c34ad271451
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/posener/complete v1.2.3 // indirect

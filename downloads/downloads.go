@@ -3,6 +3,7 @@ package downloads
 import (
 	"log"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/fsnotify/fsnotify"
 	"github.com/james-lawrence/deeppool/internal/x/errorsx"
 )
@@ -16,7 +17,7 @@ func NewDirectoryWatcher() (d Directory, err error) {
 		return d, err
 	}
 
-	return Directory{w: w}, nil
+	return Directory{w: w}.background(), nil
 }
 
 type Directory struct {
@@ -37,11 +38,15 @@ func (t Directory) background() Directory {
 		for {
 			select {
 			case evt := <-t.w.Events:
-				if evt.Op == fsnotify.Chmod {
+				switch evt.Op {
+				case fsnotify.Create:
+					// do nothing fallthrough.
+				default:
+					log.Println("change ignored", evt.Op)
 					continue
 				}
 
-				log.Println("change detected", evt.Op)
+				log.Println("change detected", spew.Sdump(evt))
 			case err := <-t.w.Errors:
 				log.Println("watch error", err)
 			}
