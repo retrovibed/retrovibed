@@ -68,8 +68,6 @@ func main() {
 		log.Println("waiting for systems to shutdown")
 	})
 
-	// envx.Debug()
-
 	parser := kong.Must(
 		&shellCli,
 		kong.Name("dpool"),
