@@ -30,14 +30,19 @@ require (
 	github.com/edsrzf/mmap-go v1.1.0 // indirect
 	github.com/google/btree v1.1.2 // indirect
 	github.com/huandu/xstrings v1.5.0 // indirect
+	github.com/mfridman/interpolate v0.0.2 // indirect
 	github.com/mschoch/smat v0.2.0 // indirect
 	github.com/ncruces/go-sqlite3 v0.20.0 // indirect
 	github.com/ncruces/julianday v1.0.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/pressly/goose/v3 v3.22.1 // indirect
 	github.com/ryszard/goskiplist v0.0.0-20150312221310-2dfbae5fcf46 // indirect
+	github.com/sethvargo/go-retry v0.3.0 // indirect
 	github.com/tetratelabs/wazero v1.8.1 // indirect
 	go.etcd.io/bbolt v1.3.9 // indirect
+	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/exp v0.0.0-20240823005443-9b4947da3948 // indirect
+	golang.org/x/sync v0.8.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 )
 

@@ -122,9 +122,16 @@ github.com/logrusorgru/aurora
 # github.com/mattn/go-isatty v0.0.20
 ## explicit; go 1.15
 github.com/mattn/go-isatty
+# github.com/mfridman/interpolate v0.0.2
+## explicit; go 1.19
+github.com/mfridman/interpolate
 # github.com/mschoch/smat v0.2.0
 ## explicit; go 1.13
 github.com/mschoch/smat
+# github.com/ncruces/go-sqlite3 v0.20.0
+## explicit; go 1.21
+# github.com/ncruces/julianday v1.0.0
+## explicit; go 1.17
 # github.com/onsi/ginkgo/v2 v2.21.0
 ## explicit; go 1.22.0
 github.com/onsi/ginkgo/v2
@@ -170,15 +177,29 @@ github.com/pmezard/go-difflib/difflib
 github.com/posener/complete
 github.com/posener/complete/cmd
 github.com/posener/complete/cmd/install
+# github.com/pressly/goose/v3 v3.22.1
+## explicit; go 1.21.0
+github.com/pressly/goose/v3
+github.com/pressly/goose/v3/database
+github.com/pressly/goose/v3/internal/dialect
+github.com/pressly/goose/v3/internal/dialect/dialectquery
+github.com/pressly/goose/v3/internal/gooseutil
+github.com/pressly/goose/v3/internal/sqlparser
+github.com/pressly/goose/v3/lock
 # github.com/riywo/loginshell v0.0.0-20200815045211-7d26008be1ab
 ## explicit
 github.com/riywo/loginshell
 # github.com/ryszard/goskiplist v0.0.0-20150312221310-2dfbae5fcf46
 ## explicit
 github.com/ryszard/goskiplist/skiplist
+# github.com/sethvargo/go-retry v0.3.0
+## explicit; go 1.21
+github.com/sethvargo/go-retry
 # github.com/stretchr/testify v1.9.0
 ## explicit; go 1.17
 github.com/stretchr/testify/assert
+# github.com/tetratelabs/wazero v1.8.1
+## explicit; go 1.21
 # github.com/willabides/kongplete v0.4.0
 ## explicit; go 1.17
 github.com/willabides/kongplete
@@ -186,6 +207,9 @@ github.com/willabides/kongplete/internal/positionalpredictor
 # go.etcd.io/bbolt v1.3.9
 ## explicit; go 1.17
 go.etcd.io/bbolt
+# go.uber.org/multierr v1.11.0
+## explicit; go 1.19
+go.uber.org/multierr
 # golang.org/x/exp v0.0.0-20240823005443-9b4947da3948
 ## explicit; go 1.20
 golang.org/x/exp/constraints
@@ -195,6 +219,9 @@ golang.org/x/net/context
 golang.org/x/net/html
 golang.org/x/net/html/atom
 golang.org/x/net/html/charset
+# golang.org/x/sync v0.8.0
+## explicit; go 1.18
+golang.org/x/sync/errgroup
 # golang.org/x/sys v0.26.0
 ## explicit; go 1.18
 golang.org/x/sys/unix
