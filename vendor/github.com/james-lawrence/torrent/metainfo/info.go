@@ -25,16 +25,26 @@ func OptionPieceLength(n int64) Option {
 	}
 }
 
+func OptionDisplayName(s string) Option {
+	return func(i *Info) {
+		i.Name = s
+	}
+}
+
 func NewFromReader(src io.Reader, options ...Option) (info *Info, err error) {
 	info = langx.Autoptr(langx.Clone(Info{
 		PieceLength: bytesx.MiB,
 	}, options...))
 
 	digest := md5.New()
-	if info.Pieces, err = ComputePieces(io.TeeReader(src, digest), info.PieceLength); err != nil {
+	length := readlength(0)
+	wrapped := io.TeeReader(src, digest)
+	wrapped = io.TeeReader(wrapped, &length)
+	if info.Pieces, err = ComputePieces(wrapped, info.PieceLength); err != nil {
 		return nil, err
 	}
 
+	info.Length = int64(length)
 	if info.Name == "" {
 		info.Name = hex.EncodeToString(digest.Sum(nil))
 	}
@@ -208,4 +218,12 @@ func (info *Info) Hashes() (ret [][]byte) {
 	}
 
 	return ret
+}
+
+type readlength uint64
+
+func (t *readlength) Write(b []byte) (int, error) {
+	bn := len(b)
+	atomic.AddUint64((*uint64)(t), uint64(bn))
+	return bn, nil
 }

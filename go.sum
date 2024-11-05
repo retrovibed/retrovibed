@@ -143,6 +143,8 @@ github.com/huandu/xstrings v1.5.0 h1:2ag3IFq9ZDANvthTwTiqSSZLjDc+BedvHPAp5tJy2TI
 github.com/huandu/xstrings v1.5.0/go.mod h1:y5/lhBue+AyNmUVz9RLU9xbLR0o4KIIExikq4ovT0aE=
 github.com/james-lawrence/torrent v0.0.0-20241022171548-aa37d129efaf h1:IbKVpjCLoDNyHAIc77FxgfVh48aRhc3XH86Qzol716M=
 github.com/james-lawrence/torrent v0.0.0-20241022171548-aa37d129efaf/go.mod h1:kz/1W54fTzN6HyqRv6pMG3vZSfXBjb5Wbd5KY+ErGQ4=
+github.com/james-lawrence/torrent v0.0.0-20241023003325-8c34ad271451 h1:CfGGZlp186RbfyFuBBml4II/f54oe0oxE1gndyxuYI8=
+github.com/james-lawrence/torrent v0.0.0-20241023003325-8c34ad271451/go.mod h1:kz/1W54fTzN6HyqRv6pMG3vZSfXBjb5Wbd5KY+ErGQ4=
 github.com/json-iterator/go v1.1.6/go.mod h1:+SdeFBvtyEkXs7REEP0seUULqWtbJapLOCVDaaPEHmU=
 github.com/json-iterator/go v1.1.9/go.mod h1:KdQUCv79m/52Kvf8AW2vK1V8akMuk1QjK/uOdHXbAo4=
 github.com/jtolds/gls v4.2.1+incompatible/go.mod h1:QJZ7F/aHp+rZTRtaJ1ow/lLfFfVYBRgL+9YlvaHOwJU=

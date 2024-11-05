@@ -4,7 +4,7 @@ go 1.23
 
 toolchain go1.23.2
 
-require github.com/james-lawrence/torrent v0.0.0-20241022171548-aa37d129efaf
+require github.com/james-lawrence/torrent v0.0.0-20241023003325-8c34ad271451
 
 require (
 	github.com/RoaringBitmap/roaring v1.9.4 // indirect

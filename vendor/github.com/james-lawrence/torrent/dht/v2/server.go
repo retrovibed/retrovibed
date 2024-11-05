@@ -14,7 +14,7 @@ import (
 	"time"
 
 	"github.com/anacrolix/missinggo"
-
+	"github.com/anacrolix/missinggo/v2/conntrack"
 	"github.com/james-lawrence/torrent/bencode"
 	"github.com/james-lawrence/torrent/dht/v2/krpc"
 	"github.com/james-lawrence/torrent/iplist"
@@ -133,9 +133,10 @@ func (s *Server) Addr() net.Addr {
 // NewDefaultServerConfig ...
 func NewDefaultServerConfig() *ServerConfig {
 	return &ServerConfig{
-		Conn:          mustListen(":0"),
-		NoSecurity:    true,
-		StartingNodes: GlobalBootstrapAddrs,
+		Conn:               mustListen(":0"),
+		NoSecurity:         true,
+		StartingNodes:      GlobalBootstrapAddrs,
+		ConnectionTracking: conntrack.NewInstance(),
 	}
 }
 
@@ -173,6 +174,9 @@ func NewServer(c *ServerConfig) (s *Server, err error) {
 			k: 8,
 		},
 		sendLimit: defaultSendLimiter,
+	}
+	if s.config.ConnectionTracking == nil {
+		s.config.ConnectionTracking = conntrack.NewInstance()
 	}
 	rand.Read(s.tokenServer.secret)
 	s.socket = c.Conn
@@ -623,13 +627,24 @@ func (s *Server) validToken(token string, addr Addr) bool {
 	return s.tokenServer.ValidToken(token, addr)
 }
 
+func (s *Server) connTrackEntryForAddr(a Addr) conntrack.Entry {
+	return conntrack.Entry{
+		Protocol:   s.socket.LocalAddr().Network(),
+		LocalAddr:  s.socket.LocalAddr().String(),
+		RemoteAddr: a.String(),
+	}
+}
+
 type numWrites int
 
 func (s *Server) beginQuery(addr Addr, reason string, f func() numWrites) stm.Operation {
 	return func(tx *stm.Tx) interface{} {
 		tx.Assert(s.sendLimit.AllowStm(tx))
+		cteh := s.config.ConnectionTracking.Allow(tx, s.connTrackEntryForAddr(addr), reason, -1)
+		tx.Assert(cteh != nil)
 		return func() {
-			f()
+			writes := f()
+			finalizeCteh(cteh, writes)
 		}
 	}
 }

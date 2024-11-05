@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/anacrolix/missinggo"
+	"github.com/anacrolix/missinggo/v2/conntrack"
 	"github.com/james-lawrence/torrent/iplist"
 	"github.com/james-lawrence/torrent/metainfo"
 
@@ -59,6 +60,8 @@ type ServerConfig struct {
 	// response. Defaults to a random value between 4.5 and 5.5s.
 	QueryResendDelay func() time.Duration
 	// TODO: Expose Peers, to return NodeInfo for received get_peers queries.
+
+	ConnectionTracking *conntrack.Instance
 
 	Logger *log.Logger
 }

@@ -9,6 +9,7 @@ import (
 
 	"github.com/james-lawrence/torrent/connections"
 
+	"github.com/anacrolix/missinggo/v2/conntrack"
 	"github.com/james-lawrence/torrent/dht/v2"
 	"github.com/james-lawrence/torrent/dht/v2/krpc"
 	"github.com/james-lawrence/torrent/metainfo"
@@ -123,6 +124,8 @@ type ClientConfig struct {
 	// connection for a given Torrent.
 	dropDuplicatePeerIds bool
 
+	ConnTracker *conntrack.Instance
+
 	connections.Handshaker
 
 	// OnQuery hook func
@@ -180,6 +183,7 @@ func NewDefaultClientConfig(options ...ClientConfigOption) *ClientConfig {
 		DhtStartingNodes:               dht.GlobalBootstrapAddrs,
 		UploadRateLimiter:              unlimited,
 		DownloadRateLimiter:            unlimited,
+		ConnTracker:                    conntrack.NewInstance(),
 		DisableAcceptRateLimiting:      true,
 		HeaderObfuscationPolicy: HeaderObfuscationPolicy{
 			Preferred:        true,

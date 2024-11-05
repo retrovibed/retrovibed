@@ -26,6 +26,7 @@ github.com/anacrolix/missinggo/x
 # github.com/anacrolix/missinggo/v2 v2.8.0
 ## explicit; go 1.18
 github.com/anacrolix/missinggo/v2
+github.com/anacrolix/missinggo/v2/conntrack
 github.com/anacrolix/missinggo/v2/iter
 # github.com/anacrolix/multiless v0.4.0
 ## explicit; go 1.18
@@ -62,7 +63,7 @@ github.com/google/btree
 # github.com/huandu/xstrings v1.5.0
 ## explicit; go 1.12
 github.com/huandu/xstrings
-# github.com/james-lawrence/torrent v0.0.0-20241022171548-aa37d129efaf
+# github.com/james-lawrence/torrent v0.0.0-20241023003325-8c34ad271451
 ## explicit; go 1.23
 github.com/james-lawrence/torrent
 github.com/james-lawrence/torrent/bencode

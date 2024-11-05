@@ -8,6 +8,7 @@ import (
 	"net"
 	"sync/atomic"
 
+	"github.com/anacrolix/missinggo/v2/conntrack"
 	"github.com/anacrolix/stm"
 	"github.com/anacrolix/stm/stmutil"
 	"github.com/benbjohnson/immutable"
@@ -177,6 +178,15 @@ func (a *Announce) beginAnnouncePeer(tx *stm.Tx) interface{} {
 	return a.beginQuery(x.Addr, "dht announce announce_peer", func() numWrites {
 		return a.announcePeer(x)
 	})(tx).(func())
+}
+
+func finalizeCteh(cteh *conntrack.EntryHandle, writes numWrites) {
+	if writes == 0 {
+		cteh.Forget()
+		// TODO: panic("how to reverse rate limit?")
+	} else {
+		cteh.Done()
+	}
 }
 
 func (a *Announce) getPeers(addr Addr) numWrites {

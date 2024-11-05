@@ -321,8 +321,9 @@ func (cl *Client) newDhtServer(conn net.PacketConn) (s *dht.Server, err error) {
 			}
 			return cl.config.PublicIP4
 		}(),
-		StartingNodes: cl.config.DhtStartingNodes,
-		OnQuery:       cl.config.DHTOnQuery,
+		StartingNodes:      cl.config.DhtStartingNodes,
+		ConnectionTracking: cl.config.ConnTracker,
+		OnQuery:            cl.config.DHTOnQuery,
 	}
 
 	if s, err = dht.NewServer(&cfg); err != nil {
