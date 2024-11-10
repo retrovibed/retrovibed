@@ -59,7 +59,7 @@ func main() {
 	kongplete.Complete(parser)
 
 	if ctx, err = parser.Parse(os.Args[1:]); cmdopts.ReportError(err) != nil {
-		ctx.FatalIfErrorf(err)
+		log.Fatalln(err)
 	}
 
 	if err = cmdopts.ReportError(ctx.Run()); err != nil {

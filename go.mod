@@ -23,27 +23,37 @@ require (
 	github.com/anacrolix/multiless v0.3.0 // indirect
 	github.com/anacrolix/stm v0.2.0 // indirect
 	github.com/anacrolix/upnp v0.1.4 // indirect
+	github.com/apache/arrow-go/v18 v18.0.0 // indirect
 	github.com/benbjohnson/immutable v0.2.0 // indirect
 	github.com/bits-and-blooms/bitset v1.12.0 // indirect
 	github.com/bits-and-blooms/bloom/v3 v3.7.0 // indirect
 	github.com/bradfitz/iter v0.0.0-20191230175014-e8f45d346db8 // indirect
 	github.com/edsrzf/mmap-go v1.1.0 // indirect
+	github.com/goccy/go-json v0.10.3 // indirect
 	github.com/google/btree v1.1.2 // indirect
+	github.com/google/flatbuffers v24.3.25+incompatible // indirect
 	github.com/huandu/xstrings v1.5.0 // indirect
+	github.com/klauspost/compress v1.17.11 // indirect
+	github.com/klauspost/cpuid/v2 v2.2.8 // indirect
 	github.com/mfridman/interpolate v0.0.2 // indirect
+	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/mschoch/smat v0.2.0 // indirect
 	github.com/ncruces/go-sqlite3 v0.20.0 // indirect
 	github.com/ncruces/julianday v1.0.0 // indirect
+	github.com/pierrec/lz4/v4 v4.1.21 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pressly/goose/v3 v3.22.1 // indirect
 	github.com/ryszard/goskiplist v0.0.0-20150312221310-2dfbae5fcf46 // indirect
 	github.com/sethvargo/go-retry v0.3.0 // indirect
 	github.com/tetratelabs/wazero v1.8.1 // indirect
+	github.com/zeebo/xxh3 v1.0.2 // indirect
 	go.etcd.io/bbolt v1.3.9 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/exp v0.0.0-20240823005443-9b4947da3948 // indirect
+	golang.org/x/exp v0.0.0-20240909161429-701f63a606c0 // indirect
+	golang.org/x/mod v0.21.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
+	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
 )
 
 require (
@@ -57,6 +67,7 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/james-lawrence/torrent v0.0.0-20241023003325-8c34ad271451
 	github.com/kr/pretty v0.3.1 // indirect
+	github.com/marcboeker/go-duckdb v1.8.3
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/posener/complete v1.2.3 // indirect
 	github.com/riywo/loginshell v0.0.0-20200815045211-7d26008be1ab // indirect
