@@ -23,10 +23,10 @@ func (t cmdTorrentMagnet) Run(ctx *cmdopts.Global) (err error) {
 	for _, uri := range t.Magnets {
 		m, cause := torrent.NewFromMagnet(uri.String())
 		if cause != nil {
-			errors.Join(err, errorsx.Wrap(cause, "unable to prepare magnet"))
+			err = errors.Join(err, errorsx.Wrap(cause, "unable to prepare magnet"))
 			continue
 		}
 		log.Println("NOOP MAGNET - Not implemented", spew.Sdump(m))
 	}
-	return nil
+	return err
 }
