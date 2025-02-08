@@ -52,8 +52,6 @@ func SetDialect(s string) error {
 		d = dialect.Ydb
 	case "turso":
 		d = dialect.Turso
-	case "duckdb":
-		d = dialect.Duckdb
 	default:
 		return fmt.Errorf("%q: unknown dialect", s)
 	}

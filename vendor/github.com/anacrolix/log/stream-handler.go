@@ -1,6 +1,7 @@
 package log
 
 import (
+	"fmt"
 	"io"
 )
 
@@ -33,7 +34,24 @@ func twoLineFormatter(msg Record) []byte {
 		b = append(b, name...)
 	}
 	b = append(b, "]\n  "...)
+
+	slogRecord := msg.SlogRecord()
+	if slogRecord.Ok {
+		gstbhLocker.Lock()
+		defer gstbhLocker.Unlock()
+		return globalSlogTextBufferHandler.handleAppend(b, slogRecord.Value)
+	}
+
 	b = append(b, msg.Text()...)
+	msg.Values(func(value interface{}) (more bool) {
+		b = append(b, ' ')
+		if item, ok := value.(item); ok {
+			b = fmt.Appendf(b, "%s=%s", item.key, item.value)
+		} else {
+			b = fmt.Append(b, value)
+		}
+		return true
+	})
 	if b[len(b)-1] != '\n' {
 		b = append(b, '\n')
 	}
