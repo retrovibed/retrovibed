@@ -260,7 +260,7 @@ func Format(k, v string, options ...func(*formatopts)) string {
 	}, options...)
 	evar := strings.TrimSpace(opts.transformer(fmt.Sprintf("%s=%s", k, v)))
 	if evar == "" {
-		debugx.Println("ignoring variable", k, "transform was empty")
+		debugx.Println("ignoring variable", k, "empty")
 	}
 
 	return fmt.Sprintf("%s=%s", k, v)

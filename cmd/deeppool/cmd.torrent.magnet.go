@@ -16,7 +16,7 @@ type cmdTorrent struct {
 }
 
 type cmdTorrentMagnet struct {
-	Magnets []url.URL `arg:"" name:"megnet" help:"magnet uri to download" required:"true"`
+	Magnets []url.URL `arg:"" name:"magnet" help:"magnet uri to download" required:"true"`
 }
 
 func (t cmdTorrentMagnet) Run(ctx *cmdopts.Global) (err error) {
