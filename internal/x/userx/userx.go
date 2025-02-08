@@ -1,7 +1,6 @@
 package userx
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"os/user"
@@ -9,10 +8,7 @@ import (
 
 	"github.com/james-lawrence/deeppool/internal/x/debugx"
 	"github.com/james-lawrence/deeppool/internal/x/envx"
-)
-
-const (
-	DefaultDir = "deeppool"
+	"github.com/james-lawrence/deeppool/internal/x/slicesx"
 )
 
 func Root() user.User {
@@ -21,6 +17,12 @@ func Root() user.User {
 		Uid:     "0",
 		HomeDir: "/root",
 	}
+}
+
+// returns the relative root that should be used for all well known directories.
+func DefaultRelRoot() string {
+	const DefaultDir = "deeppool"
+	return slicesx.FirstOrZero(filepath.Base(os.Args[0]), DefaultDir)
 }
 
 // CurrentUserOrDefault returns the current user or the default configured user.
@@ -42,8 +44,8 @@ func CurrentUserOrDefault(d user.User) (result *user.User) {
 func DefaultConfigDir(name string) string {
 	user := CurrentUserOrDefault(Root())
 
-	envconfig := filepath.Join(os.Getenv("XDG_CONFIG_HOME"), DefaultDir)
-	home := filepath.Join(user.HomeDir, ".config", DefaultDir)
+	envconfig := filepath.Join(os.Getenv("XDG_CONFIG_HOME"))
+	home := filepath.Join(user.HomeDir, ".config")
 
 	return DefaultDirectory(name, envconfig, home)
 }
@@ -52,44 +54,47 @@ func DefaultConfigDir(name string) string {
 func DefaultDirLocation(rel string) string {
 	user := CurrentUserOrDefault(Root())
 
-	env := filepath.Join(os.Getenv("XDG_CONFIG_HOME"), DefaultDir)
-	home := filepath.Join(user.HomeDir, ".config", DefaultDir)
-	system := filepath.Join("/etc", DefaultDir)
+	env := filepath.Join(os.Getenv("XDG_CONFIG_HOME"))
+	home := filepath.Join(user.HomeDir, ".config")
+	system := filepath.Join("/etc")
 
 	return DefaultDirectory(rel, env, home, system)
 }
 
 // DefaultCacheDirectory cache directory for storing data.
-func DefaultCacheDirectory() string {
+func DefaultCacheDirectory(rel ...string) string {
 	user := CurrentUserOrDefault(Root())
 	if user.Uid == Root().Uid {
-		return envx.String(filepath.Join("/", "var", "cache", DefaultDir), "CACHE_DIRECTORY")
+		return envx.String(filepath.Join("/", "var", "cache"), "CACHE_DIRECTORY")
 	}
 
-	root := filepath.Join(user.HomeDir, ".cache", DefaultDir)
+	defaultdir := filepath.Join(user.HomeDir, ".cache")
+	return filepath.Join(envx.String(defaultdir, "CACHE_DIRECTORY", "XDG_CACHE_HOME"), filepath.Join(rel...))
+}
 
-	return envx.String(root, "CACHE_DIRECTORY", "XDG_CACHE_HOME")
+func DefaultDataDirectory(rel ...string) string {
+	user := CurrentUserOrDefault(Root())
+	defaultdir := filepath.Join(user.HomeDir, ".local", "share")
+	return filepath.Join(envx.String(defaultdir, "XDG_DATA_HOME"), filepath.Join(rel...))
 }
 
 // DefaultDownloadDirectory returns the user config directory.
-func DefaultDownloadDirectory() string {
+func DefaultDownloadDirectory(rel ...string) string {
 	user := CurrentUserOrDefault(Root())
 	auto := filepath.Join(user.HomeDir, "Downloads")
-
-	return envx.String(auto, "CACHE_DIRECTORY", "XDG_DOWNLOAD_DIR")
+	return filepath.Join(envx.String(auto, "XDG_DOWNLOAD_DIR"), filepath.Join(rel...))
 }
 
 // DefaultRuntimeDirectory runtime directory for storing data.
-func DefaultRuntimeDirectory() string {
+func DefaultRuntimeDirectory(rel ...string) string {
 	user := CurrentUserOrDefault(Root())
 
 	if user.Uid == Root().Uid {
-		return envx.String(filepath.Join("/", "run", DefaultDir), "RUNTIME_DIRECTORY", "XDG_RUNTIME_DIR")
+		return envx.String(filepath.Join("/", "run"), "RUNTIME_DIRECTORY", "XDG_RUNTIME_DIR")
 	}
 
-	defaultdir := filepath.Join(os.TempDir(), fmt.Sprintf("%s-%s", DefaultDir, "runtime"))
-
-	return envx.String(defaultdir, "RUNTIME_DIRECTORY", "XDG_RUNTIME_DIR")
+	defaultdir := filepath.Join("/", "run", "user", user.Uid)
+	return filepath.Join(envx.String(defaultdir, "RUNTIME_DIRECTORY", "XDG_RUNTIME_DIR"), filepath.Join(rel...))
 }
 
 // DefaultDirectory finds the first directory root that exists and then returns

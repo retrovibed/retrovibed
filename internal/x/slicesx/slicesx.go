@@ -50,30 +50,6 @@ func FindOrZero[T any](match func(T) bool, items ...T) (zero T) {
 	return zero
 }
 
-// Last returns last element in the slice if it exists.
-func Last[T any](items ...T) (zero T, _ bool) {
-	if len(items) == 0 {
-		return zero, false
-	}
-
-	return items[len(items)-1], true
-}
-
-// Last returns last element in the slice if it exists.
-func LastOrZero[T any](items ...T) (zero T) {
-	l, _ := Last(items...)
-	return l
-}
-
-// Last returns last element in the slice if it exists.
-func LastOrDefault[T any](fallback T, items ...T) (zero T) {
-	if l, ok := Last(items...); ok {
-		return l
-	}
-
-	return fallback
-}
-
 // Map in place applying the transformation.
 func Map[T any](m func(T) T, items ...T) (zero []T) {
 	for idx, i := range items {
@@ -113,4 +89,57 @@ func Reduce[T any, Y ~func(*T)](v *T, options ...Y) *T {
 	}
 
 	return v
+}
+
+// First returns first element in the slice if it exists.
+func First[T comparable](items ...T) (zero T, _ bool) {
+	for _, v := range items {
+		if v != zero {
+			return v, true
+		}
+	}
+
+	return zero, false
+}
+
+// First returns first element in the slice if it exists, the zero value otherwise.
+func FirstOrZero[T comparable](items ...T) (zero T) {
+	l, _ := First(items...)
+	return l
+}
+
+// First returns first element in the slice if it exists and is not zero or the default
+func FirstOrDefault[T comparable](fallback T, items ...T) (zero T) {
+	for _, v := range items {
+		var z T
+		if v != z {
+			return v
+		}
+	}
+
+	return fallback
+}
+
+// Last returns last element in the slice if it exists.
+func Last[T any](items ...T) (zero T, _ bool) {
+	if len(items) == 0 {
+		return zero, false
+	}
+
+	return items[len(items)-1], true
+}
+
+// Last returns last element in the slice if it exists.
+func LastOrZero[T any](items ...T) (zero T) {
+	l, _ := Last(items...)
+	return l
+}
+
+// Last returns last element in the slice if it exists.
+func LastOrDefault[T any](fallback T, items ...T) (zero T) {
+	if l, ok := Last(items...); ok {
+		return l
+	}
+
+	return fallback
 }
