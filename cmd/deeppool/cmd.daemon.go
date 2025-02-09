@@ -15,6 +15,7 @@ import (
 	"github.com/james-lawrence/deeppool/internal/x/goosex"
 	"github.com/james-lawrence/deeppool/internal/x/torrentx"
 	"github.com/james-lawrence/deeppool/internal/x/userx"
+	"github.com/james-lawrence/torrent/dht/v2"
 
 	_ "github.com/marcboeker/go-duckdb"
 
@@ -52,11 +53,14 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global) (err error) {
 		return errorsx.Wrap(err, "unable to setup torrent socket")
 	}
 
+	tm := dht.DefaultMuxer().
+		Method("", nil)
 	tclient, err := tnetwork.Bind(
 		torrent.NewClient(
 			torrent.NewDefaultClientConfig(
 				torrent.ClientConfigSeed(true),
 				torrent.ClientConfigInfoLogger(log.New(io.Discard, "", log.Flags())),
+				torrent.ClientConfigMuxer(tm),
 			),
 		),
 	)
