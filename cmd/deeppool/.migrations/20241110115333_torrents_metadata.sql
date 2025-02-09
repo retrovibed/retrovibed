@@ -4,6 +4,7 @@ CREATE TABLE torrents_metadata (
     id UUID NOT NULL DEFAULT gen_random_uuid(),
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    bytes UINTEGER NOT NULL,
     pieces_downloaded UINTEGER NOT NULL,
     pieces_pending UINTEGER NOT NULL,
     description STRING NOT NULL DEFAULT '',

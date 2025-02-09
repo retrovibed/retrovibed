@@ -1,7 +1,6 @@
 package torrentx
 
 import (
-	"context"
 	"fmt"
 	"net"
 
@@ -12,22 +11,13 @@ import (
 	"github.com/james-lawrence/torrent/sockets"
 )
 
-type dialer interface {
-	Dial(ctx context.Context, addr string) (net.Conn, error)
-}
-
-type socket interface {
-	net.Listener
-	dialer
-}
-
-func Autosocket() (_ torrent.Binder, err error) {
+func Autosocket(p int) (_ torrent.Binder, err error) {
 	var (
 		s1, s2  sockets.Socket
 		tsocket *utp.Socket
 	)
 
-	tsocket, err = utp.NewSocket("udp", ":0")
+	tsocket, err = utp.NewSocket("udp", fmt.Sprintf(":%d", p))
 	if err != nil {
 		return nil, errorsx.Wrap(err, "unable to open utp socket")
 	}

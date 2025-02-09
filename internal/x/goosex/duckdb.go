@@ -3,7 +3,6 @@ package goosex
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/pressly/goose/v3"
@@ -41,7 +40,6 @@ func (t DuckdbStore) Delete(ctx context.Context, db database.DBTxConn, version i
 }
 
 func (t DuckdbStore) GetMigration(ctx context.Context, db database.DBTxConn, version int64) (*database.GetMigrationResult, error) {
-	log.Println("DERP")
 	q := fmt.Sprintf(`SELECT tstamp, is_applied FROM %s WHERE version_id=$1 ORDER BY tstamp DESC LIMIT 1`, t.Tablename())
 	var timestamp time.Time
 	var isApplied bool
@@ -57,13 +55,12 @@ func (t DuckdbStore) GetMigration(ctx context.Context, db database.DBTxConn, ver
 }
 
 func (t DuckdbStore) GetLatestVersion(ctx context.Context, db database.DBTxConn) (id int64, err error) {
-	q := fmt.Sprintf(`SELECT version_id, is_applied from %s ORDER BY id DESC LIMIT 1`, t.Tablename())
+	q := fmt.Sprintf(`SELECT version_id from %s ORDER BY id DESC LIMIT 1`, t.Tablename())
 	err = db.QueryRowContext(ctx, q).Scan(&id)
 	return id, err
 }
 
 func (t DuckdbStore) ListMigrations(ctx context.Context, db database.DBTxConn) ([]*database.ListMigrationsResult, error) {
-	log.Println("DERP")
 	q := fmt.Sprintf(`SELECT version_id, is_applied from %s ORDER BY id DESC`, t.Tablename())
 	rows, err := db.QueryContext(ctx, q)
 	if err != nil {

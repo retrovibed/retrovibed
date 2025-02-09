@@ -142,7 +142,7 @@ github.com/hashicorp/go-multierror
 # github.com/huandu/xstrings v1.5.0
 ## explicit; go 1.12
 github.com/huandu/xstrings
-# github.com/james-lawrence/torrent v0.0.0-20250209211048-6d357b84bfbb
+# github.com/james-lawrence/torrent v0.0.0-20250209211415-ad6fb0f3c1f6
 ## explicit; go 1.23
 github.com/james-lawrence/torrent
 github.com/james-lawrence/torrent/bencode
