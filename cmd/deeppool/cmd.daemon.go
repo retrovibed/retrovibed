@@ -20,6 +20,7 @@ import (
 	_ "github.com/marcboeker/go-duckdb"
 
 	"github.com/james-lawrence/torrent"
+	"github.com/james-lawrence/torrent/bep0051"
 )
 
 //go:embed .migrations/*.sql
@@ -54,7 +55,7 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global) (err error) {
 	}
 
 	tm := dht.DefaultMuxer().
-		Method("", nil)
+		Method(bep0051.Query, bep0051.NewEndpoint(bep0051.EmptySampler{}))
 	tclient, err := tnetwork.Bind(
 		torrent.NewClient(
 			torrent.NewDefaultClientConfig(
