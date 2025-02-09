@@ -66,7 +66,7 @@ require (
 	github.com/google/pprof v0.0.0-20241029153458-d1b30febd7db // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
-	github.com/james-lawrence/torrent v0.0.0-20250209131607-790616dbaace
+	github.com/james-lawrence/torrent v0.0.0-20250209132512-1e999d1d2044
 	github.com/marcboeker/go-duckdb v1.8.3
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/posener/complete v1.2.3 // indirect
