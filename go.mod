@@ -18,14 +18,13 @@ require (
 
 require (
 	github.com/RoaringBitmap/roaring v1.9.4 // indirect
-	github.com/alecthomas/atomic v0.1.0-alpha2 // indirect
 	github.com/anacrolix/generics v0.0.2 // indirect
 	github.com/anacrolix/log v0.16.0 // indirect
 	github.com/anacrolix/missinggo v1.3.0 // indirect
 	github.com/anacrolix/missinggo/perf v1.0.0 // indirect
 	github.com/anacrolix/missinggo/v2 v2.8.0 // indirect
 	github.com/anacrolix/multiless v0.4.0 // indirect
-	github.com/anacrolix/stm v0.5.0 // indirect
+	github.com/anacrolix/stm v0.2.0 // indirect
 	github.com/anacrolix/sync v0.5.3 // indirect
 	github.com/anacrolix/upnp v0.1.4 // indirect
 	github.com/apache/arrow-go/v18 v18.0.0 // indirect

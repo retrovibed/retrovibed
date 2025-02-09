@@ -1,7 +1,6 @@
 # stm
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/anacrolix/stm.svg)](https://pkg.go.dev/github.com/anacrolix/stm)
-[![Go Report Card](https://goreportcard.com/badge/github.com/anacrolix/stm)](https://goreportcard.com/report/github.com/anacrolix/stm)
+[![GoDoc](https://godoc.org/github.com/anacrolix/stm?status.svg)](https://godoc.org/github.com/anacrolix/stm) [![Go Report Card](https://goreportcard.com/badge/github.com/anacrolix/stm)](https://goreportcard.com/report/github.com/anacrolix/stm)
 
 Package `stm` provides [Software Transactional Memory](https://en.wikipedia.org/wiki/Software_transactional_memory) operations for Go. This is
 an alternative to the standard way of writing concurrent code (channels and
@@ -12,9 +11,13 @@ composition will either deadlock or release the lock between functions (making
 it non-atomic).
 
 The `stm` API tries to mimic that of Haskell's [`Control.Concurrent.STM`](https://hackage.haskell.org/package/stm-2.4.4.1/docs/Control-Concurrent-STM.html), but
-Haskell can enforce at compile time that STM variables are not modified outside
-the STM monad. This is not possible in Go, so be especially careful when using
-pointers in your STM code. Remember: modifying a pointer is a side effect!
+this is not entirely possible due to Go's type system; we are forced to use
+`interface{}` and type assertions. Furthermore, Haskell can enforce at compile
+time that STM variables are not modified outside the STM monad. This is not
+possible in Go, so be especially careful when using pointers in your STM code.
+Another significant departure is that `stm.Atomically` does not return a value.
+This shortens transaction code a bit, but I'm not 100% it's the right decision.
+(The alternative would be for every transaction function to return an `interface{}`.)
 
 Unlike Haskell, data in Go is not immutable by default, which means you have
 to be careful when using STM to manage pointers. If two goroutines have access
@@ -24,28 +27,96 @@ this, either use immutable data structures, or replace pointers with STM
 variables. A more concrete example is given below.
 
 It remains to be seen whether this style of concurrency has practical
-applications in Go. If you find this package useful, please tell us about it!
+applications in Go. If you find this package useful, please tell me about it!
 
 ## Examples
 
-See the package examples in the Go package docs for examples of common operations.
+Here's some example code that demonstrates how to perform common operations:
 
-See [cmd/santa-example/main.go](cmd/santa-example/main.go) for a more complex example.
+```go
+// create a shared variable
+n := stm.NewVar(3)
+
+// read a variable
+var v int
+stm.Atomically(func(tx *stm.Tx) {
+	v = tx.Get(n).(int)
+})
+// or:
+v = stm.AtomicGet(n).(int)
+
+// write to a variable
+stm.Atomically(func(tx *stm.Tx) {
+	tx.Set(n, 12)
+})
+// or:
+stm.AtomicSet(n, 12)
+
+// update a variable
+stm.Atomically(func(tx *stm.Tx) {
+	cur := tx.Get(n).(int)
+	tx.Set(n, cur-1)
+})
+
+// block until a condition is met
+stm.Atomically(func(tx *stm.Tx) {
+	cur := tx.Get(n).(int)
+	if cur != 0 {
+		tx.Retry()
+	}
+	tx.Set(n, 10)
+})
+// or:
+stm.Atomically(func(tx *stm.Tx) {
+	cur := tx.Get(n).(int)
+	tx.Assert(cur == 0)
+	tx.Set(n, 10)
+})
+
+// select among multiple (potentially blocking) transactions
+stm.Atomically(stm.Select(
+	// this function blocks forever, so it will be skipped
+	func(tx *stm.Tx) { tx.Retry() },
+
+	// this function will always succeed without blocking
+	func(tx *stm.Tx) { tx.Set(n, 10) },
+
+	// this function will never run, because the previous
+	// function succeeded
+	func(tx *stm.Tx) { tx.Set(n, 11) },
+))
+
+// since Select is a normal transaction, if the entire select retries
+// (blocks), it will be retried as a whole:
+x := 0
+stm.Atomically(stm.Select(
+	// this function will run twice, and succeed the second time
+	func(tx *stm.Tx) { tx.Assert(x == 1) },
+
+	// this function will run once
+	func(tx *stm.Tx) {
+		x = 1
+		tx.Retry()
+	},
+))
+// But wait! Transactions are only retried when one of the Vars they read is
+// updated. Since x isn't a stm Var, this code will actually block forever --
+// but you get the idea.
+```
+
+See [example_santa_test.go](example_santa_test.go) for a more complex example.
 
 ## Pointers
-
-Note that `Operation` now returns a value of type `any`, which isn't included in the
-examples throughout the documentation yet. See the type signatures for `Atomically` and `Operation`.
 
 Be very careful when managing pointers inside transactions! (This includes
 slices, maps, channels, and captured variables.) Here's why:
 
 ```go
-p := stm.NewVar[[]byte]([]byte{1,2,3})
+p := stm.NewVar([]byte{1,2,3})
 stm.Atomically(func(tx *stm.Tx) {
-	b := p.Get(tx)
+	b := tx.Get(p).([]byte)
 	b[0] = 7
-	stm.p.Set(tx, b)
+	tx.Set(p, b)
 })
 ```
 
@@ -56,11 +127,11 @@ Following this advice, we can rewrite the transaction to perform a copy:
 
 ```go
 stm.Atomically(func(tx *stm.Tx) {
-	b := p.Get(tx)
+	b := tx.Get(p).([]byte)
 	c := make([]byte, len(b))
 	copy(c, b)
 	c[0] = 7
-	p.Set(tx, c)
+	tx.Set(p, c)
 })
 ```
 
@@ -72,11 +143,11 @@ In the same vein, it would be a mistake to do this:
 type foo struct {
 	i int
 }
-p := stm.NewVar[*foo](&foo{i: 2})
+p := stm.NewVar(&foo{i: 2})
 stm.Atomically(func(tx *stm.Tx) {
-	f := p.Get(tx)
+	f := tx.Get(p).(*foo)
 	f.i = 7
-	stm.p.Set(tx, f)
+	tx.Set(p, f)
 })
 ```
 
@@ -87,11 +158,11 @@ the correct approach is to move the `Var` inside the struct:
 type foo struct {
 	i *stm.Var
 }
-f := foo{i: stm.NewVar[int](2)}
+f := foo{i: stm.NewVar(2)}
 stm.Atomically(func(tx *stm.Tx) {
-	i := f.i.Get(tx)
+	i := tx.Get(f.i).(int)
 	i = 7
-	f.i.Set(tx, i)
+	tx.Set(f.i, i)
 })
 ```
 
@@ -119,5 +190,4 @@ BenchmarkReadVarChannel-4  	   10000	    240086 ns/op
 
 ## Credits
 
-Package stm was [originally](https://github.com/lukechampine/stm/issues/3#issuecomment-549087541)
-created by lukechampine.
+Package stm was [originally](https://github.com/lukechampine/stm/issues/3#issuecomment-549087541) created by lukechampine.

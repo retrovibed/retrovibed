@@ -3,154 +3,142 @@ package stmutil
 import (
 	"unsafe"
 
-	"github.com/anacrolix/missinggo/v2/iter"
 	"github.com/benbjohnson/immutable"
+
+	"github.com/anacrolix/missinggo/v2/iter"
 )
 
-// This is the type constraint for keys passed through from github.com/benbjohnson/immutable.
-type KeyConstraint interface {
-	comparable
-}
-
-type Settish[K KeyConstraint] interface {
-	Add(K) Settish[K]
-	Delete(K) Settish[K]
-	Contains(K) bool
-	Range(func(K) bool)
+type Settish interface {
+	Add(interface{}) Settish
+	Delete(interface{}) Settish
+	Contains(interface{}) bool
+	Range(func(interface{}) bool)
 	iter.Iterable
 	Len() int
 }
 
-type mapToSet[K KeyConstraint] struct {
-	m Mappish[K, struct{}]
+type mapToSet struct {
+	m Mappish
 }
 
-type interhash[K KeyConstraint] struct{}
+type interhash struct{}
 
-func (interhash[K]) Hash(x K) uint32 {
+func (interhash) Hash(x interface{}) uint32 {
 	return uint32(nilinterhash(unsafe.Pointer(&x), 0))
 }
 
-func (interhash[K]) Equal(i, j K) bool {
+func (interhash) Equal(i, j interface{}) bool {
 	return i == j
 }
 
-func NewSet[K KeyConstraint]() Settish[K] {
-	return mapToSet[K]{NewMap[K, struct{}]()}
+func NewSet() Settish {
+	return mapToSet{NewMap()}
 }
 
-func NewSortedSet[K KeyConstraint](lesser lessFunc[K]) Settish[K] {
-	return mapToSet[K]{NewSortedMap[K, struct{}](lesser)}
+func NewSortedSet(lesser lessFunc) Settish {
+	return mapToSet{NewSortedMap(lesser)}
 }
 
-func (s mapToSet[K]) Add(x K) Settish[K] {
-	s.m = s.m.Set(x, struct{}{})
+func (s mapToSet) Add(x interface{}) Settish {
+	s.m = s.m.Set(x, nil)
 	return s
 }
 
-func (s mapToSet[K]) Delete(x K) Settish[K] {
+func (s mapToSet) Delete(x interface{}) Settish {
 	s.m = s.m.Delete(x)
 	return s
 }
 
-func (s mapToSet[K]) Len() int {
+func (s mapToSet) Len() int {
 	return s.m.Len()
 }
 
-func (s mapToSet[K]) Contains(x K) bool {
+func (s mapToSet) Contains(x interface{}) bool {
 	_, ok := s.m.Get(x)
 	return ok
 }
 
-func (s mapToSet[K]) Range(f func(K) bool) {
-	s.m.Range(func(k K, _ struct{}) bool {
+func (s mapToSet) Range(f func(interface{}) bool) {
+	s.m.Range(func(k, _ interface{}) bool {
 		return f(k)
 	})
 }
 
-func (s mapToSet[K]) Iter(cb iter.Callback) {
-	s.Range(func(k K) bool {
-		return cb(k)
-	})
+func (s mapToSet) Iter(cb iter.Callback) {
+	s.Range(cb)
 }
 
-type Map[K KeyConstraint, V any] struct {
-	*immutable.Map[K, V]
+type Map struct {
+	*immutable.Map
 }
 
-func NewMap[K KeyConstraint, V any]() Mappish[K, V] {
-	return Map[K, V]{immutable.NewMap[K, V](interhash[K]{})}
+func NewMap() Mappish {
+	return Map{immutable.NewMap(interhash{})}
 }
 
-func (m Map[K, V]) Delete(x K) Mappish[K, V] {
+var _ Mappish = Map{}
+
+func (m Map) Delete(x interface{}) Mappish {
 	m.Map = m.Map.Delete(x)
 	return m
 }
 
-func (m Map[K, V]) Set(key K, value V) Mappish[K, V] {
+func (m Map) Set(key, value interface{}) Mappish {
 	m.Map = m.Map.Set(key, value)
 	return m
 }
 
-func (sm Map[K, V]) Range(f func(K, V) bool) {
+func (sm Map) Range(f func(key, value interface{}) bool) {
 	iter := sm.Map.Iterator()
-	for {
-		k, v, ok := iter.Next()
-		if !ok {
-			break
-		}
-		if !f(k, v) {
+	for !iter.Done() {
+		if !f(iter.Next()) {
 			return
 		}
 	}
 }
 
-func (sm Map[K, V]) Iter(cb iter.Callback) {
-	sm.Range(func(key K, _ V) bool {
+func (sm Map) Iter(cb iter.Callback) {
+	sm.Range(func(key, _ interface{}) bool {
 		return cb(key)
 	})
 }
 
-type SortedMap[K KeyConstraint, V any] struct {
-	*immutable.SortedMap[K, V]
+type SortedMap struct {
+	*immutable.SortedMap
 }
 
-func (sm SortedMap[K, V]) Set(key K, value V) Mappish[K, V] {
+func (sm SortedMap) Set(key, value interface{}) Mappish {
 	sm.SortedMap = sm.SortedMap.Set(key, value)
 	return sm
 }
 
-func (sm SortedMap[K, V]) Delete(key K) Mappish[K, V] {
+func (sm SortedMap) Delete(key interface{}) Mappish {
 	sm.SortedMap = sm.SortedMap.Delete(key)
 	return sm
 }
 
-func (sm SortedMap[K, V]) Range(f func(key K, value V) bool) {
+func (sm SortedMap) Range(f func(key, value interface{}) bool) {
 	iter := sm.SortedMap.Iterator()
-	for {
-		k, v, ok := iter.Next()
-		if !ok {
-			break
-		}
-		if !f(k, v) {
+	for !iter.Done() {
+		if !f(iter.Next()) {
 			return
 		}
 	}
 }
 
-func (sm SortedMap[K, V]) Iter(cb iter.Callback) {
-	sm.Range(func(key K, _ V) bool {
+func (sm SortedMap) Iter(cb iter.Callback) {
+	sm.Range(func(key, _ interface{}) bool {
 		return cb(key)
 	})
 }
 
-type lessFunc[T KeyConstraint] func(l, r T) bool
+type lessFunc func(l, r interface{}) bool
 
-type comparer[K KeyConstraint] struct {
-	less lessFunc[K]
+type comparer struct {
+	less lessFunc
 }
 
-func (me comparer[K]) Compare(i, j K) int {
+func (me comparer) Compare(i, j interface{}) int {
 	if me.less(i, j) {
 		return -1
 	} else if me.less(j, i) {
@@ -160,22 +148,22 @@ func (me comparer[K]) Compare(i, j K) int {
 	}
 }
 
-func NewSortedMap[K KeyConstraint, V any](less lessFunc[K]) Mappish[K, V] {
-	return SortedMap[K, V]{
-		SortedMap: immutable.NewSortedMap[K, V](comparer[K]{less}),
+func NewSortedMap(less lessFunc) Mappish {
+	return SortedMap{
+		SortedMap: immutable.NewSortedMap(comparer{less}),
 	}
 }
 
-type Mappish[K, V any] interface {
-	Set(K, V) Mappish[K, V]
-	Delete(key K) Mappish[K, V]
-	Get(key K) (V, bool)
-	Range(func(K, V) bool)
+type Mappish interface {
+	Set(key, value interface{}) Mappish
+	Delete(key interface{}) Mappish
+	Get(key interface{}) (interface{}, bool)
+	Range(func(_, _ interface{}) bool)
 	Len() int
 	iter.Iterable
 }
 
-func GetLeft(l, _ any) any {
+func GetLeft(l, _ interface{}) interface{} {
 	return l
 }
 
@@ -183,10 +171,12 @@ func GetLeft(l, _ any) any {
 //go:linkname nilinterhash runtime.nilinterhash
 func nilinterhash(p unsafe.Pointer, h uintptr) uintptr
 
-func interfaceHash(x any) uint32 {
+func interfaceHash(x interface{}) uint32 {
 	return uint32(nilinterhash(unsafe.Pointer(&x), 0))
 }
 
 type Lenner interface {
 	Len() int
 }
+
+type List = *immutable.List
