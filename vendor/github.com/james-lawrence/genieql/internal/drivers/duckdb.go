@@ -9,6 +9,7 @@ const DuckDB = "github.com/marcboeker/go-duckdb"
 
 // implements the duckdb driver https://github.com/marcboeker/go-duckdb
 func init() {
+	// genieql.DebugColumnDefinitions(ddb...)
 	errorsx.MaybePanic(genieql.RegisterDriver(DuckDB, NewDriver(DuckDB, ddb...)))
 }
 
@@ -40,7 +41,7 @@ const ddbEncodeUUID = `func() {
 var ddb = []genieql.ColumnDefinition{
 	{
 		DBTypeName: "VARCHAR",
-		Type:       "sql.NullString",
+		Type:       "VARCHAR",
 		ColumnType: "sql.NullString",
 		Native:     stringExprString,
 		Decode:     StdlibDecodeString,
@@ -48,7 +49,7 @@ var ddb = []genieql.ColumnDefinition{
 	},
 	{
 		DBTypeName: "BOOLEAN",
-		Type:       "sql.NullBool",
+		Type:       "BOOLEAN",
 		ColumnType: "sql.NullBool",
 		Native:     boolExprString,
 		Decode:     StdlibDecodeBool,
@@ -56,7 +57,7 @@ var ddb = []genieql.ColumnDefinition{
 	},
 	{
 		DBTypeName: "BIGINT",
-		Type:       "sql.NullInt64",
+		Type:       "BIGINT",
 		ColumnType: "sql.NullInt64",
 		Native:     int64ExprString,
 		Decode:     StdlibDecodeInt64,
@@ -64,15 +65,24 @@ var ddb = []genieql.ColumnDefinition{
 	},
 	{
 		DBTypeName: "INTEGER",
-		Type:       "sql.NullInt32",
+		Type:       "INTEGER",
 		ColumnType: "sql.NullInt32",
 		Native:     int32ExprString,
 		Decode:     StdlibDecodeInt32,
 		Encode:     StdlibEncodeInt32,
 	},
 	{
+		DBTypeName: "UINTEGER",
+		Type:       "UINTEGER",
+		ColumnType: "sql.NullInt64",
+		Native:     uint64ExpreString,
+		Decode:     StdlibDecodeInt64,
+		Encode:     StdlibEncodeInt64,
+	},
+
+	{
 		DBTypeName: "SMALLINT",
-		Type:       "sql.NullInt16",
+		Type:       "SMALLINT",
 		ColumnType: "sql.NullInt16",
 		Native:     int16ExprString,
 		Decode:     StdlibDecodeInt16,
@@ -80,7 +90,7 @@ var ddb = []genieql.ColumnDefinition{
 	},
 	{
 		DBTypeName: "FLOAT",
-		Type:       "sql.NullFloat64",
+		Type:       "FLOAT",
 		ColumnType: "sql.NullFloat64",
 		Native:     float64ExprString,
 		Decode:     StdlibDecodeFloat64,
@@ -96,7 +106,7 @@ var ddb = []genieql.ColumnDefinition{
 	},
 	{
 		DBTypeName: "TIMESTAMPZ",
-		Type:       "sql.NullTime",
+		Type:       "TIMESTAMPZ",
 		ColumnType: "sql.NullTime",
 		Native:     timeExprString,
 		Decode:     StdlibDecodeTime,

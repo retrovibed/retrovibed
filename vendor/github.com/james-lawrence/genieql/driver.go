@@ -112,6 +112,12 @@ func (t driverRegistry) LookupDriver(name string) (Driver, error) {
 	return impl, nil
 }
 
+func DebugColumnDefinitions(supported ...ColumnDefinition) {
+	for _, typedef := range supported {
+		log.Println("column definition debug", typedef.Type, typedef.DBTypeName)
+	}
+}
+
 // NewDriver builds a new driver from the component parts
 func NewDriver(path string, supported ...ColumnDefinition) Driver {
 	mapped := make(map[string]ColumnDefinition, len(supported))
@@ -135,7 +141,7 @@ func (t driver) LookupType(l string) (ColumnDefinition, error) {
 		return typedef, nil
 	}
 
-	return ColumnDefinition{}, errors.Errorf("unsupported type: %s", l)
+	return ColumnDefinition{}, errors.Errorf("%s - unsupported type: %s", t.importPath, l)
 }
 
 func (t *driver) AddColumnDefinitions(supported ...ColumnDefinition) {

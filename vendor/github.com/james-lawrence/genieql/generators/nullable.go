@@ -19,7 +19,7 @@ func composeTypeDefinitionsExpr(definitions ...tdRegistry) genieql.LookupTypeDef
 			}
 		}
 
-		return d, errors.Errorf("failed to locate type information for %s", types.ExprString(e))
+		return d, errors.Errorf("failed to locate type information for expr %s", types.ExprString(e))
 	}
 }
 

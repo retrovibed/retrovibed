@@ -16,6 +16,7 @@ const (
 	int16ExprString   = "int16"
 	int32ExprString   = "int32"
 	int64ExprString   = "int64"
+	uint64ExpreString = "uint64"
 	stringExprString  = "string"
 	stringArrExpr     = "[]string"
 	float32ExprString = "float32"

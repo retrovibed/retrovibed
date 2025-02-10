@@ -164,10 +164,12 @@ func ConfigurationOptionRowType(rt string) ConfigurationOption {
 func ConfigurationOptionDatabase(uri *url.URL) ConfigurationOption {
 	return func(c *Configuration) (err error) {
 		var (
-			host  string
-			sport string
-			port  int
+			host     string
+			sport    string
+			port     int
+			database string
 		)
+
 		splits := strings.Split(uri.Host, ":")
 		switch len(splits) {
 		case 2:
@@ -180,11 +182,18 @@ func ConfigurationOptionDatabase(uri *url.URL) ConfigurationOption {
 			host = uri.Host
 		}
 
+		switch uri.Scheme {
+		case "duckdb":
+			database = filepath.Join(ConfigurationDirectory(), ".duckdb", uri.Path)
+		default:
+			database = strings.Trim(uri.Path, "/")
+		}
+
 		c.ConnectionURL = uri.String()
 		c.Dialect = uri.Scheme
 		c.Host = host
 		c.Port = port
-		c.Database = strings.Trim(uri.Path, "/")
+		c.Database = database
 		c.Username = uri.User.Username()
 		c.Password, _ = uri.User.Password()
 		return nil

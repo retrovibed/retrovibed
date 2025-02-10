@@ -223,7 +223,7 @@ func WriteMapper(config Configuration, name string, m MappingConfig) error {
 		return err
 	}
 
-	path := filepath.Join(config.Location, config.Database, m.Package.Name, m.Type, name)
+	path := filepath.Join(config.Location, filepath.Base(config.Database), m.Package.Name, m.Type, name)
 	if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
 		return err
 	}
@@ -251,7 +251,7 @@ func ReadMapper(config Configuration, name string, m *MappingConfig) error {
 		err error
 	)
 
-	path := filepath.Join(config.Location, config.Database, m.Package.Name, m.Type, name)
+	path := filepath.Join(config.Location, filepath.Base(config.Database), m.Package.Name, m.Type, name)
 	raw, err := os.ReadFile(path)
 	if err != nil {
 		return err

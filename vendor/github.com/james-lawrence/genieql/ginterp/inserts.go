@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"go/types"
 	"io"
+	"log"
 
 	"github.com/james-lawrence/genieql"
 	"github.com/james-lawrence/genieql/astcodec"
@@ -201,6 +202,7 @@ func (t *insert) Generate(dst io.Writer) (err error) {
 		cset.ColumnInfo(),
 	)
 
+	log.Println("GENERATING EXPLODE FUNCTION")
 	g2 := generators.NewExploderFunction(
 		t.ctx,
 		astutil.Field(ast.NewIdent(types.ExprString(t.tf.Type)), t.tf.Names...),

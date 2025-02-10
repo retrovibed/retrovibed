@@ -84,6 +84,14 @@ func Must[T any](v T, err error) T {
 	return v
 }
 
+func Zero[T any](v T, err error) (zero T) {
+	if err != nil {
+		return zero
+	}
+
+	return v
+}
+
 // MaybePanic panic when error is seen.
 func MaybePanic(err error) {
 	if err == nil {
