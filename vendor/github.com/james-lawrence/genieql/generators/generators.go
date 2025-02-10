@@ -16,6 +16,7 @@ import (
 	"github.com/james-lawrence/genieql/astcodec"
 	"github.com/james-lawrence/genieql/astutil"
 	"github.com/james-lawrence/genieql/dialects"
+	"github.com/james-lawrence/genieql/internal/drivers"
 	"github.com/james-lawrence/genieql/internal/errorsx"
 	"github.com/james-lawrence/genieql/internal/md5x"
 	"github.com/james-lawrence/genieql/internal/userx"
@@ -260,13 +261,14 @@ func NewContextFromConfig(bctx build.Context, config genieql.Configuration, pkg 
 }
 
 func ColumnMapFromFields(ctx Context, inputs ...*ast.Field) (rcmaps []genieql.ColumnMap, err error) {
+	typedefs := composeTypeDefinitions(ctx.Driver.LookupType, drivers.DefaultTypeDefinitions)
 	for _, input := range inputs {
 		for _, name := range input.Names {
 			var (
 				cmaps []genieql.ColumnMap
 			)
 
-			if cd, err := ctx.Driver.LookupType(types.ExprString(input.Type)); err == nil {
+			if cd, err := typedefs(types.ExprString(input.Type)); err == nil {
 				rcmaps = append(rcmaps, genieql.ColumnMap{
 					ColumnInfo: genieql.ColumnInfo{
 						Definition: cd,
