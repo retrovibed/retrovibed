@@ -9,7 +9,7 @@ require (
 	github.com/anacrolix/stm v0.2.0
 	github.com/anacrolix/utp v0.2.0
 	github.com/gofrs/uuid v4.4.0+incompatible
-	github.com/james-lawrence/genieql v0.0.0-20250212202458-7ef67a48c9bc
+	github.com/james-lawrence/genieql v0.0.0-20250212211814-db1c51fb27e5
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/mattn/go-isatty v0.0.20
 	github.com/onsi/ginkgo/v2 v2.22.2

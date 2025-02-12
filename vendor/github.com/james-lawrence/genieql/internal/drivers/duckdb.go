@@ -75,11 +75,18 @@ var ddb = []genieql.ColumnDefinition{
 		DBTypeName: "UINTEGER",
 		Type:       "UINTEGER",
 		ColumnType: "sql.NullInt64",
-		Native:     uint64ExpreString,
+		Native:     uint32ExprString,
 		Decode:     StdlibDecodeInt64,
 		Encode:     StdlibEncodeInt64,
 	},
-
+	{
+		DBTypeName: "UBIGINT",
+		Type:       "UBIGINT",
+		ColumnType: "sql.NullInt64",
+		Native:     uint64ExprString,
+		Decode:     StdlibDecodeInt64,
+		Encode:     StdlibEncodeInt64,
+	},
 	{
 		DBTypeName: "SMALLINT",
 		Type:       "SMALLINT",
@@ -87,6 +94,14 @@ var ddb = []genieql.ColumnDefinition{
 		Native:     int16ExprString,
 		Decode:     StdlibDecodeInt16,
 		Encode:     StdlibEncodeInt16,
+	},
+	{
+		DBTypeName: "USMALLINT",
+		Type:       "USMALLINT",
+		ColumnType: "sql.NullInt32",
+		Native:     uint16ExprString,
+		Decode:     StdlibDecodeInt32,
+		Encode:     StdlibEncodeInt32,
 	},
 	{
 		DBTypeName: "FLOAT",

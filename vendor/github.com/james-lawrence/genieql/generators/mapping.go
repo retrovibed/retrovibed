@@ -4,7 +4,6 @@ import (
 	"go/ast"
 	"go/build"
 	"go/types"
-	"log"
 
 	"github.com/james-lawrence/genieql"
 	"github.com/james-lawrence/genieql/astcodec"
@@ -94,11 +93,9 @@ func MapFields(ctx Context, params []*ast.Field, ignoreSet ...string) ([]genieql
 func MapField(ctx Context, param *ast.Field, ignoreSet ...string) ([]genieql.ColumnMap, error) {
 	x := removeEllipsis(param.Type)
 	if builtinType(x) {
-		log.Println("builtin")
 		return builtinParam(ctx, param)
 	}
 
-	log.Println("mapped")
 	return mapParam(ctx, param, ignoreSet...)
 }
 
