@@ -48,3 +48,21 @@ func MetadataFindByID(
 ) {
 	gql = gql.Query(`SELECT ` + MetadataScannerStaticColumns + ` FROM torrents_metadata WHERE "id" = {id}`)
 }
+
+//easyjson:json
+func Peer(gql genieql.Structure) {
+	gql.From(
+		gql.Table("torrents_peers"),
+	)
+}
+
+func PeerScanner(gql genieql.Scanner, pattern func(i Peer)) {
+	gql.ColumnNamePrefix("torrents_peers.")
+}
+
+func PeerInsertWithDefaults(
+	gql genieql.Insert,
+	pattern func(ctx context.Context, q sqlx.Queryer, a Peer) NewPeerScannerStaticRow,
+) {
+	gql.Into("torrents_peers").Default("created_at", "updated_at", "next_check").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, ip = EXCLUDED.ip")
+}

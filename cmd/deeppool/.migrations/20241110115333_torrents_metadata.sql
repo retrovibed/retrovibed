@@ -1,10 +1,10 @@
 -- +goose Up
 -- +goose StatementBegin
 CREATE TABLE torrents_metadata (
-    id UUID NOT NULL,
+    id UUID PRIMARY KEY NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    bytes UINTEGER NOT NULL,
+    bytes UBIGINT NOT NULL,
     description STRING NOT NULL DEFAULT '',
     infohash STRING NOT NULL,
     

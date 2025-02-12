@@ -1,12 +1,17 @@
 -- +goose Up
 -- +goose StatementBegin
+INSTALL inet;
+LOAD inet;
+
 CREATE TABLE torrents_peers (
-    id UUID NOT NULL DEFAULT gen_random_uuid(),
+    id UUID PRIMARY KEY NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    next_check TIMESTAMPTZ NOT NULL DEFAULT '-infinity',
+    ip INET NOT NULL,
+    port USMALLINT NOT NULL,
     bep51 boolean NOT NULL DEFAULT false,
-    bep51_next_available TIMESTAMPTZ NOT NULL DEFAULT 'infinity',
-    bep51_available UINTEGER NOT NULL DEFAULT 0,
+    bep51_available UBIGINT NOT NULL DEFAULT 0,
 );
 -- +goose StatementEnd
 

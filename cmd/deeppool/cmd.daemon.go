@@ -109,19 +109,21 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global) (err error) {
 				continue
 			}
 
-			log.Println("retrieving info initiated", id.HexString())
-			info, err := tclient.Info(ctx.Context, metadata)
-			if err != nil {
-				log.Println("unable retrieve info from metadata, skipping", id.HexString(), err)
-				continue
-			}
-			log.Println("retrieving info completed", id.HexString(), info.Name, info.Length, info.TotalLength())
+			go func() {
+				log.Println("retrieving info initiated", id.HexString())
+				info, err := tclient.Info(ctx.Context, metadata)
+				if err != nil {
+					log.Println("unable retrieve info from metadata, skipping", id.HexString(), err)
+					return
+				}
+				log.Println("retrieving info completed", id.HexString(), info.Name, info.Length, info.TotalLength())
 
-			var md tracking.Metadata
-			if err = tracking.MetadataInsertWithDefaults(ctx.Context, db, tracking.NewMetadata(&metadata.InfoHash, tracking.MetadataOptionFromInfo(info))).Scan(&md); err != nil {
-				log.Println("unable to record metadata", err)
-				continue
-			}
+				var md tracking.Metadata
+				if err = tracking.MetadataInsertWithDefaults(ctx.Context, db, tracking.NewMetadata(&metadata.InfoHash, tracking.MetadataOptionFromInfo(info))).Scan(&md); err != nil {
+					log.Println("unable to record metadata", err)
+					return
+				}
+			}()
 		}
 	}()
 
@@ -130,7 +132,7 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global) (err error) {
 }
 
 // randomly samples nodes from the dht.
-func Auto(ctx context.Context, s *dht.Server) iter.Seq2[metainfo.Hash, error] {
+func Auto(ctx context.Context, db *sql.DB, s *dht.Server) iter.Seq2[metainfo.Hash, error] {
 	return func(yield func(metainfo.Hash, error) bool) {
 		var (
 			err error
@@ -170,9 +172,11 @@ func Auto(ctx context.Context, s *dht.Server) iter.Seq2[metainfo.Hash, error] {
 					continue
 				}
 
+				tracking.PeerInsertWithDefaults(ctx, db)
+				// track peers with large libraries.
+				log.Println("interesting peer", resp.R.ID, resp.Y, resp.R.Interval, resp.R.Available)
+
 				for id := range slices.Chunk(resp.R.Sample, 20) {
-					// track peers with large libraries.
-					log.Println("interesting peer", resp.R.ID, resp.Y, resp.R.Interval, resp.R.Available)
 					if !yield(metainfo.Hash(id), nil) {
 						return
 					}
