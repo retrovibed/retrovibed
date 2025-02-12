@@ -21,6 +21,7 @@ import (
 	"github.com/james-lawrence/deeppool/internal/x/slicesx"
 	"github.com/james-lawrence/deeppool/internal/x/torrentx"
 	"github.com/james-lawrence/deeppool/internal/x/userx"
+	"github.com/james-lawrence/deeppool/tracking"
 	"github.com/james-lawrence/torrent/bencode"
 	"github.com/james-lawrence/torrent/dht/v2"
 	"github.com/james-lawrence/torrent/metainfo"
@@ -115,6 +116,12 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global) (err error) {
 				continue
 			}
 			log.Println("retrieving info completed", id.HexString(), info.Name, info.Length, info.TotalLength())
+
+			var md tracking.Metadata
+			if err = tracking.MetadataInsertWithDefaults(ctx.Context, db, tracking.NewMetadata(&metadata.InfoHash, tracking.MetadataOptionFromInfo(info))).Scan(&md); err != nil {
+				log.Println("unable to record metadata", err)
+				continue
+			}
 		}
 	}()
 
