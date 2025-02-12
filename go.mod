@@ -5,16 +5,16 @@ go 1.23.2
 toolchain go1.23.5
 
 require (
-	github.com/alecthomas/kong v1.3.0
+	github.com/alecthomas/kong v1.8.0
 	github.com/anacrolix/stm v0.2.0
 	github.com/anacrolix/utp v0.2.0
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/james-lawrence/genieql v0.0.0-20250210202817-fcb3ec8a504a
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/mattn/go-isatty v0.0.20
-	github.com/onsi/ginkgo/v2 v2.22.0
-	github.com/onsi/gomega v1.35.1
-	github.com/pressly/goose/v3 v3.23.0
+	github.com/onsi/ginkgo/v2 v2.22.2
+	github.com/onsi/gomega v1.36.2
+	github.com/pressly/goose/v3 v3.24.1
 	github.com/stretchr/testify v1.10.0
 	github.com/willabides/kongplete v0.4.0
 )
@@ -74,7 +74,7 @@ require (
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
-	github.com/google/pprof v0.0.0-20241101162523-b92577c0c142 // indirect
+	github.com/google/pprof v0.0.0-20241210010833-40e02aabc2ad // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/james-lawrence/torrent v0.0.0-20250209211415-ad6fb0f3c1f6

@@ -102,7 +102,7 @@ func Trace(k *Kong, args []string) (*Context, error) {
 }
 
 // Bind adds bindings to the Context.
-func (c *Context) Bind(args ...interface{}) {
+func (c *Context) Bind(args ...any) {
 	c.bindings.add(args...)
 }
 
@@ -111,7 +111,7 @@ func (c *Context) Bind(args ...interface{}) {
 // This will typically have to be called like so:
 //
 //	BindTo(impl, (*MyInterface)(nil))
-func (c *Context) BindTo(impl, iface interface{}) {
+func (c *Context) BindTo(impl, iface any) {
 	c.bindings.addTo(impl, iface)
 }
 
@@ -119,7 +119,10 @@ func (c *Context) BindTo(impl, iface interface{}) {
 //
 // This is useful when the Run() function of different commands require different values that may
 // not all be initialisable from the main() function.
-func (c *Context) BindToProvider(provider interface{}) error {
+//
+// "provider" must be a function with the signature func(...) (T, error) or func(...) T, where
+// ... will be recursively injected with bound values.
+func (c *Context) BindToProvider(provider any) error {
 	return c.bindings.addProvider(provider)
 }
 
@@ -208,7 +211,7 @@ func (c *Context) Validate() error { //nolint: gocyclo
 			desc = node.Path()
 		}
 		if validate := isValidatable(value); validate != nil {
-			if err := validate.Validate(); err != nil {
+			if err := validate.Validate(c); err != nil {
 				if desc != "" {
 					return fmt.Errorf("%s: %w", desc, err)
 				}
@@ -306,7 +309,7 @@ func (c *Context) AddResolver(resolver Resolver) {
 }
 
 // FlagValue returns the set value of a flag if it was encountered and exists, or its default value.
-func (c *Context) FlagValue(flag *Flag) interface{} {
+func (c *Context) FlagValue(flag *Flag) any {
 	for _, trace := range c.Path {
 		if trace.Flag == flag {
 			v, ok := c.values[trace.Flag.Value]
@@ -347,6 +350,7 @@ func (c *Context) endParsing() {
 	}
 }
 
+//nolint:maintidx
 func (c *Context) trace(node *Node) (err error) { //nolint: gocyclo
 	positional := 0
 	node.Active = true
@@ -424,7 +428,7 @@ func (c *Context) trace(node *Node) (err error) { //nolint: gocyclo
 
 		case FlagToken:
 			if err := c.parseFlag(flags, token.String()); err != nil {
-				if isUnknownFlagError(err) && positional < len(node.Positional) && node.Positional[positional].Passthrough {
+				if isUnknownFlagError(err) && positional < len(node.Positional) && node.Positional[positional].PassthroughMode == PassThroughModeAll {
 					c.scan.Pop()
 					c.scan.PushTyped(token.String(), PositionalArgumentToken)
 				} else {
@@ -434,7 +438,7 @@ func (c *Context) trace(node *Node) (err error) { //nolint: gocyclo
 
 		case ShortFlagToken:
 			if err := c.parseFlag(flags, token.String()); err != nil {
-				if isUnknownFlagError(err) && positional < len(node.Positional) && node.Positional[positional].Passthrough {
+				if isUnknownFlagError(err) && positional < len(node.Positional) && node.Positional[positional].PassthroughMode == PassThroughModeAll {
 					c.scan.Pop()
 					c.scan.PushTyped(token.String(), PositionalArgumentToken)
 				} else {
@@ -571,7 +575,7 @@ func (c *Context) Resolve() error {
 			}
 
 			// Pick the last resolved value.
-			var selected interface{}
+			var selected any
 			for _, resolver := range resolvers {
 				s, err := resolver.Resolve(c, path, flag)
 				if err != nil {
@@ -756,9 +760,9 @@ func (e *unknownFlagError) Unwrap() error { return e.Cause }
 func (e *unknownFlagError) Error() string { return e.Cause.Error() }
 
 // Call an arbitrary function filling arguments with bound values.
-func (c *Context) Call(fn any, binds ...interface{}) (out []interface{}, err error) {
+func (c *Context) Call(fn any, binds ...any) (out []any, err error) {
 	fv := reflect.ValueOf(fn)
-	bindings := c.Kong.bindings.clone().add(binds...).add(c).merge(c.bindings) //nolint:govet
+	bindings := c.Kong.bindings.clone().add(binds...).add(c).merge(c.bindings)
 	return callAnyFunction(fv, bindings)
 }
 
@@ -768,7 +772,7 @@ func (c *Context) Call(fn any, binds ...interface{}) (out []interface{}, err err
 //
 // Any passed values will be bindable to arguments of the target Run() method. Additionally,
 // all parent nodes in the command structure will be bound.
-func (c *Context) RunNode(node *Node, binds ...interface{}) (err error) {
+func (c *Context) RunNode(node *Node, binds ...any) (err error) {
 	type targetMethod struct {
 		node   *Node
 		method reflect.Value
@@ -781,6 +785,19 @@ func (c *Context) RunNode(node *Node, binds ...interface{}) (err error) {
 		methodBinds = methodBinds.clone()
 		for p := node; p != nil; p = p.Parent {
 			methodBinds = methodBinds.add(p.Target.Addr().Interface())
+			// Try value and pointer to value.
+			for _, p := range []reflect.Value{p.Target, p.Target.Addr()} {
+				t := p.Type()
+				for i := 0; i < p.NumMethod(); i++ {
+					methodt := t.Method(i)
+					if strings.HasPrefix(methodt.Name, "Provide") {
+						method := p.Method(i)
+						if err := methodBinds.addProvider(method.Interface()); err != nil {
+							return fmt.Errorf("%s.%s: %w", t.Name(), methodt.Name, err)
+						}
+					}
+				}
+			}
 		}
 		if method.IsValid() {
 			methods = append(methods, targetMethod{node, method, methodBinds})
@@ -789,11 +806,6 @@ func (c *Context) RunNode(node *Node, binds ...interface{}) (err error) {
 	if len(methods) == 0 {
 		return fmt.Errorf("no Run() method found in hierarchy of %s", c.Selected().Summary())
 	}
-	_, err = c.Apply()
-	if err != nil {
-		return err
-	}
-
 	for _, method := range methods {
 		if err = callFunction(method.method, method.binds); err != nil {
 			return err
@@ -806,21 +818,27 @@ func (c *Context) RunNode(node *Node, binds ...interface{}) (err error) {
 //
 // Any passed values will be bindable to arguments of the target Run() method. Additionally,
 // all parent nodes in the command structure will be bound.
-func (c *Context) Run(binds ...interface{}) (err error) {
+func (c *Context) Run(binds ...any) (err error) {
 	node := c.Selected()
 	if node == nil {
-		if len(c.Path) > 0 {
-			selected := c.Path[0].Node()
-			if selected.Type == ApplicationNode {
-				method := getMethod(selected.Target, "Run")
-				if method.IsValid() {
-					return c.RunNode(selected, binds...)
-				}
+		if len(c.Path) == 0 {
+			return fmt.Errorf("no command selected")
+		}
+		selected := c.Path[0].Node()
+		if selected.Type == ApplicationNode {
+			method := getMethod(selected.Target, "Run")
+			if method.IsValid() {
+				node = selected
 			}
 		}
-		return fmt.Errorf("no command selected")
+
+		if node == nil {
+			return fmt.Errorf("no command selected")
+		}
 	}
-	return c.RunNode(node, binds...)
+	runErr := c.RunNode(node, binds...)
+	err = c.Kong.applyHook(c, "AfterRun")
+	return errors.Join(runErr, err)
 }
 
 // PrintUsage to Kong's stdout.
@@ -996,7 +1014,7 @@ func checkEnum(value *Value, target reflect.Value) error {
 			}
 			enums = append(enums, fmt.Sprintf("%q", enum))
 		}
-		return fmt.Errorf("%s must be one of %s but got %q", value.ShortSummary(), strings.Join(enums, ","), target.Interface())
+		return fmt.Errorf("%s must be one of %s but got %q", value.ShortSummary(), strings.Join(enums, ","), fmt.Sprintf("%v", target.Interface()))
 	}
 }
 
@@ -1074,7 +1092,7 @@ func checkAndMissing(paths []*Path) error {
 	return nil
 }
 
-func findPotentialCandidates(needle string, haystack []string, format string, args ...interface{}) error {
+func findPotentialCandidates(needle string, haystack []string, format string, args ...any) error {
 	if len(haystack) == 0 {
 		return fmt.Errorf(format, args...)
 	}
@@ -1094,12 +1112,23 @@ func findPotentialCandidates(needle string, haystack []string, format string, ar
 }
 
 type validatable interface{ Validate() error }
+type extendedValidatable interface {
+	Validate(kctx *Context) error
+}
 
-func isValidatable(v reflect.Value) validatable {
+// Proxy a validatable function to the extendedValidatable interface
+type validatableFunc func() error
+
+func (f validatableFunc) Validate(kctx *Context) error { return f() }
+
+func isValidatable(v reflect.Value) extendedValidatable {
 	if !v.IsValid() || (v.Kind() == reflect.Ptr || v.Kind() == reflect.Slice || v.Kind() == reflect.Map) && v.IsNil() {
 		return nil
 	}
 	if validate, ok := v.Interface().(validatable); ok {
+		return validatableFunc(validate.Validate)
+	}
+	if validate, ok := v.Interface().(extendedValidatable); ok {
 		return validate
 	}
 	if v.CanAddr() {

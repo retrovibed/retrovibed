@@ -92,7 +92,7 @@ Examples:
     goose mysql "user:password@/dbname?parseTime=true" status
     goose redshift "postgres://user:password@qwerty.us-east-1.redshift.amazonaws.com:5439/db" status
     goose tidb "user:password@/dbname?parseTime=true" status
-    goose mssql "sqlserver://user:password@dbname:1433?database=master" status
+    goose mssql "sqlserver://user:password@hostname:1433?database=master" status
     goose clickhouse "tcp://127.0.0.1:9000" status
     goose vertica "vertica://user:password@localhost:5433/dbname?connection_load_balance=1" status
     goose ydb "grpcs://localhost:2135/local?go_query_mode=scripting&go_fake_tx=scripting&go_query_bind=declare,numeric" status
@@ -235,6 +235,33 @@ Print the current version of the database:
 
     $ goose version
     $ goose: version 002
+
+# Environment Variables
+
+If you prefer to use environment variables, instead of passing the driver and database string as
+arguments, you can set the following environment variables:
+
+**1. Via environment variables:**
+
+```shell
+export GOOSE_DRIVER=DRIVER
+export GOOSE_DBSTRING=DBSTRING
+export GOOSE_MIGRATION_DIR=MIGRATION_DIR
+```
+
+**2. Via `.env` files with corresponding variables. `.env` file example**:
+
+```env
+GOOSE_DRIVER=postgres
+GOOSE_DBSTRING=postgres://admin:admin@localhost:5432/admin_db
+GOOSE_MIGRATION_DIR=./migrations
+```
+
+Loading from `.env` files is enabled by default. To disable this feature, set the `-env=none` flag.
+If you want to load from a specific file, set the `-env` flag to the file path.
+
+For more details about environment variables, see the [official documentation on environment
+variables](https://pressly.github.io/goose/documentation/environment-variables/).
 
 # Migrations
 
