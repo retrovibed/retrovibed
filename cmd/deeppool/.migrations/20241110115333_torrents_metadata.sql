@@ -1,15 +1,13 @@
 -- +goose Up
 -- +goose StatementBegin
 CREATE TABLE torrents_metadata (
-    id UUID NOT NULL DEFAULT gen_random_uuid(),
+    id UUID NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     bytes UINTEGER NOT NULL,
-    pieces_downloaded UINTEGER NOT NULL,
-    pieces_pending UINTEGER NOT NULL,
     description STRING NOT NULL DEFAULT '',
     infohash STRING NOT NULL,
-    trackers STRING[] NOT NULL
+    
 );
 -- +goose StatementEnd
 

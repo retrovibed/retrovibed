@@ -256,13 +256,7 @@ func ReadMapper(config Configuration, name string, m *MappingConfig) error {
 	if err != nil {
 		return err
 	}
-
 	return yaml.Unmarshal(raw, m)
-}
-
-// Map TODO...
-func Map(config Configuration, name string, m MappingConfig) error {
-	return WriteMapper(config, name, m)
 }
 
 // MapFieldToNativeType maps a column to a field based on the provided aliases.

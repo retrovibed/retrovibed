@@ -1,3 +1,5 @@
 package tracking
 
-//go:generate genieql auto -o "genieql.gen.go"
+//go:generate pwd
+//go:generate which genieql
+//go:generate genieql auto -v -o "genieql.gen.go"
