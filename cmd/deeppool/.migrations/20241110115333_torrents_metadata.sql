@@ -4,7 +4,7 @@ CREATE TABLE torrents_metadata (
     id UUID PRIMARY KEY NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    bytes UBIGINT NOT NULL,
+    bytes UINTEGER NOT NULL,
     description STRING NOT NULL DEFAULT '',
     infohash STRING NOT NULL,
     

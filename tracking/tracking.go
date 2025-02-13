@@ -11,7 +11,7 @@ import (
 func MetadataOptionFromInfo(i *metainfo.Info) func(*Metadata) {
 	return func(m *Metadata) {
 		m.Description = i.Name
-		m.Bytes = uint64(i.TotalLength())
+		m.Bytes = uint32(i.TotalLength())
 	}
 }
 

@@ -97,7 +97,7 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global) (err error) {
 		}
 		log.Println("autodiscovery of hashes initiated")
 		defer log.Println("autodiscovery of hashes completed")
-		for id, err := range Auto(ctx.Context, dht) {
+		for id, err := range Auto(ctx.Context, db, dht) {
 			if err != nil {
 				log.Println("autodiscovery failed", err)
 				return
@@ -147,7 +147,7 @@ func Auto(ctx context.Context, db *sql.DB, s *dht.Server) iter.Seq2[metainfo.Has
 			}
 
 			nodes := s.MakeReturnNodes(dht.Int160FromByteArray(krpc.RandomID()), func(na krpc.NodeAddr) bool { return true })
-			log.Println("sampling from", len(nodes), "nodes", s.NumNodes(), "available")
+			log.Println("sampling from", len(nodes), krpc.RandomID(), "nodes", s.NumNodes(), "available")
 
 			for _, n := range nodes {
 				var (
@@ -172,7 +172,7 @@ func Auto(ctx context.Context, db *sql.DB, s *dht.Server) iter.Seq2[metainfo.Has
 					continue
 				}
 
-				tracking.PeerInsertWithDefaults(ctx, db)
+				// tracking.PeerInsertWithDefaults(ctx, db, )
 				// track peers with large libraries.
 				log.Println("interesting peer", resp.R.ID, resp.Y, resp.R.Interval, resp.R.Available)
 
