@@ -5,6 +5,9 @@ github.com/Masterminds/squirrel
 ## explicit; go 1.14
 github.com/RoaringBitmap/roaring
 github.com/RoaringBitmap/roaring/internal
+# github.com/alecthomas/atomic v0.1.0-alpha2
+## explicit; go 1.18
+github.com/alecthomas/atomic
 # github.com/alecthomas/kong v1.8.0
 ## explicit; go 1.20
 github.com/alecthomas/kong
@@ -41,8 +44,8 @@ github.com/anacrolix/missinggo/v2/iter
 # github.com/anacrolix/multiless v0.4.0
 ## explicit; go 1.18
 github.com/anacrolix/multiless
-# github.com/anacrolix/stm v0.2.0
-## explicit; go 1.13
+# github.com/anacrolix/stm v0.5.0
+## explicit; go 1.18
 github.com/anacrolix/stm
 github.com/anacrolix/stm/rate
 github.com/anacrolix/stm/stmutil
@@ -80,8 +83,8 @@ github.com/apache/arrow-go/v18/internal/bitutils
 github.com/apache/arrow-go/v18/internal/hashing
 github.com/apache/arrow-go/v18/internal/json
 github.com/apache/arrow-go/v18/internal/utils
-# github.com/benbjohnson/immutable v0.2.0
-## explicit; go 1.12
+# github.com/benbjohnson/immutable v0.4.3
+## explicit; go 1.18
 github.com/benbjohnson/immutable
 # github.com/bits-and-blooms/bitset v1.20.0
 ## explicit; go 1.16
@@ -209,7 +212,7 @@ github.com/james-lawrence/genieql/internal/userx
 github.com/james-lawrence/genieql/internal/wasidialect
 github.com/james-lawrence/genieql/internal/wasix/ffierrors
 github.com/james-lawrence/genieql/internal/wasix/ffiguest
-# github.com/james-lawrence/torrent v0.0.0-20250212232113-0b62ff6e3c56
+# github.com/james-lawrence/torrent v0.0.0-20250214130618-5e4bed5b84b6
 ## explicit; go 1.23
 github.com/james-lawrence/torrent
 github.com/james-lawrence/torrent/bencode

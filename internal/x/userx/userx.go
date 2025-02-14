@@ -41,13 +41,10 @@ func CurrentUserOrDefault(d user.User) (result *user.User) {
 }
 
 // DefaultConfigDir returns the user config directory.
-func DefaultConfigDir(name string) string {
+func DefaultConfigDir(rel ...string) string {
 	user := CurrentUserOrDefault(Root())
-
-	envconfig := filepath.Join(os.Getenv("XDG_CONFIG_HOME"))
-	home := filepath.Join(user.HomeDir, ".config")
-
-	return DefaultDirectory(name, envconfig, home)
+	defaultdir := filepath.Join(user.HomeDir, ".config")
+	return filepath.Join(envx.String(defaultdir, "XDG_CONFIG_HOME"), filepath.Join(rel...))
 }
 
 // DefaultDirLocation looks for a directory one of the default directory locations.

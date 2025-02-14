@@ -66,3 +66,28 @@ func PeerInsertWithDefaults(
 ) {
 	gql.Into("torrents_peers").Default("created_at", "updated_at", "next_check").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, ip = EXCLUDED.ip, port = EXCLUDED.port, bep51_available = EXCLUDED.bep51_available")
 }
+
+func PeerMarkNextCheck(
+	gql genieql.Insert,
+	pattern func(ctx context.Context, q sqlx.Queryer, a Peer) NewPeerScannerStaticRow,
+) {
+	gql.Into("torrents_peers").Default("created_at", "updated_at", "next_check").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = NOW(), next_check = NOW() + to_seconds(EXCLUDED.bep51_ttl)")
+}
+
+//easyjson:json
+func UnknownHash(gql genieql.Structure) {
+	gql.From(
+		gql.Table("torrents_unknown_infohashes"),
+	)
+}
+
+func UnknownHashScanner(gql genieql.Scanner, pattern func(i UnknownHash)) {
+	gql.ColumnNamePrefix("torrents_unknown_infohashes.")
+}
+
+func UnknownHashInsertWithDefaults(
+	gql genieql.Insert,
+	pattern func(ctx context.Context, q sqlx.Queryer, a UnknownHash) NewUnknownHashScannerStaticRow,
+) {
+	gql.Into("torrents_unknown_infohashes").Default("created_at", "updated_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT")
+}

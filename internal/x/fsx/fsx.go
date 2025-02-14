@@ -3,6 +3,7 @@ package fsx
 import (
 	"errors"
 	"os"
+	"path/filepath"
 )
 
 func ErrIsNotExist(err error) error {
@@ -27,4 +28,24 @@ func IgnoreIsExist(err error) error {
 	}
 
 	return err
+}
+
+func AutoCached(path string, gen func() ([]byte, error)) (s []byte, err error) {
+	if s, err = os.ReadFile(path); err == nil {
+		return s, nil
+	}
+
+	if s, err = gen(); err != nil {
+		return nil, err
+	}
+
+	if err = os.MkdirAll(filepath.Dir(path), 0700); err != nil {
+		return nil, err
+	}
+
+	if err = os.WriteFile(path, s, 0600); err != nil {
+		return nil, err
+	}
+
+	return s, err
 }

@@ -19,6 +19,7 @@ import (
 func main() {
 	var shellCli struct {
 		cmdopts.Global
+		cmdopts.PeerID
 		Version cmdopts.Version `cmd:"" help:"display versioning information"`
 		Daemon  cmdDaemon       `cmd:"" help:"run the backend daemon"`
 		Torrent cmdTorrent      `cmd:"" help:"torrent related sub commands"`
@@ -49,6 +50,9 @@ func main() {
 		kong.UsageOnError(),
 		kong.Bind(
 			&shellCli.Global,
+		),
+		kong.Bind(
+			&shellCli.PeerID,
 		),
 		kong.TypeMapper(reflect.TypeOf(&net.IP{}), kong.MapperFunc(cmdopts.ParseIP)),
 		kong.TypeMapper(reflect.TypeOf(&net.TCPAddr{}), kong.MapperFunc(cmdopts.ParseTCPAddr)),
