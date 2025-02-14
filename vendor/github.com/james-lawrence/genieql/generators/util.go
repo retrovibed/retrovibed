@@ -13,13 +13,13 @@ import (
 	"text/template"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/pkg/errors"
 	"github.com/serenize/snaker"
 
 	"github.com/james-lawrence/genieql"
 	"github.com/james-lawrence/genieql/astutil"
 	"github.com/james-lawrence/genieql/internal/debugx"
 	"github.com/james-lawrence/genieql/internal/drivers"
+	"github.com/james-lawrence/genieql/internal/errorsx"
 )
 
 func genFunctionLiteral(ctx Context, example string, tctx interface{}, errorHandler func(string) ast.Node) (output *ast.FuncLit, err error) {
@@ -42,15 +42,15 @@ func genFunctionLiteral(ctx Context, example string, tctx interface{}, errorHand
 	)
 
 	if err = template.Must(template.New("genFunctionLiteral").Funcs(m).Parse(example)).Execute(&buf, tctx); err != nil {
-		return nil, errors.Wrapf(err, "failed to generate from template: '''\n%s\n'''\n%s", example, spew.Sdump(tctx))
+		return nil, errorsx.Wrapf(err, "failed to generate from template: '''\n%s\n'''\n%s", example, spew.Sdump(tctx))
 	}
 
 	if parsed, err = parser.ParseExprFrom(ctx.FileSet, "", buf.Bytes(), 0); err != nil {
-		return nil, errors.Wrapf(err, "failed to parse function expression: %s", buf.String())
+		return nil, errorsx.Wrapf(err, "failed to parse function expression: %s", buf.String())
 	}
 
 	if output, ok = parsed.(*ast.FuncLit); !ok {
-		return nil, errors.Errorf("parsed template expected to result in *ast.FuncLit not %T: %s", example, parsed)
+		return nil, errorsx.Errorf("parsed template expected to result in *ast.FuncLit not %T: %s", example, parsed)
 	}
 
 	return output, nil
@@ -122,7 +122,7 @@ func decode(ctx Context) func(int, genieql.ColumnMap, func(string) ast.Node) ([]
 
 		if column.Definition.Decode == "" {
 			if column.Definition, err = lookupTypeDefinition(column.Definition.Type); err != nil {
-				return nil, errors.Wrapf(err, "invalid type definition: %s", spew.Sdump(column.Definition))
+				return nil, errorsx.Wrapf(err, "invalid type definition: %s", spew.Sdump(column.Definition))
 			}
 		}
 
@@ -300,7 +300,7 @@ func astPrint(n ast.Node) (string, error) {
 	fset := token.NewFileSet()
 	err := printer.Fprint(dst, fset, n)
 
-	return dst.String(), errors.Wrap(err, "failure to print ast")
+	return dst.String(), errorsx.Wrap(err, "failure to print ast")
 }
 
 // AllBuiltinTypes returns true iff all the types are builtin to the go runtime.
@@ -404,7 +404,7 @@ func importPath(ctx Context, x ast.Expr) (string, error) {
 		}
 
 		if src, err := parser.ParseFile(ctx.FileSet, ctx.FileSet.File(x.Pos()).Name(), nil, parser.ImportsOnly); err != nil {
-			return "", errors.Wrap(err, "failed to read the source file while determining import")
+			return "", errorsx.Wrap(err, "failed to read the source file while determining import")
 		} else {
 			for _, imp := range src.Imports {
 				if importSelector(imp) == types.ExprString(x.X) {
@@ -412,7 +412,7 @@ func importPath(ctx Context, x ast.Expr) (string, error) {
 				}
 			}
 
-			return "", errors.Errorf("failed to match selector with import: %s", types.ExprString(x))
+			return "", errorsx.Errorf("failed to match selector with import: %s", types.ExprString(x))
 		}
 	default:
 		return ctx.CurrentPackage.ImportPath, nil

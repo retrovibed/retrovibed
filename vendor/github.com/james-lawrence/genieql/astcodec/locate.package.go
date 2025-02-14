@@ -5,7 +5,7 @@ package astcodec
 import (
 	"go/build"
 
-	"github.com/pkg/errors"
+	"github.com/james-lawrence/genieql/internal/errorsx"
 )
 
 // LocatePackage finds a package by its name.
@@ -13,7 +13,7 @@ func LocatePackage(importPath, srcDir string, context build.Context, matches fun
 	pkg, err = context.Import(importPath, srcDir, build.IgnoreVendor&build.ImportComment)
 	_, noGoError := err.(*build.NoGoError)
 	if err != nil && !noGoError {
-		return nil, errors.Wrapf(err, "failed to import the package: %s", importPath)
+		return nil, errorsx.Wrapf(err, "failed to import the package: %s", importPath)
 	}
 
 	if pkg != nil && (matches == nil || matches(pkg)) {

@@ -10,8 +10,8 @@ import (
 	"path/filepath"
 
 	"github.com/james-lawrence/genieql/astutil"
+	"github.com/james-lawrence/genieql/internal/errorsx"
 	"github.com/james-lawrence/genieql/internal/transformx"
-	"github.com/pkg/errors"
 	"golang.org/x/text/transform"
 	"gopkg.in/yaml.v3"
 )
@@ -126,13 +126,13 @@ func (t MappingConfig) MappedColumnInfo(driver Driver, dialect Dialect, fset *to
 	)
 
 	if fields, err = t.TypeFields(fset, pkg); err != nil {
-		return []ColumnInfo(nil), []ColumnInfo(nil), errors.Wrapf(err, "failed to lookup fields 0: %s.%s", pkg.Name, t.Type)
+		return []ColumnInfo(nil), []ColumnInfo(nil), errorsx.Wrapf(err, "failed to lookup fields 0: %s.%s", pkg.Name, t.Type)
 	}
 
 	columns = t.Columns
 	// if no columns are defined for the mapping lets generate it automatically (may result in incorrect results)
 	if len(columns) == 0 {
-		log.Println(errors.Errorf("no defined columns for: %s.%s generating fake columns", pkg.Name, t.Type))
+		log.Println(errorsx.Errorf("no defined columns for: %s.%s generating fake columns", pkg.Name, t.Type))
 		// for now just support the CamelCase -> snakecase.
 		columns = GenerateFakeColumnInfo(driver, transform.Chain(AliasStrategySnakecase, AliasStrategyLowercase), fields...)
 	}
@@ -158,7 +158,7 @@ func (t MappingConfig) MapColumns(fset *token.FileSet, pkg *build.Package, local
 	)
 
 	if fields, err = t.TypeFields(fset, pkg); err != nil {
-		return cmap, umap, errors.Wrapf(err, "failed to lookup fields 1: %s.%s", t.Package.Name, t.Type)
+		return cmap, umap, errorsx.Wrapf(err, "failed to lookup fields 1: %s.%s", t.Package.Name, t.Type)
 	}
 
 	mm := func(c ColumnInfo, f *ast.Field) (cmap *ColumnMap) {
@@ -194,7 +194,7 @@ func (t MappingConfig) MapColumnsToFields(fset *token.FileSet, pkg *build.Packag
 	)
 
 	if fields, err = t.TypeFields(fset, pkg); err != nil {
-		return []*ast.Field{}, []*ast.Field{}, errors.Wrapf(err, "failed to lookup fields 2: %s.%s", t.Package.Name, t.Type)
+		return []*ast.Field{}, []*ast.Field{}, errorsx.Wrapf(err, "failed to lookup fields 2: %s.%s", t.Package.Name, t.Type)
 	}
 
 	mFields, uFields := mapFields(columns, fields, func(c ColumnInfo, f *ast.Field) *ast.Field { return MapFieldToNativeType(c, f, t.Aliaser()) })
@@ -209,7 +209,7 @@ func (t MappingConfig) MapFieldsToColumns2(fset *token.FileSet, pkg *build.Packa
 	)
 
 	if fields, err = t.TypeFields(fset, pkg); err != nil {
-		return []*ast.Field{}, []*ast.Field{}, errors.Wrapf(err, "failed to lookup fields 3: %s.%s", t.Package.Name, t.Type)
+		return []*ast.Field{}, []*ast.Field{}, errorsx.Wrapf(err, "failed to lookup fields 3: %s.%s", t.Package.Name, t.Type)
 	}
 
 	mFields, uFields := mapFields(columns, fields, func(c ColumnInfo, f *ast.Field) *ast.Field { return MapFieldToSQLType(c, f, t.Aliaser()) })

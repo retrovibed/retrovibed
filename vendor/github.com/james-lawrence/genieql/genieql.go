@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/pkg/errors"
+	"github.com/james-lawrence/genieql/internal/errorsx"
 	"golang.org/x/mod/modfile"
 )
 
@@ -88,11 +88,11 @@ func FindModulePath(dir string) (ipath string, err error) {
 // FindModuleRoot pulled from: https://github.com/golang/go/blob/src/cmd/dist/build.go#L1595
 func FindModuleRoot(dir string) (cleaned string, err error) {
 	if dir == "" {
-		return "", errors.New("cannot located go.mod from a blank directory path")
+		return "", errorsx.New("cannot located go.mod from a blank directory path")
 	}
 
 	if cleaned, err = filepath.Abs(filepath.Clean(dir)); err != nil {
-		return "", errors.Wrap(err, "failed to determined absolute path to directory")
+		return "", errorsx.Wrap(err, "failed to determined absolute path to directory")
 	}
 
 	// Look for enclosing go.mod.
@@ -111,5 +111,5 @@ func FindModuleRoot(dir string) (cleaned string, err error) {
 		cleaned = d
 	}
 
-	return "", errors.Errorf("go.mod not found: %s", dir)
+	return "", errorsx.Errorf("go.mod not found: %s", dir)
 }

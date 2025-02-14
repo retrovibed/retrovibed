@@ -9,7 +9,7 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/james-lawrence/genieql/internal/debugx"
-	"github.com/pkg/errors"
+	"github.com/james-lawrence/genieql/internal/errorsx"
 	"gopkg.in/yaml.v3"
 )
 
@@ -64,10 +64,10 @@ func LoadCustomColumnTypes(c Configuration, d Driver) (Driver, error) {
 	if raw, err = os.ReadFile(dpath); os.IsNotExist(err) {
 		return d, nil
 	} else if err != nil {
-		return nil, errors.Wrapf(err, "failed to read driver file: %s", dpath)
+		return nil, errorsx.Wrapf(err, "failed to read driver file: %s", dpath)
 	}
 
-	if err = errors.Wrapf(yaml.Unmarshal(raw, &cfg), "failed to parse driver file: %s", dpath); err != nil {
+	if err = errorsx.Wrapf(yaml.Unmarshal(raw, &cfg), "failed to parse driver file: %s", dpath); err != nil {
 		return nil, err
 	}
 
@@ -141,7 +141,7 @@ func (t driver) LookupType(l string) (ColumnDefinition, error) {
 		return typedef, nil
 	}
 
-	return ColumnDefinition{}, errors.Errorf("%s - unsupported type: %s", t.importPath, l)
+	return ColumnDefinition{}, errorsx.Errorf("%s - unsupported type: %s", t.importPath, l)
 }
 
 func (t *driver) AddColumnDefinitions(supported ...ColumnDefinition) {

@@ -10,11 +10,11 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/pkg/errors"
 	"golang.org/x/text/transform"
 
 	"github.com/james-lawrence/genieql"
 	"github.com/james-lawrence/genieql/astutil"
+	"github.com/james-lawrence/genieql/internal/errorsx"
 	"github.com/james-lawrence/genieql/internal/stringsx"
 )
 
@@ -242,7 +242,7 @@ func (t scanner) Generate(dst io.Writer) error {
 	}
 
 	if ctx.Columns, err = ColumnMapFromFields(t.Context, t.Fields.List...); err != nil {
-		return errors.Wrap(err, "failed to map fields")
+		return errorsx.Wrap(err, "failed to map fields")
 	}
 
 	funcMap := template.FuncMap{
@@ -267,11 +267,11 @@ func (t scanner) Generate(dst io.Writer) error {
 	if t.Mode.Enabled(ModeInterface) {
 		tmpl = template.Must(template.New("interface").Funcs(funcMap).Parse(interfaceScanner))
 		if err = tmpl.Execute(dst, ctx); err != nil {
-			return errors.Wrap(err, "failed to generate interface scanner")
+			return errorsx.Wrap(err, "failed to generate interface scanner")
 		}
 
 		if _, err = dst.Write([]byte("\n")); err != nil {
-			return errors.Wrap(err, "failed to write newline")
+			return errorsx.Wrap(err, "failed to write newline")
 		}
 	}
 
@@ -293,27 +293,27 @@ func (t scanner) Generate(dst io.Writer) error {
 
 		tmpl = template.Must(template.New("static").Funcs(funcMap).Parse(staticScanner))
 		if err = tmpl.Execute(dst, ctx); err != nil {
-			return errors.Wrapf(err, "failed to generate static scanner: '''\n%s\n'''", staticScanner)
+			return errorsx.Wrapf(err, "failed to generate static scanner: '''\n%s\n'''", staticScanner)
 		}
 
 		if _, err = dst.Write([]byte("\n")); err != nil {
-			return errors.Wrap(err, "failed to write newline")
+			return errorsx.Wrap(err, "failed to write newline")
 		}
 
 		tmpl = template.Must(template.New("static-row").Funcs(funcMap).Parse(staticRowScanner))
 		if err = tmpl.Execute(dst, ctx); err != nil {
-			return errors.Wrap(err, "failed to generate static row scanner")
+			return errorsx.Wrap(err, "failed to generate static row scanner")
 		}
 
 		if _, err = dst.Write([]byte("\n")); err != nil {
-			return errors.Wrap(err, "failed to write newline")
+			return errorsx.Wrap(err, "failed to write newline")
 		}
 	}
 
 	if t.Mode.Enabled(ModeDynamic) {
 		tmpl = template.Must(template.New("dynamic").Funcs(funcMap).Parse(dynamicScanner))
 		if err = tmpl.Execute(dst, ctx); err != nil {
-			return errors.Wrap(err, "failed to generate dynamic scanner")
+			return errorsx.Wrap(err, "failed to generate dynamic scanner")
 		}
 	}
 

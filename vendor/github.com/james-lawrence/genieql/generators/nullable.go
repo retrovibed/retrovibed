@@ -5,7 +5,7 @@ import (
 	"go/types"
 
 	"github.com/james-lawrence/genieql"
-	"github.com/pkg/errors"
+	"github.com/james-lawrence/genieql/internal/errorsx"
 )
 
 // tdRegistry type definition registry
@@ -19,7 +19,7 @@ func composeTypeDefinitionsExpr(definitions ...tdRegistry) genieql.LookupTypeDef
 			}
 		}
 
-		return d, errors.Errorf("failed to locate type information for expr %s", types.ExprString(e))
+		return d, errorsx.Errorf("failed to locate type information for expr %s", types.ExprString(e))
 	}
 }
 
@@ -31,6 +31,6 @@ func composeTypeDefinitions(definitions ...tdRegistry) tdRegistry {
 			}
 		}
 
-		return d, errors.Errorf("failed to locate type information for %s", e)
+		return d, errorsx.Errorf("failed to locate type information for %s", e)
 	}
 }

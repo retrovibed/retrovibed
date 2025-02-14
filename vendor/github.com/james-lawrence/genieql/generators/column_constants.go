@@ -8,9 +8,8 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/pkg/errors"
-
 	"github.com/james-lawrence/genieql"
+	"github.com/james-lawrence/genieql/internal/errorsx"
 )
 
 // ColumnConstantContext for building column sets.
@@ -79,12 +78,12 @@ const {{.Name}} = ` + "`{{ .Columns | transform | columns}}`"
 
 	tmpl := template.Must(template.New(templatename).Funcs(funcMap).Parse(columnConstantsTemplate))
 	if err = tmpl.Execute(dst, ctx); err != nil {
-		return errors.Wrap(err, "failed to generate columns constant")
+		return errorsx.Wrap(err, "failed to generate columns constant")
 	}
 
 	_, err = dst.Write([]byte("\n"))
 
-	return errors.Wrap(err, "")
+	return errorsx.Wrap(err, "")
 }
 
 type transformer struct {

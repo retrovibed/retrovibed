@@ -268,8 +268,8 @@ github.com/jackc/puddle v1.1.3/go.mod h1:m4B5Dj62Y0fbyuIc15OsIqK0+JU8nkqQjsgx7dv
 github.com/jackc/puddle v1.3.0/go.mod h1:m4B5Dj62Y0fbyuIc15OsIqK0+JU8nkqQjsgx7dvjSWk=
 github.com/jackc/puddle/v2 v2.2.2 h1:PR8nw+E/1w0GLuRFSmiioY6UooMp6KJv0/61nB7icHo=
 github.com/jackc/puddle/v2 v2.2.2/go.mod h1:vriiEXHvEE654aYKXXjOvZM39qJ0q+azkZFrfEOc3H4=
-github.com/james-lawrence/genieql v0.0.0-20250212211814-db1c51fb27e5 h1:UVjvXvgoFFA6l+axGX2hHg1zGsyuVZ9LtFug0EyGoaA=
-github.com/james-lawrence/genieql v0.0.0-20250212211814-db1c51fb27e5/go.mod h1:5Vs1h+Qu4QWiZm7Ld0LYfpAbHViWfyKsmNYrdsbddpQ=
+github.com/james-lawrence/genieql v0.0.0-20250214004632-76bb098e0718 h1:/sqGRwDTgIe2WKdytRRgdqRFRUPazobcqC9cvKRYj5c=
+github.com/james-lawrence/genieql v0.0.0-20250214004632-76bb098e0718/go.mod h1:5Vs1h+Qu4QWiZm7Ld0LYfpAbHViWfyKsmNYrdsbddpQ=
 github.com/james-lawrence/torrent v0.0.0-20250212232113-0b62ff6e3c56 h1:TI/8r5khpWSzi6V6y57Ph9s9s9vNR59sBTn4vudD5hM=
 github.com/james-lawrence/torrent v0.0.0-20250212232113-0b62ff6e3c56/go.mod h1:kz/1W54fTzN6HyqRv6pMG3vZSfXBjb5Wbd5KY+ErGQ4=
 github.com/jpillora/backoff v1.0.0/go.mod h1:J/6gKK9jxlEcS3zixgDgUAsiuZ7yrSoa/FX5e0EB2j4=

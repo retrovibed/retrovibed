@@ -13,7 +13,6 @@ import (
 	"github.com/james-lawrence/genieql/generators"
 	"github.com/james-lawrence/genieql/generators/functions"
 	"github.com/james-lawrence/genieql/internal/errorsx"
-	"github.com/pkg/errors"
 )
 
 // Function configuration interface for generating functions.
@@ -57,7 +56,7 @@ func FunctionFromFile(cctx generators.Context, name string, tree *ast.File) (Fun
 	}
 
 	if scanner = functions.DetectScanner(cctx, declPattern); scanner == nil {
-		return nil, errors.Errorf("genieql.Function %s - missing scanner", nodeInfo(cctx, pos))
+		return nil, errorsx.Errorf("genieql.Function %s - missing scanner", nodeInfo(cctx, pos))
 	}
 
 	return NewFunction(
@@ -103,7 +102,7 @@ func (t *function) Generate(dst io.Writer) (err error) {
 	}
 
 	if len(t.signature.Params.List) < 1 {
-		return errors.New("functions must start with a queryer param")
+		return errorsx.New("functions must start with a queryer param")
 	}
 
 	// pop the queryer off the params.
@@ -113,12 +112,12 @@ func (t *function) Generate(dst io.Writer) (err error) {
 	scanner := functions.DetectScanner(t.ctx, t.signature)
 
 	if cmaps, err = generators.ColumnMapFromFields(t.ctx, t.signature.Params.List...); err != nil {
-		return errors.Wrap(err, "unable to generate mapping")
+		return errorsx.Wrap(err, "unable to generate mapping")
 	}
 
 	encodedquery, cmaps = functions.ColumnUsageFilter(t.ctx, t.query, cmaps...)
 	if locals, encodings, qinputs, err = generators.QueryInputsFromColumnMap(t.ctx, scanner, nil, cmaps...); err != nil {
-		return errors.Wrap(err, "unable to transform query inputs")
+		return errorsx.Wrap(err, "unable to transform query inputs")
 	}
 
 	if len(locals) > 0 {

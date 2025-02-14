@@ -3,6 +3,7 @@ package md5x
 import (
 	"crypto/md5"
 	"encoding/hex"
+	"strings"
 )
 
 // Digest to md5 hex encoded string
@@ -12,8 +13,8 @@ func Digest(b []byte) string {
 }
 
 // Hex to md5 hex encoded string
-func Hex(s string) string {
-	return Digest([]byte(s))
+func Hex(s ...string) string {
+	return Digest([]byte(strings.Join(s, "")))
 }
 
 // Bytes digest byte slice

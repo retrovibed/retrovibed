@@ -18,6 +18,18 @@ func Wrapf(err error, format string, args ...interface{}) error {
 	return errors.Wrapf(err, format, args...)
 }
 
+func Errorf(format string, args ...interface{}) error {
+	return errors.Errorf(format, args...)
+}
+
+func New(msg string) error {
+	return errors.New(msg)
+}
+
+func WithStack(err error) error {
+	return errors.WithStack(err)
+}
+
 // Compact returns the first error in the set, if any.
 func Compact(errs ...error) error {
 	for _, err := range errs {

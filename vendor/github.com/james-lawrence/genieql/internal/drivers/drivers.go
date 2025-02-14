@@ -3,7 +3,6 @@ package drivers
 import (
 	"io"
 
-	"github.com/pkg/errors"
 	yaml "gopkg.in/yaml.v3"
 
 	"github.com/james-lawrence/genieql"
@@ -29,12 +28,12 @@ func ReadDriver(in io.Reader) (name string, driver genieql.Driver, err error) {
 
 	if raw, err = io.ReadAll(in); err != nil {
 		return "",
-			nil, errors.Wrap(err, "failed to read driver")
+			nil, errorsx.Wrap(err, "failed to read driver")
 	}
 
 	if err = yaml.Unmarshal(raw, &config); err != nil {
 		return "",
-			nil, errors.Wrap(err, "failed to unmarshal driver")
+			nil, errorsx.Wrap(err, "failed to unmarshal driver")
 	}
 
 	return config.Name, NewDriver("", config.Types...), nil

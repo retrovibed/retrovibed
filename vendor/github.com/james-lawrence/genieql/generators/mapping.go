@@ -19,6 +19,7 @@ func mappedParam(ctx Context, param *ast.Field) (m genieql.MappingConfig, infos 
 	var (
 		pkg *build.Package = ctx.CurrentPackage
 	)
+
 	if ipath, err := importPath(ctx, astutil.UnwrapExpr(param.Type)); err != nil {
 		return m, infos, err
 	} else if ipath != ctx.CurrentPackage.ImportPath {

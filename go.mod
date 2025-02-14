@@ -5,11 +5,12 @@ go 1.23.2
 toolchain go1.23.5
 
 require (
+	github.com/Masterminds/squirrel v1.5.4
 	github.com/alecthomas/kong v1.8.0
 	github.com/anacrolix/stm v0.2.0
 	github.com/anacrolix/utp v0.2.0
 	github.com/gofrs/uuid v4.4.0+incompatible
-	github.com/james-lawrence/genieql v0.0.0-20250212211814-db1c51fb27e5
+	github.com/james-lawrence/genieql v0.0.0-20250214004632-76bb098e0718
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/mattn/go-isatty v0.0.20
 	github.com/onsi/ginkgo/v2 v2.22.2
@@ -17,7 +18,6 @@ require (
 	github.com/pressly/goose/v3 v3.24.1
 	github.com/stretchr/testify v1.10.0
 	github.com/willabides/kongplete v0.4.0
-	github.com/Masterminds/squirrel v1.5.4
 )
 
 require (

@@ -10,7 +10,6 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/stdlib"
-	"github.com/pkg/errors"
 	"golang.org/x/text/transform"
 
 	"github.com/james-lawrence/genieql"
@@ -44,12 +43,12 @@ type dialectFactory struct{}
 func (t dialectFactory) Connect(config genieql.Configuration) (_ genieql.Dialect, err error) {
 	pcfg, err := pgx.ParseConfig(config.ConnectionURL)
 	if err != nil {
-		return nil, errors.Wrapf(err, "unable to parse postgresql connection string: %s", config.ConnectionURL)
+		return nil, errorsx.Wrapf(err, "unable to parse postgresql connection string: %s", config.ConnectionURL)
 	}
 
 	slib := stdlib.OpenDB(*pcfg)
 	if err = slib.Ping(); err != nil {
-		return nil, errors.Wrapf(err, "unable to connect to database: %s", config.ConnectionURL)
+		return nil, errorsx.Wrapf(err, "unable to connect to database: %s", config.ConnectionURL)
 	}
 
 	return dialectImplementation{db: slib}, nil
@@ -105,13 +104,13 @@ func (t dialectImplementation) ColumnInformationForQuery(d genieql.Driver, query
 
 	tx, err := t.db.Begin()
 	if err != nil {
-		return nil, errors.Wrap(err, "failure to start transaction")
+		return nil, errorsx.Wrap(err, "failure to start transaction")
 	}
 	defer tx.Rollback()
 
 	q := fmt.Sprintf("CREATE TABLE %s AS (%s LIMIT 1)", table, query)
 	if _, err = tx.Exec(q); err != nil {
-		return nil, errors.Wrapf(err, "failure to execute %s", q)
+		return nil, errorsx.Wrapf(err, "failure to execute %s", q)
 	}
 
 	return columnInformation(d, tx, columnInformationQuery, table)
@@ -129,7 +128,7 @@ func columnInformation(d genieql.Driver, q queryer, query, table string) ([]geni
 	)
 
 	if rows, err = q.Query(query, table); err != nil {
-		return nil, errors.Wrapf(err, "failed to query column information: %s, %s", query, table)
+		return nil, errorsx.Wrapf(err, "failed to query column information: %s, %s", query, table)
 	}
 	defer rows.Close()
 
@@ -145,7 +144,7 @@ func columnInformation(d genieql.Driver, q queryer, query, table string) ([]geni
 		)
 
 		if err = rows.Scan(&name, &oid, &tname, &nullable, &primary); err != nil {
-			return nil, errors.Wrapf(err, "error scanning column information for table (%s): %s", table, query)
+			return nil, errorsx.Wrapf(err, "error scanning column information for table (%s): %s", table, query)
 		}
 
 		expr = internal.OIDToType(oid)
@@ -178,5 +177,5 @@ func columnInformation(d genieql.Driver, q queryer, query, table string) ([]geni
 
 	columns = genieql.SortColumnInfo(columns)(genieql.ByName)
 
-	return columns, errors.Wrap(rows.Err(), "error retrieving column information")
+	return columns, errorsx.Wrap(rows.Err(), "error retrieving column information")
 }

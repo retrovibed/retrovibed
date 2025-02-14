@@ -9,7 +9,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/pkg/errors"
+	"github.com/james-lawrence/genieql/internal/errorsx"
 	"github.com/zieckey/goini"
 )
 
@@ -34,7 +34,7 @@ func ParseCommentOptions(comments *ast.CommentGroup) (*goini.INI, error) {
 		text = strings.TrimSpace(strings.TrimPrefix(text, magicPrefix))
 
 		if err := local.Parse([]byte(text), "||", "="); err != nil {
-			return nil, errors.Wrap(err, "failed to parse comment configuration")
+			return nil, errorsx.Wrap(err, "failed to parse comment configuration")
 		}
 
 		ini.Merge(local, true)

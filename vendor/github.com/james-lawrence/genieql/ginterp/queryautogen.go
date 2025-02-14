@@ -9,7 +9,6 @@ import (
 	"io"
 	"strings"
 
-	"github.com/pkg/errors"
 	"github.com/serenize/snaker"
 
 	"github.com/james-lawrence/genieql"
@@ -17,6 +16,7 @@ import (
 	"github.com/james-lawrence/genieql/astutil"
 	"github.com/james-lawrence/genieql/generators"
 	"github.com/james-lawrence/genieql/generators/functions"
+	"github.com/james-lawrence/genieql/internal/errorsx"
 )
 
 // QueryAutogen configuration interface for generating basic queries automatically.
@@ -50,7 +50,7 @@ func QueryAutogenFromFile(cctx generators.Context, name string, tree *ast.File) 
 	qf, typ = pos.Type.Params.List[0], pos.Type.Params.List[1]
 
 	if scanner = functions.DetectScanner(cctx, pos.Type); scanner == nil {
-		return nil, errors.Errorf("genieql.QueryAutogen %s - missing scanner", nodeInfo(cctx, pos))
+		return nil, errorsx.Errorf("genieql.QueryAutogen %s - missing scanner", nodeInfo(cctx, pos))
 	}
 
 	return NewQueryAutogen(
@@ -124,7 +124,7 @@ func (t *queryAutogen) Generate(dst io.Writer) (err error) {
 	t.ctx.Debugln("import path", t.ctx.CurrentPackage.ImportPath)
 
 	if strings.TrimSpace(t.table) == "" {
-		return errors.Errorf(
+		return errorsx.Errorf(
 			"%s:%s - table is required. use From method to specify a table",
 			t.ctx.CurrentPackage.Name,
 			types.ExprString(t.tf.Type),

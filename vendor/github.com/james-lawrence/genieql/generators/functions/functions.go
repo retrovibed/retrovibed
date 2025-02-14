@@ -13,7 +13,7 @@ import (
 	"github.com/james-lawrence/genieql"
 	"github.com/james-lawrence/genieql/astutil"
 	"github.com/james-lawrence/genieql/generators"
-	"github.com/pkg/errors"
+	"github.com/james-lawrence/genieql/internal/errorsx"
 )
 
 const (
@@ -177,7 +177,7 @@ func (t Query) Compile(d Definition) (_ *ast.FuncDecl, err error) {
 
 	// basic validations
 	if t.Scanner == nil {
-		return nil, errors.Errorf("a scanner was not provided")
+		return nil, errorsx.Errorf("a scanner was not provided")
 	}
 
 	pattern := astutil.MapFieldsToTypeExpr(t.Scanner.Type.Params.List...)
@@ -194,7 +194,7 @@ func (t Query) Compile(d Definition) (_ *ast.FuncDecl, err error) {
 	} else if queryUniquePattern(pattern...) {
 		t.QueryerFunction = ast.NewIdent("QueryRow")
 	} else {
-		return nil, errors.Errorf("a query function was not provided and failed to infer from the scanner function parameter list")
+		return nil, errorsx.Errorf("a query function was not provided and failed to infer from the scanner function parameter list")
 	}
 
 	// prevent name collisions.

@@ -15,7 +15,6 @@ import (
 	"github.com/james-lawrence/genieql/generators/typespec"
 	"github.com/james-lawrence/genieql/internal/errorsx"
 	"github.com/james-lawrence/genieql/internal/stringsx"
-	"github.com/pkg/errors"
 )
 
 // InsertBatch configuration interface for generating batch inserts.
@@ -68,7 +67,7 @@ func InsertBatchFromFile(cctx generators.Context, name string, tree *ast.File) (
 	}
 
 	if scanner = functions.DetectScanner(cctx, declPattern); scanner == nil {
-		return nil, errors.Errorf("InsertBatch %s - missing scanner", nodeInfo(cctx, pos))
+		return nil, errorsx.Errorf("InsertBatch %s - missing scanner", nodeInfo(cctx, pos))
 	}
 
 	return NewBatchInsert(
@@ -135,7 +134,7 @@ func (t *batch) Generate(dst io.Writer) (err error) {
 	t.ctx.Debugln("batch.insert scanner", t.scanner)
 
 	if cmaps, err = generators.ColumnMapFromFields(t.ctx, t.tf); err != nil {
-		return errors.Wrap(err, "unable to generate mapping")
+		return errorsx.Wrap(err, "unable to generate mapping")
 	}
 
 	defaulted := genieql.ColumnInfoFilterIgnore(t.defaults...)
@@ -158,7 +157,7 @@ func (t *batch) Generate(dst io.Writer) (err error) {
 	}
 
 	if _, encodings, _, err = generators.QueryInputsFromColumnMap(t.ctx, t.scanner, explodeerrHandler, defaultedcset...); err != nil {
-		return errors.Wrap(err, "unable to transform query inputs")
+		return errorsx.Wrap(err, "unable to transform query inputs")
 	}
 
 	errhandling := generators.ScannerErrorHandlingExpr(t.scanner)
@@ -421,7 +420,7 @@ func (t *batch) Generate(dst io.Writer) (err error) {
 	}
 
 	if explodedecl, err = explodefn.Compile(functions.New("", explodesig)); err != nil {
-		return errors.Wrap(err, "failed to generate encoding function")
+		return errorsx.Wrap(err, "failed to generate encoding function")
 	}
 
 	generatecasestatement := func(nrecords int, caseexpr ...ast.Expr) *ast.CaseClause {

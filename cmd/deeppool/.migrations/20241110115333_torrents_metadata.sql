@@ -6,8 +6,7 @@ CREATE TABLE torrents_metadata (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     bytes UBIGINT NOT NULL,
     description STRING NOT NULL DEFAULT '',
-    infohash STRING NOT NULL,
-    
+    infohash STRING NOT NULL
 );
 -- +goose StatementEnd
 

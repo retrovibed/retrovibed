@@ -13,14 +13,6 @@ func init() {
 	errorsx.MaybePanic(genieql.RegisterDriver(DuckDB, NewDriver(DuckDB, ddb...)))
 }
 
-const ddbDefaultEncode = `func() {}`
-
-const ddbDefaultDecode = `func() {
-	if err := {{ .From | expr }}.Scan({{.To | autoreference | expr}}); err != nil {
-		return err
-	}
-}`
-
 const ddbDecodeUUID = `func() {
 	if {{ .From | expr }}.Valid {
 		if uid, err := uuid.FromBytes([]byte({{ .From | expr }}.String)); err != nil {
@@ -31,11 +23,30 @@ const ddbDecodeUUID = `func() {
 	}
 }`
 
-const ddbEncodeUUID = `func() {
-	if {{ .From | expr }}.Valid {
-		tmp := {{ .Type | expr }}({{ .From | expr }}.String)
-		{{ .To | autodereference | expr }} = tmp
-	}
+// const ddbEncodeUUID = `func() {
+// 	if {{ .From | expr }}.Valid {
+// 		tmp := {{ .Type | expr }}({{ .From | expr }}.String)
+// 		{{ .To | autodereference | expr }} = tmp
+// 	}
+// }`
+
+const ddbDecodeINET = `func() {
+	{{ .To | expr }} = net.ParseIP({{ .From | expr }}.String)
+	// {{ .To | expr }} = net.IP({{ .From | expr }})
+}`
+
+const ddbEncodeINET = `func() {
+	{{ .To | expr }}.Valid = true
+	{{ .To | expr }}.String = {{ .From | expr }}.String()
+	// {{ .To | expr }} = []byte({{ .From | expr }})
+}`
+
+const ddbDecodeBinary = `func() {
+	{{ .To | expr }} ={{ .From | expr }}
+}`
+
+const ddbEncodeBinary = `func() {
+	{{ .To | expr }} = {{ .From | expr }}
 }`
 
 var ddb = []genieql.ColumnDefinition{
@@ -126,5 +137,29 @@ var ddb = []genieql.ColumnDefinition{
 		Native:     timeExprString,
 		Decode:     StdlibDecodeTime,
 		Encode:     StdlibEncodeTime,
+	},
+	{
+		DBTypeName: "INET",
+		Type:       "INET",
+		ColumnType: "sql.NullString",
+		Native:     ipExpr,
+		Decode:     ddbDecodeINET,
+		Encode:     ddbEncodeINET,
+	},
+	{
+		DBTypeName: "BINARY",
+		Type:       "BINARY",
+		ColumnType: "[]byte",
+		Native:     bytesExpr,
+		Decode:     ddbDecodeBinary,
+		Encode:     ddbEncodeBinary,
+	},
+	{
+		DBTypeName: "BLOB",
+		Type:       "BLOB",
+		ColumnType: "[]byte",
+		Native:     bytesExpr,
+		Decode:     ddbDecodeBinary,
+		Encode:     ddbEncodeBinary,
 	},
 }

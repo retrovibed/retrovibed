@@ -20,7 +20,6 @@ import (
 	"github.com/james-lawrence/genieql/internal/errorsx"
 	"github.com/james-lawrence/genieql/internal/md5x"
 	"github.com/james-lawrence/genieql/internal/userx"
-	"github.com/pkg/errors"
 )
 
 // Logging levels
@@ -219,7 +218,7 @@ func NewContextFromConfig(bctx build.Context, config genieql.Configuration, pkg 
 	}
 
 	if dialect, err = dialects.LookupDialect(config); err != nil {
-		return ctx, errors.Wrap(err, "unable to lookup dialect")
+		return ctx, errorsx.Wrap(err, "unable to lookup dialect")
 	}
 
 	if driver, err = genieql.LookupDriver(config.Driver); err != nil {
@@ -230,8 +229,7 @@ func NewContextFromConfig(bctx build.Context, config genieql.Configuration, pkg 
 		return ctx, errorsx.Wrap(err, "unable to load custom types")
 	}
 
-	cachedir := userx.DefaultCacheDirectory(md5x.Hex(config.Location))
-	// cachedir := filepath.Join(config.Location, ".cache")
+	cachedir := userx.DefaultCacheDirectory(md5x.Hex(config.Version, config.Location))
 	if err = os.MkdirAll(cachedir, 0700); err != nil {
 		return ctx, errorsx.Wrapf(err, "unable to ensure cache directory: %s", cachedir)
 	}
@@ -281,7 +279,7 @@ func ColumnMapFromFields(ctx Context, inputs ...*ast.Field) (rcmaps []genieql.Co
 			}
 
 			if cmaps, err = MapField(ctx, astutil.Field(input.Type, name)); err != nil {
-				return rcmaps, errors.Wrapf(
+				return rcmaps, errorsx.Wrapf(
 					err,
 					"failed to map columns for: %s:%s",
 					ctx.CurrentPackage.Name, types.ExprString(input.Type),
@@ -333,7 +331,7 @@ func QueryInputsFromColumnMap(ctx Context, scanner *ast.FuncDecl, errHandler fun
 		local := cmap.Local(idx)
 
 		if tmp, err = encode(idx, cmap, errHandler); err != nil {
-			return locals, encodings, qinputs, errors.Wrap(err, "failed to generate encode")
+			return locals, encodings, qinputs, errorsx.Wrap(err, "failed to generate encode")
 		}
 
 		if tmp == nil {
@@ -387,10 +385,10 @@ func (t Formatting) Generate(dst io.Writer) error {
 	}
 
 	if err = astcodec.FormatOutput(&formatted, buffer.Bytes()); err != nil {
-		return errors.Wrap(err, buffer.String())
+		return errorsx.Wrap(err, buffer.String())
 	}
 
 	_, err = io.Copy(dst, &formatted)
 
-	return errors.Wrap(err, formatted.String())
+	return errorsx.Wrap(err, formatted.String())
 }

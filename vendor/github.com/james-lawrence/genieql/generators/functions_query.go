@@ -9,11 +9,11 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/pkg/errors"
 	"github.com/zieckey/goini"
 
 	"github.com/james-lawrence/genieql"
 	"github.com/james-lawrence/genieql/astutil"
+	"github.com/james-lawrence/genieql/internal/errorsx"
 )
 
 const defaultQueryParamName = "q"
@@ -156,23 +156,23 @@ func generatorFromFuncType(ctx Context, name *ast.Ident, comment *ast.CommentGro
 
 	// validations
 	if ft.Params.NumFields() < 1 {
-		return ctx, []QueryFunctionOption(nil), errors.Errorf("function prototype (%s) requires at least the type which will perform the query. i.e.) *sql.DB", name)
+		return ctx, []QueryFunctionOption(nil), errorsx.Errorf("function prototype (%s) requires at least the type which will perform the query. i.e.) *sql.DB", name)
 	}
 
 	if ft.Results.NumFields() != 1 {
-		return ctx, []QueryFunctionOption(nil), errors.Errorf("function prototype (%s) requires a single function as the return value", name)
+		return ctx, []QueryFunctionOption(nil), errorsx.Errorf("function prototype (%s) requires a single function as the return value", name)
 	}
 
 	if defaulted, commentOptions, err = QFOFromComment(comment); err != nil {
-		return ctx, []QueryFunctionOption(nil), errors.Errorf("function prototype (%s) comment options are invalid", name)
+		return ctx, []QueryFunctionOption(nil), errorsx.Errorf("function prototype (%s) comment options are invalid", name)
 	}
 
 	if queryer, params, err = extractOptionsFromParams(ctx, defaulted, ft.Params.List...); err != nil {
-		return ctx, []QueryFunctionOption(nil), errors.Wrapf(err, "function prototype (%s) parameters are invalid", name)
+		return ctx, []QueryFunctionOption(nil), errorsx.Wrapf(err, "function prototype (%s) parameters are invalid", name)
 	}
 
 	if scannerOption, err = extractOptionsFromResult(ctx, ft.Results.List[0]); err != nil {
-		return ctx, []QueryFunctionOption(nil), errors.Wrapf(err, "function prototype (%s) scanner option is invalid", name)
+		return ctx, []QueryFunctionOption(nil), errorsx.Wrapf(err, "function prototype (%s) scanner option is invalid", name)
 	}
 
 	nameOpt = QFONoop
@@ -305,7 +305,7 @@ func NewQueryFunction(ctx Context, options ...QueryFunctionOption) genieql.Gener
 			)
 		}
 	} else {
-		return genieql.NewErrGenerator(errors.Errorf("a query function was not provided and failed to infer from the scanner function parameter list"))
+		return genieql.NewErrGenerator(errorsx.Errorf("a query function was not provided and failed to infer from the scanner function parameter list"))
 	}
 
 	return qf
@@ -384,7 +384,7 @@ func (t queryFunction) Generate(dst io.Writer) (err error) {
 
 	// log.Println("mapping fields", strings.Join(astutil.MapExprToString(astutil.MapFieldsToTypeExpr(t.Parameters...)...), ","))
 	if columns, err = MapFields(t.Context, t.Parameters, t.Ignore...); err != nil {
-		return errors.Wrap(err, "failed to map fields")
+		return errorsx.Wrap(err, "failed to map fields")
 	}
 	// log.Println("parameters", len(t.Parameters), len(t.QueryParameters), len(columns))
 	// log.Println("mapping fields")
@@ -433,7 +433,7 @@ func (t queryFunction) Generate(dst io.Writer) (err error) {
 		Error:        t.ErrHandler,
 	}
 
-	return errors.Wrap(t.Template.Execute(dst, ctx), "failed to generate query function")
+	return errorsx.Wrap(t.Template.Execute(dst, ctx), "failed to generate query function")
 }
 
 func buildParameters(queryInParams bool, queryer, query *ast.Field, params ...*ast.Field) []*ast.Field {

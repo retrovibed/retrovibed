@@ -11,7 +11,6 @@ import (
 	"strconv"
 
 	"github.com/james-lawrence/genieql/internal/errorsx"
-	"github.com/pkg/errors"
 )
 
 // Expr converts a template expression into an ast.Expr node.
@@ -379,7 +378,7 @@ func Print(n ast.Node) (string, error) {
 	fset := token.NewFileSet()
 	err := printer.Fprint(dst, fset, n)
 
-	return dst.String(), errors.Wrap(err, "failure to print ast")
+	return dst.String(), errorsx.Wrap(err, "failure to print ast")
 }
 
 // MustPrint an ast.Node
@@ -412,7 +411,7 @@ func StructureFieldSelectors(local *ast.Field, fields ...*ast.Field) []ast.Expr 
 func MustParseExpr(fs *token.FileSet, in string) ast.Expr {
 	expr, err := parser.ParseExprFrom(fs, "", []byte(in), 0)
 	if err != nil {
-		panic(errors.Wrapf(err, "failed to parse (%s)", in))
+		panic(errorsx.Wrapf(err, "failed to parse (%s)", in))
 	}
 
 	return expr

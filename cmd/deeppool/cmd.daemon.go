@@ -227,7 +227,6 @@ func FindBep51Peers(ctx context.Context, db sqlx.Queryer, s *dht.Server) (err er
 		dctx, done := context.WithTimeout(ctx, 5*time.Second)
 		defer done()
 
-		log.Println("Requesting samples", dst.String())
 		encoded, _, err := s.QueryContext(dctx, dst, req.Q, req.T, b)
 		if err != nil {
 			return errorsx.Wrap(err, "query failed")

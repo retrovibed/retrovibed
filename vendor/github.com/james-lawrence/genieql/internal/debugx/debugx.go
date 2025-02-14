@@ -16,7 +16,6 @@ import (
 	"github.com/james-lawrence/genieql/internal/errorsx"
 	"github.com/james-lawrence/genieql/internal/iox"
 	"github.com/james-lawrence/genieql/internal/stringsx"
-	"github.com/pkg/errors"
 )
 
 var (
@@ -49,7 +48,7 @@ func genDst() (path string, dst io.WriteCloser) {
 	path = filepath.Join(os.TempDir(), fmt.Sprintf("%s-%s-%s.trace", filepath.Base(os.Args[0]), t.Format("2006-01-02"), ts))
 
 	if dst, err = os.Create(path); err != nil {
-		log.Println(errors.Wrapf(err, "failed to open file: %s", path))
+		log.Println(errorsx.Wrapf(err, "failed to open file: %s", path))
 		log.Println("routine dump falling back to stderr")
 		return "stderr", iox.WriteNopCloser(os.Stderr)
 	}
@@ -125,12 +124,12 @@ func OnSignal(ctx context.Context, do func(ctx context.Context) error, sigs ...o
 
 // func run(ctx context.Context, dir string, strategy func(*profile.Profile)) (err error) {
 // 	if err = os.MkdirAll(dir, 0700); err != nil {
-// 		return errors.Wrap(err, "unable to create profiling directory")
+// 		return errorsx.Wrap(err, "unable to create profiling directory")
 // 	}
 
 // 	tmpdir, err := os.MkdirTemp(dir, strings.ReplaceAll("{}.*.profile", "{}", uuid.Must(uuid.NewV7()).String()))
 // 	if err != nil {
-// 		return errors.Wrap(err, "unable to create profiling directory")
+// 		return errorsx.Wrap(err, "unable to create profiling directory")
 // 	}
 // 	defer os.RemoveAll(tmpdir)
 
@@ -142,7 +141,7 @@ func OnSignal(ctx context.Context, do func(ctx context.Context) error, sigs ...o
 
 // 	stoppable := StopFunc(func() {
 // 		p.Stop()
-// 		errorsx.MaybeLog(errors.Wrap(clone(path.Join(dir, "profile.pprof"), tmpdir), "unable to finalize profile"))
+// 		errorsx.MaybeLog(errorsx.Wrap(clone(path.Join(dir, "profile.pprof"), tmpdir), "unable to finalize profile"))
 // 	})
 
 // 	return errors.WithStack(Run(ctx, stoppable))
@@ -183,17 +182,17 @@ func clone(dstpath string, dir string) (err error) {
 	)
 
 	if dst, err = os.Create(dstpath); err != nil {
-		return errors.Wrap(err, "copy failed")
+		return errorsx.Wrap(err, "copy failed")
 	}
 	defer dst.Close()
 
 	if src, err = os.Open(location); err != nil {
-		return errors.Wrap(err, "copy failed")
+		return errorsx.Wrap(err, "copy failed")
 	}
 	defer src.Close()
 
 	if _, err := io.Copy(dst, src); err != nil {
-		return errors.Wrap(err, "copy failed")
+		return errorsx.Wrap(err, "copy failed")
 	}
 
 	return nil

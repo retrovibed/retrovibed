@@ -12,7 +12,6 @@ import (
 	"github.com/james-lawrence/genieql/generators"
 	"github.com/james-lawrence/genieql/generators/functions"
 	"github.com/james-lawrence/genieql/internal/errorsx"
-	"github.com/pkg/errors"
 )
 
 // Insert configuration interface for generating Insert.
@@ -46,7 +45,7 @@ func InsertFromFile(cctx generators.Context, name string, tree *ast.File) (Inser
 	}
 
 	if scanner = functions.DetectScanner(cctx, declPattern); scanner == nil {
-		return nil, errors.Errorf("genieql.Insert %s - missing scanner", nodeInfo(cctx, pos))
+		return nil, errorsx.Errorf("genieql.Insert %s - missing scanner", nodeInfo(cctx, pos))
 	}
 
 	if cf = functions.DetectContext(declPattern); cf != nil {
@@ -59,7 +58,7 @@ func InsertFromFile(cctx generators.Context, name string, tree *ast.File) (Inser
 
 	switch plen := len(declPattern.Params.List); plen {
 	case 0:
-		return nil, errors.Errorf("genieql.Insert %s - missing type to insert; should be the last parameter of function declaration argument", nodeInfo(cctx, pos))
+		return nil, errorsx.Errorf("genieql.Insert %s - missing type to insert; should be the last parameter of function declaration argument", nodeInfo(cctx, pos))
 	case 1:
 		tf = declPattern.Params.List[0]
 		params = declPattern.Params.List
@@ -163,11 +162,11 @@ func (t *insert) Generate(dst io.Writer) (err error) {
 	t.ctx.Debugln("insert table", t.table)
 
 	if paramscmaps, err = generators.ColumnMapFromFields(t.ctx, t.params...); err != nil {
-		return errors.Wrap(err, "unable to generate mapping")
+		return errorsx.Wrap(err, "unable to generate mapping")
 	}
 
 	if insertcmaps, err = generators.ColumnMapFromFields(t.ctx, t.tf); err != nil {
-		return errors.Wrap(err, "unable to generate mapping")
+		return errorsx.Wrap(err, "unable to generate mapping")
 	}
 
 	ignored := genieql.ColumnInfoFilterIgnore(t.ignore...)
@@ -178,7 +177,7 @@ func (t *insert) Generate(dst io.Writer) (err error) {
 	projectioncset0 := ignoredcset0.Filter(func(cm genieql.ColumnMap) bool { return defaulted(cm.ColumnInfo) })
 
 	if locals, encodings, qinputs, err = generators.QueryInputsFromColumnMap(t.ctx, t.scanner, nil, projectioncset0...); err != nil {
-		return errors.Wrap(err, "unable to transform query inputs")
+		return errorsx.Wrap(err, "unable to transform query inputs")
 	}
 
 	transforms = []ast.Stmt{

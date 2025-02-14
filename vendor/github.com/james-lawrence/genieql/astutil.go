@@ -14,8 +14,8 @@ import (
 	"strings"
 
 	"github.com/james-lawrence/genieql/astutil"
+	"github.com/james-lawrence/genieql/internal/errorsx"
 	"github.com/james-lawrence/genieql/internal/slicesx"
-	"github.com/pkg/errors"
 )
 
 type errorString string
@@ -564,7 +564,7 @@ func PrintPackage(printer ASTPrinter, dst io.Writer, fset *token.FileSet, pkg *b
 
 	printer.Fprintf(dst, "\n\n")
 
-	return errors.Wrap(printer.Err(), "failed to print the package header")
+	return errorsx.Wrap(printer.Err(), "failed to print the package header")
 }
 
 // debuggogen generates an informational string about the details of where go:generate
