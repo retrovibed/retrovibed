@@ -82,6 +82,11 @@ func (t DebuggingQueryer) ExecContext(ctx context.Context, q string, args ...int
 	return t.Delegate.ExecContext(ctx, q, args...)
 }
 
+func Count(ctx context.Context, q Queryer, query string) (count int, err error) {
+	err = NewIntRowScanner(q.QueryRowContext(ctx, query)).Scan(&count)
+	return count, err
+}
+
 // NewIntRowScanner ...
 func NewIntRowScanner(r *sql.Row) IntRowScanner {
 	return IntRowScanner{Row: r}

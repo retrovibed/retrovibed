@@ -98,6 +98,9 @@ github.com/davecgh/go-spew/spew
 # github.com/edsrzf/mmap-go v1.2.0
 ## explicit; go 1.17
 github.com/edsrzf/mmap-go
+# github.com/felixge/fgprof v0.9.5
+## explicit; go 1.14
+github.com/felixge/fgprof
 # github.com/fsnotify/fsnotify v1.8.0
 ## explicit; go 1.17
 github.com/fsnotify/fsnotify
@@ -136,7 +139,7 @@ github.com/google/go-cmp/cmp/internal/diff
 github.com/google/go-cmp/cmp/internal/flags
 github.com/google/go-cmp/cmp/internal/function
 github.com/google/go-cmp/cmp/internal/value
-# github.com/google/pprof v0.0.0-20241210010833-40e02aabc2ad
+# github.com/google/pprof v0.0.0-20250208200701-d0013a598941
 ## explicit; go 1.22
 github.com/google/pprof/profile
 # github.com/hashicorp/errwrap v1.1.0
@@ -209,7 +212,7 @@ github.com/james-lawrence/genieql/internal/userx
 github.com/james-lawrence/genieql/internal/wasidialect
 github.com/james-lawrence/genieql/internal/wasix/ffierrors
 github.com/james-lawrence/genieql/internal/wasix/ffiguest
-# github.com/james-lawrence/torrent v0.0.0-20250214130618-5e4bed5b84b6
+# github.com/james-lawrence/torrent v0.0.0-20250214181907-21006b5342e0
 ## explicit; go 1.23
 github.com/james-lawrence/torrent
 github.com/james-lawrence/torrent/bencode
@@ -315,6 +318,9 @@ github.com/pierrec/lz4/v4/internal/xxh32
 # github.com/pkg/errors v0.9.1
 ## explicit
 github.com/pkg/errors
+# github.com/pkg/profile v1.7.0
+## explicit; go 1.13
+github.com/pkg/profile
 # github.com/pmezard/go-difflib v1.0.0
 ## explicit
 github.com/pmezard/go-difflib/difflib

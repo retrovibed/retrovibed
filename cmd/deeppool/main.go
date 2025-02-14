@@ -13,6 +13,7 @@ import (
 	"github.com/alecthomas/kong"
 	"github.com/james-lawrence/deeppool/cmd/cmdopts"
 	"github.com/james-lawrence/deeppool/internal/x/debugx"
+	"github.com/james-lawrence/deeppool/internal/x/envx"
 	"github.com/willabides/kongplete"
 )
 
@@ -39,6 +40,22 @@ func main() {
 	go cmdopts.Cleanup(shellCli.Context, shellCli.Shutdown, shellCli.Cleanup, os.Kill, os.Interrupt)(func() {
 		log.Println("waiting for systems to shutdown")
 	})
+	go debugx.OnSignal(shellCli.Context, func(ctx context.Context) error {
+		dctx, done := context.WithTimeout(ctx, envx.Duration(time.Second, "DEEPPOOL_PROFILING_DURATION"))
+		defer done()
+
+		log.Println("PROFILING INITIATED")
+		defer log.Println("PROFILING COMPLETED")
+
+		switch envx.String("cpu", "DEEPPOOL_PROFILING_STRATEGY") {
+		case "heap":
+			return debugx.Heap(envx.String(os.TempDir(), "CACHE_DIRECTORY"))(dctx)
+		case "mem":
+			return debugx.Memory(envx.String(os.TempDir(), "CACHE_DIRECTORY"))(dctx)
+		default:
+			return debugx.CPU(envx.String(os.TempDir(), "CACHE_DIRECTORY"))(dctx)
+		}
+	}, syscall.SIGUSR1)
 
 	parser := kong.Must(
 		&shellCli,
