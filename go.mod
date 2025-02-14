@@ -7,7 +7,7 @@ toolchain go1.23.5
 require (
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/alecthomas/kong v1.8.0
-	github.com/anacrolix/stm v0.5.0
+	github.com/anacrolix/stm v0.2.0
 	github.com/anacrolix/utp v0.2.0
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/james-lawrence/genieql v0.0.0-20250214004632-76bb098e0718
@@ -22,7 +22,6 @@ require (
 
 require (
 	github.com/RoaringBitmap/roaring v1.9.4 // indirect
-	github.com/alecthomas/atomic v0.1.0-alpha2 // indirect
 	github.com/anacrolix/generics v0.0.2 // indirect
 	github.com/anacrolix/log v0.16.0 // indirect
 	github.com/anacrolix/missinggo v1.3.0 // indirect
@@ -32,7 +31,7 @@ require (
 	github.com/anacrolix/sync v0.5.3 // indirect
 	github.com/anacrolix/upnp v0.1.4 // indirect
 	github.com/apache/arrow-go/v18 v18.0.0 // indirect
-	github.com/benbjohnson/immutable v0.4.3 // indirect
+	github.com/benbjohnson/immutable v0.2.0 // indirect
 	github.com/bits-and-blooms/bitset v1.20.0 // indirect
 	github.com/bits-and-blooms/bloom/v3 v3.7.0 // indirect
 	github.com/bradfitz/iter v0.0.0-20191230175014-e8f45d346db8 // indirect

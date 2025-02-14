@@ -1,19 +1,16 @@
 package stm
 
 import (
-	"math/rand"
 	"runtime/pprof"
 	"sync"
-	"time"
 )
 
 var (
-	txPool = sync.Pool{New: func() any {
+	txPool = sync.Pool{New: func() interface{} {
 		expvars.Add("new txs", 1)
 		tx := &Tx{
-			reads:    make(map[txVar]VarValue),
-			writes:   make(map[txVar]any),
-			watching: make(map[txVar]struct{}),
+			reads:  make(map[*Var]uint64),
+			writes: make(map[*Var]interface{}),
 		}
 		tx.cond.L = &tx.mu
 		return tx
@@ -21,10 +18,7 @@ var (
 	failedCommitsProfile *pprof.Profile
 )
 
-const (
-	profileFailedCommits = false
-	sleepBetweenRetries  = false
-)
+const profileFailedCommits = false
 
 func init() {
 	if profileFailedCommits {
@@ -33,47 +27,24 @@ func init() {
 }
 
 func newTx() *Tx {
-	tx := txPool.Get().(*Tx)
-	tx.tries = 0
-	tx.completed = false
-	return tx
+	return txPool.Get().(*Tx)
 }
 
-func WouldBlock[R any](fn Operation[R]) (block bool) {
+func WouldBlock(fn Operation) (block bool) {
 	tx := newTx()
 	tx.reset()
 	_, block = catchRetry(fn, tx)
-	if len(tx.watching) != 0 {
-		panic("shouldn't have installed any watchers")
-	}
-	tx.recycle()
 	return
 }
 
 // Atomically executes the atomic function fn.
-func Atomically[R any](op Operation[R]) R {
+func Atomically(op Operation) interface{} {
 	expvars.Add("atomically", 1)
 	// run the transaction
 	tx := newTx()
 retry:
-	tx.tries++
 	tx.reset()
-	if sleepBetweenRetries {
-		shift := int64(tx.tries - 1)
-		const maxShift = 30
-		if shift > maxShift {
-			shift = maxShift
-		}
-		ns := int64(1) << shift
-		d := time.Duration(rand.Int63n(ns))
-		if d > 100*time.Microsecond {
-			tx.updateWatchers()
-			time.Sleep(time.Duration(ns))
-		}
-	}
-	tx.mu.Lock()
 	ret, retry := catchRetry(op, tx)
-	tx.mu.Unlock()
 	if retry {
 		expvars.Add("retries", 1)
 		// wait for one of the variables we read to change before retrying
@@ -82,7 +53,7 @@ retry:
 	}
 	// verify the read log
 	tx.lockAllVars()
-	if tx.inputsChanged() {
+	if !tx.verify() {
 		tx.unlock()
 		expvars.Add("failed commits", 1)
 		if profileFailedCommits {
@@ -92,10 +63,6 @@ retry:
 	}
 	// commit the write log and broadcast that variables have changed
 	tx.commit()
-	tx.mu.Lock()
-	tx.completed = true
-	tx.cond.Broadcast()
-	tx.mu.Unlock()
 	tx.unlock()
 	expvars.Add("commits", 1)
 	tx.recycle()
@@ -103,12 +70,12 @@ retry:
 }
 
 // AtomicGet is a helper function that atomically reads a value.
-func AtomicGet[T any](v *Var[T]) T {
-	return v.value.Load().Get().(T)
+func AtomicGet(v *Var) interface{} {
+	return v.loadState().val
 }
 
 // AtomicSet is a helper function that atomically writes a value.
-func AtomicSet[T any](v *Var[T], val T) {
+func AtomicSet(v *Var, val interface{}) {
 	v.mu.Lock()
 	v.changeValue(val)
 	v.mu.Unlock()
@@ -116,19 +83,20 @@ func AtomicSet[T any](v *Var[T], val T) {
 
 // Compose is a helper function that composes multiple transactions into a
 // single transaction.
-func Compose[R any](fns ...Operation[R]) Operation[struct{}] {
-	return VoidOperation(func(tx *Tx) {
+func Compose(fns ...Operation) Operation {
+	return func(tx *Tx) interface{} {
 		for _, f := range fns {
 			f(tx)
 		}
-	})
+		return nil
+	}
 }
 
 // Select runs the supplied functions in order. Execution stops when a
 // function succeeds without calling Retry. If no functions succeed, the
 // entire selection will be retried.
-func Select[R any](fns ...Operation[R]) Operation[R] {
-	return func(tx *Tx) R {
+func Select(fns ...Operation) Operation {
+	return func(tx *Tx) interface{} {
 		switch len(fns) {
 		case 0:
 			// empty Select blocks forever
@@ -138,7 +106,7 @@ func Select[R any](fns ...Operation[R]) Operation[R] {
 			return fns[0](tx)
 		default:
 			oldWrites := tx.writes
-			tx.writes = make(map[txVar]any, len(oldWrites))
+			tx.writes = make(map[*Var]interface{}, len(oldWrites))
 			for k, v := range oldWrites {
 				tx.writes[k] = v
 			}
@@ -153,17 +121,11 @@ func Select[R any](fns ...Operation[R]) Operation[R] {
 	}
 }
 
-type Operation[R any] func(*Tx) R
+type Operation func(*Tx) interface{}
 
-func VoidOperation(f func(*Tx)) Operation[struct{}] {
-	return func(tx *Tx) struct{} {
+func VoidOperation(f func(*Tx)) Operation {
+	return func(tx *Tx) interface{} {
 		f(tx)
-		return struct{}{}
+		return nil
 	}
-}
-
-func AtomicModify[T any](v *Var[T], f func(T) T) {
-	Atomically(VoidOperation(func(tx *Tx) {
-		v.Set(tx, f(v.Get(tx)))
-	}))
 }
