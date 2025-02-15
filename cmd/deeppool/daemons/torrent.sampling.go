@@ -89,6 +89,7 @@ func DiscoverDHTBEP51Peers(ctx context.Context, q sqlx.Queryer, s *dht.Server) (
 		for _, n := range s.Nodes() {
 			if err := recordinterestingpeer(ctx, q, s, n); err != nil {
 				log.Println(err)
+				continue
 			}
 		}
 	}
@@ -204,19 +205,21 @@ func DiscoverDHTInfoHashes(ctx context.Context, db sqlx.Queryer, s *dht.Server) 
 		pending = errorsx.Zero(sqlx.Count(ctx, db, "SELECT COUNT (*) FROM torrents_unknown_infohashes WHERE next_check < NOW()"))
 	}
 
-	return nil
+	return ctx.Err()
 }
 
 // request samples from the domain space.
 func DiscoverDHTMetadata(ctx context.Context, db sqlx.Queryer, s *dht.Server, tclient *torrent.Client, tstore storage.ClientImpl) error {
 	const workloads = 256
+	bs := backoffx.New(backoffx.Exponential(time.Second), backoffx.Minimum(20*time.Second), backoffx.Maximum(5*time.Minute))
 	runsample := func(ctx context.Context, unk tracking.UnknownHash) (err error) {
 		var (
 			unknown tracking.UnknownHash
 			md      tracking.Metadata
+			timeout = bs.Backoff(int(unk.Attempts))
 		)
 
-		dctx, done := context.WithTimeout(ctx, time.Minute+backoffx.DynamicHashDuration(10*time.Second, unk.ID))
+		dctx, done := context.WithTimeout(ctx, timeout+backoffx.DynamicHashDuration(timeout, unk.ID))
 		defer done()
 
 		log.Println("locate infohash initiated", unk.ID)
@@ -291,8 +294,11 @@ func DiscoverDHTMetadata(ctx context.Context, db sqlx.Queryer, s *dht.Server, tc
 			for unk := range buff {
 				if err := runsample(ctx, unk); err != nil {
 					log.Println("failed to retrieve metadata", unk.ID, err)
+					continue
 				}
 			}
+
+			panic("ZERP ZERP")
 		}()
 	}
 
@@ -300,7 +306,7 @@ func DiscoverDHTMetadata(ctx context.Context, db sqlx.Queryer, s *dht.Server, tc
 		for unk, err := range locatehashed(ctx) {
 			if err != nil {
 				log.Println("locating pending info hashes failed", err)
-				break
+				continue
 			}
 
 			select {
@@ -316,6 +322,8 @@ func DiscoverDHTMetadata(ctx context.Context, db sqlx.Queryer, s *dht.Server, tc
 		default:
 		}
 	}
+
+	panic("DERP DERP")
 }
 
 func PrintStatistics(ctx context.Context, q sqlx.Queryer) {

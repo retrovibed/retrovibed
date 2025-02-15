@@ -120,6 +120,7 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, peerID *cmdopts.PeerID) (err error) 
 
 		if err := daemons.DiscoverDHTMetadata(ctx.Context, db, dht, tclient, storage.NewFile(torrentdir)); err != nil {
 			log.Println("resolving info hashes has failed", err)
+			panic(err)
 		}
 	}()
 

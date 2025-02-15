@@ -32,6 +32,19 @@ func Maximum(d time.Duration) Option {
 	}
 }
 
+// Minimum sets a lower bound for the strategy.
+func Minimum(d time.Duration) Option {
+	return func(s Strategy) Strategy {
+		return StrategyFunc(func(attempt int) time.Duration {
+			if x := s.Backoff(attempt); x > d {
+				return x
+			}
+
+			return d
+		})
+	}
+}
+
 // Jitter set a jitter frame for the strategy.
 func Jitter(multiplier float64) Option {
 	return func(s Strategy) Strategy {
