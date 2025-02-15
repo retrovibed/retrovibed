@@ -1,8 +1,6 @@
 package tracking
 
 import (
-	"encoding/hex"
-
 	"github.com/james-lawrence/deeppool/internal/x/langx"
 	"github.com/james-lawrence/deeppool/internal/x/md5x"
 	"github.com/james-lawrence/torrent/metainfo"
@@ -22,7 +20,7 @@ func MetadataOptionFromInfo(i *metainfo.Info) func(*Metadata) {
 func NewMetadata(md *metainfo.Hash, options ...func(*Metadata)) (m Metadata) {
 	r := langx.Clone(Metadata{
 		ID:       HashUID(md),
-		Infohash: hex.EncodeToString(md.Bytes()),
+		Infohash: md.Bytes(),
 	}, options...)
 	return r
 }

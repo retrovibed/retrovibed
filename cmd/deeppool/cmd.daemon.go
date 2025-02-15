@@ -10,16 +10,18 @@ import (
 	"log"
 	"net"
 	"net/netip"
-	"runtime"
 	"slices"
 	"time"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/anacrolix/stm/rate"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/pressly/goose/v3"
 
 	"github.com/james-lawrence/deeppool/cmd/cmdopts"
 	"github.com/james-lawrence/deeppool/downloads"
+	"github.com/james-lawrence/deeppool/internal/x/backoffx"
+	"github.com/james-lawrence/deeppool/internal/x/contextx"
 	"github.com/james-lawrence/deeppool/internal/x/errorsx"
 	"github.com/james-lawrence/deeppool/internal/x/goosex"
 	"github.com/james-lawrence/deeppool/internal/x/langx"
@@ -120,6 +122,20 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, peerID *cmdopts.PeerID) (err error) 
 		)
 	})
 
+	go timex.Every(time.Minute, func() {
+		type stats struct {
+			Pending   int
+			Available int
+			Peers     int
+		}
+		m := stats{
+			Pending:   errorsx.Zero(sqlx.Count(ctx.Context, db, "SELECT COUNT (*) FROM torrents_unknown_infohashes WHERE next_check < NOW()")),
+			Available: errorsx.Zero(sqlx.Count(ctx.Context, db, "SELECT COUNT (*) FROM torrents_metadata")),
+			Peers:     errorsx.Zero(sqlx.Count(ctx.Context, db, "SELECT COUNT (*) FROM torrents_peers WHERE next_check < NOW()")),
+		}
+		log.Println("status", spew.Sdump(m))
+	})
+
 	go func() {
 		dht, ok := slicesx.First(tclient.DhtServers()...)
 		if !ok {
@@ -169,16 +185,21 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, peerID *cmdopts.PeerID) (err error) 
 
 // request samples from the domain space.
 func ResolveUnknownInfoHashes(ctx context.Context, db sqlx.Queryer, s *dht.Server, tclient *torrent.Client) error {
+	const workloads = 256
 	runsample := func(ctx context.Context, unk tracking.UnknownHash) (err error) {
 		var (
 			unknown tracking.UnknownHash
 			md      tracking.Metadata
 		)
-		dctx, done := context.WithTimeout(ctx, time.Minute)
+
+		dctx, done := context.WithTimeout(ctx, time.Minute+backoffx.DynamicHashDuration(10*time.Second, unk.ID))
 		defer done()
 
 		log.Println("locate infohash initiated", unk.ID)
-		defer log.Println("locate infohash completed", unk.ID)
+		ts := time.Now()
+		defer func() {
+			log.Println("locate infohash completed", unk.ID, time.Since(ts))
+		}()
 
 		metadata, err := torrent.New(metainfo.Hash(unk.Infohash))
 		if err != nil {
@@ -186,12 +207,15 @@ func ResolveUnknownInfoHashes(ctx context.Context, db sqlx.Queryer, s *dht.Serve
 		}
 
 		info, err := tclient.Info(dctx, metadata)
+
+		if contextx.IsDeadlineExceeded(err) {
+			return tracking.UnknownHashCooldown(ctx, db, unk).Scan(&unk)
+		}
+
 		if err != nil {
 			return errorsx.Wrapf(err, "unable to download metadata for infohash %s", unk.ID)
 		}
 		defer tclient.Stop(metadata)
-
-		log.Println("retrieving info completed", unk.ID, info.Name, info.Length, info.TotalLength())
 
 		if err = tracking.MetadataInsertWithDefaults(ctx, db, tracking.NewMetadata(&metadata.InfoHash, tracking.MetadataOptionFromInfo(info))).Scan(&md); err != nil {
 			return errorsx.Wrap(err, "unable to insert metadata")
@@ -207,7 +231,11 @@ func ResolveUnknownInfoHashes(ctx context.Context, db sqlx.Queryer, s *dht.Serve
 	locatehashed := func(ctx context.Context) iter.Seq2[tracking.UnknownHash, error] {
 		return func(yield func(tracking.UnknownHash, error) bool) {
 			// consider newest unknown hashes first.
-			q := tracking.UnknownSearchBuilder().OrderBy("created_at DESC").Limit(128)
+			q := tracking.UnknownSearchBuilder().Where(
+				squirrel.And{
+					tracking.UnknownHashQueryNeedsCheck(),
+				},
+			).OrderBy("created_at DESC").Limit(128)
 			scanner := tracking.UnknownSearch(ctx, db, q)
 			defer scanner.Close()
 
@@ -233,10 +261,8 @@ func ResolveUnknownInfoHashes(ctx context.Context, db sqlx.Queryer, s *dht.Serve
 		}
 	}
 
-	// pool := pond.NewPool(1)
-	// defer pool.StopAndWait()
-	buff := make(chan tracking.UnknownHash, runtime.NumCPU()*4)
-	for i := 0; i < runtime.NumCPU()*4; i++ {
+	buff := make(chan tracking.UnknownHash, workloads)
+	for i := 0; i < workloads; i++ {
 		go func() {
 			for unk := range buff {
 				if err := runsample(ctx, unk); err != nil {
@@ -362,10 +388,6 @@ func SampleHashes(ctx context.Context, db sqlx.Queryer, s *dht.Server) error {
 
 	l := rate.NewLimiter(rate.Every(10*time.Second), 1)
 	for err := l.Wait(ctx); err == nil; err = l.Wait(ctx) {
-		unknownc := errorsx.Zero(sqlx.Count(ctx, db, "SELECT COUNT (*) FROM torrents_unknown_infohashes"))
-		metadatac := errorsx.Zero(sqlx.Count(ctx, db, "SELECT COUNT (*) FROM torrents_metadata"))
-		log.Println("sampling cycle", unknownc, metadatac)
-
 		if err := querypeers(); err != nil {
 			log.Println("failed to query peers", err)
 		}
@@ -377,7 +399,7 @@ func SampleHashes(ctx context.Context, db sqlx.Queryer, s *dht.Server) error {
 // randomly samples nodes from the dht.
 func FindBep51Peers(ctx context.Context, db sqlx.Queryer, s *dht.Server) (err error) {
 	for {
-		if s.NumNodes() > 64 {
+		if s.NumNodes() > 32 {
 			break
 		}
 		log.Println("minimum nodes not available, waiting", s.NumNodes())
@@ -420,8 +442,8 @@ func FindBep51Peers(ctx context.Context, db sqlx.Queryer, s *dht.Server) (err er
 		// track peers with large libraries.
 		if err := tracking.PeerInsertWithDefaults(ctx, db, peer).Scan(&peer); err != nil {
 			return errorsx.Wrapf(err, "unable to record interesting peer %s", n.ID)
-		} else {
-			log.Println("interesting peer", peer.ID, resp.Y, peer.Bep51, peer.Bep51TTL, peer.Bep51Available, peer.CreatedAt, peer.UpdatedAt)
+		} else if peer.CreatedAt.Before(peer.UpdatedAt) {
+			log.Println("interesting peer", peer.ID, resp.Y, peer.Bep51, peer.Bep51TTL, peer.Bep51Available, peer.CreatedAt, peer.CreatedAt.Equal(peer.UpdatedAt))
 		}
 
 		return nil

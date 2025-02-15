@@ -17,6 +17,10 @@ func NewUnknownHash(md metainfo.Hash, options ...func(*UnknownHash)) (m UnknownH
 	}, options...)
 }
 
+func UnknownHashQueryNeedsCheck() squirrel.Sqlizer {
+	return squirrel.Expr("torrents_unknown_infohashes.next_check < NOW()")
+}
+
 func UnknownSearch(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilder) UnknownHashScanner {
 	return NewUnknownHashScannerStatic(b.RunWith(q).QueryContext(ctx))
 }

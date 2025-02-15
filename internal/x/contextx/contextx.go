@@ -48,9 +48,17 @@ func IgnoreDeadlineExceeded(err error) error {
 	return err
 }
 
+func IsDeadlineExceeded(err error) bool {
+	return errors.Is(err, context.DeadlineExceeded)
+}
+
 func IgnoreCancelled(err error) error {
 	if errors.Is(err, context.Canceled) {
 		return nil
 	}
 	return err
+}
+
+func IsCancelled(err error) bool {
+	return errors.Is(err, context.Canceled)
 }

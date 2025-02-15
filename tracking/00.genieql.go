@@ -98,3 +98,10 @@ func UnknownHashDeleteByID(
 ) {
 	gql = gql.Query(`DELETE FROM torrents_unknown_infohashes WHERE "id" = {id} RETURNING ` + UnknownHashScannerStaticColumns)
 }
+
+func UnknownHashCooldown(
+	gql genieql.Insert,
+	pattern func(ctx context.Context, q sqlx.Queryer, a UnknownHash) NewUnknownHashScannerStaticRow,
+) {
+	gql.Into("torrents_unknown_infohashes").Default("created_at", "updated_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, next_check = NOW() + to_hours(24)")
+}
