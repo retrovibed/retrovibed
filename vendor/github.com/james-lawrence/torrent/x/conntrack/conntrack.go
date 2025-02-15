@@ -1,6 +1,8 @@
 package conntrack
 
-import "expvar"
+import (
+	"expvar"
+)
 
 type Protocol = string
 

@@ -4,7 +4,6 @@ import (
 	"errors"
 	"log"
 	"net/url"
-	"time"
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/james-lawrence/deeppool/cmd/cmdopts"
@@ -21,7 +20,6 @@ type cmdTorrentMagnet struct {
 }
 
 func (t cmdTorrentMagnet) Run(ctx *cmdopts.Global) (err error) {
-	log.Println("DEPR DERP DERP", time.Now().UnixNano())
 	for _, uri := range t.Magnets {
 		m, cause := torrent.NewFromMagnet(uri.String())
 		if cause != nil {

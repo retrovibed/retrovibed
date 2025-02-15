@@ -5,6 +5,9 @@ github.com/Masterminds/squirrel
 ## explicit; go 1.14
 github.com/RoaringBitmap/roaring
 github.com/RoaringBitmap/roaring/internal
+# github.com/alecthomas/atomic v0.1.0-alpha2
+## explicit; go 1.18
+github.com/alecthomas/atomic
 # github.com/alecthomas/kong v1.8.0
 ## explicit; go 1.20
 github.com/alecthomas/kong
@@ -25,9 +28,7 @@ github.com/anacrolix/missinggo/iter
 github.com/anacrolix/missinggo/mime
 github.com/anacrolix/missinggo/orderedmap
 github.com/anacrolix/missinggo/pproffd
-github.com/anacrolix/missinggo/prioritybitmap
 github.com/anacrolix/missinggo/pubsub
-github.com/anacrolix/missinggo/resource
 github.com/anacrolix/missinggo/slices
 github.com/anacrolix/missinggo/x
 # github.com/anacrolix/missinggo/perf v1.0.0
@@ -36,13 +37,16 @@ github.com/anacrolix/missinggo/perf
 # github.com/anacrolix/missinggo/v2 v2.8.0
 ## explicit; go 1.18
 github.com/anacrolix/missinggo/v2
-github.com/anacrolix/missinggo/v2/conntrack
+github.com/anacrolix/missinggo/v2/bitmap
 github.com/anacrolix/missinggo/v2/iter
+github.com/anacrolix/missinggo/v2/prioritybitmap
+github.com/anacrolix/missinggo/v2/resource
+github.com/anacrolix/missinggo/v2/slices
 # github.com/anacrolix/multiless v0.4.0
 ## explicit; go 1.18
 github.com/anacrolix/multiless
-# github.com/anacrolix/stm v0.2.0
-## explicit; go 1.13
+# github.com/anacrolix/stm v0.5.0
+## explicit; go 1.18
 github.com/anacrolix/stm
 github.com/anacrolix/stm/rate
 github.com/anacrolix/stm/stmutil
@@ -80,8 +84,8 @@ github.com/apache/arrow-go/v18/internal/bitutils
 github.com/apache/arrow-go/v18/internal/hashing
 github.com/apache/arrow-go/v18/internal/json
 github.com/apache/arrow-go/v18/internal/utils
-# github.com/benbjohnson/immutable v0.2.0
-## explicit; go 1.12
+# github.com/benbjohnson/immutable v0.4.3
+## explicit; go 1.18
 github.com/benbjohnson/immutable
 # github.com/bits-and-blooms/bitset v1.20.0
 ## explicit; go 1.16
@@ -212,7 +216,7 @@ github.com/james-lawrence/genieql/internal/userx
 github.com/james-lawrence/genieql/internal/wasidialect
 github.com/james-lawrence/genieql/internal/wasix/ffierrors
 github.com/james-lawrence/genieql/internal/wasix/ffiguest
-# github.com/james-lawrence/torrent v0.0.0-20250214181907-21006b5342e0
+# github.com/james-lawrence/torrent v0.0.0-20250215165819-4f2944741bd1
 ## explicit; go 1.23
 github.com/james-lawrence/torrent
 github.com/james-lawrence/torrent/bencode
@@ -223,6 +227,7 @@ github.com/james-lawrence/torrent/dht/v2
 github.com/james-lawrence/torrent/dht/v2/krpc
 github.com/james-lawrence/torrent/internal/errorsx
 github.com/james-lawrence/torrent/internal/netx
+github.com/james-lawrence/torrent/internal/stmutil
 github.com/james-lawrence/torrent/internal/x/bitmapx
 github.com/james-lawrence/torrent/internal/x/bytesx
 github.com/james-lawrence/torrent/internal/x/stringsx
@@ -234,6 +239,7 @@ github.com/james-lawrence/torrent/sockets
 github.com/james-lawrence/torrent/storage
 github.com/james-lawrence/torrent/tracker
 github.com/james-lawrence/torrent/x/bytesx
+github.com/james-lawrence/torrent/x/conntrack
 github.com/james-lawrence/torrent/x/langx
 # github.com/klauspost/compress v1.17.11
 ## explicit; go 1.21
@@ -458,7 +464,7 @@ golang.org/x/tools/internal/stdlib
 golang.org/x/tools/internal/typeparams
 golang.org/x/tools/internal/typesinternal
 golang.org/x/tools/internal/versions
-# golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028
+# golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da
 ## explicit; go 1.18
 golang.org/x/xerrors
 golang.org/x/xerrors/internal

@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/anacrolix/stm"
-	"github.com/anacrolix/stm/stmutil"
+	"github.com/james-lawrence/torrent/internal/stmutil"
 
 	"github.com/anacrolix/missinggo/v2"
 	"github.com/anacrolix/missinggo/v2/iter"
@@ -21,18 +21,18 @@ import (
 type reason = string
 
 type Instance struct {
-	maxEntries   *stm.Var
-	noMaxEntries *stm.Var
+	maxEntries   *stm.Var[int]
+	noMaxEntries *stm.Var[bool]
 	Timeout      func(Entry) time.Duration
 
 	// Occupied slots
-	entries *stm.Var
+	entries *stm.Var[stmutil.Mappish[Entry, stmutil.Settish[*EntryHandle]]]
 
 	// priority to entryHandleSet, ordered by priority ascending
-	waitersByPriority *stm.Var //Mappish
-	waitersByReason   *stm.Var //Mappish
-	waitersByEntry    *stm.Var //Mappish
-	waiters           *stm.Var // Settish
+	waitersByPriority *stm.Var[stmutil.Mappish[priority, stmutil.Settish[*EntryHandle]]] //Mappish
+	waitersByReason   *stm.Var[stmutil.Mappish[string, stmutil.Settish[*EntryHandle]]]   //Mappish
+	waitersByEntry    *stm.Var[stmutil.Mappish[Entry, stmutil.Settish[*EntryHandle]]]    //Mappish
+	waiters           *stm.Var[stmutil.Settish[*EntryHandle]]                            // Settish
 }
 
 type (
@@ -48,14 +48,13 @@ func NewInstance() *Instance {
 			// udp is the main offender, and the default is allegedly 30s.
 			return 30 * time.Second
 		},
-		entries: stm.NewVar(stmutil.NewMap()),
-		waitersByPriority: stm.NewVar(stmutil.NewSortedMap(func(l, r interface{}) bool {
-			return l.(priority) > r.(priority)
+		entries: stm.NewVar(stmutil.NewMap[Entry, stmutil.Settish[*EntryHandle]]()),
+		waitersByPriority: stm.NewVar(stmutil.NewSortedMap[priority, stmutil.Settish[*EntryHandle]](func(l, r priority) bool {
+			return l > r
 		})),
-
-		waitersByReason: stm.NewVar(stmutil.NewMap()),
-		waitersByEntry:  stm.NewVar(stmutil.NewMap()),
-		waiters:         stm.NewVar(stmutil.NewSet()),
+		waitersByReason: stm.NewVar(stmutil.NewMap[string, stmutil.Settish[*EntryHandle]]()),
+		waitersByEntry:  stm.NewVar(stmutil.NewMap[Entry, stmutil.Settish[*EntryHandle]]()),
+		waiters:         stm.NewVar(stmutil.NewSet[*EntryHandle]()),
 	}
 	return i
 }
@@ -66,25 +65,25 @@ func (i *Instance) SetNoMaxEntries() {
 
 func (i *Instance) SetMaxEntries(max int) {
 	stm.Atomically(stm.VoidOperation(func(tx *stm.Tx) {
-		tx.Set(i.noMaxEntries, false)
-		tx.Set(i.maxEntries, max)
+		i.noMaxEntries.Set(tx, false)
+		i.maxEntries.Set(tx, max)
 	}))
 }
 
 func (i *Instance) remove(eh *EntryHandle) {
 	stm.Atomically(func(tx *stm.Tx) interface{} {
-		es, _ := deleteFromMapToSet(tx.Get(i.entries).(stmutil.Mappish), eh.e, eh)
-		tx.Set(i.entries, es)
+		es, _ := deleteFromMapToSet(i.entries.Get(tx), eh.e, eh)
+		i.entries.Set(tx, es)
 		return nil
 	})
 }
 
-func deleteFromMapToSet(m stmutil.Mappish, mapKey, setElem interface{}) (stmutil.Mappish, bool) {
-	_s, ok := m.Get(mapKey)
+func deleteFromMapToSet[K comparable](m stmutil.Mappish[K, stmutil.Settish[*EntryHandle]], mapKey K, setElem *EntryHandle) (stmutil.Mappish[K, stmutil.Settish[*EntryHandle]], bool) {
+	s, ok := m.Get(mapKey)
 	if !ok {
 		return m, true
 	}
-	s := _s.(stmutil.Settish)
+
 	s = s.Delete(setElem)
 	if s.Len() == 0 {
 		return m.Delete(mapKey), true
@@ -93,27 +92,27 @@ func deleteFromMapToSet(m stmutil.Mappish, mapKey, setElem interface{}) (stmutil
 }
 
 func (i *Instance) deleteWaiter(eh *EntryHandle, tx *stm.Tx) {
-	tx.Set(i.waiters, tx.Get(i.waiters).(stmutil.Settish).Delete(eh))
-	tx.Set(i.waitersByPriority, stmutil.GetLeft(deleteFromMapToSet(tx.Get(i.waitersByPriority).(stmutil.Mappish), eh.priority, eh)))
-	tx.Set(i.waitersByReason, stmutil.GetLeft(deleteFromMapToSet(tx.Get(i.waitersByReason).(stmutil.Mappish), eh.reason, eh)))
-	tx.Set(i.waitersByEntry, stmutil.GetLeft(deleteFromMapToSet(tx.Get(i.waitersByEntry).(stmutil.Mappish), eh.e, eh)))
+	i.waiters.Set(tx, i.waiters.Get(tx).Delete(eh))
+	i.waitersByPriority.Set(tx, stmutil.GetLeft(deleteFromMapToSet(i.waitersByPriority.Get(tx), eh.priority, eh)).(stmutil.Mappish[priority, stmutil.Settish[*EntryHandle]]))
+	i.waitersByReason.Set(tx, stmutil.GetLeft(deleteFromMapToSet(i.waitersByReason.Get(tx), eh.reason, eh)).(stmutil.Mappish[string, stmutil.Settish[*EntryHandle]]))
+	i.waitersByEntry.Set(tx, stmutil.GetLeft(deleteFromMapToSet(i.waitersByEntry.Get(tx), eh.e, eh)).(stmutil.Mappish[Entry, stmutil.Settish[*EntryHandle]]))
 }
 
 func (i *Instance) addWaiter(eh *EntryHandle) {
 	stm.Atomically(stm.VoidOperation(func(tx *stm.Tx) {
-		tx.Set(i.waitersByPriority, addToMapToSet(tx.Get(i.waitersByPriority).(stmutil.Mappish), eh.priority, eh))
-		tx.Set(i.waitersByReason, addToMapToSet(tx.Get(i.waitersByReason).(stmutil.Mappish), eh.reason, eh))
-		tx.Set(i.waitersByEntry, addToMapToSet(tx.Get(i.waitersByEntry).(stmutil.Mappish), eh.e, eh))
-		tx.Set(i.waiters, tx.Get(i.waiters).(stmutil.Settish).Add(eh))
+		i.waitersByPriority.Set(tx, addToMapToSet(i.waitersByPriority.Get(tx), eh.priority, eh))
+		i.waitersByReason.Set(tx, addToMapToSet(i.waitersByReason.Get(tx), eh.reason, eh))
+		i.waitersByEntry.Set(tx, addToMapToSet(i.waitersByEntry.Get(tx), eh.e, eh))
+		i.waiters.Set(tx, i.waiters.Get(tx).Add(eh))
 	}))
 }
 
-func addToMapToSet(m stmutil.Mappish, mapKey, setElem interface{}) stmutil.Mappish {
+func addToMapToSet[K comparable, V comparable](m stmutil.Mappish[K, stmutil.Settish[V]], mapKey K, setElem V) stmutil.Mappish[K, stmutil.Settish[V]] {
 	s, ok := m.Get(mapKey)
 	if ok {
-		s = s.(stmutil.Settish).Add(setElem)
+		s = s.Add(setElem)
 	} else {
-		s = stmutil.NewSet().Add(setElem)
+		s = stmutil.NewSet[V]().Add(setElem)
 	}
 	return m.Set(mapKey, s)
 }
@@ -135,21 +134,21 @@ func (i *Instance) Wait(ctx context.Context, e Entry, reason string, p priority)
 	ctxDone, cancel := stmutil.ContextDoneVar(ctx)
 	defer cancel()
 	success := stm.Atomically(func(tx *stm.Tx) interface{} {
-		es := tx.Get(i.entries).(stmutil.Mappish)
+		es := i.entries.Get(tx)
 		if s, ok := es.Get(e); ok {
-			tx.Set(i.entries, es.Set(e, s.(stmutil.Settish).Add(eh)))
+			i.entries.Set(tx, es.Set(e, s.Add(eh)))
 			return true
 		}
-		haveRoom := tx.Get(i.noMaxEntries).(bool) || es.Len() < tx.Get(i.maxEntries).(int)
-		topPrio, ok := iter.First(tx.Get(i.waitersByPriority).(iter.Iterable).Iter)
+		haveRoom := i.noMaxEntries.Get(tx) || es.Len() < i.maxEntries.Get(tx)
+		topPrio, ok := iter.First(i.waitersByPriority.Get(tx).Iter)
 		if !ok {
 			panic("y u no waiting")
 		}
 		if haveRoom && p == topPrio {
-			tx.Set(i.entries, addToMapToSet(es, e, eh))
+			i.entries.Set(tx, addToMapToSet(es, e, eh))
 			return true
 		}
-		if tx.Get(ctxDone).(bool) {
+		if ctxDone.Get(tx) {
 			return false
 		}
 		tx.Retry()
@@ -172,15 +171,15 @@ func (i *Instance) Allow(tx *stm.Tx, e Entry, reason string, p priority) *EntryH
 		priority: p,
 		created:  time.Now(),
 	}
-	es := tx.Get(i.entries).(stmutil.Mappish)
+	es := i.entries.Get(tx)
 	if s, ok := es.Get(e); ok {
-		tx.Set(i.entries, es.Set(e, s.(stmutil.Settish).Add(eh)))
+		i.entries.Set(tx, es.Set(e, s.Add(eh)))
 		return eh
 	}
-	haveRoom := tx.Get(i.noMaxEntries).(bool) || es.Len() < tx.Get(i.maxEntries).(int)
-	topPrio, ok := iter.First(tx.Get(i.waitersByPriority).(iter.Iterable).Iter)
+	haveRoom := i.noMaxEntries.Get(tx) || es.Len() < i.maxEntries.Get(tx)
+	topPrio, ok := iter.First(i.waitersByPriority.Get(tx).Iter)
 	if haveRoom && (!ok || p == topPrio) {
-		tx.Set(i.entries, addToMapToSet(es, e, eh))
+		i.entries.Set(tx, addToMapToSet(es, e, eh))
 		return eh
 	}
 	return nil
@@ -202,26 +201,26 @@ func parseHostPort(hostport string) (ret struct {
 
 func (i *Instance) PrintStatus(w io.Writer) {
 	tw := tabwriter.NewWriter(w, 0, 0, 2, ' ', 0)
-	fmt.Fprintf(w, "num entries: %d\n", stm.AtomicGet(i.entries).(stmutil.Lenner).Len())
+	fmt.Fprintf(w, "num entries: %d\n", stm.AtomicGet(i.entries).Len())
 	fmt.Fprintln(w)
-	fmt.Fprintf(w, "%d waiters:\n", stm.AtomicGet(i.waiters).(stmutil.Lenner).Len())
+	fmt.Fprintf(w, "%d waiters:\n", stm.AtomicGet(i.waiters).Len())
 	fmt.Fprintf(tw, "num\treason\n")
-	stm.AtomicGet(i.waitersByReason).(stmutil.Mappish).Range(func(r, ws interface{}) bool {
-		fmt.Fprintf(tw, "%d\t%q\n", ws.(stmutil.Settish).Len(), r.(reason))
+	stm.AtomicGet(i.waitersByReason).Range(func(r reason, ws stmutil.Settish[*EntryHandle]) bool {
+		fmt.Fprintf(tw, "%d\t%q\n", ws.Len(), r)
 		return true
 	})
 	tw.Flush()
 	fmt.Fprintln(w)
 	fmt.Fprintln(w, "handles:")
 	fmt.Fprintf(tw, "protocol\tlocal\tremote\treason\texpires\tcreated\n")
-	entries := stm.AtomicGet(i.entries).(stmutil.Mappish)
+	entries := stm.AtomicGet(i.entries)
 	type entriesItem struct {
 		Entry
-		stmutil.Settish
+		stmutil.Settish[*EntryHandle]
 	}
 	entriesItems := make([]entriesItem, 0, entries.Len())
-	entries.Range(func(e, hs interface{}) bool {
-		entriesItems = append(entriesItems, entriesItem{e.(Entry), hs.(stmutil.Settish)})
+	entries.Range(func(e Entry, hs stmutil.Settish[*EntryHandle]) bool {
+		entriesItems = append(entriesItems, entriesItem{e, hs})
 		return true
 	})
 	sort.Slice(entriesItems, func(i, j int) bool {
@@ -245,8 +244,7 @@ func (i *Instance) PrintStatus(w io.Writer) {
 	})
 	for _, ei := range entriesItems {
 		e := ei.Entry
-		ei.Settish.Range(func(_h interface{}) bool {
-			h := _h.(*EntryHandle)
+		ei.Settish.Range(func(h *EntryHandle) bool {
 			fmt.Fprintf(tw,
 				"%q\t%q\t%q\t%q\t%s\t%v ago\n",
 				e.Protocol, e.LocalAddr, e.RemoteAddr, h.reason,

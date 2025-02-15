@@ -15,6 +15,8 @@ import (
 	"github.com/james-lawrence/deeppool/internal/x/debugx"
 	"github.com/james-lawrence/deeppool/internal/x/envx"
 	"github.com/willabides/kongplete"
+
+	_ "github.com/benbjohnson/immutable"
 )
 
 func main() {

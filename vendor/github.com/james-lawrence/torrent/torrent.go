@@ -20,10 +20,10 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/pkg/errors"
 
-	"github.com/anacrolix/missinggo"
 	"github.com/anacrolix/missinggo/bitmap"
 	"github.com/anacrolix/missinggo/pubsub"
 	"github.com/anacrolix/missinggo/slices"
+	"github.com/anacrolix/missinggo/v2"
 	"github.com/james-lawrence/torrent/dht/v2"
 
 	"github.com/james-lawrence/torrent/bencode"
@@ -109,12 +109,6 @@ func DownloadInto(ctx context.Context, dst io.Writer, m Torrent, options ...Tune
 }
 
 func newTorrent(cl *Client, src Metadata) *torrent {
-	// use provided storage, if provided
-	storageClient := cl.defaultStorage
-	if src.Storage != nil {
-		storageClient = storage.NewClient(src.Storage)
-	}
-
 	m := &sync.RWMutex{}
 	t := &torrent{
 		displayName: src.DisplayName,
@@ -125,18 +119,16 @@ func newTorrent(cl *Client, src Metadata) *torrent {
 		peers: newPeerPool(32, func(p Peer) peerPriority {
 			return bep40PriorityIgnoreError(cl.publicAddr(p.IP), p.addr())
 		}),
-		conns:             make(map[*connection]struct{}, 2*cl.config.EstablishedConnsPerTorrent),
-		halfOpen:          make(map[string]Peer),
-		pieceStateChanges: pubsub.NewPubSub(),
-
-		storageOpener:       storageClient,
-		maxEstablishedConns: cl.config.EstablishedConnsPerTorrent,
-
+		conns:                   make(map[*connection]struct{}, 2*cl.config.EstablishedConnsPerTorrent),
+		halfOpen:                make(map[string]Peer),
+		_halfOpenmu:             &sync.Mutex{},
+		pieceStateChanges:       pubsub.NewPubSub(),
+		storageOpener:           storage.NewClient(src.Storage),
+		maxEstablishedConns:     cl.config.EstablishedConnsPerTorrent,
 		networkingEnabled:       true,
 		duplicateRequestTimeout: time.Second,
-
-		chunks: newChunks(src.ChunkSize, &metainfo.Info{}),
-		pex:    newPex(),
+		chunks:                  newChunks(src.ChunkSize, &metainfo.Info{}),
+		pex:                     newPex(),
 	}
 	t.metadataChanged = sync.Cond{L: tlocker{torrent: t}}
 	t.event = &sync.Cond{L: tlocker{torrent: t}}
@@ -197,6 +189,8 @@ type torrent struct {
 	// Set of addrs to which we're attempting to connect. Connections are
 	// half-open until all handshakes are completed.
 	halfOpen    map[string]Peer
+	_halfOpenmu *sync.Mutex
+
 	fastestConn *connection
 
 	// Reserve of peers to connect to. A peer can be both here and in the
@@ -320,10 +314,6 @@ func (t *torrent) rUnlock() {
 
 func (t *torrent) tickleReaders() {
 	t.event.Broadcast()
-}
-
-func (t *torrent) chunkIndexSpec(chunkIndex pp.Integer, piece pieceIndex) chunkSpec {
-	return chunkIndexSpec(chunkIndex, t.pieceLength(piece), t.chunkSize)
 }
 
 // Returns a channel that is closed when the Torrent is closed.
@@ -853,8 +843,8 @@ func (t *torrent) close() (err error) {
 
 	if t.storage != nil {
 		t.storageLock.Lock()
+		defer t.storageLock.Unlock()
 		t.storage.Close()
-		t.storageLock.Unlock()
 	}
 
 	for conn := range t.conns {
@@ -1179,12 +1169,6 @@ func (t *torrent) dropHalfOpen(addr string) {
 	delete(t.halfOpen, addr)
 }
 
-func (t *torrent) lockedOpenNewConns() {
-	t.lock()
-	defer t.unlock()
-	t.openNewConns()
-}
-
 func (t *torrent) openNewConns() {
 	var (
 		ok bool
@@ -1355,7 +1339,7 @@ func (t *torrent) SetInfoBytes(b []byte) (err error) {
 
 func (t *torrent) dropConnection(c *connection) {
 	if t.deleteConnection(c) {
-		t.lockedOpenNewConns()
+		t.openNewConns()
 	}
 
 	t.event.Broadcast()
@@ -1515,7 +1499,7 @@ func (t *torrent) consumeDhtAnnouncePeers(pvs <-chan dht.PeersValues) {
 			}
 
 			t.AddPeer(Peer{
-				IP:     cp.IP[:],
+				IP:     cp.IP.AsSlice(),
 				Port:   cp.Port,
 				Source: peerSourceDhtGetPeers,
 			})
@@ -1716,7 +1700,7 @@ func (t *torrent) SetMaxEstablishedConns(max int) (oldMax int) {
 	for len(t.conns) > t.maxEstablishedConns && wcs.Len() > 0 {
 		t.dropConnection(wcs.Pop().(*connection))
 	}
-	t.lockedOpenNewConns()
+	t.openNewConns()
 	return oldMax
 }
 
@@ -1822,15 +1806,18 @@ func (t *torrent) initiateConn(ctx context.Context, peer Peer) {
 		return
 	}
 
+	t._halfOpenmu.Lock()
 	t.halfOpen[addr.String()] = peer
+	t._halfOpenmu.Unlock()
 
 	go t.cln.outgoingConnection(ctx, t, addr, peer.Source, peer.Trusted)
 }
 
 func (t *torrent) noLongerHalfOpen(addr string) {
 	t.lock()
-	defer t.unlock()
 	t.dropHalfOpen(addr)
+	t.unlock()
+
 	t.openNewConns()
 }
 

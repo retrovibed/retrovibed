@@ -1,5 +1,4 @@
-// Package prioritybitmap implements a set of integers ordered by attached
-// priorities.
+// Package prioritybitmap implements a set of integers ordered by attached priorities.
 package prioritybitmap
 
 import (
@@ -10,21 +9,24 @@ import (
 	"github.com/anacrolix/missinggo/orderedmap"
 )
 
-var (
-	bitSets = sync.Pool{
-		New: func() interface{} {
-			return make(map[int]struct{}, 1)
-		},
-	}
-)
+// The interface used for non-singleton bit-sets for each priority level.
+type Set interface {
+	Has(bit int) bool
+	Delete(bit int)
+	Len() int
+	Set(bit int)
+	Range(f func(int) bool)
+}
 
 // Maintains set of ints ordered by priority.
 type PriorityBitmap struct {
-	mu sync.Mutex
 	// From priority to singleton or set of bit indices.
 	om orderedmap.OrderedMap
 	// From bit index to priority
 	priorities map[int]int
+	// If not set, is initialized to the default map[int]struct{} implementation on first use.
+	NewSet  func() Set
+	bitSets sync.Pool
 }
 
 var _ bitmap.Interface = (*PriorityBitmap)(nil)
@@ -53,15 +55,17 @@ func (me *PriorityBitmap) deleteBit(bit int) (priority int, ok bool) {
 		if v != bit {
 			panic("invariant broken")
 		}
-	case map[int]struct{}:
-		if _, ok := v[bit]; !ok {
+	case Set:
+		if !v.Has(bit) {
 			panic("invariant broken")
 		}
-		delete(v, bit)
-		if len(v) != 0 {
+		v.Delete(bit)
+		if v.Len() != 0 {
 			return
 		}
-		bitSets.Put(v)
+		me.bitSets.Put(v)
+	default:
+		panic(v)
 	}
 	me.om.Unset(priority)
 	if me.om.Len() == 0 {
@@ -72,13 +76,6 @@ func (me *PriorityBitmap) deleteBit(bit int) (priority int, ok bool) {
 
 func bitLess(l, r interface{}) bool {
 	return l.(int) < r.(int)
-}
-
-func (me *PriorityBitmap) lazyInit() {
-	me.om = orderedmap.New(func(l, r interface{}) bool {
-		return l.(int) < r.(int)
-	})
-	me.priorities = make(map[int]int)
 }
 
 // Returns true if the priority is changed, or the bit wasn't present.
@@ -104,12 +101,22 @@ func (me *PriorityBitmap) Set(bit int, priority int) bool {
 	}
 	switch v := _v.(type) {
 	case int:
-		newV := bitSets.Get().(map[int]struct{})
-		newV[v] = struct{}{}
-		newV[bit] = struct{}{}
+		newV := func() Set {
+			i := me.bitSets.Get()
+			if i == nil {
+				if me.NewSet == nil {
+					me.NewSet = newMapSet
+				}
+				return me.NewSet()
+			} else {
+				return i.(Set)
+			}
+		}()
+		newV.Set(v)
+		newV.Set(bit)
 		me.om.Set(priority, newV)
-	case map[int]struct{}:
-		v[bit] = struct{}{}
+	case Set:
+		v.Set(bit)
 	default:
 		panic(v)
 	}
@@ -117,8 +124,6 @@ func (me *PriorityBitmap) Set(bit int, priority int) bool {
 }
 
 func (me *PriorityBitmap) Remove(bit int) bool {
-	me.mu.Lock()
-	defer me.mu.Unlock()
 	if _, ok := me.deleteBit(bit); !ok {
 		return false
 	}
@@ -139,14 +144,10 @@ func (me *PriorityBitmap) Iter(f iter.Callback) {
 }
 
 func (me *PriorityBitmap) IterTyped(_f func(i bitmap.BitIndex) bool) bool {
-	me.mu.Lock()
-	defer me.mu.Unlock()
 	if me == nil || me.om == nil {
 		return true
 	}
 	f := func(i int) bool {
-		me.mu.Unlock()
-		defer me.mu.Lock()
 		return _f(i)
 	}
 	return iter.All(func(key interface{}) bool {
@@ -154,12 +155,12 @@ func (me *PriorityBitmap) IterTyped(_f func(i bitmap.BitIndex) bool) bool {
 		switch v := value.(type) {
 		case int:
 			return f(v)
-		case map[int]struct{}:
-			for i := range v {
-				if !f(i) {
-					return false
-				}
-			}
+		case Set:
+			v.Range(func(i int) bool {
+				return f(i)
+			})
+		default:
+			panic(v)
 		}
 		return true
 	}, me.om.Iter)

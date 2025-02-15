@@ -36,6 +36,7 @@ import (
 	"github.com/james-lawrence/torrent/bencode"
 	"github.com/james-lawrence/torrent/dht/v2"
 	"github.com/james-lawrence/torrent/metainfo"
+	"github.com/james-lawrence/torrent/storage"
 
 	_ "github.com/marcboeker/go-duckdb"
 
@@ -76,6 +77,7 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, peerID *cmdopts.PeerID) (err error) 
 		return errorsx.Wrap(err, "unable to setup torrent socket")
 	}
 
+	torrentdir := userx.DefaultDataDirectory(userx.DefaultRelRoot(), "torrents")
 	tm := dht.DefaultMuxer().
 		Method(bep0051.Query, bep0051.NewEndpoint(bep0051.EmptySampler{}))
 	tclient, err := tnetwork.Bind(
@@ -85,7 +87,6 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, peerID *cmdopts.PeerID) (err error) 
 				torrent.ClientConfigSeed(true),
 				torrent.ClientConfigInfoLogger(log.New(io.Discard, "", log.Flags())),
 				torrent.ClientConfigMuxer(tm),
-				torrent.ClientConfigStorageDir(userx.DefaultDataDirectory(userx.DefaultRelRoot(), "torrents")),
 			),
 		),
 	)
@@ -146,7 +147,7 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, peerID *cmdopts.PeerID) (err error) 
 		log.Println("auto retrieval of torrent info initiated")
 		defer log.Println("auto retrieval of torrent info completed")
 
-		if err := ResolveUnknownInfoHashes(ctx.Context, db, dht, tclient); err != nil {
+		if err := ResolveUnknownInfoHashes(ctx.Context, db, dht, tclient, storage.NewFile(torrentdir)); err != nil {
 			log.Println("resolving info hashes has failed", err)
 		}
 	}()
@@ -184,7 +185,7 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, peerID *cmdopts.PeerID) (err error) 
 }
 
 // request samples from the domain space.
-func ResolveUnknownInfoHashes(ctx context.Context, db sqlx.Queryer, s *dht.Server, tclient *torrent.Client) error {
+func ResolveUnknownInfoHashes(ctx context.Context, db sqlx.Queryer, s *dht.Server, tclient *torrent.Client, tstore storage.ClientImpl) error {
 	const workloads = 256
 	runsample := func(ctx context.Context, unk tracking.UnknownHash) (err error) {
 		var (
@@ -201,7 +202,7 @@ func ResolveUnknownInfoHashes(ctx context.Context, db sqlx.Queryer, s *dht.Serve
 			log.Println("locate infohash completed", unk.ID, time.Since(ts))
 		}()
 
-		metadata, err := torrent.New(metainfo.Hash(unk.Infohash))
+		metadata, err := torrent.New(metainfo.Hash(unk.Infohash), torrent.OptionStorage(tstore))
 		if err != nil {
 			return errorsx.Wrapf(err, "unable to create metadata from infohash %s", unk.ID)
 		}

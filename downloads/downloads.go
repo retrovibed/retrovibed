@@ -16,11 +16,11 @@ import (
 	"github.com/james-lawrence/deeppool/internal/x/timex"
 	"github.com/james-lawrence/deeppool/internal/x/userx"
 	"github.com/james-lawrence/torrent"
+	"github.com/james-lawrence/torrent/storage"
 )
 
 type downloader interface {
 	Start(t torrent.Metadata) (dl torrent.Torrent, added bool, err error)
-	// Download(ctx context.Context, m torrent.Metadata, options ...torrent.Tuner) (r torrent.Reader, err error)
 }
 
 func NewDirectoryWatcher(ctx context.Context, q sqlx.Queryer, dl downloader) (d Directory, err error) {
@@ -78,7 +78,7 @@ func (t Directory) Add(path string) (err error) {
 
 // background download
 func (t Directory) download(ctx context.Context, path string) {
-	meta, err := torrent.NewFromMetaInfoFile(path)
+	meta, err := torrent.NewFromMetaInfoFile(path, torrent.OptionStorage(storage.NewFile(t.s)))
 	if err != nil {
 		log.Println("unable to process", path, "ignoring", err)
 		return
