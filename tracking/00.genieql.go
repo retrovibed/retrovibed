@@ -105,3 +105,33 @@ func UnknownHashCooldown(
 ) {
 	gql.Into("torrents_unknown_infohashes").Default("created_at", "updated_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, next_check = NOW() + to_hours(24)")
 }
+
+//easyjson:json
+func RSS(
+	gql genieql.Structure,
+) {
+	gql.From(
+		gql.Table("torrents_feed_rss"),
+	)
+}
+
+func RSSScanner(
+	gql genieql.Scanner,
+	pattern func(i RSS),
+) {
+	gql.ColumnNamePrefix("torrents_feed_rss.")
+}
+
+func RSSInsertWithDefaults(
+	gql genieql.Insert,
+	pattern func(ctx context.Context, q sqlx.Queryer, a RSS) NewRSSScannerStaticRow,
+) {
+	gql.Into("torrents_feed_rss").Default("created_at", "updated_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT")
+}
+
+func RSSCooldown(
+	gql genieql.Insert,
+	pattern func(ctx context.Context, q sqlx.Queryer, a RSS) NewRSSScannerStaticRow,
+) {
+	gql.Into("torrents_feed_rss").Default("created_at", "updated_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, next_check = NOW() + to_hours(24)")
+}
