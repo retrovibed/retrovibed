@@ -868,6 +868,7 @@ func (cl *Client) dropTorrent(infoHash metainfo.Hash) (err error) {
 	cl.rLock()
 	t, ok := cl.torrents[infoHash]
 	cl.rUnlock()
+
 	if !ok {
 		return fmt.Errorf("no such torrent")
 	}

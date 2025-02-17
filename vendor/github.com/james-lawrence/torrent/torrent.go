@@ -1159,6 +1159,16 @@ func (t *torrent) incrementReceivedConns(c *connection, delta int64) {
 	}
 }
 
+func (t *torrent) maxHalfOpen() int {
+	// Note that if we somehow exceed the maximum established conns, we want
+	// the negative value to have an effect.
+	establishedHeadroom := int64(t.maxEstablishedConns - len(t.conns))
+	extraIncoming := int64(t.numReceivedConns - int64(t.maxEstablishedConns/2))
+	// We want to allow some experimentation with new peers, and to try to
+	// upset an oversupply of received connections.
+	return int(min(max(5, extraIncoming)+establishedHeadroom, int64(t.config.HalfOpenConnsPerTorrent)))
+}
+
 func (t *torrent) dropHalfOpen(addr string) {
 	t._halfOpenmu.RLock()
 	_, ok := t.halfOpen[addr]

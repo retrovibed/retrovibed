@@ -365,6 +365,8 @@ func (cn *connection) Close() {
 	// defer trace(fmt.Sprintf("c(%p) completed", cn))
 	defer cn.t.cln.event.Broadcast()
 	defer cn.deleteAllRequests()
+	cn.cmu().Lock()
+	defer cn.cmu().Unlock()
 
 	if cn.closed.IsSet() {
 		return
@@ -377,9 +379,6 @@ func (cn *connection) Close() {
 	if cn.t != nil {
 		cn.t.incrementReceivedConns(cn, -1)
 	}
-	cn.cmu().Lock()
-	defer cn.cmu().Unlock()
-
 	cn.updateRequests()
 	cn.discardPieceInclination()
 	cn.pieceRequestOrder.Clear()
