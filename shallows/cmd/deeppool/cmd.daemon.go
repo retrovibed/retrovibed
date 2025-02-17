@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/pressly/goose/v3"
+	"golang.org/x/crypto/ssh"
 
 	"github.com/james-lawrence/deeppool/cmd/cmdopts"
 	"github.com/james-lawrence/deeppool/cmd/deeppool/daemons"
@@ -20,6 +21,7 @@ import (
 	"github.com/james-lawrence/deeppool/internal/x/torrentx"
 	"github.com/james-lawrence/deeppool/internal/x/userx"
 	"github.com/james-lawrence/torrent/dht/v2"
+	"github.com/james-lawrence/torrent/dht/v2/krpc"
 	"github.com/james-lawrence/torrent/storage"
 
 	_ "github.com/marcboeker/go-duckdb"
@@ -33,13 +35,15 @@ var embedsqlite embed.FS
 
 type cmdDaemon struct{}
 
-func (t cmdDaemon) Run(ctx *cmdopts.Global, peerID *cmdopts.PeerID) (err error) {
+func (t cmdDaemon) Run(ctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	var (
 		db           *sql.DB
 		torrentpeers = userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "torrent.peers")
+		dbpath       = userx.DefaultConfigDir(userx.DefaultRelRoot(), "dpool.db")
+		peerid       = krpc.IdFromString(ssh.FingerprintSHA256(id.PublicKey()))
 	)
 
-	if db, err = sql.Open("duckdb", "dpool.db"); err != nil {
+	if db, err = sql.Open("duckdb", dbpath); err != nil {
 		return errorsx.Wrap(err, "unable to open db")
 	}
 	defer db.Close()
@@ -66,7 +70,7 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, peerID *cmdopts.PeerID) (err error) 
 	tclient, err := tnetwork.Bind(
 		torrent.NewClient(
 			torrent.NewDefaultClientConfig(
-				torrent.ClientConfigPeerID(string(peerID[:])),
+				torrent.ClientConfigPeerID(string(peerid[:])),
 				torrent.ClientConfigSeed(true),
 				torrent.ClientConfigInfoLogger(log.New(io.Discard, "", log.Flags())),
 				torrent.ClientConfigMuxer(tm),

@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/fsnotify/fsnotify"
@@ -69,10 +70,15 @@ func (t Directory) Add(path string) (err error) {
 			return nil
 		}
 
+		if !strings.HasSuffix(path, ".torrent") {
+			return nil
+		}
+
 		go t.download(context.Background(), filepath.Join(path, name))
 
 		return nil
 	})
+
 	return errorsx.Wrap(err, "unable to find existing torrents")
 }
 
