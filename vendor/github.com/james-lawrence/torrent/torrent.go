@@ -329,8 +329,8 @@ func (t *torrent) KnownSwarm() (ks []Peer) {
 		ks = append(ks, peer)
 	})
 
-	// Add half-open peers to the list
 	t._halfOpenmu.RLock()
+	// Add half-open peers to the list
 	for _, peer := range t.halfOpen {
 		ks = append(ks, peer)
 	}
@@ -403,6 +403,7 @@ func (t *torrent) addrActive(addr string) bool {
 			return true
 		}
 	}
+
 	return false
 }
 
@@ -1158,16 +1159,6 @@ func (t *torrent) incrementReceivedConns(c *connection, delta int64) {
 	}
 }
 
-func (t *torrent) maxHalfOpen() int {
-	// Note that if we somehow exceed the maximum established conns, we want
-	// the negative value to have an effect.
-	establishedHeadroom := int64(t.maxEstablishedConns - len(t.conns))
-	extraIncoming := int64(t.numReceivedConns - int64(t.maxEstablishedConns/2))
-	// We want to allow some experimentation with new peers, and to try to
-	// upset an oversupply of received connections.
-	return int(min(max(5, extraIncoming)+establishedHeadroom, int64(t.config.HalfOpenConnsPerTorrent)))
-}
-
 func (t *torrent) dropHalfOpen(addr string) {
 	t._halfOpenmu.RLock()
 	_, ok := t.halfOpen[addr]
@@ -1516,16 +1507,21 @@ func (t *torrent) consumeDhtAnnouncePeers(pvs <-chan dht.PeersValues) {
 }
 
 func (t *torrent) announceToDht(impliedPort bool, s *dht.Server) error {
-	ps, err := s.Announce(t.infoHash, t.cln.incomingPeerPort(), impliedPort)
+	ctx, done := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer done()
+
+	ps, err := s.Announce(ctx, t.infoHash, t.cln.incomingPeerPort(), impliedPort)
 	if err != nil {
 		return err
 	}
+
+	defer ps.Close()
 	go t.consumeDhtAnnouncePeers(ps.Peers)
 	select {
 	case <-t.closed.LockedChan(t.locker()):
-	case <-time.After(5 * time.Minute):
+	case <-ctx.Done():
 	}
-	ps.Close()
+
 	return nil
 }
 

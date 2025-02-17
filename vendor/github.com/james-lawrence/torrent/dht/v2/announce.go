@@ -63,7 +63,7 @@ func (a *Announce) NumContacted() int64 {
 // Traverses the DHT graph toward nodes that store peers for the infohash, streaming them to the
 // caller, and announcing the local node to each responding node if port is non-zero or impliedPort
 // is true.
-func (s *Server) Announce(infoHash [20]byte, port int, impliedPort bool) (*Announce, error) {
+func (s *Server) Announce(ctx context.Context, infoHash [20]byte, port int, impliedPort bool) (*Announce, error) {
 	startAddrs, err := s.traversalStartingNodes()
 	if err != nil {
 		return nil, err
@@ -80,10 +80,9 @@ func (s *Server) Announce(infoHash [20]byte, port int, impliedPort bool) (*Annou
 		pendingAnnouncePeers: stm.NewVar(immutable.NewList[pendingAnnouncePeer]()),
 		traversal:            newTraversal(infoHashInt160),
 	}
-	var ctx context.Context
-	ctx, a.cancel = context.WithCancel(context.Background())
+	ctx, a.cancel, a.doneVar = stmutil.ContextDoneVar(ctx)
 	a.done = ctx.Done()
-	a.doneVar, _ = stmutil.ContextDoneVar(ctx)
+
 	// Function ferries from values to Peers until discovery is halted.
 	go func() {
 		defer close(a.Peers)
