@@ -63,7 +63,9 @@ func DiscoverDHTBEP51Peers(ctx context.Context, q sqlx.Queryer, s *dht.Server) (
 		}
 
 		if err := bencode.Unmarshal(encoded, &resp); err != nil {
-			return errorsx.Wrapf(err, "unable to generate sample response: %s", n.ID)
+			if _, ok := err.(bencode.ErrUnusedTrailingBytes); !ok {
+				return errorsx.Wrapf(err, "unable to deserialize sample response: %T %s", err, n.ID)
+			}
 		}
 
 		peer = tracking.NewPeer(n, tracking.PeerOptionBEP51(uint64(resp.R.Available), uint16(resp.R.Interval)))
@@ -162,7 +164,7 @@ func DiscoverDHTInfoHashes(ctx context.Context, db sqlx.Queryer, s *dht.Server) 
 				tracking.PeerQueryHasInfoHashes(),
 				tracking.PeerQueryNeedsCheck(),
 			},
-		).Limit(128)
+		).Limit(8)
 
 		scanner := tracking.PeerSearch(ctx, db, q)
 		defer scanner.Close()
@@ -195,14 +197,15 @@ func DiscoverDHTInfoHashes(ctx context.Context, db sqlx.Queryer, s *dht.Server) 
 	}
 
 	for err, pending := l.Wait(ctx), getpending(); err == nil; err, pending = l.Wait(ctx), getpending() {
-		if pending >= 100 {
+		if pending < 100 {
+			log.Println("querying peers for info hashes", pending, "< 100")
+		} else {
 			continue
 		}
 
 		if err := querypeers(); err != nil {
 			log.Println("failed to query peers", err)
 		}
-		pending = errorsx.Zero(sqlx.Count(ctx, db, "SELECT COUNT (*) FROM torrents_unknown_infohashes WHERE next_check < NOW()"))
 	}
 
 	return ctx.Err()
@@ -210,22 +213,32 @@ func DiscoverDHTInfoHashes(ctx context.Context, db sqlx.Queryer, s *dht.Server) 
 
 // request samples from the domain space.
 func DiscoverDHTMetadata(ctx context.Context, db sqlx.Queryer, s *dht.Server, tclient *torrent.Client, tstore storage.ClientImpl) error {
-	const workloads = 256
-	bs := backoffx.New(backoffx.Exponential(time.Second), backoffx.Minimum(20*time.Second), backoffx.Maximum(5*time.Minute))
-	runsample := func(ctx context.Context, unk tracking.UnknownHash) (err error) {
+	l := rate.NewLimiter(rate.Every(10*time.Second), 1)
+	workloads := uint64(64)
+
+	runsample := func(ctx context.Context, timeout time.Duration, unk tracking.UnknownHash) (err error) {
 		var (
 			unknown tracking.UnknownHash
 			md      tracking.Metadata
-			timeout = bs.Backoff(int(unk.Attempts))
 		)
 
-		dctx, done := context.WithTimeout(ctx, timeout+backoffx.DynamicHashDuration(timeout, unk.ID))
+		timeout = timeout + backoffx.DynamicHashDuration(timeout, unk.ID)
+		dctx, done := context.WithTimeout(ctx, timeout)
 		defer done()
 
-		log.Println("locate infohash initiated", unk.ID)
 		ts := time.Now()
 		defer func() {
-			log.Println("locate infohash completed", unk.ID, time.Since(ts))
+			st := time.Since(ts)
+
+			if err == nil {
+				log.Println("locate infohash completed", unk.ID, unk.Attempts, st, timeout)
+				return
+			}
+
+			if l.Allow() {
+				log.Println("locate infohash timed out", unk.ID, unk.Attempts, st, timeout)
+				return
+			}
 		}()
 
 		metadata, err := torrent.New(metainfo.Hash(unk.Infohash), torrent.OptionStorage(tstore))
@@ -234,9 +247,8 @@ func DiscoverDHTMetadata(ctx context.Context, db sqlx.Queryer, s *dht.Server, tc
 		}
 
 		info, err := tclient.Info(dctx, metadata)
-
 		if contextx.IsDeadlineExceeded(err) {
-			return tracking.UnknownHashCooldown(ctx, db, unk).Scan(&unk)
+			return errorsx.Compact(tracking.UnknownHashCooldown(ctx, db, unk).Scan(&unk), err)
 		}
 
 		if err != nil {
@@ -257,12 +269,15 @@ func DiscoverDHTMetadata(ctx context.Context, db sqlx.Queryer, s *dht.Server, tc
 
 	locatehashed := func(ctx context.Context) iter.Seq2[tracking.UnknownHash, error] {
 		return func(yield func(tracking.UnknownHash, error) bool) {
+			log.Println("locate hashed initiated")
+			defer log.Println("locate hashed completed")
+
 			// consider newest unknown hashes first.
 			q := tracking.UnknownSearchBuilder().Where(
 				squirrel.And{
 					tracking.UnknownHashQueryNeedsCheck(),
 				},
-			).OrderBy("created_at DESC").Limit(128)
+			).OrderBy("attempts ASC, created_at DESC").Limit(workloads * 2)
 			scanner := tracking.UnknownSearch(ctx, db, q)
 			defer scanner.Close()
 
@@ -289,20 +304,20 @@ func DiscoverDHTMetadata(ctx context.Context, db sqlx.Queryer, s *dht.Server, tc
 	}
 
 	buff := make(chan tracking.UnknownHash, workloads)
-	for i := 0; i < workloads; i++ {
-		go func() {
+	for i := uint64(0); i < workloads; i++ {
+		go func(i uint64) {
+			bs := backoffx.New(backoffx.Exponential(time.Second), backoffx.Maximum(30*time.Second))
 			for unk := range buff {
-				if err := runsample(ctx, unk); err != nil {
+				if err := runsample(ctx, bs.Backoff(int(unk.Attempts)), unk); contextx.IgnoreDeadlineExceeded(err) != nil {
 					log.Println("failed to retrieve metadata", unk.ID, err)
 					continue
 				}
 			}
-
-			panic("ZERP ZERP")
-		}()
+		}(i)
 	}
 
-	for {
+	bs := backoffx.New(backoffx.Exponential(time.Second), backoffx.Maximum(1*time.Minute))
+	for attempts := 0; ; attempts += 1 {
 		for unk, err := range locatehashed(ctx) {
 			if err != nil {
 				log.Println("locating pending info hashes failed", err)
@@ -311,23 +326,22 @@ func DiscoverDHTMetadata(ctx context.Context, db sqlx.Queryer, s *dht.Server, tc
 
 			select {
 			case buff <- unk:
+				attempts = -1
 			case <-ctx.Done():
 				return ctx.Err()
 			}
 		}
 
 		select {
+		case <-time.After(bs.Backoff(attempts)):
 		case <-ctx.Done():
 			return ctx.Err()
-		default:
 		}
 	}
-
-	panic("DERP DERP")
 }
 
 func PrintStatistics(ctx context.Context, q sqlx.Queryer) {
-	timex.Every(time.Minute, func() {
+	timex.Every(30*time.Second, func() {
 		type stats struct {
 			Pending   int
 			Available int
