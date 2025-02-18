@@ -293,8 +293,8 @@ github.com/jackc/puddle/v2 v2.2.2 h1:PR8nw+E/1w0GLuRFSmiioY6UooMp6KJv0/61nB7icHo
 github.com/jackc/puddle/v2 v2.2.2/go.mod h1:vriiEXHvEE654aYKXXjOvZM39qJ0q+azkZFrfEOc3H4=
 github.com/james-lawrence/genieql v0.0.0-20250214004632-76bb098e0718 h1:/sqGRwDTgIe2WKdytRRgdqRFRUPazobcqC9cvKRYj5c=
 github.com/james-lawrence/genieql v0.0.0-20250214004632-76bb098e0718/go.mod h1:5Vs1h+Qu4QWiZm7Ld0LYfpAbHViWfyKsmNYrdsbddpQ=
-github.com/james-lawrence/torrent v0.0.0-20250217023043-e6863253d65b h1:EvG9NTrXUhjPJ1rNaXMzwhZ7OAHm0oTYbP9k7Fv/eUg=
-github.com/james-lawrence/torrent v0.0.0-20250217023043-e6863253d65b/go.mod h1:DqCTYB5vENJCzdoamcTzKIu1rhrQEVgOlFDrOGBQQKk=
+github.com/james-lawrence/torrent v0.0.0-20250218114538-4fc4c551bce3 h1:xhrHFm1pu9mJX38MSnbAhextg0iQYHXHFtLVmRmoNsk=
+github.com/james-lawrence/torrent v0.0.0-20250218114538-4fc4c551bce3/go.mod h1:DqCTYB5vENJCzdoamcTzKIu1rhrQEVgOlFDrOGBQQKk=
 github.com/josharian/intern v1.0.0/go.mod h1:5DoeVV0s6jJacbCEi61lwdGj/aVlrQvzHFFd8Hwg//Y=
 github.com/jpillora/backoff v1.0.0/go.mod h1:J/6gKK9jxlEcS3zixgDgUAsiuZ7yrSoa/FX5e0EB2j4=
 github.com/json-iterator/go v1.1.6/go.mod h1:+SdeFBvtyEkXs7REEP0seUULqWtbJapLOCVDaaPEHmU=
@@ -619,6 +619,8 @@ golang.org/x/term v0.0.0-20210927222741-03fcf44c2211/go.mod h1:jbD1KX2456YbFQfuX
 golang.org/x/term v0.5.0/go.mod h1:jMB1sMXY+tzblOD4FWmEbocvup2/aLOaQEp7JmGp78k=
 golang.org/x/term v0.8.0/go.mod h1:xPskH00ivmX89bAKVGSKKtLOWNx2+17Eiy94tnKShWo=
 golang.org/x/term v0.17.0/go.mod h1:lLRBjIVuehSbZlaOtGMbcMncT+aqLLLmKrsjNrUguwk=
+golang.org/x/term v0.29.0 h1:L6pJp37ocefwRRtYPKSWOWzOtWSxVajvz2ldH/xi3iU=
+golang.org/x/term v0.29.0/go.mod h1:6bl4lRlvVuDgSf3179VpIxBF0o10JUpXWOnI7nErv7s=
 golang.org/x/text v0.3.0/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
 golang.org/x/text v0.3.2/go.mod h1:bEr9sfX3Q8Zfm5fL9x+3itogRgK3+ptLWKqgva+5dAk=
 golang.org/x/text v0.3.3/go.mod h1:5Zoc/QRtKVWzQhOtBMvqHzDpF6irO9z98xDceosuGiQ=

@@ -15,7 +15,6 @@ import (
 	"github.com/james-lawrence/deeppool/internal/x/contextx"
 	"github.com/james-lawrence/deeppool/internal/x/errorsx"
 	"github.com/james-lawrence/deeppool/internal/x/langx"
-	"github.com/james-lawrence/deeppool/internal/x/md5x"
 	"github.com/james-lawrence/deeppool/internal/x/netipx"
 	"github.com/james-lawrence/deeppool/internal/x/sqlx"
 	"github.com/james-lawrence/deeppool/internal/x/timex"
@@ -54,12 +53,12 @@ func DiscoverDHTBEP51Peers(ctx context.Context, q sqlx.Queryer, s *dht.Server) (
 		}
 		dst := dht.NewAddr(n.Addr.UDP())
 
-		dctx, done := context.WithTimeout(ctx, 5*time.Second)
+		dctx, done := context.WithTimeout(ctx, 30*time.Second)
 		defer done()
 
 		encoded, _, err := s.QueryContext(dctx, dst, req.Q, req.T, b)
 		if err != nil {
-			return errorsx.Wrap(err, "query failed")
+			return errorsx.Wrap(err, "sample query failed")
 		}
 
 		if err := bencode.Unmarshal(encoded, &resp); err != nil {
@@ -110,7 +109,7 @@ func DiscoverDHTInfoHashes(ctx context.Context, db sqlx.Queryer, s *dht.Server) 
 			if err == nil {
 				return
 			}
-			log.Println("marking peer as failed")
+			log.Println("marking peer as failed", err)
 			if err := tracking.PeerMarkNextCheck(ctx, db, langx.Clone(p, tracking.PeerOptionBEP51(p.Bep51Available, p.Bep51TTL))).Scan(&p); err != nil {
 				log.Println(errorsx.Wrapf(err, "unable update peer record: %s", p.IP))
 			}
@@ -124,7 +123,6 @@ func DiscoverDHTInfoHashes(ctx context.Context, db sqlx.Queryer, s *dht.Server) 
 
 		log.Println("infohash sample initiated", p.IP, dst.String())
 		defer log.Println("infohash sample completed", p.IP, dst.String())
-
 		encoded, _, err := s.QueryContext(ctx, dst, req.Q, req.T, b)
 		if err != nil {
 			return errorsx.Wrapf(err, "query failed: %s", dst.String())
@@ -147,7 +145,7 @@ func DiscoverDHTInfoHashes(ctx context.Context, db sqlx.Queryer, s *dht.Server) 
 			}
 
 			if err = tracking.UnknownHashInsertWithDefaults(ctx, db, tracking.NewUnknownHash(metainfo.Hash(id))).Scan(&unknown); err != nil {
-				return errorsx.Wrapf(err, "unable to track hash: %s", md5x.Digest(id))
+				return errorsx.Wrapf(err, "unable to track hash: %s", tracking.HashUID(langx.Autoptr(metainfo.Hash(id))))
 			}
 		}
 
@@ -214,7 +212,7 @@ func DiscoverDHTInfoHashes(ctx context.Context, db sqlx.Queryer, s *dht.Server) 
 // request samples from the domain space.
 func DiscoverDHTMetadata(ctx context.Context, db sqlx.Queryer, s *dht.Server, tclient *torrent.Client, tstore storage.ClientImpl) error {
 	l := rate.NewLimiter(rate.Every(10*time.Second), 1)
-	workloads := uint64(64)
+	workloads := uint64(1024)
 
 	runsample := func(ctx context.Context, timeout time.Duration, unk tracking.UnknownHash) (err error) {
 		var (
@@ -306,7 +304,7 @@ func DiscoverDHTMetadata(ctx context.Context, db sqlx.Queryer, s *dht.Server, tc
 	buff := make(chan tracking.UnknownHash, workloads)
 	for i := uint64(0); i < workloads; i++ {
 		go func(i uint64) {
-			bs := backoffx.New(backoffx.Exponential(time.Second), backoffx.Maximum(30*time.Second))
+			bs := backoffx.New(backoffx.Exponential(1*time.Second), backoffx.Minimum(20*time.Second), backoffx.Maximum(2*time.Minute))
 			for unk := range buff {
 				if err := runsample(ctx, bs.Backoff(int(unk.Attempts)), unk); contextx.IgnoreDeadlineExceeded(err) != nil {
 					log.Println("failed to retrieve metadata", unk.ID, err)
@@ -334,6 +332,7 @@ func DiscoverDHTMetadata(ctx context.Context, db sqlx.Queryer, s *dht.Server, tc
 
 		select {
 		case <-time.After(bs.Backoff(attempts)):
+			log.Println("slept for", bs.Backoff(attempts))
 		case <-ctx.Done():
 			return ctx.Err()
 		}

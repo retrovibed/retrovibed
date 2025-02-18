@@ -1,2 +1,4 @@
 .genieql
+.eg.cache
+.eg.runtime
 dpool.*
