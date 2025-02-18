@@ -243,6 +243,7 @@ func DiscoverDHTMetadata(ctx context.Context, db sqlx.Queryer, s *dht.Server, tc
 		if err != nil {
 			return errorsx.Wrapf(err, "unable to create metadata from infohash %s", unk.ID)
 		}
+		defer tclient.Stop(metadata)
 
 		info, err := tclient.Info(dctx, metadata)
 		if contextx.IsDeadlineExceeded(err) {
@@ -252,7 +253,6 @@ func DiscoverDHTMetadata(ctx context.Context, db sqlx.Queryer, s *dht.Server, tc
 		if err != nil {
 			return errorsx.Wrapf(err, "unable to download metadata for infohash %s", unk.ID)
 		}
-		defer tclient.Stop(metadata)
 
 		if err = tracking.MetadataInsertWithDefaults(ctx, db, tracking.NewMetadata(&metadata.InfoHash, tracking.MetadataOptionFromInfo(info))).Scan(&md); err != nil {
 			return errorsx.Wrap(err, "unable to insert metadata")
@@ -304,7 +304,7 @@ func DiscoverDHTMetadata(ctx context.Context, db sqlx.Queryer, s *dht.Server, tc
 	buff := make(chan tracking.UnknownHash, workloads)
 	for i := uint64(0); i < workloads; i++ {
 		go func(i uint64) {
-			bs := backoffx.New(backoffx.Exponential(1*time.Second), backoffx.Minimum(20*time.Second), backoffx.Maximum(2*time.Minute))
+			bs := backoffx.New(backoffx.Exponential(1*time.Second), backoffx.Minimum(20*time.Second), backoffx.Maximum(1*time.Minute))
 			for unk := range buff {
 				if err := runsample(ctx, bs.Backoff(int(unk.Attempts)), unk); contextx.IgnoreDeadlineExceeded(err) != nil {
 					log.Println("failed to retrieve metadata", unk.ID, err)
@@ -330,9 +330,9 @@ func DiscoverDHTMetadata(ctx context.Context, db sqlx.Queryer, s *dht.Server, tc
 			}
 		}
 
+		log.Println("sleeping for", bs.Backoff(attempts))
 		select {
 		case <-time.After(bs.Backoff(attempts)):
-			log.Println("slept for", bs.Backoff(attempts))
 		case <-ctx.Done():
 			return ctx.Err()
 		}

@@ -2,3 +2,4 @@
 .eg.cache
 .eg.runtime
 dpool.*
+.torrent.bolt.db
