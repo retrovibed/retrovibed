@@ -13,8 +13,17 @@ RUN apt-get -y install snapd duckdb
 
 RUN ln -s /usr/lib/go-1.23/bin/go /usr/local/bin/go
 
-# RUN snap install flutter --classic
-
 RUN systemd-sysusers
 RUN systemd-tmpfiles --create
 
+# install flutter
+RUN curl -o /tmp/flutter.tar.xz https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.29.0-stable.tar.xz
+RUN tar -xf /tmp/flutter.tar.xz -C /opt/
+RUN ln -s /opt/flutter/bin/flutter /usr/local/bin/flutter
+RUN ln -s /opt/flutter/bin/dart /usr/local/bin/dart
+RUN apt-get -y install -y protobuf-compiler
+RUN protoc --version
+RUN chown -R egd:egd /opt/flutter
+RUN sudo -H -S -u egd -g egd flutter config --no-analytics
+RUN sudo -H -S -u egd -g egd flutter --disable-analytics
+RUN sudo -H -S -u egd -g egd dart pub global activate protoc_plugin

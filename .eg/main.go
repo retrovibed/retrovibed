@@ -22,6 +22,10 @@ func main() {
 		eg.Parallel(
 			eg.Module(ctx, deb, fractal.Build),
 		),
+		eg.Parallel(
+			eg.Module(ctx, deb, fractal.Tests),
+			eg.Module(ctx, deb, fractal.Linting),
+		),
 		// eg.Module(ctx, deb.OptionLiteral("--publish", "3000:3000"), www.Build, www.Webserver),
 	)
 
