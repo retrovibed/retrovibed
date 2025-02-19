@@ -38,9 +38,8 @@ func Linting(ctx context.Context, _ eg.Op) error {
 }
 
 func Generate(ctx context.Context, _ eg.Op) error {
-	runtime := flutterRuntime()
 	return shell.Run(
 		ctx,
-		runtime.New("echo generating"),
+		shell.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:fractal/lib/media -I.proto .proto/media.proto"),
 	)
 }

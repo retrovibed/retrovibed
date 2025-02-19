@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package media;
+
+message Media {
+  string title = 1 [ json_name = "title" ];
+  string description = 2 [ json_name = "description" ];
+  string mimetype = 3 [ json_name = "mimetype" ];
+  string image = 4 [ json_name = "image" ];
+}
+
+message MediaRequest {
+  string query = 1 [ json_name = "query" ];
+  reserved 2 to 899;
+  uint64 offset = 900 [ json_name = "offset" ];
+  uint64 limit = 901 [ json_name = "limit" ];
+  reserved 902 to 999;
+}
+
+message MediaResponse {
+  MediaRequest next = 1 [ json_name = "next" ];
+  repeated Media items = 2 [ json_name = "items" ];
+}
