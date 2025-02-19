@@ -6,20 +6,28 @@ import (
 	"io"
 	"io/fs"
 	"log"
+	"net"
+	"net/http"
 	"time"
 
+	"github.com/justinas/alice"
 	"github.com/pressly/goose/v3"
 	"golang.org/x/crypto/ssh"
 
 	"github.com/james-lawrence/deeppool/cmd/cmdopts"
-	"github.com/james-lawrence/deeppool/cmd/deeppool/daemons"
+	"github.com/james-lawrence/deeppool/cmd/shallows/daemons"
 	"github.com/james-lawrence/deeppool/downloads"
+	"github.com/james-lawrence/deeppool/internal/env"
+	"github.com/james-lawrence/deeppool/internal/x/envx"
 	"github.com/james-lawrence/deeppool/internal/x/errorsx"
 	"github.com/james-lawrence/deeppool/internal/x/goosex"
+	"github.com/james-lawrence/deeppool/internal/x/httpx"
 	"github.com/james-lawrence/deeppool/internal/x/slicesx"
 	"github.com/james-lawrence/deeppool/internal/x/timex"
+	"github.com/james-lawrence/deeppool/internal/x/tlsx"
 	"github.com/james-lawrence/deeppool/internal/x/torrentx"
 	"github.com/james-lawrence/deeppool/internal/x/userx"
+	"github.com/james-lawrence/deeppool/media"
 	"github.com/james-lawrence/torrent/dht/v2"
 	"github.com/james-lawrence/torrent/dht/v2/krpc"
 	"github.com/james-lawrence/torrent/storage"
@@ -28,6 +36,8 @@ import (
 
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/bep0051"
+
+	"github.com/gorilla/mux"
 )
 
 //go:embed .migrations/*.sql
@@ -41,6 +51,7 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		torrentpeers = userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "torrent.peers")
 		dbpath       = userx.DefaultConfigDir(userx.DefaultRelRoot(), "dpool.db")
 		peerid       = krpc.IdFromString(ssh.FingerprintSHA256(id.PublicKey()))
+		httpbind     net.Listener
 	)
 
 	if db, err = sql.Open("duckdb", dbpath); err != nil {
@@ -162,6 +173,53 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		}
 	}()
 
-	<-ctx.Context.Done()
+	httpmux := mux.NewRouter()
+	httpmux.NotFoundHandler = httpx.NotFound(alice.New())
+	httpmux.Use(
+		httpx.Chaos(
+			envx.Float64(0.0, env.ChaosRate),
+			httpx.ChaosStatusCodes(http.StatusBadGateway),
+			httpx.ChaosRateLimited(time.Second),
+		),
+	)
+
+	httpmux.HandleFunc(
+		"/healthz",
+		httpx.Healthz(
+			cmdopts.MachineID(),
+			envx.Float64(0.0, env.HTTPHealthzProbability),
+			envx.Int(http.StatusOK, env.HTTPHealthzCode),
+		),
+	).Methods(http.MethodGet)
+
+	media.NewHTTPDiscovered(db).Bind(httpmux.PathPrefix("/m").Subrouter())
+
+	if httpbind, err = net.Listen("tcp", ":9998"); err != nil {
+		return err
+	}
+
+	tlspem := envx.String(userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "tls.pem"), env.DaemonTLSPEM)
+	if err = tlsx.SelfSignedLocalHostTLS(tlspem); err != nil {
+		return err
+	}
+
+	go func() {
+		<-ctx.Context.Done()
+		httpbind.Close()
+	}()
+
+	_ = httpmux.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
+		if uri, err := route.URLPath(); err == nil {
+			log.Println("Route", uri.String())
+		}
+
+		return nil
+	})
+
+	log.Println("https listening on:", httpbind.Addr().String(), tlspem)
+	if cause := http.ServeTLS(httpbind, httpmux, tlspem, tlspem); cause != nil {
+		log.Println("http server stopped", cause)
+	}
+
 	return nil
 }

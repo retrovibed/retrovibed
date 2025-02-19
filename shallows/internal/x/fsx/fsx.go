@@ -49,3 +49,18 @@ func AutoCached(path string, gen func() ([]byte, error)) (s []byte, err error) {
 
 	return s, err
 }
+
+// IsRegularFile returns true IFF a non-directory file exists at the provided path.
+func IsRegularFile(path string) bool {
+	info, err := os.Stat(path)
+
+	if os.IsNotExist(err) {
+		return false
+	}
+
+	if info.IsDir() {
+		return false
+	}
+
+	return true
+}

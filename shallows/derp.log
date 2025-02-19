@@ -1,0 +1,1370 @@
+20:06:48 downloads.go:56: watching /home/jatone/Downloads
+20:06:48 cmd.daemon.go:107: added peers 16
+20:06:48 healthz.go:16: healthz enabled with 200
+20:06:48 cmd.daemon.go:149: autodiscovery of hashes initiated
+20:06:48 cmd.daemon.go:213: Route /healthz
+20:06:48 cmd.daemon.go:213: Route /m
+20:06:48 cmd.daemon.go:213: Route /m/discovered
+20:06:48 cmd.daemon.go:219: https listening on: [::]:9998 /home/jatone/.cache/shallows/tls.pem
+20:06:48 cmd.daemon.go:133: auto retrieval of torrent info initiated
+20:06:48 cmd.daemon.go:163: autodiscovery of samplable peers initiated
+20:06:48 torrent.sampling.go:38: minimum nodes not available, waiting 16
+20:06:48 torrent.sampling.go:199: querying peers for info hashes 33 < 100
+20:06:48 torrent.sampling.go:270: locate hashed initiated
+20:06:48 torrent.sampling.go:124: infohash sample initiated 2001:9b1:10d:5c::c6c [2001:9b1:10d:5c::c6c]:20097
+20:06:48 torrent.sampling.go:301: locate hashed completed
+20:06:48 torrent.sampling.go:333: sleeping for 1m0s
+20:06:49 torrent.sampling.go:88: locating samplable peers 85 available
+20:06:54 torrent.sampling.go:232: locate infohash completed 958603b8-b19e-e8a9-7bfa-d491ec2a5bac 0 6.108818572s 36.698564233s
+20:07:02 torrent.sampling.go:128: infohash sample completed 2001:9b1:10d:5c::c6c [2001:9b1:10d:5c::c6c]:20097
+20:07:02 torrent.sampling.go:112: marking peer as failed query failed: [2001:9b1:10d:5c::c6c]:20097: timed out
+20:07:02 torrent.sampling.go:180: query failed: [2001:9b1:10d:5c::c6c]:20097: timed out
+20:07:02 torrent.sampling.go:124: infohash sample initiated 2803:1500:c00:9ce0:3c73:67ff:fe6a:be3e [2803:1500:c00:9ce0:3c73:67ff:fe6a:be3e]:44224
+20:07:04 httpx.go:80: https://localhost:9998/m/discovered GET initiated
+20:07:04 httpx.go:82: https://localhost:9998/m/discovered GET completed 2.544903ms
+20:07:05 torrent.sampling.go:232: locate infohash completed a1dc5061-07ff-9c31-ad88-8fd2ae911b8f 0 17.015190252s 38.021437665s
+20:07:09 torrent.sampling.go:237: locate infohash timed out 22f727f1-4173-cfab-80a0-ea4f88b19677 2 21.242949066s 21.239985872s
+20:07:18 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 24,
+ Available: (int) 2564,
+ Peers: (int) 3128,
+ RSS: (int) 0
+}
+
+20:07:19 torrent.sampling.go:237: locate infohash timed out 75074738-f639-bfac-3573-27cb69024020 1 31.394519523s 31.382573279s
+20:07:21 torrent.sampling.go:128: infohash sample completed 2803:1500:c00:9ce0:3c73:67ff:fe6a:be3e [2803:1500:c00:9ce0:3c73:67ff:fe6a:be3e]:44224
+20:07:21 torrent.sampling.go:112: marking peer as failed query failed: [2803:1500:c00:9ce0:3c73:67ff:fe6a:be3e]:44224: timed out
+20:07:21 torrent.sampling.go:180: query failed: [2803:1500:c00:9ce0:3c73:67ff:fe6a:be3e]:44224: timed out
+20:07:21 torrent.sampling.go:124: infohash sample initiated 2804:4f60:7c8c:de00:2897:109f:8209:4582 [2804:4f60:7c8c:de00:2897:109f:8209:4582]:6881
+20:07:21 torrent.sampling.go:92: sample query failed: timed out
+20:07:36 torrent.sampling.go:128: infohash sample completed 2804:4f60:7c8c:de00:2897:109f:8209:4582 [2804:4f60:7c8c:de00:2897:109f:8209:4582]:6881
+20:07:36 torrent.sampling.go:112: marking peer as failed query failed: [2804:4f60:7c8c:de00:2897:109f:8209:4582]:6881: timed out
+20:07:36 torrent.sampling.go:180: query failed: [2804:4f60:7c8c:de00:2897:109f:8209:4582]:6881: timed out
+20:07:36 torrent.sampling.go:124: infohash sample initiated 2804:51b4:6817:64eb:c05c:8cff:fe24:312d [2804:51b4:6817:64eb:c05c:8cff:fe24:312d]:43249
+20:07:36 torrent.sampling.go:92: sample query failed: timed out
+20:07:48 cmd.daemon.go:115: saving torrent peers 133
+20:07:48 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 15,
+ Available: (int) 2564,
+ Peers: (int) 3126,
+ RSS: (int) 0
+}
+
+20:07:48 torrent.sampling.go:270: locate hashed initiated
+20:07:48 torrent.sampling.go:301: locate hashed completed
+20:07:48 torrent.sampling.go:333: sleeping for 1m0s
+20:07:51 torrent.sampling.go:128: infohash sample completed 2804:51b4:6817:64eb:c05c:8cff:fe24:312d [2804:51b4:6817:64eb:c05c:8cff:fe24:312d]:43249
+20:07:51 torrent.sampling.go:112: marking peer as failed query failed: [2804:51b4:6817:64eb:c05c:8cff:fe24:312d]:43249: timed out
+20:07:51 torrent.sampling.go:180: query failed: [2804:51b4:6817:64eb:c05c:8cff:fe24:312d]:43249: timed out
+20:07:51 torrent.sampling.go:124: infohash sample initiated 2400:2653:36a1:2500:4168:ebea:1d7a:af32 [2400:2653:36a1:2500:4168:ebea:1d7a:af32]:42265
+20:07:51 torrent.sampling.go:92: sample query failed: timed out
+20:08:06 torrent.sampling.go:128: infohash sample completed 2400:2653:36a1:2500:4168:ebea:1d7a:af32 [2400:2653:36a1:2500:4168:ebea:1d7a:af32]:42265
+20:08:06 torrent.sampling.go:112: marking peer as failed query failed: [2400:2653:36a1:2500:4168:ebea:1d7a:af32]:42265: timed out
+20:08:06 torrent.sampling.go:180: query failed: [2400:2653:36a1:2500:4168:ebea:1d7a:af32]:42265: timed out
+20:08:06 torrent.sampling.go:124: infohash sample initiated 2001:44c8:48e4:ff72:181f:427e:4459:8864 [2001:44c8:48e4:ff72:181f:427e:4459:8864]:50375
+20:08:06 torrent.sampling.go:92: sample query failed: timed out
+20:08:10 torrent.sampling.go:237: locate infohash timed out 5bb374de-14ea-c70f-dcd8-06e4f5a252bd 2 21.73656636s 21.722305839s
+20:08:18 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 6,
+ Available: (int) 2564,
+ Peers: (int) 3124,
+ RSS: (int) 0
+}
+
+20:08:20 torrent.sampling.go:237: locate infohash timed out a425752d-cd64-8b28-af12-ff4b78b93e42 2 31.762907776s 31.749289879s
+20:08:21 torrent.sampling.go:128: infohash sample completed 2001:44c8:48e4:ff72:181f:427e:4459:8864 [2001:44c8:48e4:ff72:181f:427e:4459:8864]:50375
+20:08:21 torrent.sampling.go:112: marking peer as failed query failed: [2001:44c8:48e4:ff72:181f:427e:4459:8864]:50375: timed out
+20:08:21 torrent.sampling.go:180: query failed: [2001:44c8:48e4:ff72:181f:427e:4459:8864]:50375: timed out
+20:08:21 torrent.sampling.go:124: infohash sample initiated 2401:4900:195a:7a13:1:0:c06:6d69 [2401:4900:195a:7a13:1:0:c06:6d69]:40180
+20:08:21 torrent.sampling.go:92: sample query failed: timed out
+20:08:35 torrent.sampling.go:128: infohash sample completed 2401:4900:195a:7a13:1:0:c06:6d69 [2401:4900:195a:7a13:1:0:c06:6d69]:40180
+20:08:35 torrent.sampling.go:112: marking peer as failed query failed: [2401:4900:195a:7a13:1:0:c06:6d69]:40180: timed out
+20:08:35 torrent.sampling.go:180: query failed: [2401:4900:195a:7a13:1:0:c06:6d69]:40180: timed out
+20:08:35 torrent.sampling.go:124: infohash sample initiated 2a02:2f08:b508:8900:d6c9:4bff:fed1:d2b9 [2a02:2f08:b508:8900:d6c9:4bff:fed1:d2b9]:39443
+20:08:36 torrent.sampling.go:92: sample query failed: timed out
+20:08:48 cmd.daemon.go:115: saving torrent peers 133
+20:08:48 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 0,
+ Available: (int) 2564,
+ Peers: (int) 3123,
+ RSS: (int) 0
+}
+
+20:08:48 torrent.sampling.go:270: locate hashed initiated
+20:08:48 torrent.sampling.go:301: locate hashed completed
+20:08:48 torrent.sampling.go:333: sleeping for 1s
+20:08:49 torrent.sampling.go:270: locate hashed initiated
+20:08:49 torrent.sampling.go:301: locate hashed completed
+20:08:49 torrent.sampling.go:333: sleeping for 2s
+20:08:49 torrent.sampling.go:128: infohash sample completed 2a02:2f08:b508:8900:d6c9:4bff:fed1:d2b9 [2a02:2f08:b508:8900:d6c9:4bff:fed1:d2b9]:39443
+20:08:49 torrent.sampling.go:112: marking peer as failed query failed: [2a02:2f08:b508:8900:d6c9:4bff:fed1:d2b9]:39443: timed out
+20:08:49 torrent.sampling.go:180: query failed: [2a02:2f08:b508:8900:d6c9:4bff:fed1:d2b9]:39443: timed out
+20:08:49 torrent.sampling.go:199: querying peers for info hashes 0 < 100
+20:08:49 torrent.sampling.go:124: infohash sample initiated 2802:8012:53fc:fc00:4dd2:c4a0:8db8:a809 [2802:8012:53fc:fc00:4dd2:c4a0:8db8:a809]:53460
+20:08:50 torrent.sampling.go:92: sample query failed: timed out
+20:08:51 torrent.sampling.go:270: locate hashed initiated
+20:08:51 torrent.sampling.go:301: locate hashed completed
+20:08:51 torrent.sampling.go:333: sleeping for 4s
+20:08:55 torrent.sampling.go:270: locate hashed initiated
+20:08:55 torrent.sampling.go:301: locate hashed completed
+20:08:55 torrent.sampling.go:333: sleeping for 8s
+20:09:03 torrent.sampling.go:270: locate hashed initiated
+20:09:03 torrent.sampling.go:301: locate hashed completed
+20:09:03 torrent.sampling.go:333: sleeping for 16s
+20:09:05 torrent.sampling.go:128: infohash sample completed 2802:8012:53fc:fc00:4dd2:c4a0:8db8:a809 [2802:8012:53fc:fc00:4dd2:c4a0:8db8:a809]:53460
+20:09:05 torrent.sampling.go:112: marking peer as failed query failed: [2802:8012:53fc:fc00:4dd2:c4a0:8db8:a809]:53460: timed out
+20:09:05 torrent.sampling.go:180: query failed: [2802:8012:53fc:fc00:4dd2:c4a0:8db8:a809]:53460: timed out
+20:09:05 torrent.sampling.go:124: infohash sample initiated 186.157.156.77 186.157.156.77:42249
+20:09:05 torrent.sampling.go:92: sample query failed: timed out
+20:09:18 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 0,
+ Available: (int) 2564,
+ Peers: (int) 3121,
+ RSS: (int) 0
+}
+
+20:09:19 torrent.sampling.go:270: locate hashed initiated
+20:09:19 torrent.sampling.go:301: locate hashed completed
+20:09:19 torrent.sampling.go:333: sleeping for 32s
+20:09:19 torrent.sampling.go:128: infohash sample completed 186.157.156.77 186.157.156.77:42249
+20:09:19 torrent.sampling.go:112: marking peer as failed query failed: 186.157.156.77:42249: timed out
+20:09:19 torrent.sampling.go:180: query failed: 186.157.156.77:42249: timed out
+20:09:19 torrent.sampling.go:124: infohash sample initiated 2800:c70:13:5bb:1:2:b20d:6db1 [2800:c70:13:5bb:1:2:b20d:6db1]:39571
+20:09:20 torrent.sampling.go:92: sample query failed: timed out
+20:09:35 torrent.sampling.go:128: infohash sample completed 2800:c70:13:5bb:1:2:b20d:6db1 [2800:c70:13:5bb:1:2:b20d:6db1]:39571
+20:09:35 torrent.sampling.go:112: marking peer as failed query failed: [2800:c70:13:5bb:1:2:b20d:6db1]:39571: timed out
+20:09:35 torrent.sampling.go:180: query failed: [2800:c70:13:5bb:1:2:b20d:6db1]:39571: timed out
+20:09:35 torrent.sampling.go:124: infohash sample initiated 177.223.34.247 177.223.34.247:37241
+20:09:36 torrent.sampling.go:92: sample query failed: timed out
+20:09:48 cmd.daemon.go:115: saving torrent peers 133
+20:09:48 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 0,
+ Available: (int) 2564,
+ Peers: (int) 3122,
+ RSS: (int) 0
+}
+
+20:09:49 torrent.sampling.go:128: infohash sample completed 177.223.34.247 177.223.34.247:37241
+20:09:49 torrent.sampling.go:112: marking peer as failed query failed: 177.223.34.247:37241: timed out
+20:09:49 torrent.sampling.go:180: query failed: 177.223.34.247:37241: timed out
+20:09:49 torrent.sampling.go:124: infohash sample initiated 2a01:e0a:463:9840:ccfa:2cd7:633c:410d [2a01:e0a:463:9840:ccfa:2cd7:633c:410d]:54015
+20:09:51 torrent.sampling.go:270: locate hashed initiated
+20:09:51 torrent.sampling.go:301: locate hashed completed
+20:09:51 torrent.sampling.go:333: sleeping for 1m0s
+20:09:51 torrent.sampling.go:92: sample query failed: timed out
+20:10:04 torrent.sampling.go:128: infohash sample completed 2a01:e0a:463:9840:ccfa:2cd7:633c:410d [2a01:e0a:463:9840:ccfa:2cd7:633c:410d]:54015
+20:10:04 torrent.sampling.go:112: marking peer as failed query failed: [2a01:e0a:463:9840:ccfa:2cd7:633c:410d]:54015: timed out
+20:10:04 torrent.sampling.go:180: query failed: [2a01:e0a:463:9840:ccfa:2cd7:633c:410d]:54015: timed out
+20:10:04 torrent.sampling.go:124: infohash sample initiated 2804:e54:200e:7891:e0ed:7dff:fed7:b93d [2804:e54:200e:7891:e0ed:7dff:fed7:b93d]:56426
+20:10:07 torrent.sampling.go:92: sample query failed: timed out
+20:10:18 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 0,
+ Available: (int) 2564,
+ Peers: (int) 3122,
+ RSS: (int) 0
+}
+
+20:10:20 torrent.sampling.go:128: infohash sample completed 2804:e54:200e:7891:e0ed:7dff:fed7:b93d [2804:e54:200e:7891:e0ed:7dff:fed7:b93d]:56426
+20:10:20 torrent.sampling.go:112: marking peer as failed query failed: [2804:e54:200e:7891:e0ed:7dff:fed7:b93d]:56426: timed out
+20:10:20 torrent.sampling.go:180: query failed: [2804:e54:200e:7891:e0ed:7dff:fed7:b93d]:56426: timed out
+20:10:20 torrent.sampling.go:124: infohash sample initiated 222.64.227.241 222.64.227.241:3981
+20:10:20 torrent.sampling.go:156: infohash sample completed 222.64.227.241 222.64.227.241:3981
+20:10:20 torrent.sampling.go:124: infohash sample initiated 115.222.149.70 115.222.149.70:38676
+20:10:22 torrent.sampling.go:92: sample query failed: timed out
+20:10:35 torrent.sampling.go:128: infohash sample completed 115.222.149.70 115.222.149.70:38676
+20:10:35 torrent.sampling.go:112: marking peer as failed query failed: 115.222.149.70:38676: timed out
+20:10:35 torrent.sampling.go:180: query failed: 115.222.149.70:38676: timed out
+20:10:35 torrent.sampling.go:199: querying peers for info hashes 17 < 100
+20:10:35 torrent.sampling.go:124: infohash sample initiated ::ffff:110.53.218.11 110.53.218.11:39061
+20:10:35 torrent.sampling.go:156: infohash sample completed ::ffff:110.53.218.11 110.53.218.11:39061
+20:10:35 torrent.sampling.go:124: infohash sample initiated 73.83.210.19 73.83.210.19:59882
+20:10:36 torrent.sampling.go:92: sample query failed: timed out
+20:10:48 cmd.daemon.go:115: saving torrent peers 133
+20:10:48 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 33,
+ Available: (int) 2564,
+ Peers: (int) 3119,
+ RSS: (int) 0
+}
+
+20:10:50 torrent.sampling.go:128: infohash sample completed 73.83.210.19 73.83.210.19:59882
+20:10:50 torrent.sampling.go:112: marking peer as failed query failed: 73.83.210.19:59882: timed out
+20:10:50 torrent.sampling.go:180: query failed: 73.83.210.19:59882: timed out
+20:10:50 torrent.sampling.go:124: infohash sample initiated 2804:21c8:1da:e800:80bc:97ff:fe35:234b [2804:21c8:1da:e800:80bc:97ff:fe35:234b]:38016
+20:10:51 torrent.sampling.go:270: locate hashed initiated
+20:10:51 torrent.sampling.go:301: locate hashed completed
+20:10:51 torrent.sampling.go:333: sleeping for 1m0s
+20:10:51 torrent.sampling.go:92: sample query failed: timed out
+20:11:04 torrent.sampling.go:128: infohash sample completed 2804:21c8:1da:e800:80bc:97ff:fe35:234b [2804:21c8:1da:e800:80bc:97ff:fe35:234b]:38016
+20:11:04 torrent.sampling.go:112: marking peer as failed query failed: [2804:21c8:1da:e800:80bc:97ff:fe35:234b]:38016: timed out
+20:11:04 torrent.sampling.go:180: query failed: [2804:21c8:1da:e800:80bc:97ff:fe35:234b]:38016: timed out
+20:11:04 torrent.sampling.go:124: infohash sample initiated 2400:adcc:125:9a00:9cff:91ff:feac:45e [2400:adcc:125:9a00:9cff:91ff:feac:45e]:50069
+20:11:06 torrent.sampling.go:92: sample query failed: timed out
+20:11:13 torrent.sampling.go:237: locate infohash timed out 642b9cea-1d89-eec1-750f-73ecec759b30 1 22.024462914s 22.011097864s
+20:11:18 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 33,
+ Available: (int) 2564,
+ Peers: (int) 3119,
+ RSS: (int) 0
+}
+
+20:11:19 torrent.sampling.go:128: infohash sample completed 2400:adcc:125:9a00:9cff:91ff:feac:45e [2400:adcc:125:9a00:9cff:91ff:feac:45e]:50069
+20:11:19 torrent.sampling.go:112: marking peer as failed query failed: [2400:adcc:125:9a00:9cff:91ff:feac:45e]:50069: timed out
+20:11:19 torrent.sampling.go:180: query failed: [2400:adcc:125:9a00:9cff:91ff:feac:45e]:50069: timed out
+20:11:19 torrent.sampling.go:124: infohash sample initiated 2a01:e0a:afe:8b50:f8a6:a2ff:fe3a:6a69 [2a01:e0a:afe:8b50:f8a6:a2ff:fe3a:6a69]:41875
+20:11:22 torrent.sampling.go:92: sample query failed: timed out
+20:11:23 torrent.sampling.go:237: locate infohash timed out dc5cf51a-f55d-5fe2-02e3-08d84c8aee58 1 32.057813263s 32.046025176s
+20:11:33 torrent.sampling.go:128: infohash sample completed 2a01:e0a:afe:8b50:f8a6:a2ff:fe3a:6a69 [2a01:e0a:afe:8b50:f8a6:a2ff:fe3a:6a69]:41875
+20:11:33 torrent.sampling.go:112: marking peer as failed query failed: [2a01:e0a:afe:8b50:f8a6:a2ff:fe3a:6a69]:41875: timed out
+20:11:33 torrent.sampling.go:180: query failed: [2a01:e0a:afe:8b50:f8a6:a2ff:fe3a:6a69]:41875: timed out
+20:11:33 torrent.sampling.go:124: infohash sample initiated 45.190.100.173 45.190.100.173:12976
+20:11:39 torrent.sampling.go:92: sample query failed: timed out
+20:11:48 cmd.daemon.go:115: saving torrent peers 133
+20:11:48 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 33,
+ Available: (int) 2564,
+ Peers: (int) 3132,
+ RSS: (int) 0
+}
+
+20:11:48 torrent.sampling.go:128: infohash sample completed 45.190.100.173 45.190.100.173:12976
+20:11:48 torrent.sampling.go:112: marking peer as failed query failed: 45.190.100.173:12976: timed out
+20:11:48 torrent.sampling.go:180: query failed: 45.190.100.173:12976: timed out
+20:11:48 torrent.sampling.go:124: infohash sample initiated 88.243.68.248 88.243.68.248:15579
+20:11:51 torrent.sampling.go:270: locate hashed initiated
+20:11:51 torrent.sampling.go:301: locate hashed completed
+20:11:51 torrent.sampling.go:333: sleeping for 1m0s
+20:11:55 torrent.sampling.go:92: sample query failed: timed out
+20:11:56 torrent.sampling.go:88: locating samplable peers 133 available
+20:12:04 torrent.sampling.go:128: infohash sample completed 88.243.68.248 88.243.68.248:15579
+20:12:04 torrent.sampling.go:112: marking peer as failed query failed: 88.243.68.248:15579: timed out
+20:12:04 torrent.sampling.go:180: query failed: 88.243.68.248:15579: timed out
+20:12:04 torrent.sampling.go:124: infohash sample initiated 42.108.82.15 42.108.82.15:23818
+20:12:10 torrent.sampling.go:92: sample query failed: timed out
+20:12:13 torrent.sampling.go:237: locate infohash timed out 642b9cea-1d89-eec1-750f-73ecec759b30 2 22.024338979s 22.011097864s
+20:12:18 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 27,
+ Available: (int) 2564,
+ Peers: (int) 3135,
+ RSS: (int) 0
+}
+
+20:12:19 torrent.sampling.go:128: infohash sample completed 42.108.82.15 42.108.82.15:23818
+20:12:19 torrent.sampling.go:112: marking peer as failed query failed: 42.108.82.15:23818: timed out
+20:12:19 torrent.sampling.go:180: query failed: 42.108.82.15:23818: timed out
+20:12:19 torrent.sampling.go:199: querying peers for info hashes 23 < 100
+20:12:19 torrent.sampling.go:124: infohash sample initiated 2001:4450:812e:7b00:e4f4:ceff:fe50:9d3c [2001:4450:812e:7b00:e4f4:ceff:fe50:9d3c]:52849
+20:12:23 torrent.sampling.go:237: locate infohash timed out dc5cf51a-f55d-5fe2-02e3-08d84c8aee58 2 32.059497109s 32.046025176s
+20:12:25 server.go:3634: http: TLS handshake error from 127.0.0.1:54600: EOF
+20:12:27 torrent.sampling.go:92: sample query failed: timed out
+20:12:34 torrent.sampling.go:128: infohash sample completed 2001:4450:812e:7b00:e4f4:ceff:fe50:9d3c [2001:4450:812e:7b00:e4f4:ceff:fe50:9d3c]:52849
+20:12:34 torrent.sampling.go:112: marking peer as failed query failed: [2001:4450:812e:7b00:e4f4:ceff:fe50:9d3c]:52849: timed out
+20:12:34 torrent.sampling.go:180: query failed: [2001:4450:812e:7b00:e4f4:ceff:fe50:9d3c]:52849: timed out
+20:12:34 torrent.sampling.go:124: infohash sample initiated 2409:40f0:1180:9109:8c49:c1ff:fe28:fcfc [2409:40f0:1180:9109:8c49:c1ff:fe28:fcfc]:48099
+20:12:41 torrent.sampling.go:92: sample query failed: timed out
+20:12:48 cmd.daemon.go:115: saving torrent peers 133
+20:12:48 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 0,
+ Available: (int) 2564,
+ Peers: (int) 3133,
+ RSS: (int) 0
+}
+
+20:12:50 torrent.sampling.go:128: infohash sample completed 2409:40f0:1180:9109:8c49:c1ff:fe28:fcfc [2409:40f0:1180:9109:8c49:c1ff:fe28:fcfc]:48099
+20:12:50 torrent.sampling.go:112: marking peer as failed query failed: [2409:40f0:1180:9109:8c49:c1ff:fe28:fcfc]:48099: timed out
+20:12:50 torrent.sampling.go:180: query failed: [2409:40f0:1180:9109:8c49:c1ff:fe28:fcfc]:48099: timed out
+20:12:50 torrent.sampling.go:124: infohash sample initiated 181.25.57.1 181.25.57.1:42151
+20:12:51 torrent.sampling.go:270: locate hashed initiated
+20:12:51 torrent.sampling.go:301: locate hashed completed
+20:12:51 torrent.sampling.go:333: sleeping for 1s
+20:12:52 torrent.sampling.go:270: locate hashed initiated
+20:12:52 torrent.sampling.go:301: locate hashed completed
+20:12:52 torrent.sampling.go:333: sleeping for 2s
+20:12:54 torrent.sampling.go:270: locate hashed initiated
+20:12:54 torrent.sampling.go:301: locate hashed completed
+20:12:54 torrent.sampling.go:333: sleeping for 4s
+20:12:57 torrent.sampling.go:92: sample query failed: timed out
+20:12:58 torrent.sampling.go:270: locate hashed initiated
+20:12:58 torrent.sampling.go:301: locate hashed completed
+20:12:58 torrent.sampling.go:333: sleeping for 8s
+20:13:04 torrent.sampling.go:128: infohash sample completed 181.25.57.1 181.25.57.1:42151
+20:13:04 torrent.sampling.go:112: marking peer as failed query failed: 181.25.57.1:42151: timed out
+20:13:04 torrent.sampling.go:180: query failed: 181.25.57.1:42151: timed out
+20:13:04 torrent.sampling.go:124: infohash sample initiated 93.46.106.102 93.46.106.102:6881
+20:13:04 torrent.sampling.go:156: infohash sample completed 93.46.106.102 93.46.106.102:6881
+20:13:04 torrent.sampling.go:124: infohash sample initiated 94.247.57.130 94.247.57.130:6407
+20:13:05 torrent.sampling.go:156: infohash sample completed 94.247.57.130 94.247.57.130:6407
+20:13:05 torrent.sampling.go:124: infohash sample initiated 113.124.240.149 113.124.240.149:6881
+20:13:06 torrent.sampling.go:270: locate hashed initiated
+20:13:06 torrent.sampling.go:301: locate hashed completed
+20:13:06 torrent.sampling.go:333: sleeping for 1m0s
+20:13:13 torrent.sampling.go:92: sample query failed: timed out
+20:13:18 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 28,
+ Available: (int) 2564,
+ Peers: (int) 3132,
+ RSS: (int) 0
+}
+
+20:13:20 torrent.sampling.go:128: infohash sample completed 113.124.240.149 113.124.240.149:6881
+20:13:20 torrent.sampling.go:112: marking peer as failed query failed: 113.124.240.149:6881: timed out
+20:13:20 torrent.sampling.go:180: query failed: 113.124.240.149:6881: timed out
+20:13:20 torrent.sampling.go:124: infohash sample initiated 138.19.170.126 138.19.170.126:6881
+20:13:20 torrent.sampling.go:156: infohash sample completed 138.19.170.126 138.19.170.126:6881
+20:13:20 torrent.sampling.go:124: infohash sample initiated 189.239.64.157 189.239.64.157:49216
+20:13:26 torrent.sampling.go:237: locate infohash timed out 8537e543-6dc3-2db4-97dd-48e180131602 1 20.103754547s 20.090520821s
+20:13:27 torrent.sampling.go:92: sample query failed: timed out
+20:13:35 torrent.sampling.go:128: infohash sample completed 189.239.64.157 189.239.64.157:49216
+20:13:35 torrent.sampling.go:112: marking peer as failed query failed: 189.239.64.157:49216: timed out
+20:13:35 torrent.sampling.go:180: query failed: 189.239.64.157:49216: timed out
+20:13:35 torrent.sampling.go:199: querying peers for info hashes 45 < 100
+20:13:35 torrent.sampling.go:124: infohash sample initiated 149.255.248.6 149.255.248.6:51038
+20:13:36 torrent.sampling.go:237: locate infohash timed out 90acc8dc-03bb-d9b4-ec7e-e5e5c31a4c0e 1 30.467048897s 30.453450778s
+20:13:42 torrent.sampling.go:92: sample query failed: timed out
+20:13:48 cmd.daemon.go:115: saving torrent peers 133
+20:13:48 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 45,
+ Available: (int) 2564,
+ Peers: (int) 3129,
+ RSS: (int) 0
+}
+
+20:13:50 torrent.sampling.go:128: infohash sample completed 149.255.248.6 149.255.248.6:51038
+20:13:50 torrent.sampling.go:112: marking peer as failed query failed: 149.255.248.6:51038: timed out
+20:13:50 torrent.sampling.go:180: query failed: 149.255.248.6:51038: timed out
+20:13:50 torrent.sampling.go:124: infohash sample initiated 2a00:7c80:0:24f::2 [2a00:7c80:0:24f::2]:6890
+20:13:50 torrent.sampling.go:156: infohash sample completed 2a00:7c80:0:24f::2 [2a00:7c80:0:24f::2]:6890
+20:13:50 torrent.sampling.go:124: infohash sample initiated 2a01:e0a:c07:4460:24f6:7bff:feb2:4f43 [2a01:e0a:c07:4460:24f6:7bff:feb2:4f43]:52806
+20:14:04 torrent.sampling.go:92: sample query failed: timed out
+20:14:05 torrent.sampling.go:128: infohash sample completed 2a01:e0a:c07:4460:24f6:7bff:feb2:4f43 [2a01:e0a:c07:4460:24f6:7bff:feb2:4f43]:52806
+20:14:05 torrent.sampling.go:112: marking peer as failed query failed: [2a01:e0a:c07:4460:24f6:7bff:feb2:4f43]:52806: timed out
+20:14:05 torrent.sampling.go:180: query failed: [2a01:e0a:c07:4460:24f6:7bff:feb2:4f43]:52806: timed out
+20:14:05 torrent.sampling.go:124: infohash sample initiated 2804:a4:8e:3a73:686b:4a14:d192:c42a [2804:a4:8e:3a73:686b:4a14:d192:c42a]:49903
+20:14:06 torrent.sampling.go:270: locate hashed initiated
+20:14:06 torrent.sampling.go:301: locate hashed completed
+20:14:06 torrent.sampling.go:333: sleeping for 1m0s
+20:14:18 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 65,
+ Available: (int) 2564,
+ Peers: (int) 3126,
+ RSS: (int) 0
+}
+
+20:14:19 torrent.sampling.go:92: sample query failed: timed out
+20:14:20 torrent.sampling.go:128: infohash sample completed 2804:a4:8e:3a73:686b:4a14:d192:c42a [2804:a4:8e:3a73:686b:4a14:d192:c42a]:49903
+20:14:20 torrent.sampling.go:112: marking peer as failed query failed: [2804:a4:8e:3a73:686b:4a14:d192:c42a]:49903: timed out
+20:14:20 torrent.sampling.go:180: query failed: [2804:a4:8e:3a73:686b:4a14:d192:c42a]:49903: timed out
+20:14:20 torrent.sampling.go:124: infohash sample initiated 2804:8600:63d:30e0:acac:477f:3ba7:5b03 [2804:8600:63d:30e0:acac:477f:3ba7:5b03]:39215
+20:14:26 torrent.sampling.go:237: locate infohash timed out 8537e543-6dc3-2db4-97dd-48e180131602 2 20.103200549s 20.090520821s
+20:14:34 torrent.sampling.go:128: infohash sample completed 2804:8600:63d:30e0:acac:477f:3ba7:5b03 [2804:8600:63d:30e0:acac:477f:3ba7:5b03]:39215
+20:14:34 torrent.sampling.go:112: marking peer as failed query failed: [2804:8600:63d:30e0:acac:477f:3ba7:5b03]:39215: timed out
+20:14:34 torrent.sampling.go:180: query failed: [2804:8600:63d:30e0:acac:477f:3ba7:5b03]:39215: timed out
+20:14:34 torrent.sampling.go:124: infohash sample initiated 2800:200:ef00:22e:74ce:ba47:4e5e:e1f8 [2800:200:ef00:22e:74ce:ba47:4e5e:e1f8]:56084
+20:14:35 torrent.sampling.go:92: sample query failed: timed out
+20:14:36 torrent.sampling.go:237: locate infohash timed out 90acc8dc-03bb-d9b4-ec7e-e5e5c31a4c0e 2 30.458290965s 30.453450778s
+20:14:48 cmd.daemon.go:115: saving torrent peers 133
+20:14:48 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 37,
+ Available: (int) 2564,
+ Peers: (int) 3124,
+ RSS: (int) 0
+}
+
+20:14:50 torrent.sampling.go:128: infohash sample completed 2800:200:ef00:22e:74ce:ba47:4e5e:e1f8 [2800:200:ef00:22e:74ce:ba47:4e5e:e1f8]:56084
+20:14:50 torrent.sampling.go:112: marking peer as failed query failed: [2800:200:ef00:22e:74ce:ba47:4e5e:e1f8]:56084: timed out
+20:14:50 torrent.sampling.go:180: query failed: [2800:200:ef00:22e:74ce:ba47:4e5e:e1f8]:56084: timed out
+20:14:50 torrent.sampling.go:124: infohash sample initiated 2806:269:4481:8830:dd97:94b7:921f:a57a [2806:269:4481:8830:dd97:94b7:921f:a57a]:48751
+20:14:51 torrent.sampling.go:92: sample query failed: timed out
+20:15:05 torrent.sampling.go:128: infohash sample completed 2806:269:4481:8830:dd97:94b7:921f:a57a [2806:269:4481:8830:dd97:94b7:921f:a57a]:48751
+20:15:05 torrent.sampling.go:112: marking peer as failed query failed: [2806:269:4481:8830:dd97:94b7:921f:a57a]:48751: timed out
+20:15:05 torrent.sampling.go:180: query failed: [2806:269:4481:8830:dd97:94b7:921f:a57a]:48751: timed out
+20:15:05 torrent.sampling.go:124: infohash sample initiated 2806:264:548a:9bd7:d0bf:7eff:fed6:7637 [2806:264:548a:9bd7:d0bf:7eff:fed6:7637]:47635
+20:15:06 torrent.sampling.go:270: locate hashed initiated
+20:15:06 torrent.sampling.go:301: locate hashed completed
+20:15:06 torrent.sampling.go:333: sleeping for 1m0s
+20:15:14 torrent.sampling.go:92: sample query failed: timed out
+20:15:18 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 37,
+ Available: (int) 2564,
+ Peers: (int) 3123,
+ RSS: (int) 0
+}
+
+20:15:20 torrent.sampling.go:128: infohash sample completed 2806:264:548a:9bd7:d0bf:7eff:fed6:7637 [2806:264:548a:9bd7:d0bf:7eff:fed6:7637]:47635
+20:15:20 torrent.sampling.go:112: marking peer as failed query failed: [2806:264:548a:9bd7:d0bf:7eff:fed6:7637]:47635: timed out
+20:15:20 torrent.sampling.go:180: query failed: [2806:264:548a:9bd7:d0bf:7eff:fed6:7637]:47635: timed out
+20:15:20 torrent.sampling.go:199: querying peers for info hashes 37 < 100
+20:15:20 torrent.sampling.go:124: infohash sample initiated 24.228.24.166 24.228.24.166:42606
+20:15:27 torrent.sampling.go:237: locate infohash timed out ab4fa230-c39d-36c5-261a-58d931cb4e23 2 20.527837376s 20.512895865s
+20:15:29 torrent.sampling.go:92: sample query failed: timed out
+20:15:34 torrent.sampling.go:128: infohash sample completed 24.228.24.166 24.228.24.166:42606
+20:15:34 torrent.sampling.go:112: marking peer as failed query failed: 24.228.24.166:42606: timed out
+20:15:34 torrent.sampling.go:180: query failed: 24.228.24.166:42606: timed out
+20:15:34 torrent.sampling.go:124: infohash sample initiated 177.249.170.23 177.249.170.23:49368
+20:15:37 torrent.sampling.go:237: locate infohash timed out 1497bd27-3e5b-d291-b170-e0894b556ecd 2 31.16913379s 31.16284587s
+20:15:44 torrent.sampling.go:92: sample query failed: timed out
+20:15:48 cmd.daemon.go:115: saving torrent peers 133
+20:15:48 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 0,
+ Available: (int) 2564,
+ Peers: (int) 3122,
+ RSS: (int) 0
+}
+
+20:15:48 torrent.sampling.go:128: infohash sample completed 177.249.170.23 177.249.170.23:49368
+20:15:48 torrent.sampling.go:112: marking peer as failed query failed: 177.249.170.23:49368: timed out
+20:15:48 torrent.sampling.go:180: query failed: 177.249.170.23:49368: timed out
+20:15:48 torrent.sampling.go:124: infohash sample initiated 37.150.54.62 37.150.54.62:47311
+20:16:02 torrent.sampling.go:128: infohash sample completed 37.150.54.62 37.150.54.62:47311
+20:16:02 torrent.sampling.go:112: marking peer as failed query failed: 37.150.54.62:47311: timed out
+20:16:02 torrent.sampling.go:180: query failed: 37.150.54.62:47311: timed out
+20:16:02 torrent.sampling.go:124: infohash sample initiated 2806:2f0:5180:ec32:1077:6aff:fe8e:efa7 [2806:2f0:5180:ec32:1077:6aff:fe8e:efa7]:52394
+20:16:05 torrent.sampling.go:92: sample query failed: timed out
+20:16:06 torrent.sampling.go:270: locate hashed initiated
+20:16:06 torrent.sampling.go:301: locate hashed completed
+20:16:06 torrent.sampling.go:333: sleeping for 1m0s
+20:16:17 torrent.sampling.go:128: infohash sample completed 2806:2f0:5180:ec32:1077:6aff:fe8e:efa7 [2806:2f0:5180:ec32:1077:6aff:fe8e:efa7]:52394
+20:16:17 torrent.sampling.go:112: marking peer as failed query failed: [2806:2f0:5180:ec32:1077:6aff:fe8e:efa7]:52394: timed out
+20:16:17 torrent.sampling.go:180: query failed: [2806:2f0:5180:ec32:1077:6aff:fe8e:efa7]:52394: timed out
+20:16:17 torrent.sampling.go:124: infohash sample initiated 2a01:e0a:2b2:bba0:dacb:8aff:fe52:3b65 [2a01:e0a:2b2:bba0:dacb:8aff:fe52:3b65]:49913
+20:16:17 torrent.sampling.go:156: infohash sample completed 2a01:e0a:2b2:bba0:dacb:8aff:fe52:3b65 [2a01:e0a:2b2:bba0:dacb:8aff:fe52:3b65]:49913
+20:16:17 torrent.sampling.go:124: infohash sample initiated 2806:107e:1b:c44f:7c50:19ff:fe53:d6b8 [2806:107e:1b:c44f:7c50:19ff:fe53:d6b8]:45110
+20:16:18 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 42,
+ Available: (int) 2564,
+ Peers: (int) 3131,
+ RSS: (int) 0
+}
+
+20:16:24 torrent.sampling.go:92: sample query failed: timed out
+20:16:32 torrent.sampling.go:128: infohash sample completed 2806:107e:1b:c44f:7c50:19ff:fe53:d6b8 [2806:107e:1b:c44f:7c50:19ff:fe53:d6b8]:45110
+20:16:32 torrent.sampling.go:112: marking peer as failed query failed: [2806:107e:1b:c44f:7c50:19ff:fe53:d6b8]:45110: timed out
+20:16:32 torrent.sampling.go:180: query failed: [2806:107e:1b:c44f:7c50:19ff:fe53:d6b8]:45110: timed out
+20:16:32 torrent.sampling.go:124: infohash sample initiated 2001:4451:820e:200:2017:e65:df87:62f5 [2001:4451:820e:200:2017:e65:df87:62f5]:46832
+20:16:39 torrent.sampling.go:92: sample query failed: timed out
+20:16:47 torrent.sampling.go:128: infohash sample completed 2001:4451:820e:200:2017:e65:df87:62f5 [2001:4451:820e:200:2017:e65:df87:62f5]:46832
+20:16:47 torrent.sampling.go:112: marking peer as failed query failed: [2001:4451:820e:200:2017:e65:df87:62f5]:46832: timed out
+20:16:47 torrent.sampling.go:180: query failed: [2001:4451:820e:200:2017:e65:df87:62f5]:46832: timed out
+20:16:47 torrent.sampling.go:124: infohash sample initiated 2a02:2f07:430b:6600:5896:c044:5c0b:a8b1 [2a02:2f07:430b:6600:5896:c044:5c0b:a8b1]:51679
+20:16:48 cmd.daemon.go:115: saving torrent peers 133
+20:16:48 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 58,
+ Available: (int) 2564,
+ Peers: (int) 3134,
+ RSS: (int) 0
+}
+
+20:16:57 torrent.sampling.go:92: sample query failed: timed out
+20:17:02 torrent.sampling.go:128: infohash sample completed 2a02:2f07:430b:6600:5896:c044:5c0b:a8b1 [2a02:2f07:430b:6600:5896:c044:5c0b:a8b1]:51679
+20:17:02 torrent.sampling.go:112: marking peer as failed query failed: [2a02:2f07:430b:6600:5896:c044:5c0b:a8b1]:51679: timed out
+20:17:02 torrent.sampling.go:180: query failed: [2a02:2f07:430b:6600:5896:c044:5c0b:a8b1]:51679: timed out
+20:17:02 torrent.sampling.go:199: querying peers for info hashes 66 < 100
+20:17:02 torrent.sampling.go:124: infohash sample initiated 2a02:dd07:8015:d200:6c91:8775:8f63:cd73 [2a02:dd07:8015:d200:6c91:8775:8f63:cd73]:42236
+20:17:06 torrent.sampling.go:270: locate hashed initiated
+20:17:06 torrent.sampling.go:301: locate hashed completed
+20:17:06 torrent.sampling.go:333: sleeping for 1m0s
+20:17:08 torrent.sampling.go:237: locate infohash timed out b8ae745d-1f3f-a86f-6c0c-9d9a29d6f256 26 1m2.301210981s 1m2.287092518s
+20:17:12 torrent.sampling.go:92: sample query failed: timed out
+20:17:17 torrent.sampling.go:128: infohash sample completed 2a02:dd07:8015:d200:6c91:8775:8f63:cd73 [2a02:dd07:8015:d200:6c91:8775:8f63:cd73]:42236
+20:17:17 torrent.sampling.go:112: marking peer as failed query failed: [2a02:dd07:8015:d200:6c91:8775:8f63:cd73]:42236: timed out
+20:17:17 torrent.sampling.go:180: query failed: [2a02:dd07:8015:d200:6c91:8775:8f63:cd73]:42236: timed out
+20:17:18 torrent.sampling.go:124: infohash sample initiated 2806:2f0:9581:fd33:397e:d1d9:aa3f:4093 [2806:2f0:9581:fd33:397e:d1d9:aa3f:4093]:42363
+20:17:18 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 95,
+ Available: (int) 2564,
+ Peers: (int) 3133,
+ RSS: (int) 0
+}
+
+20:17:20 torrent.sampling.go:237: locate infohash timed out 85467336-cdea-fdba-6a34-8149c8c0103b 26 1m14.417559393s 1m14.413912859s
+20:17:27 torrent.sampling.go:92: sample query failed: timed out
+20:17:27 torrent.sampling.go:88: locating samplable peers 133 available
+20:17:31 torrent.sampling.go:237: locate infohash timed out 687d642e-00a9-c78a-a951-30a532602103 1 24.716128554s 24.701741221s
+20:17:33 torrent.sampling.go:128: infohash sample completed 2806:2f0:9581:fd33:397e:d1d9:aa3f:4093 [2806:2f0:9581:fd33:397e:d1d9:aa3f:4093]:42363
+20:17:33 torrent.sampling.go:112: marking peer as failed query failed: [2806:2f0:9581:fd33:397e:d1d9:aa3f:4093]:42363: timed out
+20:17:33 torrent.sampling.go:180: query failed: [2806:2f0:9581:fd33:397e:d1d9:aa3f:4093]:42363: timed out
+20:17:33 torrent.sampling.go:124: infohash sample initiated 2a01:e11:5021:120:a371:59fd:83e2:4191 [2a01:e11:5021:120:a371:59fd:83e2:4191]:50678
+20:17:42 torrent.sampling.go:237: locate infohash timed out 5aa16d5c-4b0a-5f7a-93c2-06ef2954b246 1 35.917360065s 35.903766782s
+20:17:44 torrent.sampling.go:92: sample query failed: timed out
+20:17:48 cmd.daemon.go:115: saving torrent peers 133
+20:17:48 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 137,
+ Available: (int) 2564,
+ Peers: (int) 3133,
+ RSS: (int) 0
+}
+
+20:17:49 torrent.sampling.go:128: infohash sample completed 2a01:e11:5021:120:a371:59fd:83e2:4191 [2a01:e11:5021:120:a371:59fd:83e2:4191]:50678
+20:17:49 torrent.sampling.go:112: marking peer as failed query failed: [2a01:e11:5021:120:a371:59fd:83e2:4191]:50678: timed out
+20:17:49 torrent.sampling.go:180: query failed: [2a01:e11:5021:120:a371:59fd:83e2:4191]:50678: timed out
+20:17:49 torrent.sampling.go:124: infohash sample initiated 2806:261:498:930e:1c62:7b2e:ee10:ebec [2806:261:498:930e:1c62:7b2e:ee10:ebec]:54579
+20:17:59 torrent.sampling.go:92: sample query failed: timed out
+20:18:04 torrent.sampling.go:128: infohash sample completed 2806:261:498:930e:1c62:7b2e:ee10:ebec [2806:261:498:930e:1c62:7b2e:ee10:ebec]:54579
+20:18:04 torrent.sampling.go:112: marking peer as failed query failed: [2806:261:498:930e:1c62:7b2e:ee10:ebec]:54579: timed out
+20:18:04 torrent.sampling.go:180: query failed: [2806:261:498:930e:1c62:7b2e:ee10:ebec]:54579: timed out
+20:18:04 torrent.sampling.go:124: infohash sample initiated 2a01:e0a:3ac:3cb0:f055:238b:80a5:abef [2a01:e0a:3ac:3cb0:f055:238b:80a5:abef]:38452
+20:18:06 torrent.sampling.go:270: locate hashed initiated
+20:18:06 torrent.sampling.go:301: locate hashed completed
+20:18:06 torrent.sampling.go:333: sleeping for 1m0s
+20:18:08 torrent.sampling.go:237: locate infohash timed out b8ae745d-1f3f-a86f-6c0c-9d9a29d6f256 26 1m2.300589663s 1m2.287092518s
+20:18:14 torrent.sampling.go:92: sample query failed: timed out
+20:18:18 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 220,
+ Available: (int) 2564,
+ Peers: (int) 3131,
+ RSS: (int) 0
+}
+
+20:18:19 torrent.sampling.go:237: locate infohash timed out b6b98acf-cbcc-2d97-036d-8f3598aba599 27 1m13.229083668s 1m13.215181498s
+20:18:19 torrent.sampling.go:128: infohash sample completed 2a01:e0a:3ac:3cb0:f055:238b:80a5:abef [2a01:e0a:3ac:3cb0:f055:238b:80a5:abef]:38452
+20:18:19 torrent.sampling.go:112: marking peer as failed query failed: [2a01:e0a:3ac:3cb0:f055:238b:80a5:abef]:38452: timed out
+20:18:19 torrent.sampling.go:180: query failed: [2a01:e0a:3ac:3cb0:f055:238b:80a5:abef]:38452: timed out
+20:18:19 torrent.sampling.go:124: infohash sample initiated 2a00:1370:8176:20:6156:afd4:fb6f:2232 [2a00:1370:8176:20:6156:afd4:fb6f:2232]:36619
+20:18:30 torrent.sampling.go:92: sample query failed: timed out
+20:18:30 torrent.sampling.go:237: locate infohash timed out 8f1fc410-8862-53e6-1eca-bd24a883ccba 26 1m24.17957031s 1m24.165811649s
+20:18:34 torrent.sampling.go:128: infohash sample completed 2a00:1370:8176:20:6156:afd4:fb6f:2232 [2a00:1370:8176:20:6156:afd4:fb6f:2232]:36619
+20:18:34 torrent.sampling.go:112: marking peer as failed query failed: [2a00:1370:8176:20:6156:afd4:fb6f:2232]:36619: timed out
+20:18:34 torrent.sampling.go:180: query failed: [2a00:1370:8176:20:6156:afd4:fb6f:2232]:36619: timed out
+20:18:34 torrent.sampling.go:124: infohash sample initiated 108.185.12.186 108.185.12.186:6881
+20:18:34 torrent.sampling.go:156: infohash sample completed 108.185.12.186 108.185.12.186:6881
+20:18:34 torrent.sampling.go:124: infohash sample initiated 98.128.172.178 98.128.172.178:56809
+20:18:34 torrent.sampling.go:156: infohash sample completed 98.128.172.178 98.128.172.178:56809
+20:18:40 torrent.sampling.go:237: locate infohash timed out 4502a0eb-bf2b-2473-21bb-bdb79e303bf0 31 1m34.232896765s 1m34.219117876s
+20:18:47 torrent.sampling.go:92: sample query failed: timed out
+20:18:48 cmd.daemon.go:115: saving torrent peers 133
+20:18:48 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 278,
+ Available: (int) 2564,
+ Peers: (int) 3127,
+ RSS: (int) 0
+}
+
+20:18:54 torrent.sampling.go:237: locate infohash timed out 15f9a089-f746-e6c0-a9cd-09cdbcc557b4 27 1m47.479932956s 1m47.466000564s
+20:19:02 torrent.sampling.go:92: sample query failed: timed out
+20:19:04 torrent.sampling.go:237: locate infohash timed out c62d9ab7-1778-e582-9156-af96aae75fd1 31 1m57.632302912s 1m57.619606859s
+20:19:06 torrent.sampling.go:270: locate hashed initiated
+20:19:06 torrent.sampling.go:301: locate hashed completed
+20:19:06 torrent.sampling.go:333: sleeping for 1m0s
+20:19:14 torrent.sampling.go:237: locate infohash timed out faf009c5-8236-6b3e-7be6-e39083c4a077 27 1m8.009199015s 1m7.996796508s
+20:19:18 torrent.sampling.go:92: sample query failed: timed out
+20:19:18 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 349,
+ Available: (int) 2564,
+ Peers: (int) 3127,
+ RSS: (int) 0
+}
+
+20:19:24 torrent.sampling.go:237: locate infohash timed out d00e2735-1d56-6fa8-c587-62cae4c2acf1 26 1m18.346506786s 1m18.333354236s
+20:19:33 torrent.sampling.go:92: sample query failed: timed out
+20:19:34 torrent.sampling.go:237: locate infohash timed out 6d6fd0d5-891c-e0a5-3eaa-0c19e6e834f1 26 1m28.464022531s 1m28.449135463s
+20:19:46 torrent.sampling.go:237: locate infohash timed out 3559f940-5aca-d902-4e84-123f3d85e8a8 27 1m39.788717941s 1m39.774485434s
+20:19:48 cmd.daemon.go:115: saving torrent peers 133
+20:19:48 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 408,
+ Available: (int) 2564,
+ Peers: (int) 3127,
+ RSS: (int) 0
+}
+
+20:19:48 torrent.sampling.go:92: sample query failed: timed out
+20:19:56 torrent.sampling.go:237: locate infohash timed out 422d5d3d-f5d3-1674-d324-e821d3568502 29 1m50.002851386s 1m49.988327967s
+20:20:03 torrent.sampling.go:92: sample query failed: timed out
+20:20:06 torrent.sampling.go:270: locate hashed initiated
+20:20:06 torrent.sampling.go:301: locate hashed completed
+20:20:06 torrent.sampling.go:333: sleeping for 1m0s
+20:20:06 torrent.sampling.go:237: locate infohash timed out 14d79975-d0cd-1ad8-1f1f-5279b68a6677 33 1m0.129177142s 1m0.115612575s
+20:20:16 torrent.sampling.go:237: locate infohash timed out 6866efc7-16bb-aaee-df8b-2a7d98f4a6bd 28 1m10.165605234s 1m10.171530592s
+20:20:18 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 444,
+ Available: (int) 2564,
+ Peers: (int) 3127,
+ RSS: (int) 0
+}
+
+20:20:19 torrent.sampling.go:92: sample query failed: timed out
+20:20:26 torrent.sampling.go:237: locate infohash timed out 9808f2c0-41d9-caf3-5837-88df345c87d0 31 1m20.444830377s 1m20.430534555s
+20:20:37 torrent.sampling.go:237: locate infohash timed out 410b38e1-3ca7-fa50-0e91-27d66307f93a 27 1m30.585892608s 1m30.572554747s
+20:20:37 torrent.sampling.go:92: sample query failed: timed out
+20:20:45 server.go:3634: http: TLS handshake error from 127.0.0.1:46246: EOF
+20:20:48 cmd.daemon.go:115: saving torrent peers 133
+20:20:48 torrent.sampling.go:237: locate infohash timed out 94213307-36f4-e0c2-1259-af87c5cccd7b 26 1m41.936582272s 1m41.923152577s
+20:20:48 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 495,
+ Available: (int) 2564,
+ Peers: (int) 3127,
+ RSS: (int) 0
+}
+
+20:20:52 torrent.sampling.go:92: sample query failed: timed out
+20:20:53 httpx.go:80: https://localhost:9998/m/discovered GET initiated
+20:20:53 httpx.go:82: https://localhost:9998/m/discovered GET completed 1.73392ms
+20:20:58 torrent.sampling.go:237: locate infohash timed out 3b9f82db-580f-bc15-c0e5-1b2dbea6d685 35 1m52.260471167s 1m52.245802135s
+20:21:06 torrent.sampling.go:270: locate hashed initiated
+20:21:06 torrent.sampling.go:301: locate hashed completed
+20:21:06 torrent.sampling.go:333: sleeping for 1m0s
+20:21:08 torrent.sampling.go:92: sample query failed: timed out
+20:21:14 torrent.sampling.go:237: locate infohash timed out 0a4a81e3-42f7-fcbe-8df2-f2e6214b9a1a 32 1m8.161661212s 1m8.146306971s
+20:21:18 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 480,
+ Available: (int) 2564,
+ Peers: (int) 3127,
+ RSS: (int) 0
+}
+
+20:21:24 torrent.sampling.go:92: sample query failed: timed out
+20:21:25 torrent.sampling.go:237: locate infohash timed out 9fa1fcb9-f244-ad1e-149e-8aeb4a1e8550 27 1m18.745226973s 1m18.731586896s
+20:21:35 torrent.sampling.go:237: locate infohash timed out d26aa1f3-d0bd-f760-c6e7-30e2a4b5049a 27 1m28.872895505s 1m28.860783342s
+20:21:37 httpx.go:80: https://localhost:9998/m/discovered GET initiated
+20:21:37 httpx.go:82: https://localhost:9998/m/discovered GET completed 2.613213ms
+20:21:40 torrent.sampling.go:92: sample query failed: timed out
+20:21:45 torrent.sampling.go:237: locate infohash timed out b566eacc-c758-a466-0ac8-fe0057b1f45d 27 1m39.177483825s 1m39.1642526s
+20:21:48 cmd.daemon.go:115: saving torrent peers 133
+20:21:48 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 561,
+ Available: (int) 2564,
+ Peers: (int) 3127,
+ RSS: (int) 0
+}
+
+20:21:55 torrent.sampling.go:237: locate infohash timed out fe33c4e7-f156-d85e-79cd-b045d5f0e4ee 35 1m49.223438547s 1m49.20987331s
+20:22:05 torrent.sampling.go:237: locate infohash timed out d4e46ad1-5bc5-4f44-1bbe-fabda0f1720e 35 1m59.25094202s 1m59.24768333s
+20:22:06 torrent.sampling.go:270: locate hashed initiated
+20:22:06 torrent.sampling.go:301: locate hashed completed
+20:22:06 torrent.sampling.go:333: sleeping for 1m0s
+20:22:08 torrent.sampling.go:92: sample query failed: timed out
+20:22:10 httpx.go:80: https://localhost:9998/m/discovered GET initiated
+20:22:10 httpx.go:82: https://localhost:9998/m/discovered GET completed 2.125751ms
+20:22:18 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 440,
+ Available: (int) 2564,
+ Peers: (int) 3127,
+ RSS: (int) 0
+}
+
+20:22:23 torrent.sampling.go:92: sample query failed: timed out
+20:22:25 httpx.go:80: https://localhost:9998/m/discovered GET initiated
+20:22:25 httpx.go:82: https://localhost:9998/m/discovered GET completed 2.156458ms
+20:22:40 torrent.sampling.go:92: sample query failed: timed out
+20:22:44 torrent.sampling.go:237: locate infohash timed out d159d299-59c8-60af-a0f2-51879c9d106f 35 1m38.047914496s 1m38.03454627s
+20:22:48 cmd.daemon.go:115: saving torrent peers 133
+20:22:48 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 541,
+ Available: (int) 2564,
+ Peers: (int) 3127,
+ RSS: (int) 0
+}
+
+20:22:54 torrent.sampling.go:237: locate infohash timed out 90a5fbd2-6c3a-0f7e-5ddc-62d973120938 35 1m48.082398619s 1m48.070080831s
+20:22:55 torrent.sampling.go:92: sample query failed: timed out
+20:23:04 torrent.sampling.go:237: locate infohash timed out d3b2eeff-5e4d-5331-7b15-b69b8cd72242 35 1m58.091800077s 1m58.087708158s
+20:23:06 torrent.sampling.go:270: locate hashed initiated
+20:23:06 torrent.sampling.go:301: locate hashed completed
+20:23:06 torrent.sampling.go:333: sleeping for 1m0s
+20:23:11 torrent.sampling.go:92: sample query failed: timed out
+20:23:11 torrent.sampling.go:88: locating samplable peers 133 available
+20:23:18 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 330,
+ Available: (int) 2564,
+ Peers: (int) 3127,
+ RSS: (int) 0
+}
+
+20:23:26 torrent.sampling.go:237: locate infohash timed out ffd65745-0111-6030-a2ec-c722e079af8b 3 20.122735791s 20.108197766s
+20:23:28 torrent.sampling.go:92: sample query failed: timed out
+20:23:36 torrent.sampling.go:237: locate infohash timed out 04dd6968-86d1-81f0-edbe-3e35f0ff3c60 3 30.200379511s 30.187774241s
+20:23:44 torrent.sampling.go:92: sample query failed: timed out
+20:23:46 torrent.sampling.go:237: locate infohash timed out 0caa9f58-8007-7974-c035-34014dcc09b5 35 1m40.241309142s 1m40.227064073s
+20:23:48 cmd.daemon.go:115: saving torrent peers 133
+20:23:48 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 286,
+ Available: (int) 2564,
+ Peers: (int) 3127,
+ RSS: (int) 0
+}
+
+20:23:56 torrent.sampling.go:237: locate infohash timed out 505253f3-c732-ef73-426b-28c667095ab5 35 1m50.262559381s 1m50.259055376s
+20:23:59 torrent.sampling.go:92: sample query failed: timed out
+20:24:06 torrent.sampling.go:270: locate hashed initiated
+20:24:06 torrent.sampling.go:301: locate hashed completed
+20:24:06 torrent.sampling.go:333: sleeping for 1m0s
+20:24:14 torrent.sampling.go:92: sample query failed: timed out
+20:24:18 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 115,
+ Available: (int) 2564,
+ Peers: (int) 3127,
+ RSS: (int) 0
+}
+
+20:24:26 torrent.sampling.go:237: locate infohash timed out b3641525-14e2-123b-2305-c121eff1f537 3 20.142090456s 20.128218796s
+20:24:31 torrent.sampling.go:92: sample query failed: timed out
+20:24:36 torrent.sampling.go:237: locate infohash timed out 0a938c13-f7ca-3913-223c-1c77432d8213 3 30.193574674s 30.179919354s
+20:24:44 torrent.sampling.go:199: querying peers for info hashes 82 < 100
+20:24:44 torrent.sampling.go:124: infohash sample initiated 2803:2d60:101f:df52:0:58:26f6:5c01 [2803:2d60:101f:df52:0:58:26f6:5c01]:41497
+20:24:46 torrent.sampling.go:237: locate infohash timed out 0caa9f58-8007-7974-c035-34014dcc09b5 35 1m40.241184805s 1m40.227064073s
+20:24:46 torrent.sampling.go:92: sample query failed: timed out
+20:24:48 cmd.daemon.go:115: saving torrent peers 133
+20:24:48 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 71,
+ Available: (int) 2564,
+ Peers: (int) 3127,
+ RSS: (int) 0
+}
+
+20:24:56 torrent.sampling.go:237: locate infohash timed out 505253f3-c732-ef73-426b-28c667095ab5 35 1m50.272920394s 1m50.259055376s
+20:25:00 torrent.sampling.go:128: infohash sample completed 2803:2d60:101f:df52:0:58:26f6:5c01 [2803:2d60:101f:df52:0:58:26f6:5c01]:41497
+20:25:00 torrent.sampling.go:112: marking peer as failed query failed: [2803:2d60:101f:df52:0:58:26f6:5c01]:41497: timed out
+20:25:00 torrent.sampling.go:180: query failed: [2803:2d60:101f:df52:0:58:26f6:5c01]:41497: timed out
+20:25:00 torrent.sampling.go:124: infohash sample initiated 88.97.254.222 88.97.254.222:59701
+20:25:00 torrent.sampling.go:156: infohash sample completed 88.97.254.222 88.97.254.222:59701
+20:25:00 torrent.sampling.go:124: infohash sample initiated 86.98.100.29 86.98.100.29:6881
+20:25:00 torrent.sampling.go:156: infohash sample completed 86.98.100.29 86.98.100.29:6881
+20:25:00 torrent.sampling.go:124: infohash sample initiated 2803:c650:2:8000:7c13:55ff:fe18:ddce [2803:c650:2:8000:7c13:55ff:fe18:ddce]:40952
+20:25:02 torrent.sampling.go:92: sample query failed: timed out
+20:25:06 torrent.sampling.go:270: locate hashed initiated
+20:25:06 torrent.sampling.go:301: locate hashed completed
+20:25:06 torrent.sampling.go:333: sleeping for 1m0s
+20:25:16 torrent.sampling.go:128: infohash sample completed 2803:c650:2:8000:7c13:55ff:fe18:ddce [2803:c650:2:8000:7c13:55ff:fe18:ddce]:40952
+20:25:16 torrent.sampling.go:112: marking peer as failed query failed: [2803:c650:2:8000:7c13:55ff:fe18:ddce]:40952: timed out
+20:25:16 torrent.sampling.go:180: query failed: [2803:c650:2:8000:7c13:55ff:fe18:ddce]:40952: timed out
+20:25:16 torrent.sampling.go:124: infohash sample initiated 2408:8256:8880:8465:b8c8:fac5:bd0a:1497 [2408:8256:8880:8465:b8c8:fac5:bd0a:1497]:45461
+20:25:16 torrent.sampling.go:92: sample query failed: timed out
+20:25:18 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 62,
+ Available: (int) 2564,
+ Peers: (int) 3123,
+ RSS: (int) 0
+}
+
+20:25:26 torrent.sampling.go:237: locate infohash timed out 8d7798aa-3172-267c-e4d2-5b83208ed3d2 1 20.350290816s 20.336122171s
+20:25:29 httpx.go:80: https://localhost:9998/m/discovered GET initiated
+20:25:29 httpx.go:82: https://localhost:9998/m/discovered GET completed 1.824811ms
+20:25:30 torrent.sampling.go:128: infohash sample completed 2408:8256:8880:8465:b8c8:fac5:bd0a:1497 [2408:8256:8880:8465:b8c8:fac5:bd0a:1497]:45461
+20:25:30 torrent.sampling.go:112: marking peer as failed query failed: [2408:8256:8880:8465:b8c8:fac5:bd0a:1497]:45461: timed out
+20:25:30 torrent.sampling.go:180: query failed: [2408:8256:8880:8465:b8c8:fac5:bd0a:1497]:45461: timed out
+20:25:30 torrent.sampling.go:124: infohash sample initiated 2a01:e34:ec73:3570:265e:beff:fe48:4d3f [2a01:e34:ec73:3570:265e:beff:fe48:4d3f]:6881
+20:25:30 torrent.sampling.go:156: infohash sample completed 2a01:e34:ec73:3570:265e:beff:fe48:4d3f [2a01:e34:ec73:3570:265e:beff:fe48:4d3f]:6881
+20:25:30 torrent.sampling.go:124: infohash sample initiated 189.201.251.130 189.201.251.130:12427
+20:25:31 torrent.sampling.go:92: sample query failed: timed out
+20:25:37 torrent.sampling.go:237: locate infohash timed out 905dcb49-a12d-41c4-952e-aa1a353182d5 1 30.692208133s 30.688858616s
+20:25:37 httpx.go:80: https://localhost:9998/m/discovered GET initiated
+20:25:37 httpx.go:82: https://localhost:9998/m/discovered GET completed 2.089622ms
+20:25:45 torrent.sampling.go:128: infohash sample completed 189.201.251.130 189.201.251.130:12427
+20:25:45 torrent.sampling.go:112: marking peer as failed query failed: 189.201.251.130:12427: timed out
+20:25:45 torrent.sampling.go:180: query failed: 189.201.251.130:12427: timed out
+20:25:45 torrent.sampling.go:124: infohash sample initiated 190.77.136.18 190.77.136.18:23410
+20:25:45 torrent.sampling.go:92: sample query failed: timed out
+20:25:47 torrent.sampling.go:237: locate infohash timed out 514d6d09-f845-e744-1415-91d74f6ade76 35 1m40.817768103s 1m40.803248901s
+20:25:48 cmd.daemon.go:115: saving torrent peers 133
+20:25:48 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 137,
+ Available: (int) 2564,
+ Peers: (int) 3120,
+ RSS: (int) 0
+}
+
+20:25:57 torrent.sampling.go:237: locate infohash timed out 2be934cc-94cb-1007-f934-043261a5b239 35 1m50.898556537s 1m50.893750856s
+20:26:00 torrent.sampling.go:128: infohash sample completed 190.77.136.18 190.77.136.18:23410
+20:26:00 torrent.sampling.go:112: marking peer as failed query failed: 190.77.136.18:23410: timed out
+20:26:00 torrent.sampling.go:180: query failed: 190.77.136.18:23410: timed out
+20:26:01 torrent.sampling.go:92: sample query failed: timed out
+20:26:06 torrent.sampling.go:270: locate hashed initiated
+20:26:06 torrent.sampling.go:301: locate hashed completed
+20:26:06 torrent.sampling.go:333: sleeping for 1m0s
+20:26:17 torrent.sampling.go:92: sample query failed: timed out
+20:26:18 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 209,
+ Available: (int) 2564,
+ Peers: (int) 3119,
+ RSS: (int) 0
+}
+
+20:26:26 torrent.sampling.go:237: locate infohash timed out 82151bf8-879c-52cb-9918-e6a92a63fba2 1 20.159383488s 20.146571305s
+20:26:37 torrent.sampling.go:237: locate infohash timed out 905dcb49-a12d-41c4-952e-aa1a353182d5 2 30.701293039s 30.688858616s
+20:26:46 torrent.sampling.go:92: sample query failed: timed out
+20:26:47 torrent.sampling.go:237: locate infohash timed out 24db16e8-1769-8bed-80ba-b76e00890738 35 1m41.434750783s 1m41.421428659s
+20:26:48 cmd.daemon.go:115: saving torrent peers 133
+20:26:48 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 256,
+ Available: (int) 2564,
+ Peers: (int) 3119,
+ RSS: (int) 0
+}
+
+20:26:58 torrent.sampling.go:237: locate infohash timed out d017c4aa-61c1-1f0b-a62b-975f4ec62719 35 1m51.477175866s 1m51.471994263s
+20:27:02 torrent.sampling.go:92: sample query failed: timed out
+20:27:06 torrent.sampling.go:270: locate hashed initiated
+20:27:06 torrent.sampling.go:301: locate hashed completed
+20:27:06 torrent.sampling.go:333: sleeping for 1m0s
+20:27:17 torrent.sampling.go:92: sample query failed: timed out
+20:27:18 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 363,
+ Available: (int) 2564,
+ Peers: (int) 3119,
+ RSS: (int) 0
+}
+
+20:27:26 torrent.sampling.go:237: locate infohash timed out 82151bf8-879c-52cb-9918-e6a92a63fba2 2 20.160111934s 20.146571305s
+20:27:33 torrent.sampling.go:92: sample query failed: timed out
+20:27:37 torrent.sampling.go:237: locate infohash timed out 4e814347-ca21-a837-5ede-422e4a3d6130 2 30.781096385s 30.769414597s
+20:27:47 torrent.sampling.go:237: locate infohash timed out a9f8efd1-16bb-c722-00e4-96cc34dbdb38 35 1m41.076080305s 1m41.062446752s
+20:27:48 cmd.daemon.go:115: saving torrent peers 133
+20:27:48 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 437,
+ Available: (int) 2564,
+ Peers: (int) 3119,
+ RSS: (int) 0
+}
+
+20:27:49 torrent.sampling.go:92: sample query failed: timed out
+20:27:57 torrent.sampling.go:237: locate infohash timed out af024d7e-c356-ea51-50b3-8f92831a63e4 35 1m51.172875884s 1m51.165358735s
+20:28:06 torrent.sampling.go:270: locate hashed initiated
+20:28:06 torrent.sampling.go:301: locate hashed completed
+20:28:06 torrent.sampling.go:333: sleeping for 1m0s
+20:28:18 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 430,
+ Available: (int) 2564,
+ Peers: (int) 3119,
+ RSS: (int) 0
+}
+
+20:28:24 torrent.sampling.go:92: sample query failed: timed out
+20:28:37 torrent.sampling.go:237: locate infohash timed out f423e823-96ac-e8f5-d720-f5f58735115c 35 1m31.069234463s 1m31.055443154s
+20:28:39 torrent.sampling.go:92: sample query failed: timed out
+20:28:47 torrent.sampling.go:237: locate infohash timed out 03a90c39-9ae6-5658-476f-6654bc77d3da 35 1m41.119316173s 1m41.115834861s
+20:28:48 cmd.daemon.go:115: saving torrent peers 133
+20:28:48 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 422,
+ Available: (int) 2564,
+ Peers: (int) 3119,
+ RSS: (int) 0
+}
+
+20:28:55 torrent.sampling.go:92: sample query failed: timed out
+20:28:57 torrent.sampling.go:237: locate infohash timed out af024d7e-c356-ea51-50b3-8f92831a63e4 35 1m51.178533854s 1m51.165358735s
+20:29:06 torrent.sampling.go:270: locate hashed initiated
+20:29:06 torrent.sampling.go:301: locate hashed completed
+20:29:06 torrent.sampling.go:333: sleeping for 1m0s
+20:29:10 torrent.sampling.go:92: sample query failed: timed out
+20:29:18 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 343,
+ Available: (int) 2564,
+ Peers: (int) 3119,
+ RSS: (int) 0
+}
+
+20:29:24 torrent.sampling.go:92: sample query failed: timed out
+20:29:36 torrent.sampling.go:237: locate infohash timed out 95d3024e-49e5-fc35-5042-edf43e533a84 35 1m30.275700073s 1m30.261131002s
+20:29:40 torrent.sampling.go:92: sample query failed: timed out
+20:29:40 torrent.sampling.go:88: locating samplable peers 133 available
+20:29:47 torrent.sampling.go:237: locate infohash timed out 093fa4e9-599b-e6ff-5b77-f9de16d72c91 35 1m40.522102627s 1m40.509369803s
+20:29:48 cmd.daemon.go:115: saving torrent peers 133
+20:29:48 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 302,
+ Available: (int) 2564,
+ Peers: (int) 3119,
+ RSS: (int) 0
+}
+
+20:29:56 torrent.sampling.go:92: sample query failed: timed out
+20:29:57 torrent.sampling.go:237: locate infohash timed out 1d2a1338-6cc2-1519-69ea-524f8685e78c 35 1m50.571636999s 1m50.567970964s
+20:30:06 torrent.sampling.go:270: locate hashed initiated
+20:30:06 torrent.sampling.go:301: locate hashed completed
+20:30:06 torrent.sampling.go:333: sleeping for 1m0s
+20:30:07 httpx.go:80: https://localhost:9998/m/discovered GET initiated
+20:30:07 httpx.go:82: https://localhost:9998/m/discovered GET completed 1.53535ms
+20:30:11 torrent.sampling.go:92: sample query failed: timed out
+20:30:18 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 174,
+ Available: (int) 2564,
+ Peers: (int) 3119,
+ RSS: (int) 0
+}
+
+20:30:27 torrent.sampling.go:92: sample query failed: timed out
+20:30:36 torrent.sampling.go:237: locate infohash timed out 31145842-4762-f7e6-54f6-d15031030c51 35 1m30.251936979s 1m30.238071638s
+20:30:40 httpx.go:80: https://localhost:9998/m/discovered GET initiated
+20:30:40 httpx.go:82: https://localhost:9998/m/discovered GET completed 1.766817ms
+20:30:44 torrent.sampling.go:92: sample query failed: timed out
+20:30:46 torrent.sampling.go:237: locate infohash timed out 7f6def8f-e2e4-0cce-b78f-5c7447fa4a90 35 1m40.252272093s 1m40.248497454s
+20:30:48 cmd.daemon.go:115: saving torrent peers 133
+20:30:48 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 133,
+ Available: (int) 2564,
+ Peers: (int) 3119,
+ RSS: (int) 0
+}
+
+20:30:50 httpx.go:80: https://localhost:9998/m/discovered GET initiated
+20:30:50 httpx.go:82: https://localhost:9998/m/discovered GET completed 1.819847ms
+20:30:56 torrent.sampling.go:237: locate infohash timed out 181350ee-09c8-184b-6ee3-9f04bad39420 35 1m50.314354211s 1m50.309450554s
+20:30:59 torrent.sampling.go:92: sample query failed: timed out
+20:31:00 torrent.sampling.go:199: querying peers for info hashes 80 < 100
+20:31:00 torrent.sampling.go:124: infohash sample initiated 2a02:2f0e:7011:1000:26fc:eebb:8146:1ebd [2a02:2f0e:7011:1000:26fc:eebb:8146:1ebd]:53568
+20:31:06 torrent.sampling.go:270: locate hashed initiated
+20:31:06 torrent.sampling.go:301: locate hashed completed
+20:31:06 torrent.sampling.go:333: sleeping for 1m0s
+20:31:15 torrent.sampling.go:128: infohash sample completed 2a02:2f0e:7011:1000:26fc:eebb:8146:1ebd [2a02:2f0e:7011:1000:26fc:eebb:8146:1ebd]:53568
+20:31:15 torrent.sampling.go:112: marking peer as failed query failed: [2a02:2f0e:7011:1000:26fc:eebb:8146:1ebd]:53568: timed out
+20:31:15 torrent.sampling.go:180: query failed: [2a02:2f0e:7011:1000:26fc:eebb:8146:1ebd]:53568: timed out
+20:31:15 torrent.sampling.go:124: infohash sample initiated 2804:370:108d:e700:d6e2:906b:fbaf:6e7d [2804:370:108d:e700:d6e2:906b:fbaf:6e7d]:48427
+20:31:15 torrent.sampling.go:92: sample query failed: timed out
+20:31:18 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 51,
+ Available: (int) 2564,
+ Peers: (int) 3118,
+ RSS: (int) 0
+}
+
+20:31:29 torrent.sampling.go:128: infohash sample completed 2804:370:108d:e700:d6e2:906b:fbaf:6e7d [2804:370:108d:e700:d6e2:906b:fbaf:6e7d]:48427
+20:31:29 torrent.sampling.go:112: marking peer as failed query failed: [2804:370:108d:e700:d6e2:906b:fbaf:6e7d]:48427: timed out
+20:31:29 torrent.sampling.go:180: query failed: [2804:370:108d:e700:d6e2:906b:fbaf:6e7d]:48427: timed out
+20:31:29 torrent.sampling.go:124: infohash sample initiated 177.192.17.148 177.192.17.148:5991
+20:31:31 torrent.sampling.go:92: sample query failed: timed out
+20:31:36 torrent.sampling.go:237: locate infohash timed out afd43cd5-86d2-8b74-0486-ca6337c52acb 35 1m30.211998875s 1m30.197705789s
+20:31:37 httpx.go:80: https://localhost:9998/m/discovered GET initiated
+20:31:37 httpx.go:82: https://localhost:9998/m/discovered GET completed 1.659605ms
+20:31:45 torrent.sampling.go:128: infohash sample completed 177.192.17.148 177.192.17.148:5991
+20:31:45 torrent.sampling.go:112: marking peer as failed query failed: 177.192.17.148:5991: timed out
+20:31:45 torrent.sampling.go:180: query failed: 177.192.17.148:5991: timed out
+20:31:45 torrent.sampling.go:124: infohash sample initiated 117.193.130.185 117.193.130.185:43760
+20:31:45 torrent.sampling.go:92: sample query failed: timed out
+20:31:46 torrent.sampling.go:237: locate infohash timed out 8bd4f3b9-725c-d6be-c533-4da18e727cc5 35 1m40.270757452s 1m40.25714872s
+20:31:48 cmd.daemon.go:115: saving torrent peers 133
+20:31:48 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 39,
+ Available: (int) 2564,
+ Peers: (int) 3116,
+ RSS: (int) 0
+}
+
+20:31:56 torrent.sampling.go:237: locate infohash timed out b80d7945-9a56-acfa-d4a4-0daf29401407 35 1m50.330629992s 1m50.316809441s
+20:31:59 torrent.sampling.go:128: infohash sample completed 117.193.130.185 117.193.130.185:43760
+20:31:59 torrent.sampling.go:112: marking peer as failed query failed: 117.193.130.185:43760: timed out
+20:31:59 torrent.sampling.go:180: query failed: 117.193.130.185:43760: timed out
+20:31:59 torrent.sampling.go:124: infohash sample initiated 2607:fb90:e610:c0ba:ac39:a171:e386:bc04 [2607:fb90:e610:c0ba:ac39:a171:e386:bc04]:47108
+20:32:00 torrent.sampling.go:92: sample query failed: timed out
+20:32:06 torrent.sampling.go:270: locate hashed initiated
+20:32:06 torrent.sampling.go:301: locate hashed completed
+20:32:06 torrent.sampling.go:333: sleeping for 1s
+20:32:07 torrent.sampling.go:270: locate hashed initiated
+20:32:07 torrent.sampling.go:301: locate hashed completed
+20:32:07 torrent.sampling.go:333: sleeping for 2s
+20:32:09 torrent.sampling.go:270: locate hashed initiated
+20:32:09 torrent.sampling.go:301: locate hashed completed
+20:32:09 torrent.sampling.go:333: sleeping for 4s
+20:32:13 torrent.sampling.go:270: locate hashed initiated
+20:32:13 torrent.sampling.go:301: locate hashed completed
+20:32:13 torrent.sampling.go:333: sleeping for 8s
+20:32:14 torrent.sampling.go:128: infohash sample completed 2607:fb90:e610:c0ba:ac39:a171:e386:bc04 [2607:fb90:e610:c0ba:ac39:a171:e386:bc04]:47108
+20:32:14 torrent.sampling.go:112: marking peer as failed query failed: [2607:fb90:e610:c0ba:ac39:a171:e386:bc04]:47108: timed out
+20:32:14 torrent.sampling.go:180: query failed: [2607:fb90:e610:c0ba:ac39:a171:e386:bc04]:47108: timed out
+20:32:14 torrent.sampling.go:124: infohash sample initiated 2804:4f60:40cd:9e00:1048:83ff:fe74:dc78 [2804:4f60:40cd:9e00:1048:83ff:fe74:dc78]:45347
+20:32:16 torrent.sampling.go:92: sample query failed: timed out
+20:32:18 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 0,
+ Available: (int) 2564,
+ Peers: (int) 3114,
+ RSS: (int) 0
+}
+
+20:32:21 torrent.sampling.go:270: locate hashed initiated
+20:32:21 torrent.sampling.go:301: locate hashed completed
+20:32:21 torrent.sampling.go:333: sleeping for 16s
+20:32:29 torrent.sampling.go:128: infohash sample completed 2804:4f60:40cd:9e00:1048:83ff:fe74:dc78 [2804:4f60:40cd:9e00:1048:83ff:fe74:dc78]:45347
+20:32:29 torrent.sampling.go:112: marking peer as failed query failed: [2804:4f60:40cd:9e00:1048:83ff:fe74:dc78]:45347: timed out
+20:32:29 torrent.sampling.go:180: query failed: [2804:4f60:40cd:9e00:1048:83ff:fe74:dc78]:45347: timed out
+20:32:29 torrent.sampling.go:124: infohash sample initiated 2803:f580:4204:e00:e025:5fff:fe65:901d [2803:f580:4204:e00:e025:5fff:fe65:901d]:43521
+20:32:30 torrent.sampling.go:92: sample query failed: timed out
+20:32:36 torrent.sampling.go:237: locate infohash timed out afd43cd5-86d2-8b74-0486-ca6337c52acb 35 1m30.210942167s 1m30.197705789s
+20:32:37 torrent.sampling.go:270: locate hashed initiated
+20:32:37 torrent.sampling.go:301: locate hashed completed
+20:32:37 torrent.sampling.go:333: sleeping for 32s
+20:32:43 torrent.sampling.go:128: infohash sample completed 2803:f580:4204:e00:e025:5fff:fe65:901d [2803:f580:4204:e00:e025:5fff:fe65:901d]:43521
+20:32:43 torrent.sampling.go:112: marking peer as failed query failed: [2803:f580:4204:e00:e025:5fff:fe65:901d]:43521: timed out
+20:32:43 torrent.sampling.go:180: query failed: [2803:f580:4204:e00:e025:5fff:fe65:901d]:43521: timed out
+20:32:43 torrent.sampling.go:124: infohash sample initiated 2409:40f0:158:7003:d481:7bff:fe7e:ab32 [2409:40f0:158:7003:d481:7bff:fe7e:ab32]:47652
+20:32:46 torrent.sampling.go:92: sample query failed: timed out
+20:32:48 cmd.daemon.go:115: saving torrent peers 133
+20:32:48 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 0,
+ Available: (int) 2564,
+ Peers: (int) 3112,
+ RSS: (int) 0
+}
+
+20:32:48 torrent.sampling.go:237: locate infohash timed out ed5ab179-cad4-8845-a7d8-cb4db82d0b1a 35 1m42.387044902s 1m42.38221975s
+20:32:58 torrent.sampling.go:128: infohash sample completed 2409:40f0:158:7003:d481:7bff:fe7e:ab32 [2409:40f0:158:7003:d481:7bff:fe7e:ab32]:47652
+20:32:58 torrent.sampling.go:112: marking peer as failed query failed: [2409:40f0:158:7003:d481:7bff:fe7e:ab32]:47652: timed out
+20:32:58 torrent.sampling.go:180: query failed: [2409:40f0:158:7003:d481:7bff:fe7e:ab32]:47652: timed out
+20:32:58 torrent.sampling.go:199: querying peers for info hashes 0 < 100
+20:32:58 torrent.sampling.go:124: infohash sample initiated 2a00:7c80:0:202::2 [2a00:7c80:0:202::2]:6886
+20:32:59 torrent.sampling.go:156: infohash sample completed 2a00:7c80:0:202::2 [2a00:7c80:0:202::2]:6886
+20:32:59 torrent.sampling.go:124: infohash sample initiated 177.200.62.80 177.200.62.80:29145
+20:32:59 torrent.sampling.go:237: locate infohash timed out 50301d35-9fd5-27e5-0039-7a3eb5710e8f 35 1m52.521620093s 1m52.517349863s
+20:33:01 torrent.sampling.go:92: sample query failed: timed out
+20:33:09 torrent.sampling.go:270: locate hashed initiated
+20:33:09 torrent.sampling.go:301: locate hashed completed
+20:33:09 torrent.sampling.go:333: sleeping for 1m0s
+20:33:14 torrent.sampling.go:128: infohash sample completed 177.200.62.80 177.200.62.80:29145
+20:33:14 torrent.sampling.go:112: marking peer as failed query failed: 177.200.62.80:29145: timed out
+20:33:14 torrent.sampling.go:180: query failed: 177.200.62.80:29145: timed out
+20:33:14 torrent.sampling.go:124: infohash sample initiated 2001:ac8:37:300:101a:c1e5:77fa:eafe [2001:ac8:37:300:101a:c1e5:77fa:eafe]:57476
+20:33:18 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 19,
+ Available: (int) 2564,
+ Peers: (int) 3109,
+ RSS: (int) 0
+}
+
+20:33:18 torrent.sampling.go:92: sample query failed: timed out
+20:33:29 torrent.sampling.go:128: infohash sample completed 2001:ac8:37:300:101a:c1e5:77fa:eafe [2001:ac8:37:300:101a:c1e5:77fa:eafe]:57476
+20:33:29 torrent.sampling.go:112: marking peer as failed query failed: [2001:ac8:37:300:101a:c1e5:77fa:eafe]:57476: timed out
+20:33:29 torrent.sampling.go:180: query failed: [2001:ac8:37:300:101a:c1e5:77fa:eafe]:57476: timed out
+20:33:29 torrent.sampling.go:124: infohash sample initiated 189.203.236.123 189.203.236.123:44557
+20:33:30 torrent.sampling.go:237: locate infohash timed out d48e9553-6c8d-8e9e-c14d-a68ea653a596 1 20.916054981s 20.903128952s
+20:33:35 torrent.sampling.go:92: sample query failed: timed out
+20:33:40 torrent.sampling.go:237: locate infohash timed out 7990c81b-b91f-096c-d673-4334c33124f8 1 30.975565357s 30.962230252s
+20:33:43 torrent.sampling.go:128: infohash sample completed 189.203.236.123 189.203.236.123:44557
+20:33:43 torrent.sampling.go:112: marking peer as failed query failed: 189.203.236.123:44557: timed out
+20:33:43 torrent.sampling.go:180: query failed: 189.203.236.123:44557: timed out
+20:33:43 torrent.sampling.go:124: infohash sample initiated 2401:4900:84cf:43a5::26e1:32df [2401:4900:84cf:43a5::26e1:32df]:41920
+20:33:48 cmd.daemon.go:115: saving torrent peers 133
+20:33:48 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 19,
+ Available: (int) 2564,
+ Peers: (int) 3107,
+ RSS: (int) 0
+}
+
+20:33:49 torrent.sampling.go:92: sample query failed: timed out
+20:33:59 torrent.sampling.go:128: infohash sample completed 2401:4900:84cf:43a5::26e1:32df [2401:4900:84cf:43a5::26e1:32df]:41920
+20:33:59 torrent.sampling.go:112: marking peer as failed query failed: [2401:4900:84cf:43a5::26e1:32df]:41920: timed out
+20:33:59 torrent.sampling.go:180: query failed: [2401:4900:84cf:43a5::26e1:32df]:41920: timed out
+20:33:59 torrent.sampling.go:124: infohash sample initiated 2408:8256:6680:18f3:7e50:2cdf:9499:825f [2408:8256:6680:18f3:7e50:2cdf:9499:825f]:5930
+20:34:04 torrent.sampling.go:92: sample query failed: timed out
+20:34:09 torrent.sampling.go:270: locate hashed initiated
+20:34:09 torrent.sampling.go:301: locate hashed completed
+20:34:09 torrent.sampling.go:333: sleeping for 1m0s
+20:34:14 torrent.sampling.go:128: infohash sample completed 2408:8256:6680:18f3:7e50:2cdf:9499:825f [2408:8256:6680:18f3:7e50:2cdf:9499:825f]:5930
+20:34:14 torrent.sampling.go:112: marking peer as failed query failed: [2408:8256:6680:18f3:7e50:2cdf:9499:825f]:5930: timed out
+20:34:14 torrent.sampling.go:180: query failed: [2408:8256:6680:18f3:7e50:2cdf:9499:825f]:5930: timed out
+20:34:14 torrent.sampling.go:124: infohash sample initiated 2001:4451:87b4:5c00:5fa9:5707:10b3:d8a0 [2001:4451:87b4:5c00:5fa9:5707:10b3:d8a0]:8498
+20:34:18 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 34,
+ Available: (int) 2564,
+ Peers: (int) 3105,
+ RSS: (int) 0
+}
+
+20:34:19 torrent.sampling.go:92: sample query failed: timed out
+20:34:29 torrent.sampling.go:128: infohash sample completed 2001:4451:87b4:5c00:5fa9:5707:10b3:d8a0 [2001:4451:87b4:5c00:5fa9:5707:10b3:d8a0]:8498
+20:34:29 torrent.sampling.go:112: marking peer as failed query failed: [2001:4451:87b4:5c00:5fa9:5707:10b3:d8a0]:8498: timed out
+20:34:29 torrent.sampling.go:180: query failed: [2001:4451:87b4:5c00:5fa9:5707:10b3:d8a0]:8498: timed out
+20:34:29 torrent.sampling.go:124: infohash sample initiated 114.80.9.214 114.80.9.214:6886
+20:34:30 torrent.sampling.go:237: locate infohash timed out d48e9553-6c8d-8e9e-c14d-a68ea653a596 2 20.917138043s 20.903128952s
+20:34:36 torrent.sampling.go:92: sample query failed: timed out
+20:34:40 torrent.sampling.go:237: locate infohash timed out 7990c81b-b91f-096c-d673-4334c33124f8 2 30.97623063s 30.962230252s
+20:34:45 torrent.sampling.go:128: infohash sample completed 114.80.9.214 114.80.9.214:6886
+20:34:45 torrent.sampling.go:112: marking peer as failed query failed: 114.80.9.214:6886: timed out
+20:34:45 torrent.sampling.go:180: query failed: 114.80.9.214:6886: timed out
+20:34:45 torrent.sampling.go:199: querying peers for info hashes 52 < 100
+20:34:45 torrent.sampling.go:124: infohash sample initiated 2401:4900:3c8b:2173:554e:70ce:a34b:fd5f [2401:4900:3c8b:2173:554e:70ce:a34b:fd5f]:44064
+20:34:48 cmd.daemon.go:115: saving torrent peers 133
+20:34:48 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 54,
+ Available: (int) 2564,
+ Peers: (int) 3103,
+ RSS: (int) 0
+}
+
+20:34:54 torrent.sampling.go:92: sample query failed: timed out
+20:34:59 torrent.sampling.go:128: infohash sample completed 2401:4900:3c8b:2173:554e:70ce:a34b:fd5f [2401:4900:3c8b:2173:554e:70ce:a34b:fd5f]:44064
+20:34:59 torrent.sampling.go:112: marking peer as failed query failed: [2401:4900:3c8b:2173:554e:70ce:a34b:fd5f]:44064: timed out
+20:34:59 torrent.sampling.go:180: query failed: [2401:4900:3c8b:2173:554e:70ce:a34b:fd5f]:44064: timed out
+20:34:59 torrent.sampling.go:124: infohash sample initiated 2804:44ac:11e8:9500:1c48:bfff:feb2:5b7c [2804:44ac:11e8:9500:1c48:bfff:feb2:5b7c]:56214
+20:35:09 torrent.sampling.go:92: sample query failed: timed out
+20:35:09 torrent.sampling.go:270: locate hashed initiated
+20:35:09 torrent.sampling.go:301: locate hashed completed
+20:35:09 torrent.sampling.go:333: sleeping for 1m0s
+20:35:14 torrent.sampling.go:128: infohash sample completed 2804:44ac:11e8:9500:1c48:bfff:feb2:5b7c [2804:44ac:11e8:9500:1c48:bfff:feb2:5b7c]:56214
+20:35:14 torrent.sampling.go:112: marking peer as failed query failed: [2804:44ac:11e8:9500:1c48:bfff:feb2:5b7c]:56214: timed out
+20:35:14 torrent.sampling.go:180: query failed: [2804:44ac:11e8:9500:1c48:bfff:feb2:5b7c]:56214: timed out
+20:35:14 torrent.sampling.go:124: infohash sample initiated 2401:4900:1c80:39f0:d9c7:d8dc:641f:9098 [2401:4900:1c80:39f0:d9c7:d8dc:641f:9098]:6881
+20:35:18 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 108,
+ Available: (int) 2564,
+ Peers: (int) 3101,
+ RSS: (int) 0
+}
+
+20:35:26 torrent.sampling.go:92: sample query failed: timed out
+20:35:29 torrent.sampling.go:128: infohash sample completed 2401:4900:1c80:39f0:d9c7:d8dc:641f:9098 [2401:4900:1c80:39f0:d9c7:d8dc:641f:9098]:6881
+20:35:29 torrent.sampling.go:112: marking peer as failed query failed: [2401:4900:1c80:39f0:d9c7:d8dc:641f:9098]:6881: timed out
+20:35:29 torrent.sampling.go:180: query failed: [2401:4900:1c80:39f0:d9c7:d8dc:641f:9098]:6881: timed out
+20:35:29 torrent.sampling.go:124: infohash sample initiated 178.125.84.245 178.125.84.245:6881
+20:35:41 torrent.sampling.go:92: sample query failed: timed out
+20:35:41 torrent.sampling.go:237: locate infohash timed out fc33706f-c293-4d0b-3801-a2bcf2d5e505 35 1m31.653946391s 1m31.643702216s
+20:35:44 torrent.sampling.go:128: infohash sample completed 178.125.84.245 178.125.84.245:6881
+20:35:44 torrent.sampling.go:112: marking peer as failed query failed: 178.125.84.245:6881: timed out
+20:35:44 torrent.sampling.go:180: query failed: 178.125.84.245:6881: timed out
+20:35:44 torrent.sampling.go:124: infohash sample initiated 46.232.211.246 46.232.211.246:64267
+20:35:45 torrent.sampling.go:156: infohash sample completed 46.232.211.246 46.232.211.246:64267
+20:35:45 torrent.sampling.go:124: infohash sample initiated 173.179.255.103 173.179.255.103:6881
+20:35:48 cmd.daemon.go:115: saving torrent peers 133
+20:35:48 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 186,
+ Available: (int) 2564,
+ Peers: (int) 3098,
+ RSS: (int) 0
+}
+
+20:35:55 torrent.sampling.go:92: sample query failed: timed out
+20:36:00 torrent.sampling.go:128: infohash sample completed 173.179.255.103 173.179.255.103:6881
+20:36:00 torrent.sampling.go:112: marking peer as failed query failed: 173.179.255.103:6881: timed out
+20:36:00 torrent.sampling.go:180: query failed: 173.179.255.103:6881: timed out
+20:36:00 torrent.sampling.go:124: infohash sample initiated 73.74.54.247 73.74.54.247:39929
+20:36:09 torrent.sampling.go:270: locate hashed initiated
+20:36:09 torrent.sampling.go:301: locate hashed completed
+20:36:09 torrent.sampling.go:333: sleeping for 1m0s
+20:36:10 torrent.sampling.go:92: sample query failed: timed out
+20:36:10 torrent.sampling.go:88: locating samplable peers 133 available
+20:36:15 torrent.sampling.go:128: infohash sample completed 73.74.54.247 73.74.54.247:39929
+20:36:15 torrent.sampling.go:112: marking peer as failed query failed: 73.74.54.247:39929: timed out
+20:36:15 torrent.sampling.go:180: query failed: 73.74.54.247:39929: timed out
+20:36:15 torrent.sampling.go:124: infohash sample initiated 2804:840c:140c:ed00:484e:7aff:fe67:1900 [2804:840c:140c:ed00:484e:7aff:fe67:1900]:55682
+20:36:18 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 278,
+ Available: (int) 2564,
+ Peers: (int) 3096,
+ RSS: (int) 0
+}
+
+20:36:26 torrent.sampling.go:92: sample query failed: timed out
+20:36:30 torrent.sampling.go:237: locate infohash timed out 586e0329-910e-90e3-467d-ff62871f0556 1 20.823483508s 20.80893181s
+20:36:30 torrent.sampling.go:128: infohash sample completed 2804:840c:140c:ed00:484e:7aff:fe67:1900 [2804:840c:140c:ed00:484e:7aff:fe67:1900]:55682
+20:36:30 torrent.sampling.go:112: marking peer as failed query failed: [2804:840c:140c:ed00:484e:7aff:fe67:1900]:55682: timed out
+20:36:30 torrent.sampling.go:180: query failed: [2804:840c:140c:ed00:484e:7aff:fe67:1900]:55682: timed out
+20:36:40 torrent.sampling.go:237: locate infohash timed out 8e427bfd-01ce-81a1-4ce7-104f44c855b5 1 31.034550754s 31.02126251s
+20:36:42 torrent.sampling.go:92: sample query failed: timed out
+20:36:48 cmd.daemon.go:115: saving torrent peers 133
+20:36:48 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 366,
+ Available: (int) 2564,
+ Peers: (int) 3095,
+ RSS: (int) 0
+}
+
+20:36:50 torrent.sampling.go:237: locate infohash timed out d6ae6361-2d6e-429a-3c1a-c751fe40c080 35 1m41.080093915s 1m41.077046439s
+20:36:58 torrent.sampling.go:92: sample query failed: timed out
+20:37:00 torrent.sampling.go:237: locate infohash timed out 5a5a9e92-7f4a-11de-8dd0-c70be7695651 35 1m51.269283332s 1m51.256017342s
+20:37:09 torrent.sampling.go:270: locate hashed initiated
+20:37:09 torrent.sampling.go:301: locate hashed completed
+20:37:09 torrent.sampling.go:333: sleeping for 1m0s
+20:37:14 torrent.sampling.go:92: sample query failed: timed out
+20:37:17 httpx.go:80: https://localhost:9998/m/discovered GET initiated
+20:37:17 httpx.go:82: https://localhost:9998/m/discovered GET completed 1.80946ms
+20:37:18 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 411,
+ Available: (int) 2564,
+ Peers: (int) 3095,
+ RSS: (int) 0
+}
+
+20:37:29 torrent.sampling.go:92: sample query failed: timed out
+20:37:30 torrent.sampling.go:237: locate infohash timed out 586e0329-910e-90e3-467d-ff62871f0556 2 20.813159098s 20.80893181s
+20:37:34 httpx.go:80: https://localhost:9998/m/discovered GET initiated
+20:37:34 httpx.go:82: https://localhost:9998/m/discovered GET completed 1.816132ms
+20:37:39 httpx.go:80: https://localhost:9998/m/discovered GET initiated
+20:37:39 httpx.go:82: https://localhost:9998/m/discovered GET completed 1.766449ms
+20:37:40 torrent.sampling.go:237: locate infohash timed out 8e427bfd-01ce-81a1-4ce7-104f44c855b5 2 31.034900379s 31.02126251s
+20:37:44 torrent.sampling.go:92: sample query failed: timed out
+20:37:45 httpx.go:80: https://localhost:9998/m/discovered GET initiated
+20:37:45 httpx.go:82: https://localhost:9998/m/discovered GET completed 1.917344ms
+20:37:48 cmd.daemon.go:115: saving torrent peers 133
+20:37:48 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 487,
+ Available: (int) 2564,
+ Peers: (int) 3095,
+ RSS: (int) 0
+}
+
+20:37:50 torrent.sampling.go:237: locate infohash timed out d6ae6361-2d6e-429a-3c1a-c751fe40c080 35 1m41.080927747s 1m41.077046439s
+20:37:58 httpx.go:80: https://localhost:9998/m/discovered GET initiated
+20:37:58 httpx.go:82: https://localhost:9998/m/discovered GET completed 1.945989ms
+20:37:59 torrent.sampling.go:92: sample query failed: timed out
+20:38:00 torrent.sampling.go:237: locate infohash timed out edacb835-4ade-2ed0-3b9c-7b97a3bee0a6 35 1m51.091354239s 1m51.077970649s
+20:38:09 torrent.sampling.go:270: locate hashed initiated
+20:38:09 torrent.sampling.go:301: locate hashed completed
+20:38:09 torrent.sampling.go:333: sleeping for 1m0s
+20:38:13 torrent.sampling.go:92: sample query failed: timed out
+20:38:18 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 491,
+ Available: (int) 2564,
+ Peers: (int) 3095,
+ RSS: (int) 0
+}
+
+20:38:29 torrent.sampling.go:92: sample query failed: timed out
+20:38:39 torrent.sampling.go:237: locate infohash timed out 305b54e2-51fd-bebe-8d2c-eb1cb8257a4d 35 1m30.190724688s 1m30.176905865s
+20:38:42 httpx.go:80: https://localhost:9998/m/discovered GET initiated
+20:38:42 httpx.go:82: https://localhost:9998/m/discovered GET completed 2.881696ms
+20:38:45 torrent.sampling.go:92: sample query failed: timed out
+20:38:48 cmd.daemon.go:115: saving torrent peers 133
+20:38:48 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 527,
+ Available: (int) 2564,
+ Peers: (int) 3095,
+ RSS: (int) 0
+}
+
+20:38:49 torrent.sampling.go:237: locate infohash timed out 48406ed3-03b3-43e1-e193-f0f58ab5dce9 35 1m40.331306565s 1m40.317664202s
+20:39:00 torrent.sampling.go:237: locate infohash timed out d0da00ca-4984-84e4-9189-2264176f162e 35 1m50.691762523s 1m50.687557651s
+20:39:03 torrent.sampling.go:92: sample query failed: timed out
+20:39:09 torrent.sampling.go:270: locate hashed initiated
+20:39:09 torrent.sampling.go:301: locate hashed completed
+20:39:09 torrent.sampling.go:333: sleeping for 1m0s
+20:39:18 torrent.sampling.go:92: sample query failed: timed out
+20:39:18 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 468,
+ Available: (int) 2564,
+ Peers: (int) 3095,
+ RSS: (int) 0
+}
+
+20:39:33 torrent.sampling.go:92: sample query failed: timed out
+20:39:39 torrent.sampling.go:237: locate infohash timed out 5c35e788-23f8-7f7c-6c61-9115f126a771 35 1m30.179644741s 1m30.173439806s
+20:39:48 cmd.daemon.go:115: saving torrent peers 133
+20:39:48 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 505,
+ Available: (int) 2564,
+ Peers: (int) 3095,
+ RSS: (int) 0
+}
+
+20:39:49 torrent.sampling.go:92: sample query failed: timed out
+20:39:49 torrent.sampling.go:237: locate infohash timed out 4ff7c3f7-e64c-2fdb-f427-d510b1d2467a 35 1m40.331266644s 1m40.317667851s
+20:40:00 torrent.sampling.go:237: locate infohash timed out 188d409a-2373-2264-dd2c-2bb5c43a297c 35 1m50.563264784s 1m50.54907211s
+20:40:05 torrent.sampling.go:92: sample query failed: timed out
+20:40:09 torrent.sampling.go:270: locate hashed initiated
+20:40:09 torrent.sampling.go:301: locate hashed completed
+20:40:09 torrent.sampling.go:333: sleeping for 1m0s
+20:40:15 torrent.sampling.go:237: locate infohash timed out e14bab49-44ba-c377-26b2-2a7017678d99 36 1m5.901416845s 1m5.886779581s
+20:40:18 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 443,
+ Available: (int) 2564,
+ Peers: (int) 3095,
+ RSS: (int) 0
+}
+
+20:40:29 torrent.sampling.go:92: sample query failed: timed out
+20:40:39 torrent.sampling.go:237: locate infohash timed out 5c35e788-23f8-7f7c-6c61-9115f126a771 35 1m30.17968836s 1m30.173439806s
+20:40:48 cmd.daemon.go:115: saving torrent peers 133
+20:40:48 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 459,
+ Available: (int) 2564,
+ Peers: (int) 3095,
+ RSS: (int) 0
+}
+
+20:40:49 torrent.sampling.go:237: locate infohash timed out c34bdc81-a3f8-7624-e848-0bc29082b19a 35 1m40.2049098s 1m40.200843375s
+20:40:59 torrent.sampling.go:237: locate infohash timed out 453d403e-fb64-c196-6b0e-5d122435fb63 35 1m50.212354829s 1m50.198314362s
+20:41:01 torrent.sampling.go:92: sample query failed: timed out
+20:41:09 torrent.sampling.go:270: locate hashed initiated
+20:41:09 torrent.sampling.go:301: locate hashed completed
+20:41:09 torrent.sampling.go:333: sleeping for 1m0s
+20:41:15 torrent.sampling.go:237: locate infohash timed out e14bab49-44ba-c377-26b2-2a7017678d99 36 1m5.901107021s 1m5.886779581s
+20:41:16 torrent.sampling.go:92: sample query failed: timed out
+20:41:18 httpx.go:80: https://localhost:9998/m/discovered GET initiated
+20:41:18 httpx.go:82: https://localhost:9998/m/discovered GET completed 2.351285ms
+20:41:18 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 361,
+ Available: (int) 2564,
+ Peers: (int) 3095,
+ RSS: (int) 0
+}
+
+20:41:25 torrent.sampling.go:237: locate infohash timed out 12aa8c28-ce6f-1158-3643-73faca47e74b 36 1m16.314734992s 1m16.318176704s
+20:41:30 torrent.sampling.go:92: sample query failed: timed out
+20:41:37 torrent.sampling.go:237: locate infohash timed out 8c22f603-e3b5-1756-e25d-c11857be3378 36 1m27.759764074s 1m27.746272685s
+20:41:46 torrent.sampling.go:92: sample query failed: timed out
+20:41:46 torrent.sampling.go:88: locating samplable peers 133 available
+20:41:47 torrent.sampling.go:237: locate infohash timed out cf047b5f-b711-c34b-f097-c33945f927c8 35 1m37.821871137s 1m37.818514975s
+20:41:48 cmd.daemon.go:115: saving torrent peers 133
+20:41:48 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 345,
+ Available: (int) 2564,
+ Peers: (int) 3095,
+ RSS: (int) 0
+}
+
+20:41:57 torrent.sampling.go:237: locate infohash timed out 7d6c2f6d-a99a-2d40-2dd7-1be1d1d74c9e 35 1m47.964835211s 1m47.95147628s
+20:41:59 httpx.go:80: https://localhost:9998/m/discovered GET initiated
+20:41:59 httpx.go:82: https://localhost:9998/m/discovered GET completed 1.902566ms
+20:42:02 torrent.sampling.go:92: sample query failed: timed out
+20:42:07 torrent.sampling.go:237: locate infohash timed out 1fdced5d-b5ad-6f33-b0e8-399bdcfa7509 35 1m58.000112377s 1m57.986111751s
+20:42:09 torrent.sampling.go:270: locate hashed initiated
+20:42:09 torrent.sampling.go:301: locate hashed completed
+20:42:09 torrent.sampling.go:333: sleeping for 1m0s
+20:42:10 httpx.go:80: https://localhost:9998/m/discovered GET initiated
+20:42:10 httpx.go:82: https://localhost:9998/m/discovered GET completed 1.674676ms
+20:42:17 torrent.sampling.go:92: sample query failed: timed out
+20:42:18 torrent.sampling.go:237: locate infohash timed out 56a7fe48-ab89-248f-5ace-6a5a2ac00747 36 1m8.69745933s 1m8.68392147s
+20:42:18 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 226,
+ Available: (int) 2564,
+ Peers: (int) 3095,
+ RSS: (int) 0
+}
+
+20:42:28 torrent.sampling.go:237: locate infohash timed out 640f920a-16fe-119e-2642-adc899760d4f 36 1m19.215448121s 1m19.202178724s
+20:42:34 torrent.sampling.go:92: sample query failed: timed out
+20:42:39 torrent.sampling.go:237: locate infohash timed out 7a1979ac-f10a-f5d8-9910-7a168309a98f 35 1m30.198720817s 1m30.184460143s
+20:42:43 httpx.go:80: https://localhost:9998/m/discovered GET initiated
+20:42:43 httpx.go:82: https://localhost:9998/m/discovered GET completed 1.746662ms
+20:42:45 httpx.go:80: https://localhost:9998/m/discovered GET initiated
+20:42:45 httpx.go:82: https://localhost:9998/m/discovered GET completed 2.009028ms
+20:42:48 cmd.daemon.go:115: saving torrent peers 133
+20:42:48 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 172,
+ Available: (int) 2564,
+ Peers: (int) 3095,
+ RSS: (int) 0
+}
+
+20:42:50 torrent.sampling.go:237: locate infohash timed out b16f753c-d296-2b6a-e2e7-f742687d3f15 35 1m40.372274217s 1m40.357957311s
+20:42:51 torrent.sampling.go:92: sample query failed: timed out
+20:43:00 torrent.sampling.go:237: locate infohash timed out c5dc8c69-bdc4-f9a4-c234-7de09123006d 35 1m50.463458526s 1m50.45014877s
+20:43:06 torrent.sampling.go:92: sample query failed: timed out
+20:43:09 torrent.sampling.go:270: locate hashed initiated
+20:43:09 torrent.sampling.go:301: locate hashed completed
+20:43:09 torrent.sampling.go:333: sleeping for 1m0s
+20:43:10 torrent.sampling.go:199: querying peers for info hashes 88 < 100
+20:43:10 torrent.sampling.go:124: infohash sample initiated 2408:820c:681e:d131::e2f [2408:820c:681e:d131::e2f]:33377
+20:43:10 httpx.go:80: https://localhost:9998/m/discovered GET initiated
+20:43:10 httpx.go:82: https://localhost:9998/m/discovered GET completed 1.722376ms
+20:43:10 torrent.sampling.go:156: infohash sample completed 2408:820c:681e:d131::e2f [2408:820c:681e:d131::e2f]:33377
+20:43:10 torrent.sampling.go:124: infohash sample initiated 185.162.184.42 185.162.184.42:62423
+20:43:11 torrent.sampling.go:156: infohash sample completed 185.162.184.42 185.162.184.42:62423
+20:43:11 torrent.sampling.go:124: infohash sample initiated 5.141.34.188 5.141.34.188:6881
+20:43:15 torrent.sampling.go:237: locate infohash timed out 7650df40-e818-1b75-c56b-c6ae06c938ed 36 1m6.215679749s 1m6.20063087s
+20:43:18 torrent.sampling.go:358: status (daemons.stats) {
+ Pending: (int) 122,
+ Available: (int) 2564,
+ Peers: (int) 3093,
+ RSS: (int) 0
+}
+
+20:43:21 torrent.sampling.go:92: sample query failed: timed out
+20:43:25 torrent.sampling.go:128: infohash sample completed 5.141.34.188 5.141.34.188:6881
+20:43:25 torrent.sampling.go:112: marking peer as failed query failed: 5.141.34.188:6881: timed out
+20:43:25 torrent.sampling.go:180: query failed: 5.141.34.188:6881: timed out
+20:43:25 torrent.sampling.go:124: infohash sample initiated 109.236.91.11 109.236.91.11:6891
+20:43:25 torrent.sampling.go:156: infohash sample completed 109.236.91.11 109.236.91.11:6891
+20:43:25 torrent.sampling.go:124: infohash sample initiated 2804:d59:bc08:fc00:6451:10e6:ed87:a6c7 [2804:d59:bc08:fc00:6451:10e6:ed87:a6c7]:48789
+20:43:25 torrent.sampling.go:237: locate infohash timed out 5adb5227-12ed-0a61-08f4-39df2c6a980b 36 1m16.248584534s 1m16.245110582s
+20:43:36 torrent.sampling.go:237: locate infohash timed out d1e730c5-cf3d-7530-86d2-b8e639a8a883 36 1m26.374803049s 1m26.360611425s
+20:43:36 torrent.sampling.go:92: sample query failed: timed out
+20:43:40 torrent.sampling.go:128: infohash sample completed 2804:d59:bc08:fc00:6451:10e6:ed87:a6c7 [2804:d59:bc08:fc00:6451:10e6:ed87:a6c7]:48789
+20:43:40 torrent.sampling.go:112: marking peer as failed query failed: [2804:d59:bc08:fc00:6451:10e6:ed87:a6c7]:48789: timed out
+20:43:40 torrent.sampling.go:180: query failed: [2804:d59:bc08:fc00:6451:10e6:ed87:a6c7]:48789: timed out
+20:43:40 torrent.sampling.go:124: infohash sample initiated 2a02:2f0e:5b17:d200:9060:567d:de5e:f3df [2a02:2f0e:5b17:d200:9060:567d:de5e:f3df]:11110

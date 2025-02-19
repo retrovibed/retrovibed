@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:fractal/designkit.dart' as ds;
 import 'card.display.dart';
+import 'package:fractal/media.dart' as media;
 
 Future<List<Widget>> data() {
+  // var f1 = media.recent().then(
+  //   (v) => v.items.map((v) => CardDisplay(display: v.description)).toList(),
+  // );
   var f1 = Future.delayed(
     Duration(seconds: 1),
     () => <Widget>[
@@ -12,13 +16,8 @@ Future<List<Widget>> data() {
     ],
   );
 
-  var f2 = Future.delayed(
-    Duration(seconds: 1),
-    () => <Widget>[
-      CardDisplay(display: 'Discovered 1'),
-      CardDisplay(display: 'Discovered 2'),
-      CardDisplay(display: 'Discovered 3'),
-    ],
+  var f2 = media.discovered().then(
+    (v) => v.items.map((v) => CardDisplay(display: v.title)).toList(),
   );
 
   var f3 = Future.delayed(
@@ -48,6 +47,7 @@ class Display extends StatelessWidget {
       future: data(),
       builder: (BuildContext ctx, AsyncSnapshot<List<Widget>> snapshot) {
         if (snapshot.hasError) {
+          print(snapshot.error);
           return SizedBox.expand(child: Text("failed"));
         }
 

@@ -9,8 +9,12 @@ require (
 	github.com/alecthomas/kong v1.8.0
 	github.com/anacrolix/utp v0.2.0
 	github.com/benbjohnson/immutable v0.4.3
+	github.com/go-playground/form/v4 v4.2.1
 	github.com/gofrs/uuid v4.4.0+incompatible
+	github.com/golang-jwt/jwt/v4 v4.5.1
+	github.com/gorilla/schema v1.4.1
 	github.com/james-lawrence/genieql v0.0.0-20250214004632-76bb098e0718
+	github.com/justinas/alice v1.2.0
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/mattn/go-isatty v0.0.20
 	github.com/onsi/ginkgo/v2 v2.22.2
@@ -21,6 +25,8 @@ require (
 	github.com/willabides/kongplete v0.4.0
 	golang.org/x/crypto v0.33.0
 	golang.org/x/time v0.10.0
+	google.golang.org/grpc v1.67.1
+	google.golang.org/protobuf v1.36.1
 )
 
 require (
@@ -81,6 +87,7 @@ require (
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/google/pprof v0.0.0-20250208200701-d0013a598941 // indirect
+	github.com/gorilla/mux v1.8.1
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/james-lawrence/torrent v0.0.0-20250218114538-4fc4c551bce3
