@@ -6,6 +6,7 @@ CREATE TABLE torrents_feed_rss (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     next_check TIMESTAMPTZ NOT NULL DEFAULT '-infinity',
     autodownload boolean NOT NULL DEFAULT 'false',
+    description VARCHAR NOT NULL,
     url VARCHAR NOT NULL,
 );
 -- +goose StatementEnd

@@ -46,6 +46,8 @@ class Display extends StatelessWidget {
       initialData: <Widget>[],
       future: data(),
       builder: (BuildContext ctx, AsyncSnapshot<List<Widget>> snapshot) {
+        final defaults = ds.theme(ctx);
+
         if (snapshot.hasError) {
           print(snapshot.error);
           return SizedBox.expand(child: Text("failed"));
@@ -56,7 +58,7 @@ class Display extends StatelessWidget {
             loading: snapshot.connectionState != ConnectionState.done,
             child: GridView.count(
               primary: false,
-              padding: const EdgeInsets.all(20),
+              padding: defaults.padding,
               crossAxisSpacing: 0,
               mainAxisSpacing: 0,
               crossAxisCount: 3,

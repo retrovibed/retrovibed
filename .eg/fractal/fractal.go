@@ -41,5 +41,6 @@ func Generate(ctx context.Context, _ eg.Op) error {
 	return shell.Run(
 		ctx,
 		shell.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:fractal/lib/media -I.proto .proto/media.proto"),
+		shell.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:fractal/lib/rss -I.proto .proto/rss.proto"),
 	)
 }

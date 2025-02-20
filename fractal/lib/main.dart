@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fractal/downloads.dart' as downloads;
 import 'package:fractal/discovery.dart' as discovery;
+import 'package:fractal/settings.dart' as settings;
+import 'package:fractal/design.kit/theme.defaults.dart' as theming;
 import 'dart:io';
 
 class MyHttpOverrides extends HttpOverrides {
@@ -25,7 +27,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      darkTheme: ThemeData(brightness: Brightness.dark),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        cardTheme: CardTheme(margin: EdgeInsets.all(10.0)),
+        extensions: [theming.Defaults.defaults],
+      ),
       themeMode: ThemeMode.dark,
       home: DefaultTabController(
         length: 4,
@@ -43,7 +49,7 @@ class MyApp extends StatelessWidget {
               discovery.Display(),
               Icon(Icons.movie),
               downloads.List(),
-              Icon(Icons.settings),
+              settings.Display(),
             ],
           ),
         ),

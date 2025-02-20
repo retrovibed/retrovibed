@@ -8,9 +8,12 @@ class Loading extends StatelessWidget {
   const Loading({
     super.key,
     this.child,
-    this.overlay = const CircularProgressIndicator(
-      backgroundColor: Color.fromARGB(0, 0, 0, 0),
-      semanticsLabel: 'Linear progress indicator',
+    this.overlay = const Center(
+      child: CircularProgressIndicator(
+        padding: EdgeInsets.all(32.0),
+        backgroundColor: Color.fromARGB(0, 0, 0, 0),
+        semanticsLabel: 'Linear progress indicator',
+      ),
     ),
     this.loading = false,
   });
@@ -18,11 +21,7 @@ class Loading extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (loading) {
-      return FractionallySizedBox(
-        child: Center(
-          child: overlay,
-        ),
-      );
+      return Container(child: FractionallySizedBox(child: overlay));
     }
 
     return child ?? const SizedBox();
