@@ -3,13 +3,12 @@ syntax = "proto3";
 package media;
 
 message Media {
-  string title = 1 [ json_name = "title" ];
-  string description = 2 [ json_name = "description" ];
-  string mimetype = 3 [ json_name = "mimetype" ];
-  string image = 4 [ json_name = "image" ];
+  string description = 1 [ json_name = "description" ];
+  string mimetype = 2 [ json_name = "mimetype" ];
+  string image = 3 [ json_name = "image" ];
 }
 
-message MediaRequest {
+message MediaSearchRequest {
   string query = 1 [ json_name = "query" ];
   reserved 2 to 899;
   uint64 offset = 900 [ json_name = "offset" ];
@@ -17,7 +16,25 @@ message MediaRequest {
   reserved 902 to 999;
 }
 
-message MediaResponse {
-  MediaRequest next = 1 [ json_name = "next" ];
+message MediaSearchResponse {
+  MediaSearchRequest next = 1 [ json_name = "next" ];
   repeated Media items = 2 [ json_name = "items" ];
+}
+
+message Download {
+  Media media = 1 [ json_name = "media" ];
+  double progress = 2 [ json_name = "progress" ];
+}
+
+message DownloadSearchRequest {
+  string query = 1 [ json_name = "query" ];
+  reserved 2 to 899;
+  uint64 offset = 900 [ json_name = "offset" ];
+  uint64 limit = 901 [ json_name = "limit" ];
+  reserved 902 to 999;
+}
+
+message DownloadSearchResponse {
+  DownloadSearchRequest next = 1 [ json_name = "next" ];
+  repeated Download items = 2 [ json_name = "items" ];
 }

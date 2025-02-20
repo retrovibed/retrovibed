@@ -17,22 +17,20 @@ import 'dart:typed_data' as $typed_data;
 const Media$json = {
   '1': 'Media',
   '2': [
-    {'1': 'title', '3': 1, '4': 1, '5': 9, '10': 'title'},
-    {'1': 'description', '3': 2, '4': 1, '5': 9, '10': 'description'},
-    {'1': 'mimetype', '3': 3, '4': 1, '5': 9, '10': 'mimetype'},
-    {'1': 'image', '3': 4, '4': 1, '5': 9, '10': 'image'},
+    {'1': 'description', '3': 1, '4': 1, '5': 9, '10': 'description'},
+    {'1': 'mimetype', '3': 2, '4': 1, '5': 9, '10': 'mimetype'},
+    {'1': 'image', '3': 3, '4': 1, '5': 9, '10': 'image'},
   ],
 };
 
 /// Descriptor for `Media`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List mediaDescriptor = $convert.base64Decode(
-    'CgVNZWRpYRIUCgV0aXRsZRgBIAEoCVIFdGl0bGUSIAoLZGVzY3JpcHRpb24YAiABKAlSC2Rlc2'
-    'NyaXB0aW9uEhoKCG1pbWV0eXBlGAMgASgJUghtaW1ldHlwZRIUCgVpbWFnZRgEIAEoCVIFaW1h'
-    'Z2U=');
+    'CgVNZWRpYRIgCgtkZXNjcmlwdGlvbhgBIAEoCVILZGVzY3JpcHRpb24SGgoIbWltZXR5cGUYAi'
+    'ABKAlSCG1pbWV0eXBlEhQKBWltYWdlGAMgASgJUgVpbWFnZQ==');
 
-@$core.Deprecated('Use mediaRequestDescriptor instead')
-const MediaRequest$json = {
-  '1': 'MediaRequest',
+@$core.Deprecated('Use mediaSearchRequestDescriptor instead')
+const MediaSearchRequest$json = {
+  '1': 'MediaSearchRequest',
   '2': [
     {'1': 'query', '3': 1, '4': 1, '5': 9, '10': 'query'},
     {'1': 'offset', '3': 900, '4': 1, '5': 4, '10': 'offset'},
@@ -44,22 +42,70 @@ const MediaRequest$json = {
   ],
 };
 
-/// Descriptor for `MediaRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List mediaRequestDescriptor = $convert.base64Decode(
-    'CgxNZWRpYVJlcXVlc3QSFAoFcXVlcnkYASABKAlSBXF1ZXJ5EhcKBm9mZnNldBiEByABKARSBm'
-    '9mZnNldBIVCgVsaW1pdBiFByABKARSBWxpbWl0SgUIAhCEB0oGCIYHEOgH');
+/// Descriptor for `MediaSearchRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List mediaSearchRequestDescriptor = $convert.base64Decode(
+    'ChJNZWRpYVNlYXJjaFJlcXVlc3QSFAoFcXVlcnkYASABKAlSBXF1ZXJ5EhcKBm9mZnNldBiEBy'
+    'ABKARSBm9mZnNldBIVCgVsaW1pdBiFByABKARSBWxpbWl0SgUIAhCEB0oGCIYHEOgH');
 
-@$core.Deprecated('Use mediaResponseDescriptor instead')
-const MediaResponse$json = {
-  '1': 'MediaResponse',
+@$core.Deprecated('Use mediaSearchResponseDescriptor instead')
+const MediaSearchResponse$json = {
+  '1': 'MediaSearchResponse',
   '2': [
-    {'1': 'next', '3': 1, '4': 1, '5': 11, '6': '.media.MediaRequest', '10': 'next'},
+    {'1': 'next', '3': 1, '4': 1, '5': 11, '6': '.media.MediaSearchRequest', '10': 'next'},
     {'1': 'items', '3': 2, '4': 3, '5': 11, '6': '.media.Media', '10': 'items'},
   ],
 };
 
-/// Descriptor for `MediaResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List mediaResponseDescriptor = $convert.base64Decode(
-    'Cg1NZWRpYVJlc3BvbnNlEicKBG5leHQYASABKAsyEy5tZWRpYS5NZWRpYVJlcXVlc3RSBG5leH'
-    'QSIgoFaXRlbXMYAiADKAsyDC5tZWRpYS5NZWRpYVIFaXRlbXM=');
+/// Descriptor for `MediaSearchResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List mediaSearchResponseDescriptor = $convert.base64Decode(
+    'ChNNZWRpYVNlYXJjaFJlc3BvbnNlEi0KBG5leHQYASABKAsyGS5tZWRpYS5NZWRpYVNlYXJjaF'
+    'JlcXVlc3RSBG5leHQSIgoFaXRlbXMYAiADKAsyDC5tZWRpYS5NZWRpYVIFaXRlbXM=');
+
+@$core.Deprecated('Use downloadDescriptor instead')
+const Download$json = {
+  '1': 'Download',
+  '2': [
+    {'1': 'media', '3': 1, '4': 1, '5': 11, '6': '.media.Media', '10': 'media'},
+    {'1': 'progress', '3': 2, '4': 1, '5': 1, '10': 'progress'},
+  ],
+};
+
+/// Descriptor for `Download`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List downloadDescriptor = $convert.base64Decode(
+    'CghEb3dubG9hZBIiCgVtZWRpYRgBIAEoCzIMLm1lZGlhLk1lZGlhUgVtZWRpYRIaCghwcm9ncm'
+    'VzcxgCIAEoAVIIcHJvZ3Jlc3M=');
+
+@$core.Deprecated('Use downloadSearchRequestDescriptor instead')
+const DownloadSearchRequest$json = {
+  '1': 'DownloadSearchRequest',
+  '2': [
+    {'1': 'query', '3': 1, '4': 1, '5': 9, '10': 'query'},
+    {'1': 'offset', '3': 900, '4': 1, '5': 4, '10': 'offset'},
+    {'1': 'limit', '3': 901, '4': 1, '5': 4, '10': 'limit'},
+  ],
+  '9': [
+    {'1': 2, '2': 900},
+    {'1': 902, '2': 1000},
+  ],
+};
+
+/// Descriptor for `DownloadSearchRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List downloadSearchRequestDescriptor = $convert.base64Decode(
+    'ChVEb3dubG9hZFNlYXJjaFJlcXVlc3QSFAoFcXVlcnkYASABKAlSBXF1ZXJ5EhcKBm9mZnNldB'
+    'iEByABKARSBm9mZnNldBIVCgVsaW1pdBiFByABKARSBWxpbWl0SgUIAhCEB0oGCIYHEOgH');
+
+@$core.Deprecated('Use downloadSearchResponseDescriptor instead')
+const DownloadSearchResponse$json = {
+  '1': 'DownloadSearchResponse',
+  '2': [
+    {'1': 'next', '3': 1, '4': 1, '5': 11, '6': '.media.DownloadSearchRequest', '10': 'next'},
+    {'1': 'items', '3': 2, '4': 3, '5': 11, '6': '.media.Download', '10': 'items'},
+  ],
+};
+
+/// Descriptor for `DownloadSearchResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List downloadSearchResponseDescriptor = $convert.base64Decode(
+    'ChZEb3dubG9hZFNlYXJjaFJlc3BvbnNlEjAKBG5leHQYASABKAsyHC5tZWRpYS5Eb3dubG9hZF'
+    'NlYXJjaFJlcXVlc3RSBG5leHQSJQoFaXRlbXMYAiADKAsyDy5tZWRpYS5Eb3dubG9hZFIFaXRl'
+    'bXM=');
 

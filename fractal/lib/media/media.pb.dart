@@ -16,15 +16,11 @@ import 'package:protobuf/protobuf.dart' as $pb;
 
 class Media extends $pb.GeneratedMessage {
   factory Media({
-    $core.String? title,
     $core.String? description,
     $core.String? mimetype,
     $core.String? image,
   }) {
     final $result = create();
-    if (title != null) {
-      $result.title = title;
-    }
     if (description != null) {
       $result.description = description;
     }
@@ -41,10 +37,9 @@ class Media extends $pb.GeneratedMessage {
   factory Media.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'Media', package: const $pb.PackageName(_omitMessageNames ? '' : 'media'), createEmptyInstance: create)
-    ..aOS(1, _omitFieldNames ? '' : 'title')
-    ..aOS(2, _omitFieldNames ? '' : 'description')
-    ..aOS(3, _omitFieldNames ? '' : 'mimetype')
-    ..aOS(4, _omitFieldNames ? '' : 'image')
+    ..aOS(1, _omitFieldNames ? '' : 'description')
+    ..aOS(2, _omitFieldNames ? '' : 'mimetype')
+    ..aOS(3, _omitFieldNames ? '' : 'image')
     ..hasRequiredFields = false
   ;
 
@@ -70,44 +65,35 @@ class Media extends $pb.GeneratedMessage {
   static Media? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.String get title => $_getSZ(0);
+  $core.String get description => $_getSZ(0);
   @$pb.TagNumber(1)
-  set title($core.String v) { $_setString(0, v); }
+  set description($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
-  $core.bool hasTitle() => $_has(0);
+  $core.bool hasDescription() => $_has(0);
   @$pb.TagNumber(1)
-  void clearTitle() => clearField(1);
+  void clearDescription() => clearField(1);
 
   @$pb.TagNumber(2)
-  $core.String get description => $_getSZ(1);
+  $core.String get mimetype => $_getSZ(1);
   @$pb.TagNumber(2)
-  set description($core.String v) { $_setString(1, v); }
+  set mimetype($core.String v) { $_setString(1, v); }
   @$pb.TagNumber(2)
-  $core.bool hasDescription() => $_has(1);
+  $core.bool hasMimetype() => $_has(1);
   @$pb.TagNumber(2)
-  void clearDescription() => clearField(2);
+  void clearMimetype() => clearField(2);
 
   @$pb.TagNumber(3)
-  $core.String get mimetype => $_getSZ(2);
+  $core.String get image => $_getSZ(2);
   @$pb.TagNumber(3)
-  set mimetype($core.String v) { $_setString(2, v); }
+  set image($core.String v) { $_setString(2, v); }
   @$pb.TagNumber(3)
-  $core.bool hasMimetype() => $_has(2);
+  $core.bool hasImage() => $_has(2);
   @$pb.TagNumber(3)
-  void clearMimetype() => clearField(3);
-
-  @$pb.TagNumber(4)
-  $core.String get image => $_getSZ(3);
-  @$pb.TagNumber(4)
-  set image($core.String v) { $_setString(3, v); }
-  @$pb.TagNumber(4)
-  $core.bool hasImage() => $_has(3);
-  @$pb.TagNumber(4)
-  void clearImage() => clearField(4);
+  void clearImage() => clearField(3);
 }
 
-class MediaRequest extends $pb.GeneratedMessage {
-  factory MediaRequest({
+class MediaSearchRequest extends $pb.GeneratedMessage {
+  factory MediaSearchRequest({
     $core.String? query,
     $fixnum.Int64? offset,
     $fixnum.Int64? limit,
@@ -124,11 +110,11 @@ class MediaRequest extends $pb.GeneratedMessage {
     }
     return $result;
   }
-  MediaRequest._() : super();
-  factory MediaRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory MediaRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  MediaSearchRequest._() : super();
+  factory MediaSearchRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory MediaSearchRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'MediaRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'media'), createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'MediaSearchRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'media'), createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'query')
     ..a<$fixnum.Int64>(900, _omitFieldNames ? '' : 'offset', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
     ..a<$fixnum.Int64>(901, _omitFieldNames ? '' : 'limit', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
@@ -139,22 +125,22 @@ class MediaRequest extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
   'Will be removed in next major version')
-  MediaRequest clone() => MediaRequest()..mergeFromMessage(this);
+  MediaSearchRequest clone() => MediaSearchRequest()..mergeFromMessage(this);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  MediaRequest copyWith(void Function(MediaRequest) updates) => super.copyWith((message) => updates(message as MediaRequest)) as MediaRequest;
+  MediaSearchRequest copyWith(void Function(MediaSearchRequest) updates) => super.copyWith((message) => updates(message as MediaSearchRequest)) as MediaSearchRequest;
 
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  static MediaRequest create() => MediaRequest._();
-  MediaRequest createEmptyInstance() => create();
-  static $pb.PbList<MediaRequest> createRepeated() => $pb.PbList<MediaRequest>();
+  static MediaSearchRequest create() => MediaSearchRequest._();
+  MediaSearchRequest createEmptyInstance() => create();
+  static $pb.PbList<MediaSearchRequest> createRepeated() => $pb.PbList<MediaSearchRequest>();
   @$core.pragma('dart2js:noInline')
-  static MediaRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<MediaRequest>(create);
-  static MediaRequest? _defaultInstance;
+  static MediaSearchRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<MediaSearchRequest>(create);
+  static MediaSearchRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.String get query => $_getSZ(0);
@@ -184,9 +170,9 @@ class MediaRequest extends $pb.GeneratedMessage {
   void clearLimit() => clearField(901);
 }
 
-class MediaResponse extends $pb.GeneratedMessage {
-  factory MediaResponse({
-    MediaRequest? next,
+class MediaSearchResponse extends $pb.GeneratedMessage {
+  factory MediaSearchResponse({
+    MediaSearchRequest? next,
     $core.Iterable<Media>? items,
   }) {
     final $result = create();
@@ -198,12 +184,12 @@ class MediaResponse extends $pb.GeneratedMessage {
     }
     return $result;
   }
-  MediaResponse._() : super();
-  factory MediaResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory MediaResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  MediaSearchResponse._() : super();
+  factory MediaSearchResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory MediaSearchResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'MediaResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'media'), createEmptyInstance: create)
-    ..aOM<MediaRequest>(1, _omitFieldNames ? '' : 'next', subBuilder: MediaRequest.create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'MediaSearchResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'media'), createEmptyInstance: create)
+    ..aOM<MediaSearchRequest>(1, _omitFieldNames ? '' : 'next', subBuilder: MediaSearchRequest.create)
     ..pc<Media>(2, _omitFieldNames ? '' : 'items', $pb.PbFieldType.PM, subBuilder: Media.create)
     ..hasRequiredFields = false
   ;
@@ -212,36 +198,240 @@ class MediaResponse extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
   'Will be removed in next major version')
-  MediaResponse clone() => MediaResponse()..mergeFromMessage(this);
+  MediaSearchResponse clone() => MediaSearchResponse()..mergeFromMessage(this);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  MediaResponse copyWith(void Function(MediaResponse) updates) => super.copyWith((message) => updates(message as MediaResponse)) as MediaResponse;
+  MediaSearchResponse copyWith(void Function(MediaSearchResponse) updates) => super.copyWith((message) => updates(message as MediaSearchResponse)) as MediaSearchResponse;
 
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  static MediaResponse create() => MediaResponse._();
-  MediaResponse createEmptyInstance() => create();
-  static $pb.PbList<MediaResponse> createRepeated() => $pb.PbList<MediaResponse>();
+  static MediaSearchResponse create() => MediaSearchResponse._();
+  MediaSearchResponse createEmptyInstance() => create();
+  static $pb.PbList<MediaSearchResponse> createRepeated() => $pb.PbList<MediaSearchResponse>();
   @$core.pragma('dart2js:noInline')
-  static MediaResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<MediaResponse>(create);
-  static MediaResponse? _defaultInstance;
+  static MediaSearchResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<MediaSearchResponse>(create);
+  static MediaSearchResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
-  MediaRequest get next => $_getN(0);
+  MediaSearchRequest get next => $_getN(0);
   @$pb.TagNumber(1)
-  set next(MediaRequest v) { setField(1, v); }
+  set next(MediaSearchRequest v) { setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasNext() => $_has(0);
   @$pb.TagNumber(1)
   void clearNext() => clearField(1);
   @$pb.TagNumber(1)
-  MediaRequest ensureNext() => $_ensure(0);
+  MediaSearchRequest ensureNext() => $_ensure(0);
 
   @$pb.TagNumber(2)
   $core.List<Media> get items => $_getList(1);
+}
+
+class Download extends $pb.GeneratedMessage {
+  factory Download({
+    Media? media,
+    $core.double? progress,
+  }) {
+    final $result = create();
+    if (media != null) {
+      $result.media = media;
+    }
+    if (progress != null) {
+      $result.progress = progress;
+    }
+    return $result;
+  }
+  Download._() : super();
+  factory Download.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory Download.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'Download', package: const $pb.PackageName(_omitMessageNames ? '' : 'media'), createEmptyInstance: create)
+    ..aOM<Media>(1, _omitFieldNames ? '' : 'media', subBuilder: Media.create)
+    ..a<$core.double>(2, _omitFieldNames ? '' : 'progress', $pb.PbFieldType.OD)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  Download clone() => Download()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  Download copyWith(void Function(Download) updates) => super.copyWith((message) => updates(message as Download)) as Download;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static Download create() => Download._();
+  Download createEmptyInstance() => create();
+  static $pb.PbList<Download> createRepeated() => $pb.PbList<Download>();
+  @$core.pragma('dart2js:noInline')
+  static Download getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Download>(create);
+  static Download? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  Media get media => $_getN(0);
+  @$pb.TagNumber(1)
+  set media(Media v) { setField(1, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasMedia() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearMedia() => clearField(1);
+  @$pb.TagNumber(1)
+  Media ensureMedia() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  $core.double get progress => $_getN(1);
+  @$pb.TagNumber(2)
+  set progress($core.double v) { $_setDouble(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasProgress() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearProgress() => clearField(2);
+}
+
+class DownloadSearchRequest extends $pb.GeneratedMessage {
+  factory DownloadSearchRequest({
+    $core.String? query,
+    $fixnum.Int64? offset,
+    $fixnum.Int64? limit,
+  }) {
+    final $result = create();
+    if (query != null) {
+      $result.query = query;
+    }
+    if (offset != null) {
+      $result.offset = offset;
+    }
+    if (limit != null) {
+      $result.limit = limit;
+    }
+    return $result;
+  }
+  DownloadSearchRequest._() : super();
+  factory DownloadSearchRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory DownloadSearchRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DownloadSearchRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'media'), createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'query')
+    ..a<$fixnum.Int64>(900, _omitFieldNames ? '' : 'offset', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(901, _omitFieldNames ? '' : 'limit', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  DownloadSearchRequest clone() => DownloadSearchRequest()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  DownloadSearchRequest copyWith(void Function(DownloadSearchRequest) updates) => super.copyWith((message) => updates(message as DownloadSearchRequest)) as DownloadSearchRequest;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static DownloadSearchRequest create() => DownloadSearchRequest._();
+  DownloadSearchRequest createEmptyInstance() => create();
+  static $pb.PbList<DownloadSearchRequest> createRepeated() => $pb.PbList<DownloadSearchRequest>();
+  @$core.pragma('dart2js:noInline')
+  static DownloadSearchRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DownloadSearchRequest>(create);
+  static DownloadSearchRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get query => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set query($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasQuery() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearQuery() => clearField(1);
+
+  @$pb.TagNumber(900)
+  $fixnum.Int64 get offset => $_getI64(1);
+  @$pb.TagNumber(900)
+  set offset($fixnum.Int64 v) { $_setInt64(1, v); }
+  @$pb.TagNumber(900)
+  $core.bool hasOffset() => $_has(1);
+  @$pb.TagNumber(900)
+  void clearOffset() => clearField(900);
+
+  @$pb.TagNumber(901)
+  $fixnum.Int64 get limit => $_getI64(2);
+  @$pb.TagNumber(901)
+  set limit($fixnum.Int64 v) { $_setInt64(2, v); }
+  @$pb.TagNumber(901)
+  $core.bool hasLimit() => $_has(2);
+  @$pb.TagNumber(901)
+  void clearLimit() => clearField(901);
+}
+
+class DownloadSearchResponse extends $pb.GeneratedMessage {
+  factory DownloadSearchResponse({
+    DownloadSearchRequest? next,
+    $core.Iterable<Download>? items,
+  }) {
+    final $result = create();
+    if (next != null) {
+      $result.next = next;
+    }
+    if (items != null) {
+      $result.items.addAll(items);
+    }
+    return $result;
+  }
+  DownloadSearchResponse._() : super();
+  factory DownloadSearchResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory DownloadSearchResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DownloadSearchResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'media'), createEmptyInstance: create)
+    ..aOM<DownloadSearchRequest>(1, _omitFieldNames ? '' : 'next', subBuilder: DownloadSearchRequest.create)
+    ..pc<Download>(2, _omitFieldNames ? '' : 'items', $pb.PbFieldType.PM, subBuilder: Download.create)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  DownloadSearchResponse clone() => DownloadSearchResponse()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  DownloadSearchResponse copyWith(void Function(DownloadSearchResponse) updates) => super.copyWith((message) => updates(message as DownloadSearchResponse)) as DownloadSearchResponse;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static DownloadSearchResponse create() => DownloadSearchResponse._();
+  DownloadSearchResponse createEmptyInstance() => create();
+  static $pb.PbList<DownloadSearchResponse> createRepeated() => $pb.PbList<DownloadSearchResponse>();
+  @$core.pragma('dart2js:noInline')
+  static DownloadSearchResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DownloadSearchResponse>(create);
+  static DownloadSearchResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  DownloadSearchRequest get next => $_getN(0);
+  @$pb.TagNumber(1)
+  set next(DownloadSearchRequest v) { setField(1, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasNext() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearNext() => clearField(1);
+  @$pb.TagNumber(1)
+  DownloadSearchRequest ensureNext() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  $core.List<Download> get items => $_getList(1);
 }
 
 

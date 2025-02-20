@@ -1,12 +1,14 @@
 package media
 
-import "github.com/james-lawrence/deeppool/tracking"
+import (
+	"github.com/james-lawrence/deeppool/tracking"
+)
 
 type MediaOption func(*Media)
 
 func MediaOptionFromTorrentMetadata(cc tracking.Metadata) MediaOption {
 	return func(c *Media) {
-		c.Title = cc.Description
+		c.Description = cc.Description
 		c.Mimetype = "applications/x-bittorrent"
 		// c.CreatedAt = grpcx.EncodeTime(cc.CreatedAt)
 		// c.InitiatedAt = grpcx.EncodeTime(cc.InitiatedAt)

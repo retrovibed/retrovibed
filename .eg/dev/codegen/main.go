@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
-	"eg/compute/fractal"
 	"log"
+
+	"eg/compute/fractal"
+	"eg/compute/shallows"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
@@ -21,6 +23,7 @@ func main() {
 		eg.Build(deb.BuildFromFile(".eg/Containerfile")),
 		eg.Parallel(
 			eg.Module(ctx, deb, fractal.Generate),
+			eg.Module(ctx, deb, shallows.Generate),
 		),
 	)
 

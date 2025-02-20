@@ -27,3 +27,8 @@ RUN chown -R egd:egd /opt/flutter
 RUN sudo -H -S -u egd -g egd flutter config --no-analytics
 RUN sudo -H -S -u egd -g egd flutter --disable-analytics
 RUN sudo -H -S -u egd -g egd dart pub global activate protoc_plugin
+
+# install genieql and golang's protocol buffers plugin
+RUN GOBIN="/usr/local/bin" go install -tags genieql.duckdb,no_duckdb_arrow github.com/james-lawrence/genieql/...@latest
+RUN GOBIN="/usr/local/bin" go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+RUN which genieql

@@ -59,8 +59,8 @@ func (t *HTTPDiscovered) Bind(r *mux.Router) {
 func (t *HTTPDiscovered) update(w http.ResponseWriter, r *http.Request) {
 	var (
 		err error
-		msg MediaResponse = MediaResponse{
-			Next: &MediaRequest{
+		msg MediaSearchResponse = MediaSearchResponse{
+			Next: &MediaSearchRequest{
 				Limit: 100,
 			},
 		}

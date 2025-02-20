@@ -17,7 +17,7 @@ Future<List<Widget>> data() {
   );
 
   var f2 = media.discovered().then(
-    (v) => v.items.map((v) => CardDisplay(display: v.title)).toList(),
+    (v) => v.items.map((v) => CardDisplay(display: v.description)).toList(),
   );
 
   var f3 = Future.delayed(
