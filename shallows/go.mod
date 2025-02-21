@@ -90,7 +90,7 @@ require (
 	github.com/gorilla/mux v1.8.1
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
-	github.com/james-lawrence/torrent v0.0.0-20250221175120-b596aef26f69
+	github.com/james-lawrence/torrent v0.0.0-20250221191043-bc411b7934a1
 	github.com/marcboeker/go-duckdb v1.8.3
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/posener/complete v1.2.3 // indirect
