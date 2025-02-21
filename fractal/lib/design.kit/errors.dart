@@ -13,8 +13,13 @@ class ErrorTests {
 
 class ErrorBoundary extends StatefulWidget {
   final Widget child;
+  final AlignmentGeometry alignment;
 
-  const ErrorBoundary({super.key, required this.child});
+  const ErrorBoundary(
+    this.child, {
+    super.key,
+    this.alignment = Alignment.center,
+  });
 
   static of(BuildContext context) {
     return context.findRootAncestorStateOfType<_ErrorBoundaryState>();
@@ -26,6 +31,7 @@ class ErrorBoundary extends StatefulWidget {
 
 class _ErrorBoundaryState extends State<ErrorBoundary> {
   Error? cause;
+  Key _refresh = UniqueKey();
 
   void onError(Error err) {
     setState(() {
@@ -33,17 +39,21 @@ class _ErrorBoundaryState extends State<ErrorBoundary> {
     });
   }
 
+  void reset() {
+    setState(() {
+      cause = null;
+      _refresh = UniqueKey();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return screens.Overlay(
+      key: _refresh,
       child: widget.child,
-      overlay: Container(
-        child: cause,
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.red),
-          color: Colors.transparent,
-        ),
-      ),
+      overlay: cause,
+      alignment: widget.alignment,
+      onTap: cause != null ? reset : null,
     );
   }
 }

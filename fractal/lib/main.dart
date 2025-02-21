@@ -45,15 +45,13 @@ class MyApp extends StatelessWidget {
                 Tab(icon: Icon(Icons.settings)),
               ],
             ),
-            body: ds.ErrorBoundary(
-              child: TabBarView(
-                children: [
-                  // discovery.Display(),
-                  Icon(Icons.movie),
-                  downloads.Display(),
-                  settings.Display(),
-                ],
-              ),
+            body: TabBarView(
+              children: [
+                // discovery.Display(),
+                ds.ErrorBoundary(Icon(Icons.movie)),
+                ds.ErrorBoundary(downloads.Display()),
+                ds.ErrorBoundary(settings.Display()),
+              ],
             ),
           ),
         ),
