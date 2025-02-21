@@ -53,7 +53,7 @@ func MetadataPausedByID(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewMetadataScannerStaticRow,
 ) {
-	gql = gql.Query(`UPDATE torrents_metadata SET paused_at = NOW() WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
+	gql = gql.Query(`UPDATE torrents_metadata SET paused_at = NOW(), initiated_at = 'infinity' WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
 }
 
 func MetadataDownloadByID(

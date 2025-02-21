@@ -208,6 +208,7 @@ func (t *HTTPDiscovered) downloading(w http.ResponseWriter, r *http.Request) {
 		squirrel.And{
 			tracking.MetadataQueryInitiated(),
 			tracking.MetadataQueryIncomplete(),
+			tracking.MetadataQueryNotPaused(),
 		},
 	).OrderBy("created_at DESC").Offset(msg.Next.Offset * msg.Next.Limit).Limit(msg.Next.Limit)
 
@@ -246,7 +247,9 @@ func (t *HTTPDiscovered) search(w http.ResponseWriter, r *http.Request) {
 	}
 	msg.Next.Limit = numericx.Min(msg.Next.Limit, 100)
 
-	q := tracking.MetadataSearchBuilder().OrderBy("created_at DESC").Offset(msg.Next.Offset * msg.Next.Limit).Limit(msg.Next.Limit)
+	q := tracking.MetadataSearchBuilder().Where(squirrel.And{
+		tracking.MetadataQueryNotInitiated(),
+	}).OrderBy("created_at DESC").Offset(msg.Next.Offset * msg.Next.Limit).Limit(msg.Next.Limit)
 
 	err = sqlxx.ScanEach(tracking.MetadataSearch(r.Context(), t.q, q), func(p *tracking.Metadata) error {
 		tmp := langx.Clone(Media{}, MediaOptionFromTorrentMetadata(langx.Clone(*p, tracking.MetadataOptionJSONSafeEncode)))

@@ -31,12 +31,20 @@ func NewMetadata(md *metainfo.Hash, options ...func(*Metadata)) (m Metadata) {
 	return r
 }
 
+func MetadataQueryNotInitiated() squirrel.Sqlizer {
+	return squirrel.Expr("torrents_metadata.initiated_at = 'infinity'")
+}
+
 func MetadataQueryInitiated() squirrel.Sqlizer {
 	return squirrel.Expr("torrents_metadata.initiated_at < NOW()")
 }
 
 func MetadataQueryIncomplete() squirrel.Sqlizer {
 	return squirrel.Expr("torrents_metadata.downloaded < torrents_metadata.bytes")
+}
+
+func MetadataQueryNotPaused() squirrel.Sqlizer {
+	return squirrel.Expr("torrents_metadata.paused_at = 'infinity'")
 }
 
 func MetadataSearch(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilder) MetadataScanner {
