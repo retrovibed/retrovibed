@@ -16,9 +16,11 @@ Future<List<Widget>> data() {
     ],
   );
 
-  var f2 = media.discovered().then(
-    (v) => v.items.map((v) => CardDisplay(display: v.description)).toList(),
-  );
+  var f2 = media.discovered
+      .available(media.mediasearch.request())
+      .then(
+        (v) => v.items.map((v) => CardDisplay(display: v.description)).toList(),
+      );
 
   var f3 = Future.delayed(
     Duration(seconds: 1),
@@ -50,20 +52,18 @@ class Display extends StatelessWidget {
 
         if (snapshot.hasError) {
           print(snapshot.error);
-          return SizedBox.expand(child: Text("failed"));
+          return ds.Error.text(snapshot.error.toString());
         }
 
-        return SizedBox.expand(
-          child: ds.Loading(
-            loading: snapshot.connectionState != ConnectionState.done,
-            child: GridView.count(
-              primary: false,
-              padding: defaults.padding,
-              crossAxisSpacing: 0,
-              mainAxisSpacing: 0,
-              crossAxisCount: 3,
-              children: snapshot.data!,
-            ),
+        return ds.Loading(
+          loading: snapshot.connectionState != ConnectionState.done,
+          child: GridView.count(
+            primary: false,
+            padding: defaults.padding,
+            crossAxisSpacing: 0,
+            mainAxisSpacing: 0,
+            crossAxisCount: 3,
+            children: snapshot.data!,
           ),
         );
       },

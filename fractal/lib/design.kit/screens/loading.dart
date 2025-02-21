@@ -21,7 +21,7 @@ class Loading extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (loading) {
-      return Container(child: FractionallySizedBox(child: overlay));
+      return Container(child: overlay);
     }
 
     return child ?? const SizedBox();

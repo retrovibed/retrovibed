@@ -31,6 +31,14 @@ func NewMetadata(md *metainfo.Hash, options ...func(*Metadata)) (m Metadata) {
 	return r
 }
 
+func MetadataQueryInitiated() squirrel.Sqlizer {
+	return squirrel.Expr("torrents_metadata.initiated_at < NOW()")
+}
+
+func MetadataQueryIncomplete() squirrel.Sqlizer {
+	return squirrel.Expr("torrents_metadata.downloaded < torrents_metadata.bytes")
+}
+
 func MetadataSearch(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilder) MetadataScanner {
 	return NewMetadataScannerStatic(b.RunWith(q).QueryContext(ctx))
 }

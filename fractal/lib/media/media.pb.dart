@@ -16,11 +16,15 @@ import 'package:protobuf/protobuf.dart' as $pb;
 
 class Media extends $pb.GeneratedMessage {
   factory Media({
+    $core.String? id,
     $core.String? description,
     $core.String? mimetype,
     $core.String? image,
   }) {
     final $result = create();
+    if (id != null) {
+      $result.id = id;
+    }
     if (description != null) {
       $result.description = description;
     }
@@ -37,9 +41,10 @@ class Media extends $pb.GeneratedMessage {
   factory Media.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'Media', package: const $pb.PackageName(_omitMessageNames ? '' : 'media'), createEmptyInstance: create)
-    ..aOS(1, _omitFieldNames ? '' : 'description')
-    ..aOS(2, _omitFieldNames ? '' : 'mimetype')
-    ..aOS(3, _omitFieldNames ? '' : 'image')
+    ..aOS(1, _omitFieldNames ? '' : 'id')
+    ..aOS(2, _omitFieldNames ? '' : 'description')
+    ..aOS(3, _omitFieldNames ? '' : 'mimetype')
+    ..aOS(4, _omitFieldNames ? '' : 'image')
     ..hasRequiredFields = false
   ;
 
@@ -65,31 +70,40 @@ class Media extends $pb.GeneratedMessage {
   static Media? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.String get description => $_getSZ(0);
+  $core.String get id => $_getSZ(0);
   @$pb.TagNumber(1)
-  set description($core.String v) { $_setString(0, v); }
+  set id($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
-  $core.bool hasDescription() => $_has(0);
+  $core.bool hasId() => $_has(0);
   @$pb.TagNumber(1)
-  void clearDescription() => clearField(1);
+  void clearId() => clearField(1);
 
   @$pb.TagNumber(2)
-  $core.String get mimetype => $_getSZ(1);
+  $core.String get description => $_getSZ(1);
   @$pb.TagNumber(2)
-  set mimetype($core.String v) { $_setString(1, v); }
+  set description($core.String v) { $_setString(1, v); }
   @$pb.TagNumber(2)
-  $core.bool hasMimetype() => $_has(1);
+  $core.bool hasDescription() => $_has(1);
   @$pb.TagNumber(2)
-  void clearMimetype() => clearField(2);
+  void clearDescription() => clearField(2);
 
   @$pb.TagNumber(3)
-  $core.String get image => $_getSZ(2);
+  $core.String get mimetype => $_getSZ(2);
   @$pb.TagNumber(3)
-  set image($core.String v) { $_setString(2, v); }
+  set mimetype($core.String v) { $_setString(2, v); }
   @$pb.TagNumber(3)
-  $core.bool hasImage() => $_has(2);
+  $core.bool hasMimetype() => $_has(2);
   @$pb.TagNumber(3)
-  void clearImage() => clearField(3);
+  void clearMimetype() => clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.String get image => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set image($core.String v) { $_setString(3, v); }
+  @$pb.TagNumber(4)
+  $core.bool hasImage() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearImage() => clearField(4);
 }
 
 class MediaSearchRequest extends $pb.GeneratedMessage {
@@ -233,14 +247,18 @@ class MediaSearchResponse extends $pb.GeneratedMessage {
 class Download extends $pb.GeneratedMessage {
   factory Download({
     Media? media,
-    $core.double? progress,
+    $fixnum.Int64? bytes,
+    $fixnum.Int64? downloaded,
   }) {
     final $result = create();
     if (media != null) {
       $result.media = media;
     }
-    if (progress != null) {
-      $result.progress = progress;
+    if (bytes != null) {
+      $result.bytes = bytes;
+    }
+    if (downloaded != null) {
+      $result.downloaded = downloaded;
     }
     return $result;
   }
@@ -250,7 +268,8 @@ class Download extends $pb.GeneratedMessage {
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'Download', package: const $pb.PackageName(_omitMessageNames ? '' : 'media'), createEmptyInstance: create)
     ..aOM<Media>(1, _omitFieldNames ? '' : 'media', subBuilder: Media.create)
-    ..a<$core.double>(2, _omitFieldNames ? '' : 'progress', $pb.PbFieldType.OD)
+    ..a<$fixnum.Int64>(2, _omitFieldNames ? '' : 'bytes', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(3, _omitFieldNames ? '' : 'downloaded', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
     ..hasRequiredFields = false
   ;
 
@@ -287,13 +306,22 @@ class Download extends $pb.GeneratedMessage {
   Media ensureMedia() => $_ensure(0);
 
   @$pb.TagNumber(2)
-  $core.double get progress => $_getN(1);
+  $fixnum.Int64 get bytes => $_getI64(1);
   @$pb.TagNumber(2)
-  set progress($core.double v) { $_setDouble(1, v); }
+  set bytes($fixnum.Int64 v) { $_setInt64(1, v); }
   @$pb.TagNumber(2)
-  $core.bool hasProgress() => $_has(1);
+  $core.bool hasBytes() => $_has(1);
   @$pb.TagNumber(2)
-  void clearProgress() => clearField(2);
+  void clearBytes() => clearField(2);
+
+  @$pb.TagNumber(3)
+  $fixnum.Int64 get downloaded => $_getI64(2);
+  @$pb.TagNumber(3)
+  set downloaded($fixnum.Int64 v) { $_setInt64(2, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasDownloaded() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearDownloaded() => clearField(3);
 }
 
 class DownloadSearchRequest extends $pb.GeneratedMessage {

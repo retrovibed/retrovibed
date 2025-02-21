@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/Masterminds/squirrel"
 	"github.com/go-playground/form/v4"
 	"github.com/gorilla/mux"
 	"github.com/james-lawrence/deeppool/internal/env"
@@ -47,16 +48,66 @@ func (t *HTTPDiscovered) Bind(r *mux.Router) {
 	r.StrictSlash(false)
 	r.Use(httpx.RouteInvoked)
 
-	r.Path("/discovered").Methods(http.MethodGet).Handler(alice.New(
+	r.Path("/available").Methods(http.MethodGet).Handler(alice.New(
 		httpx.ContextBufferPool512(),
 		httpx.ParseForm,
 		// httpauth.AuthenticateWithToken(t.jwtsecret),
 		// AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
 		httpx.Timeout2s(),
-	).ThenFunc(t.update))
+	).ThenFunc(t.search))
+
+	r.Path("/downloading").Methods(http.MethodGet).Handler(alice.New(
+		httpx.ContextBufferPool512(),
+		httpx.ParseForm,
+		// httpauth.AuthenticateWithToken(t.jwtsecret),
+		// AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
+		httpx.Timeout2s(),
+	).ThenFunc(t.downloading))
 }
 
-func (t *HTTPDiscovered) update(w http.ResponseWriter, r *http.Request) {
+func (t *HTTPDiscovered) downloading(w http.ResponseWriter, r *http.Request) {
+	var (
+		err error
+		msg DownloadSearchResponse = DownloadSearchResponse{
+			Next: &DownloadSearchRequest{
+				Limit: 100,
+			},
+		}
+	)
+
+	if err = t.decoder.Decode(msg.Next, r.Form); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to decode request"))
+		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		return
+	}
+	msg.Next.Limit = numericx.Min(msg.Next.Limit, 100)
+
+	q := tracking.MetadataSearchBuilder().Where(
+		squirrel.And{
+			tracking.MetadataQueryInitiated(),
+			tracking.MetadataQueryIncomplete(),
+		},
+	).OrderBy("created_at DESC").Offset(msg.Next.Offset * msg.Next.Limit).Limit(msg.Next.Limit)
+
+	err = sqlxx.ScanEach(tracking.MetadataSearch(r.Context(), t.q, q), func(p *tracking.Metadata) error {
+		tmp := langx.Clone(Download{}, DownloadOptionFromTorrentMetadata(langx.Clone(*p, tracking.MetadataOptionJSONSafeEncode)))
+		msg.Items = append(msg.Items, &tmp)
+		return nil
+	})
+
+	if err != nil {
+		log.Println(errorsx.Wrap(err, "encoding failed"))
+		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	if err = httpx.WriteJSON(w, httpx.GetBuffer(r), &msg); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to write response"))
+		return
+	}
+}
+
+func (t *HTTPDiscovered) search(w http.ResponseWriter, r *http.Request) {
 	var (
 		err error
 		msg MediaSearchResponse = MediaSearchResponse{

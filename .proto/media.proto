@@ -3,9 +3,10 @@ syntax = "proto3";
 package media;
 
 message Media {
-  string description = 1 [ json_name = "description" ];
-  string mimetype = 2 [ json_name = "mimetype" ];
-  string image = 3 [ json_name = "image" ];
+  string id = 1 [ json_name = "id" ];
+  string description = 2 [ json_name = "description" ];
+  string mimetype = 3 [ json_name = "mimetype" ];
+  string image = 4 [ json_name = "image" ];
 }
 
 message MediaSearchRequest {
@@ -23,7 +24,8 @@ message MediaSearchResponse {
 
 message Download {
   Media media = 1 [ json_name = "media" ];
-  double progress = 2 [ json_name = "progress" ];
+  uint64 bytes = 2 [ json_name = "bytes" ];
+  uint64 downloaded = 3 [ json_name = "downloaded" ];
 }
 
 message DownloadSearchRequest {

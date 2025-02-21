@@ -192,7 +192,7 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		),
 	).Methods(http.MethodGet)
 
-	media.NewHTTPDiscovered(db).Bind(httpmux.PathPrefix("/m").Subrouter())
+	media.NewHTTPDiscovered(db).Bind(httpmux.PathPrefix("/d").Subrouter())
 
 	if httpbind, err = net.Listen("tcp", ":9998"); err != nil {
 		return err

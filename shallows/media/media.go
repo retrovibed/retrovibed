@@ -8,6 +8,7 @@ type MediaOption func(*Media)
 
 func MediaOptionFromTorrentMetadata(cc tracking.Metadata) MediaOption {
 	return func(c *Media) {
+		c.Id = cc.ID
 		c.Description = cc.Description
 		c.Mimetype = "applications/x-bittorrent"
 		// c.CreatedAt = grpcx.EncodeTime(cc.CreatedAt)

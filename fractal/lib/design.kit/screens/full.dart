@@ -7,9 +7,11 @@ class Full extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context);
-    return SizedBox(
-      width: media.size.width,
-      height: media.size.height,
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        maxWidth: media.size.width,
+        maxHeight: media.size.height,
+      ),
       child: child,
     );
   }

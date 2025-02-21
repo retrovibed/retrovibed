@@ -17,16 +17,17 @@ import 'dart:typed_data' as $typed_data;
 const Media$json = {
   '1': 'Media',
   '2': [
-    {'1': 'description', '3': 1, '4': 1, '5': 9, '10': 'description'},
-    {'1': 'mimetype', '3': 2, '4': 1, '5': 9, '10': 'mimetype'},
-    {'1': 'image', '3': 3, '4': 1, '5': 9, '10': 'image'},
+    {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
+    {'1': 'description', '3': 2, '4': 1, '5': 9, '10': 'description'},
+    {'1': 'mimetype', '3': 3, '4': 1, '5': 9, '10': 'mimetype'},
+    {'1': 'image', '3': 4, '4': 1, '5': 9, '10': 'image'},
   ],
 };
 
 /// Descriptor for `Media`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List mediaDescriptor = $convert.base64Decode(
-    'CgVNZWRpYRIgCgtkZXNjcmlwdGlvbhgBIAEoCVILZGVzY3JpcHRpb24SGgoIbWltZXR5cGUYAi'
-    'ABKAlSCG1pbWV0eXBlEhQKBWltYWdlGAMgASgJUgVpbWFnZQ==');
+    'CgVNZWRpYRIOCgJpZBgBIAEoCVICaWQSIAoLZGVzY3JpcHRpb24YAiABKAlSC2Rlc2NyaXB0aW'
+    '9uEhoKCG1pbWV0eXBlGAMgASgJUghtaW1ldHlwZRIUCgVpbWFnZRgEIAEoCVIFaW1hZ2U=');
 
 @$core.Deprecated('Use mediaSearchRequestDescriptor instead')
 const MediaSearchRequest$json = {
@@ -66,14 +67,15 @@ const Download$json = {
   '1': 'Download',
   '2': [
     {'1': 'media', '3': 1, '4': 1, '5': 11, '6': '.media.Media', '10': 'media'},
-    {'1': 'progress', '3': 2, '4': 1, '5': 1, '10': 'progress'},
+    {'1': 'bytes', '3': 2, '4': 1, '5': 4, '10': 'bytes'},
+    {'1': 'downloaded', '3': 3, '4': 1, '5': 4, '10': 'downloaded'},
   ],
 };
 
 /// Descriptor for `Download`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List downloadDescriptor = $convert.base64Decode(
-    'CghEb3dubG9hZBIiCgVtZWRpYRgBIAEoCzIMLm1lZGlhLk1lZGlhUgVtZWRpYRIaCghwcm9ncm'
-    'VzcxgCIAEoAVIIcHJvZ3Jlc3M=');
+    'CghEb3dubG9hZBIiCgVtZWRpYRgBIAEoCzIMLm1lZGlhLk1lZGlhUgVtZWRpYRIUCgVieXRlcx'
+    'gCIAEoBFIFYnl0ZXMSHgoKZG93bmxvYWRlZBgDIAEoBFIKZG93bmxvYWRlZA==');
 
 @$core.Deprecated('Use downloadSearchRequestDescriptor instead')
 const DownloadSearchRequest$json = {

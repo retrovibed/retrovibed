@@ -1,1 +1,1 @@
-export 'downloads/list.dart';
+export 'package:fractal/downloads/display.dart';
