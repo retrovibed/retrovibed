@@ -462,6 +462,90 @@ class DownloadSearchResponse extends $pb.GeneratedMessage {
   $core.List<Download> get items => $_getList(1);
 }
 
+class DownloadBeginRequest extends $pb.GeneratedMessage {
+  factory DownloadBeginRequest() => create();
+  DownloadBeginRequest._() : super();
+  factory DownloadBeginRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory DownloadBeginRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DownloadBeginRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'media'), createEmptyInstance: create)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  DownloadBeginRequest clone() => DownloadBeginRequest()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  DownloadBeginRequest copyWith(void Function(DownloadBeginRequest) updates) => super.copyWith((message) => updates(message as DownloadBeginRequest)) as DownloadBeginRequest;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static DownloadBeginRequest create() => DownloadBeginRequest._();
+  DownloadBeginRequest createEmptyInstance() => create();
+  static $pb.PbList<DownloadBeginRequest> createRepeated() => $pb.PbList<DownloadBeginRequest>();
+  @$core.pragma('dart2js:noInline')
+  static DownloadBeginRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DownloadBeginRequest>(create);
+  static DownloadBeginRequest? _defaultInstance;
+}
+
+class DownloadBeginResponse extends $pb.GeneratedMessage {
+  factory DownloadBeginResponse({
+    Download? download,
+  }) {
+    final $result = create();
+    if (download != null) {
+      $result.download = download;
+    }
+    return $result;
+  }
+  DownloadBeginResponse._() : super();
+  factory DownloadBeginResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory DownloadBeginResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DownloadBeginResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'media'), createEmptyInstance: create)
+    ..aOM<Download>(1, _omitFieldNames ? '' : 'download', subBuilder: Download.create)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  DownloadBeginResponse clone() => DownloadBeginResponse()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  DownloadBeginResponse copyWith(void Function(DownloadBeginResponse) updates) => super.copyWith((message) => updates(message as DownloadBeginResponse)) as DownloadBeginResponse;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static DownloadBeginResponse create() => DownloadBeginResponse._();
+  DownloadBeginResponse createEmptyInstance() => create();
+  static $pb.PbList<DownloadBeginResponse> createRepeated() => $pb.PbList<DownloadBeginResponse>();
+  @$core.pragma('dart2js:noInline')
+  static DownloadBeginResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DownloadBeginResponse>(create);
+  static DownloadBeginResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  Download get download => $_getN(0);
+  @$pb.TagNumber(1)
+  set download(Download v) { setField(1, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasDownload() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearDownload() => clearField(1);
+  @$pb.TagNumber(1)
+  Download ensureDownload() => $_ensure(0);
+}
+
 
 const _omitFieldNames = $core.bool.fromEnvironment('protobuf.omit_field_names');
 const _omitMessageNames = $core.bool.fromEnvironment('protobuf.omit_message_names');

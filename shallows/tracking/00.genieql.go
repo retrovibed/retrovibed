@@ -49,6 +49,20 @@ func MetadataFindByID(
 	gql = gql.Query(`SELECT ` + MetadataScannerStaticColumns + ` FROM torrents_metadata WHERE "id" = {id}`)
 }
 
+func MetadataPausedByID(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewMetadataScannerStaticRow,
+) {
+	gql = gql.Query(`UPDATE torrents_metadata SET paused_at = NOW() WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
+}
+
+func MetadataDownloadByID(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewMetadataScannerStaticRow,
+) {
+	gql = gql.Query(`UPDATE torrents_metadata SET paused_at = 'infinity', initiated_at = NOW() WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
+}
+
 //easyjson:json
 func Peer(gql genieql.Structure) {
 	gql.From(

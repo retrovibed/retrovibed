@@ -40,3 +40,8 @@ message DownloadSearchResponse {
   DownloadSearchRequest next = 1 [ json_name = "next" ];
   repeated Download items = 2 [ json_name = "items" ];
 }
+
+message DownloadBeginRequest {}
+message DownloadBeginResponse {
+  Download download = 1 [ json_name = "download" ];
+}

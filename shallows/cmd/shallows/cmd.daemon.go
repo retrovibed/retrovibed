@@ -192,7 +192,7 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		),
 	).Methods(http.MethodGet)
 
-	media.NewHTTPDiscovered(db).Bind(httpmux.PathPrefix("/d").Subrouter())
+	media.NewHTTPDiscovered(db, tclient, storage.NewFile(torrentdir)).Bind(httpmux.PathPrefix("/d").Subrouter())
 
 	if httpbind, err = net.Listen("tcp", ":9998"); err != nil {
 		return err
@@ -210,7 +210,8 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 
 	_ = httpmux.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
 		if uri, err := route.URLPath(); err == nil {
-			log.Println("Route", uri.String())
+
+			log.Println("Route", errorsx.Zero(route.GetPathTemplate()), errorsx.Zero(route.GetMethods()), uri.String())
 		}
 
 		return nil

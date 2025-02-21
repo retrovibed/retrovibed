@@ -111,3 +111,25 @@ final $typed_data.Uint8List downloadSearchResponseDescriptor = $convert.base64De
     'NlYXJjaFJlcXVlc3RSBG5leHQSJQoFaXRlbXMYAiADKAsyDy5tZWRpYS5Eb3dubG9hZFIFaXRl'
     'bXM=');
 
+@$core.Deprecated('Use downloadBeginRequestDescriptor instead')
+const DownloadBeginRequest$json = {
+  '1': 'DownloadBeginRequest',
+};
+
+/// Descriptor for `DownloadBeginRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List downloadBeginRequestDescriptor = $convert.base64Decode(
+    'ChREb3dubG9hZEJlZ2luUmVxdWVzdA==');
+
+@$core.Deprecated('Use downloadBeginResponseDescriptor instead')
+const DownloadBeginResponse$json = {
+  '1': 'DownloadBeginResponse',
+  '2': [
+    {'1': 'download', '3': 1, '4': 1, '5': 11, '6': '.media.Download', '10': 'download'},
+  ],
+};
+
+/// Descriptor for `DownloadBeginResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List downloadBeginResponseDescriptor = $convert.base64Decode(
+    'ChVEb3dubG9hZEJlZ2luUmVzcG9uc2USKwoIZG93bmxvYWQYASABKAsyDy5tZWRpYS5Eb3dubG'
+    '9hZFIIZG93bmxvYWQ=');
+

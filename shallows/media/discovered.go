@@ -17,6 +17,9 @@ import (
 	"github.com/james-lawrence/deeppool/internal/x/sqlx"
 	"github.com/james-lawrence/deeppool/internal/x/sqlxx"
 	"github.com/james-lawrence/deeppool/tracking"
+	"github.com/james-lawrence/torrent"
+	"github.com/james-lawrence/torrent/metainfo"
+	"github.com/james-lawrence/torrent/storage"
 	"github.com/justinas/alice"
 )
 
@@ -28,9 +31,16 @@ func HTTPDiscoveredOptionJWTSecret(j jwtx.JWTSecretSource) HTTPDiscoveredOption 
 	}
 }
 
-func NewHTTPDiscovered(q sqlx.Queryer, options ...HTTPDiscoveredOption) *HTTPDiscovered {
+type download interface {
+	Start(t torrent.Metadata) (dl torrent.Torrent, added bool, err error)
+	Stop(t torrent.Metadata) (err error)
+}
+
+func NewHTTPDiscovered(q sqlx.Queryer, d download, c storage.ClientImpl, options ...HTTPDiscoveredOption) *HTTPDiscovered {
 	svc := langx.Clone(HTTPDiscovered{
 		q:         q,
+		d:         d,
+		c:         c,
 		jwtsecret: env.JWTSecret,
 		decoder:   formx.NewDecoder(),
 	}, options...)
@@ -40,6 +50,8 @@ func NewHTTPDiscovered(q sqlx.Queryer, options ...HTTPDiscoveredOption) *HTTPDis
 
 type HTTPDiscovered struct {
 	q         sqlx.Queryer
+	d         download
+	c         storage.ClientImpl
 	jwtsecret jwtx.JWTSecretSource
 	decoder   *form.Decoder
 }
@@ -63,6 +75,116 @@ func (t *HTTPDiscovered) Bind(r *mux.Router) {
 		// AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
 		httpx.Timeout2s(),
 	).ThenFunc(t.downloading))
+
+	r.Path("/{id}").Methods(http.MethodPost).Handler(alice.New(
+		httpx.ContextBufferPool512(),
+		httpx.ParseForm,
+		// httpauth.AuthenticateWithToken(t.jwtsecret),
+		// AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
+		httpx.Timeout2s(),
+	).ThenFunc(t.download))
+
+	r.Path("/{id}").Methods(http.MethodDelete).Handler(alice.New(
+		httpx.ContextBufferPool512(),
+		httpx.ParseForm,
+		// httpauth.AuthenticateWithToken(t.jwtsecret),
+		// AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
+		httpx.Timeout2s(),
+	).ThenFunc(t.pause))
+}
+
+func (t *HTTPDiscovered) pause(w http.ResponseWriter, r *http.Request) {
+	var (
+		md tracking.Metadata
+		id = mux.Vars(r)["id"]
+	)
+
+	if err := tracking.MetadataFindByID(r.Context(), t.q, id).Scan(&md); sqlx.ErrNoRows(err) != nil {
+		log.Println(errorsx.Wrap(err, "unable to find metadata"))
+		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusNotFound))
+		return
+	} else if err != nil {
+		log.Println(errorsx.Wrap(err, "unable to find metadata"))
+		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	metadata, err := torrent.New(metainfo.Hash(md.Infohash), torrent.OptionStorage(t.c))
+	if err != nil {
+		log.Println(errorsx.Wrapf(err, "unable to create metadata from metadata %s", md.ID))
+		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	if err = t.d.Stop(metadata); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to stop download"))
+		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	if err = tracking.MetadataPausedByID(r.Context(), t.q, id).Scan(&md); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to pause metadata"))
+		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &DownloadBeginResponse{
+		Download: langx.Autoptr(
+			langx.Clone(
+				Download{},
+				DownloadOptionFromTorrentMetadata(langx.Clone(md, tracking.MetadataOptionJSONSafeEncode))),
+		),
+	}); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to write response"))
+		return
+	}
+}
+
+func (t *HTTPDiscovered) download(w http.ResponseWriter, r *http.Request) {
+	var (
+		md tracking.Metadata
+		id = mux.Vars(r)["id"]
+	)
+
+	if err := tracking.MetadataFindByID(r.Context(), t.q, id).Scan(&md); sqlx.ErrNoRows(err) != nil {
+		log.Println(errorsx.Wrap(err, "unable to find metadata"))
+		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusNotFound))
+		return
+	} else if err != nil {
+		log.Println(errorsx.Wrap(err, "unable to find metadata"))
+		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	metadata, err := torrent.New(metainfo.Hash(md.Infohash), torrent.OptionStorage(t.c))
+	if err != nil {
+		log.Println(errorsx.Wrapf(err, "unable to create metadata from metadata %s", md.ID))
+		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	if _, _, err := t.d.Start(metadata); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to start download"))
+		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	if err := tracking.MetadataDownloadByID(r.Context(), t.q, id).Scan(&md); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to track download"))
+		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &DownloadBeginResponse{
+		Download: langx.Autoptr(
+			langx.Clone(
+				Download{},
+				DownloadOptionFromTorrentMetadata(langx.Clone(md, tracking.MetadataOptionJSONSafeEncode))),
+		),
+	}); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to write response"))
+		return
+	}
 }
 
 func (t *HTTPDiscovered) downloading(w http.ResponseWriter, r *http.Request) {

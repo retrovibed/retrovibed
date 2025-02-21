@@ -6,6 +6,7 @@ CREATE TABLE torrents_metadata (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     hidden_at TIMESTAMPTZ NOT NULL DEFAULT 'infinity',
     initiated_at TIMESTAMPTZ NOT NULL DEFAULT 'infinity',
+    paused_at TIMESTAMPTZ NOT NULL DEFAULT 'infinity',
     bytes UBIGINT NOT NULL,
     downloaded UBIGINT NOT NULL,
     description STRING NOT NULL DEFAULT '',
