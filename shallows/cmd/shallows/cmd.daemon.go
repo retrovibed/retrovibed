@@ -101,6 +101,7 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		return errorsx.Wrap(err, "unable to add the download directory to be watched")
 	}
 
+	tstore := storage.NewFile(torrentdir)
 	{
 		current, _ := slicesx.First(tclient.DhtServers()...)
 		if peers, err := current.AddNodesFromFile(torrentpeers); err == nil {
@@ -133,7 +134,7 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		log.Println("auto retrieval of torrent info initiated")
 		defer log.Println("auto retrieval of torrent info completed")
 
-		if err := daemons.DiscoverDHTMetadata(ctx.Context, db, dht, tclient, storage.NewFile(torrentdir)); err != nil {
+		if err := daemons.DiscoverDHTMetadata(ctx.Context, db, dht, tclient, tstore); err != nil {
 			log.Println("resolving info hashes has failed", err)
 			panic(err)
 		}
@@ -172,6 +173,8 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 			log.Println("autodiscovery of RSS feeds failed", err)
 		}
 	}()
+
+	go daemons.ResumeDownloads(ctx.Context, db, tclient, tstore)
 
 	httpmux := mux.NewRouter()
 	httpmux.NotFoundHandler = httpx.NotFound(alice.New())

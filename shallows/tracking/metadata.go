@@ -2,12 +2,15 @@ package tracking
 
 import (
 	"context"
+	"log"
+	"time"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/james-lawrence/deeppool/internal/x/langx"
 	"github.com/james-lawrence/deeppool/internal/x/sqlx"
 	"github.com/james-lawrence/deeppool/internal/x/squirrelx"
 	"github.com/james-lawrence/deeppool/internal/x/timex"
+	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/metainfo"
 )
 
@@ -53,4 +56,19 @@ func MetadataSearch(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilde
 
 func MetadataSearchBuilder() squirrel.SelectBuilder {
 	return squirrelx.PSQL.Select(sqlx.Columns(MetadataScannerStaticColumns)...).From("torrents_metadata")
+}
+
+func DownloadProgress(ctx context.Context, q sqlx.Queryer, md Metadata, dl torrent.Torrent) {
+	for range time.Tick(time.Second) {
+		current := uint64(dl.BytesCompleted())
+		if md.Downloaded == current {
+			continue
+		}
+
+		if err := MetadataProgressByID(ctx, q, md.ID, current).Scan(&md); err != nil {
+			log.Println("failed to update progress", err)
+		} else {
+			log.Println(md.ID, "updated", md.Downloaded/md.Bytes, md.Downloaded, "/", md.Bytes)
+		}
+	}
 }
