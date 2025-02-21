@@ -1,11 +1,12 @@
 package main
 
 import (
-	"encoding/binary"
+	"context"
+	"fmt"
 	"log"
 	"math"
-	"math/rand/v2"
-	"time"
+
+	"github.com/hashicorp/mdns"
 )
 
 func StorageProfit(users int, factor float64) float64 {
@@ -17,26 +18,24 @@ func Derp(users int, factor float64) {
 	log.Println(users, ":", costper, costper*float64(1000))
 }
 
-func TimestampTransactionID() string {
-	var b [binary.MaxVarintLen64]byte
-	_ = binary.PutUvarint(b[:], rand.Uint64())
-	v2 := b[:2]
-	n := binary.PutVarint(b[:], time.Now().UnixNano())
-	b[2] = v2[0]
-	b[3] = v2[1]
-	return string(b[:n])
-}
-
 func main() {
-	const factor = 0.98
-	log.Println("DERP DERP DERP", []byte(TimestampTransactionID()))
-	for i := 1; i < 100; i++ {
-		Derp(i, factor)
+	ctx, done := context.WithCancel(context.Background())
+	// Make a channel for results and start listening
+	entriesCh := make(chan *mdns.ServiceEntry, 4)
+	q := mdns.DefaultParams("_shallows._udp")
+	q.Entries = entriesCh
+
+	go func() {
+		defer close(entriesCh)
+		defer done()
+		// Start the lookup
+		if err := mdns.QueryContext(ctx, q); err != nil {
+			log.Fatalf("failed to look up service: %v", err)
+		}
+	}()
+
+	for entry := range entriesCh {
+		fmt.Printf("Got new entry: %v\n", entry)
 	}
 
-	Derp(999, factor)
-	Derp(1000, factor)
-	Derp(10000, factor)
-	Derp(100000, factor)
-	Derp(1000000, factor)
 }

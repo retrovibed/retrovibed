@@ -70,7 +70,7 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		}
 	}
 
-	tnetwork, err := torrentx.Autosocket(9999)
+	tnetwork, err := torrentx.Autosocket(0)
 	if err != nil {
 		return errorsx.Wrap(err, "unable to setup torrent socket")
 	}
@@ -197,7 +197,7 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 
 	media.NewHTTPDiscovered(db, tclient, storage.NewFile(torrentdir)).Bind(httpmux.PathPrefix("/d").Subrouter())
 
-	if httpbind, err = net.Listen("tcp", ":9998"); err != nil {
+	if httpbind, err = net.Listen("tcp", ":0"); err != nil {
 		return err
 	}
 
@@ -213,12 +213,15 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 
 	_ = httpmux.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
 		if uri, err := route.URLPath(); err == nil {
-
 			log.Println("Route", errorsx.Zero(route.GetPathTemplate()), errorsx.Zero(route.GetMethods()), uri.String())
 		}
 
 		return nil
 	})
+
+	if err := daemons.MulticastService(ctx.Context, httpbind); err != nil {
+		return errorsx.Wrap(err, "unable to setup multicast service")
+	}
 
 	log.Println("https listening on:", httpbind.Addr().String(), tlspem)
 	if cause := http.ServeTLS(httpbind, httpmux, tlspem, tlspem); cause != nil {

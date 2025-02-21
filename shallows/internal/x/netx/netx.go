@@ -3,6 +3,7 @@ package netx
 import (
 	"log"
 	"net"
+	"net/netip"
 	"strconv"
 )
 
@@ -54,4 +55,20 @@ func IP(s string) net.IP {
 	}
 
 	return HostIP(host)
+}
+
+func AddrPort(a net.Addr) *netip.AddrPort {
+	switch v := a.(type) {
+	case *net.TCPAddr:
+		ip, _ := netip.AddrFromSlice(v.IP)
+		tmp := netip.AddrPortFrom(ip, uint16(v.Port))
+		return &tmp
+	case *net.UDPAddr:
+		ip, _ := netip.AddrFromSlice(v.IP)
+		tmp := netip.AddrPortFrom(ip, uint16(v.Port))
+		return &tmp
+	default:
+		log.Printf("unknown address type: %T\n", a)
+		return nil
+	}
 }

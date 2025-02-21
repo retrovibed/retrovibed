@@ -1,17 +1,18 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fractal/downloads.dart' as downloads;
 // import 'package:fractal/discovery.dart' as discovery;
 import 'package:fractal/settings.dart' as settings;
 import 'package:fractal/designkit.dart' as ds;
 import 'package:fractal/design.kit/theme.defaults.dart' as theming;
-import 'dart:io';
+import 'package:fractal/mdns.dart' as mdns;
 
 class MyHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
     return super.createHttpClient(context)
       ..badCertificateCallback = (X509Certificate cert, String host, int port) {
-        return host == "localhost";
+        return host == "localhost" || host == Platform.localHostname;
       };
   }
 }
@@ -45,13 +46,15 @@ class MyApp extends StatelessWidget {
                 Tab(icon: Icon(Icons.settings)),
               ],
             ),
-            body: TabBarView(
-              children: [
-                // discovery.Display(),
-                ds.ErrorBoundary(Icon(Icons.movie)),
-                ds.ErrorBoundary(downloads.Display()),
-                ds.ErrorBoundary(settings.Display()),
-              ],
+            body: mdns.MDNSDiscovery(
+              TabBarView(
+                children: [
+                  // discovery.Display(),
+                  ds.ErrorBoundary(Icon(Icons.movie)),
+                  ds.ErrorBoundary(downloads.Display()),
+                  ds.ErrorBoundary(settings.Display()),
+                ],
+              ),
             ),
           ),
         ),
