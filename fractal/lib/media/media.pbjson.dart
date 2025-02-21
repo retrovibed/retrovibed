@@ -69,13 +69,17 @@ const Download$json = {
     {'1': 'media', '3': 1, '4': 1, '5': 11, '6': '.media.Media', '10': 'media'},
     {'1': 'bytes', '3': 2, '4': 1, '5': 4, '10': 'bytes'},
     {'1': 'downloaded', '3': 3, '4': 1, '5': 4, '10': 'downloaded'},
+    {'1': 'initiated_at', '3': 4, '4': 1, '5': 9, '10': 'initiated_at'},
+    {'1': 'paused_at', '3': 5, '4': 1, '5': 9, '10': 'paused_at'},
   ],
 };
 
 /// Descriptor for `Download`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List downloadDescriptor = $convert.base64Decode(
     'CghEb3dubG9hZBIiCgVtZWRpYRgBIAEoCzIMLm1lZGlhLk1lZGlhUgVtZWRpYRIUCgVieXRlcx'
-    'gCIAEoBFIFYnl0ZXMSHgoKZG93bmxvYWRlZBgDIAEoBFIKZG93bmxvYWRlZA==');
+    'gCIAEoBFIFYnl0ZXMSHgoKZG93bmxvYWRlZBgDIAEoBFIKZG93bmxvYWRlZBIiCgxpbml0aWF0'
+    'ZWRfYXQYBCABKAlSDGluaXRpYXRlZF9hdBIcCglwYXVzZWRfYXQYBSABKAlSCXBhdXNlZF9hdA'
+    '==');
 
 @$core.Deprecated('Use downloadSearchRequestDescriptor instead')
 const DownloadSearchRequest$json = {
@@ -131,5 +135,27 @@ const DownloadBeginResponse$json = {
 /// Descriptor for `DownloadBeginResponse`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List downloadBeginResponseDescriptor = $convert.base64Decode(
     'ChVEb3dubG9hZEJlZ2luUmVzcG9uc2USKwoIZG93bmxvYWQYASABKAsyDy5tZWRpYS5Eb3dubG'
+    '9hZFIIZG93bmxvYWQ=');
+
+@$core.Deprecated('Use downloadPauseRequestDescriptor instead')
+const DownloadPauseRequest$json = {
+  '1': 'DownloadPauseRequest',
+};
+
+/// Descriptor for `DownloadPauseRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List downloadPauseRequestDescriptor = $convert.base64Decode(
+    'ChREb3dubG9hZFBhdXNlUmVxdWVzdA==');
+
+@$core.Deprecated('Use downloadPauseResponseDescriptor instead')
+const DownloadPauseResponse$json = {
+  '1': 'DownloadPauseResponse',
+  '2': [
+    {'1': 'download', '3': 1, '4': 1, '5': 11, '6': '.media.Download', '10': 'download'},
+  ],
+};
+
+/// Descriptor for `DownloadPauseResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List downloadPauseResponseDescriptor = $convert.base64Decode(
+    'ChVEb3dubG9hZFBhdXNlUmVzcG9uc2USKwoIZG93bmxvYWQYASABKAsyDy5tZWRpYS5Eb3dubG'
     '9hZFIIZG93bmxvYWQ=');
 

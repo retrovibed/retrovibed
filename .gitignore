@@ -1,5 +1,5 @@
 .genieql
 .eg.cache
 .eg.runtime
-dpool.*
+*.log
 .torrent.bolt.db

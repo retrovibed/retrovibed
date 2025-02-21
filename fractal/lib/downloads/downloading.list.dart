@@ -17,7 +17,20 @@ class DownloadingListDisplay extends StatelessWidget {
           .then(
             (v) =>
                 v.items
-                    .map((v) => media.DownloadRowDisplay(current: v) as Widget)
+                    .map(
+                      (v) =>
+                          media.DownloadRowDisplay(
+                                current: v,
+                                trailing:
+                                    (ctx) => media.DownloadRowControls(
+                                      current: v,
+                                      onChange: (d) {
+                                        ds.RefreshBoundary.of(ctx)?.reset();
+                                      },
+                                    ),
+                              )
+                              as Widget,
+                    )
                     .toList(),
           )
           .catchError(

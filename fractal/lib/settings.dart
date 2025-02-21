@@ -8,7 +8,7 @@ class Display extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final defaults = ds.theme(context);
+    final defaults = ds.Defaults.of(context);
 
     return ListView(
       children: [

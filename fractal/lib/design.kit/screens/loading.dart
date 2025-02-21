@@ -28,6 +28,5 @@ class Loading extends StatelessWidget {
     }
 
     return s.Overlay(child: child ?? const SizedBox(), overlay: cause);
-    // return child ?? const SizedBox();
   }
 }

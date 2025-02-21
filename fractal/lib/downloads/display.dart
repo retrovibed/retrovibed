@@ -6,14 +6,17 @@ import 'available.list.dart';
 class Display extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final defaults = ds.theme(context);
+    final defaults = ds.Defaults.of(context);
+
     return Container(
       padding: defaults.padding,
-      child: Column(
-        children: [
-          DownloadingListDisplay(),
-          Expanded(child: AvailableListDisplay()),
-        ],
+      child: ds.RefreshBoundary(
+        Column(
+          children: [
+            ds.PeriodicBoundary(ds.RefreshBoundary(DownloadingListDisplay())),
+            Expanded(child: AvailableListDisplay()),
+          ],
+        ),
       ),
     );
   }

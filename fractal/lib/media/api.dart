@@ -68,4 +68,28 @@ abstract class discovered {
           );
         });
   }
+
+  static Future<DownloadBeginResponse> download(String id) async {
+    final client = http.Client();
+    return client
+        .post(Uri.https(httpx.host(), "/d/${id}", null), body: jsonEncode({}))
+        .then((v) {
+          return Future.value(
+            DownloadBeginResponse.create()
+              ..mergeFromProto3Json(jsonDecode(v.body)),
+          );
+        });
+  }
+
+  static Future<DownloadPauseResponse> pause(String id) async {
+    final client = http.Client();
+    return client
+        .delete(Uri.https(httpx.host(), "/d/${id}", null), body: jsonEncode({}))
+        .then((v) {
+          return Future.value(
+            DownloadPauseResponse.create()
+              ..mergeFromProto3Json(jsonDecode(v.body)),
+          );
+        });
+  }
 }

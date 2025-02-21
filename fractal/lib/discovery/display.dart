@@ -48,7 +48,7 @@ class Display extends StatelessWidget {
       initialData: <Widget>[],
       future: data(),
       builder: (BuildContext ctx, AsyncSnapshot<List<Widget>> snapshot) {
-        final defaults = ds.theme(ctx);
+        final defaults = ds.Defaults.of(context);
 
         if (snapshot.hasError) {
           print(snapshot.error);

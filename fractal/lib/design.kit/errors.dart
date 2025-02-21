@@ -1,7 +1,7 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import './screens.dart' as screens;
+import "./theme.defaults.dart" as theming;
 
 final ECONNREFUSED = 111;
 
@@ -21,8 +21,8 @@ class ErrorBoundary extends StatefulWidget {
     this.alignment = Alignment.center,
   });
 
-  static of(BuildContext context) {
-    return context.findRootAncestorStateOfType<_ErrorBoundaryState>();
+  static _ErrorBoundaryState? of(BuildContext context) {
+    return context.findAncestorStateOfType<_ErrorBoundaryState>();
   }
 
   @override
@@ -106,6 +106,10 @@ class Error extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(child: Center(child: child));
+    final defaults = theming.Defaults.of(context);
+    return Container(
+      decoration: BoxDecoration(color: defaults.danger),
+      child: Center(child: child),
+    );
   }
 }

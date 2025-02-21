@@ -20,7 +20,22 @@ class AvailableListDisplay extends StatelessWidget {
                     .map(
                       (v) => media.RowDisplay(
                         media: v,
-                        onTap: () => print("download not yet implemented"),
+                        onTap:
+                            () => media.discovered
+                                .download(v.id)
+                                .then((v) {
+                                  ds.RefreshBoundary.of(context)?.reset();
+                                })
+                                .catchError((cause) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        "Failed to download: $cause",
+                                      ),
+                                    ),
+                                  );
+                                  return null;
+                                }),
                       ),
                     )
                     .toList(),

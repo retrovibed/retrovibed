@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fractal/designkit.dart' as designkit;
+import 'package:fractal/designkit.dart' as ds;
 
 class Login extends StatefulWidget {
   final Widget child;
@@ -13,11 +13,8 @@ class _AuthenticatedState extends State<Login> {
   bool authenticated = false;
   @override
   Widget build(BuildContext context) {
-    return designkit.Full(
-      child: designkit.Loading(
-        loading: authenticated,
-        child: widget.child,
-      ),
+    return ds.Full(
+      child: ds.Loading(loading: authenticated, child: widget.child),
     );
   }
 }

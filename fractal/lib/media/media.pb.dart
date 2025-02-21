@@ -249,6 +249,8 @@ class Download extends $pb.GeneratedMessage {
     Media? media,
     $fixnum.Int64? bytes,
     $fixnum.Int64? downloaded,
+    $core.String? initiatedAt,
+    $core.String? pausedAt,
   }) {
     final $result = create();
     if (media != null) {
@@ -260,6 +262,12 @@ class Download extends $pb.GeneratedMessage {
     if (downloaded != null) {
       $result.downloaded = downloaded;
     }
+    if (initiatedAt != null) {
+      $result.initiatedAt = initiatedAt;
+    }
+    if (pausedAt != null) {
+      $result.pausedAt = pausedAt;
+    }
     return $result;
   }
   Download._() : super();
@@ -270,6 +278,8 @@ class Download extends $pb.GeneratedMessage {
     ..aOM<Media>(1, _omitFieldNames ? '' : 'media', subBuilder: Media.create)
     ..a<$fixnum.Int64>(2, _omitFieldNames ? '' : 'bytes', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
     ..a<$fixnum.Int64>(3, _omitFieldNames ? '' : 'downloaded', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
+    ..aOS(4, _omitFieldNames ? '' : 'initiated_at')
+    ..aOS(5, _omitFieldNames ? '' : 'paused_at')
     ..hasRequiredFields = false
   ;
 
@@ -322,6 +332,24 @@ class Download extends $pb.GeneratedMessage {
   $core.bool hasDownloaded() => $_has(2);
   @$pb.TagNumber(3)
   void clearDownloaded() => clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.String get initiatedAt => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set initiatedAt($core.String v) { $_setString(3, v); }
+  @$pb.TagNumber(4)
+  $core.bool hasInitiatedAt() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearInitiatedAt() => clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.String get pausedAt => $_getSZ(4);
+  @$pb.TagNumber(5)
+  set pausedAt($core.String v) { $_setString(4, v); }
+  @$pb.TagNumber(5)
+  $core.bool hasPausedAt() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearPausedAt() => clearField(5);
 }
 
 class DownloadSearchRequest extends $pb.GeneratedMessage {
@@ -533,6 +561,90 @@ class DownloadBeginResponse extends $pb.GeneratedMessage {
   @$core.pragma('dart2js:noInline')
   static DownloadBeginResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DownloadBeginResponse>(create);
   static DownloadBeginResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  Download get download => $_getN(0);
+  @$pb.TagNumber(1)
+  set download(Download v) { setField(1, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasDownload() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearDownload() => clearField(1);
+  @$pb.TagNumber(1)
+  Download ensureDownload() => $_ensure(0);
+}
+
+class DownloadPauseRequest extends $pb.GeneratedMessage {
+  factory DownloadPauseRequest() => create();
+  DownloadPauseRequest._() : super();
+  factory DownloadPauseRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory DownloadPauseRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DownloadPauseRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'media'), createEmptyInstance: create)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  DownloadPauseRequest clone() => DownloadPauseRequest()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  DownloadPauseRequest copyWith(void Function(DownloadPauseRequest) updates) => super.copyWith((message) => updates(message as DownloadPauseRequest)) as DownloadPauseRequest;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static DownloadPauseRequest create() => DownloadPauseRequest._();
+  DownloadPauseRequest createEmptyInstance() => create();
+  static $pb.PbList<DownloadPauseRequest> createRepeated() => $pb.PbList<DownloadPauseRequest>();
+  @$core.pragma('dart2js:noInline')
+  static DownloadPauseRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DownloadPauseRequest>(create);
+  static DownloadPauseRequest? _defaultInstance;
+}
+
+class DownloadPauseResponse extends $pb.GeneratedMessage {
+  factory DownloadPauseResponse({
+    Download? download,
+  }) {
+    final $result = create();
+    if (download != null) {
+      $result.download = download;
+    }
+    return $result;
+  }
+  DownloadPauseResponse._() : super();
+  factory DownloadPauseResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory DownloadPauseResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DownloadPauseResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'media'), createEmptyInstance: create)
+    ..aOM<Download>(1, _omitFieldNames ? '' : 'download', subBuilder: Download.create)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  DownloadPauseResponse clone() => DownloadPauseResponse()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  DownloadPauseResponse copyWith(void Function(DownloadPauseResponse) updates) => super.copyWith((message) => updates(message as DownloadPauseResponse)) as DownloadPauseResponse;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static DownloadPauseResponse create() => DownloadPauseResponse._();
+  DownloadPauseResponse createEmptyInstance() => create();
+  static $pb.PbList<DownloadPauseResponse> createRepeated() => $pb.PbList<DownloadPauseResponse>();
+  @$core.pragma('dart2js:noInline')
+  static DownloadPauseResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DownloadPauseResponse>(create);
+  static DownloadPauseResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
   Download get download => $_getN(0);
