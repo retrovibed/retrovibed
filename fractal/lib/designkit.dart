@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'design.kit/theme.defaults.dart' as theming;
-export 'design.kit/screens/screens.dart';
+export 'design.kit/screens.dart';
 export 'design.kit/accordian.dart';
 export 'design.kit/errors.dart';
 

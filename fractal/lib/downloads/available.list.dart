@@ -13,25 +13,32 @@ class AvailableListDisplay extends StatelessWidget {
   Widget build(BuildContext context) {
     return FutureBuilder(
       initialData: <Widget>[],
-      future: search(media.mediasearch.request(limit: 32)).then(
-        (v) =>
-            v.items
-                .map(
-                  (v) => media.RowDisplay(
-                    media: v,
-                    onTap: () => print("download not yet implemented"),
-                  ),
-                )
-                .toList(),
-      ),
+      future: search(media.mediasearch.request(limit: 32))
+          .then(
+            (v) =>
+                v.items
+                    .map(
+                      (v) => media.RowDisplay(
+                        media: v,
+                        onTap: () => print("download not yet implemented"),
+                      ),
+                    )
+                    .toList(),
+          )
+          .catchError(
+            ds.Error.boundary(
+              context,
+              List<media.RowDisplay>.empty(),
+              ds.Error.offline,
+            ),
+            test: ds.ErrorTests.offline,
+          )
+          .catchError((e) => throw ds.Error.unknown(e)),
       builder: (BuildContext ctx, AsyncSnapshot<List<Widget>> snapshot) {
-        if (snapshot.hasError) {
-          return ds.Error.unknown(snapshot.error!);
-        }
-
         return ds.Loading(
           loading: snapshot.connectionState != ConnectionState.done,
-          child: ListView(children: snapshot.data!),
+          cause: ds.Error.maybeErr(snapshot.error),
+          child: ListView(shrinkWrap: true, children: snapshot.data ?? []),
         );
       },
     );

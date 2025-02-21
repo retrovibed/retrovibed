@@ -13,18 +13,27 @@ class DownloadingListDisplay extends StatelessWidget {
   Widget build(BuildContext context) {
     return FutureBuilder(
       initialData: <Widget>[],
-      future: search(media.discoveredsearch.request(limit: 3)).then(
-        (v) =>
-            v.items.map((v) => media.DownloadRowDisplay(current: v)).toList(),
-      ),
+      future: search(media.discoveredsearch.request(limit: 3))
+          .then(
+            (v) =>
+                v.items
+                    .map((v) => media.DownloadRowDisplay(current: v) as Widget)
+                    .toList(),
+          )
+          .catchError(
+            ds.Error.boundary(
+              context,
+              List<media.DownloadRowDisplay>.empty(),
+              ds.Error.offline,
+            ),
+            test: ds.ErrorTests.offline,
+          )
+          .catchError((e) => throw ds.Error.unknown(e)),
       builder: (BuildContext ctx, AsyncSnapshot<List<Widget>> snapshot) {
-        if (snapshot.hasError) {
-          return ds.Error.unknown(snapshot.error!);
-        }
-
         return ds.Loading(
           loading: snapshot.connectionState != ConnectionState.done,
-          child: ListView(shrinkWrap: true, children: snapshot.data!),
+          cause: ds.Error.maybeErr(snapshot.error),
+          child: ListView(shrinkWrap: true, children: snapshot.data ?? []),
         );
       },
     );

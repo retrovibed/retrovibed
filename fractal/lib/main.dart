@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fractal/downloads.dart' as downloads;
-import 'package:fractal/discovery.dart' as discovery;
+// import 'package:fractal/discovery.dart' as discovery;
 import 'package:fractal/settings.dart' as settings;
 import 'package:fractal/designkit.dart' as ds;
 import 'package:fractal/design.kit/theme.defaults.dart' as theming;
@@ -45,13 +45,15 @@ class MyApp extends StatelessWidget {
                 Tab(icon: Icon(Icons.settings)),
               ],
             ),
-            body: TabBarView(
-              children: [
-                // discovery.Display(),
-                Icon(Icons.movie),
-                downloads.Display(),
-                settings.Display(),
-              ],
+            body: ds.ErrorBoundary(
+              child: TabBarView(
+                children: [
+                  // discovery.Display(),
+                  Icon(Icons.movie),
+                  downloads.Display(),
+                  settings.Display(),
+                ],
+              ),
             ),
           ),
         ),

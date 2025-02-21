@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import './overlay.dart' as s;
 
 class Loading extends StatelessWidget {
   final Widget? child;
   final bool loading;
   final Widget overlay;
+  final Widget? cause;
 
   const Loading({
     super.key,
@@ -16,6 +18,7 @@ class Loading extends StatelessWidget {
       ),
     ),
     this.loading = false,
+    this.cause = null,
   });
 
   @override
@@ -24,6 +27,7 @@ class Loading extends StatelessWidget {
       return Container(child: overlay);
     }
 
-    return child ?? const SizedBox();
+    return s.Overlay(child: child ?? const SizedBox(), overlay: cause);
+    // return child ?? const SizedBox();
   }
 }

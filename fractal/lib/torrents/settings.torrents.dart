@@ -52,6 +52,18 @@ class _EditView extends State<SettingsLeech> {
                 // onChanged: (v) => widget.feed.description = v,
               ),
             ),
+            forms.Field(
+              label: Text("peers"),
+              input: TextFormField(
+                decoration: new InputDecoration(
+                  hintText: "128",
+                  helperText:
+                      "maximum number of peers allowed per torrent, default is 128",
+                ),
+                keyboardType: TextInputType.number,
+                // onChanged: (v) => widget.feed.description = v,
+              ),
+            ),
           ],
         ),
       ),
