@@ -1,8 +1,9 @@
+import 'package:fixnum/fixnum.dart' as fixnum;
 import 'package:flutter/material.dart';
 import 'package:fractal/designkit.dart' as ds;
 import 'package:fractal/media.dart' as media;
 
-class AvailableListDisplay extends StatelessWidget {
+class AvailableListDisplay extends StatefulWidget {
   final media.FnMediaSearch search;
   const AvailableListDisplay({
     super.key,
@@ -10,52 +11,121 @@ class AvailableListDisplay extends StatelessWidget {
   });
 
   @override
+  State<StatefulWidget> createState() => _AvailableListDisplay();
+}
+
+class _AvailableListDisplay extends State<AvailableListDisplay> {
+  bool _loading = true;
+  ds.Error? _cause = null;
+  media.MediaSearchResponse _res = media.mediasearch.response(
+    next: media.mediasearch.request(limit: 32),
+  );
+
+  void refresh() {
+    widget
+        .search(_res.next)
+        .then((v) {
+          setState(() {
+            _res = v;
+            _loading = false;
+          });
+        })
+        .catchError((e) {
+          setState(() {
+            _cause = ds.Error.unknown(e);
+            _loading = false;
+          });
+        });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    refresh();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      initialData: <Widget>[],
-      future: search(media.mediasearch.request(limit: 32))
-          .then(
-            (v) =>
-                v.items
-                    .map(
-                      (v) => media.RowDisplay(
-                        media: v,
-                        onTap:
-                            () => media.discovered
-                                .download(v.id)
-                                .then((v) {
-                                  ds.RefreshBoundary.of(context)?.reset();
-                                })
-                                .catchError((cause) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        "Failed to download: $cause",
-                                      ),
-                                    ),
-                                  );
-                                  return null;
-                                }),
-                      ),
-                    )
-                    .toList(),
-          )
-          .catchError(
-            ds.Error.boundary(
-              context,
-              List<media.RowDisplay>.empty(),
-              ds.Error.offline,
-            ),
-            test: ds.ErrorTests.offline,
-          )
-          .catchError((e) => throw ds.Error.unknown(e)),
-      builder: (BuildContext ctx, AsyncSnapshot<List<Widget>> snapshot) {
-        return ds.Loading(
-          loading: snapshot.connectionState != ConnectionState.done,
-          cause: ds.Error.maybeErr(snapshot.error),
-          child: ListView(shrinkWrap: true, children: snapshot.data ?? []),
-        );
-      },
+    return ds.Table(
+      loading: _loading,
+      cause: _cause,
+      leading: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Expanded(
+                child: TextField(
+                  decoration: InputDecoration(
+                    hintText: "search available content",
+                  ),
+                  onChanged:
+                      (v) => setState(() {
+                        _res.next.query = v;
+                      }),
+                  onSubmitted: (v) {
+                    setState(() {
+                      _res.next.offset = fixnum.Int64(0);
+                    });
+                    refresh();
+                  },
+                ),
+              ),
+              IconButton(
+                onPressed:
+                    _res.next.offset > 0
+                        ? () {
+                          setState(() {
+                            _res.next.offset -= 1;
+                          });
+                          refresh();
+                        }
+                        : null,
+                icon: Icon(Icons.arrow_left),
+              ),
+              IconButton(
+                onPressed:
+                    _res.items.isNotEmpty
+                        ? () {
+                          setState(() {
+                            _res.next.offset += 1;
+                          });
+                          refresh();
+                        }
+                        : null,
+                icon: Icon(Icons.arrow_right),
+              ),
+            ],
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [Spacer(), Text("description"), Spacer()],
+          ),
+        ],
+      ),
+      children:
+          _res.items
+              .map(
+                (v) => media.RowDisplay(
+                  media: v,
+                  onTap:
+                      () => media.discovered
+                          .download(v.id)
+                          .then((v) {
+                            refresh();
+                          })
+                          .catchError((cause) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Failed to download: $cause"),
+                              ),
+                            );
+                            return null;
+                          }),
+                ),
+              )
+              .toList(),
     );
   }
 }

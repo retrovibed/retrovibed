@@ -23,6 +23,8 @@ Future<MediaSearchResponse> recent() async {
 abstract class mediasearch {
   static MediaSearchRequest request({int limit = 0}) =>
       MediaSearchRequest(limit: fixnum.Int64(limit));
+  static MediaSearchResponse response({MediaSearchRequest? next}) =>
+      MediaSearchResponse(next: next ?? request(limit: 100), items: []);
 }
 
 abstract class discoveredsearch {
