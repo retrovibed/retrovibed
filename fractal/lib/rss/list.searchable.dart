@@ -15,81 +15,142 @@ class ListSearchable extends StatefulWidget {
 }
 
 class SearchableView extends State<ListSearchable> {
-  FeedSearchResponse current = FeedSearchResponse(
+  bool _loading = true;
+  ds.Error? _cause = null;
+  Widget? _leading = null;
+  Feed _created = Feed();
+  FeedSearchResponse _res = FeedSearchResponse(
     next: FeedSearchRequest(query: '', offset: Int64(0), limit: Int64(10)),
     items: [],
   );
-  Future<FeedSearchResponse> pending = Future.delayed(
-    Duration(hours: 999999),
-    () => FeedSearchResponse(
-      next: FeedSearchRequest(query: '', offset: Int64(0), limit: Int64(10)),
-      items: [],
-    ),
-  );
 
   Future<FeedSearchResponse> refresh() {
-    return widget.search(current.next).then((r) {
-      setState(() {
-        current = r;
-      });
-      return r;
-    });
+    return widget
+        .search(_res.next)
+        .then((r) {
+          setState(() {
+            _res = r;
+          });
+          return r;
+        })
+        .whenComplete(() {
+          setState(() {
+            _loading = false;
+          });
+        });
   }
 
   @override
   void initState() {
     super.initState();
-    pending = refresh();
+    refresh().catchError((e) {
+      setState(() {
+        _cause = ds.Error.unknown(e);
+      });
+      return _res;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final zerolist = FeedSearchResponse(
-      items: List.generate(current.next.limit.toInt(), (idx) => Feed.create()),
-    );
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Expanded(
-              child: TextField(
-                decoration: InputDecoration(hintText: "search feeds"),
-                onChanged:
-                    (v) => setState(() {
-                      current.next.query = v;
-                    }),
-                onSubmitted:
-                    (v) => setState(() {
-                      pending = refresh();
-                    }),
+    final resetleading =
+        () => setState(() {
+          _leading = null;
+          _loading = false;
+          _created = Feed();
+        });
+    final createfeed = (Feed n) {
+      setState(() => _loading = true);
+      api
+          .create(FeedCreateRequest(feed: n))
+          .then((v) => resetleading())
+          .then((v) {
+            refresh();
+          })
+          .catchError((e) {
+            setState(() {
+              _cause = ds.Error.unknown(e);
+              _loading = false;
+            });
+          });
+    };
+    return ds.Table(
+      loading: _loading,
+      cause: _cause,
+      leading: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    _leading = Column(
+                      children: [
+                        Edit(
+                          onChange: (upd) {
+                            setState(() {
+                              _created = upd;
+                            });
+                          },
+                        ),
+                        Row(
+                          children: [
+                            Spacer(),
+                            TextButton(
+                              onPressed: resetleading,
+                              child: Text("cancel"),
+                            ),
+                            SizedBox(width: 10),
+                            TextButton(
+                              onPressed: () {
+                                createfeed(_created);
+                              },
+                              child: Text("save"),
+                            ),
+                            Spacer(),
+                          ],
+                        ),
+                      ],
+                    );
+                  });
+                },
+                icon: Icon(Icons.add),
               ),
-            ),
-            IconButton(onPressed: () {}, icon: Icon(Icons.arrow_left)),
-            IconButton(onPressed: () {}, icon: Icon(Icons.arrow_right)),
-          ],
-        ),
-        FutureBuilder(
-          initialData: zerolist,
-          future: pending,
-          builder: (
-            BuildContext ctx,
-            AsyncSnapshot<FeedSearchResponse> snapshot,
-          ) {
-            if (snapshot.hasError) {
-              print(snapshot.error);
-              return SizedBox.expand(child: Text("failed"));
-            }
-
-            return ds.Loading(
-              loading: snapshot.connectionState != ConnectionState.done,
-              child: ListFeeds(current: current.items),
-            );
-          },
-        ),
-      ],
+              Expanded(
+                child: TextField(
+                  decoration: InputDecoration(hintText: "search feeds"),
+                  onChanged:
+                      (v) => setState(() {
+                        _res.next.query = v;
+                      }),
+                  onSubmitted: (v) => refresh(),
+                ),
+              ),
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    _res.next.offset -= 1;
+                  });
+                  refresh();
+                },
+                icon: Icon(Icons.arrow_left),
+              ),
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    _res.next.offset += 1;
+                  });
+                  refresh();
+                },
+                icon: Icon(Icons.arrow_right),
+              ),
+            ],
+          ),
+        ],
+      ),
+      children: [_leading ?? SizedBox(), ListFeeds(current: _res.items)],
     );
   }
 }

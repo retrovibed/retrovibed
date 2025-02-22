@@ -76,10 +76,8 @@ abstract class discovered {
     return client
         .post(Uri.https(httpx.host(), "/d/${id}", null), body: jsonEncode({}))
         .then((v) {
-          return Future.value(
-            DownloadBeginResponse.create()
-              ..mergeFromProto3Json(jsonDecode(v.body)),
-          );
+          return DownloadBeginResponse.create()
+            ..mergeFromProto3Json(jsonDecode(v.body));
         });
   }
 

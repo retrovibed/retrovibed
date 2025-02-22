@@ -4,17 +4,22 @@ import './rss.pb.dart';
 
 class Edit extends StatefulWidget {
   final Feed feed;
+  final Function(Feed)? onChange;
 
-  Edit({super.key, Feed? feed})
+  Edit({super.key, Feed? feed, this.onChange})
     : feed =
           feed ?? Feed.create()
-            ..autodownload = true;
+            ..autodownload = false;
 
   @override
   State<Edit> createState() => EditView();
 }
 
 class EditView extends State<Edit> {
+  // Feed feed;
+
+  // EditView(this.feed);
+
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
@@ -26,14 +31,22 @@ class EditView extends State<Edit> {
             label: Text("description"),
             input: TextFormField(
               initialValue: widget.feed.description,
-              onChanged: (v) => widget.feed.description = v,
+              onChanged:
+                  // (v) => setState(() {
+                  //   widget.feed.description = v;
+                  // }),
+                  (v) => widget.onChange?.call(widget.feed..description = v),
             ),
           ),
           forms.Field(
             label: Text("url"),
             input: TextFormField(
               initialValue: widget.feed.url,
-              onChanged: (v) => widget.feed.url = v,
+              onChanged:
+                  // (v) => setState(() {
+                  //   widget.feed.url = v;
+                  // }),
+                  (v) => widget.onChange?.call(widget.feed..url = v),
             ),
           ),
           forms.Field(
@@ -43,11 +56,15 @@ class EditView extends State<Edit> {
                 Checkbox(
                   value: widget.feed.autodownload,
                   onChanged:
-                      (v) => setState(
-                        () =>
-                            widget.feed.autodownload =
-                                v ?? widget.feed.autodownload,
+                      (v) => widget.onChange?.call(
+                        widget.feed
+                          ..autodownload = v ?? widget.feed.autodownload,
                       ),
+                  // (v) => setState(
+                  //   () =>
+                  //       widget.feed.autodownload =
+                  //           v ?? widget.feed.autodownload,
+                  // ),
                 ),
                 Spacer(),
               ],

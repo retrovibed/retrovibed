@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fractal/rss.dart';
+import './api.dart' as api;
 
 class Item extends StatelessWidget {
   final Feed current;
@@ -7,7 +8,14 @@ class Item extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(child: Edit(feed: this.current));
+    return Container(
+      child: Edit(
+        feed: this.current,
+        onChange: (u) {
+          api.create(FeedCreateRequest(feed: u));
+        },
+      ),
+    );
   }
 }
 
@@ -21,6 +29,7 @@ class ListFeeds extends StatelessWidget {
       return Container();
     }
 
+    // return Container();
     return Container(
       child: Column(
         spacing: 5.0,

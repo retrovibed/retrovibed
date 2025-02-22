@@ -16,7 +16,7 @@ class Display extends StatelessWidget {
           description: Text("RSS"),
           content: Container(
             padding: defaults.padding,
-            child: rss.ListSearchable(search: rss.searchfake),
+            child: rss.ListSearchable(search: rss.search),
           ),
         ),
         ds.Accordion(

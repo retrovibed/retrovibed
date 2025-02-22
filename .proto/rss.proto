@@ -30,3 +30,6 @@ message FeedCreateResponse { Feed feed = 1 [ json_name = "feed" ]; }
 
 message FeedUpdateRequest { Feed feed = 1 [ json_name = "feed" ]; }
 message FeedUpdateResponse { Feed feed = 1 [ json_name = "feed" ]; }
+
+message FeedDeleteRequest {}
+message FeedDeleteResponse { Feed feed = 1 [ json_name = "feed" ]; }

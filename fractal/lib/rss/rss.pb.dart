@@ -494,6 +494,90 @@ class FeedUpdateResponse extends $pb.GeneratedMessage {
   Feed ensureFeed() => $_ensure(0);
 }
 
+class FeedDeleteRequest extends $pb.GeneratedMessage {
+  factory FeedDeleteRequest() => create();
+  FeedDeleteRequest._() : super();
+  factory FeedDeleteRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory FeedDeleteRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'FeedDeleteRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'rss'), createEmptyInstance: create)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  FeedDeleteRequest clone() => FeedDeleteRequest()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  FeedDeleteRequest copyWith(void Function(FeedDeleteRequest) updates) => super.copyWith((message) => updates(message as FeedDeleteRequest)) as FeedDeleteRequest;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static FeedDeleteRequest create() => FeedDeleteRequest._();
+  FeedDeleteRequest createEmptyInstance() => create();
+  static $pb.PbList<FeedDeleteRequest> createRepeated() => $pb.PbList<FeedDeleteRequest>();
+  @$core.pragma('dart2js:noInline')
+  static FeedDeleteRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<FeedDeleteRequest>(create);
+  static FeedDeleteRequest? _defaultInstance;
+}
+
+class FeedDeleteResponse extends $pb.GeneratedMessage {
+  factory FeedDeleteResponse({
+    Feed? feed,
+  }) {
+    final $result = create();
+    if (feed != null) {
+      $result.feed = feed;
+    }
+    return $result;
+  }
+  FeedDeleteResponse._() : super();
+  factory FeedDeleteResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory FeedDeleteResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'FeedDeleteResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'rss'), createEmptyInstance: create)
+    ..aOM<Feed>(1, _omitFieldNames ? '' : 'feed', subBuilder: Feed.create)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  FeedDeleteResponse clone() => FeedDeleteResponse()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  FeedDeleteResponse copyWith(void Function(FeedDeleteResponse) updates) => super.copyWith((message) => updates(message as FeedDeleteResponse)) as FeedDeleteResponse;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static FeedDeleteResponse create() => FeedDeleteResponse._();
+  FeedDeleteResponse createEmptyInstance() => create();
+  static $pb.PbList<FeedDeleteResponse> createRepeated() => $pb.PbList<FeedDeleteResponse>();
+  @$core.pragma('dart2js:noInline')
+  static FeedDeleteResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<FeedDeleteResponse>(create);
+  static FeedDeleteResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  Feed get feed => $_getN(0);
+  @$pb.TagNumber(1)
+  set feed(Feed v) { setField(1, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasFeed() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearFeed() => clearField(1);
+  @$pb.TagNumber(1)
+  Feed ensureFeed() => $_ensure(0);
+}
+
 
 const _omitFieldNames = $core.bool.fromEnvironment('protobuf.omit_field_names');
 const _omitMessageNames = $core.bool.fromEnvironment('protobuf.omit_message_names');

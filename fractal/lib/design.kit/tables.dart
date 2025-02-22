@@ -26,7 +26,10 @@ class Table extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           leading,
-          Expanded(child: ListView(shrinkWrap: true, children: children)),
+          Flexible(
+            fit: FlexFit.loose,
+            child: ListView(shrinkWrap: true, children: children),
+          ),
           trailing,
         ],
       ),
