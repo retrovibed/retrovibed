@@ -88,10 +88,6 @@ func MetadataQuerySearch(q string) squirrel.Sqlizer {
 	}
 
 	return squirrel.And{pexpr, nexpr}
-	// return squirrel.Expr(
-	// 	"COALESCE(fts_main_torrents_metadata.match_bm25(id, ?, fields := 'description'), 0) > 0 AND COALESCE(fts_main_torrents_metadata.match_bm25(id, ?, fields := 'description'), 0) = 0",
-	// 	strings.Join(positive, " "), strings.Join(negative, " "),
-	// )
 }
 
 func MetadataSearchBuilder() squirrel.SelectBuilder {
