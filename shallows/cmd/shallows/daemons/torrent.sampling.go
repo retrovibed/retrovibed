@@ -330,6 +330,11 @@ func DiscoverDHTMetadata(ctx context.Context, db sqlx.Queryer, s *dht.Server, tc
 			}
 		}
 
+		_, err := db.ExecContext(ctx, "PRAGMA create_fts_index('torrents_metadata', 'id', 'description', overwrite = 1);")
+		if err != nil {
+			log.Println("failed to refresh fts index", err)
+		}
+
 		log.Println("sleeping for", bs.Backoff(attempts))
 		select {
 		case <-time.After(bs.Backoff(attempts)):

@@ -3,12 +3,14 @@ package tracking
 import (
 	"context"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/james-lawrence/deeppool/internal/x/langx"
 	"github.com/james-lawrence/deeppool/internal/x/sqlx"
 	"github.com/james-lawrence/deeppool/internal/x/squirrelx"
+	"github.com/james-lawrence/deeppool/internal/x/stringsx"
 	"github.com/james-lawrence/deeppool/internal/x/timex"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/metainfo"
@@ -52,6 +54,44 @@ func MetadataQueryNotPaused() squirrel.Sqlizer {
 
 func MetadataSearch(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilder) MetadataScanner {
 	return NewMetadataScannerStatic(b.RunWith(q).QueryContext(ctx))
+}
+
+func MetadataQuerySearch(q string) squirrel.Sqlizer {
+	if stringsx.Blank(q) {
+		return squirrelx.Noop{}
+	}
+
+	negative := []string{}
+	positive := []string{}
+	for _, s := range strings.Split(q, " ") {
+		if strings.HasPrefix(s, "-") {
+			negative = append(negative, strings.TrimPrefix(s, "-"))
+		} else {
+			positive = append(positive, s)
+		}
+	}
+
+	pexpr := squirrel.Expr("TRUE")
+	if len(positive) > 0 {
+		pexpr = squirrel.Expr(
+			"COALESCE(fts_main_torrents_metadata.match_bm25(id, ?), 0) > 0",
+			strings.Join(positive, " "),
+		)
+	}
+
+	nexpr := squirrel.Expr("TRUE")
+	if len(negative) > 0 {
+		nexpr = squirrel.Expr(
+			"COALESCE(fts_main_torrents_metadata.match_bm25(id, ?), 0) = 0",
+			strings.Join(negative, " "),
+		)
+	}
+
+	return squirrel.And{pexpr, nexpr}
+	// return squirrel.Expr(
+	// 	"COALESCE(fts_main_torrents_metadata.match_bm25(id, ?, fields := 'description'), 0) > 0 AND COALESCE(fts_main_torrents_metadata.match_bm25(id, ?, fields := 'description'), 0) = 0",
+	// 	strings.Join(positive, " "), strings.Join(negative, " "),
+	// )
 }
 
 func MetadataSearchBuilder() squirrel.SelectBuilder {
