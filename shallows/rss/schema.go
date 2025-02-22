@@ -19,6 +19,7 @@ type rss struct {
 type channel struct {
 	XMLName xml.Name `xml:"channel"`
 	Items   []item   `xml:"item"`
+	TTL     int      `xml:"ttl"`
 }
 
 // item represent the actual feed for each news

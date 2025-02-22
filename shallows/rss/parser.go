@@ -7,14 +7,14 @@ import (
 	"net/url"
 )
 
-func Parse(ctx context.Context, r io.Reader) ([]Item, error) {
+func Parse(ctx context.Context, r io.Reader) (*channel, []Item, error) {
 	return parseData(r, "")
 }
 
-func parseData(data io.Reader, originURL string) ([]Item, error) {
+func parseData(data io.Reader, originURL string) (*channel, []Item, error) {
 	var r rss
 	if err := xml.NewDecoder(data).Decode(&r); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	rssItems := make([]Item, 0, len(r.Channel.Items))
@@ -44,7 +44,8 @@ func parseData(data io.Reader, originURL string) ([]Item, error) {
 
 		rssItems = append(rssItems, rssItem)
 	}
-	return rssItems, nil
+
+	return &r.Channel, rssItems, nil
 }
 
 func extractSource(urlRaw string) string {

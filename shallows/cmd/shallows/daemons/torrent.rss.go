@@ -4,13 +4,20 @@ import (
 	"context"
 	"iter"
 	"log"
+	"net/http"
 	"time"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/james-lawrence/deeppool/internal/x/backoffx"
+	"github.com/james-lawrence/deeppool/internal/x/contextx"
 	"github.com/james-lawrence/deeppool/internal/x/errorsx"
+	"github.com/james-lawrence/deeppool/internal/x/httpx"
 	"github.com/james-lawrence/deeppool/internal/x/sqlx"
+	"github.com/james-lawrence/deeppool/rss"
 	"github.com/james-lawrence/deeppool/tracking"
+	"github.com/james-lawrence/torrent"
+	"github.com/james-lawrence/torrent/metainfo"
+	"golang.org/x/time/rate"
 )
 
 func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer) (err error) {
@@ -62,15 +69,75 @@ func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer) (err error) {
 			attempts = -1
 		}
 
+		l := rate.NewLimiter(rate.Every(3*time.Second), 1)
+
 		fctx, fdone := context.WithCancelCause(ctx)
 		for feed := range queryfeeds(fctx, fdone) {
-			if err = tracking.RSSCooldown(fctx, q, feed).Scan(&feed); err != nil {
+			req, err := http.NewRequestWithContext(ctx, http.MethodGet, feed.URL, nil)
+			if err != nil {
+				log.Println("unable to build feed request", feed.ID, err)
+				continue
+			}
+
+			resp, err := httpx.AsError(http.DefaultClient.Do(req))
+			if err != nil {
+				log.Println("unable to retrieve feed", feed.ID, err)
+				continue
+			}
+			channel, items, err := rss.Parse(ctx, resp.Body)
+			if err != nil {
+				log.Println("unable to parse feed", feed.ID, err)
+				continue
+			}
+
+			for _, item := range items {
+				var (
+					meta tracking.Metadata
+				)
+
+				if err = l.Wait(ctx); err != nil {
+					log.Println("rate limit failure", err)
+					continue
+				}
+
+				req, err := http.NewRequestWithContext(ctx, http.MethodGet, item.Link, nil)
+				if err != nil {
+					log.Println("unable to build torrent request", feed.ID, err)
+					continue
+				}
+
+				resp, err := httpx.AsError(http.DefaultClient.Do(req))
+				if err != nil {
+					log.Println("unable to retrieve feed", feed.ID, err)
+					continue
+				}
+
+				mi, err := metainfo.NewFromReader(resp.Body)
+				if err != nil {
+					log.Println("unable to read metainfo from response", feed.ID, err)
+					continue
+				}
+				md, err := torrent.NewFromInfo(*mi)
+				if err != nil {
+					log.Println("unable to read metainfo from response", feed.ID, err)
+					continue
+				}
+
+				if err = tracking.MetadataInsertWithDefaults(ctx, q, tracking.NewMetadata(&md.InfoHash, tracking.MetadataOptionFromInfo(mi), tracking.MetadataOptionDescription(item.Title))).Scan(&meta); err != nil {
+					log.Println("unable to record torrent metadata", feed.ID, err)
+					continue
+				}
+
+				log.Println("recorded", feed.ID, meta.ID, meta.Description)
+			}
+
+			if err = tracking.RSSCooldownByID(fctx, q, feed.ID, channel.TTL).Scan(&feed); err != nil {
 				log.Println("unable to mark rss feed for cooldown", err)
 				continue
 			}
 		}
 
-		if err := fctx.Err(); err != nil {
+		if err := fctx.Err(); contextx.IgnoreCancelled(err) != nil {
 			return err
 		}
 

@@ -154,7 +154,14 @@ func RSSCooldown(
 	gql genieql.Insert,
 	pattern func(ctx context.Context, q sqlx.Queryer, a RSS) NewRSSScannerStaticRow,
 ) {
-	gql.Into("torrents_feed_rss").Default("created_at", "updated_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, next_check = NOW() + to_hours(24)")
+	gql.Into("torrents_feed_rss").Default("created_at", "updated_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, next_check = NOW() + to_minutes({ttl})")
+}
+
+func RSSCooldownByID(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string, ttl int) NewRSSScannerStaticRow,
+) {
+	gql = gql.Query(`UPDATE torrents_feed_rss SET updated_at = DEFAULT, next_check = NOW() + to_minutes({ttl}) WHERE "id" = {id} RETURNING ` + RSSScannerStaticColumns)
 }
 
 func RSSDeleteByID(

@@ -22,6 +22,12 @@ func MetadataOptionFromInfo(i *metainfo.Info) func(*Metadata) {
 	}
 }
 
+func MetadataOptionDescription(d string) func(*Metadata) {
+	return func(m *Metadata) {
+		m.Description = d
+	}
+}
+
 func MetadataOptionJSONSafeEncode(p *Metadata) {
 	p.CreatedAt = timex.RFC3339NanoEncode(p.CreatedAt)
 	p.UpdatedAt = timex.RFC3339NanoEncode(p.UpdatedAt)
