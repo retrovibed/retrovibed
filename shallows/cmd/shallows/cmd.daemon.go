@@ -196,8 +196,9 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	).Methods(http.MethodGet)
 
 	media.NewHTTPDiscovered(db, tclient, storage.NewFile(torrentdir)).Bind(httpmux.PathPrefix("/d").Subrouter())
+	media.NewHTTPRSSFeed(db).Bind(httpmux.PathPrefix("/rss").Subrouter())
 
-	if httpbind, err = net.Listen("tcp", ":0"); err != nil {
+	if httpbind, err = net.Listen("tcp", ":9998"); err != nil {
 		return err
 	}
 

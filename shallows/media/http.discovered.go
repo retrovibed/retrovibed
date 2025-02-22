@@ -252,8 +252,6 @@ func (t *HTTPDiscovered) search(w http.ResponseWriter, r *http.Request) {
 		tracking.MetadataQuerySearch(msg.Next.Query),
 	}).OrderBy("created_at DESC").Offset(msg.Next.Offset * msg.Next.Limit).Limit(msg.Next.Limit)
 
-	// SELECT * FROM torrents_metadata WHERE COALESCE(fts_main_torrents_metadata.match_bm25(id,'anime', fields := 'description'), 0) > 0;
-
 	err = sqlxx.ScanEach(tracking.MetadataSearch(r.Context(), t.q, q), func(p *tracking.Metadata) error {
 		tmp := langx.Clone(Media{}, MediaOptionFromTorrentMetadata(langx.Clone(*p, tracking.MetadataOptionJSONSafeEncode)))
 		msg.Items = append(msg.Items, &tmp)

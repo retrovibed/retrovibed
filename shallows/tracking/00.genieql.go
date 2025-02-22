@@ -147,7 +147,7 @@ func RSSInsertWithDefaults(
 	gql genieql.Insert,
 	pattern func(ctx context.Context, q sqlx.Queryer, a RSS) NewRSSScannerStaticRow,
 ) {
-	gql.Into("torrents_feed_rss").Default("created_at", "updated_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT")
+	gql.Into("torrents_feed_rss").Default("created_at", "updated_at", "next_check").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, autodownload = EXCLUDED.autodownload, url = EXCLUDED.url")
 }
 
 func RSSCooldown(
@@ -155,4 +155,11 @@ func RSSCooldown(
 	pattern func(ctx context.Context, q sqlx.Queryer, a RSS) NewRSSScannerStaticRow,
 ) {
 	gql.Into("torrents_feed_rss").Default("created_at", "updated_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, next_check = NOW() + to_hours(24)")
+}
+
+func RSSDeleteByID(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewRSSScannerStaticRow,
+) {
+	gql = gql.Query(`DELETE FROM torrents_feed_rss WHERE "id" = {id} RETURNING ` + RSSScannerStaticColumns)
 }
