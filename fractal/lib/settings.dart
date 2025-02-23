@@ -35,7 +35,7 @@ class Display extends StatelessWidget {
           content: Container(),
         ),
         ds.Accordion(
-          disabled: Text("coming soon - opt in features"),
+          disabled: Text("coming soon - opt in premium features"),
           description: Text("billing"),
           content: Container(),
         ),
