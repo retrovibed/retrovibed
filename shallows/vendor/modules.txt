@@ -52,7 +52,6 @@ github.com/anacrolix/multiless
 # github.com/anacrolix/stm v0.5.0
 ## explicit; go 1.18
 github.com/anacrolix/stm
-github.com/anacrolix/stm/stmutil
 # github.com/anacrolix/sync v0.5.3
 ## explicit; go 1.13
 github.com/anacrolix/sync
@@ -242,7 +241,7 @@ github.com/james-lawrence/genieql/internal/userx
 github.com/james-lawrence/genieql/internal/wasidialect
 github.com/james-lawrence/genieql/internal/wasix/ffierrors
 github.com/james-lawrence/genieql/internal/wasix/ffiguest
-# github.com/james-lawrence/torrent v0.0.0-20250223115947-89315d848f80
+# github.com/james-lawrence/torrent v0.0.0-20250223203759-78ba712207a0
 ## explicit; go 1.23.0
 github.com/james-lawrence/torrent
 github.com/james-lawrence/torrent/bencode
