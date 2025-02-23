@@ -188,7 +188,6 @@ func NewDefaultClientConfig(options ...ClientConfigOption) *ClientConfig {
 		TorrentPeersHighWater:          500,
 		TorrentPeersLowWater:           50,
 		HandshakesTimeout:              4 * time.Second,
-		// DhtStartingNodes:               dht.GlobalBootstrapAddrs,
 		DhtStartingNodes: func(network string) dht.StartingNodesGetter {
 			return func() ([]dht.Addr, error) { return dht.GlobalBootstrapAddrs(network) }
 		},
