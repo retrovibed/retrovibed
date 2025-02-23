@@ -24,7 +24,8 @@ import (
 	"github.com/anacrolix/missinggo/pubsub"
 	"github.com/anacrolix/missinggo/slices"
 	"github.com/anacrolix/missinggo/v2"
-	"github.com/james-lawrence/torrent/dht/v2"
+	"github.com/james-lawrence/torrent/dht"
+	"github.com/james-lawrence/torrent/internal/x/bytesx"
 
 	"github.com/james-lawrence/torrent/bencode"
 	pp "github.com/james-lawrence/torrent/btprotocol"
@@ -587,12 +588,13 @@ func (t *torrent) haveAllMetadataPieces() bool {
 
 // TODO: Propagate errors to disconnect peer.
 func (t *torrent) setMetadataSize(bytes int) (err error) {
+
 	if t.haveInfo() {
 		// We already know the correct metadata size.
 		return err
 	}
 
-	if bytes <= 0 || bytes > 10000000 { // 10MB, pulled from my ass.
+	if bytes <= 0 || bytes > 10*bytesx.MiB { // 10MB, pulled from my ass.
 		return errors.New("bad size")
 	}
 
@@ -1159,16 +1161,6 @@ func (t *torrent) incrementReceivedConns(c *connection, delta int64) {
 	}
 }
 
-func (t *torrent) maxHalfOpen() int {
-	// Note that if we somehow exceed the maximum established conns, we want
-	// the negative value to have an effect.
-	establishedHeadroom := int64(t.maxEstablishedConns - len(t.conns))
-	extraIncoming := int64(t.numReceivedConns - int64(t.maxEstablishedConns/2))
-	// We want to allow some experimentation with new peers, and to try to
-	// upset an oversupply of received connections.
-	return int(min(max(5, extraIncoming)+establishedHeadroom, int64(t.config.HalfOpenConnsPerTorrent)))
-}
-
 func (t *torrent) dropHalfOpen(addr string) {
 	t._halfOpenmu.RLock()
 	_, ok := t.halfOpen[addr]
@@ -1495,15 +1487,16 @@ func (t *torrent) announceRequest(event tracker.AnnounceEvent) tracker.AnnounceR
 // enough peers.
 func (t *torrent) consumeDhtAnnouncePeers(pvs <-chan dht.PeersValues) {
 	for v := range pvs {
+		log.Println("received peers", t.infoHash, len(v.Peers))
 		for _, cp := range v.Peers {
-			if cp.Port == 0 {
+			if cp.Port() == 0 {
 				// Can't do anything with this.
 				continue
 			}
 
 			t.AddPeer(Peer{
-				IP:     cp.IP.AsSlice(),
-				Port:   cp.Port,
+				IP:     cp.Addr().AsSlice(),
+				Port:   int(cp.Port()),
 				Source: peerSourceDhtGetPeers,
 			})
 		}
@@ -1521,6 +1514,7 @@ func (t *torrent) announceToDht(impliedPort bool, s *dht.Server) error {
 
 	defer ps.Close()
 	go t.consumeDhtAnnouncePeers(ps.Peers)
+
 	select {
 	case <-t.closed.LockedChan(t.locker()):
 	case <-ctx.Done():
@@ -1536,12 +1530,11 @@ func (t *torrent) dhtAnnouncer(s *dht.Server) {
 			return
 		case <-t.wantPeersEvent.LockedChan(t.locker()):
 		}
-		t.lock()
-		t.numDHTAnnounces++
-		t.unlock()
+
+		t.stats.DHTAnnounce.Add(1)
 
 		if err := t.announceToDht(true, s); err != nil {
-			t.config.errors().Println(t, errors.Wrap(err, "error announcing to DHT"))
+			t.config.info().Println(t, errors.Wrap(err, "error announcing to DHT"))
 			time.Sleep(time.Second)
 		}
 	}
@@ -2058,7 +2051,12 @@ func (t *torrent) Piece(i pieceIndex) *Piece {
 
 func (t *torrent) ping(addr net.UDPAddr) {
 	t.cln.eachDhtServer(func(s *dht.Server) {
-		go s.Ping(&addr, nil)
+		go func() {
+			ret := dht.Ping3S(context.Background(), s, dht.NewAddr(&addr), s.ID())
+			if ret.Err != nil {
+				log.Println("failed to ping address", ret.Err)
+			}
+		}()
 	})
 }
 

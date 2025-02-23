@@ -11,7 +11,11 @@ github.com/alecthomas/atomic
 # github.com/alecthomas/kong v1.8.0
 ## explicit; go 1.20
 github.com/alecthomas/kong
-# github.com/anacrolix/generics v0.0.2
+# github.com/anacrolix/chansync v0.6.0
+## explicit; go 1.16
+github.com/anacrolix/chansync
+github.com/anacrolix/chansync/events
+# github.com/anacrolix/generics v0.0.3-0.20240902042256-7fb2702ef0ca
 ## explicit; go 1.18
 github.com/anacrolix/generics
 # github.com/anacrolix/log v0.16.0
@@ -48,9 +52,18 @@ github.com/anacrolix/multiless
 # github.com/anacrolix/stm v0.5.0
 ## explicit; go 1.18
 github.com/anacrolix/stm
+github.com/anacrolix/stm/stmutil
 # github.com/anacrolix/sync v0.5.3
 ## explicit; go 1.13
 github.com/anacrolix/sync
+# github.com/anacrolix/torrent v1.58.1
+## explicit; go 1.23
+github.com/anacrolix/torrent/bencode
+github.com/anacrolix/torrent/logonce
+github.com/anacrolix/torrent/merkle
+github.com/anacrolix/torrent/metainfo
+github.com/anacrolix/torrent/types/infohash
+github.com/anacrolix/torrent/types/infohash-v2
 # github.com/anacrolix/upnp v0.1.4
 ## explicit; go 1.12
 github.com/anacrolix/upnp
@@ -229,15 +242,23 @@ github.com/james-lawrence/genieql/internal/userx
 github.com/james-lawrence/genieql/internal/wasidialect
 github.com/james-lawrence/genieql/internal/wasix/ffierrors
 github.com/james-lawrence/genieql/internal/wasix/ffiguest
-# github.com/james-lawrence/torrent v0.0.0-20250221191043-bc411b7934a1
-## explicit; go 1.23
+# github.com/james-lawrence/torrent v0.0.0-20250223035413-54bacea2a919
+## explicit; go 1.23.0
 github.com/james-lawrence/torrent
 github.com/james-lawrence/torrent/bencode
 github.com/james-lawrence/torrent/bep0051
 github.com/james-lawrence/torrent/btprotocol
 github.com/james-lawrence/torrent/connections
-github.com/james-lawrence/torrent/dht/v2
-github.com/james-lawrence/torrent/dht/v2/krpc
+github.com/james-lawrence/torrent/dht
+github.com/james-lawrence/torrent/dht/bep44
+github.com/james-lawrence/torrent/dht/containers
+github.com/james-lawrence/torrent/dht/int160
+github.com/james-lawrence/torrent/dht/k-nearest-nodes
+github.com/james-lawrence/torrent/dht/krpc
+github.com/james-lawrence/torrent/dht/peer-store
+github.com/james-lawrence/torrent/dht/transactions
+github.com/james-lawrence/torrent/dht/traversal
+github.com/james-lawrence/torrent/dht/types
 github.com/james-lawrence/torrent/internal/errorsx
 github.com/james-lawrence/torrent/internal/netx
 github.com/james-lawrence/torrent/internal/stmutil
@@ -290,12 +311,32 @@ github.com/mfridman/interpolate
 # github.com/miekg/dns v1.1.63
 ## explicit; go 1.19
 github.com/miekg/dns
+# github.com/minio/sha256-simd v1.0.1
+## explicit; go 1.17
+github.com/minio/sha256-simd
 # github.com/mitchellh/mapstructure v1.5.0
 ## explicit; go 1.14
 github.com/mitchellh/mapstructure
+# github.com/mr-tron/base58 v1.2.0
+## explicit; go 1.12
+github.com/mr-tron/base58/base58
 # github.com/mschoch/smat v0.2.0
 ## explicit; go 1.13
 github.com/mschoch/smat
+# github.com/multiformats/go-multihash v0.2.3
+## explicit; go 1.19
+github.com/multiformats/go-multihash
+github.com/multiformats/go-multihash/core
+github.com/multiformats/go-multihash/register/all
+github.com/multiformats/go-multihash/register/blake2
+github.com/multiformats/go-multihash/register/blake3
+github.com/multiformats/go-multihash/register/miniosha256
+github.com/multiformats/go-multihash/register/murmur3
+github.com/multiformats/go-multihash/register/sha256
+github.com/multiformats/go-multihash/register/sha3
+# github.com/multiformats/go-varint v0.0.7
+## explicit; go 1.18
+github.com/multiformats/go-varint
 # github.com/nxadm/tail v1.4.11
 ## explicit; go 1.13
 # github.com/onsi/ginkgo/v2 v2.22.2
@@ -367,6 +408,9 @@ github.com/pressly/goose/v3/lock
 # github.com/riywo/loginshell v0.0.0-20200815045211-7d26008be1ab
 ## explicit
 github.com/riywo/loginshell
+# github.com/rs/dnscache v0.0.0-20230804202142-fc85eb664529
+## explicit; go 1.12
+github.com/rs/dnscache
 # github.com/ryszard/goskiplist v0.0.0-20150312221310-2dfbae5fcf46
 ## explicit
 github.com/ryszard/goskiplist/skiplist
@@ -376,6 +420,9 @@ github.com/serenize/snaker
 # github.com/sethvargo/go-retry v0.3.0
 ## explicit; go 1.21
 github.com/sethvargo/go-retry
+# github.com/spaolacci/murmur3 v1.1.0
+## explicit
+github.com/spaolacci/murmur3
 # github.com/stretchr/testify v1.10.0
 ## explicit; go 1.17
 github.com/stretchr/testify/assert
@@ -400,14 +447,17 @@ go.etcd.io/bbolt/internal/freelist
 # go.uber.org/multierr v1.11.0
 ## explicit; go 1.19
 go.uber.org/multierr
-# golang.org/x/crypto v0.33.0
-## explicit; go 1.20
+# golang.org/x/crypto v0.34.0
+## explicit; go 1.23.0
+golang.org/x/crypto/blake2b
+golang.org/x/crypto/blake2s
 golang.org/x/crypto/blowfish
 golang.org/x/crypto/chacha20
 golang.org/x/crypto/curve25519
 golang.org/x/crypto/internal/alias
 golang.org/x/crypto/internal/poly1305
 golang.org/x/crypto/pbkdf2
+golang.org/x/crypto/sha3
 golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
 # golang.org/x/exp v0.0.0-20250218142911-aa4b98e5adaa
@@ -433,6 +483,7 @@ golang.org/x/net/ipv6
 ## explicit; go 1.18
 golang.org/x/sync/errgroup
 golang.org/x/sync/semaphore
+golang.org/x/sync/singleflight
 # golang.org/x/sys v0.30.0
 ## explicit; go 1.18
 golang.org/x/sys/cpu
@@ -540,3 +591,8 @@ google.golang.org/protobuf/runtime/protoimpl
 # gopkg.in/yaml.v3 v3.0.1
 ## explicit
 gopkg.in/yaml.v3
+# lukechampine.com/blake3 v1.3.0
+## explicit; go 1.17
+lukechampine.com/blake3
+lukechampine.com/blake3/bao
+lukechampine.com/blake3/guts

@@ -16,12 +16,12 @@ import (
 	"time"
 
 	"github.com/james-lawrence/torrent/connections"
+	"github.com/james-lawrence/torrent/dht"
+	"github.com/james-lawrence/torrent/dht/krpc"
 
 	"github.com/anacrolix/missinggo/v2"
 	"github.com/anacrolix/missinggo/v2/slices"
 	"github.com/davecgh/go-spew/spew"
-	"github.com/james-lawrence/torrent/dht/v2"
-	"github.com/james-lawrence/torrent/dht/v2/krpc"
 	"github.com/pkg/errors"
 	"golang.org/x/time/rate"
 
@@ -57,12 +57,17 @@ type Client struct {
 // Query torrent info from the dht
 func (cl *Client) Info(ctx context.Context, m Metadata, options ...Tuner) (i *metainfo.Info, err error) {
 	var (
-		t *torrent
+		t     *torrent
+		added bool
 	)
 
-	if t, _, err = cl.start(m); err != nil {
+	if t, added, err = cl.start(m); err != nil {
 		return nil, err
+	} else if !added {
+		log.Println("torrent already started?", m.InfoHash, len(m.InfoBytes))
+		return nil, fmt.Errorf("attempting to require the info for a torrent that is already running")
 	}
+	defer cl.Stop(m)
 
 	t.Tune(options...)
 
@@ -111,6 +116,7 @@ func (cl *Client) start(t Metadata) (dlt *torrent, added bool, err error) {
 	cl.torrents[t.InfoHash] = dlt
 
 	dlt.updateWantPeersEvent()
+
 	// Tickle Client.waitAccept, new torrent may want conns.
 	cl.event.Broadcast()
 
@@ -321,10 +327,9 @@ func (cl *Client) newDhtServer(conn net.PacketConn) (s *dht.Server, err error) {
 			}
 			return cl.config.PublicIP4
 		}(),
-		StartingNodes:      cl.config.DhtStartingNodes,
-		ConnectionTracking: cl.config.ConnTracker,
-		OnQuery:            cl.config.DHTOnQuery,
-		Logger:             newlogger(cl.config.Logger, "[dht] ", log.Flags()),
+		StartingNodes: cl.config.DhtStartingNodes(conn.LocalAddr().Network()),
+		OnQuery:       cl.config.DHTOnQuery,
+		Logger:        newlogger(cl.config.Logger, "dht", log.Flags()),
 	}
 
 	if s, err = dht.NewServer(&cfg); err != nil {
@@ -635,7 +640,11 @@ func (cl *Client) outgoingConnection(ctx context.Context, t *torrent, addr IpPor
 		err error
 	)
 
-	cl.dialRateLimiter.Wait(ctx)
+	cl.config.info().Println("opening connection", t.infoHash)
+	if err = cl.dialRateLimiter.Wait(ctx); err != nil {
+		log.Println("dial rate limit failed", err)
+		return
+	}
 
 	if c, err = cl.establishOutgoingConn(ctx, t, addr); err != nil {
 		t.noLongerHalfOpen(addr.String())
@@ -874,12 +883,11 @@ func (cl *Client) dropTorrent(infoHash metainfo.Hash) (err error) {
 		return nil
 	}
 
-	err = t.close()
-
 	cl.lock()
-	defer cl.unlock()
 	delete(cl.torrents, infoHash)
-	return err
+	cl.unlock()
+
+	return t.close()
 }
 
 func (cl *Client) allTorrentsCompleted() bool {
@@ -941,6 +949,7 @@ func (cl *Client) AddDHTNodes(nodes []string) {
 			cl.config.info().Printf("refusing to add DHT node with invalid IP: %q\n", hmp.Host)
 			continue
 		}
+
 		ni := krpc.NodeInfo{
 			Addr: krpc.NewNodeAddrFromIPPort(ip, hmp.Port),
 		}
