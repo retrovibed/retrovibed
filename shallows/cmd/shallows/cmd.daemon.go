@@ -18,18 +18,18 @@ import (
 	"github.com/james-lawrence/deeppool/cmd/shallows/daemons"
 	"github.com/james-lawrence/deeppool/downloads"
 	"github.com/james-lawrence/deeppool/internal/env"
+	"github.com/james-lawrence/deeppool/internal/x/dhtx"
 	"github.com/james-lawrence/deeppool/internal/x/envx"
 	"github.com/james-lawrence/deeppool/internal/x/errorsx"
 	"github.com/james-lawrence/deeppool/internal/x/goosex"
 	"github.com/james-lawrence/deeppool/internal/x/httpx"
 	"github.com/james-lawrence/deeppool/internal/x/slicesx"
-	"github.com/james-lawrence/deeppool/internal/x/timex"
 	"github.com/james-lawrence/deeppool/internal/x/tlsx"
 	"github.com/james-lawrence/deeppool/internal/x/torrentx"
 	"github.com/james-lawrence/deeppool/internal/x/userx"
 	"github.com/james-lawrence/deeppool/media"
-	"github.com/james-lawrence/torrent/dht/v2"
-	"github.com/james-lawrence/torrent/dht/v2/krpc"
+	"github.com/james-lawrence/torrent/dht"
+	"github.com/james-lawrence/torrent/dht/krpc"
 	"github.com/james-lawrence/torrent/storage"
 
 	_ "github.com/marcboeker/go-duckdb"
@@ -83,7 +83,7 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 			torrent.NewDefaultClientConfig(
 				torrent.ClientConfigPeerID(string(peerid[:])),
 				torrent.ClientConfigSeed(true),
-				torrent.ClientConfigInfoLogger(log.New(io.Discard, "", log.Flags())),
+				torrent.ClientConfigInfoLogger(log.New(io.Discard, "[torrent] ", log.Flags())),
 				torrent.ClientConfigMuxer(tm),
 			),
 		),
@@ -111,16 +111,12 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		}
 	}
 
-	go timex.Every(time.Minute, func() {
-		current := slicesx.FirstOrZero(tclient.DhtServers()...).Nodes()
-		log.Println("saving torrent peers", len(current))
-		errorsx.Log(
-			errorsx.Wrap(
-				dht.WriteNodesToFile(current, torrentpeers),
-				"unable to persist peers",
-			),
-		)
-	})
+	for _, d := range tclient.DhtServers() {
+		go dhtx.Statistics(ctx.Context, time.Minute, d)
+		go dhtx.RecordBootstrapNodes(ctx.Context, time.Minute, d, torrentpeers)
+		go d.TableMaintainer()
+		go d.Bootstrap(ctx.Context)
+	}
 
 	go daemons.PrintStatistics(ctx.Context, db)
 
@@ -174,7 +170,7 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		}
 	}()
 
-	go daemons.ResumeDownloads(ctx.Context, db, tclient, tstore)
+	// go daemons.ResumeDownloads(ctx.Context, db, tclient, tstore)
 
 	httpmux := mux.NewRouter()
 	httpmux.NotFoundHandler = httpx.NotFound(alice.New())

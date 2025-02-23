@@ -8,6 +8,8 @@ import (
 	"github.com/james-lawrence/torrent"
 
 	"github.com/anacrolix/utp"
+	"github.com/james-lawrence/torrent/dht"
+	"github.com/james-lawrence/torrent/dht/krpc"
 	"github.com/james-lawrence/torrent/sockets"
 )
 
@@ -32,4 +34,15 @@ func Autosocket(p int) (_ torrent.Binder, err error) {
 	}
 
 	return torrent.NewSocketsBind(s1, s2), nil
+}
+
+func NodesFromReply(ret dht.QueryResult) (retni []krpc.NodeInfo) {
+	if err := ret.ToError(); err != nil {
+		return nil
+	}
+
+	ret.Reply.R.ForAllNodes(func(ni krpc.NodeInfo) {
+		retni = append(retni, ni)
+	})
+	return retni
 }

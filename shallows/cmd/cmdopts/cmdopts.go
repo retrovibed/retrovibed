@@ -11,7 +11,7 @@ import (
 	"github.com/james-lawrence/deeppool/internal/x/fsx"
 	"github.com/james-lawrence/deeppool/internal/x/sshx"
 	"github.com/james-lawrence/deeppool/internal/x/userx"
-	"github.com/james-lawrence/torrent/dht/v2/krpc"
+	"github.com/james-lawrence/torrent/dht/krpc"
 	"golang.org/x/crypto/ssh"
 )
 

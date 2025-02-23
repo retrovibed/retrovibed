@@ -8,7 +8,7 @@ import (
 	"github.com/james-lawrence/deeppool/internal/x/md5x"
 	"github.com/james-lawrence/deeppool/internal/x/sqlx"
 	"github.com/james-lawrence/deeppool/internal/x/squirrelx"
-	"github.com/james-lawrence/torrent/dht/v2/krpc"
+	"github.com/james-lawrence/torrent/dht/krpc"
 )
 
 func PeerOptionBEP51(available uint64, ttl uint16) func(*Peer) {
@@ -24,8 +24,8 @@ func NewPeer(md krpc.NodeInfo, options ...func(*Peer)) (m Peer) {
 		ID:      md5x.Digest(md.ID[:]),
 		Peer:    md.ID[:],
 		Network: md.Addr.UDP().Network(),
-		IP:      md.Addr.IP.String(),
-		Port:    md.Addr.UDP().AddrPort().Port(),
+		IP:      md.Addr.IP().String(),
+		Port:    md.Addr.Port(),
 	}, options...)
 }
 

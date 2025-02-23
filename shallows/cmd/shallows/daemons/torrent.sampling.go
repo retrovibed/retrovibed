@@ -16,14 +16,17 @@ import (
 	"github.com/james-lawrence/deeppool/internal/x/errorsx"
 	"github.com/james-lawrence/deeppool/internal/x/langx"
 	"github.com/james-lawrence/deeppool/internal/x/netipx"
+	"github.com/james-lawrence/deeppool/internal/x/slicesx"
 	"github.com/james-lawrence/deeppool/internal/x/sqlx"
 	"github.com/james-lawrence/deeppool/internal/x/timex"
+	"github.com/james-lawrence/deeppool/internal/x/torrentx"
 	"github.com/james-lawrence/deeppool/tracking"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/bencode"
 	"github.com/james-lawrence/torrent/bep0051"
-	"github.com/james-lawrence/torrent/dht/v2"
-	"github.com/james-lawrence/torrent/dht/v2/krpc"
+	"github.com/james-lawrence/torrent/dht"
+	"github.com/james-lawrence/torrent/dht/int160"
+	"github.com/james-lawrence/torrent/dht/krpc"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
 	"golang.org/x/time/rate"
@@ -39,7 +42,7 @@ func DiscoverDHTBEP51Peers(ctx context.Context, q sqlx.Queryer, s *dht.Server) (
 		time.Sleep(time.Second)
 	}
 
-	l := rate.NewLimiter(rate.Every(100*time.Millisecond), 1)
+	l := rate.NewLimiter(rate.Every(10*time.Second), 1)
 
 	recordinterestingpeer := func(ctx context.Context, db sqlx.Queryer, s *dht.Server, n krpc.NodeInfo) error {
 		var (
@@ -47,7 +50,7 @@ func DiscoverDHTBEP51Peers(ctx context.Context, q sqlx.Queryer, s *dht.Server) (
 			peer tracking.Peer
 		)
 
-		req, b, err := bep0051.NewRequestBinary(s.ID(), n.ID)
+		qi, err := bep0051.NewRequest(s.ID(), n.ID)
 		if err != nil {
 			return errorsx.Wrapf(err, "unable to generate sample request: %s", n.ID)
 		}
@@ -56,12 +59,12 @@ func DiscoverDHTBEP51Peers(ctx context.Context, q sqlx.Queryer, s *dht.Server) (
 		dctx, done := context.WithTimeout(ctx, 30*time.Second)
 		defer done()
 
-		encoded, _, err := s.QueryContext(dctx, dst, req.Q, req.T, b)
-		if err != nil {
+		ret := s.Query(dctx, dst, qi)
+		if ret.Err != nil {
 			return errorsx.Wrap(err, "sample query failed")
 		}
 
-		if err := bencode.Unmarshal(encoded, &resp); err != nil {
+		if err := bencode.Unmarshal(ret.Raw, &resp); err != nil {
 			if _, ok := err.(bencode.ErrUnusedTrailingBytes); !ok {
 				return errorsx.Wrapf(err, "unable to deserialize sample response: %T %s", err, n.ID)
 			}
@@ -87,7 +90,18 @@ func DiscoverDHTBEP51Peers(ctx context.Context, q sqlx.Queryer, s *dht.Server) (
 	for err = l.Wait(ctx); err == nil; err = l.Wait(ctx) {
 		log.Println("locating samplable peers", s.NumNodes(), "available")
 
-		for _, n := range s.Nodes() {
+		target := int160.Random()
+		dis, ok := slicesx.First(s.ClosestGoodNodeInfos(1, target)...)
+		if !ok {
+			continue
+		}
+		ret := s.GetPeers(ctx, dht.NewAddr(dis.Addr.UDP()), target, false, dht.QueryRateLimiting{})
+		if ret.Err != nil {
+			log.Println("failed to discover peers from dht", err)
+			continue
+		}
+
+		for _, n := range torrentx.NodesFromReply(ret) {
 			if err := recordinterestingpeer(ctx, q, s, n); err != nil {
 				log.Println(err)
 				continue
@@ -115,7 +129,7 @@ func DiscoverDHTInfoHashes(ctx context.Context, db sqlx.Queryer, s *dht.Server) 
 			}
 		}()
 
-		req, b, err := bep0051.NewRequestBinary(s.ID(), krpc.ID(p.Peer))
+		qi, err := bep0051.NewRequest(s.ID(), krpc.ID(p.Peer))
 		if err != nil {
 			return errorsx.Wrapf(err, "unable to prepare sample request: %s", p.IP)
 		}
@@ -123,12 +137,12 @@ func DiscoverDHTInfoHashes(ctx context.Context, db sqlx.Queryer, s *dht.Server) 
 
 		log.Println("infohash sample initiated", p.IP, dst.String())
 		defer log.Println("infohash sample completed", p.IP, dst.String())
-		encoded, _, err := s.QueryContext(ctx, dst, req.Q, req.T, b)
-		if err != nil {
+		ret := s.Query(ctx, dst, qi)
+		if ret.Err != nil {
 			return errorsx.Wrapf(err, "query failed: %s", dst.String())
 		}
 
-		if err := bencode.Unmarshal(encoded, &resp); err != nil {
+		if err := bencode.Unmarshal(ret.Raw, &resp); err != nil {
 			return errorsx.Wrapf(err, "unable to deserialized sample response: %s", p.IP)
 		}
 
@@ -211,8 +225,16 @@ func DiscoverDHTInfoHashes(ctx context.Context, db sqlx.Queryer, s *dht.Server) 
 
 // request samples from the domain space.
 func DiscoverDHTMetadata(ctx context.Context, db sqlx.Queryer, s *dht.Server, tclient *torrent.Client, tstore storage.ClientImpl) error {
+	for {
+		if s.NumNodes() > 32 {
+			break
+		}
+		log.Println("minimum nodes not available, waiting", s.NumNodes())
+		time.Sleep(time.Second)
+	}
+
 	l := rate.NewLimiter(rate.Every(10*time.Second), 1)
-	workloads := uint64(1024)
+	workloads := uint64(32)
 
 	runsample := func(ctx context.Context, timeout time.Duration, unk tracking.UnknownHash) (err error) {
 		var (
@@ -245,6 +267,7 @@ func DiscoverDHTMetadata(ctx context.Context, db sqlx.Queryer, s *dht.Server, tc
 		}
 		defer tclient.Stop(metadata)
 
+		log.Println("initiating metadata lookup", metadata.InfoHash)
 		info, err := tclient.Info(dctx, metadata)
 		if contextx.IsDeadlineExceeded(err) {
 			return errorsx.Compact(tracking.UnknownHashCooldown(ctx, db, unk).Scan(&unk), err)
@@ -275,7 +298,7 @@ func DiscoverDHTMetadata(ctx context.Context, db sqlx.Queryer, s *dht.Server, tc
 				squirrel.And{
 					tracking.UnknownHashQueryNeedsCheck(),
 				},
-			).OrderBy("attempts ASC, created_at DESC").Limit(workloads * 2)
+			).OrderBy("attempts ASC, created_at DESC").Limit(workloads * 10)
 			scanner := tracking.UnknownSearch(ctx, db, q)
 			defer scanner.Close()
 

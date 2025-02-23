@@ -128,7 +128,7 @@ func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer) (err error) {
 					continue
 				}
 
-				log.Println("recorded", feed.ID, meta.ID, meta.Description)
+				// log.Println("recorded", feed.ID, meta.ID, meta.Description)
 			}
 
 			if err = tracking.RSSCooldownByID(fctx, q, feed.ID, channel.TTL).Scan(&feed); err != nil {
