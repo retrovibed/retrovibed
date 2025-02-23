@@ -16,8 +16,13 @@ class Display extends StatelessWidget {
           description: Text("RSS"),
           content: Container(
             padding: defaults.padding,
-            child: rss.ListSearchable(search: rss.search),
+            child: rss.ListSearchable(),
           ),
+        ),
+        ds.Accordion(
+          disabled: Text("coming soon"),
+          description: Text("storage"),
+          content: Container(),
         ),
         ds.Accordion(
           disabled: Text("coming soon"),
@@ -27,6 +32,11 @@ class Display extends StatelessWidget {
         ds.Accordion(
           disabled: Text("coming soon"),
           description: Row(children: [Text("VPN (wireguard)")]),
+          content: Container(),
+        ),
+        ds.Accordion(
+          disabled: Text("coming soon - opt in features"),
+          description: Text("billing"),
           content: Container(),
         ),
       ],
