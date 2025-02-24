@@ -85,7 +85,7 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 				torrent.ClientConfigSeed(true),
 				torrent.ClientConfigInfoLogger(log.New(io.Discard, "[torrent] ", log.Flags())),
 				torrent.ClientConfigMuxer(tm),
-				torrent.ClientConfigOptionBucketLimit(32),
+				torrent.ClientConfigBucketLimit(32),
 			),
 		),
 	)
@@ -102,7 +102,7 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		return errorsx.Wrap(err, "unable to add the download directory to be watched")
 	}
 
-	tstore := storage.NewFile(torrentdir)
+	tstore := storage.NewFileByInfoHash(torrentdir)
 	{
 		current, _ := slicesx.First(tclient.DhtServers()...)
 		if peers, err := current.AddNodesFromFile(torrentpeers); err == nil {

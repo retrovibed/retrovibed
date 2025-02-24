@@ -25,7 +25,7 @@ func MetadataInsertWithDefaults(
 	gql genieql.Insert,
 	pattern func(ctx context.Context, q sqlx.Queryer, a Metadata) NewMetadataScannerStaticRow,
 ) {
-	gql.Into("torrents_metadata").Default("created_at", "updated_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT")
+	gql.Into("torrents_metadata").Default("created_at", "updated_at", "hidden_at", "initiated_at", "paused_at", "downloaded").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT")
 }
 
 func MetadataBatchInsertWithDefaults(
@@ -124,7 +124,7 @@ func UnknownHashCooldown(
 	gql genieql.Insert,
 	pattern func(ctx context.Context, q sqlx.Queryer, a UnknownHash) NewUnknownHashScannerStaticRow,
 ) {
-	gql.Into("torrents_unknown_infohashes").Default("created_at", "updated_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, attempts = EXCLUDED.attempts + 1, next_check = NOW() + least(to_hours(CAST(EXCLUDED.attempts AS INT)), to_hours(24))")
+	gql.Into("torrents_unknown_infohashes").Default("created_at", "updated_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, attempts = EXCLUDED.attempts + 1, next_check = NOW() + least(to_minutes(CAST(EXCLUDED.attempts AS INT)*2), to_hours(24))")
 }
 
 //easyjson:json

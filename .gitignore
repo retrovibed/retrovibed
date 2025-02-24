@@ -2,4 +2,5 @@
 .eg.cache
 .eg.runtime
 *.log
+notes*.md
 .torrent.bolt.db

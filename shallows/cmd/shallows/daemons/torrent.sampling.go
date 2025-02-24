@@ -7,6 +7,8 @@ import (
 	"net"
 	"net/netip"
 	"slices"
+	"strconv"
+	"sync/atomic"
 	"time"
 
 	"github.com/Masterminds/squirrel"
@@ -146,6 +148,7 @@ func DiscoverDHTInfoHashes(ctx context.Context, db sqlx.Queryer, s *dht.Server) 
 			return errorsx.Wrapf(err, "unable to deserialized sample response: %s", p.IP)
 		}
 
+		log.Println("length of samples", len(resp.R.Sample)/20)
 		for id := range slices.Chunk(resp.R.Sample, 20) {
 			var (
 				known   tracking.Metadata
@@ -170,13 +173,33 @@ func DiscoverDHTInfoHashes(ctx context.Context, db sqlx.Queryer, s *dht.Server) 
 		return nil
 	}
 
+	const workloads = uint64(12)
+	buff := make(chan tracking.Peer, workloads)
+	for i := uint64(0); i < workloads; i++ {
+		go func(i uint64) {
+			time.Sleep(backoffx.DynamicHashDuration(time.Minute, strconv.FormatInt(int64(i), 36)))
+			for unk := range buff {
+				if err := runsample(ctx, unk); contextx.IgnoreDeadlineExceeded(err) != nil {
+					log.Println("failed to retrieve metadata", unk.ID, err)
+					continue
+				}
+
+				select {
+				case <-ctx.Done():
+					return
+				default:
+				}
+			}
+		}(i)
+	}
+
 	querypeers := func() error {
 		q := tracking.PeerSearchBuilder().Where(
 			squirrel.And{
 				tracking.PeerQueryHasInfoHashes(),
 				tracking.PeerQueryNeedsCheck(),
 			},
-		).Limit(8)
+		).Limit(workloads * 2)
 
 		scanner := tracking.PeerSearch(ctx, db, q)
 		defer scanner.Close()
@@ -190,9 +213,10 @@ func DiscoverDHTInfoHashes(ctx context.Context, db sqlx.Queryer, s *dht.Server) 
 				return err
 			}
 
-			if err := runsample(ctx, p); err != nil {
-				log.Println(err)
-				continue
+			select {
+			case buff <- p:
+			case <-ctx.Done():
+				return ctx.Err()
 			}
 		}
 
@@ -234,7 +258,8 @@ func DiscoverDHTMetadata(ctx context.Context, db sqlx.Queryer, s *dht.Server, tc
 	}
 
 	l := rate.NewLimiter(rate.Every(10*time.Second), 1)
-	workloads := uint64(32)
+	timeouts := uint64(0)
+	workloads := uint64(384)
 
 	runsample := func(ctx context.Context, timeout time.Duration, unk tracking.UnknownHash) (err error) {
 		var (
@@ -255,9 +280,17 @@ func DiscoverDHTMetadata(ctx context.Context, db sqlx.Queryer, s *dht.Server, tc
 				return
 			}
 
-			if l.Allow() {
-				log.Println("locate infohash timed out", unk.ID, unk.Attempts, st, timeout)
+			if l.Allow() && contextx.IsDeadlineExceeded(err) {
+				tc := atomic.SwapUint64(&timeouts, 0) + 1
+				log.Println("locate infohash timed out", tc, float32(tc)/float32(workloads), unk.ID, unk.Attempts, st, timeout)
 				return
+			} else if contextx.IsDeadlineExceeded(err) {
+				atomic.AddUint64(&timeouts, 1)
+				return
+			}
+
+			if err != nil {
+				log.Println("locate infohash failed", unk.ID, unk.Attempts, st, timeout, err)
 			}
 		}()
 
@@ -327,7 +360,8 @@ func DiscoverDHTMetadata(ctx context.Context, db sqlx.Queryer, s *dht.Server, tc
 	buff := make(chan tracking.UnknownHash, workloads)
 	for i := uint64(0); i < workloads; i++ {
 		go func(i uint64) {
-			bs := backoffx.New(backoffx.Exponential(1*time.Second), backoffx.Minimum(20*time.Second), backoffx.Maximum(1*time.Minute))
+			time.Sleep(backoffx.DynamicHashDuration(10*time.Second, strconv.FormatInt(int64(i), 36)))
+			bs := backoffx.New(backoffx.Exponential(1*time.Second), backoffx.Minimum(5*time.Second), backoffx.Maximum(45*time.Second))
 			for unk := range buff {
 				if err := runsample(ctx, bs.Backoff(int(unk.Attempts)), unk); contextx.IgnoreDeadlineExceeded(err) != nil {
 					log.Println("failed to retrieve metadata", unk.ID, err)

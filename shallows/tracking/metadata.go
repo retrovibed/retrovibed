@@ -3,6 +3,7 @@ package tracking
 import (
 	"context"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/Masterminds/squirrel"
@@ -17,7 +18,7 @@ import (
 
 func MetadataOptionFromInfo(i *metainfo.Info) func(*Metadata) {
 	return func(m *Metadata) {
-		m.Description = i.Name
+		m.Description = strings.ToValidUTF8(i.Name, "\uFFFD")
 		m.Bytes = uint64(i.TotalLength())
 	}
 }
