@@ -430,7 +430,7 @@ func (t *torrent) setChunkSize(size pp.Integer) {
 }
 
 func (t *torrent) pieceComplete(piece pieceIndex) bool {
-	if t.chunks == nil {
+	if t == nil || t.chunks == nil {
 		return false
 	}
 

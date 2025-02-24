@@ -62,8 +62,8 @@ func MetadataSearch(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilde
 	return NewMetadataScannerStatic(b.RunWith(q).QueryContext(ctx))
 }
 
-func MetadataQuerySearch(q string) squirrel.Sqlizer {
-	return duckdbx.FTSSearch("fts_main_torrents_metadata", q)
+func MetadataQuerySearch(q string, columns ...string) squirrel.Sqlizer {
+	return duckdbx.FTSSearch("fts_main_torrents_metadata", q, columns...)
 }
 
 func MetadataSearchBuilder() squirrel.SelectBuilder {

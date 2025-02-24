@@ -15,7 +15,7 @@ func ErrUniqueConstraintViolation(err error) error {
 	return err
 }
 
-func FTSSearch(table string, q string) squirrel.Sqlizer {
+func FTSSearch(table string, q string, columns ...string) squirrel.Sqlizer {
 	if stringsx.Blank(q) {
 		return squirrelx.Noop{}
 	}
@@ -44,6 +44,12 @@ func FTSSearch(table string, q string) squirrel.Sqlizer {
 			fmt.Sprintf("COALESCE(%s.match_bm25(id, ?), 0) = 0", table),
 			strings.Join(negative, " "),
 		)
+
+		if len(columns) > 0 {
+			for _, term := range negative {
+				nexpr = squirrel.ConcatExpr(nexpr, squirrel.Expr(fmt.Sprintf(" AND (%s NOT ILIKE ?)", stringsx.Join(" || ", columns...)), term))
+			}
+		}
 	}
 
 	return squirrel.And{pexpr, nexpr}
