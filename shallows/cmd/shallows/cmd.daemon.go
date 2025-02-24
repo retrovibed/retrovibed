@@ -85,6 +85,7 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 				torrent.ClientConfigSeed(true),
 				torrent.ClientConfigInfoLogger(log.New(io.Discard, "[torrent] ", log.Flags())),
 				torrent.ClientConfigMuxer(tm),
+				torrent.ClientConfigOptionBucketLimit(32),
 			),
 		),
 	)

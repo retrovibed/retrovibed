@@ -42,7 +42,6 @@ require (
 	github.com/anacrolix/multiless v0.4.0 // indirect
 	github.com/anacrolix/stm v0.5.0 // indirect
 	github.com/anacrolix/sync v0.5.3 // indirect
-	github.com/anacrolix/torrent v1.58.1 // indirect
 	github.com/anacrolix/upnp v0.1.4 // indirect
 	github.com/apache/arrow-go/v18 v18.0.0 // indirect
 	github.com/bits-and-blooms/bitset v1.20.0 // indirect
@@ -66,12 +65,8 @@ require (
 	github.com/lann/ps v0.0.0-20150810152359-62de8c46ede0 // indirect
 	github.com/mfridman/interpolate v0.0.2 // indirect
 	github.com/miekg/dns v1.1.63 // indirect
-	github.com/minio/sha256-simd v1.0.1 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
-	github.com/mr-tron/base58 v1.2.0 // indirect
 	github.com/mschoch/smat v0.2.0 // indirect
-	github.com/multiformats/go-multihash v0.2.3 // indirect
-	github.com/multiformats/go-varint v0.0.7 // indirect
 	github.com/nxadm/tail v1.4.11 // indirect
 	github.com/pierrec/lz4/v4 v4.1.21 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
@@ -79,7 +74,6 @@ require (
 	github.com/ryszard/goskiplist v0.0.0-20150312221310-2dfbae5fcf46 // indirect
 	github.com/serenize/snaker v0.0.0-20201027110005-a7ad2135616e // indirect
 	github.com/sethvargo/go-retry v0.3.0 // indirect
-	github.com/spaolacci/murmur3 v1.1.0 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
 	github.com/zieckey/goini v0.0.0-20240615065340-08ee21c836fb // indirect
 	go.etcd.io/bbolt v1.4.0 // indirect
@@ -88,7 +82,6 @@ require (
 	golang.org/x/mod v0.23.0 // indirect
 	golang.org/x/sync v0.11.0 // indirect
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
-	lukechampine.com/blake3 v1.3.0 // indirect
 )
 
 require (
@@ -101,7 +94,7 @@ require (
 	github.com/gorilla/mux v1.8.1
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
-	github.com/james-lawrence/torrent v0.0.0-20250224000106-633f438fcdeb
+	github.com/james-lawrence/torrent v0.0.0-20250224001356-9c82155c0729
 	github.com/marcboeker/go-duckdb v1.8.3
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/posener/complete v1.2.3 // indirect
