@@ -7,6 +7,7 @@ CREATE TABLE torrents_metadata (
     hidden_at TIMESTAMPTZ NOT NULL DEFAULT 'infinity',
     initiated_at TIMESTAMPTZ NOT NULL DEFAULT 'infinity',
     paused_at TIMESTAMPTZ NOT NULL DEFAULT 'infinity',
+    tracker VARCHAR NOT NULL, -- will convert this to an array later.
     bytes UBIGINT NOT NULL,
     downloaded UBIGINT NOT NULL,
     peers USMALLINT NOT NULL,
@@ -20,3 +21,4 @@ CREATE TABLE torrents_metadata (
 DROP TABLE IF EXISTS torrents_metadata;
 -- +goose StatementEnd
 -- ALTER TABLE torrents_metadata ADD COLUMN peers_pending USMALLINT DEFAULT 0;
+-- ALTER TABLE torrents_metadata ADD COLUMN tracker VARCHAR DEFAULT '';

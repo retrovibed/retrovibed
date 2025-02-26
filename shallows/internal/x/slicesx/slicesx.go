@@ -29,6 +29,16 @@ func Filter[T any](match func(T) bool, items ...T) (results []T) {
 	return results
 }
 
+func Flatten[T any](items ...[]T) (results []T) {
+	results = make([]T, 0, len(items))
+
+	for _, i := range items {
+		results = append(results, i...)
+	}
+
+	return results
+}
+
 // Find the first matching element
 func Find[T any](match func(T) bool, items ...T) (zero T, _ bool) {
 	for _, i := range items {

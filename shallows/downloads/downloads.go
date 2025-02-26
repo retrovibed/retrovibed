@@ -12,6 +12,7 @@ import (
 	"github.com/fsnotify/fsnotify"
 	"github.com/james-lawrence/deeppool/internal/x/errorsx"
 	"github.com/james-lawrence/deeppool/internal/x/langx"
+	"github.com/james-lawrence/deeppool/internal/x/slicesx"
 	"github.com/james-lawrence/deeppool/internal/x/sqlx"
 	"github.com/james-lawrence/deeppool/internal/x/userx"
 	"github.com/james-lawrence/deeppool/tracking"
@@ -91,20 +92,7 @@ func (t Directory) download(ctx context.Context, path string) {
 
 	var (
 		md tracking.Metadata
-		// dst *os.File
-		// src io.ReadCloser
 	)
-
-	// if err = os.Mkdir(t.c, 0700); fsx.IgnoreIsExist(err) != nil {
-	// 	log.Println(errorsx.Wrap(err, "unable to ensure temp directory"))
-	// 	return
-	// }
-
-	// if dst, err = os.CreateTemp(t.c, meta.InfoHash.HexString()); err != nil {
-	// 	log.Println(errorsx.Wrap(err, "unable to open download destination"))
-	// 	return
-	// }
-	// defer dst.Close()
 
 	tor, _, err := t.d.Start(meta)
 	if err != nil {
@@ -120,7 +108,14 @@ func (t Directory) download(ctx context.Context, path string) {
 		return
 	}
 
-	if err = tracking.MetadataInsertWithDefaults(ctx, t.q, tracking.NewMetadata(langx.Autoptr(tor.Metadata().InfoHash), tracking.MetadataOptionFromInfo(tor.Info()))).Scan(&md); err != nil {
+	if err = tracking.MetadataInsertWithDefaults(
+		ctx,
+		t.q,
+		tracking.NewMetadata(langx.Autoptr(tor.Metadata().InfoHash),
+			tracking.MetadataOptionFromInfo(tor.Info()),
+			tracking.MetadataOptionTrackers(slicesx.Flatten(meta.Trackers...)...),
+		),
+	).Scan(&md); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to insert metadata"))
 		return
 	}

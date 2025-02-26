@@ -30,6 +30,13 @@ func MetadataOptionDescription(d string) func(*Metadata) {
 	}
 }
 
+// Currently will select just the first tracker due to poor list support in duckdb.
+func MetadataOptionTrackers(d ...string) func(*Metadata) {
+	return func(m *Metadata) {
+		// m.Tr
+	}
+}
+
 func MetadataOptionJSONSafeEncode(p *Metadata) {
 	p.CreatedAt = timex.RFC3339NanoEncode(p.CreatedAt)
 	p.UpdatedAt = timex.RFC3339NanoEncode(p.UpdatedAt)
