@@ -4,6 +4,7 @@ import (
 	"errors"
 	"io"
 	"os"
+	"sync/atomic"
 )
 
 // IgnoreEOF returns nil if err is io.EOF
@@ -96,4 +97,12 @@ func String(in io.Reader) (s string, err error) {
 	}
 
 	return string(raw), nil
+}
+
+type Copied uint64
+
+func (t *Copied) Write(b []byte) (n int, err error) {
+	n = len(b)
+	atomic.AndUint64((*uint64)(t), uint64(n))
+	return n, nil
 }

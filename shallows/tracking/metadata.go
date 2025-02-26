@@ -9,6 +9,7 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/james-lawrence/deeppool/internal/x/duckdbx"
 	"github.com/james-lawrence/deeppool/internal/x/langx"
+	"github.com/james-lawrence/deeppool/internal/x/slicesx"
 	"github.com/james-lawrence/deeppool/internal/x/sqlx"
 	"github.com/james-lawrence/deeppool/internal/x/squirrelx"
 	"github.com/james-lawrence/deeppool/internal/x/timex"
@@ -33,7 +34,7 @@ func MetadataOptionDescription(d string) func(*Metadata) {
 // Currently will select just the first tracker due to poor list support in duckdb.
 func MetadataOptionTrackers(d ...string) func(*Metadata) {
 	return func(m *Metadata) {
-		// m.Tr
+		m.Tracker = slicesx.FirstOrZero(d...)
 	}
 }
 
@@ -79,19 +80,23 @@ func MetadataSearchBuilder() squirrel.SelectBuilder {
 }
 
 func DownloadProgress(ctx context.Context, q sqlx.Queryer, md Metadata, dl torrent.Torrent) {
-	log.Println("monitoring download progress", md.ID, md.Description)
+	const (
+		statsfreq = 10 * time.Second
+	)
+	log.Println("monitoring download progress initiated", md.ID, md.Description, md.Tracker)
+	defer log.Println("monitoring download progress completed", md.ID, md.Description, md.Tracker)
 	sub := dl.SubscribePieceStateChanges()
 	defer sub.Close()
 
-	go timex.Every(10*time.Second, func() {
-		stats := dl.Stats()
-		log.Printf("%s: peers(%d:%d:%d) pieces(%d:%d:%d:%d)\n", dl.Metainfo().HashInfoBytes().HexString(), stats.ActivePeers, stats.PendingPeers, stats.TotalPeers, stats.Missing, stats.Outstanding, stats.Unverified, stats.Completed)
-	})
-
+	statst := time.NewTimer(statsfreq)
 	l := rate.NewLimiter(rate.Every(time.Second), 1)
 	for {
 		select {
+		case <-statst.C:
+			stats := dl.Stats()
+			log.Printf("%s: peers(%d:%d:%d) pieces(%d:%d:%d:%d)\n", dl.Metainfo().HashInfoBytes().HexString(), stats.ActivePeers, stats.PendingPeers, stats.TotalPeers, stats.Missing, stats.Outstanding, stats.Unverified, stats.Completed)
 		case <-sub.Values:
+			statst.Reset(statsfreq)
 			if !l.Allow() {
 				continue
 			}
@@ -100,9 +105,10 @@ func DownloadProgress(ctx context.Context, q sqlx.Queryer, md Metadata, dl torre
 			if md.Downloaded == current {
 				continue
 			}
+
 			stats := dl.Stats()
 			log.Printf("%s: peers(%d:%d:%d) pieces(%d:%d:%d:%d)\n", dl.Metainfo().HashInfoBytes().HexString(), stats.ActivePeers, stats.PendingPeers, stats.TotalPeers, stats.Missing, stats.Outstanding, stats.Unverified, stats.Completed)
-			// md.Peers
+
 			if err := MetadataProgressByID(ctx, q, md.ID, uint16(stats.ActivePeers), current).Scan(&md); err != nil {
 				log.Println("failed to update progress", err)
 			}

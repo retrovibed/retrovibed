@@ -91,7 +91,8 @@ func (t Directory) download(ctx context.Context, path string) {
 	}
 
 	var (
-		md tracking.Metadata
+		md         tracking.Metadata
+		downloaded int64
 	)
 
 	tor, _, err := t.d.Start(meta)
@@ -132,9 +133,15 @@ func (t Directory) download(ctx context.Context, path string) {
 	go tracking.DownloadProgress(pctx, t.q, md, tor)
 
 	// just copying as we receive data to block until done.
-	if err = torrent.DownloadInto(ctx, io.Discard, tor); err != nil {
+	if downloaded, err = torrent.DownloadInto(ctx, io.Discard, tor); err != nil {
 		log.Println(errorsx.Wrap(err, "download failed"))
 		return
+	}
+
+	log.Println("download completed", md.ID, md.Description, downloaded)
+
+	if err := tracking.MetadataProgressByID(ctx, t.q, md.ID, 0, uint64(downloaded)).Scan(&md); err != nil {
+		log.Println("failed to update progress", err)
 	}
 }
 

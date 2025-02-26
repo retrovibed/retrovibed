@@ -15,6 +15,7 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/james-lawrence/deeppool/internal/x/backoffx"
 	"github.com/james-lawrence/deeppool/internal/x/contextx"
+	"github.com/james-lawrence/deeppool/internal/x/debugx"
 	"github.com/james-lawrence/deeppool/internal/x/errorsx"
 	"github.com/james-lawrence/deeppool/internal/x/langx"
 	"github.com/james-lawrence/deeppool/internal/x/netipx"
@@ -300,7 +301,7 @@ func DiscoverDHTMetadata(ctx context.Context, db sqlx.Queryer, s *dht.Server, tc
 		}
 		defer tclient.Stop(metadata)
 
-		log.Println("initiating metadata lookup", metadata.InfoHash)
+		debugx.Println("initiating metadata lookup", metadata.InfoHash)
 		info, err := tclient.Info(dctx, metadata)
 		if contextx.IsDeadlineExceeded(err) {
 			return errorsx.Compact(tracking.UnknownHashCooldown(ctx, db, unk).Scan(&unk), err)
