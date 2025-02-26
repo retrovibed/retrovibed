@@ -122,49 +122,49 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 
 	go daemons.PrintStatistics(ctx.Context, db)
 
-	// go func() {
-	// 	dht, ok := slicesx.First(tclient.DhtServers()...)
-	// 	if !ok {
-	// 		log.Println("No DHT servers")
-	// 		return
-	// 	}
+	go func() {
+		dht, ok := slicesx.First(tclient.DhtServers()...)
+		if !ok {
+			log.Println("No DHT servers")
+			return
+		}
 
-	// 	log.Println("auto retrieval of torrent info initiated")
-	// 	defer log.Println("auto retrieval of torrent info completed")
+		log.Println("auto retrieval of torrent info initiated")
+		defer log.Println("auto retrieval of torrent info completed")
 
-	// 	if err := daemons.DiscoverDHTMetadata(ctx.Context, db, dht, tclient, tstore); err != nil {
-	// 		log.Println("resolving info hashes has failed", err)
-	// 		panic(err)
-	// 	}
-	// }()
+		if err := daemons.DiscoverDHTMetadata(ctx.Context, db, dht, tclient, tstore); err != nil {
+			log.Println("resolving info hashes has failed", err)
+			panic(err)
+		}
+	}()
 
-	// go func() {
-	// 	dht, ok := slicesx.First(tclient.DhtServers()...)
-	// 	if !ok {
-	// 		log.Println("No DHT servers")
-	// 		return
-	// 	}
+	go func() {
+		dht, ok := slicesx.First(tclient.DhtServers()...)
+		if !ok {
+			log.Println("No DHT servers")
+			return
+		}
 
-	// 	log.Println("autodiscovery of hashes initiated")
-	// 	defer log.Println("autodiscovery of hashes completed")
-	// 	if err := daemons.DiscoverDHTInfoHashes(ctx.Context, db, dht); err != nil {
-	// 		log.Println("autodiscovery of hashes failed", err)
-	// 		return
-	// 	}
-	// }()
+		log.Println("autodiscovery of hashes initiated")
+		defer log.Println("autodiscovery of hashes completed")
+		if err := daemons.DiscoverDHTInfoHashes(ctx.Context, db, dht); err != nil {
+			log.Println("autodiscovery of hashes failed", err)
+			return
+		}
+	}()
 
-	// go func() {
-	// 	dht, ok := slicesx.First(tclient.DhtServers()...)
-	// 	if !ok {
-	// 		log.Println("No DHT servers")
-	// 		return
-	// 	}
-	// 	log.Println("autodiscovery of samplable peers initiated")
-	// 	defer log.Println("autodiscovery of samplable peers completed")
-	// 	if err := daemons.DiscoverDHTBEP51Peers(ctx.Context, db, dht); err != nil {
-	// 		log.Println("peer locating failed", err)
-	// 	}
-	// }()
+	go func() {
+		dht, ok := slicesx.First(tclient.DhtServers()...)
+		if !ok {
+			log.Println("No DHT servers")
+			return
+		}
+		log.Println("autodiscovery of samplable peers initiated")
+		defer log.Println("autodiscovery of samplable peers completed")
+		if err := daemons.DiscoverDHTBEP51Peers(ctx.Context, db, dht); err != nil {
+			log.Println("peer locating failed", err)
+		}
+	}()
 
 	go func() {
 		if err := daemons.DiscoverFromRSSFeeds(ctx.Context, db); err != nil {

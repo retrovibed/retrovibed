@@ -141,21 +141,6 @@ func (t Directory) download(ctx context.Context, path string) {
 		log.Println(errorsx.Wrap(err, "download failed"))
 		return
 	}
-
-	// if _, err := io.Copy(dst, src); err != nil {
-	// 	log.Println("download failed", err)
-	// 	return
-	// }
-
-	// if err := os.MkdirAll(t.s, 0700); err != nil {
-	// 	log.Println("unable to ensure storage directory", err)
-	// 	return
-	// }
-
-	// if err := os.Rename(dst.Name(), filepath.Join(t.s, meta.InfoHash.HexString())); err != nil {
-	// 	log.Println("unable rename", dst.Name(), "->", filepath.Join(t.s, meta.InfoHash.HexString()), err)
-	// 	return
-	// }
 }
 
 func (t Directory) background(ctx context.Context) Directory {
