@@ -12,7 +12,6 @@ import (
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/krpc"
 	"github.com/james-lawrence/torrent/metainfo"
-	"github.com/james-lawrence/torrent/x/conntrack"
 	"golang.org/x/time/rate"
 
 	"github.com/james-lawrence/torrent/mse"
@@ -123,8 +122,6 @@ type ClientConfig struct {
 	// connection for a given Torrent.
 	dropDuplicatePeerIds bool
 
-	ConnTracker *conntrack.Instance
-
 	connections.Handshaker
 
 	// OnQuery hook func
@@ -212,7 +209,6 @@ func NewDefaultClientConfig(options ...ClientConfigOption) *ClientConfig {
 		UploadRateLimiter:         rate.NewLimiter(rate.Inf, 0),
 		DownloadRateLimiter:       rate.NewLimiter(rate.Inf, 0),
 		dialRateLimiter:           rate.NewLimiter(rate.Inf, 0),
-		ConnTracker:               conntrack.NewInstance(),
 		DisableAcceptRateLimiting: true,
 		HeaderObfuscationPolicy: HeaderObfuscationPolicy{
 			Preferred:        true,

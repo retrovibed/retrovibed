@@ -8,14 +8,13 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/james-lawrence/deeppool/internal/x/errorsx"
-	"github.com/james-lawrence/deeppool/internal/x/fsx"
+	"github.com/james-lawrence/deeppool/internal/x/langx"
 	"github.com/james-lawrence/deeppool/internal/x/sqlx"
-	"github.com/james-lawrence/deeppool/internal/x/timex"
 	"github.com/james-lawrence/deeppool/internal/x/userx"
+	"github.com/james-lawrence/deeppool/tracking"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/storage"
 )
@@ -24,7 +23,7 @@ type downloader interface {
 	Start(t torrent.Metadata) (dl torrent.Torrent, added bool, err error)
 }
 
-func NewDirectoryWatcher(ctx context.Context, q sqlx.Queryer, dl downloader) (d Directory, err error) {
+func NewDirectoryWatcher(ctx context.Context, q sqlx.Queryer, dl downloader, s storage.ClientImpl) (d Directory, err error) {
 	var (
 		w *fsnotify.Watcher
 	)
@@ -37,7 +36,7 @@ func NewDirectoryWatcher(ctx context.Context, q sqlx.Queryer, dl downloader) (d 
 		d: dl,
 		w: w,
 		c: userx.DefaultCacheDirectory(userx.DefaultRelRoot()),
-		s: userx.DefaultDataDirectory(userx.DefaultRelRoot(), "media"),
+		s: s,
 		q: q,
 	}.background(ctx), nil
 }
@@ -47,7 +46,7 @@ type Directory struct {
 	q sqlx.Queryer
 	w *fsnotify.Watcher
 	c string
-	s string
+	s storage.ClientImpl
 }
 
 func (t Directory) Add(path string) (err error) {
@@ -84,27 +83,28 @@ func (t Directory) Add(path string) (err error) {
 
 // background download
 func (t Directory) download(ctx context.Context, path string) {
-	meta, err := torrent.NewFromMetaInfoFile(path, torrent.OptionStorage(storage.NewFile(t.s)))
+	meta, err := torrent.NewFromMetaInfoFile(path, torrent.OptionStorage(t.s))
 	if err != nil {
 		log.Println("unable to process", path, "ignoring", err)
 		return
 	}
 
 	var (
-		dst *os.File
-		src io.ReadCloser
+		md tracking.Metadata
+		// dst *os.File
+		// src io.ReadCloser
 	)
 
-	if err = os.Mkdir(t.c, 0700); fsx.IgnoreIsExist(err) != nil {
-		log.Println(errorsx.Wrap(err, "unable to ensure temp directory"))
-		return
-	}
+	// if err = os.Mkdir(t.c, 0700); fsx.IgnoreIsExist(err) != nil {
+	// 	log.Println(errorsx.Wrap(err, "unable to ensure temp directory"))
+	// 	return
+	// }
 
-	if dst, err = os.CreateTemp(t.c, meta.InfoHash.HexString()); err != nil {
-		log.Println(errorsx.Wrap(err, "unable to open download destination"))
-		return
-	}
-	defer dst.Close()
+	// if dst, err = os.CreateTemp(t.c, meta.InfoHash.HexString()); err != nil {
+	// 	log.Println(errorsx.Wrap(err, "unable to open download destination"))
+	// 	return
+	// }
+	// defer dst.Close()
 
 	tor, _, err := t.d.Start(meta)
 	if err != nil {
@@ -112,30 +112,50 @@ func (t Directory) download(ctx context.Context, path string) {
 		return
 	}
 
-	go timex.Every(10*time.Second, func() {
-		stats := tor.Stats()
-		log.Printf("%s: peers(%d:%d:%d) pieces(%d:%d:%d:%d)\n", tor.Metainfo().HashInfoBytes().HexString(), stats.ActivePeers, stats.PendingPeers, stats.TotalPeers, stats.Missing, stats.Outstanding, stats.Unverified, stats.Completed)
-	})
+	log.Println("wait for torrent info", meta.InfoHash)
+	select {
+	case <-tor.GotInfo():
+	case <-ctx.Done():
+		log.Println("failed to retrieve torrent information, manually restart will be required")
+		return
+	}
 
-	if err = torrent.DownloadInto(ctx, dst, tor); err != nil {
+	if err = tracking.MetadataInsertWithDefaults(ctx, t.q, tracking.NewMetadata(langx.Autoptr(tor.Metadata().InfoHash), tracking.MetadataOptionFromInfo(tor.Info()))).Scan(&md); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to insert metadata"))
+		return
+	}
+
+	if err = tracking.MetadataDownloadByID(ctx, t.q, md.ID).Scan(&md); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to mark metadata as downloading"))
+		return
+	}
+
+	pctx, done := context.WithCancel(ctx)
+	defer done()
+
+	// update the progress.
+	go tracking.DownloadProgress(pctx, t.q, md, tor)
+
+	// just copying as we receive data to block until done.
+	if err = torrent.DownloadInto(ctx, io.Discard, tor); err != nil {
 		log.Println(errorsx.Wrap(err, "download failed"))
 		return
 	}
 
-	if _, err := io.Copy(dst, src); err != nil {
-		log.Println("download failed", err)
-		return
-	}
+	// if _, err := io.Copy(dst, src); err != nil {
+	// 	log.Println("download failed", err)
+	// 	return
+	// }
 
-	if err := os.MkdirAll(t.s, 0700); err != nil {
-		log.Println("unable to ensure storage directory", err)
-		return
-	}
+	// if err := os.MkdirAll(t.s, 0700); err != nil {
+	// 	log.Println("unable to ensure storage directory", err)
+	// 	return
+	// }
 
-	if err := os.Rename(dst.Name(), filepath.Join(t.s, meta.InfoHash.HexString())); err != nil {
-		log.Println("unable rename", dst.Name(), "->", filepath.Join(t.s, meta.InfoHash.HexString()), err)
-		return
-	}
+	// if err := os.Rename(dst.Name(), filepath.Join(t.s, meta.InfoHash.HexString())); err != nil {
+	// 	log.Println("unable rename", dst.Name(), "->", filepath.Join(t.s, meta.InfoHash.HexString()), err)
+	// 	return
+	// }
 }
 
 func (t Directory) background(ctx context.Context) Directory {
@@ -145,6 +165,7 @@ func (t Directory) background(ctx context.Context) Directory {
 			case evt := <-t.w.Events:
 				switch evt.Op {
 				case fsnotify.Create:
+				case fsnotify.Chmod:
 					// fallthrough.
 				default:
 					log.Println("change ignored", evt.Op)

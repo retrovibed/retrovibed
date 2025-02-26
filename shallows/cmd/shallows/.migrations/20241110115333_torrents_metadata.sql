@@ -9,6 +9,7 @@ CREATE TABLE torrents_metadata (
     paused_at TIMESTAMPTZ NOT NULL DEFAULT 'infinity',
     bytes UBIGINT NOT NULL,
     downloaded UBIGINT NOT NULL,
+    peers USMALLINT NOT NULL,
     description STRING NOT NULL DEFAULT '',
     infohash BINARY NOT NULL
 );
@@ -18,3 +19,4 @@ CREATE TABLE torrents_metadata (
 -- +goose StatementBegin
 DROP TABLE IF EXISTS torrents_metadata;
 -- +goose StatementEnd
+-- ALTER TABLE torrents_metadata ADD COLUMN peers_pending USMALLINT DEFAULT 0;

@@ -14,6 +14,7 @@ import (
 	"github.com/james-lawrence/deeppool/internal/x/timex"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/metainfo"
+	"golang.org/x/time/rate"
 )
 
 func MetadataOptionFromInfo(i *metainfo.Info) func(*Metadata) {
@@ -71,16 +72,35 @@ func MetadataSearchBuilder() squirrel.SelectBuilder {
 }
 
 func DownloadProgress(ctx context.Context, q sqlx.Queryer, md Metadata, dl torrent.Torrent) {
-	for range time.Tick(time.Second) {
-		current := uint64(dl.BytesCompleted())
-		if md.Downloaded == current {
-			continue
-		}
+	log.Println("monitoring download progress", md.ID, md.Description)
+	sub := dl.SubscribePieceStateChanges()
+	defer sub.Close()
 
-		if err := MetadataProgressByID(ctx, q, md.ID, current).Scan(&md); err != nil {
-			log.Println("failed to update progress", err)
-		} else {
-			log.Println(md.ID, "updated", md.Downloaded/md.Bytes, md.Downloaded, "/", md.Bytes)
+	go timex.Every(10*time.Second, func() {
+		stats := dl.Stats()
+		log.Printf("%s: peers(%d:%d:%d) pieces(%d:%d:%d:%d)\n", dl.Metainfo().HashInfoBytes().HexString(), stats.ActivePeers, stats.PendingPeers, stats.TotalPeers, stats.Missing, stats.Outstanding, stats.Unverified, stats.Completed)
+	})
+
+	l := rate.NewLimiter(rate.Every(time.Second), 1)
+	for {
+		select {
+		case <-sub.Values:
+			if !l.Allow() {
+				continue
+			}
+
+			current := uint64(dl.BytesCompleted())
+			if md.Downloaded == current {
+				continue
+			}
+			stats := dl.Stats()
+			log.Printf("%s: peers(%d:%d:%d) pieces(%d:%d:%d:%d)\n", dl.Metainfo().HashInfoBytes().HexString(), stats.ActivePeers, stats.PendingPeers, stats.TotalPeers, stats.Missing, stats.Outstanding, stats.Unverified, stats.Completed)
+			// md.Peers
+			if err := MetadataProgressByID(ctx, q, md.ID, uint16(stats.ActivePeers), current).Scan(&md); err != nil {
+				log.Println("failed to update progress", err)
+			}
+		case <-ctx.Done():
+			return
 		}
 	}
 }

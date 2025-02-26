@@ -24,6 +24,8 @@ class DownloadRowDisplay extends StatelessWidget {
             ),
           ),
           gap,
+          Text(current.peers.toString()),
+          gap,
           Expanded(
             child: LinearProgressIndicator(
               value:

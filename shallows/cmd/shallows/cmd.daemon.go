@@ -93,7 +93,9 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		return errorsx.Wrap(err, "unable to setup torrent client")
 	}
 
-	dwatcher, err := downloads.NewDirectoryWatcher(ctx.Context, db, tclient)
+	tstore := storage.NewFileByInfoHash(torrentdir)
+
+	dwatcher, err := downloads.NewDirectoryWatcher(ctx.Context, db, tclient, tstore)
 	if err != nil {
 		return errorsx.Wrap(err, "unable to setup directory monitoring for torrents")
 	}
@@ -102,7 +104,6 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		return errorsx.Wrap(err, "unable to add the download directory to be watched")
 	}
 
-	tstore := storage.NewFileByInfoHash(torrentdir)
 	{
 		current, _ := slicesx.First(tclient.DhtServers()...)
 		if peers, err := current.AddNodesFromFile(torrentpeers); err == nil {
@@ -121,49 +122,49 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 
 	go daemons.PrintStatistics(ctx.Context, db)
 
-	go func() {
-		dht, ok := slicesx.First(tclient.DhtServers()...)
-		if !ok {
-			log.Println("No DHT servers")
-			return
-		}
+	// go func() {
+	// 	dht, ok := slicesx.First(tclient.DhtServers()...)
+	// 	if !ok {
+	// 		log.Println("No DHT servers")
+	// 		return
+	// 	}
 
-		log.Println("auto retrieval of torrent info initiated")
-		defer log.Println("auto retrieval of torrent info completed")
+	// 	log.Println("auto retrieval of torrent info initiated")
+	// 	defer log.Println("auto retrieval of torrent info completed")
 
-		if err := daemons.DiscoverDHTMetadata(ctx.Context, db, dht, tclient, tstore); err != nil {
-			log.Println("resolving info hashes has failed", err)
-			panic(err)
-		}
-	}()
+	// 	if err := daemons.DiscoverDHTMetadata(ctx.Context, db, dht, tclient, tstore); err != nil {
+	// 		log.Println("resolving info hashes has failed", err)
+	// 		panic(err)
+	// 	}
+	// }()
 
-	go func() {
-		dht, ok := slicesx.First(tclient.DhtServers()...)
-		if !ok {
-			log.Println("No DHT servers")
-			return
-		}
+	// go func() {
+	// 	dht, ok := slicesx.First(tclient.DhtServers()...)
+	// 	if !ok {
+	// 		log.Println("No DHT servers")
+	// 		return
+	// 	}
 
-		log.Println("autodiscovery of hashes initiated")
-		defer log.Println("autodiscovery of hashes completed")
-		if err := daemons.DiscoverDHTInfoHashes(ctx.Context, db, dht); err != nil {
-			log.Println("autodiscovery of hashes failed", err)
-			return
-		}
-	}()
+	// 	log.Println("autodiscovery of hashes initiated")
+	// 	defer log.Println("autodiscovery of hashes completed")
+	// 	if err := daemons.DiscoverDHTInfoHashes(ctx.Context, db, dht); err != nil {
+	// 		log.Println("autodiscovery of hashes failed", err)
+	// 		return
+	// 	}
+	// }()
 
-	go func() {
-		dht, ok := slicesx.First(tclient.DhtServers()...)
-		if !ok {
-			log.Println("No DHT servers")
-			return
-		}
-		log.Println("autodiscovery of samplable peers initiated")
-		defer log.Println("autodiscovery of samplable peers completed")
-		if err := daemons.DiscoverDHTBEP51Peers(ctx.Context, db, dht); err != nil {
-			log.Println("peer locating failed", err)
-		}
-	}()
+	// go func() {
+	// 	dht, ok := slicesx.First(tclient.DhtServers()...)
+	// 	if !ok {
+	// 		log.Println("No DHT servers")
+	// 		return
+	// 	}
+	// 	log.Println("autodiscovery of samplable peers initiated")
+	// 	defer log.Println("autodiscovery of samplable peers completed")
+	// 	if err := daemons.DiscoverDHTBEP51Peers(ctx.Context, db, dht); err != nil {
+	// 		log.Println("peer locating failed", err)
+	// 	}
+	// }()
 
 	go func() {
 		if err := daemons.DiscoverFromRSSFeeds(ctx.Context, db); err != nil {
@@ -171,7 +172,7 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		}
 	}()
 
-	// go daemons.ResumeDownloads(ctx.Context, db, tclient, tstore)
+	go daemons.ResumeDownloads(ctx.Context, db, tclient, tstore)
 
 	httpmux := mux.NewRouter()
 	httpmux.NotFoundHandler = httpx.NotFound(alice.New())
@@ -192,7 +193,7 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		),
 	).Methods(http.MethodGet)
 
-	media.NewHTTPDiscovered(db, tclient, storage.NewFile(torrentdir)).Bind(httpmux.PathPrefix("/d").Subrouter())
+	media.NewHTTPDiscovered(db, tclient, tstore).Bind(httpmux.PathPrefix("/d").Subrouter())
 	media.NewHTTPRSSFeed(db).Bind(httpmux.PathPrefix("/rss").Subrouter())
 
 	if httpbind, err = net.Listen("tcp", ":9998"); err != nil {

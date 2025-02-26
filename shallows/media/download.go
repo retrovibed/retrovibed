@@ -12,5 +12,6 @@ func DownloadOptionFromTorrentMetadata(cc tracking.Metadata) DownloadOption {
 		c.Media = langx.Autoptr(langx.Clone(Media{}, MediaOptionFromTorrentMetadata(cc)))
 		c.Bytes = cc.Bytes
 		c.Downloaded = cc.Downloaded
+		c.Peers = uint32(cc.Peers)
 	}
 }

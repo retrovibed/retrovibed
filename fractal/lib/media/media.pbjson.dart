@@ -71,6 +71,7 @@ const Download$json = {
     {'1': 'downloaded', '3': 3, '4': 1, '5': 4, '10': 'downloaded'},
     {'1': 'initiated_at', '3': 4, '4': 1, '5': 9, '10': 'initiated_at'},
     {'1': 'paused_at', '3': 5, '4': 1, '5': 9, '10': 'paused_at'},
+    {'1': 'peers', '3': 6, '4': 1, '5': 13, '10': 'peers'},
   ],
 };
 
@@ -78,8 +79,8 @@ const Download$json = {
 final $typed_data.Uint8List downloadDescriptor = $convert.base64Decode(
     'CghEb3dubG9hZBIiCgVtZWRpYRgBIAEoCzIMLm1lZGlhLk1lZGlhUgVtZWRpYRIUCgVieXRlcx'
     'gCIAEoBFIFYnl0ZXMSHgoKZG93bmxvYWRlZBgDIAEoBFIKZG93bmxvYWRlZBIiCgxpbml0aWF0'
-    'ZWRfYXQYBCABKAlSDGluaXRpYXRlZF9hdBIcCglwYXVzZWRfYXQYBSABKAlSCXBhdXNlZF9hdA'
-    '==');
+    'ZWRfYXQYBCABKAlSDGluaXRpYXRlZF9hdBIcCglwYXVzZWRfYXQYBSABKAlSCXBhdXNlZF9hdB'
+    'IUCgVwZWVycxgGIAEoDVIFcGVlcnM=');
 
 @$core.Deprecated('Use downloadSearchRequestDescriptor instead')
 const DownloadSearchRequest$json = {

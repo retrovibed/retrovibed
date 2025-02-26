@@ -251,6 +251,7 @@ class Download extends $pb.GeneratedMessage {
     $fixnum.Int64? downloaded,
     $core.String? initiatedAt,
     $core.String? pausedAt,
+    $core.int? peers,
   }) {
     final $result = create();
     if (media != null) {
@@ -268,6 +269,9 @@ class Download extends $pb.GeneratedMessage {
     if (pausedAt != null) {
       $result.pausedAt = pausedAt;
     }
+    if (peers != null) {
+      $result.peers = peers;
+    }
     return $result;
   }
   Download._() : super();
@@ -280,6 +284,7 @@ class Download extends $pb.GeneratedMessage {
     ..a<$fixnum.Int64>(3, _omitFieldNames ? '' : 'downloaded', $pb.PbFieldType.OU6, defaultOrMaker: $fixnum.Int64.ZERO)
     ..aOS(4, _omitFieldNames ? '' : 'initiated_at')
     ..aOS(5, _omitFieldNames ? '' : 'paused_at')
+    ..a<$core.int>(6, _omitFieldNames ? '' : 'peers', $pb.PbFieldType.OU3)
     ..hasRequiredFields = false
   ;
 
@@ -350,6 +355,15 @@ class Download extends $pb.GeneratedMessage {
   $core.bool hasPausedAt() => $_has(4);
   @$pb.TagNumber(5)
   void clearPausedAt() => clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.int get peers => $_getIZ(5);
+  @$pb.TagNumber(6)
+  set peers($core.int v) { $_setUnsignedInt32(5, v); }
+  @$pb.TagNumber(6)
+  $core.bool hasPeers() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearPeers() => clearField(6);
 }
 
 class DownloadSearchRequest extends $pb.GeneratedMessage {

@@ -99,9 +99,12 @@ func (s *Server) WriteStatus(w io.Writer) {
 			tw := tabwriter.NewWriter(w, 0, 0, 1, ' ', 0)
 			fmt.Fprintf(tw, "  node id\taddr\tlast query\tlast response\trecv\tdiscard\tflags\n")
 			// Bucket nodes ordered by distance from server ID.
-			nodes := slices.SortedFunc(b.NodeIter(), func(l *node, r *node) int {
+
+			nodes := b.NodeIter()
+			slices.SortFunc(nodes, func(l, r *node) int {
 				return l.Id.Distance(s.id).Cmp(r.Id.Distance(s.id))
 			})
+
 			for _, n := range nodes {
 				var flags []string
 				if s.IsQuestionable(n) {

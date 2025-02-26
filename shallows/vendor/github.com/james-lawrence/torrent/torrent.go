@@ -1559,7 +1559,16 @@ func (t *torrent) announceToDht(impliedPort bool, s *dht.Server) error {
 	ctx, done := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer done()
 
-	ps, err := s.Announce(ctx, t.infoHash, t.cln.incomingPeerPort(), impliedPort)
+	var opts []dht.AnnounceOpt
+
+	if port := t.cln.incomingPeerPort(); port != 0 || impliedPort {
+		opts = append([]dht.AnnounceOpt{dht.AnnouncePeer(dht.AnnouncePeerOpts{
+			Port:        port,
+			ImpliedPort: impliedPort,
+		})}, opts...)
+	}
+
+	ps, err := s.AnnounceTraversal(ctx, t.infoHash, opts...)
 	if err != nil {
 		return err
 	}
