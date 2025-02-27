@@ -17,6 +17,7 @@ func Build(ctx context.Context, _ eg.Op) error {
 	return shell.Run(
 		ctx,
 		runtime.New("flutter create --platforms=linux ."),
+		runtime.Newf("flutter build bundle"),
 		runtime.Newf("flutter build linux"),
 	)
 }

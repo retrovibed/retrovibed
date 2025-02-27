@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"eg/compute/fractal"
+	"eg/compute/release"
 	"log"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
@@ -28,6 +29,9 @@ func main() {
 		eg.Parallel(
 			eg.Module(ctx, deb, fractal.Tests),
 			eg.Module(ctx, deb, fractal.Linting),
+		),
+		eg.Parallel(
+			eg.Module(ctx, deb, release.Flatpak),
 		),
 		// eg.Module(ctx, deb.OptionLiteral("--publish", "3000:3000"), www.Build, www.Webserver),
 	)

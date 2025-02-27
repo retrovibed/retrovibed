@@ -32,3 +32,4 @@ RUN sudo -H -S -u egd -g egd dart pub global activate protoc_plugin
 RUN GOBIN="/usr/local/bin" go install -tags genieql.duckdb,no_duckdb_arrow github.com/james-lawrence/genieql/...@latest
 RUN GOBIN="/usr/local/bin" go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 RUN which genieql
+RUN apt-get -y install tree flatpak-builder
