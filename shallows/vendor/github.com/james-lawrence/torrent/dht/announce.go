@@ -74,6 +74,20 @@ func AnnouncePeer(opts AnnouncePeerOpts) AnnounceOpt {
 	}
 }
 
+// Deprecated: Use Server.AnnounceTraversal.
+// Traverses the DHT graph toward nodes that store peers for the infohash, streaming them to the
+// caller, and announcing the local node to each responding node if port is non-zero or impliedPort
+// is true.
+func (s *Server) Announce(ctx context.Context, infoHash [20]byte, port int, impliedPort bool, opts ...AnnounceOpt) (_ *Announce, err error) {
+	if port != 0 || impliedPort {
+		opts = append([]AnnounceOpt{AnnouncePeer(AnnouncePeerOpts{
+			Port:        port,
+			ImpliedPort: impliedPort,
+		})}, opts...)
+	}
+	return s.AnnounceTraversal(ctx, infoHash, opts...)
+}
+
 // Traverses the DHT graph toward nodes that store peers for the infohash, streaming them to the
 // caller.
 func (s *Server) AnnounceTraversal(ctx context.Context, infoHash [20]byte, opts ...AnnounceOpt) (_ *Announce, err error) {

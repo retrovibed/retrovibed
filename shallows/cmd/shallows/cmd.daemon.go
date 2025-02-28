@@ -86,6 +86,20 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 				torrent.ClientConfigInfoLogger(log.New(io.Discard, "[torrent] ", log.Flags())),
 				torrent.ClientConfigMuxer(tm),
 				torrent.ClientConfigBucketLimit(32),
+				torrent.ClientConfigBootstrapFn(func(n string) dht.StartingNodesGetter {
+					return func() (res []dht.Addr, err error) {
+						ps, err := dht.ReadNodesFromFile(torrentpeers)
+						if err != nil {
+							return nil, err
+						}
+
+						for _, p := range ps {
+							res = append(res, dht.NewAddr(p.Addr.UDP()))
+						}
+
+						return res, nil
+					}
+				}),
 			),
 		),
 	)

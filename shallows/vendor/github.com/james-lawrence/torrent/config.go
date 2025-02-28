@@ -12,6 +12,7 @@ import (
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/krpc"
 	"github.com/james-lawrence/torrent/metainfo"
+	"github.com/james-lawrence/torrent/x/conntrack"
 	"golang.org/x/time/rate"
 
 	"github.com/james-lawrence/torrent/mse"
@@ -122,6 +123,8 @@ type ClientConfig struct {
 	// connection for a given Torrent.
 	dropDuplicatePeerIds bool
 
+	ConnTracker *conntrack.Instance
+
 	connections.Handshaker
 
 	// OnQuery hook func
@@ -188,6 +191,18 @@ func ClientConfigPeerID(s string) ClientConfigOption {
 	}
 }
 
+func ClientConfigBootstrapFn(fn func(n string) dht.StartingNodesGetter) ClientConfigOption {
+	return func(c *ClientConfig) {
+		c.DhtStartingNodes = fn
+	}
+}
+
+func ClientConfigBootstrapGlobal(c *ClientConfig) {
+	c.DhtStartingNodes = func(network string) dht.StartingNodesGetter {
+		return func() ([]dht.Addr, error) { return dht.GlobalBootstrapAddrs(network) }
+	}
+}
+
 // NewDefaultClientConfig default client configuration.
 func NewDefaultClientConfig(options ...ClientConfigOption) *ClientConfig {
 	cc := &ClientConfig{
@@ -202,13 +217,13 @@ func NewDefaultClientConfig(options ...ClientConfigOption) *ClientConfig {
 		TorrentPeersHighWater:          500,
 		TorrentPeersLowWater:           50,
 		HandshakesTimeout:              4 * time.Second,
-		// DhtStartingNodes:               dht.GlobalBootstrapAddrs,
 		DhtStartingNodes: func(network string) dht.StartingNodesGetter {
-			return func() ([]dht.Addr, error) { return dht.GlobalBootstrapAddrs(network) }
+			return func() ([]dht.Addr, error) { return nil, nil }
 		},
 		UploadRateLimiter:         rate.NewLimiter(rate.Inf, 0),
 		DownloadRateLimiter:       rate.NewLimiter(rate.Inf, 0),
 		dialRateLimiter:           rate.NewLimiter(rate.Inf, 0),
+		ConnTracker:               conntrack.NewInstance(),
 		DisableAcceptRateLimiting: true,
 		HeaderObfuscationPolicy: HeaderObfuscationPolicy{
 			Preferred:        true,

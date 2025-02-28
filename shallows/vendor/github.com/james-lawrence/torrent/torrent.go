@@ -90,26 +90,24 @@ type Torrent interface {
 }
 
 // Download a torrent into a writer blocking until completion.
-func DownloadInto(ctx context.Context, dst io.Writer, m Torrent, options ...Tuner) (n int64, err error) {
+func DownloadInto(ctx context.Context, dst io.Writer, m Torrent, options ...Tuner) (err error) {
 	if err = m.Tune(options...); err != nil {
-		return 0, err
+		return err
 	}
 
 	select {
 	case <-m.GotInfo():
 	case <-ctx.Done():
-		return 0, ctx.Err()
+		return ctx.Err()
 	}
 
-	n, err = io.Copy(dst, m.NewReader())
-	if err != nil {
-		return 0, err
-	}
-	if n != m.Info().TotalLength() {
-		return n, errors.Errorf("download failed, missing data %d != %d", n, m.Info().TotalLength())
+	if n, err := io.Copy(dst, m.NewReader()); err != nil {
+		return err
+	} else if n != m.Info().TotalLength() {
+		return errors.Errorf("download failed, missing data %d != %d", n, m.Info().TotalLength())
 	}
 
-	return n, nil
+	return nil
 }
 
 func newTorrent(cl *Client, src Metadata) *torrent {
@@ -432,7 +430,7 @@ func (t *torrent) setChunkSize(size pp.Integer) {
 }
 
 func (t *torrent) pieceComplete(piece pieceIndex) bool {
-	if t == nil || t.chunks == nil {
+	if t.chunks == nil {
 		return false
 	}
 
@@ -1561,16 +1559,7 @@ func (t *torrent) announceToDht(impliedPort bool, s *dht.Server) error {
 	ctx, done := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer done()
 
-	var opts []dht.AnnounceOpt
-
-	if port := t.cln.incomingPeerPort(); port != 0 || impliedPort {
-		opts = append([]dht.AnnounceOpt{dht.AnnouncePeer(dht.AnnouncePeerOpts{
-			Port:        port,
-			ImpliedPort: impliedPort,
-		})}, opts...)
-	}
-
-	ps, err := s.AnnounceTraversal(ctx, t.infoHash, opts...)
+	ps, err := s.Announce(ctx, t.infoHash, t.cln.incomingPeerPort(), impliedPort)
 	if err != nil {
 		return err
 	}
