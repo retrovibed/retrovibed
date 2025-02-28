@@ -152,6 +152,9 @@ func (cfg *ClientConfig) debug() llog {
 // ClientConfigOption options for the client configuration
 type ClientConfigOption func(*ClientConfig)
 
+// useful for default noop configurations.
+func ClientConfigNoop(c *ClientConfig) {}
+
 func ClientConfigDialRateLimit(l *rate.Limiter) ClientConfigOption {
 	return func(cc *ClientConfig) {
 		cc.dialRateLimiter = l
@@ -201,6 +204,24 @@ func ClientConfigBootstrapGlobal(c *ClientConfig) {
 	c.DhtStartingNodes = func(network string) dht.StartingNodesGetter {
 		return func() ([]dht.Addr, error) { return dht.GlobalBootstrapAddrs(network) }
 	}
+}
+
+// Bootstrap from a file written by dht.WriteNodesToFile
+func ClientConfigBootstrapPeerFile(path string) ClientConfigOption {
+	return ClientConfigBootstrapFn(func(n string) dht.StartingNodesGetter {
+		return func() (res []dht.Addr, err error) {
+			ps, err := dht.ReadNodesFromFile(n)
+			if err != nil {
+				return nil, err
+			}
+
+			for _, p := range ps {
+				res = append(res, dht.NewAddr(p.Addr.UDP()))
+			}
+
+			return res, nil
+		}
+	})
 }
 
 // NewDefaultClientConfig default client configuration.

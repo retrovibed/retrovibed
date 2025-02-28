@@ -21,6 +21,7 @@ import (
 	"github.com/james-lawrence/deeppool/internal/x/dhtx"
 	"github.com/james-lawrence/deeppool/internal/x/envx"
 	"github.com/james-lawrence/deeppool/internal/x/errorsx"
+	"github.com/james-lawrence/deeppool/internal/x/fsx"
 	"github.com/james-lawrence/deeppool/internal/x/goosex"
 	"github.com/james-lawrence/deeppool/internal/x/httpx"
 	"github.com/james-lawrence/deeppool/internal/x/slicesx"
@@ -43,7 +44,9 @@ import (
 //go:embed .migrations/*.sql
 var embedsqlite embed.FS
 
-type cmdDaemon struct{}
+type cmdDaemon struct {
+	AutoBootstrap bool `arg:"" name:"auto-bootstrap" help:"bootstrap from a predefined set of peers" default:"false"`
+}
 
 func (t cmdDaemon) Run(ctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	var (
@@ -52,6 +55,7 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		dbpath       = userx.DefaultConfigDir(userx.DefaultRelRoot(), "dpool.db")
 		peerid       = krpc.IdFromString(ssh.FingerprintSHA256(id.PublicKey()))
 		httpbind     net.Listener
+		bootstrap    torrent.ClientConfigOption = torrent.ClientConfigNoop
 	)
 
 	if db, err = sql.Open("duckdb", dbpath); err != nil {
@@ -76,6 +80,15 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	}
 
 	torrentdir := userx.DefaultDataDirectory(userx.DefaultRelRoot(), "torrents")
+
+	if fsx.IsRegularFile(torrentpeers) {
+		bootstrap = torrent.ClientConfigBootstrapPeerFile(torrentpeers)
+	}
+
+	if t.AutoBootstrap {
+		bootstrap = torrent.ClientConfigBootstrapGlobal
+	}
+
 	tm := dht.DefaultMuxer().
 		Method(bep0051.Query, bep0051.NewEndpoint(bep0051.EmptySampler{}))
 	tclient, err := tnetwork.Bind(
@@ -86,20 +99,7 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 				torrent.ClientConfigInfoLogger(log.New(io.Discard, "[torrent] ", log.Flags())),
 				torrent.ClientConfigMuxer(tm),
 				torrent.ClientConfigBucketLimit(32),
-				torrent.ClientConfigBootstrapFn(func(n string) dht.StartingNodesGetter {
-					return func() (res []dht.Addr, err error) {
-						ps, err := dht.ReadNodesFromFile(torrentpeers)
-						if err != nil {
-							return nil, err
-						}
-
-						for _, p := range ps {
-							res = append(res, dht.NewAddr(p.Addr.UDP()))
-						}
-
-						return res, nil
-					}
-				}),
+				bootstrap,
 			),
 		),
 	)
