@@ -33,3 +33,4 @@ RUN GOBIN="/usr/local/bin" go install -tags genieql.duckdb,no_duckdb_arrow githu
 RUN GOBIN="/usr/local/bin" go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 RUN which genieql
 RUN apt-get -y install tree flatpak-builder
+RUN flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo

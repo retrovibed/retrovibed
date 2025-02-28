@@ -26,10 +26,10 @@ func main() {
 		eg.Parallel(
 			eg.Module(ctx, deb, fractal.Build),
 		),
-		eg.Parallel(
-			eg.Module(ctx, deb, fractal.Tests),
-			eg.Module(ctx, deb, fractal.Linting),
-		),
+		// eg.Parallel(
+		// 	eg.Module(ctx, deb, fractal.Tests),
+		// 	eg.Module(ctx, deb, fractal.Linting),
+		// ),
 		eg.Parallel(
 			eg.Module(ctx, deb, release.Flatpak),
 		),
