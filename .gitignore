@@ -1,6 +1,7 @@
 .genieql
 .eg.cache
 .eg.runtime
+.flatpak-builder
 *.log
 notes*.md
 .torrent.bolt.db
