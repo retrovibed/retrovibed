@@ -8,8 +8,10 @@ import (
 )
 
 func Tarball(ctx context.Context, op eg.Op) error {
+	archive := tarball.GitPattern("retrovibed")
 	return eg.Perform(
 		ctx,
-		tarball.Archive(tarball.Directory()),
+		tarball.Archive(archive),
+		tarball.Github(archive),
 	)
 }

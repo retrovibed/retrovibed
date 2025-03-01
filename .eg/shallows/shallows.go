@@ -29,7 +29,7 @@ func Generate(ctx context.Context, _ eg.Op) error {
 }
 
 func Install(ctx context.Context, _ eg.Op) error {
-	dstdir := tarball.Directory("usr", "lib", "retrovibed")
+	dstdir := tarball.Path(tarball.GitPattern("retrovibed"))
 	gruntime := runtime()
 	return shell.Run(
 		ctx,

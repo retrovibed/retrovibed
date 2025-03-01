@@ -47,10 +47,10 @@ func main() {
 		// 	eg.Module(ctx, deb, shallows.Test()),
 		// ),
 		eg.Module(ctx, deb, fractal.Install, shallows.Install, release.Tarball),
-		// eg.Parallel(
-		// 	eg.Module(ctx, deb, fractal.Flatpak),
-		// 	eg.Module(ctx, deb, shallows.Flatpak),
-		// ),
+		eg.Parallel(
+			eg.Module(ctx, deb, fractal.Flatpak),
+			// eg.Module(ctx, deb, shallows.Flatpak),
+		),
 		// eg.Module(ctx, deb.OptionLiteral("--publish", "3000:3000"), www.Build, www.Webserver),
 	)
 

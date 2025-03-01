@@ -52,7 +52,7 @@ func Generate(ctx context.Context, _ eg.Op) error {
 
 func Install(ctx context.Context, op eg.Op) error {
 	runtime := shell.Runtime()
-	dstdir := tarball.Directory("usr", "lib", "retrovibed")
+	dstdir := tarball.Path(tarball.GitPattern("retrovibed"))
 	builddir := egenv.WorkingDirectory("fractal", "build", egfs.FindFirst(os.DirFS(egenv.WorkingDirectory("fractal", "build")), "bundle"))
 
 	return shell.Run(
