@@ -33,7 +33,10 @@ func Install(ctx context.Context, _ eg.Op) error {
 	gruntime := runtime()
 	return shell.Run(
 		ctx,
-		gruntime.Newf("go install -tags %s ./cmd/shallows/...", strings.Join(buildTags, ",")).Environ("GOBIN", dstdir),
+		gruntime.New("ldconfig -p | grep duckdb"),
+		gruntime.New("ld --verbose | grep SEARCH_DIR | tr -s ' ;'"),
+		gruntime.New("go env"),
+		gruntime.Newf("go install -ldflags=\"-extldflags=-static\" -tags %s ./cmd/shallows/...", strings.Join(buildTags, ",")).Environ("GOBIN", dstdir),
 	)
 }
 
