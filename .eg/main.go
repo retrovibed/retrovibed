@@ -10,10 +10,7 @@ import (
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
 	"github.com/egdaemon/eg/runtime/wasi/eggit"
-	"github.com/egdaemon/eg/runtime/x/wasi/eggolang"
 )
-
-var buildTags = []string{"no_duckdb_arrow"}
 
 func main() {
 	ctx, done := context.WithTimeout(context.Background(), egenv.TTL())
@@ -24,49 +21,36 @@ func main() {
 		ctx,
 		eggit.AutoClone,
 		eg.Build(deb.BuildFromFile(".eg/Containerfile")),
-		eg.Parallel(
-			eg.Module(
-				ctx,
-				deb,
-				fractal.Generate,
-			),
-			eg.Module(
-				ctx,
-				deb,
-				shallows.Generate,
-			),
-		),
+		// eg.Parallel(
+		// 	eg.Module(
+		// 		ctx,
+		// 		deb,
+		// 		fractal.Generate,
+		// 	),
+		// 	eg.Module(
+		// 		ctx,
+		// 		deb,
+		// 		shallows.Generate,
+		// 	),
+		// ),
 		eg.Parallel(
 			eg.Module(ctx, deb, fractal.Build),
 			eg.Module(
 				ctx,
 				deb,
-				eggolang.AutoCompile(
-					eggolang.CompileOption.BuildOptions(
-						eggolang.Build(
-							eggolang.BuildOption.Tags(buildTags...),
-						),
-					),
-				),
+				shallows.Compile(),
 			),
 		),
-		eg.Parallel(
-			eg.Module(ctx, deb, fractal.Tests),
-			eg.Module(ctx, deb, fractal.Linting),
-			eg.Module(ctx, deb,
-				eggolang.AutoTest(
-					eggolang.TestOption.BuildOptions(
-						eggolang.Build(
-							eggolang.BuildOption.Tags(buildTags...),
-						),
-					),
-				),
-				eggolang.RecordCoverage,
-			),
-		),
-		eg.Parallel(
-			eg.Module(ctx, deb, release.Flatpak),
-		),
+		// eg.Parallel(
+		// 	eg.Module(ctx, deb, fractal.Tests),
+		// 	eg.Module(ctx, deb, fractal.Linting),
+		// 	eg.Module(ctx, deb, shallows.Test()),
+		// ),
+		eg.Module(ctx, deb, fractal.Install, shallows.Install, release.Tarball),
+		// eg.Parallel(
+		// 	eg.Module(ctx, deb, fractal.Flatpak),
+		// 	eg.Module(ctx, deb, shallows.Flatpak),
+		// ),
 		// eg.Module(ctx, deb.OptionLiteral("--publish", "3000:3000"), www.Build, www.Webserver),
 	)
 

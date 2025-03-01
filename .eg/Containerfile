@@ -34,3 +34,10 @@ RUN GOBIN="/usr/local/bin" go install google.golang.org/protobuf/cmd/protoc-gen-
 RUN which genieql
 RUN apt-get -y install tree flatpak-builder
 RUN flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+RUN apt-get update
+RUN apt-get -y upgrade
+RUN tree /usr/share/eg
+RUN sh /usr/share/eg/install/github.sh > /dev/null
+RUN apt-get update
+RUN apt-get install -y gh
