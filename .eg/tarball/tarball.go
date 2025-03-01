@@ -12,9 +12,11 @@ package tarball
 
 import (
 	"context"
+	"eg/compute/internal/sha256x"
 	"fmt"
-	"log"
+	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
@@ -48,7 +50,47 @@ func GitPattern(prefix string) string {
 	return fmt.Sprintf("%s.%%git.commit.year%%.%%git.commit.month%%.%%git.commit.day%%%%git.hash.short%%", prefix)
 }
 
-func Archive(pattern string) eg.OpFn {
+// Return the path to the archive for the given pattern after Pack has been called.
+func Archive(pattern string) string {
+	return root(Name(pattern))
+}
+
+// Reads the cached sha256 from disk, if it cant locate it, recalculates and stores it.
+// will panic if there is an issue calculating the sha256/persisting
+func SHA256(pattern string) string {
+	path := Archive(pattern)
+	sha := fmt.Sprintf("%s.%s", path, "sha256")
+	if digest, err := os.ReadFile(sha); err == nil {
+		return string(digest)
+	}
+
+	digest := sha256x.DigestFile(path)
+	if digest == nil {
+		panic(fmt.Errorf("unable to compute the sha256 for %s", path))
+	}
+	digesthex := sha256x.FormatHex(digest)
+	if strings.TrimSpace(digesthex) == "" {
+		panic(fmt.Errorf("unable to compute the sha256 for %s", path))
+	}
+
+	if err := os.WriteFile(sha, []byte(digesthex), 0644); err != nil {
+		panic(err)
+	}
+
+	return digesthex
+}
+
+func SHA256Op(pattern string) eg.OpFn {
+	return func(ctx context.Context, o eg.Op) error {
+		if strings.TrimSpace(SHA256(pattern)) == "" {
+			return fmt.Errorf("unable to compute sha256: %s", Archive(pattern))
+		}
+		return nil
+	}
+}
+
+// create a tarball from the contents of the archive's folder.
+func Pack(pattern string) eg.OpFn {
 	return func(ctx context.Context, o eg.Op) error {
 		dir := Path(pattern)
 		name := Name(pattern)
@@ -67,25 +109,45 @@ func GithubRelease() string {
 	return c.StringReplace("r%git.commit.year%.%git.commit.month%.%git.commit.day%%git.hash.short%")
 }
 
+// generate the github download url
+func GithubDownloadURL(pattern string) string {
+	version := GithubRelease()
+	archive := Name(pattern)
+	canon := eggit.EnvCanonicalURI()                                                                     // git@github.com:james-lawrence/deeppool.git
+	canon = strings.ReplaceAll(canon, ".git", fmt.Sprintf("/releases/download/%s/%s", version, archive)) // git@github.com:james-lawrence/deeppool/releases/download/%release%/%archive%
+	canon = strings.ReplaceAll(canon, ":", "/")                                                          // git@github.com/james-lawrence/deeppool/releases/download/%release%/%archive%
+	canon = strings.ReplaceAll(canon, "git@", "https://")                                                // https://github.com:james-lawrence/deeppool/releases/download/%release%/%archive%
+
+	return canon
+}
+
 // Release to github, this is very experimental.
 // WARNING: for local environments this assumes you've provided the token to the eg command.
 // e.g.) GH_TOKEN="$(gh auth token)" eg compute local -e GH_TOKEN
 // WARNING: for hosted environments: we've assumed the git auth access token for pulling the repository
-// will work. this has not yet been validated.
-func Github(pattern string) eg.OpFn {
+// will work. this has not yet been validated. and likely needs permission updates.
+func Github(patterns ...string) eg.OpFn {
 	return func(ctx context.Context, o eg.Op) error {
 		c := eggit.EnvCommit()
 		version := GithubRelease()
-		archive := root(Name(pattern))
 
 		runtime := shell.Runtime().Environ(
 			"GH_TOKEN", egenv.String("", "EG_GIT_AUTH_ACCESS_TOKEN", "GH_TOKEN"),
 		)
 
-		log.Println("DERP DERP", c.Committer.When)
 		return shell.Run(
 			ctx,
-			runtime.Newf("gh release create --target %s %s %s", c.Hash.String(), version, archive),
+			runtime.Newf("gh release create --target %s %s %s", c.Hash.String(), version, strings.Join(patterns, " ")),
 		)
 	}
+}
+
+// deprecated: force a clean tarball directory
+func Clean(operations ...eg.OpFn) eg.OpFn {
+	return eg.Sequential(
+		func(ctx context.Context, o eg.Op) error {
+			return os.RemoveAll(root())
+		},
+		eg.Sequential(operations...),
+	)
 }

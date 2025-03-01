@@ -5,6 +5,7 @@ import (
 	"eg/compute/fractal"
 	"eg/compute/release"
 	"eg/compute/shallows"
+	"eg/compute/tarball"
 	"log"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
@@ -21,6 +22,7 @@ func main() {
 		ctx,
 		eggit.AutoClone,
 		eg.Build(deb.BuildFromFile(".eg/Containerfile")),
+
 		// eg.Parallel(
 		// 	eg.Module(
 		// 		ctx,
@@ -46,10 +48,20 @@ func main() {
 		// 	eg.Module(ctx, deb, fractal.Linting),
 		// 	eg.Module(ctx, deb, shallows.Test()),
 		// ),
-		eg.Module(ctx, deb, fractal.Install, shallows.Install, release.Tarball),
-		eg.Parallel(
-			eg.Module(ctx, deb, fractal.Flatpak),
-			// eg.Module(ctx, deb, shallows.Flatpak),
+		tarball.Clean(
+			eg.Module(
+				ctx, deb,
+				eg.Parallel(
+					fractal.Install,
+					shallows.Install,
+				),
+				release.Tarball,
+				eg.Parallel(
+					fractal.FlatpakManifestDaemon,
+					fractal.FlatpakManifestClient,
+				),
+				release.Release,
+			),
 		),
 		// eg.Module(ctx, deb.OptionLiteral("--publish", "3000:3000"), www.Build, www.Webserver),
 	)
