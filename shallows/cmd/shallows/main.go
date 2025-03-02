@@ -25,7 +25,7 @@ func main() {
 		cmdopts.PeerID
 		cmdopts.SSHID
 		Version cmdopts.Version `cmd:"" help:"display versioning information"`
-		Daemon  cmdDaemon       `cmd:"" help:"run the backend daemon"`
+		Daemon  cmdDaemon       `cmd:"" help:"run the backend daemon" default:"true"`
 		Torrent cmdTorrent      `cmd:"" help:"torrent related sub commands"`
 	}
 

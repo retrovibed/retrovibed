@@ -45,7 +45,7 @@ import (
 var embedsqlite embed.FS
 
 type cmdDaemon struct {
-	AutoBootstrap bool `arg:"" name:"auto-bootstrap" help:"bootstrap from a predefined set of peers" default:"false"`
+	AutoBootstrap bool `flag:"" name:"auto-bootstrap" help:"bootstrap from a predefined set of peers" default:"false"`
 }
 
 func (t cmdDaemon) Run(ctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {

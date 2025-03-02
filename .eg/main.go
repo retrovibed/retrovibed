@@ -5,6 +5,7 @@ import (
 	"eg/compute/fractal"
 	"eg/compute/release"
 	"eg/compute/shallows"
+	"eg/compute/tarball"
 	"log"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
@@ -21,18 +22,18 @@ func main() {
 		ctx,
 		eggit.AutoClone,
 		eg.Build(deb.BuildFromFile(".eg/Containerfile")),
-		// eg.Parallel(
-		// 	eg.Module(
-		// 		ctx,
-		// 		deb,
-		// 		fractal.Generate,
-		// 	),
-		// 	eg.Module(
-		// 		ctx,
-		// 		deb,
-		// 		shallows.Generate,
-		// 	),
-		// ),
+		eg.Parallel(
+			eg.Module(
+				ctx,
+				deb,
+				fractal.Generate,
+			),
+			eg.Module(
+				ctx,
+				deb,
+				shallows.Generate,
+			),
+		),
 		eg.Parallel(
 			eg.Module(ctx, deb, fractal.Build),
 			eg.Module(
@@ -41,16 +42,26 @@ func main() {
 				shallows.Compile(),
 			),
 		),
-		// eg.Parallel(
-		// 	eg.Module(ctx, deb, fractal.Tests),
-		// 	eg.Module(ctx, deb, fractal.Linting),
-		// 	eg.Module(ctx, deb, shallows.Test()),
-		// ),
-		eg.Module(ctx, deb, fractal.Install, shallows.Install, release.Tarball),
-		// eg.Parallel(
-		// 	eg.Module(ctx, deb, fractal.Flatpak),
-		// 	eg.Module(ctx, deb, shallows.Flatpak),
-		// ),
+		eg.Parallel(
+			eg.Module(ctx, deb, fractal.Tests),
+			eg.Module(ctx, deb, fractal.Linting),
+			eg.Module(ctx, deb, shallows.Test()),
+		),
+		tarball.Clean(
+			eg.Module(
+				ctx, deb,
+				eg.Parallel(
+					fractal.Install,
+					shallows.Install,
+				),
+				release.Tarball,
+				eg.Parallel(
+					shallows.FlatpakManifest,
+					fractal.FlatpakManifest,
+				),
+				release.Release,
+			),
+		),
 		// eg.Module(ctx, deb.OptionLiteral("--publish", "3000:3000"), www.Build, www.Webserver),
 	)
 
