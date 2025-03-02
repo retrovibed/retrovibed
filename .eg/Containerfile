@@ -41,4 +41,3 @@ RUN tree /usr/share/eg
 RUN sh /usr/share/eg/install/github.sh > /dev/null
 RUN apt-get update
 RUN apt-get install -y gh
-RUN ldconfig -p | grep duckdb

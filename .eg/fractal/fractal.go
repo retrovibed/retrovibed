@@ -3,6 +3,7 @@ package fractal
 import (
 	"context"
 	"eg/compute/tarball"
+	"eg/compute/tarballs"
 	"os"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
@@ -11,10 +12,6 @@ import (
 	"github.com/egdaemon/eg/runtime/x/wasi/egflatpak"
 	"github.com/egdaemon/eg/runtime/x/wasi/egfs"
 )
-
-func tarballpattern() string {
-	return tarball.GitPattern("retrovibed")
-}
 
 func flutterRuntime() shell.Command {
 	return shell.Runtime().Directory(egenv.WorkingDirectory("fractal")).Environ("PUB_CACHE", egenv.CacheDirectory(".eg", "dart"))
@@ -56,7 +53,7 @@ func Generate(ctx context.Context, _ eg.Op) error {
 
 func Install(ctx context.Context, op eg.Op) error {
 	runtime := shell.Runtime()
-	dstdir := tarball.Path(tarballpattern())
+	dstdir := tarball.Path(tarballs.Retrovibed())
 	builddir := egenv.WorkingDirectory("fractal", "build", egfs.FindFirst(os.DirFS(egenv.WorkingDirectory("fractal", "build")), "bundle"))
 
 	return shell.Run(
@@ -72,8 +69,8 @@ func FlatpakDir(ctx context.Context, op eg.Op) error {
 
 	b := egflatpak.New(
 		"space.retrovibe.Daemon", "fractal",
-		egflatpak.Option.SDK("org.gnome.Sdk", "47").Runtime("org.gnome.Platform", "47").
-			CopyModule(builddir).
+		egflatpak.Option().SDK("org.gnome.Sdk", "47").Runtime("org.gnome.Platform", "47").
+			Modules(egflatpak.ModuleCopy(builddir)).
 			AllowWayland().
 			AllowDRI().
 			AllowNetwork().
@@ -88,30 +85,13 @@ func FlatpakDir(ctx context.Context, op eg.Op) error {
 	return nil
 }
 
-func FlatpakManifestDaemon(ctx context.Context, o eg.Op) error {
-	pattern := tarballpattern()
-
-	b := egflatpak.New(
-		"space.retrovibe.Daemon", "shallows",
-		egflatpak.Option.SDK("org.gnome.Sdk", "47").Runtime("org.gnome.Platform", "47").
-			Tarball(tarball.GithubDownloadURL(pattern), tarball.SHA256(pattern)).
-			AllowWayland().
-			AllowDRI().
-			AllowNetwork().
-			AllowDownload().
-			AllowMusic().
-			AllowVideos()...)
-
-	return egflatpak.ManifestOp(egenv.CacheDirectory("flatpak.daemon.yml"), b)(ctx, o)
-}
-
-func FlatpakManifestClient(ctx context.Context, o eg.Op) error {
-	pattern := tarballpattern()
-
+func FlatpakManifest(ctx context.Context, o eg.Op) error {
 	b := egflatpak.New(
 		"space.retrovibe.Client", "fractal",
-		egflatpak.Option.SDK("org.gnome.Sdk", "47").Runtime("org.gnome.Platform", "47").
-			Tarball(tarball.GithubDownloadURL(pattern), tarball.SHA256(pattern)).
+		egflatpak.Option().SDK("org.gnome.Sdk", "47").Runtime("org.gnome.Platform", "47").
+			Modules(
+				egflatpak.ModuleTarball(tarball.GithubDownloadURL(tarballs.Retrovibed()), tarball.SHA256(tarballs.Retrovibed())),
+			).
 			AllowWayland().
 			AllowDRI().
 			AllowNetwork().

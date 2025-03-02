@@ -22,19 +22,18 @@ func main() {
 		ctx,
 		eggit.AutoClone,
 		eg.Build(deb.BuildFromFile(".eg/Containerfile")),
-
-		// eg.Parallel(
-		// 	eg.Module(
-		// 		ctx,
-		// 		deb,
-		// 		fractal.Generate,
-		// 	),
-		// 	eg.Module(
-		// 		ctx,
-		// 		deb,
-		// 		shallows.Generate,
-		// 	),
-		// ),
+		eg.Parallel(
+			eg.Module(
+				ctx,
+				deb,
+				fractal.Generate,
+			),
+			eg.Module(
+				ctx,
+				deb,
+				shallows.Generate,
+			),
+		),
 		eg.Parallel(
 			eg.Module(ctx, deb, fractal.Build),
 			eg.Module(
@@ -43,11 +42,11 @@ func main() {
 				shallows.Compile(),
 			),
 		),
-		// eg.Parallel(
-		// 	eg.Module(ctx, deb, fractal.Tests),
-		// 	eg.Module(ctx, deb, fractal.Linting),
-		// 	eg.Module(ctx, deb, shallows.Test()),
-		// ),
+		eg.Parallel(
+			eg.Module(ctx, deb, fractal.Tests),
+			eg.Module(ctx, deb, fractal.Linting),
+			eg.Module(ctx, deb, shallows.Test()),
+		),
 		tarball.Clean(
 			eg.Module(
 				ctx, deb,
@@ -57,8 +56,8 @@ func main() {
 				),
 				release.Tarball,
 				eg.Parallel(
-					fractal.FlatpakManifestDaemon,
-					fractal.FlatpakManifestClient,
+					shallows.FlatpakManifest,
+					fractal.FlatpakManifest,
 				),
 				release.Release,
 			),
