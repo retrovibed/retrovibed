@@ -25,6 +25,15 @@ abstract class mediasearch {
       MediaSearchRequest(limit: fixnum.Int64(limit));
   static MediaSearchResponse response({MediaSearchRequest? next}) =>
       MediaSearchResponse(next: next ?? request(limit: 100), items: []);
+
+  static Future<MediaSearchResponse> get(MediaSearchRequest req) async {
+    final client = http.Client();
+    return client.get(Uri.https(httpx.host(), "/m")).then((v) {
+      return Future.value(
+        MediaSearchResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+      );
+    });
+  }
 }
 
 abstract class discoveredsearch {

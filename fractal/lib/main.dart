@@ -1,8 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fractal/downloads.dart' as downloads;
-// import 'package:fractal/discovery.dart' as discovery;
+import 'package:fractal/discovery.dart' as discovery;
 import 'package:fractal/settings.dart' as settings;
+import 'package:fractal/library.dart' as medialib;
 import 'package:fractal/designkit.dart' as ds;
 import 'package:fractal/design.kit/theme.defaults.dart' as theming;
 import 'package:fractal/mdns.dart' as mdns;
@@ -42,6 +43,7 @@ class MyApp extends StatelessWidget {
               child: Scaffold(
                 appBar: TabBar(
                   tabs: [
+                    // Tab(icon: Icon(Icons.share)),
                     Tab(icon: Icon(Icons.movie)),
                     Tab(icon: Icon(Icons.download)),
                     Tab(icon: Icon(Icons.settings)),
@@ -49,7 +51,8 @@ class MyApp extends StatelessWidget {
                 ),
                 body: TabBarView(
                   children: [
-                    ds.ErrorBoundary(Icon(Icons.movie)),
+                    ds.ErrorBoundary(medialib.AvailableListDisplay()),
+                    // ds.ErrorBoundary(Icon(Icons.movie)),
                     ds.ErrorBoundary(downloads.Display()),
                     ds.ErrorBoundary(settings.Display()),
                   ],
