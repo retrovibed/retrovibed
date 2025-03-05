@@ -34,26 +34,26 @@ class MyApp extends StatelessWidget {
         extensions: [theming.Defaults.defaults],
       ),
       themeMode: ThemeMode.dark,
-      home: ds.Full(
-        child: DefaultTabController(
-          length: 3,
-          child: Scaffold(
-            appBar: TabBar(
-              tabs: [
-                // Tab(icon: Icon(Icons.share)),
-                Tab(icon: Icon(Icons.movie)),
-                Tab(icon: Icon(Icons.download)),
-                Tab(icon: Icon(Icons.settings)),
-              ],
-            ),
-            body: mdns.MDNSDiscovery(
-              TabBarView(
-                children: [
-                  // discovery.Display(),
-                  ds.ErrorBoundary(Icon(Icons.movie)),
-                  ds.ErrorBoundary(downloads.Display()),
-                  ds.ErrorBoundary(settings.Display()),
-                ],
+      home: Material(
+        child: ds.Full(
+          child: mdns.MDNSDiscovery(
+            DefaultTabController(
+              length: 3,
+              child: Scaffold(
+                appBar: TabBar(
+                  tabs: [
+                    Tab(icon: Icon(Icons.movie)),
+                    Tab(icon: Icon(Icons.download)),
+                    Tab(icon: Icon(Icons.settings)),
+                  ],
+                ),
+                body: TabBarView(
+                  children: [
+                    ds.ErrorBoundary(Icon(Icons.movie)),
+                    ds.ErrorBoundary(downloads.Display()),
+                    ds.ErrorBoundary(settings.Display()),
+                  ],
+                ),
               ),
             ),
           ),

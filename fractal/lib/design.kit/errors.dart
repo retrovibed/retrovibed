@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import './screens.dart' as screens;
@@ -8,6 +9,10 @@ final ECONNREFUSED = 111;
 class ErrorTests {
   static bool offline(Object obj) {
     return obj is SocketException && obj.osError?.errorCode == ECONNREFUSED;
+  }
+
+  static bool timeout(Object obj) {
+    return obj is TimeoutException;
   }
 }
 
@@ -72,9 +77,12 @@ class Error extends StatelessWidget {
     return super.createElement();
   }
 
-  static Error text(String text) => Error(child: Text(text));
+  static Error text(String text) => Error(child: SelectableText(text));
   static Error unknown(Object obj) {
-    return Error(child: Text("an unexpected problem has occurred"), cause: obj);
+    return Error(
+      child: SelectableText("an unexpected problem has occurred"),
+      cause: obj,
+    );
   }
 
   static Error? maybeErr(Object? obj) {
@@ -85,8 +93,17 @@ class Error extends StatelessWidget {
 
   static Error offline(SocketException obj) {
     return Error(
-      child: Text(
+      child: SelectableText(
         "unable to connect to daemon, is it running? check ${obj.address?.address}:${obj.port}.",
+      ),
+      cause: obj,
+    );
+  }
+
+  static Error timeout(Object obj) {
+    return Error(
+      child: SelectableText(
+        "timeout error: unable to complete within the expected timeframe",
       ),
       cause: obj,
     );
