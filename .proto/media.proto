@@ -7,6 +7,8 @@ message Media {
   string description = 2 [ json_name = "description" ];
   string mimetype = 3 [ json_name = "mimetype" ];
   string image = 4 [ json_name = "image" ];
+  string archive_id = 5 [ json_name = "archive_id" ];
+  string torrent_id = 6 [ json_name = "torrent_id" ];
 }
 
 message MediaSearchRequest {

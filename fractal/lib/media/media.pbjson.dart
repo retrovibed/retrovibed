@@ -21,13 +21,17 @@ const Media$json = {
     {'1': 'description', '3': 2, '4': 1, '5': 9, '10': 'description'},
     {'1': 'mimetype', '3': 3, '4': 1, '5': 9, '10': 'mimetype'},
     {'1': 'image', '3': 4, '4': 1, '5': 9, '10': 'image'},
+    {'1': 'archive_id', '3': 5, '4': 1, '5': 9, '10': 'archive_id'},
+    {'1': 'torrent_id', '3': 6, '4': 1, '5': 9, '10': 'torrent_id'},
   ],
 };
 
 /// Descriptor for `Media`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List mediaDescriptor = $convert.base64Decode(
     'CgVNZWRpYRIOCgJpZBgBIAEoCVICaWQSIAoLZGVzY3JpcHRpb24YAiABKAlSC2Rlc2NyaXB0aW'
-    '9uEhoKCG1pbWV0eXBlGAMgASgJUghtaW1ldHlwZRIUCgVpbWFnZRgEIAEoCVIFaW1hZ2U=');
+    '9uEhoKCG1pbWV0eXBlGAMgASgJUghtaW1ldHlwZRIUCgVpbWFnZRgEIAEoCVIFaW1hZ2USHgoK'
+    'YXJjaGl2ZV9pZBgFIAEoCVIKYXJjaGl2ZV9pZBIeCgp0b3JyZW50X2lkGAYgASgJUgp0b3JyZW'
+    '50X2lk');
 
 @$core.Deprecated('Use mediaSearchRequestDescriptor instead')
 const MediaSearchRequest$json = {

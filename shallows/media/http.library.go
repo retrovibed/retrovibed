@@ -17,6 +17,7 @@ import (
 	"github.com/james-lawrence/deeppool/internal/x/numericx"
 	"github.com/james-lawrence/deeppool/internal/x/sqlx"
 	"github.com/james-lawrence/deeppool/internal/x/sqlxx"
+	"github.com/james-lawrence/deeppool/library"
 	"github.com/james-lawrence/deeppool/tracking"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/metainfo"
@@ -234,8 +235,8 @@ func (t *HTTPLibrary) search(w http.ResponseWriter, r *http.Request) {
 	}
 	msg.Next.Limit = numericx.Min(msg.Next.Limit, 100)
 
-	q := tracking.MetadataSearchBuilder().Where(squirrel.And{
-		tracking.MetadataQueryNotInitiated(),
+	q := library.MetadataSearchBuilder().Where(squirrel.And{
+		library.MetadataQueryVisible(),
 		tracking.MetadataQuerySearch(msg.Next.Query, "description"),
 	}).OrderBy("created_at DESC").Offset(msg.Next.Offset * msg.Next.Limit).Limit(msg.Next.Limit)
 

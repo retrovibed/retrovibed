@@ -17,22 +17,22 @@ import (
 
 var buildTags = []string{"no_duckdb_arrow"}
 
-func runtime() shell.Command {
+func shellruntime() shell.Command {
 	return eggolang.Runtime().Directory(egenv.WorkingDirectory("shallows"))
 }
 
 func Generate(ctx context.Context, _ eg.Op) error {
-	gruntime := runtime()
+	gruntime := shellruntime()
 	return shell.Run(
 		ctx,
-		gruntime.New("go generate ./... && go fmt ./..."),
+		gruntime.New("go generate ./... && go fmt ./...").Environ("GOMAXPROCS", "1"), // the go runtime doesn't play well in containers.
 	)
 }
 
 func Install(ctx context.Context, _ eg.Op) error {
 	// go install -ldflags=\"-extldflags=-static\" -tags no_duckdb_arrow ./cmd/shallows/...
 	dstdir := tarball.Path(tarballs.Retrovibed())
-	gruntime := runtime()
+	gruntime := shellruntime()
 	return shell.Run(
 		ctx,
 		gruntime.New("ldconfig -p | grep duckdb"),

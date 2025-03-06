@@ -2878,5 +2878,3 @@ func RSSDeleteByID(ctx context.Context, q sqlx.Queryer, id string) RSSScannerSta
 	c0.String = id
 	return NewRSSScannerStaticRow(q.QueryRowContext(ctx, query, c0))
 }
-
-

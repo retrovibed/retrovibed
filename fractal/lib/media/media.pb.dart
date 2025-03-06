@@ -20,6 +20,8 @@ class Media extends $pb.GeneratedMessage {
     $core.String? description,
     $core.String? mimetype,
     $core.String? image,
+    $core.String? archiveId,
+    $core.String? torrentId,
   }) {
     final $result = create();
     if (id != null) {
@@ -34,6 +36,12 @@ class Media extends $pb.GeneratedMessage {
     if (image != null) {
       $result.image = image;
     }
+    if (archiveId != null) {
+      $result.archiveId = archiveId;
+    }
+    if (torrentId != null) {
+      $result.torrentId = torrentId;
+    }
     return $result;
   }
   Media._() : super();
@@ -45,6 +53,8 @@ class Media extends $pb.GeneratedMessage {
     ..aOS(2, _omitFieldNames ? '' : 'description')
     ..aOS(3, _omitFieldNames ? '' : 'mimetype')
     ..aOS(4, _omitFieldNames ? '' : 'image')
+    ..aOS(5, _omitFieldNames ? '' : 'archive_id')
+    ..aOS(6, _omitFieldNames ? '' : 'torrent_id')
     ..hasRequiredFields = false
   ;
 
@@ -104,6 +114,24 @@ class Media extends $pb.GeneratedMessage {
   $core.bool hasImage() => $_has(3);
   @$pb.TagNumber(4)
   void clearImage() => clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.String get archiveId => $_getSZ(4);
+  @$pb.TagNumber(5)
+  set archiveId($core.String v) { $_setString(4, v); }
+  @$pb.TagNumber(5)
+  $core.bool hasArchiveId() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearArchiveId() => clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.String get torrentId => $_getSZ(5);
+  @$pb.TagNumber(6)
+  set torrentId($core.String v) { $_setString(5, v); }
+  @$pb.TagNumber(6)
+  $core.bool hasTorrentId() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearTorrentId() => clearField(6);
 }
 
 class MediaSearchRequest extends $pb.GeneratedMessage {

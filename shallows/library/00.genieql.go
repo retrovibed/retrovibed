@@ -1,7 +1,7 @@
 //go:build genieql.generate
 // +build genieql.generate
 
-package tracking
+package library
 
 import (
 	"context"
