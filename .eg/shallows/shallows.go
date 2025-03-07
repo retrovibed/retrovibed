@@ -25,7 +25,7 @@ func Generate(ctx context.Context, _ eg.Op) error {
 	gruntime := shellruntime()
 	return shell.Run(
 		ctx,
-		gruntime.New("go generate ./... && go fmt ./...").Environ("GOMAXPROCS", "1"), // the go runtime doesn't play well in containers.
+		gruntime.New("go generate ./... && go fmt ./..."),
 	)
 }
 
