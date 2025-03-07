@@ -151,6 +151,7 @@ class SearchableView extends State<ListSearchable> {
         ],
       ),
       children: [_leading ?? SizedBox(), ListFeeds(current: _res.items)],
+      (w) => w,
     );
   }
 }

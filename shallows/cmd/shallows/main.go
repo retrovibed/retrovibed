@@ -43,6 +43,7 @@ func main() {
 	go cmdopts.Cleanup(shellCli.Context, shellCli.Shutdown, shellCli.Cleanup, os.Kill, os.Interrupt)(func() {
 		log.Println("waiting for systems to shutdown")
 	})
+
 	go debugx.OnSignal(shellCli.Context, func(ctx context.Context) error {
 		dctx, done := context.WithTimeout(ctx, envx.Duration(time.Second, "DEEPPOOL_PROFILING_DURATION"))
 		defer done()

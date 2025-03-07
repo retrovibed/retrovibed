@@ -1,1 +1,1 @@
-export 'package:fractal/library/list.dart';
+export 'package:fractal/library/list.display.dart';

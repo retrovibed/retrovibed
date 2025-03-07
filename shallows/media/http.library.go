@@ -54,7 +54,6 @@ type HTTPLibrary struct {
 
 func (t *HTTPLibrary) Bind(r *mux.Router) {
 	r.StrictSlash(false)
-	r.Use(httpx.RouteInvoked)
 
 	r.Path("/").Methods(http.MethodGet).Handler(alice.New(
 		httpx.ContextBufferPool512(),

@@ -49,6 +49,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
     return ds.Table(
       loading: _loading,
       cause: _cause,
+      children: _res.items,
       leading: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -104,28 +105,21 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
           ),
         ],
       ),
-      children:
-          _res.items
-              .map(
-                (v) => media.RowDisplay(
-                  media: v,
-                  onTap:
-                      () => media.discovered
-                          .download(v.id)
-                          .then((v) {
-                            refresh();
-                          })
-                          .catchError((cause) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text("Failed to download: $cause"),
-                              ),
-                            );
-                            return null;
-                          }),
-                ),
-              )
-              .toList(),
+      (v) => media.RowDisplay(
+        media: v,
+        onTap:
+            () => media.discovered
+                .download(v.id)
+                .then((v) {
+                  refresh();
+                })
+                .catchError((cause) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Failed to download: $cause")),
+                  );
+                  return null;
+                }),
+      ),
     );
   }
 }

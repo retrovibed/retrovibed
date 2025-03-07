@@ -128,7 +128,7 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	}
 
 	for _, d := range tclient.DhtServers() {
-		go dhtx.Statistics(ctx.Context, time.Minute, d)
+		// go dhtx.Statistics(ctx.Context, time.Minute, d)
 		go dhtx.RecordBootstrapNodes(ctx.Context, time.Minute, d, torrentpeers)
 		go d.TableMaintainer()
 		go d.Bootstrap(ctx.Context)
@@ -191,6 +191,7 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	httpmux := mux.NewRouter()
 	httpmux.NotFoundHandler = httpx.NotFound(alice.New())
 	httpmux.Use(
+		httpx.RouteInvoked,
 		httpx.Chaos(
 			envx.Float64(0.0, env.ChaosRate),
 			httpx.ChaosStatusCodes(http.StatusBadGateway),
