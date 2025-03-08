@@ -21,7 +21,7 @@ func PeerOptionBEP51(available uint64, ttl uint16) func(*Peer) {
 
 func NewPeer(md krpc.NodeInfo, options ...func(*Peer)) (m Peer) {
 	return langx.Clone(Peer{
-		ID:      md5x.Digest(md.ID[:]),
+		ID:      md5x.FormatString(md5x.Digest(md.ID[:])),
 		Peer:    md.ID[:],
 		Network: md.Addr.UDP().Network(),
 		IP:      md.Addr.IP().String(),

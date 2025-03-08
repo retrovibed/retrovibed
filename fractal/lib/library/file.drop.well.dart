@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fractal/designkit.dart' as ds;
+import 'package:fractal/mimex.dart' as mimex;
 import 'package:desktop_drop/desktop_drop.dart';
 
 class FileDropWell extends StatefulWidget {
@@ -39,9 +40,31 @@ class _FileDropWell extends State<FileDropWell> {
         setState(() {
           _loading = true;
         });
-        widget.onDropped(evt).then((w) {}).whenComplete(() {
-          setState(() {
-            _loading = false;
+        Future.wait(
+          evt.files.map((c) {
+            return c
+                .openRead(0, mimex.defaultMagicNumbersMaxLength)
+                .first
+                .then((v) => v.toList())
+                .then((bits) {
+                  return new DropItemFile(
+                    c.path,
+                    name: c.name,
+                    mimeType:
+                        mimex.fromFile(c.name, magicbits: bits).toString(),
+                  );
+                });
+          }),
+        ).then((files) {
+          final resolved = DropDoneDetails(
+            files: files,
+            localPosition: evt.localPosition,
+            globalPosition: evt.globalPosition,
+          );
+          widget.onDropped(resolved).whenComplete(() {
+            setState(() {
+              _loading = false;
+            });
           });
         });
       },

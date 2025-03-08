@@ -6,5 +6,5 @@ import (
 )
 
 func HashUID(md *metainfo.Hash) string {
-	return md5x.Digest(md.Bytes())
+	return md5x.FormatString(md5x.Digest(md.Bytes()))
 }

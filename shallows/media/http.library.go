@@ -1,8 +1,12 @@
 package media
 
 import (
+	"crypto/md5"
+	"io"
 	"log"
+	"mime/multipart"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/Masterminds/squirrel"
@@ -12,14 +16,15 @@ import (
 	"github.com/james-lawrence/deeppool/internal/x/errorsx"
 	"github.com/james-lawrence/deeppool/internal/x/formx"
 	"github.com/james-lawrence/deeppool/internal/x/httpx"
+	"github.com/james-lawrence/deeppool/internal/x/iox"
 	"github.com/james-lawrence/deeppool/internal/x/jwtx"
 	"github.com/james-lawrence/deeppool/internal/x/langx"
+	"github.com/james-lawrence/deeppool/internal/x/md5x"
 	"github.com/james-lawrence/deeppool/internal/x/numericx"
 	"github.com/james-lawrence/deeppool/internal/x/sqlx"
 	"github.com/james-lawrence/deeppool/internal/x/sqlxx"
 	"github.com/james-lawrence/deeppool/library"
 	"github.com/james-lawrence/deeppool/tracking"
-	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/justinas/alice"
@@ -46,7 +51,6 @@ func NewHTTPLibrary(q sqlx.Queryer, c storage.ClientImpl, options ...HTTPLibrary
 
 type HTTPLibrary struct {
 	q         sqlx.Queryer
-	d         download
 	c         storage.ClientImpl
 	jwtsecret jwtx.JWTSecretSource
 	decoder   *form.Decoder
@@ -71,55 +75,36 @@ func (t *HTTPLibrary) Bind(r *mux.Router) {
 		httpx.TimeoutRollingRead(3*time.Second),
 	).ThenFunc(t.upload))
 
-	// r.Path("/{id}").Methods(http.MethodDelete).Handler(alice.New(
-	// 	httpx.ContextBufferPool512(),
-	// 	httpx.ParseForm,
-	// 	// httpauth.AuthenticateWithToken(t.jwtsecret),
-	// 	// AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
-	// 	httpx.Timeout2s(),
-	// ).ThenFunc(t.delete))
+	r.Path("/{id}").Methods(http.MethodDelete).Handler(alice.New(
+		httpx.ContextBufferPool512(),
+		httpx.ParseForm,
+		// httpauth.AuthenticateWithToken(t.jwtsecret),
+		// AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
+		httpx.Timeout2s(),
+	).ThenFunc(t.delete))
 }
 
 func (t *HTTPLibrary) delete(w http.ResponseWriter, r *http.Request) {
 	var (
-		md tracking.Metadata
+		md library.Metadata
 		id = mux.Vars(r)["id"]
 	)
 
-	if err := tracking.MetadataFindByID(r.Context(), t.q, id).Scan(&md); sqlx.ErrNoRows(err) != nil {
-		log.Println(errorsx.Wrap(err, "unable to find metadata"))
+	if err := library.MetadataTombstoneByID(r.Context(), t.q, id).Scan(&md); sqlx.ErrNoRows(err) != nil {
+		log.Println(errorsx.Wrap(err, "unable to tombstone metadata"))
 		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusNotFound))
 		return
 	} else if err != nil {
-		log.Println(errorsx.Wrap(err, "unable to find metadata"))
+		log.Println(errorsx.Wrap(err, "unable to tombstone metadata"))
 		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 
-	metadata, err := torrent.New(metainfo.Hash(md.Infohash), torrent.OptionStorage(t.c))
-	if err != nil {
-		log.Println(errorsx.Wrapf(err, "unable to create metadata from metadata %s", md.ID))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
-		return
-	}
-
-	if err = t.d.Stop(metadata); err != nil {
-		log.Println(errorsx.Wrap(err, "unable to stop download"))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
-		return
-	}
-
-	if err = tracking.MetadataPausedByID(r.Context(), t.q, id).Scan(&md); err != nil {
-		log.Println(errorsx.Wrap(err, "unable to pause metadata"))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
-		return
-	}
-
-	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &DownloadBeginResponse{
-		Download: langx.Autoptr(
+	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &MediaDeleteResponse{
+		Media: langx.Autoptr(
 			langx.Clone(
-				Download{},
-				DownloadOptionFromTorrentMetadata(langx.Clone(md, tracking.MetadataOptionJSONSafeEncode))),
+				Media{},
+				MediaOptionFromLibraryMetadata(langx.Clone(md, library.MetadataOptionJSONSafeEncode))),
 		),
 	}); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to write response"))
@@ -129,44 +114,54 @@ func (t *HTTPLibrary) delete(w http.ResponseWriter, r *http.Request) {
 
 func (t *HTTPLibrary) upload(w http.ResponseWriter, r *http.Request) {
 	var (
-		md tracking.Metadata
-		id = mux.Vars(r)["id"]
+		err    error
+		f      multipart.File
+		fh     *multipart.FileHeader
+		copied iox.Copied
+		mhash  = md5.New()
 	)
 
-	if err := tracking.MetadataFindByID(r.Context(), t.q, id).Scan(&md); sqlx.ErrNoRows(err) != nil {
-		log.Println(errorsx.Wrap(err, "unable to find metadata"))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusNotFound))
-		return
-	} else if err != nil {
-		log.Println(errorsx.Wrap(err, "unable to find metadata"))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+	if f, fh, err = r.FormFile("content"); err != nil {
+		log.Println(errorsx.Wrap(err, "content parameter required"))
+		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
 	}
+	defer f.Close()
 
-	metadata, err := torrent.New(metainfo.Hash(md.Infohash), torrent.OptionStorage(t.c))
+	tmp, err := os.CreateTemp("", "retrovibed.upload.*")
 	if err != nil {
-		log.Println(errorsx.Wrapf(err, "unable to create metadata from metadata %s", md.ID))
+		log.Println(errorsx.Wrap(err, "unable to create temporary file"))
 		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 
-	if _, _, err := t.d.Start(metadata); err != nil {
-		log.Println(errorsx.Wrap(err, "unable to start download"))
+	mi, err := metainfo.NewFromReader(io.TeeReader(r.Body, io.MultiWriter(tmp, mhash, &copied)), metainfo.OptionDisplayName(fh.Filename))
+	if err != nil {
+		log.Println(errorsx.Wrap(err, "unable to read upload"))
+		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+	_ = mi
+
+	lmd := library.Metadata{
+		ID:          md5x.FormatString(mhash),
+		Description: fh.Filename,
+		Bytes:       uint64(copied),
+		Mimetype:    fh.Header.Get("Content-Type"),
+	}
+
+	if err = library.MetadataInsertWithDefaults(r.Context(), sqlx.Debug(t.q), lmd).Scan(&lmd); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to record library metadata record"))
 		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 
-	if err := tracking.MetadataDownloadByID(r.Context(), t.q, id).Scan(&md); err != nil {
-		log.Println(errorsx.Wrap(err, "unable to track download"))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
-		return
-	}
-
-	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &DownloadBeginResponse{
-		Download: langx.Autoptr(
+	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &MediaUploadResponse{
+		Media: langx.Autoptr(
 			langx.Clone(
-				Download{},
-				DownloadOptionFromTorrentMetadata(langx.Clone(md, tracking.MetadataOptionJSONSafeEncode))),
+				Media{},
+				MediaOptionFromLibraryMetadata(lmd),
+			),
 		),
 	}); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to write response"))
@@ -236,11 +231,11 @@ func (t *HTTPLibrary) search(w http.ResponseWriter, r *http.Request) {
 
 	q := library.MetadataSearchBuilder().Where(squirrel.And{
 		library.MetadataQueryVisible(),
-		tracking.MetadataQuerySearch(msg.Next.Query, "description"),
+		library.MetadataQuerySearch(msg.Next.Query, "description"),
 	}).OrderBy("created_at DESC").Offset(msg.Next.Offset * msg.Next.Limit).Limit(msg.Next.Limit)
 
-	err = sqlxx.ScanEach(tracking.MetadataSearch(r.Context(), t.q, q), func(p *tracking.Metadata) error {
-		tmp := langx.Clone(Media{}, MediaOptionFromTorrentMetadata(langx.Clone(*p, tracking.MetadataOptionJSONSafeEncode)))
+	err = sqlxx.ScanEach(library.MetadataSearch(r.Context(), t.q, q), func(p *library.Metadata) error {
+		tmp := langx.Clone(Media{}, MediaOptionFromLibraryMetadata(langx.Clone(*p, library.MetadataOptionJSONSafeEncode)))
 		msg.Items = append(msg.Items, &tmp)
 		return nil
 	})

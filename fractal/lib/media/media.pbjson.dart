@@ -23,6 +23,8 @@ const Media$json = {
     {'1': 'image', '3': 4, '4': 1, '5': 9, '10': 'image'},
     {'1': 'archive_id', '3': 5, '4': 1, '5': 9, '10': 'archive_id'},
     {'1': 'torrent_id', '3': 6, '4': 1, '5': 9, '10': 'torrent_id'},
+    {'1': 'created_at', '3': 7, '4': 1, '5': 9, '10': 'created_at'},
+    {'1': 'updated_at', '3': 8, '4': 1, '5': 9, '10': 'updated_at'},
   ],
 };
 
@@ -31,7 +33,8 @@ final $typed_data.Uint8List mediaDescriptor = $convert.base64Decode(
     'CgVNZWRpYRIOCgJpZBgBIAEoCVICaWQSIAoLZGVzY3JpcHRpb24YAiABKAlSC2Rlc2NyaXB0aW'
     '9uEhoKCG1pbWV0eXBlGAMgASgJUghtaW1ldHlwZRIUCgVpbWFnZRgEIAEoCVIFaW1hZ2USHgoK'
     'YXJjaGl2ZV9pZBgFIAEoCVIKYXJjaGl2ZV9pZBIeCgp0b3JyZW50X2lkGAYgASgJUgp0b3JyZW'
-    '50X2lk');
+    '50X2lkEh4KCmNyZWF0ZWRfYXQYByABKAlSCmNyZWF0ZWRfYXQSHgoKdXBkYXRlZF9hdBgIIAEo'
+    'CVIKdXBkYXRlZF9hdA==');
 
 @$core.Deprecated('Use mediaSearchRequestDescriptor instead')
 const MediaSearchRequest$json = {
@@ -65,6 +68,41 @@ const MediaSearchResponse$json = {
 final $typed_data.Uint8List mediaSearchResponseDescriptor = $convert.base64Decode(
     'ChNNZWRpYVNlYXJjaFJlc3BvbnNlEi0KBG5leHQYASABKAsyGS5tZWRpYS5NZWRpYVNlYXJjaF'
     'JlcXVlc3RSBG5leHQSIgoFaXRlbXMYAiADKAsyDC5tZWRpYS5NZWRpYVIFaXRlbXM=');
+
+@$core.Deprecated('Use mediaDeleteRequestDescriptor instead')
+const MediaDeleteRequest$json = {
+  '1': 'MediaDeleteRequest',
+};
+
+/// Descriptor for `MediaDeleteRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List mediaDeleteRequestDescriptor = $convert.base64Decode(
+    'ChJNZWRpYURlbGV0ZVJlcXVlc3Q=');
+
+@$core.Deprecated('Use mediaDeleteResponseDescriptor instead')
+const MediaDeleteResponse$json = {
+  '1': 'MediaDeleteResponse',
+  '2': [
+    {'1': 'media', '3': 1, '4': 1, '5': 11, '6': '.media.Media', '10': 'media'},
+  ],
+};
+
+/// Descriptor for `MediaDeleteResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List mediaDeleteResponseDescriptor = $convert.base64Decode(
+    'ChNNZWRpYURlbGV0ZVJlc3BvbnNlEiIKBW1lZGlhGAEgASgLMgwubWVkaWEuTWVkaWFSBW1lZG'
+    'lh');
+
+@$core.Deprecated('Use mediaUploadResponseDescriptor instead')
+const MediaUploadResponse$json = {
+  '1': 'MediaUploadResponse',
+  '2': [
+    {'1': 'media', '3': 1, '4': 1, '5': 11, '6': '.media.Media', '10': 'media'},
+  ],
+};
+
+/// Descriptor for `MediaUploadResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List mediaUploadResponseDescriptor = $convert.base64Decode(
+    'ChNNZWRpYVVwbG9hZFJlc3BvbnNlEiIKBW1lZGlhGAEgASgLMgwubWVkaWEuTWVkaWFSBW1lZG'
+    'lh');
 
 @$core.Deprecated('Use downloadDescriptor instead')
 const Download$json = {

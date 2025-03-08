@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fractal/designkit.dart' as ds;
 import './media.pb.dart';
 
 class RowDisplay extends StatelessWidget {
@@ -9,8 +10,10 @@ class RowDisplay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const gap = SizedBox(width: 10.0);
+    final theming = ds.Defaults.of(context);
 
     return Container(
+      padding: theming.padding,
       child: InkWell(
         onTap: onTap,
         child: Row(

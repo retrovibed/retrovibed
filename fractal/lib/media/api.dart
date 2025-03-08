@@ -11,6 +11,11 @@ typedef FnMediaSearch =
 typedef FnDownloadSearch =
     Future<DownloadSearchResponse> Function(DownloadSearchRequest req);
 
+typedef FnUploadRequest =
+    Future<MediaUploadResponse> Function(
+      http.MultipartRequest Function(http.MultipartRequest req) mkreq,
+    );
+
 Future<MediaSearchResponse> recent() async {
   final client = http.Client();
   return client.get(Uri.https(httpx.host(), "/m/recent")).then((v) {
@@ -32,6 +37,36 @@ abstract class mediasearch {
       return Future.value(
         MediaSearchResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
       );
+    });
+  }
+
+  static Future<http.MultipartFile> uploadable(
+    String path,
+    String name,
+    String mimetype,
+  ) {
+    return http.MultipartFile.fromPath(
+      'content',
+      path,
+      filename: name,
+      contentType: httpx.mimetypes.parse(mimetype),
+    );
+  }
+
+  static Future<MediaUploadResponse> upload(
+    http.MultipartRequest Function(http.MultipartRequest req) mkreq,
+  ) async {
+    final client = http.Client();
+    final req = mkreq(
+      http.MultipartRequest("POST", Uri.https(httpx.host(), "/m/")),
+    );
+
+    return client.send(req).then((v) {
+      return v.stream.bytesToString().then((s) {
+        return Future.value(
+          MediaUploadResponse.create()..mergeFromProto3Json(jsonDecode(s)),
+        );
+      });
     });
   }
 }

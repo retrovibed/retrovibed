@@ -9,6 +9,8 @@ message Media {
   string image = 4 [ json_name = "image" ];
   string archive_id = 5 [ json_name = "archive_id" ];
   string torrent_id = 6 [ json_name = "torrent_id" ];
+  string created_at = 7 [ json_name = "created_at" ];
+  string updated_at = 8 [ json_name = "updated_at" ];
 }
 
 message MediaSearchRequest {
@@ -23,6 +25,10 @@ message MediaSearchResponse {
   MediaSearchRequest next = 1 [ json_name = "next" ];
   repeated Media items = 2 [ json_name = "items" ];
 }
+
+message MediaDeleteRequest {}
+message MediaDeleteResponse { Media media = 1 [ json_name = "media" ]; }
+message MediaUploadResponse { Media media = 1 [ json_name = "media" ]; }
 
 message Download {
   Media media = 1 [ json_name = "media" ];

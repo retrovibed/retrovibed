@@ -7,7 +7,12 @@ import 'file.drop.well.dart';
 
 class AvailableListDisplay extends StatefulWidget {
   final media.FnMediaSearch search;
-  const AvailableListDisplay({super.key, this.search = media.mediasearch.get});
+  final media.FnUploadRequest upload;
+  const AvailableListDisplay({
+    super.key,
+    this.search = media.mediasearch.get,
+    this.upload = media.mediasearch.upload,
+  });
 
   @override
   State<StatefulWidget> createState() => _AvailableListDisplay();
@@ -68,7 +73,33 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
       children: _res.items,
       (v) => media.RowDisplay(media: v),
       empty: FileDropWell((v) {
-        return Future.value(null);
+        final multiparts = v.files.map((c) {
+          return media.mediasearch.uploadable(c.path, c.name, c.mimeType!);
+        });
+
+        return Future.microtask(() {
+          return Future.wait(
+            multiparts.map((fv) {
+              return fv.then((v) {
+                return widget
+                    .upload((req) {
+                      req..files.add(v);
+                      return req;
+                    })
+                    .then((uploaded) {
+                      setState(() {
+                        _res.items.add(uploaded.media);
+                      });
+                    })
+                    .catchError((cause) {
+                      setState(() {
+                        _cause = ds.Error.unknown(cause);
+                      });
+                    });
+              });
+            }),
+          ).then((v) => ds.NullWidget).catchError(ds.Error.unknown);
+        });
       }),
     );
   }
