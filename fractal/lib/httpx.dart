@@ -1,3 +1,4 @@
+import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 
 var _host = "localhost:9998";
@@ -26,4 +27,18 @@ abstract class mimetypes {
     if (s == null) return MediaType("application", "octet-stream");
     return parse(s);
   }
+}
+
+Future<http.MultipartFile> uploadable(
+  String path,
+  String name,
+  String mimetype, {
+  String field = 'content',
+}) {
+  return http.MultipartFile.fromPath(
+    field,
+    path,
+    filename: name,
+    contentType: mimetypes.parse(mimetype),
+  );
 }

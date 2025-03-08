@@ -26,16 +26,24 @@ Future<MediaSearchResponse> recent() async {
 }
 
 abstract class mediasearch {
+  static final client = http.Client();
   static MediaSearchRequest request({int limit = 0}) =>
       MediaSearchRequest(limit: fixnum.Int64(limit));
   static MediaSearchResponse response({MediaSearchRequest? next}) =>
       MediaSearchResponse(next: next ?? request(limit: 100), items: []);
 
   static Future<MediaSearchResponse> get(MediaSearchRequest req) async {
-    final client = http.Client();
     return client.get(Uri.https(httpx.host(), "/m/")).then((v) {
       return Future.value(
         MediaSearchResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+      );
+    });
+  }
+
+  static Future<MediaDeleteResponse> delete(String id) async {
+    return client.delete(Uri.https(httpx.host(), "/m/${id}")).then((v) {
+      return Future.value(
+        MediaDeleteResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
       );
     });
   }
@@ -45,18 +53,12 @@ abstract class mediasearch {
     String name,
     String mimetype,
   ) {
-    return http.MultipartFile.fromPath(
-      'content',
-      path,
-      filename: name,
-      contentType: httpx.mimetypes.parse(mimetype),
-    );
+    return httpx.uploadable(path, name, mimetype);
   }
 
   static Future<MediaUploadResponse> upload(
     http.MultipartRequest Function(http.MultipartRequest req) mkreq,
   ) async {
-    final client = http.Client();
     final req = mkreq(
       http.MultipartRequest("POST", Uri.https(httpx.host(), "/m/")),
     );

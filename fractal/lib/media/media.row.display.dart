@@ -1,16 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:fractal/designkit.dart' as ds;
+import 'package:media_kit/media_kit.dart' as mediakit;
 import './media.pb.dart';
+import './player.dart';
+
+void notimplemented(String s) {
+  return print(s);
+}
+
+void rowtapdefault() => notimplemented("row tap not implemented");
+void playtapdefault() => notimplemented("play tap not implemented");
 
 class RowDisplay extends StatelessWidget {
   final Media media;
-  final Function()? onTap;
-  const RowDisplay({super.key, required this.media, this.onTap = null});
+  final void Function() onTap;
+  final void Function() onPlay;
+  const RowDisplay({
+    super.key,
+    required this.media,
+    this.onTap = rowtapdefault,
+    this.onPlay = playtapdefault,
+  });
 
   @override
   Widget build(BuildContext context) {
     const gap = SizedBox(width: 10.0);
     final theming = ds.Defaults.of(context);
+    final vscreen = VideoScreen.of(context);
 
     return Container(
       padding: theming.padding,
@@ -24,7 +40,19 @@ class RowDisplay extends StatelessWidget {
               child: Text(media.description, overflow: TextOverflow.ellipsis),
             ),
             gap,
-            Icon(Icons.download),
+            IconButton(
+              icon: Icon(Icons.play_circle_outline_rounded),
+              onPressed:
+                  vscreen == null
+                      ? null
+                      : () {
+                        vscreen.add(
+                          mediakit.Media(
+                            'file:///home/jatone/Downloads/big_buck_bunny_1080p_stereo.ogg',
+                          ),
+                        );
+                      },
+            ),
           ],
         ),
       ),

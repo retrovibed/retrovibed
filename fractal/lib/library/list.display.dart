@@ -20,6 +20,7 @@ class AvailableListDisplay extends StatefulWidget {
 
 class _AvailableListDisplay extends State<AvailableListDisplay> {
   bool _loading = true;
+  Widget? _player = null;
   ds.Error? _cause = null;
   media.MediaSearchResponse _res = media.mediasearch.response(
     next: media.mediasearch.request(limit: 32),
@@ -50,57 +51,67 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
 
   @override
   Widget build(BuildContext context) {
-    return ds.Table(
-      loading: _loading,
-      cause: _cause,
-      leading: SearchTray(
-        onSubmitted: (v) {
-          setState(() {
-            _res.next.query = v;
-            _res.next.offset = fixnum.Int64(0);
+    return ds.Overlay(
+      overlay: _player,
+      child: ds.Table(
+        loading: _loading,
+        cause: _cause,
+        leading: SearchTray(
+          onSubmitted: (v) {
+            setState(() {
+              _res.next.query = v;
+              _res.next.offset = fixnum.Int64(0);
+            });
+            refresh();
+          },
+          next: (i) {
+            setState(() {
+              _res.next.offset = i;
+            });
+            refresh();
+          },
+          current: _res.next.offset,
+          empty: fixnum.Int64(_res.items.length) < _res.next.limit,
+        ),
+        children: _res.items,
+        (v) => media.RowDisplay(
+          media: v,
+          onPlay: () {
+            setState(() {
+              _player = ds.Debug(ds.Full(SelectableText("DERP DERP")));
+            });
+          },
+        ),
+        empty: FileDropWell((v) {
+          final multiparts = v.files.map((c) {
+            return media.mediasearch.uploadable(c.path, c.name, c.mimeType!);
           });
-          refresh();
-        },
-        next: (i) {
-          setState(() {
-            _res.next.offset = i;
-          });
-          refresh();
-        },
-        current: _res.next.offset,
-        empty: fixnum.Int64(_res.items.length) < _res.next.limit,
-      ),
-      children: _res.items,
-      (v) => media.RowDisplay(media: v),
-      empty: FileDropWell((v) {
-        final multiparts = v.files.map((c) {
-          return media.mediasearch.uploadable(c.path, c.name, c.mimeType!);
-        });
 
-        return Future.microtask(() {
-          return Future.wait(
-            multiparts.map((fv) {
-              return fv.then((v) {
-                return widget
-                    .upload((req) {
-                      req..files.add(v);
-                      return req;
-                    })
-                    .then((uploaded) {
-                      setState(() {
-                        _res.items.add(uploaded.media);
+          return Future.microtask(() {
+            return Future.wait(
+              multiparts.map((fv) {
+                return fv.then((v) {
+                  return widget
+                      .upload((req) {
+                        req..files.add(v);
+                        return req;
+                      })
+                      .then((uploaded) {
+                        setState(() {
+                          _res.items.add(uploaded.media);
+                        });
+                      })
+                      .catchError((cause) {
+                        setState(() {
+                          _cause = ds.Error.unknown(cause);
+                        });
                       });
-                    })
-                    .catchError((cause) {
-                      setState(() {
-                        _cause = ds.Error.unknown(cause);
-                      });
-                    });
-              });
-            }),
-          ).then((v) => ds.NullWidget).catchError(ds.Error.unknown);
-        });
-      }),
+                });
+              }),
+            ).then((v) => ds.NullWidget).catchError(ds.Error.unknown);
+          });
+        }),
+      ),
     );
   }
 }

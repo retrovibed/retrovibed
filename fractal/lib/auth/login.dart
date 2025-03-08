@@ -13,8 +13,6 @@ class _AuthenticatedState extends State<Login> {
   bool authenticated = false;
   @override
   Widget build(BuildContext context) {
-    return ds.Full(
-      child: ds.Loading(loading: authenticated, child: widget.child),
-    );
+    return ds.Full(ds.Loading(loading: authenticated, child: widget.child));
   }
 }
