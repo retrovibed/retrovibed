@@ -9,7 +9,7 @@ import (
 // Open(name string) (File, error)
 func NewDirectoryCache(dir string) DirCache {
 	return DirCache{
-		BlockLength: 64 * bytesx.KiB,
+		BlockLength: 32 * bytesx.MiB,
 	}
 }
 

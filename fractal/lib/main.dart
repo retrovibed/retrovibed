@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart'; // Provides [Player], [Media], [Playlist] etc.
-import 'package:media_kit_video/media_kit_video.dart';
 import 'package:fractal/downloads.dart' as downloads;
 import 'package:fractal/settings.dart' as settings;
 import 'package:fractal/media.dart' as media;

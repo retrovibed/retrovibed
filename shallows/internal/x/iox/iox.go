@@ -3,6 +3,7 @@ package iox
 import (
 	"errors"
 	"io"
+	"log"
 	"os"
 	"sync/atomic"
 )
@@ -99,10 +100,20 @@ func String(in io.Reader) (s string, err error) {
 	return string(raw), nil
 }
 
-type Copied uint64
+type Copied struct {
+	Result *uint64
+}
 
-func (t *Copied) Write(b []byte) (n int, err error) {
+func (t Copied) Write(b []byte) (n int, err error) {
 	n = len(b)
-	atomic.AndUint64((*uint64)(t), uint64(n))
+	atomic.AndUint64(t.Result, uint64(n))
+	return n, nil
+}
+
+type Printer uint64
+
+func (t Printer) Write(b []byte) (n int, err error) {
+	n = len(b)
+	log.Println("DERP DERP", n)
 	return n, nil
 }

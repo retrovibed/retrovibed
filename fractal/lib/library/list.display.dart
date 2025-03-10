@@ -1,5 +1,6 @@
 import 'package:fixnum/fixnum.dart' as fixnum;
 import 'package:flutter/material.dart';
+import 'package:desktop_drop/desktop_drop.dart';
 import 'package:fractal/designkit.dart' as ds;
 import 'package:fractal/media.dart' as media;
 import './search.row.dart';
@@ -10,8 +11,8 @@ class AvailableListDisplay extends StatefulWidget {
   final media.FnUploadRequest upload;
   const AvailableListDisplay({
     super.key,
-    this.search = media.mediasearch.get,
-    this.upload = media.mediasearch.upload,
+    this.search = media.media.get,
+    this.upload = media.media.upload,
   });
 
   @override
@@ -22,8 +23,8 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
   bool _loading = true;
   Widget? _player = null;
   ds.Error? _cause = null;
-  media.MediaSearchResponse _res = media.mediasearch.response(
-    next: media.mediasearch.request(limit: 32),
+  media.MediaSearchResponse _res = media.media.response(
+    next: media.media.request(limit: 32),
   );
 
   void refresh() {
@@ -51,6 +52,47 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
 
   @override
   Widget build(BuildContext context) {
+    final upload = (DropDoneDetails v) {
+      setState(() {
+        _loading = true;
+      });
+
+      final multiparts = v.files.map((c) {
+        return media.media.uploadable(c.path, c.name, c.mimeType!);
+      });
+
+      return Future.microtask(() {
+        return Future.wait(
+              multiparts.map((fv) {
+                return fv.then((v) {
+                  return widget
+                      .upload((req) {
+                        req..files.add(v);
+                        return req;
+                      })
+                      .then((uploaded) {
+                        setState(() {
+                          _res.items.add(uploaded.media);
+                        });
+                      })
+                      .catchError((cause) {
+                        setState(() {
+                          _cause = ds.Error.unknown(cause);
+                        });
+                      });
+                });
+              }),
+            )
+            .then((v) => ds.NullWidget)
+            .catchError(ds.Error.unknown)
+            .whenComplete(
+              () => setState(() {
+                _loading = false;
+              }),
+            );
+      });
+    };
+
     return ds.Overlay(
       overlay: _player,
       child: ds.Table(
@@ -72,6 +114,13 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
           },
           current: _res.next.offset,
           empty: fixnum.Int64(_res.items.length) < _res.next.limit,
+          trailing: FileDropWell(
+            upload,
+            child: IconButton(
+              onPressed: () {},
+              icon: Icon(Icons.file_upload_outlined),
+            ),
+          ),
         ),
         children: _res.items,
         (v) => media.RowDisplay(
@@ -82,35 +131,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
             });
           },
         ),
-        empty: FileDropWell((v) {
-          final multiparts = v.files.map((c) {
-            return media.mediasearch.uploadable(c.path, c.name, c.mimeType!);
-          });
-
-          return Future.microtask(() {
-            return Future.wait(
-              multiparts.map((fv) {
-                return fv.then((v) {
-                  return widget
-                      .upload((req) {
-                        req..files.add(v);
-                        return req;
-                      })
-                      .then((uploaded) {
-                        setState(() {
-                          _res.items.add(uploaded.media);
-                        });
-                      })
-                      .catchError((cause) {
-                        setState(() {
-                          _cause = ds.Error.unknown(cause);
-                        });
-                      });
-                });
-              }),
-            ).then((v) => ds.NullWidget).catchError(ds.Error.unknown);
-          });
-        }),
+        empty: FileDropWell(upload),
       ),
     );
   }

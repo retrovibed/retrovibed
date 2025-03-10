@@ -25,7 +25,7 @@ Future<MediaSearchResponse> recent() async {
   });
 }
 
-abstract class mediasearch {
+abstract class media {
   static final client = http.Client();
   static MediaSearchRequest request({int limit = 0}) =>
       MediaSearchRequest(limit: fixnum.Int64(limit));
@@ -38,6 +38,10 @@ abstract class mediasearch {
         MediaSearchResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
       );
     });
+  }
+
+  static String download_uri(String id) {
+    return Uri.https(httpx.host(), "/m/${id}").toString();
   }
 
   static Future<MediaDeleteResponse> delete(String id) async {

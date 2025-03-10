@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fractal/designkit.dart' as ds;
 import 'package:media_kit/media_kit.dart' as mediakit;
+import './api.dart' as api;
 import './media.pb.dart';
 import './player.dart';
 
@@ -47,9 +48,7 @@ class RowDisplay extends StatelessWidget {
                       ? null
                       : () {
                         vscreen.add(
-                          mediakit.Media(
-                            'file:///home/jatone/Downloads/big_buck_bunny_1080p_stereo.ogg',
-                          ),
+                          mediakit.Media(api.media.download_uri(media.id)),
                         );
                       },
             ),

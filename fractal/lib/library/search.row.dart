@@ -3,6 +3,7 @@ import 'package:fixnum/fixnum.dart' as fixnum;
 import 'package:fractal/designkit.dart' as ds;
 
 class SearchTray extends StatelessWidget {
+  final Widget trailing;
   final void Function(String i) onSubmitted;
   final void Function(fixnum.Int64 i) next;
   final fixnum.Int64 current;
@@ -14,6 +15,7 @@ class SearchTray extends StatelessWidget {
     required this.next,
     required this.current,
     required this.empty,
+    this.trailing = const SizedBox(),
   });
 
   @override
@@ -38,7 +40,7 @@ class SearchTray extends StatelessWidget {
             onPressed: empty ? null : () => next(current + 1),
             icon: Icon(Icons.arrow_right),
           ),
-          // IconButton(onPressed: () {}, icon: Icon(Icons.file_upload_outlined)),
+          trailing,
         ],
       ),
     );

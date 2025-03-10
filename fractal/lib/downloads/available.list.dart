@@ -17,8 +17,8 @@ class AvailableListDisplay extends StatefulWidget {
 class _AvailableListDisplay extends State<AvailableListDisplay> {
   bool _loading = true;
   ds.Error? _cause = null;
-  media.MediaSearchResponse _res = media.mediasearch.response(
-    next: media.mediasearch.request(limit: 32),
+  media.MediaSearchResponse _res = media.media.response(
+    next: media.media.request(limit: 32),
   );
 
   void refresh() {
