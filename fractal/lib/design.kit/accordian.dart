@@ -36,6 +36,7 @@ class _AccordionState extends State<Accordion> {
         Icon(hidden ? Icons.arrow_drop_up : Icons.arrow_drop_down);
     final cursor =
         isDisabled ? SystemMouseCursors.forbidden : SystemMouseCursors.click;
+
     final content =
         hidden
             ? Container()
@@ -58,7 +59,7 @@ class _AccordionState extends State<Accordion> {
               trailing: icon,
             ),
           ),
-          content,
+          IntrinsicHeight(child: content),
         ],
       ),
     );

@@ -17,7 +17,7 @@ class ListSearchable extends StatefulWidget {
 class SearchableView extends State<ListSearchable> {
   bool _loading = true;
   ds.Error? _cause = null;
-  Widget? _leading = null;
+  Widget? _overlay = null;
   Feed _created = Feed();
   FeedSearchResponse _res = FeedSearchResponse(
     next: FeedSearchRequest(query: '', offset: Int64(0), limit: Int64(10)),
@@ -55,7 +55,7 @@ class SearchableView extends State<ListSearchable> {
   Widget build(BuildContext context) {
     final resetleading =
         () => setState(() {
-          _leading = null;
+          _overlay = null;
           _loading = false;
           _created = Feed();
         });
@@ -74,84 +74,84 @@ class SearchableView extends State<ListSearchable> {
             });
           });
     };
-    return ds.Table(
-      loading: _loading,
-      cause: _cause,
-      leading: Column(
-        mainAxisSize: MainAxisSize.min,
+
+    final feedproto = Center(
+      child: Column(
         children: [
+          Edit(
+            feed: _created,
+            onChange: (upd) {
+              setState(() {
+                _created = upd;
+              });
+            },
+          ),
           Row(
-            mainAxisSize: MainAxisSize.min,
             children: [
-              IconButton(
+              Spacer(),
+              TextButton(onPressed: resetleading, child: Text("cancel")),
+              SizedBox(width: 10),
+              TextButton(
                 onPressed: () {
-                  setState(() {
-                    _leading = Column(
-                      children: [
-                        Edit(
-                          onChange: (upd) {
-                            setState(() {
-                              _created = upd;
-                            });
-                          },
-                        ),
-                        Row(
-                          children: [
-                            Spacer(),
-                            TextButton(
-                              onPressed: resetleading,
-                              child: Text("cancel"),
-                            ),
-                            SizedBox(width: 10),
-                            TextButton(
-                              onPressed: () {
-                                createfeed(_created);
-                              },
-                              child: Text("save"),
-                            ),
-                            Spacer(),
-                          ],
-                        ),
-                      ],
-                    );
-                  });
+                  createfeed(_created);
                 },
-                icon: Icon(Icons.add),
+                child: Text("save"),
               ),
-              Expanded(
-                child: TextField(
-                  decoration: InputDecoration(hintText: "search feeds"),
-                  onChanged:
-                      (v) => setState(() {
-                        _res.next.query = v;
-                      }),
-                  onSubmitted: (v) => refresh(),
-                ),
-              ),
-              IconButton(
-                onPressed: () {
-                  setState(() {
-                    _res.next.offset -= 1;
-                  });
-                  refresh();
-                },
-                icon: Icon(Icons.arrow_left),
-              ),
-              IconButton(
-                onPressed: () {
-                  setState(() {
-                    _res.next.offset += 1;
-                  });
-                  refresh();
-                },
-                icon: Icon(Icons.arrow_right),
-              ),
+              Spacer(),
             ],
           ),
         ],
       ),
-      children: [_leading ?? SizedBox(), ListFeeds(current: _res.items)],
-      (w) => w,
+    );
+
+    return ds.Table(
+      loading: _loading,
+      cause: _cause,
+      leading: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            onPressed: () {
+              setState(() {
+                _overlay = ds.Debug(feedproto);
+              });
+            },
+            icon: Icon(Icons.add),
+          ),
+          Expanded(
+            child: TextField(
+              decoration: InputDecoration(hintText: "search feeds"),
+              onChanged:
+                  (v) => setState(() {
+                    _res.next.query = v;
+                  }),
+              onSubmitted: (v) => refresh(),
+            ),
+          ),
+          IconButton(
+            onPressed: () {
+              setState(() {
+                _res.next.offset -= 1;
+              });
+              refresh();
+            },
+            icon: Icon(Icons.arrow_left),
+          ),
+          IconButton(
+            onPressed: () {
+              setState(() {
+                _res.next.offset += 1;
+              });
+              refresh();
+            },
+            icon: Icon(Icons.arrow_right),
+          ),
+        ],
+      ),
+      children: _res.items,
+      (w) => Item(current: w),
+      empty: feedproto,
+      overlay: _overlay,
     );
   }
 }

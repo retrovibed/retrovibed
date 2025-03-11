@@ -421,3 +421,50 @@ func PrintStatistics(ctx context.Context, q sqlx.Queryer) {
 		log.Println("status", spew.Sdump(m))
 	})
 }
+
+func AutoDiscovery(ctx context.Context, q sqlx.Queryer, tclient *torrent.Client, tstore storage.ClientImpl) error {
+	go func() {
+		dht, ok := slicesx.First(tclient.DhtServers()...)
+		if !ok {
+			log.Println("No DHT servers")
+			return
+		}
+
+		log.Println("auto retrieval of torrent info initiated")
+		defer log.Println("auto retrieval of torrent info completed")
+
+		if err := DiscoverDHTMetadata(ctx, q, dht, tclient, tstore); err != nil {
+			log.Println("resolving info hashes has failed", err)
+			panic(err)
+		}
+	}()
+
+	go func() {
+		dht, ok := slicesx.First(tclient.DhtServers()...)
+		if !ok {
+			log.Println("No DHT servers")
+			return
+		}
+
+		log.Println("autodiscovery of hashes initiated")
+		defer log.Println("autodiscovery of hashes completed")
+		if err := DiscoverDHTInfoHashes(ctx, q, dht); err != nil {
+			log.Println("autodiscovery of hashes failed", err)
+			return
+		}
+	}()
+
+	go func() {
+		dht, ok := slicesx.First(tclient.DhtServers()...)
+		if !ok {
+			log.Println("No DHT servers")
+			return
+		}
+		log.Println("autodiscovery of samplable peers initiated")
+		defer log.Println("autodiscovery of samplable peers completed")
+		if err := DiscoverDHTBEP51Peers(ctx, q, dht); err != nil {
+			log.Println("peer locating failed", err)
+		}
+	}()
+	return nil
+}

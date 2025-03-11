@@ -7,6 +7,7 @@ class Table<T> extends StatelessWidget {
   final Widget empty;
   final Widget leading;
   final Widget trailing;
+  final Widget? overlay;
   final bool loading;
   final ds.Error? cause;
 
@@ -16,6 +17,7 @@ class Table<T> extends StatelessWidget {
     this.leading = const SizedBox(),
     this.trailing = const SizedBox(),
     this.empty = const SizedBox(),
+    this.overlay = null,
     this.children = const [],
     this.loading = false,
     this.cause = null,
@@ -26,17 +28,20 @@ class Table<T> extends StatelessWidget {
     final content =
         this.children.length == 0
             ? this.empty
-            : ListView(
-              shrinkWrap: true,
+            : Column(
+              mainAxisSize: MainAxisSize.min,
               children: this.children.map(this.render).toList(),
             );
     return ds.Loading(
       loading: loading,
       cause: cause,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        mainAxisSize: MainAxisSize.max,
-        children: [leading, Expanded(child: content), trailing],
+      child: ds.Overlay(
+        overlay: overlay,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.max,
+          children: [leading, Expanded(child: content), trailing],
+        ),
       ),
     );
   }

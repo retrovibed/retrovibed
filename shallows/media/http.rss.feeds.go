@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/Masterminds/squirrel"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/go-playground/form/v4"
 	"github.com/gofrs/uuid"
 	"github.com/gorilla/mux"
@@ -136,6 +137,7 @@ func (t *HTTPRSSFeed) create(w http.ResponseWriter, r *http.Request) {
 		Autodownload: req.Feed.Autodownload,
 	}
 
+	log.Println("DERP DERP", spew.Sdump(feed))
 	if err = tracking.RSSInsertWithDefaults(r.Context(), t.q, feed).Scan(&feed); err != nil {
 		log.Println(errorsx.Wrap(err, "encoding failed"))
 		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"embed"
 	"io"
@@ -18,6 +19,7 @@ import (
 	"github.com/james-lawrence/deeppool/cmd/shallows/daemons"
 	"github.com/james-lawrence/deeppool/downloads"
 	"github.com/james-lawrence/deeppool/internal/env"
+	"github.com/james-lawrence/deeppool/internal/x/contextx"
 	"github.com/james-lawrence/deeppool/internal/x/dhtx"
 	"github.com/james-lawrence/deeppool/internal/x/envx"
 	"github.com/james-lawrence/deeppool/internal/x/errorsx"
@@ -46,9 +48,10 @@ var embedsqlite embed.FS
 
 type cmdDaemon struct {
 	AutoBootstrap bool `flag:"" name:"auto-bootstrap" help:"bootstrap from a predefined set of peers" default:"false"`
+	AutoDiscovery bool `flag:"" name:"auto-discovery" help:"enable autodiscovery of content from peers" default:"false"`
 }
 
-func (t cmdDaemon) Run(ctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
+func (t cmdDaemon) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	var (
 		db           *sql.DB
 		torrentpeers = userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "torrent.peers")
@@ -57,6 +60,12 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		httpbind     net.Listener
 		bootstrap    torrent.ClientConfigOption = torrent.ClientConfigNoop
 	)
+
+	dctx, done := context.WithCancelCause(gctx.Context)
+	asyncfailure := func(cause error) {
+		done(contextx.IgnoreCancelled(cause))
+	}
+	defer asyncfailure(nil)
 
 	if db, err = sql.Open("duckdb", dbpath); err != nil {
 		return errorsx.Wrap(err, "unable to open db")
@@ -69,7 +78,7 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 			return errorsx.Wrap(err, "unable to build migration provider")
 		}
 
-		if _, err := mprov.Up(ctx.Context); err != nil {
+		if _, err := mprov.Up(dctx); err != nil {
 			return errorsx.Wrap(err, "unable to run migrations")
 		}
 	}
@@ -109,7 +118,7 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 
 	tstore := storage.NewFileByInfoHash(torrentdir)
 
-	dwatcher, err := downloads.NewDirectoryWatcher(ctx.Context, db, tclient, tstore)
+	dwatcher, err := downloads.NewDirectoryWatcher(dctx, db, tclient, tstore)
 	if err != nil {
 		return errorsx.Wrap(err, "unable to setup directory monitoring for torrents")
 	}
@@ -128,65 +137,32 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	}
 
 	for _, d := range tclient.DhtServers() {
-		// go dhtx.Statistics(ctx.Context, time.Minute, d)
-		go dhtx.RecordBootstrapNodes(ctx.Context, time.Minute, d, torrentpeers)
+		go dhtx.RecordBootstrapNodes(dctx, time.Minute, d, torrentpeers)
 		go d.TableMaintainer()
-		go d.Bootstrap(ctx.Context)
+		go d.Bootstrap(dctx)
 	}
 
-	go daemons.PrintStatistics(ctx.Context, db)
+	go daemons.PrintStatistics(dctx, db)
+
+	if t.AutoDiscovery {
+		go func() {
+			if err := daemons.AutoDiscovery(dctx, db, tclient, tstore); err != nil {
+				asyncfailure(errorsx.Wrap(err, "autodiscovery from peers failed"))
+				return
+			}
+		}()
+	} else {
+		log.Println("autodiscovery is disabled, to enable add --auto-discovery flag, this is an alpha feature.")
+	}
 
 	go func() {
-		dht, ok := slicesx.First(tclient.DhtServers()...)
-		if !ok {
-			log.Println("No DHT servers")
-			return
-		}
-
-		log.Println("auto retrieval of torrent info initiated")
-		defer log.Println("auto retrieval of torrent info completed")
-
-		if err := daemons.DiscoverDHTMetadata(ctx.Context, db, dht, tclient, tstore); err != nil {
-			log.Println("resolving info hashes has failed", err)
-			panic(err)
-		}
-	}()
-
-	go func() {
-		dht, ok := slicesx.First(tclient.DhtServers()...)
-		if !ok {
-			log.Println("No DHT servers")
-			return
-		}
-
-		log.Println("autodiscovery of hashes initiated")
-		defer log.Println("autodiscovery of hashes completed")
-		if err := daemons.DiscoverDHTInfoHashes(ctx.Context, db, dht); err != nil {
-			log.Println("autodiscovery of hashes failed", err)
+		if err := daemons.DiscoverFromRSSFeeds(dctx, db); err != nil {
+			asyncfailure(errorsx.Wrap(err, "autodiscovery of RSS feeds failed"))
 			return
 		}
 	}()
 
-	go func() {
-		dht, ok := slicesx.First(tclient.DhtServers()...)
-		if !ok {
-			log.Println("No DHT servers")
-			return
-		}
-		log.Println("autodiscovery of samplable peers initiated")
-		defer log.Println("autodiscovery of samplable peers completed")
-		if err := daemons.DiscoverDHTBEP51Peers(ctx.Context, db, dht); err != nil {
-			log.Println("peer locating failed", err)
-		}
-	}()
-
-	go func() {
-		if err := daemons.DiscoverFromRSSFeeds(ctx.Context, db); err != nil {
-			log.Println("autodiscovery of RSS feeds failed", err)
-		}
-	}()
-
-	go daemons.ResumeDownloads(ctx.Context, db, tclient, tstore)
+	go daemons.ResumeDownloads(dctx, db, tclient, tstore)
 
 	httpmux := mux.NewRouter()
 	httpmux.NotFoundHandler = httpx.NotFound(alice.New())
@@ -221,7 +197,7 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	}
 
 	go func() {
-		<-ctx.Context.Done()
+		<-dctx.Done()
 		httpbind.Close()
 	}()
 
@@ -233,14 +209,15 @@ func (t cmdDaemon) Run(ctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		return nil
 	})
 
-	if err := daemons.MulticastService(ctx.Context, httpbind); err != nil {
+	if err := daemons.MulticastService(dctx, httpbind); err != nil {
 		return errorsx.Wrap(err, "unable to setup multicast service")
 	}
 
 	log.Println("https listening on:", httpbind.Addr().String(), tlspem)
 	if cause := http.ServeTLS(httpbind, httpmux, tlspem, tlspem); cause != nil {
-		log.Println("http server stopped", cause)
+		return errorsx.Wrap(cause, "http server stopped")
 	}
 
-	return nil
+	// report any async failures.
+	return dctx.Err()
 }
