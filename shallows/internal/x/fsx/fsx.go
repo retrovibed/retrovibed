@@ -3,9 +3,10 @@ package fsx
 import (
 	"errors"
 	"io/fs"
-	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/james-lawrence/deeppool/internal/x/debugx"
 )
 
 func ErrIsNotExist(err error) error {
@@ -101,6 +102,6 @@ type vstoragefs struct {
 }
 
 func (t vstoragefs) Open(name string) (fs.File, error) {
-	log.Println("opening", name, "as", t.pathrewrite(name))
+	debugx.Println("opening", name, "as", t.pathrewrite(name))
 	return t.Virtual.OpenFile(t.pathrewrite(name), os.O_RDONLY, 0600)
 }
