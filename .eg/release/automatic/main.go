@@ -22,18 +22,18 @@ func main() {
 		ctx,
 		eggit.AutoClone,
 		eg.Build(deb.BuildFromFile(".eg/Containerfile")),
-		// eg.Parallel(
-		// 	eg.Module(
-		// 		ctx,
-		// 		deb,
-		// 		fractal.Generate,
-		// 	),
-		// 	eg.Module(
-		// 		ctx,
-		// 		deb,
-		// 		shallows.Generate,
-		// 	),
-		// ),
+		eg.Parallel(
+			eg.Module(
+				ctx,
+				deb,
+				fractal.Generate,
+			),
+			eg.Module(
+				ctx,
+				deb,
+				shallows.Generate,
+			),
+		),
 		eg.Parallel(
 			eg.Module(ctx, deb, fractal.Build),
 			eg.Module(
@@ -42,11 +42,11 @@ func main() {
 				shallows.Compile(),
 			),
 		),
-		// eg.Parallel(
-		// 	eg.Module(ctx, deb, fractal.Tests),
-		// 	eg.Module(ctx, deb, fractal.Linting),
-		// 	eg.Module(ctx, deb, shallows.Test()),
-		// ),
+		eg.Parallel(
+			eg.Module(ctx, deb, fractal.Tests),
+			eg.Module(ctx, deb, fractal.Linting),
+			eg.Module(ctx, deb, shallows.Test()),
+		),
 		egtarball.Clean(
 			eg.Module(
 				ctx, deb,
@@ -68,7 +68,6 @@ func main() {
 				),
 			),
 		),
-		// eg.Module(ctx, deb.OptionLiteral("--publish", "3000:3000"), www.Build, www.Webserver),
 	)
 
 	if err != nil {

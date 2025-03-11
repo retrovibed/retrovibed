@@ -1,7 +1,7 @@
 package tarballs
 
-import "eg/compute/tarball"
+import "github.com/egdaemon/eg/runtime/x/wasi/egtarball"
 
 func Retrovibed() string {
-	return tarball.GitPattern("retrovibed")
+	return egtarball.GitPattern("retrovibed")
 }

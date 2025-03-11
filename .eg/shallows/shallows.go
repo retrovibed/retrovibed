@@ -2,7 +2,6 @@ package shallows
 
 import (
 	"context"
-	"eg/compute/tarball"
 	"eg/compute/tarballs"
 	"os"
 	"strings"
@@ -13,6 +12,7 @@ import (
 	"github.com/egdaemon/eg/runtime/x/wasi/egflatpak"
 	"github.com/egdaemon/eg/runtime/x/wasi/egfs"
 	"github.com/egdaemon/eg/runtime/x/wasi/eggolang"
+	"github.com/egdaemon/eg/runtime/x/wasi/egtarball"
 )
 
 var buildTags = []string{"no_duckdb_arrow"}
@@ -31,13 +31,13 @@ func Generate(ctx context.Context, _ eg.Op) error {
 
 func Install(ctx context.Context, _ eg.Op) error {
 	// go install -ldflags=\"-extldflags=-static\" -tags no_duckdb_arrow ./cmd/shallows/...
-	dstdir := tarball.Path(tarballs.Retrovibed())
+	dstdir := egtarball.Path(tarballs.Retrovibed())
 	gruntime := shellruntime()
 	return shell.Run(
 		ctx,
-		gruntime.New("ldconfig -p | grep duckdb"),
-		gruntime.New("ld --verbose | grep SEARCH_DIR | tr -s ' ;'"),
-		gruntime.New("go env"),
+		// gruntime.New("ldconfig -p | grep duckdb"),
+		// gruntime.New("ld --verbose | grep SEARCH_DIR | tr -s ' ;'"),
+		// gruntime.New("go env"),
 		gruntime.Newf("go install -tags %s ./cmd/shallows/...", strings.Join(buildTags, ",")).Environ("GOBIN", dstdir),
 	)
 }
@@ -82,7 +82,7 @@ func FlatpakManifest(ctx context.Context, o eg.Op) error {
 					"cp -r . /app/bin",
 				).Sources(
 					egflatpak.SourceTarball(
-						tarball.GithubDownloadURL(tarballs.Retrovibed()), tarball.SHA256(tarballs.Retrovibed()),
+						egtarball.GithubDownloadURL(tarballs.Retrovibed()), egtarball.SHA256(tarballs.Retrovibed()),
 						egflatpak.SourceOptions().Destination("retrovibed.tar.xz")...,
 					),
 				)...),
@@ -100,7 +100,6 @@ func FlatpakManifest(ctx context.Context, o eg.Op) error {
 func Flatpak(ctx context.Context, op eg.Op) error {
 	runtime := shell.Runtime()
 	builddir := egenv.WorkingDirectory("fractal", "build", egfs.FindFirst(os.DirFS(egenv.WorkingDirectory("fractal", "build")), "bundle"))
-	// git clone -b v%s --depth 1 https://github.com/duckdb/duckdb.git duckdb
 	b := egflatpak.New(
 		"space.retrovibe.Daemon", "fractal",
 		egflatpak.Option().SDK("org.gnome.Sdk", "47").Runtime("org.gnome.Platform", "47").

@@ -9,7 +9,7 @@ RUN add-apt-repository -n ppa:egdaemon/duckdb
 
 RUN apt-get update
 RUN apt-get -y install golang-1.23 eg egbootstrap podman netavark rsync vim dput devscripts dh-make dput uidmap dbus-user-session git unzip xz-utils zip libglu1-mesa clang cmake git ninja-build pkg-config libgtk-3-dev liblzma-dev libstdc++-12-dev
-RUN apt-get -y install snapd duckdb
+RUN apt-get -y install snapd duckdb protobuf-compiler pkgconf
 
 RUN ln -s /usr/lib/go-1.23/bin/go /usr/local/bin/go
 
@@ -21,7 +21,6 @@ RUN curl -o /tmp/flutter.tar.xz https://storage.googleapis.com/flutter_infra_rel
 RUN tar -xf /tmp/flutter.tar.xz -C /opt/
 RUN ln -s /opt/flutter/bin/flutter /usr/local/bin/flutter
 RUN ln -s /opt/flutter/bin/dart /usr/local/bin/dart
-RUN apt-get -y install -y protobuf-compiler
 RUN protoc --version
 RUN chown -R egd:egd /opt/flutter
 RUN sudo -H -S -u egd -g egd flutter config --no-analytics
@@ -31,8 +30,8 @@ RUN sudo -H -S -u egd -g egd dart pub global activate protoc_plugin
 # install genieql and golang's protocol buffers plugin
 RUN GOBIN="/usr/local/bin" go install -tags genieql.duckdb,no_duckdb_arrow github.com/james-lawrence/genieql/...@latest
 RUN GOBIN="/usr/local/bin" go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
-RUN which genieql
-RUN apt-get -y install tree flatpak-builder
+
+RUN apt-get -y install tree flatpak-builder libmpv-dev
 RUN flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 
 RUN apt-get update
