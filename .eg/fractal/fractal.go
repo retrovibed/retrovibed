@@ -64,7 +64,7 @@ func Install(ctx context.Context, op eg.Op) error {
 	)
 }
 
-func flatpak() *egflatpak.Builder {
+func flatpak(final egflatpak.Module) *egflatpak.Builder {
 	return egflatpak.New(
 		"space.retrovibe.Client", "fractal",
 		egflatpak.Option().SDK("org.gnome.Sdk", "47").Runtime("org.gnome.Platform", "47").
@@ -76,7 +76,7 @@ func flatpak() *egflatpak.Builder {
 				libx265module(),
 				libffmpegmodule(),
 				mpvmodule(),
-				egflatpak.ModuleTarball(egtarball.GithubDownloadURL(tarballs.Retrovibed()), egtarball.SHA256(tarballs.Retrovibed())),
+				final,
 			).
 			AllowWayland().
 			AllowDRI().
@@ -93,12 +93,18 @@ func flatpak() *egflatpak.Builder {
 
 // build ensures that the flatpak has all the necessary componentry for the generated manifest.
 func FlatpakBuild(ctx context.Context, op eg.Op) error {
-	return egflatpak.Build(ctx, shell.Runtime().Timeout(30*time.Minute), flatpak())
+	// builddir := egenv.WorkingDirectory("fractal", "build", egfs.FindFirst(os.DirFS(egenv.WorkingDirectory("fractal", "build")), "bundle"))
+	return egflatpak.Build(ctx, shell.Runtime().Timeout(30*time.Minute), flatpak(
+		egflatpak.ModuleTarball(egtarball.GithubDownloadURL(tarballs.Retrovibed()), egtarball.SHA256(tarballs.Retrovibed())),
+	// egflatpak.ModuleCopy(builddir),
+	))
 }
 
 // Manifest generates the manifest for distribution.
 func FlatpakManifest(ctx context.Context, o eg.Op) error {
-	return egflatpak.ManifestOp(egenv.CacheDirectory("flatpak.client.yml"), flatpak())(ctx, o)
+	return egflatpak.ManifestOp(egenv.CacheDirectory("flatpak.client.yml"), flatpak(
+		egflatpak.ModuleTarball(egtarball.GithubDownloadURL(tarballs.Retrovibed()), egtarball.SHA256(tarballs.Retrovibed())),
+	))(ctx, o)
 }
 
 // pulled from: https://github.com/flathub/io.mpv.Mpv/blob/d895bc41c09a17d0bdca40cd57f77340e44fdca5/io.mpv.Mpv.yml

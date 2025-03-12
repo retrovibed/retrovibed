@@ -1,7 +1,7 @@
 #### release command (local system)
 
 ```bash
-GH_TOKEN="$(gh auth token)" eg compute local --hotswap -vv -e GH_TOKEN
+GH_TOKEN="$(gh auth token)" eg compute local --hotswap -e GH_TOKEN
 ```
 
 #### install flatpak daemon

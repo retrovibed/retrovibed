@@ -61,11 +61,11 @@ func main() {
 				),
 			),
 			release.Release,
-			eg.Module(
-				ctx, deb.OptionLiteral("--privileged"),
-				eg.Parallel(
-					fractal.FlatpakBuild,
-				),
+		),
+		eg.Module(
+			ctx, deb.OptionLiteral("--privileged"),
+			eg.Parallel(
+				fractal.FlatpakBuild,
 			),
 		),
 	)
