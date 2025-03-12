@@ -3,20 +3,15 @@ package fractal
 import (
 	"context"
 	"eg/compute/tarballs"
-	"fmt"
 	"os"
-	"path/filepath"
 	"time"
 
-	_eg "github.com/egdaemon/eg"
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
 	"github.com/egdaemon/eg/runtime/wasi/shell"
-	"github.com/egdaemon/eg/runtime/x/wasi/egccache"
 	"github.com/egdaemon/eg/runtime/x/wasi/egflatpak"
 	"github.com/egdaemon/eg/runtime/x/wasi/egfs"
 	"github.com/egdaemon/eg/runtime/x/wasi/egtarball"
-	"github.com/gofrs/uuid"
 )
 
 func flutterRuntime() shell.Command {
@@ -89,8 +84,8 @@ func flatpak() *egflatpak.Builder {
 			AllowDownload().
 			AllowMusic().
 			AllowVideos().Allow(
-			"--socket=pulseaudio",                // for mpv
 			"--filesystem=host:ro",               // for mpv
+			"--socket=pulseaudio",                // for mpv
 			"--env=LC_NUMERIC=C",                 // for mpv
 			"--filesystem=xdg-run/pipewire-0:ro", // for mpv
 		)...)
@@ -99,57 +94,11 @@ func flatpak() *egflatpak.Builder {
 // build ensures that the flatpak has all the necessary componentry for the generated manifest.
 func FlatpakBuild(ctx context.Context, op eg.Op) error {
 	return egflatpak.Build(ctx, shell.Runtime().Timeout(30*time.Minute), flatpak())
-	// return fpbuild(ctx, shell.Runtime().Timeout(30*time.Minute), flatpak())
 }
 
 // Manifest generates the manifest for distribution.
 func FlatpakManifest(ctx context.Context, o eg.Op) error {
 	return egflatpak.ManifestOp(egenv.CacheDirectory("flatpak.client.yml"), flatpak())(ctx, o)
-}
-
-func fpbuild(ctx context.Context, runtime shell.Command, b *egflatpak.Builder) error {
-	var (
-		userdir = egenv.CacheDirectory(_eg.DefaultModuleDirectory(), "flatpak-user")
-	)
-
-	if err := egfs.MkDirs(0755, userdir); err != nil {
-		return err
-	}
-
-	dir, err := os.MkdirTemp(".", "flatpak.build.*")
-	if err != nil {
-		return err
-	}
-	defer os.RemoveAll(dir)
-
-	manifestpath := filepath.Join(dir, fmt.Sprintf("%s.yml", Must(uuid.NewV7())))
-
-	err = eg.Perform(ctx, egflatpak.ManifestOp(manifestpath, b))
-	if err != nil {
-		return err
-	}
-
-	// enable ccache
-	runtime = runtime.EnvironFrom(
-		Must(egccache.Env())...,
-	).Environ("FLATPAK_USER_DIR", userdir)
-
-	return shell.Run(
-		ctx,
-		runtime.Newf("cat %s", manifestpath),
-		runtime.New("flatpak --user remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo"),
-		runtime.Newf("flatpak install --user --assumeyes --include-sdk flathub %s//%s", b.Runtime.ID, b.Runtime.Version),
-		runtime.Newf("flatpak install --user --assumeyes flathub %s//%s", b.SDK.ID, b.SDK.Version),
-		runtime.Newf("flatpak-builder --user --install-deps-from=flathub --install --ccache --force-clean %s %s", dir, manifestpath),
-	)
-}
-
-func Must[T any](v T, err error) T {
-	if err == nil {
-		return v
-	}
-
-	panic(err)
 }
 
 // pulled from: https://github.com/flathub/io.mpv.Mpv/blob/d895bc41c09a17d0bdca40cd57f77340e44fdca5/io.mpv.Mpv.yml
