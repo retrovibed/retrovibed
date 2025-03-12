@@ -1,7 +1,9 @@
 package cmdopts
 
 import (
+	"errors"
 	"net"
+	"net/url"
 	"reflect"
 	"strings"
 
@@ -63,4 +65,31 @@ func ParseTCPAddrArray(ctx *kong.DecodeContext, target reflect.Value) (err error
 
 	target.Set(reflect.ValueOf(results))
 	return nil
+}
+
+type Listener struct {
+	s net.Listener
+}
+
+func (t Listener) MarshalText() (text []byte, err error) {
+	return []byte(t.s.Addr().String()), nil
+}
+
+func (t *Listener) UnmarshalText(text []byte) (err error) {
+	uri, err := url.Parse(string(text))
+	if err != nil {
+		return err
+	}
+
+	switch uri.Scheme {
+	case "unix", "tcp", "tcp4", "tcp6", "udp":
+		t.s, err = net.Listen(uri.Scheme, uri.Host)
+		return err
+	default:
+		return errorsx.Wrapf(errors.ErrUnsupported, "network: %s", uri.String())
+	}
+}
+
+func (t Listener) Socket() net.Listener {
+	return t.s
 }

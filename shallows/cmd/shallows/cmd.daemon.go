@@ -7,8 +7,8 @@ import (
 	"io"
 	"io/fs"
 	"log"
-	"net"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/justinas/alice"
@@ -47,19 +47,21 @@ import (
 var embedsqlite embed.FS
 
 type cmdDaemon struct {
-	AutoBootstrap bool `flag:"" name:"auto-bootstrap" help:"bootstrap from a predefined set of peers" default:"false"`
-	AutoDiscovery bool `flag:"" name:"auto-discovery" help:"enable autodiscovery of content from peers" default:"false"`
+	AutoBootstrap bool             `flag:"" name:"auto-bootstrap" help:"bootstrap from a predefined set of peers" default:"false"`
+	AutoDiscovery bool             `flag:"" name:"auto-discovery" help:"enable autodiscovery of content from peers" default:"false"`
+	HTTP          cmdopts.Listener `flag:"" name:"http-address" help:"address to serve daemon api from" default:"tcp://:9998"`
 }
 
 func (t cmdDaemon) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	var (
 		db           *sql.DB
-		torrentpeers = userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "torrent.peers")
-		dbpath       = userx.DefaultConfigDir(userx.DefaultRelRoot(), "dpool.db")
-		peerid       = krpc.IdFromString(ssh.FingerprintSHA256(id.PublicKey()))
-		httpbind     net.Listener
+		torrentpeers                            = userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "torrent.peers")
+		dbpath                                  = userx.DefaultConfigDir(userx.DefaultRelRoot(), "dpool.db")
+		peerid                                  = krpc.IdFromString(ssh.FingerprintSHA256(id.PublicKey()))
 		bootstrap    torrent.ClientConfigOption = torrent.ClientConfigNoop
 	)
+
+	envx.Debug(os.Environ()...)
 
 	dctx, done := context.WithCancelCause(gctx.Context)
 	asyncfailure := func(cause error) {
@@ -187,15 +189,13 @@ func (t cmdDaemon) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	media.NewHTTPLibrary(db, tstore).Bind(httpmux.PathPrefix("/m").Subrouter())
 	media.NewHTTPDiscovered(db, tclient, tstore).Bind(httpmux.PathPrefix("/d").Subrouter())
 	media.NewHTTPRSSFeed(db).Bind(httpmux.PathPrefix("/rss").Subrouter())
-	if httpbind, err = net.Listen("tcp", ":9998"); err != nil {
-		return err
-	}
 
 	tlspem := envx.String(userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "tls.pem"), env.DaemonTLSPEM)
 	if err = tlsx.SelfSignedLocalHostTLS(tlspem); err != nil {
 		return err
 	}
 
+	httpbind := t.HTTP.Socket()
 	go func() {
 		<-dctx.Done()
 		httpbind.Close()
