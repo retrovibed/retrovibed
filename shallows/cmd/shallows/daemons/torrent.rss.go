@@ -17,10 +17,11 @@ import (
 	"github.com/james-lawrence/deeppool/tracking"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/metainfo"
+	"github.com/james-lawrence/torrent/storage"
 	"golang.org/x/time/rate"
 )
 
-func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer) (err error) {
+func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, tclient *torrent.Client, tstore storage.ClientImpl) (err error) {
 	queryfeeds := func(ctx context.Context, done context.CancelCauseFunc) iter.Seq[tracking.RSS] {
 		return func(yield func(tracking.RSS) bool) {
 			query := tracking.RSSSearchBuilder().Where(
@@ -90,6 +91,11 @@ func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer) (err error) {
 				continue
 			}
 
+			autodownload := tracking.MetadataOptionNoop
+			if feed.Autodownload {
+				autodownload = tracking.MetadataOptionInitiate
+			}
+
 			for _, item := range items {
 				var (
 					meta tracking.Metadata
@@ -123,7 +129,7 @@ func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer) (err error) {
 					continue
 				}
 
-				if err = tracking.MetadataInsertWithDefaults(ctx, q, tracking.NewMetadata(&md.InfoHash, tracking.MetadataOptionFromInfo(mi), tracking.MetadataOptionDescription(item.Title))).Scan(&meta); err != nil {
+				if err = tracking.MetadataInsertWithDefaults(ctx, q, tracking.NewMetadata(&md.InfoHash, tracking.MetadataOptionFromInfo(mi), tracking.MetadataOptionDescription(item.Title), autodownload)).Scan(&meta); err != nil {
 					log.Println("unable to record torrent metadata", feed.ID, err)
 					continue
 				}
@@ -135,6 +141,9 @@ func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer) (err error) {
 				log.Println("unable to mark rss feed for cooldown", err)
 				continue
 			}
+
+			// begin any torrent provided by this feed
+			ResumeDownloads(ctx, q, tclient, tstore)
 		}
 
 		if err := fctx.Err(); contextx.IgnoreCancelled(err) != nil {

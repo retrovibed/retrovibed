@@ -158,7 +158,7 @@ func (t cmdDaemon) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	}
 
 	go func() {
-		if err := daemons.DiscoverFromRSSFeeds(dctx, db); err != nil {
+		if err := daemons.DiscoverFromRSSFeeds(dctx, db, tclient, tstore); err != nil {
 			asyncfailure(errorsx.Wrap(err, "autodiscovery of RSS feeds failed"))
 			return
 		}

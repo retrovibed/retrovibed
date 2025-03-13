@@ -2,12 +2,14 @@ package tracking
 
 import (
 	"context"
+	"io"
 	"log"
 	"strings"
 	"time"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/james-lawrence/deeppool/internal/x/duckdbx"
+	"github.com/james-lawrence/deeppool/internal/x/errorsx"
 	"github.com/james-lawrence/deeppool/internal/x/langx"
 	"github.com/james-lawrence/deeppool/internal/x/slicesx"
 	"github.com/james-lawrence/deeppool/internal/x/sqlx"
@@ -17,6 +19,12 @@ import (
 	"github.com/james-lawrence/torrent/metainfo"
 	"golang.org/x/time/rate"
 )
+
+func MetadataOptionNoop(*Metadata) {}
+
+func MetadataOptionInitiate(md *Metadata) {
+	md.InitiatedAt = time.Now()
+}
 
 func MetadataOptionFromInfo(i *metainfo.Info) func(*Metadata) {
 	return func(m *Metadata) {
@@ -79,7 +87,31 @@ func MetadataSearchBuilder() squirrel.SelectBuilder {
 	return squirrelx.PSQL.Select(sqlx.Columns(MetadataScannerStaticColumns)...).From("torrents_metadata")
 }
 
-func DownloadProgress(ctx context.Context, q sqlx.Queryer, md Metadata, dl torrent.Torrent) {
+func Download(ctx context.Context, q sqlx.Queryer, md *Metadata, t torrent.Torrent) (err error) {
+	var (
+		downloaded int64
+	)
+
+	pctx, done := context.WithCancel(ctx)
+	defer done()
+
+	// update the progress.
+	go DownloadProgress(pctx, q, md, t)
+
+	// just copying as we receive data to block until done.
+	if downloaded, err = torrent.DownloadInto(ctx, io.Discard, t); err != nil {
+		return errorsx.Wrap(err, "download failed")
+	}
+
+	log.Println("download completed", md.ID, md.Description, downloaded)
+	if err := MetadataProgressByID(ctx, q, md.ID, 0, uint64(downloaded)).Scan(md); err != nil {
+		return errorsx.Wrap(err, "progress update failed")
+	}
+
+	return nil
+}
+
+func DownloadProgress(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torrent.Torrent) {
 	const (
 		statsfreq = 10 * time.Second
 	)
@@ -109,7 +141,7 @@ func DownloadProgress(ctx context.Context, q sqlx.Queryer, md Metadata, dl torre
 			stats := dl.Stats()
 			log.Printf("%s: peers(%d:%d:%d) pieces(%d:%d:%d:%d)\n", dl.Metainfo().HashInfoBytes().HexString(), stats.ActivePeers, stats.PendingPeers, stats.TotalPeers, stats.Missing, stats.Outstanding, stats.Unverified, stats.Completed)
 
-			if err := MetadataProgressByID(ctx, q, md.ID, uint16(stats.ActivePeers), current).Scan(&md); err != nil {
+			if err := MetadataProgressByID(ctx, q, md.ID, uint16(stats.ActivePeers), current).Scan(md); err != nil {
 				log.Println("failed to update progress", err)
 			}
 		case <-ctx.Done():
