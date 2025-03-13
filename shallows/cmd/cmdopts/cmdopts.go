@@ -65,9 +65,13 @@ type SSHID struct {
 }
 
 func (t *SSHID) AfterApply() (err error) {
-	if t.Signer, err = sshx.AutoCached(sshx.NewKeyGen(), userx.DefaultConfigDir(userx.DefaultRelRoot(), "id")); err != nil {
+	if t.Signer, err = sshx.AutoCached(sshx.NewKeyGen(), t.PrivateKeyPath()); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (t *SSHID) PrivateKeyPath() string {
+	return userx.DefaultConfigDir(userx.DefaultRelRoot(), "id")
 }

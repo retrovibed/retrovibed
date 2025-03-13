@@ -94,6 +94,15 @@ func DefaultRuntimeDirectory(rel ...string) string {
 	return filepath.Join(envx.String(defaultdir, "RUNTIME_DIRECTORY", "XDG_RUNTIME_DIR"), filepath.Join(rel...))
 }
 
+// return a path relative to the home directory.
+func HomeDirectoryRel(rel ...string) (path string, err error) {
+	if path, err = os.UserHomeDir(); err != nil {
+		return "", err
+	}
+
+	return filepath.Join(path, filepath.Join(rel...)), nil
+}
+
 // DefaultDirectory finds the first directory root that exists and then returns
 // that root directory joined with the relative path provided.
 func DefaultDirectory(rel string, roots ...string) (path string) {
@@ -107,7 +116,7 @@ func DefaultDirectory(rel string, roots ...string) (path string) {
 	return path
 }
 
-// HomeDirectoryOrDefault loads the user home directory or fallsback to the provided
+// HomeDirectoryOrDefault loads the user home directory or falls back to the provided
 // path when an error occurs.
 func HomeDirectoryOrDefault(fallback string) (dir string) {
 	var (

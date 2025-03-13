@@ -130,7 +130,7 @@ func (t Directory) download(ctx context.Context, path string) {
 	defer done()
 
 	// update the progress.
-	go tracking.DownloadProgress(pctx, t.q, md, tor)
+	go tracking.DownloadProgress(pctx, t.q, &md, tor)
 
 	// just copying as we receive data to block until done.
 	if downloaded, err = torrent.DownloadInto(ctx, io.Discard, tor); err != nil {

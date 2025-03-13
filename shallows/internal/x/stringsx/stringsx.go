@@ -47,3 +47,7 @@ func First(values ...string) string {
 func Blank(s string) bool {
 	return len(strings.TrimSpace(s)) == 0
 }
+
+func Present(s string) bool {
+	return len(strings.TrimSpace(s)) > 0
+}

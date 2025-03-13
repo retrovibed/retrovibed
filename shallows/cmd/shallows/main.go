@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/alecthomas/kong"
+	"github.com/gofrs/uuid"
 	"github.com/james-lawrence/deeppool/cmd/cmdopts"
 	"github.com/james-lawrence/deeppool/internal/x/debugx"
 	"github.com/james-lawrence/deeppool/internal/x/envx"
@@ -24,9 +25,10 @@ func main() {
 		cmdopts.Global
 		cmdopts.PeerID
 		cmdopts.SSHID
-		Version cmdopts.Version `cmd:"" help:"display versioning information"`
-		Daemon  cmdDaemon       `cmd:"" help:"run the backend daemon" default:"true"`
-		Torrent cmdTorrent      `cmd:"" help:"torrent related sub commands"`
+		Version  cmdopts.Version `cmd:"" help:"display versioning information"`
+		Identity cmdMetaIdentity `cmd:"" help:"identity management commands"`
+		Daemon   cmdDaemon       `cmd:"" help:"run the backend daemon" default:"true"`
+		Torrent  cmdTorrent      `cmd:"" help:"torrent related sub commands"`
 	}
 
 	var (
@@ -67,6 +69,7 @@ func main() {
 		kong.Description("daemon"),
 		kong.Vars{
 			"vars_timestamp_started": time.Now().UTC().Format(time.RFC3339),
+			"vars_random_seed":       uuid.Must(uuid.NewV4()).String(),
 		},
 		kong.UsageOnError(),
 		kong.Bind(

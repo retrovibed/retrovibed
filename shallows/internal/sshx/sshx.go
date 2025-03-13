@@ -148,3 +148,8 @@ func AutoCached(kg keygen, path string) (s ssh.Signer, err error) {
 
 	return s, err
 }
+
+// ensure the public key exists
+func EnsurePublicKey(s ssh.Signer, path string) error {
+	return os.WriteFile(fmt.Sprintf("%s.pub", path), ssh.MarshalAuthorizedKey(s.PublicKey()), 0600)
+}
