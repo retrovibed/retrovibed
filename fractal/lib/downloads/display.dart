@@ -11,10 +11,10 @@ class Display extends StatelessWidget {
     return Container(
       padding: defaults.padding,
       child: ds.RefreshBoundary(
-        Column(
+        ListView(
           children: [
             ds.PeriodicBoundary(ds.RefreshBoundary(DownloadingListDisplay())),
-            Expanded(child: AvailableListDisplay()),
+            AvailableListDisplay(),
           ],
         ),
       ),
