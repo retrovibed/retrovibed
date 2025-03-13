@@ -29,7 +29,7 @@ class Table<T> extends StatelessWidget {
         this.children.length == 0
             ? this.empty
             : Column(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisSize: MainAxisSize.max,
               children: this.children.map(this.render).toList(),
             );
     return ds.Loading(
@@ -39,8 +39,8 @@ class Table<T> extends StatelessWidget {
         overlay: overlay,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
-          mainAxisSize: MainAxisSize.max,
-          children: [leading, Expanded(child: content), trailing],
+          mainAxisSize: MainAxisSize.min,
+          children: [leading, content, trailing],
         ),
       ),
     );

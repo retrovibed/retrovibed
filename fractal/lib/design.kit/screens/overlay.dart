@@ -19,6 +19,7 @@ class Overlay extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Stack(
+        fit: StackFit.passthrough,
         alignment: alignment,
         children: [child, overlay ?? const SizedBox()],
       ),

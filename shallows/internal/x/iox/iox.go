@@ -3,7 +3,6 @@ package iox
 import (
 	"errors"
 	"io"
-	"log"
 	"os"
 	"sync/atomic"
 )
@@ -114,6 +113,5 @@ type Printer uint64
 
 func (t Printer) Write(b []byte) (n int, err error) {
 	n = len(b)
-	log.Println("DERP DERP", n)
 	return n, nil
 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:fractal/designkit.dart' as ds;
 import 'package:fractal/media.dart' as media;
+import 'package:fractal/mimex.dart' as mimex;
 import './search.row.dart';
 import 'file.drop.well.dart';
 
@@ -125,11 +126,11 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
         children: _res.items,
         (v) => media.RowDisplay(
           media: v,
-          onPlay: () {
-            setState(() {
-              _player = ds.Debug(ds.Full(SelectableText("DERP DERP")));
-            });
-          },
+          leading: [Icon(mimex.icon(v.mimetype))],
+          trailing: [
+            media.ButtonShare(current: v),
+            media.ButtonPlay(current: v),
+          ],
         ),
         empty: FileDropWell(upload),
       ),

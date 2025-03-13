@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 class Defaults extends ThemeExtension<Defaults> {
   static const defaults = Defaults();
 
+  final double? spacing;
   final EdgeInsets? padding;
   final EdgeInsetsGeometry? margin;
   final Border? border;
   final Color? danger;
 
   const Defaults({
+    this.spacing = 10.0,
     this.padding = const EdgeInsets.all(16.0),
     this.margin = const EdgeInsets.all(5.0),
     this.danger = const Color.fromRGBO(110, 1, 1, 0.75),
@@ -22,8 +24,14 @@ class Defaults extends ThemeExtension<Defaults> {
   }
 
   @override
-  Defaults copyWith({EdgeInsets? padding, EdgeInsetsGeometry? margin}) {
+  Defaults copyWith({
+    double? spacing,
+    EdgeInsets? padding,
+    EdgeInsetsGeometry? margin,
+    Border? border,
+  }) {
     return Defaults(
+      spacing: spacing ?? this.spacing,
       padding: padding ?? this.padding,
       margin: margin ?? this.margin,
       border: border ?? this.border,
@@ -45,6 +53,7 @@ class Defaults extends ThemeExtension<Defaults> {
       margin: margin ?? other.margin,
       border: border ?? other.border,
       danger: danger ?? other.danger,
+      spacing: spacing ?? other.spacing,
     );
   }
 }

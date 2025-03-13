@@ -45,23 +45,21 @@ class _AccordionState extends State<Accordion> {
               child: widget.content,
             );
 
-    return Card(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Opacity(
-            opacity: opacity,
-            child: ListTile(
-              hoverColor: theme.hoverColor,
-              mouseCursor: cursor,
-              onTap: onPressed,
-              title: widget.description,
-              trailing: icon,
-            ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Opacity(
+          opacity: opacity,
+          child: ListTile(
+            hoverColor: theme.hoverColor,
+            mouseCursor: cursor,
+            onTap: onPressed,
+            title: widget.description,
+            trailing: icon,
           ),
-          IntrinsicHeight(child: content),
-        ],
-      ),
+        ),
+        content,
+      ],
     );
   }
 }

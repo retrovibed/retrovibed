@@ -28,5 +28,6 @@ func (t cmdTorrentMagnet) Run(ctx *cmdopts.Global) (err error) {
 		}
 		log.Println("NOOP MAGNET - Not implemented", spew.Sdump(m))
 	}
+
 	return err
 }

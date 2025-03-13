@@ -2,6 +2,7 @@ import 'package:fixnum/fixnum.dart' as fixnum;
 import 'package:flutter/material.dart';
 import 'package:fractal/designkit.dart' as ds;
 import 'package:fractal/media.dart' as media;
+import 'package:fractal/mimex.dart' as mimex;
 
 class AvailableListDisplay extends StatefulWidget {
   final media.FnMediaSearch search;
@@ -119,6 +120,8 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                   );
                   return null;
                 }),
+        leading: [Icon(mimex.icon(v.mimetype))],
+        trailing: [Icon(Icons.download)],
       ),
     );
   }
