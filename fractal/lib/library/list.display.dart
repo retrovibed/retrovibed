@@ -5,7 +5,6 @@ import 'package:fractal/designkit.dart' as ds;
 import 'package:fractal/media.dart' as media;
 import 'package:fractal/mimex.dart' as mimex;
 import './search.row.dart';
-import 'file.drop.well.dart';
 
 class AvailableListDisplay extends StatefulWidget {
   final media.FnMediaSearch search;
@@ -115,7 +114,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
           },
           current: _res.next.offset,
           empty: fixnum.Int64(_res.items.length) < _res.next.limit,
-          trailing: FileDropWell(
+          trailing: ds.FileDropWell(
             upload,
             child: IconButton(
               onPressed: () {},
@@ -132,7 +131,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
             media.ButtonPlay(current: v),
           ],
         ),
-        empty: FileDropWell(upload),
+        empty: ds.FileDropWell(upload),
       ),
     );
   }

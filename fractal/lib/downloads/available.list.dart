@@ -1,14 +1,17 @@
 import 'package:fixnum/fixnum.dart' as fixnum;
 import 'package:flutter/material.dart';
+import 'package:desktop_drop/desktop_drop.dart';
 import 'package:fractal/designkit.dart' as ds;
 import 'package:fractal/media.dart' as media;
 import 'package:fractal/mimex.dart' as mimex;
 
 class AvailableListDisplay extends StatefulWidget {
   final media.FnMediaSearch search;
+  final media.FnUploadRequest upload;
   const AvailableListDisplay({
     super.key,
     this.search = media.discovered.available,
+    this.upload = media.discovered.upload,
   });
 
   @override
@@ -47,6 +50,47 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
 
   @override
   Widget build(BuildContext context) {
+    final upload = (DropDoneDetails v) {
+      setState(() {
+        _loading = true;
+      });
+
+      final multiparts = v.files.map((c) {
+        return media.media.uploadable(c.path, c.name, c.mimeType!);
+      });
+
+      return Future.microtask(() {
+        return Future.wait(
+              multiparts.map((fv) {
+                return fv.then((v) {
+                  return widget
+                      .upload((req) {
+                        req..files.add(v);
+                        return req;
+                      })
+                      .then((uploaded) {
+                        setState(() {
+                          _res.items.add(uploaded.media);
+                        });
+                      })
+                      .catchError((cause) {
+                        setState(() {
+                          _cause = ds.Error.unknown(cause);
+                        });
+                      });
+                });
+              }),
+            )
+            .then((v) => ds.NullWidget)
+            .catchError(ds.Error.unknown)
+            .whenComplete(
+              () => setState(() {
+                _loading = false;
+              }),
+            );
+      });
+    };
+
     return ds.Table(
       loading: _loading,
       cause: _cause,
@@ -97,6 +141,13 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                         }
                         : null,
                 icon: Icon(Icons.arrow_right),
+              ),
+              ds.FileDropWell(
+                upload,
+                child: IconButton(
+                  onPressed: () {},
+                  icon: Icon(Icons.file_upload_outlined),
+                ),
               ),
             ],
           ),

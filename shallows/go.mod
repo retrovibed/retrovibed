@@ -10,6 +10,7 @@ require (
 	github.com/anacrolix/utp v0.2.0
 	github.com/benbjohnson/immutable v0.4.3
 	github.com/charmbracelet/huh v0.6.0
+	github.com/gabriel-vasile/mimetype v1.4.8
 	github.com/go-playground/form/v4 v4.2.1
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/golang-jwt/jwt/v4 v4.5.1

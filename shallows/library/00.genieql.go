@@ -25,7 +25,7 @@ func MetadataInsertWithDefaults(
 	gql genieql.Insert,
 	pattern func(ctx context.Context, q sqlx.Queryer, a Metadata) NewMetadataScannerStaticRow,
 ) {
-	gql.Into("library_metadata").Default("created_at", "updated_at", "hidden_at", "tombstoned_at", "archive_id", "torrent_id").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT")
+	gql.Into("library_metadata").Default("created_at", "updated_at", "hidden_at", "tombstoned_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT")
 }
 
 func MetadataDeleteByID(

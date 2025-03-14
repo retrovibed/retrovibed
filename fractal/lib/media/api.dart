@@ -83,8 +83,8 @@ abstract class discoveredsearch {
 }
 
 abstract class discovered {
+  static final client = http.Client();
   static Future<MediaSearchResponse> available(MediaSearchRequest req) async {
-    final client = http.Client();
     return client
         .get(
           Uri.https(
@@ -104,7 +104,6 @@ abstract class discovered {
   static Future<DownloadSearchResponse> downloading(
     DownloadSearchRequest req,
   ) async {
-    final client = http.Client();
     return client
         .get(
           Uri.https(
@@ -121,8 +120,23 @@ abstract class discovered {
         });
   }
 
+  static Future<MediaUploadResponse> upload(
+    http.MultipartRequest Function(http.MultipartRequest req) mkreq,
+  ) async {
+    final req = mkreq(
+      http.MultipartRequest("POST", Uri.https(httpx.host(), "/d/")),
+    );
+
+    return client.send(req).then((v) {
+      return v.stream.bytesToString().then((s) {
+        return Future.value(
+          MediaUploadResponse.create()..mergeFromProto3Json(jsonDecode(s)),
+        );
+      });
+    });
+  }
+
   static Future<DownloadBeginResponse> download(String id) async {
-    final client = http.Client();
     return client
         .post(Uri.https(httpx.host(), "/d/${id}", null), body: jsonEncode({}))
         .then((v) {
@@ -132,7 +146,6 @@ abstract class discovered {
   }
 
   static Future<DownloadPauseResponse> pause(String id) async {
-    final client = http.Client();
     return client
         .delete(Uri.https(httpx.host(), "/d/${id}", null), body: jsonEncode({}))
         .then((v) {

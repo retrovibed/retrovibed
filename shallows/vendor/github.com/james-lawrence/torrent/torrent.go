@@ -52,6 +52,13 @@ func TunePeers(peers ...Peer) Tuner {
 	}
 }
 
+// add trackers to the torrent.
+func TuneTrackers(trackers ...[]string) Tuner {
+	return func(t *torrent) {
+		t.addTrackers(trackers)
+	}
+}
+
 // TuneClientPeer adds a trusted, pending peer for each of the Client's addresses.
 // used for tests.
 func TuneClientPeer(cl *Client) Tuner {

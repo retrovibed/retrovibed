@@ -2,22 +2,27 @@ package tracking
 
 import (
 	"context"
-	"io"
+	"crypto/md5"
 	"log"
 	"strings"
 	"time"
 
 	"github.com/Masterminds/squirrel"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/james-lawrence/deeppool/internal/x/duckdbx"
 	"github.com/james-lawrence/deeppool/internal/x/errorsx"
 	"github.com/james-lawrence/deeppool/internal/x/langx"
+	"github.com/james-lawrence/deeppool/internal/x/md5x"
 	"github.com/james-lawrence/deeppool/internal/x/slicesx"
 	"github.com/james-lawrence/deeppool/internal/x/sqlx"
 	"github.com/james-lawrence/deeppool/internal/x/squirrelx"
 	"github.com/james-lawrence/deeppool/internal/x/timex"
+	"github.com/james-lawrence/deeppool/library"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/metainfo"
 	"golang.org/x/time/rate"
+
+	"github.com/gabriel-vasile/mimetype"
 )
 
 func MetadataOptionNoop(*Metadata) {}
@@ -30,6 +35,7 @@ func MetadataOptionFromInfo(i *metainfo.Info) func(*Metadata) {
 	return func(m *Metadata) {
 		m.Description = strings.ToValidUTF8(i.Name, "\uFFFD")
 		m.Bytes = uint64(i.TotalLength())
+		m.Private = i.Private
 	}
 }
 
@@ -90,6 +96,7 @@ func MetadataSearchBuilder() squirrel.SelectBuilder {
 func Download(ctx context.Context, q sqlx.Queryer, md *Metadata, t torrent.Torrent) (err error) {
 	var (
 		downloaded int64
+		mhash      = md5.New()
 	)
 
 	pctx, done := context.WithCancel(ctx)
@@ -99,7 +106,7 @@ func Download(ctx context.Context, q sqlx.Queryer, md *Metadata, t torrent.Torre
 	go DownloadProgress(pctx, q, md, t)
 
 	// just copying as we receive data to block until done.
-	if downloaded, err = torrent.DownloadInto(ctx, io.Discard, t); err != nil {
+	if downloaded, err = torrent.DownloadInto(ctx, mhash, t); err != nil {
 		return errorsx.Wrap(err, "download failed")
 	}
 
@@ -108,6 +115,26 @@ func Download(ctx context.Context, q sqlx.Queryer, md *Metadata, t torrent.Torre
 		return errorsx.Wrap(err, "progress update failed")
 	}
 
+	content := t.NewReader()
+	defer content.Close()
+	cmimetype, err := mimetype.DetectReader(content)
+	if err != nil {
+		return errorsx.Wrap(err, "unable to determine mimetype")
+	}
+
+	lmd := library.NewMetadata(
+		md5x.FormatString(mhash),
+		library.MetadataOptionDescription(md.Description),
+		library.MetadataOptionBytes(md.Bytes),
+		library.MetadataOptionTorrentID(md.ID),
+		library.MetadataOptionMimetype(cmimetype.String()),
+	)
+
+	if err := library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd); err != nil {
+		return errorsx.Wrap(err, "unable to record library metadata")
+	}
+
+	log.Println("new library content", spew.Sdump(lmd))
 	return nil
 }
 
@@ -126,12 +153,13 @@ func DownloadProgress(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torr
 		select {
 		case <-statst.C:
 			stats := dl.Stats()
-			log.Printf("%s: peers(%d:%d:%d) pieces(%d:%d:%d:%d)\n", dl.Metainfo().HashInfoBytes().HexString(), stats.ActivePeers, stats.PendingPeers, stats.TotalPeers, stats.Missing, stats.Outstanding, stats.Unverified, stats.Completed)
+			log.Printf("%s: seeding(%t), peers(%d:%d:%d) pieces(%d:%d:%d:%d)\n", dl.Metainfo().HashInfoBytes().HexString(), stats.Seeding, stats.ActivePeers, stats.PendingPeers, stats.TotalPeers, stats.Missing, stats.Outstanding, stats.Unverified, stats.Completed)
 		case <-sub.Values:
-			statst.Reset(statsfreq)
 			if !l.Allow() {
 				continue
 			}
+
+			statst.Reset(statsfreq)
 
 			current := uint64(dl.BytesCompleted())
 			if md.Downloaded == current {

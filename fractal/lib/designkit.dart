@@ -8,5 +8,6 @@ export 'design.kit/refresh.dart';
 export 'design.kit/periodic.dart';
 export 'design.kit/tables.dart';
 export 'design.kit/debug.dart';
+export 'design.kit/file.drop.well.dart';
 
 const Widget? NullWidget = null;

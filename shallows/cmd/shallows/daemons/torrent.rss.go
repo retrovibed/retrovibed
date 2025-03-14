@@ -70,6 +70,7 @@ func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, tclient *torrent.
 			attempts = -1
 		}
 
+		c := httpx.BindRetryTransport(http.DefaultClient, http.StatusTooManyRequests, http.StatusBadGateway)
 		l := rate.NewLimiter(rate.Every(3*time.Second), 1)
 
 		fctx, fdone := context.WithCancelCause(ctx)
@@ -80,9 +81,12 @@ func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, tclient *torrent.
 				continue
 			}
 
-			resp, err := httpx.AsError(http.DefaultClient.Do(req))
+			resp, err := httpx.AsError(c.Do(req))
 			if err != nil {
 				log.Println("unable to retrieve feed", feed.ID, err)
+				if err = tracking.RSSCooldownByID(fctx, q, feed.ID, 10).Scan(&feed); err != nil {
+					log.Println("unable to mark rss feed for cooldown", err)
+				}
 				continue
 			}
 			channel, items, err := rss.Parse(ctx, resp.Body)

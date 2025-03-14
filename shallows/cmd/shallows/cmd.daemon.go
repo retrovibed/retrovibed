@@ -69,6 +69,15 @@ func (t cmdDaemon) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	}
 	defer asyncfailure(nil)
 
+	httpbind, err := t.HTTP.Socket()
+	if err != nil {
+		return errorsx.Wrap(err, "unable to setup http socket")
+	}
+	go func() {
+		<-dctx.Done()
+		httpbind.Close()
+	}()
+
 	if db, err = sql.Open("duckdb", dbpath); err != nil {
 		return errorsx.Wrap(err, "unable to open db")
 	}
@@ -194,12 +203,6 @@ func (t cmdDaemon) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	if err = tlsx.SelfSignedLocalHostTLS(tlspem); err != nil {
 		return err
 	}
-
-	httpbind := t.HTTP.Socket()
-	go func() {
-		<-dctx.Done()
-		httpbind.Close()
-	}()
 
 	_ = httpmux.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
 		if uri, err := route.URLPath(); err == nil {

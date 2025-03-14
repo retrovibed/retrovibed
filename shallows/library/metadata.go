@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/Masterminds/squirrel"
+	"github.com/gofrs/uuid"
 	"github.com/james-lawrence/deeppool/internal/x/duckdbx"
 	"github.com/james-lawrence/deeppool/internal/x/langx"
 	"github.com/james-lawrence/deeppool/internal/x/sqlx"
@@ -17,6 +18,24 @@ func MetadataOptionDescription(d string) func(*Metadata) {
 	}
 }
 
+func MetadataOptionTorrentID(d string) func(*Metadata) {
+	return func(m *Metadata) {
+		m.TorrentID = d
+	}
+}
+
+func MetadataOptionBytes(d uint64) func(*Metadata) {
+	return func(m *Metadata) {
+		m.Bytes = d
+	}
+}
+
+func MetadataOptionMimetype(s string) func(*Metadata) {
+	return func(m *Metadata) {
+		m.Mimetype = s
+	}
+}
+
 func MetadataOptionJSONSafeEncode(p *Metadata) {
 	p.CreatedAt = timex.RFC3339NanoEncode(p.CreatedAt)
 	p.UpdatedAt = timex.RFC3339NanoEncode(p.UpdatedAt)
@@ -26,7 +45,9 @@ func MetadataOptionJSONSafeEncode(p *Metadata) {
 
 func NewMetadata(id string, options ...func(*Metadata)) (m Metadata) {
 	r := langx.Clone(Metadata{
-		ID: id,
+		ID:        id,
+		TorrentID: uuid.Nil.String(),
+		ArchiveID: uuid.Nil.String(),
 	}, options...)
 
 	return r

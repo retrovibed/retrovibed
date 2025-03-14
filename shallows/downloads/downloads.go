@@ -2,7 +2,6 @@ package downloads
 
 import (
 	"context"
-	"io"
 	"io/fs"
 	"log"
 	"os"
@@ -90,12 +89,15 @@ func (t Directory) download(ctx context.Context, path string) {
 		return
 	}
 
+	if info, err := meta.Metainfo().UnmarshalInfo(); err == nil && !info.Private {
+		meta = meta.Merge(torrent.OptionTrackers(tracking.PublicTrackers()))
+	}
+
 	var (
-		md         tracking.Metadata
-		downloaded int64
+		md tracking.Metadata
 	)
 
-	tor, _, err := t.d.Start(meta)
+	dl, _, err := t.d.Start(meta)
 	if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to start torrent"))
 		return
@@ -103,7 +105,7 @@ func (t Directory) download(ctx context.Context, path string) {
 
 	log.Println("wait for torrent info", meta.InfoHash)
 	select {
-	case <-tor.GotInfo():
+	case <-dl.GotInfo():
 	case <-ctx.Done():
 		log.Println("failed to retrieve torrent information, manually restart will be required")
 		return
@@ -112,8 +114,8 @@ func (t Directory) download(ctx context.Context, path string) {
 	if err = tracking.MetadataInsertWithDefaults(
 		ctx,
 		t.q,
-		tracking.NewMetadata(langx.Autoptr(tor.Metadata().InfoHash),
-			tracking.MetadataOptionFromInfo(tor.Info()),
+		tracking.NewMetadata(langx.Autoptr(dl.Metadata().InfoHash),
+			tracking.MetadataOptionFromInfo(dl.Info()),
 			tracking.MetadataOptionTrackers(slicesx.Flatten(meta.Trackers...)...),
 		),
 	).Scan(&md); err != nil {
@@ -129,20 +131,14 @@ func (t Directory) download(ctx context.Context, path string) {
 	pctx, done := context.WithCancel(ctx)
 	defer done()
 
-	// update the progress.
-	go tracking.DownloadProgress(pctx, t.q, &md, tor)
-
-	// just copying as we receive data to block until done.
-	if downloaded, err = torrent.DownloadInto(ctx, io.Discard, tor); err != nil {
-		log.Println(errorsx.Wrap(err, "download failed"))
+	if err := dl.Tune(torrent.TuneTrackers(slicesx.Flatten(meta.Trackers...))); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to tune torrent"))
 		return
+	} else {
+		log.Println("tuned trackers", meta.Trackers)
 	}
 
-	log.Println("download completed", md.ID, md.Description, downloaded)
-
-	if err := tracking.MetadataProgressByID(ctx, t.q, md.ID, 0, uint64(downloaded)).Scan(&md); err != nil {
-		log.Println("failed to update progress", err)
-	}
+	errorsx.Log(tracking.Download(pctx, t.q, &md, dl))
 }
 
 func (t Directory) background(ctx context.Context) Directory {
@@ -153,7 +149,8 @@ func (t Directory) background(ctx context.Context) Directory {
 				switch evt.Op {
 				case fsnotify.Create:
 				case fsnotify.Chmod:
-					// fallthrough.
+				case fsnotify.Write:
+					continue // explicitly ignored to reduce noise.
 				default:
 					log.Println("change ignored", evt.Op)
 					continue

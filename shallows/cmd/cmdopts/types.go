@@ -68,7 +68,8 @@ func ParseTCPAddrArray(ctx *kong.DecodeContext, target reflect.Value) (err error
 }
 
 type Listener struct {
-	s net.Listener
+	uri *url.URL
+	s   net.Listener
 }
 
 func (t Listener) MarshalText() (text []byte, err error) {
@@ -83,13 +84,13 @@ func (t *Listener) UnmarshalText(text []byte) (err error) {
 
 	switch uri.Scheme {
 	case "unix", "tcp", "tcp4", "tcp6", "udp":
-		t.s, err = net.Listen(uri.Scheme, uri.Host)
-		return err
+		t.uri = uri
+		return nil
 	default:
 		return errorsx.Wrapf(errors.ErrUnsupported, "network: %s", uri.String())
 	}
 }
 
-func (t Listener) Socket() net.Listener {
-	return t.s
+func (t Listener) Socket() (net.Listener, error) {
+	return net.Listen(t.uri.Scheme, t.uri.Host)
 }

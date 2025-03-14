@@ -24,7 +24,7 @@ func ResumeDownloads(ctx context.Context, db sqlx.Queryer, tclient *torrent.Clie
 	)
 
 	err := sqlxx.ScanEach(tracking.MetadataSearch(ctx, db, q), func(md *tracking.Metadata) error {
-		metadata, err := torrent.New(metainfo.Hash(md.Infohash), torrent.OptionStorage(tstore), torrent.OptionTrackers([][]string{{md.Tracker}}))
+		metadata, err := torrent.New(metainfo.Hash(md.Infohash), torrent.OptionStorage(tstore), torrent.OptionTrackers([]string{md.Tracker}))
 		if err != nil {
 			return errorsx.Wrapf(err, "unable to create metadata from metadata %s", md.ID)
 		}

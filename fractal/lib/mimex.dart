@@ -14,14 +14,18 @@ String maybe(String? s) {
   return s ?? "application/octet-stream";
 }
 
+const movie = Icons.movie;
+const audio = Icons.music_note_outlined;
+const binary = Icons.file_open_outlined;
+
 IconData icon(String mimetype) {
   if (mimetype.startsWith('video/')) {
-    return Icons.movie;
+    return movie;
   }
 
   if (mimetype.startsWith('audio/')) {
-    return Icons.music_note_outlined;
+    return audio;
   }
 
-  return Icons.file_open_outlined;
+  return binary;
 }
