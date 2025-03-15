@@ -3,16 +3,18 @@ import 'package:fractal/design.kit/forms.dart' as forms;
 import './rss.pb.dart';
 
 class Edit extends StatelessWidget {
-  final Feed feed;
+  final Feed current;
   final Function(Feed)? onChange;
-  Edit({super.key, Feed? feed, this.onChange})
-    : feed = feed ?? (Feed.create()..autodownload = false);
+  final EdgeInsetsGeometry? padding;
+  Edit({super.key, Feed? current, this.onChange, this.padding})
+    : current = current ?? (Feed.create()..autodownload = false);
 
   @override
   Widget build(BuildContext context) {
     final theming = Theme.of(context);
 
     return Container(
+      padding: padding,
       color: theming.scaffoldBackgroundColor,
       child: ConstrainedBox(
         constraints: BoxConstraints(minHeight: 128, minWidth: 128),
@@ -22,15 +24,15 @@ class Edit extends StatelessWidget {
             forms.Field(
               label: Text("description"),
               input: TextFormField(
-                initialValue: feed.description,
-                onChanged: (v) => onChange?.call(feed..description = v),
+                initialValue: current.description,
+                onChanged: (v) => onChange?.call(current..description = v),
               ),
             ),
             forms.Field(
               label: Text("url"),
               input: TextFormField(
-                initialValue: feed.url,
-                onChanged: (v) => onChange?.call(feed..url = v),
+                initialValue: current.url,
+                onChanged: (v) => onChange?.call(current..url = v),
               ),
             ),
             forms.Field(
@@ -38,10 +40,10 @@ class Edit extends StatelessWidget {
               input: Row(
                 children: [
                   Checkbox(
-                    value: feed.autodownload,
+                    value: current.autodownload,
                     onChanged: (v) {
                       onChange?.call(
-                        feed..autodownload = (v ?? feed.autodownload),
+                        current..autodownload = (v ?? current.autodownload),
                       );
                     },
                   ),

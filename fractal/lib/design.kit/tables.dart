@@ -35,13 +35,14 @@ class Table<T> extends StatelessWidget {
     return ds.Loading(
       loading: loading,
       cause: cause,
-      child: ds.Overlay(
-        overlay: overlay,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [leading, content, trailing],
-        ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          leading,
+          ds.Overlay(overlay: overlay, child: content),
+          trailing,
+        ],
       ),
     );
   }

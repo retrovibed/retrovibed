@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:fractal/designkit.dart' as ds;
-import 'package:fractal/rss.dart';
 import 'package:fixnum/fixnum.dart';
-import 'package:fractal/rss/list.dart';
 import 'package:protobuf/protobuf.dart';
+import './list.dart';
+import './feed.new.dart';
 import './api.dart' as api;
 
 class ListSearchable extends StatefulWidget {
@@ -19,13 +19,13 @@ class SearchableView extends State<ListSearchable> {
   bool _loading = true;
   ds.Error? _cause = null;
   Widget? _overlay = null;
-  Feed _created = Feed();
-  FeedSearchResponse _res = FeedSearchResponse(
-    next: FeedSearchRequest(query: '', offset: Int64(0), limit: Int64(10)),
+  api.Feed _created = api.Feed();
+  api.FeedSearchResponse _res = api.FeedSearchResponse(
+    next: api.FeedSearchRequest(query: '', offset: Int64(0), limit: Int64(10)),
     items: [],
   );
 
-  Future<FeedSearchResponse> refresh() {
+  Future<api.FeedSearchResponse> refresh() {
     return widget
         .search(_res.next)
         .then((r) {
@@ -52,57 +52,45 @@ class SearchableView extends State<ListSearchable> {
     });
   }
 
+  void resetleading() => setState(() {
+    _overlay = null;
+    _loading = false;
+    _created = api.Feed();
+  });
+
+  void updfeed(api.Feed upd) => setState(() {
+    _created = upd;
+    _overlay = _FeedCreate(
+      current: _created,
+      onCancel: resetleading,
+      onChange: updfeed,
+    );
+  });
+
+  void submitfeed(api.Feed n) {
+    setState(() => _loading = true);
+    api
+        .create(api.FeedCreateRequest(feed: n))
+        .then((v) {
+          refresh();
+          return v;
+        })
+        .then((v) => resetleading())
+        .catchError((e) {
+          setState(() {
+            _cause = ds.Error.unknown(e);
+            _loading = false;
+          });
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final resetleading =
-        () => setState(() {
-          _overlay = null;
-          _loading = false;
-          _created = Feed();
-        });
-    final createfeed = (Feed n) {
-      setState(() => _loading = true);
-      api
-          .create(FeedCreateRequest(feed: n))
-          .then((v) => resetleading())
-          .then((v) {
-            refresh();
-          })
-          .catchError((e) {
-            setState(() {
-              _cause = ds.Error.unknown(e);
-              _loading = false;
-            });
-          });
-    };
-
-    final feedproto = Center(
-      child: Column(
-        children: [
-          Edit(
-            feed: _created,
-            onChange: (upd) {
-              setState(() {
-                _created = upd;
-              });
-            },
-          ),
-          Row(
-            children: [
-              Spacer(),
-              TextButton(onPressed: resetleading, child: Text("cancel")),
-              SizedBox(width: 10),
-              TextButton(
-                onPressed: () {
-                  createfeed(_created);
-                },
-                child: Text("save"),
-              ),
-              Spacer(),
-            ],
-          ),
-        ],
-      ),
+    final feedproto = _FeedCreate(
+      current: _created,
+      onCancel: resetleading,
+      onSubmit: submitfeed,
+      onChange: updfeed,
     );
 
     return ds.Table(
@@ -114,10 +102,10 @@ class SearchableView extends State<ListSearchable> {
           IconButton(
             onPressed: () {
               setState(() {
-                _overlay = ds.Debug(feedproto);
+                _overlay = _overlay == null ? feedproto : null;
               });
             },
-            icon: Icon(Icons.add),
+            icon: Icon(_overlay == null ? Icons.add : Icons.remove),
           ),
           Expanded(
             child: TextField(
@@ -130,21 +118,27 @@ class SearchableView extends State<ListSearchable> {
             ),
           ),
           IconButton(
-            onPressed: () {
-              setState(() {
-                _res.next.offset -= 1;
-              });
-              refresh();
-            },
+            onPressed:
+                _res.next.offset.toInt() > 0
+                    ? () {
+                      setState(() {
+                        _res.next.offset -= 1;
+                      });
+                      refresh();
+                    }
+                    : null,
             icon: Icon(Icons.arrow_left),
           ),
           IconButton(
-            onPressed: () {
-              setState(() {
-                _res.next.offset += 1;
-              });
-              refresh();
-            },
+            onPressed:
+                _res.items.length == _res.next.limit
+                    ? () {
+                      setState(() {
+                        _res.next.offset += 1;
+                      });
+                      refresh();
+                    }
+                    : null,
             icon: Icon(Icons.arrow_right),
           ),
         ],
@@ -156,12 +150,54 @@ class SearchableView extends State<ListSearchable> {
           final upd =
               _res.items.map((old) => old.id == v.id ? v : old).toList();
           setState(() {
-            _res = FeedSearchResponse(next: _res.next.deepCopy(), items: upd);
+            _res = api.FeedSearchResponse(
+              next: _res.next.deepCopy(),
+              items: upd,
+            );
           });
         },
       ),
       empty: feedproto,
       overlay: _overlay,
+    );
+  }
+}
+
+class _FeedCreate extends StatelessWidget {
+  final api.Feed current;
+  final Function(api.Feed)? onChange;
+  final Function(api.Feed)? onSubmit;
+  final Function()? onCancel;
+
+  _FeedCreate({
+    required this.current,
+    this.onChange,
+    this.onCancel,
+    this.onSubmit,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final themex = ds.Defaults.of(context);
+    return Center(
+      child: Column(
+        spacing: themex.spacing ?? 0.0,
+        children: [
+          FeedNew(current: current, onChange: onChange),
+          Row(
+            spacing: themex.spacing ?? 0.0,
+            children: [
+              Spacer(),
+              TextButton(onPressed: onCancel, child: Text("cancel")),
+              TextButton(
+                onPressed: () => onSubmit?.call(current),
+                child: Text("create"),
+              ),
+              Spacer(),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

@@ -23,6 +23,7 @@ class Feed extends $pb.GeneratedMessage {
     $core.String? description,
     $core.String? url,
     $core.bool? autodownload,
+    $core.bool? autoarchive,
   }) {
     final $result = create();
     if (id != null) {
@@ -46,6 +47,9 @@ class Feed extends $pb.GeneratedMessage {
     if (autodownload != null) {
       $result.autodownload = autodownload;
     }
+    if (autoarchive != null) {
+      $result.autoarchive = autoarchive;
+    }
     return $result;
   }
   Feed._() : super();
@@ -60,6 +64,7 @@ class Feed extends $pb.GeneratedMessage {
     ..aOS(5, _omitFieldNames ? '' : 'description')
     ..aOS(6, _omitFieldNames ? '' : 'url')
     ..aOB(7, _omitFieldNames ? '' : 'autodownload')
+    ..aOB(8, _omitFieldNames ? '' : 'autoarchive')
     ..hasRequiredFields = false
   ;
 
@@ -146,6 +151,15 @@ class Feed extends $pb.GeneratedMessage {
   $core.bool hasAutodownload() => $_has(6);
   @$pb.TagNumber(7)
   void clearAutodownload() => clearField(7);
+
+  @$pb.TagNumber(8)
+  $core.bool get autoarchive => $_getBF(7);
+  @$pb.TagNumber(8)
+  set autoarchive($core.bool v) { $_setBool(7, v); }
+  @$pb.TagNumber(8)
+  $core.bool hasAutoarchive() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearAutoarchive() => clearField(8);
 }
 
 class FeedSearchRequest extends $pb.GeneratedMessage {

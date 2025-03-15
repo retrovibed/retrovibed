@@ -36,6 +36,7 @@ class MyApp extends StatelessWidget {
         brightness: Brightness.dark,
         cardTheme: CardTheme(margin: EdgeInsets.all(10.0)),
         extensions: [theming.Defaults.defaults],
+        // textTheme: TextTheme(input)
       ),
       themeMode: ThemeMode.dark,
       home: Material(

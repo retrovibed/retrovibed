@@ -1,21 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:fractal/rss.dart';
+import 'package:fractal/designkit.dart' as ds;
+import 'feed.edit.dart';
+import 'feed.row.dart';
 import './api.dart' as api;
 
-void _Noop(Feed up) {}
+void _Noop(api.Feed up) {}
 
 class Item extends StatelessWidget {
-  final Feed current;
-  final void Function(Feed upd) onChange;
-  const Item({super.key, required Feed this.current, this.onChange = _Noop});
+  final api.Feed current;
+  final void Function(api.Feed upd) onChange;
+  const Item({
+    super.key,
+    required api.Feed this.current,
+    this.onChange = _Noop,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Edit(
-        feed: this.current,
+    return ds.Accordion(
+      description: FeedRow(current: this.current),
+      content: Edit(
+        current: this.current,
         onChange: (u) {
-          api.create(FeedCreateRequest(feed: u)).then((resp) {
+          api.create(api.FeedCreateRequest(feed: u)).then((resp) {
             onChange(resp.feed);
           });
         },
@@ -25,16 +32,14 @@ class Item extends StatelessWidget {
 }
 
 class ListFeeds extends StatelessWidget {
-  final List<Feed> current;
-  const ListFeeds({super.key, required List<Feed> this.current});
+  final List<api.Feed> current;
+  const ListFeeds({super.key, required List<api.Feed> this.current});
 
   @override
   Widget build(BuildContext context) {
     if (this.current.isEmpty) {
       return Container();
     }
-
-    // return Container();
     return Container(
       child: Column(
         spacing: 5.0,
