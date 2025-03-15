@@ -18,7 +18,7 @@ class Field extends StatelessWidget {
       constraints: constraints,
       child: Row(
         children: [
-          Expanded(child: label ?? Container()),
+          if (label != null) Expanded(child: label!),
           Expanded(child: input, flex: 9),
         ],
       ),

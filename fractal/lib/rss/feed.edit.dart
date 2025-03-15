@@ -57,6 +57,14 @@ class Edit extends StatelessWidget {
                 },
               ),
             ),
+            forms.Field(
+              label: Text("contribution"),
+              input: Tooltip(
+                message:
+                    "support this open source community by providing storage when autodownload is enabled",
+                child: forms.Checkbox(value: current.contributing),
+              ),
+            ),
           ],
         ),
       ),
