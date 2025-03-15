@@ -18,6 +18,7 @@ type rss struct {
 // but there is no need to use those fields
 type channel struct {
 	XMLName xml.Name `xml:"channel"`
+	Title   string   `xml:"title"`
 	Items   []item   `xml:"item"`
 	TTL     int      `xml:"ttl"`
 }

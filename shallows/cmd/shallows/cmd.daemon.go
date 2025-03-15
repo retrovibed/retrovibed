@@ -8,7 +8,6 @@ import (
 	"io/fs"
 	"log"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/justinas/alice"
@@ -61,7 +60,7 @@ func (t cmdDaemon) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		bootstrap    torrent.ClientConfigOption = torrent.ClientConfigNoop
 	)
 
-	envx.Debug(os.Environ()...)
+	// envx.Debug(os.Environ()...)
 
 	dctx, done := context.WithCancelCause(gctx.Context)
 	asyncfailure := func(cause error) {

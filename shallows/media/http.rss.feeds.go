@@ -7,7 +7,6 @@ import (
 
 	"github.com/Masterminds/squirrel"
 	"github.com/go-playground/form/v4"
-	"github.com/gofrs/uuid"
 	"github.com/gorilla/mux"
 	"github.com/james-lawrence/deeppool/internal/env"
 	"github.com/james-lawrence/deeppool/internal/x/errorsx"
@@ -15,6 +14,7 @@ import (
 	"github.com/james-lawrence/deeppool/internal/x/httpx"
 	"github.com/james-lawrence/deeppool/internal/x/jwtx"
 	"github.com/james-lawrence/deeppool/internal/x/langx"
+	"github.com/james-lawrence/deeppool/internal/x/md5x"
 	"github.com/james-lawrence/deeppool/internal/x/numericx"
 	"github.com/james-lawrence/deeppool/internal/x/sqlx"
 	"github.com/james-lawrence/deeppool/internal/x/sqlxx"
@@ -130,7 +130,7 @@ func (t *HTTPRSSFeed) create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	feed := tracking.RSS{
-		ID:           stringsx.DefaultIfBlank(req.Feed.Id, errorsx.Must(uuid.NewV7()).String()),
+		ID:           stringsx.DefaultIfBlank(req.Feed.Id, md5x.FormatString(md5x.Digest(req.Feed.Url))),
 		Description:  req.Feed.Description,
 		URL:          req.Feed.Url,
 		Autodownload: req.Feed.Autodownload,

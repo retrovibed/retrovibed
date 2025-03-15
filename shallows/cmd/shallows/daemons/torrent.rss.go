@@ -15,6 +15,7 @@ import (
 	"github.com/james-lawrence/deeppool/internal/x/httpx"
 	"github.com/james-lawrence/deeppool/internal/x/md5x"
 	"github.com/james-lawrence/deeppool/internal/x/sqlx"
+	"github.com/james-lawrence/deeppool/internal/x/stringsx"
 	"github.com/james-lawrence/deeppool/rss"
 	"github.com/james-lawrence/deeppool/tracking"
 	"github.com/james-lawrence/torrent"
@@ -112,6 +113,7 @@ func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, tclient *torrent.
 				}
 				continue
 			}
+
 			channel, items, err := rss.Parse(ctx, resp.Body)
 			if err != nil {
 				log.Println("unable to parse feed", feed.ID, err)
@@ -162,6 +164,13 @@ func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, tclient *torrent.
 				}
 
 				// log.Println("recorded", feed.ID, meta.ID, meta.Description)
+			}
+
+			if updated := stringsx.FirstNonBlank(feed.Description, channel.Title); updated != feed.Description {
+				feed.Description = updated
+				if cause := tracking.RSSInsertWithDefaults(fctx, sqlx.Debug(q), feed).Scan(&feed); cause != nil {
+					log.Println("failed to update rss feed", cause)
+				}
 			}
 
 			if err = tracking.RSSCooldownByID(fctx, q, feed.ID, channel.TTL).Scan(&feed); err != nil {

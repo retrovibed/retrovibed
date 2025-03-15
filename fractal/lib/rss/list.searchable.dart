@@ -53,17 +53,19 @@ class SearchableView extends State<ListSearchable> {
   }
 
   void resetleading() => setState(() {
+    print("UPDATING FEED CREATION");
     _overlay = null;
     _loading = false;
     _created = api.Feed();
   });
 
-  void updfeed(api.Feed upd) => setState(() {
+  void updatefeed(api.Feed upd) => setState(() {
     _created = upd;
     _overlay = _FeedCreate(
-      current: _created,
+      current: upd,
       onCancel: resetleading,
-      onChange: updfeed,
+      onSubmit: submitfeed,
+      onChange: updatefeed,
     );
   });
 
@@ -90,7 +92,7 @@ class SearchableView extends State<ListSearchable> {
       current: _created,
       onCancel: resetleading,
       onSubmit: submitfeed,
-      onChange: updfeed,
+      onChange: updatefeed,
     );
 
     return ds.Table(
@@ -190,7 +192,9 @@ class _FeedCreate extends StatelessWidget {
               Spacer(),
               TextButton(onPressed: onCancel, child: Text("cancel")),
               TextButton(
-                onPressed: () => onSubmit?.call(current),
+                onPressed: () {
+                  onSubmit?.call(current);
+                },
                 child: Text("create"),
               ),
               Spacer(),
