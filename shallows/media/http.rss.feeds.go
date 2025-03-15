@@ -134,6 +134,7 @@ func (t *HTTPRSSFeed) create(w http.ResponseWriter, r *http.Request) {
 		URL:          req.Feed.Url,
 		Autodownload: req.Feed.Autodownload,
 		Autoarchive:  req.Feed.Autoarchive,
+		Contributing: req.Feed.Contributing,
 	}
 
 	if err = tracking.RSSInsertWithDefaults(r.Context(), t.q, feed).Scan(&feed); err != nil {
