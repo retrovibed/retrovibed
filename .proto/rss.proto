@@ -10,6 +10,7 @@ message Feed {
   string description = 5 [ json_name = "description" ];
   string url = 6 [ json_name = "url" ];
   bool autodownload = 7 [ json_name = "autodownload" ];
+  bool autoarchive = 8 [ json_name = "autoarchive" ];
 }
 
 message FeedSearchRequest {

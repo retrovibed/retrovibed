@@ -39,10 +39,11 @@ class Edit extends StatelessWidget {
                 children: [
                   Checkbox(
                     value: feed.autodownload,
-                    onChanged:
-                        (v) => onChange?.call(
-                          feed..autodownload = (v ?? feed.autodownload),
-                        ),
+                    onChanged: (v) {
+                      onChange?.call(
+                        feed..autodownload = (v ?? feed.autodownload),
+                      );
+                    },
                   ),
                   Spacer(),
                 ],

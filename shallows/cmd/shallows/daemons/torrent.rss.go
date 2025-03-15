@@ -2,6 +2,7 @@ package daemons
 
 import (
 	"context"
+	"errors"
 	"iter"
 	"log"
 	"net/http"
@@ -12,6 +13,7 @@ import (
 	"github.com/james-lawrence/deeppool/internal/x/contextx"
 	"github.com/james-lawrence/deeppool/internal/x/errorsx"
 	"github.com/james-lawrence/deeppool/internal/x/httpx"
+	"github.com/james-lawrence/deeppool/internal/x/md5x"
 	"github.com/james-lawrence/deeppool/internal/x/sqlx"
 	"github.com/james-lawrence/deeppool/rss"
 	"github.com/james-lawrence/deeppool/tracking"
@@ -21,6 +23,27 @@ import (
 	"golang.org/x/time/rate"
 )
 
+func PrepareDefaultFeeds(ctx context.Context, q sqlx.Queryer) error {
+	feedcreate := func(description, url string) (err error) {
+		feed := tracking.RSS{
+			ID:          md5x.FormatString(md5x.Digest(url)),
+			Description: description,
+			URL:         url,
+		}
+
+		if err = tracking.RSSInsertWithDefaults(ctx, q, feed).Scan(&feed); err != nil {
+			return errorsx.Wrapf(err, "feed creation failed: %s - %s", description, url)
+		}
+
+		return nil
+	}
+
+	return errors.Join(
+		feedcreate("Arch Linux ISO - support open source projects by enabling autodownload to seed and archive data", "https://archlinux.org/feeds/releases/"),
+	)
+}
+
+// retrieve torrents from rss feeds.
 func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, tclient *torrent.Client, tstore storage.ClientImpl) (err error) {
 	queryfeeds := func(ctx context.Context, done context.CancelCauseFunc) iter.Seq[tracking.RSS] {
 		return func(yield func(tracking.RSS) bool) {

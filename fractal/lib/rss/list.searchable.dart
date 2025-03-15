@@ -3,6 +3,7 @@ import 'package:fractal/designkit.dart' as ds;
 import 'package:fractal/rss.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:fractal/rss/list.dart';
+import 'package:protobuf/protobuf.dart';
 import './api.dart' as api;
 
 class ListSearchable extends StatefulWidget {
@@ -149,7 +150,16 @@ class SearchableView extends State<ListSearchable> {
         ],
       ),
       children: _res.items,
-      (w) => Item(current: w),
+      (w) => Item(
+        current: w,
+        onChange: (v) {
+          final upd =
+              _res.items.map((old) => old.id == v.id ? v : old).toList();
+          setState(() {
+            _res = FeedSearchResponse(next: _res.next.deepCopy(), items: upd);
+          });
+        },
+      ),
       empty: feedproto,
       overlay: _overlay,
     );

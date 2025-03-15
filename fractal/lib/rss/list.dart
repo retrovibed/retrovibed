@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:fractal/rss.dart';
 import './api.dart' as api;
 
+void _Noop(Feed up) {}
+
 class Item extends StatelessWidget {
   final Feed current;
-  const Item({super.key, required Feed this.current});
+  final void Function(Feed upd) onChange;
+  const Item({super.key, required Feed this.current, this.onChange = _Noop});
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +15,9 @@ class Item extends StatelessWidget {
       child: Edit(
         feed: this.current,
         onChange: (u) {
-          api.create(FeedCreateRequest(feed: u));
+          api.create(FeedCreateRequest(feed: u)).then((resp) {
+            onChange(resp.feed);
+          });
         },
       ),
     );

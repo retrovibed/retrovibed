@@ -94,6 +94,10 @@ func (t cmdDaemon) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		}
 	}
 
+	go func() {
+		errorsx.Log(errorsx.Wrap(daemons.PrepareDefaultFeeds(dctx, db), "unable to initialize default rss feeds"))
+	}()
+
 	tnetwork, err := torrentx.Autosocket(0)
 	if err != nil {
 		return errorsx.Wrap(err, "unable to setup torrent socket")
