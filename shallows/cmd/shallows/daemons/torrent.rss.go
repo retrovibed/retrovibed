@@ -41,7 +41,7 @@ func PrepareDefaultFeeds(ctx context.Context, q sqlx.Queryer) error {
 	}
 
 	return errors.Join(
-		feedcreate("Arch Linux ISO - support open source projects by enabling autodownload to seed and archive data", "https://archlinux.org/feeds/releases/"),
+		feedcreate("Arch Linux", "https://archlinux.org/feeds/releases/"),
 	)
 }
 
