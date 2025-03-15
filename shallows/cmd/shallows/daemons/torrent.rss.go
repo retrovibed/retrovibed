@@ -27,9 +27,10 @@ import (
 func PrepareDefaultFeeds(ctx context.Context, q sqlx.Queryer) error {
 	feedcreate := func(description, url string) (err error) {
 		feed := tracking.RSS{
-			ID:          md5x.FormatString(md5x.Digest(url)),
-			Description: description,
-			URL:         url,
+			ID:           md5x.FormatString(md5x.Digest(url)),
+			Description:  description,
+			URL:          url,
+			Contributing: true,
 		}
 
 		if err = tracking.RSSInsertWithDefaults(ctx, q, feed).Scan(&feed); err != nil {

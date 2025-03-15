@@ -8,6 +8,7 @@ CREATE TABLE torrents_feed_rss (
     next_check TIMESTAMPTZ NOT NULL DEFAULT '-infinity',
     autodownload boolean NOT NULL DEFAULT 'false',
     autoarchive boolean NOT NULL DEFAULT 'false',
+    contributing boolean NOT NULL DEFAULT 'false',
     description VARCHAR NOT NULL,
     url VARCHAR NOT NULL,
 );

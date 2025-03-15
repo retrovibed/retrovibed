@@ -50,7 +50,6 @@ type HTTPRSSFeed struct {
 
 func (t *HTTPRSSFeed) Bind(r *mux.Router) {
 	r.StrictSlash(false)
-	r.Use(httpx.RouteInvoked, httpx.DebugRequest)
 
 	r.Path("/").Methods(http.MethodGet).Handler(alice.New(
 		httpx.ContextBufferPool512(),
@@ -134,6 +133,7 @@ func (t *HTTPRSSFeed) create(w http.ResponseWriter, r *http.Request) {
 		Description:  req.Feed.Description,
 		URL:          req.Feed.Url,
 		Autodownload: req.Feed.Autodownload,
+		Autoarchive:  req.Feed.Autoarchive,
 	}
 
 	if err = tracking.RSSInsertWithDefaults(r.Context(), t.q, feed).Scan(&feed); err != nil {

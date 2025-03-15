@@ -25,6 +25,7 @@ const Feed$json = {
     {'1': 'url', '3': 6, '4': 1, '5': 9, '10': 'url'},
     {'1': 'autodownload', '3': 7, '4': 1, '5': 8, '10': 'autodownload'},
     {'1': 'autoarchive', '3': 8, '4': 1, '5': 8, '10': 'autoarchive'},
+    {'1': 'contributing', '3': 9, '4': 1, '5': 8, '10': 'contributing'},
   ],
 };
 
@@ -34,7 +35,7 @@ final $typed_data.Uint8List feedDescriptor = $convert.base64Decode(
     '4KCnVwZGF0ZWRfYXQYAyABKAlSCnVwZGF0ZWRfYXQSHgoKbmV4dF9jaGVjaxgEIAEoCVIKbmV4'
     'dF9jaGVjaxIgCgtkZXNjcmlwdGlvbhgFIAEoCVILZGVzY3JpcHRpb24SEAoDdXJsGAYgASgJUg'
     'N1cmwSIgoMYXV0b2Rvd25sb2FkGAcgASgIUgxhdXRvZG93bmxvYWQSIAoLYXV0b2FyY2hpdmUY'
-    'CCABKAhSC2F1dG9hcmNoaXZl');
+    'CCABKAhSC2F1dG9hcmNoaXZlEiIKDGNvbnRyaWJ1dGluZxgJIAEoCFIMY29udHJpYnV0aW5n');
 
 @$core.Deprecated('Use feedSearchRequestDescriptor instead')
 const FeedSearchRequest$json = {

@@ -18,8 +18,9 @@ class FeedRow extends StatelessWidget {
         if (current.hasDescription()) SelectableText(current.description),
         SelectableText(current.url),
         Spacer(),
-        current.autodownload ? Icon(Icons.downloading_rounded) : Container(),
-        current.autoarchive ? Icon(Icons.archive_outlined) : Container(),
+        if (current.autodownload) Icon(Icons.downloading_rounded),
+        if (current.autoarchive) Icon(Icons.archive_outlined),
+        if (current.contributing) Icon(Icons.handshake_outlined),
       ],
     );
   }

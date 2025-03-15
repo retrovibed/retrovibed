@@ -37,18 +37,24 @@ class Edit extends StatelessWidget {
             ),
             forms.Field(
               label: Text("autodownload"),
-              input: Row(
-                children: [
-                  Checkbox(
-                    value: current.autodownload,
-                    onChanged: (v) {
-                      onChange?.call(
-                        current..autodownload = (v ?? current.autodownload),
-                      );
-                    },
-                  ),
-                  Spacer(),
-                ],
+              input: forms.Checkbox(
+                value: current.autodownload,
+                onChanged: (v) {
+                  onChange?.call(
+                    current..autodownload = (v ?? current.autodownload),
+                  );
+                },
+              ),
+            ),
+            forms.Field(
+              label: Text("autoarchive"),
+              input: forms.Checkbox(
+                value: current.autoarchive,
+                onChanged: (v) {
+                  onChange?.call(
+                    current..autoarchive = (v ?? current.autoarchive),
+                  );
+                },
               ),
             ),
           ],
