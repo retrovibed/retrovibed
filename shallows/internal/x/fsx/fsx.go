@@ -69,6 +69,9 @@ func IsRegularFile(path string) bool {
 }
 
 type Virtual interface {
+	// returns the path rooted at the virtual fs from the fragments.
+	Path(rel ...string) string
+	MkDirAll(path string, perm os.FileMode) error
 	OpenFile(name string, flag int, perm os.FileMode) (*os.File, error)
 }
 
@@ -88,12 +91,16 @@ type dirvirt struct {
 	root string
 }
 
+func (t dirvirt) Path(rel ...string) string {
+	return filepath.Join(t.root, filepath.Join(rel...))
+}
+
 func (t dirvirt) OpenFile(name string, flag int, perm os.FileMode) (*os.File, error) {
 	return os.OpenFile(filepath.Join(t.root, name), flag, perm)
 }
 
-func (t dirvirt) Rename(oldpath, newpath string) error {
-	return os.Rename(oldpath, filepath.Join(t.root, newpath))
+func (t dirvirt) MkDirAll(path string, perm os.FileMode) error {
+	return os.MkdirAll(filepath.Join(t.root, path), perm)
 }
 
 type vstoragefs struct {

@@ -1,7 +1,7 @@
 package blockcache
 
 import (
-	"io/fs"
+	"os"
 
 	"github.com/james-lawrence/deeppool/internal/x/bytesx"
 )
@@ -17,6 +17,6 @@ type DirCache struct {
 	BlockLength int64
 }
 
-func (t DirCache) Open(name string) (_ fs.File, err error) {
+func (t DirCache) OpenFile(name string, flag int, perm os.FileMode) (*os.File, error) {
 	return nil, nil
 }

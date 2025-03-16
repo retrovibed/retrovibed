@@ -27,7 +27,6 @@ import (
 	"github.com/james-lawrence/deeppool/internal/x/sqlx"
 	"github.com/james-lawrence/deeppool/internal/x/sqlxx"
 	"github.com/james-lawrence/deeppool/library"
-	"github.com/james-lawrence/torrent/storage"
 	"github.com/justinas/alice"
 )
 
@@ -39,19 +38,12 @@ func HTTPLibraryOptionJWTSecret(j jwtx.JWTSecretSource) HTTPLibraryOption {
 	}
 }
 
-func HTTPLibraryOptionMedia(s fsx.Virtual) HTTPLibraryOption {
-	return func(t *HTTPLibrary) {
-		t.mediastorage = s
-	}
-}
-
-func NewHTTPLibrary(q sqlx.Queryer, c storage.ClientImpl, options ...HTTPLibraryOption) *HTTPLibrary {
+func NewHTTPLibrary(q sqlx.Queryer, s fsx.Virtual, options ...HTTPLibraryOption) *HTTPLibrary {
 	svc := langx.Clone(HTTPLibrary{
 		q:            q,
-		c:            c,
 		jwtsecret:    env.JWTSecret,
 		decoder:      formx.NewDecoder(),
-		mediastorage: fsx.DirVirtual(os.TempDir()),
+		mediastorage: s,
 	}, options...)
 
 	return &svc
@@ -59,7 +51,6 @@ func NewHTTPLibrary(q sqlx.Queryer, c storage.ClientImpl, options ...HTTPLibrary
 
 type HTTPLibrary struct {
 	q            sqlx.Queryer
-	c            storage.ClientImpl
 	jwtsecret    jwtx.JWTSecretSource
 	decoder      *form.Decoder
 	mediastorage fsx.Virtual

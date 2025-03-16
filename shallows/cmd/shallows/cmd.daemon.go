@@ -14,6 +14,7 @@ import (
 	"github.com/pressly/goose/v3"
 	"golang.org/x/crypto/ssh"
 
+	"github.com/james-lawrence/deeppool/blockcache"
 	"github.com/james-lawrence/deeppool/cmd/cmdopts"
 	"github.com/james-lawrence/deeppool/cmd/shallows/daemons"
 	"github.com/james-lawrence/deeppool/downloads"
@@ -32,7 +33,6 @@ import (
 	"github.com/james-lawrence/deeppool/media"
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/krpc"
-	"github.com/james-lawrence/torrent/storage"
 
 	_ "github.com/marcboeker/go-duckdb"
 
@@ -102,8 +102,6 @@ func (t cmdDaemon) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		return errorsx.Wrap(err, "unable to setup torrent socket")
 	}
 
-	torrentdir := userx.DefaultDataDirectory(userx.DefaultRelRoot(), "torrents")
-
 	if fsx.IsRegularFile(torrentpeers) {
 		bootstrap = torrent.ClientConfigBootstrapPeerFile(torrentpeers)
 	}
@@ -130,7 +128,8 @@ func (t cmdDaemon) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		return errorsx.Wrap(err, "unable to setup torrent client")
 	}
 
-	tstore := storage.NewFileByInfoHash(torrentdir)
+	mediastore := fsx.DirVirtual(userx.DefaultDataDirectory(userx.DefaultRelRoot(), "media"))
+	tstore := blockcache.NewTorrentFromVirtualFS(mediastore)
 
 	dwatcher, err := downloads.NewDirectoryWatcher(dctx, db, tclient, tstore)
 	if err != nil {
@@ -198,7 +197,7 @@ func (t cmdDaemon) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		),
 	).Methods(http.MethodGet)
 
-	media.NewHTTPLibrary(db, tstore).Bind(httpmux.PathPrefix("/m").Subrouter())
+	media.NewHTTPLibrary(db, mediastore).Bind(httpmux.PathPrefix("/m").Subrouter())
 	media.NewHTTPDiscovered(db, tclient, tstore).Bind(httpmux.PathPrefix("/d").Subrouter())
 	media.NewHTTPRSSFeed(db).Bind(httpmux.PathPrefix("/rss").Subrouter())
 
