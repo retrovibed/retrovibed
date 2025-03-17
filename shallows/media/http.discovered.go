@@ -70,7 +70,6 @@ type HTTPDiscovered struct {
 
 func (t *HTTPDiscovered) Bind(r *mux.Router) {
 	r.StrictSlash(false)
-	r.Use(httpx.RouteInvoked)
 
 	r.Path("/").Methods(http.MethodPost).Handler(alice.New(
 		httpx.ContextBufferPool512(),
@@ -196,7 +195,7 @@ func (t *HTTPDiscovered) upload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	go func() {
-		errorsx.Log(tracking.Download(context.Background(), t.q, &lmd, dl))
+		errorsx.Log(tracking.Download(context.Background(), t.q, t.mediastorage, &lmd, dl))
 	}()
 
 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &MediaUploadResponse{

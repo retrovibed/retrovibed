@@ -99,6 +99,10 @@ func (t dirvirt) OpenFile(name string, flag int, perm os.FileMode) (*os.File, er
 	return os.OpenFile(filepath.Join(t.root, name), flag, perm)
 }
 
+func (t dirvirt) Rename(oldpath, newpath string) error {
+	return os.Rename(oldpath, filepath.Join(t.root, newpath))
+}
+
 func (t dirvirt) MkDirAll(path string, perm os.FileMode) error {
 	return os.MkdirAll(filepath.Join(t.root, path), perm)
 }

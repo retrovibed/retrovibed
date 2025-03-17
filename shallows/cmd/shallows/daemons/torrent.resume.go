@@ -6,6 +6,7 @@ import (
 
 	"github.com/Masterminds/squirrel"
 	"github.com/james-lawrence/deeppool/internal/x/errorsx"
+	"github.com/james-lawrence/deeppool/internal/x/fsx"
 	"github.com/james-lawrence/deeppool/internal/x/sqlx"
 	"github.com/james-lawrence/deeppool/internal/x/sqlxx"
 	"github.com/james-lawrence/deeppool/tracking"
@@ -14,7 +15,7 @@ import (
 	"github.com/james-lawrence/torrent/storage"
 )
 
-func ResumeDownloads(ctx context.Context, db sqlx.Queryer, tclient *torrent.Client, tstore storage.ClientImpl) {
+func ResumeDownloads(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual, tclient *torrent.Client, tstore storage.ClientImpl) {
 	q := tracking.MetadataSearchBuilder().Where(
 		squirrel.And{
 			tracking.MetadataQueryInitiated(),
@@ -35,7 +36,7 @@ func ResumeDownloads(ctx context.Context, db sqlx.Queryer, tclient *torrent.Clie
 		}
 
 		go func(md *tracking.Metadata, dl torrent.Torrent) {
-			errorsx.Log(errorsx.Wrap(tracking.Download(ctx, db, md, dl), "resume failed"))
+			errorsx.Log(errorsx.Wrap(tracking.Download(ctx, db, rootstore, md, dl), "resume failed"))
 		}(md, t)
 
 		log.Println("resumed", md.ID, md.Description)

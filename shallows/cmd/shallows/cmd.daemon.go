@@ -14,7 +14,6 @@ import (
 	"github.com/pressly/goose/v3"
 	"golang.org/x/crypto/ssh"
 
-	"github.com/james-lawrence/deeppool/blockcache"
 	"github.com/james-lawrence/deeppool/cmd/cmdopts"
 	"github.com/james-lawrence/deeppool/cmd/shallows/daemons"
 	"github.com/james-lawrence/deeppool/downloads"
@@ -33,6 +32,7 @@ import (
 	"github.com/james-lawrence/deeppool/media"
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/krpc"
+	"github.com/james-lawrence/torrent/storage"
 
 	_ "github.com/marcboeker/go-duckdb"
 
@@ -128,10 +128,13 @@ func (t cmdDaemon) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		return errorsx.Wrap(err, "unable to setup torrent client")
 	}
 
+	rootstore := fsx.DirVirtual(userx.DefaultDataDirectory(userx.DefaultRelRoot()))
 	mediastore := fsx.DirVirtual(userx.DefaultDataDirectory(userx.DefaultRelRoot(), "media"))
-	tstore := blockcache.NewTorrentFromVirtualFS(mediastore)
+	// tstore := blockcache.NewTorrentFromVirtualFS(mediastore)
+	torrentdir := userx.DefaultDataDirectory(userx.DefaultRelRoot(), "torrent")
+	tstore := storage.NewFileByInfoHash(torrentdir)
 
-	dwatcher, err := downloads.NewDirectoryWatcher(dctx, db, tclient, tstore)
+	dwatcher, err := downloads.NewDirectoryWatcher(dctx, db, rootstore, tclient, tstore)
 	if err != nil {
 		return errorsx.Wrap(err, "unable to setup directory monitoring for torrents")
 	}
@@ -169,13 +172,13 @@ func (t cmdDaemon) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	}
 
 	go func() {
-		if err := daemons.DiscoverFromRSSFeeds(dctx, db, tclient, tstore); err != nil {
+		if err := daemons.DiscoverFromRSSFeeds(dctx, db, rootstore, tclient, tstore); err != nil {
 			asyncfailure(errorsx.Wrap(err, "autodiscovery of RSS feeds failed"))
 			return
 		}
 	}()
 
-	go daemons.ResumeDownloads(dctx, db, tclient, tstore)
+	go daemons.ResumeDownloads(dctx, db, rootstore, tclient, tstore)
 
 	httpmux := mux.NewRouter()
 	httpmux.NotFoundHandler = httpx.NotFound(alice.New())

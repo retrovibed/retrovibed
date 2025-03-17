@@ -10,6 +10,7 @@ import (
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/james-lawrence/deeppool/internal/x/errorsx"
+	"github.com/james-lawrence/deeppool/internal/x/fsx"
 	"github.com/james-lawrence/deeppool/internal/x/langx"
 	"github.com/james-lawrence/deeppool/internal/x/slicesx"
 	"github.com/james-lawrence/deeppool/internal/x/sqlx"
@@ -23,7 +24,7 @@ type downloader interface {
 	Start(t torrent.Metadata) (dl torrent.Torrent, added bool, err error)
 }
 
-func NewDirectoryWatcher(ctx context.Context, q sqlx.Queryer, dl downloader, s storage.ClientImpl) (d Directory, err error) {
+func NewDirectoryWatcher(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, dl downloader, s storage.ClientImpl) (d Directory, err error) {
 	var (
 		w *fsnotify.Watcher
 	)
@@ -33,20 +34,22 @@ func NewDirectoryWatcher(ctx context.Context, q sqlx.Queryer, dl downloader, s s
 	}
 
 	return Directory{
-		d: dl,
-		w: w,
-		c: userx.DefaultCacheDirectory(userx.DefaultRelRoot()),
-		s: s,
-		q: q,
+		d:         dl,
+		w:         w,
+		c:         userx.DefaultCacheDirectory(userx.DefaultRelRoot()),
+		s:         s,
+		q:         q,
+		rootstore: rootstore,
 	}.background(ctx), nil
 }
 
 type Directory struct {
-	d downloader
-	q sqlx.Queryer
-	w *fsnotify.Watcher
-	c string
-	s storage.ClientImpl
+	d         downloader
+	q         sqlx.Queryer
+	w         *fsnotify.Watcher
+	c         string
+	s         storage.ClientImpl
+	rootstore fsx.Virtual
 }
 
 func (t Directory) Add(path string) (err error) {
@@ -138,7 +141,7 @@ func (t Directory) download(ctx context.Context, path string) {
 		log.Println("tuned trackers", meta.Trackers)
 	}
 
-	errorsx.Log(tracking.Download(pctx, t.q, &md, dl))
+	errorsx.Log(tracking.Download(pctx, t.q, t.rootstore, &md, dl))
 }
 
 func (t Directory) background(ctx context.Context) Directory {

@@ -12,6 +12,7 @@ import (
 	"github.com/james-lawrence/deeppool/internal/x/backoffx"
 	"github.com/james-lawrence/deeppool/internal/x/contextx"
 	"github.com/james-lawrence/deeppool/internal/x/errorsx"
+	"github.com/james-lawrence/deeppool/internal/x/fsx"
 	"github.com/james-lawrence/deeppool/internal/x/httpx"
 	"github.com/james-lawrence/deeppool/internal/x/md5x"
 	"github.com/james-lawrence/deeppool/internal/x/sqlx"
@@ -46,7 +47,7 @@ func PrepareDefaultFeeds(ctx context.Context, q sqlx.Queryer) error {
 }
 
 // retrieve torrents from rss feeds.
-func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, tclient *torrent.Client, tstore storage.ClientImpl) (err error) {
+func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, tclient *torrent.Client, tstore storage.ClientImpl) (err error) {
 	queryfeeds := func(ctx context.Context, done context.CancelCauseFunc) iter.Seq[tracking.RSS] {
 		return func(yield func(tracking.RSS) bool) {
 			query := tracking.RSSSearchBuilder().Where(
@@ -180,7 +181,7 @@ func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, tclient *torrent.
 			}
 
 			// begin any torrent provided by this feed
-			ResumeDownloads(ctx, q, tclient, tstore)
+			ResumeDownloads(ctx, q, rootstore, tclient, tstore)
 		}
 
 		if err := fctx.Err(); contextx.IgnoreCancelled(err) != nil {

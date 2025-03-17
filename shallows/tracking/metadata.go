@@ -4,6 +4,8 @@ import (
 	"context"
 	"crypto/md5"
 	"log"
+	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -11,6 +13,7 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/james-lawrence/deeppool/internal/x/duckdbx"
 	"github.com/james-lawrence/deeppool/internal/x/errorsx"
+	"github.com/james-lawrence/deeppool/internal/x/fsx"
 	"github.com/james-lawrence/deeppool/internal/x/langx"
 	"github.com/james-lawrence/deeppool/internal/x/md5x"
 	"github.com/james-lawrence/deeppool/internal/x/slicesx"
@@ -21,8 +24,6 @@ import (
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/metainfo"
 	"golang.org/x/time/rate"
-
-	"github.com/gabriel-vasile/mimetype"
 )
 
 func MetadataOptionNoop(*Metadata) {}
@@ -93,7 +94,7 @@ func MetadataSearchBuilder() squirrel.SelectBuilder {
 	return squirrelx.PSQL.Select(sqlx.Columns(MetadataScannerStaticColumns)...).From("torrents_metadata")
 }
 
-func Download(ctx context.Context, q sqlx.Queryer, md *Metadata, t torrent.Torrent) (err error) {
+func Download(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata, t torrent.Torrent) (err error) {
 	var (
 		downloaded int64
 		mhash      = md5.New()
@@ -110,31 +111,52 @@ func Download(ctx context.Context, q sqlx.Queryer, md *Metadata, t torrent.Torre
 		return errorsx.Wrap(err, "download failed")
 	}
 
+	log.Println("content transfer to library initiated")
+	defer log.Println("content transfer to library completed")
+	// need to get the path to the torrent media.
+	for tx, cause := range library.ImportDirectory(ctx, vfs, filepath.Join("torrent", t.Metainfo().HashInfoBytes().HexString())) {
+		if cause != nil {
+			log.Println(cause)
+			err = errorsx.Compact(err, cause)
+			continue
+		}
+
+		log.Println("DERP DERP DERP", tx.Path, tx.Bytes, md5x.FormatString(tx.MD5), tx.Mimetype.String(), md5x.FormatString(tx.MD5))
+
+		uid := md5x.FormatString(tx.MD5)
+
+		if err := os.Remove(vfs.Path("media", uid)); fsx.IgnoreIsNotExist(err) != nil {
+			return errorsx.Wrap(err, "unable to ensure symlink destination is available")
+		}
+
+		if err := os.Symlink(tx.Path, vfs.Path("media", uid)); err != nil {
+			return errorsx.Wrap(err, "unable to symlink to original location")
+		}
+
+		lmd := library.NewMetadata(
+			uid,
+			library.MetadataOptionDescription(filepath.Join(md.Description, filepath.Base(tx.Path))),
+			library.MetadataOptionBytes(tx.Bytes),
+			library.MetadataOptionTorrentID(md.ID),
+			library.MetadataOptionMimetype(tx.Mimetype.String()),
+		)
+
+		if err := library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd); err != nil {
+			return errorsx.Wrap(err, "unable to record library metadata")
+		}
+
+		log.Println("new library content", spew.Sdump(lmd))
+	}
+
+	if err != nil {
+		return errorsx.Wrap(err, "failed to transfer files into library")
+	}
+
 	log.Println("download completed", md.ID, md.Description, downloaded)
 	if err := MetadataProgressByID(ctx, q, md.ID, 0, uint64(downloaded)).Scan(md); err != nil {
 		return errorsx.Wrap(err, "progress update failed")
 	}
 
-	content := t.NewReader()
-	defer content.Close()
-	cmimetype, err := mimetype.DetectReader(content)
-	if err != nil {
-		return errorsx.Wrap(err, "unable to determine mimetype")
-	}
-
-	lmd := library.NewMetadata(
-		md5x.FormatString(mhash),
-		library.MetadataOptionDescription(md.Description),
-		library.MetadataOptionBytes(md.Bytes),
-		library.MetadataOptionTorrentID(md.ID),
-		library.MetadataOptionMimetype(cmimetype.String()),
-	)
-
-	if err := library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd); err != nil {
-		return errorsx.Wrap(err, "unable to record library metadata")
-	}
-
-	log.Println("new library content", spew.Sdump(lmd))
 	return nil
 }
 
