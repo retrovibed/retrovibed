@@ -33,11 +33,20 @@ abstract class media {
       MediaSearchResponse(next: next ?? request(limit: 100), items: []);
 
   static Future<MediaSearchResponse> get(MediaSearchRequest req) async {
-    return client.get(Uri.https(httpx.host(), "/m/")).then((v) {
-      return Future.value(
-        MediaSearchResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
-      );
-    });
+    return client
+        .get(
+          Uri.https(
+            httpx.host(),
+            "/m/",
+            jsonDecode(jsonEncode(req.toProto3Json())),
+          ),
+        )
+        .then((v) {
+          return Future.value(
+            MediaSearchResponse.create()
+              ..mergeFromProto3Json(jsonDecode(v.body)),
+          );
+        });
   }
 
   static String download_uri(String id) {

@@ -36,6 +36,12 @@ func FTSSearch(table string, q string, columns ...string) squirrel.Sqlizer {
 			fmt.Sprintf("COALESCE(%s.match_bm25(id, ?), 0) > 0", table),
 			strings.Join(positive, " "),
 		)
+
+		if len(columns) > 0 {
+			for _, term := range positive {
+				pexpr = squirrel.ConcatExpr(pexpr, squirrel.Expr(fmt.Sprintf(" OR (%s ILIKE ?)", stringsx.Join(" || ", columns...)), "%"+term+"%"))
+			}
+		}
 	}
 
 	nexpr := squirrel.Expr("TRUE")

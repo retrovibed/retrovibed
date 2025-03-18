@@ -27,9 +27,9 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
     next: media.media.request(limit: 32),
   );
 
-  void refresh() {
+  void refresh(media.MediaSearchRequest req) {
     widget
-        .search(_res.next)
+        .search(req)
         .then((v) {
           setState(() {
             _res = v;
@@ -47,7 +47,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
   @override
   void initState() {
     super.initState();
-    refresh();
+    refresh(_res.next);
   }
 
   @override
@@ -100,18 +100,17 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
         cause: _cause,
         leading: SearchTray(
           onSubmitted: (v) {
-            print("submittied");
             setState(() {
               _res.next.query = v;
               _res.next.offset = fixnum.Int64(0);
             });
-            refresh();
+            refresh(_res.next);
           },
           next: (i) {
             setState(() {
               _res.next.offset = i;
             });
-            refresh();
+            refresh(_res.next);
           },
           current: _res.next.offset,
           empty: fixnum.Int64(_res.items.length) < _res.next.limit,
