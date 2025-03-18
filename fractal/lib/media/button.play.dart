@@ -5,6 +5,31 @@ import './api.dart' as api;
 import './media.pb.dart';
 import './player.dart';
 
+mediakit.Media PlayableMedia(Media current) {
+  return mediakit.Media(
+    api.media.download_uri(current.id),
+    extras: Map.of(<String, String>{
+      "id": current.id,
+      "title": current.description,
+    }),
+  );
+}
+
+void Function()? PlayAction(BuildContext context, Media current) {
+  switch (mimex.icon(current.mimetype)) {
+    case mimex.movie:
+    case mimex.audio:
+      final vscreen = VideoScreen.of(context);
+      return vscreen == null
+          ? null
+          : () {
+            vscreen.add(PlayableMedia(current));
+          };
+    default:
+      return null;
+  }
+}
+
 class ButtonPlay extends StatelessWidget {
   final Media current;
   const ButtonPlay({super.key, required this.current});
@@ -14,17 +39,9 @@ class ButtonPlay extends StatelessWidget {
     switch (mimex.icon(current.mimetype)) {
       case mimex.movie:
       case mimex.audio:
-        final vscreen = VideoScreen.of(context);
         return IconButton(
           icon: Icon(Icons.play_circle_outline_rounded),
-          onPressed:
-              vscreen == null
-                  ? null
-                  : () {
-                    vscreen.add(
-                      mediakit.Media(api.media.download_uri(current.id)),
-                    );
-                  },
+          onPressed: PlayAction(context, current),
         );
       default:
         return Container();

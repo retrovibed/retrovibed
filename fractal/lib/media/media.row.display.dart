@@ -13,7 +13,7 @@ class RowDisplay extends StatelessWidget {
   final Media media;
   final List<Widget> leading;
   final List<Widget> trailing;
-  final void Function() onTap;
+  final void Function()? onTap;
   const RowDisplay({
     super.key,
     required this.media,

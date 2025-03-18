@@ -100,6 +100,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
         cause: _cause,
         leading: SearchTray(
           onSubmitted: (v) {
+            print("submittied");
             setState(() {
               _res.next.query = v;
               _res.next.offset = fixnum.Int64(0);
@@ -121,15 +122,14 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
               icon: Icon(Icons.file_upload_outlined),
             ),
           ),
+          autofocus: true,
         ),
         children: _res.items,
         (v) => media.RowDisplay(
           media: v,
           leading: [Icon(mimex.icon(v.mimetype))],
-          trailing: [
-            media.ButtonShare(current: v),
-            media.ButtonPlay(current: v),
-          ],
+          trailing: [media.ButtonShare(current: v)],
+          onTap: media.PlayAction(context, v),
         ),
         empty: ds.FileDropWell(upload),
       ),

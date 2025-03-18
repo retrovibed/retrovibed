@@ -135,7 +135,7 @@ func Download(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata
 
 		lmd := library.NewMetadata(
 			uid,
-			library.MetadataOptionDescription(filepath.Join(md.Description, filepath.Base(tx.Path))),
+			library.MetadataOptionDescription(filepath.Base(tx.Path)),
 			library.MetadataOptionBytes(tx.Bytes),
 			library.MetadataOptionTorrentID(md.ID),
 			library.MetadataOptionMimetype(tx.Mimetype.String()),
@@ -164,6 +164,7 @@ func DownloadProgress(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torr
 	const (
 		statsfreq = 10 * time.Second
 	)
+
 	log.Println("monitoring download progress initiated", md.ID, md.Description, md.Tracker)
 	defer log.Println("monitoring download progress completed", md.ID, md.Description, md.Tracker)
 	sub := dl.SubscribePieceStateChanges()
