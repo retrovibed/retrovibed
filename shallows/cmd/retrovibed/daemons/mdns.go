@@ -3,6 +3,7 @@ package daemons
 import (
 	"context"
 	"fmt"
+	"log"
 	"net"
 	"os"
 
@@ -19,16 +20,18 @@ func MulticastService(ctx context.Context, addr net.Listener) error {
 	}
 
 	hostname := fmt.Sprintf("%s.", errorsx.Zero(os.Hostname()))
-	info := []string{"shallows"}
-	service, err := mdns.NewMDNSService(cmdopts.MachineID(), "_shallows._udp", "local.", hostname, int(ipaddr.Port()), nil, info)
+	info := []string{"retrovibed"}
+	service, err := mdns.NewMDNSService(cmdopts.MachineID(), "_retrovibed._udp", "local.", hostname, int(ipaddr.Port()), nil, info)
 	if err != nil {
 		return err
 	}
 
+	log.Println("mdns", service.Instance, service.Service, service.Domain, service.HostName, service.Port, service.TXT)
 	server, err := mdns.NewServer(&mdns.Config{Zone: service})
 	if err != nil {
 		return err
 	}
+
 	go func() {
 		defer server.Shutdown()
 		<-ctx.Done()

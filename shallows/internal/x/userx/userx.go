@@ -21,7 +21,7 @@ func Root() user.User {
 
 // returns the relative root that should be used for all well known directories.
 func DefaultRelRoot() string {
-	const DefaultDir = "deeppool"
+	const DefaultDir = "retrovibed"
 	return slicesx.FirstOrZero(filepath.Base(os.Args[0]), DefaultDir)
 }
 

@@ -77,7 +77,7 @@ class MDNSDiscovery extends StatefulWidget {
 }
 
 class _MDNSDiscovery extends State<MDNSDiscovery> {
-  static const String ServiceName = "_shallows._udp.local";
+  static const String ServiceName = "_retrovibed._udp.local";
   bool _loading = true;
   Widget? _cause = null;
 
@@ -129,7 +129,10 @@ class _MDNSDiscovery extends State<MDNSDiscovery> {
                 this.discover();
               },
               connect: (hostname) {
-                print("connect! ${hostname}");
+                setState(() {
+                  httpx.set(hostname);
+                  _cause = null;
+                });
               },
             ),
           );

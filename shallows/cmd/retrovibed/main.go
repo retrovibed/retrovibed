@@ -15,6 +15,7 @@ import (
 	"github.com/retrovibed/retrovibed/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/internal/x/debugx"
 	"github.com/retrovibed/retrovibed/internal/x/envx"
+	"github.com/retrovibed/retrovibed/internal/x/userx"
 	"github.com/willabides/kongplete"
 
 	_ "github.com/benbjohnson/immutable"
@@ -65,7 +66,7 @@ func main() {
 
 	parser := kong.Must(
 		&shellCli,
-		kong.Name("dpool"),
+		kong.Name(userx.DefaultRelRoot()),
 		kong.Description("daemon"),
 		kong.Vars{
 			"vars_timestamp_started": time.Now().UTC().Format(time.RFC3339),

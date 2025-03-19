@@ -14,7 +14,9 @@ class MyHttpOverrides extends HttpOverrides {
   HttpClient createHttpClient(SecurityContext? context) {
     return super.createHttpClient(context)
       ..badCertificateCallback = (X509Certificate cert, String host, int port) {
-        return host == "localhost" || host == Platform.localHostname;
+        return host == "localhost" ||
+            host == Platform.localHostname ||
+            host.startsWith("192.168");
       };
   }
 }
@@ -36,7 +38,6 @@ class MyApp extends StatelessWidget {
         brightness: Brightness.dark,
         cardTheme: CardTheme(margin: EdgeInsets.all(10.0)),
         extensions: [theming.Defaults.defaults],
-        // textTheme: TextTheme(input)
       ),
       themeMode: ThemeMode.dark,
       home: Material(
