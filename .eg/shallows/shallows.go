@@ -3,14 +3,12 @@ package shallows
 import (
 	"context"
 	"eg/compute/tarballs"
-	"os"
 	"strings"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
 	"github.com/egdaemon/eg/runtime/wasi/shell"
 	"github.com/egdaemon/eg/runtime/x/wasi/egflatpak"
-	"github.com/egdaemon/eg/runtime/x/wasi/egfs"
 	"github.com/egdaemon/eg/runtime/x/wasi/eggolang"
 	"github.com/egdaemon/eg/runtime/x/wasi/egtarball"
 )
@@ -66,7 +64,7 @@ func Test() eg.OpFn {
 
 func FlatpakManifest(ctx context.Context, o eg.Op) error {
 	b := egflatpak.New(
-		"space.retrovibe.Daemon", "shallows",
+		"space.retrovibe.Daemon", "retrovibed",
 		egflatpak.Option().SDK("org.gnome.Sdk", "47").Runtime("org.gnome.Platform", "47").
 			Modules(
 				egflatpak.NewModule("duckdb", "simple", egflatpak.ModuleOptions().Commands(
@@ -97,25 +95,25 @@ func FlatpakManifest(ctx context.Context, o eg.Op) error {
 	return egflatpak.ManifestOp(egenv.CacheDirectory("flatpak.daemon.yml"), b)(ctx, o)
 }
 
-func Flatpak(ctx context.Context, op eg.Op) error {
-	runtime := shell.Runtime()
-	builddir := egenv.WorkingDirectory("fractal", "build", egfs.FindFirst(os.DirFS(egenv.WorkingDirectory("fractal", "build")), "bundle"))
-	b := egflatpak.New(
-		"space.retrovibe.Daemon", "fractal",
-		egflatpak.Option().SDK("org.gnome.Sdk", "47").Runtime("org.gnome.Platform", "47").
-			Modules(
-				egflatpak.ModuleCopy(builddir),
-			).
-			AllowWayland().
-			AllowDRI().
-			AllowNetwork().
-			AllowDownload().
-			AllowMusic().
-			AllowVideos()...)
+// func Flatpak(ctx context.Context, op eg.Op) error {
+// 	runtime := shell.Runtime()
+// 	builddir := egenv.WorkingDirectory("console", "build", egfs.FindFirst(os.DirFS(egenv.WorkingDirectory("console", "build")), "bundle"))
+// 	b := egflatpak.New(
+// 		"space.retrovibe.Daemon", "console",
+// 		egflatpak.Option().SDK("org.gnome.Sdk", "47").Runtime("org.gnome.Platform", "47").
+// 			Modules(
+// 				egflatpak.ModuleCopy(builddir),
+// 			).
+// 			AllowWayland().
+// 			AllowDRI().
+// 			AllowNetwork().
+// 			AllowDownload().
+// 			AllowMusic().
+// 			AllowVideos()...)
 
-	if err := egflatpak.Build(ctx, runtime, b); err != nil {
-		return err
-	}
+// 	if err := egflatpak.Build(ctx, runtime, b); err != nil {
+// 		return err
+// 	}
 
-	return nil
-}
+// 	return nil
+// }

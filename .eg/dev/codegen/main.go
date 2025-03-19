@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	"eg/compute/fractal"
+	"eg/compute/console"
 	"eg/compute/shallows"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
@@ -16,13 +16,13 @@ func main() {
 	ctx, done := context.WithTimeout(context.Background(), egenv.TTL())
 	defer done()
 
-	deb := eg.Container("fractal.ubuntu.24.10")
+	deb := eg.Container("retrovibe.ubuntu.24.10")
 	err := eg.Perform(
 		ctx,
 		eggit.AutoClone,
 		eg.Build(deb.BuildFromFile(".eg/Containerfile")),
 		eg.Parallel(
-			eg.Module(ctx, deb, fractal.Generate),
+			eg.Module(ctx, deb, console.Generate),
 			eg.Module(ctx, deb, shallows.Generate),
 		),
 	)

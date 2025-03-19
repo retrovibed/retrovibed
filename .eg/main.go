@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"eg/compute/fractal"
+	"eg/compute/console"
 	"eg/compute/shallows"
 	"log"
 
@@ -15,7 +15,7 @@ func main() {
 	ctx, done := context.WithTimeout(context.Background(), egenv.TTL())
 	defer done()
 
-	deb := eg.Container("fractal.ubuntu.24.10")
+	deb := eg.Container("retrovibe.ubuntu.24.10")
 	err := eg.Perform(
 		ctx,
 		eggit.AutoClone,
@@ -24,7 +24,7 @@ func main() {
 			eg.Module(
 				ctx,
 				deb,
-				fractal.Generate,
+				console.Generate,
 			),
 			eg.Module(
 				ctx,
@@ -33,7 +33,7 @@ func main() {
 			),
 		),
 		eg.Parallel(
-			eg.Module(ctx, deb, fractal.Build),
+			eg.Module(ctx, deb, console.Build),
 			eg.Module(
 				ctx,
 				deb,
@@ -41,8 +41,8 @@ func main() {
 			),
 		),
 		eg.Parallel(
-			eg.Module(ctx, deb, fractal.Tests),
-			eg.Module(ctx, deb, fractal.Linting),
+			eg.Module(ctx, deb, console.Tests),
+			eg.Module(ctx, deb, console.Linting),
 			eg.Module(ctx, deb, shallows.Test()),
 		),
 		// eg.Module(ctx, deb.OptionLiteral("--publish", "3000:3000"), www.Build, www.Webserver),
