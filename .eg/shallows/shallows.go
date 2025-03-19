@@ -64,7 +64,7 @@ func Test() eg.OpFn {
 
 func FlatpakManifest(ctx context.Context, o eg.Op) error {
 	b := egflatpak.New(
-		"space.retrovibe.d", "retrovibed",
+		"space.retrovibe.Daemon", "retrovibed",
 		egflatpak.Option().SDK("org.gnome.Sdk", "47").Runtime("org.gnome.Platform", "47").
 			Modules(
 				egflatpak.NewModule("duckdb", "simple", egflatpak.ModuleOptions().Commands(
