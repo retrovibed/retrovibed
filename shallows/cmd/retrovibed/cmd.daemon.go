@@ -15,7 +15,7 @@ import (
 	"golang.org/x/crypto/ssh"
 
 	"github.com/james-lawrence/deeppool/cmd/cmdopts"
-	"github.com/james-lawrence/deeppool/cmd/shallows/daemons"
+	"github.com/james-lawrence/deeppool/cmd/retrovibed/daemons"
 	"github.com/james-lawrence/deeppool/downloads"
 	"github.com/james-lawrence/deeppool/internal/env"
 	"github.com/james-lawrence/deeppool/internal/x/contextx"

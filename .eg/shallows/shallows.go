@@ -36,7 +36,7 @@ func Install(ctx context.Context, _ eg.Op) error {
 		// gruntime.New("ldconfig -p | grep duckdb"),
 		// gruntime.New("ld --verbose | grep SEARCH_DIR | tr -s ' ;'"),
 		// gruntime.New("go env"),
-		gruntime.Newf("go install -tags %s ./cmd/shallows/...", strings.Join(buildTags, ",")).Environ("GOBIN", dstdir),
+		gruntime.Newf("go install -tags %s ./cmd/...", strings.Join(buildTags, ",")).Environ("GOBIN", dstdir),
 	)
 }
 
