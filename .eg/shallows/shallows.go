@@ -91,7 +91,9 @@ func FlatpakManifest(ctx context.Context, o eg.Op) error {
 			AllowDownload().
 			AllowMusic().
 			AllowVideos().Allow(
-			"--filesystem=~/Downloads:ro", // bug in flatpak doesn't properly grant access to xdg-download
+			"--filesystem=~/Downloads:ro",  // bug in flatpak doesn't properly grant access to xdg-download
+			"--filesystem=~/Videos:create", // bug in flatpak doesn't properly grant full access to videos directory
+			"--filesystem=~/Music:create",  // bug in flatpak doesn't properly grant full access to music directory
 		)...)
 
 	return egflatpak.ManifestOp(egenv.CacheDirectory("flatpak.daemon.yml"), b)(ctx, o)
