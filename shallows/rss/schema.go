@@ -4,7 +4,7 @@ import (
 	"encoding/xml"
 	"time"
 
-	"github.com/james-lawrence/deeppool/internal/x/errorsx"
+	"github.com/retrovibed/retrovibed/internal/x/errorsx"
 )
 
 // rss represents the shcema of an RSS feed

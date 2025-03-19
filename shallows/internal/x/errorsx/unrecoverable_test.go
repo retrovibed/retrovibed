@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/james-lawrence/deeppool/internal/x/errorsx"
+	"github.com/retrovibed/retrovibed/internal/x/errorsx"
 
 	"github.com/stretchr/testify/assert"
 )

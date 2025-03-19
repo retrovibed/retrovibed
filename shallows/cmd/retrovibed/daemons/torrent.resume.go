@@ -5,14 +5,14 @@ import (
 	"log"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/james-lawrence/deeppool/internal/x/errorsx"
-	"github.com/james-lawrence/deeppool/internal/x/fsx"
-	"github.com/james-lawrence/deeppool/internal/x/sqlx"
-	"github.com/james-lawrence/deeppool/internal/x/sqlxx"
-	"github.com/james-lawrence/deeppool/tracking"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
+	"github.com/retrovibed/retrovibed/internal/x/errorsx"
+	"github.com/retrovibed/retrovibed/internal/x/fsx"
+	"github.com/retrovibed/retrovibed/internal/x/sqlx"
+	"github.com/retrovibed/retrovibed/internal/x/sqlxx"
+	"github.com/retrovibed/retrovibed/tracking"
 )
 
 func ResumeDownloads(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual, tclient *torrent.Client, tstore storage.ClientImpl) {

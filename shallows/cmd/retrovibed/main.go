@@ -12,9 +12,9 @@ import (
 
 	"github.com/alecthomas/kong"
 	"github.com/gofrs/uuid"
-	"github.com/james-lawrence/deeppool/cmd/cmdopts"
-	"github.com/james-lawrence/deeppool/internal/x/debugx"
-	"github.com/james-lawrence/deeppool/internal/x/envx"
+	"github.com/retrovibed/retrovibed/cmd/cmdopts"
+	"github.com/retrovibed/retrovibed/internal/x/debugx"
+	"github.com/retrovibed/retrovibed/internal/x/envx"
 	"github.com/willabides/kongplete"
 
 	_ "github.com/benbjohnson/immutable"

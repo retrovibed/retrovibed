@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/james-lawrence/deeppool/internal/x/errorsx"
 	"github.com/james-lawrence/torrent"
+	"github.com/retrovibed/retrovibed/internal/x/errorsx"
 
 	"github.com/anacrolix/utp"
 	"github.com/james-lawrence/torrent/dht"

@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/james-lawrence/deeppool/internal/x/httptestx"
-	. "github.com/james-lawrence/deeppool/internal/x/httpx"
+	"github.com/retrovibed/retrovibed/internal/x/httptestx"
+	. "github.com/retrovibed/retrovibed/internal/x/httpx"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

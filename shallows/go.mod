@@ -1,4 +1,4 @@
-module github.com/james-lawrence/deeppool
+module github.com/retrovibed/retrovibed
 
 go 1.23.2
 

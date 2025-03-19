@@ -4,11 +4,11 @@ import (
 	"context"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/james-lawrence/deeppool/internal/x/langx"
-	"github.com/james-lawrence/deeppool/internal/x/md5x"
-	"github.com/james-lawrence/deeppool/internal/x/sqlx"
-	"github.com/james-lawrence/deeppool/internal/x/squirrelx"
 	"github.com/james-lawrence/torrent/dht/krpc"
+	"github.com/retrovibed/retrovibed/internal/x/langx"
+	"github.com/retrovibed/retrovibed/internal/x/md5x"
+	"github.com/retrovibed/retrovibed/internal/x/sqlx"
+	"github.com/retrovibed/retrovibed/internal/x/squirrelx"
 )
 
 func PeerOptionBEP51(available uint64, ttl uint16) func(*Peer) {

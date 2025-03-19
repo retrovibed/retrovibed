@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/james-lawrence/deeppool/internal/x/debugx"
+	"github.com/retrovibed/retrovibed/internal/x/debugx"
 )
 
 func ErrIsNotExist(err error) error {

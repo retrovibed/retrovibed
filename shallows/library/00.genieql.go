@@ -6,8 +6,8 @@ package library
 import (
 	"context"
 
-	"github.com/james-lawrence/deeppool/internal/x/sqlx"
 	genieql "github.com/james-lawrence/genieql/ginterp"
+	"github.com/retrovibed/retrovibed/internal/x/sqlx"
 )
 
 //easyjson:json

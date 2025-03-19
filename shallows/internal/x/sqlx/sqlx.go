@@ -10,9 +10,9 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/james-lawrence/deeppool/internal/x/errorsx"
-	"github.com/james-lawrence/deeppool/internal/x/slicesx"
-	"github.com/james-lawrence/deeppool/internal/x/stringsx"
+	"github.com/retrovibed/retrovibed/internal/x/errorsx"
+	"github.com/retrovibed/retrovibed/internal/x/slicesx"
+	"github.com/retrovibed/retrovibed/internal/x/stringsx"
 	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
 )

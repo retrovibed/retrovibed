@@ -6,9 +6,9 @@ import (
 	"os/user"
 	"path/filepath"
 
-	"github.com/james-lawrence/deeppool/internal/x/debugx"
-	"github.com/james-lawrence/deeppool/internal/x/envx"
-	"github.com/james-lawrence/deeppool/internal/x/slicesx"
+	"github.com/retrovibed/retrovibed/internal/x/debugx"
+	"github.com/retrovibed/retrovibed/internal/x/envx"
+	"github.com/retrovibed/retrovibed/internal/x/slicesx"
 )
 
 func Root() user.User {

@@ -7,9 +7,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/james-lawrence/deeppool/internal/x/envx"
-	"github.com/james-lawrence/deeppool/internal/x/errorsx"
-	"github.com/james-lawrence/deeppool/internal/x/iox"
+	"github.com/retrovibed/retrovibed/internal/x/envx"
+	"github.com/retrovibed/retrovibed/internal/x/errorsx"
+	"github.com/retrovibed/retrovibed/internal/x/iox"
 )
 
 func escapeQuotes(s string) string {

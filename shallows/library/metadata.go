@@ -5,11 +5,11 @@ import (
 
 	"github.com/Masterminds/squirrel"
 	"github.com/gofrs/uuid"
-	"github.com/james-lawrence/deeppool/internal/x/duckdbx"
-	"github.com/james-lawrence/deeppool/internal/x/langx"
-	"github.com/james-lawrence/deeppool/internal/x/sqlx"
-	"github.com/james-lawrence/deeppool/internal/x/squirrelx"
-	"github.com/james-lawrence/deeppool/internal/x/timex"
+	"github.com/retrovibed/retrovibed/internal/x/duckdbx"
+	"github.com/retrovibed/retrovibed/internal/x/langx"
+	"github.com/retrovibed/retrovibed/internal/x/sqlx"
+	"github.com/retrovibed/retrovibed/internal/x/squirrelx"
+	"github.com/retrovibed/retrovibed/internal/x/timex"
 )
 
 func MetadataOptionDescription(d string) func(*Metadata) {

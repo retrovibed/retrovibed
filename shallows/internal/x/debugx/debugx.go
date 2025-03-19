@@ -15,10 +15,10 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
-	"github.com/james-lawrence/deeppool/internal/x/contextx"
-	"github.com/james-lawrence/deeppool/internal/x/errorsx"
-	"github.com/james-lawrence/deeppool/internal/x/iox"
-	"github.com/james-lawrence/deeppool/internal/x/stringsx"
+	"github.com/retrovibed/retrovibed/internal/x/contextx"
+	"github.com/retrovibed/retrovibed/internal/x/errorsx"
+	"github.com/retrovibed/retrovibed/internal/x/iox"
+	"github.com/retrovibed/retrovibed/internal/x/stringsx"
 
 	"github.com/pkg/profile"
 )

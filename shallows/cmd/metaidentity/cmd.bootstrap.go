@@ -7,14 +7,14 @@ import (
 	"github.com/charmbracelet/huh"
 	"golang.org/x/crypto/ssh"
 
-	"github.com/james-lawrence/deeppool/cmd/cmdopts"
-	"github.com/james-lawrence/deeppool/internal/huhx"
-	"github.com/james-lawrence/deeppool/internal/sshx"
-	"github.com/james-lawrence/deeppool/internal/x/errorsx"
-	"github.com/james-lawrence/deeppool/internal/x/fsx"
-	"github.com/james-lawrence/deeppool/internal/x/md5x"
-	"github.com/james-lawrence/deeppool/internal/x/stringsx"
-	"github.com/james-lawrence/deeppool/internal/x/userx"
+	"github.com/retrovibed/retrovibed/cmd/cmdopts"
+	"github.com/retrovibed/retrovibed/internal/huhx"
+	"github.com/retrovibed/retrovibed/internal/sshx"
+	"github.com/retrovibed/retrovibed/internal/x/errorsx"
+	"github.com/retrovibed/retrovibed/internal/x/fsx"
+	"github.com/retrovibed/retrovibed/internal/x/md5x"
+	"github.com/retrovibed/retrovibed/internal/x/stringsx"
+	"github.com/retrovibed/retrovibed/internal/x/userx"
 )
 
 type Bootstrap struct {

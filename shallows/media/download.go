@@ -1,8 +1,8 @@
 package media
 
 import (
-	"github.com/james-lawrence/deeppool/internal/x/langx"
-	"github.com/james-lawrence/deeppool/tracking"
+	"github.com/retrovibed/retrovibed/internal/x/langx"
+	"github.com/retrovibed/retrovibed/tracking"
 )
 
 type DownloadOption func(*Download)

@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/james-lawrence/deeppool/internal/x/errorsx"
+	"github.com/retrovibed/retrovibed/internal/x/errorsx"
 )
 
 type deadline interface {

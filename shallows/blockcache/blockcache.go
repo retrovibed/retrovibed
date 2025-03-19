@@ -3,7 +3,7 @@ package blockcache
 import (
 	"os"
 
-	"github.com/james-lawrence/deeppool/internal/x/bytesx"
+	"github.com/retrovibed/retrovibed/internal/x/bytesx"
 )
 
 // Open(name string) (File, error)

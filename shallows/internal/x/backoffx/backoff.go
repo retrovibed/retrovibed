@@ -8,7 +8,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/james-lawrence/deeppool/internal/x/timex"
+	"github.com/retrovibed/retrovibed/internal/x/timex"
 )
 
 // Strategy strategy to compute how long to wait before retrying message.

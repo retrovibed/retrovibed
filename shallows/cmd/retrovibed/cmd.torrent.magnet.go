@@ -8,11 +8,11 @@ import (
 	"os"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/james-lawrence/deeppool/cmd/cmdopts"
-	"github.com/james-lawrence/deeppool/internal/x/errorsx"
-	"github.com/james-lawrence/deeppool/internal/x/userx"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/bencode"
+	"github.com/retrovibed/retrovibed/cmd/cmdopts"
+	"github.com/retrovibed/retrovibed/internal/x/errorsx"
+	"github.com/retrovibed/retrovibed/internal/x/userx"
 )
 
 type cmdTorrent struct {

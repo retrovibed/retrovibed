@@ -5,8 +5,8 @@ import (
 	"database/sql"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/james-lawrence/deeppool/internal/x/errorsx"
-	"github.com/james-lawrence/deeppool/internal/x/sqlx"
+	"github.com/retrovibed/retrovibed/internal/x/errorsx"
+	"github.com/retrovibed/retrovibed/internal/x/sqlx"
 )
 
 type scanner[T any] interface {
