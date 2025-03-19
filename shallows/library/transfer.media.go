@@ -11,7 +11,7 @@ import (
 	"os"
 
 	"github.com/gabriel-vasile/mimetype"
-	"github.com/james-lawrence/deeppool/internal/x/fsx"
+	"github.com/retrovibed/retrovibed/internal/x/fsx"
 )
 
 type Transfered struct {

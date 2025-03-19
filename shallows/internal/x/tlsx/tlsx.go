@@ -18,8 +18,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/james-lawrence/deeppool/internal/x/errorsx"
-	"github.com/james-lawrence/deeppool/internal/x/fsx"
+	"github.com/retrovibed/retrovibed/internal/x/errorsx"
+	"github.com/retrovibed/retrovibed/internal/x/fsx"
 )
 
 type privatekey interface {

@@ -1,4 +1,4 @@
-module github.com/james-lawrence/deeppool
+module github.com/retrovibed/retrovibed
 
 go 1.23.2
 
@@ -6,31 +6,31 @@ toolchain go1.23.5
 
 require (
 	github.com/Masterminds/squirrel v1.5.4
-	github.com/alecthomas/kong v1.8.0
+	github.com/alecthomas/kong v1.9.0
 	github.com/anacrolix/utp v0.2.0
 	github.com/benbjohnson/immutable v0.4.3
 	github.com/charmbracelet/huh v0.6.0
 	github.com/gabriel-vasile/mimetype v1.4.8
-	github.com/go-playground/form/v4 v4.2.1
+	github.com/go-playground/form/v4 v4.2.2
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/golang-jwt/jwt/v4 v4.5.1
 	github.com/gorilla/schema v1.4.1
 	github.com/hashicorp/mdns v1.0.6
-	github.com/james-lawrence/genieql v0.0.0-20250214004632-76bb098e0718
+	github.com/james-lawrence/genieql v0.0.0-20250306161027-bb1395f5f457
 	github.com/justinas/alice v1.2.0
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/mattn/go-isatty v0.0.20
-	github.com/onsi/ginkgo/v2 v2.22.2
+	github.com/onsi/ginkgo/v2 v2.23.0
 	github.com/onsi/gomega v1.36.2
 	github.com/pkg/profile v1.7.0
 	github.com/pressly/goose/v3 v3.24.1
 	github.com/rymdport/portal v0.4.1
 	github.com/stretchr/testify v1.10.0
 	github.com/willabides/kongplete v0.4.0
-	golang.org/x/crypto v0.35.0
-	golang.org/x/time v0.10.0
-	google.golang.org/grpc v1.67.1
-	google.golang.org/protobuf v1.36.1
+	golang.org/x/crypto v0.36.0
+	golang.org/x/time v0.11.0
+	google.golang.org/grpc v1.71.0
+	google.golang.org/protobuf v1.36.5
 )
 
 require (

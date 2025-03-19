@@ -3,8 +3,8 @@ package rss_test
 import (
 	"testing"
 
-	"github.com/james-lawrence/deeppool/internal/x/testx"
-	"github.com/james-lawrence/deeppool/rss"
+	"github.com/retrovibed/retrovibed/internal/x/testx"
+	"github.com/retrovibed/retrovibed/rss"
 	"github.com/stretchr/testify/require"
 )
 

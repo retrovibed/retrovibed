@@ -9,15 +9,15 @@ import (
 	"strings"
 
 	"github.com/fsnotify/fsnotify"
-	"github.com/james-lawrence/deeppool/internal/x/errorsx"
-	"github.com/james-lawrence/deeppool/internal/x/fsx"
-	"github.com/james-lawrence/deeppool/internal/x/langx"
-	"github.com/james-lawrence/deeppool/internal/x/slicesx"
-	"github.com/james-lawrence/deeppool/internal/x/sqlx"
-	"github.com/james-lawrence/deeppool/internal/x/userx"
-	"github.com/james-lawrence/deeppool/tracking"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/storage"
+	"github.com/retrovibed/retrovibed/internal/x/errorsx"
+	"github.com/retrovibed/retrovibed/internal/x/fsx"
+	"github.com/retrovibed/retrovibed/internal/x/langx"
+	"github.com/retrovibed/retrovibed/internal/x/slicesx"
+	"github.com/retrovibed/retrovibed/internal/x/sqlx"
+	"github.com/retrovibed/retrovibed/internal/x/userx"
+	"github.com/retrovibed/retrovibed/tracking"
 )
 
 type downloader interface {

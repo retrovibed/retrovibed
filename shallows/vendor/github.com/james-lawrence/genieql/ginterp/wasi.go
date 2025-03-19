@@ -5,7 +5,10 @@ import (
 	"go/build"
 	"go/parser"
 	"go/token"
+	"log"
+	"path/filepath"
 
+	"github.com/james-lawrence/genieql/fsx"
 	"github.com/james-lawrence/genieql/internal/envx"
 )
 
@@ -33,10 +36,14 @@ func WasiPackage() *build.Package {
 func LoadFile() (*ast.File, error) {
 	fset := token.NewFileSet()
 	fp := envx.String("", "GENIEQL_WASI_FILEPATH")
-	// log.Println("LOADING FILE", fp)
-	// fsx.PrintDir(os.DirFS("."))
-	// fsx.PrintDir(os.DirFS(filepath.Dir(fp)))
-	// fsx.PrintString(fp)
-	// fsx.PrintString(filepath.Join(filepath.Dir(fp), "src", "main.go"))
+
+	if envx.Boolean(false, "GENIEQL_WASI_DEBUG") {
+		log.Println("LOADING FILE", fp)
+		// fsx.PrintDir(os.DirFS("."))
+		// fsx.PrintDir(os.DirFS(filepath.Dir(fp)))
+		fsx.PrintString(fp)
+		fsx.PrintString(filepath.Join(filepath.Dir(fp), "src", "main.go"))
+	}
+
 	return parser.ParseFile(fset, fp, nil, parser.ParseComments)
 }

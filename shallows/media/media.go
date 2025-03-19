@@ -1,9 +1,9 @@
 package media
 
 import (
-	"github.com/james-lawrence/deeppool/internal/x/grpcx"
-	"github.com/james-lawrence/deeppool/library"
-	"github.com/james-lawrence/deeppool/tracking"
+	"github.com/retrovibed/retrovibed/internal/x/grpcx"
+	"github.com/retrovibed/retrovibed/library"
+	"github.com/retrovibed/retrovibed/tracking"
 )
 
 type MediaOption func(*Media)

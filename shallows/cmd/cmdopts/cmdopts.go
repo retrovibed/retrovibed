@@ -8,10 +8,10 @@ import (
 	"runtime/debug"
 	"sync"
 
-	"github.com/james-lawrence/deeppool/internal/x/fsx"
-	"github.com/james-lawrence/deeppool/internal/x/sshx"
-	"github.com/james-lawrence/deeppool/internal/x/userx"
 	"github.com/james-lawrence/torrent/dht/krpc"
+	"github.com/retrovibed/retrovibed/internal/x/fsx"
+	"github.com/retrovibed/retrovibed/internal/x/sshx"
+	"github.com/retrovibed/retrovibed/internal/x/userx"
 	"golang.org/x/crypto/ssh"
 )
 

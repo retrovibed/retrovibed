@@ -84,7 +84,7 @@ const (
 	}`
 	StdlibEncodeFloat64 = `func() {
 		{{ .To | expr }}.Valid = true
-		{{ .To | expr }}.Float64 = {{ .From | expr }}
+		{{ .To | expr }}.Float64 = float64({{ .From | expr }})
 	}`
 	StdlibDecodeFloat64 = `func() {
 		if {{ .From | expr }}.Valid {
@@ -120,6 +120,15 @@ const (
 		if {{ .From | expr }}.Valid {
 			tmp := {{ .Type | expr }}({{ .From | expr }}.Int16)
 			{{ .To | autodereference | expr }} = tmp
+		}
+	}`
+	StdlibEncodeNull = `func() {
+		{{ .To | expr }}.Valid = true
+		{{ .To | expr }}.V = {{ .From | expr }}
+	}`
+	StdlibDecodeNull = `func() {
+		if {{ .From | expr }}.Valid {
+			{{ .To | autodereference | expr }} = {{ .From | expr }}.V
 		}
 	}`
 )
@@ -407,5 +416,12 @@ var stdlib = NewDriver(
 			{{ .To | expr }}.Valid = true
 			{{ .To | expr }}.String = {{ .From | expr }}
 		}`,
+	},
+	genieql.ColumnDefinition{
+		Type:       "uint16",
+		Native:     uint16ExprString,
+		ColumnType: "sql.Null[uint16]",
+		Decode:     StdlibDecodeNull,
+		Encode:     StdlibEncodeNull,
 	},
 )

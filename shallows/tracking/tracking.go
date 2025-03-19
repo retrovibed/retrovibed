@@ -1,8 +1,8 @@
 package tracking
 
 import (
-	"github.com/james-lawrence/deeppool/internal/x/md5x"
 	"github.com/james-lawrence/torrent/metainfo"
+	"github.com/retrovibed/retrovibed/internal/x/md5x"
 )
 
 func HashUID(md *metainfo.Hash) string {

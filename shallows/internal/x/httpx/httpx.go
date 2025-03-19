@@ -18,13 +18,13 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/james-lawrence/deeppool/internal/x/backoffx"
-	"github.com/james-lawrence/deeppool/internal/x/bytesx"
-	"github.com/james-lawrence/deeppool/internal/x/debugx"
-	"github.com/james-lawrence/deeppool/internal/x/errorsx"
-	"github.com/james-lawrence/deeppool/internal/x/netx"
-	"github.com/james-lawrence/deeppool/internal/x/stringsx"
 	"github.com/justinas/alice"
+	"github.com/retrovibed/retrovibed/internal/x/backoffx"
+	"github.com/retrovibed/retrovibed/internal/x/bytesx"
+	"github.com/retrovibed/retrovibed/internal/x/debugx"
+	"github.com/retrovibed/retrovibed/internal/x/errorsx"
+	"github.com/retrovibed/retrovibed/internal/x/netx"
+	"github.com/retrovibed/retrovibed/internal/x/stringsx"
 	"golang.org/x/time/rate"
 )
 

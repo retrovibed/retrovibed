@@ -9,8 +9,8 @@ import (
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
 
-	"github.com/james-lawrence/deeppool/internal/x/fsx"
-	"github.com/james-lawrence/deeppool/internal/x/iox"
+	"github.com/retrovibed/retrovibed/internal/x/fsx"
+	"github.com/retrovibed/retrovibed/internal/x/iox"
 )
 
 func NewTorrentFromVirtualFS(v fsx.Virtual) *TorrentCacheStorage {

@@ -6,7 +6,6 @@ import (
 	"io"
 
 	"github.com/james-lawrence/genieql"
-	"github.com/james-lawrence/genieql/internal/drivers"
 	"github.com/james-lawrence/genieql/internal/transformx"
 )
 
@@ -108,7 +107,7 @@ type structure struct {
 func (t structure) Generate(dst io.Writer) error {
 	const tmpl = `type {{.Name}} struct {
 	{{- range $column := .Columns }}
-	{{ $column.Name | transformation }} {{ if $column.Definition.Nullable }}*{{ end }}{{ $column.Definition.Native | type -}}
+	{{ $column.Name | transformation }} {{ if $column.Definition.Nullable }}*{{ end }}{{ $column.Definition.Native -}}
 	{{ end }}
 }`
 	type context struct {
@@ -143,7 +142,6 @@ func (t structure) Generate(dst io.Writer) error {
 		return err
 	}
 
-	typeDefinitions := composeTypeDefinitions(t.Driver.LookupType, drivers.DefaultTypeDefinitions)
 	ctx := context{
 		Name:    t.Name,
 		Columns: mapping.Columns,
@@ -153,12 +151,5 @@ func (t structure) Generate(dst io.Writer) error {
 
 	return template.Must(template.New("scanner template").Funcs(template.FuncMap{
 		"transformation": func(s string) string { return transformx.String(s, a) },
-		"type": func(s string) string {
-			if d, err := typeDefinitions(s); err == nil {
-				return d.Native
-			}
-
-			return s
-		},
 	}).Parse(tmpl)).Execute(dst, ctx)
 }

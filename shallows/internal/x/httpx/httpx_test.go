@@ -8,9 +8,9 @@ import (
 	"net/url"
 	"strings"
 
-	. "github.com/james-lawrence/deeppool/internal/x/httpx"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	. "github.com/retrovibed/retrovibed/internal/x/httpx"
 )
 
 var _ = Describe("httpx", func() {

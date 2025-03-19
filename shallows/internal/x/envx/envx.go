@@ -15,9 +15,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/james-lawrence/deeppool/internal/x/debugx"
-	"github.com/james-lawrence/deeppool/internal/x/errorsx"
-	"github.com/james-lawrence/deeppool/internal/x/slicesx"
+	"github.com/retrovibed/retrovibed/internal/x/debugx"
+	"github.com/retrovibed/retrovibed/internal/x/errorsx"
+	"github.com/retrovibed/retrovibed/internal/x/slicesx"
 )
 
 // Int retrieve a integer flag from the environment, checks each key in order

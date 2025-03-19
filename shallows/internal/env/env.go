@@ -2,7 +2,7 @@ package env
 
 import (
 	"github.com/gofrs/uuid"
-	"github.com/james-lawrence/deeppool/internal/x/envx"
+	"github.com/retrovibed/retrovibed/internal/x/envx"
 )
 
 const (

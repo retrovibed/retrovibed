@@ -7,7 +7,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/james-lawrence/deeppool/internal/x/langx"
+	"github.com/retrovibed/retrovibed/internal/x/langx"
 )
 
 // Zero logs that the error occurred but otherwise ignores it.

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/james-lawrence/deeppool/cmd/metaidentity"
+	"github.com/retrovibed/retrovibed/cmd/metaidentity"
 
 	_ "github.com/marcboeker/go-duckdb"
 )

@@ -8,7 +8,7 @@ github.com/RoaringBitmap/roaring/internal
 # github.com/alecthomas/atomic v0.1.0-alpha2
 ## explicit; go 1.18
 github.com/alecthomas/atomic
-# github.com/alecthomas/kong v1.8.0
+# github.com/alecthomas/kong v1.9.0
 ## explicit; go 1.20
 github.com/alecthomas/kong
 # github.com/anacrolix/chansync v0.6.0
@@ -176,7 +176,7 @@ github.com/gabriel-vasile/mimetype/internal/magic
 ## explicit; go 1.18
 github.com/go-logr/logr
 github.com/go-logr/logr/funcr
-# github.com/go-playground/form/v4 v4.2.1
+# github.com/go-playground/form/v4 v4.2.2
 ## explicit; go 1.13
 github.com/go-playground/form/v4
 # github.com/go-task/slim-sprig/v3 v3.0.0
@@ -266,7 +266,7 @@ github.com/jackc/pgx/v5/stdlib
 ## explicit; go 1.19
 github.com/jackc/puddle/v2
 github.com/jackc/puddle/v2/internal/genstack
-# github.com/james-lawrence/genieql v0.0.0-20250214004632-76bb098e0718
+# github.com/james-lawrence/genieql v0.0.0-20250306161027-bb1395f5f457
 ## explicit; go 1.23.2
 github.com/james-lawrence/genieql
 github.com/james-lawrence/genieql/astbuild
@@ -275,6 +275,7 @@ github.com/james-lawrence/genieql/astutil
 github.com/james-lawrence/genieql/buildx
 github.com/james-lawrence/genieql/columninfo
 github.com/james-lawrence/genieql/dialects
+github.com/james-lawrence/genieql/fsx
 github.com/james-lawrence/genieql/generators
 github.com/james-lawrence/genieql/generators/functions
 github.com/james-lawrence/genieql/generators/typespec
@@ -397,8 +398,8 @@ github.com/muesli/cancelreader
 github.com/muesli/termenv
 # github.com/nxadm/tail v1.4.11
 ## explicit; go 1.13
-# github.com/onsi/ginkgo/v2 v2.22.2
-## explicit; go 1.22.0
+# github.com/onsi/ginkgo/v2 v2.23.0
+## explicit; go 1.23.0
 github.com/onsi/ginkgo/v2
 github.com/onsi/ginkgo/v2/config
 github.com/onsi/ginkgo/v2/formatter
@@ -515,7 +516,7 @@ go.etcd.io/bbolt/internal/freelist
 # go.uber.org/multierr v1.11.0
 ## explicit; go 1.19
 go.uber.org/multierr
-# golang.org/x/crypto v0.35.0
+# golang.org/x/crypto v0.36.0
 ## explicit; go 1.23.0
 golang.org/x/crypto/blowfish
 golang.org/x/crypto/chacha20
@@ -580,8 +581,8 @@ golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
 golang.org/x/text/width
-# golang.org/x/time v0.10.0
-## explicit; go 1.18
+# golang.org/x/time v0.11.0
+## explicit; go 1.23.0
 golang.org/x/time/rate
 # golang.org/x/tools v0.30.0
 ## explicit; go 1.22.0
@@ -616,15 +617,15 @@ golang.org/x/tools/internal/versions
 ## explicit; go 1.18
 golang.org/x/xerrors
 golang.org/x/xerrors/internal
-# google.golang.org/grpc v1.67.1
-## explicit; go 1.21
+# google.golang.org/grpc v1.71.0
+## explicit; go 1.22.0
 google.golang.org/grpc/connectivity
 google.golang.org/grpc/grpclog
 google.golang.org/grpc/grpclog/internal
 google.golang.org/grpc/internal
 google.golang.org/grpc/metadata
 google.golang.org/grpc/serviceconfig
-# google.golang.org/protobuf v1.36.1
+# google.golang.org/protobuf v1.36.5
 ## explicit; go 1.21
 google.golang.org/protobuf/encoding/prototext
 google.golang.org/protobuf/encoding/protowire

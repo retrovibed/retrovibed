@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/james-lawrence/deeppool/internal/x/squirrelx"
-	"github.com/james-lawrence/deeppool/internal/x/stringsx"
+	"github.com/retrovibed/retrovibed/internal/x/squirrelx"
+	"github.com/retrovibed/retrovibed/internal/x/stringsx"
 )
 
 // checks if the error is a unique constraint violation.
