@@ -96,26 +96,3 @@ func FlatpakManifest(ctx context.Context, o eg.Op) error {
 
 	return egflatpak.ManifestOp(egenv.CacheDirectory("flatpak.daemon.yml"), b)(ctx, o)
 }
-
-// func Flatpak(ctx context.Context, op eg.Op) error {
-// 	runtime := shell.Runtime()
-// 	builddir := egenv.WorkingDirectory("console", "build", egfs.FindFirst(os.DirFS(egenv.WorkingDirectory("console", "build")), "bundle"))
-// 	b := egflatpak.New(
-// 		"space.retrovibe.Daemon", "console",
-// 		egflatpak.Option().SDK("org.gnome.Sdk", "47").Runtime("org.gnome.Platform", "47").
-// 			Modules(
-// 				egflatpak.ModuleCopy(builddir),
-// 			).
-// 			AllowWayland().
-// 			AllowDRI().
-// 			AllowNetwork().
-// 			AllowDownload().
-// 			AllowMusic().
-// 			AllowVideos()...)
-
-// 	if err := egflatpak.Build(ctx, runtime, b); err != nil {
-// 		return err
-// 	}
-
-// 	return nil
-// }
