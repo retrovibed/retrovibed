@@ -2,8 +2,8 @@ github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc h1:U9qPSI2PIWSS1
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/dustin/go-humanize v1.0.1 h1:GzkhY7T5VNhEkwH0PVJgjz+fX1rhBrR7pRT3mDkpeCY=
 github.com/dustin/go-humanize v1.0.1/go.mod h1:Mu1zIs6XwVuF/gI1OepvI0qD18qycQx+mFykh5fBlto=
-github.com/egdaemon/eg v0.0.0-20250319122006-84d132a12ba0 h1:4LxdTq37Jhx/Ay2IwAUdahKctnqn1FVBidHWn2XVF3c=
-github.com/egdaemon/eg v0.0.0-20250319122006-84d132a12ba0/go.mod h1:LW/cMks5/HgFNy6NRRcHQ9ektargCgzfQxahC71MY2Q=
+github.com/egdaemon/eg v0.0.0-20250319134506-54f64d31959b h1:k2R8/9gqTRNnFfel7He1iuFEKutxDQQNF3AEESWjXHI=
+github.com/egdaemon/eg v0.0.0-20250319134506-54f64d31959b/go.mod h1:naQr7LR/Bc7HQKDM6tP285WhSwrcNR25dkbDQN3cl1I=
 github.com/egdaemon/wasinet/wasinet v0.0.0-20250205011224-d5f0e1da96d7 h1:tmVfnQM80Qxn3DgwcRqoq0r54rpL6VhOyGfvcT/B0FU=
 github.com/egdaemon/wasinet/wasinet v0.0.0-20250205011224-d5f0e1da96d7/go.mod h1:vPVQ3HHYTa9Fe7lz+ZBqI49kw76LSTQfvKZlO8QpWsY=
 github.com/go-logr/logr v1.4.2 h1:6pFjapn8bFcIbiKo3XT4j/BhANplGihG6tvd+8rYgrY=
@@ -18,8 +18,8 @@ github.com/golang/protobuf v1.5.4 h1:i7eJL8qZTpSEXOPTxNKhASYpMn+8e5Q6AdndVa1dWek
 github.com/golang/protobuf v1.5.4/go.mod h1:lnTiLA8Wa4RWRcIUkrtSVa5nRhsEGBg48fD6rSs7xps=
 github.com/google/go-cmp v0.7.0 h1:wk8382ETsv4JYUZwIsn6YpYiWiBsYLSJiTsyBybVuN8=
 github.com/google/go-cmp v0.7.0/go.mod h1:pXiqmnSA92OHEEa9HXL2W4E7lf9JzCmGVUdgjX3N/iU=
-github.com/google/pprof v0.0.0-20241210010833-40e02aabc2ad h1:a6HEuzUHeKH6hwfN/ZoQgRgVIWFJljSWa/zetS2WTvg=
-github.com/google/pprof v0.0.0-20241210010833-40e02aabc2ad/go.mod h1:vavhavw2zAxS5dIdcRluK6cSGGPlZynqzFM8NdvU144=
+github.com/google/pprof v0.0.0-20250317173921-a4b03ec1a45e h1:ijClszYn+mADRFY17kjQEVQ1XRhq2/JR1M3sGqeJoxs=
+github.com/google/pprof v0.0.0-20250317173921-a4b03ec1a45e/go.mod h1:boTsfXsheKC2y+lKOCMpSfarhxDeIzfZG1jqGcPl3cA=
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
 github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/mattn/go-isatty v0.0.20 h1:xfD0iDuEKnDkl03q4limB+vH+GxLEtL/jb4xVJSWWEY=

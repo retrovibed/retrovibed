@@ -2,7 +2,7 @@ module eg/compute
 
 go 1.24.0
 
-require github.com/egdaemon/eg v0.0.0-20250319122006-84d132a12ba0
+require github.com/egdaemon/eg v0.0.0-20250319134506-54f64d31959b
 
 require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
@@ -17,4 +17,18 @@ require (
 	google.golang.org/grpc v1.71.0 // indirect
 	google.golang.org/protobuf v1.36.5 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+)
+
+exclude (
+	github.com/google/pprof v0.0.0-20181206194817-3ea8567a2e57
+	google.golang.org/genproto v0.0.0-20180817151627-c66870c02cf8
+	google.golang.org/genproto v0.0.0-20180831171423-11092d34479b
+	google.golang.org/genproto v0.0.0-20181029155118-b69ba1387ce2
+	google.golang.org/genproto v0.0.0-20181202183823-bd91e49a0898
+	google.golang.org/genproto v0.0.0-20190306203927-b5d61aea6440
+	google.golang.org/genproto v0.0.0-20190307195333-5fe7a883aa19
+	google.golang.org/genproto v0.0.0-20190425155659-357c62f0e4bb
+	google.golang.org/genproto v0.0.0-20190819201941-24fa4b261c55
+	google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013
+	google.golang.org/genproto v0.0.0-20241118233622-e639e219e697
 )

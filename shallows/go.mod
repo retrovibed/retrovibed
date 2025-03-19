@@ -10,15 +10,19 @@ require (
 	github.com/anacrolix/utp v0.2.0
 	github.com/benbjohnson/immutable v0.4.3
 	github.com/charmbracelet/huh v0.6.0
+	github.com/fsnotify/fsnotify v1.8.0
 	github.com/gabriel-vasile/mimetype v1.4.8
 	github.com/go-playground/form/v4 v4.2.2
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/golang-jwt/jwt/v4 v4.5.1
+	github.com/gorilla/mux v1.8.1
 	github.com/gorilla/schema v1.4.1
 	github.com/hashicorp/mdns v1.0.6
 	github.com/james-lawrence/genieql v0.0.0-20250306161027-bb1395f5f457
+	github.com/james-lawrence/torrent v0.0.0-20250319143017-4ba2ac8c12b5
 	github.com/justinas/alice v1.2.0
 	github.com/logrusorgru/aurora v2.0.3+incompatible
+	github.com/marcboeker/go-duckdb v1.8.3
 	github.com/mattn/go-isatty v0.0.20
 	github.com/onsi/ginkgo/v2 v2.23.0
 	github.com/onsi/gomega v1.36.2
@@ -28,6 +32,7 @@ require (
 	github.com/stretchr/testify v1.10.0
 	github.com/willabides/kongplete v0.4.0
 	golang.org/x/crypto v0.36.0
+	golang.org/x/text v0.23.0
 	golang.org/x/time v0.11.0
 	google.golang.org/grpc v1.71.0
 	google.golang.org/protobuf v1.36.5
@@ -49,7 +54,7 @@ require (
 	github.com/apache/arrow-go/v18 v18.0.0 // indirect
 	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
-	github.com/bits-and-blooms/bitset v1.21.0 // indirect
+	github.com/bits-and-blooms/bitset v1.22.0 // indirect
 	github.com/bits-and-blooms/bloom/v3 v3.7.0 // indirect
 	github.com/bradfitz/iter v0.0.0-20191230175014-e8f45d346db8 // indirect
 	github.com/catppuccin/go v0.3.0 // indirect
@@ -66,7 +71,7 @@ require (
 	github.com/erikgeiser/coninput v0.0.0-20211004153227-1c3628e74d0f // indirect
 	github.com/felixge/fgprof v0.9.5 // indirect
 	github.com/goccy/go-json v0.10.3 // indirect
-	github.com/godbus/dbus/v5 v5.1.0 // indirect
+	github.com/godbus/dbus/v5 v5.1.1-0.20241109141217-c266b19b28e9 // indirect
 	github.com/google/btree v1.1.3 // indirect
 	github.com/google/flatbuffers v24.3.25+incompatible // indirect
 	github.com/huandu/xstrings v1.5.0 // indirect
@@ -104,30 +109,38 @@ require (
 	github.com/zieckey/goini v0.0.0-20240615065340-08ee21c836fb // indirect
 	go.etcd.io/bbolt v1.4.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/exp v0.0.0-20250228200357-dead58393ab7 // indirect
-	golang.org/x/mod v0.23.0 // indirect
+	golang.org/x/exp v0.0.0-20250305212735-054e65f0b394 // indirect
+	golang.org/x/mod v0.24.0 // indirect
 	golang.org/x/sync v0.12.0 // indirect
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
 )
 
 require (
-	github.com/davecgh/go-spew v1.1.1
-	github.com/fsnotify/fsnotify v1.8.0
+	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
-	github.com/google/go-cmp v0.6.0 // indirect
-	github.com/google/pprof v0.0.0-20250208200701-d0013a598941 // indirect
-	github.com/gorilla/mux v1.8.1
+	github.com/google/go-cmp v0.7.0 // indirect
+	github.com/google/pprof v0.0.0-20250317173921-a4b03ec1a45e // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
-	github.com/james-lawrence/torrent v0.0.0-20250228220931-890adbcd5957
-	github.com/marcboeker/go-duckdb v1.8.3
-	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/posener/complete v1.2.3 // indirect
 	github.com/riywo/loginshell v0.0.0-20200815045211-7d26008be1ab // indirect
-	golang.org/x/net v0.36.0 // indirect
+	golang.org/x/net v0.37.0 // indirect
 	golang.org/x/sys v0.31.0 // indirect
-	golang.org/x/text v0.23.0
-	golang.org/x/tools v0.30.0 // indirect
+	golang.org/x/tools v0.31.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+)
+
+exclude (
+	github.com/google/pprof v0.0.0-20181206194817-3ea8567a2e57
+	google.golang.org/genproto v0.0.0-20180817151627-c66870c02cf8
+	google.golang.org/genproto v0.0.0-20180831171423-11092d34479b
+	google.golang.org/genproto v0.0.0-20181029155118-b69ba1387ce2
+	google.golang.org/genproto v0.0.0-20181202183823-bd91e49a0898
+	google.golang.org/genproto v0.0.0-20190306203927-b5d61aea6440
+	google.golang.org/genproto v0.0.0-20190425155659-357c62f0e4bb
+	google.golang.org/genproto v0.0.0-20190819201941-24fa4b261c55
+	google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013
+	google.golang.org/genproto v0.0.0-20241118233622-e639e219e697
 )
