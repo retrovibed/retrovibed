@@ -8,7 +8,7 @@ with the world and has an optional at cost cloud backup functionality.
 
 ```bash
 mkdir retrovibe
-curl -L -o retrovibed.daemon.yml https://github.com/retrovibed/retrovibed/releases/download/${version}/flatpak.daemon.yml
+curl -L -o retrovibed.daemon.yml https://github.com/retrovibed/retrovibed/releases/latest/download/flatpak.daemon.yml
 flatpak remote-add --if-not-exists --user flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 flatpak-builder --user --install-deps-from=flathub --install --ccache --force-clean retrovibe retrovibed.daemon.yml
 flatpak run --user space.retrovibe.Daemon
@@ -18,7 +18,7 @@ flatpak run --user space.retrovibe.Daemon
 
 ```bash
 mkdir retrovibe
-curl -L -o retrovibed.client.yml https://github.com/retrovibed/retrovibed/releases/download/${version}/flatpak.client.yml
+curl -L -o retrovibed.client.yml https://github.com/retrovibed/retrovibed/releases/latest/download/flatpak.client.yml
 flatpak remote-add --if-not-exists --user flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 flatpak-builder --user --install-deps-from=flathub --install --ccache --force-clean retrovibe retrovibed.client.yml
 flatpak run --user space.retrovibe.Client
