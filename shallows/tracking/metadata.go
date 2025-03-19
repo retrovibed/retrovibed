@@ -121,8 +121,6 @@ func Download(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata
 			continue
 		}
 
-		log.Println("DERP DERP DERP", tx.Path, tx.Bytes, md5x.FormatString(tx.MD5), tx.Mimetype.String(), md5x.FormatString(tx.MD5))
-
 		uid := md5x.FormatString(tx.MD5)
 
 		if err := os.Remove(vfs.Path("media", uid)); fsx.IgnoreIsNotExist(err) != nil {

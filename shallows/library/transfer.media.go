@@ -8,7 +8,6 @@ import (
 	"io"
 	"io/fs"
 	"iter"
-	"log"
 	"os"
 
 	"github.com/gabriel-vasile/mimetype"
@@ -27,8 +26,6 @@ type Transfered struct {
 func ImportDirectory(ctx context.Context, rootstore fsx.Virtual, subtree string) iter.Seq2[Transfered, error] {
 	ErrIterationFailed := fmt.Errorf("failed to yield transferred media")
 	fsi := os.DirFS(rootstore.Path(subtree))
-
-	log.Println("DERP DERP", rootstore.Path(subtree))
 
 	return func(yield func(Transfered, error) bool) {
 		err := fs.WalkDir(fsi, ".", func(path string, d fs.DirEntry, err error) error {
