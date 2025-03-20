@@ -79,6 +79,8 @@ func ImportSymlinkFile(vfs fsx.Virtual) ImportOp {
 
 func ImportCopyFile(vfs fsx.Virtual) ImportOp {
 	return func(ctx context.Context, path string) (*Transfered, error) {
+		log.Println("processing initiated", path)
+		defer log.Println("processing completed", path)
 		tx, err := transfermeta(path)
 		if err != nil {
 			return nil, err
@@ -133,6 +135,7 @@ func ImportFilesystem(ctx context.Context, op ImportOp, paths ...string) iter.Se
 
 			tx, cause := op(ictx, path)
 			if cause != nil {
+				errorsx.Log(cause)
 				return cause
 			}
 
@@ -154,6 +157,7 @@ func ImportFilesystem(ctx context.Context, op ImportOp, paths ...string) iter.Se
 				close(results)
 			}()
 
+			log.Println("DERP DERP", paths)
 			for _, p := range paths {
 				if info, cause := os.Stat(p); errors.Is(cause, os.ErrNotExist) {
 					err = errorsx.Wrap(cause, "ignoring")

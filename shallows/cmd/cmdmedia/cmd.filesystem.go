@@ -35,11 +35,13 @@ func (t importFilesystem) Run(gctx *cmdopts.Global) (err error) {
 
 	op := library.ImportFileDryRun
 	if !t.DryRun {
+		log.Println("DERP DERP", env.MediaDir())
 		vfs := fsx.DirVirtual(env.MediaDir())
 		op = library.ImportCopyFile(vfs)
 	}
 
 	for tx, cause := range library.ImportFilesystem(gctx.Context, op, t.Paths...) {
+		log.Println("checkpoint")
 		if cause != nil {
 			log.Println(cause)
 			err = errorsx.Compact(err, cause)
@@ -51,6 +53,7 @@ func (t importFilesystem) Run(gctx *cmdopts.Global) (err error) {
 			continue
 		}
 
+		log.Println("checkpoint")
 		lmd := library.NewMetadata(
 			md5x.FormatString(tx.MD5),
 			library.MetadataOptionDescription(filepath.Base(tx.Path)),
