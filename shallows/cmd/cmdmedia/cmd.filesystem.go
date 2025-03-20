@@ -46,6 +46,11 @@ func (t importFilesystem) Run(gctx *cmdopts.Global) (err error) {
 			continue
 		}
 
+		if t.DryRun {
+			log.Println("imported", tx.Path)
+			continue
+		}
+
 		lmd := library.NewMetadata(
 			md5x.FormatString(tx.MD5),
 			library.MetadataOptionDescription(filepath.Base(tx.Path)),
