@@ -35,6 +35,9 @@ func (t importFilesystem) Run(gctx *cmdopts.Global) (err error) {
 
 	op := library.ImportFileDryRun
 	if !t.DryRun {
+		if err = os.MkdirAll(env.MediaDir(), 0700); err != nil {
+			return err
+		}
 		log.Println("DERP DERP", env.MediaDir())
 		vfs := fsx.DirVirtual(env.MediaDir())
 		op = library.ImportCopyFile(vfs)
