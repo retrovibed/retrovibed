@@ -114,7 +114,7 @@ func (t cmdDaemon) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	rootstore := fsx.DirVirtual(userx.DefaultDataDirectory(userx.DefaultRelRoot()))
 	mediastore := fsx.DirVirtual(env.MediaDir())
 	// tstore := blockcache.NewTorrentFromVirtualFS(mediastore)
-	torrentdir := userx.DefaultDataDirectory(userx.DefaultRelRoot(), "torrent")
+	torrentdir := env.TorrentDir()
 	tstore := storage.NewFileByInfoHash(torrentdir)
 
 	dwatcher, err := downloads.NewDirectoryWatcher(dctx, db, rootstore, tclient, tstore)

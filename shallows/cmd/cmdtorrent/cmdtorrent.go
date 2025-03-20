@@ -1,5 +1,6 @@
 package cmdtorrent
 
 type Commands struct {
-	Magnet cmdMagnet `cmd:"" help:"insert magnet links for download"`
+	Import importFilesystem `cmd:"" help:"import torrents from a file/directory"`
+	Magnet cmdMagnet        `cmd:"" help:"insert magnet links for download"`
 }

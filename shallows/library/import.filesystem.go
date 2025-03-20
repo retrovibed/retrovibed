@@ -8,7 +8,6 @@ import (
 	"io"
 	"io/fs"
 	"iter"
-	"log"
 	"os"
 	"path/filepath"
 	"sync"
@@ -32,7 +31,7 @@ type Transfered struct {
 
 type ImportOp = func(ctx context.Context, path string) (*Transfered, error)
 
-func transfermeta(path string) (*Transfered, error) {
+func TransferedFromPath(path string) (*Transfered, error) {
 	cmimetype, err := mimetype.DetectFile(path)
 	if err != nil {
 		return nil, err
@@ -47,7 +46,7 @@ func transfermeta(path string) (*Transfered, error) {
 
 func ImportSymlinkFile(vfs fsx.Virtual) ImportOp {
 	return func(ctx context.Context, path string) (*Transfered, error) {
-		tx, err := transfermeta(path)
+		tx, err := TransferedFromPath(path)
 		if err != nil {
 			return nil, err
 		}
@@ -80,9 +79,7 @@ func ImportSymlinkFile(vfs fsx.Virtual) ImportOp {
 
 func ImportCopyFile(vfs fsx.Virtual) ImportOp {
 	return func(ctx context.Context, path string) (*Transfered, error) {
-		log.Println("processing initiated", path)
-		defer log.Println("processing completed", path)
-		tx, err := transfermeta(path)
+		tx, err := TransferedFromPath(path)
 		if err != nil {
 			return nil, err
 		}
@@ -121,7 +118,7 @@ func ImportCopyFile(vfs fsx.Virtual) ImportOp {
 }
 
 func ImportFileDryRun(ctx context.Context, path string) (*Transfered, error) {
-	return transfermeta(path)
+	return TransferedFromPath(path)
 }
 
 func ImportFilesystem(ctx context.Context, op ImportOp, paths ...string) iter.Seq2[*Transfered, error] {

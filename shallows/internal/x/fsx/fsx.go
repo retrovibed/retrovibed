@@ -2,11 +2,14 @@ package fsx
 
 import (
 	"errors"
+	"fmt"
 	"io/fs"
+	"log"
 	"os"
 	"path/filepath"
 
 	"github.com/retrovibed/retrovibed/internal/x/debugx"
+	"github.com/retrovibed/retrovibed/internal/x/errorsx"
 )
 
 func ErrIsNotExist(err error) error {
@@ -115,4 +118,37 @@ type vstoragefs struct {
 func (t vstoragefs) Open(name string) (fs.File, error) {
 	debugx.Println("opening", name, "as", t.pathrewrite(name))
 	return t.Virtual.OpenFile(t.pathrewrite(name), os.O_RDONLY, 0600)
+}
+
+func MkDirs(perm fs.FileMode, paths ...string) (err error) {
+	for _, p := range paths {
+		if err = os.MkdirAll(p, perm); err != nil {
+			return errorsx.Wrapf(err, "unable to create directory: %s", p)
+		}
+
+		if err = os.Chmod(p, perm); err != nil {
+			return errorsx.Wrapf(err, "unable to set directory mod: %s", p)
+		}
+	}
+
+	return nil
+}
+
+func PrintFS(d fs.FS) {
+	errorsx.Log(log.Output(2, fmt.Sprintln("--------- FS WALK INITIATED ---------")))
+	defer func() { errorsx.Log(log.Output(3, fmt.Sprintln("--------- FS WALK COMPLETED ---------"))) }()
+
+	err := fs.WalkDir(d, ".", func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+
+		info := errorsx.Zero(d.Info())
+		errorsx.Log(log.Output(7, fmt.Sprintf("%v %4d %s\n", info.Mode(), info.Size(), path)))
+
+		return nil
+	})
+	if err != nil {
+		errorsx.Log(log.Output(2, fmt.Sprintln("fs walk failed", err)))
+	}
 }

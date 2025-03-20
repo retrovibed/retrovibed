@@ -28,3 +28,7 @@ func JWTSecret() []byte {
 func MediaDir() string {
 	return userx.DefaultDataDirectory(userx.DefaultRelRoot(), "media")
 }
+
+func TorrentDir() string {
+	return userx.DefaultDataDirectory(userx.DefaultRelRoot(), "torrent")
+}

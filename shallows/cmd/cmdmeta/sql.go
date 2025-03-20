@@ -6,6 +6,8 @@ import (
 	"embed"
 	"io/fs"
 
+	_ "github.com/marcboeker/go-duckdb"
+
 	"github.com/pressly/goose/v3"
 	"github.com/retrovibed/retrovibed/internal/x/debugx"
 	"github.com/retrovibed/retrovibed/internal/x/errorsx"
@@ -28,16 +30,18 @@ func Database(ctx context.Context) (db *sql.DB, err error) {
 		errorsx.Log(db.Close())
 	}()
 
-	{
-		mprov, err := goose.NewProvider("", db, errorsx.Must(fs.Sub(embedsqlite, ".migrations")), goose.WithStore(goosex.DuckdbStore{}))
-		if err != nil {
-			return nil, errorsx.Wrap(err, "unable to build migration provider")
-		}
+	return db, InitializeDatabase(ctx, db)
+}
 
-		if _, err := mprov.Up(ctx); err != nil {
-			return nil, errorsx.Wrap(err, "unable to run migrations")
-		}
+func InitializeDatabase(ctx context.Context, db *sql.DB) (err error) {
+	mprov, err := goose.NewProvider("", db, errorsx.Must(fs.Sub(embedsqlite, ".migrations")), goose.WithStore(goosex.DuckdbStore{}))
+	if err != nil {
+		return errorsx.Wrap(err, "unable to build migration provider")
 	}
 
-	return db, nil
+	if _, err := mprov.Up(ctx); err != nil {
+		return errorsx.Wrap(err, "unable to run migrations")
+	}
+
+	return nil
 }
