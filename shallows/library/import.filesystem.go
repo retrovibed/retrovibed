@@ -11,6 +11,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sync"
 	"time"
 
 	"github.com/gabriel-vasile/mimetype"
@@ -125,6 +126,10 @@ func ImportFileDryRun(ctx context.Context, path string) (*Transfered, error) {
 
 func ImportFilesystem(ctx context.Context, op ImportOp, paths ...string) iter.Seq2[*Transfered, error] {
 	return func(yield func(*Transfered, error) bool) {
+		var (
+			capture sync.Once
+			err     error
+		)
 		results := make(chan *Transfered)
 		arena := asynccompute.New(func(ictx context.Context, path string) error {
 			if info, err := os.Stat(path); err != nil {
@@ -135,6 +140,9 @@ func ImportFilesystem(ctx context.Context, op ImportOp, paths ...string) iter.Se
 
 			tx, cause := op(ictx, path)
 			if cause != nil {
+				capture.Do(func() {
+					err = errorsx.Compact(err, cause)
+				})
 				errorsx.Log(cause)
 				return cause
 			}
@@ -147,17 +155,14 @@ func ImportFilesystem(ctx context.Context, op ImportOp, paths ...string) iter.Se
 			}
 		})
 
-		var err error
 		go func() {
 			defer func() {
 				ictx, done := context.WithTimeout(context.Background(), time.Minute)
 				defer done()
 				err = errorsx.Compact(err, asynccompute.Shutdown(ictx, arena))
-				log.Println("completed", err)
 				close(results)
 			}()
 
-			log.Println("DERP DERP", paths)
 			for _, p := range paths {
 				if info, cause := os.Stat(p); errors.Is(cause, os.ErrNotExist) {
 					err = errorsx.Wrap(cause, "ignoring")
@@ -193,20 +198,16 @@ func ImportFilesystem(ctx context.Context, op ImportOp, paths ...string) iter.Se
 			}
 		}()
 
-		log.Println("DERP DERP 0")
 		for r := range results {
 			if !yield(r, nil) {
-				log.Println("checkpoint")
 				return
 			}
 		}
-		log.Println("DERP DERP 1")
+
 		if err != nil {
 			if !yield(nil, err) {
-				log.Println("checkpoint")
 				return
 			}
 		}
-		log.Println("DERP DERP 2")
 	}
 }
