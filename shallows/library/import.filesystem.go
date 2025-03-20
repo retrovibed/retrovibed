@@ -150,6 +150,7 @@ func ImportFilesystem(ctx context.Context, op ImportOp, paths ...string) iter.Se
 				ictx, done := context.WithTimeout(context.Background(), 10*time.Second)
 				defer done()
 				err = errorsx.Compact(err, asynccompute.Shutdown(ictx, arena))
+				log.Println("completed", err)
 				close(results)
 			}()
 
