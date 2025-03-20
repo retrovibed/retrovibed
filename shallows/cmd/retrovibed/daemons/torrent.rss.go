@@ -172,12 +172,13 @@ func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, rootstore fsx.Vir
 				feed.Description = updated
 				if cause := tracking.RSSInsertWithDefaults(fctx, sqlx.Debug(q), feed).Scan(&feed); cause != nil {
 					log.Println("failed to update rss feed", cause)
+					continue
 				}
-			}
-
-			if err = tracking.RSSCooldownByID(fctx, q, feed.ID, channel.TTL).Scan(&feed); err != nil {
-				log.Println("unable to mark rss feed for cooldown", err)
-				continue
+			} else {
+				if err = tracking.RSSCooldownByID(fctx, q, feed.ID, channel.TTL).Scan(&feed); err != nil {
+					log.Println("unable to mark rss feed for cooldown", err)
+					continue
+				}
 			}
 
 			// begin any torrent provided by this feed

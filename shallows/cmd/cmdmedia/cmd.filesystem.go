@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"log"
+	"os"
 	"path/filepath"
 
 	"github.com/davecgh/go-spew/spew"
@@ -17,8 +18,9 @@ import (
 )
 
 type importFilesystem struct {
-	DryRun bool     `flag:"" name:"dry-run" help:"print what files would be imported but do not actually perform the import" default:"false"`
-	Paths  []string `arg:"" name:"paths" help:"files and folders to import" required:"true"`
+	DryRun         bool     `flag:"" name:"dry-run" help:"print what files would be imported but do not actually perform the import" default:"false"`
+	DeleteOriginal bool     `flag:"" name:"delete-original" short:"d" help:"after file is copied delete the original file from the disk" default:"false"`
+	Paths          []string `arg:"" name:"paths" help:"files and folders to import" required:"true"`
 }
 
 func (t importFilesystem) Run(gctx *cmdopts.Global) (err error) {
@@ -56,6 +58,13 @@ func (t importFilesystem) Run(gctx *cmdopts.Global) (err error) {
 		}
 
 		log.Println("new library content", spew.Sdump(lmd))
+
+		if t.DeleteOriginal {
+			log.Println("removing", tx.Path)
+			if err := os.Remove(tx.Path); err != nil {
+				return errorsx.Wrap(err, "unable to remove original file")
+			}
+		}
 	}
 
 	return nil
