@@ -388,17 +388,17 @@ func NewUpload(fieldname, filename string, in io.Reader) (mime string, b io.Read
 }
 
 func Unauthorized(r http.ResponseWriter, cause error) {
-	errorsx.MaybeLog(log.Output(2, fmt.Sprintln(cause)))
+	errorsx.Log(log.Output(2, fmt.Sprintln(cause)))
 	r.WriteHeader(http.StatusUnauthorized)
 }
 
 func Forbidden(r http.ResponseWriter, cause error) {
-	errorsx.MaybeLog(log.Output(2, fmt.Sprintln(cause)))
+	errorsx.Log(log.Output(2, fmt.Sprintln(cause)))
 	r.WriteHeader(http.StatusForbidden)
 }
 
 func ErrorHeader(r http.ResponseWriter, code int, cause error) {
-	errorsx.MaybeLog(log.Output(2, fmt.Sprintln(cause)))
+	errorsx.Log(log.Output(2, fmt.Sprintln(cause)))
 	r.WriteHeader(code)
 }
 

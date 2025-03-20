@@ -276,10 +276,10 @@ func Dirty(b bool) []string {
 }
 
 func Debug(envs ...string) {
-	errorsx.MaybeLog(log.Output(2, fmt.Sprintln("DEBUG ENVIRONMENT INITIATED")))
-	defer func() { errorsx.MaybeLog(log.Output(3, "DEBUG ENVIRONMENT COMPLETED")) }()
+	errorsx.Log(log.Output(2, fmt.Sprintln("DEBUG ENVIRONMENT INITIATED")))
+	defer func() { errorsx.Log(log.Output(3, "DEBUG ENVIRONMENT COMPLETED")) }()
 	for _, e := range envs {
-		errorsx.MaybeLog(log.Output(2, fmt.Sprintln(e)))
+		errorsx.Log(log.Output(2, fmt.Sprintln(e)))
 	}
 }
 

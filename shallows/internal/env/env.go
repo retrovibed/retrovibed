@@ -3,6 +3,7 @@ package env
 import (
 	"github.com/gofrs/uuid"
 	"github.com/retrovibed/retrovibed/internal/x/envx"
+	"github.com/retrovibed/retrovibed/internal/x/userx"
 )
 
 const (
@@ -22,4 +23,8 @@ const (
 
 func JWTSecret() []byte {
 	return []byte(envx.String(uuid.Must(uuid.NewV4()).String(), JWTSharedSecret))
+}
+
+func Metadatabase() string {
+	return userx.DefaultConfigDir(userx.DefaultRelRoot(), "meta.db")
 }

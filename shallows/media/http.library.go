@@ -101,11 +101,11 @@ func (t *HTTPLibrary) delete(w http.ResponseWriter, r *http.Request) {
 
 	if err := library.MetadataTombstoneByID(r.Context(), t.q, id).Scan(&md); sqlx.ErrNoRows(err) != nil {
 		log.Println(errorsx.Wrap(err, "unable to tombstone metadata"))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusNotFound))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
 		return
 	} else if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to tombstone metadata"))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 
@@ -133,7 +133,7 @@ func (t *HTTPLibrary) upload(w http.ResponseWriter, r *http.Request) {
 
 	if f, fh, err = r.FormFile("content"); err != nil {
 		log.Println(errorsx.Wrap(err, "content parameter required"))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
 	}
 	defer f.Close()
@@ -141,7 +141,7 @@ func (t *HTTPLibrary) upload(w http.ResponseWriter, r *http.Request) {
 	tmp, err := fsx.CreateTemp(t.mediastorage, "retrovibed.upload.*")
 	if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to create temporary file"))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 	defer func() {
@@ -156,7 +156,7 @@ func (t *HTTPLibrary) upload(w http.ResponseWriter, r *http.Request) {
 
 	if _, err = io.CopyBuffer(io.MultiWriter(tmp, mhash, copied), f, buf[:]); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to create temporary file"))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 
@@ -169,13 +169,13 @@ func (t *HTTPLibrary) upload(w http.ResponseWriter, r *http.Request) {
 
 	if err = library.MetadataInsertWithDefaults(r.Context(), t.q, lmd).Scan(&lmd); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to record library metadata record"))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 
 	if err = fsx.Rename(t.mediastorage, tmp.Name(), lmd.ID); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to record library metadata record"))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 
@@ -204,7 +204,7 @@ func (t *HTTPLibrary) search(w http.ResponseWriter, r *http.Request) {
 
 	if err = t.decoder.Decode(msg.Next, r.Form); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to decode request"))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
 	}
 	msg.Next.Limit = numericx.Min(msg.Next.Limit, 100)
@@ -222,7 +222,7 @@ func (t *HTTPLibrary) search(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println(errorsx.Wrap(err, "encoding failed"))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 

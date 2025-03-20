@@ -1,4 +1,4 @@
-package metaidentity
+package cmdmeta
 
 import (
 	"log"

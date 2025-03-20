@@ -3,20 +3,18 @@ package main
 import (
 	"context"
 	"database/sql"
-	"embed"
 	"io"
-	"io/fs"
 	"log"
 	"net/http"
 	"time"
 
 	"github.com/justinas/alice"
-	"github.com/pressly/goose/v3"
 	"golang.org/x/crypto/ssh"
 
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/krpc"
 	"github.com/james-lawrence/torrent/storage"
+	"github.com/retrovibed/retrovibed/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/cmd/retrovibed/daemons"
 	"github.com/retrovibed/retrovibed/downloads"
@@ -26,7 +24,6 @@ import (
 	"github.com/retrovibed/retrovibed/internal/x/envx"
 	"github.com/retrovibed/retrovibed/internal/x/errorsx"
 	"github.com/retrovibed/retrovibed/internal/x/fsx"
-	"github.com/retrovibed/retrovibed/internal/x/goosex"
 	"github.com/retrovibed/retrovibed/internal/x/httpx"
 	"github.com/retrovibed/retrovibed/internal/x/slicesx"
 	"github.com/retrovibed/retrovibed/internal/x/timex"
@@ -43,9 +40,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-//go:embed .migrations/*.sql
-var embedsqlite embed.FS
-
 type cmdDaemon struct {
 	AutoBootstrap bool             `flag:"" name:"auto-bootstrap" help:"bootstrap from a predefined set of peers" default:"false"`
 	AutoDiscovery bool             `flag:"" name:"auto-discovery" help:"enable autodiscovery of content from peers" default:"false"`
@@ -56,7 +50,6 @@ func (t cmdDaemon) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	var (
 		db           *sql.DB
 		torrentpeers                            = userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "torrent.peers")
-		dbpath                                  = userx.DefaultConfigDir(userx.DefaultRelRoot(), "dpool.db")
 		peerid                                  = krpc.IdFromString(ssh.FingerprintSHA256(id.PublicKey()))
 		bootstrap    torrent.ClientConfigOption = torrent.ClientConfigNoop
 	)
@@ -78,21 +71,10 @@ func (t cmdDaemon) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		httpbind.Close()
 	}()
 
-	if db, err = sql.Open("duckdb", dbpath); err != nil {
-		return errorsx.Wrap(err, "unable to open db")
+	if db, err = cmdmeta.Database(dctx); err != nil {
+		return err
 	}
 	defer db.Close()
-
-	{
-		mprov, err := goose.NewProvider("", db, errorsx.Must(fs.Sub(embedsqlite, ".migrations")), goose.WithStore(goosex.DuckdbStore{}))
-		if err != nil {
-			return errorsx.Wrap(err, "unable to build migration provider")
-		}
-
-		if _, err := mprov.Up(dctx); err != nil {
-			return errorsx.Wrap(err, "unable to run migrations")
-		}
-	}
 
 	go func() {
 		errorsx.Log(errorsx.Wrap(daemons.PrepareDefaultFeeds(dctx, db), "unable to initialize default rss feeds"))

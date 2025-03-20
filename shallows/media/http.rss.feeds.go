@@ -88,7 +88,7 @@ func (t *HTTPRSSFeed) search(w http.ResponseWriter, r *http.Request) {
 
 	if err = t.decoder.Decode(msg.Next, r.Form); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to decode request"))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
 	}
 	msg.Next.Limit = numericx.Min(msg.Next.Limit, 100)
@@ -106,7 +106,7 @@ func (t *HTTPRSSFeed) search(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println(errorsx.Wrap(err, "encoding failed"))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 
@@ -124,7 +124,7 @@ func (t *HTTPRSSFeed) create(w http.ResponseWriter, r *http.Request) {
 
 	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to decode request"))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
 	}
 
@@ -139,7 +139,7 @@ func (t *HTTPRSSFeed) create(w http.ResponseWriter, r *http.Request) {
 
 	if err = tracking.RSSInsertWithDefaults(r.Context(), t.q, feed).Scan(&feed); err != nil {
 		log.Println(errorsx.Wrap(err, "encoding failed"))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 
@@ -160,13 +160,13 @@ func (t *HTTPRSSFeed) delete(w http.ResponseWriter, r *http.Request) {
 
 	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to decode request"))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
 	}
 
 	if err = tracking.RSSDeleteByID(r.Context(), t.q, req.Feed.Id).Scan(&feed); err != nil {
 		log.Println(errorsx.Wrap(err, "encoding failed"))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 

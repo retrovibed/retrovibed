@@ -125,7 +125,7 @@ func (t *HTTPDiscovered) upload(w http.ResponseWriter, r *http.Request) {
 
 	if f, fh, err = r.FormFile("content"); err != nil {
 		log.Println(errorsx.Wrap(err, "content parameter required"))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
 	}
 	defer f.Close()
@@ -133,7 +133,7 @@ func (t *HTTPDiscovered) upload(w http.ResponseWriter, r *http.Request) {
 	tmp, err := fsx.CreateTemp(t.mediastorage, "retrovibed.upload.*")
 	if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to create temporary file"))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 	defer func() {
@@ -148,14 +148,14 @@ func (t *HTTPDiscovered) upload(w http.ResponseWriter, r *http.Request) {
 
 	if _, err = io.CopyBuffer(io.MultiWriter(tmp, mhash, copied), f, buf[:]); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to create temporary file"))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 
 	meta, err := metainfo.LoadFromFile(tmp.Name())
 	if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to read temporary file"))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 	if info, err := meta.UnmarshalInfo(); err == nil && !info.Private {
@@ -165,7 +165,7 @@ func (t *HTTPDiscovered) upload(w http.ResponseWriter, r *http.Request) {
 	info, err := meta.UnmarshalInfo()
 	if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to read temporary file"))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 	info.Name = fh.Filename
@@ -177,20 +177,20 @@ func (t *HTTPDiscovered) upload(w http.ResponseWriter, r *http.Request) {
 
 	if err = tracking.MetadataInsertWithDefaults(r.Context(), t.q, lmd).Scan(&lmd); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to record metadata record"))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 
 	metadata, err := torrent.New(metainfo.Hash(lmd.Infohash), torrent.OptionStorage(t.c), torrent.OptionNodes(meta.NodeList()...), torrent.OptionTrackers(meta.AnnounceList...), torrent.OptionWebseeds(meta.UrlList))
 	if err != nil {
 		log.Println(errorsx.Wrapf(err, "unable to create torrent from metadata %s", lmd.ID))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 
 	if dl, _, err = t.d.Start(metadata); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to start download"))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 
@@ -219,30 +219,30 @@ func (t *HTTPDiscovered) pause(w http.ResponseWriter, r *http.Request) {
 
 	if err := tracking.MetadataFindByID(r.Context(), t.q, id).Scan(&md); sqlx.ErrNoRows(err) != nil {
 		log.Println(errorsx.Wrap(err, "unable to find metadata"))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusNotFound))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
 		return
 	} else if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to find metadata"))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 
 	metadata, err := torrent.New(metainfo.Hash(md.Infohash), torrent.OptionStorage(t.c))
 	if err != nil {
 		log.Println(errorsx.Wrapf(err, "unable to create metadata from metadata %s", md.ID))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 
 	if err = t.d.Stop(metadata); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to stop download"))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 
 	if err = tracking.MetadataPausedByID(r.Context(), t.q, id).Scan(&md); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to pause metadata"))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 
@@ -266,30 +266,30 @@ func (t *HTTPDiscovered) download(w http.ResponseWriter, r *http.Request) {
 
 	if err := tracking.MetadataFindByID(r.Context(), t.q, id).Scan(&md); sqlx.ErrNoRows(err) != nil {
 		log.Println(errorsx.Wrap(err, "unable to find metadata"))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusNotFound))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
 		return
 	} else if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to find metadata"))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 
 	metadata, err := torrent.New(metainfo.Hash(md.Infohash), torrent.OptionStorage(t.c))
 	if err != nil {
 		log.Println(errorsx.Wrapf(err, "unable to create metadata from metadata %s", md.ID))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 
 	if _, _, err := t.d.Start(metadata); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to start download"))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 
 	if err := tracking.MetadataDownloadByID(r.Context(), t.q, id).Scan(&md); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to track download"))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 
@@ -317,7 +317,7 @@ func (t *HTTPDiscovered) downloading(w http.ResponseWriter, r *http.Request) {
 
 	if err = t.decoder.Decode(msg.Next, r.Form); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to decode request"))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
 	}
 	msg.Next.Limit = numericx.Min(msg.Next.Limit, 100)
@@ -338,7 +338,7 @@ func (t *HTTPDiscovered) downloading(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println(errorsx.Wrap(err, "encoding failed"))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 
@@ -360,7 +360,7 @@ func (t *HTTPDiscovered) search(w http.ResponseWriter, r *http.Request) {
 
 	if err = t.decoder.Decode(msg.Next, r.Form); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to decode request"))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
 	}
 	msg.Next.Limit = numericx.Min(msg.Next.Limit, 100)
@@ -378,7 +378,7 @@ func (t *HTTPDiscovered) search(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println(errorsx.Wrap(err, "encoding failed"))
-		errorsx.MaybeLog(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 

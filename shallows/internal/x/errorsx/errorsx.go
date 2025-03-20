@@ -152,16 +152,6 @@ func (t userfriendly) Cause() error {
 	return t.error
 }
 
-func MaybeLog(err error) {
-	if err == nil {
-		return
-	}
-
-	if cause := log.Output(1, fmt.Sprintln(err)); cause != nil {
-		log.Println(cause)
-	}
-}
-
 type AlertableOption func(*Alertable)
 
 func AlertableOptionRate(r float64) AlertableOption {

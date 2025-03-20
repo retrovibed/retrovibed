@@ -1,4 +1,4 @@
-package metaidentity
+package cmdmeta
 
 import (
 	"encoding/base64"
@@ -9,9 +9,14 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-type Identity struct{}
+type Identity struct {
+	Bootstrap Bootstrap   `cmd:"" help:"bootstrap your identity using an existing ssh key"`
+	Show      IdenDisplay `cmd:"" help:"display current identity"`
+}
 
-func (t Identity) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
+type IdenDisplay struct{}
+
+func (t IdenDisplay) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	var (
 		signer ssh.Signer = id.Signer
 	)

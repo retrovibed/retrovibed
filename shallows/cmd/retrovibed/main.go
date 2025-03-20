@@ -12,6 +12,7 @@ import (
 
 	"github.com/alecthomas/kong"
 	"github.com/gofrs/uuid"
+	"github.com/retrovibed/retrovibed/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/internal/x/debugx"
 	"github.com/retrovibed/retrovibed/internal/x/envx"
@@ -26,10 +27,10 @@ func main() {
 		cmdopts.Global
 		cmdopts.PeerID
 		cmdopts.SSHID
-		Version  cmdopts.Version `cmd:"" help:"display versioning information"`
-		Identity cmdMetaIdentity `cmd:"" help:"identity management commands"`
-		Daemon   cmdDaemon       `cmd:"" help:"run the backend daemon" default:"true"`
-		Torrent  cmdTorrent      `cmd:"" help:"torrent related sub commands"`
+		Version  cmdopts.Version  `cmd:"" help:"display versioning information"`
+		Identity cmdmeta.Identity `cmd:"" help:"identity management commands"`
+		Daemon   cmdDaemon        `cmd:"" help:"run the backend daemon" default:"true"`
+		Torrent  cmdTorrent       `cmd:"" help:"torrent related sub commands"`
 	}
 
 	var (

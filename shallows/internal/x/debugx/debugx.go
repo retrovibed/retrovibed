@@ -126,7 +126,7 @@ func run(ctx context.Context, dir string, strategy func(*profile.Profile)) (err 
 
 	stoppable := StopFunc(func() {
 		p.Stop()
-		errorsx.MaybeLog(errorsx.Wrap(clone(path.Join(dir, "profile.pprof"), tmpdir), "unable to finalize profile"))
+		errorsx.Log(errorsx.Wrap(clone(path.Join(dir, "profile.pprof"), tmpdir), "unable to finalize profile"))
 	})
 
 	return errorsx.WithStack(Run(ctx, stoppable))
