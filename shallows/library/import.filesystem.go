@@ -154,7 +154,6 @@ func ImportFilesystem(ctx context.Context, op ImportOp, paths ...string) iter.Se
 			}()
 
 			for _, p := range paths {
-				log.Println("checkpoint 0", p)
 				if info, cause := os.Stat(p); errors.Is(cause, os.ErrNotExist) {
 					err = errorsx.Wrap(cause, "ignoring")
 					return
@@ -189,16 +188,20 @@ func ImportFilesystem(ctx context.Context, op ImportOp, paths ...string) iter.Se
 			}
 		}()
 
+		log.Println("DERP DERP 0")
 		for r := range results {
 			if !yield(r, nil) {
+				log.Println("checkpoint")
 				return
 			}
 		}
-
+		log.Println("DERP DERP 1")
 		if err != nil {
 			if !yield(nil, err) {
+				log.Println("checkpoint")
 				return
 			}
 		}
+		log.Println("DERP DERP 2")
 	}
 }
