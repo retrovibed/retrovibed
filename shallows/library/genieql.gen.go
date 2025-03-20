@@ -590,3 +590,5 @@ func MetadataFindByID(ctx context.Context, q sqlx.Queryer, id string) MetadataSc
 	c0.String = id
 	return NewMetadataScannerStaticRow(q.QueryRowContext(ctx, query, c0))
 }
+
+

@@ -7,17 +7,17 @@ import (
 	"io/fs"
 
 	"github.com/pressly/goose/v3"
-	"github.com/retrovibed/retrovibed/internal/env"
 	"github.com/retrovibed/retrovibed/internal/x/debugx"
 	"github.com/retrovibed/retrovibed/internal/x/errorsx"
 	"github.com/retrovibed/retrovibed/internal/x/goosex"
+	"github.com/retrovibed/retrovibed/internal/x/userx"
 )
 
 //go:embed .migrations/*.sql
 var embedsqlite embed.FS
 
 func Database(ctx context.Context) (db *sql.DB, err error) {
-	if db, err = sql.Open("duckdb", env.Metadatabase()); err != nil {
+	if db, err = sql.Open("duckdb", userx.DefaultConfigDir(userx.DefaultRelRoot(), "meta.db")); err != nil {
 		return nil, errorsx.Wrap(err, "unable to open db")
 	}
 	defer func() {

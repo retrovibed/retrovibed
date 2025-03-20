@@ -12,8 +12,10 @@ import (
 
 	"github.com/alecthomas/kong"
 	"github.com/gofrs/uuid"
+	"github.com/retrovibed/retrovibed/cmd/cmdmedia"
 	"github.com/retrovibed/retrovibed/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/cmd/cmdopts"
+	"github.com/retrovibed/retrovibed/cmd/cmdtorrent"
 	"github.com/retrovibed/retrovibed/internal/x/debugx"
 	"github.com/retrovibed/retrovibed/internal/x/envx"
 	"github.com/retrovibed/retrovibed/internal/x/userx"
@@ -27,10 +29,11 @@ func main() {
 		cmdopts.Global
 		cmdopts.PeerID
 		cmdopts.SSHID
-		Version  cmdopts.Version  `cmd:"" help:"display versioning information"`
-		Identity cmdmeta.Identity `cmd:"" help:"identity management commands"`
-		Daemon   cmdDaemon        `cmd:"" help:"run the backend daemon" default:"true"`
-		Torrent  cmdTorrent       `cmd:"" help:"torrent related sub commands"`
+		Version  cmdopts.Version     `cmd:"" help:"display versioning information"`
+		Identity cmdmeta.Identity    `cmd:"" help:"identity management commands"`
+		Media    cmdmedia.Commands   `cmd:"" help:"media management (import/export)"`
+		Torrent  cmdtorrent.Commands `cmd:"" help:"torrent related sub commands"`
+		Daemon   cmdDaemon           `cmd:"" help:"run the backend daemon" default:"true"`
 	}
 
 	var (

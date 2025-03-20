@@ -25,6 +25,6 @@ func JWTSecret() []byte {
 	return []byte(envx.String(uuid.Must(uuid.NewV4()).String(), JWTSharedSecret))
 }
 
-func Metadatabase() string {
-	return userx.DefaultConfigDir(userx.DefaultRelRoot(), "meta.db")
+func MediaDir() string {
+	return userx.DefaultDataDirectory(userx.DefaultRelRoot(), "media")
 }

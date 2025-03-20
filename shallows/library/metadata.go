@@ -12,27 +12,37 @@ import (
 	"github.com/retrovibed/retrovibed/internal/x/timex"
 )
 
-func MetadataOptionDescription(d string) func(*Metadata) {
+type MetadataOption = func(*Metadata)
+
+func MetadataOptionDescription(d string) MetadataOption {
 	return func(m *Metadata) {
 		m.Description = d
 	}
 }
 
-func MetadataOptionTorrentID(d string) func(*Metadata) {
+func MetadataOptionTorrentID(d string) MetadataOption {
 	return func(m *Metadata) {
 		m.TorrentID = d
 	}
 }
 
-func MetadataOptionBytes(d uint64) func(*Metadata) {
+func MetadataOptionBytes(d uint64) MetadataOption {
 	return func(m *Metadata) {
 		m.Bytes = d
 	}
 }
 
-func MetadataOptionMimetype(s string) func(*Metadata) {
+func MetadataOptionMimetype(s string) MetadataOption {
 	return func(m *Metadata) {
 		m.Mimetype = s
+	}
+}
+
+func MetadataOptionCompose(options ...func(*Metadata)) MetadataOption {
+	return func(m *Metadata) {
+		for _, opt := range options {
+			opt(m)
+		}
 	}
 }
 

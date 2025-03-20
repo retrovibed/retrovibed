@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/md5"
 	"log"
-	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -111,28 +110,20 @@ func Download(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata
 		return errorsx.Wrap(err, "download failed")
 	}
 
+	mediavfs := fsx.DirVirtual(vfs.Path("media"))
+
 	log.Println("content transfer to library initiated")
 	defer log.Println("content transfer to library completed")
 	// need to get the path to the torrent media.
-	for tx, cause := range library.ImportDirectory(ctx, vfs, filepath.Join("torrent", t.Metainfo().HashInfoBytes().HexString())) {
+	for tx, cause := range library.ImportFilesystem(ctx, library.ImportSymlinkFile(mediavfs), vfs.Path("torrent", t.Metainfo().HashInfoBytes().HexString())) {
 		if cause != nil {
 			log.Println(cause)
 			err = errorsx.Compact(err, cause)
 			continue
 		}
 
-		uid := md5x.FormatString(tx.MD5)
-
-		if err := os.Remove(vfs.Path("media", uid)); fsx.IgnoreIsNotExist(err) != nil {
-			return errorsx.Wrap(err, "unable to ensure symlink destination is available")
-		}
-
-		if err := os.Symlink(tx.Path, vfs.Path("media", uid)); err != nil {
-			return errorsx.Wrap(err, "unable to symlink to original location")
-		}
-
 		lmd := library.NewMetadata(
-			uid,
+			md5x.FormatString(tx.MD5),
 			library.MetadataOptionDescription(filepath.Base(tx.Path)),
 			library.MetadataOptionBytes(tx.Bytes),
 			library.MetadataOptionTorrentID(md.ID),

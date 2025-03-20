@@ -1,4 +1,4 @@
-package main
+package cmdtorrent
 
 import (
 	"errors"
@@ -15,15 +15,11 @@ import (
 	"github.com/retrovibed/retrovibed/internal/x/userx"
 )
 
-type cmdTorrent struct {
-	Magnet cmdTorrentMagnet `cmd:"" help:"insert magnet links for download"`
-}
-
-type cmdTorrentMagnet struct {
+type cmdMagnet struct {
 	Magnets []url.URL `arg:"" name:"magnet" help:"magnet uri to download" required:"true"`
 }
 
-func (t cmdTorrentMagnet) Run(ctx *cmdopts.Global) (err error) {
+func (t cmdMagnet) Run(ctx *cmdopts.Global) (err error) {
 	for _, uri := range t.Magnets {
 		m, cause := torrent.NewFromMagnet(uri.String())
 		if cause != nil {
@@ -31,7 +27,7 @@ func (t cmdTorrentMagnet) Run(ctx *cmdopts.Global) (err error) {
 			continue
 		}
 
-		encoded, err := bencode.Marshal(m.Metainfo())
+		encoded, cause := bencode.Marshal(m.Metainfo())
 		if cause != nil {
 			err = errors.Join(err, errorsx.Wrap(cause, "unable to encode to torrent file"))
 			continue
