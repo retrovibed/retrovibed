@@ -61,7 +61,7 @@ class Edit extends StatelessWidget {
               label: Text("contribution"),
               input: Tooltip(
                 message:
-                    "support this open source community by providing storage when autodownload is enabled",
+                    "support this open source community by providing storage when autodownload and autoarchive is enabled, and financially when autoarchive is enabled",
                 child: forms.Checkbox(value: current.contributing),
               ),
             ),
