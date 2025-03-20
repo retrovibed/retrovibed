@@ -2,6 +2,7 @@ package tracking_test
 
 import (
 	"database/sql"
+	"log"
 	"os"
 	"path/filepath"
 	"testing"
@@ -10,6 +11,7 @@ import (
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/retrovibed/retrovibed/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/internal/testx"
+	"github.com/retrovibed/retrovibed/internal/x/errorsx"
 	"github.com/retrovibed/retrovibed/internal/x/fsx"
 	"github.com/retrovibed/retrovibed/internal/x/md5x"
 	"github.com/retrovibed/retrovibed/internal/x/sqlx"
@@ -27,6 +29,8 @@ func TestImportTorrent(t *testing.T) {
 	q, err := sql.Open("duckdb", filepath.Join(tmpdir, "meta.db"))
 	require.NoError(t, err)
 	defer q.Close()
+
+	log.Println("duckdb version", errorsx.Zero(sqlx.String(ctx, q, "SELECT version() AS version")))
 
 	require.NoError(t, cmdmeta.InitializeDatabase(ctx, q))
 	evfs := fsx.DirVirtual(filepath.Join(tmpdir, "examples"))

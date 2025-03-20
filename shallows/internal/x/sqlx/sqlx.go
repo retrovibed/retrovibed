@@ -87,14 +87,19 @@ func Count(ctx context.Context, q Queryer, query string) (count int, err error) 
 	return count, err
 }
 
+func String(ctx context.Context, q Queryer, query string) (s string, err error) {
+	err = NewValueRowScanner[string](q.QueryRowContext(ctx, query)).Scan(&s)
+	return s, err
+}
+
 // NewIntRowScanner ...
-func NewIntRowScanner(r *sql.Row) IntRowScanner {
+func NewIntRowScanner(r Row) IntRowScanner {
 	return IntRowScanner{Row: r}
 }
 
 // IntRowScanner helper for scanning integers in a type safe manner.
 type IntRowScanner struct {
-	*sql.Row
+	Row
 }
 
 // Scan an integer result
@@ -114,6 +119,18 @@ type BoolRowScanner struct {
 
 // Scan an bool result
 func (t BoolRowScanner) Scan(v *bool) error {
+	return t.Row.Scan(v)
+}
+
+func NewValueRowScanner[T any](r Row) ValueRowScanner[T] {
+	return ValueRowScanner[T]{Row: r}
+}
+
+type ValueRowScanner[T any] struct {
+	Row
+}
+
+func (t ValueRowScanner[T]) Scan(v *T) error {
 	return t.Row.Scan(v)
 }
 
