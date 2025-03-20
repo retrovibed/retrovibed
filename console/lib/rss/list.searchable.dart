@@ -146,18 +146,28 @@ class SearchableView extends State<ListSearchable> {
         ],
       ),
       children: _res.items,
-      (w) => Item(
-        current: w,
-        onChange: (v) {
-          final upd =
-              _res.items.map((old) => old.id == v.id ? v : old).toList();
-          setState(() {
-            _res = api.FeedSearchResponse(
-              next: _res.next.deepCopy(),
-              items: upd,
-            );
-          });
-        },
+      (items) => Column(
+        mainAxisSize: MainAxisSize.max,
+        children:
+            items
+                .map(
+                  (w) => Item(
+                    current: w,
+                    onChange: (v) {
+                      final upd =
+                          _res.items
+                              .map((old) => old.id == v.id ? v : old)
+                              .toList();
+                      setState(() {
+                        _res = api.FeedSearchResponse(
+                          next: _res.next.deepCopy(),
+                          items: upd,
+                        );
+                      });
+                    },
+                  ),
+                )
+                .toList(),
       ),
       empty: feedproto,
       overlay: _overlay,

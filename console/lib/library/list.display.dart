@@ -124,11 +124,14 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
           autofocus: true,
         ),
         children: _res.items,
-        (v) => media.RowDisplay(
-          media: v,
-          leading: [Icon(mimex.icon(v.mimetype))],
-          trailing: [media.ButtonShare(current: v)],
-          onTap: media.PlayAction(context, v),
+        flex: 1,
+        ds.Table.expanded<media.Media>(
+          (v) => media.RowDisplay(
+            media: v,
+            leading: [Icon(mimex.icon(v.mimetype))],
+            trailing: [media.ButtonShare(current: v)],
+            onTap: media.PlayAction(context, v),
+          ),
         ),
         empty: ds.FileDropWell(upload),
       ),

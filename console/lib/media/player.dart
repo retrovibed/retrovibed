@@ -67,12 +67,23 @@ class _VideoState extends State<VideoScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    // final themex = ds.Defaults.of(context);
     final m =
         player.state.playing
             ? null
             : Column(
               mainAxisSize: MainAxisSize.min,
-              children: [Expanded(child: widget.child), _resume],
+              children: [
+                Expanded(child: widget.child),
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: theme.scaffoldBackgroundColor,
+                  ),
+                  child: _resume,
+                ),
+              ],
             );
 
     return KeyboardListener(

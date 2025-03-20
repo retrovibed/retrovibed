@@ -157,22 +157,24 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
           ),
         ],
       ),
-      (v) => media.RowDisplay(
-        media: v,
-        onTap:
-            () => media.discovered
-                .download(v.id)
-                .then((v) {
-                  refresh();
-                })
-                .catchError((cause) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Failed to download: $cause")),
-                  );
-                  return null;
-                }),
-        leading: [Icon(mimex.icon(v.mimetype))],
-        trailing: [Icon(Icons.download)],
+      ds.Table.expanded<media.Media>(
+        (v) => media.RowDisplay(
+          media: v,
+          onTap:
+              () => media.discovered
+                  .download(v.id)
+                  .then((v) {
+                    refresh();
+                  })
+                  .catchError((cause) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Failed to download: $cause")),
+                    );
+                    return null;
+                  }),
+          leading: [Icon(mimex.icon(v.mimetype))],
+          trailing: [Icon(Icons.download)],
+        ),
       ),
     );
   }
