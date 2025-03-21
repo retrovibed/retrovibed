@@ -60,6 +60,12 @@ func Backlog[T any](n uint16) option[T] {
 	}
 }
 
+func Workers[T any](n uint16) option[T] {
+	return func(p *Pool[T]) {
+		p.workers = int(n)
+	}
+}
+
 func New[T any](async func(ctx context.Context, w T) error, options ...option[T]) *Pool[T] {
 	return langx.Autoptr(langx.Clone(Pool[T]{
 		workers: runtime.NumCPU(),
