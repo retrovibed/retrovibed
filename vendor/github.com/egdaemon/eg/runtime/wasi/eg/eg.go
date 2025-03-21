@@ -134,6 +134,14 @@ func Sequential(operations ...OpFn) OpFn {
 }
 
 // Run operations in parallel.
+// WARNING: currently due to limitations within wasi runtimes
+// threading isn't supported. this makes parallelism impossible
+// natively within the runtime; however some operations like executing
+// modules can be done in parallel since they are manage on the host
+// and not inside the runtime. in the future when wasi environments
+// gain threading this will automatically begin running operations
+// in parallel natively. to prevent issues in the future we shuffle
+// operations to ensure callers are not implicitly relying on order.
 func Parallel(operations ...OpFn) OpFn {
 	return func(octx context.Context, o Op) (err error) {
 		parent := prefixedop("par", o)

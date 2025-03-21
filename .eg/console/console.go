@@ -23,10 +23,9 @@ func Build(ctx context.Context, _ eg.Op) error {
 	return shell.Run(
 		ctx,
 		runtime.New("flutter create --platforms=linux ."),
-		runtime.New("go -C retrovibedbind build -buildmode=c-shared --tags no_duckdb_arrow -o ../build/lib/retrovibed.so ./..."),
+		runtime.New("go -C retrovibedbind build -buildmode=c-shared --tags no_duckdb_arrow -o ../build/flutter_assets/lib/retrovibed.so ./..."),
 		runtime.New("dart run ffigen --config ffigen.yaml"),
-		runtime.Newf("flutter build bundle"),
-		runtime.Newf("flutter build linux"),
+		runtime.Newf("flutter build linux --release"),
 	)
 }
 
@@ -65,7 +64,6 @@ func Install(ctx context.Context, op eg.Op) error {
 		runtime.Newf("cp -R %s/* %s", builddir, dstdir),
 		runtime.Newf("tree %s", builddir),
 		runtime.Newf("tree %s", dstdir),
-		runtime.New("false"),
 	)
 }
 

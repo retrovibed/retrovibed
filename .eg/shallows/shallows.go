@@ -15,8 +15,12 @@ import (
 
 var buildTags = []string{"no_duckdb_arrow"}
 
+func rootdir() string {
+	return egenv.WorkingDirectory("shallows")
+}
+
 func shellruntime() shell.Command {
-	return eggolang.Runtime().Directory(egenv.WorkingDirectory("shallows"))
+	return eggolang.Runtime().Directory(rootdir())
 }
 
 func Generate(ctx context.Context, _ eg.Op) error {
@@ -33,9 +37,6 @@ func Install(ctx context.Context, _ eg.Op) error {
 	gruntime := shellruntime()
 	return shell.Run(
 		ctx,
-		// gruntime.New("ldconfig -p | grep duckdb"),
-		// gruntime.New("ld --verbose | grep SEARCH_DIR | tr -s ' ;'"),
-		// gruntime.New("go env"),
 		gruntime.Newf("go install -tags %s ./cmd/...", strings.Join(buildTags, ",")).Environ("GOBIN", dstdir),
 	)
 }
@@ -45,6 +46,7 @@ func Compile() eg.OpFn {
 		eggolang.CompileOption.BuildOptions(
 			eggolang.Build(
 				eggolang.BuildOption.Tags(buildTags...),
+				eggolang.BuildOption.WorkingDirectory(rootdir()),
 			),
 		),
 	)
@@ -55,6 +57,7 @@ func Test() eg.OpFn {
 		eggolang.TestOption.BuildOptions(
 			eggolang.Build(
 				eggolang.BuildOption.Tags(buildTags...),
+				eggolang.BuildOption.WorkingDirectory(rootdir()),
 			),
 		),
 	),
