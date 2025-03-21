@@ -162,7 +162,7 @@ github.com/dustin/go-humanize
 # github.com/edsrzf/mmap-go v1.2.0
 ## explicit; go 1.17
 github.com/edsrzf/mmap-go
-# github.com/egdaemon/eg v0.0.0-20250321171245-6a34a42f170d
+# github.com/egdaemon/eg v0.0.0-20250321224542-12bf0441eecf
 ## explicit; go 1.23.4
 github.com/egdaemon/eg
 github.com/egdaemon/eg/backoff

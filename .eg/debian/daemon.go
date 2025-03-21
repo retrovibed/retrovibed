@@ -6,6 +6,7 @@ import (
 	"eg/compute/maintainer"
 	"embed"
 	"io/fs"
+	"time"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
@@ -38,7 +39,6 @@ func init() {
 		egdebuild.Option.Debian(errorsx.Must(fs.Sub(debskel, ".debskel"))),
 		egdebuild.Option.DependsBuild("golang-1.24", "dh-make", "debhelper", "duckdb"),
 		egdebuild.Option.Depends("duckdb"),
-		egdebuild.Option.Environ("VCS_REVISION", c.Hash.String()),
 	)
 }
 
@@ -61,10 +61,13 @@ func Runner() eg.ContainerRunner {
 }
 
 func Build(ctx context.Context, o eg.Op) error {
-	return eg.Parallel(
-		egdebuild.Build(gcfg, egdebuild.Option.Distro("jammy")),
-		egdebuild.Build(gcfg, egdebuild.Option.Distro("noble")),
-		egdebuild.Build(gcfg, egdebuild.Option.Distro("oracular")),
+	return eg.Sequential(
+		egdebuild.Build(gcfg, egdebuild.Option.Distro("oracular"), egdebuild.Option.BuildBinary(time.Minute)),
+		eg.Parallel(
+			egdebuild.Build(gcfg, egdebuild.Option.Distro("jammy")),
+			egdebuild.Build(gcfg, egdebuild.Option.Distro("noble")),
+			egdebuild.Build(gcfg, egdebuild.Option.Distro("oracular")),
+		),
 	)(ctx, o)
 }
 
