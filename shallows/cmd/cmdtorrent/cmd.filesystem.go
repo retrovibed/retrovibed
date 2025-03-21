@@ -9,6 +9,7 @@ import (
 	"github.com/retrovibed/retrovibed/internal/env"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/fsx"
+	"github.com/retrovibed/retrovibed/internal/sqlx"
 	"github.com/retrovibed/retrovibed/library"
 	"github.com/retrovibed/retrovibed/tracking"
 )
@@ -26,6 +27,8 @@ func (t importFilesystem) Run(gctx *cmdopts.Global) (err error) {
 		return err
 	}
 	defer db.Close()
+
+	log.Println("duckdb version", errorsx.Zero(sqlx.String(gctx.Context, db, "SELECT version() AS version")))
 
 	mvfs := fsx.DirVirtual(env.MediaDir())
 	tvfs := fsx.DirVirtual(env.TorrentDir())
