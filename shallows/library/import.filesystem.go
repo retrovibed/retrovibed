@@ -11,7 +11,6 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
-	"time"
 
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/retrovibed/retrovibed/internal/asynccompute"
@@ -165,9 +164,7 @@ func (t importer) Import(ctx context.Context, paths ...string) iter.Seq2[*Transf
 
 		go func() {
 			defer func() {
-				ictx, done := context.WithTimeout(context.Background(), time.Minute)
-				defer done()
-				err = errorsx.Compact(err, asynccompute.Shutdown(ictx, arena))
+				err = errorsx.Compact(err, asynccompute.Shutdown(ctx, arena))
 				close(results)
 			}()
 
