@@ -22,6 +22,7 @@ curl -L -o retrovibed.client.yml https://github.com/retrovibed/retrovibed/releas
 flatpak remote-add --if-not-exists --user flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 flatpak-builder --user --install-deps-from=flathub --install --ccache --force-clean retrovibe retrovibed.client.yml
 flatpak run --user space.retrovibe.Client
+flatpak run --command=sh --user space.retrovibe.Client
 ```
 
 ### install daemon from source
