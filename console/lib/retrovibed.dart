@@ -3,7 +3,7 @@ import 'dart:ffi';
 import 'package:ffi/ffi.dart' as ffi;
 import 'package:console/retrovibed/gen.dart' as lib;
 
-final bridge = lib.DaemonBridge(DynamicLibrary.open("build/lib/retrovibed.so"));
+final bridge = lib.DaemonBridge(DynamicLibrary.open("lib/retrovibed.so"));
 
 String bearerToken() {
   return _convertstring(bridge.authn_bearer());
