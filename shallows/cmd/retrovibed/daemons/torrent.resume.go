@@ -8,10 +8,10 @@ import (
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
-	"github.com/retrovibed/retrovibed/internal/x/errorsx"
-	"github.com/retrovibed/retrovibed/internal/x/fsx"
-	"github.com/retrovibed/retrovibed/internal/x/sqlx"
-	"github.com/retrovibed/retrovibed/internal/x/sqlxx"
+	"github.com/retrovibed/retrovibed/internal/errorsx"
+	"github.com/retrovibed/retrovibed/internal/fsx"
+	"github.com/retrovibed/retrovibed/internal/sqlx"
+	"github.com/retrovibed/retrovibed/internal/sqlxx"
 	"github.com/retrovibed/retrovibed/tracking"
 )
 

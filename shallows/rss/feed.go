@@ -1,7 +1,7 @@
 package rss
 
 import (
-	"github.com/retrovibed/retrovibed/internal/x/grpcx"
+	"github.com/retrovibed/retrovibed/internal/grpcx"
 	"github.com/retrovibed/retrovibed/tracking"
 )
 

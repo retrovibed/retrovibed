@@ -7,7 +7,7 @@ import (
 	"context"
 
 	genieql "github.com/james-lawrence/genieql/ginterp"
-	"github.com/retrovibed/retrovibed/internal/x/sqlx"
+	"github.com/retrovibed/retrovibed/internal/sqlx"
 )
 
 //easyjson:json

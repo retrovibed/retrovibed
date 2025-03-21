@@ -9,9 +9,10 @@ import (
 	"sync"
 
 	"github.com/james-lawrence/torrent/dht/krpc"
-	"github.com/retrovibed/retrovibed/internal/x/fsx"
-	"github.com/retrovibed/retrovibed/internal/x/sshx"
-	"github.com/retrovibed/retrovibed/internal/x/userx"
+	"github.com/retrovibed/retrovibed/internal/env"
+	"github.com/retrovibed/retrovibed/internal/fsx"
+	"github.com/retrovibed/retrovibed/internal/sshx"
+	"github.com/retrovibed/retrovibed/internal/userx"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -65,13 +66,9 @@ type SSHID struct {
 }
 
 func (t *SSHID) AfterApply() (err error) {
-	if t.Signer, err = sshx.AutoCached(sshx.NewKeyGen(), t.PrivateKeyPath()); err != nil {
+	if t.Signer, err = sshx.AutoCached(sshx.NewKeyGen(), env.PrivateKeyPath()); err != nil {
 		return err
 	}
 
 	return nil
-}
-
-func (t *SSHID) PrivateKeyPath() string {
-	return userx.DefaultConfigDir(userx.DefaultRelRoot(), "id")
 }

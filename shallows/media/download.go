@@ -1,7 +1,7 @@
 package media
 
 import (
-	"github.com/retrovibed/retrovibed/internal/x/langx"
+	"github.com/retrovibed/retrovibed/internal/langx"
 	"github.com/retrovibed/retrovibed/tracking"
 )
 

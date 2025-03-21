@@ -11,12 +11,12 @@ import (
 	"github.com/fsnotify/fsnotify"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/storage"
-	"github.com/retrovibed/retrovibed/internal/x/errorsx"
-	"github.com/retrovibed/retrovibed/internal/x/fsx"
-	"github.com/retrovibed/retrovibed/internal/x/langx"
-	"github.com/retrovibed/retrovibed/internal/x/slicesx"
-	"github.com/retrovibed/retrovibed/internal/x/sqlx"
-	"github.com/retrovibed/retrovibed/internal/x/userx"
+	"github.com/retrovibed/retrovibed/internal/errorsx"
+	"github.com/retrovibed/retrovibed/internal/fsx"
+	"github.com/retrovibed/retrovibed/internal/langx"
+	"github.com/retrovibed/retrovibed/internal/slicesx"
+	"github.com/retrovibed/retrovibed/internal/sqlx"
+	"github.com/retrovibed/retrovibed/internal/userx"
 	"github.com/retrovibed/retrovibed/tracking"
 )
 

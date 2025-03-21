@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"github.com/retrovibed/retrovibed/cmd/cmdopts"
-	"github.com/retrovibed/retrovibed/internal/x/md5x"
+	"github.com/retrovibed/retrovibed/internal/md5x"
 	"golang.org/x/crypto/ssh"
 )
 

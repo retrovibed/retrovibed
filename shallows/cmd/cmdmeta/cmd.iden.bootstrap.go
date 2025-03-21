@@ -8,13 +8,14 @@ import (
 	"golang.org/x/crypto/ssh"
 
 	"github.com/retrovibed/retrovibed/cmd/cmdopts"
+	"github.com/retrovibed/retrovibed/internal/env"
+	"github.com/retrovibed/retrovibed/internal/errorsx"
+	"github.com/retrovibed/retrovibed/internal/fsx"
 	"github.com/retrovibed/retrovibed/internal/huhx"
+	"github.com/retrovibed/retrovibed/internal/md5x"
 	"github.com/retrovibed/retrovibed/internal/sshx"
-	"github.com/retrovibed/retrovibed/internal/x/errorsx"
-	"github.com/retrovibed/retrovibed/internal/x/fsx"
-	"github.com/retrovibed/retrovibed/internal/x/md5x"
-	"github.com/retrovibed/retrovibed/internal/x/stringsx"
-	"github.com/retrovibed/retrovibed/internal/x/userx"
+	"github.com/retrovibed/retrovibed/internal/stringsx"
+	"github.com/retrovibed/retrovibed/internal/userx"
 )
 
 type Bootstrap struct {
@@ -53,8 +54,8 @@ func (t Bootstrap) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	if stringsx.Present(t.SSHKeyPath) && replace {
 		err := errorsx.Wrap(
 			errorsx.Compact(
-				fsx.IgnoreIsNotExist(os.Remove(id.PrivateKeyPath())),
-				os.Symlink(t.SSHKeyPath, id.PrivateKeyPath()),
+				fsx.IgnoreIsNotExist(os.Remove(env.PrivateKeyPath())),
+				os.Symlink(t.SSHKeyPath, env.PrivateKeyPath()),
 			), "unable to symlink",
 		)
 		if err != nil {
@@ -63,7 +64,7 @@ func (t Bootstrap) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	} else if replace {
 		log.Println("generating credentials with seed", t.Seed)
 		err := errorsx.Wrap(
-			fsx.IgnoreIsNotExist(os.Remove(id.PrivateKeyPath())), "unable to remove existing key",
+			fsx.IgnoreIsNotExist(os.Remove(env.PrivateKeyPath())), "unable to remove existing key",
 		)
 		if err != nil {
 			return err
@@ -72,15 +73,15 @@ func (t Bootstrap) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 
 	// unconditionally remove generated data from the private key, they'll be regenerated when necessary.
 	if err := errorsx.Compact(
-		fsx.IgnoreIsNotExist(os.Remove(id.PrivateKeyPath()+".pub")),
+		fsx.IgnoreIsNotExist(os.Remove(env.PrivateKeyPath()+".pub")),
 		fsx.IgnoreIsNotExist(os.Remove(userx.DefaultConfigDir("torrent.id"))),
 	); err != nil {
 		return err
 	}
 
-	if s, err = sshx.AutoCached(sshx.NewKeyGenSeeded(md5x.FormatString(md5x.Digest(t.Seed, "ssh"))), id.PrivateKeyPath()); err != nil {
+	if s, err = sshx.AutoCached(sshx.NewKeyGenSeeded(md5x.FormatString(md5x.Digest(t.Seed, "ssh"))), env.PrivateKeyPath()); err != nil {
 		return err
 	}
 
-	return sshx.EnsurePublicKey(s, id.PrivateKeyPath())
+	return sshx.EnsurePublicKey(s, env.PrivateKeyPath())
 }

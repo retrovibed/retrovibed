@@ -1,7 +1,7 @@
 package media
 
 import (
-	"github.com/retrovibed/retrovibed/internal/x/grpcx"
+	"github.com/retrovibed/retrovibed/internal/grpcx"
 	"github.com/retrovibed/retrovibed/library"
 	"github.com/retrovibed/retrovibed/tracking"
 )

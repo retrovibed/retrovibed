@@ -2,8 +2,8 @@ package env
 
 import (
 	"github.com/gofrs/uuid"
-	"github.com/retrovibed/retrovibed/internal/x/envx"
-	"github.com/retrovibed/retrovibed/internal/x/userx"
+	"github.com/retrovibed/retrovibed/internal/envx"
+	"github.com/retrovibed/retrovibed/internal/userx"
 )
 
 const (
@@ -31,4 +31,8 @@ func MediaDir() string {
 
 func TorrentDir() string {
 	return userx.DefaultDataDirectory(userx.DefaultRelRoot(), "torrent")
+}
+
+func PrivateKeyPath() string {
+	return userx.DefaultConfigDir(userx.DefaultRelRoot(), "id")
 }

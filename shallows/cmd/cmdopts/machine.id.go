@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/gofrs/uuid"
-	"github.com/retrovibed/retrovibed/internal/x/errorsx"
-	"github.com/retrovibed/retrovibed/internal/x/userx"
+	"github.com/retrovibed/retrovibed/internal/errorsx"
+	"github.com/retrovibed/retrovibed/internal/userx"
 )
 
 func MachineID() string {

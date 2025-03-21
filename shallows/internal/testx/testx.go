@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/gofrs/uuid"
-	"github.com/retrovibed/retrovibed/internal/x/errorsx"
+	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/stretchr/testify/require"
 )
 

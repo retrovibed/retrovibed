@@ -5,9 +5,10 @@ import (
 	"strings"
 
 	"github.com/retrovibed/retrovibed/cmd/cmdopts"
-	"github.com/retrovibed/retrovibed/internal/x/errorsx"
-	"github.com/retrovibed/retrovibed/internal/x/fsx"
-	"github.com/retrovibed/retrovibed/internal/x/stringsx"
+	"github.com/retrovibed/retrovibed/internal/env"
+	"github.com/retrovibed/retrovibed/internal/errorsx"
+	"github.com/retrovibed/retrovibed/internal/fsx"
+	"github.com/retrovibed/retrovibed/internal/stringsx"
 
 	"github.com/rymdport/portal/filechooser"
 )
@@ -29,8 +30,8 @@ func (t Bootstrap) initPrivateKey(sshdir string, id *cmdopts.SSHID) error {
 
 	return errorsx.Wrap(
 		errorsx.Compact(
-			fsx.IgnoreIsNotExist(os.Remove(id.PrivateKeyPath())),
-			os.Symlink(privpath, id.PrivateKeyPath()),
+			fsx.IgnoreIsNotExist(os.Remove(env.PrivateKeyPath())),
+			os.Symlink(privpath, env.PrivateKeyPath()),
 		), "unable to symlink",
 	)
 }

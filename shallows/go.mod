@@ -14,7 +14,7 @@ require (
 	github.com/gabriel-vasile/mimetype v1.4.8
 	github.com/go-playground/form/v4 v4.2.2
 	github.com/gofrs/uuid v4.4.0+incompatible
-	github.com/golang-jwt/jwt/v4 v4.5.1
+	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/gorilla/mux v1.8.1
 	github.com/gorilla/schema v1.4.1
 	github.com/hashicorp/mdns v1.0.6
@@ -32,6 +32,7 @@ require (
 	github.com/stretchr/testify v1.10.0
 	github.com/willabides/kongplete v0.4.0
 	golang.org/x/crypto v0.36.0
+	golang.org/x/oauth2 v0.28.0
 	golang.org/x/text v0.23.0
 	golang.org/x/time v0.11.0
 	google.golang.org/grpc v1.71.0

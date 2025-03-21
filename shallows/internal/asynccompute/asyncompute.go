@@ -5,8 +5,8 @@ import (
 	"runtime"
 	"sync"
 
-	"github.com/retrovibed/retrovibed/internal/x/contextx"
-	"github.com/retrovibed/retrovibed/internal/x/langx"
+	"github.com/retrovibed/retrovibed/internal/contextx"
+	"github.com/retrovibed/retrovibed/internal/langx"
 )
 
 // pool of workers

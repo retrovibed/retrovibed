@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/retrovibed/retrovibed/internal/x/sqlx"
-	"github.com/retrovibed/retrovibed/internal/x/squirrelx"
-	"github.com/retrovibed/retrovibed/internal/x/timex"
+	"github.com/retrovibed/retrovibed/internal/sqlx"
+	"github.com/retrovibed/retrovibed/internal/squirrelx"
+	"github.com/retrovibed/retrovibed/internal/timex"
 )
 
 func RSSOptionJSONSafeEncode(p *RSS) {

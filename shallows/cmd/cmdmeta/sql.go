@@ -9,10 +9,10 @@ import (
 	_ "github.com/marcboeker/go-duckdb"
 
 	"github.com/pressly/goose/v3"
-	"github.com/retrovibed/retrovibed/internal/x/debugx"
-	"github.com/retrovibed/retrovibed/internal/x/errorsx"
-	"github.com/retrovibed/retrovibed/internal/x/goosex"
-	"github.com/retrovibed/retrovibed/internal/x/userx"
+	"github.com/retrovibed/retrovibed/internal/debugx"
+	"github.com/retrovibed/retrovibed/internal/errorsx"
+	"github.com/retrovibed/retrovibed/internal/goosex"
+	"github.com/retrovibed/retrovibed/internal/userx"
 )
 
 //go:embed .migrations/*.sql

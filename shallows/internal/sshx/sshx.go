@@ -10,7 +10,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/retrovibed/retrovibed/internal/x/cryptox"
+	"github.com/retrovibed/retrovibed/internal/cryptox"
 	"golang.org/x/crypto/ssh"
 )
 

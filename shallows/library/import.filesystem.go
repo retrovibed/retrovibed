@@ -15,9 +15,9 @@ import (
 
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/retrovibed/retrovibed/internal/asynccompute"
-	"github.com/retrovibed/retrovibed/internal/x/errorsx"
-	"github.com/retrovibed/retrovibed/internal/x/fsx"
-	"github.com/retrovibed/retrovibed/internal/x/md5x"
+	"github.com/retrovibed/retrovibed/internal/errorsx"
+	"github.com/retrovibed/retrovibed/internal/fsx"
+	"github.com/retrovibed/retrovibed/internal/md5x"
 )
 
 const ErrIterationFailed = errorsx.String("failed to yield transferred media")

@@ -18,9 +18,9 @@ import (
 	"github.com/retrovibed/retrovibed/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/cmd/cmdtorrent"
-	"github.com/retrovibed/retrovibed/internal/x/debugx"
-	"github.com/retrovibed/retrovibed/internal/x/envx"
-	"github.com/retrovibed/retrovibed/internal/x/userx"
+	"github.com/retrovibed/retrovibed/internal/debugx"
+	"github.com/retrovibed/retrovibed/internal/envx"
+	"github.com/retrovibed/retrovibed/internal/userx"
 	"github.com/willabides/kongplete"
 
 	_ "github.com/benbjohnson/immutable"

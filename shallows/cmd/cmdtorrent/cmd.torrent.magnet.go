@@ -11,8 +11,8 @@ import (
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/bencode"
 	"github.com/retrovibed/retrovibed/cmd/cmdopts"
-	"github.com/retrovibed/retrovibed/internal/x/errorsx"
-	"github.com/retrovibed/retrovibed/internal/x/userx"
+	"github.com/retrovibed/retrovibed/internal/errorsx"
+	"github.com/retrovibed/retrovibed/internal/userx"
 )
 
 type cmdMagnet struct {

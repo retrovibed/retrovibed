@@ -5,11 +5,11 @@ import (
 
 	"github.com/Masterminds/squirrel"
 	"github.com/gofrs/uuid"
-	"github.com/retrovibed/retrovibed/internal/x/duckdbx"
-	"github.com/retrovibed/retrovibed/internal/x/langx"
-	"github.com/retrovibed/retrovibed/internal/x/sqlx"
-	"github.com/retrovibed/retrovibed/internal/x/squirrelx"
-	"github.com/retrovibed/retrovibed/internal/x/timex"
+	"github.com/retrovibed/retrovibed/internal/duckdbx"
+	"github.com/retrovibed/retrovibed/internal/langx"
+	"github.com/retrovibed/retrovibed/internal/sqlx"
+	"github.com/retrovibed/retrovibed/internal/squirrelx"
+	"github.com/retrovibed/retrovibed/internal/timex"
 )
 
 type MetadataOption = func(*Metadata)
