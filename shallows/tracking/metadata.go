@@ -35,7 +35,7 @@ func MetadataOptionFromInfo(i *metainfo.Info) func(*Metadata) {
 	return func(m *Metadata) {
 		m.Description = strings.ToValidUTF8(i.Name, "\uFFFD")
 		m.Bytes = uint64(i.TotalLength())
-		m.Private = i.Private
+		m.Private = langx.Autoderef(i.Private)
 	}
 }
 

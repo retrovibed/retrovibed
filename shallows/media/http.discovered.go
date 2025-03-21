@@ -158,7 +158,8 @@ func (t *HTTPDiscovered) upload(w http.ResponseWriter, r *http.Request) {
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
-	if info, err := meta.UnmarshalInfo(); err == nil && !info.Private {
+
+	if info, err := meta.UnmarshalInfo(); err == nil && !langx.Autoderef(info.Private) {
 		meta.AnnounceList = append(meta.AnnounceList, tracking.PublicTrackers())
 	}
 

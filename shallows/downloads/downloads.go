@@ -92,7 +92,7 @@ func (t Directory) download(ctx context.Context, path string) {
 		return
 	}
 
-	if info, err := meta.Metainfo().UnmarshalInfo(); err == nil && !info.Private {
+	if info, err := meta.Metainfo().UnmarshalInfo(); err == nil && !langx.Autoderef(info.Private) {
 		meta = meta.Merge(torrent.OptionTrackers(tracking.PublicTrackers()))
 	}
 
