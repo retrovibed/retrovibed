@@ -2,6 +2,7 @@ package shallows
 
 import (
 	"context"
+	"eg/compute/flatpakmods"
 	"eg/compute/tarballs"
 	"strings"
 
@@ -70,15 +71,7 @@ func FlatpakManifest(ctx context.Context, o eg.Op) error {
 		"space.retrovibe.Daemon", "retrovibed",
 		egflatpak.Option().SDK("org.gnome.Sdk", "47").Runtime("org.gnome.Platform", "47").
 			Modules(
-				egflatpak.NewModule("duckdb", "simple", egflatpak.ModuleOptions().Commands(
-					"cp -r . /app/lib",
-				).Sources(
-					egflatpak.SourceTarball(
-						"https://github.com/duckdb/duckdb/releases/download/v1.1.3/libduckdb-linux-amd64.zip",
-						"81199bf01b6d49941a38f426cad60e73c1ccd43f1f769a65ed8097d53fc7e40b",
-						egflatpak.SourceOptions().Destination("duckdb.zip")...,
-					),
-				)...),
+				flatpakmods.Libduckdb(),
 				egflatpak.NewModule("retrovibed", "simple", egflatpak.ModuleOptions().Commands(
 					"cp -r . /app/bin",
 				).Sources(

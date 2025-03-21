@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"eg/compute/console"
+	"eg/compute/maintainer"
 	"eg/compute/shallows"
 	"log"
 
@@ -15,7 +16,7 @@ func main() {
 	ctx, done := context.WithTimeout(context.Background(), egenv.TTL())
 	defer done()
 
-	deb := eg.Container("retrovibe.ubuntu.24.10")
+	deb := eg.Container(maintainer.Container)
 	err := eg.Perform(
 		ctx,
 		eggit.AutoClone,

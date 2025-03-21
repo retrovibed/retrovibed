@@ -2,11 +2,9 @@ package main
 
 import (
 	"context"
-	"log"
-
-	"eg/compute/console"
+	"eg/compute/debian"
 	"eg/compute/maintainer"
-	"eg/compute/shallows"
+	"log"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
@@ -22,9 +20,12 @@ func main() {
 		ctx,
 		eggit.AutoClone,
 		eg.Build(deb.BuildFromFile(".eg/Containerfile")),
-		eg.Parallel(
-			eg.Module(ctx, deb, console.Generate),
-			eg.Module(ctx, deb, shallows.Generate),
+		debian.Prepare,
+		eg.Module(
+			ctx,
+			deb,
+			debian.Build,
+			debian.Upload,
 		),
 	)
 

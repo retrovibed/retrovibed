@@ -17,7 +17,7 @@ func main() {
 	ctx, done := context.WithTimeout(context.Background(), egenv.TTL())
 	defer done()
 
-	deb := eg.Container("retrovibe.ubuntu.24.10")
+	deb := eg.Container(maintainer.Container)
 	err := eg.Perform(
 		ctx,
 		eggit.AutoClone,
@@ -42,11 +42,11 @@ func main() {
 				shallows.Compile(),
 			),
 		),
-		// eg.Parallel(
-		// 	eg.Module(ctx, deb, console.Tests),
-		// 	eg.Module(ctx, deb, console.Linting),
-		// 	eg.Module(ctx, deb, shallows.Test()),
-		// ),
+		eg.Parallel(
+			eg.Module(ctx, deb, console.Tests),
+			eg.Module(ctx, deb, console.Linting),
+			eg.Module(ctx, deb, shallows.Test()),
+		),
 		egtarball.Clean(
 			eg.Module(
 				ctx, deb,

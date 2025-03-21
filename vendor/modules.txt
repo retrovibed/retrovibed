@@ -165,6 +165,7 @@ github.com/edsrzf/mmap-go
 # github.com/egdaemon/eg v0.0.0-20250321171245-6a34a42f170d
 ## explicit; go 1.23.4
 github.com/egdaemon/eg
+github.com/egdaemon/eg/backoff
 github.com/egdaemon/eg/internal/bytesx
 github.com/egdaemon/eg/internal/coverage
 github.com/egdaemon/eg/internal/coverage/golangcov
@@ -182,6 +183,7 @@ github.com/egdaemon/eg/internal/protobuflog
 github.com/egdaemon/eg/internal/slicesx
 github.com/egdaemon/eg/internal/stringsx
 github.com/egdaemon/eg/internal/systemx
+github.com/egdaemon/eg/internal/timex
 github.com/egdaemon/eg/internal/tracex
 github.com/egdaemon/eg/internal/userx
 github.com/egdaemon/eg/interp/c8s
@@ -201,6 +203,7 @@ github.com/egdaemon/eg/runtime/wasi/egunsafe/ffigraph
 github.com/egdaemon/eg/runtime/wasi/env
 github.com/egdaemon/eg/runtime/wasi/shell
 github.com/egdaemon/eg/runtime/x/wasi/egccache
+github.com/egdaemon/eg/runtime/x/wasi/egdebuild
 github.com/egdaemon/eg/runtime/x/wasi/egflatpak
 github.com/egdaemon/eg/runtime/x/wasi/egfs
 github.com/egdaemon/eg/runtime/x/wasi/eggolang

@@ -1,0 +1,15 @@
+[Unit]
+Description=retrovibed daemon service
+After=network.target
+
+[Service]
+Restart=always
+User=retrovibed
+Group=retrovibed
+CacheDirectory=%p
+RuntimeDirectory=%p
+RuntimeDirectoryMode=0700
+ExecStart=/usr/local/bin/retrvibed daemon
+
+[Install]
+WantedBy=default.target
