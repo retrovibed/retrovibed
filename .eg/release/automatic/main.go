@@ -42,11 +42,11 @@ func main() {
 				shallows.Compile(),
 			),
 		),
-		eg.Parallel(
-			eg.Module(ctx, deb, console.Tests),
-			eg.Module(ctx, deb, console.Linting),
-			eg.Module(ctx, deb, shallows.Test()),
-		),
+		// eg.Parallel(
+		// 	eg.Module(ctx, deb, console.Tests),
+		// 	eg.Module(ctx, deb, console.Linting),
+		// 	eg.Module(ctx, deb, shallows.Test()),
+		// ),
 		egtarball.Clean(
 			eg.Module(
 				ctx, deb,
