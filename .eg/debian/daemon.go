@@ -6,7 +6,6 @@ import (
 	"eg/compute/maintainer"
 	"embed"
 	"io/fs"
-	"time"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
@@ -63,7 +62,8 @@ func Runner() eg.ContainerRunner {
 
 func Build(ctx context.Context, o eg.Op) error {
 	return eg.Sequential(
-		egdebuild.Build(gcfg, egdebuild.Option.Distro("oracular"), egdebuild.Option.BuildBinary(time.Minute)),
+		// useful for resolving build issues on ubuntu's workers
+		// egdebuild.Build(gcfg, egdebuild.Option.Distro("oracular"), egdebuild.Option.BuildBinary(time.Minute)),
 		eg.Parallel(
 			egdebuild.Build(gcfg, egdebuild.Option.Distro("jammy")),
 			egdebuild.Build(gcfg, egdebuild.Option.Distro("noble")),
