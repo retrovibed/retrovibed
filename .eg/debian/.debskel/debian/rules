@@ -22,7 +22,7 @@ override_dh_auto_build:
 	# need to set gocache otherwise it'll error out on launchpad builders
 	GOBIN="$(CURDIR)/linux/usr/bin" GOCACHE="$(CURDIR)/.gocache" GOMODCACHE="$(CURDIR)/.gomod" /usr/lib/go-1.24/bin/go env
 	cat $(CURDIR)/debian/control
-	rsync --recursive --progress $(CURDIR)/src/.dist/linux/ linux
+	cp -R $(CURDIR)/src/.dist/linux/* linux
 	cp $(CURDIR)/src/LICENSE $(CURDIR)/debian/copyright
 	GOPROXY="direct" GOCACHE="$(CURDIR)/.gocache" GOMODCACHE="$(CURDIR)/.gomod" GOBIN="$(CURDIR)/linux/usr/bin" /usr/lib/go-1.24/bin/go build -C src/shallows -mod=vendor -buildmode=pie -tags "no_duckdb_arrow" -buildvcs=false -o "$(CURDIR)/linux/usr/bin" ./cmd/retrovibed/...
 
