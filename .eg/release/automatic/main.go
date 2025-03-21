@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"eg/compute/console"
+	"eg/compute/maintainer"
 	"eg/compute/release"
 	"eg/compute/shallows"
 	"log"
