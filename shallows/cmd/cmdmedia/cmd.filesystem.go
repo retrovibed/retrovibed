@@ -21,7 +21,7 @@ import (
 type importFilesystem struct {
 	DryRun         bool     `flag:"" name:"dry-run" help:"print what files would be imported but do not actually perform the import" default:"false"`
 	DeleteOriginal bool     `flag:"" name:"delete-original" short:"d" help:"after file is copied delete the original file from the disk" default:"false"`
-	Concurrency    uint16   `flag:"" name:"dry-run" help:"number of files to transfer concurrently, defaults to the number of cpus" default:"${vars_cores}"`
+	Concurrency    uint16   `flag:"" name:"concurrency" help:"number of files to transfer concurrently, defaults to the number of cpus" default:"${vars_cores}"`
 	Paths          []string `arg:"" name:"paths" help:"files and folders to import" required:"true"`
 }
 
