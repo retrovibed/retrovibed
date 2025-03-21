@@ -23,6 +23,8 @@ func Build(ctx context.Context, _ eg.Op) error {
 	return shell.Run(
 		ctx,
 		runtime.New("flutter create --platforms=linux ."),
+		runtime.New("go -C retrovibedbind build -buildmode=c-shared -o ../build/lib/retrovibed.so"),
+		runtime.New("dart run ffigen --config ffigen.yaml"),
 		runtime.Newf("flutter build bundle"),
 		runtime.Newf("flutter build linux"),
 	)

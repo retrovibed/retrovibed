@@ -8,7 +8,6 @@ import (
 
 	"github.com/retrovibed/retrovibed/internal/debugx"
 	"github.com/retrovibed/retrovibed/internal/envx"
-	"github.com/retrovibed/retrovibed/internal/slicesx"
 )
 
 func Root() user.User {
@@ -22,7 +21,7 @@ func Root() user.User {
 // returns the relative root that should be used for all well known directories.
 func DefaultRelRoot() string {
 	const DefaultDir = "retrovibed"
-	return slicesx.FirstOrZero(filepath.Base(os.Args[0]), DefaultDir)
+	return DefaultDir
 }
 
 // CurrentUserOrDefault returns the current user or the default configured user.

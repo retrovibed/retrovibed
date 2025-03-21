@@ -148,6 +148,11 @@ github.com/charmbracelet/x/exp/strings
 # github.com/charmbracelet/x/term v0.2.1
 ## explicit; go 1.18
 github.com/charmbracelet/x/term
+# github.com/csnewman/flutter-go-bridge v0.2.0
+## explicit; go 1.20
+github.com/csnewman/flutter-go-bridge/cmd/flutter-go-bridge
+github.com/csnewman/flutter-go-bridge/generator
+github.com/csnewman/flutter-go-bridge/parser
 # github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
 ## explicit
 github.com/davecgh/go-spew/spew
@@ -295,6 +300,12 @@ github.com/hashicorp/mdns
 # github.com/huandu/xstrings v1.5.0
 ## explicit; go 1.12
 github.com/huandu/xstrings
+# github.com/iancoleman/strcase v0.3.0
+## explicit; go 1.16
+github.com/iancoleman/strcase
+# github.com/inconshreveable/mousetrap v1.1.0
+## explicit; go 1.18
+github.com/inconshreveable/mousetrap
 # github.com/jackc/pgio v1.0.0
 ## explicit; go 1.12
 github.com/jackc/pgio
@@ -357,7 +368,7 @@ github.com/james-lawrence/genieql/internal/userx
 github.com/james-lawrence/genieql/internal/wasidialect
 github.com/james-lawrence/genieql/internal/wasix/ffierrors
 github.com/james-lawrence/genieql/internal/wasix/ffiguest
-# github.com/james-lawrence/torrent v0.0.0-20250321115604-4cda48df74d2
+# github.com/james-lawrence/torrent v0.0.0-20250321125210-5cb29a0cb7aa
 ## explicit; go 1.23.0
 github.com/james-lawrence/torrent
 github.com/james-lawrence/torrent/bencode
@@ -554,6 +565,12 @@ github.com/serenize/snaker
 # github.com/sethvargo/go-retry v0.3.0
 ## explicit; go 1.21
 github.com/sethvargo/go-retry
+# github.com/spf13/cobra v1.8.1
+## explicit; go 1.15
+github.com/spf13/cobra
+# github.com/spf13/pflag v1.0.6
+## explicit; go 1.12
+github.com/spf13/pflag
 # github.com/stretchr/testify v1.10.0
 ## explicit; go 1.17
 github.com/stretchr/testify/assert

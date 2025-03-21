@@ -7,6 +7,7 @@ import (
 	"math"
 
 	"github.com/hashicorp/mdns"
+	"github.com/retrovibed/retrovibed/internal/netx"
 )
 
 func StorageProfit(users int, factor float64) float64 {
@@ -19,6 +20,8 @@ func Derp(users int, factor float64) {
 }
 
 func main() {
+
+	netx.HostIP("0.0.0.0")
 	ctx, done := context.WithCancel(context.Background())
 	// Make a channel for results and start listening
 	entriesCh := make(chan *mdns.ServiceEntry, 4)
