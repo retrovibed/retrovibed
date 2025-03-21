@@ -3,7 +3,7 @@ description: Bindings to a local daemon.
 output: "lib/retrovibed/gen.dart"
 headers:
   entry-points:
-    - "build/lib/retrovibed.h"
+    - "build/nativelib/retrovibed.h"
 compiler-opts:
   - "-I/usr/lib/clang/19/include/"
 preamble: |

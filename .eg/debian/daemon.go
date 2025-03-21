@@ -57,7 +57,7 @@ func Prepare(ctx context.Context, o eg.Op) error {
 
 // container for this package.
 func Runner() eg.ContainerRunner {
-	return eg.Container(maintainer.Container)
+	return eg.Container("retrovibe.debuild.ubuntu.24.10")
 }
 
 func Build(ctx context.Context, o eg.Op) error {
