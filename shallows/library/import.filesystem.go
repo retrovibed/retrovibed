@@ -102,7 +102,6 @@ func ImportCopyFile(vfs fsx.Virtual) ImportOp {
 		} else {
 			tx.Bytes = uint64(n)
 		}
-
 		uid := md5x.FormatString(tx.MD5)
 
 		if err := os.Remove(vfs.Path(uid)); fsx.IgnoreIsNotExist(err) != nil {
@@ -121,7 +120,19 @@ func ImportFileDryRun(ctx context.Context, path string) (*Transfered, error) {
 	return TransferedFromPath(path)
 }
 
-func ImportFilesystem(ctx context.Context, op ImportOp, paths ...string) iter.Seq2[*Transfered, error] {
+func NewImporter(op ImportOp, options ...asynccompute.Option[string]) *importer {
+	return &importer{
+		op:          op,
+		computeopts: options,
+	}
+}
+
+type importer struct {
+	op          ImportOp
+	computeopts []asynccompute.Option[string]
+}
+
+func (t importer) Import(ctx context.Context, paths ...string) iter.Seq2[*Transfered, error] {
 	return func(yield func(*Transfered, error) bool) {
 		var (
 			capture sync.Once
@@ -135,7 +146,7 @@ func ImportFilesystem(ctx context.Context, op ImportOp, paths ...string) iter.Se
 				return nil
 			}
 
-			tx, cause := op(ictx, path)
+			tx, cause := t.op(ictx, path)
 			if cause != nil {
 				capture.Do(func() {
 					err = errorsx.Compact(err, cause)
@@ -150,7 +161,7 @@ func ImportFilesystem(ctx context.Context, op ImportOp, paths ...string) iter.Se
 			case <-ictx.Done():
 				return ctx.Err()
 			}
-		})
+		}, t.computeopts...)
 
 		go func() {
 			defer func() {
@@ -207,4 +218,8 @@ func ImportFilesystem(ctx context.Context, op ImportOp, paths ...string) iter.Se
 			}
 		}
 	}
+}
+
+func ImportFilesystem(ctx context.Context, op ImportOp, paths ...string) iter.Seq2[*Transfered, error] {
+	return NewImporter(op).Import(ctx, paths...)
 }

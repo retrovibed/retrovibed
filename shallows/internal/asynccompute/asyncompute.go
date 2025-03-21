@@ -52,21 +52,29 @@ type pending[T any] struct {
 	workload  T
 }
 
-type option[T any] func(*Pool[T])
+type Option[T any] func(*Pool[T])
 
-func Backlog[T any](n uint16) option[T] {
+func Backlog[T any](n uint16) Option[T] {
 	return func(p *Pool[T]) {
 		p.queued = make(chan pending[T], n)
 	}
 }
 
-func Workers[T any](n uint16) option[T] {
+func Workers[T any](n uint16) Option[T] {
 	return func(p *Pool[T]) {
 		p.workers = int(n)
 	}
 }
 
-func New[T any](async func(ctx context.Context, w T) error, options ...option[T]) *Pool[T] {
+func Compose[T any](options ...Option[T]) Option[T] {
+	return func(p *Pool[T]) {
+		for _, opt := range options {
+			opt(p)
+		}
+	}
+}
+
+func New[T any](async func(ctx context.Context, w T) error, options ...Option[T]) *Pool[T] {
 	return langx.Autoptr(langx.Clone(Pool[T]{
 		workers: runtime.NumCPU(),
 		queued:  make(chan pending[T], runtime.NumCPU()),

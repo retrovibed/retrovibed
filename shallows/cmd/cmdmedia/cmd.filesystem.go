@@ -10,6 +10,7 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/retrovibed/retrovibed/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/cmd/cmdopts"
+	"github.com/retrovibed/retrovibed/internal/asynccompute"
 	"github.com/retrovibed/retrovibed/internal/env"
 	"github.com/retrovibed/retrovibed/internal/x/errorsx"
 	"github.com/retrovibed/retrovibed/internal/x/fsx"
@@ -20,6 +21,7 @@ import (
 type importFilesystem struct {
 	DryRun         bool     `flag:"" name:"dry-run" help:"print what files would be imported but do not actually perform the import" default:"false"`
 	DeleteOriginal bool     `flag:"" name:"delete-original" short:"d" help:"after file is copied delete the original file from the disk" default:"false"`
+	Concurrency    uint16   `flag:"" name:"dry-run" help:"number of files to transfer concurrently, defaults to the number of cpus" default:"${vars_cores}"`
 	Paths          []string `arg:"" name:"paths" help:"files and folders to import" required:"true"`
 }
 
@@ -43,7 +45,9 @@ func (t importFilesystem) Run(gctx *cmdopts.Global) (err error) {
 		op = library.ImportCopyFile(vfs)
 	}
 
-	for tx, cause := range library.ImportFilesystem(gctx.Context, op, t.Paths...) {
+	imp := library.NewImporter(op, asynccompute.Workers[string](t.Concurrency))
+
+	for tx, cause := range imp.Import(gctx.Context, t.Paths...) {
 		if cause != nil {
 			log.Println(cause)
 			err = errorsx.Compact(err, cause)

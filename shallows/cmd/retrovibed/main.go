@@ -6,6 +6,8 @@ import (
 	"net"
 	"os"
 	"reflect"
+	"runtime"
+	"strconv"
 	"sync"
 	"syscall"
 	"time"
@@ -75,6 +77,7 @@ func main() {
 		kong.Vars{
 			"vars_timestamp_started": time.Now().UTC().Format(time.RFC3339),
 			"vars_random_seed":       uuid.Must(uuid.NewV4()).String(),
+			"vars_cores":             strconv.Itoa(runtime.NumCPU()),
 		},
 		kong.UsageOnError(),
 		kong.Bind(
