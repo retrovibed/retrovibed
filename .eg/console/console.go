@@ -4,6 +4,7 @@ import (
 	"context"
 	"eg/compute/tarballs"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
@@ -24,8 +25,7 @@ func Build(ctx context.Context, _ eg.Op) error {
 		ctx,
 		runtime.New("flutter create --platforms=linux ."),
 		runtime.Newf("flutter build linux --release"),
-		runtime.New("go -C retrovibedbind build -buildmode=c-shared --tags no_duckdb_arrow -o ../build/linux/x64/release/bundle/lib/retrovibed.so ./..."),
-		runtime.New("go -C retrovibedbind build -buildmode=c-shared --tags no_duckdb_arrow -o ../build/linux/x64/debug/bundle/lib/retrovibed.so ./..."),
+		runtime.New("go -C retrovibedbind build -buildmode=c-shared --tags no_duckdb_arrow -o ../build/nativelib/retrovibed.so ./..."),
 	)
 }
 
@@ -50,21 +50,22 @@ func Generate(ctx context.Context, _ eg.Op) error {
 		ctx,
 		shell.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib/media -I.proto .proto/media.proto"),
 		shell.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib/rss -I.proto .proto/rss.proto"),
-		shell.New("dart run ffigen --config ffigen.yaml"),
+		shell.New("dart run ffigen --config ffigen.yaml").Directory(egenv.WorkingDirectory("console")),
 	)
 }
 
 func Install(ctx context.Context, op eg.Op) error {
 	runtime := shell.Runtime()
 	dstdir := egtarball.Path(tarballs.Retrovibed())
-	builddir := egenv.WorkingDirectory("console", "build", egfs.FindFirst(os.DirFS(egenv.WorkingDirectory("console", "build")), "bundle"))
-
+	builddir := egenv.WorkingDirectory("console", "build")
+	bundledir := filepath.Join(builddir, egfs.FindFirst(os.DirFS(builddir), "bundle"))
+	libdir := filepath.Join(builddir, "nativelib")
 	return shell.Run(
 		ctx,
 		runtime.Newf("mkdir -p %s", dstdir),
-		runtime.Newf("cp -R %s/* %s", builddir, dstdir),
-		runtime.Newf("tree %s", builddir),
 		runtime.Newf("tree %s", dstdir),
+		runtime.Newf("cp -R %s/* %s", bundledir, dstdir),
+		runtime.Newf("cp -R %s/* %s/lib", libdir, dstdir),
 	)
 }
 

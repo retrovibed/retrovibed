@@ -33,12 +33,11 @@ func ips() *C.char {
 
 //export daemon
 func daemon(jsonargs *C.char) {
-	log.Println("DERP DERP", cmdglobalmain.Hostname())
 	var args []string
 	if err := json.Unmarshal([]byte(C.GoString(jsonargs)), &args); err != nil {
 		log.Fatalln(err)
 	}
-	log.Println("DERP DERP", args)
+
 	go cmdglobalmain.Main(args...)
 }
 
