@@ -1,9 +1,19 @@
 import 'dart:convert';
 import 'dart:ffi';
+import 'dart:io';
 import 'package:ffi/ffi.dart' as ffi;
 import 'package:console/retrovibed/gen.dart' as lib;
 
-final bridge = lib.DaemonBridge(DynamicLibrary.open("lib/retrovibed.so"));
+String _path() {
+  final files = [
+    File("lib/retrovibed.so"),
+    File("bundle/nativelib/retrovibed.so"),
+  ];
+
+  return files.firstWhere((v) => v.existsSync()).path;
+}
+
+final bridge = lib.DaemonBridge(DynamicLibrary.open(_path()));
 
 String bearerToken() {
   return _convertstring(bridge.authn_bearer());
