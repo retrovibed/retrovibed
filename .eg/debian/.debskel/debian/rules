@@ -21,8 +21,6 @@ override_dh_auto_build:
 	mkdir -p $(CURDIR)/linux/usr/bin
 	# need to set gocache otherwise it'll error out on launchpad builders
 	GOBIN="$(CURDIR)/linux/usr/bin" GOCACHE="$(CURDIR)/.gocache" GOMODCACHE="$(CURDIR)/.gomod" /usr/lib/go-1.24/bin/go env
-	tree -L 2 $(CURDIR)
-	tree $(CURDIR)/debian
 	cat $(CURDIR)/debian/control
 	rsync --recursive --progress $(CURDIR)/src/.dist/linux/ linux
 	cp $(CURDIR)/src/LICENSE $(CURDIR)/debian/copyright
