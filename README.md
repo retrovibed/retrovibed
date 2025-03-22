@@ -18,7 +18,7 @@ RETROVIBED_TORRENT_AUTO_DISCOVERY=false
 RETROVIBED_TORRENT_AUTO_BOOTSTRAP=false
 EOF
 
-systemctl restart retrovibed.service
+systemctl enable --now retrovibed.service
 ```
 
 #### install flatpak daemon
