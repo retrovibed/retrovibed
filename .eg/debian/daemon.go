@@ -64,6 +64,7 @@ func Build(ctx context.Context, o eg.Op) error {
 	return eg.Sequential(
 		// useful for resolving build issues on ubuntu's workers
 		// egdebuild.Build(gcfg, egdebuild.Option.Distro("oracular"), egdebuild.Option.BuildBinary(time.Minute)),
+		// shell.Op(shell.New("false")),
 		eg.Parallel(
 			egdebuild.Build(gcfg, egdebuild.Option.Distro("jammy")),
 			egdebuild.Build(gcfg, egdebuild.Option.Distro("noble")),

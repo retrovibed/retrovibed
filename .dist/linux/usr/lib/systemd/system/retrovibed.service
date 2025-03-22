@@ -9,7 +9,8 @@ Group=retrovibed
 CacheDirectory=%p
 RuntimeDirectory=%p
 RuntimeDirectoryMode=0700
-ExecStart=/usr/local/bin/retrvibed daemon
+EnvironmentFile=-/etc/retrovibed/config.env
+ExecStart=/usr/bin/retrvibed daemon
 
 [Install]
 WantedBy=default.target

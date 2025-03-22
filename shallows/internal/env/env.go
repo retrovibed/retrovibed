@@ -8,17 +8,22 @@ import (
 
 const (
 	// percentage of requests that should fail.
-	ChaosRate = "SHALLOWS_CHAOS_RATE"
+	ChaosRate = "RETROVIBED_CHAOS_RATE"
 
 	// health code config
-	HTTPHealthzProbability = "SHALLOWS_PROBABILITY"
-	HTTPHealthzCode        = "SHALLOWS_HEALTHZ_CODE"
+	HTTPHealthzProbability = "RETROVIBED_PROBABILITY"
+	HTTPHealthzCode        = "RETROVIBED_HEALTHZ_CODE"
 
 	// TLS pem location.
-	DaemonTLSPEM = "SHALLOWS_TLS_PEM"
+	DaemonTLSPEM = "RETROVIBED_TLS_PEM"
 	// JWTSharedSecret shared secret between the applications, used to encrypt data.
 	// and sign messages.
-	JWTSharedSecret = "SHALLOWS_JWT_SECRET"
+	JWTSharedSecret = "RETROVIBED_JWT_SECRET"
+
+	// enable multicast service discovery
+	MDNSEnabled   = "RETROVIBED_MDNS_ENABLED"           // enable/disable multicast dns registration, allows for the frontend to automatically find daemons on the local network.
+	AutoDiscovery = "RETROVIBED_TORRENT_AUTO_DISCOVERY" // enable/disable automatically discovering torrents from peers.
+	AutoBootstrap = "RETROVIBED_TORRENT_AUTO_BOOTSTRAP" // enable/disable the predefined set of public swarms to bootstrap from
 )
 
 func JWTSecret() []byte {

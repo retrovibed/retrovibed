@@ -20,6 +20,7 @@ import (
 	"github.com/retrovibed/retrovibed/cmd/cmdtorrent"
 	"github.com/retrovibed/retrovibed/cmd/retrovibed/daemons"
 	"github.com/retrovibed/retrovibed/internal/debugx"
+	"github.com/retrovibed/retrovibed/internal/env"
 	"github.com/retrovibed/retrovibed/internal/envx"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/stringsx"
@@ -85,6 +86,9 @@ func Main(args ...string) {
 			"vars_timestamp_started": time.Now().UTC().Format(time.RFC3339),
 			"vars_random_seed":       uuid.Must(uuid.NewV4()).String(),
 			"vars_cores":             strconv.Itoa(runtime.NumCPU()),
+			"env_mdns_enabled":       env.MDNSEnabled,
+			"env_auto_bootstrap":     env.AutoBootstrap,
+			"env_auto_discovery":     env.AutoDiscovery,
 		},
 		kong.UsageOnError(),
 		kong.Bind(

@@ -40,9 +40,9 @@ import (
 )
 
 type Command struct {
-	DisableMDNS   bool             `flag:"" name:"no-mdns" help:"disable the multicast dns service" default:"false"`
-	AutoBootstrap bool             `flag:"" name:"auto-bootstrap" help:"bootstrap from a predefined set of peers" default:"false"`
-	AutoDiscovery bool             `flag:"" name:"auto-discovery" help:"enable autodiscovery of content from peers" default:"false"`
+	DisableMDNS   bool             `flag:"" name:"no-mdns" help:"disable the multicast dns service" default:"false" env:"${env_mdns_enabled}"`
+	AutoBootstrap bool             `flag:"" name:"auto-bootstrap" help:"bootstrap from a predefined set of peers" default:"false" env:"${env_auto_bootstrap}"`
+	AutoDiscovery bool             `flag:"" name:"auto-discovery" help:"enable autodiscovery of content from peers" default:"false" env:"${env_auto_discovery}"`
 	HTTP          cmdopts.Listener `flag:"" name:"http-address" help:"address to serve daemon api from" default:"tcp://:9998"`
 }
 
