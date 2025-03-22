@@ -9,9 +9,7 @@ with the world and has allows users to sign up for at cost cloud backup function
 ```bash
 add-apt-repository ppa:jljatone/retrovibed
 apt-get update && apt-get install retrovibed
-```
 
-```bash
 # /etc/retrovibed/config.env has documentation
 # around the available settings.
 cat | tee -a /etc/retrovibed/config.env << EOF
