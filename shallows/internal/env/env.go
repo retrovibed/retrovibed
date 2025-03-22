@@ -21,7 +21,7 @@ const (
 	JWTSharedSecret = "RETROVIBED_JWT_SECRET"
 
 	// enable multicast service discovery
-	MDNSEnabled   = "RETROVIBED_MDNS_ENABLED"           // enable/disable multicast dns registration, allows for the frontend to automatically find daemons on the local network.
+	MDNSDisabled  = "RETROVIBED_MDNS_DISABLED"          // enable/disable multicast dns registration, allows for the frontend to automatically find daemons on the local network.
 	AutoDiscovery = "RETROVIBED_TORRENT_AUTO_DISCOVERY" // enable/disable automatically discovering torrents from peers.
 	AutoBootstrap = "RETROVIBED_TORRENT_AUTO_BOOTSTRAP" // enable/disable the predefined set of public swarms to bootstrap from
 )

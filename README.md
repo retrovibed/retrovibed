@@ -2,7 +2,26 @@
 
 retrovibe is a personal digital archiving and distribution platform built designed to make digital distribution
 user friendly and easy to manage. It provides the ability to manage and share content within a personal library
-with the world and has an optional at cost cloud backup functionality.
+with the world and has allows users to sign up for at cost cloud backup functionality.
+
+#### install deb daemon
+
+```bash
+add-apt-repository ppa:jljatone/retrovibed
+apt-get update && apt-get install retrovibed
+```
+
+```bash
+# /etc/retrovibed/config.env has documentation
+# around the available settings.
+cat | tee -a /etc/retrovibed/config.env << EOF
+RETROVIBED_MDNS_DISABLED=true
+RETROVIBED_TORRENT_AUTO_DISCOVERY=false
+RETROVIBED_TORRENT_AUTO_BOOTSTRAP=false
+EOF
+
+systemctl restart retrovibed.service
+```
 
 #### install flatpak daemon
 
@@ -14,6 +33,12 @@ flatpak-builder --user --install-deps-from=flathub --install --ccache --force-cl
 flatpak run --user space.retrovibe.Daemon
 ```
 
+### install daemon from source
+
+```bash
+go install -tags no_duckdb_arrow github.com/retrovibed/retrovibed/shallows/cmd/retrovibed/...
+```
+
 #### install flatpak gui
 
 ```bash
@@ -23,10 +48,4 @@ flatpak remote-add --if-not-exists --user flathub https://dl.flathub.org/repo/fl
 flatpak-builder --user --install-deps-from=flathub --install --ccache --force-clean retrovibe retrovibed.client.yml
 flatpak run --user space.retrovibe.Client
 flatpak run --command=sh --user space.retrovibe.Client
-```
-
-### install daemon from source
-
-```bash
-go install -tags no_duckdb_arrow github.com/retrovibed/retrovibed/shallows/cmd/retrovibed/...
 ```

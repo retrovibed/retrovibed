@@ -16,7 +16,7 @@ func MachineID() string {
 		raw []byte
 	)
 
-	midpath := filepath.Join(userx.DefaultCacheDirectory(), "machine-id")
+	midpath := filepath.Join(userx.DefaultCacheDirectory(), userx.DefaultRelRoot(), "machine-id")
 
 	if err = os.MkdirAll(filepath.Dir(midpath), 0700); err != nil {
 		panic(errorsx.Wrapf(err, "unable to ensure cache directory for machine id %s", midpath))

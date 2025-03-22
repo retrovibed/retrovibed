@@ -6,11 +6,12 @@ After=network.target
 Restart=always
 User=retrovibed
 Group=retrovibed
-CacheDirectory=%p
+CacheDirectory=%h/.cache/%p
+ConfigurationDirectory=%h/.config/%p
 RuntimeDirectory=%p
 RuntimeDirectoryMode=0700
 EnvironmentFile=-/etc/retrovibed/config.env
-ExecStart=/usr/bin/retrvibed daemon
+ExecStart=/usr/bin/retrovibed daemon
 
 [Install]
 WantedBy=default.target
