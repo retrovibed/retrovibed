@@ -86,7 +86,7 @@ func Main(args ...string) {
 			"vars_timestamp_started": time.Now().UTC().Format(time.RFC3339),
 			"vars_random_seed":       uuid.Must(uuid.NewV4()).String(),
 			"vars_cores":             strconv.Itoa(runtime.NumCPU()),
-			"env_mdns_enabled":       env.MDNSEnabled,
+			"env_mdns_disabled":      env.MDNSDisabled,
 			"env_auto_bootstrap":     env.AutoBootstrap,
 			"env_auto_discovery":     env.AutoDiscovery,
 		},

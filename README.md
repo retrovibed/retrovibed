@@ -15,7 +15,7 @@ apt-get update && apt-get install retrovibed
 # /etc/retrovibed/config.env has documentation
 # around the available settings.
 cat | tee -a /etc/retrovibed/config.env << EOF
-RETROVIBED_MDNS_ENABLED=false
+RETROVIBED_MDNS_DISABLED=true
 RETROVIBED_TORRENT_AUTO_DISCOVERY=false
 RETROVIBED_TORRENT_AUTO_BOOTSTRAP=false
 EOF
