@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 
@@ -70,6 +71,7 @@ func ImportTorrent(q sqlx.Queryer, mvfs, tvfs fsx.Virtual) library.ImportOp {
 			if err := library.MetadataAssociateTorrent(ctx, q, slicesx.LastOrZero(finfo.Path...), tmd.ID).Scan(&lmd); sqlx.IgnoreNoRows(err) != nil {
 				return nil, errorsx.Wrap(err, "unable to retrieve metadata")
 			} else if sqlx.ErrNoRows(err) != nil {
+				log.Println("unable to match", tmd.ID, finfo.Path, slicesx.LastOrZero(finfo.Path...), "with a torrent")
 				// ignore we can't associate
 				continue
 			}

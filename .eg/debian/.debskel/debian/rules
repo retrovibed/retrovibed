@@ -28,7 +28,8 @@ override_dh_auto_build:
 
 override_dh_auto_test:
 	echo "DH AUTO TEST OVERRIDE"
-	CACHE_DIRECTORY="$(CURDIR)" $(CURDIR)/linux/usr/bin/retrovibed version
+	# version command causes a directory to be created. need to prevent that.
+	# CACHE_DIRECTORY="$(CURDIR)" $(CURDIR)/linux/usr/bin/retrovibed version
 
 
 override_dh_dwz:
