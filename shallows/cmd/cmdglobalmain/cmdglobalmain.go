@@ -108,7 +108,7 @@ func Main(args ...string) {
 	// Run kongplete.Complete to handle completion requests
 	kongplete.Complete(parser)
 
-	if ctx, err = parser.Parse(args); cmdopts.ReportError(err) != nil {
+	if ctx, err = parser.Parse(args); err != nil {
 		log.Fatalln(err)
 	}
 
