@@ -13,7 +13,7 @@ require (
 	github.com/fsnotify/fsnotify v1.8.0
 	github.com/gabriel-vasile/mimetype v1.4.8
 	github.com/go-playground/form/v4 v4.2.2
-	github.com/gofrs/uuid v4.4.0+incompatible
+	github.com/gofrs/uuid/v5 v5.3.1
 	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/gorilla/mux v1.8.1
 	github.com/gorilla/schema v1.4.1
@@ -123,6 +123,7 @@ require (
 
 require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
+	github.com/go-faker/faker/v4 v4.6.0
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect

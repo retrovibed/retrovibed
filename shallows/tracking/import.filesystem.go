@@ -71,7 +71,7 @@ func ImportTorrent(q sqlx.Queryer, mvfs, tvfs fsx.Virtual) library.ImportOp {
 			if err := library.MetadataAssociateTorrent(ctx, q, slicesx.LastOrZero(finfo.Path...), tmd.ID).Scan(&lmd); sqlx.IgnoreNoRows(err) != nil {
 				return nil, errorsx.Wrap(err, "unable to retrieve metadata")
 			} else if sqlx.ErrNoRows(err) != nil {
-				log.Println("unable to match", tmd.ID, finfo.Path, slicesx.LastOrZero(finfo.Path...), "with a torrent")
+				log.Println("unable to match", tmd.ID, finfo.Path, slicesx.LastOrZero(finfo.Path...), "with existing media")
 				// ignore we can't associate
 				continue
 			}
@@ -79,6 +79,10 @@ func ImportTorrent(q sqlx.Queryer, mvfs, tvfs fsx.Virtual) library.ImportOp {
 			dstp := tvfs.Path(uid, filepath.Join(finfo.Path...))
 			if err := os.MkdirAll(filepath.Dir(dstp), 0700); err != nil {
 				return nil, errorsx.Wrap(err, "unable to create torrent file")
+			}
+
+			if err := fsx.RemoveSymlink(dstp); err != nil {
+				return nil, errorsx.WithStack(err)
 			}
 
 			if err := os.Symlink(mvfs.Path(lmd.ID), dstp); err != nil {

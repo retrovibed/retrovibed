@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/stretchr/testify/require"
 )
@@ -67,10 +67,6 @@ func IOBytes(in io.Reader) []byte {
 	return errorsx.Must(io.ReadAll(in))
 }
 
-func Context(t *testing.T) (context.Context, context.CancelFunc) {
-	if deadline, ok := t.Deadline(); ok {
-		return context.WithDeadline(context.Background(), deadline)
-	}
-
-	return context.WithCancel(context.Background())
+func Context(t testing.TB) (context.Context, context.CancelFunc) {
+	return context.WithCancel(t.Context())
 }

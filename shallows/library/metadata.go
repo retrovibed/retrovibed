@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/internal/duckdbx"
 	"github.com/retrovibed/retrovibed/internal/langx"
 	"github.com/retrovibed/retrovibed/internal/sqlx"
@@ -51,6 +51,12 @@ func MetadataOptionJSONSafeEncode(p *Metadata) {
 	p.UpdatedAt = timex.RFC3339NanoEncode(p.UpdatedAt)
 	p.HiddenAt = timex.RFC3339NanoEncode(p.HiddenAt)
 	p.TombstonedAt = timex.RFC3339NanoEncode(p.TombstonedAt)
+}
+
+func MetadataOptionTestDefaults(p *Metadata) {
+	p.ID = uuid.Nil.String()
+	p.ArchiveID = uuid.Nil.String()
+	p.TorrentID = uuid.Nil.String()
 }
 
 func NewMetadata(id string, options ...func(*Metadata)) (m Metadata) {

@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/alecthomas/kong"
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/cmd/cmdmedia"
 	"github.com/retrovibed/retrovibed/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/cmd/cmdopts"

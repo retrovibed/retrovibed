@@ -71,6 +71,19 @@ func IsRegularFile(path string) bool {
 	return true
 }
 
+func RemoveSymlink(path string) error {
+	info, err := os.Stat(path)
+	if IgnoreIsNotExist(err) != nil {
+		return err
+	}
+
+	if info.Mode().Type()&fs.ModeSymlink != fs.ModeSymlink {
+		return fmt.Errorf("unable to remove non-symlink file: %s", path)
+	}
+
+	return os.Remove(path)
+}
+
 type Virtual interface {
 	// returns the path rooted at the virtual fs from the fragments.
 	Path(rel ...string) string
