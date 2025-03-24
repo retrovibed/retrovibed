@@ -212,7 +212,7 @@ func (t *HTTPLibrary) search(w http.ResponseWriter, r *http.Request) {
 	q := library.MetadataSearchBuilder().Where(squirrel.And{
 		library.MetadataQueryVisible(),
 		library.MetadataQuerySearch(msg.Next.Query, "description"),
-	}).OrderBy("description DESC").Offset(msg.Next.Offset * msg.Next.Limit).Limit(msg.Next.Limit)
+	}).OrderBy("description ASC").Offset(msg.Next.Offset * msg.Next.Limit).Limit(msg.Next.Limit)
 
 	err = sqlxx.ScanEach(library.MetadataSearch(r.Context(), t.q, q), func(p *library.Metadata) error {
 		tmp := langx.Clone(Media{}, MediaOptionFromLibraryMetadata(langx.Clone(*p, library.MetadataOptionJSONSafeEncode)))
