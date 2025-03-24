@@ -9,6 +9,8 @@ class SearchTray extends StatelessWidget {
   final fixnum.Int64 current;
   final bool empty;
   final bool autofocus;
+  final TextEditingController? controller;
+  final FocusNode? focus;
 
   SearchTray({
     super.key,
@@ -18,6 +20,8 @@ class SearchTray extends StatelessWidget {
     required this.empty,
     this.trailing = const SizedBox(),
     this.autofocus = false,
+    this.controller,
+    this.focus,
   });
 
   @override
@@ -30,8 +34,10 @@ class SearchTray extends StatelessWidget {
         children: [
           Expanded(
             child: TextField(
-              decoration: InputDecoration(hintText: "search your library"),
+              controller: controller,
+              decoration: InputDecoration(hintText: "search the library"),
               autofocus: autofocus,
+              focusNode: focus,
               onSubmitted: onSubmitted,
             ),
           ),

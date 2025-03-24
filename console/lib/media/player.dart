@@ -1,12 +1,14 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:media_kit/media_kit.dart'; // Provides [Player], [Media], [Playlist] etc.
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:console/designkit.dart' as ds;
 
 class VideoScreen extends StatefulWidget {
   final Widget child;
-  const VideoScreen(this.child, {Key? key}) : super(key: key);
+  final Player player;
+  const VideoScreen(this.child, this.player, {Key? key}) : super(key: key);
+
   static _VideoState? of(BuildContext context) {
     return context.findAncestorStateOfType<_VideoState>();
   }
@@ -16,32 +18,35 @@ class VideoScreen extends StatefulWidget {
 }
 
 class _VideoState extends State<VideoScreen> {
-  final FocusNode _focusNode = FocusNode();
   Widget _resume = SizedBox();
 
-  // Create a [Player] to control playback.
-  final player = Player();
-
   // Create a [VideoController] to handle video output from [Player].
-  late final controller = VideoController(player);
+  late final controller = VideoController(widget.player);
+  late final StreamSubscription<bool> subscription;
 
   void add(Media m) {
-    player.add(m).then((v) {
-      player.next();
+    widget.player.add(m).then((v) {
+      widget.player.next();
     });
   }
 
   @override
   void initState() {
     super.initState();
-    player.stream.playing.listen((state) {
+    subscription = widget.player.stream.playing.listen((state) {
       Widget resumew = SizedBox();
-      if (player.state.playlist.medias.length > 0) {
-        final _m = player.state.playlist.medias[player.state.playlist.index];
+
+      if (widget.player.state.playlist.medias.length > 0) {
+        final _m =
+            widget.player.state.playlist.medias[widget
+                .player
+                .state
+                .playlist
+                .index];
         final _title = _m.extras?["title"] ?? "";
         resumew = IconButton(
           onPressed: () {
-            player.play();
+            widget.player.play();
           },
           icon: Row(
             spacing: 10.0,
@@ -54,6 +59,7 @@ class _VideoState extends State<VideoScreen> {
       }
 
       setState(() {
+        if (!super.mounted) return;
         _resume = resumew;
       });
     });
@@ -61,20 +67,31 @@ class _VideoState extends State<VideoScreen> {
 
   @override
   void dispose() {
-    player.dispose();
+    subscription.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final themex = ds.Defaults.of(context);
+
     final m =
-        player.state.playing
-            ? null
+        widget.player.state.playing
+            ? SizedBox()
             : Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Expanded(child: widget.child),
+                Expanded(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: theme.scaffoldBackgroundColor.withValues(
+                        alpha: themex.opaque?.a ?? 0.0,
+                      ),
+                    ),
+                    child: widget.child,
+                  ),
+                ),
                 DecoratedBox(
                   decoration: BoxDecoration(
                     color: theme.scaffoldBackgroundColor,
@@ -84,20 +101,8 @@ class _VideoState extends State<VideoScreen> {
               ],
             );
 
-    return KeyboardListener(
-      focusNode: _focusNode,
-      autofocus: player.state.playing,
-      onKeyEvent: (event) {
-        if (event is KeyDownEvent) {
-          if (event.logicalKey == LogicalKeyboardKey.space) {
-            player.playOrPause();
-          }
-        }
-      },
-      child: ds.Overlay(
-        child: ds.Full(Center(child: Video(controller: controller))),
-        overlay: m,
-      ),
+    return Stack(
+      children: [ds.Full(Center(child: Video(controller: controller))), m],
     );
   }
 }

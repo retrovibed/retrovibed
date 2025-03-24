@@ -9,10 +9,14 @@ import './search.row.dart';
 class AvailableListDisplay extends StatefulWidget {
   final media.FnMediaSearch search;
   final media.FnUploadRequest upload;
+  final TextEditingController? controller;
+  final FocusNode? focus;
   const AvailableListDisplay({
     super.key,
     this.search = media.media.get,
     this.upload = media.media.upload,
+    this.controller,
+    this.focus,
   });
 
   @override
@@ -34,6 +38,15 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
           setState(() {
             _res = v;
             _loading = false;
+          });
+
+          widget.focus?.requestFocus();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            final controller = widget.controller;
+            if (controller == null) return;
+            controller.selection = TextSelection.fromPosition(
+              TextPosition(offset: controller.text.length),
+            );
           });
         })
         .catchError((e) {
@@ -99,6 +112,8 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
         loading: _loading,
         cause: _cause,
         leading: SearchTray(
+          controller: widget.controller,
+          focus: widget.focus,
           onSubmitted: (v) {
             setState(() {
               _res.next.query = v;

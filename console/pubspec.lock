@@ -363,11 +363,12 @@ packages:
   media_kit_video:
     dependency: "direct main"
     description:
-      name: media_kit_video
-      sha256: "2cc3b966679963ba25a4ce5b771e532a521ebde7c6aa20e9802bec95d9916c8f"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.2.5"
+      path: media_kit_video
+      ref: "james.lawrence/regain-focus-when-playing"
+      resolved-ref: c7d36efca609baf70624b4121612036c195716fe
+      url: "https://github.com/james-lawrence/media-kit.git"
+    source: git
+    version: "1.2.3"
   meta:
     dependency: transitive
     description:

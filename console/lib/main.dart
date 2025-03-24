@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:media_kit/media_kit.dart'; // Provides [Player], [Media], [Playlist] etc.
 import 'package:console/downloads.dart' as downloads;
 import 'package:console/settings.dart' as settings;
@@ -53,7 +54,7 @@ class MyApp extends StatelessWidget {
       home: Material(
         child: ds.Full(
           mdns.MDNSDiscovery(
-            media.VideoScreen(
+            media.Playlist(
               DefaultTabController(
                 length: 3,
                 child: Scaffold(
@@ -66,7 +67,17 @@ class MyApp extends StatelessWidget {
                   ),
                   body: TabBarView(
                     children: [
-                      ds.ErrorBoundary(medialib.AvailableListDisplay()),
+                      ds.ErrorBoundary(
+                        media.Playlist.wrap((ctx, s) {
+                          return media.VideoScreen(
+                            medialib.AvailableListDisplay(
+                              focus: s.searchfocus,
+                              controller: s.controller,
+                            ),
+                            s.player,
+                          );
+                        }),
+                      ),
                       ds.ErrorBoundary(downloads.Display()),
                       ds.ErrorBoundary(settings.Display()),
                     ],
