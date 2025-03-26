@@ -2,7 +2,6 @@ package console
 
 import (
 	"context"
-	"eg/compute/errorsx"
 	"eg/compute/flatpakmods"
 	"eg/compute/tarballs"
 	"os"
@@ -19,16 +18,17 @@ import (
 )
 
 func flutterRuntime() shell.Command {
-	return shell.Runtime().Directory(egenv.WorkingDirectory("console")).EnvironFrom(errorsx.Must(eggolang.Env())...).Environ("PUB_CACHE", egenv.CacheDirectory(".eg", "dart"))
+	return shell.Runtime().Directory(egenv.WorkingDirectory("console")).EnvironFrom(eggolang.Env()...).Environ("PUB_CACHE", egenv.CacheDirectory(".eg", "dart"))
 }
 
 func Build(ctx context.Context, _ eg.Op) error {
 	runtime := flutterRuntime()
 	return shell.Run(
 		ctx,
-		runtime.New("flutter create --platforms=linux ."),
-		runtime.Newf("flutter build linux --release"),
 		runtime.New("go -C retrovibedbind build -buildmode=c-shared --tags no_duckdb_arrow -o ../build/nativelib/retrovibed.so ./..."),
+		runtime.New("dart run ffigen --config ffigen.yaml"),
+		runtime.New("flutter create --platforms=linux ."),
+		runtime.New("flutter build linux --release lib/main.dart").Debug(),
 	)
 }
 
@@ -49,11 +49,12 @@ func Linting(ctx context.Context, _ eg.Op) error {
 }
 
 func Generate(ctx context.Context, _ eg.Op) error {
+	runtime := flutterRuntime()
 	return shell.Run(
 		ctx,
 		shell.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib/media -I.proto .proto/media.proto"),
 		shell.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib/rss -I.proto .proto/rss.proto"),
-		shell.New("dart run ffigen --config ffigen.yaml").Directory(egenv.WorkingDirectory("console")),
+		runtime.New("flutter pub get"),
 	)
 }
 
@@ -66,9 +67,9 @@ func Install(ctx context.Context, op eg.Op) error {
 	return shell.Run(
 		ctx,
 		runtime.Newf("mkdir -p %s", dstdir),
-		runtime.Newf("tree %s", dstdir),
 		runtime.Newf("cp -R %s/* %s", bundledir, dstdir),
 		runtime.Newf("cp -R %s/* %s/lib", libdir, dstdir),
+		// runtime.Newf("tree %s", dstdir),
 	)
 }
 

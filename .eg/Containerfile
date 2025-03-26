@@ -28,7 +28,8 @@ RUN sudo -H -S -u egd -g egd flutter --disable-analytics
 RUN sudo -H -S -u egd -g egd dart pub global activate protoc_plugin
 
 # install genieql and golang's protocol buffers plugin
-RUN GOBIN="/usr/local/bin" go install -tags genieql.duckdb,no_duckdb_arrow github.com/james-lawrence/genieql/...@latest
+RUN echo "cache buster 059a9a06-1686-4f49-9a7f-a30535886d54"
+RUN GOBIN="/usr/local/bin" GOPROXY=direct go install -tags genieql.duckdb,no_duckdb_arrow github.com/james-lawrence/genieql/...@latest
 RUN GOBIN="/usr/local/bin" go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 
 RUN apt-get -y install tree flatpak-builder libmpv-dev

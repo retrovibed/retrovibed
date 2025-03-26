@@ -3,8 +3,8 @@ github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc h1:U9qPSI2PIWSS1
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/dustin/go-humanize v1.0.1 h1:GzkhY7T5VNhEkwH0PVJgjz+fX1rhBrR7pRT3mDkpeCY=
 github.com/dustin/go-humanize v1.0.1/go.mod h1:Mu1zIs6XwVuF/gI1OepvI0qD18qycQx+mFykh5fBlto=
-github.com/egdaemon/eg v0.0.0-20250326163850-cc0d5b8809b6 h1:XS+70Xtaw4d5linnVPpa3MfP1n2LxOkhSiJToORGFR8=
-github.com/egdaemon/eg v0.0.0-20250326163850-cc0d5b8809b6/go.mod h1:MXIrfTDE9a+mRhVa6ajMJVuNmpAUVjcxbSy8BanHnoQ=
+github.com/egdaemon/eg v0.0.0-20250326194553-098bccf949f3 h1:Ld0TUg0V1RmpGIqgtr+GjC0Rwjw3CqtufysizR5xrY4=
+github.com/egdaemon/eg v0.0.0-20250326194553-098bccf949f3/go.mod h1:MXIrfTDE9a+mRhVa6ajMJVuNmpAUVjcxbSy8BanHnoQ=
 github.com/egdaemon/wasinet/wasinet v0.0.0-20250205011224-d5f0e1da96d7 h1:tmVfnQM80Qxn3DgwcRqoq0r54rpL6VhOyGfvcT/B0FU=
 github.com/egdaemon/wasinet/wasinet v0.0.0-20250205011224-d5f0e1da96d7/go.mod h1:vPVQ3HHYTa9Fe7lz+ZBqI49kw76LSTQfvKZlO8QpWsY=
 github.com/go-logr/logr v1.4.2 h1:6pFjapn8bFcIbiKo3XT4j/BhANplGihG6tvd+8rYgrY=

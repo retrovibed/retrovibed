@@ -35,11 +35,7 @@ func main() {
 		),
 		eg.Parallel(
 			eg.Module(ctx, deb, console.Build),
-			eg.Module(
-				ctx,
-				deb,
-				shallows.Compile(),
-			),
+			eg.Module(ctx, deb, shallows.Compile()),
 		),
 		eg.Parallel(
 			eg.Module(ctx, deb, console.Tests),
