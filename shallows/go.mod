@@ -24,8 +24,8 @@ require (
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/marcboeker/go-duckdb v1.8.3
 	github.com/mattn/go-isatty v0.0.20
-	github.com/onsi/ginkgo/v2 v2.23.0
-	github.com/onsi/gomega v1.36.2
+	github.com/onsi/ginkgo/v2 v2.23.3
+	github.com/onsi/gomega v1.36.3
 	github.com/pkg/profile v1.7.0
 	github.com/pressly/goose/v3 v3.24.1
 	github.com/rymdport/portal v0.4.1

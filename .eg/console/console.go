@@ -2,6 +2,7 @@ package console
 
 import (
 	"context"
+	"eg/compute/errorsx"
 	"eg/compute/flatpakmods"
 	"eg/compute/tarballs"
 	"os"
@@ -13,11 +14,12 @@ import (
 	"github.com/egdaemon/eg/runtime/wasi/shell"
 	"github.com/egdaemon/eg/runtime/x/wasi/egflatpak"
 	"github.com/egdaemon/eg/runtime/x/wasi/egfs"
+	"github.com/egdaemon/eg/runtime/x/wasi/eggolang"
 	"github.com/egdaemon/eg/runtime/x/wasi/egtarball"
 )
 
 func flutterRuntime() shell.Command {
-	return shell.Runtime().Directory(egenv.WorkingDirectory("console")).Environ("PUB_CACHE", egenv.CacheDirectory(".eg", "dart"))
+	return shell.Runtime().Directory(egenv.WorkingDirectory("console")).EnvironFrom(errorsx.Must(eggolang.Env())...).Environ("PUB_CACHE", egenv.CacheDirectory(".eg", "dart"))
 }
 
 func Build(ctx context.Context, _ eg.Op) error {

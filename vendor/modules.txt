@@ -162,8 +162,8 @@ github.com/dustin/go-humanize
 # github.com/edsrzf/mmap-go v1.2.0
 ## explicit; go 1.17
 github.com/edsrzf/mmap-go
-# github.com/egdaemon/eg v0.0.0-20250321224542-12bf0441eecf
-## explicit; go 1.23.4
+# github.com/egdaemon/eg v0.0.0-20250326163850-cc0d5b8809b6
+## explicit; go 1.24
 github.com/egdaemon/eg
 github.com/egdaemon/eg/backoff
 github.com/egdaemon/eg/internal/bytesx
@@ -485,7 +485,7 @@ github.com/muesli/cancelreader
 github.com/muesli/termenv
 # github.com/nxadm/tail v1.4.11
 ## explicit; go 1.13
-# github.com/onsi/ginkgo/v2 v2.23.0
+# github.com/onsi/ginkgo/v2 v2.23.3
 ## explicit; go 1.23.0
 github.com/onsi/ginkgo/v2
 github.com/onsi/ginkgo/v2/config
@@ -507,8 +507,8 @@ github.com/onsi/ginkgo/v2/internal/parallel_support
 github.com/onsi/ginkgo/v2/internal/testingtproxy
 github.com/onsi/ginkgo/v2/reporters
 github.com/onsi/ginkgo/v2/types
-# github.com/onsi/gomega v1.36.2
-## explicit; go 1.22.0
+# github.com/onsi/gomega v1.36.3
+## explicit; go 1.23.0
 github.com/onsi/gomega
 github.com/onsi/gomega/format
 github.com/onsi/gomega/internal
