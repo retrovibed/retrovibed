@@ -8,7 +8,7 @@ import 'package:console/library.dart' as medialib;
 import 'package:console/designkit.dart' as ds;
 import 'package:console/design.kit/theme.defaults.dart' as theming;
 import 'package:console/mdns.dart' as mdns;
-// import 'package:console/retrovibed.dart' as retro;
+import 'package:console/retrovibed.dart' as retro;
 
 class MyHttpOverrides extends HttpOverrides {
   final List<String> ips;
@@ -26,11 +26,12 @@ class MyHttpOverrides extends HttpOverrides {
 }
 
 void main() {
-  // print("DERP 0 ${retro.bearerToken()}");
-  // print("DERP 1 ${retro.public_key()}");
-  // print("DERP 2 ${retro.ips()}");
+  print("DERP 0 ${retro.bearer_token()}");
+  print("DERP 1 ${retro.public_key()}");
+  print("DERP 2 ${retro.ips()}");
 
-  // retro.daemon();
+  retro.daemon();
+
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
   HttpOverrides.global = MyHttpOverrides();

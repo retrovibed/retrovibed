@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package meta;
+
+message Authorization {
+  bool usermanagement = 1 [ json_name = "usermanagement" ];
+  bool billing_read = 2 [ json_name = "billing_read" ];
+  bool billing_modify = 3 [ json_name = "billing_modify" ];
+}
+
+message Bearer {
+  // START OF STANDARD FIELDS
+  string id = 1 [ json_name = "jti" ];
+  string account_id = 2 [ json_name = "iss" ];
+  string profile_id = 3 [ json_name = "sub" ];
+  string session_id = 4 [ json_name = "sid" ];
+  int64 issued = 5 [ json_name = "iat" ];
+  int64 expires = 6 [ json_name = "exp" ];
+  int64 not_before = 7 [ json_name = "nbf" ];
+  string bearer = 8 [ json_name = "bearer" ];
+  // END OF STANDARD FIELDS
+}
+
+message Token {
+  // START OF STANDARD FIELDS
+  string id = 1 [ json_name = "jti" ];
+  string account_id = 2 [ json_name = "iss" ];
+  string profile_id = 3 [ json_name = "sub" ];
+  string session_id = 4 [ json_name = "sid" ];
+  int64 issued = 5 [ json_name = "iat" ];
+  int64 expires = 6 [ json_name = "exp" ];
+  int64 not_before = 7 [ json_name = "nbf" ];
+  string bearer = 8 [ json_name = "bearer" ];
+  // END OF STANDARD FIELDS
+  reserved 9 to 999;
+  bool usermanagement = 1000 [ json_name = "usermanagement" ];
+  bool billing_read = 1002 [ json_name = "billing_read" ];
+  bool billing_modify = 1003 [ json_name = "billing_modify" ];
+}
+
+message AuthzRequest {}
+message AuthzResponse { Token token = 1 [ json_name = "token" ]; }
+
+message GrantRequest {
+  string profile_id = 1 [ json_name = "profile_id" ];
+  Authorization authorization = 2 [ json_name = "authorization" ];
+}
+message GrantResponse {
+  string profile_id = 1 [ json_name = "profile_id" ];
+  Authorization authorization = 2 [ json_name = "authorization" ];
+}
+
+message RevokeRequest {
+  string profile_id = 1 [ json_name = "profile_id" ];
+  Authorization authorization = 2 [ json_name = "authorization" ];
+}
+message RevokeResponse {
+  string profile_id = 1 [ json_name = "profile_id" ];
+  Authorization authorization = 2 [ json_name = "authorization" ];
+}
+
+message ProfileRequest { string profile_id = 1 [ json_name = "profile_id" ]; }
+message ProfileResponse {
+  Authorization authorization = 1 [ json_name = "authorization" ];
+}

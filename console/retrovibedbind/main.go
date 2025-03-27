@@ -2,13 +2,15 @@ package main
 
 import "C"
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
-	"os"
+	"time"
 
 	"github.com/retrovibed/retrovibed/authn"
 	"github.com/retrovibed/retrovibed/cmd/cmdglobalmain"
+	"github.com/retrovibed/retrovibed/cmd/cmdmeta"
 )
 
 //export authn_bearer
@@ -22,12 +24,21 @@ func authn_bearer() *C.char {
 
 //export public_key
 func public_key() *C.char {
-	log.Println(os.Environ())
 	return C.CString(authn.PublicKeyPath())
 }
 
+// json array of ip addresses
+//
 //export ips
 func ips() *C.char {
+	ctx, done := context.WithTimeout(context.Background(), 10*time.Second)
+	defer done()
+	db, err := cmdmeta.Database(ctx)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer db.Close()
+
 	return C.CString(cmdglobalmain.Hostname())
 }
 
