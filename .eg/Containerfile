@@ -1,6 +1,7 @@
 FROM ubuntu:oracular
 ARG DEBIAN_FRONTEND=noninteractive
 
+RUN echo "cache buster 059a9a06-1686-4f49-9a7f-a30535886d54"
 RUN apt-get update
 RUN apt-get install -y software-properties-common build-essential ca-certificates curl sudo
 RUN add-apt-repository -n ppa:longsleep/golang-backports
@@ -9,12 +10,13 @@ RUN add-apt-repository -n ppa:egdaemon/duckdb
 
 RUN apt-get update
 RUN apt-get -y install golang-1.24 eg egbootstrap podman netavark rsync vim dput devscripts dh-make dput uidmap dbus-user-session git unzip xz-utils zip libglu1-mesa clang cmake git ninja-build pkg-config libgtk-3-dev liblzma-dev libstdc++-12-dev
-RUN apt-get -y install snapd duckdb protobuf-compiler pkgconf
+RUN sh /usr/share/eg/install/github.sh > /dev/null
+RUN apt-get -y install snapd duckdb protobuf-compiler pkgconf clang-19 gh
 
 RUN ln -s /usr/lib/go-1.24/bin/go /usr/local/bin/go
 
-RUN systemd-sysusers
-RUN systemd-tmpfiles --create
+# RUN systemd-sysusers
+# RUN systemd-tmpfiles --create
 
 # install flutter
 RUN curl -o /tmp/flutter.tar.xz https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.29.0-stable.tar.xz
@@ -28,17 +30,8 @@ RUN sudo -H -S -u egd -g egd flutter --disable-analytics
 RUN sudo -H -S -u egd -g egd dart pub global activate protoc_plugin
 
 # install genieql and golang's protocol buffers plugin
-RUN echo "cache buster 059a9a06-1686-4f49-9a7f-a30535886d54"
 RUN GOBIN="/usr/local/bin" GOPROXY=direct go install -tags genieql.duckdb,no_duckdb_arrow github.com/james-lawrence/genieql/...@latest
 RUN GOBIN="/usr/local/bin" go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 
 RUN apt-get -y install tree flatpak-builder libmpv-dev
 RUN flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-
-RUN apt-get update
-RUN apt-get -y upgrade
-RUN tree /usr/share/eg
-RUN sh /usr/share/eg/install/github.sh > /dev/null
-RUN apt-get update
-RUN apt-get install -y gh
-RUN apt-get install -y clang-19
