@@ -28,8 +28,7 @@ func Build(ctx context.Context, _ eg.Op) error {
 		runtime.New("go -C retrovibedbind build -buildmode=c-shared --tags no_duckdb_arrow -o ../build/nativelib/retrovibed.so ./..."),
 		runtime.New("dart run ffigen --config ffigen.yaml"),
 		runtime.New("flutter create --platforms=linux ."),
-		// runtime.New("flutter build linux --release lib/main.dart").Debug(),
-		runtime.New("flutter build linux --release -v lib/main.dart").Debug(),
+		runtime.New("flutter build linux --release lib/main.dart"),
 	)
 }
 
