@@ -46,12 +46,12 @@ dependencies:
   uuid: ^4.5.1
   ffi: ^2.1.4
 
-# dependency_overrides:
-#   media_kit_video:
-#     git:
-#       url: https://github.com/james-lawrence/media-kit.git
-#       ref: james.lawrence/regain-focus-when-playing
-#       path: media_kit_video
+dependency_overrides:
+  media_kit_video:
+    git:
+      url: https://github.com/james-lawrence/media-kit.git
+      ref: james.lawrence/focus-fix
+      path: media_kit_video
 
 dev_dependencies:
   flutter_test:
