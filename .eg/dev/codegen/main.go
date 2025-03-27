@@ -26,6 +26,7 @@ func main() {
 			eg.Module(ctx, deb, console.Generate),
 			eg.Module(ctx, deb, shallows.Generate),
 		),
+		eg.Module(ctx, deb, console.GenerateBinding),
 	)
 
 	if err != nil {

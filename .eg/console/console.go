@@ -25,9 +25,6 @@ func Build(ctx context.Context, _ eg.Op) error {
 	runtime := flutterRuntime()
 	return shell.Run(
 		ctx,
-		runtime.New("go -C retrovibedbind build -buildmode=c-shared --tags no_duckdb_arrow -o ../build/nativelib/retrovibed.so ./..."),
-		runtime.New("dart run ffigen --config ffigen.yaml"),
-		runtime.New("flutter create --platforms=linux ."),
 		runtime.New("flutter build linux --release lib/main.dart"),
 	)
 }
@@ -48,14 +45,24 @@ func Linting(ctx context.Context, _ eg.Op) error {
 	)
 }
 
+func GenerateBinding(ctx context.Context, _ eg.Op) error {
+	runtime := flutterRuntime()
+	return shell.Run(
+		ctx,
+		runtime.New("go -C retrovibedbind build -buildmode=c-shared --tags no_duckdb_arrow -o ../build/nativelib/retrovibed.so ./..."),
+		runtime.New("dart run ffigen --config ffigen.yaml"),
+	)
+}
+
 func Generate(ctx context.Context, _ eg.Op) error {
 	runtime := flutterRuntime()
 	return shell.Run(
 		ctx,
 		runtime.New("flutter clean"),
+		runtime.New("flutter create --platforms=linux ."),
+		runtime.New("flutter pub get"),
 		shell.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib/media -I.proto .proto/media.proto"),
 		shell.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib/rss -I.proto .proto/rss.proto"),
-		runtime.New("flutter pub get"),
 	)
 }
 
