@@ -6,7 +6,7 @@ import (
 	"embed"
 	"io/fs"
 
-	_ "github.com/marcboeker/go-duckdb"
+	_ "github.com/marcboeker/go-duckdb/v2"
 
 	"github.com/pressly/goose/v3"
 	"github.com/retrovibed/retrovibed/internal/debugx"

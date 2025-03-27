@@ -1,10 +1,15 @@
 package authn
 
 import (
+	"net/http"
+	"strings"
+
 	"github.com/davecgh/go-spew/spew"
+	"github.com/gofrs/uuid"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/retrovibed/retrovibed/internal/debugx"
 	"github.com/retrovibed/retrovibed/internal/env"
+	"github.com/retrovibed/retrovibed/internal/envx"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/jwtx"
 	"github.com/retrovibed/retrovibed/internal/sshx"
@@ -36,4 +41,19 @@ func NewBearer() (string, error) {
 		claims,
 	).SignedString(signer)
 	return bearer, errorsx.Wrap(err, "token signature failure")
+}
+
+func JWTSecretFromEnv() []byte {
+	return []byte(envx.String(uuid.Must(uuid.NewV4()).String(), env.JWTSharedSecret))
+}
+
+// Bearer extracts the jwt bearer token from a http request.
+func Bearer(req *http.Request) string {
+	before, after, _ := strings.Cut(req.Header.Get("authorization"), " ")
+
+	if strings.ToLower(before) != "bearer" {
+		return ""
+	}
+
+	return after
 }

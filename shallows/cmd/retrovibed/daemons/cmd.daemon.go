@@ -31,7 +31,7 @@ import (
 	"github.com/retrovibed/retrovibed/internal/userx"
 	"github.com/retrovibed/retrovibed/media"
 
-	_ "github.com/marcboeker/go-duckdb"
+	_ "github.com/marcboeker/go-duckdb/v2"
 
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/bep0051"
