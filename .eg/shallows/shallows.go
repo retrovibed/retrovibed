@@ -28,9 +28,7 @@ func Generate(ctx context.Context, _ eg.Op) error {
 	gruntime := shellruntime()
 	return shell.Run(
 		ctx,
-		gruntime.New("echo derp").Debug(),
-		gruntime.New("go generate ./...").Debug(),
-		gruntime.New("go fmt ./..."),
+		gruntime.New("go generate ./... && go fmt ./..."),
 	)
 }
 
