@@ -24,7 +24,7 @@ override_dh_auto_build:
 	cat $(CURDIR)/debian/control
 	cp -R $(CURDIR)/src/.dist/linux/* linux
 	cp $(CURDIR)/src/LICENSE $(CURDIR)/debian/copyright
-	GOPROXY="direct" GOCACHE="$(CURDIR)/.gocache" GOMODCACHE="$(CURDIR)/.gomod" GOBIN="$(CURDIR)/linux/usr/bin" /usr/lib/go-1.24/bin/go build -C src/shallows -mod=vendor -buildmode=pie -tags "no_duckdb_arrow" -buildvcs=false -o "$(CURDIR)/linux/usr/bin" ./cmd/retrovibed/...
+	GOPROXY="direct" GOCACHE="$(CURDIR)/.gocache" GOMODCACHE="$(CURDIR)/.gomod" GOBIN="$(CURDIR)/linux/usr/bin" /usr/lib/go-1.24/bin/go build -C src/shallows -mod=vendor -buildmode=pie -tags "duckdb_use_lib" -buildvcs=false -o "$(CURDIR)/linux/usr/bin" ./cmd/retrovibed/...
 	# tree $(CURDIR)/linux
 
 override_dh_auto_test:

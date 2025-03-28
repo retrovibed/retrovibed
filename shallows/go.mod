@@ -22,6 +22,7 @@ require (
 	github.com/james-lawrence/torrent v0.0.0-20250321125210-5cb29a0cb7aa
 	github.com/justinas/alice v1.2.0
 	github.com/logrusorgru/aurora v2.0.3+incompatible
+	github.com/marcboeker/go-duckdb/v2 v2.1.0
 	github.com/mattn/go-isatty v0.0.20
 	github.com/onsi/ginkgo/v2 v2.23.3
 	github.com/onsi/gomega v1.36.3
@@ -34,7 +35,6 @@ require (
 	golang.org/x/text v0.23.0
 	golang.org/x/time v0.11.0
 	google.golang.org/protobuf v1.36.5
-	github.com/marcboeker/go-duckdb/v2 v2.1.0
 )
 
 require (
@@ -75,6 +75,9 @@ require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/edsrzf/mmap-go v1.2.0 // indirect
 	github.com/erikgeiser/coninput v0.0.0-20211004153227-1c3628e74d0f // indirect
+	github.com/fatih/camelcase v1.0.0 // indirect
+	github.com/fatih/gomodifytags v1.17.0 // indirect
+	github.com/fatih/structtag v1.2.0 // indirect
 	github.com/felixge/fgprof v0.9.5 // indirect
 	github.com/go-viper/mapstructure/v2 v2.2.1 // indirect
 	github.com/goccy/go-json v0.10.5 // indirect
@@ -164,5 +167,6 @@ exclude (
 
 tool (
 	github.com/csnewman/flutter-go-bridge/cmd/flutter-go-bridge
+	github.com/fatih/gomodifytags
 	github.com/james-lawrence/genieql
 )

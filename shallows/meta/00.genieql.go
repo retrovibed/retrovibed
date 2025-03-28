@@ -10,7 +10,6 @@ import (
 	"github.com/retrovibed/retrovibed/internal/sqlx"
 )
 
-//easyjson:json
 func Profile(gql genieql.Structure) {
 	gql.From(
 		gql.Table("meta_profiles"),
@@ -35,7 +34,6 @@ func ProfileFindByID(
 	gql = gql.Query(`SELECT ` + ProfileScannerStaticColumns + ` FROM meta_profiles WHERE "id" = {id}`)
 }
 
-//easyjson:json
 func IdentitySSH(gql genieql.Structure) {
 	gql.From(
 		gql.Table("meta_sso_identity_ssh"),
@@ -53,7 +51,6 @@ func IdentitySSHInsertWithDefaults(
 	gql.Into("meta_sso_identity_ssh").Default("created_at", "updated_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT")
 }
 
-//easyjson:json
 func Daemon(gql genieql.Structure) {
 	gql.From(
 		gql.Table("meta_daemons"),
@@ -62,4 +59,11 @@ func Daemon(gql genieql.Structure) {
 
 func DaemonScanner(gql genieql.Scanner, pattern func(i Daemon)) {
 	gql.ColumnNamePrefix("meta_daemons.")
+}
+
+func DaemonInsertWithDefaults(
+	gql genieql.Insert,
+	pattern func(ctx context.Context, q sqlx.Queryer, a Daemon) NewDaemonScannerStaticRow,
+) {
+	gql.Into("meta_daemons").Default("created_at", "updated_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT")
 }

@@ -49,7 +49,7 @@ func GenerateBinding(ctx context.Context, _ eg.Op) error {
 	runtime := flutterRuntime()
 	return shell.Run(
 		ctx,
-		runtime.New("go -C retrovibedbind build -buildmode=c-shared --tags no_duckdb_arrow -o ../build/nativelib/retrovibed.so ./..."),
+		runtime.New("go -C retrovibedbind build -buildmode=c-shared --tags duckdb_use_lib -o ../build/nativelib/retrovibed.so ./..."),
 		runtime.New("dart run ffigen --config ffigen.yaml"),
 	)
 }
@@ -63,6 +63,9 @@ func Generate(ctx context.Context, _ eg.Op) error {
 		runtime.New("flutter pub get"),
 		shell.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib/media -I.proto .proto/media.proto"),
 		shell.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib/rss -I.proto .proto/rss.proto"),
+		shell.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib/meta -I.proto .proto/meta.daemon.proto"),
+		shell.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib/meta -I.proto .proto/meta.profile.proto"),
+		shell.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib/meta -I.proto .proto/meta.authz.proto"),
 	)
 }
 

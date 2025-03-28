@@ -1,10 +1,9 @@
 package main
 
-import "C"
 import (
+	"C"
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"time"
 
@@ -12,6 +11,7 @@ import (
 	"github.com/retrovibed/retrovibed/cmd/cmdglobalmain"
 	"github.com/retrovibed/retrovibed/cmd/cmdmeta"
 )
+import "os"
 
 //export authn_bearer
 func authn_bearer() *C.char {
@@ -24,11 +24,14 @@ func authn_bearer() *C.char {
 
 //export public_key
 func public_key() *C.char {
-	return C.CString(authn.PublicKeyPath())
+	encoded, err := os.ReadFile(authn.PublicKeyPath())
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	return C.CString(string(encoded))
 }
 
-// json array of ip addresses
-//
 //export ips
 func ips() *C.char {
 	ctx, done := context.WithTimeout(context.Background(), 10*time.Second)
@@ -39,7 +42,17 @@ func ips() *C.char {
 	}
 	defer db.Close()
 
-	return C.CString(cmdglobalmain.Hostname())
+	results, err := cmdmeta.Hostnames(ctx, db)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	encoded, err := json.Marshal(results)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	return C.CString(string(encoded))
 }
 
 //export daemon
@@ -53,9 +66,3 @@ func daemon(jsonargs *C.char) {
 }
 
 func main() {}
-
-func debug(envs ...string) {
-	for _, e := range envs {
-		_ = log.Output(2, fmt.Sprintln(e))
-	}
-}

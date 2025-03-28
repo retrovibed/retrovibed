@@ -19,8 +19,7 @@ class MyHttpOverrides extends HttpOverrides {
       ..badCertificateCallback = (X509Certificate cert, String host, int port) {
         return ips.any((v) => host == v) ||
             host == "localhost" ||
-            host == Platform.localHostname ||
-            host.startsWith("192.168");
+            host == Platform.localHostname;
       };
   }
 }
@@ -28,14 +27,15 @@ class MyHttpOverrides extends HttpOverrides {
 void main() {
   print("DERP 0 ${retro.bearer_token()}");
   print("DERP 1 ${retro.public_key()}");
-  print("DERP 2 ${retro.ips()}");
-
-  retro.daemon();
 
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
-  HttpOverrides.global = MyHttpOverrides();
-  // HttpOverrides.global = MyHttpOverrides(ips: retro.ips());
+  // must come before the daemon since it opens and closes the database.
+  HttpOverrides.global = MyHttpOverrides(ips: retro.ips());
+
+  retro.daemon();
+
+  // HttpOverrides.global = MyHttpOverrides();
   runApp(const MyApp());
 }
 

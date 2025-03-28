@@ -24,7 +24,8 @@ String public_key() {
 }
 
 List<String> ips() {
-  return [_convertstring(bridge.ips())];
+  final List<dynamic> res = jsonDecode(_convertstring(bridge.ips()));
+  return res.whereType<String>().toList();
 }
 
 void daemon() {
