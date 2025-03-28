@@ -25,17 +25,14 @@ class MyHttpOverrides extends HttpOverrides {
 }
 
 void main() {
-  print("DERP 0 ${retro.bearer_token()}");
-  print("DERP 1 ${retro.public_key()}");
-
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
+
   // must come before the daemon since it opens and closes the database.
   HttpOverrides.global = MyHttpOverrides(ips: retro.ips());
 
   retro.daemon();
 
-  // HttpOverrides.global = MyHttpOverrides();
   runApp(const MyApp());
 }
 

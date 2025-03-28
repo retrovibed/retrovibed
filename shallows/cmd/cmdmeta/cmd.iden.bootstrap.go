@@ -79,7 +79,7 @@ func (t Bootstrap) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		return err
 	}
 
-	if s, err = sshx.AutoCached(sshx.NewKeyGenSeeded(md5x.FormatString(md5x.Digest(t.Seed, "ssh"))), env.PrivateKeyPath()); err != nil {
+	if s, err = sshx.AutoCached(sshx.NewKeyGenSeeded(md5x.FormatUUID(md5x.Digest(t.Seed, "ssh"))), env.PrivateKeyPath()); err != nil {
 		return err
 	}
 

@@ -29,7 +29,7 @@ List<String> ips() {
 }
 
 void daemon() {
-  String args = jsonEncode(["daemon"]);
+  String args = jsonEncode(["daemon", "--no-mdns"]);
   bridge.daemon(args.toNativeUtf8().cast<Char>());
 }
 

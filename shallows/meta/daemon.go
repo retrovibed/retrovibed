@@ -8,6 +8,7 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
+	"github.com/retrovibed/retrovibed/internal/md5x"
 	"github.com/retrovibed/retrovibed/internal/sqlx"
 	"github.com/retrovibed/retrovibed/internal/squirrelx"
 	"github.com/retrovibed/retrovibed/internal/stringsx"
@@ -16,7 +17,11 @@ import (
 type DaemonOption func(*Daemon)
 
 func DaemonOptionMaybeID(v *Daemon) {
-	v.ID = stringsx.FirstNonBlank(v.ID, errorsx.Must(uuid.NewV4()).String())
+	v.ID = stringsx.FirstNonBlank(v.ID, md5x.String(v.Hostname))
+}
+
+func DaemonOptionEnsureDescription(v *Daemon) {
+	v.Description = stringsx.FirstNonBlank(v.Description, v.Hostname, v.ID)
 }
 
 func DaemonOptionTestDefaults(v *Daemon) {

@@ -37,7 +37,7 @@ func TestImportTorrent(t *testing.T) {
 		require.NoError(t, cause)
 
 		lmd := library.NewMetadata(
-			md5x.FormatString(tx.MD5),
+			md5x.FormatUUID(tx.MD5),
 			library.MetadataOptionDescription(filepath.Base(tx.Path)),
 			library.MetadataOptionBytes(tx.Bytes),
 			library.MetadataOptionMimetype(tx.Mimetype.String()),

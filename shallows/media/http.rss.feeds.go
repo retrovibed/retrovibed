@@ -129,7 +129,7 @@ func (t *HTTPRSSFeed) create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	feed := tracking.RSS{
-		ID:           stringsx.DefaultIfBlank(req.Feed.Id, md5x.FormatString(md5x.Digest(req.Feed.Url))),
+		ID:           stringsx.DefaultIfBlank(req.Feed.Id, md5x.FormatUUID(md5x.Digest(req.Feed.Url))),
 		Description:  req.Feed.Description,
 		URL:          req.Feed.Url,
 		Autodownload: req.Feed.Autodownload,

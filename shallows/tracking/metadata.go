@@ -123,7 +123,7 @@ func Download(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata
 		}
 
 		lmd := library.NewMetadata(
-			md5x.FormatString(tx.MD5),
+			md5x.FormatUUID(tx.MD5),
 			library.MetadataOptionDescription(filepath.Base(tx.Path)),
 			library.MetadataOptionBytes(tx.Bytes),
 			library.MetadataOptionTorrentID(md.ID),

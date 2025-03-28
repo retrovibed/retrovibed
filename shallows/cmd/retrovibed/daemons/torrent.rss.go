@@ -28,7 +28,7 @@ import (
 func PrepareDefaultFeeds(ctx context.Context, q sqlx.Queryer) error {
 	feedcreate := func(description, url string) (err error) {
 		feed := tracking.RSS{
-			ID:           md5x.FormatString(md5x.Digest(url)),
+			ID:           md5x.FormatUUID(md5x.Digest(url)),
 			Description:  description,
 			URL:          url,
 			Contributing: true,
@@ -170,7 +170,7 @@ func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, rootstore fsx.Vir
 
 			if updated := stringsx.FirstNonBlank(feed.Description, channel.Title); updated != feed.Description {
 				feed.Description = updated
-				if cause := tracking.RSSInsertWithDefaults(fctx, sqlx.Debug(q), feed).Scan(&feed); cause != nil {
+				if cause := tracking.RSSInsertWithDefaults(fctx, q, feed).Scan(&feed); cause != nil {
 					log.Println("failed to update rss feed", cause)
 					continue
 				}

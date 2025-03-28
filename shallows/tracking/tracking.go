@@ -6,7 +6,7 @@ import (
 )
 
 func HashUID(md *metainfo.Hash) string {
-	return md5x.FormatString(md5x.Digest(md.Bytes()))
+	return md5x.FormatUUID(md5x.Digest(md.Bytes()))
 }
 
 func PublicTrackers() []string {

@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"embed"
 	"io/fs"
+	"strings"
 
 	_ "github.com/marcboeker/go-duckdb/v2"
 
@@ -59,5 +60,8 @@ func Hostnames(ctx context.Context, q sqlx.Queryer) ([]string, error) {
 		return nil, errorsx.Wrap(err, "unable to retrieve hostnames")
 	}
 
-	return slicesx.MapTransform(func(d meta.Daemon) string { return d.Hostname }), nil
+	return slicesx.MapTransform(func(d meta.Daemon) string {
+		before, _, _ := strings.Cut(d.Hostname, ":")
+		return before
+	}, results...), nil
 }

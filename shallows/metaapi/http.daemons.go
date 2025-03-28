@@ -126,13 +126,13 @@ func (t *HTTPDaemons) create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if v, err = NewMetadaemonFromDaemon(msg.Daemon, meta.DaemonOptionMaybeID, timex.JSONSafeDecodeOption); err != nil {
+	if v, err = NewMetadaemonFromDaemon(msg.Daemon, meta.DaemonOptionMaybeID, meta.DaemonOptionEnsureDescription, timex.JSONSafeDecodeOption); err != nil {
 		log.Println(errorsx.Wrap(err, "converting data failed"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
 	}
 
-	if err = meta.DaemonInsertWithDefaults(r.Context(), sqlx.Debug(t.q), v).Scan(&v); err != nil {
+	if err = meta.DaemonInsertWithDefaults(r.Context(), t.q, v).Scan(&v); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to insert record"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return

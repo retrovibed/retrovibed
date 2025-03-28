@@ -1,8 +1,6 @@
 package metaapi
 
 import (
-	"log"
-
 	"github.com/retrovibed/retrovibed/internal/grpcx"
 	"github.com/retrovibed/retrovibed/internal/langx"
 	"github.com/retrovibed/retrovibed/internal/timex"
@@ -16,8 +14,6 @@ func NewDaemonFromMetaDaemon(mp meta.Daemon) (_ *Daemon, err error) {
 		return nil, err
 	}
 
-	log.Println("WAAAT 0", mp.UpdatedAt)
-	log.Println("WAAAT 1", p.UpdatedAt)
 	return &p, nil
 }
 
