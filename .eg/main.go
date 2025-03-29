@@ -21,26 +21,22 @@ func main() {
 		ctx,
 		eggit.AutoClone,
 		eg.Build(deb.BuildFromFile(".eg/Containerfile")),
-		eg.Parallel(
-			eg.Module(
-				ctx,
-				deb,
+		eg.Module(
+			ctx,
+			deb,
+			eg.Parallel(
+				shallows.Generate,
 				console.Generate,
 			),
-			eg.Module(
-				ctx,
-				deb,
-				shallows.Generate,
+			eg.Parallel(
+				eg.Sequential(console.GenerateBinding, console.Build),
+				shallows.Compile(),
 			),
-		),
-		eg.Parallel(
-			eg.Module(ctx, deb, console.GenerateBinding, console.Build),
-			eg.Module(ctx, deb, shallows.Compile()),
-		),
-		eg.Parallel(
-			eg.Module(ctx, deb, console.Tests),
-			eg.Module(ctx, deb, console.Linting),
-			eg.Module(ctx, deb, shallows.Test()),
+			eg.Parallel(
+				console.Tests,
+				console.Linting,
+				shallows.Test(),
+			),
 		),
 		// eg.Module(ctx, deb.OptionLiteral("--publish", "3000:3000"), www.Build, www.Webserver),
 	)
