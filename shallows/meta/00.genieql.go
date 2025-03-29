@@ -67,3 +67,10 @@ func DaemonInsertWithDefaults(
 ) {
 	gql.Into("meta_daemons").Default("created_at", "updated_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT")
 }
+
+func DaemonFindByLatestUpdated(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer) NewDaemonScannerStaticRow,
+) {
+	gql = gql.Query(`SELECT ` + DaemonScannerStaticColumns + ` FROM meta_daemons ORDER BY updated_at DESC LIMIT 1`)
+}

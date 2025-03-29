@@ -62,6 +62,13 @@ func (t *HTTPDaemons) Bind(r *mux.Router) {
 		// AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
 		httpx.Timeout2s(),
 	).ThenFunc(t.create))
+
+	r.Path("/latest").Methods(http.MethodGet).Handler(alice.New(
+		httpx.ContextBufferPool512(),
+		httpauth.AuthenticateWithToken(t.jwtsecret),
+		// AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
+		httpx.Timeout2s(),
+	).ThenFunc(t.latest))
 }
 
 func (t *HTTPDaemons) search(w http.ResponseWriter, r *http.Request) {
@@ -139,6 +146,32 @@ func (t *HTTPDaemons) create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err = httpx.WriteJSON(w, httpx.GetBuffer(r), &DaemonCreateResponse{
+		Daemon: errorsx.Must(NewDaemonFromMetaDaemon(v)),
+	}); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to write response"))
+		return
+	}
+}
+
+func (t *HTTPDaemons) latest(w http.ResponseWriter, r *http.Request) {
+	var (
+		err error
+		v   meta.Daemon
+	)
+
+	// if v, err = NewMetadaemonFromDaemon(msg.Daemon, meta.DaemonOptionMaybeID, meta.DaemonOptionEnsureDescription, timex.JSONSafeDecodeOption); err != nil {
+	// 	log.Println(errorsx.Wrap(err, "converting data failed"))
+	// 	errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+	// 	return
+	// }
+
+	if err = meta.DaemonFindByLatestUpdated(r.Context(), t.q).Scan(&v); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to find record"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	if err = httpx.WriteJSON(w, httpx.GetBuffer(r), &DaemonLookupResponse{
 		Daemon: errorsx.Must(NewDaemonFromMetaDaemon(v)),
 	}); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to write response"))
