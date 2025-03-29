@@ -13,10 +13,10 @@ func UnsafeJWTSecretSource() []byte {
 	return []byte("unsafe")
 }
 
-func UnsafeToken(c jwt.Claims, s jwtx.JWTSecretSource) string {
+func UnsafeToken(c jwt.Claims, s jwtx.SecretSource) string {
 	return errorsx.Must(jwtx.Signed(s(), c))
 }
 
-func UnsafeClaimsToken(c jwt.Claims, s jwtx.JWTSecretSource) string {
+func UnsafeClaimsToken(c jwt.Claims, s jwtx.SecretSource) string {
 	return fmt.Sprintf("BEARER %s", UnsafeToken(c, s))
 }

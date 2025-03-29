@@ -8,7 +8,6 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
-	"github.com/retrovibed/retrovibed/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/httpauthtest"
 	"github.com/retrovibed/retrovibed/internal/formx"
 	"github.com/retrovibed/retrovibed/internal/httptestx"
@@ -33,8 +32,6 @@ func TestHTTPUserManagementSearch(t *testing.T) {
 
 	q := sqltestx.Metadatabase(t)
 	defer q.Close()
-
-	require.NoError(t, cmdmeta.InitializeDatabase(ctx, q))
 
 	require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
 	require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))

@@ -35,7 +35,7 @@ import (
 
 type HTTPDiscoveredOption func(*HTTPDiscovered)
 
-func HTTPDiscoveredOptionJWTSecret(j jwtx.JWTSecretSource) HTTPDiscoveredOption {
+func HTTPDiscoveredOptionJWTSecret(j jwtx.SecretSource) HTTPDiscoveredOption {
 	return func(t *HTTPDiscovered) {
 		t.jwtsecret = j
 	}
@@ -63,7 +63,7 @@ type HTTPDiscovered struct {
 	q            sqlx.Queryer
 	d            download
 	c            storage.ClientImpl
-	jwtsecret    jwtx.JWTSecretSource
+	jwtsecret    jwtx.SecretSource
 	decoder      *form.Decoder
 	mediastorage fsx.Virtual
 }

@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/james-lawrence/torrent/metainfo"
-	"github.com/retrovibed/retrovibed/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/internal/fsx"
 	"github.com/retrovibed/retrovibed/internal/md5x"
 	"github.com/retrovibed/retrovibed/internal/sqltestx"
@@ -27,7 +26,6 @@ func TestImportTorrent(t *testing.T) {
 	q := sqltestx.Metadatabase(t)
 	defer q.Close()
 
-	require.NoError(t, cmdmeta.InitializeDatabase(ctx, q))
 	evfs := fsx.DirVirtual(filepath.Join(tmpdir, "examples"))
 	mvfs := fsx.DirVirtual(filepath.Join(tmpdir, "media"))
 	tvfs := fsx.DirVirtual(filepath.Join(tmpdir, "torrents"))

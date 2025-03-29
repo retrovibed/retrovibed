@@ -32,7 +32,7 @@ import (
 
 type HTTPLibraryOption func(*HTTPLibrary)
 
-func HTTPLibraryOptionJWTSecret(j jwtx.JWTSecretSource) HTTPLibraryOption {
+func HTTPLibraryOptionJWTSecret(j jwtx.SecretSource) HTTPLibraryOption {
 	return func(t *HTTPLibrary) {
 		t.jwtsecret = j
 	}
@@ -51,7 +51,7 @@ func NewHTTPLibrary(q sqlx.Queryer, s fsx.Virtual, options ...HTTPLibraryOption)
 
 type HTTPLibrary struct {
 	q            sqlx.Queryer
-	jwtsecret    jwtx.JWTSecretSource
+	jwtsecret    jwtx.SecretSource
 	decoder      *form.Decoder
 	mediastorage fsx.Virtual
 }

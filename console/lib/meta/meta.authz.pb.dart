@@ -152,7 +152,7 @@ class Bearer extends $pb.GeneratedMessage {
 class Token extends $pb.GeneratedMessage {
   factory Token({
     $core.String? id,
-    $core.String? accountId,
+    $core.String? issuer,
     $core.String? profileId,
     $core.String? sessionId,
     $fixnum.Int64? issued,
@@ -164,8 +164,8 @@ class Token extends $pb.GeneratedMessage {
     if (id != null) {
       $result.id = id;
     }
-    if (accountId != null) {
-      $result.accountId = accountId;
+    if (issuer != null) {
+      $result.issuer = issuer;
     }
     if (profileId != null) {
       $result.profileId = profileId;
@@ -193,7 +193,7 @@ class Token extends $pb.GeneratedMessage {
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'Token', package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'), createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'jti', protoName: 'id')
-    ..aOS(2, _omitFieldNames ? '' : 'iss', protoName: 'account_id')
+    ..aOS(2, _omitFieldNames ? '' : 'iss', protoName: 'issuer')
     ..aOS(3, _omitFieldNames ? '' : 'sub', protoName: 'profile_id')
     ..aOS(4, _omitFieldNames ? '' : 'sid', protoName: 'session_id')
     ..aInt64(5, _omitFieldNames ? '' : 'iat', protoName: 'issued')
@@ -235,13 +235,13 @@ class Token extends $pb.GeneratedMessage {
   void clearId() => clearField(1);
 
   @$pb.TagNumber(2)
-  $core.String get accountId => $_getSZ(1);
+  $core.String get issuer => $_getSZ(1);
   @$pb.TagNumber(2)
-  set accountId($core.String v) { $_setString(1, v); }
+  set issuer($core.String v) { $_setString(1, v); }
   @$pb.TagNumber(2)
-  $core.bool hasAccountId() => $_has(1);
+  $core.bool hasIssuer() => $_has(1);
   @$pb.TagNumber(2)
-  void clearAccountId() => clearField(2);
+  void clearIssuer() => clearField(2);
 
   @$pb.TagNumber(3)
   $core.String get profileId => $_getSZ(2);
@@ -396,8 +396,8 @@ class AuthzResponse extends $pb.GeneratedMessage {
   Token ensureToken() => $_ensure(1);
 }
 
-class GrantRequest extends $pb.GeneratedMessage {
-  factory GrantRequest({
+class AuthzGrantRequest extends $pb.GeneratedMessage {
+  factory AuthzGrantRequest({
     Token? token,
   }) {
     final $result = create();
@@ -406,11 +406,11 @@ class GrantRequest extends $pb.GeneratedMessage {
     }
     return $result;
   }
-  GrantRequest._() : super();
-  factory GrantRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory GrantRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  AuthzGrantRequest._() : super();
+  factory AuthzGrantRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory AuthzGrantRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'GrantRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'), createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'AuthzGrantRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'), createEmptyInstance: create)
     ..aOM<Token>(1, _omitFieldNames ? '' : 'token', subBuilder: Token.create)
     ..hasRequiredFields = false
   ;
@@ -419,22 +419,22 @@ class GrantRequest extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
   'Will be removed in next major version')
-  GrantRequest clone() => GrantRequest()..mergeFromMessage(this);
+  AuthzGrantRequest clone() => AuthzGrantRequest()..mergeFromMessage(this);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  GrantRequest copyWith(void Function(GrantRequest) updates) => super.copyWith((message) => updates(message as GrantRequest)) as GrantRequest;
+  AuthzGrantRequest copyWith(void Function(AuthzGrantRequest) updates) => super.copyWith((message) => updates(message as AuthzGrantRequest)) as AuthzGrantRequest;
 
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  static GrantRequest create() => GrantRequest._();
-  GrantRequest createEmptyInstance() => create();
-  static $pb.PbList<GrantRequest> createRepeated() => $pb.PbList<GrantRequest>();
+  static AuthzGrantRequest create() => AuthzGrantRequest._();
+  AuthzGrantRequest createEmptyInstance() => create();
+  static $pb.PbList<AuthzGrantRequest> createRepeated() => $pb.PbList<AuthzGrantRequest>();
   @$core.pragma('dart2js:noInline')
-  static GrantRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<GrantRequest>(create);
-  static GrantRequest? _defaultInstance;
+  static AuthzGrantRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<AuthzGrantRequest>(create);
+  static AuthzGrantRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
   Token get token => $_getN(0);
@@ -448,8 +448,8 @@ class GrantRequest extends $pb.GeneratedMessage {
   Token ensureToken() => $_ensure(0);
 }
 
-class GrantResponse extends $pb.GeneratedMessage {
-  factory GrantResponse({
+class AuthzGrantResponse extends $pb.GeneratedMessage {
+  factory AuthzGrantResponse({
     Token? token,
   }) {
     final $result = create();
@@ -458,11 +458,11 @@ class GrantResponse extends $pb.GeneratedMessage {
     }
     return $result;
   }
-  GrantResponse._() : super();
-  factory GrantResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory GrantResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  AuthzGrantResponse._() : super();
+  factory AuthzGrantResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory AuthzGrantResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'GrantResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'), createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'AuthzGrantResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'), createEmptyInstance: create)
     ..aOM<Token>(1, _omitFieldNames ? '' : 'token', subBuilder: Token.create)
     ..hasRequiredFields = false
   ;
@@ -471,22 +471,22 @@ class GrantResponse extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
   'Will be removed in next major version')
-  GrantResponse clone() => GrantResponse()..mergeFromMessage(this);
+  AuthzGrantResponse clone() => AuthzGrantResponse()..mergeFromMessage(this);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  GrantResponse copyWith(void Function(GrantResponse) updates) => super.copyWith((message) => updates(message as GrantResponse)) as GrantResponse;
+  AuthzGrantResponse copyWith(void Function(AuthzGrantResponse) updates) => super.copyWith((message) => updates(message as AuthzGrantResponse)) as AuthzGrantResponse;
 
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  static GrantResponse create() => GrantResponse._();
-  GrantResponse createEmptyInstance() => create();
-  static $pb.PbList<GrantResponse> createRepeated() => $pb.PbList<GrantResponse>();
+  static AuthzGrantResponse create() => AuthzGrantResponse._();
+  AuthzGrantResponse createEmptyInstance() => create();
+  static $pb.PbList<AuthzGrantResponse> createRepeated() => $pb.PbList<AuthzGrantResponse>();
   @$core.pragma('dart2js:noInline')
-  static GrantResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<GrantResponse>(create);
-  static GrantResponse? _defaultInstance;
+  static AuthzGrantResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<AuthzGrantResponse>(create);
+  static AuthzGrantResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
   Token get token => $_getN(0);
@@ -500,8 +500,8 @@ class GrantResponse extends $pb.GeneratedMessage {
   Token ensureToken() => $_ensure(0);
 }
 
-class RevokeRequest extends $pb.GeneratedMessage {
-  factory RevokeRequest({
+class AuthzRevokeRequest extends $pb.GeneratedMessage {
+  factory AuthzRevokeRequest({
     Token? token,
   }) {
     final $result = create();
@@ -510,11 +510,11 @@ class RevokeRequest extends $pb.GeneratedMessage {
     }
     return $result;
   }
-  RevokeRequest._() : super();
-  factory RevokeRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory RevokeRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  AuthzRevokeRequest._() : super();
+  factory AuthzRevokeRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory AuthzRevokeRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'RevokeRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'), createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'AuthzRevokeRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'), createEmptyInstance: create)
     ..aOM<Token>(1, _omitFieldNames ? '' : 'token', subBuilder: Token.create)
     ..hasRequiredFields = false
   ;
@@ -523,22 +523,22 @@ class RevokeRequest extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
   'Will be removed in next major version')
-  RevokeRequest clone() => RevokeRequest()..mergeFromMessage(this);
+  AuthzRevokeRequest clone() => AuthzRevokeRequest()..mergeFromMessage(this);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  RevokeRequest copyWith(void Function(RevokeRequest) updates) => super.copyWith((message) => updates(message as RevokeRequest)) as RevokeRequest;
+  AuthzRevokeRequest copyWith(void Function(AuthzRevokeRequest) updates) => super.copyWith((message) => updates(message as AuthzRevokeRequest)) as AuthzRevokeRequest;
 
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  static RevokeRequest create() => RevokeRequest._();
-  RevokeRequest createEmptyInstance() => create();
-  static $pb.PbList<RevokeRequest> createRepeated() => $pb.PbList<RevokeRequest>();
+  static AuthzRevokeRequest create() => AuthzRevokeRequest._();
+  AuthzRevokeRequest createEmptyInstance() => create();
+  static $pb.PbList<AuthzRevokeRequest> createRepeated() => $pb.PbList<AuthzRevokeRequest>();
   @$core.pragma('dart2js:noInline')
-  static RevokeRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<RevokeRequest>(create);
-  static RevokeRequest? _defaultInstance;
+  static AuthzRevokeRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<AuthzRevokeRequest>(create);
+  static AuthzRevokeRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
   Token get token => $_getN(0);
@@ -552,8 +552,8 @@ class RevokeRequest extends $pb.GeneratedMessage {
   Token ensureToken() => $_ensure(0);
 }
 
-class RevokeResponse extends $pb.GeneratedMessage {
-  factory RevokeResponse({
+class AuthzRevokeResponse extends $pb.GeneratedMessage {
+  factory AuthzRevokeResponse({
     Token? token,
   }) {
     final $result = create();
@@ -562,11 +562,11 @@ class RevokeResponse extends $pb.GeneratedMessage {
     }
     return $result;
   }
-  RevokeResponse._() : super();
-  factory RevokeResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory RevokeResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  AuthzRevokeResponse._() : super();
+  factory AuthzRevokeResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory AuthzRevokeResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'RevokeResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'), createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'AuthzRevokeResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'), createEmptyInstance: create)
     ..aOM<Token>(1, _omitFieldNames ? '' : 'token', subBuilder: Token.create)
     ..hasRequiredFields = false
   ;
@@ -575,22 +575,22 @@ class RevokeResponse extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
   'Will be removed in next major version')
-  RevokeResponse clone() => RevokeResponse()..mergeFromMessage(this);
+  AuthzRevokeResponse clone() => AuthzRevokeResponse()..mergeFromMessage(this);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  RevokeResponse copyWith(void Function(RevokeResponse) updates) => super.copyWith((message) => updates(message as RevokeResponse)) as RevokeResponse;
+  AuthzRevokeResponse copyWith(void Function(AuthzRevokeResponse) updates) => super.copyWith((message) => updates(message as AuthzRevokeResponse)) as AuthzRevokeResponse;
 
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  static RevokeResponse create() => RevokeResponse._();
-  RevokeResponse createEmptyInstance() => create();
-  static $pb.PbList<RevokeResponse> createRepeated() => $pb.PbList<RevokeResponse>();
+  static AuthzRevokeResponse create() => AuthzRevokeResponse._();
+  AuthzRevokeResponse createEmptyInstance() => create();
+  static $pb.PbList<AuthzRevokeResponse> createRepeated() => $pb.PbList<AuthzRevokeResponse>();
   @$core.pragma('dart2js:noInline')
-  static RevokeResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<RevokeResponse>(create);
-  static RevokeResponse? _defaultInstance;
+  static AuthzRevokeResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<AuthzRevokeResponse>(create);
+  static AuthzRevokeResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
   Token get token => $_getN(0);
@@ -604,8 +604,8 @@ class RevokeResponse extends $pb.GeneratedMessage {
   Token ensureToken() => $_ensure(0);
 }
 
-class ProfileRequest extends $pb.GeneratedMessage {
-  factory ProfileRequest({
+class AuthzProfileRequest extends $pb.GeneratedMessage {
+  factory AuthzProfileRequest({
     $core.String? profileId,
   }) {
     final $result = create();
@@ -614,11 +614,11 @@ class ProfileRequest extends $pb.GeneratedMessage {
     }
     return $result;
   }
-  ProfileRequest._() : super();
-  factory ProfileRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory ProfileRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  AuthzProfileRequest._() : super();
+  factory AuthzProfileRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory AuthzProfileRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ProfileRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'), createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'AuthzProfileRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'), createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'profile_id')
     ..hasRequiredFields = false
   ;
@@ -627,22 +627,22 @@ class ProfileRequest extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
   'Will be removed in next major version')
-  ProfileRequest clone() => ProfileRequest()..mergeFromMessage(this);
+  AuthzProfileRequest clone() => AuthzProfileRequest()..mergeFromMessage(this);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  ProfileRequest copyWith(void Function(ProfileRequest) updates) => super.copyWith((message) => updates(message as ProfileRequest)) as ProfileRequest;
+  AuthzProfileRequest copyWith(void Function(AuthzProfileRequest) updates) => super.copyWith((message) => updates(message as AuthzProfileRequest)) as AuthzProfileRequest;
 
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  static ProfileRequest create() => ProfileRequest._();
-  ProfileRequest createEmptyInstance() => create();
-  static $pb.PbList<ProfileRequest> createRepeated() => $pb.PbList<ProfileRequest>();
+  static AuthzProfileRequest create() => AuthzProfileRequest._();
+  AuthzProfileRequest createEmptyInstance() => create();
+  static $pb.PbList<AuthzProfileRequest> createRepeated() => $pb.PbList<AuthzProfileRequest>();
   @$core.pragma('dart2js:noInline')
-  static ProfileRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ProfileRequest>(create);
-  static ProfileRequest? _defaultInstance;
+  static AuthzProfileRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<AuthzProfileRequest>(create);
+  static AuthzProfileRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.String get profileId => $_getSZ(0);
@@ -654,8 +654,8 @@ class ProfileRequest extends $pb.GeneratedMessage {
   void clearProfileId() => clearField(1);
 }
 
-class ProfileResponse extends $pb.GeneratedMessage {
-  factory ProfileResponse({
+class AuthzProfileResponse extends $pb.GeneratedMessage {
+  factory AuthzProfileResponse({
     Token? token,
   }) {
     final $result = create();
@@ -664,11 +664,11 @@ class ProfileResponse extends $pb.GeneratedMessage {
     }
     return $result;
   }
-  ProfileResponse._() : super();
-  factory ProfileResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory ProfileResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  AuthzProfileResponse._() : super();
+  factory AuthzProfileResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory AuthzProfileResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ProfileResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'), createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'AuthzProfileResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'), createEmptyInstance: create)
     ..aOM<Token>(1, _omitFieldNames ? '' : 'token', subBuilder: Token.create)
     ..hasRequiredFields = false
   ;
@@ -677,22 +677,22 @@ class ProfileResponse extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
   'Will be removed in next major version')
-  ProfileResponse clone() => ProfileResponse()..mergeFromMessage(this);
+  AuthzProfileResponse clone() => AuthzProfileResponse()..mergeFromMessage(this);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  ProfileResponse copyWith(void Function(ProfileResponse) updates) => super.copyWith((message) => updates(message as ProfileResponse)) as ProfileResponse;
+  AuthzProfileResponse copyWith(void Function(AuthzProfileResponse) updates) => super.copyWith((message) => updates(message as AuthzProfileResponse)) as AuthzProfileResponse;
 
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  static ProfileResponse create() => ProfileResponse._();
-  ProfileResponse createEmptyInstance() => create();
-  static $pb.PbList<ProfileResponse> createRepeated() => $pb.PbList<ProfileResponse>();
+  static AuthzProfileResponse create() => AuthzProfileResponse._();
+  AuthzProfileResponse createEmptyInstance() => create();
+  static $pb.PbList<AuthzProfileResponse> createRepeated() => $pb.PbList<AuthzProfileResponse>();
   @$core.pragma('dart2js:noInline')
-  static ProfileResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ProfileResponse>(create);
-  static ProfileResponse? _defaultInstance;
+  static AuthzProfileResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<AuthzProfileResponse>(create);
+  static AuthzProfileResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
   Token get token => $_getN(0);

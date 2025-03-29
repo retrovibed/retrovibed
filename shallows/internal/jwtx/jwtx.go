@@ -42,7 +42,7 @@ func GetAlgorithms() (res []string) {
 	return res
 }
 
-type JWTSecretSource func() []byte
+type SecretSource func() []byte
 
 func NotAuthorized() error {
 	return errorsx.New("not authorized")
@@ -56,6 +56,12 @@ func ClaimsOptionAuthzExpiration() Option {
 
 func ClaimsOptionAuthnExpiration() Option {
 	return ClaimsOptionExpiration(7 * 24 * time.Hour)
+}
+
+func ClaimsOptionAuthnRefreshExpiration() Option {
+	return func(rc *jwt.RegisteredClaims) {
+		rc.ExpiresAt = nil
+	}
 }
 
 func ClaimsOptionExpiration(d time.Duration) Option {
@@ -82,6 +88,12 @@ func ClaimsOptionIssuer(s string) Option {
 	}
 }
 
+func ClaimsOptionAudience(s ...string) Option {
+	return func(rc *jwt.RegisteredClaims) {
+		rc.Audience = s
+	}
+}
+
 func ClaimsOptionID(s string) Option {
 	return func(rc *jwt.RegisteredClaims) {
 		rc.ID = s
@@ -98,6 +110,7 @@ func ClaimsOptionComposed(opts ...Option) Option {
 
 func NewJWTClaims(subject string, options ...Option) (c jwt.RegisteredClaims) {
 	ts := time.Now()
+
 	c = jwt.RegisteredClaims{
 		ID:        uuid.Must(uuid.NewV4()).String(),
 		Subject:   subject,
@@ -125,12 +138,12 @@ func Signed(jwtsecret []byte, t jwt.Claims) (signed string, err error) {
 	return UnsafeSigned(jwtsecret, t)
 }
 
-func BearerFromHTTPContext(ctx context.Context, r *http.Request, jwtsecret JWTSecretSource, t jwt.Claims) (_ string, err error) {
+func BearerFromHTTPContext(ctx context.Context, r *http.Request, jwtsecret SecretSource, t jwt.Claims) (_ string, err error) {
 	encoded := r.Header.Get(mdkey)
 	return encoded, Validate(jwtsecret, encoded, t)
 }
 
-func Validate(jwtsecret JWTSecretSource, encoded string, t jwt.Claims) error {
+func Validate(jwtsecret SecretSource, encoded string, t jwt.Claims) error {
 	encoded = strings.NewReplacer(
 		"bearer ",
 		"",
@@ -143,7 +156,7 @@ func Validate(jwtsecret JWTSecretSource, encoded string, t jwt.Claims) error {
 	}, jwt.WithValidMethods(algos))
 
 	if err != nil {
-		return errorsx.Wrap(err, "unable to parse jwt token")
+		return errorsx.Wrapf(err, "unable to parse jwt token: %T", t)
 	}
 
 	if !token.Valid {

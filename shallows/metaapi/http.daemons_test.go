@@ -9,7 +9,6 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
-	"github.com/retrovibed/retrovibed/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/httpauthtest"
 	"github.com/retrovibed/retrovibed/internal/formx"
 	"github.com/retrovibed/retrovibed/internal/httptestx"
@@ -35,8 +34,6 @@ func TestHTTPDaemonSearch(t *testing.T) {
 
 	q := sqltestx.Metadatabase(t)
 	defer q.Close()
-
-	require.NoError(t, cmdmeta.InitializeDatabase(ctx, q))
 
 	require.NoError(t, testx.Fake(&p, meta.DaemonOptionTestDefaults, meta.DaemonOptionMaybeID, timex.UTCEncodeOption))
 	require.NoError(t, meta.DaemonInsertWithDefaults(ctx, q, p).Scan(&p))
@@ -74,13 +71,8 @@ func TestHTTPDaemonCreateNew(t *testing.T) {
 		claims jwt.RegisteredClaims
 	)
 
-	ctx, done := testx.Context(t)
-	defer done()
-
 	q := sqltestx.Metadatabase(t)
 	defer q.Close()
-
-	require.NoError(t, cmdmeta.InitializeDatabase(ctx, q))
 
 	require.NoError(t, testx.Fake(&v, meta.DaemonOptionTestDefaults, timex.UTCEncodeOption))
 
@@ -123,8 +115,6 @@ func TestHTTPDaemonCreateUpdate(t *testing.T) {
 
 	q := sqltestx.Metadatabase(t)
 	defer q.Close()
-
-	require.NoError(t, cmdmeta.InitializeDatabase(ctx, q))
 
 	require.NoError(t, testx.Fake(&v, meta.DaemonOptionTestDefaults, meta.DaemonOptionMaybeID, timex.UTCEncodeOption))
 	require.NoError(t, meta.DaemonInsertWithDefaults(ctx, q, v).Scan(&v))
@@ -171,7 +161,6 @@ func TestHTTPDaemonLatest(t *testing.T) {
 	q := sqltestx.Metadatabase(t)
 	defer q.Close()
 
-	require.NoError(t, cmdmeta.InitializeDatabase(ctx, q))
 	for i := 0; i < 10; i++ {
 		require.NoError(t, testx.Fake(&v, meta.DaemonOptionTestDefaults, meta.DaemonOptionMaybeID, timex.UTCEncodeOption))
 		require.NoError(t, meta.DaemonInsertWithDefaults(ctx, q, v).Scan(&v))
