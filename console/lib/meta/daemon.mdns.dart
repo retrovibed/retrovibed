@@ -1,23 +1,16 @@
-import 'package:console/meta/meta.daemon.pb.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:multicast_dns/multicast_dns.dart';
 import 'package:console/designkit.dart' as ds;
 import 'package:console/design.kit/forms.dart' as forms;
-import './httpx.dart' as httpx;
-import 'package:console/meta.dart' as meta;
+import 'package:console/httpx.dart' as httpx;
+import './api.dart' as api;
 
 class ManualConfiguration extends StatefulWidget {
   final void Function() retry;
   final void Function(String) connect;
-  final Future<DaemonSearchResponse> Function(DaemonSearchRequest) search;
 
-  ManualConfiguration({
-    super.key,
-    required this.retry,
-    required this.connect,
-    this.search = meta.daemons.search,
-  });
+  ManualConfiguration({super.key, required this.retry, required this.connect});
 
   @override
   State<ManualConfiguration> createState() => _ManualConfigurationView();
@@ -60,10 +53,10 @@ class _ManualConfigurationView extends State<ManualConfiguration> {
                 TextButton(
                   child: Text("connect"),
                   onPressed: () {
-                    meta.daemons
+                    api.daemons
                         .create(
-                          meta.DaemonCreateRequest(
-                            daemon: meta.Daemon(hostname: _hostname),
+                          api.DaemonCreateRequest(
+                            daemon: api.Daemon(hostname: _hostname),
                           ),
                         )
                         .then((d) {
@@ -81,10 +74,9 @@ class _ManualConfigurationView extends State<ManualConfiguration> {
 }
 
 class MDNSDiscovery extends StatefulWidget {
-  final Widget child;
-  final UniqueKey id = UniqueKey();
+  // final UniqueKey id = UniqueKey();
 
-  MDNSDiscovery(this.child, {super.key});
+  // MDNSDiscovery({super.key});
 
   static _MDNSDiscovery? of(BuildContext context) {
     return context.findAncestorStateOfType<_MDNSDiscovery>();
@@ -135,25 +127,7 @@ class _MDNSDiscovery extends State<MDNSDiscovery> {
           });
         })
         .catchError((cause) {
-          _loading = false;
-          _cause = ConstrainedBox(
-            constraints: BoxConstraints(maxHeight: 256, maxWidth: 800),
-            child: ManualConfiguration(
-              retry: () {
-                setState(() {
-                  _loading = true;
-                  _cause = null;
-                });
-                this.discover();
-              },
-              connect: (hostname) {
-                setState(() {
-                  httpx.set(hostname);
-                  _cause = null;
-                });
-              },
-            ),
-          );
+          // ignore timeouts they'll be marked as loaded complete and the manual setup will trigger.
         }, test: ds.ErrorTests.timeout)
         .catchError((cause) {
           setState(() {
@@ -177,6 +151,27 @@ class _MDNSDiscovery extends State<MDNSDiscovery> {
 
   @override
   Widget build(BuildContext context) {
-    return ds.Loading(cause: _cause, loading: _loading, child: widget.child);
+    return ds.Loading(
+      cause: _cause,
+      loading: _loading,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: 256, maxWidth: 512),
+        child: ManualConfiguration(
+          retry: () {
+            setState(() {
+              _loading = true;
+              _cause = null;
+            });
+            this.discover();
+          },
+          connect: (hostname) {
+            setState(() {
+              httpx.set(hostname);
+              _cause = null;
+            });
+          },
+        ),
+      ),
+    );
   }
 }

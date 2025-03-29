@@ -57,16 +57,10 @@ class _DaemonList extends State<DaemonList> {
   }
 }
 
-void notimplemented(String s) {
-  return print(s);
-}
-
-void rowtapdefault() => notimplemented("row tap not implemented");
-
 class _RowDisplay extends StatelessWidget {
   final api.Daemon current;
   final void Function()? onTap;
-  const _RowDisplay({required this.current, this.onTap = rowtapdefault});
+  const _RowDisplay({required this.current, this.onTap = ds.defaulttap});
 
   @override
   Widget build(BuildContext context) {

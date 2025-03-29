@@ -45,4 +45,18 @@ abstract class daemons {
           );
         });
   }
+
+  static Future<DaemonLookupResponse> latest() async {
+    return client
+        .get(
+          Uri.https(httpx.host(), "/meta/d/latest"),
+          headers: {"Authorization": httpx.auto_bearer()},
+        )
+        .then((v) {
+          return Future.value(
+            DaemonLookupResponse.create()
+              ..mergeFromProto3Json(jsonDecode(v.body)),
+          );
+        });
+  }
 }
