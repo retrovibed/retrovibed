@@ -46,7 +46,7 @@ func DecodeSegment(signature []byte) ([]byte, error) {
 	panic("unimplemented")
 }
 
-func (t jwtsigner) Sign(signingString string, key interface{}) ([]byte, error) {
+func (t jwtsigner) Sign(signingString string, key any) ([]byte, error) {
 	var (
 		s    ssh.Signer
 		sigb []byte

@@ -309,3 +309,9 @@ func SearchQuery(s string) string {
 
 	return strings.Join(parts, ":* | ") + ":*"
 }
+
+func NewNullString(s string) (x sql.NullString) {
+	x.String = s
+	x.Valid = true
+	return x
+}

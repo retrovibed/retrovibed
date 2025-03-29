@@ -32,6 +32,7 @@ require (
 	github.com/stretchr/testify v1.10.0
 	github.com/willabides/kongplete v0.4.0
 	golang.org/x/crypto v0.36.0
+	golang.org/x/oauth2 v0.28.0
 	golang.org/x/text v0.23.0
 	golang.org/x/time v0.11.0
 	google.golang.org/protobuf v1.36.5

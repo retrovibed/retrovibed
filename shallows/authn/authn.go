@@ -1,6 +1,13 @@
 package authn
 
 import (
+	"context"
+	"crypto/rand"
+	"encoding/base64"
+	"encoding/json"
+	"fmt"
+	"io"
+	"log"
 	"net/http"
 	"strings"
 	"sync"
@@ -11,9 +18,11 @@ import (
 	"github.com/retrovibed/retrovibed/internal/env"
 	"github.com/retrovibed/retrovibed/internal/envx"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
+	"github.com/retrovibed/retrovibed/internal/httpx"
 	"github.com/retrovibed/retrovibed/internal/jwtx"
 	"github.com/retrovibed/retrovibed/internal/sshx"
 	"golang.org/x/crypto/ssh"
+	"golang.org/x/oauth2"
 )
 
 func PublicKeyPath() string {
@@ -62,4 +71,104 @@ func Bearer(req *http.Request) string {
 	}
 
 	return after
+}
+
+func EndpointSSHAuth(hostname string) oauth2.Endpoint {
+	return oauth2.Endpoint{
+		AuthURL:   fmt.Sprintf("%s/oauth2/ssh/auth", hostname),
+		TokenURL:  fmt.Sprintf("%s/oauth2/ssh/token", hostname),
+		AuthStyle: oauth2.AuthStyleInHeader,
+	}
+}
+
+func OAuth2SSHConfig(signer ssh.Signer, otp string, endpoint oauth2.Endpoint) oauth2.Config {
+	return oauth2.Config{
+		ClientID:     ssh.FingerprintSHA256(signer.PublicKey()),
+		ClientSecret: otp,
+		Endpoint:     endpoint,
+	}
+}
+
+func OAuth2SSHToken(ctx context.Context, signer ssh.Signer, endpoint oauth2.Endpoint) (cfg oauth2.Config, tok *oauth2.Token, err error) {
+	var (
+		sig *ssh.Signature
+	)
+
+	password := uuid.Must(uuid.NewV4())
+
+	cfg = OAuth2SSHConfig(signer, password.String(), endpoint)
+	if sig, err = signer.Sign(rand.Reader, password.Bytes()); err != nil {
+		return cfg, nil, err
+	}
+
+	encodedsig := base64.RawURLEncoding.EncodeToString(ssh.Marshal(sig))
+
+	tok, err = cfg.PasswordCredentialsToken(ctx, cfg.ClientID, encodedsig)
+	return cfg, tok, err
+}
+
+func ExchangeAuthed(ctx context.Context, chttp *http.Client, endpoint string /*, authed *Authed*/) (err error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, nil)
+	if err != nil {
+		return err
+	}
+	resp, err := httpx.AsError(chttp.Do(req))
+	if err != nil {
+		return err
+	}
+	defer httpx.AutoClose(resp)
+
+	raw, _ := io.ReadAll(resp.Body)
+	log.Println("DERP DERP", string(raw))
+	// if err = json.NewDecoder(resp.Body).Decode(&authed); err != nil {
+	// return err
+	// }
+
+	return nil
+}
+
+func AutoTokenState(signer ssh.Signer) (encoded string, err error) {
+	type reqstate struct {
+		ID        string `json:"id"`
+		PublicKey []byte `json:"pkey"`
+	}
+
+	id, err := uuid.NewV4()
+	if err != nil {
+		return "", err
+	}
+	rawstate := reqstate{
+		ID:        id.String(),
+		PublicKey: signer.PublicKey().Marshal(),
+	}
+
+	if encoded, err = jwtx.EncodeJSON(rawstate); err != nil {
+		return "", errorsx.Wrap(err, "unable to encode state")
+	}
+
+	return encoded, nil
+}
+
+type AuthResponse struct {
+	Code  string `json:"code"`
+	State string `json:"state"`
+}
+
+func RetrieveAuthCode(ctx context.Context, chttp *http.Client, uri string) (r AuthResponse, err error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, uri, nil)
+	if err != nil {
+		return r, err
+	}
+
+	resp, err := httpx.AsError(chttp.Do(req))
+	if err != nil {
+		return r, err
+	}
+	defer httpx.AutoClose(resp)
+
+	if err = json.NewDecoder(resp.Body).Decode(&r); err != nil {
+		return r, err
+	}
+
+	return r, nil
 }

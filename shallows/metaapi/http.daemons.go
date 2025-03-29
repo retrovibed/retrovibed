@@ -24,7 +24,7 @@ import (
 
 type HTTPDaemonsOption func(*HTTPDaemons)
 
-func HTTPDaemonsOptionJWTSecret(j jwtx.JWTSecretSource) HTTPDaemonsOption {
+func HTTPDaemonsOptionJWTSecret(j jwtx.SecretSource) HTTPDaemonsOption {
 	return func(t *HTTPDaemons) {
 		t.jwtsecret = j
 	}
@@ -42,7 +42,7 @@ func NewHTTPDaemons(q sqlx.Queryer, options ...HTTPDaemonsOption) *HTTPDaemons {
 
 type HTTPDaemons struct {
 	q         sqlx.Queryer
-	jwtsecret jwtx.JWTSecretSource
+	jwtsecret jwtx.SecretSource
 	decoder   *form.Decoder
 }
 
@@ -158,12 +158,6 @@ func (t *HTTPDaemons) latest(w http.ResponseWriter, r *http.Request) {
 		err error
 		v   meta.Daemon
 	)
-
-	// if v, err = NewMetadaemonFromDaemon(msg.Daemon, meta.DaemonOptionMaybeID, meta.DaemonOptionEnsureDescription, timex.JSONSafeDecodeOption); err != nil {
-	// 	log.Println(errorsx.Wrap(err, "converting data failed"))
-	// 	errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
-	// 	return
-	// }
 
 	if err = meta.DaemonFindByLatestUpdated(r.Context(), t.q).Scan(&v); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to find record"))

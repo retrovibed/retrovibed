@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/ed25519"
 	"crypto/x509"
+	"encoding/base64"
 	"encoding/pem"
 	"fmt"
 	"io"
@@ -11,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/retrovibed/retrovibed/internal/cryptox"
+	"github.com/retrovibed/retrovibed/internal/md5x"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -152,4 +154,24 @@ func AutoCached(kg keygen, path string) (s ssh.Signer, err error) {
 // ensure the public key exists
 func EnsurePublicKey(s ssh.Signer, path string) error {
 	return os.WriteFile(fmt.Sprintf("%s.pub", path), ssh.MarshalAuthorizedKey(s.PublicKey()), 0600)
+}
+
+func EncodeBase64PublicKey(pub ssh.PublicKey) string {
+	return base64.RawURLEncoding.EncodeToString(pub.Marshal())
+}
+
+func DecodeBase64PublicKey(s string) (pub ssh.PublicKey, err error) {
+	var (
+		encoded []byte
+	)
+
+	if encoded, err = base64.RawURLEncoding.DecodeString(s); err != nil {
+		return nil, err
+	}
+
+	return ssh.ParsePublicKey(encoded)
+}
+
+func FingerprintMD5(pub ssh.PublicKey) string {
+	return md5x.FormatUUID(md5x.Digest(pub.Marshal()))
 }

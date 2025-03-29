@@ -17,7 +17,7 @@ message Bearer {
 message Token {
   // START OF STANDARD FIELDS
   string id = 1 [ json_name = "jti" ];
-  string account_id = 2 [ json_name = "iss" ];
+  string issuer = 2 [ json_name = "iss" ];
   string profile_id = 3 [ json_name = "sub" ];
   string session_id = 4 [ json_name = "sid" ];
   int64 issued = 5 [ json_name = "iat" ];
@@ -34,11 +34,13 @@ message AuthzResponse {
   Token token = 2 [ json_name = "token" ];
 }
 
-message GrantRequest { Token token = 1 [ json_name = "token" ]; }
-message GrantResponse { Token token = 1 [ json_name = "token" ]; }
+message AuthzGrantRequest { Token token = 1 [ json_name = "token" ]; }
+message AuthzGrantResponse { Token token = 1 [ json_name = "token" ]; }
 
-message RevokeRequest { Token token = 1 [ json_name = "token" ]; }
-message RevokeResponse { Token token = 1 [ json_name = "token" ]; }
+message AuthzRevokeRequest { Token token = 1 [ json_name = "token" ]; }
+message AuthzRevokeResponse { Token token = 1 [ json_name = "token" ]; }
 
-message ProfileRequest { string profile_id = 1 [ json_name = "profile_id" ]; }
-message ProfileResponse { Token token = 1 [ json_name = "token" ]; }
+message AuthzProfileRequest {
+  string profile_id = 1 [ json_name = "profile_id" ];
+}
+message AuthzProfileResponse { Token token = 1 [ json_name = "token" ]; }

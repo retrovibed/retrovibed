@@ -1,6 +1,7 @@
 package httpauth
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -11,7 +12,7 @@ import (
 )
 
 // Authenticate a session - responds with 401 if unable to locate the token.
-func AuthenticateWithToken(p jwtx.JWTSecretSource) func(http.Handler) http.Handler {
+func AuthenticateWithToken(p jwtx.SecretSource) func(http.Handler) http.Handler {
 	return func(original http.Handler) http.Handler {
 		return http.HandlerFunc(func(resp http.ResponseWriter, req *http.Request) {
 			var (
@@ -25,7 +26,18 @@ func AuthenticateWithToken(p jwtx.JWTSecretSource) func(http.Handler) http.Handl
 			}
 
 			original.ServeHTTP(resp, req)
-			// original.ServeHTTP(resp, req.WithContext(authn.WithLoginToken(req.Context(), b)))
 		})
 	}
+}
+
+func IssuerSubjectID(ctx context.Context, ss jwtx.SecretSource, req *http.Request) (issuer string, pid string, err error) {
+	var (
+		b jwt.RegisteredClaims
+	)
+
+	if _, err = jwtx.BearerFromHTTPContext(ctx, req, ss, &b); err != nil {
+		return "", "", err
+	}
+
+	return b.Issuer, b.Subject, nil
 }

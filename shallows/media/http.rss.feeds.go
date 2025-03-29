@@ -26,7 +26,7 @@ import (
 
 type HTTPRSSFeedOption func(*HTTPRSSFeed)
 
-func HTTPRSSFeedOptionJWTSecret(j jwtx.JWTSecretSource) HTTPRSSFeedOption {
+func HTTPRSSFeedOptionJWTSecret(j jwtx.SecretSource) HTTPRSSFeedOption {
 	return func(t *HTTPRSSFeed) {
 		t.jwtsecret = j
 	}
@@ -44,7 +44,7 @@ func NewHTTPRSSFeed(q sqlx.Queryer, options ...HTTPRSSFeedOption) *HTTPRSSFeed {
 
 type HTTPRSSFeed struct {
 	q         sqlx.Queryer
-	jwtsecret jwtx.JWTSecretSource
+	jwtsecret jwtx.SecretSource
 	decoder   *form.Decoder
 }
 

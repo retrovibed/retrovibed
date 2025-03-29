@@ -38,7 +38,7 @@ const Token$json = {
   '1': 'Token',
   '2': [
     {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'jti'},
-    {'1': 'account_id', '3': 2, '4': 1, '5': 9, '10': 'iss'},
+    {'1': 'issuer', '3': 2, '4': 1, '5': 9, '10': 'iss'},
     {'1': 'profile_id', '3': 3, '4': 1, '5': 9, '10': 'sub'},
     {'1': 'session_id', '3': 4, '4': 1, '5': 9, '10': 'sid'},
     {'1': 'issued', '3': 5, '4': 1, '5': 3, '10': 'iat'},
@@ -53,10 +53,10 @@ const Token$json = {
 
 /// Descriptor for `Token`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List tokenDescriptor = $convert.base64Decode(
-    'CgVUb2tlbhIPCgJpZBgBIAEoCVIDanRpEhcKCmFjY291bnRfaWQYAiABKAlSA2lzcxIXCgpwcm'
-    '9maWxlX2lkGAMgASgJUgNzdWISFwoKc2Vzc2lvbl9pZBgEIAEoCVIDc2lkEhMKBmlzc3VlZBgF'
-    'IAEoA1IDaWF0EhQKB2V4cGlyZXMYBiABKANSA2V4cBIXCgpub3RfYmVmb3JlGAcgASgDUgNuYm'
-    'YSJwoOdXNlcm1hbmFnZW1lbnQY6AcgASgIUg51c2VybWFuYWdlbWVudEoFCAkQ6Ac=');
+    'CgVUb2tlbhIPCgJpZBgBIAEoCVIDanRpEhMKBmlzc3VlchgCIAEoCVIDaXNzEhcKCnByb2ZpbG'
+    'VfaWQYAyABKAlSA3N1YhIXCgpzZXNzaW9uX2lkGAQgASgJUgNzaWQSEwoGaXNzdWVkGAUgASgD'
+    'UgNpYXQSFAoHZXhwaXJlcxgGIAEoA1IDZXhwEhcKCm5vdF9iZWZvcmUYByABKANSA25iZhInCg'
+    '51c2VybWFuYWdlbWVudBjoByABKAhSDnVzZXJtYW5hZ2VtZW50SgUICRDoBw==');
 
 @$core.Deprecated('Use authzRequestDescriptor instead')
 const AuthzRequest$json = {
@@ -81,75 +81,79 @@ final $typed_data.Uint8List authzResponseDescriptor = $convert.base64Decode(
     'Cg1BdXRoelJlc3BvbnNlEhYKBmJlYXJlchgBIAEoCVIGYmVhcmVyEiEKBXRva2VuGAIgASgLMg'
     'subWV0YS5Ub2tlblIFdG9rZW4=');
 
-@$core.Deprecated('Use grantRequestDescriptor instead')
-const GrantRequest$json = {
-  '1': 'GrantRequest',
+@$core.Deprecated('Use authzGrantRequestDescriptor instead')
+const AuthzGrantRequest$json = {
+  '1': 'AuthzGrantRequest',
   '2': [
     {'1': 'token', '3': 1, '4': 1, '5': 11, '6': '.meta.Token', '10': 'token'},
   ],
 };
 
-/// Descriptor for `GrantRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List grantRequestDescriptor = $convert.base64Decode(
-    'CgxHcmFudFJlcXVlc3QSIQoFdG9rZW4YASABKAsyCy5tZXRhLlRva2VuUgV0b2tlbg==');
+/// Descriptor for `AuthzGrantRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List authzGrantRequestDescriptor = $convert.base64Decode(
+    'ChFBdXRoekdyYW50UmVxdWVzdBIhCgV0b2tlbhgBIAEoCzILLm1ldGEuVG9rZW5SBXRva2Vu');
 
-@$core.Deprecated('Use grantResponseDescriptor instead')
-const GrantResponse$json = {
-  '1': 'GrantResponse',
+@$core.Deprecated('Use authzGrantResponseDescriptor instead')
+const AuthzGrantResponse$json = {
+  '1': 'AuthzGrantResponse',
   '2': [
     {'1': 'token', '3': 1, '4': 1, '5': 11, '6': '.meta.Token', '10': 'token'},
   ],
 };
 
-/// Descriptor for `GrantResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List grantResponseDescriptor = $convert.base64Decode(
-    'Cg1HcmFudFJlc3BvbnNlEiEKBXRva2VuGAEgASgLMgsubWV0YS5Ub2tlblIFdG9rZW4=');
+/// Descriptor for `AuthzGrantResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List authzGrantResponseDescriptor = $convert.base64Decode(
+    'ChJBdXRoekdyYW50UmVzcG9uc2USIQoFdG9rZW4YASABKAsyCy5tZXRhLlRva2VuUgV0b2tlbg'
+    '==');
 
-@$core.Deprecated('Use revokeRequestDescriptor instead')
-const RevokeRequest$json = {
-  '1': 'RevokeRequest',
+@$core.Deprecated('Use authzRevokeRequestDescriptor instead')
+const AuthzRevokeRequest$json = {
+  '1': 'AuthzRevokeRequest',
   '2': [
     {'1': 'token', '3': 1, '4': 1, '5': 11, '6': '.meta.Token', '10': 'token'},
   ],
 };
 
-/// Descriptor for `RevokeRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List revokeRequestDescriptor = $convert.base64Decode(
-    'Cg1SZXZva2VSZXF1ZXN0EiEKBXRva2VuGAEgASgLMgsubWV0YS5Ub2tlblIFdG9rZW4=');
+/// Descriptor for `AuthzRevokeRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List authzRevokeRequestDescriptor = $convert.base64Decode(
+    'ChJBdXRoelJldm9rZVJlcXVlc3QSIQoFdG9rZW4YASABKAsyCy5tZXRhLlRva2VuUgV0b2tlbg'
+    '==');
 
-@$core.Deprecated('Use revokeResponseDescriptor instead')
-const RevokeResponse$json = {
-  '1': 'RevokeResponse',
+@$core.Deprecated('Use authzRevokeResponseDescriptor instead')
+const AuthzRevokeResponse$json = {
+  '1': 'AuthzRevokeResponse',
   '2': [
     {'1': 'token', '3': 1, '4': 1, '5': 11, '6': '.meta.Token', '10': 'token'},
   ],
 };
 
-/// Descriptor for `RevokeResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List revokeResponseDescriptor = $convert.base64Decode(
-    'Cg5SZXZva2VSZXNwb25zZRIhCgV0b2tlbhgBIAEoCzILLm1ldGEuVG9rZW5SBXRva2Vu');
+/// Descriptor for `AuthzRevokeResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List authzRevokeResponseDescriptor = $convert.base64Decode(
+    'ChNBdXRoelJldm9rZVJlc3BvbnNlEiEKBXRva2VuGAEgASgLMgsubWV0YS5Ub2tlblIFdG9rZW'
+    '4=');
 
-@$core.Deprecated('Use profileRequestDescriptor instead')
-const ProfileRequest$json = {
-  '1': 'ProfileRequest',
+@$core.Deprecated('Use authzProfileRequestDescriptor instead')
+const AuthzProfileRequest$json = {
+  '1': 'AuthzProfileRequest',
   '2': [
     {'1': 'profile_id', '3': 1, '4': 1, '5': 9, '10': 'profile_id'},
   ],
 };
 
-/// Descriptor for `ProfileRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List profileRequestDescriptor = $convert.base64Decode(
-    'Cg5Qcm9maWxlUmVxdWVzdBIeCgpwcm9maWxlX2lkGAEgASgJUgpwcm9maWxlX2lk');
+/// Descriptor for `AuthzProfileRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List authzProfileRequestDescriptor = $convert.base64Decode(
+    'ChNBdXRoelByb2ZpbGVSZXF1ZXN0Eh4KCnByb2ZpbGVfaWQYASABKAlSCnByb2ZpbGVfaWQ=');
 
-@$core.Deprecated('Use profileResponseDescriptor instead')
-const ProfileResponse$json = {
-  '1': 'ProfileResponse',
+@$core.Deprecated('Use authzProfileResponseDescriptor instead')
+const AuthzProfileResponse$json = {
+  '1': 'AuthzProfileResponse',
   '2': [
     {'1': 'token', '3': 1, '4': 1, '5': 11, '6': '.meta.Token', '10': 'token'},
   ],
 };
 
-/// Descriptor for `ProfileResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List profileResponseDescriptor = $convert.base64Decode(
-    'Cg9Qcm9maWxlUmVzcG9uc2USIQoFdG9rZW4YASABKAsyCy5tZXRhLlRva2VuUgV0b2tlbg==');
+/// Descriptor for `AuthzProfileResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List authzProfileResponseDescriptor = $convert.base64Decode(
+    'ChRBdXRoelByb2ZpbGVSZXNwb25zZRIhCgV0b2tlbhgBIAEoCzILLm1ldGEuVG9rZW5SBXRva2'
+    'Vu');
 

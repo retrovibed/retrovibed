@@ -22,7 +22,7 @@ import (
 
 type HTTPUsermanagementOption func(*HTTPUsermanagement)
 
-func HTTPUsermanagementOptionJWTSecret(j jwtx.JWTSecretSource) HTTPUsermanagementOption {
+func HTTPUsermanagementOptionJWTSecret(j jwtx.SecretSource) HTTPUsermanagementOption {
 	return func(t *HTTPUsermanagement) {
 		t.jwtsecret = j
 	}
@@ -40,7 +40,7 @@ func NewHTTPUsermanagement(q sqlx.Queryer, options ...HTTPUsermanagementOption) 
 
 type HTTPUsermanagement struct {
 	q         sqlx.Queryer
-	jwtsecret jwtx.JWTSecretSource
+	jwtsecret jwtx.SecretSource
 	decoder   *form.Decoder
 }
 
