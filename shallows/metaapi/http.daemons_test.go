@@ -129,6 +129,8 @@ func TestHTTPDaemonCreateUpdate(t *testing.T) {
 	require.NoError(t, testx.Fake(&v, meta.DaemonOptionTestDefaults, meta.DaemonOptionMaybeID, timex.UTCEncodeOption))
 	require.NoError(t, meta.DaemonInsertWithDefaults(ctx, q, v).Scan(&v))
 
+	time.Sleep(time.Millisecond)
+
 	routes := mux.NewRouter()
 
 	metaapi.NewHTTPDaemons(
