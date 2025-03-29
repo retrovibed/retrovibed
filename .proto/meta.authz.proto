@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package meta;
+
+message Bearer {
+  // START OF STANDARD FIELDS
+  string id = 1 [ json_name = "jti" ];
+  string issuer = 2 [ json_name = "iss" ];
+  string profile_id = 3 [ json_name = "sub" ];
+  string session_id = 4 [ json_name = "sid" ];
+  int64 issued = 5 [ json_name = "iat" ];
+  int64 expires = 6 [ json_name = "exp" ];
+  int64 not_before = 7 [ json_name = "nbf" ];
+  // END OF STANDARD FIELDS
+}
+
+message Token {
+  // START OF STANDARD FIELDS
+  string id = 1 [ json_name = "jti" ];
+  string account_id = 2 [ json_name = "iss" ];
+  string profile_id = 3 [ json_name = "sub" ];
+  string session_id = 4 [ json_name = "sid" ];
+  int64 issued = 5 [ json_name = "iat" ];
+  int64 expires = 6 [ json_name = "exp" ];
+  int64 not_before = 7 [ json_name = "nbf" ];
+  // END OF STANDARD FIELDS
+  reserved 9 to 999;
+  bool usermanagement = 1000 [ json_name = "usermanagement" ];
+}
+
+message AuthzRequest {}
+message AuthzResponse {
+  string bearer = 1 [ json_name = "bearer" ];
+  Token token = 2 [ json_name = "token" ];
+}
+
+message GrantRequest { Token token = 1 [ json_name = "token" ]; }
+message GrantResponse { Token token = 1 [ json_name = "token" ]; }
+
+message RevokeRequest { Token token = 1 [ json_name = "token" ]; }
+message RevokeResponse { Token token = 1 [ json_name = "token" ]; }
+
+message ProfileRequest { string profile_id = 1 [ json_name = "profile_id" ]; }
+message ProfileResponse { Token token = 1 [ json_name = "token" ]; }

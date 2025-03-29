@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"math"
+	"reflect"
 	"time"
 )
 
@@ -162,4 +163,55 @@ func RFC3339NegInf() time.Time {
 // RFC3339Inf  infinity representation
 func RFC3339Inf() time.Time {
 	return time.Date(9999, time.December, 31, 23, 59, 59, 999000000, time.UTC)
+}
+
+func UTCEncodeOption[T any](v *T) {
+	_jsonsacodec(reflect.ValueOf(v), func(ts time.Time) time.Time {
+		return ts.UTC()
+	})
+}
+
+func JSONSafeEncodeOption[T any](v *T) {
+	JSONSafeEncode(v)
+}
+
+func JSONSafeDecodeOption[T any](v *T) {
+	JSONSafeDecode(v)
+}
+
+func JSONSafeDecode[T any](v T) T {
+	metav := reflect.ValueOf(v)
+	_jsonsacodec(metav, RFC3339NanoDecode)
+	return v
+}
+
+func JSONSafeEncode[T any](v T) T {
+	metav := reflect.ValueOf(v)
+	_jsonsacodec(metav, RFC3339NanoEncode)
+	return v
+}
+
+func _jsonsacodec(v reflect.Value, m func(time.Time) time.Time) {
+	if ts, ok := v.Interface().(time.Time); ok {
+		v.Set(reflect.ValueOf(m(ts)))
+		return
+	}
+
+	switch v.Kind() {
+	case reflect.Struct:
+		for _, nv := range reflect.VisibleFields(v.Type()) {
+			_jsonsacodec(v.FieldByIndex(nv.Index), m)
+		}
+	// case reflect.Slice, reflect.Array:
+	// case reflect.Interface:
+	case reflect.Ptr:
+		if v.IsNil() {
+			v = reflect.Zero(v.Type().Elem())
+		} else {
+			v = v.Elem()
+		}
+		_jsonsacodec(v, m)
+	default:
+		// do nothing
+	}
 }

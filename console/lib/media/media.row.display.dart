@@ -2,13 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:console/designkit.dart' as ds;
 import './media.pb.dart';
 
-void notimplemented(String s) {
-  return print(s);
-}
-
-void rowtapdefault() => notimplemented("row tap not implemented");
-void playtapdefault() => notimplemented("play tap not implemented");
-
 class RowDisplay extends StatelessWidget {
   final Media media;
   final List<Widget> leading;
@@ -19,7 +12,7 @@ class RowDisplay extends StatelessWidget {
     required this.media,
     this.leading = const [],
     this.trailing = const [],
-    this.onTap = rowtapdefault,
+    this.onTap = ds.defaulttap,
   });
 
   @override

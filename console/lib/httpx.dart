@@ -1,5 +1,6 @@
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
+import 'package:console/retrovibed.dart' as retro;
 
 var _host = "localhost:9998";
 
@@ -9,6 +10,10 @@ String host() {
 
 void set(String uri) {
   _host = uri;
+}
+
+String auto_bearer() {
+  return "bearer ${retro.bearer_token()}";
 }
 
 abstract class mimetypes {

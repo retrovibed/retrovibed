@@ -26,11 +26,11 @@ func Digest[T string | []byte](bs ...T) hash.Hash {
 
 // String to md5 uuid encoded string
 func String(s string) string {
-	return FormatString(Digest(s))
+	return FormatUUID(Digest(s))
 }
 
 // format md5 hash to a uuid encoded string
-func FormatString(m hash.Hash) string {
+func FormatUUID(m hash.Hash) string {
 	return uuid.FromBytesOrNil(m.Sum(nil)).String()
 }
 

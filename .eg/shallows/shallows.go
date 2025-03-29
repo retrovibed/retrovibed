@@ -14,7 +14,7 @@ import (
 	"github.com/egdaemon/eg/runtime/x/wasi/egtarball"
 )
 
-var buildTags = []string{"no_duckdb_arrow"}
+var buildTags = []string{"duckdb_use_lib"}
 
 func rootdir() string {
 	return egenv.WorkingDirectory("shallows")

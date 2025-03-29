@@ -1,8 +1,6 @@
 package tracking_test
 
 import (
-	"database/sql"
-	"log"
 	"os"
 	"path/filepath"
 	"testing"
@@ -10,9 +8,9 @@ import (
 
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/retrovibed/retrovibed/cmd/cmdmeta"
-	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/fsx"
 	"github.com/retrovibed/retrovibed/internal/md5x"
+	"github.com/retrovibed/retrovibed/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/internal/sqlx"
 	"github.com/retrovibed/retrovibed/internal/testx"
 	"github.com/retrovibed/retrovibed/library"
@@ -26,11 +24,8 @@ func TestImportTorrent(t *testing.T) {
 
 	tmpdir := t.TempDir()
 
-	q, err := sql.Open("duckdb", filepath.Join(tmpdir, "meta.db"))
-	require.NoError(t, err)
+	q := sqltestx.Metadatabase(t)
 	defer q.Close()
-
-	log.Println("duckdb version", errorsx.Zero(sqlx.String(ctx, q, "SELECT version() AS version")))
 
 	require.NoError(t, cmdmeta.InitializeDatabase(ctx, q))
 	evfs := fsx.DirVirtual(filepath.Join(tmpdir, "examples"))
@@ -42,7 +37,7 @@ func TestImportTorrent(t *testing.T) {
 		require.NoError(t, cause)
 
 		lmd := library.NewMetadata(
-			md5x.FormatString(tx.MD5),
+			md5x.FormatUUID(tx.MD5),
 			library.MetadataOptionDescription(filepath.Base(tx.Path)),
 			library.MetadataOptionBytes(tx.Bytes),
 			library.MetadataOptionMimetype(tx.Mimetype.String()),

@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package meta;
+
+message Profile {
+  string id = 1 [ json_name = "id" ];
+  string account_id = 2 [ json_name = "account_id" ];
+  string session_watermark = 3 [ json_name = "session_watermark" ];
+  string created_at = 4 [ json_name = "created_at" ];
+  string updated_at = 5 [ json_name = "updated_at" ];
+  string disabled_at = 6 [ json_name = "disabled_at" ];
+  string disabled_manually_at = 7 [ json_name = "disabled_manually_at" ];
+  string disabled_pending_approval_at = 8
+      [ json_name = "disabled_pending_approval_at" ];
+  string display = 9 [ json_name = "display" ];
+  string email = 10 [ json_name = "email" ];
+}
+
+message ProfileSearchRequest {
+  string query = 1 [ json_name = "query" ];
+  uint64 offset = 2 [ json_name = "offset" ];
+  uint64 limit = 3 [ json_name = "limit" ];
+  uint32 status = 4 [ json_name = "status" ];
+}
+message ProfileSearchResponse {
+  ProfileSearchRequest next = 1 [ json_name = "next" ];
+  repeated Profile items = 2 [ json_name = "items" ];
+}
+
+message ProfileCreateRequest { Profile profile = 1 [ json_name = "profile" ]; }
+message ProfileCreateResponse { Profile profile = 1 [ json_name = "profile" ]; }
+
+message ProfileLookupRequest {}
+message ProfileLookupResponse { Profile profile = 1 [ json_name = "profile" ]; }
+
+message ProfileUpdateRequest { Profile profile = 1 [ json_name = "profile" ]; }
+message ProfileUpdateResponse { Profile profile = 1 [ json_name = "profile" ]; }
+
+message ProfileDisableRequest { Profile profile = 1 [ json_name = "profile" ]; }
+message ProfileDisableResponse {
+  Profile profile = 1 [ json_name = "profile" ];
+}

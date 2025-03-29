@@ -5,17 +5,17 @@ import 'package:ffi/ffi.dart' as ffi;
 import 'package:console/retrovibed/gen.dart' as lib;
 
 String _path() {
-  final files = [
-    File("lib/retrovibed.so"),
-    File("bundle/nativelib/retrovibed.so"),
-  ];
-
-  return files.firstWhere((v) => v.existsSync()).path;
+  final files = [File("build/nativelib/retrovibed.so")];
+  final found = files.firstWhere(
+    (v) => v.existsSync(),
+    orElse: () => File("lib/retrovibed.so"),
+  );
+  return found.path;
 }
 
 final bridge = lib.DaemonBridge(DynamicLibrary.open(_path()));
 
-String bearerToken() {
+String bearer_token() {
   return _convertstring(bridge.authn_bearer());
 }
 
@@ -24,11 +24,12 @@ String public_key() {
 }
 
 List<String> ips() {
-  return [_convertstring(bridge.ips())];
+  final List<dynamic> res = jsonDecode(_convertstring(bridge.ips()));
+  return res.whereType<String>().toList();
 }
 
 void daemon() {
-  String args = jsonEncode(["daemon"]);
+  String args = jsonEncode(["daemon", "--no-mdns"]);
   bridge.daemon(args.toNativeUtf8().cast<Char>());
 }
 

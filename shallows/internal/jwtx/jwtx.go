@@ -6,17 +6,41 @@ import (
 	"encoding/json"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/httpx"
+	"github.com/retrovibed/retrovibed/internal/slicesx"
 )
 
 const (
 	mdkey = "authorization"
 )
+
+var (
+	v     sync.Mutex
+	algos []string
+)
+
+func RegisterAlgorithms(register ...jwt.SigningMethod) {
+	v.Lock()
+	defer v.Unlock()
+
+	algos = slicesx.MapTransform(func(x jwt.SigningMethod) string {
+		return x.Alg()
+	}, register...)
+}
+
+func GetAlgorithms() (res []string) {
+	v.Lock()
+	defer v.Unlock()
+	res = make([]string, len(algos))
+	copy(res, algos)
+	return res
+}
 
 type JWTSecretSource func() []byte
 
@@ -116,7 +140,7 @@ func Validate(jwtsecret JWTSecretSource, encoded string, t jwt.Claims) error {
 
 	token, err := jwt.ParseWithClaims(string(encoded), t, func(token *jwt.Token) (interface{}, error) {
 		return jwtsecret(), nil
-	}, jwt.WithValidMethods([]string{jwt.SigningMethodHS512.Alg()}))
+	}, jwt.WithValidMethods(algos))
 
 	if err != nil {
 		return errorsx.Wrap(err, "unable to parse jwt token")

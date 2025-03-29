@@ -161,7 +161,7 @@ func (t *HTTPLibrary) upload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	lmd := library.Metadata{
-		ID:          md5x.FormatString(mhash),
+		ID:          md5x.FormatUUID(mhash),
 		Description: fh.Filename,
 		Bytes:       *copied.Result,
 		Mimetype:    fh.Header.Get("Content-Type"),

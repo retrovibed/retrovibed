@@ -62,7 +62,7 @@ func ImportSymlinkFile(vfs fsx.Virtual) ImportOp {
 			tx.Bytes = uint64(n)
 		}
 
-		uid := md5x.FormatString(tx.MD5)
+		uid := md5x.FormatUUID(tx.MD5)
 
 		if err := os.Remove(vfs.Path(uid)); fsx.IgnoreIsNotExist(err) != nil {
 			return nil, errorsx.Wrap(err, "unable to ensure symlink destination is available")
@@ -101,7 +101,7 @@ func ImportCopyFile(vfs fsx.Virtual) ImportOp {
 		} else {
 			tx.Bytes = uint64(n)
 		}
-		uid := md5x.FormatString(tx.MD5)
+		uid := md5x.FormatUUID(tx.MD5)
 
 		if err := os.Remove(vfs.Path(uid)); fsx.IgnoreIsNotExist(err) != nil {
 			return nil, errorsx.Wrap(err, "unable to ensure destination is available")

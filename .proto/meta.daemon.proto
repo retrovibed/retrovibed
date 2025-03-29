@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package meta;
+
+message Daemon {
+  string id = 1 [ json_name = "id" ];
+  string created_at = 2 [ json_name = "created_at" ];
+  string updated_at = 3 [ json_name = "updated_at" ];
+  string description = 4 [ json_name = "description" ];
+  string hostname = 5 [ json_name = "hostname" ];
+}
+
+message DaemonSearchRequest {
+  string query = 1 [ json_name = "query" ];
+  uint64 offset = 2 [ json_name = "offset" ];
+  uint64 limit = 3 [ json_name = "limit" ];
+}
+message DaemonSearchResponse {
+  DaemonSearchRequest next = 1 [ json_name = "next" ];
+  repeated Daemon items = 2 [ json_name = "items" ];
+}
+
+message DaemonCreateRequest { Daemon daemon = 1 [ json_name = "daemon" ]; }
+message DaemonCreateResponse { Daemon daemon = 1 [ json_name = "daemon" ]; }
+
+message DaemonLookupRequest {}
+message DaemonLookupResponse { Daemon daemon = 1 [ json_name = "daemon" ]; }
+
+message DaemonUpdateRequest { Daemon daemon = 1 [ json_name = "daemon" ]; }
+message DaemonUpdateResponse { Daemon daemon = 1 [ json_name = "daemon" ]; }
+
+message DaemonDisableRequest { Daemon daemon = 1 [ json_name = "daemon" ]; }
+message DaemonDisableResponse { Daemon daemon = 1 [ json_name = "daemon" ]; }

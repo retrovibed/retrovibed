@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/justinas/alice"
 	"golang.org/x/crypto/ssh"
 
@@ -24,14 +25,16 @@ import (
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/fsx"
 	"github.com/retrovibed/retrovibed/internal/httpx"
+	"github.com/retrovibed/retrovibed/internal/jwtx"
 	"github.com/retrovibed/retrovibed/internal/slicesx"
 	"github.com/retrovibed/retrovibed/internal/timex"
 	"github.com/retrovibed/retrovibed/internal/tlsx"
 	"github.com/retrovibed/retrovibed/internal/torrentx"
 	"github.com/retrovibed/retrovibed/internal/userx"
 	"github.com/retrovibed/retrovibed/media"
+	"github.com/retrovibed/retrovibed/metaapi"
 
-	_ "github.com/marcboeker/go-duckdb"
+	_ "github.com/marcboeker/go-duckdb/v2"
 
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/bep0051"
@@ -55,6 +58,10 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	)
 
 	// envx.Debug(os.Environ()...)
+
+	sshjwt := jwtx.NewSSHSigner()
+	jwt.RegisterSigningMethod(sshjwt.Alg(), func() jwt.SigningMethod { return sshjwt })
+	jwtx.RegisterAlgorithms(sshjwt, jwt.SigningMethodHS512)
 
 	dctx, done := context.WithCancelCause(gctx.Context)
 	asyncfailure := func(cause error) {
@@ -190,6 +197,10 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 			envx.Int(http.StatusOK, env.HTTPHealthzCode),
 		),
 	).Methods(http.MethodGet)
+
+	metamux := httpmux.PathPrefix("/meta").Subrouter()
+	metaapi.NewHTTPUsermanagement(db).Bind(metamux.PathPrefix("/u12t").Subrouter())
+	metaapi.NewHTTPDaemons(db).Bind(metamux.PathPrefix("/d").Subrouter())
 
 	media.NewHTTPLibrary(db, mediastore).Bind(httpmux.PathPrefix("/m").Subrouter())
 	media.NewHTTPDiscovered(db, tclient, tstore).Bind(httpmux.PathPrefix("/d").Subrouter())

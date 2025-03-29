@@ -33,7 +33,7 @@ func TestImportFilesystemCopy(t *testing.T) {
 	count := 0
 	for tx, err := range library.ImportFilesystem(ctx, library.ImportCopyFile(vfs), testx.Fixture("tree.example.1")) {
 		require.NoError(t, err)
-		require.Equal(t, testx.ReadMD5(tx.Path), testx.ReadMD5(filepath.Join(tmpdir, md5x.FormatString(tx.MD5))))
+		require.Equal(t, testx.ReadMD5(tx.Path), testx.ReadMD5(filepath.Join(tmpdir, md5x.FormatUUID(tx.MD5))))
 		count++
 	}
 
@@ -49,7 +49,7 @@ func TestImportFilesystemSymlink(t *testing.T) {
 	count := 0
 	for tx, err := range library.ImportFilesystem(ctx, library.ImportSymlinkFile(vfs), testx.Must(filepath.Abs(testx.Fixture("tree.example.1")))(t)) {
 		require.NoError(t, err)
-		require.Equal(t, testx.ReadMD5(tx.Path), testx.ReadMD5(filepath.Join(tmpdir, md5x.FormatString(tx.MD5))))
+		require.Equal(t, testx.ReadMD5(tx.Path), testx.ReadMD5(filepath.Join(tmpdir, md5x.FormatUUID(tx.MD5))))
 		count++
 	}
 

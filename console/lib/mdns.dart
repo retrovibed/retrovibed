@@ -1,15 +1,23 @@
+import 'package:console/meta/meta.daemon.pb.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:multicast_dns/multicast_dns.dart';
 import 'package:console/designkit.dart' as ds;
 import 'package:console/design.kit/forms.dart' as forms;
 import './httpx.dart' as httpx;
+import 'package:console/meta.dart' as meta;
 
 class ManualConfiguration extends StatefulWidget {
   final void Function() retry;
   final void Function(String) connect;
+  final Future<DaemonSearchResponse> Function(DaemonSearchRequest) search;
 
-  ManualConfiguration({super.key, required this.retry, required this.connect});
+  ManualConfiguration({
+    super.key,
+    required this.retry,
+    required this.connect,
+    this.search = meta.daemons.search,
+  });
 
   @override
   State<ManualConfiguration> createState() => _ManualConfigurationView();
@@ -32,15 +40,17 @@ class _ManualConfigurationView extends State<ManualConfiguration> {
             forms.Field(
               label: SelectableText("hostname"),
               input: TextFormField(
+                autofocus: true,
                 decoration: new InputDecoration(
                   hintText: "example.com:9998",
                   helperText: "hostname and port for the retrovibed instance",
                 ),
                 keyboardType: TextInputType.number,
-                onChanged:
-                    (v) => setState(() {
-                      _hostname = v;
-                    }),
+                onChanged: (v) {
+                  setState(() {
+                    _hostname = v;
+                  });
+                },
               ),
             ),
             Row(
@@ -50,7 +60,15 @@ class _ManualConfigurationView extends State<ManualConfiguration> {
                 TextButton(
                   child: Text("connect"),
                   onPressed: () {
-                    widget.connect(_hostname);
+                    meta.daemons
+                        .create(
+                          meta.DaemonCreateRequest(
+                            daemon: meta.Daemon(hostname: _hostname),
+                          ),
+                        )
+                        .then((d) {
+                          return widget.connect(d.daemon.hostname);
+                        });
                   },
                 ),
               ],

@@ -18,4 +18,3 @@ CREATE TABLE torrents_feed_rss (
 -- +goose StatementBegin
 DROP TABLE IF EXISTS torrents_feed_rss;
 -- +goose StatementEnd
--- https://fearnopeer.com/rss/1395.f53e8e2a39254c02ce3c7c5b62cee890

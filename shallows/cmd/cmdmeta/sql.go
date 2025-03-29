@@ -5,14 +5,19 @@ import (
 	"database/sql"
 	"embed"
 	"io/fs"
+	"strings"
 
-	_ "github.com/marcboeker/go-duckdb"
+	_ "github.com/marcboeker/go-duckdb/v2"
 
 	"github.com/pressly/goose/v3"
 	"github.com/retrovibed/retrovibed/internal/debugx"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/goosex"
+	"github.com/retrovibed/retrovibed/internal/slicesx"
+	"github.com/retrovibed/retrovibed/internal/sqlx"
+	"github.com/retrovibed/retrovibed/internal/sqlxx"
 	"github.com/retrovibed/retrovibed/internal/userx"
+	"github.com/retrovibed/retrovibed/meta"
 )
 
 //go:embed .migrations/*.sql
@@ -44,4 +49,19 @@ func InitializeDatabase(ctx context.Context, db *sql.DB) (err error) {
 	}
 
 	return nil
+}
+
+func Hostnames(ctx context.Context, q sqlx.Queryer) ([]string, error) {
+	var (
+		results []meta.Daemon
+	)
+
+	if err := sqlxx.ScanInto(meta.DaemonSearch(ctx, q, meta.DaemonSearchBuilder().Limit(128)), &results); err != nil {
+		return nil, errorsx.Wrap(err, "unable to retrieve hostnames")
+	}
+
+	return slicesx.MapTransform(func(d meta.Daemon) string {
+		before, _, _ := strings.Cut(d.Hostname, ":")
+		return before
+	}, results...), nil
 }

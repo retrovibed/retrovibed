@@ -9,5 +9,6 @@ export 'design.kit/periodic.dart';
 export 'design.kit/tables.dart';
 export 'design.kit/debug.dart';
 export 'design.kit/file.drop.well.dart';
+export 'design.kit/inputs.dart';
 
 const Widget? NullWidget = null;

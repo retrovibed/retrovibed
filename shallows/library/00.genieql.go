@@ -10,7 +10,6 @@ import (
 	"github.com/retrovibed/retrovibed/internal/sqlx"
 )
 
-//easyjson:json
 func Metadata(gql genieql.Structure) {
 	gql.From(
 		gql.Table("library_metadata"),
