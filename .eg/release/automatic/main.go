@@ -35,14 +35,10 @@ func main() {
 				shallows.Generate,
 			),
 		),
-		eg.Parallel(
-			eg.Module(ctx, deb, console.Build),
-			eg.Module(
-				ctx,
-				deb,
-				shallows.Compile(),
-			),
-		),
+		eg.Module(ctx, deb, eg.Parallel(
+			eg.Sequential(console.GenerateBinding, console.Build),
+			shallows.Compile(),
+		)),
 		eg.Parallel(
 			eg.Module(ctx, deb, console.Tests),
 			eg.Module(ctx, deb, console.Linting),
