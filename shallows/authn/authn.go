@@ -6,8 +6,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io"
-	"log"
 	"net/http"
 	"strings"
 	"sync"
@@ -52,6 +50,43 @@ func NewBearer() (string, error) {
 	// ).SignedString(signer)
 
 	return bearer, errorsx.Wrap(err, "token signature failure")
+}
+
+func BearerForHost(ctx context.Context, host string) (string, error) {
+	signer, err := sshx.AutoCached(sshx.NewKeyGen(), env.PrivateKeyPath())
+	if err != nil {
+		return "", errorsx.Wrap(err, "unable to read identity")
+	}
+
+	state, err := AutoTokenState(signer)
+	if err != nil {
+		return "", errorsx.Wrap(err, "unable to generate authentication state")
+	}
+
+	endpoint := EndpointSSHAuth(host)
+
+	cfg := OAuth2SSHConfig(signer, "", endpoint)
+
+	authzuri := cfg.AuthCodeURL(
+		state,
+		oauth2.AccessTypeOffline,
+	)
+
+	c := &http.Client{}
+	r, err := RetrieveAuthCode(ctx, c, authzuri)
+	if err != nil {
+		return "", errorsx.Wrap(err, "unable to retrieve auth code")
+	}
+	if r.State != state {
+		return "", errorsx.Wrap(err, "invalid state")
+	}
+
+	token, err := cfg.Exchange(ctx, r.Code, oauth2.AccessTypeOffline)
+	if err != nil {
+		return "", errorsx.Wrap(err, "unable to exchange auth code")
+	}
+
+	return token.AccessToken, nil
 }
 
 var v = sync.OnceValue(func() []byte {
@@ -105,26 +140,6 @@ func OAuth2SSHToken(ctx context.Context, signer ssh.Signer, endpoint oauth2.Endp
 
 	tok, err = cfg.PasswordCredentialsToken(ctx, cfg.ClientID, encodedsig)
 	return cfg, tok, err
-}
-
-func ExchangeAuthed(ctx context.Context, chttp *http.Client, endpoint string /*, authed *Authed*/) (err error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, nil)
-	if err != nil {
-		return err
-	}
-	resp, err := httpx.AsError(chttp.Do(req))
-	if err != nil {
-		return err
-	}
-	defer httpx.AutoClose(resp)
-
-	raw, _ := io.ReadAll(resp.Body)
-	log.Println("DERP DERP", string(raw))
-	// if err = json.NewDecoder(resp.Body).Decode(&authed); err != nil {
-	// return err
-	// }
-
-	return nil
 }
 
 func AutoTokenState(signer ssh.Signer) (encoded string, err error) {

@@ -12,7 +12,13 @@ void set(String uri) {
   _host = uri;
 }
 
+// return an identity token for the local device.
 String auto_bearer() {
+  return "bearer ${retro.bearer_token()}";
+}
+
+// return a identity token from the currently connected host.
+String auto_bearer_host() {
   return "bearer ${retro.bearer_token()}";
 }
 

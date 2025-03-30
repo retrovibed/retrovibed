@@ -53,6 +53,7 @@ class _DaemonAuto extends State<DaemonAuto> {
             HttpOverrides.global = DaemonHttpOverrides(
               ips: [v.daemon.hostname.split(":").first],
             );
+
             _res = v.daemon;
             _loading = false;
           });

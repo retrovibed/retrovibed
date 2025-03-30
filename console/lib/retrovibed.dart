@@ -19,6 +19,12 @@ String bearer_token() {
   return _convertstring(bridge.authn_bearer());
 }
 
+String bearer_token_host(String hostname) {
+  return _convertstring(
+    bridge.authn_bearer_host(hostname.toNativeUtf8().cast<Char>()),
+  );
+}
+
 String public_key() {
   return _convertstring(bridge.public_key());
 }

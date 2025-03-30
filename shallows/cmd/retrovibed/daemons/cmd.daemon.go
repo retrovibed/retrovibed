@@ -198,9 +198,13 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		),
 	).Methods(http.MethodGet)
 
+	oauth2mux := httpmux.PathPrefix("/oauth2").Subrouter()
+	metaapi.NewSSHOauth2(db).Bind(oauth2mux.PathPrefix("/ssh").Subrouter())
+
 	metamux := httpmux.PathPrefix("/meta").Subrouter()
 	metaapi.NewHTTPUsermanagement(db).Bind(metamux.PathPrefix("/u12t").Subrouter())
 	metaapi.NewHTTPDaemons(db).Bind(metamux.PathPrefix("/d").Subrouter())
+	metaapi.NewHTTPAuthz(db).Bind(metamux.PathPrefix("/authz").Subrouter())
 
 	media.NewHTTPLibrary(db, mediastore).Bind(httpmux.PathPrefix("/m").Subrouter())
 	media.NewHTTPDiscovered(db, tclient, tstore).Bind(httpmux.PathPrefix("/d").Subrouter())
