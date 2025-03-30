@@ -58,7 +58,7 @@ func Generate(ctx context.Context, _ eg.Op) error {
 	runtime := flutterRuntime()
 	return shell.Run(
 		ctx,
-		runtime.New("flutter clean"),
+		// runtime.New("flutter clean"),
 		runtime.New("flutter create --platforms=linux ."),
 		runtime.New("flutter pub get"),
 		shell.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib/media -I.proto .proto/media.proto"),
