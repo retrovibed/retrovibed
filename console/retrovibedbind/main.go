@@ -1,17 +1,17 @@
 package main
 
+import "C"
 import (
-	"C"
 	"context"
 	"encoding/json"
 	"log"
+	"os"
 	"time"
 
 	"github.com/retrovibed/retrovibed/authn"
 	"github.com/retrovibed/retrovibed/cmd/cmdglobalmain"
 	"github.com/retrovibed/retrovibed/cmd/cmdmeta"
 )
-import "os"
 
 //export authn_bearer
 func authn_bearer() *C.char {
@@ -19,6 +19,19 @@ func authn_bearer() *C.char {
 	if err != nil {
 		log.Fatalln(err)
 	}
+	return C.CString(bearer)
+}
+
+//export authn_bearer_host
+func authn_bearer_host(hostname *C.char) *C.char {
+	ctx, done := context.WithTimeout(context.Background(), 10*time.Second)
+	defer done()
+
+	bearer, err := authn.BearerForHost(ctx, C.GoString(hostname))
+	if err != nil {
+		log.Println(err)
+	}
+
 	return C.CString(bearer)
 }
 

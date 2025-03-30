@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart'; // Provides [Player], [Media], [Playlist] etc.
+import 'package:console/auth.dart' as auth;
 import 'package:console/downloads.dart' as downloads;
 import 'package:console/settings.dart' as settings;
 import 'package:console/media.dart' as media;
@@ -33,33 +34,35 @@ class MyApp extends StatelessWidget {
       home: Material(
         child: ds.Full(
           meta.DaemonAuto(
-            media.Playlist(
-              DefaultTabController(
-                length: 3,
-                child: Scaffold(
-                  appBar: TabBar(
-                    tabs: [
-                      Tab(icon: Icon(Icons.movie)),
-                      Tab(icon: Icon(Icons.download)),
-                      Tab(icon: Icon(Icons.settings)),
-                    ],
-                  ),
-                  body: TabBarView(
-                    children: [
-                      ds.ErrorBoundary(
-                        media.Playlist.wrap((ctx, s) {
-                          return media.VideoScreen(
-                            medialib.AvailableListDisplay(
-                              focus: s.searchfocus,
-                              controller: s.controller,
-                            ),
-                            s.player,
-                          );
-                        }),
-                      ),
-                      ds.ErrorBoundary(downloads.Display()),
-                      ds.ErrorBoundary(settings.Display()),
-                    ],
+            auth.AuthzCache(
+              media.Playlist(
+                DefaultTabController(
+                  length: 3,
+                  child: Scaffold(
+                    appBar: TabBar(
+                      tabs: [
+                        Tab(icon: Icon(Icons.movie)),
+                        Tab(icon: Icon(Icons.download)),
+                        Tab(icon: Icon(Icons.settings)),
+                      ],
+                    ),
+                    body: TabBarView(
+                      children: [
+                        ds.ErrorBoundary(
+                          media.Playlist.wrap((ctx, s) {
+                            return media.VideoScreen(
+                              medialib.AvailableListDisplay(
+                                focus: s.searchfocus,
+                                controller: s.controller,
+                              ),
+                              s.player,
+                            );
+                          }),
+                        ),
+                        ds.ErrorBoundary(downloads.Display()),
+                        ds.ErrorBoundary(settings.Display()),
+                      ],
+                    ),
                   ),
                 ),
               ),

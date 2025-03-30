@@ -36,6 +36,21 @@ class DaemonBridge {
   late final _authn_bearer =
       _authn_bearerPtr.asFunction<ffi.Pointer<ffi.Char> Function()>();
 
+  ffi.Pointer<ffi.Char> authn_bearer_host(
+    ffi.Pointer<ffi.Char> hostname,
+  ) {
+    return _authn_bearer_host(
+      hostname,
+    );
+  }
+
+  late final _authn_bearer_hostPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<ffi.Char> Function(
+              ffi.Pointer<ffi.Char>)>>('authn_bearer_host');
+  late final _authn_bearer_host = _authn_bearer_hostPtr
+      .asFunction<ffi.Pointer<ffi.Char> Function(ffi.Pointer<ffi.Char>)>();
+
   ffi.Pointer<ffi.Char> public_key() {
     return _public_key();
   }
