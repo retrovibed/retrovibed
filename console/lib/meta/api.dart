@@ -18,8 +18,8 @@ Future<Token> authz(Token current) {
         Uri.https(httpx.host(), "/meta/authz"),
         headers: {"Authorization": httpx.auto_bearer_host()},
       )
+      .then(httpx.auto_error)
       .then((v) {
-        // print("WAAAT ${v.body} ${v.statusCode}");
         return Token.create()..mergeFromProto3Json(jsonDecode(v.body));
       });
 }
@@ -40,6 +40,7 @@ abstract class daemons {
           ),
           headers: {"Authorization": httpx.auto_bearer()},
         )
+        .then(httpx.auto_error)
         .then((v) {
           return DaemonSearchResponse.create()
             ..mergeFromProto3Json(jsonDecode(v.body));
@@ -53,6 +54,7 @@ abstract class daemons {
           headers: {"Authorization": httpx.auto_bearer()},
           body: jsonEncode(req.toProto3Json()),
         )
+        .then(httpx.auto_error)
         .then((v) {
           return Future.value(
             DaemonCreateResponse.create()

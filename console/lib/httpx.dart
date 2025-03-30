@@ -19,7 +19,7 @@ String auto_bearer() {
 
 // return a identity token from the currently connected host.
 String auto_bearer_host() {
-  return "bearer ${retro.bearer_token()}";
+  return "bearer ${retro.bearer_token_host("https://${_host}")}";
 }
 
 abstract class mimetypes {
@@ -52,4 +52,12 @@ Future<http.MultipartFile> uploadable(
     filename: name,
     contentType: mimetypes.parse(mimetype),
   );
+}
+
+Future<http.Response> auto_error(http.Response v) {
+  if (v.statusCode >= 300) {
+    print("failed ${v.request?.url.toString()} ${v.statusCode}");
+  }
+
+  return v.statusCode >= 300 ? Future.error(v) : Future.value(v);
 }

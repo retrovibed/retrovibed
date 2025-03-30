@@ -80,6 +80,15 @@ func X509OptionTimeWindow(c clock, d time.Duration) X509Option {
 	}
 }
 
+// X509OptionCompose
+func X509OptionCompose(options ...X509Option) X509Option {
+	return func(cert *x509.Certificate) {
+		for _, opt := range options {
+			opt(cert)
+		}
+	}
+}
+
 type clock interface {
 	Now() time.Time
 }
@@ -320,7 +329,7 @@ func NewDialer(c *tls.Config, options ...Option) *tls.Dialer {
 	}
 }
 
-func SelfSignedLocalHostTLS(path string) error {
+func SelfSignedLocalHostTLS(path string, options ...X509Option) error {
 	if fsx.IsRegularFile(path) {
 		return nil
 	}
@@ -341,6 +350,9 @@ func SelfSignedLocalHostTLS(path string) error {
 			"localhost",
 			"127.0.0.1",
 			"[::1]",
+		),
+		X509OptionCompose(
+			options...,
 		),
 	)
 

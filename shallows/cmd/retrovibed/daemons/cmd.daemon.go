@@ -211,7 +211,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	media.NewHTTPRSSFeed(db).Bind(httpmux.PathPrefix("/rss").Subrouter())
 
 	tlspem := envx.String(userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "tls.pem"), env.DaemonTLSPEM)
-	if err = tlsx.SelfSignedLocalHostTLS(tlspem); err != nil {
+	if err = tlsx.SelfSignedLocalHostTLS(tlspem, tlsx.X509OptionHosts(envx.Strings(nil, env.SelfSignedHosts)...)); err != nil {
 		return err
 	}
 

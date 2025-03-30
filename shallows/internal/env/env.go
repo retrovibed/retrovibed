@@ -21,9 +21,10 @@ const (
 	JWTSharedSecret = "RETROVIBED_JWT_SECRET"
 
 	// enable multicast service discovery
-	MDNSDisabled  = "RETROVIBED_MDNS_DISABLED"          // enable/disable multicast dns registration, allows for the frontend to automatically find daemons on the local network.
-	AutoDiscovery = "RETROVIBED_TORRENT_AUTO_DISCOVERY" // enable/disable automatically discovering torrents from peers.
-	AutoBootstrap = "RETROVIBED_TORRENT_AUTO_BOOTSTRAP" // enable/disable the predefined set of public swarms to bootstrap from
+	MDNSDisabled    = "RETROVIBED_MDNS_DISABLED"          // enable/disable multicast dns registration, allows for the frontend to automatically find daemons on the local network.
+	AutoDiscovery   = "RETROVIBED_TORRENT_AUTO_DISCOVERY" // enable/disable automatically discovering torrents from peers.
+	AutoBootstrap   = "RETROVIBED_TORRENT_AUTO_BOOTSTRAP" // enable/disable the predefined set of public swarms to bootstrap from
+	SelfSignedHosts = "RETROVIBED_SELF_SIGNED_HOSTS"      // list of hosts to add to the self signed certificate.
 )
 
 func JWTSecret() []byte {

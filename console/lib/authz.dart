@@ -30,7 +30,7 @@ Future<T> Function(Cached<T>) refresh<T>(
 ) {
   return (t) {
     final ts = DateTime.now();
-    print("DERP DERP ${expired(t.current, ts)} ${t.current}");
+
     if (!expired(t.current, ts)) {
       return Future.value(t.current);
     }
