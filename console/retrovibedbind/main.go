@@ -3,8 +3,10 @@ package main
 import "C"
 import (
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"log"
+	"net/http"
 	"os"
 	"time"
 
@@ -27,7 +29,16 @@ func authn_bearer_host(hostname *C.char) *C.char {
 	ctx, done := context.WithTimeout(context.Background(), 10*time.Second)
 	defer done()
 
-	bearer, err := authn.BearerForHost(ctx, C.GoString(hostname))
+	// temporary
+	ctransport := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: true,
+		},
+	}
+	defaultclient := &http.Client{Transport: ctransport, Timeout: 20 * time.Second}
+	// defaultclient = httpx.BindRetryTransport(defaultclient, http.StatusTooManyRequests, http.StatusBadGateway, http.StatusInternalServerError, http.StatusRequestTimeout)
+
+	bearer, err := authn.BearerForHost(ctx, defaultclient, C.GoString(hostname))
 	if err != nil {
 		log.Println(err)
 	}

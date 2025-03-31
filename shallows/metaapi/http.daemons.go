@@ -59,14 +59,12 @@ func (t *HTTPDaemons) Bind(r *mux.Router) {
 	r.Path("/").Methods(http.MethodPost).Handler(alice.New(
 		httpx.ContextBufferPool512(),
 		httpauth.AuthenticateWithToken(t.jwtsecret),
-		// AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
 		httpx.Timeout2s(),
 	).ThenFunc(t.create))
 
 	r.Path("/latest").Methods(http.MethodGet).Handler(alice.New(
 		httpx.ContextBufferPool512(),
 		httpauth.AuthenticateWithToken(t.jwtsecret),
-		// AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
 		httpx.Timeout2s(),
 	).ThenFunc(t.latest))
 }

@@ -59,7 +59,6 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	)
 
 	// envx.Debug(os.Environ()...)
-	log.Println("self-signed-hosts", t.SelfSignedHosts)
 
 	sshjwt := jwtx.NewSSHSigner()
 	jwt.RegisterSigningMethod(sshjwt.Alg(), func() jwt.SigningMethod { return sshjwt })

@@ -52,7 +52,7 @@ func NewBearer() (string, error) {
 	return bearer, errorsx.Wrap(err, "token signature failure")
 }
 
-func BearerForHost(ctx context.Context, host string) (string, error) {
+func BearerForHost(ctx context.Context, c *http.Client, host string) (string, error) {
 	signer, err := sshx.AutoCached(sshx.NewKeyGen(), env.PrivateKeyPath())
 	if err != nil {
 		return "", errorsx.Wrap(err, "unable to read identity")
@@ -63,6 +63,8 @@ func BearerForHost(ctx context.Context, host string) (string, error) {
 		return "", errorsx.Wrap(err, "unable to generate authentication state")
 	}
 
+	ctx = context.WithValue(ctx, oauth2.HTTPClient, c)
+
 	endpoint := EndpointSSHAuth(host)
 
 	cfg := OAuth2SSHConfig(signer, "", endpoint)
@@ -72,7 +74,6 @@ func BearerForHost(ctx context.Context, host string) (string, error) {
 		oauth2.AccessTypeOffline,
 	)
 
-	c := &http.Client{}
 	r, err := RetrieveAuthCode(ctx, c, authzuri)
 	if err != nil {
 		return "", errorsx.Wrap(err, "unable to retrieve auth code")

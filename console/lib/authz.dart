@@ -1,20 +1,20 @@
 import 'package:synchronized/synchronized.dart' as sync;
 
-mixin MyMixin {
-  void myMixinMethod() {
-    print('Mixin method called');
-  }
+class Bearer<T> {
+  T metadata;
+  String bearer;
+  Bearer(this.metadata, this.bearer);
 }
 
 class Cached<T> {
   sync.Lock _m = sync.Lock();
 
-  T current;
-  Future<T> Function(Cached<T> current) refresh;
+  Bearer<T> current;
+  Future<Bearer<T>> Function(Cached<T> current) refresh;
 
   Cached(this.current, this.refresh);
 
-  Future<T> token() {
+  Future<Bearer<T>> token() {
     return refresh(this).then(
       (v) => _m.synchronized(() {
         this.current = v;
@@ -24,17 +24,17 @@ class Cached<T> {
   }
 }
 
-Future<T> Function(Cached<T>) refresh<T>(
-  Future<T> Function(T current) fn,
+Future<Bearer<T>> Function(Cached<T>) refresh<T>(
+  Future<Bearer<T>> Function(T current) fn,
   bool Function(T current, DateTime ts) expired,
 ) {
   return (t) {
     final ts = DateTime.now();
 
-    if (!expired(t.current, ts)) {
+    if (!expired(t.current.metadata, ts)) {
       return Future.value(t.current);
     }
 
-    return fn(t.current);
+    return fn(t.current.metadata);
   };
 }

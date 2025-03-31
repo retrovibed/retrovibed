@@ -269,6 +269,7 @@ func (t *HTTPSSHOauth2) token(w http.ResponseWriter, req *http.Request) {
 		if err = jwtx.Validate(func() []byte {
 			return []byte(md5x.String(iden.PublicKey + md5x.FormatUUID(md5x.Digest(t.jwtsecret()))))
 		}, msg.Code, &claims); err != nil {
+			log.Println("validation of code failed", err)
 			errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 			return
 		}

@@ -19,11 +19,16 @@ typedef FnUploadRequest =
 
 Future<MediaSearchResponse> recent() async {
   final client = http.Client();
-  return client.get(Uri.https(httpx.host(), "/m/recent")).then((v) {
-    return Future.value(
-      MediaSearchResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
-    );
-  });
+  return client
+      .get(
+        Uri.https(httpx.host(), "/m/recent"),
+        headers: {"Authorization": httpx.auto_bearer_host()},
+      )
+      .then((v) {
+        return Future.value(
+          MediaSearchResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+        );
+      });
 }
 
 abstract class media {
@@ -41,6 +46,7 @@ abstract class media {
             "/m/",
             jsonDecode(jsonEncode(req.toProto3Json())),
           ),
+          headers: {"Authorization": httpx.auto_bearer_host()},
         )
         .then((v) {
           return Future.value(
@@ -55,11 +61,17 @@ abstract class media {
   }
 
   static Future<MediaDeleteResponse> delete(String id) async {
-    return client.delete(Uri.https(httpx.host(), "/m/${id}")).then((v) {
-      return Future.value(
-        MediaDeleteResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
-      );
-    });
+    return client
+        .delete(
+          Uri.https(httpx.host(), "/m/${id}"),
+          headers: {"Authorization": httpx.auto_bearer_host()},
+        )
+        .then((v) {
+          return Future.value(
+            MediaDeleteResponse.create()
+              ..mergeFromProto3Json(jsonDecode(v.body)),
+          );
+        });
   }
 
   static Future<http.MultipartFile> uploadable(
@@ -93,8 +105,8 @@ abstract class discoveredsearch {
 }
 
 abstract class discovered {
-  static final client = http.Client();
   static Future<MediaSearchResponse> available(MediaSearchRequest req) async {
+    final client = http.Client();
     return client
         .get(
           Uri.https(
@@ -102,6 +114,7 @@ abstract class discovered {
             "/d/available",
             jsonDecode(jsonEncode(req.toProto3Json())),
           ),
+          headers: {"Authorization": httpx.auto_bearer_host()},
         )
         .then((v) {
           return Future.value(
@@ -114,6 +127,7 @@ abstract class discovered {
   static Future<DownloadSearchResponse> downloading(
     DownloadSearchRequest req,
   ) async {
+    final client = http.Client();
     return client
         .get(
           Uri.https(
@@ -121,6 +135,7 @@ abstract class discovered {
             "/d/downloading",
             jsonDecode(jsonEncode(req.toProto3Json())),
           ),
+          headers: {"Authorization": httpx.auto_bearer_host()},
         )
         .then((v) {
           return Future.value(
@@ -133,6 +148,7 @@ abstract class discovered {
   static Future<MediaUploadResponse> upload(
     http.MultipartRequest Function(http.MultipartRequest req) mkreq,
   ) async {
+    final client = http.Client();
     final req = mkreq(
       http.MultipartRequest("POST", Uri.https(httpx.host(), "/d/")),
     );
@@ -147,6 +163,7 @@ abstract class discovered {
   }
 
   static Future<DownloadBeginResponse> download(String id) async {
+    final client = http.Client();
     return client
         .post(Uri.https(httpx.host(), "/d/${id}", null), body: jsonEncode({}))
         .then((v) {
@@ -156,6 +173,7 @@ abstract class discovered {
   }
 
   static Future<DownloadPauseResponse> pause(String id) async {
+    final client = http.Client();
     return client
         .delete(Uri.https(httpx.host(), "/d/${id}", null), body: jsonEncode({}))
         .then((v) {
