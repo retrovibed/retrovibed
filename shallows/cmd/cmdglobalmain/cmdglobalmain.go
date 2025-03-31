@@ -89,6 +89,7 @@ func Main(args ...string) {
 			"env_mdns_disabled":      env.MDNSDisabled,
 			"env_auto_bootstrap":     env.AutoBootstrap,
 			"env_auto_discovery":     env.AutoDiscovery,
+			"env_self_signed_hosts":  env.SelfSignedHosts,
 		},
 		kong.UsageOnError(),
 		kong.Bind(
