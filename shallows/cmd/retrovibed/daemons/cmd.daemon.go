@@ -43,10 +43,11 @@ import (
 )
 
 type Command struct {
-	DisableMDNS   bool             `flag:"" name:"no-mdns" help:"disable the multicast dns service" default:"false" env:"${env_mdns_disabled}"`
-	AutoBootstrap bool             `flag:"" name:"auto-bootstrap" help:"bootstrap from a predefined set of peers" default:"false" env:"${env_auto_bootstrap}"`
-	AutoDiscovery bool             `flag:"" name:"auto-discovery" help:"enable autodiscovery of content from peers" default:"false" env:"${env_auto_discovery}"`
-	HTTP          cmdopts.Listener `flag:"" name:"http-address" help:"address to serve daemon api from" default:"tcp://:9998"`
+	DisableMDNS     bool             `flag:"" name:"no-mdns" help:"disable the multicast dns service" default:"false" env:"${env_mdns_disabled}"`
+	AutoBootstrap   bool             `flag:"" name:"auto-bootstrap" help:"bootstrap from a predefined set of peers" default:"false" env:"${env_auto_bootstrap}"`
+	AutoDiscovery   bool             `flag:"" name:"auto-discovery" help:"enable autodiscovery of content from peers" default:"false" env:"${env_auto_discovery}"`
+	HTTP            cmdopts.Listener `flag:"" name:"http-address" help:"address to serve daemon api from" default:"tcp://:9998"`
+	SelfSignedHosts []string         `flag:"" name:"self-signed-hosts" help:"comma seperated list of hosts to add to the sign signed certificate" env:"${env_self_signed_hosts}"`
 }
 
 func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
@@ -58,6 +59,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	)
 
 	// envx.Debug(os.Environ()...)
+	log.Println("self-signed-hosts", t.SelfSignedHosts)
 
 	sshjwt := jwtx.NewSSHSigner()
 	jwt.RegisterSigningMethod(sshjwt.Alg(), func() jwt.SigningMethod { return sshjwt })
@@ -211,7 +213,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	media.NewHTTPRSSFeed(db).Bind(httpmux.PathPrefix("/rss").Subrouter())
 
 	tlspem := envx.String(userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "tls.pem"), env.DaemonTLSPEM)
-	if err = tlsx.SelfSignedLocalHostTLS(tlspem, tlsx.X509OptionHosts(envx.Strings(nil, env.SelfSignedHosts)...)); err != nil {
+	if err = tlsx.SelfSignedLocalHostTLS(tlspem, tlsx.X509OptionHosts(t.SelfSignedHosts...)); err != nil {
 		return err
 	}
 
