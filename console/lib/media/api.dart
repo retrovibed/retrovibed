@@ -48,6 +48,7 @@ abstract class media {
           ),
           headers: {"Authorization": httpx.auto_bearer_host()},
         )
+        .then(httpx.auto_error)
         .then((v) {
           return Future.value(
             MediaSearchResponse.create()
@@ -66,6 +67,7 @@ abstract class media {
           Uri.https(httpx.host(), "/m/${id}"),
           headers: {"Authorization": httpx.auto_bearer_host()},
         )
+        .then(httpx.auto_error)
         .then((v) {
           return Future.value(
             MediaDeleteResponse.create()
@@ -116,6 +118,7 @@ abstract class discovered {
           ),
           headers: {"Authorization": httpx.auto_bearer_host()},
         )
+        .then(httpx.auto_error)
         .then((v) {
           return Future.value(
             MediaSearchResponse.create()
@@ -137,6 +140,7 @@ abstract class discovered {
           ),
           headers: {"Authorization": httpx.auto_bearer_host()},
         )
+        .then(httpx.auto_error)
         .then((v) {
           return Future.value(
             DownloadSearchResponse.create()
@@ -153,6 +157,7 @@ abstract class discovered {
       http.MultipartRequest("POST", Uri.https(httpx.host(), "/d/")),
     );
 
+    // req.headers = {"Authorization": httpx.auto_bearer_host()};
     return client.send(req).then((v) {
       return v.stream.bytesToString().then((s) {
         return Future.value(
@@ -165,7 +170,12 @@ abstract class discovered {
   static Future<DownloadBeginResponse> download(String id) async {
     final client = http.Client();
     return client
-        .post(Uri.https(httpx.host(), "/d/${id}", null), body: jsonEncode({}))
+        .post(
+          Uri.https(httpx.host(), "/d/${id}", null),
+          headers: {"Authorization": httpx.auto_bearer_host()},
+          body: jsonEncode({}),
+        )
+        .then(httpx.auto_error)
         .then((v) {
           return DownloadBeginResponse.create()
             ..mergeFromProto3Json(jsonDecode(v.body));
@@ -175,7 +185,12 @@ abstract class discovered {
   static Future<DownloadPauseResponse> pause(String id) async {
     final client = http.Client();
     return client
-        .delete(Uri.https(httpx.host(), "/d/${id}", null), body: jsonEncode({}))
+        .delete(
+          Uri.https(httpx.host(), "/d/${id}", null),
+          headers: {"Authorization": httpx.auto_bearer_host()},
+          body: jsonEncode({}),
+        )
+        .then(httpx.auto_error)
         .then((v) {
           return Future.value(
             DownloadPauseResponse.create()

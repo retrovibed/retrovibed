@@ -15,8 +15,6 @@ Future<http.Response> healthz() async {
 Future<AuthzResponse> authz(Token current) {
   return http.Client()
       .get(
-        // Uri.https("localhost:9998", "/meta/authz/"),
-        // headers: {"Authorization": httpx.auto_bearer()},
         Uri.https(httpx.host(), "/meta/authz/"),
         headers: {"Authorization": httpx.auto_bearer_host()},
       )
