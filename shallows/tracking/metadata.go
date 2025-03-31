@@ -3,6 +3,7 @@ package tracking
 import (
 	"context"
 	"crypto/md5"
+	"encoding/hex"
 	"log"
 	"path/filepath"
 	"strings"
@@ -165,7 +166,7 @@ func DownloadProgress(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torr
 		select {
 		case <-statst.C:
 			stats := dl.Stats()
-			log.Printf("%s: seeding(%t), peers(%d:%d:%d) pieces(%d:%d:%d:%d)\n", dl.Metainfo().HashInfoBytes().HexString(), stats.Seeding, stats.ActivePeers, stats.PendingPeers, stats.TotalPeers, stats.Missing, stats.Outstanding, stats.Unverified, stats.Completed)
+			log.Printf("%s - %s: seeding(%t), peers(%d:%d:%d) pieces(%d:%d:%d:%d)\n", md.ID, hex.EncodeToString(md.Infohash), stats.Seeding, stats.ActivePeers, stats.PendingPeers, stats.TotalPeers, stats.Missing, stats.Outstanding, stats.Unverified, stats.Completed)
 		case <-sub.Values:
 			if !l.Allow() {
 				continue
