@@ -90,6 +90,7 @@ abstract class media {
     final req = mkreq(
       http.MultipartRequest("POST", Uri.https(httpx.host(), "/m/")),
     );
+    req.headers["Authorization"] = httpx.auto_bearer_host();
 
     return client.send(req).then((v) {
       return v.stream.bytesToString().then((s) {
@@ -156,8 +157,8 @@ abstract class discovered {
     final req = mkreq(
       http.MultipartRequest("POST", Uri.https(httpx.host(), "/d/")),
     );
+    req.headers["Authorization"] = httpx.auto_bearer_host();
 
-    // req.headers = {"Authorization": httpx.auto_bearer_host()};
     return client.send(req).then((v) {
       return v.stream.bytesToString().then((s) {
         return Future.value(
