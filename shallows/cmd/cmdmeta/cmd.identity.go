@@ -3,6 +3,7 @@ package cmdmeta
 import (
 	"encoding/base64"
 	"log"
+	"strings"
 
 	"github.com/retrovibed/retrovibed/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/internal/md5x"
@@ -23,6 +24,7 @@ func (t IdenDisplay) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 
 	log.Println("identity", md5x.String(ssh.FingerprintSHA256(signer.PublicKey())))
 	log.Println("fingerprint", ssh.FingerprintSHA256(signer.PublicKey()))
+	log.Println("public", strings.TrimSpace(string(ssh.MarshalAuthorizedKey(signer.PublicKey()))))
 	log.Println("base64", base64.URLEncoding.EncodeToString(signer.PublicKey().Marshal()))
 
 	return nil

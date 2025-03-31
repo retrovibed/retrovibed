@@ -8,13 +8,11 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
-	"sync"
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/gofrs/uuid"
 	"github.com/retrovibed/retrovibed/internal/debugx"
 	"github.com/retrovibed/retrovibed/internal/env"
-	"github.com/retrovibed/retrovibed/internal/envx"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
 	"github.com/retrovibed/retrovibed/internal/httpx"
 	"github.com/retrovibed/retrovibed/internal/jwtx"
@@ -90,12 +88,8 @@ func BearerForHost(ctx context.Context, c *http.Client, host string) (string, er
 	return token.AccessToken, nil
 }
 
-var v = sync.OnceValue(func() []byte {
-	return []byte(envx.String(uuid.Must(uuid.NewV4()).String(), env.JWTSharedSecret))
-})
-
 func JWTSecretFromEnv() []byte {
-	return v()
+	return env.JWTSecret()
 }
 
 // Bearer extracts the jwt bearer token from a http request.

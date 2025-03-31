@@ -1,6 +1,8 @@
 package env
 
 import (
+	"sync"
+
 	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/internal/envx"
 	"github.com/retrovibed/retrovibed/internal/userx"
@@ -27,8 +29,12 @@ const (
 	SelfSignedHosts = "RETROVIBED_SELF_SIGNED_HOSTS"      // list of hosts to add to the self signed certificate.
 )
 
-func JWTSecret() []byte {
+var v = sync.OnceValue(func() []byte {
 	return []byte(envx.String(uuid.Must(uuid.NewV4()).String(), JWTSharedSecret))
+})
+
+func JWTSecret() []byte {
+	return v()
 }
 
 func MediaDir() string {
