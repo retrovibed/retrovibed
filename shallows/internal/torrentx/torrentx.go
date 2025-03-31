@@ -1,8 +1,11 @@
 package torrentx
 
 import (
+	"errors"
 	"fmt"
+	"log"
 	"net"
+	"os"
 
 	"github.com/james-lawrence/torrent"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
@@ -45,4 +48,21 @@ func NodesFromReply(ret dht.QueryResult) (retni []krpc.NodeInfo) {
 		retni = append(retni, ni)
 	})
 	return retni
+}
+
+// read the info option from a on disk file
+func OptionInfoFromFile(path string) torrent.Option {
+	if infob, err := os.ReadFile(path); err == nil {
+		return torrent.OptionInfo(infob)
+	} else if !errors.Is(err, os.ErrNotExist) {
+		log.Println("unable to load torrent info, will attempt to locate it from peers", err)
+	}
+
+	return torrent.OptionNoop
+}
+
+func RecordInfo(infopath string, dl torrent.Metadata) {
+	if info := dl.InfoBytes; info != nil {
+		errorsx.Log(errorsx.Wrap(os.WriteFile(infopath, info, 0600), "unable to record info file"))
+	}
 }
