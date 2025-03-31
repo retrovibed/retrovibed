@@ -16,6 +16,7 @@ cat | tee -a /etc/retrovibed/config.env << EOF
 RETROVIBED_MDNS_DISABLED=true
 RETROVIBED_TORRENT_AUTO_DISCOVERY=false
 RETROVIBED_TORRENT_AUTO_BOOTSTRAP=false
+RETROVIBED_SELF_SIGNED_HOSTS=127.0.0.1
 EOF
 
 systemctl enable --now retrovibed.service
