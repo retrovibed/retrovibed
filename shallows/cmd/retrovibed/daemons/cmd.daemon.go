@@ -237,5 +237,5 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	}
 
 	// report any async failures.
-	return dctx.Err()
+	return errorsx.Compact(context.Cause(dctx), dctx.Err())
 }
