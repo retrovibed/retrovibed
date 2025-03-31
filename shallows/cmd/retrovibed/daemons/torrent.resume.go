@@ -31,13 +31,13 @@ func ResumeDownloads(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual
 
 		metadata, err := torrent.New(metainfo.Hash(md.Infohash), torrent.OptionStorage(tstore), torrent.OptionTrackers([]string{md.Tracker}), torrentx.OptionInfoFromFile(infopath))
 		if err != nil {
-			log.Println(errorsx.Wrapf(err, "unable to create metadata from %s", md.ID))
-			return nil
+			return errorsx.Wrapf(err, "unable to create metadata from %s", md.ID)
 		}
 
 		t, _, err := tclient.Start(metadata)
 		if err != nil {
-			return errorsx.Wrapf(err, "unable to start download %s", md.ID)
+			log.Println(errorsx.Wrapf(err, "unable to start download %s", md.ID))
+			return nil
 		}
 
 		go func(infopath string, md *tracking.Metadata, dl torrent.Torrent) {
