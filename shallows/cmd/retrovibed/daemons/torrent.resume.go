@@ -31,7 +31,8 @@ func ResumeDownloads(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual
 
 		metadata, err := torrent.New(metainfo.Hash(md.Infohash), torrent.OptionStorage(tstore), torrent.OptionTrackers([]string{md.Tracker}), torrentx.OptionInfoFromFile(infopath))
 		if err != nil {
-			return errorsx.Wrapf(err, "unable to create metadata from metadata %s", md.ID)
+			log.Println(errorsx.Wrapf(err, "unable to create metadata from metadata %s", md.ID))
+			return nil
 		}
 
 		t, _, err := tclient.Start(metadata)
