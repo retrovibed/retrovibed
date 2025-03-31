@@ -8,6 +8,8 @@ import (
 	"encoding/pem"
 	"fmt"
 	"io"
+	"iter"
+	"log"
 	"os"
 	"strings"
 
@@ -174,4 +176,33 @@ func DecodeBase64PublicKey(s string) (pub ssh.PublicKey, err error) {
 
 func FingerprintMD5(pub ssh.PublicKey) string {
 	return md5x.FormatUUID(md5x.Digest(pub.Marshal()))
+}
+
+type Parsed struct {
+	ssh.PublicKey
+	Comment string
+	Options []string
+}
+
+func ParseAuthorizedKeys(encoded []byte) iter.Seq[Parsed] {
+	return func(yield func(Parsed) bool) {
+		for len(encoded) != 0 {
+			var (
+				err error
+				p   Parsed
+			)
+
+			if p.PublicKey, p.Comment, p.Options, encoded, err = ssh.ParseAuthorizedKey(encoded); err != nil {
+				if IsNoKeyFound(err) {
+					continue
+				}
+				log.Println(err)
+				continue
+			}
+
+			if !yield(p) {
+				return
+			}
+		}
+	}
 }

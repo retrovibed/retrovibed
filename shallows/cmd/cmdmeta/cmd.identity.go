@@ -10,7 +10,7 @@ import (
 )
 
 type Identity struct {
-	Bootstrap Bootstrap   `cmd:"" help:"bootstrap your identity using an existing ssh key"`
+	Bootstrap Bootstrap   `cmd:"" help:"bootstrap authorized users into the system, used to initially provision the system"`
 	Show      IdenDisplay `cmd:"" help:"display current identity"`
 }
 
