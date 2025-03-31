@@ -18,9 +18,11 @@ class AuthzCache extends StatefulWidget {
 class _AuthzCache extends State<AuthzCache> {
   bool _loading = true;
   authz.Cached<_meta.Token> meta = authz.Cached(
-    _meta.Token(),
+    authz.Bearer(_meta.Token(), ""),
     authz.refresh(
-      (c) => _meta.authz(c),
+      (c) => _meta.authz(c).then((v) {
+        return authz.Bearer(v.token, v.bearer);
+      }),
       (c, ts) =>
           DateTime.fromMillisecondsSinceEpoch(c.expires.toInt()).isBefore(ts),
     ),

@@ -14,6 +14,7 @@ import (
 	"github.com/go-playground/form/v4"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
+	"github.com/retrovibed/retrovibed/httpauth"
 	"github.com/retrovibed/retrovibed/internal/bytesx"
 	"github.com/retrovibed/retrovibed/internal/env"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
@@ -62,7 +63,7 @@ func (t *HTTPLibrary) Bind(r *mux.Router) {
 	r.Path("/").Methods(http.MethodGet).Handler(alice.New(
 		httpx.ContextBufferPool512(),
 		httpx.ParseForm,
-		// httpauth.AuthenticateWithToken(t.jwtsecret),
+		httpauth.AuthenticateWithToken(t.jwtsecret),
 		// AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
 		httpx.Timeout2s(),
 	).ThenFunc(t.search))
@@ -70,7 +71,7 @@ func (t *HTTPLibrary) Bind(r *mux.Router) {
 	r.Path("/").Methods(http.MethodPost).Handler(alice.New(
 		httpx.ContextBufferPool512(),
 		httpx.ParseForm,
-		// httpauth.AuthenticateWithToken(t.jwtsecret),
+		httpauth.AuthenticateWithToken(t.jwtsecret),
 		// AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
 		httpx.TimeoutRollingRead(3*time.Second),
 	).ThenFunc(t.upload))
@@ -78,15 +79,15 @@ func (t *HTTPLibrary) Bind(r *mux.Router) {
 	r.Path("/{id}").Methods(http.MethodDelete).Handler(alice.New(
 		httpx.ContextBufferPool512(),
 		httpx.ParseForm,
-		// httpauth.AuthenticateWithToken(t.jwtsecret),
+		httpauth.AuthenticateWithToken(t.jwtsecret),
 		// AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
 		httpx.Timeout2s(),
 	).ThenFunc(t.delete))
 
 	r.Path("/{id}").Methods(http.MethodGet).Handler(alice.New(
-		// httpauth.AuthenticateWithToken(t.jwtsecret),
+		httpauth.AuthenticateWithToken(t.jwtsecret),
 		// AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
-		httpx.TimeoutRollingWrite(3 * time.Second),
+		httpx.TimeoutRollingWrite(3*time.Second),
 	).Then(http.FileServerFS(fsx.VirtualAsFSWithRewrite(t.mediastorage, func(s string) string {
 		return strings.TrimPrefix(s, "m/")
 	}))))

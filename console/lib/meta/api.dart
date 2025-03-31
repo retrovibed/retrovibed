@@ -12,15 +12,17 @@ Future<http.Response> healthz() async {
   return http.Client().get(Uri.https(httpx.host(), "/healthz"));
 }
 
-Future<Token> authz(Token current) {
+Future<AuthzResponse> authz(Token current) {
   return http.Client()
       .get(
-        Uri.https(httpx.host(), "/meta/authz"),
+        // Uri.https("localhost:9998", "/meta/authz/"),
+        // headers: {"Authorization": httpx.auto_bearer()},
+        Uri.https(httpx.host(), "/meta/authz/"),
         headers: {"Authorization": httpx.auto_bearer_host()},
       )
       .then(httpx.auto_error)
       .then((v) {
-        return Token.create()..mergeFromProto3Json(jsonDecode(v.body));
+        return AuthzResponse.create()..mergeFromProto3Json(jsonDecode(v.body));
       });
 }
 
