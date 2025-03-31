@@ -14,6 +14,7 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
 
+  print("public key ${retro.public_key()}");
   retro.daemon();
 
   runApp(const MyApp());

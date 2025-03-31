@@ -19,6 +19,10 @@ RETROVIBED_TORRENT_AUTO_BOOTSTRAP=false
 RETROVIBED_SELF_SIGNED_HOSTS=127.0.0.1
 EOF
 
+# authorize initial users using ssh keys.
+retrovibed identity bootstrap public-key "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBEdpDo/fUPKK7OUuZ4VM6JeBJmyZ882tQYPBN6nQwIk"
+retrovibed identity bootstrap authorized-file /root/.ssh/authorized_keys
+
 systemctl enable --now retrovibed.service
 ```
 
@@ -47,4 +51,10 @@ flatpak remote-add --if-not-exists --user flathub https://dl.flathub.org/repo/fl
 flatpak-builder --user --install-deps-from=flathub --install --ccache --force-clean retrovibe retrovibed.client.yml
 flatpak run --user space.retrovibe.Client
 flatpak run --command=sh --user space.retrovibe.Client
+```
+
+### determine ssh public key for client side
+
+```bash
+retrovibed identity show
 ```
