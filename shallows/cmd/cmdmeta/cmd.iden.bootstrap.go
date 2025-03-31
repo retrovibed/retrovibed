@@ -1,87 +1,96 @@
 package cmdmeta
 
 import (
-	"log"
+	"context"
+	"database/sql"
 	"os"
+	"time"
 
-	"github.com/charmbracelet/huh"
 	"golang.org/x/crypto/ssh"
 
 	"github.com/retrovibed/retrovibed/cmd/cmdopts"
-	"github.com/retrovibed/retrovibed/internal/env"
 	"github.com/retrovibed/retrovibed/internal/errorsx"
-	"github.com/retrovibed/retrovibed/internal/fsx"
-	"github.com/retrovibed/retrovibed/internal/huhx"
-	"github.com/retrovibed/retrovibed/internal/md5x"
+	"github.com/retrovibed/retrovibed/internal/langx"
 	"github.com/retrovibed/retrovibed/internal/sshx"
-	"github.com/retrovibed/retrovibed/internal/stringsx"
-	"github.com/retrovibed/retrovibed/internal/userx"
+	"github.com/retrovibed/retrovibed/meta"
+	"github.com/retrovibed/retrovibed/meta/identityssh"
 )
 
 type Bootstrap struct {
-	Automatic  bool   `name:"automatic" help:"disable key file prompt if no path is provided" default:"false"`
-	Seed       string `name:"seed" help:"generate a ssh key deterministically based on a seed value" default:"${vars_random_seed}"`
-	Replace    bool   `name:"replace" help:"do not prompt and unconditionally replace the existing identity"`
-	SSHKeyPath string `arg:"" name:"sshkeypath" help:"path to ssh private key to use" default:""`
+	PublicKey      BootstrapPublicKey  `cmd:"" help:"a single ssh public key into the system"`
+	AuthorizedFile BootstrapAuthorized `cmd:"" help:"authorize public keys from a authorized keys file"`
 }
 
-func (t Bootstrap) replaceExistingKey(forced bool) bool {
-	if forced {
-		return true
-	}
-
-	return huhx.Fallback(false)(
-		huhx.Bool(huh.NewInput().Prompt("y/N: ").
-			Title("retrovibed generates a unique identity automatically, do you want to replace your existing identity?")))
+type BootstrapPublicKey struct {
+	PublicKey string `arg:"" name:"pubkey" help:"public key to add" required:"true"`
 }
 
-func (t Bootstrap) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
+func (t BootstrapPublicKey) Run(gctx *cmdopts.Global) (err error) {
 	var (
-		s ssh.Signer
+		db     *sql.DB
+		parsed sshx.Parsed
 	)
 
-	sshdir, err := userx.HomeDirectoryRel(".ssh")
+	if db, err = Database(gctx.Context); err != nil {
+		return err
+	}
+	defer db.Close()
+
+	ctx, done := context.WithTimeout(gctx.Context, 10*time.Second)
+	defer done()
+
+	if parsed.PublicKey, parsed.Comment, parsed.Options, _, err = ssh.ParseAuthorizedKey([]byte(t.PublicKey)); err != nil {
+		return errorsx.Wrap(err, "unable to parse public key")
+	}
+
+	return identityssh.ImportParsed(ctx, db, parsed)
+}
+
+type BootstrapAuthorized struct {
+	Path string `arg:"" name:"authorized_keys" help:"path to authorized key file to import" required:"true"`
+}
+
+func (t BootstrapAuthorized) Run(gctx *cmdopts.Global) (err error) {
+	var (
+		db *sql.DB
+	)
+
+	if db, err = Database(gctx.Context); err != nil {
+		return err
+	}
+	defer db.Close()
+
+	ctx, done := context.WithTimeout(gctx.Context, 10*time.Second)
+	defer done()
+
+	encoded, err := os.ReadFile(t.Path)
 	if err != nil {
-		return err
+		return errorsx.Wrapf(err, "unable to read authorized keys from %s", t.Path)
 	}
 
-	if stringsx.Blank(t.SSHKeyPath) && !t.Automatic {
-		if err := t.initPrivateKey(sshdir, id); err != nil {
-			return err
+	for parsed := range sshx.ParseAuthorizedKeys(encoded) {
+		p := meta.Profile{
+			Description: parsed.Comment,
+		}
+		if err = meta.ProfileInsertWithDefaults(ctx, db, p).Scan(&p); err != nil {
+			return errorsx.Wrap(err, "unable to create profile")
+		}
+
+		authz := langx.Clone(meta.Authz{}, meta.AuthzOptionAdmin)
+		if err = meta.AuthzInsertWithDefaults(ctx, db, authz).Scan(&authz); err != nil {
+			return errorsx.Wrap(err, "unable to setup authorizations")
+		}
+
+		iden := identityssh.Identity{
+			ID:        sshx.FingerprintMD5(parsed.PublicKey),
+			PublicKey: sshx.EncodeBase64PublicKey(parsed.PublicKey),
+			ProfileID: p.ID,
+		}
+
+		if err = identityssh.IdentityInsertWithDefaults(ctx, db, iden).Scan(&iden); err != nil {
+			return errorsx.Wrap(err, "unable create ssh identity")
 		}
 	}
-	replace := t.replaceExistingKey(t.Replace)
-	if stringsx.Present(t.SSHKeyPath) && replace {
-		err := errorsx.Wrap(
-			errorsx.Compact(
-				fsx.IgnoreIsNotExist(os.Remove(env.PrivateKeyPath())),
-				os.Symlink(t.SSHKeyPath, env.PrivateKeyPath()),
-			), "unable to symlink",
-		)
-		if err != nil {
-			return err
-		}
-	} else if replace {
-		log.Println("generating credentials with seed", t.Seed)
-		err := errorsx.Wrap(
-			fsx.IgnoreIsNotExist(os.Remove(env.PrivateKeyPath())), "unable to remove existing key",
-		)
-		if err != nil {
-			return err
-		}
-	}
 
-	// unconditionally remove generated data from the private key, they'll be regenerated when necessary.
-	if err := errorsx.Compact(
-		fsx.IgnoreIsNotExist(os.Remove(env.PrivateKeyPath()+".pub")),
-		fsx.IgnoreIsNotExist(os.Remove(userx.DefaultConfigDir("torrent.id"))),
-	); err != nil {
-		return err
-	}
-
-	if s, err = sshx.AutoCached(sshx.NewKeyGenSeeded(md5x.FormatUUID(md5x.Digest(t.Seed, "ssh"))), env.PrivateKeyPath()); err != nil {
-		return err
-	}
-
-	return sshx.EnsurePublicKey(s, env.PrivateKeyPath())
+	return nil
 }
