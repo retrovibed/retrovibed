@@ -2,6 +2,7 @@ package storage
 
 import (
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 
@@ -126,6 +127,7 @@ type fileTorrentImplIO struct {
 // Returns EOF on short or missing file.
 func (fst *fileTorrentImplIO) readFileAt(fi metainfo.FileInfo, b []byte, off int64) (n int, err error) {
 	f, err := os.Open(fst.fts.fileInfoName(fi))
+	log.Println("opened", fst.fts.fileInfoName(fi), err, off)
 	if os.IsNotExist(err) {
 		// File missing is treated the same as a short file.
 		err = io.EOF

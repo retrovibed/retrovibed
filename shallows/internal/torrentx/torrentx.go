@@ -55,8 +55,6 @@ func NodesFromReply(ret dht.QueryResult) (retni []krpc.NodeInfo) {
 func OptionInfoFromFile(path string) torrent.Option {
 	if minfo, err := metainfo.LoadFromFile(path); err == nil {
 		return torrent.OptionInfo(minfo.InfoBytes)
-		// if infob, err := os.ReadFile(path); err == nil {
-		// return torrent.OptionInfo(infob)
 	} else if !errors.Is(err, os.ErrNotExist) {
 		log.Println("unable to load torrent info, will attempt to locate it from peers", err)
 	}

@@ -94,6 +94,19 @@ func MetadataSearchBuilder() squirrel.SelectBuilder {
 	return squirrelx.PSQL.Select(sqlx.Columns(MetadataScannerStaticColumns)...).From("torrents_metadata")
 }
 
+func Verify(ctx context.Context, t torrent.Torrent) error {
+	log.Println("verify initiated", t.Metadata().DisplayName)
+	defer log.Println("verify completed", t.Metadata().DisplayName, spew.Sdump(t.Stats()))
+
+	select {
+	case <-t.GotInfo():
+		t.VerifyData()
+		return nil
+	case <-ctx.Done():
+		return errorsx.Compact(context.Cause(ctx), ctx.Err())
+	}
+}
+
 func Download(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata, t torrent.Torrent) (err error) {
 	var (
 		downloaded int64
