@@ -13,6 +13,7 @@ import (
 	"github.com/anacrolix/utp"
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/krpc"
+	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/sockets"
 )
 
@@ -52,8 +53,10 @@ func NodesFromReply(ret dht.QueryResult) (retni []krpc.NodeInfo) {
 
 // read the info option from a on disk file
 func OptionInfoFromFile(path string) torrent.Option {
-	if infob, err := os.ReadFile(path); err == nil {
-		return torrent.OptionInfo(infob)
+	if minfo, err := metainfo.LoadFromFile(path); err == nil {
+		return torrent.OptionInfo(minfo.InfoBytes)
+		// if infob, err := os.ReadFile(path); err == nil {
+		// return torrent.OptionInfo(infob)
 	} else if !errors.Is(err, os.ErrNotExist) {
 		log.Println("unable to load torrent info, will attempt to locate it from peers", err)
 	}
