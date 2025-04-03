@@ -19,7 +19,7 @@ require (
 	github.com/gorilla/schema v1.4.1
 	github.com/hashicorp/mdns v1.0.6
 	github.com/james-lawrence/genieql v0.0.0-20250306161027-bb1395f5f457
-	github.com/james-lawrence/torrent v0.0.0-20250321125210-5cb29a0cb7aa
+	github.com/james-lawrence/torrent v0.0.0-20250402204655-61b4474ee42a
 	github.com/justinas/alice v1.2.0
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/marcboeker/go-duckdb/v2 v2.1.0
@@ -28,7 +28,6 @@ require (
 	github.com/onsi/gomega v1.36.3
 	github.com/pkg/profile v1.7.0
 	github.com/pressly/goose/v3 v3.24.1
-	github.com/rymdport/portal v0.4.1
 	github.com/stretchr/testify v1.10.0
 	github.com/willabides/kongplete v0.4.0
 	golang.org/x/crypto v0.36.0
@@ -82,7 +81,6 @@ require (
 	github.com/felixge/fgprof v0.9.5 // indirect
 	github.com/go-viper/mapstructure/v2 v2.2.1 // indirect
 	github.com/goccy/go-json v0.10.5 // indirect
-	github.com/godbus/dbus/v5 v5.1.1-0.20241109141217-c266b19b28e9 // indirect
 	github.com/google/btree v1.1.3 // indirect
 	github.com/google/flatbuffers v25.2.10+incompatible // indirect
 	github.com/google/uuid v1.6.0 // indirect
@@ -126,7 +124,6 @@ require (
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
 	github.com/zieckey/goini v0.0.0-20240615065340-08ee21c836fb // indirect
-	go.etcd.io/bbolt v1.4.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/exp v0.0.0-20250305212735-054e65f0b394 // indirect
 	golang.org/x/mod v0.24.0 // indirect
