@@ -373,8 +373,8 @@ github.com/jackc/puddle/v2 v2.2.2 h1:PR8nw+E/1w0GLuRFSmiioY6UooMp6KJv0/61nB7icHo
 github.com/jackc/puddle/v2 v2.2.2/go.mod h1:vriiEXHvEE654aYKXXjOvZM39qJ0q+azkZFrfEOc3H4=
 github.com/james-lawrence/genieql v0.0.0-20250306161027-bb1395f5f457 h1:5nWFZEeJ9xu/EMusiNxSbhM0jANuAs/4EKlmOramzF4=
 github.com/james-lawrence/genieql v0.0.0-20250306161027-bb1395f5f457/go.mod h1:EyzmpLWKoZSlSnOo5Iydc7tDAc0TwlixVVgtqxMuHx8=
-github.com/james-lawrence/torrent v0.0.0-20250402204655-61b4474ee42a h1:qfvU0jouToqse+lNs+FcHYoJUDwW7SkiTVxxsSt8eFc=
-github.com/james-lawrence/torrent v0.0.0-20250402204655-61b4474ee42a/go.mod h1:yy0vafN0eOqw5HupvKQwno1n9tPQvwCqeDkXvCYZASQ=
+github.com/james-lawrence/torrent v0.0.0-20250403215354-11facd03addb h1:VjM8bUDD8DtyzS0wcRV6PQAtWG6HOoYNr+LxkkzNIl0=
+github.com/james-lawrence/torrent v0.0.0-20250403215354-11facd03addb/go.mod h1:yy0vafN0eOqw5HupvKQwno1n9tPQvwCqeDkXvCYZASQ=
 github.com/josharian/intern v1.0.0/go.mod h1:5DoeVV0s6jJacbCEi61lwdGj/aVlrQvzHFFd8Hwg//Y=
 github.com/jpillora/backoff v1.0.0/go.mod h1:J/6gKK9jxlEcS3zixgDgUAsiuZ7yrSoa/FX5e0EB2j4=
 github.com/json-iterator/go v1.1.6/go.mod h1:+SdeFBvtyEkXs7REEP0seUULqWtbJapLOCVDaaPEHmU=
