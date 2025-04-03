@@ -40,7 +40,6 @@ func ResumeDownloads(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual
 			return nil
 		}
 
-		t.VerifyData()
 		go func(infopath string, md *tracking.Metadata, dl torrent.Torrent) {
 			errorsx.Log(errorsx.Wrap(tracking.Verify(ctx, dl), "failed to verify data"))
 			errorsx.Log(errorsx.Wrap(tracking.Download(ctx, db, rootstore, md, dl), "resume failed"))
