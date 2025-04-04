@@ -77,6 +77,10 @@ func MetadataQueryIncomplete() squirrel.Sqlizer {
 	return squirrel.Expr("torrents_metadata.downloaded < torrents_metadata.bytes")
 }
 
+func MetadataQuerySeeding() squirrel.Sqlizer {
+	return squirrel.Expr("torrents_metadata.seeding")
+}
+
 func MetadataQueryNotPaused() squirrel.Sqlizer {
 	return squirrel.Expr("torrents_metadata.paused_at = 'infinity'")
 }
@@ -121,7 +125,7 @@ func Download(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata
 	log.Println("content transfer to library initiated")
 	defer log.Println("content transfer to library completed")
 	// need to get the path to the torrent media.
-	for tx, cause := range library.ImportFilesystem(ctx, library.ImportSymlinkFile(mediavfs), vfs.Path("torrent", t.Metainfo().HashInfoBytes().HexString())) {
+	for tx, cause := range library.ImportFilesystem(ctx, library.ImportSymlinkFile(mediavfs), vfs.Path("torrent", t.Metadata().ID.HexString())) {
 		if cause != nil {
 			log.Println(cause)
 			err = errorsx.Compact(err, cause)

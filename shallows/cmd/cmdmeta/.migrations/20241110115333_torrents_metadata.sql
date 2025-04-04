@@ -7,6 +7,7 @@ CREATE TABLE torrents_metadata (
     hidden_at TIMESTAMPTZ NOT NULL DEFAULT 'infinity',
     initiated_at TIMESTAMPTZ NOT NULL DEFAULT 'infinity',
     paused_at TIMESTAMPTZ NOT NULL DEFAULT 'infinity',
+    announced_at TIMESTAMPTZ NOT NULL DEFAULT '-infinity',
     seeding boolean NOT NULL DEFAULT 'false',
     private boolean NOT NULL DEFAULT 'false',
     tracker VARCHAR NOT NULL, -- will convert this to an array later.

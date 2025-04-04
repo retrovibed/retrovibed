@@ -301,7 +301,7 @@ func DiscoverDHTMetadata(ctx context.Context, db sqlx.Queryer, s *dht.Server, tc
 		}
 		defer tclient.Stop(metadata)
 
-		debugx.Println("initiating metadata lookup", metadata.InfoHash)
+		debugx.Println("initiating metadata lookup", metadata.ID)
 		info, err := tclient.Info(dctx, metadata)
 		if contextx.IsDeadlineExceeded(err) {
 			return errorsx.Compact(tracking.UnknownHashCooldown(ctx, db, unk).Scan(&unk), err)
@@ -311,11 +311,11 @@ func DiscoverDHTMetadata(ctx context.Context, db sqlx.Queryer, s *dht.Server, tc
 			return errorsx.Wrapf(err, "unable to download metadata for infohash %s", unk.ID)
 		}
 
-		if err = tracking.MetadataInsertWithDefaults(ctx, db, tracking.NewMetadata(&metadata.InfoHash, tracking.MetadataOptionFromInfo(info))).Scan(&md); err != nil {
+		if err = tracking.MetadataInsertWithDefaults(ctx, db, tracking.NewMetadata(&metadata.ID, tracking.MetadataOptionFromInfo(info))).Scan(&md); err != nil {
 			return errorsx.Wrap(err, "unable to insert metadata")
 		}
 
-		if err := tracking.UnknownHashDeleteByID(ctx, db, tracking.HashUID(&metadata.InfoHash)).Scan(&unknown); err != nil {
+		if err := tracking.UnknownHashDeleteByID(ctx, db, tracking.HashUID(&metadata.ID)).Scan(&unknown); err != nil {
 			return errorsx.Wrapf(err, "unable to delete unknown infohash: %s", unk.ID)
 		}
 

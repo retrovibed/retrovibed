@@ -178,6 +178,7 @@ func (t Command) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		}
 	}()
 
+	go AccounceTorrent(dctx, db, rootstore, tclient, tstore)
 	go ResumeDownloads(dctx, db, rootstore, tclient, tstore)
 
 	httpmux := mux.NewRouter()

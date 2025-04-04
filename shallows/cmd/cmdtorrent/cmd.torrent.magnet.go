@@ -33,7 +33,7 @@ func (t cmdMagnet) Run(ctx *cmdopts.Global) (err error) {
 			continue
 		}
 
-		path := userx.DefaultDownloadDirectory(fmt.Sprintf("%s.torrent", m.InfoHash.HexString()))
+		path := userx.DefaultDownloadDirectory(fmt.Sprintf("%s.torrent", m.ID.HexString()))
 		if cause := os.WriteFile(path, encoded, 0600); cause != nil {
 			err = errors.Join(err, errorsx.Wrap(cause, "unable to write torrent file"))
 			continue
@@ -44,7 +44,7 @@ func (t cmdMagnet) Run(ctx *cmdopts.Global) (err error) {
 			continue
 		}
 
-		log.Println("NOOP MAGNET - Not implemented", userx.DefaultDownloadDirectory(fmt.Sprintf("%s.torrent", m.InfoHash.HexString())), spew.Sdump(m))
+		log.Println("NOOP MAGNET - Not implemented", userx.DefaultDownloadDirectory(fmt.Sprintf("%s.torrent", m.ID.HexString())), spew.Sdump(m))
 	}
 
 	return err
