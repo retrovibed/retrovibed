@@ -19,7 +19,7 @@ require (
 	github.com/gorilla/schema v1.4.1
 	github.com/hashicorp/mdns v1.0.6
 	github.com/james-lawrence/genieql v0.0.0-20250306161027-bb1395f5f457
-	github.com/james-lawrence/torrent v0.0.0-20250403215354-11facd03addb
+	github.com/james-lawrence/torrent v0.0.0-20250404050540-d6746584573b
 	github.com/justinas/alice v1.2.0
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/marcboeker/go-duckdb/v2 v2.1.0
