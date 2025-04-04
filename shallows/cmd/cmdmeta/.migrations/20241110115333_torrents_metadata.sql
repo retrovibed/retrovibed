@@ -7,12 +7,13 @@ CREATE TABLE torrents_metadata (
     hidden_at TIMESTAMPTZ NOT NULL DEFAULT 'infinity',
     initiated_at TIMESTAMPTZ NOT NULL DEFAULT 'infinity',
     paused_at TIMESTAMPTZ NOT NULL DEFAULT 'infinity',
-    announced_at TIMESTAMPTZ NOT NULL DEFAULT '-infinity',
+    next_announce_at TIMESTAMPTZ NOT NULL DEFAULT '-infinity',
     seeding boolean NOT NULL DEFAULT 'false',
     private boolean NOT NULL DEFAULT 'false',
     tracker VARCHAR NOT NULL, -- will convert this to an array later.
     bytes UBIGINT NOT NULL DEFAULT 0,
     downloaded UBIGINT NOT NULL DEFAULT 0,
+    uploaded UBIGINT NOT NULL DEFAULT 0,
     peers USMALLINT NOT NULL DEFAULT 0,
     description STRING NOT NULL DEFAULT '',
     infohash BINARY NOT NULL
