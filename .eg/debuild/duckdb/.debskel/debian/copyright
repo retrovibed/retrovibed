@@ -1,0 +1,7 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: duckdb
+Source: https://github.com/duckdb/duckdb
+
+Files: \*
+Copyright: 2023-2024 Retrovibed <engineering@retrovibed.space>
+License: AGPL-3.0

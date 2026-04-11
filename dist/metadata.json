@@ -1,0 +1,12 @@
+{
+  "project_name": "retrovibed",
+  "tag": "v0.0.0",
+  "previous_tag": "",
+  "version": "0.0.0-SNAPSHOT-467f8209",
+  "commit": "467f8209ec37303b0ae7bf302a49a94bb3754b1e",
+  "date": "2025-07-29T12:33:05.62524643-04:00",
+  "runtime": {
+    "goos": "linux",
+    "goarch": "amd64"
+  }
+}

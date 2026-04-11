@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+package retrovibed.cas;
+
+message Media {
+  string id = 1 [ json_name = "id" ];
+  string account_id = 2 [ json_name = "account_id" ];
+  string uploaded_by = 3 [ json_name = "uploaded_by" ];
+  string created_at = 4 [ json_name = "created_at" ];
+  string updated_at = 5 [ json_name = "updated_at" ];
+  string mimetype = 6 [ json_name = "mimetype" ];
+  uint64 bytes = 7 [ json_name = "bytes" ];
+  uint64 usage = 8 [ json_name = "usage" ]; // represents the actual storage being charged.
+  string tombstoned_at = 9 [ json_name = "tombstoned_at" ]; // when the media was tombstoned.
+  reserved 20 to 999;
+}
+
+message MediaSearchRequest {
+  string query = 1 [ json_name = "query" ];
+  uint64 offset = 2 [ json_name = "offset" ];
+  uint64 limit = 3 [ json_name = "limit" ];
+  reserved 4 to 999;
+}
+
+message MediaSearchResponse {
+  MediaSearchRequest next = 1 [ json_name = "next" ];
+  repeated Media items = 2 [ json_name = "items" ];
+}
+
+message MediaCreateRequest {
+  Media media = 1 [ json_name = "media" ];
+}
+message MediaCreateResponse {
+  Media media = 1 [ json_name = "media" ];
+}
+
+message MediaUploadRequest {
+  Media media = 1 [ json_name = "media" ];
+}
+message MediaUploadResponse {
+  Media media = 1 [ json_name = "media" ];
+}
+
+message MediaDownloadRequest {}
+
+message MediaCompletedRequest {}
+message MediaCompletedResponse {
+  Media media = 1 [ json_name = "media" ];
+}
+
+message MediaFindRequest { }
+message MediaFindResponse {
+  Media media = 1 [ json_name = "media" ];
+}
+
+message MediaDeleteRequest { }
+message MediaDeleteResponse {
+  Media media = 1 [ json_name = "media" ];
+}

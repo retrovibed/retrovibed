@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package meta;
+
+message Quota {
+  string sku = 1 [ json_name = "id" ];
+  string account_id = 2 [ json_name = "account_id" ];
+  string created_at = 3 [ json_name = "created_at" ];
+  string updated_at = 4 [ json_name = "updated_at" ];
+  string renewed_at = 5 [ json_name = "renewed_at" ];
+  string description = 6 [ json_name = "description" ];
+  bool adjustable = 7 [ json_name = "adjustable" ];
+  int64 maximum = 8 [ json_name = "maximum" ];
+  int64 credits = 9 [ json_name = "credits" ];
+  int64 reserved = 10 [ json_name = "reserved" ];
+  int64 consumed = 11 [ json_name = "consumed" ];
+  uint64 rollover = 12 [ json_name = "rollover" ];
+  int64 granted = 13 [ json_name = "granted" ];
+}
+
+message QuotaSearchRequest {
+  string query = 1 [ json_name = "query" ];
+  uint64 offset = 2 [ json_name = "offset" ];
+  uint64 limit = 3 [ json_name = "limit" ];
+}
+message QuotaSearchResponse {
+  QuotaSearchRequest next = 1 [ json_name = "next" ];
+  repeated Quota items = 2 [ json_name = "items" ];
+}
+
+message QuotaUpdateRequest { Quota quota = 1; }
+message QuotaUpdateResponse { Quota quota = 1; }
+
+message QuotaFindRequest {}
+message QuotaFindResponse { Quota quota = 1; }
+
+message Adjustment {
+  string sku = 1 [ json_name = "sku" ];
+  int64 limit = 2 [ json_name = "limit" ];
+}
+
+message QuotaAdjustmentRequest {
+  repeated Adjustment adjustments = 1 [ json_name = "adjustments" ];
+  string expires_at = 2 [ json_name = "expires_at" ];
+}
+message QuotaAdjustmentResponse {}

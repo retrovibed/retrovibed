@@ -1,0 +1,141 @@
+syntax = "proto3";
+
+package media;
+
+message Media {
+  string id = 1 [ json_name = "id" ];
+  string description = 2 [ json_name = "description" ];
+  string mimetype = 3 [ json_name = "mimetype" ];
+  string image = 4 [ json_name = "image" ];
+  string archive_id = 5 [ json_name = "archive_id" ];
+  string torrent_id = 6 [ json_name = "torrent_id" ];
+  string created_at = 7 [ json_name = "created_at" ];
+  string updated_at = 8 [ json_name = "updated_at" ];
+  string known_media_id = 9 [ json_name = "known_media_id" ];
+  string encryption_seed = 10 [ json_name = "encryption_seed" ];
+}
+
+message MediaSearchRequest {
+  string query = 1 [ json_name = "query" ];
+  repeated string mimetypes = 2 [ json_name = "mimetypes" ];
+  bool adult = 3 [ json_name = "adult" ];
+  bool hidden = 4 [ json_name = "hidden" ];
+  reserved 5 to 899;
+  uint64 offset = 900 [ json_name = "offset" ];
+  uint64 limit = 901 [ json_name = "limit" ];
+  reserved 902 to 999;
+}
+
+message MediaSearchResponse {
+  MediaSearchRequest next = 1 [ json_name = "next" ];
+  repeated Media items = 2 [ json_name = "items" ];
+}
+
+message MediaFindResponse { Media media = 1 [ json_name = "media" ]; }
+
+message MediaUpdateRequest { Media media = 1 [ json_name = "media" ]; }
+message MediaUpdateResponse { Media media = 1 [ json_name = "media" ]; }
+
+message MediaDeleteRequest {}
+message MediaDeleteResponse { Media media = 1 [ json_name = "media" ]; }
+message MediaUploadResponse { Media media = 1 [ json_name = "media" ]; }
+
+message Download {
+  Media media = 1 [ json_name = "media" ];
+  uint64 bytes = 2 [ json_name = "bytes" ];
+  uint64 downloaded = 3 [ json_name = "downloaded" ];
+  string initiated_at = 4 [ json_name = "initiated_at" ];
+  string paused_at = 5 [ json_name = "paused_at" ];
+  uint32 peers = 6 [ json_name = "peers" ];
+  bool distributing = 7 [ json_name = "distributing" ];
+  string path = 8 [ json_name = "path" ];
+  uint32 peers_seeders = 9 [ json_name = "peers_seeders" ];
+  uint32 peers_half = 10 [ json_name = "peers_half" ];
+  uint32 peers_available = 11 [ json_name = "peers_available" ];
+  string completed_at = 12 [ json_name = "completed_at" ];
+  string verify_at = 13 [ json_name = "verify_at" ];
+}
+
+message MagnetCreateRequest { string uri = 1 [ json_name = "uri" ]; }
+
+message MagnetCreateResponse {
+  Download download = 1 [ json_name = "download" ];
+}
+
+message DownloadSearchRequest {
+  string query = 1 [ json_name = "query" ];
+  repeated string mimetypes = 2 [ json_name = "mimetypes" ];
+  bool completed = 3 [ json_name = "completed" ];
+  bool hidden = 4 [ json_name = "hidden" ];
+  reserved 5 to 899;
+  uint64 offset = 900 [ json_name = "offset" ];
+  uint64 limit = 901 [ json_name = "limit" ];
+  reserved 902 to 999;
+}
+
+message DownloadSearchResponse {
+  DownloadSearchRequest next = 1 [ json_name = "next" ];
+  repeated Download items = 2 [ json_name = "items" ];
+}
+
+message DownloadUpdateRequest {
+  Download download = 1 [ json_name = "download" ];
+}
+message DownloadUpdateResponse {
+  Download download = 1 [ json_name = "download" ];
+}
+
+message DownloadMetadataRequest {}
+message DownloadMetadataResponse {
+  Download download = 1 [ json_name = "download" ];
+}
+
+message DownloadBeginRequest {}
+message DownloadBeginResponse {
+  Download download = 1 [ json_name = "download" ];
+}
+
+message DownloadPauseRequest {}
+message DownloadPauseResponse {
+  Download download = 1 [ json_name = "download" ];
+}
+
+message DownloadTuneRequest {
+  repeated string peers = 1 [ json_name = "peers" ];
+}
+message DownloadTuneResponse {}
+
+message DownloadDeleteRequest {}
+message DownloadDeleteResponse {
+  Download download = 1 [ json_name = "download" ];
+}
+
+message Published {
+  string id = 1 [ json_name = "id" ];
+  string mimetype = 2 [ json_name = "mimetype" ];
+  string description = 3 [ json_name = "description" ];
+  uint64 bytes = 4 [ json_name = "bytes" ];
+  string entropy = 5 [ json_name = "entropy" ];
+  string expires_at = 6 [ json_name = "expires_at" ];
+}
+
+message PublishedUploadRequest {
+  string entropy = 1 [ json_name = "entropy" ];
+  string mimetype = 2 [ json_name = "mimetype" ];
+  uint64 ttl = 3 [ json_name = "ttl" ];
+}
+
+message PublishedUploadResponse {
+  Published published = 1 [ json_name = "published" ];
+}
+
+message MetadataSyncRequest { Media media = 1 [ json_name = "media" ]; }
+message MetadataSyncResponse { Media media = 1 [ json_name = "media" ]; }
+
+message PublishedRequest {
+  string known_media_id = 1 [ json_name = "known_media_id" ];
+}
+message PublishedResponse {
+  Media media = 1 [ json_name = "media" ];
+  string magnet_uri = 2 [ json_name = "magnet_uri" ];
+}

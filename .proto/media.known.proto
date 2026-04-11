@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package media;
+
+import "meta.search.proto";
+
+message Known {
+  string id = 1 [ json_name = "id" ];
+  float rating = 2 [ json_name = "rating" ];
+  bool adult = 3 [ json_name = "adult" ];
+  string description = 4 [ json_name = "description" ];
+  string summary = 5 [ json_name = "summary" ];
+  string image = 6 [ json_name = "image" ];
+  string released = 7 [ json_name = "released" ];
+}
+
+message KnownSearchRequest {
+  string query = 1 [ json_name = "query" ];
+  bool adult = 2 [ json_name = "adult" ];
+  string language = 3 [ json_name = "language" ];
+  reserved 4 to 899;
+  uint64 offset = 900 [ json_name = "offset" ];
+  uint64 limit = 901 [ json_name = "limit" ];
+  reserved 902 to 999;
+}
+
+message KnownSearchResponse {
+  KnownSearchRequest next = 1 [ json_name = "next" ];
+  repeated Known items = 2 [ json_name = "items" ];
+}
+
+message KnownMatchRequest { string query = 1 [ json_name = "query" ]; }
+
+message KnownLookupRequest {}
+message KnownLookupResponse { Known known = 1 [ json_name = "known" ]; }
+
+message KnownDownloadRequest {}
+message KnownDownloadResponse { Known known = 1 [ json_name = "known" ]; }
+
+message KnownCreateRequest { Known known = 1 [ json_name = "known" ]; }
+message KnownCreateResponse { Known known = 1 [ json_name = "known" ]; }
+
+message KnownLatestRequest {
+  meta.DateRange released = 1 [ json_name = "released" ];
+  reserved 2 to 899;
+  uint64 offset = 900 [ json_name = "offset" ];
+  uint64 limit = 901 [ json_name = "limit" ];
+  reserved 902 to 999;
+}
+
+message KnownLatestResponse {
+  KnownLatestRequest next = 1 [ json_name = "next" ];
+  repeated Known items = 2 [ json_name = "items" ];
+}
+
+message RecommendationsRequest {
+  reserved 1 to 899;
+  uint64 offset = 900 [ json_name = "offset" ];
+  uint64 limit = 901 [ json_name = "limit" ];
+  reserved 902 to 999;
+}
+
+message RecommendationsResponse {
+  RecommendationsRequest next = 1 [ json_name = "next" ];
+  repeated Known items = 2 [ json_name = "items" ];
+}

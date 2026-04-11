@@ -1,0 +1,48 @@
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:retrovibed/retrovibed.dart' as retro;
+
+bool boolean(String key, {bool fallback = false}) {
+  try {
+    return bool.parse(Platform.environment[key] ?? "");
+  } catch (_) {
+    return fallback;
+  }
+}
+
+String string(String key, {String fallback = ""}) {
+  try {
+    return Platform.environment[key] ?? fallback;
+  } catch (_) {
+    return fallback;
+  }
+}
+
+void printSystemEnv() {
+  Platform.environment.forEach((key, value) {
+    print('$key: $value');
+  });
+}
+
+Future<void> xdg() async {
+  if (Platform.isLinux || Platform.isMacOS) {
+    return;
+  }
+
+  final configDir = await getApplicationSupportDirectory();
+  final dataDir = await getApplicationDocumentsDirectory();
+  final cacheDir = await getApplicationCacheDirectory();
+  final downloadDir = Platform.isIOS ? dataDir : await getDownloadsDirectory();
+  print("config ${configDir}");
+  print("data ${dataDir}");
+  print("cache ${cacheDir}");
+  print("download ${downloadDir}");
+  retro.setenv("XDG_CONFIG_HOME", configDir.path);
+  retro.setenv("XDG_DATA_HOME", dataDir.path);
+  retro.setenv("XDG_CACHE_HOME", cacheDir.path);
+  retro.setenv("XDG_DOWNLOAD_DIR", downloadDir?.path ?? "");
+}
+
+class vars {
+  static const AutoIdentifyMedia = "RETROVIBED_MEDIA_AUTO_IDENTIFY";
+}

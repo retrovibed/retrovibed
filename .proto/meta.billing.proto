@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package meta;
+
+message Billing {
+  string customer_id = 1 [ json_name = "customer_id" ];
+  string plan_id = 2 [ json_name = "plan_id" ];
+  string subscription_id = 3 [ json_name = "subscription_id" ];
+  string subscription_ended_at = 4 [ json_name = "subscription_ended_at" ];
+}
+
+message Plan {
+  string token = 1 [ json_name = "token" ];
+  string id = 2 [ json_name = "id" ];
+  bool legacy = 3 [ json_name = "legacy" ];
+  bool hidden = 4 [ json_name = "hidden" ];
+
+  reserved 5 to 999;
+
+  int64 profiles = 1000 [ json_name = "profiles" ];
+  int64 storage = 1001 [ json_name = "storage" ];
+  int64 bandwidth = 1002 [ json_name = "bandwidth" ];
+  bool mobile = 1003 [ json_name = "mobile" ];
+
+  reserved 1004 to 1999;
+
+  string stripe_id = 2000 [ json_name = "stripe_id" ];
+}
+
+message BillingCreateRequest {}
+message BillingCreateResponse { Billing billing = 1 [ json_name = "billing" ]; }
+
+message BillingLookupRequest {}
+message BillingLookupResponse {
+  Billing billing = 1 [ json_name = "billing" ];
+  int64 attribution_count = 2 [ json_name = "attribution_count" ];
+  int32 attribution_rate = 3 [ json_name = "attribution_rate" ];
+  Plan plan = 4 [ json_name = "plan" ];
+}
+
+message BillingSubscribeRequest { string plan = 1 [ json_name = "plan" ]; }
+message BillingSubscribeResponse {
+  Billing billing = 1 [ json_name = "billing" ];
+}
+
+message BillingSessionRequest { string plan = 1 [ json_name = "plan" ]; }
+message BillingSessionResponse {
+  string redirect = 1 [ json_name = "redirect" ];
+}
+
+message BillingPlansRequest {}
+message BillingPlansResponse {
+  repeated Plan plans = 1 [ json_name = "plans" ];
+}
+
+message AttributionTokenResponse { string token = 1 [ json_name = "token" ]; }
+
+message AttributionConsumeRequest { string token = 1 [ json_name = "token" ]; }
+
+message AttributionConsumeResponse {
+  string attribution_id = 1 [ json_name = "attribution_id" ];
+}

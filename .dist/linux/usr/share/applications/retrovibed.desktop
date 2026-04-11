@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Retrovibe Console
+Comment=A versatile application for data archival and media playback.
+Exec=/app/bin/console
+Icon=space.retrovibe.Console
+Type=Application
+Categories=Utility;Archiving;AudioVideo;Player;
+Terminal=false
+StartupNotify=true
+StartupWMClass=space.retrovibe.Console
+Keywords=retro;console;emulator;game;archive;data;media;player;video;audio;

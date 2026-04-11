@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:retrovibed="https://retrovibed.com/rss/feed" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:media="http://search.yahoo.com/mrss/">
+	<channel>
+		<title>Retrovibed Media Database</title>
+		<link>https://media.community.retrovibe.space</link>
+		<description>magnet links for media metadata archives for use by the retrovibed application</description>
+		<copyright>Retrovibed 2025</copyright>
+		<language>en-us</language>
+		<lastBuildDate>Tue, 22 Jul 2025 13:02:40 +0000</lastBuildDate>
+		<ttl>1440</ttl>
+		<retrovibed:metadata entropy="57869e82c2684ac4881bd32581f969db" mimetype="application/vnd.retrovibed.media.archive"></retrovibed:metadata>
+		<item>
+			<guid isPermaLink="false">00000000-0000-0000-0000-000000000001</guid>
+			<title>Retrovibe Media Archive 00</title>
+			<link>https://media.community.retrovibe.space/00000000-0000-0000-0000-000000000001</link>
+			<pubDate>Tue, 22 Jul 2025 13:02:40 +0000</pubDate>
+			<enclosure url="magnet:?xt=urn:btih:8665727372B28B0263690B82928399516641A1B4&amp;dn=retrovibed.media.metadata.00.gz" type="application/x-bittorrent" length="1243643904"></enclosure>
+		</item>
+	</channel>
+</rss>

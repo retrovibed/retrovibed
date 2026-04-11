@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package storage;
+
+message Local {
+  bool reclaim = 1 [ json_name = "reclaim" ];
+  uint64 maximum = 2 [ json_name = "maximum" ];
+}
+
+message StorageSettingsRequest {
+  Local local = 1 [ json_name = "local" ];
+}
+
+message StorageSettingsResponse {
+  Local local = 1 [ json_name = "local" ];
+}

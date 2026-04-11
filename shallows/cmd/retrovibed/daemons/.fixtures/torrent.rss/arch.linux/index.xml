@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Arch Linux: Releases</title>
+        <link>https://archlinux.org/download/</link>
+        <description>Release ISOs</description>
+        <atom:link href="https://archlinux.org/feeds/releases/" rel="self" />
+        <language>en-us</language>
+        <lastBuildDate>Tue, 01 Jul 2025 17:47:32 +0000</lastBuildDate>
+        <item>
+            <title>2025.07.01</title>
+            <link>https://archlinux.org/releng/releases/2025.07.01/</link>
+            <description />
+            <pubDate>Tue, 01 Jul 2025 00:00:00 +0000</pubDate>
+            <guid isPermaLink="false">tag:archlinux.org,2025-07-01:/releng/releases/2025.07.01/</guid>
+            <enclosure length="1357545472" type="application/x-bittorrent"
+                url="https://archlinux.org//releng/releases/2025.07.01/torrent/" />
+        </item>
+    </channel>
+</rss>

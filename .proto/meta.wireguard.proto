@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package meta;
+
+message Wireguard {
+  string id = 1 [ json_name = "id" ];
+  string created_at = 2 [ json_name = "created_at" ];
+  string updated_at = 3 [ json_name = "updated_at" ];
+  string description = 4 [ json_name = "description" ];
+  bool default = 5 [ json_name = "default" ];
+  uint32 port = 6 [ json_name = "port" ];
+  uint32 dns_rate_limit = 7 [ json_name = "dns_rate_limit" ];
+}
+
+message WireguardSearchRequest {
+  string query = 1 [ json_name = "query" ];
+  uint64 offset = 2 [ json_name = "offset" ];
+  uint64 limit = 3 [ json_name = "limit" ];
+}
+message WireguardSearchResponse {
+  WireguardSearchRequest next = 1 [ json_name = "next" ];
+  repeated Wireguard items = 2 [ json_name = "items" ];
+}
+
+message WireguardUpdateRequest {
+  Wireguard Wireguard = 1 [ json_name = "wireguard" ];
+}
+message WireguardUpdateResponse {
+  Wireguard Wireguard = 1 [ json_name = "wireguard" ];
+}
+
+message WireguardTouchRequest {}
+message WireguardTouchResponse {
+  Wireguard Wireguard = 1 [ json_name = "wireguard" ];
+}
+
+message WireguardUploadRequest {}
+message WireguardUploadResponse {
+  Wireguard Wireguard = 1 [ json_name = "wireguard" ];
+}
+
+message WireguardCurrentRequest {}
+message WireguardCurrentResponse {
+  Wireguard Wireguard = 1 [ json_name = "wireguard" ];
+  bool online = 2 [ json_name = "online" ];
+  string ip = 3 [ json_name = "ip" ];
+  string ip4 = 4 [ json_name = "ip4" ];
+}
+
+message WireguardDeleteRequest {}
+message WireguardDeleteResponse {
+  Wireguard Wireguard = 1 [ json_name = "wireguard" ];
+}

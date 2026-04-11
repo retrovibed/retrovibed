@@ -1,0 +1,22 @@
+FROM retrovibe.ubuntu:latest
+
+# install android sdk
+RUN apt-get update && apt-get install -y openjdk-17-jdk curl unzip
+RUN mkdir -p /opt/android-sdk/cmdline-tools && chown -R egd:egd /opt/android-sdk
+RUN curl -L https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -o /tmp/tools.zip
+RUN sudo -u egd unzip /tmp/tools.zip -d /tmp
+RUN yes | sudo -u egd /tmp/cmdline-tools/bin/sdkmanager --sdk_root=/opt/android-sdk "cmdline-tools;latest"
+RUN yes | sudo -u egd /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=/opt/android-sdk \
+    "ndk;27.0.12077973" \
+    "ndk;28.2.13676358" \
+    "build-tools;35.0.0" \
+    "platforms;android-36" \
+    "cmake;3.22.1" \
+    "platform-tools"
+
+RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
+RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee /etc/apt/sources.list.d/google-cloud-sdk.list
+RUN apt-get update && apt-get install -y google-cloud-cli
+
+RUN systemd-tmpfiles --create
+RUN systemd-tmpfiles --clean

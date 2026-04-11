@@ -1,0 +1,62 @@
+package dht
+
+import (
+	"context"
+	"errors"
+	"time"
+
+	"github.com/james-lawrence/torrent/dht/krpc"
+	"github.com/james-lawrence/torrent/dht/traversal"
+	"github.com/james-lawrence/torrent/internal/langx"
+)
+
+type TraversalStats = traversal.Stats
+
+// Populates the node table.
+func (s *Server) Bootstrap(ctx context.Context) (_zero TraversalStats, err error) {
+	s.mu.Lock()
+	if s.bootstrappingNow {
+		s.mu.Unlock()
+		return _zero, errors.New("already bootstrapping")
+	}
+	s.bootstrappingNow = true
+	s.mu.Unlock()
+	defer func() {
+		s.mu.Lock()
+		defer s.mu.Unlock()
+		s.bootstrappingNow = false
+	}()
+	// Track number of responses, for STM use. (It's available via atomic in TraversalStats but that
+	// won't let wake up STM transactions that are observing the value.)
+	t := traversal.Start(traversal.OperationInput{
+		Target: s.id.Load().AsByteArray(),
+		K:      64,
+		DoQuery: func(ctx context.Context, addr krpc.NodeAddr) traversal.QueryResult {
+			return s.FindNode(ctx, NewAddr(addr.AddrPort), langx.Zero(s.id.Load()), QueryRateLimiting{}).TraversalQueryResult(addr)
+		},
+		NodeFilter: s.TraversalNodeFilter,
+	})
+
+	nodes, err := s.TraversalStartingNodes()
+	if err != nil {
+		return _zero, err
+	}
+
+	t.AddNodes(nodes)
+	s.mu.Lock()
+	s.lastBootstrap = time.Now()
+	s.mu.Unlock()
+	select {
+	case <-ctx.Done():
+		err = ctx.Err()
+	case <-t.Stalled():
+	}
+	t.Stop()
+	if err != nil {
+		// Could test for Stopped and return stats here but the interface doesn't tell the caller if
+		// we were successful in taking the stats. We could also take a snapshot instead.
+		return _zero, err
+	}
+	<-t.Stopped()
+	return *t.Stats(), nil
+}

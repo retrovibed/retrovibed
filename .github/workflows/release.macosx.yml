@@ -1,0 +1,53 @@
+name: macos build
+permissions:
+  contents: write
+  id-token: write
+on:
+  workflow_dispatch:
+  # push:
+  #   branches:
+  #     - main
+
+jobs:
+  macos:
+    name: macosx-build
+    runs-on: macos-latest
+    steps:
+      - name: Set up Homebrew
+        id: set-up-homebrew
+        uses: Homebrew/actions/setup-homebrew@main
+
+      - name: Setup Go environment on macOS
+        id: setup-go-macos
+        uses: actions/setup-go@v5
+        with:
+          go-version: "stable" # Use 'stable' to always get the latest stable Go version
+          cache: true # Enable caching for Go modules and build cache
+          check-latest: true # Ensures the latest stable version is always used
+      - uses: tecolicom/actions-use-homebrew-tools@v1
+        with:
+          tools: "duckdb gpgme flutter tree ffmpeg@7"
+          # tools: 'duckdb gpgme tree'
+          verbose: false
+      - name: Install EG
+        uses: nick-fields/retry@v3
+        with:
+          max_attempts: 5 # Number of retries
+          timeout_minutes: 10
+          command: GOPROXY=direct go install github.com/egdaemon/eg/...@latest
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+      - name: Debug Flutter SDK
+        run: ls -lha $(dirname $(dirname $(which flutter)))
+      - name: Fix Flutter SDK cache permissions
+        run: sudo chown -R $(id -un) $(dirname $(dirname $(which flutter)))
+      - name: build
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          eg compute baremetal -e GH_TOKEN --no-podman --secret=gcpsm://${{ secrets.GCP_PROJECT }}/apple-signing-env --secret=gcpsm://${{ secrets.GCP_PROJECT }}/apple-macos-signing-env release/darwin

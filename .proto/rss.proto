@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package rss;
+
+message Feed {
+  string id = 1 [ json_name = "id" ];
+  string created_at = 2 [ json_name = "created_at" ];
+  string updated_at = 3 [ json_name = "updated_at" ];
+  string next_check = 4 [ json_name = "next_check" ];
+  string description = 5 [ json_name = "description" ];
+  string url = 6 [ json_name = "url" ];
+  bool autodownload = 7 [ json_name = "autodownload" ];
+  bool autoarchive = 8 [ json_name = "autoarchive" ];
+  bool contributing = 9 [ json_name = "contributing" ];
+  string disabled_at = 10 [ json_name = "disabled_at" ];
+  uint64 ttl_minimum = 11 [ json_name = "ttl_minimum" ];
+  string encryption_seed = 12 [ json_name = "encryption_seed" ];
+  string digest = 13 [ json_name = "digest" ];
+}
+
+message FeedSearchRequest {
+  string query = 1 [ json_name = "query" ];
+  reserved 2 to 899;
+  uint64 offset = 900 [ json_name = "offset" ];
+  uint64 limit = 901 [ json_name = "limit" ];
+  reserved 902 to 999;
+}
+
+message FeedSearchResponse {
+  FeedSearchRequest next = 1 [ json_name = "next" ];
+  repeated Feed items = 2 [ json_name = "items" ];
+}
+
+message FeedCreateRequest {
+  Feed feed = 1 [ json_name = "feed" ];
+}
+
+message FeedCreateResponse { Feed feed = 1 [ json_name = "feed" ]; }
+
+message FeedUpdateRequest { Feed feed = 1 [ json_name = "feed" ]; }
+message FeedUpdateResponse { Feed feed = 1 [ json_name = "feed" ]; }
+
+message FeedDeleteRequest {}
+message FeedDeleteResponse { Feed feed = 1 [ json_name = "feed" ]; }

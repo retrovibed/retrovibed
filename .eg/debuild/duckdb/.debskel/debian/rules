@@ -1,0 +1,19 @@
+#!/usr/bin/make -f
+# See debhelper(7) (uncomment to enable)
+# output every command that modifies files on the build system.
+DH_VERBOSE=1
+
+%:
+	CCACHE_DIR=${CCACHE_DIR} CCACHE_COMPILERCHECK=content CCACHE_DEBUG=1 CCACHE_DEBUGDIR=ccache-debug-1 dh $@
+
+override_dh_auto_build:
+	echo "DH AUTO BUILD OVERRIDE '${CMAKE_BUILD_PARALLEL_LEVEL}' pkg version '${PACKAGE_VERSION}'"
+
+	# ccache -s
+
+	GEN=ninja OVERRIDE_GIT_DESCRIBE="v${PACKAGE_VERSION}" GIT_COMMIT_HASH="${GIT_COMMIT_HASH}" ENABLE_EXTENSION_AUTOLOADING=1 ENABLE_EXTENSION_AUTOINSTALL=1 CORE_EXTENSIONS='autocomplete;json;parquet;icu' DUCKDB_BUILD=Static make -C src
+	DESTDIR="linux" cmake --install src/build/release --prefix="/usr"
+
+
+override_dh_usrlocal:
+	echo "DH usrlocal override due to over restrict rules"

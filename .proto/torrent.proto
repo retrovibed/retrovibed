@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package torrents;
+
+message Peers {
+  uint32 min = 1 [ json_name = "min" ];
+  uint32 max = 2 [ json_name = "max" ];
+}
+
+message Limit {
+  uint32 rate = 1 [ json_name = "rate" ];
+  uint32 burst = 2 [ json_name = "burst" ];
+}
+
+message TorrentSettings {
+  bool seed = 1 [ json_name = "seed" ];
+  bool pex = 2 [ json_name = "pex" ];
+  bool auto_bootstrap = 3 [ json_name = "auto_bootstrap" ];
+  bool auto_locate_media = 4 [ json_name = "auto_locate_media" ];
+  bool firewalled = 5 [ json_name = "firewalled" ];
+  bool resumable = 6 [ json_name = "resumable" ];
+  string ip4 = 7 [ json_name = "ip4" ];
+  string ip6 = 8 [ json_name = "ip6" ];
+  uint32 port = 9 [ json_name = "port" ];
+  bool log = 998 [ json_name = "log" ];
+  bool debug = 999 [ json_name = "debug" ];
+  reserved 10 to 997;
+  Limit download = 1000 [ json_name = "download" ];
+  Limit upload = 1001 [ json_name = "upload" ];
+  Limit inbound = 1002 [ json_name = "inbound" ];
+  Limit outbound = 1003 [ json_name = "outbound" ];
+  Peers peers = 1004 [ json_name = "peers" ];
+  uint64 maximum_requests = 1005 [ json_name = "maximum_requests" ];
+}
+
+message DiscoverySettings {
+  bool enabled = 1 [ json_name = "enabled" ];
+  uint32 ratio = 2 [ json_name = "ratio" ];
+  uint32 partitions = 3 [ json_name = "partitions" ];
+  uint32 workloads = 4 [ json_name = "workloads" ];
+  string seed = 5 [ json_name = "seed" ];
+}

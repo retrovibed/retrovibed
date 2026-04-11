@@ -1,0 +1,6 @@
+syntax = "proto3";
+
+package meta;
+
+message IdentitySSHCreateRequest { string pubkey = 1 [ json_name = "pubkey" ]; }
+message IdentitySSHCreateResponse {}

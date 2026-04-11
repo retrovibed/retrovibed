@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package media;
+
+import "media.proto";
+import "meta.search.proto";
+
+message RecentSearchRequest {
+  meta.DateRange created = 1 [ json_name = "created" ];
+  reserved 2 to 899;
+  uint64 offset = 900 [ json_name = "offset" ];
+  uint64 limit = 901 [ json_name = "limit" ];
+  reserved 902 to 999;
+}
+
+message RecentSearchResponse {
+  RecentSearchRequest next = 1 [ json_name = "next" ];
+  repeated RecentRecordRequest items = 2 [ json_name = "items" ];
+}
+
+message RecentRecordRequest {
+  string id = 1 [ json_name = "id" ];
+  Media media = 2 [ json_name = "media" ];
+  uint64 duration = 3 [ json_name = "duration" ];
+  uint64 position = 4 [ json_name = "position" ];
+  MediaSearchRequest query = 5 [ json_name = "query" ];
+}
+
+message RecentRecordResponse {}
+
+message RecentDeleteRequest {}
+
+message RecentDeleteResponse {}

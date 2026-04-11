@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:retrovibed="https://retrovibed.com/rss/feed" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:media="http://search.yahoo.com/mrss/">
+	<channel>
+		<title>Item Expires Test</title>
+		<link>https://test.retrovibe.space</link>
+		<description>Test item expires parsing</description>
+		<copyright>Retrovibed 2025</copyright>
+		<language>en-us</language>
+		<lastBuildDate>Tue, 22 Jul 2025 13:02:40 +0000</lastBuildDate>
+		<ttl>1440</ttl>
+		<item>
+			<guid isPermaLink="false">item-expires-001</guid>
+			<title>Item with Expires</title>
+			<link>https://test.retrovibe.space/item-expires-001</link>
+			<pubDate>Tue, 22 Jul 2025 13:02:40 +0000</pubDate>
+			<retrovibed:expires>Wed, 23 Jul 2025 13:02:40 +0000</retrovibed:expires>
+		</item>
+		<item>
+			<guid isPermaLink="false">item-no-expires-002</guid>
+			<title>Item without Expires</title>
+			<link>https://test.retrovibe.space/item-no-expires-002</link>
+			<pubDate>Tue, 22 Jul 2025 13:02:40 +0000</pubDate>
+		</item>
+	</channel>
+</rss>

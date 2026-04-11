@@ -1,0 +1,67 @@
+[
+  {
+    "name": "metadata.json",
+    "path": "dist/metadata.json",
+    "internal_type": 39,
+    "type": "Metadata"
+  },
+  {
+    "name": "retrovibed",
+    "path": "dist/retrovibed-arm64_darwin_arm64_v8.0/retrovibed",
+    "goos": "darwin",
+    "goarch": "arm64",
+    "goarm64": "v8.0",
+    "target": "darwin_arm64_v8.0",
+    "internal_type": 4,
+    "type": "Binary",
+    "extra": {
+      "Binary": "retrovibed",
+      "Builder": "go",
+      "Ext": "",
+      "ID": "retrovibed-arm64"
+    }
+  },
+  {
+    "name": "Retrovibed.app",
+    "path": "dist/apps/retrovibed_darwinarm64/Retrovibed.app",
+    "goos": "darwin",
+    "goarch": "arm64",
+    "internal_type": 34,
+    "type": "App Bundle",
+    "extra": {
+      "Binaries": [
+        "retrovibed"
+      ],
+      "Binary": "retrovibed",
+      "Builder": "go",
+      "Ext": ".app",
+      "ID": "retrovibed"
+    }
+  },
+  {
+    "name": "retrovibed.arm64.dmg",
+    "path": "dist/dmg/retrovibed_darwinarm64/retrovibed.arm64.dmg",
+    "goos": "darwin",
+    "goarch": "arm64",
+    "internal_type": 35,
+    "type": "DMG",
+    "extra": {
+      "Binaries": [
+        "Retrovibed.app"
+      ],
+      "Binary": "retrovibed",
+      "Builder": "go",
+      "Checksum": "sha256:4e4300e039672c6c07f609c520632cd758e061e2f98ce4cf1c4a23b28fd26491",
+      "Ext": ".dmg",
+      "ID": "retrovibed",
+      "Replaces": true
+    }
+  },
+  {
+    "name": "retrovibed_0.0.0-SNAPSHOT-467f8209_checksums.txt",
+    "path": "dist/retrovibed_0.0.0-SNAPSHOT-467f8209_checksums.txt",
+    "internal_type": 12,
+    "type": "Checksum",
+    "extra": {}
+  }
+]

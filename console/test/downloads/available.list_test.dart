@@ -1,0 +1,135 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:retrovibed/downloads/available.list.dart';
+import 'package:retrovibed/media.dart' as media;
+import 'package:retrovibed/httpx.dart' as httpx;
+import 'package:retrovibed/uuidx.dart' as uuidx;
+import 'package:retrovibed/testing/widget_tester_extensions.dart';
+
+Future<media.DownloadSearchResponse> _mockSearchEmpty(
+  media.DownloadSearchRequest req, {
+  List<httpx.Option> options = const [],
+}) async {
+  return media.discoveredsearch.response(
+    next: media.discoveredsearch.request(limit: 32),
+  );
+}
+
+Future<media.DownloadSearchResponse> _mockSearchWithItems(
+  media.DownloadSearchRequest req, {
+  List<httpx.Option> options = const [],
+}) async {
+  return media.DownloadSearchResponse(
+    items: [
+      media.Download(
+        media: media.Media(
+          id: 'test-id-1',
+          description: 'Test Media One with a fairly long description',
+          mimetype: 'video/mp4',
+          createdAt: '2025-01-01T00:00:00Z',
+          archiveId: uuidx.min(),
+          torrentId: uuidx.min(),
+          knownMediaId: uuidx.min(),
+        ),
+      ),
+      media.Download(
+        media: media.Media(
+          id: 'test-id-2',
+          description: 'Test Media Two',
+          mimetype: 'audio/mp3',
+          createdAt: '2025-01-02T00:00:00Z',
+          archiveId: uuidx.min(),
+          torrentId: uuidx.min(),
+          knownMediaId: uuidx.min(),
+        ),
+      ),
+    ],
+    next: media.discoveredsearch.request(limit: 32),
+  );
+}
+
+Future<media.DownloadSearchResponse> _mockSearchWithLongNames(
+  media.DownloadSearchRequest req, {
+  List<httpx.Option> options = const [],
+}) async {
+  return media.DownloadSearchResponse(
+    items: [
+      media.Download(
+        media: media.Media(
+          id: 'very-long-identifier-that-could-potentially-cause-overflow',
+          description:
+              'An Extremely Long Title That Could Potentially Overflow The Display Widget And Cause Layout Issues',
+          mimetype: 'video/mp4',
+          createdAt: '2025-01-01T00:00:00Z',
+          archiveId: uuidx.min(),
+          torrentId: uuidx.min(),
+          knownMediaId: uuidx.min(),
+        ),
+      ),
+    ],
+    next: media.discoveredsearch.request(limit: 32),
+  );
+}
+
+final _resolutions = Resolutions.variant();
+
+void main() {
+  group('AvailableListDisplay', () {
+    testWidgets('renders empty without overflow', (WidgetTester tester) async {
+      final entry = _resolutions.currentValue!;
+      await tester.pumpApp(
+        AvailableListDisplay(search: _mockSearchEmpty),
+        physicalSize: entry.value,
+      );
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    }, variant: _resolutions);
+
+    testWidgets('renders with items without overflow', (
+      WidgetTester tester,
+    ) async {
+      final entry = _resolutions.currentValue!;
+      await tester.pumpApp(
+        AvailableListDisplay(search: _mockSearchWithItems),
+        physicalSize: entry.value,
+      );
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    }, variant: _resolutions);
+
+    testWidgets('renders with long names without overflow', (
+      WidgetTester tester,
+    ) async {
+      final entry = _resolutions.currentValue!;
+      await tester.pumpApp(
+        AvailableListDisplay(search: _mockSearchWithLongNames),
+        physicalSize: entry.value,
+      );
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    }, variant: _resolutions);
+
+    testWidgets('renders empty without overflow at narrow 300x600', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpApp(
+        AvailableListDisplay(search: _mockSearchEmpty),
+        physicalSize: const Size(300, 600),
+      );
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('renders with items without overflow at narrow 300x600', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpApp(
+        AvailableListDisplay(search: _mockSearchWithItems),
+        physicalSize: const Size(300, 600),
+      );
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    });
+
+  });
+}

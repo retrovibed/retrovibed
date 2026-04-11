@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <channel>
+        <title>FOSS Torrents - RSS Feed for Torrent Files </title>
+        <atom:link href="https://fosstorrents.com/feed/torrents.xml" rel="self" type="application/rss+xml"/>
+        <link>https://fosstorrents.com/feed/torrents.xml</link>
+        <description>This RSS Feed is designed be imported into qBittorrent and similar software that support RSS Feeds. This will allow your software to automatically fetch new torrents and remove old ones. Perfect for those Super Seeders out there.</description>
+        <language>en-CA</language>
+        <copyright>(c) 2025 FOSS Torrents </copyright>
+        <pubDate>Sun, 7 Sep 2025 20:43:27 -0300</pubDate>
+        <lastBuildDate>Sun, 7 Sep 2025 20:43:27 -0300</lastBuildDate>
+        <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
+        <ttl>30</ttl>
+        <item>
+            <title>0 A.D. 0.27.1 - Windows (x86_64)</title>
+            <description>Torrent for 0ad - Windows (x86_64)</description>
+            <link>https://fosstorrents.com/direct-files/0ad-0.27.1-win32.exe.torrent</link>
+            <guid isPermaLink="false">cff7bfbd744236b6bb9e36ea4bf0054e008d7aa68ba60b651c5e2517152279b7</guid>
+            <pubDate>Fri, 18 Jul 2025 20:43:27 -0300</pubDate>
+        </item>
+    </channel>
+</rss>

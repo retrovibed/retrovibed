@@ -1,0 +1,195 @@
+package torrent
+
+import (
+	"log"
+	"net/netip"
+	"sync"
+	"time"
+
+	"github.com/anacrolix/multiless"
+	"github.com/google/btree"
+	"github.com/james-lawrence/torrent/internal/fnvx"
+)
+
+// Peers are stored with their priority at insertion. Their priority may
+// change if our apparent IP changes, we don't currently handle that.
+type prioritizedPeer struct {
+	prio peerPriority
+	p    Peer
+}
+
+func priorityPeerCmp(a, b prioritizedPeer) bool {
+	return multiless.New().Uint64(
+		a.p.Attempts, b.p.Attempts, // prioritize peers we havent attempted before.
+	// ).Uint64(
+	// 	uint64(a.p.LastAttempt.UnixNano()), uint64(b.p.LastAttempt.UnixNano()), // prioritize peers we havent contacted recently
+	).Bool(
+		a.p.Trusted, b.p.Trusted,
+	).Uint32(
+		a.prio, b.prio,
+	).Uint32(
+		fnvx.Uint32(a.p.AddrPort.String()), fnvx.Uint32(b.p.AddrPort.String()),
+	).Uint32(
+		uint32(a.p.Port()), uint32(b.p.Port()),
+	).Less()
+}
+
+func newPeerPool(n int, prio func(Peer) peerPriority) peerPool {
+	return peerPool{
+		m:         &sync.RWMutex{},
+		untried:   btree.NewG(n, priorityPeerCmp),
+		attempted: btree.NewG(n, priorityPeerCmp),
+		available: btree.NewG(n, priorityPeerCmp),
+		loaned:    make(map[netip.AddrPort]Peer, 32),
+		getPrio:   prio,
+		nextswap:  time.Now().Add(time.Minute),
+	}
+}
+
+type peerPool struct {
+	m         *sync.RWMutex
+	untried   *btree.BTreeG[prioritizedPeer]
+	attempted *btree.BTreeG[prioritizedPeer]
+	available *btree.BTreeG[prioritizedPeer]
+	loaned    map[netip.AddrPort]Peer
+	getPrio   func(Peer) peerPriority
+	nextswap  time.Time
+}
+
+func (t peerPool) prioritized(p Peer) prioritizedPeer {
+	return prioritizedPeer{prio: t.getPrio(p), p: p}
+}
+
+func (t *peerPool) Each(f func(Peer)) {
+	t.m.RLock()
+	defer t.m.RUnlock()
+
+	t.untried.Ascend(func(item prioritizedPeer) bool {
+		f(item.p)
+		return true
+	})
+
+	t.attempted.Ascend(func(item prioritizedPeer) bool {
+		f(item.p)
+		return true
+	})
+
+	t.available.Ascend(func(item prioritizedPeer) bool {
+		f(item.p)
+		return true
+	})
+
+	for _, p := range t.loaned {
+		f(p)
+	}
+}
+
+func (t *peerPool) Stats() (pending, connecting int) {
+	t.m.RLock()
+	defer t.m.RUnlock()
+	return t.untried.Len(), len(t.loaned)
+}
+
+func (t *peerPool) Len() int {
+	t.m.RLock()
+	defer t.m.RUnlock()
+	return t.untried.Len()
+}
+
+func (t *peerPool) Connecting(p Peer) bool {
+	t.m.RLock()
+	defer t.m.RUnlock()
+	_, ok := t.loaned[p.AddrPort]
+	return ok
+}
+
+// Peer is returned to the pool
+func (t *peerPool) Attempted(p Peer, attempts uint64) {
+	if attempts > 3 {
+		return
+	}
+
+	t.m.Lock()
+	defer t.m.Unlock()
+	p.Attempts = attempts
+	delete(t.loaned, p.AddrPort)
+
+	if attempts == 0 {
+		t.available.ReplaceOrInsert(t.prioritized(p))
+		return
+	}
+
+	t.attempted.ReplaceOrInsert(t.prioritized(p))
+}
+
+func (t *peerPool) Loaned(p Peer) {
+	t.m.Lock()
+	defer t.m.Unlock()
+
+	p.LastAttempt = time.Now()
+	t.loaned[p.AddrPort] = p
+}
+
+// Returns true if a peer is replaced.
+func (t *peerPool) Add(p Peer) bool {
+	t.m.Lock()
+	defer t.m.Unlock()
+
+	prio := t.prioritized(p)
+
+	if exists := t.attempted.Has(prio); exists {
+		return exists
+	}
+
+	if exists := t.available.Has(prio); exists {
+		return exists
+	}
+
+	if _, exists := t.loaned[p.AddrPort]; exists {
+		return exists
+	}
+
+	if _, replaced := t.untried.ReplaceOrInsert(prio); replaced {
+		return replaced
+	}
+
+	return false
+}
+
+func (t *peerPool) DeleteMin() (ret prioritizedPeer, ok bool) {
+	t.m.Lock()
+	defer t.m.Unlock()
+
+	return t.untried.DeleteMin()
+}
+
+func (t *peerPool) PopMax() (p prioritizedPeer, ok bool) {
+	t.m.Lock()
+	defer t.m.Unlock()
+
+	if max, present := t.untried.DeleteMax(); present {
+		return max, present
+	}
+
+	if max, present := t.available.DeleteMax(); present {
+		return max, present
+	}
+
+	if ts := time.Now(); t.nextswap.After(ts) {
+		return p, false
+	} else {
+		t.nextswap = ts.Add(time.Minute)
+	}
+
+	log.Println("returning moving failed to available")
+	for range 10 {
+		if item, ok := t.attempted.DeleteMax(); ok {
+			t.available.ReplaceOrInsert(item)
+			continue
+		}
+
+		break
+	}
+
+	return t.available.DeleteMax()
+}

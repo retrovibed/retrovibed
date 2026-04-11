@@ -1,0 +1,16 @@
+.eg.cache
+.eg.workload
+*.archive.d
+.flatpak-builder
+flatpak.build.*
+.torrent
+*.log
+notes*.md
+.torrent.bolt.db
+retrovibed.client.yml
+retrivobed.vibed
+*.bin
+*.designs
+
+# FVM Version Cache
+.fvm/

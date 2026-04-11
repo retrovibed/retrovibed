@@ -1,0 +1,15 @@
+FROM ubuntu:noble
+ARG DEBIAN_FRONTEND=noninteractive
+
+# RUN echo "tzdata tzdata/Areas select Etc" | debconf-set-selections
+# RUN echo "tzdata tzdata/Zones select Etc/UTC" | debconf-set-selections
+# RUN dpkg-reconfigure --frontend=noninteractive tzdata
+RUN echo "cache buster 059a9a06-1686-4f49-9a7f-a30535886d58"
+RUN apt-get update
+RUN apt-get install -y curl flatpak-builder
+
+RUN mkdir retrovibe
+# RUN curl -L -o retrovibed.client.yml https://github.com/retrovibed/retrovibed/releases/latest/download/flatpak.client.yml
+RUN flatpak remote-add --if-not-exists --user flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+
+CMD flatpak-builder --verbose --user --install-deps-from=flathub --install --ccache --force-clean retrovibe retrovibed.client.yml

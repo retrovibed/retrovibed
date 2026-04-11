@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package meta;
+
+message Account {
+  string id = 1 [ json_name = "id" ];
+  string description = 2 [ json_name = "description" ];
+  string created_at = 3 [ json_name = "created_at" ];
+  string updated_at = 4 [ json_name = "updated_at" ];
+  string disabled_at = 5 [ json_name = "disabled_at" ];
+  string email = 6 [ json_name = "email" ];
+  string phone = 7 [ json_name = "phone" ];
+}
+
+message AccountLookupRequest {}
+message AccountLookupResponse { Account account = 1 [ json_name = "account" ]; }
+
+message AccountUpdateRequest { Account account = 1 [ json_name = "account" ]; }
+message AccountUpdateResponse { Account account = 1 [ json_name = "account" ]; }

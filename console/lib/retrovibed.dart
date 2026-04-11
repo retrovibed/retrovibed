@@ -1,0 +1,139 @@
+import 'dart:convert';
+import 'dart:ffi';
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:ffi/ffi.dart' as ffi;
+import 'package:retrovibed/retrovibed/gen.dart' as lib;
+
+String _frameworksLib(String name) {
+  final execDir = File(Platform.resolvedExecutable).parent.path;
+  return "$execDir/../Frameworks/$name";
+}
+
+File _defaultlib() {
+  if (Platform.isMacOS) {
+    return File(_frameworksLib("retrovibed.dylib"));
+  }
+
+  return File("/app/lib/libretrovibed.so");
+}
+
+String _path() {
+  if (Platform.isAndroid) {
+    return "libretrovibed.so";
+  }
+
+  final files = () {
+    if (Platform.isMacOS) {
+      return [
+        File(_frameworksLib("retrovibed.dylib")),
+        File("build/nativelib/retrovibed.dylib"),
+      ];
+    }
+
+    return [File("build/nativelib/libretrovibed.so")];
+  }();
+
+  final found = files.firstWhere((v) {
+    try {
+      return v.existsSync();
+    } catch (_) {
+      return false;
+    }
+  }, orElse: _defaultlib);
+  return found.path;
+}
+
+DynamicLibrary _loadLibrary() {
+  if (Platform.isIOS) {
+    return DynamicLibrary.process();
+  }
+  return DynamicLibrary.open(_path());
+}
+
+final bridge = lib.DaemonBridge(_loadLibrary());
+
+String oauth2_bearer() {
+  return _convertstring(bridge.oauth2_bearer());
+}
+
+String bearer_token() {
+  return _convertstring(bridge.authn_bearer());
+}
+
+String bearer_token_host(String hostname) {
+  return _convertstring(
+    bridge.authn_bearer_host(hostname.toNativeUtf8().cast<Char>()),
+  );
+}
+
+String public_key() {
+  return _convertstring(bridge.public_key());
+}
+
+String username() {
+  return _convertstring(bridge.username());
+}
+
+// returns an empty string on success, non empty contains the error.
+String seed(String passphrase) {
+  return _convertstring(bridge.seed(passphrase.toNativeUtf8().cast<Char>()));
+}
+
+// returns an empty string on success, non empty contains the error.
+String unseed() {
+  return _convertstring(bridge.unseed());
+}
+
+List<String> ips() {
+  final String? ipaddrs = _convertstring(bridge.ips());
+  final List<dynamic> res = jsonDecode(ipaddrs ?? "") ?? [];
+  return res.whereType<String>().toList();
+}
+
+void setenv(String key, String value) {
+  bridge.gsetenv(
+    key.toNativeUtf8().cast<Char>(),
+    value.toNativeUtf8().cast<Char>(),
+  );
+}
+
+void logging() {
+  bridge.logging();
+}
+
+// Returns true if the certificate is valid/enrolled, false otherwise.
+bool validatecert(String hostname, Uint8List derBytes) {
+  final hostnamePtr = hostname.toNativeUtf8().cast<Char>();
+  final certPtr = ffi.calloc<Uint8>(derBytes.length);
+  try {
+    certPtr.asTypedList(derBytes.length).setAll(0, derBytes);
+    final result = bridge.validatecert(
+      hostnamePtr,
+      certPtr.cast<UnsignedChar>(),
+      derBytes.length,
+    );
+    return result == 0;
+  } finally {
+    ffi.calloc.free(hostnamePtr);
+    ffi.calloc.free(certPtr);
+  }
+}
+
+void daemon() {
+  String args = jsonEncode([
+    "daemon",
+    "--no-auto-mdns",
+    "--auto-archive",
+    "--auto-socks5",
+  ]);
+  bridge.egdaemon(args.toNativeUtf8().cast<Char>());
+}
+
+String _convertstring(Pointer<Char> charPointer) {
+  try {
+    return charPointer.cast<ffi.Utf8>().toDartString();
+  } finally {
+    ffi.calloc.free(charPointer);
+  }
+}

@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package media;
+
+message Locate {
+  string id = 1 [ json_name = "id" ];
+  string created_at = 2 [ json_name = "created_at" ];
+  string updated_at = 3 [ json_name = "updated_at" ];
+  string known_media_id = 4 [ json_name = "known_media_id" ];
+  string located_torrent_id = 5 [ json_name = "located_torrent_id" ];
+}
+
+message LocateSearchRequest {
+  string query = 1 [ json_name = "query" ];
+  reserved 2 to 899;
+  uint64 offset = 900 [ json_name = "offset" ];
+  uint64 limit = 901 [ json_name = "limit" ];
+  reserved 902 to 999;
+}
+
+message LocateSearchResponse {
+  LocateSearchRequest next = 1 [ json_name = "next" ];
+  repeated Locate items = 2 [ json_name = "items" ];
+}
+
+message LocateMatchRequest {
+  string query = 1 [ json_name = "query" ];
+}
+
+message LocateLookupRequest {}
+message LocateLookupResponse {
+  Locate locate = 1 [ json_name = "locate" ];
+}
+
+message LocateCreateRequest {
+  Locate locate = 1 [json_name = "locate" ];
+}
+message LocateCreateResponse {
+  Locate locate = 1 [ json_name = "locate" ];
+}

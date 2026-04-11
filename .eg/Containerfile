@@ -1,0 +1,50 @@
+FROM ubuntu:questing
+ARG DEBIAN_FRONTEND=noninteractive
+ARG GOBIN="/usr/bin"
+ARG GOMODCACHE="/tmp/gomod"
+ARG GOCACHE="/tmp/gocache"
+
+RUN echo "cache buster 059a9a06-1686-4f49-9a7f-a30535886d59"
+RUN apt-get update
+RUN apt-get install -y software-properties-common build-essential ca-certificates curl sudo
+RUN add-apt-repository -n ppa:longsleep/golang-backports
+RUN add-apt-repository -n ppa:egdaemon/eg
+RUN add-apt-repository -n ppa:egdaemon/duckdb
+
+RUN echo "cache buster 059a9a06-1686-4f49-9a7f-a30535886d52"
+RUN apt-get update && apt-get -y install golang-1.25 eg egbootstrap duckdb podman netavark rsync vim dput devscripts dh-make dput uidmap dbus-user-session git unzip xz-utils zip libglu1-mesa clang lld cmake git ninja-build pkg-config libgtk-3-dev liblzma-dev libstdc++-12-dev
+RUN sh /usr/share/eg/install/github.sh > /dev/null
+RUN echo "cache buster 059a9a06-1686-4f49-9a7f-a30535886d50"
+RUN apt-get update && apt-get -y install snapd protobuf-compiler pkgconf clang-19 gh tree flatpak-builder libmpv-dev
+
+RUN ln -s /usr/lib/go-1.25/bin/go /usr/local/bin/go
+
+# install genieql and golang's protocol buffers and other dev tooling.
+RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+RUN go install github.com/fatih/gomodifytags@latest
+RUN echo "cache buster 159a9a06-1686-4f49-9a7f-a30535786d59"
+RUN GOPROXY=direct go install -tags duckdb_use_lib github.com/james-lawrence/genieql/...@latest
+RUN curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b /usr/local/bin v2.7.2
+
+
+# install flatpak
+RUN apt-get update && apt-get -y install tree flatpak-builder libmpv-dev
+RUN flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+# install flutter
+RUN echo "cache buster 159a9a06-1686-4f49-9a7f-a30535786d59"
+RUN git clone -b stable --depth 1 https://github.com/flutter/flutter.git /opt/flutter
+RUN ln -s /opt/flutter/bin/flutter /usr/local/bin/flutter
+RUN ln -s /opt/flutter/bin/dart /usr/local/bin/dart
+RUN protoc --version
+RUN chown -R egd:egd /opt/flutter
+RUN sudo -H -S -u egd -g egd flutter precache --linux --android --ios
+RUN sudo -H -S -u egd -g egd flutter config --no-analytics
+RUN sudo -H -S -u egd -g egd flutter --disable-analytics
+RUN sudo -H -S -u egd -g egd dart pub global activate protoc_plugin
+
+RUN systemd-tmpfiles --create
+RUN systemd-tmpfiles --clean
+
+# hack due to ubuntu updating sudo
+RUN update-alternatives --set sudo /usr/bin/sudo.ws

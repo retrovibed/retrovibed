@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package ddisc;
+
+message Peer {
+  string id = 1 [ json_name = "id" ];
+  bytes infohash = 2 [ json_name = "infohash" ];
+  string created_at = 3 [json_name = "created_at" ];
+  string description = 4 [json_name = "description" ];
+  bool bep51 = 5 [ json_name = "bep_51" ];
+  bool ddisc = 6 [ json_name = "ddisc" ];
+  string syncoffset = 7 [ json_name = "syncoffset" ];
+  string partition = 8 [ json_name = "partition" ];
+}
+
+message PeerSearchRequest {
+  string query = 1 [ json_name = "query" ];
+  uint64 offset = 2 [ json_name = "offset" ];
+  uint64 limit = 3 [ json_name = "limit" ];
+  reserved 4 to 999;
+}
+
+message PeerSearchResponse {
+  PeerSearchRequest next = 1 [ json_name = "next" ];
+  repeated Peer items = 2 [ json_name = "items" ];
+}
+
+message PeerCreateRequest {
+  Peer peer = 1 [ json_name = "peer" ];
+}
+message PeerCreateResponse {
+  Peer peer = 1 [ json_name = "peer" ];
+}
+
+message PeerSyncRequest {}
+message PeerSyncResponse {
+  Peer peer = 1 [ json_name = "peer" ];
+}
+
+message PeerFindRequest { }
+message PeerFindResponse {
+  Peer peer = 1 [ json_name = "peer" ];
+}
+
+message PeerUpdateRequest {
+  Peer peer = 1 [ json_name = "peer" ];
+}
+message PeerUpdateResponse {
+  Peer peer = 1 [ json_name = "peer" ];
+}
+
+message PeerDeleteRequest {}
+message PeerDeleteResponse {
+  Peer peer = 1 [ json_name = "peer" ];
+}

@@ -1,0 +1,1356 @@
+package dht
+
+import (
+	"context"
+	"crypto/rand"
+	"encoding/base64"
+	"errors"
+	"fmt"
+	"io"
+	"log"
+	"net"
+	"net/netip"
+	"reflect"
+	"runtime/pprof"
+	"slices"
+	"strings"
+	"sync"
+	"sync/atomic"
+	"text/tabwriter"
+	"time"
+
+	"github.com/anacrolix/generics"
+	"github.com/james-lawrence/torrent/bencode"
+	"github.com/james-lawrence/torrent/internal/atomicx"
+	"github.com/james-lawrence/torrent/internal/errorsx"
+	"github.com/james-lawrence/torrent/internal/netx"
+	"github.com/james-lawrence/torrent/iplist"
+	"github.com/james-lawrence/torrent/logonce"
+	"golang.org/x/time/rate"
+
+	"github.com/james-lawrence/torrent/dht/bep44"
+	"github.com/james-lawrence/torrent/dht/int160"
+	"github.com/james-lawrence/torrent/dht/krpc"
+	peer_store "github.com/james-lawrence/torrent/dht/peer-store"
+	"github.com/james-lawrence/torrent/dht/transactions"
+	"github.com/james-lawrence/torrent/dht/traversal"
+	"github.com/james-lawrence/torrent/dht/types"
+	"github.com/james-lawrence/torrent/internal/langx"
+)
+
+type dnscacher interface {
+	LookupHost(ctx context.Context, host string) (addrs []string, err error)
+}
+
+// A Server defines parameters for a DHT node server that is able to send
+// queries, and respond to the ones from the network. Each node has a globally
+// unique identifier known as the "node ID." Node IDs are chosen at random
+// from the same 160-bit space as BitTorrent infohashes and define the
+// behaviour of the node. Zero valued Server does not have a valid ID and thus
+// is unable to function properly. Use `NewServer(nil)` to initialize a
+// default node.
+type Server struct {
+	id          *atomic.Pointer[int160.T]
+	dynamicaddr *atomic.Pointer[netip.AddrPort]
+	socket      net.PacketConn
+
+	mu               sync.RWMutex
+	transactions     transactions.Dispatcher[*transaction]
+	table            *table
+	closed           chan struct{}
+	tokenServer      tokenServer // Manages tokens we issue to our queriers.
+	stats            ServerStats
+	announceto       []PeerAnnounce
+	dnscache         dnscacher
+	lastBootstrap    time.Time
+	bootstrappingNow bool
+
+	resolvepublicaddr PublicAddrPort
+	// Hook received queries. Return false if you don't want to propagate to the default handlers.
+	hookQuery HookQuery
+	// Called when a peer successfully announces to us.
+	hookAnnouncePeer PeerAnnounce
+	// How long to wait before resending queries that haven't received a response. Defaults to 2s.
+	// After the last send, a query is aborted after this time.
+	queryResendDelay func() time.Duration
+	defaultWant      []krpc.Want
+
+	// used when there are no good nodes to use in the routing table. This might be called any
+	// time when there are no nodes, including during bootstrap if one is performed. Typically it
+	// returns the resolve addresses of bootstrap or "router" nodes that are designed to kick-start
+	// a routing table.
+	bootstrap []StartingNodesGetter
+
+	// Initial IP blocklist to use. Applied before serving and bootstrapping
+	// begins.
+	blocklist iplist.Ranger
+	// TODO: Expose Peers, to return NodeInfo for received get_peers queries.
+	peers peer_store.Interface
+	// BEP-44: Storing arbitrary data in the DHT.
+	store       bep44.Store
+	log         logging
+	sendLimiter *rate.Limiter
+
+	mux Muxer
+}
+
+func (s *Server) numGoodNodes() (num int) {
+	s.table.forNodes(func(n *node) bool {
+		if s.IsGood(n) {
+			num++
+		}
+		return true
+	})
+	return
+}
+
+func prettySince(t time.Time) string {
+	if t.IsZero() {
+		return "never"
+	}
+	d := time.Since(t)
+	d /= time.Second
+	d *= time.Second
+	return fmt.Sprintf("%s ago", d)
+}
+
+func (s *Server) WriteStatus(w io.Writer) {
+	fmt.Fprintf(w, "Listening on %s\n", s.Addr())
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	id := langx.Zero(s.id.Load())
+
+	fmt.Fprintf(w, "Nodes in table: %d good, %d total\n", s.numGoodNodes(), s.numNodes())
+	fmt.Fprintf(w, "Ongoing transactions: %d\n", s.transactions.NumActive())
+	fmt.Fprintf(w, "Server node ID: %s\n", id.String())
+	buckets := &s.table.buckets
+	for i := range s.table.buckets {
+		b := &buckets[i]
+		if b.Len() == 0 && b.lastChanged.IsZero() {
+			continue
+		}
+		fmt.Fprintf(w,
+			"b# %v: %v nodes, last updated: %v\n",
+			i, b.Len(), prettySince(b.lastChanged))
+		if b.Len() > 0 {
+			tw := tabwriter.NewWriter(w, 0, 0, 1, ' ', 0)
+			fmt.Fprintf(tw, "  node id\taddr\tlast query\tlast response\trecv\tdiscard\tflags\n")
+			// Bucket nodes ordered by distance from server ID.
+			nodes := slices.SortedFunc(b.NodeIter(), func(l *node, r *node) int {
+				return l.Id.Distance(id).Cmp(r.Id.Distance(id))
+			})
+			for _, n := range nodes {
+				var flags []string
+				if s.IsQuestionable(n) {
+					flags = append(flags, "q10e")
+				}
+				if s.nodeIsBad(n) {
+					flags = append(flags, "bad")
+				}
+				if s.IsGood(n) {
+					flags = append(flags, "good")
+				}
+				if n.IsSecure() {
+					flags = append(flags, "sec")
+				}
+				fmt.Fprintf(tw, "  %x\t%s\t%s\t%s\t%d\t%v\t%v\n",
+					n.Id.Bytes(),
+					n.Addr,
+					prettySince(n.lastGotQuery),
+					prettySince(n.lastGotResponse),
+					n.numReceivesFrom,
+					n.failedLastQuestionablePing,
+					strings.Join(flags, ","),
+				)
+			}
+			tw.Flush()
+		}
+	}
+	fmt.Fprintln(w)
+}
+
+func (s *Server) numNodes() (num int) {
+	return s.table.numNodes()
+}
+
+// Stats returns statistics for the server.
+func (s *Server) Stats() ServerStats {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	ss := s.stats
+	ss.GoodNodes = s.numGoodNodes()
+	ss.Nodes = s.numNodes()
+	ss.OutstandingTransactions = s.transactions.NumActive()
+	return ss
+}
+
+// Addr returns the listen address for the server.
+// WARNING: Most usages should use AddrPort())
+func (s *Server) Addr() net.Addr {
+	if s == nil || s.socket == nil {
+		return nil
+	}
+
+	return s.socket.LocalAddr()
+}
+
+func (s *Server) AddrPort() netip.AddrPort {
+	if s == nil {
+		return netip.AddrPortFrom(netip.IPv6Unspecified(), 0)
+	}
+
+	addr := langx.Zero(s.dynamicaddr.Load())
+	if ip := addr.Addr(); ip.Is4In6() {
+		return netip.AddrPortFrom(ip.Unmap(), addr.Port())
+	}
+
+	return addr
+}
+
+type discard struct{}
+
+func (discard) Output(int, string) error {
+	return nil
+}
+
+// Println replicates the behaviour of the standard logger.
+func (t discard) Println(v ...any) {
+}
+
+func (t discard) Printf(format string, v ...any) {
+}
+
+func (t discard) Print(v ...any) {
+
+}
+
+// NewServer initializes a new DHT node server.
+func NewServer(k int, options ...Option) (s *Server, err error) {
+	s = langx.Autoptr(langx.Clone(Server{
+		id:        atomicx.Pointer(int160.Random()),
+		blocklist: iplist.Zero(),
+		tokenServer: tokenServer{
+			maxIntervalDelta: 2,
+			interval:         5 * time.Minute,
+			secret:           make([]byte, 20),
+		},
+		dnscache:          net.DefaultResolver,
+		table:             newTable(k),
+		store:             bep44.NewWrapper(bep44.NewMemory(), 2*time.Hour),
+		closed:            make(chan struct{}),
+		dynamicaddr:       atomicx.Pointer(netip.AddrPortFrom(netip.IPv6Unspecified(), 0)),
+		resolvepublicaddr: PublicAddrPortFromPacketConn,
+		sendLimiter:       DefaultSendLimiter,
+		mux:               DefaultMuxer(),
+		queryResendDelay:  defaultQueryResendDelay,
+		defaultWant:       []krpc.Want{krpc.WantNodes, krpc.WantNodes6},
+		log:               discard{},
+		hookQuery:         func(query *krpc.Msg, source net.Addr) (propagate bool) { return true },
+		hookAnnouncePeer:  PeerAnnounceFn(func(peerid int160.T, ip net.IP, port uint16, portOk bool) {}),
+	}, options...))
+
+	if _, err = rand.Read(s.tokenServer.secret); err != nil {
+		return nil, err
+	}
+
+	return s, nil
+}
+
+func (s *Server) Serve(ctx context.Context, pc net.PacketConn) error {
+	updateaddr := func(fixed int160.T, detected netip.AddrPort) {
+		var (
+			upd krpc.ID = fixed.AsByteArray()
+		)
+
+		SecureNodeId(&upd, detected.Addr().AsSlice())
+
+		s.logger().Println("updated", fixed, "->", upd, detected)
+
+		latest := int160.FromByteArray(upd)
+		old := langx.Zero(s.id.Swap(&latest))
+		if latest.Cmp(old) == 0 {
+			return
+		}
+
+		s.logger().Println("peer id changed", old, "->", latest)
+		s.dynamicaddr.Store(&detected)
+	}
+
+	safeclose := func(n net.PacketConn) error {
+		if n == nil {
+			return nil
+		}
+
+		return n.Close()
+	}
+
+	s.mu.Lock()
+	tmp := s.socket
+	s.socket = pc
+	s.mu.Unlock()
+
+	if err := safeclose(tmp); err != nil {
+		return errorsx.Wrap(err, "failed to close old dht socket")
+	}
+
+	// static value to use as our base.
+	fixed := langx.Zero(s.id.Load())
+
+	dctx, done := context.WithCancelCause(context.Background())
+	seq, err := s.resolvepublicaddr(dctx, s, fixed, pc)
+	if err != nil {
+		s.logger().Println("failed to resolve", err)
+		done(nil)
+		return err
+	}
+
+	// resolve the public ip before attempting to move forward.
+	for detected := range seq {
+		updateaddr(fixed, detected)
+		break
+	}
+
+	go func() {
+		for detected := range seq {
+			updateaddr(fixed, detected)
+		}
+	}()
+
+	go func() {
+		done(s.serveUntilClosed(pc))
+	}()
+
+	return nil
+}
+
+func (s *Server) isClosed() bool {
+	select {
+	case _, ok := <-s.closed:
+		return !ok
+	default:
+		return false
+	}
+}
+
+func (s *Server) AttachAnnouncer(a PeerAnnounce) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.announceto = append(s.announceto, a)
+}
+
+func (s *Server) DetachAnnouncer(a PeerAnnounce) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	slices.SortStableFunc(s.announceto, func(a, b PeerAnnounce) int {
+		aptr := reflect.ValueOf(a).Pointer()
+		bptr := reflect.ValueOf(b).Pointer()
+		return int(aptr) - int(bptr)
+	})
+	s.announceto = slices.CompactFunc(s.announceto, func(a, b PeerAnnounce) bool {
+		aptr := reflect.ValueOf(a).Pointer()
+		bptr := reflect.ValueOf(b).Pointer()
+		return aptr == bptr
+	})
+}
+
+func (s *Server) serveUntilClosed(pc net.PacketConn) error {
+	err := s.serve(pc)
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.isClosed() {
+		return nil
+	}
+	return err
+}
+
+// Returns a description of the Server.
+func (s *Server) String() string {
+	return fmt.Sprintf("dht server on %s (node id %v)", s.socket.LocalAddr(), s.id)
+}
+
+// Packets to and from any address matching a range in the list are dropped.
+func (s *Server) SetIPBlockList(list iplist.Ranger) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.blocklist = list
+}
+
+func (s *Server) IPBlocklist() iplist.Ranger {
+	return s.blocklist
+}
+
+func (s *Server) processPacket(ctx context.Context, b []byte, addr Addr) {
+	// log.Printf("got packet %q", b)
+	if len(b) < 2 || b[0] != 'd' {
+		// KRPC messages are bencoded dicts.
+		readNotKRPCDict.Add(1)
+		return
+	}
+	var d krpc.Msg
+	err := bencode.Unmarshal(b, &d)
+	if _, ok := err.(bencode.ErrUnusedTrailingBytes); ok {
+		// log.Printf("%s: received message packet with %d trailing bytes: %q", s, _err.NumUnusedBytes, b[len(b)-_err.NumUnusedBytes:])
+		expvars.Add("processed packets with trailing bytes", 1)
+	} else if err != nil {
+		readUnmarshalError.Add(1)
+		// log.Printf("%s: received bad krpc message from %s: %s: %+q", s, addr, err, b)
+		func() {
+			if se, ok := err.(*bencode.SyntaxError); ok {
+				// The message was truncated.
+				if int(se.Offset) == len(b) {
+					return
+				}
+				// Some messages seem to drop to nul chars abruptly.
+				if int(se.Offset) < len(b) && b[se.Offset] == 0 {
+					return
+				}
+				// The message isn't bencode from the first.
+				if se.Offset == 0 {
+					return
+				}
+			}
+			log.Printf("%s: received bad krpc message from %s: %s: %+q", s, addr, err, b)
+		}()
+		return
+	}
+
+	if s.isClosed() {
+		return
+	}
+
+	if d.Y == krpc.YQuery {
+		s.logger().Printf("received query %q from %v\n", d.Q, addr)
+		s.handleQuery(ctx, addr, b, d)
+		return
+	}
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	tk := transactionKey{
+		RemoteAddr: addr.AddrPort(),
+		T:          d.T,
+	}
+	if !s.transactions.Have(tk) {
+		s.logger().Printf("received response for untracked transaction %q from %v\n", d.T, addr)
+		return
+	}
+	t := s.transactions.Pop(tk)
+
+	// s.logger().Printf("received response for transaction %q from %v\n", d.T, addr)
+	go t.handleResponse(b, d)
+
+	s.updateNode(addr, d.SenderID(), !d.ReadOnly, func(n *node) {
+		n.lastGotResponse = time.Now()
+		n.failedLastQuestionablePing = false
+		n.numReceivesFrom++
+	})
+}
+
+func (s *Server) serve(socket net.PacketConn) error {
+	var b [0x10000]byte
+	for {
+		n, addr, err := socket.ReadFrom(b[:])
+		if err != nil {
+			if ignoreReadFromError(err) {
+				continue
+			}
+			return err
+		}
+
+		if n == len(b) {
+			logonce.Stderr.Printf("received dht packet exceeds buffer size")
+			continue
+		}
+
+		if errorsx.Zero(netx.NetPort(addr)) == 0 {
+			readZeroPort.Add(1)
+			continue
+		}
+		blocked, err := func() (bool, error) {
+			s.mu.RLock()
+			defer s.mu.RUnlock()
+			if s.isClosed() {
+				return false, errors.New("server is closed")
+			}
+			return s.ipBlocked(netx.NetIPOrNil(addr)), nil
+		}()
+		if err != nil {
+			return err
+		}
+		if blocked {
+			readBlocked.Add(1)
+			continue
+		}
+
+		s.processPacket(context.Background(), b[:n], NewAddr(errorsx.Zero(netx.AddrPort(addr))))
+	}
+}
+
+func (s *Server) ipBlocked(ip net.IP) (blocked bool) {
+	_, blocked = s.blocklist.Lookup(ip)
+	return blocked
+}
+
+// Adds directly to the node table.
+func (s *Server) AddNode(nis ...krpc.NodeInfo) error {
+	addnode := func(n krpc.NodeInfo) error {
+		s.mu.Lock()
+		defer s.mu.Unlock()
+		return s.updateNode(NewAddr(n.Addr.AddrPort), &n.ID, true, func(*node) {})
+	}
+
+	for _, ni := range nis {
+		if id := int160.FromByteArray(ni.ID); id.IsZero() {
+			go s.Ping(ni.Addr.AddrPort)
+			continue
+		}
+
+		if err := addnode(ni); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func shouldReturnNodes(queryWants []krpc.Want, querySource net.IP) bool {
+	if len(queryWants) != 0 {
+		return slices.Contains(queryWants, krpc.WantNodes)
+	}
+	// Is it possible to be over IPv6 with IPv4 endpoints?
+	return querySource.To4() != nil
+}
+
+func shouldReturnNodes6(queryWants []krpc.Want, querySource net.IP) bool {
+	if len(queryWants) != 0 {
+		return slices.Contains(queryWants, krpc.WantNodes6)
+	}
+	return querySource.To4() == nil
+}
+
+func (s *Server) MakeReturnNodes(target int160.T, filter func(krpc.NodeAddr) bool) []krpc.NodeInfo {
+	return s.closestGoodNodeInfos(8, target, filter)
+}
+
+var krpcErrMissingArguments = krpc.Error{
+	Code: krpc.ErrorCodeProtocolError,
+	Msg:  "missing arguments dict",
+}
+
+// Filters peers per BEP 32 to return in the values field to a get_peers query.
+func filterPeers(querySourceIp net.IP, queryWants []krpc.Want, allPeers []krpc.NodeAddr) (filtered []krpc.NodeAddr) {
+	// The logic here is common with nodes, see BEP 32.
+	retain4 := shouldReturnNodes(queryWants, querySourceIp)
+	retain6 := shouldReturnNodes6(queryWants, querySourceIp)
+	for _, peer := range allPeers {
+		if ip, ok := func(ip net.IP) (net.IP, bool) {
+			as4 := peer.IP().To4()
+			as16 := peer.IP().To16()
+			switch {
+			case retain4 && len(ip) == net.IPv4len:
+				return ip, true
+			case retain6 && len(ip) == net.IPv6len:
+				return ip, true
+			case retain4 && as4 != nil:
+				// Is it possible that we're converting to an IPv4 address when the transport in use
+				// is IPv6?
+				return as4, true
+			case retain6 && as16 != nil:
+				// Couldn't any IPv4 address be converted to IPv6, but isn't listening over IPv6?
+				return as16, true
+			default:
+				return nil, false
+			}
+		}(peer.IP()); ok {
+			filtered = append(filtered, krpc.NewNodeAddrFromIPPort(ip, peer.Port()))
+		}
+	}
+	return
+}
+
+func (s *Server) setReturnNodes(r *krpc.Return, queryMsg krpc.Msg, querySource Addr) *krpc.Error {
+	if queryMsg.A == nil {
+		return &krpcErrMissingArguments
+	}
+	target := int160.FromByteArray(queryMsg.A.InfoHash)
+	if shouldReturnNodes(queryMsg.A.Want, querySource.IP()) {
+		r.Nodes = s.MakeReturnNodes(target, func(na krpc.NodeAddr) bool { return na.Addr().Is4() })
+	}
+	if shouldReturnNodes6(queryMsg.A.Want, querySource.IP()) {
+		r.Nodes6 = s.MakeReturnNodes(target, func(krpc.NodeAddr) bool { return true })
+	}
+	return nil
+}
+
+func (s *Server) handleQuery(ctx context.Context, source Addr, raw []byte, m krpc.Msg) {
+	var (
+		pattern string
+		fn      Handler
+	)
+
+	s.updateNode(source, m.SenderID(), !m.ReadOnly, func(n *node) {
+		n.lastGotQuery = time.Now()
+		n.numReceivesFrom++
+	})
+
+	propagate := s.hookQuery(&m, source.Raw())
+	if !propagate {
+		return
+	}
+
+	if pattern, fn = s.mux.Handler(raw, &m); fn == nil {
+		log.Println("unable to locate a handler for", pattern)
+		return
+	}
+
+	if err := fn.Handle(ctx, source, s, raw, &m); err != nil {
+		log.Printf("query failed %s - %T - %v\n", source.String(), err, err)
+		if cause, ok := err.(krpc.Error); ok {
+			if err := s.sendError(ctx, source, m.T, cause); err != nil {
+				log.Println("unable to return an error", err)
+			}
+		}
+		if cause, ok := err.(*krpc.Error); ok {
+			if err := s.sendError(ctx, source, m.T, *cause); err != nil {
+				log.Println("unable to return an error", err)
+			}
+		}
+	}
+}
+
+func (s *Server) sendError(ctx context.Context, addr Addr, t string, e krpc.Error) error {
+	m := krpc.Msg{
+		T: t,
+		Y: krpc.YError,
+		E: &e,
+	}
+	b, err := bencode.Marshal(m)
+	if err != nil {
+		return err
+	}
+	s.logger().Printf("sending error to %q: %v", addr, e)
+	_, err = s.SendToNode(ctx, b, addr, 1)
+	if err != nil {
+		s.logger().Printf("error replying to %q: %v", addr, err)
+		return err
+	}
+
+	return nil
+}
+
+func (s *Server) reply(ctx context.Context, addr Addr, t string, r krpc.Return) error {
+	r.ID = s.id.Load().AsByteArray()
+	m := krpc.Msg{
+		T:  t,
+		Y:  krpc.YResponse,
+		R:  &r,
+		IP: addr.KRPC(),
+	}
+	b := bencode.MustMarshal(m)
+	s.logger().Printf("replying to %s\n", addr)
+	_, err := s.SendToNode(ctx, b, addr, 1)
+	if err != nil {
+		s.logger().Printf("error replying to %s: %s\n", addr, err)
+		return err
+	}
+
+	return nil
+}
+
+// Adds a node if appropriate.
+func (s *Server) addNode(n *node) error {
+	if s.nodeIsBad(n) {
+		return errors.New("node is bad")
+	}
+	root := langx.Zero(s.id.Load())
+	b := s.table.bucketForID(root, n.Id)
+	if b.Len() >= s.table.k {
+		if b.EachNode(func(bn *node) bool {
+			// Replace bad and untested nodes with a good one.
+			if s.nodeIsBad(bn) || (s.IsGood(n) && bn.lastGotResponse.IsZero()) {
+				s.table.dropNode(root, bn)
+			}
+			return b.Len() >= s.table.k
+		}) {
+			return errors.New("no room in bucket")
+		}
+	}
+
+	if err := s.table.addNode(root, n); err != nil {
+		return fmt.Errorf("expected to add node: %s", err)
+	}
+
+	return nil
+}
+
+func (s *Server) NodeRespondedToPing(addr Addr, id int160.T) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	root := langx.Zero(s.id.Load())
+	if id == root {
+		return
+	}
+
+	b := s.table.bucketForID(root, id)
+	if b.GetNode(addr, id) == nil {
+		return
+	}
+	b.lastChanged = time.Now()
+}
+
+// Updates the node, adding it if appropriate.
+func (s *Server) updateNode(addr Addr, id *krpc.ID, tryAdd bool, update func(*node)) (err error) {
+	if id == nil {
+		return errors.New("id is nil")
+	}
+	root := langx.Zero(s.id.Load())
+	_id := int160.FromByteArray(*id)
+	n := s.table.getNode(root, addr, _id)
+	missing := n == nil
+
+	if missing {
+		if !tryAdd {
+			return errors.New("node not present and add flag false")
+		}
+		if _id == root {
+			return errors.New("can't store own id in routing table")
+		}
+		n = &node{nodeKey: nodeKey{
+			Id:   _id,
+			Addr: addr,
+		}}
+	}
+
+	update(n)
+
+	if !missing {
+		return nil
+	}
+	return s.addNode(n)
+}
+
+func (s *Server) nodeIsBad(n *node) bool {
+	return s.nodeErr(n) != nil
+}
+
+func (s *Server) nodeErr(n *node) error {
+	root := langx.Zero(s.id.Load())
+	if n.Id == root {
+		return errors.New("is self")
+	}
+	if n.Id.IsZero() {
+		return errors.New("has zero id")
+	}
+	if !(n.IsSecure()) {
+		return errors.New("not secure")
+	}
+	if n.failedLastQuestionablePing {
+		return errors.New("didn't respond to last questionable node ping")
+	}
+	return nil
+}
+
+func (s *Server) SendMessageToNode(ctx context.Context, m any, node Addr, maximum int) (wrote bool, err error) {
+	b, err := bencode.Marshal(m)
+	if err != nil {
+		return false, err
+	}
+	return s.SendToNode(ctx, b, node, maximum)
+}
+
+func (s *Server) SendToNode(ctx context.Context, b []byte, node Addr, maximum int) (wrote bool, err error) {
+	err = func() error {
+		// This is a pain. It would be better if the blocklist returned an error if it was closed
+		// instead.
+		s.mu.RLock()
+		defer s.mu.RUnlock()
+		if s.isClosed() {
+			return errors.New("server is closed")
+		}
+
+		if r, ok := s.blocklist.Lookup(node.IP()); ok {
+			return fmt.Errorf("write to %v blocked by %v", node, r)
+		}
+
+		return nil
+	}()
+
+	if err != nil {
+		return false, err
+	}
+
+	n, err := repeatsend(ctx, s.socket, node.Raw(), b, s.queryResendDelay(), maximum)
+	if err != nil {
+		return false, err
+	}
+
+	wrote = true
+	if n != len(b) {
+		return wrote, io.ErrShortWrite
+	}
+
+	return wrote, nil
+}
+
+func (s *Server) deleteTransaction(k transactionKey) {
+	if s.transactions.Have(k) {
+		s.transactions.Pop(k)
+	}
+}
+
+func (s *Server) addTransaction(k transactionKey, t *transaction) {
+	s.transactions.Add(k, t)
+}
+
+// ID returns the 20-byte server ID. This is the ID used to communicate with the
+// DHT network.
+func (s *Server) ID() int160.T {
+	return langx.Zero(s.id.Load())
+}
+
+func (s *Server) createToken(addr Addr) string {
+	return s.tokenServer.CreateToken(addr)
+}
+
+func (s *Server) validToken(token string, addr Addr) bool {
+	return s.tokenServer.ValidToken(token, addr)
+}
+
+type numWrites int
+
+type QueryResult struct {
+	Raw    []byte
+	Reply  krpc.Msg
+	Writes numWrites
+	Err    error
+}
+
+func (qr QueryResult) ToError() error {
+	if qr.Err != nil {
+		return qr.Err
+	}
+
+	return nil
+}
+
+// Converts a Server QueryResult to a traversal.QueryResult.
+func (me QueryResult) TraversalQueryResult(addr krpc.NodeAddr) (ret traversal.QueryResult) {
+	r := me.Reply.R
+	if r == nil {
+		return
+	}
+	ret.ResponseFrom = &krpc.NodeInfo{
+		Addr: addr,
+		ID:   r.ID,
+	}
+	ret.Nodes = r.Nodes
+	ret.Nodes6 = r.Nodes6
+	if r.Token != nil {
+		ret.ClosestData = *r.Token
+	}
+	return
+}
+
+// Rate-limiting to be applied to writes for a given query. Queries occur inside transactions that
+// will attempt to send several times. If the STM rate-limiting helpers are used, the first send is
+// often already accounted for in the rate-limiting machinery before the query method that does the
+// IO is invoked.
+type QueryRateLimiting struct {
+	// Don't rate-limit the first send for a query.
+	NotFirst bool
+	// Don't rate-limit any sends for a query. Note that there's still built-in waits before retries.
+	NotAny        bool
+	WaitOnRetries bool
+	NoWaitFirst   bool
+}
+
+// The zero value for this uses reasonable/traditional defaults on Server methods.
+type QueryInput struct {
+	Method   string
+	Tid      string
+	Encoded  []byte
+	NumTries int
+}
+
+// Performs an arbitrary query. `q` is the query value, defined by the DHT BEP. `a` should contain
+// the appropriate argument values, if any. `a.ID` is clobbered by the Server. Responses to queries
+// made this way are not interpreted by the Server. More specific methods like FindNode and GetPeers
+// may make use of the response internally before passing it back to the caller.
+func (s *Server) Query(ctx context.Context, addr Addr, input QueryInput) (ret QueryResult) {
+	defer func(started time.Time) {
+		s.logger().Printf(
+			"Query(%v) returned after %v (err=%v, reply.Y=%v, reply.E=%v, writes=%v) encoded=%s\n",
+			input.Method, time.Since(started), ret.Err, ret.Reply.Y, ret.Reply.E, ret.Writes, base64.URLEncoding.EncodeToString(input.Encoded))
+	}(time.Now())
+
+	replyChan := make(chan *QueryResult, 1)
+	sctx, done := context.WithCancelCause(pprof.WithLabels(ctx, pprof.Labels("q", input.Method)))
+	// Make sure the query sender stops.
+	defer done(nil)
+
+	t := &transaction{
+		onResponse: func(m []byte, r krpc.Msg) {
+			select {
+			case replyChan <- &QueryResult{
+				Raw:   m,
+				Reply: r,
+				Err:   r.Error(),
+			}:
+			case <-sctx.Done():
+			}
+		},
+	}
+	tk := transactionKey{
+		RemoteAddr: addr.AddrPort(),
+	}
+	s.mu.Lock()
+	s.stats.OutboundQueriesAttempted++
+	tk.T = input.Tid
+	s.addTransaction(tk, t)
+	s.mu.Unlock()
+
+	go func() {
+		s.logger().Printf("transmitting initiated %s %s %x %d\n", addr, input.Method, input.Tid, input.NumTries)
+		_, err := s.SendToNode(sctx, input.Encoded, addr, input.NumTries)
+		s.logger().Printf("transmitting completed %s %s %x %d %v\n", addr, input.Method, input.Tid, input.NumTries, err)
+		if err != nil {
+			done(err)
+		}
+	}()
+
+	defer func() {
+		s.mu.Lock()
+		s.deleteTransaction(tk)
+		s.mu.Unlock()
+	}()
+
+	select {
+	case qr := <-replyChan:
+		return *qr
+	case <-sctx.Done():
+		return NewQueryResultErr(errorsx.Compact(context.Cause(sctx), sctx.Err()))
+	}
+}
+
+// Sends a ping query to the address given.
+func (s *Server) PingQueryInput(ctx context.Context, node netip.AddrPort, qi QueryInput) QueryResult {
+	res := PingDuration(ctx, 30*time.Second, s, node, s.ID())
+	if res.Err == nil {
+		id := res.Reply.SenderID()
+		if id != nil {
+			s.NodeRespondedToPing(NewAddr(node), id.Int160())
+		}
+	}
+
+	return res
+}
+
+// Sends a ping query to the address given.
+func (s *Server) Ping(node netip.AddrPort) QueryResult {
+	return s.PingQueryInput(context.Background(), node, QueryInput{})
+}
+
+// Put adds a new item to node. You need to call Get first for a write token.
+func (s *Server) Put(ctx context.Context, node Addr, i bep44.Put, token string, rl QueryRateLimiting) QueryResult {
+	if err := s.store.Put(i.ToItem()); err != nil {
+		return QueryResult{
+			Err: err,
+		}
+	}
+
+	qi, err := NewMessageRequest("put", &krpc.MsgArgs{
+		Cas:   i.Cas,
+		ID:    s.ID().AsByteArray(),
+		Salt:  i.Salt,
+		Seq:   &i.Seq,
+		Sig:   i.Sig,
+		Token: token,
+		V:     i.V,
+		K:     langx.Zero(i.K),
+	})
+
+	if err != nil {
+		return QueryResult{Err: err}
+	}
+
+	return s.Query(ctx, node, qi)
+}
+
+func (s *Server) announcePeer(
+	ctx context.Context,
+	node Addr, infoHash int160.T, port uint16, token string, impliedPort bool,
+) (
+	ret QueryResult,
+) {
+
+	qi, err := NewAnnouncePeerRequest(s.ID().AsByteArray(), infoHash.AsByteArray(), port, token, impliedPort)
+	if err != nil {
+		return NewQueryResultErr(err)
+	}
+
+	if ret = s.Query(ctx, node, qi); ret.Err != nil {
+		return ret
+	}
+
+	if ret.Err != nil {
+		return ret
+	}
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.stats.SuccessfulOutboundAnnouncePeerQueries++
+	return
+}
+
+// Sends a find_node query to addr. targetID is the node we're looking for. The Server makes use of
+// some of the response fields.
+func (s *Server) FindNode(ctx context.Context, addr Addr, targetID int160.T, rl QueryRateLimiting) (ret QueryResult) {
+	return FindNode(ctx, s, addr, s.ID().AsByteArray(), targetID, s.defaultWant)
+}
+
+// Returns how many nodes are in the node table.
+func (s *Server) NumNodes() int {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.numNodes()
+}
+
+// Returns non-bad nodes from the routing table.
+func (s *Server) Nodes() (nis []krpc.NodeInfo) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.notBadNodes()
+}
+
+// Returns non-bad nodes from the routing table.
+func (s *Server) notBadNodes() (nis []krpc.NodeInfo) {
+	s.table.forNodes(func(n *node) bool {
+		if s.nodeIsBad(n) {
+			return true
+		}
+		nis = append(nis, krpc.NodeInfo{
+			Addr: n.Addr.KRPC(),
+			ID:   n.Id.AsByteArray(),
+		})
+		return true
+	})
+	return
+}
+
+// Stops the server network activity. This is all that's required to clean-up a Server.
+func (s *Server) Close() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.isClosed() {
+		return
+	}
+	close(s.closed)
+	if s.socket == nil {
+		return
+	}
+
+	go s.socket.Close()
+}
+
+func (s *Server) GetPeers(
+	ctx context.Context,
+	addr Addr,
+	infoHash int160.T,
+	// Be advised that if you set this, you might not get any "Return.values" back. That wasn't my
+	// reading of BEP 33 but there you go.
+	scrape bool,
+) (ret QueryResult) {
+	return FindPeers(ctx, s, addr, s.ID().AsByteArray(), infoHash.AsByteArray(), scrape)
+}
+
+// Get gets item information from a specific target ID. If seq is set to a specific value,
+// only items with seq bigger than the one provided will return a V, K and Sig, if any.
+// Get must be used to get a Put write token, when you want to write an item instead of read it.
+func (s *Server) Get(ctx context.Context, addr Addr, target bep44.Target, seq *int64, rl QueryRateLimiting) QueryResult {
+	qi, err := NewMessageRequest("get", &krpc.MsgArgs{
+		ID:     s.ID().AsByteArray(),
+		Target: target,
+		Seq:    seq,
+		Want:   []krpc.Want{krpc.WantNodes, krpc.WantNodes6},
+	})
+	if err != nil {
+		return NewQueryResultErr(err)
+	}
+
+	return s.Query(ctx, addr, qi)
+}
+
+func (s *Server) ClosestGoodNodeInfos(
+	k int,
+	targetID int160.T,
+) (
+	ret []krpc.NodeInfo,
+) {
+	return s.closestGoodNodeInfos(k, targetID, func(na krpc.NodeAddr) bool { return true })
+}
+
+func (s *Server) closestGoodNodeInfos(
+	k int,
+	targetID int160.T,
+	filter func(krpc.NodeAddr) bool,
+) (
+	ret []krpc.NodeInfo,
+) {
+	for _, n := range s.closestNodes(k, targetID, func(n *node) bool {
+		return s.IsGood(n) && filter(n.NodeInfo().Addr)
+	}) {
+		ret = append(ret, n.NodeInfo())
+	}
+	return
+}
+
+func (s *Server) closestNodes(k int, target int160.T, filter func(*node) bool) []*node {
+	return s.table.closestNodes(langx.Zero(s.id.Load()), k, target, filter)
+}
+
+func (s *Server) TraversalStartingNodes() (nodes []addrMaybeId, err error) {
+	s.mu.RLock()
+	s.table.forNodes(func(n *node) bool {
+		nodes = append(nodes, addrMaybeId{
+			Addr: n.Addr.KRPC(),
+			Id:   generics.Some(n.Id)})
+		return true
+	})
+	s.mu.RUnlock()
+	if len(nodes) > 0 {
+		return nodes, nil
+	}
+
+	for _, fn := range s.bootstrap {
+		// There seems to be floods on this call on occasion, which may cause a barrage of DNS
+		// resolution attempts. This would require that we're unable to get replies because we can't
+		// resolve, transmit or receive on the network. Nodes currently don't get expired from the
+		// table, so once we have some entries, we should never have to fallback.
+		// s.logger().Println("falling back on starting nodes")
+		addrs, err := fn(context.Background(), s.dnscache)
+		if err != nil {
+			return nil, errorsx.Wrap(err, "getting starting nodes")
+		}
+
+		for _, a := range addrs {
+			nodes = append(nodes, addrMaybeId{Addr: a.KRPC()})
+		}
+	}
+
+	if len(nodes) == 0 {
+		return nil, ErrDHTNoInitialNodes
+	}
+
+	return nodes, nil
+}
+
+func (s *Server) AddNodesFromFile(fileName string) (added int, err error) {
+	ns, err := ReadNodesFromFile(fileName)
+	if err != nil {
+		log.Println("failed to read peers", err)
+		return
+	}
+
+	if s.AddNode(ns...) == nil {
+		added += len(ns)
+	}
+
+	return added, nil
+}
+
+func (s *Server) logger() logging {
+	return s.log
+}
+
+func (s *Server) PeerStore() peer_store.Interface {
+	return s.peers
+}
+
+func (s *Server) shouldStopRefreshingBucket(bucketIndex int) bool {
+	if s.isClosed() {
+		return true
+	}
+	b := &s.table.buckets[bucketIndex]
+	// Stop if the bucket is full, and none of the nodes are bad.
+	return b.Len() == s.table.K() && b.EachNode(func(n *node) bool {
+		return !s.nodeIsBad(n)
+	})
+}
+
+func (s *Server) refreshBucket(bucketIndex int) *traversal.Stats {
+	s.mu.RLock()
+	id := s.table.randomIdForBucket(langx.Zero(s.id.Load()), bucketIndex)
+	op := traversal.Start(traversal.OperationInput{
+		Target: id.AsByteArray(),
+		Alpha:  3,
+		// Running this to completion with K matching the full-bucket size should result in a good,
+		// full bucket, since the Server will add nodes that respond to its table to replace the bad
+		// ones we're presumably refreshing. It might be possible to terminate the traversal early
+		// as soon as the bucket is good.
+		K: s.table.K(),
+		DoQuery: func(ctx context.Context, addr krpc.NodeAddr) traversal.QueryResult {
+			res := s.FindNode(ctx, NewAddr(addr.AddrPort), id, QueryRateLimiting{})
+			err := res.Err
+			if err != nil && !errors.Is(err, ErrTransactionTimeout) {
+				s.logger().Printf("error doing find node while refreshing bucket: %v\n", err)
+			}
+			return res.TraversalQueryResult(addr)
+		},
+		NodeFilter: s.TraversalNodeFilter,
+	})
+	defer func() {
+		s.mu.RUnlock()
+		op.Stop()
+		<-op.Stopped()
+	}()
+	b := &s.table.buckets[bucketIndex]
+wait:
+	for {
+		if s.shouldStopRefreshingBucket(bucketIndex) {
+			break wait
+		}
+		op.AddNodes(types.AddrMaybeIdSliceFromNodeInfoSlice(s.notBadNodes()))
+		bucketChanged := b.changed.Signaled()
+		s.mu.RUnlock()
+		select {
+		case <-op.Stalled():
+			s.mu.RLock()
+			break wait
+		case <-bucketChanged:
+		case <-s.closed:
+		}
+		s.mu.RLock()
+	}
+	return op.Stats()
+}
+
+func (s *Server) shouldBootstrap() bool {
+	return s.lastBootstrap.IsZero() || time.Since(s.lastBootstrap) > 30*time.Minute
+}
+
+func (s *Server) shouldBootstrapUnlocked() bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.shouldBootstrap()
+}
+
+func (s *Server) pingQuestionableNodesInBucket(bucketIndex int) {
+	b := &s.table.buckets[bucketIndex]
+	var wg sync.WaitGroup
+	b.EachNode(func(n *node) bool {
+		if s.IsQuestionable(n) {
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				ctx, done := context.WithTimeout(context.Background(), 15*time.Second)
+				defer done()
+				err := s.questionableNodePing(ctx, n.Addr, n.Id.AsByteArray()).Err
+				if err != nil {
+					s.logger().Printf("error pinging questionable node in bucket %v: %v", bucketIndex, err)
+				}
+			}()
+		}
+		return true
+	})
+	s.mu.RUnlock()
+	wg.Wait()
+	s.mu.RLock()
+}
+
+// A routine that maintains the Server's routing table, by pinging questionable nodes, and
+// refreshing buckets. This should be invoked on a running Server when the caller is satisfied with
+// having set it up. It is not necessary to explicitly Bootstrap the Server once this routine has
+// started.
+func (s *Server) TableMaintainer() {
+	freq := rate.NewLimiter(rate.Every(5*time.Minute), 1)
+	logger := s.logger()
+	for {
+		if err := freq.Wait(context.Background()); err != nil {
+			log.Println("table maintenance failed", err)
+			return
+		}
+
+		if s.shouldBootstrapUnlocked() {
+			stats, err := s.Bootstrap(context.Background())
+			if err != nil {
+				log.Printf("error bootstrapping during bucket refresh: %v\n", err)
+				continue
+			}
+			logger.Printf("bucket refresh bootstrap stats: %v\n", stats)
+		}
+		s.mu.RLock()
+		for i := range s.table.buckets {
+			s.pingQuestionableNodesInBucket(i)
+			if s.shouldStopRefreshingBucket(i) {
+				continue
+			}
+			logger.Printf("refreshing bucket %v\n", i)
+			s.mu.RUnlock()
+			stats := s.refreshBucket(i)
+			logger.Printf("finished refreshing bucket %v: %v\n", i, stats)
+			s.mu.RLock()
+			if !s.shouldStopRefreshingBucket(i) {
+				// Presumably we couldn't fill the bucket anymore, so assume we're as deep in the
+				// available node space as we can go.
+				break
+			}
+		}
+		s.mu.RUnlock()
+		select {
+		case <-s.closed:
+			return
+		case <-time.After(time.Minute):
+		}
+	}
+}
+
+func (s *Server) questionableNodePing(ctx context.Context, addr Addr, id krpc.ID) QueryResult {
+	qi, err := NewPingRequest(s.ID())
+	if err != nil {
+		return NewQueryResultErr(err)
+	}
+
+	// A ping query that will be certain to try at least 3 times.
+	qi.NumTries = 3
+
+	res := s.Query(ctx, addr, qi)
+	if res.Err == nil && res.Reply.R != nil {
+		s.NodeRespondedToPing(addr, res.Reply.R.ID.Int160())
+	} else {
+		s.mu.Lock()
+		err := s.updateNode(addr, &id, false, func(n *node) {
+			n.failedLastQuestionablePing = true
+		})
+		s.mu.Unlock()
+		errorsx.Log(errorsx.Wrap(err, "failed to update questionable node"))
+	}
+	return res
+}
+
+// Whether we should consider a node for contact based on its address and possible ID.
+func (s *Server) TraversalNodeFilter(node addrMaybeId) bool {
+	if !validNodeAddr(node.Addr.UDP()) {
+		return false
+	}
+	if s.ipBlocked(node.Addr.IP()) {
+		return false
+	}
+	if !node.Id.Ok {
+		return true
+	}
+	return NodeIdSecure(node.Id.Value.AsByteArray(), node.Addr.IP())
+}
+
+func validNodeAddr(addr net.Addr) bool {
+	// At least for UDP addresses, we know what doesn't work.
+	ua := addr.(*net.UDPAddr)
+	if ua.Port == 0 {
+		return false
+	}
+	if ip4 := ua.IP.To4(); ip4 != nil && ip4[0] == 0 {
+		// Why?
+		return false
+	}
+	return true
+}

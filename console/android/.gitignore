@@ -1,0 +1,5 @@
+*
+!.gitignore
+!**/
+!**/AndroidManifest.xml
+!app/build.gradle.kts

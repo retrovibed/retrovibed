@@ -1,0 +1,30 @@
+kind: pipeline
+type: docker
+name: default
+
+steps:
+  - name: build
+    image: golang
+    environment:
+      TVDB_API_KEY:
+        from_secret: tvdb_api_key
+      TVDB_API_URL:
+        from_secret: tvdb_api_url
+      TVDB_API_TOKEN:
+        from_secret: tvdb_api_token
+    commands:
+      - make test
+  - name: slack
+    image: plugins/slack
+    settings:
+      webhook:
+        from_secret: slack_webhook
+    when:
+      status: [success, failure]
+
+trigger:
+  branch:
+    - main
+  event:
+    - push
+    - custom

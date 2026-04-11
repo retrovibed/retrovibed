@@ -1,0 +1,112 @@
+package main
+
+import (
+	"context"
+	"eg/compute/console"
+	"eg/compute/debuild/duckdb"
+	"eg/compute/release"
+	"eg/compute/tarballs"
+	"log"
+	"path/filepath"
+	"time"
+
+	"github.com/egdaemon/eg/runtime/wasi/eg"
+	"github.com/egdaemon/eg/runtime/wasi/egenv"
+	"github.com/egdaemon/eg/runtime/wasi/shell"
+	"github.com/egdaemon/eg/runtime/x/wasi/egbug"
+	"github.com/egdaemon/eg/runtime/x/wasi/eggithub"
+	"github.com/egdaemon/eg/runtime/x/wasi/eggolang"
+	"github.com/egdaemon/eg/runtime/x/wasi/egtarball"
+)
+
+func tarinfo() *tarballs.Build {
+	return &tarballs.Build{
+		OS:   egenv.String("darin", "EG_COMPUTE_HOST_OS"),
+		Arch: egenv.String("arm64", "EG_COMPUTE_HOST_ARCH"),
+	}
+}
+
+// Baremetal command for darwin due to macosx nonsense for no cloud vms.
+func main() {
+	log.SetFlags(log.Flags() | log.Lshortfile)
+	ctx, done := context.WithTimeout(context.Background(), egenv.TTL())
+	defer done()
+
+	runtime := shell.Runtime().
+		EnvironFrom(eggolang.Env()...).
+		Environ("PUB_CACHE", egenv.CacheDirectory(".eg", "dart"))
+
+	tarballapp := filepath.Join(egtarball.Path(tarballs.Retrovibed(tarinfo())), "retrovibed.app")
+	dmgpath := egenv.CacheDirectory("retrovibed.darwin.arm64.dmg")
+	keychainPath := egenv.WorkspaceDirectory("apple.signing.keychain")
+	flutter := runtime.Directory(egenv.WorkingDirectory("console"))
+	shallows := runtime.Directory(egenv.WorkingDirectory("shallows"))
+	duckdblibs := egenv.CacheDirectory("duckdb", ".darwin-arm64")
+
+	duckdbldflags := "-L" + duckdblibs + " " +
+		"-lduckdb_static " +
+		"-lautocomplete_extension -lcore_functions_extension -licu_extension -ljson_extension -lparquet_extension " +
+		"-linet_extension -lfts_extension " +
+		"-ltpcds_extension -ltpch_extension " +
+		"-lduckdb_fastpforlib -lduckdb_fmt -lduckdb_fsst -lduckdb_hyperloglog -lduckdb_mbedtls -lduckdb_miniz -lduckdb_pg_query -lduckdb_re2 -lduckdb_skiplistlib -lduckdb_utf8proc -lduckdb_yyjson -lduckdb_zstd " +
+		"-lc++"
+
+	apikey := egenv.String("", "RETROVIBED_APPLE_API_KEY")
+	issuerid := egenv.String("", "RETROVIBED_APPLE_ISSUER_ID")
+
+	err := eg.Perform(
+		ctx,
+		eg.Sequential(
+			duckdb.MaybeBuild(".eg.cache/duckdb/.darwin-arm64/libduckdb_static.a", duckdb.CompileDarwin("osx_arm64", "arm64"), duckdb.CloneDarwin),
+			shell.Op(
+				shell.Newf("test -f %[1]s/libtpcds_extension.a || (echo 'void __stub(void){}' | cc -xc -c - -o /tmp/stub.o && ar rcs %[1]s/libtpcds_extension.a /tmp/stub.o && ar rcs %[1]s/libtpch_extension.a /tmp/stub.o)", duckdblibs),
+			),
+			console.GenerateFlutter,
+			egbug.DebugFailure(
+				shell.Op(
+					flutter.New("rm -rf build/macos/{x64,arm64}/debug").Lenient(true),
+					flutter.New("flutter build macos --build-name=%git.commit.year%.%git.commit.month%.%git.commit.day% --build-number=%git.commit.unix% --release lib/main.dart").Timeout(10*time.Minute),
+				),
+				shell.Op(shell.New("flutter failed to build app")),
+			),
+			shell.Op(
+				flutter.Newf("CGO_LDFLAGS=\"%s\" go -C retrovibedbind build --tags duckdb_use_static_lib -buildmode=c-shared -o ../build/macos/Build/Products/Release/retrovibed.app/Contents/Frameworks/retrovibed.dylib ./...", duckdbldflags),
+				flutter.New("tree build/macos/Build/Products/Release/retrovibed.app"),
+				shell.Newf("mkdir -p %s", tarballapp),
+				flutter.Newf("cp -R build/macos/Build/Products/Release/retrovibed.app/ %s/", tarballapp),
+			),
+			shell.Op(
+				shallows.Newf(
+					"CGO_LDFLAGS=\"%s\" go install --tags duckdb_use_static_lib ./cmd/...",
+					duckdbldflags,
+				).Environ("GOBIN", filepath.Join(tarballapp, "Contents", "Helpers")),
+			),
+			release.KeychainPEM(
+				egenv.String("", "APPLE_SIGNING_KEY"),
+				egenv.String("", "APPLE_SIGNING_CER"),
+			),
+			release.AuthKey(
+				apikey,
+				egenv.String("", "RETROVIBED_APPLE_AUTH_KEY"),
+			),
+			shell.Op(
+				shell.Newf("security unlock-keychain -p %s %s", egenv.RunID(), keychainPath),
+				shell.Newf("codesign --deep --force --options runtime --sign \"Developer ID Application\" --keychain %s %s", keychainPath, tarballapp),
+			),
+			release.DarwinDmg(tarinfo()),
+			shell.Op(
+				shell.Newf("security unlock-keychain -p %s %s", egenv.RunID(), keychainPath),
+				shell.Newf("codesign --force --sign \"Developer ID Application\" --keychain %s %s", keychainPath, dmgpath),
+				shell.Newf("xcrun notarytool submit %s --key ~/.private_keys/AuthKey_${APPLE_API_KEY}.p8 --key-id ${APPLE_API_KEY} --issuer ${APPLE_ISSUER_ID} --wait", dmgpath).
+					Environ("APPLE_API_KEY", apikey).
+					Environ("APPLE_ISSUER_ID", issuerid),
+				shell.Newf("xcrun stapler staple %s", dmgpath),
+			),
+			eggithub.Release(dmgpath),
+		),
+	)
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+}
