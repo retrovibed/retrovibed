@@ -93,9 +93,14 @@ class Error extends StatelessWidget {
   @override
   StatelessElement createElement() {
     if (this.cause != null) {
-      print(this.cause.toString());
-      print(this.trace.toString());
+      if (Platform.environment.containsKey('FLUTTER_TEST')) {
+        return super.createElement();
+      }
+
+      debugPrint(this.cause.toString());
+      debugPrint(this.trace.toString());
     }
+
     return super.createElement();
   }
 

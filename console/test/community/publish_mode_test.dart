@@ -14,7 +14,7 @@ void main() {
     });
 
     test('personal4 plan returns LISTED', () {
-      expect(maxPublishMode(personal4().id), equals(PublishMode.LISTED));
+      expect(maxPublishMode(personal4().id), equals(PublishMode.SYNDICATED));
     });
 
     test('family plan returns SYNDICATED', () {

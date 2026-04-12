@@ -182,6 +182,19 @@ func logging() {
 	redirectlogs()
 }
 
+//export checkpointdb
+func checkpointdb() {
+	// this method is to force checkpoint the database on system initialization.
+	// this prevents a bunch of duckdb issues from impacting startup due to bad shutdowns.
+	ctx, done := context.WithTimeout(context.Background(), time.Second)
+	defer done()
+	db, err := cmdmeta.Database(ctx)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer db.Close()
+}
+
 //export validatecert
 func validatecert(hostname *C.char, certData *C.uchar, certLen C.int) C.int {
 	shostname := C.GoString(hostname)

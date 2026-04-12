@@ -137,3 +137,7 @@ String _convertstring(Pointer<Char> charPointer) {
     ffi.calloc.free(charPointer);
   }
 }
+
+void checkpointdb() {
+  bridge.checkpointdb();
+}
