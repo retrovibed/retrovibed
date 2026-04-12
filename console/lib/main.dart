@@ -38,6 +38,11 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   HttpOverrides.global = meta.DaemonHttpOverrides();
   retro.logging();
+  // checkpointing the database on initialization prevents
+  // a significant number of issues due to hard shutdowns and state corruption
+  // issues.
+  retro.checkpointdb();
+
   await env.xdg();
 
   if (theming.Defaults.defaults.desktop) {

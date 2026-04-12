@@ -51,6 +51,10 @@ func InitializeDatabase(ctx context.Context, db *sql.DB) (err error) {
 	m.Lock()
 	defer m.Unlock()
 
+	if _, err := db.ExecContext(ctx, "CHECKPOINT;"); err != nil {
+		return errorsx.Wrap(err, "failed to checkpoint database")
+	}
+
 	if version, err := sqlx.String(ctx, db, "SELECT library_version FROM pragma_version()"); err != nil {
 		return err
 	} else {
@@ -75,6 +79,10 @@ func InitializeDatabase(ctx context.Context, db *sql.DB) (err error) {
 
 	if _, err := mprov.Up(ctx); err != nil {
 		return errorsx.Wrap(err, "unable to run migrations")
+	}
+
+	if _, err := db.ExecContext(ctx, "CHECKPOINT;"); err != nil {
+		return errorsx.Wrap(err, "failed to checkpoint database")
 	}
 
 	return nil

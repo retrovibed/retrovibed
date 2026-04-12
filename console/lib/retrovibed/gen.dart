@@ -144,6 +144,13 @@ class DaemonBridge {
   late final _loggingPtr = _lookup<ffi.NativeFunction<ffi.Void Function()>>('logging');
   late final _logging = _loggingPtr.asFunction<void Function()>();
 
+  void checkpointdb() {
+    return _checkpointdb();
+  }
+
+  late final _checkpointdbPtr = _lookup<ffi.NativeFunction<ffi.Void Function()>>('checkpointdb');
+  late final _checkpointdb = _checkpointdbPtr.asFunction<void Function()>();
+
   int validatecert(
     ffi.Pointer<ffi.Char> hostname,
     ffi.Pointer<ffi.UnsignedChar> certData,
