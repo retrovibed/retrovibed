@@ -80,13 +80,13 @@ class API {
   }
 
   static Future<PublishContentResponse> publish(
-    String communityId,
+    String cid,
     PublishContentRequest req, {
     List<httpx.Option> options = const [],
   }) async {
     return httpx
         .post(
-          Uri.https(httpx.host(), "/c/$communityId/publish"),
+          Uri.https(httpx.host(), "/c/$cid/publish"),
           body: jsonEncode(req.toProto3Json()),
           options: [httpx.Accept.json, httpx.Content.json, ...options],
         )

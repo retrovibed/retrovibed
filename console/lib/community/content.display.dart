@@ -46,13 +46,11 @@ class _CommunityContentDisplayState extends State<CommunityContentDisplay> {
     });
 
     // TODO: deeppool endpoints for published content
-    final authOptions = [authn.DeeppoolAuthzCache.bearer(context)];
-
     return httpx
         .withRetry(
           () => api.API.published(
             widget.community.id,
-            options: authOptions,
+            options: [authn.DeeppoolAuthzCache.bearer(context)],
           ),
         )
         .then((response) {

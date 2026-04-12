@@ -59,7 +59,7 @@ class _PublishConfirmationState extends State<PublishConfirmation> {
         })
         .catchError((e) {
           setState(() {
-            _cause = ds.Errors.httpauto(e, onTap: _clearCause);
+            _cause = ds.Errors.httpauto(e, onTap: _reseterr);
           });
         }, test: httpx.ErrorsTest.httpauto);
   }
@@ -69,7 +69,7 @@ class _PublishConfirmationState extends State<PublishConfirmation> {
     super.setState(fn);
   }
 
-  void _clearCause() {
+  void _reseterr() {
     setState(() {
       _cause = ds.Error.zero;
     });
@@ -81,7 +81,6 @@ class _PublishConfirmationState extends State<PublishConfirmation> {
       _cause = ds.Error.zero;
     });
 
-    final authOptions = [authn.AuthzCache.bearer(context)];
     _request.publishedContent
       ..communityId = widget.community!.id
       ..knownMediaId = widget.knownMedia?.id ?? widget.download!.media.knownMediaId
@@ -92,13 +91,18 @@ class _PublishConfirmationState extends State<PublishConfirmation> {
           () => widget.publish(
             widget.community!.id,
             _request,
-            options: authOptions,
+            options: [authn.AuthzCache.bearer(context)],
           ),
         )
         .then((_) => widget.onPublished())
         .catchError((cause) {
           setState(() {
-            _cause = ds.Error.unknown(cause, onTap: _clearCause);
+            _cause = ds.Errors.httpauto(cause, onTap: _reseterr);
+          });
+        }, test: httpx.ErrorsTest.httpauto)
+        .catchError((cause) {
+          setState(() {
+            _cause = ds.Error.unknown(cause, onTap: _reseterr);
           });
         })
         .whenComplete(() {
@@ -142,7 +146,10 @@ class _PublishConfirmationState extends State<PublishConfirmation> {
             SizedBox(height: defaults.spacing * 2),
             PublishModeEdit(
               publishMode: _request.publishMode,
-              onChanged: (mode) => setState(() { _request.publishMode = mode; }),
+              onChanged:
+                  (mode) => setState(() {
+                    _request.publishMode = mode;
+                  }),
             ),
             Visibility(
               visible: isVideo,
@@ -151,7 +158,9 @@ class _PublishConfirmationState extends State<PublishConfirmation> {
                 value: _request.publishedContent.oauthGoogleId.isNotEmpty,
                 onChanged:
                     _oauthGoogleId.isNotEmpty
-                        ? (v) => setState(() { _request.publishedContent.oauthGoogleId = (v ?? false) ? _oauthGoogleId : ''; })
+                        ? (v) => setState(() {
+                          _request.publishedContent.oauthGoogleId = (v ?? false) ? _oauthGoogleId : '';
+                        })
                         : null,
                 description: Text('Upload this content to your linked YouTube account'),
               ),
