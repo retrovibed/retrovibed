@@ -38,6 +38,7 @@ func main() {
 
 	tarballapp := filepath.Join(egtarball.Path(tarballs.Retrovibed(tarinfo())), "retrovibed.app")
 	dmgpath := egenv.CacheDirectory("retrovibed.darwin.arm64.dmg")
+	pkgpath := egenv.CacheDirectory("retrovibed.darwin.arm64.pkg")
 	keychainPath := egenv.WorkspaceDirectory("apple.signing.keychain")
 	flutter := runtime.Directory(egenv.WorkingDirectory("console"))
 	shallows := runtime.Directory(egenv.WorkingDirectory("shallows"))
@@ -85,6 +86,10 @@ func main() {
 				egenv.String("", "APPLE_SIGNING_KEY"),
 				egenv.String("", "APPLE_SIGNING_CER"),
 			),
+			release.KeychainAppendPEM(
+				egenv.String("", "APPLE_INSTALLER_KEY"),
+				egenv.String("", "APPLE_INSTALLER_CER"),
+			),
 			release.AuthKey(
 				apikey,
 				egenv.String("", "RETROVIBED_APPLE_AUTH_KEY"),
@@ -101,6 +106,13 @@ func main() {
 					Environ("APPLE_API_KEY", apikey).
 					Environ("APPLE_ISSUER_ID", issuerid),
 				shell.Newf("xcrun stapler staple %s", dmgpath),
+			),
+			shell.Op(
+				shell.Newf("security unlock-keychain -p %s %s", egenv.RunID(), keychainPath),
+				shell.Newf("productbuild --component %s /Applications --sign \"3rd Party Mac Developer Installer\" --keychain %s %s", tarballapp, keychainPath, pkgpath),
+				shell.Newf("xcrun altool --upload-app --type macos -f %s --apiKey ${APPLE_API_KEY} --apiIssuer ${APPLE_ISSUER_ID}", pkgpath).
+					Environ("APPLE_API_KEY", apikey).
+					Environ("APPLE_ISSUER_ID", issuerid),
 			),
 			eggithub.Release(dmgpath),
 		),
