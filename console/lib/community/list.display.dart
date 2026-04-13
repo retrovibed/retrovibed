@@ -51,9 +51,8 @@ class _ListDisplayState extends State<ListDisplay> {
 
   Future<void> _refresh(CommunitySearchRequest req) {
     setState(() => _loading = true);
-    final auth = [authn.AuthzCache.bearer(context)];
     return httpx
-        .withRetry(() => widget.search(req, options: auth))
+        .withRetry(() => widget.search(req, options: [authn.AuthzCache.bearer(context)]))
         .then((response) {
           setState(() {
             _resp = response;
@@ -104,7 +103,7 @@ class _ListDisplayState extends State<ListDisplay> {
             );
           },
           onCreate: (_) {
-            _refresh(_resp.next..offset -= 1).whenComplete(_resetoverlay);
+            _refresh(_resp.next).whenComplete(_resetoverlay);
           },
           onCancel: _resetoverlay,
         ),
