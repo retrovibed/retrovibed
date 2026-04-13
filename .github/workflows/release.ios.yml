@@ -32,7 +32,7 @@ jobs:
         uses: nick-fields/retry@v3
         with:
           max_attempts: 5 # Number of retries
-          timeout_minutes: 10
+          timeout_minutes: 20
           command: GOPROXY=direct go install github.com/egdaemon/eg/...@latest
       - name: Checkout repository
         uses: actions/checkout@v4
