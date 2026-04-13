@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"eg/compute/console"
+	"eg/compute/flathub"
 	"eg/compute/maintainer"
 	"eg/compute/release"
 	"eg/compute/shallows"
@@ -72,6 +73,7 @@ func build() eg.OpFn {
 			shell.Op(
 				shell.Newf("cp --verbose -R .dist/linux/* %s", egtarball.Path(archive)),
 			),
+			flathub.Metainfo(b),
 		),
 		shell.Op(
 			shell.Newf("echo 'tarballing %s -> %s'", egtarball.Path(archive), egtarball.Archive(archive)),
