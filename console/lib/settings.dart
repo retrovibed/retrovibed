@@ -74,116 +74,114 @@ class _DisplayState extends State<Display> {
     return ds.build((context) {
       final defaults = ds.Defaults.of(context);
       final compact = defaults.isCompact;
-      return billing.Registered(
-        SelectionArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.start,
-            verticalDirection: compact ? VerticalDirection.up : VerticalDirection.down,
-            children: [
-              meta.DaemonDropdown(
-                library: _library,
-                trailing: [
-                  _overlay == ds.Empty
-                      ? IconButton(
-                        onPressed: () {
-                          masked(
-                            ds.Confirmation.yesNo(
-                              content: Text(
-                                'Delete ${_library.value.description}?',
-                              ),
-                              onCancel: () => overlay(ds.Empty),
-                              onConfirm: () {
-                                httpx.withRetry(
-                                  () => meta.daemons.delete(_library.value.id).then((_) {
-                                    overlay(ds.Empty);
-                                  }),
-                                );
-                              },
+      return SelectionArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.start,
+          verticalDirection: compact ? VerticalDirection.up : VerticalDirection.down,
+          children: [
+            meta.DaemonDropdown(
+              library: _library,
+              trailing: [
+                _overlay == ds.Empty
+                    ? IconButton(
+                      onPressed: () {
+                        masked(
+                          ds.Confirmation.yesNo(
+                            content: Text(
+                              'Delete ${_library.value.description}?',
                             ),
-                          );
-                        },
-                        icon: Icon(Icons.delete),
-                      )
-                      : ds.LoadingIconButton.close(
-                        onPressed: () {
-                          overlay(ds.Empty);
-                          return Future.value(null);
-                        },
-                      ),
-                ],
-              ),
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: defaults.padding.horizontal / 2,
-                  ),
-                  child: ds.Overlay(
-                    alignment: Alignment.topLeft,
-                    ds.layout((context, constraints) {
-                      const mainAxisExtent = 192.0;
-                      const crossAxisExtent = 192.0;
-                      int crossAxisCount;
-
-                      if (constraints.maxWidth > mainAxisExtent) {
-                        crossAxisCount = constraints.maxWidth ~/ mainAxisExtent;
-                      } else {
-                        crossAxisCount = 1;
-                      }
-
-                      return GridView(
-                        reverse: compact,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: crossAxisCount,
-                          mainAxisExtent: mainAxisExtent,
-                          childAspectRatio: crossAxisExtent / mainAxisExtent,
-                          crossAxisSpacing: defaults.spacing / 2,
-                          mainAxisSpacing: defaults.spacing / 2,
-                        ),
-                        children: [
-                          billing.Card(
-                            onPressed: full,
-                            margin: EdgeInsets.zero,
+                            onCancel: () => overlay(ds.Empty),
+                            onConfirm: () {
+                              httpx.withRetry(
+                                () => meta.daemons.delete(_library.value.id).then((_) {
+                                  overlay(ds.Empty);
+                                }),
+                              );
+                            },
                           ),
-                          billing.ReferralCard(
-                            onPressed: full,
-                            margin: EdgeInsets.zero,
-                          ),
-                          billing.InviteCard(margin: EdgeInsets.zero),
-                          quotas.Card(),
-                          profiles.Card(
-                            onPressed: defaults.debug ? full : null,
-                          ),
-                          rss.Card(
-                            onPressed: full,
-                            margin: EdgeInsets.zero,
-                          ),
-                          wireguard.Card(
-                            onPressed: full,
-                            margin: EdgeInsets.zero,
-                          ),
-                          usermanagement.Card(
-                            onPressed: full,
-                            margin: EdgeInsets.zero,
-                          ),
-                          google.Card(onPressed: full),
-                          debug.Card(margin: EdgeInsets.zero),
-                        ],
-                      );
-                    }),
-                    overlay: MediaQuery(
-                      data: MediaQuery.of(context).copyWith(
-                        padding: EdgeInsets.only(
-                          top: 139,
-                        ), // compensate for the dropdown and titlebar
-                      ),
-                      child: _overlay,
+                        );
+                      },
+                      icon: Icon(Icons.delete),
+                    )
+                    : ds.LoadingIconButton.close(
+                      onPressed: () {
+                        overlay(ds.Empty);
+                        return Future.value(null);
+                      },
                     ),
+              ],
+            ),
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: defaults.padding.horizontal / 2,
+                ),
+                child: ds.Overlay(
+                  alignment: Alignment.topLeft,
+                  ds.layout((context, constraints) {
+                    const mainAxisExtent = 192.0;
+                    const crossAxisExtent = 192.0;
+                    int crossAxisCount;
+
+                    if (constraints.maxWidth > mainAxisExtent) {
+                      crossAxisCount = constraints.maxWidth ~/ mainAxisExtent;
+                    } else {
+                      crossAxisCount = 1;
+                    }
+
+                    return GridView(
+                      reverse: compact,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: crossAxisCount,
+                        mainAxisExtent: mainAxisExtent,
+                        childAspectRatio: crossAxisExtent / mainAxisExtent,
+                        crossAxisSpacing: defaults.spacing / 2,
+                        mainAxisSpacing: defaults.spacing / 2,
+                      ),
+                      children: [
+                        billing.Card(
+                          onPressed: full,
+                          margin: EdgeInsets.zero,
+                        ),
+                        billing.ReferralCard(
+                          onPressed: full,
+                          margin: EdgeInsets.zero,
+                        ),
+                        billing.InviteCard(margin: EdgeInsets.zero),
+                        quotas.Card(),
+                        profiles.Card(
+                          onPressed: defaults.debug ? full : null,
+                        ),
+                        rss.Card(
+                          onPressed: full,
+                          margin: EdgeInsets.zero,
+                        ),
+                        wireguard.Card(
+                          onPressed: full,
+                          margin: EdgeInsets.zero,
+                        ),
+                        usermanagement.Card(
+                          onPressed: full,
+                          margin: EdgeInsets.zero,
+                        ),
+                        google.Card(onPressed: full),
+                        debug.Card(margin: EdgeInsets.zero),
+                      ],
+                    );
+                  }),
+                  overlay: MediaQuery(
+                    data: MediaQuery.of(context).copyWith(
+                      padding: EdgeInsets.only(
+                        top: 139,
+                      ), // compensate for the dropdown and titlebar
+                    ),
+                    child: _overlay,
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       );
     });

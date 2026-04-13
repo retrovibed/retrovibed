@@ -92,15 +92,20 @@ class Error extends StatelessWidget {
 
   @override
   StatelessElement createElement() {
-    if (this.cause != null) {
+    final printerr = (Object? cause, StackTrace trace) {
       if (Platform.environment.containsKey('FLUTTER_TEST')) {
-        return super.createElement();
+        return;
       }
 
-      debugPrint(this.cause.toString());
-      debugPrint(this.trace.toString());
-    }
+      if (cause == null) {
+        return;
+      }
 
+      debugPrint(cause.toString());
+      debugPrint(trace.toString());
+    };
+
+    printerr(this.cause, this.trace);
     return super.createElement();
   }
 
