@@ -87,8 +87,8 @@ func main() {
 				egenv.String("", "APPLE_SIGNING_CER"),
 			),
 			release.KeychainAppendPEM(
-				egenv.String("", "APPLE_INSTALLER_KEY"),
-				egenv.String("", "APPLE_INSTALLER_CER"),
+				egenv.String("", "APPLE_MACOS_INSTALLER_KEY"),
+				egenv.String("", "APPLE_MACOS_INSTALLER_CERT"),
 			),
 			release.AuthKey(
 				apikey,
