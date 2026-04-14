@@ -55,4 +55,4 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          eg compute baremetal -e GH_TOKEN --no-podman --secret=gcpsm://${{ secrets.GCP_PROJECT }}/apple-signing-env --secret=gcpsm://${{ secrets.GCP_PROJECT }}/apple-macos-signing-env --secret=gcpsm://${{ secrets.GCP_PROJECT }}/apple-macos-installer-env release/darwin
+          eg compute baremetal -e GH_TOKEN --no-podman --secret=gcpsm://${{ secrets.GCP_PROJECT }}/apple-signing-env --secret=gcpsm://${{ secrets.GCP_PROJECT }}/apple-macos-signing-env --secret=gcpsm://${{ secrets.GCP_PROJECT }}/apple-macos-installer-env --secret=gcpsm://${{ secrets.GCP_PROJECT }}/apple-macos-appstore-env release/darwin

@@ -102,10 +102,11 @@ func KeychainPEM(base64key, base64cert string) eg.OpFn {
 }
 
 // KeychainAppendPEM imports an additional PEM key and DER certificate into the existing signing keychain.
-func KeychainAppendPEM(base64key, base64cert string) eg.OpFn {
+// label distinguishes temp files when multiple certificates are imported.
+func KeychainAppendPEM(label, base64key, base64cert string) eg.OpFn {
 	return func(ctx context.Context, o eg.Op) error {
-		keypath := egenv.WorkspaceDirectory("apple.installer.key.pem")
-		certpath := egenv.WorkspaceDirectory("apple.installer.cert.der")
+		keypath := egenv.WorkspaceDirectory(fmt.Sprintf("apple.%s.key.pem", label))
+		certpath := egenv.WorkspaceDirectory(fmt.Sprintf("apple.%s.cert.der", label))
 		keychainPath := egenv.WorkspaceDirectory("apple.signing.keychain")
 
 		if err := writeBase64File(keypath, base64key, "installer key"); err != nil {
@@ -154,6 +155,13 @@ func AuthKey(keyid, base64authkey string) eg.OpFn {
 				Environ("APPLE_API_KEY_ID", keyid).
 				Environ("APPLE_AUTH_KEY_PATH", filename),
 		)
+	}
+}
+
+// EmbedProvisioningProfile decodes a provisioning profile and writes it to destpath.
+func EmbedProvisioningProfile(base64profile, destpath string) eg.OpFn {
+	return func(ctx context.Context, o eg.Op) error {
+		return writeBase64File(destpath, base64profile, "embedded provisioning profile")
 	}
 }
 
