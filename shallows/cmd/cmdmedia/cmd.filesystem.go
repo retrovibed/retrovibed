@@ -9,14 +9,14 @@ import (
 	"path/filepath"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/retrovibed/retrovibed/cmd/cmdmeta"
-	"github.com/retrovibed/retrovibed/cmd/cmdopts"
-	"github.com/retrovibed/retrovibed/internal/asynccompute"
-	"github.com/retrovibed/retrovibed/internal/env"
-	"github.com/retrovibed/retrovibed/internal/errorsx"
-	"github.com/retrovibed/retrovibed/internal/fsx"
-	"github.com/retrovibed/retrovibed/internal/md5x"
-	"github.com/retrovibed/retrovibed/library"
+	"github.com/retrovibed/retrovibed/shallows/cmd/cmdmeta"
+	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
+	"github.com/retrovibed/retrovibed/shallows/internal/asynccompute"
+	"github.com/retrovibed/retrovibed/shallows/internal/env"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
+	"github.com/retrovibed/retrovibed/shallows/library"
 )
 
 type importFilesystem struct {

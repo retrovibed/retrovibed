@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/retrovibed/retrovibed/internal/testx"
+	"github.com/retrovibed/retrovibed/shallows/internal/testx"
 	"github.com/stretchr/testify/require"
 )
 

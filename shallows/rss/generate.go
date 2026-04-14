@@ -9,10 +9,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/retrovibed/retrovibed/internal/errorsx"
-	"github.com/retrovibed/retrovibed/internal/langx"
-	"github.com/retrovibed/retrovibed/internal/stringsx"
-	"github.com/retrovibed/retrovibed/internal/timex"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
+	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 )
 
 type GenOption func(*gen)

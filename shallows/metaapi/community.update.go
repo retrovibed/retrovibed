@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/retrovibed/retrovibed/deeppool"
-	"github.com/retrovibed/retrovibed/internal/httpx"
-	"github.com/retrovibed/retrovibed/meta"
+	"github.com/retrovibed/retrovibed/shallows/deeppool"
+	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
+	"github.com/retrovibed/retrovibed/shallows/meta"
 )
 
 func CommunityUpdate(ctx context.Context, c *http.Client, domainOrId string, com *meta.CommunityUpdateRequest) (resp *meta.CommunityUpdateResponse, err error) {

@@ -3,8 +3,8 @@ package duckdbx_test
 import (
 	"testing"
 
-	"github.com/retrovibed/retrovibed/internal/duckdbx"
-	"github.com/retrovibed/retrovibed/internal/lucenex"
+	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
+	"github.com/retrovibed/retrovibed/shallows/internal/lucenex"
 	"github.com/stretchr/testify/require"
 )
 

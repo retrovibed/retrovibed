@@ -7,14 +7,14 @@ import (
 
 	"github.com/Masterminds/squirrel"
 	"github.com/gofrs/uuid/v5"
-	"github.com/retrovibed/retrovibed/cmd/cmdmeta"
-	"github.com/retrovibed/retrovibed/cmd/cmdopts"
-	"github.com/retrovibed/retrovibed/internal/env"
-	"github.com/retrovibed/retrovibed/internal/fsx"
-	"github.com/retrovibed/retrovibed/internal/sqlx"
-	"github.com/retrovibed/retrovibed/internal/squirrelx"
-	"github.com/retrovibed/retrovibed/library"
-	"github.com/retrovibed/retrovibed/tracking"
+	"github.com/retrovibed/retrovibed/shallows/cmd/cmdmeta"
+	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
+	"github.com/retrovibed/retrovibed/shallows/internal/env"
+	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
+	"github.com/retrovibed/retrovibed/shallows/internal/squirrelx"
+	"github.com/retrovibed/retrovibed/shallows/library"
+	"github.com/retrovibed/retrovibed/shallows/tracking"
 )
 
 type reindex struct {

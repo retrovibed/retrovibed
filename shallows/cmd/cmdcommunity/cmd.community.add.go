@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/retrovibed/retrovibed/cmd/cmdopts"
-	"github.com/retrovibed/retrovibed/deeppool"
-	"github.com/retrovibed/retrovibed/internal/errorsx"
-	"github.com/retrovibed/retrovibed/meta"
+	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
+	"github.com/retrovibed/retrovibed/shallows/deeppool"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/meta"
 )
 
 type cmdCommunityAdd struct {

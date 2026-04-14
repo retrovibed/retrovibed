@@ -6,16 +6,16 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/retrovibed/retrovibed/community"
-	"github.com/retrovibed/retrovibed/deeppool"
-	"github.com/retrovibed/retrovibed/internal/asyncx"
-	"github.com/retrovibed/retrovibed/internal/backoffx"
-	"github.com/retrovibed/retrovibed/internal/contextx"
-	"github.com/retrovibed/retrovibed/internal/errorsx"
-	"github.com/retrovibed/retrovibed/internal/fsx"
-	"github.com/retrovibed/retrovibed/internal/sqlx"
-	"github.com/retrovibed/retrovibed/library"
-	"github.com/retrovibed/retrovibed/metaapi"
+	"github.com/retrovibed/retrovibed/shallows/community"
+	"github.com/retrovibed/retrovibed/shallows/deeppool"
+	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
+	"github.com/retrovibed/retrovibed/shallows/internal/backoffx"
+	"github.com/retrovibed/retrovibed/shallows/internal/contextx"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
+	"github.com/retrovibed/retrovibed/shallows/library"
+	"github.com/retrovibed/retrovibed/shallows/metaapi"
 )
 
 func AutoArchival(ctx context.Context, q sqlx.Queryer, mediastore fsx.Virtual, async *asyncx.Wakeup, archive bool) error {

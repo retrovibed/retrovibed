@@ -5,11 +5,11 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/retrovibed/retrovibed/community"
-	"github.com/retrovibed/retrovibed/deeppool"
-	"github.com/retrovibed/retrovibed/internal/contextx"
-	"github.com/retrovibed/retrovibed/internal/errorsx"
-	"github.com/retrovibed/retrovibed/internal/sqlx"
+	"github.com/retrovibed/retrovibed/shallows/community"
+	"github.com/retrovibed/retrovibed/shallows/deeppool"
+	"github.com/retrovibed/retrovibed/shallows/internal/contextx"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 )
 
 func SubscriptionSync(ctx context.Context, q sqlx.Queryer, c *http.Client) error {

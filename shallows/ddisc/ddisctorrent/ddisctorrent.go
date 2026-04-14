@@ -5,7 +5,7 @@ import (
 
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/dht/krpc"
-	"github.com/retrovibed/retrovibed/ddisc"
+	"github.com/retrovibed/retrovibed/shallows/ddisc"
 )
 
 const (

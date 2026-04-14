@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 
 	"github.com/pkg/errors"
-	"github.com/retrovibed/retrovibed/internal/fsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 )
 
 // Pack ...

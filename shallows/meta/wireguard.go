@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/retrovibed/retrovibed/internal/langx"
-	"github.com/retrovibed/retrovibed/internal/sqlx"
-	"github.com/retrovibed/retrovibed/internal/squirrelx"
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
+	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
+	"github.com/retrovibed/retrovibed/shallows/internal/squirrelx"
 )
 
 func WireguardSearch(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilder) WireguardScanner {

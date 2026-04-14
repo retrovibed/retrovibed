@@ -12,8 +12,8 @@ import (
 	"github.com/porfirion/trie"
 
 	"github.com/james-lawrence/torrent/metainfo"
-	"github.com/retrovibed/retrovibed/internal/langx"
-	"github.com/retrovibed/retrovibed/internal/stringsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
+	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 )
 
 type Info struct {

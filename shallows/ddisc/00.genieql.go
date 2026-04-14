@@ -6,7 +6,7 @@ package ddisc
 import (
 	"context"
 
-	"github.com/retrovibed/retrovibed/internal/sqlx"
+	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 )
 
 func Discovered(

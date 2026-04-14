@@ -7,7 +7,7 @@ import (
 	"sort"
 
 	"github.com/gofrs/uuid/v5"
-	"github.com/retrovibed/retrovibed/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 )
 
 func Random[T any](v T) Paired[T] {

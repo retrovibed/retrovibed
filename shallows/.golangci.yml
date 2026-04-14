@@ -16,11 +16,12 @@ linters:
       # List of functions to exclude from checking, where each entry is a single function to exclude.
       # See https://github.com/kisielk/errcheck#excluding-functions for details.
       exclude-functions:
-        - github.com/retrovibed/retrovibed/internal/httpx.AutoClose
-        - github.com/retrovibed/retrovibed/internal/httpx.TryClose
-        - github.com/retrovibed/retrovibed/internal/timex.NowAndEvery
-        - (github.com/retrovibed/retrovibed/internal/sqlx.scanner[T]).Close
-        - (github.com/retrovibed/retrovibed/internal/sqlx.scanner2[X, Y]).Close
+        - github.com/retrovibed/retrovibed/shallows/internal/httpx.AutoClose
+        - github.com/retrovibed/retrovibed/shallows/internal/httpx.TryClose
+        - github.com/retrovibed/retrovibed/shallows/internal/timex.NowAndEvery
+        - (github.com/retrovibed/retrovibed/shallows/internal/sqlx.scanner[T]).Close
+        - (github.com/retrovibed/retrovibed/shallows/internal/sqlx.scanner2[X, Y]).Close
+        - (*github.com/retrovibed/retrovibed/shallows/internal/asyncx.Wakeup).Close
         - (*github.com/hashicorp/mdns.Server).Shutdown
         - (*github.com/fsnotify/fsnotify.Watcher).Close
         - (*os.File).Close
@@ -40,6 +41,5 @@ linters:
         - (*github.com/james-lawrence/torrent.Client).Close
         - (*github.com/james-lawrence/torrent.Client).Stop
         - (*database/sql.DB).Close
-        - (*github.com/retrovibed/retrovibed/internal/asyncx.Wakeup).Close
       # Display function signature instead of selector.
       verbose: true

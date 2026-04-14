@@ -8,7 +8,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/retrovibed/retrovibed/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 )
 
 // IgnoreEOF returns nil if err is io.EOF

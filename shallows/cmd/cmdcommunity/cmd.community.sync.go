@@ -5,12 +5,12 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/retrovibed/retrovibed/cmd/cmdmeta"
-	"github.com/retrovibed/retrovibed/cmd/cmdopts"
-	"github.com/retrovibed/retrovibed/community"
-	"github.com/retrovibed/retrovibed/deeppool"
-	"github.com/retrovibed/retrovibed/internal/errorsx"
-	"github.com/retrovibed/retrovibed/metaapi"
+	"github.com/retrovibed/retrovibed/shallows/cmd/cmdmeta"
+	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
+	"github.com/retrovibed/retrovibed/shallows/community"
+	"github.com/retrovibed/retrovibed/shallows/deeppool"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/metaapi"
 )
 
 type cmdCommunitySync struct {

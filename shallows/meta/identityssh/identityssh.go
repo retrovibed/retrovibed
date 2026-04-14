@@ -3,11 +3,11 @@ package identityssh
 import (
 	"context"
 
-	"github.com/retrovibed/retrovibed/internal/errorsx"
-	"github.com/retrovibed/retrovibed/internal/langx"
-	"github.com/retrovibed/retrovibed/internal/sqlx"
-	"github.com/retrovibed/retrovibed/internal/sshx"
-	"github.com/retrovibed/retrovibed/meta"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
+	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
+	"github.com/retrovibed/retrovibed/shallows/internal/sshx"
+	"github.com/retrovibed/retrovibed/shallows/meta"
 	"golang.org/x/crypto/ssh"
 )
 

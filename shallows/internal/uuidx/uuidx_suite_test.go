@@ -3,7 +3,7 @@ package uuidx_test
 import (
 	"os"
 
-	"github.com/retrovibed/retrovibed/internal/testx"
+	"github.com/retrovibed/retrovibed/shallows/internal/testx"
 
 	"testing"
 )

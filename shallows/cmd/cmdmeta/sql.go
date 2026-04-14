@@ -13,12 +13,12 @@ import (
 	_ "github.com/duckdb/duckdb-go/v2"
 
 	"github.com/pressly/goose/v3"
-	"github.com/retrovibed/retrovibed/internal/debugx"
-	"github.com/retrovibed/retrovibed/internal/errorsx"
-	"github.com/retrovibed/retrovibed/internal/goosex"
-	"github.com/retrovibed/retrovibed/internal/sqlx"
-	"github.com/retrovibed/retrovibed/internal/userx"
-	"github.com/retrovibed/retrovibed/meta"
+	"github.com/retrovibed/retrovibed/shallows/internal/debugx"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/goosex"
+	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
+	"github.com/retrovibed/retrovibed/shallows/internal/userx"
+	"github.com/retrovibed/retrovibed/shallows/meta"
 )
 
 //go:embed .migrations/*.sql

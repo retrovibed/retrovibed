@@ -12,11 +12,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/retrovibed/retrovibed/internal/debugx"
-	"github.com/retrovibed/retrovibed/internal/errorsx"
-	"github.com/retrovibed/retrovibed/internal/fsx"
-	"github.com/retrovibed/retrovibed/internal/langx"
-	"github.com/retrovibed/retrovibed/internal/netx"
+	"github.com/retrovibed/retrovibed/shallows/internal/debugx"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
+	"github.com/retrovibed/retrovibed/shallows/internal/netx"
 )
 
 // Pool is a directory-based trust-on-first-use certificate pool.

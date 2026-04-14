@@ -4,9 +4,9 @@ import (
 	"io"
 
 	"github.com/gofrs/uuid/v5"
-	"github.com/retrovibed/retrovibed/internal/md5x"
-	"github.com/retrovibed/retrovibed/internal/rendezvous"
-	"github.com/retrovibed/retrovibed/internal/slicesx"
+	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
+	"github.com/retrovibed/retrovibed/shallows/internal/rendezvous"
+	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
 )
 
 func Partitions(n uint16, s io.Reader) *Partition {

@@ -8,11 +8,11 @@ import (
 	"mime/multipart"
 	"net/http"
 
-	"github.com/retrovibed/retrovibed/deeppool"
-	"github.com/retrovibed/retrovibed/internal/errorsx"
-	"github.com/retrovibed/retrovibed/internal/httpx"
-	"github.com/retrovibed/retrovibed/internal/mimex"
-	"github.com/retrovibed/retrovibed/meta"
+	"github.com/retrovibed/retrovibed/shallows/deeppool"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
+	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
+	"github.com/retrovibed/retrovibed/shallows/meta"
 )
 
 func CommunityPublish(ctx context.Context, c *http.Client, id string, in io.Reader) (resp *meta.CommunityUploadResponse, err error) {

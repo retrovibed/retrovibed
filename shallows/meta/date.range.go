@@ -1,8 +1,8 @@
 package meta
 
 import (
-	"github.com/retrovibed/retrovibed/internal/grpcx"
-	"github.com/retrovibed/retrovibed/internal/timex"
+	"github.com/retrovibed/retrovibed/shallows/internal/grpcx"
+	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 )
 
 func NewDateRange(r timex.Range) *DateRange {

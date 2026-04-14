@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/gofrs/uuid/v5"
-	. "github.com/retrovibed/retrovibed/internal/uuidx"
+	. "github.com/retrovibed/retrovibed/shallows/internal/uuidx"
 	"github.com/stretchr/testify/require"
 )
 

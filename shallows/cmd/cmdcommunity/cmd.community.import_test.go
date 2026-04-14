@@ -6,8 +6,8 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/retrovibed/retrovibed/cmd/cmdopts"
-	"github.com/retrovibed/retrovibed/internal/testx"
+	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
+	"github.com/retrovibed/retrovibed/shallows/internal/testx"
 	"github.com/stretchr/testify/require"
 )
 

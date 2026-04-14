@@ -7,11 +7,11 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid/v5"
-	"github.com/retrovibed/retrovibed/internal/sqltestx"
-	"github.com/retrovibed/retrovibed/internal/testx"
-	"github.com/retrovibed/retrovibed/library"
-	"github.com/retrovibed/retrovibed/meta"
-	"github.com/retrovibed/retrovibed/rss"
+	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
+	"github.com/retrovibed/retrovibed/shallows/internal/testx"
+	"github.com/retrovibed/retrovibed/shallows/library"
+	"github.com/retrovibed/retrovibed/shallows/meta"
+	"github.com/retrovibed/retrovibed/shallows/rss"
 	"github.com/stretchr/testify/require"
 )
 

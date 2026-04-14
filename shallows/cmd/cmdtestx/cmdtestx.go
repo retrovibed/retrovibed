@@ -8,13 +8,13 @@ import (
 
 	"github.com/alecthomas/kong"
 	"github.com/gorilla/mux"
-	"github.com/retrovibed/retrovibed/httpauthtest"
-	"github.com/retrovibed/retrovibed/internal/sqlx"
-	"github.com/retrovibed/retrovibed/internal/sshx"
-	"github.com/retrovibed/retrovibed/internal/testx"
-	"github.com/retrovibed/retrovibed/meta"
-	"github.com/retrovibed/retrovibed/meta/identityssh"
-	"github.com/retrovibed/retrovibed/metaapi"
+	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
+	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
+	"github.com/retrovibed/retrovibed/shallows/internal/sshx"
+	"github.com/retrovibed/retrovibed/shallows/internal/testx"
+	"github.com/retrovibed/retrovibed/shallows/meta"
+	"github.com/retrovibed/retrovibed/shallows/meta/identityssh"
+	"github.com/retrovibed/retrovibed/shallows/metaapi"
 	"github.com/stretchr/testify/require"
 )
 

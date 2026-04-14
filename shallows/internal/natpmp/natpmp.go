@@ -7,7 +7,7 @@ import (
 	"net/netip"
 	"time"
 
-	"github.com/retrovibed/retrovibed/internal/langx"
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 )
 
 // Implement the NAT-PMP protocol, typically supported by Apple routers and open source

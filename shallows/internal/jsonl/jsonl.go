@@ -7,7 +7,7 @@ import (
 	"io"
 	"iter"
 
-	"github.com/retrovibed/retrovibed/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 )
 
 type Encoder struct {

@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/retrovibed/retrovibed/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 )
 
 // Inf - positive infinity no time can be larger.

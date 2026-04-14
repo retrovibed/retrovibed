@@ -7,7 +7,7 @@ import (
 	"net/netip"
 	"time"
 
-	"github.com/retrovibed/retrovibed/internal/netx"
+	"github.com/retrovibed/retrovibed/shallows/internal/netx"
 )
 
 const nAT_PMP_PORT = 5351

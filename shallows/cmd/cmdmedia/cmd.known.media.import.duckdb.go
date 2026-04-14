@@ -4,11 +4,11 @@ import (
 	"database/sql"
 	"os"
 
-	"github.com/retrovibed/retrovibed/cmd/cmdmeta"
-	"github.com/retrovibed/retrovibed/cmd/cmdopts"
-	"github.com/retrovibed/retrovibed/internal/jsonl"
-	"github.com/retrovibed/retrovibed/internal/sqlx"
-	"github.com/retrovibed/retrovibed/library"
+	"github.com/retrovibed/retrovibed/shallows/cmd/cmdmeta"
+	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
+	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
+	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
+	"github.com/retrovibed/retrovibed/shallows/library"
 )
 
 type duckdbimport struct{}

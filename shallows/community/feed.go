@@ -8,13 +8,13 @@ import (
 	"slices"
 	"time"
 
-	"github.com/retrovibed/retrovibed/deeppool"
-	"github.com/retrovibed/retrovibed/internal/errorsx"
-	"github.com/retrovibed/retrovibed/internal/sqlx"
-	"github.com/retrovibed/retrovibed/internal/stringsx"
-	"github.com/retrovibed/retrovibed/library"
-	"github.com/retrovibed/retrovibed/meta"
-	"github.com/retrovibed/retrovibed/rss"
+	"github.com/retrovibed/retrovibed/shallows/deeppool"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
+	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
+	"github.com/retrovibed/retrovibed/shallows/library"
+	"github.com/retrovibed/retrovibed/shallows/meta"
+	"github.com/retrovibed/retrovibed/shallows/rss"
 )
 
 const (

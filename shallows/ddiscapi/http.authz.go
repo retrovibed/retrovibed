@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/retrovibed/retrovibed/internal/errorsx"
-	"github.com/retrovibed/retrovibed/metaapi"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/metaapi"
 )
 
 func AuthzPermPeerManagement(ctx context.Context, cause error) (_ context.Context, token *metaapi.Token, err error) {

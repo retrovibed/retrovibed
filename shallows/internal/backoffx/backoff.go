@@ -11,7 +11,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/retrovibed/retrovibed/internal/timex"
+	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 )
 
 // Strategy strategy to compute how long to wait before retrying message.

@@ -7,11 +7,11 @@ import (
 
 	"github.com/Masterminds/squirrel"
 	"github.com/james-lawrence/torrent/dht/int160"
-	"github.com/retrovibed/retrovibed/internal/backoffx"
-	"github.com/retrovibed/retrovibed/internal/langx"
-	"github.com/retrovibed/retrovibed/internal/sqlx"
-	"github.com/retrovibed/retrovibed/internal/squirrelx"
-	"github.com/retrovibed/retrovibed/internal/torrentx"
+	"github.com/retrovibed/retrovibed/shallows/internal/backoffx"
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
+	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
+	"github.com/retrovibed/retrovibed/shallows/internal/squirrelx"
+	"github.com/retrovibed/retrovibed/shallows/internal/torrentx"
 )
 
 type OptionUnknownHash func(*UnknownHash)

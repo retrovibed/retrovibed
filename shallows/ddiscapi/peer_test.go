@@ -3,10 +3,10 @@ package ddiscapi_test
 import (
 	"testing"
 
-	"github.com/retrovibed/retrovibed/ddiscapi"
-	"github.com/retrovibed/retrovibed/internal/grpcx"
-	"github.com/retrovibed/retrovibed/internal/testx"
-	"github.com/retrovibed/retrovibed/tracking"
+	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
+	"github.com/retrovibed/retrovibed/shallows/internal/grpcx"
+	"github.com/retrovibed/retrovibed/shallows/internal/testx"
+	"github.com/retrovibed/retrovibed/shallows/tracking"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

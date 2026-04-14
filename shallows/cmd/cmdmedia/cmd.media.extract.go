@@ -5,9 +5,9 @@ import (
 	"os"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/retrovibed/retrovibed/cmd/cmdopts"
-	"github.com/retrovibed/retrovibed/ddisc"
-	"github.com/retrovibed/retrovibed/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
+	"github.com/retrovibed/retrovibed/shallows/ddisc"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 )
 
 type mediaInspectFile struct {

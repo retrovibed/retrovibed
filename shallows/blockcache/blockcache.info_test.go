@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/retrovibed/retrovibed/blockcache"
+	"github.com/retrovibed/retrovibed/shallows/blockcache"
 	"github.com/stretchr/testify/require"
 )
 

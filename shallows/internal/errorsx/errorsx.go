@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/retrovibed/retrovibed/internal/langx"
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 )
 
 // print detailed information about the error.

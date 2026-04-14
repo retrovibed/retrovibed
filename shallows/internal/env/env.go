@@ -5,8 +5,8 @@ import (
 	"sync"
 
 	"github.com/gofrs/uuid/v5"
-	"github.com/retrovibed/retrovibed/internal/envx"
-	"github.com/retrovibed/retrovibed/internal/userx"
+	"github.com/retrovibed/retrovibed/shallows/internal/envx"
+	"github.com/retrovibed/retrovibed/shallows/internal/userx"
 )
 
 const (

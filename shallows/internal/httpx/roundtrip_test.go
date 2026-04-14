@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/retrovibed/retrovibed/internal/httpx"
+	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/stretchr/testify/require"
 )
 

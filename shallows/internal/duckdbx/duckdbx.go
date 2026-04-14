@@ -6,8 +6,8 @@ import (
 
 	"github.com/Masterminds/squirrel"
 	"github.com/duckdb/duckdb-go/v2"
-	"github.com/retrovibed/retrovibed/internal/squirrelx"
-	"github.com/retrovibed/retrovibed/internal/stringsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/squirrelx"
+	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 )
 
 // checks if the error is a unique constraint violation.

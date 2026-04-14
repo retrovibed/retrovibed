@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/retrovibed/retrovibed/internal/errorsx"
-	"github.com/retrovibed/retrovibed/metaapi"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/metaapi"
 )
 
 // DeeppoolClient provides an http.Client for deeppool API calls.

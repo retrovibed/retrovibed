@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"github.com/alecthomas/kong"
-	"github.com/retrovibed/retrovibed/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 )
 
 // ParseIP addresses
