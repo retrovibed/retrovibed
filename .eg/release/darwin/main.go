@@ -37,8 +37,10 @@ func main() {
 		Environ("PUB_CACHE", egenv.CacheDirectory(".eg", "dart"))
 
 	tarballapp := filepath.Join(egtarball.Path(tarballs.Retrovibed(tarinfo())), "retrovibed.app")
+	appstoreapp := egenv.CacheDirectory("retrovibed.appstore.app")
 	dmgpath := egenv.CacheDirectory("retrovibed.darwin.arm64.dmg")
 	pkgpath := egenv.CacheDirectory("retrovibed.darwin.arm64.pkg")
+	entitlements := egenv.WorkingDirectory("console", "macos", "Runner", "Release.entitlements")
 	keychainPath := egenv.WorkspaceDirectory("apple.signing.keychain")
 	flutter := runtime.Directory(egenv.WorkingDirectory("console"))
 	shallows := runtime.Directory(egenv.WorkingDirectory("shallows"))
@@ -87,8 +89,14 @@ func main() {
 				egenv.String("", "APPLE_SIGNING_CER"),
 			),
 			release.KeychainAppendPEM(
+				"installer",
 				egenv.String("", "APPLE_MACOS_INSTALLER_KEY"),
 				egenv.String("", "APPLE_MACOS_INSTALLER_CERT"),
+			),
+			release.KeychainAppendPEM(
+				"appstore",
+				egenv.String("", "APPLE_MACOS_APPSTORE_KEY"),
+				egenv.String("", "APPLE_MACOS_APPSTORE_CERT"),
 			),
 			release.AuthKey(
 				apikey,
@@ -108,9 +116,19 @@ func main() {
 				shell.Newf("xcrun stapler staple %s", dmgpath),
 			),
 			shell.Op(
+				shell.Newf("rm -rf %s && cp -R %s %s", appstoreapp, tarballapp, appstoreapp),
+			),
+			release.EmbedProvisioningProfile(
+				egenv.String("", "APPLE_MACOS_APPSTORE_PROFILE"),
+				filepath.Join(appstoreapp, "Contents", "embedded.provisionprofile"),
+			),
+			shell.Op(
 				shell.Newf("security unlock-keychain -p %s %s", egenv.RunID(), keychainPath),
-				shell.Newf("productbuild --component %s /Applications --sign \"3rd Party Mac Developer Installer\" --keychain %s %s", tarballapp, keychainPath, pkgpath),
-				shell.Newf("xcrun altool --upload-app --type macos -f %s --apiKey ${APPLE_API_KEY} --apiIssuer ${APPLE_ISSUER_ID}", pkgpath).
+				shell.Newf("codesign --deep --force --options runtime --sign \"Apple Distribution\" --keychain %s %s", keychainPath, appstoreapp),
+				shell.Newf("codesign --force --options runtime --sign \"Apple Distribution\" --entitlements %s --keychain %s %s/Contents/Helpers/retrovibed", entitlements, keychainPath, appstoreapp),
+				shell.Newf("codesign --force --options runtime --sign \"Apple Distribution\" --entitlements %s --keychain %s %s", entitlements, keychainPath, appstoreapp),
+				shell.Newf("productbuild --component %s /Applications --sign \"3rd Party Mac Developer Installer\" --keychain %s %s", appstoreapp, keychainPath, pkgpath),
+				shell.Newf("xcrun altool --upload-app --type macos -f %s --apiKey ${APPLE_API_KEY} --apiIssuer ${APPLE_ISSUER_ID} 2>&1 | tee /tmp/altool.log && ! grep -q 'UPLOAD FAILED' /tmp/altool.log", pkgpath).
 					Environ("APPLE_API_KEY", apikey).
 					Environ("APPLE_ISSUER_ID", issuerid),
 			),
