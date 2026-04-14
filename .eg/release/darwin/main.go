@@ -116,7 +116,7 @@ func main() {
 				shell.Newf("xcrun stapler staple %s", dmgpath),
 			),
 			shell.Op(
-				shell.Newf("rm -rf %s && cp -R %s %s", appstoreapp, tarballapp, appstoreapp),
+				shell.Newf("rm -rf %s && cp -R %s %s && chmod -R a+rX %s", appstoreapp, tarballapp, appstoreapp, appstoreapp),
 			),
 			release.EmbedProvisioningProfile(
 				egenv.String("", "APPLE_MACOS_APPSTORE_PROFILE"),
