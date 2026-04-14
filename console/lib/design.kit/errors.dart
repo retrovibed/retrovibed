@@ -27,6 +27,14 @@ class ErrorTests {
   static bool timeout(Object obj) {
     return obj is TimeoutException;
   }
+
+  static bool websocketclosed(Object obj) {
+    return obj is WebSocketException;
+  }
+
+  static bool socketclosed(Object obj) {
+    return obj is SocketException && obj.message == 'Reading from a closed socket';
+  }
 }
 
 class ErrorBoundary extends StatefulWidget {

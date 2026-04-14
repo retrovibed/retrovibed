@@ -35,13 +35,16 @@ class _DownloadingState extends State<RefreshingDownload> {
     setState(() => _cause = ds.Error.zero);
   }
 
-  @override
-  void initState() {
-    super.initState();
-    current = widget.current;
+  void _reconnect() {
+    if (!mounted) return;
+    Future.delayed(widget.interval, _connect);
+  }
+
+  void _connect() {
+    _subscription?.cancel();
     widget
         .watch(
-          widget.current.media.id,
+          current.media.id,
           options: [authn.AuthzCache.bearer(context)],
         )
         .then((socket) {
@@ -60,11 +63,31 @@ class _DownloadingState extends State<RefreshingDownload> {
 
           return c.future;
         })
+        .then((_) {
+          ds.RefreshBoundary.of(context)?.reset();
+          debugPrint('download watch stream closed cleanly, reconnecting');
+          _reconnect();
+        })
+        .catchError((e) {
+          debugPrint('download watch socket closed by server, reconnecting: $e');
+          _reconnect();
+        }, test: ds.ErrorTests.socketclosed)
+        .catchError((e) {
+          debugPrint('download watch websocket closed abnormally, reconnecting: $e');
+          _reconnect();
+        }, test: ds.ErrorTests.websocketclosed)
         .catchError((cause) {
           setState(() {
             _cause = ds.Error.unknown(cause, onTap: _resetcause);
           });
         });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    current = widget.current;
+    _connect();
   }
 
   @override
