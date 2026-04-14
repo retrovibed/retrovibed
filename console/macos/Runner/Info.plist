@@ -30,6 +30,8 @@
 	<string>NSApplication</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.entertainment</string>
 	<key>FLTEnableImpeller</key>
 	<true/>
 </dict>
