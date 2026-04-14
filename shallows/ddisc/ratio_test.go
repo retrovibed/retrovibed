@@ -3,8 +3,8 @@ package ddisc_test
 import (
 	"testing"
 
-	"github.com/retrovibed/retrovibed/ddisc"
-	"github.com/retrovibed/retrovibed/internal/cryptox"
+	"github.com/retrovibed/retrovibed/shallows/ddisc"
+	"github.com/retrovibed/retrovibed/shallows/internal/cryptox"
 	"github.com/stretchr/testify/require"
 )
 

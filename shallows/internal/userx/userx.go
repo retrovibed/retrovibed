@@ -6,8 +6,8 @@ import (
 	"os/user"
 	"path/filepath"
 
-	"github.com/retrovibed/retrovibed/internal/debugx"
-	"github.com/retrovibed/retrovibed/internal/envx"
+	"github.com/retrovibed/retrovibed/shallows/internal/debugx"
+	"github.com/retrovibed/retrovibed/shallows/internal/envx"
 )
 
 func Locale() string {

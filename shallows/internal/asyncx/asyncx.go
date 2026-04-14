@@ -6,8 +6,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/retrovibed/retrovibed/internal/backoffx"
-	"github.com/retrovibed/retrovibed/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/backoffx"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 )
 
 const (

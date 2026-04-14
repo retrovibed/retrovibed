@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/retrovibed/retrovibed/internal/md5x"
+	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 )
 
 func ConsumedTokenFromJWTClaims(raw string, c jwt.RegisteredClaims) ConsumedToken {

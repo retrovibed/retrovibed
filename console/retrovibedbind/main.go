@@ -10,10 +10,10 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/retrovibed/retrovibed/authn"
-	"github.com/retrovibed/retrovibed/cmd/cmdglobalmain"
-	"github.com/retrovibed/retrovibed/cmd/cmdmeta"
-	"github.com/retrovibed/retrovibed/meta/identityssh"
+	"github.com/retrovibed/retrovibed/shallows/authn"
+	"github.com/retrovibed/retrovibed/shallows/cmd/cmdglobalmain"
+	"github.com/retrovibed/retrovibed/shallows/cmd/cmdmeta"
+	"github.com/retrovibed/retrovibed/shallows/meta/identityssh"
 	"golang.org/x/oauth2"
 )
 

@@ -5,11 +5,11 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/retrovibed/retrovibed/internal/sqltestx"
-	"github.com/retrovibed/retrovibed/internal/sqlx"
-	"github.com/retrovibed/retrovibed/internal/sshx"
-	"github.com/retrovibed/retrovibed/internal/testx"
-	"github.com/retrovibed/retrovibed/meta/identityssh"
+	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
+	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
+	"github.com/retrovibed/retrovibed/shallows/internal/sshx"
+	"github.com/retrovibed/retrovibed/shallows/internal/testx"
+	"github.com/retrovibed/retrovibed/shallows/meta/identityssh"
 	"github.com/stretchr/testify/require"
 )
 

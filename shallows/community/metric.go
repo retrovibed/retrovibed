@@ -3,8 +3,8 @@ package community
 import (
 	"time"
 
-	"github.com/retrovibed/retrovibed/internal/langx"
-	"github.com/retrovibed/retrovibed/internal/timex"
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
+	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 )
 
 // MetricPeriodOption allows configuring the metric query period.

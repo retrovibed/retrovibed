@@ -7,7 +7,7 @@
 package media
 
 import (
-	meta "github.com/retrovibed/retrovibed/meta"
+	meta "github.com/retrovibed/retrovibed/shallows/meta"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"

@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/retrovibed/retrovibed/cmd/cmdglobalmain"
+	"github.com/retrovibed/retrovibed/shallows/cmd/cmdglobalmain"
 )
 
 func main() {

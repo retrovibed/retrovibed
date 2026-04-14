@@ -1,4 +1,4 @@
-module github.com/retrovibed/retrovibed
+module github.com/retrovibed/retrovibed/shallows
 
 go 1.25.0
 
@@ -128,6 +128,7 @@ require (
 	github.com/mattn/go-localereader v0.0.1 // indirect
 	github.com/mattn/go-runewidth v0.0.16 // indirect
 	github.com/mfridman/interpolate v0.0.2 // indirect
+	github.com/michiwend/golang-pretty v0.0.0-20141116172505-8ac61812ea3f // indirect
 	github.com/miekg/dns v1.1.68 // indirect
 	github.com/mitchellh/hashstructure/v2 v2.0.2 // indirect
 	github.com/mschoch/smat v0.2.0 // indirect

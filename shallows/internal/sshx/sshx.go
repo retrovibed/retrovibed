@@ -16,10 +16,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/retrovibed/retrovibed/internal/cryptox"
-	"github.com/retrovibed/retrovibed/internal/errorsx"
-	"github.com/retrovibed/retrovibed/internal/fsx"
-	"github.com/retrovibed/retrovibed/internal/md5x"
+	"github.com/retrovibed/retrovibed/shallows/internal/cryptox"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"golang.org/x/crypto/ssh"
 )
 

@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/james-lawrence/torrent/torrenttest"
-	"github.com/retrovibed/retrovibed/blockcache"
-	"github.com/retrovibed/retrovibed/internal/bytesx"
+	"github.com/retrovibed/retrovibed/shallows/blockcache"
+	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

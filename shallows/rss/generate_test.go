@@ -5,11 +5,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/retrovibed/retrovibed/internal/iterx"
-	"github.com/retrovibed/retrovibed/internal/mimex"
-	"github.com/retrovibed/retrovibed/internal/testx"
-	"github.com/retrovibed/retrovibed/internal/timex"
-	"github.com/retrovibed/retrovibed/rss"
+	"github.com/retrovibed/retrovibed/shallows/internal/iterx"
+	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
+	"github.com/retrovibed/retrovibed/shallows/internal/testx"
+	"github.com/retrovibed/retrovibed/shallows/internal/timex"
+	"github.com/retrovibed/retrovibed/shallows/rss"
 	"github.com/stretchr/testify/require"
 )
 

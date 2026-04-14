@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/retrovibed/retrovibed/internal/sqlx"
-	"github.com/retrovibed/retrovibed/internal/squirrelx"
+	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
+	"github.com/retrovibed/retrovibed/shallows/internal/squirrelx"
 )
 
 func CommunityMetricAggregateSearch(ctx context.Context, q sqlx.Queryer, communityID string, periodStart, periodEnd time.Time) (summary CommunityMetric, err error) {

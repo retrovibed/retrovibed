@@ -5,8 +5,8 @@ import (
 	"log"
 
 	"github.com/fsnotify/fsnotify"
-	"github.com/retrovibed/retrovibed/internal/errorsx"
-	"github.com/retrovibed/retrovibed/internal/fsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 )
 
 func FileCreated(evt fsnotify.Event) bool {

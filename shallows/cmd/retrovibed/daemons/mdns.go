@@ -8,9 +8,9 @@ import (
 	"os"
 
 	"github.com/hashicorp/mdns"
-	"github.com/retrovibed/retrovibed/cmd/cmdopts"
-	"github.com/retrovibed/retrovibed/internal/errorsx"
-	"github.com/retrovibed/retrovibed/internal/netx"
+	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/netx"
 )
 
 func MulticastService(ctx context.Context, addr net.Listener) error {

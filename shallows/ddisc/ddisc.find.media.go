@@ -4,8 +4,8 @@ import (
 	"context"
 	"iter"
 
-	"github.com/retrovibed/retrovibed/internal/iterx"
-	"github.com/retrovibed/retrovibed/internal/sqlx"
+	"github.com/retrovibed/retrovibed/shallows/internal/iterx"
+	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 )
 
 // search for known media

@@ -7,11 +7,11 @@ import (
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/krpc"
-	"github.com/retrovibed/retrovibed/ddisc/ddisctorrent"
-	"github.com/retrovibed/retrovibed/internal/langx"
-	"github.com/retrovibed/retrovibed/internal/netx"
-	"github.com/retrovibed/retrovibed/internal/sqltestx"
-	"github.com/retrovibed/retrovibed/internal/torrenttestx"
+	"github.com/retrovibed/retrovibed/shallows/ddisc/ddisctorrent"
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
+	"github.com/retrovibed/retrovibed/shallows/internal/netx"
+	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
+	"github.com/retrovibed/retrovibed/shallows/internal/torrenttestx"
 	"github.com/stretchr/testify/require"
 )
 

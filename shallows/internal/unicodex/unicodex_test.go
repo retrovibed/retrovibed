@@ -4,7 +4,7 @@ import (
 	"testing"
 	"unicode"
 
-	"github.com/retrovibed/retrovibed/internal/unicodex"
+	"github.com/retrovibed/retrovibed/shallows/internal/unicodex"
 	"github.com/stretchr/testify/assert"
 )
 

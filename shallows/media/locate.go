@@ -1,8 +1,8 @@
 package media
 
 import (
-	"github.com/retrovibed/retrovibed/internal/grpcx"
-	"github.com/retrovibed/retrovibed/library"
+	"github.com/retrovibed/retrovibed/shallows/internal/grpcx"
+	"github.com/retrovibed/retrovibed/shallows/library"
 )
 
 type LocateOption func(*Locate)

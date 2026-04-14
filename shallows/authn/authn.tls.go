@@ -7,8 +7,8 @@ import (
 	"log"
 	"sync"
 
-	"github.com/retrovibed/retrovibed/internal/env"
-	"github.com/retrovibed/retrovibed/internal/tlsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/env"
+	"github.com/retrovibed/retrovibed/shallows/internal/tlsx"
 )
 
 var initpool = sync.OnceValue(func() tlsx.Pool {

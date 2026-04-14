@@ -1,10 +1,10 @@
 package metaapi
 
 import (
-	"github.com/retrovibed/retrovibed/internal/grpcx"
-	"github.com/retrovibed/retrovibed/internal/langx"
-	"github.com/retrovibed/retrovibed/internal/timex"
-	"github.com/retrovibed/retrovibed/meta"
+	"github.com/retrovibed/retrovibed/shallows/internal/grpcx"
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
+	"github.com/retrovibed/retrovibed/shallows/internal/timex"
+	"github.com/retrovibed/retrovibed/shallows/meta"
 )
 
 func NewDaemonFromMetaDaemon(mp meta.Daemon) (_ *Daemon, err error) {

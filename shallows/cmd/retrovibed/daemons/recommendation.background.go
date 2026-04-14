@@ -6,12 +6,12 @@ import (
 	"log"
 	"time"
 
-	"github.com/retrovibed/retrovibed/internal/asyncx"
-	"github.com/retrovibed/retrovibed/internal/backoffx"
-	"github.com/retrovibed/retrovibed/internal/contextx"
-	"github.com/retrovibed/retrovibed/internal/errorsx"
-	"github.com/retrovibed/retrovibed/internal/sqlx"
-	"github.com/retrovibed/retrovibed/library"
+	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
+	"github.com/retrovibed/retrovibed/shallows/internal/backoffx"
+	"github.com/retrovibed/retrovibed/shallows/internal/contextx"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
+	"github.com/retrovibed/retrovibed/shallows/library"
 )
 
 func RecommendationsBackgroundRun(ctx context.Context, q sqlx.Queryer) error {

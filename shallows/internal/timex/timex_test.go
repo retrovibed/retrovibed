@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/retrovibed/retrovibed/internal/timex"
+	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/stretchr/testify/require"
 )
 

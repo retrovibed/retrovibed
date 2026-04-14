@@ -5,7 +5,7 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/retrovibed/retrovibed/internal/asyncx"
+	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/stretchr/testify/require"
 )
 

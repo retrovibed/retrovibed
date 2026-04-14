@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/retrovibed/retrovibed/blockcache"
-	"github.com/retrovibed/retrovibed/internal/fsx"
+	"github.com/retrovibed/retrovibed/shallows/blockcache"
+	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 )
 
 func calculateBlockRange(blocklength uint64, offset uint64, length uint64) (doffset, dlength uint64) {

@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/retrovibed/retrovibed/internal/sqltestx"
+	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/stretchr/testify/require"
 )
 

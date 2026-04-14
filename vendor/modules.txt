@@ -732,6 +732,8 @@ github.com/mattn/go-runewidth
 # github.com/mfridman/interpolate v0.0.2
 ## explicit; go 1.19
 github.com/mfridman/interpolate
+# github.com/michiwend/golang-pretty v0.0.0-20141116172505-8ac61812ea3f
+## explicit
 # github.com/michiwend/gomusicbrainz v0.0.0-20181012083520-6c07e13dd396
 ## explicit
 github.com/michiwend/gomusicbrainz

@@ -9,10 +9,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/retrovibed/retrovibed/authn"
-	"github.com/retrovibed/retrovibed/deeppool"
-	"github.com/retrovibed/retrovibed/internal/backoffx"
-	"github.com/retrovibed/retrovibed/internal/httpx"
+	"github.com/retrovibed/retrovibed/shallows/authn"
+	"github.com/retrovibed/retrovibed/shallows/deeppool"
+	"github.com/retrovibed/retrovibed/shallows/internal/backoffx"
+	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 )
 
 func Register(ctx context.Context) (*Session, error) {

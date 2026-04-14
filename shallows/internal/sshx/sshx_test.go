@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/retrovibed/retrovibed/internal/sshx"
+	"github.com/retrovibed/retrovibed/shallows/internal/sshx"
 	"github.com/stretchr/testify/require"
 )
 

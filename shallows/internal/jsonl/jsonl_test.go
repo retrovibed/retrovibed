@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/retrovibed/retrovibed/internal/jsonl"
+	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
 	"github.com/stretchr/testify/require"
 )
 

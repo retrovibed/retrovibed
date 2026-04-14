@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/mattn/go-isatty"
-	"github.com/retrovibed/retrovibed/internal/envx"
+	"github.com/retrovibed/retrovibed/shallows/internal/envx"
 )
 
 // Logging enable logging if stdout terminal is a tty.

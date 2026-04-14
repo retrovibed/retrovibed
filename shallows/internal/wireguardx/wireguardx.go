@@ -11,9 +11,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/retrovibed/retrovibed/internal/errorsx"
-	"github.com/retrovibed/retrovibed/internal/langx"
-	"github.com/retrovibed/retrovibed/internal/userx"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
+	"github.com/retrovibed/retrovibed/shallows/internal/userx"
 	"golang.org/x/text/encoding/unicode"
 	"golang.zx2c4.com/wireguard/tun/netstack"
 )

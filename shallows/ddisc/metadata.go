@@ -5,11 +5,11 @@ import (
 	"time"
 
 	"github.com/gabriel-vasile/mimetype"
-	"github.com/retrovibed/retrovibed/internal/errorsx"
-	"github.com/retrovibed/retrovibed/internal/iox"
-	"github.com/retrovibed/retrovibed/internal/langx"
-	"github.com/retrovibed/retrovibed/internal/slicesx"
-	"github.com/retrovibed/retrovibed/internal/stringsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/iox"
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
+	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
+	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 )
 
 type Metadata struct {

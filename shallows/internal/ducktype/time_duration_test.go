@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/retrovibed/retrovibed/internal/ducktype"
+	"github.com/retrovibed/retrovibed/shallows/internal/ducktype"
 	"github.com/stretchr/testify/require"
 )
 

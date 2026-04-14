@@ -1,8 +1,8 @@
 package rss
 
 import (
-	"github.com/retrovibed/retrovibed/internal/grpcx"
-	"github.com/retrovibed/retrovibed/tracking"
+	"github.com/retrovibed/retrovibed/shallows/internal/grpcx"
+	"github.com/retrovibed/retrovibed/shallows/tracking"
 )
 
 type FeedOption func(*Feed)

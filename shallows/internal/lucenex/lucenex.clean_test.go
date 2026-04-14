@@ -3,7 +3,7 @@ package lucenex_test
 import (
 	"testing"
 
-	"github.com/retrovibed/retrovibed/internal/lucenex"
+	"github.com/retrovibed/retrovibed/shallows/internal/lucenex"
 	"github.com/stretchr/testify/assert"
 )
 

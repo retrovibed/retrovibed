@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/retrovibed/retrovibed/internal/httpx"
-	"github.com/retrovibed/retrovibed/internal/tlsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
+	"github.com/retrovibed/retrovibed/shallows/internal/tlsx"
 )
 
 type TLSConfig struct {

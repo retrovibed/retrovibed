@@ -7,7 +7,7 @@ import (
 	"context"
 
 	genieql "github.com/james-lawrence/genieql/ginterp"
-	"github.com/retrovibed/retrovibed/internal/sqlx"
+	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 )
 
 func Profile(gql genieql.Structure) {

@@ -3,7 +3,7 @@ package ddisc
 import (
 	"io"
 
-	"github.com/retrovibed/retrovibed/internal/rendezvous"
+	"github.com/retrovibed/retrovibed/shallows/internal/rendezvous"
 )
 
 type Filter func(k []byte) bool
