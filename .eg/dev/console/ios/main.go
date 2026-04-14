@@ -94,18 +94,22 @@ func main() {
 					Debug(runtime),
 				),
 			),
+			console.RetagSimulator(
+				egenv.WorkingDirectory("console", "build", "nativelib", "ios-sim-x86_64", "libretrovibed.a"),
+				egenv.WorkingDirectory("console", "ios", "libretrovibed.a"),
+			),
 			shell.Op(
-				flutter.New("mkdir -p build/vtool_fix && cd build/vtool_fix && ar x ../nativelib/ios-sim-x86_64/libretrovibed.a && for o in *.o; do xcrun vtool -set-build-version 7 16.0 16.0 -replace -output \"$o\" \"$o\" 2>/dev/null || xcrun vtool -set-build-version 7 16.0 16.0 -output \"$o\" \"$o\" 2>/dev/null || true; done && ar rcs ../../ios/libretrovibed.a *.o && cd ../.. && rm -rf build/vtool_fix"),
 				flutter.New("cp build/nativelib/ios-sim-x86_64/libretrovibed.h ios/Classes/libretrovibed.h"),
 				flutter.Newf("libtool -static -o ios/libduckdb_static.a $(find %s -name '*.a' ! -path '*/test/*')", duckdbbuild),
 				flutter.New("flutter create --org space.retrovibe --platforms=ios ."),
 				flutter.New("flutter pub get"),
 				flutter.New("cd ios && pod install"),
 				runtime.New("open -a Simulator"),
-				runtime.New("xcrun simctl boot 'iPhone 16'").Lenient(true),
+				runtime.New("xcrun simctl list devices 'iOS 26.4' | grep -q 'Retrovibed Review' || xcrun simctl create 'Retrovibed Review' com.apple.CoreSimulator.SimDeviceType.iPad-Air-5th-generation com.apple.CoreSimulator.SimRuntime.iOS-26-4"),
+				runtime.New("xcrun simctl boot 'Retrovibed Review'").Lenient(true),
 				runtime.New("xcrun simctl list devices booted").Attempts(15),
 			),
-			console.RunDev("flutter run -d iPhone"),
+			console.RunDev("flutter run -d 'Retrovibed Review'"),
 		),
 	)
 

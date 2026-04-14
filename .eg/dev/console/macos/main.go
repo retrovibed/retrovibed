@@ -62,6 +62,7 @@ func main() {
 				),
 			),
 			shell.Op(
+				flutter.New("flutter create --org space.retrovibe --platforms=macos ."),
 				flutter.New("flutter pub get"),
 				flutter.New("flutter build macos --debug"),
 				flutter.New("cp build/nativelib/retrovibed.dylib build/macos/Build/Products/Debug/retrovibed.app/Contents/MacOS/retrovibed.dylib"),
