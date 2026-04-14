@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:retrovibed/downloads/display.dart';
@@ -10,7 +11,7 @@ Future<Stream<media.Download>> _mockWatch(
   String id, {
   List<httpx.Option> options = const [], // ignore: avoid_unused_parameters
 }) async {
-  return const Stream.empty();
+  return StreamController<media.Download>().stream;
 }
 
 Future<media.DownloadSearchResponse> _mockSearchWithItems(
