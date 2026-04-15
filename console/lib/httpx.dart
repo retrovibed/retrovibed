@@ -459,9 +459,10 @@ abstract class RetryChecks {
     return null;
   }
 
-  /// Retry on network issues (SocketException, ClientException, etc).
+  /// Retry on network issues (SocketException, ClientException, HandshakeException, etc).
   static Duration? networkissue(Object error, Duration backoff) {
     if (error is SocketException || error is HttpException) return backoff;
+    if (error is HandshakeException) return backoff;
     if (error is http.ClientException) return backoff;
     return null;
   }
