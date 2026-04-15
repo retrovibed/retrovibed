@@ -15,10 +15,7 @@ class InviteCard extends StatelessWidget {
     return ds.Card(
       alignment: Alignment.center,
       margin: margin ?? defaults.margin,
-      help: ds.Hint(
-        label: const Text("Invite"),
-        description: const Text("copies an invite link to your clipboard"),
-      ),
+      help: ds.Hint(const Text("copies an invite link to your clipboard")),
       Column(
         mainAxisAlignment: MainAxisAlignment.center,
         spacing: defaults.spacing,

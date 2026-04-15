@@ -121,8 +121,11 @@ class _SearchTrayState extends State<SearchTray> {
     final trailing = [
       ...widget.trailing,
       CompactingMenu.pinned(
-        buttons.search(
-          onPressed: () => widget.onSubmitted((widget.controller ?? _defaultController).text),
+        Help(
+          buttons.search(
+            onPressed: () => widget.onSubmitted((widget.controller ?? _defaultController).text),
+          ),
+          Hint(Text("refresh the search results")),
         ),
       ),
       if (widget.tuning != SearchTray.zerobox)
@@ -133,30 +136,28 @@ class _SearchTrayState extends State<SearchTray> {
         ),
     ];
 
-    return Help(
-      Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          lucene.Queryer(
-            (v) => widget.onSubmitted(v),
-            widget.filters,
-            decoration: decoration,
-            autofocus: widget.autofocus,
-            disabled: widget.disabled,
-            controller: widget.controller ?? _defaultController,
-            focusNode: widget.focus ?? _focusNode,
-            leading: widget.leading,
-            trailing: trailing,
-          ),
-          ValueListenableBuilder<Widget>(
-            valueListenable: _tuningwidget,
-            builder: (BuildContext context, Widget v, Widget? child) {
-              return v;
-            },
-          ),
-        ],
-      ),
-      widget.help,
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        lucene.Queryer(
+          (v) => widget.onSubmitted(v),
+          widget.filters,
+          decoration: decoration,
+          autofocus: widget.autofocus,
+          disabled: widget.disabled,
+          controller: widget.controller ?? _defaultController,
+          focusNode: widget.focus ?? _focusNode,
+          leading: widget.leading,
+          trailing: trailing,
+          help: widget.help,
+        ),
+        ValueListenableBuilder<Widget>(
+          valueListenable: _tuningwidget,
+          builder: (BuildContext context, Widget v, Widget? child) {
+            return v;
+          },
+        ),
+      ],
     );
   }
 }

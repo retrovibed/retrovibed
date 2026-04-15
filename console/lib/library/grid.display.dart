@@ -202,21 +202,11 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                           ds.FileDropWell.icon(
                             upload,
                             mimetypes: widget.search.value.next.mimetypes,
-                            help: ds.Hint(
-                              label: const Text("Upload"),
-                              description: const Text(
-                                "drag and drop files onto the grid to add media to your library",
-                              ),
-                            ),
+                            help: ds.Hint(const Text("drag and drop files onto the grid to add media to your library")),
                           ),
                         ],
                         tuning: defaults.debug ? GridSettings() : ds.SearchTray.zerobox,
-                        help: ds.Hint(
-                          label: const Text("Search"),
-                          description: const Text(
-                            "filter your library by title",
-                          ),
-                        ),
+                        help: ds.Hint(const Text("search your library, use @ to access advanced filtering")),
                       ),
                       (widget.search.value.next.query.isEmpty)
                           ? disc.Home(
@@ -296,6 +286,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                               },
                             ),
                     (context, _media) {
+                      final hint = ds.Hint(const Text("play a media item and auto-generate a playlist from results"));
                       var onSettings = () {
                         ds.modals
                             .of(context)
@@ -329,6 +320,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                           onChange: replace,
                           highlighted: _media.id == widget.highlighted,
                           key: ValueKey(_media.id),
+                          help: hint,
                         );
                       }
 
@@ -350,14 +342,9 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                         media: _media,
                         highlighted: _media.id == widget.highlighted,
                         key: ValueKey(_media.id),
+                        help: hint,
                       );
                     },
-                    help: ds.Hint(
-                      label: const Text("Double-click"),
-                      description: const Text(
-                        "play a media item and auto-generate a playlist from results",
-                      ),
-                    ),
                   ),
                 ],
               ),

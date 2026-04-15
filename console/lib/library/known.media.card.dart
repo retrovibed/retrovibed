@@ -13,6 +13,7 @@ class KnownMediaCard extends StatelessWidget {
   final Widget? trailing;
   final IconData? icon;
   final bool highlighted;
+  final Widget help;
 
   static Widget future(
     Future<api.Known> future, {
@@ -24,6 +25,7 @@ class KnownMediaCard extends StatelessWidget {
     Widget? trailing,
     bool highlighted = false,
     IconData? icon = Icons.play_circle_filled,
+    Widget help = ds.HelpScope.None,
   }) {
     return FutureBuilder<api.Known>(
       future: future,
@@ -38,6 +40,7 @@ class KnownMediaCard extends StatelessWidget {
           trailing: trailing,
           highlighted: highlighted,
           icon: icon,
+          help: help,
         );
       },
     );
@@ -54,6 +57,7 @@ class KnownMediaCard extends StatelessWidget {
     this.trailing,
     this.highlighted = false,
     this.icon = Icons.play_circle_filled,
+    this.help = ds.HelpScope.None,
   });
 
   Map<String, String>? _imageheaders(String original) {
@@ -114,6 +118,7 @@ class KnownMediaCard extends StatelessWidget {
         onDoubleTap: onDoubleTap,
         onSecondaryTap: onSecondaryTap,
         onLongPress: onLongPress,
+        help: help,
         leading: [
           Center(
             child: Text(

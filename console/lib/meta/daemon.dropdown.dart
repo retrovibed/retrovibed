@@ -107,12 +107,7 @@ class _DaemonDropdownState extends State<DaemonDropdown> {
         ],
       ),
       widget.help ??
-          ds.Hint(
-            label: const Text("Daemon"),
-            description: const Text(
-              "select which daemon instance to configure from the dropdown",
-            ),
-          ),
+          ds.Hint(const Text("select which daemon instance to configure from the dropdown")),
     );
   }
 }

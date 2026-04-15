@@ -35,16 +35,20 @@ TextScaler autoscaling(BuildContext context) {
 }
 
 void main() async {
+  print("cp 0");
   WidgetsFlutterBinding.ensureInitialized();
+  print("cp 1");
   HttpOverrides.global = meta.DaemonHttpOverrides();
+  print("cp 2");
   retro.logging();
+  print("cp 3");
+  await env.xdg();
+  print("cp 4");
   // checkpointing the database on initialization prevents
   // a significant number of issues due to hard shutdowns and state corruption
   // issues.
   retro.checkpointdb();
-
-  await env.xdg();
-
+  print("cp 5");
   if (theming.Defaults.defaults.desktop) {
     await windowManager.ensureInitialized();
     await Future.wait([
@@ -52,8 +56,9 @@ void main() async {
       windowManager.maximize(),
     ]);
   }
-
+  print("cp 6");
   MediaKit.ensureInitialized();
+  print("cp 7");
   runApp(Retrovibed());
 }
 
@@ -186,22 +191,24 @@ class Retrovibed extends StatelessWidget {
                                       TabBarView(
                                         children: [
                                           modals.Node(
-                                            media.Playlist.wrap((ctx, s) {
-                                              return media.VideoScreen(
-                                                medialib.AvailableGridDisplay(
-                                                  focus: defaults.mobile ? null : s.searchfocus,
-                                                  controller: s.controller,
-                                                  highlighted: s.current.id,
-                                                  search: s.search,
-                                                ),
-                                                s.player,
-                                                s.playerfocus,
-                                              );
-                                            }),
+                                            media.AutoHelp(
+                                              media.Playlist.wrap((ctx, s) {
+                                                return media.VideoScreen(
+                                                  medialib.AvailableGridDisplay(
+                                                    focus: defaults.mobile ? null : s.searchfocus,
+                                                    controller: s.controller,
+                                                    highlighted: s.current.id,
+                                                    search: s.search,
+                                                  ),
+                                                  s.player,
+                                                  s.playerfocus,
+                                                );
+                                              }),
+                                            ),
                                           ),
-                                          modals.Node(downloads.Display()),
-                                          modals.Node(community.Management()),
-                                          modals.Node(settings.Display()),
+                                          modals.Node(downloads.AutoHelp(const downloads.Display())),
+                                          modals.Node(community.AutoHelp(community.Management())),
+                                          modals.Node(settings.AutoHelp(const settings.Display())),
                                         ],
                                       ),
                                     ),

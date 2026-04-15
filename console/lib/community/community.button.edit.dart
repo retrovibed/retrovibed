@@ -15,10 +15,7 @@ class EditButton extends StatelessWidget {
       },
       icon: Icon(Icons.edit),
       tooltip: 'Edit Community',
-      help: ds.Hint(
-        label: const Text("Edit"),
-        description: const Text("edit community description and publish mode"),
-      ),
+      help: ds.Hint(const Text("edit community description and publish mode")),
     );
   }
 }

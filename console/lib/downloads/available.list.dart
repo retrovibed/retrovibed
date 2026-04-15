@@ -152,7 +152,12 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
         current: _res.next.offset,
         empty: ds.Table.offset(_res.items.length) < _res.next.limit,
         leading: [
-          ds.FileDropWell.icon(upload, mimetypes: [mimex.bittorrent], tooltip: "upload"),
+          ds.FileDropWell.icon(
+            upload,
+            mimetypes: [mimex.bittorrent],
+            tooltip: "upload",
+            help: ds.Hint(Text("upload torrent files to download")),
+          ),
           ds.buttons.link(
             onPressed: () {
               ds.modals.push(
@@ -173,6 +178,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                 ),
               );
             },
+            help: ds.Hint(Text("upload magnet urls to download")),
           ),
         ],
         tuning: GridSettings(
@@ -183,6 +189,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
             });
           },
         ),
+        help: ds.Hint(const Text("search discovered content, use @ to access advanced filtering")),
       ),
       ds.Table.expanded<media.Download>(
         (v) {

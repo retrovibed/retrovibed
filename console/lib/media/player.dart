@@ -131,12 +131,7 @@ class _VideoState extends State<VideoScreen> {
                 icon: Icon(Icons.tune),
               ),
             ),
-            ds.Hint(
-              label: const Text("Tune icon"),
-              description: const Text(
-                "open settings to select audio, video, or subtitle tracks",
-              ),
-            ),
+            ds.Hint(const Text("open settings to select audio, video, or subtitle tracks")),
           ),
           SizedBox.square(dimension: defaults.spacing),
           ds.build(
@@ -165,12 +160,7 @@ class _VideoState extends State<VideoScreen> {
                 mimetypes: mimetypes,
                 icon: Icons.video_collection_rounded,
                 tooltip: "play a local media file",
-                help: ds.Hint(
-                  label: const Text("video collection icon"),
-                  description: const Text(
-                    "play a local media file",
-                  ),
-                ),
+                help: ds.Hint(const Text("play a local media file")),
               );
             },
           ),

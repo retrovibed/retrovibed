@@ -11,6 +11,27 @@ import 'package:retrovibed/google.dart' as google;
 import 'package:retrovibed/usermanagement.dart' as usermanagement;
 import 'package:retrovibed/debug.dart' as debug;
 
+class AutoHelp extends StatelessWidget {
+  final Widget child;
+  const AutoHelp(this.child, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return ds.HelpAuto(
+      child,
+      cacheid: 'settings',
+      title: Text("Settings", style: theme.textTheme.titleMedium),
+      content: const Text(
+        "Configure your account, billing, storage, and integrations. "
+        "Manage connected services, RSS feeds, VPN settings, and "
+        "user access from this panel.\n\n"
+        "Press Alt+? at any time to activate/deactivate help overlay",
+      ),
+    );
+  }
+}
+
 class Display extends StatefulWidget {
   const Display({super.key});
 

@@ -24,7 +24,7 @@ class Card extends StatelessWidget {
       alignment: Alignment.center,
       margin: margin ?? defaults.margin,
       onTap: tap,
-      help: ds.Hint(label: const Text("WireGuard"), description: const Text("set up VPN connections")),
+      help: ds.Hint(const Text("set up VPN connections")),
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: defaults.spacing / 2,

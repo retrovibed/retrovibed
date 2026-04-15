@@ -42,6 +42,7 @@ func main() {
 			ctx,
 			deb,
 			eg.Sequential(
+				duckdb.Download,
 				duckdb.MaybeBuild("console/android/app/src/main/jniLibs/x86_64/libduckdb_static.a", duckdb.CompileAndroid("android_x86_64", "x86_64"), duckdb.CloneAndroid),
 				eg.Sequential(
 					console.Generate,

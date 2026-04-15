@@ -14,10 +14,7 @@ class ShareButton extends StatelessWidget {
       onPressed: () => Clipboard.setData(ClipboardData(text: community.url)),
       icon: Icon(Icons.share),
       tooltip: 'Share',
-      help: ds.Hint(
-        label: const Text("Share"),
-        description: const Text("copies the community link to your clipboard"),
-      ),
+      help: ds.Hint(const Text("copies the community link to your clipboard")),
     );
   }
 }

@@ -22,7 +22,6 @@ export 'design.kit/guage.dart';
 export 'design.kit/grid.dart';
 export 'design.kit/heading.dart';
 export 'design.kit/help.dart';
-export 'design.kit/help.hint.dart';
 export 'design.kit/hyperlink.dart';
 export 'design.kit/image.dart';
 export 'design.kit/key.press.aware.dart';

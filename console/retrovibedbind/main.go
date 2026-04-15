@@ -190,7 +190,8 @@ func checkpointdb() {
 	defer done()
 	db, err := cmdmeta.Database(ctx)
 	if err != nil {
-		log.Fatalln(err)
+		log.Println("failed to connect to database", err)
+		return
 	}
 	defer db.Close()
 }

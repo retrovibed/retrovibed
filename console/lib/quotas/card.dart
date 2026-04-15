@@ -51,10 +51,7 @@ class _CardState extends State<Card> {
     return ds.Card(
       alignment: Alignment.center,
       margin: widget.margin,
-      help: ds.Hint(
-        label: const Text("Quotas"),
-        description: const Text("check storage usage and limits"),
-      ),
+      help: ds.Hint(const Text("check storage usage and limits")),
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

@@ -25,7 +25,7 @@ class _ShortcutsState extends State<Shortcuts> {
   void _syncHelp() {
     final scope = HelpScope.of(context);
     for (final w in _registered) {
-      _helpScope?.unregister(w);
+      _helpScope?.unregisterGlobal(w);
     }
     _helpScope = scope;
     _registered =
@@ -45,10 +45,10 @@ class _ShortcutsState extends State<Shortcuts> {
             labelText = modifiers.join('+');
           }
 
-          return Hint(label: Text(labelText), description: e.value.$1);
+          return HelpShortcut(label: Text(labelText), description: e.value.$1);
         }).toList();
     for (final w in _registered) {
-      scope?.register(w);
+      scope?.registerGlobal(w);
     }
   }
 
@@ -69,7 +69,7 @@ class _ShortcutsState extends State<Shortcuts> {
   @override
   void dispose() {
     for (final w in _registered) {
-      _helpScope?.unregister(w);
+      _helpScope?.unregisterGlobal(w);
     }
     super.dispose();
   }

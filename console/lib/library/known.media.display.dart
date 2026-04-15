@@ -17,6 +17,7 @@ class KnownMediaDisplay extends StatefulWidget {
   final void Function(_media.Media upd)? onChange;
   final Widget? trailing;
   final bool highlighted;
+  final Widget help;
 
   const KnownMediaDisplay(
     this.pending, {
@@ -27,6 +28,7 @@ class KnownMediaDisplay extends StatefulWidget {
     this.onChange,
     this.trailing,
     this.highlighted = false,
+    this.help = ds.HelpScope.None,
     required this.media,
   });
 
@@ -39,6 +41,7 @@ class KnownMediaDisplay extends StatefulWidget {
     void Function(_media.Media upd)? onChange,
     Widget? trailing,
     bool highlighted = false,
+    Widget help = ds.HelpScope.None,
   }) {
     return KnownMediaDisplay(
       api.known.autodetect(m),
@@ -50,6 +53,7 @@ class KnownMediaDisplay extends StatefulWidget {
       onChange: onChange,
       trailing: trailing,
       highlighted: highlighted,
+      help: help,
     );
   }
 
@@ -137,6 +141,7 @@ class _KnownMediaDisplayState extends State<KnownMediaDisplay> {
       current,
       highlighted: widget.highlighted,
       hovered: hovered,
+      help: widget.help,
       onTap: widget.onTap,
       onDoubleTap: widget.onDoubleTap,
       onLongPress: () {

@@ -41,9 +41,11 @@ class _CompactingMenuState extends State<CompactingMenu> {
     return Builder(
       builder: (context) {
         final compact = defaults.isCompact;
+        final spacing = 1.0;
 
         if (!compact) {
           return Row(
+            spacing: spacing,
             children: [...widget.leading, Expanded(child: widget.child), ...widget.trailing],
           );
         }
@@ -56,6 +58,7 @@ class _CompactingMenuState extends State<CompactingMenu> {
 
         if (menuItems.isEmpty) {
           return Row(
+            spacing: spacing,
             children: [...widget.leading, Expanded(child: widget.child), ...widget.trailing],
           );
         }
@@ -66,7 +69,7 @@ class _CompactingMenuState extends State<CompactingMenu> {
           crossAxisAlignment: widget.crossAxisAlignment,
           children: [
             Row(
-              spacing: defaults.spacing,
+              spacing: spacing,
               children: [
                 ...pinnedLeading,
                 Expanded(child: widget.child),
@@ -86,7 +89,7 @@ class _CompactingMenuState extends State<CompactingMenu> {
             if (_open && menuItems.isNotEmpty)
               Row(
                 mainAxisSize: MainAxisSize.max,
-                spacing: defaults.spacing,
+                spacing: spacing,
                 children: [
                   for (final w in menuItems) Expanded(child: w),
                 ],

@@ -13,16 +13,11 @@ import (
 	"github.com/egdaemon/eg/runtime/x/wasi/egfs"
 )
 
-// GEN=ninja OVERRIDE_GIT_DESCRIBE="v${PACKAGE_VERSION}" GIT_COMMIT_HASH="${GIT_COMMIT_HASH}" ENABLE_EXTENSION_AUTOLOADING=1 ENABLE_EXTENSION_AUTOINSTALL=1 CORE_EXTENSIONS='autocomplete;json;parquet;icu' DUCKDB_BUILD=Static make -C src
-// DESTDIR="linux" cmake --install src/build/release --prefix="/usr"
-
 // download the version of duckdb we're using
 func Download(ctx context.Context, op eg.Op) error {
 	sruntime := shell.Runtime().Directory(egenv.CacheDirectory())
 	return shell.Run(
 		ctx,
-		sruntime.New("echo ----------------------------"),
-		sruntime.New("pwd"),
 		sruntime.Newf("test -d duckdb || git clone -b v%s --depth 1 https://github.com/duckdb/duckdb.git duckdb", version),
 		sruntime.New("md5sum duckdb/src/include/duckdb.h"),
 		sruntime.New("echo \"2a20d340931922b25919dd8a870365a9  duckdb/src/include/duckdb.h\" > duckdb.md5"),

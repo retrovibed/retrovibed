@@ -22,10 +22,7 @@ class ReferralCard extends StatelessWidget {
     return ds.Card(
       alignment: Alignment.center,
       margin: margin ?? defaults.margin,
-      help: ds.Hint(
-        label: const Text("Referrals"),
-        description: const Text("view your referral earnings"),
-      ),
+      help: ds.Hint(const Text("view your referral earnings")),
       onTap: tap,
       Column(
         spacing: defaults.spacing,

@@ -164,12 +164,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
           ds.FileDropWell.icon(
             upload,
             mimetypes: _res.next.mimetypes,
-            help: ds.Hint(
-              label: const Text("Upload"),
-              description: const Text(
-                "drag and drop files onto the grid to add media to your library",
-              ),
-            ),
+            help: ds.Hint(const Text("drag and drop files onto the grid to add media to your library")),
           ),
         ],
       ),
