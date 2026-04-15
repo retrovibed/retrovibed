@@ -116,13 +116,14 @@ func main() {
 				shell.Newf("xcrun stapler staple %s", dmgpath),
 			),
 			shell.Op(
-				shell.Newf("rm -rf %s && cp -R %s %s && chmod -R a+rX %s", appstoreapp, tarballapp, appstoreapp, appstoreapp),
+				shell.Newf("rm -rf %s && cp -R %s %s", appstoreapp, tarballapp, appstoreapp),
 			),
 			release.EmbedProvisioningProfile(
 				egenv.String("", "APPLE_MACOS_APPSTORE_PROFILE"),
 				filepath.Join(appstoreapp, "Contents", "embedded.provisionprofile"),
 			),
 			shell.Op(
+				shell.Newf("chmod -R a+rX %s", appstoreapp),
 				shell.Newf("security unlock-keychain -p %s %s", egenv.RunID(), keychainPath),
 				shell.Newf("codesign --deep --force --options runtime --sign \"Apple Distribution\" --keychain %s %s", keychainPath, appstoreapp),
 				shell.Newf("codesign --force --options runtime --sign \"Apple Distribution\" --entitlements %s --keychain %s %s/Contents/Helpers/retrovibed", entitlements, keychainPath, appstoreapp),
