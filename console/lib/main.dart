@@ -42,12 +42,12 @@ void main() async {
   print("cp 2");
   retro.logging();
   print("cp 3");
+  await env.xdg();
+  print("cp 4");
   // checkpointing the database on initialization prevents
   // a significant number of issues due to hard shutdowns and state corruption
   // issues.
   retro.checkpointdb();
-  print("cp 4");
-  await env.xdg();
   print("cp 5");
   if (theming.Defaults.defaults.desktop) {
     await windowManager.ensureInitialized();

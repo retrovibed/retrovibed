@@ -139,5 +139,9 @@ String _convertstring(Pointer<Char> charPointer) {
 }
 
 void checkpointdb() {
-  bridge.checkpointdb();
+  try {
+    bridge.checkpointdb();
+  } catch (e) {
+    print("failed to checkpoint database ${e}");
+  }
 }
