@@ -19,10 +19,7 @@ class Card extends StatelessWidget {
       alignment: Alignment.center,
       margin: margin ?? defaults.margin,
       onTap: tap,
-      help: ds.Hint(
-        label: const Text("Users"),
-        description: const Text("administer user accounts and roles"),
-      ),
+      help: ds.Hint(const Text("administer user accounts and roles")),
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: defaults.spacing / 2,

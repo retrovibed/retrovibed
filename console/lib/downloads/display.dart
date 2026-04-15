@@ -14,32 +14,6 @@ class Display extends StatefulWidget {
     this.availableSearch = media.discovered.available,
     this.downloadWatch = media.discovered.watch,
   });
-  static const hints = [
-    ds.Hint(
-      label: const Text("Progress"),
-      description: const Text(
-        "active downloads auto-refresh at the top of the view",
-      ),
-    ),
-    ds.Hint(
-      label: const Text("Search"),
-      description: const Text("find available content to download"),
-    ),
-    ds.Hint(
-      label: const Text("Upload"),
-      description: const Text("drag and drop files to discover new content"),
-    ),
-    ds.Hint(
-      label: const Text("Magnet"),
-      description: const Text("import magnet links via the magnet button"),
-    ),
-    ds.Hint(
-      label: const Text("Double-click"),
-      description: const Text(
-        "expand a download to see size, path, and status details",
-      ),
-    ),
-  ];
 
   @override
   State<Display> createState() => _DisplayState();

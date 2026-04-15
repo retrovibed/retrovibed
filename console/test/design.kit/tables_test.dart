@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:retrovibed/designkit.dart' as ds;
+import 'package:retrovibed/design.kit/modals.dart' as modals;
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
 
 // Compact breakpoint is 400 — below it the Table reverses vertical direction.
@@ -19,9 +20,8 @@ Widget buildTable({
   Widget cause = const SizedBox(),
   bool expanded = true,
 }) {
-  final render = expanded
-      ? ds.Table.expanded<String>((item) => Text(item))
-      : ds.Table.inline<String>((item) => Text(item));
+  final render =
+      expanded ? ds.Table.expanded<String>((item) => Text(item)) : ds.Table.inline<String>((item) => Text(item));
   return ds.Table<String>(
     render,
     children: children,
@@ -480,7 +480,7 @@ void main() {
           ds.Table<String>(
             ds.Table.expanded((item) => Text(item)),
             children: ['a'],
-            help: ds.Hint(label: const Text('Table'), description: const Text('list of items')),
+            help: ds.Hint(const Text('list of items')),
           ),
         ),
       );
@@ -493,11 +493,13 @@ void main() {
 
     testWidgets('description appears in help overlay', (tester) async {
       await tester.pumpApp(
-        ds.HelpScope(
-          ds.Table<String>(
-            ds.Table.expanded((item) => Text(item)),
-            children: ['a'],
-            help: ds.Hint(label: const Text('Table'), description: const Text('list of items')),
+        modals.Node(
+          ds.HelpScope(
+            ds.Table<String>(
+              ds.Table.expanded((item) => Text(item)),
+              children: ['a'],
+              help: ds.Hint(const Text('list of items')),
+            ),
           ),
         ),
       );
@@ -510,7 +512,9 @@ void main() {
       await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
       await tester.pumpAndSettle();
 
-      expect(find.text('Table'), findsOneWidget);
+      await tester.tap(find.byType(InkWell).last);
+      await tester.pumpAndSettle();
+
       expect(find.text('list of items'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });

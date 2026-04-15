@@ -25,10 +25,7 @@ class Card extends StatelessWidget {
     return ds.Card(
       alignment: Alignment.center,
       margin: this.margin ?? defaults.margin,
-      help: ds.Hint(
-        label: const Text("Billing"),
-        description: const Text("view your account plan and billing details"),
-      ),
+      help: ds.Hint(const Text("view your account plan and billing details")),
       onTap: (Platform.isAndroid || Platform.isIOS) ? null : tap,
       Column(
         spacing: defaults.spacing,

@@ -24,10 +24,7 @@ class Card extends StatelessWidget {
       alignment: Alignment.center,
       margin: margin ?? defaults.margin,
       onTap: tap,
-      help: ds.Hint(
-        label: const Text("RSS"),
-        description: const Text("configure RSS feed subscriptions"),
-      ),
+      help: ds.Hint(const Text("configure RSS feed subscriptions")),
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: defaults.spacing / 2,

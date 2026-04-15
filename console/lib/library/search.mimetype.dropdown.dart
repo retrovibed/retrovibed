@@ -65,12 +65,7 @@ class SearchMimetypeDropdown extends StatelessWidget {
               ),
             ],
       ),
-      ds.Hint(
-        label: const Text("Mimetype"),
-        description: const Text(
-          "dropdown to filter by movies, audio, documents, or images",
-        ),
-      ),
+      ds.Hint(const Text("dropdown to filter by movies, audio, documents, or images")),
     );
   }
 }

@@ -135,10 +135,7 @@ class _ListDisplayState extends State<ListDisplay> {
         },
         current: _resp.next.offset,
         empty: ds.Int64(_resp.items.length) < _resp.next.limit,
-        help: ds.Hint(
-          label: const Text("Search"),
-          description: const Text("find communities by name or description"),
-        ),
+        help: ds.Hint(const Text("find communities by name or description")),
         leading: [
           ds.CompactingMenu.pinned(
             ds.LoadingIconButton(
@@ -148,12 +145,7 @@ class _ListDisplayState extends State<ListDisplay> {
                   _overlay = _overlay == ds.Empty ? communitycreation : ds.Empty;
                 });
               },
-              help: ds.Hint(
-                label: const Text("+"),
-                description: const Text(
-                  "create a new community with a domain and description",
-                ),
-              ),
+              help: ds.Hint(const Text("create a new community with a domain and description")),
             ),
           ),
         ],

@@ -21,10 +21,7 @@ class PublishButton extends StatelessWidget {
       ),
       icon: Icon(Icons.publish),
       tooltip: 'Publish Content',
-      help: ds.Hint(
-        label: const Text("Publish"),
-        description: const Text("share library content to this community"),
-      ),
+      help: ds.Hint(const Text("share library content to this community")),
     );
   }
 }

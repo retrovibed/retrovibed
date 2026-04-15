@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:retrovibed/design.kit/modals.dart' as modals;
 import 'package:retrovibed/design.kit/help.dart';
+import 'package:retrovibed/designkit.dart';
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
 
 void main() {
@@ -11,7 +13,7 @@ void main() {
         HelpScope(
           Help(
             Text('child'),
-            Hint(label: const Text('X'), description: const Text('desc')),
+            Hint(const Text('desc')),
           ),
         ),
       );
@@ -33,7 +35,7 @@ void main() {
               if (!visible) return Text('empty');
               return Help(
                 Text('child'),
-                Hint(label: const Text('X'), description: const Text('desc')),
+                Hint(const Text('desc')),
               );
             },
           ),
@@ -56,9 +58,9 @@ void main() {
         HelpScope(
           Column(
             children: [
-              Help(Text('a'), Hint(label: const Text('A'), description: const Text('first'))),
-              Help(Text('b'), Hint(label: const Text('B'), description: const Text('second'))),
-              Help(Text('c'), Hint(label: const Text('C'), description: const Text('third'))),
+              Help(Text('a'), Hint(const Text('first'))),
+              Help(Text('b'), Hint(const Text('second'))),
+              Help(Text('c'), Hint(const Text('third'))),
             ],
           ),
         ),
@@ -75,7 +77,7 @@ void main() {
     testWidgets('overlay not visible initially', (tester) async {
       await tester.pumpApp(
         HelpScope(
-          Help(Text('child'), Hint(label: const Text('X'), description: const Text('desc'))),
+          Help(Text('child'), Hint(const Text('desc'))),
         ),
       );
       await tester.pumpAndSettle();
@@ -92,77 +94,9 @@ void main() {
 
     testWidgets('alt+? toggles help overlay', (tester) async {
       await tester.pumpApp(
-        HelpScope(
-          Help(Text('child'), Hint(label: const Text('Search'), description: const Text('find things'))),
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      await tester.sendKeyDownEvent(LogicalKeyboardKey.altLeft);
-      await tester.sendKeyEvent(LogicalKeyboardKey.slash);
-      await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
-      await tester.pumpAndSettle();
-
-      expect(find.text('Help'), findsOneWidget);
-      expect(find.text('Search'), findsOneWidget);
-      expect(find.text('find things'), findsOneWidget);
-      expect(tester.takeException(), isNull);
-    });
-
-    testWidgets('ESC closes help overlay', (tester) async {
-      await tester.pumpApp(
-        HelpScope(
-          Help(Text('child'), Hint(label: const Text('X'), description: const Text('desc'))),
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      await tester.sendKeyDownEvent(LogicalKeyboardKey.altLeft);
-      await tester.sendKeyEvent(LogicalKeyboardKey.slash);
-      await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
-      await tester.pumpAndSettle();
-      expect(find.text('Help'), findsOneWidget);
-
-      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
-      await tester.pumpAndSettle();
-
-      expect(find.text('Help'), findsNothing);
-      expect(tester.takeException(), isNull);
-    });
-
-    testWidgets('alt+? toggles off after second press', (tester) async {
-      await tester.pumpApp(
-        HelpScope(
-          Help(Text('child'), Hint(label: const Text('X'), description: const Text('desc'))),
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      await tester.sendKeyDownEvent(LogicalKeyboardKey.altLeft);
-      await tester.sendKeyEvent(LogicalKeyboardKey.slash);
-      await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
-      await tester.pumpAndSettle();
-      expect(find.text('Help'), findsOneWidget);
-
-      await tester.sendKeyDownEvent(LogicalKeyboardKey.altLeft);
-      await tester.sendKeyEvent(LogicalKeyboardKey.slash);
-      await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
-      await tester.pumpAndSettle();
-      expect(find.text('Help'), findsNothing);
-
-      expect(tester.takeException(), isNull);
-    });
-  });
-
-  group('HelpScope content', () {
-    testWidgets('renders registered Hint widgets', (tester) async {
-      await tester.pumpApp(
-        HelpScope(
-          Column(
-            children: [
-              Help(Text('a'), Hint(label: const Text('Search'), description: const Text('filter by title'))),
-              Help(Text('b'), Hint(label: const Text('Upload'), description: const Text('drag files'))),
-            ],
+        modals.Node(
+          HelpScope(
+            Help(Text('child'), Hint(const Text('find things'))),
           ),
         ),
       );
@@ -172,18 +106,19 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.slash);
       await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
       await tester.pumpAndSettle();
+      await tester.tap(find.byType(InkWell).last);
+      await tester.pumpAndSettle();
 
-      expect(find.text('Search'), findsOneWidget);
-      expect(find.text('filter by title'), findsOneWidget);
-      expect(find.text('Upload'), findsOneWidget);
-      expect(find.text('drag files'), findsOneWidget);
+      expect(find.text('find things'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('renders arbitrary Widget descriptions', (tester) async {
+    testWidgets('ESC closes help overlay', (tester) async {
       await tester.pumpApp(
-        HelpScope(
-          Help(Text('child'), Text('custom help text')),
+        modals.Node(
+          HelpScope(
+            Help(Text('child'), Hint(const Text('desc'))),
+          ),
         ),
       );
       await tester.pumpAndSettle();
@@ -191,6 +126,88 @@ void main() {
       await tester.sendKeyDownEvent(LogicalKeyboardKey.altLeft);
       await tester.sendKeyEvent(LogicalKeyboardKey.slash);
       await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(InkWell).last);
+      await tester.pumpAndSettle();
+      expect(find.text('desc'), findsOneWidget);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+
+      expect(find.text('desc'), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('alt+? toggles off after second press', (tester) async {
+      await tester.pumpApp(
+        modals.Node(
+          HelpScope(
+            Help(Text('child'), Hint(const Text('desc'))),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.altLeft);
+      await tester.sendKeyEvent(LogicalKeyboardKey.slash);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(InkWell).last);
+      await tester.pumpAndSettle();
+      expect(find.text('desc'), findsOneWidget);
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.altLeft);
+      await tester.sendKeyEvent(LogicalKeyboardKey.slash);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
+      await tester.pumpAndSettle();
+      expect(find.text('desc'), findsNothing);
+
+      expect(tester.takeException(), isNull);
+    });
+  });
+
+  group('HelpScope content', () {
+    testWidgets('renders registered Hint widgets', (tester) async {
+      await tester.pumpApp(
+        modals.Node(
+          HelpScope(
+            Column(
+              children: [
+                Help(Text('a'), Hint(const Text('filter by title'))),
+                Help(Text('b'), Hint(const Text('drag files'))),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.altLeft);
+      await tester.sendKeyEvent(LogicalKeyboardKey.slash);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(InkWell).last);
+      await tester.pumpAndSettle();
+
+      expect(find.text('drag files'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('renders arbitrary Widget descriptions', (tester) async {
+      await tester.pumpApp(
+        modals.Node(
+          HelpScope(
+            Help(Text('child'), Text('custom help text')),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.altLeft);
+      await tester.sendKeyEvent(LogicalKeyboardKey.slash);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(InkWell).last);
       await tester.pumpAndSettle();
 
       expect(find.text('custom help text'), findsOneWidget);
@@ -206,7 +223,7 @@ void main() {
             children: [
               Help(
                 SizedBox(key: Key('target'), width: 200, height: 50),
-                Hint(label: const Text('X'), description: const Text('desc')),
+                Hint(const Text('desc')),
               ),
             ],
           ),
@@ -250,10 +267,12 @@ void main() {
       await tester.pumpApp(
         HelpScope(
           Help(
-            Builder(builder: (context) {
-              rebuildCount++;
-              return Text('child');
-            }),
+            Builder(
+              builder: (context) {
+                rebuildCount++;
+                return Text('child');
+              },
+            ),
             HelpScope.None,
           ),
         ),
@@ -284,12 +303,14 @@ void main() {
 
     testWidgets('Help with None description does not appear in overlay', (tester) async {
       await tester.pumpApp(
-        HelpScope(
-          Column(
-            children: [
-              Help(Text('a'), Hint(label: const Text('Visible'), description: const Text('shown'))),
-              Help(Text('b'), HelpScope.None),
-            ],
+        modals.Node(
+          HelpScope(
+            Column(
+              children: [
+                Help(Text('a'), HelpScope.None),
+                Help(Text('b'), Hint(const Text('shown'))),
+              ],
+            ),
           ),
         ),
       );
@@ -302,8 +323,10 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.slash);
       await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
       await tester.pumpAndSettle();
+      await tester.tap(find.byType(InkWell).last);
+      await tester.pumpAndSettle();
 
-      expect(find.text('Visible'), findsOneWidget);
+      expect(find.text('shown'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
@@ -314,7 +337,7 @@ void main() {
         HelpScope(
           Column(
             children: [
-              Help(Text('a'), Hint(label: const Text('X'), description: const Text('desc'))),
+              Help(Text('a'), Hint(const Text('desc'))),
               ValueListenableBuilder<bool>(
                 valueListenable: show,
                 builder: (_, visible, __) {
@@ -339,19 +362,64 @@ void main() {
     });
   });
 
-  group('Help nesting', () {
-    testWidgets('nested Help wrappers register all descriptions', (tester) async {
+  group('Help activated display', () {
+    testWidgets('displays overlay when activated', (tester) async {
       await tester.pumpApp(
         HelpScope(
           Help(
+            Text('child'),
+            Hint(const Text('desc')),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(InkWell), findsNothing);
+
+      final scope = tester.state<HelpScopeState>(find.byType(HelpScope));
+      scope.toggle();
+      await tester.pumpAndSettle();
+
+      expect(find.byType(InkWell), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('shows click cursor when activated', (tester) async {
+      await tester.pumpApp(
+        HelpScope(
+          Help(
+            Text('child'),
+            Hint(const Text('desc')),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final scope = tester.state<HelpScopeState>(find.byType(HelpScope));
+      scope.toggle();
+      await tester.pumpAndSettle();
+
+      final inkWell = tester.widget<InkWell>(find.byType(InkWell));
+      expect(inkWell.mouseCursor, SystemMouseCursors.click);
+      expect(tester.takeException(), isNull);
+    });
+  });
+
+  group('Help nesting', () {
+    testWidgets('nested Help wrappers register all descriptions', (tester) async {
+      await tester.pumpApp(
+        modals.Node(
+          HelpScope(
             Help(
               Help(
-                Text('deeply wrapped'),
-                Hint(label: const Text('Inner'), description: const Text('inner desc')),
+                Help(
+                  Text('deeply wrapped'),
+                  Hint(const Text('inner desc')),
+                ),
+                Hint(const Text('middle desc')),
               ),
-              Hint(label: const Text('Middle'), description: const Text('middle desc')),
+              Hint(const Text('outer desc')),
             ),
-            Hint(label: const Text('Outer'), description: const Text('outer desc')),
           ),
         ),
       );
@@ -364,10 +432,10 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.slash);
       await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
       await tester.pumpAndSettle();
+      await tester.tap(find.byType(InkWell).last);
+      await tester.pumpAndSettle();
 
-      expect(find.text('Inner'), findsOneWidget);
-      expect(find.text('Middle'), findsOneWidget);
-      expect(find.text('Outer'), findsOneWidget);
+      expect(find.text('outer desc'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   });

@@ -27,7 +27,7 @@ class Card extends StatelessWidget {
       alignment: Alignment.center,
       margin: margin,
       onTap: tap,
-      help: ds.Hint(label: const Text("Google"), description: const Text("connect Google services")),
+      help: ds.Hint(const Text("connect Google services")),
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: defaults.spacing / 2,

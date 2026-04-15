@@ -28,10 +28,7 @@ class Card extends StatelessWidget {
     return ds.Card(
       alignment: Alignment.topLeft,
       margin: margin,
-      help: ds.Hint(
-        label: const Text("Debug"),
-        description: const Text("device and display information"),
-      ),
+      help: ds.Hint(const Text("device and display information")),
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: defaults.spacing / 4,

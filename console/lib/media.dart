@@ -11,3 +11,4 @@ export 'media/button.play.dart';
 export 'media/button.share.dart';
 export 'media/playlist.dart';
 export 'media/play.queue.dart' show range;
+export 'media/autohelp.dart';

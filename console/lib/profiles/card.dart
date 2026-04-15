@@ -92,10 +92,7 @@ class _CardState extends State<Card> {
       alignment: Alignment.center,
       margin: widget.margin,
       onTap: tap,
-      help: ds.Hint(
-        label: const Text("Profiles"),
-        description: const Text("manage user profiles"),
-      ),
+      help: ds.Hint(const Text("manage user profiles")),
       ds.Loading(
         loading: _loading,
         cause: _cause,

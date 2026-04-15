@@ -1,31 +1,35 @@
 import 'package:flutter/material.dart';
+import 'help.dart';
 
 abstract class buttons {
-  static IconButton search({required VoidCallback? onPressed, double? size}) {
-    return IconButton(onPressed: onPressed, icon: Icon(Icons.search_rounded, size: size));
+  static Widget search({required VoidCallback? onPressed, double? size, Widget help = HelpScope.None}) {
+    return Help(
+      IconButton(onPressed: onPressed, icon: Icon(Icons.search_rounded, size: size)),
+      help,
+    );
   }
 
-  static IconButton refresh({required VoidCallback? onPressed, double? size}) {
-    return IconButton(onPressed: onPressed, icon: Icon(Icons.refresh, size: size));
+  static Widget refresh({required VoidCallback? onPressed, double? size, Widget help = HelpScope.None}) {
+    return Help(IconButton(onPressed: onPressed, icon: Icon(Icons.refresh, size: size)), help);
   }
 
-  static IconButton settings({required VoidCallback? onPressed, double? size}) {
-    return IconButton(onPressed: onPressed, icon: Icon(Icons.tune, size: size));
+  static Widget settings({required VoidCallback? onPressed, double? size, Widget help = HelpScope.None}) {
+    return Help(IconButton(onPressed: onPressed, icon: Icon(Icons.tune, size: size)), help);
   }
 
-  static IconButton link({required VoidCallback? onPressed, double? size}) {
-    return IconButton(onPressed: onPressed, icon: Icon(Icons.link, size: size));
+  static Widget link({required VoidCallback? onPressed, double? size, Widget help = HelpScope.None}) {
+    return Help(IconButton(onPressed: onPressed, icon: Icon(Icons.link, size: size)), help);
   }
 
-  static IconButton remove({required VoidCallback? onPressed, double? size}) {
-    return IconButton(onPressed: onPressed, icon: Icon(Icons.clear, size: size));
+  static Widget remove({required VoidCallback? onPressed, double? size, Widget help = HelpScope.None}) {
+    return Help(IconButton(onPressed: onPressed, icon: Icon(Icons.clear, size: size)), help);
   }
 
-  static IconButton accept({required VoidCallback? onPressed, double? size}) {
-    return IconButton(onPressed: onPressed, icon: Icon(Icons.check, size: size));
+  static Widget accept({required VoidCallback? onPressed, double? size, Widget help = HelpScope.None}) {
+    return Help(IconButton(onPressed: onPressed, icon: Icon(Icons.check, size: size)), help);
   }
 
-  static IconButton copy({required VoidCallback? onPressed, double? size}) {
-    return IconButton(onPressed: onPressed, icon: Icon(Icons.copy, size: size));
+  static Widget copy({required VoidCallback? onPressed, double? size, Widget help = HelpScope.None}) {
+    return Help(IconButton(onPressed: onPressed, icon: Icon(Icons.copy, size: size)), help);
   }
 }

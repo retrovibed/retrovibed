@@ -4,7 +4,6 @@ import 'package:retrovibed/lucene.dart' as lucene;
 import 'help.dart';
 import 'buttons.dart';
 import 'compacting.menu.dart';
-import 'help.hint.dart';
 
 abstract class textediting {
   static void refocus(TextEditingController? controller) {
@@ -126,7 +125,7 @@ class _SearchTrayState extends State<SearchTray> {
           buttons.search(
             onPressed: () => widget.onSubmitted((widget.controller ?? _defaultController).text),
           ),
-          Hint(label: Text("refresh"), description: Text("refresh search contents")),
+          Hint(Text("refresh the search results")),
         ),
       ),
       if (widget.tuning != SearchTray.zerobox)

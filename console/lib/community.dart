@@ -5,6 +5,27 @@ import 'package:retrovibed/community/qr.scanner.dart';
 import 'package:retrovibed/community/list.display.dart';
 import 'package:retrovibed/uuidx.dart' as uuidx;
 
+class AutoHelp extends StatelessWidget {
+  final Widget child;
+  const AutoHelp(this.child, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return ds.HelpAuto(
+      child,
+      cacheid: 'community',
+      title: Text("Community", style: theme.textTheme.titleMedium),
+      content: const Text(
+        "Connect and share with other users. Browse community-curated "
+        "collections, join groups, and discover new content shared by "
+        "people with similar tastes.\n\n"
+        "Press Alt+? at any time to activate/deactivate help overlay",
+      ),
+    );
+  }
+}
+
 class Management extends StatefulWidget {
   @override
   _ManagementState createState() => _ManagementState();
@@ -68,12 +89,7 @@ class _ManagementState extends State<Management> {
                         });
                         return Future.value();
                       },
-                      help: ds.Hint(
-                        label: const Text("QR"),
-                        description: const Text(
-                          "scan a QR code to subscribe or link content",
-                        ),
-                      ),
+                      help: ds.Hint(const Text("scan a QR code to subscribe or link content")),
                     ),
                 ],
               ),

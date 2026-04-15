@@ -45,10 +45,7 @@ class DeleteButton extends StatelessWidget {
       onPressed: () => _confirm(context),
       icon: Icon(Icons.delete, color: Colors.red),
       tooltip: 'Delete Community',
-      help: ds.Hint(
-        label: const Text("Delete"),
-        description: const Text("permanently remove this community"),
-      ),
+      help: ds.Hint(const Text("permanently remove this community")),
     );
   }
 }

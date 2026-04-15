@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:retrovibed/design.kit/container.dart' as ds;
 import 'package:retrovibed/design.kit/modals.dart' as modals;
+import 'package:retrovibed/design.kit/screens.dart' as screens;
 import 'package:retrovibed/design.kit/theme.defaults.dart';
-import 'package:retrovibed/design.kit/help.hint.dart';
+import 'package:retrovibed/design.kit/help.shortcut.dart';
 import 'buttons.dart';
+export 'package:retrovibed/design.kit/help.auto.dart';
+export 'package:retrovibed/design.kit/help.shortcut.dart';
 export 'package:retrovibed/design.kit/help.hint.dart';
 
 class HelpScope extends StatefulWidget {
@@ -85,15 +88,76 @@ class HelpScopeState extends State<HelpScope> {
 
     if (!HardwareKeyboard.instance.isAltPressed) return false;
     if (event.physicalKey != PhysicalKeyboardKey.slash) return false;
-    if (_modalActive()) return false;
 
+    // Close any active modal first, then toggle visibility
+    final modal = modals.of(context);
+    if (modal != null && modal.current != modals.NodeState.zeromodal) {
+      modal.push(null);
+    }
     toggle();
     return true;
   }
 
   @override
   Widget build(BuildContext context) {
-    return widget.child;
+    return screens.Overlay(
+      widget.child,
+      overlay: _GlobalsOverlay(
+        visibility: visibility,
+        globals: _globals,
+      ),
+    );
+  }
+}
+
+class _GlobalsOverlay extends StatefulWidget {
+  final ValueNotifier<bool> visibility;
+  final List<Widget> globals;
+  const _GlobalsOverlay({required this.visibility, required this.globals});
+
+  @override
+  State<_GlobalsOverlay> createState() => _GlobalsOverlayState();
+}
+
+class _GlobalsOverlayState extends State<_GlobalsOverlay> {
+  bool _visible = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _visible = widget.visibility.value;
+    widget.visibility.addListener(_onChanged);
+  }
+
+  @override
+  void dispose() {
+    widget.visibility.removeListener(_onChanged);
+    super.dispose();
+  }
+
+  void _onChanged() {
+    if (widget.visibility.value) {
+      setState(() => _visible = true);
+    } else {
+      setState(() => _visible = false);
+    }
+  }
+
+  void _close() => setState(() => _visible = false);
+
+  @override
+  Widget build(BuildContext context) {
+    return Visibility(
+      visible: _visible && widget.globals.isNotEmpty,
+      child: screens.Masked(
+        Center(
+          child: SingleChildScrollView(
+            child: _GlobalsContent(widget.globals, _close),
+          ),
+        ),
+        reset: _close,
+      ),
+    );
   }
 }
 
@@ -144,41 +208,79 @@ class _HelpState extends State<Help> {
     final defaults = Defaults.of(context);
     final borderColor = Color.fromRGBO(140, 120, 220, _hovered ? 0.7 : 0.4);
 
-    return MouseRegion(
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      child: Stack(
-        children: [
-          widget.child,
-          Positioned.fill(
-            child: AnimatedContainer(
-              duration: Duration(milliseconds: 150),
-              decoration: BoxDecoration(
-                borderRadius: defaults.borderRadius,
-                border: Border.all(color: borderColor),
-                color: _hovered ? defaults.highlight.withOpacity(0.05) : Colors.transparent,
-                boxShadow: _active ? defaults.highlightTint : null,
-              ),
-              child: ClipRRect(
-                borderRadius: defaults.borderRadius,
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    mouseCursor: SystemMouseCursors.click,
-                    onTap: () {
-                      modals.asyncfn(context, (_) {
-                        return _HelpContent(
-                          widget.description,
-                          _scope?.globals ?? [],
-                          () => modals.of(context)?.push(null),
-                        );
-                      });
-                    },
+    return InkWell(
+      mouseCursor: SystemMouseCursors.click,
+      onTap: () {
+        modals.asyncfn(context, (_) {
+          return _HelpContent(
+            widget.description,
+            () => modals.of(context)?.push(null),
+          );
+        });
+      },
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _hovered = true),
+        onExit: (_) => setState(() => _hovered = false),
+        child: Stack(
+          children: [
+            widget.child,
+            Positioned.fill(
+              child: AnimatedContainer(
+                duration: Duration(milliseconds: 150),
+                decoration: BoxDecoration(
+                  borderRadius: defaults.borderRadius,
+                  border: Border.all(color: borderColor),
+                  color: _hovered ? defaults.highlight.withValues(alpha: 0.05) : Colors.transparent,
+                  boxShadow: _active ? defaults.highlightTint : null,
+                ),
+                child: ClipRRect(
+                  borderRadius: defaults.borderRadius,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: const SizedBox(),
                   ),
                 ),
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _GlobalsContent extends StatelessWidget {
+  final List<Widget> globals;
+  final VoidCallback close;
+  const _GlobalsContent(this.globals, this.close);
+
+  @override
+  Widget build(BuildContext context) {
+    final defaults = Defaults.of(context);
+    final theme = Theme.of(context);
+
+    return ds.Container(
+      padding: defaults.padding,
+      margin: defaults.margin,
+      constraints: BoxConstraints(maxWidth: 512),
+      Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: defaults.spacing,
+        children: [
+          Row(
+            children: [
+              Text("Shortcuts", style: theme.textTheme.titleMedium),
+              Spacer(),
+              buttons.remove(onPressed: close),
+            ],
           ),
+          Divider(),
+          HelpShortcut(
+            label: Text("alt+?"),
+            description: Text("open this help dialog"),
+          ),
+          ...globals,
         ],
       ),
     );
@@ -187,9 +289,8 @@ class _HelpState extends State<Help> {
 
 class _HelpContent extends StatelessWidget {
   final Widget help;
-  final List<Widget> globals;
   final VoidCallback close;
-  const _HelpContent(this.help, this.globals, this.close);
+  const _HelpContent(this.help, this.close);
 
   @override
   Widget build(BuildContext context) {
@@ -214,13 +315,6 @@ class _HelpContent extends StatelessWidget {
           ),
           Divider(),
           help,
-          Text("Shortcuts available", style: theme.textTheme.titleMedium),
-          Divider(),
-          Hint(
-            label: Text("alt+?"),
-            description: Text("open this help dialog"),
-          ),
-          ...globals,
         ],
       ),
     );
