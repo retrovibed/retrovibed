@@ -4,6 +4,7 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:retrovibed/caching/fscache.dart' as fscache;
 import 'screens.dart' as screens;
+import 'buttons.dart';
 import 'help.dart' show HelpScope;
 import 'container.dart' as _c;
 import 'theme.defaults.dart';
@@ -64,7 +65,13 @@ class _HelpAutoState extends State<HelpAuto> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   spacing: defaults.spacing,
                   children: [
-                    widget.title,
+                    Row(
+                      children: [
+                        widget.title,
+                        Spacer(),
+                        buttons.remove(onPressed: _close),
+                      ],
+                    ),
                     const Divider(),
                     widget.content,
                     ...HelpScope.of(context)?.globals ?? [],
