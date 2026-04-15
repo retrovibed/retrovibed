@@ -244,6 +244,31 @@ void main() {
   });
 
   group('HelpScope.None', () {
+    testWidgets('Help with None description does not subscribe to visibility changes', (tester) async {
+      int rebuildCount = 0;
+
+      await tester.pumpApp(
+        HelpScope(
+          Help(
+            Builder(builder: (context) {
+              rebuildCount++;
+              return Text('child');
+            }),
+            HelpScope.None,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      rebuildCount = 0; // reset after initial build
+
+      final scope = tester.state<HelpScopeState>(find.byType(HelpScope));
+      scope.toggle();
+      await tester.pumpAndSettle();
+
+      expect(rebuildCount, 0);
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('Help with None description does not register', (tester) async {
       await tester.pumpApp(
         HelpScope(

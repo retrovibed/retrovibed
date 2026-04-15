@@ -9,17 +9,19 @@ class Hint extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final defaults = Defaults.of(context);
+    final padding = EdgeInsets.symmetric(
+      horizontal: defaults.spacing,
+      vertical: defaults.spacing / 2,
+    );
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: defaults.spacing,
       children: [
         SizedBox(
           width: 120,
           child: Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: defaults.spacing,
-              vertical: defaults.spacing / 2,
-            ),
+            padding: padding,
             decoration: BoxDecoration(
               color: defaults.highlight,
               borderRadius: defaults.borderRadius,
@@ -27,8 +29,12 @@ class Hint extends StatelessWidget {
             child: label,
           ),
         ),
-        SizedBox(width: defaults.spacing),
-        Expanded(child: description),
+        Expanded(
+          child: Container(
+            padding: padding,
+            child: description,
+          ),
+        ),
       ],
     );
   }

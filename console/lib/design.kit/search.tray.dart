@@ -4,6 +4,7 @@ import 'package:retrovibed/lucene.dart' as lucene;
 import 'help.dart';
 import 'buttons.dart';
 import 'compacting.menu.dart';
+import 'help.hint.dart';
 
 abstract class textediting {
   static void refocus(TextEditingController? controller) {
@@ -121,8 +122,11 @@ class _SearchTrayState extends State<SearchTray> {
     final trailing = [
       ...widget.trailing,
       CompactingMenu.pinned(
-        buttons.search(
-          onPressed: () => widget.onSubmitted((widget.controller ?? _defaultController).text),
+        Help(
+          buttons.search(
+            onPressed: () => widget.onSubmitted((widget.controller ?? _defaultController).text),
+          ),
+          Hint(label: Text("refresh"), description: Text("refresh search contents")),
         ),
       ),
       if (widget.tuning != SearchTray.zerobox)
@@ -133,30 +137,28 @@ class _SearchTrayState extends State<SearchTray> {
         ),
     ];
 
-    return Help(
-      Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          lucene.Queryer(
-            (v) => widget.onSubmitted(v),
-            widget.filters,
-            decoration: decoration,
-            autofocus: widget.autofocus,
-            disabled: widget.disabled,
-            controller: widget.controller ?? _defaultController,
-            focusNode: widget.focus ?? _focusNode,
-            leading: widget.leading,
-            trailing: trailing,
-          ),
-          ValueListenableBuilder<Widget>(
-            valueListenable: _tuningwidget,
-            builder: (BuildContext context, Widget v, Widget? child) {
-              return v;
-            },
-          ),
-        ],
-      ),
-      widget.help,
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        lucene.Queryer(
+          (v) => widget.onSubmitted(v),
+          widget.filters,
+          decoration: decoration,
+          autofocus: widget.autofocus,
+          disabled: widget.disabled,
+          controller: widget.controller ?? _defaultController,
+          focusNode: widget.focus ?? _focusNode,
+          leading: widget.leading,
+          trailing: trailing,
+          help: widget.help,
+        ),
+        ValueListenableBuilder<Widget>(
+          valueListenable: _tuningwidget,
+          builder: (BuildContext context, Widget v, Widget? child) {
+            return v;
+          },
+        ),
+      ],
     );
   }
 }

@@ -112,6 +112,7 @@ class Queryer extends StatefulWidget {
   final FocusNode? focusNode;
   final List<Widget> leading;
   final List<Widget> trailing;
+  final Widget help;
 
   const Queryer(
     this.onQuery,
@@ -124,6 +125,7 @@ class Queryer extends StatefulWidget {
     this.focusNode,
     this.leading = const [],
     this.trailing = const [],
+    this.help = ds.HelpScope.None,
   });
 
   @override
@@ -294,27 +296,30 @@ class _QueryerState extends State<Queryer> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ds.CompactingMenu(
-            TextField(
-              controller: _ctrl,
-              enabled: !widget.disabled,
-              autofocus: widget.autofocus,
-              focusNode: widget.focusNode,
-              decoration: (widget.decoration ??
-                      const InputDecoration(
-                        hintText: 'Search… (@ for filters)',
-                      ))
-                  .copyWith(
-                    isDense: true,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 12,
+            ds.Help(
+              TextField(
+                controller: _ctrl,
+                enabled: !widget.disabled,
+                autofocus: widget.autofocus,
+                focusNode: widget.focusNode,
+                decoration: (widget.decoration ??
+                        const InputDecoration(
+                          hintText: 'Search… (@ for filters)',
+                        ))
+                    .copyWith(
+                      isDense: true,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 12,
+                      ),
                     ),
-                  ),
-              onSubmitted: (v) {
-                if (_partialParse()) return;
-                widget.onQuery(v);
-                ds.textediting.refocus(_ctrl);
-              },
+                onSubmitted: (v) {
+                  if (_partialParse()) return;
+                  widget.onQuery(v);
+                  ds.textediting.refocus(_ctrl);
+                },
+              ),
+              widget.help,
             ),
             leading: widget.leading,
             trailing: widget.trailing,

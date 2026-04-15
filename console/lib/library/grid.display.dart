@@ -214,7 +214,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                         help: ds.Hint(
                           label: const Text("Search"),
                           description: const Text(
-                            "filter your library by title",
+                            "search your library, use @ to access advanced filtering",
                           ),
                         ),
                       ),
@@ -296,6 +296,12 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                               },
                             ),
                     (context, _media) {
+                      final hint = ds.Hint(
+                        label: const Text("Double-click"),
+                        description: const Text(
+                          "play a media item and auto-generate a playlist from results",
+                        ),
+                      );
                       var onSettings = () {
                         ds.modals
                             .of(context)
@@ -329,6 +335,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                           onChange: replace,
                           highlighted: _media.id == widget.highlighted,
                           key: ValueKey(_media.id),
+                          help: hint,
                         );
                       }
 
@@ -350,14 +357,9 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                         media: _media,
                         highlighted: _media.id == widget.highlighted,
                         key: ValueKey(_media.id),
+                        help: hint,
                       );
                     },
-                    help: ds.Hint(
-                      label: const Text("Double-click"),
-                      description: const Text(
-                        "play a media item and auto-generate a playlist from results",
-                      ),
-                    ),
                   ),
                 ],
               ),

@@ -95,25 +95,17 @@ class _DownloadingListState extends State<DownloadingListDisplay> {
       future: _pending,
       builder: (BuildContext ctx, AsyncSnapshot<List<Widget>> snapshot) {
         final defaults = ds.Defaults.of(context);
-        return ds.Help(
-          ds.Loading(
-            cause: ds.Error.maybeErr(snapshot.error),
-            ds.RefreshBoundary(
-              onReset: () {
-                widget.events ?? setState(this.refresh);
-                widget.events?.value += 1;
-              },
-              ListView(
-                shrinkWrap: true,
-                padding: items.length > 0 ? defaults.padding.copyWith(left: 0, right: 0) : EdgeInsets.zero,
-                children: items,
-              ),
-            ),
-          ),
-          ds.Hint(
-            label: const Text("Progress"),
-            description: const Text(
-              "active downloads auto-refresh at the top of the view",
+        return ds.Loading(
+          cause: ds.Error.maybeErr(snapshot.error),
+          ds.RefreshBoundary(
+            onReset: () {
+              widget.events ?? setState(this.refresh);
+              widget.events?.value += 1;
+            },
+            ListView(
+              shrinkWrap: true,
+              padding: items.length > 0 ? defaults.padding.copyWith(left: 0, right: 0) : EdgeInsets.zero,
+              children: items,
             ),
           ),
         );
