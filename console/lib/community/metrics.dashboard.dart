@@ -23,21 +23,21 @@ class MetricsDashboard extends StatefulWidget {
     String id, {
     List<httpx.Option> options,
   })
-  sync;
+  apicommunitysync;
   final Future<CommunityMetricsResponse> Function(
     String id, {
     required DateTime startDate,
     required DateTime endDate,
     List<httpx.Option> options,
   })
-  metrics;
+  apicommunitymetrics;
   final List<timex.Range> segments;
 
   MetricsDashboard({
     super.key,
     required this.community,
-    this.sync = communityapi.API.sync,
-    this.metrics = communityapi.API.metrics,
+    this.apicommunitysync = communityapi.API.sync,
+    this.apicommunitymetrics = communityapi.API.metrics,
     List<timex.Range>? segments,
   }) : segments = segments ?? _defaultSegments();
 
@@ -78,7 +78,7 @@ class _MetricsDashboardState extends State<MetricsDashboard> {
     final auth = [authn.AuthzCache.bearer(context)];
 
     return httpx
-        .withRetry(() => widget.sync(widget.community.id, options: auth))
+        .withRetry(() => widget.apicommunitysync(widget.community.id, options: auth))
         .then((_) => _loadMetrics())
         .catchError((cause) {
           setState(() {
@@ -102,7 +102,7 @@ class _MetricsDashboardState extends State<MetricsDashboard> {
 
     return httpx
         .withRetry(
-          () => widget.metrics(
+          () => widget.apicommunitymetrics(
             widget.community.id,
             startDate: _selected.begin,
             endDate: _selected.end,

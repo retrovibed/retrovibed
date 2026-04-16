@@ -66,8 +66,8 @@ void main() {
           MetricsDashboard(
             community: testCommunity(),
             segments: _segments,
-            sync: mockSync,
-            metrics: mockEmptyMetrics,
+            apicommunitysync: mockSync,
+            apicommunitymetrics: mockEmptyMetrics,
           ),
         );
         await tester.pumpAndSettle();
@@ -85,8 +85,8 @@ void main() {
           MetricsDashboard(
             community: testCommunity(),
             segments: _segments,
-            sync: mockSync,
-            metrics: mockMetrics,
+            apicommunitysync: mockSync,
+            apicommunitymetrics: mockMetrics,
           ),
         );
         await tester.pumpAndSettle();

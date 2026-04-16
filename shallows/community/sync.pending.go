@@ -1,15 +1,18 @@
 package community
 
 import (
+	"bytes"
 	"context"
+	"fmt"
+	"io"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
-	"github.com/retrovibed/retrovibed/shallows/deeppool"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
@@ -22,7 +25,7 @@ import (
 )
 
 type MetricsPublisher interface {
-	Publish(ctx context.Context, communityID string, req *meta.PublishContentRequest) (*meta.PublishContentResponse, error)
+	Publish(ctx context.Context, req *meta.PublishContentRequest, torrent io.Reader) (*meta.PublishContentResponse, error)
 }
 
 func magnetURI(tmd tracking.Metadata, name string) string {
@@ -48,13 +51,9 @@ func ensureTorrent(ctx context.Context, q sqlx.Queryer, mvfs, tvfs fsx.Virtual, 
 	return media.GenerateTorrent(ctx, q, mvfs, tvfs, lmd)
 }
 
-// SyncPendingToDeeppool syncs pending published content to deeppool.
-// Returns a set of community IDs that were affected.
-func SyncPendingToDeeppool(ctx context.Context, q sqlx.Queryer, httpc *http.Client, metrics MetricsPublisher, mvfs, tvfs fsx.Virtual) (map[string]struct{}, error) {
-	var (
-		pending     = sqlx.Scan(PublishedContentFindByPendingSync(ctx, q))
-		communities = make(map[string]struct{})
-	)
+// SyncPendingToDeeppool syncs pending published content to deeppool and regenerates affected feeds.
+func SyncPendingToDeeppool(ctx context.Context, q sqlx.Queryer, httpc *http.Client, metrics MetricsPublisher, published FeedPublisher, archiver library.Archiver, mvfs, tvfs fsx.Virtual) error {
+	pending := sqlx.Scan(PublishedContentFindByPendingSync(ctx, q))
 
 	for pc := range pending.Iter() {
 		var lmd library.Metadata
@@ -69,6 +68,7 @@ func SyncPendingToDeeppool(ctx context.Context, q sqlx.Queryer, httpc *http.Clie
 			log.Println(errorsx.Wrap(err, "failed to ensure torrent"))
 			continue
 		}
+
 		pc.MagnetURI = magnetURI(tmd, lmd.Description)
 		if err := PublishedContentUpdateMagnetURI(ctx, q, pc.ID, pc.MagnetURI).Scan(&pc); err != nil {
 			log.Println(errorsx.Wrap(err, "failed to update magnet_uri"))
@@ -100,18 +100,35 @@ func SyncPendingToDeeppool(ctx context.Context, q sqlx.Queryer, httpc *http.Clie
 				log.Println(errorsx.Wrap(err, "failed to update published_at"))
 				continue
 			}
-			communities[pc.CommunityID] = struct{}{}
+
+			if err := RegenerateFeed(ctx, q, published, pc.CommunityID); err != nil {
+				log.Println(errorsx.Wrap(err, "feed regeneration failed for community "+pc.CommunityID))
+				continue
+			}
+
 			log.Printf("synced listed published content %s", pc.ID)
 			continue
 		}
 
-		if lmd.ArchiveID == uuid.Nil.String() || lmd.ArchiveID == uuid.Max.String() {
+		if lmd.ArchiveID == uuid.Max.String() {
+			continue // archival in progress, waiting
+		} else if lmd.ArchiveID == uuid.Nil.String() {
+			if err := library.Archive(ctx, q, &lmd, mvfs, archiver); err != nil {
+				log.Println(errorsx.Wrap(err, "failed to archive media"))
+				continue
+			}
+		}
+
+		encoded, err := os.ReadFile(tvfs.Path(fmt.Sprintf("%s.torrent", int160.FromBytes(tmd.Infohash).String())))
+		if err != nil {
+			log.Println(errorsx.Wrap(err, "failed to open torrent file"))
 			continue
 		}
 
-		if _, err := metrics.Publish(ctx, pc.CommunityID, &meta.PublishContentRequest{
+		_, err = metrics.Publish(ctx, &meta.PublishContentRequest{
 			PublishedContent: &meta.PublishedContent{
 				Id:             pc.ID,
+				CommunityId:    pc.CommunityID,
 				KnownMediaId:   pc.KnownMediaID,
 				MagnetUri:      pc.MagnetURI,
 				ArchivedId:     lmd.ArchiveID,
@@ -120,7 +137,9 @@ func SyncPendingToDeeppool(ctx context.Context, q sqlx.Queryer, httpc *http.Clie
 				Mimetype:       stringsx.FirstNonBlank(known.Mimetype, lmd.Mimetype),
 				EncryptionSeed: lmd.EncryptionSeed,
 			},
-		}); err != nil {
+		}, io.NopCloser(bytes.NewReader(encoded)))
+
+		if err != nil {
 			log.Println(errorsx.Wrap(err, "failed to sync to deeppool"))
 			continue
 		}
@@ -130,39 +149,12 @@ func SyncPendingToDeeppool(ctx context.Context, q sqlx.Queryer, httpc *http.Clie
 			continue
 		}
 
-		communities[pc.CommunityID] = struct{}{}
+		if err := RegenerateFeed(ctx, q, published, pc.CommunityID); err != nil {
+			log.Println(errorsx.Wrap(err, "feed regeneration failed for community "+pc.CommunityID))
+		}
+
 		log.Printf("synced published content %s to deeppool with archive_id %s", pc.ID, lmd.ArchiveID)
 	}
 
-	if err := pending.Err(); err != nil {
-		return communities, err
-	}
-
-	return communities, nil
-}
-
-// NewPendingSync creates a background worker that periodically syncs pending published content.
-func NewPendingSync(ctx context.Context, q sqlx.Queryer, httpc *http.Client, metrics MetricsPublisher, published deeppool.Published, mvfs, tvfs fsx.Virtual, interval time.Duration) error {
-	log.Println("pending sync worker initiated")
-	defer log.Println("pending sync worker completed")
-
-	return timex.NowAndEvery(ctx, interval, func(ctx context.Context) error {
-		communities, err := SyncPendingToDeeppool(ctx, q, httpc, metrics, mvfs, tvfs)
-		if err != nil {
-			log.Println(errorsx.Wrap(err, "pending sync failed"))
-			return nil
-		}
-
-		if len(communities) > 0 {
-			log.Printf("pending sync completed: synced %d communities", len(communities))
-		}
-
-		for communityID := range communities {
-			if err := RegenerateFeed(ctx, q, published, communityID); err != nil {
-				log.Println(errorsx.Wrap(err, "feed regeneration failed for community "+communityID))
-			}
-		}
-
-		return nil
-	})
+	return pending.Err()
 }

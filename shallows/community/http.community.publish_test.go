@@ -57,6 +57,7 @@ func TestPublishEndpoint(t *testing.T) {
 		community.NewHTTP(
 			q,
 			community.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			community.HTTPOptionHTTPClient(&http.Client{}),
 			community.HTTPOptionMediaStorage(fsx.DirVirtual(mediaDir)),
 			community.HTTPOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
 		).Bind(routes.PathPrefix("/c").Subrouter())
@@ -170,7 +171,7 @@ func TestPublishEndpoint(t *testing.T) {
 		require.Equal(t, uuid.Nil.String(), updatedLmd.ArchiveID)
 	})
 
-	t.Run("syndicated marks library as archivable", func(t *testing.T) {
+	t.Run("syndicated stores publish mode and skips archival marking", func(t *testing.T) {
 		var (
 			ctx, done   = testx.Context(t)
 			q           = sqltestx.Metadatabase(t)
@@ -240,10 +241,10 @@ func TestPublishEndpoint(t *testing.T) {
 
 		var updatedLmd library.Metadata
 		require.NoError(t, library.MetadataFindByID(ctx, q, libraryID).Scan(&updatedLmd))
-		require.Equal(t, uuid.Max.String(), updatedLmd.ArchiveID)
+		require.Equal(t, uuid.Nil.String(), updatedLmd.ArchiveID)
 	})
 
-	t.Run("returns existing magnet uri when torrent exists", func(t *testing.T) {
+	t.Run("returns immediately without magnet uri even when torrent exists", func(t *testing.T) {
 		var (
 			ctx, done   = testx.Context(t)
 			q           = sqltestx.Metadatabase(t)
@@ -286,6 +287,7 @@ func TestPublishEndpoint(t *testing.T) {
 		community.NewHTTP(
 			q,
 			community.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			community.HTTPOptionHTTPClient(&http.Client{}),
 			community.HTTPOptionMediaStorage(fsx.DirVirtual(mediaDir)),
 			community.HTTPOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
 		).Bind(routes.PathPrefix("/c").Subrouter())
@@ -313,7 +315,7 @@ func TestPublishEndpoint(t *testing.T) {
 
 		var result meta.PublishContentResponse
 		require.NoError(t, json.Unmarshal(resp.Body.Bytes(), &result))
-		require.NotEmpty(t, result.PublishedContent.MagnetUri)
-		require.Contains(t, result.PublishedContent.MagnetUri, "magnet:?")
+		require.NotEmpty(t, result.PublishedContent.Id)
+		require.Equal(t, "", result.PublishedContent.MagnetUri)
 	})
 }

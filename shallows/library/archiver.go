@@ -16,11 +16,11 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 )
 
-type archiver interface {
+type Archiver interface {
 	Upload(ctx context.Context, mimetype string, r io.Reader) (m *deeppool.Media, _ error)
 }
 
-func Archive(ctx context.Context, q sqlx.Queryer, md *Metadata, vfs fsx.Virtual, dst archiver) (err error) {
+func Archive(ctx context.Context, q sqlx.Queryer, md *Metadata, vfs fsx.Virtual, dst Archiver) (err error) {
 	log.Println("archive initiated", md.ID)
 	defer func() {
 		log.Println("archive completed", md.ID, md.ArchiveID)

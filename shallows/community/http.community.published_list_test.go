@@ -65,6 +65,7 @@ func TestPublishedListEndpoint(t *testing.T) {
 		community.NewHTTP(
 			q,
 			community.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			community.HTTPOptionHTTPClient(&http.Client{}),
 			community.HTTPOptionMediaStorage(fsx.DirVirtual(mediaDir)),
 			community.HTTPOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
 		).Bind(routes.PathPrefix("/c").Subrouter())
