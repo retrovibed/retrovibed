@@ -123,6 +123,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
       cause: _cause,
       children: _res.items,
       leading: ds.SearchTray(
+        ensureVisible: true,
         autofocus: defaults.desktop,
         decoration: InputDecoration(hintText: "search downloadable content"),
         controller: widget.controller,

@@ -117,6 +117,7 @@ class _ListDisplayState extends State<ListDisplay> {
       overlay: _overlay,
       empty: Center(child: Text('No communities found')),
       leading: ds.SearchTray(
+        ensureVisible: true,
         decoration: InputDecoration(hintText: "search communities"),
         autofocus: defaults.desktop,
         onSubmitted: (v) {
