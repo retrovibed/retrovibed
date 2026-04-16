@@ -1,0 +1,15 @@
+__GoStringLen
+__GoStringPtr
+_oauth2_bearer
+_authn_bearer
+_authn_bearer_host
+_public_key
+_username
+_unseed
+_seed
+_ips
+_gsetenv
+_egdaemon
+_logging
+_checkpointdb
+_validatecert

@@ -5,6 +5,7 @@
 !.gitignore
 !Podfile
 !RetrovivedBind.podspec
+!RetrovivedBind.exports.txt
 !ExportOptions.plist
 !Classes/
 !Classes/EnforceBinding.m
