@@ -8,6 +8,12 @@ __attribute__((used)) void enforce_binding() {
 	authn_bearer_host("");
 	public_key();
 	username();
+	unseed();
+	seed("");
 	ips();
+	gsetenv("", "");
 	egdaemon("[]");
+	logging();
+	checkpointdb();
+	validatecert("", (unsigned char *)"", 0);
 }
