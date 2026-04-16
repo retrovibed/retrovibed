@@ -7,21 +7,25 @@ import 'package:retrovibed/design.kit/modals.dart' as modals;
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
 
 Widget buildSearchTray({
+  Key? key,
   Widget help = ds.HelpScope.None,
   Future<void> Function(String)? onSubmitted,
   void Function(fixnum.Int64)? next,
   fixnum.Int64? current,
   bool empty = true,
+  bool ensureVisible = false,
   List<Widget> leading = const [],
   List<Widget> trailing = const [],
   Widget? tuning,
   EdgeInsets? padding,
 }) {
   return ds.SearchTray(
+    key: key,
     onSubmitted: onSubmitted ?? (_) async {},
     next: next ?? (_) {},
     current: current ?? fixnum.Int64.ZERO,
     empty: empty,
+    ensureVisible: ensureVisible,
     leading: leading,
     trailing: trailing,
     tuning: tuning ?? ds.SearchTray.zerobox,
@@ -378,6 +382,7 @@ void main() {
         modals.Node(
           ds.HelpScope(
             buildSearchTray(
+              key: Key('search-tray'),
               help: ds.Hint(const Text('filter results')),
             ),
           ),
@@ -391,18 +396,14 @@ void main() {
       await tester.sendKeyUpEvent(LogicalKeyboardKey.shiftLeft);
       await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
       await tester.pumpAndSettle();
-
-      // Tap the SearchTray - the Help widget wraps the Queryer which contains the TextField
-      final searchTrayFinder = find.byType(ds.SearchTray);
-      expect(searchTrayFinder, findsOneWidget);
-      final RenderBox box = tester.renderObject(searchTrayFinder);
-      final Offset center = box.size.center(Offset.zero);
-      await tester.tapAt(center);
+      await tester.tap(find.byIcon(Icons.clear));
+      await tester.pumpAndSettle();
+      await tester.tap(find.descendant(of: find.byKey(Key('search-tray')), matching: find.byType(InkWell)).first);
       await tester.pumpAndSettle();
 
       expect(find.text('filter results'), findsOneWidget);
       expect(tester.takeException(), isNull);
-    }, skip: true);
+    });
 
     testWidgets('defaults to HelpScope.None and does not register', (
       tester,
@@ -413,6 +414,49 @@ void main() {
       final scope = tester.state<ds.HelpScopeState>(find.byType(ds.HelpScope));
       expect(scope.descriptions, hasLength(1));
       expect(tester.takeException(), isNull);
+    });
+  });
+
+  group('SearchTray ensureVisible', () {
+    testWidgets('defaults to false and does not scroll', (
+      WidgetTester tester,
+    ) async {
+      final scrollController = ScrollController();
+      await tester.pumpApp(
+        ListView(
+          controller: scrollController,
+          children: [
+            SizedBox(height: 800),
+            buildSearchTray(),
+          ],
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(scrollController.offset, equals(0.0));
+      expect(tester.takeException(), isNull);
+      scrollController.dispose();
+    });
+
+    testWidgets('scrolls tray into view when ensureVisible is true', (
+      WidgetTester tester,
+    ) async {
+      final scrollController = ScrollController();
+      await tester.pumpApp(
+        ListView(
+          controller: scrollController,
+          children: [
+            SizedBox(height: 800),
+            buildSearchTray(ensureVisible: true),
+          ],
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(scrollController.offset, greaterThan(0.0));
+      expect(find.byType(TextField), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      scrollController.dispose();
     });
   });
 

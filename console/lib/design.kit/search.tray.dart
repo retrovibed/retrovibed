@@ -43,6 +43,7 @@ class SearchTray extends StatefulWidget {
   final bool empty;
   final bool autofocus;
   final bool disabled;
+  final bool ensureVisible;
   final TextEditingController? controller;
   final FocusNode? focus;
   final InputDecoration? decoration;
@@ -57,6 +58,7 @@ class SearchTray extends StatefulWidget {
     this.trailing = const [],
     this.autofocus = false,
     this.disabled = false,
+    this.ensureVisible = false,
     this.focus,
     this.decoration,
     this.padding,
@@ -76,6 +78,17 @@ class _SearchTrayState extends State<SearchTray> {
   final ValueNotifier<Widget> _tuningwidget = ValueNotifier<Widget>(
     SearchTray.zerobox,
   );
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.ensureVisible) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        Scrollable.ensureVisible(context);
+      });
+    }
+  }
 
   @override
   void dispose() {

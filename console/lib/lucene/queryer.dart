@@ -253,6 +253,7 @@ class _QueryerState extends State<Queryer> {
         }).toList();
 
     return ds.Shortcuts(
+      enabled: defaults.desktop,
       bindings: {
         const SingleActivator(LogicalKeyboardKey.escape): (
           const Text('reset search'),

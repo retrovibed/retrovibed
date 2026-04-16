@@ -25,8 +25,7 @@ class AutoHelp extends StatelessWidget {
       content: const Text(
         "Configure your account, billing, storage, and integrations. "
         "Manage connected services, RSS feeds, VPN settings, and "
-        "user access from this panel.\n\n"
-        "Press Alt+? at any time to activate/deactivate help overlay",
+        "user access from this panel.",
       ),
     );
   }

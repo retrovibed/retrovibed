@@ -49,6 +49,10 @@ class _HelpAutoState extends State<HelpAuto> {
   @override
   Widget build(BuildContext context) {
     final defaults = Defaults.of(context);
+    final activate =
+        defaults.mobile
+            ? "Shake the phone to activate/deactivate help"
+            : "Press Alt+? at any time to activate/deactivate help overlay";
     return screens.Overlay(
       widget.child,
       overlay: Visibility(
@@ -74,6 +78,7 @@ class _HelpAutoState extends State<HelpAuto> {
                     ),
                     const Divider(),
                     widget.content,
+                    Text(activate),
                     ...HelpScope.of(context)?.globals ?? [],
                   ],
                 ),

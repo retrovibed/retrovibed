@@ -6,6 +6,7 @@ import 'package:retrovibed/design.kit/screens.dart' as screens;
 import 'package:retrovibed/design.kit/theme.defaults.dart';
 import 'package:retrovibed/design.kit/help.shortcut.dart';
 import 'buttons.dart';
+import 'shake.dart';
 export 'package:retrovibed/design.kit/help.auto.dart';
 export 'package:retrovibed/design.kit/help.shortcut.dart';
 export 'package:retrovibed/design.kit/help.hint.dart';
@@ -100,8 +101,12 @@ class HelpScopeState extends State<HelpScope> {
 
   @override
   Widget build(BuildContext context) {
+    final defaults = Defaults.of(context);
     return screens.Overlay(
-      widget.child,
+      ShakeDetector(
+        onShake: defaults.mobile ? this.toggle : null,
+        child: widget.child,
+      ),
       overlay: _GlobalsOverlay(
         visibility: visibility,
         globals: _globals,
@@ -148,7 +153,7 @@ class _GlobalsOverlayState extends State<_GlobalsOverlay> {
   @override
   Widget build(BuildContext context) {
     return Visibility(
-      visible: _visible && widget.globals.isNotEmpty,
+      visible: _visible,
       child: screens.Masked(
         Center(
           child: SingleChildScrollView(
@@ -277,7 +282,7 @@ class _GlobalsContent extends StatelessWidget {
           ),
           Divider(),
           HelpShortcut(
-            label: Text("alt+?"),
+            label: defaults.mobile ? Text("Shake") : Text("alt+?"),
             description: Text("open this help dialog"),
           ),
           ...globals,

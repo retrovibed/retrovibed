@@ -30,6 +30,7 @@ export 'design.kit/periodic.dart';
 export 'design.kit/refresh.dart';
 export 'design.kit/repeat.dart';
 export 'design.kit/rating.dart';
+export 'design.kit/shake.dart';
 export 'design.kit/shortcuts.dart';
 export 'design.kit/search.dropdown.dart';
 export 'design.kit/compacting.menu.dart';
@@ -70,4 +71,23 @@ Widget build(Widget Function(BuildContext) b) {
 
 Widget layout(Widget Function(BuildContext, BoxConstraints) b) {
   return LayoutBuilder(builder: b);
+}
+
+VoidCallback once(VoidCallback action) {
+  bool hasRun = false;
+
+  return () {
+    if (hasRun) return;
+    action();
+    hasRun = true;
+  };
+}
+
+// The target non-nullable asynchronous function type
+typedef AsyncVoidCallback = Future<void> Function();
+
+AsyncVoidCallback toasync(VoidCallback fn) {
+  return () async {
+    fn();
+  };
 }

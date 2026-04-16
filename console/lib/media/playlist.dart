@@ -201,12 +201,14 @@ class _PlaylistState extends State<Playlist> {
 
   @override
   Widget build(BuildContext context) {
+    final defaults = ds.Defaults.of(context);
     return ds.Shortcuts(
       FocusScope(
         key: ValueKey(_queue.current.id),
         node: _selffocus,
         child: widget.child,
       ),
+      enabled: defaults.desktop,
       bindings: {
         const SingleActivator(LogicalKeyboardKey.escape): (
           const Text('play/pause'),

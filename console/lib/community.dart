@@ -19,8 +19,7 @@ class AutoHelp extends StatelessWidget {
       content: const Text(
         "Connect and share with other users. Browse community-curated "
         "collections, join groups, and discover new content shared by "
-        "people with similar tastes.\n\n"
-        "Press Alt+? at any time to activate/deactivate help overlay",
+        "people with similar tastes.",
       ),
     );
   }

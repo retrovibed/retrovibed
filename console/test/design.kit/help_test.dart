@@ -96,7 +96,7 @@ void main() {
       await tester.pumpApp(
         modals.Node(
           HelpScope(
-            Help(Text('child'), Hint(const Text('find things'))),
+            Help(Text('child'), Hint(const Text('find things')), key: Key('help')),
           ),
         ),
       );
@@ -106,7 +106,9 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.slash);
       await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
       await tester.pumpAndSettle();
-      await tester.tap(find.byType(InkWell).last);
+      await tester.tap(find.byIcon(Icons.clear));
+      await tester.pumpAndSettle();
+      await tester.tap(find.descendant(of: find.byKey(Key('help')), matching: find.byType(InkWell)));
       await tester.pumpAndSettle();
 
       expect(find.text('find things'), findsOneWidget);
@@ -117,7 +119,7 @@ void main() {
       await tester.pumpApp(
         modals.Node(
           HelpScope(
-            Help(Text('child'), Hint(const Text('desc'))),
+            Help(Text('child'), Hint(const Text('desc')), key: Key('help')),
           ),
         ),
       );
@@ -127,7 +129,9 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.slash);
       await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
       await tester.pumpAndSettle();
-      await tester.tap(find.byType(InkWell).last);
+      await tester.tap(find.byIcon(Icons.clear));
+      await tester.pumpAndSettle();
+      await tester.tap(find.descendant(of: find.byKey(Key('help')), matching: find.byType(InkWell)));
       await tester.pumpAndSettle();
       expect(find.text('desc'), findsOneWidget);
 
@@ -142,7 +146,7 @@ void main() {
       await tester.pumpApp(
         modals.Node(
           HelpScope(
-            Help(Text('child'), Hint(const Text('desc'))),
+            Help(Text('child'), Hint(const Text('desc')), key: Key('help')),
           ),
         ),
       );
@@ -152,7 +156,9 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.slash);
       await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
       await tester.pumpAndSettle();
-      await tester.tap(find.byType(InkWell).last);
+      await tester.tap(find.byIcon(Icons.clear));
+      await tester.pumpAndSettle();
+      await tester.tap(find.descendant(of: find.byKey(Key('help')), matching: find.byType(InkWell)));
       await tester.pumpAndSettle();
       expect(find.text('desc'), findsOneWidget);
 
@@ -174,7 +180,7 @@ void main() {
             Column(
               children: [
                 Help(Text('a'), Hint(const Text('filter by title'))),
-                Help(Text('b'), Hint(const Text('drag files'))),
+                Help(Text('b'), Hint(const Text('drag files')), key: Key('help-b')),
               ],
             ),
           ),
@@ -186,7 +192,9 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.slash);
       await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
       await tester.pumpAndSettle();
-      await tester.tap(find.byType(InkWell).last);
+      await tester.tap(find.byIcon(Icons.clear));
+      await tester.pumpAndSettle();
+      await tester.tap(find.descendant(of: find.byKey(Key('help-b')), matching: find.byType(InkWell)));
       await tester.pumpAndSettle();
 
       expect(find.text('drag files'), findsOneWidget);
@@ -197,7 +205,7 @@ void main() {
       await tester.pumpApp(
         modals.Node(
           HelpScope(
-            Help(Text('child'), Text('custom help text')),
+            Help(Text('child'), Text('custom help text'), key: Key('help')),
           ),
         ),
       );
@@ -207,7 +215,9 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.slash);
       await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
       await tester.pumpAndSettle();
-      await tester.tap(find.byType(InkWell).last);
+      await tester.tap(find.byIcon(Icons.clear));
+      await tester.pumpAndSettle();
+      await tester.tap(find.descendant(of: find.byKey(Key('help')), matching: find.byType(InkWell)));
       await tester.pumpAndSettle();
 
       expect(find.text('custom help text'), findsOneWidget);
@@ -308,7 +318,7 @@ void main() {
             Column(
               children: [
                 Help(Text('a'), HelpScope.None),
-                Help(Text('b'), Hint(const Text('shown'))),
+                Help(Text('b'), Hint(const Text('shown')), key: Key('help-b')),
               ],
             ),
           ),
@@ -323,7 +333,9 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.slash);
       await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
       await tester.pumpAndSettle();
-      await tester.tap(find.byType(InkWell).last);
+      await tester.tap(find.byIcon(Icons.clear));
+      await tester.pumpAndSettle();
+      await tester.tap(find.descendant(of: find.byKey(Key('help-b')), matching: find.byType(InkWell)));
       await tester.pumpAndSettle();
 
       expect(find.text('shown'), findsOneWidget);
@@ -369,18 +381,19 @@ void main() {
           Help(
             Text('child'),
             Hint(const Text('desc')),
+            key: Key('help'),
           ),
         ),
       );
       await tester.pumpAndSettle();
 
-      expect(find.byType(InkWell), findsNothing);
+      expect(find.descendant(of: find.byKey(Key('help')), matching: find.byType(InkWell)), findsNothing);
 
       final scope = tester.state<HelpScopeState>(find.byType(HelpScope));
       scope.toggle();
       await tester.pumpAndSettle();
 
-      expect(find.byType(InkWell), findsOneWidget);
+      expect(find.descendant(of: find.byKey(Key('help')), matching: find.byType(InkWell)), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
@@ -390,6 +403,7 @@ void main() {
           Help(
             Text('child'),
             Hint(const Text('desc')),
+            key: Key('help'),
           ),
         ),
       );
@@ -399,7 +413,9 @@ void main() {
       scope.toggle();
       await tester.pumpAndSettle();
 
-      final inkWell = tester.widget<InkWell>(find.byType(InkWell));
+      final inkWell = tester.widget<InkWell>(
+        find.descendant(of: find.byKey(Key('help')), matching: find.byType(InkWell)),
+      );
       expect(inkWell.mouseCursor, SystemMouseCursors.click);
       expect(tester.takeException(), isNull);
     });
@@ -419,6 +435,7 @@ void main() {
                 Hint(const Text('middle desc')),
               ),
               Hint(const Text('outer desc')),
+              key: Key('help-outer'),
             ),
           ),
         ),
@@ -432,7 +449,9 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.slash);
       await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
       await tester.pumpAndSettle();
-      await tester.tap(find.byType(InkWell).last);
+      await tester.tap(find.byIcon(Icons.clear));
+      await tester.pumpAndSettle();
+      await tester.tap(find.descendant(of: find.byKey(Key('help-outer')), matching: find.byType(InkWell)).first);
       await tester.pumpAndSettle();
 
       expect(find.text('outer desc'), findsOneWidget);

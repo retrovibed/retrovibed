@@ -15,8 +15,7 @@ class AutoHelp extends StatelessWidget {
       content: const Text(
         "Browse and play your media library. Use the search bar to filter "
         "by title, artist, or album. Click any item to begin playback, "
-        "or use the player controls at the bottom to manage the queue.\n\n"
-        "Press Alt+? at any time to activate/deactivate help overlay",
+        "or use the player controls at the bottom to manage the queue.",
       ),
     );
   }

@@ -15,8 +15,7 @@ class AutoHelp extends StatelessWidget {
       content: const Text(
         "Track and manage your active and completed downloads. "
         "Pause, resume, or cancel individual downloads from this view. "
-        "Completed downloads are available in your media library.\n\n"
-        "Press Alt+? at any time to activate/deactivate help overlay",
+        "Completed downloads are available in your media library.",
       ),
     );
   }

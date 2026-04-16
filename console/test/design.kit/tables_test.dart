@@ -499,6 +499,7 @@ void main() {
               ds.Table.expanded((item) => Text(item)),
               children: ['a'],
               help: ds.Hint(const Text('list of items')),
+              key: Key('table'),
             ),
           ),
         ),
@@ -511,8 +512,9 @@ void main() {
       await tester.sendKeyUpEvent(LogicalKeyboardKey.shiftLeft);
       await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
       await tester.pumpAndSettle();
-
-      await tester.tap(find.byType(InkWell).last);
+      await tester.tap(find.byIcon(Icons.clear));
+      await tester.pumpAndSettle();
+      await tester.tap(find.descendant(of: find.byKey(Key('table')), matching: find.byType(InkWell)));
       await tester.pumpAndSettle();
 
       expect(find.text('list of items'), findsOneWidget);

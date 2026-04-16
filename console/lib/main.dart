@@ -62,11 +62,14 @@ void main() async {
   runApp(Retrovibed());
 }
 
+final ds.AsyncVoidCallback _startdaemon = ds.toasync(ds.once(retro.daemon));
+
 class Retrovibed extends StatelessWidget {
   Retrovibed({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final defaults = theming.Defaults.defaults;
     final btnstyle = ButtonStyle(
       mouseCursor: WidgetStateProperty.all(SystemMouseCursors.click),
     );
@@ -103,11 +106,10 @@ class Retrovibed extends StatelessWidget {
       builder: (context, child) {
         final isCompact =
             MediaQuery.of(context).size.width < theming.Defaults.defaults.compact || theming.Defaults.defaults.mobile;
-        final defaults = theming.Defaults.defaults.copyWith(isCompact: isCompact);
         return MediaQuery(
           data: MediaQuery.of(context).copyWith(textScaler: autoscaling(context)),
           child: Theme(
-            data: Theme.of(context).copyWith(extensions: [defaults]),
+            data: Theme.of(context).copyWith(extensions: [defaults.copyWith(isCompact: isCompact)]),
             child: child ?? ds.Empty,
           ),
         );
@@ -117,9 +119,7 @@ class Retrovibed extends StatelessWidget {
           child: ds.Full(
             ds.HelpScope(
               authn.Login(
-                authenticated: () async {
-                  retro.daemon();
-                },
+                authenticated: _startdaemon,
                 meta.EndpointAuto(
                   authn.Authenticated(
                     authn.DeeppoolAuthzCache(

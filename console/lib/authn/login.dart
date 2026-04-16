@@ -60,6 +60,7 @@ class _LoginState extends State<Login> {
   void _checkKey() {
     if (!widget.publicKey().isNotEmpty) return;
     if (_hasKey) return;
+
     widget
         .authenticated()
         .then((_) {

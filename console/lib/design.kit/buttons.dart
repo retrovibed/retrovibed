@@ -32,4 +32,8 @@ abstract class buttons {
   static Widget copy({required VoidCallback? onPressed, double? size, Widget help = HelpScope.None}) {
     return Help(IconButton(onPressed: onPressed, icon: Icon(Icons.copy, size: size)), help);
   }
+
+  static Widget help({required VoidCallback? onPressed, double? size, Widget help = HelpScope.None}) {
+    return Help(IconButton(onPressed: onPressed, icon: Icon(Icons.help_center_outlined, size: size)), help);
+  }
 }

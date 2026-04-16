@@ -9,10 +9,11 @@ typedef ShortcutBinding = (Widget help, KeyEventResult Function() handler);
 // Bindings may include a help widget that is registered with the nearest
 // HelpScope ancestor for display in help overlays.
 class Shortcuts extends StatefulWidget {
+  final bool enabled;
   final Map<ShortcutActivator, ShortcutBinding> bindings;
   final Widget child;
 
-  const Shortcuts(this.child, {super.key, required this.bindings});
+  const Shortcuts(this.child, {super.key, required this.bindings, this.enabled = true});
 
   @override
   State<Shortcuts> createState() => _ShortcutsState();
@@ -26,6 +27,12 @@ class _ShortcutsState extends State<Shortcuts> {
     final scope = HelpScope.of(context);
     for (final w in _registered) {
       _helpScope?.unregisterGlobal(w);
+    }
+
+    if (!widget.enabled) {
+      _registered = [];
+      _helpScope = scope;
+      return;
     }
     _helpScope = scope;
     _registered =
