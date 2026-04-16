@@ -6,6 +6,9 @@
 !Podfile
 !RetrovivedBind.podspec
 !ExportOptions.plist
+!Flutter/
+!Flutter/Release.xcconfig
+!Flutter/Debug.xcconfig
 !Classes/
 !Classes/EnforceBinding.m
 !Runner/
