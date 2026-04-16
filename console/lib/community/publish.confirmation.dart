@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/design.kit/forms.dart' as forms;
+import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/media/media.pb.dart';
@@ -17,7 +18,8 @@ class PublishConfirmation extends StatefulWidget {
   final Known? knownMedia;
   final VoidCallback onPublished;
   final Future<YouTubeStatus> Function({List<httpx.Option> options}) youtubeStatus;
-  final Future<PublishContentResponse> Function(String, PublishContentRequest, {List<httpx.Option> options}) publish;
+  final Future<PublishContentResponse> Function(String cid, PublishContentRequest req, {List<httpx.Option> options})
+  apicommunitypublish;
 
   const PublishConfirmation({
     super.key,
@@ -26,7 +28,7 @@ class PublishConfirmation extends StatefulWidget {
     this.knownMedia,
     required this.onPublished,
     this.youtubeStatus = google.YouTube.status,
-    this.publish = community_api.API.publish,
+    this.apicommunitypublish = community_api.API.publish,
   });
 
   @override
@@ -82,14 +84,14 @@ class _PublishConfirmationState extends State<PublishConfirmation> {
     });
 
     _request.publishedContent
-      ..communityId = widget.community!.id
+      ..communityId = widget.community?.id ?? uuidx.min()
       ..knownMediaId = widget.knownMedia?.id ?? widget.download!.media.knownMediaId
       ..libraryId = widget.download!.media.id;
 
     httpx
         .withRetry(
-          () => widget.publish(
-            widget.community!.id,
+          () => widget.apicommunitypublish(
+            widget.community?.id ?? uuidx.min(),
             _request,
             options: [authn.AuthzCache.bearer(context)],
           ),

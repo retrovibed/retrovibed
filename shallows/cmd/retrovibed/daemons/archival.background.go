@@ -3,11 +3,8 @@ package daemons
 import (
 	"context"
 	"log"
-	"net/http"
 	"time"
 
-	"github.com/retrovibed/retrovibed/shallows/community"
-	"github.com/retrovibed/retrovibed/shallows/deeppool"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/backoffx"
 	"github.com/retrovibed/retrovibed/shallows/internal/contextx"
@@ -38,17 +35,6 @@ func AutoArchival(ctx context.Context, q sqlx.Queryer, mediastore fsx.Virtual, a
 	go asyncx.Periodic(ctx, async, s, "automatic archival initiated - next")
 	contextx.Run(ctx, func() {
 		errorsx.Log(library.NewAutoArchive(ctx, c, mediastore, q, async, archive))
-	})
-
-	return nil
-}
-
-func PendingSync(ctx context.Context, q sqlx.Queryer, c *http.Client, mvfs, tvfs fsx.Virtual) error {
-	metrics := deeppool.NewMetrics(c)
-	published := deeppool.NewPublished(c)
-
-	contextx.Run(ctx, func() {
-		errorsx.Log(community.NewPendingSync(ctx, q, c, metrics, published, mvfs, tvfs, time.Minute))
 	})
 
 	return nil

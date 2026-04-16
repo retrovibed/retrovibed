@@ -32,8 +32,7 @@ Download _audioDownload() => Download(
 
 Community _community() => Community(id: _communityId, domain: 'test.community');
 
-Future<YouTubeStatus> _noYouTube({List<httpx.Option> options = const []}) =>
-    Future.value(YouTubeStatus(id: ''));
+Future<YouTubeStatus> _noYouTube({List<httpx.Option> options = const []}) => Future.value(YouTubeStatus(id: ''));
 
 Future<PublishContentResponse> _noopPublish(
   String communityId,
@@ -47,22 +46,19 @@ PublishConfirmation _build({
   Known? knownMedia,
   VoidCallback? onPublished,
   Future<YouTubeStatus> Function({List<httpx.Option> options})? youtubeStatus,
-  Future<PublishContentResponse> Function(String, PublishContentRequest,
-          {List<httpx.Option> options})?
-      publish,
+  Future<PublishContentResponse> Function(String, PublishContentRequest, {List<httpx.Option> options})? publish,
 }) => PublishConfirmation(
   download: download ?? _videoDownload(),
   community: community ?? _community(),
   knownMedia: knownMedia,
   onPublished: onPublished ?? () {},
   youtubeStatus: youtubeStatus ?? _noYouTube,
-  publish: publish ?? _noopPublish,
+  apicommunitypublish: publish ?? _noopPublish,
 );
 
 void main() {
   group('PublishConfirmation', () {
-    testWidgets('renders confirmation rows for content and community',
-        (tester) async {
+    testWidgets('renders confirmation rows for content and community', (tester) async {
       await tester.pumpApp(_build());
       await tester.pumpAndSettle();
 
@@ -71,8 +67,7 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('renders media info row when knownMedia is provided',
-        (tester) async {
+    testWidgets('renders media info row when knownMedia is provided', (tester) async {
       await tester.pumpApp(
         _build(knownMedia: Known(id: 'k', description: 'Known Title')),
       );
@@ -90,8 +85,7 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('cross-post checkbox hidden for non-video content',
-        (tester) async {
+    testWidgets('cross-post checkbox hidden for non-video content', (tester) async {
       await tester.pumpApp(_build(download: _audioDownload()));
       await tester.pumpAndSettle();
 
@@ -99,12 +93,10 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('YouTube status with id enables the cross-post checkbox',
-        (tester) async {
+    testWidgets('YouTube status with id enables the cross-post checkbox', (tester) async {
       await tester.pumpApp(
         _build(
-          youtubeStatus: ({options = const []}) =>
-              Future.value(YouTubeStatus(id: 'google-123')),
+          youtubeStatus: ({options = const []}) => Future.value(YouTubeStatus(id: 'google-123')),
         ),
       );
       await tester.pumpAndSettle();
@@ -113,12 +105,10 @@ void main() {
       expect(checkbox.onChanged, isNotNull);
     });
 
-    testWidgets('YouTube status with empty id disables the cross-post checkbox',
-        (tester) async {
+    testWidgets('YouTube status with empty id disables the cross-post checkbox', (tester) async {
       await tester.pumpApp(
         _build(
-          youtubeStatus: ({options = const []}) =>
-              Future.value(YouTubeStatus(id: '')),
+          youtubeStatus: ({options = const []}) => Future.value(YouTubeStatus(id: '')),
         ),
       );
       await tester.pumpAndSettle();
@@ -127,8 +117,7 @@ void main() {
       expect(checkbox.onChanged, isNull);
     });
 
-    testWidgets('publish invoked with correct communityId, knownMediaId, libraryId',
-        (tester) async {
+    testWidgets('publish invoked with correct communityId, knownMediaId, libraryId', (tester) async {
       String? capturedCommunityId;
       PublishContentRequest? capturedRequest;
 
@@ -160,8 +149,7 @@ void main() {
       await tester.pumpApp(
         _build(
           onPublished: () => published = true,
-          publish: (id, req, {options = const []}) =>
-              Future.value(PublishContentResponse()),
+          publish: (id, req, {options = const []}) => Future.value(PublishContentResponse()),
         ),
       );
       await tester.pumpAndSettle();

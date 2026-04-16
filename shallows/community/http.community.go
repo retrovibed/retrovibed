@@ -55,6 +55,12 @@ func HTTPOptionArchival(a *asyncx.Wakeup) HTTPOption {
 	}
 }
 
+func HTTPOptionPublishing(p *asyncx.Wakeup) HTTPOption {
+	return func(t *HTTP) {
+		t.publishing = p
+	}
+}
+
 func HTTPOptionMediaStorage(vfs fsx.Virtual) HTTPOption {
 	return func(t *HTTP) {
 		t.mediastorage = vfs
@@ -69,9 +75,11 @@ func HTTPOptionTorrentStorage(vfs fsx.Virtual) HTTPOption {
 
 func NewHTTP(q sqlx.Queryer, options ...HTTPOption) *HTTP {
 	svc := langx.Clone(HTTP{
-		q:         q,
-		jwtsecret: env.JWTSecret,
-		decoder:   formx.NewDecoder(),
+		q:          q,
+		jwtsecret:  env.JWTSecret,
+		decoder:    formx.NewDecoder(),
+		archival:   asyncx.NewWakeup(context.Background()),
+		publishing: asyncx.NewWakeup(context.Background()),
 	}, options...)
 
 	return &svc
@@ -83,6 +91,7 @@ type HTTP struct {
 	decoder        *form.Decoder
 	httpc          *http.Client
 	archival       *asyncx.Wakeup
+	publishing     *asyncx.Wakeup
 	mediastorage   fsx.Virtual
 	torrentstorage fsx.Virtual
 }
@@ -132,13 +141,16 @@ func (t *HTTP) Bind(r *mux.Router) {
 
 func (t *HTTP) publish(w http.ResponseWriter, r *http.Request) {
 	var (
-		err             error
-		alreadyArchived bool
-		lmd             library.Metadata
-		tmd             tracking.Metadata
-		communityID     = mux.Vars(r)["id"]
-		req             meta.PublishContentRequest
+		err         error
+		lmd         library.Metadata
+		communityID = mux.Vars(r)["id"]
+		req         meta.PublishContentRequest
 	)
+
+	if t.httpc == nil {
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusServiceUnavailable))
+		return
+	}
 
 	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to decode publish request"))
@@ -162,39 +174,11 @@ func (t *HTTP) publish(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	lmd.KnownMediaID = stringsx.FirstNonBlank(req.PublishedContent.KnownMediaId, lmd.KnownMediaID)
-
-	var magnetStr string
-	if lmd.TorrentID != uuid.Nil.String() {
-		if err = tracking.MetadataFindByID(r.Context(), t.q, lmd.TorrentID).Scan(&tmd); err != nil {
-			log.Println(errorsx.Wrap(err, "unable to find existing torrent metadata"))
-			errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
-			return
-		}
-		magnetStr = magnetURI(tmd, lmd.Description)
-	}
-
-	mode := req.PublishMode
-	if t.httpc == nil && mode > meta.PublishMode_UNLISTED {
-		mode = meta.PublishMode_UNLISTED
-	}
-
-	if mode == meta.PublishMode_SYNDICATED {
-		alreadyArchived = lmd.ArchiveID != uuid.Nil.String() && lmd.ArchiveID != uuid.Max.String()
-		if lmd.ArchiveID == uuid.Nil.String() {
-			lmd.ArchiveID = uuid.Max.String()
-			if err = library.MetadataUpdate(r.Context(), t.q, lmd.ID, lmd).Scan(&lmd); err != nil {
-				log.Println(errorsx.Wrap(err, "unable to mark as archivable"))
-			}
-		}
-	}
-
 	pc := PublishedContent{
 		CommunityID:   communityID,
-		KnownMediaID:  lmd.KnownMediaID,
-		MagnetURI:     magnetStr,
+		KnownMediaID:  stringsx.FirstNonBlank(req.PublishedContent.KnownMediaId, lmd.KnownMediaID),
 		LibraryID:     lmd.ID,
-		PublishMode:   int32(mode),
+		PublishMode:   int32(req.PublishMode),
 		OAuthGoogleID: stringsx.FirstNonBlank(req.PublishedContent.OauthGoogleId, uuid.Nil.String()),
 	}
 
@@ -216,48 +200,8 @@ func (t *HTTP) publish(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	switch mode {
-	case meta.PublishMode_UNLISTED:
-		return
-	case meta.PublishMode_LISTED:
-		published := deeppool.NewPublished(t.httpc)
-		if err = RegenerateFeed(r.Context(), t.q, published, communityID); err != nil {
-			log.Println(errorsx.Wrap(err, "failed to regenerate feed"))
-		}
-	case meta.PublishMode_SYNDICATED:
-		if !alreadyArchived {
-			if t.archival != nil {
-				t.archival.Broadcast()
-			}
-			return
-		}
-
-		var known library.Known
-		if err = library.KnownFindByID(r.Context(), t.q, pc.KnownMediaID).Scan(&known); sqlx.IgnoreNoRows(err) != nil {
-			log.Println(errorsx.Wrap(err, "failed to find known media"))
-		}
-
-		metrics := deeppool.NewMetrics(t.httpc)
-		if _, err = metrics.Publish(r.Context(), communityID, &meta.PublishContentRequest{
-			PublishedContent: &meta.PublishedContent{
-				Id:             pc.ID,
-				KnownMediaId:   pc.KnownMediaID,
-				MagnetUri:      pc.MagnetURI,
-				ArchivedId:     lmd.ArchiveID,
-				Title:          stringsx.FirstNonBlank(known.Title, lmd.Description),
-				Description:    known.Overview,
-				Mimetype:       stringsx.FirstNonBlank(known.Mimetype, lmd.Mimetype),
-				EncryptionSeed: lmd.EncryptionSeed,
-			},
-		}); err != nil {
-			log.Println(errorsx.Wrap(err, "failed to sync already-archived content to deeppool"))
-			return
-		}
-
-		published := deeppool.NewPublished(t.httpc)
-		if err = RegenerateFeed(r.Context(), t.q, published, communityID); err != nil {
-			log.Println(errorsx.Wrap(err, "failed to regenerate feed"))
-		}
+	if req.PublishMode > meta.PublishMode_UNLISTED {
+		t.publishing.Broadcast()
 	}
 }
 

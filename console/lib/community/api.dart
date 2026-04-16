@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:fixnum/fixnum.dart' as fixnum;
 import 'package:retrovibed/httpx.dart' as httpx;
 import './community.pb.dart';
 
@@ -103,12 +104,18 @@ class API {
     int offset = 0,
     int limit = 100,
   }) async {
+    final req =
+        PublishedContentListRequest()
+          ..communityId = id
+          ..offset = fixnum.Int64(offset)
+          ..limit = fixnum.Int64(limit);
     return httpx
         .get(
-          Uri.https(httpx.metaendpoint(), "/c/$id/published", {
-            'offset': offset.toString(),
-            'limit': limit.toString(),
-          }),
+          Uri.https(
+            httpx.metaendpoint(),
+            "/p/",
+            jsonDecode(jsonEncode(req.toProto3Json())),
+          ),
           options: [httpx.Accept.json, ...options],
         )
         .then((v) {

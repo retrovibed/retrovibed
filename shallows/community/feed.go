@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"slices"
 	"time"
 
-	"github.com/retrovibed/retrovibed/shallows/deeppool"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
@@ -17,13 +17,18 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/rss"
 )
 
+type FeedPublisher interface {
+	Find(ctx context.Context, communityID string) (*meta.Community, error)
+	UploadFeed(ctx context.Context, communityID string, feed io.Reader) error
+}
+
 const (
 	feedDefaultTTL      = 24 * 60
 	feedDefaultLanguage = "en"
 )
 
 // RegenerateFeed generates an RSS feed for a community and uploads it to deeppool.
-func RegenerateFeed(ctx context.Context, q sqlx.Queryer, published deeppool.Published, communityID string) error {
+func RegenerateFeed(ctx context.Context, q sqlx.Queryer, published FeedPublisher, communityID string) error {
 	c, err := published.Find(ctx, communityID)
 	if err != nil {
 		return errorsx.Wrap(err, "failed to find community")
