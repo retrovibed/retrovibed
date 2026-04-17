@@ -10,7 +10,7 @@ import (
 	"github.com/shirou/gopsutil/v4/disk"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/retrovibed/retrovibed/shallows/deeppool"
+	"github.com/retrovibed/retroapi/deeppool"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"

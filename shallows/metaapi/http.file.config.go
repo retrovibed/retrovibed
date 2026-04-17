@@ -10,14 +10,14 @@ import (
 	"github.com/go-playground/form/v4"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
-	"github.com/retrovibed/retrovibed/shallows/authn"
-	"github.com/retrovibed/retrovibed/shallows/httpauth"
+	"github.com/retrovibed/retroapi/authn"
+	"github.com/retrovibed/retroapi/httpauth"
+	"github.com/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
-	"github.com/retrovibed/retrovibed/shallows/internal/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 )
 

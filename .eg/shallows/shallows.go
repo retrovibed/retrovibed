@@ -62,7 +62,7 @@ func GenerateProtocol(ctx context.Context, op eg.Op) error {
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmedia.locate.proto=github.com/retrovibed/retrovibed/shallows/media --go_opt=paths=source_relative --go_out=media media.locate.proto"),
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mrss.proto=github.com/retrovibed/retrovibed/shallows/rss --go_opt=paths=source_relative --go_out=rss rss.proto"),
 		// block cache
-		gruntime.New("protoc --proto_path=../.proto --go_opt=Mcontent.addressable.storage.proto=github.com/retrovibed/retrovibed/shallows/deeppool --go_opt=paths=source_relative --go_out=deeppool content.addressable.storage.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mcontent.addressable.storage.proto=github.com/retrovibed/retroapi/deeppool --go_opt=paths=source_relative --go_out=../retroapi/deeppool content.addressable.storage.proto"),
 		// community
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mcommunity.proto=github.com/retrovibed/retrovibed/shallows/meta --go_opt=paths=source_relative --go_out=meta community.proto"),
 		// ddisc
