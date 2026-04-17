@@ -1,8 +1,3 @@
-// Package retrovibedbind Every //export directive in this file MUST also be referenced from
-// console/ios/Classes/EnforceBinding.m. iOS links the Go bindings as a
-// static archive and the Apple linker dead-strips any exported symbol
-// the Obj-C/Swift code does not reference, causing Dart FFI dlsym
-// lookups to fail at runtime with a whitescreen on launch.
 package main
 
 import (

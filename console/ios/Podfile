@@ -49,10 +49,6 @@ post_install do |installer|
       # mobile_scanner (MLKit) only ships x86_64 for the simulator.
       # Go static lib is built as darwin/amd64 to match.
       config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
-      # Preserve Go //export globals so Dart FFI's dlsym(RTLD_DEFAULT, ...)
-      # can find them. Default STRIP_STYLE=all strips externals post-link;
-      # non-global keeps them in the binary.
-      config.build_settings['STRIP_STYLE'] = 'non-global'
     end
   end
   runner_project.save
