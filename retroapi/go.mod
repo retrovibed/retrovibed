@@ -1,4 +1,4 @@
-module github.com/retrovibed/retroapi
+module github.com/retrovibed/retrovibed/retroapi
 
 go 1.25.0
 

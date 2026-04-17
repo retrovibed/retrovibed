@@ -8,9 +8,9 @@ import (
 	"testing"
 
 	"github.com/gofrs/uuid/v5"
-	"github.com/retrovibed/retroapi/internal/bytesx"
-	"github.com/retrovibed/retroapi/internal/cryptox"
-	"github.com/retrovibed/retroapi/internal/testx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/bytesx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/cryptox"
+	"github.com/retrovibed/retrovibed/retroapi/internal/testx"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/crypto/chacha20"
 )

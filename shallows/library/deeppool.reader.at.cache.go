@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid/v5"
-	"github.com/retrovibed/retroapi/blockcache"
-	"github.com/retrovibed/retroapi/deeppool"
+	"github.com/retrovibed/retrovibed/retroapi/blockcache"
+	"github.com/retrovibed/retrovibed/retroapi/deeppool"
 	"github.com/retrovibed/retrovibed/shallows/internal/cryptox"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/iox"

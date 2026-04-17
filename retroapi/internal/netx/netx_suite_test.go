@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/retrovibed/retroapi/internal/testx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/testx"
 )
 
 func TestMain(m *testing.M) {

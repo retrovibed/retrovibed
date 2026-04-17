@@ -19,13 +19,13 @@ import (
 	"time"
 
 	"github.com/justinas/alice"
-	"github.com/retrovibed/retroapi/internal/backoffx"
-	"github.com/retrovibed/retroapi/internal/bytesx"
-	"github.com/retrovibed/retroapi/internal/debugx"
-	"github.com/retrovibed/retroapi/internal/errorsx"
-	"github.com/retrovibed/retroapi/internal/langx"
-	"github.com/retrovibed/retroapi/internal/netx"
-	"github.com/retrovibed/retroapi/internal/stringsx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/backoffx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/bytesx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/debugx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/langx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/netx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/stringsx"
 	"golang.org/x/time/rate"
 )
 

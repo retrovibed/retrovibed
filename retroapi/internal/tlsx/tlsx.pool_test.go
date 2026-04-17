@@ -15,7 +15,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/retrovibed/retroapi/internal/tlsx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/tlsx"
 	"github.com/stretchr/testify/require"
 )
 

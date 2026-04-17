@@ -15,10 +15,10 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid/v5"
-	"github.com/retrovibed/retroapi/internal/contextx"
-	"github.com/retrovibed/retroapi/internal/errorsx"
-	"github.com/retrovibed/retroapi/internal/iox"
-	"github.com/retrovibed/retroapi/internal/stringsx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/contextx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/iox"
+	"github.com/retrovibed/retrovibed/retroapi/internal/stringsx"
 
 	"github.com/pkg/profile"
 )

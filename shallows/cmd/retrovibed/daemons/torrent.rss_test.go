@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/retrovibed/retroapi/blockcache"
+	"github.com/retrovibed/retrovibed/retroapi/blockcache"
 	"github.com/retrovibed/retrovibed/shallows/cmd/retrovibed/daemons"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"

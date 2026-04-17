@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/retrovibed/retroapi/internal/env"
-	"github.com/retrovibed/retroapi/internal/errorsx"
-	"github.com/retrovibed/retroapi/internal/langx"
-	"github.com/retrovibed/retroapi/internal/sshx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/env"
+	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/langx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/sshx"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/oauth2"
 )

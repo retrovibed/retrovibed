@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/retrovibed/retroapi/internal/envx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/envx"
 )
 
 // returns the relative root that should be used for all well known directories.

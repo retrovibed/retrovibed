@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/retrovibed/retroapi/internal/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
 
 	"github.com/stretchr/testify/assert"
 )

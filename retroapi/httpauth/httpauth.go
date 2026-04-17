@@ -5,10 +5,10 @@ import (
 	"net/http"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/retrovibed/retroapi/authn"
-	"github.com/retrovibed/retroapi/internal/errorsx"
-	"github.com/retrovibed/retroapi/internal/httpx"
-	"github.com/retrovibed/retroapi/jwtx"
+	"github.com/retrovibed/retrovibed/retroapi/authn"
+	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/httpx"
+	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 )
 
 // Authenticate a session - responds with 401 if unable to locate the token.

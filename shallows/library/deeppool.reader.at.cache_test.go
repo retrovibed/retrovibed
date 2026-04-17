@@ -14,7 +14,7 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
-	"github.com/retrovibed/retroapi/blockcache"
+	"github.com/retrovibed/retrovibed/retroapi/blockcache"
 	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/cryptox"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"

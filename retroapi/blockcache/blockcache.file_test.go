@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/retrovibed/retroapi/blockcache"
+	"github.com/retrovibed/retrovibed/retroapi/blockcache"
 	"github.com/stretchr/testify/require"
 )
 

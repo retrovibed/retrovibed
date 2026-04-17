@@ -6,8 +6,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/retrovibed/retroapi/internal/envx"
-	"github.com/retrovibed/retroapi/internal/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/envx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
 )
 
 // returns the relative root that should be used for all well known directories.

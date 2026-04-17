@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/justinas/alice"
-	"github.com/retrovibed/retroapi/internal/httpx"
-	"github.com/retrovibed/retroapi/internal/testx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/httpx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/testx"
 	"github.com/stretchr/testify/require"
 )
 

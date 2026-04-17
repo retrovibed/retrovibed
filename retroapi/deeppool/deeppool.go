@@ -8,8 +8,8 @@ import (
 	"mime/multipart"
 	"net/http"
 
-	"github.com/retrovibed/retroapi/internal/errorsx"
-	"github.com/retrovibed/retroapi/internal/httpx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/httpx"
 )
 
 func NewArchiver(c *http.Client) Archiver {

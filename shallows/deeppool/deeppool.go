@@ -1,7 +1,7 @@
 package deeppool
 
 import (
-	"github.com/retrovibed/retroapi/deeppool"
+	"github.com/retrovibed/retrovibed/retroapi/deeppool"
 )
 
 type Archiver = deeppool.Archiver

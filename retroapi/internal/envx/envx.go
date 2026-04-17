@@ -15,9 +15,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/retrovibed/retroapi/internal/debugx"
-	"github.com/retrovibed/retroapi/internal/errorsx"
-	"github.com/retrovibed/retroapi/internal/langx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/debugx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/langx"
 )
 
 // Int retrieve a integer flag from the environment, checks each key in order

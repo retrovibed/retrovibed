@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/retrovibed/retroapi/blockcache"
+	"github.com/retrovibed/retrovibed/retroapi/blockcache"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 )
 

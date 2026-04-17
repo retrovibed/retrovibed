@@ -6,10 +6,10 @@ import (
 	"math/rand/v2"
 	"testing"
 
-	"github.com/retrovibed/retroapi/blockcache"
-	"github.com/retrovibed/retroapi/internal/bytesx"
-	"github.com/retrovibed/retroapi/internal/cryptox"
-	"github.com/retrovibed/retroapi/internal/md5x"
+	"github.com/retrovibed/retrovibed/retroapi/blockcache"
+	"github.com/retrovibed/retrovibed/retroapi/internal/bytesx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/cryptox"
+	"github.com/retrovibed/retrovibed/retroapi/internal/md5x"
 	"github.com/stretchr/testify/require"
 )
 

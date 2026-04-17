@@ -10,10 +10,10 @@ import (
 	"net/textproto"
 	"testing"
 
-	"github.com/retrovibed/retroapi/internal/cryptox"
-	"github.com/retrovibed/retroapi/internal/httpx"
-	"github.com/retrovibed/retroapi/internal/md5x"
-	"github.com/retrovibed/retroapi/internal/testx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/cryptox"
+	"github.com/retrovibed/retrovibed/retroapi/internal/httpx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/md5x"
+	"github.com/retrovibed/retrovibed/retroapi/internal/testx"
 	"github.com/stretchr/testify/require"
 )
 

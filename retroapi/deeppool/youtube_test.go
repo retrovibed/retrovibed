@@ -8,9 +8,9 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/retrovibed/retroapi/deeppool"
-	"github.com/retrovibed/retroapi/internal/httpx"
-	"github.com/retrovibed/retroapi/internal/testx"
+	"github.com/retrovibed/retrovibed/retroapi/deeppool"
+	"github.com/retrovibed/retrovibed/retroapi/internal/httpx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/testx"
 	"github.com/stretchr/testify/require"
 )
 

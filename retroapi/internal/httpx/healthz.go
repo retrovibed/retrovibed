@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/retrovibed/retroapi/internal/cryptox"
-	"github.com/retrovibed/retroapi/internal/slicesx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/cryptox"
+	"github.com/retrovibed/retrovibed/retroapi/internal/slicesx"
 )
 
 // Healthz

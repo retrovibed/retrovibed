@@ -7,8 +7,8 @@ import (
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
 
-	"github.com/retrovibed/retroapi/internal/fsx"
-	"github.com/retrovibed/retroapi/internal/langx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/fsx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/langx"
 )
 
 type OptionTorrentCacheStorage func(*TorrentCacheStorage)

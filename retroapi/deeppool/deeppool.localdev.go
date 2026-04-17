@@ -3,8 +3,8 @@
 package deeppool
 
 import (
-	"github.com/retrovibed/retroapi/internal/env"
-	"github.com/retrovibed/retroapi/internal/envx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/env"
+	"github.com/retrovibed/retrovibed/retroapi/internal/envx"
 )
 
 func Deeppool() string {

@@ -11,7 +11,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/retrovibed/retroapi/internal/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
 )
 
 func BuildURL(path string, v url.Values) *url.URL {

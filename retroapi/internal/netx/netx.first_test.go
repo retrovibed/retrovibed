@@ -4,7 +4,7 @@ import (
 	"net"
 	"testing"
 
-	"github.com/retrovibed/retroapi/internal/netx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/netx"
 	"github.com/stretchr/testify/require"
 )
 

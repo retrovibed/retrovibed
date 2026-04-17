@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/retrovibed/retroapi/internal/httpx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/httpx"
 	"golang.org/x/oauth2"
 )
 
