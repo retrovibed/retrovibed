@@ -14,7 +14,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/meta"
-	"google.golang.org/protobuf/encoding/protojson"
 )
 
 type contextKey int
@@ -90,7 +89,7 @@ func AuthzTokenHTTP(p jwtx.SecretSource, check func(ctx context.Context, cause e
 				claims = tokenclaims{Token: &Token{}}
 			)
 
-			if err = jwtx.Validate(p, authn.Bearer(r), &claims); err != nil {
+			if err = jwtx.Validate(p, authn.BearerToken(r), &claims); err != nil {
 				httpx.Unauthorized(w, errorsx.Wrap(err, "invalid token"))
 				return
 			}
@@ -130,14 +129,6 @@ func (t *tokenclaims) GetSubject() (string, error) {
 }
 func (t *tokenclaims) GetAudience() (jwt.ClaimStrings, error) {
 	return nil, nil
-}
-
-func (t *Token) MarshalJSON() ([]byte, error) {
-	return protojson.Marshal(t)
-}
-
-func (t *Token) UnmarshalJSON(b []byte) error {
-	return protojson.Unmarshal(b, t)
 }
 
 type TokenOption func(*Token)

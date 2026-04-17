@@ -39,7 +39,7 @@ func (t U12TLs) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.SS
 	}
 
 	c := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(fmt.Sprintf("https://%s", t.Endpoint)), authn.SSHTokenSourceOptionSigner(signer))
-	cc := metaapi.AuthzClientLibrary(tls.Config(), c, t.Endpoint)
+	cc := authn.AuthzClientLibrary(tls.Config(), c, t.Endpoint)
 
 	return t.run(ctx, cc)
 }
@@ -101,7 +101,7 @@ func (t U12TGrant) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts
 	}
 
 	c := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(fmt.Sprintf("https://%s", t.Endpoint)), authn.SSHTokenSourceOptionSigner(signer))
-	cc := metaapi.AuthzClientLibrary(tls.Config(), c, t.Endpoint)
+	cc := authn.AuthzClientLibrary(tls.Config(), c, t.Endpoint)
 
 	return t.run(ctx, cc)
 }
@@ -184,7 +184,7 @@ func (t U12TRevoke) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopt
 	}
 
 	c := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(fmt.Sprintf("https://%s", t.Endpoint)), authn.SSHTokenSourceOptionSigner(signer))
-	cc := metaapi.AuthzClientLibrary(tls.Config(), c, t.Endpoint)
+	cc := authn.AuthzClientLibrary(tls.Config(), c, t.Endpoint)
 
 	return t.run(ctx, cc)
 }

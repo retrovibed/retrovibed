@@ -13,7 +13,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
-	"github.com/retrovibed/retrovibed/shallows/metaapi"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 )
 
@@ -30,7 +29,7 @@ func (t cmdPeerDelete) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig) (err er
 	)
 
 	c := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(fmt.Sprintf("https://%s", t.Endpoint)))
-	cc := metaapi.AuthzClientLibrary(tls.Config(), c, t.Endpoint)
+	cc := authn.AuthzClientLibrary(tls.Config(), c, t.Endpoint)
 
 	infohash, err := int160.FromHexEncodedString(t.ID)
 	if err != nil {

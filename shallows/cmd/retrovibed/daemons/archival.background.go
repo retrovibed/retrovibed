@@ -5,6 +5,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/backoffx"
 	"github.com/retrovibed/retrovibed/shallows/internal/contextx"
@@ -22,7 +23,7 @@ func AutoArchival(ctx context.Context, q sqlx.Queryer, mediastore fsx.Virtual, a
 		}
 	}
 
-	c, err := metaapi.AutoJWTClient(ctx)
+	c, err := authn.AutoJWTClient(ctx)
 	if err != nil {
 		return errorsx.Wrap(err, "failed to create oauth2 bearer token")
 	}

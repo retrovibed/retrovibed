@@ -275,7 +275,7 @@ func JWTRegistrationSecretFromEnv() []byte {
 }
 
 // Bearer extracts the jwt bearer token from a http request.
-func Bearer(req *http.Request) string {
+func BearerToken(req *http.Request) string {
 	before, after, _ := strings.Cut(req.Header.Get("authorization"), " ")
 
 	if strings.ToLower(before) != "bearer" {
@@ -288,7 +288,7 @@ func Bearer(req *http.Request) string {
 // AuthorizationToken retrieve and decode the authorization token.
 func AuthorizationToken(ctx context.Context, secret jwtx.SecretSource, req *http.Request, claims jwt.Claims) (bearer string, err error) {
 	// detect authorization header bearer token
-	if bearer = Bearer(req); len(bearer) > 0 {
+	if bearer = BearerToken(req); len(bearer) > 0 {
 		if err = jwtx.Validate(secret, bearer, claims); err == nil {
 			return bearer, nil
 		}

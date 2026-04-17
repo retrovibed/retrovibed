@@ -32,7 +32,7 @@ func (t IdenAdd) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.S
 	}
 
 	c := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(fmt.Sprintf("https://%s", t.Endpoint)), authn.SSHTokenSourceOptionSigner(signer))
-	cc := metaapi.AuthzClientLibrary(tls.Config(), c, t.Endpoint)
+	cc := authn.AuthzClientLibrary(tls.Config(), c, t.Endpoint)
 
 	return t.run(ctx, cc)
 }

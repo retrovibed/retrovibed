@@ -13,6 +13,7 @@ import (
 	"golang.org/x/crypto/ssh"
 	"golang.zx2c4.com/wireguard/tun/netstack"
 
+	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdmeta"
@@ -143,7 +144,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	jwt.RegisterSigningMethod(sshjwt.Alg(), func() jwt.SigningMethod { return sshjwt })
 	jwtx.RegisterAlgorithms(sshjwt, jwt.SigningMethodHS512)
 
-	if c, err := metaapi.AutoJWTClient(gctx.Context); err == nil {
+	if c, err := authn.AutoJWTClient(gctx.Context); err == nil {
 		deepjwt = c
 	} else {
 		// we allow creation to fail the application should function even without the api.

@@ -1,4 +1,4 @@
-package metaapi
+package authn
 
 import (
 	"context"
@@ -8,15 +8,15 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/retrovibed/retrovibed/retroapi/authn"
+	
 	"github.com/retrovibed/retrovibed/retroapi/deeppool"
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/httpx"
 	"golang.org/x/oauth2"
 )
 
 func AutoJWTClient(ctx context.Context) (c *http.Client, err error) {
-	c, err = authn.Oauth2DeeppoolHTTPClient(ctx)
+	c, err = Oauth2DeeppoolHTTPClient(ctx)
 	if err != nil {
 		return nil, errorsx.Wrap(err, "failed to create oauth2 http client")
 	}
@@ -30,7 +30,7 @@ func JWTClient(oauth2c *http.Client) *http.Client {
 
 func JWTClientHostname(oauth2c *http.Client, hostname string) *http.Client {
 	return oauth2.NewClient(
-		context.WithValue(context.Background(), oauth2.HTTPClient, authn.HTTPClientDefaults()),
+		context.WithValue(context.Background(), oauth2.HTTPClient, HTTPClientDefaults()),
 		&jwttokensource{
 			oauth2c:  oauth2c,
 			endpoint: fmt.Sprintf("https://%s", hostname),
@@ -78,11 +78,11 @@ func (t *jwttokensource) Token() (*oauth2.Token, error) {
 }
 
 func AuthzClient(oauth2c *http.Client) *http.Client {
-	return AuthzClientEndpoint(context.WithValue(context.Background(), oauth2.HTTPClient, authn.HTTPClientDefaults()), oauth2c, fmt.Sprintf("https://%s/m/authz/", deeppool.Deeppool()))
+	return AuthzClientEndpoint(context.WithValue(context.Background(), oauth2.HTTPClient, HTTPClientDefaults()), oauth2c, fmt.Sprintf("https://%s/m/authz/", deeppool.Deeppool()))
 }
 
 func AuthzClientLibrary(tls *tls.Config, oauth2c *http.Client, endpoint string) *http.Client {
-	cc := authn.HTTPClientLocalDefaults(tls)
+	cc := HTTPClientLocalDefaults(tls)
 	return AuthzClientEndpoint(context.WithValue(context.Background(), oauth2.HTTPClient, cc), oauth2c, fmt.Sprintf("https://%s/meta/authz/", endpoint))
 }
 

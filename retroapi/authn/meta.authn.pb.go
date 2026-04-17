@@ -4,7 +4,7 @@
 // 	protoc        v3.21.12
 // source: meta.authn.proto
 
-package metaapi
+package authn
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"

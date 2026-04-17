@@ -18,7 +18,7 @@ func AuthenticateWithToken(p jwtx.SecretSource) func(http.Handler) http.Handler 
 			var (
 				err     error
 				b       jwt.RegisteredClaims
-				encoded = authn.Bearer(req)
+				encoded = authn.BearerToken(req)
 			)
 
 			if err = jwtx.Validate(p, encoded, &b); err != nil {

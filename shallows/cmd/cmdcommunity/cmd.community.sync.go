@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/community"
@@ -31,7 +32,7 @@ func (t cmdCommunitySync) Run(gctx *cmdopts.Global) (err error) {
 		return errorsx.Wrap(err, "unable to register with archival service")
 	}
 
-	if httpc, err = metaapi.AutoJWTClient(gctx.Context); err != nil {
+	if httpc, err = authn.AutoJWTClient(gctx.Context); err != nil {
 		return errorsx.Wrap(err, "unable to create api client")
 	}
 

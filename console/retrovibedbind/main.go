@@ -15,7 +15,7 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/retrovibed/retroapi/authn"
+	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdglobalmain"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/shallows/meta/identityssh"
