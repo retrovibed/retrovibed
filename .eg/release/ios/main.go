@@ -102,6 +102,8 @@ func iosbuild(ctx context.Context, op eg.Op) error {
 				flutter.New(commit.StringReplace("flutter build ipa --build-name=%git.commit.year%.%git.commit.month%.%git.commit.day% --build-number=%git.commit.unix% --no-codesign --release --build-number=%git.commit.unix%")).
 					Environ("OTHER_LDFLAGS", "-force_load $(PROJECT_DIR)/libretrovibed.a -force_load $(PROJECT_DIR)/libduckdb_static.a -lc++").
 					Timeout(15*time.Minute),
+				flutter.New("echo '--- xcconfig OTHER_LDFLAGS ---' && grep OTHER_LDFLAGS ios/Pods/Target\\ Support\\ Files/Pods-Runner/Pods-Runner.release.xcconfig | head -1"),
+				flutter.New("echo '--- Runner nm audit ---' && nm -gU build/ios/archive/Runner.xcarchive/Products/Applications/Runner.app/Runner | grep -c _logging; nm -gU build/ios/archive/Runner.xcarchive/Products/Applications/Runner.app/Runner | grep _logging || echo 'SYMBOL NOT FOUND'"),
 			),
 			shell.Op(
 				shell.New("echo flutter failed to build iOS app"),
