@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/retrovibed/retrovibed/shallows/authn"
+	"github.com/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"

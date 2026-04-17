@@ -4,5 +4,6 @@ use (
 	// ../torrent
 	./.eg
 	./console/retrovibedbind
+	./retroapi
 	./shallows
 )

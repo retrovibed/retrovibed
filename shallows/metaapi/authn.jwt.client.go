@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/retrovibed/retrovibed/shallows/authn"
-	"github.com/retrovibed/retrovibed/shallows/deeppool"
+	"github.com/retrovibed/retroapi/authn"
+	"github.com/retrovibed/retroapi/deeppool"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"golang.org/x/oauth2"

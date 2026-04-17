@@ -8,7 +8,7 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/james-lawrence/torrent/dht/int160"
-	"github.com/retrovibed/retrovibed/shallows/authn"
+	"github.com/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"

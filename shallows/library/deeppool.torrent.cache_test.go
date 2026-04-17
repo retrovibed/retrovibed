@@ -10,7 +10,7 @@ import (
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/james-lawrence/torrent/torrenttest"
-	"github.com/retrovibed/retrovibed/shallows/blockcache"
+	"github.com/retrovibed/retroapi/blockcache"
 	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/cryptox"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"

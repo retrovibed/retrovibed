@@ -1,12 +1,12 @@
-// Every //export directive in this file MUST also be referenced from
+// Package retrovibedbind Every //export directive in this file MUST also be referenced from
 // console/ios/Classes/EnforceBinding.m. iOS links the Go bindings as a
 // static archive and the Apple linker dead-strips any exported symbol
 // the Obj-C/Swift code does not reference, causing Dart FFI dlsym
 // lookups to fail at runtime with a whitescreen on launch.
 package main
 
-import "C"
 import (
+	"C"
 	"context"
 	"encoding/json"
 	"log"
@@ -15,7 +15,7 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/retrovibed/retrovibed/shallows/authn"
+	"github.com/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdglobalmain"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/shallows/meta/identityssh"

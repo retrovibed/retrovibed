@@ -11,7 +11,7 @@ import (
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
-	"github.com/retrovibed/retrovibed/shallows/blockcache"
+	"github.com/retrovibed/retroapi/blockcache"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/asynccompute"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"

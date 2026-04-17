@@ -9,7 +9,8 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
-	"github.com/retrovibed/retrovibed/shallows/blockcache"
+	"github.com/retrovibed/retroapi/blockcache"
+	"github.com/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
@@ -18,7 +19,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
-	"github.com/retrovibed/retrovibed/shallows/internal/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"

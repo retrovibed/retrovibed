@@ -12,8 +12,8 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid/v5"
-	"github.com/retrovibed/retrovibed/shallows/blockcache"
-	"github.com/retrovibed/retrovibed/shallows/deeppool"
+	"github.com/retrovibed/retroapi/blockcache"
+	"github.com/retrovibed/retroapi/deeppool"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/cryptox"
