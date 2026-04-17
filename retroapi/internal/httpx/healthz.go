@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/retrovibed/retrovibed/retroapi/internal/cryptox"
+	"github.com/retrovibed/retrovibed/retroapi/cryptox"
 	"github.com/retrovibed/retrovibed/retroapi/internal/slicesx"
 )
 

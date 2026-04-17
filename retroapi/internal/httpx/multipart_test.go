@@ -10,7 +10,7 @@ import (
 	"net/textproto"
 	"testing"
 
-	"github.com/retrovibed/retrovibed/retroapi/internal/cryptox"
+	"github.com/retrovibed/retrovibed/retroapi/cryptox"
 	"github.com/retrovibed/retrovibed/retroapi/internal/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/md5x"
 	"github.com/retrovibed/retrovibed/retroapi/internal/testx"

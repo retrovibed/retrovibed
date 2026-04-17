@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
+	"github.com/retrovibed/retrovibed/retroapi/cryptox"
 	"github.com/retrovibed/retrovibed/retroapi/internal/bytesx"
-	"github.com/retrovibed/retrovibed/retroapi/internal/cryptox"
 	"github.com/retrovibed/retrovibed/retroapi/internal/md5x"
 	"github.com/stretchr/testify/require"
 )

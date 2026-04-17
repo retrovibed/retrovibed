@@ -16,7 +16,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/retrovibed/retrovibed/retroapi/internal/cryptox"
+	"github.com/retrovibed/retrovibed/retroapi/cryptox"
 	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/fsx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/md5x"
