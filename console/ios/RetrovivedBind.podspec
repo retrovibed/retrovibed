@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
   s.platform     = :ios, '16.0'
 
   static_libs = Dir[File.join(__dir__, '*.a')].map { |f| File.basename(f) }
-  s.vendored_libraries = static_libs
+  s.vendored_libraries = static_libs.reject { |f| f == 'libretrovibed.a' }
   s.static_framework = true
   s.source_files = 'Classes/**/*.{h,m}'
   s.public_header_files = 'Classes/**/*.h'
