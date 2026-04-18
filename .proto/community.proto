@@ -82,9 +82,13 @@ message PublishedContent {
   string title = 9 [ json_name = "title" ];
   string description = 10 [ json_name = "description" ];
   string mimetype = 11 [ json_name = "mimetype" ];
-  string library_id = 12 [ json_name = "library_id" ];
-  string oauth_google_id = 13 [ json_name = "oauth_google_id" ];
-  string encryption_seed = 14 [ json_name = "encryption_seed" ];
+  string encryption_seed = 12 [ json_name = "encryption_seed" ];
+  uint64 bytes = 13 [ json_name = "bytes" ];
+
+  reserved 14 to 999;
+  // private fields for retrovibed use only, not populated by clients.
+  string library_id = 1000 [ json_name = "library_id" ];
+  string oauth_google_id = 1001 [ json_name = "oauth_google_id" ];
 }
 
 message PublishContentRequest {

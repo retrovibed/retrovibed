@@ -136,6 +136,7 @@ func SyncPendingToDeeppool(ctx context.Context, q sqlx.Queryer, httpc *http.Clie
 				Description:    known.Overview,
 				Mimetype:       stringsx.FirstNonBlank(known.Mimetype, lmd.Mimetype),
 				EncryptionSeed: lmd.EncryptionSeed,
+				Bytes:          lmd.Bytes,
 			},
 		}, io.NopCloser(bytes.NewReader(encoded)))
 
