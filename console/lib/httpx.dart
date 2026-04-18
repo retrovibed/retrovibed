@@ -106,18 +106,18 @@ Future<http.MultipartFile> uploadable(
 }
 
 Future<T> auto_error<T extends http.BaseResponse>(T v) {
-  // if (v.statusCode >= 300) {
-  //   print("failed ${v.request?.url.toString()} ${v.statusCode}");
-  // }
+  if (v.statusCode >= 300) {
+    print("failed ${v.request?.url.toString()} ${v.statusCode}");
+  }
 
   return v.statusCode >= 300 ? Future.error(v) : Future.value(v);
 }
 
 Future<HttpClientResponse> dart_io_auto_error(HttpClientRequest v) {
   return v.close().then((r) {
-    // if (r.statusCode >= 300) {
-    //   print("failed ${v.uri.toString()} ${r.statusCode}");
-    // }
+    if (r.statusCode >= 300) {
+      print("failed ${v.uri.toString()} ${r.statusCode}");
+    }
 
     return r.statusCode >= 300 ? Future.error(r) : Future.value(r);
   });

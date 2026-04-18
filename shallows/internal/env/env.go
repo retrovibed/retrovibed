@@ -2,10 +2,8 @@ package env
 
 import (
 	"path/filepath"
-	"sync"
 
-	"github.com/gofrs/uuid/v5"
-	"github.com/retrovibed/retrovibed/shallows/internal/envx"
+	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/shallows/internal/userx"
 )
 
@@ -53,15 +51,8 @@ const (
 	LoggingVerbosity        = "RETROVIBED_LOGGING_VERBOSITY"                // controls logging verbosity level
 )
 
-var v = sync.OnceValue(func() []byte {
-	return []byte(envx.String(
-		uuid.Must(uuid.NewV4()).String(),
-		JWTSharedSecret,
-	))
-})
-
 func JWTSecret() []byte {
-	return v()
+	return authn.JWTSecretFromEnv()
 }
 
 func RootStorageDir(rel ...string) string {
