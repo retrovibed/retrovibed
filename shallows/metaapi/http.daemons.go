@@ -8,9 +8,9 @@ import (
 	"github.com/go-playground/form/v4"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
-	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/retroapi/httpauth"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
+	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
@@ -32,7 +32,7 @@ func HTTPDaemonsOptionJWTSecret(j jwtx.SecretSource) HTTPDaemonsOption {
 func NewHTTPDaemons(q sqlx.Queryer, options ...HTTPDaemonsOption) *HTTPDaemons {
 	svc := langx.Clone(HTTPDaemons{
 		q:         q,
-		jwtsecret: authn.JWTSecretFromEnv,
+		jwtsecret: env.JWTSecret,
 		decoder:   formx.NewDecoder(),
 	}, options...)
 

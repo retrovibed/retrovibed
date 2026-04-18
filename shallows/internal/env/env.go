@@ -1,13 +1,18 @@
 package env
 
 import (
-	"path/filepath"
 	"sync"
 
 	"github.com/gofrs/uuid/v5"
+	"github.com/retrovibed/retrovibed/retroapi/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/envx"
-	"github.com/retrovibed/retrovibed/shallows/internal/userx"
 )
+
+func MediaDir() string                    { return env.MediaDir() }
+func TorrentDir() string                  { return env.TorrentDir() }
+func PrivateKeyPath() string              { return env.PrivateKeyPath() }
+func TLSPoolDir() string                  { return env.TLSPoolDir() }
+func RootStorageDir(rel ...string) string { return env.RootStorageDir(rel...) }
 
 const (
 	// percentage of requests that should fail.
@@ -62,24 +67,4 @@ var v = sync.OnceValue(func() []byte {
 
 func JWTSecret() []byte {
 	return v()
-}
-
-func RootStorageDir(rel ...string) string {
-	return userx.DefaultDataDirectory(userx.DefaultRelRoot(), filepath.Join(rel...))
-}
-
-func MediaDir() string {
-	return RootStorageDir("media")
-}
-
-func TorrentDir() string {
-	return RootStorageDir("torrent")
-}
-
-func PrivateKeyPath() string {
-	return userx.DefaultConfigDir(userx.DefaultRelRoot(), "id")
-}
-
-func TLSPoolDir() string {
-	return userx.DefaultConfigDir(userx.DefaultRelRoot(), "tls.d")
 }

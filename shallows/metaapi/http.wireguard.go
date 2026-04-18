@@ -16,11 +16,11 @@ import (
 	"github.com/go-playground/form/v4"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
-	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/retroapi/httpauth"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
+	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
@@ -48,7 +48,7 @@ func NewHTTPWireguard(dir string, q sqlx.Queryer, options ...HTTPWireguardOption
 	svc := langx.Clone(HTTPWireguard{
 		q:         q,
 		dir:       fsx.DirVirtual(dir),
-		jwtsecret: authn.JWTSecretFromEnv,
+		jwtsecret: env.JWTSecret,
 		decoder:   formx.NewDecoder(),
 	}, options...)
 

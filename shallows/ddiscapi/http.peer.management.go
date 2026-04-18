@@ -9,10 +9,10 @@ import (
 	"github.com/go-playground/form/v4"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
-	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/retroapi/httpauth"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
+	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
@@ -36,7 +36,7 @@ func HTTPPeerManagementOptionJWTSecret(j jwtx.SecretSource) HTTPPeerManagementOp
 func NewHTTPPeerManagement(q sqlx.Queryer, options ...HTTPPeerManagementOption) *HTTPPeerManagement {
 	svc := langx.Clone(HTTPPeerManagement{
 		q:         q,
-		jwtsecret: authn.JWTSecretFromEnv,
+		jwtsecret: env.JWTSecret,
 		decoder:   formx.NewDecoder(),
 	}, options...)
 

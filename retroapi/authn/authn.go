@@ -17,16 +17,16 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/retrovibed/retrovibed/retroapi/deeppool"
+	"github.com/retrovibed/retrovibed/retroapi/env"
 	"github.com/retrovibed/retrovibed/retroapi/internal/debugx"
-	"github.com/retrovibed/retrovibed/retroapi/internal/env"
 	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/httpx"
-	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/md5x"
 	"github.com/retrovibed/retrovibed/retroapi/internal/oauth2x"
 	"github.com/retrovibed/retrovibed/retroapi/internal/sshx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/stringsx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/userx"
+	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/oauth2"
 )
@@ -176,7 +176,7 @@ func (t FnTokenSource) Token() (*oauth2.Token, error) {
 	return t()
 }
 
-func AutomaticTokenSource() (*oauth2.Token, error) {
+func AutomaticTokenSource(jwtsecret func() []byte) (*oauth2.Token, error) {
 	signer, err := sshx.AutoCached(sshx.NewKeyGen(), env.PrivateKeyPath())
 	if err != nil {
 		return nil, errorsx.Wrap(err, "unable to read identity")
@@ -192,7 +192,7 @@ func AutomaticTokenSource() (*oauth2.Token, error) {
 
 	debugx.Println("claims", spew.Sdump(claims))
 
-	bearer, err := jwtx.Signed(JWTSecretFromEnv(), claims)
+	bearer, err := jwtx.Signed(jwtsecret(), claims)
 	if err != nil {
 		return nil, errorsx.Wrap(err, "unable to create bearer")
 	}
@@ -204,7 +204,7 @@ func AutomaticTokenSource() (*oauth2.Token, error) {
 	}, nil
 }
 
-func NewBearer() (string, error) {
+func NewBearer(jwtsecret func() []byte) (string, error) {
 	signer, err := sshx.AutoCached(sshx.NewKeyGen(), env.PrivateKeyPath())
 	if err != nil {
 		return "", errorsx.Wrap(err, "unable to read identity")
@@ -220,7 +220,7 @@ func NewBearer() (string, error) {
 
 	debugx.Println("claims", spew.Sdump(claims))
 
-	bearer, err := jwtx.Signed(JWTSecretFromEnv(), claims)
+	bearer, err := jwtx.Signed(jwtsecret(), claims)
 
 	return bearer, errorsx.Wrap(err, "token signature failure")
 }
@@ -263,15 +263,13 @@ func BearerForHost(ctx context.Context, c *http.Client, host string) (*oauth2.To
 	return token, nil
 }
 
-func JWTSecretFromEnv() []byte {
-	return env.JWTSecret()
-}
-
 // special jwt secret for registration. essentially just the jwt secret hashed
 // with the string registration. allows us to basically always return a valid jwt token
 // for the oauth2 endpoint but only for the registration endpoints.
-func JWTRegistrationSecretFromEnv() []byte {
-	return md5x.Digest(env.JWTSecret(), []byte("registration")).Sum(nil)
+func JWTRegistrationSecretFromEnv(jwtsecret func() []byte) func() []byte {
+	return func() []byte {
+		return md5x.Digest(jwtsecret(), []byte("registration")).Sum(nil)
+	}
 }
 
 // Bearer extracts the jwt bearer token from a http request.

@@ -12,6 +12,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
+	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
@@ -68,7 +69,7 @@ func TestHTTPSSO(t *testing.T) {
 					jwtx.ClaimsOptionID(uuid.Nil.String()),
 					jwtx.ClaimsOptionIssuer(iden.ID),
 				),
-				authn.JWTRegistrationSecretFromEnv,
+				authn.JWTRegistrationSecretFromEnv(env.JWTSecret),
 			)
 
 			v, err := formx.NewEncoder().Encode(metaapi.Identity{Display: "derp"})
@@ -89,7 +90,7 @@ func TestHTTPSSO(t *testing.T) {
 			require.NoError(t, json.NewDecoder(w.Body).Decode(&result))
 
 			_, err = jwt.ParseWithClaims(result.AccessToken, &claims, func(t *jwt.Token) (interface{}, error) {
-				return authn.JWTRegistrationSecretFromEnv(), nil
+				return authn.JWTRegistrationSecretFromEnv(env.JWTSecret)(), nil
 			})
 			require.NoError(t, err)
 
