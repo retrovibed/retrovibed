@@ -46,7 +46,7 @@ String _path() {
 
 DynamicLibrary _loadLibrary() {
   if (Platform.isIOS) {
-    return DynamicLibrary.process();
+    return DynamicLibrary.open('RetrovivedBind.framework/RetrovivedBind');
   }
   return DynamicLibrary.open(_path());
 }
