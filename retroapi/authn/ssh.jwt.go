@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/retrovibed/retrovibed/retroapi/internal/env"
+	"github.com/retrovibed/retrovibed/retroapi/env"
 	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/langx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/sshx"

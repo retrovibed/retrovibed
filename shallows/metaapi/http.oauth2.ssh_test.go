@@ -12,6 +12,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
+	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sshx"
@@ -138,7 +139,7 @@ func TestHTTPSSHOauth2(t *testing.T) {
 		require.Equal(t, "", token.RefreshToken)            // should be an refresh token
 		require.Less(t, int64(0), time.Until(token.Expiry)) // should have an expiration
 
-		require.NoError(t, jwtx.Validate(authn.JWTRegistrationSecretFromEnv, token.AccessToken, &claims))
+		require.NoError(t, jwtx.Validate(authn.JWTRegistrationSecretFromEnv(env.JWTSecret), token.AccessToken, &claims))
 
 		require.Equal(t, uuid.Nil.String(), claims.Subject)
 		require.Equal(t, "3ace4786-0a48-4599-ff07-72bc411413ef", claims.Issuer)

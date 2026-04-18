@@ -16,6 +16,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/meta/identityssh"
 	"golang.org/x/oauth2"
 )
+import "github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 
 //export oauth2_bearer
 func oauth2_bearer() *C.char {
@@ -55,7 +56,7 @@ func oauth2_bearer() *C.char {
 
 //export authn_bearer
 func authn_bearer() *C.char {
-	bearer, err := authn.NewBearer()
+	bearer, err := authn.NewBearer(cmdopts.JWTSecret)
 	if err != nil {
 		log.Fatalln(err)
 	}

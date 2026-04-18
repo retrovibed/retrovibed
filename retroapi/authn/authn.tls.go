@@ -7,7 +7,7 @@ import (
 	"log"
 	"sync"
 
-	"github.com/retrovibed/retrovibed/retroapi/internal/env"
+	"github.com/retrovibed/retrovibed/retroapi/env"
 	"github.com/retrovibed/retrovibed/retroapi/internal/tlsx"
 )
 

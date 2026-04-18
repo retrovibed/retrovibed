@@ -15,6 +15,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/httpauth"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
+	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
@@ -39,7 +40,7 @@ func HTTPOptionJWTSecret(v jwtx.SecretSource) HTTPOption {
 func NewHTTP(q sqlx.Queryer, options ...HTTPOption) (svc *HTTPSSO) {
 	svc = &HTTPSSO{
 		q:         q,
-		jwtsecret: authn.JWTSecretFromEnv,
+		jwtsecret: env.JWTSecret,
 		decoder:   formx.NewDecoder(),
 	}
 
@@ -145,7 +146,7 @@ func (t *HTTPSSO) register(w http.ResponseWriter, r *http.Request) {
 		bearer   string
 	)
 
-	if bearer, err = authn.AuthorizationToken(r.Context(), authn.JWTRegistrationSecretFromEnv, r, &claims); err != nil {
+	if bearer, err = authn.AuthorizationToken(r.Context(), authn.JWTRegistrationSecretFromEnv(env.JWTSecret), r, &claims); err != nil {
 		httpx.Forbidden(w, errorsx.Wrap(err, "unable to decode authentication token"))
 		return
 	}
@@ -188,7 +189,7 @@ func (t *HTTPSSO) register(w http.ResponseWriter, r *http.Request) {
 		p.ID,
 		jwtx.ClaimsOptionAuthzExpiration(),
 	)
-	ast, err := jwtx.Signed(authn.JWTRegistrationSecretFromEnv(), aclaims)
+	ast, err := jwtx.Signed(authn.JWTRegistrationSecretFromEnv(env.JWTSecret)(), aclaims)
 
 	if err != nil {
 		log.Println("unable to generate access token", err)

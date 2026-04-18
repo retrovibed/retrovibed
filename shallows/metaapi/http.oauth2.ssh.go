@@ -13,6 +13,7 @@ import (
 	"github.com/justinas/alice"
 	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
+	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
@@ -47,7 +48,7 @@ func SSHOauth2AutoConfig(q sqlx.Queryer) (_ *HTTPSSHOauth2, err error) {
 func NewSSHOauth2(q sqlx.Queryer, options ...SSHOauth2Option) (svc *HTTPSSHOauth2) {
 	svc = &HTTPSSHOauth2{
 		q:         q,
-		jwtsecret: authn.JWTSecretFromEnv,
+		jwtsecret: env.JWTSecret,
 		decoder:   formx.NewDecoder(),
 	}
 
@@ -305,7 +306,7 @@ func (t *HTTPSSHOauth2) token(w http.ResponseWriter, req *http.Request) {
 			jwtx.ClaimsOptionAuthzExpiration(),
 			jwtx.ClaimsOptionIssuer(iden.ID),
 		)
-		ast, err := jwtx.Signed(authn.JWTRegistrationSecretFromEnv(), aclaims)
+		ast, err := jwtx.Signed(authn.JWTRegistrationSecretFromEnv(env.JWTSecret)(), aclaims)
 
 		if err != nil {
 			return errorsx.Wrap(err, "unable to generate access token")
