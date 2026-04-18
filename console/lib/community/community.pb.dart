@@ -946,9 +946,10 @@ class PublishedContent extends $pb.GeneratedMessage {
     $core.String? title,
     $core.String? description,
     $core.String? mimetype,
+    $core.String? encryptionSeed,
+    $fixnum.Int64? bytes,
     $core.String? libraryId,
     $core.String? oauthGoogleId,
-    $core.String? encryptionSeed,
   }) {
     final result = create();
     if (id != null) result.id = id;
@@ -962,9 +963,10 @@ class PublishedContent extends $pb.GeneratedMessage {
     if (title != null) result.title = title;
     if (description != null) result.description = description;
     if (mimetype != null) result.mimetype = mimetype;
+    if (encryptionSeed != null) result.encryptionSeed = encryptionSeed;
+    if (bytes != null) result.bytes = bytes;
     if (libraryId != null) result.libraryId = libraryId;
     if (oauthGoogleId != null) result.oauthGoogleId = oauthGoogleId;
-    if (encryptionSeed != null) result.encryptionSeed = encryptionSeed;
     return result;
   }
 
@@ -993,9 +995,11 @@ class PublishedContent extends $pb.GeneratedMessage {
     ..aOS(9, _omitFieldNames ? '' : 'title')
     ..aOS(10, _omitFieldNames ? '' : 'description')
     ..aOS(11, _omitFieldNames ? '' : 'mimetype')
-    ..aOS(12, _omitFieldNames ? '' : 'library_id')
-    ..aOS(13, _omitFieldNames ? '' : 'oauth_google_id')
-    ..aOS(14, _omitFieldNames ? '' : 'encryption_seed')
+    ..aOS(12, _omitFieldNames ? '' : 'encryption_seed')
+    ..a<$fixnum.Int64>(13, _omitFieldNames ? '' : 'bytes', $pb.PbFieldType.OU6,
+        defaultOrMaker: $fixnum.Int64.ZERO)
+    ..aOS(1000, _omitFieldNames ? '' : 'library_id')
+    ..aOS(1001, _omitFieldNames ? '' : 'oauth_google_id')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1117,31 +1121,41 @@ class PublishedContent extends $pb.GeneratedMessage {
   void clearMimetype() => $_clearField(11);
 
   @$pb.TagNumber(12)
-  $core.String get libraryId => $_getSZ(11);
+  $core.String get encryptionSeed => $_getSZ(11);
   @$pb.TagNumber(12)
-  set libraryId($core.String value) => $_setString(11, value);
+  set encryptionSeed($core.String value) => $_setString(11, value);
   @$pb.TagNumber(12)
-  $core.bool hasLibraryId() => $_has(11);
+  $core.bool hasEncryptionSeed() => $_has(11);
   @$pb.TagNumber(12)
-  void clearLibraryId() => $_clearField(12);
+  void clearEncryptionSeed() => $_clearField(12);
 
   @$pb.TagNumber(13)
-  $core.String get oauthGoogleId => $_getSZ(12);
+  $fixnum.Int64 get bytes => $_getI64(12);
   @$pb.TagNumber(13)
-  set oauthGoogleId($core.String value) => $_setString(12, value);
+  set bytes($fixnum.Int64 value) => $_setInt64(12, value);
   @$pb.TagNumber(13)
-  $core.bool hasOauthGoogleId() => $_has(12);
+  $core.bool hasBytes() => $_has(12);
   @$pb.TagNumber(13)
-  void clearOauthGoogleId() => $_clearField(13);
+  void clearBytes() => $_clearField(13);
 
-  @$pb.TagNumber(14)
-  $core.String get encryptionSeed => $_getSZ(13);
-  @$pb.TagNumber(14)
-  set encryptionSeed($core.String value) => $_setString(13, value);
-  @$pb.TagNumber(14)
-  $core.bool hasEncryptionSeed() => $_has(13);
-  @$pb.TagNumber(14)
-  void clearEncryptionSeed() => $_clearField(14);
+  /// private fields for retrovibed use only, not populated by clients.
+  @$pb.TagNumber(1000)
+  $core.String get libraryId => $_getSZ(13);
+  @$pb.TagNumber(1000)
+  set libraryId($core.String value) => $_setString(13, value);
+  @$pb.TagNumber(1000)
+  $core.bool hasLibraryId() => $_has(13);
+  @$pb.TagNumber(1000)
+  void clearLibraryId() => $_clearField(1000);
+
+  @$pb.TagNumber(1001)
+  $core.String get oauthGoogleId => $_getSZ(14);
+  @$pb.TagNumber(1001)
+  set oauthGoogleId($core.String value) => $_setString(14, value);
+  @$pb.TagNumber(1001)
+  $core.bool hasOauthGoogleId() => $_has(14);
+  @$pb.TagNumber(1001)
+  void clearOauthGoogleId() => $_clearField(1001);
 }
 
 class PublishContentRequest extends $pb.GeneratedMessage {

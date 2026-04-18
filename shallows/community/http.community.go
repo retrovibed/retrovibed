@@ -180,6 +180,7 @@ func (t *HTTP) publish(w http.ResponseWriter, r *http.Request) {
 		LibraryID:     lmd.ID,
 		PublishMode:   int32(req.PublishMode),
 		OAuthGoogleID: stringsx.FirstNonBlank(req.PublishedContent.OauthGoogleId, uuid.Nil.String()),
+		Bytes:         lmd.Bytes,
 	}
 
 	if err = PublishedContentInsertWithDefaults(r.Context(), t.q, pc).Scan(&pc); err != nil {
@@ -308,6 +309,7 @@ func PublishedContentOptionFromDB(pc PublishedContent) func(*meta.PublishedConte
 		p.PublishedAt = grpcx.EncodeTime(pc.PublishedAt)
 		p.CreatedAt = grpcx.EncodeTime(pc.CreatedAt)
 		p.UpdatedAt = grpcx.EncodeTime(pc.UpdatedAt)
+		p.Bytes = pc.Bytes
 	}
 }
 

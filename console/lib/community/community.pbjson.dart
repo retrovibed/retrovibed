@@ -322,9 +322,19 @@ const PublishedContent$json = {
     {'1': 'title', '3': 9, '4': 1, '5': 9, '10': 'title'},
     {'1': 'description', '3': 10, '4': 1, '5': 9, '10': 'description'},
     {'1': 'mimetype', '3': 11, '4': 1, '5': 9, '10': 'mimetype'},
-    {'1': 'library_id', '3': 12, '4': 1, '5': 9, '10': 'library_id'},
-    {'1': 'oauth_google_id', '3': 13, '4': 1, '5': 9, '10': 'oauth_google_id'},
-    {'1': 'encryption_seed', '3': 14, '4': 1, '5': 9, '10': 'encryption_seed'},
+    {'1': 'encryption_seed', '3': 12, '4': 1, '5': 9, '10': 'encryption_seed'},
+    {'1': 'bytes', '3': 13, '4': 1, '5': 4, '10': 'bytes'},
+    {'1': 'library_id', '3': 1000, '4': 1, '5': 9, '10': 'library_id'},
+    {
+      '1': 'oauth_google_id',
+      '3': 1001,
+      '4': 1,
+      '5': 9,
+      '10': 'oauth_google_id'
+    },
+  ],
+  '9': [
+    {'1': 14, '2': 1000},
   ],
 };
 
@@ -336,9 +346,10 @@ final $typed_data.Uint8List publishedContentDescriptor = $convert.base64Decode(
     'B1Ymxpc2hlZF9hdBIeCgpjcmVhdGVkX2F0GAYgASgJUgpjcmVhdGVkX2F0Eh4KCnVwZGF0ZWRf'
     'YXQYByABKAlSCnVwZGF0ZWRfYXQSIAoLYXJjaGl2ZWRfaWQYCCABKAlSC2FyY2hpdmVkX2lkEh'
     'QKBXRpdGxlGAkgASgJUgV0aXRsZRIgCgtkZXNjcmlwdGlvbhgKIAEoCVILZGVzY3JpcHRpb24S'
-    'GgoIbWltZXR5cGUYCyABKAlSCG1pbWV0eXBlEh4KCmxpYnJhcnlfaWQYDCABKAlSCmxpYnJhcn'
-    'lfaWQSKAoPb2F1dGhfZ29vZ2xlX2lkGA0gASgJUg9vYXV0aF9nb29nbGVfaWQSKAoPZW5jcnlw'
-    'dGlvbl9zZWVkGA4gASgJUg9lbmNyeXB0aW9uX3NlZWQ=');
+    'GgoIbWltZXR5cGUYCyABKAlSCG1pbWV0eXBlEigKD2VuY3J5cHRpb25fc2VlZBgMIAEoCVIPZW'
+    '5jcnlwdGlvbl9zZWVkEhQKBWJ5dGVzGA0gASgEUgVieXRlcxIfCgpsaWJyYXJ5X2lkGOgHIAEo'
+    'CVIKbGlicmFyeV9pZBIpCg9vYXV0aF9nb29nbGVfaWQY6QcgASgJUg9vYXV0aF9nb29nbGVfaW'
+    'RKBQgOEOgH');
 
 @$core.Deprecated('Use publishContentRequestDescriptor instead')
 const PublishContentRequest$json = {

@@ -767,11 +767,13 @@ type PublishedContent struct {
 	Title          string                 `protobuf:"bytes,9,opt,name=title,proto3" json:"title,omitempty"`
 	Description    string                 `protobuf:"bytes,10,opt,name=description,proto3" json:"description,omitempty"`
 	Mimetype       string                 `protobuf:"bytes,11,opt,name=mimetype,proto3" json:"mimetype,omitempty"`
-	LibraryId      string                 `protobuf:"bytes,12,opt,name=library_id,proto3" json:"library_id,omitempty"`
-	OauthGoogleId  string                 `protobuf:"bytes,13,opt,name=oauth_google_id,proto3" json:"oauth_google_id,omitempty"`
-	EncryptionSeed string                 `protobuf:"bytes,14,opt,name=encryption_seed,proto3" json:"encryption_seed,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	EncryptionSeed string                 `protobuf:"bytes,12,opt,name=encryption_seed,proto3" json:"encryption_seed,omitempty"`
+	Bytes          uint64                 `protobuf:"varint,13,opt,name=bytes,proto3" json:"bytes,omitempty"`
+	// private fields for retrovibed use only, not populated by clients.
+	LibraryId     string `protobuf:"bytes,1000,opt,name=library_id,proto3" json:"library_id,omitempty"`
+	OauthGoogleId string `protobuf:"bytes,1001,opt,name=oauth_google_id,proto3" json:"oauth_google_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *PublishedContent) Reset() {
@@ -881,6 +883,20 @@ func (x *PublishedContent) GetMimetype() string {
 	return ""
 }
 
+func (x *PublishedContent) GetEncryptionSeed() string {
+	if x != nil {
+		return x.EncryptionSeed
+	}
+	return ""
+}
+
+func (x *PublishedContent) GetBytes() uint64 {
+	if x != nil {
+		return x.Bytes
+	}
+	return 0
+}
+
 func (x *PublishedContent) GetLibraryId() string {
 	if x != nil {
 		return x.LibraryId
@@ -891,13 +907,6 @@ func (x *PublishedContent) GetLibraryId() string {
 func (x *PublishedContent) GetOauthGoogleId() string {
 	if x != nil {
 		return x.OauthGoogleId
-	}
-	return ""
-}
-
-func (x *PublishedContent) GetEncryptionSeed() string {
-	if x != nil {
-		return x.EncryptionSeed
 	}
 	return ""
 }
@@ -1777,7 +1786,7 @@ const file_community_proto_rawDesc = "" +
 	"\x16CommunityUpdateRequest\x12=\n" +
 	"\tcommunity\x18\x01 \x01(\v2\x1f.retrovibed.community.CommunityR\tcommunity\"X\n" +
 	"\x17CommunityUpdateResponse\x12=\n" +
-	"\tcommunity\x18\x01 \x01(\v2\x1f.retrovibed.community.CommunityR\tcommunity\"\xdc\x03\n" +
+	"\tcommunity\x18\x01 \x01(\v2\x1f.retrovibed.community.CommunityR\tcommunity\"\xfb\x03\n" +
 	"\x10PublishedContent\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\"\n" +
 	"\fcommunity_id\x18\x02 \x01(\tR\fcommunity_id\x12&\n" +
@@ -1796,12 +1805,13 @@ const file_community_proto_rawDesc = "" +
 	"\x05title\x18\t \x01(\tR\x05title\x12 \n" +
 	"\vdescription\x18\n" +
 	" \x01(\tR\vdescription\x12\x1a\n" +
-	"\bmimetype\x18\v \x01(\tR\bmimetype\x12\x1e\n" +
+	"\bmimetype\x18\v \x01(\tR\bmimetype\x12(\n" +
+	"\x0fencryption_seed\x18\f \x01(\tR\x0fencryption_seed\x12\x14\n" +
+	"\x05bytes\x18\r \x01(\x04R\x05bytes\x12\x1f\n" +
 	"\n" +
-	"library_id\x18\f \x01(\tR\n" +
-	"library_id\x12(\n" +
-	"\x0foauth_google_id\x18\r \x01(\tR\x0foauth_google_id\x12(\n" +
-	"\x0fencryption_seed\x18\x0e \x01(\tR\x0fencryption_seed\"\xba\x01\n" +
+	"library_id\x18\xe8\a \x01(\tR\n" +
+	"library_id\x12)\n" +
+	"\x0foauth_google_id\x18\xe9\a \x01(\tR\x0foauth_google_idJ\x05\b\x0e\x10\xe8\a\"\xba\x01\n" +
 	"\x15PublishContentRequest\x12T\n" +
 	"\x11published_content\x18\x01 \x01(\v2&.retrovibed.community.PublishedContentR\x11published_content\x12E\n" +
 	"\fpublish_mode\x18\x02 \x01(\x0e2!.retrovibed.community.PublishModeR\fpublish_modeJ\x04\b\x03\x10\x04\"n\n" +
