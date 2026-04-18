@@ -13,4 +13,6 @@ Pod::Spec.new do |s|
   s.source_files = 'Classes/**/*.{h,m}'
   s.public_header_files = 'Classes/**/*.h'
   s.libraries = 'c++', 'resolv'
+  force_load_flags = static_libs.map { |lib| "-force_load $(PODS_ROOT)/RetrovivedBind/#{lib}" }.join(' ')
+  s.pod_target_xcconfig = { 'OTHER_LDFLAGS' => force_load_flags }
 end
