@@ -8,13 +8,7 @@ Pod::Spec.new do |s|
   s.source       = { :path => '.' }
   s.platform     = :ios, '16.0'
 
-  s.static_framework = true
-
-  static_libs = Dir[File.join(__dir__, '*.a')].map { |f| File.basename(f) }
-  s.vendored_libraries = static_libs
+  s.vendored_frameworks = 'RetrovivedBind.xcframework'
   s.source_files = 'Classes/**/*.{h,m}'
   s.public_header_files = 'Classes/**/*.h'
-  s.libraries = 'c++', 'resolv'
-  force_load_flags = static_libs.map { |lib| "-force_load $(PODS_ROOT)/../#{lib}" }.join(' ')
-  s.user_target_xcconfig = { 'OTHER_LDFLAGS' => "$(inherited) #{force_load_flags} -Wl,-export_dynamic" }
 end

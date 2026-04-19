@@ -96,6 +96,7 @@ func iosbuild(ctx context.Context, op eg.Op) error {
 		egbug.DebugFailure(
 			shell.Op(
 				flutter.New("mkdir -p ios/Classes && cp ios/libretrovibed.h ios/Classes/libretrovibed.h"),
+				flutter.New("bash ios/mkframework.sh"),
 				flutter.New("flutter pub get"),
 				flutter.New("pod install").Directory(egenv.WorkingDirectory("console", "ios")),
 				flutter.New(commit.StringReplace("flutter build ipa --build-name=%git.commit.year%.%git.commit.month%.%git.commit.day% --build-number=%git.commit.unix% --no-codesign --release --build-number=%git.commit.unix%")).
