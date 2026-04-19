@@ -9,8 +9,8 @@
 !Flutter/
 !Flutter/Release.xcconfig
 !Flutter/Debug.xcconfig
-!Classes/
-!Classes/EnforceBinding.m
+!RetrovivedBind/
+!RetrovivedBind/Info.plist
 !Runner/
 !Runner/Info.plist
 !Runner/*.entitlements

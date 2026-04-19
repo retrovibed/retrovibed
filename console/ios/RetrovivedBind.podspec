@@ -9,6 +9,4 @@ Pod::Spec.new do |s|
   s.platform     = :ios, '16.0'
 
   s.vendored_frameworks = 'RetrovivedBind.xcframework'
-  s.source_files = 'Classes/**/*.{h,m}'
-  s.public_header_files = 'Classes/**/*.h'
 end
