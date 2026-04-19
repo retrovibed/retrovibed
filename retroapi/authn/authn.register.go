@@ -84,6 +84,42 @@ func Register(ctx context.Context) (*Session, error) {
 	})
 }
 
+// AwaitAuthorized polls the authz endpoint until granted returns true for the
+// received token or the context is cancelled. Uses exponential backoff capped
+// at 30 seconds between attempts.
+func AwaitAuthorized(ctx context.Context, c *http.Client, granted func(*Token) bool) error {
+	endpoint := fmt.Sprintf("https://%s/m/authz/", deeppool.Deeppool())
+	bs := backoffx.New(backoffx.Exponential(500*time.Millisecond), backoffx.Maximum(30*time.Second))
+
+	err := backoffx.Attempt(ctx, bs, func(ctx context.Context) error {
+		var authed AuthzResponse
+
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
+		if err != nil {
+			return err
+		}
+
+		resp, err := httpx.AsError(c.Do(req))
+		if err != nil {
+			log.Println("awaiting authorization", err)
+			return err
+		}
+		defer resp.Body.Close()
+
+		if err = json.NewDecoder(resp.Body).Decode(&authed); err != nil {
+			return err
+		}
+
+		if authed.Token == nil || !granted(authed.Token) {
+			return errors.New("access not yet granted")
+		}
+
+		return nil
+	})
+
+	return errorsx.Wrap(err, "awaiting authorization failed")
+}
+
 func PrintIdentity(w io.Writer, s ssh.Signer, session *Session) error {
 	var (
 		err3 error
