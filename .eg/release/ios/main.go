@@ -96,7 +96,7 @@ func iosbuild(ctx context.Context, op eg.Op) error {
 		egbug.DebugFailure(
 			shell.Op(
 				flutter.New("mkdir -p ios/Classes && cp ios/libretrovibed.h ios/Classes/libretrovibed.h"),
-				flutter.New("bash ios/mkframework.sh"),
+				flutter.New("bash -c 'cd ios && rm -rf RetrovivedBind.framework RetrovivedBind.xcframework && mkdir -p RetrovivedBind.framework && xcrun clang -target arm64-apple-ios16.0 -isysroot \"$(xcrun --sdk iphoneos --show-sdk-path)\" -shared -o RetrovivedBind.framework/RetrovivedBind $(for f in *.a; do printf -- \"-Wl,-force_load,%s \" \"$f\"; done) -lc++ -lresolv -framework CoreFoundation -framework Security -Wl,-install_name,@rpath/RetrovivedBind.framework/RetrovivedBind && /usr/libexec/PlistBuddy -c \"Add :CFBundleExecutable string RetrovivedBind\" -c \"Add :CFBundleIdentifier string space.retrovibe.retrovibedbind\" -c \"Add :CFBundleInfoDictionaryVersion string 6.0\" -c \"Add :CFBundleName string RetrovivedBind\" -c \"Add :CFBundlePackageType string FMWK\" -c \"Add :CFBundleVersion string 1.0.0\" -c \"Add :MinimumOSVersion string 16.0\" RetrovivedBind.framework/Info.plist && xcodebuild -create-xcframework -framework RetrovivedBind.framework -output RetrovivedBind.xcframework'"),
 				flutter.New("flutter pub get"),
 				flutter.New("pod install").Directory(egenv.WorkingDirectory("console", "ios")),
 				flutter.New(commit.StringReplace("flutter build ipa --build-name=%git.commit.year%.%git.commit.month%.%git.commit.day% --build-number=%git.commit.unix% --no-codesign --release --build-number=%git.commit.unix%")).
