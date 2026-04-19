@@ -95,7 +95,9 @@ func iosbuild(ctx context.Context, op eg.Op) error {
 	return eg.Sequential(
 		egbug.DebugFailure(
 			shell.Op(
-				flutter.New("cp ios/libretrovibed.h ios/Classes/libretrovibed.h"),
+				flutter.New("rm -rf ios/RetrovivedBind.framework ios/RetrovivedBind.xcframework && cp -r ios/RetrovivedBind ios/RetrovivedBind.framework"),
+				flutter.New("bash -c 'cd ios && xcrun clang -target arm64-apple-ios16.0 -isysroot \"$(xcrun --sdk iphoneos --show-sdk-path)\" -shared -o RetrovivedBind.framework/RetrovivedBind $(for f in *.a; do printf -- \"-Wl,-force_load,%s \" \"$f\"; done) -lc++ -lresolv -framework CoreFoundation -framework Security -Wl,-install_name,@rpath/RetrovivedBind.framework/RetrovivedBind'"),
+				flutter.New("bash -c 'cd ios && xcodebuild -create-xcframework -framework RetrovivedBind.framework -output RetrovivedBind.xcframework'"),
 				flutter.New("flutter pub get"),
 				flutter.New("pod install").Directory(egenv.WorkingDirectory("console", "ios")),
 				flutter.New(commit.StringReplace("flutter build ipa --build-name=%git.commit.year%.%git.commit.month%.%git.commit.day% --build-number=%git.commit.unix% --no-codesign --release --build-number=%git.commit.unix%")).

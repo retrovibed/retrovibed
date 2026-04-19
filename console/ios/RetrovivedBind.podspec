@@ -8,9 +8,5 @@ Pod::Spec.new do |s|
   s.source       = { :path => '.' }
   s.platform     = :ios, '16.0'
 
-  static_libs = Dir[File.join(__dir__, '*.a')].map { |f| File.basename(f) }
-  s.vendored_libraries = static_libs
-  s.source_files = 'Classes/**/*.{h,m}'
-  s.public_header_files = 'Classes/**/*.h'
-  s.libraries = 'c++', 'resolv'
+  s.vendored_frameworks = 'RetrovivedBind.xcframework'
 end
