@@ -1,22 +1,27 @@
-package metaapi
+package authn
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
-	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/retroapi/deeppool"
-	"github.com/retrovibed/retrovibed/shallows/internal/backoffx"
-	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/backoffx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/httpx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/md5x"
+	"golang.org/x/crypto/ssh"
 )
 
 func Register(ctx context.Context) (*Session, error) {
-	c, err := authn.Oauth2DeeppoolHTTPClient(ctx)
+	c, err := Oauth2DeeppoolHTTPClient(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -77,4 +82,18 @@ func Register(ctx context.Context) (*Session, error) {
 
 		return &session, nil
 	})
+}
+
+func PrintIdentity(w io.Writer, s ssh.Signer, session *Session) error {
+	var (
+		err3 error
+	)
+	_, err1 := fmt.Fprintln(w, "fingerprint", ssh.FingerprintSHA256(s.PublicKey()))
+	_, err2 := fmt.Fprintln(w, "identity   ", md5x.String(ssh.FingerprintSHA256(s.PublicKey())))
+	if session != nil {
+		_, err3 = fmt.Fprintln(w, "account    ", session.Account.Id)
+	}
+	_, err4 := fmt.Fprintln(w, "public     ", strings.TrimSpace(string(ssh.MarshalAuthorizedKey(s.PublicKey()))))
+	_, err5 := fmt.Fprintln(w, "base64     ", base64.URLEncoding.EncodeToString(s.PublicKey().Marshal()))
+	return errorsx.Compact(err1, err2, err3, err4, err5)
 }

@@ -11,7 +11,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/deeppool"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
-	"github.com/retrovibed/retrovibed/shallows/metaapi"
 )
 
 type cmdCommunitySync struct {
@@ -28,7 +27,7 @@ func (t cmdCommunitySync) Run(gctx *cmdopts.Global) (err error) {
 	log.Println("community sync initiated", t.Community)
 	defer log.Println("community sync completed", t.Community)
 
-	if _, err = metaapi.Register(gctx.Context); err != nil {
+	if _, err = authn.Register(gctx.Context); err != nil {
 		return errorsx.Wrap(err, "unable to register with archival service")
 	}
 
