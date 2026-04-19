@@ -1,35 +1,15 @@
 package cmdmeta
 
 import (
-	"encoding/base64"
-	"fmt"
-	"io"
 	"os"
-	"strings"
 
 	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/internal/sshx"
 	"github.com/retrovibed/retrovibed/shallows/metaapi"
-	"golang.org/x/crypto/ssh"
 )
-
-func printIdentity(w io.Writer, s ssh.Signer, session *metaapi.Session) error {
-	var (
-		err3 error
-	)
-	_, err1 := fmt.Fprintln(w, "fingerprint", ssh.FingerprintSHA256(s.PublicKey()))
-	_, err2 := fmt.Fprintln(w, "identity   ", md5x.String(ssh.FingerprintSHA256(s.PublicKey())))
-	if session != nil {
-		_, err3 = fmt.Fprintln(w, "account    ", session.Account.Id)
-	}
-	_, err4 := fmt.Fprintln(w, "public     ", strings.TrimSpace(string(ssh.MarshalAuthorizedKey(s.PublicKey()))))
-	_, err5 := fmt.Fprintln(w, "base64     ", base64.URLEncoding.EncodeToString(s.PublicKey().Marshal()))
-	return errorsx.Compact(err1, err2, err3, err4, err5)
-}
 
 type Identity struct {
 	Generate  GenerateID  `cmd:"" help:"bootstrap the identity of the device itself, allows you to provide a seed for consistent generation"`
@@ -46,7 +26,7 @@ func (t IdenDisplay) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 	if err != nil {
 		return err
 	}
-	return printIdentity(os.Stdout, signer, nil)
+	return authn.PrintIdentity(os.Stdout, signer, nil)
 }
 
 type GenerateID struct {
@@ -60,7 +40,7 @@ func (t GenerateID) Run(gctx *cmdopts.Global) (err error) {
 		return err
 	}
 
-	return printIdentity(os.Stdout, id, nil)
+	return authn.PrintIdentity(os.Stdout, id, nil)
 }
 
 type Register struct {
@@ -81,7 +61,7 @@ func (t Register) Run(gctx *cmdopts.Global) (err error) {
 		return errorsx.Wrap(err, "unable to register")
 	}
 
-	if err := printIdentity(os.Stdout, id, session); err != nil {
+	if err := authn.PrintIdentity(os.Stdout, id, session); err != nil {
 		return err
 	}
 
