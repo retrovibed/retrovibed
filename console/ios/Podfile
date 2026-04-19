@@ -49,6 +49,10 @@ post_install do |installer|
       # mobile_scanner (MLKit) only ships x86_64 for the simulator.
       # Go static lib is built as darwin/amd64 to match.
       config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
+      # Export Go symbols so DynamicLibrary.process() can find them via dlsym.
+      # -dead_strip removes force-loaded symbols from the export trie unless they
+      # are explicitly exported. -export_dynamic preserves all global symbols.
+      config.build_settings['OTHER_LDFLAGS'] = '$(inherited) -Wl,-export_dynamic'
     end
   end
   runner_project.save
