@@ -66,6 +66,7 @@ const Token$json = {
     },
     {'1': 'library_read', '3': 1007, '4': 1, '5': 8, '10': 'library_read'},
     {'1': 'library_modify', '3': 1008, '4': 1, '5': 8, '10': 'library_modify'},
+    {'1': 'archive_sync', '3': 1009, '4': 1, '5': 8, '10': 'archive_sync'},
   ],
   '9': [
     {'1': 9, '2': 1000},
@@ -82,7 +83,8 @@ final $typed_data.Uint8List tokenDescriptor = $convert.base64Decode(
     '9kaWZ5EisKEGNvbW11bml0eV9tb2RpZnkY7AcgASgIUhBjb21tdW5pdHlfbW9kaWZ5EicKDmFy'
     'Y2hpdmVfdXBsb2FkGO0HIAEoBFIOYXJjaGl2ZV91cGxvYWQSKwoQYXJjaGl2ZV9kb3dubG9hZB'
     'juByABKARSEGFyY2hpdmVfZG93bmxvYWQSIwoMbGlicmFyeV9yZWFkGO8HIAEoCFIMbGlicmFy'
-    'eV9yZWFkEicKDmxpYnJhcnlfbW9kaWZ5GPAHIAEoCFIObGlicmFyeV9tb2RpZnlKBQgJEOgH');
+    'eV9yZWFkEicKDmxpYnJhcnlfbW9kaWZ5GPAHIAEoCFIObGlicmFyeV9tb2RpZnkSIwoMYXJjaG'
+    'l2ZV9zeW5jGPEHIAEoCFIMYXJjaGl2ZV9zeW5jSgUICRDoBw==');
 
 @$core.Deprecated('Use authzRequestDescriptor instead')
 const AuthzRequest$json = {

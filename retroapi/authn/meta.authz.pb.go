@@ -132,6 +132,7 @@ type Token struct {
 	ArchiveDownload uint64 `protobuf:"varint,1006,opt,name=archive_download,proto3" json:"archive_download,omitempty"`
 	LibraryRead     bool   `protobuf:"varint,1007,opt,name=library_read,proto3" json:"library_read,omitempty"`
 	LibraryModify   bool   `protobuf:"varint,1008,opt,name=library_modify,proto3" json:"library_modify,omitempty"`
+	ArchiveSync     bool   `protobuf:"varint,1009,opt,name=archive_sync,proto3" json:"archive_sync,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -267,6 +268,13 @@ func (x *Token) GetLibraryRead() bool {
 func (x *Token) GetLibraryModify() bool {
 	if x != nil {
 		return x.LibraryModify
+	}
+	return false
+}
+
+func (x *Token) GetArchiveSync() bool {
+	if x != nil {
+		return x.ArchiveSync
 	}
 	return false
 }
@@ -638,7 +646,7 @@ const file_meta_authz_proto_rawDesc = "" +
 	"\x06issued\x18\x05 \x01(\x03R\x03iat\x12\x14\n" +
 	"\aexpires\x18\x06 \x01(\x03R\x03exp\x12\x17\n" +
 	"\n" +
-	"not_before\x18\a \x01(\x03R\x03nbf\"\xf2\x03\n" +
+	"not_before\x18\a \x01(\x03R\x03nbf\"\x97\x04\n" +
 	"\x05Token\x12\x0f\n" +
 	"\x02id\x18\x01 \x01(\tR\x03jti\x12\x13\n" +
 	"\x06issuer\x18\x02 \x01(\tR\x03iss\x12\x17\n" +
@@ -657,7 +665,8 @@ const file_meta_authz_proto_rawDesc = "" +
 	"\x0earchive_upload\x18\xed\a \x01(\x04R\x0earchive_upload\x12+\n" +
 	"\x10archive_download\x18\xee\a \x01(\x04R\x10archive_download\x12#\n" +
 	"\flibrary_read\x18\xef\a \x01(\bR\flibrary_read\x12'\n" +
-	"\x0elibrary_modify\x18\xf0\a \x01(\bR\x0elibrary_modifyJ\x05\b\t\x10\xe8\a\"\x0e\n" +
+	"\x0elibrary_modify\x18\xf0\a \x01(\bR\x0elibrary_modify\x12#\n" +
+	"\farchive_sync\x18\xf1\a \x01(\bR\farchive_syncJ\x05\b\t\x10\xe8\a\"\x0e\n" +
 	"\fAuthzRequest\"J\n" +
 	"\rAuthzResponse\x12\x16\n" +
 	"\x06bearer\x18\x01 \x01(\tR\x06bearer\x12!\n" +

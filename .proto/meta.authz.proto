@@ -33,6 +33,8 @@ message Token {
   uint64 archive_download = 1006 [ json_name = "archive_download" ];
   bool library_read = 1007 [ json_name = "library_read" ];
   bool library_modify = 1008 [ json_name = "library_modify" ];
+  bool archive_sync = 1009 [ json_name = "archive_sync" ];
+  bool community_sync = 1010 [ json_name = "community_sync" ];
 }
 
 message AuthzRequest {}

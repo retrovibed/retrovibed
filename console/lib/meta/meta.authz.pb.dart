@@ -160,6 +160,7 @@ class Token extends $pb.GeneratedMessage {
     $fixnum.Int64? archiveDownload,
     $core.bool? libraryRead,
     $core.bool? libraryModify,
+    $core.bool? archiveSync,
   }) {
     final result = create();
     if (id != null) result.id = id;
@@ -177,6 +178,7 @@ class Token extends $pb.GeneratedMessage {
     if (archiveDownload != null) result.archiveDownload = archiveDownload;
     if (libraryRead != null) result.libraryRead = libraryRead;
     if (libraryModify != null) result.libraryModify = libraryModify;
+    if (archiveSync != null) result.archiveSync = archiveSync;
     return result;
   }
 
@@ -212,6 +214,7 @@ class Token extends $pb.GeneratedMessage {
         defaultOrMaker: $fixnum.Int64.ZERO)
     ..aOB(1007, _omitFieldNames ? '' : 'library_read')
     ..aOB(1008, _omitFieldNames ? '' : 'library_modify')
+    ..aOB(1009, _omitFieldNames ? '' : 'archive_sync')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -367,6 +370,15 @@ class Token extends $pb.GeneratedMessage {
   $core.bool hasLibraryModify() => $_has(14);
   @$pb.TagNumber(1008)
   void clearLibraryModify() => $_clearField(1008);
+
+  @$pb.TagNumber(1009)
+  $core.bool get archiveSync => $_getBF(15);
+  @$pb.TagNumber(1009)
+  set archiveSync($core.bool value) => $_setBool(15, value);
+  @$pb.TagNumber(1009)
+  $core.bool hasArchiveSync() => $_has(15);
+  @$pb.TagNumber(1009)
+  void clearArchiveSync() => $_clearField(1009);
 }
 
 class AuthzRequest extends $pb.GeneratedMessage {
