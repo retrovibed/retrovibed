@@ -145,7 +145,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	jwtx.RegisterAlgorithms(sshjwt, jwt.SigningMethodHS512)
 
 	if c, err := authn.AutoJWTClient(gctx.Context); err == nil {
-		deepjwt = c
+		deepjwt = httpx.BindRetryTransport(c, http.StatusTooManyRequests, http.StatusBadGateway, http.StatusInternalServerError, http.StatusRequestTimeout)
 	} else {
 		// we allow creation to fail the application should function even without the api.
 		// just warn that the api is unavailable.
