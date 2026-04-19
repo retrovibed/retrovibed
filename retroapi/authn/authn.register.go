@@ -1,4 +1,4 @@
-package metaapi
+package authn
 
 import (
 	"context"
@@ -9,14 +9,13 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/retroapi/deeppool"
-	"github.com/retrovibed/retrovibed/shallows/internal/backoffx"
-	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/backoffx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/httpx"
 )
 
 func Register(ctx context.Context) (*Session, error) {
-	c, err := authn.Oauth2DeeppoolHTTPClient(ctx)
+	c, err := Oauth2DeeppoolHTTPClient(ctx)
 	if err != nil {
 		return nil, err
 	}

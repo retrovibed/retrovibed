@@ -13,12 +13,11 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/library"
-	"github.com/retrovibed/retrovibed/shallows/metaapi"
 )
 
 func AutoArchival(ctx context.Context, q sqlx.Queryer, mediastore fsx.Virtual, async *asyncx.Wakeup, archive bool) error {
 	if archive {
-		if _, err := metaapi.Register(ctx); err != nil {
+		if _, err := authn.Register(ctx); err != nil {
 			return errorsx.Wrap(err, "unable to register with archival service")
 		}
 	}

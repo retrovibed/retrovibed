@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -76,7 +77,7 @@ func (t Register) Run(gctx *cmdopts.Global) (err error) {
 		return err
 	}
 
-	if session, err = metaapi.Register(gctx.Context); err != nil {
+	if session, err = authn.Register(gctx.Context); err != nil {
 		return errorsx.Wrap(err, "unable to register")
 	}
 

@@ -6,7 +6,6 @@ import (
 
 	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
-	"github.com/retrovibed/retrovibed/shallows/metaapi"
 )
 
 // DeeppoolClient provides an http.Client for deeppool API calls.
@@ -19,7 +18,7 @@ type DeeppoolClient interface {
 type DeeppoolClientDefault struct{}
 
 func (t DeeppoolClientDefault) HTTPClient(ctx context.Context) (*http.Client, error) {
-	if _, err := metaapi.Register(ctx); err != nil {
+	if _, err := authn.Register(ctx); err != nil {
 		return nil, errorsx.Wrap(err, "unable to register with archival service")
 	}
 
