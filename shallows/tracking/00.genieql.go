@@ -277,7 +277,7 @@ func RSSCooldownByID(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer, id string, ttl int, digest string, lastbuild time.Time) NewRSSScannerStaticRow,
 ) {
-	gql = gql.Query(`UPDATE torrents_feed_rss SET updated_at = DEFAULT, next_check = NOW() + to_minutes({ttl}), last_built_at = {lastbuild}, digest = {digest} WHERE "id" = {id} RETURNING ` + RSSScannerStaticColumns)
+	gql = gql.Query(`UPDATE torrents_feed_rss SET updated_at = DEFAULT, next_check = CAST(NOW() AS TIMESTAMP) + to_minutes({ttl}), last_built_at = {lastbuild}, digest = {digest} WHERE "id" = {id} RETURNING ` + RSSScannerStaticColumns)
 }
 
 func RSSDeleteByID(

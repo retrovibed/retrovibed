@@ -222,11 +222,20 @@ class _LoadingIconButtonState extends State<LoadingIconButton> {
     });
 
     // Execute the user's asynchronous function and await its completion
-    widget.onPressed().whenComplete(() {
-      setState(() {
-        _isLoading = false;
-      });
-    });
+    widget
+        .onPressed()
+        .catchError((cause) {
+          debugPrint(cause);
+          // Handle any errors that occur during the asynchronous operation
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("An error occurred: $cause")),
+          );
+        })
+        .whenComplete(() {
+          setState(() {
+            _isLoading = false;
+          });
+        });
   }
 
   @override
