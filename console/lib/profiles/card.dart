@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/authn.dart' as authn;
@@ -127,13 +128,15 @@ class _CardState extends State<Card> {
               ),
               onPressed: ds.Copyable.copy(retro.public_key()),
             ),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton(
-                onPressed: _openWebConsole,
-                child: Text("Web Console"),
+            // TODO (man7iss): revert iOS gate when ready
+            if (!Platform.isIOS)
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton(
+                  onPressed: _openWebConsole,
+                  child: Text("Web Console"),
+                ),
               ),
-            ),
           ],
         ),
       ),

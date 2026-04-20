@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/httpx.dart' as httpx;
@@ -124,21 +125,23 @@ class _Settings extends State<Settings> {
               ),
             ),
             desired.$1,
-            Purchase(
-              current: current,
-              desired: desired.$2,
-              onChange: (pending) {
-                return pending
-                    .then((v) {
-                      _billing?.replace(v);
-                    })
-                    .catchError((cause) {
-                      setState(() {
-                        _cause = ds.Error.unknown(cause, onTap: _reseterr);
+            // TODO (man7iss): revert iOS gate when ready
+            if (!Platform.isIOS)
+              Purchase(
+                current: current,
+                desired: desired.$2,
+                onChange: (pending) {
+                  return pending
+                      .then((v) {
+                        _billing?.replace(v);
+                      })
+                      .catchError((cause) {
+                        setState(() {
+                          _cause = ds.Error.unknown(cause, onTap: _reseterr);
+                        });
                       });
-                    });
-              },
-            ),
+                },
+              ),
           ],
         ),
       ),
