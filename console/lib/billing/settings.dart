@@ -126,7 +126,7 @@ class _Settings extends State<Settings> {
             ),
             desired.$1,
             // TODO (man7iss): revert iOS gate when ready
-            if (!Platform.isIOS)
+            if (!(Platform.isIOS || Platform.isMacOS))
               Purchase(
                 current: current,
                 desired: desired.$2,

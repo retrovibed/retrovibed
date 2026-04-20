@@ -129,7 +129,7 @@ class _CardState extends State<Card> {
               onPressed: ds.Copyable.copy(retro.public_key()),
             ),
             // TODO (man7iss): revert iOS gate when ready
-            if (!Platform.isIOS)
+            if (!(Platform.isIOS || Platform.isMacOS))
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton(
