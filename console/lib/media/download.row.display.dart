@@ -157,8 +157,18 @@ class DownloadRowDisplay extends StatelessWidget {
                     spacing: defaults.spacing,
                     children: [
                       Expanded(child: Icon(Icons.people_outline, size: 16)),
-                      Expanded(child: Text(current.peers.toString())),
-                      Expanded(child: Text("${(percentage * 100).toStringAsFixed(1)}%")),
+                      Expanded(
+                        child: Text(
+                          current.peers.toString().padLeft(3),
+                          style: const TextStyle(fontFamily: 'monospace'),
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          "${(percentage * 100).toStringAsFixed(2).padLeft(6)}%",
+                          style: const TextStyle(fontFamily: 'monospace'),
+                        ),
+                      ),
                       trailing?.call(context) ?? const SizedBox(),
                     ],
                   ),
@@ -182,8 +192,11 @@ class DownloadRowDisplay extends StatelessWidget {
                   ),
                 ),
                 Icon(Icons.people_outline, size: 16),
-                Text(current.peers.toString()),
-                Text("${(percentage * 100).toStringAsFixed(1)}%"),
+                Text(current.peers.toString().padLeft(3), style: const TextStyle(fontFamily: 'monospace')),
+                Text(
+                  "${(percentage * 100).toStringAsFixed(2).padLeft(6)}%",
+                  style: const TextStyle(fontFamily: 'monospace'),
+                ),
                 trailing?.call(context) ?? const SizedBox(),
               ],
             );

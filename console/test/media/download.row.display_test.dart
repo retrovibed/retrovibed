@@ -197,7 +197,7 @@ void main() {
       await tester.pump(_reconnectInterval * 2);
 
       expect(find.text('an unexpected problem has occurred'), findsNothing);
-      expect(find.text('100.0%'), findsOneWidget);
+      expect(find.text('100.00%'), findsOneWidget);
     });
   });
 }

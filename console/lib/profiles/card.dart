@@ -72,8 +72,10 @@ class _CardState extends State<Card> {
     final theme = Theme.of(context);
     final defaults = ds.Defaults.of(context);
     final _openWebConsole = () {
-      authn
-          .otp(options: [authn.DeeppoolAuthzCache.bearer(context)])
+      httpx
+          .withRetry(
+            () => authn.otp(options: [authn.DeeppoolAuthzCache.bearer(context)]),
+          )
           .then((r) {
             final Uri q = Uri.https(httpx.consoleendpoint(), "/", {
               "lt": r.token,

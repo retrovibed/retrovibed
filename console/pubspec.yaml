@@ -63,6 +63,7 @@ dependencies:
   stream_transform: ^2.1.1
   window_manager: ^0.5.1
   shake: ^3.0.0
+  downloadsfolder: ^1.2.0
 
 dev_dependencies:
   flutter_test:
