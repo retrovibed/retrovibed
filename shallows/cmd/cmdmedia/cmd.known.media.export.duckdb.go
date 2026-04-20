@@ -2,7 +2,9 @@ package cmdmedia
 
 import (
 	"database/sql"
+	"log"
 	"os"
+	"sync/atomic"
 
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
@@ -11,14 +13,17 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/library"
 )
 
-type duckdbimport struct{}
+type duckdbexport struct {
+	Database string `flag:"" name:"database" help:"database to read" default:"${vars_user_configuration_directory}/meta.db"`
+}
 
-func (t duckdbimport) Run(gctx *cmdopts.Global) (err error) {
+func (t duckdbexport) Run(gctx *cmdopts.Global) (err error) {
 	var (
-		db *sql.DB
+		db       *sql.DB
+		progress uint64
 	)
 
-	if db, err = cmdmeta.Database(gctx.Context); err != nil {
+	if db, err = cmdmeta.DatabaseCustom(gctx.Context, t.Database); err != nil {
 		return err
 	}
 	defer db.Close()
@@ -30,6 +35,11 @@ func (t duckdbimport) Run(gctx *cmdopts.Global) (err error) {
 	for v := range q.Iter() {
 		if err := d.Encode(v); err != nil {
 			return err
+		}
+
+		if atomic.AddUint64(&progress, 1)%100 == 0 {
+			log.Println("exported", progress, "records")
+			log.Println("current", v.ID, v.UID, v.Title)
 		}
 	}
 

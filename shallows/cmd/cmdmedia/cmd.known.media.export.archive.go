@@ -18,12 +18,12 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/library"
 )
 
-type tarchiveimport struct {
+type tarchiveexport struct {
 	Directory string `flag:"" name:"directory" help:"work directory for the command, defaults to current working directory, usually shouldnt be needed"`
 	Pattern   string `flag:"" name:"pattern" help:"name of the archive directory to import" default:"retrovibed.media.archive.d"`
 }
 
-func (t tarchiveimport) Run(gctx *cmdopts.Global) (err error) {
+func (t tarchiveexport) Run(gctx *cmdopts.Global) (err error) {
 	encoder := jsonl.NewEncoder(os.Stdout)
 
 	insert := asynccompute.New(func(ctx context.Context, v library.Known) error {

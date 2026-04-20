@@ -8,10 +8,12 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
+	"net/url"
 
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
+
 	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/meta"
 )
@@ -83,6 +85,49 @@ func (t Published) Find(ctx context.Context, communityID string) (*meta.Communit
 	}
 
 	return msg.Community, nil
+}
+
+// PublishedContentSyncRequest is the cursor-based request for the sync endpoint.
+type PublishedContentSyncRequest struct {
+	Sync   string `json:"sync"`
+	Offset uint64 `json:"offset"`
+	Limit  uint64 `json:"limit"`
+}
+
+// PublishedContentSyncResponse is the response from the sync endpoint.
+type PublishedContentSyncResponse struct {
+	Next  *PublishedContentSyncRequest `json:"next"`
+	Items []*meta.PublishedContent     `json:"items"`
+}
+
+// Sync pages through all published content using a cursor. cursor is the last-seen ID
+// (use empty string to start from the beginning).
+func (t Published) Sync(ctx context.Context, cursor string) (*PublishedContentSyncResponse, error) {
+	var (
+		err  error
+		req  *http.Request
+		resp *http.Response
+		msg  PublishedContentSyncResponse
+	)
+
+	params := url.Values{}
+	params.Set("sync", cursor)
+
+	uri := fmt.Sprintf("https://%s/p/sync?%s", t.endpoint, params.Encode())
+	if req, err = http.NewRequestWithContext(ctx, http.MethodGet, uri, nil); err != nil {
+		return nil, err
+	}
+
+	if resp, err = httpx.AsError(t.c.Do(req)); err != nil {
+		return nil, errorsx.Wrap(err, "sync request failed")
+	}
+	defer resp.Body.Close()
+
+	if err = json.NewDecoder(resp.Body).Decode(&msg); err != nil {
+		return nil, err
+	}
+
+	return &msg, nil
 }
 
 // List returns all published content for a community.

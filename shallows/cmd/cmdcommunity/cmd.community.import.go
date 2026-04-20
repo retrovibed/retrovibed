@@ -46,7 +46,7 @@ func (t cmdCommunityImport) Run(gctx *cmdopts.Global) (err error) {
 		return errorsx.Wrap(err, "failed to decode community")
 	}
 
-	if db, err = cmdmeta.Database(gctx.Context); err != nil {
+	if db, err = cmdmeta.DatabaseMeta(gctx.Context); err != nil {
 		return err
 	}
 	defer db.Close()

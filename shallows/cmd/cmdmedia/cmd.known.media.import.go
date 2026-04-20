@@ -13,7 +13,9 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/library"
 )
 
-type knownimport struct{}
+type knownimport struct {
+	Database string `flag:"" name:"database" help:"database to read" default:"${vars_user_configuration_directory}/meta.db"`
+}
 
 func (t knownimport) Run(gctx *cmdopts.Global) (err error) {
 	var (
@@ -22,7 +24,7 @@ func (t knownimport) Run(gctx *cmdopts.Global) (err error) {
 		derr error
 	)
 
-	if db, err = cmdmeta.Database(gctx.Context); err != nil {
+	if db, err = cmdmeta.DatabaseCustom(gctx.Context, t.Database); err != nil {
 		return err
 	}
 	defer db.Close()
