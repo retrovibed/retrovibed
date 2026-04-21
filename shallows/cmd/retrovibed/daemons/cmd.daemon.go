@@ -75,7 +75,7 @@ type Command struct {
 	Socks5              cmdopts.Listener `flag:"" name:"socks5-address" help:"enable socks5 proxy, requires a vpn to be configured" default:"tcp://:9999"`
 	DHTLogging          bool             `flag:"" name:"dht-logging" help:"enable debug logging for the dht" default:"false" negatable:"" hidden:"true"`
 	TorrentResume       bool             `flag:"" name:"torrent-resume" help:"enable announcing and resuming torrents" default:"true" negatable:""`
-	TorrentFirealled    bool             `flag:"" name:"torrent-firewalled" help:"restrict torrent connections to private networks" env:"${env_torrent_private}"`
+	TorrentFirewalled   bool             `flag:"" name:"torrent-firewalled" help:"restrict torrent connections to private networks" env:"${env_torrent_private}"`
 	TorrentLogging      bool             `flag:"" name:"torrent-logging" help:"enable torrent logging" default:"false" negatable:"" env:"${env_torrent_logging}"`
 	TorrentDebug        bool             `flag:"" name:"torrent-debug" help:"enable torrent debug logging" default:"false" negatable:"" env:"${env_torrent_debug}"`
 	TorrentPort         uint16           `flag:"" name:"torrent-port" help:"port to use for torrenting" env:"${env_torrent_port}" default:"10000"`
@@ -101,7 +101,7 @@ func (t Command) torrentsettings() *TorrentSettings {
 		Ip4:             t.TorrentPublicIP4,
 		Ip6:             t.TorrentPublicIP6,
 		Resumable:       t.TorrentResume,
-		Firewalled:      t.TorrentFirealled,
+		Firewalled:      t.TorrentFirewalled,
 		Port:            uint32(t.TorrentPort),
 		AutoBootstrap:   t.AutoBootstrap,
 		AutoLocateMedia: t.AutoLocateMedia,
