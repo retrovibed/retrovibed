@@ -231,6 +231,20 @@ void main() {
       expect(find.text('bg'), findsWidgets);
     });
 
+    testWidgets('empty widget is hidden while loading', (tester) async {
+      await tester.pumpApp(
+        CarouselRow(
+          constraints: const BoxConstraints.tightFor(height: 256),
+          title: const Text('Recommendations'),
+          empty: const Text('Content partnerships in progress'),
+          items: const [],
+          loading: true,
+        ),
+      );
+      await tester.pump();
+      expect(find.text('Content partnerships in progress'), findsNothing);
+    });
+
     testWidgets('empty widget is hidden when items are present', (tester) async {
       await tester.pumpApp(
         CarouselRow(

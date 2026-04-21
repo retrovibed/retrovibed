@@ -97,7 +97,7 @@ class _CarouselRowState extends State<CarouselRow> {
                     Stack(
                       children: [
                         if (widget.items.isEmpty) widget.background,
-                        if (widget.items.isEmpty) Center(child: widget.empty),
+                        if (widget.items.isEmpty && !widget.loading) Center(child: widget.empty),
                         Listener(
                           onPointerSignal: (event) {
                             if (event is PointerScrollEvent) {
