@@ -1,6 +1,7 @@
 package cmdmedia
 
 import (
+	"context"
 	"database/sql"
 	"io"
 	"os"
@@ -18,29 +19,32 @@ type knownimport struct {
 }
 
 func (t knownimport) Run(gctx *cmdopts.Global) (err error) {
-	var (
-		db   *sql.DB
-		v    library.Known
-		derr error
-	)
+	var db *sql.DB
 
 	if db, err = cmdmeta.DatabaseCustom(gctx.Context, t.Database); err != nil {
 		return err
 	}
 	defer db.Close()
 
-	d := jsonl.NewDecoder(os.Stdin)
+	return t.run(gctx.Context, db, os.Stdin)
+}
 
-	for derr = d.Decode(&v); derr == nil; derr = d.Decode(&v) {
+func (t knownimport) run(ctx context.Context, db *sql.DB, r io.Reader) (err error) {
+	d := jsonl.Iter[library.Known](jsonl.NewDecoder(r))
+	for v := range d.Each(ctx) {
 		v.AutoDescription = stringsx.Join("\n", v.Title, v.OriginalTitle, v.Overview)
-		if err = library.KnownInsertWithDefaults(gctx.Context, db, v).Scan(&v); err != nil {
+		if err = library.KnownInsertWithDefaults(ctx, db, v).Scan(&v); err != nil {
 			return err
 		}
 	}
 
-	if _, err := db.ExecContext(gctx.Context, "CHECKPOINT"); err != nil {
+	if err = d.Err(); err != nil {
+		return err
+	}
+
+	if _, err := db.ExecContext(ctx, "CHECKPOINT"); err != nil {
 		return errorsx.Wrap(err, "failed to checkpoint database")
 	}
 
-	return errorsx.Ignore(derr, io.EOF)
+	return nil
 }

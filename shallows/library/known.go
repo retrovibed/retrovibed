@@ -39,6 +39,8 @@ func KnownOptionTestDefaults(t *Known) {
 	t.Adult = false
 	t.Released = time.Now()
 	t.Mimetype = mimex.Binary
+	t.Duplicates = 0
+	t.Popularity = 0
 }
 
 // ImportPrefix is a type constraint for import source prefixes.
