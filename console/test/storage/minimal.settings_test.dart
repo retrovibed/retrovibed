@@ -8,30 +8,17 @@ import 'package:retrovibed/storage/local.storage.dart';
 import 'package:retrovibed/storage/archive.storage.dart';
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/quotas.dart' as quotas;
-import 'package:nock/nock.dart';
+
+Future<quotas.QuotaFindResponse> _mockArchiveQuota(
+  String sku, {
+  List<httpx.Option> options = const [],
+}) async =>
+    quotas.QuotaFindResponse(quota: quotas.Quota(consumed: fixnum.Int64(0)));
 
 void main() {
   group('MinimalSettings', () {
-    nock('https://api.retrovibe.space')
-        .get(RegExp(r'/q/.*'))
-        .reply(
-          200,
-          quotas.QuotaFindResponse.create().toProto3Json(),
-          headers: {'Content-Type': 'application/json'},
-        );
-
     testWidgets('renders within 384x384', (WidgetTester tester) async {
       final initialSettings = api.StorageSettingsResponse()..local = api.Local();
-
-      // Mock quota endpoint that returns immediately without HTTP call
-      Future<quotas.QuotaFindResponse> mockArchiveQuota(
-        String sku, {
-        List<httpx.Option> options = const [],
-      }) async {
-        return quotas.QuotaFindResponse(
-          quota: quotas.Quota(consumed: fixnum.Int64(0)),
-        );
-      }
 
       await tester.pumpApp(
         Center(
@@ -42,7 +29,7 @@ void main() {
               onChange: (settings) async {
                 return settings;
               },
-              archiveQuota: mockArchiveQuota,
+              archiveQuota: _mockArchiveQuota,
             ),
           ),
         ),
@@ -71,7 +58,6 @@ void main() {
     testWidgets('renders correctly with initial data', (
       WidgetTester tester,
     ) async {
-      // Create a mock StorageSettingsResponse with initial data
       final initialSettings = api.StorageSettingsResponse()..local = api.Local();
 
       await tester.pumpApp(
@@ -80,11 +66,11 @@ void main() {
           onChange: (settings) async {
             return settings;
           },
+          archiveQuota: _mockArchiveQuota,
         ),
       );
       await tester.pumpAndSettle();
 
-      // Verify that the widget builds without errors
       expect(find.text('library'), findsOneWidget);
       expect(find.text('cache storage'), findsOneWidget);
       expect(find.text('archive'), findsOneWidget);
@@ -94,10 +80,8 @@ void main() {
     testWidgets('handles local storage changes correctly', (
       WidgetTester tester,
     ) async {
-      // Create a mock StorageSettingsResponse with initial data
       final initialSettings = api.StorageSettingsResponse()..local = api.Local();
 
-      // Track if onChange is called
       bool onChangeCalled = false;
 
       await tester.pumpApp(
@@ -107,22 +91,20 @@ void main() {
             onChangeCalled = true;
             return settings;
           },
+          archiveQuota: _mockArchiveQuota,
         ),
       );
       await tester.pumpAndSettle();
 
-      // Verify that the widget builds without errors
       expect(find.text('library'), findsOneWidget);
       expect(find.text('cache storage'), findsOneWidget);
 
-      // Verify that onChange was not called yet
       expect(onChangeCalled, isFalse);
     });
 
     testWidgets('renders LocalStorageSettings and ArchiveStorage components', (
       WidgetTester tester,
     ) async {
-      // Create a mock StorageSettingsResponse with initial data
       final initialSettings = api.StorageSettingsResponse()..local = api.Local();
 
       await tester.pumpApp(
@@ -131,14 +113,12 @@ void main() {
           onChange: (settings) async {
             return settings;
           },
+          archiveQuota: _mockArchiveQuota,
         ),
       );
       await tester.pumpAndSettle();
 
-      // Verify that the LocalStorageSettings component is rendered
       expect(find.byType(LocalStorageSettings), findsOneWidget);
-
-      // Verify that the ArchiveStorage component is rendered
       expect(find.byType(ArchiveStorage), findsOneWidget);
     });
   });
