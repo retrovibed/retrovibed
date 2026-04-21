@@ -109,7 +109,6 @@ class _Settings extends State<Settings> {
             forms.Field(
               label: Text("plan"),
               input: DropdownButton(
-                mouseCursor: SystemMouseCursors.click,
                 borderRadius: defaults.borderRadius,
                 alignment: Alignment.topLeft,
                 isExpanded: true,
