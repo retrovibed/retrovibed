@@ -214,6 +214,53 @@ void main() {
       expect(find.text('card'), findsExactly(5));
     });
 
+    testWidgets('empty widget is shown when items list is empty', (tester) async {
+      await tester.pumpApp(
+        CarouselRow(
+          constraints: const BoxConstraints.tightFor(height: 256),
+          title: const Text('Recommendations'),
+          background: Repeat(
+            () => const SizedBox(width: 100, height: 100, child: Text('bg')),
+          ),
+          empty: const Text('Content partnerships in progress'),
+          items: const [],
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Content partnerships in progress'), findsOneWidget);
+      expect(find.text('bg'), findsWidgets);
+    });
+
+    testWidgets('empty widget is hidden while loading', (tester) async {
+      await tester.pumpApp(
+        CarouselRow(
+          constraints: const BoxConstraints.tightFor(height: 256),
+          title: const Text('Recommendations'),
+          empty: const Text('Content partnerships in progress'),
+          items: const [],
+          loading: true,
+        ),
+      );
+      await tester.pump();
+      expect(find.text('Content partnerships in progress'), findsNothing);
+    });
+
+    testWidgets('empty widget is hidden when items are present', (tester) async {
+      await tester.pumpApp(
+        CarouselRow(
+          constraints: const BoxConstraints.tightFor(height: 256),
+          title: const Text('Recommendations'),
+          empty: const Text('Content partnerships in progress'),
+          items: [
+            SizedBox(width: 100, height: 150, child: Text('item')),
+          ],
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Content partnerships in progress'), findsNothing);
+      expect(find.text('item'), findsOneWidget);
+    });
+
     testWidgets('buttons inside items are tappable', (tester) async {
       bool tapped = false;
       await tester.pumpApp(

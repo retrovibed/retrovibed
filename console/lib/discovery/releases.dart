@@ -73,6 +73,10 @@ class _NewReleasesState extends State<NewReleases> {
       title: const Text('New Releases'),
       constraints: BoxConstraints.tightForFinite(height: 256),
       background: ds.Repeat(() => lib.KnownMediaCard(lib.Known(), icon: null)),
+        empty: Text(
+          'Content partnerships in progress',
+          style: TextStyle(color: Colors.grey),
+        ),
       items:
           _result.items
               .map(

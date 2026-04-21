@@ -13,6 +13,7 @@ class CarouselRow extends StatefulWidget {
   final bool loading;
   final Widget cause;
   final Widget background;
+  final Widget empty;
 
   const CarouselRow({
     super.key,
@@ -21,6 +22,7 @@ class CarouselRow extends StatefulWidget {
     this.loading = false,
     this.cause = Error.zero,
     this.background = const SizedBox(),
+    this.empty = const SizedBox(),
     this.constraints,
   });
 
@@ -95,6 +97,7 @@ class _CarouselRowState extends State<CarouselRow> {
                     Stack(
                       children: [
                         if (widget.items.isEmpty) widget.background,
+                        if (widget.items.isEmpty && !widget.loading) Center(child: widget.empty),
                         Listener(
                           onPointerSignal: (event) {
                             if (event is PointerScrollEvent) {
