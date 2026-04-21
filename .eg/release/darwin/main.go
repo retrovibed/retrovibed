@@ -14,6 +14,7 @@ import (
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
 	"github.com/egdaemon/eg/runtime/wasi/shell"
 	"github.com/egdaemon/eg/runtime/x/wasi/egbug"
+	"github.com/egdaemon/eg/runtime/wasi/eggit"
 	"github.com/egdaemon/eg/runtime/x/wasi/eggithub"
 	"github.com/egdaemon/eg/runtime/x/wasi/eggolang"
 	"github.com/egdaemon/eg/runtime/x/wasi/egtarball"
@@ -44,6 +45,7 @@ func main() {
 	keychainPath := egenv.WorkspaceDirectory("apple.signing.keychain")
 	flutter := runtime.Directory(egenv.WorkingDirectory("console"))
 	shallows := runtime.Directory(egenv.WorkingDirectory("shallows"))
+	commit := eggit.EnvCommit()
 	duckdblibs := egenv.CacheDirectory("duckdb", ".darwin-arm64")
 
 	duckdbldflags := "-L" + duckdblibs + " " +
@@ -68,7 +70,7 @@ func main() {
 			egbug.DebugFailure(
 				shell.Op(
 					flutter.New("rm -rf build/macos/{x64,arm64}/debug").Lenient(true),
-					flutter.New("flutter build macos --build-name=%git.commit.year%.%git.commit.month%.%git.commit.day% --build-number=%git.commit.unix% --release lib/main.dart").Timeout(10*time.Minute),
+					flutter.New(commit.StringReplace("flutter build macos --build-name=%git.commit.year%.%git.commit.month%.%git.commit.day% --build-number=%git.commit.unix% --release lib/main.dart")).Timeout(10*time.Minute),
 				),
 				shell.Op(shell.New("flutter failed to build app")),
 			),
