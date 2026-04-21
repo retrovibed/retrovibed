@@ -65,7 +65,7 @@ class OwnerListDisplayItem extends StatelessWidget {
               constraints: BoxConstraints(maxWidth: defaults.compact),
               community: community,
               update: (updated) {
-                var auth = [authn.AuthzCache.bearer(context)];
+                var auth = [authn.DeeppoolAuthzCache.bearer(context)];
                 return httpx.withRetry(
                   () => API.update(
                     updated.id,
