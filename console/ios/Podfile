@@ -46,9 +46,8 @@ post_install do |installer|
     next unless target.name == 'Runner'
     target.build_configurations.each do |config|
       config.build_settings['PRODUCT_BUNDLE_SIGNATURE'] = '????'
-      # mobile_scanner (MLKit) only ships x86_64 for the simulator.
-      # Go static lib is built as darwin/amd64 to match.
-      config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
+      config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'x86_64'
+      config.build_settings['ONLY_ACTIVE_ARCH'] = 'YES'
     end
   end
   runner_project.save

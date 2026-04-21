@@ -30,10 +30,12 @@
 		<array>
 			<string>_http._tcp.</string>
 		</array>
+		<key>NSMicrophoneUsageDescription</key>
+		<string>Retrovibed may access the microphone during media playback for audio routing.</string>
 		<key>NSCameraUsageDescription</key>
-		<string>Camera access for QR code scanning</string>
+		<string>Retrovibed uses your camera to scan QR codes when joining communities shared by friends.</string>
 		<key>NSLocalNetworkUsageDescription</key>
-		<string>Local network access for device discovery</string>
+		<string>Retrovibed searches your local network to find and connect to your personal media server.</string>
 		<key>UIApplicationSceneManifest</key>
 		<dict>
 			<key>UIApplicationSupportsMultipleScenes</key>

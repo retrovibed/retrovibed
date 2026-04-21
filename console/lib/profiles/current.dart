@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/design.kit/forms.dart' as forms;
@@ -78,27 +79,29 @@ class _CurrentState extends State<Current> {
               label: Text("name"),
               input: Text(current.account.description),
             ),
-            TextButton(
-              child: Text("open web console"),
-              onPressed: () {
-                httpx
-                    .withRetry(
-                      () =>
-                          authn.otp(options: [authn.DeeppoolAuthzCache.bearer(context)]),
-                    )
-                    .then((r) {
-                      final Uri q = Uri.https(httpx.consoleendpoint(), "/", {
-                        "lt": r.token,
+            // TODO (man7iss): revert iOS gate when ready
+            if (!(Platform.isIOS || Platform.isMacOS))
+              TextButton(
+                child: Text("open web console"),
+                onPressed: () {
+                  httpx
+                      .withRetry(
+                        () =>
+                            authn.otp(options: [authn.DeeppoolAuthzCache.bearer(context)]),
+                      )
+                      .then((r) {
+                        final Uri q = Uri.https(httpx.consoleendpoint(), "/", {
+                          "lt": r.token,
+                        });
+                        launchUrl(q);
+                      })
+                      .catchError((cause) {
+                        setState(() {
+                          _cause = ds.Error.unknown(cause, onTap: refresh);
+                        });
                       });
-                      launchUrl(q);
-                    })
-                    .catchError((cause) {
-                      setState(() {
-                        _cause = ds.Error.unknown(cause, onTap: refresh);
-                      });
-                    });
-              },
-            ),
+                },
+              ),
           ],
         ),
       ),
