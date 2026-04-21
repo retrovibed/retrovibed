@@ -71,6 +71,10 @@ func KnownSearch(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilder) 
 	return NewKnownScannerStatic(b.RunWith(q).QueryContext(ctx))
 }
 
+func KnownQueryUIDGreaterThan(uid string) squirrel.Sqlizer {
+	return squirrel.Expr("library_known_media.uid > ?", uid)
+}
+
 func KnownQueryExplicit(b bool) squirrel.Sqlizer {
 	return squirrel.Expr("library_known_media.adult = ?", b)
 }

@@ -11,6 +11,7 @@ import (
 	"go/types"
 	"io"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/james-lawrence/genieql/astutil"
@@ -95,33 +96,38 @@ func StrictPackageImport(name string) func(*build.Package) bool {
 
 // Locate files with the specified build tags
 func FindTaggedFiles(bctx build.Context, path string, tags ...string) (taggedFiles []string, err error) {
+	entries, err := os.ReadDir(path)
+	if err != nil {
+		return nil, err
+	}
+
 	nctx := bctx
-	nctx.BuildTags = []string{}
-	normal, err := nctx.Import(".", path, build.IgnoreVendor)
-	if err != nil {
-		return taggedFiles, err
-	}
+	nctx.BuildTags = tags
 
-	ctx := bctx
-	ctx.BuildTags = tags
-	tagged, err := ctx.Import(".", path, build.IgnoreVendor)
-	if err != nil {
-		return taggedFiles, err
-	}
+	for _, e := range entries {
+		if e.IsDir() || filepath.Ext(e.Name()) != ".go" {
+			continue
+		}
+		name := e.Name()
+		if matched, err := nctx.MatchFile(path, name); err != nil || !matched {
+			continue
+		}
 
-	for _, t := range tagged.GoFiles {
-		missing := true
-		for _, n := range normal.GoFiles {
-			if t == n {
-				missing = false
+		// file must require ALL tags: removing any one must make it fail
+		exclusive := true
+		for _, t := range tags {
+			sctx := bctx
+			sctx.BuildTags = slicesx.Remove(func(s string) bool { return s == t }, tags...)
+			if ok, _ := sctx.MatchFile(path, name); ok {
+				exclusive = false
+				break
 			}
 		}
 
-		if missing {
-			taggedFiles = append(taggedFiles, t)
+		if exclusive {
+			taggedFiles = append(taggedFiles, name)
 		}
 	}
-
 	return taggedFiles, nil
 }
 

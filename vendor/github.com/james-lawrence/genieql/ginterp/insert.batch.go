@@ -6,6 +6,7 @@ import (
 	"go/token"
 	"go/types"
 	"io"
+	"strings"
 
 	"github.com/james-lawrence/genieql"
 	"github.com/james-lawrence/genieql/astcodec"
@@ -423,148 +424,63 @@ func (t *batch) Generate(dst io.Writer) (err error) {
 		return errorsx.Wrap(err, "failed to generate encoding function")
 	}
 
-	generatecasestatement := func(nrecords int, caseexpr ...ast.Expr) *ast.CaseClause {
-		var (
-			qinputs = astutil.ExprList(
-				ast.NewIdent("t.ctx"),
-				ast.NewIdent("query"),
-			)
-			genlocals   []ast.Spec
-			assignments []ast.Stmt
-			remaining   func(...ast.Expr) ast.Stmt = func(inputs ...ast.Expr) ast.Stmt {
-				return astutil.Return(
-					astutil.CallExpr(
-						t.scanner.Name,
-						astutil.CallExpr(
-							&ast.SelectorExpr{
-								X: astutil.SelExpr(
-									"t",
-									"q",
-								),
-								Sel: ast.NewIdent("QueryContext"),
-							},
-							inputs...,
-						),
-					),
-					&ast.SliceExpr{
-						X:   t.tf.Names[0],
-						Low: astutil.IntegerLiteral(nrecords),
-					},
-					ast.NewIdent("true"),
-				)
-			}
-		)
+	valueTupleExprs := make([]ast.Expr, t.n)
 
-		if nrecords == t.n {
-			remaining = func(inputs ...ast.Expr) ast.Stmt {
-				return astutil.Return(
-					astutil.CallExpr(
-						t.scanner.Name,
-						astutil.CallExpr(
-							&ast.SelectorExpr{
-								X: astutil.SelExpr(
-									"t",
-									"q",
-								),
-								Sel: ast.NewIdent("QueryContext"),
-							},
-							inputs...,
-						),
-					),
-					astutil.CallExpr(
-						&ast.ArrayType{Elt: t.tf.Type},
-						ast.NewIdent("nil"),
-					),
-					ast.NewIdent("false"),
-				)
-			}
-		}
-
-		for j := 0; j < nrecords; j++ {
-			localqf1 := astutil.TransformFields(func(f *ast.Field) *ast.Field {
-				return astutil.Field(f.Type, ast.NewIdent(fmt.Sprintf("r%d%s", j, f.Names[0])))
-			}, queryfields...)
-			inputs := astutil.MapFieldsToNameExpr(localqf1...)
-			localqf2 := astutil.MapFieldsToValueSpec(localqf1...)
-			localqf3 := astutil.MapValueSpecToSpec(localqf2...)
-			assignment := astutil.ExprList(
-				inputs...,
-			)
-			assignment = append(assignment, ast.NewIdent("err"))
-			genlocals = append(genlocals, localqf3...)
-			assignments = append(
-				assignments,
-				astutil.If(
-					astutil.Assign(
-						assignment,
-						token.ASSIGN,
-						astutil.ExprList(
-							astutil.CallExpr(
-								ast.NewIdent("transform"),
-								&ast.IndexListExpr{
-									X:       t.tf.Names[0],
-									Indices: astutil.ExprList(astutil.IntegerLiteral(j)),
-								},
-							),
-						),
-					),
-					astutil.BinaryExpr(
-						ast.NewIdent("err"), token.NEQ, ast.NewIdent("nil"),
-					),
-					astutil.Block(
-						astutil.Return(
-							errhandling("err"),
-							astutil.CallExpr(
-								&ast.ArrayType{Elt: t.tf.Type},
-								ast.NewIdent("nil"),
-							),
-							ast.NewIdent("false"),
-						),
-					),
-					nil,
-				),
-			)
-
-			qinputs = append(qinputs, inputs...)
-		}
-
-		queryreplacement := functions.QueryLiteralColumnMapReplacer(t.ctx, t.ctx.Dialect.Insert(nrecords, 0, t.table, t.conflict, cset.ColumnNames(), cset.ColumnNames(), t.defaults), cmaps...)
-		casestmts := make([]ast.Stmt, 0, len(assignments)+3)
-		casestmts = append(casestmts, astutil.DeclStmt(genieql.QueryLiteral(
-			"query",
-			queryreplacement,
-		)))
-		casestmts = append(casestmts, astutil.DeclStmt(astutil.VarList(append(genlocals, astutil.ValueSpec(ast.NewIdent("error"), ast.NewIdent("err")))...)))
-		casestmts = append(casestmts, assignments...)
-		casestmts = append(casestmts, remaining(qinputs...))
-
-		return astutil.CaseClause(
-			caseexpr,
-			casestmts...,
-		)
+	qi := functions.QueryLiteralColumnMapReplacer(t.ctx, t.ctx.Dialect.Insert(t.n, 0, t.table, t.conflict, cset.ColumnNames(), cset.ColumnNames(), t.defaults), cmaps...)
+	queryPrefix, remaining, _ := strings.Cut(qi, "VALUES")
+	queryPrefix += "VALUES "
+	querySuffix := ""
+	tuples, suffix, ok := strings.Cut(remaining, " ON CONFLICT ")
+	if ok {
+		querySuffix = " ON CONFLICT " + suffix
+	}
+	tuples, suffix, ok = strings.Cut(tuples, " RETURNING ")
+	if ok {
+		querySuffix = " RETURNING " + suffix
 	}
 
-	genscanning := func() *ast.BlockStmt {
-		stmts := make([]ast.Stmt, 0, t.n)
-		stmts = append(stmts, astutil.CaseClause(
-			astutil.ExprList(astutil.IntegerLiteral(0)),
-			astutil.Return(
-				ast.NewIdent("nil"),
+	tuples = strings.ReplaceAll(tuples, "),(", ")),((")
+	tuplesarr := strings.Split(tuples, "),(")
+	for i := range t.n {
+		valueTupleExprs[i] = astutil.StringLiteral(strings.TrimSpace(tuplesarr[i]))
+	}
+
+	colIdents := astutil.MapFieldsToNameExpr(queryfields...)
+	transformLHS := append(astutil.MapFieldsToNameExpr(queryfields...), ast.NewIdent("err"))
+	appendCallArgs := append([]ast.Expr{ast.NewIdent("args")}, colIdents...)
+
+	loopbody := astutil.Block(
+		astutil.Assign(
+			transformLHS,
+			token.DEFINE,
+			astutil.ExprList(
 				astutil.CallExpr(
-					&ast.ArrayType{Elt: t.tf.Type},
-					ast.NewIdent("nil"),
+					ast.NewIdent("transform"),
+					&ast.IndexListExpr{
+						X:       t.tf.Names[0],
+						Indices: astutil.ExprList(ast.NewIdent("i")),
+					},
 				),
-				ast.NewIdent("false"),
 			),
-		))
-
-		for i := 1; len(stmts) < cap(stmts); i++ {
-			stmts = append(stmts, generatecasestatement(i, astutil.IntegerLiteral(i)))
-		}
-
-		stmts = append(stmts, generatecasestatement(t.n))
-		return astutil.Block(stmts...)
-	}
+		),
+		astutil.If(
+			nil,
+			astutil.BinaryExpr(ast.NewIdent("err"), token.NEQ, ast.NewIdent("nil")),
+			astutil.Block(
+				astutil.Return(
+					errhandling("err"),
+					astutil.CallExpr(&ast.ArrayType{Elt: t.tf.Type}, ast.NewIdent("nil")),
+					ast.NewIdent("false"),
+				),
+			),
+			nil,
+		),
+		astutil.Assign(
+			astutil.ExprList(ast.NewIdent("args")),
+			token.ASSIGN,
+			astutil.ExprList(astutil.CallExpr(ast.NewIdent("append"), appendCallArgs...)),
+		),
+	)
 
 	advancefn := functions.NewFn(
 		astutil.Assign(
@@ -572,13 +488,108 @@ func (t *batch) Generate(dst io.Writer) (err error) {
 			token.DEFINE,
 			astutil.ExprList(astutil.FuncLiteral(explodedecl)),
 		),
-		astutil.Switch(
+		astutil.If(
 			nil,
-			astutil.CallExpr(
-				ast.NewIdent("len"),
-				ast.NewIdent(t.tf.Names[0].String()),
+			astutil.BinaryExpr(
+				astutil.CallExpr(ast.NewIdent("len"), t.tf.Names[0]),
+				token.EQL,
+				astutil.IntegerLiteral(0),
 			),
-			genscanning(),
+			astutil.Block(
+				astutil.Return(
+					ast.NewIdent("nil"),
+					astutil.CallExpr(&ast.ArrayType{Elt: t.tf.Type}, ast.NewIdent("nil")),
+					ast.NewIdent("false"),
+				),
+			),
+			nil,
+		),
+		astutil.Assign(
+			astutil.ExprList(ast.NewIdent("n")),
+			token.DEFINE,
+			astutil.ExprList(
+				astutil.CallExpr(
+					ast.NewIdent("min"),
+					astutil.CallExpr(ast.NewIdent("len"), t.tf.Names[0]),
+					astutil.IntegerLiteral(t.n),
+				),
+			),
+		),
+		astutil.DeclStmt(genieql.QueryLiteral("queryPrefix", queryPrefix)),
+		astutil.DeclStmt(genieql.QueryLiteral("querySuffix", querySuffix)),
+		astutil.Assign(
+			astutil.ExprList(ast.NewIdent("valueTuples")),
+			token.DEFINE,
+			astutil.ExprList(
+				&ast.CompositeLit{
+					Type: &ast.ArrayType{
+						Len: astutil.IntegerLiteral(t.n),
+						Elt: ast.NewIdent("string"),
+					},
+					Elts: valueTupleExprs,
+				},
+			),
+		),
+		astutil.Assign(
+			astutil.ExprList(ast.NewIdent("query")),
+			token.DEFINE,
+			astutil.ExprList(
+				astutil.BinaryExpr(
+					astutil.BinaryExpr(
+						ast.NewIdent("queryPrefix"),
+						token.ADD,
+						astutil.CallExpr(
+							&ast.SelectorExpr{X: ast.NewIdent("strings"), Sel: ast.NewIdent("Join")},
+							&ast.SliceExpr{X: ast.NewIdent("valueTuples"), High: ast.NewIdent("n")},
+							astutil.StringLiteral(","),
+						),
+					),
+					token.ADD,
+					ast.NewIdent("querySuffix"),
+				),
+			),
+		),
+		astutil.Assign(
+			astutil.ExprList(ast.NewIdent("args")),
+			token.DEFINE,
+			astutil.ExprList(
+				astutil.CallExpr(
+					ast.NewIdent("make"),
+					&ast.ArrayType{Elt: ast.NewIdent("any")},
+					astutil.IntegerLiteral(0),
+					astutil.BinaryExpr(
+						ast.NewIdent("n"),
+						token.MUL,
+						astutil.IntegerLiteral(len(queryfields)),
+					),
+				),
+			),
+		),
+		astutil.Range(
+			ast.NewIdent("i"),
+			nil,
+			token.DEFINE,
+			ast.NewIdent("n"),
+			loopbody,
+		),
+		astutil.Return(
+			astutil.CallExpr(
+				t.scanner.Name,
+				astutil.CallExprEllipsis(
+					&ast.SelectorExpr{
+						X:   astutil.SelExpr("t", "q"),
+						Sel: ast.NewIdent("QueryContext"),
+					},
+					ast.NewIdent("t.ctx"),
+					ast.NewIdent("query"),
+					ast.NewIdent("args"),
+				),
+			),
+			&ast.SliceExpr{
+				X:   t.tf.Names[0],
+				Low: ast.NewIdent("n"),
+			},
+			ast.NewIdent("true"),
 		),
 	)
 

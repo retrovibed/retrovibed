@@ -168,15 +168,12 @@ func KnownInsertWithDefaults(
 	gql.Into("library_known_media").Default("created_at").Conflict("ON CONFLICT (uid) DO UPDATE SET title = EXCLUDED.title, original_language = EXCLUDED.original_language, original_title = EXCLUDED.original_title, popularity = EXCLUDED.popularity, overview = EXCLUDED.overview, source = EXCLUDED.source, poster_path = EXCLUDED.poster_path, backdrop_path = EXCLUDED.backdrop_path, mimetype = EXCLUDED.mimetype, duplicates = duplicates + 1")
 }
 
-// need to revisit batch insert.
-// it handles the maximum incorrect returning nil, false instead of p[n:], true
-// it also generates extremely large functions.
-// func KnownBatchInsertWithDefaults(
-// 	gql genieql.InsertBatch,
-// 	pattern func(ctx context.Context, q sqlx.Queryer, p Known) NewKnownScannerStatic,
-// ) {
-// 	gql.Into("library_known_media").Batch(32).Default("created_at").Conflict("ON CONFLICT (uid) DO UPDATE SET title = EXCLUDED.title, original_language = EXCLUDED.original_language, original_title = EXCLUDED.original_title, popularity = EXCLUDED.popularity, overview = EXCLUDED.overview, source = EXCLUDED.source, poster_path = EXCLUDED.poster_path, backdrop_path = EXCLUDED.backdrop_path, mimetype = EXCLUDED.mimetype, duplicates = duplicates + 1")
-// }
+func KnownBatchInsertWithDefaults(
+	gql genieql.InsertBatch,
+	pattern func(ctx context.Context, q sqlx.Queryer, p Known) NewKnownScannerStatic,
+) {
+	gql.Into("library_known_media").Batch(256).Default("created_at").Conflict("ON CONFLICT (uid) DO UPDATE SET title = EXCLUDED.title, original_language = EXCLUDED.original_language, original_title = EXCLUDED.original_title, popularity = EXCLUDED.popularity, overview = EXCLUDED.overview, source = EXCLUDED.source, poster_path = EXCLUDED.poster_path, backdrop_path = EXCLUDED.backdrop_path, mimetype = EXCLUDED.mimetype, duplicates = duplicates + 1")
+}
 
 func KnownFindByID(
 	gql genieql.Function,

@@ -9,7 +9,9 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/iterx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
+	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 )
@@ -31,12 +33,34 @@ func (t knownimport) Run(gctx *cmdopts.Global) (err error) {
 
 func (t knownimport) run(ctx context.Context, db *sql.DB, r io.Reader) (err error) {
 	d := jsonl.Iter[library.Known](jsonl.NewDecoder(r))
-	for v := range d.Each(ctx) {
-		v.AutoDescription = stringsx.Join("\n", v.Title, v.OriginalTitle, v.Overview)
-		if err = library.KnownInsertWithDefaults(ctx, db, v).Scan(&v); err != nil {
-			return err
+	for chunk := range iterx.Chunk(d.Each(ctx), 1024) {
+		chunk = slicesx.Map(func(v library.Known) library.Known {
+			v.AutoDescription = stringsx.Join("\n", v.Title, v.OriginalTitle, v.Overview)
+			return v
+		}, chunk...)
+
+		s := library.NewKnownBatchInsertWithDefaults(ctx, db, chunk...)
+		for s.Next() {
+			var v library.Known
+			if err = s.Scan(&v); err != nil {
+				return errorsx.Wrap(err, "failed to scan inserted record")
+			}
+		}
+
+		if err = s.Err(); err != nil {
+			return errorsx.Wrap(err, "failed to insert batch")
+		}
+
+		if err = s.Close(); err != nil {
+			return errorsx.Wrap(err, "failed to close batch")
 		}
 	}
+	// for v := range d.Each(ctx) {
+	// 	v.AutoDescription = stringsx.Join("\n", v.Title, v.OriginalTitle, v.Overview)
+	// 	if err = library.KnownInsertWithDefaults(ctx, db, v).Scan(&v); err != nil {
+	// 		return err
+	// 	}
+	// }
 
 	if err = d.Err(); err != nil {
 		return err

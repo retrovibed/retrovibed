@@ -108,11 +108,12 @@ func (t Test) Insert(n int, offset int, table, conflict string, columns, project
 	)
 	offset = offset + 1
 	values := make([]string, 0, n)
-	for i := 0; i < n; i++ {
+	for range n {
 		var (
 			p []string
 		)
-		p, offset = placeholders(offset, selectPlaceholder(columns, defaults))
+		p, newOffset := placeholders(offset, selectPlaceholder(columns, defaults))
+		offset += newOffset
 		values = append(values, fmt.Sprintf("(%s)", strings.Join(p, ",")))
 	}
 

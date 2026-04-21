@@ -15,6 +15,7 @@ import (
 
 type duckdbexport struct {
 	Database string `flag:"" name:"database" help:"database to read" default:"${vars_user_configuration_directory}/meta.db"`
+	Offset   string `flag:"" name:"offset" help:"uid offset to start export from" default:"00000000-0000-0000-0000-000000000000"`
 }
 
 func (t duckdbexport) Run(gctx *cmdopts.Global) (err error) {
@@ -30,7 +31,9 @@ func (t duckdbexport) Run(gctx *cmdopts.Global) (err error) {
 
 	d := jsonl.NewEncoder(os.Stdout)
 
-	q := sqlx.Scan(library.KnownSearch(gctx.Context, db, library.KnownSearchBuilder()))
+	q := sqlx.Scan(library.KnownSearch(gctx.Context, db, library.KnownSearchBuilder().OrderBy("uid ASC").Where(
+		library.KnownQueryUIDGreaterThan(t.Offset),
+	)))
 
 	for v := range q.Iter() {
 		if err := d.Encode(v); err != nil {
