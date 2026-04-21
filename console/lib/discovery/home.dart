@@ -47,8 +47,8 @@ class _HomeState extends State<Home> {
           verticalDirection: compact ? VerticalDirection.up : VerticalDirection.down,
           children: [
             Recent(),
-            if (defaults.debug) Recommendations(),
-            if (defaults.debug) NewReleases(),
+            Recommendations(),
+            NewReleases(),
           ],
         ),
       );

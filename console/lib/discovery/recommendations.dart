@@ -86,8 +86,16 @@ class _RecommendationsState extends State<Recommendations> {
           ],
         ),
         constraints: BoxConstraints.tightForFinite(height: 256),
-        background: ds.Repeat(
-          () => lib.KnownMediaCard(lib.Known(), icon: null),
+        background: Stack(
+          children: [
+            ds.Repeat(() => lib.KnownMediaCard(lib.Known(), icon: null)),
+            Center(
+              child: Text(
+                'Content partnerships in progress',
+                style: TextStyle(color: Colors.grey),
+              ),
+            ),
+          ],
         ),
         items:
             _items
