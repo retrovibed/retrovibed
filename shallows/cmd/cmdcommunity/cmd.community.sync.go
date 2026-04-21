@@ -35,7 +35,7 @@ func (t cmdCommunitySync) Run(gctx *cmdopts.Global) (err error) {
 		return errorsx.Wrap(err, "unable to create api client")
 	}
 
-	if db, err = cmdmeta.Database(gctx.Context); err != nil {
+	if db, err = cmdmeta.DatabaseMeta(gctx.Context); err != nil {
 		return err
 	}
 	defer db.Close()

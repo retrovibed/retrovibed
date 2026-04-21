@@ -27,7 +27,7 @@ func (t reindex) Run(gctx *cmdopts.Global) (err error) {
 		missing squirrel.Sqlizer = squirrelx.Noop{}
 	)
 
-	if db, err = cmdmeta.Database(gctx.Context); err != nil {
+	if db, err = cmdmeta.DatabaseMeta(gctx.Context); err != nil {
 		return err
 	}
 	defer db.Close()

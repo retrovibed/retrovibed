@@ -36,7 +36,7 @@ func (t cmdCommunityList) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClient) 
 		return errorsx.Wrap(err, "failed to locate community")
 	}
 
-	if db, err = cmdmeta.Database(gctx.Context); err != nil {
+	if db, err = cmdmeta.DatabaseMeta(gctx.Context); err != nil {
 		return err
 	}
 	defer db.Close()

@@ -111,7 +111,7 @@ func (t importPeer) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) (err error) 
 
 	gctx.Cleanup.Add(1)
 	defer gctx.Cleanup.Done()
-	if db, err = cmdmeta.Database(gctx.Context); err != nil {
+	if db, err = cmdmeta.DatabaseMeta(gctx.Context); err != nil {
 		return err
 	}
 	defer db.Close()

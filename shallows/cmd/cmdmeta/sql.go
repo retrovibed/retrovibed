@@ -7,6 +7,7 @@ import (
 	"io/fs"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 
@@ -24,14 +25,18 @@ import (
 //go:embed .migrations/*.sql
 var embedsqlite embed.FS
 
-func Database(ctx context.Context) (db *sql.DB, err error) {
-	log.Println("database path", userx.DefaultConfigDir(userx.DefaultRelRoot(), "meta.db"))
+func DatabaseMeta(ctx context.Context) (db *sql.DB, err error) {
+	return DatabaseCustom(ctx, userx.DefaultConfigDir(userx.DefaultRelRoot(), "meta.db"))
+}
 
-	if err := os.MkdirAll(userx.DefaultConfigDir(userx.DefaultRelRoot()), 0700); err != nil {
+func DatabaseCustom(ctx context.Context, path string) (db *sql.DB, err error) {
+	log.Println("database path", path)
+
+	if err := os.MkdirAll(filepath.Dir(path), 0700); err != nil {
 		return nil, err
 	}
 
-	if db, err = sql.Open("duckdb", userx.DefaultConfigDir(userx.DefaultRelRoot(), "meta.db")); err != nil {
+	if db, err = sql.Open("duckdb", path); err != nil {
 		return nil, errorsx.Wrap(err, "unable to open db")
 	}
 	defer func() {

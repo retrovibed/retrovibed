@@ -28,7 +28,7 @@ type BootstrapPublicKey struct {
 func (t BootstrapPublicKey) Run(gctx *cmdopts.Global) (err error) {
 	var db *sql.DB
 
-	if db, err = Database(gctx.Context); err != nil {
+	if db, err = DatabaseMeta(gctx.Context); err != nil {
 		return err
 	}
 	defer db.Close()
@@ -56,7 +56,7 @@ type BootstrapAuthorized struct {
 func (t BootstrapAuthorized) Run(gctx *cmdopts.Global) (err error) {
 	var db *sql.DB
 
-	if db, err = Database(gctx.Context); err != nil {
+	if db, err = DatabaseMeta(gctx.Context); err != nil {
 		return err
 	}
 	defer db.Close()

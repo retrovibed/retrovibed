@@ -39,6 +39,8 @@ func KnownOptionTestDefaults(t *Known) {
 	t.Adult = false
 	t.Released = time.Now()
 	t.Mimetype = mimex.Binary
+	t.Duplicates = 0
+	t.Popularity = 0
 }
 
 // ImportPrefix is a type constraint for import source prefixes.
@@ -67,6 +69,10 @@ func Unknown() Known {
 
 func KnownSearch(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilder) KnownScanner {
 	return NewKnownScannerStatic(b.RunWith(q).QueryContext(ctx))
+}
+
+func KnownQueryUIDGreaterThan(uid string) squirrel.Sqlizer {
+	return squirrel.Expr("library_known_media.uid > ?", uid)
 }
 
 func KnownQueryExplicit(b bool) squirrel.Sqlizer {

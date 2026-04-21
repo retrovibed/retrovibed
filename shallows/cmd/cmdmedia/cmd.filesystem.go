@@ -31,7 +31,7 @@ func (t importFilesystem) Run(gctx *cmdopts.Global) (err error) {
 		db *sql.DB
 	)
 
-	if db, err = cmdmeta.Database(gctx.Context); err != nil {
+	if db, err = cmdmeta.DatabaseMeta(gctx.Context); err != nil {
 		return err
 	}
 	defer db.Close()
