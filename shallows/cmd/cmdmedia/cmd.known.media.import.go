@@ -4,7 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"io"
+	"log"
 	"os"
+	"time"
 
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
@@ -18,6 +20,7 @@ import (
 
 type knownimport struct {
 	Database string `flag:"" name:"database" help:"database to read" default:"${vars_user_configuration_directory}/meta.db"`
+	Batch    int    `flag:"" name:"batch" help:"number of records to insert per batch" default:"8192"`
 }
 
 func (t knownimport) Run(gctx *cmdopts.Global) (err error) {
@@ -33,12 +36,13 @@ func (t knownimport) Run(gctx *cmdopts.Global) (err error) {
 
 func (t knownimport) run(ctx context.Context, db *sql.DB, r io.Reader) (err error) {
 	d := jsonl.Iter[library.Known](jsonl.NewDecoder(r))
-	for chunk := range iterx.Chunk(d.Each(ctx), 1024) {
+	for chunk := range iterx.Chunk(d.Each(ctx), t.Batch) {
 		chunk = slicesx.Map(func(v library.Known) library.Known {
 			v.AutoDescription = stringsx.Join("\n", v.Title, v.OriginalTitle, v.Overview)
 			return v
 		}, chunk...)
 
+		ts := time.Now()
 		s := library.NewKnownBatchInsertWithDefaults(ctx, db, chunk...)
 		for s.Next() {
 			var v library.Known
@@ -54,13 +58,9 @@ func (t knownimport) run(ctx context.Context, db *sql.DB, r io.Reader) (err erro
 		if err = s.Close(); err != nil {
 			return errorsx.Wrap(err, "failed to close batch")
 		}
+
+		log.Println("imported", time.Since(ts), len(chunk), "records")
 	}
-	// for v := range d.Each(ctx) {
-	// 	v.AutoDescription = stringsx.Join("\n", v.Title, v.OriginalTitle, v.Overview)
-	// 	if err = library.KnownInsertWithDefaults(ctx, db, v).Scan(&v); err != nil {
-	// 		return err
-	// 	}
-	// }
 
 	if err = d.Err(); err != nil {
 		return err
