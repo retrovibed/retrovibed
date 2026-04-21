@@ -72,16 +72,10 @@ class _NewReleasesState extends State<NewReleases> {
     return ds.CarouselRow(
       title: const Text('New Releases'),
       constraints: BoxConstraints.tightForFinite(height: 256),
-      background: Stack(
-          children: [
-            ds.Repeat(() => lib.KnownMediaCard(lib.Known(), icon: null)),
-            Center(
-              child: Text(
-                'Content partnerships in progress',
-                style: TextStyle(color: Colors.grey),
-              ),
-            ),
-          ],
+      background: ds.Repeat(() => lib.KnownMediaCard(lib.Known(), icon: null)),
+        empty: Text(
+          'Content partnerships in progress',
+          style: TextStyle(color: Colors.grey),
         ),
       items:
           _result.items
