@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gofrs/uuid/v5"
 
@@ -23,8 +24,8 @@ import (
 )
 
 type deeppoolimport struct {
-	Cursor string `flag:"" name:"cursor" help:"sync cursor to resume from" default:"00000000-0000-0000-0000-000000000000"`
-	Source string `flag:"" name:"source" help:"short id for the data source" hidden:"true" default:"deeppool"`
+	StartAt time.Time `flag:"" name:"start" help:"date to start retrieving data from" format:"2006-01-02" default:"1970-01-01"`
+	Source  string    `flag:"" name:"source" help:"short id for the data source" hidden:"true" default:"deeppool"`
 }
 
 func (t deeppoolimport) Run(gctx *cmdopts.Global) error {
@@ -38,7 +39,7 @@ func (t deeppoolimport) Run(gctx *cmdopts.Global) error {
 
 func (t deeppoolimport) run(ctx context.Context, enc *json.Encoder, httpc *http.Client) error {
 	client := deeppool.NewPublished(httpc)
-	cursor := t.Cursor
+	cursor := uuid.Must(uuid.NewV7AtTime(t.StartAt)).String()
 
 	for {
 		resp, err := client.Sync(ctx, cursor)

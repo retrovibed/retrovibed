@@ -2,11 +2,13 @@ package cmdmedia
 
 import (
 	"bytes"
+	"encoding/binary"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"testing"
+	"time"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/shallows/deeppool"
@@ -97,6 +99,32 @@ func TestDeeppoolImportRun(t *testing.T) {
 		return results
 	}
 
+	t.Run("uses start date as initial cursor", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		startAt := time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
+		var firstCursor string
+
+		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if firstCursor == "" {
+				firstCursor = r.URL.Query().Get("sync")
+			}
+			require.NoError(t, json.NewEncoder(w).Encode(syncResponse()))
+		}))
+		defer srv.Close()
+
+		m := deeppoolimport{StartAt: startAt, Source: "deeppool"}
+		require.NoError(t, m.run(ctx, json.NewEncoder(&bytes.Buffer{}), newHTTPClient(t, srv)))
+
+		parsed := uuid.FromStringOrNil(firstCursor)
+		require.False(t, parsed.IsNil())
+		require.Equal(t, uuid.V7, parsed.Version())
+		// top 48 bits of UUID v7 are milliseconds since Unix epoch
+		ms := int64(binary.BigEndian.Uint64(parsed[:8]) >> 16)
+		require.Equal(t, startAt.UnixMilli(), ms)
+	})
+
 	t.Run("returns records from a single page", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
@@ -104,9 +132,11 @@ func TestDeeppoolImportRun(t *testing.T) {
 		id1 := uuid.Must(uuid.NewV7()).String()
 		id2 := uuid.Must(uuid.NewV7()).String()
 
+		call := 0
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			call++
 			require.Equal(t, "/p/sync", r.URL.Path)
-			if r.URL.Query().Get("sync") == uuid.Nil.String() {
+			if call == 1 {
 				require.NoError(t, json.NewEncoder(w).Encode(syncResponse(
 					makeItem(id1, "Film One"),
 					makeItem(id2, "Film Two"),
@@ -118,7 +148,7 @@ func TestDeeppoolImportRun(t *testing.T) {
 		defer srv.Close()
 
 		var buf bytes.Buffer
-		m := deeppoolimport{Cursor: uuid.Nil.String(), Source: "deeppool"}
+		m := deeppoolimport{Source: "deeppool"}
 		require.NoError(t, m.run(ctx, json.NewEncoder(&buf), newHTTPClient(t, srv)))
 
 		results := decodeAll(t, &buf)
@@ -131,10 +161,10 @@ func TestDeeppoolImportRun(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 
-		callCount := 0
+		call := 0
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			callCount++
-			if r.URL.Query().Get("sync") == uuid.Nil.String() {
+			call++
+			if call == 1 {
 				require.NoError(t, json.NewEncoder(w).Encode(syncResponse(
 					makeItem("aaaaaaaa-0000-0000-0000-000000000001", "Film A"),
 					makeItem("aaaaaaaa-0000-0000-0000-000000000002", "Film B"),
@@ -146,10 +176,10 @@ func TestDeeppoolImportRun(t *testing.T) {
 		defer srv.Close()
 
 		var buf bytes.Buffer
-		m := deeppoolimport{Cursor: uuid.Nil.String(), Source: "deeppool"}
+		m := deeppoolimport{Source: "deeppool"}
 		require.NoError(t, m.run(ctx, json.NewEncoder(&buf), newHTTPClient(t, srv)))
 		require.Len(t, decodeAll(t, &buf), 2)
-		require.Equal(t, 2, callCount)
+		require.Equal(t, 2, call)
 	})
 
 	t.Run("advances cursor to last item id", func(t *testing.T) {
@@ -162,20 +192,21 @@ func TestDeeppoolImportRun(t *testing.T) {
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			cursor := r.URL.Query().Get("sync")
 			seenCursors = append(seenCursors, cursor)
-			if cursor == uuid.Nil.String() {
+			if cursor == page1LastID {
+				require.NoError(t, json.NewEncoder(w).Encode(syncResponse()))
+			} else {
 				require.NoError(t, json.NewEncoder(w).Encode(syncResponse(
 					makeItem("bbbbbbbb-0000-0000-0000-000000000001", "Film B1"),
 					makeItem(page1LastID, "Film B2"),
 				)))
-			} else {
-				require.NoError(t, json.NewEncoder(w).Encode(syncResponse()))
 			}
 		}))
 		defer srv.Close()
 
-		m := deeppoolimport{Cursor: uuid.Nil.String(), Source: "deeppool"}
+		m := deeppoolimport{Source: "deeppool"}
 		require.NoError(t, m.run(ctx, json.NewEncoder(&bytes.Buffer{}), newHTTPClient(t, srv)))
-		require.Equal(t, []string{uuid.Nil.String(), page1LastID}, seenCursors)
+		require.Len(t, seenCursors, 2)
+		require.Equal(t, page1LastID, seenCursors[1])
 	})
 
 	t.Run("returns error on server failure", func(t *testing.T) {
@@ -187,7 +218,7 @@ func TestDeeppoolImportRun(t *testing.T) {
 		}))
 		defer srv.Close()
 
-		m := deeppoolimport{Cursor: uuid.Nil.String(), Source: "deeppool"}
+		m := deeppoolimport{Source: "deeppool"}
 		require.Error(t, m.run(ctx, json.NewEncoder(&bytes.Buffer{}), newHTTPClient(t, srv)))
 	})
 }
