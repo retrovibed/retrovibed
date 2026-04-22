@@ -53,14 +53,14 @@ func Main(args ...string) {
 		cmdopts.TLSConfig
 		cmdopts.PeerID
 		cmdopts.SSHID
-		Version   cmdopts.Version       `cmd:"" help:"display versioning information"`
-		Identity  cmdmeta.Identity      `cmd:"" help:"identity management commands"`
-		Media     cmdmedia.Commands     `cmd:"" help:"media management (import/export)"`
-		Torrent   cmdtorrent.Commands   `cmd:"" help:"torrent commands"`
-		Community cmdcommunity.Commands `cmd:"" help:"community commands"`
-		Discovery cmdddisc.Commands     `cmd:"" help:"media discovery commands, used to manage discovery of media"`
-		ETL       cmdetl.Commands       `cmd:"" help:"etl commands for processing jsonl through llm endpoints"`
-		Daemon    daemons.Command       `cmd:"" help:"run the backend daemon" default:"true"`
+		Version   cmdopts.Version        `cmd:"" help:"display versioning information"`
+		Identity  cmdmeta.Identity       `cmd:"" help:"identity management commands"`
+		Media     cmdmedia.Commands      `cmd:"" help:"media management (import/export)"`
+		Torrent   cmdtorrent.Commands    `cmd:"" help:"torrent commands"`
+		Community cmdcommunity.Community `cmd:"" help:"community commands"`
+		Discovery cmdddisc.Commands      `cmd:"" help:"media discovery commands, used to manage discovery of media"`
+		ETL       cmdetl.Commands        `cmd:"" help:"etl commands for processing jsonl through llm endpoints"`
+		Daemon    daemons.Command        `cmd:"" help:"run the backend daemon" default:"true"`
 	}
 
 	var (

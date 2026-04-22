@@ -1,6 +1,11 @@
 package cmdcommunity
 
-type Commands struct {
+type Community struct {
+	Deeppool Deeppool `cmd:"" help:"deeppool community commands"`
+	Library  Library  `cmd:"" help:"library community commands"`
+}
+
+type Deeppool struct {
 	Create  cmdCommunityCreate  `cmd:"" help:"create a new community"`
 	Delete  cmdCommunityDelete  `cmd:"" help:"delete a community"`
 	Update  cmdCommunityUpdate  `cmd:"" help:"update a community"`
@@ -10,4 +15,8 @@ type Commands struct {
 	List    cmdCommunityList    `cmd:"" help:"list published content for a community"`
 	Import  cmdCommunityImport  `cmd:"" help:"import published content to local database from stdin"`
 	Sync    cmdCommunitySync    `cmd:"" help:"sync published content from deeppool to local database"`
+}
+
+type Library struct {
+	Publish cmdCommunityLibraryPublish `cmd:"" name:"publish" help:"publish a library item to a community"`
 }

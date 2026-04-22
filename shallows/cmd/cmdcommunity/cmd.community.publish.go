@@ -16,6 +16,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/grpcx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
@@ -55,7 +56,7 @@ func (t cmdCommunityPublish) items(c *meta.Community, r io.Reader) iter.Seq[rss.
 				Title:       v.Description,
 				PublishDate: ts,
 				Expires:     timex.RFC3339NanoDecode(errorsx.Zero(grpcx.DecodeTime(v.ExpiresAt))),
-				Link:        fmt.Sprintf("https://%s.community.retrovibe.space/%s", c.Domain, v.Id),
+				Link:        langx.FirstNonZero(c.Url, fmt.Sprintf("https://%s.community.retrovibe.space/%s", c.Domain, v.Id)),
 				Enclosures: []rss.Enclosure{
 					{URL: uri.String(), Mimetype: mimex.Bittorrent, Length: v.Bytes},
 				},
@@ -97,7 +98,7 @@ func (t cmdCommunityPublish) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClien
 	}
 
 	err = errorsx.Wrap(rss.Generator().Generate(io.MultiWriter(&buf), rss.Channel{
-		Link:          fmt.Sprintf("https://%s.community.retrovibe.space", com.Domain),
+		Link:          langx.FirstNonZero(com.Url, fmt.Sprintf("https://%s.community.retrovibe.space", com.Domain)),
 		TTL:           int(t.TTL.Minutes()),
 		Title:         com.Domain,
 		LastBuildDate: t.Timestamp,
