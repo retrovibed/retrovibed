@@ -76,7 +76,7 @@ func (t *mbimport) releases(ctx context.Context, c *gomusicbrainz.WS2Client, l *
 					uidmd5 := uuid.FromBytesOrNil(md5x.JSON(rel).Sum(nil))
 
 					lang := langx.FirstNonZero(
-						errorsx.Zero(language.Parse(rel.TextRepresentation.Language)),
+						errorsx.ZeroSilent(language.Parse(rel.TextRepresentation.Language)),
 						language.Und,
 					)
 

@@ -13,8 +13,6 @@ import (
 
 // print detailed information about the error.
 func Debug(err error) {
-	log.Println("--------------------------------------------------------------------------------------")
-	defer log.Println("--------------------------------------------------------------------------------------")
 	if err == nil {
 		return
 	}
@@ -30,6 +28,14 @@ func Zero[T any](v T, err error) T {
 
 	if cause := log.Output(2, fmt.Sprintln(err)); cause != nil {
 		panic(cause)
+	}
+
+	return v
+}
+
+func ZeroSilent[T any](v T, err error) T {
+	if err == nil {
+		return v
 	}
 
 	return v
