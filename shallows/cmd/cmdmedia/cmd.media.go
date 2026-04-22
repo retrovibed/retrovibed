@@ -9,6 +9,7 @@ type Commands struct {
 }
 
 type Known struct {
+	Env         knownenv       `cmd:"" help:"extract environment infornation for known media import, specifically dates from and existing database"`
 	Tarchive    tarchiveexport `cmd:"" help:"export known media from a directory of tar.gz archives and writes to stdout in known media jsonl format for importing"`
 	Duckdb      duckdbexport   `cmd:"" help:"export known media from a duckdb database and writes to stdout in known media jsonl format for importing"`
 	TMDB        tmdbimport     `cmd:"" help:"import known media from tmdb and writes to stdout in known media jsonl format for importing"`

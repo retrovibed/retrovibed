@@ -40,7 +40,7 @@ func (t duckdbexport) Run(gctx *cmdopts.Global) (err error) {
 			return err
 		}
 
-		if atomic.AddUint64(&progress, 1)%100 == 0 {
+		if atomic.AddUint64(&progress, 1)%8192 == 0 {
 			log.Println("exported", progress, "records")
 			log.Println("current", v.ID, v.UID, v.Title)
 		}

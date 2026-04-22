@@ -22,7 +22,7 @@ import (
 )
 
 type knownarchive struct {
-	Directory string `flag:"" name:"directory" help:"work directory for the command"`
+	Directory string `flag:"" name:"directory" help:"work directory for the command" default:"."`
 	Pattern   string `flag:"" name:"pattern" help:"name of the archive directory to create" default:"retrovibed.media.archive.*.d"`
 	DryRun    bool   `flag:"" name:"dry-run" help:"do not actually write the data into the archive just log" negatable:"" default:"false"`
 }
@@ -33,6 +33,9 @@ func (t knownarchive) Run(gctx *cmdopts.Global) (err error) {
 		v    library.Known
 		derr error
 	)
+
+	log.Println("archive generation initiated")
+	defer log.Println("archive generation completed")
 
 	d := jsonl.NewDecoder(os.Stdin)
 
