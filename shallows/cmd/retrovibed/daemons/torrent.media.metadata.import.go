@@ -5,6 +5,7 @@ import (
 	"context"
 	"io"
 	"log"
+	"time"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/james-lawrence/torrent"
@@ -13,7 +14,9 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/asynccompute"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/iterx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
+	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/tarx"
@@ -36,9 +39,27 @@ func MediaMetadataImport(ctx context.Context, db sqlx.Queryer, tvfs fsx.Virtual,
 	mdcache := torrent.NewMetadataCache(tvfs.Path())
 	iter := sqlx.Scan(tracking.MetadataSearch(ctx, db, q))
 
-	insert := asynccompute.New(func(ctx context.Context, v library.Known) error {
-		return library.KnownInsertWithDefaults(ctx, db, v).Scan(&v)
-	}, asynccompute.Workers[library.Known](1))
+	insert := asynccompute.New(func(ctx context.Context, chunk []library.Known) error {
+		ts := time.Now()
+		s := library.NewKnownBatchInsertWithDefaults(ctx, db, chunk...)
+		for s.Next() {
+			var v library.Known
+			if err := s.Scan(&v); err != nil {
+				return errorsx.Wrap(err, "failed to scan inserted record")
+			}
+		}
+
+		if err := s.Err(); err != nil {
+			return errorsx.Wrap(err, "failed to insert batch")
+		}
+
+		if err := s.Close(); err != nil {
+			return errorsx.Wrap(err, "failed to close batch")
+		}
+
+		log.Println("imported", time.Since(ts), len(chunk), "records")
+		return nil
+	}, asynccompute.Workers[[]library.Known](1))
 
 	pool := asynccompute.New(func(ctx context.Context, _md tracking.Metadata) error {
 		id := int160.FromBytes(_md.Infohash)
@@ -63,27 +84,20 @@ func MediaMetadataImport(ctx context.Context, db sqlx.Queryer, tvfs fsx.Virtual,
 		}
 
 		importtarfile := func(header *tar.Header, content *tar.Reader) error {
-			var (
-				derr error
-				i    uint64
-				v    library.Known
-			)
-
 			log.Println("media metadata import initiated", id, _md.Description, header.Name)
 			defer log.Println("media metadata import completed", id, _md.Description, header.Name)
-			d := jsonl.NewDecoder(content)
 
-			for derr = d.Decode(&v); derr == nil; i, derr = i+1, d.Decode(&v) {
-				v.AutoDescription = stringsx.Join("\n", v.Title, v.OriginalTitle, v.Overview)
-				if err := insert.Run(ctx, v); err != nil {
+			d := jsonl.Iter[library.Known](jsonl.NewDecoder(content))
+			for chunk := range iterx.Chunk(d.Each(ctx), 8192) {
+				chunk = slicesx.Map(func(v library.Known) library.Known {
+					v.AutoDescription = stringsx.Join("\n", v.Title, v.OriginalTitle, v.Overview)
+					return v
+				}, chunk...)
+
+				if err := insert.Run(ctx, chunk); err != nil {
 					return err
 				}
 			}
-
-			if err := errorsx.Ignore(derr, io.EOF); err != nil {
-				return err
-			}
-
 			return nil
 		}
 
