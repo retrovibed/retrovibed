@@ -55,7 +55,8 @@ func Main(args ...string) {
 		cmdopts.SSHID
 		Version   cmdopts.Version        `cmd:"" help:"display versioning information"`
 		Identity  cmdmeta.Identity       `cmd:"" help:"identity management commands"`
-		Media     cmdmedia.Commands      `cmd:"" help:"media management (import/export)"`
+		Media     cmdmedia.Commands      `cmd:"" help:"media metadata management (import/export)"`
+		Library   cmdcommunity.Library   `cmd:"" help:"manage your media library"`
 		Torrent   cmdtorrent.Commands    `cmd:"" help:"torrent commands"`
 		Community cmdcommunity.Community `cmd:"" help:"community commands"`
 		Discovery cmdddisc.Commands      `cmd:"" help:"media discovery commands, used to manage discovery of media"`
