@@ -1,8 +1,12 @@
 package cmdcommunity
 
+import (
+	"github.com/retrovibed/retrovibed/shallows/cmd/cmdcommunitylibrary"
+)
+
 type Community struct {
-	Deeppool Deeppool `cmd:"" help:"deeppool community commands"`
-	Library  Library  `cmd:"" help:"library community commands"`
+	Deeppool Deeppool                    `cmd:"" help:"deeppool community commands"`
+	Library  cmdcommunitylibrary.Library `cmd:"" help:"library community commands"`
 }
 
 type Deeppool struct {
@@ -15,8 +19,4 @@ type Deeppool struct {
 	List    cmdCommunityList    `cmd:"" help:"list published content for a community"`
 	Import  cmdCommunityImport  `cmd:"" help:"import published content to local database from stdin"`
 	Sync    cmdCommunitySync    `cmd:"" help:"sync published content from deeppool to local database"`
-}
-
-type Library struct {
-	Publish cmdCommunityLibraryPublish `cmd:"" name:"publish" help:"publish a library item to a community"`
 }

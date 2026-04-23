@@ -1,4 +1,4 @@
-package cmdcommunity
+package cmdcommunitylibrary
 
 import (
 	"bytes"
@@ -82,7 +82,7 @@ func TestCommunityLibraryPublish(t *testing.T) {
 		encodeLibraryItem(t, jsonl.NewEncoder(&input), lmd)
 
 		var output bytes.Buffer
-		cmd := cmdCommunityLibraryPublish{Endpoint: "localhost:9998", DryRun: true}
+		cmd := cmdPublish{Endpoint: "localhost:9998", DryRun: true}
 		require.NoError(t, cmd.run(ctx, jsonl.NewEncoder(&output), &input, c, com))
 
 		require.False(t, called, "endpoint must not be called during dry run")
@@ -127,7 +127,7 @@ func TestCommunityLibraryPublish(t *testing.T) {
 		encodeLibraryItem(t, jsonl.NewEncoder(&input), lmd)
 
 		var output bytes.Buffer
-		cmd := cmdCommunityLibraryPublish{Endpoint: srv.URL, DryRun: false}
+		cmd := cmdPublish{Endpoint: srv.URL, DryRun: false}
 		token := httpauthtest.UnsafeToken(metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v))), httpauthtest.UnsafeJWTSecretSource)
 		headers := http.Header{"Authorization": []string{"Bearer " + token}}
 		c := &http.Client{
@@ -189,7 +189,7 @@ func TestCommunityLibraryPublish(t *testing.T) {
 
 		com := &meta.Community{Id: communityID}
 		var output bytes.Buffer
-		cmd := cmdCommunityLibraryPublish{Endpoint: srv.URL, DryRun: false}
+		cmd := cmdPublish{Endpoint: srv.URL, DryRun: false}
 		token := httpauthtest.UnsafeToken(metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v))), httpauthtest.UnsafeJWTSecretSource)
 		headers := http.Header{"Authorization": []string{"Bearer " + token}}
 		c := &http.Client{
@@ -250,7 +250,7 @@ func TestCommunityLibraryPublish(t *testing.T) {
 		encodeLibraryItem(t, jsonl.NewEncoder(&input), lmd)
 
 		var output bytes.Buffer
-		cmd := cmdCommunityLibraryPublish{Endpoint: srv.URL, DryRun: false}
+		cmd := cmdPublish{Endpoint: srv.URL, DryRun: false}
 		token := httpauthtest.UnsafeToken(metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v))), httpauthtest.UnsafeJWTSecretSource)
 		headers := http.Header{"Authorization": []string{"Bearer " + token}}
 		c := &http.Client{
@@ -295,7 +295,7 @@ func TestCommunityLibraryPublish(t *testing.T) {
 		require.NoError(t, jsonl.NewEncoder(&input).Encode(lmd))
 
 		com := &meta.Community{Id: communityID}
-		cmd := cmdCommunityLibraryPublish{Endpoint: srv.URL, DryRun: false}
+		cmd := cmdPublish{Endpoint: srv.URL, DryRun: false}
 		token := httpauthtest.UnsafeToken(metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v))), httpauthtest.UnsafeJWTSecretSource)
 		headers := http.Header{"Authorization": []string{"Bearer " + token}}
 		c := &http.Client{

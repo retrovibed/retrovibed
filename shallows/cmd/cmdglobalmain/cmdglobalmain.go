@@ -19,6 +19,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdcommunity"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdddisc"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdetl"
+	"github.com/retrovibed/retrovibed/shallows/cmd/cmdlibrary"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdmedia"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
@@ -56,7 +57,7 @@ func Main(args ...string) {
 		Version   cmdopts.Version        `cmd:"" help:"display versioning information"`
 		Identity  cmdmeta.Identity       `cmd:"" help:"identity management commands"`
 		Media     cmdmedia.Commands      `cmd:"" help:"media metadata management (import/export)"`
-		Library   cmdcommunity.Library   `cmd:"" help:"manage your media library"`
+		Library   cmdlibrary.Commands    `cmd:"" help:"manage your media library"`
 		Torrent   cmdtorrent.Commands    `cmd:"" help:"torrent commands"`
 		Community cmdcommunity.Community `cmd:"" help:"community commands"`
 		Discovery cmdddisc.Commands      `cmd:"" help:"media discovery commands, used to manage discovery of media"`

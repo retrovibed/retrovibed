@@ -17,7 +17,7 @@ type cmdCommunityInfo struct {
 func (t cmdCommunityInfo) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClient) (err error) {
 	c, err := dpc.HTTPClient(gctx.Context)
 	if err != nil {
-		return err
+		return errorsx.Wrap(err, "unable to create deeppool client")
 	}
 
 	commresp, err := metaapi.CommunityInfo(gctx.Context, c, t.Name)

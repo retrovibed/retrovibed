@@ -1,4 +1,4 @@
-package cmdcommunity
+package cmdcommunitylibrary
 
 import (
 	"bytes"
@@ -22,12 +22,12 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/meta"
 )
 
-type cmdCommunityLibraryPublish struct {
+type cmdPublish struct {
 	Endpoint string `flag:"" name:"peer" help:"http address for the retrovibed daemon" default:"http://localhost:9998"`
 	DryRun   bool   `flag:"" name:"dry-run" help:"print what would be published without actually publishing" negatable:"" default:"true"`
 }
 
-func (t cmdCommunityLibraryPublish) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig) (err error) {
+func (t cmdPublish) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig) (err error) {
 	httpc := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(t.Endpoint))
 
 	debugx.Println("reading community from stdin")
@@ -39,7 +39,7 @@ func (t cmdCommunityLibraryPublish) Run(gctx *cmdopts.Global, tls *cmdopts.TLSCo
 	return t.run(gctx.Context, jsonl.NewEncoder(os.Stdout), os.Stdin, httpc, &com)
 }
 
-func (t cmdCommunityLibraryPublish) run(ctx context.Context, enc *jsonl.Encoder, r io.Reader, c *http.Client, com *meta.Community) error {
+func (t cmdPublish) run(ctx context.Context, enc *jsonl.Encoder, r io.Reader, c *http.Client, com *meta.Community) error {
 	d := jsonl.NewDecoder(r)
 
 	var derr error
@@ -65,7 +65,7 @@ func (t cmdCommunityLibraryPublish) run(ctx context.Context, enc *jsonl.Encoder,
 	return errorsx.Ignore(derr, io.EOF)
 }
 
-func (t cmdCommunityLibraryPublish) publishItem(ctx context.Context, c *http.Client, com *meta.Community, libraryID string) (*meta.PublishContentResponse, error) {
+func (t cmdPublish) publishItem(ctx context.Context, c *http.Client, com *meta.Community, libraryID string) (*meta.PublishContentResponse, error) {
 	var (
 		err  error
 		req  *http.Request
