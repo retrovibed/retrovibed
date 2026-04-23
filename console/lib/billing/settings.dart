@@ -106,26 +106,26 @@ class _Settings extends State<Settings> {
         Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            forms.Field(
-              label: Text("plan"),
-              input: DropdownButton(
-                borderRadius: defaults.borderRadius,
-                alignment: Alignment.topLeft,
-                isExpanded: true,
-                value: desired.$1,
-                items: [
-                  for (final p in visible) DropdownMenuItem(child: p.$1.description, value: p.$1),
-                ],
-                onChanged: (v) {
-                  setState(() {
-                    desired = visible.firstWhere((x) => x.$1.id == (v ?? current).id);
-                  });
-                },
+            // TODO (man7iss): revert debug gate when billing is ready on Apple platforms
+            if (defaults.debug || !(Platform.isIOS || Platform.isMacOS)) ...[
+              forms.Field(
+                label: Text("plan"),
+                input: DropdownButton(
+                  borderRadius: defaults.borderRadius,
+                  alignment: Alignment.topLeft,
+                  isExpanded: true,
+                  value: desired.$1,
+                  items: [
+                    for (final p in visible) DropdownMenuItem(child: p.$1.description, value: p.$1),
+                  ],
+                  onChanged: (v) {
+                    setState(() {
+                      desired = visible.firstWhere((x) => x.$1.id == (v ?? current).id);
+                    });
+                  },
+                ),
               ),
-            ),
-            desired.$1,
-            // TODO (man7iss): revert iOS gate when ready
-            if (!(Platform.isIOS || Platform.isMacOS))
+              desired.$1,
               Purchase(
                 current: current,
                 desired: desired.$2,
@@ -141,6 +141,9 @@ class _Settings extends State<Settings> {
                       });
                 },
               ),
+            ] else ...[
+              current,
+            ],
           ],
         ),
       ),
