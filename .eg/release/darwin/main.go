@@ -127,7 +127,7 @@ func main() {
 			shell.Op(
 				shell.Newf("chmod -R a+rX %s", appstoreapp),
 				shell.Newf("security unlock-keychain -p %s %s", egenv.RunID(), keychainPath),
-				shell.Newf("codesign --deep --force --options runtime --sign \"Apple Distribution\" --keychain %s %s", keychainPath, appstoreapp),
+				shell.Newf("find %s/Contents/Frameworks -maxdepth 1 -name '*.framework' -o -name '*.dylib' | xargs -I{} codesign --force --options runtime --sign \"Apple Distribution\" --keychain %s {}", appstoreapp, keychainPath),
 				shell.Newf("codesign --force --options runtime --sign \"Apple Distribution\" --entitlements %s --keychain %s %s/Contents/Helpers/retrovibed", entitlements, keychainPath, appstoreapp),
 				shell.Newf("codesign --force --options runtime --sign \"Apple Distribution\" --entitlements %s --keychain %s %s", entitlements, keychainPath, appstoreapp),
 				shell.Newf("productbuild --component %s /Applications --sign \"3rd Party Mac Developer Installer\" --keychain %s %s", appstoreapp, keychainPath, pkgpath),
