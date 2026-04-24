@@ -1,4 +1,4 @@
-package cmdcommunity
+package cmdlibrary
 
 import (
 	"bytes"
@@ -79,11 +79,12 @@ func TestCommunityLibraryPublish(t *testing.T) {
 
 		com := &meta.Community{Id: communityID}
 		var input bytes.Buffer
+		require.NoError(t, json.NewEncoder(&input).Encode(com))
 		encodeLibraryItem(t, jsonl.NewEncoder(&input), lmd)
 
 		var output bytes.Buffer
-		cmd := cmdCommunityLibraryPublish{Endpoint: "localhost:9998", DryRun: true}
-		require.NoError(t, cmd.run(ctx, jsonl.NewEncoder(&output), &input, c, com))
+		cmd := cmdPublish{Endpoint: "localhost:9998", DryRun: true}
+		require.NoError(t, cmd.run(ctx, jsonl.NewEncoder(&output), &input, c))
 
 		require.False(t, called, "endpoint must not be called during dry run")
 		var decoded library.Metadata
@@ -124,16 +125,17 @@ func TestCommunityLibraryPublish(t *testing.T) {
 
 		com := &meta.Community{Id: communityID}
 		var input bytes.Buffer
+		require.NoError(t, json.NewEncoder(&input).Encode(com))
 		encodeLibraryItem(t, jsonl.NewEncoder(&input), lmd)
 
 		var output bytes.Buffer
-		cmd := cmdCommunityLibraryPublish{Endpoint: srv.URL, DryRun: false}
+		cmd := cmdPublish{Endpoint: srv.URL, DryRun: false}
 		token := httpauthtest.UnsafeToken(metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v))), httpauthtest.UnsafeJWTSecretSource)
 		headers := http.Header{"Authorization": []string{"Bearer " + token}}
 		c := &http.Client{
 			Transport: httpx.NewHeadersTransport(headers),
 		}
-		require.NoError(t, cmd.run(ctx, jsonl.NewEncoder(&output), &input, c, com))
+		require.NoError(t, cmd.run(ctx, jsonl.NewEncoder(&output), &input, c))
 
 		var result meta.PublishedContent
 		require.NoError(t, json.NewDecoder(&output).Decode(&result))
@@ -165,7 +167,9 @@ func TestCommunityLibraryPublish(t *testing.T) {
 
 		communityID := uuid.Must(uuid.NewV7()).String()
 
+		com := &meta.Community{Id: communityID}
 		var input bytes.Buffer
+		require.NoError(t, json.NewEncoder(&input).Encode(com))
 		enc := jsonl.NewEncoder(&input)
 		var libraryIDs []string
 		for range 3 {
@@ -187,16 +191,15 @@ func TestCommunityLibraryPublish(t *testing.T) {
 		srv := httptest.NewServer(communityLibraryPublishServer(t, q))
 		defer srv.Close()
 
-		com := &meta.Community{Id: communityID}
 		var output bytes.Buffer
-		cmd := cmdCommunityLibraryPublish{Endpoint: srv.URL, DryRun: false}
+		cmd := cmdPublish{Endpoint: srv.URL, DryRun: false}
 		token := httpauthtest.UnsafeToken(metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v))), httpauthtest.UnsafeJWTSecretSource)
 		headers := http.Header{"Authorization": []string{"Bearer " + token}}
 		c := &http.Client{
 			Transport: httpx.NewHeadersTransport(headers),
 		}
 
-		require.NoError(t, cmd.run(ctx, jsonl.NewEncoder(&output), &input, c, com))
+		require.NoError(t, cmd.run(ctx, jsonl.NewEncoder(&output), &input, c))
 
 		dec := json.NewDecoder(&output)
 		var results []*meta.PublishedContent
@@ -247,17 +250,18 @@ func TestCommunityLibraryPublish(t *testing.T) {
 
 		com := &meta.Community{Id: communityID, DefaultPublishMode: meta.PublishMode_LISTED}
 		var input bytes.Buffer
+		require.NoError(t, json.NewEncoder(&input).Encode(com))
 		encodeLibraryItem(t, jsonl.NewEncoder(&input), lmd)
 
 		var output bytes.Buffer
-		cmd := cmdCommunityLibraryPublish{Endpoint: srv.URL, DryRun: false}
+		cmd := cmdPublish{Endpoint: srv.URL, DryRun: false}
 		token := httpauthtest.UnsafeToken(metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v))), httpauthtest.UnsafeJWTSecretSource)
 		headers := http.Header{"Authorization": []string{"Bearer " + token}}
 		c := &http.Client{
 			Transport: httpx.NewHeadersTransport(headers),
 		}
 
-		require.NoError(t, cmd.run(ctx, jsonl.NewEncoder(&output), &input, c, com))
+		require.NoError(t, cmd.run(ctx, jsonl.NewEncoder(&output), &input, c))
 
 		var result meta.PublishedContent
 		require.NoError(t, json.NewDecoder(&output).Decode(&result))
@@ -290,18 +294,19 @@ func TestCommunityLibraryPublish(t *testing.T) {
 		defer srv.Close()
 
 		// library item not inserted — endpoint returns an error status
+		com := &meta.Community{Id: communityID}
 		lmd := library.Metadata{ID: libraryID}
 		var input bytes.Buffer
+		require.NoError(t, json.NewEncoder(&input).Encode(com))
 		require.NoError(t, jsonl.NewEncoder(&input).Encode(lmd))
 
-		com := &meta.Community{Id: communityID}
-		cmd := cmdCommunityLibraryPublish{Endpoint: srv.URL, DryRun: false}
+		cmd := cmdPublish{Endpoint: srv.URL, DryRun: false}
 		token := httpauthtest.UnsafeToken(metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v))), httpauthtest.UnsafeJWTSecretSource)
 		headers := http.Header{"Authorization": []string{"Bearer " + token}}
 		c := &http.Client{
 			Transport: httpx.NewHeadersTransport(headers),
 		}
 
-		require.Error(t, cmd.run(ctx, jsonl.NewEncoder(&bytes.Buffer{}), &input, c, com))
+		require.Error(t, cmd.run(ctx, jsonl.NewEncoder(&bytes.Buffer{}), &input, c))
 	})
 }

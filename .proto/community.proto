@@ -23,8 +23,9 @@ message Community {
   bool hidden = 13 [ json_name = "hidden" ];
   string url = 14 [ json_name = "url" ];
   bool adult = 15 [ json_name = "adult" ];
-  reserved 16 to 19;
-  reserved 20 to 999;
+  uint64 default_ttl = 16 [ json_name = "default_ttl" ];
+  string default_language = 17 [ json_name = "default_language" ];
+  reserved 18 to 999;
 }
 
 message CommunitySearchRequest {

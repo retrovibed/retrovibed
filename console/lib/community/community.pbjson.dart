@@ -55,10 +55,17 @@ const Community$json = {
     {'1': 'hidden', '3': 13, '4': 1, '5': 8, '10': 'hidden'},
     {'1': 'url', '3': 14, '4': 1, '5': 9, '10': 'url'},
     {'1': 'adult', '3': 15, '4': 1, '5': 8, '10': 'adult'},
+    {'1': 'default_ttl', '3': 16, '4': 1, '5': 4, '10': 'default_ttl'},
+    {
+      '1': 'default_language',
+      '3': 17,
+      '4': 1,
+      '5': 9,
+      '10': 'default_language'
+    },
   ],
   '9': [
-    {'1': 16, '2': 20},
-    {'1': 20, '2': 1000},
+    {'1': 18, '2': 1000},
   ],
 };
 
@@ -72,7 +79,8 @@ final $typed_data.Uint8List communityDescriptor = $convert.base64Decode(
     'EoCVINc3Vic2NyaWJlZF9hdBJVChRkZWZhdWx0X3B1Ymxpc2hfbW9kZRgMIAEoDjIhLnJldHJv'
     'dmliZWQuY29tbXVuaXR5LlB1Ymxpc2hNb2RlUhRkZWZhdWx0X3B1Ymxpc2hfbW9kZRIWCgZoaW'
     'RkZW4YDSABKAhSBmhpZGRlbhIQCgN1cmwYDiABKAlSA3VybBIUCgVhZHVsdBgPIAEoCFIFYWR1'
-    'bHRKBAgQEBRKBQgUEOgH');
+    'bHQSIAoLZGVmYXVsdF90dGwYECABKARSC2RlZmF1bHRfdHRsEioKEGRlZmF1bHRfbGFuZ3VhZ2'
+    'UYESABKAlSEGRlZmF1bHRfbGFuZ3VhZ2VKBQgSEOgH');
 
 @$core.Deprecated('Use communitySearchRequestDescriptor instead')
 const CommunitySearchRequest$json = {

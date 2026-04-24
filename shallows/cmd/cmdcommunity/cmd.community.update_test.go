@@ -10,6 +10,7 @@ import (
 
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/testx"
 	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/stretchr/testify/assert"
@@ -21,7 +22,13 @@ func TestCommunityUpdate(t *testing.T) {
 		ctx, cancel := testx.Context(t)
 		defer cancel()
 
-		expected := &meta.Community{
+		current := &meta.Community{
+			Id:          "test-id",
+			Domain:      "test-community",
+			Description: "original description",
+			Mimetype:    "video/mp4",
+		}
+		updated := &meta.Community{
 			Id:          "test-id",
 			Domain:      "test-community",
 			Description: "updated description",
@@ -29,9 +36,15 @@ func TestCommunityUpdate(t *testing.T) {
 		}
 
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			require.Equal(t, http.MethodPut, r.Method)
 			require.Equal(t, "/c/test-community", r.URL.Path)
-			assert.NoError(t, json.NewEncoder(w).Encode(&meta.CommunityUpdateResponse{Community: expected}))
+			switch r.Method {
+			case http.MethodGet:
+				assert.NoError(t, json.NewEncoder(w).Encode(&meta.CommunityFindResponse{Community: current}))
+			case http.MethodPut:
+				assert.NoError(t, json.NewEncoder(w).Encode(&meta.CommunityUpdateResponse{Community: updated}))
+			default:
+				w.WriteHeader(http.StatusMethodNotAllowed)
+			}
 		}))
 		defer srv.Close()
 
@@ -40,8 +53,7 @@ func TestCommunityUpdate(t *testing.T) {
 
 		cmd := cmdCommunityUpdate{
 			Name:        "test-community",
-			Description: "updated description",
-			Mimetype:    "video/mp4",
+			Description: langx.Autoptr("updated description"),
 		}
 		gctx := &cmdopts.Global{
 			Context:  ctx,
@@ -54,7 +66,7 @@ func TestCommunityUpdate(t *testing.T) {
 		require.NoError(t, err)
 	})
 
-	t.Run("returns error on server failure", func(t *testing.T) {
+	t.Run("returns error when info fails", func(t *testing.T) {
 		ctx, cancel := testx.Context(t)
 		defer cancel()
 
@@ -68,7 +80,7 @@ func TestCommunityUpdate(t *testing.T) {
 
 		cmd := cmdCommunityUpdate{
 			Name:        "test-community",
-			Description: "updated description",
+			Description: langx.Autoptr("updated description"),
 		}
 		gctx := &cmdopts.Global{
 			Context:  ctx,
@@ -81,21 +93,19 @@ func TestCommunityUpdate(t *testing.T) {
 		require.Error(t, err)
 	})
 
-	t.Run("sends correct request body", func(t *testing.T) {
+	t.Run("returns error when update fails", func(t *testing.T) {
 		ctx, cancel := testx.Context(t)
 		defer cancel()
 
-		var receivedReq meta.CommunityUpdateRequest
+		current := &meta.Community{Id: "test-id", Domain: "test-community"}
 
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			assert.NoError(t, json.NewDecoder(r.Body).Decode(&receivedReq))
-			assert.NoError(t, json.NewEncoder(w).Encode(&meta.CommunityUpdateResponse{
-				Community: &meta.Community{
-					Id:          "updated-id",
-					Description: receivedReq.Community.Description,
-					Mimetype:    receivedReq.Community.Mimetype,
-				},
-			}))
+			switch r.Method {
+			case http.MethodGet:
+				assert.NoError(t, json.NewEncoder(w).Encode(&meta.CommunityFindResponse{Community: current}))
+			default:
+				w.WriteHeader(http.StatusInternalServerError)
+			}
 		}))
 		defer srv.Close()
 
@@ -103,9 +113,56 @@ func TestCommunityUpdate(t *testing.T) {
 		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
 
 		cmd := cmdCommunityUpdate{
-			Name:        "my-community",
-			Description: "new description",
-			Mimetype:    "audio/mpeg",
+			Name:        "test-community",
+			Description: langx.Autoptr("updated description"),
+		}
+		gctx := &cmdopts.Global{
+			Context:  ctx,
+			Shutdown: cancel,
+			Cleanup:  &sync.WaitGroup{},
+		}
+		dpc := cmdopts.DeeppoolClientTest{Client: c}
+
+		err := cmd.Run(gctx, dpc)
+		require.Error(t, err)
+	})
+
+	t.Run("preserves current values for unset fields", func(t *testing.T) {
+		ctx, cancel := testx.Context(t)
+		defer cancel()
+
+		current := &meta.Community{
+			Id:                 "test-id",
+			Domain:             "test-community",
+			Description:        "original description",
+			Mimetype:           "video/mp4",
+			DefaultPublishMode: meta.PublishMode_LISTED,
+			DefaultTtl:         3600,
+			DefaultLanguage:    "en",
+			Hidden:             true,
+			Adult:              true,
+		}
+
+		var receivedReq meta.CommunityUpdateRequest
+
+		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			switch r.Method {
+			case http.MethodGet:
+				assert.NoError(t, json.NewEncoder(w).Encode(&meta.CommunityFindResponse{Community: current}))
+			case http.MethodPut:
+				assert.NoError(t, json.NewDecoder(r.Body).Decode(&receivedReq))
+				assert.NoError(t, json.NewEncoder(w).Encode(&meta.CommunityUpdateResponse{Community: &meta.Community{}}))
+			}
+		}))
+		defer srv.Close()
+
+		c := &http.Client{}
+		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
+
+		// only override description; all other fields should come from current
+		cmd := cmdCommunityUpdate{
+			Name:        "test-community",
+			Description: langx.Autoptr("new description"),
 		}
 		gctx := &cmdopts.Global{
 			Context:  ctx,
@@ -118,7 +175,54 @@ func TestCommunityUpdate(t *testing.T) {
 		require.NoError(t, err)
 
 		require.Equal(t, "new description", receivedReq.Community.Description)
-		require.Equal(t, "audio/mpeg", receivedReq.Community.Mimetype)
+		require.Equal(t, "video/mp4", receivedReq.Community.Mimetype)
+		require.Equal(t, meta.PublishMode_LISTED, receivedReq.Community.DefaultPublishMode)
+		require.Equal(t, uint64(3600), receivedReq.Community.DefaultTtl)
+		require.Equal(t, "en", receivedReq.Community.DefaultLanguage)
+		require.True(t, receivedReq.Community.Hidden)
+		require.True(t, receivedReq.Community.Adult)
+	})
+
+	t.Run("overrides default publish mode", func(t *testing.T) {
+		ctx, cancel := testx.Context(t)
+		defer cancel()
+
+		current := &meta.Community{
+			Id:                 "test-id",
+			Domain:             "test-community",
+			DefaultPublishMode: meta.PublishMode_UNLISTED,
+		}
+
+		var receivedReq meta.CommunityUpdateRequest
+
+		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			switch r.Method {
+			case http.MethodGet:
+				assert.NoError(t, json.NewEncoder(w).Encode(&meta.CommunityFindResponse{Community: current}))
+			case http.MethodPut:
+				assert.NoError(t, json.NewDecoder(r.Body).Decode(&receivedReq))
+				assert.NoError(t, json.NewEncoder(w).Encode(&meta.CommunityUpdateResponse{Community: &meta.Community{}}))
+			}
+		}))
+		defer srv.Close()
+
+		c := &http.Client{}
+		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
+
+		cmd := cmdCommunityUpdate{
+			Name:               "test-community",
+			DefaultPublishMode: langx.Autoptr("SYNDICATED"),
+		}
+		gctx := &cmdopts.Global{
+			Context:  ctx,
+			Shutdown: cancel,
+			Cleanup:  &sync.WaitGroup{},
+		}
+		dpc := cmdopts.DeeppoolClientTest{Client: c}
+
+		err := cmd.Run(gctx, dpc)
+		require.NoError(t, err)
+		require.Equal(t, meta.PublishMode_SYNDICATED, receivedReq.Community.DefaultPublishMode)
 	})
 
 	t.Run("includes community name in path", func(t *testing.T) {
@@ -129,18 +233,19 @@ func TestCommunityUpdate(t *testing.T) {
 
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			require.Equal(t, "/c/"+communityName, r.URL.Path)
-			assert.NoError(t, json.NewEncoder(w).Encode(&meta.CommunityUpdateResponse{
-				Community: &meta.Community{},
-			}))
+			switch r.Method {
+			case http.MethodGet:
+				assert.NoError(t, json.NewEncoder(w).Encode(&meta.CommunityFindResponse{Community: &meta.Community{}}))
+			case http.MethodPut:
+				assert.NoError(t, json.NewEncoder(w).Encode(&meta.CommunityUpdateResponse{Community: &meta.Community{}}))
+			}
 		}))
 		defer srv.Close()
 
 		c := &http.Client{}
 		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
 
-		cmd := cmdCommunityUpdate{
-			Name: communityName,
-		}
+		cmd := cmdCommunityUpdate{Name: communityName}
 		gctx := &cmdopts.Global{
 			Context:  ctx,
 			Shutdown: cancel,

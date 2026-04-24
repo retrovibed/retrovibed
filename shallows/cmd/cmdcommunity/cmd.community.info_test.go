@@ -1,14 +1,14 @@
 package cmdcommunity
 
 import (
+	"bytes"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
-	"sync"
+	"strings"
 	"testing"
 
-	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/testx"
 	"github.com/retrovibed/retrovibed/shallows/meta"
@@ -38,17 +38,8 @@ func TestCommunityInfo(t *testing.T) {
 		c := &http.Client{}
 		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
 
-		cmd := cmdCommunityInfo{
-			Name: "test-community",
-		}
-		gctx := &cmdopts.Global{
-			Context:  ctx,
-			Shutdown: cancel,
-			Cleanup:  &sync.WaitGroup{},
-		}
-		dpc := cmdopts.DeeppoolClientTest{Client: c}
-
-		err := cmd.Run(gctx, dpc)
+		cmd := cmdCommunityInfo{Name: "test-community"}
+		err := cmd.run(ctx, c, strings.NewReader(""), &bytes.Buffer{})
 		require.NoError(t, err)
 	})
 
@@ -64,17 +55,8 @@ func TestCommunityInfo(t *testing.T) {
 		c := &http.Client{}
 		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
 
-		cmd := cmdCommunityInfo{
-			Name: "nonexistent-community",
-		}
-		gctx := &cmdopts.Global{
-			Context:  ctx,
-			Shutdown: cancel,
-			Cleanup:  &sync.WaitGroup{},
-		}
-		dpc := cmdopts.DeeppoolClientTest{Client: c}
-
-		err := cmd.Run(gctx, dpc)
+		cmd := cmdCommunityInfo{Name: "nonexistent-community"}
+		err := cmd.run(ctx, c, strings.NewReader(""), &bytes.Buffer{})
 		require.Error(t, err)
 	})
 
@@ -95,17 +77,30 @@ func TestCommunityInfo(t *testing.T) {
 		c := &http.Client{}
 		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
 
-		cmd := cmdCommunityInfo{
-			Name: communityName,
-		}
-		gctx := &cmdopts.Global{
-			Context:  ctx,
-			Shutdown: cancel,
-			Cleanup:  &sync.WaitGroup{},
-		}
-		dpc := cmdopts.DeeppoolClientTest{Client: c}
-
-		err := cmd.Run(gctx, dpc)
+		cmd := cmdCommunityInfo{Name: communityName}
+		err := cmd.run(ctx, c, strings.NewReader(""), &bytes.Buffer{})
 		require.NoError(t, err)
+	})
+
+	t.Run("copies stdin to stdout", func(t *testing.T) {
+		ctx, cancel := testx.Context(t)
+		defer cancel()
+
+		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			assert.NoError(t, json.NewEncoder(w).Encode(&meta.CommunityFindResponse{
+				Community: &meta.Community{},
+			}))
+		}))
+		defer srv.Close()
+
+		c := &http.Client{}
+		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
+
+		const stdinContent = "hello from stdin"
+		var out bytes.Buffer
+
+		cmd := cmdCommunityInfo{Name: "test-community"}
+		require.NoError(t, cmd.run(ctx, c, strings.NewReader(stdinContent), &out))
+		require.Contains(t, out.String(), stdinContent)
 	})
 }

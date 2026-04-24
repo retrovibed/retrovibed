@@ -307,7 +307,14 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	metaapi.NewHTTPFileConfig(torrenting.cfgpath).Bind(httpmux.PathPrefix("/s/torrents").Subrouter())
 	metaapi.NewHTTPFileConfig(storagecfgpath).Bind(httpmux.PathPrefix("/s/storage").Subrouter())
 
-	community.NewHTTP(db, envx.Toggle(community.HTTPOptionNoop, community.HTTPOptionHTTPClient(deepjwt), t.AutoArchive), community.HTTPOptionArchival(archival), community.HTTPOptionPublishing(publishing), community.HTTPOptionMediaStorage(mediastore), community.HTTPOptionTorrentStorage(tvfs)).Bind(httpmux.PathPrefix("/c").Subrouter())
+	community.NewHTTP(
+		db,
+		envx.Toggle(community.HTTPOptionNoop, community.HTTPOptionHTTPClient(deepjwt), t.AutoArchive),
+		community.HTTPOptionArchival(archival),
+		community.HTTPOptionPublishing(publishing),
+		community.HTTPOptionMediaStorage(mediastore),
+		community.HTTPOptionTorrentStorage(tvfs),
+	).Bind(httpmux.PathPrefix("/c").Subrouter())
 
 	community.NewHTTPYouTube(db, deepjwt).Bind(httpmux.PathPrefix("/integrations/youtube").Subrouter())
 

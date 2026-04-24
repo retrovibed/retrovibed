@@ -1,4 +1,4 @@
-package cmdcommunity
+package cmdlibrary
 
 import (
 	"bytes"
@@ -22,25 +22,24 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/meta"
 )
 
-type cmdCommunityLibraryPublish struct {
-	Endpoint string `flag:"" name:"peer" help:"http address for the retrovibed daemon" default:"http://localhost:9998"`
+type cmdPublish struct {
+	Endpoint string `flag:"" name:"peer" help:"http address for the retrovibed daemon" default:"https://localhost:9998"`
 	DryRun   bool   `flag:"" name:"dry-run" help:"print what would be published without actually publishing" negatable:"" default:"true"`
 }
 
-func (t cmdCommunityLibraryPublish) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig) (err error) {
+func (t cmdPublish) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig) (err error) {
 	httpc := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(t.Endpoint))
-
-	debugx.Println("reading community from stdin")
-	var com meta.Community
-	if err = json.NewDecoder(os.Stdin).Decode(&com); err != nil {
-		return err
-	}
-
-	return t.run(gctx.Context, jsonl.NewEncoder(os.Stdout), os.Stdin, httpc, &com)
+	return t.run(gctx.Context, jsonl.NewEncoder(os.Stdout), os.Stdin, httpc)
 }
 
-func (t cmdCommunityLibraryPublish) run(ctx context.Context, enc *jsonl.Encoder, r io.Reader, c *http.Client, com *meta.Community) error {
+func (t cmdPublish) run(ctx context.Context, enc *jsonl.Encoder, r io.Reader, c *http.Client) error {
+	var com meta.Community
+
+	debugx.Println("reading community from stdin")
 	d := jsonl.NewDecoder(r)
+	if err := d.Decode(&com); err != nil {
+		return errorsx.Wrap(err, "unable to decode community from stdin")
+	}
 
 	var derr error
 	var lmd library.Metadata
@@ -52,9 +51,9 @@ func (t cmdCommunityLibraryPublish) run(ctx context.Context, enc *jsonl.Encoder,
 			continue
 		}
 
-		resp, err := t.publishItem(ctx, c, com, lmd.ID)
+		resp, err := t.publishItem(ctx, c, &com, lmd.ID)
 		if err != nil {
-			return err
+			return errorsx.Wrapf(err, "failed to publish library content: %s", lmd.ID)
 		}
 
 		if err = enc.Encode(resp.PublishedContent); err != nil {
@@ -65,7 +64,7 @@ func (t cmdCommunityLibraryPublish) run(ctx context.Context, enc *jsonl.Encoder,
 	return errorsx.Ignore(derr, io.EOF)
 }
 
-func (t cmdCommunityLibraryPublish) publishItem(ctx context.Context, c *http.Client, com *meta.Community, libraryID string) (*meta.PublishContentResponse, error) {
+func (t cmdPublish) publishItem(ctx context.Context, c *http.Client, com *meta.Community, libraryID string) (*meta.PublishContentResponse, error) {
 	var (
 		err  error
 		req  *http.Request
@@ -74,8 +73,11 @@ func (t cmdCommunityLibraryPublish) publishItem(ctx context.Context, c *http.Cli
 	)
 
 	body, err := json.Marshal(&meta.PublishContentRequest{
-		PublishedContent: &meta.PublishedContent{LibraryId: libraryID},
-		PublishMode:      com.DefaultPublishMode,
+		PublishedContent: &meta.PublishedContent{
+			LibraryId:   libraryID,
+			CommunityId: com.Id,
+		},
+		PublishMode: com.DefaultPublishMode,
 	})
 	if err != nil {
 		return nil, err
