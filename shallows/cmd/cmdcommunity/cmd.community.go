@@ -1,15 +1,7 @@
 package cmdcommunity
 
-import (
-	"github.com/retrovibed/retrovibed/shallows/cmd/cmdcommunitylibrary"
-)
-
-type Community struct {
-	Deeppool Deeppool                    `cmd:"" help:"deeppool community commands"`
-	Library  cmdcommunitylibrary.Library `cmd:"" help:"library community commands"`
-}
-
-type Deeppool struct {
+// Deeppool community commands
+type Commands struct {
 	Create  cmdCommunityCreate  `cmd:"" help:"create a new community"`
 	Delete  cmdCommunityDelete  `cmd:"" help:"delete a community"`
 	Update  cmdCommunityUpdate  `cmd:"" help:"update a community"`

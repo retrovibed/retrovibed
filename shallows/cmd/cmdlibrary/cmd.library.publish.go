@@ -1,4 +1,4 @@
-package cmdcommunitylibrary
+package cmdlibrary
 
 import (
 	"bytes"

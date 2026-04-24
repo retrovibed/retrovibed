@@ -1,7 +1,11 @@
 package cmdcommunity
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
 	"os"
 
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
@@ -14,19 +18,36 @@ type cmdCommunityInfo struct {
 	Name        string `arg:"" name:"name" help:"name of the community globally unique. must be valid url subdomain" required:"true"`
 }
 
-func (t cmdCommunityInfo) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClient) (err error) {
+func (t cmdCommunityInfo) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClient, ioout cmdopts.IOOut) (err error) {
+	out, err := ioout.Open(os.Stdout)
+	if err != nil {
+		return errorsx.Wrap(err, "unable to open output")
+	}
+
 	c, err := dpc.HTTPClient(gctx.Context)
 	if err != nil {
 		return errorsx.Wrap(err, "unable to create deeppool client")
 	}
 
-	commresp, err := metaapi.CommunityInfo(gctx.Context, c, t.Name)
+	return t.run(gctx.Context, c, os.Stdin, out)
+}
+
+func (t cmdCommunityInfo) run(ctx context.Context, c *http.Client, in io.Reader, out io.Writer) (err error) {
+	commresp, err := metaapi.CommunityInfo(ctx, c, t.Name)
 	if err != nil {
 		return errorsx.Wrap(err, "failed to locate community")
 	}
 
-	if err = json.NewEncoder(os.Stdout).Encode(commresp.Community); err != nil {
+	if err = json.NewEncoder(out).Encode(commresp.Community); err != nil {
 		return errorsx.Wrap(err, "unable to write to encoder")
+	}
+
+	if _, err = fmt.Fprintf(out, "\n"); err != nil {
+		return errorsx.Wrap(err, "failed to write newline")
+	}
+
+	if _, err = io.Copy(out, in); err != nil {
+		return errorsx.Wrap(err, "failed to copy stdin to stdout")
 	}
 
 	return nil

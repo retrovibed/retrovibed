@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/library"
@@ -42,13 +43,14 @@ func RegenerateFeed(ctx context.Context, q sqlx.Queryer, published FeedPublisher
 	buf := new(bytes.Buffer)
 	channel := rss.Channel{
 		Title:         c.Domain,
-		Link:          fmt.Sprintf("https://%s.community.retrovibe.space", c.Domain), // TODO: return the fully qualified url from the find function. aka add a uri field.
+		Link:          langx.FirstNonZero(c.Url, fmt.Sprintf("https://%s.community.retrovibe.space", c.Domain)),
 		Description:   c.Description,
-		TTL:           feedDefaultTTL,
+		TTL:           langx.FirstNonZero(int(c.DefaultTtl), feedDefaultTTL),
 		LastBuildDate: time.Now().UTC(),
-		Language:      feedDefaultLanguage,
+		Language:      stringsx.FirstNonBlank(c.DefaultLanguage, feedDefaultLanguage),
 		Retrovibed:    &rss.Retrovibed{Entropy: c.Entropy, Mimetype: c.Mimetype},
 	}
+
 	if err := rss.Generator().Generate(buf, channel, slices.Values(items)); err != nil {
 		return errorsx.Wrap(err, "failed to generate RSS feed")
 	}

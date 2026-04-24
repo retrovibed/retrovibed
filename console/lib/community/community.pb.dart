@@ -37,6 +37,8 @@ class Community extends $pb.GeneratedMessage {
     $core.bool? hidden,
     $core.String? url,
     $core.bool? adult,
+    $fixnum.Int64? defaultTtl,
+    $core.String? defaultLanguage,
   }) {
     final result = create();
     if (id != null) result.id = id;
@@ -54,6 +56,8 @@ class Community extends $pb.GeneratedMessage {
     if (hidden != null) result.hidden = hidden;
     if (url != null) result.url = url;
     if (adult != null) result.adult = adult;
+    if (defaultTtl != null) result.defaultTtl = defaultTtl;
+    if (defaultLanguage != null) result.defaultLanguage = defaultLanguage;
     return result;
   }
 
@@ -87,6 +91,10 @@ class Community extends $pb.GeneratedMessage {
     ..aOB(13, _omitFieldNames ? '' : 'hidden')
     ..aOS(14, _omitFieldNames ? '' : 'url')
     ..aOB(15, _omitFieldNames ? '' : 'adult')
+    ..a<$fixnum.Int64>(
+        16, _omitFieldNames ? '' : 'default_ttl', $pb.PbFieldType.OU6,
+        defaultOrMaker: $fixnum.Int64.ZERO)
+    ..aOS(17, _omitFieldNames ? '' : 'default_language')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -232,6 +240,24 @@ class Community extends $pb.GeneratedMessage {
   $core.bool hasAdult() => $_has(13);
   @$pb.TagNumber(15)
   void clearAdult() => $_clearField(15);
+
+  @$pb.TagNumber(16)
+  $fixnum.Int64 get defaultTtl => $_getI64(14);
+  @$pb.TagNumber(16)
+  set defaultTtl($fixnum.Int64 value) => $_setInt64(14, value);
+  @$pb.TagNumber(16)
+  $core.bool hasDefaultTtl() => $_has(14);
+  @$pb.TagNumber(16)
+  void clearDefaultTtl() => $_clearField(16);
+
+  @$pb.TagNumber(17)
+  $core.String get defaultLanguage => $_getSZ(15);
+  @$pb.TagNumber(17)
+  set defaultLanguage($core.String value) => $_setString(15, value);
+  @$pb.TagNumber(17)
+  $core.bool hasDefaultLanguage() => $_has(15);
+  @$pb.TagNumber(17)
+  void clearDefaultLanguage() => $_clearField(17);
 }
 
 class CommunitySearchRequest extends $pb.GeneratedMessage {
