@@ -3,7 +3,6 @@ package cmdcommunity
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -41,10 +40,6 @@ func (t cmdCommunityInfo) run(ctx context.Context, c *http.Client, in io.Reader,
 
 	if err = json.NewEncoder(out).Encode(commresp.Community); err != nil {
 		return errorsx.Wrap(err, "unable to write to encoder")
-	}
-
-	if _, err = fmt.Fprintf(out, "\n"); err != nil {
-		return errorsx.Wrap(err, "failed to write newline")
 	}
 
 	if _, err = io.Copy(out, in); err != nil {

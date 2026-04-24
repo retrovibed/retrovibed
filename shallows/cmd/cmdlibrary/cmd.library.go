@@ -6,5 +6,5 @@ type cmdImports struct {
 
 type Commands struct {
 	Import  cmdImports `cmd:"" help:"import media using various strategies"`
-	Publist cmdPublish `cmd:"" help:"publish a library content"`
+	Publish cmdPublish `cmd:"" help:"publish a library content"`
 }

@@ -107,6 +107,7 @@ func (t *HTTP) Bind(r *mux.Router) {
 	).ThenFunc(t.search))
 
 	r.Path("/{id}/publish").Methods(http.MethodPost).Handler(alice.New(
+		httpx.RouteInvoked,
 		httpx.ContextBufferPool512(),
 		httpauth.AuthenticateWithToken(t.jwtsecret),
 		httpx.Timeout2s(),
@@ -148,6 +149,7 @@ func (t *HTTP) publish(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if t.httpc == nil {
+		log.Println("http client is missing - unable to publish content")
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusServiceUnavailable))
 		return
 	}
