@@ -125,9 +125,10 @@ func main() {
 				filepath.Join(appstoreapp, "Contents", "embedded.provisionprofile"),
 			),
 			shell.Op(
+				shell.Newf("rm -f %s/Contents/Frameworks/retrovibed.h", appstoreapp),
 				shell.Newf("chmod -R a+rX %s", appstoreapp),
 				shell.Newf("security unlock-keychain -p %s %s", egenv.RunID(), keychainPath),
-				shell.Newf("find %s/Contents/Frameworks -maxdepth 1 -name '*.framework' -o -name '*.dylib' | xargs -I{} codesign --force --options runtime --sign \"Apple Distribution\" --keychain %s {}", appstoreapp, keychainPath),
+				shell.Newf("find %s/Contents/Frameworks -depth -name '*.framework' -o -name '*.dylib' | xargs -I{} codesign --force --options runtime --sign \"Apple Distribution\" --keychain %s {}", appstoreapp, keychainPath),
 				shell.Newf("codesign --force --options runtime --sign \"Apple Distribution\" --entitlements %s --keychain %s %s/Contents/Helpers/retrovibed", entitlements, keychainPath, appstoreapp),
 				shell.Newf("codesign --force --options runtime --sign \"Apple Distribution\" --entitlements %s --keychain %s %s", entitlements, keychainPath, appstoreapp),
 				shell.Newf("productbuild --component %s /Applications --sign \"3rd Party Mac Developer Installer\" --keychain %s %s", appstoreapp, keychainPath, pkgpath),
