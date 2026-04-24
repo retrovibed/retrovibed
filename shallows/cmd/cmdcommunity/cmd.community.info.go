@@ -14,12 +14,13 @@ import (
 )
 
 type cmdCommunityInfo struct {
-	Description string `flag:"" name:"description" help:"description of the community"`
-	Name        string `arg:"" name:"name" help:"name of the community globally unique. must be valid url subdomain" required:"true"`
+	Description string        `flag:"" name:"description" help:"description of the community"`
+	Name        string        `arg:"" name:"name" help:"name of the community globally unique. must be valid url subdomain" required:"true"`
+	Output      cmdopts.IOOut `flag:"" name:"output" default:"-" help:"output destination; '-' for stdout"`
 }
 
-func (t cmdCommunityInfo) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClient, ioout cmdopts.IOOut) (err error) {
-	out, err := ioout.Open(os.Stdout)
+func (t cmdCommunityInfo) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClient) (err error) {
+	out, err := t.Output.Open(os.Stdout)
 	if err != nil {
 		return errorsx.Wrap(err, "unable to open output")
 	}
