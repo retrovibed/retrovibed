@@ -86,6 +86,7 @@ func flatpak(final egflatpak.Module) *egflatpak.Builder {
 			"--socket=pulseaudio",                           // for mpv
 			"--filesystem=xdg-run/pipewire-0:ro",            // for mpv
 			"--filesystem=~/.duckdb:create",                 // for duckdb
+			"--socket=fallback-x11",                         // to appease the flatpak linter for flathub.
 			"--share=ipc",                                   // enable standard desktop functionality.
 			"--filesystem=xdg-run/gvfsd",                    // enable standard desktop functionality. (probably unnnecessary)
 			"--env=LC_NUMERIC=C",                            // for mpv
