@@ -5,7 +5,7 @@ this is public alpha software. its under active development and testing. expect 
 #### download
 
 [linux - flatpak](https://github.com/retrovibed/retrovibed/releases/latest/download/flatpak.client.yml)  
-[android - apk](https://github.com/retrovibed/retrovibed/releases/latest/download/retrovibed.apk)  
+[android](https://play.google.com/store/apps/details?id=space.retrovibe.retrovibed)  
 [macos](https://github.com/retrovibed/retrovibed/releases/latest/download/retrovibed.dmg)
 
 #### retrovibe
