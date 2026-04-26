@@ -34,5 +34,9 @@
 	<string>public.app-category.entertainment</string>
 	<key>FLTEnableImpeller</key>
 	<true/>
+	<key>NSDownloadsFolderUsageDescription</key>
+	<string>Retrovibe monitors your Downloads folder to auto-detect torrents and uses it as the export destination for media downloaded from the app. For example, when you download a movie, it will be saved to your Downloads folder.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Retrovibe uses the camera to scan QR codes for joining communities. For example, scanning a printed community invite card.</string>
 </dict>
 </plist>
