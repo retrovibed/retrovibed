@@ -92,14 +92,20 @@ func Release(ctx context.Context, o eg.Op) error {
 func Submit(ctx context.Context, o eg.Op) error {
 	return eg.Sequential(
 		shell.Op(
-			shell.Newf("gh repo fork flathub/flathub --clone -- %s", egenv.EphemeralDirectory("flathub")),
+			shell.New("mkdir -m 0700 -p /home/egd/.ssh"),
+			shell.New("eg ssh key --path /home/egd/.ssh/id_ed25519"),
+			shell.New("git config --global url.\"git@github.com:\".insteadOf \"https://github.com/\""),
+			shell.Newf("gh repo fork flathub/flathub --org retrovibed --fork-name flathub --remote-name origin --clone -- %s", egenv.EphemeralDirectory("flathub")),
+			shell.Newf("git -C %s remote -v", egenv.EphemeralDirectory("flathub")),
 			shell.Newf("git -C %s checkout -b space.retrovibe.Console origin/new-pr", egenv.EphemeralDirectory("flathub")),
 			shell.Newf("gh release download --repo retrovibed/retrovibed --pattern 'space.retrovibe.Console.yml' --dir %s --clobber", egenv.EphemeralDirectory("flathub")),
 		),
 		cloneAssets(egenv.EphemeralDirectory("flathub")),
 		shell.Op(
-			shell.Newf("git -C %s add -A", egenv.EphemeralDirectory("flathub")),
+			shell.Newf("chown -R egd:egd %s", egenv.EphemeralDirectory("flathub")).Privileged(),
+			shell.Newf("git -C %s add -A .", egenv.EphemeralDirectory("flathub")),
 			shell.Newf("git -C %s -c user.name='Retrovibed Engineering' -c user.email='engineering@retrovibe.space' commit -m 'Add space.retrovibe.Console'", egenv.EphemeralDirectory("flathub")),
+			shell.Newf("git -C %s remote -v", egenv.EphemeralDirectory("flathub")),
 			shell.Newf("git -C %s push origin HEAD", egenv.EphemeralDirectory("flathub")),
 		),
 	)(ctx, o)
