@@ -82,7 +82,7 @@ func flatpak(final egflatpak.Module) *egflatpak.Builder {
 			AllowVideos().Allow(
 			// we specify environment variables here so they show up in flatseal for easy adjustments.
 			// "--filesystem=host:ro",                          // for mpv
-			"--filesystem=home:ro",                          // for mpv
+			// "--filesystem=home:ro",                          // for mpv
 			"--socket=pulseaudio",                           // for mpv
 			"--filesystem=xdg-run/pipewire-0:ro",            // for mpv
 			"--filesystem=~/.duckdb:create",                 // for duckdb
