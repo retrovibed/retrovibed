@@ -30,7 +30,7 @@ func main() {
 			ctx, deb,
 			eg.Sequential(
 				eg.Parallel(
-					shallows.Generate,
+					// shallows.Generate,
 					console.Generate,
 				),
 				eg.Parallel(
