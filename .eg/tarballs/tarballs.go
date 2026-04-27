@@ -30,7 +30,7 @@ func Retrovibed(b *Build) string {
 }
 
 func RetrovibedSource() string {
-	return "retrovibed.tar.gz"
+	return "retrovibed.source"
 }
 
 func Flatpak(b *Build) string {
@@ -40,7 +40,7 @@ func Flatpak(b *Build) string {
 func Tarchive(ctx context.Context, op eg.Op) error {
 	return eg.Sequential(
 		shell.Op(
-			shell.Newf("git archive --format=tar.gz -o %s %s", egtarball.Path(RetrovibedSource()), eggit.EnvCommit().StringReplace("%git.hash%")),
+			shell.Newf("git archive --format=tar.xz -o %s %s", egtarball.Path(RetrovibedSource()), eggit.EnvCommit().StringReplace("%git.hash%")),
 		),
 	)(ctx, op)
 }
