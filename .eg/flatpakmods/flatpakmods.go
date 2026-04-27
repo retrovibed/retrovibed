@@ -32,10 +32,9 @@ func Libduckdb2() egflatpak.Module {
 		"-DBUILD_SHELL=0",
 		"-DCMAKE_BUILD_TYPE=Release",
 	).Sources(
-		egflatpak.SourceTarball(
-			"https://github.com/duckdb/duckdb/releases/download/v1.4.1/libduckdb-src.zip",
-			"81da1c9943f7b16e8a41456549fba72473ace3c83887e813e5610eb446c19781",
-			egflatpak.SourceOptions().Destination("duckdb.zip")...,
+		egflatpak.SourceGit(
+			"https://github.com/duckdb/duckdb.git",
+			"d1dc88f950d456d72493df452dabdcd13aa413dd", // v1.4.3
 		),
 	)...)
 }
