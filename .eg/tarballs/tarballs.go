@@ -26,11 +26,11 @@ func (c Build) StringReplace(pattern string) string {
 }
 
 func Retrovibed(b *Build) string {
-	return b.StringReplace("retrovibed.%goenv.os%.%goenv.arch%")
+	return egtarball.Tarxz(b.StringReplace("retrovibed.%goenv.os%.%goenv.arch%"))
 }
 
 func RetrovibedSource() string {
-	return "retrovibed.source"
+	return egtarball.Targz("retrovibed.source")
 }
 
 func Flatpak(b *Build) string {
@@ -40,7 +40,7 @@ func Flatpak(b *Build) string {
 func Tarchive(ctx context.Context, op eg.Op) error {
 	return eg.Sequential(
 		shell.Op(
-			shell.Newf("git archive --format=tar.gz -o %s %s", egtarball.Path(RetrovibedSource()), eggit.EnvCommit().StringReplace("%git.hash%")),
+			shell.Newf("git archive --format=tar.gz -o %s %s", egtarball.Archive(RetrovibedSource()), eggit.EnvCommit().StringReplace("%git.hash%")),
 		),
 	)(ctx, op)
 }
