@@ -357,7 +357,7 @@ github.com/ebitengine/purego/internal/xreflect
 # github.com/edsrzf/mmap-go v1.2.0
 ## explicit; go 1.17
 github.com/edsrzf/mmap-go
-# github.com/egdaemon/eg v0.0.0-20260321185338-b7f5ee49aae8
+# github.com/egdaemon/eg v0.0.0-20260427143101-1046463b9f02
 ## explicit; go 1.24.2
 github.com/egdaemon/eg
 github.com/egdaemon/eg/backoff

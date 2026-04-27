@@ -31,7 +31,6 @@ func Libduckdb2() egflatpak.Module {
 		"-DBUILD_UNITTESTS=0",
 		"-DBUILD_SHELL=0",
 		"-DCMAKE_BUILD_TYPE=Release",
-		// "-DCMAKE_INSTALL_PREFIX=/app",
 	).Sources(
 		egflatpak.SourceTarball(
 			"https://github.com/duckdb/duckdb/releases/download/v1.4.1/libduckdb-src.zip",
@@ -78,6 +77,8 @@ func Libx265() egflatpak.Module {
 		),
 		egflatpak.SourceShell(
 			egflatpak.SourceOptions().Commands(
+				// cmake had deprecated/removed build options that caused cmake to fail this patches them out.
+				// fixed up stream but not yet tagged in a release.
 				"patch -p1 < libx265-cmake.patch",
 			)...,
 		),
@@ -189,6 +190,7 @@ func Libplacebo() egflatpak.Module {
 		),
 		egflatpak.SourceShell(
 			egflatpak.SourceOptions().Commands(
+				// patching libplacebo due to a breaking change in python fixed upstream but not yet tagged in a release.
 				"patch -p1 < libplacebo-vulkan-utils_gen-python.patch",
 			)...,
 		),

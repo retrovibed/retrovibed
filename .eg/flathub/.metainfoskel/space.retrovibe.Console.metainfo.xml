@@ -16,7 +16,7 @@
       creators directly.
     </p>
     <ul>
-      <li>4K video and lossless audio playback powered by mpv</li>
+      <li>4K video and lossless audio playback powered by ffmpeg</li>
       <li>Built-in torrent client for peer-to-peer media distribution</li>
       <li>Cloud archive with end-to-end encryption and zero-knowledge storage</li>
       <li>Privacy-first: built-in SOCKS5 proxy support</li>
@@ -37,4 +37,11 @@
   <releases>
     <release version="{{.Version}}" date="{{.Date}}" />
   </releases>
+
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/retrovibed/retrovibed/main/.dist/screenshots/flatpak/library.png</image>
+      <caption>retrovibe media library</caption>
+    </screenshot>
+  </screenshots>q
 </component>
