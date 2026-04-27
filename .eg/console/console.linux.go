@@ -81,8 +81,6 @@ func flatpak(final egflatpak.Module) *egflatpak.Builder {
 			AllowMusic().
 			AllowVideos().Allow(
 			// we specify environment variables here so they show up in flatseal for easy adjustments.
-			// "--filesystem=host:ro",                          // for mpv
-			// "--filesystem=home:ro",                          // for mpv
 			"--socket=pulseaudio",                           // for mpv
 			"--filesystem=xdg-run/pipewire-0:ro",            // for mpv
 			"--filesystem=~/.duckdb:create",                 // for duckdb
@@ -126,16 +124,12 @@ func FlatpakManifest(b *tarballs.Build) eg.OpFn {
 					moduleTarball(eggithub.DownloadURL(tarballs.Retrovibed(b)), egtarball.SHA256(tarballs.Retrovibed(b))),
 				),
 			),
-			// TODO: install flatpak-builder-lint in container.
-			// shell.Op(
-			// 	shell.New("flatpak run --command=flatpak-builder-lint org.flatpak.Builder manifest space.retrovibe.Console.yml"),
-			// ),
 		)(ctx, o)
 	}
 }
 
 func moduleTarball(url, sha256d string) egflatpak.Module {
-	return egflatpak.NewModule("tarball", "simple", egflatpak.ModuleOptions().Commands(
+	return egflatpak.NewModule("retrovibed", "simple", egflatpak.ModuleOptions().Commands(
 		"mv usr/share/applications/retrovibed.desktop /app/share/applications/space.retrovibe.Console.desktop",
 		"mv usr/share/icons/hicolor/scalable/apps/retrovibed.svg /app/share/icons/hicolor/scalable/apps/space.retrovibe.Console.svg",
 		"mv usr/share/metainfo/space.retrovibe.Console.metainfo.xml /app/share/metainfo/space.retrovibe.Console.metainfo.xml",
