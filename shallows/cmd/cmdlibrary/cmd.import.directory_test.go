@@ -2,6 +2,7 @@ package cmdlibrary
 
 import (
 	"bytes"
+	"database/sql"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -10,23 +11,45 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
+	"github.com/gorilla/mux"
+	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
+	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
+	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
+	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
+	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/testx"
+	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/retrovibed/retrovibed/shallows/media"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func TestImportDirectory(t *testing.T) {
-	newClient := func(t *testing.T, srv *httptest.Server) *http.Client {
-		t.Helper()
-		c := &http.Client{}
-		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
-		return c
-	}
+func newImportDirectoryServer(t *testing.T, q *sql.DB) *http.Client {
+	t.Helper()
 
+	vfs := fsx.DirVirtual(t.TempDir())
+	routes := mux.NewRouter()
+	media.NewHTTPLibrary(
+		q,
+		asyncx.NewWakeup(t.Context()),
+		vfs,
+		nil,
+		media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+	).Bind(routes.PathPrefix("/m").Subrouter())
+
+	srv := httptest.NewServer(routes)
+	t.Cleanup(srv.Close)
+
+	headers := http.Header{"Authorization": []string{httpauthtest.UnsafeTokenAuto(t)}}
+	return &http.Client{
+		Transport: httpx.NewHeadersTransport(headers, httpx.HTORoundTripper(
+			httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), nil),
+		)),
+	}
+}
+
+func TestImportDirectory(t *testing.T) {
 	decodeAll := func(t *testing.T, buf *bytes.Buffer) []*media.Media {
 		t.Helper()
 		var results []*media.Media
@@ -43,165 +66,134 @@ func TestImportDirectory(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 
+		q := sqltestx.Metadatabase(t)
 		dir := t.TempDir()
 		require.NoError(t, os.WriteFile(filepath.Join(dir, "a.mp4"), []byte("video content"), 0600))
 		require.NoError(t, os.WriteFile(filepath.Join(dir, "b.mp4"), []byte("more video"), 0600))
 
-		uploadCount := 0
-		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			assert.Equal(t, http.MethodPost, r.Method)
-			assert.Equal(t, "/m/", r.URL.Path)
-			uploadCount++
-			id := uuid.Must(uuid.NewV4()).String()
-			assert.NoError(t, json.NewEncoder(w).Encode(&media.MediaUploadResponse{
-				Media: &media.Media{Id: id},
-			}))
-		}))
-		defer srv.Close()
-
 		var buf bytes.Buffer
 		cmd := importDirectory{Endpoint: "localhost:9998", Concurrency: 1, Directory: dir}
-		require.NoError(t, cmd.run(ctx, jsonl.NewEncoder(&buf), newClient(t, srv)))
+		require.NoError(t, cmd.run(ctx, jsonl.NewEncoder(&buf), newImportDirectoryServer(t, q)))
 
-		require.Equal(t, 2, uploadCount)
-		results := decodeAll(t, &buf)
-		require.Len(t, results, 2)
+		require.Equal(t, 2, testx.Must(sqlx.Count(ctx, q, "SELECT COUNT(*) FROM library_metadata"))(t))
+		require.Len(t, decodeAll(t, &buf), 2)
 	})
 
 	t.Run("skips subdirectories", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 
+		q := sqltestx.Metadatabase(t)
 		dir := t.TempDir()
 		require.NoError(t, os.WriteFile(filepath.Join(dir, "file.mp4"), []byte("content"), 0600))
 		require.NoError(t, os.MkdirAll(filepath.Join(dir, "subdir"), 0700))
 		require.NoError(t, os.WriteFile(filepath.Join(dir, "subdir", "nested.mp4"), []byte("nested"), 0600))
 
-		uploadCount := 0
-		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			uploadCount++
-			assert.NoError(t, json.NewEncoder(w).Encode(&media.MediaUploadResponse{
-				Media: &media.Media{Id: uuid.Must(uuid.NewV4()).String()},
-			}))
-		}))
-		defer srv.Close()
-
 		cmd := importDirectory{Endpoint: "localhost:9998", Concurrency: 1, Directory: dir}
-		require.NoError(t, cmd.run(ctx, jsonl.NewEncoder(&bytes.Buffer{}), newClient(t, srv)))
+		require.NoError(t, cmd.run(ctx, jsonl.NewEncoder(&bytes.Buffer{}), newImportDirectoryServer(t, q)))
 
-		require.Equal(t, 1, uploadCount, "only the immediate file should be uploaded, not nested ones")
+		require.Equal(t, 1, testx.Must(sqlx.Count(ctx, q, "SELECT COUNT(*) FROM library_metadata"))(t))
 	})
 
 	t.Run("empty directory produces no uploads", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 
-		dir := t.TempDir()
+		q := sqltestx.Metadatabase(t)
 
-		uploadCount := 0
-		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			uploadCount++
-		}))
-		defer srv.Close()
+		cmd := importDirectory{Endpoint: "localhost:9998", Concurrency: 1, Directory: t.TempDir()}
+		require.NoError(t, cmd.run(ctx, jsonl.NewEncoder(&bytes.Buffer{}), newImportDirectoryServer(t, q)))
 
-		cmd := importDirectory{Endpoint: "localhost:9998", Concurrency: 1, Directory: dir}
-		require.NoError(t, cmd.run(ctx, jsonl.NewEncoder(&bytes.Buffer{}), newClient(t, srv)))
-
-		require.Equal(t, 0, uploadCount)
+		require.Equal(t, 0, testx.Must(sqlx.Count(ctx, q, "SELECT COUNT(*) FROM library_metadata"))(t))
 	})
 
-	t.Run("server error returns error", func(t *testing.T) {
+	t.Run("filename matches basename", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 
-		dir := t.TempDir()
-		require.NoError(t, os.WriteFile(filepath.Join(dir, "file.mp4"), []byte("content"), 0600))
-
-		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusInternalServerError)
-		}))
-		defer srv.Close()
-
-		cmd := importDirectory{Endpoint: "localhost:9998", Concurrency: 1, Directory: dir}
-		require.Error(t, cmd.run(ctx, jsonl.NewEncoder(&bytes.Buffer{}), newClient(t, srv)))
-	})
-
-	t.Run("multipart field name is content and filename matches basename", func(t *testing.T) {
-		ctx, done := testx.Context(t)
-		defer done()
-
+		q := sqltestx.Metadatabase(t)
 		dir := t.TempDir()
 		require.NoError(t, os.WriteFile(filepath.Join(dir, "my-video.mp4"), []byte("data"), 0600))
 
-		var receivedFilename, receivedField string
-		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			require.NoError(t, r.ParseMultipartForm(1<<20))
-			for _, fh := range r.MultipartForm.File["content"] {
-				receivedField = "content"
-				receivedFilename = fh.Filename
-			}
-			assert.NoError(t, json.NewEncoder(w).Encode(&media.MediaUploadResponse{
-				Media: &media.Media{Id: uuid.Must(uuid.NewV4()).String()},
-			}))
-		}))
-		defer srv.Close()
-
+		var buf bytes.Buffer
 		cmd := importDirectory{Endpoint: "localhost:9998", Concurrency: 1, Directory: dir}
-		require.NoError(t, cmd.run(ctx, jsonl.NewEncoder(&bytes.Buffer{}), newClient(t, srv)))
+		require.NoError(t, cmd.run(ctx, jsonl.NewEncoder(&buf), newImportDirectoryServer(t, q)))
 
-		require.Equal(t, "content", receivedField)
-		require.Equal(t, "my-video.mp4", receivedFilename)
+		results := decodeAll(t, &buf)
+		require.Len(t, results, 1)
+
+		var md library.Metadata
+		require.NoError(t, library.MetadataFindByID(ctx, q, results[0].Id).Scan(&md))
+		require.Equal(t, "my-video.mp4", md.Description)
 	})
 
 	t.Run("mime type detected from extension", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 
+		q := sqltestx.Metadatabase(t)
 		dir := t.TempDir()
-		require.NoError(t, os.WriteFile(filepath.Join(dir, "video.mp4"), []byte("data"), 0600))
-		require.NoError(t, os.WriteFile(filepath.Join(dir, "unknown.xyz"), []byte("data"), 0600))
+		require.NoError(t, os.WriteFile(filepath.Join(dir, "video.mp4"), []byte("video data"), 0600))
+		require.NoError(t, os.WriteFile(filepath.Join(dir, "unknown.xyz"), []byte("unknown data"), 0600))
 
-		received := map[string]string{}
-		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			require.NoError(t, r.ParseMultipartForm(1<<20))
-			for _, fh := range r.MultipartForm.File["content"] {
-				received[fh.Filename] = fh.Header.Get("Content-Type")
-			}
-			assert.NoError(t, json.NewEncoder(w).Encode(&media.MediaUploadResponse{
-				Media: &media.Media{Id: uuid.Must(uuid.NewV4()).String()},
-			}))
-		}))
-		defer srv.Close()
-
+		var buf bytes.Buffer
 		cmd := importDirectory{Endpoint: "localhost:9998", Concurrency: 1, Directory: dir}
-		require.NoError(t, cmd.run(ctx, jsonl.NewEncoder(&bytes.Buffer{}), newClient(t, srv)))
+		require.NoError(t, cmd.run(ctx, jsonl.NewEncoder(&buf), newImportDirectoryServer(t, q)))
 
-		require.Equal(t, "video/mp4", received["video.mp4"])
-		require.NotEmpty(t, received["unknown.xyz"], "unknown extension should fall back to binary mimetype")
+		results := decodeAll(t, &buf)
+		require.Len(t, results, 2)
+
+		mimetypes := map[string]string{}
+		for _, m := range results {
+			var md library.Metadata
+			require.NoError(t, library.MetadataFindByID(ctx, q, m.Id).Scan(&md))
+			mimetypes[md.Description] = md.Mimetype
+		}
+
+		require.Equal(t, "video/mp4", mimetypes["video.mp4"])
+		require.NotEmpty(t, mimetypes["unknown.xyz"])
+	})
+
+	t.Run("mimetype flag overrides extension detection", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		q := sqltestx.Metadatabase(t)
+		dir := t.TempDir()
+		require.NoError(t, os.WriteFile(filepath.Join(dir, "video.mp4"), []byte("video data"), 0600))
+		require.NoError(t, os.WriteFile(filepath.Join(dir, "unknown.xyz"), []byte("unknown data"), 0600))
+
+		var buf bytes.Buffer
+		cmd := importDirectory{Endpoint: "localhost:9998", Concurrency: 1, Mimetype: "video/quicktime", Directory: dir}
+		require.NoError(t, cmd.run(ctx, jsonl.NewEncoder(&buf), newImportDirectoryServer(t, q)))
+
+		results := decodeAll(t, &buf)
+		require.Len(t, results, 2)
+
+		for _, m := range results {
+			var md library.Metadata
+			require.NoError(t, library.MetadataFindByID(ctx, q, m.Id).Scan(&md))
+			require.Equal(t, "video/quicktime", md.Mimetype)
+		}
 	})
 
 	t.Run("output contains uploaded media IDs", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 
+		q := sqltestx.Metadatabase(t)
 		dir := t.TempDir()
 		require.NoError(t, os.WriteFile(filepath.Join(dir, "clip.mp4"), []byte("content"), 0600))
 
-		expectedID := uuid.Must(uuid.NewV4()).String()
-		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			assert.NoError(t, json.NewEncoder(w).Encode(&media.MediaUploadResponse{
-				Media: &media.Media{Id: expectedID, Description: "clip.mp4"},
-			}))
-		}))
-		defer srv.Close()
-
 		var buf bytes.Buffer
 		cmd := importDirectory{Endpoint: "localhost:9998", Concurrency: 1, Directory: dir}
-		require.NoError(t, cmd.run(ctx, jsonl.NewEncoder(&buf), newClient(t, srv)))
+		require.NoError(t, cmd.run(ctx, jsonl.NewEncoder(&buf), newImportDirectoryServer(t, q)))
 
 		results := decodeAll(t, &buf)
 		require.Len(t, results, 1)
-		require.Equal(t, expectedID, results[0].Id)
-		require.Equal(t, "clip.mp4", results[0].Description)
+
+		var md library.Metadata
+		require.NoError(t, library.MetadataFindByID(ctx, q, results[0].Id).Scan(&md))
+		require.Equal(t, "clip.mp4", md.Description)
 	})
 }

@@ -27,6 +27,7 @@ import (
 type importDirectory struct {
 	Endpoint    string `flag:"" name:"peer" help:"http address for the daemon you want to import to" default:"localhost:9998"`
 	Concurrency uint16 `flag:"" name:"concurrency" help:"number of files to upload concurrently, defaults to the number of cpus" default:"${vars_cores}"`
+	Mimetype    string `flag:"" name:"mimetype" help:"override the mimetype for all uploaded files" optional:""`
 	Directory   string `arg:"" name:"directory" help:"directory to import; each immediate file is uploaded to the library"`
 }
 
@@ -56,7 +57,7 @@ func (t importDirectory) run(ctx context.Context, enc *jsonl.Encoder, c *http.Cl
 		defer f.Close()
 
 		filename := filepath.Base(w.Path)
-		mimetype := langx.FirstNonZero(mime.TypeByExtension(filepath.Ext(filename)), mimex.Binary)
+		mimetype := langx.FirstNonZero(t.Mimetype, mime.TypeByExtension(filepath.Ext(filename)), mimex.Binary)
 
 		contentType, body, err := httpx.Multipart(func(mw *multipart.Writer) error {
 			part, lerr := mw.CreatePart(httpx.NewMultipartHeader(mimetype, "content", filename))
