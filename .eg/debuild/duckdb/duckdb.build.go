@@ -20,7 +20,7 @@ func Download(ctx context.Context, op eg.Op) error {
 		ctx,
 		sruntime.Newf("test -d duckdb || git clone -b v%s --depth 1 https://github.com/duckdb/duckdb.git duckdb", version),
 		sruntime.New("md5sum duckdb/src/include/duckdb.h"),
-		sruntime.New("echo \"2a20d340931922b25919dd8a870365a9  duckdb/src/include/duckdb.h\" > duckdb.md5"),
+		sruntime.New("echo \"fcdba922a5ef1ac7373134cb915d204b  duckdb/src/include/duckdb.h\" > duckdb.md5"),
 		sruntime.New("md5sum -c duckdb.md5"),
 	)
 }
