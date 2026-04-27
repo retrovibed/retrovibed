@@ -76,6 +76,7 @@ func (t cmdPublish) publishItem(ctx context.Context, c *http.Client, com *meta.C
 		PublishedContent: &meta.PublishedContent{
 			LibraryId:   libraryID,
 			CommunityId: com.Id,
+			Mimetype:    com.Mimetype,
 		},
 		PublishMode: com.DefaultPublishMode,
 	})
