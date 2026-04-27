@@ -47,7 +47,7 @@ class EndpointAuto extends StatefulWidget {
   State<StatefulWidget> createState() => _EndpointAuto();
 }
 
-class _EndpointAuto extends State<EndpointAuto> {
+class _EndpointAuto extends State<EndpointAuto> with WidgetsBindingObserver {
   final ValueNotifier<api.Daemon> changed = ValueNotifier<api.Daemon>(
     api.Daemon(),
   );
@@ -210,7 +210,19 @@ class _EndpointAuto extends State<EndpointAuto> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     refresh(latest());
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    print("lifecycle detection: $state");
   }
 
   @override
