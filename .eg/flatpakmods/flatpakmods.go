@@ -21,6 +21,26 @@ func Libduckdb() egflatpak.Module {
 	)...)
 }
 
+func Libduckdb2() egflatpak.Module {
+	return egflatpak.NewModule("duckdb", "cmake", egflatpak.ModuleOptions().ConfigOptions(
+		"-DEXTENSION_STATIC_BUILD=1",
+		"-DBUILD_EXTENSIONS=autocomplete;json;parquet;icu;inet;fts",
+		"-DENABLE_EXTENSION_AUTOLOADING=1",
+		"-DENABLE_EXTENSION_AUTOINSTALL=1",
+		"-DCMAKE_VERBOSE_MAKEFILE=on",
+		"-DBUILD_UNITTESTS=0",
+		"-DBUILD_SHELL=0",
+		"-DCMAKE_BUILD_TYPE=Release",
+		// "-DCMAKE_INSTALL_PREFIX=/app",
+	).Sources(
+		egflatpak.SourceTarball(
+			"https://github.com/duckdb/duckdb/releases/download/v1.4.1/libduckdb-src.zip",
+			"81da1c9943f7b16e8a41456549fba72473ace3c83887e813e5610eb446c19781",
+			egflatpak.SourceOptions().Destination("duckdb.zip")...,
+		),
+	)...)
+}
+
 // pulled from: https://github.com/flathub/io.mpv.Mpv/blob/d895bc41c09a17d0bdca40cd57f77340e44fdca5/io.mpv.Mpv.yml
 func Libx264() egflatpak.Module {
 	return egflatpak.NewModule("libx264", "autotools", egflatpak.ModuleOptions().ConfigOptions(

@@ -28,7 +28,7 @@ func Download(ctx context.Context, op eg.Op) error {
 // compile and put the results into the specified directory.
 func Compile(runtime shell.Command, build string) eg.OpFn {
 	return func(ctx context.Context, op eg.Op) error {
-		return compile(shell.Runtime(), "cmake -G \"Ninja\" -DEXTENSION_STATIC_BUILD=1 -DBUILD_EXTENSIONS=${DUCKDB_EXTENSIONS} -DENABLE_EXTENSION_AUTOLOADING=1 -DENABLE_EXTENSION_AUTOINSTALL=1 -DCMAKE_VERBOSE_MAKEFILE=on -DBUILD_UNITTESTS=0 -DBUILD_SHELL=o -DCMAKE_BUILD_TYPE=Release .")(ctx, op)
+		return compile(shell.Runtime(), "cmake -G \"Ninja\" -DEXTENSION_STATIC_BUILD=1 -DBUILD_EXTENSIONS=${DUCKDB_EXTENSIONS} -DENABLE_EXTENSION_AUTOLOADING=1 -DENABLE_EXTENSION_AUTOINSTALL=1 -DCMAKE_VERBOSE_MAKEFILE=on -DBUILD_UNITTESTS=0 -DBUILD_SHELL=0 -DCMAKE_BUILD_TYPE=Release .")(ctx, op)
 	}
 }
 

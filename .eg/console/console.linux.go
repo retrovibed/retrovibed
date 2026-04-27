@@ -64,7 +64,8 @@ func flatpak(final egflatpak.Module) *egflatpak.Builder {
 		"space.retrovibe.Console", "console",
 		egflatpak.Option().SDK("org.gnome.Sdk", "50").Runtime("org.gnome.Platform", "50").
 			Modules(
-				flatpakmods.Libduckdb(),
+				// flatpakmods.Libduckdb(),
+				flatpakmods.Libduckdb2(),
 				flatpakmods.Libass(),
 				flatpakmods.Libbs2b(),
 				flatpakmods.Libplacebo(),
