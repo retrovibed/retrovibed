@@ -6,7 +6,7 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/duckdb/duckdb-go/mapping"
+	"github.com/duckdb/duckdb-go/v2/mapping"
 )
 
 // fnGetVectorValue is the getter callback function for any (nested) vector.
@@ -102,8 +102,11 @@ func getTimeTZ(ti *mapping.TimeTZ) time.Time {
 	// TIMETZ has microsecond precision.
 	hour, minute, sec, micro := mapping.TimeStructMembers(&timeStruct)
 	nanos := int(micro) * 1000
-	loc := time.FixedZone("", int(offset))
-	return time.Date(1, time.January, 1, int(hour), int(minute), int(sec), nanos, loc).UTC()
+	loc := time.UTC
+	if offset != 0 {
+		loc = time.FixedZone("", int(offset))
+	}
+	return time.Date(1, time.January, 1, int(hour), int(minute), int(sec), nanos, loc)
 }
 
 func (vec *vector) getInterval(rowIdx mapping.IdxT) Interval {
@@ -123,6 +126,44 @@ func getInterval(interval *mapping.Interval) Interval {
 func (vec *vector) getHugeint(rowIdx mapping.IdxT) *big.Int {
 	hugeInt := getPrimitive[mapping.HugeInt](vec, rowIdx)
 	return hugeIntToNative(&hugeInt)
+}
+
+func (vec *vector) getUhugeint(rowIdx mapping.IdxT) *big.Int {
+	uhugeInt := getPrimitive[mapping.UHugeInt](vec, rowIdx)
+	return uhugeIntToNative(&uhugeInt)
+}
+
+func (vec *vector) getBigNum(rowIdx mapping.IdxT) *big.Int {
+	// BIGNUM is stored as StringT containing DuckDB's encoding:
+	// - Bytes 0-2: 3-byte header (length | 0x800000 for positive, complemented for negative)
+	// - Bytes 3+: Big-endian magnitude (complemented for negative)
+	// Sign is determined by whether MSB of byte 0 is set (0x80)
+	strT := getPrimitive[mapping.StringT](vec, rowIdx)
+	data := []byte(mapping.StringTData(&strT))
+
+	if len(data) < 4 {
+		return big.NewInt(0)
+	}
+
+	// Check sign: MSB set means positive
+	isPositive := (data[0] & 0x80) != 0
+
+	// Data starts at byte 3, magnitude is already big-endian
+	magnitude := data[3:]
+
+	if isPositive {
+		return new(big.Int).SetBytes(magnitude)
+	}
+
+	// Negative: complement all magnitude bytes
+	complemented := make([]byte, len(magnitude))
+	for i := range magnitude {
+		complemented[i] = ^magnitude[i]
+	}
+
+	result := new(big.Int).SetBytes(complemented)
+	result.Neg(result)
+	return result
 }
 
 func (vec *vector) getBytes(rowIdx mapping.IdxT) any {
@@ -194,15 +235,15 @@ func (vec *vector) getStruct(rowIdx mapping.IdxT) map[string]any {
 	return m
 }
 
-func (vec *vector) getMap(rowIdx mapping.IdxT) Map {
+func (vec *vector) getMap(rowIdx mapping.IdxT) OrderedMap {
 	list := vec.getList(rowIdx)
 
-	m := Map{}
+	m := OrderedMap{}
 	for i := range list {
 		mapItem := list[i].(map[string]any)
 		key := mapItem[mapKeysField()]
 		val := mapItem[mapValuesField()]
-		m[key] = val
+		m.Set(key, val)
 	}
 	return m
 }

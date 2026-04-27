@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/duckdb/duckdb-go/mapping"
+	"github.com/duckdb/duckdb-go/v2/mapping"
 )
 
 func getValue(v mapping.Value) (any, error) {
@@ -64,6 +64,13 @@ func getValue(v mapping.Value) (any, error) {
 	case TYPE_HUGEINT:
 		hugeInt := mapping.GetHugeInt(v)
 		return hugeIntToNative(&hugeInt), nil
+	case TYPE_UHUGEINT:
+		uhugeInt := mapping.GetUHugeInt(v)
+		return uhugeIntToNative(&uhugeInt), nil
+	case TYPE_BIGNUM:
+		bigNum := mapping.GetBigNum(v)
+		defer mapping.DestroyBigNum(&bigNum)
+		return bigNumToNative(&bigNum), nil
 	case TYPE_VARCHAR:
 		return mapping.GetVarchar(v), nil
 	case TYPE_SQLNULL:
@@ -86,6 +93,8 @@ func createValue(lt mapping.LogicalType, val any) (mapping.Value, error) {
 		return createSliceValue(lt, t, val)
 	case TYPE_STRUCT:
 		return createStructValue(lt, val)
+	case TYPE_MAP:
+		return createMapValue(lt, val)
 	default:
 		return mapping.Value{}, unsupportedTypeError(reflect.TypeOf(val).Name())
 	}
@@ -120,12 +129,18 @@ func createPrimitiveValue(t mapping.Type, v any) (mapping.Value, error) {
 		return mapping.CreateDouble(v.(float64)), nil
 	case TYPE_VARCHAR:
 		return mapping.CreateVarchar(v.(string)), nil
-	case TYPE_TIMESTAMP, TYPE_TIMESTAMP_TZ:
+	case TYPE_TIMESTAMP:
 		vv, err := inferTimestamp(t, v)
 		if err != nil {
 			return mapping.Value{}, err
 		}
 		return mapping.CreateTimestamp(vv), nil
+	case TYPE_TIMESTAMP_TZ:
+		vv, err := inferTimestamp(t, v)
+		if err != nil {
+			return mapping.Value{}, err
+		}
+		return mapping.CreateTimestampTZ(vv), nil
 	case TYPE_TIMESTAMP_S:
 		vv, err := inferTimestampS(v)
 		if err != nil {
@@ -174,6 +189,19 @@ func createPrimitiveValue(t mapping.Type, v any) (mapping.Value, error) {
 			return mapping.Value{}, err
 		}
 		return mapping.CreateHugeInt(vv), nil
+	case TYPE_UHUGEINT:
+		vv, err := inferUHugeInt(v)
+		if err != nil {
+			return mapping.Value{}, err
+		}
+		return mapping.CreateUHugeInt(vv), nil
+	case TYPE_BIGNUM:
+		vv, err := inferBigNum(v)
+		if err != nil {
+			return mapping.Value{}, err
+		}
+		defer mapping.DestroyBigNum(&vv)
+		return mapping.CreateBigNum(vv), nil
 	case TYPE_UUID:
 		vv, err := inferUUID(v)
 		if err != nil {
@@ -230,6 +258,15 @@ func inferLogicalTypeAndValue(v any) (mapping.LogicalType, mapping.Value, error)
 		return mapping.CreateLogicalType(t), val, err
 	}
 
+	if t == TYPE_MAP {
+		// TODO.
+		return mapping.LogicalType{}, mapping.Value{}, unsupportedTypeError(typeToStringMap[t])
+	}
+	if t == TYPE_UNION {
+		// TODO.
+		return mapping.LogicalType{}, mapping.Value{}, unsupportedTypeError(typeToStringMap[t])
+	}
+
 	// User-provided type with a Stringer interface:
 	// We create a string and return a VARCHAR value.
 	// TYPE_DECIMAL has a Stringer interface.
@@ -250,15 +287,6 @@ func inferLogicalTypeAndValue(v any) (mapping.LogicalType, mapping.Value, error)
 			return mapping.LogicalType{}, mapping.Value{}, err
 		}
 		return mapping.CreateLogicalType(t), val, err
-	}
-
-	if t == TYPE_MAP {
-		// TODO.
-		return mapping.LogicalType{}, mapping.Value{}, unsupportedTypeError(typeToStringMap[t])
-	}
-	if t == TYPE_UNION {
-		// TODO.
-		return mapping.LogicalType{}, mapping.Value{}, unsupportedTypeError(typeToStringMap[t])
 	}
 
 	// Complex types.
@@ -320,10 +348,9 @@ func inferPrimitiveType(v any) (Type, any) {
 		t = TYPE_VARCHAR
 		v = string(vv)
 	case time.Time:
-		// There is no way to distinguish between
-		// TYPE_DATE, TYPE_TIME, TYPE_TIMESTAMP_S, TYPE_TIMESTAMP_MS, TYPE_TIMESTAMP_NS,
-		// TYPE_TIME_TZ, TYPE_TIMESTAMP_TZ.
-		t = TYPE_TIMESTAMP
+		// Go's time.Time always carries timezone information (via Location),
+		// so TIMESTAMP WITH TIME ZONE is the correct semantic mapping.
+		t = TYPE_TIMESTAMP_TZ
 	case Interval:
 		t = TYPE_INTERVAL
 	case *big.Int:
@@ -332,7 +359,7 @@ func inferPrimitiveType(v any) (Type, any) {
 		t = TYPE_DECIMAL
 	case UUID:
 		t = TYPE_UUID
-	case Map:
+	case Map, OrderedMap:
 		// We special-case TYPE_MAP to disambiguate with structs passed as map[string]any.
 		t = TYPE_MAP
 	case Union:
@@ -347,7 +374,7 @@ func isPrimitiveType(t Type) bool {
 	case TYPE_DECIMAL, TYPE_ENUM, TYPE_LIST, TYPE_STRUCT, TYPE_MAP, TYPE_ARRAY, TYPE_UNION:
 		// Complex type.
 		return false
-	case TYPE_INVALID, TYPE_UHUGEINT, TYPE_BIT, TYPE_ANY, TYPE_BIGNUM:
+	case TYPE_INVALID, TYPE_BIT, TYPE_ANY:
 		// Invalid or unsupported.
 		return false
 	}
@@ -370,7 +397,7 @@ func inferSliceLogicalTypeAndValue[T any](val T, array bool, length int) (mappin
 	}
 
 	values := make([]mapping.Value, 0, length)
-	defer destroyValueSlice(values)
+	defer func() { destroyValueSlice(values) }()
 
 	if len(slice) == 0 {
 		lt := mapping.CreateLogicalType(TYPE_SQLNULL)
@@ -379,7 +406,7 @@ func inferSliceLogicalTypeAndValue[T any](val T, array bool, length int) (mappin
 	}
 
 	logicalTypes := make([]mapping.LogicalType, 0, length)
-	defer destroyLogicalTypes(logicalTypes)
+	defer func() { destroyLogicalTypes(logicalTypes) }()
 
 	var elemLogicalType mapping.LogicalType
 	expectedIndex := -1
@@ -431,7 +458,7 @@ func createSliceValue[T any](lt mapping.LogicalType, t Type, val T) (mapping.Val
 	}
 
 	var values []mapping.Value
-	defer destroyValueSlice(values)
+	defer func() { destroyValueSlice(values) }()
 
 	for _, v := range slice {
 		vv, err := createValue(childType, v)
@@ -459,7 +486,7 @@ func createStructValue(lt mapping.LogicalType, val any) (mapping.Value, error) {
 	}
 
 	var values []mapping.Value
-	defer destroyValueSlice(values)
+	defer func() { destroyValueSlice(values) }()
 
 	childCount := mapping.StructTypeChildCount(lt)
 	for i := range uint64(childCount) {
@@ -480,6 +507,48 @@ func createStructValue(lt mapping.LogicalType, val any) (mapping.Value, error) {
 	}
 
 	return mapping.CreateStructValue(lt, values), nil
+}
+
+func createMapValue(lt mapping.LogicalType, val any) (mapping.Value, error) {
+	var m OrderedMap
+	switch v := val.(type) {
+	case OrderedMap:
+		m = v
+	case Map:
+		m = OrderedMap{}
+		for key, value := range v {
+			m.Set(key, value)
+		}
+	default:
+		return mapping.Value{}, castError(reflect.TypeOf(val).String(), reflectTypeMap.Name())
+	}
+
+	keyType := mapping.MapTypeKeyType(lt)
+	defer mapping.DestroyLogicalType(&keyType)
+	valueType := mapping.MapTypeValueType(lt)
+	defer mapping.DestroyLogicalType(&valueType)
+
+	keys := make([]mapping.Value, m.Len())
+	defer destroyValueSlice(keys)
+	for i, k := range m.Keys() {
+		kv, err := createValue(keyType, k)
+		if err != nil {
+			return mapping.Value{}, err
+		}
+		keys[i] = kv
+	}
+
+	values := make([]mapping.Value, m.Len())
+	defer destroyValueSlice(values)
+	for i, v := range m.Values() {
+		vv, err := createValue(valueType, v)
+		if err != nil {
+			return mapping.Value{}, err
+		}
+		values[i] = vv
+	}
+
+	return mapping.CreateMapValue(lt, keys, values), nil
 }
 
 func destroyValueSlice(values []mapping.Value) {

@@ -5,25 +5,32 @@
 
 The DuckDB driver conforms to the built-in `database/sql` interface.
 
-**Current DuckDB version: `v1.4.3`.**
+**Current DuckDB version: `v1.5.2`.**
 
-The first duckdb-go tag with that version is `v2.5.4`.
+The first duckdb-go tag with that version is `v2.10502.0`.
+
+Starting with DuckDB `v1.5.0`, the duckdb-go version encodes the DuckDB version in its second semver component.
+The format is `v2.MAJOR_MINOR_PATCH.x`, e.g., DuckDB `v1.5.0` maps to duckdb-go `v2.10500.x`.
 
 Previous DuckDB versions:
 
-| DuckDB   | duckdb-go |
-|----------|-----------|
-| `v1.4.3` | `v2.5.4`  |
-| `v1.4.2` | `v2.5.2`  |
-| `v1.4.1` | `v2.4.2`  |
-| `v1.4.0` | `v2.4.0`  |
-| `v1.3.2` | `v2.3.3`  |
-| `v1.3.1` | `v2.3.2`  |
-| `v1.3.0` | `v2.3.0`  |
-| `v1.2.2` | `v2.2.0`  |
-| `v1.2.1` | `v2.1.0`  |
-| `v1.2.0` | `v2.0.3`  |
-| `v1.1.3` | `v1.8.5`  |
+| DuckDB   | duckdb-go    |
+|----------|--------------|
+| `v1.5.2` | `v2.10502.0` |
+| `v1.5.1` | `v2.10501.0` |
+| `v1.5.0` | `v2.10500.0` |
+| `v1.4.4` | `v2.5.5`     |
+| `v1.4.3` | `v2.5.4`     |
+| `v1.4.2` | `v2.5.2`     |
+| `v1.4.1` | `v2.4.2`     |
+| `v1.4.0` | `v2.4.0`     |
+| `v1.3.2` | `v2.3.3`     |
+| `v1.3.1` | `v2.3.2`     |
+| `v1.3.0` | `v2.3.0`     |
+| `v1.2.2` | `v2.2.0`     |
+| `v1.2.1` | `v2.1.0`     |
+| `v1.2.0` | `v2.0.3`     |
+| `v1.1.3` | `v1.8.5`     |
 
 ## Migration from marcboeker/go-duckdb
 
@@ -41,8 +48,8 @@ go get github.com/duckdb/duckdb-go/v2@v2.5.0
 gofmt -w -r '"github.com/marcboeker/go-duckdb/v2" -> "github.com/duckdb/duckdb-go/v2"' .
 
 # If you use the mapping or arrowmapping submodules, also run
-gofmt -w -r '"github.com/marcboeker/go-duckdb/mapping" -> "github.com/duckdb/duckdb-go/mapping"' .
-gofmt -w -r '"github.com/marcboeker/go-duckdb/arrowmapping" -> "github.com/duckdb/duckdb-go/arrowmapping"' .
+gofmt -w -r '"github.com/marcboeker/go-duckdb/mapping" -> "github.com/duckdb/duckdb-go/v2/mapping"' .
+gofmt -w -r '"github.com/marcboeker/go-duckdb/arrowmapping" -> "github.com/duckdb/duckdb-go/v2/arrowmapping"' .
 
 # Clean up
 go mod tidy
@@ -88,7 +95,7 @@ If you want to use it, you can enable it by passing `-tags=duckdb_arrow` to `go 
 #### JSON type scanning changes
 
 The pre-built libraries ship DuckDB's JSON extension containing the `JSON` type.
-Pre-v2, it was possible to scan a JSON type into `[]byte` via [`Rows.Scan`](https://cs.opensource.google/go/go/+/go1.24.1:src/database/sql/sql.go;l=3365).
+Pre-v2, it was possible to scan a JSON type into `[]byte` via [`Rows.Scan`](https://pkg.go.dev/database/sql#Rows.Scan).
 However, scanning into `any` (`driver.Value`) would cause the JSON string to contain escape characters and other unexpected behavior.
 
 It is now possible to scan into `any`, or directly into duckdb-go's `Composite` type,
@@ -115,7 +122,7 @@ pacman -S mingw-w64-ucrt-x86_64-gcc
 
 Select "yes" when necessary; it is okay if the shell closes.
 Then, add gcc to the path using whatever method you prefer.
-In powershell this is `$env:PATH = "C:\msys64\ucrt64\bin:$env:PATH"`.
+In powershell this is `$env:PATH = "C:\msys64\ucrt64\bin;$env:PATH"`.
 After, you can compile this package in Windows.
 
 ### Vendoring
@@ -306,7 +313,7 @@ defer c.Close()
 ## DuckDB Appender API
 
 If you want to use the [DuckDB Appender API](https://duckdb.org/docs/data/appender.html), you can obtain a new `Appender` by passing a DuckDB connection to `NewAppenderFromConn()`.
-See `examples/appender.go` for a complete example.
+See `examples/appender/main.go` for a complete example.
 
 ```go
 c, err := duckdb.NewConnector("test.db", nil)
@@ -396,30 +403,15 @@ Additionally, automatic extension loading is enabled.
 
 ## Releasing a New DuckDB Version
 
-#### Update the Mappings
-
 1. Create a new branch.
-2. Update the `duckdb-go-bindings` dependencies in `mapping/mod.go` and `arrowmapping/mod.go`.
-3. Run `go mod tidy` inside `mapping` and inside `arrowmapping`.
-4. Commit and PR changes.
-5. Push two new tagged releases, `mapping/vx.x.x` and `arrowmapping/vx.x.x`.
-
-#### Update the Main Module
-
-1. Create a new branch.
-2. Update the `mapping` and `arrowmapping` dependencies in `go.mod`.
+2. Update `duckdb-go-bindings` via `go get github.com/duckdb/duckdb-go-bindings@latest`.
 3. Run `go mod tidy`.
 4. Update `DUCKDB_VERSION` in `Makefile`.
 5. Update the latest version in `README.md`.
 6. Commit and PR changes.
-7. Push a new tagged release, `vx.x.x`.
+7. Push a new tagged release, `v2.MAJOR_MINOR_PATCH.x`, e.g. `v2.10500.0` for DuckDB 1.5.0.
 
 ```
 git tag <tagname>
 git push origin <tagname>
 ```
-
-Example PRs:
-
-- Update the Mappings: https://github.com/marcboeker/go-duckdb/pull/473
-- Update the Main Module: https://github.com/marcboeker/go-duckdb/pull/474
