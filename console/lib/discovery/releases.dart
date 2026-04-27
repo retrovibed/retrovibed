@@ -73,10 +73,10 @@ class _NewReleasesState extends State<NewReleases> {
       title: const Text('New Releases'),
       constraints: BoxConstraints.tightForFinite(height: 256),
       background: ds.Repeat(() => lib.KnownMediaCard(lib.Known(), icon: null)),
-        empty: Text(
-          'Content partnerships in progress',
-          style: TextStyle(color: Colors.grey),
-        ),
+      empty: Text(
+        'Content partnerships in progress',
+        style: TextStyle(color: Colors.grey),
+      ),
       items:
           _result.items
               .map(
@@ -86,7 +86,7 @@ class _NewReleasesState extends State<NewReleases> {
                   onTap: () {
                     ds.modals.asyncfn(
                       context,
-                      (completion) => ds.Confirmation.yesNo(
+                      (completion) => ds.Confirmation.ok(
                         content: Text("automatic media discovery is not yet implemented"),
                         onConfirm: completion.complete,
                         onCancel: completion.complete,
