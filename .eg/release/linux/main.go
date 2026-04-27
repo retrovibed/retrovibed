@@ -42,7 +42,10 @@ func main() {
 					console.Linting,
 					shallows.Test(),
 				),
-				build(),
+				eg.Parallel(
+					build(),
+					tarballs.Tarchive,
+				),
 			),
 		),
 		release.Release(tarinfo()),

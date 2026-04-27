@@ -1,7 +1,13 @@
 package tarballs
 
 import (
+	"context"
 	"strings"
+
+	"github.com/egdaemon/eg/runtime/wasi/eg"
+	"github.com/egdaemon/eg/runtime/wasi/eggit"
+	"github.com/egdaemon/eg/runtime/wasi/shell"
+	"github.com/egdaemon/eg/runtime/x/wasi/egtarball"
 )
 
 type Build struct {
@@ -23,6 +29,18 @@ func Retrovibed(b *Build) string {
 	return b.StringReplace("retrovibed.%goenv.os%.%goenv.arch%")
 }
 
+func RetrovibedSource() string {
+	return egtarball.Path("retrovibed.tar.gz")
+}
+
 func Flatpak(b *Build) string {
 	return b.StringReplace("space.retrovibe.Console.yml")
+}
+
+func Tarchive(ctx context.Context, op eg.Op) error {
+	return eg.Sequential(
+		shell.Op(
+			shell.Newf("git archive --format=tar.gz -o %s %s", RetrovibedSource(), eggit.EnvCommit().StringReplace("%git.hash%")),
+		),
+	)(ctx, op)
 }
