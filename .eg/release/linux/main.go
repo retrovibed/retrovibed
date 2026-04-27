@@ -37,11 +37,11 @@ func main() {
 					console.BuildLinux,
 					shallows.Compile(),
 				),
-				// eg.Parallel(
-				// 	console.Tests,
-				// 	console.Linting,
-				// 	shallows.Test(),
-				// ),
+				eg.Parallel(
+					console.Tests,
+					console.Linting,
+					shallows.Test(),
+				),
 				eg.Parallel(
 					build(),
 					tarballs.Tarchive,

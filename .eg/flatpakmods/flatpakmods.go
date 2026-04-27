@@ -5,6 +5,23 @@ import (
 )
 
 func Libduckdb() egflatpak.Module {
+	// Duckdb is a pita to build in general and esp on flatpak due to its extensions.
+	// they download them during the build process which is disallowed in flatpak.
+	// their src archive doesnt include the build tooling for cmake nor does it include the extensions.
+	// as a result we pull the prebuilt binaries for the library.
+
+	// [ 11%] Creating directories for 'inet_extension_fc-populate'
+	// [ 22%] Performing download step (git clone) for 'inet_extension_fc-populate'
+	// Cloning into 'inet_extension_fc-src'...
+	// fatal: unable to access 'https://github.com/duckdb/duckdb-inet/': Could not resolve host: github.com
+	// Cloning into 'inet_extension_fc-src'...
+	// fatal: unable to access 'https://github.com/duckdb/duckdb-inet/': Could not resolve host: github.com
+	// Cloning into 'inet_extension_fc-src'...
+	// fatal: unable to access 'https://github.com/duckdb/duckdb-inet/': Could not resolve host: github.com
+	// Had to git clone more than once: 3 times.
+	// CMake Error at inet_extension_fc-subbuild/inet_extension_fc-populate-prefix/tmp/inet_extension_fc-populate-gitclone.cmake:50 (message):
+	//   Failed to clone repository: 'https://github.com/duckdb/duckdb-inet'
+
 	return egflatpak.NewModule("duckdb", "simple", egflatpak.ModuleOptions().Commands(
 		"cp -r . /app/lib",
 	).Sources(
@@ -21,7 +38,7 @@ func Libduckdb() egflatpak.Module {
 	)...)
 }
 
-func Libduckdb2() egflatpak.Module {
+func Libduckdbsrc() egflatpak.Module {
 	return egflatpak.NewModule("duckdb", "cmake", egflatpak.ModuleOptions().ConfigOptions(
 		"-DEXTENSION_STATIC_BUILD=1",
 		"-DBUILD_EXTENSIONS=autocomplete;json;parquet;icu;inet;fts",
@@ -32,10 +49,9 @@ func Libduckdb2() egflatpak.Module {
 		"-DBUILD_SHELL=0",
 		"-DCMAKE_BUILD_TYPE=Release",
 	).Sources(
-		egflatpak.SourceTarball(
-			"https://github.com/duckdb/duckdb/releases/download/v1.4.1/libduckdb-src.zip",
-			"81da1c9943f7b16e8a41456549fba72473ace3c83887e813e5610eb446c19781",
-			egflatpak.SourceOptions().Destination("duckdb.zip")...,
+		egflatpak.SourceGit(
+			"https://github.com/duckdb/duckdb.git",
+			"d1dc88f950d456d72493df452dabdcd13aa413dd", // v1.4.3
 		),
 	)...)
 }
