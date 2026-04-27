@@ -11,6 +11,6 @@ retrovibed.client.yml
 retrivobed.vibed
 *.bin
 *.designs
-
+dist/*
 # FVM Version Cache
 .fvm/
