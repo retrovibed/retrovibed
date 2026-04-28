@@ -49,7 +49,8 @@ func main() {
 	duckdblibs := egenv.CacheDirectory("duckdb", ".darwin-arm64")
 
 	duckdbldflags := "-L" + duckdblibs + " " +
-		"-lduckdb_static " +
+		"-Wl,-force_load," + duckdblibs + "/libduckdb_static.a " +
+		"-lduckdb_generated_extension_loader " +
 		"-lautocomplete_extension -lcore_functions_extension -licu_extension -ljson_extension -lparquet_extension " +
 		"-linet_extension -lfts_extension " +
 		"-ltpcds_extension -ltpch_extension " +
