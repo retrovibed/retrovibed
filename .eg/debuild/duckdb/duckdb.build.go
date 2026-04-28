@@ -65,7 +65,24 @@ func CompileAndroid(platform, arch string) eg.OpFn {
 		Environ("ANDROID_ABI", arch).
 		Environ("PLATFORM_NAME", platform)
 
-	return compile(sruntime, "cmake -G \"Ninja\" -DEXTENSION_STATIC_BUILD=1 -DDUCKDB_EXTRA_LINK_FLAGS=\"-llog -Wl,-z,max-page-size=16384\" -DCMAKE_SHARED_LINKER_FLAGS=\"-Wl,-z,max-page-size=16384\" -DCMAKE_EXE_LINKER_FLAGS=\"-Wl,-z,max-page-size=16384\" -DDUCKDB_EXTRA_LINK_FLAGS=\"-llog\" -DBUILD_EXTENSIONS=${DUCKDB_EXTENSIONS} -DENABLE_EXTENSION_AUTOLOADING=1 -DENABLE_EXTENSION_AUTOINSTALL=1 -DCMAKE_VERBOSE_MAKEFILE=on -DANDROID_PLATFORM=${ANDROID_PLATFORM} -DDUCKDB_EXPLICIT_PLATFORM=${PLATFORM_NAME} -DBUILD_UNITTESTS=0 -DBUILD_SHELL=1 -DANDROID_ABI=${ANDROID_ABI} -DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK}/build/cmake/android.toolchain.cmake -DCMAKE_BUILD_TYPE=Release -S . -B build")
+	return compile(sruntime, "cmake -G \"Ninja\" "+
+		"-DEXTENSION_STATIC_BUILD=1 "+
+		// "-DAMALGAMATION_BUILD=1 "+
+		"-DBUILD_EXTENSIONS=${DUCKDB_EXTENSIONS} "+
+		"-DENABLE_EXTENSION_AUTOLOADING=1 "+
+		"-DENABLE_EXTENSION_AUTOINSTALL=1 "+
+		"-DBUILD_UNITTESTS=0 "+
+		"-DBUILD_SHELL=0 "+
+		"-DCMAKE_VERBOSE_MAKEFILE=on "+
+		"-DANDROID_PLATFORM=${ANDROID_PLATFORM} "+
+		"-DDUCKDB_EXPLICIT_PLATFORM=${PLATFORM_NAME} "+
+		"-DANDROID_ABI=${ANDROID_ABI} "+
+		"-DDUCKDB_EXTRA_LINK_FLAGS=\"-llog -Wl,-z,max-page-size=16384\" "+
+		"-DCMAKE_SHARED_LINKER_FLAGS=\"-Wl,-z,max-page-size=16384\" "+
+		"-DCMAKE_EXE_LINKER_FLAGS=\"-Wl,-z,max-page-size=16384\" "+
+		"-DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK}/build/cmake/android.toolchain.cmake "+
+		"-DCMAKE_BUILD_TYPE=Release "+
+		"-S . -B build")
 }
 
 // clone only the necessary files for android.
@@ -74,6 +91,7 @@ func CloneAndroid(dir string) eg.OpFn {
 		sruntime := egccache.Runtime().Directory(egenv.CacheDirectory("duckdb"))
 		return shell.Run(
 			ctx,
+			sruntime.Newf("ls -lha %s/*.a", egenv.EphemeralDirectory("duckdb", "lib")),
 			sruntime.Newf("rsync -avm --include='*/' --include='*.so' --include='*.a' --exclude='*' %s/* %s", egenv.EphemeralDirectory("duckdb", "lib"), dir),
 		)
 	}
@@ -86,7 +104,6 @@ func CompileDarwin(platform, arch string) eg.OpFn {
 
 	return compile(sruntime, "cmake -G \"Ninja\" "+
 		"-DCMAKE_OSX_ARCHITECTURES=${ARCH} "+
-		"-DDUCKDB_EXTENSION_STATIC_BUILD=1 "+
 		"-DEXTENSION_STATIC_BUILD=1 "+
 		"-DBUILD_EXTENSIONS=${DUCKDB_EXTENSIONS} "+
 		"-DENABLE_EXTENSION_AUTOLOADING=1 "+
@@ -124,7 +141,6 @@ func CompileIOS(platform, arch string) eg.OpFn {
 		"-DCMAKE_OSX_SYSROOT=$(xcrun --sdk iphoneos --show-sdk-path) "+
 		"-DCMAKE_OSX_DEPLOYMENT_TARGET=16.0 "+
 		// "-DAMALGAMATION_BUILD=1 "+
-		"-DDUCKDB_EXTENSION_STATIC_BUILD=1 "+
 		"-DEXTENSION_STATIC_BUILD=1 "+
 		"-DBUILD_EXTENSIONS=${DUCKDB_EXTENSIONS} "+
 		"-DENABLE_EXTENSION_AUTOLOADING=1 "+
