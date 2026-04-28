@@ -143,7 +143,7 @@ func GenerateProtocol(ctx context.Context, _ eg.Op) error {
 
 func Install(b *tarballs.Build) eg.OpFn {
 	runtime := shell.Runtime()
-	dstdir := egtarball.Path(tarballs.Retrovibed(b))
+	dstdir := filepath.Join(egtarball.Path(tarballs.Retrovibed(b)), "usr", "lib", "retrovibed")
 	builddir := egenv.WorkingDirectory("console", "build")
 	linuxdir := filepath.Join(builddir, "linux")
 	bundledir := filepath.Join(linuxdir, egfs.FindFirst(os.DirFS(linuxdir), "bundle"))
@@ -151,11 +151,9 @@ func Install(b *tarballs.Build) eg.OpFn {
 	return eg.Sequential(
 		CompileBinding(b),
 		shell.Op(
-			runtime.Newf("echo mkdir -p %s", dstdir),
 			runtime.Newf("mkdir -p %s", dstdir),
 			runtime.Newf("ls -lha  %s/retrovibed", bundledir).Lenient(true),
 			runtime.Newf("mv %s/retrovibed %s/console", bundledir, bundledir),
-			runtime.Newf("echo cp -R %s/* %s", bundledir, dstdir),
 			runtime.Newf("cp -R %s/* %s", bundledir, dstdir),
 			runtime.Newf("cp -R %s/* %s/lib", libdir, dstdir),
 			// runtime.Newf("tree %s", dstdir),
