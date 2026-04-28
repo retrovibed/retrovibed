@@ -27,7 +27,8 @@ func main() {
 		eggit.AutoClone,
 		eg.Build(deb.BuildFromFile(".eg/Containerfile")),
 		eg.Module(
-			ctx, deb,
+			ctx,
+			deb,
 			eg.Sequential(
 				eg.Parallel(
 					shallows.Generate,
