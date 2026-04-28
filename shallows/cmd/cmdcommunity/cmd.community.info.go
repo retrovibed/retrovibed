@@ -1,6 +1,7 @@
 package cmdcommunity
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"io"
@@ -29,7 +30,12 @@ func (t cmdCommunityInfo) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClient) 
 		return errorsx.Wrap(err, "unable to create deeppool client")
 	}
 
-	return t.run(gctx.Context, c, os.Stdin, out)
+	var in io.Reader = bytes.NewReader(nil)
+	if cmdopts.Readable(os.Stdin) {
+		in = os.Stdin
+	}
+
+	return t.run(gctx.Context, c, in, out)
 }
 
 func (t cmdCommunityInfo) run(ctx context.Context, c *http.Client, in io.Reader, out io.Writer) (err error) {
