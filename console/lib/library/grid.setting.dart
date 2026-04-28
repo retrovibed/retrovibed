@@ -87,8 +87,7 @@ class GridSettings extends StatelessWidget {
         leading: [ds.Heading(Text("network"))],
         wireguard.Settings.future(
           wgcurrent().then((r) => r.wireguard),
-          onChange: (v) =>
-              wgupdate(v, options: [authn.AuthzCache.bearer(context)]).then((r) => r.wireguard),
+          onChange: (v) => wgupdate(v, options: [authn.AuthzCache.bearer(context)]).then((r) => r.wireguard),
         ),
       ),
     ];

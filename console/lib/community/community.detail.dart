@@ -32,8 +32,7 @@ class CommunityDetail extends StatelessWidget {
             color: theme.colorScheme.primary,
           ),
         ),
-        if (community.description.isNotEmpty)
-          Text(community.description, style: theme.textTheme.bodyMedium),
+        if (community.description.isNotEmpty) Text(community.description, style: theme.textTheme.bodyMedium),
         ds.Timestamp.iso8601(community.createdAt, leading: Text('Created: ')),
       ],
     );

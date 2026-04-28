@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 class Rating extends StatelessWidget {
@@ -53,7 +52,7 @@ class Rating extends StatelessWidget {
             size: size,
             color: Colors.white, // Use white for the "mask"
           ),
-        ]
+        ],
       ),
     );
   }

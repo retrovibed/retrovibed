@@ -15,6 +15,19 @@ class KnownMediaCard extends StatelessWidget {
   final bool highlighted;
   final Widget help;
 
+  static const hint = ds.Hint(
+    Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text("hover — reveal the media summary and primary action icon"),
+        Text("tap — perform the primary action (e.g. play or download)"),
+        Text("double tap — perform the secondary action"),
+        Text("secondary tap — open the context menu"),
+        Text("long press — show or hide additional controls"),
+      ],
+    ),
+  );
+
   static Widget future(
     Future<api.Known> future, {
     Key? key,

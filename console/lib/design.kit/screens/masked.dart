@@ -28,9 +28,7 @@ class Masked extends StatelessWidget {
         );
         final calculated = Size(
           constraints.hasBoundedWidth ? constraints.maxWidth : available.width,
-          constraints.hasBoundedHeight
-              ? constraints.maxHeight
-              : available.height,
+          constraints.hasBoundedHeight ? constraints.maxHeight : available.height,
         );
 
         return FocusScope(

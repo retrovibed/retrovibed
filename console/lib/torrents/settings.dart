@@ -28,10 +28,7 @@ class Settings extends StatefulWidget {
           key: ValueKey(snapshot.data.hashCode),
           onChange: onChange,
         ),
-        cause:
-            snapshot.hasError
-                ? ds.Error.unknown(snapshot.error!)
-                : ds.Error.zero,
+        cause: snapshot.hasError ? ds.Error.unknown(snapshot.error!) : ds.Error.zero,
       );
     });
   }
@@ -42,8 +39,7 @@ class Settings extends StatefulWidget {
 
 class _EditView extends State<Settings> {
   api.TorrentSettings current;
-  final ValueNotifier<api.TorrentSettings> _update =
-      ValueNotifier<api.TorrentSettings>(api.TorrentSettings());
+  final ValueNotifier<api.TorrentSettings> _update = ValueNotifier<api.TorrentSettings>(api.TorrentSettings());
 
   _EditView(this.current);
 
@@ -83,8 +79,7 @@ class _EditView extends State<Settings> {
           forms.Field(
             label: Text("download rate"),
             input: Tooltip(
-              message:
-                  "maximum download rate allowed per second across all downloads, default (0) is unlimited",
+              message: "maximum download rate allowed per second across all downloads, default (0) is unlimited",
               child: inputs.Bytes(
                 decoration: new InputDecoration(hintText: "0"),
                 magnitude: ds.bytesx.MiB,
@@ -104,8 +99,7 @@ class _EditView extends State<Settings> {
           forms.Field(
             label: Text("upload rate"),
             input: Tooltip(
-              message:
-                  "maximum upload rate allowed per second across all content, default (0) is unlimited",
+              message: "maximum upload rate allowed per second across all content, default (0) is unlimited",
               child: inputs.Bytes(
                 decoration: new InputDecoration(hintText: "0"),
                 value: current.upload.rate.toInt(),
@@ -165,8 +159,7 @@ class _EditView extends State<Settings> {
             input: TextFormField(
               decoration: new InputDecoration(
                 hintText: "32",
-                helperText:
-                    "maximum number of outbound connections allowed per second",
+                helperText: "maximum number of outbound connections allowed per second",
               ),
               keyboardType: TextInputType.number,
               initialValue: current.outbound.rate.toString(),
@@ -185,8 +178,7 @@ class _EditView extends State<Settings> {
             input: TextFormField(
               decoration: new InputDecoration(
                 hintText: "32",
-                helperText:
-                    "maximum number of inbound connections allowed per second",
+                helperText: "maximum number of inbound connections allowed per second",
               ),
               keyboardType: TextInputType.number,
               initialValue: current.inbound.rate.toString(),
@@ -216,8 +208,7 @@ class _EditView extends State<Settings> {
                   const Text("debug"),
                   value: current.debug,
                   onChanged: (v) {
-                    final _update =
-                        current.deepCopy()..debug = v ?? current.debug;
+                    final _update = current.deepCopy()..debug = v ?? current.debug;
                     setState(() => current = _update);
                   },
                 ),
@@ -225,9 +216,7 @@ class _EditView extends State<Settings> {
                   const Text("firewall"),
                   value: current.firewalled,
                   onChanged: (v) {
-                    final _update =
-                        current.deepCopy()
-                          ..firewalled = v ?? current.firewalled;
+                    final _update = current.deepCopy()..firewalled = v ?? current.firewalled;
                     setState(() => current = _update);
                   },
                 ),

@@ -8,6 +8,7 @@ class RowDisplay extends StatelessWidget {
   final List<Widget> trailing;
   final Future<void> Function()? onTap;
   final Future<void> Function()? onDoubleTap;
+  final Widget help;
   const RowDisplay({
     super.key,
     required this.media,
@@ -15,15 +16,19 @@ class RowDisplay extends StatelessWidget {
     this.trailing = const [],
     this.onTap,
     this.onDoubleTap,
+    this.help = ds.HelpScope.None,
   });
 
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
-    return ds.TableRow(padding: defaults.padding, onTap: onTap, [
-      ...leading,
-      Expanded(child: Text(media.description, overflow: TextOverflow.ellipsis)),
-      ...trailing,
-    ]);
+    return ds.Help(
+      ds.TableRow(padding: defaults.padding, onTap: onTap, [
+        ...leading,
+        Expanded(child: Text(media.description, overflow: TextOverflow.ellipsis)),
+        ...trailing,
+      ]),
+      help,
+    );
   }
 }

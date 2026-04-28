@@ -31,8 +31,7 @@ class YouTube {
   static Uri authUri({required String token}) {
     return Uri.https(httpx.metaendpoint(), "/oauth2/proxy/google/auth", {
       "token": token,
-      "redirect_uri":
-          Uri.https(httpx.host(), "/integrations/youtube/callback").toString(),
+      "redirect_uri": Uri.https(httpx.host(), "/integrations/youtube/callback").toString(),
     });
   }
 }

@@ -10,8 +10,7 @@ class LocalStorageSettings extends StatefulWidget {
   LocalStorageSettings(this.initial, {super.key, this.onChange});
 
   @override
-  State<LocalStorageSettings> createState() =>
-      _LocalStorageSettings(this.initial);
+  State<LocalStorageSettings> createState() => _LocalStorageSettings(this.initial);
 }
 
 class _LocalStorageSettings extends State<LocalStorageSettings> {

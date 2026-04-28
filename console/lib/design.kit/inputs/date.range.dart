@@ -108,9 +108,7 @@ class _DateRangeInputState extends State<DateRangeInput> {
         }
       },
       onKeyEvent: (node, event) {
-        if (event is KeyDownEvent &&
-            event.logicalKey == LogicalKeyboardKey.enter &&
-            _pending != widget.value) {
+        if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.enter && _pending != widget.value) {
           _apply();
           return KeyEventResult.handled;
         }

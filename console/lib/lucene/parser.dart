@@ -208,9 +208,7 @@ class _Parser {
     }
 
     // field query: word/phrase followed by colon
-    if ((_is(_TK.word) || _is(_TK.phrase)) &&
-        _i + 1 < _tokens.length &&
-        _tokens[_i + 1].kind == _TK.colon) {
+    if ((_is(_TK.word) || _is(_TK.phrase)) && _i + 1 < _tokens.length && _tokens[_i + 1].kind == _TK.colon) {
       return _field();
     }
 

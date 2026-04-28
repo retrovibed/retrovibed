@@ -57,6 +57,42 @@ class KnownMediaDisplay extends StatefulWidget {
     );
   }
 
+  static const hintPlayMedia = ds.Hint(
+    Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text("tap — play media item and auto-generate a playlist from results"),
+        Text("long press — show or hide additional controls"),
+        Text("settings — edit metadata, tags, and playback options"),
+      ],
+    ),
+  );
+
+  static const hintReleases = ds.Hint(
+    Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text("Newly released media discovered through content partnerships."),
+        Text("Hover over the card to reveal a summary and the download icon."),
+        Text("Tap the card to add it to your library."),
+      ],
+    ),
+  );
+
+  static const hintRecommendations = ds.Hint(
+    Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text("Suggested content for you."),
+        Text("Hover over a card to reveal a summary and the download icon."),
+        Text("Tap the card to add the item to your library."),
+        Text("Use the refresh button to generate a new set of recommendations."),
+      ],
+    ),
+  );
+
   static _KnownMediaDisplayState? of(BuildContext context) {
     return context.findAncestorStateOfType<_KnownMediaDisplayState>();
   }

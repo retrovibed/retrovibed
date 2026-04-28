@@ -19,7 +19,7 @@ Icon archived_trash(String uid, {ds.Defaults? defaults, double size = 24.0}) {
   );
 }
 
-Widget sharing(String uid, {ds.Defaults? defaults, double  size = 24.0, Color? color}) {
+Widget sharing(String uid, {ds.Defaults? defaults, double size = 24.0, Color? color}) {
   final minmax = Icon(Icons.share_outlined, size: size, color: defaults?.opaque);
   final v = Icon(Icons.archive_outlined, size: size);
   return toggled(uid, minmax, minmax, v);

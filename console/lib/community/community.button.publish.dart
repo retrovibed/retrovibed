@@ -11,14 +11,15 @@ class PublishButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ds.LoadingIconButton(
-      onPressed: () => ds.modals.asyncfn<void>(
-        context,
-        (completion) => PublishContainer(
-          onPublished: completion.complete,
-          onCancel: completion.complete,
-          community: community,
-        ),
-      ),
+      onPressed:
+          () => ds.modals.asyncfn<void>(
+            context,
+            (completion) => PublishContainer(
+              onPublished: completion.complete,
+              onCancel: completion.complete,
+              community: community,
+            ),
+          ),
       icon: Icon(Icons.publish),
       tooltip: 'Publish Content',
       help: ds.Hint(const Text("share library content to this community")),

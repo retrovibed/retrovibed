@@ -1,11 +1,8 @@
 import 'package:iso_duration_parser/iso_duration_parser.dart' as derp;
 
-final DateTime inf =
-    DateTime.fromMillisecondsSinceEpoch(253402300799999, isUtc: true).toUtc();
-final DateTime epoch =
-    DateTime.fromMillisecondsSinceEpoch(0, isUtc: true).toUtc();
-final DateTime neginf =
-    DateTime.fromMillisecondsSinceEpoch(0, isUtc: true).toUtc(); // todo.
+final DateTime inf = DateTime.fromMillisecondsSinceEpoch(253402300799999, isUtc: true).toUtc();
+final DateTime epoch = DateTime.fromMillisecondsSinceEpoch(0, isUtc: true).toUtc();
+final DateTime neginf = DateTime.fromMillisecondsSinceEpoch(0, isUtc: true).toUtc(); // todo.
 
 class durations {
   static Duration? tryParse(
@@ -42,8 +39,7 @@ class Range {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Range && begin == other.begin && end == other.end;
+      identical(this, other) || other is Range && begin == other.begin && end == other.end;
 
   @override
   int get hashCode => Object.hash(begin, end);

@@ -90,14 +90,8 @@ class RangeField<T> extends Field<({T min, T max})> {
   @override
   Node from(({T min, T max}) value) => Range(
     name,
-    min:
-        minField.from(value.min) is Term
-            ? (minField.from(value.min) as Term).value
-            : null,
-    max:
-        maxField.from(value.max) is Term
-            ? (maxField.from(value.max) as Term).value
-            : null,
+    min: minField.from(value.min) is Term ? (minField.from(value.min) as Term).value : null,
+    max: maxField.from(value.max) is Term ? (maxField.from(value.max) as Term).value : null,
   );
 
   @override
@@ -116,8 +110,7 @@ class RangeField<T> extends Field<({T min, T max})> {
   List<Suggestion> suggestions(String partial) => const [];
 
   @override
-  ParserResult of(({T min, T max}) value) =>
-      ParserResultRange(withCurrent(value));
+  ParserResult of(({T min, T max}) value) => ParserResultRange(withCurrent(value));
 
   @override
   bool apply(Node node) {
@@ -135,8 +128,7 @@ class RangeField<T> extends Field<({T min, T max})> {
 class Suggestion {
   final Field field;
   final String label;
-  final String
-  completion; // full lucene text to insert, e.g. "date:[NOW-30d TO *]"
+  final String completion; // full lucene text to insert, e.g. "date:[NOW-30d TO *]"
   final String? description;
 
   const Suggestion({
@@ -155,8 +147,7 @@ List<Suggestion> complete(String partial, List<Field> fields) {
     final prefix = partial.toLowerCase();
     return [
       for (final f in fields)
-        if (f.name.startsWith(prefix))
-          Suggestion(field: f, label: f.name, completion: '${f.name}:'),
+        if (f.name.startsWith(prefix)) Suggestion(field: f, label: f.name, completion: '${f.name}:'),
     ];
   }
 
@@ -245,8 +236,7 @@ class Timestamp extends Field<DateTime> {
   }
 
   @override
-  Timestamp withCurrent(DateTime value) =>
-      Timestamp(name, value, defaultValue, setter);
+  Timestamp withCurrent(DateTime value) => Timestamp(name, value, defaultValue, setter);
 
   @override
   Node from(DateTime value) => Term(name, value.toIso8601String());
@@ -346,8 +336,7 @@ class DateRange extends RangeField<DateTime> {
         Suggestion(
           field: this,
           label: p.label,
-          completion:
-              '$name:[${p.range.begin.toIso8601String()} TO ${p.range.end.toIso8601String()}]',
+          completion: '$name:[${p.range.begin.toIso8601String()} TO ${p.range.end.toIso8601String()}]',
         ),
   ];
 
@@ -364,8 +353,7 @@ class DateRange extends RangeField<DateTime> {
 }
 
 class Number extends Field<num> {
-  const Number(String name, num v, num defaultValue, void Function(num) setter)
-    : super(name, v, defaultValue, setter);
+  const Number(String name, num v, num defaultValue, void Function(num) setter) : super(name, v, defaultValue, setter);
 
   factory Number.auto(
     String name,
@@ -382,8 +370,7 @@ class Number extends Field<num> {
   Node from(num value) => Term(name, value.toString());
 
   @override
-  num parse(String raw) =>
-      num.tryParse(raw.replaceFirst(RegExp(r'^[><=]+'), '')) ?? defaultValue;
+  num parse(String raw) => num.tryParse(raw.replaceFirst(RegExp(r'^[><=]+'), '')) ?? defaultValue;
 
   @override
   List<Suggestion> suggestions(String partial) => const [];
@@ -418,8 +405,7 @@ class Elapsed extends Field<Duration> {
   }
 
   @override
-  Elapsed withCurrent(Duration value) =>
-      Elapsed(name, value, defaultValue, setter);
+  Elapsed withCurrent(Duration value) => Elapsed(name, value, defaultValue, setter);
 
   @override
   Node from(Duration value) {

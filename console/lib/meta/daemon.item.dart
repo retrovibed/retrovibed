@@ -40,14 +40,13 @@ class _DaemonDropdownItemState extends State<DaemonDropdownItem> {
       tint: defaults.dangerTint,
       InkWell(
         onTap: () {
-          EndpointAuto.of(context)
-              ?.refreshNoErrHandling(Future.value(widget.daemon))
-              .then((_) => widget.onTap())
-              .catchError((e) {
-                setState(() {
-                  _cause = ds.Error.unknown(e, onTap: reseterr);
-                });
-              });
+          EndpointAuto.of(
+            context,
+          )?.refreshNoErrHandling(Future.value(widget.daemon)).then((_) => widget.onTap()).catchError((e) {
+            setState(() {
+              _cause = ds.Error.unknown(e, onTap: reseterr);
+            });
+          });
         },
         child: Container(
           padding: defaults.padding,

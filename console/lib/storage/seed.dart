@@ -23,8 +23,7 @@ class Seed {
     id: id,
     label: const Text("personal"),
     description: const Text("Private to you"),
-    tooltip:
-        "your personal seed, used for information you want to keep private",
+    tooltip: "your personal seed, used for information you want to keep private",
     icon: Icons.person,
   );
 

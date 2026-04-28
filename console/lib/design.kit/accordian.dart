@@ -35,11 +35,8 @@ class _AccordionState extends State<Accordion> {
     final isDisabled = widget.disabled != null;
     final onPressed = isDisabled ? null : toggle;
     final opacity = isDisabled ? 0.2 : 1.0;
-    final icon =
-        widget.disabled ??
-        Icon(hidden ? Icons.arrow_drop_up : Icons.arrow_drop_down);
-    final cursor =
-        isDisabled ? SystemMouseCursors.forbidden : SystemMouseCursors.click;
+    final icon = widget.disabled ?? Icon(hidden ? Icons.arrow_drop_up : Icons.arrow_drop_down);
+    final cursor = isDisabled ? SystemMouseCursors.forbidden : SystemMouseCursors.click;
 
     final content =
         hidden

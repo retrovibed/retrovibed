@@ -16,5 +16,4 @@ Future<T> defaulttapfn<T>(T v) {
   return Future.value(v);
 }
 
-Future<void> defaulttapv({String msg = "tap not implemented"}) =>
-    Future.sync(() => _notimplemented(msg));
+Future<void> defaulttapv({String msg = "tap not implemented"}) => Future.sync(() => _notimplemented(msg));

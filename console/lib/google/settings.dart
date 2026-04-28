@@ -102,18 +102,16 @@ class _SettingsState extends State<Settings> {
                       )
                       : OutlinedButton(
                         onPressed: () {
-                          authn
-                              .otp(options: [authn.DeeppoolAuthzCache.bearer(context)])
-                              .then((session) {
-                                launchUrl(
-                                  api.YouTube.authUri(token: session.token),
-                                );
-                                _poll?.cancel();
-                                _poll = Timer.periodic(
-                                  const Duration(seconds: 3),
-                                  (_) => _fetch(),
-                                );
-                              });
+                          authn.otp(options: [authn.DeeppoolAuthzCache.bearer(context)]).then((session) {
+                            launchUrl(
+                              api.YouTube.authUri(token: session.token),
+                            );
+                            _poll?.cancel();
+                            _poll = Timer.periodic(
+                              const Duration(seconds: 3),
+                              (_) => _fetch(),
+                            );
+                          });
                         },
                         child: Text("Link YouTube"),
                       ),

@@ -86,8 +86,7 @@ class _CurrentState extends State<Current> {
                 onPressed: () {
                   httpx
                       .withRetry(
-                        () =>
-                            authn.otp(options: [authn.DeeppoolAuthzCache.bearer(context)]),
+                        () => authn.otp(options: [authn.DeeppoolAuthzCache.bearer(context)]),
                       )
                       .then((r) {
                         final Uri q = Uri.https(httpx.consoleendpoint(), "/", {

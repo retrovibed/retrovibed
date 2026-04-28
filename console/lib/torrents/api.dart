@@ -5,17 +5,14 @@ import 'package:retrovibed/httpx.dart' as httpx;
 export 'package:retrovibed/torrents/torrent.pb.dart';
 
 abstract class api {
-    static Future<TorrentSettings> get({
+  static Future<TorrentSettings> get({
     List<httpx.Option> options = const [],
   }) async {
-    return httpx
-        .get(Uri.https(httpx.host(), "/s/torrents/", {}), options: options)
-        .then((v) {
-          return Future.value(
-            TorrentSettings.create()
-              ..mergeFromProto3Json(jsonDecode(v.body)),
-          );
-        });
+    return httpx.get(Uri.https(httpx.host(), "/s/torrents/", {}), options: options).then((v) {
+      return Future.value(
+        TorrentSettings.create()..mergeFromProto3Json(jsonDecode(v.body)),
+      );
+    });
   }
 
   static Future<TorrentSettings> create(
@@ -27,10 +24,10 @@ abstract class api {
           Uri.https(httpx.host(), "/s/torrents/", {}),
           options: options,
           body: jsonEncode(req.toProto3Json()),
-        ).then((v) {
+        )
+        .then((v) {
           return Future.value(
-            TorrentSettings.create()
-              ..mergeFromProto3Json(jsonDecode(v.body)),
+            TorrentSettings.create()..mergeFromProto3Json(jsonDecode(v.body)),
           );
         });
   }
@@ -42,10 +39,10 @@ abstract class api {
         .delete(
           Uri.https(httpx.host(), "/s/torrents/", {}),
           options: options,
-        ).then((v) {
+        )
+        .then((v) {
           return Future.value(
-            TorrentSettings.create()
-              ..mergeFromProto3Json(jsonDecode(v.body)),
+            TorrentSettings.create()..mergeFromProto3Json(jsonDecode(v.body)),
           );
         });
   }

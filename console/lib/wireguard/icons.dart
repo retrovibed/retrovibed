@@ -14,8 +14,7 @@ abstract class Icons {
     return ds.LoadingIconButton.delete(
       key: key,
       tooltip: tooltip,
-      onPressed: onPressed ??
-          () => api.wireguard.delete(current.id).then((_) {}),
+      onPressed: onPressed ?? () => api.wireguard.delete(current.id).then((_) {}),
     );
   }
 

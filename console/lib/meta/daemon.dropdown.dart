@@ -106,8 +106,7 @@ class _DaemonDropdownState extends State<DaemonDropdown> {
           if (_optional != null) _optional!,
         ],
       ),
-      widget.help ??
-          ds.Hint(const Text("select which daemon instance to configure from the dropdown")),
+      widget.help ?? ds.Hint(const Text("select which daemon instance to configure from the dropdown")),
     );
   }
 }

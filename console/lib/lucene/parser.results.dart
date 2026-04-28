@@ -64,8 +64,7 @@ class ParserResultRange<T> extends ParserResult {
 
   @override
   Widget build(BuildContext context) {
-    return field.display?.call(field.current) ??
-        Text('${field.name}: ${field.current}');
+    return field.display?.call(field.current) ?? Text('${field.name}: ${field.current}');
   }
 
   @override
@@ -99,8 +98,7 @@ class ParserResultTimestamp extends ParserResult {
   }
 
   @override
-  Widget? edit(void Function(ParserResult) onChanged) =>
-      field.render(field.current, (v) => onChanged(field.of(v)));
+  Widget? edit(void Function(ParserResult) onChanged) => field.render(field.current, (v) => onChanged(field.of(v)));
 
   @override
   void reset(Parser parser) {

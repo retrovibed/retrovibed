@@ -30,8 +30,7 @@ class Context {
     this.lastOffset = 0,
   });
 
-  num remaining(TextEditingController ctrl) =>
-      ctrl.selection.baseOffset - lastOffset;
+  num remaining(TextEditingController ctrl) => ctrl.selection.baseOffset - lastOffset;
 }
 
 class Query extends ParserState {
@@ -137,10 +136,7 @@ class Input extends ParserState {
       final upd =
           ctx.fields
               .map(
-                (f) =>
-                    f.name == field.name
-                        ? field.withCurrent(defaultValue ?? field.defaultValue)
-                        : f,
+                (f) => f.name == field.name ? field.withCurrent(defaultValue ?? field.defaultValue) : f,
               )
               .toList();
 
@@ -185,10 +181,7 @@ class Input extends ParserState {
 
   @override
   Widget build(BuildContext context) {
-    final matches =
-        ctx.fields
-            .where((f) => f.available && f.name.startsWith(ctx.partial))
-            .toList();
+    final matches = ctx.fields.where((f) => f.available && f.name.startsWith(ctx.partial)).toList();
     if (matches.isEmpty) return ds.Empty;
 
     final key = SuggestionKeyScope.of(context);
@@ -230,9 +223,7 @@ class UnknownFieldError extends ParserState {
     final text = ctrl.text;
 
     // If the @ anchor is gone, bail out to Query.
-    if (ctx.offset < 0 ||
-        ctx.offset >= text.length ||
-        text[ctx.offset] != '@') {
+    if (ctx.offset < 0 || ctx.offset >= text.length || text[ctx.offset] != '@') {
       final next = Context(
         ctx.fields,
         cursor - 1,
@@ -420,8 +411,7 @@ class Parser {
       _ => null,
     };
     if (ctx == null) return;
-    final fields =
-        ctx.fields.map((f) => f.name == field.name ? field : f).toList();
+    final fields = ctx.fields.map((f) => f.name == field.name ? field : f).toList();
     final next = Context(
       fields,
       ctx.offset,

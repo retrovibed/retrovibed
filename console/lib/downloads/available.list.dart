@@ -218,6 +218,17 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                 media.RowDisplay(
                   media: v.media,
                   leading: [Icon(mimex.icon(v.media.mimetype))],
+                  help: ds.Hint.multiline([
+                    Text("A downloadable media item."),
+                    ds.HelpShortcut(
+                      label: Text("tap"),
+                      description: Text("expand details: file path, size, and distribution status"),
+                    ),
+                    ds.HelpShortcut(
+                      label: Text("delete"),
+                      description: Text("remove the item"),
+                    ),
+                  ]),
                   onTap: () async {
                     setState(() {
                       _focused = _focused == v.media.id ? '' : v.media.id;
@@ -227,6 +238,15 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                     ds.LoadingIconButton(
                       icon: Icon(downloading ? Icons.downloading : Icons.download),
                       disabled: downloading && !paused,
+                      help: ds.Hint(
+                        Text(
+                          downloading && !paused
+                              ? "Download is in progress."
+                              : paused
+                              ? "Resume the download for this item."
+                              : "Start downloading this item.",
+                        ),
+                      ),
                       onPressed:
                           () => media.discovered
                               .download(

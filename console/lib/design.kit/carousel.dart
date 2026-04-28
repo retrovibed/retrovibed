@@ -52,8 +52,7 @@ class _CarouselRowState extends State<CarouselRow> {
           return KeyEventResult.ignored;
         }
 
-        if (event.logicalKey != LogicalKeyboardKey.arrowRight &&
-            event.logicalKey != LogicalKeyboardKey.arrowLeft) {
+        if (event.logicalKey != LogicalKeyboardKey.arrowRight && event.logicalKey != LogicalKeyboardKey.arrowLeft) {
           return KeyEventResult.ignored;
         }
 
