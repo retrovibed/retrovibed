@@ -30,19 +30,19 @@ func main() {
 			ctx,
 			deb,
 			eg.Sequential(
-				eg.Parallel(
-					shallows.Generate,
-					console.Generate,
-				),
+				// eg.Parallel(
+				// 	shallows.Generate,
+				// 	console.Generate,
+				// ),
 				eg.Parallel(
 					console.BuildLinux,
 					shallows.Compile(),
 				),
-				eg.Parallel(
-					console.Tests,
-					console.Linting,
-					shallows.Test(),
-				),
+				// eg.Parallel(
+				// 	console.Tests,
+				// 	console.Linting,
+				// 	shallows.Test(),
+				// ),
 				eg.Parallel(
 					build(),
 					tarballs.Tarchive,
@@ -76,6 +76,15 @@ func build() eg.OpFn {
 			shallows.Install(b),
 			shell.Op(
 				shell.Newf("cp --verbose -R .dist/linux/* %s", egtarball.Path(archive)),
+				shell.Newf(
+					"cat .dist/linux/usr/share/applications/retrovibed.desktop | envsubst > %s/usr/share/applications/retrovibed.desktop",
+					egtarball.Path(archive),
+				).
+					Environ("VERSION", eggit.EnvCommit().StringReplace("%git.commit.year%.%git.commit.month%.%git.commit.day%")).
+					Environ("ARCH", b.Arch),
+				shell.Newf(
+					"cat usr/share/applications/retrovibed.desktop",
+				).Directory(egtarball.Path(archive)),
 			),
 			flathub.Metainfo(b),
 		),
@@ -83,6 +92,6 @@ func build() eg.OpFn {
 			shell.Newf("echo 'tarballing %s -> %s'", egtarball.Path(archive), egtarball.Archive(archive)),
 		),
 		release.Tarball(b),
-		console.FlatpakManifest(b),
+		// console.FlatpakManifest(b),
 	)
 }
