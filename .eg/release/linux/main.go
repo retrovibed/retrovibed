@@ -76,6 +76,15 @@ func build() eg.OpFn {
 			shallows.Install(b),
 			shell.Op(
 				shell.Newf("cp --verbose -R .dist/linux/* %s", egtarball.Path(archive)),
+				shell.Newf(
+					"cat .dist/linux/usr/share/applications/retrovibed.desktop | envsubst > %s/usr/share/applications/retrovibed.desktop",
+					egtarball.Path(archive),
+				).
+					Environ("VERSION", eggit.EnvCommit().StringReplace("%git.commit.year%.%git.commit.month%.%git.commit.day%")).
+					Environ("ARCH", b.Arch),
+				shell.Newf(
+					"cat usr/share/applications/retrovibed.desktop",
+				).Directory(egtarball.Path(archive)),
 			),
 			flathub.Metainfo(b),
 		),

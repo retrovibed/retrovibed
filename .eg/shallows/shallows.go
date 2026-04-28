@@ -3,6 +3,7 @@ package shallows
 import (
 	"context"
 	"eg/compute/tarballs"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -74,7 +75,7 @@ func GenerateProtocol(ctx context.Context, op eg.Op) error {
 }
 
 func Install(b *tarballs.Build) eg.OpFn {
-	dstdir := egtarball.Path(tarballs.Retrovibed(b))
+	dstdir := filepath.Join(egtarball.Path(tarballs.Retrovibed(b)), "usr", "lib", "retrovibed")
 	gruntime := shellruntime()
 
 	return shell.Op(
