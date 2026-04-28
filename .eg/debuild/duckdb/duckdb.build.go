@@ -18,7 +18,8 @@ func Download(ctx context.Context, op eg.Op) error {
 	sruntime := shell.Runtime().Directory(egenv.CacheDirectory())
 	return shell.Run(
 		ctx,
-		sruntime.Newf("test -d duckdb || git clone -b v%s --depth 1 https://github.com/duckdb/duckdb.git duckdb", version),
+		// 3 attempts to deal with racey behavior around cloning the repo multiple times in parallel.
+		sruntime.Newf("test -d duckdb || git clone -b v%s --depth 1 https://github.com/duckdb/duckdb.git duckdb", version).Attempts(3),
 		sruntime.New("md5sum duckdb/src/include/duckdb.h"),
 		sruntime.New("echo \"fcdba922a5ef1ac7373134cb915d204b  duckdb/src/include/duckdb.h\" > duckdb.md5"),
 		sruntime.New("md5sum -c duckdb.md5"),
@@ -67,7 +68,7 @@ func CompileAndroid(platform, arch string) eg.OpFn {
 
 	return compile(sruntime, "cmake -G \"Ninja\" "+
 		"-DEXTENSION_STATIC_BUILD=1 "+
-		// "-DAMALGAMATION_BUILD=1 "+
+		"-DAMALGAMATION_BUILD=1 "+
 		"-DBUILD_EXTENSIONS=${DUCKDB_EXTENSIONS} "+
 		"-DENABLE_EXTENSION_AUTOLOADING=1 "+
 		"-DENABLE_EXTENSION_AUTOINSTALL=1 "+

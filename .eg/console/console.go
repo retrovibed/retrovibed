@@ -94,6 +94,7 @@ func AndroidRuntime(target string) shell.Command {
 	return shell.Runtime().
 		Environ("GOOS", "android").
 		Environ("CGO_ENABLED", "1").
+		Environ("GRADLE_USER_HOME", egenv.CacheDirectory("gradle")).
 		Environ("CC", fmt.Sprintf("/opt/android-sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/linux-x86_64/bin/clang --sysroot=/opt/android-sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/linux-x86_64/sysroot -target %s", target)).
 		Environ("CXX", fmt.Sprintf("/opt/android-sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ --sysroot=/opt/android-sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/linux-x86_64/sysroot -target %s", target))
 }
