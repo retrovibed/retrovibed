@@ -38,8 +38,7 @@ Future<FeedCreateResponse> create(
         options: options,
       )
       .then((v) {
-        return FeedCreateResponse.create()
-          ..mergeFromProto3Json(jsonDecode(v.body));
+        return FeedCreateResponse.create()..mergeFromProto3Json(jsonDecode(v.body));
       });
 }
 
@@ -56,8 +55,7 @@ Future<FeedCreateResponse> refresh(
         options: options,
       )
       .then((v) {
-        return FeedCreateResponse.create()
-          ..mergeFromProto3Json(jsonDecode(v.body));
+        return FeedCreateResponse.create()..mergeFromProto3Json(jsonDecode(v.body));
       });
 }
 
@@ -65,10 +63,7 @@ Future<FeedDeleteResponse> delete(
   String id, {
   List<httpx.Option> options = const [],
 }) async {
-  return httpx
-      .delete(Uri.https(httpx.host(), "/rss/${id}"), options: options)
-      .then((v) {
-        return FeedDeleteResponse.create()
-          ..mergeFromProto3Json(jsonDecode(v.body));
-      });
+  return httpx.delete(Uri.https(httpx.host(), "/rss/${id}"), options: options).then((v) {
+    return FeedDeleteResponse.create()..mergeFromProto3Json(jsonDecode(v.body));
+  });
 }

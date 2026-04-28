@@ -77,6 +77,7 @@ class _RecommendationsState extends State<Recommendations> {
             const Text('Recommendations'),
             Spacer(),
             ds.LoadingIconButton.refresh(
+              help: ds.Hint(const Text("generate a new (random) recommendation")),
               onPressed: () {
                 return httpx
                     .withRetry(() => lib.recommendations.random(options: [authn.AuthzCache.bearer(context)]))
@@ -97,6 +98,7 @@ class _RecommendationsState extends State<Recommendations> {
                   (item) => lib.KnownMediaCard(
                     item,
                     icon: Icons.download,
+                    help: lib.KnownMediaDisplay.hintRecommendations,
                     onTap: () {
                       ds.modals.asyncfn(
                         context,

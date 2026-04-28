@@ -17,9 +17,12 @@ class _RefreshBoundary extends State<RefreshBoundary> {
   Key _refresh = UniqueKey();
 
   void reset() {
-    setState(widget.onReset ?? () {
-      _refresh = UniqueKey();
-    });
+    setState(
+      widget.onReset ??
+          () {
+            _refresh = UniqueKey();
+          },
+    );
   }
 
   @override

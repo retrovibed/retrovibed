@@ -11,20 +11,20 @@ class AuthzMetaDisplay extends StatelessWidget {
   const AuthzMetaDisplay(this.token, {super.key});
 
   static Widget current() {
-    return Builder(builder: (context) {
-      return AuthzMetaDisplay(
-        authn.AuthzCache.of(context)?.meta.current.metadata ?? meta.Token(),
-      );
-    });
+    return Builder(
+      builder: (context) {
+        return AuthzMetaDisplay(
+          authn.AuthzCache.of(context)?.meta.current.metadata ?? meta.Token(),
+        );
+      },
+    );
   }
 
   static FutureBuilder<meta.Token> future(Future<meta.Token> pending) {
     return ds.future(meta.Token(), pending, (snapshot) {
       return ds.ErrorScreen(
         AuthzMetaDisplay(snapshot.data ?? meta.Token()),
-        cause: snapshot.hasError
-            ? ds.Error.unknown(snapshot.error!)
-            : ds.Error.zero,
+        cause: snapshot.hasError ? ds.Error.unknown(snapshot.error!) : ds.Error.zero,
       );
     });
   }

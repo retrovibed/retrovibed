@@ -49,8 +49,7 @@ class SearchDropdown extends StatefulWidget {
   }
 
   @override
-  State<SearchDropdown> createState() =>
-      _SearchDropdownState(controller: controller ?? TextEditingController());
+  State<SearchDropdown> createState() => _SearchDropdownState(controller: controller ?? TextEditingController());
 }
 
 class _SearchDropdownState extends State<SearchDropdown> {

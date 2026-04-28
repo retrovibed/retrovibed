@@ -54,19 +54,17 @@ class _CreateInlinedState extends State<CreateInlined> {
 
     return httpx
         .withRetry(
-          () => meta.profiles
-              .create(request, options: [authn.AuthzCache.bearer(context)])
-              .then((v) {
-                return httpx.withRetry(
-                  () => meta.authz
-                      .grant(
-                        v.profile.id,
-                        _token,
-                        options: [authn.AuthzCache.bearer(context)],
-                      )
-                      .then((_) => v.profile),
-                );
-              }),
+          () => meta.profiles.create(request, options: [authn.AuthzCache.bearer(context)]).then((v) {
+            return httpx.withRetry(
+              () => meta.authz
+                  .grant(
+                    v.profile.id,
+                    _token,
+                    options: [authn.AuthzCache.bearer(context)],
+                  )
+                  .then((_) => v.profile),
+            );
+          }),
         )
         .then((profile) {
           setState(() => _loading = false);

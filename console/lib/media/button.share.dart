@@ -16,9 +16,7 @@ class ButtonShare extends StatelessWidget {
     return IconButton(
       icon: Icon(Icons.share_outlined),
       color:
-          uuidx.fromString(current.torrentId) == uuid.Namespace.nil.uuidValue
-              ? theme.disabledColor
-              : defaults.success,
+          uuidx.fromString(current.torrentId) == uuid.Namespace.nil.uuidValue ? theme.disabledColor : defaults.success,
       onPressed: () {
         print(
           "sharing management is not let implemented ${current.id} - ${current.torrentId}",

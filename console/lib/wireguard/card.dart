@@ -12,14 +12,15 @@ class Card extends StatelessWidget {
     final theme = Theme.of(context);
     final defaults = ds.Defaults.of(context);
 
-    final tap = () => onPressed(
-      ds.Container(
-        alignment: Alignment.topCenter,
-        padding: defaults.padding,
-        margin: EdgeInsets.zero,
-        ListDisplay(),
-      ),
-    );
+    final tap =
+        () => onPressed(
+          ds.Container(
+            alignment: Alignment.topCenter,
+            padding: defaults.padding,
+            margin: EdgeInsets.zero,
+            ListDisplay(),
+          ),
+        );
     return ds.Card(
       alignment: Alignment.center,
       margin: margin ?? defaults.margin,

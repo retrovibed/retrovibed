@@ -75,10 +75,7 @@ class _DurationInputState extends State<DurationInput> {
             if (unit == null) return;
             setState(() => _unit = unit);
           },
-          items:
-              _units
-                  .map((u) => DropdownMenuItem(value: u, child: Text(u.label)))
-                  .toList(),
+          items: _units.map((u) => DropdownMenuItem(value: u, child: Text(u.label))).toList(),
         ),
       ],
     );

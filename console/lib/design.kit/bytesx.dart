@@ -57,7 +57,7 @@ extension ByteFormatter on bytesx {
     const int TiB = 1024 * GiB;
     const int PiB = 1024 * TiB;
     const int EiB = 1024 * PiB;
-    
+
     int div = 1;
     String suffix = "B";
 
@@ -85,7 +85,7 @@ extension ByteFormatter on bytesx {
     if (div != 1) {
       convertedValue = convertedValue.roundToDouble();
     }
-    
+
     if (convertedValue == convertedValue.toInt().toDouble()) {
       return "${convertedValue.toInt()} $suffix";
     } else {
@@ -101,7 +101,7 @@ extension ByteFormatter on bytesx {
     const int TB_SI = 1000 * GB_SI;
     const int PB_SI = 1000 * TB_SI;
     const int EB_SI = 1000 * PB_SI;
-    
+
     int div = 1;
     String suffix = "B";
 
@@ -129,7 +129,7 @@ extension ByteFormatter on bytesx {
     if (div != 1) {
       convertedValue = convertedValue.roundToDouble();
     }
-    
+
     if (convertedValue == convertedValue.toInt().toDouble()) {
       return "${convertedValue.toInt()} $suffix";
     } else {

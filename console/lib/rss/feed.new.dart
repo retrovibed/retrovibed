@@ -10,8 +10,7 @@ class FeedNew extends StatelessWidget {
   final Feed current;
   final Function(Feed)? onChange;
 
-  FeedNew({super.key, Feed? current, this.onChange})
-    : current = current ?? (Feed.create()..autodownload = false);
+  FeedNew({super.key, Feed? current, this.onChange}) : current = current ?? (Feed.create()..autodownload = false);
 
   @override
   Widget build(BuildContext context) {

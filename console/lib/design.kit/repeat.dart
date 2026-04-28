@@ -119,8 +119,7 @@ class _MeasureSize extends SingleChildRenderObjectWidget {
   });
 
   @override
-  RenderObject createRenderObject(BuildContext context) =>
-      _MeasureSizeRenderObject(onSizeMeasured);
+  RenderObject createRenderObject(BuildContext context) => _MeasureSizeRenderObject(onSizeMeasured);
 }
 
 class _MeasureSizeRenderObject extends RenderProxyBox {

@@ -4,8 +4,7 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:uuid/uuid.dart' as uuid;
 
-uuid.UuidValue fromString(String v) =>
-    v.isEmpty ? uuid.Namespace.nil.uuidValue : uuid.UuidValue.fromString(v);
+uuid.UuidValue fromString(String v) => v.isEmpty ? uuid.Namespace.nil.uuidValue : uuid.UuidValue.fromString(v);
 
 String max() => uuid.Namespace.max.value;
 String min() => uuid.Namespace.nil.value;
@@ -25,8 +24,7 @@ T pattern<T>(String v, T min, T max, T value) {
 
 String random() => uuid.Uuid().v4();
 
-String withSuffix(int v) =>
-    '00000000-0000-0000-0000-${v.toString().padLeft(12, '0')}';
+String withSuffix(int v) => '00000000-0000-0000-0000-${v.toString().padLeft(12, '0')}';
 
 bool prefix(String p, v) => v.startsWith(p);
 

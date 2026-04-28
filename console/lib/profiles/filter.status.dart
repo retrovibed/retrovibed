@@ -21,12 +21,13 @@ class FilterStatus extends StatelessWidget {
       initialValue: current,
       tooltip: "Filter by status",
       onSelected: onChange,
-      itemBuilder: (context) => [
-        PopupMenuItem(value: meta.ProfileStatus.ENABLED, child: Text("Enabled")),
-        PopupMenuItem(value: meta.ProfileStatus.PENDING, child: Text("Pending")),
-        PopupMenuItem(value: meta.ProfileStatus.DISABLED, child: Text("Disabled")),
-        PopupMenuItem(value: meta.ProfileStatus.NONE, child: Text("Any")),
-      ],
+      itemBuilder:
+          (context) => [
+            PopupMenuItem(value: meta.ProfileStatus.ENABLED, child: Text("Enabled")),
+            PopupMenuItem(value: meta.ProfileStatus.PENDING, child: Text("Pending")),
+            PopupMenuItem(value: meta.ProfileStatus.DISABLED, child: Text("Disabled")),
+            PopupMenuItem(value: meta.ProfileStatus.NONE, child: Text("Any")),
+          ],
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

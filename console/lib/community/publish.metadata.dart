@@ -77,7 +77,8 @@ class _PublishMetadataState extends State<PublishMetadata> {
     });
 
     final authOptions = [authn.AuthzCache.bearer(context)];
-    widget.knownGet(knownMediaId, options: [httpx.Accept.json, ...authOptions])
+    widget
+        .knownGet(knownMediaId, options: [httpx.Accept.json, ...authOptions])
         .then((response) {
           setState(() {
             _formData = response.known;
@@ -169,7 +170,8 @@ class _PublishMetadataState extends State<PublishMetadata> {
     final authOptions = [authn.AuthzCache.bearer(context)];
     final req = KnownCreateRequest(known: _formData);
 
-    widget.knownCreate(
+    widget
+        .knownCreate(
           req,
           options: [httpx.Accept.json, httpx.Content.json, ...authOptions],
         )

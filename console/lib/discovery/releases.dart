@@ -83,6 +83,7 @@ class _NewReleasesState extends State<NewReleases> {
                 (item) => lib.KnownMediaCard(
                   item,
                   icon: Icons.download,
+                  help: lib.KnownMediaDisplay.hintReleases,
                   onTap: () {
                     ds.modals.asyncfn(
                       context,

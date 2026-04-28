@@ -77,10 +77,7 @@ class _ManualConfigurationView extends State<ManualConfiguration> {
                         .create(
                           api.DaemonCreateRequest(
                             daemon: api.Daemon(
-                              hostname:
-                                  _hostname.isEmpty
-                                      ? defaultLocalhost
-                                      : _hostname,
+                              hostname: _hostname.isEmpty ? defaultLocalhost : _hostname,
                             ),
                           ),
                         )

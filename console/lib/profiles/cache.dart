@@ -5,7 +5,6 @@ import 'package:lru/lru.dart';
 import 'package:retrovibed/meta.dart' as meta;
 import 'package:retrovibed/design.kit/bytesx.dart';
 
-
 final LruTypedDataCache<String, Uint8List> cache = LruTypedDataCache<String, Uint8List>(
   capacity: 256,
   capacityInBytes: bytesx.MiB,

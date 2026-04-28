@@ -287,7 +287,6 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                               },
                             ),
                     (context, _media) {
-                      final hint = ds.Hint(const Text("play a media item and auto-generate a playlist from results"));
                       var onSettings = () {
                         ds.modals
                             .of(context)
@@ -321,7 +320,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                           onChange: replace,
                           highlighted: _media.id == widget.highlighted,
                           key: ValueKey(_media.id),
-                          help: hint,
+                          help: KnownMediaDisplay.hintPlayMedia,
                         );
                       }
 
@@ -343,7 +342,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                         media: _media,
                         highlighted: _media.id == widget.highlighted,
                         key: ValueKey(_media.id),
-                        help: hint,
+                        help: KnownMediaDisplay.hintPlayMedia,
                       );
                     },
                   ),

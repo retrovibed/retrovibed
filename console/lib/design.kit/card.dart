@@ -40,14 +40,10 @@ class Card extends material.StatelessWidget {
   material.Widget build(material.BuildContext context) {
     final defaults = ds.Defaults.of(context);
 
-    final interactive =
-        onTap != null || onDoubleTap != null || onSecondaryTap != null || onLongPress != null;
+    final interactive = onTap != null || onDoubleTap != null || onSecondaryTap != null || onLongPress != null;
     return ds.Help(
       material.MouseRegion(
-        cursor:
-            interactive
-                ? material.SystemMouseCursors.click
-                : material.SystemMouseCursors.basic,
+        cursor: interactive ? material.SystemMouseCursors.click : material.SystemMouseCursors.basic,
         child: material.Card(
           margin: margin,
           clipBehavior: material.Clip.antiAlias,

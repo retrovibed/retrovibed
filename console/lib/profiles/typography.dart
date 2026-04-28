@@ -118,8 +118,7 @@ class Typography extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              if (!compact)
-                Expanded(child: ds.Timestamp.iso8601(current.updatedAt)),
+              if (!compact) Expanded(child: ds.Timestamp.iso8601(current.updatedAt)),
               ...trailing,
             ],
           ),

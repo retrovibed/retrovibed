@@ -9,9 +9,15 @@ import 'package:retrovibed/community/api.dart' as community;
 import 'package:retrovibed/community/community.detail.dart';
 import 'package:retrovibed/community/link.content.dart';
 
-typedef SearchCommunity = Future<community.CommunitySearchResponse> Function(community.CommunitySearchRequest req, {List<httpx.Option> options});
-typedef ConsumeAttribution = Future<billing.AttributionConsumeResponse> Function(String token, {List<httpx.Option> options});
-typedef SubscribeAction = Future<void> Function(BuildContext context, community.Community community, String attribution);
+typedef SearchCommunity =
+    Future<community.CommunitySearchResponse> Function(
+      community.CommunitySearchRequest req, {
+      List<httpx.Option> options,
+    });
+typedef ConsumeAttribution =
+    Future<billing.AttributionConsumeResponse> Function(String token, {List<httpx.Option> options});
+typedef SubscribeAction =
+    Future<void> Function(BuildContext context, community.Community community, String attribution);
 
 Stream<Uri> _defaultUriStream() => AppLinks().uriLinkStream;
 Future<Uri?> _defaultInitialUri() => AppLinks().getInitialLink();
@@ -82,10 +88,12 @@ class _DeepLinkState extends State<DeepLink> {
     final attribution = uri.queryParameters['a'] ?? '';
     if (attribution.isEmpty) return;
 
-    widget.consumeAttribution(
-      attribution,
-      options: [authn.Authenticated.bearer(context)],
-    ).ignore();
+    widget
+        .consumeAttribution(
+          attribution,
+          options: [authn.Authenticated.bearer(context)],
+        )
+        .ignore();
   }
 
   void _handleCommunity(Uri uri) {
@@ -102,42 +110,45 @@ class _DeepLinkState extends State<DeepLink> {
         .then((response) {
           if (response.items.isEmpty) {
             setState(
-              () => _overlay = ds.Masked(
-                alignment: Alignment.center,
-                ds.Error.unknown('community not found', onTap: _dismiss),
-              ),
+              () =>
+                  _overlay = ds.Masked(
+                    alignment: Alignment.center,
+                    ds.Error.unknown('community not found', onTap: _dismiss),
+                  ),
             );
             return;
           }
 
           final c = response.items.first;
           setState(
-            () => _overlay = ds.Masked(
-              alignment: Alignment.center,
-              ds.Confirmation.yesNo(
-                content: Column(
-                  children: [CommunityDetail(community: c)],
+            () =>
+                _overlay = ds.Masked(
+                  alignment: Alignment.center,
+                  ds.Confirmation.yesNo(
+                    content: Column(
+                      children: [CommunityDetail(community: c)],
+                    ),
+                    onConfirm: () {
+                      widget.subscribe(context, c, '').catchError((e, s) {
+                        setState(
+                          () => _overlay = ds.Error.unknown(e, onTap: _dismiss),
+                        );
+                        return Future.error(e);
+                      }).ignore();
+                      _dismiss();
+                    },
+                    onCancel: _dismiss,
+                  ),
                 ),
-                onConfirm: () {
-                  widget.subscribe(context, c, '').catchError((e, s) {
-                    setState(
-                      () => _overlay = ds.Error.unknown(e, onTap: _dismiss),
-                    );
-                    return Future.error(e);
-                  }).ignore();
-                  _dismiss();
-                },
-                onCancel: _dismiss,
-              ),
-            ),
           );
         })
         .catchError((e) {
           setState(
-            () => _overlay = ds.Masked(
-              alignment: Alignment.center,
-              ds.Error.unknown(e, onTap: _dismiss),
-            ),
+            () =>
+                _overlay = ds.Masked(
+                  alignment: Alignment.center,
+                  ds.Error.unknown(e, onTap: _dismiss),
+                ),
           );
         });
   }

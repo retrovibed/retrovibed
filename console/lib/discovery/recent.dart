@@ -79,10 +79,10 @@ class _RecentState extends State<Recent> {
       title: const Text('Continue Watching'),
       constraints: BoxConstraints.tightForFinite(height: 256),
       background: ds.Repeat(() => lib.KnownMediaCard(lib.Known(), icon: null)),
-        empty: Text(
-          'Media you watch will appear here',
-          style: TextStyle(color: Colors.grey),
-        ),
+      empty: Text(
+        'Media you watch will appear here',
+        style: TextStyle(color: Colors.grey),
+      ),
       items:
           _result.items.map((item) {
             final deletion = () {

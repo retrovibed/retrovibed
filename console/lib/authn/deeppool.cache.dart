@@ -14,7 +14,12 @@ class DeeppoolAuthzCache extends StatefulWidget {
   final FnDeeppoolAuthz apideeppoolauthz;
   final FnAttribution apibillingattribution;
 
-  const DeeppoolAuthzCache(this.child, {Key? key, this.apideeppoolauthz = deeppool.authz, this.apibillingattribution = billing.attribution}) : super(key: key);
+  const DeeppoolAuthzCache(
+    this.child, {
+    Key? key,
+    this.apideeppoolauthz = deeppool.authz,
+    this.apibillingattribution = billing.attribution,
+  }) : super(key: key);
 
   static _AuthzCache? of(BuildContext context) {
     return context.findAncestorStateOfType<_AuthzCache>();
@@ -42,9 +47,11 @@ class _AuthzCache extends State<DeeppoolAuthzCache> {
   String? _attribution;
 
   Future<String> _attributionToken() {
-    return httpx.withRetry(
-      () => widget.apibillingattribution(options: [Authenticated.bearer(context)]),
-    ).then((v) => _attribution ??= v.token);
+    return httpx
+        .withRetry(
+          () => widget.apibillingattribution(options: [Authenticated.bearer(context)]),
+        )
+        .then((v) => _attribution ??= v.token);
   }
 
   Future<authz.Bearer<_meta.Token>> Function(authz.Cached<_meta.Token>) _refresh() {
