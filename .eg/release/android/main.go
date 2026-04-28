@@ -12,6 +12,7 @@ import (
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
 	"github.com/egdaemon/eg/runtime/wasi/shell"
+	"github.com/egdaemon/eg/runtime/x/wasi/egbug"
 	"github.com/egdaemon/eg/runtime/x/wasi/egfs"
 	"github.com/egdaemon/eg/runtime/x/wasi/eggithub"
 	"github.com/egdaemon/eg/runtime/x/wasi/egsecrets"
@@ -45,6 +46,7 @@ func main() {
 					// eg.WhenFn(egfs.FileNotExistsFn(egenv.CacheDirectory("android", "keystore")), android.SigningKey(egenv.CacheDirectory("android", "keystore"), "upload")),
 					eg.WhenFn(egfs.FileNotExistsFn(egenv.CacheDirectory("android", "keystore")), egsecrets.CopyIntoFileOp(egenv.CacheDirectory("android", "keystore"), "gcpsm://retrovibed-prod/android-keystore/latest")),
 					console.Generate,
+					egbug.Log("generated console bindings"),
 					eg.Parallel(
 						console.GenerateStaticBinding(
 							egenv.WorkingDirectory("console/android/app/src/main/jniLibs/x86_64"),
@@ -57,6 +59,7 @@ func main() {
 								Environ("GOARCH", "arm64"),
 						),
 					),
+					egbug.Log("generated static libraries for android"),
 					eg.Parallel(
 						duckdb.MaybeBuild(
 							"console/android/app/src/main/jniLibs/x86_64/libduckdb_static.a",
@@ -69,6 +72,7 @@ func main() {
 							duckdb.CloneAndroid,
 						),
 					),
+					egbug.Log("generated static libraries for duckdb"),
 					console.BuildAndroidAPK(androidruntime()),
 					console.BuildAndroidBundle(androidruntime()),
 					eggithub.Release(
