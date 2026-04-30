@@ -640,7 +640,7 @@ github.com/james-lawrence/genieql/internal/userx
 github.com/james-lawrence/genieql/internal/wasidialect
 github.com/james-lawrence/genieql/internal/wasix/ffierrors
 github.com/james-lawrence/genieql/internal/wasix/ffiguest
-# github.com/james-lawrence/torrent v0.0.0-20260326131309-087d71bc64d3
+# github.com/james-lawrence/torrent v0.0.0-20260430131319-2b17301ce126
 ## explicit; go 1.24.0
 github.com/james-lawrence/torrent
 github.com/james-lawrence/torrent/autobind
@@ -923,7 +923,7 @@ golang.org/x/crypto/internal/poly1305
 golang.org/x/crypto/poly1305
 golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
-# golang.org/x/exp v0.0.0-20260312153236-7ab1446f8b90
+# golang.org/x/exp v0.0.0-20260410095643-746e56fc9e2f
 ## explicit; go 1.25.0
 golang.org/x/exp/constraints
 golang.org/x/exp/maps
