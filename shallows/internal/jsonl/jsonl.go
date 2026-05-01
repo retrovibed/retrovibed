@@ -7,6 +7,7 @@ import (
 	"io"
 	"iter"
 
+	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 )
 
@@ -38,8 +39,10 @@ type Decoder struct {
 
 // NewDecoder returns a new Decoder that reads from r.
 func NewDecoder(r io.Reader) *Decoder {
+	s := bufio.NewScanner(r)
+	s.Buffer(make([]byte, bytesx.MiB), 16*bytesx.MiB)
 	return &Decoder{
-		scanner: bufio.NewScanner(r),
+		scanner: s,
 	}
 }
 

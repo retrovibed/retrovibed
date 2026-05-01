@@ -1,6 +1,7 @@
 package cmdmedia
 
 import (
+	"bytes"
 	"context"
 	"encoding/binary"
 	"fmt"
@@ -44,7 +45,8 @@ type mbJSONReleaseGroup struct {
 }
 
 type mbjsonlimport struct {
-	Source string `flag:"" name:"source" help:"short id for the data source" hidden:"true" default:"musicbrainz"`
+	Source string        `flag:"" name:"source" help:"short id for the data source" hidden:"true" default:"musicbrainz"`
+	Output cmdopts.IOOut `flag:"" name:"output" default:"-" help:"output destination; '-' for stdout"`
 	cause  error
 }
 
@@ -109,5 +111,15 @@ func (t mbjsonlimport) run(ctx context.Context, r io.Reader, encoder *jsonl.Enco
 }
 
 func (t mbjsonlimport) Run(gctx *cmdopts.Global) (err error) {
-	return t.run(gctx.Context, os.Stdin, jsonl.NewEncoder(os.Stdout))
+	out, err := t.Output.Open(os.Stdout)
+	if err != nil {
+		return errorsx.Wrap(err, "unable to open output")
+	}
+
+	var in io.Reader = bytes.NewReader(nil)
+	if cmdopts.Readable(os.Stdin) {
+		in = os.Stdin
+	}
+
+	return t.run(gctx.Context, in, jsonl.NewEncoder(out))
 }
