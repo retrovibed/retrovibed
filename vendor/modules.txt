@@ -812,6 +812,8 @@ github.com/pressly/goose/v3/internal/sqlparser
 github.com/pressly/goose/v3/lock
 github.com/pressly/goose/v3/lock/internal/store
 github.com/pressly/goose/v3/lock/internal/table
+# github.com/retrovibed/retrovibed/retroapi v0.0.0-20260430131836-bda4ea6a9c13
+## explicit; go 1.25.0
 # github.com/rivo/uniseg v0.4.7
 ## explicit; go 1.18
 github.com/rivo/uniseg

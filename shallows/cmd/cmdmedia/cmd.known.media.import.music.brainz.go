@@ -45,8 +45,13 @@ func (t *mbimport) releases(ctx context.Context, c *gomusicbrainz.WS2Client, l *
 		for currentDate.Before(endDate) {
 			offset := 0
 
-			// Lucene query for specific date to stay under the 2000-result pagination ceiling
-			query := fmt.Sprintf("date:%s", currentDate.Format(time.DateOnly))
+			nextDate := currentDate.Add(24 * time.Hour)
+			// Query a specific 24-hour slice of modifications
+			// Format: [YYYY-MM-DD TO YYYY-MM-DD]
+			query := fmt.Sprintf("lastmodified:[%s TO %s]",
+				currentDate.Format(time.DateOnly),
+				nextDate.Format(time.DateOnly),
+			)
 
 			for {
 				resp, err := backoffx.AttemptV(ctx, bs, func(ctx context.Context, attempts uint) (*gomusicbrainz.ReleaseSearchResponse, error) {
@@ -54,7 +59,6 @@ func (t *mbimport) releases(ctx context.Context, c *gomusicbrainz.WS2Client, l *
 						return nil, errorsx.Wrap(err, "rate limit failure")
 					}
 
-					log.Println("retrieving musicbrainz releases", attempts, currentDate.Format(time.DateOnly), offset)
 					if attempts > t.Attempts {
 						return nil, backoffx.ErrStopAttempts
 					}
@@ -67,6 +71,8 @@ func (t *mbimport) releases(ctx context.Context, c *gomusicbrainz.WS2Client, l *
 					t.cause = errorsx.Wrapf(err, "failed to search releases %v - %d", currentDate, offset)
 					return
 				}
+
+				log.Println("retrieved musicbrainz releases", query, offset, len(resp.Releases))
 
 				if len(resp.Releases) == 0 {
 					break
@@ -93,7 +99,7 @@ func (t *mbimport) releases(ctx context.Context, c *gomusicbrainz.WS2Client, l *
 						ID:               id.String(),
 						OriginalTitle:    rel.ReleaseGroup.Title,
 						Title:            rel.ReleaseGroup.Title,
-						Released:         rel.Date.Time,
+						Released:         rel.ReleaseGroup.FirstReleaseDate.Time,
 						PosterPath:       fmt.Sprintf("https://coverartarchive.org/release-group/%s/front-500", id),
 						OriginalLanguage: lang.String(),
 						Mimetype:         mimex.Audio,

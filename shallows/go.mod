@@ -35,6 +35,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/profile v1.7.0
 	github.com/pressly/goose/v3 v3.27.0
+	github.com/retrovibed/retrovibed/retroapi v0.0.0-20260430131836-bda4ea6a9c13
 	github.com/shirou/gopsutil/v4 v4.26.3
 	github.com/stretchr/testify v1.11.1
 	github.com/things-go/go-socks5 v0.1.1
@@ -134,6 +135,7 @@ require (
 	github.com/muesli/termenv v0.16.0 // indirect
 	github.com/nxadm/tail v1.4.11 // indirect
 	github.com/pierrec/lz4/v4 v4.1.25 // indirect
+	github.com/porfirion/trie v1.0.0 // indirect
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/serenize/snaker v0.0.0-20201027110005-a7ad2135616e // indirect
