@@ -47,10 +47,13 @@ RUN systemd-tmpfiles --create
 RUN systemd-tmpfiles --clean
 
 # install appimage-builder for AppImage packaging
-RUN apt-get -y install python3-pip python3-apt squashfs-tools patchelf desktop-file-utils libgdk-pixbuf2.0-dev fakeroot gnupg2
-RUN pip3 install appimage-builder
+RUN apt-get update && apt-get -y install pipx python3-venv python3-apt squashfs-tools patchelf desktop-file-utils libgdk-pixbuf-xlib-2.0-dev fakeroot gnupg2
+# Use pipx to install appimage-builder globally (available in /usr/local/bin)
+RUN PIPX_HOME=/opt/pipx PIPX_BIN_DIR=/usr/local/bin pipx install appimage-builder
+
 RUN curl -sSfL https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-$(uname -m).AppImage -o /usr/local/bin/appimagetool \
     && chmod +x /usr/local/bin/appimagetool
 
 # hack due to ubuntu updating sudo
 RUN update-alternatives --set sudo /usr/bin/sudo.ws
+
