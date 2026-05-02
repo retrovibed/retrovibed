@@ -80,7 +80,7 @@ func build() eg.OpFn {
 					"cat .dist/linux/usr/share/applications/retrovibed.desktop | envsubst > %s/usr/share/applications/retrovibed.desktop",
 					egtarball.Path(archive),
 				).
-					Environ("VERSION", eggit.EnvCommit().StringReplace("%git.commit.year%.%git.commit.month%.%git.commit.day%")).
+					Environ("VERSION", tarballs.Version()).
 					Environ("ARCH", b.Arch),
 				shell.Newf(
 					"cat usr/share/applications/retrovibed.desktop",

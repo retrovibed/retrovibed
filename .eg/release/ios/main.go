@@ -5,6 +5,8 @@ import (
 	"eg/compute/console"
 	"eg/compute/debuild/duckdb"
 	"eg/compute/release"
+	"eg/compute/tarballs"
+	"fmt"
 	"log"
 	"time"
 
@@ -99,7 +101,7 @@ func iosbuild(ctx context.Context, op eg.Op) error {
 				flutter.New("bash -c 'cd ios && xcodebuild -create-xcframework -framework RetrovivedBind.framework -output RetrovivedBind.xcframework'"),
 				flutter.New("flutter pub get"),
 				flutter.New("pod install").Directory(egenv.WorkingDirectory("console", "ios")),
-				flutter.New(commit.StringReplace("flutter build ipa --build-name=%git.commit.year%.%git.commit.month%.%git.commit.day% --build-number=%git.commit.unix% --no-codesign --release --build-number=%git.commit.unix%")).
+				flutter.New(fmt.Sprintf("flutter build ipa --build-name=%s --build-number=%s --no-codesign --release", tarballs.Version(), commit.StringReplace("%git.commit.unix%"))).
 					Timeout(15*time.Minute),
 			),
 			shell.Op(

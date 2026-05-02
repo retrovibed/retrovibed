@@ -6,6 +6,7 @@ import (
 	"eg/compute/debuild/duckdb"
 	"eg/compute/release"
 	"eg/compute/tarballs"
+	"fmt"
 	"log"
 	"path/filepath"
 	"time"
@@ -71,7 +72,7 @@ func main() {
 			egbug.DebugFailure(
 				shell.Op(
 					flutter.New("rm -rf build/macos/{x64,arm64}/debug").Lenient(true),
-					flutter.New(commit.StringReplace("flutter build macos --build-name=%git.commit.year%.%git.commit.month%.%git.commit.day% --build-number=%git.commit.unix% --release lib/main.dart")).Timeout(10*time.Minute),
+					flutter.New(fmt.Sprintf("flutter build macos --build-name=%s --build-number=%s --release lib/main.dart", tarballs.Version(), commit.StringReplace("%git.commit.unix%"))).Timeout(10*time.Minute),
 				),
 				shell.Op(shell.New("flutter failed to build app")),
 			),
