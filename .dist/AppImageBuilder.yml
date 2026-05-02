@@ -1,0 +1,40 @@
+version: 1
+
+AppDir:
+  path: !ENV '${APPDIR}'
+
+  app_info:
+    id: space.retrovibe.Console
+    name: retrovibed
+    icon: retrovibed
+    version: !ENV '${VERSION}'
+    exec: usr/lib/retrovibed/console
+    exec_args: $@
+
+  apt:
+    arch: !ENV '${APT_ARCH}'
+    sources:
+      - sourceline: 'deb http://archive.ubuntu.com/ubuntu/ questing main restricted universe multiverse'
+      - sourceline: 'deb https://ppa.launchpadcontent.net/jljatone/retrovibed/ubuntu questing main'
+        key_url: !ENV 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x${GPG_FINGERPRINT}'
+    include:
+      - duckdb
+      - libgtk-3-0
+      - libglu1-mesa
+    exclude:
+      - libglib2.0-data
+      - shared-mime-info
+      - xdg-user-dirs
+      - hicolor-icon-theme
+  files:
+    exclude:
+      - usr/share/man
+      - usr/share/doc/*/README.*
+      - usr/share/doc/*/changelog.*
+      - usr/share/doc/*/NEWS.*
+
+AppImage:
+  arch: !ENV '${APPIMAGE_ARCH}'
+  update-information: !ENV 'gh-releases-zsync|retrovibed|retrovibed|latest|retrovibed-*-${APPIMAGE_ARCH}.AppImage.zsync'
+  sign-key: None
+  file_name: !ENV '${APPIMAGE_FILE_NAME}'
