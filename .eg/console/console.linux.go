@@ -4,6 +4,7 @@ import (
 	"context"
 	"eg/compute/flatpakmods"
 	"eg/compute/tarballs"
+	"fmt"
 	"time"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
@@ -33,9 +34,7 @@ func BuildAndroidAPK(runtime shell.Command) eg.OpFn {
 		return shell.Run(
 			ctx,
 			runtime.New(
-				commit.StringReplace(
-					"flutter build apk --build-name=%git.commit.year%.%git.commit.month%.%git.commit.day% --build-number=%git.commit.unix% --release lib/main.dart",
-				),
+				fmt.Sprintf("flutter build apk --build-name=%s --build-number=%s --release lib/main.dart", tarballs.Version(), commit.StringReplace("%git.commit.unix%")),
 			).Timeout(20*time.Minute),
 			runtime.New("mv app-release.apk retrovibed.apk").Timeout(20*time.Minute).Directory(egenv.WorkingDirectory("console/build/app/outputs/apk/release")),
 		)
@@ -50,9 +49,7 @@ func BuildAndroidBundle(runtime shell.Command) eg.OpFn {
 		return shell.Run(
 			ctx,
 			runtime.New(
-				commit.StringReplace(
-					"flutter build appbundle --build-name=%git.commit.year%.%git.commit.month%.%git.commit.day% --build-number=%git.commit.unix% --release lib/main.dart",
-				),
+				fmt.Sprintf("flutter build appbundle --build-name=%s --build-number=%s --release lib/main.dart", tarballs.Version(), commit.StringReplace("%git.commit.unix%")),
 			).Timeout(20*time.Minute),
 			runtime.New("mv app-release.aab retrovibed.aab").Timeout(20*time.Minute).Directory(egenv.WorkingDirectory("console/build/app/outputs/bundle/release")),
 		)

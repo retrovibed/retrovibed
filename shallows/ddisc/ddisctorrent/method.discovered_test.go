@@ -75,10 +75,10 @@ func TestDiscoveredProtocol(t *testing.T) {
 			genrecord(t.Context(), pdb)
 		}
 
-		req, err := ddisctorrent.NewDiscoveredRequest(cdht.ID().AsByteArray(), 100, uuid.Nil.String())
+		req, err := ddisctorrent.NewDiscoveredRequest(cdht.ID(cdht.DynamicAddrPort()).AsByteArray(), 100, uuid.Nil.String())
 		require.NoError(t, err)
 
-		ret := cdht.Query(t.Context(), dht.NewAddr(pdht.AddrPort()), req)
+		ret := cdht.Query(t.Context(), dht.NewAddr(pdht.DynamicAddrPort()), req)
 		require.NoError(t, ret.Err)
 
 		require.Eventually(t, func() bool {

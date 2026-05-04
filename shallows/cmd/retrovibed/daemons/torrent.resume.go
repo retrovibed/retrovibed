@@ -165,8 +165,8 @@ func AnnounceSeeded(ctx context.Context, q sqlx.Queryer, dhts *dht.Server, roots
 		}
 
 		req := tracker.NewAccounceRequest(
-			dhts.ID(),
-			dhts.AddrPort().Port(),
+			dhts.ID(dhts.DynamicAddrPort()),
+			dhts.DynamicAddrPort().Port(),
 			int160.FromBytes(md.Infohash),
 			tracker.AnnounceOptionKey,
 			tracker.AnnounceOptionDownloaded(int64(md.Downloaded)),

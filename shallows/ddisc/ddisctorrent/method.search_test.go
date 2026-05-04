@@ -74,10 +74,10 @@ func TestSearchProtocol(t *testing.T) {
 			genrecord(t.Context(), pdb, idx)
 		}
 
-		req, err := ddisctorrent.NewSearchRequest(cdht.ID(), knownmedia.String())
+		req, err := ddisctorrent.NewSearchRequest(cdht.ID(cdht.DynamicAddrPort()), knownmedia.String())
 		require.NoError(t, err)
 
-		ret := cdht.Query(t.Context(), dht.NewAddr(pdht.AddrPort()), req)
+		ret := cdht.Query(t.Context(), dht.NewAddr(pdht.DynamicAddrPort()), req)
 		require.NoError(t, ret.Err)
 
 		require.Eventually(t, func() bool {

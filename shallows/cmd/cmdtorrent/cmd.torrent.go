@@ -11,6 +11,6 @@ type Commands struct {
 	Export     exportMagnets    `cmd:"" help:"export seeded torrents as magnet urls to stdout or a file"`
 	Magnet     cmdMagnet        `cmd:"" help:"insert magnet links for download"`
 	KnownMedia cmdKnownMedia    `cmd:"" help:"best effort attempt to assign known media"`
-	Download   cmdDownload      `cmd:"" help:"test util for downloading a torrent, primarily used to ensure working torrent library, does not persist anything"`
+	Download   cmdDownload      `cmd:"" help:"test util for downloading a torrent, primarily used to ensure working torrent library, does not persist anything. use kill -s USR1 to dump statistics"`
 	DHT        cmdDHTTest       `cmd:"" help:"test utility for ensuring dht behaviors"`
 }

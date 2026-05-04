@@ -15,7 +15,8 @@ func PeerWith(ctx context.Context, s *dht.Server, partition uuid.UUID, n krpc.No
 		resp MetaResponse
 	)
 
-	qi, err := NewMetaRequest(s.ID(), partition.String())
+	b := s.Binding(n.Addr.AddrPort)
+	qi, err := NewMetaRequest(b.ID(), partition.String())
 	if err != nil {
 		return _zero, errorsx.Wrapf(err, "unable to generate search request: %s", n.ID)
 	}

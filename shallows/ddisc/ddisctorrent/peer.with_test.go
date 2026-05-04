@@ -8,8 +8,6 @@ import (
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/krpc"
 	"github.com/retrovibed/retrovibed/shallows/ddisc/ddisctorrent"
-	"github.com/retrovibed/retrovibed/shallows/internal/langx"
-	"github.com/retrovibed/retrovibed/shallows/internal/netx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/torrenttestx"
 	"github.com/stretchr/testify/require"
@@ -56,15 +54,15 @@ func TestPeerWith(t *testing.T) {
 			cdht,
 			uuid.Nil,
 			krpc.NewInfo(
-				pdht.ID().AsByteArray(),
+				pdht.ID(pdht.DynamicAddrPort()).AsByteArray(),
 				krpc.NewNodeAddrFromAddrPort(
-					langx.Autoderef(netx.AddrPort(pdht.Addr())),
+					pdht.DynamicAddrPort(),
 				),
 			),
 		)
 		require.NoError(t, err)
 		require.Equal(t, uuid.Max.String(), info.Partition)
-		require.Equal(t, pdht.ID(), info.Peer.Int160())
+		require.Equal(t, pdht.ID(pdht.DynamicAddrPort()), info.Peer.Int160())
 		require.Equal(t, ddisctorrent.ExtensionName, info.Version)
 	})
 
@@ -107,9 +105,9 @@ func TestPeerWith(t *testing.T) {
 			cdht,
 			uuid.Nil,
 			krpc.NewInfo(
-				pdht.ID().AsByteArray(),
+				pdht.ID(pdht.DynamicAddrPort()).AsByteArray(),
 				krpc.NewNodeAddrFromAddrPort(
-					langx.Autoderef(netx.AddrPort(pdht.Addr())),
+					pdht.DynamicAddrPort(),
 				),
 			),
 		)

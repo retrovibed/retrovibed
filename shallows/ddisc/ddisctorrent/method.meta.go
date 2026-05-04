@@ -67,7 +67,7 @@ type Meta struct {
 	partition uuid.UUID
 }
 
-func (t Meta) Handle(ctx context.Context, source dht.Addr, s *dht.Server, raw []byte, _ *krpc.Msg) error {
+func (t Meta) Handle(ctx context.Context, source dht.Addr, s *dht.Server, b dht.Binding, raw []byte, _ *krpc.Msg) error {
 	var (
 		m MetaRequest
 	)
@@ -76,7 +76,7 @@ func (t Meta) Handle(ctx context.Context, source dht.Addr, s *dht.Server, raw []
 		return err
 	}
 
-	resp := NewMetaResponse(s.ID(), t.partition.String(), m.T)
+	resp := NewMetaResponse(b.ID(), t.partition.String(), m.T)
 
 	if _, err := s.SendMessageToNode(ctx, resp, source, 3); err != nil {
 		return err

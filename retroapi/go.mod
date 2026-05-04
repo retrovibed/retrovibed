@@ -8,7 +8,7 @@ require (
 	github.com/gofrs/uuid/v5 v5.4.0
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/gorilla/schema v1.4.1
-	github.com/james-lawrence/torrent v0.0.0-20260430131319-2b17301ce126
+	github.com/james-lawrence/torrent v0.0.0-20260504114734-001214417dc9
 	github.com/justinas/alice v1.2.0
 	github.com/mattn/go-isatty v0.0.21
 	github.com/pkg/profile v1.7.0
@@ -21,10 +21,8 @@ require (
 )
 
 require (
-	filippo.io/edwards25519 v1.2.0 // indirect
 	github.com/RoaringBitmap/roaring/v2 v2.18.0 // indirect
 	github.com/alecthomas/atomic v0.1.0-alpha2 // indirect
-	github.com/alecthomas/repr v0.5.2 // indirect
 	github.com/anacrolix/generics v0.2.0 // indirect
 	github.com/anacrolix/go-libutp v1.4.0 // indirect
 	github.com/anacrolix/log v0.17.0 // indirect

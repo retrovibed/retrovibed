@@ -56,7 +56,7 @@ func (t cmdDHTTest) Run(gctx *cmdopts.Global) (err error) {
 		return errorsx.Wrap(err, "unable to serve dht")
 	}
 
-	go dhtx.Statistics(gctx.Context, 5*time.Second, dhts)
+	go dhtx.BackgroundStatistics(gctx.Context, 5*time.Second, dhts)
 
 	bctx, done := context.WithTimeout(gctx.Context, 30*time.Second)
 	defer done()
