@@ -2,6 +2,7 @@ package cmdmedia
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -57,7 +58,7 @@ func TestMBImportReleases(t *testing.T) {
 
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			require.Equal(t, "/ws/2/release", r.URL.Path)
-			require.Equal(t, "date:2020-01-15", r.URL.Query().Get("query"))
+			require.Equal(t, "lastmodified:[2020-01-15 TO 2020-01-16]", r.URL.Query().Get("query"))
 			errorsx.Must(fmt.Fprint(w, releaseXML(2, 0,
 				releaseEntryXML("8f6a4a2b-e29b-41d4-a716-446655440001", "Album One", "2020-01-15", "eng"),
 				releaseEntryXML("8f6a4a2b-e29b-41d4-a716-446655440002", "Album Two", "2020-01-15", "fra"),
@@ -170,6 +171,7 @@ func TestMBImportReleases(t *testing.T) {
 		seenDates := map[string]bool{}
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			q := r.URL.Query().Get("query")
+			log.Println("DERP DERP", q)
 			seenDates[q] = true
 			id := fmt.Sprintf("8f6a4a2b-e29b-41d4-a716-44665544000%d", len(seenDates))
 			errorsx.Must(fmt.Fprint(w, releaseXML(1, 0, releaseEntryXML(id, q, "2020-01-15", ""))))
@@ -193,9 +195,9 @@ func TestMBImportReleases(t *testing.T) {
 
 		require.Equal(t, uint64(3), testx.SeqCount(m.releases(ctx, c, unlimited, immediate)))
 		require.NoError(t, m.cause)
-		require.True(t, seenDates["date:2020-01-15"])
-		require.True(t, seenDates["date:2020-01-16"])
-		require.True(t, seenDates["date:2020-01-17"])
+		require.True(t, seenDates["lastmodified:[2020-01-15 TO 2020-01-16]"])
+		require.True(t, seenDates["lastmodified:[2020-01-16 TO 2020-01-17]"])
+		require.True(t, seenDates["lastmodified:[2020-01-17 TO 2020-01-18]"])
 	})
 
 	t.Run("sets cause on server error", func(t *testing.T) {
