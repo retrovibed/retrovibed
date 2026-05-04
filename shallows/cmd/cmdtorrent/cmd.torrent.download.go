@@ -24,7 +24,7 @@ import (
 type cmdDownload struct {
 	Magnet    url.URL   `arg:"" name:"magnet" help:"magnet uri to download" required:"true"`
 	Peers     []url.URL `flag:"" name:"peer" help:"uri of a peer to download from"`
-	Bootstrap bool      `flag:"" name:"bootstrap" help:"bootstrap the dht using well known trackers"`
+	Bootstrap bool      `flag:"" name:"bootstrap" help:"bootstrap the dht using well known trackers" negatable:"" default:"true"`
 }
 
 func (t cmdDownload) Run(gctx *cmdopts.Global) error {
@@ -80,8 +80,8 @@ func (t cmdDownload) Run(gctx *cmdopts.Global) error {
 		torrent.ClientConfigConnectionClosed(func(id int160.T, stats torrent.ConnStats, remaining int) {
 			log.Println("connection closed", id, remaining, spew.Sdump(stats))
 		}),
-		torrent.ClientConfigDebugLogger(log.Default()),
-		torrent.ClientConfigInfoLogger(log.Default()),
+		// torrent.ClientConfigDebugLogger(log.Default()),
+		// torrent.ClientConfigInfoLogger(log.Default()),
 		torrent.ClientConfigMaxOutstandingRequests(2048),
 		torrent.ClientConfigExtension(ddisctorrent.ExtensionName),
 	)

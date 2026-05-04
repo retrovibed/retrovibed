@@ -1,6 +1,7 @@
 package dhtx
 
 import (
+	"bytes"
 	"context"
 	"log"
 	"time"
@@ -14,7 +15,13 @@ import (
 // log out the dht statistics every d period.
 func Statistics(ctx context.Context, d time.Duration, ds *dht.Server) {
 	timex.NowAndEvery(ctx, d, func(ctx context.Context) error {
-		log.Println("dht", ds.ID(), ds.AddrPort(), spew.Sdump(ds.Stats()))
+		var b = bytes.NewBuffer(nil)
+		if err := dht.Dump(ds, b); err != nil {
+			return err
+		}
+
+		log.Println("dht", ds.ID(ds.DynamicAddrPort()), ds.AddrPort(ds.DynamicAddrPort()), spew.Sdump(ds.Stats()))
+		log.Println(b.String())
 		return nil
 	})
 }

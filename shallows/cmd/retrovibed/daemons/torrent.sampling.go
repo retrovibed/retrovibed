@@ -98,7 +98,7 @@ func DiscoverDHTBEP51Peers(ctx context.Context, q sqlx.Queryer, s *dht.Server) (
 		}
 
 		target := int160.Random()
-		peers := s.ClosestGoodNodeInfos(256, target)
+		peers := s.ClosestGoodNodeInfos(s.DynamicAddrPort(), 256, target)
 
 		for _, dis := range peers {
 			ret := s.GetPeers(ctx, dht.NewAddr(dis.Addr.AddrPort), target, false)
@@ -143,7 +143,7 @@ func DiscoverDHTInfoHashes(ctx context.Context, db sqlx.Queryer, s *dht.Server) 
 			}
 		}()
 
-		qi, err := bep0051.NewRequest(s.ID(), krpc.ID(p.Peer))
+		qi, err := bep0051.NewRequest(s.ID(dst), krpc.ID(p.Peer))
 		if err != nil {
 			return errorsx.Wrapf(err, "unable to prepare sample request: %s", p.IP)
 		}

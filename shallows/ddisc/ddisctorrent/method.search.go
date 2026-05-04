@@ -47,7 +47,7 @@ type Search struct {
 	q sqlx.Queryer
 }
 
-func (t Search) Handle(ctx context.Context, source dht.Addr, s *dht.Server, raw []byte, _ *krpc.Msg) error {
+func (t Search) Handle(ctx context.Context, source dht.Addr, s *dht.Server, b dht.Binding, raw []byte, _ *krpc.Msg) error {
 	var (
 		m SearchRequest
 	)
@@ -66,7 +66,7 @@ func (t Search) Handle(ctx context.Context, source dht.Addr, s *dht.Server, raw 
 			Q: MethodMedia,
 			Y: "q",
 			T: krpc.TimestampTransactionID(),
-			A: mediaFromDiscovered(m.A.Token, s.ID(), &v),
+			A: mediaFromDiscovered(m.A.Token, b.ID(), &v),
 		}
 
 		if _, err := s.SendMessageToNode(ctx, msg, source, 1); err != nil {

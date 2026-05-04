@@ -34,11 +34,13 @@ func Announce(ctx context.Context, cln *torrent.Client, s *dht.Server, partition
 					return nil
 				}
 
+				b := s.Binding(to)
+
 				// ping the node to determine its id, allowing us to check if we've talked to them before.
-				if ret := dht.PingDuration(ctx, 2*time.Second, s, to, s.ID()); ret.Err != nil {
+				if ret := dht.PingDuration(ctx, 2*time.Second, s, to, b.ID()); ret.Err != nil {
 					return errorsx.Wrap(ret.Err, "ping failed")
-				} else if pid = ret.Reply.SenderID().Int160(); pid == s.ID() {
-					log.Println("skipping self", s.ID(), "vs", pid)
+				} else if pid = ret.Reply.SenderID().Int160(); pid == b.ID() {
+					log.Println("skipping self", b.ID(), "vs", pid)
 					return nil
 				} else {
 					log.Println("pinged", pid, to, "we are", ret.Reply.IP)
@@ -47,7 +49,7 @@ func Announce(ctx context.Context, cln *torrent.Client, s *dht.Server, partition
 				dctx, done := context.WithTimeout(ctx, time.Second)
 				defer done()
 
-				req, err := NewSyncRequest(s.ID(), p.String(), uuid.Nil.String())
+				req, err := NewSyncRequest(id, p.String(), uuid.Nil.String())
 				if err != nil {
 					return errorsx.Wrap(err, "failed to create sync request")
 				}
@@ -67,10 +69,10 @@ func Announce(ctx context.Context, cln *torrent.Client, s *dht.Server, partition
 			}
 
 			for pv := range seq.Each(ctx) {
-				addrport := s.AddrPort()
 				for _, peer := range pv.Peers {
+					b := s.Binding(peer.AddrPort)
 					log.Println("sync initiated", id, peer)
-					if err := performsync(addrport, peer.AddrPort); err != nil {
+					if err := performsync(b.AddrPort(), peer.AddrPort); err != nil {
 						log.Println("failed to request sync with", id, peer, err)
 						continue
 					}

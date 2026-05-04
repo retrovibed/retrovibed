@@ -76,10 +76,10 @@ func TestSyncProtocol(t *testing.T) {
 			genrecord(t.Context(), pdb, idx)
 		}
 
-		req, err := ddisctorrent.NewSyncRequest(cdht.ID(), uuidx.WithSuffix(0), uuid.Nil.String())
+		req, err := ddisctorrent.NewSyncRequest(cdht.ID(cdht.DynamicAddrPort()), uuidx.WithSuffix(0), uuid.Nil.String())
 		require.NoError(t, err)
 
-		ret := cdht.Query(t.Context(), dht.NewAddr(pdht.AddrPort()), req)
+		ret := cdht.Query(t.Context(), dht.NewAddr(pdht.DynamicAddrPort()), req)
 		require.NoError(t, ret.Err)
 
 		require.Eventually(t, func() bool {

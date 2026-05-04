@@ -78,8 +78,8 @@ func Peers(ctx context.Context, s *dht.Server, id int160.T) ([]dht.Peer, error) 
 	return nil, errorsx.Wrapf(seq.Err(), "failed to announce partition %s", id)
 }
 
-func localsocket(port uint16) (s0 *utp.Socket, s1 net.Listener, err error) {
-	if s0, err = utp.NewSocket("udp", fmt.Sprintf(":%d", port)); err != nil {
+func localsocket(network string, port uint16) (s0 *utp.Socket, s1 net.Listener, err error) {
+	if s0, err = utp.NewSocket(network, fmt.Sprintf(":%d", port)); err != nil {
 		return nil, nil, errorsx.Wrap(err, "unable to open utp socket")
 	}
 
@@ -150,13 +150,33 @@ func Autosocket(_dht *dht.Server, p uint16) (_ torrent.Binder, err error) {
 	var (
 		s1 *utp.Socket
 		s2 net.Listener
+
+		s3 *utp.Socket
+		s4 net.Listener
 	)
 
-	if s1, s2, err = localsocket(p); err != nil {
+	if s1, s2, err = localsocket("udp", p); err != nil {
 		return nil, err
 	}
 
-	return torrent.NewSocketsBind(sockets.New(s1, s1), sockets.New(s2, &net.Dialer{})).Options(torrent.BinderOptionDHT(_dht)), nil
+	if netx.AddrPort(s1.LocalAddr()).Addr().Unmap().Is6() {
+		// if out localsocket "udp" bound an ipv6 address then
+		// attempt to bind to ip4 as well. but its okay if udp4 fails.
+		if s3, s4, err = localsocket("udp4", p); err != nil {
+			log.Println("unable to bind to ip4, skipping since we have ip6", err)
+			return torrent.NewSocketsBind(
+				sockets.New(s1, s1),
+				sockets.New(s2, &net.Dialer{}),
+			).Options(torrent.BinderOptionDHT(_dht)), nil
+		}
+	}
+
+	return torrent.NewSocketsBind(
+		sockets.New(s1, s1),
+		sockets.New(s2, &net.Dialer{}),
+		sockets.New(s3, s3),
+		sockets.New(s4, &net.Dialer{}),
+	).Options(torrent.BinderOptionDHT(_dht)), nil
 }
 
 func WireguardSocket(wcfg *wireguardx.Config) (_ *netstack.Net, err error) {
@@ -242,7 +262,7 @@ func AutomaticIP(wcfg *wireguardx.Config, d netx.Dialer, port uint16) dht.Option
 		return dht.OptionStaticPort(port)
 	}
 
-	return dht.OptionDynamicPort(func(ctx context.Context, q *dht.Server, id int160.T, local net.PacketConn) (iter.Seq[netip.AddrPort], error) {
+	return dht.OptionDynamicPort(func(ctx context.Context, sc *dht.Server, q dht.Binding, id int160.T, local net.PacketConn) (iter.Seq[netip.AddrPort], error) {
 		return func(yield func(netip.AddrPort) bool) {
 			for {
 				addr, d, err := ExternalPort(wcfg, d, port)

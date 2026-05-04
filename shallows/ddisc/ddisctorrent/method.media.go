@@ -27,7 +27,7 @@ type SearchRecorder struct {
 	q sqlx.Queryer
 }
 
-func (t SearchRecorder) Handle(ctx context.Context, source dht.Addr, s *dht.Server, raw []byte, _ *krpc.Msg) error {
+func (t SearchRecorder) Handle(ctx context.Context, source dht.Addr, s *dht.Server, b dht.Binding, raw []byte, _ *krpc.Msg) error {
 	var (
 		m Media
 		d ddisc.Discovered

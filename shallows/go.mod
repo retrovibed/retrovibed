@@ -26,7 +26,7 @@ require (
 	github.com/grindlemire/go-lucene v0.0.33
 	github.com/hashicorp/mdns v1.0.6
 	github.com/james-lawrence/genieql v0.0.0-20260421144153-ebaab114ac1d
-	github.com/james-lawrence/torrent v0.0.0-20260430131319-2b17301ce126
+	github.com/james-lawrence/torrent v0.0.0-20260504114734-001214417dc9
 	github.com/justinas/alice v1.2.0
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/mattn/go-isatty v0.0.21
