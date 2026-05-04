@@ -34,8 +34,6 @@ cloud.google.com/go/iam/apiv1/iampb
 cloud.google.com/go/secretmanager/apiv1
 cloud.google.com/go/secretmanager/apiv1/secretmanagerpb
 cloud.google.com/go/secretmanager/internal
-# filippo.io/edwards25519 v1.2.0
-## explicit; go 1.24.0
 # github.com/Masterminds/squirrel v1.5.4
 ## explicit; go 1.14
 github.com/Masterminds/squirrel
@@ -49,8 +47,6 @@ github.com/alecthomas/atomic
 # github.com/alecthomas/kong v1.15.0
 ## explicit; go 1.20
 github.com/alecthomas/kong
-# github.com/alecthomas/repr v0.5.2
-## explicit; go 1.18
 # github.com/anacrolix/generics v0.2.0
 ## explicit; go 1.18
 github.com/anacrolix/generics
@@ -640,8 +636,8 @@ github.com/james-lawrence/genieql/internal/userx
 github.com/james-lawrence/genieql/internal/wasidialect
 github.com/james-lawrence/genieql/internal/wasix/ffierrors
 github.com/james-lawrence/genieql/internal/wasix/ffiguest
-# github.com/james-lawrence/torrent v0.0.0-20260430131319-2b17301ce126
-## explicit; go 1.24.0
+# github.com/james-lawrence/torrent v0.0.0-20260504114734-001214417dc9
+## explicit; go 1.25.0
 github.com/james-lawrence/torrent
 github.com/james-lawrence/torrent/autobind
 github.com/james-lawrence/torrent/bencode

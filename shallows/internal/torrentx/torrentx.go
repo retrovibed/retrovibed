@@ -317,6 +317,24 @@ func OptionTracker(tracker string) torrent.Option {
 	return torrent.OptionTrackers(tracker)
 }
 
+func Info(dl torrent.Torrent) func(ctx context.Context) error {
+	return func(ctx context.Context) error {
+		stats := dl.Stats()
+		info := dl.Info()
+		md := dl.Metadata()
+
+		log.Printf(
+			"%s - %s: info(%t) %s\n", md.ID, md.DisplayName, info != nil, stats,
+		)
+
+		if err := dl.Tune(torrent.TuneNewConns); err != nil {
+			log.Println("unable to request new connections", err)
+		}
+
+		return nil
+	}
+}
+
 func DownloadProgress(ctx context.Context, dl torrent.Torrent) {
 	var (
 		statsfreq = envx.Duration(1*time.Minute, env.TorrentDownloadStats)

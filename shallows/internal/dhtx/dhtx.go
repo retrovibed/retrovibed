@@ -12,9 +12,8 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 )
 
-// log out the dht statistics every d period.
-func Statistics(ctx context.Context, d time.Duration, ds *dht.Server) {
-	timex.NowAndEvery(ctx, d, func(ctx context.Context) error {
+func Statistics(ds *dht.Server) func(ctx context.Context) error {
+	return func(ctx context.Context) error {
 		var b = bytes.NewBuffer(nil)
 		if err := dht.Dump(ds, b); err != nil {
 			return err
@@ -23,7 +22,12 @@ func Statistics(ctx context.Context, d time.Duration, ds *dht.Server) {
 		log.Println("dht", ds.ID(ds.DynamicAddrPort()), ds.AddrPort(ds.DynamicAddrPort()), spew.Sdump(ds.Stats()))
 		log.Println(b.String())
 		return nil
-	})
+	}
+}
+
+// log out the dht statistics every d period.
+func BackgroundStatistics(ctx context.Context, d time.Duration, ds *dht.Server) {
+	timex.NowAndEvery(ctx, d, Statistics(ds))
 }
 
 func RecordBootstrapNodes(ctx context.Context, d time.Duration, min int, ds *dht.Server, dst string) {

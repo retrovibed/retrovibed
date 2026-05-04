@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/url"
 	"os"
+	"syscall"
 	"time"
 
 	"github.com/davecgh/go-spew/spew"
@@ -14,6 +15,7 @@ import (
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/ddisc/ddisctorrent"
+	"github.com/retrovibed/retrovibed/shallows/internal/debugx"
 	"github.com/retrovibed/retrovibed/shallows/internal/dhtx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
@@ -22,9 +24,9 @@ import (
 )
 
 type cmdDownload struct {
-	Magnet    url.URL   `arg:"" name:"magnet" help:"magnet uri to download" required:"true"`
-	Peers     []url.URL `flag:"" name:"peer" help:"uri of a peer to download from"`
-	Bootstrap bool      `flag:"" name:"bootstrap" help:"bootstrap the dht using well known trackers" negatable:"" default:"true"`
+	Magnet    url.URL   `arg:"" name:"magnet" help:"magnet uri to download (e.g. magnet:?xt=urn:btih:...)" required:"true"`
+	Peers     []url.URL `flag:"" name:"peer" help:"peer uri to connect to (e.g. p0000000000000000000000000000000000000000://[::1]:3196) — may be repeated"`
+	Bootstrap bool      `flag:"" name:"bootstrap" help:"bootstrap the DHT using well-known trackers (default: true; use --no-bootstrap to skip)" negatable:"" default:"true"`
 }
 
 func (t cmdDownload) Run(gctx *cmdopts.Global) error {
@@ -66,7 +68,6 @@ func (t cmdDownload) Run(gctx *cmdopts.Global) error {
 		log.Fatalln(err)
 	}
 
-	go dhtx.Statistics(gctx.Context, time.Minute, _dht)
 	go _dht.TableMaintainer()
 
 	torconfig := torrent.NewDefaultClientConfig(
@@ -80,8 +81,8 @@ func (t cmdDownload) Run(gctx *cmdopts.Global) error {
 		torrent.ClientConfigConnectionClosed(func(id int160.T, stats torrent.ConnStats, remaining int) {
 			log.Println("connection closed", id, remaining, spew.Sdump(stats))
 		}),
-		// torrent.ClientConfigDebugLogger(log.Default()),
-		// torrent.ClientConfigInfoLogger(log.Default()),
+		torrent.ClientConfigDebugLogger(log.Default()),
+		torrent.ClientConfigInfoLogger(log.Default()),
 		torrent.ClientConfigMaxOutstandingRequests(2048),
 		torrent.ClientConfigExtension(ddisctorrent.ExtensionName),
 	)
@@ -95,10 +96,13 @@ func (t cmdDownload) Run(gctx *cmdopts.Global) error {
 		return errorsx.Wrap(err, "unable to setup torrent client")
 	}
 
-	dl, _, err := tclient.Start(md, torrent.TunePeers(peers...))
+	dl, _, err := tclient.Start(md, torrent.TunePeers(peers...), torrent.TuneAnnounceUntilComplete)
 	if err != nil {
 		return errorsx.Wrap(err, "unable to start torrent")
 	}
+
+	go debugx.OnSignal(gctx.Context, dhtx.Statistics(_dht), syscall.SIGUSR1)
+	go debugx.OnSignal(gctx.Context, torrentx.Info(dl), syscall.SIGUSR1)
 	go torrentx.DownloadProgress(gctx.Context, dl)
 
 	n, err := torrent.DownloadInto(gctx.Context, digest, dl)

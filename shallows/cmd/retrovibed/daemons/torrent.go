@@ -385,7 +385,7 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 		}
 	}
 
-	go dhtx.Statistics(dctx, time.Minute, dhts)
+	go dhtx.BackgroundStatistics(dctx, time.Minute, dhts)
 	go dhtx.RecordBootstrapNodes(dctx, time.Minute, dhtminpeers, dhts, torrentpeers)
 	go dhts.TableMaintainer()
 
