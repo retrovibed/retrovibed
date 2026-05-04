@@ -41,6 +41,10 @@ func AppImage(b *Build) string {
 	return b.StringReplace("retrovibed.%goenv.os%.%goenv.arch%.AppImage")
 }
 
+func AppImageBuild(b *Build) string {
+	return b.StringReplace("retrovibed.%goenv.os%.%goenv.arch%.AppImageBuild")
+}
+
 // Version returns the date-based build version string from git commit metadata.
 func Version() string {
 	return eggit.EnvCommit().StringReplace("%git.commit.year%.%git.commit.month%.%git.commit.day%")

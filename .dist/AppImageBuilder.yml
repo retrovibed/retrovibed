@@ -1,26 +1,37 @@
 version: 1
 
 AppDir:
-  path: !ENV '${APPDIR}'
+  path: !ENV "${APPDIR}"
 
   app_info:
     id: space.retrovibe.Console
     name: retrovibed
     icon: retrovibed
-    version: !ENV '${VERSION}'
+    version: !ENV "${VERSION}"
     exec: usr/lib/retrovibed/console
     exec_args: $@
 
   apt:
-    arch: !ENV '${APT_ARCH}'
+    arch: !ENV "${APT_ARCH}"
     sources:
-      - sourceline: 'deb http://archive.ubuntu.com/ubuntu/ questing main restricted universe multiverse'
-      - sourceline: 'deb https://ppa.launchpadcontent.net/jljatone/retrovibed/ubuntu questing main'
-        key_url: !ENV 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x${GPG_FINGERPRINT}'
+      - sourceline: "deb https://mirror.pilotfiber.com/ubuntu/ questing main restricted universe multiverse"
+        key_url: "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x871920D1991BC93C"
+      - sourceline: "deb https://mirror.pilotfiber.com/ubuntu/ questing-updates main restricted universe multiverse"
+        key_url: "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x871920D1991BC93C"
+      - sourceline: "deb https://mirror.pilotfiber.com/ubuntu/ questing-backports main restricted universe multiverse"
+        key_url: "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x871920D1991BC93C"
+      # - sourceline: "deb http://security.ubuntu.com/ubuntu questing-security main restricted universe multiverse"
+      #   key_url: "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x871920D1991BC93C"
+      - sourceline: "deb https://ppa.launchpadcontent.net/jljatone/retrovibed/ubuntu questing main"
+        key_url: !ENV "https://keyserver.ubuntu.com/pks/lookup?op=get&search=${GPG_ID}"
     include:
       - duckdb
-      - libgtk-3-0
+      - libgtk-3-0t64
       - libglu1-mesa
+      - dash
+      - bash
+      - gstreamer1.0-tools
+      - gstreamer1.0-plugins-base
     exclude:
       - libglib2.0-data
       - shared-mime-info
@@ -34,7 +45,7 @@ AppDir:
       - usr/share/doc/*/NEWS.*
 
 AppImage:
-  arch: !ENV '${APPIMAGE_ARCH}'
-  update-information: !ENV 'gh-releases-zsync|retrovibed|retrovibed|latest|retrovibed-*-${APPIMAGE_ARCH}.AppImage.zsync'
-  sign-key: None
-  file_name: !ENV '${APPIMAGE_FILE_NAME}'
+  arch: !ENV "${APPIMAGE_ARCH}"
+  update-information: !ENV "gh-releases-zsync|retrovibed|retrovibed|latest|retrovibed-*-${APPIMAGE_ARCH}.AppImage.zsync"
+  # sign-key: None # TODO
+  file_name: !ENV "${APPIMAGE_FILE_NAME}"

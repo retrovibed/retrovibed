@@ -49,7 +49,7 @@ RUN systemd-tmpfiles --clean
 # install appimage-builder for AppImage packaging
 RUN apt-get update && apt-get -y install pipx python3-venv python3-apt squashfs-tools patchelf desktop-file-utils libgdk-pixbuf-xlib-2.0-dev fakeroot gnupg2
 # Use pipx to install appimage-builder globally (available in /usr/local/bin)
-RUN PIPX_HOME=/opt/pipx PIPX_BIN_DIR=/usr/local/bin pipx install appimage-builder
+RUN PIPX_HOME=/opt/pipx PIPX_BIN_DIR=/usr/local/bin pipx install git+https://github.com/AppImageCrafters/appimage-builder.git
 
 RUN curl -sSfL https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-$(uname -m).AppImage -o /usr/local/bin/appimagetool \
     && chmod +x /usr/local/bin/appimagetool
@@ -57,3 +57,6 @@ RUN curl -sSfL https://github.com/AppImage/appimagetool/releases/download/contin
 # hack due to ubuntu updating sudo
 RUN update-alternatives --set sudo /usr/bin/sudo.ws
 
+# noop apt-key (deprecated in newer Ubuntu, causes errors in some tools, specifically appimage-builder which doesnt use it but checks for it)
+RUN printf '#!/bin/sh\nexit 0\n' > /usr/local/bin/apt-key && chmod +x /usr/local/bin/apt-key
+RUN apt-get update && apt-get -y install zsync

@@ -4,6 +4,7 @@ import (
 	"context"
 	"eg/compute/maintainer"
 	"eg/compute/tarballs"
+	"time"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
@@ -24,18 +25,23 @@ func Release(b *tarballs.Build) eg.OpFn {
 
 func AppImageBuild(b *tarballs.Build) eg.OpFn {
 	appimage := tarballs.AppImage(b)
+	builddir := egenv.CacheDirectory(tarballs.AppImageBuild(b))
 
 	return shell.Op(
+		shell.Newf("echo %s", tarballs.Version()),
+		shell.Newf("appimage-builder --help"),
+		shell.Newf("mkdir -p %s", builddir),
 		shell.Newf(
-			"appimage-builder --recipe .dist/AppImageBuilder.yml --skip-tests",
-		).
+			"appimage-builder --recipe .dist/AppImageBuilder.yml --skip-tests --build-dir %s",
+			builddir,
+		).Timeout(20*time.Minute).
 			Environ("APPDIR", egtarball.Path(tarballs.Retrovibed(b))).
 			Environ("VERSION", tarballs.Version()).
 			Environ("APT_ARCH", b.Arch).
 			Environ("APPIMAGE_ARCH", tarballs.ArchGoToMachine(b.Arch)).
 			Environ("APPIMAGE_FILE_NAME", appimage).
-			Environ("GPG_FINGERPRINT", maintainer.GPGFingerprint),
-		shell.Newf("mv %s %s", appimage, egenv.CacheDirectory(appimage)),
+			Environ("GPG_ID", maintainer.GPGID),
+		shell.Newf("mv %s* %s", appimage, egenv.CacheDirectory(appimage)).Debug(),
 	)
 }
 
