@@ -127,7 +127,7 @@ func FlatpakManifest(b *tarballs.Build) eg.OpFn {
 
 func moduleTarball(url, sha256d string) egflatpak.Module {
 	return egflatpak.NewModule("retrovibed", "simple", egflatpak.ModuleOptions().Commands(
-		"sed 's|Exec=/usr/lib/retrovibed/console|Exec=/app/bin/console|' usr/share/applications/retrovibed.desktop > /app/share/applications/space.retrovibe.Console.desktop",
+		"sed 's|Exec=/usr/lib/retrovibed/console|Exec=/app/bin/console|' usr/share/applications/space.retrovibe.Console.desktop > /app/share/applications/space.retrovibe.Console.desktop",
 		"mv usr/share/icons/hicolor/scalable/apps/space.retrovibe.Console.svg /app/share/icons/hicolor/scalable/apps/space.retrovibe.Console.svg",
 		"mv usr/share/metainfo/space.retrovibe.Console.metainfo.xml /app/share/metainfo/space.retrovibe.Console.metainfo.xml",
 		"mv usr/share/licenses/space.retrovibe.Console /app/share/licenses/space.retrovibe.Console",
