@@ -10,13 +10,17 @@ bool boolean(String key, {bool fallback = false}) {
   }
 }
 
-String string(String key, {String fallback = ""}) {
-  try {
-    return Platform.environment[key] ?? fallback;
-  } catch (_) {
-    return fallback;
+String lookup(Iterable<String> key, Map<String, String?> env, String fallback) {
+  for (final k in key) {
+    if (env.containsKey(k)) {
+      return env[k] ?? '';
+    }
   }
+  return fallback;
 }
+
+String string(Iterable<String> key, {String fallback = ''}) =>
+    lookup(key, Platform.environment, fallback);
 
 void printSystemEnv() {
   Platform.environment.forEach((key, value) {

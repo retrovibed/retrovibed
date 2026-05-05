@@ -1,0 +1,51 @@
+version: 1
+
+AppDir:
+  path: !ENV "${APPDIR}"
+
+  app_info:
+    id: space.retrovibe.Console
+    name: retrovibed
+    icon: retrovibed
+    version: !ENV "${VERSION}"
+    exec: usr/lib/retrovibed/console
+    exec_args: $@
+
+  apt:
+    arch: !ENV "${APT_ARCH}"
+    sources:
+      - sourceline: "deb https://mirror.pilotfiber.com/ubuntu/ questing main restricted universe multiverse"
+        key_url: "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x871920D1991BC93C"
+      - sourceline: "deb https://mirror.pilotfiber.com/ubuntu/ questing-updates main restricted universe multiverse"
+        key_url: "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x871920D1991BC93C"
+      - sourceline: "deb https://mirror.pilotfiber.com/ubuntu/ questing-backports main restricted universe multiverse"
+        key_url: "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x871920D1991BC93C"
+      # - sourceline: "deb http://security.ubuntu.com/ubuntu questing-security main restricted universe multiverse"
+      #   key_url: "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x871920D1991BC93C"
+      # - sourceline: "deb https://ppa.launchpadcontent.net/jljatone/retrovibed/ubuntu questing main"
+      #   key_url: !ENV "https://keyserver.ubuntu.com/pks/lookup?op=get&search=${GPG_ID}"
+    include:
+      # - duckdb
+      - libgtk-3-0t64
+      - libglu1-mesa
+      - librsvg2-common
+      - dash
+      - bash
+    exclude:
+      - libglib2.0-data
+      - shared-mime-info
+      - xdg-user-dirs
+      - hicolor-icon-theme
+  files:
+    exclude:
+      - usr/share/man
+      - usr/share/doc/*/README.*
+      - usr/share/doc/*/changelog.*
+      - usr/share/doc/*/NEWS.*
+
+AppImage:
+  comp: zstd
+  arch: !ENV "${APPIMAGE_ARCH}"
+  update-information: !ENV "gh-releases-zsync|retrovibed|retrovibed|latest|retrovibed-*-${APPIMAGE_ARCH}.AppImage.zsync"
+  # sign-key: None # TODO
+  file_name: !ENV "${APPIMAGE_FILE_NAME}"

@@ -31,17 +31,8 @@ func main() {
 			deb,
 			eg.Sequential(
 				eg.Parallel(
-					shallows.Generate,
-					console.Generate,
-				),
-				eg.Parallel(
 					console.BuildLinux,
 					shallows.Compile(),
-				),
-				eg.Parallel(
-					console.Tests,
-					console.Linting,
-					shallows.Test(),
 				),
 				eg.Parallel(
 					build(),
@@ -91,7 +82,10 @@ func build() eg.OpFn {
 		shell.Op(
 			shell.Newf("echo 'tarballing %s -> %s'", egtarball.Path(archive), egtarball.Archive(archive)),
 		),
-		release.Tarball(b),
+		eg.Parallel(
+			release.Tarball(b),
+			release.AppImageBuild(b),
+		),
 		console.FlatpakManifest(b),
 	)
 }

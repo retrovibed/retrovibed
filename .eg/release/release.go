@@ -2,6 +2,7 @@ package release
 
 import (
 	"context"
+	"eg/compute/maintainer"
 	"eg/compute/tarballs"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
@@ -17,6 +18,30 @@ func Release(b *tarballs.Build) eg.OpFn {
 		egtarball.Archive(tarballs.Retrovibed(b)),
 		egtarball.Archive(tarballs.RetrovibedSource()),
 		egenv.CacheDirectory(tarballs.Flatpak(b)),
+		egenv.WorkspaceDirectory(tarballs.AppImage(b)),
+		egenv.WorkspaceDirectory(tarballs.AppImageZsync(b)),
+	)
+}
+
+func AppImageBuild(b *tarballs.Build) eg.OpFn {
+	appimage := tarballs.AppImage(b)
+	builddir := egenv.CacheDirectory(tarballs.AppImageBuild(b))
+	return shell.Op(
+		shell.Newf("mkdir -p %s", builddir),
+		shell.Newf(
+			"appimage-builder --recipe %s --skip-tests --build-dir %s",
+			egenv.WorkingDirectory(".dist", "AppImageBuilder.yml"),
+			builddir,
+		).Directory(egenv.WorkspaceDirectory()).
+			Attempts(3).
+			Environ("APPDIR", egtarball.Path(tarballs.Retrovibed(b))).
+			Environ("VERSION", tarballs.Version()).
+			Environ("APT_ARCH", b.Arch).
+			Environ("APPIMAGE_ARCH", tarballs.ArchGoToMachine(b.Arch)).
+			Environ("APPIMAGE_FILE_NAME", appimage).
+			Environ("GPG_ID", maintainer.GPGID),
+		// copy is only needed temporarily while we flesh out app image support.
+		shell.Newf("cp %s* %s", egenv.WorkspaceDirectory(appimage), egenv.CacheDirectory()).Debug(),
 	)
 }
 

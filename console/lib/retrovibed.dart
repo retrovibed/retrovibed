@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:ffi/ffi.dart' as ffi;
 import 'package:retrovibed/retrovibed/gen.dart' as lib;
+import 'package:retrovibed/env.dart' as env;
 
 String _frameworksLib(String name) {
   final execDir = File(Platform.resolvedExecutable).parent.path;
@@ -23,6 +24,10 @@ String _path() {
     return "libretrovibed.so";
   }
 
+  if (Platform.isIOS) {
+    return 'RetrovivedBind.framework/RetrovivedBind';
+  }
+
   final files = () {
     if (Platform.isMacOS) {
       return [
@@ -31,7 +36,12 @@ String _path() {
       ];
     }
 
-    return [File("build/nativelib/libretrovibed.so")];
+    final ldlibs = env.string(['LD_LIBRARY_PATH', 'APPDIR_LIBRARY_PATH'], fallback: '');
+
+    return [
+      ...ldlibs.split(":").map((path) => File("${path}/libretrovibed.so")),
+      File("build/nativelib/libretrovibed.so"),
+    ];
   }();
 
   final found = files.firstWhere((v) {
@@ -45,9 +55,6 @@ String _path() {
 }
 
 DynamicLibrary _loadLibrary() {
-  if (Platform.isIOS) {
-    return DynamicLibrary.open('RetrovivedBind.framework/RetrovivedBind');
-  }
   return DynamicLibrary.open(_path());
 }
 
