@@ -44,7 +44,7 @@ func GenerateBinding(ctx context.Context, _ eg.Op) error {
 	runtime := flutterRuntimev2(shell.Runtime())
 	return shell.Run(
 		ctx,
-		runtime.New("go -C retrovibedbind build -buildmode=c-shared --tags duckdb_use_lib -o ../build/nativelib/libretrovibed.so ./..."),
+		runtime.New("go -C retrovibedbind build -buildmode=c-shared -buildvcs=true --tags duckdb_use_lib -o ../build/nativelib/libretrovibed.so ./..."),
 		runtime.New("dart run ffigen --config ffigen.yaml"),
 	)
 }
@@ -54,7 +54,7 @@ func CompileBinding(b *tarballs.Build) eg.OpFn {
 		runtime := flutterRuntimev2(shell.Runtime())
 		return shell.Run(
 			ctx,
-			runtime.New("go -C retrovibedbind build -buildmode=c-shared --tags duckdb_use_lib -o ../build/nativelib/libretrovibed.so ."),
+			runtime.New("go -C retrovibedbind build -buildmode=c-shared -buildvcs=true --tags duckdb_use_lib -o ../build/nativelib/libretrovibed.so ."),
 		)
 	}
 }
@@ -63,7 +63,7 @@ func GenerateDevBinding(ctx context.Context, _ eg.Op) error {
 	runtime := flutterRuntimev2(shell.Runtime())
 	return shell.Run(
 		ctx,
-		runtime.New("go -C retrovibedbind build -buildmode=c-shared --tags duckdb_use_lib,localdev -o ../build/nativelib/libretrovibed.so ./..."),
+		runtime.New("go -C retrovibedbind build -buildmode=c-shared -buildvcs=true --tags duckdb_use_lib,localdev -o ../build/nativelib/libretrovibed.so ./..."),
 		runtime.New("dart run ffigen --config ffigen.yaml"),
 	)
 }
@@ -74,7 +74,7 @@ func GenerateDevStaticBinding(dir string, rt shell.Command) eg.OpFn {
 		runtime := flutterRuntimev2(rt)
 		return shell.Run(
 			ctx,
-			runtime.Newf("go -C retrovibedbind build -trimpath -buildmode=c-shared --tags duckdb_use_static_lib,localdev -o %s/libretrovibed.so .", dir).Environ("CGO_LDFLAGS", fmt.Sprintf("-Wl,--allow-multiple-definition -L%s -Wl,--whole-archive %s -Wl,--no-whole-archive -static-libstdc++ -Wl,-z,max-page-size=16384", dir, duckdblibs)),
+			runtime.Newf("go -C retrovibedbind build -trimpath -buildmode=c-shared -buildvcs=true --tags duckdb_use_static_lib,localdev -o %s/libretrovibed.so .", dir).Environ("CGO_LDFLAGS", fmt.Sprintf("-Wl,--allow-multiple-definition -L%s -Wl,--whole-archive %s -Wl,--no-whole-archive -static-libstdc++ -Wl,-z,max-page-size=16384", dir, duckdblibs)),
 		)
 	}
 }
@@ -85,7 +85,7 @@ func GenerateStaticBinding(dir string, rt shell.Command) eg.OpFn {
 		runtime := flutterRuntimev2(rt)
 		return shell.Run(
 			ctx,
-			runtime.Newf("go -C retrovibedbind build -trimpath -buildmode=c-shared --tags duckdb_use_static_lib -o %s/libretrovibed.so .", dir).Environ("CGO_LDFLAGS", fmt.Sprintf("-Wl,--allow-multiple-definition -L%s -Wl,--whole-archive %s -Wl,--no-whole-archive -static-libstdc++ -Wl,-z,max-page-size=16384", dir, duckdblibs)),
+			runtime.Newf("go -C retrovibedbind build -trimpath -buildmode=c-shared -buildvcs=true --tags duckdb_use_static_lib -o %s/libretrovibed.so .", dir).Environ("CGO_LDFLAGS", fmt.Sprintf("-Wl,--allow-multiple-definition -L%s -Wl,--whole-archive %s -Wl,--no-whole-archive -static-libstdc++ -Wl,-z,max-page-size=16384", dir, duckdblibs)),
 		)
 	}
 }

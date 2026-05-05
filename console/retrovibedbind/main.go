@@ -18,6 +18,15 @@ import (
 )
 import "github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 
+//export build_version
+func build_version() *C.char {
+	version, err := cmdopts.BuildVersion()
+	if err != nil {
+		log.Println(err)
+	}
+	return C.CString(version)
+}
+
 //export oauth2_bearer
 func oauth2_bearer() *C.char {
 	var (

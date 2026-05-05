@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"runtime/debug"
 	"strconv"
 	"sync"
 
@@ -17,6 +16,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sshx"
+	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/userx"
 	"golang.org/x/crypto/ssh"
 )
@@ -62,14 +62,11 @@ func (t Global) AfterApply() (err error) {
 type Version struct{}
 
 func (t Version) Run(ctx *Global) (err error) {
-	var (
-		ok   bool
-		info *debug.BuildInfo
-	)
-
-	if info, ok = debug.ReadBuildInfo(); ok {
-		log.Println(info.Main.Path, info.Main.Version)
+	if version, err := BuildVersion(); stringsx.Present(version) {
+		log.Println(version)
 		return nil
+	} else {
+		log.Println("failed to detect build version", err)
 	}
 
 	log.Println("unknown version")

@@ -44,6 +44,13 @@ class DaemonBridge {
   late final __GoStringPtrPtr = _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function(_GoString_)>>('_GoStringPtr');
   late final __GoStringPtr = __GoStringPtrPtr.asFunction<ffi.Pointer<ffi.Char> Function(_GoString_)>();
 
+  ffi.Pointer<ffi.Char> build_version() {
+    return _build_version();
+  }
+
+  late final _build_versionPtr = _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function()>>('build_version');
+  late final _build_version = _build_versionPtr.asFunction<ffi.Pointer<ffi.Char> Function()>();
+
   ffi.Pointer<ffi.Char> oauth2_bearer() {
     return _oauth2_bearer();
   }

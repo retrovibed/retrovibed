@@ -35,6 +35,7 @@ TextScaler autoscaling(BuildContext context) {
 }
 
 void main() async {
+  print("build version ${retro.build_version()}");
   // env.printSystemEnv();
   print("cp 0");
   WidgetsFlutterBinding.ensureInitialized();
