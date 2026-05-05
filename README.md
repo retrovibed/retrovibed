@@ -45,6 +45,8 @@ usage is simplified and auto-updates are provided via [AM](https://github.com/iv
 am extra --user https://github.com/retrovibed/retrovibed retrovibed
 # fix am management of the desktop integration.
 am icons retrovibed
+# update retrovibed
+am update retrovibed
 ```
 
 for gui management for app images
