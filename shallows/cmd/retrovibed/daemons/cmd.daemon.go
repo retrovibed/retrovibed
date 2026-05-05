@@ -44,6 +44,7 @@ import (
 	"github.com/james-lawrence/torrent/storage"
 
 	"github.com/gorilla/mux"
+	"github.com/logrusorgru/aurora"
 )
 
 func DefaultDialer(wgnet *netstack.Net, cache dnscache.Resolver) netx.Dialer {
@@ -235,7 +236,8 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 
 		for _, dir := range t.TorrentFolderWatch {
 			if err = dwatcher.Add(dir); err != nil {
-				return errorsx.Wrapf(err, "unable to watch directory: %s", dir)
+				log.Println(aurora.Yellow("WARNING"), errorsx.Wrapf(err, "unable to watch directory: %s", dir))
+				continue
 			}
 		}
 	} else {
