@@ -1,10 +1,10 @@
 [Desktop Entry]
-Name=Retrovibe Console
-Comment=A versatile application for data archival and media playback.
+Name=Retrovibe
+Comment="A versatile application for data archival and media playback"
 Exec=/usr/lib/retrovibed/console
 Icon=space.retrovibe.Console
 Type=Application
-Categories=Utility;Archiving;AudioVideo;Player;
+Categories=Player;Utility;Archiving;AudioVideo;
 Terminal=false
 StartupNotify=true
 StartupWMClass=space.retrovibe.Console

@@ -6,7 +6,7 @@ AppDir:
   app_info:
     id: space.retrovibe.Console
     name: retrovibed
-    icon: retrovibed
+    icon: space.retrovibe.Console
     version: !ENV "${VERSION}"
     exec: usr/lib/retrovibed/console
     exec_args: $@
@@ -35,7 +35,10 @@ AppDir:
       - libglib2.0-data
       - shared-mime-info
       - xdg-user-dirs
+      - humanity-icon-theme
       - hicolor-icon-theme
+      - adwaita-icon-theme
+      - ubuntu-mono
   files:
     exclude:
       - usr/share/man

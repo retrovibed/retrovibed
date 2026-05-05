@@ -4,7 +4,6 @@ this is public alpha software. its under active development and testing. expect 
 
 #### download
 
-[linux - flatpak](https://github.com/retrovibed/retrovibed/releases/latest/download/flatpak.client.yml)  
 [android](https://play.google.com/store/apps/details?id=space.retrovibe.retrovibed)  
 [macos](https://github.com/retrovibed/retrovibed/releases/latest/download/retrovibed.dmg)
 
@@ -36,14 +35,23 @@ see the [site](https://retrovibe.space) for more details
 
 build a community around content. each member reduces the cost for everyone.
 
-#### install flatpak gui (recommended)
+#### install via appimage (recommended)
 
-requires flatpak-builder 1.4.2 or later to be installed.
+while you can just download the appimage file from [releases](https://github.com/retrovibed/retrovibed/releases/latest)
+
+usage is simplified and auto-updates are provided via [AM](https://github.com/ivan-hc/AM)
 
 ```bash
-flatpak remote-add --if-not-exists --user flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-curl -L -o space.retrovibe.Console.yml https://github.com/retrovibed/retrovibed/releases/latest/download/space.retrovibe.Console.yml
-flatpak-builder --user --install-deps-from=flathub --install --ccache --force-clean retrovibe space.retrovibe.Console.yml
+am extra --user https://github.com/retrovibed/retrovibed retrovibed
+# fix am management of the desktop integration.
+am icons retrovibed
+```
+
+for gui management for app images
+
+```bash
+am -i am-gui
+am-gui
 ```
 
 #### install deb daemon
@@ -72,6 +80,16 @@ retrovibed identity bootstrap public-key "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB
 retrovibed identity bootstrap authorized-file /root/.ssh/authorized_keys
 
 systemctl enable --now retrovibed.service
+```
+
+#### install via flatpak
+
+requires flatpak-builder 1.4.2 or later to be installed.
+
+```bash
+flatpak remote-add --if-not-exists --user flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+curl -L -o space.retrovibe.Console.yml https://github.com/retrovibed/retrovibed/releases/latest/download/space.retrovibe.Console.yml
+flatpak-builder --user --install-deps-from=flathub --install --ccache --force-clean retrovibe space.retrovibe.Console.yml
 ```
 
 ### determine ssh public key for client side
