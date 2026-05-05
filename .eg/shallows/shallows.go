@@ -80,7 +80,11 @@ func Install(b *tarballs.Build) eg.OpFn {
 
 	return shell.Op(
 		gruntime.Newf("mkdir -p ~/.duckdb %s && ln -sfn %s ~/.duckdb", egenv.CacheDirectory("duckdb"), egenv.CacheDirectory("duckdb")),
-		gruntime.Newf("go build -tags %s -o %s ./cmd/...", strings.Join(buildTags, ","), dstdir),
+		gruntime.Newf(
+			"go build -ldflags=\"-X 'main.version=${GOBUILD_VERSION}\" -tags %s -o %s ./cmd/...",
+			strings.Join(buildTags, ","),
+			dstdir,
+		).Environ("GOBUILD_VERSION", tarballs.VersionUnix()),
 	)
 }
 

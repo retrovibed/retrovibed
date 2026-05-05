@@ -54,6 +54,10 @@ func Version() string {
 	return eggit.EnvCommit().StringReplace("%git.commit.year%.%git.commit.month%.%git.commit.day%")
 }
 
+func VersionUnix() string {
+	return eggit.EnvCommit().StringReplace("%git.commit.year%.%git.commit.month%.%git.commit.unix%")
+}
+
 // ArchGoToMachine maps GOARCH/dpkg architecture names (amd64, arm64, 386, arm)
 // to POSIX uname -m machine hardware names (x86_64, aarch64, i686, armhf).
 func ArchGoToMachine(arch string) string {
