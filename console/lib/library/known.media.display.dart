@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
+import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/library/known.media.card.dart';
 import 'package:retrovibed/media/media.pb.dart';
 import 'package:retrovibed/media.dart' as _media;
@@ -191,7 +192,10 @@ class _KnownMediaDisplayState extends State<KnownMediaDisplay> {
             children: [
               if (constraints.maxWidth >= 260) ds.Rating(rating: current.rating),
               Expanded(child: KnownMediaSource(current)),
-              uuidx.pattern(widget.media.archiveId, archivable, archiving, purge),
+              Visibility(
+                visible: (authn.AuthzCache.of(context)?.meta.current.metadata.archiveUpload.toInt() ?? 0) > 0,
+                child: uuidx.pattern(widget.media.archiveId, archivable, archiving, purge),
+              ),
               ds.LoadingIconButton(
                 tooltip: "download this file to your downloads folder",
                 onPressed: _media.DownloadAction(context, widget.media),

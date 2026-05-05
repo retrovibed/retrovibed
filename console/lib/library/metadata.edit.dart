@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
+import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/design.kit/forms.dart' as forms;
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/uuidx.dart' as uuidx;
-import 'package:retrovibed/authn.dart' as authn;
 import './metadata.typography.dart' as typography;
 import './metadata.icons.dart' as icons;
 
@@ -113,9 +113,12 @@ class MediaEdit extends StatelessWidget {
             label: Text("sharing"),
             input: typography.sharing(current.torrentId),
           ),
-          forms.Field(
-            label: Text("archived"),
-            input: archive(context, current.archiveId),
+          Visibility(
+            visible: (authn.AuthzCache.of(context)?.meta.current.metadata.archiveUpload.toInt() ?? 0) > 0,
+            child: forms.Field(
+              label: Text("archived"),
+              input: archive(context, current.archiveId),
+            ),
           ),
         ],
       ),
