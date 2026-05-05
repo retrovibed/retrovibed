@@ -60,6 +60,10 @@ DynamicLibrary _loadLibrary() {
 
 final bridge = lib.DaemonBridge(_loadLibrary());
 
+String build_version() {
+  return _convertstring(bridge.build_version());
+}
+
 String oauth2_bearer() {
   return _convertstring(bridge.oauth2_bearer());
 }
