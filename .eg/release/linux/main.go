@@ -68,13 +68,13 @@ func build() eg.OpFn {
 			shell.Op(
 				shell.Newf("cp --verbose -R .dist/linux/* %s", egtarball.Path(archive)),
 				shell.Newf(
-					"cat .dist/linux/usr/share/applications/retrovibed.desktop | envsubst > %s/usr/share/applications/retrovibed.desktop",
+					"cat .dist/linux/usr/share/applications/space.retrovibe.Console.desktop | envsubst > %s/usr/share/applications/space.retrovibe.Console.desktop",
 					egtarball.Path(archive),
 				).
 					Environ("VERSION", tarballs.Version()).
 					Environ("ARCH", b.Arch),
 				shell.Newf(
-					"cat usr/share/applications/retrovibed.desktop",
+					"cat usr/share/applications/space.retrovibe.Console.desktop",
 				).Directory(egtarball.Path(archive)),
 			),
 			flathub.Metainfo(b),
