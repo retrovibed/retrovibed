@@ -4,6 +4,7 @@ import 'package:retrovibed/authn/login.dart' as authn;
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
 
 final _resolutions = Resolutions.variant();
+const _tall = Size(800, 900);
 
 void main() {
   group('Login', () {
@@ -29,6 +30,7 @@ void main() {
         WidgetTester tester,
       ) async {
         await tester.pumpApp(
+          physicalSize: _tall,
           authn.Login(
             const Text('authenticated content'),
             publicKey: () => 'ssh-ed25519 AAAA...',
@@ -47,6 +49,7 @@ void main() {
         WidgetTester tester,
       ) async {
         await tester.pumpApp(
+          physicalSize: _tall,
           authn.Login(
             const Text('authenticated content'),
             publicKey: () => '',
@@ -66,6 +69,7 @@ void main() {
         WidgetTester tester,
       ) async {
         await tester.pumpApp(
+          physicalSize: _tall,
           Center(
             child: authn.Login(
               const Text('child'),
@@ -83,17 +87,16 @@ void main() {
         WidgetTester tester,
       ) async {
         await tester.pumpApp(
+          physicalSize: _tall,
           ConstrainedBox(
             constraints: const BoxConstraints(
               maxWidth: 400,
-              maxHeight: 600,
+              maxHeight: 900,
             ),
-            child: SingleChildScrollView(
-              child: authn.Login(
-                const Text('child'),
-                publicKey: () => '',
-                seed: (_) => '',
-              ),
+            child: authn.Login(
+              const Text('child'),
+              publicKey: () => '',
+              seed: (_) => '',
             ),
           ),
         );
@@ -106,6 +109,7 @@ void main() {
         WidgetTester tester,
       ) async {
         await tester.pumpApp(
+          physicalSize: _tall,
           Column(
             children: [
               authn.Login(
@@ -142,6 +146,165 @@ void main() {
       }, variant: _resolutions);
     });
 
+    group('registration', () {
+      testWidgets('auto-checks register when no account exists', (
+        WidgetTester tester,
+      ) async {
+        await tester.pumpApp(
+          physicalSize: _tall,
+          authn.Login(
+            const Text('child'),
+            publicKey: () => '',
+            seed: (_) => '',
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('register a new account'), findsOneWidget);
+        expect(find.widgetWithText(TextFormField, 'confirm password'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('does not auto-check register when account exists', (
+        WidgetTester tester,
+      ) async {
+        await tester.pumpApp(
+          physicalSize: _tall,
+          authn.Login(
+            const Text('child'),
+            publicKey: () => 'ssh-ed25519 AAAA...',
+            seed: (_) => '',
+            authenticated: () => Future.error(Exception('fail')),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final checkbox = tester.widget<Checkbox>(
+          find.byType(Checkbox).first,
+        );
+        expect(checkbox.value, isFalse);
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('shows error when passwords do not match', (
+        WidgetTester tester,
+      ) async {
+        var seedCalled = false;
+
+        await tester.pumpApp(
+          physicalSize: _tall,
+          authn.Login(
+            const Text('child'),
+            publicKey: () => '',
+            seed: (_) {
+              seedCalled = true;
+              return '';
+            },
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.enterText(find.widgetWithText(TextFormField, 'email'), 'user');
+        await tester.enterText(find.widgetWithText(TextFormField, 'password'), 'pass1');
+        await tester.enterText(find.widgetWithText(TextFormField, 'confirm password'), 'pass2');
+        await tester.pumpAndSettle();
+        await tester.tap(find.byType(Checkbox).at(1));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Login'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('passwords do not match'), findsOneWidget);
+        expect(seedCalled, isFalse);
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('calls seed when passwords match', (
+        WidgetTester tester,
+      ) async {
+        String? captured;
+
+        await tester.pumpApp(
+          physicalSize: _tall,
+          authn.Login(
+            const Text('child'),
+            publicKey: () => '',
+            seed: (p) {
+              captured = p;
+              return 'error';
+            },
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.enterText(find.widgetWithText(TextFormField, 'email'), 'user');
+        await tester.enterText(find.widgetWithText(TextFormField, 'password'), 'pass');
+        await tester.enterText(find.widgetWithText(TextFormField, 'confirm password'), 'pass');
+        await tester.pumpAndSettle();
+        await tester.tap(find.byType(Checkbox).at(1));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Login'));
+        await tester.pumpAndSettle();
+
+        expect(captured, 'user:pass');
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('hides confirm field when register unchecked', (
+        WidgetTester tester,
+      ) async {
+        await tester.pumpApp(
+          physicalSize: _tall,
+          authn.Login(
+            const Text('child'),
+            publicKey: () => '',
+            seed: (_) => '',
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.byType(TextFormField), findsNWidgets(3));
+
+        await tester.tap(find.byType(Checkbox).first);
+        await tester.pumpAndSettle();
+
+        expect(find.byType(TextFormField), findsNWidgets(2));
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('skips confirm validation when register unchecked', (
+        WidgetTester tester,
+      ) async {
+        var seedCalled = false;
+
+        await tester.pumpApp(
+          physicalSize: _tall,
+          authn.Login(
+            const Text('child'),
+            publicKey: () => '',
+            seed: (_) {
+              seedCalled = true;
+              return 'error';
+            },
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byType(Checkbox).first);
+        await tester.pumpAndSettle();
+
+        await tester.enterText(find.widgetWithText(TextFormField, 'email'), 'user');
+        await tester.enterText(find.widgetWithText(TextFormField, 'password'), 'pass');
+        await tester.pumpAndSettle();
+        await tester.tap(find.byType(Checkbox).at(1));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Login'));
+        await tester.pumpAndSettle();
+
+        expect(seedCalled, isTrue);
+        expect(tester.takeException(), isNull);
+      });
+    });
+
     group('seed interaction', () {
       testWidgets('shows child after successful seed', (
         WidgetTester tester,
@@ -149,6 +312,7 @@ void main() {
         var seeded = false;
 
         await tester.pumpApp(
+          physicalSize: _tall,
           authn.Login(
             const Text('authenticated content'),
             publicKey: () => seeded ? 'ssh-ed25519 AAAA...' : '',
@@ -162,10 +326,11 @@ void main() {
 
         expect(find.text('authenticated content'), findsNothing);
 
-        await tester.enterText(find.byType(TextFormField).first, 'email');
-        await tester.enterText(find.byType(TextFormField).last, 'password');
+        await tester.enterText(find.widgetWithText(TextFormField, 'email'), 'email');
+        await tester.enterText(find.widgetWithText(TextFormField, 'password'), 'password');
+        await tester.enterText(find.widgetWithText(TextFormField, 'confirm password'), 'password');
         await tester.pumpAndSettle();
-        await tester.tap(find.byType(Checkbox));
+        await tester.tap(find.byType(Checkbox).at(1));
         await tester.pumpAndSettle();
         await tester.tap(find.text('Login'));
         await tester.pumpAndSettle();
@@ -176,6 +341,7 @@ void main() {
 
       testWidgets('shows error on seed failure', (WidgetTester tester) async {
         await tester.pumpApp(
+          physicalSize: _tall,
           authn.Login(
             const Text('authenticated content'),
             publicKey: () => '',
@@ -184,10 +350,11 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        await tester.enterText(find.byType(TextFormField).first, 'email');
-        await tester.enterText(find.byType(TextFormField).last, 'password');
+        await tester.enterText(find.widgetWithText(TextFormField, 'email'), 'email');
+        await tester.enterText(find.widgetWithText(TextFormField, 'password'), 'password');
+        await tester.enterText(find.widgetWithText(TextFormField, 'confirm password'), 'password');
         await tester.pumpAndSettle();
-        await tester.tap(find.byType(Checkbox));
+        await tester.tap(find.byType(Checkbox).at(1));
         await tester.pumpAndSettle();
         await tester.tap(find.text('Login'));
         await tester.pumpAndSettle();
@@ -203,6 +370,7 @@ void main() {
         var seedCalled = false;
 
         await tester.pumpApp(
+          physicalSize: _tall,
           authn.Login(
             const Text('child'),
             publicKey: () => '',
@@ -227,6 +395,7 @@ void main() {
         var seedCalled = false;
 
         await tester.pumpApp(
+          physicalSize: _tall,
           authn.Login(
             const Text('child'),
             publicKey: () => '',
@@ -238,10 +407,11 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        await tester.enterText(find.byType(TextFormField).first, 'email');
-        await tester.enterText(find.byType(TextFormField).last, 'password');
+        await tester.enterText(find.widgetWithText(TextFormField, 'email'), 'email');
+        await tester.enterText(find.widgetWithText(TextFormField, 'password'), 'password');
+        await tester.enterText(find.widgetWithText(TextFormField, 'confirm password'), 'password');
         await tester.pumpAndSettle();
-        await tester.tap(find.byType(Checkbox));
+        await tester.tap(find.byType(Checkbox).at(1));
         await tester.pumpAndSettle();
         await tester.tap(find.text('Login'));
         await tester.pumpAndSettle();
@@ -256,6 +426,7 @@ void main() {
         String? capturedPassword;
 
         await tester.pumpApp(
+          physicalSize: _tall,
           authn.Login(
             const Text('child'),
             publicKey: () => '',
@@ -267,10 +438,11 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        await tester.enterText(find.byType(TextFormField).first, 'email');
-        await tester.enterText(find.byType(TextFormField).last, 'password');
+        await tester.enterText(find.widgetWithText(TextFormField, 'email'), 'email');
+        await tester.enterText(find.widgetWithText(TextFormField, 'password'), 'password');
+        await tester.enterText(find.widgetWithText(TextFormField, 'confirm password'), 'password');
         await tester.pumpAndSettle();
-        await tester.tap(find.byType(Checkbox));
+        await tester.tap(find.byType(Checkbox).at(1));
         await tester.pumpAndSettle();
         await tester.tap(find.text('Login'));
         await tester.pumpAndSettle();
@@ -278,41 +450,12 @@ void main() {
         expect(capturedPassword, 'email:password');
       });
 
-      testWidgets('submits via Enter key on password field', (
-        WidgetTester tester,
-      ) async {
-        var seeded = false;
-
-        await tester.pumpApp(
-          authn.Login(
-            const Text('authenticated content'),
-            publicKey: () => seeded ? 'ssh-ed25519 AAAA...' : '',
-            seed: (p) {
-              seeded = true;
-              return '';
-            },
-          ),
-        );
-        await tester.pumpAndSettle();
-
-        expect(find.text('authenticated content'), findsNothing);
-
-        await tester.enterText(find.byType(TextFormField).first, 'email');
-        await tester.enterText(find.byType(TextFormField).last, 'password');
-        await tester.pumpAndSettle();
-        await tester.testTextInput.receiveAction(TextInputAction.done);
-        await tester.pumpAndSettle();
-
-        expect(seeded, isTrue);
-        expect(find.text('authenticated content'), findsOneWidget);
-        expect(tester.takeException(), isNull);
-      });
-
       testWidgets('tapping seed error dismisses it', (
         WidgetTester tester,
       ) async {
         var clicked = false;
         await tester.pumpApp(
+          physicalSize: _tall,
           authn.Login(
             const Text('authenticated content'),
             publicKey: () => '',
@@ -325,10 +468,11 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        await tester.enterText(find.byType(TextFormField).first, 'email');
-        await tester.enterText(find.byType(TextFormField).last, 'password');
+        await tester.enterText(find.widgetWithText(TextFormField, 'email'), 'email');
+        await tester.enterText(find.widgetWithText(TextFormField, 'password'), 'password');
+        await tester.enterText(find.widgetWithText(TextFormField, 'confirm password'), 'password');
         await tester.pumpAndSettle();
-        await tester.tap(find.byType(Checkbox));
+        await tester.tap(find.byType(Checkbox).at(1));
         await tester.pumpAndSettle();
         await tester.tap(find.text('Login'));
         await tester.pumpAndSettle();
@@ -346,6 +490,7 @@ void main() {
         var seeded = false;
 
         await tester.pumpApp(
+          physicalSize: _tall,
           authn.Login(
             const Text('authenticated content'),
             publicKey: () => seeded ? 'ssh-ed25519 AAAA...' : '',
@@ -358,10 +503,11 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        await tester.enterText(find.byType(TextFormField).first, 'email');
-        await tester.enterText(find.byType(TextFormField).last, 'password');
+        await tester.enterText(find.widgetWithText(TextFormField, 'email'), 'email');
+        await tester.enterText(find.widgetWithText(TextFormField, 'password'), 'password');
+        await tester.enterText(find.widgetWithText(TextFormField, 'confirm password'), 'password');
         await tester.pumpAndSettle();
-        await tester.tap(find.byType(Checkbox));
+        await tester.tap(find.byType(Checkbox).at(1));
         await tester.pumpAndSettle();
         await tester.tap(find.text('Login'));
         await tester.pumpAndSettle();

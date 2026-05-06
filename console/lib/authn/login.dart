@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
+import 'package:retrovibed/design.kit/forms.dart' as forms;
 import 'package:retrovibed/retrovibed.dart' as retro;
 
 class Login extends StatefulWidget {
@@ -31,12 +32,15 @@ class _LoginState extends State<Login> {
   bool _isObscured = true;
   bool _hasKey = false;
   bool _acceptedTos = false;
+  bool _register = false;
   String _username = '';
   String _password = '';
+  String _confirm = '';
 
   @override
   void initState() {
     super.initState();
+    _register = !widget.publicKey().isNotEmpty;
     _checkKey();
   }
 
@@ -78,6 +82,12 @@ class _LoginState extends State<Login> {
 
   Future<void> _seed() async {
     _reseterr();
+    if (_register && _password != _confirm) {
+      setState(() {
+        _cause = ds.Error.text("passwords do not match", onTap: _reseterr);
+      });
+      return;
+    }
     final err = widget.seed("${_username}:${_password}");
     if (err.isNotEmpty) {
       setState(() {
@@ -95,16 +105,19 @@ class _LoginState extends State<Login> {
 
     return ds.Masked(
       alignment: Alignment.center,
-      Center(
-        child: ds.Container(
-          padding: defaults.padding,
-          margin: defaults.margin,
-          constraints: BoxConstraints(maxWidth: 375),
-          ds.Loading(
-            cause: _cause,
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              spacing: defaults.spacing,
+      ListView(
+        shrinkWrap: true,
+        children: [
+          Center(
+            child: ds.Container(
+              padding: defaults.padding,
+              margin: defaults.margin,
+              constraints: BoxConstraints(maxWidth: 375),
+              ds.Loading(
+                cause: _cause,
+                Column(
+                  mainAxisSize: MainAxisSize.max,
+                  spacing: defaults.spacing,
               children: [
                 Text(
                   'Welcome to Retrovibed',
@@ -115,7 +128,6 @@ class _LoginState extends State<Login> {
                   'setup your device',
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
-                const SizedBox(height: 16),
                 TextFormField(
                   decoration: InputDecoration(hintText: 'email'),
                   onChanged: (v) => setState(() => _username = v),
@@ -139,29 +151,34 @@ class _LoginState extends State<Login> {
                   onChanged: (v) => setState(() => _password = v),
                   onFieldSubmitted: (_) => _seed(),
                 ),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Checkbox(
-                      value: _acceptedTos,
-                      onChanged: (v) => setState(() => _acceptedTos = v ?? false),
-                    ),
-                    Flexible(
-                      child: Text.rich(
-                        textAlign: TextAlign.center,
-                        TextSpan(
-                          text: 'By continuing you accept the ',
-                          children: [
-                            ds.Hyperlink.inline(
-                              'terms of service',
-                              url: 'https://retrovibe.space/terms',
-                            ),
-                          ],
+                Visibility(
+                  visible: _register,
+                  child: TextFormField(
+                    obscureText: _isObscured,
+                    decoration: InputDecoration(hintText: 'confirm password'),
+                    onChanged: (v) => setState(() => _confirm = v),
+                    onFieldSubmitted: (_) => _seed(),
+                  ),
+                ),
+                forms.Checkbox(
+                  Text('register a new account'),
+                  value: _register,
+                  onChanged: (v) => setState(() => _register = v ?? false),
+                ),
+                forms.Checkbox(
+                  Text.rich(
+                    TextSpan(
+                      text: 'By continuing you accept the ',
+                      children: [
+                        ds.Hyperlink.inline(
+                          'terms of service',
+                          url: 'https://retrovibe.space/terms',
                         ),
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
+                      ],
                     ),
-                  ],
+                  ),
+                  value: _acceptedTos,
+                  onChanged: (v) => setState(() => _acceptedTos = v ?? false),
                 ),
                 ds.LoadingButton(
                   const Text('Login'),
@@ -172,6 +189,8 @@ class _LoginState extends State<Login> {
             ),
           ),
         ),
+      ),
+        ],
       ),
     );
   }
