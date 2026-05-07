@@ -31,10 +31,25 @@ type cmdDownload struct {
 
 func (t cmdDownload) Run(gctx *cmdopts.Global) error {
 	var (
-		tnetwork  torrent.Binder
-		digest               = md5.New()
-		bootstrap dht.Option = dht.OptionNoop
+		tnetwork     torrent.Binder
+		digest                                  = md5.New()
+		bootstrap    dht.Option                 = dht.OptionNoop
+		dhtdebug     dht.Option                 = dht.OptionNoop
+		torrentinfo                             = torrent.ClientConfigInfoLogger(log.Default())
+		torrentdebug torrent.ClientConfigOption = torrent.ClientConfigNoop
 	)
+
+	if gctx.Verbosity >= 2 {
+		log.Println("-------------------------- DHT DEBUG LOGGING ENABLED --------------------------")
+		dhtdebug = dht.OptionLogger(log.Default())
+	}
+
+	if gctx.Verbosity >= 1 {
+		log.Println("-------------------------- TORRENT DEBUG LOGGING ENABLED --------------------------")
+		torrentdebug = torrent.ClientConfigDebugLogger(log.Default())
+	}
+
+	log.Println("-------------------------- ", gctx.Verbosity, " --------------------------")
 
 	if t.Bootstrap {
 		bootstrap = dht.OptionBootstrapGlobal
@@ -62,13 +77,13 @@ func (t cmdDownload) Run(gctx *cmdopts.Global) error {
 		32,
 		bootstrap,
 		dht.OptionUPnP,
-		dht.OptionLogger(log.Default()),
+		dhtdebug,
 	)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	go _dht.TableMaintainer()
+	go _dht.TableMaintainer(gctx.Context)
 
 	torconfig := torrent.NewDefaultClientConfig(
 		torrent.NewMetadataCache(tvfs.Path()),
@@ -81,10 +96,10 @@ func (t cmdDownload) Run(gctx *cmdopts.Global) error {
 		torrent.ClientConfigConnectionClosed(func(id int160.T, stats torrent.ConnStats, remaining int) {
 			log.Println("connection closed", id, remaining, spew.Sdump(stats))
 		}),
-		torrent.ClientConfigDebugLogger(log.Default()),
-		torrent.ClientConfigInfoLogger(log.Default()),
 		torrent.ClientConfigMaxOutstandingRequests(2048),
 		torrent.ClientConfigExtension(ddisctorrent.ExtensionName),
+		torrentinfo,
+		torrentdebug,
 	)
 
 	if tnetwork, err = torrentx.Autosocket(_dht, 0); err != nil {

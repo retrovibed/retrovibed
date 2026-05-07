@@ -64,7 +64,7 @@ func (t cmdDHTTest) Run(gctx *cmdopts.Global) (err error) {
 	if errorsx.Ignore(err, context.DeadlineExceeded) != nil {
 		return err
 	}
-	go dhts.TableMaintainer()
+	go dhts.TableMaintainer(gctx.Context)
 
 	log.Println("bootstrap stats", spew.Sdump(bstat))
 	announce := func(_ctx context.Context, target int160.T) {

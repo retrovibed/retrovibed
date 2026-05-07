@@ -387,7 +387,7 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 
 	go dhtx.BackgroundStatistics(dctx, time.Minute, dhts)
 	go dhtx.RecordBootstrapNodes(dctx, time.Minute, dhtminpeers, dhts, torrentpeers)
-	go dhts.TableMaintainer()
+	go dhts.TableMaintainer(dctx)
 
 	firewall = torrent.ClientConfigFirewall(connections.NewFirewall(
 		connections.BanInvalidPort{},
