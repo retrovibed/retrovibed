@@ -102,22 +102,28 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
     if (_hasKey) return widget.child;
-
+    final obscureicon = IconButton(
+      icon: Icon(
+        _isObscured ? Icons.visibility : Icons.visibility_off,
+      ),
+      onPressed: () {
+        setState(() {
+          _isObscured = !_isObscured;
+        });
+      },
+    );
     return ds.Masked(
       alignment: Alignment.center,
-      ListView(
-        shrinkWrap: true,
-        children: [
-          Center(
-            child: ds.Container(
-              padding: defaults.padding,
-              margin: defaults.margin,
-              constraints: BoxConstraints(maxWidth: 375),
-              ds.Loading(
-                cause: _cause,
-                Column(
-                  mainAxisSize: MainAxisSize.max,
-                  spacing: defaults.spacing,
+      ds.Container(
+        padding: defaults.padding,
+        margin: defaults.margin,
+        constraints: BoxConstraints(maxWidth: 375),
+        ds.Loading(
+          cause: _cause,
+          SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              spacing: defaults.spacing,
               children: [
                 Text(
                   'Welcome to Retrovibed',
@@ -137,16 +143,7 @@ class _LoginState extends State<Login> {
                   obscureText: _isObscured,
                   decoration: InputDecoration(
                     hintText: 'password',
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _isObscured ? Icons.visibility : Icons.visibility_off,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _isObscured = !_isObscured;
-                        });
-                      },
-                    ),
+                    suffixIcon: obscureicon,
                   ),
                   onChanged: (v) => setState(() => _password = v),
                   onFieldSubmitted: (_) => _seed(),
@@ -155,7 +152,10 @@ class _LoginState extends State<Login> {
                   visible: _register,
                   child: TextFormField(
                     obscureText: _isObscured,
-                    decoration: InputDecoration(hintText: 'confirm password'),
+                    decoration: InputDecoration(
+                      hintText: 'confirm password',
+                      suffixIcon: obscureicon,
+                    ),
                     onChanged: (v) => setState(() => _confirm = v),
                     onFieldSubmitted: (_) => _seed(),
                   ),
@@ -189,8 +189,6 @@ class _LoginState extends State<Login> {
             ),
           ),
         ),
-      ),
-        ],
       ),
     );
   }

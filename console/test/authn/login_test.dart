@@ -4,7 +4,6 @@ import 'package:retrovibed/authn/login.dart' as authn;
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
 
 final _resolutions = Resolutions.variant();
-const _tall = Size(800, 900);
 
 void main() {
   group('Login', () {
@@ -30,7 +29,6 @@ void main() {
         WidgetTester tester,
       ) async {
         await tester.pumpApp(
-          physicalSize: _tall,
           authn.Login(
             const Text('authenticated content'),
             publicKey: () => 'ssh-ed25519 AAAA...',
@@ -49,7 +47,6 @@ void main() {
         WidgetTester tester,
       ) async {
         await tester.pumpApp(
-          physicalSize: _tall,
           authn.Login(
             const Text('authenticated content'),
             publicKey: () => '',
@@ -69,7 +66,6 @@ void main() {
         WidgetTester tester,
       ) async {
         await tester.pumpApp(
-          physicalSize: _tall,
           Center(
             child: authn.Login(
               const Text('child'),
@@ -87,7 +83,6 @@ void main() {
         WidgetTester tester,
       ) async {
         await tester.pumpApp(
-          physicalSize: _tall,
           ConstrainedBox(
             constraints: const BoxConstraints(
               maxWidth: 400,
@@ -109,7 +104,6 @@ void main() {
         WidgetTester tester,
       ) async {
         await tester.pumpApp(
-          physicalSize: _tall,
           Column(
             children: [
               authn.Login(
@@ -151,7 +145,6 @@ void main() {
         WidgetTester tester,
       ) async {
         await tester.pumpApp(
-          physicalSize: _tall,
           authn.Login(
             const Text('child'),
             publicKey: () => '',
@@ -169,7 +162,6 @@ void main() {
         WidgetTester tester,
       ) async {
         await tester.pumpApp(
-          physicalSize: _tall,
           authn.Login(
             const Text('child'),
             publicKey: () => 'ssh-ed25519 AAAA...',
@@ -192,7 +184,6 @@ void main() {
         var seedCalled = false;
 
         await tester.pumpApp(
-          physicalSize: _tall,
           authn.Login(
             const Text('child'),
             publicKey: () => '',
@@ -224,7 +215,6 @@ void main() {
         String? captured;
 
         await tester.pumpApp(
-          physicalSize: _tall,
           authn.Login(
             const Text('child'),
             publicKey: () => '',
@@ -253,7 +243,6 @@ void main() {
         WidgetTester tester,
       ) async {
         await tester.pumpApp(
-          physicalSize: _tall,
           authn.Login(
             const Text('child'),
             publicKey: () => '',
@@ -277,7 +266,6 @@ void main() {
         var seedCalled = false;
 
         await tester.pumpApp(
-          physicalSize: _tall,
           authn.Login(
             const Text('child'),
             publicKey: () => '',
@@ -312,7 +300,6 @@ void main() {
         var seeded = false;
 
         await tester.pumpApp(
-          physicalSize: _tall,
           authn.Login(
             const Text('authenticated content'),
             publicKey: () => seeded ? 'ssh-ed25519 AAAA...' : '',
@@ -341,7 +328,6 @@ void main() {
 
       testWidgets('shows error on seed failure', (WidgetTester tester) async {
         await tester.pumpApp(
-          physicalSize: _tall,
           authn.Login(
             const Text('authenticated content'),
             publicKey: () => '',
@@ -370,7 +356,6 @@ void main() {
         var seedCalled = false;
 
         await tester.pumpApp(
-          physicalSize: _tall,
           authn.Login(
             const Text('child'),
             publicKey: () => '',
@@ -395,7 +380,6 @@ void main() {
         var seedCalled = false;
 
         await tester.pumpApp(
-          physicalSize: _tall,
           authn.Login(
             const Text('child'),
             publicKey: () => '',
@@ -426,7 +410,6 @@ void main() {
         String? capturedPassword;
 
         await tester.pumpApp(
-          physicalSize: _tall,
           authn.Login(
             const Text('child'),
             publicKey: () => '',
@@ -455,7 +438,6 @@ void main() {
       ) async {
         var clicked = false;
         await tester.pumpApp(
-          physicalSize: _tall,
           authn.Login(
             const Text('authenticated content'),
             publicKey: () => '',
@@ -490,7 +472,6 @@ void main() {
         var seeded = false;
 
         await tester.pumpApp(
-          physicalSize: _tall,
           authn.Login(
             const Text('authenticated content'),
             publicKey: () => seeded ? 'ssh-ed25519 AAAA...' : '',
@@ -527,13 +508,14 @@ void main() {
         await tester.pumpApp(
           authn.Login(
             Builder(
-              builder: (context) => TextButton(
-                onPressed: () {
-                  loggedOut = true;
-                  authn.Login.logout(context);
-                },
-                child: const Text('do logout'),
-              ),
+              builder:
+                  (context) => TextButton(
+                    onPressed: () {
+                      loggedOut = true;
+                      authn.Login.logout(context);
+                    },
+                    child: const Text('do logout'),
+                  ),
             ),
             publicKey: () => loggedOut ? '' : 'ssh-ed25519 AAAA...',
             seed: (_) => '',
