@@ -86,7 +86,7 @@ void main() {
           ConstrainedBox(
             constraints: const BoxConstraints(
               maxWidth: 400,
-              maxHeight: 900,
+              maxHeight: 600,
             ),
             child: authn.Login(
               const Text('child'),
