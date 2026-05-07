@@ -1,6 +1,7 @@
 package torrentx
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -9,10 +10,12 @@ import (
 	"net"
 	"net/netip"
 	"os"
+	"text/tabwriter"
 	"time"
 
 	"github.com/RoaringBitmap/roaring/v2"
 	"github.com/james-lawrence/torrent"
+	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/envx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -150,32 +153,15 @@ func Autosocket(_dht *dht.Server, p uint16) (_ torrent.Binder, err error) {
 	var (
 		s1 *utp.Socket
 		s2 net.Listener
-
-		s3 *utp.Socket
-		s4 net.Listener
 	)
 
 	if s1, s2, err = localsocket("udp", p); err != nil {
 		return nil, err
 	}
 
-	if netx.AddrPort(s1.LocalAddr()).Addr().Unmap().Is6() {
-		// if out localsocket "udp" bound an ipv6 address then
-		// attempt to bind to ip4 as well. but its okay if udp4 fails.
-		if s3, s4, err = localsocket("udp4", p); err != nil {
-			log.Println("unable to bind to ip4, skipping since we have ip6", err)
-			return torrent.NewSocketsBind(
-				sockets.New(s1, s1),
-				sockets.New(s2, &net.Dialer{}),
-			).Options(torrent.BinderOptionDHT(_dht)), nil
-		}
-	}
-
 	return torrent.NewSocketsBind(
 		sockets.New(s1, s1),
 		sockets.New(s2, &net.Dialer{}),
-		sockets.New(s3, s3),
-		sockets.New(s4, &net.Dialer{}),
 	).Options(torrent.BinderOptionDHT(_dht)), nil
 }
 
@@ -262,7 +248,7 @@ func AutomaticIP(wcfg *wireguardx.Config, d netx.Dialer, port uint16) dht.Option
 		return dht.OptionStaticPort(port)
 	}
 
-	return dht.OptionDynamicPort(func(ctx context.Context, sc *dht.Server, q dht.Binding, id int160.T, local net.PacketConn) (iter.Seq[netip.AddrPort], error) {
+	return dht.OptionDynamicPort(func(ctx context.Context, sc *dht.Server, q dht.Binding, id int160.T, bestaddr netip.AddrPort, local net.PacketConn) (iter.Seq[netip.AddrPort], error) {
 		return func(yield func(netip.AddrPort) bool) {
 			for {
 				addr, d, err := ExternalPort(wcfg, d, port)
@@ -323,9 +309,73 @@ func Info(dl torrent.Torrent) func(ctx context.Context) error {
 		info := dl.Info()
 		md := dl.Metadata()
 
-		log.Printf(
-			"%s - %s: info(%t) %s\n", md.ID, md.DisplayName, info != nil, stats,
-		)
+		var infoStatus string
+		if info != nil {
+			infoStatus = "downloaded"
+		} else {
+			infoStatus = "missing"
+		}
+
+		var peers []torrent.Peer
+		if err := dl.Tune(torrent.TuneReadPeers(&peers)); err != nil {
+			log.Println("unable to read peers", err)
+			peers = nil
+		}
+
+		var b = &bytes.Buffer{}
+		tw := tabwriter.NewWriter(b, 1, 0, 2, ' ', 0)
+
+		fmt.Fprintf(tw, "%s - %s: info(%s) seeding(%t) (last connection: %s)\n",
+			md.ID, md.DisplayName, infoStatus, stats.Seeding, timex.Human(stats.LastConnection))
+
+		_, _ = fmt.Fprintf(tw, "  Maximum Allowed Peers %d\n", stats.MaximumAllowedPeers)
+		_, _ = fmt.Fprintf(tw, "  Active Peers          %d\n", stats.ActivePeers)
+		_, _ = fmt.Fprintf(tw, "  Half-Open Peers       %d\n", stats.HalfOpenPeers)
+		_, _ = fmt.Fprintf(tw, "  Pending Peers         %d\n", stats.PendingPeers)
+		_, _ = fmt.Fprintf(tw, "  Total Peers           %d\n", stats.TotalPeers)
+		_, _ = fmt.Fprintf(tw, "  Seeders               %d\n", stats.Seeders)
+
+		_, _ = fmt.Fprintf(tw, "  Pieces Missing        %d\n", stats.Missing)
+		_, _ = fmt.Fprintf(tw, "  Pieces Outstanding    %d\n", stats.Outstanding)
+		_, _ = fmt.Fprintf(tw, "  Pieces Unverified     %d\n", stats.Unverified)
+		_, _ = fmt.Fprintf(tw, "  Pieces Completed      %d\n", stats.Completed)
+		_, _ = fmt.Fprintf(tw, "  Pieces Failed         %d\n", stats.Failed)
+
+		_, _ = fmt.Fprintf(tw, "  Bytes Written         %s\n", bytesx.Unit(stats.BytesWritten.Int64()))
+		_, _ = fmt.Fprintf(tw, "  Bytes Read            %s\n", bytesx.Unit(stats.BytesRead.Int64()))
+		_, _ = fmt.Fprintf(tw, "  Chunks Written        %d\n", stats.ChunksWritten.Int64())
+		_, _ = fmt.Fprintf(tw, "  Chunks Read           %d\n", stats.ChunksRead.Int64())
+		_, _ = fmt.Fprintf(tw, "  DHT Announce          %d\n", stats.DHTAnnounce.Int64())
+
+		if len(peers) > 0 {
+			active, pending := partitionPeers(peers)
+
+			if len(active) > 0 {
+				_, _ = fmt.Fprintln(tw, "  Active Connections")
+				_, _ = fmt.Fprintf(tw, "    %-40s  %-28s    %s\n",
+					"Peer ID", "Address", "Encrypted")
+				for _, p := range active {
+					_, _ = fmt.Fprintf(tw, "    %040s  %-28s  %t\n",
+						p.ID.String(), p.String(), p.SupportsEncryption,
+					)
+				}
+			}
+
+			if len(pending) > 0 {
+				_, _ = fmt.Fprintln(tw, "  Pending Peers")
+				_, _ = fmt.Fprintf(tw, "    %-40s  %-28s  %-14s  %s\n",
+					"Peer ID", "Address", "Last Attempt", "Attempts")
+				for _, p := range pending {
+					_, _ = fmt.Fprintf(tw, "    %040s  %-28s  %-14s  %d\n",
+						p.ID.String(), p.String(), timex.Human(p.LastAttempt), p.Attempts,
+					)
+				}
+			}
+		}
+
+		_ = tw.Flush()
+
+		log.Println(b.String())
 
 		if err := dl.Tune(torrent.TuneNewConns); err != nil {
 			log.Println("unable to request new connections", err)
@@ -333,6 +383,17 @@ func Info(dl torrent.Torrent) func(ctx context.Context) error {
 
 		return nil
 	}
+}
+
+func partitionPeers(peers []torrent.Peer) (active, pending []torrent.Peer) {
+	for _, p := range peers {
+		if p.LastAttempt.IsZero() || p.Attempts == 0 {
+			active = append(active, p)
+		} else {
+			pending = append(pending, p)
+		}
+	}
+	return active, pending
 }
 
 func DownloadProgress(ctx context.Context, dl torrent.Torrent) {

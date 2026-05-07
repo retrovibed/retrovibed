@@ -24,6 +24,10 @@ func Release(b *tarballs.Build) eg.OpFn {
 }
 
 func AppImageBuild(b *tarballs.Build) eg.OpFn {
+	// packaging metainfo.
+	// https://docs.appimage.org/packaging-guide/optional/appstream.html
+	// runtime to look into.
+	// https://github.com/pkgforge-dev/Anylinux-AppImages
 	appimage := tarballs.AppImage(b)
 	builddir := egenv.CacheDirectory(tarballs.AppImageBuild(b))
 	return shell.Op(

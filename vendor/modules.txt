@@ -350,7 +350,7 @@ github.com/ebitengine/purego/internal/xreflect
 # github.com/edsrzf/mmap-go v1.2.0
 ## explicit; go 1.17
 github.com/edsrzf/mmap-go
-# github.com/egdaemon/eg v0.0.0-20260427150755-156bb06063d2
+# github.com/egdaemon/eg v0.0.0-20260507170309-83e275be7a30
 ## explicit; go 1.24.2
 github.com/egdaemon/eg
 github.com/egdaemon/eg/backoff
@@ -636,7 +636,7 @@ github.com/james-lawrence/genieql/internal/userx
 github.com/james-lawrence/genieql/internal/wasidialect
 github.com/james-lawrence/genieql/internal/wasix/ffierrors
 github.com/james-lawrence/genieql/internal/wasix/ffiguest
-# github.com/james-lawrence/torrent v0.0.0-20260504114734-001214417dc9
+# github.com/james-lawrence/torrent v0.0.0-20260507161259-853186b24050
 ## explicit; go 1.25.0
 github.com/james-lawrence/torrent
 github.com/james-lawrence/torrent/autobind

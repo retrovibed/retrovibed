@@ -2,7 +2,6 @@ package cmdmedia
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -171,7 +170,6 @@ func TestMBImportReleases(t *testing.T) {
 		seenDates := map[string]bool{}
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			q := r.URL.Query().Get("query")
-			log.Println("DERP DERP", q)
 			seenDates[q] = true
 			id := fmt.Sprintf("8f6a4a2b-e29b-41d4-a716-44665544000%d", len(seenDates))
 			errorsx.Must(fmt.Fprint(w, releaseXML(1, 0, releaseEntryXML(id, q, "2020-01-15", ""))))

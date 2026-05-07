@@ -8,7 +8,7 @@ require (
 	github.com/gofrs/uuid/v5 v5.4.0
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/gorilla/schema v1.4.1
-	github.com/james-lawrence/torrent v0.0.0-20260504114734-001214417dc9
+	github.com/james-lawrence/torrent v0.0.0-20260507161259-853186b24050
 	github.com/justinas/alice v1.2.0
 	github.com/mattn/go-isatty v0.0.21
 	github.com/pkg/profile v1.7.0

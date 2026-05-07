@@ -26,7 +26,8 @@ import (
 )
 
 const (
-	ContainerName = "egdebuild"
+	ContainerName        = "egdebuild"
+	UbuntuLatestCodename = "resolute"
 )
 
 //go:embed .debian
@@ -45,24 +46,32 @@ type Dependency struct {
 	Build   []string
 	Runtime []string
 }
+
 type Config struct {
 	Maintainer
 	ChangeLog
 	Dependency
-	Description    string   // package description
-	Architecture   string   // architecture for the debian package, defaults to any.
-	SignatureKeyID string   // GPG key ID to use for signing the package.
-	Name           string   // name of the package to build. correlates to the DEB_PACKAGE_NAME environment variable.
-	Version        string   // version of the package to build. correlates to DEB_VERSION environment variable.
-	Distro         string   // distribution to build the package for. correlates to DEB_DISTRO environment variable.
-	SourceDir      string   // absolute path to the source files to use for building the package.
-	Debian         fs.FS    // debian package files to use for building the package. generally only the rules file needs to be provided. the 'debian' directory is cloned from the fs.FS
-	Environ        []string // additional environment variables to pass to the build process.
-	lintian        string   // lintian flag
+	Description    string        // package description
+	Architecture   string        // architecture for the debian package, defaults to any.
+	SignatureKeyID string        // GPG key ID to use for signing the package.
+	Name           string        // name of the package to build. correlates to the DEB_PACKAGE_NAME environment variable.
+	Version        string        // version of the package to build. correlates to DEB_VERSION environment variable.
+	Distro         string        // distribution to build the package for. correlates to DEB_DISTRO environment variable.
+	SourceDir      string        // absolute path to the source files to use for building the package.
+	Debian         fs.FS         // debian package files to use for building the package. generally only the rules file needs to be provided. the 'debian' directory is cloned from the fs.FS
+	Environ        []string      // additional environment variables to pass to the build process.
+	lintian        string        // lintian flag
+	timeout        time.Duration // command timeout
 	buildCommand   func(*Config, shell.Command) shell.Command
 }
 
 type option func(*Config)
+
+func (option) Timeout(d time.Duration) option {
+	return func(c *Config) {
+		c.timeout = d
+	}
+}
 
 // set the version for the package. if the version string contains :autopatch: then an automatic patch version will be substituted.
 // which is useful for uploading to launchpad and other services.
@@ -169,6 +178,7 @@ func New(pkg string, distro string, src string, opts ...option) (c Config) {
 		buildCommand: func(cfg *Config, runtime shell.Command) shell.Command {
 			return runtime.Newf("debuild %s-S -k%s", cfg.lintian, cfg.SignatureKeyID).Privileged()
 		},
+		timeout: 5 * time.Minute,
 	}, opts...)
 }
 
@@ -204,6 +214,7 @@ func Runner() eg.ContainerRunner {
 func Runtime(cfg Config, opts ...option) shell.Command {
 	cfg = From(cfg, opts...)
 	return shell.Runtime().
+		Timeout(cfg.timeout).
 		Environ("DEB_PACKAGE_NAME", cfg.Name).
 		Environ("DEB_VERSION", applyversionsubstitutions(cfg)).
 		Environ("DEB_DISTRO", cfg.Distro).
@@ -261,17 +272,22 @@ func Build(cfg Config, opts ...option) eg.OpFn {
 }
 
 // uploads the generated deb packages using a dput configuration.
-func UploadDPut(gcfg Config, dput fs.FS) eg.OpFn {
+func UploadDPut(gcfg Config, dput fs.FS, opts ...option) eg.OpFn {
 	return func(ctx context.Context, o eg.Op) error {
 		if err := egfs.CloneFS(ctx, egenv.EphemeralDirectory(), "dput.config", dput); err != nil {
 			return err
 		}
 		root := fmt.Sprintf("deb.%s", gcfg.Name)
 		bdir := egenv.EphemeralDirectory(root)
-		runtime := Runtime(gcfg)
+		runtime := Runtime(gcfg, opts...)
 		return shell.Run(
 			ctx,
-			runtime.Newf("ls %s/*_source.changes | xargs -I {} dput -f -c %s %s {}", bdir, egenv.EphemeralDirectory("dput.config"), gcfg.Name).Privileged(),
+			runtime.Newf(
+				"ls %s/*_source.changes | xargs -I {} dput -f -c %s %s {}",
+				bdir,
+				egenv.EphemeralDirectory("dput.config"),
+				gcfg.Name,
+			).Privileged(),
 		)
 	}
 }
