@@ -63,7 +63,7 @@ abstract class known {
     Media m, {
     List<httpx.Option> options = const [],
   }) async {
-    if (mimex.icon(m.mimetype) == mimex.image) {
+    if (mimex.icon(m.mimetype) == mimex.icoimage) {
       return Future.value(
         Known(
           id: "",

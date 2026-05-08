@@ -9,8 +9,8 @@ class SearchMimetypeDropdown extends StatelessWidget {
   SearchMimetypeDropdown(this.current, {super.key, required this.onChange});
 
   Icon _icon(int checksum) {
-    if (checksum == mimex.checksumfor(mimex.movie)) return Icon(Icons.movie_filter);
-    if (checksum == mimex.checksumfor(mimex.audio)) return Icon(Icons.music_note);
+    if (checksum == mimex.checksumfor(mimex.icomovie)) return Icon(Icons.movie_filter);
+    if (checksum == mimex.checksumfor(mimex.icoaudio)) return Icon(Icons.music_note);
     return Icon(Icons.file_open_rounded);
   }
 
@@ -26,16 +26,16 @@ class SearchMimetypeDropdown extends StatelessWidget {
         surfaceTintColor: Theme.of(context).colorScheme.surface,
         icon: _icon(mimetypes),
         onSelected: (v) {
-          if (v == mimex.checksumfor(mimex.movie)) {
+          if (v == mimex.checksumfor(mimex.icomovie)) {
             current.mimetypes.clear();
-            current.mimetypes.addAll(mimex.of(mimex.movie));
+            current.mimetypes.addAll(mimex.of(mimex.icomovie));
             onChange(current);
             return;
           }
 
-          if (v == mimex.checksumfor(mimex.audio)) {
+          if (v == mimex.checksumfor(mimex.icoaudio)) {
             current.mimetypes.clear();
-            current.mimetypes.addAll(mimex.of(mimex.audio));
+            current.mimetypes.addAll(mimex.of(mimex.icoaudio));
             onChange(current);
             return;
           }
@@ -46,18 +46,18 @@ class SearchMimetypeDropdown extends StatelessWidget {
         itemBuilder:
             (context) => [
               PopupMenuItem(
-                value: mimex.checksumfor(mimex.audio),
+                value: mimex.checksumfor(mimex.icoaudio),
                 child: Tooltip(message: "Music", child: Icon(Icons.music_note)),
               ),
               PopupMenuItem(
-                value: mimex.checksumfor(mimex.movie),
+                value: mimex.checksumfor(mimex.icomovie),
                 child: Tooltip(
                   message: "Movies",
                   child: Icon(Icons.movie_filter),
                 ),
               ),
               PopupMenuItem(
-                value: mimex.checksumfor(mimex.binary),
+                value: mimex.checksumfor(mimex.icobinary),
                 child: Tooltip(
                   message: "Files",
                   child: Icon(Icons.file_open_rounded),

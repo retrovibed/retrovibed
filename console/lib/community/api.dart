@@ -99,21 +99,21 @@ class API {
   }
 
   static Future<PublishedContentListResponse> published(
-    String id, {
+    String cid, {
     List<httpx.Option> options = const [],
     int offset = 0,
     int limit = 100,
   }) async {
     final req =
         PublishedContentListRequest()
-          ..communityId = id
+          ..communityId = cid
           ..offset = fixnum.Int64(offset)
           ..limit = fixnum.Int64(limit);
     return httpx
         .get(
           Uri.https(
-            httpx.metaendpoint(),
-            "/p/",
+            httpx.host(),
+            "/c/$cid/published",
             jsonDecode(jsonEncode(req.toProto3Json())),
           ),
           options: [httpx.Accept.json, ...options],

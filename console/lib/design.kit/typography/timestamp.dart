@@ -39,7 +39,7 @@ class Timestamp extends StatelessWidget {
     } else if (width < 300) {
       return DateFormat("MMM d, y hh:mm a").format;
     }
-    return DateFormat("y MMMM EEEE d hh:mm a").format;
+    return DateFormat("y MMMM d EEEE hh:mm a").format;
   }
 
   @override

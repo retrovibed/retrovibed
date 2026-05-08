@@ -41,7 +41,7 @@ class _QRAttributionState extends State<QRAttribution> {
         ds.Container(
           margin: defaults.margin.copyWith(left: 0.0, right: 0.0),
           clipBehavior: Clip.antiAlias,
-          constraints: BoxConstraints(maxWidth: defaults.compact),
+          constraints: BoxConstraints(maxHeight: defaults.compact),
           ClipRRect(
             borderRadius: defaults.borderRadius,
             child: QrImageView(
