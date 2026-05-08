@@ -94,13 +94,14 @@ func (t *HTTP) Bind(r *mux.Router) {
 	r.StrictSlash(false)
 
 	r.Path("/").Methods(http.MethodGet).Handler(alice.New(
+		httpx.RouteInvoked,
 		httpx.ContextBufferPool512(),
 		httpx.ParseForm,
 		httpauth.AuthenticateWithToken(t.jwtsecret),
 		httpx.Timeout2s(),
 	).ThenFunc(t.search))
 
-	r.Path("/{id}/published").Methods(http.MethodDelete).Handler(alice.New(
+	r.Path("/published/{id}").Methods(http.MethodDelete).Handler(alice.New(
 		httpx.RouteInvoked,
 		httpx.ContextBufferPool512(),
 		httpauth.AuthenticateWithToken(t.jwtsecret),
@@ -145,15 +146,9 @@ func (t *HTTP) tombstoned(w http.ResponseWriter, r *http.Request) {
 	pid := mux.Vars(r)["id"]
 
 	var (
-		cs  CommunitySyncState
-		req meta.PublishContentDeleteRequest
-		pc  PublishedContent
+		cs CommunitySyncState
+		pc PublishedContent
 	)
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		log.Println(errorsx.Wrap(err, "unable to decode publish request"))
-		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
-		return
-	}
 
 	if err := PublishedContentDeleteByID(r.Context(), t.q, pid).Scan(&pc); errors.Is(err, sql.ErrNoRows) {
 		log.Println(errorsx.Wrap(err, "unable to tombstone missing record"))

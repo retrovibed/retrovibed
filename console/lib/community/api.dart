@@ -129,13 +129,11 @@ class API {
     String pid, {
     List<httpx.Option> options = const [],
   }) async {
-    final req = PublishContentDeleteResponse();
     return httpx
         .delete(
           Uri.https(
             httpx.host(),
             "/c/published/$pid",
-            jsonDecode(jsonEncode(req.toProto3Json())),
           ),
           options: [httpx.Accept.json, ...options],
         )
