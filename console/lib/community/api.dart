@@ -125,6 +125,27 @@ class API {
         });
   }
 
+  static Future<PublishContentDeleteResponse> publishedtombstone(
+    String pid, {
+    List<httpx.Option> options = const [],
+  }) async {
+    final req = PublishContentDeleteResponse();
+    return httpx
+        .delete(
+          Uri.https(
+            httpx.host(),
+            "/c/published/$pid",
+            jsonDecode(jsonEncode(req.toProto3Json())),
+          ),
+          options: [httpx.Accept.json, ...options],
+        )
+        .then((v) {
+          return Future.value(
+            PublishContentDeleteResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+          );
+        });
+  }
+
   static Future<CommunityMetricsResponse> metrics(
     String id, {
     required DateTime startDate,

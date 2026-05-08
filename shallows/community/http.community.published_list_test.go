@@ -115,6 +115,95 @@ func TestPublishedListEndpoint(t *testing.T) {
 		require.Contains(t, ids, lmd2.ID)
 	})
 
+	t.Run("excludes tombstoned content from results", func(t *testing.T) {
+		var (
+			ctx, done  = testx.Context(t)
+			q          = sqltestx.Metadatabase(t)
+			p          meta.Profile
+			v          meta.Authz
+			mediaDir   = t.TempDir()
+			torrentDir = t.TempDir()
+		)
+		defer done()
+
+		communityID := uuid.Must(uuid.NewV7()).String()
+
+		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
+		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
+		require.NoError(t, testx.Fake(&v, meta.AuthzOptionProfileID(p.ID), meta.AuthzOptionAdmin))
+		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
+
+		lmd1 := library.Metadata{
+			ID:             uuid.Must(uuid.NewV7()).String(),
+			Description:    "active media",
+			Bytes:          1024,
+			TorrentID:      uuid.Nil.String(),
+			KnownMediaID:   uuid.Nil.String(),
+			ArchiveID:      uuid.Nil.String(),
+			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+		}
+		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd1).Scan(&lmd1))
+
+		lmd2 := library.Metadata{
+			ID:             uuid.Must(uuid.NewV7()).String(),
+			Description:    "tombstoned media",
+			Bytes:          2048,
+			TorrentID:      uuid.Nil.String(),
+			KnownMediaID:   uuid.Nil.String(),
+			ArchiveID:      uuid.Nil.String(),
+			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+		}
+		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd2).Scan(&lmd2))
+
+		pc1 := community.PublishedContent{
+			CommunityID:   communityID,
+			LibraryID:     lmd1.ID,
+			KnownMediaID:  uuid.Nil.String(),
+			OAuthGoogleID: uuid.Nil.String(),
+			Bytes:         lmd1.Bytes,
+		}
+		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc1).Scan(&pc1))
+
+		pc2 := community.PublishedContent{
+			CommunityID:   communityID,
+			LibraryID:     lmd2.ID,
+			KnownMediaID:  uuid.Nil.String(),
+			OAuthGoogleID: uuid.Nil.String(),
+			Bytes:         lmd2.Bytes,
+		}
+		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc2).Scan(&pc2))
+		require.NoError(t, community.PublishedContentTombstone(ctx, q, pc2.ID).Scan(&pc2))
+
+		routes := mux.NewRouter()
+		community.NewHTTP(
+			q,
+			community.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			community.HTTPOptionHTTPClient(&http.Client{}),
+			community.HTTPOptionMediaStorage(fsx.DirVirtual(mediaDir)),
+			community.HTTPOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
+		).Bind(routes.PathPrefix("/c").Subrouter())
+
+		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
+		token := "Bearer " + httpauthtest.UnsafeToken(claims, httpauthtest.UnsafeJWTSecretSource)
+
+		resp, req, err := httptestx.BuildRequestContextBytes(
+			ctx,
+			http.MethodGet,
+			"/c/"+communityID+"/published",
+			nil,
+			httptestx.RequestOptionAuthorization(token),
+		)
+		require.NoError(t, err)
+
+		routes.ServeHTTP(resp, req)
+		require.Equal(t, http.StatusOK, resp.Code)
+
+		var result meta.PublishedContentListResponse
+		require.NoError(t, json.Unmarshal(resp.Body.Bytes(), &result))
+		require.Len(t, result.Items, 1)
+		require.Equal(t, lmd1.ID, result.Items[0].LibraryId)
+	})
+
 	t.Run("returns empty list for community with no content", func(t *testing.T) {
 		var (
 			ctx, done   = testx.Context(t)

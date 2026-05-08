@@ -62,25 +62,26 @@ class ManagementListDisplayItem extends StatelessWidget {
           alignment: WrapAlignment.center,
           spacing: defaults.spacing,
           children: [
-            ds.Debug.blue(
-              CommunityUpdate(
-                constraints: BoxConstraints(maxWidth: defaults.compact),
-                community: community,
-                update: (updated) {
-                  var auth = [authn.DeeppoolAuthzCache.bearer(context)];
-                  return httpx.withRetry(
-                    () => API.update(
-                      updated.id,
-                      CommunityUpdateRequest(community: updated),
-                      options: auth,
-                    ),
-                  );
-                },
-                onUpdate: (c) => onChanged?.call(c),
-                onCancel: () {},
+            CommunityUpdate(
+              constraints: BoxConstraints(
+                maxWidth: defaults.compact + defaults.padding.horizontal,
+                minHeight: defaults.compact + defaults.padding.vertical,
               ),
+              community: community,
+              update: (updated) {
+                var auth = [authn.DeeppoolAuthzCache.bearer(context)];
+                return httpx.withRetry(
+                  () => API.update(
+                    updated.id,
+                    CommunityUpdateRequest(community: updated),
+                    options: auth,
+                  ),
+                );
+              },
+              onUpdate: (c) => onChanged?.call(c),
+              onCancel: () {},
             ),
-            ds.Debug.green(QRAttribution(community: community)),
+            QRAttribution(community: community),
             Divider(height: 32),
             MetricsDashboard(community: community),
             CommunityContentDisplay(community: community),

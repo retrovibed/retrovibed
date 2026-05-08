@@ -7,6 +7,7 @@ import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'package:retrovibed/community/content.detail.dart';
 import 'package:retrovibed/community/content.display.dart';
 import 'package:retrovibed/community/community.pb.dart';
+import 'package:retrovibed/design.kit/modals.dart' as modals;
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
 
 final _resolutions = Resolutions.variant();
@@ -347,6 +348,165 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.byIcon(Icons.archive), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
+    });
+
+    group('deletion', () {
+      Future<PublishContentDeleteResponse> tombstone(
+        String id, {
+        List<httpx.Option> options = const [],
+      }) async => PublishContentDeleteResponse();
+
+      testWidgets('delete button shown for each item', (tester) async {
+        await tester.pumpApp(
+          physicalSize: const Size(1280, 720),
+          modals.Node(
+            CommunityContentDisplay(
+              community: _testCommunity(),
+              apipublished: _withContent,
+              apitombstone: tombstone,
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.byIcon(Icons.delete), findsNWidgets(2));
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('tapping delete shows confirmation dialog', (tester) async {
+        await tester.pumpApp(
+          physicalSize: const Size(1280, 720),
+          modals.Node(
+            CommunityContentDisplay(
+              community: _testCommunity(),
+              apipublished: _withContent,
+              apitombstone: tombstone,
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byIcon(Icons.delete).first);
+        await tester.pumpAndSettle();
+
+        expect(find.text('Yes'), findsOneWidget);
+        expect(find.text('No'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('confirming deletion removes item from list', (tester) async {
+        await tester.pumpApp(
+          physicalSize: const Size(1280, 720),
+          modals.Node(
+            CommunityContentDisplay(
+              community: _testCommunity(),
+              apipublished: _withContent,
+              apitombstone: tombstone,
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Movie One'), findsOneWidget);
+
+        await tester.tap(find.byIcon(Icons.delete).first);
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('Yes'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Movie One'), findsNothing);
+        expect(find.text('Movie Two'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('cancelling deletion leaves item in list', (tester) async {
+        await tester.pumpApp(
+          physicalSize: const Size(1280, 720),
+          modals.Node(
+            CommunityContentDisplay(
+              community: _testCommunity(),
+              apipublished: _withContent,
+              apitombstone: tombstone,
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byIcon(Icons.delete).first);
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('No'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Movie One'), findsOneWidget);
+        expect(find.text('Movie Two'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('tombstone is called with item id on confirm', (tester) async {
+        String? calledWith;
+        Future<PublishContentDeleteResponse> captureTombstone(
+          String id, {
+          List<httpx.Option> options = const [],
+        }) async {
+          calledWith = id;
+          return PublishContentDeleteResponse();
+        }
+
+        await tester.pumpApp(
+          physicalSize: const Size(1280, 720),
+          modals.Node(
+            CommunityContentDisplay(
+              community: _testCommunity(),
+              apipublished: _withContent,
+              apitombstone: captureTombstone,
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byIcon(Icons.delete).first);
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('Yes'));
+        await tester.pumpAndSettle();
+
+        expect(calledWith, 'pc-1');
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('tombstone not called on cancel', (tester) async {
+        bool called = false;
+        Future<PublishContentDeleteResponse> captureTombstone(
+          String id, {
+          List<httpx.Option> options = const [],
+        }) async {
+          called = true;
+          return PublishContentDeleteResponse();
+        }
+
+        await tester.pumpApp(
+          physicalSize: const Size(1280, 720),
+          modals.Node(
+            CommunityContentDisplay(
+              community: _testCommunity(),
+              apipublished: _withContent,
+              apitombstone: captureTombstone,
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byIcon(Icons.delete).first);
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('No'));
+        await tester.pumpAndSettle();
+
+        expect(called, isFalse);
         expect(tester.takeException(), isNull);
       });
     });

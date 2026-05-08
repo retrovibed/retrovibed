@@ -1023,6 +1023,94 @@ func (x *PublishContentResponse) GetPublishedContent() *PublishedContent {
 	return nil
 }
 
+type PublishContentDeleteRequest struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	PublishedContent *PublishedContent      `protobuf:"bytes,1,opt,name=published_content,proto3" json:"published_content,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *PublishContentDeleteRequest) Reset() {
+	*x = PublishContentDeleteRequest{}
+	mi := &file_community_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PublishContentDeleteRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PublishContentDeleteRequest) ProtoMessage() {}
+
+func (x *PublishContentDeleteRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_community_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PublishContentDeleteRequest.ProtoReflect.Descriptor instead.
+func (*PublishContentDeleteRequest) Descriptor() ([]byte, []int) {
+	return file_community_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *PublishContentDeleteRequest) GetPublishedContent() *PublishedContent {
+	if x != nil {
+		return x.PublishedContent
+	}
+	return nil
+}
+
+type PublishContentDeleteResponse struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	PublishedContent *PublishedContent      `protobuf:"bytes,1,opt,name=published_content,proto3" json:"published_content,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *PublishContentDeleteResponse) Reset() {
+	*x = PublishContentDeleteResponse{}
+	mi := &file_community_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PublishContentDeleteResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PublishContentDeleteResponse) ProtoMessage() {}
+
+func (x *PublishContentDeleteResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_community_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PublishContentDeleteResponse.ProtoReflect.Descriptor instead.
+func (*PublishContentDeleteResponse) Descriptor() ([]byte, []int) {
+	return file_community_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *PublishContentDeleteResponse) GetPublishedContent() *PublishedContent {
+	if x != nil {
+		return x.PublishedContent
+	}
+	return nil
+}
+
 type PublishedContentListRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	CommunityId   string                 `protobuf:"bytes,1,opt,name=community_id,proto3" json:"community_id,omitempty"`
@@ -1034,7 +1122,7 @@ type PublishedContentListRequest struct {
 
 func (x *PublishedContentListRequest) Reset() {
 	*x = PublishedContentListRequest{}
-	mi := &file_community_proto_msgTypes[16]
+	mi := &file_community_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1046,7 +1134,7 @@ func (x *PublishedContentListRequest) String() string {
 func (*PublishedContentListRequest) ProtoMessage() {}
 
 func (x *PublishedContentListRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_community_proto_msgTypes[16]
+	mi := &file_community_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1059,7 +1147,7 @@ func (x *PublishedContentListRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PublishedContentListRequest.ProtoReflect.Descriptor instead.
 func (*PublishedContentListRequest) Descriptor() ([]byte, []int) {
-	return file_community_proto_rawDescGZIP(), []int{16}
+	return file_community_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *PublishedContentListRequest) GetCommunityId() string {
@@ -1094,7 +1182,7 @@ type PublishedContentListResponse struct {
 
 func (x *PublishedContentListResponse) Reset() {
 	*x = PublishedContentListResponse{}
-	mi := &file_community_proto_msgTypes[17]
+	mi := &file_community_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1106,7 +1194,7 @@ func (x *PublishedContentListResponse) String() string {
 func (*PublishedContentListResponse) ProtoMessage() {}
 
 func (x *PublishedContentListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_community_proto_msgTypes[17]
+	mi := &file_community_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1119,7 +1207,7 @@ func (x *PublishedContentListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PublishedContentListResponse.ProtoReflect.Descriptor instead.
 func (*PublishedContentListResponse) Descriptor() ([]byte, []int) {
-	return file_community_proto_rawDescGZIP(), []int{17}
+	return file_community_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *PublishedContentListResponse) GetCommunity() *Community {
@@ -1156,7 +1244,7 @@ type CommunityMetric struct {
 
 func (x *CommunityMetric) Reset() {
 	*x = CommunityMetric{}
-	mi := &file_community_proto_msgTypes[18]
+	mi := &file_community_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1168,7 +1256,7 @@ func (x *CommunityMetric) String() string {
 func (*CommunityMetric) ProtoMessage() {}
 
 func (x *CommunityMetric) ProtoReflect() protoreflect.Message {
-	mi := &file_community_proto_msgTypes[18]
+	mi := &file_community_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1181,7 +1269,7 @@ func (x *CommunityMetric) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CommunityMetric.ProtoReflect.Descriptor instead.
 func (*CommunityMetric) Descriptor() ([]byte, []int) {
-	return file_community_proto_rawDescGZIP(), []int{18}
+	return file_community_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *CommunityMetric) GetId() string {
@@ -1234,7 +1322,7 @@ type PublishedContentMetric struct {
 
 func (x *PublishedContentMetric) Reset() {
 	*x = PublishedContentMetric{}
-	mi := &file_community_proto_msgTypes[19]
+	mi := &file_community_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1246,7 +1334,7 @@ func (x *PublishedContentMetric) String() string {
 func (*PublishedContentMetric) ProtoMessage() {}
 
 func (x *PublishedContentMetric) ProtoReflect() protoreflect.Message {
-	mi := &file_community_proto_msgTypes[19]
+	mi := &file_community_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1259,7 +1347,7 @@ func (x *PublishedContentMetric) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PublishedContentMetric.ProtoReflect.Descriptor instead.
 func (*PublishedContentMetric) Descriptor() ([]byte, []int) {
-	return file_community_proto_rawDescGZIP(), []int{19}
+	return file_community_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *PublishedContentMetric) GetId() string {
@@ -1323,7 +1411,7 @@ type CommunityMetricsRequest struct {
 
 func (x *CommunityMetricsRequest) Reset() {
 	*x = CommunityMetricsRequest{}
-	mi := &file_community_proto_msgTypes[20]
+	mi := &file_community_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1335,7 +1423,7 @@ func (x *CommunityMetricsRequest) String() string {
 func (*CommunityMetricsRequest) ProtoMessage() {}
 
 func (x *CommunityMetricsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_community_proto_msgTypes[20]
+	mi := &file_community_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1348,7 +1436,7 @@ func (x *CommunityMetricsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CommunityMetricsRequest.ProtoReflect.Descriptor instead.
 func (*CommunityMetricsRequest) Descriptor() ([]byte, []int) {
-	return file_community_proto_rawDescGZIP(), []int{20}
+	return file_community_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *CommunityMetricsRequest) GetCommunityId() string {
@@ -1390,7 +1478,7 @@ type CommunityMetricsResponse struct {
 
 func (x *CommunityMetricsResponse) Reset() {
 	*x = CommunityMetricsResponse{}
-	mi := &file_community_proto_msgTypes[21]
+	mi := &file_community_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1402,7 +1490,7 @@ func (x *CommunityMetricsResponse) String() string {
 func (*CommunityMetricsResponse) ProtoMessage() {}
 
 func (x *CommunityMetricsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_community_proto_msgTypes[21]
+	mi := &file_community_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1415,7 +1503,7 @@ func (x *CommunityMetricsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CommunityMetricsResponse.ProtoReflect.Descriptor instead.
 func (*CommunityMetricsResponse) Descriptor() ([]byte, []int) {
-	return file_community_proto_rawDescGZIP(), []int{21}
+	return file_community_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *CommunityMetricsResponse) GetSummary() *CommunityMetric {
@@ -1449,7 +1537,7 @@ type MetricsSyncRequest struct {
 
 func (x *MetricsSyncRequest) Reset() {
 	*x = MetricsSyncRequest{}
-	mi := &file_community_proto_msgTypes[22]
+	mi := &file_community_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1461,7 +1549,7 @@ func (x *MetricsSyncRequest) String() string {
 func (*MetricsSyncRequest) ProtoMessage() {}
 
 func (x *MetricsSyncRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_community_proto_msgTypes[22]
+	mi := &file_community_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1474,7 +1562,7 @@ func (x *MetricsSyncRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MetricsSyncRequest.ProtoReflect.Descriptor instead.
 func (*MetricsSyncRequest) Descriptor() ([]byte, []int) {
-	return file_community_proto_rawDescGZIP(), []int{22}
+	return file_community_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *MetricsSyncRequest) GetCommunityId() string {
@@ -1503,7 +1591,7 @@ type MetricsSyncResponse struct {
 
 func (x *MetricsSyncResponse) Reset() {
 	*x = MetricsSyncResponse{}
-	mi := &file_community_proto_msgTypes[23]
+	mi := &file_community_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1515,7 +1603,7 @@ func (x *MetricsSyncResponse) String() string {
 func (*MetricsSyncResponse) ProtoMessage() {}
 
 func (x *MetricsSyncResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_community_proto_msgTypes[23]
+	mi := &file_community_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1528,7 +1616,7 @@ func (x *MetricsSyncResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MetricsSyncResponse.ProtoReflect.Descriptor instead.
 func (*MetricsSyncResponse) Descriptor() ([]byte, []int) {
-	return file_community_proto_rawDescGZIP(), []int{23}
+	return file_community_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *MetricsSyncResponse) GetCommunityMetrics() []*CommunityMetric {
@@ -1571,7 +1659,7 @@ type MetricsSyncProgress struct {
 
 func (x *MetricsSyncProgress) Reset() {
 	*x = MetricsSyncProgress{}
-	mi := &file_community_proto_msgTypes[24]
+	mi := &file_community_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1583,7 +1671,7 @@ func (x *MetricsSyncProgress) String() string {
 func (*MetricsSyncProgress) ProtoMessage() {}
 
 func (x *MetricsSyncProgress) ProtoReflect() protoreflect.Message {
-	mi := &file_community_proto_msgTypes[24]
+	mi := &file_community_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1596,7 +1684,7 @@ func (x *MetricsSyncProgress) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MetricsSyncProgress.ProtoReflect.Descriptor instead.
 func (*MetricsSyncProgress) Descriptor() ([]byte, []int) {
-	return file_community_proto_rawDescGZIP(), []int{24}
+	return file_community_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *MetricsSyncProgress) GetStatus() string {
@@ -1635,7 +1723,7 @@ type CommunitySubscribeRequest struct {
 
 func (x *CommunitySubscribeRequest) Reset() {
 	*x = CommunitySubscribeRequest{}
-	mi := &file_community_proto_msgTypes[25]
+	mi := &file_community_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1647,7 +1735,7 @@ func (x *CommunitySubscribeRequest) String() string {
 func (*CommunitySubscribeRequest) ProtoMessage() {}
 
 func (x *CommunitySubscribeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_community_proto_msgTypes[25]
+	mi := &file_community_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1660,7 +1748,7 @@ func (x *CommunitySubscribeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CommunitySubscribeRequest.ProtoReflect.Descriptor instead.
 func (*CommunitySubscribeRequest) Descriptor() ([]byte, []int) {
-	return file_community_proto_rawDescGZIP(), []int{25}
+	return file_community_proto_rawDescGZIP(), []int{27}
 }
 
 type CommunitySubscribeResponse struct {
@@ -1671,7 +1759,7 @@ type CommunitySubscribeResponse struct {
 
 func (x *CommunitySubscribeResponse) Reset() {
 	*x = CommunitySubscribeResponse{}
-	mi := &file_community_proto_msgTypes[26]
+	mi := &file_community_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1683,7 +1771,7 @@ func (x *CommunitySubscribeResponse) String() string {
 func (*CommunitySubscribeResponse) ProtoMessage() {}
 
 func (x *CommunitySubscribeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_community_proto_msgTypes[26]
+	mi := &file_community_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1696,7 +1784,7 @@ func (x *CommunitySubscribeResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CommunitySubscribeResponse.ProtoReflect.Descriptor instead.
 func (*CommunitySubscribeResponse) Descriptor() ([]byte, []int) {
-	return file_community_proto_rawDescGZIP(), []int{26}
+	return file_community_proto_rawDescGZIP(), []int{28}
 }
 
 type YouTubeStatus struct {
@@ -1709,7 +1797,7 @@ type YouTubeStatus struct {
 
 func (x *YouTubeStatus) Reset() {
 	*x = YouTubeStatus{}
-	mi := &file_community_proto_msgTypes[27]
+	mi := &file_community_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1721,7 +1809,7 @@ func (x *YouTubeStatus) String() string {
 func (*YouTubeStatus) ProtoMessage() {}
 
 func (x *YouTubeStatus) ProtoReflect() protoreflect.Message {
-	mi := &file_community_proto_msgTypes[27]
+	mi := &file_community_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1734,7 +1822,7 @@ func (x *YouTubeStatus) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use YouTubeStatus.ProtoReflect.Descriptor instead.
 func (*YouTubeStatus) Descriptor() ([]byte, []int) {
-	return file_community_proto_rawDescGZIP(), []int{27}
+	return file_community_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *YouTubeStatus) GetLinked() bool {
@@ -1834,6 +1922,10 @@ const file_community_proto_rawDesc = "" +
 	"\x11published_content\x18\x01 \x01(\v2&.retrovibed.community.PublishedContentR\x11published_content\x12E\n" +
 	"\fpublish_mode\x18\x02 \x01(\x0e2!.retrovibed.community.PublishModeR\fpublish_modeJ\x04\b\x03\x10\x04\"n\n" +
 	"\x16PublishContentResponse\x12T\n" +
+	"\x11published_content\x18\x01 \x01(\v2&.retrovibed.community.PublishedContentR\x11published_content\"s\n" +
+	"\x1bPublishContentDeleteRequest\x12T\n" +
+	"\x11published_content\x18\x01 \x01(\v2&.retrovibed.community.PublishedContentR\x11published_content\"t\n" +
+	"\x1cPublishContentDeleteResponse\x12T\n" +
 	"\x11published_content\x18\x01 \x01(\v2&.retrovibed.community.PublishedContentR\x11published_content\"\x80\x01\n" +
 	"\x1bPublishedContentListRequest\x12\"\n" +
 	"\fcommunity_id\x18\x01 \x01(\tR\fcommunity_id\x12\x17\n" +
@@ -1910,7 +2002,7 @@ func file_community_proto_rawDescGZIP() []byte {
 }
 
 var file_community_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_community_proto_msgTypes = make([]protoimpl.MessageInfo, 28)
+var file_community_proto_msgTypes = make([]protoimpl.MessageInfo, 30)
 var file_community_proto_goTypes = []any{
 	(PublishMode)(0),                     // 0: retrovibed.community.PublishMode
 	(*Community)(nil),                    // 1: retrovibed.community.Community
@@ -1929,18 +2021,20 @@ var file_community_proto_goTypes = []any{
 	(*PublishedContent)(nil),             // 14: retrovibed.community.PublishedContent
 	(*PublishContentRequest)(nil),        // 15: retrovibed.community.PublishContentRequest
 	(*PublishContentResponse)(nil),       // 16: retrovibed.community.PublishContentResponse
-	(*PublishedContentListRequest)(nil),  // 17: retrovibed.community.PublishedContentListRequest
-	(*PublishedContentListResponse)(nil), // 18: retrovibed.community.PublishedContentListResponse
-	(*CommunityMetric)(nil),              // 19: retrovibed.community.CommunityMetric
-	(*PublishedContentMetric)(nil),       // 20: retrovibed.community.PublishedContentMetric
-	(*CommunityMetricsRequest)(nil),      // 21: retrovibed.community.CommunityMetricsRequest
-	(*CommunityMetricsResponse)(nil),     // 22: retrovibed.community.CommunityMetricsResponse
-	(*MetricsSyncRequest)(nil),           // 23: retrovibed.community.MetricsSyncRequest
-	(*MetricsSyncResponse)(nil),          // 24: retrovibed.community.MetricsSyncResponse
-	(*MetricsSyncProgress)(nil),          // 25: retrovibed.community.MetricsSyncProgress
-	(*CommunitySubscribeRequest)(nil),    // 26: retrovibed.community.CommunitySubscribeRequest
-	(*CommunitySubscribeResponse)(nil),   // 27: retrovibed.community.CommunitySubscribeResponse
-	(*YouTubeStatus)(nil),                // 28: retrovibed.community.YouTubeStatus
+	(*PublishContentDeleteRequest)(nil),  // 17: retrovibed.community.PublishContentDeleteRequest
+	(*PublishContentDeleteResponse)(nil), // 18: retrovibed.community.PublishContentDeleteResponse
+	(*PublishedContentListRequest)(nil),  // 19: retrovibed.community.PublishedContentListRequest
+	(*PublishedContentListResponse)(nil), // 20: retrovibed.community.PublishedContentListResponse
+	(*CommunityMetric)(nil),              // 21: retrovibed.community.CommunityMetric
+	(*PublishedContentMetric)(nil),       // 22: retrovibed.community.PublishedContentMetric
+	(*CommunityMetricsRequest)(nil),      // 23: retrovibed.community.CommunityMetricsRequest
+	(*CommunityMetricsResponse)(nil),     // 24: retrovibed.community.CommunityMetricsResponse
+	(*MetricsSyncRequest)(nil),           // 25: retrovibed.community.MetricsSyncRequest
+	(*MetricsSyncResponse)(nil),          // 26: retrovibed.community.MetricsSyncResponse
+	(*MetricsSyncProgress)(nil),          // 27: retrovibed.community.MetricsSyncProgress
+	(*CommunitySubscribeRequest)(nil),    // 28: retrovibed.community.CommunitySubscribeRequest
+	(*CommunitySubscribeResponse)(nil),   // 29: retrovibed.community.CommunitySubscribeResponse
+	(*YouTubeStatus)(nil),                // 30: retrovibed.community.YouTubeStatus
 }
 var file_community_proto_depIdxs = []int32{
 	0,  // 0: retrovibed.community.Community.default_publish_mode:type_name -> retrovibed.community.PublishMode
@@ -1957,18 +2051,20 @@ var file_community_proto_depIdxs = []int32{
 	14, // 11: retrovibed.community.PublishContentRequest.published_content:type_name -> retrovibed.community.PublishedContent
 	0,  // 12: retrovibed.community.PublishContentRequest.publish_mode:type_name -> retrovibed.community.PublishMode
 	14, // 13: retrovibed.community.PublishContentResponse.published_content:type_name -> retrovibed.community.PublishedContent
-	1,  // 14: retrovibed.community.PublishedContentListResponse.community:type_name -> retrovibed.community.Community
-	17, // 15: retrovibed.community.PublishedContentListResponse.next:type_name -> retrovibed.community.PublishedContentListRequest
-	14, // 16: retrovibed.community.PublishedContentListResponse.items:type_name -> retrovibed.community.PublishedContent
-	19, // 17: retrovibed.community.CommunityMetricsResponse.summary:type_name -> retrovibed.community.CommunityMetric
-	20, // 18: retrovibed.community.CommunityMetricsResponse.items:type_name -> retrovibed.community.PublishedContentMetric
-	19, // 19: retrovibed.community.MetricsSyncResponse.community_metrics:type_name -> retrovibed.community.CommunityMetric
-	20, // 20: retrovibed.community.MetricsSyncResponse.content_metrics:type_name -> retrovibed.community.PublishedContentMetric
-	21, // [21:21] is the sub-list for method output_type
-	21, // [21:21] is the sub-list for method input_type
-	21, // [21:21] is the sub-list for extension type_name
-	21, // [21:21] is the sub-list for extension extendee
-	0,  // [0:21] is the sub-list for field type_name
+	14, // 14: retrovibed.community.PublishContentDeleteRequest.published_content:type_name -> retrovibed.community.PublishedContent
+	14, // 15: retrovibed.community.PublishContentDeleteResponse.published_content:type_name -> retrovibed.community.PublishedContent
+	1,  // 16: retrovibed.community.PublishedContentListResponse.community:type_name -> retrovibed.community.Community
+	19, // 17: retrovibed.community.PublishedContentListResponse.next:type_name -> retrovibed.community.PublishedContentListRequest
+	14, // 18: retrovibed.community.PublishedContentListResponse.items:type_name -> retrovibed.community.PublishedContent
+	21, // 19: retrovibed.community.CommunityMetricsResponse.summary:type_name -> retrovibed.community.CommunityMetric
+	22, // 20: retrovibed.community.CommunityMetricsResponse.items:type_name -> retrovibed.community.PublishedContentMetric
+	21, // 21: retrovibed.community.MetricsSyncResponse.community_metrics:type_name -> retrovibed.community.CommunityMetric
+	22, // 22: retrovibed.community.MetricsSyncResponse.content_metrics:type_name -> retrovibed.community.PublishedContentMetric
+	23, // [23:23] is the sub-list for method output_type
+	23, // [23:23] is the sub-list for method input_type
+	23, // [23:23] is the sub-list for extension type_name
+	23, // [23:23] is the sub-list for extension extendee
+	0,  // [0:23] is the sub-list for field type_name
 }
 
 func init() { file_community_proto_init() }
@@ -1982,7 +2078,7 @@ func file_community_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_community_proto_rawDesc), len(file_community_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   28,
+			NumMessages:   30,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

@@ -101,6 +101,14 @@ message PublishContentResponse {
   PublishedContent published_content = 1 [ json_name = "published_content" ];
 }
 
+message PublishContentDeleteRequest {
+  PublishedContent published_content = 1 [ json_name = "published_content" ];
+}
+
+message PublishContentDeleteResponse {
+  PublishedContent published_content = 1 [ json_name = "published_content" ];
+}
+
 message PublishedContentListRequest {
   string community_id = 1 [ json_name = "community_id" ];
   reserved 2 to 899;

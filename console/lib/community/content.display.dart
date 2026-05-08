@@ -16,15 +16,23 @@ typedef FnPublished =
       int limit,
     });
 
+typedef FnPublishedTombstone =
+    Future<PublishContentDeleteResponse> Function(
+      String id, {
+      List<httpx.Option> options,
+    });
+
 class CommunityContentDisplay extends StatefulWidget {
   final Community community;
   final FnPublished apipublished;
+  final FnPublishedTombstone apitombstone;
   final Widget help;
 
   const CommunityContentDisplay({
     super.key,
     required this.community,
     this.apipublished = api.API.published,
+    this.apitombstone = api.API.publishedtombstone,
     this.help = ds.HelpScope.None,
   });
 
@@ -106,6 +114,16 @@ class _CommunityContentDisplayState extends State<CommunityContentDisplay> {
         (item) => _ContentRow(
           community: widget.community,
           item: item,
+          onDelete:
+              (content) => httpx
+                  .withRetry(
+                    () => widget.apitombstone(content.id, options: [authn.AuthzCache.bearer(context)]),
+                  )
+                  .then((_) {
+                    setState(() {
+                      _resp.items.remove(content);
+                    });
+                  }),
         ),
       ),
       loading: _loading,
@@ -150,8 +168,9 @@ class _CommunityContentDisplayState extends State<CommunityContentDisplay> {
 class _ContentRow extends StatelessWidget {
   final Community community;
   final PublishedContent item;
+  final Future<void> Function(PublishedContent)? onDelete;
 
-  const _ContentRow({required this.community, required this.item});
+  const _ContentRow({required this.community, required this.item, this.onDelete});
 
   @override
   Widget build(BuildContext context) {
@@ -182,6 +201,30 @@ class _ContentRow extends StatelessWidget {
           ),
         ),
         if (item.archivedId != uuidx.min()) Icon(Icons.archive, color: theme.colorScheme.primary),
+        if (onDelete != null)
+          ds.LoadingIconButton(
+            icon: Icon(Icons.delete, color: Colors.red),
+            tooltip: 'remove content',
+            onPressed: () async {
+              ds.modals
+                  .of(context)
+                  ?.push(
+                    ds.Confirmation.yesNo(
+                      content: Text(
+                        'Are you sure you want to delist "${item.title.isNotEmpty ? item.title : item.id}"?',
+                      ),
+                      onConfirm: () {
+                        onDelete!(item).whenComplete(() {
+                          ds.modals.of(context)?.push(null);
+                        });
+                      },
+                      onCancel: () {
+                        ds.modals.of(context)?.push(null);
+                      },
+                    ),
+                  );
+            },
+          ),
       ],
       expanded: SizedBox(
         width: double.infinity,

@@ -37,19 +37,16 @@ class _QRAttributionState extends State<QRAttribution> {
     final qrData = encodeQRPayload(widget.community, attribution: _attribution);
 
     return ds.Help(
-      ds.Debug.pink(
-        ds.Container(
-          margin: defaults.margin.copyWith(left: 0.0, right: 0.0),
-          clipBehavior: Clip.antiAlias,
-          constraints: BoxConstraints(maxHeight: defaults.compact),
-          ClipRRect(
-            borderRadius: defaults.borderRadius,
-            child: QrImageView(
-              data: qrData,
-              version: QrVersions.auto,
-              backgroundColor: Colors.white,
-              dataModuleStyle: QrDataModuleStyle(color: Colors.black),
-            ),
+      ds.Container(
+        clipBehavior: Clip.antiAlias,
+        constraints: BoxConstraints(maxHeight: defaults.compact + defaults.padding.vertical),
+        ClipRRect(
+          borderRadius: defaults.borderRadius,
+          child: QrImageView(
+            data: qrData,
+            version: QrVersions.auto,
+            backgroundColor: Colors.white,
+            dataModuleStyle: QrDataModuleStyle(color: Colors.black),
           ),
         ),
       ),
