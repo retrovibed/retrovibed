@@ -2,22 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/httpx.dart' as httpx;
-import 'package:retrovibed/community/api.dart';
-import 'package:retrovibed/community/qr.attribution.dart';
-import 'package:retrovibed/community/metrics.dashboard.dart';
-import 'package:retrovibed/community/community.detail.dart';
-import 'package:retrovibed/community/community.button.subscribe.dart';
-import 'package:retrovibed/community/community.button.publish.dart';
-import 'package:retrovibed/community/community.button.delete.dart';
-import 'package:retrovibed/community/community.button.share.dart';
-import 'package:retrovibed/community/community.update.dart';
+import 'api.dart';
+import 'qr.attribution.dart';
+import 'metrics.dashboard.dart';
+import 'community.detail.dart';
+import 'community.button.subscribe.dart';
+import 'community.button.publish.dart';
+import 'community.button.delete.dart';
+import 'community.button.share.dart';
+import 'community.update.dart';
+import 'content.display.dart';
 
-class OwnerListDisplayItem extends StatelessWidget {
+class ManagementListDisplayItem extends StatelessWidget {
   final Community community;
   final void Function(Community)? onChanged;
   final FnSubscribe subscribe;
 
-  const OwnerListDisplayItem({
+  const ManagementListDisplayItem({
     super.key,
     required this.community,
     this.onChanged,
@@ -61,35 +62,28 @@ class OwnerListDisplayItem extends StatelessWidget {
           alignment: WrapAlignment.center,
           spacing: defaults.spacing,
           children: [
-            CommunityUpdate(
-              constraints: BoxConstraints(maxWidth: defaults.compact),
-              community: community,
-              update: (updated) {
-                var auth = [authn.DeeppoolAuthzCache.bearer(context)];
-                return httpx.withRetry(
-                  () => API.update(
-                    updated.id,
-                    CommunityUpdateRequest(community: updated),
-                    options: auth,
-                  ),
-                );
-              },
-              onUpdate: (c) => onChanged?.call(c),
-              onCancel: () {},
+            ds.Debug.blue(
+              CommunityUpdate(
+                constraints: BoxConstraints(maxWidth: defaults.compact),
+                community: community,
+                update: (updated) {
+                  var auth = [authn.DeeppoolAuthzCache.bearer(context)];
+                  return httpx.withRetry(
+                    () => API.update(
+                      updated.id,
+                      CommunityUpdateRequest(community: updated),
+                      options: auth,
+                    ),
+                  );
+                },
+                onUpdate: (c) => onChanged?.call(c),
+                onCancel: () {},
+              ),
             ),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                QRAttribution(community: community),
-                Text(
-                  'Scan this QR code to subscribe to this community',
-                  style: theme.textTheme.bodyMedium,
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
+            ds.Debug.green(QRAttribution(community: community)),
             Divider(height: 32),
             MetricsDashboard(community: community),
+            CommunityContentDisplay(community: community),
           ],
         ),
       ),

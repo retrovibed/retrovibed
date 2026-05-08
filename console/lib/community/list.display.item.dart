@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/community/api.dart';
-import 'package:retrovibed/community/list.display.item.owner.dart';
+import 'package:retrovibed/community/list.display.item.management.dart';
 import 'package:retrovibed/community/list.display.item.subscriber.dart';
 
 class ListDisplayItem extends StatelessWidget {
@@ -30,7 +30,7 @@ class ListDisplayItem extends StatelessWidget {
         onChanged: onChanged,
         subscribe: subscribe,
       ),
-      child: OwnerListDisplayItem(
+      child: ManagementListDisplayItem(
         community: community,
         onChanged: onChanged,
         subscribe: subscribe,

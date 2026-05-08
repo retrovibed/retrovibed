@@ -8,10 +8,29 @@ import 'api.dart' as api;
 import 'community.pb.dart';
 import 'publish.container.dart';
 
+typedef FnPublished = Future<PublishedContentListResponse> Function(
+  String id, {
+  List<httpx.Option> options,
+  int offset,
+  int limit,
+});
+
+typedef FnMagnet = Future<media_pb.MagnetCreateResponse> Function(
+  media_pb.MagnetCreateRequest req, {
+  List<httpx.Option> options,
+});
+
 class CommunityContentDisplay extends StatefulWidget {
   final Community community;
+  final FnPublished apipublished;
+  final FnMagnet apimagnet;
 
-  const CommunityContentDisplay({super.key, required this.community});
+  const CommunityContentDisplay({
+    super.key,
+    required this.community,
+    this.apipublished = api.API.published,
+    this.apimagnet = media_api.discovered.magnet,
+  });
 
   @override
   State<CommunityContentDisplay> createState() => _CommunityContentDisplayState();
@@ -45,10 +64,9 @@ class _CommunityContentDisplayState extends State<CommunityContentDisplay> {
       _cause = ds.Error.zero;
     });
 
-    // TODO: deeppool endpoints for published content
     return httpx
         .withRetry(
-          () => api.API.published(
+          () => widget.apipublished(
             widget.community.id,
             options: [authn.DeeppoolAuthzCache.bearer(context)],
           ),
@@ -86,63 +104,54 @@ class _CommunityContentDisplayState extends State<CommunityContentDisplay> {
     final theme = Theme.of(context);
     final defaults = ds.Defaults.of(context);
 
-    final emptyState = Center(
-      child: Padding(
-        padding: EdgeInsets.all(defaults.spacing * 4),
-        child: Column(
+    return ds.Table<PublishedContent>(
+      ds.Table.expanded<PublishedContent>(
+        (item) => _ContentRow(
+          community: widget.community,
+          item: item,
+          apimagnet: widget.apimagnet,
+        ),
+      ),
+      loading: _loading,
+      cause: _cause,
+      children: _content,
+      leading: Padding(
+        padding: defaults.padding,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Icon(Icons.folder_off, size: 48, color: theme.colorScheme.outline),
-            SizedBox(height: defaults.spacing),
-            Text(
-              'No content published yet',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.outline,
-              ),
-            ),
-            SizedBox(height: defaults.spacing),
-            TextButton.icon(
+            Text('Published Content', style: theme.textTheme.titleMedium),
+            ElevatedButton.icon(
               onPressed: _showPublishModal,
               icon: Icon(Icons.add),
-              label: Text('Publish your first content'),
+              label: Text('Publish'),
             ),
           ],
         ),
       ),
-    );
-
-    final contentList = Expanded(
-      child: ListView.builder(
-        padding: defaults.padding,
-        itemCount: _content.length,
-        itemBuilder: (context, index) {
-          final item = _content[index];
-          return _ContentRow(community: widget.community, item: item);
-        },
-      ),
-    );
-
-    return ds.Loading(
-      loading: _loading,
-      cause: _cause,
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: defaults.padding,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Published Content', style: theme.textTheme.titleMedium),
-                ElevatedButton.icon(
-                  onPressed: _showPublishModal,
-                  icon: Icon(Icons.add),
-                  label: Text('Publish'),
+      empty: Center(
+        child: Padding(
+          padding: EdgeInsets.all(defaults.spacing * 4),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.folder_off, size: 48, color: theme.colorScheme.outline),
+              SizedBox(height: defaults.spacing),
+              Text(
+                'No content published yet',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.outline,
                 ),
-              ],
-            ),
+              ),
+              SizedBox(height: defaults.spacing),
+              TextButton.icon(
+                onPressed: _showPublishModal,
+                icon: Icon(Icons.add),
+                label: Text('Publish your first content'),
+              ),
+            ],
           ),
-          if (_content.isEmpty) emptyState else contentList,
-        ],
+        ),
       ),
     );
   }
@@ -151,57 +160,49 @@ class _CommunityContentDisplayState extends State<CommunityContentDisplay> {
 class _ContentRow extends StatelessWidget {
   final Community community;
   final PublishedContent item;
+  final FnMagnet apimagnet;
 
-  const _ContentRow({required this.community, required this.item});
+  const _ContentRow({required this.community, required this.item, required this.apimagnet});
 
   Future<void> _archive(BuildContext context) {
     final req = media_pb.MagnetCreateRequest(uri: item.magnetUri);
     return httpx.withRetry(
-      () => media_api.discovered.magnet(req, options: [authn.AuthzCache.bearer(context)]),
+      () => apimagnet(req, options: [authn.AuthzCache.bearer(context)]),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final defaults = ds.Defaults.of(context);
 
-    return Card(
-      margin: EdgeInsets.only(bottom: defaults.spacing),
-      child: Padding(
-        padding: defaults.padding,
-        child: Row(
-          children: [
-            Icon(Icons.movie, size: 40, color: theme.colorScheme.primary),
-            SizedBox(width: defaults.spacing),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    item.knownMediaId,
-                    style: theme.textTheme.bodyLarge,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(height: defaults.spacing / 2),
-                  Text(
-                    item.magnetUri,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.outline,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+    return ds.TableRow(
+      [
+        Icon(Icons.movie, size: 40, color: theme.colorScheme.primary),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                item.knownMediaId,
+                style: theme.textTheme.bodyLarge,
+                overflow: TextOverflow.ellipsis,
               ),
-            ),
-            ds.LoadingIconButton(
-              tooltip: 'Archive this content',
-              onPressed: () => _archive(context),
-              icon: Icon(Icons.download),
-            ),
-          ],
+              Text(
+                item.magnetUri,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.outline,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
         ),
-      ),
+        ds.LoadingIconButton(
+          tooltip: 'Archive this content',
+          onPressed: () => _archive(context),
+          icon: Icon(Icons.download),
+        ),
+      ],
     );
   }
 }
