@@ -36,19 +36,21 @@ class _QRAttributionState extends State<QRAttribution> {
     final defaults = ds.Defaults.of(context);
     final qrData = encodeQRPayload(widget.community, attribution: _attribution);
 
-    return ds.Container(
-      margin: defaults.margin.copyWith(left: 0.0, right: 0.0),
-      clipBehavior: Clip.antiAlias,
-      constraints: BoxConstraints(maxHeight: defaults.compact, maxWidth: defaults.compact),
-      ClipRRect(
-        borderRadius: defaults.borderRadius,
-        child: QrImageView(
-          data: qrData,
-          version: QrVersions.auto,
-          backgroundColor: Colors.white,
-          dataModuleStyle: QrDataModuleStyle(color: Colors.black),
+    return ds.Help(
+      ds.Container(
+        clipBehavior: Clip.antiAlias,
+        constraints: BoxConstraints(maxHeight: defaults.compact + defaults.padding.vertical),
+        ClipRRect(
+          borderRadius: defaults.borderRadius,
+          child: QrImageView(
+            data: qrData,
+            version: QrVersions.auto,
+            backgroundColor: Colors.white,
+            dataModuleStyle: QrDataModuleStyle(color: Colors.black),
+          ),
         ),
       ),
+      ds.Hint(Text("Scanning this QR code will subscribe users to this community")),
     );
   }
 }

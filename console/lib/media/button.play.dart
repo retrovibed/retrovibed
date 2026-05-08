@@ -15,8 +15,8 @@ Future<void> Function()? PlayAction(
   MediaSearchResponse s,
 ) {
   switch (mimex.icon(current.mimetype)) {
-    case mimex.movie:
-    case mimex.audio:
+    case mimex.icomovie:
+    case mimex.icoaudio:
       final playlist = Playlist.of(context);
       return playlist == null
           ? null
@@ -127,8 +127,8 @@ class ButtonPlay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     switch (mimex.icon(current.mimetype)) {
-      case mimex.movie:
-      case mimex.audio:
+      case mimex.icomovie:
+      case mimex.icoaudio:
         return IconButton(
           icon: Icon(Icons.play_circle_outline_rounded),
           onPressed: PlayAction(context, current, playlist),

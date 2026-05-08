@@ -7,12 +7,35 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 )
 
-type scanner[T any] interface {
+type Scanner[T any] interface {
 	Scan(i *T) error
 	Next() bool
 	Close() error
 	Err() error
 }
+
+type rowsscanner[T any] struct {
+	rows *sql.Rows
+}
+
+func (r *rowsscanner[T]) Scan(i *T) error { return r.rows.Scan(i) }
+func (r *rowsscanner[T]) Next() bool      { return r.rows.Next() }
+func (r *rowsscanner[T]) Close() error    { return r.rows.Close() }
+func (r *rowsscanner[T]) Err() error      { return r.rows.Err() }
+
+func NewRowsScanner[T any](rows *sql.Rows, err error) Scanner[T] {
+	if err != nil {
+		return errorScanner[T]{cause: err}
+	}
+	return &rowsscanner[T]{rows: rows}
+}
+
+type errorScanner[T any] struct{ cause error }
+
+func (e errorScanner[T]) Scan(_ *T) error { return e.cause }
+func (e errorScanner[T]) Next() bool      { return false }
+func (e errorScanner[T]) Close() error    { return nil }
+func (e errorScanner[T]) Err() error      { return e.cause }
 
 type Iter[T any] interface {
 	Iter() iter.Seq[T]
@@ -20,13 +43,16 @@ type Iter[T any] interface {
 }
 
 type scanningiter[T any] struct {
-	s     scanner[T]
+	s     Scanner[T]
 	cause error
 }
 
 func (t *scanningiter[T]) Iter() iter.Seq[T] {
 	return func(yield func(T) bool) {
-		defer t.s.Close()
+		defer func() {
+			t.cause = errorsx.Compact(t.cause, t.s.Close())
+		}()
+
 		for t.s.Next() {
 			var (
 				p T
@@ -50,13 +76,13 @@ func (t *scanningiter[T]) Err() error {
 	return t.cause
 }
 
-func Scan[T any](s scanner[T]) Iter[T] {
+func Scan[T any](s Scanner[T]) Iter[T] {
 	return &scanningiter[T]{
 		s: s,
 	}
 }
 
-func ScanOne[T any](s scanner[T]) (_zero T, _ error) {
+func ScanOne[T any](s Scanner[T]) (_zero T, _ error) {
 	i := Scan(s)
 
 	for v := range i.Iter() {
@@ -67,7 +93,7 @@ func ScanOne[T any](s scanner[T]) (_zero T, _ error) {
 }
 
 // ScanInto a slice, automatically closes the scanner once done.
-func ScanInto[T any](s scanner[T], dst *[]T) (err error) {
+func ScanInto[T any](s Scanner[T], dst *[]T) (err error) {
 	i := Scan(s)
 	for v := range i.Iter() {
 		*dst = append(*dst, v)

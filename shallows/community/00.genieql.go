@@ -21,11 +21,13 @@ func PublishedContentScanner(gql genieql.Scanner, pattern func(i PublishedConten
 	gql.ColumnNamePrefix("published_content.")
 }
 
+func IDScanner(gql genieql.Scanner, pattern func(i string)) {}
+
 func PublishedContentInsertWithDefaults(
 	gql genieql.Insert,
 	pattern func(ctx context.Context, q sqlx.Queryer, a PublishedContent) NewPublishedContentScannerStaticRow,
 ) {
-	gql.Into("published_content").Default("id", "published_at", "created_at", "updated_at").Conflict("ON CONFLICT (community_id, library_id) DO UPDATE SET magnet_uri = EXCLUDED.magnet_uri, known_media_id = EXCLUDED.known_media_id, publish_mode = EXCLUDED.publish_mode, oauth_google_id = EXCLUDED.oauth_google_id, bytes = EXCLUDED.bytes, published_at = DEFAULT, updated_at = DEFAULT")
+	gql.Into("published_content").Default("id", "published_at", "created_at", "updated_at", "tombstoned_at").Conflict("ON CONFLICT (community_id, library_id) DO UPDATE SET magnet_uri = EXCLUDED.magnet_uri, known_media_id = EXCLUDED.known_media_id, publish_mode = EXCLUDED.publish_mode, oauth_google_id = EXCLUDED.oauth_google_id, bytes = EXCLUDED.bytes, published_at = DEFAULT, updated_at = DEFAULT")
 }
 
 func PublishedContentFindByID(
@@ -39,7 +41,7 @@ func PublishedContentFindByCommunityID(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer, communityID string) NewPublishedContentScannerStatic,
 ) {
-	gql = gql.Query(`SELECT ` + PublishedContentScannerStaticColumns + ` FROM published_content WHERE "community_id" = {communityID} ORDER BY published_at DESC`)
+	gql = gql.Query(`SELECT ` + PublishedContentScannerStaticColumns + ` FROM published_content WHERE "community_id" = {communityID} AND tombstoned_at = 'infinity' ORDER BY published_at DESC`)
 }
 
 func PublishedContentFindByMagnetURI(
@@ -77,11 +79,18 @@ func PublishedContentUpdatePublishedAt(
 	gql = gql.Query(`UPDATE published_content SET published_at = {publishedAt}, updated_at = now() WHERE id = {id} RETURNING ` + PublishedContentScannerStaticColumns)
 }
 
+func PublishedContentTombstone(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewPublishedContentScannerStaticRow,
+) {
+	gql = gql.Query(`UPDATE published_content SET tombstoned_at = now(), updated_at = now() WHERE id = {id} RETURNING ` + PublishedContentScannerStaticColumns)
+}
+
 func PublishedContentFindByPendingSync(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer) NewPublishedContentScannerStatic,
 ) {
-	gql = gql.Query(`SELECT ` + PublishedContentScannerStaticColumns + ` FROM published_content WHERE published_at >= 'infinity' AND (publish_mode > 0 OR oauth_google_id != '00000000-0000-0000-0000-000000000000')`)
+	gql = gql.Query(`SELECT ` + PublishedContentScannerStaticColumns + ` FROM published_content WHERE published_at >= 'infinity' AND tombstoned_at = 'infinity' AND (publish_mode > 0 OR oauth_google_id != '00000000-0000-0000-0000-000000000000')`)
 }
 
 func PublishedContentFindByCommunityIDForFeed(
@@ -160,7 +169,7 @@ func CommunitySyncStateInsertWithDefaults(
 	gql genieql.Insert,
 	pattern func(ctx context.Context, q sqlx.Queryer, a CommunitySyncState) NewCommunitySyncStateScannerStaticRow,
 ) {
-	gql.Into("community_sync_state").Default("id", "created_at", "updated_at").Conflict("ON CONFLICT (community_id) DO UPDATE SET updated_at = DEFAULT, last_sync_at = EXCLUDED.last_sync_at")
+	gql.Into("community_sync_state").Default("id", "created_at", "updated_at", "sync_feed_at").Conflict("ON CONFLICT (community_id) DO UPDATE SET updated_at = DEFAULT, last_sync_at = EXCLUDED.last_sync_at")
 }
 
 func CommunitySyncStateFindByCommunityID(
@@ -168,6 +177,27 @@ func CommunitySyncStateFindByCommunityID(
 	pattern func(ctx context.Context, q sqlx.Queryer, communityID string) NewCommunitySyncStateScannerStaticRow,
 ) {
 	gql = gql.Query(`SELECT ` + CommunitySyncStateScannerStaticColumns + ` FROM community_sync_state WHERE community_id = {communityID}`)
+}
+
+func CommunitySyncStateRequestFeedSync(
+	gql genieql.Insert,
+	pattern func(ctx context.Context, q sqlx.Queryer, a CommunitySyncState) NewCommunitySyncStateScannerStaticRow,
+) {
+	gql.Into("community_sync_state").Default("id", "created_at", "updated_at", "last_sync_at").Conflict("ON CONFLICT (community_id) DO UPDATE SET updated_at = DEFAULT, sync_feed_at = EXCLUDED.sync_feed_at")
+}
+
+func CommunitySyncStateLookupFeedSyncRequests(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer) NewCommunitySyncStateScannerStatic,
+) {
+	gql = gql.Query(`SELECT ` + CommunitySyncStateScannerStaticColumns + ` FROM community_sync_state WHERE sync_feed_at < NOW()`)
+}
+
+func CommunitySyncStateRequestFeedSyncCompleted(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, cid string) NewCommunitySyncStateScannerStaticRow,
+) {
+	gql = gql.Query(`UPDATE community_sync_state SET sync_feed_at = DEFAULT, updated_at = NOW() WHERE community_id = {cid} RETURNING ` + CommunitySubscriptionScannerStaticColumns)
 }
 
 func CommunitySubscription(gql genieql.Structure) {

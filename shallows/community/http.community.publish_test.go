@@ -44,6 +44,7 @@ func TestPublishEndpoint(t *testing.T) {
 			ID:             libraryID,
 			Description:    "test media",
 			Bytes:          1024,
+			Mimetype:       "audio/mpeg",
 			TorrentID:      uuid.Nil.String(),
 			KnownMediaID:   uuid.Nil.String(),
 			ArchiveID:      uuid.Nil.String(),
@@ -92,6 +93,8 @@ func TestPublishEndpoint(t *testing.T) {
 		require.NoError(t, community.PublishedContentFindByID(ctx, q, result.PublishedContent.Id).Scan(&pc))
 		require.Equal(t, "", pc.MagnetURI)
 		require.Equal(t, libraryID, pc.LibraryID)
+		require.Equal(t, lmd.Mimetype, pc.Mimetype)
+		require.Equal(t, lmd.Bytes, pc.Bytes)
 
 		var updatedLmd library.Metadata
 		require.NoError(t, library.MetadataFindByID(ctx, q, libraryID).Scan(&updatedLmd))
@@ -120,6 +123,7 @@ func TestPublishEndpoint(t *testing.T) {
 			ID:             libraryID,
 			Description:    "test media",
 			Bytes:          1024,
+			Mimetype:       "audio/mpeg",
 			TorrentID:      uuid.Nil.String(),
 			KnownMediaID:   uuid.Nil.String(),
 			ArchiveID:      uuid.Nil.String(),
@@ -165,6 +169,8 @@ func TestPublishEndpoint(t *testing.T) {
 		var pc community.PublishedContent
 		require.NoError(t, community.PublishedContentFindByID(ctx, q, result.PublishedContent.Id).Scan(&pc))
 		require.Equal(t, int32(meta.PublishMode_LISTED), pc.PublishMode)
+		require.Equal(t, lmd.Mimetype, pc.Mimetype)
+		require.Equal(t, lmd.Bytes, pc.Bytes)
 
 		var updatedLmd library.Metadata
 		require.NoError(t, library.MetadataFindByID(ctx, q, libraryID).Scan(&updatedLmd))
@@ -193,6 +199,7 @@ func TestPublishEndpoint(t *testing.T) {
 			ID:             libraryID,
 			Description:    "test media",
 			Bytes:          1024,
+			Mimetype:       "audio/mpeg",
 			TorrentID:      uuid.Nil.String(),
 			KnownMediaID:   uuid.Nil.String(),
 			ArchiveID:      uuid.Nil.String(),
@@ -238,6 +245,8 @@ func TestPublishEndpoint(t *testing.T) {
 		var pc community.PublishedContent
 		require.NoError(t, community.PublishedContentFindByID(ctx, q, result.PublishedContent.Id).Scan(&pc))
 		require.Equal(t, int32(meta.PublishMode_SYNDICATED), pc.PublishMode)
+		require.Equal(t, lmd.Mimetype, pc.Mimetype)
+		require.Equal(t, lmd.Bytes, pc.Bytes)
 
 		var updatedLmd library.Metadata
 		require.NoError(t, library.MetadataFindByID(ctx, q, libraryID).Scan(&updatedLmd))

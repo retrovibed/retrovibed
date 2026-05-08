@@ -184,20 +184,6 @@ class _MetricsDashboardState extends State<MetricsDashboard> {
                     ),
                   ],
                 ),
-                Visibility(
-                  visible: _metrics.items.isNotEmpty,
-                  child: Column(
-                    children: [
-                      SizedBox(height: defaults.spacing * 2),
-                      Text(
-                        'Per-Content Breakdown',
-                        style: theme.textTheme.titleSmall,
-                      ),
-                      SizedBox(height: defaults.spacing),
-                      ..._metrics.items.map((item) => _MetricRow(metric: item)),
-                    ],
-                  ),
-                ),
               ],
             )
             : emptyState;
@@ -270,44 +256,6 @@ class _MetricCard extends StatelessWidget {
                 color: theme.colorScheme.outline,
               ),
               overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _MetricRow extends StatelessWidget {
-  final PublishedContentMetric metric;
-
-  const _MetricRow({required this.metric});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final defaults = ds.Defaults.of(context);
-
-    return Card(
-      margin: EdgeInsets.only(bottom: defaults.spacing / 2),
-      child: Padding(
-        padding: defaults.padding,
-        child: Row(
-          children: [
-            Expanded(
-              flex: 2,
-              child: Text(
-                metric.publishedContentId,
-                style: theme.textTheme.bodySmall,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            Expanded(
-              child: Text(
-                '${metric.archivers} archivers',
-                style: theme.textTheme.bodyMedium,
-                textAlign: TextAlign.end,
-              ),
             ),
           ],
         ),

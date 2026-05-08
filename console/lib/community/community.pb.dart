@@ -1315,6 +1315,128 @@ class PublishContentResponse extends $pb.GeneratedMessage {
   PublishedContent ensurePublishedContent() => $_ensure(0);
 }
 
+class PublishContentDeleteRequest extends $pb.GeneratedMessage {
+  factory PublishContentDeleteRequest({
+    PublishedContent? publishedContent,
+  }) {
+    final result = create();
+    if (publishedContent != null) result.publishedContent = publishedContent;
+    return result;
+  }
+
+  PublishContentDeleteRequest._();
+
+  factory PublishContentDeleteRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory PublishContentDeleteRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'PublishContentDeleteRequest',
+      package: const $pb.PackageName(
+          _omitMessageNames ? '' : 'retrovibed.community'),
+      createEmptyInstance: create)
+    ..aOM<PublishedContent>(1, _omitFieldNames ? '' : 'published_content',
+        subBuilder: PublishedContent.create)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  PublishContentDeleteRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  PublishContentDeleteRequest copyWith(
+          void Function(PublishContentDeleteRequest) updates) =>
+      super.copyWith(
+              (message) => updates(message as PublishContentDeleteRequest))
+          as PublishContentDeleteRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static PublishContentDeleteRequest create() =>
+      PublishContentDeleteRequest._();
+  @$core.override
+  PublishContentDeleteRequest createEmptyInstance() => create();
+  @$core.pragma('dart2js:noInline')
+  static PublishContentDeleteRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<PublishContentDeleteRequest>(create);
+  static PublishContentDeleteRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  PublishedContent get publishedContent => $_getN(0);
+  @$pb.TagNumber(1)
+  set publishedContent(PublishedContent value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasPublishedContent() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearPublishedContent() => $_clearField(1);
+  @$pb.TagNumber(1)
+  PublishedContent ensurePublishedContent() => $_ensure(0);
+}
+
+class PublishContentDeleteResponse extends $pb.GeneratedMessage {
+  factory PublishContentDeleteResponse({
+    PublishedContent? publishedContent,
+  }) {
+    final result = create();
+    if (publishedContent != null) result.publishedContent = publishedContent;
+    return result;
+  }
+
+  PublishContentDeleteResponse._();
+
+  factory PublishContentDeleteResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory PublishContentDeleteResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'PublishContentDeleteResponse',
+      package: const $pb.PackageName(
+          _omitMessageNames ? '' : 'retrovibed.community'),
+      createEmptyInstance: create)
+    ..aOM<PublishedContent>(1, _omitFieldNames ? '' : 'published_content',
+        subBuilder: PublishedContent.create)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  PublishContentDeleteResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  PublishContentDeleteResponse copyWith(
+          void Function(PublishContentDeleteResponse) updates) =>
+      super.copyWith(
+              (message) => updates(message as PublishContentDeleteResponse))
+          as PublishContentDeleteResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static PublishContentDeleteResponse create() =>
+      PublishContentDeleteResponse._();
+  @$core.override
+  PublishContentDeleteResponse createEmptyInstance() => create();
+  @$core.pragma('dart2js:noInline')
+  static PublishContentDeleteResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<PublishContentDeleteResponse>(create);
+  static PublishContentDeleteResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  PublishedContent get publishedContent => $_getN(0);
+  @$pb.TagNumber(1)
+  set publishedContent(PublishedContent value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasPublishedContent() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearPublishedContent() => $_clearField(1);
+  @$pb.TagNumber(1)
+  PublishedContent ensurePublishedContent() => $_ensure(0);
+}
+
 class PublishedContentListRequest extends $pb.GeneratedMessage {
   factory PublishedContentListRequest({
     $core.String? communityId,

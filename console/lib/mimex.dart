@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:mime/mime.dart' as mimetype;
 export 'package:mime/mime.dart';
 
+const metadataarchive = "application/vnd";
 const bittorrent = "application/x-bittorrent";
+const binary = "application/octet-stream";
 
 final resolver = mimetype.MimeTypeResolver()..addMagicNumber([0x4F, 0x67, 0x67, 0x53], "video/ogg");
 
@@ -11,13 +13,15 @@ String fromFile(String s, {List<int>? magicbits}) {
 }
 
 String maybe(String? s) {
-  return s ?? "application/octet-stream";
+  s = s ?? "";
+  return s.isNotEmpty ? s : binary;
 }
 
-const movie = Icons.movie;
-const audio = Icons.music_note_outlined;
-const image = Icons.image;
-const binary = Icons.file_open_outlined;
+const icomovie = Icons.movie;
+const icoaudio = Icons.music_note_outlined;
+const icoimage = Icons.image;
+const icobinary = Icons.file_open_outlined;
+const icometadataarchive = Icons.live_tv;
 
 String ext(String mime) {
   return mimetype.extensionFromMime(mime) ?? ".bin";
@@ -109,9 +113,9 @@ const List<String> audios = [
 ];
 
 List<String> of(IconData v) {
-  if (v == movie) return videos;
-  if (v == image) return images;
-  if (v == audio) return audios;
+  if (v == icomovie) return videos;
+  if (v == icoimage) return images;
+  if (v == icoaudio) return audios;
   return const [];
 }
 
@@ -128,16 +132,20 @@ bool isVideo(String mimetype) => mimetype.startsWith('video/');
 
 IconData icon(String mimetype) {
   if (isVideo(mimetype)) {
-    return movie;
+    return icomovie;
   }
 
   if (mimetype.startsWith('audio/')) {
-    return audio;
+    return icoaudio;
   }
 
   if (mimetype.startsWith('image/')) {
-    return image;
+    return icoimage;
   }
 
-  return binary;
+  if (mimetype == metadataarchive) {
+    return icometadataarchive;
+  }
+
+  return icobinary;
 }

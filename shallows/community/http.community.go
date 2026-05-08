@@ -2,7 +2,9 @@ package community
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -49,12 +51,6 @@ func HTTPOptionHTTPClient(c *http.Client) HTTPOption {
 	}
 }
 
-func HTTPOptionArchival(a *asyncx.Wakeup) HTTPOption {
-	return func(t *HTTP) {
-		t.archival = a
-	}
-}
-
 func HTTPOptionPublishing(p *asyncx.Wakeup) HTTPOption {
 	return func(t *HTTP) {
 		t.publishing = p
@@ -78,7 +74,6 @@ func NewHTTP(q sqlx.Queryer, options ...HTTPOption) *HTTP {
 		q:          q,
 		jwtsecret:  env.JWTSecret,
 		decoder:    formx.NewDecoder(),
-		archival:   asyncx.NewWakeup(context.Background()),
 		publishing: asyncx.NewWakeup(context.Background()),
 	}, options...)
 
@@ -90,7 +85,6 @@ type HTTP struct {
 	jwtsecret      jwtx.SecretSource
 	decoder        *form.Decoder
 	httpc          *http.Client
-	archival       *asyncx.Wakeup
 	publishing     *asyncx.Wakeup
 	mediastorage   fsx.Virtual
 	torrentstorage fsx.Virtual
@@ -105,6 +99,13 @@ func (t *HTTP) Bind(r *mux.Router) {
 		httpauth.AuthenticateWithToken(t.jwtsecret),
 		httpx.Timeout2s(),
 	).ThenFunc(t.search))
+
+	r.Path("/{id}/published").Methods(http.MethodDelete).Handler(alice.New(
+		httpx.RouteInvoked,
+		httpx.ContextBufferPool512(),
+		httpauth.AuthenticateWithToken(t.jwtsecret),
+		httpx.Timeout2s(),
+	).ThenFunc(t.tombstoned))
 
 	r.Path("/{id}/publish").Methods(http.MethodPost).Handler(alice.New(
 		httpx.RouteInvoked,
@@ -138,6 +139,50 @@ func (t *HTTP) Bind(r *mux.Router) {
 		httpauth.AuthenticateWithToken(t.jwtsecret),
 		httpx.Timeout2s(),
 	).ThenFunc(t.subscribe))
+}
+
+func (t *HTTP) tombstoned(w http.ResponseWriter, r *http.Request) {
+	pid := mux.Vars(r)["id"]
+
+	var (
+		cs  CommunitySyncState
+		req meta.PublishContentDeleteRequest
+		pc  PublishedContent
+	)
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to decode publish request"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		return
+	}
+
+	if err := PublishedContentDeleteByID(r.Context(), t.q, pid).Scan(&pc); errors.Is(err, sql.ErrNoRows) {
+		log.Println(errorsx.Wrap(err, "unable to tombstone missing record"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
+		return
+	}
+
+	if err := CommunitySyncStateRequestFeedSync(r.Context(), t.q, CommunitySyncState{
+		CommunityID: pc.CommunityID,
+		SyncFeedAt:  time.Now(),
+	}).Scan(&cs); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to request feed sync for community"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
+		return
+	}
+
+	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &meta.PublishContentDeleteResponse{
+		PublishedContent: langx.Autoptr(
+			langx.Clone(
+				meta.PublishedContent{},
+				PublishedContentOptionFromDB(langx.Clone(pc, timex.JSONSafeEncodeOption)),
+			),
+		),
+	}); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to write response"))
+		return
+	}
+
+	t.publishing.Broadcast()
 }
 
 func (t *HTTP) publish(w http.ResponseWriter, r *http.Request) {
@@ -183,6 +228,7 @@ func (t *HTTP) publish(w http.ResponseWriter, r *http.Request) {
 		PublishMode:   int32(req.PublishMode),
 		OAuthGoogleID: stringsx.FirstNonBlank(req.PublishedContent.OauthGoogleId, uuid.Nil.String()),
 		Bytes:         lmd.Bytes,
+		Mimetype:      lmd.Mimetype,
 	}
 
 	if err = PublishedContentInsertWithDefaults(r.Context(), t.q, pc).Scan(&pc); err != nil {

@@ -37,3 +37,18 @@ func AutoPublishing(ctx context.Context, q sqlx.Queryer, c *http.Client, mvfs, t
 
 	return nil
 }
+
+func AutoFeedSync(ctx context.Context, q sqlx.Queryer, c *http.Client, async *asyncx.Wakeup) error {
+	published := deeppool.NewPublished(c)
+
+	contextx.Run(ctx, func() {
+		errorsx.Log(asyncx.Run(ctx, async, func(ctx context.Context) error {
+			if err := community.SyncFeed(ctx, q, c, published); err != nil {
+				log.Println(errorsx.Wrap(err, "feed sync failed"))
+			}
+			return nil
+		}))
+	})
+
+	return nil
+}

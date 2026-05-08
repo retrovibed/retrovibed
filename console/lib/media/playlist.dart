@@ -83,7 +83,7 @@ class _PlaylistState extends State<Playlist> {
   );
   ValueNotifier<api.MediaSearchResponse> search = ValueNotifier(
     api.media.response(
-      next: api.media.request(limit: 32, mimetypes: mimex.of(mimex.audio)),
+      next: api.media.request(limit: 32, mimetypes: mimex.of(mimex.icoaudio)),
     ),
   );
   Known get current => _queue.current;

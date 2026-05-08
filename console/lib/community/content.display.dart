@@ -2,23 +2,51 @@ import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/authn.dart' as authn;
-import 'package:retrovibed/media/api.dart' as media_api;
-import 'package:retrovibed/media/media.pb.dart' as media_pb;
+import 'package:retrovibed/mimex.dart' as mimex;
+import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'api.dart' as api;
 import 'community.pb.dart';
-import 'publish.container.dart';
+import 'content.detail.dart';
+
+typedef FnPublished =
+    Future<PublishedContentListResponse> Function(
+      String id, {
+      List<httpx.Option> options,
+      int offset,
+      int limit,
+    });
+
+typedef FnPublishedTombstone =
+    Future<PublishContentDeleteResponse> Function(
+      String id, {
+      List<httpx.Option> options,
+    });
 
 class CommunityContentDisplay extends StatefulWidget {
   final Community community;
+  final FnPublished apipublished;
+  final FnPublishedTombstone apitombstone;
+  final Widget help;
 
-  const CommunityContentDisplay({super.key, required this.community});
+  const CommunityContentDisplay({
+    super.key,
+    required this.community,
+    this.apipublished = api.API.published,
+    this.apitombstone = api.API.publishedtombstone,
+    this.help = ds.HelpScope.None,
+  });
 
   @override
   State<CommunityContentDisplay> createState() => _CommunityContentDisplayState();
 }
 
 class _CommunityContentDisplayState extends State<CommunityContentDisplay> {
-  List<PublishedContent> _content = [];
+  PublishedContentListResponse _resp = PublishedContentListResponse(
+    next: PublishedContentListRequest(
+      offset: ds.Int64(0),
+      limit: ds.Int64(20),
+    ),
+  );
   bool _loading = true;
   Widget _cause = ds.Error.zero;
 
@@ -36,28 +64,34 @@ class _CommunityContentDisplayState extends State<CommunityContentDisplay> {
   @override
   void initState() {
     super.initState();
-    _loadContent();
+    _refresh(_resp.next);
   }
 
-  Future<Null> _loadContent() {
+  Future<void> _refresh(PublishedContentListRequest req) {
     setState(() {
       _loading = true;
       _cause = ds.Error.zero;
     });
 
-    // TODO: deeppool endpoints for published content
     return httpx
         .withRetry(
-          () => api.API.published(
+          () => widget.apipublished(
             widget.community.id,
-            options: [authn.DeeppoolAuthzCache.bearer(context)],
+            options: [authn.AuthzCache.bearer(context)],
+            offset: req.offset.toInt(),
+            limit: req.limit.toInt(),
           ),
         )
         .then((response) {
           setState(() {
-            _content = response.items;
+            _resp = response;
           });
         })
+        .catchError((cause) {
+          setState(() {
+            _cause = ds.Errors.httpauto(cause, onTap: _clearCause);
+          });
+        }, test: httpx.ErrorsTest.httpauto)
         .catchError((cause) {
           setState(() {
             _cause = ds.Error.unknown(cause, onTap: _clearCause);
@@ -70,79 +104,62 @@ class _CommunityContentDisplayState extends State<CommunityContentDisplay> {
         });
   }
 
-  void _showPublishModal() {
-    ds.modals.asyncfn<void>(
-      context,
-      (completion) => PublishContainer(
-        onCancel: completion.complete,
-        onPublished: () => _loadContent().then(completion.complete),
-        community: widget.community,
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final defaults = ds.Defaults.of(context);
 
-    final emptyState = Center(
-      child: Padding(
-        padding: EdgeInsets.all(defaults.spacing * 4),
-        child: Column(
-          children: [
-            Icon(Icons.folder_off, size: 48, color: theme.colorScheme.outline),
-            SizedBox(height: defaults.spacing),
-            Text(
-              'No content published yet',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.outline,
-              ),
-            ),
-            SizedBox(height: defaults.spacing),
-            TextButton.icon(
-              onPressed: _showPublishModal,
-              icon: Icon(Icons.add),
-              label: Text('Publish your first content'),
-            ),
-          ],
+    return ds.Table<PublishedContent>(
+      ds.Table.expanded<PublishedContent>(
+        (item) => _ContentRow(
+          community: widget.community,
+          item: item,
+          onDelete:
+              (content) => httpx
+                  .withRetry(
+                    () => widget.apitombstone(content.id, options: [authn.AuthzCache.bearer(context)]),
+                  )
+                  .then((_) {
+                    setState(() {
+                      _resp.items.remove(content);
+                    });
+                  }),
         ),
       ),
-    );
-
-    final contentList = Expanded(
-      child: ListView.builder(
-        padding: defaults.padding,
-        itemCount: _content.length,
-        itemBuilder: (context, index) {
-          final item = _content[index];
-          return _ContentRow(community: widget.community, item: item);
-        },
-      ),
-    );
-
-    return ds.Loading(
       loading: _loading,
       cause: _cause,
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: defaults.padding,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Published Content', style: theme.textTheme.titleMedium),
-                ElevatedButton.icon(
-                  onPressed: _showPublishModal,
-                  icon: Icon(Icons.add),
-                  label: Text('Publish'),
+      children: _resp.items,
+      leading: ds.SearchTray(
+        decoration: InputDecoration(hintText: "search content"),
+        onSubmitted: (_) {
+          setState(() => _resp.next..offset = ds.Int64(0));
+          return _refresh(_resp.next);
+        },
+        next: (i) {
+          setState(() => _resp.next..offset = i);
+          _refresh(_resp.next);
+        },
+        current: _resp.next.offset,
+        empty: ds.Int64(_resp.items.length) < _resp.next.limit,
+        help: widget.help,
+      ),
+      empty: Center(
+        child: Padding(
+          padding: EdgeInsets.all(defaults.spacing * 4),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            spacing: defaults.spacing,
+            children: [
+              Icon(Icons.folder_off, size: 48, color: theme.colorScheme.outline),
+              Text(
+                'No content published yet',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.outline,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-          if (_content.isEmpty) emptyState else contentList,
-        ],
+        ),
       ),
     );
   }
@@ -151,55 +168,69 @@ class _CommunityContentDisplayState extends State<CommunityContentDisplay> {
 class _ContentRow extends StatelessWidget {
   final Community community;
   final PublishedContent item;
+  final Future<void> Function(PublishedContent)? onDelete;
 
-  const _ContentRow({required this.community, required this.item});
-
-  Future<void> _archive(BuildContext context) {
-    final req = media_pb.MagnetCreateRequest(uri: item.magnetUri);
-    return httpx.withRetry(
-      () => media_api.discovered.magnet(req, options: [authn.AuthzCache.bearer(context)]),
-    );
-  }
+  const _ContentRow({required this.community, required this.item, this.onDelete});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final defaults = ds.Defaults.of(context);
 
-    return Card(
-      margin: EdgeInsets.only(bottom: defaults.spacing),
-      child: Padding(
-        padding: defaults.padding,
-        child: Row(
-          children: [
-            Icon(Icons.movie, size: 40, color: theme.colorScheme.primary),
-            SizedBox(width: defaults.spacing),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+    return ds.TableRow(
+      key: ValueKey(item.id),
+      [
+        Icon(mimex.icon(item.mimetype), size: 40, color: theme.colorScheme.primary),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                item.title.isNotEmpty ? item.title : item.id,
+                style: theme.textTheme.bodyLarge,
+                overflow: TextOverflow.ellipsis,
+              ),
+              Wrap(
+                spacing: defaults.spacing,
                 children: [
-                  Text(
-                    item.knownMediaId,
-                    style: theme.textTheme.bodyLarge,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(height: defaults.spacing / 2),
-                  Text(
-                    item.magnetUri,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.outline,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  ds.Bytes(item.bytes),
+                  ds.Timestamp.iso8601(item.publishedAt, leading: Text('published ')),
                 ],
               ),
-            ),
-            ds.LoadingIconButton(
-              tooltip: 'Archive this content',
-              onPressed: () => _archive(context),
-              icon: Icon(Icons.download),
-            ),
-          ],
+            ],
+          ),
+        ),
+        if (item.archivedId != uuidx.min()) Icon(Icons.archive, color: theme.colorScheme.primary),
+        if (onDelete != null)
+          ds.LoadingIconButton(
+            icon: Icon(Icons.delete, color: Colors.red),
+            tooltip: 'remove content',
+            onPressed: () async {
+              ds.modals
+                  .of(context)
+                  ?.push(
+                    ds.Confirmation.yesNo(
+                      content: Text(
+                        'Are you sure you want to delist "${item.title.isNotEmpty ? item.title : item.id}"?',
+                      ),
+                      onConfirm: () {
+                        onDelete!(item).whenComplete(() {
+                          ds.modals.of(context)?.push(null);
+                        });
+                      },
+                      onCancel: () {
+                        ds.modals.of(context)?.push(null);
+                      },
+                    ),
+                  );
+            },
+          ),
+      ],
+      expanded: SizedBox(
+        width: double.infinity,
+        child: ds.Container(
+          padding: defaults.padding,
+          PublishedContentDetail(item: item),
         ),
       ),
     );

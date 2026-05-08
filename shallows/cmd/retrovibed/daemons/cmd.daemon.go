@@ -188,6 +188,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		log.Println("automatic archival is enabled")
 		errorsx.Log(AutoArchival(gctx.Context, db, mediastore, archival, t.AutoArchive))
 		errorsx.Log(AutoPublishing(gctx.Context, db, deepjwt, mediastore, tvfs, publishing))
+		errorsx.Log(AutoFeedSync(gctx.Context, db, deepjwt, publishing))
 		errorsx.Log(SubscriptionSync(gctx.Context, db, deepjwt))
 		tstore = library.NewTorrentStorageFromHTTP(deepjwt, db, tstore)
 	} else {
@@ -312,7 +313,6 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	community.NewHTTP(
 		db,
 		envx.Toggle(community.HTTPOptionNoop, community.HTTPOptionHTTPClient(deepjwt), t.AutoArchive),
-		community.HTTPOptionArchival(archival),
 		community.HTTPOptionPublishing(publishing),
 		community.HTTPOptionMediaStorage(mediastore),
 		community.HTTPOptionTorrentStorage(tvfs),

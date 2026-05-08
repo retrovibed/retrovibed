@@ -99,21 +99,21 @@ class API {
   }
 
   static Future<PublishedContentListResponse> published(
-    String id, {
+    String cid, {
     List<httpx.Option> options = const [],
     int offset = 0,
     int limit = 100,
   }) async {
     final req =
         PublishedContentListRequest()
-          ..communityId = id
+          ..communityId = cid
           ..offset = fixnum.Int64(offset)
           ..limit = fixnum.Int64(limit);
     return httpx
         .get(
           Uri.https(
-            httpx.metaendpoint(),
-            "/p/",
+            httpx.host(),
+            "/c/$cid/published",
             jsonDecode(jsonEncode(req.toProto3Json())),
           ),
           options: [httpx.Accept.json, ...options],
@@ -121,6 +121,27 @@ class API {
         .then((v) {
           return Future.value(
             PublishedContentListResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+          );
+        });
+  }
+
+  static Future<PublishContentDeleteResponse> publishedtombstone(
+    String pid, {
+    List<httpx.Option> options = const [],
+  }) async {
+    final req = PublishContentDeleteResponse();
+    return httpx
+        .delete(
+          Uri.https(
+            httpx.host(),
+            "/c/published/$pid",
+            jsonDecode(jsonEncode(req.toProto3Json())),
+          ),
+          options: [httpx.Accept.json, ...options],
+        )
+        .then((v) {
+          return Future.value(
+            PublishContentDeleteResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
           );
         });
   }

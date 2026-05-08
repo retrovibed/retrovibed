@@ -227,7 +227,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                                 if (_loading) return Future.value([]);
                                 if (search.items.isNotEmpty) return Future.value([]);
                                 if (search.next.mimetypes.isNotEmpty &&
-                                    mimex.checksum(search.next.mimetypes) != mimex.checksumfor(mimex.movie))
+                                    mimex.checksum(search.next.mimetypes) != mimex.checksumfor(mimex.icomovie))
                                   return Future.value([]);
 
                                 return httpx.withRetry(
