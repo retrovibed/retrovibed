@@ -21,44 +21,6 @@ import (
 )
 
 func TestTombstonedEndpoint(t *testing.T) {
-	t.Run("returns 400 for invalid request body", func(t *testing.T) {
-		var (
-			ctx, done   = testx.Context(t)
-			q           = sqltestx.Metadatabase(t)
-			p           meta.Profile
-			v           meta.Authz
-			communityID = uuid.Must(uuid.NewV7()).String()
-		)
-		defer done()
-
-		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
-		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
-		require.NoError(t, testx.Fake(&v, meta.AuthzOptionProfileID(p.ID), meta.AuthzOptionAdmin))
-		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
-
-		routes := mux.NewRouter()
-		community.NewHTTP(
-			q,
-			community.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
-			community.HTTPOptionMediaStorage(fsx.DirVirtual(t.TempDir())),
-			community.HTTPOptionTorrentStorage(fsx.DirVirtual(t.TempDir())),
-		).Bind(routes.PathPrefix("/c").Subrouter())
-
-		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
-		resp, req, err := httptestx.BuildRequestContextBytes(
-			ctx,
-			http.MethodDelete,
-			"/c/"+communityID+"/published",
-			[]byte("not-valid-json"),
-			httptestx.RequestOptionAuthorization("Bearer "+httpauthtest.UnsafeToken(claims, httpauthtest.UnsafeJWTSecretSource)),
-			httptestx.RequestOptionContent("application/json"),
-		)
-		require.NoError(t, err)
-
-		routes.ServeHTTP(resp, req)
-		require.Equal(t, http.StatusBadRequest, resp.Code)
-	})
-
 	t.Run("returns 404 when published content does not exist", func(t *testing.T) {
 		var (
 			ctx, done     = testx.Context(t)
@@ -83,14 +45,11 @@ func TestTombstonedEndpoint(t *testing.T) {
 		).Bind(routes.PathPrefix("/c").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
-		body, err := json.Marshal(&meta.PublishContentDeleteRequest{})
-		require.NoError(t, err)
-
 		resp, req, err := httptestx.BuildRequestContextBytes(
 			ctx,
 			http.MethodDelete,
-			"/c/"+nonExistentID+"/published",
-			body,
+			"/c/published/"+nonExistentID,
+			nil,
 			httptestx.RequestOptionAuthorization("Bearer "+httpauthtest.UnsafeToken(claims, httpauthtest.UnsafeJWTSecretSource)),
 			httptestx.RequestOptionContent("application/json"),
 		)
@@ -144,14 +103,11 @@ func TestTombstonedEndpoint(t *testing.T) {
 		).Bind(routes.PathPrefix("/c").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
-		body, err := json.Marshal(&meta.PublishContentDeleteRequest{})
-		require.NoError(t, err)
-
 		resp, req, err := httptestx.BuildRequestContextBytes(
 			ctx,
 			http.MethodDelete,
-			"/c/"+pc.ID+"/published",
-			body,
+			"/c/published/"+pc.ID,
+			nil,
 			httptestx.RequestOptionAuthorization("Bearer "+httpauthtest.UnsafeToken(claims, httpauthtest.UnsafeJWTSecretSource)),
 			httptestx.RequestOptionContent("application/json"),
 		)
@@ -221,14 +177,11 @@ func TestTombstonedEndpoint(t *testing.T) {
 		).Bind(routes.PathPrefix("/c").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
-		body, err := json.Marshal(&meta.PublishContentDeleteRequest{})
-		require.NoError(t, err)
-
 		resp, req, err := httptestx.BuildRequestContextBytes(
 			ctx,
 			http.MethodDelete,
-			"/c/"+pc1.ID+"/published",
-			body,
+			"/c/published/"+pc1.ID,
+			nil,
 			httptestx.RequestOptionAuthorization("Bearer "+httpauthtest.UnsafeToken(claims, httpauthtest.UnsafeJWTSecretSource)),
 			httptestx.RequestOptionContent("application/json"),
 		)
