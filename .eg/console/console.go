@@ -154,7 +154,7 @@ func Install(b *tarballs.Build) eg.OpFn {
 		shell.Op(
 			runtime.Newf("mkdir -p %s", dstdir),
 			runtime.Newf("ls -lha  %s/retrovibed", bundledir).Lenient(true),
-			runtime.Newf("mv %s/retrovibed %s/console", bundledir, bundledir),
+			runtime.Newf("mv %s/retrovibed %s/retrovibe", bundledir, bundledir),
 			runtime.Newf("cp -R %s/* %s", bundledir, dstdir),
 			runtime.Newf("cp -R %s/* %s/lib", libdir, dstdir),
 			// runtime.Newf("tree %s", dstdir),
