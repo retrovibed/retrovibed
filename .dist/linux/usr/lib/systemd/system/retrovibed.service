@@ -11,7 +11,7 @@ ConfigurationDirectory=%E/%p
 RuntimeDirectory=%p
 RuntimeDirectoryMode=0700
 EnvironmentFile=-/etc/retrovibed/config.env
-ExecStart=/usr/bin/retrovibed daemon
+ExecStart=/usr/bin/retrovibe daemon
 
 [Install]
 WantedBy=default.target
