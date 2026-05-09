@@ -103,7 +103,7 @@ retrovibed identity show
 ### install daemon from source
 
 ```bash
-go install github.com/retrovibed/retrovibed/shallows/cmd/retrovibed/...
+go install github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/...
 ```
 
 ### general commands
