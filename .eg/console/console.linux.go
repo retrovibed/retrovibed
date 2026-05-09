@@ -58,7 +58,7 @@ func BuildAndroidBundle(runtime shell.Command) eg.OpFn {
 
 func flatpak(final egflatpak.Module) *egflatpak.Builder {
 	return egflatpak.New(
-		"space.retrovibe.Console", "console",
+		"space.retrovibe.Console", "retrovibe",
 		egflatpak.Option().SDK("org.gnome.Sdk", "50").Runtime("org.gnome.Platform", "50").
 			Modules(
 				flatpakmods.Libduckdb(),
@@ -127,11 +127,11 @@ func FlatpakManifest(b *tarballs.Build) eg.OpFn {
 
 func moduleTarball(url, sha256d string) egflatpak.Module {
 	return egflatpak.NewModule("retrovibed", "simple", egflatpak.ModuleOptions().Commands(
-		"sed 's|Exec=/usr/lib/retrovibed/console|Exec=/app/bin/console|' usr/share/applications/space.retrovibe.Console.desktop > /app/share/applications/space.retrovibe.Console.desktop",
+		"mv usr/share/applications/space.retrovibe.Console.desktop /app/share/applications/space.retrovibe.Console.desktop",
 		"mv usr/share/icons/hicolor/scalable/apps/space.retrovibe.Console.svg /app/share/icons/hicolor/scalable/apps/space.retrovibe.Console.svg",
 		"mv usr/share/metainfo/space.retrovibe.Console.metainfo.xml /app/share/metainfo/space.retrovibe.Console.metainfo.xml",
 		"mv usr/share/licenses/space.retrovibe.Console /app/share/licenses/space.retrovibe.Console",
-		"mv usr/lib/retrovibed/lib /app/lib",
+		"mv usr/lib/retrovibed/lib/* /app/lib",
 		"mv usr/lib/retrovibed/* /app/bin",
 		"rm -rf usr",
 		"rm -rf etc",
