@@ -8,22 +8,20 @@ AppDir:
     name: retrovibed
     icon: space.retrovibe.Console
     version: !ENV "${VERSION}"
-    exec: usr/lib/retrovibed/console
+    exec: usr/lib/retrovibed/retrovibe
     exec_args: $@
 
   apt:
     arch: !ENV "${APT_ARCH}"
     sources:
-      - sourceline: "deb https://mirror.pilotfiber.com/ubuntu/ questing main restricted universe multiverse"
+      - sourceline: "deb https://archive.ubuntu.com/ubuntu/ questing main restricted universe multiverse"
         key_url: "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x871920D1991BC93C"
-      - sourceline: "deb https://mirror.pilotfiber.com/ubuntu/ questing-updates main restricted universe multiverse"
+      - sourceline: "deb https://archive.ubuntu.com/ubuntu/ questing-updates main restricted universe multiverse"
         key_url: "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x871920D1991BC93C"
-      - sourceline: "deb https://mirror.pilotfiber.com/ubuntu/ questing-backports main restricted universe multiverse"
+      - sourceline: "deb https://archive.ubuntu.com/ubuntu/ questing-backports main restricted universe multiverse"
         key_url: "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x871920D1991BC93C"
-      # - sourceline: "deb http://security.ubuntu.com/ubuntu questing-security main restricted universe multiverse"
-      #   key_url: "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x871920D1991BC93C"
-      # - sourceline: "deb https://ppa.launchpadcontent.net/jljatone/retrovibed/ubuntu questing main"
-      #   key_url: !ENV "https://keyserver.ubuntu.com/pks/lookup?op=get&search=${GPG_ID}"
+      - sourceline: "deb http://security.ubuntu.com/ubuntu questing-security main restricted universe multiverse"
+        key_url: "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x871920D1991BC93C"
     include:
       - libgtk-3-0t64
       - libglu1-mesa
@@ -41,9 +39,8 @@ AppDir:
   files:
     exclude:
       - usr/share/man
-      - usr/share/doc/*/README.*
-      - usr/share/doc/*/changelog.*
-      - usr/share/doc/*/NEWS.*
+      - usr/share/doc
+      - usr/share/bash-completion
 
 AppImage:
   comp: zstd
