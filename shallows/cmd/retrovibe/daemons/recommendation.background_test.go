@@ -3,7 +3,7 @@ package daemons_test
 import (
 	"testing"
 
-	"github.com/retrovibed/retrovibed/shallows/cmd/retrovibed/daemons"
+	"github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/daemons"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/testx"
