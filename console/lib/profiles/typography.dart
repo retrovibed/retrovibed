@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
-// import 'package:retrovibed/design.kit/modals.dart' as modals;
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/meta.dart' as meta;
 import 'package:retrovibed/timex.dart' as timex;
 import 'cache.dart';
 import 'disabled.icon.dart';
-// import 'permissions.editor.dart';
-// import 'rename.modal.dart';
 
 class Typography extends StatelessWidget {
   static void noop(Future<meta.Profile> pending) {}
@@ -71,8 +68,9 @@ class Typography extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
-    final session = authn.Authenticated.syncSession(context);
+    final authzmd = authn.AuthzCache.authzmetadata(context);
     final defaultDisplay = current.display.isEmpty ? "-" : current.display;
+
     return Builder(
       builder: (context) {
         final compact = defaults.isCompact;
@@ -114,7 +112,7 @@ class Typography extends StatelessWidget {
                 ),
               Expanded(
                 child: Text(
-                  session.profile.id == current.id ? "you" : defaultDisplay,
+                  authzmd.profileId == current.id ? "you" : defaultDisplay,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),

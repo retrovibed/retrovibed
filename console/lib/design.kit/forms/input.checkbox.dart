@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart' as m;
+import 'package:retrovibed/design.kit/theme.defaults.dart' as theming;
 
 class Checkbox extends m.StatelessWidget {
   final m.Widget? label;
@@ -21,27 +22,23 @@ class Checkbox extends m.StatelessWidget {
 
   @override
   m.Widget build(m.BuildContext context) {
+    final defaults = theming.Defaults.of(context);
     return m.Material(
       color: m.Colors.transparent,
-      child: m.Column(
-        mainAxisSize: m.MainAxisSize.min,
-        crossAxisAlignment: m.CrossAxisAlignment.start,
-        children: [
-          m.IntrinsicHeight(
-            child: m.CheckboxListTile(
-              dense: dense,
-              title: label,
-              secondary: trailing,
-              subtitle: description,
-              value: value,
-              onChanged: onChanged,
-              controlAffinity: m.ListTileControlAffinity.leading,
-              visualDensity: m.VisualDensity.compact,
-              materialTapTargetSize: m.MaterialTapTargetSize.shrinkWrap,
-              contentPadding: m.EdgeInsets.zero,
-            ),
-          ),
-        ],
+      child: m.IntrinsicHeight(
+        child: m.CheckboxListTile(
+          dense: dense,
+          title: label,
+          secondary: trailing,
+          subtitle: description,
+          value: value,
+          onChanged: onChanged,
+          controlAffinity: m.ListTileControlAffinity.leading,
+          visualDensity: m.VisualDensity.compact,
+          materialTapTargetSize: m.MaterialTapTargetSize.shrinkWrap,
+          contentPadding: m.EdgeInsets.zero,
+          shape: m.RoundedRectangleBorder(borderRadius: defaults.borderRadius),
+        ),
       ),
     );
   }

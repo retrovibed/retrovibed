@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/design.kit/forms.dart' as forms;
 
 class AuthzPermissionRow extends StatelessWidget {
@@ -17,9 +18,8 @@ class AuthzPermissionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 288.0),
-      child: forms.Checkbox(
+    return ds.Container(
+      forms.Checkbox(
         Text(label),
         description: Text(
           description,
@@ -29,6 +29,7 @@ class AuthzPermissionRow extends StatelessWidget {
         value: value,
         onChanged: onChanged != null ? (v) => onChanged!(v ?? false) : null,
       ),
+      constraints: const BoxConstraints(maxWidth: 288.0),
     );
   }
 }

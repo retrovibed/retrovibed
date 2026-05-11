@@ -87,15 +87,18 @@ class _ListDisplay extends State<ListDisplay> {
     super.dispose();
   }
 
+  void _replace(meta.Profile v) {
+    setState(() {
+      _res = meta.ProfileSearchResponse(
+        items: _res.items.map((o) => o.id == v.id ? v : o).toList(),
+        next: _res.next,
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
-    final replace = (meta.Profile v) {
-      final replaced = _res.items.map((o) => o.id == v.id ? v : o);
-      setState(() {
-        _res = meta.ProfileSearchResponse(items: replaced, next: _res.next);
-      });
-    };
 
     final togglecreate = () {
       final reset =
@@ -164,7 +167,7 @@ class _ListDisplay extends State<ListDisplay> {
           ),
         ],
       ),
-      ds.Table.expanded<meta.Profile>((v) => ListRow(key: ValueKey(v.id), v, onChange: replace)),
+      ds.Table.expanded<meta.Profile>((v) => ListRow(key: ValueKey(v.id), v, onChange: _replace)),
     );
   }
 }

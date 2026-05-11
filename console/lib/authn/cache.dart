@@ -29,6 +29,11 @@ class AuthzCache extends StatefulWidget {
     return context.findAncestorStateOfType<_AuthzCache>();
   }
 
+  static _meta.Token authzmetadata(BuildContext context) {
+    final cache = of(context) ?? _AuthzCache();
+    return cache.meta.current.metadata;
+  }
+
   static httpx.Option bearer(BuildContext context) {
     final cache = of(context) ?? _AuthzCache();
     return httpx.Request.bearer(() => cache.meta.token().then((v) => v.bearer));

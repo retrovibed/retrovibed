@@ -49,56 +49,55 @@ class ListRow extends StatefulWidget {
 }
 
 class _ListRowState extends State<ListRow> {
-  bool _expanded = false;
+  Future<meta.Token> _authzToken = Future.delayed(Duration(days: 365));
 
-  void _toggle() {
-    setState(() {
-      _expanded = !_expanded;
-    });
+  @override
+  void initState() {
+    super.initState();
+    _authzToken = httpx.withRetry(
+      () => widget.apiauthzget(widget.current.id, options: [authn.AuthzCache.bearer(context)]).then((v) => v.token),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        ds.TableRow.single(typo.Typography(widget.current), onTap: _toggle),
-        if (_expanded)
-          Container(
-            padding: theme.buttonTheme.padding,
-            child: Wrap(
-              children: [
-                Edit(
-                  widget.current,
-                  onChange: (u, _) {
-                    widget
-                        .apiprofileupdate(
-                          meta.ProfileUpdateRequest(profile: u),
-                          options: [authn.AuthzCache.bearer(context)],
-                        )
-                        .then((resp) {
-                          widget.onChange(resp.profile);
-                        });
-                  },
-                ),
-                AuthzMetaEdit.future(
-                  httpx.withRetry(
-                    () => widget
-                        .apiauthzget(widget.current.id, options: [authn.AuthzCache.bearer(context)])
-                        .then((v) => v.token),
-                  ),
-                  onChange: (t) {
-                    widget.apiauthzgrant(widget.current.id, t, options: [authn.AuthzCache.bearer(context)]).then((_) {
-                      widget.onChange(widget.current);
+    return ds.TableRow.single(
+      typo.Typography(
+        widget.current,
+        onChange: (pending) {
+          pending.then((v) => widget.onChange(v));
+        },
+      ),
+      expanded: Container(
+        padding: theme.buttonTheme.padding,
+        child: Wrap(
+          children: [
+            Edit(
+              widget.current,
+              onChange: (u, _) {
+                widget
+                    .apiprofileupdate(
+                      meta.ProfileUpdateRequest(profile: u),
+                      options: [authn.AuthzCache.bearer(context)],
+                    )
+                    .then((resp) {
+                      widget.onChange(resp.profile);
                     });
-                  },
-                ),
-              ],
+              },
             ),
-          ),
-      ],
+            AuthzMetaEdit.future(
+              _authzToken,
+              onChange: (t) {
+                widget.apiauthzgrant(widget.current.id, t, options: [authn.AuthzCache.bearer(context)]).then((_) {
+                  widget.onChange(widget.current);
+                });
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

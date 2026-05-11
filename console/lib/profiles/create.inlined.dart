@@ -104,7 +104,7 @@ class _CreateInlinedState extends State<CreateInlined> {
                   }),
             ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.center,
               spacing: defaults.spacing,
               children: [
                 ds.LoadingButton(Text("Cancel"), onPressed: widget.onClose),

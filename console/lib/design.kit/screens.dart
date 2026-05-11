@@ -1,6 +1,7 @@
 export 'screens/full.dart';
 export 'screens/loading.dart';
 export 'screens/guarded.dart';
+export 'screens/guarded.mask.dart';
 export 'screens/overlay.dart';
 export 'screens/hover.dart';
 export 'screens/masked.dart';

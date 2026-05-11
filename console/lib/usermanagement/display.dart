@@ -36,6 +36,7 @@ class _DisplayState extends State<Display> {
       padding: widget.padding ?? defaults.padding,
       margin: widget.margin ?? defaults.margin,
       Column(
+        spacing: defaults.spacing,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -43,7 +44,6 @@ class _DisplayState extends State<Display> {
               Text("User Management", style: theme.textTheme.titleLarge),
             ],
           ),
-          SizedBox(height: defaults.spacing),
           profiles.ListDisplay(controller: controller, events: events),
         ],
       ),
