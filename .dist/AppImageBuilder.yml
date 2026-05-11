@@ -46,5 +46,4 @@ AppImage:
   comp: zstd
   arch: !ENV "${APPIMAGE_ARCH}"
   update-information: !ENV "gh-releases-zsync|retrovibed|retrovibed|latest|retrovibed-*-${APPIMAGE_ARCH}.AppImage.zsync"
-  # sign-key: None # TODO
   file_name: !ENV "${APPIMAGE_FILE_NAME}"

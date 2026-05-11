@@ -9,7 +9,4 @@ Terminal=false
 StartupNotify=true
 StartupWMClass=space.retrovibe.Console
 Keywords=retro;console;emulator;game;archive;data;media;player;video;audio;
-X-AppImage-Version=${VERSION}
-X-AppImage-Name=retrovibed
-X-AppImage-Arch=${ARCH}
 X-AppImage-UpdateInformation=gh-releases-zsync|retrovibed|retrovibed|latest|retrovibed-*-${ARCH}.AppImage.zsync
