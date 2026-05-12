@@ -1,6 +1,7 @@
 package cmdmedia
 
 import (
+	"context"
 	"database/sql"
 	"log"
 	"strings"
@@ -16,38 +17,40 @@ import (
 )
 
 type knownquery struct {
-	Query string `arg:"" name:"query" help:"query to search for" required:"true"`
+	Database string `flag:"" name:"database" help:"database to read" default:"${vars_user_configuration_directory}/meta.db"`
+	Explicit bool   `flag:"" name:"explicit" help:"include explicit content in results" default:"false"`
+	Query    string `arg:"" name:"query" help:"query to search for" required:"true"`
 }
 
 func (t knownquery) Run(gctx *cmdopts.Global) (err error) {
+	var db *sql.DB
+	if db, err = cmdmeta.DatabaseCustom(gctx.Context, t.Database); err != nil {
+		return err
+	}
+	defer db.Close()
+	return t.run(gctx.Context, db)
+}
+
+func (t knownquery) run(ctx context.Context, db *sql.DB) (err error) {
 	type ScoredKnown struct {
 		library.Known
 		Relevance float64
 	}
-	var (
-		db     *sql.DB
-		result = ScoredKnown{
-			Relevance: -1.0,
-		}
-	)
 
-	if db, err = cmdmeta.DatabaseMeta(gctx.Context); err != nil {
-		return err
-	}
-	defer db.Close()
+	result := ScoredKnown{Relevance: -1.0}
 
 	{
 		q := library.KnownSearchBuilder().Where(squirrel.And{
-			library.KnownQueryExplicit(false),
+			library.KnownQueryExplicit(t.Explicit),
 			lucenex.Query(duckdbx.NewLucene(), t.Query, lucenex.WithDefaultField("auto_description")),
 		}).OrderBy("title DESC").Limit(1028)
 
-		scanner := sqlx.Scan(library.KnownSearch(gctx.Context, db, q))
+		scanner := sqlx.Scan(library.KnownSearch(ctx, db, q))
 
 		for v := range scanner.Iter() {
 			var cur = ScoredKnown{Known: v}
 
-			if err := library.KnownScoreByID(gctx.Context, db, v.UID, t.Query).Scan(&cur.Relevance); err != nil {
+			if err := library.KnownScoreByID(ctx, db, v.UID, t.Query).Scan(&cur.Relevance); err != nil {
 				log.Println("unable to score", v.UID, err)
 				continue
 			}
@@ -71,15 +74,16 @@ func (t knownquery) Run(gctx *cmdopts.Global) (err error) {
 	{
 		terms := strings.ReplaceAll(stringsx.CompactWhitespace(t.Query), " ", " OR ")
 		q := library.KnownSearchBuilder().Where(squirrel.And{
+			library.KnownQueryExplicit(t.Explicit),
 			lucenex.Query(duckdbx.NewLucene(), terms, lucenex.WithDefaultField("title")),
 		})
 
-		scanner := sqlx.Scan(library.KnownSearch(gctx.Context, db, q))
+		scanner := sqlx.Scan(library.KnownSearch(ctx, db, q))
 
 		for v := range scanner.Iter() {
 			var cur = ScoredKnown{Known: v}
 
-			if err := library.KnownScoreByID(gctx.Context, db, v.UID, t.Query).Scan(&cur.Relevance); err != nil {
+			if err := library.KnownScoreByID(ctx, db, v.UID, t.Query).Scan(&cur.Relevance); err != nil {
 				log.Println("unable to score", v.UID, err)
 				continue
 			}
