@@ -1,0 +1,6 @@
+syntax = "proto3";
+package retrovibed.media;
+
+message CleanIDRequest { string text = 1 [ json_name = "text" ]; }
+
+message CleanIDResponse { string text = 1 [ json_name = "text" ]; }

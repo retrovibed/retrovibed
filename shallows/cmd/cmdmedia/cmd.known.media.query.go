@@ -37,7 +37,6 @@ func (t knownquery) Run(gctx *cmdopts.Global) (err error) {
 	defer db.Close()
 
 	{
-
 		q := library.KnownSearchBuilder().Where(squirrel.And{
 			library.KnownQueryExplicit(false),
 			lucenex.Query(duckdbx.NewLucene(), t.Query, lucenex.WithDefaultField("auto_description")),
