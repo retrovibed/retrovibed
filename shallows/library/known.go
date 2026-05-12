@@ -18,6 +18,16 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/unicodex"
 )
 
+type QueryCleaner interface {
+	Clean(ctx context.Context, text string) (string, error)
+}
+
+type NoopQueryCleaner struct{}
+
+func (NoopQueryCleaner) Clean(_ context.Context, text string) (string, error) {
+	return text, nil
+}
+
 func KnownOptionRandomID(t *Known) {
 	t.ID = errorsx.Must(uuid.NewV4()).String()
 }

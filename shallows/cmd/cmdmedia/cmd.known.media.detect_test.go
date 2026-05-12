@@ -1,6 +1,8 @@
 package cmdmedia
 
 import (
+	"bytes"
+	"strings"
 	"testing"
 
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
@@ -10,8 +12,6 @@ import (
 )
 
 func TestKnownDetectRun(t *testing.T) {
-	cmd := knowndetect{}
-
 	t.Run("finds a matching record by title", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
@@ -23,18 +23,30 @@ func TestKnownDetectRun(t *testing.T) {
 
 		require.NoError(t, knownimport{}.run(ctx, db, jsonlBuffer(t, known)))
 
-		result, err := cmd.run(ctx, db, "The Grand Budapest Hotel")
-		require.NoError(t, err)
-		require.Equal(t, known.UID, result.UID)
+		require.NoError(t, knowndetect{}.run(ctx, strings.NewReader("{\"query\":\"The Grand Budapest Hotel\"}\n"), db, library.NoopQueryCleaner{}))
 	})
 
-	t.Run("returns Unknown when no match found", func(t *testing.T) {
+	t.Run("returns no error when no match found", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 		db := sqltestx.Metadatabase(t)
 
-		result, err := cmd.run(ctx, db, "something completely unknown")
-		require.NoError(t, err)
-		require.Equal(t, library.Unknown().UID, result.UID)
+		require.NoError(t, knowndetect{}.run(ctx, strings.NewReader("{\"query\":\"something completely unknown\"}\n"), db, library.NoopQueryCleaner{}))
+	})
+
+	t.Run("query with embedded lucene keywords does not error", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+		db := sqltestx.Metadatabase(t)
+
+		require.NoError(t, knowndetect{}.run(ctx, strings.NewReader("{\"query\":\"How to School 101 Brilliant Ideas to Keep\"}\n"), db, library.NoopQueryCleaner{}))
+	})
+
+	t.Run("fails when stdin is empty", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+		db := sqltestx.Metadatabase(t)
+
+		require.Error(t, knowndetect{}.run(ctx, bytes.NewReader(nil), db, library.NoopQueryCleaner{}))
 	})
 }

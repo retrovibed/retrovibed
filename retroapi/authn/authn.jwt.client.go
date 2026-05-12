@@ -21,7 +21,7 @@ func AutoJWTClient(ctx context.Context) (c *http.Client, err error) {
 		return nil, errorsx.Wrap(err, "failed to create oauth2 http client")
 	}
 
-	return AuthzClient(JWTClient(c)), nil
+	return RetryClient(AuthzClient(JWTClient(c))), nil
 }
 
 func JWTClient(oauth2c *http.Client) *http.Client {

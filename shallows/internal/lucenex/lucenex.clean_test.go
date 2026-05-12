@@ -16,5 +16,10 @@ func TestClean(t *testing.T) {
 	assert.Equal(t, "foo bar", lucenex.Clean("and.foo.bar"))
 	assert.Equal(t, "foo bar", lucenex.Clean("or.foo.bar"))
 	assert.Equal(t, "foo bar", lucenex.Clean("to.foo.bar"))
-	assert.Equal(t, "la legende", lucenex.Clean("La.Légende"))
+	assert.Equal(t, "la legende", lucenex.Clean("La.Légende"))
+	assert.Equal(t, "foo bar", lucenex.Clean("foo.bar.and"))
+	assert.Equal(t, "foo bar", lucenex.Clean("foo.bar.or"))
+	assert.Equal(t, "foo bar", lucenex.Clean("foo.bar.not"))
+	assert.Equal(t, "foo bar", lucenex.Clean("foo.bar.to"))
+	assert.Equal(t, "how school 101 brilliant ideas", lucenex.Clean("How to School 101 Brilliant Ideas to"))
 }

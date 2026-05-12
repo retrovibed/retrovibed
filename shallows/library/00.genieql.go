@@ -205,9 +205,9 @@ func KnownFindRandom(
 
 func KnownScoreByID(
 	gql genieql.Function,
-	pattern func(ctx context.Context, q sqlx.Queryer, uid string, terms string) NewScoredScannerStaticRow,
+	pattern func(ctx context.Context, q sqlx.Queryer, uid string, terms string, cutoff float32) NewScoredScannerStaticRow,
 ) {
-	gql = gql.Query(`SELECT COALESCE(fts_main_library_known_media.match_bm25(md5_lower, {terms}), 0.0)::float AS relevance FROM library_known_media WHERE uid = {uid}`)
+	gql = gql.Query(`SELECT (jaro_winkler_similarity(title, {terms}, {cutoff}) + jaro_similarity(title, {terms}, {cutoff})) / 2 AS relevance FROM library_known_media WHERE uid = {uid}`)
 }
 
 func KnownBestMatch(
