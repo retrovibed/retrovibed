@@ -67,12 +67,16 @@ func Clean(s string) string {
 	o = strings.ToLower(o)
 	o = strings.TrimPrefix(o, "and ")
 	o = strings.ReplaceAll(o, " and ", " ")
+	o = strings.TrimSuffix(o, " and")
 	o = strings.TrimPrefix(o, "or ")
 	o = strings.ReplaceAll(o, " or ", " ")
+	o = strings.TrimSuffix(o, " or")
 	o = strings.TrimPrefix(o, "to ")
 	o = strings.ReplaceAll(o, " to ", " ")
+	o = strings.TrimSuffix(o, " to")
 	o = strings.TrimPrefix(o, "not ")
 	o = strings.ReplaceAll(o, " not ", " ")
+	o = strings.TrimSuffix(o, " not")
 
 	return o
 }

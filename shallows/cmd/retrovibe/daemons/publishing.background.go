@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	rdeepool "github.com/retrovibed/retrovibed/retroapi/deeppool"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/deeppool"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
@@ -28,7 +29,7 @@ func AutoPublishing(ctx context.Context, q sqlx.Queryer, c *http.Client, mvfs, t
 	go asyncx.Periodic(ctx, async, s, "automatic publishing initiated")
 	contextx.Run(ctx, func() {
 		errorsx.Log(asyncx.Run(ctx, async, func(ctx context.Context) error {
-			if err := community.SyncPendingToDeeppool(ctx, q, c, metrics, published, deeppool.NewArchiver(c), mvfs, tvfs); err != nil {
+			if err := community.SyncPendingToDeeppool(ctx, q, c, metrics, published, rdeepool.NewArchiver(c), mvfs, tvfs); err != nil {
 				log.Println(errorsx.Wrap(err, "publishing sync failed"))
 			}
 			return nil

@@ -15,14 +15,18 @@ class AuthzCache extends StatefulWidget {
   const AuthzCache(this.child, {super.key, this.current = _meta.authz.current});
 
   static Future<_meta.AuthzResponse> fake({String? host}) {
-    return Future.value(
-      _meta.AuthzResponse(
-        bearer: uuidx.min(),
-        token: _meta.Token(
-          expires: fixnum.Int64(DateTime.now().millisecondsSinceEpoch + 3600000),
+    return fakeWith(_meta.Token())(host: host);
+  }
+
+  static FnAuthzCurrent fakeWith(_meta.Token token) {
+    return ({String? host}) {
+      return Future.value(
+        _meta.AuthzResponse(
+          bearer: uuidx.min(),
+          token: token..expires = fixnum.Int64(DateTime.now().millisecondsSinceEpoch + 3600000),
         ),
-      ),
-    );
+      );
+    };
   }
 
   static _AuthzCache? of(BuildContext context) {
@@ -30,8 +34,7 @@ class AuthzCache extends StatefulWidget {
   }
 
   static _meta.Token authzmetadata(BuildContext context) {
-    final cache = of(context) ?? _AuthzCache();
-    return cache.meta.current.metadata;
+    return context.dependOnInheritedWidgetOfExactType<_AuthzTokenData>()?.bearer.metadata ?? _meta.Token();
   }
 
   static httpx.Option bearer(BuildContext context) {
@@ -46,6 +49,15 @@ class AuthzCache extends StatefulWidget {
 
   @override
   State<AuthzCache> createState() => _AuthzCache();
+}
+
+class _AuthzTokenData extends InheritedWidget {
+  final authz.Bearer<_meta.Token> bearer;
+
+  const _AuthzTokenData({required this.bearer, required super.child});
+
+  @override
+  bool updateShouldNotify(_AuthzTokenData old) => bearer != old.bearer;
 }
 
 class _AuthzCache extends State<AuthzCache> {
@@ -75,15 +87,18 @@ class _AuthzCache extends State<AuthzCache> {
                 ],
               )
               .then((v) {
-                return authz.Bearer(v.token, v.bearer);
+                final bearer = authz.Bearer(v.token, v.bearer);
+                setState(() {
+                  meta.current = bearer;
+                  _loading = false;
+                });
+                return bearer;
               })
               .catchError((e) {
-                return authz.Bearer(c, "");
-              })
-              .whenComplete(() {
                 setState(() {
                   _loading = false;
                 });
+                return authz.Bearer(c, "");
               }),
           (c, ts) {
             return DateTime.fromMillisecondsSinceEpoch(
@@ -112,9 +127,12 @@ class _AuthzCache extends State<AuthzCache> {
 
   @override
   Widget build(BuildContext context) {
-    return ds.Loading(
-      loading: _loading,
-      _loading ? SizedBox() : widget.child,
+    return _AuthzTokenData(
+      bearer: meta.current,
+      child: ds.Loading(
+        loading: _loading,
+        _loading ? SizedBox() : widget.child,
+      ),
     );
   }
 }

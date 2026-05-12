@@ -64,13 +64,14 @@ func GenerateProtocol(ctx context.Context, op eg.Op) error {
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mrss.proto=github.com/retrovibed/retrovibed/shallows/rss --go_opt=paths=source_relative --go_out=rss rss.proto"),
 		// block cache
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mcontent.addressable.storage.proto=github.com/retrovibed/retroapi/deeppool --go_opt=paths=source_relative --go_out=../retroapi/deeppool content.addressable.storage.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmedia.id.proto=github.com/retrovibed/retrovibed/retroapi/deeppool --go_opt=paths=source_relative --go_out=../retroapi/deeppool media.id.proto"),
 		// community
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mcommunity.proto=github.com/retrovibed/retrovibed/shallows/meta --go_opt=paths=source_relative --go_out=meta community.proto"),
 		// ddisc
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mddisc.peers.proto=github.com/retrovibed/retrovibed/shallows/ddiscapi --go_opt=paths=source_relative --go_out=ddiscapi ddisc.peers.proto"),
 		// settings
-		gruntime.New("protoc --proto_path=../.proto --go_opt=Mstorage.proto=github.com/retrovibed/retrovibed/shallows/cmd/daemons --go_opt=paths=source_relative --go_out=cmd/retrovibed/daemons storage.proto"),
-		gruntime.New("protoc --proto_path=../.proto --go_opt=Mtorrent.proto=github.com/retrovibed/retrovibed/shallows/cmd/daemons --go_opt=paths=source_relative --go_out=cmd/retrovibed/daemons torrent.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mstorage.proto=github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/daemons --go_opt=paths=source_relative --go_out=cmd/retrovibe/daemons storage.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mtorrent.proto=github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/daemons --go_opt=paths=source_relative --go_out=cmd/retrovibe/daemons torrent.proto"),
 	)
 }
 

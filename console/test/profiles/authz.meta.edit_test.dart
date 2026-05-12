@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:retrovibed/profiles.dart' as profiles;
 import 'package:retrovibed/meta.dart' as meta;
+import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
 
 final _resolutions = Resolutions.variant();
@@ -183,6 +184,7 @@ void main() {
               changedToken = token;
             },
           ),
+          authzCurrent: authn.AuthzCache.fakeWith(meta.Token()..usermanagement = true),
         );
         await tester.pumpAndSettle();
 
@@ -205,6 +207,7 @@ void main() {
               changedToken = t;
             },
           ),
+          authzCurrent: authn.AuthzCache.fakeWith(meta.Token()..usermanagement = true),
         );
         await tester.pumpAndSettle();
 
@@ -226,6 +229,7 @@ void main() {
               changedToken = token;
             },
           ),
+          authzCurrent: authn.AuthzCache.fakeWith(meta.Token()..usermanagement = true),
         );
         await tester.pumpAndSettle();
 
@@ -247,6 +251,7 @@ void main() {
               changedTokens.add(token);
             },
           ),
+          authzCurrent: authn.AuthzCache.fakeWith(meta.Token()..usermanagement = true),
         );
         await tester.pumpAndSettle();
 

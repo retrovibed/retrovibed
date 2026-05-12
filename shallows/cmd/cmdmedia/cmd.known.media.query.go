@@ -1,14 +1,21 @@
 package cmdmedia
 
 import (
+	"bytes"
+	"context"
 	"database/sql"
+	"io"
 	"log"
+	"os"
 	"strings"
 
 	"github.com/Masterminds/squirrel"
+	"github.com/retrovibed/retrovibed/retroapi/deeppool"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
 	"github.com/retrovibed/retrovibed/shallows/internal/lucenex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
@@ -16,86 +23,134 @@ import (
 )
 
 type knownquery struct {
-	Query string `arg:"" name:"query" help:"query to search for" required:"true"`
+	Database string  `flag:"" name:"database" help:"database to read" default:"${vars_user_configuration_directory}/meta.db"`
+	Explicit bool    `flag:"" name:"explicit" help:"include explicit content in results" default:"false"`
+	Clean    bool    `flag:"" name:"clean" help:"clean query text via deeppool before searching" default:"false"`
+	Cutoff   float32 `flag:"" name:"cutoff" help:"similarity cutoff for scoring" default:"0.7"`
 }
 
-func (t knownquery) Run(gctx *cmdopts.Global) (err error) {
-	type ScoredKnown struct {
-		library.Known
-		Relevance float64
-	}
-	var (
-		db     *sql.DB
-		result = ScoredKnown{
-			Relevance: -1.0,
-		}
-	)
-
-	if db, err = cmdmeta.DatabaseMeta(gctx.Context); err != nil {
+func (t knownquery) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClient) (err error) {
+	var db *sql.DB
+	if db, err = cmdmeta.DatabaseCustom(gctx.Context, t.Database); err != nil {
 		return err
 	}
 	defer db.Close()
 
-	{
-
-		q := library.KnownSearchBuilder().Where(squirrel.And{
-			library.KnownQueryExplicit(false),
-			lucenex.Query(duckdbx.NewLucene(), t.Query, lucenex.WithDefaultField("auto_description")),
-		}).OrderBy("title DESC").Limit(1028)
-
-		scanner := sqlx.Scan(library.KnownSearch(gctx.Context, db, q))
-
-		for v := range scanner.Iter() {
-			var cur = ScoredKnown{Known: v}
-
-			if err := library.KnownScoreByID(gctx.Context, db, v.UID, t.Query).Scan(&cur.Relevance); err != nil {
-				log.Println("unable to score", v.UID, err)
-				continue
-			}
-
-			if cur.Relevance > result.Relevance {
-				result = cur
-				log.Println(cur.Relevance, cur.UID, cur.Title)
-			}
+	cleaner := library.QueryCleaner(library.NoopQueryCleaner{})
+	if t.Clean {
+		httpc, err := dpc.HTTPClient(gctx.Context)
+		if err != nil {
+			return errorsx.Wrap(err, "unable to create deeppool client")
 		}
-
-		if err := scanner.Err(); err != nil {
-			return err
-		}
+		cleaner = deeppool.NewMediaID(httpc)
 	}
 
-	if result.Relevance > 0 {
-		log.Println("result", result.Relevance, result.UID, result.Title)
-		return nil
+	var in io.Reader = bytes.NewReader(nil)
+	if cmdopts.Readable(os.Stdin) {
+		in = os.Stdin
 	}
 
-	{
-		terms := strings.ReplaceAll(stringsx.CompactWhitespace(t.Query), " ", " OR ")
-		q := library.KnownSearchBuilder().Where(squirrel.And{
-			lucenex.Query(duckdbx.NewLucene(), terms, lucenex.WithDefaultField("title")),
-		})
+	return t.run(gctx.Context, in, db, cleaner)
+}
 
-		scanner := sqlx.Scan(library.KnownSearch(gctx.Context, db, q))
+func (t knownquery) run(ctx context.Context, in io.Reader, db *sql.DB, cleaner library.QueryCleaner) error {
+	type input struct {
+		Query string `json:"query"`
+	}
 
-		for v := range scanner.Iter() {
-			var cur = ScoredKnown{Known: v}
+	type ScoredKnown struct {
+		library.Known
+		Relevance float64
+	}
 
-			if err := library.KnownScoreByID(gctx.Context, db, v.UID, t.Query).Scan(&cur.Relevance); err != nil {
-				log.Println("unable to score", v.UID, err)
-				continue
+	var count int
+	seq := jsonl.Iter[input](jsonl.NewDecoder(in))
+	for rec := range seq.Each(ctx) {
+		count++
+
+		query, err := cleaner.Clean(ctx, rec.Query)
+		if err != nil {
+			log.Println("unable to clean query", err)
+			query = rec.Query
+		}
+		query = lucenex.Clean(query)
+
+		if rec.Query != query {
+			log.Println("query cleaned", rec.Query, "->", query)
+		}
+
+		result := ScoredKnown{Relevance: -1.0}
+
+		{
+			q := library.KnownSearchBuilder().Where(squirrel.And{
+				library.KnownQueryExplicit(t.Explicit),
+				lucenex.Query(duckdbx.NewLucene(), query, lucenex.WithDefaultField("auto_description")),
+			}).OrderBy("title DESC").Limit(1028)
+
+			scanner := sqlx.Scan(library.KnownSearch(ctx, db, q))
+
+			for v := range scanner.Iter() {
+				var cur = ScoredKnown{Known: v}
+
+				if err := library.KnownScoreByID(ctx, db, v.UID, query, t.Cutoff).Scan(&cur.Relevance); err != nil {
+					log.Println("unable to score", v.UID, err)
+					continue
+				}
+
+				if cur.Relevance > result.Relevance {
+					result = cur
+					log.Println(cur.Relevance, cur.UID, cur.Title, cur.Released)
+				}
 			}
 
-			if cur.Relevance > result.Relevance {
-				result = cur
-				log.Println(cur.Relevance, cur.UID, cur.Title)
+			if err := scanner.Err(); err != nil {
+				return err
 			}
 		}
 
-		if err := scanner.Err(); err != nil {
-			return err
+		if result.Relevance > 0 {
+			log.Println("result", result.Relevance, result.UID, result.Title, result.Released)
+			continue
 		}
+
+		{
+			terms := strings.ReplaceAll(stringsx.CompactWhitespace(query), " ", " OR ")
+			q := library.KnownSearchBuilder().Where(squirrel.And{
+				library.KnownQueryExplicit(t.Explicit),
+				lucenex.Query(duckdbx.NewLucene(), terms, lucenex.WithDefaultField("title")),
+			}).Limit(1028)
+
+			scanner := sqlx.Scan(library.KnownSearch(ctx, db, q))
+
+			for v := range scanner.Iter() {
+				var cur = ScoredKnown{Known: v}
+
+				if err := library.KnownScoreByID(ctx, db, v.UID, query, t.Cutoff).Scan(&cur.Relevance); err != nil {
+					log.Println("unable to score", v.UID, err)
+					continue
+				}
+
+				if cur.Relevance > result.Relevance {
+					result = cur
+					log.Println(cur.Relevance, cur.UID, cur.Title, cur.Released)
+				}
+			}
+
+			if err := scanner.Err(); err != nil {
+				return err
+			}
+		}
+
+		log.Println("result", result.Relevance, result.UID, result.Title, result.Released)
 	}
 
-	log.Println("result", result.Relevance, result.UID, result.Title)
+	if err := seq.Err(); err != nil {
+		return errorsx.Wrap(err, "failed to decode input")
+	}
+
+	if count == 0 {
+		return errorsx.New("query is required: stdin was empty")
+	}
+
 	return nil
 }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/meta.dart' as meta;
@@ -49,7 +50,7 @@ class ListRow extends StatefulWidget {
 }
 
 class _ListRowState extends State<ListRow> {
-  Future<meta.Token> _authzToken = Future.delayed(Duration(days: 365));
+  Future<meta.Token> _authzToken = Completer<meta.Token>().future;
 
   @override
   void initState() {

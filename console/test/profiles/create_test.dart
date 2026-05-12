@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/design.kit/forms.dart' as forms;
 import 'package:retrovibed/profiles.dart' as profiles;
 import 'package:retrovibed/meta.dart' as meta;
@@ -162,6 +163,7 @@ void main() {
               changedToken = t;
             },
           ),
+          authzCurrent: authn.AuthzCache.fakeWith(meta.Token()..usermanagement = true),
         );
         await tester.pumpAndSettle();
 
