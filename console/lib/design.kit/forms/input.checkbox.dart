@@ -25,20 +25,18 @@ class Checkbox extends m.StatelessWidget {
     final defaults = theming.Defaults.of(context);
     return m.Material(
       color: m.Colors.transparent,
-      child: m.IntrinsicHeight(
-        child: m.CheckboxListTile(
-          dense: dense,
-          title: label,
-          secondary: trailing,
-          subtitle: description,
-          value: value,
-          onChanged: onChanged,
-          controlAffinity: m.ListTileControlAffinity.leading,
-          visualDensity: m.VisualDensity.compact,
-          materialTapTargetSize: m.MaterialTapTargetSize.shrinkWrap,
-          contentPadding: m.EdgeInsets.zero,
-          shape: m.RoundedRectangleBorder(borderRadius: defaults.borderRadius),
-        ),
+      child: m.CheckboxListTile(
+        dense: dense,
+        title: label,
+        secondary: trailing,
+        subtitle: description,
+        value: value,
+        onChanged: onChanged,
+        controlAffinity: m.ListTileControlAffinity.leading,
+        visualDensity: m.VisualDensity.compact,
+        materialTapTargetSize: m.MaterialTapTargetSize.shrinkWrap,
+        contentPadding: m.EdgeInsets.zero,
+        shape: m.RoundedRectangleBorder(borderRadius: defaults.borderRadius),
       ),
     );
   }

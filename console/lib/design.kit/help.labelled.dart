@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/design.kit/theme.defaults.dart';
 
-class HelpShortcut extends StatelessWidget {
+class HelpLabelled extends StatelessWidget {
   final Widget label;
   final Widget description;
-  const HelpShortcut({super.key, required this.label, required this.description});
+  const HelpLabelled({super.key, required this.label, required this.description});
 
   @override
   Widget build(BuildContext context) {

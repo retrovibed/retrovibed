@@ -457,5 +457,39 @@ void main() {
       expect(find.text('outer desc'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
+
+    testWidgets('innermost nested Help is clickable', (tester) async {
+      await tester.pumpApp(
+        modals.Node(
+          HelpScope(
+            Help(
+              Help(
+                Help(
+                  Text('deeply wrapped'),
+                  Hint(const Text('inner desc')),
+                  key: Key('help-inner'),
+                ),
+                Hint(const Text('middle desc')),
+              ),
+              Hint(const Text('outer desc')),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.altLeft);
+      await tester.sendKeyEvent(LogicalKeyboardKey.slash);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.clear));
+      await tester.pumpAndSettle();
+      await tester.tap(find.descendant(of: find.byKey(Key('help-inner')), matching: find.byType(InkWell)).first);
+      await tester.pumpAndSettle();
+
+      expect(find.text('outer desc'), findsNothing);
+      expect(find.text('inner desc'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
   });
 }

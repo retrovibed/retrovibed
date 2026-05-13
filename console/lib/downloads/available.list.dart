@@ -220,11 +220,11 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                   leading: [Icon(mimex.icon(v.media.mimetype))],
                   help: ds.Hint.multiline([
                     Text("A downloadable media item."),
-                    ds.HelpShortcut(
+                    ds.HelpLabelled(
                       label: Text("tap"),
                       description: Text("expand details: file path, size, and distribution status"),
                     ),
-                    ds.HelpShortcut(
+                    ds.HelpLabelled(
                       label: Text("delete"),
                       description: Text("remove the item"),
                     ),

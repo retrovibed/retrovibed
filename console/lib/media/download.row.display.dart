@@ -104,11 +104,11 @@ class _DownloadingState extends State<RefreshingDownload> {
         current: current,
         help: ds.Hint.multiline([
           Text("An active download showing progress, peer count, and completion percentage."),
-          ds.HelpShortcut(
+          ds.HelpLabelled(
             label: Text("pause"),
             description: Text("suspend the download"),
           ),
-          ds.HelpShortcut(
+          ds.HelpLabelled(
             label: Text("check"),
             description: Text("mark as processed once completed"),
           ),
