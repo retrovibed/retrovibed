@@ -61,7 +61,95 @@ class Playlist extends StatefulWidget {
         final _PlaylistState? current = Playlist.of(context);
         // if we don't have a playlist ancestor thats a bug.
         assert(current != null);
-        return b(context, current!);
+        final s = current!;
+        final defaults = ds.Defaults.of(context);
+        return ds.Shortcuts(
+          b(context, s),
+          enabled: defaults.desktop,
+          bindings: {
+            const SingleActivator(LogicalKeyboardKey.escape): (
+              const Text('play/pause'),
+              () {
+                print("shortcut: play/pause");
+                s.player.playOrPause();
+                return KeyEventResult.handled;
+              },
+            ),
+            const SingleActivator(LogicalKeyboardKey.arrowRight): (
+              const Text('seek forward 10s'),
+              () {
+                final pos = s.player.state.position + const Duration(seconds: 10);
+                print("shortcut: seek forward -> ${pos}");
+                s.player.seek(pos);
+                return KeyEventResult.handled;
+              },
+            ),
+            const SingleActivator(LogicalKeyboardKey.arrowLeft): (
+              const Text('seek backward 10s'),
+              () {
+                final pos = s.player.state.position - const Duration(seconds: 10);
+                final clamped = pos < Duration.zero ? Duration.zero : pos;
+                print("shortcut: seek backward -> ${clamped}");
+                s.player.seek(clamped);
+                return KeyEventResult.handled;
+              },
+            ),
+            const SingleActivator(control: true, LogicalKeyboardKey.arrowUp): (
+              const Text('volume up'),
+              () {
+                final vol = (s.player.state.volume + 5.0).clamp(0.0, 100.0);
+                print("shortcut: volume up -> ${vol}");
+                s.player.setVolume(vol);
+                return KeyEventResult.handled;
+              },
+            ),
+            const SingleActivator(
+              control: true,
+              LogicalKeyboardKey.arrowDown,
+            ): (
+              const Text('volume down'),
+              () {
+                final vol = (s.player.state.volume - 5.0).clamp(0.0, 100.0);
+                print("shortcut: volume down -> ${vol}");
+                s.player.setVolume(vol);
+                return KeyEventResult.handled;
+              },
+            ),
+            const SingleActivator(control: true, LogicalKeyboardKey.keyM): (
+              const Text('mute'),
+              () {
+                final vol = s.player.state.volume > 0 ? 0.0 : 100.0;
+                print("shortcut: mute -> ${vol}");
+                s.player.setVolume(vol);
+                return KeyEventResult.handled;
+              },
+            ),
+            const SingleActivator(control: true, LogicalKeyboardKey.keyN): (
+              const Text('next'),
+              () {
+                print("shortcut: next");
+                s.next();
+                return KeyEventResult.handled;
+              },
+            ),
+            const SingleActivator(control: true, LogicalKeyboardKey.keyP): (
+              const Text('previous'),
+              () {
+                print("shortcut: previous");
+                s.previous();
+                return KeyEventResult.handled;
+              },
+            ),
+            const SingleActivator(control: true, LogicalKeyboardKey.keyF): (
+              const Text('fullscreen'),
+              () {
+                print("shortcut: fullscreen");
+                ds.Full.of(context)?.toggle();
+                return KeyEventResult.handled;
+              },
+            ),
+          },
+        );
       },
     );
   }
@@ -201,94 +289,10 @@ class _PlaylistState extends State<Playlist> {
 
   @override
   Widget build(BuildContext context) {
-    final defaults = ds.Defaults.of(context);
-    return ds.Shortcuts(
-      FocusScope(
-        key: ValueKey(_queue.current.id),
-        node: _selffocus,
-        child: widget.child,
-      ),
-      enabled: defaults.desktop,
-      bindings: {
-        const SingleActivator(LogicalKeyboardKey.escape): (
-          const Text('play/pause'),
-          () {
-            print("shortcut: play/pause");
-            player.playOrPause();
-            return KeyEventResult.handled;
-          },
-        ),
-        const SingleActivator(LogicalKeyboardKey.arrowRight): (
-          const Text('seek forward 10s'),
-          () {
-            final pos = player.state.position + const Duration(seconds: 10);
-            print("shortcut: seek forward -> ${pos}");
-            player.seek(pos);
-            return KeyEventResult.handled;
-          },
-        ),
-        const SingleActivator(LogicalKeyboardKey.arrowLeft): (
-          const Text('seek backward 10s'),
-          () {
-            final pos = player.state.position - const Duration(seconds: 10);
-            final clamped = pos < Duration.zero ? Duration.zero : pos;
-            print("shortcut: seek backward -> ${clamped}");
-            player.seek(clamped);
-            return KeyEventResult.handled;
-          },
-        ),
-        const SingleActivator(control: true, LogicalKeyboardKey.arrowUp): (
-          const Text('volume up'),
-          () {
-            final vol = (player.state.volume + 5.0).clamp(0.0, 100.0);
-            print("shortcut: volume up -> ${vol}");
-            player.setVolume(vol);
-            return KeyEventResult.handled;
-          },
-        ),
-        const SingleActivator(control: true, LogicalKeyboardKey.arrowDown): (
-          const Text('volume down'),
-          () {
-            final vol = (player.state.volume - 5.0).clamp(0.0, 100.0);
-            print("shortcut: volume down -> ${vol}");
-            player.setVolume(vol);
-            return KeyEventResult.handled;
-          },
-        ),
-        const SingleActivator(control: true, LogicalKeyboardKey.keyM): (
-          const Text('mute'),
-          () {
-            final vol = player.state.volume > 0 ? 0.0 : 100.0;
-            print("shortcut: mute -> ${vol}");
-            player.setVolume(vol);
-            return KeyEventResult.handled;
-          },
-        ),
-        const SingleActivator(control: true, LogicalKeyboardKey.keyN): (
-          const Text('next'),
-          () {
-            print("shortcut: next");
-            next();
-            return KeyEventResult.handled;
-          },
-        ),
-        const SingleActivator(control: true, LogicalKeyboardKey.keyP): (
-          const Text('previous'),
-          () {
-            print("shortcut: previous");
-            previous();
-            return KeyEventResult.handled;
-          },
-        ),
-        const SingleActivator(control: true, LogicalKeyboardKey.keyF): (
-          const Text('fullscreen'),
-          () {
-            print("shortcut: fullscreen");
-            ds.Full.of(context)?.toggle();
-            return KeyEventResult.handled;
-          },
-        ),
-      },
+    return FocusScope(
+      key: ValueKey(_queue.current.id),
+      node: _selffocus,
+      child: widget.child,
     );
   }
 }

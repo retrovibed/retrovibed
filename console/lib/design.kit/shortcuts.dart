@@ -52,7 +52,7 @@ class _ShortcutsState extends State<Shortcuts> {
             labelText = modifiers.join('+');
           }
 
-          return HelpShortcut(label: Text(labelText), description: e.value.$1);
+          return HelpLabelled(label: Text(labelText), description: e.value.$1);
         }).toList();
     for (final w in _registered) {
       scope?.registerGlobal(w);
