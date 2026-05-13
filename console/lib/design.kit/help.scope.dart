@@ -8,6 +8,18 @@ import 'package:retrovibed/design.kit/help.labelled.dart';
 import 'buttons.dart';
 import 'shake.dart';
 
+class _HelpVisibility extends InheritedWidget {
+  final bool visible;
+  const _HelpVisibility({required this.visible, required super.child});
+
+  @override
+  bool updateShouldNotify(_HelpVisibility old) => old.visible != visible;
+
+  static bool of(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<_HelpVisibility>()?.visible ?? false;
+  }
+}
+
 class HelpScope extends StatefulWidget {
   static const None = const SizedBox();
   final Widget child;
@@ -16,6 +28,8 @@ class HelpScope extends StatefulWidget {
   static HelpScopeState? of(BuildContext context) {
     return context.findAncestorStateOfType<HelpScopeState>();
   }
+
+  static bool visible(BuildContext context) => _HelpVisibility.of(context);
 
   @override
   State<HelpScope> createState() => HelpScopeState();
@@ -33,16 +47,14 @@ class HelpScopeState extends State<HelpScope> {
     super.setState(fn);
   }
 
-  void register(Widget description, VoidCallback onChange) {
+  void register(Widget description) {
     if (identical(description, HelpScope.None)) return;
     _descriptions.add(description);
-    visibility.addListener(onChange);
   }
 
-  void unregister(Widget description, VoidCallback onChange) {
+  void unregister(Widget description) {
     if (identical(description, HelpScope.None)) return;
     _descriptions.remove(description);
-    visibility.removeListener(onChange);
   }
 
   void registerGlobal(Widget description) {
@@ -56,15 +68,19 @@ class HelpScopeState extends State<HelpScope> {
   @override
   void initState() {
     super.initState();
+    visibility.addListener(_onVisibilityChanged);
     HardwareKeyboard.instance.addHandler(_onKey);
   }
 
   @override
   void dispose() {
+    visibility.removeListener(_onVisibilityChanged);
     HardwareKeyboard.instance.removeHandler(_onKey);
     visibility.dispose();
     super.dispose();
   }
+
+  void _onVisibilityChanged() => setState(() {});
 
   void toggle() {
     visibility.value = !visibility.value;
@@ -99,14 +115,17 @@ class HelpScopeState extends State<HelpScope> {
   @override
   Widget build(BuildContext context) {
     final defaults = Defaults.of(context);
-    return screens.Overlay(
-      ShakeDetector(
-        onShake: defaults.mobile ? this.toggle : null,
-        child: widget.child,
-      ),
-      overlay: _GlobalsOverlay(
-        visibility: visibility,
-        globals: _globals,
+    return _HelpVisibility(
+      visible: visibility.value,
+      child: screens.Overlay(
+        ShakeDetector(
+          onShake: defaults.mobile ? this.toggle : null,
+          child: widget.child,
+        ),
+        overlay: _GlobalsOverlay(
+          visibility: visibility,
+          globals: _globals,
+        ),
       ),
     );
   }

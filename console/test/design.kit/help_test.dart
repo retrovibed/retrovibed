@@ -424,19 +424,16 @@ void main() {
   group('Help nesting', () {
     testWidgets('nested Help wrappers register all descriptions', (tester) async {
       await tester.pumpApp(
-        modals.Node(
-          HelpScope(
+        HelpScope(
+          Help(
             Help(
               Help(
-                Help(
-                  Text('deeply wrapped'),
-                  Hint(const Text('inner desc')),
-                ),
-                Hint(const Text('middle desc')),
+                Text('deeply wrapped'),
+                Hint(const Text('inner desc')),
               ),
-              Hint(const Text('outer desc')),
-              key: Key('help-outer'),
+              Hint(const Text('middle desc')),
             ),
+            Hint(const Text('outer desc')),
           ),
         ),
       );
@@ -444,17 +441,6 @@ void main() {
 
       final scope = tester.state<HelpScopeState>(find.byType(HelpScope));
       expect(scope.descriptions, hasLength(3));
-
-      await tester.sendKeyDownEvent(LogicalKeyboardKey.altLeft);
-      await tester.sendKeyEvent(LogicalKeyboardKey.slash);
-      await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
-      await tester.pumpAndSettle();
-      await tester.tap(find.byIcon(Icons.clear));
-      await tester.pumpAndSettle();
-      await tester.tap(find.descendant(of: find.byKey(Key('help-outer')), matching: find.byType(InkWell)).first);
-      await tester.pumpAndSettle();
-
-      expect(find.text('outer desc'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
@@ -487,8 +473,165 @@ void main() {
       await tester.tap(find.descendant(of: find.byKey(Key('help-inner')), matching: find.byType(InkWell)).first);
       await tester.pumpAndSettle();
 
-      expect(find.text('outer desc'), findsNothing);
       expect(find.text('inner desc'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('outer Help is clickable in area not covered by inner Help', (tester) async {
+      await tester.pumpApp(
+        modals.Node(
+          HelpScope(
+            Help(
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Help(
+                    const SizedBox(width: 100, height: 100),
+                    Hint(const Text('inner desc')),
+                    key: Key('help-inner'),
+                  ),
+                  const SizedBox(width: 100, height: 100, key: Key('outer-only')),
+                ],
+              ),
+              Hint(const Text('outer desc')),
+              key: Key('help-outer'),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.altLeft);
+      await tester.sendKeyEvent(LogicalKeyboardKey.slash);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.clear));
+      await tester.pumpAndSettle();
+
+      await tester.tapAt(tester.getCenter(find.byKey(Key('outer-only'))));
+      await tester.pumpAndSettle();
+
+      expect(find.text('outer desc'), findsOneWidget);
+      expect(find.text('inner desc'), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('Help with tappable child shows description instead of firing child tap', (tester) async {
+      var childTapped = false;
+      await tester.pumpApp(
+        modals.Node(
+          HelpScope(
+            Help(
+              GestureDetector(
+                onTap: () => childTapped = true,
+                child: const SizedBox(width: 100, height: 100),
+              ),
+              Hint(const Text('desc')),
+              key: Key('help'),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.altLeft);
+      await tester.sendKeyEvent(LogicalKeyboardKey.slash);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.clear));
+      await tester.pumpAndSettle();
+      await tester.tap(find.descendant(of: find.byKey(Key('help')), matching: find.byType(InkWell)));
+      await tester.pumpAndSettle();
+
+      expect(find.text('desc'), findsOneWidget);
+      expect(childTapped, isFalse);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('Help with tappable child and nested help shows description instead of firing child tap', (
+      tester,
+    ) async {
+      var childTapped = false;
+      await tester.pumpApp(
+        modals.Node(
+          HelpScope(
+            Help(
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  GestureDetector(
+                    onTap: () => childTapped = true,
+                    child: const SizedBox(width: 100, height: 100),
+                    key: Key('child'),
+                  ),
+                  Help(
+                    const SizedBox(width: 100, height: 100, key: Key('outer-only')),
+                    Hint(const Text('inner')),
+                  ),
+                ],
+              ),
+              Hint(const Text('outer')),
+              key: Key('help'),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.altLeft);
+      await tester.sendKeyEvent(LogicalKeyboardKey.slash);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.clear));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(Key('child')), warnIfMissed: false);
+      await tester.pumpAndSettle();
+
+      expect(find.text('outer'), findsOneWidget);
+      expect(childTapped, isFalse);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('inner Help with tappable child shows description instead of firing child tap', (tester) async {
+      var childTapped = false;
+      await tester.pumpApp(
+        modals.Node(
+          HelpScope(
+            Help(
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Help(
+                    GestureDetector(
+                      onTap: () => childTapped = true,
+                      child: const SizedBox(width: 100, height: 100),
+                    ),
+                    Hint(const Text('inner desc')),
+                    key: Key('help-inner'),
+                  ),
+                  const SizedBox(width: 100, height: 100, key: Key('outer-only')),
+                ],
+              ),
+              Hint(const Text('outer desc')),
+              key: Key('help-outer'),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.altLeft);
+      await tester.sendKeyEvent(LogicalKeyboardKey.slash);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.clear));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.descendant(of: find.byKey(Key('help-inner')), matching: find.byType(InkWell)).first);
+      await tester.pumpAndSettle();
+
+      expect(find.text('inner desc'), findsOneWidget);
+      expect(childTapped, isFalse);
       expect(tester.takeException(), isNull);
     });
   });

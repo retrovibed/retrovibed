@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'container.dart' as ds;
 import 'modals.dart' as modals;
 import 'theme.defaults.dart';
@@ -21,39 +22,52 @@ class Help extends StatefulWidget {
 
 class _HelpState extends State<Help> {
   HelpScopeState? _scope;
-  bool _active = false;
   bool _hovered = false;
+  _HelpState? _parentHelp;
+  int _nestedhelp = 0;
+
+  bool get _isNone => identical(widget.description, HelpScope.None);
+  bool get _hasChild => _nestedhelp > 0;
+
+  void _adjdelta(int n) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) setState(() => _nestedhelp += n);
+    });
+  }
 
   @override
   void initState() {
     super.initState();
     _scope = HelpScope.of(context);
-    _scope?.register(widget.description, _rebuild);
-    _active = _scope?.visibility.value ?? false;
+    _scope?.register(widget.description);
+    if (!_isNone) {
+      _parentHelp = context.findAncestorStateOfType<_HelpState>();
+      _parentHelp?._adjdelta(1);
+    }
   }
 
   @override
   void dispose() {
-    _scope?.unregister(widget.description, _rebuild);
+    _scope?.unregister(widget.description);
+    _parentHelp?._adjdelta(-1);
     super.dispose();
-  }
-
-  void _rebuild() {
-    if (mounted) setState(() => _active = _scope?.visibility.value ?? false);
   }
 
   @override
   void didUpdateWidget(Help old) {
     super.didUpdateWidget(old);
     if (old.description != widget.description) {
-      _scope?.unregister(old.description, _rebuild);
-      _scope?.register(widget.description, _rebuild);
+      _scope?.unregister(old.description);
+      _scope?.register(widget.description);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (!_active) return widget.child;
+    if (_isNone) return widget.child;
+
+    final active = HelpScope.visible(context);
+    if (!active) return widget.child;
 
     final defaults = Defaults.of(context);
     final borderColor = Color.fromRGBO(140, 120, 220, _hovered ? 0.7 : 0.4);
@@ -61,7 +75,6 @@ class _HelpState extends State<Help> {
     return InkWell(
       mouseCursor: SystemMouseCursors.click,
       onTap: () {
-        print("DERPA DERPA ${widget.key}");
         modals.asyncfn(context, (_) {
           return _HelpContent(
             widget.description,
@@ -72,28 +85,33 @@ class _HelpState extends State<Help> {
       child: MouseRegion(
         onEnter: (_) => setState(() => _hovered = true),
         onExit: (_) => setState(() => _hovered = false),
-        child: Stack(
-          children: [
-            widget.child,
-            Positioned.fill(
-              child: AnimatedContainer(
-                duration: Duration(milliseconds: 150),
-                decoration: BoxDecoration(
-                  borderRadius: defaults.borderRadius,
-                  border: Border.all(color: borderColor),
-                  color: _hovered ? defaults.highlight.withValues(alpha: 0.05) : Colors.transparent,
-                  boxShadow: _active ? defaults.highlightTint : null,
-                ),
-                child: ClipRRect(
-                  borderRadius: defaults.borderRadius,
-                  child: Material(
-                    color: Colors.transparent,
-                    child: const SizedBox(),
+        child: _GestureController(
+          child: Stack(
+            children: [
+              widget.child,
+              Positioned.fill(
+                child: IgnorePointer(
+                  ignoring: _hasChild,
+                  child: AnimatedContainer(
+                    duration: Duration(milliseconds: 150),
+                    decoration: BoxDecoration(
+                      borderRadius: defaults.borderRadius,
+                      border: Border.all(color: borderColor),
+                      color: _hovered ? defaults.highlight.withValues(alpha: 0.05) : Colors.transparent,
+                      boxShadow: active ? defaults.highlightTint : null,
+                    ),
+                    child: ClipRRect(
+                      borderRadius: defaults.borderRadius,
+                      child: Material(
+                        color: Colors.transparent,
+                        child: const SizedBox(),
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -131,5 +149,36 @@ class _HelpContent extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class _GestureController extends SingleChildRenderObjectWidget {
+  const _GestureController({required super.child});
+
+  @override
+  HelpGestureController createRenderObject(BuildContext context) => HelpGestureController();
+}
+
+class HelpGestureController extends RenderProxyBox {
+  HelpGestureController();
+
+  @override
+  bool hitTestSelf(Offset position) => true;
+
+  @override
+  bool hitTestChildren(BoxHitTestResult result, {required Offset position}) {
+    final before = result.path.length;
+    final hit = super.hitTestChildren(result, position: position);
+
+    if (!hit) return false;
+
+    final hasHelpChild = result.path.skip(before).any((e) => e.target is HelpGestureController);
+
+    if (!hasHelpChild) {
+      (result.path as List<HitTestEntry>).removeRange(before, result.path.length);
+      return false;
+    }
+
+    return true;
   }
 }
