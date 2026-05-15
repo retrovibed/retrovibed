@@ -104,7 +104,7 @@ class _CardState extends State<Card> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           spacing: defaults.spacing / 4,
           children: [
-            Text("Account", style: theme.textTheme.titleMedium),
+            Text("Profile", style: theme.textTheme.titleMedium),
             ds.Copyable(
               Text(
                 [

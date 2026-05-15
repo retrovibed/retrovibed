@@ -23,6 +23,14 @@ func InitializeAdmin(ctx context.Context, q sqlx.Queryer, pub ssh.PublicKey) (er
 		return err
 	}
 
+	authz := langx.Clone(meta.Authz{
+		ID:        sshx.FingerprintMD5(parsed.PublicKey),
+		ProfileID: p.ID,
+	}, meta.AuthzOptionAdmin)
+	if err = meta.AuthzInsertWithIDDefaults(ctx, q, authz).Scan(&authz); err != nil {
+		return errorsx.Wrap(err, "unable to setup authorizations")
+	}
+
 	if err := meta.ProfileAutoEnable(ctx, q, &p); err != nil {
 		return errorsx.Wrap(err, "unable to enable profile")
 	}
@@ -63,14 +71,6 @@ func importParsed(ctx context.Context, q sqlx.Queryer, parsed sshx.Parsed) (_zer
 
 	if err = meta.ProfileInsertWithID(ctx, q, p).Scan(&p); err != nil {
 		return _zero, errorsx.Wrap(err, "unable to create profile")
-	}
-
-	authz := langx.Clone(meta.Authz{
-		ID:        sshx.FingerprintMD5(parsed.PublicKey),
-		ProfileID: p.ID,
-	}, meta.AuthzOptionAdmin)
-	if err = meta.AuthzInsertWithIDDefaults(ctx, q, authz).Scan(&authz); err != nil {
-		return _zero, errorsx.Wrap(err, "unable to setup authorizations")
 	}
 
 	iden := Identity{

@@ -7,13 +7,11 @@ import 'package:retrovibed/testing/widget_tester_extensions.dart';
 
 final _resolutions = Resolutions.variant();
 
-Future<authn.Session> _mockSession(BuildContext ctx) =>
-    Future.value(authn.Session());
+Future<authn.Session> _mockSession(BuildContext ctx) => Future.value(authn.Session());
 
 Future<meta.Authn> _mockCurrent() => Future.value(meta.Authn());
 
-Future<authn.Session> _failSession(BuildContext ctx) =>
-    Future.error(Exception('session error'));
+Future<authn.Session> _failSession(BuildContext ctx) => Future.error(Exception('session error'));
 
 Future<meta.Authn> _failCurrent() => Future.error(Exception('current error'));
 
@@ -26,7 +24,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('Account'), findsOneWidget);
+        expect(find.text('Profile'), findsOneWidget);
         expect(tester.takeException(), isNull);
       });
 
@@ -59,14 +57,16 @@ void main() {
         WidgetTester tester,
       ) async {
         await tester.pumpApp(
-          Column(children: [
-            Expanded(
-              child: profiles.Card(
-                session: _mockSession,
-                current: _mockCurrent,
+          Column(
+            children: [
+              Expanded(
+                child: profiles.Card(
+                  session: _mockSession,
+                  current: _mockCurrent,
+                ),
               ),
-            ),
-          ]),
+            ],
+          ),
         );
         await tester.pumpAndSettle();
 
@@ -77,14 +77,16 @@ void main() {
         WidgetTester tester,
       ) async {
         await tester.pumpApp(
-          Row(children: [
-            Expanded(
-              child: profiles.Card(
-                session: _mockSession,
-                current: _mockCurrent,
+          Row(
+            children: [
+              Expanded(
+                child: profiles.Card(
+                  session: _mockSession,
+                  current: _mockCurrent,
+                ),
               ),
-            ),
-          ]),
+            ],
+          ),
         );
         await tester.pumpAndSettle();
 

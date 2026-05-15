@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/authn/login.dart' as login;
-import 'package:retrovibed/retrovibed.dart' as retro;
 
 class Hamburger extends StatefulWidget {
   const Hamburger({super.key});
@@ -80,7 +79,6 @@ class _HamburgerState extends State<Hamburger> with WindowListener {
                 ],
               ),
               onTap: () {
-                retro.unseed();
                 login.Login.logout(context);
               },
             ),
