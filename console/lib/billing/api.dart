@@ -94,6 +94,10 @@ Future<AttributionConsumeResponse> consumeAttribution(
       });
 }
 
+Future<void> delete({List<httpx.Option> options = const []}) {
+  return httpx.delete(Uri.https(httpx.metaendpoint(), "/m/b/"), options: options).then((_) {});
+}
+
 Future<BillingSubscribeResponse> subscribe(String plan) {
   return httpx
       .get(

@@ -9,7 +9,6 @@ import (
 	"os"
 
 	"github.com/retrovibed/retrovibed/retroapi/deeppool"
-	"github.com/retrovibed/retrovibed/shallows/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
@@ -26,7 +25,7 @@ type knowndetect struct {
 func (t knowndetect) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClient) (err error) {
 	var db *sql.DB
 
-	if db, err = cmdmeta.DatabaseCustom(gctx.Context, t.Database); err != nil {
+	if db, err = cmdopts.DatabaseCustom(gctx.Context, t.Database); err != nil {
 		return err
 	}
 	defer db.Close()

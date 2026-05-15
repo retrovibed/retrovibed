@@ -10,9 +10,7 @@ import (
 
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sshx"
-	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/retrovibed/retrovibed/shallows/meta/identityssh"
 )
 
@@ -28,7 +26,7 @@ type BootstrapPublicKey struct {
 func (t BootstrapPublicKey) Run(gctx *cmdopts.Global) (err error) {
 	var db *sql.DB
 
-	if db, err = DatabaseMeta(gctx.Context); err != nil {
+	if db, err = cmdopts.DatabaseMeta(gctx.Context); err != nil {
 		return err
 	}
 	defer db.Close()
@@ -46,7 +44,7 @@ func (t BootstrapPublicKey) run(ctx context.Context, db *sql.DB) (err error) {
 		return errorsx.Wrap(err, "unable to parse public key")
 	}
 
-	return identityssh.ImportParsed(ctx, db, parsed)
+	return identityssh.InitializeAdmin(ctx, db, parsed)
 }
 
 type BootstrapAuthorized struct {
@@ -56,7 +54,7 @@ type BootstrapAuthorized struct {
 func (t BootstrapAuthorized) Run(gctx *cmdopts.Global) (err error) {
 	var db *sql.DB
 
-	if db, err = DatabaseMeta(gctx.Context); err != nil {
+	if db, err = cmdopts.DatabaseMeta(gctx.Context); err != nil {
 		return err
 	}
 	defer db.Close()
@@ -74,28 +72,8 @@ func (t BootstrapAuthorized) run(ctx context.Context, db *sql.DB) (err error) {
 	}
 
 	for parsed := range sshx.ParseAuthorizedKeys(encoded) {
-		p := meta.Profile{
-			ID:      sshx.FingerprintMD5(parsed.PublicKey),
-			Display: parsed.Comment,
-		}
-
-		if err = meta.ProfileInsertWithID(ctx, db, p).Scan(&p); err != nil {
-			return errorsx.Wrap(err, "unable to create profile")
-		}
-
-		authz := langx.Clone(meta.Authz{ProfileID: p.ID}, meta.AuthzOptionAdmin)
-		if err = meta.AuthzUpsertWithDefaults(ctx, db, authz).Scan(&authz); err != nil {
-			return errorsx.Wrap(err, "unable to setup authorizations")
-		}
-
-		iden := identityssh.Identity{
-			ID:        sshx.FingerprintMD5(parsed.PublicKey),
-			PublicKey: sshx.EncodeBase64PublicKey(parsed.PublicKey),
-			ProfileID: p.ID,
-		}
-
-		if err = identityssh.IdentityInsertWithDefaults(ctx, db, iden).Scan(&iden); err != nil {
-			return errorsx.Wrap(err, "unable create ssh identity")
+		if err = identityssh.InitializeAdmin(ctx, db, parsed); err != nil {
+			return err
 		}
 	}
 

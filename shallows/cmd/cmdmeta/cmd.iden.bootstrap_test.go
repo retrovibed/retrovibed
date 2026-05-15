@@ -2,12 +2,12 @@ package cmdmeta
 
 import (
 	"bytes"
-	"database/sql"
 	"os"
 	"path/filepath"
 	"testing"
 
 	_ "github.com/duckdb/duckdb-go/v2"
+	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sshx"
 	"github.com/retrovibed/retrovibed/shallows/internal/testx"
@@ -15,21 +15,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func testDatabase(t *testing.T) *sql.DB {
-	t.Helper()
-	db, err := sql.Open("duckdb", "")
-	require.NoError(t, err)
-	require.NoError(t, InitializeDatabase(t.Context(), db))
-	t.Cleanup(func() { db.Close() })
-	return db
-}
-
 func TestBootstrapPublicKey(t *testing.T) {
 	t.Run("creates profile with admin permissions", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 
-		q := testDatabase(t)
+		q := sqltestx.Metadatabase(t)
 
 		_, pub, err := sshx.UnsafeNewKeyGen().Generate()
 		require.NoError(t, err)
@@ -49,13 +40,15 @@ func TestBootstrapPublicKey(t *testing.T) {
 		require.True(t, authz.Usermanagement)
 		require.True(t, authz.LibraryRead)
 		require.True(t, authz.LibraryModify)
+		require.True(t, authz.BillingModify)
+		require.True(t, authz.BillingRead)
 	})
 
 	t.Run("idempotent - same key does not create duplicates", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 
-		q := testDatabase(t)
+		q := sqltestx.Metadatabase(t)
 
 		_, pub, err := sshx.UnsafeNewKeyGen().Generate()
 		require.NoError(t, err)
@@ -74,7 +67,7 @@ func TestBootstrapAuthorized(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 
-		q := testDatabase(t)
+		q := sqltestx.Metadatabase(t)
 
 		gen := sshx.UnsafeNewKeyGen()
 		buf := bytes.NewBufferString("")
@@ -106,6 +99,8 @@ func TestBootstrapAuthorized(t *testing.T) {
 			require.True(t, authz.Usermanagement)
 			require.True(t, authz.LibraryRead)
 			require.True(t, authz.LibraryModify)
+			require.True(t, authz.BillingModify)
+			require.True(t, authz.BillingRead)
 		}
 		require.NoError(t, rows.Err())
 	})
@@ -114,7 +109,7 @@ func TestBootstrapAuthorized(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 
-		q := testDatabase(t)
+		q := sqltestx.Metadatabase(t)
 
 		gen := sshx.UnsafeNewKeyGen()
 		buf := bytes.NewBufferString("")

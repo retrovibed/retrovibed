@@ -51,6 +51,7 @@ class _LoginState extends State<Login> {
   }
 
   void _logout() {
+    retro.unseed();
     setState(() {
       _hasKey = false;
     });

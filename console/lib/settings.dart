@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/httpx.dart' as httpx;
@@ -94,6 +96,9 @@ class _DisplayState extends State<Display> {
     return ds.build((context) {
       final defaults = ds.Defaults.of(context);
       final compact = defaults.isCompact;
+      final _billing = billing.Registered.of(context);
+      final _displaybilling = !(_billing.current.subscriptionId.isEmpty && Platform.isMacOS);
+
       return SelectionArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -164,12 +169,14 @@ class _DisplayState extends State<Display> {
                           onPressed: full,
                           margin: EdgeInsets.zero,
                         ),
-                        billing.ReferralCard(
-                          onPressed: full,
-                          margin: EdgeInsets.zero,
-                        ),
-                        billing.InviteCard(margin: EdgeInsets.zero),
-                        quotas.Card(),
+                        if (_displaybilling) ...[
+                          billing.ReferralCard(
+                            onPressed: full,
+                            margin: EdgeInsets.zero,
+                          ),
+                          billing.InviteCard(margin: EdgeInsets.zero),
+                          quotas.Card(),
+                        ],
                         profiles.Card(
                           onPressed: defaults.debug ? full : null,
                         ),

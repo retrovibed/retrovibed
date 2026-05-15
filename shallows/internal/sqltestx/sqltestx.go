@@ -6,7 +6,7 @@ import (
 	"time"
 
 	_ "github.com/duckdb/duckdb-go/v2"
-	"github.com/retrovibed/retrovibed/shallows/cmd/cmdmeta"
+	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/stretchr/testify/require"
 )
@@ -15,7 +15,7 @@ func Metadatabase(t testing.TB) *sql.DB {
 	db, err := sql.Open("duckdb", "")
 	require.NoError(t, err)
 	t.Cleanup(func() { db.Close() })
-	require.NoError(t, cmdmeta.InitializeDatabase(t.Context(), db))
+	require.NoError(t, cmdopts.InitializeDatabase(t.Context(), db))
 	return db
 }
 

@@ -11,7 +11,6 @@ import (
 
 	"github.com/Masterminds/squirrel"
 	"github.com/retrovibed/retrovibed/retroapi/deeppool"
-	"github.com/retrovibed/retrovibed/shallows/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -31,7 +30,7 @@ type knownquery struct {
 
 func (t knownquery) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClient) (err error) {
 	var db *sql.DB
-	if db, err = cmdmeta.DatabaseCustom(gctx.Context, t.Database); err != nil {
+	if db, err = cmdopts.DatabaseCustom(gctx.Context, t.Database); err != nil {
 		return err
 	}
 	defer db.Close()

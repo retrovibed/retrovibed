@@ -127,7 +127,7 @@ func seed(s *C.char) *C.char {
 	ctx, done := context.WithTimeout(context.Background(), 10*time.Second)
 	defer done()
 
-	db, err := cmdmeta.DatabaseMeta(ctx)
+	db, err := cmdopts.DatabaseMeta(ctx)
 	if err != nil {
 		log.Println("failed to connect to db", err)
 		return C.CString(err.Error())
@@ -152,7 +152,7 @@ func seed(s *C.char) *C.char {
 func ips() *C.char {
 	ctx, done := context.WithTimeout(context.Background(), 10*time.Second)
 	defer done()
-	db, err := cmdmeta.DatabaseMeta(ctx)
+	db, err := cmdopts.DatabaseMeta(ctx)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -198,7 +198,7 @@ func checkpointdb() {
 	// this prevents a bunch of duckdb issues from impacting startup due to bad shutdowns.
 	ctx, done := context.WithTimeout(context.Background(), time.Second)
 	defer done()
-	db, err := cmdmeta.DatabaseMeta(ctx)
+	db, err := cmdopts.DatabaseMeta(ctx)
 	if err != nil {
 		log.Println("failed to connect to database", err)
 		return

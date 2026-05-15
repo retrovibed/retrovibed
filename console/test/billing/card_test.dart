@@ -12,7 +12,7 @@ void main() {
         await tester.pumpApp(billing.Card(onPressed: (_) {}));
         await tester.pumpAndSettle();
 
-        expect(find.text('Subscription'), findsOneWidget);
+        expect(find.text('Account'), findsOneWidget);
         expect(tester.takeException(), isNull);
       });
 
@@ -109,7 +109,7 @@ void main() {
         await tester.pumpApp(physicalSize: entry.value, billing.Card(onPressed: (_) {}));
         await tester.pumpAndSettle();
 
-        expect(find.text('Subscription'), findsOneWidget);
+        expect(find.text('Account'), findsOneWidget);
         expect(tester.takeException(), isNull);
       }, variant: _resolutions);
     });

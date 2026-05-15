@@ -5,6 +5,7 @@ import 'package:retrovibed/designkit.dart' as ds;
 import './registered.dart';
 import './plan.summary.dart';
 import './settings.dart';
+import './cancellation.dart';
 
 class Card extends StatelessWidget {
   final EdgeInsets? margin;
@@ -30,7 +31,7 @@ class Card extends StatelessWidget {
       Column(
         spacing: defaults.spacing,
         children: [
-          Text("Subscription", style: theme.textTheme.titleMedium),
+          Text("Account", style: theme.textTheme.titleMedium),
           DefaultTextStyle(
             style:
                 theme.textTheme.bodyLarge?.copyWith(
@@ -43,11 +44,11 @@ class Card extends StatelessWidget {
             style: theme.textTheme.bodySmall ?? TextStyle(),
             child: plan.price,
           ),
-          if (billing.current.subscriptionEndedAt.isNotEmpty)
-            ds.Timestamp.iso8601(
-              leading: Text("Ends: "),
-              billing.current.subscriptionEndedAt,
-            ),
+          ds.Timestamp.iso8601(
+            leading: Text("Ends: "),
+            billing.current.subscriptionEndedAt,
+          ),
+          CancellationButton(),
         ],
       ),
     );

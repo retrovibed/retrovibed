@@ -6,6 +6,8 @@ func AuthzOptionAdmin(v *Authz) {
 	v.Usermanagement = true
 	v.LibraryRead = true
 	v.LibraryModify = true
+	v.BillingModify = true
+	v.BillingRead = true
 }
 
 func AuthzOptionNoPrivileges(v *Authz) {
