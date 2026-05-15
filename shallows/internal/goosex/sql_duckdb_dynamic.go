@@ -1,5 +1,5 @@
 //go:build !duckdb_use_static_lib
 
-package cmdmeta
+package goosex
 
 const inetSQL = "INSTALL inet; LOAD inet;"

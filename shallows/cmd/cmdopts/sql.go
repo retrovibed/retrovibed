@@ -1,4 +1,4 @@
-package cmdmeta
+package cmdopts
 
 import (
 	"context"
@@ -8,18 +8,13 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"strings"
-	"sync"
 
 	_ "github.com/duckdb/duckdb-go/v2"
 
-	"github.com/pressly/goose/v3"
 	"github.com/retrovibed/retrovibed/shallows/internal/debugx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/goosex"
-	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/userx"
-	"github.com/retrovibed/retrovibed/shallows/meta"
 )
 
 //go:embed .migrations/*.sql
@@ -50,47 +45,8 @@ func DatabaseCustom(ctx context.Context, path string) (db *sql.DB, err error) {
 	return db, InitializeDatabase(ctx, db)
 }
 
-var m sync.Mutex
-
 func InitializeDatabase(ctx context.Context, db *sql.DB) (err error) {
-	m.Lock()
-	defer m.Unlock()
-
-	if _, err := db.ExecContext(ctx, "CHECKPOINT;"); err != nil {
-		return errorsx.Wrap(err, "failed to checkpoint database")
-	}
-
-	if version, err := sqlx.String(ctx, db, "SELECT library_version FROM pragma_version()"); err != nil {
-		return err
-	} else {
-		log.Println("detected duckdb", version)
-	}
-
-	if _, err := db.ExecContext(ctx, inetSQL); err != nil {
-		return errorsx.Wrap(err, "failed to load inet extension")
-	}
-
-	mprov, err := goose.NewProvider(
-		"",
-		db,
-		errorsx.Must(fs.Sub(embedsqlite, ".migrations")),
-		goose.WithStore(goosex.DuckdbStore{}),
-		goose.WithAllowOutofOrder(true),
-		// goose.WithVerbose(true),
-	)
-	if err != nil {
-		return errorsx.Wrap(err, "unable to build migration provider")
-	}
-
-	if _, err := mprov.Up(ctx); err != nil {
-		return errorsx.Wrap(err, "unable to run migrations")
-	}
-
-	if _, err := db.ExecContext(ctx, "CHECKPOINT;"); err != nil {
-		return errorsx.Wrap(err, "failed to checkpoint database")
-	}
-
-	return nil
+	return goosex.InitializeDatabase(ctx, db, errorsx.Must(fs.Sub(embedsqlite, ".migrations")))
 }
 
 func Checkpoint(ctx context.Context, db *sql.DB) (err error) {
@@ -102,14 +58,4 @@ func Checkpoint(ctx context.Context, db *sql.DB) (err error) {
 	}
 
 	return nil
-}
-
-func Hostnames(ctx context.Context, q sqlx.Queryer) (res []string, _ error) {
-	s := sqlx.Scan(meta.DaemonSearch(ctx, q, meta.DaemonSearchBuilder().Limit(128)))
-	for d := range s.Iter() {
-		before, _, _ := strings.Cut(d.Hostname, ":")
-		res = append(res, before)
-	}
-
-	return res, s.Err()
 }

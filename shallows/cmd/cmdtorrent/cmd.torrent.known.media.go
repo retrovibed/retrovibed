@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/retrovibed/retrovibed/shallows/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
@@ -23,7 +22,7 @@ func (t cmdKnownMedia) Run(ctx *cmdopts.Global) (err error) {
 		db *sql.DB
 	)
 
-	if db, err = cmdmeta.DatabaseMeta(ctx.Context); err != nil {
+	if db, err = cmdopts.DatabaseMeta(ctx.Context); err != nil {
 		return err
 	}
 	defer db.Close()

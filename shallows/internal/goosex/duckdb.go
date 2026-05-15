@@ -2,11 +2,17 @@ package goosex
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
+	"io/fs"
+	"log"
+	"sync"
 	"time"
 
 	"github.com/pressly/goose/v3"
 	"github.com/pressly/goose/v3/database"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 )
 
 type DuckdbStore struct{}
@@ -84,4 +90,47 @@ func (t DuckdbStore) ListMigrations(ctx context.Context, db database.DBTxConn) (
 		return nil, err
 	}
 	return migrations, nil
+}
+
+var m sync.Mutex
+
+func InitializeDatabase(ctx context.Context, db *sql.DB, migrations fs.FS) (err error) {
+	m.Lock()
+	defer m.Unlock()
+
+	if _, err := db.ExecContext(ctx, "CHECKPOINT;"); err != nil {
+		return errorsx.Wrap(err, "failed to checkpoint database")
+	}
+
+	if version, err := sqlx.String(ctx, db, "SELECT library_version FROM pragma_version()"); err != nil {
+		return err
+	} else {
+		log.Println("detected duckdb", version)
+	}
+
+	if _, err := db.ExecContext(ctx, inetSQL); err != nil {
+		return errorsx.Wrap(err, "failed to load inet extension")
+	}
+
+	mprov, err := goose.NewProvider(
+		"",
+		db,
+		migrations,
+		goose.WithStore(DuckdbStore{}),
+		goose.WithAllowOutofOrder(true),
+		// goose.WithVerbose(true),
+	)
+	if err != nil {
+		return errorsx.Wrap(err, "unable to build migration provider")
+	}
+
+	if _, err := mprov.Up(ctx); err != nil {
+		return errorsx.Wrap(err, "unable to run migrations")
+	}
+
+	if _, err := db.ExecContext(ctx, "CHECKPOINT;"); err != nil {
+		return errorsx.Wrap(err, "failed to checkpoint database")
+	}
+
+	return nil
 }

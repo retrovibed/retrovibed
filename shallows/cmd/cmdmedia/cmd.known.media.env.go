@@ -7,7 +7,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/retrovibed/retrovibed/shallows/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/envx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
@@ -20,7 +19,7 @@ type knownenv struct {
 func (t knownenv) Run(gctx *cmdopts.Global) (err error) {
 	var db *sql.DB
 
-	if db, err = cmdmeta.DatabaseCustom(gctx.Context, t.Database); err != nil {
+	if db, err = cmdopts.DatabaseCustom(gctx.Context, t.Database); err != nil {
 		return err
 	}
 	defer db.Close()

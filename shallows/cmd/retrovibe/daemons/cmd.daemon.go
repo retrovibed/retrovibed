@@ -16,7 +16,6 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
-	"github.com/retrovibed/retrovibed/shallows/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
@@ -163,7 +162,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		errorsx.Log(errorsx.Wrap(httpbind.Close(), "http server shutdown failed"))
 	}()
 
-	if db, err = cmdmeta.DatabaseMeta(gctx.Context); err != nil {
+	if db, err = cmdopts.DatabaseMeta(gctx.Context); err != nil {
 		return err
 	}
 	defer db.Close()
@@ -248,9 +247,9 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	go PrintStatistics(gctx.Context, db)
 
 	// block for first refresh
-	errorsx.Log(cmdmeta.Checkpoint(gctx.Context, db))
+	errorsx.Log(cmdopts.Checkpoint(gctx.Context, db))
 	go timex.Every(10*time.Minute, func() {
-		errorsx.Log(cmdmeta.Checkpoint(gctx.Context, db))
+		errorsx.Log(cmdopts.Checkpoint(gctx.Context, db))
 	})
 
 	if t.AutoIdentifyMedia {

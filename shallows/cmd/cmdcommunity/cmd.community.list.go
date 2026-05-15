@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/retrovibed/retrovibed/shallows/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -36,7 +35,7 @@ func (t cmdCommunityList) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClient) 
 		return errorsx.Wrap(err, "failed to locate community")
 	}
 
-	if db, err = cmdmeta.DatabaseMeta(gctx.Context); err != nil {
+	if db, err = cmdopts.DatabaseMeta(gctx.Context); err != nil {
 		return err
 	}
 	defer db.Close()

@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/retrovibed/retrovibed/shallows/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/asynccompute"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
@@ -31,7 +30,7 @@ func (t importFilesystem) Run(gctx *cmdopts.Global) (err error) {
 		db *sql.DB
 	)
 
-	if db, err = cmdmeta.DatabaseMeta(gctx.Context); err != nil {
+	if db, err = cmdopts.DatabaseMeta(gctx.Context); err != nil {
 		return err
 	}
 	defer db.Close()

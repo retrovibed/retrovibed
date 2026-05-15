@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/retrovibed/retrovibed/retroapi/authn"
-	"github.com/retrovibed/retrovibed/shallows/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/deeppool"
@@ -35,7 +34,7 @@ func (t cmdCommunitySync) Run(gctx *cmdopts.Global) (err error) {
 		return errorsx.Wrap(err, "unable to create api client")
 	}
 
-	if db, err = cmdmeta.DatabaseMeta(gctx.Context); err != nil {
+	if db, err = cmdopts.DatabaseMeta(gctx.Context); err != nil {
 		return err
 	}
 	defer db.Close()
