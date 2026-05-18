@@ -75,7 +75,7 @@ class Card extends StatelessWidget {
                         toggled: retro.metered(),
                         icon: Icon(Icons.network_check, color: retro.metered() ? Colors.green : null),
                         onPressed: () async {
-                          print("DERP DERP ${retro.metered()}");
+                          // TODO: do this as a standalone card that is only displayed in debug mode.
                           retro.set_metered(!retro.metered());
                           setState(() {});
                         },

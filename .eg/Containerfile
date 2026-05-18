@@ -12,12 +12,12 @@ RUN add-apt-repository -n ppa:egdaemon/eg
 RUN add-apt-repository -n ppa:jljatone/retrovibed
 
 RUN echo "cache buster 059a9a06-1686-4f49-9a7f-a30535886d53"
-RUN apt-get update && apt-get -y install golang-1.25 eg egbootstrap duckdb podman netavark rsync vim dput devscripts dh-make dput uidmap dbus-user-session git unzip xz-utils zip libglu1-mesa clang lld cmake git ninja-build pkg-config libgtk-3-dev liblzma-dev libstdc++-12-dev
+RUN apt-get update && apt-get -y install golang-1.26 eg egbootstrap duckdb podman netavark rsync vim dput devscripts dh-make dput uidmap dbus-user-session git unzip xz-utils zip libglu1-mesa clang lld cmake git ninja-build pkg-config libgtk-3-dev liblzma-dev libstdc++-12-dev
 RUN sh /usr/share/eg/install/github.sh > /dev/null
 RUN echo "cache buster 059a9a06-1686-4f49-9a7f-a30535886d50"
 RUN apt-get update && apt-get -y install snapd protobuf-compiler pkgconf clang-19 gh tree flatpak-builder libmpv-dev
 
-RUN ln -s /usr/lib/go-1.25/bin/go /usr/local/bin/go
+RUN ln -s /usr/lib/go-1.26/bin/go /usr/local/bin/go
 
 # install genieql and golang's protocol buffers and other dev tooling.
 RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
