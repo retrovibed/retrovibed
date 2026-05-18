@@ -9,7 +9,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/cryptox"
-	"github.com/retrovibed/retrovibed/shallows/internal/iterx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/iterx"
 	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/testx"

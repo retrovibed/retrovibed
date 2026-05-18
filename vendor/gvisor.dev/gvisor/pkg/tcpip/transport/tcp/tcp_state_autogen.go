@@ -25,8 +25,8 @@ func (a *acceptQueue) beforeSave() {}
 // +checklocksignore
 func (a *acceptQueue) StateSave(stateSinkObject state.Sink) {
 	a.beforeSave()
-	var endpointsValue []*Endpoint
-	endpointsValue = a.saveEndpoints()
+	endpointsValue := a.saveEndpoints()
+	_ = ([]*Endpoint)(endpointsValue)
 	stateSinkObject.SaveValue(0, endpointsValue)
 	stateSinkObject.Save(1, &a.pendingEndpoints)
 	stateSinkObject.Save(2, &a.capacity)
@@ -496,14 +496,15 @@ func (e *Endpoint) StateFields() []string {
 		"lastOutOfWindowAckTime",
 		"pmtud",
 		"alsoBindToV4",
+		"terminateAtRestore",
 	}
 }
 
 // +checklocksignore
 func (e *Endpoint) StateSave(stateSinkObject state.Sink) {
 	e.beforeSave()
-	var stateValue EndpointState
-	stateValue = e.saveState()
+	stateValue := e.saveState()
+	_ = (EndpointState)(stateValue)
 	stateSinkObject.SaveValue(12, stateValue)
 	stateSinkObject.Save(0, &e.TCPEndpointStateInner)
 	stateSinkObject.Save(1, &e.TransportEndpointInfo)
@@ -561,6 +562,7 @@ func (e *Endpoint) StateSave(stateSinkObject state.Sink) {
 	stateSinkObject.Save(54, &e.lastOutOfWindowAckTime)
 	stateSinkObject.Save(55, &e.pmtud)
 	stateSinkObject.Save(56, &e.alsoBindToV4)
+	stateSinkObject.Save(57, &e.terminateAtRestore)
 }
 
 // +checklocksignore
@@ -621,6 +623,7 @@ func (e *Endpoint) StateLoad(ctx context.Context, stateSourceObject state.Source
 	stateSourceObject.Load(54, &e.lastOutOfWindowAckTime)
 	stateSourceObject.Load(55, &e.pmtud)
 	stateSourceObject.Load(56, &e.alsoBindToV4)
+	stateSourceObject.Load(57, &e.terminateAtRestore)
 	stateSourceObject.LoadValue(12, new(EndpointState), func(y any) { e.loadState(ctx, y.(EndpointState)) })
 	stateSourceObject.AfterLoad(func() { e.afterLoad(ctx) })
 }
@@ -964,8 +967,8 @@ func (s *segment) beforeSave() {}
 // +checklocksignore
 func (s *segment) StateSave(stateSinkObject state.Sink) {
 	s.beforeSave()
-	var optionsValue []byte
-	optionsValue = s.saveOptions()
+	optionsValue := s.saveOptions()
+	_ = ([]byte)(optionsValue)
 	stateSinkObject.SaveValue(12, optionsValue)
 	stateSinkObject.Save(0, &s.segmentEntry)
 	stateSinkObject.Save(1, &s.segmentRefs)

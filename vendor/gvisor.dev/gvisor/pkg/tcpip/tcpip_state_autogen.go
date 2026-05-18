@@ -1264,31 +1264,6 @@ func (s *stdClock) StateLoad(ctx context.Context, stateSourceObject state.Source
 	stateSourceObject.AfterLoad(func() { s.afterLoad(ctx) })
 }
 
-func (st *stdTimer) StateTypeName() string {
-	return "pkg/tcpip.stdTimer"
-}
-
-func (st *stdTimer) StateFields() []string {
-	return []string{
-		"t",
-	}
-}
-
-func (st *stdTimer) beforeSave() {}
-
-// +checklocksignore
-func (st *stdTimer) StateSave(stateSinkObject state.Sink) {
-	st.beforeSave()
-	stateSinkObject.Save(0, &st.t)
-}
-
-func (st *stdTimer) afterLoad(context.Context) {}
-
-// +checklocksignore
-func (st *stdTimer) StateLoad(ctx context.Context, stateSourceObject state.Source) {
-	stateSourceObject.Load(0, &st.t)
-}
-
 func (mt *MonotonicTime) StateTypeName() string {
 	return "pkg/tcpip.MonotonicTime"
 }
@@ -1505,8 +1480,8 @@ func (c *ReceivableControlMessages) beforeSave() {}
 // +checklocksignore
 func (c *ReceivableControlMessages) StateSave(stateSinkObject state.Sink) {
 	c.beforeSave()
-	var TimestampValue int64
-	TimestampValue = c.saveTimestamp()
+	TimestampValue := c.saveTimestamp()
+	_ = (int64)(TimestampValue)
 	stateSinkObject.SaveValue(0, TimestampValue)
 	stateSinkObject.Save(1, &c.HasInq)
 	stateSinkObject.Save(2, &c.Inq)
@@ -3224,7 +3199,6 @@ func (j *jobInstance) StateTypeName() string {
 
 func (j *jobInstance) StateFields() []string {
 	return []string{
-		"timer",
 		"earlyReturn",
 	}
 }
@@ -3234,16 +3208,14 @@ func (j *jobInstance) beforeSave() {}
 // +checklocksignore
 func (j *jobInstance) StateSave(stateSinkObject state.Sink) {
 	j.beforeSave()
-	stateSinkObject.Save(0, &j.timer)
-	stateSinkObject.Save(1, &j.earlyReturn)
+	stateSinkObject.Save(0, &j.earlyReturn)
 }
 
 func (j *jobInstance) afterLoad(context.Context) {}
 
 // +checklocksignore
 func (j *jobInstance) StateLoad(ctx context.Context, stateSourceObject state.Source) {
-	stateSourceObject.Load(0, &j.timer)
-	stateSourceObject.Load(1, &j.earlyReturn)
+	stateSourceObject.Load(0, &j.earlyReturn)
 }
 
 func (j *Job) StateTypeName() string {
@@ -3328,7 +3300,6 @@ func init() {
 	state.Register((*LocalSockError)(nil))
 	state.Register((*SockError)(nil))
 	state.Register((*stdClock)(nil))
-	state.Register((*stdTimer)(nil))
 	state.Register((*MonotonicTime)(nil))
 	state.Register((*Address)(nil))
 	state.Register((*AddressMask)(nil))
