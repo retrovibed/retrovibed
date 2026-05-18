@@ -4,7 +4,7 @@ import (
 	"context"
 	"iter"
 
-	"github.com/retrovibed/retrovibed/retroapi/internal/iterx"
+	"github.com/retrovibed/retrovibed/retroapi/iterx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 )
 

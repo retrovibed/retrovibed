@@ -185,6 +185,10 @@ func (t *_torrenting) Reload(ctx context.Context, cfg *TorrentSettings, disc *Di
 	return nil
 }
 
+func (t *_torrenting) Broadcast() {
+	t.cond.Broadcast()
+}
+
 func (t *_torrenting) Watch(ctx context.Context, paths ...string) error {
 	if err := fsx.Touch(0600, paths...); err != nil {
 		return err

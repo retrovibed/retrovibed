@@ -11,6 +11,7 @@ import (
 	"unsafe"
 
 	"github.com/retrovibed/retrovibed/retroapi/authn"
+	"github.com/retrovibed/retrovibed/retroapi/netmonx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdglobalmain"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/shallows/meta/identityssh"
@@ -169,6 +170,19 @@ func ips() *C.char {
 	}
 
 	return C.CString(string(encoded))
+}
+
+//export netmon_metered
+func netmon_metered() C.int {
+	if netmonx.Metered() {
+		return 1
+	}
+	return 0
+}
+
+//export netmon_set_metered
+func netmon_set_metered(b C.int) {
+	netmonx.SetMetered(b != 0)
 }
 
 //export gsetenv

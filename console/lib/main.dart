@@ -14,6 +14,7 @@ import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/meta.dart' as meta;
 import 'package:retrovibed/retrovibed.dart' as retro;
 import 'package:retrovibed/deeplink.dart';
+import 'package:retrovibed/netmonx/metered.dart';
 import 'package:retrovibed/env.dart' as env;
 import 'package:retrovibed/design.kit/theme.defaults.dart' as theming;
 import 'package:retrovibed/design.kit/modals.dart' as modals;
@@ -126,96 +127,98 @@ class Retrovibed extends StatelessWidget {
                   authn.Authenticated(
                     authn.DeeppoolAuthzCache(
                       authn.AuthzCache(
-                        DeepLink(
-                          billing.Registered(
-                            media.Playlist(
-                              tracing: (ctx, pos, dur, q, id) {
-                                medialib.recent
-                                    .record(
-                                      medialib.RecentRecordRequest(
-                                        media: medialib.Media(id: id),
-                                        position: ds.Int64(pos.inMilliseconds),
-                                        duration: ds.Int64(dur.inMilliseconds),
-                                        query: q,
-                                      ),
-                                      options: [authn.AuthzCache.bearer(ctx)],
-                                    )
-                                    .then((v) {})
-                                    .catchError((cause) {
-                                      print(
-                                        "failed to record watch event ${pos}/${dur} - ${q} - ${cause}",
-                                      );
-                                    })
-                                    .ignore();
-                              },
-                              DefaultTabController(
-                                length: 4,
-                                child: ds.build((context) {
-                                  final defaults = ds.Defaults.of(context);
-                                  final compact = defaults.isCompact;
-                                  final nochrome = ds.Full.nochrome(context);
-                                  final tabbar = TabBar(
-                                    dividerHeight: 0,
-                                    tabs: [
-                                      Tab(icon: Icon(Icons.movie)),
-                                      Tab(icon: Icon(Icons.download)),
-                                      Tab(icon: Icon(Icons.groups)),
-                                      Tab(icon: Icon(Icons.settings)),
-                                    ],
-                                  );
+                        Metered(
+                          DeepLink(
+                            billing.Registered(
+                              media.Playlist(
+                                tracing: (ctx, pos, dur, q, id) {
+                                  medialib.recent
+                                      .record(
+                                        medialib.RecentRecordRequest(
+                                          media: medialib.Media(id: id),
+                                          position: ds.Int64(pos.inMilliseconds),
+                                          duration: ds.Int64(dur.inMilliseconds),
+                                          query: q,
+                                        ),
+                                        options: [authn.AuthzCache.bearer(ctx)],
+                                      )
+                                      .then((v) {})
+                                      .catchError((cause) {
+                                        print(
+                                          "failed to record watch event ${pos}/${dur} - ${q} - ${cause}",
+                                        );
+                                      })
+                                      .ignore();
+                                },
+                                DefaultTabController(
+                                  length: 4,
+                                  child: ds.build((context) {
+                                    final defaults = ds.Defaults.of(context);
+                                    final compact = defaults.isCompact;
+                                    final nochrome = ds.Full.nochrome(context);
+                                    final tabbar = TabBar(
+                                      dividerHeight: 0,
+                                      tabs: [
+                                        Tab(icon: Icon(Icons.movie)),
+                                        Tab(icon: Icon(Icons.download)),
+                                        Tab(icon: Icon(Icons.groups)),
+                                        Tab(icon: Icon(Icons.settings)),
+                                      ],
+                                    );
 
-                                  final tabs = DecoratedBox(
-                                    decoration: BoxDecoration(
-                                      border: Border(
-                                        bottom: BorderSide(
-                                          width: 1.0,
-                                          color: Theme.of(context).dividerColor,
+                                    final tabs = DecoratedBox(
+                                      decoration: BoxDecoration(
+                                        border: Border(
+                                          bottom: BorderSide(
+                                            width: 1.0,
+                                            color: Theme.of(context).dividerColor,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Expanded(child: tabbar),
-                                        if (defaults.desktop) navbar.Hamburger(),
-                                      ],
-                                    ),
-                                  );
-                                  return Scaffold(
-                                    appBar:
-                                        (!compact && !nochrome)
-                                            ? PreferredSize(
-                                              preferredSize: Size.fromHeight(kTextTabBarHeight),
-                                              child: tabs,
-                                            )
-                                            : null,
-                                    bottomNavigationBar: (compact && !nochrome) ? tabs : null,
-                                    body: ds.ErrorBoundary(
-                                      TabBarView(
+                                      child: Row(
                                         children: [
-                                          modals.Node(
-                                            media.AutoHelp(
-                                              media.Playlist.wrap((ctx, s) {
-                                                return media.VideoScreen(
-                                                  medialib.AvailableGridDisplay(
-                                                    focus: defaults.mobile ? null : s.searchfocus,
-                                                    controller: s.controller,
-                                                    highlighted: s.current.id,
-                                                    search: s.search,
-                                                  ),
-                                                  s.player,
-                                                  s.playerfocus,
-                                                );
-                                              }),
-                                            ),
-                                          ),
-                                          modals.Node(downloads.AutoHelp(const downloads.Display())),
-                                          modals.Node(community.AutoHelp(community.Management())),
-                                          modals.Node(settings.AutoHelp(const settings.Display())),
+                                          Expanded(child: tabbar),
+                                          if (defaults.desktop) navbar.Hamburger(),
                                         ],
                                       ),
-                                    ),
-                                  );
-                                }),
+                                    );
+                                    return Scaffold(
+                                      appBar:
+                                          (!compact && !nochrome)
+                                              ? PreferredSize(
+                                                preferredSize: Size.fromHeight(kTextTabBarHeight),
+                                                child: tabs,
+                                              )
+                                              : null,
+                                      bottomNavigationBar: (compact && !nochrome) ? tabs : null,
+                                      body: ds.ErrorBoundary(
+                                        TabBarView(
+                                          children: [
+                                            modals.Node(
+                                              media.AutoHelp(
+                                                media.Playlist.wrap((ctx, s) {
+                                                  return media.VideoScreen(
+                                                    medialib.AvailableGridDisplay(
+                                                      focus: defaults.mobile ? null : s.searchfocus,
+                                                      controller: s.controller,
+                                                      highlighted: s.current.id,
+                                                      search: s.search,
+                                                    ),
+                                                    s.player,
+                                                    s.playerfocus,
+                                                  );
+                                                }),
+                                              ),
+                                            ),
+                                            modals.Node(downloads.AutoHelp(const downloads.Display())),
+                                            modals.Node(community.AutoHelp(community.Management())),
+                                            modals.Node(settings.AutoHelp(const settings.Display())),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  }),
+                                ),
                               ),
                             ),
                           ),

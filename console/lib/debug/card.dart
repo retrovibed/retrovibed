@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
+import 'package:retrovibed/retrovibed.dart' as retro;
 
 class Card extends StatelessWidget {
   final EdgeInsets margin;
@@ -29,34 +30,61 @@ class Card extends StatelessWidget {
       alignment: Alignment.topLeft,
       margin: margin,
       help: ds.Hint(const Text("device and display information")),
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: defaults.spacing / 4,
-        children: [
-          Text("Device Info", style: theme.textTheme.titleMedium),
-          ...rows.map(
-            (r) => Row(
+      SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: defaults.spacing / 4,
+          children: [
+            Text("Device Info", style: theme.textTheme.titleMedium),
+            ...rows.map(
+              (r) => Row(
+                children: [
+                  SizedBox(
+                    width: 84,
+                    child: Text(
+                      r.$1,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      r.$2,
+                      style: theme.textTheme.bodySmall,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Row(
               children: [
                 SizedBox(
                   width: 84,
                   child: Text(
-                    r.$1,
+                    'Metered',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                   ),
                 ),
-                Expanded(
-                  child: Text(
-                    r.$2,
-                    style: theme.textTheme.bodySmall,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                StatefulBuilder(
+                  builder:
+                      (context, setState) => ds.LoadingIconButton(
+                        toggled: retro.metered(),
+                        icon: Icon(Icons.network_check, color: retro.metered() ? Colors.green : null),
+                        onPressed: () async {
+                          print("DERP DERP ${retro.metered()}");
+                          retro.set_metered(!retro.metered());
+                          setState(() {});
+                        },
+                      ),
                 ),
               ],
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

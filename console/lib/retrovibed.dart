@@ -149,6 +149,14 @@ String _convertstring(Pointer<Char> charPointer) {
   }
 }
 
+bool metered() {
+  return bridge.netmon_metered() != 0;
+}
+
+void set_metered(bool b) {
+  bridge.netmon_set_metered(b ? 1 : 0);
+}
+
 void checkpointdb() {
   try {
     bridge.checkpointdb();

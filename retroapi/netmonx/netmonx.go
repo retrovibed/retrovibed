@@ -4,13 +4,53 @@ import (
 	"context"
 	"iter"
 	"sync"
+	"sync/atomic"
 
 	"tailscale.com/net/netmon"
+	"tailscale.com/types/logger"
+	"tailscale.com/util/eventbus"
 )
 
+var (
+	globalMon  atomic.Pointer[Monitor]
+	globalOnce sync.Once
+)
+
+func Global() *Monitor {
+	globalOnce.Do(func() {
+		m, err := New()
+		if err != nil {
+			return
+		}
+		globalMon.Store(m)
+	})
+	return globalMon.Load()
+}
+
+func SetMetered(b bool) {
+	m := Global()
+	if m == nil {
+		return
+	}
+
+	if state := m.mon.InterfaceState(); state != nil {
+		state.IsExpensive = b
+		m.mon.InjectEvent()
+	}
+}
+
+func Metered() bool {
+	m := Global()
+	if m == nil {
+		return false
+	}
+	return m.Metered()
+}
+
 type Monitor struct {
+	bus  *eventbus.Bus
 	mon  *netmon.Monitor
-	ch   chan *netmon.Delta
+	ch   chan netmon.ChangeDelta
 	done chan struct{}
 	once sync.Once
 	err  error
@@ -18,37 +58,38 @@ type Monitor struct {
 
 func New() (*Monitor, error) {
 	m := &Monitor{
-		ch:   make(chan *netmon.Delta, 16),
+		bus:  eventbus.New(),
+		ch:   make(chan netmon.ChangeDelta, 16),
 		done: make(chan struct{}),
 	}
 
-	mon, err := netmon.New(func(n *netmon.Delta) {
+	mon, err := netmon.New(m.bus, logger.Discard)
+	if err != nil {
+		m.bus.Close()
+		return nil, err
+	}
+
+	mon.RegisterChangeCallback(func(delta *netmon.ChangeDelta) {
 		select {
-		case m.ch <- n:
+		case m.ch <- *delta:
 		case <-m.done:
 		}
 	})
-	if err != nil {
-		return nil, err
-	}
 
 	m.mon = mon
 	mon.Start()
 	return m, nil
 }
 
-func (m *Monitor) Each(ctx context.Context) iter.Seq[*netmon.Delta] {
-	return func(yield func(*netmon.Delta) bool) {
+func (m *Monitor) Each(ctx context.Context) iter.Seq[netmon.ChangeDelta] {
+	return func(yield func(netmon.ChangeDelta) bool) {
 		for {
 			select {
 			case <-ctx.Done():
 				return
 			case <-m.done:
 				return
-			case v, ok := <-m.ch:
-				if !ok {
-					return
-				}
+			case v := <-m.ch:
 				if !yield(v) {
 					return
 				}
@@ -57,14 +98,25 @@ func (m *Monitor) Each(ctx context.Context) iter.Seq[*netmon.Delta] {
 	}
 }
 
+func (m *Monitor) Metered() bool {
+	state := m.mon.InterfaceState()
+	if state == nil {
+		return false
+	}
+	return state.IsExpensive
+}
+
 func (m *Monitor) Err() error {
 	return m.err
 }
 
 func (m *Monitor) Close() error {
+	var err error
 	m.once.Do(func() {
 		close(m.done)
-		close(m.ch)
+		err = m.mon.Close()
+		m.bus.Close()
+		m.err = err
 	})
-	return m.mon.Close()
+	return err
 }

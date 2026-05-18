@@ -64,6 +64,7 @@ dependencies:
   window_manager: ^0.5.1
   shake: ^3.0.0
   downloadsfolder: ^1.2.0
+  connectivity_plus: ^7.1.1
 
 dev_dependencies:
   flutter_test:

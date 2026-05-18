@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/retrovibed/retrovibed/retroapi/internal/iterx"
+	"github.com/retrovibed/retrovibed/retroapi/iterx"
 	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/testx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"

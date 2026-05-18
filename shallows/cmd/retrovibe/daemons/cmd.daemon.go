@@ -16,6 +16,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
+	"github.com/retrovibed/retrovibed/retroapi/netmonx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
@@ -215,6 +216,16 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	); err != nil {
 		return err
 	}
+
+	netmon := netmonx.Global()
+	go func() {
+		for delta := range netmon.Each(gctx.Context) {
+			log.Println("network delta", delta)
+			torrenting.Broadcast()
+		}
+
+		errorsx.Log(errorsx.Wrap(netmon.Err(), "netmon failed"))
+	}()
 
 	asyncx.Background(gctx.Context, mediameta, func(ctx context.Context) error {
 		return errorsx.Wrap(MediaMetadataImport(ctx, db, tvfs, tstore), "media metadata import failed")
