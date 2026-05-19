@@ -15,7 +15,7 @@ void main() {
     printOnFailure('Cursor kind: ${cursor.kind}');
 
     // validate initial expectations for the environment.
-    expect(Platform.version, startsWith("3.11"));
+    expect(Platform.version, startsWith("3.12"));
     expect(tester.view.physicalSize.width, 2400.0);
     expect(tester.view.physicalSize.height, 1800.0);
     expect(tester.view.devicePixelRatio, 3.0);

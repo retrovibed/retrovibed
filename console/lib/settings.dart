@@ -194,6 +194,7 @@ class _DisplayState extends State<Display> {
                         ),
                         google.Card(onPressed: full),
                         debug.Card(margin: EdgeInsets.zero),
+                        if (defaults.debug) debug.MeteredCard(margin: EdgeInsets.zero),
                       ],
                     );
                   }),

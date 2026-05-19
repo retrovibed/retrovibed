@@ -24,6 +24,7 @@ class Card extends StatelessWidget {
       ('Desktop', defaults.desktop.toString()),
       ('Mobile', defaults.mobile.toString()),
       ('Compact', defaults.isCompact.toString()),
+      ('Metered', retro.metered().toString()),
     ];
 
     return ds.Card(
@@ -57,31 +58,6 @@ class Card extends StatelessWidget {
                   ),
                 ],
               ),
-            ),
-            Row(
-              children: [
-                SizedBox(
-                  width: 84,
-                  child: Text(
-                    'Metered',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                    ),
-                  ),
-                ),
-                StatefulBuilder(
-                  builder:
-                      (context, setState) => ds.LoadingIconButton(
-                        toggled: retro.metered(),
-                        icon: Icon(Icons.network_check, color: retro.metered() ? Colors.green : null),
-                        onPressed: () async {
-                          // TODO: do this as a standalone card that is only displayed in debug mode.
-                          retro.set_metered(!retro.metered());
-                          setState(() {});
-                        },
-                      ),
-                ),
-              ],
             ),
           ],
         ),
