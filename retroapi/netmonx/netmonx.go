@@ -6,6 +6,7 @@ import (
 	"sync"
 	"sync/atomic"
 
+	"github.com/retrovibed/retrovibed/retroapi/atomicx"
 	"tailscale.com/net/netmon"
 	"tailscale.com/types/logger"
 	"tailscale.com/util/eventbus"
@@ -32,11 +33,14 @@ func SetMetered(b bool) {
 	if m == nil {
 		return
 	}
+	m.SetMetered(b)
+}
 
-	if state := m.mon.InterfaceState(); state != nil {
-		state.IsExpensive = b
-		m.mon.InjectEvent()
-	}
+func (m *Monitor) SetMetered(b bool) {
+	s := m.current.Load()
+	s.IsExpensive = b
+	m.current.Store(s)
+	m.mon.InjectEvent()
 }
 
 func Metered() bool {
@@ -44,23 +48,26 @@ func Metered() bool {
 	if m == nil {
 		return false
 	}
+
 	return m.Metered()
 }
 
 type Monitor struct {
-	bus  *eventbus.Bus
-	mon  *netmon.Monitor
-	ch   chan netmon.ChangeDelta
-	done chan struct{}
-	once sync.Once
-	err  error
+	bus     *eventbus.Bus
+	mon     *netmon.Monitor
+	current *atomic.Pointer[netmon.State]
+	ch      chan netmon.ChangeDelta
+	done    chan struct{}
+	once    sync.Once
+	err     error
 }
 
 func New() (*Monitor, error) {
 	m := &Monitor{
-		bus:  eventbus.New(),
-		ch:   make(chan netmon.ChangeDelta, 16),
-		done: make(chan struct{}),
+		bus:     eventbus.New(),
+		ch:      make(chan netmon.ChangeDelta, 16),
+		done:    make(chan struct{}),
+		current: atomicx.Pointer(netmon.State{}),
 	}
 
 	mon, err := netmon.New(m.bus, logger.Discard)
@@ -70,6 +77,10 @@ func New() (*Monitor, error) {
 	}
 
 	mon.RegisterChangeCallback(func(delta *netmon.ChangeDelta) {
+		s := delta.CurrentState()
+		s.IsExpensive = m.current.Load().IsExpensive
+		m.current.Store(s)
+
 		select {
 		case m.ch <- *delta:
 		case <-m.done:
@@ -78,6 +89,11 @@ func New() (*Monitor, error) {
 
 	m.mon = mon
 	mon.Start()
+
+	if st := mon.InterfaceState(); st != nil {
+		m.current.Store(st)
+	}
+
 	return m, nil
 }
 
@@ -99,11 +115,7 @@ func (m *Monitor) Each(ctx context.Context) iter.Seq[netmon.ChangeDelta] {
 }
 
 func (m *Monitor) Metered() bool {
-	state := m.mon.InterfaceState()
-	if state == nil {
-		return false
-	}
-	return state.IsExpensive
+	return m.current.Load().IsExpensive
 }
 
 func (m *Monitor) Err() error {

@@ -10,14 +10,17 @@ class MeteredToggle extends StatefulWidget {
 }
 
 class _MeteredToggleState extends State<MeteredToggle> {
+  bool _metered = retro.metered();
   @override
   Widget build(BuildContext context) {
     return ds.LoadingIconButton(
-      toggled: retro.metered(),
-      icon: Icon(Icons.network_check, color: retro.metered() ? Colors.green : null),
+      toggled: _metered,
+      icon: Icon(Icons.network_check, color: _metered ? Colors.green : null),
       onPressed: () async {
-        retro.set_metered(!retro.metered());
-        setState(() {});
+        final upd = retro.set_metered(!retro.metered());
+        setState(() {
+          _metered = upd;
+        });
       },
     );
   }

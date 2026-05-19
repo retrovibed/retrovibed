@@ -149,11 +149,12 @@ func (t *_torrenting) Reload(ctx context.Context, cfg *TorrentSettings, disc *Di
 
 			if metered := netmonx.Metered(); metered {
 				log.Println("applying metered settings to configuration")
-				mcfg.Inbound.Rate = 0        // block inbound connections.
-				mcfg.Seed = false            // dont seed
-				mcfg.Resumable = false       // dont attempt to resume downloads
-				mcfg.AutoLocateMedia = false // dont attempt to index the swarm
-				disc.Enabled = false         // dont attempt to discover content from the swarm
+				mcfg.Inbound.Rate = 0         // block inbound connections.
+				mcfg.Upload.Rate = bytesx.KiB // dramatically slow down distribution to peers
+				mcfg.Seed = false             // dont seed
+				mcfg.Resumable = false        // dont attempt to resume downloads
+				mcfg.AutoLocateMedia = false  // dont attempt to index the swarm
+				disc.Enabled = false          // dont attempt to discover content from the swarm
 			}
 
 			_ctx, _done := context.WithCancelCause(ctx)

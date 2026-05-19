@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/justinas/alice"
 	"golang.org/x/crypto/ssh"
@@ -220,7 +221,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	netmon := netmonx.Global()
 	go func() {
 		for delta := range netmon.Each(gctx.Context) {
-			log.Println("network delta", delta)
+			log.Println("network delta", spew.Sdump(delta))
 			torrenting.Broadcast()
 		}
 
