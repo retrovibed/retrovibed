@@ -118,6 +118,24 @@ class DaemonBridge {
   late final _ipsPtr = _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function()>>('ips');
   late final _ips = _ipsPtr.asFunction<ffi.Pointer<ffi.Char> Function()>();
 
+  int netmon_metered() {
+    return _netmon_metered();
+  }
+
+  late final _netmon_meteredPtr = _lookup<ffi.NativeFunction<ffi.Int Function()>>('netmon_metered');
+  late final _netmon_metered = _netmon_meteredPtr.asFunction<int Function()>();
+
+  void netmon_set_metered(
+    int b,
+  ) {
+    return _netmon_set_metered(
+      b,
+    );
+  }
+
+  late final _netmon_set_meteredPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int)>>('netmon_set_metered');
+  late final _netmon_set_metered = _netmon_set_meteredPtr.asFunction<void Function(int)>();
+
   void gsetenv(
     ffi.Pointer<ffi.Char> key,
     ffi.Pointer<ffi.Char> value,

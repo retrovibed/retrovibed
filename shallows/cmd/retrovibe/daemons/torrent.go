@@ -22,6 +22,7 @@ import (
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/storage"
+	"github.com/retrovibed/retrovibed/retroapi/netmonx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/ddisc/ddisctorrent"
@@ -146,6 +147,15 @@ func (t *_torrenting) Reload(ctx context.Context, cfg *TorrentSettings, disc *Di
 			}
 			log.Println("torrent settings completed", spew.Sdump(mcfg))
 
+			if metered := netmonx.Metered(); metered {
+				log.Println("applying metered settings to configuration")
+				mcfg.Inbound.Rate = 0        // block inbound connections.
+				mcfg.Seed = false            // dont seed
+				mcfg.Resumable = false       // dont attempt to resume downloads
+				mcfg.AutoLocateMedia = false // dont attempt to index the swarm
+				disc.Enabled = false         // dont attempt to discover content from the swarm
+			}
+
 			_ctx, _done := context.WithCancelCause(ctx)
 			log.Println("torrent settings", spew.Sdump(mcfg))
 			log.Println("discovery settings", spew.Sdump(disc))
@@ -183,6 +193,10 @@ func (t *_torrenting) Reload(ctx context.Context, cfg *TorrentSettings, disc *Di
 	}()
 
 	return nil
+}
+
+func (t *_torrenting) Broadcast() {
+	t.cond.Broadcast()
 }
 
 func (t *_torrenting) Watch(ctx context.Context, paths ...string) error {

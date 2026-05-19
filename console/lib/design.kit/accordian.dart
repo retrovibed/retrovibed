@@ -51,12 +51,15 @@ class _AccordionState extends State<Accordion> {
       children: [
         Opacity(
           opacity: opacity,
-          child: ListTile(
-            hoverColor: theme.hoverColor,
-            mouseCursor: cursor,
-            onTap: onPressed,
-            title: widget.description,
-            trailing: icon,
+          child: Material(
+            color: Colors.transparent,
+            child: ListTile(
+              hoverColor: theme.hoverColor,
+              mouseCursor: cursor,
+              onTap: onPressed,
+              title: widget.description,
+              trailing: icon,
+            ),
           ),
         ),
         Visibility(visible: !hidden, child: content),
