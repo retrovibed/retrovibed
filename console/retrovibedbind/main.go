@@ -181,8 +181,10 @@ func netmon_metered() C.int {
 }
 
 //export netmon_set_metered
-func netmon_set_metered(b C.int) {
-	netmonx.SetMetered(b != 0)
+func netmon_set_metered(b C.int) C.int {
+	_b := b != 0
+	netmonx.SetMetered(_b)
+	return b
 }
 
 //export gsetenv
