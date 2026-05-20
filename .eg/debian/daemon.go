@@ -39,7 +39,7 @@ func init() {
 		egdebuild.Option.Version("0.0.:autopatch:"),
 		egdebuild.Option.Description("media distribution platform", "provides torrenting functionality with builtin media player and cloud storage allowing you to take your content anywhere you go"),
 		egdebuild.Option.Debian(errorsx.Must(fs.Sub(debskel, ".debskel"))),
-		egdebuild.Option.DependsBuild("golang-1.25", "dh-make", "debhelper", "duckdb"),
+		egdebuild.Option.DependsBuild("golang-1.26", "dh-make", "debhelper", "duckdb"),
 		egdebuild.Option.Depends("duckdb"),
 	)
 }
@@ -59,7 +59,7 @@ func Prepare(ctx context.Context, o eg.Op) error {
 
 // container for this package.
 func Runner() eg.ContainerRunner {
-	return eg.Container("retrovibe.debuild.ubuntu.24.10")
+	return eg.Container("retrovibe.debuild.ubuntu")
 }
 
 func Build(ctx context.Context, o eg.Op) error {
@@ -70,9 +70,10 @@ func Build(ctx context.Context, o eg.Op) error {
 		egdebuild.Build(gcfg, egdebuild.Option.Distro("jammy")),
 		egdebuild.Build(gcfg, egdebuild.Option.Distro("noble"), egdebuild.Option.NoLint()),
 		egdebuild.Build(gcfg, egdebuild.Option.Distro("questing"), egdebuild.Option.NoLint()),
+		egdebuild.Build(gcfg, egdebuild.Option.Distro(egdebuild.UbuntuLatestCodename), egdebuild.Option.NoLint()), // resolute
 		egdebuild.Build(
 			gcfg,
-			egdebuild.Option.Distro("questing"),
+			egdebuild.Option.Distro(egdebuild.UbuntuLatestCodename),
 			egdebuild.Option.BuildBinary(20*time.Minute),
 			egdebuild.Option.Environ(eggolang.Env()...),
 			egdebuild.Option.NoLint(),
