@@ -210,7 +210,7 @@ class Retrovibed extends StatelessWidget {
                                                 }),
                                               ),
                                             ),
-                                            modals.Node(downloads.AutoHelp(const downloads.Display())),
+                                            modals.Node(downloads.AutoHelp(downloads.MeteredWarning(const downloads.Display()))),
                                             modals.Node(community.AutoHelp(community.Management())),
                                             modals.Node(settings.AutoHelp(const settings.Display())),
                                           ],
