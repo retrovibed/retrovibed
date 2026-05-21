@@ -14,7 +14,7 @@ class AuthzMetaDisplay extends StatelessWidget {
     return Builder(
       builder: (context) {
         return AuthzMetaDisplay(
-          authn.AuthzCache.of(context)?.meta.current.metadata ?? meta.Token(),
+          authn.AuthzCache.of(context).meta.current.token,
         );
       },
     );

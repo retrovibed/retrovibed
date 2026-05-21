@@ -55,7 +55,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
   Future<void> refresh(media.MediaSearchRequest req, {bool refocus = false}) {
     return httpx
         .withRetry(
-          () => widget.apisearch(req, options: [authn.AuthzCache.bearer(context)]),
+          () => widget.apisearch(req, options: [authn.request(authn.AuthzCache.meta(context))]),
         )
         .then((v) {
           setState(() {
@@ -89,7 +89,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
   @override
   void initState() {
     super.initState();
-    refresh(widget.search.value.next);
+    WidgetsBinding.instance.addPostFrameCallback((_) => refresh(widget.search.value.next));
   }
 
   @override
@@ -239,7 +239,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                                           query: search.next.query,
                                           limit: search.next.limit.toInt(),
                                         ),
-                                        options: [authn.AuthzCache.bearer(context)],
+                                        options: [authn.request(authn.AuthzCache.meta(context))],
                                       )
                                       .then((v) => v.items),
                                 );
@@ -261,7 +261,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                                 return api.locate
                                     .create(
                                       api.Locate.create()..knownMediaId = v.id,
-                                      options: [authn.AuthzCache.bearer(context)],
+                                      options: [authn.request(authn.AuthzCache.meta(context))],
                                     )
                                     .then((_) {
                                       ScaffoldMessenger.of(context).showSnackBar(
@@ -330,7 +330,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                               _media.knownMediaId,
                               () => api.known.get(
                                 _media.knownMediaId,
-                                options: [authn.AuthzCache.bearer(context)],
+                                options: [authn.request(authn.AuthzCache.meta(context))],
                               ),
                             )
                             .then(

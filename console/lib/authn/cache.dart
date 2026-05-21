@@ -29,35 +29,34 @@ class AuthzCache extends StatefulWidget {
     };
   }
 
-  static _AuthzCache? of(BuildContext context) {
-    return context.findAncestorStateOfType<_AuthzCache>();
+  static _AuthzCache of(BuildContext context) {
+    return context.findAncestorStateOfType<_AuthzCache>() ?? _AuthzCache();
   }
 
-  static _meta.Token authzmetadata(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<_AuthzTokenData>()?.bearer.metadata ?? _meta.Token();
+  static _AuthzTokenData cached(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<_AuthzTokenData>() ?? _AuthzTokenData.empty;
   }
 
-  static httpx.Option bearer(BuildContext context) {
-    final cache = of(context) ?? _AuthzCache();
-    return httpx.Request.bearer(() => cache.meta.token().then((v) => v.bearer));
-  }
+  static _meta.Token authzmetadata(BuildContext context) => cached(context).meta.current.token;
 
-  static Future<String> bearerString(BuildContext context) {
-    final cache = of(context) ?? _AuthzCache();
-    return cache.meta.token().then((v) => v.bearer);
-  }
+  static authz.Cached<_meta.Token> meta(BuildContext context) => cached(context).meta;
 
   @override
   State<AuthzCache> createState() => _AuthzCache();
 }
 
 class _AuthzTokenData extends InheritedWidget {
-  final authz.Bearer<_meta.Token> bearer;
+  final authz.Cached<_meta.Token> meta;
 
-  const _AuthzTokenData({required this.bearer, required super.child});
+  const _AuthzTokenData({required this.meta, required super.child});
+
+  static final empty = _AuthzTokenData(
+    meta: authz.Cached(authz.Bearer(_meta.Token(), ""), authz.Cached.pending),
+    child: const SizedBox(),
+  );
 
   @override
-  bool updateShouldNotify(_AuthzTokenData old) => bearer != old.bearer;
+  bool updateShouldNotify(_AuthzTokenData old) => meta != old.meta;
 }
 
 class _AuthzCache extends State<AuthzCache> {
@@ -128,7 +127,7 @@ class _AuthzCache extends State<AuthzCache> {
   @override
   Widget build(BuildContext context) {
     return _AuthzTokenData(
-      bearer: meta.current,
+      meta: meta,
       child: ds.Loading(
         loading: _loading,
         _loading ? SizedBox() : widget.child,

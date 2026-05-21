@@ -24,7 +24,7 @@ Future<void> Function()? PlayAction(
             return Future.sync(
               () => playlist.setPlaylist(
                 s.next,
-                range(s.next, current, options: () => [authn.AuthzCache.bearer(context)]),
+                range(s.next, current, options: () => [authn.request(authn.AuthzCache.meta(context))]),
               ),
             );
           };
@@ -41,7 +41,7 @@ Future<void> Function() DownloadAction(BuildContext context, Media current) {
         final dst = File('${downloads.path}/$fname');
         final sink = dst.openWrite();
         return api.media
-            .download(current.id, options: [authn.AuthzCache.bearer(context)])
+            .download(current.id, options: [authn.request(authn.AuthzCache.meta(context))])
             .then((resp) => resp.stream.pipe(sink))
             .whenComplete(() {
               return sink.close().then((v) {
@@ -60,7 +60,7 @@ Future<void> Function() DownloadAction(BuildContext context, Media current) {
             '${downloads!.path}/${current.description.trim().replaceAll(" ", ".")}',
           ).openWrite();
       return api.media
-          .download(current.id, options: [authn.AuthzCache.bearer(context)])
+          .download(current.id, options: [authn.request(authn.AuthzCache.meta(context))])
           .then((resp) => resp.stream.pipe(sink))
           .whenComplete(() => sink.close());
     });
@@ -77,7 +77,7 @@ Future<Media> Function() ArchiveAction(
         .update(
           current.id,
           current..archiveId = uuidx.max(),
-          options: [authn.AuthzCache.bearer(context)],
+          options: [authn.request(authn.AuthzCache.meta(context))],
         )
         .then((v) => v.media)
         .then(then ?? (v) => v);
@@ -94,7 +94,7 @@ Future<Media> Function() ArchiveCancelAction(
         .update(
           current.id,
           current..archiveId = uuidx.min(),
-          options: [authn.AuthzCache.bearer(context)],
+          options: [authn.request(authn.AuthzCache.meta(context))],
         )
         .then((v) => v.media)
         .then(then ?? (v) => v);

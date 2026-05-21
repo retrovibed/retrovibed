@@ -33,7 +33,7 @@ class MediaEdit extends StatelessWidget {
                   .update(
                     current.id,
                     current..archiveId = uuidx.min(),
-                    options: [authn.AuthzCache.bearer(context)],
+                    options: [authn.request(authn.AuthzCache.meta(context))],
                   )
                   .then((v) => onChange(Future.value(v.media)));
             },
@@ -54,7 +54,7 @@ class MediaEdit extends StatelessWidget {
                   .update(
                     current.id,
                     current..archiveId = uuidx.max(),
-                    options: [authn.AuthzCache.bearer(context)],
+                    options: [authn.request(authn.AuthzCache.meta(context))],
                   )
                   .then((v) => onChange(Future.value(v.media)));
             },
@@ -79,7 +79,7 @@ class MediaEdit extends StatelessWidget {
                     (v) => media.media.update(
                       current.id,
                       current..archiveId = uuidx.min(),
-                      options: [authn.AuthzCache.bearer(context)],
+                      options: [authn.request(authn.AuthzCache.meta(context))],
                     ),
                   )
                   .then((v) => onChange(Future.value(v.media))),
@@ -114,7 +114,7 @@ class MediaEdit extends StatelessWidget {
             input: typography.sharing(current.torrentId),
           ),
           Visibility(
-            visible: (authn.AuthzCache.of(context)?.meta.current.metadata.archiveUpload.toInt() ?? 0) > 0,
+            visible: (authn.AuthzCache.of(context).meta.current.token.archiveUpload.toInt()) > 0,
             child: forms.Field(
               label: Text("archived"),
               input: archive(context, current.archiveId),

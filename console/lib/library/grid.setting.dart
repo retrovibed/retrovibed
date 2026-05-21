@@ -57,12 +57,12 @@ class GridSettings extends StatelessWidget {
         leading: [ds.Heading(Text("sharing"))],
         torrents_pkg.Settings.future(
           httpx.withRetry(
-            () => torrents(options: [authn.AuthzCache.bearer(context)]),
+            () => torrents(options: [authn.request(authn.AuthzCache.meta(context))]),
           ),
           onChange: (v) {
             return torrents_pkg.api.create(
               v,
-              options: [authn.AuthzCache.bearer(context)],
+              options: [authn.request(authn.AuthzCache.meta(context))],
             );
           },
         ),
@@ -72,13 +72,13 @@ class GridSettings extends StatelessWidget {
         storage_pkg.MinimalSettings.future(
           httpx.withRetry(
             () => storage(
-              options: [authn.AuthzCache.bearer(context)],
+              options: [authn.request(authn.AuthzCache.meta(context))],
             ),
           ),
           onChange: (v) {
             return storage_pkg.api.create(
               v,
-              options: [authn.AuthzCache.bearer(context)],
+              options: [authn.request(authn.AuthzCache.meta(context))],
             );
           },
         ),
@@ -87,7 +87,7 @@ class GridSettings extends StatelessWidget {
         leading: [ds.Heading(Text("network"))],
         wireguard.Settings.future(
           wgcurrent().then((r) => r.wireguard),
-          onChange: (v) => wgupdate(v, options: [authn.AuthzCache.bearer(context)]).then((r) => r.wireguard),
+          onChange: (v) => wgupdate(v, options: [authn.request(authn.AuthzCache.meta(context))]).then((r) => r.wireguard),
         ),
       ),
     ];

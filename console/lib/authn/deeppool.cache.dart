@@ -27,7 +27,7 @@ class DeeppoolAuthzCache extends StatefulWidget {
 
   static httpx.Option bearer(BuildContext context) {
     final cache = of(context) ?? _AuthzCache();
-    return httpx.Request.bearer(() => cache.meta.token().then((v) => v.bearer));
+    return httpx.Request.bearer(() => cache.meta.auto().then((v) => v.bearer));
   }
 
   static Future<String> attributionToken(BuildContext context) {

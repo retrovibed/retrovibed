@@ -42,7 +42,7 @@ class SearchableView extends State<ListSearchable> {
 
   Future<api.FeedSearchResponse> refresh(api.FeedSearchRequest next) {
     return widget
-        .search(next, options: [authn.AuthzCache.bearer(context)])
+        .search(next, options: [authn.request(authn.AuthzCache.meta(context))])
         .then((r) {
           setState(() {
             _res = r;
@@ -59,11 +59,13 @@ class SearchableView extends State<ListSearchable> {
   @override
   void initState() {
     super.initState();
-    refresh(_res.next).catchError((e) {
-      setState(() {
-        _cause = ds.Error.unknown(e, onTap: reseterr);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      refresh(_res.next).catchError((e) {
+        setState(() {
+          _cause = ds.Error.unknown(e, onTap: reseterr);
+        });
+        return _res;
       });
-      return _res;
     });
   }
 
@@ -88,7 +90,7 @@ class SearchableView extends State<ListSearchable> {
     api
         .create(
           api.FeedCreateRequest(feed: n),
-          options: [authn.AuthzCache.bearer(context)],
+          options: [authn.request(authn.AuthzCache.meta(context))],
         )
         .then((v) {
           refresh(_res.next);

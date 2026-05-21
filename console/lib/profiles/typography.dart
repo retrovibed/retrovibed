@@ -91,14 +91,14 @@ class Typography extends StatelessWidget {
                       () => meta.profiles
                           .disable(
                             current.id,
-                            options: [authn.AuthzCache.bearer(context)],
+                            options: [authn.request(authn.AuthzCache.meta(context))],
                           )
                           .then((v) => v.profile);
                   final enable =
                       () => meta.profiles
                           .enable(
                             current,
-                            options: [authn.AuthzCache.bearer(context)],
+                            options: [authn.request(authn.AuthzCache.meta(context))],
                           )
                           .then((v) => v.profile);
                   final pending = enabled ? disable() : enable();

@@ -21,7 +21,7 @@ class SubscribeButton extends StatelessWidget {
         color: subscribed ? theme.colorScheme.primary : null,
       ),
       onPressed: () {
-        final auth = [authn.AuthzCache.bearer(context)];
+        final auth = [authn.request(authn.AuthzCache.meta(context))];
         return httpx.withRetry(() => subscribe(community.id, options: auth)).then((v) => onChanged?.call(community));
       },
       tooltip: subscribed ? 'Unsubscribe' : 'Subscribe',

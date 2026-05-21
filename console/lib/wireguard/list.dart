@@ -121,7 +121,7 @@ class _ListDisplay extends State<ListDisplay> {
                         (v) => api.wireguard
                             .touch(
                               v.wireguard.id,
-                              options: [authn.AuthzCache.bearer(context)],
+                              options: [authn.request(authn.AuthzCache.meta(context))],
                             )
                             .then((_) => v),
                       )
@@ -181,7 +181,7 @@ class _ListDisplay extends State<ListDisplay> {
           return api.wireguard
               .touch(
                 _current.id == v.id ? uuidx.max() : v.id,
-                options: [authn.AuthzCache.bearer(context)],
+                options: [authn.request(authn.AuthzCache.meta(context))],
               )
               .then((r) {
                 setState(() {

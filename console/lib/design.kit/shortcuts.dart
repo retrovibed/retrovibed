@@ -4,6 +4,37 @@ import 'package:retrovibed/design.kit/help.dart';
 
 typedef ShortcutBinding = (Widget help, KeyEventResult Function() handler);
 
+// Activator that fires only after the full key sequence is entered in order.
+// Maintains mutable progress state — create a single stable instance (e.g. as a
+// State field) rather than recreating it on every build.
+class SequenceActivator implements ShortcutActivator {
+  final List<LogicalKeyboardKey> sequence;
+  int _progress = 0;
+
+  SequenceActivator(this.sequence);
+
+  @override
+  bool accepts(KeyEvent event, HardwareKeyboard state) {
+    if (event is! KeyDownEvent) return false;
+    if (event.logicalKey == sequence[_progress]) {
+      _progress++;
+      if (_progress == sequence.length) {
+        _progress = 0;
+        return true;
+      }
+    } else {
+      _progress = event.logicalKey == sequence[0] ? 1 : 0;
+    }
+    return false;
+  }
+
+  @override
+  Iterable<LogicalKeyboardKey>? get triggers => null;
+
+  @override
+  String debugDescribeKeys() => sequence.map((k) => k.keyLabel).join(' ');
+}
+
 // Like Shortcuts but callbacks return bool to indicate whether the
 // event was handled. Returning false allows the event to continue propagating.
 // Bindings may include a help widget that is registered with the nearest
@@ -36,7 +67,7 @@ class _ShortcutsState extends State<Shortcuts> {
     }
     _helpScope = scope;
     _registered =
-        widget.bindings.entries.map((e) {
+        widget.bindings.entries.where((v) => v.value.$1 != HelpScope.None).map((e) {
           final activator = e.key;
           String labelText = '';
 
@@ -50,6 +81,8 @@ class _ShortcutsState extends State<Shortcuts> {
               activator.trigger.keyLabel,
             ];
             labelText = modifiers.join('+');
+          } else if (activator is SequenceActivator) {
+            labelText = activator.sequence.map((k) => k.keyLabel).join(' ');
           }
 
           return HelpLabelled(label: Text(labelText), description: e.value.$1);

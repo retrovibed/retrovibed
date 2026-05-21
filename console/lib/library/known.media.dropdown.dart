@@ -44,7 +44,7 @@ class _KnownMediaDropdown extends State<KnownMediaDropdown> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _authOptions = [authn.AuthzCache.bearer(context)];
+    _authOptions = [authn.request(authn.AuthzCache.meta(context))];
   }
 
   void reseterr() {
@@ -83,24 +83,25 @@ class _KnownMediaDropdown extends State<KnownMediaDropdown> {
   void initState() {
     super.initState();
 
-    _authOptions = [authn.AuthzCache.bearer(context)];
-
     if (uuidx.isMinMax(uuidx.fromString(widget.current))) {
       refresh(_res.next);
       return;
     }
 
-    api.known
-        .cached(
-          widget.current,
-          () => api.known.get(widget.current, options: _authOptions),
-        )
-        .then(
-          (w) => setState(() {
-            current = w.known;
-          }),
-        )
-        .whenComplete(() => refresh(_res.next));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _authOptions = [authn.request(authn.AuthzCache.meta(context))];
+      api.known
+          .cached(
+            widget.current,
+            () => api.known.get(widget.current, options: _authOptions),
+          )
+          .then(
+            (w) => setState(() {
+              current = w.known;
+            }),
+          )
+          .whenComplete(() => refresh(_res.next));
+    });
   }
 
   @override

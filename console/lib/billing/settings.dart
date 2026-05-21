@@ -106,8 +106,7 @@ class _Settings extends State<Settings> {
         Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // TODO (man7iss): revert debug gate when billing is ready on Apple platforms
-            if (defaults.debug || !(Platform.isIOS || Platform.isMacOS)) ...[
+            if (authn.developer(context).subscription || !(Platform.isIOS || Platform.isMacOS)) ...[
               forms.Field(
                 label: Text("plan"),
                 input: DropdownButton(

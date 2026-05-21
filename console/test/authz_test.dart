@@ -5,7 +5,7 @@ void main() {
   group('Bearer', () {
     test('holds metadata and bearer string', () {
       final b = Bearer('meta', 'tok');
-      expect(b.metadata, equals('meta'));
+      expect(b.token, equals('meta'));
       expect(b.bearer, equals('tok'));
     });
   });
@@ -13,21 +13,21 @@ void main() {
   group('Cached', () {
     test('pending throws when token is called', () {
       final c = Cached(Bearer('m', 'tok'), Cached.pending);
-      expect(() => c.token(), throwsArgumentError);
+      expect(() => c.auto(), throwsArgumentError);
     });
 
     test('noprefresh returns current value immediately', () async {
       final b = Bearer('m', 'tok');
       final c = Cached(b, Cached.noprefresh);
-      final result = await c.token();
+      final result = await c.auto();
       expect(result.bearer, equals('tok'));
-      expect(result.metadata, equals('m'));
+      expect(result.token, equals('m'));
     });
 
     test('token() updates current via refresh function', () async {
       final updated = Bearer('m2', 'new-tok');
       final c = Cached(Bearer('m', 'old-tok'), (_) => Future.value(updated));
-      final result = await c.token();
+      final result = await c.auto();
       expect(result.bearer, equals('new-tok'));
       expect(c.current.bearer, equals('new-tok'));
     });
@@ -42,8 +42,8 @@ void main() {
         },
       );
 
-      final first = await c.token();
-      final second = await c.token();
+      final first = await c.auto();
+      final second = await c.auto();
 
       expect(first.bearer, equals('tok-1'));
       expect(second.bearer, equals('tok-2'));
@@ -62,7 +62,7 @@ void main() {
         _notExpired,
       );
       final c = Cached(current, fn);
-      final result = await c.token();
+      final result = await c.auto();
       expect(result.bearer, equals('cached-tok'));
     });
 
@@ -72,7 +72,7 @@ void main() {
         _expired,
       );
       final c = Cached(Bearer('expired', 'old-tok'), fn);
-      final result = await c.token();
+      final result = await c.auto();
       expect(result.bearer, equals('refreshed-tok'));
     });
 
@@ -86,7 +86,7 @@ void main() {
         _expired,
       );
       final c = Cached(Bearer('expired', 'tok'), fn);
-      await c.token();
+      await c.auto();
       expect(received, equals('expired'));
     });
 
@@ -101,7 +101,7 @@ void main() {
       );
       final before = DateTime.now();
       final c = Cached(Bearer('m', 'tok'), fn);
-      await c.token();
+      await c.auto();
       final after = DateTime.now();
 
       expect(capturedTs, isNotNull);
@@ -122,7 +122,7 @@ void main() {
 
       // meta is a future timestamp — not before now, so not expired
       final c = Cached(Bearer(futureTs, 'cached-tok'), fn);
-      final result = await c.token();
+      final result = await c.auto();
 
       expect(refreshed, isFalse);
       expect(result.bearer, equals('cached-tok'));
@@ -140,7 +140,7 @@ void main() {
       );
 
       final c = Cached(Bearer(pastTs, 'old-tok'), fn);
-      final result = await c.token();
+      final result = await c.auto();
 
       expect(refreshed, isTrue);
       expect(result.bearer, equals('new-tok'));

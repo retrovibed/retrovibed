@@ -37,7 +37,7 @@ class KnownMediaTypography extends StatelessWidget {
                 id,
                 () => api.known.get(
                   id,
-                  options: [authn.AuthzCache.bearer(context)],
+                  options: [authn.request(authn.AuthzCache.meta(context))],
                 ),
               )
               .then((w) => w.known),

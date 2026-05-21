@@ -53,7 +53,7 @@ class _ListDisplay extends State<ListDisplay> {
 
   Future<void> refresh(meta.ProfileSearchRequest req) {
     return widget
-        .search(req, options: [authn.AuthzCache.bearer(context)])
+        .search(req, options: [authn.request(authn.AuthzCache.meta(context))])
         .then((v) {
           setState(() {
             _res = v;
@@ -72,7 +72,7 @@ class _ListDisplay extends State<ListDisplay> {
   @override
   void initState() {
     super.initState();
-    refresh(_res.next);
+    WidgetsBinding.instance.addPostFrameCallback((_) => refresh(_res.next));
     _eventsListener = () {
       if (mounted) refresh(_res.next);
     };

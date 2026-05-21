@@ -71,14 +71,14 @@ class _MediaSettingsState extends State<MediaSettings> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     // Cache auth context while it's still valid
-    _authOptions = [authn.AuthzCache.bearer(context)];
+    _authOptions = [authn.request(authn.AuthzCache.meta(context))];
   }
 
   @override
   void deactivate() {
     if (_dirty) {
       media.media
-          .update(_modified.id, _modified, options: [authn.AuthzCache.bearer(context)])
+          .update(_modified.id, _modified, options: [authn.request(authn.AuthzCache.meta(context))])
           .then((v) => widget.onChange(Future.value(v.media)));
     }
 

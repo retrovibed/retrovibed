@@ -79,8 +79,7 @@ class _CurrentState extends State<Current> {
               label: Text("name"),
               input: Text(current.account.description),
             ),
-            // TODO (man7iss): revert iOS gate when ready
-            if (!(Platform.isIOS || Platform.isMacOS))
+            if (authn.developer(context).subscription || !(Platform.isIOS || Platform.isMacOS))
               TextButton(
                 child: Text("open web console"),
                 onPressed: () {

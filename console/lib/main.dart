@@ -140,7 +140,7 @@ class Retrovibed extends StatelessWidget {
                                           duration: ds.Int64(dur.inMilliseconds),
                                           query: q,
                                         ),
-                                        options: [authn.AuthzCache.bearer(ctx)],
+                                        options: [authn.request(authn.AuthzCache.meta(ctx))],
                                       )
                                       .then((v) {})
                                       .catchError((cause) {

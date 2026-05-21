@@ -34,7 +34,7 @@ class _DownloadingListState extends State<DownloadingListDisplay> {
     _pending = widget
         .search(
           media.discoveredsearch.request(limit: 3),
-          options: [authn.AuthzCache.bearer(context)],
+          options: [authn.request(authn.AuthzCache.meta(context))],
         )
         .then(
           (v) =>
@@ -72,7 +72,7 @@ class _DownloadingListState extends State<DownloadingListDisplay> {
   @override
   void initState() {
     super.initState();
-    refresh();
+    WidgetsBinding.instance.addPostFrameCallback((_) => refresh());
     period = Timer.periodic(
       const Duration(seconds: 20),
       (p) => setState(this.refresh),

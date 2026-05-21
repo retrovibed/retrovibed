@@ -46,7 +46,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
 
   Future<void> refresh(media.MediaSearchRequest req) {
     return widget
-        .search(req, options: [authn.AuthzCache.bearer(context)])
+        .search(req, options: [authn.request(authn.AuthzCache.meta(context))])
         .then((v) {
           setState(() {
             _res = v;
@@ -74,7 +74,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
   void initState() {
     super.initState();
     _res.next..query = widget.controller?.text ?? "";
-    refresh(_res.next);
+    WidgetsBinding.instance.addPostFrameCallback((_) => refresh(_res.next));
   }
 
   @override

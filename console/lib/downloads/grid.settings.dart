@@ -47,11 +47,11 @@ class GridSettings extends StatelessWidget {
       _GridItem(
         leading: [ds.Heading(Text("sharing"))],
         torrents.Settings.future(
-          torrents.api.get(options: [authn.AuthzCache.bearer(context)]),
+          torrents.api.get(options: [authn.request(authn.AuthzCache.meta(context))]),
           onChange: (v) {
             return torrents.api.create(
               v,
-              options: [authn.AuthzCache.bearer(context)],
+              options: [authn.request(authn.AuthzCache.meta(context))],
             );
           },
         ),
@@ -63,7 +63,7 @@ class GridSettings extends StatelessWidget {
         wireguard.Settings.future(
           wgcurrent().then((r) => r.wireguard),
           onChange: (v) {
-            return wgupdate(v, options: [authn.AuthzCache.bearer(context)]).then((r) => r.wireguard);
+            return wgupdate(v, options: [authn.request(authn.AuthzCache.meta(context))]).then((r) => r.wireguard);
           },
         ),
         trailing: const [],

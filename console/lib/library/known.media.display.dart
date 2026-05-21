@@ -193,7 +193,7 @@ class _KnownMediaDisplayState extends State<KnownMediaDisplay> {
               if (constraints.maxWidth >= 260) ds.Rating(rating: current.rating),
               Expanded(child: KnownMediaSource(current)),
               Visibility(
-                visible: (authn.AuthzCache.of(context)?.meta.current.metadata.archiveUpload.toInt() ?? 0) > 0,
+                visible: (authn.AuthzCache.of(context).meta.current.token.archiveUpload.toInt()) > 0,
                 child: uuidx.pattern(widget.media.archiveId, archivable, archiving, purge),
               ),
               ds.LoadingIconButton(

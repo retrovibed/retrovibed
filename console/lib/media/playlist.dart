@@ -268,14 +268,14 @@ class _PlaylistState extends State<Playlist> {
   }
 
   Future<PlayableMedia?> _reverse() {
-    return authn.AuthzCache.bearerString(context).then((auth) => _queue.reverse(auth, player)).then((m) {
+    return authn.bearer(authn.AuthzCache.meta(context)).then((auth) => _queue.reverse(auth, player)).then((m) {
       if (m != null) setState(() {});
       return m;
     });
   }
 
   Future<PlayableMedia?> _advance() {
-    return authn.AuthzCache.bearerString(context).then((auth) => _queue.advance(auth, player)).then((m) {
+    return authn.bearer(authn.AuthzCache.meta(context)).then((auth) => _queue.advance(auth, player)).then((m) {
       if (m != null) setState(() {});
       return m;
     });
