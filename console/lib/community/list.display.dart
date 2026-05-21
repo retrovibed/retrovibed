@@ -83,7 +83,7 @@ class _ListDisplayState extends State<ListDisplay> {
   @override
   void initState() {
     super.initState();
-    _refresh(_resp.next);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _refresh(_resp.next));
   }
 
   @override

@@ -87,7 +87,14 @@ class _DownloadingState extends State<RefreshingDownload> {
   void initState() {
     super.initState();
     current = widget.current;
-    _connect();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_subscription == null) {
+      _connect();
+    }
   }
 
   @override

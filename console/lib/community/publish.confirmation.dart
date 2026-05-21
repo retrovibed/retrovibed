@@ -48,22 +48,24 @@ class _PublishConfirmationState extends State<PublishConfirmation> {
       publishMode: widget.community?.defaultPublishMode ?? PublishMode.UNLISTED,
       publishedContent: PublishedContent(),
     );
-    httpx
-        .withRetry(
-          () => widget.youtubeStatus(
-            options: [authn.request(authn.AuthzCache.meta(context))],
-          ),
-        )
-        .then((status) {
-          setState(() {
-            _oauthGoogleId = status.id;
-          });
-        })
-        .catchError((e) {
-          setState(() {
-            _cause = ds.Errors.httpauto(e, onTap: _reseterr);
-          });
-        }, test: httpx.ErrorsTest.httpauto);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      httpx
+          .withRetry(
+            () => widget.youtubeStatus(
+              options: [authn.request(authn.AuthzCache.meta(context))],
+            ),
+          )
+          .then((status) {
+            setState(() {
+              _oauthGoogleId = status.id;
+            });
+          })
+          .catchError((e) {
+            setState(() {
+              _cause = ds.Errors.httpauto(e, onTap: _reseterr);
+            });
+          }, test: httpx.ErrorsTest.httpauto);
+    });
   }
 
   void setState(VoidCallback fn) {

@@ -64,7 +64,7 @@ class _CommunityContentDisplayState extends State<CommunityContentDisplay> {
   @override
   void initState() {
     super.initState();
-    _refresh(_resp.next);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _refresh(_resp.next));
   }
 
   Future<void> _refresh(PublishedContentListRequest req) {

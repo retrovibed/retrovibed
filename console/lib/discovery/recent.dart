@@ -40,7 +40,7 @@ class _RecentState extends State<Recent> {
   @override
   void initState() {
     super.initState();
-    _load(context);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _load(context));
   }
 
   Future<void> _load(BuildContext context) async {
@@ -87,8 +87,9 @@ class _RecentState extends State<Recent> {
           _result.items.map((item) {
             final deletion = () {
               return httpx.withRetry(
-                () =>
-                    widget.tombstone(item.id, options: [authn.request(authn.AuthzCache.meta(context))]).then((_) => _load(context)),
+                () => widget
+                    .tombstone(item.id, options: [authn.request(authn.AuthzCache.meta(context))])
+                    .then((_) => _load(context)),
               );
             };
             return lib.KnownMediaCard.future(

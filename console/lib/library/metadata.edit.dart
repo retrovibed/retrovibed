@@ -114,7 +114,7 @@ class MediaEdit extends StatelessWidget {
             input: typography.sharing(current.torrentId),
           ),
           Visibility(
-            visible: (authn.AuthzCache.of(context)?.meta.current.token.archiveUpload.toInt() ?? 0) > 0,
+            visible: (authn.AuthzCache.of(context).meta.current.token.archiveUpload.toInt()) > 0,
             child: forms.Field(
               label: Text("archived"),
               input: archive(context, current.archiveId),

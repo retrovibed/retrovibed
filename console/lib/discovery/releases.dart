@@ -32,7 +32,7 @@ class _NewReleasesState extends State<NewReleases> {
   @override
   void initState() {
     super.initState();
-    _load();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _load());
   }
 
   Future<void> _load() async {

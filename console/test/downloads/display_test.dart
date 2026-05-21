@@ -100,7 +100,7 @@ void main() {
     testWidgets('renders without overflow', (WidgetTester tester) async {
       final entry = _resolutions.currentValue!;
       await tester.pumpApp(
-        Display(availableSearch: _mockSearchWithItems, downloadWatch: _mockWatch),
+        Display(downloadingSearch: _mockSearchWithItems, availableSearch: _mockSearchWithItems, downloadWatch: _mockWatch),
         physicalSize: entry.value,
       );
       await tester.pumpAndSettle();
@@ -112,7 +112,7 @@ void main() {
     ) async {
       final entry = _resolutions.currentValue!;
       await tester.pumpApp(
-        Display(availableSearch: _mockSearchWithLongNames, downloadWatch: _mockWatch),
+        Display(downloadingSearch: _mockSearchWithLongNames, availableSearch: _mockSearchWithLongNames, downloadWatch: _mockWatch),
         physicalSize: entry.value,
       );
       await tester.pumpAndSettle();
@@ -141,7 +141,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpApp(
-        Display(availableSearch: _mockSearchWithItems, downloadWatch: _mockWatch),
+        Display(downloadingSearch: _mockSearchWithItems, availableSearch: _mockSearchWithItems, downloadWatch: _mockWatch),
         physicalSize: const Size(300, 600),
       );
       await tester.pumpAndSettle();
@@ -152,7 +152,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpApp(
-        Display(availableSearch: _mockSearchWithLongNames, downloadWatch: _mockWatch),
+        Display(downloadingSearch: _mockSearchWithLongNames, availableSearch: _mockSearchWithLongNames, downloadWatch: _mockWatch),
         physicalSize: const Size(300, 600),
       );
       await tester.pumpAndSettle();
@@ -173,8 +173,7 @@ void main() {
       testWidgets('opens', (WidgetTester tester) async {
         final entry = _resolutions.currentValue!;
         await tester.pumpApp(
-          Display(availableSearch: _mockSearchWithItems, downloadWatch: _mockWatch),
-
+          Display(downloadingSearch: _mockSearchWithItems, availableSearch: _mockSearchWithItems, downloadWatch: _mockWatch),
           physicalSize: entry.value,
         );
         await tester.pumpAndSettle();
@@ -183,7 +182,7 @@ void main() {
 
       testWidgets('opens at narrow 300x600', (WidgetTester tester) async {
         await tester.pumpApp(
-          Display(availableSearch: _mockSearchWithItems, downloadWatch: _mockWatch),
+          Display(downloadingSearch: _mockSearchWithItems, availableSearch: _mockSearchWithItems, downloadWatch: _mockWatch),
           physicalSize: const Size(300, 600),
         );
         await tester.pumpAndSettle();
@@ -194,7 +193,7 @@ void main() {
         WidgetTester tester,
       ) async {
         await tester.pumpApp(
-          Display(availableSearch: _mockSearchWithItems, downloadWatch: _mockWatch),
+          Display(downloadingSearch: _mockSearchWithItems, availableSearch: _mockSearchWithItems, downloadWatch: _mockWatch),
           physicalSize: const Size(300, 600),
         );
         await tester.pumpAndSettle();

@@ -33,7 +33,7 @@ class _RecommendationsState extends State<Recommendations> {
   @override
   void initState() {
     super.initState();
-    _load();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _load());
   }
 
   Future<void> _load() async {

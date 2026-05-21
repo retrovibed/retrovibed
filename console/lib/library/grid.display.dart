@@ -89,7 +89,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
   @override
   void initState() {
     super.initState();
-    refresh(widget.search.value.next);
+    WidgetsBinding.instance.addPostFrameCallback((_) => refresh(widget.search.value.next));
   }
 
   @override

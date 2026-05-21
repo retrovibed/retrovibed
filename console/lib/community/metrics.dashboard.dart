@@ -66,7 +66,7 @@ class _MetricsDashboardState extends State<MetricsDashboard> {
   void initState() {
     super.initState();
     _selected = widget.segments.first;
-    _syncAndLoad();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _syncAndLoad());
   }
 
   Future<void> _syncAndLoad() {

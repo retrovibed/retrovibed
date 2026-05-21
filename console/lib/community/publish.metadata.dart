@@ -76,31 +76,33 @@ class _PublishMetadataState extends State<PublishMetadata> {
       _cause = ds.Error.zero;
     });
 
-    final authOptions = [authn.request(authn.AuthzCache.meta(context))];
-    widget
-        .knownGet(knownMediaId, options: [httpx.Accept.json, ...authOptions])
-        .then((response) {
-          setState(() {
-            _formData = response.known;
-            _hasExistingMetadata = true;
-            _dirty = uuidx.random();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final authOptions = [authn.request(authn.AuthzCache.meta(context))];
+      widget
+          .knownGet(knownMediaId, options: [httpx.Accept.json, ...authOptions])
+          .then((response) {
+            setState(() {
+              _formData = response.known;
+              _hasExistingMetadata = true;
+              _dirty = uuidx.random();
+            });
+          })
+          .catchError((cause) {
+            setState(() {
+              _formData = Known(
+                description: media.description,
+                released: media.createdAt,
+                adult: false,
+              );
+              _dirty = uuidx.random();
+            });
+          })
+          .whenComplete(() {
+            setState(() {
+              _loadingMetadata = false;
+            });
           });
-        })
-        .catchError((cause) {
-          setState(() {
-            _formData = Known(
-              description: media.description,
-              released: media.createdAt,
-              adult: false,
-            );
-            _dirty = uuidx.random();
-          });
-        })
-        .whenComplete(() {
-          setState(() {
-            _loadingMetadata = false;
-          });
-        });
+    });
   }
 
   void _update(void Function(Known) fn) {

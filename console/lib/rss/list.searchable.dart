@@ -59,11 +59,13 @@ class SearchableView extends State<ListSearchable> {
   @override
   void initState() {
     super.initState();
-    refresh(_res.next).catchError((e) {
-      setState(() {
-        _cause = ds.Error.unknown(e, onTap: reseterr);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      refresh(_res.next).catchError((e) {
+        setState(() {
+          _cause = ds.Error.unknown(e, onTap: reseterr);
+        });
+        return _res;
       });
-      return _res;
     });
   }
 
