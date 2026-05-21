@@ -75,7 +75,7 @@ class _MetricsDashboardState extends State<MetricsDashboard> {
       _cause = ds.Error.zero;
     });
 
-    final auth = [authn.AuthzCache.bearer(context)];
+    final auth = [authn.request(authn.AuthzCache.meta(context))];
 
     return httpx
         .withRetry(() => widget.apicommunitysync(widget.community.id, options: auth))
@@ -98,7 +98,7 @@ class _MetricsDashboardState extends State<MetricsDashboard> {
   }
 
   Future<void> _loadMetrics() {
-    final auth = [authn.AuthzCache.bearer(context)];
+    final auth = [authn.request(authn.AuthzCache.meta(context))];
 
     return httpx
         .withRetry(

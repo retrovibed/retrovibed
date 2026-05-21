@@ -43,7 +43,7 @@ class _SettingsState extends State<Settings> {
       _cause = ds.Error.zero;
     });
 
-    final auth = [authn.AuthzCache.bearer(context)];
+    final auth = [authn.request(authn.AuthzCache.meta(context))];
     httpx
         .withRetry(() => api.YouTube.status(options: auth))
         .then((v) {
@@ -66,7 +66,7 @@ class _SettingsState extends State<Settings> {
     final theme = Theme.of(context);
     final defaults = ds.Defaults.of(context);
 
-    final auth = [authn.AuthzCache.bearer(context)];
+    final auth = [authn.request(authn.AuthzCache.meta(context))];
     return ds.Loading(
       loading: _loading,
       cause: _cause,

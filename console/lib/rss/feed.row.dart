@@ -64,7 +64,7 @@ class _FeedRowState extends State<FeedRow> {
                   .withRetry(() {
                     return api.refresh(
                       api.FeedCreateRequest(feed: widget.current),
-                      options: [authn.AuthzCache.bearer(context)],
+                      options: [authn.request(authn.AuthzCache.meta(context))],
                     );
                   })
                   .then((resp) {
@@ -93,7 +93,7 @@ class _FeedRowState extends State<FeedRow> {
                             .withRetry(
                               () => api.delete(
                                 widget.current.id,
-                                options: [authn.AuthzCache.bearer(context)],
+                                options: [authn.request(authn.AuthzCache.meta(context))],
                               ),
                             )
                             .then((resp) => widget.onChange?.call(null))

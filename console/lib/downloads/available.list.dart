@@ -49,7 +49,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
 
   Future<void> refresh(media.DownloadSearchRequest req) {
     return widget
-        .search(req, options: [authn.AuthzCache.bearer(context)])
+        .search(req, options: [authn.request(authn.AuthzCache.meta(context))])
         .then((v) {
           setState(() {
             _res = v;
@@ -168,7 +168,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                     final pending = magents.map(
                       (v) => media.discovered.magnet(
                         media.MagnetCreateRequest(uri: v),
-                        options: [authn.AuthzCache.bearer(context)],
+                        options: [authn.request(authn.AuthzCache.meta(context))],
                       ),
                     );
                     return Future.wait(pending, eagerError: true).then((_) {
@@ -200,7 +200,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
           return ds.KeyPressAware.delete(
             onPress: () {
               return media.discovered
-                  .reset(v.media.id, options: [authn.AuthzCache.bearer(context)])
+                  .reset(v.media.id, options: [authn.request(authn.AuthzCache.meta(context))])
                   .then((v) {
                     widget.events ?? refresh(_res.next);
                     widget.events?.value += 1;
@@ -251,7 +251,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                           () => media.discovered
                               .download(
                                 v.media.id,
-                                options: [authn.AuthzCache.bearer(context)],
+                                options: [authn.request(authn.AuthzCache.meta(context))],
                               )
                               .then((v) {
                                 widget.events ?? refresh(_res.next);
@@ -284,7 +284,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                                   .update(
                                     v.media.torrentId,
                                     download..verifyAt = DateTime.now().toUtc().toIso8601String(),
-                                    options: [authn.AuthzCache.bearer(context)],
+                                    options: [authn.request(authn.AuthzCache.meta(context))],
                                   )
                                   .then((_) => completion.complete())
                                   .catchError((cause) {
@@ -307,7 +307,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                                     () => media.discovered.reset(
                                       v.media.id,
                                       options: [
-                                        authn.AuthzCache.bearer(context),
+                                        authn.request(authn.AuthzCache.meta(context)),
                                       ],
                                     ),
                                   )

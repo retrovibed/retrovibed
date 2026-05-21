@@ -37,7 +37,7 @@ class _NewReleasesState extends State<NewReleases> {
 
   Future<void> _load() async {
     setState(() => _loading = true);
-    final auth = authn.AuthzCache.bearer(context);
+    final auth = authn.request(authn.AuthzCache.meta(context));
     return httpx
         .withRetry(
           () => widget.latest(lib.known.latestRequest(), options: [auth]),

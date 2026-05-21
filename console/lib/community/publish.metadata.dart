@@ -76,7 +76,7 @@ class _PublishMetadataState extends State<PublishMetadata> {
       _cause = ds.Error.zero;
     });
 
-    final authOptions = [authn.AuthzCache.bearer(context)];
+    final authOptions = [authn.request(authn.AuthzCache.meta(context))];
     widget
         .knownGet(knownMediaId, options: [httpx.Accept.json, ...authOptions])
         .then((response) {
@@ -125,7 +125,7 @@ class _PublishMetadataState extends State<PublishMetadata> {
       _cause = ds.Error.zero;
     });
 
-    final authOptions = [authn.AuthzCache.bearer(context)];
+    final authOptions = [authn.request(authn.AuthzCache.meta(context))];
     final updatedMedia = widget.download!.media..knownMediaId = known.id;
 
     httpx
@@ -167,7 +167,7 @@ class _PublishMetadataState extends State<PublishMetadata> {
       _cause = ds.Error.zero;
     });
 
-    final authOptions = [authn.AuthzCache.bearer(context)];
+    final authOptions = [authn.request(authn.AuthzCache.meta(context))];
     final req = KnownCreateRequest(known: _formData);
 
     widget

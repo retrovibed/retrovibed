@@ -77,7 +77,7 @@ class _CommunityContentDisplayState extends State<CommunityContentDisplay> {
         .withRetry(
           () => widget.apipublished(
             widget.community.id,
-            options: [authn.AuthzCache.bearer(context)],
+            options: [authn.request(authn.AuthzCache.meta(context))],
             offset: req.offset.toInt(),
             limit: req.limit.toInt(),
           ),
@@ -117,7 +117,7 @@ class _CommunityContentDisplayState extends State<CommunityContentDisplay> {
           onDelete:
               (content) => httpx
                   .withRetry(
-                    () => widget.apitombstone(content.id, options: [authn.AuthzCache.bearer(context)]),
+                    () => widget.apitombstone(content.id, options: [authn.request(authn.AuthzCache.meta(context))]),
                   )
                   .then((_) {
                     setState(() {

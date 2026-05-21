@@ -42,7 +42,7 @@ class SearchableView extends State<ListSearchable> {
 
   Future<api.FeedSearchResponse> refresh(api.FeedSearchRequest next) {
     return widget
-        .search(next, options: [authn.AuthzCache.bearer(context)])
+        .search(next, options: [authn.request(authn.AuthzCache.meta(context))])
         .then((r) {
           setState(() {
             _res = r;
@@ -88,7 +88,7 @@ class SearchableView extends State<ListSearchable> {
     api
         .create(
           api.FeedCreateRequest(feed: n),
-          options: [authn.AuthzCache.bearer(context)],
+          options: [authn.request(authn.AuthzCache.meta(context))],
         )
         .then((v) {
           refresh(_res.next);

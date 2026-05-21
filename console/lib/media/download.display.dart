@@ -36,7 +36,7 @@ class DownloadDisplay extends StatelessWidget {
       builder: (context) {
         return FutureBuilder<api.Download>(
           initialData: api.Download.create(),
-          future: get(id, options: [authn.AuthzCache.bearer(context)]).then((v) => v.download),
+          future: get(id, options: [authn.request(authn.AuthzCache.meta(context))]).then((v) => v.download),
           builder: (BuildContext ctx, AsyncSnapshot<api.Download> snapshot) {
             return ds.Loading(
               loading: !(snapshot.hasData || snapshot.hasError),

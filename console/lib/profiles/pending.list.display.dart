@@ -46,7 +46,7 @@ class _PendingListDisplay extends State<PendingListDisplay> {
 
   Future<void> refresh(meta.ProfileSearchRequest req) {
     return widget
-        .search(req, options: [authn.AuthzCache.bearer(context)])
+        .search(req, options: [authn.request(authn.AuthzCache.meta(context))])
         .then((v) {
           setState(() {
             _res = v;
@@ -126,7 +126,7 @@ class _PendingListDisplay extends State<PendingListDisplay> {
                           meta.ProfileUpdateRequest(
                             profile: v..disabledPendingApprovalAt = timex.inf.toIso8601String(),
                           ),
-                          options: [authn.AuthzCache.bearer(context)],
+                          options: [authn.request(authn.AuthzCache.meta(context))],
                         )
                         .then((v) => refresh(_res.next..offset = ds.Table.offset(0)));
                   },
@@ -136,7 +136,7 @@ class _PendingListDisplay extends State<PendingListDisplay> {
                   v.id,
                   onPressed: () {
                     meta.profiles
-                        .disable(v.id, options: [authn.AuthzCache.bearer(context)])
+                        .disable(v.id, options: [authn.request(authn.AuthzCache.meta(context))])
                         .then((v) => refresh(_res.next..offset = ds.Table.offset(0)));
                   },
                 ),

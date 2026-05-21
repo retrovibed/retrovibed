@@ -28,12 +28,14 @@ void main() {
 
         await tester.pumpApp(
           DeeppoolAuthzCache(
-            Builder(builder: (ctx) {
-              capturedCtx = ctx;
-              return const Text('child');
-            }),
-            apideeppoolauthz: ({options = const []}) =>
-                Future.value(_response('bearer-from-deeppool', _futureExpiry())),
+            Builder(
+              builder: (ctx) {
+                capturedCtx = ctx;
+                return const Text('child');
+              },
+            ),
+            apideeppoolauthz:
+                ({options = const []}) => Future.value(_response('bearer-from-deeppool', _futureExpiry())),
           ),
         );
         await tester.pumpAndSettle();
@@ -41,7 +43,7 @@ void main() {
         final cache = DeeppoolAuthzCache.of(capturedCtx!);
         expect(cache, isNotNull);
 
-        final token = await cache!.meta.token();
+        final token = await cache!.meta.auto();
         expect(token.bearer, isNotEmpty);
         expect(token.bearer, equals('bearer-from-deeppool'));
         expect(tester.takeException(), isNull);
@@ -52,18 +54,19 @@ void main() {
 
         await tester.pumpApp(
           DeeppoolAuthzCache(
-            Builder(builder: (ctx) {
-              capturedCtx = ctx;
-              return const Text('child');
-            }),
-            apideeppoolauthz: ({options = const []}) =>
-                Future.value(_response('cached-bearer', _futureExpiry())),
+            Builder(
+              builder: (ctx) {
+                capturedCtx = ctx;
+                return const Text('child');
+              },
+            ),
+            apideeppoolauthz: ({options = const []}) => Future.value(_response('cached-bearer', _futureExpiry())),
           ),
         );
         await tester.pumpAndSettle();
 
         final cache = DeeppoolAuthzCache.of(capturedCtx!);
-        final token = await cache!.meta.token();
+        final token = await cache!.meta.auto();
         await tester.pumpAndSettle();
 
         expect(token.bearer, equals('cached-bearer'));
@@ -78,12 +81,13 @@ void main() {
 
         await tester.pumpApp(
           DeeppoolAuthzCache(
-            Builder(builder: (ctx) {
-              capturedCtx = ctx;
-              return const Text('child');
-            }),
-            apideeppoolauthz: ({options = const []}) =>
-                Future.value(_response('bearer-option-token', _futureExpiry())),
+            Builder(
+              builder: (ctx) {
+                capturedCtx = ctx;
+                return const Text('child');
+              },
+            ),
+            apideeppoolauthz: ({options = const []}) => Future.value(_response('bearer-option-token', _futureExpiry())),
           ),
         );
         await tester.pumpAndSettle();
@@ -102,12 +106,13 @@ void main() {
 
         await tester.pumpApp(
           DeeppoolAuthzCache(
-            Builder(builder: (ctx) {
-              capturedCtx = ctx;
-              return const Text('child');
-            }),
-            apideeppoolauthz: ({options = const []}) =>
-                Future.value(_response('my-token', _futureExpiry())),
+            Builder(
+              builder: (ctx) {
+                capturedCtx = ctx;
+                return const Text('child');
+              },
+            ),
+            apideeppoolauthz: ({options = const []}) => Future.value(_response('my-token', _futureExpiry())),
           ),
         );
         await tester.pumpAndSettle();
@@ -127,14 +132,15 @@ void main() {
 
         await tester.pumpApp(
           DeeppoolAuthzCache(
-            Builder(builder: (ctx) {
-              capturedCtx = ctx;
-              return const Text('child');
-            }),
-            apideeppoolauthz: ({options = const []}) =>
-                Future.value(_response('bearer', _futureExpiry())),
-            apibillingattribution: ({options = const []}) =>
-                Future.value(billing.AttributionTokenResponse(token: 'attr-jwt-token')),
+            Builder(
+              builder: (ctx) {
+                capturedCtx = ctx;
+                return const Text('child');
+              },
+            ),
+            apideeppoolauthz: ({options = const []}) => Future.value(_response('bearer', _futureExpiry())),
+            apibillingattribution:
+                ({options = const []}) => Future.value(billing.AttributionTokenResponse(token: 'attr-jwt-token')),
           ),
         );
         await tester.pumpAndSettle();
@@ -150,12 +156,13 @@ void main() {
 
         await tester.pumpApp(
           DeeppoolAuthzCache(
-            Builder(builder: (ctx) {
-              capturedCtx = ctx;
-              return const Text('child');
-            }),
-            apideeppoolauthz: ({options = const []}) =>
-                Future.value(_response('bearer', _futureExpiry())),
+            Builder(
+              builder: (ctx) {
+                capturedCtx = ctx;
+                return const Text('child');
+              },
+            ),
+            apideeppoolauthz: ({options = const []}) => Future.value(_response('bearer', _futureExpiry())),
             apibillingattribution: ({options = const []}) {
               callCount++;
               return Future.value(billing.AttributionTokenResponse(token: 'attr-v$callCount'));
@@ -180,10 +187,12 @@ void main() {
 
         await tester.pumpApp(
           DeeppoolAuthzCache(
-            Builder(builder: (ctx) {
-              capturedCtx = ctx;
-              return const Text('child');
-            }),
+            Builder(
+              builder: (ctx) {
+                capturedCtx = ctx;
+                return const Text('child');
+              },
+            ),
             apideeppoolauthz: ({options = const []}) {
               callCount++;
               return Future.value(_response('bearer-call-$callCount', _pastExpiry()));
@@ -195,13 +204,13 @@ void main() {
         final cache = DeeppoolAuthzCache.of(capturedCtx!);
 
         // First token() call fetches since token starts expired
-        final firstToken = await cache!.meta.token();
+        final firstToken = await cache!.meta.auto();
         await tester.pumpAndSettle();
         expect(callCount, equals(1));
         expect(firstToken.bearer, equals('bearer-call-1'));
 
         // Second token() call re-fetches because the returned token is also expired
-        final secondToken = await cache.meta.token();
+        final secondToken = await cache.meta.auto();
         await tester.pumpAndSettle();
 
         expect(callCount, equals(2));
@@ -215,10 +224,12 @@ void main() {
 
         await tester.pumpApp(
           DeeppoolAuthzCache(
-            Builder(builder: (ctx) {
-              capturedCtx = ctx;
-              return const Text('child');
-            }),
+            Builder(
+              builder: (ctx) {
+                capturedCtx = ctx;
+                return const Text('child');
+              },
+            ),
             apideeppoolauthz: ({options = const []}) {
               callCount++;
               return Future.value(_response('valid-bearer', _futureExpiry()));
@@ -230,13 +241,13 @@ void main() {
         final cache = DeeppoolAuthzCache.of(capturedCtx!);
 
         // First token() call fetches the token
-        final firstToken = await cache!.meta.token();
+        final firstToken = await cache!.meta.auto();
         await tester.pumpAndSettle();
         expect(callCount, equals(1));
         expect(firstToken.bearer, equals('valid-bearer'));
 
         // Second token() call uses the cached non-expired token, no re-fetch
-        final token = await cache.meta.token();
+        final token = await cache.meta.auto();
         await tester.pumpAndSettle();
 
         expect(callCount, equals(1));
@@ -250,10 +261,12 @@ void main() {
 
         await tester.pumpApp(
           DeeppoolAuthzCache(
-            Builder(builder: (ctx) {
-              capturedCtx = ctx;
-              return const Text('child');
-            }),
+            Builder(
+              builder: (ctx) {
+                capturedCtx = ctx;
+                return const Text('child');
+              },
+            ),
             apideeppoolauthz: ({options = const []}) {
               callCount++;
               return Future.value(_response('bearer-v$callCount', _pastExpiry()));
@@ -265,13 +278,13 @@ void main() {
         final cache = DeeppoolAuthzCache.of(capturedCtx!);
 
         // First token() fetch — token comes back expired
-        final firstToken = await cache!.meta.token();
+        final firstToken = await cache!.meta.auto();
         await tester.pumpAndSettle();
         expect(callCount, equals(1));
         expect(firstToken.bearer, equals('bearer-v1'));
 
         // Second token() re-fetches because the token is expired
-        final secondToken = await cache.meta.token();
+        final secondToken = await cache.meta.auto();
         await tester.pumpAndSettle();
 
         expect(callCount, equals(2));

@@ -56,7 +56,7 @@ class _ListRowState extends State<ListRow> {
   void initState() {
     super.initState();
     _authzToken = httpx.withRetry(
-      () => widget.apiauthzget(widget.current.id, options: [authn.AuthzCache.bearer(context)]).then((v) => v.token),
+      () => widget.apiauthzget(widget.current.id, options: [authn.request(authn.AuthzCache.meta(context))]).then((v) => v.token),
     );
   }
 
@@ -81,7 +81,7 @@ class _ListRowState extends State<ListRow> {
                 widget
                     .apiprofileupdate(
                       meta.ProfileUpdateRequest(profile: u),
-                      options: [authn.AuthzCache.bearer(context)],
+                      options: [authn.request(authn.AuthzCache.meta(context))],
                     )
                     .then((resp) {
                       widget.onChange(resp.profile);
@@ -91,7 +91,7 @@ class _ListRowState extends State<ListRow> {
             AuthzMetaEdit.future(
               _authzToken,
               onChange: (t) {
-                widget.apiauthzgrant(widget.current.id, t, options: [authn.AuthzCache.bearer(context)]).then((_) {
+                widget.apiauthzgrant(widget.current.id, t, options: [authn.request(authn.AuthzCache.meta(context))]).then((_) {
                   widget.onChange(widget.current);
                 });
               },

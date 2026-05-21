@@ -44,7 +44,7 @@ class _KnownMediaDropdown extends State<KnownMediaDropdown> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _authOptions = [authn.AuthzCache.bearer(context)];
+    _authOptions = [authn.request(authn.AuthzCache.meta(context))];
   }
 
   void reseterr() {
@@ -83,7 +83,7 @@ class _KnownMediaDropdown extends State<KnownMediaDropdown> {
   void initState() {
     super.initState();
 
-    _authOptions = [authn.AuthzCache.bearer(context)];
+    _authOptions = [authn.request(authn.AuthzCache.meta(context))];
 
     if (uuidx.isMinMax(uuidx.fromString(widget.current))) {
       refresh(_res.next);

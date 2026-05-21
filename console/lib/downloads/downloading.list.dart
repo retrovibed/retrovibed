@@ -34,7 +34,7 @@ class _DownloadingListState extends State<DownloadingListDisplay> {
     _pending = widget
         .search(
           media.discoveredsearch.request(limit: 3),
-          options: [authn.AuthzCache.bearer(context)],
+          options: [authn.request(authn.AuthzCache.meta(context))],
         )
         .then(
           (v) =>

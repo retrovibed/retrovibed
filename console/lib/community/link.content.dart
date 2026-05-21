@@ -6,7 +6,7 @@ import 'package:retrovibed/community/api.dart' as api;
 import 'package:retrovibed/community/community.pb.dart';
 
 Future<void> handleSubscribeAction(BuildContext context, Community community, String attribution) {
-  final auth = [authn.AuthzCache.bearer(context)];
+  final auth = [authn.request(authn.AuthzCache.meta(context))];
   billing.consumeAttribution(attribution, options: [authn.Authenticated.bearer(context)]).ignore();
   return httpx.withRetry(() => api.API.subscribe(community.id, options: auth));
 }

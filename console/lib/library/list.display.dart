@@ -46,7 +46,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
 
   Future<void> refresh(media.MediaSearchRequest req) {
     return widget
-        .search(req, options: [authn.AuthzCache.bearer(context)])
+        .search(req, options: [authn.request(authn.AuthzCache.meta(context))])
         .then((v) {
           setState(() {
             _res = v;

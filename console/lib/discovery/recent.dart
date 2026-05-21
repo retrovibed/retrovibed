@@ -45,7 +45,7 @@ class _RecentState extends State<Recent> {
 
   Future<void> _load(BuildContext context) async {
     setState(() => _loading = true);
-    final auth = authn.AuthzCache.bearer(context);
+    final auth = authn.request(authn.AuthzCache.meta(context));
     return httpx
         .withRetry(() => widget.latest(lib.recent.request(), options: [auth]))
         .then(
@@ -88,11 +88,11 @@ class _RecentState extends State<Recent> {
             final deletion = () {
               return httpx.withRetry(
                 () =>
-                    widget.tombstone(item.id, options: [authn.AuthzCache.bearer(context)]).then((_) => _load(context)),
+                    widget.tombstone(item.id, options: [authn.request(authn.AuthzCache.meta(context))]).then((_) => _load(context)),
               );
             };
             return lib.KnownMediaCard.future(
-              lib.known.autodetect(item.media, options: [authn.AuthzCache.bearer(context)]),
+              lib.known.autodetect(item.media, options: [authn.request(authn.AuthzCache.meta(context))]),
               onTap: () {
                 final pos = Duration(milliseconds: item.position.toInt());
                 final dur = Duration(milliseconds: item.duration.toInt());
@@ -105,7 +105,7 @@ class _RecentState extends State<Recent> {
                     item.query,
                     item.media,
                     pos: delta < 0 ? Duration(milliseconds: 0) : Duration(milliseconds: item.position.toInt()),
-                    options: () => [authn.AuthzCache.bearer(context)],
+                    options: () => [authn.request(authn.AuthzCache.meta(context))],
                   ),
                 );
               },

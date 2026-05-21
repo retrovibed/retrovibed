@@ -38,7 +38,7 @@ class _RecommendationsState extends State<Recommendations> {
 
   Future<void> _load() async {
     setState(() => _loading = true);
-    final auth = authn.AuthzCache.bearer(context);
+    final auth = authn.request(authn.AuthzCache.meta(context));
     return httpx
         .withRetry(
           () => widget.latest(lib.recommendations.request(), options: [auth]),
@@ -80,7 +80,7 @@ class _RecommendationsState extends State<Recommendations> {
               help: ds.Hint(const Text("generate a new (random) recommendation")),
               onPressed: () {
                 return httpx
-                    .withRetry(() => lib.recommendations.random(options: [authn.AuthzCache.bearer(context)]))
+                    .withRetry(() => lib.recommendations.random(options: [authn.request(authn.AuthzCache.meta(context))]))
                     .then((_) => _load());
               },
             ),

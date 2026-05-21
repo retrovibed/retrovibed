@@ -11,7 +11,7 @@ class AuthzDeeppool extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
-    final token = authn.DeeppoolAuthzCache.of(context)?.meta.current.metadata ?? meta.Token();
+    final token = authn.DeeppoolAuthzCache.of(context)?.meta.current.token ?? meta.Token();
 
     return forms.Container(
       padding: EdgeInsets.symmetric(horizontal: 10),

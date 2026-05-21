@@ -104,7 +104,7 @@ class _DeepLinkState extends State<DeepLink> {
         .withRetry(
           () => widget.search(
             community.CommunitySearchRequest(query: domain),
-            options: [authn.AuthzCache.bearer(context)],
+            options: [authn.request(authn.AuthzCache.meta(context))],
           ),
         )
         .then((response) {

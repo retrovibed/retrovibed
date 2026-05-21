@@ -1,9 +1,9 @@
 import 'package:synchronized/synchronized.dart' as sync;
 
 class Bearer<T> {
-  T metadata;
+  T token;
   String bearer;
-  Bearer(this.metadata, this.bearer);
+  Bearer(this.token, this.bearer);
 }
 
 class Cached<T> {
@@ -22,7 +22,8 @@ class Cached<T> {
 
   Cached(this.current, this.refresh);
 
-  Future<Bearer<T>> token() {
+  // returns a refreshed (if necessary) bearer token.
+  Future<Bearer<T>> auto() {
     return refresh(this).then(
       (v) => _m.synchronized(() {
         this.current = v;
@@ -39,9 +40,9 @@ Future<Bearer<T>> Function(Cached<T>) refresh<T>(
   return (t) {
     final ts = DateTime.now();
 
-    if (!expired(t.current.metadata, ts)) {
+    if (!expired(t.current.token, ts)) {
       return Future.value(t.current);
     }
-    return fn(t.current.metadata);
+    return fn(t.current.token);
   };
 }

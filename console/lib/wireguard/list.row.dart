@@ -39,7 +39,7 @@ class ListRow extends StatelessWidget {
               .withRetry(
                 () => api.wireguard.update(
                   upd,
-                  options: [authn.AuthzCache.bearer(context)],
+                  options: [authn.request(authn.AuthzCache.meta(context))],
                 ),
               )
               .then((resp) {
@@ -48,7 +48,7 @@ class ListRow extends StatelessWidget {
                     () => api.wireguard
                         .touch(
                           resp.wireguard.id,
-                          options: [authn.AuthzCache.bearer(context)],
+                          options: [authn.request(authn.AuthzCache.meta(context))],
                         )
                         .then((_) => resp),
                   );

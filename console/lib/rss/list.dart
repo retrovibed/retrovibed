@@ -34,7 +34,7 @@ class Item extends StatelessWidget {
                     .withRetry(
                       () => api.create(
                         api.FeedCreateRequest(feed: u),
-                        options: [authn.AuthzCache.bearer(context)],
+                        options: [authn.request(authn.AuthzCache.meta(context))],
                       ),
                     )
                     .then((resp) {

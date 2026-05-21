@@ -51,7 +51,7 @@ class _PublishConfirmationState extends State<PublishConfirmation> {
     httpx
         .withRetry(
           () => widget.youtubeStatus(
-            options: [authn.AuthzCache.bearer(context)],
+            options: [authn.request(authn.AuthzCache.meta(context))],
           ),
         )
         .then((status) {
@@ -93,7 +93,7 @@ class _PublishConfirmationState extends State<PublishConfirmation> {
           () => widget.apicommunitypublish(
             widget.community?.id ?? uuidx.min(),
             _request,
-            options: [authn.AuthzCache.bearer(context)],
+            options: [authn.request(authn.AuthzCache.meta(context))],
           ),
         )
         .then((_) => widget.onPublished())

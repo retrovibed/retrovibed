@@ -24,7 +24,7 @@ class _ControlState extends State<DownloadRowControls> {
       api.discovered
           .pause(
             widget.current.media.id,
-            options: [authn.AuthzCache.bearer(context)],
+            options: [authn.request(authn.AuthzCache.meta(context))],
           )
           .then((v) {
             widget.onChange?.call(v.download);
@@ -46,7 +46,7 @@ class _ControlState extends State<DownloadRowControls> {
           .tune(
             widget.current.media.id,
             api.DownloadTuneRequest(peers: []),
-            options: [authn.AuthzCache.bearer(context)],
+            options: [authn.request(authn.AuthzCache.meta(context))],
           )
           .then((v) {
             setState(() => disabled = false);

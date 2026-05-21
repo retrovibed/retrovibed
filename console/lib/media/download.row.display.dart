@@ -45,7 +45,7 @@ class _DownloadingState extends State<RefreshingDownload> {
     widget
         .watch(
           current.media.id,
-          options: [authn.AuthzCache.bearer(context)],
+          options: [authn.request(authn.AuthzCache.meta(context))],
         )
         .then((socket) {
           final c = Completer();
