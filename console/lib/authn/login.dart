@@ -3,6 +3,7 @@ import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/design.kit/forms.dart' as forms;
 import 'package:retrovibed/retrovibed.dart' as retro;
 import 'package:retrovibed/design.kit/modals.dart' as modals;
+import 'developer.mode.dart';
 
 class Login extends StatefulWidget {
   final Widget child;
@@ -24,8 +25,26 @@ class Login extends StatefulWidget {
     context.findAncestorStateOfType<_LoginState>()?._logout();
   }
 
+  static _LoginCachedData cached(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<_LoginCachedData>() ?? _LoginCachedData.empty;
+  }
+
   @override
   State<Login> createState() => _LoginState();
+}
+
+class _LoginCachedData extends InheritedWidget {
+  final DeveloperMode flags;
+
+  const _LoginCachedData({required this.flags, required super.child});
+
+  static final empty = _LoginCachedData(
+    flags: DeveloperMode(),
+    child: const SizedBox(),
+  );
+
+  @override
+  bool updateShouldNotify(_LoginCachedData old) => flags != old.flags;
 }
 
 class _LoginState extends State<Login> {
