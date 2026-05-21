@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/design.kit/forms.dart' as forms;
 import 'package:retrovibed/retrovibed.dart' as retro;
@@ -29,6 +30,10 @@ class Login extends StatefulWidget {
     return context.dependOnInheritedWidgetOfExactType<_LoginCachedData>() ?? _LoginCachedData.empty;
   }
 
+  static _LoginState? of(BuildContext context) {
+    return context.findAncestorStateOfType<_LoginState>();
+  }
+
   @override
   State<Login> createState() => _LoginState();
 }
@@ -56,6 +61,8 @@ class _LoginState extends State<Login> {
   String _username = '';
   String _password = '';
   String _confirm = '';
+  DeveloperMode flags = DeveloperMode();
+
 
   @override
   void initState() {
@@ -122,7 +129,7 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
-    if (_hasKey) return widget.child;
+    if (_hasKey) return _LoginCachedData(flags: flags, child: widget.child);
     final obscureicon = IconButton(
       icon: Icon(
         _isObscured ? Icons.visibility : Icons.visibility_off,
@@ -134,94 +141,97 @@ class _LoginState extends State<Login> {
       },
     );
 
-    return ds.Masked(
-      alignment: Alignment.center,
-      modals.Node(
-        ds.HelpGlobal(
-          ds.Loading(
-            cause: _cause,
-            ds.Container(
-              padding: defaults.padding,
-              margin: defaults.margin,
-              constraints: BoxConstraints(maxWidth: 375),
+    return _LoginCachedData(
+        flags: flags,
+        child: ds.Masked(
+          alignment: Alignment.center,
+          modals.Node(
+            ds.HelpGlobal(
+              ds.Loading(
+                cause: _cause,
+                ds.Container(
+                  padding: defaults.padding,
+                  margin: defaults.margin,
+                  constraints: BoxConstraints(maxWidth: 375),
 
-              SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  spacing: defaults.spacing,
-                  children: [
-                    Text(
-                      'Welcome to Retrovibed',
-                      style: Theme.of(context).textTheme.headlineSmall,
-                      textAlign: TextAlign.center,
-                    ),
-                    Text(
-                      'setup your device',
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                    TextFormField(
-                      decoration: InputDecoration(hintText: 'email'),
-                      onChanged: (v) => setState(() => _username = v),
-                      onFieldSubmitted: (_) => _seed(),
-                    ),
-                    TextFormField(
-                      obscureText: _isObscured,
-                      decoration: InputDecoration(
-                        hintText: 'password',
-                        suffixIcon: obscureicon,
-                      ),
-                      onChanged: (v) => setState(() => _password = v),
-                      onFieldSubmitted: (_) => _seed(),
-                    ),
-                    Visibility(
-                      visible: _register,
-                      child: TextFormField(
-                        obscureText: _isObscured,
-                        decoration: InputDecoration(
-                          hintText: 'confirm password',
-                          suffixIcon: obscureicon,
+                  SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      spacing: defaults.spacing,
+                      children: [
+                        Text(
+                          'Welcome to Retrovibed',
+                          style: Theme.of(context).textTheme.headlineSmall,
+                          textAlign: TextAlign.center,
                         ),
-                        onChanged: (v) => setState(() => _confirm = v),
-                        onFieldSubmitted: (_) => _seed(),
-                      ),
-                    ),
-                    forms.Checkbox(
-                      Text('register a new account'),
-                      value: _register,
-                      onChanged: (v) => setState(() => _register = v ?? false),
-                    ),
-                    forms.Checkbox(
-                      Text.rich(
-                        TextSpan(
-                          text: 'By continuing you accept the ',
-                          children: [
-                            ds.Hyperlink.inline(
-                              'terms of service',
-                              url: 'https://retrovibe.space/terms',
+                        Text(
+                          'setup your device',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                        TextFormField(
+                          decoration: InputDecoration(hintText: 'email'),
+                          onChanged: (v) => setState(() => _username = v),
+                          onFieldSubmitted: (_) => _seed(),
+                        ),
+                        TextFormField(
+                          obscureText: _isObscured,
+                          decoration: InputDecoration(
+                            hintText: 'password',
+                            suffixIcon: obscureicon,
+                          ),
+                          onChanged: (v) => setState(() => _password = v),
+                          onFieldSubmitted: (_) => _seed(),
+                        ),
+                        Visibility(
+                          visible: _register,
+                          child: TextFormField(
+                            obscureText: _isObscured,
+                            decoration: InputDecoration(
+                              hintText: 'confirm password',
+                              suffixIcon: obscureicon,
                             ),
-                          ],
+                            onChanged: (v) => setState(() => _confirm = v),
+                            onFieldSubmitted: (_) => _seed(),
+                          ),
                         ),
-                      ),
-                      value: _acceptedTos,
-                      onChanged: (v) => setState(() => _acceptedTos = v ?? false),
+                        forms.Checkbox(
+                          Text('register a new account'),
+                          value: _register,
+                          onChanged: (v) => setState(() => _register = v ?? false),
+                        ),
+                        forms.Checkbox(
+                          Text.rich(
+                            TextSpan(
+                              text: 'By continuing you accept the ',
+                              children: [
+                                ds.Hyperlink.inline(
+                                  'terms of service',
+                                  url: 'https://retrovibe.space/terms',
+                                ),
+                              ],
+                            ),
+                          ),
+                          value: _acceptedTos,
+                          onChanged: (v) => setState(() => _acceptedTos = v ?? false),
+                        ),
+                        ds.LoadingButton(
+                          const Text('Login'),
+                          onPressed: _seed,
+                          disabled: _username.isEmpty || _password.isEmpty || !_acceptedTos,
+                        ),
+                      ],
                     ),
-                    ds.LoadingButton(
-                      const Text('Login'),
-                      onPressed: _seed,
-                      disabled: _username.isEmpty || _password.isEmpty || !_acceptedTos,
-                    ),
-                  ],
+                  ),
                 ),
               ),
+              ds.Hint.multiline([
+                Text(
+                  'Retrovibed takes personal privacy seriously. The information you enter here is used to seed cryptographic primatives and never leaves your device.',
+                ),
+              ]),
             ),
           ),
-          ds.Hint.multiline([
-            Text(
-              'Retrovibed takes personal privacy seriously. The information you enter here is used to seed cryptographic primatives and never leaves your device.',
-            ),
-          ]),
         ),
-      ),
     );
   }
 }

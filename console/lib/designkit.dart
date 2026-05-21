@@ -25,6 +25,7 @@ export 'design.kit/help.dart';
 export 'design.kit/hyperlink.dart';
 export 'design.kit/image.dart';
 export 'design.kit/key.press.aware.dart';
+export 'design.kit/long.hold.dart';
 export 'design.kit/modals.dart';
 export 'design.kit/periodic.dart';
 export 'design.kit/refresh.dart';

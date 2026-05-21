@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/meta.dart' as meta;
@@ -12,6 +13,7 @@ import 'package:retrovibed/wireguard.dart' as wireguard;
 import 'package:retrovibed/google.dart' as google;
 import 'package:retrovibed/usermanagement.dart' as usermanagement;
 import 'package:retrovibed/debug.dart' as debug;
+import 'package:retrovibed/authn.dart' as authn;
 
 class AutoHelp extends StatelessWidget {
   final Widget child;
@@ -43,6 +45,19 @@ class Display extends StatefulWidget {
 class _DisplayState extends State<Display> {
   Widget _overlay = ds.Empty;
   ValueNotifier<meta.Daemon> _library = ValueNotifier(meta.Daemon());
+
+  final _konamiActivator = ds.SequenceActivator([
+    LogicalKeyboardKey.arrowUp,
+    LogicalKeyboardKey.arrowUp,
+    LogicalKeyboardKey.arrowDown,
+    LogicalKeyboardKey.arrowDown,
+    LogicalKeyboardKey.arrowLeft,
+    LogicalKeyboardKey.arrowRight,
+    LogicalKeyboardKey.arrowLeft,
+    LogicalKeyboardKey.arrowRight,
+    LogicalKeyboardKey.keyB,
+    LogicalKeyboardKey.keyA,
+  ]);
   void setState(VoidCallback fn) {
     if (!mounted) return;
     super.setState(fn);
@@ -93,125 +108,145 @@ class _DisplayState extends State<Display> {
 
   @override
   Widget build(BuildContext context) {
-    return ds.build((context) {
-      final defaults = ds.Defaults.of(context);
-      final compact = defaults.isCompact;
-      final _billing = billing.Registered.of(context);
-      final _displaybilling = !(_billing.current.subscriptionId.isEmpty && Platform.isMacOS);
+    return ds.Shortcuts(
+      bindings: {
+        _konamiActivator: (
+          const Text('developer mode'),
+          () {
+            masked(debug.DeveloperSettings());
+            return KeyEventResult.handled;
+          },
+        ),
+      },
+      ds.build((context) {
+        final defaults = ds.Defaults.of(context);
+        final compact = defaults.isCompact;
+        final _billing = billing.Registered.of(context);
+        final _displaybilling =
+            !(_billing.current.subscriptionId.isEmpty && Platform.isMacOS) || authn.developer(context).subscription;
 
-      return SelectionArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.start,
-          verticalDirection: compact ? VerticalDirection.up : VerticalDirection.down,
-          children: [
-            meta.DaemonDropdown(
-              library: _library,
-              trailing: [
-                _overlay == ds.Empty
-                    ? IconButton(
-                      onPressed: () {
-                        masked(
-                          ds.Confirmation.yesNo(
-                            content: Text(
-                              'Delete ${_library.value.description}?',
+        return SelectionArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.start,
+            verticalDirection: compact ? VerticalDirection.up : VerticalDirection.down,
+            children: [
+              meta.DaemonDropdown(
+                library: _library,
+                trailing: [
+                  _overlay == ds.Empty
+                      ? IconButton(
+                        onPressed: () {
+                          masked(
+                            ds.Confirmation.yesNo(
+                              content: Text(
+                                'Delete ${_library.value.description}?',
+                              ),
+                              onCancel: () => overlay(ds.Empty),
+                              onConfirm: () {
+                                httpx.withRetry(
+                                  () => meta.daemons.delete(_library.value.id).then((_) {
+                                    overlay(ds.Empty);
+                                  }),
+                                );
+                              },
                             ),
-                            onCancel: () => overlay(ds.Empty),
-                            onConfirm: () {
-                              httpx.withRetry(
-                                () => meta.daemons.delete(_library.value.id).then((_) {
-                                  overlay(ds.Empty);
-                                }),
-                              );
-                            },
-                          ),
-                        );
-                      },
-                      icon: Icon(Icons.delete),
-                    )
-                    : ds.LoadingIconButton.close(
-                      onPressed: () {
-                        overlay(ds.Empty);
-                        return Future.value(null);
-                      },
-                    ),
-              ],
-            ),
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: defaults.padding.horizontal / 2,
-                ),
-                child: ds.Overlay(
-                  alignment: Alignment.topLeft,
-                  ds.layout((context, constraints) {
-                    const mainAxisExtent = 192.0;
-                    const crossAxisExtent = 192.0;
-                    int crossAxisCount;
-
-                    if (constraints.maxWidth > mainAxisExtent) {
-                      crossAxisCount = constraints.maxWidth ~/ mainAxisExtent;
-                    } else {
-                      crossAxisCount = 1;
-                    }
-
-                    return GridView(
-                      reverse: compact,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: crossAxisCount,
-                        mainAxisExtent: mainAxisExtent,
-                        childAspectRatio: crossAxisExtent / mainAxisExtent,
-                        crossAxisSpacing: defaults.spacing / 2,
-                        mainAxisSpacing: defaults.spacing / 2,
+                          );
+                        },
+                        icon: Icon(Icons.delete),
+                      )
+                      : ds.LoadingIconButton.close(
+                        onPressed: () {
+                          overlay(ds.Empty);
+                          return Future.value(null);
+                        },
                       ),
-                      children: [
-                        billing.Card(
-                          onPressed: full,
-                          margin: EdgeInsets.zero,
+                ],
+              ),
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: defaults.padding.horizontal / 2,
+                  ),
+                  child: ds.Overlay(
+                    alignment: Alignment.topLeft,
+                    ds.layout((context, constraints) {
+                      const mainAxisExtent = 192.0;
+                      const crossAxisExtent = 192.0;
+                      int crossAxisCount;
+
+                      if (constraints.maxWidth > mainAxisExtent) {
+                        crossAxisCount = constraints.maxWidth ~/ mainAxisExtent;
+                      } else {
+                        crossAxisCount = 1;
+                      }
+
+                      return GridView(
+                        reverse: compact,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: crossAxisCount,
+                          mainAxisExtent: mainAxisExtent,
+                          childAspectRatio: crossAxisExtent / mainAxisExtent,
+                          crossAxisSpacing: defaults.spacing / 2,
+                          mainAxisSpacing: defaults.spacing / 2,
                         ),
-                        if (_displaybilling) ...[
-                          billing.ReferralCard(
+                        children: [
+                          billing.Card(
                             onPressed: full,
                             margin: EdgeInsets.zero,
                           ),
-                          billing.InviteCard(margin: EdgeInsets.zero),
-                          quotas.Card(),
+                          if (_displaybilling) ...[
+                            billing.ReferralCard(
+                              onPressed: full,
+                              margin: EdgeInsets.zero,
+                            ),
+                            billing.InviteCard(margin: EdgeInsets.zero),
+                            quotas.Card(),
+                          ],
+                          profiles.Card(
+                            onPressed: defaults.debug ? full : null,
+                          ),
+                          rss.Card(
+                            onPressed: full,
+                            margin: EdgeInsets.zero,
+                          ),
+                          wireguard.Card(
+                            onPressed: full,
+                            margin: EdgeInsets.zero,
+                          ),
+                          usermanagement.Card(
+                            onPressed: full,
+                            margin: EdgeInsets.zero,
+                          ),
+                          google.Card(onPressed: full),
+                          ds.LongHold(
+                            onHold: () {
+                              print("WAKA WAKA");
+                              masked(
+                                debug.DeveloperSettings(),
+                              );
+                            },
+                            child: debug.Card(margin: EdgeInsets.zero),
+                          ),
+                          if (defaults.debug) debug.MeteredCard(margin: EdgeInsets.zero),
                         ],
-                        profiles.Card(
-                          onPressed: defaults.debug ? full : null,
-                        ),
-                        rss.Card(
-                          onPressed: full,
-                          margin: EdgeInsets.zero,
-                        ),
-                        wireguard.Card(
-                          onPressed: full,
-                          margin: EdgeInsets.zero,
-                        ),
-                        usermanagement.Card(
-                          onPressed: full,
-                          margin: EdgeInsets.zero,
-                        ),
-                        google.Card(onPressed: full),
-                        debug.Card(margin: EdgeInsets.zero),
-                        if (defaults.debug) debug.MeteredCard(margin: EdgeInsets.zero),
-                      ],
-                    );
-                  }),
-                  overlay: MediaQuery(
-                    data: MediaQuery.of(context).copyWith(
-                      padding: EdgeInsets.only(
-                        top: 139,
-                      ), // compensate for the dropdown and titlebar
+                      );
+                    }),
+                    overlay: MediaQuery(
+                      data: MediaQuery.of(context).copyWith(
+                        padding: EdgeInsets.only(
+                          top: 139,
+                        ), // compensate for the dropdown and titlebar
+                      ),
+                      child: _overlay,
                     ),
-                    child: _overlay,
                   ),
                 ),
               ),
-            ),
-          ],
-        ),
-      );
-    });
+            ],
+          ),
+        );
+      }),
+    );
   }
 }
