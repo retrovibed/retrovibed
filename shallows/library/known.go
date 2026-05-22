@@ -22,6 +22,10 @@ type QueryCleaner interface {
 	Clean(ctx context.Context, text string) (string, error)
 }
 
+func QueryCleanerNoop() *NoopQueryCleaner {
+	return &NoopQueryCleaner{}
+}
+
 type NoopQueryCleaner struct{}
 
 func (NoopQueryCleaner) Clean(_ context.Context, text string) (string, error) {

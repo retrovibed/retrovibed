@@ -11,6 +11,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/lucenex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/library"
@@ -29,10 +30,7 @@ func (t knowndetect) Run(gctx *cmdopts.Global) (err error) {
 	}
 	defer db.Close()
 
-	cleaner := library.QueryCleaner(library.NoopQueryCleaner{})
-	if t.Model != "" {
-		cleaner = library.NewQueryerCleanerV0(t.Model)
-	}
+	cleaner := langx.FirstNonZero[library.QueryCleaner](library.NewQueryerCleanerV0(t.Model), library.QueryCleanerNoop())
 
 	var in io.Reader = bytes.NewReader(nil)
 	if cmdopts.Readable(os.Stdin) {
