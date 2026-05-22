@@ -7,6 +7,10 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/neurals"
 )
 
+const (
+	NeuralMediaIDCached = "mediaid.onnx"
+)
+
 type QueryerCleanerV0 struct {
 	text *neurals.Text
 }

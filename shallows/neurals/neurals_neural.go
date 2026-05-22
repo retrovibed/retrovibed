@@ -1,0 +1,37 @@
+//go:build retrovibed && neural
+
+package neurals
+
+// #cgo LDFLAGS: -lpredicttext
+// #include <stdlib.h>
+// extern int predict(const char* model_path, const char* input, size_t seq_len, long long num_tokens, long long pad, long long bos, long long eos, char* output, size_t output_len);
+import "C"
+
+import (
+	"fmt"
+	"unsafe"
+)
+
+func predict(t *Text, input string) (string, error) {
+	cModel := C.CString(t.model)
+	defer C.free(unsafe.Pointer(cModel))
+	cInput := C.CString(input)
+	defer C.free(unsafe.Pointer(cInput))
+
+	buf := make([]byte, t.outputLen)
+	ret := C.predict(
+		cModel,
+		cInput,
+		C.size_t(t.seqLen),
+		C.longlong(t.numTokens),
+		C.longlong(t.pad),
+		C.longlong(t.bos),
+		C.longlong(t.eos),
+		(*C.char)(unsafe.Pointer(&buf[0])),
+		C.size_t(t.outputLen),
+	)
+	if ret != 0 {
+		return "", fmt.Errorf("predict failed for %q", input)
+	}
+	return C.GoString((*C.char)(unsafe.Pointer(&buf[0]))), nil
+}

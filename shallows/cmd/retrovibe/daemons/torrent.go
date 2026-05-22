@@ -41,6 +41,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/torrentx"
 	"github.com/retrovibed/retrovibed/shallows/internal/userx"
 	"github.com/retrovibed/retrovibed/shallows/internal/wireguardx"
+	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 	"golang.org/x/crypto/ssh"
@@ -87,6 +88,7 @@ func newTorrenting(db *sql.DB, id ssh.Signer, root, media, tvfs fsx.Virtual, tst
 		tvfs:          tvfs,
 		tstore:        tstore,
 		socks5:        socks5,
+		mc:            library.QueryCleanerNoop(),
 		_tclient:      &atomic.Pointer[torrent.Client]{},
 		_dnscache:     dnscache.AutoProxyResolver(),
 	}
@@ -104,6 +106,7 @@ type _torrenting struct {
 	rootstore     fsx.Virtual
 	mediastore    fsx.Virtual
 	tvfs          fsx.Virtual
+	mc            library.QueryCleaner
 	tstore        storage.ClientImpl
 	socks5        net.Listener
 	_tclient      *atomic.Pointer[torrent.Client]
@@ -518,7 +521,7 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 	}()
 
 	go timex.NowAndEveryVoid(dctx, envx.Duration(24*time.Hour, env.TorrentVerifyFrequency), func(ctx context.Context) {
-		VerifyTorrents(dctx, t.db, t.rootstore, tclient, t.tstore)
+		VerifyTorrents(dctx, t.db, t.rootstore, t.mc, tclient, t.tstore)
 	})
 
 	if cfg.Resumable {

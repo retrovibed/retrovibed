@@ -91,7 +91,13 @@ func PrepareDefaultFeeds(ctx context.Context, q sqlx.Queryer) error {
 	return nil
 }
 
-func DiscoverFromRSSFeedsOnce(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, tclient *torrent.Client, tstore storage.ClientImpl) (err error) {
+func DiscoverFromRSSFeedsOnce(
+	ctx context.Context,
+	q sqlx.Queryer,
+	rootstore fsx.Virtual,
+	tclient *torrent.Client,
+	tstore storage.ClientImpl,
+) (err error) {
 	const defaultttl = 1440 // 1 day in minutes
 	queryfeeds := func(ctx context.Context, done context.CancelCauseFunc) iter.Seq[tracking.RSS] {
 		return func(yield func(tracking.RSS) bool) {

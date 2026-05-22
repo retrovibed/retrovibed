@@ -12,12 +12,15 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
+	"github.com/retrovibed/retrovibed/shallows/internal/env"
+	"github.com/retrovibed/retrovibed/shallows/internal/envx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/lucenex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/userx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 )
 
@@ -35,7 +38,15 @@ func (t knownquery) Run(gctx *cmdopts.Global) (err error) {
 	}
 	defer db.Close()
 
-	cleaner := langx.FirstNonZero[library.QueryCleaner](library.NewQueryerCleanerV0(t.Model), library.QueryCleanerNoop())
+	cleaner := langx.FirstNonZero[library.QueryCleaner](
+		library.NewQueryerCleanerV0(
+			envx.String(
+				userx.DefaultCacheDirectory(userx.DefaultRelRoot(), library.NeuralMediaIDCached),
+				env.NeuralMediaID,
+			),
+		),
+		library.QueryCleanerNoop(),
+	)
 
 	var in io.Reader = bytes.NewReader(nil)
 	if cmdopts.Readable(os.Stdin) {
