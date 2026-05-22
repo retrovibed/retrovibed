@@ -28,6 +28,7 @@ func main() {
 				eg.Parallel(
 					shallows.Generate,
 					console.Generate,
+					shallows.NeuralsBuild(),
 				),
 				eg.Parallel(
 					eg.Sequential(console.GenerateBinding, console.BuildLinux),
