@@ -15,7 +15,7 @@ import (
 	"github.com/egdaemon/eg/runtime/x/wasi/egtarball"
 )
 
-var buildTags = []string{"duckdb_use_lib"}
+var buildTags = []string{"duckdb_use_lib", "retrovibed", "neural"}
 
 func rootdir() string {
 	return egenv.WorkingDirectory("shallows")
@@ -98,6 +98,7 @@ func Install(b *tarballs.Build) eg.OpFn {
 			strings.Join(buildTags, ","),
 			dstdir,
 		),
+		gruntime.Newf("cp libpredicttext.so %s/", dstdir).Directory(egenv.CacheDirectory("neurals")),
 	)
 }
 
