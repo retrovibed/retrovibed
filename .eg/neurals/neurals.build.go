@@ -42,6 +42,31 @@ func Clone(dir string) eg.OpFn {
 	}
 }
 
+// CompileAndroid cross-compiles libpredicttext.so for the given Rust target triple
+// and rsyncs the result into dir. The NDK toolchain must be on PATH.
+func CompileAndroid(rustTarget, dir string) eg.OpFn {
+	return func(ctx context.Context, op eg.Op) error {
+		sruntime := runtime()
+		return shell.Run(
+			ctx,
+			sruntime.Newf("cargo build --release --target %s", rustTarget).Timeout(egenv.TTL()),
+			sruntime.Newf("mkdir -p %s && rsync -a ${CARGO_TARGET_DIR}/%s/release/libpredicttext.so %s/", dir, rustTarget, dir),
+		)
+	}
+}
+
+// CompileIOS cross-compiles libpredicttext.a for arm64-apple-ios and rsyncs it into dir.
+func CompileIOS(dir string) eg.OpFn {
+	return func(ctx context.Context, op eg.Op) error {
+		sruntime := runtime()
+		return shell.Run(
+			ctx,
+			sruntime.New("cargo build --release --target aarch64-apple-ios").Timeout(egenv.TTL()),
+			sruntime.Newf("mkdir -p %s && rsync -a ${CARGO_TARGET_DIR}/aarch64-apple-ios/release/libpredicttext.a %s/", dir, dir),
+		)
+	}
+}
+
 // MaybeBuild skips compilation if sopath already exists.
 func MaybeBuild(sopath string, clone func(dir string) eg.OpFn) eg.OpFn {
 	return eg.WhenFn(func(ctx context.Context) bool {

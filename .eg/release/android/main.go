@@ -6,6 +6,7 @@ import (
 	"eg/compute/console"
 	"eg/compute/debuild/duckdb"
 	"eg/compute/maintainer"
+	"eg/compute/neurals"
 	"log"
 	"time"
 
@@ -71,6 +72,8 @@ func main() {
 							duckdb.CompileAndroid("android_arm64", "arm64-v8a"),
 							duckdb.CloneAndroid,
 						),
+						neurals.CompileAndroid("x86_64-linux-android", egenv.WorkingDirectory("console/android/app/src/main/jniLibs/x86_64")),
+						neurals.CompileAndroid("aarch64-linux-android", egenv.WorkingDirectory("console/android/app/src/main/jniLibs/arm64-v8a")),
 					),
 					egbug.Log("generated static libraries for duckdb"),
 					console.BuildAndroidAPK(androidruntime()),
