@@ -12,22 +12,17 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
-	"github.com/retrovibed/retrovibed/shallows/internal/env"
-	"github.com/retrovibed/retrovibed/shallows/internal/envx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
-	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/lucenex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/userx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 )
 
 type knownquery struct {
 	Database string  `flag:"" name:"database" help:"database to read" default:"${vars_user_configuration_directory}/meta.db"`
 	Explicit bool    `flag:"" name:"explicit" help:"include explicit content in results" default:"false"`
-	Model    string  `flag:"" name:"model" help:"path to neurals model for query cleaning" default:""`
 	Cutoff   float32 `flag:"" name:"cutoff" help:"similarity cutoff for scoring" default:"0.7"`
 }
 
@@ -38,15 +33,7 @@ func (t knownquery) Run(gctx *cmdopts.Global) (err error) {
 	}
 	defer db.Close()
 
-	cleaner := langx.FirstNonZero[library.QueryCleaner](
-		library.NewQueryerCleanerV0(
-			envx.String(
-				userx.DefaultCacheDirectory(userx.DefaultRelRoot(), library.NeuralMediaIDCached),
-				env.NeuralMediaID,
-			),
-		),
-		library.QueryCleanerNoop(),
-	)
+	cleaner := library.NewQueryerCleanerAuto()
 
 	var in io.Reader = bytes.NewReader(nil)
 	if cmdopts.Readable(os.Stdin) {
@@ -112,7 +99,7 @@ func (t knownquery) run(ctx context.Context, in io.Reader, db *sql.DB, cleaner l
 		}
 
 		if result.Relevance > 0 {
-			log.Println("result", result.Relevance, result.UID, result.Title, result.Released)
+			log.Println("result", result.Relevance, result.UID, result.Title, result.Released, result.Mimetype)
 			continue
 		}
 
@@ -144,7 +131,7 @@ func (t knownquery) run(ctx context.Context, in io.Reader, db *sql.DB, cleaner l
 			}
 		}
 
-		log.Println("result", result.Relevance, result.UID, result.Title, result.Released)
+		log.Println("result", result.Relevance, result.UID, result.Title, result.Released, result.Mimetype)
 	}
 
 	if err := seq.Err(); err != nil {

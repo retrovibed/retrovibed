@@ -95,6 +95,7 @@ func DiscoverFromRSSFeedsOnce(
 	ctx context.Context,
 	q sqlx.Queryer,
 	rootstore fsx.Virtual,
+	mc library.QueryCleaner,
 	tclient *torrent.Client,
 	tstore storage.ClientImpl,
 ) (err error) {
@@ -259,7 +260,7 @@ func DiscoverFromRSSFeedsOnce(
 			}
 
 			_md := tracking.NewMetadata(
-				langx.Autoptr(int160.FromByteArray(md.InfoHash)),
+				new(int160.FromByteArray(md.InfoHash)),
 				tracking.MetadataOptionFromMagnet(&md),
 				tracking.MetadataOptionBytes(uri.Length),
 				tracking.MetadataOptionMimetype(stringsx.FirstNonBlank(channel.Retrovibed.Mimetype, uri.Mimetype)),
@@ -324,7 +325,7 @@ func DiscoverFromRSSFeedsOnce(
 
 		log.Println("starting any downloads", feed.Description)
 		// begin any torrent provided by this feed
-		ResumeDownloads(ctx, q, rootstore, tclient, tstore)
+		ResumeDownloads(ctx, q, rootstore, mc, tclient, tstore)
 	}
 
 	if err := fctx.Err(); contextx.IgnoreCancelled(err) != nil {
@@ -335,7 +336,7 @@ func DiscoverFromRSSFeedsOnce(
 }
 
 // retrieve torrents from rss feeds.
-func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, tclient *torrent.Client, tstore storage.ClientImpl) (err error) {
+func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, mc library.QueryCleaner, tclient *torrent.Client, tstore storage.ClientImpl) (err error) {
 	bs := backoffx.New(
 		backoffx.Exponential(time.Minute),
 		backoffx.Maximum(15*time.Minute),
@@ -353,7 +354,7 @@ func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, rootstore fsx.Vir
 			attempts = -1
 		}
 
-		if err := DiscoverFromRSSFeedsOnce(ctx, q, rootstore, tclient, tstore); err != nil {
+		if err := DiscoverFromRSSFeedsOnce(ctx, q, rootstore, mc, tclient, tstore); err != nil {
 			log.Println("failed to discover torrents", err)
 			continue
 		}

@@ -283,7 +283,7 @@ func (t importPeer) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) (err error) 
 		// dctx, done := context.WithCancel(ctx)
 		// dst := iox.NewTimeoutWriter(done, time.Minute, io.Discard)
 		log.Println("---------------------------------- downloading", w.meta.ID)
-		if cause := tracking.DownloadInto(ctx, db, rootstore, library.QueryCleanerNoop(), &lmd, dl, io.Discard); cause != nil {
+		if cause := tracking.DownloadInto(ctx, db, rootstore, library.NewQueryerCleanerAuto(), &lmd, dl, io.Discard); cause != nil {
 			return errorsx.LogErr(errorsx.Wrapf(cause, "failed to download %s %v", w.meta.ID.String(), cause))
 		}
 

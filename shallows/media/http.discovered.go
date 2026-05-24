@@ -62,15 +62,22 @@ func HTTPDiscoveredOptionRootStorage(vfs fsx.Virtual) HTTPDiscoveredOption {
 	}
 }
 
+func HTTPDiscoveredOptionQueryCleaner(mc library.QueryCleaner) HTTPDiscoveredOption {
+	return func(t *HTTPDiscovered) {
+		t.mediacleaner = mc
+	}
+}
+
 func NewHTTPDiscovered(q sqlx.Queryer, d *atomic.Pointer[torrent.Client], c storage.ClientImpl, options ...HTTPDiscoveredOption) *HTTPDiscovered {
 	svc := langx.Clone(HTTPDiscovered{
-		q:           q,
-		d:           d,
-		c:           c,
-		jwtsecret:   env.JWTSecret,
-		decoder:     formx.NewDecoder(),
-		rootstorage: fsx.DirVirtual(os.TempDir()),
-		fts:         duckdbx.NewLucene(),
+		q:            q,
+		d:            d,
+		c:            c,
+		jwtsecret:    env.JWTSecret,
+		decoder:      formx.NewDecoder(),
+		rootstorage:  fsx.DirVirtual(os.TempDir()),
+		fts:          duckdbx.NewLucene(),
+		mediacleaner: library.QueryCleanerNoop(),
 	}, options...)
 
 	errorsx.Log(errorsx.Wrap(fsx.MkDirs(0700, svc.rootstorage.Path("torrent"), svc.rootstorage.Path("media")), "failed to prepare directories"))
@@ -79,13 +86,14 @@ func NewHTTPDiscovered(q sqlx.Queryer, d *atomic.Pointer[torrent.Client], c stor
 }
 
 type HTTPDiscovered struct {
-	q           sqlx.Queryer
-	d           *atomic.Pointer[torrent.Client]
-	c           storage.ClientImpl
-	jwtsecret   jwtx.SecretSource
-	decoder     *form.Decoder
-	rootstorage fsx.Virtual
-	fts         lucenex.Driver
+	q            sqlx.Queryer
+	d            *atomic.Pointer[torrent.Client]
+	c            storage.ClientImpl
+	jwtsecret    jwtx.SecretSource
+	decoder      *form.Decoder
+	rootstorage  fsx.Virtual
+	fts          lucenex.Driver
+	mediacleaner library.QueryCleaner
 }
 
 func (t *HTTPDiscovered) Bind(r *mux.Router) {
@@ -228,7 +236,11 @@ func (t *HTTPDiscovered) magnet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	go func() {
-		errorsx.Log(tracking.Download(context.Background(), t.q, t.rootstorage, &lmd, dl))
+		var (
+			mhash = md5.New()
+		)
+
+		errorsx.Log(tracking.DownloadInto(context.Background(), t.q, t.rootstorage, t.mediacleaner, &lmd, dl, mhash))
 	}()
 
 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &MagnetCreateResponse{
@@ -458,11 +470,16 @@ func (t *HTTPDiscovered) upload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	go func() {
+		var (
+			mhash = md5.New()
+		)
+
 		if dl, _, err = t.d.Load().Start(metadata); err != nil {
 			log.Println(errorsx.Wrap(err, "unable to start download"))
 			return
 		}
-		errorsx.Log(tracking.Download(context.Background(), t.q, t.rootstorage, &lmd, dl))
+
+		errorsx.Log(tracking.DownloadInto(context.Background(), t.q, t.rootstorage, t.mediacleaner, &lmd, dl, mhash))
 	}()
 
 	if err := tracking.MetadataDownloadByID(r.Context(), t.q, lmd.ID).Scan(&lmd); sqlx.ErrNoRows(err) != nil {
@@ -674,6 +691,7 @@ func (t *HTTPDiscovered) download(w http.ResponseWriter, r *http.Request) {
 
 	go func(meta tracking.Metadata) {
 		var (
+			mhash = md5.New()
 			dl    torrent.Torrent
 			added bool
 		)
@@ -697,7 +715,7 @@ func (t *HTTPDiscovered) download(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		errorsx.Log(tracking.Download(context.Background(), t.q, t.rootstorage, &meta, dl))
+		errorsx.Log(tracking.DownloadInto(context.Background(), t.q, t.rootstorage, t.mediacleaner, &meta, dl, mhash))
 	}(meta)
 
 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &DownloadBeginResponse{

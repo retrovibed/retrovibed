@@ -2,7 +2,6 @@ package tracking
 
 import (
 	"context"
-	"crypto/md5"
 	"encoding/hex"
 	"errors"
 	"io"
@@ -405,14 +404,6 @@ func DownloadInto(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, mc libra
 	}
 
 	return nil
-}
-
-func Download(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata, t torrent.Torrent) (err error) {
-	var (
-		mhash = md5.New()
-	)
-
-	return DownloadInto(ctx, q, vfs, library.QueryCleanerNoop(), md, t, mhash)
 }
 
 func DescriptionFromPath(md *Metadata, path string) string {

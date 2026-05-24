@@ -72,7 +72,7 @@ func AutoTorrentSettings(defaults *TorrentSettings, options ...func(*TorrentSett
 	}, options...))
 }
 
-func newTorrenting(db *sql.DB, id ssh.Signer, root, media, tvfs fsx.Virtual, tstore storage.ClientImpl, socks5 net.Listener) _torrenting {
+func newTorrenting(db *sql.DB, id ssh.Signer, root, media, tvfs fsx.Virtual, mc library.QueryCleaner, tstore storage.ClientImpl, socks5 net.Listener) _torrenting {
 	return _torrenting{
 		cond:          sync.NewCond(&sync.Mutex{}),
 		cfgpath:       userx.DefaultConfigDir(userx.DefaultRelRoot(), "torrent.cfg"),
@@ -88,7 +88,7 @@ func newTorrenting(db *sql.DB, id ssh.Signer, root, media, tvfs fsx.Virtual, tst
 		tvfs:          tvfs,
 		tstore:        tstore,
 		socks5:        socks5,
-		mc:            library.QueryCleanerNoop(),
+		mc:            mc,
 		_tclient:      &atomic.Pointer[torrent.Client]{},
 		_dnscache:     dnscache.AutoProxyResolver(),
 	}
@@ -514,7 +514,7 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 	}
 
 	go func() {
-		if err := DiscoverFromRSSFeeds(dctx, t.db, t.rootstore, tclient, t.tstore); errorsx.Ignore(err, context.Canceled) != nil {
+		if err := DiscoverFromRSSFeeds(dctx, t.db, t.rootstore, t.mc, tclient, t.tstore); errorsx.Ignore(err, context.Canceled) != nil {
 			asyncfailure(errorsx.Wrap(err, "autodiscovery of RSS feeds failed"))
 			return
 		}
@@ -526,7 +526,7 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 
 	if cfg.Resumable {
 		go AnnounceSeeded(dctx, t.db, dhts, t.rootstore, tclient, t.tstore)
-		go ResumeDownloads(dctx, t.db, t.rootstore, tclient, t.tstore)
+		go ResumeDownloads(dctx, t.db, t.rootstore, t.mc, tclient, t.tstore)
 	} else {
 		log.Println("announce/resume disabled")
 	}

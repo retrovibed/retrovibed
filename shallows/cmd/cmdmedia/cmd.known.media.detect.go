@@ -9,20 +9,15 @@ import (
 	"os"
 
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
-	"github.com/retrovibed/retrovibed/shallows/internal/env"
-	"github.com/retrovibed/retrovibed/shallows/internal/envx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
-	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/lucenex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
-	"github.com/retrovibed/retrovibed/shallows/internal/userx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 )
 
 type knowndetect struct {
 	Database string `flag:"" name:"database" help:"database to read" default:"${vars_user_configuration_directory}/meta.db"`
-	Model    string `flag:"" name:"model" help:"path to neurals model for query cleaning" default:""`
 }
 
 func (t knowndetect) Run(gctx *cmdopts.Global) (err error) {
@@ -33,15 +28,7 @@ func (t knowndetect) Run(gctx *cmdopts.Global) (err error) {
 	}
 	defer db.Close()
 
-	cleaner := langx.FirstNonZero[library.QueryCleaner](
-		library.NewQueryerCleanerV0(
-			envx.String(
-				userx.DefaultCacheDirectory(userx.DefaultRelRoot(), library.NeuralMediaIDCached),
-				env.NeuralMediaID,
-			),
-		),
-		library.QueryCleanerNoop(),
-	)
+	cleaner := library.NewQueryerCleanerAuto()
 
 	var in io.Reader = bytes.NewReader(nil)
 	if cmdopts.Readable(os.Stdin) {
