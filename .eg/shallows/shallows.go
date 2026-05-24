@@ -108,6 +108,10 @@ func Compile() eg.OpFn {
 			eggolang.Build(
 				eggolang.BuildOption.Tags(buildTags...),
 				eggolang.BuildOption.WorkingDirectory(rootdir()),
+				eggolang.BuildOption.Environ(
+					"CGO_LDFLAGS=-L"+egenv.CacheDirectory("neurals"),
+					"LD_LIBRARY_PATH="+egenv.CacheDirectory("neurals"),
+				),
 			),
 		),
 	)
