@@ -6,6 +6,7 @@ import (
 	"eg/compute/console"
 	"eg/compute/debuild/duckdb"
 	"eg/compute/maintainer"
+	"eg/compute/neurals"
 	"log"
 	"time"
 
@@ -48,19 +49,6 @@ func main() {
 					console.Generate,
 					egbug.Log("generated console bindings"),
 					eg.Parallel(
-						console.GenerateStaticBinding(
-							egenv.WorkingDirectory("console/android/app/src/main/jniLibs/x86_64"),
-							console.AndroidRuntime("x86_64-none-linux-android31").
-								Environ("GOARCH", "amd64"),
-						),
-						console.GenerateStaticBinding(
-							egenv.WorkingDirectory("console/android/app/src/main/jniLibs/arm64-v8a"),
-							console.AndroidRuntime("aarch64-none-linux-android31").
-								Environ("GOARCH", "arm64"),
-						),
-					),
-					egbug.Log("generated static libraries for android"),
-					eg.Parallel(
 						duckdb.MaybeBuild(
 							"console/android/app/src/main/jniLibs/x86_64/libduckdb_static.a",
 							duckdb.CompileAndroid("android_x86_64", "x86_64"),
@@ -70,6 +58,21 @@ func main() {
 							"console/android/app/src/main/jniLibs/arm64-v8a/libduckdb_static.a",
 							duckdb.CompileAndroid("android_arm64", "arm64-v8a"),
 							duckdb.CloneAndroid,
+						),
+						neurals.CompileAndroid("x86_64", egenv.WorkingDirectory("console/android/app/src/main/jniLibs/x86_64")),
+						neurals.CompileAndroid("arm64-v8a", egenv.WorkingDirectory("console/android/app/src/main/jniLibs/arm64-v8a")),
+					),
+					egbug.Log("generated static libraries for android"),
+					eg.Parallel(
+						console.GenerateStaticBinding(
+							egenv.WorkingDirectory("console/android/app/src/main/jniLibs/x86_64"),
+							console.AndroidRuntime("x86_64-none-linux-android31").
+								Environ("GOARCH", "amd64"),
+						),
+						console.GenerateStaticBinding(
+							egenv.WorkingDirectory("console/android/app/src/main/jniLibs/arm64-v8a"),
+							console.AndroidRuntime("aarch64-none-linux-android31").
+								Environ("GOARCH", "arm64"),
 						),
 					),
 					egbug.Log("generated static libraries for duckdb"),
