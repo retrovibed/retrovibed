@@ -33,6 +33,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/torrentx"
 	"github.com/retrovibed/retrovibed/shallows/internal/userx"
+	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 )
 
@@ -282,7 +283,7 @@ func (t importPeer) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) (err error) 
 		// dctx, done := context.WithCancel(ctx)
 		// dst := iox.NewTimeoutWriter(done, time.Minute, io.Discard)
 		log.Println("---------------------------------- downloading", w.meta.ID)
-		if cause := tracking.DownloadInto(ctx, db, rootstore, &lmd, dl, io.Discard); cause != nil {
+		if cause := tracking.DownloadInto(ctx, db, rootstore, library.NewQueryerCleanerAuto(), &lmd, dl, io.Discard); cause != nil {
 			return errorsx.LogErr(errorsx.Wrapf(cause, "failed to download %s %v", w.meta.ID.String(), cause))
 		}
 

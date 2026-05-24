@@ -2,6 +2,7 @@ package shallows
 
 import (
 	"context"
+	"eg/compute/neurals"
 	"eg/compute/tarballs"
 	"path/filepath"
 	"strings"
@@ -27,6 +28,17 @@ func shellruntime() shell.Command {
 		"XDG_CACHE_HOME", egenv.CacheDirectory("xdg"), // temporary until eg catches up.
 	).Environ(
 		"GOLANGCI_LINT_CACHE", egenv.CacheDirectory("golang-lint"),
+	).Environ(
+		"CGO_LDFLAGS", "-L"+egenv.CacheDirectory("neurals"),
+	).Environ(
+		"LD_LIBRARY_PATH", egenv.CacheDirectory("neurals"),
+	)
+}
+
+func NeuralsBuild() eg.OpFn {
+	return neurals.MaybeBuild(
+		".eg.cache/neurals/libpredicttext.so",
+		neurals.Clone,
 	)
 }
 

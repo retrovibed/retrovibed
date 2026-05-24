@@ -41,6 +41,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/torrentx"
 	"github.com/retrovibed/retrovibed/shallows/internal/userx"
 	"github.com/retrovibed/retrovibed/shallows/internal/wireguardx"
+	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 	"golang.org/x/crypto/ssh"
@@ -71,7 +72,7 @@ func AutoTorrentSettings(defaults *TorrentSettings, options ...func(*TorrentSett
 	}, options...))
 }
 
-func newTorrenting(db *sql.DB, id ssh.Signer, root, media, tvfs fsx.Virtual, tstore storage.ClientImpl, socks5 net.Listener) _torrenting {
+func newTorrenting(db *sql.DB, id ssh.Signer, root, media, tvfs fsx.Virtual, mc library.QueryCleaner, tstore storage.ClientImpl, socks5 net.Listener) _torrenting {
 	return _torrenting{
 		cond:          sync.NewCond(&sync.Mutex{}),
 		cfgpath:       userx.DefaultConfigDir(userx.DefaultRelRoot(), "torrent.cfg"),
@@ -87,6 +88,7 @@ func newTorrenting(db *sql.DB, id ssh.Signer, root, media, tvfs fsx.Virtual, tst
 		tvfs:          tvfs,
 		tstore:        tstore,
 		socks5:        socks5,
+		mc:            mc,
 		_tclient:      &atomic.Pointer[torrent.Client]{},
 		_dnscache:     dnscache.AutoProxyResolver(),
 	}
@@ -104,6 +106,7 @@ type _torrenting struct {
 	rootstore     fsx.Virtual
 	mediastore    fsx.Virtual
 	tvfs          fsx.Virtual
+	mc            library.QueryCleaner
 	tstore        storage.ClientImpl
 	socks5        net.Listener
 	_tclient      *atomic.Pointer[torrent.Client]
@@ -511,19 +514,19 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 	}
 
 	go func() {
-		if err := DiscoverFromRSSFeeds(dctx, t.db, t.rootstore, tclient, t.tstore); errorsx.Ignore(err, context.Canceled) != nil {
+		if err := DiscoverFromRSSFeeds(dctx, t.db, t.rootstore, t.mc, tclient, t.tstore); errorsx.Ignore(err, context.Canceled) != nil {
 			asyncfailure(errorsx.Wrap(err, "autodiscovery of RSS feeds failed"))
 			return
 		}
 	}()
 
 	go timex.NowAndEveryVoid(dctx, envx.Duration(24*time.Hour, env.TorrentVerifyFrequency), func(ctx context.Context) {
-		VerifyTorrents(dctx, t.db, t.rootstore, tclient, t.tstore)
+		VerifyTorrents(dctx, t.db, t.rootstore, t.mc, tclient, t.tstore)
 	})
 
 	if cfg.Resumable {
 		go AnnounceSeeded(dctx, t.db, dhts, t.rootstore, tclient, t.tstore)
-		go ResumeDownloads(dctx, t.db, t.rootstore, tclient, t.tstore)
+		go ResumeDownloads(dctx, t.db, t.rootstore, t.mc, tclient, t.tstore)
 	} else {
 		log.Println("announce/resume disabled")
 	}

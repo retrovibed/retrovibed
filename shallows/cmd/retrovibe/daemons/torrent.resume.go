@@ -28,7 +28,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 )
 
-func ResumeDownloads(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual, tclient *torrent.Client, tstore storage.ClientImpl) {
+func ResumeDownloads(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual, mc library.QueryCleaner, tclient *torrent.Client, tstore storage.ClientImpl) {
 	q := tracking.MetadataSearchBuilder().Where(
 		squirrel.And{
 			tracking.MetadataQueryInitiated(),
@@ -69,7 +69,11 @@ func ResumeDownloads(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual
 		}
 
 		go func(infopath string, md tracking.Metadata, dl torrent.Torrent) {
-			errorsx.Log(errorsx.Wrap(tracking.Download(ctx, db, rootstore, &md, dl), "resume failed"))
+			var (
+				mhash = md5.New()
+			)
+
+			errorsx.Log(errorsx.Wrap(tracking.DownloadInto(ctx, db, rootstore, mc, &md, dl, mhash), "resume failed"))
 		}(infopath, md, t)
 
 		log.Println("resumed", md.ID, hex.EncodeToString(md.Infohash), md.Description)
@@ -78,7 +82,7 @@ func ResumeDownloads(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual
 	errorsx.Log(errorsx.Wrap(iter.Err(), "failed to resume all downloads"))
 }
 
-func VerifyTorrents(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual, tclient *torrent.Client, tstore storage.ClientImpl) {
+func VerifyTorrents(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual, mc library.QueryCleaner, tclient *torrent.Client, tstore storage.ClientImpl) {
 	q := tracking.MetadataSearchBuilder().Where(
 		squirrel.And{
 			tracking.MetadataQueryNeedsVerification(),
@@ -125,7 +129,7 @@ func VerifyTorrents(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual,
 			continue
 		}
 
-		if err = tracking.DownloadInto(ctx, db, rootstore, &md, t, md5.New()); err != nil {
+		if err = tracking.DownloadInto(ctx, db, rootstore, mc, &md, t, md5.New()); err != nil {
 			log.Println(errorsx.Wrapf(err, "unable reimport torrent %s - %s", md.ID, infopath))
 			continue
 		}

@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/retrovibed/retrovibed/retroapi/deeppool"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -24,25 +23,17 @@ import (
 type knownquery struct {
 	Database string  `flag:"" name:"database" help:"database to read" default:"${vars_user_configuration_directory}/meta.db"`
 	Explicit bool    `flag:"" name:"explicit" help:"include explicit content in results" default:"false"`
-	Clean    bool    `flag:"" name:"clean" help:"clean query text via deeppool before searching" default:"false"`
 	Cutoff   float32 `flag:"" name:"cutoff" help:"similarity cutoff for scoring" default:"0.7"`
 }
 
-func (t knownquery) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClient) (err error) {
+func (t knownquery) Run(gctx *cmdopts.Global) (err error) {
 	var db *sql.DB
 	if db, err = cmdopts.DatabaseCustom(gctx.Context, t.Database); err != nil {
 		return err
 	}
 	defer db.Close()
 
-	cleaner := library.QueryCleaner(library.NoopQueryCleaner{})
-	if t.Clean {
-		httpc, err := dpc.HTTPClient(gctx.Context)
-		if err != nil {
-			return errorsx.Wrap(err, "unable to create deeppool client")
-		}
-		cleaner = deeppool.NewMediaID(httpc)
-	}
+	cleaner := library.NewQueryerCleanerAuto()
 
 	var in io.Reader = bytes.NewReader(nil)
 	if cmdopts.Readable(os.Stdin) {
@@ -108,7 +99,7 @@ func (t knownquery) run(ctx context.Context, in io.Reader, db *sql.DB, cleaner l
 		}
 
 		if result.Relevance > 0 {
-			log.Println("result", result.Relevance, result.UID, result.Title, result.Released)
+			log.Println("result", result.Relevance, result.UID, result.Title, result.Released, result.Mimetype)
 			continue
 		}
 
@@ -140,7 +131,7 @@ func (t knownquery) run(ctx context.Context, in io.Reader, db *sql.DB, cleaner l
 			}
 		}
 
-		log.Println("result", result.Relevance, result.UID, result.Title, result.Released)
+		log.Println("result", result.Relevance, result.UID, result.Title, result.Released, result.Mimetype)
 	}
 
 	if err := seq.Err(); err != nil {

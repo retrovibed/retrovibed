@@ -2,7 +2,6 @@ package tracking
 
 import (
 	"context"
-	"crypto/md5"
 	"encoding/hex"
 	"errors"
 	"io"
@@ -331,7 +330,7 @@ func Reset(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata) (
 	return nil
 }
 
-func DownloadInto(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata, t torrent.Torrent, dst io.Writer, options ...torrent.Tuner) (err error) {
+func DownloadInto(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, mc library.QueryCleaner, md *Metadata, t torrent.Torrent, dst io.Writer, options ...torrent.Tuner) (err error) {
 	var (
 		downloaded int64
 	)
@@ -366,7 +365,9 @@ func DownloadInto(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Meta
 			continue
 		}
 
-		desc := DescriptionFromPath(md, tx.Path)
+		desc := langx.FirstNonZero(errorsx.Zero(mc.Clean(ctx, md.Description)), DescriptionFromPath(md, tx.Path))
+		log.Println("------------------------------------------- cleaned", md.Description, tx.Path, "->", desc)
+
 		lmd := library.NewMetadata(
 			md5x.FormatUUID(tx.MD5),
 			library.MetadataOptionDescription(desc),
@@ -403,13 +404,6 @@ func DownloadInto(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Meta
 	}
 
 	return nil
-}
-
-func Download(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata, t torrent.Torrent) (err error) {
-	var (
-		mhash = md5.New()
-	)
-	return DownloadInto(ctx, q, vfs, md, t, mhash)
 }
 
 func DescriptionFromPath(md *Metadata, path string) string {

@@ -131,6 +131,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		publishing     = asyncx.NewWakeup(gctx.Context)
 		vpncfgpath     = userx.DefaultConfigDir(userx.DefaultRelRoot(), "vpn.cfg")
 		storagecfgpath = userx.DefaultConfigDir(userx.DefaultRelRoot(), "storage.cfg")
+		mc             = library.NewQueryerCleanerAuto()
 	)
 
 	gctx.Cleanup.Add(1)
@@ -204,7 +205,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		}
 	}
 
-	torrenting := newTorrenting(db, id, rootstore, mediastore, tvfs, tstore, _socks5)
+	torrenting := newTorrenting(db, id, rootstore, mediastore, tvfs, mc, tstore, _socks5)
 
 	if err = torrenting.Reload(gctx.Context, t.torrentsettings(), t.discoverysettings()); err != nil {
 		return errorsx.Wrap(err, "failed to reload torrent")
@@ -308,8 +309,20 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	metaapi.NewHTTPUsermanagement(db).Bind(metamux.PathPrefix("/u12t").Subrouter())
 	metaapi.NewHTTPDaemons(db).Bind(metamux.PathPrefix("/d").Subrouter())
 	metaapi.NewHTTPAuthz(db).Bind(metamux.PathPrefix("/authz").Subrouter())
-	media.NewHTTPLibrary(db, archival, mediastore, deepjwt, media.HTTPLibraryOptionTorrentStorage(tvfs)).Bind(httpmux.PathPrefix("/m").Subrouter())
-	media.NewHTTPDiscovered(db, torrenting._tclient, tstore, media.HTTPDiscoveredOptionRootStorage(rootstore)).Bind(httpmux.PathPrefix("/d").Subrouter())
+	media.NewHTTPLibrary(
+		db,
+		archival,
+		mediastore,
+		deepjwt,
+		media.HTTPLibraryOptionTorrentStorage(tvfs),
+	).Bind(httpmux.PathPrefix("/m").Subrouter())
+	media.NewHTTPDiscovered(
+		db,
+		torrenting._tclient,
+		tstore,
+		media.HTTPDiscoveredOptionRootStorage(rootstore),
+		media.HTTPDiscoveredOptionQueryCleaner(mc),
+	).Bind(httpmux.PathPrefix("/d").Subrouter())
 	media.NewHTTPRecommendations(db).Bind(httpmux.PathPrefix("/r").Subrouter())
 	media.NewHTTPRecent(db).Bind(httpmux.PathPrefix("/w").Subrouter())
 	ddiscapi.NewHTTPPeerManagement(db).Bind(httpmux.PathPrefix("/ddisc").Subrouter())

@@ -32,6 +32,7 @@ const (
 	// JWTSharedSecret used to create jwt tokens
 	JWTSharedSecret = "RETROVIBED_JWT_SECRET"
 
+	NeuralMediaID           = "RETROVIBED_NEURALS_MEDIA_ID"                 // model for extracting media metadata from essentially file names. used in identification of media.
 	AutoDownloadMetadata    = "RETROVIBED_METADATA_AUTODOWNLOAD"            // enable/disable automatically downloading metadata.
 	AutoMDNS                = "RETROVIBED_AUTO_MDNS"                        // enable/disable multicast dns registration, allows for the frontend to automatically find daemons on the local network.
 	AutoArchive             = "RETROVIBED_MEDIA_AUTO_ARCHIVE"               // enable/disable automatic archiving of eligible media.

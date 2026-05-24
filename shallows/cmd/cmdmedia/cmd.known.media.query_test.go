@@ -17,7 +17,7 @@ func TestKnownQueryRun(t *testing.T) {
 		defer done()
 		db := sqltestx.Metadatabase(t)
 
-		require.NoError(t, knownquery{}.run(ctx, strings.NewReader("{\"query\":\"inception\"}\n"), db, library.NoopQueryCleaner{}))
+		require.NoError(t, knownquery{}.run(ctx, strings.NewReader("{\"query\":\"inception\"}\n"), db, library.QueryCleanerNoop()))
 	})
 
 	t.Run("finds record matching description", func(t *testing.T) {
@@ -31,7 +31,7 @@ func TestKnownQueryRun(t *testing.T) {
 		known.Overview = "A mind-bending thriller about dreams within dreams"
 
 		require.NoError(t, knownimport{}.run(ctx, db, jsonlBuffer(t, known)))
-		require.NoError(t, knownquery{}.run(ctx, strings.NewReader("{\"query\":\"Inception\"}\n"), db, library.NoopQueryCleaner{}))
+		require.NoError(t, knownquery{}.run(ctx, strings.NewReader("{\"query\":\"Inception\"}\n"), db, library.QueryCleanerNoop()))
 	})
 
 	t.Run("falls back to title search when no fts match", func(t *testing.T) {
@@ -44,7 +44,7 @@ func TestKnownQueryRun(t *testing.T) {
 		known.Title = "The Dark Knight"
 
 		require.NoError(t, knownimport{}.run(ctx, db, jsonlBuffer(t, known)))
-		require.NoError(t, knownquery{}.run(ctx, strings.NewReader("{\"query\":\"Dark Knight\"}\n"), db, library.NoopQueryCleaner{}))
+		require.NoError(t, knownquery{}.run(ctx, strings.NewReader("{\"query\":\"Dark Knight\"}\n"), db, library.QueryCleanerNoop()))
 	})
 
 	t.Run("query with embedded lucene keywords does not error", func(t *testing.T) {
@@ -52,7 +52,7 @@ func TestKnownQueryRun(t *testing.T) {
 		defer done()
 		db := sqltestx.Metadatabase(t)
 
-		require.NoError(t, knownquery{}.run(ctx, strings.NewReader("{\"query\":\"How to School 101 Brilliant Ideas to Keep\"}\n"), db, library.NoopQueryCleaner{}))
+		require.NoError(t, knownquery{}.run(ctx, strings.NewReader("{\"query\":\"How to School 101 Brilliant Ideas to Keep\"}\n"), db, library.QueryCleanerNoop()))
 	})
 
 	t.Run("fails when stdin is empty", func(t *testing.T) {
@@ -60,6 +60,6 @@ func TestKnownQueryRun(t *testing.T) {
 		defer done()
 		db := sqltestx.Metadatabase(t)
 
-		require.Error(t, knownquery{}.run(ctx, bytes.NewReader(nil), db, library.NoopQueryCleaner{}))
+		require.Error(t, knownquery{}.run(ctx, bytes.NewReader(nil), db, library.QueryCleanerNoop()))
 	})
 }

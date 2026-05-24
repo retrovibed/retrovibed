@@ -8,7 +8,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/retrovibed/retrovibed/retroapi/deeppool"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
@@ -19,10 +18,9 @@ import (
 
 type knowndetect struct {
 	Database string `flag:"" name:"database" help:"database to read" default:"${vars_user_configuration_directory}/meta.db"`
-	Clean    bool   `flag:"" name:"clean" help:"clean query text via deeppool before searching" default:"false"`
 }
 
-func (t knowndetect) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClient) (err error) {
+func (t knowndetect) Run(gctx *cmdopts.Global) (err error) {
 	var db *sql.DB
 
 	if db, err = cmdopts.DatabaseCustom(gctx.Context, t.Database); err != nil {
@@ -30,14 +28,7 @@ func (t knowndetect) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClient) (err 
 	}
 	defer db.Close()
 
-	cleaner := library.QueryCleaner(library.NoopQueryCleaner{})
-	if t.Clean {
-		httpc, err := dpc.HTTPClient(gctx.Context)
-		if err != nil {
-			return errorsx.Wrap(err, "unable to create deeppool client")
-		}
-		cleaner = deeppool.NewMediaID(httpc)
-	}
+	cleaner := library.NewQueryerCleanerAuto()
 
 	var in io.Reader = bytes.NewReader(nil)
 	if cmdopts.Readable(os.Stdin) {

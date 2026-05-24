@@ -20,6 +20,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/testx"
 	"github.com/retrovibed/retrovibed/shallows/internal/torrenttestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/uuidx"
+	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -62,7 +63,7 @@ func TestDiscoverFromRSSFeeds(t *testing.T) {
 
 		require.NotEqual(t, time.Date(2025, time.July, 01, 17, 47, 32, 0, time.UTC), feed.LastBuiltAt)
 		require.Equal(t, 1, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT (*) FROM torrents_feed_rss WHERE next_check < NOW()")))
-		require.NoError(t, daemons.DiscoverFromRSSFeedsOnce(t.Context(), q, vfs, tclient, tstore))
+		require.NoError(t, daemons.DiscoverFromRSSFeedsOnce(t.Context(), q, vfs, library.QueryCleanerNoop(), tclient, tstore))
 		require.Equal(t, 0, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT (*) FROM torrents_feed_rss WHERE next_check < NOW()")))
 		require.Equal(t, 1, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT (*) FROM torrents_metadata")))
 
@@ -115,7 +116,7 @@ func TestDiscoverFromRSSFeeds(t *testing.T) {
 		require.NoError(t, tracking.RSSInsertDefaultFeed(t.Context(), q, feed).Scan(&feed))
 
 		require.Equal(t, 1, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT (*) FROM torrents_feed_rss WHERE next_check < NOW()")))
-		require.NoError(t, daemons.DiscoverFromRSSFeedsOnce(t.Context(), q, vfs, tclient, tstore))
+		require.NoError(t, daemons.DiscoverFromRSSFeedsOnce(t.Context(), q, vfs, library.QueryCleanerNoop(), tclient, tstore))
 		require.Equal(t, 0, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT (*) FROM torrents_feed_rss WHERE next_check < NOW()")))
 		require.Equal(t, 1, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT (*) FROM torrents_metadata")))
 	})
@@ -151,7 +152,7 @@ func TestDiscoverFromRSSFeeds(t *testing.T) {
 		require.NoError(t, tracking.RSSInsertDefaultFeed(t.Context(), q, feed).Scan(&feed))
 
 		require.Equal(t, 1, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT (*) FROM torrents_feed_rss WHERE next_check < NOW()")))
-		require.NoError(t, daemons.DiscoverFromRSSFeedsOnce(t.Context(), q, vfs, tclient, tstore))
+		require.NoError(t, daemons.DiscoverFromRSSFeedsOnce(t.Context(), q, vfs, library.QueryCleanerNoop(), tclient, tstore))
 		require.Equal(t, 0, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT (*) FROM torrents_feed_rss WHERE next_check < NOW()")))
 		require.Equal(t, 0, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT (*) FROM torrents_metadata")))
 	})
@@ -187,7 +188,7 @@ func TestDiscoverFromRSSFeeds(t *testing.T) {
 		require.NoError(t, tracking.RSSInsertDefaultFeed(t.Context(), q, feed).Scan(&feed))
 
 		require.Equal(t, 1, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT (*) FROM torrents_feed_rss WHERE next_check < NOW()")))
-		require.NoError(t, daemons.DiscoverFromRSSFeedsOnce(t.Context(), q, vfs, tclient, tstore))
+		require.NoError(t, daemons.DiscoverFromRSSFeedsOnce(t.Context(), q, vfs, library.QueryCleanerNoop(), tclient, tstore))
 		require.Equal(t, 0, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT (*) FROM torrents_feed_rss WHERE next_check < NOW()")))
 		require.Equal(t, 1, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT (*) FROM torrents_metadata")))
 		require.True(t, sqltestx.Bool(t, q, "SELECT hidden_at == 'infinity' FROM torrents_metadata"))
@@ -221,7 +222,7 @@ func TestDiscoverFromRSSFeeds(t *testing.T) {
 		require.NoError(t, tracking.RSSInsertDefaultFeed(t.Context(), q, feed).Scan(&feed))
 
 		require.Equal(t, 1, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT (*) FROM torrents_feed_rss WHERE next_check < NOW()")))
-		require.NoError(t, daemons.DiscoverFromRSSFeedsOnce(t.Context(), q, vfs, tclient, tstore))
+		require.NoError(t, daemons.DiscoverFromRSSFeedsOnce(t.Context(), q, vfs, library.QueryCleanerNoop(), tclient, tstore))
 		require.Equal(t, 0, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT (*) FROM torrents_feed_rss WHERE next_check < NOW()")))
 		require.Equal(t, 1, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT (*) FROM torrents_metadata")))
 	})
@@ -254,7 +255,7 @@ func TestDiscoverFromRSSFeeds(t *testing.T) {
 		require.NoError(t, tracking.RSSInsertDefaultFeed(t.Context(), q, feed).Scan(&feed))
 
 		require.Equal(t, 0, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT (*) FROM torrents_metadata")))
-		require.NoError(t, daemons.DiscoverFromRSSFeedsOnce(t.Context(), q, vfs, tclient, tstore))
+		require.NoError(t, daemons.DiscoverFromRSSFeedsOnce(t.Context(), q, vfs, library.QueryCleanerNoop(), tclient, tstore))
 		require.Equal(t, 1, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT (*) FROM torrents_metadata")))
 		assert.Equal(t, mimex.RetrovibedMediaArchive, sqltestx.String(t, q, "SELECT mimetype FROM torrents_metadata"))
 		assert.WithinDuration(t, time.Now(), sqltestx.Timestamp(t, q, "SELECT hidden_at FROM torrents_metadata"), 100*time.Millisecond)

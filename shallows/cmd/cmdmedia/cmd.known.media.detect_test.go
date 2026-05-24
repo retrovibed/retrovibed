@@ -23,7 +23,7 @@ func TestKnownDetectRun(t *testing.T) {
 
 		require.NoError(t, knownimport{}.run(ctx, db, jsonlBuffer(t, known)))
 
-		require.NoError(t, knowndetect{}.run(ctx, strings.NewReader("{\"query\":\"The Grand Budapest Hotel\"}\n"), db, library.NoopQueryCleaner{}))
+		require.NoError(t, knowndetect{}.run(ctx, strings.NewReader("{\"query\":\"The Grand Budapest Hotel\"}\n"), db, library.QueryCleanerNoop()))
 	})
 
 	t.Run("returns no error when no match found", func(t *testing.T) {
@@ -31,7 +31,7 @@ func TestKnownDetectRun(t *testing.T) {
 		defer done()
 		db := sqltestx.Metadatabase(t)
 
-		require.NoError(t, knowndetect{}.run(ctx, strings.NewReader("{\"query\":\"something completely unknown\"}\n"), db, library.NoopQueryCleaner{}))
+		require.NoError(t, knowndetect{}.run(ctx, strings.NewReader("{\"query\":\"something completely unknown\"}\n"), db, library.QueryCleanerNoop()))
 	})
 
 	t.Run("query with embedded lucene keywords does not error", func(t *testing.T) {
@@ -39,7 +39,7 @@ func TestKnownDetectRun(t *testing.T) {
 		defer done()
 		db := sqltestx.Metadatabase(t)
 
-		require.NoError(t, knowndetect{}.run(ctx, strings.NewReader("{\"query\":\"How to School 101 Brilliant Ideas to Keep\"}\n"), db, library.NoopQueryCleaner{}))
+		require.NoError(t, knowndetect{}.run(ctx, strings.NewReader("{\"query\":\"How to School 101 Brilliant Ideas to Keep\"}\n"), db, library.QueryCleanerNoop()))
 	})
 
 	t.Run("fails when stdin is empty", func(t *testing.T) {
@@ -47,6 +47,6 @@ func TestKnownDetectRun(t *testing.T) {
 		defer done()
 		db := sqltestx.Metadatabase(t)
 
-		require.Error(t, knowndetect{}.run(ctx, bytes.NewReader(nil), db, library.NoopQueryCleaner{}))
+		require.Error(t, knowndetect{}.run(ctx, bytes.NewReader(nil), db, library.QueryCleanerNoop()))
 	})
 }
