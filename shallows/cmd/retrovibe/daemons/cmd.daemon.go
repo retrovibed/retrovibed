@@ -219,15 +219,18 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		return err
 	}
 
-	netmon := netmonx.Global()
-	go func() {
-		for delta := range netmon.Each(gctx.Context) {
-			log.Println("network delta", spew.Sdump(delta))
-			torrenting.Broadcast()
-		}
+	if netmon := netmonx.Global(); netmon != nil {
+		go func() {
+			for delta := range netmon.Each(gctx.Context) {
+				log.Println("network delta", spew.Sdump(delta))
+				torrenting.Broadcast()
+			}
 
-		errorsx.Log(errorsx.Wrap(netmon.Err(), "netmon failed"))
-	}()
+			errorsx.Log(errorsx.Wrap(netmon.Err(), "netmon failed"))
+		}()
+	} else {
+		log.Println("network monitor unavailable, network change detection disabled")
+	}
 
 	asyncx.Background(gctx.Context, mediameta, func(ctx context.Context) error {
 		return errorsx.Wrap(MediaMetadataImport(ctx, db, tvfs, tstore), "media metadata import failed")

@@ -111,7 +111,8 @@ class _DisplayState extends State<Display> {
     return ds.Shortcuts(
       bindings: {
         _konamiActivator: (
-          const Text('developer mode'),
+          // const Text('developer mode'),
+          ds.HelpScope.None,
           () {
             masked(debug.DeveloperSettings());
             return KeyEventResult.handled;

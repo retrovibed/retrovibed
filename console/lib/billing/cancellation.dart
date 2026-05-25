@@ -17,14 +17,14 @@ class CancellationButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authzmd = authn.AuthzCache.authzmetadata(context);
-    final deleteaccount =
+    final Future<void> Function() deleteaccount =
         () => apibillingdelete(
           options: [authn.DeeppoolAuthzCache.bearer(context)],
         ).then((_) {
           authn.Login.logout(context);
         });
 
-    final deleteidentity =
+    final Future<void> Function() deleteidentity =
         () => apiidentitydelete(
           options: [authn.DeeppoolAuthzCache.bearer(context)],
         ).then((_) {
@@ -43,7 +43,7 @@ class CancellationButton extends StatelessWidget {
               ),
               onConfirm: () {
                 final pending = authzmd.billingModify ? deleteaccount() : deleteidentity();
-                pending.whenComplete(() => completion.complete()).ignore();
+                pending.then((_) => completion.complete()).catchError(completion.completeError);
               },
               onCancel: () => completion.complete(),
             ),
