@@ -17,7 +17,8 @@ func IdentifyTorrentMedia(ctx context.Context, db sqlx.Queryer) error {
 	q := tracking.MetadataSearchBuilder().Where(
 		squirrel.And{
 			tracking.MetadataQueryNeedsKnownMediaID(),
-			tracking.MetadataQueryNotMetadataArchive(),
+			tracking.MetadataQueryNotMediaArchive(),
+			tracking.MetadataQueryNotNeural(),
 		},
 	)
 

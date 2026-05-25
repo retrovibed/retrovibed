@@ -30,7 +30,7 @@ func MediaMetadataImport(ctx context.Context, db sqlx.Queryer, tvfs fsx.Virtual,
 
 	q := tracking.MetadataSearchBuilder().Where(
 		squirrel.And{
-			tracking.MetadataQueryMetadataArchive(),
+			tracking.MetadataQueryMediaArchive(),
 			tracking.MetadataQueryCompleted(true),
 			tracking.MetadataQueryNotImported(),
 		},

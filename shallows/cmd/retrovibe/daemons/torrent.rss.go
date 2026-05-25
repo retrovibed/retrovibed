@@ -71,6 +71,12 @@ func PrepareDefaultFeeds(ctx context.Context, q sqlx.Queryer) error {
 				Contributing: true,
 				Autodownload: envx.Boolean(true, env.AutoDownloadMetadata),
 			},
+			{
+				Description:  "Retroneural - various small AI functionality for retrovibed",
+				URL:          "https://neurals.community.retrovibe.space",
+				Contributing: true,
+				Autodownload: envx.Boolean(false, env.AutoDownloadNeurals),
+			},
 		})
 	})
 	if err != nil {

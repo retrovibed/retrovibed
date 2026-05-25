@@ -9,6 +9,7 @@ const (
 	Binary                 = "application/octet-stream"
 	Bittorrent             = "application/x-bittorrent"
 	RSS                    = "application/rss+xml"
-	RetrovibedMediaArchive = "application/vnd.retrovibed.media.archive"
 	ISO9660                = "application/x-iso9660-image"
+	RetrovibedMediaArchive = "application/vnd.retrovibed.media.archive"
+	RetrovibedNeural       = "application/vnd.retrovibed.neural"
 )

@@ -232,6 +232,10 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	asyncx.Background(gctx.Context, mediameta, func(ctx context.Context) error {
 		return errorsx.Wrap(MediaMetadataImport(ctx, db, tvfs, tstore), "media metadata import failed")
 	})
+	asyncx.Background(gctx.Context, mediameta, func(ctx context.Context) error {
+		return errorsx.Wrap(NeuralImport(ctx, db, userx.DefaultCacheDirectory(userx.DefaultRelRoot()), tvfs, tstore), "media metadata import failed")
+	})
+
 	go func() {
 		errorsx.Log(errorsx.Wrap(asyncx.WatchDirectories(gctx.Context, mediameta, asyncx.FileCreated, mediastore.Path()), "media metadata file watch failed"))
 	}()
