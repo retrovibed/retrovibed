@@ -20,5 +20,13 @@ RUN yes | sudo -u egd /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk
     "cmake;3.22.1" \
     "platform-tools"
 
+
+RUN apt-get install -y rustup
+RUN sudo -u egd rustup default stable
+RUN sudo -u egd rustup target add x86_64-linux-android aarch64-linux-android
+RUN sudo -u egd cargo install cargo-ndk
+
 RUN systemd-tmpfiles --create
 RUN systemd-tmpfiles --clean
+
+ENV PATH=/home/egd/.cargo/bin:$PATH

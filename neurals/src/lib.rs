@@ -29,25 +29,34 @@ fn run_predict(
             .map_err(|e| format!("Optimization failed: {e}"))?
             .into_runnable()
             .map_err(|e| format!("Failed to build runnable plan: {e}"))?;
-        Ok(Model { path: model_path.to_string(), plan })
+        Ok(Model {
+            path: model_path.to_string(),
+            plan,
+        })
     });
 
     let model = instance.as_ref().map_err(|e| e.clone())?;
 
     let mut flat = vec![pad; seq_len];
     for (i, c) in input.chars().enumerate() {
-        if i >= seq_len { break; }
+        if i >= seq_len {
+            break;
+        }
         flat[i] = (c as i64) % num_tokens;
     }
 
     let src: Tensor = tract_ndarray::Array2::from_shape_vec((1, seq_len), flat)
         .map_err(|e| format!("Tensor error: {e}"))?
-        .into_dyn().into();
+        .into_dyn()
+        .into();
 
-    let mut outputs = model.plan.run(tvec!(src.into()))
+    let mut outputs = model
+        .plan
+        .run(tvec!(src.into()))
         .map_err(|e| format!("Execution error: {e}"))?;
 
-    let logits = outputs.remove(0)
+    let logits = outputs
+        .remove(0)
         .to_array_view::<f32>()
         .map_err(|e| format!("Output type mismatch: {e}"))?
         .into_owned();
@@ -57,11 +66,14 @@ fn run_predict(
         let tok = (0..num_tokens as usize)
             .max_by(|&a, &b| logits[[0, i, a]].partial_cmp(&logits[[0, i, b]]).unwrap())
             .unwrap_or(0) as i64;
-        if tok == eos { break; }
+        if tok == eos {
+            break;
+        }
         token_ids.push(tok);
     }
 
-    Ok(token_ids.iter()
+    Ok(token_ids
+        .iter()
         .filter(|&&t| t != pad && t != bos && t != eos)
         .filter_map(|&t| char::from_u32(t as u32))
         .collect())
@@ -90,7 +102,9 @@ pub extern "C" fn predict(
             let s = CString::new(result).unwrap_or_default();
             let bytes = s.as_bytes_with_nul();
             let copy_len = bytes.len().min(output_len);
-            unsafe { std::ptr::copy_nonoverlapping(bytes.as_ptr() as *const c_char, output, copy_len) };
+            unsafe {
+                std::ptr::copy_nonoverlapping(bytes.as_ptr() as *const c_char, output, copy_len)
+            };
             0
         }
         Err(_) => -1,

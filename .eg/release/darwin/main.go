@@ -4,6 +4,7 @@ import (
 	"context"
 	"eg/compute/console"
 	"eg/compute/debuild/duckdb"
+	"eg/compute/neurals"
 	"eg/compute/release"
 	"eg/compute/tarballs"
 	"fmt"
@@ -48,6 +49,7 @@ func main() {
 	shallows := runtime.Directory(egenv.WorkingDirectory("shallows"))
 	commit := eggit.EnvCommit()
 	duckdblibs := egenv.CacheDirectory("duckdb", ".darwin-arm64")
+	neuralsdir := egenv.CacheDirectory("neurals")
 
 	duckdbldflags := "-L" + duckdblibs + " " +
 		"-Wl,-force_load," + duckdblibs + "/libduckdb_static.a " +
@@ -65,6 +67,7 @@ func main() {
 		ctx,
 		eg.Sequential(
 			duckdb.MaybeBuild(".eg.cache/duckdb/.darwin-arm64/libduckdb_static.a", duckdb.CompileDarwin("osx_arm64", "arm64"), duckdb.CloneDarwin),
+			neurals.CompileDarwin(neuralsdir),
 			shell.Op(
 				shell.Newf("test -f %[1]s/libtpcds_extension.a || (echo 'void __stub(void){}' | cc -xc -c - -o /tmp/stub.o && ar rcs %[1]s/libtpcds_extension.a /tmp/stub.o && ar rcs %[1]s/libtpch_extension.a /tmp/stub.o)", duckdblibs),
 			),
@@ -84,9 +87,10 @@ func main() {
 			),
 			shell.Op(
 				shallows.Newf(
-					"CGO_LDFLAGS=\"%s\" go install --tags duckdb_use_static_lib ./cmd/...",
-					duckdbldflags,
+					"CGO_LDFLAGS=\"%s -L%s -lpredicttext -Wl,-rpath,@executable_path/../Frameworks\" go install --tags duckdb_use_static_lib,retrovibed,neural ./cmd/...",
+					duckdbldflags, neuralsdir,
 				).Environ("GOBIN", filepath.Join(tarballapp, "Contents", "Helpers")),
+				shell.Newf("cp %s/libpredicttext.dylib %s/Contents/Frameworks/", neuralsdir, tarballapp),
 			),
 			release.KeychainPEM(
 				egenv.String("", "APPLE_SIGNING_KEY"),
