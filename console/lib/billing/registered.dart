@@ -93,7 +93,7 @@ class RegisteredState extends State<Registered> {
         }, test: httpx.ErrorsTest.err404)
         .catchError((cause) {
           setState(() {
-            _cause = ds.Error.unknown(cause, onTap: _reseterr);
+            _cause = ds.Errors.httpauto(cause, onTap: _reseterr);
           });
         })
         .whenComplete(() {

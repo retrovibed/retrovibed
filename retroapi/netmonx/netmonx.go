@@ -3,6 +3,7 @@ package netmonx
 import (
 	"context"
 	"iter"
+	"log"
 	"sync"
 	"sync/atomic"
 
@@ -21,6 +22,7 @@ func Global() *Monitor {
 	globalOnce.Do(func() {
 		m, err := New()
 		if err != nil {
+			log.Println("failed to initialize global monitor", err)
 			return
 		}
 		globalMon.Store(m)
@@ -46,7 +48,7 @@ func (m *Monitor) SetMetered(b bool) {
 func Metered() bool {
 	m := Global()
 	if m == nil {
-		return false
+		return true // assume worst case.
 	}
 
 	return m.Metered()

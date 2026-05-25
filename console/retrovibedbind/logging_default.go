@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-// RedirectLogs is a no-op on non-android platforms.
+// RedirectLogs is a no-op on non-mobile platforms.
 func redirectlogs() {
 	// Standard behavior remains: Go logs to the default stdout/stderr
 	// which works normally on desktop and iOS.

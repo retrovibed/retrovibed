@@ -140,7 +140,7 @@ func MetadataOptionAutoDescription(m *Metadata) {
 func MetadataOptionAutoHidden(m *Metadata) {
 	_, ok := slicesx.Find(func(mime string) bool {
 		return m.Mimetype == mime
-	}, mimex.RetrovibedMediaArchive)
+	}, mimex.RetrovibedMediaArchive, mimex.RetrovibedNeural)
 	if !ok {
 		return
 	}
@@ -249,12 +249,20 @@ func MetadataQueryNeedsKnownMediaID() squirrel.Sqlizer {
 	return squirrel.Expr("torrents_metadata.known_media_id = 'FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF'")
 }
 
-func MetadataQueryMetadataArchive() squirrel.Sqlizer {
+func MetadataQueryMediaArchive() squirrel.Sqlizer {
 	return squirrel.Expr("torrents_metadata.mimetype = ?", mimex.RetrovibedMediaArchive)
 }
 
-func MetadataQueryNotMetadataArchive() squirrel.Sqlizer {
+func MetadataQueryNotMediaArchive() squirrel.Sqlizer {
 	return squirrel.Expr("torrents_metadata.mimetype != ?", mimex.RetrovibedMediaArchive)
+}
+
+func MetadataQueryNeural() squirrel.Sqlizer {
+	return squirrel.Expr("torrents_metadata.mimetype = ?", mimex.RetrovibedNeural)
+}
+
+func MetadataQueryNotNeural() squirrel.Sqlizer {
+	return squirrel.Expr("torrents_metadata.mimetype != ?", mimex.RetrovibedNeural)
 }
 
 func MetadataQueryCreatedAfter(ts time.Time) squirrel.Sqlizer {

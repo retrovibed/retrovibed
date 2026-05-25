@@ -50,6 +50,8 @@ jobs:
         run: ls -lha $(dirname $(dirname $(which flutter)))
       - name: Fix Flutter SDK cache permissions
         run: sudo chown -R $(id -un) $(dirname $(dirname $(which flutter)))
+      - name: Install Rust iOS target
+        run: rustup target add aarch64-apple-ios
       - name: build
         run: |
           eg compute baremetal --no-podman --secret=gcpsm://${{ secrets.GCP_PROJECT }}/apple-signing-env release/ios
