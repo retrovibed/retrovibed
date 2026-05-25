@@ -15,6 +15,10 @@ import (
 	"github.com/egdaemon/eg/runtime/x/wasi/egtarball"
 )
 
+func testBuildTags() []string {
+	return []string{"duckdb_use_lib"}
+}
+
 var buildTags = []string{"duckdb_use_lib", "retrovibed", "neural"}
 
 func rootdir() string {
@@ -122,7 +126,7 @@ func Test() eg.OpFn {
 		eggolang.AutoTest(
 			eggolang.TestOption.BuildOptions(
 				eggolang.Build(
-					eggolang.BuildOption.Tags(buildTags...),
+					eggolang.BuildOption.Tags(testBuildTags()...),
 					eggolang.BuildOption.WorkingDirectory(rootdir()),
 				),
 			),
