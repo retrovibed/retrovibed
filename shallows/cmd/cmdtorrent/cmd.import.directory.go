@@ -30,7 +30,7 @@ type importDirectory struct {
 	Entropy   string        `flag:"" name:"entropy" help:"encryption entropy value to set for uploads" default:""`
 	Mimetype  string        `flag:"" name:"mimetype" help:"mimetype of the media if known and consistent"`
 	TTL       time.Duration `flag:"" name:"ttl" help:"when the torrents from this import should be marked for expiration, which means they're no longer valid"`
-	Directory string        `arg:"" name:"directory" help:"directory containing the content to import. each immediate file / directory generates a torrent torrent. subdirectories create multi file torrents"`
+	Directory string        `arg:"" name:"directory" help:"directory containing the content to import. each immediate file / directory generates a torrent. subdirectories create multi file torrents"`
 }
 
 func (t importDirectory) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig) error {

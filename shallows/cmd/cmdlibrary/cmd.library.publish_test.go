@@ -42,11 +42,6 @@ func communityLibraryPublishServer(t *testing.T, q *sql.DB) *mux.Router {
 	return routes
 }
 
-func encodeLibraryItem(t *testing.T, enc *jsonl.Encoder, lmd library.Metadata) {
-	t.Helper()
-	require.NoError(t, enc.Encode(langx.Clone(lmd, timex.JSONSafeEncodeOption)))
-}
-
 func TestCommunityLibraryPublish(t *testing.T) {
 	t.Run("dry run outputs library items without calling endpoint", func(t *testing.T) {
 		ctx, done := testx.Context(t)
@@ -80,7 +75,7 @@ func TestCommunityLibraryPublish(t *testing.T) {
 		com := &meta.Community{Id: communityID}
 		var input bytes.Buffer
 		require.NoError(t, json.NewEncoder(&input).Encode(com))
-		encodeLibraryItem(t, jsonl.NewEncoder(&input), lmd)
+		require.NoError(t, jsonl.NewEncoder(&input).Encode(langx.Clone(lmd, timex.JSONSafeEncodeOption)))
 
 		var output bytes.Buffer
 		cmd := cmdPublish{Endpoint: "localhost:9998", DryRun: true}
@@ -126,7 +121,7 @@ func TestCommunityLibraryPublish(t *testing.T) {
 		com := &meta.Community{Id: communityID}
 		var input bytes.Buffer
 		require.NoError(t, json.NewEncoder(&input).Encode(com))
-		encodeLibraryItem(t, jsonl.NewEncoder(&input), lmd)
+		require.NoError(t, jsonl.NewEncoder(&input).Encode(langx.Clone(lmd, timex.JSONSafeEncodeOption)))
 
 		var output bytes.Buffer
 		cmd := cmdPublish{Endpoint: srv.URL, DryRun: false}
@@ -185,7 +180,7 @@ func TestCommunityLibraryPublish(t *testing.T) {
 				EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
 			}
 			require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
-			encodeLibraryItem(t, enc, lmd)
+			require.NoError(t, enc.Encode(langx.Clone(lmd, timex.JSONSafeEncodeOption)))
 		}
 
 		srv := httptest.NewServer(communityLibraryPublishServer(t, q))
@@ -251,7 +246,7 @@ func TestCommunityLibraryPublish(t *testing.T) {
 		com := &meta.Community{Id: communityID, DefaultPublishMode: meta.PublishMode_LISTED}
 		var input bytes.Buffer
 		require.NoError(t, json.NewEncoder(&input).Encode(com))
-		encodeLibraryItem(t, jsonl.NewEncoder(&input), lmd)
+		require.NoError(t, jsonl.NewEncoder(&input).Encode(langx.Clone(lmd, timex.JSONSafeEncodeOption)))
 
 		var output bytes.Buffer
 		cmd := cmdPublish{Endpoint: srv.URL, DryRun: false}
