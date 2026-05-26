@@ -9,6 +9,7 @@ export 'authn/login.dart';
 export 'authn/cache.dart';
 export 'authn/deeppool.cache.dart';
 export 'authn/api.dart';
+export 'authn/developer.mode.dart';
 
 Future<String> bearer<T>(authz.Cached<T> c) {
   return c.auto().then((v) => v.bearer);

@@ -7,7 +7,8 @@ import "meta.search.proto";
 
 message RecentSearchRequest {
   meta.DateRange created = 1 [ json_name = "created" ];
-  reserved 2 to 899;
+  string mimetype = 2 [ json_name = "mimetype" ];
+  reserved 3 to 899;
   uint64 offset = 900 [ json_name = "offset" ];
   uint64 limit = 901 [ json_name = "limit" ];
   reserved 902 to 999;

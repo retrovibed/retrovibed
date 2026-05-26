@@ -25,6 +25,7 @@ const (
 type RecentSearchRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Created       *meta.DateRange        `protobuf:"bytes,1,opt,name=created,proto3" json:"created,omitempty"`
+	Mimetype      string                 `protobuf:"bytes,2,opt,name=mimetype,proto3" json:"mimetype,omitempty"`
 	Offset        uint64                 `protobuf:"varint,900,opt,name=offset,proto3" json:"offset,omitempty"`
 	Limit         uint64                 `protobuf:"varint,901,opt,name=limit,proto3" json:"limit,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -66,6 +67,13 @@ func (x *RecentSearchRequest) GetCreated() *meta.DateRange {
 		return x.Created
 	}
 	return nil
+}
+
+func (x *RecentSearchRequest) GetMimetype() string {
+	if x != nil {
+		return x.Mimetype
+	}
+	return ""
 }
 
 func (x *RecentSearchRequest) GetOffset() uint64 {
@@ -322,11 +330,12 @@ var File_media_recent_proto protoreflect.FileDescriptor
 
 const file_media_recent_proto_rawDesc = "" +
 	"\n" +
-	"\x12media.recent.proto\x12\x05media\x1a\vmedia.proto\x1a\x11meta.search.proto\"\x7f\n" +
+	"\x12media.recent.proto\x12\x05media\x1a\vmedia.proto\x1a\x11meta.search.proto\"\x9b\x01\n" +
 	"\x13RecentSearchRequest\x12)\n" +
-	"\acreated\x18\x01 \x01(\v2\x0f.meta.DateRangeR\acreated\x12\x17\n" +
+	"\acreated\x18\x01 \x01(\v2\x0f.meta.DateRangeR\acreated\x12\x1a\n" +
+	"\bmimetype\x18\x02 \x01(\tR\bmimetype\x12\x17\n" +
 	"\x06offset\x18\x84\a \x01(\x04R\x06offset\x12\x15\n" +
-	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\x02\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"x\n" +
+	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\x03\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"x\n" +
 	"\x14RecentSearchResponse\x12.\n" +
 	"\x04next\x18\x01 \x01(\v2\x1a.media.RecentSearchRequestR\x04next\x120\n" +
 	"\x05items\x18\x02 \x03(\v2\x1a.media.RecentRecordRequestR\x05items\"\xb2\x01\n" +

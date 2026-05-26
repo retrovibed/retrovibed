@@ -6,8 +6,9 @@ import 'package:retrovibed/library.dart' as lib;
 import '../media/media.known.pb.dart' as known;
 
 class Recommendations extends StatefulWidget {
-  const Recommendations({super.key, this.latest = lib.recommendations.latest});
+  const Recommendations(this.mimetype, {super.key, this.latest = lib.recommendations.latest});
 
+  final String mimetype;
   final lib.FnRecommendations latest;
 
   @override
@@ -41,7 +42,7 @@ class _RecommendationsState extends State<Recommendations> {
     final auth = authn.request(authn.AuthzCache.meta(context));
     return httpx
         .withRetry(
-          () => widget.latest(lib.recommendations.request(), options: [auth]),
+          () => widget.latest(lib.recommendations.request(mimetype: widget.mimetype), options: [auth]),
         )
         .then(
           (resp) => setState(() {
@@ -80,7 +81,9 @@ class _RecommendationsState extends State<Recommendations> {
               help: ds.Hint(const Text("generate a new (random) recommendation")),
               onPressed: () {
                 return httpx
-                    .withRetry(() => lib.recommendations.random(options: [authn.request(authn.AuthzCache.meta(context))]))
+                    .withRetry(
+                      () => lib.recommendations.random(options: [authn.request(authn.AuthzCache.meta(context))]),
+                    )
                     .then((_) => _load());
               },
             ),

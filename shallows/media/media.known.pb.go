@@ -119,6 +119,7 @@ type KnownSearchRequest struct {
 	Query         string                 `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
 	Adult         bool                   `protobuf:"varint,2,opt,name=adult,proto3" json:"adult,omitempty"`
 	Language      string                 `protobuf:"bytes,3,opt,name=language,proto3" json:"language,omitempty"`
+	Mimetype      string                 `protobuf:"bytes,4,opt,name=mimetype,proto3" json:"mimetype,omitempty"`
 	Offset        uint64                 `protobuf:"varint,900,opt,name=offset,proto3" json:"offset,omitempty"`
 	Limit         uint64                 `protobuf:"varint,901,opt,name=limit,proto3" json:"limit,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -172,6 +173,13 @@ func (x *KnownSearchRequest) GetAdult() bool {
 func (x *KnownSearchRequest) GetLanguage() string {
 	if x != nil {
 		return x.Language
+	}
+	return ""
+}
+
+func (x *KnownSearchRequest) GetMimetype() string {
+	if x != nil {
+		return x.Mimetype
 	}
 	return ""
 }
@@ -537,6 +545,7 @@ func (x *KnownCreateResponse) GetKnown() *Known {
 type KnownLatestRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Released      *meta.DateRange        `protobuf:"bytes,1,opt,name=released,proto3" json:"released,omitempty"`
+	Mimetype      string                 `protobuf:"bytes,2,opt,name=mimetype,proto3" json:"mimetype,omitempty"`
 	Offset        uint64                 `protobuf:"varint,900,opt,name=offset,proto3" json:"offset,omitempty"`
 	Limit         uint64                 `protobuf:"varint,901,opt,name=limit,proto3" json:"limit,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -578,6 +587,13 @@ func (x *KnownLatestRequest) GetReleased() *meta.DateRange {
 		return x.Released
 	}
 	return nil
+}
+
+func (x *KnownLatestRequest) GetMimetype() string {
+	if x != nil {
+		return x.Mimetype
+	}
+	return ""
 }
 
 func (x *KnownLatestRequest) GetOffset() uint64 {
@@ -648,6 +664,7 @@ func (x *KnownLatestResponse) GetItems() []*Known {
 
 type RecommendationsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	Mimetype      string                 `protobuf:"bytes,1,opt,name=mimetype,proto3" json:"mimetype,omitempty"`
 	Offset        uint64                 `protobuf:"varint,900,opt,name=offset,proto3" json:"offset,omitempty"`
 	Limit         uint64                 `protobuf:"varint,901,opt,name=limit,proto3" json:"limit,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -682,6 +699,13 @@ func (x *RecommendationsRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use RecommendationsRequest.ProtoReflect.Descriptor instead.
 func (*RecommendationsRequest) Descriptor() ([]byte, []int) {
 	return file_media_known_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *RecommendationsRequest) GetMimetype() string {
+	if x != nil {
+		return x.Mimetype
+	}
+	return ""
 }
 
 func (x *RecommendationsRequest) GetOffset() uint64 {
@@ -762,13 +786,14 @@ const file_media_known_proto_rawDesc = "" +
 	"\vdescription\x18\x04 \x01(\tR\vdescription\x12\x18\n" +
 	"\asummary\x18\x05 \x01(\tR\asummary\x12\x14\n" +
 	"\x05image\x18\x06 \x01(\tR\x05image\x12\x1a\n" +
-	"\breleased\x18\a \x01(\tR\breleased\"\x9b\x01\n" +
+	"\breleased\x18\a \x01(\tR\breleased\"\xb7\x01\n" +
 	"\x12KnownSearchRequest\x12\x14\n" +
 	"\x05query\x18\x01 \x01(\tR\x05query\x12\x14\n" +
 	"\x05adult\x18\x02 \x01(\bR\x05adult\x12\x1a\n" +
-	"\blanguage\x18\x03 \x01(\tR\blanguage\x12\x17\n" +
+	"\blanguage\x18\x03 \x01(\tR\blanguage\x12\x1a\n" +
+	"\bmimetype\x18\x04 \x01(\tR\bmimetype\x12\x17\n" +
 	"\x06offset\x18\x84\a \x01(\x04R\x06offset\x12\x15\n" +
-	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\x04\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"h\n" +
+	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\x05\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"h\n" +
 	"\x13KnownSearchResponse\x12-\n" +
 	"\x04next\x18\x01 \x01(\v2\x19.media.KnownSearchRequestR\x04next\x12\"\n" +
 	"\x05items\x18\x02 \x03(\v2\f.media.KnownR\x05items\")\n" +
@@ -783,17 +808,19 @@ const file_media_known_proto_rawDesc = "" +
 	"\x12KnownCreateRequest\x12\"\n" +
 	"\x05known\x18\x01 \x01(\v2\f.media.KnownR\x05known\"9\n" +
 	"\x13KnownCreateResponse\x12\"\n" +
-	"\x05known\x18\x01 \x01(\v2\f.media.KnownR\x05known\"\x80\x01\n" +
+	"\x05known\x18\x01 \x01(\v2\f.media.KnownR\x05known\"\x9c\x01\n" +
 	"\x12KnownLatestRequest\x12+\n" +
-	"\breleased\x18\x01 \x01(\v2\x0f.meta.DateRangeR\breleased\x12\x17\n" +
+	"\breleased\x18\x01 \x01(\v2\x0f.meta.DateRangeR\breleased\x12\x1a\n" +
+	"\bmimetype\x18\x02 \x01(\tR\bmimetype\x12\x17\n" +
 	"\x06offset\x18\x84\a \x01(\x04R\x06offset\x12\x15\n" +
-	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\x02\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"h\n" +
+	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\x03\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"h\n" +
 	"\x13KnownLatestResponse\x12-\n" +
 	"\x04next\x18\x01 \x01(\v2\x19.media.KnownLatestRequestR\x04next\x12\"\n" +
-	"\x05items\x18\x02 \x03(\v2\f.media.KnownR\x05items\"W\n" +
-	"\x16RecommendationsRequest\x12\x17\n" +
+	"\x05items\x18\x02 \x03(\v2\f.media.KnownR\x05items\"s\n" +
+	"\x16RecommendationsRequest\x12\x1a\n" +
+	"\bmimetype\x18\x01 \x01(\tR\bmimetype\x12\x17\n" +
 	"\x06offset\x18\x84\a \x01(\x04R\x06offset\x12\x15\n" +
-	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\x01\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"p\n" +
+	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\x02\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"p\n" +
 	"\x17RecommendationsResponse\x121\n" +
 	"\x04next\x18\x01 \x01(\v2\x1d.media.RecommendationsRequestR\x04next\x12\"\n" +
 	"\x05items\x18\x02 \x03(\v2\f.media.KnownR\x05itemsb\x06proto3"
