@@ -28,6 +28,7 @@ class Known extends $pb.GeneratedMessage {
     $core.String? summary,
     $core.String? image,
     $core.String? released,
+    $core.String? mimetype,
   }) {
     final result = create();
     if (id != null) result.id = id;
@@ -37,6 +38,7 @@ class Known extends $pb.GeneratedMessage {
     if (summary != null) result.summary = summary;
     if (image != null) result.image = image;
     if (released != null) result.released = released;
+    if (mimetype != null) result.mimetype = mimetype;
     return result;
   }
 
@@ -60,6 +62,7 @@ class Known extends $pb.GeneratedMessage {
     ..aOS(5, _omitFieldNames ? '' : 'summary')
     ..aOS(6, _omitFieldNames ? '' : 'image')
     ..aOS(7, _omitFieldNames ? '' : 'released')
+    ..aOS(8, _omitFieldNames ? '' : 'mimetype')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -142,6 +145,15 @@ class Known extends $pb.GeneratedMessage {
   $core.bool hasReleased() => $_has(6);
   @$pb.TagNumber(7)
   void clearReleased() => $_clearField(7);
+
+  @$pb.TagNumber(8)
+  $core.String get mimetype => $_getSZ(7);
+  @$pb.TagNumber(8)
+  set mimetype($core.String value) => $_setString(7, value);
+  @$pb.TagNumber(8)
+  $core.bool hasMimetype() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearMimetype() => $_clearField(8);
 }
 
 class KnownSearchRequest extends $pb.GeneratedMessage {
@@ -982,6 +994,63 @@ class RecommendationsResponse extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(2)
   $pb.PbList<Known> get items => $_getList(1);
+}
+
+class RecommendationsRandomRequest extends $pb.GeneratedMessage {
+  factory RecommendationsRandomRequest({
+    $core.String? mimetype,
+  }) {
+    final result = create();
+    if (mimetype != null) result.mimetype = mimetype;
+    return result;
+  }
+
+  RecommendationsRandomRequest._();
+
+  factory RecommendationsRandomRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory RecommendationsRandomRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'RecommendationsRandomRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
+      createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'mimetype')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  RecommendationsRandomRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  RecommendationsRandomRequest copyWith(
+          void Function(RecommendationsRandomRequest) updates) =>
+      super.copyWith(
+              (message) => updates(message as RecommendationsRandomRequest))
+          as RecommendationsRandomRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static RecommendationsRandomRequest create() =>
+      RecommendationsRandomRequest._();
+  @$core.override
+  RecommendationsRandomRequest createEmptyInstance() => create();
+  @$core.pragma('dart2js:noInline')
+  static RecommendationsRandomRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<RecommendationsRandomRequest>(create);
+  static RecommendationsRandomRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get mimetype => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set mimetype($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasMimetype() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearMimetype() => $_clearField(1);
 }
 
 const $core.bool _omitFieldNames =

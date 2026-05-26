@@ -231,6 +231,7 @@ abstract class recommendations {
   }
 
   static Future<void> random({
+    String mimetype = "",
     List<httpx.Option> options = const [],
   }) async {
     return httpx
@@ -238,7 +239,7 @@ abstract class recommendations {
           Uri.https(
             httpx.host(),
             "/r/random",
-            jsonDecode(jsonEncode({})),
+            jsonDecode(jsonEncode(RecommendationsRandomRequest(mimetype: mimetype).toProto3Json())),
           ),
           options: options,
         )

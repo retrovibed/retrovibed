@@ -82,7 +82,10 @@ class _RecommendationsState extends State<Recommendations> {
               onPressed: () {
                 return httpx
                     .withRetry(
-                      () => lib.recommendations.random(options: [authn.request(authn.AuthzCache.meta(context))]),
+                      () => lib.recommendations.random(
+                        mimetype: widget.mimetype,
+                        options: [authn.request(authn.AuthzCache.meta(context))],
+                      ),
                     )
                     .then((_) => _load());
               },

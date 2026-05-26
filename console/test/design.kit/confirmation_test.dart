@@ -8,17 +8,14 @@ void main() {
     testWidgets('renders with custom content and buttons', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: ds.Confirmation(
-              content: Text('Are you sure?'),
-              confirmation: Text('Confirm'),
-              cancellation: Text('Deny'),
-            ),
-          ),
+      await tester.pumpApp(
+        ds.Confirmation(
+          content: Text('Are you sure?'),
+          confirmation: Text('Confirm'),
+          cancellation: Text('Deny'),
         ),
       );
+      await tester.pumpAndSettle();
 
       expect(find.text('Are you sure?'), findsOneWidget);
       expect(find.text('Confirm'), findsOneWidget);
@@ -29,21 +26,17 @@ void main() {
     testWidgets('renders with complex content widget', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: ds.Confirmation(
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text('Delete Item'),
-                  Text('This action cannot be undone.'),
-                ],
-              ),
-              confirmation: Text('Delete'),
-              cancellation: Text('Keep'),
-            ),
+      await tester.pumpApp(
+        ds.Confirmation(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Delete Item'),
+              Text('This action cannot be undone.'),
+            ],
           ),
+          confirmation: Text('Delete'),
+          cancellation: Text('Keep'),
         ),
       );
       await tester.pumpAndSettle();
@@ -56,15 +49,11 @@ void main() {
     });
 
     testWidgets('renders with icon buttons', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: ds.Confirmation(
-              content: Text('Confirm action?'),
-              confirmation: Icon(Icons.check),
-              cancellation: Icon(Icons.close),
-            ),
-          ),
+      await tester.pumpApp(
+        ds.Confirmation(
+          content: Text('Confirm action?'),
+          confirmation: Icon(Icons.check),
+          cancellation: Icon(Icons.close),
         ),
       );
       await tester.pumpAndSettle();
@@ -80,14 +69,8 @@ void main() {
     testWidgets('yesNo creates dialog with Yes and No buttons', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: ds.Confirmation.yesNo(
-              content: Text('Continue?'),
-            ),
-          ),
-        ),
+      await tester.pumpApp(
+        ds.Confirmation.yesNo(content: Text('Continue?')),
       );
       await tester.pumpAndSettle();
 
@@ -100,14 +83,8 @@ void main() {
     testWidgets('createCancel creates dialog with Create and Cancel buttons', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: ds.Confirmation.createCancel(
-              content: Text('Create new item?'),
-            ),
-          ),
-        ),
+      await tester.pumpApp(
+        ds.Confirmation.createCancel(content: Text('Create new item?')),
       );
       await tester.pumpAndSettle();
 
@@ -124,16 +101,13 @@ void main() {
     ) async {
       bool confirmed = false;
 
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: ds.Confirmation.yesNo(
-              content: Text('Confirm?'),
-              onConfirm: () => confirmed = true,
-            ),
-          ),
+      await tester.pumpApp(
+        ds.Confirmation.yesNo(
+          content: Text('Confirm?'),
+          onConfirm: () => confirmed = true,
         ),
       );
+      await tester.pumpAndSettle();
 
       expect(confirmed, isFalse);
 
@@ -149,14 +123,10 @@ void main() {
     ) async {
       bool cancelled = false;
 
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: ds.Confirmation.yesNo(
-              content: Text('Confirm?'),
-              onCancel: () => cancelled = true,
-            ),
-          ),
+      await tester.pumpApp(
+        ds.Confirmation.yesNo(
+          content: Text('Confirm?'),
+          onCancel: () => cancelled = true,
         ),
       );
       await tester.pumpAndSettle();
@@ -176,15 +146,11 @@ void main() {
       int confirmCount = 0;
       int cancelCount = 0;
 
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: ds.Confirmation.createCancel(
-              content: Text('Action?'),
-              onConfirm: () => confirmCount++,
-              onCancel: () => cancelCount++,
-            ),
-          ),
+      await tester.pumpApp(
+        ds.Confirmation.createCancel(
+          content: Text('Action?'),
+          onConfirm: () => confirmCount++,
+          onCancel: () => cancelCount++,
         ),
       );
       await tester.pumpAndSettle();
@@ -203,14 +169,8 @@ void main() {
     });
 
     testWidgets('null callbacks do not throw', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: ds.Confirmation.yesNo(
-              content: Text('No callbacks'),
-            ),
-          ),
-        ),
+      await tester.pumpApp(
+        ds.Confirmation.yesNo(content: Text('No callbacks')),
       );
       await tester.pumpAndSettle();
 
@@ -226,17 +186,11 @@ void main() {
 
   group('Confirmation finite constraints', () {
     testWidgets('renders in finite container', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SizedBox(
-              width: 400,
-              height: 200,
-              child: ds.Confirmation.yesNo(
-                content: Text('Constrained'),
-              ),
-            ),
-          ),
+      await tester.pumpApp(
+        SizedBox(
+          width: 400,
+          height: 200,
+          child: ds.Confirmation.yesNo(content: Text('Constrained')),
         ),
       );
       await tester.pumpAndSettle();
@@ -249,19 +203,15 @@ void main() {
     testWidgets('renders in Column with constrained parent', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SizedBox(
-              width: 400,
-              height: 300,
-              child: Column(
-                children: [
-                  ds.Confirmation.yesNo(content: Text('In column')),
-                  Text('Other content'),
-                ],
-              ),
-            ),
+      await tester.pumpApp(
+        SizedBox(
+          width: 400,
+          height: 300,
+          child: Column(
+            children: [
+              ds.Confirmation.yesNo(content: Text('In column')),
+              Text('Other content'),
+            ],
           ),
         ),
       );
@@ -275,17 +225,14 @@ void main() {
 
   group('Confirmation infinite constraints', () {
     testWidgets('renders in ListView', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: ListView(
-              children: [
-                ds.Confirmation.yesNo(content: Text('In list')),
-                Text('Item below'),
-              ],
-            ),
-          ),
+      await tester.pumpApp(
+        ListView(
+          children: [
+            ds.Confirmation.yesNo(content: Text('In list')),
+            Text('Item below'),
+          ],
         ),
+        fit: FlexFit.tight,
       );
       await tester.pumpAndSettle();
 
@@ -297,19 +244,16 @@ void main() {
     testWidgets('renders in SingleChildScrollView', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SingleChildScrollView(
-              child: Column(
-                children: [
-                  ds.Confirmation.createCancel(content: Text('Scrollable')),
-                  Text('More content'),
-                ],
-              ),
-            ),
+      await tester.pumpApp(
+        SingleChildScrollView(
+          child: Column(
+            children: [
+              ds.Confirmation.createCancel(content: Text('Scrollable')),
+              Text('More content'),
+            ],
           ),
         ),
+        fit: FlexFit.tight,
       );
       await tester.pumpAndSettle();
 
@@ -321,19 +265,16 @@ void main() {
     testWidgets('renders multiple Confirmations in Column', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SingleChildScrollView(
-              child: Column(
-                children: [
-                  ds.Confirmation.yesNo(content: Text('First')),
-                  ds.Confirmation.createCancel(content: Text('Second')),
-                ],
-              ),
-            ),
+      await tester.pumpApp(
+        SingleChildScrollView(
+          child: Column(
+            children: [
+              ds.Confirmation.yesNo(content: Text('First')),
+              ds.Confirmation.createCancel(content: Text('Second')),
+            ],
           ),
         ),
+        fit: FlexFit.tight,
       );
       await tester.pumpAndSettle();
 
@@ -348,12 +289,8 @@ void main() {
     testWidgets('confirmation button has InkWell', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: ds.Confirmation.yesNo(content: Text('Test')),
-          ),
-        ),
+      await tester.pumpApp(
+        ds.Confirmation.yesNo(content: Text('Test')),
       );
       await tester.pumpAndSettle();
 
@@ -362,15 +299,11 @@ void main() {
     });
 
     testWidgets('InkWell wraps button content', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: ds.Confirmation(
-              content: Text('Content'),
-              confirmation: Text('OK'),
-              cancellation: Text('Back'),
-            ),
-          ),
+      await tester.pumpApp(
+        ds.Confirmation(
+          content: Text('Content'),
+          confirmation: Text('OK'),
+          cancellation: Text('Back'),
         ),
       );
       await tester.pumpAndSettle();

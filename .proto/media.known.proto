@@ -68,3 +68,8 @@ message RecommendationsResponse {
   RecommendationsRequest next = 1 [ json_name = "next" ];
   repeated Known items = 2 [ json_name = "items" ];
 }
+
+message RecommendationsRandomRequest {
+  string mimetype = 1 [ json_name = "mimetype" ];
+  reserved 2 to 899;
+}

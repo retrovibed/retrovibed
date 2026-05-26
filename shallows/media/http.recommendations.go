@@ -91,6 +91,7 @@ func (t *HTTPRecommendations) latest(w http.ResponseWriter, r *http.Request) {
 
 	query := library.RecommendationKnownSearchBuilder().Where(
 		library.RecommendationQueryNotTombstoned(),
+		library.RecommendationQueryMimetype(msg.Next.Mimetype),
 	).OrderBy("library_recommendations.updated_at DESC").
 		Offset(msg.Next.Offset * msg.Next.Limit).
 		Limit(msg.Next.Limit)
@@ -136,9 +137,16 @@ func (t *HTTPRecommendations) delete(w http.ResponseWriter, r *http.Request) {
 }
 
 func (t *HTTPRecommendations) random(w http.ResponseWriter, r *http.Request) {
-	rec, err := library.RecommendationFromRandomKnown(r.Context(), t.q)
+	var req RecommendationsRandomRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to decode request"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		return
+	}
+
+	rec, err := library.RecommendationFromRandomKnown(r.Context(), t.q, req.Mimetype)
 	if sqlx.ErrNoRows(err) != nil {
-		log.Println(errorsx.Wrap(err, "no known media available"))
+		log.Println(errorsx.Wrap(err, "no recommendation available"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
 		return
 	} else if err != nil {
@@ -176,7 +184,7 @@ func (t *HTTPRecommendations) refresh(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, err = library.RecommendationFromRandomKnown(r.Context(), t.q); sqlx.ErrNoRows(err) != nil {
+	if _, err = library.RecommendationFromRandomKnown(r.Context(), t.q, msg.Mimetype); sqlx.ErrNoRows(err) != nil {
 		// no known media available - nothing to do
 	} else if err != nil {
 		log.Println(errorsx.Wrap(err, "refresh failed"))

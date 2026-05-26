@@ -14,7 +14,7 @@ Future<void> _noop({List<httpx.Option> options = const []}) => Future.value();
 Future<void> _pending({List<httpx.Option> options = const []}) => Completer<void>().future;
 Future<void> _failing({List<httpx.Option> options = const []}) => Future.error(Exception('api error'));
 
-Widget _wrap(Widget child) => modals.Node(child);
+Widget _wrap(Widget child) => Scaffold(body: modals.Node(child));
 
 // asyncfn keeps the LoadingIconButton in loading state (indefinite CircularProgressIndicator)
 // until the modal is dismissed. Use pump() after tapping the delete icon so the modal

@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/daemons"
+	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/testx"
@@ -12,14 +13,31 @@ import (
 )
 
 func TestRecommendationsBackgroundRun(t *testing.T) {
-	t.Run("generates a recommendation when none exist", func(t *testing.T) {
+	t.Run("generates a video recommendation when none exist", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 
 		q := sqltestx.Metadatabase(t)
 
 		var known library.Known
-		require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults))
+		require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults, library.KnownOptionMimetype(mimex.Video)))
+		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
+
+		require.NoError(t, daemons.RecommendationsBackgroundRun(ctx, q))
+
+		count, err := sqlx.Count(ctx, q, "SELECT COUNT(*) FROM library_recommendations")
+		require.NoError(t, err)
+		require.Equal(t, 1, count)
+	})
+
+	t.Run("generates a audio recommendation when none exist", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		q := sqltestx.Metadatabase(t)
+
+		var known library.Known
+		require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults, library.KnownOptionMimetype(mimex.Audio)))
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 
 		require.NoError(t, daemons.RecommendationsBackgroundRun(ctx, q))
@@ -36,7 +54,7 @@ func TestRecommendationsBackgroundRun(t *testing.T) {
 		q := sqltestx.Metadatabase(t)
 
 		var known library.Known
-		require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults))
+		require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults, library.KnownOptionMimetype(mimex.Video)))
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 
 		// generate the first recommendation

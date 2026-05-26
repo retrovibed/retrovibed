@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:mime/mime.dart' as mimetype;
 export 'package:mime/mime.dart';
 
+const audio = "audio";
+const video = "video";
+const image = "image";
 const metadataarchive = "application/vnd";
 const bittorrent = "application/x-bittorrent";
 const binary = "application/octet-stream";

@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:retrovibed/design.kit/buttons.loading.icon.dart';
-
-Widget _wrap(Widget child) => MaterialApp(home: Scaffold(body: child));
+import 'package:retrovibed/testing/widget_tester_extensions.dart';
 
 void main() {
   group('LoadingIconButton toggled state', () {
     testWidgets('toggled=true applies primary color to IconButton', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(_wrap(
+      await tester.pumpApp(
         LoadingIconButton(
           onPressed: () async {},
           icon: const Icon(Icons.star),
           toggled: true,
         ),
-      ));
+      );
+      await tester.pumpAndSettle();
 
       final context = tester.element(find.byType(LoadingIconButton));
       final primaryColor = Theme.of(context).colorScheme.primary;
@@ -28,13 +28,14 @@ void main() {
     testWidgets('toggled=false applies no color to IconButton', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(_wrap(
+      await tester.pumpApp(
         LoadingIconButton(
           onPressed: () async {},
           icon: const Icon(Icons.star),
           toggled: false,
         ),
-      ));
+      );
+      await tester.pumpAndSettle();
 
       final iconButton = tester.widget<IconButton>(find.byType(IconButton));
       expect(iconButton.color, isNull);
@@ -44,12 +45,13 @@ void main() {
     testWidgets('toggled omitted (null) applies no color to IconButton', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(_wrap(
+      await tester.pumpApp(
         LoadingIconButton(
           onPressed: () async {},
           icon: const Icon(Icons.star),
         ),
-      ));
+      );
+      await tester.pumpAndSettle();
 
       final iconButton = tester.widget<IconButton>(find.byType(IconButton));
       expect(iconButton.color, isNull);
@@ -61,25 +63,24 @@ void main() {
     ) async {
       bool toggled = false;
 
-      await tester.pumpWidget(
+      await tester.pumpApp(
         StatefulBuilder(
-          builder: (context, setState) => _wrap(
-            Column(
-              children: [
-                LoadingIconButton(
-                  onPressed: () async {},
-                  icon: const Icon(Icons.star),
-                  toggled: toggled,
-                ),
-                ElevatedButton(
-                  onPressed: () => setState(() => toggled = !toggled),
-                  child: const Text('toggle'),
-                ),
-              ],
-            ),
+          builder: (context, setState) => Column(
+            children: [
+              LoadingIconButton(
+                onPressed: () async {},
+                icon: const Icon(Icons.star),
+                toggled: toggled,
+              ),
+              ElevatedButton(
+                onPressed: () => setState(() => toggled = !toggled),
+                child: const Text('toggle'),
+              ),
+            ],
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       final context = tester.element(find.byType(LoadingIconButton));
       final primaryColor = Theme.of(context).colorScheme.primary;
@@ -98,7 +99,7 @@ void main() {
     ) async {
       int callCount = 0;
 
-      await tester.pumpWidget(_wrap(
+      await tester.pumpApp(
         LoadingIconButton(
           onPressed: () async {
             callCount++;
@@ -106,7 +107,8 @@ void main() {
           icon: const Icon(Icons.star),
           toggled: true,
         ),
-      ));
+      );
+      await tester.pumpAndSettle();
 
       await tester.tap(find.byType(IconButton));
       await tester.pumpAndSettle();

@@ -26,6 +26,7 @@ const Known$json = {
     {'1': 'summary', '3': 5, '4': 1, '5': 9, '10': 'summary'},
     {'1': 'image', '3': 6, '4': 1, '5': 9, '10': 'image'},
     {'1': 'released', '3': 7, '4': 1, '5': 9, '10': 'released'},
+    {'1': 'mimetype', '3': 8, '4': 1, '5': 9, '10': 'mimetype'},
   ],
 };
 
@@ -34,7 +35,7 @@ final $typed_data.Uint8List knownDescriptor = $convert.base64Decode(
     'CgVLbm93bhIOCgJpZBgBIAEoCVICaWQSFgoGcmF0aW5nGAIgASgCUgZyYXRpbmcSFAoFYWR1bH'
     'QYAyABKAhSBWFkdWx0EiAKC2Rlc2NyaXB0aW9uGAQgASgJUgtkZXNjcmlwdGlvbhIYCgdzdW1t'
     'YXJ5GAUgASgJUgdzdW1tYXJ5EhQKBWltYWdlGAYgASgJUgVpbWFnZRIaCghyZWxlYXNlZBgHIA'
-    'EoCVIIcmVsZWFzZWQ=');
+    'EoCVIIcmVsZWFzZWQSGgoIbWltZXR5cGUYCCABKAlSCG1pbWV0eXBl');
 
 @$core.Deprecated('Use knownSearchRequestDescriptor instead')
 const KnownSearchRequest$json = {
@@ -253,3 +254,20 @@ final $typed_data.Uint8List recommendationsResponseDescriptor = $convert.base64D
     'ChdSZWNvbW1lbmRhdGlvbnNSZXNwb25zZRIxCgRuZXh0GAEgASgLMh0ubWVkaWEuUmVjb21tZW'
     '5kYXRpb25zUmVxdWVzdFIEbmV4dBIiCgVpdGVtcxgCIAMoCzIMLm1lZGlhLktub3duUgVpdGVt'
     'cw==');
+
+@$core.Deprecated('Use recommendationsRandomRequestDescriptor instead')
+const RecommendationsRandomRequest$json = {
+  '1': 'RecommendationsRandomRequest',
+  '2': [
+    {'1': 'mimetype', '3': 1, '4': 1, '5': 9, '10': 'mimetype'},
+  ],
+  '9': [
+    {'1': 2, '2': 900},
+  ],
+};
+
+/// Descriptor for `RecommendationsRandomRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List recommendationsRandomRequestDescriptor =
+    $convert.base64Decode(
+        'ChxSZWNvbW1lbmRhdGlvbnNSYW5kb21SZXF1ZXN0EhoKCG1pbWV0eXBlGAEgASgJUghtaW1ldH'
+        'lwZUoFCAIQhAc=');

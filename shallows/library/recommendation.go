@@ -8,8 +8,10 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
+	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/squirrelx"
+	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 )
 
@@ -36,6 +38,7 @@ func RecommendationOptionTestDefaults(r *Recommendation) {
 	r.Source = md5x.String(RecommendationSourceRandom)
 	r.KnownMediaID = uuid.Nil.String()
 	r.TombstoneAt = timex.Inf()
+	r.Mimetype = mimex.Binary
 }
 
 func RecommendationOptionID(id string) func(*Recommendation) {
@@ -50,9 +53,15 @@ func RecommendationOptionKnownMediaID(kid string) func(*Recommendation) {
 	}
 }
 
-func RecommendationFromRandomKnown(ctx context.Context, q sqlx.Queryer) (rec Recommendation, err error) {
+func RecommendationFromRandomKnown(ctx context.Context, q sqlx.Queryer, mimetype string) (rec Recommendation, err error) {
 	var known Known
-	if err = KnownFindRandom(ctx, q).Scan(&known); err != nil {
+
+	scanner := KnownSearch(ctx, q, KnownSearchBuilder().Where(squirrel.And{
+		KnownQueryExplicit(false),
+		KnownQueryWithPoster(),
+		KnownQueryMimetype(mimetype),
+	}).OrderBy("random()").Limit(1))
+	if known, err = sqlx.ScanOne(scanner); err != nil {
 		return rec, err
 	}
 
@@ -61,6 +70,7 @@ func RecommendationFromRandomKnown(ctx context.Context, q sqlx.Queryer) (rec Rec
 		Source:       md5x.String(RecommendationSourceRandom),
 		KnownMediaID: known.UID,
 		TombstoneAt:  time.Now().Add(30 * 24 * time.Hour),
+		Mimetype:     known.Mimetype,
 	}).Scan(&rec); err != nil {
 		return rec, err
 	}
@@ -81,4 +91,12 @@ func RecommendationQueryNotTombstoned() squirrel.Sqlizer {
 
 func RecommendationQueryByKnownMediaID(kid string) squirrel.Sqlizer {
 	return squirrel.Eq{"library_recommendations.known_media_id": kid}
+}
+
+func RecommendationQueryMimetype(v string) squirrel.Sqlizer {
+	if stringsx.Blank(v) {
+		return squirrelx.Noop{}
+	}
+
+	return squirrel.Expr("library_recommendations.mimetype = ?", v)
 }
