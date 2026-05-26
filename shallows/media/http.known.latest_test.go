@@ -13,6 +13,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
 	"github.com/retrovibed/retrovibed/shallows/internal/grpcx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
+	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/testx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
@@ -169,6 +170,63 @@ func TestKnownLatest(t *testing.T) {
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 		require.Len(t, result.Items, 5)
+	})
+
+	t.Run("filters by mimetype", func(t *testing.T) {
+		var (
+			p     meta.Profile
+			authz meta.Authz
+			known library.Known
+		)
+		ctx, done := testx.Context(t)
+		defer done()
+
+		q := sqltestx.Metadatabase(t)
+
+		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
+		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
+		require.NoError(t, testx.Fake(&authz, meta.AuthzOptionProfileID(p.ID), meta.AuthzOptionAdmin))
+		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, authz).Scan(&authz))
+
+		for range 5 {
+			require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults, library.KnownOptionMimetype(mimex.Video)))
+			require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
+		}
+		for range 5 {
+			require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults, library.KnownOptionMimetype(mimex.Audio)))
+			require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
+		}
+
+		routes := mux.NewRouter()
+		media.NewHTTPKnown(q, media.HTTPKnownOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
+
+		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
+
+		encoder := formx.NewEncoder()
+		query, err := encoder.Encode(&media.KnownLatestRequest{
+			Released: meta.NewDateRange(timex.NewRangeDuration(24 * time.Hour)),
+			Mimetype: mimex.Video,
+			Limit:    100,
+		})
+		require.NoError(t, err)
+
+		resp, req, err := httptestx.BuildRequestBytes(
+			http.MethodGet,
+			fmt.Sprintf("/latest?%s", query.Encode()),
+			nil,
+			httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)),
+		)
+		require.NoError(t, err)
+
+		routes.ServeHTTP(resp, req)
+
+		var result media.KnownLatestResponse
+		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
+		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.Len(t, result.Items, 5)
+		for _, item := range result.Items {
+			require.Equal(t, mimex.Video, item.Mimetype)
+		}
 	})
 
 	t.Run("order by released date", func(t *testing.T) {

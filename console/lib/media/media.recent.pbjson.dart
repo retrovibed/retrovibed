@@ -27,11 +27,12 @@ const RecentSearchRequest$json = {
       '6': '.meta.DateRange',
       '10': 'created'
     },
+    {'1': 'mimetype', '3': 2, '4': 1, '5': 9, '10': 'mimetype'},
     {'1': 'offset', '3': 900, '4': 1, '5': 4, '10': 'offset'},
     {'1': 'limit', '3': 901, '4': 1, '5': 4, '10': 'limit'},
   ],
   '9': [
-    {'1': 2, '2': 900},
+    {'1': 3, '2': 900},
     {'1': 902, '2': 1000},
   ],
 };
@@ -39,8 +40,8 @@ const RecentSearchRequest$json = {
 /// Descriptor for `RecentSearchRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List recentSearchRequestDescriptor = $convert.base64Decode(
     'ChNSZWNlbnRTZWFyY2hSZXF1ZXN0EikKB2NyZWF0ZWQYASABKAsyDy5tZXRhLkRhdGVSYW5nZV'
-    'IHY3JlYXRlZBIXCgZvZmZzZXQYhAcgASgEUgZvZmZzZXQSFQoFbGltaXQYhQcgASgEUgVsaW1p'
-    'dEoFCAIQhAdKBgiGBxDoBw==');
+    'IHY3JlYXRlZBIaCghtaW1ldHlwZRgCIAEoCVIIbWltZXR5cGUSFwoGb2Zmc2V0GIQHIAEoBFIG'
+    'b2Zmc2V0EhUKBWxpbWl0GIUHIAEoBFIFbGltaXRKBQgDEIQHSgYIhgcQ6Ac=');
 
 @$core.Deprecated('Use recentSearchResponseDescriptor instead')
 const RecentSearchResponse$json = {
@@ -79,9 +80,10 @@ const RecentRecordRequest$json = {
     {'1': 'media', '3': 2, '4': 1, '5': 11, '6': '.media.Media', '10': 'media'},
     {'1': 'duration', '3': 3, '4': 1, '5': 4, '10': 'duration'},
     {'1': 'position', '3': 4, '4': 1, '5': 4, '10': 'position'},
+    {'1': 'mimetype', '3': 5, '4': 1, '5': 9, '10': 'mimetype'},
     {
       '1': 'query',
-      '3': 5,
+      '3': 6,
       '4': 1,
       '5': 11,
       '6': '.media.MediaSearchRequest',
@@ -94,8 +96,8 @@ const RecentRecordRequest$json = {
 final $typed_data.Uint8List recentRecordRequestDescriptor = $convert.base64Decode(
     'ChNSZWNlbnRSZWNvcmRSZXF1ZXN0Eg4KAmlkGAEgASgJUgJpZBIiCgVtZWRpYRgCIAEoCzIMLm'
     '1lZGlhLk1lZGlhUgVtZWRpYRIaCghkdXJhdGlvbhgDIAEoBFIIZHVyYXRpb24SGgoIcG9zaXRp'
-    'b24YBCABKARSCHBvc2l0aW9uEi8KBXF1ZXJ5GAUgASgLMhkubWVkaWEuTWVkaWFTZWFyY2hSZX'
-    'F1ZXN0UgVxdWVyeQ==');
+    'b24YBCABKARSCHBvc2l0aW9uEhoKCG1pbWV0eXBlGAUgASgJUghtaW1ldHlwZRIvCgVxdWVyeR'
+    'gGIAEoCzIZLm1lZGlhLk1lZGlhU2VhcmNoUmVxdWVzdFIFcXVlcnk=');
 
 @$core.Deprecated('Use recentRecordResponseDescriptor instead')
 const RecentRecordResponse$json = {

@@ -7,12 +7,14 @@ import 'package:retrovibed/media.dart' as media;
 import 'recent.edit.dart';
 
 class Recent extends StatefulWidget {
-  const Recent({
+  const Recent(
+    this.mimetype, {
     super.key,
     this.latest = lib.recent.latest,
     this.tombstone = lib.recent.delete,
   });
 
+  final String mimetype;
   final lib.FnRecent latest;
   final lib.FnRecentTombstone tombstone;
 
@@ -43,11 +45,23 @@ class _RecentState extends State<Recent> {
     WidgetsBinding.instance.addPostFrameCallback((_) => _load(context));
   }
 
+  @override
+  void didUpdateWidget(Recent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.mimetype != widget.mimetype) {
+      _load(context);
+    }
+  }
+
   Future<void> _load(BuildContext context) async {
     setState(() => _loading = true);
-    final auth = authn.request(authn.AuthzCache.meta(context));
     return httpx
-        .withRetry(() => widget.latest(lib.recent.request(), options: [auth]))
+        .withRetry(
+          () => widget.latest(
+            lib.recent.request(mimetype: widget.mimetype),
+            options: [authn.request(authn.AuthzCache.meta(context))],
+          ),
+        )
         .then(
           (resp) => setState(() {
             _result = resp;

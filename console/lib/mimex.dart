@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:mime/mime.dart' as mimetype;
 export 'package:mime/mime.dart';
 
+const audio = "audio";
+const video = "video";
+const image = "image";
 const metadataarchive = "application/vnd";
 const bittorrent = "application/x-bittorrent";
 const binary = "application/octet-stream";
@@ -128,18 +131,30 @@ int checksum(List<String> mimes) {
   return Object.hashAllUnordered(mimes);
 }
 
-bool isVideo(String mimetype) => mimetype.startsWith('video/');
+bool isVideo(String mimetype) => mimetype.startsWith('video');
+bool isAudio(String mimetype) => mimetype.startsWith('audio');
+bool isImage(String mimetype) => mimetype.startsWith('image');
+
+String category(List<String> mimes) {
+  final sum = checksum(mimes);
+  return switch (sum) {
+    _ when sum == checksumfor(icomovie) => "video",
+    _ when sum == checksumfor(icoaudio) => "audio",
+    _ when sum == checksumfor(icoimage) => "image",
+    _ => "",
+  };
+}
 
 IconData icon(String mimetype) {
   if (isVideo(mimetype)) {
     return icomovie;
   }
 
-  if (mimetype.startsWith('audio/')) {
+  if (isAudio(mimetype)) {
     return icoaudio;
   }
 
-  if (mimetype.startsWith('image/')) {
+  if (isImage(mimetype)) {
     return icoimage;
   }
 

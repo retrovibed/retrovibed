@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"testing"
 
+	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/testx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
@@ -33,7 +34,7 @@ func TestRecommendationLastGeneratedAt(t *testing.T) {
 		require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults))
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, db, known).Scan(&known))
 
-		rec, err := library.RecommendationFromRandomKnown(ctx, db)
+		rec, err := library.RecommendationFromRandomKnown(ctx, db, "")
 		require.NoError(t, err)
 
 		ts, err := library.RecommendationLastGeneratedAt(ctx, db, library.RecommendationSourceRandom)
@@ -51,7 +52,7 @@ func TestRecommendationLastGeneratedAt(t *testing.T) {
 		require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults))
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, db, known).Scan(&known))
 
-		_, err := library.RecommendationFromRandomKnown(ctx, db)
+		_, err := library.RecommendationFromRandomKnown(ctx, db, "")
 		require.NoError(t, err)
 
 		ts, err := library.RecommendationLastGeneratedAt(ctx, db, library.RecommendationSourceGenerative)
@@ -71,7 +72,7 @@ func TestRecommendationFromRandomKnown(t *testing.T) {
 		require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults))
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, db, known).Scan(&known))
 
-		rec, err := library.RecommendationFromRandomKnown(ctx, db)
+		rec, err := library.RecommendationFromRandomKnown(ctx, db, "")
 		require.NoError(t, err)
 		require.Equal(t, known.UID, rec.KnownMediaID)
 		require.NotEmpty(t, rec.ID)
@@ -87,7 +88,7 @@ func TestRecommendationFromRandomKnown(t *testing.T) {
 		require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults))
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, db, known).Scan(&known))
 
-		rec, err := library.RecommendationFromRandomKnown(ctx, db)
+		rec, err := library.RecommendationFromRandomKnown(ctx, db, "")
 		require.NoError(t, err)
 		require.NotEmpty(t, rec.Source)
 	})
@@ -102,10 +103,10 @@ func TestRecommendationFromRandomKnown(t *testing.T) {
 		require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults))
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, db, known).Scan(&known))
 
-		_, err := library.RecommendationFromRandomKnown(ctx, db)
+		_, err := library.RecommendationFromRandomKnown(ctx, db, "")
 		require.NoError(t, err)
 
-		rec, err := library.RecommendationFromRandomKnown(ctx, db)
+		rec, err := library.RecommendationFromRandomKnown(ctx, db, "")
 		require.NoError(t, err)
 		require.EqualValues(t, 1, rec.Recommendations)
 	})
@@ -116,7 +117,7 @@ func TestRecommendationFromRandomKnown(t *testing.T) {
 
 		db := sqltestx.Metadatabase(t)
 
-		_, err := library.RecommendationFromRandomKnown(ctx, db)
+		_, err := library.RecommendationFromRandomKnown(ctx, db, "")
 		require.ErrorIs(t, err, sql.ErrNoRows)
 	})
 
@@ -131,7 +132,39 @@ func TestRecommendationFromRandomKnown(t *testing.T) {
 		adult.Adult = true
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, db, adult).Scan(&adult))
 
-		_, err := library.RecommendationFromRandomKnown(ctx, db)
+		_, err := library.RecommendationFromRandomKnown(ctx, db, "")
 		require.ErrorIs(t, err, sql.ErrNoRows)
+	})
+
+	t.Run("filters by mimetype", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		db := sqltestx.Metadatabase(t)
+
+		var video, audio library.Known
+		require.NoError(t, testx.Fake(&video, library.KnownOptionTestDefaults, library.KnownOptionMimetype(mimex.Video)))
+		require.NoError(t, library.KnownInsertWithDefaults(ctx, db, video).Scan(&video))
+		require.NoError(t, testx.Fake(&audio, library.KnownOptionTestDefaults, library.KnownOptionMimetype(mimex.Audio)))
+		require.NoError(t, library.KnownInsertWithDefaults(ctx, db, audio).Scan(&audio))
+
+		rec, err := library.RecommendationFromRandomKnown(ctx, db, mimex.Audio)
+		require.NoError(t, err)
+		require.Equal(t, mimex.Audio, rec.Mimetype)
+	})
+
+	t.Run("copies mimetype from known media", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		db := sqltestx.Metadatabase(t)
+
+		var known library.Known
+		require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults, library.KnownOptionMimetype(mimex.Video)))
+		require.NoError(t, library.KnownInsertWithDefaults(ctx, db, known).Scan(&known))
+
+		rec, err := library.RecommendationFromRandomKnown(ctx, db, mimex.Video)
+		require.NoError(t, err)
+		require.Equal(t, mimex.Video, rec.Mimetype)
 	})
 }

@@ -10,7 +10,9 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
+	"github.com/retrovibed/retrovibed/shallows/internal/formx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
+	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/testx"
 	"github.com/retrovibed/retrovibed/shallows/internal/uuidx"
@@ -183,10 +185,8 @@ func TestRecommendationsLatest(t *testing.T) {
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 		require.Empty(t, result.Items)
 	})
-}
 
-func TestRecommendationsRefresh(t *testing.T) {
-	t.Run("records known_media_id", func(t *testing.T) {
+	t.Run("filters by mimetype", func(t *testing.T) {
 		var (
 			p     meta.Profile
 			authz meta.Authz
@@ -201,200 +201,43 @@ func TestRecommendationsRefresh(t *testing.T) {
 		require.NoError(t, testx.Fake(&authz, meta.AuthzOptionProfileID(p.ID), meta.AuthzOptionAdmin))
 		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, authz).Scan(&authz))
 
-		var known library.Known
-		require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults))
-		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
+		for idx := range 3 {
+			var known library.Known
+			require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults, library.KnownOptionMimetype(mimex.Video)))
+			require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 
-		routes := mux.NewRouter()
-		media.NewHTTPRecommendations(q, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
-
-		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
-
-		body, err := json.Marshal(&media.RecommendationsRequest{})
-		require.NoError(t, err)
-
-		resp, req, err := httptestx.BuildRequestBytes(
-			http.MethodPost, "/", body,
-			httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)),
-		)
-		require.NoError(t, err)
-		routes.ServeHTTP(resp, req)
-		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-
-		var rec library.Recommendation
-		require.NoError(t, library.RecommendationFindByKnownMediaID(ctx, q, known.UID).Scan(&rec))
-		require.Equal(t, known.UID, rec.KnownMediaID)
-	})
-
-	t.Run("increments counter on repeat", func(t *testing.T) {
-		var (
-			p     meta.Profile
-			authz meta.Authz
-		)
-		ctx, done := testx.Context(t)
-		defer done()
-
-		q := sqltestx.Metadatabase(t)
-
-		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
-		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
-		require.NoError(t, testx.Fake(&authz, meta.AuthzOptionProfileID(p.ID), meta.AuthzOptionAdmin))
-		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, authz).Scan(&authz))
-
-		var known library.Known
-		require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults))
-		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
-
-		routes := mux.NewRouter()
-		media.NewHTTPRecommendations(q, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
-
-		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
-
-		body, err := json.Marshal(&media.RecommendationsRequest{})
-		require.NoError(t, err)
-
-		for range 3 {
-			resp, req, err := httptestx.BuildRequestBytes(
-				http.MethodPost, "/", body,
-				httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)),
-			)
-			require.NoError(t, err)
-			routes.ServeHTTP(resp, req)
-			require.Equal(t, http.StatusOK, resp.Result().StatusCode)
+			var rec library.Recommendation
+			require.NoError(t, testx.Fake(&rec, library.RecommendationOptionTestDefaults, library.RecommendationOptionID(uuidx.WithSuffix(idx)), library.RecommendationOptionKnownMediaID(known.UID), func(r *library.Recommendation) {
+				r.Mimetype = known.Mimetype
+			}))
+			require.NoError(t, library.RecommendationInsertWithDefaults(ctx, q, rec).Scan(&rec))
 		}
 
-		var rec library.Recommendation
-		require.NoError(t, library.RecommendationFindByKnownMediaID(ctx, q, known.UID).Scan(&rec))
-		require.EqualValues(t, 2, rec.Recommendations)
-	})
+		for idx := range 2 {
+			var known library.Known
+			require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults, library.KnownOptionMimetype(mimex.Audio)))
+			require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 
-	t.Run("malformed json returns 400", func(t *testing.T) {
-		var (
-			p     meta.Profile
-			authz meta.Authz
-		)
-		ctx, done := testx.Context(t)
-		defer done()
-
-		q := sqltestx.Metadatabase(t)
-
-		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
-		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
-		require.NoError(t, testx.Fake(&authz, meta.AuthzOptionProfileID(p.ID), meta.AuthzOptionAdmin))
-		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, authz).Scan(&authz))
+			var rec library.Recommendation
+			require.NoError(t, testx.Fake(&rec, library.RecommendationOptionTestDefaults, library.RecommendationOptionID(uuidx.WithSuffix(idx+10)), library.RecommendationOptionKnownMediaID(known.UID), func(r *library.Recommendation) {
+				r.Mimetype = known.Mimetype
+			}))
+			require.NoError(t, library.RecommendationInsertWithDefaults(ctx, q, rec).Scan(&rec))
+		}
 
 		routes := mux.NewRouter()
 		media.NewHTTPRecommendations(q, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
-		resp, req, err := httptestx.BuildRequestBytes(
-			http.MethodPost, "/", []byte(`{not valid json`),
-			httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)),
-		)
+		encoder := formx.NewEncoder()
+		query, err := encoder.Encode(&media.RecommendationsRequest{Mimetype: mimex.Video})
 		require.NoError(t, err)
-		routes.ServeHTTP(resp, req)
-		require.Equal(t, http.StatusBadRequest, resp.Result().StatusCode)
-	})
-}
-
-func TestRecommendationsDelete(t *testing.T) {
-	t.Run("deletes recommendation", func(t *testing.T) {
-		var (
-			p     meta.Profile
-			authz meta.Authz
-		)
-		ctx, done := testx.Context(t)
-		defer done()
-
-		q := sqltestx.Metadatabase(t)
-
-		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
-		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
-		require.NoError(t, testx.Fake(&authz, meta.AuthzOptionProfileID(p.ID), meta.AuthzOptionAdmin))
-		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, authz).Scan(&authz))
-
-		var known library.Known
-		require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults))
-		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
-
-		var rec library.Recommendation
-		require.NoError(t, testx.Fake(&rec, library.RecommendationOptionTestDefaults, library.RecommendationOptionKnownMediaID(known.UID)))
-		require.NoError(t, library.RecommendationInsertWithDefaults(ctx, q, rec).Scan(&rec))
-
-		routes := mux.NewRouter()
-		media.NewHTTPRecommendations(q, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
-
-		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
 		resp, req, err := httptestx.BuildRequestBytes(
-			http.MethodDelete, fmt.Sprintf("/%s", rec.ID), nil,
-			httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)),
-		)
-		require.NoError(t, err)
-		routes.ServeHTTP(resp, req)
-		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-
-		require.Error(t, library.RecommendationFindByID(ctx, q, rec.ID).Scan(&rec))
-	})
-
-	t.Run("unknown id returns 404", func(t *testing.T) {
-		var (
-			p     meta.Profile
-			authz meta.Authz
-		)
-		ctx, done := testx.Context(t)
-		defer done()
-
-		q := sqltestx.Metadatabase(t)
-
-		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
-		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
-		require.NoError(t, testx.Fake(&authz, meta.AuthzOptionProfileID(p.ID), meta.AuthzOptionAdmin))
-		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, authz).Scan(&authz))
-
-		routes := mux.NewRouter()
-		media.NewHTTPRecommendations(q, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
-
-		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
-
-		resp, req, err := httptestx.BuildRequestBytes(
-			http.MethodDelete, fmt.Sprintf("/%s", uuidx.WithSuffix(999)), nil,
-			httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)),
-		)
-		require.NoError(t, err)
-		routes.ServeHTTP(resp, req)
-		require.Equal(t, http.StatusNotFound, resp.Result().StatusCode)
-	})
-}
-
-func TestRecommendationsRandom(t *testing.T) {
-	t.Run("creates recommendation from random known media", func(t *testing.T) {
-		var (
-			p     meta.Profile
-			authz meta.Authz
-		)
-		ctx, done := testx.Context(t)
-		defer done()
-
-		q := sqltestx.Metadatabase(t)
-
-		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
-		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
-		require.NoError(t, testx.Fake(&authz, meta.AuthzOptionProfileID(p.ID), meta.AuthzOptionAdmin))
-		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, authz).Scan(&authz))
-
-		var known library.Known
-		require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults))
-		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
-
-		routes := mux.NewRouter()
-		media.NewHTTPRecommendations(q, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
-
-		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
-
-		resp, req, err := httptestx.BuildRequestBytes(
-			http.MethodPost, "/random", nil,
+			http.MethodGet,
+			fmt.Sprintf("/?%s", query.Encode()),
+			nil,
 			httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)),
 		)
 		require.NoError(t, err)
@@ -403,10 +246,13 @@ func TestRecommendationsRandom(t *testing.T) {
 		var result media.RecommendationsResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
-		require.Equal(t, known.UID, result.Items[0].Id)
+		require.Len(t, result.Items, 3)
+		for _, item := range result.Items {
+			require.Equal(t, mimex.Video, item.Mimetype)
+		}
 	})
 
-	t.Run("empty database returns 404", func(t *testing.T) {
+	t.Run("blank mimetype returns all", func(t *testing.T) {
 		var (
 			p     meta.Profile
 			authz meta.Authz
@@ -421,17 +267,45 @@ func TestRecommendationsRandom(t *testing.T) {
 		require.NoError(t, testx.Fake(&authz, meta.AuthzOptionProfileID(p.ID), meta.AuthzOptionAdmin))
 		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, authz).Scan(&authz))
 
+		for idx := range 2 {
+			var known library.Known
+			require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults, library.KnownOptionMimetype(mimex.Video)))
+			require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
+
+			var rec library.Recommendation
+			require.NoError(t, testx.Fake(&rec, library.RecommendationOptionTestDefaults, library.RecommendationOptionID(uuidx.WithSuffix(idx)), library.RecommendationOptionKnownMediaID(known.UID), func(r *library.Recommendation) {
+				r.Mimetype = known.Mimetype
+			}))
+			require.NoError(t, library.RecommendationInsertWithDefaults(ctx, q, rec).Scan(&rec))
+		}
+
+		for idx := range 2 {
+			var known library.Known
+			require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults, library.KnownOptionMimetype(mimex.Audio)))
+			require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
+
+			var rec library.Recommendation
+			require.NoError(t, testx.Fake(&rec, library.RecommendationOptionTestDefaults, library.RecommendationOptionID(uuidx.WithSuffix(idx+10)), library.RecommendationOptionKnownMediaID(known.UID), func(r *library.Recommendation) {
+				r.Mimetype = known.Mimetype
+			}))
+			require.NoError(t, library.RecommendationInsertWithDefaults(ctx, q, rec).Scan(&rec))
+		}
+
 		routes := mux.NewRouter()
 		media.NewHTTPRecommendations(q, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
 		resp, req, err := httptestx.BuildRequestBytes(
-			http.MethodPost, "/random", nil,
+			http.MethodGet, "/", nil,
 			httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)),
 		)
 		require.NoError(t, err)
 		routes.ServeHTTP(resp, req)
-		require.Equal(t, http.StatusNotFound, resp.Result().StatusCode)
+
+		var result media.RecommendationsResponse
+		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
+		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.Len(t, result.Items, 4)
 	})
 }

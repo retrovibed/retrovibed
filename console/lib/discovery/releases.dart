@@ -5,8 +5,9 @@ import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/library.dart' as lib;
 
 class NewReleases extends StatefulWidget {
-  const NewReleases({super.key, this.latest = lib.known.latest});
+  const NewReleases(String this.mimetype, {super.key, this.latest = lib.known.latest});
 
+  final String mimetype;
   final lib.FnKnownLatest latest;
 
   @override
@@ -35,12 +36,20 @@ class _NewReleasesState extends State<NewReleases> {
     WidgetsBinding.instance.addPostFrameCallback((_) => _load());
   }
 
+  @override
+  void didUpdateWidget(NewReleases oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.mimetype != widget.mimetype) {
+      _load();
+    }
+  }
+
   Future<void> _load() async {
     setState(() => _loading = true);
     final auth = authn.request(authn.AuthzCache.meta(context));
     return httpx
         .withRetry(
-          () => widget.latest(lib.known.latestRequest(), options: [auth]),
+          () => widget.latest(lib.known.latestRequest(mimetype: widget.mimetype), options: [auth]),
         )
         .then(
           (resp) => setState(() {

@@ -6,8 +6,9 @@ import 'package:retrovibed/library.dart' as lib;
 import '../media/media.known.pb.dart' as known;
 
 class Recommendations extends StatefulWidget {
-  const Recommendations({super.key, this.latest = lib.recommendations.latest});
+  const Recommendations(this.mimetype, {super.key, this.latest = lib.recommendations.latest});
 
+  final String mimetype;
   final lib.FnRecommendations latest;
 
   @override
@@ -36,12 +37,20 @@ class _RecommendationsState extends State<Recommendations> {
     WidgetsBinding.instance.addPostFrameCallback((_) => _load());
   }
 
+  @override
+  void didUpdateWidget(Recommendations oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.mimetype != widget.mimetype) {
+      _load();
+    }
+  }
+
   Future<void> _load() async {
     setState(() => _loading = true);
     final auth = authn.request(authn.AuthzCache.meta(context));
     return httpx
         .withRetry(
-          () => widget.latest(lib.recommendations.request(), options: [auth]),
+          () => widget.latest(lib.recommendations.request(mimetype: widget.mimetype), options: [auth]),
         )
         .then(
           (resp) => setState(() {
@@ -80,7 +89,12 @@ class _RecommendationsState extends State<Recommendations> {
               help: ds.Hint(const Text("generate a new (random) recommendation")),
               onPressed: () {
                 return httpx
-                    .withRetry(() => lib.recommendations.random(options: [authn.request(authn.AuthzCache.meta(context))]))
+                    .withRetry(
+                      () => lib.recommendations.random(
+                        mimetype: widget.mimetype,
+                        options: [authn.request(authn.AuthzCache.meta(context))],
+                      ),
+                    )
                     .then((_) => _load());
               },
             ),

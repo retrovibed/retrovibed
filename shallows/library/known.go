@@ -42,6 +42,12 @@ func KnownOptionReleased(ts time.Time) func(*Known) {
 	}
 }
 
+func KnownOptionMimetype(v string) func(*Known) {
+	return func(t *Known) {
+		t.Mimetype = v
+	}
+}
+
 func KnownOptionTestNoPoster(t *Known) {
 	t.PosterPath = ""
 	t.BackdropPath = ""
@@ -99,6 +105,14 @@ func KnownQueryLanguage(v string) squirrel.Sqlizer {
 	}
 
 	return squirrel.Expr("library_known_media.original_language = ?", v)
+}
+
+func KnownQueryMimetype(v string) squirrel.Sqlizer {
+	if stringsx.Blank(v) {
+		return squirrelx.Noop{}
+	}
+
+	return squirrel.Expr("library_known_media.mimetype = ?", v)
 }
 
 func KnownQueryDetectLanguage(v string) squirrel.Sqlizer {

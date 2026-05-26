@@ -40,6 +40,7 @@ extension WidgetTesterExtensions on WidgetTester {
       enabledMouseCursor: SystemMouseCursors.click,
     );
     final merged = base.copyWith(
+      splashFactory: NoSplash.splashFactory,
       textButtonTheme: TextButtonThemeData(
         style: defaultTextButtonStyle.merge(base.textButtonTheme.style),
       ),

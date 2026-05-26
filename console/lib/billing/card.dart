@@ -19,6 +19,8 @@ class Card extends StatelessWidget {
     final billing = Registered.of(context);
     final plan = PlanSummary.fromID(billing.plan.id);
     final defaults = ds.Defaults.of(context);
+    final tappable =
+        !(Platform.isAndroid || Platform.isIOS || Platform.isMacOS) || authn.developer(context).subscription;
     final tap =
         () => onPressed(
           Settings(margin: EdgeInsets.zero, padding: EdgeInsets.zero),
@@ -28,10 +30,7 @@ class Card extends StatelessWidget {
       alignment: Alignment.center,
       margin: this.margin ?? defaults.margin,
       help: ds.Hint(const Text("view your account plan and billing details")),
-      onTap:
-          (Platform.isAndroid || Platform.isIOS || Platform.isMacOS) && !authn.developer(context).subscription
-              ? null
-              : tap,
+      onTap: tappable ? tap : null,
       Column(
         spacing: defaults.spacing,
         children: [

@@ -162,11 +162,13 @@ abstract class known {
   }
 
   static KnownLatestRequest latestRequest({
+    String mimetype = "",
     timex.Range? released,
     int limit = 100,
   }) {
     released = released ?? timex.Range.latest(Duration(days: 360));
     return KnownLatestRequest(
+      mimetype: mimetype,
       limit: ds.Int64(limit),
       released: DateRange(
         oldest: timex.formatISO8601(released.begin),
@@ -186,7 +188,7 @@ abstract class known {
             "/k/latest",
             httpx.params(req.toProto3Json()),
           ),
-          options: options,
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
@@ -198,11 +200,12 @@ abstract class known {
 
 abstract class recommendations {
   static RecommendationsRequest request({
+    String mimetype = "",
     int limit = 100,
     timex.Range? created,
   }) {
     created = created ?? timex.Range.latest(Duration(days: 30));
-    return RecommendationsRequest(limit: ds.Int64(limit));
+    return RecommendationsRequest(mimetype: mimetype, limit: ds.Int64(limit));
   }
 
   static RecommendationsResponse response({RecommendationsRequest? next}) => RecommendationsResponse(items: []);
@@ -216,9 +219,9 @@ abstract class recommendations {
           Uri.https(
             httpx.host(),
             "/r/",
-            jsonDecode(jsonEncode(req.toProto3Json())),
+            httpx.params(req.toProto3Json()),
           ),
-          options: options,
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
@@ -228,6 +231,7 @@ abstract class recommendations {
   }
 
   static Future<void> random({
+    String mimetype = "",
     List<httpx.Option> options = const [],
   }) async {
     return httpx
@@ -235,9 +239,9 @@ abstract class recommendations {
           Uri.https(
             httpx.host(),
             "/r/random",
-            jsonDecode(jsonEncode({})),
           ),
-          options: options,
+          options: [httpx.Content.json, httpx.Accept.json, ...options],
+          body: jsonEncode(RecommendationsRandomRequest(mimetype: mimetype).toProto3Json()),
         )
         .then((v) {
           return Future.value();
@@ -262,9 +266,10 @@ abstract class recommendations {
 }
 
 abstract class recent {
-  static RecentSearchRequest request({int limit = 100, timex.Range? created}) {
+  static RecentSearchRequest request({String mimetype = "", int limit = 100, timex.Range? created}) {
     created = created ?? timex.Range.latest(Duration(days: 30));
     return RecentSearchRequest(
+      mimetype: mimetype,
       limit: ds.Int64(limit),
       created: DateRange(
         oldest: timex.formatISO8601(created.begin),
@@ -283,7 +288,7 @@ abstract class recent {
     return httpx
         .get(
           Uri.https(httpx.host(), "/w/", httpx.params(req.toProto3Json())),
-          options: options,
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(

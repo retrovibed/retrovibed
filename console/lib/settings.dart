@@ -58,6 +58,7 @@ class _DisplayState extends State<Display> {
     LogicalKeyboardKey.keyB,
     LogicalKeyboardKey.keyA,
   ]);
+
   void setState(VoidCallback fn) {
     if (!mounted) return;
     super.setState(fn);
@@ -222,7 +223,6 @@ class _DisplayState extends State<Display> {
                           google.Card(onPressed: full),
                           ds.LongHold(
                             onHold: () {
-                              print("WAKA WAKA");
                               masked(
                                 debug.DeveloperSettings(),
                               );

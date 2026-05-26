@@ -31,6 +31,7 @@ type Known struct {
 	Summary       string                 `protobuf:"bytes,5,opt,name=summary,proto3" json:"summary,omitempty"`
 	Image         string                 `protobuf:"bytes,6,opt,name=image,proto3" json:"image,omitempty"`
 	Released      string                 `protobuf:"bytes,7,opt,name=released,proto3" json:"released,omitempty"`
+	Mimetype      string                 `protobuf:"bytes,8,opt,name=mimetype,proto3" json:"mimetype,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -114,11 +115,19 @@ func (x *Known) GetReleased() string {
 	return ""
 }
 
+func (x *Known) GetMimetype() string {
+	if x != nil {
+		return x.Mimetype
+	}
+	return ""
+}
+
 type KnownSearchRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Query         string                 `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
 	Adult         bool                   `protobuf:"varint,2,opt,name=adult,proto3" json:"adult,omitempty"`
 	Language      string                 `protobuf:"bytes,3,opt,name=language,proto3" json:"language,omitempty"`
+	Mimetype      string                 `protobuf:"bytes,4,opt,name=mimetype,proto3" json:"mimetype,omitempty"`
 	Offset        uint64                 `protobuf:"varint,900,opt,name=offset,proto3" json:"offset,omitempty"`
 	Limit         uint64                 `protobuf:"varint,901,opt,name=limit,proto3" json:"limit,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -172,6 +181,13 @@ func (x *KnownSearchRequest) GetAdult() bool {
 func (x *KnownSearchRequest) GetLanguage() string {
 	if x != nil {
 		return x.Language
+	}
+	return ""
+}
+
+func (x *KnownSearchRequest) GetMimetype() string {
+	if x != nil {
+		return x.Mimetype
 	}
 	return ""
 }
@@ -537,6 +553,7 @@ func (x *KnownCreateResponse) GetKnown() *Known {
 type KnownLatestRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Released      *meta.DateRange        `protobuf:"bytes,1,opt,name=released,proto3" json:"released,omitempty"`
+	Mimetype      string                 `protobuf:"bytes,2,opt,name=mimetype,proto3" json:"mimetype,omitempty"`
 	Offset        uint64                 `protobuf:"varint,900,opt,name=offset,proto3" json:"offset,omitempty"`
 	Limit         uint64                 `protobuf:"varint,901,opt,name=limit,proto3" json:"limit,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -578,6 +595,13 @@ func (x *KnownLatestRequest) GetReleased() *meta.DateRange {
 		return x.Released
 	}
 	return nil
+}
+
+func (x *KnownLatestRequest) GetMimetype() string {
+	if x != nil {
+		return x.Mimetype
+	}
+	return ""
 }
 
 func (x *KnownLatestRequest) GetOffset() uint64 {
@@ -648,6 +672,7 @@ func (x *KnownLatestResponse) GetItems() []*Known {
 
 type RecommendationsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	Mimetype      string                 `protobuf:"bytes,1,opt,name=mimetype,proto3" json:"mimetype,omitempty"`
 	Offset        uint64                 `protobuf:"varint,900,opt,name=offset,proto3" json:"offset,omitempty"`
 	Limit         uint64                 `protobuf:"varint,901,opt,name=limit,proto3" json:"limit,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -682,6 +707,13 @@ func (x *RecommendationsRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use RecommendationsRequest.ProtoReflect.Descriptor instead.
 func (*RecommendationsRequest) Descriptor() ([]byte, []int) {
 	return file_media_known_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *RecommendationsRequest) GetMimetype() string {
+	if x != nil {
+		return x.Mimetype
+	}
+	return ""
 }
 
 func (x *RecommendationsRequest) GetOffset() uint64 {
@@ -750,11 +782,55 @@ func (x *RecommendationsResponse) GetItems() []*Known {
 	return nil
 }
 
+type RecommendationsRandomRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Mimetype      string                 `protobuf:"bytes,1,opt,name=mimetype,proto3" json:"mimetype,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RecommendationsRandomRequest) Reset() {
+	*x = RecommendationsRandomRequest{}
+	mi := &file_media_known_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RecommendationsRandomRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RecommendationsRandomRequest) ProtoMessage() {}
+
+func (x *RecommendationsRandomRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_media_known_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RecommendationsRandomRequest.ProtoReflect.Descriptor instead.
+func (*RecommendationsRandomRequest) Descriptor() ([]byte, []int) {
+	return file_media_known_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *RecommendationsRandomRequest) GetMimetype() string {
+	if x != nil {
+		return x.Mimetype
+	}
+	return ""
+}
+
 var File_media_known_proto protoreflect.FileDescriptor
 
 const file_media_known_proto_rawDesc = "" +
 	"\n" +
-	"\x11media.known.proto\x12\x05media\x1a\x11meta.search.proto\"\xb3\x01\n" +
+	"\x11media.known.proto\x12\x05media\x1a\x11meta.search.proto\"\xcf\x01\n" +
 	"\x05Known\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x16\n" +
 	"\x06rating\x18\x02 \x01(\x02R\x06rating\x12\x14\n" +
@@ -762,13 +838,15 @@ const file_media_known_proto_rawDesc = "" +
 	"\vdescription\x18\x04 \x01(\tR\vdescription\x12\x18\n" +
 	"\asummary\x18\x05 \x01(\tR\asummary\x12\x14\n" +
 	"\x05image\x18\x06 \x01(\tR\x05image\x12\x1a\n" +
-	"\breleased\x18\a \x01(\tR\breleased\"\x9b\x01\n" +
+	"\breleased\x18\a \x01(\tR\breleased\x12\x1a\n" +
+	"\bmimetype\x18\b \x01(\tR\bmimetype\"\xb7\x01\n" +
 	"\x12KnownSearchRequest\x12\x14\n" +
 	"\x05query\x18\x01 \x01(\tR\x05query\x12\x14\n" +
 	"\x05adult\x18\x02 \x01(\bR\x05adult\x12\x1a\n" +
-	"\blanguage\x18\x03 \x01(\tR\blanguage\x12\x17\n" +
+	"\blanguage\x18\x03 \x01(\tR\blanguage\x12\x1a\n" +
+	"\bmimetype\x18\x04 \x01(\tR\bmimetype\x12\x17\n" +
 	"\x06offset\x18\x84\a \x01(\x04R\x06offset\x12\x15\n" +
-	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\x04\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"h\n" +
+	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\x05\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"h\n" +
 	"\x13KnownSearchResponse\x12-\n" +
 	"\x04next\x18\x01 \x01(\v2\x19.media.KnownSearchRequestR\x04next\x12\"\n" +
 	"\x05items\x18\x02 \x03(\v2\f.media.KnownR\x05items\")\n" +
@@ -783,20 +861,24 @@ const file_media_known_proto_rawDesc = "" +
 	"\x12KnownCreateRequest\x12\"\n" +
 	"\x05known\x18\x01 \x01(\v2\f.media.KnownR\x05known\"9\n" +
 	"\x13KnownCreateResponse\x12\"\n" +
-	"\x05known\x18\x01 \x01(\v2\f.media.KnownR\x05known\"\x80\x01\n" +
+	"\x05known\x18\x01 \x01(\v2\f.media.KnownR\x05known\"\x9c\x01\n" +
 	"\x12KnownLatestRequest\x12+\n" +
-	"\breleased\x18\x01 \x01(\v2\x0f.meta.DateRangeR\breleased\x12\x17\n" +
+	"\breleased\x18\x01 \x01(\v2\x0f.meta.DateRangeR\breleased\x12\x1a\n" +
+	"\bmimetype\x18\x02 \x01(\tR\bmimetype\x12\x17\n" +
 	"\x06offset\x18\x84\a \x01(\x04R\x06offset\x12\x15\n" +
-	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\x02\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"h\n" +
+	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\x03\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"h\n" +
 	"\x13KnownLatestResponse\x12-\n" +
 	"\x04next\x18\x01 \x01(\v2\x19.media.KnownLatestRequestR\x04next\x12\"\n" +
-	"\x05items\x18\x02 \x03(\v2\f.media.KnownR\x05items\"W\n" +
-	"\x16RecommendationsRequest\x12\x17\n" +
+	"\x05items\x18\x02 \x03(\v2\f.media.KnownR\x05items\"s\n" +
+	"\x16RecommendationsRequest\x12\x1a\n" +
+	"\bmimetype\x18\x01 \x01(\tR\bmimetype\x12\x17\n" +
 	"\x06offset\x18\x84\a \x01(\x04R\x06offset\x12\x15\n" +
-	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\x01\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"p\n" +
+	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\x02\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"p\n" +
 	"\x17RecommendationsResponse\x121\n" +
 	"\x04next\x18\x01 \x01(\v2\x1d.media.RecommendationsRequestR\x04next\x12\"\n" +
-	"\x05items\x18\x02 \x03(\v2\f.media.KnownR\x05itemsb\x06proto3"
+	"\x05items\x18\x02 \x03(\v2\f.media.KnownR\x05items\"A\n" +
+	"\x1cRecommendationsRandomRequest\x12\x1a\n" +
+	"\bmimetype\x18\x01 \x01(\tR\bmimetypeJ\x05\b\x02\x10\x84\ab\x06proto3"
 
 var (
 	file_media_known_proto_rawDescOnce sync.Once
@@ -810,23 +892,24 @@ func file_media_known_proto_rawDescGZIP() []byte {
 	return file_media_known_proto_rawDescData
 }
 
-var file_media_known_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_media_known_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
 var file_media_known_proto_goTypes = []any{
-	(*Known)(nil),                   // 0: media.Known
-	(*KnownSearchRequest)(nil),      // 1: media.KnownSearchRequest
-	(*KnownSearchResponse)(nil),     // 2: media.KnownSearchResponse
-	(*KnownMatchRequest)(nil),       // 3: media.KnownMatchRequest
-	(*KnownLookupRequest)(nil),      // 4: media.KnownLookupRequest
-	(*KnownLookupResponse)(nil),     // 5: media.KnownLookupResponse
-	(*KnownDownloadRequest)(nil),    // 6: media.KnownDownloadRequest
-	(*KnownDownloadResponse)(nil),   // 7: media.KnownDownloadResponse
-	(*KnownCreateRequest)(nil),      // 8: media.KnownCreateRequest
-	(*KnownCreateResponse)(nil),     // 9: media.KnownCreateResponse
-	(*KnownLatestRequest)(nil),      // 10: media.KnownLatestRequest
-	(*KnownLatestResponse)(nil),     // 11: media.KnownLatestResponse
-	(*RecommendationsRequest)(nil),  // 12: media.RecommendationsRequest
-	(*RecommendationsResponse)(nil), // 13: media.RecommendationsResponse
-	(*meta.DateRange)(nil),          // 14: meta.DateRange
+	(*Known)(nil),                        // 0: media.Known
+	(*KnownSearchRequest)(nil),           // 1: media.KnownSearchRequest
+	(*KnownSearchResponse)(nil),          // 2: media.KnownSearchResponse
+	(*KnownMatchRequest)(nil),            // 3: media.KnownMatchRequest
+	(*KnownLookupRequest)(nil),           // 4: media.KnownLookupRequest
+	(*KnownLookupResponse)(nil),          // 5: media.KnownLookupResponse
+	(*KnownDownloadRequest)(nil),         // 6: media.KnownDownloadRequest
+	(*KnownDownloadResponse)(nil),        // 7: media.KnownDownloadResponse
+	(*KnownCreateRequest)(nil),           // 8: media.KnownCreateRequest
+	(*KnownCreateResponse)(nil),          // 9: media.KnownCreateResponse
+	(*KnownLatestRequest)(nil),           // 10: media.KnownLatestRequest
+	(*KnownLatestResponse)(nil),          // 11: media.KnownLatestResponse
+	(*RecommendationsRequest)(nil),       // 12: media.RecommendationsRequest
+	(*RecommendationsResponse)(nil),      // 13: media.RecommendationsResponse
+	(*RecommendationsRandomRequest)(nil), // 14: media.RecommendationsRandomRequest
+	(*meta.DateRange)(nil),               // 15: meta.DateRange
 }
 var file_media_known_proto_depIdxs = []int32{
 	1,  // 0: media.KnownSearchResponse.next:type_name -> media.KnownSearchRequest
@@ -835,7 +918,7 @@ var file_media_known_proto_depIdxs = []int32{
 	0,  // 3: media.KnownDownloadResponse.known:type_name -> media.Known
 	0,  // 4: media.KnownCreateRequest.known:type_name -> media.Known
 	0,  // 5: media.KnownCreateResponse.known:type_name -> media.Known
-	14, // 6: media.KnownLatestRequest.released:type_name -> meta.DateRange
+	15, // 6: media.KnownLatestRequest.released:type_name -> meta.DateRange
 	10, // 7: media.KnownLatestResponse.next:type_name -> media.KnownLatestRequest
 	0,  // 8: media.KnownLatestResponse.items:type_name -> media.Known
 	12, // 9: media.RecommendationsResponse.next:type_name -> media.RecommendationsRequest
@@ -858,7 +941,7 @@ func file_media_known_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_media_known_proto_rawDesc), len(file_media_known_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   14,
+			NumMessages:   15,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

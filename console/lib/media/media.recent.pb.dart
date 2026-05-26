@@ -23,11 +23,13 @@ export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
 class RecentSearchRequest extends $pb.GeneratedMessage {
   factory RecentSearchRequest({
     $0.DateRange? created,
+    $core.String? mimetype,
     $fixnum.Int64? offset,
     $fixnum.Int64? limit,
   }) {
     final result = create();
     if (created != null) result.created = created;
+    if (mimetype != null) result.mimetype = mimetype;
     if (offset != null) result.offset = offset;
     if (limit != null) result.limit = limit;
     return result;
@@ -48,6 +50,7 @@ class RecentSearchRequest extends $pb.GeneratedMessage {
       createEmptyInstance: create)
     ..aOM<$0.DateRange>(1, _omitFieldNames ? '' : 'created',
         subBuilder: $0.DateRange.create)
+    ..aOS(2, _omitFieldNames ? '' : 'mimetype')
     ..a<$fixnum.Int64>(
         900, _omitFieldNames ? '' : 'offset', $pb.PbFieldType.OU6,
         defaultOrMaker: $fixnum.Int64.ZERO)
@@ -85,21 +88,30 @@ class RecentSearchRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $0.DateRange ensureCreated() => $_ensure(0);
 
+  @$pb.TagNumber(2)
+  $core.String get mimetype => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set mimetype($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasMimetype() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearMimetype() => $_clearField(2);
+
   @$pb.TagNumber(900)
-  $fixnum.Int64 get offset => $_getI64(1);
+  $fixnum.Int64 get offset => $_getI64(2);
   @$pb.TagNumber(900)
-  set offset($fixnum.Int64 value) => $_setInt64(1, value);
+  set offset($fixnum.Int64 value) => $_setInt64(2, value);
   @$pb.TagNumber(900)
-  $core.bool hasOffset() => $_has(1);
+  $core.bool hasOffset() => $_has(2);
   @$pb.TagNumber(900)
   void clearOffset() => $_clearField(900);
 
   @$pb.TagNumber(901)
-  $fixnum.Int64 get limit => $_getI64(2);
+  $fixnum.Int64 get limit => $_getI64(3);
   @$pb.TagNumber(901)
-  set limit($fixnum.Int64 value) => $_setInt64(2, value);
+  set limit($fixnum.Int64 value) => $_setInt64(3, value);
   @$pb.TagNumber(901)
-  $core.bool hasLimit() => $_has(2);
+  $core.bool hasLimit() => $_has(3);
   @$pb.TagNumber(901)
   void clearLimit() => $_clearField(901);
 }
@@ -174,6 +186,7 @@ class RecentRecordRequest extends $pb.GeneratedMessage {
     $1.Media? media,
     $fixnum.Int64? duration,
     $fixnum.Int64? position,
+    $core.String? mimetype,
     $1.MediaSearchRequest? query,
   }) {
     final result = create();
@@ -181,6 +194,7 @@ class RecentRecordRequest extends $pb.GeneratedMessage {
     if (media != null) result.media = media;
     if (duration != null) result.duration = duration;
     if (position != null) result.position = position;
+    if (mimetype != null) result.mimetype = mimetype;
     if (query != null) result.query = query;
     return result;
   }
@@ -207,7 +221,8 @@ class RecentRecordRequest extends $pb.GeneratedMessage {
     ..a<$fixnum.Int64>(
         4, _omitFieldNames ? '' : 'position', $pb.PbFieldType.OU6,
         defaultOrMaker: $fixnum.Int64.ZERO)
-    ..aOM<$1.MediaSearchRequest>(5, _omitFieldNames ? '' : 'query',
+    ..aOS(5, _omitFieldNames ? '' : 'mimetype')
+    ..aOM<$1.MediaSearchRequest>(6, _omitFieldNames ? '' : 'query',
         subBuilder: $1.MediaSearchRequest.create)
     ..hasRequiredFields = false;
 
@@ -269,15 +284,24 @@ class RecentRecordRequest extends $pb.GeneratedMessage {
   void clearPosition() => $_clearField(4);
 
   @$pb.TagNumber(5)
-  $1.MediaSearchRequest get query => $_getN(4);
+  $core.String get mimetype => $_getSZ(4);
   @$pb.TagNumber(5)
-  set query($1.MediaSearchRequest value) => $_setField(5, value);
+  set mimetype($core.String value) => $_setString(4, value);
   @$pb.TagNumber(5)
-  $core.bool hasQuery() => $_has(4);
+  $core.bool hasMimetype() => $_has(4);
   @$pb.TagNumber(5)
-  void clearQuery() => $_clearField(5);
-  @$pb.TagNumber(5)
-  $1.MediaSearchRequest ensureQuery() => $_ensure(4);
+  void clearMimetype() => $_clearField(5);
+
+  @$pb.TagNumber(6)
+  $1.MediaSearchRequest get query => $_getN(5);
+  @$pb.TagNumber(6)
+  set query($1.MediaSearchRequest value) => $_setField(6, value);
+  @$pb.TagNumber(6)
+  $core.bool hasQuery() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearQuery() => $_clearField(6);
+  @$pb.TagNumber(6)
+  $1.MediaSearchRequest ensureQuery() => $_ensure(5);
 }
 
 class RecentRecordResponse extends $pb.GeneratedMessage {

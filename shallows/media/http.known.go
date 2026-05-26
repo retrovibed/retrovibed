@@ -104,6 +104,7 @@ func (t *HTTPKnown) search(w http.ResponseWriter, r *http.Request) {
 	msg.Next.Limit = numericx.Min(msg.Next.Limit, 100)
 
 	q := sqlx.Scan(library.KnownSearch(r.Context(), t.q, library.KnownSearchBuilder().Where(squirrel.And{
+		library.KnownQueryMimetype(msg.Next.Mimetype),
 		library.KnownQueryLanguage(msg.Next.Language),
 		library.KnownQueryDetectLanguage(msg.Next.Language),
 		library.KnownQueryExplicit(msg.Next.Adult),
@@ -184,6 +185,7 @@ func (t *HTTPKnown) latest(w http.ResponseWriter, r *http.Request) {
 	q := sqlx.Scan(library.KnownSearch(r.Context(), t.q, library.KnownSearchBuilder().Where(squirrel.And{
 		library.KnownQueryExplicit(false),
 		library.KnownQueryReleased(released),
+		library.KnownQueryMimetype(msg.Next.Mimetype),
 		library.KnownQueryWithPoster(),
 	}).OrderBy("released DESC", "title DESC").Offset(msg.Next.Offset*msg.Next.Limit).Limit(msg.Next.Limit)))
 
@@ -203,42 +205,6 @@ func (t *HTTPKnown) latest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
-
-// func (t *HTTPKnown) download(w http.ResponseWriter, r *http.Request) {
-// 	var (
-// 		meta library.Known
-// 		d    library.Download
-// 		id   = mux.Vars(r)["id"]
-// 	)
-
-// 	if err := library.KnownFindByID(r.Context(), t.q, id).Scan(&meta); sqlx.ErrNoRows(err) != nil {
-// 		log.Println(errorsx.Wrap(err, "unable to find metadata"))
-// 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
-// 		return
-// 	} else if err != nil {
-// 		log.Println(errorsx.Wrap(err, "unable to find metadata"))
-// 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
-// 		return
-// 	}
-
-// 	if err := library.DownloadInsertWithDefaults(r.Context(), t.q, library.Download{KnownMediaID: meta.ID}).Scan(&d); err != nil {
-// 		log.Println(errorsx.Wrap(err, "unable to create download record"))
-// 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
-// 		return
-// 	}
-
-// 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &KnownDownloadResponse{
-// 		Known: langx.Autoptr(
-// 			langx.Clone(
-// 				Known{},
-// 				KnownOptionFromLibraryKnown(langx.Clone(meta, timex.JSONSafeEncodeOption)),
-// 			),
-// 		),
-// 	}); err != nil {
-// 		log.Println(errorsx.Wrap(err, "unable to write response"))
-// 		return
-// 	}
-// }
 
 func (t *HTTPKnown) create(w http.ResponseWriter, r *http.Request) {
 	var (

@@ -99,6 +99,7 @@ func (t *HTTPRecent) latest(w http.ResponseWriter, r *http.Request) {
 		squirrel.And{
 			library.MetadataQueryNotTombstoned(),
 			library.RecentSessionQueryCreated(created),
+			library.RecentSessionQueryMimetype(msg.Next.Mimetype),
 		},
 	).OrderBy("library_recent_sessions.last_played_at DESC").Limit(msg.Next.Limit)
 
@@ -120,6 +121,7 @@ func (t *HTTPRecent) latest(w http.ResponseWriter, r *http.Request) {
 			Query:    &req,
 			Duration: uint64(s.Duration / time.Millisecond),
 			Position: uint64(s.Position / time.Millisecond),
+			Mimetype: s.Mimetype,
 		})
 	}
 
@@ -179,6 +181,7 @@ func (t *HTTPRecent) record(w http.ResponseWriter, r *http.Request) {
 
 	if err = library.RecentSessionInsertWithDefaults(r.Context(), t.q, library.RecentSession{
 		ID:       md5x.FormatUUID(md5x.Digest(encoded)),
+		Mimetype: msg.Mimetype,
 		MediaID:  msg.Media.Id,
 		Duration: time.Duration(msg.Duration) * time.Millisecond,
 		Position: time.Duration(msg.Position) * time.Millisecond,

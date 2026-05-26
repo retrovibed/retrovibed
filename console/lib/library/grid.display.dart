@@ -72,12 +72,6 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
             _loading = false;
           });
         }, test: httpx.ErrorsTest.httpauto)
-        .catchError((cause) {
-          setState(() {
-            _cause = ds.Error.unauthorized(cause, onTap: reseterr);
-            _loading = false;
-          });
-        }, test: httpx.ErrorsTest.unauthorized)
         .catchError((e) {
           setState(() {
             _cause = ds.Error.unknown(e, onTap: reseterr);
@@ -136,6 +130,8 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
         widget.search.value = media.MediaSearchResponse(items: replaced, next: widget.search.value.next);
       });
     };
+
+    final category = mimex.category(widget.search.value.next.mimetypes);
 
     return RefreshIndicator(
       onRefresh: () => refresh(widget.search.value.next),
@@ -211,6 +207,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                       ),
                       (widget.search.value.next.query.isEmpty)
                           ? disc.Home(
+                            category,
                             padding: defaults.padding.copyWith(
                               top: 0.0,
                               bottom: 0.0,
@@ -226,8 +223,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                                 final search = widget.search.value;
                                 if (_loading) return Future.value([]);
                                 if (search.items.isNotEmpty) return Future.value([]);
-                                if (search.next.mimetypes.isNotEmpty &&
-                                    mimex.checksum(search.next.mimetypes) != mimex.checksumfor(mimex.icomovie))
+                                if (search.next.mimetypes.isNotEmpty && !mimex.isVideo(category))
                                   return Future.value([]);
 
                                 return httpx.withRetry(

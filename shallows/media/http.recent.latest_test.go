@@ -11,6 +11,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
+	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/testx"
@@ -253,6 +254,140 @@ func TestRecentLatest(t *testing.T) {
 		count, err := sqlx.Count(ctx, q, `SELECT COUNT(*) FROM library_recent_sessions`)
 		require.NoError(t, err)
 		require.Equal(t, 1, count)
+	})
+
+	t.Run("filters by mimetype", func(t *testing.T) {
+		var (
+			p     meta.Profile
+			authz meta.Authz
+		)
+		ctx, done := testx.Context(t)
+		defer done()
+
+		q := sqltestx.Metadatabase(t)
+
+		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
+		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
+		require.NoError(t, testx.Fake(&authz, meta.AuthzOptionProfileID(p.ID), meta.AuthzOptionAdmin))
+		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, authz).Scan(&authz))
+
+		for idx := range 3 {
+			var md library.Metadata
+			require.NoError(t, testx.Fake(&md, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID))
+			require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, md).Scan(&md))
+
+			var session library.RecentSession
+			require.NoError(t, testx.Fake(&session, library.RecentSessionOptionTestDefaults, library.RecentSessionOptionID(uuidx.WithSuffix(idx)), library.RecentSessionOptionMediaID(md.ID)))
+			session.Mimetype = mimex.Video
+			require.NoError(t, library.RecentSessionInsertWithDefaults(ctx, q, session).Scan(&session))
+		}
+
+		for idx := range 3 {
+			var md library.Metadata
+			require.NoError(t, testx.Fake(&md, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID))
+			require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, md).Scan(&md))
+
+			var session library.RecentSession
+			require.NoError(t, testx.Fake(&session, library.RecentSessionOptionTestDefaults, library.RecentSessionOptionID(uuidx.WithSuffix(10+idx)), library.RecentSessionOptionMediaID(md.ID)))
+			session.Mimetype = mimex.Audio
+			require.NoError(t, library.RecentSessionInsertWithDefaults(ctx, q, session).Scan(&session))
+		}
+
+		routes := mux.NewRouter()
+		media.NewHTTPRecent(q, media.HTTPRecentOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
+
+		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
+
+		searchreq := &media.RecentSearchRequest{
+			Created:  meta.NewDateRange(timex.NewRangeDuration(24 * time.Hour)),
+			Mimetype: mimex.Video,
+			Limit:    100,
+		}
+		encoded, err := formx.NewEncoder().Encode(&searchreq)
+		require.NoError(t, err)
+
+		resp, req, err := httptestx.BuildRequestBytes(
+			http.MethodGet,
+			"/?"+encoded.Encode(),
+			nil,
+			httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)),
+		)
+		require.NoError(t, err)
+
+		routes.ServeHTTP(resp, req)
+
+		var result media.RecentSearchResponse
+		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
+		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.Len(t, result.Items, 3)
+		for _, item := range result.Items {
+			require.Equal(t, mimex.Video, item.Mimetype)
+		}
+	})
+
+	t.Run("empty mimetype returns all", func(t *testing.T) {
+		var (
+			p     meta.Profile
+			authz meta.Authz
+		)
+		ctx, done := testx.Context(t)
+		defer done()
+
+		q := sqltestx.Metadatabase(t)
+
+		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
+		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
+		require.NoError(t, testx.Fake(&authz, meta.AuthzOptionProfileID(p.ID), meta.AuthzOptionAdmin))
+		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, authz).Scan(&authz))
+
+		for idx := range 3 {
+			var md library.Metadata
+			require.NoError(t, testx.Fake(&md, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID))
+			require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, md).Scan(&md))
+
+			var session library.RecentSession
+			require.NoError(t, testx.Fake(&session, library.RecentSessionOptionTestDefaults, library.RecentSessionOptionID(uuidx.WithSuffix(idx)), library.RecentSessionOptionMediaID(md.ID)))
+			session.Mimetype = mimex.Video
+			require.NoError(t, library.RecentSessionInsertWithDefaults(ctx, q, session).Scan(&session))
+		}
+
+		for idx := range 3 {
+			var md library.Metadata
+			require.NoError(t, testx.Fake(&md, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID))
+			require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, md).Scan(&md))
+
+			var session library.RecentSession
+			require.NoError(t, testx.Fake(&session, library.RecentSessionOptionTestDefaults, library.RecentSessionOptionID(uuidx.WithSuffix(10+idx)), library.RecentSessionOptionMediaID(md.ID)))
+			session.Mimetype = mimex.Audio
+			require.NoError(t, library.RecentSessionInsertWithDefaults(ctx, q, session).Scan(&session))
+		}
+
+		routes := mux.NewRouter()
+		media.NewHTTPRecent(q, media.HTTPRecentOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
+
+		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
+
+		searchreq := &media.RecentSearchRequest{
+			Created: meta.NewDateRange(timex.NewRangeDuration(24 * time.Hour)),
+			Limit:   100,
+		}
+		encoded, err := formx.NewEncoder().Encode(&searchreq)
+		require.NoError(t, err)
+
+		resp, req, err := httptestx.BuildRequestBytes(
+			http.MethodGet,
+			"/?"+encoded.Encode(),
+			nil,
+			httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)),
+		)
+		require.NoError(t, err)
+
+		routes.ServeHTTP(resp, req)
+
+		var result media.RecentSearchResponse
+		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
+		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.Len(t, result.Items, 6)
 	})
 
 	t.Run("tombstoned excluded", func(t *testing.T) {

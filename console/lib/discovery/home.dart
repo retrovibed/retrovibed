@@ -4,8 +4,9 @@ import 'recent.dart';
 import 'releases.dart';
 import 'recommendations.dart';
 
-class Home extends StatefulWidget {
-  const Home({
+class Home extends StatelessWidget {
+  const Home(
+    this.mimetype, {
     super.key,
     this.padding,
     this.margin,
@@ -16,6 +17,7 @@ class Home extends StatefulWidget {
     this.clipBehavior = Clip.none,
   });
 
+  final String mimetype;
   final EdgeInsets? padding;
   final EdgeInsets? margin;
   final BoxDecoration? decoration;
@@ -25,30 +27,25 @@ class Home extends StatefulWidget {
   final Clip clipBehavior;
 
   @override
-  State<Home> createState() => _HomeState();
-}
-
-class _HomeState extends State<Home> {
-  @override
   Widget build(BuildContext context) {
     return ds.build((context) {
       final defaults = ds.Defaults.of(context);
       final compact = defaults.isCompact;
       return ds.Container(
-        alignment: widget.alignment ?? Alignment.topCenter,
-        background: widget.background ?? Colors.transparent,
-        padding: widget.padding,
-        margin: widget.margin,
-        decoration: widget.decoration,
-        constraints: widget.constraints,
-        clipBehavior: widget.clipBehavior,
+        alignment: alignment ?? Alignment.topCenter,
+        background: background ?? Colors.transparent,
+        padding: padding,
+        margin: margin,
+        decoration: decoration,
+        constraints: constraints,
+        clipBehavior: clipBehavior,
         Column(
           spacing: defaults.spacing,
           verticalDirection: compact ? VerticalDirection.up : VerticalDirection.down,
           children: [
-            Recent(),
-            Recommendations(),
-            NewReleases(),
+            Recent(mimetype),
+            Recommendations(mimetype),
+            NewReleases(mimetype),
           ],
         ),
       );
