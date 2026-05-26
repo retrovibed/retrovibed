@@ -12,6 +12,7 @@ message Known {
   string summary = 5 [ json_name = "summary" ];
   string image = 6 [ json_name = "image" ];
   string released = 7 [ json_name = "released" ];
+  string mimetype = 8 [ json_name = "mimetype" ];
 }
 
 message KnownSearchRequest {

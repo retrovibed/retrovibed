@@ -104,6 +104,7 @@ func (t *HTTPKnown) search(w http.ResponseWriter, r *http.Request) {
 	msg.Next.Limit = numericx.Min(msg.Next.Limit, 100)
 
 	q := sqlx.Scan(library.KnownSearch(r.Context(), t.q, library.KnownSearchBuilder().Where(squirrel.And{
+		library.KnownQueryMimetype(msg.Next.Mimetype),
 		library.KnownQueryLanguage(msg.Next.Language),
 		library.KnownQueryDetectLanguage(msg.Next.Language),
 		library.KnownQueryExplicit(msg.Next.Adult),
@@ -184,6 +185,7 @@ func (t *HTTPKnown) latest(w http.ResponseWriter, r *http.Request) {
 	q := sqlx.Scan(library.KnownSearch(r.Context(), t.q, library.KnownSearchBuilder().Where(squirrel.And{
 		library.KnownQueryExplicit(false),
 		library.KnownQueryReleased(released),
+		library.KnownQueryMimetype(msg.Next.Mimetype),
 		library.KnownQueryWithPoster(),
 	}).OrderBy("released DESC", "title DESC").Offset(msg.Next.Offset*msg.Next.Limit).Limit(msg.Next.Limit)))
 
