@@ -206,42 +206,6 @@ func (t *HTTPKnown) latest(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// func (t *HTTPKnown) download(w http.ResponseWriter, r *http.Request) {
-// 	var (
-// 		meta library.Known
-// 		d    library.Download
-// 		id   = mux.Vars(r)["id"]
-// 	)
-
-// 	if err := library.KnownFindByID(r.Context(), t.q, id).Scan(&meta); sqlx.ErrNoRows(err) != nil {
-// 		log.Println(errorsx.Wrap(err, "unable to find metadata"))
-// 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
-// 		return
-// 	} else if err != nil {
-// 		log.Println(errorsx.Wrap(err, "unable to find metadata"))
-// 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
-// 		return
-// 	}
-
-// 	if err := library.DownloadInsertWithDefaults(r.Context(), t.q, library.Download{KnownMediaID: meta.ID}).Scan(&d); err != nil {
-// 		log.Println(errorsx.Wrap(err, "unable to create download record"))
-// 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
-// 		return
-// 	}
-
-// 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &KnownDownloadResponse{
-// 		Known: langx.Autoptr(
-// 			langx.Clone(
-// 				Known{},
-// 				KnownOptionFromLibraryKnown(langx.Clone(meta, timex.JSONSafeEncodeOption)),
-// 			),
-// 		),
-// 	}); err != nil {
-// 		log.Println(errorsx.Wrap(err, "unable to write response"))
-// 		return
-// 	}
-// }
-
 func (t *HTTPKnown) create(w http.ResponseWriter, r *http.Request) {
 	var (
 		req  KnownCreateRequest

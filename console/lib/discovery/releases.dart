@@ -36,6 +36,14 @@ class _NewReleasesState extends State<NewReleases> {
     WidgetsBinding.instance.addPostFrameCallback((_) => _load());
   }
 
+  @override
+  void didUpdateWidget(NewReleases oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.mimetype != widget.mimetype) {
+      _load();
+    }
+  }
+
   Future<void> _load() async {
     setState(() => _loading = true);
     final auth = authn.request(authn.AuthzCache.meta(context));

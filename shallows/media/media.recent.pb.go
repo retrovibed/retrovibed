@@ -148,7 +148,8 @@ type RecentRecordRequest struct {
 	Media         *Media                 `protobuf:"bytes,2,opt,name=media,proto3" json:"media,omitempty"`
 	Duration      uint64                 `protobuf:"varint,3,opt,name=duration,proto3" json:"duration,omitempty"`
 	Position      uint64                 `protobuf:"varint,4,opt,name=position,proto3" json:"position,omitempty"`
-	Query         *MediaSearchRequest    `protobuf:"bytes,5,opt,name=query,proto3" json:"query,omitempty"`
+	Mimetype      string                 `protobuf:"bytes,5,opt,name=mimetype,proto3" json:"mimetype,omitempty"`
+	Query         *MediaSearchRequest    `protobuf:"bytes,6,opt,name=query,proto3" json:"query,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -209,6 +210,13 @@ func (x *RecentRecordRequest) GetPosition() uint64 {
 		return x.Position
 	}
 	return 0
+}
+
+func (x *RecentRecordRequest) GetMimetype() string {
+	if x != nil {
+		return x.Mimetype
+	}
+	return ""
 }
 
 func (x *RecentRecordRequest) GetQuery() *MediaSearchRequest {
@@ -338,13 +346,14 @@ const file_media_recent_proto_rawDesc = "" +
 	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\x03\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"x\n" +
 	"\x14RecentSearchResponse\x12.\n" +
 	"\x04next\x18\x01 \x01(\v2\x1a.media.RecentSearchRequestR\x04next\x120\n" +
-	"\x05items\x18\x02 \x03(\v2\x1a.media.RecentRecordRequestR\x05items\"\xb2\x01\n" +
+	"\x05items\x18\x02 \x03(\v2\x1a.media.RecentRecordRequestR\x05items\"\xce\x01\n" +
 	"\x13RecentRecordRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\"\n" +
 	"\x05media\x18\x02 \x01(\v2\f.media.MediaR\x05media\x12\x1a\n" +
 	"\bduration\x18\x03 \x01(\x04R\bduration\x12\x1a\n" +
-	"\bposition\x18\x04 \x01(\x04R\bposition\x12/\n" +
-	"\x05query\x18\x05 \x01(\v2\x19.media.MediaSearchRequestR\x05query\"\x16\n" +
+	"\bposition\x18\x04 \x01(\x04R\bposition\x12\x1a\n" +
+	"\bmimetype\x18\x05 \x01(\tR\bmimetype\x12/\n" +
+	"\x05query\x18\x06 \x01(\v2\x19.media.MediaSearchRequestR\x05query\"\x16\n" +
 	"\x14RecentRecordResponse\"\x15\n" +
 	"\x13RecentDeleteRequest\"\x16\n" +
 	"\x14RecentDeleteResponseb\x06proto3"

@@ -45,6 +45,7 @@ type HTTPRecommendations struct {
 
 func (t *HTTPRecommendations) Bind(r *mux.Router) {
 	r.StrictSlash(false)
+	// r.Use(httpx.DebugRequest)
 
 	r.Path("/").Methods(http.MethodGet).Handler(alice.New(
 		httpx.ContextBufferPool512(),
@@ -89,10 +90,10 @@ func (t *HTTPRecommendations) latest(w http.ResponseWriter, r *http.Request) {
 	}
 	msg.Next.Limit = numericx.Min(msg.Next.Limit, 100)
 
-	query := library.RecommendationKnownSearchBuilder().Where(
-		library.RecommendationQueryNotTombstoned(),
-		library.RecommendationQueryMimetype(msg.Next.Mimetype),
-	).OrderBy("library_recommendations.updated_at DESC").
+	query := library.RecommendationKnownSearchBuilder().
+		Where(library.RecommendationQueryNotTombstoned()).
+		Where(library.RecommendationQueryMimetype(msg.Next.Mimetype)).
+		OrderBy("library_recommendations.updated_at DESC").
 		Offset(msg.Next.Offset * msg.Next.Limit).
 		Limit(msg.Next.Limit)
 

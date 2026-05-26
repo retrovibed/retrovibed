@@ -45,6 +45,14 @@ class _RecentState extends State<Recent> {
     WidgetsBinding.instance.addPostFrameCallback((_) => _load(context));
   }
 
+  @override
+  void didUpdateWidget(Recent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.mimetype != widget.mimetype) {
+      _load(context);
+    }
+  }
+
   Future<void> _load(BuildContext context) async {
     setState(() => _loading = true);
     return httpx

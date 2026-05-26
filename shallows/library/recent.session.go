@@ -7,6 +7,7 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/squirrelx"
+	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 )
 
@@ -24,6 +25,14 @@ func RecentSessionLibrarySearchBuilder() squirrel.SelectBuilder {
 
 func RecentSessionQueryCreated(r timex.Range) squirrel.Sqlizer {
 	return squirrelx.Between("library_recent_sessions.created_at", r.Start, r.End)
+}
+
+func RecentSessionQueryMimetype(v string) squirrel.Sqlizer {
+	if stringsx.Blank(v) {
+		return squirrelx.Noop{}
+	}
+
+	return squirrel.Expr("library_recent_sessions.mimetype = ?", v)
 }
 
 type RecentSessionOption func(*RecentSession)

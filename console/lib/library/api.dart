@@ -188,7 +188,7 @@ abstract class known {
             "/k/latest",
             httpx.params(req.toProto3Json()),
           ),
-          options: options,
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
@@ -219,9 +219,9 @@ abstract class recommendations {
           Uri.https(
             httpx.host(),
             "/r/",
-            jsonDecode(jsonEncode(req.toProto3Json())),
+            httpx.params(req.toProto3Json()),
           ),
-          options: options,
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
@@ -239,9 +239,9 @@ abstract class recommendations {
           Uri.https(
             httpx.host(),
             "/r/random",
-            jsonDecode(jsonEncode(RecommendationsRandomRequest(mimetype: mimetype).toProto3Json())),
           ),
-          options: options,
+          options: [httpx.Content.json, httpx.Accept.json, ...options],
+          body: jsonEncode(RecommendationsRandomRequest(mimetype: mimetype).toProto3Json()),
         )
         .then((v) {
           return Future.value();
@@ -288,7 +288,7 @@ abstract class recent {
     return httpx
         .get(
           Uri.https(httpx.host(), "/w/", httpx.params(req.toProto3Json())),
-          options: options,
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(

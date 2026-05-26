@@ -19,6 +19,7 @@ import 'package:retrovibed/env.dart' as env;
 import 'package:retrovibed/design.kit/theme.defaults.dart' as theming;
 import 'package:retrovibed/design.kit/modals.dart' as modals;
 import 'package:retrovibed/community.dart' as community;
+import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:window_manager/window_manager.dart';
 
 TextScaler autoscaling(BuildContext context) {
@@ -139,6 +140,7 @@ class Retrovibed extends StatelessWidget {
                                           position: ds.Int64(pos.inMilliseconds),
                                           duration: ds.Int64(dur.inMilliseconds),
                                           query: q,
+                                          mimetype: mimex.category(q.mimetypes),
                                         ),
                                         options: [authn.request(authn.AuthzCache.meta(ctx))],
                                       )
@@ -210,7 +212,9 @@ class Retrovibed extends StatelessWidget {
                                                 }),
                                               ),
                                             ),
-                                            modals.Node(downloads.AutoHelp(downloads.MeteredWarning(const downloads.Display()))),
+                                            modals.Node(
+                                              downloads.AutoHelp(downloads.MeteredWarning(const downloads.Display())),
+                                            ),
                                             modals.Node(community.AutoHelp(community.Management())),
                                             modals.Node(settings.AutoHelp(const settings.Display())),
                                           ],

@@ -24,7 +24,8 @@ message RecentRecordRequest {
   Media media = 2 [ json_name = "media" ];
   uint64 duration = 3 [ json_name = "duration" ];
   uint64 position = 4 [ json_name = "position" ];
-  MediaSearchRequest query = 5 [ json_name = "query" ];
+  string mimetype = 5 [ json_name = "mimetype" ];
+  MediaSearchRequest query = 6 [ json_name = "query" ];
 }
 
 message RecentRecordResponse {}
