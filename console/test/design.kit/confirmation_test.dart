@@ -104,7 +104,7 @@ void main() {
       await tester.pumpApp(
         ds.Confirmation.yesNo(
           content: Text('Confirm?'),
-          onConfirm: () => confirmed = true,
+          onConfirm: (_) => confirmed = true,
         ),
       );
       await tester.pumpAndSettle();
@@ -126,7 +126,7 @@ void main() {
       await tester.pumpApp(
         ds.Confirmation.yesNo(
           content: Text('Confirm?'),
-          onCancel: () => cancelled = true,
+          onCancel: (_) => cancelled = true,
         ),
       );
       await tester.pumpAndSettle();
@@ -149,8 +149,8 @@ void main() {
       await tester.pumpApp(
         ds.Confirmation.createCancel(
           content: Text('Action?'),
-          onConfirm: () => confirmCount++,
-          onCancel: () => cancelCount++,
+          onConfirm: (_) => confirmCount++,
+          onCancel: (_) => cancelCount++,
         ),
       );
       await tester.pumpAndSettle();

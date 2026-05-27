@@ -8,12 +8,13 @@ import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'package:retrovibed/lucene.dart' as lucene;
 import 'package:retrovibed/discovery.dart' as disc;
-import './api.dart' as api;
-import './known.media.download.dart';
-import './known.media.display.dart';
-import './media.settings.dart';
-import './search.mimetype.dropdown.dart';
-import './grid.setting.dart';
+import 'api.dart' as api;
+import 'known.media.download.dart';
+import 'known.media.display.dart';
+import 'media.settings.dart';
+import 'search.mimetype.dropdown.dart';
+import 'grid.setting.dart';
+import 'known.media.dropdown.dart';
 
 class AvailableGridDisplay extends StatefulWidget {
   final media.FnMediaSearch apisearch;
@@ -129,6 +130,8 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
       setState(() {
         widget.search.value = media.MediaSearchResponse(items: replaced, next: widget.search.value.next);
       });
+
+      return v;
     };
 
     final category = mimex.category(widget.search.value.next.mimetypes);
@@ -284,43 +287,60 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                             ),
                     (context, _media) {
                       var onSettings = () {
-                        ds.modals
-                            .of(context)
-                            ?.push(
-                              MediaSettings(
-                                current: _media,
-                                onChange: (pending, {bool forced = false, bool autoclose = false}) {
-                                  pending
-                                      .then(replace)
-                                      .then((v) {
-                                        if (forced) refresh(widget.search.value.next, refocus: false);
-                                        if (autoclose) ds.modals.push(context, null);
-                                      })
-                                      .catchError((cause) {
-                                        setState(() {
-                                          _cause = ds.Error.unknown(cause, onTap: reseterr);
-                                        });
-                                      });
-                                },
-                              ),
-                            );
+                        ds.modals.asyncfn<media.Media>(
+                          context,
+                          (completion) => MediaSettings(
+                            current: _media,
+                            onChange: (pending, {bool forced = false, bool autoclose = false}) {
+                              pending
+                                  .then(replace)
+                                  .then((v) {
+                                    if (forced) refresh(widget.search.value.next, refocus: false);
+                                    if (autoclose) completion.complete(v);
+                                  })
+                                  .catchError((cause) {
+                                    setState(() {
+                                      _cause = ds.Error.unknown(cause, onTap: reseterr);
+                                    });
+                                  });
+                            },
+                          ),
+                        );
                       };
+                      final trailing = [
+                        ds.LoadingIconButton.info(
+                          tooltip: "manually identify the media",
+                          help: ds.Hint(
+                            Text("search for and select the correct media identity from the known library"),
+                          ),
+                          onPressed: KnownMediaDropdown.modal(
+                            context,
+                            _media,
+                            onChange: replace,
+                            mimetype: category,
+                          ),
+                        ),
+                      ];
+
+                      final key = ValueKey(uuidx.md5x("${_media.id}.${_media.updatedAt}"));
 
                       if (uuidx.isMinMax(
                         uuidx.fromString(_media.knownMediaId),
                       )) {
                         return KnownMediaDisplay.missing(
+                          key: key,
                           _media,
                           onTap: media.PlayAction(context, _media, widget.search.value),
                           onSettings: onSettings,
                           onChange: replace,
                           highlighted: _media.id == widget.highlighted,
-                          key: ValueKey(_media.id),
                           help: KnownMediaDisplay.hintPlayMedia,
+                          trailing: trailing,
                         );
                       }
 
                       return KnownMediaDisplay(
+                        key: key,
                         api.known
                             .cached(
                               _media.knownMediaId,
@@ -337,8 +357,8 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                         onChange: replace,
                         media: _media,
                         highlighted: _media.id == widget.highlighted,
-                        key: ValueKey(_media.id),
                         help: KnownMediaDisplay.hintPlayMedia,
+                        trailing: trailing,
                       );
                     },
                   ),

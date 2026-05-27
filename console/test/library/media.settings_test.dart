@@ -21,24 +21,6 @@ void main() {
       return api.KnownSearchResponse(items: [], next: req);
     }
 
-    // Mock metadataSync function that doesn't make HTTP calls
-    Future<media.MetadataSyncResponse> mockMetadataSync(
-      String id,
-      media.Media mediaItem, {
-      List<httpx.Option> options = const [],
-    }) async {
-      return media.MetadataSyncResponse(media: mediaItem);
-    }
-
-    // Mock library update function
-    Future<media.MediaUpdateResponse> mockLibraryUpdate(
-      String id,
-      media.Media upd, {
-      List<httpx.Option> options = const [],
-    }) async {
-      return media.MediaUpdateResponse(media: upd);
-    }
-
     setUp(() {
       // Create test media without torrent
       testMedia = media.Media(
@@ -79,8 +61,7 @@ void main() {
                 current: testMedia,
                 onChange: (pending, {bool forced = false, bool autoclose = false}) {},
                 knownSearch: mockKnownSearch,
-                discoveredMetadataSync: mockMetadataSync,
-                libraryMetadataSync: mockLibraryUpdate,
+
               ),
             ),
           ),
@@ -109,8 +90,7 @@ void main() {
                       current: testMedia,
                       onChange: (pending, {bool forced = false, bool autoclose = false}) {},
                       knownSearch: mockKnownSearch,
-                      discoveredMetadataSync: mockMetadataSync,
-                      libraryMetadataSync: mockLibraryUpdate,
+
                     ),
                   ),
                 ),
@@ -137,8 +117,7 @@ void main() {
                       current: testMedia,
                       onChange: (pending, {bool forced = false, bool autoclose = false}) {},
                       knownSearch: mockKnownSearch,
-                      discoveredMetadataSync: mockMetadataSync,
-                      libraryMetadataSync: mockLibraryUpdate,
+
                     ),
                   ),
                 ),
@@ -172,8 +151,7 @@ void main() {
                           current: testMedia,
                           onChange: (pending, {bool forced = false, bool autoclose = false}) {},
                           knownSearch: mockKnownSearch,
-                          discoveredMetadataSync: mockMetadataSync,
-                          libraryMetadataSync: mockLibraryUpdate,
+
                         ),
                       ),
                     ),
@@ -203,8 +181,7 @@ void main() {
                 current: testMedia,
                 onChange: (pending, {bool forced = false, bool autoclose = false}) {},
                 knownSearch: mockKnownSearch,
-                discoveredMetadataSync: mockMetadataSync,
-                libraryMetadataSync: mockLibraryUpdate,
+
               ),
             ),
           ),
@@ -228,8 +205,7 @@ void main() {
                 current: testMediaWithTorrent,
                 onChange: (pending, {bool forced = false, bool autoclose = false}) {},
                 knownSearch: mockKnownSearch,
-                discoveredMetadataSync: mockMetadataSync,
-                libraryMetadataSync: mockLibraryUpdate,
+
               ),
             ),
           ),
@@ -255,8 +231,7 @@ void main() {
                 current: testMedia,
                 onChange: (pending, {bool forced = false, bool autoclose = false}) {},
                 knownSearch: mockKnownSearch,
-                discoveredMetadataSync: mockMetadataSync,
-                libraryMetadataSync: mockLibraryUpdate,
+
               ),
             ),
           ),
@@ -286,8 +261,7 @@ void main() {
                     current: currentMedia,
                     onChange: (pending, {bool forced = false, bool autoclose = false}) {},
                     knownSearch: mockKnownSearch,
-                    discoveredMetadataSync: mockMetadataSync,
-                    libraryMetadataSync: mockLibraryUpdate,
+
                   ),
                 ),
               );
@@ -336,8 +310,7 @@ void main() {
                   capturedMedia = await pending;
                 },
                 knownSearch: mockKnownSearch,
-                discoveredMetadataSync: mockMetadataSync,
-                libraryMetadataSync: mockLibraryUpdate,
+
               ),
             ),
           ),
@@ -368,8 +341,7 @@ void main() {
                   capturedMedia = await pending;
                 },
                 knownSearch: mockKnownSearch,
-                discoveredMetadataSync: mockMetadataSync,
-                libraryMetadataSync: mockLibraryUpdate,
+
               ),
             ),
           ),
@@ -394,8 +366,7 @@ void main() {
                 current: testMediaWithTorrent,
                 onChange: (pending, {bool forced = false, bool autoclose = false}) {},
                 knownSearch: mockKnownSearch,
-                discoveredMetadataSync: mockMetadataSync,
-                libraryMetadataSync: mockLibraryUpdate,
+
               ),
             ),
           ),
@@ -418,8 +389,7 @@ void main() {
                 current: testMedia,
                 onChange: (pending, {bool forced = false, bool autoclose = false}) {},
                 knownSearch: mockKnownSearch,
-                discoveredMetadataSync: mockMetadataSync,
-                libraryMetadataSync: mockLibraryUpdate,
+
               ),
             ),
           ),
@@ -455,8 +425,7 @@ void main() {
                   captureOnChange?.call(forced);
                 },
                 knownSearch: mockKnownSearch,
-                discoveredMetadataSync: mockMetadataSync,
-                libraryMetadataSync: mockLibraryUpdate,
+
                 discoveredGet: mockDiscoveredGet,
                 discoveredUpdate: (id, download, {options = const []}) async {
                   onUpdate(id, download);
@@ -534,6 +503,73 @@ void main() {
       });
     });
 
+    group('deactivate', () {
+      testWidgets('calls mediaUpdate with modified media when dirty', (tester) async {
+        String? capturedId;
+        media.Media? capturedMedia;
+
+        await tester.pumpApp(
+          SizedBox(
+            width: 800,
+            height: 600,
+            child: SingleChildScrollView(
+              child: MediaSettings(
+                current: testMedia,
+                onChange: (pending, {bool forced = false, bool autoclose = false}) {},
+                knownSearch: mockKnownSearch,
+                mediaUpdate: (id, upd, {options = const []}) async {
+                  capturedId = id;
+                  capturedMedia = media.Media()..mergeFromMessage(upd);
+                  return media.MediaUpdateResponse(media: upd);
+                },
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Edit the description to make the state dirty
+        await tester.enterText(find.byType(TextFormField).first, 'updated description');
+        await tester.pump();
+
+        // Navigate away to trigger deactivate()
+        await tester.pumpWidget(const MaterialApp(home: Scaffold(body: Text('gone'))));
+        await tester.pump();
+
+        expect(capturedId, equals(testMedia.id));
+        expect(capturedMedia?.description, equals('updated description'));
+      });
+
+      testWidgets('does not call mediaUpdate when not dirty', (tester) async {
+        bool updateCalled = false;
+
+        await tester.pumpApp(
+          SizedBox(
+            width: 800,
+            height: 600,
+            child: SingleChildScrollView(
+              child: MediaSettings(
+                current: testMedia,
+                onChange: (pending, {bool forced = false, bool autoclose = false}) {},
+                knownSearch: mockKnownSearch,
+                mediaUpdate: (id, upd, {options = const []}) async {
+                  updateCalled = true;
+                  return media.MediaUpdateResponse(media: upd);
+                },
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Navigate away WITHOUT editing anything
+        await tester.pumpWidget(const MaterialApp(home: Scaffold(body: Text('gone'))));
+        await tester.pump();
+
+        expect(updateCalled, isFalse);
+      });
+    });
+
     group('onTap (reset)', () {
       Future<media.DownloadMetadataResponse> mockDiscoveredGet(
         String id, {
@@ -557,8 +593,7 @@ void main() {
                   captureOnChange?.call(forced);
                 },
                 knownSearch: mockKnownSearch,
-                discoveredMetadataSync: mockMetadataSync,
-                libraryMetadataSync: mockLibraryUpdate,
+
                 discoveredGet: mockDiscoveredGet,
                 discoveredUpdate: (id, download, {options = const []}) async =>
                     media.DownloadUpdateResponse(),

@@ -141,6 +141,7 @@ func MetadataOptionAutoHidden(m *Metadata) {
 	_, ok := slicesx.Find(func(mime string) bool {
 		return m.Mimetype == mime
 	}, mimex.RetrovibedMediaArchive, mimex.RetrovibedNeural)
+
 	if !ok {
 		return
 	}
@@ -373,12 +374,18 @@ func DownloadInto(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, mc libra
 			continue
 		}
 
-		desc := langx.FirstNonZero(errorsx.Zero(mc.Clean(ctx, md.Description)), DescriptionFromPath(md, tx.Path))
+		desc, cause := mc.Clean(ctx, stringsx.Join(" ", md.Description, DescriptionFromPath(md, tx.Path)))
+		if err != nil {
+			log.Println("import failed", cause)
+			err = errorsx.Compact(err, cause)
+			continue
+		}
+
 		log.Println("------------------------------------------- cleaned", md.Description, tx.Path, "->", desc)
 
 		lmd := library.NewMetadata(
 			md5x.FormatUUID(tx.MD5),
-			library.MetadataOptionDescription(desc),
+			library.MetadataOptionDescription(strings.TrimSpace(desc)),
 			library.MetadataOptionAutoDescription(library.NormalizedDescription(desc)),
 			library.MetadataOptionBytes(tx.Bytes),
 			library.MetadataOptionOffset(tx.Offset),
@@ -416,11 +423,15 @@ func DownloadInto(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, mc libra
 
 func DescriptionFromPath(md *Metadata, path string) string {
 	tmp := filepath.Base(path)
-	if hex.EncodeToString(md.Infohash) == tmp {
-		tmp = ""
+	if tmp == hex.EncodeToString(md.Infohash) {
+		return ""
 	}
 
-	return library.NormalizedDescription(stringsx.FirstNonBlank(tmp, md.Description))
+	if tmp == md.Description {
+		return ""
+	}
+
+	return tmp
 }
 
 func DownloadProgress(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torrent.Torrent) {

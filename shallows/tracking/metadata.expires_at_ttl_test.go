@@ -21,7 +21,7 @@ func TestMetadataOptionExpiresAtTTL(t *testing.T) {
 		require.WithinDuration(t, md.ExpiresAt, time.Now(), 5*time.Minute+time.Second)
 	})
 
-	t.Run("duration == 0", func(t *testing.T) {
+	t.Run("duration == 0 should use the default", func(t *testing.T) {
 		md := NewMetadata(
 			langx.Autoptr(int160.Random()),
 			MetadataOptionExpiresAtTTL(0),

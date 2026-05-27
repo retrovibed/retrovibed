@@ -118,8 +118,8 @@ class _RecommendationsState extends State<Recommendations> {
                         context,
                         (completion) => ds.Confirmation.ok(
                           content: Text("automatic media discovery is not yet implemented"),
-                          onConfirm: completion.complete,
-                          onCancel: completion.complete,
+                          onConfirm: (_) => completion.complete(),
+                          onCancel: (_) => completion.complete(),
                         ),
                       );
                     },

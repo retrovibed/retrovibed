@@ -65,13 +65,13 @@ class _QRScannerModalState extends State<QRScannerModal> {
                   ),
                 ],
               ),
-              onConfirm: () {
+              onConfirm: (_) {
                 widget.onScanned(community, attribution).catchError((e, s) {
                   setState(() => _cause = ds.Error.unknown(e, onTap: _reseterr));
                   return Future.error(e);
                 }).ignore();
               },
-              onCancel: _reseterr,
+              onCancel: (_) => _reseterr(),
             ),
           ),
     );

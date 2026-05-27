@@ -144,8 +144,8 @@ class _DisplayState extends State<Display> {
                               content: Text(
                                 'Delete ${_library.value.description}?',
                               ),
-                              onCancel: () => overlay(ds.Empty),
-                              onConfirm: () {
+                              onCancel: (_) => overlay(ds.Empty),
+                              onConfirm: (_) {
                                 httpx.withRetry(
                                   () => meta.daemons.delete(_library.value.id).then((_) {
                                     overlay(ds.Empty);

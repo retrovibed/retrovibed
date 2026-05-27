@@ -128,7 +128,7 @@ class _DeepLinkState extends State<DeepLink> {
                     content: Column(
                       children: [CommunityDetail(community: c)],
                     ),
-                    onConfirm: () {
+                    onConfirm: (context) {
                       widget.subscribe(context, c, '').catchError((e, s) {
                         setState(
                           () => _overlay = ds.Error.unknown(e, onTap: _dismiss),
@@ -137,7 +137,7 @@ class _DeepLinkState extends State<DeepLink> {
                       }).ignore();
                       _dismiss();
                     },
-                    onCancel: _dismiss,
+                    onCancel: (_) => _dismiss(),
                   ),
                 ),
           );

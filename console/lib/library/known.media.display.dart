@@ -16,7 +16,7 @@ class KnownMediaDisplay extends StatefulWidget {
   final GestureTapCallback? onDoubleTap;
   final void Function()? onSettings;
   final void Function(_media.Media upd)? onChange;
-  final Widget? trailing;
+  final List<Widget> trailing;
   final bool highlighted;
   final Widget help;
 
@@ -27,7 +27,7 @@ class KnownMediaDisplay extends StatefulWidget {
     this.onDoubleTap,
     this.onSettings,
     this.onChange,
-    this.trailing,
+    this.trailing = const [],
     this.highlighted = false,
     this.help = ds.HelpScope.None,
     required this.media,
@@ -40,7 +40,7 @@ class KnownMediaDisplay extends StatefulWidget {
     GestureTapCallback? onDoubleTap,
     void Function()? onSettings,
     void Function(_media.Media upd)? onChange,
-    Widget? trailing,
+    List<Widget> trailing = const [],
     bool highlighted = false,
     Widget help = ds.HelpScope.None,
   }) {
@@ -212,6 +212,7 @@ class _KnownMediaDisplayState extends State<KnownMediaDisplay> {
                   toggled: hovered.value,
                   onPressed: () async => setState(() => hovered.value = !hovered.value),
                 ),
+              ...widget.trailing,
             ],
           );
         },

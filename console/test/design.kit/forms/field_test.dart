@@ -281,6 +281,56 @@ void main() {
       });
     });
 
+    group('with trailing widgets', () {
+      testWidgets('renders trailing widget without overflow at default size', (
+        WidgetTester tester,
+      ) async {
+        await tester.pumpApp(
+          Field(
+            label: Text('id'),
+            input: Text('some-id-value'),
+            trailing: [IconButton(onPressed: null, icon: Icon(Icons.delete_forever_rounded))],
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.byType(Field), findsOneWidget);
+        expect(find.byIcon(Icons.delete_forever_rounded), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('renders trailing widget without overflow in narrow SizedBox (200px)', (
+        WidgetTester tester,
+      ) async {
+        await tester.pumpApp(
+          SizedBox(
+            width: 200,
+            child: Field(
+              label: Text('id'),
+              input: Text('some-id-value'),
+              trailing: [IconButton(onPressed: null, icon: Icon(Icons.delete_forever_rounded))],
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.byType(Field), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('omitting trailing defaults to empty list with no overflow', (
+        WidgetTester tester,
+      ) async {
+        await tester.pumpApp(
+          Field(label: Text('id'), input: Text('some-id-value')),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.byType(Field), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
+    });
+
     group('in Column', () {
       testWidgets('multiple fields in Column do not overflow at 200px', (
         WidgetTester tester,

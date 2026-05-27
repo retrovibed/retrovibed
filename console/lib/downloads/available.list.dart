@@ -279,7 +279,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                             content: Text(
                               "Are you sure you want to verify ${v.media.description}?",
                             ),
-                            onConfirm: () {
+                            onConfirm: (context) {
                               media.discovered
                                   .update(
                                     v.media.torrentId,
@@ -291,7 +291,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                                     completion.completeError(cause);
                                   });
                             },
-                            onCancel: completion.complete,
+                            onCancel: (_) => completion.complete(),
                           ),
                         ),
                     onTap:
@@ -301,7 +301,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                             content: Text(
                               "Are you sure you want to reset ${v.media.description}?",
                             ),
-                            onConfirm: () {
+                            onConfirm: (context) {
                               httpx
                                   .withRetry(
                                     () => media.discovered.reset(
@@ -326,7 +326,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                                     completion.completeError(cause);
                                   });
                             },
-                            onCancel: completion.complete,
+                            onCancel: (_) => completion.complete(),
                           ),
                         ),
                     trailing: [],

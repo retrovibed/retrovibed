@@ -42,6 +42,10 @@ func (t importDirectory) run(ctx context.Context, enc *jsonl.Encoder, c *http.Cl
 		Entry fs.DirEntry
 	}
 
+	encwriter := asynccompute.New(func(ctx context.Context, w *media.Media) (err error) {
+		return enc.Encode(w)
+	}, asynccompute.Workers[*media.Media](1), asynccompute.Backlog[*media.Media](t.Concurrency*2))
+
 	publisher := asynccompute.New(func(ctx context.Context, w Workload) (err error) {
 		var (
 			m = new(media.MediaUploadResponse)
@@ -88,7 +92,7 @@ func (t importDirectory) run(ctx context.Context, enc *jsonl.Encoder, c *http.Cl
 			return err
 		}
 
-		return enc.Encode(m.Media)
+		return encwriter.Run(ctx, m.Media)
 	}, asynccompute.Workers[Workload](t.Concurrency))
 
 	w := fsx.Walk(os.DirFS(t.Directory))
@@ -106,5 +110,8 @@ func (t importDirectory) run(ctx context.Context, enc *jsonl.Encoder, c *http.Cl
 		return errorsx.Wrapf(err, "failed to import directory: %s", t.Directory)
 	}
 
-	return asynccompute.Shutdown(ctx, publisher)
+	return langx.FirstNonNil(
+		asynccompute.Shutdown(ctx, publisher),
+		asynccompute.Shutdown(ctx, encwriter),
+	)
 }

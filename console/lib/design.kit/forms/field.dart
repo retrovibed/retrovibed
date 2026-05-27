@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class Field extends StatelessWidget {
   final Widget label;
   final Widget input;
+  final List<Widget> trailing;
   final EdgeInsets margin;
   final EdgeInsets padding;
 
@@ -10,6 +11,7 @@ class Field extends StatelessWidget {
     super.key,
     required this.input,
     this.label = const SizedBox(),
+    this.trailing = const [],
     this.margin = EdgeInsets.zero,
     this.padding = EdgeInsets.zero,
   });
@@ -25,7 +27,7 @@ class Field extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(width: double.infinity, child: input),
+            Row(children: [Expanded(child: input), ...trailing]),
             DefaultTextStyle(
               style: theme.textTheme.bodySmall!.copyWith(
                 color: theme.hintColor,
