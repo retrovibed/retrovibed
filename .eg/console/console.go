@@ -74,33 +74,21 @@ func GenerateDevStaticBinding(rt shell.Command, outdir string, staticdirs ...str
 
 		for _, dir := range staticdirs {
 			fmt.Fprintf(&cgoFlags, " -L%s", dir)
-
-			libs, _ := filepath.Glob(filepath.Join(dir, "*.a"))
-			if len(libs) > 0 {
-				fmt.Fprintf(&cgoFlags, " -Wl,-Bstatic")
-				for _, lib := range libs {
-					name := strings.TrimSuffix(filepath.Base(lib), ".a")
-					name = strings.TrimPrefix(name, "lib")
-					fmt.Fprintf(&cgoFlags, " -l%s", name)
-				}
-				fmt.Fprintf(&cgoFlags, " -Wl,-Bdynamic")
-			}
 		}
 
-		// Standard optimization flags (retained from your original script)
-		fmt.Fprintf(&cgoFlags, " -static-libstdc++ -Wl,-z,max-page-size=16384")
+		// 1. Link to the clean dynamic libduckdb.so to drop duplicate symbol issues
+		// 2. Explicitly bind libpredicttext.a statically so its Rust code is baked inside
+		// duckdb is an absolute disaster to statically link
+		fmt.Fprintf(&cgoFlags, " -lduckdb -Wl,-Bstatic -lpredicttext -Wl,-Bdynamic -static-libstdc++ -Wl,-z,max-page-size=16384")
 
 		runtime := flutterRuntimev2(rt).Debug()
 		return shell.Run(
 			ctx,
 			runtime.Newf(
-				"go -C retrovibedbind build -trimpath -buildmode=c-shared -buildvcs=true --tags duckdb_use_static_lib,localdev,retrovibed,neural -o %s/libretrovibed.so .",
+				"go -C retrovibedbind build -trimpath -buildmode=c-shared -buildvcs=true --tags localdev,retrovibed,neural -o %s/libretrovibed.so .",
 				outdir,
 			).
-				Environ("CGO_LDFLAGS", strings.TrimSpace(cgoFlags.String())).
-				// FIX: Force Go/CGO to use global-dynamic thread local storage instead of static pools
-				Environ("CGO_CFLAGS", "-ftls-model=global-dynamic").
-				Environ("CGO_CXXFLAGS", "-ftls-model=global-dynamic"),
+				Environ("CGO_LDFLAGS", strings.TrimSpace(cgoFlags.String())),
 		)
 	}
 }

@@ -18,7 +18,7 @@ func runtime() shell.Command {
 		Environ("CARGO_TARGET_DIR", egenv.CacheDirectory("neurals", "target"))
 }
 
-// Compile runs cargo build --release then rsyncs libpredicttext.so into dir.
+// Compile runs cargo build --release.
 func Compile(dir string) eg.OpFn {
 	return func(ctx context.Context, op eg.Op) error {
 		sruntime := runtime()

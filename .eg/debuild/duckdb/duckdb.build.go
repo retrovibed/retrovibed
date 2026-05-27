@@ -39,14 +39,14 @@ func compile(runtime shell.Command, build string) eg.OpFn {
 			Directory(egenv.CacheDirectory("duckdb"))
 		return shell.Run(
 			ctx,
-			sruntime.New("env"),
-			sruntime.New(build).Environ(
-				"EXTENSION_CONFIGS", egenv.WorkingDirectory(".dist", "duckdb_config.cmake"),
-			).Timeout(egenv.TTL()),
+			sruntime.New(build).
+				Environ("DUCKDB_EXTENSIONS", "inet").
+				Environ(
+					"EXTENSION_CONFIGS", egenv.WorkingDirectory(".dist", "duckdb_config.cmake"),
+				).Timeout(egenv.TTL()),
 			sruntime.Newf("mkdir -p %s", egenv.EphemeralDirectory("duckdb")),
 			sruntime.Newf("cp build/release/libduckdb_bundle.a %s/", egenv.EphemeralDirectory("duckdb")),
 			sruntime.Newf("cp build/release/src/libduckdb.so %s/", egenv.EphemeralDirectory("duckdb")),
-			sruntime.Newf("ls -lha %s", egenv.EphemeralDirectory("duckdb")),
 		)
 	}
 }
