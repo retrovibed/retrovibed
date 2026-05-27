@@ -37,8 +37,8 @@ class Edit extends StatelessWidget {
                     modal?.push(
                       ds.Confirmation.yesNo(
                         content: Text('Delete ${current.description}?'),
-                        onCancel: () => modal.push(null),
-                        onConfirm: () {
+                        onCancel: (_) => modal.push(null),
+                        onConfirm: (_) {
                           api.wireguard.delete(current.id).then((_) {
                             modal.push(null);
                           });

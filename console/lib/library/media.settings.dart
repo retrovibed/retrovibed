@@ -117,33 +117,32 @@ class _MediaSettingsState extends State<MediaSettings> {
                                 content: Text(
                                   "Are you sure you want to verify ${_modified.description}?",
                                 ),
-                                onConfirm: () {
+                                onConfirm: (ctx) {
                                   widget
                                       .discoveredUpdate(
                                         _modified.torrentId,
                                         download..verifyAt = DateTime.now().toUtc().toIso8601String(),
-                                        options: [authn.request(authn.AuthzCache.meta(context))],
+                                        options: [authn.request(authn.AuthzCache.meta(ctx))],
                                       )
                                       .then((_) => completion.complete())
                                       .catchError((cause) {
                                         completion.completeError(cause);
                                       });
                                 },
-                                onCancel: completion.complete,
+                                onCancel: (_) => completion.complete(),
                               ),
                             ),
                         onTap:
                             () => ds.modals.asyncfn(context, (completion) {
-                              final _options = [authn.request(authn.AuthzCache.meta(context))];
                               return ds.Confirmation.yesNo(
                                 content: Text(
                                   "Are you sure you want to reset ${_modified.description}?",
                                 ),
-                                onConfirm: () {
+                                onConfirm: (ctx) {
                                   widget
                                       .discoveredReset(
                                         _modified.torrentId,
-                                        options: _options,
+                                        options: [authn.request(authn.AuthzCache.meta(ctx))],
                                       )
                                       .then((v) {
                                         widget.onChange(
@@ -156,7 +155,7 @@ class _MediaSettingsState extends State<MediaSettings> {
                                         completion.completeError(cause);
                                       });
                                 },
-                                onCancel: completion.complete,
+                                onCancel: (_) => completion.complete(),
                               );
                             }),
                       ),

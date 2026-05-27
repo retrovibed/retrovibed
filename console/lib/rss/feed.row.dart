@@ -88,7 +88,7 @@ class _FeedRowState extends State<FeedRow> {
                       content: Text(
                         "Are you sure you want to delete the ${widget.current.description} feed?",
                       ),
-                      onConfirm: () {
+                      onConfirm: (context) {
                         httpx
                             .withRetry(
                               () => api.delete(
@@ -113,7 +113,7 @@ class _FeedRowState extends State<FeedRow> {
                               ds.modals.of(context)?.push(null);
                             });
                       },
-                      onCancel: () {
+                      onCancel: (context) {
                         ds.modals.of(context)?.push(null);
                       },
                     ),

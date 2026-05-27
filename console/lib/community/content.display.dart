@@ -213,12 +213,12 @@ class _ContentRow extends StatelessWidget {
                       content: Text(
                         'Are you sure you want to delist "${item.title.isNotEmpty ? item.title : item.id}"?',
                       ),
-                      onConfirm: () {
+                      onConfirm: (context) {
                         onDelete!(item).whenComplete(() {
                           ds.modals.of(context)?.push(null);
                         });
                       },
-                      onCancel: () {
+                      onCancel: (context) {
                         ds.modals.of(context)?.push(null);
                       },
                     ),

@@ -7,8 +7,8 @@ class Confirmation extends StatelessWidget {
   final Widget content;
   final Widget confirmation;
   final Widget cancellation;
-  final VoidCallback? onConfirm;
-  final VoidCallback? onCancel;
+  final void Function(BuildContext)? onConfirm;
+  final void Function(BuildContext)? onCancel;
 
   const Confirmation({
     super.key,
@@ -22,8 +22,8 @@ class Confirmation extends StatelessWidget {
   factory Confirmation.ok({
     Key? key,
     required Widget content,
-    VoidCallback? onConfirm,
-    VoidCallback? onCancel,
+    void Function(BuildContext)? onConfirm,
+    void Function(BuildContext)? onCancel,
   }) {
     return Confirmation(
       key: key,
@@ -38,8 +38,8 @@ class Confirmation extends StatelessWidget {
   factory Confirmation.yesNo({
     Key? key,
     required Widget content,
-    VoidCallback? onConfirm,
-    VoidCallback? onCancel,
+    void Function(BuildContext)? onConfirm,
+    void Function(BuildContext)? onCancel,
   }) {
     return Confirmation(
       key: key,
@@ -54,8 +54,8 @@ class Confirmation extends StatelessWidget {
   factory Confirmation.createCancel({
     Key? key,
     required Widget content,
-    VoidCallback? onConfirm,
-    VoidCallback? onCancel,
+    void Function(BuildContext)? onConfirm,
+    void Function(BuildContext)? onCancel,
   }) {
     return Confirmation(
       key: key,
@@ -87,7 +87,7 @@ class Confirmation extends StatelessWidget {
             children: [
               InkWell(
                 autofocus: true,
-                onTap: onCancel,
+                onTap: onCancel == null ? null : () => onCancel!(context),
                 mouseCursor: SystemMouseCursors.click,
                 borderRadius: defaults.borderRadius,
                 child: Container(
@@ -103,7 +103,7 @@ class Confirmation extends StatelessWidget {
               ),
               if (confirmation != Empty)
                 InkWell(
-                  onTap: onConfirm,
+                  onTap: onConfirm == null ? null : () => onConfirm!(context),
                   mouseCursor: SystemMouseCursors.click,
                   borderRadius: defaults.borderRadius,
                   child: Container(

@@ -79,7 +79,7 @@ class DownloadDisplay extends StatelessWidget {
               if (onVerify != null)
                 ds.LoadingIconButton(
                   onPressed: () => onVerify!(current),
-                  tooltip: "validate stored data",
+                  tooltip: "verify data",
                   icon: Icon(Icons.fact_check),
                 ),
               if (onTap != null)

@@ -41,11 +41,11 @@ class CancellationButton extends StatelessWidget {
               content: const Text(
                 'Are you sure you want to delete your account? This action cannot be undone.',
               ),
-              onConfirm: () {
+              onConfirm: (_) {
                 final pending = authzmd.billingModify ? deleteaccount() : deleteidentity();
                 pending.then((_) => completion.complete()).catchError(completion.completeError);
               },
-              onCancel: () => completion.complete(),
+              onCancel: (_) => completion.complete(),
             ),
           ),
     );
