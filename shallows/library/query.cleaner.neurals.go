@@ -43,6 +43,8 @@ func NewQueryerCleanerV0(path string, options ...func(*neurals.Text)) *QueryerCl
 		return nil
 	}
 
+	log.Println("neural located at", path, "loading...")
+
 	return &QueryerCleanerV0{text: neurals.NewText(path, options...)}
 }
 
