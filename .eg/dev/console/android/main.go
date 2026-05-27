@@ -46,7 +46,7 @@ func main() {
 				duckdb.MaybeBuild("console/android/app/src/main/jniLibs/x86_64/libduckdb_static.a", duckdb.CompileAndroid("android_x86_64", "x86_64"), duckdb.CloneAndroid),
 				eg.Sequential(
 					console.Generate,
-					console.GenerateDevStaticBinding(egenv.WorkingDirectory("console/android/app/src/main/jniLibs/x86_64"), console.AndroidRuntime("x86_64-none-linux-android31")),
+					console.GenerateDevStaticBinding(console.AndroidRuntime("x86_64-none-linux-android31"), egenv.WorkingDirectory("console/android/app/src/main/jniLibs/x86_64"), egenv.WorkingDirectory("console/android/app/src/main/jniLibs/x86_64")),
 					console.BuildLinux,
 				),
 			),

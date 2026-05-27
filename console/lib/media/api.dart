@@ -115,14 +115,15 @@ abstract class media {
     return Uri.https(httpx.host(), "/m/${id}").toString();
   }
 
-  static Future<MediaDeleteResponse> delete(String id) async {
-    final client = http.Client();
-    return client
+  static Future<MediaDeleteResponse> delete(
+    String id, {
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx
         .delete(
           Uri.https(httpx.host(), "/m/${id}"),
-          headers: {"Authorization": httpx.auto_bearer_host()},
+          options: [httpx.Accept.json, ...options],
         )
-        .then(httpx.auto_error)
         .then((v) {
           return Future.value(
             MediaDeleteResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),

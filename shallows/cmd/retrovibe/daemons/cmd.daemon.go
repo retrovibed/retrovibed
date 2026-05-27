@@ -134,6 +134,9 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		mc             = library.NewQueryerCleanerAuto()
 	)
 
+	log.Println("--------------------------------------------------------------------------------")
+	mc.Clean(gctx.Context, "DERP DERP")
+	log.Println("--------------------------------------------------------------------------------")
 	gctx.Cleanup.Add(1)
 	defer gctx.Cleanup.Done()
 

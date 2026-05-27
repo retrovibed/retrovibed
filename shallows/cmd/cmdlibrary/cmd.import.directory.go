@@ -65,11 +65,12 @@ func (t importDirectory) run(ctx context.Context, enc *jsonl.Encoder, c *http.Cl
 		}
 		defer f.Close()
 
-		filename := filepath.Base(strings.TrimPrefix(w.Path, t.Directory))
+		filename := strings.TrimPrefix(w.Path, filepath.Dir(strings.TrimSuffix(t.Directory, string(filepath.Separator))))
+		filename = strings.ReplaceAll(filename, string(filepath.Separator), " ")
 		mimetype := langx.FirstNonZero(t.Mimetype, mime.TypeByExtension(filepath.Ext(filename)), mimex.Binary)
 
 		contentType, body, err := httpx.Multipart(func(mw *multipart.Writer) error {
-			part, lerr := mw.CreatePart(httpx.NewMultipartHeader(mimetype, "content", w.Path))
+			part, lerr := mw.CreatePart(httpx.NewMultipartHeader(mimetype, "content", filename))
 			if lerr != nil {
 				return lerr
 			}

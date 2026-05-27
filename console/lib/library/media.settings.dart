@@ -5,6 +5,7 @@ import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'package:retrovibed/httpx.dart' as httpx;
+import 'media.download.accordian.dart';
 import 'metadata.edit.dart';
 import 'api.dart' as api;
 
@@ -35,6 +36,11 @@ class MediaSettings extends StatefulWidget {
     List<httpx.Option> options,
   })
   mediaUpdate;
+  final Future<media.MediaDeleteResponse> Function(
+    String id, {
+    List<httpx.Option> options,
+  })
+  mediaDelete;
 
   const MediaSettings({
     super.key,
@@ -46,6 +52,7 @@ class MediaSettings extends StatefulWidget {
     this.discoveredReset = media.discovered.reset,
     this.discoveredGet = media.discovered.get,
     this.mediaUpdate = media.media.update,
+    this.mediaDelete = media.media.delete,
   });
 
   @override
@@ -86,6 +93,28 @@ class _MediaSettingsState extends State<MediaSettings> {
             MediaEdit(
               current: _modified,
               padding: defaults.padding,
+              deletable: ds.LoadingIconButton(
+                icon: Icon(Icons.delete_forever_rounded),
+                onPressed:
+                    () => ds.modals.asyncfn(
+                      context,
+                      ds.Confirmation.dangerous(
+                        content: Text(
+                          "Are you sure you want to delete ${_modified.description}?",
+                        ),
+                        onConfirm: (ctx) => httpx
+                            .withRetry(
+                              () => widget.mediaDelete(
+                                _modified.id,
+                                options: [authn.request(authn.AuthzCache.meta(ctx))],
+                              ),
+                            )
+                            .then((_) {
+                              widget.onChange(Future.value(_modified), forced: true, autoclose: true);
+                            }),
+                      ),
+                    ),
+              ),
               closable: ds.LoadingIconButton.close(
                 onPressed: () async => widget.onChange(Future.value(widget.current), autoclose: true),
               ),
@@ -99,69 +128,13 @@ class _MediaSettingsState extends State<MediaSettings> {
               },
             ),
             if (!uuidx.isMinMax(uuidx.fromString(_modified.torrentId)))
-              ds.Container(
-                background: theme.colorScheme.surface,
-                ds.Accordion(
-                  expanded: true,
-                  description: Text("source details"),
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      media.DownloadDisplay.fromID(
-                        _modified.torrentId,
-                        get: widget.discoveredGet,
-                        onVerify:
-                            (download) => ds.modals.asyncfn(
-                              context,
-                              (completion) => ds.Confirmation.yesNo(
-                                content: Text(
-                                  "Are you sure you want to verify ${_modified.description}?",
-                                ),
-                                onConfirm: (ctx) {
-                                  widget
-                                      .discoveredUpdate(
-                                        _modified.torrentId,
-                                        download..verifyAt = DateTime.now().toUtc().toIso8601String(),
-                                        options: [authn.request(authn.AuthzCache.meta(ctx))],
-                                      )
-                                      .then((_) => completion.complete())
-                                      .catchError((cause) {
-                                        completion.completeError(cause);
-                                      });
-                                },
-                                onCancel: (_) => completion.complete(),
-                              ),
-                            ),
-                        onTap:
-                            () => ds.modals.asyncfn(context, (completion) {
-                              return ds.Confirmation.yesNo(
-                                content: Text(
-                                  "Are you sure you want to reset ${_modified.description}?",
-                                ),
-                                onConfirm: (ctx) {
-                                  widget
-                                      .discoveredReset(
-                                        _modified.torrentId,
-                                        options: [authn.request(authn.AuthzCache.meta(ctx))],
-                                      )
-                                      .then((v) {
-                                        widget.onChange(
-                                          Future.value(_modified),
-                                          forced: true,
-                                        );
-                                        completion.complete();
-                                      })
-                                      .catchError((cause) {
-                                        completion.completeError(cause);
-                                      });
-                                },
-                                onCancel: (_) => completion.complete(),
-                              );
-                            }),
-                      ),
-                    ],
-                  ),
-                ),
+              MediaDownloadAccordian(
+                torrentId: _modified.torrentId,
+                description: _modified.description,
+                discoveredGet: widget.discoveredGet,
+                discoveredUpdate: widget.discoveredUpdate,
+                discoveredReset: widget.discoveredReset,
+                onReset: () => widget.onChange(Future.value(_modified), forced: true),
               ),
           ],
         ),

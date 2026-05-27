@@ -9,10 +9,12 @@ import "C"
 
 import (
 	"fmt"
+	"log"
 	"unsafe"
 )
 
 func predict(t *Text, input string) (string, error) {
+	log.Println("-----------------------------------------------------------------------")
 	cModel := C.CString(t.model)
 	defer C.free(unsafe.Pointer(cModel))
 	cInput := C.CString(input)

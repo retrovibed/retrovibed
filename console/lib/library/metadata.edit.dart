@@ -11,12 +11,14 @@ class MediaEdit extends StatelessWidget {
   final media.Media current;
   final Function(Future<media.Media>) onChange;
   final Widget closable;
+  final Widget deletable;
   final EdgeInsets? padding;
   MediaEdit({
     super.key,
     required this.current,
     required this.onChange,
     this.closable = ds.Empty,
+    this.deletable = ds.Empty,
     this.padding,
   });
 
@@ -101,7 +103,7 @@ class MediaEdit extends StatelessWidget {
           forms.Field(
             label: Text("id"),
             input: Text(current.id),
-            trailing: [closable],
+            trailing: [deletable, closable],
           ),
           forms.Field(
             label: Text("description"),

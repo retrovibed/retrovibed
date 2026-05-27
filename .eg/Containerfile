@@ -60,3 +60,7 @@ RUN update-alternatives --set sudo /usr/bin/sudo.ws
 # noop apt-key (deprecated in newer Ubuntu, causes errors in some tools, specifically appimage-builder which doesnt use it but checks for it)
 RUN printf '#!/bin/sh\nexit 0\n' > /usr/local/bin/apt-key && chmod +x /usr/local/bin/apt-key
 RUN apt-get update && apt-get -y install zsync
+
+RUN apt-get install -y rustup
+RUN sudo -u egd rustup default stable
+ENV PATH=/home/egd/.cargo/bin:$PATH
