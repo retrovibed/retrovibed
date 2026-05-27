@@ -48,16 +48,8 @@ class MediaSettings extends StatefulWidget {
 class _MediaSettingsState extends State<MediaSettings> {
   bool _dirty = false;
   media.Media _modified;
-  List<httpx.Option> _authOptions = [];
 
   _MediaSettingsState(this._modified);
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // Cache auth context while it's still valid
-    _authOptions = [authn.request(authn.AuthzCache.meta(context))];
-  }
 
   @override
   void deactivate() {
@@ -120,7 +112,7 @@ class _MediaSettingsState extends State<MediaSettings> {
                                       .discoveredUpdate(
                                         _modified.torrentId,
                                         download..verifyAt = DateTime.now().toUtc().toIso8601String(),
-                                        options: _authOptions,
+                                        options: [authn.request(authn.AuthzCache.meta(context))],
                                       )
                                       .then((_) => completion.complete())
                                       .catchError((cause) {
@@ -139,7 +131,7 @@ class _MediaSettingsState extends State<MediaSettings> {
                                 ),
                                 onConfirm: () {
                                   widget
-                                      .discoveredReset(_modified.torrentId, options: _authOptions)
+                                      .discoveredReset(_modified.torrentId, options: [authn.request(authn.AuthzCache.meta(context))])
                                       .then((v) {
                                         widget.onChange(
                                           Future.value(_modified),
