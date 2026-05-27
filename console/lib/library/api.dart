@@ -43,6 +43,20 @@ typedef FnRecentTombstone =
       List<httpx.Option> options,
     });
 
+typedef FnLibraryMetadataSync =
+    Future<MediaUpdateResponse> Function(
+      String id,
+      Media media, {
+      List<httpx.Option> options,
+    });
+
+typedef FnDiscoveredMetadataSync =
+    Future<MetadataSyncResponse> Function(
+      String id,
+      Media media, {
+      List<httpx.Option> options,
+    });
+
 abstract class known {
   static final Lock _lock = Lock();
 

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/gestures.dart' show kDoubleTapMinTime;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -145,6 +146,17 @@ extension WidgetTesterExtensions on WidgetTester {
     }
 
     return SystemMouseCursors.basic;
+  }
+
+  /// Simulates a double-tap on the widget matched by [finder].
+  ///
+  /// Fires two taps separated by [kDoubleTapMinTime] so that Flutter's
+  /// [DoubleTapGestureRecognizer] recognises the gesture.
+  Future<void> doubleTap(Finder finder) async {
+    await tap(finder);
+    await pump(kDoubleTapMinTime);
+    await tap(finder);
+    await pump();
   }
 
   /// Pumps frames until the widget at [finder] is the actual hit target

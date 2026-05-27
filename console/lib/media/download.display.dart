@@ -70,27 +70,21 @@ class DownloadDisplay extends StatelessWidget {
         children: [
           forms.Field(
             label: Text("id"),
-            input: Row(
-              mainAxisSize: MainAxisSize.max,
-              spacing: defaults.spacing,
-              children: [
-                Flexible(
-                  child: Text(
-                    current.media.id,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
-                ),
-                if (onVerify != null)
-                  ds.LoadingIconButton(
-                    onPressed: () => onVerify!(current),
-                    tooltip: "verify data",
-                    icon: Icon(Icons.fact_check),
-                  ),
-                if (onTap != null)
-                  ds.LoadingIconButton.delete(onPressed: onTap!, tooltip: "clear data from disk keeps metadata"),
-              ],
+            input: Text(
+              current.media.id,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
             ),
+            trailing: [
+              if (onVerify != null)
+                ds.LoadingIconButton(
+                  onPressed: () => onVerify!(current),
+                  tooltip: "validate stored data",
+                  icon: Icon(Icons.fact_check),
+                ),
+              if (onTap != null)
+                ds.LoadingIconButton.delete(onPressed: onTap!, tooltip: "clear data from disk keeps metadata"),
+            ],
           ),
           forms.Field(
             label: Text("description"),

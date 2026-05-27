@@ -4,17 +4,19 @@ import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/design.kit/forms.dart' as forms;
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/uuidx.dart' as uuidx;
-import './metadata.typography.dart' as typography;
-import './metadata.icons.dart' as icons;
+import 'metadata.typography.dart' as typography;
+import 'metadata.icons.dart' as icons;
 
 class MediaEdit extends StatelessWidget {
   final media.Media current;
   final Function(Future<media.Media>) onChange;
+  final Widget closable;
   final EdgeInsets? padding;
   MediaEdit({
     super.key,
     required this.current,
     required this.onChange,
+    this.closable = ds.Empty,
     this.padding,
   });
 
@@ -96,7 +98,11 @@ class MediaEdit extends StatelessWidget {
       Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          forms.Field(label: Text("id"), input: Text(current.id)),
+          forms.Field(
+            label: Text("id"),
+            input: Text(current.id),
+            trailing: [closable],
+          ),
           forms.Field(
             label: Text("description"),
             input: TextFormField(

@@ -29,6 +29,12 @@ class MediaSettings extends StatefulWidget {
     List<httpx.Option> options,
   })
   discoveredGet;
+  final Future<media.MediaUpdateResponse> Function(
+    String id,
+    media.Media upd, {
+    List<httpx.Option> options,
+  })
+  mediaUpdate;
 
   const MediaSettings({
     super.key,
@@ -39,6 +45,7 @@ class MediaSettings extends StatefulWidget {
     this.discoveredUpdate = media.discovered.update,
     this.discoveredReset = media.discovered.reset,
     this.discoveredGet = media.discovered.get,
+    this.mediaUpdate = media.media.update,
   });
 
   @override
@@ -54,8 +61,8 @@ class _MediaSettingsState extends State<MediaSettings> {
   @override
   void deactivate() {
     if (_dirty) {
-      media.media
-          .update(_modified.id, _modified, options: [authn.request(authn.AuthzCache.meta(context))])
+      widget
+          .mediaUpdate(_modified.id, _modified, options: [authn.request(authn.AuthzCache.meta(context))])
           .then((v) => widget.onChange(Future.value(v.media)));
     }
 
@@ -79,6 +86,9 @@ class _MediaSettingsState extends State<MediaSettings> {
             MediaEdit(
               current: _modified,
               padding: defaults.padding,
+              closable: ds.LoadingIconButton.close(
+                onPressed: () async => widget.onChange(Future.value(widget.current), autoclose: true),
+              ),
               onChange: (Future<media.Media> p) {
                 p.then((v) {
                   setState(() {
@@ -123,15 +133,18 @@ class _MediaSettingsState extends State<MediaSettings> {
                               ),
                             ),
                         onTap:
-                            () => ds.modals.asyncfn(
-                              context,
-                              (completion) => ds.Confirmation.yesNo(
+                            () => ds.modals.asyncfn(context, (completion) {
+                              final _options = [authn.request(authn.AuthzCache.meta(context))];
+                              return ds.Confirmation.yesNo(
                                 content: Text(
                                   "Are you sure you want to reset ${_modified.description}?",
                                 ),
                                 onConfirm: () {
                                   widget
-                                      .discoveredReset(_modified.torrentId, options: [authn.request(authn.AuthzCache.meta(context))])
+                                      .discoveredReset(
+                                        _modified.torrentId,
+                                        options: _options,
+                                      )
                                       .then((v) {
                                         widget.onChange(
                                           Future.value(_modified),
@@ -144,8 +157,8 @@ class _MediaSettingsState extends State<MediaSettings> {
                                       });
                                 },
                                 onCancel: completion.complete,
-                              ),
-                            ),
+                              );
+                            }),
                       ),
                     ],
                   ),

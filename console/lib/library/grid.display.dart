@@ -310,6 +310,9 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                       final trailing = [
                         ds.LoadingIconButton.info(
                           tooltip: "manually identify the media",
+                          help: ds.Hint(
+                            Text("search for and select the correct media identity from the known library"),
+                          ),
                           onPressed: KnownMediaDropdown.modal(
                             context,
                             _media,
