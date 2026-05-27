@@ -21,24 +21,6 @@ void main() {
       return api.KnownSearchResponse(items: [], next: req);
     }
 
-    // Mock metadataSync function that doesn't make HTTP calls
-    Future<media.MetadataSyncResponse> mockMetadataSync(
-      String id,
-      media.Media mediaItem, {
-      List<httpx.Option> options = const [],
-    }) async {
-      return media.MetadataSyncResponse(media: mediaItem);
-    }
-
-    // Mock library update function
-    Future<media.MediaUpdateResponse> mockLibraryUpdate(
-      String id,
-      media.Media upd, {
-      List<httpx.Option> options = const [],
-    }) async {
-      return media.MediaUpdateResponse(media: upd);
-    }
-
     setUp(() {
       // Create test media without torrent
       testMedia = media.Media(
@@ -79,8 +61,7 @@ void main() {
                 current: testMedia,
                 onChange: (pending, {bool forced = false, bool autoclose = false}) {},
                 knownSearch: mockKnownSearch,
-                discoveredMetadataSync: mockMetadataSync,
-                libraryMetadataSync: mockLibraryUpdate,
+
               ),
             ),
           ),
@@ -109,8 +90,7 @@ void main() {
                       current: testMedia,
                       onChange: (pending, {bool forced = false, bool autoclose = false}) {},
                       knownSearch: mockKnownSearch,
-                      discoveredMetadataSync: mockMetadataSync,
-                      libraryMetadataSync: mockLibraryUpdate,
+
                     ),
                   ),
                 ),
@@ -137,8 +117,7 @@ void main() {
                       current: testMedia,
                       onChange: (pending, {bool forced = false, bool autoclose = false}) {},
                       knownSearch: mockKnownSearch,
-                      discoveredMetadataSync: mockMetadataSync,
-                      libraryMetadataSync: mockLibraryUpdate,
+
                     ),
                   ),
                 ),
@@ -172,8 +151,7 @@ void main() {
                           current: testMedia,
                           onChange: (pending, {bool forced = false, bool autoclose = false}) {},
                           knownSearch: mockKnownSearch,
-                          discoveredMetadataSync: mockMetadataSync,
-                          libraryMetadataSync: mockLibraryUpdate,
+
                         ),
                       ),
                     ),
@@ -203,8 +181,7 @@ void main() {
                 current: testMedia,
                 onChange: (pending, {bool forced = false, bool autoclose = false}) {},
                 knownSearch: mockKnownSearch,
-                discoveredMetadataSync: mockMetadataSync,
-                libraryMetadataSync: mockLibraryUpdate,
+
               ),
             ),
           ),
@@ -228,8 +205,7 @@ void main() {
                 current: testMediaWithTorrent,
                 onChange: (pending, {bool forced = false, bool autoclose = false}) {},
                 knownSearch: mockKnownSearch,
-                discoveredMetadataSync: mockMetadataSync,
-                libraryMetadataSync: mockLibraryUpdate,
+
               ),
             ),
           ),
@@ -255,8 +231,7 @@ void main() {
                 current: testMedia,
                 onChange: (pending, {bool forced = false, bool autoclose = false}) {},
                 knownSearch: mockKnownSearch,
-                discoveredMetadataSync: mockMetadataSync,
-                libraryMetadataSync: mockLibraryUpdate,
+
               ),
             ),
           ),
@@ -286,8 +261,7 @@ void main() {
                     current: currentMedia,
                     onChange: (pending, {bool forced = false, bool autoclose = false}) {},
                     knownSearch: mockKnownSearch,
-                    discoveredMetadataSync: mockMetadataSync,
-                    libraryMetadataSync: mockLibraryUpdate,
+
                   ),
                 ),
               );
@@ -336,8 +310,7 @@ void main() {
                   capturedMedia = await pending;
                 },
                 knownSearch: mockKnownSearch,
-                discoveredMetadataSync: mockMetadataSync,
-                libraryMetadataSync: mockLibraryUpdate,
+
               ),
             ),
           ),
@@ -368,8 +341,7 @@ void main() {
                   capturedMedia = await pending;
                 },
                 knownSearch: mockKnownSearch,
-                discoveredMetadataSync: mockMetadataSync,
-                libraryMetadataSync: mockLibraryUpdate,
+
               ),
             ),
           ),
@@ -394,8 +366,7 @@ void main() {
                 current: testMediaWithTorrent,
                 onChange: (pending, {bool forced = false, bool autoclose = false}) {},
                 knownSearch: mockKnownSearch,
-                discoveredMetadataSync: mockMetadataSync,
-                libraryMetadataSync: mockLibraryUpdate,
+
               ),
             ),
           ),
@@ -418,8 +389,7 @@ void main() {
                 current: testMedia,
                 onChange: (pending, {bool forced = false, bool autoclose = false}) {},
                 knownSearch: mockKnownSearch,
-                discoveredMetadataSync: mockMetadataSync,
-                libraryMetadataSync: mockLibraryUpdate,
+
               ),
             ),
           ),
@@ -455,8 +425,7 @@ void main() {
                   captureOnChange?.call(forced);
                 },
                 knownSearch: mockKnownSearch,
-                discoveredMetadataSync: mockMetadataSync,
-                libraryMetadataSync: mockLibraryUpdate,
+
                 discoveredGet: mockDiscoveredGet,
                 discoveredUpdate: (id, download, {options = const []}) async {
                   onUpdate(id, download);
@@ -557,8 +526,7 @@ void main() {
                   captureOnChange?.call(forced);
                 },
                 knownSearch: mockKnownSearch,
-                discoveredMetadataSync: mockMetadataSync,
-                libraryMetadataSync: mockLibraryUpdate,
+
                 discoveredGet: mockDiscoveredGet,
                 discoveredUpdate: (id, download, {options = const []}) async =>
                     media.DownloadUpdateResponse(),

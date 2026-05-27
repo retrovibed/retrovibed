@@ -141,6 +141,14 @@ class KnownMediaCard extends StatelessWidget {
             ),
           ),
         ],
+        trailing: [
+          ds.Timestamp.iso8601(
+            current.released,
+            format: ds.Timestamp.year,
+            inf: ds.Empty,
+            neginf: ds.Empty,
+          ),
+        ],
         fit: FlexFit.tight,
       ),
     );

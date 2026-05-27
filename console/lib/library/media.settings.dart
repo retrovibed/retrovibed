@@ -5,27 +5,14 @@ import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'package:retrovibed/httpx.dart' as httpx;
-import './known.media.dropdown.dart';
-import './metadata.edit.dart';
-import './api.dart' as api;
+import 'metadata.edit.dart';
+import 'api.dart' as api;
 
 class MediaSettings extends StatefulWidget {
   final media.Media current;
   final void Function(Future<media.Media> pending, {bool forced, bool autoclose}) onChange;
   final api.FnKnownSearch knownSearch;
   final EdgeInsets? margin;
-  final Future<media.MetadataSyncResponse> Function(
-    String torrentId,
-    media.Media media, {
-    List<httpx.Option> options,
-  })
-  discoveredMetadataSync;
-  final Future<media.MediaUpdateResponse> Function(
-    String id,
-    media.Media media, {
-    List<httpx.Option> options,
-  })
-  libraryMetadataSync;
   final Future<media.DownloadUpdateResponse> Function(
     String id,
     media.Download download, {
@@ -49,8 +36,6 @@ class MediaSettings extends StatefulWidget {
     required this.onChange,
     this.margin,
     this.knownSearch = api.known.search,
-    this.discoveredMetadataSync = media.discovered.metadatasync,
-    this.libraryMetadataSync = media.media.metadatasync,
     this.discoveredUpdate = media.discovered.update,
     this.discoveredReset = media.discovered.reset,
     this.discoveredGet = media.discovered.get,
@@ -109,35 +94,6 @@ class _MediaSettingsState extends State<MediaSettings> {
                     _modified = v;
                   });
                 });
-              },
-            ),
-            KnownMediaDropdown(
-              current: _modified.knownMediaId,
-              search: widget.knownSearch,
-              onChange: (known) {
-                if (uuidx.isMin(uuidx.fromString(_modified.torrentId))) {
-                  return widget.onChange(
-                    widget
-                        .libraryMetadataSync(
-                          _modified.id,
-                          _modified..knownMediaId = known?.id ?? uuidx.min(),
-                          options: _authOptions,
-                        )
-                        .then((v) => v.media),
-                    forced: true,
-                  );
-                }
-
-                widget.onChange(
-                  widget
-                      .discoveredMetadataSync(
-                        _modified.torrentId,
-                        _modified..knownMediaId = known?.id ?? uuidx.min(),
-                        options: _authOptions,
-                      )
-                      .then((v) => v.media),
-                  forced: true,
-                );
               },
             ),
             if (!uuidx.isMinMax(uuidx.fromString(_modified.torrentId)))

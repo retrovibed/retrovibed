@@ -4,6 +4,7 @@ import 'package:retrovibed/design.kit/forms.dart' as forms;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'package:retrovibed/authn.dart' as authn;
+import 'package:retrovibed/media.dart' as _media;
 import 'known.media.card.dart';
 import 'known.media.typography.dart';
 import './api.dart' as api;
@@ -13,6 +14,7 @@ class KnownMediaDropdown extends StatefulWidget {
   final TextEditingController? controller;
   final FocusNode? focus;
   final String current;
+  final String mimetype;
   final void Function(api.Known? k)? onChange;
   const KnownMediaDropdown({
     super.key,
@@ -21,7 +23,47 @@ class KnownMediaDropdown extends StatefulWidget {
     this.focus,
     this.current = "",
     this.onChange,
+    this.mimetype = "",
   });
+
+  static Future<void> Function() modal(
+    BuildContext context,
+    _media.Media current, {
+    String mimetype = "",
+    void Function(_media.Media)? onChange,
+  }) {
+    return () => ds.modals.asyncfn<void>(
+      context,
+      (completion) => ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 512.0),
+        child: KnownMediaDropdown(
+          current: current.knownMediaId,
+          mimetype: mimetype,
+          onChange: (known) {
+            final authOptions = [authn.request(authn.AuthzCache.meta(context))];
+            final updated = current..knownMediaId = known?.id ?? uuidx.min();
+            final Future<_media.Media> pending;
+            if (uuidx.isMin(uuidx.fromString(current.torrentId))) {
+              pending = _media.media.metadatasync(updated.id, updated, options: authOptions).then((v) => v.media);
+            } else {
+              pending = _media.discovered
+                  .metadatasync(updated.torrentId, updated, options: authOptions)
+                  .then((v) => v.media);
+            }
+
+            pending
+                .then<void>(
+                  (v) {
+                    onChange?.call(v);
+                    completion.complete();
+                  },
+                )
+                .catchError(completion.completeError);
+          },
+        ),
+      ),
+    );
+  }
 
   @override
   State<StatefulWidget> createState() => _KnownMediaDropdown();
@@ -34,17 +76,10 @@ class _KnownMediaDropdown extends State<KnownMediaDropdown> {
     next: api.known.request(limit: 4),
   );
   api.Known? current = null;
-  List<httpx.Option> _authOptions = [];
 
   void setState(VoidCallback fn) {
     if (!mounted) return;
     super.setState(fn);
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _authOptions = [authn.request(authn.AuthzCache.meta(context))];
   }
 
   void reseterr() {
@@ -55,13 +90,12 @@ class _KnownMediaDropdown extends State<KnownMediaDropdown> {
 
   Future<void> refresh(api.KnownSearchRequest req) {
     return widget
-        .search(req, options: _authOptions)
+        .search(req..mimetype = widget.mimetype, options: [authn.request(authn.AuthzCache.meta(context))])
         .then((v) {
           setState(() {
             _res = v;
             _loading = false;
           });
-
           widget.focus?.requestFocus();
           ds.textediting.refocus(widget.controller);
         })
@@ -84,16 +118,17 @@ class _KnownMediaDropdown extends State<KnownMediaDropdown> {
     super.initState();
 
     if (uuidx.isMinMax(uuidx.fromString(widget.current))) {
-      refresh(_res.next);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        refresh(_res.next);
+      });
       return;
     }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _authOptions = [authn.request(authn.AuthzCache.meta(context))];
       api.known
           .cached(
             widget.current,
-            () => api.known.get(widget.current, options: _authOptions),
+            () => api.known.get(widget.current, options: [authn.request(authn.AuthzCache.meta(context))]),
           )
           .then(
             (w) => setState(() {
@@ -169,19 +204,21 @@ class _KnownMediaDropdown extends State<KnownMediaDropdown> {
               loading: _loading,
               cause: _cause,
               leading: [],
-              (context, v) => KnownMediaCard(
-                v,
-                icon: Icons.search,
-                onDoubleTap:
-                    widget.onChange == null
-                        ? null
-                        : () {
-                          setState(() {
-                            current = v;
-                          });
-                          widget.onChange!(v);
-                        },
-              ),
+              (context, v) {
+                return KnownMediaCard(
+                  v,
+                  icon: Icons.search,
+                  onDoubleTap:
+                      widget.onChange == null
+                          ? null
+                          : () {
+                            setState(() {
+                              current = v;
+                            });
+                            widget.onChange!(v);
+                          },
+                );
+              },
             ),
           ),
         ),
