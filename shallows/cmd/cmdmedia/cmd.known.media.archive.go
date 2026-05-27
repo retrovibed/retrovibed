@@ -74,7 +74,7 @@ func (t knownarchive) Run(gctx *cmdopts.Global) (err error) {
 		return nil
 	}
 
-	w := fsx.Walk(os.DirFS(dir))
+	w := fsx.WalkDir(os.DirFS(dir))
 	for path := range w.Walk() {
 		if path == "." {
 			continue
@@ -136,7 +136,7 @@ func (t knownarchive) Run(gctx *cmdopts.Global) (err error) {
 		return errorsx.Compact(tarx.Pack(out, path), out.Close(), os.RemoveAll(path))
 	})
 
-	w = fsx.Walk(os.DirFS(dir))
+	w = fsx.WalkDir(os.DirFS(dir))
 
 	for path := range w.Walk() {
 		if path == "." {

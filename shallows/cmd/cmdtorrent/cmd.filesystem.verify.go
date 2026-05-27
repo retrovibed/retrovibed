@@ -45,7 +45,7 @@ func (t filesystemVerify) Run(gctx *cmdopts.Global) (err error) {
 		return err
 	}
 
-	dir := fsx.Walk(root.FS())
+	dir := fsx.WalkDir(root.FS())
 
 	perform := func(_ context.Context, w workload) error {
 		var (

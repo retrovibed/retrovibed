@@ -25,7 +25,7 @@ func Pack(dst io.Writer, paths ...string) (err error) {
 	defer tw.Close()
 
 	for _, basepath := range paths {
-		w := fsx.Walk(os.DirFS(basepath))
+		w := fsx.WalkDir(os.DirFS(basepath))
 
 		for p, dent := range w.Walk() {
 			// skip the root directory itself.

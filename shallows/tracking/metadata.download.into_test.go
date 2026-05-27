@@ -103,11 +103,11 @@ func TestDownloadInto(t *testing.T) {
 
 		require.Equal(t, md5x.FormatUUID(expected), md5x.FormatUUID(actual))
 
-		w0 := fsx.Walk(os.DirFS(leechdir))
+		w0 := fsx.WalkDir(os.DirFS(leechdir))
 		require.EqualValues(t, 3, testx.Seq2Count(w0.Walk()))
 		require.NoError(t, w0.Err())
 
-		w1 := fsx.Walk(os.DirFS(mediadir))
+		w1 := fsx.WalkDir(os.DirFS(mediadir))
 		require.EqualValues(t, 6, testx.Seq2Count(w1.Walk()))
 		require.NoError(t, w1.Err())
 
@@ -196,11 +196,11 @@ func TestDownloadInto(t *testing.T) {
 
 		require.Equal(t, md5x.FormatUUID(expected), md5x.FormatUUID(actual))
 
-		w0 := fsx.Walk(os.DirFS(leechdir))
+		w0 := fsx.WalkDir(os.DirFS(leechdir))
 		require.EqualValues(t, 3, testx.Seq2Count(w0.Walk()))
 		require.NoError(t, w0.Err())
 
-		w1 := fsx.Walk(os.DirFS(mediadir))
+		w1 := fsx.WalkDir(os.DirFS(mediadir))
 		require.EqualValues(t, 6, testx.Seq2Count(w1.Walk()))
 		require.NoError(t, w1.Err())
 
@@ -300,7 +300,7 @@ func TestDownloadInto(t *testing.T) {
 		require.Equal(t, md5x.FormatUUID(expected), md5x.FormatUUID(actual))
 
 		// bluray: entire torrent is treated as a single file, so only 1 symlink is created in the media dir
-		w1 := fsx.Walk(os.DirFS(mediadir))
+		w1 := fsx.WalkDir(os.DirFS(mediadir))
 		require.EqualValues(t, 2, testx.Seq2Count(w1.Walk()))
 		require.NoError(t, w1.Err())
 
@@ -394,7 +394,7 @@ func TestDownloadInto(t *testing.T) {
 		require.Equal(t, md5x.FormatUUID(expected), md5x.FormatUUID(actual))
 
 		// dvd: entire torrent is treated as a single file, so only 1 symlink is created in the media dir
-		w1 := fsx.Walk(os.DirFS(mediadir))
+		w1 := fsx.WalkDir(os.DirFS(mediadir))
 		require.EqualValues(t, 2, testx.Seq2Count(w1.Walk()))
 		require.NoError(t, w1.Err())
 
@@ -581,7 +581,7 @@ func TestDownloadInto(t *testing.T) {
 		require.Equal(t, md5x.FormatUUID(expected), md5x.FormatUUID(actual))
 
 		// single file torrent: exactly one symlink in the media dir (dir + symlink = 2 walk entries)
-		w1 := fsx.Walk(os.DirFS(mediadir))
+		w1 := fsx.WalkDir(os.DirFS(mediadir))
 		require.EqualValues(t, 2, testx.Seq2Count(w1.Walk()))
 		require.NoError(t, w1.Err())
 

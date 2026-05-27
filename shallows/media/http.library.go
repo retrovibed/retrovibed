@@ -54,6 +54,12 @@ func HTTPLibraryOptionTorrentStorage(vfs fsx.Virtual) HTTPLibraryOption {
 	}
 }
 
+func HTTPLibraryOptionQueryCleaner(mc library.QueryCleaner) HTTPLibraryOption {
+	return func(t *HTTPLibrary) {
+		t.mediacleaner = mc
+	}
+}
+
 func NewHTTPLibrary(q sqlx.Queryer, archival *asyncx.Wakeup, media fsx.Virtual, deeppool *http.Client, options ...HTTPLibraryOption) *HTTPLibrary {
 	svc := langx.Clone(HTTPLibrary{
 		q:            q,
@@ -63,6 +69,7 @@ func NewHTTPLibrary(q sqlx.Queryer, archival *asyncx.Wakeup, media fsx.Virtual, 
 		fts:          duckdbx.NewLucene(),
 		deeppool:     deeppool,
 		archival:     archival,
+		mediacleaner: library.QueryCleanerNoop(),
 	}, options...)
 
 	return &svc
@@ -77,6 +84,7 @@ type HTTPLibrary struct {
 	torrentstorage fsx.Virtual
 	fts            lucenex.Driver
 	archival       *asyncx.Wakeup
+	mediacleaner   library.QueryCleaner
 }
 
 func (t *HTTPLibrary) Bind(r *mux.Router) {
@@ -259,11 +267,18 @@ func (t *HTTPLibrary) upload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	cleandescription, err := t.mediacleaner.Clean(r.Context(), fh.Filename)
+	if err != nil {
+		log.Println(errorsx.Wrap(err, "unable to clean description"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
 	lmd := library.NewMetadata(
 		md5x.FormatUUID(mhash),
 		library.MetadataOptionBytes(*copied.Result),
-		library.MetadataOptionDescription(fh.Filename),
-		library.MetadataOptionAutoDescription(library.NormalizedDescription(fh.Filename)),
+		library.MetadataOptionDescription(cleandescription),
+		library.MetadataOptionAutoDescription(library.NormalizedDescription(cleandescription)),
 		library.MetadataOptionMimetype(fh.Header.Get("Content-Type")),
 	)
 

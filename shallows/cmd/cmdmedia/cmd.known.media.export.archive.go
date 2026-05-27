@@ -70,7 +70,7 @@ func (t tarchiveexport) Run(gctx *cmdopts.Global) (err error) {
 		return nil
 	})
 
-	w := fsx.Walk(os.DirFS(t.Pattern))
+	w := fsx.WalkDir(os.DirFS(t.Pattern))
 	for path := range w.Walk() {
 		if path == "." {
 			continue

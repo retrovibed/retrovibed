@@ -1150,4 +1150,73 @@ func TestLibraryUploadFile(t *testing.T) {
 		require.Equal(t, mimex.RSS, md.Mimetype)
 		require.Equal(t, "feed.rss", md.Description)
 	})
+
+	t.Run("query cleaner applies", func(t *testing.T) {
+		var (
+			p      meta.Profile
+			v      meta.Authz
+			result media.MediaUploadResponse
+		)
+		ctx, done := testx.Context(t)
+		defer done()
+
+		q := sqltestx.Metadatabase(t)
+
+		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
+		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
+		require.NoError(t, testx.Fake(&v, meta.AuthzOptionProfileID(p.ID), meta.AuthzOptionAdmin))
+		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
+
+		vfs := fsx.DirVirtual(t.TempDir())
+		routes := mux.NewRouter()
+
+		media.NewHTTPLibrary(
+			q,
+			asyncx.NewWakeup(t.Context()),
+			vfs,
+			nil,
+			media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			media.HTTPLibraryOptionQueryCleaner(library.NewQueryCleanerFn(func(text string) string {
+				return "cleaned: " + text
+			})),
+		).Bind(routes.PathPrefix("/").Subrouter())
+
+		prng := cryptox.NewChaCha8(errorsx.Must(uuid.NewV4()).String())
+
+		mimetype, buf, err := httpx.Multipart(func(w *multipart.Writer) error {
+			part, lerr := w.CreatePart(httpx.NewMultipartHeader(mimex.RetrovibedMediaArchive, "content", "my-video.mp4"))
+			if lerr != nil {
+				return errorsx.Wrap(lerr, "unable to create archive part")
+			}
+
+			if _, lerr = io.Copy(part, io.LimitReader(prng, 16*bytesx.KiB)); lerr != nil {
+				return errorsx.Wrap(lerr, "unable to copy archive")
+			}
+
+			return nil
+		})
+		require.NoError(t, err)
+
+		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
+
+		resp, req, err := httptestx.BuildRequestBytes(
+			http.MethodPost,
+			"/",
+			testx.IOBytes(buf),
+			httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)),
+			httptestx.RequestOptionHeader("Content-Type", mimetype),
+		)
+		require.NoError(t, err)
+
+		routes.ServeHTTP(resp, req)
+
+		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
+		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+
+		var dbMD library.Metadata
+		require.NoError(t, library.MetadataFindByID(ctx, q, result.Media.Id).Scan(&dbMD))
+
+		require.Equal(t, "cleaned: my-video.mp4", dbMD.Description)
+		require.Equal(t, "cleaned my video mp4", dbMD.AutoDescription)
+	})
 }

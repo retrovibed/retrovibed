@@ -22,6 +22,18 @@ type QueryCleaner interface {
 	Clean(ctx context.Context, text string) (string, error)
 }
 
+func NewQueryCleanerFn(fn func(text string) string) QueryCleanerFn {
+	return QueryCleanerFn(func(_ context.Context, text string) (string, error) {
+		return fn(text), nil
+	})
+}
+
+type QueryCleanerFn func(_ context.Context, text string) (string, error)
+
+func (fn QueryCleanerFn) Clean(ctx context.Context, text string) (string, error) {
+	return fn(ctx, text)
+}
+
 func QueryCleanerNoop() *NoopQueryCleaner {
 	return &NoopQueryCleaner{}
 }

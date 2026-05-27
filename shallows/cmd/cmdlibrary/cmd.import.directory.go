@@ -6,11 +6,13 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"log"
 	"mime"
 	"mime/multipart"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
@@ -42,6 +44,9 @@ func (t importDirectory) run(ctx context.Context, enc *jsonl.Encoder, c *http.Cl
 		Entry fs.DirEntry
 	}
 
+	log.Println("directory import initiated")
+	defer log.Println("directory import completed")
+
 	encwriter := asynccompute.New(func(ctx context.Context, w *media.Media) (err error) {
 		return enc.Encode(w)
 	}, asynccompute.Workers[*media.Media](1), asynccompute.Backlog[*media.Media](t.Concurrency*2))
@@ -60,11 +65,11 @@ func (t importDirectory) run(ctx context.Context, enc *jsonl.Encoder, c *http.Cl
 		}
 		defer f.Close()
 
-		filename := filepath.Base(w.Path)
+		filename := filepath.Base(strings.TrimPrefix(w.Path, t.Directory))
 		mimetype := langx.FirstNonZero(t.Mimetype, mime.TypeByExtension(filepath.Ext(filename)), mimex.Binary)
 
 		contentType, body, err := httpx.Multipart(func(mw *multipart.Writer) error {
-			part, lerr := mw.CreatePart(httpx.NewMultipartHeader(mimetype, "content", filename))
+			part, lerr := mw.CreatePart(httpx.NewMultipartHeader(mimetype, "content", w.Path))
 			if lerr != nil {
 				return lerr
 			}

@@ -322,6 +322,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		mediastore,
 		deepjwt,
 		media.HTTPLibraryOptionTorrentStorage(tvfs),
+		media.HTTPLibraryOptionQueryCleaner(mc),
 	).Bind(httpmux.PathPrefix("/m").Subrouter())
 	media.NewHTTPDiscovered(
 		db,

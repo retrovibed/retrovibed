@@ -107,7 +107,7 @@ func (t importDirectory) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig) error
 		return encoder.Encode(m.Published)
 	})
 
-	w := fsx.Walk(os.DirFS(t.Directory))
+	w := fsx.WalkDir(os.DirFS(t.Directory))
 	for p, e := range w.Walk() {
 		if p == "." {
 			continue
