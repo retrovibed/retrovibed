@@ -80,7 +80,7 @@ func TestImportDirectory(t *testing.T) {
 		require.Len(t, decodeAll(t, &buf), 2)
 	})
 
-	t.Run("skips subdirectories", func(t *testing.T) {
+	t.Run("recurses into subdirectories", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 
@@ -93,7 +93,7 @@ func TestImportDirectory(t *testing.T) {
 		cmd := importDirectory{Endpoint: "localhost:9998", Concurrency: 1, Directory: dir}
 		require.NoError(t, cmd.run(ctx, jsonl.NewEncoder(&bytes.Buffer{}), newImportDirectoryServer(t, q)))
 
-		require.Equal(t, 1, testx.Must(sqlx.Count(ctx, q, "SELECT COUNT(*) FROM library_metadata"))(t))
+		require.Equal(t, 2, testx.Must(sqlx.Count(ctx, q, "SELECT COUNT(*) FROM library_metadata"))(t))
 	})
 
 	t.Run("empty directory produces no uploads", func(t *testing.T) {
@@ -113,7 +113,8 @@ func TestImportDirectory(t *testing.T) {
 		defer done()
 
 		q := sqltestx.Metadatabase(t)
-		dir := t.TempDir()
+		dir := filepath.Join(t.TempDir(), "media")
+		require.NoError(t, os.MkdirAll(dir, 0700))
 		require.NoError(t, os.WriteFile(filepath.Join(dir, "my-video.mp4"), []byte("data"), 0600))
 
 		var buf bytes.Buffer
@@ -125,7 +126,7 @@ func TestImportDirectory(t *testing.T) {
 
 		var md library.Metadata
 		require.NoError(t, library.MetadataFindByID(ctx, q, results[0].Id).Scan(&md))
-		require.Equal(t, "my-video.mp4", md.Description)
+		require.Equal(t, " media my-video.mp4", md.Description)
 	})
 
 	t.Run("mime type detected from extension", func(t *testing.T) {
@@ -133,7 +134,8 @@ func TestImportDirectory(t *testing.T) {
 		defer done()
 
 		q := sqltestx.Metadatabase(t)
-		dir := t.TempDir()
+		dir := filepath.Join(t.TempDir(), "media")
+		require.NoError(t, os.MkdirAll(dir, 0700))
 		require.NoError(t, os.WriteFile(filepath.Join(dir, "video.mp4"), []byte("video data"), 0600))
 		require.NoError(t, os.WriteFile(filepath.Join(dir, "unknown.xyz"), []byte("unknown data"), 0600))
 
@@ -151,8 +153,8 @@ func TestImportDirectory(t *testing.T) {
 			mimetypes[md.Description] = md.Mimetype
 		}
 
-		require.Equal(t, "video/mp4", mimetypes["video.mp4"])
-		require.NotEmpty(t, mimetypes["unknown.xyz"])
+		require.Equal(t, "video/mp4", mimetypes[" media video.mp4"])
+		require.NotEmpty(t, mimetypes[" media unknown.xyz"])
 	})
 
 	t.Run("mimetype flag overrides extension detection", func(t *testing.T) {
@@ -183,7 +185,8 @@ func TestImportDirectory(t *testing.T) {
 		defer done()
 
 		q := sqltestx.Metadatabase(t)
-		dir := t.TempDir()
+		dir := filepath.Join(t.TempDir(), "media")
+		require.NoError(t, os.MkdirAll(dir, 0700))
 		require.NoError(t, os.WriteFile(filepath.Join(dir, "clip.mp4"), []byte("content"), 0600))
 
 		var buf bytes.Buffer
@@ -195,6 +198,6 @@ func TestImportDirectory(t *testing.T) {
 
 		var md library.Metadata
 		require.NoError(t, library.MetadataFindByID(ctx, q, results[0].Id).Scan(&md))
-		require.Equal(t, "clip.mp4", md.Description)
+		require.Equal(t, " media clip.mp4", md.Description)
 	})
 }
