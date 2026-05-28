@@ -70,7 +70,7 @@ func KnownOptionTestDefaults(t *Known) {
 	t.Md5 = errorsx.Must(uuid.NewV4()).String()
 	t.Adult = false
 	t.Released = time.Now()
-	t.Mimetype = mimex.Binary
+	t.Mimetype = mimex.Application
 	t.Duplicates = 0
 	t.Popularity = 0
 }

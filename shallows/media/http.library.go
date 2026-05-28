@@ -54,15 +54,16 @@ func HTTPLibraryOptionTorrentStorage(vfs fsx.Virtual) HTTPLibraryOption {
 	}
 }
 
-func NewHTTPLibrary(q sqlx.Queryer, archival *asyncx.Wakeup, media fsx.Virtual, deeppool *http.Client, options ...HTTPLibraryOption) *HTTPLibrary {
+func NewHTTPLibrary(q sqlx.Queryer, archival *asyncx.Wakeup, identification *asyncx.Wakeup, media fsx.Virtual, deeppool *http.Client, options ...HTTPLibraryOption) *HTTPLibrary {
 	svc := langx.Clone(HTTPLibrary{
-		q:            q,
-		jwtsecret:    env.JWTSecret,
-		decoder:      formx.NewDecoder(),
-		mediastorage: media,
-		fts:          duckdbx.NewLucene(),
-		deeppool:     deeppool,
-		archival:     archival,
+		q:              q,
+		jwtsecret:      env.JWTSecret,
+		decoder:        formx.NewDecoder(),
+		mediastorage:   media,
+		fts:            duckdbx.NewLucene(),
+		deeppool:       deeppool,
+		archival:       archival,
+		identification: identification,
 	}, options...)
 
 	return &svc
@@ -77,6 +78,7 @@ type HTTPLibrary struct {
 	torrentstorage fsx.Virtual
 	fts            lucenex.Driver
 	archival       *asyncx.Wakeup
+	identification *asyncx.Wakeup
 }
 
 func (t *HTTPLibrary) Bind(r *mux.Router) {
@@ -298,6 +300,8 @@ func (t *HTTPLibrary) upload(w http.ResponseWriter, r *http.Request) {
 		log.Println(errorsx.Wrap(err, "unable to write response"))
 		return
 	}
+
+	t.identification.Broadcast()
 }
 
 func (t *HTTPLibrary) random(w http.ResponseWriter, r *http.Request) {

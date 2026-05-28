@@ -42,6 +42,7 @@ func TestRandom(t *testing.T) {
 		h := media.NewHTTPLibrary(
 			q,
 			asyncx.NewWakeup(t.Context()),
+			asyncx.NewWakeup(t.Context()),
 			nil,
 			nil,
 			media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
@@ -92,6 +93,7 @@ func TestRandom(t *testing.T) {
 		h := media.NewHTTPLibrary(
 			q,
 			asyncx.NewWakeup(t.Context()),
+			asyncx.NewWakeup(t.Context()),
 			nil,
 			nil,
 			media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
@@ -134,6 +136,7 @@ func TestRandom(t *testing.T) {
 
 		h := media.NewHTTPLibrary(
 			q,
+			asyncx.NewWakeup(t.Context()),
 			asyncx.NewWakeup(t.Context()),
 			nil,
 			nil,
@@ -188,6 +191,7 @@ func TestRandom(t *testing.T) {
 		h := media.NewHTTPLibrary(
 			q,
 			asyncx.NewWakeup(t.Context()),
+			asyncx.NewWakeup(t.Context()),
 			nil,
 			nil,
 			media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
@@ -233,6 +237,7 @@ func TestRandom(t *testing.T) {
 
 		h := media.NewHTTPLibrary(
 			q,
+			asyncx.NewWakeup(t.Context()),
 			asyncx.NewWakeup(t.Context()),
 			nil,
 			nil,

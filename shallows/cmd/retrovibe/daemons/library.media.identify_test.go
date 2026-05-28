@@ -40,7 +40,7 @@ func TestLibraryMetadataIdentify(t *testing.T) {
 		require.Equal(t, known.UID, lmd.KnownMediaID)
 	})
 
-	t.Run("no match leaves known media id unchanged", func(t *testing.T) {
+	t.Run("no match marks known media id as nil", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 
@@ -60,7 +60,30 @@ func TestLibraryMetadataIdentify(t *testing.T) {
 		require.NoError(t, daemons.IdentifyLibraryMedia(ctx, q, library.QueryCleanerNoop()))
 
 		require.NoError(t, library.MetadataFindByID(ctx, q, lmd.ID).Scan(&lmd))
-		require.Equal(t, uuid.Max.String(), lmd.KnownMediaID)
+		require.Equal(t, uuid.Nil.String(), lmd.KnownMediaID)
+	})
+
+	t.Run("blank cleaned description marks known media id as nil", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		q := sqltestx.Metadatabase(t)
+
+		lmd := library.Metadata{
+			ID:             uuid.Must(uuid.NewV7()).String(),
+			Description:    "some description",
+			Bytes:          1024,
+			TorrentID:      uuid.Nil.String(),
+			KnownMediaID:   uuid.Max.String(),
+			ArchiveID:      uuid.Nil.String(),
+			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+		}
+		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
+
+		require.NoError(t, daemons.IdentifyLibraryMedia(ctx, q, library.NewQueryCleanerFn(func(string) string { return "" })))
+
+		require.NoError(t, library.MetadataFindByID(ctx, q, lmd.ID).Scan(&lmd))
+		require.Equal(t, uuid.Nil.String(), lmd.KnownMediaID)
 	})
 
 	t.Run("tombstoned metadata is skipped", func(t *testing.T) {

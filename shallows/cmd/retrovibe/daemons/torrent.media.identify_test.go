@@ -38,7 +38,7 @@ func TestTorrentMetadataIdentify(t *testing.T) {
 		require.Equal(t, known.UID, lmd.KnownMediaID)
 	})
 
-	t.Run("no match leaves known media id unchanged", func(t *testing.T) {
+	t.Run("no match marks known media id as nil", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 
@@ -53,7 +53,25 @@ func TestTorrentMetadataIdentify(t *testing.T) {
 		require.NoError(t, daemons.IdentifyTorrentMedia(ctx, q, library.QueryCleanerNoop()))
 
 		require.NoError(t, tracking.MetadataFindByID(ctx, q, lmd.ID).Scan(&lmd))
-		require.Equal(t, uuid.Max.String(), lmd.KnownMediaID)
+		require.Equal(t, uuid.Nil.String(), lmd.KnownMediaID)
+	})
+
+	t.Run("blank cleaned description marks known media id as nil", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		q := sqltestx.Metadatabase(t)
+
+		lmd := tracking.NewMetadata(
+			langx.Autoptr(int160.Random()),
+			tracking.MetadataOptionDescription("some description"),
+		)
+		require.NoError(t, tracking.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
+
+		require.NoError(t, daemons.IdentifyTorrentMedia(ctx, q, library.NewQueryCleanerFn(func(string) string { return "" })))
+
+		require.NoError(t, tracking.MetadataFindByID(ctx, q, lmd.ID).Scan(&lmd))
+		require.Equal(t, uuid.Nil.String(), lmd.KnownMediaID)
 	})
 
 	t.Run("empty metadata table returns no error", func(t *testing.T) {

@@ -329,6 +329,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	media.NewHTTPLibrary(
 		db,
 		archival,
+		mediaidentification,
 		mediastore,
 		deepjwt,
 		media.HTTPLibraryOptionTorrentStorage(tvfs),

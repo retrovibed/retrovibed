@@ -54,6 +54,7 @@ func TestLibraryUploadFile(t *testing.T) {
 		media.NewHTTPLibrary(
 			q,
 			asyncx.NewWakeup(t.Context()),
+			asyncx.NewWakeup(t.Context()),
 			vfs,
 			nil,
 			media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
@@ -125,6 +126,7 @@ func TestLibraryUploadFile(t *testing.T) {
 		media.NewHTTPLibrary(
 			q,
 			asyncx.NewWakeup(t.Context()),
+			asyncx.NewWakeup(t.Context()),
 			vfs,
 			nil,
 			media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
@@ -190,6 +192,7 @@ func TestLibraryUploadFile(t *testing.T) {
 
 		media.NewHTTPLibrary(
 			q,
+			asyncx.NewWakeup(t.Context()),
 			asyncx.NewWakeup(t.Context()),
 			vfs,
 			nil,
@@ -257,6 +260,7 @@ func TestLibraryUploadFile(t *testing.T) {
 		media.NewHTTPLibrary(
 			q,
 			asyncx.NewWakeup(t.Context()),
+			asyncx.NewWakeup(t.Context()),
 			vfs,
 			nil,
 			media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
@@ -322,6 +326,7 @@ func TestLibraryUploadFile(t *testing.T) {
 
 		media.NewHTTPLibrary(
 			q,
+			asyncx.NewWakeup(t.Context()),
 			asyncx.NewWakeup(t.Context()),
 			vfs,
 			nil,
@@ -389,6 +394,7 @@ func TestLibraryUploadFile(t *testing.T) {
 		media.NewHTTPLibrary(
 			q,
 			asyncx.NewWakeup(t.Context()),
+			asyncx.NewWakeup(t.Context()),
 			vfs,
 			nil,
 			media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
@@ -454,6 +460,7 @@ func TestLibraryUploadFile(t *testing.T) {
 
 		media.NewHTTPLibrary(
 			q,
+			asyncx.NewWakeup(t.Context()),
 			asyncx.NewWakeup(t.Context()),
 			vfs,
 			nil,
@@ -521,6 +528,7 @@ func TestLibraryUploadFile(t *testing.T) {
 		media.NewHTTPLibrary(
 			q,
 			asyncx.NewWakeup(t.Context()),
+			asyncx.NewWakeup(t.Context()),
 			vfs,
 			nil,
 			media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
@@ -586,6 +594,7 @@ func TestLibraryUploadFile(t *testing.T) {
 
 		media.NewHTTPLibrary(
 			q,
+			asyncx.NewWakeup(t.Context()),
 			asyncx.NewWakeup(t.Context()),
 			vfs,
 			nil,
@@ -671,6 +680,7 @@ func TestLibraryUploadFile(t *testing.T) {
 
 		media.NewHTTPLibrary(
 			q,
+			asyncx.NewWakeup(t.Context()),
 			asyncx.NewWakeup(t.Context()),
 			vfs,
 			nil,
@@ -761,6 +771,7 @@ func TestLibraryUploadFile(t *testing.T) {
 
 		media.NewHTTPLibrary(
 			q,
+			asyncx.NewWakeup(t.Context()),
 			asyncx.NewWakeup(t.Context()),
 			vfs,
 			nil,
@@ -858,6 +869,7 @@ func TestLibraryUploadFile(t *testing.T) {
 		media.NewHTTPLibrary(
 			q,
 			asyncx.NewWakeup(t.Context()),
+			asyncx.NewWakeup(t.Context()),
 			vfs,
 			nil,
 			media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
@@ -913,6 +925,7 @@ func TestLibraryUploadFile(t *testing.T) {
 
 		media.NewHTTPLibrary(
 			q,
+			asyncx.NewWakeup(t.Context()),
 			asyncx.NewWakeup(t.Context()),
 			vfs,
 			nil,
@@ -979,6 +992,7 @@ func TestLibraryUploadFile(t *testing.T) {
 		media.NewHTTPLibrary(
 			q,
 			asyncx.NewWakeup(t.Context()),
+			asyncx.NewWakeup(t.Context()),
 			vfs,
 			nil,
 			media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
@@ -1044,6 +1058,7 @@ func TestLibraryUploadFile(t *testing.T) {
 		media.NewHTTPLibrary(
 			q,
 			asyncx.NewWakeup(t.Context()),
+			asyncx.NewWakeup(t.Context()),
 			vfs,
 			nil,
 			media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
@@ -1108,6 +1123,7 @@ func TestLibraryUploadFile(t *testing.T) {
 
 		media.NewHTTPLibrary(
 			q,
+			asyncx.NewWakeup(t.Context()),
 			asyncx.NewWakeup(t.Context()),
 			vfs,
 			nil,

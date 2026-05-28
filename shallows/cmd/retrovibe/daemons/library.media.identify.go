@@ -38,16 +38,26 @@ func IdentifyLibraryMedia(ctx context.Context, db sqlx.Queryer, mc library.Query
 			continue
 		} else if stringsx.Blank(cleaned) {
 			log.Println("unable to clean media for library - detected messy description ended up with blank", md.ID, md.Description, "|", "''", "|", err)
+			updated := md
+			updated.KnownMediaID = uuid.Nil.String()
+			if err = library.MetadataUpdate(ctx, db, md.ID, updated).Scan(&md); err != nil {
+				log.Println("unable to mark library media as unidentifiable", md.ID, err)
+			}
 			continue
 		}
 
-		if known, err = library.DetectKnownMedia(ctx, db, mimex.Category(md.Mimetype), cleaned); err != nil {
+		if known, err = library.DetectKnownMedia(ctx, db, mimex.Category(stringsx.FirstNonBlank(md.Mimetype, mimex.Binary)), cleaned); err != nil {
 			log.Println("unable to detect known media for library media", md.ID, md.Description, "|", err)
 			continue
 		}
 
 		if uuid.FromStringOrNil(known.UID).IsNil() {
 			log.Println("no match for library media", md.ID, md.Description)
+			updated := md
+			updated.KnownMediaID = uuid.Nil.String()
+			if err = library.MetadataUpdate(ctx, db, md.ID, updated).Scan(&md); err != nil {
+				log.Println("unable to mark library media as unidentifiable", md.ID, err)
+			}
 			continue
 		}
 

@@ -105,6 +105,7 @@ func TestLibraryDownload(t *testing.T) {
 		media.NewHTTPLibrary(
 			q,
 			asyncx.NewWakeup(t.Context()),
+			asyncx.NewWakeup(t.Context()),
 			storage,
 			nil,
 			media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
@@ -183,6 +184,7 @@ func TestLibraryDownload(t *testing.T) {
 		media.NewHTTPLibrary(
 			q,
 			asyncx.NewWakeup(t.Context()),
+			asyncx.NewWakeup(t.Context()),
 			storage,
 			c,
 			media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
@@ -256,6 +258,7 @@ func TestLibraryDownload(t *testing.T) {
 		media.NewHTTPLibrary(
 			q,
 			asyncx.NewWakeup(t.Context()),
+			asyncx.NewWakeup(t.Context()),
 			storage,
 			c,
 			media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
@@ -328,6 +331,7 @@ func TestLibraryDownload(t *testing.T) {
 		routes := mux.NewRouter()
 		media.NewHTTPLibrary(
 			q,
+			asyncx.NewWakeup(t.Context()),
 			asyncx.NewWakeup(t.Context()),
 			storage,
 			c,

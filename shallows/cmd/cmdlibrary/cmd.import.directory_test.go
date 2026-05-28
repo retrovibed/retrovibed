@@ -33,6 +33,7 @@ func newImportDirectoryServer(t *testing.T, q *sql.DB) *http.Client {
 	media.NewHTTPLibrary(
 		q,
 		asyncx.NewWakeup(t.Context()),
+		asyncx.NewWakeup(t.Context()),
 		vfs,
 		nil,
 		media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),

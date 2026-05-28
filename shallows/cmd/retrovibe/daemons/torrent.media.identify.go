@@ -43,6 +43,9 @@ func IdentifyTorrentMedia(ctx context.Context, db sqlx.Queryer, mc library.Query
 			continue
 		} else if stringsx.Blank(cleaned) {
 			log.Println("unable to clean media for torrent - detected messy description ended up with blank", md.ID, md.Description, "|", "''", "|", err)
+			if err = tracking.MetadataAssignKnownMediaID(ctx, db, md.ID, uuid.Nil.String()).Scan(&md); err != nil {
+				log.Println("unable to mark torrent as unidentifiable", md.ID, err)
+			}
 			continue
 		}
 
@@ -53,6 +56,9 @@ func IdentifyTorrentMedia(ctx context.Context, db sqlx.Queryer, mc library.Query
 
 		if uuid.FromStringOrNil(known.UID).IsNil() {
 			log.Println("unable to detect media for torrent", md.ID, md.Description, "|", md.Description)
+			if err = tracking.MetadataAssignKnownMediaID(ctx, db, md.ID, uuid.Nil.String()).Scan(&md); err != nil {
+				log.Println("unable to mark torrent as unidentifiable", md.ID, err)
+			}
 			continue
 		}
 
