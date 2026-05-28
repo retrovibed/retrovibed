@@ -109,6 +109,7 @@ const TorrentSettings$json = {
       '5': 4,
       '10': 'maximum_requests'
     },
+    {'1': 'connections', '3': 1006, '4': 1, '5': 4, '10': 'connections'},
   ],
   '9': [
     {'1': 10, '2': 998},
@@ -127,7 +128,7 @@ final $typed_data.Uint8List torrentSettingsDescriptor = $convert.base64Decode(
     'QSKgoHaW5ib3VuZBjqByABKAsyDy50b3JyZW50cy5MaW1pdFIHaW5ib3VuZBIsCghvdXRib3Vu'
     'ZBjrByABKAsyDy50b3JyZW50cy5MaW1pdFIIb3V0Ym91bmQSJgoFcGVlcnMY7AcgASgLMg8udG'
     '9ycmVudHMuUGVlcnNSBXBlZXJzEisKEG1heGltdW1fcmVxdWVzdHMY7QcgASgEUhBtYXhpbXVt'
-    'X3JlcXVlc3RzSgUIChDmBw==');
+    'X3JlcXVlc3RzEiEKC2Nvbm5lY3Rpb25zGO4HIAEoBFILY29ubmVjdGlvbnNKBQgKEOYH');
 
 @$core.Deprecated('Use discoverySettingsDescriptor instead')
 const DiscoverySettings$json = {

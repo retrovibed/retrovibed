@@ -10,12 +10,17 @@ import (
 	"net"
 	"net/netip"
 	"os"
+	"syscall"
 	"text/tabwriter"
 	"time"
 
 	"github.com/RoaringBitmap/roaring/v2"
 	"github.com/james-lawrence/torrent"
+	retronetx "github.com/retrovibed/retrovibed/retroapi/netx"
+	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
+	"github.com/retrovibed/retrovibed/shallows/internal/backoffx"
 	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
+	"github.com/retrovibed/retrovibed/shallows/internal/debugx"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/envx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -149,7 +154,7 @@ func FileBitmap(info *metainfo.Info, c metainfo.FileInfo) (m roaring.Bitmap) {
 	return m
 }
 
-func Autosocket(_dht *dht.Server, p uint16) (_ torrent.Binder, err error) {
+func Autosocket(_dht *dht.Server, p uint16, cl *retronetx.ConnLimit) (_ torrent.Binder, err error) {
 	var (
 		s1 *utp.Socket
 		s2 net.Listener
@@ -160,12 +165,12 @@ func Autosocket(_dht *dht.Server, p uint16) (_ torrent.Binder, err error) {
 	}
 
 	return torrent.NewSocketsBind(
-		sockets.New(s1, s1),
-		sockets.New(s2, &net.Dialer{}),
+		sockets.New(cl.Listener(s1), cl.Dialer(s1)),
+		sockets.New(cl.Listener(s2), cl.Dialer(&net.Dialer{})),
 	).Options(torrent.BinderOptionDHT(_dht)), nil
 }
 
-func WireguardSocket(wcfg *wireguardx.Config) (_ *netstack.Net, err error) {
+func WireguardSocket(ctx context.Context, wcfg *wireguardx.Config) (_ *netstack.Net, err error) {
 	var (
 		// logger    = device.NewLogger(device.LogLevelError, "")
 		logger = device.NewLogger(device.LogLevelVerbose, "")
@@ -182,6 +187,15 @@ func WireguardSocket(wcfg *wireguardx.Config) (_ *netstack.Net, err error) {
 
 	dev := device.NewDevice(tun, conn.NewDefaultBind(), logger)
 
+	w := asyncx.NewWakeup(ctx)
+
+	diagnostic := func(ctx context.Context) error {
+		return wireguardx.Diagnostic(os.Stderr, dev)
+	}
+	go debugx.OnSignal(ctx, diagnostic, syscall.SIGUSR1)
+	go asyncx.Periodic(ctx, w, backoffx.Constant(5*time.Second), "wireguard statistics")
+	asyncx.Background(ctx, w, diagnostic)
+
 	for _, ipcset := range wireguardx.FormatIPCSet(wcfg) {
 		if err = dev.IpcSet(ipcset); err != nil {
 			return nil, errorsx.Wrap(err, "invalid ipcset for peer")
@@ -195,7 +209,7 @@ func WireguardSocket(wcfg *wireguardx.Config) (_ *netstack.Net, err error) {
 	return tnet, nil
 }
 
-func SetupTorrentBinder(tnet *netstack.Net, port uint16, opts ...torrent.BinderOption) (_ torrent.Binder, err error) {
+func SetupTorrentBinder(tnet *netstack.Net, port uint16, cl *retronetx.ConnLimit, opts ...torrent.BinderOption) (_ torrent.Binder, err error) {
 	var (
 		s0, s1    sockets.Socket
 		utpsocket *utp.Socket
@@ -213,13 +227,13 @@ func SetupTorrentBinder(tnet *netstack.Net, port uint16, opts ...torrent.BinderO
 		return nil, errorsx.Wrap(err, "failed to create utp socket")
 	}
 
-	s0 = sockets.New(utpsocket, utpsocket)
+	s0 = sockets.New(cl.Listener(utpsocket), cl.Dialer(utpsocket))
 	if addr, ok := utpsocket.Addr().(*net.UDPAddr); ok {
 		s, err := tnet.ListenTCP(&net.TCPAddr{Port: addr.Port})
 		if err != nil {
 			return nil, errorsx.Wrap(err, "unable to open tcp socket")
 		}
-		s1 = sockets.New(s, tnet)
+		s1 = sockets.New(cl.Listener(s), cl.Dialer(tnet))
 	}
 
 	return torrent.NewSocketsBind(s0, s1).Options(opts...), nil

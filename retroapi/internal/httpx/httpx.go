@@ -24,7 +24,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/internal/debugx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/langx"
-	"github.com/retrovibed/retrovibed/retroapi/internal/netx"
+	"github.com/retrovibed/retrovibed/retroapi/netx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/stringsx"
 	"golang.org/x/time/rate"
 )

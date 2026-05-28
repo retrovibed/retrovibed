@@ -10,6 +10,7 @@ message Wireguard {
   bool default = 5 [ json_name = "default" ];
   uint32 port = 6 [ json_name = "port" ];
   uint32 dns_rate_limit = 7 [ json_name = "dns_rate_limit" ];
+  uint64 maximum_connections = 8 [ json_name = "maximum_connections" ];
 }
 
 message WireguardSearchRequest {

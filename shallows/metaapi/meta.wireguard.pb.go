@@ -22,16 +22,17 @@ const (
 )
 
 type Wireguard struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,2,opt,name=created_at,proto3" json:"created_at,omitempty"`
-	UpdatedAt     string                 `protobuf:"bytes,3,opt,name=updated_at,proto3" json:"updated_at,omitempty"`
-	Description   string                 `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
-	Default       bool                   `protobuf:"varint,5,opt,name=default,proto3" json:"default,omitempty"`
-	Port          uint32                 `protobuf:"varint,6,opt,name=port,proto3" json:"port,omitempty"`
-	DnsRateLimit  uint32                 `protobuf:"varint,7,opt,name=dns_rate_limit,proto3" json:"dns_rate_limit,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	Id                 string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	CreatedAt          string                 `protobuf:"bytes,2,opt,name=created_at,proto3" json:"created_at,omitempty"`
+	UpdatedAt          string                 `protobuf:"bytes,3,opt,name=updated_at,proto3" json:"updated_at,omitempty"`
+	Description        string                 `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
+	Default            bool                   `protobuf:"varint,5,opt,name=default,proto3" json:"default,omitempty"`
+	Port               uint32                 `protobuf:"varint,6,opt,name=port,proto3" json:"port,omitempty"`
+	DnsRateLimit       uint32                 `protobuf:"varint,7,opt,name=dns_rate_limit,proto3" json:"dns_rate_limit,omitempty"`
+	MaximumConnections uint64                 `protobuf:"varint,8,opt,name=maximum_connections,proto3" json:"maximum_connections,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *Wireguard) Reset() {
@@ -109,6 +110,13 @@ func (x *Wireguard) GetPort() uint32 {
 func (x *Wireguard) GetDnsRateLimit() uint32 {
 	if x != nil {
 		return x.DnsRateLimit
+	}
+	return 0
+}
+
+func (x *Wireguard) GetMaximumConnections() uint64 {
+	if x != nil {
+		return x.MaximumConnections
 	}
 	return 0
 }
@@ -661,7 +669,7 @@ var File_meta_wireguard_proto protoreflect.FileDescriptor
 
 const file_meta_wireguard_proto_rawDesc = "" +
 	"\n" +
-	"\x14meta.wireguard.proto\x12\x04meta\"\xd3\x01\n" +
+	"\x14meta.wireguard.proto\x12\x04meta\"\x85\x02\n" +
 	"\tWireguard\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1e\n" +
 	"\n" +
@@ -673,7 +681,8 @@ const file_meta_wireguard_proto_rawDesc = "" +
 	"\vdescription\x18\x04 \x01(\tR\vdescription\x12\x18\n" +
 	"\adefault\x18\x05 \x01(\bR\adefault\x12\x12\n" +
 	"\x04port\x18\x06 \x01(\rR\x04port\x12&\n" +
-	"\x0edns_rate_limit\x18\a \x01(\rR\x0edns_rate_limit\"\\\n" +
+	"\x0edns_rate_limit\x18\a \x01(\rR\x0edns_rate_limit\x120\n" +
+	"\x13maximum_connections\x18\b \x01(\x04R\x13maximum_connections\"\\\n" +
 	"\x16WireguardSearchRequest\x12\x14\n" +
 	"\x05query\x18\x01 \x01(\tR\x05query\x12\x16\n" +
 	"\x06offset\x18\x02 \x01(\x04R\x06offset\x12\x14\n" +

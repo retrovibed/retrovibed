@@ -1,20 +1,24 @@
 package wireguardx
 
 import (
+	"bufio"
 	"context"
 	"encoding/base64"
 	"fmt"
+	"io"
 	"net"
 	"net/netip"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/userx"
 	"golang.org/x/text/encoding/unicode"
+	"golang.zx2c4.com/wireguard/device"
 	"golang.zx2c4.com/wireguard/tun/netstack"
 )
 
@@ -161,6 +165,75 @@ func (c *Config) maybeAddPeer(p *Peer) {
 	if p != nil {
 		c.Peers = append(c.Peers, *p)
 	}
+}
+
+func Diagnostic(w io.Writer, dev *device.Device) error {
+	uapiData, err := dev.IpcGet()
+	if err != nil {
+		return fmt.Errorf("failed to read internal device memory: %w", err)
+	}
+
+	var tx, rx uint64
+	var lastHandshake int64
+	var keepaliveInterval uint64
+	var hasPeer bool
+	var peerKey string
+
+	scanner := bufio.NewScanner(strings.NewReader(uapiData))
+	for scanner.Scan() {
+		line := scanner.Text()
+		key, value, ok := strings.Cut(line, "=")
+		if !ok {
+			continue
+		}
+
+		switch key {
+		case "public_key":
+			hasPeer = true
+			peerKey = value
+		case "tx_bytes":
+			tx = errorsx.Zero(strconv.ParseUint(value, 10, 64))
+		case "rx_bytes":
+			rx = errorsx.Zero(strconv.ParseUint(value, 10, 64))
+		case "last_handshake_time_sec":
+			lastHandshake = errorsx.Zero(strconv.ParseInt(value, 10, 64))
+		case "persistent_keepalive_interval":
+			keepaliveInterval = errorsx.Zero(strconv.ParseUint(value, 10, 64))
+		}
+	}
+
+	fmt.Fprintln(w, "=== WireGuard Engine Internal Diagnostics ===")
+	if !hasPeer {
+		fmt.Fprintln(w, "Status: INACTIVE - No peer configurations loaded in memory.")
+		return nil
+	}
+
+	fmt.Fprintf(w, "Peer Node:  %s\n", peerKey)
+	fmt.Fprintf(w, "Keepalive:  %ds\n", keepaliveInterval)
+	fmt.Fprintf(w, "Data Sent:  %d bytes\n", tx)
+	fmt.Fprintf(w, "Data Recv:  %d bytes\n", rx)
+
+	if lastHandshake == 0 {
+		fmt.Fprintln(w, "Handshake:  NEVER COMPLETED (Tunnel initializing or completely blocked)")
+		fmt.Fprintln(w, "Conclusion: Server rate-limiting or firewall block is active.")
+		return nil
+	}
+
+	timeSinceHandshake := time.Now().Unix() - lastHandshake
+	fmt.Fprintf(w, "Last Sync:  %d seconds ago\n", timeSinceHandshake)
+
+	fmt.Fprintln(w, "--- Analysis ---")
+	if tx > 0 && rx == 0 {
+		fmt.Fprintln(w, "Alert:      Unbalanced Pipe (Data leaving host, but server dropping response)")
+		fmt.Fprintln(w, "Conclusion: VPN active block / rate limit signature matched.")
+	} else if timeSinceHandshake > 180 {
+		fmt.Fprintln(w, "Alert:      Stale Handshake (Exceeded 3-minute protocol window)")
+		fmt.Fprintln(w, "Conclusion: Connection dropped by remote endpoint.")
+	} else {
+		fmt.Fprintln(w, "Status:     Healthy (Bidirectional data flow and valid handshakes)")
+	}
+
+	return nil
 }
 
 func FormatIPCSet(wcfg *Config) (ipcsets []string) {

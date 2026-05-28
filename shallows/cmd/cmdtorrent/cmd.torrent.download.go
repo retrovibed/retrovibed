@@ -13,6 +13,7 @@ import (
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/storage"
+	retronetx "github.com/retrovibed/retrovibed/retroapi/netx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/ddisc/ddisctorrent"
 	"github.com/retrovibed/retrovibed/shallows/internal/debugx"
@@ -102,7 +103,7 @@ func (t cmdDownload) Run(gctx *cmdopts.Global) error {
 		torrentdebug,
 	)
 
-	if tnetwork, err = torrentx.Autosocket(_dht, 0); err != nil {
+	if tnetwork, err = torrentx.Autosocket(_dht, 0, retronetx.NewConnUnlimited()); err != nil {
 		return errorsx.Wrap(err, "unable to setup torrent socket")
 	}
 
