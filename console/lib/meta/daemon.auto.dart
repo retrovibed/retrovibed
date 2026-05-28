@@ -210,19 +210,12 @@ class _EndpointAuto extends State<EndpointAuto> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
     refresh(latest());
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    print("lifecycle detection: $state");
   }
 
   @override
