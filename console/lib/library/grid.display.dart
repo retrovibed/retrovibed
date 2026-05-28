@@ -142,6 +142,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
         builder: (context, constraints) {
           final defaults = ds.Defaults.of(context);
           final compact = defaults.isCompact;
+          final authz = authn.AuthzCache.meta(context);
           return SingleChildScrollView(
             physics: AlwaysScrollableScrollPhysics(),
             child: ConstrainedBox(
@@ -238,7 +239,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                                           query: search.next.query,
                                           limit: search.next.limit.toInt(),
                                         ),
-                                        options: [authn.request(authn.AuthzCache.meta(context))],
+                                        options: [authn.request(authz)],
                                       )
                                       .then((v) => v.items),
                                 );
@@ -260,7 +261,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                                 return api.locate
                                     .create(
                                       api.Locate.create()..knownMediaId = v.id,
-                                      options: [authn.request(authn.AuthzCache.meta(context))],
+                                      options: [authn.request(authz)],
                                     )
                                     .then((_) {
                                       ScaffoldMessenger.of(context).showSnackBar(
@@ -346,7 +347,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                               _media.knownMediaId,
                               () => api.known.get(
                                 _media.knownMediaId,
-                                options: [authn.request(authn.AuthzCache.meta(context))],
+                                options: [authn.request(authz)],
                               ),
                             )
                             .then(
