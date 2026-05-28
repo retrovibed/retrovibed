@@ -80,6 +80,21 @@ class Edit extends StatelessWidget {
               },
             ),
           ),
+          forms.Field(
+            label: Text("maximum connections"),
+            input: inputs.Uint64(
+              value: current.maximumConnections,
+              presets: [
+                (label: '16', value: ds.Int64(16)),
+                (label: '32', value: ds.Int64(32)),
+                (label: '64', value: ds.Int64(64)),
+                (label: 'unlimited', value: ds.Int64(-1)),
+              ],
+              onChanged: (v) {
+                onChange?.call(current..maximumConnections = v);
+              },
+            ),
+          ),
         ],
       ),
     );

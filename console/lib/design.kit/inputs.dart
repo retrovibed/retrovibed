@@ -4,6 +4,7 @@ export 'inputs/date.range.dart';
 export 'inputs/duration.dart';
 export 'inputs/rate.limit.dart';
 export 'inputs/time.range.dart';
+export 'inputs/uint64.dart';
 
 void _notimplemented(String s) {
   return print(s);

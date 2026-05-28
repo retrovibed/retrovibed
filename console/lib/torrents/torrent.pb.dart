@@ -166,7 +166,6 @@ class TorrentSettings extends $pb.GeneratedMessage {
     Limit? outbound,
     Peers? peers,
     $fixnum.Int64? maximumRequests,
-    $fixnum.Int64? connections,
   }) {
     final result = create();
     if (seed != null) result.seed = seed;
@@ -186,7 +185,6 @@ class TorrentSettings extends $pb.GeneratedMessage {
     if (outbound != null) result.outbound = outbound;
     if (peers != null) result.peers = peers;
     if (maximumRequests != null) result.maximumRequests = maximumRequests;
-    if (connections != null) result.connections = connections;
     return result;
   }
 
@@ -225,9 +223,6 @@ class TorrentSettings extends $pb.GeneratedMessage {
     ..aOM<Peers>(1004, _omitFieldNames ? '' : 'peers', subBuilder: Peers.create)
     ..a<$fixnum.Int64>(
         1005, _omitFieldNames ? '' : 'maximum_requests', $pb.PbFieldType.OU6,
-        defaultOrMaker: $fixnum.Int64.ZERO)
-    ..a<$fixnum.Int64>(
-        1006, _omitFieldNames ? '' : 'connections', $pb.PbFieldType.OU6,
         defaultOrMaker: $fixnum.Int64.ZERO)
     ..hasRequiredFields = false;
 
@@ -412,15 +407,6 @@ class TorrentSettings extends $pb.GeneratedMessage {
   $core.bool hasMaximumRequests() => $_has(16);
   @$pb.TagNumber(1005)
   void clearMaximumRequests() => $_clearField(1005);
-
-  @$pb.TagNumber(1006)
-  $fixnum.Int64 get connections => $_getI64(17);
-  @$pb.TagNumber(1006)
-  set connections($fixnum.Int64 value) => $_setInt64(17, value);
-  @$pb.TagNumber(1006)
-  $core.bool hasConnections() => $_has(17);
-  @$pb.TagNumber(1006)
-  void clearConnections() => $_clearField(1006);
 }
 
 class DiscoverySettings extends $pb.GeneratedMessage {

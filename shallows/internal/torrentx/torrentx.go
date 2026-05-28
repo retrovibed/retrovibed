@@ -187,14 +187,17 @@ func WireguardSocket(ctx context.Context, wcfg *wireguardx.Config) (_ *netstack.
 
 	dev := device.NewDevice(tun, conn.NewDefaultBind(), logger)
 
-	w := asyncx.NewWakeup(ctx)
-
 	diagnostic := func(ctx context.Context) error {
 		return wireguardx.Diagnostic(os.Stderr, dev)
 	}
 	go debugx.OnSignal(ctx, diagnostic, syscall.SIGUSR1)
+	w := asyncx.NewWakeup(ctx)
 	go asyncx.Periodic(ctx, w, backoffx.Constant(5*time.Second), "wireguard statistics")
 	asyncx.Background(ctx, w, diagnostic)
+	go wireguardx.Autoheal(ctx, dev, backoffx.New(
+		backoffx.Exponential(envx.Duration(30*time.Second, env.WireguardAutohealFrequency)),
+		backoffx.Maximum(envx.Duration(30*time.Minute, env.WireguardAutohealMax)),
+	))
 
 	for _, ipcset := range wireguardx.FormatIPCSet(wcfg) {
 		if err = dev.IpcSet(ipcset); err != nil {

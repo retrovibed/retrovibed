@@ -33,6 +33,9 @@ func NewConnLimited(n uint64) *ConnLimit {
 }
 
 func (c *ConnLimit) Listener(l net.Listener) net.Listener {
+	if pc, ok := l.(net.PacketConn); ok {
+		return &limitedPacketConnListener{PacketConn: pc, listener: l, cl: c}
+	}
 	return &limitedListener{Listener: l, cl: c}
 }
 
@@ -71,6 +74,40 @@ func (l *limitedListener) Accept() (net.Conn, error) {
 
 	return &limitedConn{Conn: conn, cl: l.cl, inbound: true}, nil
 }
+
+// limitedPacketConnListener wraps a net.Listener that also implements net.PacketConn
+// (e.g. a UTP socket), preserving the PacketConn interface so callers like BindDHT
+// can detect and use it for packet-based protocols.
+type limitedPacketConnListener struct {
+	net.PacketConn
+	listener net.Listener
+	cl       *ConnLimit
+}
+
+func (l *limitedPacketConnListener) Accept() (net.Conn, error) {
+	conn, err := l.listener.Accept()
+	if err != nil {
+		return nil, err
+	}
+
+	for {
+		cur := l.cl.total.Load()
+		if cur >= l.cl.max {
+			conn.Close()
+			l.cl.rejected.Add(1)
+			return nil, errors.New("connection limit reached")
+		}
+		if l.cl.total.CompareAndSwap(cur, cur+1) {
+			l.cl.inbound.Add(1)
+			break
+		}
+	}
+
+	return &limitedConn{Conn: conn, cl: l.cl, inbound: true}, nil
+}
+
+func (l *limitedPacketConnListener) Addr() net.Addr  { return l.listener.Addr() }
+func (l *limitedPacketConnListener) Close() error    { return l.listener.Close() }
 
 type limitedDialer struct {
 	Dialer

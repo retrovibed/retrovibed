@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"log"
+	"math"
 	"net"
 	"os"
 	"runtime"
@@ -372,7 +373,7 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 		// go torrentx.AnnouncePort1(dctx, int160.Zero().Prefix([]byte{0x1}), dhts)
 		// go torrentx.AnnouncePort2(dctx, int160.Zero().Prefix([]byte{0x2}), dhts)
 
-		limit = retronetx.NewConnLimited(wgcfg.MaximumConnections)
+		limit = retronetx.NewConnLimited(langx.FirstNonZero(wgcfg.MaximumConnections, math.MaxUint64))
 		tnetwork, err = torrentx.SetupTorrentBinder(
 			wgnet,
 			uint16(cfg.Port),
@@ -408,6 +409,9 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 
 	// debugx.OnSignal(dctx, dhtx.Statistics(dhts), syscall.SIGUSR1)
 	// go dhtx.BackgroundStatistics(dctx, time.Minute, dhts)
+	go timex.NowAndEveryVoid(dctx, 5*time.Second, func(_ context.Context) {
+		retronetx.ConnLimitStatistics(os.Stderr, limit)
+	})
 	go dhtx.RecordBootstrapNodes(dctx, time.Minute, dhtminpeers, dhts, torrentpeers)
 	go dhts.TableMaintainer(dctx)
 
