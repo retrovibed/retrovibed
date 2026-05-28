@@ -114,7 +114,15 @@ class _CardState extends State<Card> {
                 style: theme.textTheme.bodyLarge,
                 overflow: TextOverflow.ellipsis,
               ),
-              onPressed: ds.Copyable.copy(_session.account.id),
+              help: ds.Hint(const Text('copy account id to clipboard')),
+              onPressed: ds.decorated(
+                ds.Copyable.copy(_session.account.id),
+                (pending) => pending
+                    .then((_) => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Account ID copied'))))
+                    .catchError(
+                      (e) => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to copy account ID'))),
+                    ),
+              ),
             ),
             ds.Copyable(
               Text(
@@ -126,7 +134,15 @@ class _CardState extends State<Card> {
                 style: theme.textTheme.bodyMedium,
                 overflow: TextOverflow.ellipsis,
               ),
-              onPressed: ds.Copyable.copy(retro.public_key()),
+              help: ds.Hint(const Text('copy public key to clipboard')),
+              onPressed: ds.decorated(
+                ds.Copyable.copy(retro.public_key()),
+                (pending) => pending
+                    .then((_) => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Public key copied'))))
+                    .catchError(
+                      (e) => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to copy public key'))),
+                    ),
+              ),
             ),
             if (authn.developer(context).subscription || !(Platform.isIOS || Platform.isMacOS))
               SizedBox(

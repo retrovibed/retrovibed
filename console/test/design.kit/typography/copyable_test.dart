@@ -144,9 +144,9 @@ void main() {
         Scaffold(
           body: ds.Copyable(
             const Text('hello world'),
-            onPressed: () {
+            onPressed: ds.toasync(() {
               pressed = true;
-            },
+            }),
           ),
         ),
       );
