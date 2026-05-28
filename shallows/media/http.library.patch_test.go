@@ -46,6 +46,7 @@ func TestMediaUpdate(t *testing.T) {
 	media.NewHTTPLibrary(
 		q,
 		asyncx.NewWakeup(t.Context()),
+		asyncx.NewWakeup(t.Context()),
 		nil,
 		nil,
 		media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),

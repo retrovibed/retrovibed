@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:media_kit/media_kit.dart' as mediakit;
 import 'package:retrovibed/media.dart';
 import 'package:retrovibed/uuidx.dart' as uuidx;
@@ -47,7 +48,7 @@ class RingBuffer<T> {
 }
 
 class PlayQueue {
-  PlayableMedia? _current;
+  final ValueNotifier<PlayableMedia?> current = ValueNotifier(null);
   final RingBuffer<PlayableMedia> _upcoming = RingBuffer(128);
   final RingBuffer<PlayableMedia> _previous = RingBuffer(128);
   StreamIterator<PlayableMedia> _stream = StreamIterator(Stream.empty());
@@ -55,12 +56,8 @@ class PlayQueue {
   int get upcoming => _upcoming.length;
   int get previous => _previous.length;
 
-  Duration get currentStart => _current?.pos ?? Duration.zero;
-
-  Known get current => Known(
-    id: _current?.current.id ?? uuidx.min(),
-    description: _current?.current.description,
-  );
+  Known get known => current.value.known;
+  Duration get currentStart => current.value?.pos ?? Duration.zero;
 
   void reset(Stream<PlayableMedia> stream) {
     _stream = StreamIterator(stream);
@@ -81,8 +78,8 @@ class PlayQueue {
 
     try {
       await player.open(m.playable(auth));
-      _previous.insert(_current);
-      _current = m;
+      _previous.insert(current.value);
+      current.value = m;
       return m;
     } catch (cause) {
       print("unable to pull next media from playlist $cause");
@@ -94,9 +91,9 @@ class PlayQueue {
     final prev = _previous.remove();
     if (prev == null) return null;
     await player.open(prev.playable(auth));
-    _upcoming.insert(_current);
-    _current = prev;
-    return _current;
+    _upcoming.insert(current.value);
+    current.value = prev;
+    return current.value;
   }
 }
 
@@ -105,6 +102,11 @@ class PlayableMedia {
   final Duration pos;
 
   const PlayableMedia(this.current, {this.pos = const Duration(milliseconds: 0)});
+
+  Known get known => Known(
+    id: current.id,
+    description: current.description,
+  );
 
   mediakit.Media playable(String auth) => mediakit.Media(
     api.media.download_uri(current.id),
@@ -115,6 +117,14 @@ class PlayableMedia {
     start: pos,
     httpHeaders: <String, String>{"Authorization": httpx.auto_bearer_host()},
   );
+}
+
+extension PlayableMediaNullable on PlayableMedia? {
+  Known get known =>
+      this?.known ??
+      Known(
+        id: uuidx.min(),
+      );
 }
 
 Stream<PlayableMedia> range(

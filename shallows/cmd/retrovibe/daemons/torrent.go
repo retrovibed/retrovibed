@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"log"
-	"math"
 	"net"
 	"os"
 	"runtime"
@@ -64,11 +63,11 @@ func AutoTorrentSettings(defaults *TorrentSettings, options ...func(*TorrentSett
 		Port:            defaults.Port,
 		AutoBootstrap:   defaults.AutoBootstrap,
 		AutoLocateMedia: defaults.AutoLocateMedia,
-		Peers:           &Peers{Min: 32, Max: 64},
+		Peers:           &Peers{Min: 8, Max: 16},
 		Upload:          &Limit{Rate: 256 * bytesx.MiB, Burst: 256 * bytesx.MiB},
 		Download:        &Limit{Rate: 256 * bytesx.MiB, Burst: 256 * bytesx.MiB},
 		Outbound:        &Limit{Rate: 16, Burst: 1},
-		Inbound:         &Limit{Rate: math.MaxUint32, Burst: 1},
+		Inbound:         &Limit{Rate: 16, Burst: 1},
 	}, options...))
 }
 

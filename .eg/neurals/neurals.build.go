@@ -18,19 +18,18 @@ func runtime() shell.Command {
 		Environ("CARGO_TARGET_DIR", egenv.CacheDirectory("neurals", "target"))
 }
 
-// Compile runs cargo build --release then rsyncs libpredicttext.so into dir.
+// Compile runs cargo build --release.
 func Compile(dir string) eg.OpFn {
 	return func(ctx context.Context, op eg.Op) error {
 		sruntime := runtime()
 		return shell.Run(
 			ctx,
 			sruntime.New("cargo build --release").Timeout(egenv.TTL()),
-			sruntime.Newf("mkdir -p %s && rsync -a ${CARGO_TARGET_DIR}/release/libpredicttext.so ${CARGO_TARGET_DIR}/release/libpredicttext.a %s/", dir, dir),
 		)
 	}
 }
 
-// Clone copies libpredicttext.so from the cargo target dir into dir.
+// Clone copies libpredicttext.{so,a} from the cargo target dir into dir.
 func Clone(dir string) eg.OpFn {
 	return func(ctx context.Context, op eg.Op) error {
 		sruntime := runtime()
@@ -94,11 +93,11 @@ func CompileIOS(dir string) eg.OpFn {
 }
 
 // MaybeBuild skips compilation if sopath already exists.
-func MaybeBuild(sopath string, clone func(dir string) eg.OpFn) eg.OpFn {
+func MaybeBuild(sopath string, compile func(dir string) eg.OpFn, clone func(dir string) eg.OpFn) eg.OpFn {
 	return eg.WhenFn(func(ctx context.Context) bool {
-		return !egfs.FileExists(egenv.WorkingDirectory(sopath))
+		return !egfs.FileExists(egenv.CacheDirectory(sopath))
 	}, eg.Sequential(
-		Compile(egenv.WorkingDirectory(filepath.Dir(sopath))),
-		clone(egenv.WorkingDirectory(filepath.Dir(sopath))),
+		compile(egenv.CacheDirectory(filepath.Dir(sopath))),
+		clone(egenv.CacheDirectory(filepath.Dir(sopath))),
 	))
 }

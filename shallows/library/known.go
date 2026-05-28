@@ -22,6 +22,18 @@ type QueryCleaner interface {
 	Clean(ctx context.Context, text string) (string, error)
 }
 
+func NewQueryCleanerFn(fn func(text string) string) QueryCleanerFn {
+	return QueryCleanerFn(func(_ context.Context, text string) (string, error) {
+		return fn(text), nil
+	})
+}
+
+type QueryCleanerFn func(_ context.Context, text string) (string, error)
+
+func (fn QueryCleanerFn) Clean(ctx context.Context, text string) (string, error) {
+	return fn(ctx, text)
+}
+
 func QueryCleanerNoop() *NoopQueryCleaner {
 	return &NoopQueryCleaner{}
 }
@@ -58,7 +70,7 @@ func KnownOptionTestDefaults(t *Known) {
 	t.Md5 = errorsx.Must(uuid.NewV4()).String()
 	t.Adult = false
 	t.Released = time.Now()
-	t.Mimetype = mimex.Binary
+	t.Mimetype = mimex.Application
 	t.Duplicates = 0
 	t.Popularity = 0
 }
@@ -140,10 +152,10 @@ func KnownSearchBuilder() squirrel.SelectBuilder {
 	return squirrelx.PSQL.Select(sqlx.Columns(KnownScannerStaticColumns)...).From("library_known_media")
 }
 
-func DetectKnownMedia(ctx context.Context, db sqlx.Queryer, query string) (k Known, err error) {
+func DetectKnownMedia(ctx context.Context, db sqlx.Queryer, mimecat string, query string) (k Known, err error) {
 	k = Unknown()
 
-	if err := KnownBestMatch(ctx, db, query, 0.7).Scan(&k); sqlx.IgnoreNoRows(err) != nil {
+	if err := KnownBestMatch(ctx, db, mimecat, query, 0.7).Scan(&k); sqlx.IgnoreNoRows(err) != nil {
 		return k, errorsx.Wrap(err, "unable to score")
 	}
 

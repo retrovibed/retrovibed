@@ -42,6 +42,7 @@ func TestLibrarySearch(t *testing.T) {
 		h := media.NewHTTPLibrary(
 			q,
 			asyncx.NewWakeup(t.Context()),
+			asyncx.NewWakeup(t.Context()),
 			nil,
 			nil,
 			media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
@@ -102,6 +103,7 @@ func TestLibrarySearch(t *testing.T) {
 		h := media.NewHTTPLibrary(
 			q,
 			asyncx.NewWakeup(t.Context()),
+			asyncx.NewWakeup(t.Context()),
 			nil,
 			nil,
 			media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
@@ -151,6 +153,7 @@ func TestLibrarySearch(t *testing.T) {
 
 		h := media.NewHTTPLibrary(
 			q,
+			asyncx.NewWakeup(t.Context()),
 			asyncx.NewWakeup(t.Context()),
 			nil,
 			nil,
@@ -208,6 +211,7 @@ func TestLibrarySearch(t *testing.T) {
 
 		h := media.NewHTTPLibrary(
 			q,
+			asyncx.NewWakeup(t.Context()),
 			asyncx.NewWakeup(t.Context()),
 			nil,
 			nil,
@@ -270,6 +274,7 @@ func TestLibrarySearch(t *testing.T) {
 		h := media.NewHTTPLibrary(
 			q,
 			asyncx.NewWakeup(t.Context()),
+			asyncx.NewWakeup(t.Context()),
 			nil,
 			nil,
 			media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
@@ -325,6 +330,7 @@ func TestLibrarySearch(t *testing.T) {
 
 		h := media.NewHTTPLibrary(
 			q,
+			asyncx.NewWakeup(t.Context()),
 			asyncx.NewWakeup(t.Context()),
 			nil,
 			nil,
@@ -385,6 +391,7 @@ func TestLibrarySearch(t *testing.T) {
 		h := media.NewHTTPLibrary(
 			q,
 			asyncx.NewWakeup(t.Context()),
+			asyncx.NewWakeup(t.Context()),
 			nil,
 			nil,
 			media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
@@ -430,6 +437,7 @@ func TestLibrarySearch(t *testing.T) {
 
 		h := media.NewHTTPLibrary(
 			q,
+			asyncx.NewWakeup(t.Context()),
 			asyncx.NewWakeup(t.Context()),
 			nil,
 			nil,
@@ -493,6 +501,7 @@ func TestLibrarySearch(t *testing.T) {
 		h := media.NewHTTPLibrary(
 			q,
 			asyncx.NewWakeup(t.Context()),
+			asyncx.NewWakeup(t.Context()),
 			nil,
 			nil,
 			media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
@@ -552,6 +561,7 @@ func TestLibrarySearch(t *testing.T) {
 		h := media.NewHTTPLibrary(
 			q,
 			asyncx.NewWakeup(t.Context()),
+			asyncx.NewWakeup(t.Context()),
 			nil,
 			nil,
 			media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
@@ -600,6 +610,7 @@ func TestLibrarySearch(t *testing.T) {
 
 		h := media.NewHTTPLibrary(
 			q,
+			asyncx.NewWakeup(t.Context()),
 			asyncx.NewWakeup(t.Context()),
 			nil,
 			nil,
@@ -663,6 +674,7 @@ func TestLibrarySearch(t *testing.T) {
 
 		h := media.NewHTTPLibrary(
 			q,
+			asyncx.NewWakeup(t.Context()),
 			asyncx.NewWakeup(t.Context()),
 			nil,
 			nil,

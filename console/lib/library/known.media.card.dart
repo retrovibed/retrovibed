@@ -89,6 +89,7 @@ class KnownMediaCard extends StatelessWidget {
             : Image.network(
               current.image,
               headers: _imageheaders(current.image),
+              errorBuilder: (context, error, stackTrace) => const Icon(Icons.image_outlined),
             );
 
     return AspectRatio(

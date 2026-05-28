@@ -42,7 +42,7 @@ func (t exportMagnets) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) 
 		return err
 	}
 
-	dir := fsx.Walk(root.FS())
+	dir := fsx.WalkDir(root.FS())
 	bmc := torrent.NewBitmapCache(tvfs.Path())
 
 	for path := range dir.Walk() {

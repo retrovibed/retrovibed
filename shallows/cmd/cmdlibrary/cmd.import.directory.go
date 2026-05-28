@@ -6,11 +6,13 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"log"
 	"mime"
 	"mime/multipart"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
@@ -42,6 +44,9 @@ func (t importDirectory) run(ctx context.Context, enc *jsonl.Encoder, c *http.Cl
 		Entry fs.DirEntry
 	}
 
+	log.Println("directory import initiated")
+	defer log.Println("directory import completed")
+
 	encwriter := asynccompute.New(func(ctx context.Context, w *media.Media) (err error) {
 		return enc.Encode(w)
 	}, asynccompute.Workers[*media.Media](1), asynccompute.Backlog[*media.Media](t.Concurrency*2))
@@ -50,6 +55,7 @@ func (t importDirectory) run(ctx context.Context, enc *jsonl.Encoder, c *http.Cl
 		var (
 			m = new(media.MediaUploadResponse)
 		)
+
 		defer func() {
 			errorsx.Log(errorsx.Wrapf(err, "import failed: %s", w.Path))
 		}()
@@ -60,7 +66,8 @@ func (t importDirectory) run(ctx context.Context, enc *jsonl.Encoder, c *http.Cl
 		}
 		defer f.Close()
 
-		filename := filepath.Base(w.Path)
+		filename := strings.TrimPrefix(w.Path, filepath.Dir(strings.TrimSuffix(t.Directory, string(filepath.Separator))))
+		filename = strings.ReplaceAll(filename, string(filepath.Separator), " ")
 		mimetype := langx.FirstNonZero(t.Mimetype, mime.TypeByExtension(filepath.Ext(filename)), mimex.Binary)
 
 		contentType, body, err := httpx.Multipart(func(mw *multipart.Writer) error {

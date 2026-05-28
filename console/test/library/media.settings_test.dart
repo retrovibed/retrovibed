@@ -570,6 +570,97 @@ void main() {
       });
     });
 
+    group('onDelete', () {
+      Widget buildWidget({
+        required String? Function(String) onDelete,
+        void Function(bool forced, bool autoclose)? captureOnChange,
+      }) {
+        return modals.Node(
+          SizedBox(
+            width: 800,
+            height: 600,
+            child: SingleChildScrollView(
+              child: MediaSettings(
+                current: testMedia,
+                onChange: (pending, {bool forced = false, bool autoclose = false}) {
+                  captureOnChange?.call(forced, autoclose);
+                },
+                knownSearch: mockKnownSearch,
+                mediaDelete: (id, {options = const []}) async {
+                  onDelete(id);
+                  return media.MediaDeleteResponse();
+                },
+              ),
+            ),
+          ),
+        );
+      }
+
+      testWidgets('tapping confirm calls mediaDelete and onChange with forced:true autoclose:true', (tester) async {
+        String? capturedId;
+        bool capturedForced = false;
+        bool capturedAutoclose = false;
+
+        await tester.pumpApp(
+          buildWidget(
+            onDelete: (id) {
+              capturedId = id;
+              return null;
+            },
+            captureOnChange: (forced, autoclose) {
+              capturedForced = forced;
+              capturedAutoclose = autoclose;
+            },
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byIcon(Icons.delete_forever_rounded));
+        await tester.pump();
+
+        expect(
+          find.text('Are you sure you want to delete ${testMedia.description}?'),
+          findsOneWidget,
+        );
+
+        await tester.tap(find.text('Yes'));
+        await tester.pumpAndSettle();
+
+        expect(capturedId, equals(testMedia.id));
+        expect(capturedForced, isTrue);
+        expect(capturedAutoclose, isTrue);
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('tapping cancel does not call mediaDelete', (tester) async {
+        bool deleteCalled = false;
+
+        await tester.pumpApp(
+          buildWidget(
+            onDelete: (_) {
+              deleteCalled = true;
+              return null;
+            },
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byIcon(Icons.delete_forever_rounded));
+        await tester.pump();
+
+        expect(
+          find.text('Are you sure you want to delete ${testMedia.description}?'),
+          findsOneWidget,
+        );
+
+        await tester.tap(find.text('No'));
+        await tester.pumpAndSettle();
+
+        expect(deleteCalled, isFalse);
+        expect(tester.takeException(), isNull);
+      });
+    });
+
     group('onTap (reset)', () {
       Future<media.DownloadMetadataResponse> mockDiscoveredGet(
         String id, {

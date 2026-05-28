@@ -68,13 +68,27 @@ func GenerateDevBinding(ctx context.Context, _ eg.Op) error {
 	)
 }
 
-func GenerateDevStaticBinding(dir string, rt shell.Command) eg.OpFn {
+func GenerateDevStaticBinding(rt shell.Command, outdir string, staticdirs ...string) eg.OpFn {
 	return func(ctx context.Context, _ eg.Op) error {
-		duckdblibs := strings.Join(errorsx.Zero(filepath.Glob(filepath.Join(dir, "*.a"))), " ")
-		runtime := flutterRuntimev2(rt)
+		var cgoFlags strings.Builder
+
+		for _, dir := range staticdirs {
+			fmt.Fprintf(&cgoFlags, " -L%s", dir)
+		}
+
+		// 1. Link to the clean dynamic libduckdb.so to drop duplicate symbol issues
+		// 2. Explicitly bind libpredicttext.a statically so its Rust code is baked inside
+		// duckdb is an absolute disaster to statically link
+		fmt.Fprintf(&cgoFlags, " -lduckdb -Wl,-Bstatic -lpredicttext -Wl,-Bdynamic -static-libstdc++ -Wl,-z,max-page-size=16384")
+
+		runtime := flutterRuntimev2(rt).Debug()
 		return shell.Run(
 			ctx,
-			runtime.Newf("go -C retrovibedbind build -trimpath -buildmode=c-shared -buildvcs=true --tags duckdb_use_static_lib,localdev -o %s/libretrovibed.so .", dir).Environ("CGO_LDFLAGS", fmt.Sprintf("-Wl,--allow-multiple-definition -L%s -Wl,--whole-archive %s -Wl,--no-whole-archive -static-libstdc++ -Wl,-z,max-page-size=16384", dir, duckdblibs)),
+			runtime.Newf(
+				"go -C retrovibedbind build -trimpath -buildmode=c-shared -buildvcs=true --tags localdev,retrovibed,neural -o %s/libretrovibed.so .",
+				outdir,
+			).
+				Environ("CGO_LDFLAGS", strings.TrimSpace(cgoFlags.String())),
 		)
 	}
 }

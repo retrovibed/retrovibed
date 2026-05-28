@@ -11,6 +11,12 @@ class Image extends m.StatelessWidget {
 
   @override
   m.Widget build(m.BuildContext context) {
-    return current == "" ? m.Icon(m.Icons.image_outlined, size: size) : m.Image.network(current, height: size);
+    return current == ""
+        ? m.Icon(m.Icons.image_outlined, size: size)
+        : m.Image.network(
+            current,
+            height: size,
+            errorBuilder: (context, error, stackTrace) => m.Icon(m.Icons.image_outlined, size: size),
+          );
   }
 }

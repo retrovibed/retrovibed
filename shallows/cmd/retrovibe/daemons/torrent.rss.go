@@ -165,8 +165,7 @@ func DiscoverFromRSSFeedsOnce(
 
 		handlehttp := func(uri rss.Enclosure, i rss.Item) error {
 			var (
-				known library.Known
-				meta  tracking.Metadata
+				meta tracking.Metadata
 			)
 
 			if !strings.HasPrefix(uri.URL, "http") && !strings.HasPrefix(uri.URL, "https") {
@@ -208,17 +207,13 @@ func DiscoverFromRSSFeedsOnce(
 				return errorsx.Wrapf(err, "unable to persist torrent to disk: %s", feed.ID)
 			}
 
-			if known, err = library.DetectKnownMedia(ctx, q, mi.Name); err != nil {
-				log.Println("unable to detect known media ignoring", err)
-			}
-
 			if err = tracking.MetadataInsertWithDefaults(
 				ctx, q, tracking.NewMetadata(
 					langx.Autoptr(md.ID()),
 					tracking.MetadataOptionFromInfo(&mi),
 					tracking.MetadataOptionDescription(stringsx.FirstNonBlank(mi.Name, i.Title)),
 					tracking.MetadataOptionTrackers(md.Announce),
-					tracking.MetadataOptionKnownMediaID(known.UID),
+					tracking.MetadataOptionKnownMediaID(uuid.Max.String()),
 					tracking.MetadataOptionMimetype(stringsx.FirstNonBlank(channel.Retrovibed.Mimetype, uri.Mimetype)),
 					tracking.MetadataOptionEntropySeed(
 						md.HashInfoBytes().Bytes(),
@@ -247,8 +242,7 @@ func DiscoverFromRSSFeedsOnce(
 
 		handlemagnet := func(uri rss.Enclosure, i rss.Item) error {
 			var (
-				known library.Known
-				meta  tracking.Metadata
+				meta tracking.Metadata
 			)
 
 			if !strings.HasPrefix(uri.URL, "magnet") {
@@ -261,17 +255,13 @@ func DiscoverFromRSSFeedsOnce(
 				return errorsx.Wrapf(err, "unable to parse magnet link: %s", feed.ID)
 			}
 
-			if known, err = library.DetectKnownMedia(ctx, q, md.DisplayName); err != nil {
-				log.Println("unable to detect known media ignoring", err)
-			}
-
 			_md := tracking.NewMetadata(
 				new(int160.FromByteArray(md.InfoHash)),
 				tracking.MetadataOptionFromMagnet(&md),
 				tracking.MetadataOptionBytes(uri.Length),
 				tracking.MetadataOptionMimetype(stringsx.FirstNonBlank(channel.Retrovibed.Mimetype, uri.Mimetype)),
 				tracking.MetadataOptionDescription(i.Title),
-				tracking.MetadataOptionKnownMediaID(known.UID),
+				tracking.MetadataOptionKnownMediaID(uuid.Max.String()),
 				tracking.MetadataOptionEntropySeed(
 					md.InfoHash.Bytes(),
 					uuidx.FirstNonNil(

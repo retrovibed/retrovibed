@@ -210,6 +210,41 @@ func PrintFS(d fs.FS) {
 	}
 }
 
+func WalkDir(d fs.FS) *DirWalker {
+	return &DirWalker{
+		root: d,
+	}
+}
+
+type DirWalker struct {
+	root   fs.FS
+	failed error
+}
+
+func (t *DirWalker) Walk() iter.Seq2[string, fs.DirEntry] {
+	return func(yield func(string, fs.DirEntry) bool) {
+		t.failed = fs.WalkDir(t.root, ".", func(path string, d fs.DirEntry, err error) error {
+			if err != nil {
+				return err
+			}
+
+			if !yield(path, d) {
+				return fmt.Errorf("unable to yield path: %s", path)
+			}
+
+			if d.IsDir() && path != "." {
+				return fs.SkipDir
+			}
+
+			return nil
+		})
+	}
+}
+
+func (t *DirWalker) Err() error {
+	return t.failed
+}
+
 func Walk(d fs.FS) *Walker {
 	return &Walker{
 		root: d,
@@ -230,10 +265,6 @@ func (t *Walker) Walk() iter.Seq2[string, fs.DirEntry] {
 
 			if !yield(path, d) {
 				return fmt.Errorf("unable to yield path: %s", path)
-			}
-
-			if d.IsDir() && path != "." {
-				return fs.SkipDir
 			}
 
 			return nil

@@ -353,7 +353,7 @@ github.com/ebitengine/purego/internal/xreflect
 # github.com/edsrzf/mmap-go v1.2.0
 ## explicit; go 1.17
 github.com/edsrzf/mmap-go
-# github.com/egdaemon/eg v0.0.0-20260507170309-83e275be7a30
+# github.com/egdaemon/eg v0.0.0-20260526222845-c198ed9b8af6
 ## explicit; go 1.24.2
 github.com/egdaemon/eg
 github.com/egdaemon/eg/backoff
@@ -396,7 +396,6 @@ github.com/egdaemon/eg/runtime/wasi/egunsafe/ffigraph
 github.com/egdaemon/eg/runtime/wasi/env
 github.com/egdaemon/eg/runtime/wasi/shell
 github.com/egdaemon/eg/runtime/x/wasi/egbug
-github.com/egdaemon/eg/runtime/x/wasi/egcargo
 github.com/egdaemon/eg/runtime/x/wasi/egccache
 github.com/egdaemon/eg/runtime/x/wasi/egdebuild
 github.com/egdaemon/eg/runtime/x/wasi/egdmg
@@ -794,10 +793,6 @@ github.com/mutablelogic/go-media/pkg/image
 github.com/mutablelogic/go-media/sys/ffmpeg71
 # github.com/nxadm/tail v1.4.11
 ## explicit; go 1.13
-# github.com/onsi/ginkgo/v2 v2.28.1
-## explicit; go 1.24.0
-# github.com/onsi/gomega v1.39.1
-## explicit; go 1.24.0
 # github.com/pierrec/lz4/v4 v4.1.25
 ## explicit; go 1.17
 github.com/pierrec/lz4/v4

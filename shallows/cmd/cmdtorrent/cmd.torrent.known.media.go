@@ -8,6 +8,7 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
@@ -37,7 +38,7 @@ func (t cmdKnownMedia) Run(ctx *cmdopts.Global) (err error) {
 			known library.Known
 		)
 
-		if known, err = library.DetectKnownMedia(ctx.Context, db, md.Description); err != nil {
+		if known, err = library.DetectKnownMedia(ctx.Context, db, mimex.Category(md.Mimetype), md.Description); err != nil {
 			log.Println("failed to detect known media", err)
 			continue
 		}

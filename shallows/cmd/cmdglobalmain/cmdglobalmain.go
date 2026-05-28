@@ -63,6 +63,7 @@ func Main(args ...string) {
 		Discovery cmdddisc.Commands     `cmd:"" help:"media discovery commands, used to manage discovery of media"`
 		ETL       cmdetl.Commands       `cmd:"" help:"etl commands for processing jsonl through llm endpoints"`
 		Daemon    daemons.Command       `cmd:"" help:"run the backend daemon" default:"true"`
+		Console   cmdopts.CmdExec       `cmd:"" hidden:"" help:"open the retrovibe console (ui)"`
 	}
 
 	var (
@@ -72,6 +73,7 @@ func Main(args ...string) {
 
 	shellCli.Context, shellCli.Shutdown = context.WithCancel(context.Background())
 	shellCli.Cleanup = &sync.WaitGroup{}
+	shellCli.Console = cmdopts.NewCmdExec("retrovibe")
 
 	log.SetFlags(log.Lshortfile | log.LUTC | log.Ltime)
 	log.SetPrefix(fmt.Sprintf("%d ", os.Getpid()))

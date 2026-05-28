@@ -186,6 +186,10 @@ func MetadataQueryNotIndexed() squirrel.Sqlizer {
 	return squirrel.Expr("library_metadata.auto_description == ''")
 }
 
+func MetadataQueryNeedsKnownMediaID() squirrel.Sqlizer {
+	return squirrel.Expr("library_metadata.known_media_id = 'FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF'")
+}
+
 func MetadataSearch(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilder) MetadataScanner {
 	return NewMetadataScannerStatic(b.RunWith(q).QueryContext(ctx))
 }

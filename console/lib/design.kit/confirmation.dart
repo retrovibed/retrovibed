@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import './theme.defaults.dart';
 import 'container.dart' as _container;
@@ -64,6 +65,21 @@ class Confirmation extends StatelessWidget {
       cancellation: Text('Cancel'),
       onConfirm: onConfirm,
       onCancel: onCancel,
+    );
+  }
+
+  static Widget Function(Completer<void>) dangerous({
+    required Widget content,
+    required Future<void> Function(BuildContext) onConfirm,
+  }) {
+    return (completion) => Confirmation.yesNo(
+      content: content,
+      onConfirm: (ctx) {
+        onConfirm(ctx)
+            .then((_) => completion.complete())
+            .catchError(completion.completeError);
+      },
+      onCancel: (_) => completion.complete(),
     );
   }
 

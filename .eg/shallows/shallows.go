@@ -41,7 +41,8 @@ func shellruntime() shell.Command {
 
 func NeuralsBuild() eg.OpFn {
 	return neurals.MaybeBuild(
-		".eg.cache/neurals/libpredicttext.so",
+		"neurals/libpredicttext.so",
+		neurals.Compile,
 		neurals.Clone,
 	)
 }

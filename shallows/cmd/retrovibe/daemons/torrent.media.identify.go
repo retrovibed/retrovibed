@@ -8,12 +8,14 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
+	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 )
 
-func IdentifyTorrentMedia(ctx context.Context, db sqlx.Queryer) error {
+func IdentifyTorrentMedia(ctx context.Context, db sqlx.Queryer, mc library.QueryCleaner) error {
 	q := tracking.MetadataSearchBuilder().Where(
 		squirrel.And{
 			tracking.MetadataQueryNeedsKnownMediaID(),
@@ -31,17 +33,32 @@ func IdentifyTorrentMedia(ctx context.Context, db sqlx.Queryer) error {
 
 	for md := range iter.Iter() {
 		var (
-			err   error
-			known library.Known
+			err     error
+			cleaned string
+			known   library.Known
 		)
 
-		if known, err = library.DetectKnownMedia(ctx, db, md.Description); err != nil {
+		if cleaned, err = mc.Clean(ctx, md.Description); err != nil {
+			log.Println("unable to clean media for torrent", md.ID, md.Description, "|", cleaned, "|", err)
+			continue
+		} else if stringsx.Blank(cleaned) {
+			log.Println("unable to clean media for torrent - detected messy description ended up with blank", md.ID, md.Description, "|", "''", "|", err)
+			if err = tracking.MetadataAssignKnownMediaID(ctx, db, md.ID, uuid.Nil.String()).Scan(&md); err != nil {
+				log.Println("unable to mark torrent as unidentifiable", md.ID, err)
+			}
+			continue
+		}
+
+		if known, err = library.DetectKnownMedia(ctx, db, mimex.Category(md.Mimetype), cleaned); err != nil {
 			log.Println("unable to detect media for torrent", md.ID, md.Description, "|", md.Description, "|", err)
 			continue
 		}
 
 		if uuid.FromStringOrNil(known.UID).IsNil() {
 			log.Println("unable to detect media for torrent", md.ID, md.Description, "|", md.Description)
+			if err = tracking.MetadataAssignKnownMediaID(ctx, db, md.ID, uuid.Nil.String()).Scan(&md); err != nil {
+				log.Println("unable to mark torrent as unidentifiable", md.ID, err)
+			}
 			continue
 		}
 

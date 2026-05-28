@@ -4,7 +4,6 @@ import (
 	"context"
 	"eg/compute/android"
 	"path/filepath"
-	"time"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
@@ -27,9 +26,9 @@ func Download(ctx context.Context, op eg.Op) error {
 }
 
 // compile and put the results into the specified directory.
-func Compile(runtime shell.Command, build string) eg.OpFn {
+func Compile(runtime shell.Command) eg.OpFn {
 	return func(ctx context.Context, op eg.Op) error {
-		return compile(shell.Runtime(), "cmake -G \"Ninja\" -DEXTENSION_STATIC_BUILD=1 -DBUILD_EXTENSIONS=${DUCKDB_EXTENSIONS} -DENABLE_EXTENSION_AUTOLOADING=1 -DENABLE_EXTENSION_AUTOINSTALL=1 -DCMAKE_VERBOSE_MAKEFILE=on -DBUILD_UNITTESTS=0 -DBUILD_SHELL=0 -DCMAKE_BUILD_TYPE=Release .")(ctx, op)
+		return compile(shell.Runtime(), "GEN=ninja make bundle-library")(ctx, op)
 	}
 }
 
@@ -37,13 +36,17 @@ func compile(runtime shell.Command, build string) eg.OpFn {
 	return func(ctx context.Context, o eg.Op) error {
 		sruntime := runtime.
 			EnvironFrom(egccache.Env()...).
-			Environ("DUCKDB_EXTENSIONS", "autocomplete;json;parquet;icu;inet;fts").
 			Directory(egenv.CacheDirectory("duckdb"))
 		return shell.Run(
 			ctx,
-			sruntime.New(build).Timeout(egenv.TTL()),
-			sruntime.New("cmake --build build --config Release").Timeout(30*time.Minute),
-			sruntime.Newf("DESTDIR=\"%s\" cmake --install build --prefix=\"/\"", egenv.EphemeralDirectory("duckdb")),
+			sruntime.New(build).
+				Environ("DUCKDB_EXTENSIONS", "inet").
+				Environ(
+					"EXTENSION_CONFIGS", egenv.WorkingDirectory(".dist", "duckdb_config.cmake"),
+				).Timeout(egenv.TTL()),
+			sruntime.Newf("mkdir -p %s", egenv.EphemeralDirectory("duckdb")),
+			sruntime.Newf("cp build/release/libduckdb_bundle.a %s/", egenv.EphemeralDirectory("duckdb")),
+			sruntime.Newf("cp build/release/src/libduckdb.so %s/", egenv.EphemeralDirectory("duckdb")),
 		)
 	}
 }
@@ -54,6 +57,8 @@ func Clone(dir string) eg.OpFn {
 		sruntime := egccache.Runtime().Directory(egenv.CacheDirectory("duckdb"))
 		return shell.Run(
 			ctx,
+			sruntime.Newf("ls -lha %s/*.a", egenv.EphemeralDirectory("duckdb")),
+			sruntime.Newf("mkdir -p %s", dir),
 			sruntime.Newf("rsync -avm --include='*/' --include='*.so' --include='*.a' --include='*.h' --exclude='*' %s/* %s", egenv.EphemeralDirectory("duckdb"), dir),
 		)
 	}
@@ -170,11 +175,11 @@ func CloneIOS(dir string) eg.OpFn {
 
 func MaybeBuild(sopath string, bop eg.OpFn, clone func(dir string) eg.OpFn) eg.OpFn {
 	return eg.WhenFn(func(ctx context.Context) bool {
-		return !egfs.FileExists(egenv.WorkingDirectory(sopath))
+		return !egfs.FileExists(egenv.CacheDirectory(sopath))
 	}, eg.Sequential(
 		Download,
 		bop,
-		clone(egenv.WorkingDirectory(filepath.Dir(sopath))),
+		clone(egenv.CacheDirectory(filepath.Dir(sopath))),
 	),
 	)
 }

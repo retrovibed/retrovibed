@@ -28,7 +28,7 @@ fn run_predict(
             .into_optimized()
             .map_err(|e| format!("Optimization failed: {e}"))?
             .into_runnable()
-            .map_err(|e| format!("Failed to build runnable plan: {e}"))?;
+            .map_err(|e| format!("failed to build runnable plan: {e}"))?;
         Ok(Model {
             path: model_path.to_string(),
             plan,
@@ -46,19 +46,19 @@ fn run_predict(
     }
 
     let src: Tensor = tract_ndarray::Array2::from_shape_vec((1, seq_len), flat)
-        .map_err(|e| format!("Tensor error: {e}"))?
+        .map_err(|e| format!("{0} tensor error: {e}", model.path))?
         .into_dyn()
         .into();
 
     let mut outputs = model
         .plan
         .run(tvec!(src.into()))
-        .map_err(|e| format!("Execution error: {e}"))?;
+        .map_err(|e| format!("{0} execution error: {e}", model.path))?;
 
     let logits = outputs
         .remove(0)
         .to_array_view::<f32>()
-        .map_err(|e| format!("Output type mismatch: {e}"))?
+        .map_err(|e| format!("{0} output type mismatch: {e}", model.path))?
         .into_owned();
 
     let mut token_ids: Vec<i64> = Vec::new();
@@ -81,7 +81,7 @@ fn run_predict(
 
 /// Predict output for input string using the ONNX model at model_path.
 /// Writes a null-terminated result into output (up to output_len bytes).
-/// Returns 0 on success, -1 on error.
+/// Returns 0 on success, 1 on error.
 #[no_mangle]
 pub extern "C" fn predict(
     model_path: *const c_char,
@@ -107,6 +107,6 @@ pub extern "C" fn predict(
             };
             0
         }
-        Err(_) => -1,
+        Err(_) => 1,
     }
 }

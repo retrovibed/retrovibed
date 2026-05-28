@@ -25,7 +25,7 @@ func MetadataInsertWithDefaults(
 	gql genieql.Insert,
 	pattern func(ctx context.Context, q sqlx.Queryer, a Metadata) NewMetadataScannerStaticRow,
 ) {
-	gql.Into("library_metadata").Default("created_at", "updated_at", "tombstoned_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, tombstoned_at = DEFAULT, archive_id = CASE WHEN archive_id IN ('ffffffff-ffff-ffff-ffff-ffffffffffff', '00000000-0000-0000-0000-000000000000') THEN EXCLUDED.archive_id ELSE archive_id END")
+	gql.Into("library_metadata").Default("created_at", "updated_at", "tombstoned_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, tombstoned_at = DEFAULT, auto_description = EXCLUDED.auto_description, description = EXCLUDED.description, archive_id = CASE WHEN archive_id IN ('ffffffff-ffff-ffff-ffff-ffffffffffff', '00000000-0000-0000-0000-000000000000') THEN EXCLUDED.archive_id ELSE archive_id END, known_media_id = CASE WHEN known_media_id IN ('ffffffff-ffff-ffff-ffff-ffffffffffff', '00000000-0000-0000-0000-000000000000') THEN EXCLUDED.known_media_id ELSE known_media_id END")
 }
 
 func MetadataDeleteByID(
@@ -212,9 +212,9 @@ func KnownScoreByID(
 
 func KnownBestMatch(
 	gql genieql.Function,
-	pattern func(ctx context.Context, q sqlx.Queryer, terms string, cutoff float32) NewKnownScannerStaticRow,
+	pattern func(ctx context.Context, q sqlx.Queryer, mime string, terms string, cutoff float32) NewKnownScannerStaticRow,
 ) {
-	gql = gql.Query(`WITH scored AS (SELECT uid, {terms} as q, (jaro_winkler_similarity(title, q, {cutoff}) + jaro_similarity(title, q, {cutoff})) / 2 AS relevance FROM library_known_media WHERE NOT adult ORDER BY relevance DESC) SELECT ` + KnownScannerStaticColumns + ` FROM library_known_media INNER JOIN scored ON library_known_media.uid = scored.uid WHERE scored.relevance > {cutoff} ORDER BY scored.relevance DESC`)
+	gql = gql.Query(`WITH scored AS (SELECT uid, {terms} as q, (jaro_winkler_similarity(title, q, {cutoff}) + jaro_similarity(title, q, {cutoff})) / 2 AS relevance FROM library_known_media WHERE NOT adult AND ({mime} = '' OR mimetype = {mime}) ORDER BY relevance DESC) SELECT ` + KnownScannerStaticColumns + ` FROM library_known_media INNER JOIN scored ON library_known_media.uid = scored.uid WHERE scored.relevance > {cutoff} ORDER BY scored.relevance DESC`)
 }
 
 func Locate(gql genieql.Structure) {
