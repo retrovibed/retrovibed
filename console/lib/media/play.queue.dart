@@ -124,7 +124,6 @@ extension PlayableMediaNullable on PlayableMedia? {
       this?.known ??
       Known(
         id: uuidx.min(),
-        description: "",
       );
 }
 
@@ -142,7 +141,6 @@ Stream<PlayableMedia> range(
   );
 
   for (var (idx, m) in initial.indexed) {
-    print("DERP DERP 0");
     yield PlayableMedia(
       m,
       pos: idx == 0 ? pos : const Duration(milliseconds: 0),
@@ -152,7 +150,6 @@ Stream<PlayableMedia> range(
   while (i.items.length == i.next.limit.toInt()) {
     i = await search(i.next, options: options());
     for (var m in i.items) {
-      print("DERP DERP 1");
       yield PlayableMedia(m);
     }
     i.next..offset += 1;
@@ -164,7 +161,6 @@ Stream<PlayableMedia> range(
   // results to keep a trend going.
   while (true) {
     final v = await random(i.next, options: options());
-    print("DERP DERP 2");
     yield PlayableMedia(v.media);
   }
 }

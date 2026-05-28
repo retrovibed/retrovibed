@@ -136,9 +136,6 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		mc                  = library.NewQueryerCleanerAuto()
 	)
 
-	log.Println("--------------------------------------------------------------------------------")
-	log.Println("WAKA", errorsx.Zero(mc.Clean(gctx.Context, "DERP DERP[avc][mp4].mp3")))
-	log.Println("--------------------------------------------------------------------------------")
 	gctx.Cleanup.Add(1)
 	defer gctx.Cleanup.Done()
 

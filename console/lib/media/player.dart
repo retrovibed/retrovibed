@@ -4,7 +4,6 @@ import 'package:media_kit/media_kit.dart'; // Provides [Player], [Media], [Playl
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/uuidx.dart' as uuidx;
-import 'package:retrovibed/library.dart' as _library;
 import './playlist.dart' as internal;
 import './player.control.previous.dart';
 import './player.control.next.dart';
