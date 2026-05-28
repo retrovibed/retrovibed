@@ -92,3 +92,7 @@ AsyncVoidCallback toasync(VoidCallback fn) {
     fn();
   };
 }
+
+AsyncVoidCallback decorated(AsyncVoidCallback fn, Future<void> Function(Future<void>) decorate) {
+  return () => decorate(fn());
+}

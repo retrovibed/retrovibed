@@ -238,6 +238,12 @@ class _LoadingIconButtonState extends State<LoadingIconButton> {
         });
   }
 
+  // CircularProgressIndicator throws on NaN/Infinity; treat those as indeterminate.
+  static double? _sanitize(double? v) {
+    if (v == null || v.isNaN || v.isInfinite) return null;
+    return v.clamp(0.0, 1.0);
+  }
+
   @override
   Widget build(BuildContext context) {
     final isOn = widget.toggled == true;
@@ -254,7 +260,7 @@ class _LoadingIconButtonState extends State<LoadingIconButton> {
                 ? SizedBox(
                   width: widget.iconSize,
                   height: widget.iconSize,
-                  child: CircularProgressIndicator(strokeWidth: 2.0, value: widget.value),
+                  child: CircularProgressIndicator(strokeWidth: 2.0, value: _sanitize(widget.value)),
                 )
                 : widget.icon,
       ),
