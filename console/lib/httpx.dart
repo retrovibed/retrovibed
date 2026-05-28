@@ -16,8 +16,8 @@ String host() {
 
 String? normalizeuri(String? s) {
   if (s == null) return s;
-  final uri = Uri.parse(s);
-  if (uri.host.isEmpty) return s;
+  final uri = Uri.tryParse(s);
+  if (uri == null || uri.host.isEmpty) return s;
   return "${uri.host}:${uri.port}";
 }
 

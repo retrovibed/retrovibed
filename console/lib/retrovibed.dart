@@ -13,7 +13,7 @@ String _frameworksLib(String name) {
 
 File _defaultlib() {
   if (Platform.isMacOS) {
-    return File(_frameworksLib("retrovibed.dylib"));
+    return File(_frameworksLib("libretrovibed.dylib"));
   }
 
   return File("/app/lib/libretrovibed.so");
@@ -31,8 +31,8 @@ String _path() {
   final files = () {
     if (Platform.isMacOS) {
       return [
-        File(_frameworksLib("retrovibed.dylib")),
-        File("build/nativelib/retrovibed.dylib"),
+        File(_frameworksLib("libretrovibed.dylib")),
+        File("build/nativelib/libretrovibed.dylib"),
       ];
     }
 
