@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"testing"
 
+	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/testx"
 	"github.com/retrovibed/retrovibed/shallows/library"
@@ -65,7 +66,7 @@ func TestKnownBestMatch(t *testing.T) {
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, db, known).Scan(&known))
 
 		var result library.Known
-		require.NoError(t, library.KnownBestMatch(ctx, db, "Inception", 0.7).Scan(&result))
+		require.NoError(t, library.KnownBestMatch(ctx, db, mimex.Binary, "Inception", 0.7).Scan(&result))
 		require.Equal(t, known.UID, result.UID)
 	})
 
@@ -83,7 +84,7 @@ func TestKnownBestMatch(t *testing.T) {
 		}
 
 		var result library.Known
-		require.NoError(t, library.KnownBestMatch(ctx, db, "Inception", 0.7).Scan(&result))
+		require.NoError(t, library.KnownBestMatch(ctx, db, mimex.Binary, "Inception", 0.7).Scan(&result))
 		require.Equal(t, "Inception", result.Title)
 	})
 
@@ -99,7 +100,7 @@ func TestKnownBestMatch(t *testing.T) {
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, db, known).Scan(&known))
 
 		var result library.Known
-		err := library.KnownBestMatch(ctx, db, "xyzzy completely unrelated", 0.99).Scan(&result)
+		err := library.KnownBestMatch(ctx, db, mimex.Binary, "xyzzy completely unrelated", 0.99).Scan(&result)
 		require.ErrorIs(t, err, sql.ErrNoRows)
 	})
 
@@ -115,7 +116,7 @@ func TestKnownBestMatch(t *testing.T) {
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, db, known).Scan(&known))
 
 		var result library.Known
-		err := library.KnownBestMatch(ctx, db, "Inception", 0.7).Scan(&result)
+		err := library.KnownBestMatch(ctx, db, mimex.Binary, "Inception", 0.7).Scan(&result)
 		require.ErrorIs(t, err, sql.ErrNoRows)
 	})
 }

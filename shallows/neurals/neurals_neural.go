@@ -13,8 +13,14 @@ import (
 	"unsafe"
 )
 
-func predict(t *Text, input string) (string, error) {
+func predict(t *Text, input string) (res string, err error) {
 	log.Println("-----------------------------------------------------------------------")
+	defer func() {
+		if err != nil {
+			return
+		}
+		log.Println("cleaned", input, "->", res)
+	}()
 	cModel := C.CString(t.model)
 	defer C.free(unsafe.Pointer(cModel))
 	cInput := C.CString(input)
@@ -35,5 +41,6 @@ func predict(t *Text, input string) (string, error) {
 	if ret != 0 {
 		return "", fmt.Errorf("predict failed for %q", input)
 	}
+
 	return C.GoString((*C.char)(unsafe.Pointer(&buf[0]))), nil
 }

@@ -12,6 +12,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
 	"github.com/retrovibed/retrovibed/shallows/internal/lucenex"
+	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 )
@@ -40,7 +41,8 @@ func (t knowndetect) Run(gctx *cmdopts.Global) (err error) {
 
 func (t knowndetect) run(ctx context.Context, in io.Reader, db sqlx.Queryer, cleaner library.QueryCleaner) error {
 	type input struct {
-		Query string `json:"query"`
+		Query    string `json:"query"`
+		Mimetype string `json:"mimetype"`
 	}
 
 	var count int
@@ -59,7 +61,7 @@ func (t knowndetect) run(ctx context.Context, in io.Reader, db sqlx.Queryer, cle
 			log.Println("query cleaned", rec.Query, "->", query)
 		}
 
-		result, err := library.DetectKnownMedia(ctx, db, query)
+		result, err := library.DetectKnownMedia(ctx, db, mimex.Category(rec.Mimetype), query)
 		if err != nil {
 			return err
 		}

@@ -14,7 +14,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
-	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 )
@@ -46,16 +45,11 @@ func SyncPublishedContentItem(ctx context.Context, q sqlx.Queryer, pc *meta.Publ
 		return errorsx.Wrap(err, "failed to parse magnet URI")
 	}
 
-	known, err := library.DetectKnownMedia(ctx, q, md.DisplayName)
-	if err != nil {
-		log.Println("unable to detect known media, ignoring", err)
-	}
-
 	tmeta := tracking.NewMetadata(
 		langx.Autoptr(int160.FromByteArray(md.InfoHash)),
 		tracking.MetadataOptionFromMagnet(&md),
 		tracking.MetadataOptionDescription(md.DisplayName),
-		tracking.MetadataOptionKnownMediaID(stringsx.FirstNonBlank(pc.KnownMediaId, known.UID)),
+		tracking.MetadataOptionKnownMediaID(stringsx.FirstNonBlank(pc.KnownMediaId, uuid.Max.String())),
 		tracking.MetadataOptionEntropySeed(md.InfoHash.Bytes()),
 		tracking.MetadataOptionAutoDescription,
 		tracking.MetadataOptionAutoHidden,
@@ -74,10 +68,10 @@ func SyncPublishedContentItem(ctx context.Context, q sqlx.Queryer, pc *meta.Publ
 	dbpc := PublishedContent{
 		ID:            pc.Id,
 		CommunityID:   pc.CommunityId,
-		KnownMediaID:  stringsx.FirstNonBlank(pc.KnownMediaId, known.UID),
 		MagnetURI:     pc.MagnetUri,
 		LibraryID:     stringsx.FirstNonBlank(pc.LibraryId, uuid.Nil.String()),
 		OAuthGoogleID: stringsx.FirstNonBlank(pc.OauthGoogleId, uuid.Nil.String()),
+		KnownMediaID:  tmeta.KnownMediaID,
 	}
 
 	if err = PublishedContentInsertWithDefaults(ctx, q, dbpc).Scan(&dbpc); err != nil {

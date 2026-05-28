@@ -152,10 +152,10 @@ func KnownSearchBuilder() squirrel.SelectBuilder {
 	return squirrelx.PSQL.Select(sqlx.Columns(KnownScannerStaticColumns)...).From("library_known_media")
 }
 
-func DetectKnownMedia(ctx context.Context, db sqlx.Queryer, query string) (k Known, err error) {
+func DetectKnownMedia(ctx context.Context, db sqlx.Queryer, mimecat string, query string) (k Known, err error) {
 	k = Unknown()
 
-	if err := KnownBestMatch(ctx, db, query, 0.7).Scan(&k); sqlx.IgnoreNoRows(err) != nil {
+	if err := KnownBestMatch(ctx, db, mimecat, query, 0.7).Scan(&k); sqlx.IgnoreNoRows(err) != nil {
 		return k, errorsx.Wrap(err, "unable to score")
 	}
 

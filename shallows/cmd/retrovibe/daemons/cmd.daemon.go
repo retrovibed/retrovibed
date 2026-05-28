@@ -134,9 +134,6 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		mc             = library.NewQueryerCleanerAuto()
 	)
 
-	log.Println("--------------------------------------------------------------------------------")
-	mc.Clean(gctx.Context, "DERP DERP")
-	log.Println("--------------------------------------------------------------------------------")
 	gctx.Cleanup.Add(1)
 	defer gctx.Cleanup.Done()
 
@@ -277,7 +274,11 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 
 	if t.AutoIdentifyMedia {
 		go timex.NowAndEvery(gctx.Context, 15*time.Minute, func(ctx context.Context) error {
-			errorsx.Log(IdentifyTorrentMedia(gctx.Context, db))
+			errorsx.Log(IdentifyTorrentMedia(gctx.Context, db, mc))
+			return nil
+		})
+		go timex.NowAndEvery(gctx.Context, 15*time.Minute, func(ctx context.Context) error {
+			errorsx.Log(IdentifyLibraryMedia(gctx.Context, db, mc))
 			return nil
 		})
 	} else {
@@ -325,7 +326,6 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		mediastore,
 		deepjwt,
 		media.HTTPLibraryOptionTorrentStorage(tvfs),
-		media.HTTPLibraryOptionQueryCleaner(mc),
 	).Bind(httpmux.PathPrefix("/m").Subrouter())
 	media.NewHTTPDiscovered(
 		db,
