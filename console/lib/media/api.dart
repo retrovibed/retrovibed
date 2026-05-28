@@ -104,6 +104,25 @@ abstract class media {
         });
   }
 
+  static Future<List<Media>> similar(
+    String mediaId, {
+    List<String> exclude = const [],
+    List<httpx.Option> options = const [],
+  }) async {
+    final query = <String, String>{};
+    if (exclude.isNotEmpty) query['exclude'] = exclude.join(',');
+    return httpx
+        .get(
+          Uri.https(httpx.host(), "/similar/$mediaId").replace(queryParameters: query),
+          options: options,
+        )
+        .then((v) {
+          final body = jsonDecode(v.body) as Map<String, dynamic>;
+          final items = (body['items'] as List?) ?? [];
+          return items.map<Media>((e) => Media.create()..mergeFromProto3Json(e)).toList();
+        });
+  }
+
   static Future<http.StreamedResponse> download(
     String id, {
     List<httpx.Option> options = const [],

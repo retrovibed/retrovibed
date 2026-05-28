@@ -18,6 +18,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/netmonx"
+	"github.com/retrovibed/retrovibed/shallows/acoustics"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
@@ -123,17 +124,18 @@ func (t Command) discoverysettings() *DiscoverySettings {
 
 func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts.TLSConfig) (err error) {
 	var (
-		db                  *sql.DB
-		id                  ssh.Signer
-		_socks5             net.Listener
-		deepjwt             = httpx.NewFixedStatusClient(http.StatusMethodNotAllowed)
-		mediameta           = asyncx.NewWakeup(gctx.Context)
-		archival            = asyncx.NewWakeup(gctx.Context)
-		publishing          = asyncx.NewWakeup(gctx.Context)
-		mediaidentification = asyncx.NewWakeup(gctx.Context)
-		vpncfgpath          = userx.DefaultConfigDir(userx.DefaultRelRoot(), "vpn.cfg")
-		storagecfgpath      = userx.DefaultConfigDir(userx.DefaultRelRoot(), "storage.cfg")
-		mc                  = library.NewQueryerCleanerAuto()
+		mc             = library.NewQueryerCleanerAuto()
+		db             *sql.DB
+		id             ssh.Signer
+		_socks5        net.Listener
+		acousticsIdx   acoustics.Index
+		acousticsStats acoustics.RunningStats
+		deepjwt        = httpx.NewFixedStatusClient(http.StatusMethodNotAllowed)
+		mediameta      = asyncx.NewWakeup(gctx.Context)
+		archival       = asyncx.NewWakeup(gctx.Context)
+		publishing     = asyncx.NewWakeup(gctx.Context)
+		vpncfgpath     = userx.DefaultConfigDir(userx.DefaultRelRoot(), "vpn.cfg")
+		storagecfgpath = userx.DefaultConfigDir(userx.DefaultRelRoot(), "storage.cfg")
 	)
 
 	gctx.Cleanup.Add(1)
@@ -200,6 +202,9 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	}
 
 	errorsx.Log(AutoReclaim(gctx.Context, db, mediastore, asyncx.NewWakeup(gctx.Context), t.AutoReclaim))
+
+	// Acoustics: seed hyperplanes, recompute stats, and rebuild the in-memory LSH from audio_features.
+	errorsx.Log(errorsx.Wrap(acoustics.Rebuild(gctx.Context, db, &acousticsIdx, &acousticsStats), "acoustics: rebuild index"))
 
 	if t.AutoSocks5 {
 		if _socks5, err = t.Socks5.Socket(); err != nil {
@@ -294,6 +299,13 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		log.Println("auto recommendations is disabled")
 	}
 
+	mediaFS := library.New(deepjwt, mediastore, func(ctx context.Context, s string) (*library.Metadata, error) {
+		var md library.Metadata
+		err = library.MetadataFindByID(ctx, db, s).Scan(&md)
+		return &md, err
+	})
+	errorsx.Log(AcousticsBackground(gctx.Context, db, &acousticsIdx, &acousticsStats, mediaFS))
+
 	httpmux := mux.NewRouter()
 	httpmux.NotFoundHandler = httpx.NotFound(alice.New())
 	httpmux.Use(
@@ -339,6 +351,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		media.HTTPDiscoveredOptionQueryCleaner(mc),
 	).Bind(httpmux.PathPrefix("/d").Subrouter())
 	media.NewHTTPRecommendations(db).Bind(httpmux.PathPrefix("/r").Subrouter())
+	media.NewHTTPSimilar(db, &acousticsIdx, &acousticsStats).Bind(httpmux.PathPrefix("/similar").Subrouter())
 	media.NewHTTPRecent(db).Bind(httpmux.PathPrefix("/w").Subrouter())
 	ddiscapi.NewHTTPPeerManagement(db).Bind(httpmux.PathPrefix("/ddisc").Subrouter())
 	media.NewHTTPRSSFeed(db).Bind(httpmux.PathPrefix("/rss").Subrouter())
