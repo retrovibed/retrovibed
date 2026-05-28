@@ -263,8 +263,9 @@ func (t *HTTPLibrary) upload(w http.ResponseWriter, r *http.Request) {
 		md5x.FormatUUID(mhash),
 		library.MetadataOptionBytes(*copied.Result),
 		library.MetadataOptionDescription(fh.Filename),
-		library.MetadataOptionAutoDescription(library.NormalizedDescription(fh.Filename)),
 		library.MetadataOptionMimetype(fh.Header.Get("Content-Type")),
+		library.MetadataOptionKnownMediaID(uuid.Max.String()),
+		library.MetadataOptionAutoDescription(library.NormalizedDescription(fh.Filename)),
 	)
 
 	if err = library.MetadataInsertWithDefaults(r.Context(), t.q, lmd).Scan(&lmd); err != nil {

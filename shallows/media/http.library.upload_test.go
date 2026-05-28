@@ -100,6 +100,7 @@ func TestLibraryUploadFile(t *testing.T) {
 		require.NoError(t, err)
 
 		require.Equal(t, result.Media.Id, testx.IOMD5(io.NewSectionReader(bcache, 0, int64(md.Bytes))))
+		require.Equal(t, uuid.Max.String(), md.KnownMediaID, "uploaded media should be marked for auto identification")
 	})
 
 	t.Run("simple_filename", func(t *testing.T) {

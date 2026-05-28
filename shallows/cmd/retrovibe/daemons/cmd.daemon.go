@@ -24,6 +24,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/dnscache"
 	"github.com/retrovibed/retrovibed/shallows/downloads"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
+	"github.com/retrovibed/retrovibed/shallows/internal/backoffx"
 	"github.com/retrovibed/retrovibed/shallows/internal/contextx"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/envx"
@@ -122,18 +123,22 @@ func (t Command) discoverysettings() *DiscoverySettings {
 
 func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts.TLSConfig) (err error) {
 	var (
-		db             *sql.DB
-		id             ssh.Signer
-		_socks5        net.Listener
-		deepjwt        = httpx.NewFixedStatusClient(http.StatusMethodNotAllowed)
-		mediameta      = asyncx.NewWakeup(gctx.Context)
-		archival       = asyncx.NewWakeup(gctx.Context)
-		publishing     = asyncx.NewWakeup(gctx.Context)
-		vpncfgpath     = userx.DefaultConfigDir(userx.DefaultRelRoot(), "vpn.cfg")
-		storagecfgpath = userx.DefaultConfigDir(userx.DefaultRelRoot(), "storage.cfg")
-		mc             = library.NewQueryerCleanerAuto()
+		db                  *sql.DB
+		id                  ssh.Signer
+		_socks5             net.Listener
+		deepjwt             = httpx.NewFixedStatusClient(http.StatusMethodNotAllowed)
+		mediameta           = asyncx.NewWakeup(gctx.Context)
+		archival            = asyncx.NewWakeup(gctx.Context)
+		publishing          = asyncx.NewWakeup(gctx.Context)
+		mediaidentification = asyncx.NewWakeup(gctx.Context)
+		vpncfgpath          = userx.DefaultConfigDir(userx.DefaultRelRoot(), "vpn.cfg")
+		storagecfgpath      = userx.DefaultConfigDir(userx.DefaultRelRoot(), "storage.cfg")
+		mc                  = library.NewQueryerCleanerAuto()
 	)
 
+	log.Println("--------------------------------------------------------------------------------")
+	log.Println("WAKA", errorsx.Zero(mc.Clean(gctx.Context, "DERP DERP[avc][mp4].mp3")))
+	log.Println("--------------------------------------------------------------------------------")
 	gctx.Cleanup.Add(1)
 	defer gctx.Cleanup.Done()
 
@@ -273,13 +278,14 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	})
 
 	if t.AutoIdentifyMedia {
-		go timex.NowAndEvery(gctx.Context, 15*time.Minute, func(ctx context.Context) error {
-			errorsx.Log(IdentifyTorrentMedia(gctx.Context, db, mc))
-			return nil
+		b := backoffx.New(backoffx.Constant(15*time.Minute), backoffx.JitterRandom(time.Second))
+		go asyncx.Periodic(gctx.Context, mediaidentification, b, "automatic media identification - periodic")
+		asyncx.Background(gctx.Context, mediaidentification, func(ctx context.Context) error {
+			return errorsx.Wrap(IdentifyTorrentMedia(gctx.Context, db, mc), "failed to identify media")
 		})
-		go timex.NowAndEvery(gctx.Context, 15*time.Minute, func(ctx context.Context) error {
-			errorsx.Log(IdentifyLibraryMedia(gctx.Context, db, mc))
-			return nil
+
+		asyncx.Background(gctx.Context, mediaidentification, func(ctx context.Context) error {
+			return errorsx.Wrap(IdentifyLibraryMedia(gctx.Context, db, mc), "failed to identify media")
 		})
 	} else {
 		log.Println("auto identify media is disabled, to enable add --auto-identify-media flag, this is an experimental feature.")

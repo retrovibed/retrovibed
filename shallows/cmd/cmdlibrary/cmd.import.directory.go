@@ -55,6 +55,7 @@ func (t importDirectory) run(ctx context.Context, enc *jsonl.Encoder, c *http.Cl
 		var (
 			m = new(media.MediaUploadResponse)
 		)
+
 		defer func() {
 			errorsx.Log(errorsx.Wrapf(err, "import failed: %s", w.Path))
 		}()
