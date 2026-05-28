@@ -18,16 +18,15 @@ Future<void> Function()? PlayAction(
     case mimex.icomovie:
     case mimex.icoaudio:
       final playlist = Playlist.of(context);
-      return playlist == null
-          ? null
-          : () {
-            return Future.sync(
-              () => playlist.setPlaylist(
-                s.next,
-                range(s.next, current, options: () => [authn.request(authn.AuthzCache.meta(context))]),
-              ),
-            );
-          };
+      if (playlist == null) return null;
+      return () {
+        return Future.sync(
+          () => playlist.setPlaylist(
+            s.next,
+            range(s.next, current, options: () => [authn.request(authn.AuthzCache.meta(context))]),
+          ),
+        );
+      };
     default:
       return null;
   }

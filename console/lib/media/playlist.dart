@@ -178,7 +178,9 @@ class _PlaylistState extends State<Playlist> {
       next: api.media.request(limit: 32, mimetypes: mimex.of(mimex.icoaudio)),
     ),
   );
-  Known get current => _queue.current;
+
+  Known get known => _queue.current.value.known;
+  ValueNotifier<PlayableMedia?> get current => _queue.current;
 
   void setState(VoidCallback fn) {
     if (!mounted) return;
@@ -213,7 +215,7 @@ class _PlaylistState extends State<Playlist> {
     });
 
     player.stream.position.throttle(const Duration(seconds: 3), trailing: true).listen((pos) {
-      final id = _queue.current.id;
+      final id = known.id;
       if (id == uuidx.min()) return;
       if (search.value.next.query.trim().isEmpty) return;
       widget.tracing(context, pos, player.state.duration, search.value.next, id);
@@ -251,22 +253,22 @@ class _PlaylistState extends State<Playlist> {
 
   void next() {
     print(
-      "next initiated: ${_queue.previous} | ${_queue.current.description} - ${_queue.currentStart} | ${_queue.upcoming}",
+      "next initiated: ${_queue.previous} | ${known.description} - ${_queue.currentStart} | ${_queue.upcoming}",
     );
     _advance().whenComplete(() {
       print(
-        "next completed: ${_queue.previous} | ${_queue.current.description} | ${_queue.upcoming}",
+        "next completed: ${_queue.previous} | ${known.description} | ${_queue.upcoming}",
       );
     });
   }
 
   void previous() {
     print(
-      "previous initiated: ${_queue.previous} | ${_queue.current.description} | ${_queue.upcoming}",
+      "previous initiated: ${_queue.previous} | ${known.description} | ${_queue.upcoming}",
     );
     _reverse().then((m) {
       print(
-        "previous completed: ${_queue.previous} | ${_queue.current.description} | ${_queue.upcoming}",
+        "previous completed: ${_queue.previous} | ${known.description} | ${_queue.upcoming}",
       );
     });
   }

@@ -23,12 +23,12 @@ void main() {
   group('PlayQueue.current', () {
     test('defaults id to uuidx.min() when no media is loaded', () {
       final q = PlayQueue();
-      expect(q.current.id, uuidx.min());
+      expect(q.known.id, uuidx.min());
     });
 
     test('defaults description to empty when no media is loaded', () {
       final q = PlayQueue();
-      expect(q.current.hasDescription(), isFalse);
+      expect(q.known.hasDescription(), isFalse);
     });
 
     test('returns id and description from loaded media', () async {
@@ -39,8 +39,8 @@ void main() {
       q.reset(Stream.fromIterable([_media('abc', 'My Song')]));
       await q.advance("", player);
 
-      expect(q.current.id, 'abc');
-      expect(q.current.description, 'My Song');
+      expect(q.known.id, 'abc');
+      expect(q.known.description, 'My Song');
     });
   });
 
@@ -84,7 +84,7 @@ void main() {
       final result = await q.advance("", player);
 
       expect(result, isNull);
-      expect(q.current.id, uuidx.min());
+      expect(q.known.id, uuidx.min());
     });
 
     test('advances through stream items in order', () async {
@@ -95,11 +95,11 @@ void main() {
       q.reset(Stream.fromIterable([_media('1', 'First'), _media('2', 'Second')]));
 
       await q.advance("", player);
-      expect(q.current.id, '1');
+      expect(q.known.id, '1');
       expect(q.previous, 0);
 
       await q.advance("", player);
-      expect(q.current.id, '2');
+      expect(q.known.id, '2');
       expect(q.previous, 1);
     });
 
@@ -114,12 +114,12 @@ void main() {
 
       // reverse puts 'b' in upcoming and restores 'a'
       await q.reverse("", player);
-      expect(q.current.id, 'a');
+      expect(q.known.id, 'a');
       expect(q.upcoming, 1); // 'b' is buffered
 
       // advance should use the buffer, not the (exhausted) stream
       await q.advance("", player);
-      expect(q.current.id, 'b');
+      expect(q.known.id, 'b');
       expect(q.upcoming, 0);
     });
 
@@ -134,7 +134,7 @@ void main() {
       final result = await q.advance("", player);
 
       expect(result, isNull);
-      expect(q.current.id, uuidx.min());
+      expect(q.known.id, uuidx.min());
     });
   });
 
@@ -262,7 +262,7 @@ void main() {
       await q.advance("", player); // current = 'y', previous has 'x'
 
       await q.reverse("", player);
-      expect(q.current.id, 'x');
+      expect(q.known.id, 'x');
       expect(q.previous, 0);
     });
 
@@ -295,13 +295,13 @@ void main() {
       await q.advance("", player);
       await q.advance("", player);
       await q.advance("", player);
-      expect(q.current.id, '3');
+      expect(q.known.id, '3');
 
       await q.reverse("", player);
-      expect(q.current.id, '2');
+      expect(q.known.id, '2');
 
       await q.reverse("", player);
-      expect(q.current.id, '1');
+      expect(q.known.id, '1');
 
       final result = await q.reverse("", player);
       expect(result, isNull); // nothing left in previous

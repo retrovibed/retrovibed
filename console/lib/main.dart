@@ -219,7 +219,7 @@ class Retrovibed extends StatelessWidget {
                                                       medialib.AvailableGridDisplay(
                                                         focus: defaults.mobile ? null : s.searchfocus,
                                                         controller: s.controller,
-                                                        highlighted: s.current.id,
+                                                        highlighted: s.known.id,
                                                         search: s.search,
                                                       ),
                                                       s.player,

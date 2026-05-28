@@ -4,9 +4,15 @@ import 'package:media_kit/media_kit.dart'; // Provides [Player], [Media], [Playl
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/uuidx.dart' as uuidx;
-import 'package:retrovibed/mimex.dart' as mimex;
+import 'package:retrovibed/library.dart' as _library;
 import './playlist.dart' as internal;
-import './player.settings.dart';
+import './player.control.previous.dart';
+import './player.control.next.dart';
+import './player.control.title.dart';
+import './player.control.settings.dart';
+import './player.control.filedrop.dart';
+import './player.control.fullscreen.dart';
+import './player.control.resume.dart';
 
 class VideoScreen extends StatefulWidget {
   final Widget child;
@@ -74,104 +80,24 @@ class _VideoState extends State<VideoScreen> {
       builder: (context) {
         final theme = Theme.of(context);
         final defaults = ds.Defaults.of(context);
-        final plist = internal.Playlist.of(context);
-        final title = plist?.current.description ?? "";
+        final plist = internal.Playlist.of(context)!;
+        final current = plist.known;
         final compact = defaults.isCompact;
         final controls = [
-          ds.build(
-            (context) => IconButton(
-              onPressed: () {
-                internal.Playlist.of(context)?.previous();
-              },
-              icon: Icon(Icons.skip_previous_rounded),
-            ),
-          ),
+          PlayerControlPrevious(),
           MaterialPlayOrPauseButton(),
-          Builder(
-            builder:
-                (context) => IconButton(
-                  onPressed: () {
-                    internal.Playlist.of(context)?.next();
-                  },
-                  icon: Icon(Icons.skip_next_rounded),
-                ),
-          ),
+          PlayerControlNext(),
           MaterialDesktopVolumeButton(),
           SizedBox.square(dimension: defaults.spacing),
-          Expanded(
-            child: StreamBuilder(
-              stream: widget.player.stream.track,
-              builder: (context, snapshot) {
-                final plist = internal.Playlist.of(context);
-                final title = plist?.current.description ?? "";
-                return Text(
-                  title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                );
-              },
-            ),
-          ),
+          Expanded(child: PlayerControlTitle(plist.current)),
           SizedBox.square(dimension: defaults.spacing),
           MaterialPositionIndicator(),
           SizedBox.square(dimension: defaults.spacing),
-          ds.Help(
-            ds.build(
-              (context) => IconButton(
-                onPressed: () {
-                  ds.modals.push(
-                    context,
-                    PlayerSettings(
-                      constraints: BoxConstraints(maxWidth: 256),
-                      padding: defaults.padding,
-                      current: widget.player,
-                    ),
-                  );
-                },
-                icon: Icon(Icons.tune),
-              ),
-            ),
-            ds.Hint(const Text("open settings to select audio, video, or subtitle tracks")),
-          ),
+          PlayerControlSettings(widget.player),
           SizedBox.square(dimension: defaults.spacing),
-          ds.build(
-            (context) {
-              // havent figured out how to both filter and allow folder navigation on linux GTK.
-              const mimetypes = <String>[
-                // ...mimex.folders,
-                ...mimex.audios,
-                ...mimex.videos,
-                "application/x-iso9660-image", // sometimes bluray/dvd are iso images.
-              ];
-              final playfile = (ds.FilesEvent evt, {ValueNotifier<int>? progress}) {
-                print("play file checkpoint 0 ${evt.files.length}");
-                if (evt.files.isEmpty) return Future.value(ds.NullWidget);
-                final file = evt.files.firstWhere((v) {
-                  print("play file checkpoint 1 ${v.mimeType}");
-                  return mimetypes.any((x) => x == v.mimeType);
-                }, orElse: () => evt.files.first);
-
-                print("play file checkpoint 2 ${file.name}");
-                return internal.Playlist.file(context, "file://${file.path}").then((v) => ds.NullWidget);
-              };
-
-              return ds.FileDropWell.icon(
-                playfile,
-                mimetypes: mimetypes,
-                icon: Icons.video_collection_rounded,
-                tooltip: "play a local media file",
-                help: ds.Hint(const Text("play a local media file")),
-              );
-            },
-          ),
+          PlayerControlFiledrop(widget.player),
           SizedBox.square(dimension: defaults.spacing),
-          IconButton(
-            onPressed: () => ds.Full.toggle(context),
-            icon: Icon(
-              ds.Full.nochrome(context) ? Icons.fit_screen : Icons.crop_free,
-            ),
-            tooltip: ds.Full.nochrome(context) ? 'Exit Full Screen' : 'Full Screen',
-          ),
+          PlayerControlFullscreen(widget.player),
         ];
 
         return FocusScope(
@@ -212,24 +138,8 @@ class _VideoState extends State<VideoScreen> {
                       ),
                     ),
                     Visibility(
-                      visible: !uuidx.isMin(uuidx.fromString(plist?.current.id ?? uuidx.min())),
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: theme.scaffoldBackgroundColor,
-                        ),
-                        child: IconButton(
-                          onPressed: () {
-                            widget.player.play();
-                          },
-                          icon: Row(
-                            spacing: defaults.spacing,
-                            children: [
-                              Icon(Icons.play_circle_outline_rounded),
-                              Text("Resume ${title}"),
-                            ],
-                          ),
-                        ),
-                      ),
+                      visible: !uuidx.isMin(uuidx.fromString(current.id)),
+                      child: PlayerControlResume(widget.player, current),
                     ),
                   ],
                 ),
