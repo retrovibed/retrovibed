@@ -162,17 +162,24 @@ func Install(b *tarballs.Build) eg.OpFn {
 }
 
 func RunDev(cmd string) eg.OpFn {
+	return RunDevAt(cmd, "localhost")
+}
+
+// RunDevAt is RunDev with the meta/console host overridable so workloads
+// running in an isolated network namespace (Tart guest, remote VM) can point
+// the daemon at a different host. host is embedded into the launch command's
+// env prefix, so callers may pass either a literal hostname/IP or a bash
+// command substitution (e.g. "$(route get default | awk '/gateway:/{print $2}')")
+// to resolve the address at runtime inside the guest.
+func RunDevAt(cmd, host string) eg.OpFn {
 	return func(ctx context.Context, _ eg.Op) error {
 		runtime := flutterRuntimev2(shell.Runtime()).
-			// Environ("RETROVIBED_TORRENT_DEBUG", "true").
-			Environ("RETROVIBED_METADATA_AUTODOWNLOAD", "false").
-			// Environ("RETROVIBED_META_ENDPOINT", "api.retrovibe.space").
-			// Environ("RETROVIBED_CONSOLE_ENDPOINT", "console.retrovibe.space")
-			Environ("RETROVIBED_META_ENDPOINT", "localhost:8081").
-			Environ("RETROVIBED_CONSOLE_ENDPOINT", "localhost:8080")
+			Environ("RETROVIBED_METADATA_AUTODOWNLOAD", "false")
+		prefixed := "RETROVIBED_META_ENDPOINT=" + host + ":8081 " +
+			"RETROVIBED_CONSOLE_ENDPOINT=" + host + ":8080 " + cmd
 		return shell.Run(
 			ctx,
-			runtime.New(cmd).Timeout(egenv.TTL()),
+			runtime.New(prefixed).Timeout(egenv.TTL()),
 		)
 	}
 }

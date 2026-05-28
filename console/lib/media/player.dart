@@ -31,7 +31,13 @@ class _VideoState extends State<VideoScreen> {
   late final StreamSubscription<Tracks> sub0;
   late final StreamSubscription<bool> sub1;
 
-  _VideoState(Player player) : controller = VideoController(player);
+  _VideoState(Player player)
+    : controller = VideoController(
+        player,
+        configuration: const bool.fromEnvironment('EG_VM')
+            ? const VideoControllerConfiguration(enableHardwareAcceleration: false)
+            : const VideoControllerConfiguration(),
+      );
 
   void setState(VoidCallback fn) {
     if (!mounted) return;
