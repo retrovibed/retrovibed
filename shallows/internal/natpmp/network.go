@@ -71,7 +71,7 @@ func (n *network) call(ctx context.Context, msg []byte, timeout time.Duration) (
 		var _remoteAddr net.Addr
 		bytesRead, _remoteAddr, err = conn.ReadFrom(result)
 		if err != nil {
-			if err.(net.Error).Timeout() {
+			if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
 				tries++
 				needNewDeadline = true
 				continue

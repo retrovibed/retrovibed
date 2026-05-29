@@ -52,6 +52,7 @@ import (
 )
 
 func AutoTorrentSettings(defaults *TorrentSettings, options ...func(*TorrentSettings)) *TorrentSettings {
+	// highly conservative settings for vpn providers like protonvpn.
 	return langx.Autoptr(langx.Clone(TorrentSettings{
 		Seed:            defaults.Seed,
 		Pex:             defaults.Pex,
@@ -65,11 +66,11 @@ func AutoTorrentSettings(defaults *TorrentSettings, options ...func(*TorrentSett
 		Port:            defaults.Port,
 		AutoBootstrap:   defaults.AutoBootstrap,
 		AutoLocateMedia: defaults.AutoLocateMedia,
-		Peers:           &Peers{Min: 8, Max: 16},
-		Upload:          &Limit{Rate: 256 * bytesx.MiB, Burst: 256 * bytesx.MiB},
-		Download:        &Limit{Rate: 256 * bytesx.MiB, Burst: 256 * bytesx.MiB},
-		Outbound:        &Limit{Rate: 16, Burst: 1},
-		Inbound:         &Limit{Rate: 16, Burst: 1},
+		Peers:           &Peers{Min: 4, Max: 8},
+		Upload:          &Limit{Rate: 1 * bytesx.MiB, Burst: 1 * bytesx.MiB},
+		Download:        &Limit{Rate: 1 * bytesx.MiB, Burst: 1 * bytesx.MiB},
+		Outbound:        &Limit{Rate: 4, Burst: 1},
+		Inbound:         &Limit{Rate: 4, Burst: 1},
 	}, options...))
 }
 
@@ -230,16 +231,11 @@ func (t *_torrenting) Watch(ctx context.Context, paths ...string) error {
 	}
 
 	addpath(t.cfgpath)
-	addpath(t.wglatest)
+	addpath(t.wgconfigdir)
 
 	for _, path := range paths {
 		addpath(path)
 	}
-
-	go timex.Every(time.Minute, func() {
-		// hack due to fsnotify losing watches when toggling on/off.
-		addpath(t.wglatest)
-	})
 
 	go func() {
 		defer log.Println("torrent file watch done")
