@@ -44,20 +44,21 @@ func main() {
 				eg.Sequential(
 					// eggcp.CredentialsHack,
 					CredentialsHack,
-					// eg.WhenFn(egfs.FileNotExistsFn(egenv.CacheDirectory("android", "keystore")), android.SigningKey(egenv.CacheDirectory("android", "keystore"), "upload")),
 					eg.WhenFn(egfs.FileNotExistsFn(egenv.CacheDirectory("android", "keystore")), egsecrets.CopyIntoFileOp(egenv.CacheDirectory("android", "keystore"), "gcpsm://retrovibed-prod/android-keystore/latest")),
 					console.Generate,
 					egbug.Log("generated console bindings"),
 					eg.Parallel(
 						duckdb.MaybeBuild(
-							"console/android/app/src/main/jniLibs/x86_64/libduckdb_static.a",
-							duckdb.CompileAndroid("android_x86_64", "x86_64"),
-							duckdb.CloneAndroid,
+							"console/android/app/src/main/jniLibs/x86_64/libduckdb.a",
+							duckdb.CompileAndroidRuntime("android_x86_64", "x86_64"),
+							duckdb.CompileAndroid,
+							duckdb.CloneStaticBuild,
 						),
 						duckdb.MaybeBuild(
-							"console/android/app/src/main/jniLibs/arm64-v8a/libduckdb_static.a",
-							duckdb.CompileAndroid("android_arm64", "arm64-v8a"),
-							duckdb.CloneAndroid,
+							"console/android/app/src/main/jniLibs/arm64-v8a/libduckdb.a",
+							duckdb.CompileAndroidRuntime("android_arm64", "arm64-v8a"),
+							duckdb.CompileAndroid,
+							duckdb.CloneStaticBuild,
 						),
 						neurals.CompileAndroid("x86_64", egenv.WorkingDirectory("console/android/app/src/main/jniLibs/x86_64")),
 						neurals.CompileAndroid("arm64-v8a", egenv.WorkingDirectory("console/android/app/src/main/jniLibs/arm64-v8a")),

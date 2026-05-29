@@ -38,7 +38,7 @@ func main() {
 	err := eg.Perform(
 		ctx,
 		eg.Sequential(
-			duckdb.MaybeBuild(".eg.cache/duckdb/.arm64/libduckdb_static.a", duckdb.CompileIOS("ios_arm64", "arm64"), duckdb.CloneIOS),
+			duckdb.MaybeBuild(".eg.cache/duckdb/.arm64/libduckdb_static.a", duckdb.CompileIOSRuntime("ios_arm64", "arm64"), duckdb.CompileIOS, duckdb.CloneStaticBuild),
 			neurals.CompileIOS(egenv.WorkingDirectory("console/ios")),
 			shell.Op(shell.Newf("cp .eg.cache/duckdb/.arm64/*.a console/ios/")),
 			console.GenerateFlutter,

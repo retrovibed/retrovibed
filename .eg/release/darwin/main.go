@@ -14,9 +14,9 @@ import (
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
+	"github.com/egdaemon/eg/runtime/wasi/eggit"
 	"github.com/egdaemon/eg/runtime/wasi/shell"
 	"github.com/egdaemon/eg/runtime/x/wasi/egbug"
-	"github.com/egdaemon/eg/runtime/wasi/eggit"
 	"github.com/egdaemon/eg/runtime/x/wasi/eggithub"
 	"github.com/egdaemon/eg/runtime/x/wasi/eggolang"
 	"github.com/egdaemon/eg/runtime/x/wasi/egtarball"
@@ -66,7 +66,12 @@ func main() {
 	err := eg.Perform(
 		ctx,
 		eg.Sequential(
-			duckdb.MaybeBuild(".eg.cache/duckdb/.darwin-arm64/libduckdb_static.a", duckdb.CompileDarwin("osx_arm64", "arm64"), duckdb.CloneDarwin),
+			duckdb.MaybeBuild(
+				"duckdb/.darwin-arm64/libduckdb.a",
+				duckdb.CompileDarwinRuntime("osx_arm64", "arm64"),
+				duckdb.CompileDarwin,
+				duckdb.CloneStaticBuild,
+			),
 			neurals.CompileDarwin(neuralsdir),
 			shell.Op(
 				shell.Newf("test -f %[1]s/libtpcds_extension.a || (echo 'void __stub(void){}' | cc -xc -c - -o /tmp/stub.o && ar rcs %[1]s/libtpcds_extension.a /tmp/stub.o && ar rcs %[1]s/libtpch_extension.a /tmp/stub.o)", duckdblibs),
