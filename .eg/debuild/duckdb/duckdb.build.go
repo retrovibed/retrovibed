@@ -145,6 +145,7 @@ func CompileIOSRuntime(platform, arch string) shell.Command {
 	fmt.Fprintf(&cmakevars, " -DCMAKE_OSX_DEPLOYMENT_TARGET=16.0")
 	fmt.Fprintf(&cmakevars, " -DDUCKDB_EXPLICIT_PLATFORM=%s", platform)
 	fmt.Fprintf(&cmakevars, " -DBUILD_UNITTESTS=OFF")
+	fmt.Fprintf(&cmakevars, " -DBUILD_SHELL=OFF")
 
 	builddir := fmt.Sprintf("build/%s-%s", platform, arch)
 	absbuilddir := egenv.EphemeralDirectory("duckdb", builddir)
