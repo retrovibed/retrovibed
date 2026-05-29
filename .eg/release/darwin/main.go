@@ -68,7 +68,7 @@ func main() {
 		eg.Sequential(
 			eg.Parallel(
 				duckdb.MaybeBuild(
-					"duckdb/.darwin-arm64/libduckdb.a",
+					".eg.cache/duckdb/.darwin-arm64/libduckdb.a",
 					duckdb.CompileDarwinRuntime("osx_arm64", "arm64"),
 					duckdb.CompileDarwin,
 					duckdb.CloneStaticBuild,
