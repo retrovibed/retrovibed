@@ -26,6 +26,13 @@ const Wireguard$json = {
     {'1': 'default', '3': 5, '4': 1, '5': 8, '10': 'default'},
     {'1': 'port', '3': 6, '4': 1, '5': 13, '10': 'port'},
     {'1': 'dns_rate_limit', '3': 7, '4': 1, '5': 13, '10': 'dns_rate_limit'},
+    {
+      '1': 'maximum_connections',
+      '3': 8,
+      '4': 1,
+      '5': 4,
+      '10': 'maximum_connections'
+    },
   ],
 };
 
@@ -34,7 +41,8 @@ final $typed_data.Uint8List wireguardDescriptor = $convert.base64Decode(
     'CglXaXJlZ3VhcmQSDgoCaWQYASABKAlSAmlkEh4KCmNyZWF0ZWRfYXQYAiABKAlSCmNyZWF0ZW'
     'RfYXQSHgoKdXBkYXRlZF9hdBgDIAEoCVIKdXBkYXRlZF9hdBIgCgtkZXNjcmlwdGlvbhgEIAEo'
     'CVILZGVzY3JpcHRpb24SGAoHZGVmYXVsdBgFIAEoCFIHZGVmYXVsdBISCgRwb3J0GAYgASgNUg'
-    'Rwb3J0EiYKDmRuc19yYXRlX2xpbWl0GAcgASgNUg5kbnNfcmF0ZV9saW1pdA==');
+    'Rwb3J0EiYKDmRuc19yYXRlX2xpbWl0GAcgASgNUg5kbnNfcmF0ZV9saW1pdBIwChNtYXhpbXVt'
+    'X2Nvbm5lY3Rpb25zGAggASgEUhNtYXhpbXVtX2Nvbm5lY3Rpb25z');
 
 @$core.Deprecated('Use wireguardSearchRequestDescriptor instead')
 const WireguardSearchRequest$json = {

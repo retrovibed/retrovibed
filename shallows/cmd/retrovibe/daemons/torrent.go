@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"log"
+	"math"
 	"net"
 	"os"
 	"runtime"
@@ -22,6 +23,7 @@ import (
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/retrovibed/retrovibed/retroapi/netmonx"
+	retronetx "github.com/retrovibed/retrovibed/retroapi/netx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/ddisc/ddisctorrent"
@@ -271,6 +273,7 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 		firewall     torrent.ClientConfigOption
 		wgcfg        meta.Wireguard
 		dhts         *dht.Server
+		limit                   = retronetx.NewConnUnlimited()
 		peerid                  = int160.New(ssh.FingerprintSHA256(t.id.PublicKey()))
 		torrentpeers            = t.peercachepath
 		bootstrap    dht.Option = dht.OptionNoop
@@ -342,7 +345,7 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 
 		log.Println("loaded wireguard configuration", path)
 
-		if wgnet, err = torrentx.WireguardSocket(wcfg); err != nil {
+		if wgnet, err = torrentx.WireguardSocket(dctx, wcfg); err != nil {
 			return errorsx.Wrap(err, "unable to setup wireguard tunnel")
 		}
 
@@ -370,9 +373,11 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 		// go torrentx.AnnouncePort1(dctx, int160.Zero().Prefix([]byte{0x1}), dhts)
 		// go torrentx.AnnouncePort2(dctx, int160.Zero().Prefix([]byte{0x2}), dhts)
 
+		limit = retronetx.NewConnLimited(langx.FirstNonZero(wgcfg.MaximumConnections, math.MaxUint64))
 		tnetwork, err = torrentx.SetupTorrentBinder(
 			wgnet,
 			uint16(cfg.Port),
+			limit,
 			torrent.BinderOptionDHT(dhts),
 		)
 		if err != nil {
@@ -397,13 +402,16 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 		}
 
 		log.Println("------------------------------------", cfg.Port, wgcfg.Port, "------------------------------------")
-		if tnetwork, err = torrentx.Autosocket(dhts, uint16(cfg.Port)); err != nil {
+		if tnetwork, err = torrentx.Autosocket(dhts, uint16(cfg.Port), limit); err != nil {
 			return errorsx.Wrap(err, "unable to setup torrent socket")
 		}
 	}
 
 	// debugx.OnSignal(dctx, dhtx.Statistics(dhts), syscall.SIGUSR1)
 	// go dhtx.BackgroundStatistics(dctx, time.Minute, dhts)
+	go timex.NowAndEveryVoid(dctx, 5*time.Second, func(_ context.Context) {
+		retronetx.ConnLimitStatistics(os.Stderr, limit)
+	})
 	go dhtx.RecordBootstrapNodes(dctx, time.Minute, dhtminpeers, dhts, torrentpeers)
 	go dhts.TableMaintainer(dctx)
 

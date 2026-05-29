@@ -1,20 +1,26 @@
 package wireguardx
 
 import (
+	"bufio"
 	"context"
 	"encoding/base64"
 	"fmt"
+	"io"
+	"log"
 	"net"
 	"net/netip"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
+	"github.com/retrovibed/retrovibed/shallows/internal/backoffx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/userx"
 	"golang.org/x/text/encoding/unicode"
+	"golang.zx2c4.com/wireguard/device"
 	"golang.zx2c4.com/wireguard/tun/netstack"
 )
 
@@ -160,6 +166,170 @@ const (
 func (c *Config) maybeAddPeer(p *Peer) {
 	if p != nil {
 		c.Peers = append(c.Peers, *p)
+	}
+}
+
+// Statistics is a point-in-time snapshot of WireGuard device state.
+type Statistics struct {
+	Timestamp         time.Time
+	PeerKey           string
+	KeepaliveInterval uint64
+	TXBytes           uint64
+	RXBytes           uint64
+	LastHandshakeSec  int64
+}
+
+// Snapshot reads the current device state via UAPI.
+func Snapshot(dev *device.Device) (Statistics, error) {
+	uapiData, err := dev.IpcGet()
+	if err != nil {
+		return Statistics{}, fmt.Errorf("failed to read internal device memory: %w", err)
+	}
+
+	s := Statistics{Timestamp: time.Now()}
+	scanner := bufio.NewScanner(strings.NewReader(uapiData))
+	for scanner.Scan() {
+		key, value, ok := strings.Cut(scanner.Text(), "=")
+		if !ok {
+			continue
+		}
+		switch key {
+		case "public_key":
+			s.PeerKey = value
+		case "tx_bytes":
+			s.TXBytes = errorsx.Zero(strconv.ParseUint(value, 10, 64))
+		case "rx_bytes":
+			s.RXBytes = errorsx.Zero(strconv.ParseUint(value, 10, 64))
+		case "last_handshake_time_sec":
+			s.LastHandshakeSec = errorsx.Zero(strconv.ParseInt(value, 10, 64))
+		case "persistent_keepalive_interval":
+			s.KeepaliveInterval = errorsx.Zero(strconv.ParseUint(value, 10, 64))
+		}
+	}
+
+	return s, nil
+}
+
+// Diagnostic prints the current device state to w.
+func Diagnostic(w io.Writer, dev *device.Device) error {
+	s, err := Snapshot(dev)
+	if err != nil {
+		return err
+	}
+
+	errorsx.Zero(fmt.Fprintln(w, "=== WireGuard Engine Internal Diagnostics ==="))
+	if s.PeerKey == "" {
+		errorsx.Zero(fmt.Fprintln(w, "Status: INACTIVE - No peer configurations loaded in memory."))
+		return nil
+	}
+
+	errorsx.Zero(fmt.Fprintf(w, "Peer Node:  %s\n", s.PeerKey))
+	errorsx.Zero(fmt.Fprintf(w, "Keepalive:  %ds\n", s.KeepaliveInterval))
+	errorsx.Zero(fmt.Fprintf(w, "Data Sent:  %d bytes\n", s.TXBytes))
+	errorsx.Zero(fmt.Fprintf(w, "Data Recv:  %d bytes\n", s.RXBytes))
+
+	if s.LastHandshakeSec == 0 {
+		errorsx.Zero(fmt.Fprintln(w, "Handshake:  NEVER COMPLETED (Tunnel initializing or completely blocked)"))
+		errorsx.Zero(fmt.Fprintln(w, "Conclusion: Server rate-limiting or firewall block is active."))
+		return nil
+	}
+
+	elapsed := time.Now().Unix() - s.LastHandshakeSec
+	errorsx.Zero(fmt.Fprintf(w, "Last Sync:  %d seconds ago\n", elapsed))
+
+	errorsx.Zero(fmt.Fprintln(w, "--- Analysis ---"))
+	if s.TXBytes > 0 && s.RXBytes == 0 {
+		errorsx.Zero(fmt.Fprintln(w, "Alert:      Unbalanced Pipe (Data leaving host, but server dropping response)"))
+		errorsx.Zero(fmt.Fprintln(w, "Conclusion: VPN active block / rate limit signature matched."))
+	} else if elapsed > 180 {
+		errorsx.Zero(fmt.Fprintln(w, "Alert:      Stale Handshake (Exceeded 3-minute protocol window)"))
+		errorsx.Zero(fmt.Fprintln(w, "Conclusion: Connection dropped by remote endpoint."))
+	} else {
+		errorsx.Zero(fmt.Fprintln(w, "Status:     Healthy (Bidirectional data flow and valid handshakes)"))
+	}
+
+	return nil
+}
+
+type autohealState struct {
+	prev            Statistics
+	attempt         int
+	lastRecovery    time.Time
+	handshakeExpiry time.Duration
+}
+
+func newAutohealState() autohealState {
+	return autohealState{
+		lastRecovery:    time.Now(),
+		handshakeExpiry: 185 * time.Second,
+	}
+}
+
+// reset records the recovery timestamp, clears the stateful baseline, and
+// increments attempt so the backoff grows before the next check.
+func (a *autohealState) reset() {
+	a.lastRecovery = time.Now()
+	a.prev = Statistics{}
+	a.attempt++
+}
+
+func (a *autohealState) needsRecovery(curr Statistics) bool {
+	if curr.PeerKey == "" || curr.LastHandshakeSec == 0 {
+		return false
+	}
+	// suppress until a handshake newer than last recovery/start is seen
+	if curr.LastHandshakeSec <= a.lastRecovery.Unix() {
+		return false
+	}
+	// keepalive configured but handshake stale → tunnel dropped
+	if curr.KeepaliveInterval > 0 &&
+		time.Duration(time.Now().Unix()-curr.LastHandshakeSec)*time.Second > a.handshakeExpiry {
+		return true
+	}
+	// tx growing, rx frozen across two snapshots → server dropping responses
+	if curr.TXBytes > a.prev.TXBytes && curr.RXBytes == a.prev.RXBytes && a.prev.RXBytes > 0 {
+		return true
+	}
+	return false
+}
+
+// Autoheal monitors the WireGuard device and attempts Down/Up recovery when
+// the tunnel appears dead. The backoff strategy controls polling frequency;
+// attempt resets to 0 on a healthy check and grows on recovery triggers.
+func Autoheal(ctx context.Context, dev *device.Device, b backoffx.Strategy) {
+	state := newAutohealState()
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-time.After(b.Backoff(state.attempt)):
+		}
+
+		curr, err := Snapshot(dev)
+		if err != nil {
+			log.Println("wireguard autoheal: snapshot failed:", err)
+			state.attempt++
+			continue
+		}
+
+		errorsx.Log(Diagnostic(os.Stderr, dev))
+
+		switch {
+		case state.needsRecovery(curr):
+			log.Println("wireguard autoheal: tunnel dead, initiating recovery")
+
+			if err := errorsx.Compact(dev.Down(), dev.Up()); err != nil {
+				log.Println("wireguard autoheal: recovery failed:", err)
+				continue
+			}
+
+			state.reset()
+		case curr.LastHandshakeSec > state.lastRecovery.Unix():
+			state.attempt = 0
+			// else: post-recovery settle window, leave attempt unchanged
+		}
+
+		state.prev = curr
 	}
 }
 

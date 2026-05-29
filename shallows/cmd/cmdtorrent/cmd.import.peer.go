@@ -21,6 +21,7 @@ import (
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
+	retronetx "github.com/retrovibed/retrovibed/retroapi/netx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/daemons"
 	"github.com/retrovibed/retrovibed/shallows/internal/asynccompute"
@@ -204,7 +205,7 @@ func (t importPeer) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) (err error) 
 		firewall,
 	)
 
-	if tnetwork, err = torrentx.Autosocket(_dht, 0); err != nil {
+	if tnetwork, err = torrentx.Autosocket(_dht, 0, retronetx.NewConnUnlimited()); err != nil {
 		return errorsx.Wrap(err, "unable to setup torrent socket")
 	}
 

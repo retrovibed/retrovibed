@@ -16,7 +16,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/fsx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/langx"
-	"github.com/retrovibed/retrovibed/retroapi/internal/netx"
+	"github.com/retrovibed/retrovibed/retroapi/netx"
 )
 
 // Pool is a directory-based trust-on-first-use certificate pool.
