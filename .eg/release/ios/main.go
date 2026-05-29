@@ -105,7 +105,7 @@ func iosbuild(ctx context.Context, op eg.Op) error {
 		egbug.DebugFailure(
 			shell.Op(
 				flutter.New("rm -rf ios/RetrovivedBind.framework ios/RetrovivedBind.xcframework && cp -r ios/RetrovivedBind ios/RetrovivedBind.framework"),
-				flutter.New("bash -c 'cd ios && xcrun clang -target arm64-apple-ios16.0 -isysroot \"$(xcrun --sdk iphoneos --show-sdk-path)\" -shared -o RetrovivedBind.framework/RetrovivedBind -Wl,-force_load,libretrovibed.a -Wl,-force_load,libduckdb_static.a -Wl,-force_load,libduckdb_generated_extension_loader.a $(for f in lib*_extension.a; do printf -- \"-Wl,-force_load,%s \" \"$f\"; done) -Wl,-force_load,libpredicttext.a -lc++ -lresolv -framework CoreFoundation -framework Security -Wl,-install_name,@rpath/RetrovivedBind.framework/RetrovivedBind'"),
+				flutter.New("bash -c 'cd ios && xcrun clang -target arm64-apple-ios16.0 -isysroot \"$(xcrun --sdk iphoneos --show-sdk-path)\" -shared -o RetrovivedBind.framework/RetrovivedBind -Wl,-force_load,libretrovibed.a -Wl,-force_load,libduckdb.a -Wl,-force_load,libpredicttext.a -lc++ -lresolv -framework CoreFoundation -framework Security -Wl,-install_name,@rpath/RetrovivedBind.framework/RetrovivedBind'"),
 				flutter.New("bash -c 'cd ios && xcodebuild -create-xcframework -framework RetrovivedBind.framework -output RetrovivedBind.xcframework'"),
 				flutter.New("flutter pub get"),
 				flutter.New("pod install").Directory(egenv.WorkingDirectory("console", "ios")),
