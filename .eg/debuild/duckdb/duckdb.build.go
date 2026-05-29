@@ -29,11 +29,6 @@ func Download(ctx context.Context, op eg.Op) error {
 }
 
 // compile and put the results into the specified directory.
-func CompileDevRuntime() shell.Command {
-	return shell.Runtime()
-}
-
-// compile and put the results into the specified directory.
 func Compile(runtime shell.Command) eg.OpFn {
 	return func(ctx context.Context, op eg.Op) error {
 		return compile(runtime, egenv.WorkingDirectory(".dist", "duckdb_config.cmake"))(ctx, op)
@@ -74,6 +69,16 @@ func bundle(sruntime shell.Command) eg.OpFn {
 	}
 }
 
+// compile and put the results into the specified directory.
+func CompileDevRuntime() shell.Command {
+	builddir := "build/dev"
+	absbuilddir := egenv.EphemeralDirectory("duckdb", builddir)
+	return shell.Runtime().
+		Directory(absbuilddir).
+		Environ("BUILD_DIRECTORY", absbuilddir).
+		Environ("BUILD_DIRECTORY_REL", builddir)
+}
+
 func CompileAndroidRuntime(platform, arch string) shell.Command {
 	var cmakevars strings.Builder
 	fmt.Fprintf(&cmakevars, "-DCMAKE_TOOLCHAIN_FILE=%s/build/cmake/android.toolchain.cmake", android.NDKPath)
@@ -104,7 +109,7 @@ func CloneStaticBuild(sruntime shell.Command) eg.OpFn {
 	return func(ctx context.Context, op eg.Op) error {
 		return shell.Run(
 			ctx,
-			sruntime.New("rsync -avm --include='*/' --include='libduckdb.a' --exclude='*' ${BUILD_DIRECTORY}/* ${CLONE_DIRECTORY}"),
+			sruntime.New("rsync --mkpath -avm --include='*/' --include='libduckdb.a' --exclude='*' ${BUILD_DIRECTORY}/* ${CLONE_DIRECTORY}"),
 		)
 	}
 }
@@ -119,6 +124,7 @@ func CompileDarwinRuntime(platform, arch string) shell.Command {
 	absbuilddir := egenv.EphemeralDirectory("duckdb", builddir)
 
 	return egccache.Runtime().
+		Debug().
 		Directory(absbuilddir).
 		Environ("BUILD_DIRECTORY", absbuilddir).
 		Environ("BUILD_DIRECTORY_REL", builddir).

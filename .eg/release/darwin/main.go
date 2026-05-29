@@ -66,13 +66,15 @@ func main() {
 	err := eg.Perform(
 		ctx,
 		eg.Sequential(
-			duckdb.MaybeBuild(
-				"duckdb/.darwin-arm64/libduckdb.a",
-				duckdb.CompileDarwinRuntime("osx_arm64", "arm64"),
-				duckdb.CompileDarwin,
-				duckdb.CloneStaticBuild,
+			eg.Parallel(
+				duckdb.MaybeBuild(
+					"duckdb/.darwin-arm64/libduckdb.a",
+					duckdb.CompileDarwinRuntime("osx_arm64", "arm64"),
+					duckdb.CompileDarwin,
+					duckdb.CloneStaticBuild,
+				),
+				neurals.CompileDarwin(neuralsdir),
 			),
-			neurals.CompileDarwin(neuralsdir),
 			shell.Op(
 				shell.Newf("test -f %[1]s/libtpcds_extension.a || (echo 'void __stub(void){}' | cc -xc -c - -o /tmp/stub.o && ar rcs %[1]s/libtpcds_extension.a /tmp/stub.o && ar rcs %[1]s/libtpch_extension.a /tmp/stub.o)", duckdblibs),
 			),

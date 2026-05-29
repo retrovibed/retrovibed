@@ -29,6 +29,7 @@ func main() {
 			ctx,
 			deb,
 			eg.Sequential(
+				console.Generate,
 				eg.Parallel(
 					duckdb.MaybeBuild(
 						filepath.Join("dev.native.libs", "libduckdb.a"),
@@ -39,7 +40,6 @@ func main() {
 					neurals.MaybeBuild(filepath.Join("dev.native.libs", "libpredicttext.a"), neurals.Compile, neurals.Clone),
 				),
 				console.GenerateDevStaticBinding(shell.Runtime(), egenv.WorkingDirectory("console", "build", "nativelib"), egenv.CacheDirectory("dev.native.libs")),
-				console.Generate,
 				console.BuildLinux,
 			),
 		),
