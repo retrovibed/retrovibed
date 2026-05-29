@@ -75,9 +75,9 @@ func main() {
 				),
 				neurals.CompileDarwin(neuralsdir),
 			),
-			shell.Op(
-				shell.Newf("test -f %[1]s/libtpcds_extension.a || (echo 'void __stub(void){}' | cc -xc -c - -o /tmp/stub.o && ar rcs %[1]s/libtpcds_extension.a /tmp/stub.o && ar rcs %[1]s/libtpch_extension.a /tmp/stub.o)", duckdblibs),
-			),
+			// shell.Op(
+			// 	shell.Newf("test -f %[1]s/libtpcds_extension.a || (echo 'void __stub(void){}' | cc -xc -c - -o /tmp/stub.o && ar rcs %[1]s/libtpcds_extension.a /tmp/stub.o && ar rcs %[1]s/libtpch_extension.a /tmp/stub.o)", duckdblibs),
+			// ),
 			console.GenerateFlutter,
 			egbug.DebugFailure(
 				shell.Op(
