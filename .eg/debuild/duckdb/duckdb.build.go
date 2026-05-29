@@ -88,6 +88,15 @@ func bundlededup(sruntime shell.Command) eg.OpFn {
 	}
 }
 
+func bundlelibtool(sruntime shell.Command) eg.OpFn {
+	return func(ctx context.Context, op eg.Op) error {
+		return shell.Run(
+			ctx,
+			sruntime.New("xcrun libtool -static -o ${BUILD_DIRECTORY}/libduckdb.a lib/*.a"),
+		)
+	}
+}
+
 // compile and put the results into the specified directory.
 func CompileDevRuntime() shell.Command {
 	builddir := "build/dev"
@@ -182,7 +191,7 @@ func CompileIOSRuntime(platform, arch string) shell.Command {
 func CompileIOS(sruntime shell.Command) eg.OpFn {
 	return eg.Sequential(
 		compile(sruntime, egenv.WorkingDirectory(".dist", "duckdb_ios_config.cmake")),
-		bundlededup(sruntime),
+		bundlelibtool(sruntime),
 	)
 }
 

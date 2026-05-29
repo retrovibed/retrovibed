@@ -45,7 +45,7 @@ func main() {
 	pkgpath := egenv.CacheDirectory("retrovibed.darwin.arm64.pkg")
 	entitlements := egenv.WorkingDirectory("console", "macos", "Runner", "Release.entitlements")
 	keychainPath := egenv.WorkspaceDirectory("apple.signing.keychain")
-	flutter := runtime.Directory(egenv.WorkingDirectory("console"))
+	flutter := runtime.Directory(egenv.WorkingDirectory("console")).Debug()
 	shallows := runtime.Directory(egenv.WorkingDirectory("shallows"))
 	commit := eggit.EnvCommit()
 	duckdblibs := egenv.CacheDirectory("duckdb", ".darwin-arm64")
