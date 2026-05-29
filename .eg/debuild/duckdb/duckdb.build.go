@@ -111,7 +111,7 @@ func CloneStaticBuild(sruntime shell.Command) eg.OpFn {
 	return func(ctx context.Context, op eg.Op) error {
 		return shell.Run(
 			ctx,
-			sruntime.New("rsync -avm --include='*/' --include='libduckdb.a' --exclude='*' ${BUILD_DIRECTORY}/* ${CLONE_DIRECTORY}"),
+			sruntime.New("rsync -avm --include='*/' --include='libduckdb.a' --exclude='*' ${BUILD_DIRECTORY}/* ${CLONE_DIRECTORY}/"),
 		)
 	}
 }
