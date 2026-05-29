@@ -98,7 +98,7 @@ func main() {
 }
 
 func iosbuild(ctx context.Context, op eg.Op) error {
-	flutter := flutterRuntime()
+	flutter := flutterRuntime().Debug()
 	commit := eggit.EnvCommit()
 
 	return eg.Sequential(
