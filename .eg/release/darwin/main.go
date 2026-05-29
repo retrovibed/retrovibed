@@ -52,12 +52,7 @@ func main() {
 	neuralsdir := egenv.CacheDirectory("neurals")
 
 	duckdbldflags := "-L" + duckdblibs + " " +
-		"-Wl,-force_load," + duckdblibs + "/libduckdb_static.a " +
-		"-lduckdb_generated_extension_loader " +
-		"-lautocomplete_extension -lcore_functions_extension -licu_extension -ljson_extension -lparquet_extension " +
-		"-linet_extension -lfts_extension " +
-		"-ltpcds_extension -ltpch_extension " +
-		"-lduckdb_fastpforlib -lduckdb_fmt -lduckdb_fsst -lduckdb_hyperloglog -lduckdb_mbedtls -lduckdb_miniz -lduckdb_pg_query -lduckdb_re2 -lduckdb_skiplistlib -lduckdb_utf8proc -lduckdb_yyjson -lduckdb_zstd " +
+		"-Wl,-force_load," + duckdblibs + "/libduckdb.a " +
 		"-lc++"
 
 	apikey := egenv.String("", "RETROVIBED_APPLE_API_KEY")
