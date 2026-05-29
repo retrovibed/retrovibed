@@ -47,7 +47,7 @@ func compile(runtime shell.Command, cmakeconfigs ...string) eg.OpFn {
 				Environ(
 					"EXTENSION_CONFIGS", strings.Join(cmakeconfigs, ";"),
 				).Timeout(egenv.TTL()),
-			sruntime.New("cmake --build ${BUILD_DIRECTORY_REL} --config Release").Timeout(30*time.Minute),
+			sruntime.New("cmake --build ${BUILD_DIRECTORY_REL} --config Release --parallel").Timeout(30*time.Minute),
 			sruntime.New("DESTDIR=${BUILD_DIRECTORY} cmake --install ${BUILD_DIRECTORY_REL} --prefix=\"/\""),
 		)
 	}
@@ -65,6 +65,25 @@ func bundle(sruntime shell.Command) eg.OpFn {
 			sruntime.New("find bundle -name '*.a' -execdir ar -x {} \\;"),
 			// bundle-library-o: archive all .o files into libduckdb.a
 			sruntime.New("cd bundle && echo ./*/*.o | xargs ar cr ${BUILD_DIRECTORY}/libduckdb.a"),
+		)
+	}
+}
+
+// bundlededup is like bundle but deduplicates .o files by basename (first-wins)
+// before archiving. Required on iOS/Darwin where the linker errors on duplicate symbols
+// that arise when multiple DuckDB extension archives share object files (e.g. mbedtls).
+func bundlededup(sruntime shell.Command) eg.OpFn {
+	return func(ctx context.Context, op eg.Op) error {
+		return shell.Run(
+			ctx,
+			sruntime.New("rm -rf bundle && mkdir -p bundle"),
+			sruntime.New("cp lib/*.a bundle/."),
+			sruntime.New("find bundle -name '*.a' -exec mkdir -p {}.objects \\; -exec mv {} {}.objects \\;"),
+			sruntime.New("find bundle -name '*.a' -execdir ar -x {} \\;"),
+			// Deduplicate: copy each .o by basename with no-overwrite so first-seen wins,
+			// then archive the flat merged set.
+			sruntime.New("mkdir -p bundle/merged && find bundle -name '*.o' -not -path 'bundle/merged/*' -exec cp -n {} bundle/merged/ \\;"),
+			sruntime.New("find bundle/merged -name '*.o' | xargs ar cr ${BUILD_DIRECTORY}/libduckdb.a"),
 		)
 	}
 }
@@ -136,7 +155,7 @@ func CompileDarwinRuntime(platform, arch string) shell.Command {
 func CompileDarwin(sruntime shell.Command) eg.OpFn {
 	return eg.Sequential(
 		compile(sruntime, egenv.WorkingDirectory(".dist", "duckdb_darwin_config.cmake")),
-		bundle(sruntime),
+		bundlededup(sruntime),
 	)
 }
 
@@ -160,29 +179,10 @@ func CompileIOSRuntime(platform, arch string) shell.Command {
 		Environ("EXTRA_CMAKE_VARIABLES", cmakevars.String())
 }
 
-// bundleDedup is like bundle but deduplicates .o files by basename (first-wins)
-// before archiving. Required on iOS/Darwin where the linker errors on duplicate symbols
-// that arise when multiple DuckDB extension archives share object files (e.g. mbedtls).
-func bundleDedup(sruntime shell.Command) eg.OpFn {
-	return func(ctx context.Context, op eg.Op) error {
-		return shell.Run(
-			ctx,
-			sruntime.New("rm -rf bundle && mkdir -p bundle"),
-			sruntime.New("cp lib/*.a bundle/."),
-			sruntime.New("find bundle -name '*.a' -exec mkdir -p {}.objects \\; -exec mv {} {}.objects \\;"),
-			sruntime.New("find bundle -name '*.a' -execdir ar -x {} \\;"),
-			// Deduplicate: copy each .o by basename with no-overwrite so first-seen wins,
-			// then archive the flat merged set.
-			sruntime.New("mkdir -p bundle/merged && find bundle -name '*.o' -not -path 'bundle/merged/*' -exec cp -n {} bundle/merged/ \\;"),
-			sruntime.New("find bundle/merged -name '*.o' | xargs ar cr ${BUILD_DIRECTORY}/libduckdb.a"),
-		)
-	}
-}
-
 func CompileIOS(sruntime shell.Command) eg.OpFn {
 	return eg.Sequential(
 		compile(sruntime, egenv.WorkingDirectory(".dist", "duckdb_ios_config.cmake")),
-		bundleDedup(sruntime),
+		bundlededup(sruntime),
 	)
 }
 
