@@ -74,6 +74,7 @@ func CompileDevRuntime() shell.Command {
 	builddir := "build/dev"
 	absbuilddir := egenv.EphemeralDirectory("duckdb", builddir)
 	return shell.Runtime().
+		Debug().
 		Directory(absbuilddir).
 		Environ("BUILD_DIRECTORY", absbuilddir).
 		Environ("BUILD_DIRECTORY_REL", builddir)
@@ -90,7 +91,8 @@ func CompileAndroidRuntime(platform, arch string) shell.Command {
 	builddir := fmt.Sprintf("build/%s", platform)
 	absbuilddir := egenv.EphemeralDirectory("duckdb", builddir)
 
-	return egccache.Runtime().Debug().
+	return egccache.Runtime().
+		Debug().
 		Directory(absbuilddir).
 		Environ("BUILD_DIRECTORY", absbuilddir).
 		Environ("BUILD_DIRECTORY_REL", builddir).
@@ -151,6 +153,7 @@ func CompileIOSRuntime(platform, arch string) shell.Command {
 	absbuilddir := egenv.EphemeralDirectory("duckdb", builddir)
 
 	return egccache.Runtime().
+		Debug().
 		Directory(absbuilddir).
 		Environ("BUILD_DIRECTORY", absbuilddir).
 		Environ("BUILD_DIRECTORY_REL", builddir).
@@ -166,11 +169,11 @@ func CompileIOS(sruntime shell.Command) eg.OpFn {
 
 func MaybeBuild(sopath string, runtime shell.Command, bop func(runtime shell.Command) eg.OpFn, clone func(runtime shell.Command) eg.OpFn) eg.OpFn {
 	return eg.WhenFn(func(ctx context.Context) bool {
-		return !egfs.FileExists(egenv.WorkingDirectory(sopath))
+		return !egfs.FileExists(sopath)
 	}, eg.Sequential(
 		Download,
 		bop(runtime),
-		clone(runtime.Environ("CLONE_DIRECTORY", egenv.WorkingDirectory(filepath.Dir(sopath)))),
+		clone(runtime.Environ("CLONE_DIRECTORY", filepath.Dir(sopath))),
 	),
 	)
 }

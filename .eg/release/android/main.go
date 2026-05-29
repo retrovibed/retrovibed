@@ -49,13 +49,13 @@ func main() {
 					egbug.Log("generated console bindings"),
 					eg.Parallel(
 						duckdb.MaybeBuild(
-							"console/android/app/src/main/jniLibs/x86_64/libduckdb.a",
+							egenv.WorkingDirectory("console/android/app/src/main/jniLibs/x86_64/libduckdb.a"),
 							duckdb.CompileAndroidRuntime("android_x86_64", "x86_64"),
 							duckdb.CompileAndroid,
 							duckdb.CloneStaticBuild,
 						),
 						duckdb.MaybeBuild(
-							"console/android/app/src/main/jniLibs/arm64-v8a/libduckdb.a",
+							egenv.WorkingDirectory("console/android/app/src/main/jniLibs/arm64-v8a/libduckdb.a"),
 							duckdb.CompileAndroidRuntime("android_arm64", "arm64-v8a"),
 							duckdb.CompileAndroid,
 							duckdb.CloneStaticBuild,
