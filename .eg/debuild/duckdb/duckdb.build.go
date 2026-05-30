@@ -70,13 +70,18 @@ func bundle(sruntime shell.Command) eg.OpFn {
 	}
 }
 
+// bundlelibtool deduplicates .o files by basename (first-seen wins) before archiving.
+// Uses xcrun ar and cp -n (macOS equivalents of ar and cp --update=none).
 func bundlelibtool(sruntime shell.Command) eg.OpFn {
 	return func(ctx context.Context, op eg.Op) error {
 		return shell.Run(
 			ctx,
 			sruntime.New("rm -rf bundle && mkdir -p bundle"),
 			sruntime.New("rsync -av lib/*.a bundle/"),
-			sruntime.New("xcrun libtool -static -o ${BUILD_DIRECTORY}/libduckdb.a bundle/*.a"),
+			sruntime.New("find bundle -name '*.a' -exec mkdir -p {}.objects \\; -exec mv {} {}.objects \\;"),
+			sruntime.New("find bundle -name '*.a' -execdir xcrun ar -x {} \\;"),
+			sruntime.New("mkdir -p bundle/merged && find bundle -name '*.o' -not -path 'bundle/merged/*' -exec cp -n {} bundle/merged/ \\;"),
+			sruntime.New("find bundle/merged -name '*.o' | xargs xcrun libtool -static -o ${BUILD_DIRECTORY}/libduckdb.a"),
 		)
 	}
 }
@@ -101,8 +106,8 @@ func CompileAndroidRuntime(platform, arch string) shell.Command {
 	fmt.Fprintf(&cmakevars, " -DBUILD_UNITTESTS=OFF")
 
 	builddir := fmt.Sprintf("build/%s", platform)
-	// absbuilddir := egenv.EphemeralDirectory("duckdb", builddir)
-	absbuilddir := egenv.CacheDirectory("duckdb.bin", builddir)
+	absbuilddir := egenv.EphemeralDirectory("duckdb", builddir)
+	// absbuilddir := egenv.CacheDirectory("duckdb.bin", builddir)
 
 	return egccache.Runtime().
 		Debug().
