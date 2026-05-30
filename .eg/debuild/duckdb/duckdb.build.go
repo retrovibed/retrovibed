@@ -63,21 +63,23 @@ func bundlededup(sruntime shell.Command) eg.OpFn {
 			sruntime.New("rsync -av --exclude='libduckdb_static.a' --exclude='libduckdb_generated_extension_loader.a' lib/*.a bundle/"),
 			sruntime.New("find bundle -name '*.a' -exec mkdir -p {}.objects \\; -exec mv {} {}.objects \\;"),
 			sruntime.New("find bundle -name '*.a' -execdir ar -x {} \\;"),
-			sruntime.New("mkdir -p bundle/merged && find bundle -name '*.o' -not -path 'bundle/merged/*' -exec cp -n {} bundle/merged/ \\;"),
+			sruntime.New("mkdir -p bundle/merged && find bundle -name '*.o' -not -path 'bundle/merged/*' -exec cp --update=none {} bundle/merged/ \\;"),
 			// sruntime.New("tree -L 2 bundle/*"),
 			sruntime.New("find bundle/merged -name '*.o' | xargs ar cr ${BUILD_DIRECTORY}/libduckdb.a"),
 		)
 	}
 }
 
-// func bundlelibtool(sruntime shell.Command) eg.OpFn {
-// 	return func(ctx context.Context, op eg.Op) error {
-// 		return shell.Run(
-// 			ctx,
-// 			sruntime.New("xcrun libtool -static -o ${BUILD_DIRECTORY}/libduckdb.a lib/*.a"),
-// 		)
-// 	}
-// }
+func bundlelibtool(sruntime shell.Command) eg.OpFn {
+	return func(ctx context.Context, op eg.Op) error {
+		return shell.Run(
+			ctx,
+			sruntime.New("rm -rf bundle && mkdir -p bundle"),
+			sruntime.New("rsync -av --exclude='libduckdb_static.a' --exclude='libduckdb_generated_extension_loader.a' lib/*.a bundle/"),
+			sruntime.New("xcrun libtool -static -o ${BUILD_DIRECTORY}/libduckdb.a bundle/*.a"),
+		)
+	}
+}
 
 // compile and put the results into the specified directory.
 func CompileDevRuntime() shell.Command {
@@ -174,7 +176,7 @@ func CompileIOSRuntime(platform, arch string) shell.Command {
 func CompileIOS(sruntime shell.Command) eg.OpFn {
 	return eg.Sequential(
 		compile(sruntime, egenv.WorkingDirectory(".dist", "duckdb_ios_config.cmake")),
-		bundlededup(sruntime),
+		bundlelibtool(sruntime),
 	)
 }
 
