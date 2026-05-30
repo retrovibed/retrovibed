@@ -43,10 +43,19 @@ func main() {
 			deb,
 			eg.Sequential(
 				duckdb.Download,
-				duckdb.MaybeBuild("console/android/app/src/main/jniLibs/x86_64/libduckdb.a", duckdb.CompileAndroidRuntime("android_x86_64", "x86_64"), duckdb.CompileAndroid, duckdb.CloneStaticBuild),
+				duckdb.MaybeBuild(
+					egenv.WorkingDirectory("console/android/app/src/main/jniLibs/x86_64/libduckdb.a"),
+					duckdb.CompileAndroidRuntime("android_x86_64", "x86_64"),
+					duckdb.CompileAndroid,
+					duckdb.CloneBuild,
+				),
 				eg.Sequential(
 					console.Generate,
-					console.GenerateDevStaticBinding(console.AndroidRuntime("x86_64-none-linux-android31"), egenv.WorkingDirectory("console/android/app/src/main/jniLibs/x86_64"), egenv.WorkingDirectory("console/android/app/src/main/jniLibs/x86_64")),
+					console.GenerateDevStaticBinding(
+						console.AndroidRuntime("x86_64-none-linux-android31"),
+						egenv.WorkingDirectory("console/android/app/src/main/jniLibs/x86_64"),
+						egenv.WorkingDirectory("console/android/app/src/main/jniLibs/x86_64"),
+					),
 					console.BuildLinux,
 				),
 			),

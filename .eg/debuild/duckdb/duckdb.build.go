@@ -60,7 +60,7 @@ func bundlededup(sruntime shell.Command) eg.OpFn {
 		return shell.Run(
 			ctx,
 			sruntime.New("rm -rf bundle && mkdir -p bundle"),
-			sruntime.New("rsync -av --exclude='libduckdb_static.a' --exclude='libduckdb_generated_extension_loader.a' lib/*.a bundle/"),
+			sruntime.New("rsync -av lib/*.a bundle/"),
 			sruntime.New("find bundle -name '*.a' -exec mkdir -p {}.objects \\; -exec mv {} {}.objects \\;"),
 			sruntime.New("find bundle -name '*.a' -execdir ar -x {} \\;"),
 			sruntime.New("mkdir -p bundle/merged && find bundle -name '*.o' -not -path 'bundle/merged/*' -exec cp --update=none {} bundle/merged/ \\;"),
@@ -75,7 +75,7 @@ func bundlelibtool(sruntime shell.Command) eg.OpFn {
 		return shell.Run(
 			ctx,
 			sruntime.New("rm -rf bundle && mkdir -p bundle"),
-			sruntime.New("rsync -av --exclude='libduckdb_static.a' --exclude='libduckdb_generated_extension_loader.a' lib/*.a bundle/"),
+			sruntime.New("rsync -av lib/*.a bundle/"),
 			sruntime.New("xcrun libtool -static -o ${BUILD_DIRECTORY}/libduckdb.a bundle/*.a"),
 		)
 	}
@@ -101,8 +101,8 @@ func CompileAndroidRuntime(platform, arch string) shell.Command {
 	fmt.Fprintf(&cmakevars, " -DBUILD_UNITTESTS=OFF")
 
 	builddir := fmt.Sprintf("build/%s", platform)
-	absbuilddir := egenv.EphemeralDirectory("duckdb", builddir)
-	// absbuilddir := egenv.CacheDirectory("duckdb.bin", builddir)
+	// absbuilddir := egenv.EphemeralDirectory("duckdb", builddir)
+	absbuilddir := egenv.CacheDirectory("duckdb.bin", builddir)
 
 	return egccache.Runtime().
 		Debug().
@@ -125,6 +125,17 @@ func CloneStaticBuild(sruntime shell.Command) eg.OpFn {
 		return shell.Run(
 			ctx,
 			sruntime.New("rsync -avm --include='*/' --include='libduckdb.a' --exclude='*' ${BUILD_DIRECTORY}/* ${CLONE_DIRECTORY}/"),
+		)
+	}
+}
+
+// clone both the static and shared libraries from the build directory, flattened into CLONE_DIRECTORY.
+func CloneBuild(sruntime shell.Command) eg.OpFn {
+	return func(ctx context.Context, op eg.Op) error {
+		return shell.Run(
+			ctx,
+			sruntime.New("cp ${BUILD_DIRECTORY}/libduckdb.a ${CLONE_DIRECTORY}/libduckdb.a"),
+			sruntime.New("cp ${BUILD_DIRECTORY}/lib/libduckdb.so ${CLONE_DIRECTORY}/libduckdb.so"),
 		)
 	}
 }
