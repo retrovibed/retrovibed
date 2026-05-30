@@ -180,7 +180,8 @@ func CompileDarwinRuntime(platform, arch string) shell.Command {
 	cmakevars := cmake().
 		set("CMAKE_OSX_ARCHITECTURES", arch).
 		set("DUCKDB_EXPLICIT_PLATFORM", platform).
-		set("BUILD_UNITTESTS", "OFF")
+		set("BUILD_UNITTESTS", "OFF").
+		set("BUILD_SHELL", "OFF")
 
 	builddir := fmt.Sprintf("build/%s-%s", platform, arch)
 	absbuilddir := egenv.EphemeralDirectory("duckdb", builddir)
@@ -196,7 +197,7 @@ func CompileDarwinRuntime(platform, arch string) shell.Command {
 func CompileDarwin(sruntime shell.Command) eg.OpFn {
 	return eg.Sequential(
 		compile(sruntime, egenv.WorkingDirectory(".dist", "duckdb_darwin_config.cmake")),
-		bundle(sruntime),
+		bundlelibtool(sruntime),
 	)
 }
 
@@ -210,8 +211,8 @@ func CompileIOSRuntime(platform, arch string) shell.Command {
 		set("BUILD_SHELL", "OFF")
 
 	builddir := fmt.Sprintf("build/%s-%s", platform, arch)
-	// absbuilddir := egenv.EphemeralDirectory("duckdb", builddir)
-	absbuilddir := egenv.CacheDirectory("duckdb.bin", builddir)
+	absbuilddir := egenv.EphemeralDirectory("duckdb", builddir)
+	// absbuilddir := egenv.CacheDirectory("duckdb.bin", builddir)
 
 	return egccache.Runtime().
 		Debug().
