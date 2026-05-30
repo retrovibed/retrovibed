@@ -32,7 +32,7 @@ class RateLimit extends StatefulWidget {
 class _RateLimitState extends State<RateLimit> {
   int _value;
   String _unit;
-  RateLimitPreset? _preset;
+  int _generation = 0;
   bool _expanded = false;
 
   _RateLimitState({required int value, String unit = 'sec'}) : _value = value, _unit = unit;
@@ -40,16 +40,16 @@ class _RateLimitState extends State<RateLimit> {
   void _selectUnit(String unit) {
     setState(() {
       _unit = unit;
-      _preset = null;
       _expanded = false;
+      _generation++;
     });
   }
 
   void _selectPreset(RateLimitPreset preset) {
     setState(() {
-      _preset = preset;
       _unit = preset.unit;
       _value = preset.value;
+      _generation++;
     });
     widget.onChanged(preset.value);
   }
@@ -59,7 +59,6 @@ class _RateLimitState extends State<RateLimit> {
     if (n == null) return;
     setState(() {
       _value = n;
-      _preset = null;
     });
     widget.onChanged(n);
   }
@@ -73,7 +72,7 @@ class _RateLimitState extends State<RateLimit> {
       spacing: defaults.spacing,
       children: [
         TextFormField(
-          key: ValueKey((_preset, _unit)),
+          key: ValueKey(_generation),
           initialValue: _value > 0 ? _value.toString() : '',
           keyboardType: TextInputType.number,
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],

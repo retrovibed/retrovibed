@@ -27,6 +27,7 @@ class Uint64 extends StatefulWidget {
 
 class _Uint64State extends State<Uint64> {
   bool _expanded = false;
+  int _generation = 0;
 
   String _display(Int64 v) => v > Int64.ZERO ? v.toString() : '';
 
@@ -36,7 +37,10 @@ class _Uint64State extends State<Uint64> {
   }
 
   void _selectPreset(({String label, Int64 value}) preset) {
-    setState(() => _expanded = false);
+    setState(() {
+      _expanded = false;
+      _generation++;
+    });
     widget.onChanged(preset.value);
   }
 
@@ -49,7 +53,7 @@ class _Uint64State extends State<Uint64> {
       spacing: defaults.spacing,
       children: [
         TextFormField(
-          key: ValueKey(widget.value),
+          key: ValueKey(_generation),
           initialValue: _display(widget.value),
           keyboardType: TextInputType.number,
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
