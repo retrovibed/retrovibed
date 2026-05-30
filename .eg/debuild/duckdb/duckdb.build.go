@@ -53,9 +53,9 @@ func compile(runtime shell.Command, cmakeconfigs ...string) eg.OpFn {
 	}
 }
 
-// bundlededup deduplicates .o files by basename (first-seen wins) before archiving.
+// bundle deduplicates .o files by basename (first-seen wins) before archiving.
 // Required when multiple extension archives share third-party object files (e.g. zstd, fastpfor).
-func bundlededup(sruntime shell.Command) eg.OpFn {
+func bundle(sruntime shell.Command) eg.OpFn {
 	return func(ctx context.Context, op eg.Op) error {
 		return shell.Run(
 			ctx,
@@ -115,7 +115,7 @@ func CompileAndroidRuntime(platform, arch string) shell.Command {
 func CompileAndroid(sruntime shell.Command) eg.OpFn {
 	return eg.Sequential(
 		compile(sruntime, egenv.WorkingDirectory(".dist", "duckdb_android_config.cmake")),
-		bundlededup(sruntime),
+		bundle(sruntime),
 	)
 }
 
@@ -160,7 +160,7 @@ func CompileDarwinRuntime(platform, arch string) shell.Command {
 func CompileDarwin(sruntime shell.Command) eg.OpFn {
 	return eg.Sequential(
 		compile(sruntime, egenv.WorkingDirectory(".dist", "duckdb_darwin_config.cmake")),
-		bundlededup(sruntime),
+		bundle(sruntime),
 	)
 }
 

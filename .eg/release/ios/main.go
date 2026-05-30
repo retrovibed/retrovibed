@@ -118,7 +118,7 @@ func gobuild(ctx context.Context, op eg.Op) error {
 }
 
 func iosbuild(ctx context.Context, op eg.Op) error {
-	flutter := flutterRuntime().EnvironFrom(iOSCompilerEnv()...).Debug()
+	flutter := flutterRuntime().EnvironFrom(iOSCompilerEnv()...)
 	commit := eggit.EnvCommit()
 
 	return eg.Sequential(
