@@ -55,6 +55,8 @@ func main() {
 		"-Wl,-force_load," + duckdblibs + "/libduckdb.a " +
 		"-lc++"
 
+	neuralsldflags := "-L" + neuralsdir + " -lpredicttext"
+
 	apikey := egenv.String("", "RETROVIBED_APPLE_API_KEY")
 	issuerid := egenv.String("", "RETROVIBED_APPLE_ISSUER_ID")
 
@@ -79,15 +81,15 @@ func main() {
 				shell.Op(shell.New("flutter failed to build app")),
 			),
 			shell.Op(
-				flutter.Newf("CGO_LDFLAGS=\"%s\" go -C retrovibedbind build --tags duckdb_use_static_lib,retrovibed,neural -buildmode=c-shared -o ../build/macos/Build/Products/Release/retrovibed.app/Contents/Frameworks/retrovibed.dylib ./...", duckdbldflags),
+				flutter.Newf("CGO_LDFLAGS=\"%s %s\" go -C retrovibedbind build --tags duckdb_use_static_lib,retrovibed,neural -buildmode=c-shared -o ../build/macos/Build/Products/Release/retrovibed.app/Contents/Frameworks/retrovibed.dylib ./...", duckdbldflags, neuralsldflags),
 				flutter.New("tree build/macos/Build/Products/Release/retrovibed.app"),
 				shell.Newf("mkdir -p %s", tarballapp),
 				flutter.Newf("cp -R build/macos/Build/Products/Release/retrovibed.app/ %s/", tarballapp),
 			),
 			shell.Op(
 				shallows.Newf(
-					"CGO_LDFLAGS=\"%s -L%s -lpredicttext -Wl,-rpath,@executable_path/../Frameworks\" go install --tags duckdb_use_static_lib,retrovibed,neural ./cmd/...",
-					duckdbldflags, neuralsdir,
+					"CGO_LDFLAGS=\"%s %s -Wl,-rpath,@executable_path/../Frameworks\" go install --tags duckdb_use_static_lib,retrovibed,neural ./cmd/...",
+					duckdbldflags, neuralsldflags,
 				).Environ("GOBIN", filepath.Join(tarballapp, "Contents", "Helpers")),
 				shell.Newf("cp %s/libpredicttext.dylib %s/Contents/Frameworks/", neuralsdir, tarballapp),
 			),
