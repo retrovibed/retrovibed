@@ -62,6 +62,7 @@ func main() {
 			),
 			console.GenerateFlutter,
 			gobuild,
+			iosbuild,
 			release.Keychain(
 				egenv.String("", "RETROVIBED_APPLE_SIGNING_KEY"),
 				egenv.String("", "RETROVIBED_APPLE_SIGNING_PASSWORD"),
@@ -73,7 +74,6 @@ func main() {
 				egenv.String("", "RETROVIBED_APPLE_API_KEY"),
 				egenv.String("", "RETROVIBED_APPLE_AUTH_KEY"),
 			),
-			iosbuild,
 			shell.Op(
 				shell.Newf("security unlock-keychain -p %s %s", egenv.RunID(), egenv.WorkspaceDirectory("apple.signing.keychain")),
 				flutter.Newf(
