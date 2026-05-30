@@ -4,8 +4,10 @@ package neurals
 
 // -Bstatic/-Bdynamic wrapping forces predicttext to link statically without affecting other libs.
 // Done here rather than CGO_LDFLAGS env to avoid Go repeating the flags once per CGo module.
+// Darwin/iOS use dynamic linking (dylib) so -Bstatic/-Bdynamic (GNU ld only) are omitted.
 
-// #cgo LDFLAGS: -Wl,-Bstatic -lpredicttext -Wl,-Bdynamic
+// #cgo linux LDFLAGS: -Wl,-Bstatic -lpredicttext -Wl,-Bdynamic
+// #cgo darwin ios LDFLAGS: -lpredicttext
 // #include <stdlib.h>
 // extern int predict(const char* model_path, const char* input, size_t seq_len, long long num_tokens, long long pad, long long bos, long long eos, char* output, size_t output_len);
 import "C"
