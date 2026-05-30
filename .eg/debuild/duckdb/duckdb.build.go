@@ -130,8 +130,8 @@ func CompileAndroidRuntime(platform, arch string) shell.Command {
 		set("BUILD_UNITTESTS", "OFF")
 
 	builddir := fmt.Sprintf("build/%s", platform)
-	absbuilddir := egenv.EphemeralDirectory("duckdb", builddir)
-	// absbuilddir := egenv.CacheDirectory("duckdb.bin", builddir)
+	// absbuilddir := egenv.EphemeralDirectory("duckdb", builddir)
+	absbuilddir := egenv.CacheDirectory("duckdb.bin", builddir)
 
 	return egccache.Runtime().
 		Debug().
@@ -139,6 +139,13 @@ func CompileAndroidRuntime(platform, arch string) shell.Command {
 		Environ("BUILD_DIRECTORY", absbuilddir).
 		Environ("BUILD_DIRECTORY_REL", builddir).
 		Environ("EXTRA_CMAKE_VARIABLES", cmakevars.String())
+}
+
+func CompileDev(sruntime shell.Command) eg.OpFn {
+	return eg.Sequential(
+		compile(sruntime, egenv.WorkingDirectory(".dist", "duckdb_config.cmake")),
+		bundle(sruntime),
+	)
 }
 
 func CompileAndroid(sruntime shell.Command) eg.OpFn {
