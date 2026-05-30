@@ -23,7 +23,7 @@ type Discovered struct {
 	Attempts               uint32        `json:"attempts"`
 	AudioBitrate           uint32        `json:"audio_bitrate"`
 	AudioDefaultLocale     string        `json:"audio_default_locale"`
-	Bytes                  uint64        `json:"bytes"`
+	Bytes                  uint64        `json:"bytes,string"`
 	Collation              string        `json:"collation"`
 	CreatedAt              time.Time     `json:"created_at"`
 	Description            string        `json:"description"`

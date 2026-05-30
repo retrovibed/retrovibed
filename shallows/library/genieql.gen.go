@@ -41,7 +41,7 @@ type Known struct {
 	Duplicates       int64     `json:"duplicates"`
 	ID               string    `json:"id"`
 	Md5              string    `json:"md_5"`
-	Md5Lower         uint64    `json:"md_5_lower"`
+	Md5Lower         uint64    `json:"md_5_lower,string"`
 	Mimetype         string    `json:"mimetype"`
 	OriginalLanguage string    `json:"original_language"`
 	OriginalTitle    string    `json:"original_title"`
@@ -58,18 +58,18 @@ type Known struct {
 type Metadata struct {
 	ArchiveID       string    `json:"archive_id"`
 	AutoDescription string    `json:"auto_description"`
-	Bytes           uint64    `json:"bytes"`
+	Bytes           uint64    `json:"bytes,string"`
 	CreatedAt       time.Time `json:"created_at"`
 	Description     string    `json:"description"`
-	DiskOffset      uint64    `json:"disk_offset"`
-	DiskUsage       uint64    `json:"disk_usage"`
+	DiskOffset      uint64    `json:"disk_offset,string"`
+	DiskUsage       uint64    `json:"disk_usage,string"`
 	EncryptionSeed  string    `json:"encryption_seed"`
 	HiddenAt        time.Time `json:"hidden_at"`
 	ID              string    `json:"id"`
 	Image           string    `json:"image"`
 	KnownMediaID    string    `json:"known_media_id"`
 	Mimetype        string    `json:"mimetype"`
-	QuotaUsage      uint64    `json:"quota_usage"`
+	QuotaUsage      uint64    `json:"quota_usage,string"`
 	TombstonedAt    time.Time `json:"tombstoned_at"`
 	TorrentID       string    `json:"torrent_id"`
 	UpdatedAt       time.Time `json:"updated_at"`

@@ -251,6 +251,21 @@ func Diagnostic(w io.Writer, dev *device.Device) error {
 	return nil
 }
 
+type autohealOptions struct {
+	diagnostic io.Writer
+}
+
+// Option configures Autoheal behaviour.
+type Option func(*autohealOptions)
+
+// WithDiagnostic prints the device diagnostic to w on each polling interval.
+// By default diagnostics are discarded.
+func WithDiagnostic(w io.Writer) Option {
+	return func(o *autohealOptions) {
+		o.diagnostic = w
+	}
+}
+
 type autohealState struct {
 	prev            Statistics
 	attempt         int
@@ -296,7 +311,8 @@ func (a *autohealState) needsRecovery(curr Statistics) bool {
 // Autoheal monitors the WireGuard device and attempts Down/Up recovery when
 // the tunnel appears dead. The backoff strategy controls polling frequency;
 // attempt resets to 0 on a healthy check and grows on recovery triggers.
-func Autoheal(ctx context.Context, dev *device.Device, b backoffx.Strategy) {
+func Autoheal(ctx context.Context, dev *device.Device, b backoffx.Strategy, options ...Option) {
+	opts := langx.Clone(autohealOptions{diagnostic: io.Discard}, options...)
 	state := newAutohealState()
 	for {
 		select {
@@ -312,7 +328,7 @@ func Autoheal(ctx context.Context, dev *device.Device, b backoffx.Strategy) {
 			continue
 		}
 
-		errorsx.Log(Diagnostic(os.Stderr, dev))
+		errorsx.Log(Diagnostic(opts.diagnostic, dev))
 
 		switch {
 		case state.needsRecovery(curr):

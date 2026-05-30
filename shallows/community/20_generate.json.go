@@ -1,3 +1,4 @@
 package community
 
 //go:generate gomodifytags -w -all -quiet -skip-unexported -add-tags json -file genieql.gen.go
+//go:generate gomodifytags -w -quiet -struct PublishedContent -field Bytes -add-options json=string -file genieql.gen.go

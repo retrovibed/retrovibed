@@ -65,8 +65,9 @@ func TestHTTPWireguardUpdate(t *testing.T) {
 
 		request := metaapi.WireguardUpdateRequest{
 			Wireguard: &metaapi.Wireguard{
-				Id:          wg.ID,
-				Description: "updated description",
+				Id:                 wg.ID,
+				Description:        "updated description",
+				MaximumConnections: 100,
 			},
 		}
 
@@ -80,5 +81,6 @@ func TestHTTPWireguardUpdate(t *testing.T) {
 
 		require.Equal(t, wg.ID, result.Wireguard.Id)
 		require.Equal(t, "updated description", result.Wireguard.Description)
+		require.Equal(t, uint64(100), result.Wireguard.MaximumConnections)
 	})
 }

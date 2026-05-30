@@ -3,7 +3,10 @@ package duckdb
 import (
 	"context"
 	"eg/compute/android"
+	"fmt"
 	"path/filepath"
+	"strings"
+	"time"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
@@ -28,158 +31,173 @@ func Download(ctx context.Context, op eg.Op) error {
 // compile and put the results into the specified directory.
 func Compile(runtime shell.Command) eg.OpFn {
 	return func(ctx context.Context, op eg.Op) error {
-		return compile(shell.Runtime(), "GEN=ninja make bundle-library")(ctx, op)
+		return compile(runtime, egenv.WorkingDirectory(".dist", "duckdb_config.cmake"))(ctx, op)
 	}
 }
 
-func compile(runtime shell.Command, build string) eg.OpFn {
+func compile(runtime shell.Command, cmakeconfigs ...string) eg.OpFn {
 	return func(ctx context.Context, o eg.Op) error {
 		sruntime := runtime.
-			EnvironFrom(egccache.Env()...).
 			Directory(egenv.CacheDirectory("duckdb"))
+
 		return shell.Run(
 			ctx,
-			sruntime.New(build).
+			sruntime.New("cmake -G \"Ninja\" -S . -B ${BUILD_DIRECTORY_REL} ${EXTRA_CMAKE_VARIABLES}").
 				Environ("DUCKDB_EXTENSIONS", "inet").
 				Environ(
-					"EXTENSION_CONFIGS", egenv.WorkingDirectory(".dist", "duckdb_config.cmake"),
+					"EXTENSION_CONFIGS", strings.Join(cmakeconfigs, ";"),
 				).Timeout(egenv.TTL()),
-			sruntime.Newf("mkdir -p %s", egenv.EphemeralDirectory("duckdb")),
-			sruntime.Newf("cp build/release/libduckdb_bundle.a %s/", egenv.EphemeralDirectory("duckdb")),
-			sruntime.Newf("cp build/release/src/libduckdb.so %s/", egenv.EphemeralDirectory("duckdb")),
+			sruntime.New("cmake --build ${BUILD_DIRECTORY_REL} --config Release --parallel").Timeout(30*time.Minute),
+			sruntime.New("DESTDIR=${BUILD_DIRECTORY} cmake --install ${BUILD_DIRECTORY_REL} --prefix=\"/\""),
 		)
 	}
 }
 
-// clone the compiled results from the ephemeral directory into the specified directory.
-func Clone(dir string) eg.OpFn {
+// bundlededup deduplicates .o files by basename (first-seen wins) before archiving.
+// Required when multiple extension archives share third-party object files (e.g. zstd, fastpfor).
+func bundlededup(sruntime shell.Command) eg.OpFn {
 	return func(ctx context.Context, op eg.Op) error {
-		sruntime := egccache.Runtime().Directory(egenv.CacheDirectory("duckdb"))
 		return shell.Run(
 			ctx,
-			sruntime.Newf("ls -lha %s/*.a", egenv.EphemeralDirectory("duckdb")),
-			sruntime.Newf("mkdir -p %s", dir),
-			sruntime.Newf("rsync -avm --include='*/' --include='*.so' --include='*.a' --include='*.h' --exclude='*' %s/* %s", egenv.EphemeralDirectory("duckdb"), dir),
+			sruntime.New("rm -rf bundle && mkdir -p bundle"),
+			sruntime.New("rsync -av lib/*.a bundle/"),
+			sruntime.New("find bundle -name '*.a' -exec mkdir -p {}.objects \\; -exec mv {} {}.objects \\;"),
+			sruntime.New("find bundle -name '*.a' -execdir ar -x {} \\;"),
+			sruntime.New("mkdir -p bundle/merged && find bundle -name '*.o' -not -path 'bundle/merged/*' -exec cp --update=none {} bundle/merged/ \\;"),
+			// sruntime.New("tree -L 2 bundle/*"),
+			sruntime.New("find bundle/merged -name '*.o' | xargs ar cr ${BUILD_DIRECTORY}/libduckdb.a"),
 		)
 	}
 }
 
-func CompileAndroid(platform, arch string) eg.OpFn {
-	sruntime := egccache.Runtime().
-		Environ("ANDROID_NDK", android.NDKPath).
-		Environ("ANDROID_PLATFORM", android.Platform). // Now explicitly using the platform variable
-		Environ("ANDROID_ABI", arch).
-		Environ("PLATFORM_NAME", platform)
-
-	return compile(sruntime, "cmake -G \"Ninja\" "+
-		"-DEXTENSION_STATIC_BUILD=1 "+
-		"-DAMALGAMATION_BUILD=1 "+
-		"-DBUILD_EXTENSIONS=${DUCKDB_EXTENSIONS} "+
-		"-DENABLE_EXTENSION_AUTOLOADING=1 "+
-		"-DENABLE_EXTENSION_AUTOINSTALL=1 "+
-		"-DBUILD_UNITTESTS=0 "+
-		"-DBUILD_SHELL=0 "+
-		"-DCMAKE_VERBOSE_MAKEFILE=on "+
-		"-DANDROID_PLATFORM=${ANDROID_PLATFORM} "+
-		"-DDUCKDB_EXPLICIT_PLATFORM=${PLATFORM_NAME} "+
-		"-DANDROID_ABI=${ANDROID_ABI} "+
-		"-DDUCKDB_EXTRA_LINK_FLAGS=\"-llog -Wl,-z,max-page-size=16384\" "+
-		"-DCMAKE_SHARED_LINKER_FLAGS=\"-Wl,-z,max-page-size=16384\" "+
-		"-DCMAKE_EXE_LINKER_FLAGS=\"-Wl,-z,max-page-size=16384\" "+
-		"-DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK}/build/cmake/android.toolchain.cmake "+
-		"-DCMAKE_BUILD_TYPE=Release "+
-		"-S . -B build")
-}
-
-// clone only the necessary files for android.
-func CloneAndroid(dir string) eg.OpFn {
+func bundlelibtool(sruntime shell.Command) eg.OpFn {
 	return func(ctx context.Context, op eg.Op) error {
-		sruntime := egccache.Runtime().Directory(egenv.CacheDirectory("duckdb"))
 		return shell.Run(
 			ctx,
-			sruntime.Newf("ls -lha %s/*.a", egenv.EphemeralDirectory("duckdb", "lib")),
-			sruntime.Newf("rsync -avm --include='*/' --include='*.so' --include='*.a' --exclude='*' %s/* %s", egenv.EphemeralDirectory("duckdb", "lib"), dir),
+			sruntime.New("rm -rf bundle && mkdir -p bundle"),
+			sruntime.New("rsync -av lib/*.a bundle/"),
+			sruntime.New("xcrun libtool -static -o ${BUILD_DIRECTORY}/libduckdb.a bundle/*.a"),
 		)
 	}
 }
 
-func CompileDarwin(platform, arch string) eg.OpFn {
-	sruntime := egccache.Runtime().
-		Environ("PLATFORM_NAME", platform).
-		Environ("ARCH", arch)
-
-	return compile(sruntime, "cmake -G \"Ninja\" "+
-		"-DCMAKE_OSX_ARCHITECTURES=${ARCH} "+
-		"-DEXTENSION_STATIC_BUILD=1 "+
-		"-DBUILD_EXTENSIONS=${DUCKDB_EXTENSIONS} "+
-		"-DENABLE_EXTENSION_AUTOLOADING=1 "+
-		"-DENABLE_EXTENSION_AUTOINSTALL=1 "+
-		"-DDUCKDB_EXPLICIT_PLATFORM=${PLATFORM_NAME} "+
-		"-DBUILD_UNITTESTS=0 "+
-		"-DBUILD_SHELL=0 "+
-		"-DCMAKE_BUILD_TYPE=Release "+
-		"-S . -B build")
+// compile and put the results into the specified directory.
+func CompileDevRuntime() shell.Command {
+	builddir := "build/dev"
+	absbuilddir := egenv.EphemeralDirectory("duckdb", builddir)
+	return shell.Runtime().
+		Debug().
+		Directory(absbuilddir).
+		Environ("BUILD_DIRECTORY", absbuilddir).
+		Environ("BUILD_DIRECTORY_REL", builddir)
 }
 
-// CloneDarwin copies static libraries and headers for macOS builds.
-func CloneDarwin(dir string) eg.OpFn {
+func CompileAndroidRuntime(platform, arch string) shell.Command {
+	var cmakevars strings.Builder
+	fmt.Fprintf(&cmakevars, "-DCMAKE_TOOLCHAIN_FILE=%s/build/cmake/android.toolchain.cmake", android.NDKPath)
+	fmt.Fprintf(&cmakevars, " -DANDROID_PLATFORM=%s", android.Platform)
+	fmt.Fprintf(&cmakevars, " -DANDROID_ABI=%s", arch)
+	fmt.Fprintf(&cmakevars, " -DDUCKDB_EXPLICIT_PLATFORM=%s", platform)
+	fmt.Fprintf(&cmakevars, " -DBUILD_UNITTESTS=OFF")
+
+	builddir := fmt.Sprintf("build/%s", platform)
+	// absbuilddir := egenv.EphemeralDirectory("duckdb", builddir)
+	absbuilddir := egenv.CacheDirectory("duckdb.bin", builddir)
+
+	return egccache.Runtime().
+		Debug().
+		Directory(absbuilddir).
+		Environ("BUILD_DIRECTORY", absbuilddir).
+		Environ("BUILD_DIRECTORY_REL", builddir).
+		Environ("EXTRA_CMAKE_VARIABLES", cmakevars.String())
+}
+
+func CompileAndroid(sruntime shell.Command) eg.OpFn {
+	return eg.Sequential(
+		compile(sruntime, egenv.WorkingDirectory(".dist", "duckdb_android_config.cmake")),
+		bundlededup(sruntime),
+	)
+}
+
+// clone only the necessary files for a static build
+func CloneStaticBuild(sruntime shell.Command) eg.OpFn {
 	return func(ctx context.Context, op eg.Op) error {
-		sruntime := egccache.Runtime().Directory(egenv.CacheDirectory("duckdb"))
 		return shell.Run(
 			ctx,
-			sruntime.Newf("mkdir -p %s", dir),
-			sruntime.Newf("rsync -avm --include='*/' --include='*.h' --include='*.a' --exclude='*' %s/* %s",
-				egenv.EphemeralDirectory("duckdb", "lib"),
-				dir,
-			),
+			sruntime.New("rsync -avm --include='*/' --include='libduckdb.a' --exclude='*' ${BUILD_DIRECTORY}/* ${CLONE_DIRECTORY}/"),
 		)
 	}
 }
 
-func CompileIOS(platform, arch string) eg.OpFn {
-	sruntime := egccache.Runtime().
-		Environ("PLATFORM_NAME", platform).
-		Environ("ARCH", arch)
-
-	return compile(sruntime, "cmake -G \"Ninja\" "+
-		"-DCMAKE_SYSTEM_NAME=iOS "+
-		"-DCMAKE_OSX_ARCHITECTURES=${ARCH} "+
-		"-DCMAKE_OSX_SYSROOT=$(xcrun --sdk iphoneos --show-sdk-path) "+
-		"-DCMAKE_OSX_DEPLOYMENT_TARGET=16.0 "+
-		// "-DAMALGAMATION_BUILD=1 "+
-		"-DEXTENSION_STATIC_BUILD=1 "+
-		"-DBUILD_EXTENSIONS=${DUCKDB_EXTENSIONS} "+
-		"-DENABLE_EXTENSION_AUTOLOADING=1 "+
-		"-DENABLE_EXTENSION_AUTOINSTALL=1 "+
-		"-DDUCKDB_EXPLICIT_PLATFORM=${PLATFORM_NAME} "+
-		"-DBUILD_UNITTESTS=0 "+
-		"-DBUILD_SHELL=0 "+
-		"-DCMAKE_BUILD_TYPE=Release "+
-		"-S . -B build")
-}
-
-// CloneIOS mirrors CloneAndroid but targets the ios directory
-func CloneIOS(dir string) eg.OpFn {
+// clone both the static and shared libraries from the build directory, flattened into CLONE_DIRECTORY.
+func CloneBuild(sruntime shell.Command) eg.OpFn {
 	return func(ctx context.Context, op eg.Op) error {
-		sruntime := egccache.Runtime().Directory(egenv.CacheDirectory("duckdb"))
 		return shell.Run(
 			ctx,
-			sruntime.Newf("mkdir -p %s", dir),
-			sruntime.Newf("rsync -avm --include='*/' --include='*.h' --include='*.a' --exclude='*' %s/* %s",
-				egenv.EphemeralDirectory("duckdb", "lib"),
-				dir,
-			),
+			sruntime.New("cp ${BUILD_DIRECTORY}/libduckdb.a ${CLONE_DIRECTORY}/libduckdb.a"),
+			sruntime.New("cp ${BUILD_DIRECTORY}/lib/libduckdb.so ${CLONE_DIRECTORY}/libduckdb.so"),
 		)
 	}
 }
 
-func MaybeBuild(sopath string, bop eg.OpFn, clone func(dir string) eg.OpFn) eg.OpFn {
+func CompileDarwinRuntime(platform, arch string) shell.Command {
+	var cmakevars strings.Builder
+	fmt.Fprintf(&cmakevars, "-DCMAKE_OSX_ARCHITECTURES=%s", arch)
+	fmt.Fprintf(&cmakevars, " -DDUCKDB_EXPLICIT_PLATFORM=%s", platform)
+	fmt.Fprintf(&cmakevars, " -DBUILD_UNITTESTS=OFF")
+
+	builddir := fmt.Sprintf("build/%s-%s", platform, arch)
+	absbuilddir := egenv.EphemeralDirectory("duckdb", builddir)
+
+	return egccache.Runtime().
+		Debug().
+		Directory(absbuilddir).
+		Environ("BUILD_DIRECTORY", absbuilddir).
+		Environ("BUILD_DIRECTORY_REL", builddir).
+		Environ("EXTRA_CMAKE_VARIABLES", cmakevars.String())
+}
+
+func CompileDarwin(sruntime shell.Command) eg.OpFn {
+	return eg.Sequential(
+		compile(sruntime, egenv.WorkingDirectory(".dist", "duckdb_darwin_config.cmake")),
+		bundlededup(sruntime),
+	)
+}
+
+func CompileIOSRuntime(platform, arch string) shell.Command {
+	var cmakevars strings.Builder
+	fmt.Fprintf(&cmakevars, "-DCMAKE_SYSTEM_NAME=iOS")
+	fmt.Fprintf(&cmakevars, " -DCMAKE_OSX_ARCHITECTURES=%s", arch)
+	fmt.Fprintf(&cmakevars, " -DCMAKE_OSX_DEPLOYMENT_TARGET=16.0")
+	fmt.Fprintf(&cmakevars, " -DDUCKDB_EXPLICIT_PLATFORM=%s", platform)
+	fmt.Fprintf(&cmakevars, " -DBUILD_UNITTESTS=OFF")
+	fmt.Fprintf(&cmakevars, " -DBUILD_SHELL=OFF")
+
+	builddir := fmt.Sprintf("build/%s-%s", platform, arch)
+	absbuilddir := egenv.EphemeralDirectory("duckdb", builddir)
+
+	return egccache.Runtime().
+		Debug().
+		Directory(absbuilddir).
+		Environ("BUILD_DIRECTORY", absbuilddir).
+		Environ("BUILD_DIRECTORY_REL", builddir).
+		Environ("EXTRA_CMAKE_VARIABLES", cmakevars.String())
+}
+
+func CompileIOS(sruntime shell.Command) eg.OpFn {
+	return eg.Sequential(
+		compile(sruntime, egenv.WorkingDirectory(".dist", "duckdb_ios_config.cmake")),
+		bundlelibtool(sruntime),
+	)
+}
+
+func MaybeBuild(sopath string, runtime shell.Command, bop func(runtime shell.Command) eg.OpFn, clone func(runtime shell.Command) eg.OpFn) eg.OpFn {
 	return eg.WhenFn(func(ctx context.Context) bool {
-		return !egfs.FileExists(egenv.CacheDirectory(sopath))
+		return !egfs.FileExists(sopath)
 	}, eg.Sequential(
 		Download,
-		bop,
-		clone(egenv.CacheDirectory(filepath.Dir(sopath))),
+		bop(runtime),
+		clone(runtime.Environ("CLONE_DIRECTORY", filepath.Dir(sopath))),
 	),
 	)
 }

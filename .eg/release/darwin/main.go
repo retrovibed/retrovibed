@@ -14,9 +14,9 @@ import (
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
+	"github.com/egdaemon/eg/runtime/wasi/eggit"
 	"github.com/egdaemon/eg/runtime/wasi/shell"
 	"github.com/egdaemon/eg/runtime/x/wasi/egbug"
-	"github.com/egdaemon/eg/runtime/wasi/eggit"
 	"github.com/egdaemon/eg/runtime/x/wasi/eggithub"
 	"github.com/egdaemon/eg/runtime/x/wasi/eggolang"
 	"github.com/egdaemon/eg/runtime/x/wasi/egtarball"
@@ -45,19 +45,14 @@ func main() {
 	pkgpath := egenv.CacheDirectory("retrovibed.darwin.arm64.pkg")
 	entitlements := egenv.WorkingDirectory("console", "macos", "Runner", "Release.entitlements")
 	keychainPath := egenv.WorkspaceDirectory("apple.signing.keychain")
-	flutter := runtime.Directory(egenv.WorkingDirectory("console"))
+	flutter := runtime.Directory(egenv.WorkingDirectory("console")).Debug()
 	shallows := runtime.Directory(egenv.WorkingDirectory("shallows"))
 	commit := eggit.EnvCommit()
 	duckdblibs := egenv.CacheDirectory("duckdb", ".darwin-arm64")
 	neuralsdir := egenv.CacheDirectory("neurals")
 
 	duckdbldflags := "-L" + duckdblibs + " " +
-		"-Wl,-force_load," + duckdblibs + "/libduckdb_static.a " +
-		"-lduckdb_generated_extension_loader " +
-		"-lautocomplete_extension -lcore_functions_extension -licu_extension -ljson_extension -lparquet_extension " +
-		"-linet_extension -lfts_extension " +
-		"-ltpcds_extension -ltpch_extension " +
-		"-lduckdb_fastpforlib -lduckdb_fmt -lduckdb_fsst -lduckdb_hyperloglog -lduckdb_mbedtls -lduckdb_miniz -lduckdb_pg_query -lduckdb_re2 -lduckdb_skiplistlib -lduckdb_utf8proc -lduckdb_yyjson -lduckdb_zstd " +
+		"-Wl,-force_load," + duckdblibs + "/libduckdb.a " +
 		"-lc++"
 
 	apikey := egenv.String("", "RETROVIBED_APPLE_API_KEY")
@@ -66,10 +61,14 @@ func main() {
 	err := eg.Perform(
 		ctx,
 		eg.Sequential(
-			duckdb.MaybeBuild(".eg.cache/duckdb/.darwin-arm64/libduckdb_static.a", duckdb.CompileDarwin("osx_arm64", "arm64"), duckdb.CloneDarwin),
-			neurals.CompileDarwin(neuralsdir),
-			shell.Op(
-				shell.Newf("test -f %[1]s/libtpcds_extension.a || (echo 'void __stub(void){}' | cc -xc -c - -o /tmp/stub.o && ar rcs %[1]s/libtpcds_extension.a /tmp/stub.o && ar rcs %[1]s/libtpch_extension.a /tmp/stub.o)", duckdblibs),
+			eg.Parallel(
+				duckdb.MaybeBuild(
+					filepath.Join(duckdblibs, "libduckdb.a"),
+					duckdb.CompileDarwinRuntime("osx_arm64", "arm64"),
+					duckdb.CompileDarwin,
+					duckdb.CloneStaticBuild,
+				),
+				neurals.CompileDarwin(neuralsdir),
 			),
 			console.GenerateFlutter,
 			egbug.DebugFailure(

@@ -19,6 +19,7 @@ import (
 
 func flutterRuntimev2(v shell.Command) shell.Command {
 	return v.
+		Debug().
 		Directory(egenv.WorkingDirectory("console")).
 		EnvironFrom(eggolang.Env()...).
 		Environ("PUB_CACHE", egenv.CacheDirectory(".eg", "dart"))
@@ -79,13 +80,13 @@ func GenerateDevStaticBinding(rt shell.Command, outdir string, staticdirs ...str
 		// 1. Link to the clean dynamic libduckdb.so to drop duplicate symbol issues
 		// 2. Explicitly bind libpredicttext.a statically so its Rust code is baked inside
 		// duckdb is an absolute disaster to statically link
-		fmt.Fprintf(&cgoFlags, " -lduckdb -Wl,-Bstatic -lpredicttext -Wl,-Bdynamic -static-libstdc++ -Wl,-z,max-page-size=16384")
+		fmt.Fprintf(&cgoFlags, " -Wl,-Bstatic -lduckdb -lpredicttext -Wl,-Bdynamic -static-libstdc++ -Wl,-z,max-page-size=16384")
 
-		runtime := flutterRuntimev2(rt).Debug()
+		runtime := flutterRuntimev2(rt)
 		return shell.Run(
 			ctx,
 			runtime.Newf(
-				"go -C retrovibedbind build -trimpath -buildmode=c-shared -buildvcs=true --tags localdev,retrovibed,neural -o %s/libretrovibed.so .",
+				"go -C retrovibedbind build -trimpath -buildmode=c-shared -buildvcs=true --tags duckdb_use_static_lib,localdev,retrovibed,neural -o %s/libretrovibed.so .",
 				outdir,
 			).
 				Environ("CGO_LDFLAGS", strings.TrimSpace(cgoFlags.String())),
@@ -99,7 +100,7 @@ func GenerateStaticBinding(dir string, rt shell.Command) eg.OpFn {
 		runtime := flutterRuntimev2(rt)
 		return shell.Run(
 			ctx,
-			runtime.Newf("go -C retrovibedbind build -trimpath -buildmode=c-shared -buildvcs=true --tags duckdb_use_static_lib,retrovibed,neural -o %s/libretrovibed.so .", dir).Environ("CGO_LDFLAGS", fmt.Sprintf("-Wl,--allow-multiple-definition -L%s -Wl,--whole-archive %s -Wl,--no-whole-archive -static-libstdc++ -lpredicttext -Wl,-z,max-page-size=16384", dir, duckdblibs)),
+			runtime.Newf("go -C retrovibedbind build -trimpath -buildmode=c-shared -buildvcs=true --tags duckdb_use_static_lib,retrovibed,neural -o %s/libretrovibed.so .", dir).Environ("CGO_LDFLAGS", fmt.Sprintf("-Wl -L%s -Wl %s -static-libstdc++ -lpredicttext -Wl,-z,max-page-size=16384", dir, duckdblibs)),
 		)
 	}
 }
