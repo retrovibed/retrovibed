@@ -15,6 +15,30 @@ import (
 	"github.com/egdaemon/eg/runtime/x/wasi/egfs"
 )
 
+type cmakeVars struct{ strings.Builder }
+
+func cmake() *cmakeVars { return &cmakeVars{} }
+
+func (c *cmakeVars) set(key, value string) *cmakeVars {
+	if c.Len() > 0 {
+		c.WriteByte(' ')
+	}
+	fmt.Fprintf(&c.Builder, `-D%s=%s`, key, value)
+	return c
+}
+
+// quoted quotes the value. Use only when the flags are embedded directly in a shell
+// command string — the shell strips the quotes. Do NOT use for values placed in an
+// env var expanded later via ${VAR}: the shell does not re-process quotes during
+// variable expansion, so cmake would receive the literal quote characters.
+func (c *cmakeVars) quoted(key, value string) *cmakeVars {
+	if c.Len() > 0 {
+		c.WriteByte(' ')
+	}
+	fmt.Fprintf(&c.Builder, `-D%s="%s"`, key, value)
+	return c
+}
+
 // download the version of duckdb we're using
 func Download(ctx context.Context, op eg.Op) error {
 	sruntime := shell.Runtime().Directory(egenv.CacheDirectory())
@@ -39,14 +63,14 @@ func compile(runtime shell.Command, cmakeconfigs ...string) eg.OpFn {
 	return func(ctx context.Context, o eg.Op) error {
 		sruntime := runtime.
 			Directory(egenv.CacheDirectory("duckdb"))
-
+		cfg := cmake().
+			set("EXTENSION_STATIC_BUILD", "1"). // this needs to happen *before* our configurations are loaded. jfc.
+			quoted("DUCKDB_EXTENSION_CONFIGS", strings.Join(cmakeconfigs, ";")).
+			quoted("BUILD_EXTENSIONS", "inet;autocomplete;json;parquet;icu")
 		return shell.Run(
 			ctx,
-			sruntime.New("cmake -G \"Ninja\" -S . -B ${BUILD_DIRECTORY_REL} ${EXTRA_CMAKE_VARIABLES}").
-				Environ("DUCKDB_EXTENSIONS", "inet").
-				Environ(
-					"EXTENSION_CONFIGS", strings.Join(cmakeconfigs, ";"),
-				).Timeout(egenv.TTL()),
+			sruntime.Newf("cmake -G \"Ninja\" -S . -B ${BUILD_DIRECTORY_REL} %s ${EXTRA_CMAKE_VARIABLES}", cfg).
+				Timeout(egenv.TTL()),
 			sruntime.New("cmake --build ${BUILD_DIRECTORY_REL} --config Release --parallel").Timeout(30*time.Minute),
 			sruntime.New("DESTDIR=${BUILD_DIRECTORY} cmake --install ${BUILD_DIRECTORY_REL} --prefix=\"/\""),
 		)
@@ -63,7 +87,7 @@ func bundle(sruntime shell.Command) eg.OpFn {
 			sruntime.New("rsync -av lib/*.a bundle/"),
 			sruntime.New("find bundle -name '*.a' -exec mkdir -p {}.objects \\; -exec mv {} {}.objects \\;"),
 			sruntime.New("find bundle -name '*.a' -execdir ar -x {} \\;"),
-			sruntime.New("mkdir -p bundle/merged && find bundle -name '*.o' -not -path 'bundle/merged/*' -exec cp --update=none {} bundle/merged/ \\;"),
+			sruntime.New("mkdir -p bundle/merged && find bundle -name '*.o' -not -path 'bundle/merged/*' -exec sh -c 'cp --update=none \"$1\" \"bundle/merged/$(md5sum \"$1\" | cut -c1-32).o\"' _ {} \\;"),
 			// sruntime.New("tree -L 2 bundle/*"),
 			sruntime.New("find bundle/merged -name '*.o' | xargs ar cr ${BUILD_DIRECTORY}/libduckdb.a"),
 		)
@@ -80,7 +104,7 @@ func bundlelibtool(sruntime shell.Command) eg.OpFn {
 			sruntime.New("rsync -av lib/*.a bundle/"),
 			sruntime.New("find bundle -name '*.a' -exec mkdir -p {}.objects \\; -exec mv {} {}.objects \\;"),
 			sruntime.New("find bundle -name '*.a' -execdir xcrun ar -x {} \\;"),
-			sruntime.New("mkdir -p bundle/merged && find bundle -name '*.o' -not -path 'bundle/merged/*' -exec cp -n {} bundle/merged/ \\;"),
+			sruntime.New("mkdir -p bundle/merged && find bundle -name '*.o' -not -path 'bundle/merged/*' -exec sh -c 'cp -n \"$1\" \"bundle/merged/$(md5 -q \"$1\").o\"' _ {} \\;"),
 			sruntime.New("find bundle/merged -name '*.o' | xargs xcrun libtool -static -o ${BUILD_DIRECTORY}/libduckdb.a"),
 		)
 	}
@@ -98,12 +122,12 @@ func CompileDevRuntime() shell.Command {
 }
 
 func CompileAndroidRuntime(platform, arch string) shell.Command {
-	var cmakevars strings.Builder
-	fmt.Fprintf(&cmakevars, "-DCMAKE_TOOLCHAIN_FILE=%s/build/cmake/android.toolchain.cmake", android.NDKPath)
-	fmt.Fprintf(&cmakevars, " -DANDROID_PLATFORM=%s", android.Platform)
-	fmt.Fprintf(&cmakevars, " -DANDROID_ABI=%s", arch)
-	fmt.Fprintf(&cmakevars, " -DDUCKDB_EXPLICIT_PLATFORM=%s", platform)
-	fmt.Fprintf(&cmakevars, " -DBUILD_UNITTESTS=OFF")
+	cmakevars := cmake().
+		set("CMAKE_TOOLCHAIN_FILE", fmt.Sprintf("%s/build/cmake/android.toolchain.cmake", android.NDKPath)).
+		set("ANDROID_PLATFORM", android.Platform).
+		set("ANDROID_ABI", arch).
+		set("DUCKDB_EXPLICIT_PLATFORM", platform).
+		set("BUILD_UNITTESTS", "OFF")
 
 	builddir := fmt.Sprintf("build/%s", platform)
 	absbuilddir := egenv.EphemeralDirectory("duckdb", builddir)
@@ -146,10 +170,10 @@ func CloneBuild(sruntime shell.Command) eg.OpFn {
 }
 
 func CompileDarwinRuntime(platform, arch string) shell.Command {
-	var cmakevars strings.Builder
-	fmt.Fprintf(&cmakevars, "-DCMAKE_OSX_ARCHITECTURES=%s", arch)
-	fmt.Fprintf(&cmakevars, " -DDUCKDB_EXPLICIT_PLATFORM=%s", platform)
-	fmt.Fprintf(&cmakevars, " -DBUILD_UNITTESTS=OFF")
+	cmakevars := cmake().
+		set("CMAKE_OSX_ARCHITECTURES", arch).
+		set("DUCKDB_EXPLICIT_PLATFORM", platform).
+		set("BUILD_UNITTESTS", "OFF")
 
 	builddir := fmt.Sprintf("build/%s-%s", platform, arch)
 	absbuilddir := egenv.EphemeralDirectory("duckdb", builddir)
@@ -170,13 +194,13 @@ func CompileDarwin(sruntime shell.Command) eg.OpFn {
 }
 
 func CompileIOSRuntime(platform, arch string) shell.Command {
-	var cmakevars strings.Builder
-	fmt.Fprintf(&cmakevars, "-DCMAKE_SYSTEM_NAME=iOS")
-	fmt.Fprintf(&cmakevars, " -DCMAKE_OSX_ARCHITECTURES=%s", arch)
-	fmt.Fprintf(&cmakevars, " -DCMAKE_OSX_DEPLOYMENT_TARGET=16.0")
-	fmt.Fprintf(&cmakevars, " -DDUCKDB_EXPLICIT_PLATFORM=%s", platform)
-	fmt.Fprintf(&cmakevars, " -DBUILD_UNITTESTS=OFF")
-	fmt.Fprintf(&cmakevars, " -DBUILD_SHELL=OFF")
+	cmakevars := cmake().
+		set("CMAKE_SYSTEM_NAME", "iOS").
+		set("CMAKE_OSX_ARCHITECTURES", arch).
+		set("CMAKE_OSX_DEPLOYMENT_TARGET", "16.0").
+		set("DUCKDB_EXPLICIT_PLATFORM", platform).
+		set("BUILD_UNITTESTS", "OFF").
+		set("BUILD_SHELL", "OFF")
 
 	builddir := fmt.Sprintf("build/%s-%s", platform, arch)
 	absbuilddir := egenv.EphemeralDirectory("duckdb", builddir)
