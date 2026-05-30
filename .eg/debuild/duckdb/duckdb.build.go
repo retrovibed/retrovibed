@@ -173,7 +173,7 @@ func CloneBuild(sruntime shell.Command) eg.OpFn {
 			ctx,
 			sruntime.New("mkdir -p ${CLONE_DIRECTORY}"),
 			sruntime.New("cp ${BUILD_DIRECTORY}/libduckdb.a ${CLONE_DIRECTORY}/libduckdb.a"),
-			sruntime.New("cp ${BUILD_DIRECTORY}/lib/libduckdb.so ${CLONE_DIRECTORY}/libduckdb.so"),
+			sruntime.New("cp ${BUILD_DIRECTORY}/lib/libduckdb.* ${CLONE_DIRECTORY}/"),
 		)
 	}
 }
