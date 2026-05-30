@@ -1,4 +1,4 @@
-//go:build duckdb_use_static_lib
+//go:build duckdb_use_static_lib && linux
 
 package goosex
 
