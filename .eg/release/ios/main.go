@@ -54,15 +54,15 @@ func main() {
 						"CC=\"$(xcrun --sdk iphoneos --find clang)\" "+
 							"CXX=\"$(xcrun --sdk iphoneos --find clang++)\" "+
 							"SDKROOT=\"$(xcrun --sdk iphoneos --show-sdk-path)\" "+
-							"CGO_CFLAGS=\"-target arm64-apple-ios16.0 -isysroot $(xcrun --sdk iphoneos --show-sdk-path) -I%[1]s -DDUCKDB_STATIC_BUILD\" "+
-							"CGO_LDFLAGS=\"-target arm64-apple-ios16.0 -isysroot $(xcrun --sdk iphoneos --show-sdk-path) -lc++ -framework CoreFoundation -framework Security -L$(pwd)/console/ios -lpredicttext\" "+
+							"CGO_CFLAGS=\"-target arm64-apple-ios16.0 -I%[1]s\" "+
+							"CGO_LDFLAGS=\"-target arm64-apple-ios16.0 -lc++ -framework CoreFoundation -framework Security -L$(pwd)/console/ios -lpredicttext -Wl,-force_load,libduckdb.a -Wl,-force_load,libpredicttext.a\" "+
 							"go -C retrovibedbind build -trimpath -buildmode=c-archive --tags duckdb_use_static_lib,retrovibed,neural -o ../ios/libretrovibed.a ./...",
 						egenv.CacheDirectory("duckdb", ".arm64"),
 					).
 						Environ("GOOS", "ios").
 						Environ("GOARCH", "arm64").
 						Environ("CGO_ENABLED", "1").
-						Timeout(5*time.Minute),
+						Timeout(30*time.Minute),
 				),
 				shell.Op(shell.New("echo 'go failed to build for iOS'")),
 			),
@@ -105,7 +105,7 @@ func iosbuild(ctx context.Context, op eg.Op) error {
 		egbug.DebugFailure(
 			shell.Op(
 				flutter.New("rm -rf ios/RetrovivedBind.framework ios/RetrovivedBind.xcframework && cp -r ios/RetrovivedBind ios/RetrovivedBind.framework"),
-				flutter.New("bash -c 'cd ios && xcrun clang -target arm64-apple-ios16.0 -isysroot \"$(xcrun --sdk iphoneos --show-sdk-path)\" -shared -o RetrovivedBind.framework/RetrovivedBind -Wl,-force_load,libretrovibed.a -Wl,-force_load,libduckdb.a -Wl,-force_load,libpredicttext.a -lc++ -lresolv -framework CoreFoundation -framework Security -Wl,-install_name,@rpath/RetrovivedBind.framework/RetrovivedBind'"),
+				flutter.New("bash -c 'cd ios && xcrun clang -target arm64-apple-ios16.0 -isysroot \"$(xcrun --sdk iphoneos --show-sdk-path)\" -shared -o RetrovivedBind.framework/RetrovivedBind -Wl,-force_load,libretrovibed.a -lc++ -lresolv -framework CoreFoundation -framework Security -Wl,-install_name,@rpath/RetrovivedBind.framework/RetrovivedBind'"),
 				flutter.New("bash -c 'cd ios && xcodebuild -create-xcframework -framework RetrovivedBind.framework -output RetrovivedBind.xcframework'"),
 				flutter.New("flutter pub get"),
 				flutter.New("pod install").Directory(egenv.WorkingDirectory("console", "ios")),
