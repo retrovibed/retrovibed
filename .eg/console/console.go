@@ -19,6 +19,7 @@ import (
 
 func flutterRuntimev2(v shell.Command) shell.Command {
 	return v.
+		Debug().
 		Directory(egenv.WorkingDirectory("console")).
 		EnvironFrom(eggolang.Env()...).
 		Environ("PUB_CACHE", egenv.CacheDirectory(".eg", "dart"))
@@ -99,7 +100,7 @@ func GenerateStaticBinding(dir string, rt shell.Command) eg.OpFn {
 		runtime := flutterRuntimev2(rt)
 		return shell.Run(
 			ctx,
-			runtime.Newf("go -C retrovibedbind build -trimpath -buildmode=c-shared -buildvcs=true --tags duckdb_use_static_lib,retrovibed,neural -o %s/libretrovibed.so .", dir).Environ("CGO_LDFLAGS", fmt.Sprintf("-Wl,--allow-multiple-definition -L%s -Wl,--whole-archive %s -Wl,--no-whole-archive -static-libstdc++ -lpredicttext -Wl,-z,max-page-size=16384", dir, duckdblibs)),
+			runtime.Newf("go -C retrovibedbind build -trimpath -buildmode=c-shared -buildvcs=true --tags duckdb_use_static_lib,retrovibed,neural -o %s/libretrovibed.so .", dir).Environ("CGO_LDFLAGS", fmt.Sprintf("-Wl -L%s -Wl %s -static-libstdc++ -lpredicttext -Wl,-z,max-page-size=16384", dir, duckdblibs)),
 		)
 	}
 }

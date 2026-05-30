@@ -53,49 +53,31 @@ func compile(runtime shell.Command, cmakeconfigs ...string) eg.OpFn {
 	}
 }
 
-// bundle replicates `make bundle-library` for a specific cmake binary directory.
-// the runtime must already be set to the proper directory before invoking.
-func bundle(sruntime shell.Command) eg.OpFn {
-	return func(ctx context.Context, op eg.Op) error {
-		return shell.Run(
-			ctx,
-			sruntime.New("rm -rf bundle && mkdir -p bundle"),
-			sruntime.New("cp lib/*.a bundle/."),
-			sruntime.New("find bundle -name '*.a' -exec mkdir -p {}.objects \\; -exec mv {} {}.objects \\;"),
-			sruntime.New("find bundle -name '*.a' -execdir ar -x {} \\;"),
-			// bundle-library-o: archive all .o files into libduckdb.a
-			sruntime.New("cd bundle && echo ./*/*.o | xargs ar cr ${BUILD_DIRECTORY}/libduckdb.a"),
-		)
-	}
-}
-
-// bundlededup is like bundle but deduplicates .o files by basename (first-wins)
-// before archiving. Required on iOS/Darwin where the linker errors on duplicate symbols
-// that arise when multiple DuckDB extension archives share object files (e.g. mbedtls).
+// bundlededup deduplicates .o files by basename (first-seen wins) before archiving.
+// Required when multiple extension archives share third-party object files (e.g. zstd, fastpfor).
 func bundlededup(sruntime shell.Command) eg.OpFn {
 	return func(ctx context.Context, op eg.Op) error {
 		return shell.Run(
 			ctx,
 			sruntime.New("rm -rf bundle && mkdir -p bundle"),
-			sruntime.New("cp lib/*.a bundle/."),
+			sruntime.New("rsync -av --exclude='libduckdb_static.a' --exclude='libduckdb_generated_extension_loader.a' lib/*.a bundle/"),
 			sruntime.New("find bundle -name '*.a' -exec mkdir -p {}.objects \\; -exec mv {} {}.objects \\;"),
 			sruntime.New("find bundle -name '*.a' -execdir ar -x {} \\;"),
-			// Deduplicate: copy each .o by basename with no-overwrite so first-seen wins,
-			// then archive the flat merged set.
 			sruntime.New("mkdir -p bundle/merged && find bundle -name '*.o' -not -path 'bundle/merged/*' -exec cp -n {} bundle/merged/ \\;"),
+			// sruntime.New("tree -L 2 bundle/*"),
 			sruntime.New("find bundle/merged -name '*.o' | xargs ar cr ${BUILD_DIRECTORY}/libduckdb.a"),
 		)
 	}
 }
 
-func bundlelibtool(sruntime shell.Command) eg.OpFn {
-	return func(ctx context.Context, op eg.Op) error {
-		return shell.Run(
-			ctx,
-			sruntime.New("xcrun libtool -static -o ${BUILD_DIRECTORY}/libduckdb.a lib/*.a"),
-		)
-	}
-}
+// func bundlelibtool(sruntime shell.Command) eg.OpFn {
+// 	return func(ctx context.Context, op eg.Op) error {
+// 		return shell.Run(
+// 			ctx,
+// 			sruntime.New("xcrun libtool -static -o ${BUILD_DIRECTORY}/libduckdb.a lib/*.a"),
+// 		)
+// 	}
+// }
 
 // compile and put the results into the specified directory.
 func CompileDevRuntime() shell.Command {
@@ -118,6 +100,7 @@ func CompileAndroidRuntime(platform, arch string) shell.Command {
 
 	builddir := fmt.Sprintf("build/%s", platform)
 	absbuilddir := egenv.EphemeralDirectory("duckdb", builddir)
+	// absbuilddir := egenv.CacheDirectory("duckdb.bin", builddir)
 
 	return egccache.Runtime().
 		Debug().
@@ -130,7 +113,7 @@ func CompileAndroidRuntime(platform, arch string) shell.Command {
 func CompileAndroid(sruntime shell.Command) eg.OpFn {
 	return eg.Sequential(
 		compile(sruntime, egenv.WorkingDirectory(".dist", "duckdb_android_config.cmake")),
-		bundle(sruntime),
+		bundlededup(sruntime),
 	)
 }
 
@@ -191,7 +174,7 @@ func CompileIOSRuntime(platform, arch string) shell.Command {
 func CompileIOS(sruntime shell.Command) eg.OpFn {
 	return eg.Sequential(
 		compile(sruntime, egenv.WorkingDirectory(".dist", "duckdb_ios_config.cmake")),
-		bundlelibtool(sruntime),
+		bundlededup(sruntime),
 	)
 }
 
