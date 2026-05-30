@@ -101,7 +101,7 @@ func bundlelibtool(sruntime shell.Command) eg.OpFn {
 		return shell.Run(
 			ctx,
 			sruntime.New("rm -rf bundle && mkdir -p bundle"),
-			sruntime.New("rsync -av lib/*.a bundle/"),
+			sruntime.New("rsync -av --exclude='libdummy_static_extension_loader.a' lib/*.a bundle/"),
 			sruntime.New("find bundle -name '*.a' -exec mkdir -p {}.objects \\; -exec mv {} {}.objects \\;"),
 			sruntime.New("find bundle -name '*.a' -execdir xcrun ar -x {} \\;"),
 			sruntime.New("mkdir -p bundle/merged && find bundle -name '*.o' -not -path 'bundle/merged/*' -exec sh -c 'cp -n \"$1\" \"bundle/merged/$(md5 -q \"$1\").o\"' _ {} \\;"),
