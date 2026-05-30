@@ -80,7 +80,7 @@ func GenerateDevStaticBinding(rt shell.Command, outdir string, staticdirs ...str
 		// 1. Link to the clean dynamic libduckdb.so to drop duplicate symbol issues
 		// 2. Explicitly bind libpredicttext.a statically so its Rust code is baked inside
 		// duckdb is an absolute disaster to statically link
-		fmt.Fprintf(&cgoFlags, " -Wl,-Bstatic -lduckdb -lpredicttext -Wl,-Bdynamic -static-libstdc++ -Wl,-z,max-page-size=16384")
+		fmt.Fprintf(&cgoFlags, " -Wl,--whole-archive -lduckdb -Wl,--no-whole-archive -Wl,-Bstatic -lpredicttext -Wl,-Bdynamic -static-libstdc++ -Wl,-z,max-page-size=16384")
 
 		runtime := flutterRuntimev2(rt)
 		return shell.Run(
