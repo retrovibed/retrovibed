@@ -20,7 +20,10 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/library"
 )
 
-const similarityThreshold = 0.5
+const (
+	similarityThreshold = 0.5
+	similarLimit        = 20
+)
 
 type HTTPSimilarOption func(*HTTPSimilar)
 
@@ -30,19 +33,15 @@ func HTTPSimilarOptionJWTSecret(j jwtx.SecretSource) HTTPSimilarOption {
 	}
 }
 
-func NewHTTPSimilar(q sqlx.Queryer, idx *acoustics.Index, stats *acoustics.RunningStats, options ...HTTPSimilarOption) *HTTPSimilar {
+func NewHTTPSimilar(q sqlx.Queryer, options ...HTTPSimilarOption) *HTTPSimilar {
 	return langx.Autoptr(langx.Clone(HTTPSimilar{
 		q:         q,
-		idx:       idx,
-		stats:     stats,
 		jwtsecret: env.JWTSecret,
 	}, options...))
 }
 
 type HTTPSimilar struct {
 	q         sqlx.Queryer
-	idx       *acoustics.Index
-	stats     *acoustics.RunningStats
 	jwtsecret jwtx.SecretSource
 }
 
@@ -84,48 +83,36 @@ func (t *HTTPSimilar) similar(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	seedVecs, _, err := acoustics.FetchCandidateVectors(r.Context(), t.q, []uuid.UUID{mediaID})
+	seedVec, err := acoustics.FetchFeatures(r.Context(), t.q, mediaID)
 	if err != nil {
+		if sqlx.IgnoreNoRows(err) == nil {
+			errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
+			return
+		}
 		log.Println(errorsx.Wrap(err, "acoustics: fetch seed vector"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
-	if len(seedVecs) == 0 {
-		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
-		return
-	}
-	seedVec := t.stats.Normalize(seedVecs[0])
 
-	exclude := make(map[uuid.UUID]struct{})
-	exclude[mediaID] = struct{}{}
+	exclude := []uuid.UUID{mediaID}
 	if raw := r.FormValue("exclude"); raw != "" {
 		for _, s := range strings.Split(raw, ",") {
-			uid, parseErr := uuid.FromString(strings.TrimSpace(s))
-			if parseErr == nil {
-				exclude[uid] = struct{}{}
+			if uid, parseErr := uuid.FromString(strings.TrimSpace(s)); parseErr == nil {
+				exclude = append(exclude, uid)
 			}
 		}
 	}
 
-	candidateIDs := t.idx.Candidates(seedVec, exclude)
-	candidateVecs, candidateMediaIDs, err := acoustics.FetchCandidateVectors(r.Context(), t.q, candidateIDs)
+	ids, err := acoustics.SimilarMediaIDs(r.Context(), t.q, seedVec, exclude, similarLimit, similarityThreshold)
 	if err != nil {
-		log.Println(errorsx.Wrap(err, "acoustics: fetch candidate vectors"))
+		log.Println(errorsx.Wrap(err, "acoustics: similar"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 
-	normalized := make([]acoustics.FeatureVector, len(candidateVecs))
-	for i, v := range candidateVecs {
-		normalized[i] = t.stats.Normalize(v)
-	}
-
-	results := acoustics.RankCandidates(seedVec, normalized, candidateMediaIDs, 20, similarityThreshold)
-
-	resp := SimilarResponse{Items: make([]*Media, 0, len(results))}
-	for _, res := range results {
-		err = library.MetadataFindByID(r.Context(), t.q, res.MediaID.String()).Scan(&md)
-		if err != nil {
+	resp := SimilarResponse{Items: make([]*Media, 0, len(ids))}
+	for _, id := range ids {
+		if err = library.MetadataFindByID(r.Context(), t.q, id.String()).Scan(&md); err != nil {
 			continue
 		}
 
@@ -136,8 +123,7 @@ func (t *HTTPSimilar) similar(w http.ResponseWriter, r *http.Request) {
 		)))
 	}
 
-	err = httpx.WriteJSON(w, httpx.GetBuffer(r), &resp)
-	if err != nil {
+	if err = httpx.WriteJSON(w, httpx.GetBuffer(r), &resp); err != nil {
 		log.Println(errorsx.Wrap(err, "acoustics: write response"))
 	}
 }

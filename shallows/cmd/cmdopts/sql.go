@@ -3,13 +3,14 @@ package cmdopts
 import (
 	"context"
 	"database/sql"
+	"database/sql/driver"
 	"embed"
 	"io/fs"
 	"log"
 	"os"
 	"path/filepath"
 
-	_ "github.com/duckdb/duckdb-go/v2"
+	"github.com/duckdb/duckdb-go/v2"
 
 	"github.com/retrovibed/retrovibed/shallows/internal/debugx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -31,9 +32,15 @@ func DatabaseCustom(ctx context.Context, path string) (db *sql.DB, err error) {
 		return nil, err
 	}
 
-	if db, err = sql.Open("duckdb", path); err != nil {
-		return nil, errorsx.Wrap(err, "unable to open db")
+	connector, err := duckdb.NewConnector(path, func(execer driver.ExecerContext) error {
+		_, err := execer.ExecContext(context.Background(), "SET hnsw_enable_experimental_persistence = true;", nil)
+		return err
+	})
+	if err != nil {
+		return nil, errorsx.Wrap(err, "unable to open db connector")
 	}
+
+	db = sql.OpenDB(connector)
 	defer func() {
 		if err == nil {
 			return

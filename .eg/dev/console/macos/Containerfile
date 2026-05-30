@@ -1,0 +1,33 @@
+FROM ubuntu:resolute
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get -y install \
+    software-properties-common \
+    ca-certificates \
+    curl \
+    git \
+    gnupg2 \
+    lsb-release \
+    sudo \
+    dbus-broker \
+    dbus-user-session
+
+RUN add-apt-repository -n ppa:egdaemon/eg
+RUN add-apt-repository -n ppa:egdaemon/duckdb
+
+RUN apt-get update && apt-get -y install eg egbootstrap
+
+# eg's runner.health.check waits for systemd to reach is-system-running ==
+# running. dbus-broker has to replace the legacy dbus daemon (which fails
+# in rootless containers), polkit/packagekit/resolved have to be masked
+# because they expect kernel features the container doesn't expose, and
+# egd needs a linger marker so launchctl-style background work survives.
+RUN systemctl enable dbus-broker.service
+RUN systemctl enable podman.socket
+RUN systemctl mask packagekit.service
+RUN systemctl mask systemd-resolved.service
+RUN systemctl mask systemd-timesyncd.service
+RUN mkdir -p /var/lib/systemd/linger && touch /var/lib/systemd/linger/egd
+RUN update-alternatives --set sudo /usr/bin/sudo.ws
+
+CMD /usr/sbin/init

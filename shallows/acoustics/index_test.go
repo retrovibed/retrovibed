@@ -91,7 +91,7 @@ func TestAnalyzeSamples(t *testing.T) {
 		fv := AnalyzeSamples(segments)
 
 		// Inter-window σ dimensions (FeatureDim through VectorDim-1)
-		sigmaSum := 0.0
+		sigmaSum := float32(0.0)
 		for i := FeatureDim; i < VectorDim; i++ {
 			sigmaSum += fv[i]
 		}

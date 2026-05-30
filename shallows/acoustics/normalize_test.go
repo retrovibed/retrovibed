@@ -14,14 +14,14 @@ func TestAggregateWindows(t *testing.T) {
 
 		fv := AggregateWindows(w)
 
-		expectedMean := 2.0
-		if math.Abs(fv[0]-expectedMean) > 1e-10 {
+		expectedMean := float32(2.0)
+		if math.Abs(float64(fv[0]-expectedMean)) > 1e-6 {
 			t.Fatalf("mean: expected %f, got %f", expectedMean, fv[0])
 		}
 
 		// σ = sqrt(((1-2)^2 + (2-2)^2 + (3-2)^2) / 3) = sqrt(2/3)
-		expectedSigma := math.Sqrt(2.0 / 3.0)
-		if math.Abs(fv[FeatureDim]-expectedSigma) > 1e-10 {
+		expectedSigma := float32(math.Sqrt(2.0 / 3.0))
+		if math.Abs(float64(fv[FeatureDim]-expectedSigma)) > 1e-6 {
 			t.Fatalf("sigma: expected %f, got %f", expectedSigma, fv[FeatureDim])
 		}
 	})
@@ -78,10 +78,10 @@ func TestRunningStats(t *testing.T) {
 		na := stats.Normalize(a)
 		nb := stats.Normalize(b)
 
-		if math.Abs(na[0]-(-1.0)) > 1e-10 {
+		if math.Abs(float64(na[0])-(-1.0)) > 1e-6 {
 			t.Fatalf("normalized a[0]: expected -1, got %f", na[0])
 		}
-		if math.Abs(nb[0]-1.0) > 1e-10 {
+		if math.Abs(float64(nb[0])-1.0) > 1e-6 {
 			t.Fatalf("normalized b[0]: expected 1, got %f", nb[0])
 		}
 	})
@@ -117,8 +117,8 @@ func TestRunningStats(t *testing.T) {
 	t.Run("recompute matches incremental", func(t *testing.T) {
 		vectors := make([]FeatureVector, 10)
 		for i := range vectors {
-			vectors[i][0] = float64(i)
-			vectors[i][5] = float64(i * 2)
+			vectors[i][0] = float32(i)
+			vectors[i][5] = float32(i * 2)
 		}
 
 		var incremental RunningStats

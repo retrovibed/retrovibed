@@ -17,7 +17,7 @@ import (
 )
 
 // AcousticsBackgroundRun indexes one unindexed audio track per invocation.
-func AcousticsBackgroundRun(ctx context.Context, q sqlx.Queryer, idx *acoustics.Index, stats *acoustics.RunningStats, media fs.FS) error {
+func AcousticsBackgroundRun(ctx context.Context, q sqlx.Queryer, media fs.FS) error {
 	ids, err := acoustics.UnindexedMediaIDs(ctx, q, 1)
 	if err != nil {
 		return errorsx.Wrap(err, "acoustics: find unindexed")
@@ -40,26 +40,8 @@ func AcousticsBackgroundRun(ctx context.Context, q sqlx.Queryer, idx *acoustics.
 		return errorsx.Wrap(err, "acoustics: analyze file")
 	}
 
-	stats.Update(vec)
-
-	err = acoustics.StoreFeatures(ctx, q, id, vec, acoustics.StatsVersion)
-	if err != nil {
+	if err = acoustics.StoreFeatures(ctx, q, id, vec, acoustics.StatsVersion); err != nil {
 		return errorsx.Wrap(err, "acoustics: store features")
-	}
-
-	idx.Insert(id, stats.Normalize(vec))
-
-	count, err := acoustics.IndexedCount(ctx, q, acoustics.StatsVersion)
-	if err != nil {
-		return errorsx.Wrap(err, "acoustics: count indexed")
-	}
-
-	if count == acoustics.ColdStartThreshold {
-		err = acoustics.Rebuild(ctx, q, idx, stats)
-		if err != nil {
-			return errorsx.Wrap(err, "acoustics: rebuild at cold start")
-		}
-		log.Println("acoustics: cold start threshold reached, rebuilt index for", count, "vectors")
 	}
 
 	log.Println("acoustics: indexed", id)
@@ -67,7 +49,7 @@ func AcousticsBackgroundRun(ctx context.Context, q sqlx.Queryer, idx *acoustics.
 }
 
 // AcousticsBackground runs the acoustic indexer on a 1-second interval with jitter.
-func AcousticsBackground(ctx context.Context, q sqlx.Queryer, idx *acoustics.Index, stats *acoustics.RunningStats, media fs.FS) error {
+func AcousticsBackground(ctx context.Context, q sqlx.Queryer, media fs.FS) error {
 	wakeup := asyncx.NewWakeup(ctx)
 	s := backoffx.New(
 		backoffx.Constant(time.Second),
@@ -77,7 +59,7 @@ func AcousticsBackground(ctx context.Context, q sqlx.Queryer, idx *acoustics.Ind
 	go asyncx.Periodic(ctx, wakeup, s, "acoustics background indexer")
 	contextx.Run(ctx, func() {
 		errorsx.Log(asyncx.Run(ctx, wakeup, func(ctx context.Context) error {
-			return AcousticsBackgroundRun(ctx, q, idx, stats, media)
+			return AcousticsBackgroundRun(ctx, q, media)
 		}))
 	})
 

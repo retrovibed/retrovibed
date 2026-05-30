@@ -1,29 +1,21 @@
 package acoustics
 
 import (
-	"encoding/binary"
-	"fmt"
-	"math"
+	"context"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"testing"
 )
 
-// TestThresholdValidation decodes MP3s via ffmpeg CLI, computes feature vectors,
-// and evaluates precision/recall at various similarity thresholds.
-// Ground truth: tracks in the same subdirectory are "similar."
-//
-// Set ACOUSTICS_TEST_DATA to the directory containing artist subdirectories.
-// Skips if unset or ffmpeg is unavailable.
+// TestThresholdValidation decodes audio files via the package's FFmpeg-backed
+// decoder, computes feature vectors, and evaluates precision/recall at various
+// similarity thresholds. Ground truth: tracks in the same subdirectory are
+// "similar." Set ACOUSTICS_TEST_DATA to the directory containing artist
+// subdirectories. Skips if unset.
 func TestThresholdValidation(t *testing.T) {
 	dataDir := os.Getenv("ACOUSTICS_TEST_DATA")
 	if dataDir == "" {
 		t.Skip("ACOUSTICS_TEST_DATA not set")
-	}
-
-	if _, err := exec.LookPath("ffmpeg"); err != nil {
-		t.Skip("ffmpeg not in PATH")
 	}
 
 	type track struct {
@@ -49,21 +41,12 @@ func TestThresholdValidation(t *testing.T) {
 		}
 
 		for _, f := range files {
-			pcm, err := decodeWithFFmpeg(f)
+			vec, err := AnalyzeFile(context.Background(), f)
 			if err != nil {
 				t.Logf("skip %s: %v", f, err)
 				continue
 			}
 
-			dur := float64(len(pcm)) / float64(SampleRate)
-			segs := SegmentsForDuration(dur)
-			if segs == nil {
-				t.Logf("skip %s: too short (%.1fs)", f, dur)
-				continue
-			}
-
-			segments := splitPCM(pcm, segs)
-			vec := AnalyzeSamples(segments)
 			tracks = append(tracks, track{
 				path:   filepath.Base(f),
 				artist: artist.Name(),
@@ -81,7 +64,6 @@ func TestThresholdValidation(t *testing.T) {
 	}
 	t.Logf("analyzed %d tracks across %d artists", len(tracks), len(artistSet))
 
-	// Normalize all vectors.
 	var stats RunningStats
 	for _, tr := range tracks {
 		stats.Update(tr.vec)
@@ -92,10 +74,9 @@ func TestThresholdValidation(t *testing.T) {
 		normalized[i] = stats.Normalize(tr.vec)
 	}
 
-	// Compute all pairwise similarities.
 	type pair struct {
-		sim      float64
-		sameArt  bool
+		sim     float64
+		sameArt bool
 	}
 
 	var pairs []pair
@@ -116,7 +97,6 @@ func TestThresholdValidation(t *testing.T) {
 	}
 	t.Logf("%d pairs total: %d same-artist, %d cross-artist", len(pairs), sameCount, len(pairs)-sameCount)
 
-	// Evaluate thresholds.
 	t.Logf("")
 	t.Logf("threshold | precision | recall | f1")
 	t.Logf("----------|-----------|--------|-------")
@@ -149,41 +129,3 @@ func TestThresholdValidation(t *testing.T) {
 		t.Logf("  %.1f     |   %.3f   | %.3f  | %.3f", thresh, precision, recall, f1)
 	}
 }
-
-func decodeWithFFmpeg(path string) ([]float32, error) {
-	cmd := exec.Command("ffmpeg",
-		"-i", path,
-		"-f", "f32le",
-		"-ac", "1",
-		"-ar", fmt.Sprintf("%d", SampleRate),
-		"pipe:1",
-	)
-	cmd.Stderr = nil
-
-	out, err := cmd.Output()
-	if err != nil {
-		return nil, err
-	}
-
-	nSamples := len(out) / 4
-	samples := make([]float32, nSamples)
-	for i := range nSamples {
-		samples[i] = math.Float32frombits(binary.LittleEndian.Uint32(out[i*4:]))
-	}
-	return samples, nil
-}
-
-func splitPCM(pcm []float32, segs []Segment) [][]float32 {
-	result := make([][]float32, len(segs))
-	for i, seg := range segs {
-		start := int(seg.OffsetSec * SampleRate)
-		end := start + int(seg.DurationSec*SampleRate)
-		if start >= len(pcm) {
-			continue
-		}
-		end = min(end, len(pcm))
-		result[i] = pcm[start:end]
-	}
-	return result
-}
-
