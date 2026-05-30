@@ -37,7 +37,7 @@ func geniOSCompilerEnv(ctx context.Context, op eg.Op) error {
 		env.New("echo \"CC=$(xcrun --sdk iphoneos --find clang)\" | tee ${IOSENV}"),
 		env.New("echo \"CXX=$(xcrun --sdk iphoneos --find clang++)\" | tee -a ${IOSENV}"),
 		env.New("echo \"SDKROOT=$(xcrun --sdk iphoneos --show-sdk-path)\" | tee -a ${IOSENV}"),
-		env.New("echo \"IOS_TARGET=${IOS_TARGET}\" | tee -a ${IOSENV}"),
+		env.New("echo \"IOS_TARGET=arm64-apple-ios16.0\" | tee -a ${IOSENV}"),
 	)(ctx, op)
 }
 
@@ -125,7 +125,7 @@ func iosbuild(ctx context.Context, op eg.Op) error {
 		egbug.DebugFailure(
 			shell.Op(
 				flutter.New("rm -rf ios/RetrovivedBind.framework ios/RetrovivedBind.xcframework && cp -r ios/RetrovivedBind ios/RetrovivedBind.framework"),
-				flutter.New("xcrun clang -target ${IOS_TARGET} -isysroot ${SDKROOT} -shared -o RetrovivedBind.framework/RetrovivedBind -Wl,-force_load,libretrovibed.a -lc++ -lresolv -framework CoreFoundation -framework Security -Wl,-install_name,@rpath/RetrovivedBind.framework/RetrovivedBind").Directory(egenv.WorkingDirectory("console", "ios")),
+				flutter.New("xcrun clang -target ${IOS_TARGET} -isysroot ${SDKROOT} -shared -o RetrovivedBind.framework/RetrovivedBind -Wl,-force_load,libretrovibed.a -Wl,-force_load,libduckdb.a -Wl,-force_load,libpredicttext.a -lc++ -lresolv -framework CoreFoundation -framework Security -Wl,-install_name,@rpath/RetrovivedBind.framework/RetrovivedBind").Directory(egenv.WorkingDirectory("console", "ios")),
 				flutter.New("xcodebuild -create-xcframework -framework RetrovivedBind.framework -output RetrovivedBind.xcframework").Directory(egenv.WorkingDirectory("console", "ios")),
 				flutter.New("flutter pub get"),
 				flutter.New("pod install").Directory(egenv.WorkingDirectory("console", "ios")),
