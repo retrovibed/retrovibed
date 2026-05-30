@@ -71,7 +71,7 @@ func compile(runtime shell.Command, cmakeconfigs ...string) eg.OpFn {
 			ctx,
 			sruntime.Newf("cmake -G \"Ninja\" -S . -B ${BUILD_DIRECTORY_REL} %s ${EXTRA_CMAKE_VARIABLES}", cfg).
 				Timeout(egenv.TTL()),
-			sruntime.New("cmake --build ${BUILD_DIRECTORY_REL} --config Release --parallel").Timeout(30*time.Minute),
+			sruntime.New("cmake --build ${BUILD_DIRECTORY_REL} --config Release --parallel --verbose").Timeout(30*time.Minute),
 			sruntime.New("DESTDIR=${BUILD_DIRECTORY} cmake --install ${BUILD_DIRECTORY_REL} --prefix=\"/\""),
 		)
 	}
@@ -84,7 +84,7 @@ func bundle(sruntime shell.Command) eg.OpFn {
 		return shell.Run(
 			ctx,
 			sruntime.New("rm -rf bundle && mkdir -p bundle"),
-			sruntime.New("rsync -av lib/*.a bundle/"),
+			sruntime.New("rsync -av --exclude='libdummy_static_extension_loader.a' lib/*.a bundle/"),
 			sruntime.New("find bundle -name '*.a' -exec mkdir -p {}.objects \\; -exec mv {} {}.objects \\;"),
 			sruntime.New("find bundle -name '*.a' -execdir ar -x {} \\;"),
 			sruntime.New("mkdir -p bundle/merged && find bundle -name '*.o' -not -path 'bundle/merged/*' -exec sh -c 'cp --update=none \"$1\" \"bundle/merged/$(md5sum \"$1\" | cut -c1-32).o\"' _ {} \\;"),

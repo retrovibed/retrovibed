@@ -2,7 +2,6 @@ package console
 
 import (
 	"context"
-	"eg/compute/errorsx"
 	"eg/compute/tarballs"
 	"fmt"
 	"os"
@@ -60,13 +59,16 @@ func CompileBinding(b *tarballs.Build) eg.OpFn {
 	}
 }
 
-func GenerateDevBinding(ctx context.Context, _ eg.Op) error {
-	runtime := flutterRuntimev2(shell.Runtime())
-	return shell.Run(
-		ctx,
-		runtime.New("go -C retrovibedbind build -buildmode=c-shared -buildvcs=true --tags duckdb_use_lib,localdev -o ../build/nativelib/libretrovibed.so ./..."),
-		runtime.New("dart run ffigen --config ffigen.yaml"),
-	)
+func GenerateDevBinding(runtime shell.Command, outdir string, staticdirs ...string) eg.OpFn {
+	return func(ctx context.Context, _ eg.Op) error {
+		runtime := flutterRuntimev2(runtime)
+		return shell.Run(
+			ctx,
+			runtime.New("go -C retrovibedbind build -buildmode=c-shared -buildvcs=true --tags duckdb_use_lib,localdev -o ${OUTPUT}/libretrovibed.so ./...").
+				Environ("OUTPUT", outdir),
+			runtime.New("dart run ffigen --config ffigen.yaml"),
+		)
+	}
 }
 
 func GenerateDevStaticBinding(rt shell.Command, outdir string, staticdirs ...string) eg.OpFn {
@@ -80,7 +82,7 @@ func GenerateDevStaticBinding(rt shell.Command, outdir string, staticdirs ...str
 		// 1. Link to the clean dynamic libduckdb.so to drop duplicate symbol issues
 		// 2. Explicitly bind libpredicttext.a statically so its Rust code is baked inside
 		// duckdb is an absolute disaster to statically link
-		fmt.Fprintf(&cgoFlags, " -Wl,--whole-archive -lduckdb -Wl,--no-whole-archive -Wl,-Bstatic -lpredicttext -Wl,-Bdynamic -static-libstdc++ -Wl,-z,max-page-size=16384")
+		fmt.Fprintf(&cgoFlags, " -static-libstdc++ -Wl,-z,max-page-size=16384")
 
 		runtime := flutterRuntimev2(rt)
 		return shell.Run(
@@ -96,11 +98,17 @@ func GenerateDevStaticBinding(rt shell.Command, outdir string, staticdirs ...str
 
 func GenerateStaticBinding(dir string, rt shell.Command) eg.OpFn {
 	return func(ctx context.Context, _ eg.Op) error {
-		duckdblibs := strings.Join(errorsx.Zero(filepath.Glob(filepath.Join(dir, "*.a"))), " ")
+		var cgoFlags strings.Builder
+		fmt.Fprintf(&cgoFlags, "-L%s", dir)
+		fmt.Fprintf(&cgoFlags, " -static-libstdc++ -Wl,-z,max-page-size=16384")
+
 		runtime := flutterRuntimev2(rt)
 		return shell.Run(
 			ctx,
-			runtime.Newf("go -C retrovibedbind build -trimpath -buildmode=c-shared -buildvcs=true --tags duckdb_use_static_lib,retrovibed,neural -o %s/libretrovibed.so .", dir).Environ("CGO_LDFLAGS", fmt.Sprintf("-L%s -Wl,--whole-archive %s -Wl,--no-whole-archive -static-libstdc++ -Wl,-z,max-page-size=16384", dir, duckdblibs)),
+			runtime.Newf(
+				"go -C retrovibedbind build -trimpath -buildmode=c-shared -buildvcs=true --tags duckdb_use_static_lib,retrovibed,neural -o %s/libretrovibed.so .",
+				dir,
+			).Environ("CGO_LDFLAGS", strings.TrimSpace(cgoFlags.String())),
 		)
 	}
 }
