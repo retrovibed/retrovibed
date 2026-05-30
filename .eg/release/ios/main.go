@@ -21,6 +21,7 @@ import (
 
 func flutterRuntime() shell.Command {
 	runtime := shell.Runtime().
+		Debug().
 		EnvironFrom(eggolang.Env()...).
 		Environ("IOSENV", egenv.WorkloadDirectory("ios.compile.env")).
 		Environ("LANG", "en_US.UTF-8").
@@ -124,7 +125,7 @@ func iosbuild(ctx context.Context, op eg.Op) error {
 		egbug.DebugFailure(
 			shell.Op(
 				flutter.New("rm -rf ios/RetrovivedBind.framework ios/RetrovivedBind.xcframework && cp -r ios/RetrovivedBind ios/RetrovivedBind.framework"),
-				flutter.New("xcrun clang -target ${IOS_TARGET} -isysroot \"${SDKROOT}\" -shared -o RetrovivedBind.framework/RetrovivedBind -Wl,-force_load,libretrovibed.a -lc++ -lresolv -framework CoreFoundation -framework Security -Wl,-install_name,@rpath/RetrovivedBind.framework/RetrovivedBind").Directory(egenv.WorkingDirectory("console", "ios")),
+				flutter.New("xcrun clang -target ${IOS_TARGET} -isysroot ${SDKROOT} -shared -o RetrovivedBind.framework/RetrovivedBind -Wl,-force_load,libretrovibed.a -lc++ -lresolv -framework CoreFoundation -framework Security -Wl,-install_name,@rpath/RetrovivedBind.framework/RetrovivedBind").Directory(egenv.WorkingDirectory("console", "ios")),
 				flutter.New("xcodebuild -create-xcframework -framework RetrovivedBind.framework -output RetrovivedBind.xcframework").Directory(egenv.WorkingDirectory("console", "ios")),
 				flutter.New("flutter pub get"),
 				flutter.New("pod install").Directory(egenv.WorkingDirectory("console", "ios")),
