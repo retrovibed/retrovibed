@@ -45,7 +45,7 @@ func AppImageBuild(b *tarballs.Build) eg.OpFn {
 			Environ("APPIMAGE_FILE_NAME", appimage).
 			Environ("GPG_ID", maintainer.GPGID),
 		// copy is only needed temporarily while we flesh out app image support.
-		shell.Newf("cp %s* %s", egenv.WorkspaceDirectory(appimage), egenv.CacheDirectory()).Debug(),
+		shell.Newf("cp %s* %s", egenv.WorkspaceDirectory(appimage), egenv.CacheDirectory()),
 	)
 }
 

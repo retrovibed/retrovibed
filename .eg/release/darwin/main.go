@@ -24,7 +24,7 @@ import (
 
 func tarinfo() *tarballs.Build {
 	return &tarballs.Build{
-		OS:   egenv.String("darin", "EG_COMPUTE_HOST_OS"),
+		OS:   egenv.String("darwin", "EG_COMPUTE_HOST_OS"),
 		Arch: egenv.String("arm64", "EG_COMPUTE_HOST_ARCH"),
 	}
 }
@@ -66,7 +66,7 @@ func main() {
 					filepath.Join(duckdblibs, "libduckdb.a"),
 					duckdb.CompileDarwinRuntime("osx_arm64", "arm64"),
 					duckdb.CompileDarwin,
-					duckdb.CloneStaticBuild,
+					duckdb.CloneBuild,
 				),
 				neurals.CompileDarwin(neuralsdir),
 			),
@@ -79,7 +79,7 @@ func main() {
 				shell.Op(shell.New("flutter failed to build app")),
 			),
 			shell.Op(
-				flutter.Newf("CGO_LDFLAGS=\"%s\" go -C retrovibedbind build --tags duckdb_use_static_lib -buildmode=c-shared -o ../build/macos/Build/Products/Release/retrovibed.app/Contents/Frameworks/retrovibed.dylib ./...", duckdbldflags),
+				flutter.Newf("CGO_LDFLAGS=\"%s\" go -C retrovibedbind build --tags duckdb_use_static_lib,retrovibed,neural -buildmode=c-shared -o ../build/macos/Build/Products/Release/retrovibed.app/Contents/Frameworks/retrovibed.dylib ./...", duckdbldflags),
 				flutter.New("tree build/macos/Build/Products/Release/retrovibed.app"),
 				shell.Newf("mkdir -p %s", tarballapp),
 				flutter.Newf("cp -R build/macos/Build/Products/Release/retrovibed.app/ %s/", tarballapp),

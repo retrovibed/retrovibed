@@ -2,7 +2,10 @@
 
 package neurals
 
-// #cgo LDFLAGS: -lpredicttext
+// -Bstatic/-Bdynamic wrapping forces predicttext to link statically without affecting other libs.
+// Done here rather than CGO_LDFLAGS env to avoid Go repeating the flags once per CGo module.
+
+// #cgo LDFLAGS: -Wl,-Bstatic -lpredicttext -Wl,-Bdynamic
 // #include <stdlib.h>
 // extern int predict(const char* model_path, const char* input, size_t seq_len, long long num_tokens, long long pad, long long bos, long long eos, char* output, size_t output_len);
 import "C"

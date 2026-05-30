@@ -32,14 +32,14 @@ func main() {
 				console.Generate,
 				eg.Parallel(
 					duckdb.MaybeBuild(
-						filepath.Join("dev.native.libs", "libduckdb.a"),
+						egenv.CacheDirectory("dev.native.libs", "libduckdb.a"),
 						duckdb.CompileDevRuntime(),
-						duckdb.Compile,
-						duckdb.CloneStaticBuild,
+						duckdb.CompileDev,
+						duckdb.CloneBuild,
 					),
 					neurals.MaybeBuild(filepath.Join("dev.native.libs", "libpredicttext.a"), neurals.Compile, neurals.Clone),
 				),
-				console.GenerateDevStaticBinding(shell.Runtime(), egenv.WorkingDirectory("console", "build", "nativelib"), egenv.CacheDirectory("dev.native.libs")),
+				console.GenerateDevBinding(shell.Runtime(), egenv.WorkingDirectory("console", "build", "nativelib"), egenv.CacheDirectory("dev.native.libs")),
 				console.BuildLinux,
 			),
 		),

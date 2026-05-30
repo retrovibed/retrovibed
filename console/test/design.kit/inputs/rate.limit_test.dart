@@ -361,5 +361,44 @@ void main() {
       expect(changed, isNull);
       expect(tester.takeException(), isNull);
     });
+
+    testWidgets('retains focus when typing after preset selection', (
+      WidgetTester tester,
+    ) async {
+      // Regression: key: ValueKey((_preset, _unit)) changed when _onTextChanged
+      // cleared _preset, destroying the TextFormField and losing focus.
+      await tester.pumpApp(
+        RateLimit(
+          value: 0,
+          onChanged: (_) {},
+          presets: presets,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Select a preset so _preset becomes non-null.
+      await tester.tap(find.byType(IconButton));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('low'));
+      await tester.pumpAndSettle();
+
+      // Focus the text field.
+      await tester.tap(find.byType(TextFormField));
+      await tester.pump();
+
+      final focusBefore = tester.binding.focusManager.primaryFocus;
+      expect(focusBefore, isNotNull);
+
+      // Type without re-tapping — internally clears _preset, used to change the key.
+      tester.testTextInput.enterText('5');
+      await tester.pump();
+
+      expect(
+        tester.binding.focusManager.primaryFocus,
+        same(focusBefore),
+        reason: 'text field should retain focus when typing clears a previously selected preset',
+      );
+      expect(tester.takeException(), isNull);
+    });
   });
 }
