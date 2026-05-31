@@ -14,13 +14,13 @@ AppDir:
   apt:
     arch: !ENV "${APT_ARCH}"
     sources:
-      - sourceline: "deb https://archive.ubuntu.com/ubuntu/ questing main restricted universe multiverse"
+      - sourceline: "deb https://archive.ubuntu.com/ubuntu/ resolute main restricted universe multiverse"
         key_url: "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x871920D1991BC93C"
-      - sourceline: "deb https://archive.ubuntu.com/ubuntu/ questing-updates main restricted universe multiverse"
+      - sourceline: "deb https://archive.ubuntu.com/ubuntu/ resolute-updates main restricted universe multiverse"
         key_url: "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x871920D1991BC93C"
-      - sourceline: "deb https://archive.ubuntu.com/ubuntu/ questing-backports main restricted universe multiverse"
+      - sourceline: "deb https://archive.ubuntu.com/ubuntu/ resolute-backports main restricted universe multiverse"
         key_url: "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x871920D1991BC93C"
-      - sourceline: "deb http://security.ubuntu.com/ubuntu questing-security main restricted universe multiverse"
+      - sourceline: "deb http://security.ubuntu.com/ubuntu resolute-security main restricted universe multiverse"
         key_url: "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x871920D1991BC93C"
     include:
       - libgtk-3-0t64
