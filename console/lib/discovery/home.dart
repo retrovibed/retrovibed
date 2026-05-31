@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
+import 'package:retrovibed/authn.dart' as authn;
 import 'recent.dart';
 import 'releases.dart';
 import 'recommendations.dart';
@@ -44,8 +45,8 @@ class Home extends StatelessWidget {
           verticalDirection: compact ? VerticalDirection.up : VerticalDirection.down,
           children: [
             Recent(mimetype),
-            Recommendations(mimetype),
-            NewReleases(mimetype),
+            if (authn.developer(context).recommendations) Recommendations(mimetype),
+            if (authn.developer(context).releases) NewReleases(mimetype),
           ],
         ),
       );
