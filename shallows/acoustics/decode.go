@@ -52,8 +52,8 @@ func DecodePCM(ctx context.Context, path string, segments []Segment) ([][]float3
 	defer decoders.Close()
 
 	var (
-		buf    []float32
-		endTs  float64
+		buf   []float32
+		endTs float64
 	)
 
 	results := make([][]float32, len(segments))

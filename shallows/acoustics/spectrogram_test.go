@@ -9,7 +9,7 @@ func TestSTFT(t *testing.T) {
 	t.Run("frame count", func(t *testing.T) {
 		nSamples := 11025 // 1 second at 11,025 Hz
 		expected := SpectrogramFrames(nSamples)
-		got := (nSamples - WindowSize) / HopSize + 1
+		got := (nSamples-WindowSize)/HopSize + 1
 
 		if expected != got {
 			t.Fatalf("expected %d frames, got %d", expected, got)

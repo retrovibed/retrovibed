@@ -86,4 +86,3 @@ func UnindexedMediaIDs(ctx context.Context, q sqlx.Queryer, limit int) ([]uuid.U
 	}
 	return ids, v.Err()
 }
-

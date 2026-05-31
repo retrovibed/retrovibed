@@ -1,0 +1,48 @@
+- type: sql.NullString
+  native: string
+  database_type_name: ""
+  column_type: sql.NullString
+  nullable: false
+  primarykey: false
+  decode: |-
+    func() {
+    		if {{ .From | expr }}.Valid {
+    			tmp := {{ .Type | expr }}({{ .From | expr }}.String)
+    			{{ .To | autodereference | expr }} = tmp
+    		}
+    	}
+  encode: |-
+    func() {
+    		{{ .To | expr }}.Valid = true
+    		{{ .To | expr }}.String = {{ .From | expr }}
+    	}
+
+- type: ducktype.FloatArray
+  native: '[]float32'
+  database_type_name: 'FLOAT[128]'
+  column_type: ducktype.FloatArray
+  nullable: false
+  primarykey: false
+  decode: |-
+    func() {
+    		{{ .To | autodereference | expr }} = []float32({{ .From | expr }})
+    	}
+  encode: |-
+    func() {
+    		{{ .To | expr }} = ducktype.FloatArray({{ .From | expr }})
+    	}
+
+- type: '[]float32'
+  native: '[]float32'
+  database_type_name: ''
+  column_type: ducktype.FloatArray
+  nullable: false
+  primarykey: false
+  decode: |-
+    func() {
+    		{{ .To | autodereference | expr }} = []float32({{ .From | expr }})
+    	}
+  encode: |-
+    func() {
+    		{{ .To | expr }} = ducktype.FloatArray({{ .From | expr }})
+    	}

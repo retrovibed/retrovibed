@@ -27,5 +27,5 @@ func SpectrogramFrames(nSamples int) int {
 	if nSamples < WindowSize {
 		return 0
 	}
-	return (nSamples - WindowSize) / HopSize + 1
+	return (nSamples-WindowSize)/HopSize + 1
 }
