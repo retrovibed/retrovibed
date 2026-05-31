@@ -26,7 +26,6 @@ RUN echo "cache buster 159a9a06-1686-4f49-9a7f-a30535786d59"
 RUN GOPROXY=direct go install -tags duckdb_use_lib github.com/james-lawrence/genieql/...@latest
 RUN curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b /usr/local/bin v2.12.2
 
-
 # install flatpak
 RUN apt-get update && apt-get -y install tree flatpak-builder libmpv-dev
 RUN flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
@@ -43,9 +42,6 @@ RUN sudo -H -S -u egd -g egd flutter config --no-analytics
 RUN sudo -H -S -u egd -g egd flutter --disable-analytics
 RUN sudo -H -S -u egd -g egd dart pub global activate protoc_plugin
 
-RUN systemd-tmpfiles --create
-RUN systemd-tmpfiles --clean
-
 # install appimage-builder for AppImage packaging
 RUN apt-get update && apt-get -y install pipx python3-dev python3-venv python3-apt squashfs-tools patchelf desktop-file-utils libgdk-pixbuf-xlib-2.0-dev fakeroot gnupg2
 # Use pipx to install appimage-builder globally (available in /usr/local/bin)
@@ -54,9 +50,6 @@ RUN PIPX_HOME=/opt/pipx PIPX_BIN_DIR=/usr/local/bin pipx install git+https://git
 RUN curl -sSfL https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-$(uname -m).AppImage -o /usr/local/bin/appimagetool \
     && chmod +x /usr/local/bin/appimagetool
 
-# hack due to ubuntu updating sudo
-RUN update-alternatives --set sudo /usr/bin/sudo.ws
-
 # noop apt-key (deprecated in newer Ubuntu, causes errors in some tools, specifically appimage-builder which doesnt use it but checks for it)
 RUN printf '#!/bin/sh\nexit 0\n' > /usr/local/bin/apt-key && chmod +x /usr/local/bin/apt-key
 RUN apt-get update && apt-get -y install zsync
@@ -64,3 +57,6 @@ RUN apt-get update && apt-get -y install zsync
 RUN apt-get install -y rustup
 RUN sudo -u egd rustup default stable
 ENV PATH=/home/egd/.cargo/bin:$PATH
+
+RUN systemd-tmpfiles --create
+RUN systemd-tmpfiles --clean
