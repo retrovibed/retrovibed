@@ -433,6 +433,37 @@ void main() {
         expect(capturedPassword, 'email:password');
       });
 
+      testWidgets('displays entered username after login failure is dismissed', (
+        WidgetTester tester,
+      ) async {
+        await tester.pumpApp(
+          authn.Login(
+            const Text('authenticated content'),
+            publicKey: () => '',
+            seed: (_) => 'authentication failed',
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byType(Checkbox).first);
+        await tester.pumpAndSettle();
+        await tester.enterText(find.widgetWithText(TextFormField, 'email'), 'user@example.com');
+        await tester.enterText(find.widgetWithText(TextFormField, 'password'), 'secret');
+        await tester.pumpAndSettle();
+        await tester.tap(find.byType(Checkbox).at(1));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Login'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('login failed'), findsOneWidget);
+
+        await tester.tap(find.text('login failed'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('user@example.com'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
+
       testWidgets('tapping seed error dismisses it', (
         WidgetTester tester,
       ) async {

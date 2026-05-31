@@ -167,11 +167,13 @@ class _LoginState extends State<Login> {
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
                       TextFormField(
+                        initialValue: _username,
                         decoration: InputDecoration(hintText: 'email'),
                         onChanged: (v) => setState(() => _username = v),
                         onFieldSubmitted: (_) => _seed(),
                       ),
                       TextFormField(
+                        initialValue: _password,
                         obscureText: _isObscured,
                         decoration: InputDecoration(
                           hintText: 'password',
