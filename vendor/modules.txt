@@ -312,7 +312,6 @@ github.com/dashotv/tvdb/openapi/types
 github.com/davecgh/go-spew/spew
 # github.com/dblohm7/wingoes v0.0.0-20250822163801-6d8e6105c62d
 ## explicit; go 1.22
-github.com/dblohm7/wingoes
 # github.com/djthorpe/go-errors v1.0.3
 ## explicit; go 1.17
 github.com/djthorpe/go-errors
@@ -463,12 +462,6 @@ github.com/go-faker/faker/v4/pkg/options
 github.com/go-faker/faker/v4/pkg/slice
 # github.com/go-json-experiment/json v0.0.0-20260505212615-e40f80bf6836
 ## explicit; go 1.26
-github.com/go-json-experiment/json
-github.com/go-json-experiment/json/internal
-github.com/go-json-experiment/json/internal/jsonflags
-github.com/go-json-experiment/json/internal/jsonopts
-github.com/go-json-experiment/json/internal/jsonwire
-github.com/go-json-experiment/json/jsontext
 # github.com/go-logr/logr v1.4.3
 ## explicit; go 1.18
 github.com/go-logr/logr
@@ -709,8 +702,6 @@ github.com/james-lawrence/torrent/upnp
 github.com/james-lawrence/torrent/x/conntrack
 # github.com/jsimonetti/rtnetlink v1.4.2
 ## explicit; go 1.20
-github.com/jsimonetti/rtnetlink
-github.com/jsimonetti/rtnetlink/internal/unix
 # github.com/justinas/alice v1.2.0
 ## explicit; go 1.12
 github.com/justinas/alice
@@ -931,10 +922,8 @@ go.opentelemetry.io/otel/trace/noop
 go.uber.org/multierr
 # go4.org/mem v0.0.0-20240501181205-ae6ca9944745
 ## explicit; go 1.14
-go4.org/mem
 # go4.org/netipx v0.0.0-20231129151722-fdeea329fbba
 ## explicit; go 1.18
-go4.org/netipx
 # golang.org/x/crypto v0.51.0
 ## explicit; go 1.25.0
 golang.org/x/crypto/argon2
@@ -949,10 +938,7 @@ golang.org/x/crypto/curve25519
 golang.org/x/crypto/hkdf
 golang.org/x/crypto/internal/alias
 golang.org/x/crypto/internal/poly1305
-golang.org/x/crypto/nacl/box
-golang.org/x/crypto/nacl/secretbox
 golang.org/x/crypto/poly1305
-golang.org/x/crypto/salsa20/salsa
 golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
 # golang.org/x/exp v0.0.0-20260508232706-74f9aab9d74a
@@ -1006,8 +992,6 @@ golang.org/x/sys/cpu
 golang.org/x/sys/unix
 golang.org/x/sys/windows
 golang.org/x/sys/windows/registry
-golang.org/x/sys/windows/svc
-golang.org/x/sys/windows/svc/mgr
 # golang.org/x/telemetry v0.0.0-20260508192327-42602be52be6
 ## explicit; go 1.25.0
 golang.org/x/telemetry/counter
@@ -1088,7 +1072,6 @@ golang.zx2c4.com/wireguard/tun
 golang.zx2c4.com/wireguard/tun/netstack
 # golang.zx2c4.com/wireguard/windows v1.0.1
 ## explicit; go 1.25.0
-golang.zx2c4.com/wireguard/windows/tunnel/winipcfg
 # google.golang.org/api v0.269.0
 ## explicit; go 1.25.0
 google.golang.org/api/androidpublisher/v3
@@ -1283,51 +1266,3 @@ gvisor.dev/gvisor/pkg/tcpip/transport/tcp
 gvisor.dev/gvisor/pkg/tcpip/transport/tcpconntrack
 gvisor.dev/gvisor/pkg/tcpip/transport/udp
 gvisor.dev/gvisor/pkg/waiter
-# tailscale.com v1.98.2
-## explicit; go 1.26.3
-tailscale.com
-tailscale.com/envknob
-tailscale.com/feature
-tailscale.com/feature/buildfeatures
-tailscale.com/hostinfo
-tailscale.com/kube/kubetypes
-tailscale.com/metrics
-tailscale.com/net/netaddr
-tailscale.com/net/netmon
-tailscale.com/net/tsaddr
-tailscale.com/syncs
-tailscale.com/tailcfg
-tailscale.com/tsconst
-tailscale.com/tsweb
-tailscale.com/tsweb/varz
-tailscale.com/types/dnstype
-tailscale.com/types/ipproto
-tailscale.com/types/key
-tailscale.com/types/lazy
-tailscale.com/types/logger
-tailscale.com/types/opt
-tailscale.com/types/persist
-tailscale.com/types/result
-tailscale.com/types/structs
-tailscale.com/types/tkatype
-tailscale.com/types/views
-tailscale.com/util/bufiox
-tailscale.com/util/cibuild
-tailscale.com/util/clientmetric
-tailscale.com/util/cloudenv
-tailscale.com/util/ctxkey
-tailscale.com/util/dirwalk
-tailscale.com/util/dnsname
-tailscale.com/util/eventbus
-tailscale.com/util/lineiter
-tailscale.com/util/mak
-tailscale.com/util/nocasemaps
-tailscale.com/util/rands
-tailscale.com/util/set
-tailscale.com/util/slicesx
-tailscale.com/util/testenv
-tailscale.com/util/vizerror
-tailscale.com/util/winutil
-tailscale.com/util/winutil/winenv
-tailscale.com/version
-tailscale.com/version/distro
