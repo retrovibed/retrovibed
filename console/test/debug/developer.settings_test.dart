@@ -27,7 +27,7 @@ void main() {
         expect(tester.takeException(), isNull);
       }, variant: _resolutions);
 
-      testWidgets('displays Networking and Subscription checkboxes', (
+      testWidgets('displays all developer flag checkboxes', (
         WidgetTester tester,
       ) async {
         await tester.pumpApp(_authenticated(const DeveloperSettings()));
@@ -35,7 +35,8 @@ void main() {
 
         expect(find.text('Networking'), findsOneWidget);
         expect(find.text('Subscription'), findsOneWidget);
-        expect(find.byType(Checkbox), findsNWidgets(2));
+        expect(find.text('Recommendations'), findsOneWidget);
+        expect(find.text('Releases'), findsOneWidget);
         expect(tester.takeException(), isNull);
       });
     });
@@ -125,6 +126,64 @@ void main() {
 
         expect(find.text('networking:true'), findsOneWidget);
         expect(find.text('subscription:false'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('toggling Recommendations updates the cached flag', (
+        WidgetTester tester,
+      ) async {
+        await tester.pumpApp(
+          _authenticated(
+            Builder(
+              builder: (context) {
+                final flags = authn.Login.cached(context).flags;
+                return Column(
+                  children: [
+                    const DeveloperSettings(),
+                    Text('recommendations:${flags.recommendations}'),
+                  ],
+                );
+              },
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('recommendations:true'), findsOneWidget);
+
+        await tester.tap(find.byType(Checkbox).at(2));
+        await tester.pumpAndSettle();
+
+        expect(find.text('recommendations:false'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('toggling Releases updates the cached flag', (
+        WidgetTester tester,
+      ) async {
+        await tester.pumpApp(
+          _authenticated(
+            Builder(
+              builder: (context) {
+                final flags = authn.Login.cached(context).flags;
+                return Column(
+                  children: [
+                    const DeveloperSettings(),
+                    Text('releases:${flags.releases}'),
+                  ],
+                );
+              },
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('releases:true'), findsOneWidget);
+
+        await tester.tap(find.byType(Checkbox).at(3));
+        await tester.pumpAndSettle();
+
+        expect(find.text('releases:false'), findsOneWidget);
         expect(tester.takeException(), isNull);
       });
     });
