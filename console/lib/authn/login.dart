@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/design.kit/forms.dart' as forms;
@@ -60,7 +61,10 @@ class _LoginState extends State<Login> {
   String _username = '';
   String _password = '';
   String _confirm = '';
-  DeveloperMode flags = DeveloperMode();
+  DeveloperMode flags = DeveloperMode(
+    recommendations: !Platform.isMacOS,
+    releases: !Platform.isMacOS,
+  );
 
   @override
   void initState() {

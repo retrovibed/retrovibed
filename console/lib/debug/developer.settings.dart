@@ -29,9 +29,12 @@ class DeveloperSettings extends StatelessWidget {
             value: flags.networking,
             onChanged: (v) {
               final s = Login.of(context);
-              s?.setState(() => s.flags = DeveloperMode()
-                ..networking = v ?? false
-                ..subscription = flags.subscription);
+              s?.setState(() => s.flags = DeveloperMode(
+                networking: v ?? false,
+                subscription: flags.subscription,
+                recommendations: flags.recommendations,
+                releases: flags.releases,
+              ));
             },
           ),
           forms.Checkbox(
@@ -40,9 +43,40 @@ class DeveloperSettings extends StatelessWidget {
             value: flags.subscription,
             onChanged: (v) {
               final s = Login.of(context);
-              s?.setState(() => s.flags = DeveloperMode()
-                ..networking = flags.networking
-                ..subscription = v ?? false);
+              s?.setState(() => s.flags = DeveloperMode(
+                networking: flags.networking,
+                subscription: v ?? false,
+                recommendations: flags.recommendations,
+                releases: flags.releases,
+              ));
+            },
+          ),
+          forms.Checkbox(
+            const Text('Recommendations'),
+            description: const Text('Toggle recommendations panel'),
+            value: flags.recommendations,
+            onChanged: (v) {
+              final s = Login.of(context);
+              s?.setState(() => s.flags = DeveloperMode(
+                networking: flags.networking,
+                subscription: flags.subscription,
+                recommendations: v ?? false,
+                releases: flags.releases,
+              ));
+            },
+          ),
+          forms.Checkbox(
+            const Text('Releases'),
+            description: const Text('Toggle releases panel'),
+            value: flags.releases,
+            onChanged: (v) {
+              final s = Login.of(context);
+              s?.setState(() => s.flags = DeveloperMode(
+                networking: flags.networking,
+                subscription: flags.subscription,
+                recommendations: flags.recommendations,
+                releases: v ?? false,
+              ));
             },
           ),
         ],
