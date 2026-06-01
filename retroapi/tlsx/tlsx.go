@@ -2,7 +2,8 @@ package tlsx
 
 import (
 	"crypto"
-	"crypto/ed25519"
+	"crypto/ecdsa"
+	"crypto/elliptic"
 	"crypto/md5"
 	"crypto/rand"
 	"crypto/tls"
@@ -146,12 +147,39 @@ func X509Template(d time.Duration, options ...X509Option) (template x509.Certifi
 	return X509TemplateRand(rand.Reader, d, stdlibclock{}, options...)
 }
 
-func SelfSignedED25519(r io.Reader, template *x509.Certificate) (priv ed25519.PrivateKey, derBytes []byte, err error) {
-	if _, priv, err = ed25519.GenerateKey(r); err != nil {
+// SelfSignedAuto generates an ECDSA P-256 key and creates a self-signed certificate.
+// P-256 has broad TLS client support (including Dart/Flutter BoringSSL).
+func SelfSignedAuto(r io.Reader, template *x509.Certificate) (priv *ecdsa.PrivateKey, derBytes []byte, err error) {
+	if priv, err = generateECDSAP256(r); err != nil {
 		return priv, derBytes, err
 	}
 
-	return SelfSigned(priv, template)
+	_, derBytes, err = SelfSigned(priv, template)
+	return priv, derBytes, err
+}
+
+// generateECDSAP256 generates an ECDSA P-256 key using r as the entropy source.
+// Unlike ecdsa.GenerateKey, this respects the provided reader (Go 1.26+ ignores it).
+func generateECDSAP256(r io.Reader) (*ecdsa.PrivateKey, error) {
+	privBytes, x, y, err := elliptic.GenerateKey(elliptic.P256(), r) //nolint:staticcheck
+	if err != nil {
+		return nil, err
+	}
+	return &ecdsa.PrivateKey{
+		PublicKey: ecdsa.PublicKey{Curve: elliptic.P256(), X: x, Y: y},
+		D:         new(big.Int).SetBytes(privBytes),
+	}, nil
+}
+
+// SignedAuto generates a fresh ECDSA P-256 key for template and signs it with parentKey under parent.
+func SignedAuto(r io.Reader, parent *x509.Certificate, parentKey crypto.Signer, template *x509.Certificate) (priv *ecdsa.PrivateKey, derBytes []byte, err error) {
+	if priv, err = generateECDSAP256(r); err != nil {
+		return priv, derBytes, err
+	}
+	if derBytes, err = x509.CreateCertificate(r, template, parent, priv.Public(), parentKey); err != nil {
+		return priv, derBytes, errorsx.WithStack(err)
+	}
+	return priv, derBytes, nil
 }
 
 // SelfSigned signs its own certificate ..
@@ -174,7 +202,7 @@ func SignedRand[T privatekey](r io.Reader, priv T, template, parent *x509.Certif
 }
 
 // WritePEMFile ...
-func WritePEMFile(path string, key ed25519.PrivateKey, derBytes []byte) (err error) {
+func WritePEMFile(path string, key crypto.PrivateKey, derBytes []byte) (err error) {
 	var (
 		dst *os.File
 	)
@@ -187,14 +215,14 @@ func WritePEMFile(path string, key ed25519.PrivateKey, derBytes []byte) (err err
 }
 
 // WritePEM ...
-func WritePEM(dst io.Writer, key ed25519.PrivateKey, derBytes []byte) (err error) {
+func WritePEM(dst io.Writer, key crypto.PrivateKey, derBytes []byte) (err error) {
 	if err = pem.Encode(dst, &pem.Block{Type: "CERTIFICATE", Bytes: derBytes}); err != nil {
 		return errorsx.WithStack(err)
 	}
 
 	pkcs8, err := x509.MarshalPKCS8PrivateKey(key)
 	if err != nil {
-		return errorsx.Wrap(err, "failed to marshal ed25519 private key")
+		return errorsx.Wrap(err, "failed to marshal private key")
 	}
 
 	if err = pem.Encode(dst, &pem.Block{Type: "PRIVATE KEY", Bytes: pkcs8}); err != nil {
@@ -205,16 +233,16 @@ func WritePEM(dst io.Writer, key ed25519.PrivateKey, derBytes []byte) (err error
 }
 
 // WritePrivateKey ...
-func WritePrivateKey(dst io.Writer, key ed25519.PrivateKey) error {
+func WritePrivateKey(dst io.Writer, key crypto.PrivateKey) error {
 	pkcs8, err := x509.MarshalPKCS8PrivateKey(key)
 	if err != nil {
-		return errorsx.Wrap(err, "failed to marshal ed25519 private key")
+		return errorsx.Wrap(err, "failed to marshal private key")
 	}
 	return errorsx.WithStack(pem.Encode(dst, &pem.Block{Type: "PRIVATE KEY", Bytes: pkcs8}))
 }
 
 // WritePrivateKeyFile ...
-func WritePrivateKeyFile(path string, key ed25519.PrivateKey) (err error) {
+func WritePrivateKeyFile(path string, key crypto.PrivateKey) (err error) {
 	var (
 		dst *os.File
 	)
@@ -401,7 +429,7 @@ func SelfSignedLocalHostTLSSeeded(r io.Reader, path string, options ...X509Optio
 		return err
 	}
 
-	priv, derbytes, err := SelfSignedED25519(r, &certtempl)
+	priv, derbytes, err := SelfSignedAuto(r, &certtempl)
 	if err != nil {
 		return err
 	}
