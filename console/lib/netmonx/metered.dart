@@ -23,12 +23,13 @@ class _MeteredState extends State<Metered> {
   @override
   void initState() {
     super.initState();
+    _sub = Connectivity().onConnectivityChanged.listen((results) {
+      print("metered ${results}");
+      retro.set_metered(_isMetered(results));
+    });
     Connectivity().checkConnectivity().then((results) {
       retro.set_metered(_isMetered(results));
     }).ignore();
-    _sub = Connectivity().onConnectivityChanged.listen((results) {
-      retro.set_metered(_isMetered(results));
-    });
   }
 
   @override

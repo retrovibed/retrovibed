@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/design.kit/forms.dart' as forms;
-import 'package:retrovibed/meta.dart' as meta;
 import 'package:retrovibed/authn.dart' as authn;
 import './authz.permission.row.dart';
 
@@ -11,7 +10,7 @@ class AuthzDeeppool extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
-    final token = authn.DeeppoolAuthzCache.of(context)?.meta.current.token ?? meta.Token();
+    final token = authn.DeeppoolAuthzCache.of(context).meta.current.token;
 
     return forms.Container(
       padding: EdgeInsets.symmetric(horizontal: 10),

@@ -5,7 +5,6 @@ import (
 	"crypto/ed25519"
 	"crypto/md5"
 	"crypto/rand"
-	"crypto/rsa"
 	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
@@ -16,10 +15,10 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
 )
 
 type privatekey interface {
@@ -99,7 +98,7 @@ func (t stdlibclock) Now() time.Time {
 	return time.Now()
 }
 
-// Default clock that can be used to generate a template cert.
+// DefaultClock that can be used to generate a template cert.
 func DefaultClock() clock {
 	return stdlibclock{}
 }
@@ -147,21 +146,7 @@ func X509Template(d time.Duration, options ...X509Option) (template x509.Certifi
 	return X509TemplateRand(rand.Reader, d, stdlibclock{}, options...)
 }
 
-// SelfSignedRSAGen generate a self signed certificate.
-func SelfSignedRSAGen(bits int, template *x509.Certificate) (priv *rsa.PrivateKey, derBytes []byte, err error) {
-	return SelfSignedRSARandGen(rand.Reader, bits, template)
-}
-
-// SelfSignedRSAGen generate a self signed certificate.
-func SelfSignedRSARandGen(r io.Reader, bits int, template *x509.Certificate) (priv *rsa.PrivateKey, derBytes []byte, err error) {
-	if priv, err = rsa.GenerateKey(r, bits); err != nil {
-		return priv, derBytes, errorsx.WithStack(err)
-	}
-
-	return SelfSigned(priv, template)
-}
-
-func SelfSignedED25519(r io.Reader, bits int, template *x509.Certificate) (priv ed25519.PrivateKey, derBytes []byte, err error) {
+func SelfSignedED25519(r io.Reader, template *x509.Certificate) (priv ed25519.PrivateKey, derBytes []byte, err error) {
 	if _, priv, err = ed25519.GenerateKey(r); err != nil {
 		return priv, derBytes, err
 	}
@@ -189,7 +174,7 @@ func SignedRand[T privatekey](r io.Reader, priv T, template, parent *x509.Certif
 }
 
 // WritePEMFile ...
-func WritePEMFile(path string, key *rsa.PrivateKey, derBytes []byte) (err error) {
+func WritePEMFile(path string, key ed25519.PrivateKey, derBytes []byte) (err error) {
 	var (
 		dst *os.File
 	)
@@ -202,13 +187,17 @@ func WritePEMFile(path string, key *rsa.PrivateKey, derBytes []byte) (err error)
 }
 
 // WritePEM ...
-func WritePEM(dst io.Writer, key *rsa.PrivateKey, derBytes []byte) (err error) {
-
+func WritePEM(dst io.Writer, key ed25519.PrivateKey, derBytes []byte) (err error) {
 	if err = pem.Encode(dst, &pem.Block{Type: "CERTIFICATE", Bytes: derBytes}); err != nil {
 		return errorsx.WithStack(err)
 	}
 
-	if err = pem.Encode(dst, &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(key)}); err != nil {
+	pkcs8, err := x509.MarshalPKCS8PrivateKey(key)
+	if err != nil {
+		return errorsx.Wrap(err, "failed to marshal ed25519 private key")
+	}
+
+	if err = pem.Encode(dst, &pem.Block{Type: "PRIVATE KEY", Bytes: pkcs8}); err != nil {
 		return errorsx.WithStack(err)
 	}
 
@@ -216,12 +205,16 @@ func WritePEM(dst io.Writer, key *rsa.PrivateKey, derBytes []byte) (err error) {
 }
 
 // WritePrivateKey ...
-func WritePrivateKey(dst io.Writer, key *rsa.PrivateKey) error {
-	return errorsx.WithStack(pem.Encode(dst, &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(key)}))
+func WritePrivateKey(dst io.Writer, key ed25519.PrivateKey) error {
+	pkcs8, err := x509.MarshalPKCS8PrivateKey(key)
+	if err != nil {
+		return errorsx.Wrap(err, "failed to marshal ed25519 private key")
+	}
+	return errorsx.WithStack(pem.Encode(dst, &pem.Block{Type: "PRIVATE KEY", Bytes: pkcs8}))
 }
 
 // WritePrivateKeyFile ...
-func WritePrivateKeyFile(path string, key *rsa.PrivateKey) (err error) {
+func WritePrivateKeyFile(path string, key ed25519.PrivateKey) (err error) {
 	var (
 		dst *os.File
 	)
@@ -327,6 +320,24 @@ func DecodePEMCertificate(encoded []byte) (cert *x509.Certificate, err error) {
 	return cert, nil
 }
 
+// DecodePEMPrivateKey returns the first PEM block whose type ends in "PRIVATE KEY",
+// skipping any leading non-key blocks (e.g. certificates). The caller is responsible
+// for parsing the block bytes based on block.Type.
+func DecodePEMPrivateKey(encoded []byte) (*pem.Block, error) {
+	rest := encoded
+	for {
+		var p *pem.Block
+		p, rest = pem.Decode(rest)
+		if p == nil {
+			return nil, errorsx.New("no private key block found in PEM data")
+		}
+
+		if strings.HasSuffix(p.Type, "PRIVATE KEY") {
+			return p, nil
+		}
+	}
+}
+
 // NewDialer for tls configurations.
 func NewDialer(c *tls.Config, options ...Option) *tls.Dialer {
 	return &tls.Dialer{
@@ -337,13 +348,35 @@ func NewDialer(c *tls.Config, options ...Option) *tls.Dialer {
 	}
 }
 
+// ExpiredCertificate reports whether the PEM file at path needs to be (re)generated.
+// Returns true if the file is missing, unreadable, corrupt, or contains an expired cert.
+// Returns false only when the file contains a valid, unexpired certificate.
+func ExpiredCertificate(path string) bool {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return true
+	}
+	cert, err := DecodePEMCertificate(data)
+	return err != nil || cert == nil || time.Now().After(cert.NotAfter)
+}
+
+// SelfSignedLocalHostTLS generates or renews a self-signed localhost cert at path.
 func SelfSignedLocalHostTLS(path string, options ...X509Option) error {
-	if fsx.IsRegularFile(path) {
+	return SelfSignedLocalHostTLSSeeded(rand.Reader, path, options...)
+}
+
+// SelfSignedLocalHostTLSSeeded generates or renews a self-signed localhost cert at path using r as
+// the random source. If the file already exists and the cert inside is still valid, it is left
+// untouched. If the cert is expired (or unreadable), the file is removed and a new cert is written.
+func SelfSignedLocalHostTLSSeeded(r io.Reader, path string, options ...X509Option) error {
+	if !ExpiredCertificate(path) {
 		return nil
 	}
 
-	certtempl, err := X509Template(
+	certtempl, err := X509TemplateRand(
+		r,
 		365*24*time.Hour,
+		stdlibclock{},
 		X509OptionCA,
 		X509OptionUsage(
 			x509.KeyUsageKeyEncipherment|
@@ -368,7 +401,7 @@ func SelfSignedLocalHostTLS(path string, options ...X509Option) error {
 		return err
 	}
 
-	priv, derbytes, err := SelfSignedRSAGen(2048, &certtempl)
+	priv, derbytes, err := SelfSignedED25519(r, &certtempl)
 	if err != nil {
 		return err
 	}

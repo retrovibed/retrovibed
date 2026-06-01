@@ -21,17 +21,17 @@ class DeeppoolAuthzCache extends StatefulWidget {
     this.apibillingattribution = billing.attribution,
   }) : super(key: key);
 
-  static _AuthzCache? of(BuildContext context) {
-    return context.findAncestorStateOfType<_AuthzCache>();
+  static _AuthzCache of(BuildContext context) {
+    return context.findAncestorStateOfType<_AuthzCache>() ?? _AuthzCache();
   }
 
   static httpx.Option bearer(BuildContext context) {
-    final cache = of(context) ?? _AuthzCache();
+    final cache = of(context);
     return httpx.Request.bearer(() => cache.meta.auto().then((v) => v.bearer));
   }
 
   static Future<String> attributionToken(BuildContext context) {
-    final cache = of(context) ?? _AuthzCache();
+    final cache = of(context);
     return cache._attributionToken();
   }
 

@@ -8,7 +8,7 @@ import (
 	"sync"
 
 	"github.com/retrovibed/retrovibed/retroapi/env"
-	"github.com/retrovibed/retrovibed/retroapi/internal/tlsx"
+	"github.com/retrovibed/retrovibed/retroapi/tlsx"
 )
 
 var initpool = sync.OnceValue(func() tlsx.Pool {
