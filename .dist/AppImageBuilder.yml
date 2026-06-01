@@ -11,16 +11,26 @@ AppDir:
     exec: usr/lib/retrovibed/retrovibed
     exec_args: $@
 
+  # stuck on questing because resolute causes the following issues:
+  # Finding 1: Fix APPRUN_ERROR (ENOENT) caused by missing lib64 layout in resolute (t64)
+  # appimage-builder installs the dynamic linker into runtime/compat/usr/lib64/ but
+  # fails to generate the root-level symlink directory expected by the AppRun runtime.
+  # Required manual fix in pipeline before packaging:
+  #   mkdir -p ${APPDIR}/runtime/compat/lib64
+  #   ln -s ../usr/lib64/ld-linux-x86-64.so.2 ${APPDIR}/runtime/compat/lib64/ld-linux-x86-64.so.2
+  # Finding 2: Prevent GTK/Glycin core dump during SVG fallback icon rendering
+  # Glycin spawns decoders via 'env -i', stripping APPDIR/PATH and causing execution
+  # to look for /usr/libexec/glycin-loaders/2+/glycin-svg on the host filesystem.
   apt:
     arch: !ENV "${APT_ARCH}"
     sources:
-      - sourceline: "deb https://archive.ubuntu.com/ubuntu/ resolute main restricted universe multiverse"
+      - sourceline: "deb https://archive.ubuntu.com/ubuntu/ questing main restricted universe multiverse"
         key_url: "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x871920D1991BC93C"
-      - sourceline: "deb https://archive.ubuntu.com/ubuntu/ resolute-updates main restricted universe multiverse"
+      - sourceline: "deb https://archive.ubuntu.com/ubuntu/ questing-updates main restricted universe multiverse"
         key_url: "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x871920D1991BC93C"
-      - sourceline: "deb https://archive.ubuntu.com/ubuntu/ resolute-backports main restricted universe multiverse"
+      - sourceline: "deb https://archive.ubuntu.com/ubuntu/ questing-backports main restricted universe multiverse"
         key_url: "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x871920D1991BC93C"
-      - sourceline: "deb http://security.ubuntu.com/ubuntu resolute-security main restricted universe multiverse"
+      - sourceline: "deb http://security.ubuntu.com/ubuntu questing-security main restricted universe multiverse"
         key_url: "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x871920D1991BC93C"
     include:
       - libgtk-3-0t64

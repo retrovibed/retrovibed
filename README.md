@@ -49,13 +49,6 @@ am icons retrovibed
 am update retrovibed
 ```
 
-for gui management for app images
-
-```bash
-am -i am-gui
-am-gui
-```
-
 #### install deb daemon
 
 ```bash
