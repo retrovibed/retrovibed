@@ -18,6 +18,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/netmonx"
+	"github.com/retrovibed/retrovibed/retroapi/tlsx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
@@ -26,6 +27,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/backoffx"
 	"github.com/retrovibed/retrovibed/shallows/internal/contextx"
+	"github.com/retrovibed/retrovibed/shallows/internal/cryptox"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/envx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -33,7 +35,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/netx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
-	"github.com/retrovibed/retrovibed/shallows/internal/tlsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/userx"
 	"github.com/retrovibed/retrovibed/shallows/internal/wireguardx"
 	"github.com/retrovibed/retrovibed/shallows/library"
@@ -360,7 +361,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	community.NewHTTPYouTube(db, deepjwt).Bind(httpmux.PathPrefix("/integrations/youtube").Subrouter())
 
 	tlspem := envx.String(userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "tls.pem"), env.DaemonTLSPEM)
-	if err = tlsx.SelfSignedLocalHostTLS(tlspem, tlsx.X509OptionHosts(t.SelfSignedHosts...)); err != nil {
+	if err = tlsx.SelfSignedLocalHostTLSSeeded(cryptox.NewChaCha8(cmdopts.MachineID()), tlspem, tlsx.X509OptionHosts(t.SelfSignedHosts...)); err != nil {
 		return err
 	}
 

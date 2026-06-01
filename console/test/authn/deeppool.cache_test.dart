@@ -39,7 +39,7 @@ void main() {
       await tester.pumpAndSettle();
 
       final cache = DeeppoolAuthzCache.of(capturedCtx!);
-      final token = await cache!.meta.auto();
+      final token = await cache.meta.auto();
       expect(token.bearer, isNotEmpty);
       expect(tester.takeException(), isNull);
     });
@@ -65,7 +65,7 @@ void main() {
         final cache = DeeppoolAuthzCache.of(capturedCtx!);
         expect(cache, isNotNull);
 
-        final token = await cache!.meta.auto();
+        final token = await cache.meta.auto();
         expect(token.bearer, isNotEmpty);
         expect(token.bearer, equals('bearer-from-deeppool'));
         expect(tester.takeException(), isNull);
@@ -88,7 +88,7 @@ void main() {
         await tester.pumpAndSettle();
 
         final cache = DeeppoolAuthzCache.of(capturedCtx!);
-        final token = await cache!.meta.auto();
+        final token = await cache.meta.auto();
         await tester.pumpAndSettle();
 
         expect(token.bearer, equals('cached-bearer'));
@@ -226,7 +226,7 @@ void main() {
         final cache = DeeppoolAuthzCache.of(capturedCtx!);
 
         // First token() call fetches since token starts expired
-        final firstToken = await cache!.meta.auto();
+        final firstToken = await cache.meta.auto();
         await tester.pumpAndSettle();
         expect(callCount, equals(1));
         expect(firstToken.bearer, equals('bearer-call-1'));
@@ -263,7 +263,7 @@ void main() {
         final cache = DeeppoolAuthzCache.of(capturedCtx!);
 
         // First token() call fetches the token
-        final firstToken = await cache!.meta.auto();
+        final firstToken = await cache.meta.auto();
         await tester.pumpAndSettle();
         expect(callCount, equals(1));
         expect(firstToken.bearer, equals('valid-bearer'));
@@ -300,7 +300,7 @@ void main() {
         final cache = DeeppoolAuthzCache.of(capturedCtx!);
 
         // First token() fetch — token comes back expired
-        final firstToken = await cache!.meta.auto();
+        final firstToken = await cache.meta.auto();
         await tester.pumpAndSettle();
         expect(callCount, equals(1));
         expect(firstToken.bearer, equals('bearer-v1'));

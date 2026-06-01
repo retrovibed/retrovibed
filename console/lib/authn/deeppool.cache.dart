@@ -4,7 +4,6 @@ import 'package:retrovibed/meta/api.deeppool.dart' as deeppool;
 import 'package:retrovibed/billing/api.dart' as billing;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/authz.dart' as authz;
-import 'package:retrovibed/designkit.dart' as ds;
 import 'authenticated.dart';
 
 typedef FnDeeppoolAuthz = Future<deeppool.AuthzResponse> Function({List<httpx.Option> options});

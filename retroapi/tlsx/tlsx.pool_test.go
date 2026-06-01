@@ -1,8 +1,8 @@
 package tlsx_test
 
 import (
+	"crypto/ed25519"
 	"crypto/rand"
-	"crypto/rsa"
 	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
@@ -15,7 +15,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/retrovibed/retrovibed/shallows/internal/tlsx"
+	"github.com/retrovibed/retrovibed/retroapi/tlsx"
 	"github.com/stretchr/testify/require"
 )
 
@@ -24,10 +24,7 @@ import (
 func newCAAndSignedCert(t *testing.T, notBefore, notAfter time.Time) (*x509.CertPool, *tls.Certificate) {
 	t.Helper()
 
-	caKey, err := rsa.GenerateKey(rand.Reader, 2048)
-	require.NoError(t, err)
-
-	caTemplate := &x509.Certificate{
+	caKey, caDER, err := tlsx.SelfSignedED25519(rand.Reader, &x509.Certificate{
 		SerialNumber:          big.NewInt(1),
 		Subject:               pkix.Name{CommonName: "test-ca"},
 		NotBefore:             notBefore,
@@ -35,24 +32,22 @@ func newCAAndSignedCert(t *testing.T, notBefore, notAfter time.Time) (*x509.Cert
 		IsCA:                  true,
 		BasicConstraintsValid: true,
 		KeyUsage:              x509.KeyUsageCertSign,
-	}
-	caDER, err := x509.CreateCertificate(rand.Reader, caTemplate, caTemplate, &caKey.PublicKey, caKey)
+	})
 	require.NoError(t, err)
 	caCert, err := x509.ParseCertificate(caDER)
 	require.NoError(t, err)
 
-	leafKey, err := rsa.GenerateKey(rand.Reader, 2048)
+	_, leafKey, err := ed25519.GenerateKey(rand.Reader)
 	require.NoError(t, err)
 
-	leafTemplate := &x509.Certificate{
+	leafDER, err := x509.CreateCertificate(rand.Reader, &x509.Certificate{
 		SerialNumber:          big.NewInt(2),
 		Subject:               pkix.Name{CommonName: "localhost.lan"},
 		DNSNames:              []string{"localhost.lan"},
 		NotBefore:             notBefore,
 		NotAfter:              notAfter,
 		BasicConstraintsValid: true,
-	}
-	leafDER, err := x509.CreateCertificate(rand.Reader, leafTemplate, caCert, &leafKey.PublicKey, caKey)
+	}, caCert, leafKey.Public(), caKey)
 	require.NoError(t, err)
 	leafParsed, err := x509.ParseCertificate(leafDER)
 	require.NoError(t, err)
@@ -75,10 +70,7 @@ func newTLSCertHost(t *testing.T, hostname string, notBefore, notAfter time.Time
 		BasicConstraintsValid: true,
 	}
 
-	priv, err := rsa.GenerateKey(rand.Reader, 2048)
-	require.NoError(t, err)
-
-	der, err := x509.CreateCertificate(rand.Reader, templ, templ, &priv.PublicKey, priv)
+	priv, der, err := tlsx.SelfSignedED25519(rand.Reader, templ)
 	require.NoError(t, err)
 
 	leaf, err := x509.ParseCertificate(der)
