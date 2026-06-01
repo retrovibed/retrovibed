@@ -11,6 +11,9 @@ AppDir:
     exec: usr/lib/retrovibed/retrovibed
     exec_args: $@
 
+  runtime:
+    path_mappings: []
+
   apt:
     arch: !ENV "${APT_ARCH}"
     sources:
