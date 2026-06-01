@@ -78,7 +78,7 @@ func DecodePCM(ctx context.Context, path string, segments []Segment) ([][]float3
 		})
 
 		if errorsx.Ignore(err, io.EOF) != nil {
-			pcmPool.Put(buf[:0])
+			pcmPool.Put(buf[:0]) // nolint: staticcheck
 			return nil, err
 		}
 

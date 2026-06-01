@@ -33,7 +33,9 @@ func AcousticsBackgroundRun(ctx context.Context, q sqlx.Queryer, media fs.FS) er
 	if err != nil {
 		return errorsx.Wrap(err, "acoustics: copy to temp")
 	}
-	defer os.Remove(tmpPath)
+	defer func() {
+		errorsx.Log(errorsx.Wrap(os.Remove(tmpPath), "acoustics: cleanup temp"))
+	}()
 
 	vec, err := acoustics.AnalyzeFile(ctx, tmpPath)
 	if err != nil {
@@ -84,7 +86,7 @@ func copyToTemp(media fs.FS, name string) (string, error) {
 	}
 
 	if err != nil {
-		os.Remove(tmp.Name())
+		errorsx.Log(errorsx.Wrap(os.Remove(tmp.Name()), "acoustics: cleanup temp"))
 		return "", err
 	}
 	return tmp.Name(), nil

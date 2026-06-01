@@ -83,6 +83,6 @@ var pcmPool = sync.Pool{
 
 func returnPCMBuffers(segments [][]float32) {
 	for _, buf := range segments {
-		pcmPool.Put(buf[:0])
+		pcmPool.Put(buf[:0]) // nolint: staticcheck
 	}
 }
