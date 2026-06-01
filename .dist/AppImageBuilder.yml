@@ -3,6 +3,10 @@ version: 1
 AppDir:
   path: !ENV "${APPDIR}"
 
+  runtime:
+    path_mappings:
+      - /dev/null:/dev/null
+
   app_info:
     id: space.retrovibe.Console
     name: retrovibed
