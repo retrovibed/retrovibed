@@ -123,16 +123,17 @@ func (t Command) discoverysettings() *DiscoverySettings {
 
 func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts.TLSConfig) (err error) {
 	var (
-		mc             = library.NewQueryerCleanerAuto()
-		db             *sql.DB
-		id             ssh.Signer
-		_socks5        net.Listener
-		deepjwt        = httpx.NewFixedStatusClient(http.StatusMethodNotAllowed)
-		mediameta      = asyncx.NewWakeup(gctx.Context)
-		archival       = asyncx.NewWakeup(gctx.Context)
-		publishing     = asyncx.NewWakeup(gctx.Context)
-		vpncfgpath     = userx.DefaultConfigDir(userx.DefaultRelRoot(), "vpn.cfg")
-		storagecfgpath = userx.DefaultConfigDir(userx.DefaultRelRoot(), "storage.cfg")
+		mc                  = library.NewQueryerCleanerAuto()
+		db                  *sql.DB
+		id                  ssh.Signer
+		_socks5             net.Listener
+		deepjwt             = httpx.NewFixedStatusClient(http.StatusMethodNotAllowed)
+		mediameta           = asyncx.NewWakeup(gctx.Context)
+		archival            = asyncx.NewWakeup(gctx.Context)
+		publishing          = asyncx.NewWakeup(gctx.Context)
+		mediaidentification = asyncx.NewWakeup(gctx.Context)
+		vpncfgpath          = userx.DefaultConfigDir(userx.DefaultRelRoot(), "vpn.cfg")
+		storagecfgpath      = userx.DefaultConfigDir(userx.DefaultRelRoot(), "storage.cfg")
 	)
 
 	gctx.Cleanup.Add(1)
