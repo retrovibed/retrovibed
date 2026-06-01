@@ -1,7 +1,6 @@
 package tlsx_test
 
 import (
-	"crypto/ed25519"
 	"crypto/rand"
 	"crypto/tls"
 	"crypto/x509"
@@ -24,7 +23,7 @@ import (
 func newCAAndSignedCert(t *testing.T, notBefore, notAfter time.Time) (*x509.CertPool, *tls.Certificate) {
 	t.Helper()
 
-	caKey, caDER, err := tlsx.SelfSignedED25519(rand.Reader, &x509.Certificate{
+	caKey, caDER, err := tlsx.SelfSignedAuto(rand.Reader, &x509.Certificate{
 		SerialNumber:          big.NewInt(1),
 		Subject:               pkix.Name{CommonName: "test-ca"},
 		NotBefore:             notBefore,
@@ -37,17 +36,14 @@ func newCAAndSignedCert(t *testing.T, notBefore, notAfter time.Time) (*x509.Cert
 	caCert, err := x509.ParseCertificate(caDER)
 	require.NoError(t, err)
 
-	_, leafKey, err := ed25519.GenerateKey(rand.Reader)
-	require.NoError(t, err)
-
-	leafDER, err := x509.CreateCertificate(rand.Reader, &x509.Certificate{
+	leafKey, leafDER, err := tlsx.SignedAuto(rand.Reader, caCert, caKey, &x509.Certificate{
 		SerialNumber:          big.NewInt(2),
 		Subject:               pkix.Name{CommonName: "localhost.lan"},
 		DNSNames:              []string{"localhost.lan"},
 		NotBefore:             notBefore,
 		NotAfter:              notAfter,
 		BasicConstraintsValid: true,
-	}, caCert, leafKey.Public(), caKey)
+	})
 	require.NoError(t, err)
 	leafParsed, err := x509.ParseCertificate(leafDER)
 	require.NoError(t, err)
@@ -70,7 +66,7 @@ func newTLSCertHost(t *testing.T, hostname string, notBefore, notAfter time.Time
 		BasicConstraintsValid: true,
 	}
 
-	priv, der, err := tlsx.SelfSignedED25519(rand.Reader, templ)
+	priv, der, err := tlsx.SelfSignedAuto(rand.Reader, templ)
 	require.NoError(t, err)
 
 	leaf, err := x509.ParseCertificate(der)

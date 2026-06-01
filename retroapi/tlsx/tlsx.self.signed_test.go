@@ -1,7 +1,7 @@
 package tlsx_test
 
 import (
-	"crypto/ed25519"
+	"crypto/ecdsa"
 	"crypto/rand"
 	"crypto/tls"
 	"crypto/x509"
@@ -20,7 +20,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func expiredCert(t *testing.T) (ed25519.PrivateKey, []byte) {
+func expiredCert(t *testing.T) (*ecdsa.PrivateKey, []byte) {
 	t.Helper()
 	templ := &x509.Certificate{
 		SerialNumber:          big.NewInt(1),
@@ -30,7 +30,7 @@ func expiredCert(t *testing.T) (ed25519.PrivateKey, []byte) {
 		IsCA:                  true,
 		BasicConstraintsValid: true,
 	}
-	priv, der, err := tlsx.SelfSignedED25519(rand.Reader, templ)
+	priv, der, err := tlsx.SelfSignedAuto(rand.Reader, templ)
 	require.NoError(t, err)
 	return priv, der
 }
