@@ -54,16 +54,17 @@ func Main(args ...string) {
 		cmdopts.TLSConfig
 		cmdopts.PeerID
 		cmdopts.SSHID
-		Version   cmdopts.Version       `cmd:"" help:"display versioning information"`
-		Identity  cmdmeta.Identity      `cmd:"" help:"identity management commands"`
-		Media     cmdmedia.Commands     `cmd:"" help:"media metadata management (import/export)"`
-		Library   cmdlibrary.Commands   `cmd:"" help:"manage your media library"`
-		Torrent   cmdtorrent.Commands   `cmd:"" help:"torrent commands"`
-		Community cmdcommunity.Commands `cmd:"" help:"community commands"`
-		Discovery cmdddisc.Commands     `cmd:"" help:"media discovery commands, used to manage discovery of media"`
-		ETL       cmdetl.Commands       `cmd:"" help:"etl commands for processing jsonl through llm endpoints"`
-		Daemon    daemons.Command       `cmd:"" help:"run the backend daemon" default:"true"`
-		Console   cmdopts.CmdExec       `cmd:"" hidden:"" help:"open the retrovibe console (ui)"`
+		Version   cmdopts.Version        `cmd:"" help:"display versioning information"`
+		Identity  cmdmeta.Identity       `cmd:"" help:"identity management commands"`
+		U12t      cmdmeta.Usermanagement `cmd:"" name:"u12t" help:"user management commands"`
+		Media     cmdmedia.Commands      `cmd:"" help:"media metadata management (import/export)"`
+		Library   cmdlibrary.Commands    `cmd:"" help:"manage your media library"`
+		Torrent   cmdtorrent.Commands    `cmd:"" help:"torrent commands"`
+		Community cmdcommunity.Commands  `cmd:"" help:"community commands"`
+		Discovery cmdddisc.Commands      `cmd:"" help:"media discovery commands, used to manage discovery of media"`
+		ETL       cmdetl.Commands        `cmd:"" help:"etl commands for processing jsonl through llm endpoints"`
+		Daemon    daemons.Command        `cmd:"" help:"run the backend daemon" default:"true"`
+		Console   cmdopts.CmdExec        `cmd:"" hidden:"" help:"open the retrovibe console (ui)"`
 	}
 
 	var (
