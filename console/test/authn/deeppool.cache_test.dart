@@ -22,6 +22,28 @@ deeppool.AuthzResponse _response(String bearer, fixnum.Int64 expires) {
 
 void main() {
   group('DeeppoolAuthzCache', () {
+    testWidgets('never returns an empty token', (WidgetTester tester) async {
+      BuildContext? capturedCtx;
+
+      await tester.pumpApp(
+        DeeppoolAuthzCache(
+          Builder(
+            builder: (ctx) {
+              capturedCtx = ctx;
+              return const Text('child');
+            },
+          ),
+          apideeppoolauthz: ({options = const []}) => Future.value(_response('bearer-token', _futureExpiry())),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final cache = DeeppoolAuthzCache.of(capturedCtx!);
+      final token = await cache!.meta.auto();
+      expect(token.bearer, isNotEmpty);
+      expect(tester.takeException(), isNull);
+    });
+
     group('of()', () {
       testWidgets('returns non-empty token on first call', (WidgetTester tester) async {
         BuildContext? capturedCtx;

@@ -4,6 +4,7 @@ import 'package:retrovibed/meta/api.deeppool.dart' as deeppool;
 import 'package:retrovibed/billing/api.dart' as billing;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/authz.dart' as authz;
+import 'package:retrovibed/designkit.dart' as ds;
 import 'authenticated.dart';
 
 typedef FnDeeppoolAuthz = Future<deeppool.AuthzResponse> Function({List<httpx.Option> options});
@@ -21,17 +22,17 @@ class DeeppoolAuthzCache extends StatefulWidget {
     this.apibillingattribution = billing.attribution,
   }) : super(key: key);
 
-  static _AuthzCache? of(BuildContext context) {
-    return context.findAncestorStateOfType<_AuthzCache>();
+  static _AuthzCache of(BuildContext context) {
+    return context.findAncestorStateOfType<_AuthzCache>() ?? _AuthzCache();
   }
 
   static httpx.Option bearer(BuildContext context) {
-    final cache = of(context) ?? _AuthzCache();
+    final cache = of(context);
     return httpx.Request.bearer(() => cache.meta.auto().then((v) => v.bearer));
   }
 
   static Future<String> attributionToken(BuildContext context) {
-    final cache = of(context) ?? _AuthzCache();
+    final cache = of(context);
     return cache._attributionToken();
   }
 
