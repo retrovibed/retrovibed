@@ -28,6 +28,7 @@ AppDir:
       - librsvg2-common
       - dash
       - bash
+      - perl
     exclude:
       - libglib2.0-data
       - shared-mime-info
