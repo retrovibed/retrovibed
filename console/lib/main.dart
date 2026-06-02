@@ -211,6 +211,9 @@ class Retrovibed extends StatelessWidget {
                                         bottomNavigationBar: (compact && !nochrome) ? tabs : null,
                                         body: ds.ErrorBoundary(
                                           TabBarView(
+                                            // disable scrolling so that people dont accidently scroll
+                                            // through the tabs
+                                            physics: const NeverScrollableScrollPhysics(),
                                             children: [
                                               modals.Node(
                                                 media.AutoHelp(
