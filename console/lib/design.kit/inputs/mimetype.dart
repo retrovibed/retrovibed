@@ -81,7 +81,6 @@ class _MimetypeState extends State<Mimetype> {
               ),
               LayoutBuilder(
                 builder: (context, constraints) {
-                  final buttonWidth = (constraints.maxWidth - defaults.spacing * 2) / 3.0;
                   return Wrap(
                     spacing: defaults.spacing,
                     runSpacing: defaults.spacing,
@@ -90,18 +89,18 @@ class _MimetypeState extends State<Mimetype> {
                         widget.presets
                             .map(
                               (p) => OutlinedButton(
-                                  onPressed: () => _selectPreset(p),
-                                  style: OutlinedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 8,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
+                                onPressed: () => _selectPreset(p),
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 8,
                                   ),
-                                  child: p.label,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
                                 ),
+                                child: p.label,
+                              ),
                             )
                             .toList(),
                   );
