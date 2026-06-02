@@ -11,6 +11,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/meta"
 )
 
@@ -62,6 +63,7 @@ func (t cmdCommunityImport) Run(gctx *cmdopts.Global) (err error) {
 				MagnetURI:     pc.MagnetUri,
 				LibraryID:     stringsx.FirstNonBlank(pc.LibraryId, uuid.Nil.String()),
 				OAuthGoogleID: uuid.Nil.String(),
+				PublishedAt:   timex.Inf(),
 			}
 			err = community.PublishedContentInsertWithDefaults(gctx.Context, db, dbpc).Scan(&dbpc)
 		}

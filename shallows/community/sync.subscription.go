@@ -65,14 +65,14 @@ func SyncPublishedContentItem(ctx context.Context, q sqlx.Queryer, pc *meta.Publ
 		}
 	}
 
-	dbpc := PublishedContent{
+	dbpc := NewPublishedContent(PublishedContent{
 		ID:            pc.Id,
 		CommunityID:   pc.CommunityId,
 		MagnetURI:     pc.MagnetUri,
 		LibraryID:     stringsx.FirstNonBlank(pc.LibraryId, uuid.Nil.String()),
-		OAuthGoogleID: stringsx.FirstNonBlank(pc.OauthGoogleId, uuid.Nil.String()),
+		OAuthGoogleID: pc.OauthGoogleId,
 		KnownMediaID:  tmeta.KnownMediaID,
-	}
+	})
 
 	if err = PublishedContentInsertWithDefaults(ctx, q, dbpc).Scan(&dbpc); err != nil {
 		return errorsx.Wrap(err, "failed to insert published content")

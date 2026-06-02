@@ -156,22 +156,18 @@ func TestPublishedListEndpoint(t *testing.T) {
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd2).Scan(&lmd2))
 
-		pc1 := community.PublishedContent{
-			CommunityID:   communityID,
-			LibraryID:     lmd1.ID,
-			KnownMediaID:  uuid.Nil.String(),
-			OAuthGoogleID: uuid.Nil.String(),
-			Bytes:         lmd1.Bytes,
-		}
+		pc1 := community.NewPublishedContent(community.PublishedContent{
+			CommunityID: communityID,
+			LibraryID:   lmd1.ID,
+			Bytes:       lmd1.Bytes,
+		})
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc1).Scan(&pc1))
 
-		pc2 := community.PublishedContent{
-			CommunityID:   communityID,
-			LibraryID:     lmd2.ID,
-			KnownMediaID:  uuid.Nil.String(),
-			OAuthGoogleID: uuid.Nil.String(),
-			Bytes:         lmd2.Bytes,
-		}
+		pc2 := community.NewPublishedContent(community.PublishedContent{
+			CommunityID: communityID,
+			LibraryID:   lmd2.ID,
+			Bytes:       lmd2.Bytes,
+		})
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc2).Scan(&pc2))
 		require.NoError(t, community.PublishedContentTombstone(ctx, q, pc2.ID).Scan(&pc2))
 
@@ -245,23 +241,19 @@ func TestPublishedListEndpoint(t *testing.T) {
 
 		now := time.Now()
 
-		pc1 := community.PublishedContent{
-			CommunityID:   communityID,
-			LibraryID:     lmd1.ID,
-			KnownMediaID:  uuid.Nil.String(),
-			OAuthGoogleID: uuid.Nil.String(),
-			Bytes:         lmd1.Bytes,
-		}
+		pc1 := community.NewPublishedContent(community.PublishedContent{
+			CommunityID: communityID,
+			LibraryID:   lmd1.ID,
+			Bytes:       lmd1.Bytes,
+		})
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc1).Scan(&pc1))
 		require.NoError(t, community.PublishedContentUpdatePublishedAt(ctx, q, pc1.ID, now.Add(-48*time.Hour)).Scan(&pc1))
 
-		pc2 := community.PublishedContent{
-			CommunityID:   communityID,
-			LibraryID:     lmd2.ID,
-			KnownMediaID:  uuid.Nil.String(),
-			OAuthGoogleID: uuid.Nil.String(),
-			Bytes:         lmd2.Bytes,
-		}
+		pc2 := community.NewPublishedContent(community.PublishedContent{
+			CommunityID: communityID,
+			LibraryID:   lmd2.ID,
+			Bytes:       lmd2.Bytes,
+		})
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc2).Scan(&pc2))
 		require.NoError(t, community.PublishedContentUpdatePublishedAt(ctx, q, pc2.ID, now.Add(-24*time.Hour)).Scan(&pc2))
 

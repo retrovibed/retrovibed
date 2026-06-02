@@ -83,14 +83,13 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
-		pc := PublishedContent{
-			CommunityID:   communityID,
-			KnownMediaID:  uuid.Must(uuid.NewV7()).String(),
-			MagnetURI:     "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33",
-			LibraryID:     libraryID,
-			PublishMode:   int32(meta.PublishMode_SYNDICATED),
-			OAuthGoogleID: uuid.Nil.String(),
-		}
+		pc := NewPublishedContent(PublishedContent{
+			CommunityID:  communityID,
+			KnownMediaID: uuid.Must(uuid.NewV7()).String(),
+			MagnetURI:    "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33",
+			LibraryID:    libraryID,
+			PublishMode:  int32(meta.PublishMode_SYNDICATED),
+		})
 		require.NoError(t, PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
 		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, fsx.DirVirtual(t.TempDir()), fsx.DirVirtual(t.TempDir()))
@@ -122,14 +121,13 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
-		pc := PublishedContent{
-			CommunityID:   communityID,
-			KnownMediaID:  uuid.Must(uuid.NewV7()).String(),
-			MagnetURI:     "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33",
-			LibraryID:     libraryID,
-			PublishMode:   int32(meta.PublishMode_SYNDICATED),
-			OAuthGoogleID: uuid.Nil.String(),
-		}
+		pc := NewPublishedContent(PublishedContent{
+			CommunityID:  communityID,
+			KnownMediaID: uuid.Must(uuid.NewV7()).String(),
+			MagnetURI:    "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33",
+			LibraryID:    libraryID,
+			PublishMode:  int32(meta.PublishMode_SYNDICATED),
+		})
 		require.NoError(t, PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
 		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, fsx.DirVirtual(t.TempDir()), fsx.DirVirtual(t.TempDir()))
@@ -167,14 +165,13 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
-		pc := PublishedContent{
-			CommunityID:   communityID,
-			KnownMediaID:  uuid.Must(uuid.NewV7()).String(),
-			MagnetURI:     "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33",
-			LibraryID:     libraryID,
-			PublishMode:   int32(meta.PublishMode_SYNDICATED),
-			OAuthGoogleID: uuid.Nil.String(),
-		}
+		pc := NewPublishedContent(PublishedContent{
+			CommunityID:  communityID,
+			KnownMediaID: uuid.Must(uuid.NewV7()).String(),
+			MagnetURI:    "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33",
+			LibraryID:    libraryID,
+			PublishMode:  int32(meta.PublishMode_SYNDICATED),
+		})
 		require.NoError(t, PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 		require.NoError(t, PublishedContentUpdatePublishedAt(ctx, q, pc.ID, time.Now()).Scan(&pc))
 
@@ -214,14 +211,13 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
-		pc := PublishedContent{
-			CommunityID:   communityID,
-			KnownMediaID:  uuid.Must(uuid.NewV7()).String(),
-			MagnetURI:     "",
-			LibraryID:     libraryID,
-			PublishMode:   int32(meta.PublishMode_SYNDICATED),
-			OAuthGoogleID: uuid.Nil.String(),
-		}
+		pc := NewPublishedContent(PublishedContent{
+			CommunityID:  communityID,
+			KnownMediaID: uuid.Must(uuid.NewV7()).String(),
+			MagnetURI:    "",
+			LibraryID:    libraryID,
+			PublishMode:  int32(meta.PublishMode_SYNDICATED),
+		})
 		require.NoError(t, PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
 		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, fsx.DirVirtual(mediaDir), fsx.DirVirtual(torrentDir))
@@ -264,14 +260,13 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
-		pc := PublishedContent{
-			CommunityID:   communityID,
-			KnownMediaID:  uuid.Must(uuid.NewV7()).String(),
-			MagnetURI:     "",
-			LibraryID:     libraryID,
-			PublishMode:   int32(meta.PublishMode_SYNDICATED),
-			OAuthGoogleID: uuid.Nil.String(),
-		}
+		pc := NewPublishedContent(PublishedContent{
+			CommunityID:  communityID,
+			KnownMediaID: uuid.Must(uuid.NewV7()).String(),
+			MagnetURI:    "",
+			LibraryID:    libraryID,
+			PublishMode:  int32(meta.PublishMode_SYNDICATED),
+		})
 		require.NoError(t, PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
 		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, fsx.DirVirtual(mediaDir), fsx.DirVirtual(torrentDir))
@@ -341,14 +336,13 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
-		pc := PublishedContent{
-			CommunityID:   communityID,
-			KnownMediaID:  uuid.Must(uuid.NewV7()).String(),
-			MagnetURI:     "",
-			LibraryID:     libraryID,
-			PublishMode:   int32(meta.PublishMode_SYNDICATED),
-			OAuthGoogleID: uuid.Nil.String(),
-		}
+		pc := NewPublishedContent(PublishedContent{
+			CommunityID:  communityID,
+			KnownMediaID: uuid.Must(uuid.NewV7()).String(),
+			MagnetURI:    "",
+			LibraryID:    libraryID,
+			PublishMode:  int32(meta.PublishMode_SYNDICATED),
+		})
 		require.NoError(t, PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
 		err = SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, fsx.DirVirtual(mediaDir), fsx.DirVirtual(torrentDir))
@@ -383,14 +377,13 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
-		pc := PublishedContent{
-			CommunityID:   communityID,
-			KnownMediaID:  uuid.Must(uuid.NewV7()).String(),
-			MagnetURI:     "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33",
-			LibraryID:     libraryID,
-			PublishMode:   int32(meta.PublishMode_UNLISTED),
-			OAuthGoogleID: uuid.Nil.String(),
-		}
+		pc := NewPublishedContent(PublishedContent{
+			CommunityID:  communityID,
+			KnownMediaID: uuid.Must(uuid.NewV7()).String(),
+			MagnetURI:    "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33",
+			LibraryID:    libraryID,
+			PublishMode:  int32(meta.PublishMode_UNLISTED),
+		})
 		require.NoError(t, PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
 		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, fsx.DirVirtual(t.TempDir()), fsx.DirVirtual(t.TempDir()))
@@ -458,14 +451,13 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
-		pc := PublishedContent{
-			CommunityID:   communityID,
-			KnownMediaID:  uuid.Must(uuid.NewV7()).String(),
-			MagnetURI:     "",
-			LibraryID:     libraryID,
-			PublishMode:   int32(meta.PublishMode_SYNDICATED),
-			OAuthGoogleID: uuid.Nil.String(),
-		}
+		pc := NewPublishedContent(PublishedContent{
+			CommunityID:  communityID,
+			KnownMediaID: uuid.Must(uuid.NewV7()).String(),
+			MagnetURI:    "",
+			LibraryID:    libraryID,
+			PublishMode:  int32(meta.PublishMode_SYNDICATED),
+		})
 		require.NoError(t, PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
 		err = SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, mvfs, tvfs)
@@ -506,14 +498,13 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
-		pc := PublishedContent{
-			CommunityID:   communityID,
-			KnownMediaID:  uuid.Must(uuid.NewV7()).String(),
-			MagnetURI:     "",
-			LibraryID:     libraryID,
-			PublishMode:   int32(meta.PublishMode_SYNDICATED),
-			OAuthGoogleID: uuid.Nil.String(),
-		}
+		pc := NewPublishedContent(PublishedContent{
+			CommunityID:  communityID,
+			KnownMediaID: uuid.Must(uuid.NewV7()).String(),
+			MagnetURI:    "",
+			LibraryID:    libraryID,
+			PublishMode:  int32(meta.PublishMode_SYNDICATED),
+		})
 		require.NoError(t, PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
 		mvfs := fsx.DirVirtual(mediaDir)
@@ -564,13 +555,12 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
-		pc := PublishedContent{
-			CommunityID:   communityID,
-			KnownMediaID:  uuid.Must(uuid.NewV7()).String(),
-			LibraryID:     libraryID,
-			PublishMode:   int32(meta.PublishMode_SYNDICATED),
-			OAuthGoogleID: uuid.Nil.String(),
-		}
+		pc := NewPublishedContent(PublishedContent{
+			CommunityID:  communityID,
+			KnownMediaID: uuid.Must(uuid.NewV7()).String(),
+			LibraryID:    libraryID,
+			PublishMode:  int32(meta.PublishMode_SYNDICATED),
+		})
 		require.NoError(t, PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
 		mvfs := fsx.DirVirtual(mediaDir)
@@ -620,14 +610,13 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
-		pc := PublishedContent{
-			CommunityID:   communityID,
-			KnownMediaID:  uuid.Must(uuid.NewV7()).String(),
-			MagnetURI:     "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33",
-			LibraryID:     libraryID,
-			PublishMode:   int32(meta.PublishMode_LISTED),
-			OAuthGoogleID: uuid.Nil.String(),
-		}
+		pc := NewPublishedContent(PublishedContent{
+			CommunityID:  communityID,
+			KnownMediaID: uuid.Must(uuid.NewV7()).String(),
+			MagnetURI:    "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33",
+			LibraryID:    libraryID,
+			PublishMode:  int32(meta.PublishMode_LISTED),
+		})
 		require.NoError(t, PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
 		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, fsx.DirVirtual(t.TempDir()), fsx.DirVirtual(t.TempDir()))
@@ -669,14 +658,13 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
-		pc := PublishedContent{
-			CommunityID:   communityID,
-			KnownMediaID:  known.UID,
-			MagnetURI:     "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33",
-			LibraryID:     libraryID,
-			PublishMode:   int32(meta.PublishMode_SYNDICATED),
-			OAuthGoogleID: uuid.Nil.String(),
-		}
+		pc := NewPublishedContent(PublishedContent{
+			CommunityID:  communityID,
+			KnownMediaID: known.UID,
+			MagnetURI:    "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33",
+			LibraryID:    libraryID,
+			PublishMode:  int32(meta.PublishMode_SYNDICATED),
+		})
 		require.NoError(t, PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
 		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, fsx.DirVirtual(t.TempDir()), fsx.DirVirtual(t.TempDir()))
@@ -710,14 +698,13 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
-		pc := PublishedContent{
-			CommunityID:   communityID,
-			KnownMediaID:  uuid.Must(uuid.NewV7()).String(),
-			MagnetURI:     "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33",
-			LibraryID:     libraryID,
-			PublishMode:   int32(meta.PublishMode_SYNDICATED),
-			OAuthGoogleID: uuid.Nil.String(),
-		}
+		pc := NewPublishedContent(PublishedContent{
+			CommunityID:  communityID,
+			KnownMediaID: uuid.Must(uuid.NewV7()).String(),
+			MagnetURI:    "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33",
+			LibraryID:    libraryID,
+			PublishMode:  int32(meta.PublishMode_SYNDICATED),
+		})
 		require.NoError(t, PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
 		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, fsx.DirVirtual(t.TempDir()), fsx.DirVirtual(t.TempDir()))
@@ -748,14 +735,13 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
-		pc := PublishedContent{
-			CommunityID:   communityID,
-			KnownMediaID:  uuid.Must(uuid.NewV7()).String(),
-			MagnetURI:     "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33",
-			LibraryID:     libraryID,
-			PublishMode:   int32(meta.PublishMode_SYNDICATED),
-			OAuthGoogleID: uuid.Nil.String(),
-		}
+		pc := NewPublishedContent(PublishedContent{
+			CommunityID:  communityID,
+			KnownMediaID: uuid.Must(uuid.NewV7()).String(),
+			MagnetURI:    "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33",
+			LibraryID:    libraryID,
+			PublishMode:  int32(meta.PublishMode_SYNDICATED),
+		})
 		require.NoError(t, PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
 		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, fsx.DirVirtual(t.TempDir()), fsx.DirVirtual(t.TempDir()))
@@ -800,14 +786,13 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
-		pc := PublishedContent{
-			CommunityID:   communityID,
-			KnownMediaID:  uuid.Must(uuid.NewV7()).String(),
-			MagnetURI:     "",
-			LibraryID:     libraryID,
-			PublishMode:   int32(meta.PublishMode_SYNDICATED),
-			OAuthGoogleID: uuid.Nil.String(),
-		}
+		pc := NewPublishedContent(PublishedContent{
+			CommunityID:  communityID,
+			KnownMediaID: uuid.Must(uuid.NewV7()).String(),
+			MagnetURI:    "",
+			LibraryID:    libraryID,
+			PublishMode:  int32(meta.PublishMode_SYNDICATED),
+		})
 		require.NoError(t, PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
 		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, archiver, fsx.DirVirtual(mediaDir), fsx.DirVirtual(torrentDir))

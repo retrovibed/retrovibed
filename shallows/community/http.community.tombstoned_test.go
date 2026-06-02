@@ -85,13 +85,11 @@ func TestTombstonedEndpoint(t *testing.T) {
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
-		pc := community.PublishedContent{
-			CommunityID:   communityID,
-			LibraryID:     lmd.ID,
-			KnownMediaID:  uuid.Nil.String(),
-			OAuthGoogleID: uuid.Nil.String(),
-			Bytes:         lmd.Bytes,
-		}
+		pc := community.NewPublishedContent(community.PublishedContent{
+			CommunityID: communityID,
+			LibraryID:   lmd.ID,
+			Bytes:       lmd.Bytes,
+		})
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
 		routes := mux.NewRouter()
@@ -152,13 +150,11 @@ func TestTombstonedEndpoint(t *testing.T) {
 				EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
 			}
 			require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
-			pc := community.PublishedContent{
-				CommunityID:   communityID,
-				LibraryID:     lmd.ID,
-				KnownMediaID:  uuid.Nil.String(),
-				OAuthGoogleID: uuid.Nil.String(),
-				Bytes:         lmd.Bytes,
-			}
+			pc := community.NewPublishedContent(community.PublishedContent{
+				CommunityID: communityID,
+				LibraryID:   lmd.ID,
+				Bytes:       lmd.Bytes,
+			})
 			require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 			return pc
 		}

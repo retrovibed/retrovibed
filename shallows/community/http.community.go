@@ -12,7 +12,6 @@ import (
 
 	"github.com/Masterminds/squirrel"
 	"github.com/go-playground/form/v4"
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
 	"github.com/retrovibed/retrovibed/retroapi/httpauth"
@@ -221,17 +220,18 @@ func (t *HTTP) publish(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pc := PublishedContent{
+	pc := NewPublishedContent(PublishedContent{
 		Title:         stringsx.FirstNonBlank(req.PublishedContent.Title, lmd.Description),
 		Description:   req.PublishedContent.Description,
 		CommunityID:   communityID,
 		KnownMediaID:  stringsx.FirstNonBlank(req.PublishedContent.KnownMediaId, lmd.KnownMediaID),
 		LibraryID:     lmd.ID,
 		PublishMode:   int32(req.PublishMode),
-		OAuthGoogleID: stringsx.FirstNonBlank(req.PublishedContent.OauthGoogleId, uuid.Nil.String()),
+		OAuthGoogleID: req.PublishedContent.OauthGoogleId,
 		Bytes:         lmd.Bytes,
 		Mimetype:      lmd.Mimetype,
-	}
+		PublishedAt:   errorsx.Zero(grpcx.DecodeTime(langx.FirstNonZero(req.PublishedContent.PublishedAt, grpcx.EncodeTime(timex.Inf())))),
+	})
 
 	if err = PublishedContentInsertWithDefaults(r.Context(), t.q, pc).Scan(&pc); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to insert published content"))
@@ -351,24 +351,6 @@ func (t *HTTP) metrics(w http.ResponseWriter, r *http.Request) {
 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &msg); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to write response"))
 		return
-	}
-}
-
-// PublishedContentOptionFromDB converts a database model to proto options.
-func PublishedContentOptionFromDB(pc PublishedContent) func(*meta.PublishedContent) {
-	return func(p *meta.PublishedContent) {
-		p.Id = pc.ID
-		p.Title = pc.Title
-		p.Description = pc.Description
-		p.CommunityId = pc.CommunityID
-		p.KnownMediaId = pc.KnownMediaID
-		p.MagnetUri = pc.MagnetURI
-		p.LibraryId = pc.LibraryID
-		p.OauthGoogleId = pc.OAuthGoogleID
-		p.PublishedAt = grpcx.EncodeTime(pc.PublishedAt)
-		p.CreatedAt = grpcx.EncodeTime(pc.CreatedAt)
-		p.UpdatedAt = grpcx.EncodeTime(pc.UpdatedAt)
-		p.Bytes = pc.Bytes
 	}
 }
 
