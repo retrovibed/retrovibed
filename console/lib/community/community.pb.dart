@@ -1440,11 +1440,13 @@ class PublishContentDeleteResponse extends $pb.GeneratedMessage {
 class PublishedContentListRequest extends $pb.GeneratedMessage {
   factory PublishedContentListRequest({
     $core.String? communityId,
+    $core.String? query,
     $fixnum.Int64? offset,
     $fixnum.Int64? limit,
   }) {
     final result = create();
     if (communityId != null) result.communityId = communityId;
+    if (query != null) result.query = query;
     if (offset != null) result.offset = offset;
     if (limit != null) result.limit = limit;
     return result;
@@ -1465,6 +1467,7 @@ class PublishedContentListRequest extends $pb.GeneratedMessage {
           _omitMessageNames ? '' : 'retrovibed.community'),
       createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'community_id')
+    ..aOS(2, _omitFieldNames ? '' : 'query')
     ..a<$fixnum.Int64>(
         900, _omitFieldNames ? '' : 'offset', $pb.PbFieldType.OU6,
         defaultOrMaker: $fixnum.Int64.ZERO)
@@ -1503,21 +1506,30 @@ class PublishedContentListRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   void clearCommunityId() => $_clearField(1);
 
+  @$pb.TagNumber(2)
+  $core.String get query => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set query($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasQuery() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearQuery() => $_clearField(2);
+
   @$pb.TagNumber(900)
-  $fixnum.Int64 get offset => $_getI64(1);
+  $fixnum.Int64 get offset => $_getI64(2);
   @$pb.TagNumber(900)
-  set offset($fixnum.Int64 value) => $_setInt64(1, value);
+  set offset($fixnum.Int64 value) => $_setInt64(2, value);
   @$pb.TagNumber(900)
-  $core.bool hasOffset() => $_has(1);
+  $core.bool hasOffset() => $_has(2);
   @$pb.TagNumber(900)
   void clearOffset() => $_clearField(900);
 
   @$pb.TagNumber(901)
-  $fixnum.Int64 get limit => $_getI64(2);
+  $fixnum.Int64 get limit => $_getI64(3);
   @$pb.TagNumber(901)
-  set limit($fixnum.Int64 value) => $_setInt64(2, value);
+  set limit($fixnum.Int64 value) => $_setInt64(3, value);
   @$pb.TagNumber(901)
-  $core.bool hasLimit() => $_has(2);
+  $core.bool hasLimit() => $_has(3);
   @$pb.TagNumber(901)
   void clearLimit() => $_clearField(901);
 }

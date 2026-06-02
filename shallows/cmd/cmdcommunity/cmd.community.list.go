@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/Masterminds/squirrel"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -45,7 +46,13 @@ func (t cmdCommunityList) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClient) 
 		return errorsx.Wrap(err, "failed to encode community")
 	}
 
-	q := sqlx.Scan(community.PublishedContentFindByCommunityID(gctx.Context, db, commresp.Community.Id))
+	q := sqlx.Scan(community.PublishedContentSearch(gctx.Context, db, community.PublishedContentSearchBuilder().Where(
+		squirrel.And{
+			community.PublishedContentQueryCommunityID(commresp.Community.Id),
+			community.PublishedContentQueryNotTombstoned(),
+		},
+	).OrderBy("published_at DESC")))
+
 	for pc := range q.Iter() {
 		tmp := langx.Clone(meta.PublishedContent{}, community.PublishedContentOptionFromDB(langx.Clone(pc, timex.JSONSafeEncodeOption)))
 		tmp.CommunityId = commresp.Community.Id

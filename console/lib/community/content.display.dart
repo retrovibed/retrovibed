@@ -12,8 +12,7 @@ typedef FnPublished =
     Future<PublishedContentListResponse> Function(
       String id, {
       List<httpx.Option> options,
-      int offset,
-      int limit,
+      PublishedContentListRequest req,
     });
 
 typedef FnPublishedTombstone =
@@ -45,6 +44,7 @@ class _CommunityContentDisplayState extends State<CommunityContentDisplay> {
     next: PublishedContentListRequest(
       offset: ds.Int64(0),
       limit: ds.Int64(20),
+      query: "",
     ),
   );
   bool _loading = true;
@@ -77,9 +77,8 @@ class _CommunityContentDisplayState extends State<CommunityContentDisplay> {
         .withRetry(
           () => widget.apipublished(
             widget.community.id,
+            req: req,
             options: [authn.request(authn.AuthzCache.meta(context))],
-            offset: req.offset.toInt(),
-            limit: req.limit.toInt(),
           ),
         )
         .then((response) {
@@ -108,6 +107,8 @@ class _CommunityContentDisplayState extends State<CommunityContentDisplay> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final defaults = ds.Defaults.of(context);
+    final session = authn.Authenticated.syncSession(context);
+    final owned = session.account.id == widget.community.accountId;
 
     return ds.Table<PublishedContent>(
       ds.Table.expanded<PublishedContent>(
@@ -115,15 +116,17 @@ class _CommunityContentDisplayState extends State<CommunityContentDisplay> {
           community: widget.community,
           item: item,
           onDelete:
-              (content) => httpx
-                  .withRetry(
-                    () => widget.apitombstone(content.id, options: [authn.request(authn.AuthzCache.meta(context))]),
-                  )
-                  .then((_) {
-                    setState(() {
-                      _resp.items.remove(content);
-                    });
-                  }),
+              owned
+                  ? (content) => httpx
+                      .withRetry(
+                        () => widget.apitombstone(content.id, options: [authn.request(authn.AuthzCache.meta(context))]),
+                      )
+                      .then((_) {
+                        setState(() {
+                          _resp.items.remove(content);
+                        });
+                      })
+                  : null,
         ),
       ),
       loading: _loading,
@@ -131,8 +134,13 @@ class _CommunityContentDisplayState extends State<CommunityContentDisplay> {
       children: _resp.items,
       leading: ds.SearchTray(
         decoration: InputDecoration(hintText: "search content"),
-        onSubmitted: (_) {
-          setState(() => _resp.next..offset = ds.Int64(0));
+        onSubmitted: (q) {
+          setState(
+            () =>
+                _resp.next
+                  ..query = q
+                  ..offset = ds.Int64(0),
+          );
           return _refresh(_resp.next);
         },
         next: (i) {

@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/Masterminds/squirrel"
 	"github.com/go-playground/form/v4"
 	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
@@ -18,6 +19,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/deeppool"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
+	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
@@ -25,6 +27,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/grpcx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
+	"github.com/retrovibed/retrovibed/shallows/internal/lucenex"
 	"github.com/retrovibed/retrovibed/shallows/internal/numericx"
 	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
@@ -75,6 +78,7 @@ func NewHTTP(q sqlx.Queryer, options ...HTTPOption) *HTTP {
 		jwtsecret:  env.JWTSecret,
 		decoder:    formx.NewDecoder(),
 		publishing: asyncx.NewWakeup(context.Background()),
+		lucene:     duckdbx.NewLucene(),
 	}, options...)
 
 	return &svc
@@ -88,6 +92,7 @@ type HTTP struct {
 	publishing     *asyncx.Wakeup
 	mediastorage   fsx.Virtual
 	torrentstorage fsx.Virtual
+	lucene         lucenex.Driver
 }
 
 func (t *HTTP) Bind(r *mux.Router) {
@@ -267,7 +272,14 @@ func (t *HTTP) published(w http.ResponseWriter, r *http.Request) {
 	}
 	msg.Next.Limit = numericx.Min(msg.Next.Limit, 100)
 
-	q := sqlx.Scan(PublishedContentFindByCommunityID(r.Context(), t.q, communityID))
+	q := sqlx.Scan(PublishedContentSearch(r.Context(), t.q, PublishedContentSearchBuilder().Where(
+		squirrel.And{
+			PublishedContentQueryCommunityID(communityID),
+			PublishedContentQueryNotTombstoned(),
+			lucenex.Query(t.lucene, msg.Next.Query, lucenex.WithDefaultField("title")),
+		},
+	).OrderBy("published_at DESC")))
+
 	for pc := range q.Iter() {
 		tmp := langx.Clone(meta.PublishedContent{}, PublishedContentOptionFromDB(langx.Clone(pc, timex.JSONSafeEncodeOption)))
 		msg.Items = append(msg.Items, &tmp)

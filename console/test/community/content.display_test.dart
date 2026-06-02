@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:retrovibed/httpx.dart' as httpx;
@@ -7,6 +6,7 @@ import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'package:retrovibed/community/content.detail.dart';
 import 'package:retrovibed/community/content.display.dart';
 import 'package:retrovibed/community/community.pb.dart';
+import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/design.kit/modals.dart' as modals;
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
 
@@ -21,30 +21,29 @@ Community _testCommunity() => Community(
 Future<PublishedContentListResponse> _empty(
   String id, {
   List<httpx.Option> options = const [],
-  int offset = 0,
-  int limit = 100,
+  PublishedContentListRequest? req,
 }) async {
+  final r = req ?? PublishedContentListRequest(offset: ds.Int64(0), limit: ds.Int64(100));
   return PublishedContentListResponse(
     items: [],
-    next: PublishedContentListRequest(offset: Int64(offset), limit: Int64(limit)),
+    next: r,
   );
 }
 
 Future<PublishedContentListResponse> _noop(
   String id, {
   List<httpx.Option> options = const [],
-  int offset = 0,
-  int limit = 100,
+  PublishedContentListRequest? req,
 }) => Completer<PublishedContentListResponse>().future;
 
 Future<PublishedContentListResponse> _withContent(
   String id, {
   List<httpx.Option> options = const [],
-  int offset = 0,
-  int limit = 100,
+  PublishedContentListRequest? req,
 }) async {
+  final r = req ?? PublishedContentListRequest(offset: ds.Int64(0), limit: ds.Int64(100));
   return PublishedContentListResponse(
-    next: PublishedContentListRequest(offset: Int64(offset), limit: Int64(limit)),
+    next: r,
     items: [
       PublishedContent(
         id: 'pc-1',
@@ -53,7 +52,7 @@ Future<PublishedContentListResponse> _withContent(
         magnetUri: 'magnet:?xt=urn:btih:abc123',
         title: 'Movie One',
         mimetype: 'video/mp4',
-        bytes: Int64(1500000000),
+        bytes: ds.Int64(1500000000),
         publishedAt: '2026-01-15T10:00:00Z',
       ),
       PublishedContent(
@@ -63,7 +62,7 @@ Future<PublishedContentListResponse> _withContent(
         magnetUri: 'magnet:?xt=urn:btih:def456',
         title: 'Movie Two',
         mimetype: 'video/mp4',
-        bytes: Int64(800000000),
+        bytes: ds.Int64(800000000),
         publishedAt: '2026-02-10T14:30:00Z',
       ),
     ],
@@ -73,11 +72,11 @@ Future<PublishedContentListResponse> _withContent(
 Future<PublishedContentListResponse> _withArchivedContent(
   String id, {
   List<httpx.Option> options = const [],
-  int offset = 0,
-  int limit = 100,
+  PublishedContentListRequest? req,
 }) async {
+  final r = req ?? PublishedContentListRequest(offset: ds.Int64(0), limit: ds.Int64(100));
   return PublishedContentListResponse(
-    next: PublishedContentListRequest(offset: Int64(offset), limit: Int64(limit)),
+    next: r,
     items: [
       PublishedContent(
         id: 'pc-1',
@@ -86,7 +85,7 @@ Future<PublishedContentListResponse> _withArchivedContent(
         magnetUri: 'magnet:?xt=urn:btih:abc123',
         title: 'Archived Movie',
         mimetype: 'video/mp4',
-        bytes: Int64(1500000000),
+        bytes: ds.Int64(1500000000),
         publishedAt: '2026-01-15T10:00:00Z',
         archivedId: uuidx.withSuffix(1),
       ),
@@ -97,7 +96,7 @@ Future<PublishedContentListResponse> _withArchivedContent(
         magnetUri: 'magnet:?xt=urn:btih:def456',
         title: 'Unarchived Movie',
         mimetype: 'video/mp4',
-        bytes: Int64(800000000),
+        bytes: ds.Int64(800000000),
         publishedAt: '2026-02-10T14:30:00Z',
         archivedId: uuidx.min(),
       ),
@@ -108,11 +107,11 @@ Future<PublishedContentListResponse> _withArchivedContent(
 Future<PublishedContentListResponse> _withLongContent(
   String id, {
   List<httpx.Option> options = const [],
-  int offset = 0,
-  int limit = 100,
+  PublishedContentListRequest? req,
 }) async {
+  final r = req ?? PublishedContentListRequest(offset: ds.Int64(0), limit: ds.Int64(100));
   return PublishedContentListResponse(
-    next: PublishedContentListRequest(offset: Int64(0), limit: Int64(limit)),
+    next: r,
     items: [
       PublishedContent(
         id: 'pc-long',
@@ -121,7 +120,7 @@ Future<PublishedContentListResponse> _withLongContent(
         magnetUri: 'magnet:?xt=urn:btih:${'x' * 40}',
         title: 'A' * 200,
         mimetype: 'video/mp4',
-        bytes: Int64(1500000000),
+        bytes: ds.Int64(1500000000),
         publishedAt: '2026-01-15T10:00:00Z',
       ),
     ],
