@@ -71,11 +71,13 @@ class ManagementListDisplayItem extends StatelessWidget {
               update: (updated) {
                 var auth = [authn.DeeppoolAuthzCache.bearer(context)];
                 return httpx.withRetry(
-                  () => API.update(
-                    updated.id,
-                    CommunityUpdateRequest(community: updated),
-                    options: auth,
-                  ),
+                  () {
+                    return API.update(
+                      updated.id,
+                      CommunityUpdateRequest(community: updated),
+                      options: auth,
+                    );
+                  },
                 );
               },
               onUpdate: (c) => onChanged?.call(c),

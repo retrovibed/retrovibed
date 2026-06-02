@@ -296,8 +296,6 @@ class _PlaylistState extends State<Playlist> {
   @override
   Widget build(BuildContext context) {
     return FocusScope(
-      // JAL: we believe this was added to deal with prior issues with mediakits state management nonsense.
-      // key: ValueKey(_queue.current.id), // causes VideoControlsThemeDataInjector deactivated-ancestor crash in media_kit_video
       node: _selffocus,
       child: widget.child,
     );

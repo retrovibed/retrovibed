@@ -1114,6 +1114,7 @@ func (x *PublishContentDeleteResponse) GetPublishedContent() *PublishedContent {
 type PublishedContentListRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	CommunityId   string                 `protobuf:"bytes,1,opt,name=community_id,proto3" json:"community_id,omitempty"`
+	Query         string                 `protobuf:"bytes,2,opt,name=query,proto3" json:"query,omitempty"`
 	Offset        uint64                 `protobuf:"varint,900,opt,name=offset,proto3" json:"offset,omitempty"`
 	Limit         uint64                 `protobuf:"varint,901,opt,name=limit,proto3" json:"limit,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -1153,6 +1154,13 @@ func (*PublishedContentListRequest) Descriptor() ([]byte, []int) {
 func (x *PublishedContentListRequest) GetCommunityId() string {
 	if x != nil {
 		return x.CommunityId
+	}
+	return ""
+}
+
+func (x *PublishedContentListRequest) GetQuery() string {
+	if x != nil {
+		return x.Query
 	}
 	return ""
 }
@@ -1926,11 +1934,12 @@ const file_community_proto_rawDesc = "" +
 	"\x1bPublishContentDeleteRequest\x12T\n" +
 	"\x11published_content\x18\x01 \x01(\v2&.retrovibed.community.PublishedContentR\x11published_content\"t\n" +
 	"\x1cPublishContentDeleteResponse\x12T\n" +
-	"\x11published_content\x18\x01 \x01(\v2&.retrovibed.community.PublishedContentR\x11published_content\"\x80\x01\n" +
+	"\x11published_content\x18\x01 \x01(\v2&.retrovibed.community.PublishedContentR\x11published_content\"\x96\x01\n" +
 	"\x1bPublishedContentListRequest\x12\"\n" +
-	"\fcommunity_id\x18\x01 \x01(\tR\fcommunity_id\x12\x17\n" +
+	"\fcommunity_id\x18\x01 \x01(\tR\fcommunity_id\x12\x14\n" +
+	"\x05query\x18\x02 \x01(\tR\x05query\x12\x17\n" +
 	"\x06offset\x18\x84\a \x01(\x04R\x06offset\x12\x15\n" +
-	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\x02\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"\xe2\x01\n" +
+	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\x03\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"\xe2\x01\n" +
 	"\x1cPublishedContentListResponse\x12=\n" +
 	"\tcommunity\x18\x01 \x01(\v2\x1f.retrovibed.community.CommunityR\tcommunity\x12E\n" +
 	"\x04next\x18\x02 \x01(\v21.retrovibed.community.PublishedContentListRequestR\x04next\x12<\n" +

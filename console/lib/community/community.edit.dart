@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/design.kit/forms.dart' as forms;
+import 'package:retrovibed/design.kit/inputs.dart' as inputs;
+import 'package:retrovibed/authn.dart' as authn;
+import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/community/community.pb.dart';
 import 'package:retrovibed/community/publish.mode.edit.dart';
 import 'package:retrovibed/community/visibility.selector.dart';
@@ -65,6 +68,23 @@ class CommunityEdit extends StatelessWidget {
                 hintText: 'description',
                 border: OutlineInputBorder(),
               ),
+            ),
+          ),
+          forms.Field(
+            label: Text('Mimetype'),
+            input: inputs.Mimetype(
+              value: community.mimetype,
+              presets: [
+                (label: Text('binary (default)') as Widget, value: mimex.binary),
+                if (authn.developer(context).alpha) ...[
+                  (label: Text('metadata archive') as Widget, value: mimex.mediaarchive),
+                  (label: Text('neural') as Widget, value: mimex.neural),
+                ],
+              ],
+              onChanged: (v) => onChange(community..mimetype = v),
+            ),
+            help: Text(
+              'Mimetype is used to provide the default to content uploaded to this commmunity, generally speaking you should leave it defaulted',
             ),
           ),
           VisibilitySelector(

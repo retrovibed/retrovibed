@@ -101,14 +101,12 @@ class API {
   static Future<PublishedContentListResponse> published(
     String cid, {
     List<httpx.Option> options = const [],
-    int offset = 0,
-    int limit = 100,
+    PublishedContentListRequest? req,
   }) async {
-    final req =
-        PublishedContentListRequest()
-          ..communityId = cid
-          ..offset = fixnum.Int64(offset)
-          ..limit = fixnum.Int64(limit);
+    req ??= PublishedContentListRequest();
+    req.communityId = cid;
+    if (req.limit.isZero) req.limit = fixnum.Int64(100);
+
     return httpx
         .get(
           Uri.https(

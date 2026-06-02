@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
+import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'community.pb.dart';
 import 'community.edit.dart';
@@ -27,7 +28,7 @@ class CommunityCreate extends StatefulWidget {
 }
 
 class _CommunityCreateState extends State<CommunityCreate> {
-  Community _community = Community();
+  Community _community = Community(mimetype: mimex.binary);
   bool _creating = false;
   Widget _cause = ds.Error.zero;
 

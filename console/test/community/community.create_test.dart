@@ -7,8 +7,7 @@ import 'package:retrovibed/testing/widget_tester_extensions.dart';
 
 final _resolutions = Resolutions.variant();
 
-Future<CommunityCreateResponse> _noop(Community _) =>
-    Completer<CommunityCreateResponse>().future;
+Future<CommunityCreateResponse> _noop(Community _) => Completer<CommunityCreateResponse>().future;
 
 void main() {
   group('CommunityCreate', () {
@@ -16,6 +15,7 @@ void main() {
       Community? received;
 
       await tester.pumpApp(
+        physicalSize: const Size(800, 620),
         CommunityCreate(
           create: (c) {
             received = c;
@@ -28,7 +28,7 @@ void main() {
       await tester.pumpAndSettle();
 
       await tester.enterText(find.byType(TextFormField).first, 'mydomain');
-      await tester.enterText(find.byType(TextFormField).last, 'my description');
+      await tester.enterText(find.byType(TextFormField).at(1), 'my description');
       await tester.tap(find.text('Create'));
       await tester.pump();
 

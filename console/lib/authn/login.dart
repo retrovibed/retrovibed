@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' as foundation;
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/design.kit/forms.dart' as forms;
 import 'package:retrovibed/retrovibed.dart' as retro;
@@ -62,6 +63,7 @@ class _LoginState extends State<Login> {
   String _password = '';
   String _confirm = '';
   DeveloperMode flags = DeveloperMode(
+    alpha: foundation.kDebugMode,
     recommendations: !Platform.isMacOS,
     releases: !Platform.isMacOS,
   );

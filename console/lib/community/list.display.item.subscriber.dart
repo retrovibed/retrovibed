@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:retrovibed/designkit.dart' as ds;
-import 'package:retrovibed/community/api.dart';
-import 'package:retrovibed/community/qr.dart';
-import 'package:retrovibed/community/community.detail.dart';
-import 'package:retrovibed/community/community.button.subscribe.dart';
+import 'api.dart';
+import 'qr.dart';
+import 'community.detail.dart';
+import 'community.button.subscribe.dart';
+import 'content.display.dart';
 
 class SubscriberListDisplayItem extends StatelessWidget {
   final Community community;
@@ -61,6 +62,7 @@ class SubscriberListDisplayItem extends StatelessWidget {
               style: theme.textTheme.bodyMedium,
               textAlign: TextAlign.center,
             ),
+            CommunityContentDisplay(community: community),
           ],
         ),
       ),

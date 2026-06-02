@@ -461,11 +461,12 @@ const PublishedContentListRequest$json = {
   '1': 'PublishedContentListRequest',
   '2': [
     {'1': 'community_id', '3': 1, '4': 1, '5': 9, '10': 'community_id'},
+    {'1': 'query', '3': 2, '4': 1, '5': 9, '10': 'query'},
     {'1': 'offset', '3': 900, '4': 1, '5': 4, '10': 'offset'},
     {'1': 'limit', '3': 901, '4': 1, '5': 4, '10': 'limit'},
   ],
   '9': [
-    {'1': 2, '2': 900},
+    {'1': 3, '2': 900},
     {'1': 902, '2': 1000},
   ],
 };
@@ -474,8 +475,8 @@ const PublishedContentListRequest$json = {
 final $typed_data.Uint8List publishedContentListRequestDescriptor =
     $convert.base64Decode(
         'ChtQdWJsaXNoZWRDb250ZW50TGlzdFJlcXVlc3QSIgoMY29tbXVuaXR5X2lkGAEgASgJUgxjb2'
-        '1tdW5pdHlfaWQSFwoGb2Zmc2V0GIQHIAEoBFIGb2Zmc2V0EhUKBWxpbWl0GIUHIAEoBFIFbGlt'
-        'aXRKBQgCEIQHSgYIhgcQ6Ac=');
+        '1tdW5pdHlfaWQSFAoFcXVlcnkYAiABKAlSBXF1ZXJ5EhcKBm9mZnNldBiEByABKARSBm9mZnNl'
+        'dBIVCgVsaW1pdBiFByABKARSBWxpbWl0SgUIAxCEB0oGCIYHEOgH');
 
 @$core.Deprecated('Use publishedContentListResponseDescriptor instead')
 const PublishedContentListResponse$json = {

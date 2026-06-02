@@ -37,13 +37,6 @@ func PublishedContentFindByID(
 	gql = gql.Query(`SELECT ` + PublishedContentScannerStaticColumns + ` FROM published_content WHERE "id" = {id}`)
 }
 
-func PublishedContentFindByCommunityID(
-	gql genieql.Function,
-	pattern func(ctx context.Context, q sqlx.Queryer, communityID string) NewPublishedContentScannerStatic,
-) {
-	gql = gql.Query(`SELECT ` + PublishedContentScannerStaticColumns + ` FROM published_content WHERE "community_id" = {communityID} AND tombstoned_at = 'infinity' ORDER BY published_at DESC`)
-}
-
 func PublishedContentFindByMagnetURI(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer, magnetURI string) NewPublishedContentScannerStaticRow,

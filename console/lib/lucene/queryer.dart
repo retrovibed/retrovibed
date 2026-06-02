@@ -317,6 +317,7 @@ class _QueryerState extends State<Queryer> {
                 onSubmitted: (v) {
                   if (_partialParse()) return;
                   widget.onQuery(v);
+                  widget.focusNode?.requestFocus();
                   ds.textediting.refocus(_ctrl);
                 },
               ),

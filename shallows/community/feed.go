@@ -67,6 +67,7 @@ func buildFeedItems(ctx context.Context, q sqlx.Queryer, community *meta.Communi
 	var items []rss.Item
 
 	scanner := sqlx.Scan(PublishedContentFindByCommunityIDForFeed(ctx, q, community.Id))
+
 	for pc := range scanner.Iter() {
 		var (
 			known library.Known
