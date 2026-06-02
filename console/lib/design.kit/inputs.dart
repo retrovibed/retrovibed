@@ -1,4 +1,5 @@
 export 'inputs/bytes.dart';
+export 'inputs/mimetype.dart';
 export 'inputs/date.dart';
 export 'inputs/date.range.dart';
 export 'inputs/duration.dart';

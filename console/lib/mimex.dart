@@ -6,6 +6,8 @@ const audio = "audio";
 const video = "video";
 const image = "image";
 const metadataarchive = "application/vnd";
+const mediaarchive = "application/vnd.retrovibed.media.archive";
+const neural = "application/vnd.retrovibed.neural";
 const bittorrent = "application/x-bittorrent";
 const binary = "application/octet-stream";
 
@@ -25,6 +27,7 @@ const icoaudio = Icons.music_note_outlined;
 const icoimage = Icons.image;
 const icobinary = Icons.file_open_outlined;
 const icometadataarchive = Icons.live_tv;
+const iconneural = Icons.psychology;
 
 String ext(String mime) {
   return mimetype.extensionFromMime(mime) ?? ".bin";
