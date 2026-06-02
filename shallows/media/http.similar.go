@@ -15,6 +15,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
+	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/library"
@@ -94,14 +95,8 @@ func (t *HTTPSimilar) similar(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	exclude := []uuid.UUID{mediaID}
-	if raw := r.FormValue("exclude"); raw != "" {
-		for _, s := range strings.Split(raw, ",") {
-			if uid, parseErr := uuid.FromString(strings.TrimSpace(s)); parseErr == nil {
-				exclude = append(exclude, uid)
-			}
-		}
-	}
+	parsed, _ := slicesx.MapTransformErr(uuid.FromString, strings.Split(r.FormValue("exclude"), ",")...)
+	exclude := append([]uuid.UUID{mediaID}, parsed...)
 
 	ids, err := acoustics.SimilarMediaIDs(r.Context(), t.q, seedVec, exclude, similarLimit, similarityThreshold)
 	if err != nil {

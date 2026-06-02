@@ -112,6 +112,10 @@ func InitializeDatabase(ctx context.Context, db *sql.DB, migrations fs.FS) (err 
 		return errorsx.Wrap(err, "failed to load inet extension")
 	}
 
+	if _, err := db.ExecContext(ctx, vssSQL); err != nil {
+		return errorsx.Wrap(err, "failed to load vss extension")
+	}
+
 	mprov, err := goose.NewProvider(
 		"",
 		db,

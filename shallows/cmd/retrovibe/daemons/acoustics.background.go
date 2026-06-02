@@ -8,27 +8,45 @@ import (
 	"os"
 	"time"
 
+	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/shallows/acoustics"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/backoffx"
 	"github.com/retrovibed/retrovibed/shallows/internal/contextx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 )
 
-// AcousticsBackgroundRun indexes one unindexed audio track per invocation.
+// AcousticsBackgroundRun drains the unindexed audio backlog in batches. Tracks
+// that fail to analyze are logged and skipped so a single bad file does not
+// stall the index or spin the drain.
 func AcousticsBackgroundRun(ctx context.Context, q sqlx.Queryer, media fs.FS) error {
-	ids, err := acoustics.UnindexedMediaIDs(ctx, q, 1)
-	if err != nil {
-		return errorsx.Wrap(err, "acoustics: find unindexed")
-	}
-	if len(ids) == 0 {
-		return nil
-	}
+	attempted := make(map[uuid.UUID]struct{})
 
-	id := ids[0]
+	for {
+		ids, err := acoustics.UnindexedMediaIDs(ctx, q, 16)
+		if err != nil {
+			return errorsx.Wrap(err, "acoustics: find unindexed")
+		}
 
-	// Copy media from VFS to a temp file for FFmpeg (which requires a seekable path).
+		progressed := false
+		for _, id := range ids {
+			if _, ok := attempted[id]; ok {
+				continue
+			}
+			attempted[id] = struct{}{}
+			progressed = true
+			errorsx.Log(acousticsIndexOne(ctx, q, media, id))
+		}
+
+		if !progressed {
+			return nil
+		}
+	}
+}
+
+func acousticsIndexOne(ctx context.Context, q sqlx.Queryer, media fs.FS, id uuid.UUID) error {
 	tmpPath, err := copyToTemp(media, id.String())
 	if err != nil {
 		return errorsx.Wrap(err, "acoustics: copy to temp")
@@ -50,11 +68,13 @@ func AcousticsBackgroundRun(ctx context.Context, q sqlx.Queryer, media fs.FS) er
 	return nil
 }
 
-// AcousticsBackground runs the acoustic indexer on a 1-second interval with jitter.
+// AcousticsBackground drains the index, then polls for new media on an
+// exponential backoff that maxes out at an hour.
 func AcousticsBackground(ctx context.Context, q sqlx.Queryer, media fs.FS) error {
 	wakeup := asyncx.NewWakeup(ctx)
 	s := backoffx.New(
-		backoffx.Constant(time.Second),
+		backoffx.Exponential(time.Second),
+		backoffx.Maximum(time.Hour),
 		backoffx.Jitter(0.1),
 	)
 
@@ -68,7 +88,7 @@ func AcousticsBackground(ctx context.Context, q sqlx.Queryer, media fs.FS) error
 	return nil
 }
 
-func copyToTemp(media fs.FS, name string) (string, error) {
+func copyToTemp(media fs.FS, name string) (_ string, err error) {
 	src, err := media.Open(name)
 	if err != nil {
 		return "", err
@@ -79,15 +99,17 @@ func copyToTemp(media fs.FS, name string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	defer func() {
+		if err != nil {
+			errorsx.Log(errorsx.Wrap(os.Remove(tmp.Name()), "acoustics: cleanup temp"))
+		}
+	}()
 
 	_, err = io.Copy(tmp, src)
-	if closeErr := tmp.Close(); err == nil {
-		err = closeErr
-	}
-
+	err = langx.FirstNonZero(err, tmp.Close())
 	if err != nil {
-		errorsx.Log(errorsx.Wrap(os.Remove(tmp.Name()), "acoustics: cleanup temp"))
 		return "", err
 	}
+
 	return tmp.Name(), nil
 }

@@ -155,25 +155,11 @@ Stream<PlayableMedia> range(
     i.next..offset += 1;
   }
 
-  // Search exhausted. Try acoustically similar tracks anchored to the seed,
-  // falling back to random when the similarity engine has no results
-  // (cold start, below threshold, or library too small).
-  final seed = current.id;
-  final yielded = <String>{seed};
+  // at this point we've run out of content from the provided search.
+  // lets play random content. using things like the mimetypes from
+  // from the initial request. we'll eventually add in more coherent
+  // results to keep a trend going.
   while (true) {
-    final similar = await httpx.withRetry(
-      () => api.media.similar(seed, exclude: yielded.toList(), options: options()),
-      maxRetries: 1,
-    ).catchError((_) => <Media>[]);
-
-    if (similar.isNotEmpty) {
-      for (var m in similar) {
-        yielded.add(m.id);
-        yield PlayableMedia(m);
-      }
-      continue;
-    }
-
     final v = await random(i.next, options: options());
     yield PlayableMedia(v.media);
   }

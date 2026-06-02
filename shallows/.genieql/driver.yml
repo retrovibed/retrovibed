@@ -1,26 +1,7 @@
-- type: sql.NullString
-  native: string
-  database_type_name: ""
-  column_type: sql.NullString
-  nullable: false
-  primarykey: false
-  decode: |-
-    func() {
-    		if {{ .From | expr }}.Valid {
-    			tmp := {{ .Type | expr }}({{ .From | expr }}.String)
-    			{{ .To | autodereference | expr }} = tmp
-    		}
-    	}
-  encode: |-
-    func() {
-    		{{ .To | expr }}.Valid = true
-    		{{ .To | expr }}.String = {{ .From | expr }}
-    	}
-
-- type: ducktype.FloatArray
+- type: retrovibed.Float128
   native: '[]float32'
   database_type_name: 'FLOAT[128]'
-  column_type: ducktype.FloatArray
+  column_type: retrovibed.Float128
   nullable: false
   primarykey: false
   decode: |-
@@ -29,13 +10,13 @@
     	}
   encode: |-
     func() {
-    		{{ .To | expr }} = ducktype.FloatArray({{ .From | expr }})
+    		{{ .To | expr }} = retrovibed.Float128({{ .From | expr }})
     	}
 
 - type: '[]float32'
   native: '[]float32'
   database_type_name: ''
-  column_type: ducktype.FloatArray
+  column_type: retrovibed.Float128
   nullable: false
   primarykey: false
   decode: |-
@@ -44,5 +25,5 @@
     	}
   encode: |-
     func() {
-    		{{ .To | expr }} = ducktype.FloatArray({{ .From | expr }})
+    		{{ .To | expr }} = retrovibed.Float128({{ .From | expr }})
     	}

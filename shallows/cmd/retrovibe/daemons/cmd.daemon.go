@@ -201,8 +201,6 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 
 	errorsx.Log(AutoReclaim(gctx.Context, db, mediastore, asyncx.NewWakeup(gctx.Context), t.AutoReclaim))
 
-	// Acoustics: seed hyperplanes, recompute stats, and rebuild the in-memory LSH from audio_features.
-
 	if t.AutoSocks5 {
 		if _socks5, err = t.Socks5.Socket(); err != nil {
 			return errorsx.Wrap(err, "unable to setup socks5 socket")

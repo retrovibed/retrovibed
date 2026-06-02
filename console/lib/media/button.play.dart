@@ -23,7 +23,12 @@ Future<void> Function()? PlayAction(
         return Future.sync(
           () => playlist.setPlaylist(
             s.next,
-            range(s.next, current, options: () => [authn.request(authn.AuthzCache.meta(context))]),
+            range(
+              s.next,
+              current,
+              options: () => [authn.request(authn.AuthzCache.meta(context))],
+              random: api.media.acoustic(current.id),
+            ),
           ),
         );
       };
