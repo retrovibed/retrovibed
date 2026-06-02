@@ -224,6 +224,20 @@ void main() {
   });
 
   group('Queryer onQuery callback', () {
+    testWidgets('refocuses search box after onSubmitted', (tester) async {
+      final focusNode = FocusNode();
+      addTearDown(focusNode.dispose);
+      await tester.pumpApp(lucene.Queryer((_) {}, [], focusNode: focusNode));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextField), 'hello');
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pumpAndSettle();
+
+      expect(focusNode.hasFocus, isTrue);
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('submitting free text calls onQuery', (tester) async {
       String? emitted;
       await tester.pumpApp(lucene.Queryer((q) => emitted = q, []));
