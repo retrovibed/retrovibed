@@ -217,6 +217,8 @@ func (t *HTTP) publish(w http.ResponseWriter, r *http.Request) {
 	}
 
 	pc := PublishedContent{
+		Title:         stringsx.FirstNonBlank(req.PublishedContent.Title, lmd.Description),
+		Description:   req.PublishedContent.Description,
 		CommunityID:   communityID,
 		KnownMediaID:  stringsx.FirstNonBlank(req.PublishedContent.KnownMediaId, lmd.KnownMediaID),
 		LibraryID:     lmd.ID,
@@ -344,6 +346,8 @@ func (t *HTTP) metrics(w http.ResponseWriter, r *http.Request) {
 func PublishedContentOptionFromDB(pc PublishedContent) func(*meta.PublishedContent) {
 	return func(p *meta.PublishedContent) {
 		p.Id = pc.ID
+		p.Title = pc.Title
+		p.Description = pc.Description
 		p.CommunityId = pc.CommunityID
 		p.KnownMediaId = pc.KnownMediaID
 		p.MagnetUri = pc.MagnetURI
