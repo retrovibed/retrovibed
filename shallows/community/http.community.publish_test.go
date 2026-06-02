@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
@@ -11,9 +12,11 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/grpcx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/testx"
+	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/retrovibed/retrovibed/shallows/metaapi"
@@ -251,6 +254,165 @@ func TestPublishEndpoint(t *testing.T) {
 		var updatedLmd library.Metadata
 		require.NoError(t, library.MetadataFindByID(ctx, q, libraryID).Scan(&updatedLmd))
 		require.Equal(t, uuid.Nil.String(), updatedLmd.ArchiveID)
+	})
+
+	t.Run("timestamps are set by db on insert when not provided in request", func(t *testing.T) {
+		var (
+			ctx, done   = testx.Context(t)
+			q           = sqltestx.Metadatabase(t)
+			p           meta.Profile
+			v           meta.Authz
+			communityID = uuid.Must(uuid.NewV7()).String()
+			libraryID   = uuid.Must(uuid.NewV7()).String()
+			mediaDir    = t.TempDir()
+			torrentDir  = t.TempDir()
+			before      = time.Now()
+		)
+		defer done()
+
+		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
+		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
+		require.NoError(t, testx.Fake(&v, meta.AuthzOptionProfileID(p.ID), meta.AuthzOptionAdmin))
+		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
+
+		lmd := library.Metadata{
+			ID:             libraryID,
+			Description:    "test media",
+			Bytes:          1024,
+			Mimetype:       "audio/mpeg",
+			TorrentID:      uuid.Nil.String(),
+			KnownMediaID:   uuid.Nil.String(),
+			ArchiveID:      uuid.Nil.String(),
+			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+		}
+		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
+
+		routes := mux.NewRouter()
+		community.NewHTTP(
+			q,
+			community.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			community.HTTPOptionHTTPClient(&http.Client{}),
+			community.HTTPOptionMediaStorage(fsx.DirVirtual(mediaDir)),
+			community.HTTPOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
+		).Bind(routes.PathPrefix("/c").Subrouter())
+
+		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
+		body, err := json.Marshal(&meta.PublishContentRequest{
+			PublishedContent: &meta.PublishedContent{
+				LibraryId: libraryID,
+			},
+		})
+		require.NoError(t, err)
+
+		resp, req, err := httptestx.BuildRequestContextBytes(
+			ctx,
+			http.MethodPost,
+			"/c/"+communityID+"/publish",
+			body,
+			httptestx.RequestOptionAuthorization("Bearer "+httpauthtest.UnsafeToken(claims, httpauthtest.UnsafeJWTSecretSource)),
+			httptestx.RequestOptionContent("application/json"),
+		)
+		require.NoError(t, err)
+
+		routes.ServeHTTP(resp, req)
+		require.Equal(t, http.StatusOK, resp.Code)
+
+		var result meta.PublishContentResponse
+		require.NoError(t, json.Unmarshal(resp.Body.Bytes(), &result))
+		require.NotEmpty(t, result.PublishedContent.Id)
+
+		var pc community.PublishedContent
+		require.NoError(t, community.PublishedContentFindByID(ctx, q, result.PublishedContent.Id).Scan(&pc))
+		require.False(t, pc.CreatedAt.IsZero())
+		require.False(t, pc.UpdatedAt.IsZero())
+		require.False(t, pc.PublishedAt.IsZero())
+		require.WithinDuration(t, before, pc.CreatedAt, time.Minute)
+		require.WithinDuration(t, before, pc.UpdatedAt, time.Minute)
+		require.WithinDuration(t, timex.Inf(), pc.PublishedAt, time.Minute)
+	})
+
+	t.Run("response timestamps match stored timestamps", func(t *testing.T) {
+		var (
+			ctx, done   = testx.Context(t)
+			q           = sqltestx.Metadatabase(t)
+			p           meta.Profile
+			v           meta.Authz
+			communityID = uuid.Must(uuid.NewV7()).String()
+			libraryID   = uuid.Must(uuid.NewV7()).String()
+			mediaDir    = t.TempDir()
+			torrentDir  = t.TempDir()
+		)
+		defer done()
+
+		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
+		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
+		require.NoError(t, testx.Fake(&v, meta.AuthzOptionProfileID(p.ID), meta.AuthzOptionAdmin))
+		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
+
+		lmd := library.Metadata{
+			ID:             libraryID,
+			Description:    "test media",
+			Bytes:          1024,
+			Mimetype:       "audio/mpeg",
+			TorrentID:      uuid.Nil.String(),
+			KnownMediaID:   uuid.Nil.String(),
+			ArchiveID:      uuid.Nil.String(),
+			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+		}
+		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
+
+		routes := mux.NewRouter()
+		community.NewHTTP(
+			q,
+			community.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			community.HTTPOptionHTTPClient(&http.Client{}),
+			community.HTTPOptionMediaStorage(fsx.DirVirtual(mediaDir)),
+			community.HTTPOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
+		).Bind(routes.PathPrefix("/c").Subrouter())
+
+		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
+		body, err := json.Marshal(&meta.PublishContentRequest{
+			PublishedContent: &meta.PublishedContent{
+				LibraryId:   libraryID,
+				CreatedAt:   grpcx.EncodeTime(time.Date(2024, 1, 15, 10, 0, 0, 0, time.UTC)),
+				UpdatedAt:   grpcx.EncodeTime(time.Date(2024, 2, 20, 12, 0, 0, 0, time.UTC)),
+				PublishedAt: grpcx.EncodeTime(time.Date(2024, 3, 25, 14, 0, 0, 0, time.UTC)),
+			},
+		})
+		require.NoError(t, err)
+
+		resp, req, err := httptestx.BuildRequestContextBytes(
+			ctx,
+			http.MethodPost,
+			"/c/"+communityID+"/publish",
+			body,
+			httptestx.RequestOptionAuthorization("Bearer "+httpauthtest.UnsafeToken(claims, httpauthtest.UnsafeJWTSecretSource)),
+			httptestx.RequestOptionContent("application/json"),
+		)
+		require.NoError(t, err)
+
+		routes.ServeHTTP(resp, req)
+		require.Equal(t, http.StatusOK, resp.Code)
+
+		var result meta.PublishContentResponse
+		require.NoError(t, json.Unmarshal(resp.Body.Bytes(), &result))
+		require.NotEmpty(t, result.PublishedContent.Id)
+
+		var pc community.PublishedContent
+		require.NoError(t, community.PublishedContentFindByID(ctx, q, result.PublishedContent.Id).Scan(&pc))
+
+		// verify response timestamps round-trip correctly with what was stored
+		storedCreatedAt, err := grpcx.DecodeTime(result.PublishedContent.CreatedAt)
+		require.NoError(t, err)
+		require.WithinDuration(t, storedCreatedAt, pc.CreatedAt, time.Second)
+
+		storedUpdatedAt, err := grpcx.DecodeTime(result.PublishedContent.UpdatedAt)
+		require.NoError(t, err)
+		require.WithinDuration(t, storedUpdatedAt, pc.UpdatedAt, time.Second)
+
+		storedPublishedAt, err := grpcx.DecodeTime(result.PublishedContent.PublishedAt)
+		require.NoError(t, err)
+		require.WithinDuration(t, storedPublishedAt, pc.PublishedAt, time.Second)
 	})
 
 	t.Run("returns immediately without magnet uri even when torrent exists", func(t *testing.T) {

@@ -61,25 +61,22 @@ func TestFeedGeneration(t *testing.T) {
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd2).Scan(&lmd2))
 
-		pc1 := PublishedContent{
-			CommunityID:   communityID,
-			KnownMediaID:  known.UID,
-			MagnetURI:     "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33&dn=Test+Movie",
-			LibraryID:     libraryID1,
-			PublishMode:   int32(meta.PublishMode_LISTED),
-			OAuthGoogleID: uuid.Nil.String(),
-		}
+		pc1 := NewPublishedContent(PublishedContent{
+			CommunityID:  communityID,
+			KnownMediaID: known.UID,
+			MagnetURI:    "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33&dn=Test+Movie",
+			LibraryID:    libraryID1,
+			PublishMode:  int32(meta.PublishMode_LISTED),
+		})
 		require.NoError(t, PublishedContentInsertWithDefaults(ctx, q, pc1).Scan(&pc1))
 		require.NoError(t, PublishedContentUpdatePublishedAt(ctx, q, pc1.ID, time.Now().Add(-time.Hour)).Scan(&pc1))
 
-		pc2 := PublishedContent{
-			CommunityID:   communityID,
-			KnownMediaID:  uuid.Nil.String(),
-			MagnetURI:     "magnet:?xt=urn:btih:1234567890abcdef1234567890abcdef12345678&dn=Unknown+Media",
-			LibraryID:     libraryID2,
-			PublishMode:   int32(meta.PublishMode_SYNDICATED),
-			OAuthGoogleID: uuid.Nil.String(),
-		}
+		pc2 := NewPublishedContent(PublishedContent{
+			CommunityID: communityID,
+			MagnetURI:   "magnet:?xt=urn:btih:1234567890abcdef1234567890abcdef12345678&dn=Unknown+Media",
+			LibraryID:   libraryID2,
+			PublishMode: int32(meta.PublishMode_SYNDICATED),
+		})
 		require.NoError(t, PublishedContentInsertWithDefaults(ctx, q, pc2).Scan(&pc2))
 		require.NoError(t, PublishedContentUpdatePublishedAt(ctx, q, pc2.ID, time.Now()).Scan(&pc2))
 
@@ -144,25 +141,21 @@ func TestFeedGeneration(t *testing.T) {
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd2).Scan(&lmd2))
 
-		pc1 := PublishedContent{
-			CommunityID:   communityID,
-			KnownMediaID:  uuid.Nil.String(),
-			MagnetURI:     "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33",
-			LibraryID:     libraryID1,
-			PublishMode:   int32(meta.PublishMode_UNLISTED),
-			OAuthGoogleID: uuid.Nil.String(),
-		}
+		pc1 := NewPublishedContent(PublishedContent{
+			CommunityID: communityID,
+			MagnetURI:   "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33",
+			LibraryID:   libraryID1,
+			PublishMode: int32(meta.PublishMode_UNLISTED),
+		})
 		require.NoError(t, PublishedContentInsertWithDefaults(ctx, q, pc1).Scan(&pc1))
 		require.NoError(t, PublishedContentUpdatePublishedAt(ctx, q, pc1.ID, time.Now()).Scan(&pc1))
 
-		pc2 := PublishedContent{
-			CommunityID:   communityID,
-			KnownMediaID:  uuid.Nil.String(),
-			MagnetURI:     "magnet:?xt=urn:btih:1234567890abcdef1234567890abcdef12345678",
-			LibraryID:     libraryID2,
-			PublishMode:   int32(meta.PublishMode_LISTED),
-			OAuthGoogleID: uuid.Nil.String(),
-		}
+		pc2 := NewPublishedContent(PublishedContent{
+			CommunityID: communityID,
+			MagnetURI:   "magnet:?xt=urn:btih:1234567890abcdef1234567890abcdef12345678",
+			LibraryID:   libraryID2,
+			PublishMode: int32(meta.PublishMode_LISTED),
+		})
 		require.NoError(t, PublishedContentInsertWithDefaults(ctx, q, pc2).Scan(&pc2))
 		require.NoError(t, PublishedContentUpdatePublishedAt(ctx, q, pc2.ID, time.Now()).Scan(&pc2))
 
