@@ -104,7 +104,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.enterText(find.byType(TextFormField).last, 'updated desc');
+      await tester.enterText(find.byType(TextFormField).at(1), 'updated desc');
       await tester.pump();
 
       expect(received, isNotNull);
