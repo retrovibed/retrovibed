@@ -81,5 +81,7 @@ formatter:
   page_width: 120
   trailing_commas: preserve
 analyzer:
+  exclude:
+    - ".eg.cache/**"
   errors:
     library_private_types_in_public_api: ignore
