@@ -148,6 +148,72 @@ func PublishedCASMetricFindByCommunityIDAndPeriod(
 	gql = gql.Query(`SELECT ` + PublishedCASMetricScannerStaticColumns + ` FROM published_cas_metrics JOIN published_content ON published_cas_metrics.published_content_id = published_content.id WHERE published_content.community_id = {communityID} AND published_cas_metrics.period_start >= {periodStart} AND published_cas_metrics.period_start <= {periodEnd} ORDER BY published_cas_metrics.period_start DESC`)
 }
 
+func Community(gql genieql.Structure) {
+	gql.From(
+		gql.Table("community"),
+	)
+}
+
+func CommunityScanner(gql genieql.Scanner, pattern func(i Community)) {
+	gql.ColumnNamePrefix("community.")
+}
+
+func CommunityInsertWithDefaults(
+	gql genieql.Insert,
+	pattern func(ctx context.Context, q sqlx.Queryer, a Community) NewCommunityScannerStaticRow,
+) {
+	gql.Into("community").Default("id", "created_at", "updated_at", "sync_feed_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, last_sync_at = EXCLUDED.last_sync_at, sync_cursor_published_content = GREATEST(sync_cursor_published_content, EXCLUDED.sync_cursor_published_content)")
+}
+
+func CommunityFindByID(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, cid string) NewCommunityScannerStaticRow,
+) {
+	gql = gql.Query(`SELECT ` + CommunityScannerStaticColumns + ` FROM community WHERE id = {cid}`)
+}
+
+func CommunityDeleteByID(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, cid string) NewCommunityScannerStaticRow,
+) {
+	gql = gql.Query(`DELETE FROM community WHERE id = {cid} RETURNING ` + CommunityScannerStaticColumns)
+}
+
+func CommunityUpdateLastSyncAt(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, cid string, lastSyncAt time.Time) NewCommunityScannerStaticRow,
+) {
+	gql = gql.Query(`UPDATE community SET last_sync_at = {lastSyncAt}, updated_at = now() WHERE id = {cid} RETURNING ` + CommunityScannerStaticColumns)
+}
+
+func CommunityUpsertAutoDownload(
+	gql genieql.Insert,
+	pattern func(ctx context.Context, q sqlx.Queryer, a Community) NewCommunityScannerStaticRow,
+) {
+	gql.Into("community").Default("id", "created_at", "updated_at", "sync_feed_at", "last_sync_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, auto_download = EXCLUDED.auto_download")
+}
+
+func CommunityRequestFeedSync(
+	gql genieql.Insert,
+	pattern func(ctx context.Context, q sqlx.Queryer, a Community) NewCommunityScannerStaticRow,
+) {
+	gql.Into("community").Default("id", "created_at", "updated_at", "last_sync_at", "auto_download").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, sync_feed_at = EXCLUDED.sync_feed_at")
+}
+
+func CommunityLookupFeedSyncRequests(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer) NewCommunityScannerStatic,
+) {
+	gql = gql.Query(`SELECT ` + CommunityScannerStaticColumns + ` FROM community WHERE sync_feed_at < NOW()`)
+}
+
+func CommunityRequestFeedSyncCompleted(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, cid string) NewCommunityScannerStaticRow,
+) {
+	gql = gql.Query(`UPDATE community SET sync_feed_at = DEFAULT, updated_at = NOW() WHERE id = {cid} RETURNING ` + CommunityScannerStaticColumns)
+}
+
 func CommunitySyncState(gql genieql.Structure) {
 	gql.From(
 		gql.Table("community_sync_state"),

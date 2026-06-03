@@ -264,13 +264,20 @@ func (t *HTTP) publish(w http.ResponseWriter, r *http.Request) {
 
 func (t *HTTP) resync(w http.ResponseWriter, r *http.Request) {
 	var (
-		msg  CommunityFindRequest
-		resp CommunityFindResponse
+		cid   = mux.Vars(r)["id"]
+		msg   CommunityFindRequest
+		resp  CommunityFindResponse
+		syncd community.CommunitySyncState
 	)
-	_ = msg
+	_ = &msg
 
-	cid := mux.Vars(r)["id"]
-	_ = cid
+	if err := community.CommunitySyncStateFindByCommunityID(r.Context(), t.q, cid).Scan(&syncd); err != nil {
+		log.Println(errorsx.Wrap(err, "unable lookup sync state"))
+		return
+	}
+
+	published := NewDeeppoolPublished(t.httpc)
+	published.List(r.Context(), cid, nil)
 
 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &resp); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to write response"))
