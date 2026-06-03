@@ -15,7 +15,7 @@ class SubscribeButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final subscribed = timex.iso8601(community.subscribedAt).isBefore(timex.inf);
+    final subscribed = timex.iso8601(community.subscribedAt, empty: timex.inf).isBefore(timex.inf);
 
     return ds.LoadingIconButton(
       icon: Icon(

@@ -254,7 +254,6 @@ func TestMetricsSyncEndpoint(t *testing.T) {
 		require.WithinDuration(t, syncedAt, updated.LastSyncAt, time.Second)
 	})
 
-
 	t.Run("returns 503 when no http client configured", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()

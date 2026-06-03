@@ -27,8 +27,8 @@ Future<CommunitySearchResponse> _withCommunities(
 }) async {
   return CommunitySearchResponse(
     items: [
-      Community(id: '1', domain: 'alpha', description: 'Alpha community'),
-      Community(id: '2', domain: 'beta', description: 'Beta community'),
+      Community(id: '1', domain: 'alpha', description: 'Alpha community', url: 'https://alpha.community.retrovibe.space'),
+      Community(id: '2', domain: 'beta', description: 'Beta community', url: 'https://beta.community.retrovibe.space'),
     ],
   );
 }

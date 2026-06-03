@@ -9,6 +9,7 @@ void main() {
     testWidgets('displays domain and URL', (WidgetTester tester) async {
       final community = Community(
         domain: 'testdomain',
+        url: 'https://testdomain.community.retrovibe.space',
         description: '',
         createdAt: '2024-01-15T14:30:00Z',
       );

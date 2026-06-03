@@ -100,7 +100,9 @@ func NewSubscriptionSync(ctx context.Context, q sqlx.Queryer, client DeeppoolPub
 				log.Printf("subscription sync: imported %d items for %s", synced, sub.ID)
 			}
 
-			if err = community.CommunityUpdateLastSyncAt(ctx, q, sub.ID, time.Now()).Scan(&sub); err != nil {
+			sub.LastSyncAt = time.Now()
+
+			if err = community.CommunityUpdateLastSyncAt(ctx, q, sub).Scan(&sub); err != nil {
 				log.Println(errorsx.Wrap(err, "failed to update last_sync_at for "+sub.ID))
 			}
 		}

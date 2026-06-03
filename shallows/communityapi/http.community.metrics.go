@@ -222,7 +222,8 @@ func (t *HTTPMetrics) storeMetrics(ctx context.Context, communityID string, resp
 	if syncedAt, err = grpcx.DecodeTime(resp.SyncedAt); err != nil {
 		return errorsx.Wrap(err, "failed to decode synced at")
 	}
-	if err = community.CommunityUpdateLastSyncAt(ctx, t.q, communityID, syncedAt).Scan(&syncState); err != nil {
+
+	if err = community.CommunityUpdateLastSyncAt(ctx, t.q, community.Community{ID: communityID, LastSyncAt: syncedAt}).Scan(&syncState); err != nil {
 		return errorsx.Wrap(err, "failed to update sync state")
 	}
 

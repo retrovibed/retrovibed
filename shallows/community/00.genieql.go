@@ -180,10 +180,10 @@ func CommunityDeleteByID(
 }
 
 func CommunityUpdateLastSyncAt(
-	gql genieql.Function,
-	pattern func(ctx context.Context, q sqlx.Queryer, cid string, lastSyncAt time.Time) NewCommunityScannerStaticRow,
+	gql genieql.Insert,
+	pattern func(ctx context.Context, q sqlx.Queryer, c Community) NewCommunityScannerStaticRow,
 ) {
-	gql = gql.Query(`UPDATE community SET last_sync_at = {lastSyncAt}, updated_at = now() WHERE id = {cid} RETURNING ` + CommunityScannerStaticColumns)
+	gql.Into("community").Default("created_at", "updated_at", "auto_download", "account_id", "sync_cursor_published_content", "subscribed_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, last_sync_at = EXCLUDED.last_sync_at")
 }
 
 func CommunitySubscribe(
