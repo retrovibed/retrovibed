@@ -1,4 +1,4 @@
-package meta
+package communityapi
 
 import "google.golang.org/protobuf/encoding/protojson"
 

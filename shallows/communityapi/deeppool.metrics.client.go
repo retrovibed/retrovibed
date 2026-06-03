@@ -1,4 +1,4 @@
-package deeppool
+package communityapi
 
 import (
 	"context"
@@ -10,7 +10,6 @@ import (
 
 	deepool "github.com/retrovibed/retrovibed/retroapi/deeppool"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
-	"github.com/retrovibed/retrovibed/shallows/meta"
 )
 
 func NewMetrics(c *http.Client) Metrics {
@@ -25,12 +24,12 @@ type Metrics struct {
 	endpoint string
 }
 
-func (t Metrics) Sync(ctx context.Context, communityID string) (*meta.MetricsSyncResponse, error) {
+func (t Metrics) Sync(ctx context.Context, communityID string) (*MetricsSyncResponse, error) {
 	var (
 		err  error
 		req  *http.Request
 		resp *http.Response
-		msg  meta.MetricsSyncResponse
+		msg  MetricsSyncResponse
 	)
 
 	uri := fmt.Sprintf("https://%s/c/%s/metrics/sync", t.endpoint, communityID)
@@ -50,12 +49,12 @@ func (t Metrics) Sync(ctx context.Context, communityID string) (*meta.MetricsSyn
 	return &msg, nil
 }
 
-func (t Metrics) Publish(ctx context.Context, content *meta.PublishContentRequest, torrent io.Reader) (*meta.PublishContentResponse, error) {
+func (t Metrics) Publish(ctx context.Context, content *PublishContentRequest, torrent io.Reader) (*PublishContentResponse, error) {
 	var (
 		err  error
 		req  *http.Request
 		resp *http.Response
-		msg  meta.PublishContentResponse
+		msg  PublishContentResponse
 	)
 
 	uri := fmt.Sprintf("https://%s/p/", t.endpoint)

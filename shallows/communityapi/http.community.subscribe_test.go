@@ -1,4 +1,4 @@
-package community_test
+package communityapi_test
 
 import (
 	"database/sql"
@@ -14,6 +14,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/community"
+	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
@@ -29,8 +30,8 @@ import (
 func newCommunityMockClient(communityID string) *http.Client {
 	return httptestx.NewTestClient(func(req *http.Request) *http.Response {
 		if req.Method == http.MethodGet && strings.Contains(req.URL.Path, communityID) {
-			body, _ := json.Marshal(&meta.CommunityFindResponse{
-				Community: &meta.Community{
+			body, _ := json.Marshal(&communityapi.CommunityFindResponse{
+				Community: &communityapi.Community{
 					Id:          communityID,
 					Domain:      "community",
 					Description: communityID,
@@ -70,12 +71,12 @@ func TestSubscribeEndpoint(t *testing.T) {
 		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
 
 		routes := mux.NewRouter()
-		community.NewHTTP(
+		communityapi.NewHTTP(
 			q,
-			community.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
-			community.HTTPOptionHTTPClient(newCommunityMockClient(communityID)),
-			community.HTTPOptionMediaStorage(fsx.DirVirtual(t.TempDir())),
-			community.HTTPOptionTorrentStorage(fsx.DirVirtual(t.TempDir())),
+			communityapi.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			communityapi.HTTPOptionHTTPClient(newCommunityMockClient(communityID)),
+			communityapi.HTTPOptionMediaStorage(fsx.DirVirtual(t.TempDir())),
+			communityapi.HTTPOptionTorrentStorage(fsx.DirVirtual(t.TempDir())),
 		).Bind(routes.PathPrefix("/c").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
@@ -124,12 +125,12 @@ func TestSubscribeEndpoint(t *testing.T) {
 		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
 
 		routes := mux.NewRouter()
-		community.NewHTTP(
+		communityapi.NewHTTP(
 			q,
-			community.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
-			community.HTTPOptionHTTPClient(newCommunityMockClient(communityID)),
-			community.HTTPOptionMediaStorage(fsx.DirVirtual(t.TempDir())),
-			community.HTTPOptionTorrentStorage(fsx.DirVirtual(t.TempDir())),
+			communityapi.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			communityapi.HTTPOptionHTTPClient(newCommunityMockClient(communityID)),
+			communityapi.HTTPOptionMediaStorage(fsx.DirVirtual(t.TempDir())),
+			communityapi.HTTPOptionTorrentStorage(fsx.DirVirtual(t.TempDir())),
 		).Bind(routes.PathPrefix("/c").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
@@ -180,12 +181,12 @@ func TestSubscribeEndpoint(t *testing.T) {
 		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
 
 		routes := mux.NewRouter()
-		community.NewHTTP(
+		communityapi.NewHTTP(
 			q,
-			community.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
-			community.HTTPOptionHTTPClient(newCommunityMockClient(communityID)),
-			community.HTTPOptionMediaStorage(fsx.DirVirtual(t.TempDir())),
-			community.HTTPOptionTorrentStorage(fsx.DirVirtual(t.TempDir())),
+			communityapi.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			communityapi.HTTPOptionHTTPClient(newCommunityMockClient(communityID)),
+			communityapi.HTTPOptionMediaStorage(fsx.DirVirtual(t.TempDir())),
+			communityapi.HTTPOptionTorrentStorage(fsx.DirVirtual(t.TempDir())),
 		).Bind(routes.PathPrefix("/c").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))

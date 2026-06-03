@@ -1,4 +1,4 @@
-package community
+package communityapi
 
 import (
 	"context"
@@ -16,7 +16,7 @@ import (
 	"github.com/justinas/alice"
 	"github.com/retrovibed/retrovibed/retroapi/httpauth"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
-	"github.com/retrovibed/retrovibed/shallows/deeppool"
+	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
@@ -33,7 +33,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/library"
-	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 )
 
@@ -150,17 +149,17 @@ func (t *HTTP) tombstoned(w http.ResponseWriter, r *http.Request) {
 	pid := mux.Vars(r)["id"]
 
 	var (
-		cs CommunitySyncState
-		pc PublishedContent
+		cs community.CommunitySyncState
+		pc community.PublishedContent
 	)
 
-	if err := PublishedContentDeleteByID(r.Context(), t.q, pid).Scan(&pc); errors.Is(err, sql.ErrNoRows) {
+	if err := community.PublishedContentDeleteByID(r.Context(), t.q, pid).Scan(&pc); errors.Is(err, sql.ErrNoRows) {
 		log.Println(errorsx.Wrap(err, "unable to tombstone missing record"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
 		return
 	}
 
-	if err := CommunitySyncStateRequestFeedSync(r.Context(), t.q, CommunitySyncState{
+	if err := community.CommunitySyncStateRequestFeedSync(r.Context(), t.q, community.CommunitySyncState{
 		CommunityID: pc.CommunityID,
 		SyncFeedAt:  time.Now(),
 	}).Scan(&cs); err != nil {
@@ -169,10 +168,10 @@ func (t *HTTP) tombstoned(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &meta.PublishContentDeleteResponse{
+	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &PublishContentDeleteResponse{
 		PublishedContent: langx.Autoptr(
 			langx.Clone(
-				meta.PublishedContent{},
+				PublishedContent{},
 				PublishedContentOptionFromDB(langx.Clone(pc, timex.JSONSafeEncodeOption)),
 			),
 		),
@@ -189,7 +188,7 @@ func (t *HTTP) publish(w http.ResponseWriter, r *http.Request) {
 		err         error
 		lmd         library.Metadata
 		communityID = mux.Vars(r)["id"]
-		req         meta.PublishContentRequest
+		req         PublishContentRequest
 	)
 
 	if t.httpc == nil {
@@ -220,7 +219,7 @@ func (t *HTTP) publish(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pc := NewPublishedContent(PublishedContent{
+	pc := community.NewPublishedContent(community.PublishedContent{
 		Title:         stringsx.FirstNonBlank(req.PublishedContent.Title, lmd.Description),
 		Description:   req.PublishedContent.Description,
 		CommunityID:   communityID,
@@ -233,16 +232,16 @@ func (t *HTTP) publish(w http.ResponseWriter, r *http.Request) {
 		PublishedAt:   errorsx.Zero(grpcx.DecodeTime(langx.FirstNonZero(req.PublishedContent.PublishedAt, grpcx.EncodeTime(timex.Inf())))),
 	})
 
-	if err = PublishedContentInsertWithDefaults(r.Context(), t.q, pc).Scan(&pc); err != nil {
+	if err = community.PublishedContentInsertWithDefaults(r.Context(), t.q, pc).Scan(&pc); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to insert published content"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 
-	if err = httpx.WriteJSON(w, httpx.GetBuffer(r), &meta.PublishContentResponse{
+	if err = httpx.WriteJSON(w, httpx.GetBuffer(r), &PublishContentResponse{
 		PublishedContent: langx.Autoptr(
 			langx.Clone(
-				meta.PublishedContent{},
+				PublishedContent{},
 				PublishedContentOptionFromDB(langx.Clone(pc, timex.JSONSafeEncodeOption)),
 			),
 		),
@@ -251,7 +250,7 @@ func (t *HTTP) publish(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if req.PublishMode > meta.PublishMode_UNLISTED {
+	if req.PublishMode > PublishMode_UNLISTED {
 		t.publishing.Broadcast()
 	}
 }
@@ -259,8 +258,8 @@ func (t *HTTP) publish(w http.ResponseWriter, r *http.Request) {
 func (t *HTTP) published(w http.ResponseWriter, r *http.Request) {
 	communityID := mux.Vars(r)["id"]
 
-	var msg meta.PublishedContentSearchResponse
-	msg.Next = &meta.PublishedContentSearchRequest{
+	var msg PublishedContentSearchResponse
+	msg.Next = &PublishedContentSearchRequest{
 		CommunityId: communityID,
 		Limit:       100,
 	}
@@ -272,16 +271,16 @@ func (t *HTTP) published(w http.ResponseWriter, r *http.Request) {
 	}
 	msg.Next.Limit = numericx.Min(msg.Next.Limit, 100)
 
-	q := sqlx.Scan(PublishedContentSearch(r.Context(), t.q, PublishedContentSearchBuilder().Where(
+	q := sqlx.Scan(community.PublishedContentSearch(r.Context(), t.q, community.PublishedContentSearchBuilder().Where(
 		squirrel.And{
-			PublishedContentQueryCommunityID(communityID),
-			PublishedContentQueryNotTombstoned(),
+			community.PublishedContentQueryCommunityID(communityID),
+			community.PublishedContentQueryNotTombstoned(),
 			lucenex.Query(t.lucene, msg.Next.Query, lucenex.WithDefaultField("title")),
 		},
 	).OrderBy("published_at DESC")))
 
 	for pc := range q.Iter() {
-		tmp := langx.Clone(meta.PublishedContent{}, PublishedContentOptionFromDB(langx.Clone(pc, timex.JSONSafeEncodeOption)))
+		tmp := langx.Clone(PublishedContent{}, PublishedContentOptionFromDB(langx.Clone(pc, timex.JSONSafeEncodeOption)))
 		msg.Items = append(msg.Items, &tmp)
 	}
 
@@ -300,51 +299,51 @@ func (t *HTTP) published(w http.ResponseWriter, r *http.Request) {
 func (t *HTTP) metrics(w http.ResponseWriter, r *http.Request) {
 	communityID := mux.Vars(r)["id"]
 
-	var options []MetricPeriodOption
+	var options []community.MetricPeriodOption
 
 	if startDate := r.URL.Query().Get("start_date"); startDate != "" {
 		if ts, err := time.Parse(time.RFC3339, startDate); err == nil {
-			options = append(options, MetricPeriodOptionStartDate(ts))
+			options = append(options, community.MetricPeriodOptionStartDate(ts))
 		}
 	}
 	if endDate := r.URL.Query().Get("end_date"); endDate != "" {
 		if ts, err := time.Parse(time.RFC3339, endDate); err == nil {
-			options = append(options, MetricPeriodOptionEndDate(ts))
+			options = append(options, community.MetricPeriodOptionEndDate(ts))
 		}
 	}
 
-	periodStart, periodEnd := ResolvePeriod(options...)
+	periodStart, periodEnd := community.ResolvePeriod(options...)
 
-	summary, err := CommunityMetricAggregateSearch(r.Context(), t.q, communityID, periodStart, periodEnd)
+	summary, err := community.CommunityMetricAggregateSearch(r.Context(), t.q, communityID, periodStart, periodEnd)
 	if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to aggregate community metrics"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 
-	totalArchivers, err := PublishedCASMetricAggregateSearch(r.Context(), t.q, communityID, periodStart, periodEnd)
+	totalArchivers, err := community.PublishedCASMetricAggregateSearch(r.Context(), t.q, communityID, periodStart, periodEnd)
 	if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to aggregate archiver metrics"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 
-	msg := meta.CommunityMetricsResponse{
+	msg := CommunityMetricsResponse{
 		Summary: langx.Autoptr(langx.Clone(
-			meta.CommunityMetric{},
+			CommunityMetric{},
 			CommunityMetricOptionFromDB(langx.Clone(summary, timex.JSONSafeEncodeOption)),
 		)),
 		TotalArchivers: totalArchivers,
 	}
 
-	items, err := PublishedCASMetricPerContentSearch(r.Context(), t.q, communityID, periodStart, periodEnd)
+	items, err := community.PublishedCASMetricPerContentSearch(r.Context(), t.q, communityID, periodStart, periodEnd)
 	if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to fetch content metrics"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 	for _, m := range items {
-		tmp := langx.Clone(meta.PublishedContentMetric{}, PublishedCASMetricOptionFromDB(langx.Clone(m, timex.JSONSafeEncodeOption)))
+		tmp := langx.Clone(PublishedContentMetric{}, PublishedCASMetricOptionFromDB(langx.Clone(m, timex.JSONSafeEncodeOption)))
 		msg.Items = append(msg.Items, &tmp)
 	}
 
@@ -355,8 +354,8 @@ func (t *HTTP) metrics(w http.ResponseWriter, r *http.Request) {
 }
 
 // CommunityMetricOptionFromDB converts a database model to proto options.
-func CommunityMetricOptionFromDB(cm CommunityMetric) func(*meta.CommunityMetric) {
-	return func(m *meta.CommunityMetric) {
+func CommunityMetricOptionFromDB(cm community.CommunityMetric) func(*CommunityMetric) {
+	return func(m *CommunityMetric) {
 		m.Id = cm.ID
 		m.CommunityId = cm.CommunityID
 		m.PeriodStart = grpcx.EncodeTime(cm.PeriodStart)
@@ -366,8 +365,8 @@ func CommunityMetricOptionFromDB(cm CommunityMetric) func(*meta.CommunityMetric)
 }
 
 // PublishedCASMetricOptionFromDB converts a database model to proto options.
-func PublishedCASMetricOptionFromDB(pcm PublishedCASMetric) func(*meta.PublishedContentMetric) {
-	return func(m *meta.PublishedContentMetric) {
+func PublishedCASMetricOptionFromDB(pcm community.PublishedCASMetric) func(*PublishedContentMetric) {
+	return func(m *PublishedContentMetric) {
 		m.Id = pcm.ID
 		m.PublishedContentId = pcm.PublishedContentID
 		m.PeriodStart = grpcx.EncodeTime(pcm.PeriodStart)
@@ -384,7 +383,7 @@ func (t *HTTP) search(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var req meta.CommunitySearchRequest
+	var req CommunitySearchRequest
 	req.Limit = 100
 	if err := t.decoder.Decode(&req, r.Form); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to decode search request"))
@@ -393,7 +392,7 @@ func (t *HTTP) search(w http.ResponseWriter, r *http.Request) {
 	}
 	req.Limit = numericx.Min(req.Limit, 100)
 
-	client := deeppool.NewPublished(t.httpc)
+	client := NewPublished(t.httpc)
 	resp, err := client.Search(r.Context(), req.Query, req.Offset, req.Limit)
 	if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to search communities"))
@@ -402,7 +401,7 @@ func (t *HTTP) search(w http.ResponseWriter, r *http.Request) {
 	}
 
 	subs := make(map[string]time.Time)
-	q := sqlx.Scan(CommunitySubscriptionFindAll(r.Context(), t.q))
+	q := sqlx.Scan(community.CommunitySubscriptionFindAll(r.Context(), t.q))
 	for sub := range q.Iter() {
 		subs[sub.CommunityID] = sub.CreatedAt
 	}
@@ -427,11 +426,11 @@ func (t *HTTP) search(w http.ResponseWriter, r *http.Request) {
 
 func (t *HTTP) subscribe(w http.ResponseWriter, r *http.Request) {
 	var (
-		existing CommunitySubscription
+		existing community.CommunitySubscription
 		cid      = mux.Vars(r)["id"]
 	)
 
-	client := deeppool.NewPublished(t.httpc)
+	client := NewPublished(t.httpc)
 	com, err := client.Find(r.Context(), cid)
 	if err != nil {
 		log.Println(errorsx.Wrapf(err, "unable to find community from deeppool - %s", cid))
@@ -439,7 +438,7 @@ func (t *HTTP) subscribe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = CommunitySubscriptionFindByCommunityID(r.Context(), t.q, cid).Scan(&existing)
+	err = community.CommunitySubscriptionFindByCommunityID(r.Context(), t.q, cid).Scan(&existing)
 	if sqlx.IgnoreNoRows(err) != nil {
 		log.Println(errorsx.Wrap(err, "unable to look up subscription"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
@@ -448,7 +447,7 @@ func (t *HTTP) subscribe(w http.ResponseWriter, r *http.Request) {
 
 	if err == nil {
 		// already subscribed — toggle off
-		if err = CommunitySubscriptionDeleteByCommunityID(r.Context(), t.q, cid).Scan(&existing); err != nil {
+		if err = community.CommunitySubscriptionDeleteByCommunityID(r.Context(), t.q, cid).Scan(&existing); err != nil {
 			log.Println(errorsx.Wrap(err, "unable to delete subscription"))
 			errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 			return
@@ -465,11 +464,11 @@ func (t *HTTP) subscribe(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		// not subscribed — subscribe
-		var sub = CommunitySubscription{
+		var sub = community.CommunitySubscription{
 			CommunityID: cid,
 		}
 
-		if err = CommunitySubscriptionInsertWithDefaults(r.Context(), t.q, sub).Scan(&sub); err != nil {
+		if err = community.CommunitySubscriptionInsertWithDefaults(r.Context(), t.q, sub).Scan(&sub); err != nil {
 			log.Println(errorsx.Wrap(err, "unable to insert subscription"))
 			errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 			return
@@ -507,9 +506,9 @@ func (t *HTTP) metricsSync(w http.ResponseWriter, r *http.Request) {
 
 	var (
 		err         error
-		resp        *meta.MetricsSyncResponse
+		resp        *MetricsSyncResponse
 		communityID = mux.Vars(r)["id"]
-		metrics     = deeppool.NewMetrics(t.httpc)
+		metrics     = NewMetrics(t.httpc)
 	)
 
 	if resp, err = metrics.Sync(r.Context(), communityID); err != nil {
@@ -524,7 +523,7 @@ func (t *HTTP) metricsSync(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = httpx.WriteJSON(w, httpx.GetBuffer(r), &meta.MetricsSyncProgress{
+	if err = httpx.WriteJSON(w, httpx.GetBuffer(r), &MetricsSyncProgress{
 		Status:                "completed",
 		CommunityMetricsCount: int32(len(resp.CommunityMetrics)),
 		ContentMetricsCount:   int32(len(resp.ContentMetrics)),
@@ -534,13 +533,13 @@ func (t *HTTP) metricsSync(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (t *HTTP) storeMetrics(ctx context.Context, communityID string, resp *meta.MetricsSyncResponse) error {
+func (t *HTTP) storeMetrics(ctx context.Context, communityID string, resp *MetricsSyncResponse) error {
 	var (
 		err         error
 		periodStart time.Time
 		periodEnd   time.Time
 		syncedAt    time.Time
-		syncState   CommunitySyncState
+		syncState   community.CommunitySyncState
 	)
 
 	for _, cm := range resp.CommunityMetrics {
@@ -550,13 +549,13 @@ func (t *HTTP) storeMetrics(ctx context.Context, communityID string, resp *meta.
 		if periodEnd, err = grpcx.DecodeTime(cm.PeriodEnd); err != nil {
 			return errorsx.Wrap(err, "failed to decode period end")
 		}
-		local := CommunityMetric{
+		local := community.CommunityMetric{
 			CommunityID: cm.CommunityId,
 			PeriodStart: periodStart,
 			PeriodEnd:   periodEnd,
 			Subscribers: cm.Subscribers,
 		}
-		if err = CommunityMetricInsertWithDefaults(ctx, t.q, local).Scan(&local); err != nil {
+		if err = community.CommunityMetricInsertWithDefaults(ctx, t.q, local).Scan(&local); err != nil {
 			return errorsx.Wrap(err, "failed to insert community metric")
 		}
 	}
@@ -568,7 +567,7 @@ func (t *HTTP) storeMetrics(ctx context.Context, communityID string, resp *meta.
 		if periodEnd, err = grpcx.DecodeTime(pcm.PeriodEnd); err != nil {
 			return errorsx.Wrap(err, "failed to decode period end")
 		}
-		local := PublishedCASMetric{
+		local := community.PublishedCASMetric{
 			PublishedContentID: pcm.PublishedContentId,
 			PeriodStart:        periodStart,
 			PeriodEnd:          periodEnd,
@@ -576,7 +575,7 @@ func (t *HTTP) storeMetrics(ctx context.Context, communityID string, resp *meta.
 			Bytes:              pcm.Bytes,
 			Revenue:            pcm.Revenue,
 		}
-		if err = PublishedCASMetricInsertWithDefaults(ctx, t.q, local).Scan(&local); err != nil {
+		if err = community.PublishedCASMetricInsertWithDefaults(ctx, t.q, local).Scan(&local); err != nil {
 			return errorsx.Wrap(err, "failed to insert content metric")
 		}
 	}
@@ -584,11 +583,11 @@ func (t *HTTP) storeMetrics(ctx context.Context, communityID string, resp *meta.
 	if syncedAt, err = grpcx.DecodeTime(resp.SyncedAt); err != nil {
 		return errorsx.Wrap(err, "failed to decode synced at")
 	}
-	syncState = CommunitySyncState{
+	syncState = community.CommunitySyncState{
 		CommunityID: communityID,
 		LastSyncAt:  syncedAt,
 	}
-	if err = CommunitySyncStateInsertWithDefaults(ctx, t.q, syncState).Scan(&syncState); err != nil {
+	if err = community.CommunitySyncStateInsertWithDefaults(ctx, t.q, syncState).Scan(&syncState); err != nil {
 		return errorsx.Wrap(err, "failed to update sync state")
 	}
 

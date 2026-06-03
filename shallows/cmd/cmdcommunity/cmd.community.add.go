@@ -7,9 +7,8 @@ import (
 	"os"
 
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
-	"github.com/retrovibed/retrovibed/shallows/deeppool"
+	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
-	"github.com/retrovibed/retrovibed/shallows/meta"
 )
 
 type cmdCommunityAdd struct {
@@ -22,7 +21,7 @@ type cmdCommunityAdd struct {
 func (t cmdCommunityAdd) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClient) (err error) {
 	var (
 		httpc *http.Client
-		resp  *meta.PublishContentResponse
+		resp  *communityapi.PublishContentResponse
 	)
 
 	log.Println("community add initiated", t.Community)
@@ -32,8 +31,8 @@ func (t cmdCommunityAdd) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClient) (
 		return err
 	}
 
-	client := deeppool.NewPublished(httpc)
-	pc := &meta.PublishedContent{
+	client := communityapi.NewPublished(httpc)
+	pc := &communityapi.PublishedContent{
 		KnownMediaId: t.KnownMediaID,
 		MagnetUri:    t.MagnetURI,
 		ArchivedId:   t.ArchivedID,

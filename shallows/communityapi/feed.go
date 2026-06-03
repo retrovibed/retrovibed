@@ -1,4 +1,4 @@
-package community
+package communityapi
 
 import (
 	"bytes"
@@ -9,17 +9,17 @@ import (
 	"slices"
 	"time"
 
+	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/library"
-	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/retrovibed/retrovibed/shallows/rss"
 )
 
 type FeedPublisher interface {
-	Find(ctx context.Context, communityID string) (*meta.Community, error)
+	Find(ctx context.Context, communityID string) (*Community, error)
 	UploadFeed(ctx context.Context, communityID string, feed io.Reader) error
 }
 
@@ -63,10 +63,10 @@ func RegenerateFeed(ctx context.Context, q sqlx.Queryer, published FeedPublisher
 	return nil
 }
 
-func buildFeedItems(ctx context.Context, q sqlx.Queryer, community *meta.Community) ([]rss.Item, error) {
+func buildFeedItems(ctx context.Context, q sqlx.Queryer, c *Community) ([]rss.Item, error) {
 	var items []rss.Item
 
-	scanner := sqlx.Scan(PublishedContentFindByCommunityIDForFeed(ctx, q, community.Id))
+	scanner := sqlx.Scan(community.PublishedContentFindByCommunityIDForFeed(ctx, q, c.Id))
 
 	for pc := range scanner.Iter() {
 		var (

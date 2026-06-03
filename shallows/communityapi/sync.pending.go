@@ -1,4 +1,4 @@
-package community
+package communityapi
 
 import (
 	"bytes"
@@ -13,6 +13,7 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
+	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
@@ -20,12 +21,11 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/retrovibed/retrovibed/shallows/media"
-	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 )
 
 type MetricsPublisher interface {
-	Publish(ctx context.Context, req *meta.PublishContentRequest, torrent io.Reader) (*meta.PublishContentResponse, error)
+	Publish(ctx context.Context, req *PublishContentRequest, torrent io.Reader) (*PublishContentResponse, error)
 }
 
 func magnetURI(tmd tracking.Metadata, name string) string {
@@ -53,7 +53,7 @@ func ensureTorrent(ctx context.Context, q sqlx.Queryer, mvfs, tvfs fsx.Virtual, 
 
 // SyncPendingToDeeppool syncs pending published content to deeppool and regenerates affected feeds.
 func SyncPendingToDeeppool(ctx context.Context, q sqlx.Queryer, httpc *http.Client, metrics MetricsPublisher, published FeedPublisher, archiver library.Archiver, mvfs, tvfs fsx.Virtual) error {
-	pending := sqlx.Scan(PublishedContentFindByPendingSync(ctx, q))
+	pending := sqlx.Scan(community.PublishedContentFindByPendingSync(ctx, q))
 
 	for pc := range pending.Iter() {
 		var lmd library.Metadata
@@ -70,7 +70,7 @@ func SyncPendingToDeeppool(ctx context.Context, q sqlx.Queryer, httpc *http.Clie
 		}
 
 		pc.MagnetURI = magnetURI(tmd, lmd.Description)
-		if err := PublishedContentUpdateMagnetURI(ctx, q, pc.ID, pc.MagnetURI).Scan(&pc); err != nil {
+		if err := community.PublishedContentUpdateMagnetURI(ctx, q, pc.ID, pc.MagnetURI).Scan(&pc); err != nil {
 			log.Println(errorsx.Wrap(err, "failed to update magnet_uri"))
 			continue
 		}
@@ -83,20 +83,20 @@ func SyncPendingToDeeppool(ctx context.Context, q sqlx.Queryer, httpc *http.Clie
 		}
 
 		if pc.OAuthGoogleID != uuid.Nil.String() {
-			if uerr := YouTubeUpload(ctx, q, httpc, mvfs, pc.OAuthGoogleID, lmd, stringsx.FirstNonBlank(known.Title, lmd.Description), known.Overview); uerr != nil {
+			if uerr := community.YouTubeUpload(ctx, q, httpc, mvfs, pc.OAuthGoogleID, lmd, stringsx.FirstNonBlank(known.Title, lmd.Description), known.Overview); uerr != nil {
 				log.Println(errorsx.Wrap(uerr, "youtube cross-post failed"))
 			}
 		}
 
-		if pc.PublishMode == int32(meta.PublishMode_UNLISTED) {
-			if err := PublishedContentUpdatePublishedAt(ctx, q, pc.ID, time.Now()).Scan(&pc); err != nil {
+		if pc.PublishMode == int32(PublishMode_UNLISTED) {
+			if err := community.PublishedContentUpdatePublishedAt(ctx, q, pc.ID, time.Now()).Scan(&pc); err != nil {
 				log.Println(errorsx.Wrap(err, "failed to update published_at"))
 			}
 			continue
 		}
 
-		if pc.PublishMode == int32(meta.PublishMode_LISTED) {
-			if err := PublishedContentUpdatePublishedAt(ctx, q, pc.ID, time.Now()).Scan(&pc); err != nil {
+		if pc.PublishMode == int32(PublishMode_LISTED) {
+			if err := community.PublishedContentUpdatePublishedAt(ctx, q, pc.ID, time.Now()).Scan(&pc); err != nil {
 				log.Println(errorsx.Wrap(err, "failed to update published_at"))
 				continue
 			}
@@ -125,8 +125,8 @@ func SyncPendingToDeeppool(ctx context.Context, q sqlx.Queryer, httpc *http.Clie
 			continue
 		}
 
-		_, err = metrics.Publish(ctx, &meta.PublishContentRequest{
-			PublishedContent: &meta.PublishedContent{
+		_, err = metrics.Publish(ctx, &PublishContentRequest{
+			PublishedContent: &PublishedContent{
 				Id:             pc.ID,
 				CommunityId:    pc.CommunityID,
 				KnownMediaId:   pc.KnownMediaID,
@@ -145,7 +145,7 @@ func SyncPendingToDeeppool(ctx context.Context, q sqlx.Queryer, httpc *http.Clie
 			continue
 		}
 
-		if err := PublishedContentUpdatePublishedAt(ctx, q, pc.ID, time.Now()).Scan(&pc); err != nil {
+		if err := community.PublishedContentUpdatePublishedAt(ctx, q, pc.ID, time.Now()).Scan(&pc); err != nil {
 			log.Println(errorsx.Wrap(err, "failed to update published_at"))
 			continue
 		}

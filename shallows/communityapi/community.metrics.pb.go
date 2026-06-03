@@ -4,7 +4,7 @@
 // 	protoc        v3.21.12
 // source: community.metrics.proto
 
-package meta
+package communityapi
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"

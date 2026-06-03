@@ -1,4 +1,4 @@
-package deeppool
+package communityapi
 
 import (
 	"bytes"
@@ -10,19 +10,18 @@ import (
 	"net/http"
 	"net/url"
 
-	deepool "github.com/retrovibed/retrovibed/retroapi/deeppool"
+	"github.com/retrovibed/retrovibed/retroapi/deeppool"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 
 	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
-	"github.com/retrovibed/retrovibed/shallows/meta"
 )
 
 func NewPublished(c *http.Client) Published {
 	return Published{
 		c:        c,
-		endpoint: deepool.Deeppool(),
+		endpoint: deeppool.Deeppool(),
 	}
 }
 
@@ -32,15 +31,15 @@ type Published struct {
 }
 
 // Search returns communities matching the query from deeppool.
-func (t Published) Search(ctx context.Context, query string, offset, limit uint64) (*meta.CommunitySearchResponse, error) {
+func (t Published) Search(ctx context.Context, query string, offset, limit uint64) (*CommunitySearchResponse, error) {
 	var (
 		err  error
 		req  *http.Request
 		resp *http.Response
-		msg  meta.CommunitySearchResponse
+		msg  CommunitySearchResponse
 	)
 
-	params, err := formx.NewEncoder().Encode(&meta.CommunitySearchRequest{Query: query, Offset: offset, Limit: limit})
+	params, err := formx.NewEncoder().Encode(&CommunitySearchRequest{Query: query, Offset: offset, Limit: limit})
 	if err != nil {
 		return nil, err
 	}
@@ -63,12 +62,12 @@ func (t Published) Search(ctx context.Context, query string, offset, limit uint6
 }
 
 // Find returns community info from deeppool.
-func (t Published) Find(ctx context.Context, communityID string) (*meta.Community, error) {
+func (t Published) Find(ctx context.Context, communityID string) (*Community, error) {
 	var (
 		err  error
 		req  *http.Request
 		resp *http.Response
-		msg  meta.CommunityFindResponse
+		msg  CommunityFindResponse
 	)
 
 	uri := fmt.Sprintf("https://%s/c/%s", t.endpoint, communityID)
@@ -88,27 +87,14 @@ func (t Published) Find(ctx context.Context, communityID string) (*meta.Communit
 	return msg.Community, nil
 }
 
-// PublishedContentSyncRequest is the cursor-based request for the sync endpoint.
-type PublishedContentSyncRequest struct {
-	Sync   string `json:"sync"`
-	Offset uint64 `json:"offset"`
-	Limit  uint64 `json:"limit"`
-}
-
-// PublishedContentSyncResponse is the response from the sync endpoint.
-type PublishedContentSyncResponse struct {
-	Next  *PublishedContentSyncRequest `json:"next"`
-	Items []*meta.PublishedContent     `json:"items"`
-}
-
 // Sync pages through all published content using a cursor. cursor is the last-seen ID
 // (use empty string to start from the beginning).
-func (t Published) Sync(ctx context.Context, cursor string) (*PublishedContentSyncResponse, error) {
+func (t Published) Sync(ctx context.Context, cursor string) (*PublishedContentSearchResponse, error) {
 	var (
 		err  error
 		req  *http.Request
 		resp *http.Response
-		msg  PublishedContentSyncResponse
+		msg  PublishedContentSearchResponse
 	)
 
 	params := url.Values{}
@@ -132,12 +118,12 @@ func (t Published) Sync(ctx context.Context, cursor string) (*PublishedContentSy
 }
 
 // List returns all published content for a community.
-func (t Published) List(ctx context.Context, communityID string) (*meta.PublishedContentSearchResponse, error) {
+func (t Published) List(ctx context.Context, communityID string) (*PublishedContentSearchResponse, error) {
 	var (
 		err  error
 		req  *http.Request
 		resp *http.Response
-		msg  meta.PublishedContentSearchResponse
+		msg  PublishedContentSearchResponse
 	)
 
 	uri := fmt.Sprintf("https://%s/c/%s/published", t.endpoint, communityID)
@@ -197,15 +183,15 @@ func (t Published) UploadFeed(ctx context.Context, communityID string, feed io.R
 }
 
 // Publish publishes content to a community in deeppool.
-func (t Published) Publish(ctx context.Context, communityID string, pc *meta.PublishedContent) (*meta.PublishContentResponse, error) {
+func (t Published) Publish(ctx context.Context, communityID string, pc *PublishedContent) (*PublishContentResponse, error) {
 	var (
 		err  error
 		req  *http.Request
 		resp *http.Response
-		msg  meta.PublishContentResponse
+		msg  PublishContentResponse
 	)
 
-	body, err := json.Marshal(&meta.PublishContentRequest{PublishedContent: pc})
+	body, err := json.Marshal(&PublishContentRequest{PublishedContent: pc})
 	if err != nil {
 		return nil, err
 	}

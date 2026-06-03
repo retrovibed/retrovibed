@@ -1,6 +1,7 @@
-package community
+package communityapi
 
 import (
+	"github.com/retrovibed/retrovibed/shallows/community"
 	"net/http"
 	"testing"
 	"time"
@@ -23,8 +24,8 @@ func TestSyncFeed(t *testing.T) {
 		defer done()
 
 		for _, cid := range []string{communityID1, communityID2} {
-			var cs CommunitySyncState
-			require.NoError(t, CommunitySyncStateRequestFeedSync(ctx, q, CommunitySyncState{
+			var cs community.CommunitySyncState
+			require.NoError(t, community.CommunitySyncStateRequestFeedSync(ctx, q, community.CommunitySyncState{
 				CommunityID: cid,
 				SyncFeedAt:  time.Now().Add(-time.Minute),
 			}).Scan(&cs))
@@ -56,8 +57,8 @@ func TestSyncFeed(t *testing.T) {
 		)
 		defer done()
 
-		var cs CommunitySyncState
-		require.NoError(t, CommunitySyncStateRequestFeedSync(ctx, q, CommunitySyncState{
+		var cs community.CommunitySyncState
+		require.NoError(t, community.CommunitySyncStateRequestFeedSync(ctx, q, community.CommunitySyncState{
 			CommunityID: communityID,
 			SyncFeedAt:  time.Now().Add(time.Hour),
 		}).Scan(&cs))

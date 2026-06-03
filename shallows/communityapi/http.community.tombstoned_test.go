@@ -1,4 +1,4 @@
-package community_test
+package communityapi_test
 
 import (
 	"encoding/json"
@@ -9,6 +9,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/community"
+	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
@@ -37,11 +38,11 @@ func TestTombstonedEndpoint(t *testing.T) {
 		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
 
 		routes := mux.NewRouter()
-		community.NewHTTP(
+		communityapi.NewHTTP(
 			q,
-			community.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
-			community.HTTPOptionMediaStorage(fsx.DirVirtual(t.TempDir())),
-			community.HTTPOptionTorrentStorage(fsx.DirVirtual(t.TempDir())),
+			communityapi.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			communityapi.HTTPOptionMediaStorage(fsx.DirVirtual(t.TempDir())),
+			communityapi.HTTPOptionTorrentStorage(fsx.DirVirtual(t.TempDir())),
 		).Bind(routes.PathPrefix("/c").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
@@ -93,11 +94,11 @@ func TestTombstonedEndpoint(t *testing.T) {
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
 		routes := mux.NewRouter()
-		community.NewHTTP(
+		communityapi.NewHTTP(
 			q,
-			community.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
-			community.HTTPOptionMediaStorage(fsx.DirVirtual(t.TempDir())),
-			community.HTTPOptionTorrentStorage(fsx.DirVirtual(t.TempDir())),
+			communityapi.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			communityapi.HTTPOptionMediaStorage(fsx.DirVirtual(t.TempDir())),
+			communityapi.HTTPOptionTorrentStorage(fsx.DirVirtual(t.TempDir())),
 		).Bind(routes.PathPrefix("/c").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
@@ -114,7 +115,7 @@ func TestTombstonedEndpoint(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Code)
 
-		var result meta.PublishContentDeleteResponse
+		var result communityapi.PublishContentDeleteResponse
 		require.NoError(t, json.Unmarshal(resp.Body.Bytes(), &result))
 		require.NotNil(t, result.PublishedContent)
 		require.Equal(t, pc.ID, result.PublishedContent.Id)
@@ -165,11 +166,11 @@ func TestTombstonedEndpoint(t *testing.T) {
 		require.NotEmpty(t, pc2.ID)
 
 		routes := mux.NewRouter()
-		community.NewHTTP(
+		communityapi.NewHTTP(
 			q,
-			community.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
-			community.HTTPOptionMediaStorage(fsx.DirVirtual(t.TempDir())),
-			community.HTTPOptionTorrentStorage(fsx.DirVirtual(t.TempDir())),
+			communityapi.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			communityapi.HTTPOptionMediaStorage(fsx.DirVirtual(t.TempDir())),
+			communityapi.HTTPOptionTorrentStorage(fsx.DirVirtual(t.TempDir())),
 		).Bind(routes.PathPrefix("/c").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
