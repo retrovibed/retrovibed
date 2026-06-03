@@ -76,59 +76,58 @@ func TestPublishedCASMetricInsert(t *testing.T) {
 	require.Equal(t, int64(2048), metric.Revenue)
 }
 
-func TestCommunitySyncStateInsert(t *testing.T) {
+func TestCommunityInsert(t *testing.T) {
 	ctx, done := testx.Context(t)
 	defer done()
 
 	q := sqltestx.Metadatabase(t)
 
 	now := time.Now()
-	state := CommunitySyncState{
-		CommunityID: uuid.Nil.String(),
-		LastSyncAt:  now,
+	state := Community{
+		ID:         uuid.Nil.String(),
+		LastSyncAt: now,
 	}
 
-	require.NoError(t, CommunitySyncStateInsertWithDefaults(ctx, q, state).Scan(&state))
-	require.NotEmpty(t, state.ID)
-	require.Equal(t, uuid.Nil.String(), state.CommunityID)
+	require.NoError(t, CommunityInsertWithDefaults(ctx, q, state).Scan(&state))
+	require.Equal(t, uuid.Nil.String(), state.ID)
 }
 
-func TestCommunitySyncStateUpsert(t *testing.T) {
+func TestCommunityUpsert(t *testing.T) {
 	ctx, done := testx.Context(t)
 	defer done()
 
 	q := sqltestx.Metadatabase(t)
 
 	now := time.Now()
-	state := CommunitySyncState{
-		CommunityID: uuid.Nil.String(),
-		LastSyncAt:  now,
+	state := Community{
+		ID:         uuid.Nil.String(),
+		LastSyncAt: now,
 	}
 
-	require.NoError(t, CommunitySyncStateInsertWithDefaults(ctx, q, state).Scan(&state))
+	require.NoError(t, CommunityInsertWithDefaults(ctx, q, state).Scan(&state))
 	originalID := state.ID
 
 	state.LastSyncAt = now.Add(time.Hour)
-	require.NoError(t, CommunitySyncStateInsertWithDefaults(ctx, q, state).Scan(&state))
+	require.NoError(t, CommunityInsertWithDefaults(ctx, q, state).Scan(&state))
 	require.Equal(t, originalID, state.ID)
 }
 
-func TestCommunitySyncStateFindByCommunityID(t *testing.T) {
+func TestCommunityFindByID(t *testing.T) {
 	ctx, done := testx.Context(t)
 	defer done()
 
 	q := sqltestx.Metadatabase(t)
 
 	now := time.Now()
-	state := CommunitySyncState{
-		CommunityID: uuid.Nil.String(),
-		LastSyncAt:  now,
+	state := Community{
+		ID:         uuid.Nil.String(),
+		LastSyncAt: now,
 	}
 
-	require.NoError(t, CommunitySyncStateInsertWithDefaults(ctx, q, state).Scan(&state))
+	require.NoError(t, CommunityInsertWithDefaults(ctx, q, state).Scan(&state))
 
-	var found CommunitySyncState
-	require.NoError(t, CommunitySyncStateFindByCommunityID(ctx, q, uuid.Nil.String()).Scan(&found))
+	var found Community
+	require.NoError(t, CommunityFindByID(ctx, q, uuid.Nil.String()).Scan(&found))
 	require.Equal(t, state.ID, found.ID)
 }
 

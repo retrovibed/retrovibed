@@ -57,7 +57,7 @@ func TestSubscribeEndpoint(t *testing.T) {
 		var (
 			p   meta.Profile
 			v   meta.Authz
-			sub community.CommunitySubscription
+			sub community.Community
 		)
 		ctx, done := testx.Context(t)
 		defer done()
@@ -94,8 +94,8 @@ func TestSubscribeEndpoint(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Code)
 
-		require.NoError(t, community.CommunitySubscriptionFindByCommunityID(ctx, q, communityID).Scan(&sub))
-		require.Equal(t, communityID, sub.CommunityID)
+		require.NoError(t, community.CommunityFindByID(ctx, q, communityID).Scan(&sub))
+		require.Equal(t, communityID, sub.ID)
 		require.Equal(t, 1, sqltestx.Count(t, q, "SELECT COUNT(*) FROM torrents_feed_rss"))
 
 		feedURL := "https://community.community.retrovibe.space"
@@ -111,7 +111,7 @@ func TestSubscribeEndpoint(t *testing.T) {
 		var (
 			p   meta.Profile
 			v   meta.Authz
-			sub community.CommunitySubscription
+			sub community.Community
 		)
 		ctx, done := testx.Context(t)
 		defer done()
@@ -146,7 +146,7 @@ func TestSubscribeEndpoint(t *testing.T) {
 		require.NoError(t, err)
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Code)
-		require.NoError(t, community.CommunitySubscriptionFindByCommunityID(ctx, q, communityID).Scan(&sub))
+		require.NoError(t, community.CommunityFindByID(ctx, q, communityID).Scan(&sub))
 		require.Equal(t, 1, sqltestx.Count(t, q, "SELECT COUNT(*) FROM torrents_feed_rss"))
 
 		// unsubscribe
@@ -159,7 +159,7 @@ func TestSubscribeEndpoint(t *testing.T) {
 		require.NoError(t, err)
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Code)
-		require.ErrorIs(t, community.CommunitySubscriptionFindByCommunityID(ctx, q, communityID).Scan(&sub), sql.ErrNoRows)
+		require.ErrorIs(t, community.CommunityFindByID(ctx, q, communityID).Scan(&sub), sql.ErrNoRows)
 		require.Equal(t, 0, sqltestx.Count(t, q, "SELECT COUNT(*) FROM torrents_feed_rss"))
 	})
 
@@ -167,7 +167,7 @@ func TestSubscribeEndpoint(t *testing.T) {
 		var (
 			p   meta.Profile
 			v   meta.Authz
-			sub community.CommunitySubscription
+			sub community.Community
 		)
 		ctx, done := testx.Context(t)
 		defer done()
@@ -202,7 +202,7 @@ func TestSubscribeEndpoint(t *testing.T) {
 		require.NoError(t, err)
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Code)
-		require.NoError(t, community.CommunitySubscriptionFindByCommunityID(ctx, q, communityID).Scan(&sub))
+		require.NoError(t, community.CommunityFindByID(ctx, q, communityID).Scan(&sub))
 		require.Equal(t, 1, sqltestx.Count(t, q, "SELECT COUNT(*) FROM torrents_feed_rss"))
 
 		// unsubscribe
@@ -215,7 +215,7 @@ func TestSubscribeEndpoint(t *testing.T) {
 		require.NoError(t, err)
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Code)
-		require.ErrorIs(t, community.CommunitySubscriptionFindByCommunityID(ctx, q, communityID).Scan(&sub), sql.ErrNoRows)
+		require.ErrorIs(t, community.CommunityFindByID(ctx, q, communityID).Scan(&sub), sql.ErrNoRows)
 		require.Equal(t, 0, sqltestx.Count(t, q, "SELECT COUNT(*) FROM torrents_feed_rss"))
 
 		// resubscribe
@@ -228,8 +228,8 @@ func TestSubscribeEndpoint(t *testing.T) {
 		require.NoError(t, err)
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Code)
-		require.NoError(t, community.CommunitySubscriptionFindByCommunityID(ctx, q, communityID).Scan(&sub))
-		require.Equal(t, communityID, sub.CommunityID)
+		require.NoError(t, community.CommunityFindByID(ctx, q, communityID).Scan(&sub))
+		require.Equal(t, communityID, sub.ID)
 		require.Equal(t, 1, sqltestx.Count(t, q, "SELECT COUNT(*) FROM torrents_feed_rss"))
 	})
 }

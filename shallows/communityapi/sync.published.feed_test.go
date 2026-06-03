@@ -24,10 +24,10 @@ func TestSyncFeed(t *testing.T) {
 		defer done()
 
 		for _, cid := range []string{communityID1, communityID2} {
-			var cs community.CommunitySyncState
-			require.NoError(t, community.CommunitySyncStateRequestFeedSync(ctx, q, community.CommunitySyncState{
-				CommunityID: cid,
-				SyncFeedAt:  time.Now().Add(-time.Minute),
+			var cs community.Community
+			require.NoError(t, community.CommunityRequestFeedSync(ctx, q, community.Community{
+				ID:         cid,
+				SyncFeedAt: time.Now().Add(-time.Minute),
 			}).Scan(&cs))
 		}
 
@@ -57,10 +57,10 @@ func TestSyncFeed(t *testing.T) {
 		)
 		defer done()
 
-		var cs community.CommunitySyncState
-		require.NoError(t, community.CommunitySyncStateRequestFeedSync(ctx, q, community.CommunitySyncState{
-			CommunityID: communityID,
-			SyncFeedAt:  time.Now().Add(time.Hour),
+		var cs community.Community
+		require.NoError(t, community.CommunityRequestFeedSync(ctx, q, community.Community{
+			ID:         communityID,
+			SyncFeedAt: time.Now().Add(time.Hour),
 		}).Scan(&cs))
 
 		require.NoError(t, SyncFeed(ctx, q, http.DefaultClient, feeds))

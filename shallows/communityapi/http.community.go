@@ -156,7 +156,7 @@ func (t *HTTP) tombstoned(w http.ResponseWriter, r *http.Request) {
 	pid := mux.Vars(r)["id"]
 
 	var (
-		cs community.CommunitySyncState
+		cs community.Community
 		pc community.PublishedContent
 	)
 
@@ -166,9 +166,9 @@ func (t *HTTP) tombstoned(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := community.CommunitySyncStateRequestFeedSync(r.Context(), t.q, community.CommunitySyncState{
-		CommunityID: pc.CommunityID,
-		SyncFeedAt:  time.Now(),
+	if err := community.CommunityRequestFeedSync(r.Context(), t.q, community.Community{
+		ID:         pc.CommunityID,
+		SyncFeedAt: time.Now(),
 	}).Scan(&cs); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to request feed sync for community"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
@@ -267,11 +267,11 @@ func (t *HTTP) resync(w http.ResponseWriter, r *http.Request) {
 		cid   = mux.Vars(r)["id"]
 		msg   CommunityFindRequest
 		resp  CommunityFindResponse
-		syncd community.CommunitySyncState
+		syncd community.Community
 	)
 	_ = &msg
 
-	if err := community.CommunitySyncStateFindByCommunityID(r.Context(), t.q, cid).Scan(&syncd); err != nil {
+	if err := community.CommunityFindByID(r.Context(), t.q, cid).Scan(&syncd); err != nil {
 		log.Println(errorsx.Wrap(err, "unable lookup sync state"))
 		return
 	}
@@ -420,12 +420,13 @@ func (t *HTTP) search(w http.ResponseWriter, r *http.Request) {
 	}
 
 	subs := make(map[string]time.Time)
-	q := sqlx.Scan(community.CommunitySubscriptionFindAll(r.Context(), t.q))
-	for sub := range q.Iter() {
-		subs[sub.CommunityID] = sub.CreatedAt
+	q := community.CommunitySearchBuilder()
+	scanner := sqlx.Scan(community.CommunitySearch(r.Context(), t.q, q))
+	for sub := range scanner.Iter() {
+		subs[sub.ID] = sub.CreatedAt
 	}
 
-	if err := q.Err(); err != nil {
+	if err := scanner.Err(); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to fetch subscriptions"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
@@ -445,7 +446,7 @@ func (t *HTTP) search(w http.ResponseWriter, r *http.Request) {
 
 func (t *HTTP) subscribe(w http.ResponseWriter, r *http.Request) {
 	var (
-		existing community.CommunitySubscription
+		existing community.Community
 		cid      = mux.Vars(r)["id"]
 	)
 
@@ -457,7 +458,7 @@ func (t *HTTP) subscribe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = community.CommunitySubscriptionFindByCommunityID(r.Context(), t.q, cid).Scan(&existing)
+	err = community.CommunityFindByID(r.Context(), t.q, cid).Scan(&existing)
 	if sqlx.IgnoreNoRows(err) != nil {
 		log.Println(errorsx.Wrap(err, "unable to look up subscription"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
@@ -466,7 +467,7 @@ func (t *HTTP) subscribe(w http.ResponseWriter, r *http.Request) {
 
 	if err == nil {
 		// already subscribed — toggle off
-		if err = community.CommunitySubscriptionDeleteByCommunityID(r.Context(), t.q, cid).Scan(&existing); err != nil {
+		if err = community.CommunityDeleteByID(r.Context(), t.q, cid).Scan(&existing); err != nil {
 			log.Println(errorsx.Wrap(err, "unable to delete subscription"))
 			errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 			return
@@ -483,11 +484,11 @@ func (t *HTTP) subscribe(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		// not subscribed — subscribe
-		var sub = community.CommunitySubscription{
-			CommunityID: cid,
+		var sub = community.Community{
+			ID: cid,
 		}
 
-		if err = community.CommunitySubscriptionInsertWithDefaults(r.Context(), t.q, sub).Scan(&sub); err != nil {
+		if err = community.CommunityUpsertAutoDownload(r.Context(), t.q, sub).Scan(&sub); err != nil {
 			log.Println(errorsx.Wrap(err, "unable to insert subscription"))
 			errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 			return
@@ -558,7 +559,7 @@ func (t *HTTP) storeMetrics(ctx context.Context, communityID string, resp *Metri
 		periodStart time.Time
 		periodEnd   time.Time
 		syncedAt    time.Time
-		syncState   community.CommunitySyncState
+		syncState   community.Community
 	)
 
 	for _, cm := range resp.CommunityMetrics {
@@ -602,11 +603,11 @@ func (t *HTTP) storeMetrics(ctx context.Context, communityID string, resp *Metri
 	if syncedAt, err = grpcx.DecodeTime(resp.SyncedAt); err != nil {
 		return errorsx.Wrap(err, "failed to decode synced at")
 	}
-	syncState = community.CommunitySyncState{
-		CommunityID: communityID,
-		LastSyncAt:  syncedAt,
+	syncState = community.Community{
+		ID:         communityID,
+		LastSyncAt: syncedAt,
 	}
-	if err = community.CommunitySyncStateInsertWithDefaults(ctx, t.q, syncState).Scan(&syncState); err != nil {
+	if err = community.CommunityInsertWithDefaults(ctx, t.q, syncState).Scan(&syncState); err != nil {
 		return errorsx.Wrap(err, "failed to update sync state")
 	}
 

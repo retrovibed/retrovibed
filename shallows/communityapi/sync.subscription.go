@@ -87,21 +87,21 @@ func NewSubscriptionSync(ctx context.Context, q sqlx.Queryer, client DeeppoolPub
 	defer log.Println("subscription sync worker completed")
 
 	return timex.NowAndEvery(ctx, interval, func(ctx context.Context) error {
-		subs := sqlx.Scan(community.CommunitySubscriptionFindAll(ctx, q))
+		subs := sqlx.Scan(community.CommunitySearch(ctx, q, community.CommunitySearchBuilder()))
 		for sub := range subs.Iter() {
 			autodownload := sub.AutoDownload != 0
-			synced, err := SyncContentFromDeeppool(ctx, q, client, sub.CommunityID, autodownload)
+			synced, err := SyncContentFromDeeppool(ctx, q, client, sub.ID, autodownload)
 			if err != nil {
-				log.Println(errorsx.Wrap(err, "subscription sync failed for "+sub.CommunityID))
+				log.Println(errorsx.Wrap(err, "subscription sync failed for "+sub.ID))
 				continue
 			}
 
 			if synced > 0 {
-				log.Printf("subscription sync: imported %d items for %s", synced, sub.CommunityID)
+				log.Printf("subscription sync: imported %d items for %s", synced, sub.ID)
 			}
 
-			if err = community.CommunitySubscriptionUpdateLastSyncAt(ctx, q, sub.CommunityID, time.Now()).Scan(&sub); err != nil {
-				log.Println(errorsx.Wrap(err, "failed to update last_sync_at for "+sub.CommunityID))
+			if err = community.CommunityUpdateLastSyncAt(ctx, q, sub.ID, time.Now()).Scan(&sub); err != nil {
+				log.Println(errorsx.Wrap(err, "failed to update last_sync_at for "+sub.ID))
 			}
 		}
 
