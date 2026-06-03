@@ -27,7 +27,7 @@ class CommunityDetail extends StatelessWidget {
           ],
         ),
         SelectableText(
-          'https://${community.domain}.community.retrovibe.space',
+          community.url,
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.primary,
           ),

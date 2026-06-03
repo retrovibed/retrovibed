@@ -1,7 +1,6 @@
 package communityapi
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -135,26 +134,26 @@ func (t *HTTP) subscribe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = community.CommunityFindByID(r.Context(), t.q, cid).Scan(&existing)
-	if sqlx.IgnoreNoRows(err) != nil {
-		log.Println(errorsx.Wrap(err, "unable to look up subscription"))
+	if err := community.CommunityInsertWithDefaults(r.Context(), t.q, CommunityFromDeeppool(com)).Scan(&existing); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to upsert community"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 
-	if err == nil {
+	subscribed := existing.SubscribedAt.Before(timex.Inf())
+
+	if subscribed {
 		// already subscribed — toggle off
-		if err = community.CommunityDeleteByID(r.Context(), t.q, cid).Scan(&existing); err != nil {
-			log.Println(errorsx.Wrap(err, "unable to delete subscription"))
+		if err = community.CommunityUnsubscribe(r.Context(), t.q, cid).Scan(&existing); err != nil {
+			log.Println(errorsx.Wrap(err, "unable to unsubscribe"))
 			errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 			return
 		}
 
 		var (
-			feed    tracking.RSS
-			feedURL = fmt.Sprintf("https://%s.community.retrovibe.space", com.Domain)
+			feed tracking.RSS
 		)
-		if err = tracking.RSSDeleteByURL(r.Context(), t.q, feedURL).Scan(&feed); sqlx.IgnoreNoRows(err) != nil {
+		if err = tracking.RSSDeleteByURL(r.Context(), t.q, existing.URL).Scan(&feed); sqlx.IgnoreNoRows(err) != nil {
 			log.Println(errorsx.Wrap(err, "unable to delete rss feed"))
 			errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 			return
@@ -166,18 +165,20 @@ func (t *HTTP) subscribe(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if err = community.CommunityUpsertAutoDownload(r.Context(), t.q, sub).Scan(&sub); err != nil {
-			log.Println(errorsx.Wrap(err, "unable to insert subscription"))
+			log.Println(errorsx.Wrap(err, "unable to upsert community"))
 			errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 			return
 		}
 
-		var (
-			feedURL = fmt.Sprintf("https://%s.community.retrovibe.space", com.Domain)
-		)
+		if err = community.CommunitySubscribe(r.Context(), t.q, cid).Scan(&existing); err != nil {
+			log.Println(errorsx.Wrap(err, "unable to subscribe"))
+			errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+			return
+		}
 
 		feed := tracking.NewFeedRSS(
 			"",
-			tracking.RSSOptionURL(feedURL),
+			tracking.RSSOptionURL(existing.URL),
 			tracking.RSSOptionDescription(stringsx.Join(" - ", slicesx.Filter(stringsx.Present, com.Domain, com.Description)...)),
 			tracking.RSSOptionEncryptionSeed(com.Entropy),
 			tracking.RSSOptionAutodownload(true),

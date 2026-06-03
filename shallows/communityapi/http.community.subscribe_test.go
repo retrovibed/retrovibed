@@ -1,7 +1,6 @@
 package communityapi_test
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -19,6 +18,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/testx"
+	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/internal/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/retrovibed/retrovibed/shallows/metaapi"
@@ -35,6 +35,7 @@ func newCommunityMockClient(communityID string) *http.Client {
 					Domain:      "community",
 					Description: communityID,
 					Entropy:     uuidx.WithSuffix(1),
+					Url:         "https://community.community.retrovibe.space",
 				},
 			})
 			return &http.Response{
@@ -154,7 +155,8 @@ func TestSubscribeEndpoint(t *testing.T) {
 		require.NoError(t, err)
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Code)
-		require.ErrorIs(t, community.CommunityFindByID(ctx, q, communityID).Scan(&sub), sql.ErrNoRows)
+		require.NoError(t, community.CommunityFindByID(ctx, q, communityID).Scan(&sub))
+		require.True(t, sub.SubscribedAt.Equal(timex.Inf()), "expected subscribed_at to be infinity after unsubscribe")
 		require.Equal(t, 0, sqltestx.Count(t, q, "SELECT COUNT(*) FROM torrents_feed_rss"))
 	})
 
@@ -208,7 +210,8 @@ func TestSubscribeEndpoint(t *testing.T) {
 		require.NoError(t, err)
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Code)
-		require.ErrorIs(t, community.CommunityFindByID(ctx, q, communityID).Scan(&sub), sql.ErrNoRows)
+		require.NoError(t, community.CommunityFindByID(ctx, q, communityID).Scan(&sub))
+		require.True(t, sub.SubscribedAt.Equal(timex.Inf()), "expected subscribed_at to be infinity after unsubscribe")
 		require.Equal(t, 0, sqltestx.Count(t, q, "SELECT COUNT(*) FROM torrents_feed_rss"))
 
 		// resubscribe

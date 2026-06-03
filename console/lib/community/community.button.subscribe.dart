@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/httpx.dart' as httpx;
-import 'package:retrovibed/community/api.dart';
 import 'package:retrovibed/authn.dart' as authn;
+import 'package:retrovibed/timex.dart' as timex;
+import 'api.dart';
 
 class SubscribeButton extends StatelessWidget {
   final Community community;
@@ -14,7 +15,8 @@ class SubscribeButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final subscribed = community.subscribedAt.isNotEmpty;
+    final subscribed = timex.iso8601(community.subscribedAt).isBefore(timex.inf);
+
     return ds.LoadingIconButton(
       icon: Icon(
         subscribed ? Icons.check_circle : Icons.add_circle_outline,

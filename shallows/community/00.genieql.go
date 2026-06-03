@@ -186,6 +186,20 @@ func CommunityUpdateLastSyncAt(
 	gql = gql.Query(`UPDATE community SET last_sync_at = {lastSyncAt}, updated_at = now() WHERE id = {cid} RETURNING ` + CommunityScannerStaticColumns)
 }
 
+func CommunitySubscribe(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, cid string) NewCommunityScannerStaticRow,
+) {
+	gql = gql.Query(`UPDATE community SET subscribed_at = now(), updated_at = now() WHERE id = {cid} RETURNING ` + CommunityScannerStaticColumns)
+}
+
+func CommunityUnsubscribe(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, cid string) NewCommunityScannerStaticRow,
+) {
+	gql = gql.Query(`UPDATE community SET subscribed_at = 'infinity', updated_at = now() WHERE id = {cid} RETURNING ` + CommunityScannerStaticColumns)
+}
+
 func CommunityUpsertAutoDownload(
 	gql genieql.Insert,
 	pattern func(ctx context.Context, q sqlx.Queryer, a Community) NewCommunityScannerStaticRow,

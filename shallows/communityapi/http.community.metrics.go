@@ -53,22 +53,22 @@ type HTTPMetrics struct {
 func (t *HTTPMetrics) Bind(r *mux.Router) {
 	r.StrictSlash(false)
 
-	r.Path("/{id}/metrics").Methods(http.MethodGet).Handler(alice.New(
+	r.Path("/{id}").Methods(http.MethodGet).Handler(alice.New(
 		httpx.ContextBufferPool512(),
 		httpx.ParseForm,
 		httpauth.AuthenticateWithToken(t.jwtsecret),
 		httpx.Timeout2s(),
-	).ThenFunc(t.metrics))
+	).ThenFunc(t.search))
 
-	r.Path("/{id}/metrics/sync").Methods(http.MethodPost).Handler(alice.New(
+	r.Path("/{id}").Methods(http.MethodPost).Handler(alice.New(
 		httpx.ContextBufferPool512(),
 		httpauth.AuthenticateWithToken(t.jwtsecret),
 		httpx.Timeout2s(),
-	).ThenFunc(t.metricsSync))
+	).ThenFunc(t.sync))
 }
 
-func (t *HTTPMetrics) metrics(w http.ResponseWriter, r *http.Request) {
-	communityID := mux.Vars(r)["id"]
+func (t *HTTPMetrics) search(w http.ResponseWriter, r *http.Request) {
+	cid := mux.Vars(r)["id"]
 
 	var options []community.MetricPeriodOption
 
@@ -85,14 +85,14 @@ func (t *HTTPMetrics) metrics(w http.ResponseWriter, r *http.Request) {
 
 	periodStart, periodEnd := community.ResolvePeriod(options...)
 
-	summary, err := community.CommunityMetricAggregateSearch(r.Context(), t.q, communityID, periodStart, periodEnd)
+	summary, err := community.CommunityMetricAggregateSearch(r.Context(), t.q, cid, periodStart, periodEnd)
 	if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to aggregate community metrics"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 
-	totalArchivers, err := community.PublishedCASMetricAggregateSearch(r.Context(), t.q, communityID, periodStart, periodEnd)
+	totalArchivers, err := community.PublishedCASMetricAggregateSearch(r.Context(), t.q, cid, periodStart, periodEnd)
 	if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to aggregate archiver metrics"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
@@ -107,7 +107,7 @@ func (t *HTTPMetrics) metrics(w http.ResponseWriter, r *http.Request) {
 		TotalArchivers: totalArchivers,
 	}
 
-	items, err := community.PublishedCASMetricPerContentSearch(r.Context(), t.q, communityID, periodStart, periodEnd)
+	items, err := community.PublishedCASMetricPerContentSearch(r.Context(), t.q, cid, periodStart, periodEnd)
 	if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to fetch content metrics"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
@@ -137,7 +137,7 @@ func PublishedCASMetricOptionFromDB(pcm community.PublishedCASMetric) func(*Publ
 	}
 }
 
-func (t *HTTPMetrics) metricsSync(w http.ResponseWriter, r *http.Request) {
+func (t *HTTPMetrics) sync(w http.ResponseWriter, r *http.Request) {
 	if t.httpc == nil {
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusServiceUnavailable))
 		return
@@ -222,11 +222,7 @@ func (t *HTTPMetrics) storeMetrics(ctx context.Context, communityID string, resp
 	if syncedAt, err = grpcx.DecodeTime(resp.SyncedAt); err != nil {
 		return errorsx.Wrap(err, "failed to decode synced at")
 	}
-	syncState = community.Community{
-		ID:         communityID,
-		LastSyncAt: syncedAt,
-	}
-	if err = community.CommunityInsertWithDefaults(ctx, t.q, syncState).Scan(&syncState); err != nil {
+	if err = community.CommunityUpdateLastSyncAt(ctx, t.q, communityID, syncedAt).Scan(&syncState); err != nil {
 		return errorsx.Wrap(err, "failed to update sync state")
 	}
 

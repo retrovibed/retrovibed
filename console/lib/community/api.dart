@@ -91,7 +91,7 @@ class API {
   }) async {
     return httpx
         .post(
-          Uri.https(httpx.host(), "/c/$cid/publish"),
+          Uri.https(httpx.host(), "/c/p/$cid"),
           body: jsonEncode(req.toProto3Json()),
           options: [httpx.Accept.json, httpx.Content.json, ...options],
         )
@@ -115,7 +115,7 @@ class API {
         .get(
           Uri.https(
             httpx.host(),
-            "/c/$cid/published",
+            "/c/p/$cid",
             jsonDecode(jsonEncode(req.toProto3Json())),
           ),
           options: [httpx.Accept.json, ...options],
@@ -135,7 +135,7 @@ class API {
         .delete(
           Uri.https(
             httpx.host(),
-            "/c/published/$pid",
+            "/c/p/$pid",
           ),
           options: [httpx.Accept.json, ...options],
         )
@@ -152,12 +152,14 @@ class API {
     required DateTime endDate,
     List<httpx.Option> options = const [],
   }) async {
+    final req = CommunityMetricsRequest(
+      communityId: id,
+      startDate: startDate.toIso8601String(),
+      endDate: endDate.toIso8601String(),
+    );
     return httpx
         .get(
-          Uri.https(httpx.host(), "/c/$id/metrics", {
-            'start_date': startDate.toIso8601String(),
-            'end_date': endDate.toIso8601String(),
-          }),
+          Uri.https(httpx.host(), "/c/m/$id", httpx.params(req.toProto3Json())),
           options: [httpx.Accept.json, ...options],
         )
         .then((v) {
@@ -173,7 +175,7 @@ class API {
   }) async {
     return httpx
         .post(
-          Uri.https(httpx.host(), "/c/$id/metrics/sync"),
+          Uri.https(httpx.host(), "/c/m/$id"),
           options: [httpx.Accept.json, ...options],
         )
         .then((v) {
