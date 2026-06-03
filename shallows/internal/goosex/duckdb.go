@@ -116,6 +116,10 @@ func InitializeDatabase(ctx context.Context, db *sql.DB, migrations fs.FS) (err 
 		return errorsx.Wrap(err, "failed to load vss extension")
 	}
 
+	if _, err := db.ExecContext(ctx, "SET GLOBAL hnsw_enable_experimental_persistence = true;"); err != nil {
+		return errorsx.Wrap(err, "failed to enable hnsw persistence")
+	}
+
 	mprov, err := goose.NewProvider(
 		"",
 		db,
