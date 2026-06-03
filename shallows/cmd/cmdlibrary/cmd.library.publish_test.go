@@ -32,13 +32,13 @@ func communityLibraryPublishServer(t *testing.T, q *sql.DB) *mux.Router {
 	t.Helper()
 
 	routes := mux.NewRouter()
-	communityapi.NewHTTP(
+	communityapi.NewHTTPPublished(
 		q,
-		communityapi.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
-		communityapi.HTTPOptionHTTPClient(&http.Client{}),
-		communityapi.HTTPOptionMediaStorage(fsx.DirVirtual(t.TempDir())),
-		communityapi.HTTPOptionTorrentStorage(fsx.DirVirtual(t.TempDir())),
-	).Bind(routes.PathPrefix("/c").Subrouter())
+		communityapi.HTTPPublishedOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+		communityapi.HTTPPublishedOptionHTTPClient(&http.Client{}),
+		communityapi.HTTPPublishedOptionMediaStorage(fsx.DirVirtual(t.TempDir())),
+		communityapi.HTTPPublishedOptionTorrentStorage(fsx.DirVirtual(t.TempDir())),
+	).Bind(routes.PathPrefix("/c/p").Subrouter())
 
 	return routes
 }

@@ -38,18 +38,18 @@ func TestTombstonedEndpoint(t *testing.T) {
 		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
 
 		routes := mux.NewRouter()
-		communityapi.NewHTTP(
+		communityapi.NewHTTPPublished(
 			q,
-			communityapi.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
-			communityapi.HTTPOptionMediaStorage(fsx.DirVirtual(t.TempDir())),
-			communityapi.HTTPOptionTorrentStorage(fsx.DirVirtual(t.TempDir())),
+			communityapi.HTTPPublishedOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			communityapi.HTTPPublishedOptionMediaStorage(fsx.DirVirtual(t.TempDir())),
+			communityapi.HTTPPublishedOptionTorrentStorage(fsx.DirVirtual(t.TempDir())),
 		).Bind(routes.PathPrefix("/c").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
 		resp, req, err := httptestx.BuildRequestContextBytes(
 			ctx,
 			http.MethodDelete,
-			"/c/published/"+nonExistentID,
+			"/c/"+nonExistentID,
 			nil,
 			httptestx.RequestOptionAuthorization("Bearer "+httpauthtest.UnsafeToken(claims, httpauthtest.UnsafeJWTSecretSource)),
 			httptestx.RequestOptionContent("application/json"),
@@ -94,18 +94,18 @@ func TestTombstonedEndpoint(t *testing.T) {
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
 		routes := mux.NewRouter()
-		communityapi.NewHTTP(
+		communityapi.NewHTTPPublished(
 			q,
-			communityapi.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
-			communityapi.HTTPOptionMediaStorage(fsx.DirVirtual(t.TempDir())),
-			communityapi.HTTPOptionTorrentStorage(fsx.DirVirtual(t.TempDir())),
+			communityapi.HTTPPublishedOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			communityapi.HTTPPublishedOptionMediaStorage(fsx.DirVirtual(t.TempDir())),
+			communityapi.HTTPPublishedOptionTorrentStorage(fsx.DirVirtual(t.TempDir())),
 		).Bind(routes.PathPrefix("/c").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
 		resp, req, err := httptestx.BuildRequestContextBytes(
 			ctx,
 			http.MethodDelete,
-			"/c/published/"+pc.ID,
+			"/c/"+pc.ID,
 			nil,
 			httptestx.RequestOptionAuthorization("Bearer "+httpauthtest.UnsafeToken(claims, httpauthtest.UnsafeJWTSecretSource)),
 			httptestx.RequestOptionContent("application/json"),
@@ -166,18 +166,18 @@ func TestTombstonedEndpoint(t *testing.T) {
 		require.NotEmpty(t, pc2.ID)
 
 		routes := mux.NewRouter()
-		communityapi.NewHTTP(
+		communityapi.NewHTTPPublished(
 			q,
-			communityapi.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
-			communityapi.HTTPOptionMediaStorage(fsx.DirVirtual(t.TempDir())),
-			communityapi.HTTPOptionTorrentStorage(fsx.DirVirtual(t.TempDir())),
+			communityapi.HTTPPublishedOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			communityapi.HTTPPublishedOptionMediaStorage(fsx.DirVirtual(t.TempDir())),
+			communityapi.HTTPPublishedOptionTorrentStorage(fsx.DirVirtual(t.TempDir())),
 		).Bind(routes.PathPrefix("/c").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
 		resp, req, err := httptestx.BuildRequestContextBytes(
 			ctx,
 			http.MethodDelete,
-			"/c/published/"+pc1.ID,
+			"/c/"+pc1.ID,
 			nil,
 			httptestx.RequestOptionAuthorization("Bearer "+httpauthtest.UnsafeToken(claims, httpauthtest.UnsafeJWTSecretSource)),
 			httptestx.RequestOptionContent("application/json"),

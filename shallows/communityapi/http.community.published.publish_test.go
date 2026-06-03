@@ -59,12 +59,12 @@ func TestPublishEndpoint(t *testing.T) {
 		require.Equal(t, uuid.Nil.String(), lmd.ArchiveID)
 
 		routes := mux.NewRouter()
-		communityapi.NewHTTP(
+		communityapi.NewHTTPPublished(
 			q,
-			communityapi.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
-			communityapi.HTTPOptionHTTPClient(&http.Client{}),
-			communityapi.HTTPOptionMediaStorage(fsx.DirVirtual(mediaDir)),
-			communityapi.HTTPOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
+			communityapi.HTTPPublishedOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			communityapi.HTTPPublishedOptionHTTPClient(&http.Client{}),
+			communityapi.HTTPPublishedOptionMediaStorage(fsx.DirVirtual(mediaDir)),
+			communityapi.HTTPPublishedOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
 		).Bind(routes.PathPrefix("/c").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
@@ -78,7 +78,7 @@ func TestPublishEndpoint(t *testing.T) {
 		resp, req, err := httptestx.BuildRequestContextBytes(
 			ctx,
 			http.MethodPost,
-			"/c/"+communityID+"/publish",
+			"/c/"+communityID,
 			body,
 			httptestx.RequestOptionAuthorization("Bearer "+httpauthtest.UnsafeToken(claims, httpauthtest.UnsafeJWTSecretSource)),
 			httptestx.RequestOptionContent("application/json"),
@@ -136,12 +136,12 @@ func TestPublishEndpoint(t *testing.T) {
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
 		routes := mux.NewRouter()
-		communityapi.NewHTTP(
+		communityapi.NewHTTPPublished(
 			q,
-			communityapi.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
-			communityapi.HTTPOptionHTTPClient(&http.Client{}),
-			communityapi.HTTPOptionMediaStorage(fsx.DirVirtual(mediaDir)),
-			communityapi.HTTPOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
+			communityapi.HTTPPublishedOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			communityapi.HTTPPublishedOptionHTTPClient(&http.Client{}),
+			communityapi.HTTPPublishedOptionMediaStorage(fsx.DirVirtual(mediaDir)),
+			communityapi.HTTPPublishedOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
 		).Bind(routes.PathPrefix("/c").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
@@ -156,7 +156,7 @@ func TestPublishEndpoint(t *testing.T) {
 		resp, req, err := httptestx.BuildRequestContextBytes(
 			ctx,
 			http.MethodPost,
-			"/c/"+communityID+"/publish",
+			"/c/"+communityID,
 			body,
 			httptestx.RequestOptionAuthorization("Bearer "+httpauthtest.UnsafeToken(claims, httpauthtest.UnsafeJWTSecretSource)),
 			httptestx.RequestOptionContent("application/json"),
@@ -212,12 +212,12 @@ func TestPublishEndpoint(t *testing.T) {
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
 		routes := mux.NewRouter()
-		communityapi.NewHTTP(
+		communityapi.NewHTTPPublished(
 			q,
-			communityapi.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
-			communityapi.HTTPOptionHTTPClient(&http.Client{}),
-			communityapi.HTTPOptionMediaStorage(fsx.DirVirtual(mediaDir)),
-			communityapi.HTTPOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
+			communityapi.HTTPPublishedOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			communityapi.HTTPPublishedOptionHTTPClient(&http.Client{}),
+			communityapi.HTTPPublishedOptionMediaStorage(fsx.DirVirtual(mediaDir)),
+			communityapi.HTTPPublishedOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
 		).Bind(routes.PathPrefix("/c").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
@@ -232,7 +232,7 @@ func TestPublishEndpoint(t *testing.T) {
 		resp, req, err := httptestx.BuildRequestContextBytes(
 			ctx,
 			http.MethodPost,
-			"/c/"+communityID+"/publish",
+			"/c/"+communityID,
 			body,
 			httptestx.RequestOptionAuthorization("Bearer "+httpauthtest.UnsafeToken(claims, httpauthtest.UnsafeJWTSecretSource)),
 			httptestx.RequestOptionContent("application/json"),
@@ -289,12 +289,12 @@ func TestPublishEndpoint(t *testing.T) {
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
 		routes := mux.NewRouter()
-		communityapi.NewHTTP(
+		communityapi.NewHTTPPublished(
 			q,
-			communityapi.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
-			communityapi.HTTPOptionHTTPClient(&http.Client{}),
-			communityapi.HTTPOptionMediaStorage(fsx.DirVirtual(mediaDir)),
-			communityapi.HTTPOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
+			communityapi.HTTPPublishedOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			communityapi.HTTPPublishedOptionHTTPClient(&http.Client{}),
+			communityapi.HTTPPublishedOptionMediaStorage(fsx.DirVirtual(mediaDir)),
+			communityapi.HTTPPublishedOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
 		).Bind(routes.PathPrefix("/c").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
@@ -308,7 +308,7 @@ func TestPublishEndpoint(t *testing.T) {
 		resp, req, err := httptestx.BuildRequestContextBytes(
 			ctx,
 			http.MethodPost,
-			"/c/"+communityID+"/publish",
+			"/c/"+communityID,
 			body,
 			httptestx.RequestOptionAuthorization("Bearer "+httpauthtest.UnsafeToken(claims, httpauthtest.UnsafeJWTSecretSource)),
 			httptestx.RequestOptionContent("application/json"),
@@ -363,12 +363,12 @@ func TestPublishEndpoint(t *testing.T) {
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
 		routes := mux.NewRouter()
-		communityapi.NewHTTP(
+		communityapi.NewHTTPPublished(
 			q,
-			communityapi.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
-			communityapi.HTTPOptionHTTPClient(&http.Client{}),
-			communityapi.HTTPOptionMediaStorage(fsx.DirVirtual(mediaDir)),
-			communityapi.HTTPOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
+			communityapi.HTTPPublishedOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			communityapi.HTTPPublishedOptionHTTPClient(&http.Client{}),
+			communityapi.HTTPPublishedOptionMediaStorage(fsx.DirVirtual(mediaDir)),
+			communityapi.HTTPPublishedOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
 		).Bind(routes.PathPrefix("/c").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
@@ -385,7 +385,7 @@ func TestPublishEndpoint(t *testing.T) {
 		resp, req, err := httptestx.BuildRequestContextBytes(
 			ctx,
 			http.MethodPost,
-			"/c/"+communityID+"/publish",
+			"/c/"+communityID,
 			body,
 			httptestx.RequestOptionAuthorization("Bearer "+httpauthtest.UnsafeToken(claims, httpauthtest.UnsafeJWTSecretSource)),
 			httptestx.RequestOptionContent("application/json"),
@@ -456,12 +456,12 @@ func TestPublishEndpoint(t *testing.T) {
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
 		routes := mux.NewRouter()
-		communityapi.NewHTTP(
+		communityapi.NewHTTPPublished(
 			q,
-			communityapi.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
-			communityapi.HTTPOptionHTTPClient(&http.Client{}),
-			communityapi.HTTPOptionMediaStorage(fsx.DirVirtual(mediaDir)),
-			communityapi.HTTPOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
+			communityapi.HTTPPublishedOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			communityapi.HTTPPublishedOptionHTTPClient(&http.Client{}),
+			communityapi.HTTPPublishedOptionMediaStorage(fsx.DirVirtual(mediaDir)),
+			communityapi.HTTPPublishedOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
 		).Bind(routes.PathPrefix("/c").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
@@ -475,7 +475,7 @@ func TestPublishEndpoint(t *testing.T) {
 		resp, req, err := httptestx.BuildRequestContextBytes(
 			ctx,
 			http.MethodPost,
-			"/c/"+communityID+"/publish",
+			"/c/"+communityID,
 			body,
 			httptestx.RequestOptionAuthorization("Bearer "+httpauthtest.UnsafeToken(claims, httpauthtest.UnsafeJWTSecretSource)),
 			httptestx.RequestOptionContent("application/json"),

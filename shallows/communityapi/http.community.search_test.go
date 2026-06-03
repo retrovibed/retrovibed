@@ -13,7 +13,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
-	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/testx"
@@ -65,8 +64,6 @@ func TestSearchEndpoint(t *testing.T) {
 				Domain:      "testcommunity",
 				Description: "a test community",
 			})),
-			communityapi.HTTPOptionMediaStorage(fsx.DirVirtual(t.TempDir())),
-			communityapi.HTTPOptionTorrentStorage(fsx.DirVirtual(t.TempDir())),
 		).Bind(routes.PathPrefix("/c").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
@@ -110,8 +107,6 @@ func TestSearchEndpoint(t *testing.T) {
 				Id:     communityID,
 				Domain: "testcommunity",
 			})),
-			communityapi.HTTPOptionMediaStorage(fsx.DirVirtual(t.TempDir())),
-			communityapi.HTTPOptionTorrentStorage(fsx.DirVirtual(t.TempDir())),
 		).Bind(routes.PathPrefix("/c").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))

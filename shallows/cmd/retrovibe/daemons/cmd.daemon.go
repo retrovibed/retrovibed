@@ -350,12 +350,22 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	metaapi.NewHTTPFileConfig(torrenting.cfgpath).Bind(httpmux.PathPrefix("/s/torrents").Subrouter())
 	metaapi.NewHTTPFileConfig(storagecfgpath).Bind(httpmux.PathPrefix("/s/storage").Subrouter())
 
+	communityapi.NewHTTPMetrics(
+		db,
+		envx.Toggle(communityapi.HTTPMetricsOptionNoop, communityapi.HTTPMetricsOptionHTTPClient(deepjwt), t.AutoArchive),
+	).Bind(httpmux.PathPrefix("/c/m").Subrouter())
+
+	communityapi.NewHTTPPublished(
+		db,
+		envx.Toggle(communityapi.HTTPPublishedOptionNoop, communityapi.HTTPPublishedOptionHTTPClient(deepjwt), t.AutoArchive),
+		communityapi.HTTPPublishedOptionPublishing(publishing),
+		communityapi.HTTPPublishedOptionMediaStorage(mediastore),
+		communityapi.HTTPPublishedOptionTorrentStorage(tvfs),
+	).Bind(httpmux.PathPrefix("/c/p").Subrouter())
+
 	communityapi.NewHTTP(
 		db,
 		envx.Toggle(communityapi.HTTPOptionNoop, communityapi.HTTPOptionHTTPClient(deepjwt), t.AutoArchive),
-		communityapi.HTTPOptionPublishing(publishing),
-		communityapi.HTTPOptionMediaStorage(mediastore),
-		communityapi.HTTPOptionTorrentStorage(tvfs),
 	).Bind(httpmux.PathPrefix("/c").Subrouter())
 
 	communityapi.NewHTTPYouTube(db, deepjwt).Bind(httpmux.PathPrefix("/integrations/youtube").Subrouter())

@@ -83,7 +83,7 @@ func (t cmdPublish) publishItem(ctx context.Context, c *http.Client, com *commun
 		return nil, err
 	}
 
-	uri := fmt.Sprintf("%s/c/%s/publish", t.Endpoint, com.Id)
+	uri := fmt.Sprintf("%s/c/p/%s", t.Endpoint, com.Id)
 	if req, err = http.NewRequestWithContext(ctx, http.MethodPost, uri, bytes.NewReader(body)); err != nil {
 		return nil, err
 	}
