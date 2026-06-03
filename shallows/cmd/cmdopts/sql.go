@@ -9,6 +9,8 @@ import (
 	"os"
 	"path/filepath"
 
+	_ "github.com/duckdb/duckdb-go/v2"
+
 	"github.com/retrovibed/retrovibed/shallows/internal/debugx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/goosex"
