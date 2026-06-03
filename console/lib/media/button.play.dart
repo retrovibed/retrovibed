@@ -27,7 +27,9 @@ Future<void> Function()? PlayAction(
               s.next,
               current,
               options: () => [authn.request(authn.AuthzCache.meta(context))],
-              random: api.media.acoustic(current.id),
+              random: mimex.icon(current.mimetype) == mimex.icoaudio
+                  ? api.media.acoustic(current.id)
+                  : api.media.random,
             ),
           ),
         );

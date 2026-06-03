@@ -33,7 +33,7 @@ func DatabaseCustom(ctx context.Context, path string) (db *sql.DB, err error) {
 	}
 
 	connector, err := duckdb.NewConnector(path, func(execer driver.ExecerContext) error {
-		_, err := execer.ExecContext(context.Background(), "SET hnsw_enable_experimental_persistence = true;", nil)
+		_, err := execer.ExecContext(context.Background(), "SET GLOBAL hnsw_enable_experimental_persistence = true;", nil)
 		return err
 	})
 	if err != nil {
