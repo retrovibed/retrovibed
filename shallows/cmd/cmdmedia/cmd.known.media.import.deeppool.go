@@ -37,7 +37,7 @@ func (t deeppoolimport) Run(gctx *cmdopts.Global) error {
 }
 
 func (t deeppoolimport) run(ctx context.Context, enc *json.Encoder, httpc *http.Client) error {
-	client := communityapi.NewPublished(httpc)
+	client := communityapi.NewDeeppoolPublished(httpc)
 	cursor := uuid.Must(uuid.NewV7AtTime(t.StartAt)).String()
 
 	for {

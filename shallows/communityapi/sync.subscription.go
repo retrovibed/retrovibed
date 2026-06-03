@@ -19,8 +19,8 @@ import (
 
 // SyncContentFromDeeppool fetches published content for a community from deeppool
 // and imports it into the local database. Returns the number of items synced.
-func SyncContentFromDeeppool(ctx context.Context, q sqlx.Queryer, client Published, communityID string, autodownload bool) (int, error) {
-	resp, err := client.List(ctx, communityID)
+func SyncContentFromDeeppool(ctx context.Context, q sqlx.Queryer, client DeeppoolPublished, communityID string, autodownload bool) (int, error) {
+	resp, err := client.List(ctx, communityID, &PublishedContentSearchRequest{})
 	if err != nil {
 		return 0, errorsx.Wrap(err, "failed to fetch published content from deeppool")
 	}
@@ -82,7 +82,7 @@ func SyncPublishedContentItem(ctx context.Context, q sqlx.Queryer, pc *Published
 
 // NewSubscriptionSync creates a background worker that periodically syncs
 // content from all subscribed communities.
-func NewSubscriptionSync(ctx context.Context, q sqlx.Queryer, client Published, interval time.Duration) error {
+func NewSubscriptionSync(ctx context.Context, q sqlx.Queryer, client DeeppoolPublished, interval time.Duration) error {
 	log.Println("subscription sync worker initiated")
 	defer log.Println("subscription sync worker completed")
 

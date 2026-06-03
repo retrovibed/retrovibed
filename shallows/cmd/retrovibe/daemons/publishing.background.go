@@ -18,7 +18,7 @@ import (
 
 func AutoPublishing(ctx context.Context, q sqlx.Queryer, c *http.Client, mvfs, tvfs fsx.Virtual, async *asyncx.Wakeup) error {
 	metrics := communityapi.NewMetrics(c)
-	published := communityapi.NewPublished(c)
+	published := communityapi.NewDeeppoolCommunity(c)
 
 	s := backoffx.New(
 		backoffx.Constant(time.Hour),
@@ -39,7 +39,7 @@ func AutoPublishing(ctx context.Context, q sqlx.Queryer, c *http.Client, mvfs, t
 }
 
 func AutoFeedSync(ctx context.Context, q sqlx.Queryer, c *http.Client, async *asyncx.Wakeup) error {
-	published := communityapi.NewPublished(c)
+	published := communityapi.NewDeeppoolCommunity(c)
 
 	contextx.Run(ctx, func() {
 		errorsx.Log(asyncx.Run(ctx, async, func(ctx context.Context) error {

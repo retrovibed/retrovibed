@@ -5,8 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
-	"mime/multipart"
 	"net/http"
 	"net/url"
 
@@ -18,78 +16,21 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 )
 
-func NewPublished(c *http.Client) Published {
-	return Published{
+func NewDeeppoolPublished(c *http.Client) DeeppoolPublished {
+	return DeeppoolPublished{
 		c:        c,
 		endpoint: deeppool.Deeppool(),
 	}
 }
 
-type Published struct {
+type DeeppoolPublished struct {
 	c        *http.Client
 	endpoint string
 }
 
-// Search returns communities matching the query from deeppool.
-func (t Published) Search(ctx context.Context, query string, offset, limit uint64) (*CommunitySearchResponse, error) {
-	var (
-		err  error
-		req  *http.Request
-		resp *http.Response
-		msg  CommunitySearchResponse
-	)
-
-	params, err := formx.NewEncoder().Encode(&CommunitySearchRequest{Query: query, Offset: offset, Limit: limit})
-	if err != nil {
-		return nil, err
-	}
-
-	uri := fmt.Sprintf("https://%s/c/?%s", t.endpoint, params.Encode())
-	if req, err = http.NewRequestWithContext(ctx, http.MethodGet, uri, nil); err != nil {
-		return nil, err
-	}
-
-	if resp, err = httpx.AsError(t.c.Do(req)); err != nil {
-		return nil, errorsx.Wrap(err, "request failed")
-	}
-	defer resp.Body.Close()
-
-	if err = json.NewDecoder(resp.Body).Decode(&msg); err != nil {
-		return nil, err
-	}
-
-	return &msg, nil
-}
-
-// Find returns community info from deeppool.
-func (t Published) Find(ctx context.Context, communityID string) (*Community, error) {
-	var (
-		err  error
-		req  *http.Request
-		resp *http.Response
-		msg  CommunityFindResponse
-	)
-
-	uri := fmt.Sprintf("https://%s/c/%s", t.endpoint, communityID)
-	if req, err = http.NewRequestWithContext(ctx, http.MethodGet, uri, nil); err != nil {
-		return nil, err
-	}
-
-	if resp, err = httpx.AsError(t.c.Do(req)); err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	if err = json.NewDecoder(resp.Body).Decode(&msg); err != nil {
-		return nil, err
-	}
-
-	return msg.Community, nil
-}
-
 // Sync pages through all published content using a cursor. cursor is the last-seen ID
 // (use empty string to start from the beginning).
-func (t Published) Sync(ctx context.Context, cursor string) (*PublishedContentSearchResponse, error) {
+func (t DeeppoolPublished) Sync(ctx context.Context, cursor string) (*PublishedContentSearchResponse, error) {
 	var (
 		err  error
 		req  *http.Request
@@ -118,20 +59,25 @@ func (t Published) Sync(ctx context.Context, cursor string) (*PublishedContentSe
 }
 
 // List returns all published content for a community.
-func (t Published) List(ctx context.Context, communityID string) (*PublishedContentSearchResponse, error) {
+func (t DeeppoolPublished) List(ctx context.Context, communityID string, req *PublishedContentSearchRequest) (*PublishedContentSearchResponse, error) {
 	var (
 		err  error
-		req  *http.Request
+		r    *http.Request
 		resp *http.Response
 		msg  PublishedContentSearchResponse
 	)
 
-	uri := fmt.Sprintf("https://%s/c/%s/published", t.endpoint, communityID)
-	if req, err = http.NewRequestWithContext(ctx, http.MethodGet, uri, nil); err != nil {
+	params, err := formx.NewEncoder().Encode(req)
+	if err != nil {
 		return nil, err
 	}
 
-	if resp, err = httpx.AsError(t.c.Do(req)); err != nil {
+	uri := fmt.Sprintf("https://%s/c/%s/published?%s", t.endpoint, communityID, params.Encode())
+	if r, err = http.NewRequestWithContext(ctx, http.MethodGet, uri, nil); err != nil {
+		return nil, err
+	}
+
+	if resp, err = httpx.AsError(t.c.Do(r)); err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -143,47 +89,8 @@ func (t Published) List(ctx context.Context, communityID string) (*PublishedCont
 	return &msg, nil
 }
 
-// UploadFeed uploads an RSS feed to deeppool for a community.
-func (t Published) UploadFeed(ctx context.Context, communityID string, feed io.Reader) error {
-	var (
-		err  error
-		req  *http.Request
-		resp *http.Response
-		part io.Writer
-	)
-
-	contenttype, data, err := httpx.Multipart(func(w *multipart.Writer) error {
-		if part, err = w.CreatePart(httpx.NewMultipartHeader(mimex.RSS, "content", "feed.xml")); err != nil {
-			return errorsx.Wrap(err, "unable to create feed part")
-		}
-
-		if _, err = io.Copy(part, feed); err != nil {
-			return errorsx.Wrap(err, "unable to copy feed")
-		}
-
-		return nil
-	})
-	if err != nil {
-		return err
-	}
-	defer data.Close()
-
-	uri := fmt.Sprintf("https://%s/c/%s", t.endpoint, communityID)
-	if req, err = http.NewRequestWithContext(ctx, http.MethodPost, uri, data); err != nil {
-		return err
-	}
-	req.Header.Set("Content-Type", contenttype)
-
-	if resp, err = httpx.AsError(t.c.Do(req)); err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	return nil
-}
-
 // Publish publishes content to a community in deeppool.
-func (t Published) Publish(ctx context.Context, communityID string, pc *PublishedContent) (*PublishContentResponse, error) {
+func (t DeeppoolPublished) Publish(ctx context.Context, communityID string, pc *PublishedContent) (*PublishContentResponse, error) {
 	var (
 		err  error
 		req  *http.Request

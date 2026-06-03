@@ -12,7 +12,7 @@ import (
 )
 
 func SubscriptionSync(ctx context.Context, q sqlx.Queryer, c *http.Client) error {
-	published := communityapi.NewPublished(c)
+	published := communityapi.NewDeeppoolPublished(c)
 
 	contextx.Run(ctx, func() {
 		errorsx.Log(communityapi.NewSubscriptionSync(ctx, q, published, 5*time.Minute))

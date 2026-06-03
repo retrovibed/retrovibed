@@ -143,6 +143,13 @@ func (t *HTTP) Bind(r *mux.Router) {
 		httpauth.AuthenticateWithToken(t.jwtsecret),
 		httpx.Timeout2s(),
 	).ThenFunc(t.subscribe))
+
+	r.Path("/{id}").Methods(http.MethodGet).Handler(alice.New(
+		httpx.RouteInvoked,
+		httpx.ContextBufferPool512(),
+		httpauth.AuthenticateWithToken(t.jwtsecret),
+		httpx.Timeout2s(),
+	).ThenFunc(t.resync))
 }
 
 func (t *HTTP) tombstoned(w http.ResponseWriter, r *http.Request) {
@@ -255,6 +262,22 @@ func (t *HTTP) publish(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (t *HTTP) resync(w http.ResponseWriter, r *http.Request) {
+	var (
+		msg  CommunityFindRequest
+		resp CommunityFindResponse
+	)
+	_ = msg
+
+	cid := mux.Vars(r)["id"]
+	_ = cid
+
+	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &resp); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to write response"))
+		return
+	}
+}
+
 func (t *HTTP) published(w http.ResponseWriter, r *http.Request) {
 	communityID := mux.Vars(r)["id"]
 
@@ -353,17 +376,6 @@ func (t *HTTP) metrics(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// CommunityMetricOptionFromDB converts a database model to proto options.
-func CommunityMetricOptionFromDB(cm community.CommunityMetric) func(*CommunityMetric) {
-	return func(m *CommunityMetric) {
-		m.Id = cm.ID
-		m.CommunityId = cm.CommunityID
-		m.PeriodStart = grpcx.EncodeTime(cm.PeriodStart)
-		m.PeriodEnd = grpcx.EncodeTime(cm.PeriodEnd)
-		m.Subscribers = cm.Subscribers
-	}
-}
-
 // PublishedCASMetricOptionFromDB converts a database model to proto options.
 func PublishedCASMetricOptionFromDB(pcm community.PublishedCASMetric) func(*PublishedContentMetric) {
 	return func(m *PublishedContentMetric) {
@@ -392,7 +404,7 @@ func (t *HTTP) search(w http.ResponseWriter, r *http.Request) {
 	}
 	req.Limit = numericx.Min(req.Limit, 100)
 
-	client := NewPublished(t.httpc)
+	client := NewDeeppoolCommunity(t.httpc)
 	resp, err := client.Search(r.Context(), req.Query, req.Offset, req.Limit)
 	if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to search communities"))
@@ -430,7 +442,7 @@ func (t *HTTP) subscribe(w http.ResponseWriter, r *http.Request) {
 		cid      = mux.Vars(r)["id"]
 	)
 
-	client := NewPublished(t.httpc)
+	client := NewDeeppoolCommunity(t.httpc)
 	com, err := client.Find(r.Context(), cid)
 	if err != nil {
 		log.Println(errorsx.Wrapf(err, "unable to find community from deeppool - %s", cid))

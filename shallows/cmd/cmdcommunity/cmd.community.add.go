@@ -31,7 +31,7 @@ func (t cmdCommunityAdd) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClient) (
 		return err
 	}
 
-	client := communityapi.NewPublished(httpc)
+	client := communityapi.NewDeeppoolPublished(httpc)
 	pc := &communityapi.PublishedContent{
 		KnownMediaId: t.KnownMediaID,
 		MagnetUri:    t.MagnetURI,
