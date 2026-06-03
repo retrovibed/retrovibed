@@ -1,8 +1,8 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:retrovibed/community.dart';
 import 'package:retrovibed/community/content.detail.dart';
-import 'package:retrovibed/community/community.pb.dart';
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
 
 final _resolutions = Resolutions.variant();

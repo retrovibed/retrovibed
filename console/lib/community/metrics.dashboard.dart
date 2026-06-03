@@ -3,9 +3,8 @@ import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/timex.dart' as timex;
-import 'package:retrovibed/community/api.dart' as communityapi;
-import 'package:retrovibed/community/community.pb.dart';
 import 'package:retrovibed/design.kit/inputs.dart' as inputs;
+import 'api.dart' as communityapi;
 
 List<timex.Range> _defaultSegments() {
   final now = DateTime.now();
@@ -18,13 +17,13 @@ List<timex.Range> _defaultSegments() {
 }
 
 class MetricsDashboard extends StatefulWidget {
-  final Community community;
-  final Future<MetricsSyncProgress> Function(
+  final communityapi.Community community;
+  final Future<communityapi.MetricsSyncProgress> Function(
     String id, {
     List<httpx.Option> options,
   })
   apicommunitysync;
-  final Future<CommunityMetricsResponse> Function(
+  final Future<communityapi.CommunityMetricsResponse> Function(
     String id, {
     required DateTime startDate,
     required DateTime endDate,
@@ -46,7 +45,7 @@ class MetricsDashboard extends StatefulWidget {
 }
 
 class _MetricsDashboardState extends State<MetricsDashboard> {
-  CommunityMetricsResponse _metrics = CommunityMetricsResponse();
+  communityapi.CommunityMetricsResponse _metrics = communityapi.CommunityMetricsResponse();
   bool _loading = true;
   Widget _cause = ds.Error.zero;
   timex.Range _selected = _defaultSegments().first;

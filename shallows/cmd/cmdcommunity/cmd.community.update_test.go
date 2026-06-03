@@ -9,10 +9,10 @@ import (
 	"testing"
 
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
+	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/testx"
-	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -22,13 +22,13 @@ func TestCommunityUpdate(t *testing.T) {
 		ctx, cancel := testx.Context(t)
 		defer cancel()
 
-		current := &meta.Community{
+		current := &communityapi.Community{
 			Id:          "test-id",
 			Domain:      "test-community",
 			Description: "original description",
 			Mimetype:    "video/mp4",
 		}
-		updated := &meta.Community{
+		updated := &communityapi.Community{
 			Id:          "test-id",
 			Domain:      "test-community",
 			Description: "updated description",
@@ -39,9 +39,9 @@ func TestCommunityUpdate(t *testing.T) {
 			require.Equal(t, "/c/test-community", r.URL.Path)
 			switch r.Method {
 			case http.MethodGet:
-				assert.NoError(t, json.NewEncoder(w).Encode(&meta.CommunityFindResponse{Community: current}))
+				assert.NoError(t, json.NewEncoder(w).Encode(&communityapi.CommunityFindResponse{Community: current}))
 			case http.MethodPut:
-				assert.NoError(t, json.NewEncoder(w).Encode(&meta.CommunityUpdateResponse{Community: updated}))
+				assert.NoError(t, json.NewEncoder(w).Encode(&communityapi.CommunityUpdateResponse{Community: updated}))
 			default:
 				w.WriteHeader(http.StatusMethodNotAllowed)
 			}
@@ -97,12 +97,12 @@ func TestCommunityUpdate(t *testing.T) {
 		ctx, cancel := testx.Context(t)
 		defer cancel()
 
-		current := &meta.Community{Id: "test-id", Domain: "test-community"}
+		current := &communityapi.Community{Id: "test-id", Domain: "test-community"}
 
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			switch r.Method {
 			case http.MethodGet:
-				assert.NoError(t, json.NewEncoder(w).Encode(&meta.CommunityFindResponse{Community: current}))
+				assert.NoError(t, json.NewEncoder(w).Encode(&communityapi.CommunityFindResponse{Community: current}))
 			default:
 				w.WriteHeader(http.StatusInternalServerError)
 			}
@@ -131,27 +131,27 @@ func TestCommunityUpdate(t *testing.T) {
 		ctx, cancel := testx.Context(t)
 		defer cancel()
 
-		current := &meta.Community{
+		current := &communityapi.Community{
 			Id:                 "test-id",
 			Domain:             "test-community",
 			Description:        "original description",
 			Mimetype:           "video/mp4",
-			DefaultPublishMode: meta.PublishMode_LISTED,
+			DefaultPublishMode: communityapi.PublishMode_LISTED,
 			DefaultTtl:         3600,
 			DefaultLanguage:    "en",
 			Hidden:             true,
 			Adult:              true,
 		}
 
-		var receivedReq meta.CommunityUpdateRequest
+		var receivedReq communityapi.CommunityUpdateRequest
 
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			switch r.Method {
 			case http.MethodGet:
-				assert.NoError(t, json.NewEncoder(w).Encode(&meta.CommunityFindResponse{Community: current}))
+				assert.NoError(t, json.NewEncoder(w).Encode(&communityapi.CommunityFindResponse{Community: current}))
 			case http.MethodPut:
 				assert.NoError(t, json.NewDecoder(r.Body).Decode(&receivedReq))
-				assert.NoError(t, json.NewEncoder(w).Encode(&meta.CommunityUpdateResponse{Community: &meta.Community{}}))
+				assert.NoError(t, json.NewEncoder(w).Encode(&communityapi.CommunityUpdateResponse{Community: &communityapi.Community{}}))
 			}
 		}))
 		defer srv.Close()
@@ -176,7 +176,7 @@ func TestCommunityUpdate(t *testing.T) {
 
 		require.Equal(t, "new description", receivedReq.Community.Description)
 		require.Equal(t, "video/mp4", receivedReq.Community.Mimetype)
-		require.Equal(t, meta.PublishMode_LISTED, receivedReq.Community.DefaultPublishMode)
+		require.Equal(t, communityapi.PublishMode_LISTED, receivedReq.Community.DefaultPublishMode)
 		require.Equal(t, uint64(3600), receivedReq.Community.DefaultTtl)
 		require.Equal(t, "en", receivedReq.Community.DefaultLanguage)
 		require.True(t, receivedReq.Community.Hidden)
@@ -187,21 +187,21 @@ func TestCommunityUpdate(t *testing.T) {
 		ctx, cancel := testx.Context(t)
 		defer cancel()
 
-		current := &meta.Community{
+		current := &communityapi.Community{
 			Id:                 "test-id",
 			Domain:             "test-community",
-			DefaultPublishMode: meta.PublishMode_UNLISTED,
+			DefaultPublishMode: communityapi.PublishMode_UNLISTED,
 		}
 
-		var receivedReq meta.CommunityUpdateRequest
+		var receivedReq communityapi.CommunityUpdateRequest
 
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			switch r.Method {
 			case http.MethodGet:
-				assert.NoError(t, json.NewEncoder(w).Encode(&meta.CommunityFindResponse{Community: current}))
+				assert.NoError(t, json.NewEncoder(w).Encode(&communityapi.CommunityFindResponse{Community: current}))
 			case http.MethodPut:
 				assert.NoError(t, json.NewDecoder(r.Body).Decode(&receivedReq))
-				assert.NoError(t, json.NewEncoder(w).Encode(&meta.CommunityUpdateResponse{Community: &meta.Community{}}))
+				assert.NoError(t, json.NewEncoder(w).Encode(&communityapi.CommunityUpdateResponse{Community: &communityapi.Community{}}))
 			}
 		}))
 		defer srv.Close()
@@ -222,7 +222,7 @@ func TestCommunityUpdate(t *testing.T) {
 
 		err := cmd.Run(gctx, dpc)
 		require.NoError(t, err)
-		require.Equal(t, meta.PublishMode_SYNDICATED, receivedReq.Community.DefaultPublishMode)
+		require.Equal(t, communityapi.PublishMode_SYNDICATED, receivedReq.Community.DefaultPublishMode)
 	})
 
 	t.Run("includes community name in path", func(t *testing.T) {
@@ -235,9 +235,9 @@ func TestCommunityUpdate(t *testing.T) {
 			require.Equal(t, "/c/"+communityName, r.URL.Path)
 			switch r.Method {
 			case http.MethodGet:
-				assert.NoError(t, json.NewEncoder(w).Encode(&meta.CommunityFindResponse{Community: &meta.Community{}}))
+				assert.NoError(t, json.NewEncoder(w).Encode(&communityapi.CommunityFindResponse{Community: &communityapi.Community{}}))
 			case http.MethodPut:
-				assert.NoError(t, json.NewEncoder(w).Encode(&meta.CommunityUpdateResponse{Community: &meta.Community{}}))
+				assert.NoError(t, json.NewEncoder(w).Encode(&communityapi.CommunityUpdateResponse{Community: &communityapi.Community{}}))
 			}
 		}))
 		defer srv.Close()

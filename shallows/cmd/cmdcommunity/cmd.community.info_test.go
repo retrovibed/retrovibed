@@ -9,9 +9,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/testx"
-	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -21,7 +21,7 @@ func TestCommunityInfo(t *testing.T) {
 		ctx, cancel := testx.Context(t)
 		defer cancel()
 
-		expected := &meta.Community{
+		expected := &communityapi.Community{
 			Id:          "test-id",
 			Domain:      "test-community",
 			Description: "test description",
@@ -31,7 +31,7 @@ func TestCommunityInfo(t *testing.T) {
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			require.Equal(t, http.MethodGet, r.Method)
 			require.Equal(t, "/c/test-community", r.URL.Path)
-			assert.NoError(t, json.NewEncoder(w).Encode(&meta.CommunityFindResponse{Community: expected}))
+			assert.NoError(t, json.NewEncoder(w).Encode(&communityapi.CommunityFindResponse{Community: expected}))
 		}))
 		defer srv.Close()
 
@@ -68,8 +68,8 @@ func TestCommunityInfo(t *testing.T) {
 
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			require.Equal(t, "/c/"+communityName, r.URL.Path)
-			assert.NoError(t, json.NewEncoder(w).Encode(&meta.CommunityFindResponse{
-				Community: &meta.Community{},
+			assert.NoError(t, json.NewEncoder(w).Encode(&communityapi.CommunityFindResponse{
+				Community: &communityapi.Community{},
 			}))
 		}))
 		defer srv.Close()
@@ -87,8 +87,8 @@ func TestCommunityInfo(t *testing.T) {
 		defer cancel()
 
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			assert.NoError(t, json.NewEncoder(w).Encode(&meta.CommunityFindResponse{
-				Community: &meta.Community{},
+			assert.NoError(t, json.NewEncoder(w).Encode(&communityapi.CommunityFindResponse{
+				Community: &communityapi.Community{},
 			}))
 		}))
 		defer srv.Close()

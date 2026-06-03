@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:retrovibed/community/publish.confirmation.dart';
-import 'package:retrovibed/community/community.pb.dart';
+import 'package:retrovibed/testing/widget_tester_extensions.dart';
 import 'package:retrovibed/httpx.dart' as httpx;
+import 'package:retrovibed/community.dart';
+import 'package:retrovibed/community/publish.confirmation.dart';
 import 'package:retrovibed/media/media.pb.dart';
 import 'package:retrovibed/media/media.known.pb.dart';
-import 'package:retrovibed/testing/widget_tester_extensions.dart';
 
 final _resolutions = Resolutions.variant();
 

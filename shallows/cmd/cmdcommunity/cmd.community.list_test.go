@@ -9,10 +9,10 @@ import (
 	"testing"
 
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
+	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/testx"
-	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -51,7 +51,7 @@ func TestCommunityList(t *testing.T) {
 
 		_ = sqltestx.Metadatabase(t)
 
-		expected := &meta.Community{
+		expected := &communityapi.Community{
 			Id:          "00000000-0000-0000-0000-000000000001",
 			Domain:      "test-community",
 			Description: "test description",
@@ -59,7 +59,7 @@ func TestCommunityList(t *testing.T) {
 
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			require.Equal(t, http.MethodGet, r.Method)
-			assert.NoError(t, json.NewEncoder(w).Encode(&meta.CommunityFindResponse{Community: expected}))
+			assert.NoError(t, json.NewEncoder(w).Encode(&communityapi.CommunityFindResponse{Community: expected}))
 		}))
 		defer srv.Close()
 

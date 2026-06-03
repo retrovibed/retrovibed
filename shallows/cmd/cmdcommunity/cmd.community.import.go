@@ -8,11 +8,11 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/community"
+	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
-	"github.com/retrovibed/retrovibed/shallows/meta"
 )
 
 type cmdCommunityImport struct {
@@ -24,8 +24,8 @@ type cmdCommunityImport struct {
 func (t cmdCommunityImport) Run(gctx *cmdopts.Global) (err error) {
 	var (
 		db            *sql.DB
-		comm          meta.Community
-		pc            meta.PublishedContent
+		comm          communityapi.Community
+		pc            communityapi.PublishedContent
 		input, output *os.File
 	)
 
@@ -71,7 +71,7 @@ func (t cmdCommunityImport) Run(gctx *cmdopts.Global) (err error) {
 		if err != nil {
 			return err
 		}
-		pc = meta.PublishedContent{}
+		pc = communityapi.PublishedContent{}
 	}
 
 	if err != io.EOF {

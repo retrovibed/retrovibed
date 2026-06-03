@@ -20,7 +20,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/netmonx"
 	"github.com/retrovibed/retrovibed/retroapi/tlsx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
-	"github.com/retrovibed/retrovibed/shallows/community"
+	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
 	"github.com/retrovibed/retrovibed/shallows/dnscache"
 	"github.com/retrovibed/retrovibed/shallows/downloads"
@@ -350,15 +350,15 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	metaapi.NewHTTPFileConfig(torrenting.cfgpath).Bind(httpmux.PathPrefix("/s/torrents").Subrouter())
 	metaapi.NewHTTPFileConfig(storagecfgpath).Bind(httpmux.PathPrefix("/s/storage").Subrouter())
 
-	community.NewHTTP(
+	communityapi.NewHTTP(
 		db,
-		envx.Toggle(community.HTTPOptionNoop, community.HTTPOptionHTTPClient(deepjwt), t.AutoArchive),
-		community.HTTPOptionPublishing(publishing),
-		community.HTTPOptionMediaStorage(mediastore),
-		community.HTTPOptionTorrentStorage(tvfs),
+		envx.Toggle(communityapi.HTTPOptionNoop, communityapi.HTTPOptionHTTPClient(deepjwt), t.AutoArchive),
+		communityapi.HTTPOptionPublishing(publishing),
+		communityapi.HTTPOptionMediaStorage(mediastore),
+		communityapi.HTTPOptionTorrentStorage(tvfs),
 	).Bind(httpmux.PathPrefix("/c").Subrouter())
 
-	community.NewHTTPYouTube(db, deepjwt).Bind(httpmux.PathPrefix("/integrations/youtube").Subrouter())
+	communityapi.NewHTTPYouTube(db, deepjwt).Bind(httpmux.PathPrefix("/integrations/youtube").Subrouter())
 
 	tlspem := envx.String(userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "tls.pem"), env.DaemonTLSPEM)
 	if err = tlsx.SelfSignedLocalHostTLSSeeded(cryptox.NewChaCha8(cmdopts.MachineID()), tlspem, tlsx.X509OptionHosts(t.SelfSignedHosts...)); err != nil {

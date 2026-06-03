@@ -9,13 +9,13 @@ import (
 	"net/http"
 
 	"github.com/retrovibed/retrovibed/retroapi/deeppool"
+	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
-	"github.com/retrovibed/retrovibed/shallows/meta"
 )
 
-func CommunityPublish(ctx context.Context, c *http.Client, id string, in io.Reader) (resp *meta.CommunityUploadResponse, err error) {
+func CommunityPublish(ctx context.Context, c *http.Client, id string, in io.Reader) (resp *communityapi.CommunityUploadResponse, err error) {
 	boundary, reader, err := httpx.Multipart(func(w *multipart.Writer) error {
 		part, lerr := w.CreatePart(httpx.NewMultipartHeader(mimex.RSS, "feed", mimex.RSS))
 		if lerr != nil {
@@ -35,7 +35,7 @@ func CommunityPublish(ctx context.Context, c *http.Client, id string, in io.Read
 		return nil, err
 	}
 
-	resp = new(meta.CommunityUploadResponse)
+	resp = new(communityapi.CommunityUploadResponse)
 
 	if err = json.NewDecoder(_resp.Body).Decode(resp); err != nil {
 		return nil, err

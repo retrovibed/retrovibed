@@ -7,8 +7,8 @@ import (
 
 	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
-	"github.com/retrovibed/retrovibed/shallows/community"
-	"github.com/retrovibed/retrovibed/shallows/deeppool"
+	"github.com/retrovibed/retrovibed/shallows/communityapi"
+
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 )
 
@@ -39,8 +39,8 @@ func (t cmdCommunitySync) Run(gctx *cmdopts.Global) (err error) {
 	}
 	defer db.Close()
 
-	client := deeppool.NewPublished(httpc)
-	synced, err := community.SyncContentFromDeeppool(gctx.Context, db, client, t.Community, t.Autodownload)
+	client := communityapi.NewPublished(httpc)
+	synced, err := communityapi.SyncContentFromDeeppool(gctx.Context, db, client, t.Community, t.Autodownload)
 	if err != nil {
 		return err
 	}

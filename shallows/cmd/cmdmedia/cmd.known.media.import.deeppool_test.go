@@ -11,12 +11,11 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid/v5"
-	"github.com/retrovibed/retrovibed/shallows/deeppool"
+	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/testx"
 	"github.com/retrovibed/retrovibed/shallows/library"
-	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/stretchr/testify/require"
 )
 
@@ -24,7 +23,7 @@ func TestDeeppoolImportKnownFromPublished(t *testing.T) {
 	m := deeppoolimport{Source: "deeppool"}
 
 	t.Run("maps title and overview", func(t *testing.T) {
-		pc := &meta.PublishedContent{
+		pc := &communityapi.PublishedContent{
 			Id:          uuid.Must(uuid.NewV7()).String(),
 			Title:       "My Movie",
 			Description: "A great film",
@@ -40,7 +39,7 @@ func TestDeeppoolImportKnownFromPublished(t *testing.T) {
 
 	t.Run("prefers known_media_id as uid when present", func(t *testing.T) {
 		knownMediaID := uuid.Must(uuid.NewV7()).String()
-		pc := &meta.PublishedContent{
+		pc := &communityapi.PublishedContent{
 			Id:           uuid.Must(uuid.NewV7()).String(),
 			KnownMediaId: knownMediaID,
 		}
@@ -50,20 +49,20 @@ func TestDeeppoolImportKnownFromPublished(t *testing.T) {
 
 	t.Run("falls back to namespaced pc id when known_media_id absent", func(t *testing.T) {
 		id := uuid.Must(uuid.NewV7())
-		pc := &meta.PublishedContent{Id: id.String()}
+		pc := &communityapi.PublishedContent{Id: id.String()}
 		known := m.knownFromPublished(pc)
 		require.NotEmpty(t, known.UID)
 		require.NotEqual(t, id.String(), known.UID, "uid should be namespaced, not the raw id")
 	})
 
 	t.Run("defaults mimetype to video when blank", func(t *testing.T) {
-		pc := &meta.PublishedContent{Id: uuid.Must(uuid.NewV7()).String()}
+		pc := &communityapi.PublishedContent{Id: uuid.Must(uuid.NewV7()).String()}
 		known := m.knownFromPublished(pc)
 		require.Equal(t, mimex.Video, known.Mimetype)
 	})
 
 	t.Run("md5 is stable for same input", func(t *testing.T) {
-		pc := &meta.PublishedContent{Id: "01234567-89ab-7def-0123-456789abcdef", Title: "Stable Film"}
+		pc := &communityapi.PublishedContent{Id: "01234567-89ab-7def-0123-456789abcdef", Title: "Stable Film"}
 		a := m.knownFromPublished(pc)
 		b := m.knownFromPublished(pc)
 		require.Equal(t, a.Md5, b.Md5)
@@ -72,12 +71,12 @@ func TestDeeppoolImportKnownFromPublished(t *testing.T) {
 }
 
 func TestDeeppoolImportRun(t *testing.T) {
-	makeItem := func(id, title string) *meta.PublishedContent {
-		return &meta.PublishedContent{Id: id, Title: title, Mimetype: mimex.Video}
+	makeItem := func(id, title string) *communityapi.PublishedContent {
+		return &communityapi.PublishedContent{Id: id, Title: title, Mimetype: mimex.Video}
 	}
 
-	syncResponse := func(items ...*meta.PublishedContent) deeppool.PublishedContentSyncResponse {
-		return deeppool.PublishedContentSyncResponse{Items: items}
+	syncResponse := func(items ...*communityapi.PublishedContent) communityapi.PublishedContentSearchResponse {
+		return communityapi.PublishedContentSearchResponse{Items: items}
 	}
 
 	newHTTPClient := func(t *testing.T, srv *httptest.Server) *http.Client {

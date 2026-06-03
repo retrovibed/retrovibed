@@ -7,9 +7,9 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/testx"
-	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/retrovibed/retrovibed/shallows/metaapi"
 	"github.com/stretchr/testify/require"
 )
@@ -17,13 +17,13 @@ import (
 func TestCommunityCreate(t *testing.T) {
 	t.Run("example 1", func(t *testing.T) {
 		var (
-			expected meta.CommunityCreateRequest
+			expected communityapi.CommunityCreateRequest
 		)
 
 		require.NoError(t, testx.Fake(&expected))
 
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			require.NoError(t, json.NewEncoder(w).Encode(&meta.CommunityCreateResponse{Community: expected.Community}))
+			require.NoError(t, json.NewEncoder(w).Encode(&communityapi.CommunityCreateResponse{Community: expected.Community}))
 		}))
 
 		c := &http.Client{}

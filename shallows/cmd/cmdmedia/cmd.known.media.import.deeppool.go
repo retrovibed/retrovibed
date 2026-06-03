@@ -12,7 +12,7 @@ import (
 	"github.com/gofrs/uuid/v5"
 
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
-	"github.com/retrovibed/retrovibed/shallows/deeppool"
+	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
@@ -20,7 +20,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/library"
-	"github.com/retrovibed/retrovibed/shallows/meta"
 )
 
 type deeppoolimport struct {
@@ -38,7 +37,7 @@ func (t deeppoolimport) Run(gctx *cmdopts.Global) error {
 }
 
 func (t deeppoolimport) run(ctx context.Context, enc *json.Encoder, httpc *http.Client) error {
-	client := deeppool.NewPublished(httpc)
+	client := communityapi.NewPublished(httpc)
 	cursor := uuid.Must(uuid.NewV7AtTime(t.StartAt)).String()
 
 	for {
@@ -62,7 +61,7 @@ func (t deeppoolimport) run(ctx context.Context, enc *json.Encoder, httpc *http.
 	}
 }
 
-func (t deeppoolimport) knownFromPublished(pc *meta.PublishedContent) library.Known {
+func (t deeppoolimport) knownFromPublished(pc *communityapi.PublishedContent) library.Known {
 	_md5 := md5x.JSON(pc)
 	uidmd5 := uuid.FromBytesOrNil(_md5.Sum(nil))
 

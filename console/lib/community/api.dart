@@ -1,9 +1,13 @@
 import 'dart:convert';
 import 'package:fixnum/fixnum.dart' as fixnum;
 import 'package:retrovibed/httpx.dart' as httpx;
-import './community.pb.dart';
+import 'community.pb.dart';
+import 'community.metrics.pb.dart';
+import 'community.publish.pb.dart';
 
-export './community.pb.dart';
+export 'community.pb.dart';
+export 'community.metrics.pb.dart';
+export 'community.publish.pb.dart';
 
 typedef FnSubscribe = Future<CommunitySubscribeResponse> Function(String communityId, {List<httpx.Option> options});
 
@@ -98,12 +102,12 @@ class API {
         });
   }
 
-  static Future<PublishedContentListResponse> published(
+  static Future<PublishedContentSearchResponse> published(
     String cid, {
     List<httpx.Option> options = const [],
-    PublishedContentListRequest? req,
+    PublishedContentSearchRequest? req,
   }) async {
-    req ??= PublishedContentListRequest();
+    req ??= PublishedContentSearchRequest();
     req.communityId = cid;
     if (req.limit.isZero) req.limit = fixnum.Int64(100);
 
@@ -118,7 +122,7 @@ class API {
         )
         .then((v) {
           return Future.value(
-            PublishedContentListResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            PublishedContentSearchResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
           );
         });
   }

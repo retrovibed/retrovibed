@@ -5,9 +5,9 @@ import (
 	"os"
 
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
+	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
-	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/retrovibed/retrovibed/shallows/metaapi"
 )
 
@@ -22,14 +22,14 @@ type cmdCommunityUpdate struct {
 	Name               string  `arg:"" name:"name" help:"name or id of the community to update" required:"true"`
 }
 
-func (t cmdCommunityUpdate) publishmode(m string, fallback meta.PublishMode) *meta.PublishMode {
+func (t cmdCommunityUpdate) publishmode(m string, fallback communityapi.PublishMode) *communityapi.PublishMode {
 	switch langx.Autoderef(t.DefaultPublishMode) {
-	case meta.PublishMode_UNLISTED.String():
-		return langx.Autoptr(meta.PublishMode_UNLISTED)
-	case meta.PublishMode_LISTED.String():
-		return langx.Autoptr(meta.PublishMode_LISTED)
-	case meta.PublishMode_SYNDICATED.String():
-		return langx.Autoptr(meta.PublishMode_SYNDICATED)
+	case communityapi.PublishMode_UNLISTED.String():
+		return langx.Autoptr(communityapi.PublishMode_UNLISTED)
+	case communityapi.PublishMode_LISTED.String():
+		return langx.Autoptr(communityapi.PublishMode_LISTED)
+	case communityapi.PublishMode_SYNDICATED.String():
+		return langx.Autoptr(communityapi.PublishMode_SYNDICATED)
 	default:
 		return langx.Autoptr(fallback)
 	}
@@ -47,8 +47,8 @@ func (t cmdCommunityUpdate) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClient
 	}
 	current := inforesp.Community
 
-	commresp, err := metaapi.CommunityUpdate(gctx.Context, c, t.Name, &meta.CommunityUpdateRequest{
-		Community: &meta.Community{
+	commresp, err := metaapi.CommunityUpdate(gctx.Context, c, t.Name, &communityapi.CommunityUpdateRequest{
+		Community: &communityapi.Community{
 			Description:        *langx.FirstNonZero(t.Description, &current.Description),
 			Mimetype:           *langx.FirstNonZero(t.Mimetype, &current.Mimetype),
 			DefaultPublishMode: *t.publishmode(langx.Zero(t.DefaultPublishMode), current.DefaultPublishMode),

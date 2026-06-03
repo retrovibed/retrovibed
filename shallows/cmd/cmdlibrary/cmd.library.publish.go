@@ -11,6 +11,7 @@ import (
 
 	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
+	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/debugx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
@@ -19,7 +20,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/library"
-	"github.com/retrovibed/retrovibed/shallows/meta"
 )
 
 type cmdPublish struct {
@@ -33,7 +33,7 @@ func (t cmdPublish) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig) (err error
 }
 
 func (t cmdPublish) run(ctx context.Context, enc *jsonl.Encoder, r io.Reader, c *http.Client) error {
-	var com meta.Community
+	var com communityapi.Community
 
 	debugx.Println("reading community from stdin")
 	d := jsonl.NewDecoder(r)
@@ -64,16 +64,16 @@ func (t cmdPublish) run(ctx context.Context, enc *jsonl.Encoder, r io.Reader, c 
 	return errorsx.Ignore(derr, io.EOF)
 }
 
-func (t cmdPublish) publishItem(ctx context.Context, c *http.Client, com *meta.Community, libraryID string) (*meta.PublishContentResponse, error) {
+func (t cmdPublish) publishItem(ctx context.Context, c *http.Client, com *communityapi.Community, libraryID string) (*communityapi.PublishContentResponse, error) {
 	var (
 		err  error
 		req  *http.Request
 		resp *http.Response
-		msg  meta.PublishContentResponse
+		msg  communityapi.PublishContentResponse
 	)
 
-	body, err := json.Marshal(&meta.PublishContentRequest{
-		PublishedContent: &meta.PublishedContent{
+	body, err := json.Marshal(&communityapi.PublishContentRequest{
+		PublishedContent: &communityapi.PublishedContent{
 			LibraryId:   libraryID,
 			CommunityId: com.Id,
 		},

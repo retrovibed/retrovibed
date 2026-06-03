@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/timex.dart' as timex;
+import 'package:retrovibed/community.dart';
 import 'package:retrovibed/community/metrics.dashboard.dart';
-import 'package:retrovibed/community/community.pb.dart';
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
 
 final _now = DateTime(2024, 6, 15);

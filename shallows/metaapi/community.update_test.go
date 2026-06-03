@@ -7,22 +7,22 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/testx"
-	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/retrovibed/retrovibed/shallows/metaapi"
 	"github.com/stretchr/testify/require"
 )
 
 func TestCommunityUpdate(t *testing.T) {
 	t.Run("updates community successfully", func(t *testing.T) {
-		var expected meta.CommunityUpdateRequest
+		var expected communityapi.CommunityUpdateRequest
 		require.NoError(t, testx.Fake(&expected))
 
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			require.Equal(t, http.MethodPut, r.Method)
 			require.Contains(t, r.URL.Path, "/c/")
-			require.NoError(t, json.NewEncoder(w).Encode(&meta.CommunityUpdateResponse{Community: expected.Community}))
+			require.NoError(t, json.NewEncoder(w).Encode(&communityapi.CommunityUpdateResponse{Community: expected.Community}))
 		}))
 
 		c := &http.Client{}
@@ -37,15 +37,15 @@ func TestCommunityUpdate(t *testing.T) {
 	})
 
 	t.Run("updates hidden field", func(t *testing.T) {
-		var expected meta.CommunityUpdateRequest
+		var expected communityapi.CommunityUpdateRequest
 		require.NoError(t, testx.Fake(&expected))
 		expected.Community.Hidden = true
 
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			var received meta.CommunityUpdateRequest
+			var received communityapi.CommunityUpdateRequest
 			require.NoError(t, json.NewDecoder(r.Body).Decode(&received))
 			require.True(t, received.Community.Hidden)
-			require.NoError(t, json.NewEncoder(w).Encode(&meta.CommunityUpdateResponse{Community: expected.Community}))
+			require.NoError(t, json.NewEncoder(w).Encode(&communityapi.CommunityUpdateResponse{Community: expected.Community}))
 		}))
 
 		c := &http.Client{}
@@ -56,14 +56,14 @@ func TestCommunityUpdate(t *testing.T) {
 	})
 
 	t.Run("includes domain in path", func(t *testing.T) {
-		var expected meta.CommunityUpdateRequest
+		var expected communityapi.CommunityUpdateRequest
 		require.NoError(t, testx.Fake(&expected))
 
 		domainOrId := "my-test-domain"
 
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			require.Equal(t, "/c/"+domainOrId, r.URL.Path)
-			require.NoError(t, json.NewEncoder(w).Encode(&meta.CommunityUpdateResponse{Community: expected.Community}))
+			require.NoError(t, json.NewEncoder(w).Encode(&communityapi.CommunityUpdateResponse{Community: expected.Community}))
 		}))
 
 		c := &http.Client{}
@@ -73,7 +73,7 @@ func TestCommunityUpdate(t *testing.T) {
 	})
 
 	t.Run("returns error on server failure", func(t *testing.T) {
-		var expected meta.CommunityUpdateRequest
+		var expected communityapi.CommunityUpdateRequest
 		require.NoError(t, testx.Fake(&expected))
 
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

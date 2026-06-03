@@ -6,9 +6,8 @@ import (
 	"net/http"
 	"time"
 
-	rdeepool "github.com/retrovibed/retrovibed/retroapi/deeppool"
-	"github.com/retrovibed/retrovibed/shallows/community"
-	"github.com/retrovibed/retrovibed/shallows/deeppool"
+	"github.com/retrovibed/retrovibed/retroapi/deeppool"
+	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/backoffx"
 	"github.com/retrovibed/retrovibed/shallows/internal/contextx"
@@ -18,8 +17,8 @@ import (
 )
 
 func AutoPublishing(ctx context.Context, q sqlx.Queryer, c *http.Client, mvfs, tvfs fsx.Virtual, async *asyncx.Wakeup) error {
-	metrics := deeppool.NewMetrics(c)
-	published := deeppool.NewPublished(c)
+	metrics := communityapi.NewMetrics(c)
+	published := communityapi.NewPublished(c)
 
 	s := backoffx.New(
 		backoffx.Constant(time.Hour),
@@ -29,7 +28,7 @@ func AutoPublishing(ctx context.Context, q sqlx.Queryer, c *http.Client, mvfs, t
 	go asyncx.Periodic(ctx, async, s, "automatic publishing initiated")
 	contextx.Run(ctx, func() {
 		errorsx.Log(asyncx.Run(ctx, async, func(ctx context.Context) error {
-			if err := community.SyncPendingToDeeppool(ctx, q, c, metrics, published, rdeepool.NewArchiver(c), mvfs, tvfs); err != nil {
+			if err := communityapi.SyncPendingToDeeppool(ctx, q, c, metrics, published, deeppool.NewArchiver(c), mvfs, tvfs); err != nil {
 				log.Println(errorsx.Wrap(err, "publishing sync failed"))
 			}
 			return nil
@@ -40,11 +39,11 @@ func AutoPublishing(ctx context.Context, q sqlx.Queryer, c *http.Client, mvfs, t
 }
 
 func AutoFeedSync(ctx context.Context, q sqlx.Queryer, c *http.Client, async *asyncx.Wakeup) error {
-	published := deeppool.NewPublished(c)
+	published := communityapi.NewPublished(c)
 
 	contextx.Run(ctx, func() {
 		errorsx.Log(asyncx.Run(ctx, async, func(ctx context.Context) error {
-			if err := community.SyncFeed(ctx, q, c, published); err != nil {
+			if err := communityapi.SyncFeed(ctx, q, c, published); err != nil {
 				log.Println(errorsx.Wrap(err, "feed sync failed"))
 			}
 			return nil
