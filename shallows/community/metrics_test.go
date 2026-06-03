@@ -84,8 +84,10 @@ func TestCommunityInsert(t *testing.T) {
 
 	now := time.Now()
 	state := Community{
-		ID:         uuid.Nil.String(),
-		LastSyncAt: now,
+		ID:                         uuid.Nil.String(),
+		AccountID:                  uuid.Nil.String(),
+		SyncCursorPublishedContent: uuid.Nil.String(),
+		LastSyncAt:                 now,
 	}
 
 	require.NoError(t, CommunityInsertWithDefaults(ctx, q, state).Scan(&state))
@@ -100,8 +102,10 @@ func TestCommunityUpsert(t *testing.T) {
 
 	now := time.Now()
 	state := Community{
-		ID:         uuid.Nil.String(),
-		LastSyncAt: now,
+		ID:                         uuid.Nil.String(),
+		AccountID:                  uuid.Nil.String(),
+		SyncCursorPublishedContent: uuid.Nil.String(),
+		LastSyncAt:                 now,
 	}
 
 	require.NoError(t, CommunityInsertWithDefaults(ctx, q, state).Scan(&state))
@@ -120,8 +124,10 @@ func TestCommunityFindByID(t *testing.T) {
 
 	now := time.Now()
 	state := Community{
-		ID:         uuid.Nil.String(),
-		LastSyncAt: now,
+		ID:                         uuid.Nil.String(),
+		AccountID:                  uuid.Nil.String(),
+		SyncCursorPublishedContent: uuid.Nil.String(),
+		LastSyncAt:                 now,
 	}
 
 	require.NoError(t, CommunityInsertWithDefaults(ctx, q, state).Scan(&state))

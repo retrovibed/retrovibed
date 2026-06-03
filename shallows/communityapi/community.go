@@ -1,9 +1,11 @@
 package communityapi
 
 import (
+	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/grpcx"
+	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
@@ -30,7 +32,7 @@ func NewCommunity(opts ...func(*Community)) *Community {
 func CommunityFromDeeppool(c *Community) community.Community {
 	return community.Community{
 		ID:                 c.Id,
-		AccountID:          c.AccountId,
+		AccountID:          stringsx.DefaultIfBlank(c.AccountId, uuid.Nil.String()),
 		CreatedAt:          errorsx.Zero(grpcx.DecodeTime(c.CreatedAt)),
 		UpdatedAt:          errorsx.Zero(grpcx.DecodeTime(c.UpdatedAt)),
 		Mimetype:           c.Mimetype,
