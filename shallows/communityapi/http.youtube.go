@@ -1,4 +1,4 @@
-package community
+package communityapi
 
 import (
 	"fmt"
@@ -12,6 +12,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/deeppool"
 	"github.com/retrovibed/retrovibed/retroapi/httpauth"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
+	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
@@ -99,7 +100,7 @@ func (t *HTTPYouTube) callback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	row := OAuth2Google{
+	row := community.OAuth2Google{
 		AccessToken:  token.AccessToken,
 		RefreshToken: token.RefreshToken,
 		TokenType:    token.TokenType,
@@ -107,7 +108,7 @@ func (t *HTTPYouTube) callback(w http.ResponseWriter, r *http.Request) {
 		Scopes:       "https://www.googleapis.com/auth/youtube.upload",
 	}
 
-	if err = OAuth2GoogleInsertWithDefaults(r.Context(), t.q, row).Scan(&row); err != nil {
+	if err = community.OAuth2GoogleInsertWithDefaults(r.Context(), t.q, row).Scan(&row); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to store youtube token"))
 		callbackHTML(w, http.StatusInternalServerError, "YouTube linking failed.", "Unable to save authorization.")
 		return
@@ -119,8 +120,8 @@ func (t *HTTPYouTube) callback(w http.ResponseWriter, r *http.Request) {
 }
 
 func (t *HTTPYouTube) status(w http.ResponseWriter, r *http.Request) {
-	var row OAuth2Google
-	err := OAuth2GoogleFindFirst(r.Context(), t.q).Scan(&row)
+	var row community.OAuth2Google
+	err := community.OAuth2GoogleFindFirst(r.Context(), t.q).Scan(&row)
 
 	linked := err == nil && row.AccessToken != ""
 
@@ -136,8 +137,8 @@ func (t *HTTPYouTube) status(w http.ResponseWriter, r *http.Request) {
 }
 
 func (t *HTTPYouTube) revoke(w http.ResponseWriter, r *http.Request) {
-	var row OAuth2Google
-	if err := OAuth2GoogleDeleteAll(r.Context(), t.q).Scan(&row); sqlx.IgnoreNoRows(err) != nil {
+	var row community.OAuth2Google
+	if err := community.OAuth2GoogleDeleteAll(r.Context(), t.q).Scan(&row); sqlx.IgnoreNoRows(err) != nil {
 		log.Println(errorsx.Wrap(err, "unable to delete youtube token"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return

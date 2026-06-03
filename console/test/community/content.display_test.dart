@@ -5,7 +5,7 @@ import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'package:retrovibed/community/content.detail.dart';
 import 'package:retrovibed/community/content.display.dart';
-import 'package:retrovibed/community/community.pb.dart';
+import 'package:retrovibed/community.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/design.kit/modals.dart' as modals;
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
@@ -18,31 +18,31 @@ Community _testCommunity() => Community(
   description: 'A test community',
 );
 
-Future<PublishedContentListResponse> _empty(
+Future<PublishedContentSearchResponse> _empty(
   String id, {
   List<httpx.Option> options = const [],
-  PublishedContentListRequest? req,
+  PublishedContentSearchRequest? req,
 }) async {
-  final r = req ?? PublishedContentListRequest(offset: ds.Int64(0), limit: ds.Int64(100));
-  return PublishedContentListResponse(
+  final r = req ?? PublishedContentSearchRequest(offset: ds.Int64(0), limit: ds.Int64(100));
+  return PublishedContentSearchResponse(
     items: [],
     next: r,
   );
 }
 
-Future<PublishedContentListResponse> _noop(
+Future<PublishedContentSearchResponse> _noop(
   String id, {
   List<httpx.Option> options = const [],
-  PublishedContentListRequest? req,
-}) => Completer<PublishedContentListResponse>().future;
+  PublishedContentSearchRequest? req,
+}) => Completer<PublishedContentSearchResponse>().future;
 
-Future<PublishedContentListResponse> _withContent(
+Future<PublishedContentSearchResponse> _withContent(
   String id, {
   List<httpx.Option> options = const [],
-  PublishedContentListRequest? req,
+  PublishedContentSearchRequest? req,
 }) async {
-  final r = req ?? PublishedContentListRequest(offset: ds.Int64(0), limit: ds.Int64(100));
-  return PublishedContentListResponse(
+  final r = req ?? PublishedContentSearchRequest(offset: ds.Int64(0), limit: ds.Int64(100));
+  return PublishedContentSearchResponse(
     next: r,
     items: [
       PublishedContent(
@@ -69,13 +69,13 @@ Future<PublishedContentListResponse> _withContent(
   );
 }
 
-Future<PublishedContentListResponse> _withArchivedContent(
+Future<PublishedContentSearchResponse> _withArchivedContent(
   String id, {
   List<httpx.Option> options = const [],
-  PublishedContentListRequest? req,
+  PublishedContentSearchRequest? req,
 }) async {
-  final r = req ?? PublishedContentListRequest(offset: ds.Int64(0), limit: ds.Int64(100));
-  return PublishedContentListResponse(
+  final r = req ?? PublishedContentSearchRequest(offset: ds.Int64(0), limit: ds.Int64(100));
+  return PublishedContentSearchResponse(
     next: r,
     items: [
       PublishedContent(
@@ -104,13 +104,13 @@ Future<PublishedContentListResponse> _withArchivedContent(
   );
 }
 
-Future<PublishedContentListResponse> _withLongContent(
+Future<PublishedContentSearchResponse> _withLongContent(
   String id, {
   List<httpx.Option> options = const [],
-  PublishedContentListRequest? req,
+  PublishedContentSearchRequest? req,
 }) async {
-  final r = req ?? PublishedContentListRequest(offset: ds.Int64(0), limit: ds.Int64(100));
-  return PublishedContentListResponse(
+  final r = req ?? PublishedContentSearchRequest(offset: ds.Int64(0), limit: ds.Int64(100));
+  return PublishedContentSearchResponse(
     next: r,
     items: [
       PublishedContent(

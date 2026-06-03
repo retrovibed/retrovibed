@@ -1,4 +1,4 @@
-package community
+package communityapi
 
 import (
 	"bytes"
@@ -6,11 +6,13 @@ import (
 	"testing"
 	"time"
 
+	"github.com/retrovibed/retrovibed/shallows/community"
+
 	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/testx"
 	"github.com/retrovibed/retrovibed/shallows/library"
-	"github.com/retrovibed/retrovibed/shallows/meta"
+
 	"github.com/retrovibed/retrovibed/shallows/rss"
 	"github.com/stretchr/testify/require"
 )
@@ -61,26 +63,26 @@ func TestFeedGeneration(t *testing.T) {
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd2).Scan(&lmd2))
 
-		pc1 := NewPublishedContent(PublishedContent{
+		pc1 := community.NewPublishedContent(community.PublishedContent{
 			CommunityID:  communityID,
 			KnownMediaID: known.UID,
 			MagnetURI:    "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33&dn=Test+Movie",
 			LibraryID:    libraryID1,
-			PublishMode:  int32(meta.PublishMode_LISTED),
+			PublishMode:  int32(PublishMode_LISTED),
 		})
-		require.NoError(t, PublishedContentInsertWithDefaults(ctx, q, pc1).Scan(&pc1))
-		require.NoError(t, PublishedContentUpdatePublishedAt(ctx, q, pc1.ID, time.Now().Add(-time.Hour)).Scan(&pc1))
+		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc1).Scan(&pc1))
+		require.NoError(t, community.PublishedContentUpdatePublishedAt(ctx, q, pc1.ID, time.Now().Add(-time.Hour)).Scan(&pc1))
 
-		pc2 := NewPublishedContent(PublishedContent{
+		pc2 := community.NewPublishedContent(community.PublishedContent{
 			CommunityID: communityID,
 			MagnetURI:   "magnet:?xt=urn:btih:1234567890abcdef1234567890abcdef12345678&dn=Unknown+Media",
 			LibraryID:   libraryID2,
-			PublishMode: int32(meta.PublishMode_SYNDICATED),
+			PublishMode: int32(PublishMode_SYNDICATED),
 		})
-		require.NoError(t, PublishedContentInsertWithDefaults(ctx, q, pc2).Scan(&pc2))
-		require.NoError(t, PublishedContentUpdatePublishedAt(ctx, q, pc2.ID, time.Now()).Scan(&pc2))
+		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc2).Scan(&pc2))
+		require.NoError(t, community.PublishedContentUpdatePublishedAt(ctx, q, pc2.ID, time.Now()).Scan(&pc2))
 
-		community := &meta.Community{
+		community := &Community{
 			Id:          communityID,
 			Domain:      "testcommunity",
 			Description: "A test community for RSS feed generation",
@@ -141,25 +143,25 @@ func TestFeedGeneration(t *testing.T) {
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd2).Scan(&lmd2))
 
-		pc1 := NewPublishedContent(PublishedContent{
+		pc1 := community.NewPublishedContent(community.PublishedContent{
 			CommunityID: communityID,
 			MagnetURI:   "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33",
 			LibraryID:   libraryID1,
-			PublishMode: int32(meta.PublishMode_UNLISTED),
+			PublishMode: int32(PublishMode_UNLISTED),
 		})
-		require.NoError(t, PublishedContentInsertWithDefaults(ctx, q, pc1).Scan(&pc1))
-		require.NoError(t, PublishedContentUpdatePublishedAt(ctx, q, pc1.ID, time.Now()).Scan(&pc1))
+		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc1).Scan(&pc1))
+		require.NoError(t, community.PublishedContentUpdatePublishedAt(ctx, q, pc1.ID, time.Now()).Scan(&pc1))
 
-		pc2 := NewPublishedContent(PublishedContent{
+		pc2 := community.NewPublishedContent(community.PublishedContent{
 			CommunityID: communityID,
 			MagnetURI:   "magnet:?xt=urn:btih:1234567890abcdef1234567890abcdef12345678",
 			LibraryID:   libraryID2,
-			PublishMode: int32(meta.PublishMode_LISTED),
+			PublishMode: int32(PublishMode_LISTED),
 		})
-		require.NoError(t, PublishedContentInsertWithDefaults(ctx, q, pc2).Scan(&pc2))
-		require.NoError(t, PublishedContentUpdatePublishedAt(ctx, q, pc2.ID, time.Now()).Scan(&pc2))
+		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc2).Scan(&pc2))
+		require.NoError(t, community.PublishedContentUpdatePublishedAt(ctx, q, pc2.ID, time.Now()).Scan(&pc2))
 
-		community := &meta.Community{
+		community := &Community{
 			Id:          communityID,
 			Domain:      "testcommunity",
 			Description: "test",

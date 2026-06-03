@@ -9,9 +9,9 @@ import (
 	"testing"
 
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
+	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/testx"
-	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -21,7 +21,7 @@ func TestCommunityPublish(t *testing.T) {
 		ctx, cancel := testx.Context(t)
 		defer cancel()
 
-		communityInfo := &meta.Community{
+		communityInfo := &communityapi.Community{
 			Id:          "test-id",
 			Domain:      "test-community",
 			Description: "test description",
@@ -30,7 +30,7 @@ func TestCommunityPublish(t *testing.T) {
 
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if r.Method == http.MethodGet {
-				assert.NoError(t, json.NewEncoder(w).Encode(&meta.CommunityFindResponse{Community: communityInfo}))
+				assert.NoError(t, json.NewEncoder(w).Encode(&communityapi.CommunityFindResponse{Community: communityInfo}))
 				return
 			}
 			t.Fatal("should not upload in dry run mode")
@@ -59,7 +59,7 @@ func TestCommunityPublish(t *testing.T) {
 		ctx, cancel := testx.Context(t)
 		defer cancel()
 
-		communityInfo := &meta.Community{
+		communityInfo := &communityapi.Community{
 			Id:          "test-id",
 			Domain:      "test-community",
 			Description: "test description",
@@ -69,12 +69,12 @@ func TestCommunityPublish(t *testing.T) {
 		uploaded := false
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if r.Method == http.MethodGet {
-				assert.NoError(t, json.NewEncoder(w).Encode(&meta.CommunityFindResponse{Community: communityInfo}))
+				assert.NoError(t, json.NewEncoder(w).Encode(&communityapi.CommunityFindResponse{Community: communityInfo}))
 				return
 			}
 			if r.Method == http.MethodPost {
 				uploaded = true
-				assert.NoError(t, json.NewEncoder(w).Encode(&meta.CommunityUploadResponse{Community: communityInfo}))
+				assert.NoError(t, json.NewEncoder(w).Encode(&communityapi.CommunityUploadResponse{Community: communityInfo}))
 				return
 			}
 		}))

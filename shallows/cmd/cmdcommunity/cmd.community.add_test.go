@@ -9,9 +9,9 @@ import (
 	"testing"
 
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
+	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/testx"
-	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -21,7 +21,7 @@ func TestCommunityAdd(t *testing.T) {
 		ctx, cancel := testx.Context(t)
 		defer cancel()
 
-		expected := &meta.PublishedContent{
+		expected := &communityapi.PublishedContent{
 			Id:           "published-id",
 			CommunityId:  "test-community",
 			MagnetUri:    "magnet:?xt=urn:btih:abc123",
@@ -31,7 +31,7 @@ func TestCommunityAdd(t *testing.T) {
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			require.Equal(t, http.MethodPost, r.Method)
 			require.Contains(t, r.URL.Path, "/c/test-community/publish")
-			assert.NoError(t, json.NewEncoder(w).Encode(&meta.PublishContentResponse{PublishedContent: expected}))
+			assert.NoError(t, json.NewEncoder(w).Encode(&communityapi.PublishContentResponse{PublishedContent: expected}))
 		}))
 		defer srv.Close()
 
@@ -85,12 +85,12 @@ func TestCommunityAdd(t *testing.T) {
 		ctx, cancel := testx.Context(t)
 		defer cancel()
 
-		var receivedReq meta.PublishContentRequest
+		var receivedReq communityapi.PublishContentRequest
 
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			assert.NoError(t, json.NewDecoder(r.Body).Decode(&receivedReq))
-			assert.NoError(t, json.NewEncoder(w).Encode(&meta.PublishContentResponse{
-				PublishedContent: &meta.PublishedContent{
+			assert.NoError(t, json.NewEncoder(w).Encode(&communityapi.PublishContentResponse{
+				PublishedContent: &communityapi.PublishedContent{
 					Id: "created-id",
 				},
 			}))

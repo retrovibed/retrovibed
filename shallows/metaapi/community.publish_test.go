@@ -8,16 +8,16 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/testx"
-	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/retrovibed/retrovibed/shallows/metaapi"
 	"github.com/stretchr/testify/require"
 )
 
 func TestCommunityPublish(t *testing.T) {
 	t.Run("publishes feed successfully", func(t *testing.T) {
-		var expected meta.CommunityUploadResponse
+		var expected communityapi.CommunityUploadResponse
 		require.NoError(t, testx.Fake(&expected))
 
 		communityID := "test-community"

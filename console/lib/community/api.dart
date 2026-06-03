@@ -1,9 +1,13 @@
 import 'dart:convert';
 import 'package:fixnum/fixnum.dart' as fixnum;
 import 'package:retrovibed/httpx.dart' as httpx;
-import './community.pb.dart';
+import 'community.pb.dart';
+import 'community.metrics.pb.dart';
+import 'community.publish.pb.dart';
 
-export './community.pb.dart';
+export 'community.pb.dart';
+export 'community.metrics.pb.dart';
+export 'community.publish.pb.dart';
 
 typedef FnSubscribe = Future<CommunitySubscribeResponse> Function(String communityId, {List<httpx.Option> options});
 
@@ -87,7 +91,7 @@ class API {
   }) async {
     return httpx
         .post(
-          Uri.https(httpx.host(), "/c/$cid/publish"),
+          Uri.https(httpx.host(), "/c/p/$cid"),
           body: jsonEncode(req.toProto3Json()),
           options: [httpx.Accept.json, httpx.Content.json, ...options],
         )
@@ -98,12 +102,12 @@ class API {
         });
   }
 
-  static Future<PublishedContentListResponse> published(
+  static Future<PublishedContentSearchResponse> published(
     String cid, {
     List<httpx.Option> options = const [],
-    PublishedContentListRequest? req,
+    PublishedContentSearchRequest? req,
   }) async {
-    req ??= PublishedContentListRequest();
+    req ??= PublishedContentSearchRequest();
     req.communityId = cid;
     if (req.limit.isZero) req.limit = fixnum.Int64(100);
 
@@ -111,14 +115,14 @@ class API {
         .get(
           Uri.https(
             httpx.host(),
-            "/c/$cid/published",
+            "/c/p/$cid",
             jsonDecode(jsonEncode(req.toProto3Json())),
           ),
           options: [httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
-            PublishedContentListResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            PublishedContentSearchResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
           );
         });
   }
@@ -131,7 +135,7 @@ class API {
         .delete(
           Uri.https(
             httpx.host(),
-            "/c/published/$pid",
+            "/c/p/$pid",
           ),
           options: [httpx.Accept.json, ...options],
         )
@@ -148,12 +152,14 @@ class API {
     required DateTime endDate,
     List<httpx.Option> options = const [],
   }) async {
+    final req = CommunityMetricsRequest(
+      communityId: id,
+      startDate: startDate.toIso8601String(),
+      endDate: endDate.toIso8601String(),
+    );
     return httpx
         .get(
-          Uri.https(httpx.host(), "/c/$id/metrics", {
-            'start_date': startDate.toIso8601String(),
-            'end_date': endDate.toIso8601String(),
-          }),
+          Uri.https(httpx.host(), "/c/m/$id", httpx.params(req.toProto3Json())),
           options: [httpx.Accept.json, ...options],
         )
         .then((v) {
@@ -169,7 +175,7 @@ class API {
   }) async {
     return httpx
         .post(
-          Uri.https(httpx.host(), "/c/$id/metrics/sync"),
+          Uri.https(httpx.host(), "/c/m/$id"),
           options: [httpx.Accept.json, ...options],
         )
         .then((v) {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/mimex.dart' as mimex;
-import 'community.pb.dart';
+import 'api.dart';
 
 class PublishedContentDetail extends StatelessWidget {
   final PublishedContent item;

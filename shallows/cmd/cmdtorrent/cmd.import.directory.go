@@ -15,6 +15,7 @@ import (
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
+	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/asynccompute"
 	"github.com/retrovibed/retrovibed/shallows/internal/debugx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -22,7 +23,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
 	"github.com/retrovibed/retrovibed/shallows/media"
-	"github.com/retrovibed/retrovibed/shallows/meta"
 )
 
 type importDirectory struct {
@@ -40,7 +40,7 @@ func (t importDirectory) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig) error
 	}
 
 	var (
-		com meta.Community
+		com communityapi.Community
 	)
 
 	encoder := jsonl.NewEncoder(os.Stdout)
@@ -56,7 +56,7 @@ func (t importDirectory) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig) error
 			return err
 		}
 	} else {
-		com = meta.Community{
+		com = communityapi.Community{
 			Entropy:  t.Entropy,
 			Mimetype: t.Mimetype,
 		}

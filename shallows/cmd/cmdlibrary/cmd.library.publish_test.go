@@ -13,6 +13,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/community"
+	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
@@ -31,13 +32,13 @@ func communityLibraryPublishServer(t *testing.T, q *sql.DB) *mux.Router {
 	t.Helper()
 
 	routes := mux.NewRouter()
-	community.NewHTTP(
+	communityapi.NewHTTPPublished(
 		q,
-		community.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
-		community.HTTPOptionHTTPClient(&http.Client{}),
-		community.HTTPOptionMediaStorage(fsx.DirVirtual(t.TempDir())),
-		community.HTTPOptionTorrentStorage(fsx.DirVirtual(t.TempDir())),
-	).Bind(routes.PathPrefix("/c").Subrouter())
+		communityapi.HTTPPublishedOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+		communityapi.HTTPPublishedOptionHTTPClient(&http.Client{}),
+		communityapi.HTTPPublishedOptionMediaStorage(fsx.DirVirtual(t.TempDir())),
+		communityapi.HTTPPublishedOptionTorrentStorage(fsx.DirVirtual(t.TempDir())),
+	).Bind(routes.PathPrefix("/c/p").Subrouter())
 
 	return routes
 }
@@ -72,7 +73,7 @@ func TestCommunityLibraryPublish(t *testing.T) {
 			Transport: httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), nil),
 		}
 
-		com := &meta.Community{Id: communityID}
+		com := &communityapi.Community{Id: communityID}
 		var input bytes.Buffer
 		require.NoError(t, json.NewEncoder(&input).Encode(com))
 		require.NoError(t, jsonl.NewEncoder(&input).Encode(langx.Clone(lmd, timex.JSONSafeEncodeOption)))
@@ -118,7 +119,7 @@ func TestCommunityLibraryPublish(t *testing.T) {
 		srv := httptest.NewServer(communityLibraryPublishServer(t, q))
 		defer srv.Close()
 
-		com := &meta.Community{Id: communityID}
+		com := &communityapi.Community{Id: communityID}
 		var input bytes.Buffer
 		require.NoError(t, json.NewEncoder(&input).Encode(com))
 		require.NoError(t, jsonl.NewEncoder(&input).Encode(langx.Clone(lmd, timex.JSONSafeEncodeOption)))
@@ -132,7 +133,7 @@ func TestCommunityLibraryPublish(t *testing.T) {
 		}
 		require.NoError(t, cmd.run(ctx, jsonl.NewEncoder(&output), &input, c))
 
-		var result meta.PublishedContent
+		var result communityapi.PublishedContent
 		require.NoError(t, json.NewDecoder(&output).Decode(&result))
 		require.NotEmpty(t, result.Id)
 		require.Equal(t, libraryID, result.LibraryId)
@@ -162,7 +163,7 @@ func TestCommunityLibraryPublish(t *testing.T) {
 
 		communityID := uuid.Must(uuid.NewV7()).String()
 
-		com := &meta.Community{Id: communityID}
+		com := &communityapi.Community{Id: communityID}
 		var input bytes.Buffer
 		require.NoError(t, json.NewEncoder(&input).Encode(com))
 		enc := jsonl.NewEncoder(&input)
@@ -197,9 +198,9 @@ func TestCommunityLibraryPublish(t *testing.T) {
 		require.NoError(t, cmd.run(ctx, jsonl.NewEncoder(&output), &input, c))
 
 		dec := json.NewDecoder(&output)
-		var results []*meta.PublishedContent
+		var results []*communityapi.PublishedContent
 		for dec.More() {
-			var pc meta.PublishedContent
+			var pc communityapi.PublishedContent
 			require.NoError(t, dec.Decode(&pc))
 			results = append(results, &pc)
 		}
@@ -243,7 +244,7 @@ func TestCommunityLibraryPublish(t *testing.T) {
 		srv := httptest.NewServer(communityLibraryPublishServer(t, q))
 		defer srv.Close()
 
-		com := &meta.Community{Id: communityID, DefaultPublishMode: meta.PublishMode_LISTED}
+		com := &communityapi.Community{Id: communityID, DefaultPublishMode: communityapi.PublishMode_LISTED}
 		var input bytes.Buffer
 		require.NoError(t, json.NewEncoder(&input).Encode(com))
 		require.NoError(t, jsonl.NewEncoder(&input).Encode(langx.Clone(lmd, timex.JSONSafeEncodeOption)))
@@ -258,12 +259,12 @@ func TestCommunityLibraryPublish(t *testing.T) {
 
 		require.NoError(t, cmd.run(ctx, jsonl.NewEncoder(&output), &input, c))
 
-		var result meta.PublishedContent
+		var result communityapi.PublishedContent
 		require.NoError(t, json.NewDecoder(&output).Decode(&result))
 
 		var pc community.PublishedContent
 		require.NoError(t, community.PublishedContentFindByID(ctx, q, result.Id).Scan(&pc))
-		require.Equal(t, int32(meta.PublishMode_LISTED), pc.PublishMode)
+		require.Equal(t, int32(communityapi.PublishMode_LISTED), pc.PublishMode)
 	})
 
 	t.Run("returns error when library item does not exist", func(t *testing.T) {
@@ -289,7 +290,7 @@ func TestCommunityLibraryPublish(t *testing.T) {
 		defer srv.Close()
 
 		// library item not inserted — endpoint returns an error status
-		com := &meta.Community{Id: communityID}
+		com := &communityapi.Community{Id: communityID}
 		lmd := library.Metadata{ID: libraryID}
 		var input bytes.Buffer
 		require.NoError(t, json.NewEncoder(&input).Encode(com))

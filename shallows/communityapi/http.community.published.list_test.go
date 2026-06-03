@@ -1,4 +1,4 @@
-package community_test
+package communityapi_test
 
 import (
 	"encoding/json"
@@ -10,6 +10,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/community"
+	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
@@ -63,12 +64,12 @@ func TestPublishedListEndpoint(t *testing.T) {
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd2).Scan(&lmd2))
 
 		routes := mux.NewRouter()
-		community.NewHTTP(
+		communityapi.NewHTTPPublished(
 			q,
-			community.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
-			community.HTTPOptionHTTPClient(&http.Client{}),
-			community.HTTPOptionMediaStorage(fsx.DirVirtual(mediaDir)),
-			community.HTTPOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
+			communityapi.HTTPPublishedOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			communityapi.HTTPPublishedOptionHTTPClient(&http.Client{}),
+			communityapi.HTTPPublishedOptionMediaStorage(fsx.DirVirtual(mediaDir)),
+			communityapi.HTTPPublishedOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
 		).Bind(routes.PathPrefix("/c").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
@@ -76,15 +77,15 @@ func TestPublishedListEndpoint(t *testing.T) {
 
 		// Publish two items to the same community.
 		for _, lid := range []string{lmd1.ID, lmd2.ID} {
-			body, err := json.Marshal(&meta.PublishContentRequest{
-				PublishedContent: &meta.PublishedContent{LibraryId: lid},
+			body, err := json.Marshal(&communityapi.PublishContentRequest{
+				PublishedContent: &communityapi.PublishedContent{LibraryId: lid},
 			})
 			require.NoError(t, err)
 
 			resp, req, err := httptestx.BuildRequestContextBytes(
 				ctx,
 				http.MethodPost,
-				"/c/"+communityID+"/publish",
+				"/c/"+communityID,
 				body,
 				httptestx.RequestOptionAuthorization(token),
 				httptestx.RequestOptionContent("application/json"),
@@ -98,7 +99,7 @@ func TestPublishedListEndpoint(t *testing.T) {
 		resp, req, err := httptestx.BuildRequestContextBytes(
 			ctx,
 			http.MethodGet,
-			"/c/"+communityID+"/published",
+			"/c/"+communityID,
 			nil,
 			httptestx.RequestOptionAuthorization(token),
 		)
@@ -107,7 +108,7 @@ func TestPublishedListEndpoint(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Code)
 
-		var result meta.PublishedContentListResponse
+		var result communityapi.PublishedContentSearchResponse
 		require.NoError(t, json.Unmarshal(resp.Body.Bytes(), &result))
 		require.Len(t, result.Items, 2)
 
@@ -172,12 +173,12 @@ func TestPublishedListEndpoint(t *testing.T) {
 		require.NoError(t, community.PublishedContentTombstone(ctx, q, pc2.ID).Scan(&pc2))
 
 		routes := mux.NewRouter()
-		community.NewHTTP(
+		communityapi.NewHTTPPublished(
 			q,
-			community.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
-			community.HTTPOptionHTTPClient(&http.Client{}),
-			community.HTTPOptionMediaStorage(fsx.DirVirtual(mediaDir)),
-			community.HTTPOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
+			communityapi.HTTPPublishedOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			communityapi.HTTPPublishedOptionHTTPClient(&http.Client{}),
+			communityapi.HTTPPublishedOptionMediaStorage(fsx.DirVirtual(mediaDir)),
+			communityapi.HTTPPublishedOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
 		).Bind(routes.PathPrefix("/c").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
@@ -186,7 +187,7 @@ func TestPublishedListEndpoint(t *testing.T) {
 		resp, req, err := httptestx.BuildRequestContextBytes(
 			ctx,
 			http.MethodGet,
-			"/c/"+communityID+"/published",
+			"/c/"+communityID,
 			nil,
 			httptestx.RequestOptionAuthorization(token),
 		)
@@ -195,7 +196,7 @@ func TestPublishedListEndpoint(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Code)
 
-		var result meta.PublishedContentListResponse
+		var result communityapi.PublishedContentSearchResponse
 		require.NoError(t, json.Unmarshal(resp.Body.Bytes(), &result))
 		require.Len(t, result.Items, 1)
 		require.Equal(t, lmd1.ID, result.Items[0].LibraryId)
@@ -258,12 +259,12 @@ func TestPublishedListEndpoint(t *testing.T) {
 		require.NoError(t, community.PublishedContentUpdatePublishedAt(ctx, q, pc2.ID, now.Add(-24*time.Hour)).Scan(&pc2))
 
 		routes := mux.NewRouter()
-		community.NewHTTP(
+		communityapi.NewHTTPPublished(
 			q,
-			community.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
-			community.HTTPOptionHTTPClient(&http.Client{}),
-			community.HTTPOptionMediaStorage(fsx.DirVirtual(mediaDir)),
-			community.HTTPOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
+			communityapi.HTTPPublishedOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			communityapi.HTTPPublishedOptionHTTPClient(&http.Client{}),
+			communityapi.HTTPPublishedOptionMediaStorage(fsx.DirVirtual(mediaDir)),
+			communityapi.HTTPPublishedOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
 		).Bind(routes.PathPrefix("/c").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
@@ -272,7 +273,7 @@ func TestPublishedListEndpoint(t *testing.T) {
 		resp, req, err := httptestx.BuildRequestContextBytes(
 			ctx,
 			http.MethodGet,
-			"/c/"+communityID+"/published",
+			"/c/"+communityID,
 			nil,
 			httptestx.RequestOptionAuthorization(token),
 		)
@@ -281,7 +282,7 @@ func TestPublishedListEndpoint(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Code)
 
-		var result meta.PublishedContentListResponse
+		var result communityapi.PublishedContentSearchResponse
 		require.NoError(t, json.Unmarshal(resp.Body.Bytes(), &result))
 		require.Len(t, result.Items, 2)
 		require.Equal(t, lmd2.ID, result.Items[0].LibraryId) // newer published_at first
@@ -327,12 +328,12 @@ func TestPublishedListEndpoint(t *testing.T) {
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd2).Scan(&lmd2))
 
 		routes := mux.NewRouter()
-		community.NewHTTP(
+		communityapi.NewHTTPPublished(
 			q,
-			community.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
-			community.HTTPOptionHTTPClient(&http.Client{}),
-			community.HTTPOptionMediaStorage(fsx.DirVirtual(mediaDir)),
-			community.HTTPOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
+			communityapi.HTTPPublishedOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			communityapi.HTTPPublishedOptionHTTPClient(&http.Client{}),
+			communityapi.HTTPPublishedOptionMediaStorage(fsx.DirVirtual(mediaDir)),
+			communityapi.HTTPPublishedOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
 		).Bind(routes.PathPrefix("/c").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
@@ -345,15 +346,15 @@ func TestPublishedListEndpoint(t *testing.T) {
 			{lmd1.ID, "alpha video"},
 			{lmd2.ID, "beta video"},
 		} {
-			body, err := json.Marshal(&meta.PublishContentRequest{
-				PublishedContent: &meta.PublishedContent{LibraryId: item.lid, Title: item.title},
+			body, err := json.Marshal(&communityapi.PublishContentRequest{
+				PublishedContent: &communityapi.PublishedContent{LibraryId: item.lid, Title: item.title},
 			})
 			require.NoError(t, err)
 
 			resp, req, err := httptestx.BuildRequestContextBytes(
 				ctx,
 				http.MethodPost,
-				"/c/"+communityID+"/publish",
+				"/c/"+communityID,
 				body,
 				httptestx.RequestOptionAuthorization(token),
 				httptestx.RequestOptionContent("application/json"),
@@ -366,7 +367,7 @@ func TestPublishedListEndpoint(t *testing.T) {
 		resp, req, err := httptestx.BuildRequestContextBytes(
 			ctx,
 			http.MethodGet,
-			"/c/"+communityID+"/published?query=alpha",
+			"/c/"+communityID+"?query=alpha",
 			nil,
 			httptestx.RequestOptionAuthorization(token),
 		)
@@ -375,7 +376,7 @@ func TestPublishedListEndpoint(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Code)
 
-		var result meta.PublishedContentListResponse
+		var result communityapi.PublishedContentSearchResponse
 		require.NoError(t, json.Unmarshal(resp.Body.Bytes(), &result))
 		require.Len(t, result.Items, 1)
 		require.Equal(t, lmd1.ID, result.Items[0].LibraryId)
@@ -410,26 +411,26 @@ func TestPublishedListEndpoint(t *testing.T) {
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd1).Scan(&lmd1))
 
 		routes := mux.NewRouter()
-		community.NewHTTP(
+		communityapi.NewHTTPPublished(
 			q,
-			community.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
-			community.HTTPOptionHTTPClient(&http.Client{}),
-			community.HTTPOptionMediaStorage(fsx.DirVirtual(mediaDir)),
-			community.HTTPOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
+			communityapi.HTTPPublishedOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			communityapi.HTTPPublishedOptionHTTPClient(&http.Client{}),
+			communityapi.HTTPPublishedOptionMediaStorage(fsx.DirVirtual(mediaDir)),
+			communityapi.HTTPPublishedOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
 		).Bind(routes.PathPrefix("/c").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
 		token := "Bearer " + httpauthtest.UnsafeToken(claims, httpauthtest.UnsafeJWTSecretSource)
 
-		body, err := json.Marshal(&meta.PublishContentRequest{
-			PublishedContent: &meta.PublishedContent{LibraryId: lmd1.ID, Title: "specific title"},
+		body, err := json.Marshal(&communityapi.PublishContentRequest{
+			PublishedContent: &communityapi.PublishedContent{LibraryId: lmd1.ID, Title: "specific title"},
 		})
 		require.NoError(t, err)
 
 		resp, req, err := httptestx.BuildRequestContextBytes(
 			ctx,
 			http.MethodPost,
-			"/c/"+communityID+"/publish",
+			"/c/"+communityID,
 			body,
 			httptestx.RequestOptionAuthorization(token),
 			httptestx.RequestOptionContent("application/json"),
@@ -441,7 +442,7 @@ func TestPublishedListEndpoint(t *testing.T) {
 		resp, req, err = httptestx.BuildRequestContextBytes(
 			ctx,
 			http.MethodGet,
-			"/c/"+communityID+"/published?query=nomatch",
+			"/c/"+communityID+"?query=nomatch",
 			nil,
 			httptestx.RequestOptionAuthorization(token),
 		)
@@ -450,7 +451,7 @@ func TestPublishedListEndpoint(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Code)
 
-		var result meta.PublishedContentListResponse
+		var result communityapi.PublishedContentSearchResponse
 		require.NoError(t, json.Unmarshal(resp.Body.Bytes(), &result))
 		require.Empty(t, result.Items)
 	})
@@ -473,11 +474,11 @@ func TestPublishedListEndpoint(t *testing.T) {
 		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
 
 		routes := mux.NewRouter()
-		community.NewHTTP(
+		communityapi.NewHTTPPublished(
 			q,
-			community.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
-			community.HTTPOptionMediaStorage(fsx.DirVirtual(mediaDir)),
-			community.HTTPOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
+			communityapi.HTTPPublishedOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			communityapi.HTTPPublishedOptionMediaStorage(fsx.DirVirtual(mediaDir)),
+			communityapi.HTTPPublishedOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
 		).Bind(routes.PathPrefix("/c").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
@@ -486,7 +487,7 @@ func TestPublishedListEndpoint(t *testing.T) {
 		resp, req, err := httptestx.BuildRequestContextBytes(
 			ctx,
 			http.MethodGet,
-			"/c/"+communityID+"/published",
+			"/c/"+communityID,
 			nil,
 			httptestx.RequestOptionAuthorization(token),
 		)
@@ -495,7 +496,7 @@ func TestPublishedListEndpoint(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Code)
 
-		var result meta.PublishedContentListResponse
+		var result communityapi.PublishedContentSearchResponse
 		require.NoError(t, json.Unmarshal(resp.Body.Bytes(), &result))
 		require.Empty(t, result.Items)
 	})

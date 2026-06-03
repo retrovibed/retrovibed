@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+package retrovibed.community;
+
+import "community.proto";
+
+message PublishedContent {
+  string id = 1 [ json_name = "id" ];
+  string community_id = 2 [ json_name = "community_id" ];
+  string known_media_id = 3 [ json_name = "known_media_id" ];
+  string magnet_uri = 4 [ json_name = "magnet_uri" ];
+  string published_at = 5 [ json_name = "published_at" ];
+  string created_at = 6 [ json_name = "created_at" ];
+  string updated_at = 7 [ json_name = "updated_at" ];
+  string archived_id = 8 [ json_name = "archived_id" ];
+  string title = 9 [ json_name = "title" ];
+  string description = 10 [ json_name = "description" ];
+  string mimetype = 11 [ json_name = "mimetype" ];
+  string encryption_seed = 12 [ json_name = "encryption_seed" ];
+  uint64 bytes = 13 [ json_name = "bytes" ];
+
+  reserved 14 to 999;
+  // private fields for retrovibed use only, not populated by clients.
+  string library_id = 1000 [ json_name = "library_id" ];
+  string oauth_google_id = 1001 [ json_name = "oauth_google_id" ];
+}
+
+message PublishContentRequest {
+  PublishedContent published_content = 1 [ json_name = "published_content" ];
+  PublishMode publish_mode = 2 [ json_name = "publish_mode" ];
+  reserved 3;
+}
+message PublishContentResponse {
+  PublishedContent published_content = 1 [ json_name = "published_content" ];
+}
+
+message PublishContentDeleteRequest {
+  PublishedContent published_content = 1 [ json_name = "published_content" ];
+}
+
+message PublishContentDeleteResponse {
+  PublishedContent published_content = 1 [ json_name = "published_content" ];
+}
+
+message PublishedContentSearchRequest {
+  string community_id = 1 [ json_name = "community_id" ];
+  string query = 2 [ json_name = "query" ];
+  string sync = 3 [ json_name = "sync" ];
+  reserved 4 to 899;
+  uint64 offset = 900 [ json_name = "offset" ];
+  uint64 limit = 901 [ json_name = "limit" ];
+  reserved 902 to 999;
+}
+
+message PublishedContentSearchResponse {
+  Community community = 1 [ json_name = "community" ];
+  PublishedContentSearchRequest next = 2 [ json_name = "next" ];
+  repeated PublishedContent items = 3 [ json_name = "items" ];
+}

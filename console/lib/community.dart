@@ -5,6 +5,8 @@ import 'package:retrovibed/community/qr.scanner.dart';
 import 'package:retrovibed/community/list.display.dart';
 import 'package:retrovibed/uuidx.dart' as uuidx;
 
+export 'package:retrovibed/community/api.dart';
+
 class AutoHelp extends StatelessWidget {
   final Widget child;
   const AutoHelp(this.child, {super.key});

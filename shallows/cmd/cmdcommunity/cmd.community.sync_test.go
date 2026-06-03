@@ -4,12 +4,11 @@ import (
 	"testing"
 
 	"github.com/gofrs/uuid/v5"
-	"github.com/retrovibed/retrovibed/shallows/community"
+	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/testx"
-	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 	"github.com/stretchr/testify/require"
 )
@@ -27,7 +26,7 @@ func TestCommunitySync(t *testing.T) {
 		publishedContentID := uuid.Must(uuid.NewV7()).String()
 		libraryID := uuid.Must(uuid.NewV7()).String()
 
-		err := community.SyncPublishedContentItem(ctx, db, &meta.PublishedContent{
+		err := communityapi.SyncPublishedContentItem(ctx, db, &communityapi.PublishedContent{
 			Id:           publishedContentID,
 			CommunityId:  communityID,
 			KnownMediaId: knownMediaID,
@@ -58,7 +57,7 @@ func TestCommunitySync(t *testing.T) {
 
 		communityID := uuid.Must(uuid.NewV7()).String()
 
-		items := []*meta.PublishedContent{
+		items := []*communityapi.PublishedContent{
 			{
 				Id:           uuid.Must(uuid.NewV7()).String(),
 				CommunityId:  communityID,
@@ -83,7 +82,7 @@ func TestCommunitySync(t *testing.T) {
 		}
 
 		for _, item := range items {
-			require.NoError(t, community.SyncPublishedContentItem(ctx, db, item, false))
+			require.NoError(t, communityapi.SyncPublishedContentItem(ctx, db, item, false))
 		}
 
 		require.Equal(t, 3, errorsx.Zero(sqlx.Count(ctx, db, "SELECT COUNT(*) FROM torrents_metadata")))
@@ -101,7 +100,7 @@ func TestCommunitySync(t *testing.T) {
 		publishedContentID := uuid.Must(uuid.NewV7()).String()
 		libraryID := uuid.Must(uuid.NewV7()).String()
 
-		pc := &meta.PublishedContent{
+		pc := &communityapi.PublishedContent{
 			Id:           publishedContentID,
 			CommunityId:  communityID,
 			KnownMediaId: uuid.Must(uuid.NewV7()).String(),
@@ -109,18 +108,18 @@ func TestCommunitySync(t *testing.T) {
 			LibraryId:    libraryID,
 		}
 
-		require.NoError(t, community.SyncPublishedContentItem(ctx, db, pc, false))
+		require.NoError(t, communityapi.SyncPublishedContentItem(ctx, db, pc, false))
 		require.Equal(t, 1, errorsx.Zero(sqlx.Count(ctx, db, "SELECT COUNT(*) FROM torrents_metadata")))
 		require.Equal(t, 1, errorsx.Zero(sqlx.Count(ctx, db, "SELECT COUNT(*) FROM published_content")))
 
-		pc2 := &meta.PublishedContent{
+		pc2 := &communityapi.PublishedContent{
 			Id:           uuid.Must(uuid.NewV7()).String(),
 			CommunityId:  communityID,
 			KnownMediaId: uuid.Must(uuid.NewV7()).String(),
 			MagnetUri:    "magnet:?xt=urn:btih:4444444444444444444444444444444444444444&dn=duplicate.txt",
 			LibraryId:    uuid.Must(uuid.NewV7()).String(),
 		}
-		require.NoError(t, community.SyncPublishedContentItem(ctx, db, pc2, false))
+		require.NoError(t, communityapi.SyncPublishedContentItem(ctx, db, pc2, false))
 		require.Equal(t, 1, errorsx.Zero(sqlx.Count(ctx, db, "SELECT COUNT(*) FROM torrents_metadata")), "should not create duplicate torrent metadata")
 		require.Equal(t, 2, errorsx.Zero(sqlx.Count(ctx, db, "SELECT COUNT(*) FROM published_content")), "should create separate published content records")
 	})
@@ -134,7 +133,7 @@ func TestCommunitySync(t *testing.T) {
 
 		communityID := uuid.Must(uuid.NewV7()).String()
 
-		pc := &meta.PublishedContent{
+		pc := &communityapi.PublishedContent{
 			Id:           uuid.Must(uuid.NewV7()).String(),
 			CommunityId:  communityID,
 			KnownMediaId: uuid.Must(uuid.NewV7()).String(),
@@ -142,7 +141,7 @@ func TestCommunitySync(t *testing.T) {
 			LibraryId:    uuid.Must(uuid.NewV7()).String(),
 		}
 
-		err := community.SyncPublishedContentItem(ctx, db, pc, false)
+		err := communityapi.SyncPublishedContentItem(ctx, db, pc, false)
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "failed to parse magnet URI")
 	})
@@ -157,7 +156,7 @@ func TestCommunitySync(t *testing.T) {
 		communityID := uuid.Must(uuid.NewV7()).String()
 		publishedContentID := uuid.Must(uuid.NewV7()).String()
 
-		pc := &meta.PublishedContent{
+		pc := &communityapi.PublishedContent{
 			Id:           publishedContentID,
 			CommunityId:  communityID,
 			KnownMediaId: uuid.Must(uuid.NewV7()).String(),
@@ -165,7 +164,7 @@ func TestCommunitySync(t *testing.T) {
 			LibraryId:    uuid.Must(uuid.NewV7()).String(),
 		}
 
-		require.NoError(t, community.SyncPublishedContentItem(ctx, db, pc, true))
+		require.NoError(t, communityapi.SyncPublishedContentItem(ctx, db, pc, true))
 
 		var tmeta tracking.Metadata
 		require.NoError(t, tracking.MetadataFindByID(ctx, db, errorsx.Must(sqlx.String(ctx, db, "SELECT id::text FROM torrents_metadata"))).Scan(&tmeta))
@@ -183,7 +182,7 @@ func TestCommunitySync(t *testing.T) {
 		knownMediaID := uuid.Must(uuid.NewV7()).String()
 		publishedContentID := uuid.Must(uuid.NewV7()).String()
 
-		pc := &meta.PublishedContent{
+		pc := &communityapi.PublishedContent{
 			Id:           publishedContentID,
 			CommunityId:  communityID,
 			KnownMediaId: knownMediaID,
@@ -191,7 +190,7 @@ func TestCommunitySync(t *testing.T) {
 			LibraryId:    uuid.Must(uuid.NewV7()).String(),
 		}
 
-		require.NoError(t, community.SyncPublishedContentItem(ctx, db, pc, false))
+		require.NoError(t, communityapi.SyncPublishedContentItem(ctx, db, pc, false))
 
 		var tmeta tracking.Metadata
 		require.NoError(t, tracking.MetadataFindByID(ctx, db, errorsx.Must(sqlx.String(ctx, db, "SELECT id::text FROM torrents_metadata"))).Scan(&tmeta))

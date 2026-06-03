@@ -8,12 +8,12 @@ import (
 	"net/http"
 
 	"github.com/retrovibed/retrovibed/retroapi/deeppool"
+	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
-	"github.com/retrovibed/retrovibed/shallows/meta"
 )
 
-func CommunityCreate(ctx context.Context, c *http.Client, com *meta.CommunityCreateRequest) (resp *meta.CommunityCreateResponse, err error) {
+func CommunityCreate(ctx context.Context, c *http.Client, com *communityapi.CommunityCreateRequest) (resp *communityapi.CommunityCreateResponse, err error) {
 	encoded, err := json.Marshal(com)
 	if err != nil {
 		return nil, err
@@ -23,7 +23,7 @@ func CommunityCreate(ctx context.Context, c *http.Client, com *meta.CommunityCre
 		return nil, err
 	}
 
-	resp = new(meta.CommunityCreateResponse)
+	resp = new(communityapi.CommunityCreateResponse)
 
 	if err = json.NewDecoder(_resp.Body).Decode(resp); err != nil {
 		return nil, err

@@ -7,16 +7,16 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/testx"
-	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/retrovibed/retrovibed/shallows/metaapi"
 	"github.com/stretchr/testify/require"
 )
 
 func TestCommunityDelete(t *testing.T) {
 	t.Run("deletes community successfully", func(t *testing.T) {
-		var expected meta.CommunityDeleteResponse
+		var expected communityapi.CommunityDeleteResponse
 		require.NoError(t, testx.Fake(&expected))
 
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -32,7 +32,7 @@ func TestCommunityDelete(t *testing.T) {
 	})
 
 	t.Run("includes domain in path", func(t *testing.T) {
-		var expected meta.CommunityDeleteResponse
+		var expected communityapi.CommunityDeleteResponse
 		require.NoError(t, testx.Fake(&expected))
 
 		domainOrId := "my-test-domain"

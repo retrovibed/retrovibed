@@ -12,6 +12,7 @@ import (
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
+	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/debugx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/grpcx"
@@ -21,7 +22,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/media"
-	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/retrovibed/retrovibed/shallows/metaapi"
 	"github.com/retrovibed/retrovibed/shallows/rss"
 )
@@ -36,7 +36,7 @@ type cmdCommunityPublish struct {
 	Name        string        `arg:"" name:"name" optional:"" help:"name of the community to upload the feed, if this is unspecified it is assumed the first message will contain the community info"`
 }
 
-func (t cmdCommunityPublish) items(c *meta.Community, r io.Reader) iter.Seq[rss.Item] {
+func (t cmdCommunityPublish) items(c *communityapi.Community, r io.Reader) iter.Seq[rss.Item] {
 	ts := time.Now()
 	return func(yield func(rss.Item) bool) {
 		var (
@@ -74,7 +74,7 @@ func (t cmdCommunityPublish) items(c *meta.Community, r io.Reader) iter.Seq[rss.
 func (t cmdCommunityPublish) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClient) (err error) {
 	var (
 		buf bytes.Buffer
-		com = &meta.Community{
+		com = &communityapi.Community{
 			Domain: t.Name,
 		}
 	)

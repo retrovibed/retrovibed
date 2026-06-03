@@ -1,7 +1,6 @@
-package community_test
+package communityapi_test
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -14,11 +13,12 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/community"
+	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
-	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/testx"
+	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/internal/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/retrovibed/retrovibed/shallows/metaapi"
@@ -29,12 +29,13 @@ import (
 func newCommunityMockClient(communityID string) *http.Client {
 	return httptestx.NewTestClient(func(req *http.Request) *http.Response {
 		if req.Method == http.MethodGet && strings.Contains(req.URL.Path, communityID) {
-			body, _ := json.Marshal(&meta.CommunityFindResponse{
-				Community: &meta.Community{
+			body, _ := json.Marshal(&communityapi.CommunityFindResponse{
+				Community: &communityapi.Community{
 					Id:          communityID,
 					Domain:      "community",
 					Description: communityID,
 					Entropy:     uuidx.WithSuffix(1),
+					Url:         "https://community.community.retrovibe.space",
 				},
 			})
 			return &http.Response{
@@ -56,7 +57,7 @@ func TestSubscribeEndpoint(t *testing.T) {
 		var (
 			p   meta.Profile
 			v   meta.Authz
-			sub community.CommunitySubscription
+			sub community.Community
 		)
 		ctx, done := testx.Context(t)
 		defer done()
@@ -70,12 +71,10 @@ func TestSubscribeEndpoint(t *testing.T) {
 		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
 
 		routes := mux.NewRouter()
-		community.NewHTTP(
+		communityapi.NewHTTP(
 			q,
-			community.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
-			community.HTTPOptionHTTPClient(newCommunityMockClient(communityID)),
-			community.HTTPOptionMediaStorage(fsx.DirVirtual(t.TempDir())),
-			community.HTTPOptionTorrentStorage(fsx.DirVirtual(t.TempDir())),
+			communityapi.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			communityapi.HTTPOptionHTTPClient(newCommunityMockClient(communityID)),
 		).Bind(routes.PathPrefix("/c").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
@@ -93,8 +92,8 @@ func TestSubscribeEndpoint(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Code)
 
-		require.NoError(t, community.CommunitySubscriptionFindByCommunityID(ctx, q, communityID).Scan(&sub))
-		require.Equal(t, communityID, sub.CommunityID)
+		require.NoError(t, community.CommunityFindByID(ctx, q, communityID).Scan(&sub))
+		require.Equal(t, communityID, sub.ID)
 		require.Equal(t, 1, sqltestx.Count(t, q, "SELECT COUNT(*) FROM torrents_feed_rss"))
 
 		feedURL := "https://community.community.retrovibe.space"
@@ -110,7 +109,7 @@ func TestSubscribeEndpoint(t *testing.T) {
 		var (
 			p   meta.Profile
 			v   meta.Authz
-			sub community.CommunitySubscription
+			sub community.Community
 		)
 		ctx, done := testx.Context(t)
 		defer done()
@@ -124,12 +123,10 @@ func TestSubscribeEndpoint(t *testing.T) {
 		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
 
 		routes := mux.NewRouter()
-		community.NewHTTP(
+		communityapi.NewHTTP(
 			q,
-			community.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
-			community.HTTPOptionHTTPClient(newCommunityMockClient(communityID)),
-			community.HTTPOptionMediaStorage(fsx.DirVirtual(t.TempDir())),
-			community.HTTPOptionTorrentStorage(fsx.DirVirtual(t.TempDir())),
+			communityapi.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			communityapi.HTTPOptionHTTPClient(newCommunityMockClient(communityID)),
 		).Bind(routes.PathPrefix("/c").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
@@ -145,7 +142,7 @@ func TestSubscribeEndpoint(t *testing.T) {
 		require.NoError(t, err)
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Code)
-		require.NoError(t, community.CommunitySubscriptionFindByCommunityID(ctx, q, communityID).Scan(&sub))
+		require.NoError(t, community.CommunityFindByID(ctx, q, communityID).Scan(&sub))
 		require.Equal(t, 1, sqltestx.Count(t, q, "SELECT COUNT(*) FROM torrents_feed_rss"))
 
 		// unsubscribe
@@ -158,7 +155,8 @@ func TestSubscribeEndpoint(t *testing.T) {
 		require.NoError(t, err)
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Code)
-		require.ErrorIs(t, community.CommunitySubscriptionFindByCommunityID(ctx, q, communityID).Scan(&sub), sql.ErrNoRows)
+		require.NoError(t, community.CommunityFindByID(ctx, q, communityID).Scan(&sub))
+		require.True(t, sub.SubscribedAt.Equal(timex.Inf()), "expected subscribed_at to be infinity after unsubscribe")
 		require.Equal(t, 0, sqltestx.Count(t, q, "SELECT COUNT(*) FROM torrents_feed_rss"))
 	})
 
@@ -166,7 +164,7 @@ func TestSubscribeEndpoint(t *testing.T) {
 		var (
 			p   meta.Profile
 			v   meta.Authz
-			sub community.CommunitySubscription
+			sub community.Community
 		)
 		ctx, done := testx.Context(t)
 		defer done()
@@ -180,12 +178,10 @@ func TestSubscribeEndpoint(t *testing.T) {
 		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
 
 		routes := mux.NewRouter()
-		community.NewHTTP(
+		communityapi.NewHTTP(
 			q,
-			community.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
-			community.HTTPOptionHTTPClient(newCommunityMockClient(communityID)),
-			community.HTTPOptionMediaStorage(fsx.DirVirtual(t.TempDir())),
-			community.HTTPOptionTorrentStorage(fsx.DirVirtual(t.TempDir())),
+			communityapi.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			communityapi.HTTPOptionHTTPClient(newCommunityMockClient(communityID)),
 		).Bind(routes.PathPrefix("/c").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
@@ -201,7 +197,7 @@ func TestSubscribeEndpoint(t *testing.T) {
 		require.NoError(t, err)
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Code)
-		require.NoError(t, community.CommunitySubscriptionFindByCommunityID(ctx, q, communityID).Scan(&sub))
+		require.NoError(t, community.CommunityFindByID(ctx, q, communityID).Scan(&sub))
 		require.Equal(t, 1, sqltestx.Count(t, q, "SELECT COUNT(*) FROM torrents_feed_rss"))
 
 		// unsubscribe
@@ -214,7 +210,8 @@ func TestSubscribeEndpoint(t *testing.T) {
 		require.NoError(t, err)
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Code)
-		require.ErrorIs(t, community.CommunitySubscriptionFindByCommunityID(ctx, q, communityID).Scan(&sub), sql.ErrNoRows)
+		require.NoError(t, community.CommunityFindByID(ctx, q, communityID).Scan(&sub))
+		require.True(t, sub.SubscribedAt.Equal(timex.Inf()), "expected subscribed_at to be infinity after unsubscribe")
 		require.Equal(t, 0, sqltestx.Count(t, q, "SELECT COUNT(*) FROM torrents_feed_rss"))
 
 		// resubscribe
@@ -227,8 +224,8 @@ func TestSubscribeEndpoint(t *testing.T) {
 		require.NoError(t, err)
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Code)
-		require.NoError(t, community.CommunitySubscriptionFindByCommunityID(ctx, q, communityID).Scan(&sub))
-		require.Equal(t, communityID, sub.CommunityID)
+		require.NoError(t, community.CommunityFindByID(ctx, q, communityID).Scan(&sub))
+		require.Equal(t, communityID, sub.ID)
 		require.Equal(t, 1, sqltestx.Count(t, q, "SELECT COUNT(*) FROM torrents_feed_rss"))
 	})
 }

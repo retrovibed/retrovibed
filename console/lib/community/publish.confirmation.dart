@@ -7,9 +7,8 @@ import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/media/media.pb.dart';
 import 'package:retrovibed/media/media.known.pb.dart';
 import 'package:retrovibed/mimex.dart' as mimex;
-import 'package:retrovibed/community/api.dart' as community_api;
-import 'package:retrovibed/community/community.pb.dart';
-import 'package:retrovibed/community/publish.mode.edit.dart';
+import 'api.dart';
+import 'publish.mode.edit.dart';
 import 'package:retrovibed/google/api.dart' as google;
 
 class PublishConfirmation extends StatefulWidget {
@@ -18,7 +17,11 @@ class PublishConfirmation extends StatefulWidget {
   final Known? knownMedia;
   final VoidCallback onPublished;
   final Future<YouTubeStatus> Function({List<httpx.Option> options}) youtubeStatus;
-  final Future<PublishContentResponse> Function(String cid, PublishContentRequest req, {List<httpx.Option> options})
+  final Future<PublishContentResponse> Function(
+    String cid,
+    PublishContentRequest req, {
+    List<httpx.Option> options,
+  })
   apicommunitypublish;
 
   const PublishConfirmation({
@@ -28,7 +31,7 @@ class PublishConfirmation extends StatefulWidget {
     this.knownMedia,
     required this.onPublished,
     this.youtubeStatus = google.YouTube.status,
-    this.apicommunitypublish = community_api.API.publish,
+    this.apicommunitypublish = API.publish,
   });
 
   @override

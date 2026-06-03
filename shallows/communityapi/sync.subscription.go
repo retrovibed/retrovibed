@@ -1,4 +1,4 @@
-package community
+package communityapi
 
 import (
 	"context"
@@ -8,20 +8,19 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
-	"github.com/retrovibed/retrovibed/shallows/deeppool"
+	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
-	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 )
 
 // SyncContentFromDeeppool fetches published content for a community from deeppool
 // and imports it into the local database. Returns the number of items synced.
-func SyncContentFromDeeppool(ctx context.Context, q sqlx.Queryer, client deeppool.Published, communityID string, autodownload bool) (int, error) {
-	resp, err := client.List(ctx, communityID)
+func SyncContentFromDeeppool(ctx context.Context, q sqlx.Queryer, client DeeppoolPublished, communityID string, autodownload bool) (int, error) {
+	resp, err := client.List(ctx, communityID, &PublishedContentSearchRequest{})
 	if err != nil {
 		return 0, errorsx.Wrap(err, "failed to fetch published content from deeppool")
 	}
@@ -39,7 +38,7 @@ func SyncContentFromDeeppool(ctx context.Context, q sqlx.Queryer, client deeppoo
 }
 
 // SyncPublishedContentItem syncs a single published content item from deeppool into the local database.
-func SyncPublishedContentItem(ctx context.Context, q sqlx.Queryer, pc *meta.PublishedContent, autodownload bool) error {
+func SyncPublishedContentItem(ctx context.Context, q sqlx.Queryer, pc *PublishedContent, autodownload bool) error {
 	md, err := metainfo.ParseMagnetURI(pc.MagnetUri)
 	if err != nil {
 		return errorsx.Wrap(err, "failed to parse magnet URI")
@@ -65,7 +64,7 @@ func SyncPublishedContentItem(ctx context.Context, q sqlx.Queryer, pc *meta.Publ
 		}
 	}
 
-	dbpc := NewPublishedContent(PublishedContent{
+	dbpc := community.NewPublishedContent(community.PublishedContent{
 		ID:            pc.Id,
 		CommunityID:   pc.CommunityId,
 		MagnetURI:     pc.MagnetUri,
@@ -74,7 +73,7 @@ func SyncPublishedContentItem(ctx context.Context, q sqlx.Queryer, pc *meta.Publ
 		KnownMediaID:  tmeta.KnownMediaID,
 	})
 
-	if err = PublishedContentInsertWithDefaults(ctx, q, dbpc).Scan(&dbpc); err != nil {
+	if err = community.PublishedContentInsertWithDefaults(ctx, q, dbpc).Scan(&dbpc); err != nil {
 		return errorsx.Wrap(err, "failed to insert published content")
 	}
 
@@ -83,26 +82,28 @@ func SyncPublishedContentItem(ctx context.Context, q sqlx.Queryer, pc *meta.Publ
 
 // NewSubscriptionSync creates a background worker that periodically syncs
 // content from all subscribed communities.
-func NewSubscriptionSync(ctx context.Context, q sqlx.Queryer, client deeppool.Published, interval time.Duration) error {
+func NewSubscriptionSync(ctx context.Context, q sqlx.Queryer, client DeeppoolPublished, interval time.Duration) error {
 	log.Println("subscription sync worker initiated")
 	defer log.Println("subscription sync worker completed")
 
 	return timex.NowAndEvery(ctx, interval, func(ctx context.Context) error {
-		subs := sqlx.Scan(CommunitySubscriptionFindAll(ctx, q))
+		subs := sqlx.Scan(community.CommunitySearch(ctx, q, community.CommunitySearchBuilder()))
 		for sub := range subs.Iter() {
 			autodownload := sub.AutoDownload != 0
-			synced, err := SyncContentFromDeeppool(ctx, q, client, sub.CommunityID, autodownload)
+			synced, err := SyncContentFromDeeppool(ctx, q, client, sub.ID, autodownload)
 			if err != nil {
-				log.Println(errorsx.Wrap(err, "subscription sync failed for "+sub.CommunityID))
+				log.Println(errorsx.Wrap(err, "subscription sync failed for "+sub.ID))
 				continue
 			}
 
 			if synced > 0 {
-				log.Printf("subscription sync: imported %d items for %s", synced, sub.CommunityID)
+				log.Printf("subscription sync: imported %d items for %s", synced, sub.ID)
 			}
 
-			if err = CommunitySubscriptionUpdateLastSyncAt(ctx, q, sub.CommunityID, time.Now()).Scan(&sub); err != nil {
-				log.Println(errorsx.Wrap(err, "failed to update last_sync_at for "+sub.CommunityID))
+			sub.LastSyncAt = time.Now()
+
+			if err = community.CommunityUpdateLastSyncAt(ctx, q, sub).Scan(&sub); err != nil {
+				log.Println(errorsx.Wrap(err, "failed to update last_sync_at for "+sub.ID))
 			}
 		}
 

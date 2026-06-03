@@ -5,24 +5,23 @@ import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'api.dart' as api;
-import 'community.pb.dart';
 import 'content.detail.dart';
 
 typedef FnPublished =
-    Future<PublishedContentListResponse> Function(
+    Future<api.PublishedContentSearchResponse> Function(
       String id, {
       List<httpx.Option> options,
-      PublishedContentListRequest req,
+      api.PublishedContentSearchRequest req,
     });
 
 typedef FnPublishedTombstone =
-    Future<PublishContentDeleteResponse> Function(
+    Future<api.PublishContentDeleteResponse> Function(
       String id, {
       List<httpx.Option> options,
     });
 
 class CommunityContentDisplay extends StatefulWidget {
-  final Community community;
+  final api.Community community;
   final FnPublished apipublished;
   final FnPublishedTombstone apitombstone;
   final Widget help;
@@ -40,8 +39,8 @@ class CommunityContentDisplay extends StatefulWidget {
 }
 
 class _CommunityContentDisplayState extends State<CommunityContentDisplay> {
-  PublishedContentListResponse _resp = PublishedContentListResponse(
-    next: PublishedContentListRequest(
+  api.PublishedContentSearchResponse _resp = api.PublishedContentSearchResponse(
+    next: api.PublishedContentSearchRequest(
       offset: ds.Int64(0),
       limit: ds.Int64(20),
       query: "",
@@ -67,7 +66,7 @@ class _CommunityContentDisplayState extends State<CommunityContentDisplay> {
     WidgetsBinding.instance.addPostFrameCallback((_) => _refresh(_resp.next));
   }
 
-  Future<void> _refresh(PublishedContentListRequest req) {
+  Future<void> _refresh(api.PublishedContentSearchRequest req) {
     setState(() {
       _loading = true;
       _cause = ds.Error.zero;
@@ -110,8 +109,8 @@ class _CommunityContentDisplayState extends State<CommunityContentDisplay> {
     final session = authn.Authenticated.syncSession(context);
     final owned = session.account.id == widget.community.accountId;
 
-    return ds.Table<PublishedContent>(
-      ds.Table.expanded<PublishedContent>(
+    return ds.Table<api.PublishedContent>(
+      ds.Table.expanded<api.PublishedContent>(
         (item) => _ContentRow(
           community: widget.community,
           item: item,
@@ -174,9 +173,9 @@ class _CommunityContentDisplayState extends State<CommunityContentDisplay> {
 }
 
 class _ContentRow extends StatelessWidget {
-  final Community community;
-  final PublishedContent item;
-  final Future<void> Function(PublishedContent)? onDelete;
+  final api.Community community;
+  final api.PublishedContent item;
+  final Future<void> Function(api.PublishedContent)? onDelete;
 
   const _ContentRow({required this.community, required this.item, this.onDelete});
 

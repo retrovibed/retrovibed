@@ -9,9 +9,9 @@ import (
 	"testing"
 
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
+	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/testx"
-	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -49,7 +49,7 @@ func TestCommunityDelete(t *testing.T) {
 		ctx, cancel := testx.Context(t)
 		defer cancel()
 
-		expected := &meta.Community{
+		expected := &communityapi.Community{
 			Id:     "deleted-id",
 			Domain: "test-community",
 		}
@@ -57,7 +57,7 @@ func TestCommunityDelete(t *testing.T) {
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			require.Equal(t, http.MethodDelete, r.Method)
 			require.Equal(t, "/c/test-community", r.URL.Path)
-			assert.NoError(t, json.NewEncoder(w).Encode(&meta.CommunityDeleteResponse{Community: expected}))
+			assert.NoError(t, json.NewEncoder(w).Encode(&communityapi.CommunityDeleteResponse{Community: expected}))
 		}))
 		defer srv.Close()
 

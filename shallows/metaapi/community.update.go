@@ -7,11 +7,11 @@ import (
 	"net/http"
 
 	"github.com/retrovibed/retrovibed/retroapi/deeppool"
+	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
-	"github.com/retrovibed/retrovibed/shallows/meta"
 )
 
-func CommunityUpdate(ctx context.Context, c *http.Client, domainOrId string, com *meta.CommunityUpdateRequest) (resp *meta.CommunityUpdateResponse, err error) {
+func CommunityUpdate(ctx context.Context, c *http.Client, domainOrId string, com *communityapi.CommunityUpdateRequest) (resp *communityapi.CommunityUpdateResponse, err error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, fmt.Sprintf("https://%s/c/%s", deeppool.Deeppool(), domainOrId), nil)
 	if err != nil {
 		return nil, err
@@ -26,7 +26,7 @@ func CommunityUpdate(ctx context.Context, c *http.Client, domainOrId string, com
 		return nil, err
 	}
 
-	resp = new(meta.CommunityUpdateResponse)
+	resp = new(communityapi.CommunityUpdateResponse)
 
 	if err = json.NewDecoder(_resp.Body).Decode(resp); err != nil {
 		return nil, err
