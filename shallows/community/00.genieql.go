@@ -162,7 +162,7 @@ func CommunityInsertWithDefaults(
 	gql genieql.Insert,
 	pattern func(ctx context.Context, q sqlx.Queryer, a Community) NewCommunityScannerStaticRow,
 ) {
-	gql.Into("community").Default("id", "created_at", "updated_at", "sync_feed_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, last_sync_at = EXCLUDED.last_sync_at, sync_cursor_published_content = GREATEST(sync_cursor_published_content, EXCLUDED.sync_cursor_published_content)")
+	gql.Into("community").Default("id", "created_at", "updated_at", "sync_feed_at", "subscribed_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, account_id = EXCLUDED.account_id, mimetype = EXCLUDED.mimetype, domain = EXCLUDED.domain, description = EXCLUDED.description, entropy = EXCLUDED.entropy, bytes = EXCLUDED.bytes, default_publish_mode = EXCLUDED.default_publish_mode, hidden = EXCLUDED.hidden, url = EXCLUDED.url, adult = EXCLUDED.adult, default_ttl = EXCLUDED.default_ttl, default_language = EXCLUDED.default_language, auto_download = EXCLUDED.auto_download, last_sync_at = EXCLUDED.last_sync_at, sync_cursor_published_content = GREATEST(sync_cursor_published_content, EXCLUDED.sync_cursor_published_content)")
 }
 
 func CommunityFindByID(

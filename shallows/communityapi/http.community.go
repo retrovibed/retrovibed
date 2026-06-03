@@ -419,23 +419,17 @@ func (t *HTTP) search(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	subs := make(map[string]time.Time)
-	q := community.CommunitySearchBuilder()
-	scanner := sqlx.Scan(community.CommunitySearch(r.Context(), t.q, q))
-	for sub := range scanner.Iter() {
-		subs[sub.ID] = sub.CreatedAt
-	}
-
-	if err := scanner.Err(); err != nil {
-		log.Println(errorsx.Wrap(err, "unable to fetch subscriptions"))
-		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
-		return
-	}
-
 	for _, c := range resp.Items {
-		if subscribedAt, ok := subs[c.Id]; ok {
-			c.SubscribedAt = grpcx.EncodeTime(subscribedAt)
+		var (
+			local community.Community
+		)
+
+		if err := community.CommunityInsertWithDefaults(r.Context(), t.q, CommunityFromDeeppool(c)).Scan(&local); err != nil {
+			log.Println(errorsx.Wrap(err, "unable to upsert community"))
+			continue
 		}
+
+		*c = langx.Autoderef(NewCommunity(CommunityOptionFromDB(langx.Clone(local, timex.JSONSafeEncodeOption))))
 	}
 
 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), resp); err != nil {

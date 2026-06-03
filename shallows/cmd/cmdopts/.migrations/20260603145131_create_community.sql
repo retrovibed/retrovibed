@@ -16,6 +16,7 @@ CREATE TABLE community (
     adult BOOLEAN NOT NULL DEFAULT false,
     default_ttl BIGINT NOT NULL DEFAULT 0,
     default_language TEXT NOT NULL DEFAULT '',
+    subscribed_at TIMESTAMPTZ NOT NULL DEFAULT 'infinity',
     last_sync_at TIMESTAMPTZ NOT NULL DEFAULT '-infinity',
     sync_feed_at TIMESTAMPTZ NOT NULL DEFAULT 'infinity',
     auto_download INTEGER NOT NULL DEFAULT 0,
