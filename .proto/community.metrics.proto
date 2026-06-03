@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package retrovibed.community;
+
+message CommunityMetric {
+  string id = 1 [ json_name = "id" ];
+  string community_id = 2 [ json_name = "community_id" ];
+  string period_start = 3 [ json_name = "period_start" ];
+  string period_end = 4 [ json_name = "period_end" ];
+  uint32 subscribers = 5 [ json_name = "subscribers" ];
+}
+
+message PublishedContentMetric {
+  string id = 1 [ json_name = "id" ];
+  string published_content_id = 2 [ json_name = "published_content_id" ];
+  string period_start = 3 [ json_name = "period_start" ];
+  string period_end = 4 [ json_name = "period_end" ];
+  uint32 archivers = 5 [ json_name = "archivers" ];
+  int64 bytes = 6 [ json_name = "bytes" ];
+  int64 revenue = 7 [ json_name = "revenue" ];
+}
+
+message CommunityMetricsRequest {
+  string community_id = 1 [ json_name = "community_id" ];
+  string period = 2 [ json_name = "period" ];
+  string start_date = 3 [ json_name = "start_date" ];
+  string end_date = 4 [ json_name = "end_date" ];
+}
+
+message CommunityMetricsResponse {
+  CommunityMetric summary = 1 [ json_name = "summary" ];
+  int32 total_archivers = 2 [ json_name = "total_archivers" ];
+  repeated PublishedContentMetric items = 3 [ json_name = "items" ];
+}
+
+message MetricsSyncRequest {
+  string community_id = 1 [ json_name = "community_id" ];
+  string since = 2 [ json_name = "since" ];
+}
+
+message MetricsSyncResponse {
+  repeated CommunityMetric community_metrics = 1
+      [ json_name = "community_metrics" ];
+  repeated PublishedContentMetric content_metrics = 2
+      [ json_name = "content_metrics" ];
+  string synced_at = 3 [ json_name = "synced_at" ];
+  bool complete = 4 [ json_name = "complete" ];
+}
+
+message MetricsSyncProgress {
+  string status = 1 [ json_name = "status" ];
+  int32 community_metrics_count = 2 [ json_name = "community_metrics_count" ];
+  int32 content_metrics_count = 3 [ json_name = "content_metrics_count" ];
+  string error = 4 [ json_name = "error" ];
+}
