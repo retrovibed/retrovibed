@@ -107,7 +107,7 @@ func TestPublishedListEndpoint(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Code)
 
-		var result meta.PublishedContentListResponse
+		var result meta.PublishedContentSearchResponse
 		require.NoError(t, json.Unmarshal(resp.Body.Bytes(), &result))
 		require.Len(t, result.Items, 2)
 
@@ -195,7 +195,7 @@ func TestPublishedListEndpoint(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Code)
 
-		var result meta.PublishedContentListResponse
+		var result meta.PublishedContentSearchResponse
 		require.NoError(t, json.Unmarshal(resp.Body.Bytes(), &result))
 		require.Len(t, result.Items, 1)
 		require.Equal(t, lmd1.ID, result.Items[0].LibraryId)
@@ -281,7 +281,7 @@ func TestPublishedListEndpoint(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Code)
 
-		var result meta.PublishedContentListResponse
+		var result meta.PublishedContentSearchResponse
 		require.NoError(t, json.Unmarshal(resp.Body.Bytes(), &result))
 		require.Len(t, result.Items, 2)
 		require.Equal(t, lmd2.ID, result.Items[0].LibraryId) // newer published_at first
@@ -375,7 +375,7 @@ func TestPublishedListEndpoint(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Code)
 
-		var result meta.PublishedContentListResponse
+		var result meta.PublishedContentSearchResponse
 		require.NoError(t, json.Unmarshal(resp.Body.Bytes(), &result))
 		require.Len(t, result.Items, 1)
 		require.Equal(t, lmd1.ID, result.Items[0].LibraryId)
@@ -450,7 +450,7 @@ func TestPublishedListEndpoint(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Code)
 
-		var result meta.PublishedContentListResponse
+		var result meta.PublishedContentSearchResponse
 		require.NoError(t, json.Unmarshal(resp.Body.Bytes(), &result))
 		require.Empty(t, result.Items)
 	})
@@ -495,7 +495,7 @@ func TestPublishedListEndpoint(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Code)
 
-		var result meta.PublishedContentListResponse
+		var result meta.PublishedContentSearchResponse
 		require.NoError(t, json.Unmarshal(resp.Body.Bytes(), &result))
 		require.Empty(t, result.Items)
 	})

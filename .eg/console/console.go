@@ -159,6 +159,8 @@ func GenerateProtocol(ctx context.Context, _ eg.Op) error {
 		runtime.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib/media -I.proto .proto/content.addressable.storage.proto"),
 		runtime.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib/rss -I.proto .proto/rss.proto"),
 		runtime.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib/community -I.proto .proto/community.proto"),
+		runtime.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib/community -I.proto .proto/community.proto .proto/community.metrics.proto"),
+		runtime.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib/community -I.proto .proto/community.proto .proto/community.publish.proto"),
 		// frontend exclusive
 		runtime.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib/storage -I.proto .proto/storage.proto"),
 		runtime.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib/torrents -I.proto .proto/torrent.proto"),

@@ -132,12 +132,12 @@ func (t Published) Sync(ctx context.Context, cursor string) (*PublishedContentSy
 }
 
 // List returns all published content for a community.
-func (t Published) List(ctx context.Context, communityID string) (*meta.PublishedContentListResponse, error) {
+func (t Published) List(ctx context.Context, communityID string) (*meta.PublishedContentSearchResponse, error) {
 	var (
 		err  error
 		req  *http.Request
 		resp *http.Response
-		msg  meta.PublishedContentListResponse
+		msg  meta.PublishedContentSearchResponse
 	)
 
 	uri := fmt.Sprintf("https://%s/c/%s/published", t.endpoint, communityID)

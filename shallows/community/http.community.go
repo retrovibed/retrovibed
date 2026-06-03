@@ -259,8 +259,8 @@ func (t *HTTP) publish(w http.ResponseWriter, r *http.Request) {
 func (t *HTTP) published(w http.ResponseWriter, r *http.Request) {
 	communityID := mux.Vars(r)["id"]
 
-	var msg meta.PublishedContentListResponse
-	msg.Next = &meta.PublishedContentListRequest{
+	var msg meta.PublishedContentSearchResponse
+	msg.Next = &meta.PublishedContentSearchRequest{
 		CommunityId: communityID,
 		Limit:       100,
 	}

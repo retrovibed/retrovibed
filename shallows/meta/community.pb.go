@@ -770,959 +770,6 @@ func (x *CommunityUpdateResponse) GetCommunity() *Community {
 	return nil
 }
 
-type PublishedContent struct {
-	state          protoimpl.MessageState `protogen:"open.v1"`
-	Id             string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	CommunityId    string                 `protobuf:"bytes,2,opt,name=community_id,proto3" json:"community_id,omitempty"`
-	KnownMediaId   string                 `protobuf:"bytes,3,opt,name=known_media_id,proto3" json:"known_media_id,omitempty"`
-	MagnetUri      string                 `protobuf:"bytes,4,opt,name=magnet_uri,proto3" json:"magnet_uri,omitempty"`
-	PublishedAt    string                 `protobuf:"bytes,5,opt,name=published_at,proto3" json:"published_at,omitempty"`
-	CreatedAt      string                 `protobuf:"bytes,6,opt,name=created_at,proto3" json:"created_at,omitempty"`
-	UpdatedAt      string                 `protobuf:"bytes,7,opt,name=updated_at,proto3" json:"updated_at,omitempty"`
-	ArchivedId     string                 `protobuf:"bytes,8,opt,name=archived_id,proto3" json:"archived_id,omitempty"`
-	Title          string                 `protobuf:"bytes,9,opt,name=title,proto3" json:"title,omitempty"`
-	Description    string                 `protobuf:"bytes,10,opt,name=description,proto3" json:"description,omitempty"`
-	Mimetype       string                 `protobuf:"bytes,11,opt,name=mimetype,proto3" json:"mimetype,omitempty"`
-	EncryptionSeed string                 `protobuf:"bytes,12,opt,name=encryption_seed,proto3" json:"encryption_seed,omitempty"`
-	Bytes          uint64                 `protobuf:"varint,13,opt,name=bytes,proto3" json:"bytes,omitempty"`
-	// private fields for retrovibed use only, not populated by clients.
-	LibraryId     string `protobuf:"bytes,1000,opt,name=library_id,proto3" json:"library_id,omitempty"`
-	OauthGoogleId string `protobuf:"bytes,1001,opt,name=oauth_google_id,proto3" json:"oauth_google_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *PublishedContent) Reset() {
-	*x = PublishedContent{}
-	mi := &file_community_proto_msgTypes[13]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *PublishedContent) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*PublishedContent) ProtoMessage() {}
-
-func (x *PublishedContent) ProtoReflect() protoreflect.Message {
-	mi := &file_community_proto_msgTypes[13]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use PublishedContent.ProtoReflect.Descriptor instead.
-func (*PublishedContent) Descriptor() ([]byte, []int) {
-	return file_community_proto_rawDescGZIP(), []int{13}
-}
-
-func (x *PublishedContent) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-func (x *PublishedContent) GetCommunityId() string {
-	if x != nil {
-		return x.CommunityId
-	}
-	return ""
-}
-
-func (x *PublishedContent) GetKnownMediaId() string {
-	if x != nil {
-		return x.KnownMediaId
-	}
-	return ""
-}
-
-func (x *PublishedContent) GetMagnetUri() string {
-	if x != nil {
-		return x.MagnetUri
-	}
-	return ""
-}
-
-func (x *PublishedContent) GetPublishedAt() string {
-	if x != nil {
-		return x.PublishedAt
-	}
-	return ""
-}
-
-func (x *PublishedContent) GetCreatedAt() string {
-	if x != nil {
-		return x.CreatedAt
-	}
-	return ""
-}
-
-func (x *PublishedContent) GetUpdatedAt() string {
-	if x != nil {
-		return x.UpdatedAt
-	}
-	return ""
-}
-
-func (x *PublishedContent) GetArchivedId() string {
-	if x != nil {
-		return x.ArchivedId
-	}
-	return ""
-}
-
-func (x *PublishedContent) GetTitle() string {
-	if x != nil {
-		return x.Title
-	}
-	return ""
-}
-
-func (x *PublishedContent) GetDescription() string {
-	if x != nil {
-		return x.Description
-	}
-	return ""
-}
-
-func (x *PublishedContent) GetMimetype() string {
-	if x != nil {
-		return x.Mimetype
-	}
-	return ""
-}
-
-func (x *PublishedContent) GetEncryptionSeed() string {
-	if x != nil {
-		return x.EncryptionSeed
-	}
-	return ""
-}
-
-func (x *PublishedContent) GetBytes() uint64 {
-	if x != nil {
-		return x.Bytes
-	}
-	return 0
-}
-
-func (x *PublishedContent) GetLibraryId() string {
-	if x != nil {
-		return x.LibraryId
-	}
-	return ""
-}
-
-func (x *PublishedContent) GetOauthGoogleId() string {
-	if x != nil {
-		return x.OauthGoogleId
-	}
-	return ""
-}
-
-type PublishContentRequest struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	PublishedContent *PublishedContent      `protobuf:"bytes,1,opt,name=published_content,proto3" json:"published_content,omitempty"`
-	PublishMode      PublishMode            `protobuf:"varint,2,opt,name=publish_mode,proto3,enum=retrovibed.community.PublishMode" json:"publish_mode,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
-}
-
-func (x *PublishContentRequest) Reset() {
-	*x = PublishContentRequest{}
-	mi := &file_community_proto_msgTypes[14]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *PublishContentRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*PublishContentRequest) ProtoMessage() {}
-
-func (x *PublishContentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_community_proto_msgTypes[14]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use PublishContentRequest.ProtoReflect.Descriptor instead.
-func (*PublishContentRequest) Descriptor() ([]byte, []int) {
-	return file_community_proto_rawDescGZIP(), []int{14}
-}
-
-func (x *PublishContentRequest) GetPublishedContent() *PublishedContent {
-	if x != nil {
-		return x.PublishedContent
-	}
-	return nil
-}
-
-func (x *PublishContentRequest) GetPublishMode() PublishMode {
-	if x != nil {
-		return x.PublishMode
-	}
-	return PublishMode_UNLISTED
-}
-
-type PublishContentResponse struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	PublishedContent *PublishedContent      `protobuf:"bytes,1,opt,name=published_content,proto3" json:"published_content,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
-}
-
-func (x *PublishContentResponse) Reset() {
-	*x = PublishContentResponse{}
-	mi := &file_community_proto_msgTypes[15]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *PublishContentResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*PublishContentResponse) ProtoMessage() {}
-
-func (x *PublishContentResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_community_proto_msgTypes[15]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use PublishContentResponse.ProtoReflect.Descriptor instead.
-func (*PublishContentResponse) Descriptor() ([]byte, []int) {
-	return file_community_proto_rawDescGZIP(), []int{15}
-}
-
-func (x *PublishContentResponse) GetPublishedContent() *PublishedContent {
-	if x != nil {
-		return x.PublishedContent
-	}
-	return nil
-}
-
-type PublishContentDeleteRequest struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	PublishedContent *PublishedContent      `protobuf:"bytes,1,opt,name=published_content,proto3" json:"published_content,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
-}
-
-func (x *PublishContentDeleteRequest) Reset() {
-	*x = PublishContentDeleteRequest{}
-	mi := &file_community_proto_msgTypes[16]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *PublishContentDeleteRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*PublishContentDeleteRequest) ProtoMessage() {}
-
-func (x *PublishContentDeleteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_community_proto_msgTypes[16]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use PublishContentDeleteRequest.ProtoReflect.Descriptor instead.
-func (*PublishContentDeleteRequest) Descriptor() ([]byte, []int) {
-	return file_community_proto_rawDescGZIP(), []int{16}
-}
-
-func (x *PublishContentDeleteRequest) GetPublishedContent() *PublishedContent {
-	if x != nil {
-		return x.PublishedContent
-	}
-	return nil
-}
-
-type PublishContentDeleteResponse struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	PublishedContent *PublishedContent      `protobuf:"bytes,1,opt,name=published_content,proto3" json:"published_content,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
-}
-
-func (x *PublishContentDeleteResponse) Reset() {
-	*x = PublishContentDeleteResponse{}
-	mi := &file_community_proto_msgTypes[17]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *PublishContentDeleteResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*PublishContentDeleteResponse) ProtoMessage() {}
-
-func (x *PublishContentDeleteResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_community_proto_msgTypes[17]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use PublishContentDeleteResponse.ProtoReflect.Descriptor instead.
-func (*PublishContentDeleteResponse) Descriptor() ([]byte, []int) {
-	return file_community_proto_rawDescGZIP(), []int{17}
-}
-
-func (x *PublishContentDeleteResponse) GetPublishedContent() *PublishedContent {
-	if x != nil {
-		return x.PublishedContent
-	}
-	return nil
-}
-
-type PublishedContentListRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	CommunityId   string                 `protobuf:"bytes,1,opt,name=community_id,proto3" json:"community_id,omitempty"`
-	Query         string                 `protobuf:"bytes,2,opt,name=query,proto3" json:"query,omitempty"`
-	Offset        uint64                 `protobuf:"varint,900,opt,name=offset,proto3" json:"offset,omitempty"`
-	Limit         uint64                 `protobuf:"varint,901,opt,name=limit,proto3" json:"limit,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *PublishedContentListRequest) Reset() {
-	*x = PublishedContentListRequest{}
-	mi := &file_community_proto_msgTypes[18]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *PublishedContentListRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*PublishedContentListRequest) ProtoMessage() {}
-
-func (x *PublishedContentListRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_community_proto_msgTypes[18]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use PublishedContentListRequest.ProtoReflect.Descriptor instead.
-func (*PublishedContentListRequest) Descriptor() ([]byte, []int) {
-	return file_community_proto_rawDescGZIP(), []int{18}
-}
-
-func (x *PublishedContentListRequest) GetCommunityId() string {
-	if x != nil {
-		return x.CommunityId
-	}
-	return ""
-}
-
-func (x *PublishedContentListRequest) GetQuery() string {
-	if x != nil {
-		return x.Query
-	}
-	return ""
-}
-
-func (x *PublishedContentListRequest) GetOffset() uint64 {
-	if x != nil {
-		return x.Offset
-	}
-	return 0
-}
-
-func (x *PublishedContentListRequest) GetLimit() uint64 {
-	if x != nil {
-		return x.Limit
-	}
-	return 0
-}
-
-type PublishedContentListResponse struct {
-	state         protoimpl.MessageState       `protogen:"open.v1"`
-	Community     *Community                   `protobuf:"bytes,1,opt,name=community,proto3" json:"community,omitempty"`
-	Next          *PublishedContentListRequest `protobuf:"bytes,2,opt,name=next,proto3" json:"next,omitempty"`
-	Items         []*PublishedContent          `protobuf:"bytes,3,rep,name=items,proto3" json:"items,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *PublishedContentListResponse) Reset() {
-	*x = PublishedContentListResponse{}
-	mi := &file_community_proto_msgTypes[19]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *PublishedContentListResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*PublishedContentListResponse) ProtoMessage() {}
-
-func (x *PublishedContentListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_community_proto_msgTypes[19]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use PublishedContentListResponse.ProtoReflect.Descriptor instead.
-func (*PublishedContentListResponse) Descriptor() ([]byte, []int) {
-	return file_community_proto_rawDescGZIP(), []int{19}
-}
-
-func (x *PublishedContentListResponse) GetCommunity() *Community {
-	if x != nil {
-		return x.Community
-	}
-	return nil
-}
-
-func (x *PublishedContentListResponse) GetNext() *PublishedContentListRequest {
-	if x != nil {
-		return x.Next
-	}
-	return nil
-}
-
-func (x *PublishedContentListResponse) GetItems() []*PublishedContent {
-	if x != nil {
-		return x.Items
-	}
-	return nil
-}
-
-type CommunityMetric struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	CommunityId   string                 `protobuf:"bytes,2,opt,name=community_id,proto3" json:"community_id,omitempty"`
-	PeriodStart   string                 `protobuf:"bytes,3,opt,name=period_start,proto3" json:"period_start,omitempty"`
-	PeriodEnd     string                 `protobuf:"bytes,4,opt,name=period_end,proto3" json:"period_end,omitempty"`
-	Subscribers   uint32                 `protobuf:"varint,5,opt,name=subscribers,proto3" json:"subscribers,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CommunityMetric) Reset() {
-	*x = CommunityMetric{}
-	mi := &file_community_proto_msgTypes[20]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CommunityMetric) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CommunityMetric) ProtoMessage() {}
-
-func (x *CommunityMetric) ProtoReflect() protoreflect.Message {
-	mi := &file_community_proto_msgTypes[20]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CommunityMetric.ProtoReflect.Descriptor instead.
-func (*CommunityMetric) Descriptor() ([]byte, []int) {
-	return file_community_proto_rawDescGZIP(), []int{20}
-}
-
-func (x *CommunityMetric) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-func (x *CommunityMetric) GetCommunityId() string {
-	if x != nil {
-		return x.CommunityId
-	}
-	return ""
-}
-
-func (x *CommunityMetric) GetPeriodStart() string {
-	if x != nil {
-		return x.PeriodStart
-	}
-	return ""
-}
-
-func (x *CommunityMetric) GetPeriodEnd() string {
-	if x != nil {
-		return x.PeriodEnd
-	}
-	return ""
-}
-
-func (x *CommunityMetric) GetSubscribers() uint32 {
-	if x != nil {
-		return x.Subscribers
-	}
-	return 0
-}
-
-type PublishedContentMetric struct {
-	state              protoimpl.MessageState `protogen:"open.v1"`
-	Id                 string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	PublishedContentId string                 `protobuf:"bytes,2,opt,name=published_content_id,proto3" json:"published_content_id,omitempty"`
-	PeriodStart        string                 `protobuf:"bytes,3,opt,name=period_start,proto3" json:"period_start,omitempty"`
-	PeriodEnd          string                 `protobuf:"bytes,4,opt,name=period_end,proto3" json:"period_end,omitempty"`
-	Archivers          uint32                 `protobuf:"varint,5,opt,name=archivers,proto3" json:"archivers,omitempty"`
-	Bytes              int64                  `protobuf:"varint,6,opt,name=bytes,proto3" json:"bytes,omitempty"`
-	Revenue            int64                  `protobuf:"varint,7,opt,name=revenue,proto3" json:"revenue,omitempty"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
-}
-
-func (x *PublishedContentMetric) Reset() {
-	*x = PublishedContentMetric{}
-	mi := &file_community_proto_msgTypes[21]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *PublishedContentMetric) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*PublishedContentMetric) ProtoMessage() {}
-
-func (x *PublishedContentMetric) ProtoReflect() protoreflect.Message {
-	mi := &file_community_proto_msgTypes[21]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use PublishedContentMetric.ProtoReflect.Descriptor instead.
-func (*PublishedContentMetric) Descriptor() ([]byte, []int) {
-	return file_community_proto_rawDescGZIP(), []int{21}
-}
-
-func (x *PublishedContentMetric) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-func (x *PublishedContentMetric) GetPublishedContentId() string {
-	if x != nil {
-		return x.PublishedContentId
-	}
-	return ""
-}
-
-func (x *PublishedContentMetric) GetPeriodStart() string {
-	if x != nil {
-		return x.PeriodStart
-	}
-	return ""
-}
-
-func (x *PublishedContentMetric) GetPeriodEnd() string {
-	if x != nil {
-		return x.PeriodEnd
-	}
-	return ""
-}
-
-func (x *PublishedContentMetric) GetArchivers() uint32 {
-	if x != nil {
-		return x.Archivers
-	}
-	return 0
-}
-
-func (x *PublishedContentMetric) GetBytes() int64 {
-	if x != nil {
-		return x.Bytes
-	}
-	return 0
-}
-
-func (x *PublishedContentMetric) GetRevenue() int64 {
-	if x != nil {
-		return x.Revenue
-	}
-	return 0
-}
-
-type CommunityMetricsRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	CommunityId   string                 `protobuf:"bytes,1,opt,name=community_id,proto3" json:"community_id,omitempty"`
-	Period        string                 `protobuf:"bytes,2,opt,name=period,proto3" json:"period,omitempty"`
-	StartDate     string                 `protobuf:"bytes,3,opt,name=start_date,proto3" json:"start_date,omitempty"`
-	EndDate       string                 `protobuf:"bytes,4,opt,name=end_date,proto3" json:"end_date,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CommunityMetricsRequest) Reset() {
-	*x = CommunityMetricsRequest{}
-	mi := &file_community_proto_msgTypes[22]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CommunityMetricsRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CommunityMetricsRequest) ProtoMessage() {}
-
-func (x *CommunityMetricsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_community_proto_msgTypes[22]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CommunityMetricsRequest.ProtoReflect.Descriptor instead.
-func (*CommunityMetricsRequest) Descriptor() ([]byte, []int) {
-	return file_community_proto_rawDescGZIP(), []int{22}
-}
-
-func (x *CommunityMetricsRequest) GetCommunityId() string {
-	if x != nil {
-		return x.CommunityId
-	}
-	return ""
-}
-
-func (x *CommunityMetricsRequest) GetPeriod() string {
-	if x != nil {
-		return x.Period
-	}
-	return ""
-}
-
-func (x *CommunityMetricsRequest) GetStartDate() string {
-	if x != nil {
-		return x.StartDate
-	}
-	return ""
-}
-
-func (x *CommunityMetricsRequest) GetEndDate() string {
-	if x != nil {
-		return x.EndDate
-	}
-	return ""
-}
-
-type CommunityMetricsResponse struct {
-	state          protoimpl.MessageState    `protogen:"open.v1"`
-	Summary        *CommunityMetric          `protobuf:"bytes,1,opt,name=summary,proto3" json:"summary,omitempty"`
-	TotalArchivers int32                     `protobuf:"varint,2,opt,name=total_archivers,proto3" json:"total_archivers,omitempty"`
-	Items          []*PublishedContentMetric `protobuf:"bytes,3,rep,name=items,proto3" json:"items,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
-}
-
-func (x *CommunityMetricsResponse) Reset() {
-	*x = CommunityMetricsResponse{}
-	mi := &file_community_proto_msgTypes[23]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CommunityMetricsResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CommunityMetricsResponse) ProtoMessage() {}
-
-func (x *CommunityMetricsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_community_proto_msgTypes[23]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CommunityMetricsResponse.ProtoReflect.Descriptor instead.
-func (*CommunityMetricsResponse) Descriptor() ([]byte, []int) {
-	return file_community_proto_rawDescGZIP(), []int{23}
-}
-
-func (x *CommunityMetricsResponse) GetSummary() *CommunityMetric {
-	if x != nil {
-		return x.Summary
-	}
-	return nil
-}
-
-func (x *CommunityMetricsResponse) GetTotalArchivers() int32 {
-	if x != nil {
-		return x.TotalArchivers
-	}
-	return 0
-}
-
-func (x *CommunityMetricsResponse) GetItems() []*PublishedContentMetric {
-	if x != nil {
-		return x.Items
-	}
-	return nil
-}
-
-type MetricsSyncRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	CommunityId   string                 `protobuf:"bytes,1,opt,name=community_id,proto3" json:"community_id,omitempty"`
-	Since         string                 `protobuf:"bytes,2,opt,name=since,proto3" json:"since,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *MetricsSyncRequest) Reset() {
-	*x = MetricsSyncRequest{}
-	mi := &file_community_proto_msgTypes[24]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *MetricsSyncRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*MetricsSyncRequest) ProtoMessage() {}
-
-func (x *MetricsSyncRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_community_proto_msgTypes[24]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use MetricsSyncRequest.ProtoReflect.Descriptor instead.
-func (*MetricsSyncRequest) Descriptor() ([]byte, []int) {
-	return file_community_proto_rawDescGZIP(), []int{24}
-}
-
-func (x *MetricsSyncRequest) GetCommunityId() string {
-	if x != nil {
-		return x.CommunityId
-	}
-	return ""
-}
-
-func (x *MetricsSyncRequest) GetSince() string {
-	if x != nil {
-		return x.Since
-	}
-	return ""
-}
-
-type MetricsSyncResponse struct {
-	state            protoimpl.MessageState    `protogen:"open.v1"`
-	CommunityMetrics []*CommunityMetric        `protobuf:"bytes,1,rep,name=community_metrics,proto3" json:"community_metrics,omitempty"`
-	ContentMetrics   []*PublishedContentMetric `protobuf:"bytes,2,rep,name=content_metrics,proto3" json:"content_metrics,omitempty"`
-	SyncedAt         string                    `protobuf:"bytes,3,opt,name=synced_at,proto3" json:"synced_at,omitempty"`
-	Complete         bool                      `protobuf:"varint,4,opt,name=complete,proto3" json:"complete,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
-}
-
-func (x *MetricsSyncResponse) Reset() {
-	*x = MetricsSyncResponse{}
-	mi := &file_community_proto_msgTypes[25]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *MetricsSyncResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*MetricsSyncResponse) ProtoMessage() {}
-
-func (x *MetricsSyncResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_community_proto_msgTypes[25]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use MetricsSyncResponse.ProtoReflect.Descriptor instead.
-func (*MetricsSyncResponse) Descriptor() ([]byte, []int) {
-	return file_community_proto_rawDescGZIP(), []int{25}
-}
-
-func (x *MetricsSyncResponse) GetCommunityMetrics() []*CommunityMetric {
-	if x != nil {
-		return x.CommunityMetrics
-	}
-	return nil
-}
-
-func (x *MetricsSyncResponse) GetContentMetrics() []*PublishedContentMetric {
-	if x != nil {
-		return x.ContentMetrics
-	}
-	return nil
-}
-
-func (x *MetricsSyncResponse) GetSyncedAt() string {
-	if x != nil {
-		return x.SyncedAt
-	}
-	return ""
-}
-
-func (x *MetricsSyncResponse) GetComplete() bool {
-	if x != nil {
-		return x.Complete
-	}
-	return false
-}
-
-type MetricsSyncProgress struct {
-	state                 protoimpl.MessageState `protogen:"open.v1"`
-	Status                string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
-	CommunityMetricsCount int32                  `protobuf:"varint,2,opt,name=community_metrics_count,proto3" json:"community_metrics_count,omitempty"`
-	ContentMetricsCount   int32                  `protobuf:"varint,3,opt,name=content_metrics_count,proto3" json:"content_metrics_count,omitempty"`
-	Error                 string                 `protobuf:"bytes,4,opt,name=error,proto3" json:"error,omitempty"`
-	unknownFields         protoimpl.UnknownFields
-	sizeCache             protoimpl.SizeCache
-}
-
-func (x *MetricsSyncProgress) Reset() {
-	*x = MetricsSyncProgress{}
-	mi := &file_community_proto_msgTypes[26]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *MetricsSyncProgress) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*MetricsSyncProgress) ProtoMessage() {}
-
-func (x *MetricsSyncProgress) ProtoReflect() protoreflect.Message {
-	mi := &file_community_proto_msgTypes[26]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use MetricsSyncProgress.ProtoReflect.Descriptor instead.
-func (*MetricsSyncProgress) Descriptor() ([]byte, []int) {
-	return file_community_proto_rawDescGZIP(), []int{26}
-}
-
-func (x *MetricsSyncProgress) GetStatus() string {
-	if x != nil {
-		return x.Status
-	}
-	return ""
-}
-
-func (x *MetricsSyncProgress) GetCommunityMetricsCount() int32 {
-	if x != nil {
-		return x.CommunityMetricsCount
-	}
-	return 0
-}
-
-func (x *MetricsSyncProgress) GetContentMetricsCount() int32 {
-	if x != nil {
-		return x.ContentMetricsCount
-	}
-	return 0
-}
-
-func (x *MetricsSyncProgress) GetError() string {
-	if x != nil {
-		return x.Error
-	}
-	return ""
-}
-
 type CommunitySubscribeRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -1731,7 +778,7 @@ type CommunitySubscribeRequest struct {
 
 func (x *CommunitySubscribeRequest) Reset() {
 	*x = CommunitySubscribeRequest{}
-	mi := &file_community_proto_msgTypes[27]
+	mi := &file_community_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1743,7 +790,7 @@ func (x *CommunitySubscribeRequest) String() string {
 func (*CommunitySubscribeRequest) ProtoMessage() {}
 
 func (x *CommunitySubscribeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_community_proto_msgTypes[27]
+	mi := &file_community_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1756,7 +803,7 @@ func (x *CommunitySubscribeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CommunitySubscribeRequest.ProtoReflect.Descriptor instead.
 func (*CommunitySubscribeRequest) Descriptor() ([]byte, []int) {
-	return file_community_proto_rawDescGZIP(), []int{27}
+	return file_community_proto_rawDescGZIP(), []int{13}
 }
 
 type CommunitySubscribeResponse struct {
@@ -1767,7 +814,7 @@ type CommunitySubscribeResponse struct {
 
 func (x *CommunitySubscribeResponse) Reset() {
 	*x = CommunitySubscribeResponse{}
-	mi := &file_community_proto_msgTypes[28]
+	mi := &file_community_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1779,7 +826,7 @@ func (x *CommunitySubscribeResponse) String() string {
 func (*CommunitySubscribeResponse) ProtoMessage() {}
 
 func (x *CommunitySubscribeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_community_proto_msgTypes[28]
+	mi := &file_community_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1792,7 +839,7 @@ func (x *CommunitySubscribeResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CommunitySubscribeResponse.ProtoReflect.Descriptor instead.
 func (*CommunitySubscribeResponse) Descriptor() ([]byte, []int) {
-	return file_community_proto_rawDescGZIP(), []int{28}
+	return file_community_proto_rawDescGZIP(), []int{14}
 }
 
 type YouTubeStatus struct {
@@ -1805,7 +852,7 @@ type YouTubeStatus struct {
 
 func (x *YouTubeStatus) Reset() {
 	*x = YouTubeStatus{}
-	mi := &file_community_proto_msgTypes[29]
+	mi := &file_community_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1817,7 +864,7 @@ func (x *YouTubeStatus) String() string {
 func (*YouTubeStatus) ProtoMessage() {}
 
 func (x *YouTubeStatus) ProtoReflect() protoreflect.Message {
-	mi := &file_community_proto_msgTypes[29]
+	mi := &file_community_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1830,7 +877,7 @@ func (x *YouTubeStatus) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use YouTubeStatus.ProtoReflect.Descriptor instead.
 func (*YouTubeStatus) Descriptor() ([]byte, []int) {
-	return file_community_proto_rawDescGZIP(), []int{29}
+	return file_community_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *YouTubeStatus) GetLinked() bool {
@@ -1900,92 +947,7 @@ const file_community_proto_rawDesc = "" +
 	"\x16CommunityUpdateRequest\x12=\n" +
 	"\tcommunity\x18\x01 \x01(\v2\x1f.retrovibed.community.CommunityR\tcommunity\"X\n" +
 	"\x17CommunityUpdateResponse\x12=\n" +
-	"\tcommunity\x18\x01 \x01(\v2\x1f.retrovibed.community.CommunityR\tcommunity\"\xfb\x03\n" +
-	"\x10PublishedContent\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\"\n" +
-	"\fcommunity_id\x18\x02 \x01(\tR\fcommunity_id\x12&\n" +
-	"\x0eknown_media_id\x18\x03 \x01(\tR\x0eknown_media_id\x12\x1e\n" +
-	"\n" +
-	"magnet_uri\x18\x04 \x01(\tR\n" +
-	"magnet_uri\x12\"\n" +
-	"\fpublished_at\x18\x05 \x01(\tR\fpublished_at\x12\x1e\n" +
-	"\n" +
-	"created_at\x18\x06 \x01(\tR\n" +
-	"created_at\x12\x1e\n" +
-	"\n" +
-	"updated_at\x18\a \x01(\tR\n" +
-	"updated_at\x12 \n" +
-	"\varchived_id\x18\b \x01(\tR\varchived_id\x12\x14\n" +
-	"\x05title\x18\t \x01(\tR\x05title\x12 \n" +
-	"\vdescription\x18\n" +
-	" \x01(\tR\vdescription\x12\x1a\n" +
-	"\bmimetype\x18\v \x01(\tR\bmimetype\x12(\n" +
-	"\x0fencryption_seed\x18\f \x01(\tR\x0fencryption_seed\x12\x14\n" +
-	"\x05bytes\x18\r \x01(\x04R\x05bytes\x12\x1f\n" +
-	"\n" +
-	"library_id\x18\xe8\a \x01(\tR\n" +
-	"library_id\x12)\n" +
-	"\x0foauth_google_id\x18\xe9\a \x01(\tR\x0foauth_google_idJ\x05\b\x0e\x10\xe8\a\"\xba\x01\n" +
-	"\x15PublishContentRequest\x12T\n" +
-	"\x11published_content\x18\x01 \x01(\v2&.retrovibed.community.PublishedContentR\x11published_content\x12E\n" +
-	"\fpublish_mode\x18\x02 \x01(\x0e2!.retrovibed.community.PublishModeR\fpublish_modeJ\x04\b\x03\x10\x04\"n\n" +
-	"\x16PublishContentResponse\x12T\n" +
-	"\x11published_content\x18\x01 \x01(\v2&.retrovibed.community.PublishedContentR\x11published_content\"s\n" +
-	"\x1bPublishContentDeleteRequest\x12T\n" +
-	"\x11published_content\x18\x01 \x01(\v2&.retrovibed.community.PublishedContentR\x11published_content\"t\n" +
-	"\x1cPublishContentDeleteResponse\x12T\n" +
-	"\x11published_content\x18\x01 \x01(\v2&.retrovibed.community.PublishedContentR\x11published_content\"\x96\x01\n" +
-	"\x1bPublishedContentListRequest\x12\"\n" +
-	"\fcommunity_id\x18\x01 \x01(\tR\fcommunity_id\x12\x14\n" +
-	"\x05query\x18\x02 \x01(\tR\x05query\x12\x17\n" +
-	"\x06offset\x18\x84\a \x01(\x04R\x06offset\x12\x15\n" +
-	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\x03\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"\xe2\x01\n" +
-	"\x1cPublishedContentListResponse\x12=\n" +
-	"\tcommunity\x18\x01 \x01(\v2\x1f.retrovibed.community.CommunityR\tcommunity\x12E\n" +
-	"\x04next\x18\x02 \x01(\v21.retrovibed.community.PublishedContentListRequestR\x04next\x12<\n" +
-	"\x05items\x18\x03 \x03(\v2&.retrovibed.community.PublishedContentR\x05items\"\xab\x01\n" +
-	"\x0fCommunityMetric\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\"\n" +
-	"\fcommunity_id\x18\x02 \x01(\tR\fcommunity_id\x12\"\n" +
-	"\fperiod_start\x18\x03 \x01(\tR\fperiod_start\x12\x1e\n" +
-	"\n" +
-	"period_end\x18\x04 \x01(\tR\n" +
-	"period_end\x12 \n" +
-	"\vsubscribers\x18\x05 \x01(\rR\vsubscribers\"\xee\x01\n" +
-	"\x16PublishedContentMetric\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x122\n" +
-	"\x14published_content_id\x18\x02 \x01(\tR\x14published_content_id\x12\"\n" +
-	"\fperiod_start\x18\x03 \x01(\tR\fperiod_start\x12\x1e\n" +
-	"\n" +
-	"period_end\x18\x04 \x01(\tR\n" +
-	"period_end\x12\x1c\n" +
-	"\tarchivers\x18\x05 \x01(\rR\tarchivers\x12\x14\n" +
-	"\x05bytes\x18\x06 \x01(\x03R\x05bytes\x12\x18\n" +
-	"\arevenue\x18\a \x01(\x03R\arevenue\"\x91\x01\n" +
-	"\x17CommunityMetricsRequest\x12\"\n" +
-	"\fcommunity_id\x18\x01 \x01(\tR\fcommunity_id\x12\x16\n" +
-	"\x06period\x18\x02 \x01(\tR\x06period\x12\x1e\n" +
-	"\n" +
-	"start_date\x18\x03 \x01(\tR\n" +
-	"start_date\x12\x1a\n" +
-	"\bend_date\x18\x04 \x01(\tR\bend_date\"\xc9\x01\n" +
-	"\x18CommunityMetricsResponse\x12?\n" +
-	"\asummary\x18\x01 \x01(\v2%.retrovibed.community.CommunityMetricR\asummary\x12(\n" +
-	"\x0ftotal_archivers\x18\x02 \x01(\x05R\x0ftotal_archivers\x12B\n" +
-	"\x05items\x18\x03 \x03(\v2,.retrovibed.community.PublishedContentMetricR\x05items\"N\n" +
-	"\x12MetricsSyncRequest\x12\"\n" +
-	"\fcommunity_id\x18\x01 \x01(\tR\fcommunity_id\x12\x14\n" +
-	"\x05since\x18\x02 \x01(\tR\x05since\"\xfc\x01\n" +
-	"\x13MetricsSyncResponse\x12S\n" +
-	"\x11community_metrics\x18\x01 \x03(\v2%.retrovibed.community.CommunityMetricR\x11community_metrics\x12V\n" +
-	"\x0fcontent_metrics\x18\x02 \x03(\v2,.retrovibed.community.PublishedContentMetricR\x0fcontent_metrics\x12\x1c\n" +
-	"\tsynced_at\x18\x03 \x01(\tR\tsynced_at\x12\x1a\n" +
-	"\bcomplete\x18\x04 \x01(\bR\bcomplete\"\xb3\x01\n" +
-	"\x13MetricsSyncProgress\x12\x16\n" +
-	"\x06status\x18\x01 \x01(\tR\x06status\x128\n" +
-	"\x17community_metrics_count\x18\x02 \x01(\x05R\x17community_metrics_count\x124\n" +
-	"\x15content_metrics_count\x18\x03 \x01(\x05R\x15content_metrics_count\x12\x14\n" +
-	"\x05error\x18\x04 \x01(\tR\x05error\"\x1b\n" +
+	"\tcommunity\x18\x01 \x01(\v2\x1f.retrovibed.community.CommunityR\tcommunity\"\x1b\n" +
 	"\x19CommunitySubscribeRequest\"\x1c\n" +
 	"\x1aCommunitySubscribeResponse\"7\n" +
 	"\rYouTubeStatus\x12\x16\n" +
@@ -2011,39 +973,25 @@ func file_community_proto_rawDescGZIP() []byte {
 }
 
 var file_community_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_community_proto_msgTypes = make([]protoimpl.MessageInfo, 30)
+var file_community_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
 var file_community_proto_goTypes = []any{
-	(PublishMode)(0),                     // 0: retrovibed.community.PublishMode
-	(*Community)(nil),                    // 1: retrovibed.community.Community
-	(*CommunitySearchRequest)(nil),       // 2: retrovibed.community.CommunitySearchRequest
-	(*CommunitySearchResponse)(nil),      // 3: retrovibed.community.CommunitySearchResponse
-	(*CommunityCreateRequest)(nil),       // 4: retrovibed.community.CommunityCreateRequest
-	(*CommunityCreateResponse)(nil),      // 5: retrovibed.community.CommunityCreateResponse
-	(*CommunityFindRequest)(nil),         // 6: retrovibed.community.CommunityFindRequest
-	(*CommunityFindResponse)(nil),        // 7: retrovibed.community.CommunityFindResponse
-	(*CommunityUploadRequest)(nil),       // 8: retrovibed.community.CommunityUploadRequest
-	(*CommunityUploadResponse)(nil),      // 9: retrovibed.community.CommunityUploadResponse
-	(*CommunityDeleteRequest)(nil),       // 10: retrovibed.community.CommunityDeleteRequest
-	(*CommunityDeleteResponse)(nil),      // 11: retrovibed.community.CommunityDeleteResponse
-	(*CommunityUpdateRequest)(nil),       // 12: retrovibed.community.CommunityUpdateRequest
-	(*CommunityUpdateResponse)(nil),      // 13: retrovibed.community.CommunityUpdateResponse
-	(*PublishedContent)(nil),             // 14: retrovibed.community.PublishedContent
-	(*PublishContentRequest)(nil),        // 15: retrovibed.community.PublishContentRequest
-	(*PublishContentResponse)(nil),       // 16: retrovibed.community.PublishContentResponse
-	(*PublishContentDeleteRequest)(nil),  // 17: retrovibed.community.PublishContentDeleteRequest
-	(*PublishContentDeleteResponse)(nil), // 18: retrovibed.community.PublishContentDeleteResponse
-	(*PublishedContentListRequest)(nil),  // 19: retrovibed.community.PublishedContentListRequest
-	(*PublishedContentListResponse)(nil), // 20: retrovibed.community.PublishedContentListResponse
-	(*CommunityMetric)(nil),              // 21: retrovibed.community.CommunityMetric
-	(*PublishedContentMetric)(nil),       // 22: retrovibed.community.PublishedContentMetric
-	(*CommunityMetricsRequest)(nil),      // 23: retrovibed.community.CommunityMetricsRequest
-	(*CommunityMetricsResponse)(nil),     // 24: retrovibed.community.CommunityMetricsResponse
-	(*MetricsSyncRequest)(nil),           // 25: retrovibed.community.MetricsSyncRequest
-	(*MetricsSyncResponse)(nil),          // 26: retrovibed.community.MetricsSyncResponse
-	(*MetricsSyncProgress)(nil),          // 27: retrovibed.community.MetricsSyncProgress
-	(*CommunitySubscribeRequest)(nil),    // 28: retrovibed.community.CommunitySubscribeRequest
-	(*CommunitySubscribeResponse)(nil),   // 29: retrovibed.community.CommunitySubscribeResponse
-	(*YouTubeStatus)(nil),                // 30: retrovibed.community.YouTubeStatus
+	(PublishMode)(0),                   // 0: retrovibed.community.PublishMode
+	(*Community)(nil),                  // 1: retrovibed.community.Community
+	(*CommunitySearchRequest)(nil),     // 2: retrovibed.community.CommunitySearchRequest
+	(*CommunitySearchResponse)(nil),    // 3: retrovibed.community.CommunitySearchResponse
+	(*CommunityCreateRequest)(nil),     // 4: retrovibed.community.CommunityCreateRequest
+	(*CommunityCreateResponse)(nil),    // 5: retrovibed.community.CommunityCreateResponse
+	(*CommunityFindRequest)(nil),       // 6: retrovibed.community.CommunityFindRequest
+	(*CommunityFindResponse)(nil),      // 7: retrovibed.community.CommunityFindResponse
+	(*CommunityUploadRequest)(nil),     // 8: retrovibed.community.CommunityUploadRequest
+	(*CommunityUploadResponse)(nil),    // 9: retrovibed.community.CommunityUploadResponse
+	(*CommunityDeleteRequest)(nil),     // 10: retrovibed.community.CommunityDeleteRequest
+	(*CommunityDeleteResponse)(nil),    // 11: retrovibed.community.CommunityDeleteResponse
+	(*CommunityUpdateRequest)(nil),     // 12: retrovibed.community.CommunityUpdateRequest
+	(*CommunityUpdateResponse)(nil),    // 13: retrovibed.community.CommunityUpdateResponse
+	(*CommunitySubscribeRequest)(nil),  // 14: retrovibed.community.CommunitySubscribeRequest
+	(*CommunitySubscribeResponse)(nil), // 15: retrovibed.community.CommunitySubscribeResponse
+	(*YouTubeStatus)(nil),              // 16: retrovibed.community.YouTubeStatus
 }
 var file_community_proto_depIdxs = []int32{
 	0,  // 0: retrovibed.community.Community.default_publish_mode:type_name -> retrovibed.community.PublishMode
@@ -2057,23 +1005,11 @@ var file_community_proto_depIdxs = []int32{
 	1,  // 8: retrovibed.community.CommunityDeleteResponse.community:type_name -> retrovibed.community.Community
 	1,  // 9: retrovibed.community.CommunityUpdateRequest.community:type_name -> retrovibed.community.Community
 	1,  // 10: retrovibed.community.CommunityUpdateResponse.community:type_name -> retrovibed.community.Community
-	14, // 11: retrovibed.community.PublishContentRequest.published_content:type_name -> retrovibed.community.PublishedContent
-	0,  // 12: retrovibed.community.PublishContentRequest.publish_mode:type_name -> retrovibed.community.PublishMode
-	14, // 13: retrovibed.community.PublishContentResponse.published_content:type_name -> retrovibed.community.PublishedContent
-	14, // 14: retrovibed.community.PublishContentDeleteRequest.published_content:type_name -> retrovibed.community.PublishedContent
-	14, // 15: retrovibed.community.PublishContentDeleteResponse.published_content:type_name -> retrovibed.community.PublishedContent
-	1,  // 16: retrovibed.community.PublishedContentListResponse.community:type_name -> retrovibed.community.Community
-	19, // 17: retrovibed.community.PublishedContentListResponse.next:type_name -> retrovibed.community.PublishedContentListRequest
-	14, // 18: retrovibed.community.PublishedContentListResponse.items:type_name -> retrovibed.community.PublishedContent
-	21, // 19: retrovibed.community.CommunityMetricsResponse.summary:type_name -> retrovibed.community.CommunityMetric
-	22, // 20: retrovibed.community.CommunityMetricsResponse.items:type_name -> retrovibed.community.PublishedContentMetric
-	21, // 21: retrovibed.community.MetricsSyncResponse.community_metrics:type_name -> retrovibed.community.CommunityMetric
-	22, // 22: retrovibed.community.MetricsSyncResponse.content_metrics:type_name -> retrovibed.community.PublishedContentMetric
-	23, // [23:23] is the sub-list for method output_type
-	23, // [23:23] is the sub-list for method input_type
-	23, // [23:23] is the sub-list for extension type_name
-	23, // [23:23] is the sub-list for extension extendee
-	0,  // [0:23] is the sub-list for field type_name
+	11, // [11:11] is the sub-list for method output_type
+	11, // [11:11] is the sub-list for method input_type
+	11, // [11:11] is the sub-list for extension type_name
+	11, // [11:11] is the sub-list for extension extendee
+	0,  // [0:11] is the sub-list for field type_name
 }
 
 func init() { file_community_proto_init() }
@@ -2087,7 +1023,7 @@ func file_community_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_community_proto_rawDesc), len(file_community_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   30,
+			NumMessages:   16,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
