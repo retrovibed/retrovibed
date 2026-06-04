@@ -4,7 +4,7 @@ go 1.26.3
 
 require (
 	github.com/Masterminds/squirrel v1.5.4
-	github.com/RoaringBitmap/roaring/v2 v2.18.0
+	github.com/RoaringBitmap/roaring/v2 v2.18.2
 	github.com/alecthomas/kong v1.15.0
 	github.com/anacrolix/go-libutp v1.4.0
 	github.com/anacrolix/missinggo v1.3.0
@@ -26,7 +26,7 @@ require (
 	github.com/grindlemire/go-lucene v0.0.33
 	github.com/hashicorp/mdns v1.0.6
 	github.com/james-lawrence/genieql v0.0.0-20260421144153-ebaab114ac1d
-	github.com/james-lawrence/torrent v0.0.0-20260507161259-853186b24050
+	github.com/james-lawrence/torrent v0.0.0-20260604222541-a8807b62f578
 	github.com/justinas/alice v1.2.0
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/mattn/go-isatty v0.0.21
@@ -41,7 +41,7 @@ require (
 	github.com/things-go/go-socks5 v0.1.1
 	github.com/willabides/kongplete v0.4.0
 	golang.org/x/crypto v0.51.0
-	golang.org/x/exp v0.0.0-20260508232706-74f9aab9d74a
+	golang.org/x/exp v0.0.0-20260603202125-055de637280b
 	golang.org/x/oauth2 v0.36.0
 	golang.org/x/text v0.37.0
 	golang.org/x/time v0.15.0
@@ -172,8 +172,8 @@ require (
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/posener/complete v1.2.3 // indirect
 	github.com/riywo/loginshell v0.0.0-20200815045211-7d26008be1ab // indirect
-	golang.org/x/net v0.54.0 // indirect
-	golang.org/x/sys v0.44.0 // indirect
+	golang.org/x/net v0.55.0 // indirect
+	golang.org/x/sys v0.45.0 // indirect
 	golang.org/x/tools v0.45.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

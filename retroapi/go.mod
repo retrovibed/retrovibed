@@ -5,10 +5,11 @@ go 1.26.3
 require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
 	github.com/go-faker/faker/v4 v4.6.1
+	github.com/go-playground/form/v4 v4.3.0
 	github.com/gofrs/uuid/v5 v5.4.0
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/gorilla/schema v1.4.1
-	github.com/james-lawrence/torrent v0.0.0-20260507161259-853186b24050
+	github.com/james-lawrence/torrent v0.0.0-20260604222541-a8807b62f578
 	github.com/justinas/alice v1.2.0
 	github.com/mattn/go-isatty v0.0.21
 	github.com/mdlayher/netlink v1.11.2
@@ -16,16 +17,16 @@ require (
 	github.com/porfirion/trie v1.0.0
 	github.com/stretchr/testify v1.11.1
 	golang.org/x/crypto v0.51.0
-	golang.org/x/exp v0.0.0-20260508232706-74f9aab9d74a
-	golang.org/x/net v0.54.0
+	golang.org/x/exp v0.0.0-20260603202125-055de637280b
+	golang.org/x/net v0.55.0
 	golang.org/x/oauth2 v0.36.0
-	golang.org/x/sys v0.44.0
+	golang.org/x/sys v0.45.0
 	golang.org/x/time v0.15.0
 	google.golang.org/protobuf v1.36.11
 )
 
 require (
-	github.com/RoaringBitmap/roaring/v2 v2.18.0 // indirect
+	github.com/RoaringBitmap/roaring/v2 v2.18.2 // indirect
 	github.com/alecthomas/atomic v0.1.0-alpha2 // indirect
 	github.com/anacrolix/generics v0.2.0 // indirect
 	github.com/anacrolix/go-libutp v1.4.0 // indirect
@@ -44,7 +45,6 @@ require (
 	github.com/bradfitz/iter v0.0.0-20191230175014-e8f45d346db8 // indirect
 	github.com/edsrzf/mmap-go v1.2.0 // indirect
 	github.com/felixge/fgprof v0.9.5 // indirect
-	github.com/go-playground/form/v4 v4.3.0 // indirect
 	github.com/google/btree v1.1.3 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/pprof v0.0.0-20260402051712-545e8a4df936 // indirect

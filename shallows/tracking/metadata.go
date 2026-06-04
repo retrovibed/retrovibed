@@ -479,9 +479,14 @@ func DownloadProgress(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torr
 				log.Println("failed to update progress", err)
 			}
 			done()
-		case <-sub.Values:
-			if !l.Allow() {
-				continue
+		case evt := <-sub.Values:
+			switch evt.(type) {
+			case torrent.TorrentComplete:
+				// when torrent is complete should should trigger emit a final event.
+			default:
+				if !l.Allow() {
+					continue
+				}
 			}
 
 			stats := dl.Stats()

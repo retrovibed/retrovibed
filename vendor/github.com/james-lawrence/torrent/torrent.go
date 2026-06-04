@@ -378,6 +378,16 @@ func TuneSeeding(t *torrent) error {
 	return nil
 }
 
+func TuneComplete(t *torrent) error {
+	if t.chunks.Incomplete() {
+		return nil
+	}
+
+	t.pieceStateChanges.Publish(TorrentComplete{})
+
+	return nil
+}
+
 func TuneRecordMetadata(t *torrent) error {
 	if t.Info() == nil {
 		return ErrTorrentAttemptedToPersistNilMetadata
@@ -400,6 +410,9 @@ func tuneMerge(md Metadata) Tuner {
 		return nil
 	}
 }
+
+// TorrentComplete is published to pieceStateChanges when all pieces are verified.
+type TorrentComplete struct{}
 
 // Torrent represents the state of a torrent within a client.
 // interface is currently being used to ease the transition of to a cleaner API.
@@ -437,7 +450,7 @@ func DownloadInto(ctx context.Context, dst io.Writer, m Torrent, options ...Tune
 		return n, errorsx.Errorf("download failed, missing data %d != %d", n, m.Info().TotalLength())
 	}
 
-	if err = m.Tune(TuneAnnounceOnce(tracker.AnnounceOptionEventCompleted)); err != nil {
+	if err = m.Tune(TuneAnnounceOnce(tracker.AnnounceOptionEventCompleted), TuneComplete); err != nil {
 		log.Println("failed to announce completion", err)
 	}
 
@@ -475,7 +488,7 @@ func Verify(ctx context.Context, t Torrent) error {
 		return errorsx.Compact(context.Cause(ctx), ctx.Err())
 	}
 
-	return t.Tune(TuneVerifyFull)
+	return t.Tune(TuneVerifyFull, TuneComplete)
 }
 
 // returns a bitmap of the verified data within the storage implementation.
