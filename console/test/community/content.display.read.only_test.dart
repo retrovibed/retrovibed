@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:retrovibed/httpx.dart' as httpx;
-import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'package:retrovibed/community/content.detail.dart';
 import 'package:retrovibed/community/content.display.read.only.dart';
 import 'package:retrovibed/community.dart';
@@ -61,7 +60,6 @@ Future<PublishedContentSearchResponse> _withContent(
     ],
   );
 }
-
 
 Future<PublishedContentSearchResponse> _withLongContent(
   String id, {
@@ -308,7 +306,6 @@ void main() {
         expect(find.byType(PublishedContentDetail), findsNothing);
         expect(tester.takeException(), isNull);
       });
-
     });
 
     group('404 response', () {

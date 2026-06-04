@@ -64,7 +64,7 @@ class _CommunityContentDisplayState extends State<CommunityContentDisplay> {
           () => widget.apipublished(
             widget.community.id,
             req: req,
-            options: [authn.DeeppoolAuthzCache.bearer(context)],
+            options: [authn.request(authn.AuthzCache.meta(context))],
           ),
         )
         .then((response) {
