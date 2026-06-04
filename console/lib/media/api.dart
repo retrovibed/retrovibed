@@ -104,6 +104,53 @@ abstract class media {
         });
   }
 
+  static Future<List<Media>> similar(
+    String mediaId, {
+    List<String> exclude = const [],
+    List<httpx.Option> options = const [],
+  }) async {
+    final query = <String, String>{};
+    if (exclude.isNotEmpty) query['exclude'] = exclude.join(',');
+    return httpx
+        .get(
+          Uri.https(httpx.host(), "/similar/$mediaId").replace(queryParameters: query),
+          options: options,
+        )
+        .then((v) {
+          final body = jsonDecode(v.body) as Map<String, dynamic>;
+          final items = (body['items'] as List?) ?? [];
+          return items.map<Media>((e) => Media.create()..mergeFromProto3Json(e)).toList();
+        });
+  }
+
+  // acoustic returns a random function anchored to seed: it serves acoustically
+  // similar tracks, refilling from /similar as its buffer drains, and falls back
+  // to random once the similarity engine has nothing left (cold start, below
+  // threshold, or library too small).
+  static FnMediaRandom acoustic(String seed) {
+    final exclude = <String>{seed};
+    final buffered = <Media>[];
+
+    return (MediaSearchRequest req, {List<httpx.Option> options = const []}) async {
+      if (buffered.isEmpty) {
+        try {
+          for (final m in await similar(seed, exclude: exclude.toList(), options: options)) {
+            exclude.add(m.id);
+            buffered.add(m);
+          }
+        } catch (cause) {
+          print("acoustic similarity lookup failed, falling back to random: $cause");
+        }
+      }
+
+      if (buffered.isNotEmpty) {
+        return MediaFindResponse(media: buffered.removeAt(0));
+      }
+
+      return random(req, options: options);
+    };
+  }
+
   static Future<http.StreamedResponse> download(
     String id, {
     List<httpx.Option> options = const [],

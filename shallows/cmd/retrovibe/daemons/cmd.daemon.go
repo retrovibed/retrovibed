@@ -124,6 +124,7 @@ func (t Command) discoverysettings() *DiscoverySettings {
 
 func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts.TLSConfig) (err error) {
 	var (
+		mc                  = library.NewQueryerCleanerAuto()
 		db                  *sql.DB
 		id                  ssh.Signer
 		_socks5             net.Listener
@@ -134,7 +135,6 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		mediaidentification = asyncx.NewWakeup(gctx.Context)
 		vpncfgpath          = userx.DefaultConfigDir(userx.DefaultRelRoot(), "vpn.cfg")
 		storagecfgpath      = userx.DefaultConfigDir(userx.DefaultRelRoot(), "storage.cfg")
-		mc                  = library.NewQueryerCleanerAuto()
 	)
 
 	gctx.Cleanup.Add(1)
@@ -295,6 +295,13 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		log.Println("auto recommendations is disabled")
 	}
 
+	mediaFS := library.New(deepjwt, mediastore, func(ctx context.Context, s string) (*library.Metadata, error) {
+		var md library.Metadata
+		err = library.MetadataFindByID(ctx, db, s).Scan(&md)
+		return &md, err
+	})
+	errorsx.Log(AcousticsBackground(gctx.Context, db, mediaFS))
+
 	httpmux := mux.NewRouter()
 	httpmux.NotFoundHandler = httpx.NotFound(alice.New())
 	httpmux.Use(
@@ -340,6 +347,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		media.HTTPDiscoveredOptionQueryCleaner(mc),
 	).Bind(httpmux.PathPrefix("/d").Subrouter())
 	media.NewHTTPRecommendations(db).Bind(httpmux.PathPrefix("/r").Subrouter())
+	media.NewHTTPSimilar(db).Bind(httpmux.PathPrefix("/similar").Subrouter())
 	media.NewHTTPRecent(db).Bind(httpmux.PathPrefix("/w").Subrouter())
 	ddiscapi.NewHTTPPeerManagement(db).Bind(httpmux.PathPrefix("/ddisc").Subrouter())
 	media.NewHTTPRSSFeed(db).Bind(httpmux.PathPrefix("/rss").Subrouter())

@@ -3,3 +3,4 @@
 package goosex
 
 const inetSQL = "LOAD inet;"
+const vssSQL = "LOAD vss;"

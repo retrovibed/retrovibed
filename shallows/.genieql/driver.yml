@@ -1,0 +1,29 @@
+- type: retrovibed.Float128
+  native: '[]float32'
+  database_type_name: 'FLOAT[128]'
+  column_type: retrovibed.Float128
+  nullable: false
+  primarykey: false
+  decode: |-
+    func() {
+    		{{ .To | autodereference | expr }} = []float32({{ .From | expr }})
+    	}
+  encode: |-
+    func() {
+    		{{ .To | expr }} = retrovibed.Float128({{ .From | expr }})
+    	}
+
+- type: '[]float32'
+  native: '[]float32'
+  database_type_name: ''
+  column_type: retrovibed.Float128
+  nullable: false
+  primarykey: false
+  decode: |-
+    func() {
+    		{{ .To | autodereference | expr }} = []float32({{ .From | expr }})
+    	}
+  encode: |-
+    func() {
+    		{{ .To | expr }} = retrovibed.Float128({{ .From | expr }})
+    	}

@@ -1,0 +1,18 @@
+-- +goose Up
+-- +goose StatementBegin
+CREATE TABLE audio_features (
+    media_id UUID PRIMARY KEY NOT NULL,
+    features FLOAT[128] NOT NULL,
+    stats_version UINTEGER NOT NULL DEFAULT 0,
+    indexed_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX audio_features_hnsw ON audio_features
+USING HNSW (features) WITH (metric = 'cosine');
+-- +goose StatementEnd
+
+-- +goose Down
+-- +goose StatementBegin
+DROP INDEX IF EXISTS audio_features_hnsw;
+DROP TABLE IF EXISTS audio_features;
+-- +goose StatementEnd

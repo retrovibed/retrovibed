@@ -23,7 +23,14 @@ Future<void> Function()? PlayAction(
         return Future.sync(
           () => playlist.setPlaylist(
             s.next,
-            range(s.next, current, options: () => [authn.request(authn.AuthzCache.meta(context))]),
+            range(
+              s.next,
+              current,
+              options: () => [authn.request(authn.AuthzCache.meta(context))],
+              random: mimex.icon(current.mimetype) == mimex.icoaudio
+                  ? api.media.acoustic(current.id)
+                  : api.media.random,
+            ),
           ),
         );
       };
