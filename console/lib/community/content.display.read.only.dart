@@ -3,29 +3,26 @@ import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/mimex.dart' as mimex;
-import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'api.dart' as api;
 import 'content.detail.dart';
 
-class CommunityContentDisplay extends StatefulWidget {
+class ContentDisplayReadOnly extends StatefulWidget {
   final api.Community community;
   final api.FnPublishingSearch apipublished;
-  final api.FnPublishingTombstone apitombstone;
   final Widget help;
 
-  const CommunityContentDisplay({
+  const ContentDisplayReadOnly({
     super.key,
     required this.community,
-    this.apipublished = api.publishing.search,
-    this.apitombstone = api.publishing.tombstone,
+    this.apipublished = api.API.published,
     this.help = ds.HelpScope.None,
   });
 
   @override
-  State<CommunityContentDisplay> createState() => _CommunityContentDisplayState();
+  State<ContentDisplayReadOnly> createState() => _ContentDisplayReadOnlyState();
 }
 
-class _CommunityContentDisplayState extends State<CommunityContentDisplay> {
+class _ContentDisplayReadOnlyState extends State<ContentDisplayReadOnly> {
   api.PublishedContentSearchResponse _resp = api.PublishedContentSearchResponse(
     next: api.PublishedContentSearchRequest(
       offset: ds.Int64(0),
@@ -73,6 +70,9 @@ class _CommunityContentDisplayState extends State<CommunityContentDisplay> {
           });
         })
         .catchError((cause) {
+          setState(() {});
+        }, test: httpx.ErrorsTest.err404)
+        .catchError((cause) {
           setState(() {
             _cause = ds.Errors.httpauto(cause, onTap: _clearCause);
           });
@@ -93,26 +93,12 @@ class _CommunityContentDisplayState extends State<CommunityContentDisplay> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final defaults = ds.Defaults.of(context);
-    final session = authn.Authenticated.syncSession(context);
-    final owned = session.account.id == widget.community.accountId;
 
     return ds.Table<api.PublishedContent>(
       ds.Table.expanded<api.PublishedContent>(
         (item) => _ContentRow(
           community: widget.community,
           item: item,
-          onDelete:
-              owned
-                  ? (content) => httpx
-                      .withRetry(
-                        () => widget.apitombstone(content.id, options: [authn.request(authn.AuthzCache.meta(context))]),
-                      )
-                      .then((_) {
-                        setState(() {
-                          _resp.items.remove(content);
-                        });
-                      })
-                  : null,
         ),
       ),
       loading: _loading,
@@ -162,9 +148,11 @@ class _CommunityContentDisplayState extends State<CommunityContentDisplay> {
 class _ContentRow extends StatelessWidget {
   final api.Community community;
   final api.PublishedContent item;
-  final Future<void> Function(api.PublishedContent)? onDelete;
 
-  const _ContentRow({required this.community, required this.item, this.onDelete});
+  const _ContentRow({
+    required this.community,
+    required this.item,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -194,31 +182,6 @@ class _ContentRow extends StatelessWidget {
             ],
           ),
         ),
-        if (item.archivedId != uuidx.min()) Icon(Icons.archive, color: theme.colorScheme.primary),
-        if (onDelete != null)
-          ds.LoadingIconButton(
-            icon: Icon(Icons.delete, color: Colors.red),
-            tooltip: 'remove content',
-            onPressed: () async {
-              ds.modals
-                  .of(context)
-                  ?.push(
-                    ds.Confirmation.yesNo(
-                      content: Text(
-                        'Are you sure you want to delist "${item.title.isNotEmpty ? item.title : item.id}"?',
-                      ),
-                      onConfirm: (context) {
-                        onDelete!(item).whenComplete(() {
-                          ds.modals.of(context)?.push(null);
-                        });
-                      },
-                      onCancel: (context) {
-                        ds.modals.of(context)?.push(null);
-                      },
-                    ),
-                  );
-            },
-          ),
       ],
       expanded: SizedBox(
         width: double.infinity,

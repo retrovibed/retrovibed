@@ -1,5 +1,7 @@
 -- +goose Up
 -- +goose StatementBegin
+DROP TABLE IF EXISTS community;
+
 CREATE TABLE community (
     id UUID PRIMARY KEY NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),

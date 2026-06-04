@@ -31,7 +31,7 @@ class PublishConfirmation extends StatefulWidget {
     this.knownMedia,
     required this.onPublished,
     this.youtubeStatus = google.YouTube.status,
-    this.apicommunitypublish = API.publish,
+    this.apicommunitypublish = publishing.publish,
   });
 
   @override

@@ -3,7 +3,7 @@ import 'package:retrovibed/designkit.dart' as ds;
 import 'api.dart';
 import 'community.detail.dart';
 import 'community.button.subscribe.dart';
-import 'content.display.dart';
+import 'content.display.read.only.dart';
 
 class SubscriberListDisplayItem extends StatelessWidget {
   final Community community;
@@ -45,7 +45,7 @@ class SubscriberListDisplayItem extends StatelessWidget {
         child: Column(
           spacing: defaults.spacing,
           children: [
-            CommunityContentDisplay(community: community),
+            ContentDisplayReadOnly(community: community),
           ],
         ),
       ),
