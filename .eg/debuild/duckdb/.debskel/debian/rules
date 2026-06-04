@@ -11,7 +11,7 @@ override_dh_auto_build:
 
 	# ccache -s
 
-	GEN=ninja OVERRIDE_GIT_DESCRIBE="v${PACKAGE_VERSION}" GIT_COMMIT_HASH="${GIT_COMMIT_HASH}" ENABLE_EXTENSION_AUTOLOADING=1 ENABLE_EXTENSION_AUTOINSTALL=1 CORE_EXTENSIONS='autocomplete;json;parquet;icu' DUCKDB_BUILD=Static make -C src
+	GEN=ninja OVERRIDE_GIT_DESCRIBE="v${PACKAGE_VERSION}" GIT_COMMIT_HASH="${GIT_COMMIT_HASH}" ENABLE_EXTENSION_AUTOLOADING=1 ENABLE_EXTENSION_AUTOINSTALL=1 BUILD_EXTENSIONS='autocomplete;json;parquet;icu;inet;vss' DUCKDB_BUILD=Static make -C src
 	DESTDIR="linux" cmake --install src/build/release --prefix="/usr"
 
 

@@ -1,5 +1,9 @@
 -- +goose Up
 -- +goose StatementBegin
+
+INSTALL vss; LOAD vss;
+SET hnsw_enable_experimental_persistence = true;
+
 CREATE TABLE audio_features (
     media_id UUID PRIMARY KEY NOT NULL,
     features FLOAT[128] NOT NULL,
