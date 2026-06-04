@@ -67,12 +67,13 @@ func (t DeeppoolPublished) List(ctx context.Context, communityID string, req *Pu
 		msg  PublishedContentSearchResponse
 	)
 
+	req.CommunityId = communityID
 	params, err := formx.NewEncoder().Encode(req)
 	if err != nil {
 		return nil, err
 	}
 
-	uri := fmt.Sprintf("https://%s/c/%s/published?%s", t.endpoint, communityID, params.Encode())
+	uri := fmt.Sprintf("https://%s/p?%s", t.endpoint, params.Encode())
 	if r, err = http.NewRequestWithContext(ctx, http.MethodGet, uri, nil); err != nil {
 		return nil, err
 	}
