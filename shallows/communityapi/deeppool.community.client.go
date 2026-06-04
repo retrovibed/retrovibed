@@ -5,8 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"mime/multipart"
 	"net/http"
+	"net/http/httputil"
 
 	"github.com/retrovibed/retrovibed/retroapi/deeppool"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -39,16 +41,17 @@ func (t DeeppoolCommunity) Search(ctx context.Context, query string, offset, lim
 
 	params, err := formx.NewEncoder().Encode(&CommunitySearchRequest{Query: query, Offset: offset, Limit: limit})
 	if err != nil {
-		return nil, err
+		return nil, errorsx.Wrap(err, "invalid params")
 	}
 
 	uri := fmt.Sprintf("https://%s/c/?%s", t.endpoint, params.Encode())
 	if req, err = http.NewRequestWithContext(ctx, http.MethodGet, uri, nil); err != nil {
-		return nil, err
+		return nil, errorsx.Wrapf(err, "request creation failed: %s", t.endpoint)
 	}
 
 	if resp, err = httpx.AsError(t.c.Do(req)); err != nil {
-		return nil, errorsx.Wrap(err, "request failed")
+		log.Println("WAAAAAAT", string(errorsx.Zero(httputil.DumpRequest(req, true))))
+		return nil, errorsx.Wrapf(err, "request failed: %s", uri)
 	}
 	defer resp.Body.Close()
 

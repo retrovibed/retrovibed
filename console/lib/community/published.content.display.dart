@@ -20,25 +20,25 @@ typedef FnPublishedTombstone =
       List<httpx.Option> options,
     });
 
-class CommunityContentDisplay extends StatefulWidget {
+class PublishedContentDisplay extends StatefulWidget {
   final api.Community community;
   final FnPublished apipublished;
   final FnPublishedTombstone apitombstone;
   final Widget help;
 
-  const CommunityContentDisplay({
+  const PublishedContentDisplay({
     super.key,
     required this.community,
-    this.apipublished = api.publishing.search,
-    this.apitombstone = api.publishing.tombstone,
+    this.apipublished = api.API.published,
+    this.apitombstone = api.API.publishedtombstone,
     this.help = ds.HelpScope.None,
   });
 
   @override
-  State<CommunityContentDisplay> createState() => _CommunityContentDisplayState();
+  State<PublishedContentDisplay> createState() => _PublishedContentDisplayState();
 }
 
-class _CommunityContentDisplayState extends State<CommunityContentDisplay> {
+class _PublishedContentDisplayState extends State<PublishedContentDisplay> {
   api.PublishedContentSearchResponse _resp = api.PublishedContentSearchResponse(
     next: api.PublishedContentSearchRequest(
       offset: ds.Int64(0),
@@ -77,7 +77,7 @@ class _CommunityContentDisplayState extends State<CommunityContentDisplay> {
           () => widget.apipublished(
             widget.community.id,
             req: req,
-            options: [authn.DeeppoolAuthzCache.bearer(context)],
+            options: [authn.request(authn.AuthzCache.meta(context))],
           ),
         )
         .then((response) {
