@@ -3,42 +3,26 @@ import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/mimex.dart' as mimex;
-import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'api.dart' as api;
 import 'content.detail.dart';
 
-typedef FnPublished =
-    Future<api.PublishedContentSearchResponse> Function(
-      String id, {
-      List<httpx.Option> options,
-      api.PublishedContentSearchRequest req,
-    });
-
-typedef FnPublishedTombstone =
-    Future<api.PublishContentDeleteResponse> Function(
-      String id, {
-      List<httpx.Option> options,
-    });
-
-class PublishedContentDisplay extends StatefulWidget {
+class ContentDisplayReadOnly extends StatefulWidget {
   final api.Community community;
-  final FnPublished apipublished;
-  final FnPublishedTombstone apitombstone;
+  final api.FnPublishingSearch apipublished;
   final Widget help;
 
-  const PublishedContentDisplay({
+  const ContentDisplayReadOnly({
     super.key,
     required this.community,
     this.apipublished = api.API.published,
-    this.apitombstone = api.API.publishedtombstone,
     this.help = ds.HelpScope.None,
   });
 
   @override
-  State<PublishedContentDisplay> createState() => _PublishedContentDisplayState();
+  State<ContentDisplayReadOnly> createState() => _ContentDisplayReadOnlyState();
 }
 
-class _PublishedContentDisplayState extends State<PublishedContentDisplay> {
+class _ContentDisplayReadOnlyState extends State<ContentDisplayReadOnly> {
   api.PublishedContentSearchResponse _resp = api.PublishedContentSearchResponse(
     next: api.PublishedContentSearchRequest(
       offset: ds.Int64(0),
@@ -77,7 +61,7 @@ class _PublishedContentDisplayState extends State<PublishedContentDisplay> {
           () => widget.apipublished(
             widget.community.id,
             req: req,
-            options: [authn.request(authn.AuthzCache.meta(context))],
+            options: [authn.DeeppoolAuthzCache.bearer(context)],
           ),
         )
         .then((response) {
@@ -85,6 +69,9 @@ class _PublishedContentDisplayState extends State<PublishedContentDisplay> {
             _resp = response;
           });
         })
+        .catchError((cause) {
+          setState(() {});
+        }, test: httpx.ErrorsTest.err404)
         .catchError((cause) {
           setState(() {
             _cause = ds.Errors.httpauto(cause, onTap: _clearCause);
@@ -106,26 +93,12 @@ class _PublishedContentDisplayState extends State<PublishedContentDisplay> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final defaults = ds.Defaults.of(context);
-    final session = authn.Authenticated.syncSession(context);
-    final owned = session.account.id == widget.community.accountId;
 
     return ds.Table<api.PublishedContent>(
       ds.Table.expanded<api.PublishedContent>(
         (item) => _ContentRow(
           community: widget.community,
           item: item,
-          onDelete:
-              owned
-                  ? (content) => httpx
-                      .withRetry(
-                        () => widget.apitombstone(content.id, options: [authn.request(authn.AuthzCache.meta(context))]),
-                      )
-                      .then((_) {
-                        setState(() {
-                          _resp.items.remove(content);
-                        });
-                      })
-                  : null,
         ),
       ),
       loading: _loading,
@@ -175,9 +148,11 @@ class _PublishedContentDisplayState extends State<PublishedContentDisplay> {
 class _ContentRow extends StatelessWidget {
   final api.Community community;
   final api.PublishedContent item;
-  final Future<void> Function(api.PublishedContent)? onDelete;
 
-  const _ContentRow({required this.community, required this.item, this.onDelete});
+  const _ContentRow({
+    required this.community,
+    required this.item,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -207,31 +182,6 @@ class _ContentRow extends StatelessWidget {
             ],
           ),
         ),
-        if (item.archivedId != uuidx.min()) Icon(Icons.archive, color: theme.colorScheme.primary),
-        if (onDelete != null)
-          ds.LoadingIconButton(
-            icon: Icon(Icons.delete, color: Colors.red),
-            tooltip: 'remove content',
-            onPressed: () async {
-              ds.modals
-                  .of(context)
-                  ?.push(
-                    ds.Confirmation.yesNo(
-                      content: Text(
-                        'Are you sure you want to delist "${item.title.isNotEmpty ? item.title : item.id}"?',
-                      ),
-                      onConfirm: (context) {
-                        onDelete!(item).whenComplete(() {
-                          ds.modals.of(context)?.push(null);
-                        });
-                      },
-                      onCancel: (context) {
-                        ds.modals.of(context)?.push(null);
-                      },
-                    ),
-                  );
-            },
-          ),
       ],
       expanded: SizedBox(
         width: double.infinity,

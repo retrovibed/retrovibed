@@ -13,7 +13,7 @@ func CommunitySearch(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuild
 }
 
 func CommunitySearchBuilder() squirrel.SelectBuilder {
-	return squirrelx.PSQL.Select(sqlx.Columns(CommunityScannerStaticColumns)...).From("published_content")
+	return squirrelx.PSQL.Select(sqlx.Columns(CommunityScannerStaticColumns)...).From("community")
 }
 
 func CommunityQueryNotTombstoned() squirrel.Sqlizer {

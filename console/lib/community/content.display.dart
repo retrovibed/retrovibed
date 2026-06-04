@@ -7,23 +7,10 @@ import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'api.dart' as api;
 import 'content.detail.dart';
 
-typedef FnPublished =
-    Future<api.PublishedContentSearchResponse> Function(
-      String id, {
-      List<httpx.Option> options,
-      api.PublishedContentSearchRequest req,
-    });
-
-typedef FnPublishedTombstone =
-    Future<api.PublishContentDeleteResponse> Function(
-      String id, {
-      List<httpx.Option> options,
-    });
-
 class CommunityContentDisplay extends StatefulWidget {
   final api.Community community;
-  final FnPublished apipublished;
-  final FnPublishedTombstone apitombstone;
+  final api.FnPublishingSearch apipublished;
+  final api.FnPublishingTombstone apitombstone;
   final Widget help;
 
   const CommunityContentDisplay({

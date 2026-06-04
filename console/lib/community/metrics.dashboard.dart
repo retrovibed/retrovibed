@@ -35,8 +35,8 @@ class MetricsDashboard extends StatefulWidget {
   MetricsDashboard({
     super.key,
     required this.community,
-    this.apicommunitysync = communityapi.API.sync,
-    this.apicommunitymetrics = communityapi.API.metrics,
+    this.apicommunitysync = communityapi.metrics.sync,
+    this.apicommunitymetrics = communityapi.metrics.search,
     List<timex.Range>? segments,
   }) : segments = segments ?? _defaultSegments();
 
