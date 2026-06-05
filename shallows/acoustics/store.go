@@ -73,16 +73,3 @@ func IndexedCount(ctx context.Context, q sqlx.Queryer, statsVersion uint32) (int
 	err := AudioFeaturesCountByVersion(ctx, q, statsVersion).Scan(&count)
 	return count, err
 }
-
-// UnindexedMediaIDs returns audio media IDs without a corresponding audio_features entry.
-func UnindexedMediaIDs(ctx context.Context, q sqlx.Queryer, limit int) ([]uuid.UUID, error) {
-	v := sqlx.Scan(AudioFeaturesUnindexedMediaIDs(ctx, q, limit))
-
-	var ids []uuid.UUID
-	for mid := range v.Iter() {
-		if id, err := uuid.FromString(mid); err == nil {
-			ids = append(ids, id)
-		}
-	}
-	return ids, v.Err()
-}

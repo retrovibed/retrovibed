@@ -25,19 +25,22 @@ func AcousticsBackgroundRun(ctx context.Context, q sqlx.Queryer, media fs.FS) er
 	attempted := make(map[uuid.UUID]struct{})
 
 	for {
-		ids, err := acoustics.UnindexedMediaIDs(ctx, q, 16)
-		if err != nil {
-			return errorsx.Wrap(err, "acoustics: find unindexed")
-		}
-
+		v := sqlx.Scan(acoustics.AudioFeaturesUnindexedMediaIDs(ctx, q, 16))
 		progressed := false
-		for _, id := range ids {
+		for mid := range v.Iter() {
+			id, err := uuid.FromString(mid)
+			if err != nil {
+				continue
+			}
 			if _, ok := attempted[id]; ok {
 				continue
 			}
 			attempted[id] = struct{}{}
 			progressed = true
 			errorsx.Log(acousticsIndexOne(ctx, q, media, id))
+		}
+		if err := v.Err(); err != nil {
+			return errorsx.Wrap(err, "acoustics: find unindexed")
 		}
 
 		if !progressed {
@@ -72,6 +75,7 @@ func acousticsIndexOne(ctx context.Context, q sqlx.Queryer, media fs.FS, id uuid
 // exponential backoff that maxes out at an hour.
 func AcousticsBackground(ctx context.Context, q sqlx.Queryer, media fs.FS) error {
 	wakeup := asyncx.NewWakeup(ctx)
+	defer wakeup.Broadcast() // kick off an initial indexing process
 	s := backoffx.New(
 		backoffx.Exponential(time.Second),
 		backoffx.Maximum(time.Hour),
