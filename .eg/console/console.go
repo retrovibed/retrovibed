@@ -129,6 +129,21 @@ func Generate(ctx context.Context, op eg.Op) error {
 	)(ctx, op)
 }
 
+func MaskDartTool(ctx context.Context, _ eg.Op) error {
+	// dart relies on .dart_tool cached data to work properly.
+	// but it doesnt allow providing the directory location.
+	// so to behavior properly between host/guest runtimes
+	// we need to mask it.
+	runtime := flutterRuntimev2(shell.Runtime())
+	return shell.Run(
+		ctx,
+		runtime.New("pwd"),
+		runtime.New("tree -L 1 .dart_tool"),
+		runtime.New("mount -t tmpfs tmpfs .dart_tool").Privileged(),
+		runtime.New("tree -L 1 .dart_tool"),
+	)
+}
+
 func GenerateFlutter(ctx context.Context, _ eg.Op) error {
 	runtime := flutterRuntimev2(shell.Runtime())
 	return shell.Run(
