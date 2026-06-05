@@ -137,9 +137,7 @@ func MaskDartTool(ctx context.Context, _ eg.Op) error {
 	runtime := flutterRuntimev2(shell.Runtime())
 	return shell.Run(
 		ctx,
-		runtime.New("pwd"),
-		runtime.New("tree -L 1 .dart_tool"),
-		runtime.New("mount -t tmpfs tmpfs .dart_tool").Privileged(),
+		runtime.New("rm -rf .dart_tool && mkdir .dart_tool && mount -t tmpfs tmpfs .dart_tool").Privileged(),
 		runtime.New("tree -L 1 .dart_tool"),
 	)
 }
