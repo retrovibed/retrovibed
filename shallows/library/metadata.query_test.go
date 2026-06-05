@@ -21,7 +21,7 @@ func TestMetadataQueryHasKnownMedia(t *testing.T) {
 
 		var withKnown, withNil, withMax library.Metadata
 		require.NoError(t, testx.Fake(&withKnown, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID, library.MetadataOptionKnownMediaID(realID)))
-		require.NoError(t, testx.Fake(&withNil, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID))   // nil UUID
+		require.NoError(t, testx.Fake(&withNil, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID)) // nil UUID
 		require.NoError(t, testx.Fake(&withMax, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID, library.MetadataOptionKnownMediaID(uuid.Max.String())))
 
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, withKnown).Scan(&withKnown))

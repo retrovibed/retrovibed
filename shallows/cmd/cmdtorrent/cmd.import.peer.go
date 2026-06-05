@@ -1,9 +1,9 @@
 package cmdtorrent
 
 import (
-	"bufio"
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"io"
 	"iter"
@@ -54,8 +54,8 @@ type importPeer struct {
 	Concurrency    uint16   `flag:"" name:"concurrency" help:"specify the number of workers" default:"${vars_cores}"`
 }
 
-func (t importPeer) torrents(tstore fsx.Virtual) iter.Seq2[string, torrent.Metadata] {
-	return func(yield func(string, torrent.Metadata) bool) {
+func (t importPeer) torrents(tstore fsx.Virtual) iter.Seq2[torrentRecord, torrent.Metadata] {
+	return func(yield func(torrentRecord, torrent.Metadata) bool) {
 		src := os.Stdin
 
 		if stringsx.Present(t.Magnets) {
@@ -68,9 +68,15 @@ func (t importPeer) torrents(tstore fsx.Virtual) iter.Seq2[string, torrent.Metad
 			}
 		}
 
-		s := bufio.NewScanner(src)
-		for s.Scan() {
-			magnet, err := torrent.NewFromMagnet(s.Text())
+		dec := json.NewDecoder(src)
+		for dec.More() {
+			var rec torrentRecord
+			if err := dec.Decode(&rec); err != nil {
+				log.Println("unable to decode torrent record", err)
+				return
+			}
+
+			magnet, err := torrent.NewFromMagnet(rec.Magnet)
 			if err != nil {
 				log.Println("unable to parse magnet link", err)
 				return
@@ -81,25 +87,18 @@ func (t importPeer) torrents(tstore fsx.Virtual) iter.Seq2[string, torrent.Metad
 				if magnet.InfoBytes, err = os.ReadFile(infopath); err != nil {
 					log.Println("failed to read torrent info", err)
 				}
-				// log.Println("loaded existing torrent info", infopath)
-				// } else {
-				// log.Println("torrent info unavailable", infopath)
 			}
 
-			if !yield(s.Text(), magnet) {
+			if !yield(rec, magnet) {
 				return
 			}
-		}
-
-		if err := s.Err(); err != nil {
-			log.Fatalln(err)
 		}
 	}
 }
 
 func (t importPeer) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) (err error) {
 	type workload struct {
-		magnet string
+		record torrentRecord
 		meta   torrent.Metadata
 	}
 
@@ -248,7 +247,6 @@ func (t importPeer) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) (err error) 
 				return errorsx.Wrapf(cause, "failed to record torrent %s %v", w.meta.ID, cause)
 			}
 		} else {
-			// log.Printf("torrent info available resuming %s %d\n", w.meta.ID, len(w.meta.InfoBytes))
 			if _info, cause := w.meta.Metainfo().UnmarshalInfo(); cause != nil {
 				return errorsx.Wrapf(cause, "failed to resume torrent %s", w.meta.ID)
 			} else {
@@ -261,6 +259,7 @@ func (t importPeer) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) (err error) 
 			tracking.MetadataOptionFromInfo(info),
 			tracking.MetadataOptionTrackers(w.meta.Trackers...),
 			tracking.MetadataOptionAutoArchive(t.Archive),
+			tracking.MetadataOptionEncryptionSeed(w.record.EncryptionSeed),
 			tracking.MetadataOptionInitiate,
 			tracking.MetadataOptionAutoDescription,
 			tracking.MetadataOptionAutoHidden,
@@ -279,10 +278,6 @@ func (t importPeer) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) (err error) 
 			errorsx.Log(errorsx.Wrapf(tclient.Stop(w.meta), "failed to shutdown torrent %s %v", w.meta.ID.String(), cause))
 		}()
 
-		// give each torrent a minute of no writing activity before giving up importing it.
-		// it'll continue to try in the background but the import process will context.
-		// dctx, done := context.WithCancel(ctx)
-		// dst := iox.NewTimeoutWriter(done, time.Minute, io.Discard)
 		log.Println("---------------------------------- downloading", w.meta.ID)
 		if cause := tracking.DownloadInto(ctx, db, rootstore, library.NewQueryerCleanerAuto(), &lmd, dl, io.Discard); cause != nil {
 			return errorsx.LogErr(errorsx.Wrapf(cause, "failed to download %s %v", w.meta.ID.String(), cause))
@@ -302,15 +297,15 @@ func (t importPeer) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) (err error) 
 
 	arena := asynccompute.New(func(ctx context.Context, w workload) error {
 		if err := importfn(ctx, w); err != nil {
-			fmt.Println(w.magnet)
+			fmt.Println(w.record.Magnet)
 			return err
 		}
 
 		return nil
 	}, asynccompute.Workers[workload](t.Concurrency))
 
-	for k, v := range t.torrents(torrentstore) {
-		if err := arena.Run(gctx.Context, workload{magnet: k, meta: v}); err != nil {
+	for rec, v := range t.torrents(torrentstore) {
+		if err := arena.Run(gctx.Context, workload{record: rec, meta: v}); err != nil {
 			return errorsx.Compact(err, asynccompute.Shutdown(gctx.Context, arena))
 		}
 	}

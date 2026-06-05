@@ -94,6 +94,15 @@ func MetadataOptionEntropySeed(d ...[]byte) func(*Metadata) {
 	}
 }
 
+func MetadataOptionEncryptionSeed(seed string) func(*Metadata) {
+	return func(m *Metadata) {
+		if stringsx.Blank(seed) {
+			return
+		}
+		m.EncryptionSeed = seed
+	}
+}
+
 func MetadataOptionAutoArchive(b bool) func(*Metadata) {
 	return func(m *Metadata) {
 		m.Archivable = b

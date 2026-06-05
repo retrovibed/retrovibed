@@ -1,31 +1,32 @@
 package cmdtorrent
 
 import (
-	"fmt"
-	"log"
+	"encoding/json"
 	"os"
-	"strings"
+	"time"
 
-	"github.com/james-lawrence/torrent"
-	"github.com/james-lawrence/torrent/dht/int160"
+	"github.com/Masterminds/squirrel"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
-	"github.com/retrovibed/retrovibed/shallows/internal/env"
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
+	"github.com/retrovibed/retrovibed/shallows/tracking"
 )
 
+// torrentRecord is the JSONL transfer encoding for export/import peer.
+type torrentRecord struct {
+	Magnet         string `json:"magnet"`
+	EncryptionSeed string `json:"encryption_seed,omitempty"`
+}
+
 type exportMagnets struct {
-	Path   string `arg:"" name:"path" help:"file to write magnet urls out to, defaults to stdout" default:"" required:"false"`
-	Legacy bool   `flag:"" name:"legacy" help:"enable legacy storage structure for migration" default:"false" hidden:"true"`
+	Path         string    `arg:"" name:"path" help:"file to write magnet urls out to, defaults to stdout" default:"" required:"false"`
+	Completed    bool      `flag:"" name:"completed" help:"only export completed torrents" default:"false"`
+	Hidden       bool      `flag:"" name:"hidden" help:"include hidden torrents" default:"false"`
+	CreatedAfter time.Time `flag:"" name:"created-after" help:"only export torrents created after this timestamp" required:"false"`
 }
 
 func (t exportMagnets) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
-	const (
-		suffix = ".torrent"
-	)
-
 	dst := os.Stdout
 	if stringsx.Present(t.Path) {
 		if dst, err = os.OpenFile(t.Path, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0600); err != nil {
@@ -33,58 +34,38 @@ func (t exportMagnets) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) 
 		}
 	}
 
-	tvfs := fsx.DirVirtual(env.TorrentDir())
-
-	mdcache := torrent.NewMetadataCache(tvfs.Path())
-
-	root, err := os.OpenRoot(tvfs.Path())
+	db, err := cmdopts.DatabaseMeta(gctx.Context)
 	if err != nil {
 		return err
 	}
+	defer db.Close()
 
-	dir := fsx.WalkDir(root.FS())
-	bmc := torrent.NewBitmapCache(tvfs.Path())
+	filters := squirrel.And{tracking.MetadataQueryNotTombstoned()}
+	if !t.Hidden {
+		filters = append(filters, tracking.MetadataQueryNotHidden())
+	}
+	if t.Completed {
+		filters = append(filters, tracking.MetadataQueryCompleted(true))
+	}
+	if !t.CreatedAfter.IsZero() {
+		filters = append(filters, tracking.MetadataQueryCreatedAfter(t.CreatedAfter))
+	}
 
-	for path := range dir.Walk() {
-		if !strings.HasSuffix(path, suffix) {
-			continue
-		}
+	q := tracking.MetadataSearchBuilder().Where(filters)
+	enc := json.NewEncoder(dst)
 
-		id, err := int160.FromHexEncodedString(strings.TrimSuffix(path, suffix))
-		if err != nil {
-			return errorsx.Wrapf(err, "unable to read id from %s", path)
-		}
-
-		if !fsx.Exists(tvfs.Path(id.String())) {
-			continue
-		}
-
-		bm, err := bmc.Read(id)
-		if err != nil {
-			log.Println(errorsx.Wrapf(err, "unable to open bitmap cache %s", id))
-			continue
-		}
-
-		if bm.GetCardinality() == 0 {
-			log.Printf("bitmap - skipping due to no data available %s\n", id)
-			continue
-		}
-
-		md, err := mdcache.Read(id)
-		if err != nil {
-			return errorsx.Wrapf(err, "unable to read medata of %s", id)
-		}
-
+	scanner := sqlx.Scan(tracking.MetadataSearch(gctx.Context, db, q))
+	for lmd := range scanner.Iter() {
 		mg := metainfo.Magnet{
-			InfoHash:    metainfo.Hash(md.ID.Bytes()),
-			Trackers:    md.Trackers,
-			DisplayName: md.DisplayName,
+			InfoHash:    metainfo.Hash(lmd.Infohash),
+			Trackers:    []string{lmd.Tracker},
+			DisplayName: lmd.Description,
 		}
-
-		if _, err = fmt.Fprintln(dst, mg.String()); err != nil {
+		rec := torrentRecord{Magnet: mg.String(), EncryptionSeed: lmd.EncryptionSeed}
+		if err = enc.Encode(rec); err != nil {
 			return err
 		}
 	}
 
-	return nil
+	return scanner.Err()
 }

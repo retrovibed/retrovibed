@@ -58,17 +58,23 @@ func (t importJSONL) run(ctx context.Context, c *http.Client, endpoint string, r
 
 func importItem(ctx context.Context, c *http.Client, endpoint string, dec *json.Decoder, numChunks uint64) error {
 	h := md5.New()
-	var data bytes.Buffer
-	for i := uint64(0); i < numChunks; i++ {
+	var (
+		data    bytes.Buffer
+		trailer exportTrailer
+	)
+
+	w := io.MultiWriter(h, &data)
+	for i := range numChunks {
 		var chunk exportChunk
 		if err := dec.Decode(&chunk); err != nil {
 			return errorsx.Wrapf(err, "decode chunk %d", i)
 		}
-		h.Write(chunk.Data)
-		data.Write(chunk.Data)
+
+		if _, err := w.Write(chunk.Data); err != nil {
+			return errorsx.Wrap(err, "failed to write chunk")
+		}
 	}
 
-	var trailer exportTrailer
 	if err := dec.Decode(&trailer); err != nil {
 		return errorsx.Wrap(err, "decode trailer")
 	}
