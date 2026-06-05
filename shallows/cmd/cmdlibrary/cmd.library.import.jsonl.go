@@ -115,7 +115,7 @@ func importItem(ctx context.Context, c *http.Client, endpoint string, dec *json.
 		return errorsx.Wrap(err, "decode upload response")
 	}
 
-	patchBody, err := json.Marshal(&media.MediaUpdateRequest{
+	patch, err := json.Marshal(&media.MediaUpdateRequest{
 		Media: &media.Media{
 			Description:  trailer.Metadata.Description,
 			KnownMediaId: trailer.Metadata.KnownMediaID,
@@ -128,7 +128,7 @@ func importItem(ctx context.Context, c *http.Client, endpoint string, dec *json.
 
 	patchReq, err := http.NewRequestWithContext(ctx, http.MethodPost,
 		endpoint+"/m/"+uploadResp.Media.Id+"/metadatasync",
-		bytes.NewReader(patchBody))
+		bytes.NewReader(patch))
 	if err != nil {
 		return err
 	}
