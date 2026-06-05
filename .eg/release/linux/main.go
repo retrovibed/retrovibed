@@ -31,7 +31,11 @@ func main() {
 			deb,
 			eg.Sequential(
 				eg.Parallel(
-					console.BuildLinux,
+					eg.Sequential(
+						console.MaskDartTool,
+						console.Generate,
+						console.BuildLinux,
+					),
 					shallows.Compile(),
 				),
 				eg.Parallel(
