@@ -41,6 +41,16 @@ jobs:
           command: go install github.com/egdaemon/eg/...@latest
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Get commit year-month
+        id: commit-date
+        run: echo "yearmonth=$(git log -1 --format=%cd --date=format:'%Y-%m')" >> "$GITHUB_OUTPUT"
+      - name: Cache .eg.cache
+        uses: actions/cache@v4
+        with:
+          path: .eg.cache
+          key: eg-cache-${{ runner.os }}-${{ steps.commit-date.outputs.yearmonth }}
+          restore-keys: |
+            eg-cache-${{ runner.os }}-
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
