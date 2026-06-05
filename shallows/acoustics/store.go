@@ -10,9 +10,9 @@ import (
 // StoreFeatures persists a feature vector. The HNSW index updates automatically.
 // HNSW does not support UPDATEs on the indexed column, so callers reindexing a
 // track should DeleteFeatures first.
-func StoreFeatures(ctx context.Context, q sqlx.Queryer, id uuid.UUID, vec FeatureVector, statsVersion uint32) error {
+func StoreFeatures(ctx context.Context, q sqlx.Queryer, id string, vec FeatureVector, statsVersion uint32) error {
 	a := AudioFeatures{
-		MediaID:      id.String(),
+		MediaID:      id,
 		Features:     vec[:],
 		StatsVersion: statsVersion,
 	}
@@ -72,17 +72,4 @@ func IndexedCount(ctx context.Context, q sqlx.Queryer, statsVersion uint32) (int
 	var count int64
 	err := AudioFeaturesCountByVersion(ctx, q, statsVersion).Scan(&count)
 	return count, err
-}
-
-// UnindexedMediaIDs returns audio media IDs without a corresponding audio_features entry.
-func UnindexedMediaIDs(ctx context.Context, q sqlx.Queryer, limit int) ([]uuid.UUID, error) {
-	v := sqlx.Scan(AudioFeaturesUnindexedMediaIDs(ctx, q, limit))
-
-	var ids []uuid.UUID
-	for mid := range v.Iter() {
-		if id, err := uuid.FromString(mid); err == nil {
-			ids = append(ids, id)
-		}
-	}
-	return ids, v.Err()
 }

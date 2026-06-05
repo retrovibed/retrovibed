@@ -21,7 +21,6 @@ import (
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
-	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/envx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -280,10 +279,6 @@ func MetadataQueryNotHidden() squirrel.Sqlizer {
 
 func MetadataSearch(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilder) MetadataScanner {
 	return NewMetadataScannerStatic(b.RunWith(q).QueryContext(ctx))
-}
-
-func MetadataQuerySearch(q string, columns ...string) squirrel.Sqlizer {
-	return duckdbx.FTSSearch("fts_main_torrents_metadata", q, columns...)
 }
 
 func MetadataSearchBuilder() squirrel.SelectBuilder {

@@ -60,7 +60,7 @@ func AnalyzeSamples(segments [][]float32) FeatureVector {
 func AnalyzeFile(ctx context.Context, path string) (FeatureVector, error) {
 	dur, err := ProbeDuration(path)
 	if err != nil {
-		return FeatureVector{}, err
+		return FeatureVector{}, errorsx.Wrap(err, "duration detection failed")
 	}
 
 	segments := SegmentsForDuration(dur)
@@ -70,7 +70,7 @@ func AnalyzeFile(ctx context.Context, path string) (FeatureVector, error) {
 
 	pcm, err := DecodePCM(ctx, path, segments)
 	if err != nil {
-		return FeatureVector{}, err
+		return FeatureVector{}, errorsx.Wrap(err, "decode pcm failed")
 	}
 	defer returnPCMBuffers(pcm)
 

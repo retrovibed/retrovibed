@@ -66,6 +66,8 @@ func (t *HTTPSimilar) similar(w http.ResponseWriter, r *http.Request) {
 		md      library.Metadata
 	)
 
+	log.Println("acoustic similarity initiated")
+	defer log.Println("acoustic similarity completed")
 	mediaID, err = uuid.FromString(mux.Vars(r)["media_id"])
 	if err != nil {
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))

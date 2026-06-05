@@ -10,6 +10,14 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 )
 
+func LibraryMetadata(gql genieql.Structure) {
+	gql.From(gql.Table("library_metadata"))
+}
+
+func LibraryMetadataScanner(gql genieql.Scanner, pattern func(i LibraryMetadata)) {
+	gql.ColumnNamePrefix("library_metadata.")
+}
+
 func AudioFeatures(gql genieql.Structure) {
 	gql.From(gql.Table("audio_features"))
 }
@@ -55,11 +63,9 @@ func AudioFeaturesCountByVersion(
 	gql = gql.Query(`SELECT COUNT(*) AS count FROM audio_features WHERE "stats_version" = {version}`)
 }
 
-func MediaIDScanner(gql genieql.Scanner, pattern func(media_id string)) {}
-
 func AudioFeaturesUnindexedMediaIDs(
 	gql genieql.Function,
-	pattern func(ctx context.Context, q sqlx.Queryer, limit int) NewMediaIDScannerStatic,
+	pattern func(ctx context.Context, q sqlx.Queryer) NewLibraryMetadataScannerStatic,
 ) {
-	gql = gql.Query(`SELECT m.id AS media_id FROM library_metadata m LEFT JOIN audio_features af ON af.media_id = m.id WHERE m.mimetype LIKE 'audio/%' AND m.tombstoned_at = 'infinity' AND af.media_id IS NULL LIMIT {limit}`)
+	gql = gql.Query(`SELECT ` + LibraryMetadataScannerStaticColumns + ` FROM library_metadata LEFT JOIN audio_features af ON af.media_id = library_metadata.id WHERE library_metadata.mimetype LIKE 'audio/%' AND library_metadata.tombstoned_at = 'infinity' AND af.media_id IS NULL`)
 }
