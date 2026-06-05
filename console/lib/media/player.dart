@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart'; // Provides [Player], [Media], [Playlist] etc.
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:retrovibed/designkit.dart' as ds;
+import 'package:retrovibed/debug.dart' as debug;
 import 'package:retrovibed/uuidx.dart' as uuidx;
 import './playlist.dart' as internal;
 import './player.control.previous.dart';
@@ -102,65 +103,71 @@ class _VideoState extends State<VideoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Builder(
-      builder: (context) {
-        final theme = Theme.of(context);
-        final defaults = ds.Defaults.of(context);
-        final plist = internal.Playlist.of(context)!;
-        final current = plist.known;
-        final compact = defaults.isCompact;
+    return debug.Lifecycle(
+      message: "player lifecycle",
+      Builder(
+        builder: (context) {
+          final theme = Theme.of(context);
+          final defaults = ds.Defaults.of(context);
+          final plist = internal.Playlist.of(context)!;
+          final current = plist.known;
+          final compact = defaults.isCompact;
 
-        return FocusScope(
-          node: _selffocus,
-          child: Stack(
-            fit: StackFit.passthrough,
-            children: [
-              MaterialDesktopVideoControlsTheme(
-                normal: MaterialDesktopVideoControlsThemeData(
-                  modifyVolumeOnScroll: false,
-                  bottomButtonBar: _controls,
-                  keyboardShortcuts: {},
+          return FocusScope(
+            node: _selffocus,
+            child: Stack(
+              fit: StackFit.passthrough,
+              children: [
+                debug.Lifecycle(
+                  message: "video controls theme",
+                  MaterialDesktopVideoControlsTheme(
+                    normal: MaterialDesktopVideoControlsThemeData(
+                      modifyVolumeOnScroll: false,
+                      bottomButtonBar: _controls,
+                      keyboardShortcuts: {},
+                    ),
+                    fullscreen: MaterialDesktopVideoControlsThemeData(
+                      modifyVolumeOnScroll: false,
+                      bottomButtonBar: _controls,
+                      keyboardShortcuts: {},
+                    ),
+                    child: Video(focusNode: widget.focus, controller: controller),
+                  ),
                 ),
-                fullscreen: MaterialDesktopVideoControlsThemeData(
-                  modifyVolumeOnScroll: false,
-                  bottomButtonBar: _controls,
-                  keyboardShortcuts: {},
-                ),
-                child: Video(focusNode: widget.focus, controller: controller),
-              ),
-              Visibility(
-                maintainState: true,
-                maintainFocusability: true,
-                visible: !_playing,
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  verticalDirection: compact ? VerticalDirection.up : VerticalDirection.down,
-                  children: [
-                    Expanded(
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: theme.scaffoldBackgroundColor.withValues(
-                            // TODO: make opacity configurable because people have
-                            // personal preferences....
-                            // alpha: defaults.opaque.a,
-                            alpha: 1.0,
+                Visibility(
+                  maintainState: true,
+                  maintainFocusability: true,
+                  visible: !_playing,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    verticalDirection: compact ? VerticalDirection.up : VerticalDirection.down,
+                    children: [
+                      Expanded(
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: theme.scaffoldBackgroundColor.withValues(
+                              // TODO: make opacity configurable because people have
+                              // personal preferences....
+                              // alpha: defaults.opaque.a,
+                              alpha: 1.0,
+                            ),
                           ),
+                          child: widget.child,
                         ),
-                        child: widget.child,
                       ),
-                    ),
-                    Visibility(
-                      visible: !uuidx.isMin(uuidx.fromString(current.id)),
-                      child: PlayerControlResume(widget.player, current),
-                    ),
-                  ],
+                      Visibility(
+                        visible: !uuidx.isMin(uuidx.fromString(current.id)),
+                        child: PlayerControlResume(widget.player, current),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-        );
-      },
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 }
