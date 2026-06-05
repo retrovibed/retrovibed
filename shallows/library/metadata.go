@@ -189,6 +189,20 @@ func MetadataQueryNeedsKnownMediaID() squirrel.Sqlizer {
 	return squirrel.Expr("library_metadata.known_media_id = 'FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF'")
 }
 
+func MetadataQueryHasKnownMedia(has bool) squirrel.Sqlizer {
+	if has {
+		return squirrel.Expr("library_metadata.known_media_id != '00000000-0000-0000-0000-000000000000' AND library_metadata.known_media_id != 'ffffffff-ffff-ffff-ffff-ffffffffffff'")
+	}
+	return squirrel.Expr("library_metadata.known_media_id IN ('00000000-0000-0000-0000-000000000000', 'ffffffff-ffff-ffff-ffff-ffffffffffff')")
+}
+
+func MetadataQueryHasTorrent(has bool) squirrel.Sqlizer {
+	if has {
+		return squirrel.Expr("library_metadata.torrent_id != '00000000-0000-0000-0000-000000000000'")
+	}
+	return squirrel.Expr("library_metadata.torrent_id = '00000000-0000-0000-0000-000000000000'")
+}
+
 func MetadataSearch(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilder) MetadataScanner {
 	return NewMetadataScannerStatic(b.RunWith(q).QueryContext(ctx))
 }
