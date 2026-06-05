@@ -116,8 +116,23 @@ func (t *File) Stat() (fs.FileInfo, error) {
 }
 
 func (t *File) Read(p []byte) (int, error) {
-	n, err := t.ReadAt(p, int64(t.index.Load()))
-	t.index.Add(uint64(n))
+	cur := t.index.Load()
+	if cur >= t.Length {
+		return 0, io.EOF
+	}
+
+	remaining := t.Length - cur
+	if uint64(len(p)) > remaining {
+		p = p[:remaining]
+	}
+
+	n, err := t.ReadAt(p, int64(cur))
+	upd := t.index.Add(uint64(n))
+
+	if err == nil && upd >= t.Length {
+		return n, io.EOF
+	}
+
 	return n, err
 }
 

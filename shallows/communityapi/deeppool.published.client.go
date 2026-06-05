@@ -73,7 +73,7 @@ func (t DeeppoolPublished) List(ctx context.Context, communityID string, req *Pu
 		return nil, err
 	}
 
-	uri := fmt.Sprintf("https://%s/p?%s", t.endpoint, params.Encode())
+	uri := fmt.Sprintf("https://%s/p/?%s", t.endpoint, params.Encode())
 	if r, err = http.NewRequestWithContext(ctx, http.MethodGet, uri, nil); err != nil {
 		return nil, err
 	}

@@ -70,7 +70,7 @@ func (t *DeeppoolReaderAtCache) ReadAt(p []byte, off int64) (n int, err error) {
 		return n, nil
 	}
 
-	if err = t.downloadChunk(MetadataChaCha8(t.md), t.md.ArchiveID, t.md.DiskOffset+uint64(off), t.md.DiskOffset+t.md.Bytes); err != nil {
+	if err = t.downloadChunk(MetadataChaCha8(t.md), t.md.ArchiveID, uint64(off), t.md.DiskOffset+t.md.Bytes); err != nil {
 		return n, errorsx.Wrap(err, "failed to donload from archive")
 	}
 

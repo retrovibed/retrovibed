@@ -41,5 +41,12 @@ func (t vstoragefs) Open(name string) (fs.File, error) {
 		return nil, err
 	}
 
-	return blockcache.NewFile(NewDeeppoolReaderAt(t.c, *md, dcache), md.CreatedAt, md.ID, md.Bytes, 0600), nil
+	return blockcache.NewFile(
+		NewDeeppoolReaderAt(t.c, *md, dcache),
+		md.CreatedAt,
+		md.ID,
+		md.Bytes,
+		0600,
+		blockcache.WithInitialOffset(md.DiskOffset),
+	), nil
 }

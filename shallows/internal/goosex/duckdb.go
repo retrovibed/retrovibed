@@ -98,10 +98,6 @@ func InitializeDatabase(ctx context.Context, db *sql.DB, migrations fs.FS) (err 
 	m.Lock()
 	defer m.Unlock()
 
-	if _, err := db.ExecContext(ctx, "CHECKPOINT;"); err != nil {
-		return errorsx.Wrap(err, "failed to checkpoint database")
-	}
-
 	if version, err := sqlx.String(ctx, db, "SELECT library_version FROM pragma_version()"); err != nil {
 		return err
 	} else {
@@ -118,6 +114,10 @@ func InitializeDatabase(ctx context.Context, db *sql.DB, migrations fs.FS) (err 
 
 	if _, err := db.ExecContext(ctx, "SET GLOBAL hnsw_enable_experimental_persistence = true;"); err != nil {
 		return errorsx.Wrap(err, "failed to enable hnsw persistence")
+	}
+
+	if _, err := db.ExecContext(ctx, "CHECKPOINT;"); err != nil {
+		return errorsx.Wrap(err, "failed to checkpoint database")
 	}
 
 	mprov, err := goose.NewProvider(

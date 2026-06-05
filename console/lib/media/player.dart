@@ -35,6 +35,10 @@ class _VideoState extends State<VideoScreen> {
   final controller;
   late final StreamSubscription<Tracks> sub0;
   late final StreamSubscription<bool> sub1;
+  // Stable list so MaterialDesktopVideoControlsThemeData identity doesn't
+  // change on every setState, which would cause VideoControlsThemeDataInjector
+  // to deactivate mid-frame and abort Impeller on macOS.
+  List<Widget> _controls = const [];
 
   _VideoState(Player player) : controller = VideoController(player);
 
@@ -67,6 +71,29 @@ class _VideoState extends State<VideoScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final defaults = ds.Defaults.of(context);
+    final plist = internal.Playlist.of(context)!;
+    _controls = [
+      PlayerControlPrevious(),
+      MaterialPlayOrPauseButton(),
+      PlayerControlNext(),
+      MaterialDesktopVolumeButton(),
+      SizedBox.square(dimension: defaults.spacing),
+      Expanded(child: PlayerControlTitle(plist.current)),
+      SizedBox.square(dimension: defaults.spacing),
+      MaterialPositionIndicator(),
+      SizedBox.square(dimension: defaults.spacing),
+      PlayerControlSettings(widget.player),
+      SizedBox.square(dimension: defaults.spacing),
+      PlayerControlFiledrop(widget.player),
+      SizedBox.square(dimension: defaults.spacing),
+      PlayerControlFullscreen(widget.player),
+    ];
+  }
+
+  @override
   void dispose() {
     sub0.cancel();
     sub1.cancel();
@@ -82,22 +109,6 @@ class _VideoState extends State<VideoScreen> {
         final plist = internal.Playlist.of(context)!;
         final current = plist.known;
         final compact = defaults.isCompact;
-        final controls = [
-          PlayerControlPrevious(),
-          MaterialPlayOrPauseButton(),
-          PlayerControlNext(),
-          MaterialDesktopVolumeButton(),
-          SizedBox.square(dimension: defaults.spacing),
-          Expanded(child: PlayerControlTitle(plist.current)),
-          SizedBox.square(dimension: defaults.spacing),
-          MaterialPositionIndicator(),
-          SizedBox.square(dimension: defaults.spacing),
-          PlayerControlSettings(widget.player),
-          SizedBox.square(dimension: defaults.spacing),
-          PlayerControlFiledrop(widget.player),
-          SizedBox.square(dimension: defaults.spacing),
-          PlayerControlFullscreen(widget.player),
-        ];
 
         return FocusScope(
           node: _selffocus,
@@ -107,12 +118,12 @@ class _VideoState extends State<VideoScreen> {
               MaterialDesktopVideoControlsTheme(
                 normal: MaterialDesktopVideoControlsThemeData(
                   modifyVolumeOnScroll: false,
-                  bottomButtonBar: controls,
+                  bottomButtonBar: _controls,
                   keyboardShortcuts: {},
                 ),
                 fullscreen: MaterialDesktopVideoControlsThemeData(
                   modifyVolumeOnScroll: false,
-                  bottomButtonBar: controls,
+                  bottomButtonBar: _controls,
                   keyboardShortcuts: {},
                 ),
                 child: Video(focusNode: widget.focus, controller: controller),

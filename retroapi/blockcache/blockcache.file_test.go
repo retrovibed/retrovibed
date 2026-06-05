@@ -344,6 +344,75 @@ func TestFile(t *testing.T) {
 			require.Zero(t, n)
 			require.EqualValues(t, fileLength, blockcache.FileIndex(f))
 		})
+
+		t.Run("Read exact remaining returns EOF", func(t *testing.T) {
+			bCache := NewByteArrayCache(uint16(fileLength))
+			_, err := bCache.WriteAt(initialContent, 0)
+			require.NoError(t, err)
+			// index=7, remaining=3, buf exactly 3 — must return 3, io.EOF
+			f := blockcache.NewFile(bCache, time.Now(), "testfile.txt", fileLength, 0, blockcache.WithInitialIndex(7))
+			buf := make([]byte, 3)
+			n, err := f.Read(buf)
+			require.ErrorIs(t, err, io.EOF)
+			require.Equal(t, 3, n)
+			require.Equal(t, []byte("HIJ"), buf)
+			require.EqualValues(t, fileLength, blockcache.FileIndex(f))
+		})
+
+		t.Run("Sequential reads advance index", func(t *testing.T) {
+			bCache := NewByteArrayCache(uint16(fileLength))
+			_, err := bCache.WriteAt(initialContent, 0)
+			require.NoError(t, err)
+			f := blockcache.NewFile(bCache, time.Now(), "testfile.txt", fileLength, 0)
+			buf := make([]byte, 4)
+
+			n, err := f.Read(buf)
+			require.NoError(t, err)
+			require.Equal(t, 4, n)
+			require.Equal(t, []byte("ABCD"), buf)
+
+			n, err = f.Read(buf)
+			require.NoError(t, err)
+			require.Equal(t, 4, n)
+			require.Equal(t, []byte("EFGH"), buf)
+
+			n, err = f.Read(buf)
+			require.ErrorIs(t, err, io.EOF)
+			require.Equal(t, 2, n)
+			require.Equal(t, []byte("IJ"), buf[:n])
+			require.EqualValues(t, fileLength, blockcache.FileIndex(f))
+		})
+
+		t.Run("Non-zero Offset reads correct region", func(t *testing.T) {
+			// cache holds two logical files back-to-back: fileA (bytes 0-4) and fileB (bytes 5-9)
+			combined := []byte("AAAAABBBBB")
+			bCache := NewByteArrayCache(uint16(len(combined)))
+			_, err := bCache.WriteAt(combined, 0)
+			require.NoError(t, err)
+
+			fileB := blockcache.NewFile(bCache, time.Now(), "b.bin", 5, 0600, blockcache.WithInitialOffset(5))
+			buf := make([]byte, 5)
+			n, err := fileB.Read(buf)
+			require.ErrorIs(t, err, io.EOF)
+			require.Equal(t, 5, n)
+			require.Equal(t, []byte("BBBBB"), buf)
+		})
+
+		t.Run("Non-zero Offset does not spill into adjacent region", func(t *testing.T) {
+			// fileA occupies bytes 0..9, fileB occupies bytes 10..19 in a shared cache
+			cache := NewByteArrayCache(20)
+			dataA := bytes.Repeat([]byte("A"), 10)
+			dataB := bytes.Repeat([]byte("B"), 10)
+			_, err := cache.WriteAt(dataA, 0)
+			require.NoError(t, err)
+			_, err = cache.WriteAt(dataB, 10)
+			require.NoError(t, err)
+
+			fileA := blockcache.NewFile(cache, time.Now(), "a.bin", 10, 0600)
+			all, err := io.ReadAll(fileA)
+			require.NoError(t, err)
+			require.Equal(t, dataA, all, "fileA must not read into fileB's region")
+		})
 	})
 
 	t.Run("Stat", func(t *testing.T) {

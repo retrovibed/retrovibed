@@ -29,6 +29,7 @@ func main() {
 			ctx,
 			deb,
 			eg.Sequential(
+				console.MaskDartTool,
 				console.Generate,
 				eg.Parallel(
 					duckdb.MaybeBuild(
