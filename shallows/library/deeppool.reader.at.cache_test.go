@@ -196,7 +196,7 @@ func TestDeeppoolReaderAtDownload(t *testing.T) {
 		md := library.NewMetadata(
 			uuidx.WithSuffix(1),
 			library.MetadataOptionEncryptionSeed(seed.String()),
-			library.MetadataOptionBytes(nlen),
+			library.MetadataOptionBytes(nlen-diskOffset),
 			library.MetadataOptionOffset(diskOffset),
 		)
 
@@ -212,7 +212,8 @@ func TestDeeppoolReaderAtDownload(t *testing.T) {
 		c := &http.Client{}
 		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
 
-		vfs := library.New(c, fsx.DirVirtual(t.TempDir()), func(ctx context.Context, s string) (*library.Metadata, error) {
+		mediastorage := fsx.DirVirtual(t.TempDir())
+		vfs := library.New(c, mediastorage, func(ctx context.Context, s string) (*library.Metadata, error) {
 			return &md, nil
 		})
 
@@ -220,10 +221,16 @@ func TestDeeppoolReaderAtDownload(t *testing.T) {
 		require.NoError(t, err)
 		defer file.Close()
 
-		downloaded := md5.New()
-		n, err := io.CopyN(downloaded, file, nlen)
+		n, err := io.CopyN(io.Discard, file, nlen-diskOffset)
 		require.NoError(t, err)
-		require.EqualValues(t, nlen, n)
+		require.EqualValues(t, nlen-diskOffset, n)
+
+		raw, err := blockcache.NewDirectoryCache(mediastorage.Path(md.ID))
+		// raw, err := mediastorage.OpenFile(md.ID, os.O_RDONLY, 0600)
+		require.NoError(t, err)
+		downloaded := md5.New()
+		_, err = io.Copy(downloaded, io.NewSectionReader(raw, 0, nlen))
+		require.NoError(t, err)
 		require.Equal(t, md5x.FormatUUID(digest), md5x.FormatUUID(downloaded))
 	})
 
