@@ -10,9 +10,9 @@ import (
 // StoreFeatures persists a feature vector. The HNSW index updates automatically.
 // HNSW does not support UPDATEs on the indexed column, so callers reindexing a
 // track should DeleteFeatures first.
-func StoreFeatures(ctx context.Context, q sqlx.Queryer, id uuid.UUID, vec FeatureVector, statsVersion uint32) error {
+func StoreFeatures(ctx context.Context, q sqlx.Queryer, id string, vec FeatureVector, statsVersion uint32) error {
 	a := AudioFeatures{
-		MediaID:      id.String(),
+		MediaID:      id,
 		Features:     vec[:],
 		StatsVersion: statsVersion,
 	}

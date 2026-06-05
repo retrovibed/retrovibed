@@ -9,7 +9,6 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
-	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/runesx"
@@ -196,10 +195,6 @@ func MetadataSearch(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilde
 
 func MetadataSearchOne(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilder) MetadataScanner {
 	return NewMetadataScannerStatic(b.RunWith(q).QueryContext(ctx))
-}
-
-func MetadataQuerySearch(q string, columns ...string) squirrel.Sqlizer {
-	return duckdbx.FTSSearch("fts_main_library_metadata", q, columns...)
 }
 
 func MetadataSearchBuilder() squirrel.SelectBuilder {

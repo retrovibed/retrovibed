@@ -8,7 +8,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/shallows/acoustics"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/backoffx"
@@ -18,39 +17,25 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 )
 
-// AcousticsBackgroundRun drains the unindexed audio backlog in batches. Tracks
-// that fail to analyze are logged and skipped so a single bad file does not
-// stall the index or spin the drain.
+// AcousticsBackgroundRun drains the unindexed audio backlog.
 func AcousticsBackgroundRun(ctx context.Context, q sqlx.Queryer, media fs.FS) error {
-	attempted := make(map[uuid.UUID]struct{})
+	v := sqlx.Scan(acoustics.AudioFeaturesUnindexedMediaIDs(ctx, q))
 
-	for {
-		v := sqlx.Scan(acoustics.AudioFeaturesUnindexedMediaIDs(ctx, q, 16))
-		progressed := false
-		for mid := range v.Iter() {
-			id, err := uuid.FromString(mid)
-			if err != nil {
-				continue
-			}
-			if _, ok := attempted[id]; ok {
-				continue
-			}
-			attempted[id] = struct{}{}
-			progressed = true
-			errorsx.Log(acousticsIndexOne(ctx, q, media, id))
-		}
-		if err := v.Err(); err != nil {
-			return errorsx.Wrap(err, "acoustics: find unindexed")
-		}
-
-		if !progressed {
-			return nil
-		}
+	for m := range v.Iter() {
+		log.Println("acousticly indexing initiated", m.ID, m.Description)
+		errorsx.Log(acousticsIndexOne(ctx, q, media, m.ID))
+		log.Println("acousticly indexing completed", m.ID, m.Description)
 	}
+
+	if err := v.Err(); err != nil {
+		return errorsx.Wrap(err, "acoustics: find unindexed")
+	}
+
+	return nil
 }
 
-func acousticsIndexOne(ctx context.Context, q sqlx.Queryer, media fs.FS, id uuid.UUID) error {
-	tmpPath, err := copyToTemp(media, id.String())
+func acousticsIndexOne(ctx context.Context, q sqlx.Queryer, media fs.FS, id string) error {
+	tmpPath, err := copyToTemp(media, id)
 	if err != nil {
 		return errorsx.Wrap(err, "acoustics: copy to temp")
 	}
