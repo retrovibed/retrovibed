@@ -15,10 +15,18 @@ class _Lifecycle extends State<Lifecycle> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    print("${widget.message}: mounted");
+  }
+
+  @override
+  void deactivate() {
+    print("${widget.message}: deactivated (removed from tree)");
+    super.deactivate();
   }
 
   @override
   void dispose() {
+    print("${widget.message}: dismounted");
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
