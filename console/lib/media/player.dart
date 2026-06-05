@@ -70,7 +70,6 @@ class _VideoState extends State<VideoScreen> {
   void dispose() {
     sub0.cancel();
     sub1.cancel();
-    controller.dispose();
     super.dispose();
   }
 
