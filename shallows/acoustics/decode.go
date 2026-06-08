@@ -21,9 +21,24 @@ func ProbeDuration(path string) (float64, error) {
 	return reader.Duration().Seconds(), nil
 }
 
-// DecodePCM opens an audio file and decodes each segment to mono float32 at
-// SampleRate Hz. Uses a single ffmpeg.Open + reader.Map, seeking between segments.
+// DecodePCM decodes each segment of an audio file to mono float32 at SampleRate.
+// The file is reopened per segment: go-media flushes the decoder at the end of
+// every decode and exposes no way to reset it, so a reader cannot be reused
+// across seeks.
 func DecodePCM(ctx context.Context, path string, segments []Segment) ([][]float32, error) {
+	results := make([][]float32, len(segments))
+	for i, seg := range segments {
+		buf, err := decodeSegment(ctx, path, seg)
+		if err != nil {
+			returnPCMBuffers(results[:i])
+			return nil, err
+		}
+		results[i] = buf
+	}
+	return results, nil
+}
+
+func decodeSegment(ctx context.Context, path string, seg Segment) ([]float32, error) {
 	reader, err := ffmpeg.Open(path)
 	if err != nil {
 		return nil, err
@@ -51,39 +66,27 @@ func DecodePCM(ctx context.Context, path string, segments []Segment) ([][]float3
 	}
 	defer decoders.Close()
 
-	var (
-		buf   []float32
-		endTs float64
-	)
-
-	results := make([][]float32, len(segments))
-	for i, seg := range segments {
-		err = reader.Seek(best, seg.OffsetSec)
-		if err != nil {
-			return nil, err
-		}
-
-		buf = pcmPool.Get().([]float32)[:0]
-		endTs = seg.OffsetSec + seg.DurationSec
-
-		err = reader.DecodeWithContext(ctx, decoders, func(_ int, frame *ffmpeg.Frame) error {
-			if frame.Type() != media.AUDIO {
-				return nil
-			}
-			if ts := frame.Ts(); ts != ffmpeg.TS_UNDEFINED && ts >= endTs {
-				return io.EOF
-			}
-			buf = append(buf, frame.Float32(0)...)
-			return nil
-		})
-
-		if errorsx.Ignore(err, io.EOF) != nil {
-			pcmPool.Put(buf[:0]) // nolint: staticcheck
-			return nil, err
-		}
-
-		results[i] = buf
+	if err = reader.Seek(best, seg.OffsetSec); err != nil {
+		return nil, err
 	}
 
-	return results, nil
+	buf := pcmPool.Get().([]float32)[:0]
+	endTs := seg.OffsetSec + seg.DurationSec
+
+	err = reader.DecodeWithContext(ctx, decoders, func(_ int, frame *ffmpeg.Frame) error {
+		if frame.Type() != media.AUDIO {
+			return nil
+		}
+		if ts := frame.Ts(); ts != ffmpeg.TS_UNDEFINED && ts >= endTs {
+			return io.EOF
+		}
+		buf = append(buf, frame.Float32(0)...)
+		return nil
+	})
+	if err != nil {
+		pcmPool.Put(buf[:0]) // nolint: staticcheck
+		return nil, err
+	}
+
+	return buf, nil
 }

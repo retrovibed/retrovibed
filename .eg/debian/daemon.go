@@ -39,8 +39,8 @@ func init() {
 		egdebuild.Option.Version("0.0.:autopatch:"),
 		egdebuild.Option.Description("media distribution platform", "provides torrenting functionality with builtin media player and cloud storage allowing you to take your content anywhere you go"),
 		egdebuild.Option.Debian(errorsx.Must(fs.Sub(debskel, ".debskel"))),
-		egdebuild.Option.DependsBuild("golang-1.26", "dh-make", "debhelper", "duckdb"),
-		egdebuild.Option.Depends("duckdb"),
+		egdebuild.Option.DependsBuild("golang-1.26", "dh-make", "debhelper", "duckdb", "libavcodec-dev", "libavformat-dev", "libavutil-dev", "libswresample-dev", "libavfilter-dev", "libavdevice-dev", "libswscale-dev"),
+		egdebuild.Option.Depends("duckdb", "ffmpeg"),
 	)
 }
 
