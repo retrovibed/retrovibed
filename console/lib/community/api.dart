@@ -213,7 +213,6 @@ class API {
     req.sync = uuidx.min();
     if (req.limit.isZero) req.limit = fixnum.Int64(100);
 
-    print("DERP DERP ${httpx.metaendpoint()}");
     return httpx
         .get(
           Uri.https(

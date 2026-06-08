@@ -3,8 +3,8 @@ module github.com/retrovibed/retrovibed/retroapi
 go 1.26.3
 
 require (
+	github.com/brianvoe/gofakeit/v7 v7.15.0
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
-	github.com/go-faker/faker/v4 v4.6.1
 	github.com/go-playground/form/v4 v4.3.0
 	github.com/gofrs/uuid/v5 v5.4.0
 	github.com/golang-jwt/jwt/v5 v5.3.1
@@ -54,6 +54,5 @@ require (
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	golang.org/x/sync v0.20.0 // indirect
-	golang.org/x/text v0.37.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

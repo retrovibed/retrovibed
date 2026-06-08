@@ -3,7 +3,7 @@ package backoffx_test
 import (
 	"os"
 
-	"github.com/retrovibed/retrovibed/retroapi/internal/testx"
+	"github.com/retrovibed/retrovibed/retroapi/testx"
 
 	"testing"
 )

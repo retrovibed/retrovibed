@@ -8,10 +8,10 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
-	"github.com/retrovibed/retrovibed/shallows/internal/testx"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

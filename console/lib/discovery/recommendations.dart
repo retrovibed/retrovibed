@@ -95,6 +95,11 @@ class _RecommendationsState extends State<Recommendations> {
                         options: [authn.request(authn.AuthzCache.meta(context))],
                       ),
                     )
+                    .catchError((cause) {
+                      setState(() {
+                        _cause = ds.Errors.httpauto(cause, onTap: reseterr);
+                      });
+                    }, test: httpx.ErrorsTest.httpauto)
                     .then((_) => _load());
               },
             ),

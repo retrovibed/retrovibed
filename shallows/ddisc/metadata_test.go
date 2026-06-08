@@ -1,4 +1,4 @@
-//go:build !darwin && ffmpeg_enabled
+//go:build !(darwin || ffmpeg_disabled)
 
 package ddisc_test
 
@@ -6,9 +6,9 @@ import (
 	"io"
 	"testing"
 
+	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
-	"github.com/retrovibed/retrovibed/shallows/internal/testx"
 	"github.com/stretchr/testify/require"
 )
 
@@ -18,28 +18,28 @@ func TestAudioMetadata(t *testing.T) {
 	t.Run("example.1.flac", func(t *testing.T) {
 		extract, err := ddisc.Extract(testx.Read(".fixtures", t.Name()))
 		require.NoError(t, err)
-		require.Equal(t, "retrovibed - example 1 01 vibed", extract.Music.Metadata.String())
+		require.Equal(t, "retrovibed - example 1 01 vibed", extract.Music.String())
 	})
 
 	t.Run("example.2.flac", func(t *testing.T) {
 		// missing track test
 		extract, err := ddisc.Extract(testx.Read(".fixtures", t.Name()))
 		require.NoError(t, err)
-		require.Equal(t, "retrovibed - example 1 vibed", extract.Music.Metadata.String())
+		require.Equal(t, "retrovibed - example 1 vibed", extract.Music.String())
 	})
 
 	t.Run("example.3.flac", func(t *testing.T) {
 		// missing artist test
 		extract, err := ddisc.Extract(testx.Read(".fixtures", t.Name()))
 		require.NoError(t, err)
-		require.Equal(t, "example 1 01 vibed", extract.Music.Metadata.String())
+		require.Equal(t, "example 1 01 vibed", extract.Music.String())
 	})
 
 	t.Run("example.4.flac", func(t *testing.T) {
 		// missing album test
 		extract, err := ddisc.Extract(testx.Read(".fixtures", t.Name()))
 		require.NoError(t, err)
-		require.Equal(t, "retrovibed 01 vibed", extract.Music.Metadata.String())
+		require.Equal(t, "retrovibed 01 vibed", extract.Music.String())
 	})
 }
 

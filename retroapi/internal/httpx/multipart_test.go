@@ -13,7 +13,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/cryptox"
 	"github.com/retrovibed/retrovibed/retroapi/internal/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/md5x"
-	"github.com/retrovibed/retrovibed/retroapi/internal/testx"
+	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/stretchr/testify/require"
 )
 

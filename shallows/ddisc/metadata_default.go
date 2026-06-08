@@ -1,4 +1,4 @@
-//go:build !darwin && ffmpeg_enabled
+//go:build !(darwin || ffmpeg_disabled)
 
 package ddisc
 

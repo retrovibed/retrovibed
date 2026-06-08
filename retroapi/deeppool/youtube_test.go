@@ -10,7 +10,7 @@ import (
 
 	"github.com/retrovibed/retrovibed/retroapi/deeppool"
 	"github.com/retrovibed/retrovibed/retroapi/internal/httpx"
-	"github.com/retrovibed/retrovibed/retroapi/internal/testx"
+	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/stretchr/testify/require"
 )
 

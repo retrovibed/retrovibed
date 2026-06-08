@@ -7,10 +7,10 @@ import (
 	"testing"
 
 	_ "github.com/duckdb/duckdb-go/v2"
+	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sshx"
-	"github.com/retrovibed/retrovibed/shallows/internal/testx"
 	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/stretchr/testify/require"
 )
