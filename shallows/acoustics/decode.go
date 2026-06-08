@@ -1,4 +1,4 @@
-//go:build !darwin && ffmpeg_enabled
+//go:build !darwin
 
 package acoustics
 
@@ -55,17 +55,6 @@ func decodeSegment(ctx context.Context, path string, seg Segment) ([]float32, er
 		return nil, err
 	}
 
-	decoders, err := reader.Map(func(stream int, p *ffmpeg.Par) (*ffmpeg.Par, error) {
-		if stream == best {
-			return par, nil
-		}
-		return nil, nil
-	})
-	if err != nil {
-		return nil, err
-	}
-	defer decoders.Close()
-
 	if err = reader.Seek(best, seg.OffsetSec); err != nil {
 		return nil, err
 	}
@@ -73,7 +62,12 @@ func decodeSegment(ctx context.Context, path string, seg Segment) ([]float32, er
 	buf := pcmPool.Get().([]float32)[:0]
 	endTs := seg.OffsetSec + seg.DurationSec
 
-	err = reader.DecodeWithContext(ctx, decoders, func(_ int, frame *ffmpeg.Frame) error {
+	err = reader.Demux(ctx, func(stream int, p *ffmpeg.Par) (*ffmpeg.Par, error) {
+		if stream == best {
+			return par, nil
+		}
+		return nil, nil
+	}, func(_ int, frame *ffmpeg.Frame) error {
 		if frame.Type() != media.AUDIO {
 			return nil
 		}
@@ -82,7 +76,8 @@ func decodeSegment(ctx context.Context, path string, seg Segment) ([]float32, er
 		}
 		buf = append(buf, frame.Float32(0)...)
 		return nil
-	})
+	}, nil)
+
 	if err != nil {
 		pcmPool.Put(buf[:0]) // nolint: staticcheck
 		return nil, err
