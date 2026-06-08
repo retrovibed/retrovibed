@@ -30,7 +30,7 @@ require (
 	github.com/justinas/alice v1.2.0
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/michiwend/gomusicbrainz v0.0.0-20181012083520-6c07e13dd396
-	github.com/mutablelogic/go-media v1.7.7
+	github.com/mutablelogic/go-media v1.8.3
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/profile v1.7.0
 	github.com/pressly/goose/v3 v3.27.0
