@@ -1,7 +1,7 @@
 -- +goose Up
 -- +goose StatementBegin
 
-INSTALL vss; LOAD vss;
+LOAD vss;
 SET hnsw_enable_experimental_persistence = true;
 
 CREATE TABLE audio_features (
