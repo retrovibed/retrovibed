@@ -66,7 +66,7 @@ func compile(runtime shell.Command, cmakeconfigs ...string) eg.OpFn {
 		cfg := cmake().
 			set("EXTENSION_STATIC_BUILD", "1"). // this needs to happen *before* our configurations are loaded. jfc.
 			quoted("DUCKDB_EXTENSION_CONFIGS", strings.Join(cmakeconfigs, ";")).
-			quoted("BUILD_EXTENSIONS", "inet;autocomplete;json;parquet;icu;vss")
+			quoted("BUILD_EXTENSIONS", "inet;autocomplete;json;parquet;icu")
 		return shell.Run(
 			ctx,
 			sruntime.Newf("cmake -G \"Ninja\" -S . -B ${BUILD_DIRECTORY_REL} %s ${EXTRA_CMAKE_VARIABLES}", cfg).
