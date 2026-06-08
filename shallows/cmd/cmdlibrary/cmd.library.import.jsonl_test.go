@@ -7,10 +7,10 @@ import (
 
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 
+	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
-	"github.com/retrovibed/retrovibed/shallows/internal/testx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/stretchr/testify/require"
 )

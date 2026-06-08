@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
+	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/daemons"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
@@ -17,7 +18,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
-	"github.com/retrovibed/retrovibed/shallows/internal/testx"
 	"github.com/retrovibed/retrovibed/shallows/internal/torrenttestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/library"

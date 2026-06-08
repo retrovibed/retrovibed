@@ -29,7 +29,6 @@ require (
 	github.com/james-lawrence/torrent v0.0.0-20260604222541-a8807b62f578
 	github.com/justinas/alice v1.2.0
 	github.com/logrusorgru/aurora v2.0.3+incompatible
-	github.com/mattn/go-isatty v0.0.21
 	github.com/michiwend/gomusicbrainz v0.0.0-20181012083520-6c07e13dd396
 	github.com/mutablelogic/go-media v1.7.7
 	github.com/pkg/errors v0.9.1
@@ -123,6 +122,7 @@ require (
 	github.com/lann/ps v0.0.0-20150810152359-62de8c46ede0 // indirect
 	github.com/lib/pq v1.10.9 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
+	github.com/mattn/go-isatty v0.0.21 // indirect
 	github.com/mattn/go-localereader v0.0.1 // indirect
 	github.com/mattn/go-runewidth v0.0.16 // indirect
 	github.com/mfridman/interpolate v0.0.2 // indirect
@@ -165,7 +165,6 @@ require (
 
 require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
-	github.com/go-faker/faker/v4 v4.6.1
 	github.com/google/pprof v0.0.0-20260402051712-545e8a4df936 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect

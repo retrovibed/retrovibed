@@ -8,7 +8,7 @@ import (
 	"github.com/james-lawrence/torrent/autobind"
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/storage"
-	"github.com/retrovibed/retrovibed/retroapi/internal/testx"
+	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/time/rate"
 )

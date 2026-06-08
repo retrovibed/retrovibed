@@ -232,6 +232,11 @@ github.com/bits-and-blooms/bloom/v3
 # github.com/bradfitz/iter v0.0.0-20191230175014-e8f45d346db8
 ## explicit; go 1.11
 github.com/bradfitz/iter
+# github.com/brianvoe/gofakeit/v7 v7.15.0
+## explicit; go 1.22
+github.com/brianvoe/gofakeit/v7
+github.com/brianvoe/gofakeit/v7/data
+github.com/brianvoe/gofakeit/v7/source
 # github.com/catppuccin/go v0.3.0
 ## explicit; go 1.19
 github.com/catppuccin/go
@@ -451,13 +456,6 @@ github.com/gabriel-vasile/mimetype/internal/json
 github.com/gabriel-vasile/mimetype/internal/magic
 github.com/gabriel-vasile/mimetype/internal/markup
 github.com/gabriel-vasile/mimetype/internal/scan
-# github.com/go-faker/faker/v4 v4.6.1
-## explicit; go 1.18
-github.com/go-faker/faker/v4
-github.com/go-faker/faker/v4/pkg/errors
-github.com/go-faker/faker/v4/pkg/interfaces
-github.com/go-faker/faker/v4/pkg/options
-github.com/go-faker/faker/v4/pkg/slice
 # github.com/go-logr/logr v1.4.3
 ## explicit; go 1.18
 github.com/go-logr/logr

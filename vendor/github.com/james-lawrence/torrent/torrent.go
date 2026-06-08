@@ -379,12 +379,7 @@ func TuneSeeding(t *torrent) error {
 }
 
 func TuneComplete(t *torrent) error {
-	if t.chunks.Incomplete() {
-		return nil
-	}
-
 	t.pieceStateChanges.Publish(TorrentComplete{})
-
 	return nil
 }
 
@@ -488,7 +483,7 @@ func Verify(ctx context.Context, t Torrent) error {
 		return errorsx.Compact(context.Cause(ctx), ctx.Err())
 	}
 
-	return t.Tune(TuneVerifyFull, TuneComplete)
+	return t.Tune(TuneVerifyFull)
 }
 
 // returns a bitmap of the verified data within the storage implementation.

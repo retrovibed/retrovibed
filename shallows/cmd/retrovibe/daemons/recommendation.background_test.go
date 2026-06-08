@@ -3,11 +3,11 @@ package daemons_test
 import (
 	"testing"
 
+	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/daemons"
 	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
-	"github.com/retrovibed/retrovibed/shallows/internal/testx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/stretchr/testify/require"
 )

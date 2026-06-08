@@ -7,10 +7,10 @@ import (
 	"github.com/james-lawrence/torrent/dht/int160"
 
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
+	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/internal/cryptox"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
-	"github.com/retrovibed/retrovibed/shallows/internal/testx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/retrovibed/retrovibed/shallows/media"

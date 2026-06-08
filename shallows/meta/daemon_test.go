@@ -3,8 +3,8 @@ package meta_test
 import (
 	"testing"
 
+	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
-	"github.com/retrovibed/retrovibed/shallows/internal/testx"
 	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/stretchr/testify/require"
 )
