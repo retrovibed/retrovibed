@@ -16,10 +16,10 @@ import (
 )
 
 func testBuildTags() []string {
-	return []string{"duckdb_use_lib", "ffmpeg_enabled"}
+	return []string{"duckdb_use_lib"}
 }
 
-var buildTags = []string{"duckdb_use_lib", "retrovibed", "neural", "ffmpeg_enabled"}
+var buildTags = []string{"duckdb_use_lib", "retrovibed", "neural"}
 
 func rootdir() string {
 	return egenv.WorkingDirectory("shallows")
