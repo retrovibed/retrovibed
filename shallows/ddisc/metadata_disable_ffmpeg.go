@@ -1,4 +1,4 @@
-//go:build darwin || ffmpeg_disabled
+//go:build darwin || android || ffmpeg_disabled
 
 package ddisc
 
