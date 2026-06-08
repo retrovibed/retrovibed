@@ -3,6 +3,7 @@ duckdb_extension_load(autocomplete)
 duckdb_extension_load(json)
 duckdb_extension_load(parquet)
 duckdb_extension_load(icu)
+duckdb_extension_load(vss)
 
 set(BUILD_UNITTESTS 0 CACHE BOOL "Disable unit tests" FORCE)
 set(BUILD_SHELL 0 CACHE BOOL "Disable CLI shell" FORCE)
