@@ -14,7 +14,7 @@ require (
 	github.com/coder/websocket v1.8.14
 	github.com/cyruzin/golang-tmdb v1.9.3
 	github.com/dashotv/tvdb v0.5.2
-	github.com/duckdb/duckdb-go/v2 v2.10502.0
+	github.com/duckdb/duckdb-go/v2 v2.10503.1
 	github.com/fsnotify/fsnotify v1.10.1
 	github.com/gabriel-vasile/mimetype v1.4.13
 	github.com/go-playground/form/v4 v4.3.0
@@ -81,12 +81,12 @@ require (
 	github.com/charmbracelet/x/term v0.2.1 // indirect
 	github.com/csnewman/flutter-go-bridge v0.2.0 // indirect
 	github.com/djthorpe/go-errors v1.0.3 // indirect
-	github.com/duckdb/duckdb-go-bindings v0.10502.0 // indirect
-	github.com/duckdb/duckdb-go-bindings/lib/darwin-amd64 v0.10502.0 // indirect
-	github.com/duckdb/duckdb-go-bindings/lib/darwin-arm64 v0.10502.0 // indirect
-	github.com/duckdb/duckdb-go-bindings/lib/linux-amd64 v0.10502.0 // indirect
-	github.com/duckdb/duckdb-go-bindings/lib/linux-arm64 v0.10502.0 // indirect
-	github.com/duckdb/duckdb-go-bindings/lib/windows-amd64 v0.10502.0 // indirect
+	github.com/duckdb/duckdb-go-bindings v0.10503.0 // indirect
+	github.com/duckdb/duckdb-go-bindings/lib/darwin-amd64 v0.10503.0 // indirect
+	github.com/duckdb/duckdb-go-bindings/lib/darwin-arm64 v0.10503.0 // indirect
+	github.com/duckdb/duckdb-go-bindings/lib/linux-amd64 v0.10503.0 // indirect
+	github.com/duckdb/duckdb-go-bindings/lib/linux-arm64 v0.10503.0 // indirect
+	github.com/duckdb/duckdb-go-bindings/lib/windows-amd64 v0.10503.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/ebitengine/purego v0.10.0 // indirect
 	github.com/edsrzf/mmap-go v1.2.0 // indirect
