@@ -40,5 +40,5 @@ func TestLinuxMonitorInitialState(t *testing.T) {
 		break
 	}
 	require.NotNil(t, got)
-	require.NotEmpty(t, got.Interfaces, "expected at least one interface with IPs")
+	require.NotEmpty(t, got.Networks, "expected at least one network prefix")
 }
