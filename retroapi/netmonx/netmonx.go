@@ -223,6 +223,10 @@ func (m *Monitor) SetMetered(b bool) {
 	}
 }
 
+func (m *Monitor) Current() *State {
+	return m.current.Load()
+}
+
 func (m *Monitor) Err() error {
 	return m.err
 }

@@ -47,6 +47,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/time/rate"
+	"golang.zx2c4.com/wireguard/device"
 	"golang.zx2c4.com/wireguard/tun/netstack"
 	"google.golang.org/protobuf/proto"
 )
@@ -93,6 +94,7 @@ func newTorrenting(db *sql.DB, id ssh.Signer, root, media, tvfs fsx.Virtual, mc 
 		mc:            mc,
 		_tclient:      &atomic.Pointer[torrent.Client]{},
 		_dnscache:     dnscache.AutoProxyResolver(),
+		_wgdev:        &atomic.Pointer[device.Device]{},
 	}
 }
 
@@ -113,6 +115,7 @@ type _torrenting struct {
 	socks5        net.Listener
 	_tclient      *atomic.Pointer[torrent.Client]
 	_dnscache     *dnscache.ProxyPtr
+	_wgdev        *atomic.Pointer[device.Device]
 	cond          *sync.Cond
 }
 
@@ -135,6 +138,13 @@ func (t _torrenting) loadcfg(path string, v proto.Message) error {
 	proto.Merge(v, d)
 
 	return nil
+}
+
+func (t *_torrenting) WireguardSnapshot() (wireguardx.Statistics, error) {
+	if dev := t._wgdev.Load(); dev != nil {
+		return wireguardx.Snapshot(dev)
+	}
+	return wireguardx.Statistics{}, nil
 }
 
 func (t *_torrenting) Reload(ctx context.Context, cfg *TorrentSettings, disc *DiscoverySettings) error {
@@ -341,9 +351,11 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 
 		log.Println("loaded wireguard configuration", path)
 
-		if wgnet, err = torrentx.WireguardSocket(dctx, wcfg); err != nil {
+		var wgdev *device.Device
+		if wgnet, wgdev, err = torrentx.WireguardSocket(dctx, wcfg); err != nil {
 			return errorsx.Wrap(err, "unable to setup wireguard tunnel")
 		}
+		t._wgdev.Store(wgdev)
 
 		log.Println("------------------------------------", cfg.Port, wgcfg.Port, "------------------------------------")
 		t._dnscache.Store(

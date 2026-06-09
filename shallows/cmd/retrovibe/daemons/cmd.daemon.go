@@ -337,6 +337,9 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	metaapi.NewHTTPUsermanagement(db).Bind(metamux.PathPrefix("/u12t").Subrouter())
 	metaapi.NewHTTPDaemons(db).Bind(metamux.PathPrefix("/d").Subrouter())
 	metaapi.NewHTTPAuthz(db).Bind(metamux.PathPrefix("/authz").Subrouter())
+
+	diagmux := httpmux.PathPrefix("/diagnostics").Subrouter()
+	metaapi.NewHTTPDiagnostics(torrenting.WireguardSnapshot).Bind(diagmux.PathPrefix("/network").Subrouter())
 	media.NewHTTPLibrary(
 		db,
 		archival,
