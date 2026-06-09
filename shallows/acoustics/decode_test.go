@@ -3,12 +3,13 @@
 package acoustics
 
 import (
-	"context"
 	"encoding/binary"
 	"math"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 // writeWAV synthesizes a mono 16-bit PCM WAV sine wave at the requested rate and
@@ -42,27 +43,20 @@ func writeWAV(t *testing.T, sampleRate int, durationSec, freq float64) string {
 	}
 
 	path := filepath.Join(t.TempDir(), "tone.wav")
-	if err := os.WriteFile(path, b, 0o600); err != nil {
-		t.Fatalf("write wav: %v", err)
-	}
+	require.NoError(t, os.WriteFile(path, b, 0o600))
 	return path
 }
 
 func TestProbeDuration(t *testing.T) {
 	t.Run("returns the duration of a valid file", func(t *testing.T) {
 		dur, err := ProbeDuration(writeWAV(t, 44100, 12.0, 440))
-		if err != nil {
-			t.Fatalf("ProbeDuration: %v", err)
-		}
-		if dur < 11.0 || dur > 13.0 {
-			t.Fatalf("duration %.3fs, expected ~12s", dur)
-		}
+		require.NoError(t, err)
+		require.True(t, dur >= 11.0 && dur <= 13.0, "duration %.3fs, expected ~12s", dur)
 	})
 
 	t.Run("errors on a missing file", func(t *testing.T) {
-		if _, err := ProbeDuration(filepath.Join(t.TempDir(), "missing.wav")); err == nil {
-			t.Fatal("expected error for missing file")
-		}
+		_, err := ProbeDuration(filepath.Join(t.TempDir(), "missing.wav"))
+		require.Error(t, err)
 	})
 }
 
@@ -70,55 +64,84 @@ func TestDecodePCM(t *testing.T) {
 	t.Run("decodes every segment to mono float32 at SampleRate", func(t *testing.T) {
 		segments := SegmentsForDuration(12.0)
 
-		pcm, err := DecodePCM(context.Background(), writeWAV(t, 44100, 12.0, 440), segments)
-		if err != nil {
-			t.Fatalf("DecodePCM: %v", err)
-		}
-		defer returnPCMBuffers(pcm)
-
-		if len(pcm) != NumSegments {
-			t.Fatalf("got %d segments, expected %d", len(pcm), NumSegments)
-		}
+		pcm, err := DecodePCM(t.Context(), writeWAV(t, 44100, 12.0, 440), segments)
+		require.NoError(t, err)
+		require.Len(t, pcm, NumSegments)
 
 		expected := int(segments[0].DurationSec * SampleRate)
 		for i, seg := range pcm {
-			if len(seg) < expected/2 || len(seg) > expected*2 {
-				t.Fatalf("segment %d: %d samples, expected ~%d at %dHz", i, len(seg), expected, SampleRate)
-			}
+			require.True(t, len(seg) >= expected/2 && len(seg) <= expected*2,
+				"segment %d: %d samples, expected ~%d at %dHz", i, len(seg), expected, SampleRate)
 			for _, v := range seg {
 				// resampling overshoots the source's [-1, 1] slightly; this only
 				// guards against garbage, not exact normalization.
-				if v < -1.5 || v > 1.5 {
-					t.Fatalf("segment %d: sample %f far outside audio range", i, v)
-				}
+				require.True(t, v >= -1.5 && v <= 1.5,
+					"segment %d: sample %f far outside audio range", i, v)
 			}
 		}
 	})
 
 	t.Run("errors on a missing file", func(t *testing.T) {
-		_, err := DecodePCM(context.Background(), filepath.Join(t.TempDir(), "missing.wav"), SegmentsForDuration(12.0))
-		if err == nil {
-			t.Fatal("expected error for missing file")
-		}
+		_, err := DecodePCM(t.Context(), filepath.Join(t.TempDir(), "missing.wav"), SegmentsForDuration(12.0))
+		require.Error(t, err)
 	})
 
 	t.Run("errors on a non-media file", func(t *testing.T) {
 		path := filepath.Join(t.TempDir(), "notaudio.txt")
-		if err := os.WriteFile(path, []byte("this is not media"), 0o600); err != nil {
-			t.Fatalf("write file: %v", err)
-		}
-		if _, err := DecodePCM(context.Background(), path, SegmentsForDuration(12.0)); err == nil {
-			t.Fatal("expected error for non-media file")
-		}
+		require.NoError(t, os.WriteFile(path, []byte("this is not media"), 0o600))
+		_, err := DecodePCM(t.Context(), path, SegmentsForDuration(12.0))
+		require.Error(t, err)
+	})
+
+	t.Run("succeeds on concatenated MP3 with data inside the segment time range", func(t *testing.T) {
+		// .fixtures/decode.corrupted.example.1.mp3 is two identical 12s MP3s
+		// joined byte-for-byte. Generated with:
+		//   ffmpeg -f lavfi -i "sine=frequency=440:duration=12" -ar 44100 -ac 1 tone.wav
+		//   ffmpeg -i tone.wav -b:a 128k tone.mp3
+		//   cat tone.mp3 tone.mp3 > decode.corrupted.example.1.mp3
+		//
+		// FFmpeg emits "invalid concatenated file detected" on open. The segment
+		// ends well before the seam (6s < 12s) so decoding succeeds cleanly.
+		seg := Segment{OffsetSec: 0, DurationSec: 6.0}
+		buf, err := decodeSegment(t.Context(), ".fixtures/decode.corrupted.example.1.mp3", seg)
+		require.NoError(t, err)
+		require.NotEmpty(t, buf)
+	})
+
+	t.Run("succeeds on concatenated MP3 when corrupt region is beyond endTs", func(t *testing.T) {
+		// Same fixture as below. DurationSec=12 means endTs=12s, which is right at
+		// the seam; the frame callback sets done=true before Demux errors on the
+		// null region, so the error is suppressed and we get valid audio back.
+		seg := Segment{OffsetSec: 0.0, DurationSec: 12.0}
+		buf, err := decodeSegment(t.Context(), ".fixtures/decode.corrupted.example.2.mp3", seg)
+		require.NoError(t, err)
+		require.NotEmpty(t, buf)
+	})
+
+	t.Run("fails on concatenated MP3 with corrupt region within segment", func(t *testing.T) {
+		// .fixtures/decode.corrupted.example.2.mp3 is a 12s MP3 followed by an
+		// equal-sized block of null bytes. Generated with:
+		//   ffmpeg -f lavfi -i "sine=frequency=440:duration=12" -ar 44100 -ac 1 tone.wav
+		//   ffmpeg -i tone.wav -b:a 128k tone.mp3
+		//   SIZE=$(wc -c < tone.mp3)
+		//   cp tone.mp3 decode.corrupted.example.2.mp3
+		//   dd if=/dev/zero bs=$SIZE count=1 >> decode.corrupted.example.2.mp3
+		//
+		// FFmpeg estimates ~24s (bitrate × file size). endTs=16s extends into the
+		// null region; Demux hits AVERROR_INVALIDDATA before the frame callback
+		// ever fires, so done stays false and the error propagates. This documents
+		// the desired behavior (return available data rather than fail); it will
+		// fail until fixed.
+		seg := Segment{OffsetSec: 0.0, DurationSec: 16.0}
+		_, err := decodeSegment(t.Context(), ".fixtures/decode.corrupted.example.2.mp3", seg)
+		require.ErrorContains(t, err, "Invalid data found when processing input")
 	})
 }
 
 func TestAnalyzeFile(t *testing.T) {
 	t.Run("produces a non-zero vector from a real file", func(t *testing.T) {
-		fv, err := AnalyzeFile(context.Background(), writeWAV(t, 44100, 12.0, 440))
-		if err != nil {
-			t.Fatalf("AnalyzeFile: %v", err)
-		}
+		fv, err := AnalyzeFile(t.Context(), writeWAV(t, 44100, 12.0, 440))
+		require.NoError(t, err)
 
 		nonZero := 0
 		for _, v := range fv {
@@ -126,14 +149,11 @@ func TestAnalyzeFile(t *testing.T) {
 				nonZero++
 			}
 		}
-		if nonZero == 0 {
-			t.Fatal("expected a non-zero feature vector")
-		}
+		require.Positive(t, nonZero, "expected a non-zero feature vector")
 	})
 
 	t.Run("rejects a track shorter than the minimum", func(t *testing.T) {
-		if _, err := AnalyzeFile(context.Background(), writeWAV(t, 44100, 5.0, 440)); err == nil {
-			t.Fatal("expected error for sub-minimum track")
-		}
+		_, err := AnalyzeFile(t.Context(), writeWAV(t, 44100, 5.0, 440))
+		require.Error(t, err)
 	})
 }

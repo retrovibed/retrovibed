@@ -30,7 +30,6 @@ func DecodePCM(ctx context.Context, path string, segments []Segment) ([][]float3
 	for i, seg := range segments {
 		buf, err := decodeSegment(ctx, path, seg)
 		if err != nil {
-			returnPCMBuffers(results[:i])
 			return nil, err
 		}
 		results[i] = buf
@@ -39,6 +38,9 @@ func DecodePCM(ctx context.Context, path string, segments []Segment) ([][]float3
 }
 
 func decodeSegment(ctx context.Context, path string, seg Segment) ([]float32, error) {
+	var (
+		buf = make([]float32, 0, 330_750)
+	)
 	reader, err := ffmpeg.Open(path)
 	if err != nil {
 		return nil, err
@@ -59,27 +61,31 @@ func decodeSegment(ctx context.Context, path string, seg Segment) ([]float32, er
 		return nil, err
 	}
 
-	buf := pcmPool.Get().([]float32)[:0]
 	endTs := seg.OffsetSec + seg.DurationSec
 
+	var done bool
 	err = reader.Demux(ctx, func(stream int, p *ffmpeg.Par) (*ffmpeg.Par, error) {
 		if stream == best {
 			return par, nil
 		}
+
 		return nil, nil
 	}, func(_ int, frame *ffmpeg.Frame) error {
 		if frame.Type() != media.AUDIO {
 			return nil
 		}
+
 		if ts := frame.Ts(); ts != ffmpeg.TS_UNDEFINED && ts >= endTs {
+			done = true
 			return io.EOF
 		}
+
 		buf = append(buf, frame.Float32(0)...)
+
 		return nil
 	}, nil)
 
-	if err != nil {
-		pcmPool.Put(buf[:0]) // nolint: staticcheck
+	if err != nil && !done {
 		return nil, err
 	}
 
