@@ -19,6 +19,11 @@ import (
 )
 import "github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 
+//export fault
+func fault(code C.int) {
+	os.Exit(int(code))
+}
+
 //export build_version
 func build_version() *C.char {
 	version, err := cmdopts.BuildVersion()

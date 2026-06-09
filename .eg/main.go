@@ -34,11 +34,14 @@ func main() {
 					eg.Sequential(console.GenerateBinding, console.BuildLinux),
 					shallows.Compile(),
 				),
-				eg.Parallel(
-					console.Tests,
-					console.Linting,
-					shallows.Test(),
-					shallows.Linting,
+				eg.Sequential(
+					eg.Parallel(
+						console.Tests,
+						console.Linting,
+						shallows.Test(),
+						shallows.Linting,
+					),
+					console.RunDev("flutter run --target lib/main.smoke.dart"),
 				),
 			),
 		),

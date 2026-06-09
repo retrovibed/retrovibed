@@ -64,19 +64,18 @@ class _DaemonDropdownState extends State<DaemonDropdown> {
                 tooltip: "connect to another library",
                 onPressed: () {
                   setState(() {
-                    _optional =
-                        _optional != null
-                            ? null
-                            : ManualConfiguration(
-                              connect: (daemon) {
-                                setState(() {
-                                  _optional = null;
-                                });
-                                EndpointAuto.of(
-                                  context,
-                                )?.setdaemon(daemon).ignore();
-                              },
-                            );
+                    _optional = _optional != null
+                        ? null
+                        : ManualConfiguration(
+                            connect: (daemon) {
+                              setState(() {
+                                _optional = null;
+                              });
+                              EndpointAuto.of(
+                                context,
+                              )?.setdaemon(daemon).ignore();
+                            },
+                          );
                   });
                 },
                 icon: Icon(_optional == null ? Icons.add : Icons.remove),
@@ -103,7 +102,7 @@ class _DaemonDropdownState extends State<DaemonDropdown> {
               });
             },
           ),
-          if (_optional != null) _optional!,
+          ?_optional,
         ],
       ),
       widget.help ?? ds.Hint(const Text("select which daemon instance to configure from the dropdown")),

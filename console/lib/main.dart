@@ -1,7 +1,4 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:media_kit/media_kit.dart'; // Provides [Player], [Media], [Playlist] etc.
 
 import 'package:retrovibed/navbar.dart' as navbar;
 import 'package:retrovibed/billing.dart' as billing;
@@ -15,12 +12,10 @@ import 'package:retrovibed/meta.dart' as meta;
 import 'package:retrovibed/retrovibed.dart' as retro;
 import 'package:retrovibed/deeplink.dart';
 import 'package:retrovibed/netmonx/metered.dart';
-import 'package:retrovibed/env.dart' as env;
 import 'package:retrovibed/design.kit/theme.defaults.dart' as theming;
 import 'package:retrovibed/design.kit/modals.dart' as modals;
 import 'package:retrovibed/community.dart' as community;
 import 'package:retrovibed/mimex.dart' as mimex;
-import 'package:window_manager/window_manager.dart';
 
 TextScaler autoscaling(BuildContext context) {
   // final width = MediaQuery.of(context).size.width;
@@ -37,48 +32,23 @@ TextScaler autoscaling(BuildContext context) {
 }
 
 void main() async {
-  print("build version ${retro.build_version()}");
-  // env.printSystemEnv();
-  print("cp 0");
-  WidgetsFlutterBinding.ensureInitialized();
-  print("cp 1");
-  HttpOverrides.global = meta.DaemonHttpOverrides();
-  print("cp 2");
-  retro.logging();
-  print("cp 3");
-  await env.xdg();
-  print("cp 4");
-  // checkpointing the database on initialization prevents
-  // a significant number of issues due to hard shutdowns and state corruption
-  // issues.
-  retro.checkpointdb();
-  print("cp 5");
-  if (theming.Defaults.defaults.desktop) {
-    await windowManager.ensureInitialized();
-    await Future.wait([
-      windowManager.setTitleBarStyle(TitleBarStyle.hidden),
-      windowManager.maximize(),
-    ]);
-  }
-  print("cp 6");
-  MediaKit.ensureInitialized();
-  print("cp 7");
+  await retro.run(() {
+    FlutterError.onError = (FlutterErrorDetails details) {
+      FlutterError.dumpErrorToConsole(details);
+    };
 
-  FlutterError.onError = (FlutterErrorDetails details) {
-    FlutterError.dumpErrorToConsole(details);
-  };
+    ErrorWidget.builder = (FlutterErrorDetails details) {
+      FlutterError.dumpErrorToConsole(details);
+      return Material(
+        child: InkWell(
+          onTap: () => WidgetsBinding.instance.addPostFrameCallback((_) => runApp(Retrovibed())),
+          child: const Center(child: Text('Something went wrong. Tap to restart.')),
+        ),
+      );
+    };
 
-  ErrorWidget.builder = (FlutterErrorDetails details) {
-    FlutterError.dumpErrorToConsole(details);
-    return Material(
-      child: InkWell(
-        onTap: () => WidgetsBinding.instance.addPostFrameCallback((_) => runApp(Retrovibed())),
-        child: const Center(child: Text('Something went wrong. Tap to restart.')),
-      ),
-    );
-  };
-
-  runApp(Retrovibed());
+    runApp(Retrovibed());
+  });
 }
 
 final ds.AsyncVoidCallback _startdaemon = ds.toasync(ds.once(retro.daemon));
@@ -201,13 +171,12 @@ class Retrovibed extends StatelessWidget {
                                         ),
                                       );
                                       return Scaffold(
-                                        appBar:
-                                            (!compact && !nochrome)
-                                                ? PreferredSize(
-                                                  preferredSize: Size.fromHeight(kTextTabBarHeight),
-                                                  child: tabs,
-                                                )
-                                                : null,
+                                        appBar: (!compact && !nochrome)
+                                            ? PreferredSize(
+                                                preferredSize: Size.fromHeight(kTextTabBarHeight),
+                                                child: tabs,
+                                              )
+                                            : null,
                                         bottomNavigationBar: (compact && !nochrome) ? tabs : null,
                                         body: ds.ErrorBoundary(
                                           TabBarView(

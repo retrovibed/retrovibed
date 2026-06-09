@@ -44,6 +44,17 @@ class DaemonBridge {
   late final __GoStringPtrPtr = _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function(_GoString_)>>('_GoStringPtr');
   late final __GoStringPtr = __GoStringPtrPtr.asFunction<ffi.Pointer<ffi.Char> Function(_GoString_)>();
 
+  void fault(
+    int code,
+  ) {
+    return _fault(
+      code,
+    );
+  }
+
+  late final _faultPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int)>>('fault');
+  late final _fault = _faultPtr.asFunction<void Function(int)>();
+
   ffi.Pointer<ffi.Char> build_version() {
     return _build_version();
   }
@@ -76,8 +87,8 @@ class DaemonBridge {
   late final _authn_bearer_hostPtr = _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function(ffi.Pointer<ffi.Char>)>>(
     'authn_bearer_host',
   );
-  late final _authn_bearer_host =
-      _authn_bearer_hostPtr.asFunction<ffi.Pointer<ffi.Char> Function(ffi.Pointer<ffi.Char>)>();
+  late final _authn_bearer_host = _authn_bearer_hostPtr
+      .asFunction<ffi.Pointer<ffi.Char> Function(ffi.Pointer<ffi.Char>)>();
 
   ffi.Pointer<ffi.Char> public_key() {
     return _public_key();
@@ -192,8 +203,8 @@ class DaemonBridge {
       _lookup<ffi.NativeFunction<ffi.Int Function(ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.UnsignedChar>, ffi.Int)>>(
         'validatecert',
       );
-  late final _validatecert =
-      _validatecertPtr.asFunction<int Function(ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.UnsignedChar>, int)>();
+  late final _validatecert = _validatecertPtr
+      .asFunction<int Function(ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.UnsignedChar>, int)>();
 }
 
 typedef ptrdiff_t = ffi.Long;
