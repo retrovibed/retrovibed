@@ -169,7 +169,7 @@ func Autosocket(_dht *dht.Server, p uint16, cl *retronetx.ConnLimit) (_ torrent.
 	).Options(torrent.BinderOptionDHT(_dht)), nil
 }
 
-func WireguardSocket(ctx context.Context, wcfg *wireguardx.Config) (_ *netstack.Net, err error) {
+func WireguardSocket(ctx context.Context, wcfg *wireguardx.Config) (_ *netstack.Net, _ *device.Device, err error) {
 	var (
 		// logger    = device.NewLogger(device.LogLevelError, "")
 		logger = device.NewLogger(device.LogLevelVerbose, "")
@@ -181,7 +181,7 @@ func WireguardSocket(ctx context.Context, wcfg *wireguardx.Config) (_ *netstack.
 		langx.FirstNonZero(int(wcfg.Interface.MTU), wireguardx.DefaultMTU),
 	)
 	if err != nil {
-		return nil, errorsx.Wrap(err, "failed to create network tun device")
+		return nil, nil, errorsx.Wrap(err, "failed to create network tun device")
 	}
 
 	dev := device.NewDevice(tun, conn.NewDefaultBind(), logger)
@@ -203,15 +203,15 @@ func WireguardSocket(ctx context.Context, wcfg *wireguardx.Config) (_ *netstack.
 
 	for _, ipcset := range wireguardx.FormatIPCSet(wcfg) {
 		if err = dev.IpcSet(ipcset); err != nil {
-			return nil, errorsx.Wrap(err, "invalid ipcset for peer")
+			return nil, nil, errorsx.Wrap(err, "invalid ipcset for peer")
 		}
 	}
 
 	if err = dev.Up(); err != nil {
-		return nil, errorsx.Wrap(err, "network device failed to come up")
+		return nil, nil, errorsx.Wrap(err, "network device failed to come up")
 	}
 
-	return tnet, nil
+	return tnet, dev, nil
 }
 
 func SetupTorrentBinder(tnet *netstack.Net, port uint16, cl *retronetx.ConnLimit, opts ...torrent.BinderOption) (_ torrent.Binder, err error) {

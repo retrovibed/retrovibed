@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package meta;
+
+message WireguardDiagnostics {
+  string peer_key           = 1 [ json_name = "peer_key" ];
+  uint64 keepalive_interval = 2 [ json_name = "keepalive_interval" ];
+  uint64 tx_bytes           = 3 [ json_name = "tx_bytes" ];
+  uint64 rx_bytes           = 4 [ json_name = "rx_bytes" ];
+  int64  last_handshake_sec = 5 [ json_name = "last_handshake_sec" ];
+  string status             = 6 [ json_name = "status" ];
+}
+
+message NetworkInterface {
+  string name    = 1 [ json_name = "name" ];
+  string ip      = 2 [ json_name = "ip" ];
+  bool   metered = 3 [ json_name = "metered" ];
+}
+
+message Network {
+  repeated NetworkInterface interfaces        = 1 [ json_name = "interfaces" ];
+  bool                      have_v4           = 2 [ json_name = "have_v4" ];
+  bool                      have_v6           = 3 [ json_name = "have_v6" ];
+  string                    default_interface = 4 [ json_name = "default_interface" ];
+}
+
+message NetworkMetricsResponse {
+  WireguardDiagnostics wireguard = 1 [ json_name = "wireguard" ];
+  Network              network   = 2 [ json_name = "network" ];
+}

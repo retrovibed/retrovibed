@@ -47,16 +47,16 @@ func Metered() bool {
 	return m.Metered()
 }
 
-// InterfaceDetails holds the addresses and metered status of a single interface.
-type InterfaceDetails struct {
+// NetworkDetails holds the address and metered status of a single network prefix.
+type NetworkDetails struct {
 	Name    string
-	IPs     []netip.Prefix
+	IP      netip.Prefix
 	Metered bool
 }
 
 // State represents a snapshot of network interface state.
 type State struct {
-	Interfaces            []InterfaceDetails
+	Networks              []NetworkDetails
 	HaveV4                bool
 	HaveV6                bool
 	DefaultRouteInterface string
@@ -161,7 +161,7 @@ func (m *Monitor) refresh() {
 		Old:                     old,
 		New:                     newState,
 		DefaultInterfaceChanged: old.DefaultRouteInterface != newState.DefaultRouteInterface,
-		InterfaceIPsChanged:     !interfacesEqual(old.Interfaces, newState.Interfaces),
+		InterfaceIPsChanged:     !networksEqual(old.Networks, newState.Networks),
 	}
 
 	select {
@@ -190,6 +190,10 @@ func (m *Monitor) Each(ctx context.Context) iter.Seq[ChangeDelta] {
 	}
 }
 
+func (m *Monitor) Snapshot() *State {
+	return m.current.Load()
+}
+
 func (m *Monitor) Metered() bool {
 	if metered := langx.Zero(m.metered.Load()); metered {
 		return true
@@ -200,9 +204,9 @@ func (m *Monitor) Metered() bool {
 		return true
 	}
 
-	for _, iface := range s.Interfaces {
-		if iface.Name == s.DefaultRouteInterface {
-			return iface.Metered
+	for _, n := range s.Networks {
+		if n.Name == s.DefaultRouteInterface {
+			return n.Metered
 		}
 	}
 
@@ -217,6 +221,10 @@ func (m *Monitor) SetMetered(b bool) {
 	case m.notify <- struct{}{}:
 	default:
 	}
+}
+
+func (m *Monitor) Current() *State {
+	return m.current.Load()
 }
 
 func (m *Monitor) Err() error {
@@ -251,7 +259,7 @@ func getState() (*State, error) {
 			continue
 		}
 
-		var prefixes []netip.Prefix
+		metered := langx.FirstNonZero(platformMetered(iface.Name), isMeteredInterface(iface.Name))
 		for _, addr := range addrs {
 			var prefix netip.Prefix
 			switch v := addr.(type) {
@@ -276,19 +284,15 @@ func getState() (*State, error) {
 			if a.IsLoopback() || a.IsLinkLocalUnicast() {
 				continue
 			}
-			prefixes = append(prefixes, prefix)
 			if a.Is4() {
 				s.HaveV4 = true
 			} else if a.Is6() {
 				s.HaveV6 = true
 			}
-		}
-
-		if len(prefixes) > 0 {
-			s.Interfaces = append(s.Interfaces, InterfaceDetails{
+			s.Networks = append(s.Networks, NetworkDetails{
 				Name:    iface.Name,
-				IPs:     prefixes,
-				Metered: langx.FirstNonZero(platformMetered(iface.Name), isMeteredInterface(iface.Name)),
+				IP:      prefix,
+				Metered: metered,
 			})
 		}
 	}
@@ -312,36 +316,19 @@ func statesEqual(a, b *State) bool {
 	return a.HaveV4 == b.HaveV4 &&
 		a.HaveV6 == b.HaveV6 &&
 		a.DefaultRouteInterface == b.DefaultRouteInterface &&
-		interfacesEqual(a.Interfaces, b.Interfaces)
+		networksEqual(a.Networks, b.Networks)
 }
 
-func interfacesEqual(a, b []InterfaceDetails) bool {
+func networksEqual(a, b []NetworkDetails) bool {
 	if len(a) != len(b) {
 		return false
 	}
-	bByName := make(map[string]InterfaceDetails, len(b))
-	for _, d := range b {
-		bByName[d.Name] = d
+	set := make(map[NetworkDetails]bool, len(a))
+	for _, n := range a {
+		set[n] = true
 	}
-	for _, da := range a {
-		db, ok := bByName[da.Name]
-		if !ok || da.Metered != db.Metered || !prefixSetsEqual(da.IPs, db.IPs) {
-			return false
-		}
-	}
-	return true
-}
-
-func prefixSetsEqual(a, b []netip.Prefix) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	set := make(map[netip.Prefix]bool, len(a))
-	for _, p := range a {
-		set[p] = true
-	}
-	for _, p := range b {
-		if !set[p] {
+	for _, n := range b {
+		if !set[n] {
 			return false
 		}
 	}
