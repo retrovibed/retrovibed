@@ -45,7 +45,11 @@ func acousticsIndexOne(ctx context.Context, q sqlx.Queryer, media fs.FS, id stri
 
 	vec, err := acoustics.AnalyzeFile(ctx, tmpPath)
 	if err != nil {
-		return errorsx.Wrap(err, "acoustics: analyze file")
+		// the file is permanently undecodable (corrupt, unsupported, or too short);
+		// mark it failed so it is not retried on every pass. transient failures
+		// (e.g. copyToTemp above) still return and retry.
+		log.Println("acoustics: unindexable, marking failed", id, err)
+		return errorsx.Wrap(acoustics.StoreFailed(ctx, q, id, acoustics.StatsVersion), "acoustics: store failed marker")
 	}
 
 	if err = acoustics.StoreFeatures(ctx, q, id, vec, acoustics.StatsVersion); err != nil {

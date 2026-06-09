@@ -19,6 +19,21 @@ func StoreFeatures(ctx context.Context, q sqlx.Queryer, id string, vec FeatureVe
 	return AudioFeaturesInsert(ctx, q, a).Scan(&a)
 }
 
+// StoreFailed records that a media file could not be decoded or analyzed (corrupt,
+// unsupported, or too short) so the background indexer stops retrying it: the row
+// is what AudioFeaturesUnindexedMediaIDs keys off. A zero vector is stored with
+// failed=true, and the similarity and count queries exclude failed rows.
+func StoreFailed(ctx context.Context, q sqlx.Queryer, id string, statsVersion uint32) error {
+	var zero FeatureVector
+	a := AudioFeatures{
+		MediaID:      id,
+		Features:     zero[:],
+		Failed:       true,
+		StatsVersion: statsVersion,
+	}
+	return AudioFeaturesInsert(ctx, q, a).Scan(&a)
+}
+
 // DeleteFeatures removes a row from audio_features. The HNSW index updates automatically.
 func DeleteFeatures(ctx context.Context, q sqlx.Queryer, id uuid.UUID) error {
 	var a AudioFeatures
