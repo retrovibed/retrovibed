@@ -2,7 +2,6 @@ package acoustics
 
 import (
 	"context"
-	"sync"
 
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 )
@@ -72,17 +71,6 @@ func AnalyzeFile(ctx context.Context, path string) (FeatureVector, error) {
 	if err != nil {
 		return FeatureVector{}, errorsx.Wrap(err, "decode pcm failed")
 	}
-	defer returnPCMBuffers(pcm)
 
 	return AnalyzeSamples(pcm), nil
-}
-
-var pcmPool = sync.Pool{
-	New: func() any { return make([]float32, 0, 330_750) },
-}
-
-func returnPCMBuffers(segments [][]float32) {
-	for _, buf := range segments {
-		pcmPool.Put(buf[:0]) // nolint: staticcheck
-	}
 }

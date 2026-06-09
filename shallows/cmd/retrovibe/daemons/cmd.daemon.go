@@ -76,7 +76,7 @@ type Command struct {
 	AutoReclaim         bool             `flag:"" name:"auto-reclaim" help:"EXPERIMENTAL: enable automatic reclaiming of disk space of archived media" negatable:"" env:"${env_auto_reclaim}"`
 	AutoRecommendations bool             `flag:"" name:"auto-recommendations" help:"enable automatic daily recommendations" default:"true" negatable:""`
 	AutoSocks5          bool             `flag:"" name:"auto-socks5" help:"enable the socks5 proxy service" default:"true" negatable:""`
-	AutoAcousticsIndex  bool             `flag:"" name:"auto-acoustics-index" help:"acoustic indexing for currently playing song" default:"false" negatable:""`
+	AutoAcousticsIndex  bool             `flag:"" name:"auto-acoustics-index" help:"acoustic indexing for currently playing song" default:"true" negatable:""`
 	Socks5              cmdopts.Listener `flag:"" name:"socks5-address" help:"enable socks5 proxy, requires a vpn to be configured" default:"tcp://:9999"`
 	DHTLogging          bool             `flag:"" name:"dht-logging" help:"enable debug logging for the dht" default:"false" negatable:"" hidden:"true"`
 	TorrentResume       bool             `flag:"" name:"torrent-resume" help:"enable announcing and resuming torrents" default:"true" negatable:""`
@@ -297,6 +297,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	}
 
 	if t.AutoAcousticsIndex {
+		log.Println("*************************************** acoustic indexing is enabled ***************************************")
 		mediaFS := library.New(deepjwt, mediastore, func(ctx context.Context, s string) (*library.Metadata, error) {
 			var md library.Metadata
 			err = library.MetadataFindByID(ctx, db, s).Scan(&md)
@@ -304,7 +305,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		})
 		errorsx.Log(AcousticsBackground(gctx.Context, db, mediaFS))
 	} else {
-		log.Println("acoustic indexing is disabled")
+		log.Println("*************************************** acoustic indexing is disabled ***************************************")
 	}
 
 	httpmux := mux.NewRouter()
