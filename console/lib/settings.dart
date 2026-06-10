@@ -229,7 +229,7 @@ class _DisplayState extends State<Display> {
                             },
                             child: debug.Card(margin: EdgeInsets.zero),
                           ),
-                          if (defaults.debug) debug.MeteredCard(margin: EdgeInsets.zero),
+                          if (defaults.debug) debug.MeteredCard(onPressed: full, margin: EdgeInsets.zero),
                         ],
                       );
                     }),

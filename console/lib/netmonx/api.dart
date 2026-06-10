@@ -13,7 +13,7 @@ abstract class network {
   }) async {
     return httpx
         .get(
-          Uri.https(httpx.host(), "/diagnostics/network"),
+          Uri.https(httpx.host(), "/diagnostics/network/"),
           options: [httpx.Accept.json, ...options],
         )
         .then((v) => NetworkMetricsResponse()..mergeFromProto3Json(jsonDecode(v.body)));

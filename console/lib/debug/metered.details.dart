@@ -4,42 +4,18 @@ import 'package:retrovibed/design.kit/forms.dart' as forms;
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/netmonx/api.dart' as api;
-import 'package:retrovibed/retrovibed.dart' as retro;
+import './metered.toggle.dart';
 
-class MeteredToggle extends StatefulWidget {
-  const MeteredToggle({super.key});
-
-  @override
-  State<MeteredToggle> createState() => _MeteredToggleState();
-}
-
-class _MeteredToggleState extends State<MeteredToggle> {
-  bool _metered = retro.metered();
-  @override
-  Widget build(BuildContext context) {
-    return ds.LoadingIconButton(
-      toggled: _metered,
-      icon: Icon(Icons.network_check, color: _metered ? Colors.green : null),
-      onPressed: () async {
-        final upd = retro.set_metered(!retro.metered());
-        setState(() {
-          _metered = upd;
-        });
-      },
-    );
-  }
-}
-
-class MeteredCard extends StatefulWidget {
+class MeteredDetails extends StatefulWidget {
   final EdgeInsets margin;
   final api.FnNetworkDiagnostics apinetwork;
-  const MeteredCard({super.key, this.margin = EdgeInsets.zero, this.apinetwork = api.network.get});
+  const MeteredDetails({super.key, this.margin = EdgeInsets.zero, this.apinetwork = api.network.get});
 
   @override
-  State<MeteredCard> createState() => _MeteredCardState();
+  State<MeteredDetails> createState() => _MeteredDetailsState();
 }
 
-class _MeteredCardState extends State<MeteredCard> {
+class _MeteredDetailsState extends State<MeteredDetails> {
   bool _loading = true;
   Widget _cause = ds.Error.zero;
   api.NetworkMetricsResponse _data = api.NetworkMetricsResponse();
