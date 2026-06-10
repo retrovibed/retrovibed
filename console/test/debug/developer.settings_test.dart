@@ -37,6 +37,7 @@ void main() {
         expect(find.text('Subscription'), findsOneWidget);
         expect(find.text('Recommendations'), findsOneWidget);
         expect(find.text('Releases'), findsOneWidget);
+        expect(find.text('Debug'), findsOneWidget);
         expect(tester.takeException(), isNull);
       });
     });
@@ -184,6 +185,35 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('releases:false'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('toggling Debug updates the cached flag', (
+        WidgetTester tester,
+      ) async {
+        await tester.pumpApp(
+          _authenticated(
+            Builder(
+              builder: (context) {
+                final flags = authn.Login.cached(context).flags;
+                return Column(
+                  children: [
+                    const DeveloperSettings(),
+                    Text('debug:${flags.debug}'),
+                  ],
+                );
+              },
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('debug:true'), findsOneWidget);
+
+        await tester.tap(find.byType(Checkbox).at(4));
+        await tester.pumpAndSettle();
+
+        expect(find.text('debug:false'), findsOneWidget);
         expect(tester.takeException(), isNull);
       });
     });

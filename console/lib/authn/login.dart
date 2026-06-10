@@ -66,6 +66,7 @@ class _LoginState extends State<Login> {
     alpha: foundation.kDebugMode,
     recommendations: !Platform.isMacOS,
     releases: !Platform.isMacOS,
+    debug: foundation.kDebugMode,
   );
 
   @override

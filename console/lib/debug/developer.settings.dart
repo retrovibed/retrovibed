@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/design.kit/forms.dart' as forms;
-import 'package:retrovibed/authn/developer.mode.dart';
 import 'package:retrovibed/authn/login.dart';
 
 class DeveloperSettings extends StatelessWidget {
@@ -29,12 +28,7 @@ class DeveloperSettings extends StatelessWidget {
             value: flags.networking,
             onChanged: (v) {
               final s = Login.of(context);
-              s?.setState(() => s.flags = DeveloperMode(
-                networking: v ?? false,
-                subscription: flags.subscription,
-                recommendations: flags.recommendations,
-                releases: flags.releases,
-              ));
+              s?.setState(() => s.flags = flags.copyWith(networking: v ?? false));
             },
           ),
           forms.Checkbox(
@@ -43,12 +37,7 @@ class DeveloperSettings extends StatelessWidget {
             value: flags.subscription,
             onChanged: (v) {
               final s = Login.of(context);
-              s?.setState(() => s.flags = DeveloperMode(
-                networking: flags.networking,
-                subscription: v ?? false,
-                recommendations: flags.recommendations,
-                releases: flags.releases,
-              ));
+              s?.setState(() => s.flags = flags.copyWith(subscription: v ?? false));
             },
           ),
           forms.Checkbox(
@@ -57,12 +46,7 @@ class DeveloperSettings extends StatelessWidget {
             value: flags.recommendations,
             onChanged: (v) {
               final s = Login.of(context);
-              s?.setState(() => s.flags = DeveloperMode(
-                networking: flags.networking,
-                subscription: flags.subscription,
-                recommendations: v ?? false,
-                releases: flags.releases,
-              ));
+              s?.setState(() => s.flags = flags.copyWith(recommendations: v ?? false));
             },
           ),
           forms.Checkbox(
@@ -71,12 +55,16 @@ class DeveloperSettings extends StatelessWidget {
             value: flags.releases,
             onChanged: (v) {
               final s = Login.of(context);
-              s?.setState(() => s.flags = DeveloperMode(
-                networking: flags.networking,
-                subscription: flags.subscription,
-                recommendations: flags.recommendations,
-                releases: v ?? false,
-              ));
+              s?.setState(() => s.flags = flags.copyWith(releases: v ?? false));
+            },
+          ),
+          forms.Checkbox(
+            const Text('Debug'),
+            description: const Text('Enable debug-only UX and tuning panels'),
+            value: flags.debug,
+            onChanged: (v) {
+              final s = Login.of(context);
+              s?.setState(() => s.flags = flags.copyWith(debug: v ?? false));
             },
           ),
         ],

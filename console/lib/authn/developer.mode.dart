@@ -8,6 +8,7 @@ class DeveloperMode {
   bool subscription; // force enable subscription management ux.
   bool recommendations; // toggle recommendations panel.
   bool releases; // toggle releases panel.
+  bool debug; // enable debug-only ux and tuning panels.
 
   DeveloperMode({
     this.alpha = false,
@@ -16,5 +17,26 @@ class DeveloperMode {
     this.subscription = false,
     this.recommendations = false,
     this.releases = false,
+    this.debug = false,
   });
+
+  DeveloperMode copyWith({
+    bool? alpha,
+    bool? beta,
+    bool? networking,
+    bool? subscription,
+    bool? recommendations,
+    bool? releases,
+    bool? debug,
+  }) {
+    return DeveloperMode(
+      alpha: alpha ?? this.alpha,
+      beta: beta ?? this.beta,
+      networking: networking ?? this.networking,
+      subscription: subscription ?? this.subscription,
+      recommendations: recommendations ?? this.recommendations,
+      releases: releases ?? this.releases,
+      debug: debug ?? this.debug,
+    );
+  }
 }

@@ -1,13 +1,11 @@
 import 'dart:io';
 
-import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
 import 'dart:ui' show lerpDouble;
 
 class Defaults extends ThemeExtension<Defaults> {
   static const defaults = Defaults();
 
-  static final _defaultDebug = foundation.kDebugMode;
   static final _defaultDesktop = Platform.isLinux || Platform.isWindows || Platform.isMacOS;
   static final _defaultMobile = Platform.isAndroid || Platform.isIOS;
   static final _defaultBorderRadius = BorderRadius.circular(10.0);
@@ -37,7 +35,6 @@ class Defaults extends ThemeExtension<Defaults> {
   );
   static const _defaultCompact = 400.0;
 
-  final bool? _debug;
   final bool? _desktop;
   final bool? _mobile;
   final double? _spacing;
@@ -54,7 +51,6 @@ class Defaults extends ThemeExtension<Defaults> {
   final double? _compact;
   final bool? _isCompact;
 
-  bool get debug => _debug ?? _defaultDebug;
   bool get desktop => _desktop ?? _defaultDesktop;
   bool get mobile => _mobile ?? _defaultMobile;
   double get spacing => _spacing ?? _defaultSpacing;
@@ -73,7 +69,6 @@ class Defaults extends ThemeExtension<Defaults> {
 
   // The constructor accepts nullable values to create partial instances.
   const Defaults({
-    bool? debug,
     bool? desktop,
     bool? mobile,
     double? spacing,
@@ -100,7 +95,6 @@ class Defaults extends ThemeExtension<Defaults> {
        _highlight = highlight,
        _dangerTint = dangerTint,
        _highlightTint = highlightTint,
-       _debug = debug,
        _desktop = desktop,
        _mobile = mobile,
        _compact = compact,
@@ -123,7 +117,6 @@ class Defaults extends ThemeExtension<Defaults> {
     Color? highlight,
     List<BoxShadow>? dangerTint,
     List<BoxShadow>? highlightTint,
-    bool? debug,
     bool? desktop,
     bool? mobile,
     double? compact,
@@ -141,7 +134,6 @@ class Defaults extends ThemeExtension<Defaults> {
       highlight: highlight ?? _highlight,
       dangerTint: dangerTint ?? _dangerTint,
       highlightTint: highlightTint ?? _highlightTint,
-      debug: debug ?? _debug,
       desktop: desktop ?? _desktop,
       mobile: mobile ?? _mobile,
       compact: compact ?? _compact,
@@ -178,7 +170,6 @@ class Defaults extends ThemeExtension<Defaults> {
         other._highlightTint ?? _defaultHighlightTint,
         t,
       ),
-      debug: other._debug ?? _debug,
       desktop: other._desktop ?? _desktop,
       mobile: other._mobile ?? _mobile,
       compact: lerpDouble(_compact, other._compact, t),

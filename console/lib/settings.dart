@@ -206,7 +206,7 @@ class _DisplayState extends State<Display> {
                             quotas.Card(),
                           ],
                           profiles.Card(
-                            onPressed: defaults.debug ? full : null,
+                            onPressed: authn.developer(context).debug ? full : null,
                           ),
                           rss.Card(
                             onPressed: full,
@@ -229,7 +229,7 @@ class _DisplayState extends State<Display> {
                             },
                             child: debug.Card(margin: EdgeInsets.zero),
                           ),
-                          if (defaults.debug) debug.MeteredCard(onPressed: full, margin: EdgeInsets.zero),
+                          if (authn.developer(context).debug) debug.MeteredCard(onPressed: full, margin: EdgeInsets.zero),
                         ],
                       );
                     }),

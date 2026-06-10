@@ -75,7 +75,7 @@ class _ControlState extends State<DownloadRowControls> {
           ),
           ds.Hint(Text(isCompleted ? "mark as processed and remove from active downloads" : "pause the download")),
         ),
-        if (defaults.debug)
+        if (authn.developer(context).debug)
           ds.Help(
             IconButton(icon: Icon(Icons.tune), onPressed: disabled ? null : tune),
             ds.Hint(Text("tune peer connections for this download")),

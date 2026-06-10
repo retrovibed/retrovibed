@@ -206,7 +206,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                             help: ds.Hint(const Text("drag and drop files onto the grid to add media to your library")),
                           ),
                         ],
-                        tuning: defaults.debug ? GridSettings() : ds.SearchTray.zerobox,
+                        tuning: authn.developer(context).debug ? GridSettings() : ds.SearchTray.zerobox,
                         help: ds.Hint(const Text("search your library, use @ to access advanced filtering")),
                       ),
                       (widget.search.value.next.query.isEmpty)
