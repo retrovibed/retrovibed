@@ -47,7 +47,7 @@ class _ContentDisplayReadOnlyState extends State<ContentDisplayReadOnly> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _refresh(_resp.next));
+    ds.postframe(() => _refresh(_resp.next));
   }
 
   Future<void> _refresh(api.PublishedContentSearchRequest req) {

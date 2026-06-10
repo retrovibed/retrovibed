@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'flutterx.dart';
 import 'theme.defaults.dart';
 
 /// A widget that repeats a child widget to fill available space.
@@ -132,7 +133,7 @@ class _MeasureSizeRenderObject extends RenderProxyBox {
     super.performLayout();
     if (child != null && child!.hasSize) {
       // Notify the state about the size after the layout pass completes.
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+      postframe(() {
         onSizeMeasured(child!.size);
       });
     }

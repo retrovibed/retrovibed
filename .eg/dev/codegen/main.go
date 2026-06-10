@@ -25,8 +25,13 @@ func main() {
 		eg.Module(
 			ctx,
 			deb,
-			eg.Parallel(console.Generate, shallows.Generate),
-			console.GenerateBinding,
+			eg.Sequential(
+				eg.Parallel(
+					console.Generate,
+					shallows.Generate,
+				),
+				console.GenerateBinding,
+			),
 		),
 	)
 

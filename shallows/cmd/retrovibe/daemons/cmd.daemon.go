@@ -408,9 +408,11 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		log.Println("mdns service is disabled")
 	}
 
-	log.Println("https listening on:", httpbind.Addr().String(), tlspem)
-	if cause := http.ServeTLS(httpbind, httpmux, tlspem, tlspem); netx.IgnoreConnectionClosed(cause) != nil {
-		return errorsx.Wrap(cause, "http server stopped")
+	if !envx.Boolean(false, env.Smoke) { // dont spin up the blocking http server when smoke test is enabled.
+		log.Println("https listening on:", httpbind.Addr().String(), tlspem)
+		if cause := http.ServeTLS(httpbind, httpmux, tlspem, tlspem); netx.IgnoreConnectionClosed(cause) != nil {
+			return errorsx.Wrap(cause, "http server stopped")
+		}
 	}
 
 	// report any async failures.

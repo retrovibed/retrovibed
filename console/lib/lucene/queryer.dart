@@ -173,7 +173,7 @@ class _QueryerState extends State<Queryer> {
         }
       });
 
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+      ds.postframe(() {
         setState(() {
           _ctrl.value = _ctrl.value.replaced(range, contents);
         });

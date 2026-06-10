@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'flutterx.dart';
 import 'theme.defaults.dart';
 
 class CompactingMenu extends StatefulWidget {
@@ -46,7 +47,11 @@ class _CompactingMenuState extends State<CompactingMenu> {
         if (!compact) {
           return Row(
             spacing: spacing,
-            children: [...widget.leading, Expanded(child: widget.child), ...widget.trailing],
+            children: [
+              ...widget.leading,
+              Expanded(child: widget.child),
+              ...widget.trailing,
+            ],
           );
         }
 
@@ -59,7 +64,11 @@ class _CompactingMenuState extends State<CompactingMenu> {
         if (menuItems.isEmpty) {
           return Row(
             spacing: spacing,
-            children: [...widget.leading, Expanded(child: widget.child), ...widget.trailing],
+            children: [
+              ...widget.leading,
+              Expanded(child: widget.child),
+              ...widget.trailing,
+            ],
           );
         }
 
@@ -78,9 +87,7 @@ class _CompactingMenuState extends State<CompactingMenu> {
                   IconButton(
                     onPressed: () {
                       setState(() => _open = !_open);
-                      WidgetsBinding.instance.addPostFrameCallback(
-                        (_) => Scrollable.ensureVisible(context),
-                      );
+                      postframe(() => Scrollable.ensureVisible(context));
                     },
                     icon: widget.icon,
                   ),

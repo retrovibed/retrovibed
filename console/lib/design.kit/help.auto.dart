@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:retrovibed/caching/fscache.dart' as fscache;
+import 'flutterx.dart';
 import 'screens.dart' as screens;
 import 'buttons.dart';
 import 'help.dart' show HelpScope;
@@ -38,7 +39,7 @@ class _HelpAutoState extends State<HelpAuto> {
     final alreadyActivated = cache.maybe<bool>(widget.cacheid, () => false);
     if (!alreadyActivated) {
       cache.write<bool>(widget.cacheid, true);
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+      postframe(() {
         if (mounted) setState(() => _visible = true);
       });
     }
@@ -49,10 +50,9 @@ class _HelpAutoState extends State<HelpAuto> {
   @override
   Widget build(BuildContext context) {
     final defaults = Defaults.of(context);
-    final activate =
-        defaults.mobile
-            ? "Shake the phone to activate/deactivate help"
-            : "Press Alt+? at any time to activate/deactivate help overlay";
+    final activate = defaults.mobile
+        ? "Shake the phone to activate/deactivate help"
+        : "Press Alt+? at any time to activate/deactivate help overlay";
     return screens.Overlay(
       widget.child,
       overlay: Visibility(

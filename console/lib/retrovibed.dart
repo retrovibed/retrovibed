@@ -3,8 +3,13 @@ import 'dart:ffi';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:ffi/ffi.dart' as ffi;
+import 'package:flutter/widgets.dart';
+import 'package:media_kit/media_kit.dart';
 import 'package:retrovibed/retrovibed/gen.dart' as lib;
+import 'package:retrovibed/design.kit/theme.defaults.dart' as theming;
 import 'package:retrovibed/env.dart' as env;
+import 'package:retrovibed/meta.dart' as meta;
+import 'package:window_manager/window_manager.dart';
 
 String _frameworksLib(String name) {
   final execDir = File(Platform.resolvedExecutable).parent.path;
@@ -131,14 +136,14 @@ bool validatecert(String hostname, Uint8List derBytes) {
   }
 }
 
-void daemon() {
+void daemon({bool smoke = false}) {
   String args = jsonEncode([
     "daemon",
     "--no-auto-mdns",
     "--auto-archive",
     "--auto-socks5",
   ]);
-  bridge.egdaemon(args.toNativeUtf8().cast<Char>());
+  bridge.egdaemon(args.toNativeUtf8().cast<Char>(), smoke ? 1 : 0);
 }
 
 String _convertstring(Pointer<Char> charPointer) {
@@ -163,4 +168,39 @@ void checkpointdb() {
   } catch (e) {
     print("failed to checkpoint database ${e}");
   }
+}
+
+void fault(int errcode) {
+  exit(errcode);
+}
+
+Future<void> run(void Function() fn) async {
+  print("build version ${build_version()}");
+  // env.printSystemEnv();
+  print("cp 0");
+  WidgetsFlutterBinding.ensureInitialized();
+  print("cp 1");
+  HttpOverrides.global = meta.DaemonHttpOverrides();
+  print("cp 2");
+  logging();
+  print("cp 3");
+  await env.xdg();
+  print("cp 4");
+  // checkpointing the database on initialization prevents
+  // a significant number of issues due to hard shutdowns and state corruption
+  // issues.
+  checkpointdb();
+  print("cp 5");
+  if (theming.Defaults.defaults.desktop) {
+    await windowManager.ensureInitialized();
+    await Future.wait([
+      windowManager.setTitleBarStyle(TitleBarStyle.hidden),
+      windowManager.maximize(),
+    ]);
+  }
+  print("cp 6");
+  MediaKit.ensureInitialized();
+  print("cp 7");
+
+  fn();
 }

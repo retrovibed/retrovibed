@@ -61,12 +61,11 @@ class _DaemonList extends State<DaemonList> {
     final current = httpx.host();
     final replace = (api.Daemon v) {
       final replaced = _res.items.map((o) {
-        final upd =
-            o.id == v.id
-                ? v
-                : (o
-                  ..default_100 = false
-                  ..downloads = !v.downloads && o.downloads);
+        final upd = o.id == v.id
+            ? v
+            : (o
+                ..default_100 = false
+                ..downloads = !v.downloads && o.downloads);
         return upd;
       });
 
@@ -106,25 +105,24 @@ class _DaemonList extends State<DaemonList> {
               IconButton(
                 onPressed: () {
                   setState(() {
-                    _optional =
-                        _optional != null
-                            ? null
-                            : ManualConfiguration(
-                              connect: (daemon) {
-                                setState(() {
-                                  _optional = null;
-                                  _res.next.offset = ds.Int64(0);
-                                });
-                                refresh(_res.next);
-                              },
-                            );
+                    _optional = _optional != null
+                        ? null
+                        : ManualConfiguration(
+                            connect: (daemon) {
+                              setState(() {
+                                _optional = null;
+                                _res.next.offset = ds.Int64(0);
+                              });
+                              refresh(_res.next);
+                            },
+                          );
                   });
                 },
                 icon: Icon(_optional == null ? Icons.add : Icons.remove),
               ),
             ],
           ),
-          if (_optional != null) _optional!,
+          ?_optional,
         ],
       ),
       ds.Table.inline<api.Daemon>(
@@ -133,19 +131,18 @@ class _DaemonList extends State<DaemonList> {
             hostname: current,
             current: v,
             replace: replace,
-            onDoubleTap:
-                widget.onDoubleTap == null
-                    ? null
-                    : () {
-                      return api.daemons
-                          .connectable(v)
-                          .then((v) {
-                            return widget.onDoubleTap!(v).then(replace);
-                          })
-                          .whenComplete(() {
-                            setState(() {});
-                          });
-                    },
+            onDoubleTap: widget.onDoubleTap == null
+                ? null
+                : () {
+                    return api.daemons
+                        .connectable(v)
+                        .then((v) {
+                          return widget.onDoubleTap!(v).then(replace);
+                        })
+                        .whenComplete(() {
+                          setState(() {});
+                        });
+                  },
             onRemove: (api.Daemon d) {
               return api.daemons.delete(d.id).then((v) {
                 _res.next.offset = _res.next.offset - 1;
@@ -179,27 +176,26 @@ class _RowDisplay extends StatelessWidget {
     final themex = ds.Defaults.of(context);
     return Container(
       child: InkWell(
-        onDoubleTap:
-            onDoubleTap == null
-                ? null
-                : () {
-                  onDoubleTap!()
-                      .catchError(
-                        ds.Error.boundary(context, current, ds.Error.offline),
-                        test: ds.ErrorTests.offline,
-                      )
-                      .catchError(
-                        ds.Error.boundary(
-                          context,
-                          current,
-                          ds.Error.connectivity,
-                        ),
-                        test: ds.ErrorTests.connectivity,
-                      )
-                      .catchError(
-                        ds.Error.boundary(context, current, ds.Error.unknown),
-                      );
-                },
+        onDoubleTap: onDoubleTap == null
+            ? null
+            : () {
+                onDoubleTap!()
+                    .catchError(
+                      ds.Error.boundary(context, current, ds.Error.offline),
+                      test: ds.ErrorTests.offline,
+                    )
+                    .catchError(
+                      ds.Error.boundary(
+                        context,
+                        current,
+                        ds.Error.connectivity,
+                      ),
+                      test: ds.ErrorTests.connectivity,
+                    )
+                    .catchError(
+                      ds.Error.boundary(context, current, ds.Error.unknown),
+                    );
+              },
         child: Row(
           spacing: themex.spacing,
           children: [
@@ -226,10 +222,9 @@ class _RowDisplay extends StatelessWidget {
                     });
               },
               icon: Icon(Icons.downloading_rounded, color: current.downloads ? Colors.lightGreenAccent : null),
-              tooltip:
-                  current.downloads
-                      ? "downloads will be sent to this library by default for background processes"
-                      : "mark this library the default for downloads from background processes",
+              tooltip: current.downloads
+                  ? "downloads will be sent to this library by default for background processes"
+                  : "mark this library the default for downloads from background processes",
             ),
             Expanded(
               child: Text(current.description, overflow: TextOverflow.ellipsis),

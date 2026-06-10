@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import './theme.defaults.dart';
+import 'flutterx.dart';
+import 'theme.defaults.dart';
 
 class SearchDropdown extends StatefulWidget {
   static const InputDecoration defaultDecoration = const InputDecoration(
@@ -72,7 +73,7 @@ class _SearchDropdownState extends State<SearchDropdown> {
   }
 
   void _focused() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    postframe(() {
       if (!mounted) return;
       if (!_focus.hasFocus) return;
       _query(controller.text);

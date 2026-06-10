@@ -66,7 +66,7 @@ class _PendingListDisplay extends State<PendingListDisplay> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => refresh(_res.next));
+    ds.postframe(() => refresh(_res.next));
   }
 
   @override

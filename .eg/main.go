@@ -39,6 +39,7 @@ func main() {
 					console.Linting,
 					shallows.Test(),
 					shallows.Linting,
+					console.RunDev("wlheadless-run -- flutter run --target lib/main.smoke.dart"),
 				),
 			),
 		),

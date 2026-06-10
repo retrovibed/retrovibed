@@ -76,7 +76,7 @@ class _PublishMetadataState extends State<PublishMetadata> {
       _cause = ds.Error.zero;
     });
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    ds.postframe(() {
       final authOptions = [authn.request(authn.AuthzCache.meta(context))];
       widget
           .knownGet(knownMediaId, options: [httpx.Accept.json, ...authOptions])

@@ -33,7 +33,7 @@ class _NewReleasesState extends State<NewReleases> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _load());
+    ds.postframe(() => _load());
   }
 
   @override

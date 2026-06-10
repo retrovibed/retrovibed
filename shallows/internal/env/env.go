@@ -15,6 +15,9 @@ func TLSPoolDir() string                  { return env.TLSPoolDir() }
 func RootStorageDir(rel ...string) string { return env.RootStorageDir(rel...) }
 
 const (
+	// smoke test exit after initialization
+	Smoke = "RETROVIBED_SMOKE"
+
 	// percentage of requests that should fail.
 	ChaosRate = "RETROVIBED_CHAOS_RATE"
 

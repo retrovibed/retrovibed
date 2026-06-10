@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:retrovibed/design.kit/modals.dart' as _modals;
+import 'design.kit/flutterx.dart';
 
 export 'package:fixnum/fixnum.dart';
 export 'design.kit/screens.dart';
@@ -39,6 +40,7 @@ export 'design.kit/search.tray.dart';
 export 'design.kit/tables.dart';
 export 'design.kit/theme.defaults.dart';
 export 'design.kit/typography.dart';
+export 'design.kit/flutterx.dart' show postframe;
 
 abstract class modals {
   static _modals.NodeState? of(BuildContext context) {
@@ -58,7 +60,7 @@ abstract class modals {
 abstract class textediting {
   static void refocus(TextEditingController? controller) {
     if (controller == null) return;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    postframe(() {
       controller.selection = TextSelection.fromPosition(
         TextPosition(offset: controller.text.length),
       );

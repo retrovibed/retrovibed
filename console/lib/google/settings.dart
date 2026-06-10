@@ -28,7 +28,7 @@ class _SettingsState extends State<Settings> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _fetch());
+    ds.postframe(() => _fetch());
   }
 
   @override

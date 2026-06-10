@@ -72,7 +72,7 @@ class _DownloadingListState extends State<DownloadingListDisplay> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => refresh());
+    ds.postframe(() => refresh());
     period = Timer.periodic(
       const Duration(seconds: 20),
       (p) => setState(this.refresh),

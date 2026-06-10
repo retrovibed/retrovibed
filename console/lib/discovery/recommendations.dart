@@ -34,7 +34,7 @@ class _RecommendationsState extends State<Recommendations> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _load());
+    ds.postframe(() => _load());
   }
 
   @override

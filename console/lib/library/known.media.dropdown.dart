@@ -168,13 +168,13 @@ class _KnownMediaDropdown extends State<KnownMediaDropdown> {
     super.initState();
 
     if (uuidx.isMinMax(uuidx.fromString(widget.current))) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+      ds.postframe(() {
         refresh(_res.next);
       });
       return;
     }
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    ds.postframe(() {
       api.known
           .cached(
             widget.current,

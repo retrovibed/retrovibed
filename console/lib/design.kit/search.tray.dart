@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fixnum/fixnum.dart' as fixnum;
 import 'package:retrovibed/lucene.dart' as lucene;
+import 'flutterx.dart';
 import 'help.dart';
 import 'buttons.dart';
 import 'compacting.menu.dart';
@@ -8,7 +9,7 @@ import 'compacting.menu.dart';
 abstract class textediting {
   static void refocus(TextEditingController? controller) {
     if (controller == null) return;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    postframe(() {
       controller.selection = TextSelection.fromPosition(
         TextPosition(offset: controller.text.length),
       );
@@ -83,7 +84,7 @@ class _SearchTrayState extends State<SearchTray> {
   void initState() {
     super.initState();
     if (widget.ensureVisible) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+      postframe(() {
         if (!mounted) return;
         Scrollable.ensureVisible(context);
       });

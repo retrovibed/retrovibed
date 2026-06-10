@@ -51,7 +51,7 @@ class _PublishConfirmationState extends State<PublishConfirmation> {
       publishMode: widget.community?.defaultPublishMode ?? PublishMode.UNLISTED,
       publishedContent: PublishedContent(),
     );
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    ds.postframe(() {
       httpx
           .withRetry(
             () => widget.youtubeStatus(
