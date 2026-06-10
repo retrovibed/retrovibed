@@ -66,7 +66,7 @@ func main() {
 			shell.Newf("systemctl --user is-active --quiet retrovibed-android || systemd-run --user --unit=retrovibed-android --setenv=QT_QPA_PLATFORM=xcb --collect /opt/android-sdk/emulator/emulator -avd retrovibed -port %d", port),
 			shell.Newf("adb -s emulator-%d wait-for-device shell 'while [ \"$(getprop sys.boot_completed)\" != \"1\" ]; do sleep 1; done'", port),
 		),
-		console.RunDev(fmt.Sprintf("flutter run -d emulator-%d", port)),
+		console.RunDev(fmt.Sprintf("flutter pub get && flutter run -d emulator-%d", port)),
 	)
 
 	if err != nil {
