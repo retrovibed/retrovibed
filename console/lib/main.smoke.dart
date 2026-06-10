@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'package:retrovibed/retrovibed.dart' as retro;
 
@@ -6,7 +8,9 @@ void main() async {
   // used by CI/CD as a case to limit build / environment issues across platforms.
 
   await retro.run(() {
+    retro.setenv("RETROVIBED_SMOKE", "true");
     retro.seed(uuidx.random());
-    retro.daemon();
+    retro.daemon(smoke: true);
   });
+  exit(0);
 }

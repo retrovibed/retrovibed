@@ -136,14 +136,14 @@ bool validatecert(String hostname, Uint8List derBytes) {
   }
 }
 
-void daemon() {
+void daemon({bool smoke = false}) {
   String args = jsonEncode([
     "daemon",
     "--no-auto-mdns",
     "--auto-archive",
     "--auto-socks5",
   ]);
-  bridge.egdaemon(args.toNativeUtf8().cast<Char>());
+  bridge.egdaemon(args.toNativeUtf8().cast<Char>(), smoke ? 1 : 0);
 }
 
 String _convertstring(Pointer<Char> charPointer) {

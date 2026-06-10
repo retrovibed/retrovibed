@@ -14,10 +14,10 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/netmonx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdglobalmain"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdmeta"
+	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/meta/identityssh"
 	"golang.org/x/oauth2"
 )
-import "github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 
 //export fault
 func fault(code C.int) {
@@ -198,14 +198,18 @@ func gsetenv(key *C.char, value *C.char) {
 }
 
 //export egdaemon
-func egdaemon(jsonargs *C.char) {
+func egdaemon(jsonargs *C.char, smoke C.int) {
 	var args []string
 	if err := json.Unmarshal([]byte(C.GoString(jsonargs)), &args); err != nil {
 		log.Fatalln(err)
 		return
 	}
 
-	go cmdglobalmain.Main(args...)
+	if smoke != 0 {
+		cmdglobalmain.Main(args...)
+	} else {
+		go cmdglobalmain.Main(args...)
+	}
 }
 
 //export logging

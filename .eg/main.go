@@ -34,14 +34,12 @@ func main() {
 					eg.Sequential(console.GenerateBinding, console.BuildLinux),
 					shallows.Compile(),
 				),
-				eg.Sequential(
-					eg.Parallel(
-						console.Tests,
-						console.Linting,
-						shallows.Test(),
-						shallows.Linting,
-					),
-					console.RunDev("flutter run --target lib/main.smoke.dart"),
+				eg.Parallel(
+					console.Tests,
+					console.Linting,
+					shallows.Test(),
+					shallows.Linting,
+					console.RunDev("wlheadless-run -- flutter run --target lib/main.smoke.dart"),
 				),
 			),
 		),

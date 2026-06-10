@@ -164,14 +164,16 @@ class DaemonBridge {
 
   void egdaemon(
     ffi.Pointer<ffi.Char> jsonargs,
+    int smoke,
   ) {
     return _egdaemon(
       jsonargs,
+      smoke,
     );
   }
 
-  late final _egdaemonPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Char>)>>('egdaemon');
-  late final _egdaemon = _egdaemonPtr.asFunction<void Function(ffi.Pointer<ffi.Char>)>();
+  late final _egdaemonPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Char>, ffi.Int)>>('egdaemon');
+  late final _egdaemon = _egdaemonPtr.asFunction<void Function(ffi.Pointer<ffi.Char>, int)>();
 
   void logging() {
     return _logging();
