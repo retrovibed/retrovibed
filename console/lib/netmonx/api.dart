@@ -3,9 +3,11 @@ import 'dart:convert';
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/meta/meta.network.pb.dart';
 
-export 'package:retrovibed/meta/meta.network.pb.dart' show NetworkMetricsResponse;
+export 'package:retrovibed/meta/meta.network.pb.dart';
 
-abstract class NetworkDiagnostics {
+typedef FnNetworkDiagnostics = Future<NetworkMetricsResponse> Function({List<httpx.Option> options});
+
+abstract class network {
   static Future<NetworkMetricsResponse> get({
     List<httpx.Option> options = const [],
   }) async {
