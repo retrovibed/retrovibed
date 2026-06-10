@@ -5,10 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"mime/multipart"
 	"net/http"
-	"net/http/httputil"
 
 	"github.com/retrovibed/retrovibed/retroapi/deeppool"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -50,7 +48,6 @@ func (t DeeppoolCommunity) Search(ctx context.Context, query string, offset, lim
 	}
 
 	if resp, err = httpx.AsError(t.c.Do(req)); err != nil {
-		log.Println("WAAAAAAT", string(errorsx.Zero(httputil.DumpRequest(req, true))))
 		return nil, errorsx.Wrapf(err, "request failed: %s", uri)
 	}
 	defer resp.Body.Close()
