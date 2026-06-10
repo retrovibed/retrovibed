@@ -186,17 +186,22 @@ func Install(b *tarballs.Build) eg.OpFn {
 	dstdir := filepath.Join(egtarball.Path(tarballs.Retrovibed(b)), "usr", "lib", "retrovibed")
 	builddir := egenv.WorkingDirectory("console", "build")
 	linuxdir := filepath.Join(builddir, "linux")
-	bundledir := filepath.Join(linuxdir, egfs.FindFirst(os.DirFS(linuxdir), "bundle"))
 	libdir := filepath.Join(builddir, "nativelib")
 	return eg.Sequential(
 		CompileBinding(b),
-		shell.Op(
-			runtime.Newf("mkdir -p %s", dstdir),
-			runtime.Newf("ls -lha  %s/retrovibed", bundledir).Lenient(true),
-			runtime.Newf("cp -R %s/* %s", bundledir, dstdir),
-			runtime.Newf("cp -R %s/* %s/lib", libdir, dstdir),
-			// runtime.Newf("tree %s", dstdir),
-		),
+		func(ctx context.Context, op eg.Op) error {
+			// resolved at execution time since the bundle directory only
+			// exists once console.BuildLinux has run.
+			bundledir := filepath.Join(linuxdir, egfs.FindFirst(os.DirFS(linuxdir), "bundle"))
+			return shell.Run(
+				ctx,
+				runtime.Newf("mkdir -p %s", dstdir),
+				runtime.Newf("ls -lha  %s/retrovibed", bundledir).Lenient(true),
+				runtime.Newf("cp -R %s/* %s", bundledir, dstdir),
+				runtime.Newf("cp -R %s/* %s/lib", libdir, dstdir),
+				// runtime.Newf("tree %s", dstdir),
+			)
+		},
 	)
 }
 

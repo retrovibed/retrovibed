@@ -1,7 +1,5 @@
 -- +goose Up
 -- +goose StatementBegin
-
-INSTALL vss; LOAD vss;
 SET hnsw_enable_experimental_persistence = true;
 
 DROP INDEX IF EXISTS audio_features_hnsw;
@@ -21,8 +19,6 @@ USING HNSW (features) WITH (metric = 'cosine');
 
 -- +goose Down
 -- +goose StatementBegin
-
-INSTALL vss; LOAD vss;
 SET hnsw_enable_experimental_persistence = true;
 
 DROP INDEX IF EXISTS audio_features_hnsw;
