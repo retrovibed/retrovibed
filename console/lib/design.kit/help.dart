@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'flutterx.dart';
 import 'container.dart' as ds;
 import 'modals.dart' as modals;
 import 'theme.defaults.dart';
@@ -30,7 +31,7 @@ class _HelpState extends State<Help> {
   bool get _hasChild => _nestedhelp > 0;
 
   void _adjdelta(int n) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    postframe(() {
       if (mounted) setState(() => _nestedhelp += n);
     });
   }

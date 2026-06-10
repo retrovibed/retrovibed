@@ -59,7 +59,7 @@ class SearchableView extends State<ListSearchable> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    ds.postframe(() {
       refresh(_res.next).catchError((e) {
         setState(() {
           _cause = ds.Error.unknown(e, onTap: reseterr);

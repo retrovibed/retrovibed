@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:retrovibed/designkit.dart' as ds;
+import '../flutterx.dart';
 import 'package:retrovibed/timex.dart' as timex;
 import 'package:retrovibed/design.kit/typography.dart' as typography;
 
@@ -35,13 +36,13 @@ class _DateRangeInputState extends State<DateRangeInput> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _showBegin());
+    postframe(() => _showBegin());
   }
 
   @override
   void deactivate() {
     if (_pending != widget.value) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => widget.onChanged(_pending));
+      postframe(() => widget.onChanged(_pending));
     }
     super.deactivate();
   }

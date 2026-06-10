@@ -41,7 +41,7 @@ void main() async {
       FlutterError.dumpErrorToConsole(details);
       return Material(
         child: InkWell(
-          onTap: () => WidgetsBinding.instance.addPostFrameCallback((_) => runApp(Retrovibed())),
+          onTap: () => ds.postframe(() => runApp(Retrovibed())),
           child: const Center(child: Text('Something went wrong. Tap to restart.')),
         ),
       );

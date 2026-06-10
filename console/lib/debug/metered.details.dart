@@ -28,7 +28,7 @@ class _MeteredDetailsState extends State<MeteredDetails> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _fetch());
+    ds.postframe(() => _fetch());
   }
 
   void _fetch() {

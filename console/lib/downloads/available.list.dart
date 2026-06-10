@@ -67,7 +67,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => refresh(_res.next));
+    ds.postframe(() => refresh(_res.next));
     widget.events?.addListener(() {
       refresh(_res.next);
     });

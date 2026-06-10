@@ -42,7 +42,7 @@ class _RecentState extends State<Recent> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _load(context));
+    ds.postframe(() => _load(context));
   }
 
   @override
