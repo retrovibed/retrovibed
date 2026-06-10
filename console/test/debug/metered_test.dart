@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
-import 'package:retrovibed/debug/metered.dart';
+import 'package:retrovibed/debug/metered.card.dart';
+import 'package:retrovibed/debug/metered.details.dart';
+import 'package:retrovibed/debug/metered.toggle.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/netmonx/api.dart' as api;
@@ -61,7 +63,34 @@ void main() {
     testWidgets('renders without overflow', (WidgetTester tester) async {
       final entry = _resolutions.currentValue!;
       await tester.pumpApp(
-        MeteredCard(apinetwork: _empty),
+        MeteredCard(onPressed: (_) {}),
+        physicalSize: entry.value,
+      );
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    }, variant: _resolutions);
+
+    testWidgets('invokes onPressed with details widget', (tester) async {
+      Widget? received;
+      await tester.pumpApp(
+        physicalSize: const Size(1280, 720),
+        MeteredCard(onPressed: (w) => received = w),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Metered Network'));
+      await tester.pumpAndSettle();
+
+      expect(received, isNotNull);
+      expect(tester.takeException(), isNull);
+    });
+  });
+
+  group('MeteredDetails', () {
+    testWidgets('renders without overflow', (WidgetTester tester) async {
+      final entry = _resolutions.currentValue!;
+      await tester.pumpApp(
+        MeteredDetails(apinetwork: _empty),
         physicalSize: entry.value,
       );
       await tester.pumpAndSettle();
@@ -71,7 +100,7 @@ void main() {
     testWidgets('shows loading indicator while fetching', (tester) async {
       await tester.pumpApp(
         physicalSize: const Size(1280, 720),
-        MeteredCard(apinetwork: _noop),
+        MeteredDetails(apinetwork: _noop),
       );
       await tester.pump();
 
@@ -82,7 +111,7 @@ void main() {
     testWidgets('renders diagnostics after loading', (tester) async {
       await tester.pumpApp(
         physicalSize: const Size(1280, 720),
-        MeteredCard(apinetwork: _withData),
+        MeteredDetails(apinetwork: _withData),
       );
       await tester.pumpAndSettle();
 
@@ -97,7 +126,7 @@ void main() {
     testWidgets('renders placeholders when diagnostics are empty', (tester) async {
       await tester.pumpApp(
         physicalSize: const Size(1280, 720),
-        MeteredCard(apinetwork: _empty),
+        MeteredDetails(apinetwork: _empty),
       );
       await tester.pumpAndSettle();
 
@@ -108,7 +137,7 @@ void main() {
     testWidgets('shows not found error on 404', (tester) async {
       await tester.pumpApp(
         physicalSize: const Size(1280, 720),
-        MeteredCard(apinetwork: _404),
+        MeteredDetails(apinetwork: _404),
       );
       await tester.pumpAndSettle();
 
@@ -119,7 +148,7 @@ void main() {
     testWidgets('shows unauthorized error on 401', (tester) async {
       await tester.pumpApp(
         physicalSize: const Size(1280, 720),
-        MeteredCard(apinetwork: _unauthorized),
+        MeteredDetails(apinetwork: _unauthorized),
       );
       await tester.pumpAndSettle();
 
