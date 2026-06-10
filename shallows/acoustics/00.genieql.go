@@ -51,7 +51,7 @@ func AudioFeaturesSimilarByVec(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer, vec []float32, exclude []string, n int) NewAudioFeaturesScannerStatic,
 ) {
-	gql = gql.Query(`SELECT ` + AudioFeaturesScannerStaticColumns + ` FROM audio_features WHERE NOT list_contains({exclude}, media_id::VARCHAR) ORDER BY array_cosine_distance(features, {vec}::FLOAT[128]) LIMIT {n}`)
+	gql = gql.Query(`SELECT ` + AudioFeaturesScannerStaticColumns + ` FROM audio_features WHERE NOT failed AND NOT list_contains({exclude}, media_id::VARCHAR) ORDER BY array_cosine_distance(features, {vec}::FLOAT[128]) LIMIT {n}`)
 }
 
 func CountScanner(gql genieql.Scanner, pattern func(count int64)) {}
@@ -60,7 +60,7 @@ func AudioFeaturesCountByVersion(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer, version uint32) NewCountScannerStaticRow,
 ) {
-	gql = gql.Query(`SELECT COUNT(*) AS count FROM audio_features WHERE "stats_version" = {version}`)
+	gql = gql.Query(`SELECT COUNT(*) AS count FROM audio_features WHERE "stats_version" = {version} AND NOT failed`)
 }
 
 func AudioFeaturesUnindexedMediaIDs(
