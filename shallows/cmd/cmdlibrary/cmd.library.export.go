@@ -1,19 +1,23 @@
 package cmdlibrary
 
 import (
+	"bytes"
 	"context"
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"io"
 	"log"
 	"os"
 
+	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
-	"github.com/retrovibed/retrovibed/shallows/internal/env"
+	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/library"
@@ -21,6 +25,7 @@ import (
 
 type exportJSONL struct {
 	Database   string `flag:"" name:"database" help:"database to read" default:"${vars_user_configuration_directory}/meta.db"`
+	MediaDir   string `flag:"" name:"mediadir" help:"root directory of media storage" default:"${vars_media_directory}"`
 	KnownMedia *bool  `flag:"" name:"known-media" help:"filter by known media presence" negatable:""`
 	Torrent    *bool  `flag:"" name:"torrent" help:"filter by torrent presence" negatable:""`
 }
@@ -32,7 +37,7 @@ func (t exportJSONL) Run(gctx *cmdopts.Global) (err error) {
 	}
 	defer db.Close()
 
-	return t.run(gctx.Context, db, fsx.DirVirtual(env.TorrentDir()), os.Stdout)
+	return t.run(gctx.Context, db, fsx.DirVirtual(t.MediaDir), os.Stdout)
 }
 
 func (t exportJSONL) run(ctx context.Context, db sqlx.Queryer, vfs fsx.Virtual, w io.Writer) error {
@@ -49,18 +54,19 @@ func (t exportJSONL) run(ctx context.Context, db sqlx.Queryer, vfs fsx.Virtual, 
 	scanner := sqlx.Scan(library.MetadataSearch(ctx, db, q))
 	var exported uint64
 	for md := range scanner.Iter() {
-		if err := exportItem(enc, vfs, md); err != nil {
+		if err := t.export(enc, vfs, md); err != nil {
 			return err
 		}
-		exported++
-		if exported%256 == 0 {
+
+		if exported += 1; exported%256 == 0 {
 			log.Println("exported", exported, "records")
 		}
 	}
 	return scanner.Err()
 }
 
-func exportItem(enc *json.Encoder, vfs fsx.Virtual, md library.Metadata) error {
+func (t exportJSONL) export(enc *json.Encoder, vfs fsx.Virtual, md library.Metadata) error {
+	const chunksize = 16 * bytesx.MiB
 	dcache, err := blockcache.NewDirectoryCache(vfs.Path(md.ID))
 	if err != nil {
 		return errorsx.Wrap(err, "open block cache")
@@ -68,7 +74,7 @@ func exportItem(enc *json.Encoder, vfs fsx.Virtual, md library.Metadata) error {
 
 	numChunks := uint64(0)
 	if md.Bytes > 0 {
-		numChunks = (md.Bytes + exportChunkSize - 1) / exportChunkSize
+		numChunks = (md.Bytes + chunksize - 1) / chunksize
 	}
 
 	if err := enc.Encode(exportHeader{Chunks: numChunks}); err != nil {
@@ -76,24 +82,26 @@ func exportItem(enc *json.Encoder, vfs fsx.Virtual, md library.Metadata) error {
 	}
 
 	h := md5.New()
-	buf := make([]byte, exportChunkSize)
+	b := bytes.NewBuffer(make([]byte, chunksize))
+	w := io.MultiWriter(h, b)
+
 	for i := uint64(0); i < numChunks; i++ {
-		off := int64(md.DiskOffset) + int64(i)*exportChunkSize
-		n, readErr := dcache.ReadAt(buf, off)
-		if readErr != nil && readErr != io.EOF {
-			timex.JSONSafeEncodeOption(&md)
-			_ = enc.Encode(exportTrailer{Metadata: md, MD5: ""})
-			return errorsx.Wrapf(readErr, "read chunk %d at offset %d", i, off)
+		b.Reset()
+		off := int64(md.DiskOffset) + int64(i)*chunksize
+
+		_, err := io.CopyN(w, io.NewSectionReader(dcache, off, chunksize), chunksize)
+		if errorsx.Ignore(err, io.EOF) != nil {
+			failed := enc.Encode(exportTrailer{Metadata: langx.Clone(md, timex.JSONSafeEncodeOption), MD5: uuid.Nil.String()})
+			return errors.Join(errorsx.Wrapf(err, "read chunk %d at offset %d", i, off), failed)
 		}
-		h.Write(buf[:n])
-		if err := enc.Encode(exportChunk{Data: buf[:n]}); err != nil {
+
+		if err := enc.Encode(exportChunk{Data: b.Bytes()}); err != nil {
 			return err
 		}
 	}
 
-	timex.JSONSafeEncodeOption(&md)
 	return enc.Encode(exportTrailer{
-		Metadata: md,
+		Metadata: langx.Clone(md, timex.JSONSafeEncodeOption),
 		MD5:      hex.EncodeToString(h.Sum(nil)),
 	})
 }

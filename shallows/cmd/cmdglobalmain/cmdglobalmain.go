@@ -140,6 +140,7 @@ func Main(args ...string) {
 			"vars_random_seed":                  uuid.Must(uuid.NewV4()).String(),
 			"vars_cores":                        strconv.Itoa(runtime.GOMAXPROCS(0)),
 			"vars_downloads_directory":          userx.DefaultDownloadDirectory(),
+			"vars_media_directory":              env.MediaDir(),
 			"env_auto_mdns":                     env.AutoMDNS,
 			"env_auto_bootstrap":                env.AutoBootstrap,
 			"env_auto_discovery":                env.AutoDiscovery,

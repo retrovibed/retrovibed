@@ -1,4 +1,4 @@
-### Notice
+qq### Notice
 
 this is public alpha software. its under active development and testing. expect issues.
 
@@ -49,6 +49,16 @@ am icons retrovibed
 am update retrovibed
 ```
 
+#### install via flatpak
+
+generally not recommend at this time, requires flatpak-builder 1.4.2 or later to be installed.
+
+```bash
+flatpak remote-add --if-not-exists --user flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+curl -L -o space.retrovibe.Console.yml https://github.com/retrovibed/retrovibed/releases/latest/download/space.retrovibe.Console.yml
+flatpak-builder --user --install-deps-from=flathub --install --ccache --force-clean retrovibe space.retrovibe.Console.yml
+```
+
 #### install deb daemon
 
 ```bash
@@ -67,24 +77,14 @@ RETROVIBED_TORRENT_PUBLIC_IP6=""
 RETROVIBED_SELF_SIGNED_HOSTS=127.0.0.1
 EOF
 
-# generate an account. optional, essentially used to create a static id for your account.
+# generate an account. essentially used to create a static id for your account.
 retrovibed identity generate {secret}
 
-# authorize initial users using ssh keys.
+# authorize initial users using ssh keys. can be located by using `retrovibed identity show`
 retrovibed identity bootstrap public-key "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBEdpDo/fUPKK7OUuZ4VM6JeBJmyZ882tQYPBN6nQwIk"
 retrovibed identity bootstrap authorized-file /root/.ssh/authorized_keys
 
 systemctl enable --now retrovibed.service
-```
-
-#### install via flatpak
-
-requires flatpak-builder 1.4.2 or later to be installed.
-
-```bash
-flatpak remote-add --if-not-exists --user flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-curl -L -o space.retrovibe.Console.yml https://github.com/retrovibed/retrovibed/releases/latest/download/space.retrovibe.Console.yml
-flatpak-builder --user --install-deps-from=flathub --install --ccache --force-clean retrovibe space.retrovibe.Console.yml
 ```
 
 ### determine ssh public key for client side
@@ -144,5 +144,7 @@ retrovibed identity generate {secret}
 on the device you're exporting from:
 
 ```bash
+retrovibed library export --no-torrent | ssh user@newdevicehost "retrovibed library export"
+
 retrovibed torrent export | ssh user@newdevicehost "retrovibed torrent import peer --peer='olddevicehost:port'"
 ```
