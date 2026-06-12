@@ -4,12 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 )
 
 type IdenRegister struct {
@@ -39,6 +41,11 @@ func (t IdenRegister) run(ctx context.Context, c *http.Client) (err error) {
 	} else if err != nil {
 		return errorsx.Wrap(err, "registration failed")
 	}
+	defer func() {
+		err = langx.FirstNonNil(err, resp.Body.Close())
+	}()
 
-	return resp.Body.Close()
+	log.Println("registration request successful")
+
+	return nil
 }
