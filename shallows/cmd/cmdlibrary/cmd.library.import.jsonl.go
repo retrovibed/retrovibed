@@ -17,6 +17,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/media"
 )
@@ -42,7 +43,7 @@ func (t importJSONL) run(ctx context.Context, c *http.Client, endpoint string, r
 			return errorsx.Wrap(err, "decode header")
 		}
 
-		if err := importItem(ctx, c, endpoint, dec, hdr.Chunks); err != nil {
+		if err := t.importItem(ctx, c, endpoint, dec, hdr.Chunks); err != nil {
 			return err
 		}
 
@@ -56,7 +57,7 @@ func (t importJSONL) run(ctx context.Context, c *http.Client, endpoint string, r
 	return nil
 }
 
-func importItem(ctx context.Context, c *http.Client, endpoint string, dec *json.Decoder, numChunks uint64) error {
+func (t importJSONL) importItem(ctx context.Context, c *http.Client, endpoint string, dec *json.Decoder, numChunks uint64) error {
 	h := md5.New()
 	var (
 		data    bytes.Buffer
@@ -78,7 +79,7 @@ func importItem(ctx context.Context, c *http.Client, endpoint string, dec *json.
 	if err := dec.Decode(&trailer); err != nil {
 		return errorsx.Wrap(err, "decode trailer")
 	}
-	timex.JSONSafeDecodeOption(&trailer.Metadata)
+	trailer.Metadata = langx.Clone(trailer.Metadata, timex.JSONSafeDecodeOption)
 
 	got := hex.EncodeToString(h.Sum(nil))
 	if got != trailer.MD5 {
