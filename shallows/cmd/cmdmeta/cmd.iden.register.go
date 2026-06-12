@@ -2,11 +2,14 @@ package cmdmeta
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 
 	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 )
 
 type IdenRegister struct {
@@ -20,11 +23,22 @@ func (t IdenRegister) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdo
 	}
 
 	c := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(fmt.Sprintf("https://%s", t.Endpoint)), authn.SSHTokenSourceOptionSigner(signer))
-	cc := authn.AuthzClientLibrary(tls.Config(), c, t.Endpoint)
 
-	return t.run(gctx.Context, cc)
+	return t.run(gctx.Context, c)
 }
 
 func (t IdenRegister) run(ctx context.Context, c *http.Client) (err error) {
-	return nil
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, fmt.Sprintf("https://%s/sso/register", t.Endpoint), nil)
+	if err != nil {
+		return errorsx.Wrap(err, "unable to create http request")
+	}
+
+	resp, err := httpx.AsError(c.Do(req))
+	if cause, ok := errors.AsType[*httpx.Error](err); ok && cause.Code == http.StatusConflict {
+		return nil
+	} else if err != nil {
+		return errorsx.Wrap(err, "registration failed")
+	}
+
+	return resp.Body.Close()
 }
