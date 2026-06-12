@@ -9,7 +9,7 @@ require (
 	github.com/gofrs/uuid/v5 v5.4.0
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/gorilla/schema v1.4.1
-	github.com/james-lawrence/torrent v0.0.0-20260604222541-a8807b62f578
+	github.com/james-lawrence/torrent v0.0.0-20260612193919-1f97461f5f6d
 	github.com/justinas/alice v1.2.0
 	github.com/mattn/go-isatty v0.0.21
 	github.com/mdlayher/netlink v1.11.2
