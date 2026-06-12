@@ -144,7 +144,7 @@ retrovibed identity generate {secret}
 on the device you're exporting from:
 
 ```bash
-retrovibed library export --no-torrent | ssh user@newdevicehost "retrovibed library export"
+retrovibed library export --no-torrent | ssh user@newdevicehost "~/go/bin/retrovibe library import jsonl"
 
 retrovibed torrent export | ssh user@newdevicehost "retrovibed torrent import peer --peer='olddevicehost:port'"
 ```

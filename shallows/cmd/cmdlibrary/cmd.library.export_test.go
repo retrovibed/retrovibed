@@ -144,6 +144,29 @@ func TestExportJSONLRun(t *testing.T) {
 		require.Equal(t, withoutKnown.ID, trailers[0].Metadata.ID)
 	})
 
+	t.Run("filter by id", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+		db := sqltestx.Metadatabase(t)
+		vfs := fsx.DirVirtual(t.TempDir())
+
+		var a, b library.Metadata
+		require.NoError(t, testx.Fake(&a, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID))
+		require.NoError(t, testx.Fake(&b, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID))
+		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, a).Scan(&a))
+		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, b).Scan(&b))
+		writeBlockData(t, vfs, a)
+		writeBlockData(t, vfs, b)
+
+		c := exportJSONL{ID: []string{a.ID}}
+		var buf bytes.Buffer
+		require.NoError(t, c.run(ctx, db, vfs, &buf))
+
+		trailers := decodeExportStream(t, &buf)
+		require.Len(t, trailers, 1)
+		require.Equal(t, a.ID, trailers[0].Metadata.ID)
+	})
+
 	t.Run("filter torrent true", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()

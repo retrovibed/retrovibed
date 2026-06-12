@@ -203,6 +203,14 @@ func MetadataQueryHasTorrent(has bool) squirrel.Sqlizer {
 	return squirrel.Expr("library_metadata.torrent_id = '00000000-0000-0000-0000-000000000000'")
 }
 
+func MetadataQueryByIDs(ids ...string) squirrel.Sqlizer {
+	if len(ids) == 0 {
+		return squirrelx.Noop{}
+	}
+
+	return squirrelx.In("library_metadata.id", ids...)
+}
+
 func MetadataSearch(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilder) MetadataScanner {
 	return NewMetadataScannerStatic(b.RunWith(q).QueryContext(ctx))
 }

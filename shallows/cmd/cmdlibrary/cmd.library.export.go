@@ -24,10 +24,11 @@ import (
 )
 
 type exportJSONL struct {
-	Database   string `flag:"" name:"database" help:"database to read" default:"${vars_user_configuration_directory}/meta.db"`
-	MediaDir   string `flag:"" name:"mediadir" help:"root directory of media storage" default:"${vars_media_directory}"`
-	KnownMedia *bool  `flag:"" name:"known-media" help:"filter by known media presence" negatable:""`
-	Torrent    *bool  `flag:"" name:"torrent" help:"filter by torrent presence" negatable:""`
+	Database   string   `flag:"" name:"database" help:"database to read" default:"${vars_user_configuration_directory}/meta.db"`
+	MediaDir   string   `flag:"" name:"mediadir" help:"root directory of media storage" default:"${vars_media_directory}"`
+	KnownMedia *bool    `flag:"" name:"known-media" help:"filter by known media presence" negatable:""`
+	Torrent    *bool    `flag:"" name:"torrent" help:"filter by torrent presence" negatable:""`
+	ID         []string `flag:"" name:"id" help:"export only the specified media id(s)" optional:""`
 }
 
 func (t exportJSONL) Run(gctx *cmdopts.Global) (err error) {
@@ -50,6 +51,7 @@ func (t exportJSONL) run(ctx context.Context, db sqlx.Queryer, vfs fsx.Virtual, 
 	if t.Torrent != nil {
 		q = q.Where(library.MetadataQueryHasTorrent(*t.Torrent))
 	}
+	q = q.Where(library.MetadataQueryByIDs(t.ID...))
 
 	scanner := sqlx.Scan(library.MetadataSearch(ctx, db, q))
 	var exported uint64
