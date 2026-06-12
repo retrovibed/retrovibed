@@ -35,6 +35,28 @@ func TestUnseeded(t *testing.T) {
 	})
 }
 
+func TestLoad(t *testing.T) {
+	t.Run("loads an existing cached identity", func(t *testing.T) {
+		dir := t.TempDir()
+		path := filepath.Join(dir, "id")
+
+		seeded, err := sshx.Seeded(context.Background(), "testseed", false, path)
+		require.NoError(t, err)
+
+		loaded, err := sshx.Load(path)
+		require.NoError(t, err)
+		require.Equal(t, seeded.PublicKey().Marshal(), loaded.PublicKey().Marshal())
+	})
+
+	t.Run("errors when no identity exists", func(t *testing.T) {
+		dir := t.TempDir()
+		path := filepath.Join(dir, "id")
+
+		_, err := sshx.Load(path)
+		require.Error(t, err)
+	})
+}
+
 func TestSeeded(t *testing.T) {
 	t.Run("creates key at new path", func(t *testing.T) {
 		dir := t.TempDir()

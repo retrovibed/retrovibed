@@ -56,6 +56,7 @@ func Main(args ...string) {
 		cmdopts.SSHID
 		Version   cmdopts.Version        `cmd:"" help:"display versioning information"`
 		Identity  cmdmeta.Identity       `cmd:"" help:"identity management commands"`
+		Cloud     cmdmeta.Cloud          `cmd:"" name:"cloud" help:"retrovibe.space cloud service commands"`
 		U12t      cmdmeta.Usermanagement `cmd:"" name:"u12t" help:"user management commands"`
 		Media     cmdmedia.Commands      `cmd:"" help:"media metadata management (import/export)"`
 		Library   cmdlibrary.Commands    `cmd:"" help:"manage your media library"`

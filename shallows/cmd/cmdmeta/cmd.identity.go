@@ -6,17 +6,15 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sshx"
-	"github.com/retrovibed/retrovibed/shallows/metaapi"
 )
 
 type Identity struct {
-	Generate  GenerateID  `cmd:"" help:"bootstrap the identity of the device itself, allows you to provide a seed for consistent generation"`
-	Bootstrap Bootstrap   `cmd:"" help:"bootstrap authorized users into the system, used to initially provision the system"`
-	Add       IdenAdd     `cmd:"" help:"add a user by public key via the api"`
-	Register  Register    `cmd:"" help:"register the current identity with the cloud service"`
-	Show      IdenDisplay `cmd:"" help:"display current identity"`
+	Generate  GenerateID   `cmd:"" help:"bootstrap the identity of the device itself, allows you to provide a seed for consistent generation"`
+	Bootstrap Bootstrap    `cmd:"" help:"bootstrap authorized users into the system, used to initially provision the system"`
+	Add       IdenAdd      `cmd:"" help:"add a user by public key via the api"`
+	Show      IdenDisplay  `cmd:"" help:"display current identity"`
+	Register  IdenRegister `cmd:"" help:"register the current identity with the cloud service"`
 }
 
 type IdenDisplay struct{}
@@ -41,29 +39,4 @@ func (t GenerateID) Run(gctx *cmdopts.Global) (err error) {
 	}
 
 	return authn.PrintIdentity(os.Stdout, id, nil)
-}
-
-type Register struct {
-	Seed string `arg:"" name:"seed" help:"used to seed the key generation, this command is used for when you want to maintain a persistent account identity easily" `
-}
-
-func (t Register) Run(gctx *cmdopts.Global) (err error) {
-	var (
-		session *metaapi.Session
-	)
-
-	id, err := sshx.AutoCached(sshx.NewKeyGenSeeded(t.Seed), env.PrivateKeyPath())
-	if err != nil {
-		return err
-	}
-
-	if session, err = authn.Register(gctx.Context); err != nil {
-		return errorsx.Wrap(err, "unable to register")
-	}
-
-	if err := authn.PrintIdentity(os.Stdout, id, session); err != nil {
-		return err
-	}
-
-	return nil
 }

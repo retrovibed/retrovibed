@@ -102,13 +102,12 @@ type keygen interface {
 	Generate() (epriv, epub []byte, err error)
 }
 
-func loadcached(path string) (s ssh.Signer, err error) {
-	var (
-		privencoded []byte
-	)
-
-	if privencoded, err = os.ReadFile(path); err != nil {
-		return nil, err
+// Load reads the identity cached at path. Unlike AutoCached/Seeded it never
+// generates a new key — it errors if no identity exists at path yet.
+func Load(path string) (s ssh.Signer, err error) {
+	privencoded, err := os.ReadFile(path)
+	if err != nil {
+		return nil, errorsx.Wrapf(err, "no identity found at %s, run identity generate first", path)
 	}
 
 	return ssh.ParsePrivateKey(privencoded)
@@ -171,7 +170,7 @@ func AutoCached(kg keygen, path string) (s ssh.Signer, err error) {
 		privencoded, pubencoded []byte
 	)
 
-	if s, err = loadcached(path); err == nil {
+	if s, err = Load(path); err == nil {
 		return s, nil
 	}
 

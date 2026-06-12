@@ -19,13 +19,13 @@ import (
 
 type U12TGrant struct {
 	Endpoint        string `flag:"" name:"endpoint"         help:"http address of the retrovibed instance" default:"localhost:9998"`
-	ProfileID       string `arg:"" name:"profile.id"        help:"profile id to grant access"             required:"true"`
 	LibraryRead     bool   `flag:"" name:"library-read"     help:"grant library read access"               negatable:"" default:"true"`
 	LibraryModify   bool   `flag:"" name:"library-modify"   help:"grant library modify access"             negatable:"" default:"false"`
 	BillingRead     bool   `flag:"" name:"billing-read"     help:"grant billing read access"               negatable:"" default:"false"`
 	BillingModify   bool   `flag:"" name:"billing-modify"   help:"grant billing modify access"             negatable:"" default:"false"`
 	CommunityModify bool   `flag:"" name:"community-modify" help:"grant community modify access"           negatable:"" default:"false"`
 	Usermanagement  bool   `flag:"" name:"usermanagement"   help:"grant usermanagement access"             negatable:"" default:"false"`
+	ProfileID       string `arg:"" name:"profile.id"        help:"profile id to grant access"             required:"true"`
 }
 
 func (t U12TGrant) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.SSHID) (err error) {
