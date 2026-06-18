@@ -7,6 +7,7 @@ import (
 	"log"
 	"math"
 	"net"
+	"net/netip"
 	"os"
 	"runtime"
 	"sync"
@@ -21,6 +22,7 @@ import (
 	"github.com/james-lawrence/torrent/connections"
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/int160"
+	"github.com/james-lawrence/torrent/dht/krpc"
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/retrovibed/retrovibed/retroapi/netmonx"
 	retronetx "github.com/retrovibed/retrovibed/retroapi/netx"
@@ -401,6 +403,13 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 			dht.OptionNodeID(peerid),
 			dht.OptionMuxer(tmux),
 			dht.OptionHostResolver(t._dnscache),
+			dht.OptionOnQuery(func(source netip.AddrPort, query *krpc.Msg) (propagate bool) {
+				log.Println("DERP DERP QUERY", query.Q, spew.Sdump(query))
+				return true
+			}),
+			dht.OptionOnAnnouncePeer(dht.PeerAnnounceFn(func(peerid int160.T, source netip.AddrPort, portOk bool) {
+				log.Println("DERP DERP ANNOUNCE", peerid, source, portOk)
+			})),
 			dht.OptionUPnP,
 			dhtdebug,
 			bootstrap,
