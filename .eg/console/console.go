@@ -211,6 +211,7 @@ func RunDev(cmd string) eg.OpFn {
 			// Environ("RETROVIBED_TORRENT_DEBUG", "true").
 			Environ("RETROVIBED_TORRENT_AUTO_DISCOVERY", "true").
 			Environ("RETROVIBED_METADATA_AUTODOWNLOAD", "false").
+			Environ("RETROVIBED_DDISC_INDEX_RATIO", "99").
 			// Environ("RETROVIBED_META_ENDPOINT", "api.retrovibe.space").
 			// Environ("RETROVIBED_CONSOLE_ENDPOINT", "console.retrovibe.space")
 			Environ("RETROVIBED_META_ENDPOINT", "localhost:8081").
