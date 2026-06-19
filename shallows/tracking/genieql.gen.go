@@ -208,7 +208,8 @@ func (t metadataScannerStatic) Scan(i *Metadata) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CompletedAt = tmp
 	default:
-		i.CompletedAt = c3.Time
+		tmp := c3.Time
+		i.CompletedAt = tmp
 	}
 
 	switch c4.InfinityModifier {
@@ -219,7 +220,8 @@ func (t metadataScannerStatic) Scan(i *Metadata) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c4.Time
+		tmp := c4.Time
+		i.CreatedAt = tmp
 	}
 
 	if c5.Valid {
@@ -236,7 +238,8 @@ func (t metadataScannerStatic) Scan(i *Metadata) error {
 		if uid, err := uuid.FromBytes([]byte(c7.String)); err != nil {
 			return err
 		} else {
-			i.EncryptionSeed = uid.String()
+			tmp := uid.String()
+			i.EncryptionSeed = tmp
 		}
 	}
 
@@ -248,7 +251,8 @@ func (t metadataScannerStatic) Scan(i *Metadata) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.ExpiresAt = tmp
 	default:
-		i.ExpiresAt = c8.Time
+		tmp := c8.Time
+		i.ExpiresAt = tmp
 	}
 
 	switch c9.InfinityModifier {
@@ -259,14 +263,16 @@ func (t metadataScannerStatic) Scan(i *Metadata) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.HiddenAt = tmp
 	default:
-		i.HiddenAt = c9.Time
+		tmp := c9.Time
+		i.HiddenAt = tmp
 	}
 
 	if c10.Valid {
 		if uid, err := uuid.FromBytes([]byte(c10.String)); err != nil {
 			return err
 		} else {
-			i.ID = uid.String()
+			tmp := uid.String()
+			i.ID = tmp
 		}
 	}
 
@@ -278,7 +284,8 @@ func (t metadataScannerStatic) Scan(i *Metadata) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.ImportedAt = tmp
 	default:
-		i.ImportedAt = c11.Time
+		tmp := c11.Time
+		i.ImportedAt = tmp
 	}
 
 	i.Infohash = c12
@@ -291,14 +298,16 @@ func (t metadataScannerStatic) Scan(i *Metadata) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.InitiatedAt = tmp
 	default:
-		i.InitiatedAt = c13.Time
+		tmp := c13.Time
+		i.InitiatedAt = tmp
 	}
 
 	if c14.Valid {
 		if uid, err := uuid.FromBytes([]byte(c14.String)); err != nil {
 			return err
 		} else {
-			i.KnownMediaID = uid.String()
+			tmp := uid.String()
+			i.KnownMediaID = tmp
 		}
 	}
 
@@ -315,7 +324,8 @@ func (t metadataScannerStatic) Scan(i *Metadata) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.NextAnnounceAt = tmp
 	default:
-		i.NextAnnounceAt = c16.Time
+		tmp := c16.Time
+		i.NextAnnounceAt = tmp
 	}
 
 	switch c17.InfinityModifier {
@@ -326,7 +336,8 @@ func (t metadataScannerStatic) Scan(i *Metadata) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.PausedAt = tmp
 	default:
-		i.PausedAt = c17.Time
+		tmp := c17.Time
+		i.PausedAt = tmp
 	}
 
 	if c18.Valid {
@@ -352,7 +363,8 @@ func (t metadataScannerStatic) Scan(i *Metadata) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.TombstonedAt = tmp
 	default:
-		i.TombstonedAt = c21.Time
+		tmp := c21.Time
+		i.TombstonedAt = tmp
 	}
 
 	if c22.Valid {
@@ -368,7 +380,8 @@ func (t metadataScannerStatic) Scan(i *Metadata) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		i.UpdatedAt = c23.Time
+		tmp := c23.Time
+		i.UpdatedAt = tmp
 	}
 
 	if c24.Valid {
@@ -384,7 +397,8 @@ func (t metadataScannerStatic) Scan(i *Metadata) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.VerifyAt = tmp
 	default:
-		i.VerifyAt = c25.Time
+		tmp := c25.Time
+		i.VerifyAt = tmp
 	}
 
 	return t.Rows.Err()
@@ -484,7 +498,8 @@ func (t MetadataScannerStaticRow) Scan(i *Metadata) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CompletedAt = tmp
 	default:
-		i.CompletedAt = c3.Time
+		tmp := c3.Time
+		i.CompletedAt = tmp
 	}
 
 	switch c4.InfinityModifier {
@@ -495,7 +510,8 @@ func (t MetadataScannerStaticRow) Scan(i *Metadata) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c4.Time
+		tmp := c4.Time
+		i.CreatedAt = tmp
 	}
 
 	if c5.Valid {
@@ -512,7 +528,8 @@ func (t MetadataScannerStaticRow) Scan(i *Metadata) error {
 		if uid, err := uuid.FromBytes([]byte(c7.String)); err != nil {
 			return err
 		} else {
-			i.EncryptionSeed = uid.String()
+			tmp := uid.String()
+			i.EncryptionSeed = tmp
 		}
 	}
 
@@ -524,7 +541,8 @@ func (t MetadataScannerStaticRow) Scan(i *Metadata) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.ExpiresAt = tmp
 	default:
-		i.ExpiresAt = c8.Time
+		tmp := c8.Time
+		i.ExpiresAt = tmp
 	}
 
 	switch c9.InfinityModifier {
@@ -535,14 +553,16 @@ func (t MetadataScannerStaticRow) Scan(i *Metadata) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.HiddenAt = tmp
 	default:
-		i.HiddenAt = c9.Time
+		tmp := c9.Time
+		i.HiddenAt = tmp
 	}
 
 	if c10.Valid {
 		if uid, err := uuid.FromBytes([]byte(c10.String)); err != nil {
 			return err
 		} else {
-			i.ID = uid.String()
+			tmp := uid.String()
+			i.ID = tmp
 		}
 	}
 
@@ -554,7 +574,8 @@ func (t MetadataScannerStaticRow) Scan(i *Metadata) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.ImportedAt = tmp
 	default:
-		i.ImportedAt = c11.Time
+		tmp := c11.Time
+		i.ImportedAt = tmp
 	}
 
 	i.Infohash = c12
@@ -567,14 +588,16 @@ func (t MetadataScannerStaticRow) Scan(i *Metadata) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.InitiatedAt = tmp
 	default:
-		i.InitiatedAt = c13.Time
+		tmp := c13.Time
+		i.InitiatedAt = tmp
 	}
 
 	if c14.Valid {
 		if uid, err := uuid.FromBytes([]byte(c14.String)); err != nil {
 			return err
 		} else {
-			i.KnownMediaID = uid.String()
+			tmp := uid.String()
+			i.KnownMediaID = tmp
 		}
 	}
 
@@ -591,7 +614,8 @@ func (t MetadataScannerStaticRow) Scan(i *Metadata) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.NextAnnounceAt = tmp
 	default:
-		i.NextAnnounceAt = c16.Time
+		tmp := c16.Time
+		i.NextAnnounceAt = tmp
 	}
 
 	switch c17.InfinityModifier {
@@ -602,7 +626,8 @@ func (t MetadataScannerStaticRow) Scan(i *Metadata) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.PausedAt = tmp
 	default:
-		i.PausedAt = c17.Time
+		tmp := c17.Time
+		i.PausedAt = tmp
 	}
 
 	if c18.Valid {
@@ -628,7 +653,8 @@ func (t MetadataScannerStaticRow) Scan(i *Metadata) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.TombstonedAt = tmp
 	default:
-		i.TombstonedAt = c21.Time
+		tmp := c21.Time
+		i.TombstonedAt = tmp
 	}
 
 	if c22.Valid {
@@ -644,7 +670,8 @@ func (t MetadataScannerStaticRow) Scan(i *Metadata) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		i.UpdatedAt = c23.Time
+		tmp := c23.Time
+		i.UpdatedAt = tmp
 	}
 
 	if c24.Valid {
@@ -660,7 +687,8 @@ func (t MetadataScannerStaticRow) Scan(i *Metadata) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.VerifyAt = tmp
 	default:
-		i.VerifyAt = c25.Time
+		tmp := c25.Time
+		i.VerifyAt = tmp
 	}
 
 	return nil
@@ -850,7 +878,8 @@ func (t metadataScannerDynamic) Scan(i *Metadata) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.CompletedAt = tmp
 			default:
-				i.CompletedAt = c3.Time
+				tmp := c3.Time
+				i.CompletedAt = tmp
 			}
 
 		case cn4:
@@ -862,7 +891,8 @@ func (t metadataScannerDynamic) Scan(i *Metadata) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.CreatedAt = tmp
 			default:
-				i.CreatedAt = c4.Time
+				tmp := c4.Time
+				i.CreatedAt = tmp
 			}
 
 		case cn5:
@@ -882,7 +912,8 @@ func (t metadataScannerDynamic) Scan(i *Metadata) error {
 				if uid, err := uuid.FromBytes([]byte(c7.String)); err != nil {
 					return err
 				} else {
-					i.EncryptionSeed = uid.String()
+					tmp := uid.String()
+					i.EncryptionSeed = tmp
 				}
 			}
 
@@ -895,7 +926,8 @@ func (t metadataScannerDynamic) Scan(i *Metadata) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.ExpiresAt = tmp
 			default:
-				i.ExpiresAt = c8.Time
+				tmp := c8.Time
+				i.ExpiresAt = tmp
 			}
 
 		case cn9:
@@ -907,7 +939,8 @@ func (t metadataScannerDynamic) Scan(i *Metadata) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.HiddenAt = tmp
 			default:
-				i.HiddenAt = c9.Time
+				tmp := c9.Time
+				i.HiddenAt = tmp
 			}
 
 		case cn10:
@@ -915,7 +948,8 @@ func (t metadataScannerDynamic) Scan(i *Metadata) error {
 				if uid, err := uuid.FromBytes([]byte(c10.String)); err != nil {
 					return err
 				} else {
-					i.ID = uid.String()
+					tmp := uid.String()
+					i.ID = tmp
 				}
 			}
 
@@ -928,7 +962,8 @@ func (t metadataScannerDynamic) Scan(i *Metadata) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.ImportedAt = tmp
 			default:
-				i.ImportedAt = c11.Time
+				tmp := c11.Time
+				i.ImportedAt = tmp
 			}
 
 		case cn12:
@@ -943,7 +978,8 @@ func (t metadataScannerDynamic) Scan(i *Metadata) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.InitiatedAt = tmp
 			default:
-				i.InitiatedAt = c13.Time
+				tmp := c13.Time
+				i.InitiatedAt = tmp
 			}
 
 		case cn14:
@@ -951,7 +987,8 @@ func (t metadataScannerDynamic) Scan(i *Metadata) error {
 				if uid, err := uuid.FromBytes([]byte(c14.String)); err != nil {
 					return err
 				} else {
-					i.KnownMediaID = uid.String()
+					tmp := uid.String()
+					i.KnownMediaID = tmp
 				}
 			}
 
@@ -970,7 +1007,8 @@ func (t metadataScannerDynamic) Scan(i *Metadata) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.NextAnnounceAt = tmp
 			default:
-				i.NextAnnounceAt = c16.Time
+				tmp := c16.Time
+				i.NextAnnounceAt = tmp
 			}
 
 		case cn17:
@@ -982,7 +1020,8 @@ func (t metadataScannerDynamic) Scan(i *Metadata) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.PausedAt = tmp
 			default:
-				i.PausedAt = c17.Time
+				tmp := c17.Time
+				i.PausedAt = tmp
 			}
 
 		case cn18:
@@ -1012,7 +1051,8 @@ func (t metadataScannerDynamic) Scan(i *Metadata) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.TombstonedAt = tmp
 			default:
-				i.TombstonedAt = c21.Time
+				tmp := c21.Time
+				i.TombstonedAt = tmp
 			}
 
 		case cn22:
@@ -1030,7 +1070,8 @@ func (t metadataScannerDynamic) Scan(i *Metadata) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.UpdatedAt = tmp
 			default:
-				i.UpdatedAt = c23.Time
+				tmp := c23.Time
+				i.UpdatedAt = tmp
 			}
 
 		case cn24:
@@ -1048,7 +1089,8 @@ func (t metadataScannerDynamic) Scan(i *Metadata) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.VerifyAt = tmp
 			default:
-				i.VerifyAt = c25.Time
+				tmp := c25.Time
+				i.VerifyAt = tmp
 			}
 
 		}
@@ -1170,7 +1212,8 @@ func (t rSSScannerStatic) Scan(i *RSS) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c3.Time
+		tmp := c3.Time
+		i.CreatedAt = tmp
 	}
 
 	if c4.Valid {
@@ -1182,7 +1225,8 @@ func (t rSSScannerStatic) Scan(i *RSS) error {
 		if uid, err := uuid.FromBytes([]byte(c5.String)); err != nil {
 			return err
 		} else {
-			i.Digest = uid.String()
+			tmp := uid.String()
+			i.Digest = tmp
 		}
 	}
 
@@ -1194,14 +1238,16 @@ func (t rSSScannerStatic) Scan(i *RSS) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.DisabledAt = tmp
 	default:
-		i.DisabledAt = c6.Time
+		tmp := c6.Time
+		i.DisabledAt = tmp
 	}
 
 	if c7.Valid {
 		if uid, err := uuid.FromBytes([]byte(c7.String)); err != nil {
 			return err
 		} else {
-			i.EncryptionSeed = uid.String()
+			tmp := uid.String()
+			i.EncryptionSeed = tmp
 		}
 	}
 
@@ -1209,7 +1255,8 @@ func (t rSSScannerStatic) Scan(i *RSS) error {
 		if uid, err := uuid.FromBytes([]byte(c8.String)); err != nil {
 			return err
 		} else {
-			i.ID = uid.String()
+			tmp := uid.String()
+			i.ID = tmp
 		}
 	}
 
@@ -1221,7 +1268,8 @@ func (t rSSScannerStatic) Scan(i *RSS) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.LastBuiltAt = tmp
 	default:
-		i.LastBuiltAt = c9.Time
+		tmp := c9.Time
+		i.LastBuiltAt = tmp
 	}
 
 	switch c10.InfinityModifier {
@@ -1232,7 +1280,8 @@ func (t rSSScannerStatic) Scan(i *RSS) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.NextCheck = tmp
 	default:
-		i.NextCheck = c10.Time
+		tmp := c10.Time
+		i.NextCheck = tmp
 	}
 
 	if c11.Valid {
@@ -1253,7 +1302,8 @@ func (t rSSScannerStatic) Scan(i *RSS) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		i.UpdatedAt = c13.Time
+		tmp := c13.Time
+		i.UpdatedAt = tmp
 	}
 
 	if c14.Valid {
@@ -1347,7 +1397,8 @@ func (t RSSScannerStaticRow) Scan(i *RSS) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c3.Time
+		tmp := c3.Time
+		i.CreatedAt = tmp
 	}
 
 	if c4.Valid {
@@ -1359,7 +1410,8 @@ func (t RSSScannerStaticRow) Scan(i *RSS) error {
 		if uid, err := uuid.FromBytes([]byte(c5.String)); err != nil {
 			return err
 		} else {
-			i.Digest = uid.String()
+			tmp := uid.String()
+			i.Digest = tmp
 		}
 	}
 
@@ -1371,14 +1423,16 @@ func (t RSSScannerStaticRow) Scan(i *RSS) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.DisabledAt = tmp
 	default:
-		i.DisabledAt = c6.Time
+		tmp := c6.Time
+		i.DisabledAt = tmp
 	}
 
 	if c7.Valid {
 		if uid, err := uuid.FromBytes([]byte(c7.String)); err != nil {
 			return err
 		} else {
-			i.EncryptionSeed = uid.String()
+			tmp := uid.String()
+			i.EncryptionSeed = tmp
 		}
 	}
 
@@ -1386,7 +1440,8 @@ func (t RSSScannerStaticRow) Scan(i *RSS) error {
 		if uid, err := uuid.FromBytes([]byte(c8.String)); err != nil {
 			return err
 		} else {
-			i.ID = uid.String()
+			tmp := uid.String()
+			i.ID = tmp
 		}
 	}
 
@@ -1398,7 +1453,8 @@ func (t RSSScannerStaticRow) Scan(i *RSS) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.LastBuiltAt = tmp
 	default:
-		i.LastBuiltAt = c9.Time
+		tmp := c9.Time
+		i.LastBuiltAt = tmp
 	}
 
 	switch c10.InfinityModifier {
@@ -1409,7 +1465,8 @@ func (t RSSScannerStaticRow) Scan(i *RSS) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.NextCheck = tmp
 	default:
-		i.NextCheck = c10.Time
+		tmp := c10.Time
+		i.NextCheck = tmp
 	}
 
 	if c11.Valid {
@@ -1430,7 +1487,8 @@ func (t RSSScannerStaticRow) Scan(i *RSS) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		i.UpdatedAt = c13.Time
+		tmp := c13.Time
+		i.UpdatedAt = tmp
 	}
 
 	if c14.Valid {
@@ -1581,7 +1639,8 @@ func (t rSSScannerDynamic) Scan(i *RSS) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.CreatedAt = tmp
 			default:
-				i.CreatedAt = c3.Time
+				tmp := c3.Time
+				i.CreatedAt = tmp
 			}
 
 		case cn4:
@@ -1595,7 +1654,8 @@ func (t rSSScannerDynamic) Scan(i *RSS) error {
 				if uid, err := uuid.FromBytes([]byte(c5.String)); err != nil {
 					return err
 				} else {
-					i.Digest = uid.String()
+					tmp := uid.String()
+					i.Digest = tmp
 				}
 			}
 
@@ -1608,7 +1668,8 @@ func (t rSSScannerDynamic) Scan(i *RSS) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.DisabledAt = tmp
 			default:
-				i.DisabledAt = c6.Time
+				tmp := c6.Time
+				i.DisabledAt = tmp
 			}
 
 		case cn7:
@@ -1616,7 +1677,8 @@ func (t rSSScannerDynamic) Scan(i *RSS) error {
 				if uid, err := uuid.FromBytes([]byte(c7.String)); err != nil {
 					return err
 				} else {
-					i.EncryptionSeed = uid.String()
+					tmp := uid.String()
+					i.EncryptionSeed = tmp
 				}
 			}
 
@@ -1625,7 +1687,8 @@ func (t rSSScannerDynamic) Scan(i *RSS) error {
 				if uid, err := uuid.FromBytes([]byte(c8.String)); err != nil {
 					return err
 				} else {
-					i.ID = uid.String()
+					tmp := uid.String()
+					i.ID = tmp
 				}
 			}
 
@@ -1638,7 +1701,8 @@ func (t rSSScannerDynamic) Scan(i *RSS) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.LastBuiltAt = tmp
 			default:
-				i.LastBuiltAt = c9.Time
+				tmp := c9.Time
+				i.LastBuiltAt = tmp
 			}
 
 		case cn10:
@@ -1650,7 +1714,8 @@ func (t rSSScannerDynamic) Scan(i *RSS) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.NextCheck = tmp
 			default:
-				i.NextCheck = c10.Time
+				tmp := c10.Time
+				i.NextCheck = tmp
 			}
 
 		case cn11:
@@ -1674,7 +1739,8 @@ func (t rSSScannerDynamic) Scan(i *RSS) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.UpdatedAt = tmp
 			default:
-				i.UpdatedAt = c13.Time
+				tmp := c13.Time
+				i.UpdatedAt = tmp
 			}
 
 		case cn14:
@@ -1786,21 +1852,24 @@ func (t unknownHashScannerStatic) Scan(i *UnknownHash) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c1.Time
+		tmp := c1.Time
+		i.CreatedAt = tmp
 	}
 
 	if c2.Valid {
 		if uid, err := uuid.FromBytes([]byte(c2.String)); err != nil {
 			return err
 		} else {
-			i.ID = uid.String()
+			tmp := uid.String()
+			i.ID = tmp
 		}
 	}
 
 	i.Infohash = c3
 
 	if c4.Valid {
-		i.IP = c4.V
+		tmp := c4.V
+		i.IP = tmp
 	}
 
 	switch c5.InfinityModifier {
@@ -1811,7 +1880,8 @@ func (t unknownHashScannerStatic) Scan(i *UnknownHash) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.NextCheck = tmp
 	default:
-		i.NextCheck = c5.Time
+		tmp := c5.Time
+		i.NextCheck = tmp
 	}
 
 	i.Peer = c6
@@ -1829,7 +1899,8 @@ func (t unknownHashScannerStatic) Scan(i *UnknownHash) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		i.UpdatedAt = c8.Time
+		tmp := c8.Time
+		i.UpdatedAt = tmp
 	}
 
 	return t.Rows.Err()
@@ -1902,21 +1973,24 @@ func (t UnknownHashScannerStaticRow) Scan(i *UnknownHash) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c1.Time
+		tmp := c1.Time
+		i.CreatedAt = tmp
 	}
 
 	if c2.Valid {
 		if uid, err := uuid.FromBytes([]byte(c2.String)); err != nil {
 			return err
 		} else {
-			i.ID = uid.String()
+			tmp := uid.String()
+			i.ID = tmp
 		}
 	}
 
 	i.Infohash = c3
 
 	if c4.Valid {
-		i.IP = c4.V
+		tmp := c4.V
+		i.IP = tmp
 	}
 
 	switch c5.InfinityModifier {
@@ -1927,7 +2001,8 @@ func (t UnknownHashScannerStaticRow) Scan(i *UnknownHash) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.NextCheck = tmp
 	default:
-		i.NextCheck = c5.Time
+		tmp := c5.Time
+		i.NextCheck = tmp
 	}
 
 	i.Peer = c6
@@ -1945,7 +2020,8 @@ func (t UnknownHashScannerStaticRow) Scan(i *UnknownHash) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		i.UpdatedAt = c8.Time
+		tmp := c8.Time
+		i.UpdatedAt = tmp
 	}
 
 	return nil
@@ -2055,7 +2131,8 @@ func (t unknownHashScannerDynamic) Scan(i *UnknownHash) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.CreatedAt = tmp
 			default:
-				i.CreatedAt = c1.Time
+				tmp := c1.Time
+				i.CreatedAt = tmp
 			}
 
 		case cn2:
@@ -2063,7 +2140,8 @@ func (t unknownHashScannerDynamic) Scan(i *UnknownHash) error {
 				if uid, err := uuid.FromBytes([]byte(c2.String)); err != nil {
 					return err
 				} else {
-					i.ID = uid.String()
+					tmp := uid.String()
+					i.ID = tmp
 				}
 			}
 
@@ -2072,7 +2150,8 @@ func (t unknownHashScannerDynamic) Scan(i *UnknownHash) error {
 
 		case cn4:
 			if c4.Valid {
-				i.IP = c4.V
+				tmp := c4.V
+				i.IP = tmp
 			}
 
 		case cn5:
@@ -2084,7 +2163,8 @@ func (t unknownHashScannerDynamic) Scan(i *UnknownHash) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.NextCheck = tmp
 			default:
-				i.NextCheck = c5.Time
+				tmp := c5.Time
+				i.NextCheck = tmp
 			}
 
 		case cn6:
@@ -2105,7 +2185,8 @@ func (t unknownHashScannerDynamic) Scan(i *UnknownHash) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.UpdatedAt = tmp
 			default:
-				i.UpdatedAt = c8.Time
+				tmp := c8.Time
+				i.UpdatedAt = tmp
 			}
 
 		}
@@ -2228,7 +2309,8 @@ func (t peerScannerStatic) Scan(i *Peer) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c3.Time
+		tmp := c3.Time
+		i.CreatedAt = tmp
 	}
 
 	if c4.Valid {
@@ -2240,7 +2322,8 @@ func (t peerScannerStatic) Scan(i *Peer) error {
 		if uid, err := uuid.FromBytes([]byte(c5.String)); err != nil {
 			return err
 		} else {
-			i.DdiscPartition = uid.String()
+			tmp := uid.String()
+			i.DdiscPartition = tmp
 		}
 	}
 
@@ -2248,7 +2331,8 @@ func (t peerScannerStatic) Scan(i *Peer) error {
 		if uid, err := uuid.FromBytes([]byte(c6.String)); err != nil {
 			return err
 		} else {
-			i.DdiscSyncoffset = uid.String()
+			tmp := uid.String()
+			i.DdiscSyncoffset = tmp
 		}
 	}
 
@@ -2261,12 +2345,14 @@ func (t peerScannerStatic) Scan(i *Peer) error {
 		if uid, err := uuid.FromBytes([]byte(c8.String)); err != nil {
 			return err
 		} else {
-			i.ID = uid.String()
+			tmp := uid.String()
+			i.ID = tmp
 		}
 	}
 
 	if c9.Valid {
-		i.IP = c9.V
+		tmp := c9.V
+		i.IP = tmp
 	}
 
 	if c10.Valid {
@@ -2282,7 +2368,8 @@ func (t peerScannerStatic) Scan(i *Peer) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.NextCheck = tmp
 	default:
-		i.NextCheck = c11.Time
+		tmp := c11.Time
+		i.NextCheck = tmp
 	}
 
 	i.Peer = c12
@@ -2300,7 +2387,8 @@ func (t peerScannerStatic) Scan(i *Peer) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.TombstonedAt = tmp
 	default:
-		i.TombstonedAt = c14.Time
+		tmp := c14.Time
+		i.TombstonedAt = tmp
 	}
 
 	switch c15.InfinityModifier {
@@ -2311,7 +2399,8 @@ func (t peerScannerStatic) Scan(i *Peer) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		i.UpdatedAt = c15.Time
+		tmp := c15.Time
+		i.UpdatedAt = tmp
 	}
 
 	return t.Rows.Err()
@@ -2401,7 +2490,8 @@ func (t PeerScannerStaticRow) Scan(i *Peer) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c3.Time
+		tmp := c3.Time
+		i.CreatedAt = tmp
 	}
 
 	if c4.Valid {
@@ -2413,7 +2503,8 @@ func (t PeerScannerStaticRow) Scan(i *Peer) error {
 		if uid, err := uuid.FromBytes([]byte(c5.String)); err != nil {
 			return err
 		} else {
-			i.DdiscPartition = uid.String()
+			tmp := uid.String()
+			i.DdiscPartition = tmp
 		}
 	}
 
@@ -2421,7 +2512,8 @@ func (t PeerScannerStaticRow) Scan(i *Peer) error {
 		if uid, err := uuid.FromBytes([]byte(c6.String)); err != nil {
 			return err
 		} else {
-			i.DdiscSyncoffset = uid.String()
+			tmp := uid.String()
+			i.DdiscSyncoffset = tmp
 		}
 	}
 
@@ -2434,12 +2526,14 @@ func (t PeerScannerStaticRow) Scan(i *Peer) error {
 		if uid, err := uuid.FromBytes([]byte(c8.String)); err != nil {
 			return err
 		} else {
-			i.ID = uid.String()
+			tmp := uid.String()
+			i.ID = tmp
 		}
 	}
 
 	if c9.Valid {
-		i.IP = c9.V
+		tmp := c9.V
+		i.IP = tmp
 	}
 
 	if c10.Valid {
@@ -2455,7 +2549,8 @@ func (t PeerScannerStaticRow) Scan(i *Peer) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.NextCheck = tmp
 	default:
-		i.NextCheck = c11.Time
+		tmp := c11.Time
+		i.NextCheck = tmp
 	}
 
 	i.Peer = c12
@@ -2473,7 +2568,8 @@ func (t PeerScannerStaticRow) Scan(i *Peer) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.TombstonedAt = tmp
 	default:
-		i.TombstonedAt = c14.Time
+		tmp := c14.Time
+		i.TombstonedAt = tmp
 	}
 
 	switch c15.InfinityModifier {
@@ -2484,7 +2580,8 @@ func (t PeerScannerStaticRow) Scan(i *Peer) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		i.UpdatedAt = c15.Time
+		tmp := c15.Time
+		i.UpdatedAt = tmp
 	}
 
 	return nil
@@ -2634,7 +2731,8 @@ func (t peerScannerDynamic) Scan(i *Peer) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.CreatedAt = tmp
 			default:
-				i.CreatedAt = c3.Time
+				tmp := c3.Time
+				i.CreatedAt = tmp
 			}
 
 		case cn4:
@@ -2648,7 +2746,8 @@ func (t peerScannerDynamic) Scan(i *Peer) error {
 				if uid, err := uuid.FromBytes([]byte(c5.String)); err != nil {
 					return err
 				} else {
-					i.DdiscPartition = uid.String()
+					tmp := uid.String()
+					i.DdiscPartition = tmp
 				}
 			}
 
@@ -2657,7 +2756,8 @@ func (t peerScannerDynamic) Scan(i *Peer) error {
 				if uid, err := uuid.FromBytes([]byte(c6.String)); err != nil {
 					return err
 				} else {
-					i.DdiscSyncoffset = uid.String()
+					tmp := uid.String()
+					i.DdiscSyncoffset = tmp
 				}
 			}
 
@@ -2672,13 +2772,15 @@ func (t peerScannerDynamic) Scan(i *Peer) error {
 				if uid, err := uuid.FromBytes([]byte(c8.String)); err != nil {
 					return err
 				} else {
-					i.ID = uid.String()
+					tmp := uid.String()
+					i.ID = tmp
 				}
 			}
 
 		case cn9:
 			if c9.Valid {
-				i.IP = c9.V
+				tmp := c9.V
+				i.IP = tmp
 			}
 
 		case cn10:
@@ -2696,7 +2798,8 @@ func (t peerScannerDynamic) Scan(i *Peer) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.NextCheck = tmp
 			default:
-				i.NextCheck = c11.Time
+				tmp := c11.Time
+				i.NextCheck = tmp
 			}
 
 		case cn12:
@@ -2717,7 +2820,8 @@ func (t peerScannerDynamic) Scan(i *Peer) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.TombstonedAt = tmp
 			default:
-				i.TombstonedAt = c14.Time
+				tmp := c14.Time
+				i.TombstonedAt = tmp
 			}
 
 		case cn15:
@@ -2729,7 +2833,8 @@ func (t peerScannerDynamic) Scan(i *Peer) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.UpdatedAt = tmp
 			default:
-				i.UpdatedAt = c15.Time
+				tmp := c15.Time
+				i.UpdatedAt = tmp
 			}
 
 		}
@@ -2756,32 +2861,6 @@ func (t peerScannerDynamic) Next() bool {
 	return t.Rows.Next()
 }
 
-// MetadataDownloadByID generated by genieql
-func MetadataDownloadByID(ctx context.Context, q sqlx.Queryer, id string) MetadataScannerStaticRow {
-	const query = `UPDATE torrents_metadata SET paused_at = 'infinity', initiated_at = NOW() WHERE "id" = $1 RETURNING torrents_metadata."archivable",torrents_metadata."auto_description",torrents_metadata."bytes",torrents_metadata."completed_at",torrents_metadata."created_at",torrents_metadata."description",torrents_metadata."downloaded",torrents_metadata."encryption_seed",torrents_metadata."expires_at",torrents_metadata."hidden_at",torrents_metadata."id",torrents_metadata."imported_at",torrents_metadata."infohash",torrents_metadata."initiated_at",torrents_metadata."known_media_id",torrents_metadata."mimetype",torrents_metadata."next_announce_at",torrents_metadata."paused_at",torrents_metadata."peers",torrents_metadata."private",torrents_metadata."seeding",torrents_metadata."tombstoned_at",torrents_metadata."tracker",torrents_metadata."updated_at",torrents_metadata."uploaded",torrents_metadata."verify_at"`
-	var c0 sql.NullString // id
-	c0.Valid = true
-	c0.String = id
-	return NewMetadataScannerStaticRow(q.QueryRowContext(ctx, query, c0))
-}
-
-// PeerUpdateDdisc generated by genieql
-func PeerUpdateDdisc(ctx context.Context, q sqlx.Queryer, id string, a Peer) PeerScannerStaticRow {
-	const query = `UPDATE torrents_peers SET updated_at = NOW(), description = $3, ddisc = $2 WHERE "id" = $1 RETURNING torrents_peers."bep51",torrents_peers."bep51_available",torrents_peers."bep51_ttl",torrents_peers."created_at",torrents_peers."ddisc",torrents_peers."ddisc_partition",torrents_peers."ddisc_syncoffset",torrents_peers."description",torrents_peers."id",torrents_peers."ip",torrents_peers."network",torrents_peers."next_check",torrents_peers."peer",torrents_peers."port",torrents_peers."tombstoned_at",torrents_peers."updated_at"`
-	var (
-		c0 sql.NullString // id
-		c1 sql.NullBool   // ddisc
-		c2 sql.NullString // description
-	)
-	c0.Valid = true
-	c0.String = id
-	c1.Valid = true
-	c1.Bool = a.Ddisc
-	c2.Valid = true
-	c2.String = a.Description
-	return NewPeerScannerStaticRow(q.QueryRowContext(ctx, query, c0, c1, c2))
-}
-
 // MetadataPausedByID generated by genieql
 func MetadataPausedByID(ctx context.Context, q sqlx.Queryer, id string) MetadataScannerStaticRow {
 	const query = `UPDATE torrents_metadata SET paused_at = NOW(), initiated_at = 'infinity' WHERE "id" = $1 RETURNING torrents_metadata."archivable",torrents_metadata."auto_description",torrents_metadata."bytes",torrents_metadata."completed_at",torrents_metadata."created_at",torrents_metadata."description",torrents_metadata."downloaded",torrents_metadata."encryption_seed",torrents_metadata."expires_at",torrents_metadata."hidden_at",torrents_metadata."id",torrents_metadata."imported_at",torrents_metadata."infohash",torrents_metadata."initiated_at",torrents_metadata."known_media_id",torrents_metadata."mimetype",torrents_metadata."next_announce_at",torrents_metadata."paused_at",torrents_metadata."peers",torrents_metadata."private",torrents_metadata."seeding",torrents_metadata."tombstoned_at",torrents_metadata."tracker",torrents_metadata."updated_at",torrents_metadata."uploaded",torrents_metadata."verify_at"`
@@ -2791,9 +2870,33 @@ func MetadataPausedByID(ctx context.Context, q sqlx.Queryer, id string) Metadata
 	return NewMetadataScannerStaticRow(q.QueryRowContext(ctx, query, c0))
 }
 
+// PeerFindByID generated by genieql
+func PeerFindByID(ctx context.Context, q sqlx.Queryer, id string) PeerScannerStaticRow {
+	const query = `SELECT torrents_peers."bep51",torrents_peers."bep51_available",torrents_peers."bep51_ttl",torrents_peers."created_at",torrents_peers."ddisc",torrents_peers."ddisc_partition",torrents_peers."ddisc_syncoffset",torrents_peers."description",torrents_peers."id",torrents_peers."ip",torrents_peers."network",torrents_peers."next_check",torrents_peers."peer",torrents_peers."port",torrents_peers."tombstoned_at",torrents_peers."updated_at" FROM torrents_peers WHERE "id" = $1`
+	var c0 sql.NullString // id
+	c0.Valid = true
+	c0.String = id
+	return NewPeerScannerStaticRow(q.QueryRowContext(ctx, query, c0))
+}
+
+// MetadataSamplePublic generated by genieql
+func MetadataSamplePublic(ctx context.Context, q sqlx.Queryer) MetadataScanner {
+	const query = `SELECT torrents_metadata."archivable",torrents_metadata."auto_description",torrents_metadata."bytes",torrents_metadata."completed_at",torrents_metadata."created_at",torrents_metadata."description",torrents_metadata."downloaded",torrents_metadata."encryption_seed",torrents_metadata."expires_at",torrents_metadata."hidden_at",torrents_metadata."id",torrents_metadata."imported_at",torrents_metadata."infohash",torrents_metadata."initiated_at",torrents_metadata."known_media_id",torrents_metadata."mimetype",torrents_metadata."next_announce_at",torrents_metadata."paused_at",torrents_metadata."peers",torrents_metadata."private",torrents_metadata."seeding",torrents_metadata."tombstoned_at",torrents_metadata."tracker",torrents_metadata."updated_at",torrents_metadata."uploaded",torrents_metadata."verify_at" FROM (SELECT torrents_metadata."archivable",torrents_metadata."auto_description",torrents_metadata."bytes",torrents_metadata."completed_at",torrents_metadata."created_at",torrents_metadata."description",torrents_metadata."downloaded",torrents_metadata."encryption_seed",torrents_metadata."expires_at",torrents_metadata."hidden_at",torrents_metadata."id",torrents_metadata."imported_at",torrents_metadata."infohash",torrents_metadata."initiated_at",torrents_metadata."known_media_id",torrents_metadata."mimetype",torrents_metadata."next_announce_at",torrents_metadata."paused_at",torrents_metadata."peers",torrents_metadata."private",torrents_metadata."seeding",torrents_metadata."tombstoned_at",torrents_metadata."tracker",torrents_metadata."updated_at",torrents_metadata."uploaded",torrents_metadata."verify_at" FROM torrents_metadata WHERE seeding AND NOT private) AS torrents_metadata USING SAMPLE 512`
+	return NewMetadataScannerStatic(q.QueryContext(ctx, query))
+}
+
 // MetadataFindByID generated by genieql
 func MetadataFindByID(ctx context.Context, q sqlx.Queryer, id string) MetadataScannerStaticRow {
 	const query = `SELECT torrents_metadata."archivable",torrents_metadata."auto_description",torrents_metadata."bytes",torrents_metadata."completed_at",torrents_metadata."created_at",torrents_metadata."description",torrents_metadata."downloaded",torrents_metadata."encryption_seed",torrents_metadata."expires_at",torrents_metadata."hidden_at",torrents_metadata."id",torrents_metadata."imported_at",torrents_metadata."infohash",torrents_metadata."initiated_at",torrents_metadata."known_media_id",torrents_metadata."mimetype",torrents_metadata."next_announce_at",torrents_metadata."paused_at",torrents_metadata."peers",torrents_metadata."private",torrents_metadata."seeding",torrents_metadata."tombstoned_at",torrents_metadata."tracker",torrents_metadata."updated_at",torrents_metadata."uploaded",torrents_metadata."verify_at" FROM torrents_metadata WHERE "id" = $1`
+	var c0 sql.NullString // id
+	c0.Valid = true
+	c0.String = id
+	return NewMetadataScannerStaticRow(q.QueryRowContext(ctx, query, c0))
+}
+
+// MetadataDownloadByID generated by genieql
+func MetadataDownloadByID(ctx context.Context, q sqlx.Queryer, id string) MetadataScannerStaticRow {
+	const query = `UPDATE torrents_metadata SET paused_at = 'infinity', initiated_at = NOW() WHERE "id" = $1 RETURNING torrents_metadata."archivable",torrents_metadata."auto_description",torrents_metadata."bytes",torrents_metadata."completed_at",torrents_metadata."created_at",torrents_metadata."description",torrents_metadata."downloaded",torrents_metadata."encryption_seed",torrents_metadata."expires_at",torrents_metadata."hidden_at",torrents_metadata."id",torrents_metadata."imported_at",torrents_metadata."infohash",torrents_metadata."initiated_at",torrents_metadata."known_media_id",torrents_metadata."mimetype",torrents_metadata."next_announce_at",torrents_metadata."paused_at",torrents_metadata."peers",torrents_metadata."private",torrents_metadata."seeding",torrents_metadata."tombstoned_at",torrents_metadata."tracker",torrents_metadata."updated_at",torrents_metadata."uploaded",torrents_metadata."verify_at"`
 	var c0 sql.NullString // id
 	c0.Valid = true
 	c0.String = id
@@ -3006,7 +3109,7 @@ func PeerInsertWithDefaultsExplode(a *Peer) ([]interface{}, error) {
 
 // PeerInsertWithDefaults generated by genieql
 func PeerInsertWithDefaults(ctx context.Context, q sqlx.Queryer, a Peer) PeerScannerStaticRow {
-	const query = `INSERT INTO "torrents_peers" ("bep51","bep51_available","bep51_ttl","created_at","ddisc","ddisc_partition","ddisc_syncoffset","description","id","ip","network","next_check","peer","port","tombstoned_at","updated_at") VALUES ($1,$2,$3,DEFAULT,$4,$5,$6,$7,$8,$9,$10,DEFAULT,$11,$12,$13,DEFAULT) ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, ip = EXCLUDED.ip, port = EXCLUDED.port, description = EXCLUDED.description, bep51_available = EXCLUDED.bep51_available, ddisc = EXCLUDED.ddisc, ddisc_partition = EXCLUDED.ddisc_partition, ddisc_syncoffset = EXCLUDED.ddisc_syncoffset RETURNING "bep51","bep51_available","bep51_ttl","created_at","ddisc","ddisc_partition","ddisc_syncoffset","description","id","ip","network","next_check","peer","port","tombstoned_at","updated_at"`
+	const query = `INSERT INTO "torrents_peers" ("bep51","bep51_available","bep51_ttl","created_at","ddisc","ddisc_partition","ddisc_syncoffset","description","id","ip","network","next_check","peer","port","tombstoned_at","updated_at") VALUES ($1,$2,$3,DEFAULT,$4,$5,$6,$7,$8,$9,$10,DEFAULT,$11,$12,$13,DEFAULT) ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, peer = EXCLUDED.peer, ip = EXCLUDED.ip, port = EXCLUDED.port, description = EXCLUDED.description, bep51_available = EXCLUDED.bep51_available, ddisc = EXCLUDED.ddisc, ddisc_partition = EXCLUDED.ddisc_partition, ddisc_syncoffset = EXCLUDED.ddisc_syncoffset, tombstoned_at = EXCLUDED.tombstoned_at RETURNING "bep51","bep51_available","bep51_ttl","created_at","ddisc","ddisc_partition","ddisc_syncoffset","description","id","ip","network","next_check","peer","port","tombstoned_at","updated_at"`
 	var (
 		c0  sql.NullBool         // bep51
 		c1  ducktype.NullUint64  // bep51_available
@@ -3057,6 +3160,23 @@ func PeerInsertWithDefaults(ctx context.Context, q sqlx.Queryer, a Peer) PeerSca
 	return NewPeerScannerStaticRow(q.QueryRowContext(ctx, query, c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12))
 }
 
+// PeerUpdateDdisc generated by genieql
+func PeerUpdateDdisc(ctx context.Context, q sqlx.Queryer, id string, a Peer) PeerScannerStaticRow {
+	const query = `UPDATE torrents_peers SET updated_at = NOW(), description = $3, ddisc = $2 WHERE "id" = $1 RETURNING torrents_peers."bep51",torrents_peers."bep51_available",torrents_peers."bep51_ttl",torrents_peers."created_at",torrents_peers."ddisc",torrents_peers."ddisc_partition",torrents_peers."ddisc_syncoffset",torrents_peers."description",torrents_peers."id",torrents_peers."ip",torrents_peers."network",torrents_peers."next_check",torrents_peers."peer",torrents_peers."port",torrents_peers."tombstoned_at",torrents_peers."updated_at"`
+	var (
+		c0 sql.NullString // id
+		c1 sql.NullBool   // ddisc
+		c2 sql.NullString // description
+	)
+	c0.Valid = true
+	c0.String = id
+	c1.Valid = true
+	c1.Bool = a.Ddisc
+	c2.Valid = true
+	c2.String = a.Description
+	return NewPeerScannerStaticRow(q.QueryRowContext(ctx, query, c0, c1, c2))
+}
+
 // MetadataFindByInfohash generated by genieql
 func MetadataFindByInfohash(ctx context.Context, q sqlx.Queryer, id string) MetadataScannerStaticRow {
 	const query = `SELECT torrents_metadata."archivable",torrents_metadata."auto_description",torrents_metadata."bytes",torrents_metadata."completed_at",torrents_metadata."created_at",torrents_metadata."description",torrents_metadata."downloaded",torrents_metadata."encryption_seed",torrents_metadata."expires_at",torrents_metadata."hidden_at",torrents_metadata."id",torrents_metadata."imported_at",torrents_metadata."infohash",torrents_metadata."initiated_at",torrents_metadata."known_media_id",torrents_metadata."mimetype",torrents_metadata."next_announce_at",torrents_metadata."paused_at",torrents_metadata."peers",torrents_metadata."private",torrents_metadata."seeding",torrents_metadata."tombstoned_at",torrents_metadata."tracker",torrents_metadata."updated_at",torrents_metadata."uploaded",torrents_metadata."verify_at" FROM torrents_metadata WHERE "infohash" = unhex($1)`
@@ -3064,15 +3184,6 @@ func MetadataFindByInfohash(ctx context.Context, q sqlx.Queryer, id string) Meta
 	c0.Valid = true
 	c0.String = id
 	return NewMetadataScannerStaticRow(q.QueryRowContext(ctx, query, c0))
-}
-
-// PeerFindByID generated by genieql
-func PeerFindByID(ctx context.Context, q sqlx.Queryer, id string) PeerScannerStaticRow {
-	const query = `SELECT torrents_peers."bep51",torrents_peers."bep51_available",torrents_peers."bep51_ttl",torrents_peers."created_at",torrents_peers."ddisc",torrents_peers."ddisc_partition",torrents_peers."ddisc_syncoffset",torrents_peers."description",torrents_peers."id",torrents_peers."ip",torrents_peers."network",torrents_peers."next_check",torrents_peers."peer",torrents_peers."port",torrents_peers."tombstoned_at",torrents_peers."updated_at" FROM torrents_peers WHERE "id" = $1`
-	var c0 sql.NullString // id
-	c0.Valid = true
-	c0.String = id
-	return NewPeerScannerStaticRow(q.QueryRowContext(ctx, query, c0))
 }
 
 // PeerDeleteByID generated by genieql
@@ -3213,6 +3324,15 @@ func PeerClearTombstoned(ctx context.Context, q sqlx.Queryer, ts time.Time) Peer
 	c0.Valid = true
 	c0.Time = ts
 	return NewPeerScannerStatic(q.QueryContext(ctx, query, c0))
+}
+
+// PeerNextCheck generated by genieql
+func PeerNextCheck(ctx context.Context, q sqlx.Queryer, ts time.Time) PeerScannerStaticRow {
+	const query = `UPDATE torrents_peers SET next_check = $1 WHERE id IN (SELECT id FROM torrents_peers WHERE next_check < NOW() AND bep51_available > 0 LIMIT 1) RETURNING torrents_peers."bep51",torrents_peers."bep51_available",torrents_peers."bep51_ttl",torrents_peers."created_at",torrents_peers."ddisc",torrents_peers."ddisc_partition",torrents_peers."ddisc_syncoffset",torrents_peers."description",torrents_peers."id",torrents_peers."ip",torrents_peers."network",torrents_peers."next_check",torrents_peers."peer",torrents_peers."port",torrents_peers."tombstoned_at",torrents_peers."updated_at"`
+	var c0 sql.NullTime // ts
+	c0.Valid = true
+	c0.Time = ts
+	return NewPeerScannerStaticRow(q.QueryRowContext(ctx, query, c0))
 }
 
 // MetadataResetByID generated by genieql

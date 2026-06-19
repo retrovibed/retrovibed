@@ -127,7 +127,8 @@ func (t libraryMetadataScannerStatic) Scan(i *LibraryMetadata) error {
 		if uid, err := uuid.FromBytes([]byte(c0.String)); err != nil {
 			return err
 		} else {
-			i.ArchiveID = uid.String()
+			tmp := uid.String()
+			i.ArchiveID = tmp
 		}
 	}
 
@@ -149,7 +150,8 @@ func (t libraryMetadataScannerStatic) Scan(i *LibraryMetadata) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c3.Time
+		tmp := c3.Time
+		i.CreatedAt = tmp
 	}
 
 	if c4.Valid {
@@ -171,7 +173,8 @@ func (t libraryMetadataScannerStatic) Scan(i *LibraryMetadata) error {
 		if uid, err := uuid.FromBytes([]byte(c7.String)); err != nil {
 			return err
 		} else {
-			i.EncryptionSeed = uid.String()
+			tmp := uid.String()
+			i.EncryptionSeed = tmp
 		}
 	}
 
@@ -183,14 +186,16 @@ func (t libraryMetadataScannerStatic) Scan(i *LibraryMetadata) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.HiddenAt = tmp
 	default:
-		i.HiddenAt = c8.Time
+		tmp := c8.Time
+		i.HiddenAt = tmp
 	}
 
 	if c9.Valid {
 		if uid, err := uuid.FromBytes([]byte(c9.String)); err != nil {
 			return err
 		} else {
-			i.ID = uid.String()
+			tmp := uid.String()
+			i.ID = tmp
 		}
 	}
 
@@ -203,7 +208,8 @@ func (t libraryMetadataScannerStatic) Scan(i *LibraryMetadata) error {
 		if uid, err := uuid.FromBytes([]byte(c11.String)); err != nil {
 			return err
 		} else {
-			i.KnownMediaID = uid.String()
+			tmp := uid.String()
+			i.KnownMediaID = tmp
 		}
 	}
 
@@ -225,14 +231,16 @@ func (t libraryMetadataScannerStatic) Scan(i *LibraryMetadata) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.TombstonedAt = tmp
 	default:
-		i.TombstonedAt = c14.Time
+		tmp := c14.Time
+		i.TombstonedAt = tmp
 	}
 
 	if c15.Valid {
 		if uid, err := uuid.FromBytes([]byte(c15.String)); err != nil {
 			return err
 		} else {
-			i.TorrentID = uid.String()
+			tmp := uid.String()
+			i.TorrentID = tmp
 		}
 	}
 
@@ -244,7 +252,8 @@ func (t libraryMetadataScannerStatic) Scan(i *LibraryMetadata) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		i.UpdatedAt = c16.Time
+		tmp := c16.Time
+		i.UpdatedAt = tmp
 	}
 
 	return t.Rows.Err()
@@ -316,7 +325,8 @@ func (t LibraryMetadataScannerStaticRow) Scan(i *LibraryMetadata) error {
 		if uid, err := uuid.FromBytes([]byte(c0.String)); err != nil {
 			return err
 		} else {
-			i.ArchiveID = uid.String()
+			tmp := uid.String()
+			i.ArchiveID = tmp
 		}
 	}
 
@@ -338,7 +348,8 @@ func (t LibraryMetadataScannerStaticRow) Scan(i *LibraryMetadata) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c3.Time
+		tmp := c3.Time
+		i.CreatedAt = tmp
 	}
 
 	if c4.Valid {
@@ -360,7 +371,8 @@ func (t LibraryMetadataScannerStaticRow) Scan(i *LibraryMetadata) error {
 		if uid, err := uuid.FromBytes([]byte(c7.String)); err != nil {
 			return err
 		} else {
-			i.EncryptionSeed = uid.String()
+			tmp := uid.String()
+			i.EncryptionSeed = tmp
 		}
 	}
 
@@ -372,14 +384,16 @@ func (t LibraryMetadataScannerStaticRow) Scan(i *LibraryMetadata) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.HiddenAt = tmp
 	default:
-		i.HiddenAt = c8.Time
+		tmp := c8.Time
+		i.HiddenAt = tmp
 	}
 
 	if c9.Valid {
 		if uid, err := uuid.FromBytes([]byte(c9.String)); err != nil {
 			return err
 		} else {
-			i.ID = uid.String()
+			tmp := uid.String()
+			i.ID = tmp
 		}
 	}
 
@@ -392,7 +406,8 @@ func (t LibraryMetadataScannerStaticRow) Scan(i *LibraryMetadata) error {
 		if uid, err := uuid.FromBytes([]byte(c11.String)); err != nil {
 			return err
 		} else {
-			i.KnownMediaID = uid.String()
+			tmp := uid.String()
+			i.KnownMediaID = tmp
 		}
 	}
 
@@ -414,14 +429,16 @@ func (t LibraryMetadataScannerStaticRow) Scan(i *LibraryMetadata) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.TombstonedAt = tmp
 	default:
-		i.TombstonedAt = c14.Time
+		tmp := c14.Time
+		i.TombstonedAt = tmp
 	}
 
 	if c15.Valid {
 		if uid, err := uuid.FromBytes([]byte(c15.String)); err != nil {
 			return err
 		} else {
-			i.TorrentID = uid.String()
+			tmp := uid.String()
+			i.TorrentID = tmp
 		}
 	}
 
@@ -433,7 +450,8 @@ func (t LibraryMetadataScannerStaticRow) Scan(i *LibraryMetadata) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		i.UpdatedAt = c16.Time
+		tmp := c16.Time
+		i.UpdatedAt = tmp
 	}
 
 	return nil
@@ -565,7 +583,8 @@ func (t libraryMetadataScannerDynamic) Scan(i *LibraryMetadata) error {
 				if uid, err := uuid.FromBytes([]byte(c0.String)); err != nil {
 					return err
 				} else {
-					i.ArchiveID = uid.String()
+					tmp := uid.String()
+					i.ArchiveID = tmp
 				}
 			}
 
@@ -590,7 +609,8 @@ func (t libraryMetadataScannerDynamic) Scan(i *LibraryMetadata) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.CreatedAt = tmp
 			default:
-				i.CreatedAt = c3.Time
+				tmp := c3.Time
+				i.CreatedAt = tmp
 			}
 
 		case cn4:
@@ -616,7 +636,8 @@ func (t libraryMetadataScannerDynamic) Scan(i *LibraryMetadata) error {
 				if uid, err := uuid.FromBytes([]byte(c7.String)); err != nil {
 					return err
 				} else {
-					i.EncryptionSeed = uid.String()
+					tmp := uid.String()
+					i.EncryptionSeed = tmp
 				}
 			}
 
@@ -629,7 +650,8 @@ func (t libraryMetadataScannerDynamic) Scan(i *LibraryMetadata) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.HiddenAt = tmp
 			default:
-				i.HiddenAt = c8.Time
+				tmp := c8.Time
+				i.HiddenAt = tmp
 			}
 
 		case cn9:
@@ -637,7 +659,8 @@ func (t libraryMetadataScannerDynamic) Scan(i *LibraryMetadata) error {
 				if uid, err := uuid.FromBytes([]byte(c9.String)); err != nil {
 					return err
 				} else {
-					i.ID = uid.String()
+					tmp := uid.String()
+					i.ID = tmp
 				}
 			}
 
@@ -652,7 +675,8 @@ func (t libraryMetadataScannerDynamic) Scan(i *LibraryMetadata) error {
 				if uid, err := uuid.FromBytes([]byte(c11.String)); err != nil {
 					return err
 				} else {
-					i.KnownMediaID = uid.String()
+					tmp := uid.String()
+					i.KnownMediaID = tmp
 				}
 			}
 
@@ -677,7 +701,8 @@ func (t libraryMetadataScannerDynamic) Scan(i *LibraryMetadata) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.TombstonedAt = tmp
 			default:
-				i.TombstonedAt = c14.Time
+				tmp := c14.Time
+				i.TombstonedAt = tmp
 			}
 
 		case cn15:
@@ -685,7 +710,8 @@ func (t libraryMetadataScannerDynamic) Scan(i *LibraryMetadata) error {
 				if uid, err := uuid.FromBytes([]byte(c15.String)); err != nil {
 					return err
 				} else {
-					i.TorrentID = uid.String()
+					tmp := uid.String()
+					i.TorrentID = tmp
 				}
 			}
 
@@ -698,7 +724,8 @@ func (t libraryMetadataScannerDynamic) Scan(i *LibraryMetadata) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.UpdatedAt = tmp
 			default:
-				i.UpdatedAt = c16.Time
+				tmp := c16.Time
+				i.UpdatedAt = tmp
 			}
 
 		}
@@ -802,14 +829,16 @@ func (t audioFeaturesScannerStatic) Scan(i *AudioFeatures) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.IndexedAt = tmp
 	default:
-		i.IndexedAt = c2.Time
+		tmp := c2.Time
+		i.IndexedAt = tmp
 	}
 
 	if c3.Valid {
 		if uid, err := uuid.FromBytes([]byte(c3.String)); err != nil {
 			return err
 		} else {
-			i.MediaID = uid.String()
+			tmp := uid.String()
+			i.MediaID = tmp
 		}
 	}
 
@@ -886,14 +915,16 @@ func (t AudioFeaturesScannerStaticRow) Scan(i *AudioFeatures) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.IndexedAt = tmp
 	default:
-		i.IndexedAt = c2.Time
+		tmp := c2.Time
+		i.IndexedAt = tmp
 	}
 
 	if c3.Valid {
 		if uid, err := uuid.FromBytes([]byte(c3.String)); err != nil {
 			return err
 		} else {
-			i.MediaID = uid.String()
+			tmp := uid.String()
+			i.MediaID = tmp
 		}
 	}
 
@@ -996,7 +1027,8 @@ func (t audioFeaturesScannerDynamic) Scan(i *AudioFeatures) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.IndexedAt = tmp
 			default:
-				i.IndexedAt = c2.Time
+				tmp := c2.Time
+				i.IndexedAt = tmp
 			}
 
 		case cn3:
@@ -1004,7 +1036,8 @@ func (t audioFeaturesScannerDynamic) Scan(i *AudioFeatures) error {
 				if uid, err := uuid.FromBytes([]byte(c3.String)); err != nil {
 					return err
 				} else {
-					i.MediaID = uid.String()
+					tmp := uid.String()
+					i.MediaID = tmp
 				}
 			}
 

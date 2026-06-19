@@ -17,7 +17,7 @@ See your distro for installation instructions. flutter doctor must show android 
 ## Running the application
 
 ```bash
-eg compute baremetal --infinite dev/console/android
+eg compute baremetal --ttl=infinity dev/console/android
 ```
 
 ## Troubleshooting

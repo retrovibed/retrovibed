@@ -99,7 +99,8 @@ func (t identityScannerStatic) Scan(i *Identity) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c0.Time
+		tmp := c0.Time
+		i.CreatedAt = tmp
 	}
 
 	switch c1.InfinityModifier {
@@ -110,14 +111,16 @@ func (t identityScannerStatic) Scan(i *Identity) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.DisabledAt = tmp
 	default:
-		i.DisabledAt = c1.Time
+		tmp := c1.Time
+		i.DisabledAt = tmp
 	}
 
 	if c2.Valid {
 		if uid, err := uuid.FromBytes([]byte(c2.String)); err != nil {
 			return err
 		} else {
-			i.ID = uid.String()
+			tmp := uid.String()
+			i.ID = tmp
 		}
 	}
 
@@ -125,7 +128,8 @@ func (t identityScannerStatic) Scan(i *Identity) error {
 		if uid, err := uuid.FromBytes([]byte(c3.String)); err != nil {
 			return err
 		} else {
-			i.ProfileID = uid.String()
+			tmp := uid.String()
+			i.ProfileID = tmp
 		}
 	}
 
@@ -142,7 +146,8 @@ func (t identityScannerStatic) Scan(i *Identity) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		i.UpdatedAt = c5.Time
+		tmp := c5.Time
+		i.UpdatedAt = tmp
 	}
 
 	return t.Rows.Err()
@@ -207,7 +212,8 @@ func (t IdentityScannerStaticRow) Scan(i *Identity) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c0.Time
+		tmp := c0.Time
+		i.CreatedAt = tmp
 	}
 
 	switch c1.InfinityModifier {
@@ -218,14 +224,16 @@ func (t IdentityScannerStaticRow) Scan(i *Identity) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.DisabledAt = tmp
 	default:
-		i.DisabledAt = c1.Time
+		tmp := c1.Time
+		i.DisabledAt = tmp
 	}
 
 	if c2.Valid {
 		if uid, err := uuid.FromBytes([]byte(c2.String)); err != nil {
 			return err
 		} else {
-			i.ID = uid.String()
+			tmp := uid.String()
+			i.ID = tmp
 		}
 	}
 
@@ -233,7 +241,8 @@ func (t IdentityScannerStaticRow) Scan(i *Identity) error {
 		if uid, err := uuid.FromBytes([]byte(c3.String)); err != nil {
 			return err
 		} else {
-			i.ProfileID = uid.String()
+			tmp := uid.String()
+			i.ProfileID = tmp
 		}
 	}
 
@@ -250,7 +259,8 @@ func (t IdentityScannerStaticRow) Scan(i *Identity) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		i.UpdatedAt = c5.Time
+		tmp := c5.Time
+		i.UpdatedAt = tmp
 	}
 
 	return nil
@@ -342,7 +352,8 @@ func (t identityScannerDynamic) Scan(i *Identity) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.CreatedAt = tmp
 			default:
-				i.CreatedAt = c0.Time
+				tmp := c0.Time
+				i.CreatedAt = tmp
 			}
 
 		case cn1:
@@ -354,7 +365,8 @@ func (t identityScannerDynamic) Scan(i *Identity) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.DisabledAt = tmp
 			default:
-				i.DisabledAt = c1.Time
+				tmp := c1.Time
+				i.DisabledAt = tmp
 			}
 
 		case cn2:
@@ -362,7 +374,8 @@ func (t identityScannerDynamic) Scan(i *Identity) error {
 				if uid, err := uuid.FromBytes([]byte(c2.String)); err != nil {
 					return err
 				} else {
-					i.ID = uid.String()
+					tmp := uid.String()
+					i.ID = tmp
 				}
 			}
 
@@ -371,7 +384,8 @@ func (t identityScannerDynamic) Scan(i *Identity) error {
 				if uid, err := uuid.FromBytes([]byte(c3.String)); err != nil {
 					return err
 				} else {
-					i.ProfileID = uid.String()
+					tmp := uid.String()
+					i.ProfileID = tmp
 				}
 			}
 
@@ -390,7 +404,8 @@ func (t identityScannerDynamic) Scan(i *Identity) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.UpdatedAt = tmp
 			default:
-				i.UpdatedAt = c5.Time
+				tmp := c5.Time
+				i.UpdatedAt = tmp
 			}
 
 		}

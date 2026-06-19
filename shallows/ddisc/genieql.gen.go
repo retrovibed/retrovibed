@@ -156,7 +156,8 @@ func (t discoveredScannerStatic) Scan(i *Discovered) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c5.Time
+		tmp := c5.Time
+		i.CreatedAt = tmp
 	}
 
 	if c6.Valid {
@@ -172,14 +173,16 @@ func (t discoveredScannerStatic) Scan(i *Discovered) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.HiddenAt = tmp
 	default:
-		i.HiddenAt = c7.Time
+		tmp := c7.Time
+		i.HiddenAt = tmp
 	}
 
 	if c8.Valid {
 		if uid, err := uuid.FromBytes([]byte(c8.String)); err != nil {
 			return err
 		} else {
-			i.ID = uid.String()
+			tmp := uid.String()
+			i.ID = tmp
 		}
 	}
 
@@ -189,7 +192,8 @@ func (t discoveredScannerStatic) Scan(i *Discovered) error {
 		if uid, err := uuid.FromBytes([]byte(c10.String)); err != nil {
 			return err
 		} else {
-			i.KnownMediaID = uid.String()
+			tmp := uid.String()
+			i.KnownMediaID = tmp
 		}
 	}
 
@@ -206,14 +210,16 @@ func (t discoveredScannerStatic) Scan(i *Discovered) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.NextCheckAt = tmp
 	default:
-		i.NextCheckAt = c12.Time
+		tmp := c12.Time
+		i.NextCheckAt = tmp
 	}
 
 	if c13.Valid {
 		if uid, err := uuid.FromBytes([]byte(c13.String)); err != nil {
 			return err
 		} else {
-			i.Partition = uid.String()
+			tmp := uid.String()
+			i.Partition = tmp
 		}
 	}
 
@@ -225,7 +231,8 @@ func (t discoveredScannerStatic) Scan(i *Discovered) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.ReleasedAt = tmp
 	default:
-		i.ReleasedAt = c14.Time
+		tmp := c14.Time
+		i.ReleasedAt = tmp
 	}
 
 	if c15.Valid {
@@ -237,7 +244,8 @@ func (t discoveredScannerStatic) Scan(i *Discovered) error {
 		if uid, err := uuid.FromBytes([]byte(c16.String)); err != nil {
 			return err
 		} else {
-			i.SyncUID = uid.String()
+			tmp := uid.String()
+			i.SyncUID = tmp
 		}
 	}
 
@@ -254,7 +262,8 @@ func (t discoveredScannerStatic) Scan(i *Discovered) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.TombstonedAt = tmp
 	default:
-		i.TombstonedAt = c18.Time
+		tmp := c18.Time
+		i.TombstonedAt = tmp
 	}
 
 	switch c19.InfinityModifier {
@@ -265,7 +274,8 @@ func (t discoveredScannerStatic) Scan(i *Discovered) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		i.UpdatedAt = c19.Time
+		tmp := c19.Time
+		i.UpdatedAt = tmp
 	}
 
 	if c20.Valid {
@@ -381,7 +391,8 @@ func (t DiscoveredScannerStaticRow) Scan(i *Discovered) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c5.Time
+		tmp := c5.Time
+		i.CreatedAt = tmp
 	}
 
 	if c6.Valid {
@@ -397,14 +408,16 @@ func (t DiscoveredScannerStaticRow) Scan(i *Discovered) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.HiddenAt = tmp
 	default:
-		i.HiddenAt = c7.Time
+		tmp := c7.Time
+		i.HiddenAt = tmp
 	}
 
 	if c8.Valid {
 		if uid, err := uuid.FromBytes([]byte(c8.String)); err != nil {
 			return err
 		} else {
-			i.ID = uid.String()
+			tmp := uid.String()
+			i.ID = tmp
 		}
 	}
 
@@ -414,7 +427,8 @@ func (t DiscoveredScannerStaticRow) Scan(i *Discovered) error {
 		if uid, err := uuid.FromBytes([]byte(c10.String)); err != nil {
 			return err
 		} else {
-			i.KnownMediaID = uid.String()
+			tmp := uid.String()
+			i.KnownMediaID = tmp
 		}
 	}
 
@@ -431,14 +445,16 @@ func (t DiscoveredScannerStaticRow) Scan(i *Discovered) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.NextCheckAt = tmp
 	default:
-		i.NextCheckAt = c12.Time
+		tmp := c12.Time
+		i.NextCheckAt = tmp
 	}
 
 	if c13.Valid {
 		if uid, err := uuid.FromBytes([]byte(c13.String)); err != nil {
 			return err
 		} else {
-			i.Partition = uid.String()
+			tmp := uid.String()
+			i.Partition = tmp
 		}
 	}
 
@@ -450,7 +466,8 @@ func (t DiscoveredScannerStaticRow) Scan(i *Discovered) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.ReleasedAt = tmp
 	default:
-		i.ReleasedAt = c14.Time
+		tmp := c14.Time
+		i.ReleasedAt = tmp
 	}
 
 	if c15.Valid {
@@ -462,7 +479,8 @@ func (t DiscoveredScannerStaticRow) Scan(i *Discovered) error {
 		if uid, err := uuid.FromBytes([]byte(c16.String)); err != nil {
 			return err
 		} else {
-			i.SyncUID = uid.String()
+			tmp := uid.String()
+			i.SyncUID = tmp
 		}
 	}
 
@@ -479,7 +497,8 @@ func (t DiscoveredScannerStaticRow) Scan(i *Discovered) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.TombstonedAt = tmp
 	default:
-		i.TombstonedAt = c18.Time
+		tmp := c18.Time
+		i.TombstonedAt = tmp
 	}
 
 	switch c19.InfinityModifier {
@@ -490,7 +509,8 @@ func (t DiscoveredScannerStaticRow) Scan(i *Discovered) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		i.UpdatedAt = c19.Time
+		tmp := c19.Time
+		i.UpdatedAt = tmp
 	}
 
 	if c20.Valid {
@@ -686,7 +706,8 @@ func (t discoveredScannerDynamic) Scan(i *Discovered) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.CreatedAt = tmp
 			default:
-				i.CreatedAt = c5.Time
+				tmp := c5.Time
+				i.CreatedAt = tmp
 			}
 
 		case cn6:
@@ -704,7 +725,8 @@ func (t discoveredScannerDynamic) Scan(i *Discovered) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.HiddenAt = tmp
 			default:
-				i.HiddenAt = c7.Time
+				tmp := c7.Time
+				i.HiddenAt = tmp
 			}
 
 		case cn8:
@@ -712,7 +734,8 @@ func (t discoveredScannerDynamic) Scan(i *Discovered) error {
 				if uid, err := uuid.FromBytes([]byte(c8.String)); err != nil {
 					return err
 				} else {
-					i.ID = uid.String()
+					tmp := uid.String()
+					i.ID = tmp
 				}
 			}
 
@@ -724,7 +747,8 @@ func (t discoveredScannerDynamic) Scan(i *Discovered) error {
 				if uid, err := uuid.FromBytes([]byte(c10.String)); err != nil {
 					return err
 				} else {
-					i.KnownMediaID = uid.String()
+					tmp := uid.String()
+					i.KnownMediaID = tmp
 				}
 			}
 
@@ -743,7 +767,8 @@ func (t discoveredScannerDynamic) Scan(i *Discovered) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.NextCheckAt = tmp
 			default:
-				i.NextCheckAt = c12.Time
+				tmp := c12.Time
+				i.NextCheckAt = tmp
 			}
 
 		case cn13:
@@ -751,7 +776,8 @@ func (t discoveredScannerDynamic) Scan(i *Discovered) error {
 				if uid, err := uuid.FromBytes([]byte(c13.String)); err != nil {
 					return err
 				} else {
-					i.Partition = uid.String()
+					tmp := uid.String()
+					i.Partition = tmp
 				}
 			}
 
@@ -764,7 +790,8 @@ func (t discoveredScannerDynamic) Scan(i *Discovered) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.ReleasedAt = tmp
 			default:
-				i.ReleasedAt = c14.Time
+				tmp := c14.Time
+				i.ReleasedAt = tmp
 			}
 
 		case cn15:
@@ -778,7 +805,8 @@ func (t discoveredScannerDynamic) Scan(i *Discovered) error {
 				if uid, err := uuid.FromBytes([]byte(c16.String)); err != nil {
 					return err
 				} else {
-					i.SyncUID = uid.String()
+					tmp := uid.String()
+					i.SyncUID = tmp
 				}
 			}
 
@@ -797,7 +825,8 @@ func (t discoveredScannerDynamic) Scan(i *Discovered) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.TombstonedAt = tmp
 			default:
-				i.TombstonedAt = c18.Time
+				tmp := c18.Time
+				i.TombstonedAt = tmp
 			}
 
 		case cn19:
@@ -809,7 +838,8 @@ func (t discoveredScannerDynamic) Scan(i *Discovered) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.UpdatedAt = tmp
 			default:
-				i.UpdatedAt = c19.Time
+				tmp := c19.Time
+				i.UpdatedAt = tmp
 			}
 
 		case cn20:

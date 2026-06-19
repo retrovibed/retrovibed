@@ -9,7 +9,7 @@ See https://egdaemon.com/docs/installation/index.html
 ## Running the application
 
 ```bash
-eg compute baremetal --infinite dev/console/linux
+eg compute baremetal --ttl=infinity dev/console/linux
 ```
 
 Hot reload works for Dart changes but not for native library changes.

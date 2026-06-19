@@ -58,8 +58,9 @@ func PeerOptionTombstone(ts time.Time) func(*Peer) {
 }
 
 func PeerOptionTestDefaults(p *Peer) {
-	p.Peer = int160.Random().Bytes()
-	p.ID = md5x.FormatUUID(md5x.Digest(p.Peer))
+	id := int160.Random()
+	p.Peer = id.Bytes()
+	p.ID = PeerUID(id)
 	p.Ddisc = true
 	p.Bep51 = true
 	p.DdiscPartition = uuidx.WithSuffix(1)
@@ -90,7 +91,7 @@ func NewPeerFromInfo(info krpc.NodeInfo, options ...func(*Peer)) (m Peer) {
 
 // generate the unique uuid from the public int160 id.
 func PeerUID(id int160.T) string {
-	return md5x.FormatUUID(md5x.Digest(id.Bytes()))
+	return md5x.FormatUUID(md5x.Digest(int160.StableSuffix(id).Bytes()))
 }
 
 func NewPeer(id int160.T, options ...func(*Peer)) (m Peer) {

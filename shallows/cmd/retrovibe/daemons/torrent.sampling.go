@@ -2,6 +2,7 @@ package daemons
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"log"
 	"net/netip"
@@ -13,7 +14,6 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/james-lawrence/torrent"
-	"github.com/james-lawrence/torrent/bencode"
 	"github.com/james-lawrence/torrent/bep0051"
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/int160"
@@ -25,6 +25,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/backoffx"
 	"github.com/retrovibed/retrovibed/shallows/internal/contextx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/int160x"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
@@ -36,8 +37,8 @@ import (
 )
 
 // discover peers in the dht who support bep51.
-func DiscoverDHTBEP51Peers(ctx context.Context, q sqlx.Queryer, s *dht.Server) (err error) {
-	l := rate.NewLimiter(rate.Every(10*time.Second), 1)
+func DiscoverDHTBEP51Peers(ctx context.Context, q sqlx.Queryer, s *dht.Server, ranger int160x.Ranger) (err error) {
+	l := rate.NewLimiter(rate.Every(time.Hour), 1)
 
 	recordinterestingpeer := func(ctx context.Context, db sqlx.Queryer, s *dht.Server, n krpc.NodeInfo) (err error) {
 		var (
@@ -61,8 +62,8 @@ func DiscoverDHTBEP51Peers(ctx context.Context, q sqlx.Queryer, s *dht.Server) (
 				}
 
 				bep51 = tracking.PeerOptionBEP51(uint64(sampled.Available), uint16(sampled.Interval))
-				// if they have hashes they are not interesting.
-				interesting = interesting && sampled.Available > 0
+				// peers with available hashes are interesting.
+				interesting = sampled.Available > 0
 				return nil
 			}()
 			errorsx.Log(errorsx.Wrap(failed, "failure checking if peer supports bep51"))
@@ -97,7 +98,8 @@ func DiscoverDHTBEP51Peers(ctx context.Context, q sqlx.Queryer, s *dht.Server) (
 			log.Println("unable to clear tombstoned peers", err)
 		}
 
-		target := int160.Random()
+		target := ranger.Generate()
+
 		peers := s.ClosestGoodNodeInfos(s.DynamicAddrPort(), 256, target)
 
 		for _, dis := range peers {
@@ -123,7 +125,7 @@ func DiscoverDHTBEP51Peers(ctx context.Context, q sqlx.Queryer, s *dht.Server) (
 func DiscoverDHTInfoHashes(ctx context.Context, db sqlx.Queryer, s *dht.Server) error {
 	runsample := func(ctx context.Context, p tracking.Peer) (err error) {
 		var (
-			resp bep0051.Response
+			sample *bep0051.Sample
 		)
 
 		dst := netip.AddrPortFrom(p.IP, p.Port)
@@ -143,21 +145,12 @@ func DiscoverDHTInfoHashes(ctx context.Context, db sqlx.Queryer, s *dht.Server) 
 			}
 		}()
 
-		qi, err := bep0051.NewRequest(s.ID(dst), krpc.ID(p.Peer))
-		if err != nil {
-			return errorsx.Wrapf(err, "unable to prepare sample request: %s", p.IP)
+		n := krpc.NewInfo(krpc.ID(p.Peer), krpc.NewNodeAddrFromAddrPort(dst))
+		if sample, err = bep0051.LatestSampleForNodeInfo(ctx, s, n); err != nil {
+			return errorsx.Wrapf(err, "unable to retrieve sample: %s", p.IP)
 		}
 
-		ret := s.Query(ctx, dstaddr, qi)
-		if ret.Err != nil {
-			return errorsx.Wrapf(err, "query failed: %s", dstaddr.String())
-		}
-
-		if err := bencode.Unmarshal(ret.Raw, &resp); err != nil {
-			return errorsx.Wrapf(err, "unable to deserialized sample response: %s", p.IP)
-		}
-
-		for id := range slices.Chunk(resp.R.Sample, 20) {
+		for id := range slices.Chunk(sample.Sample, 20) {
 			var (
 				known      tracking.Metadata
 				discovered ddisc.Discovered
@@ -190,7 +183,7 @@ func DiscoverDHTInfoHashes(ctx context.Context, db sqlx.Queryer, s *dht.Server) 
 
 		p = langx.Clone(
 			p,
-			tracking.PeerOptionBEP51(uint64(resp.R.Available), uint16(resp.R.Interval)),
+			tracking.PeerOptionBEP51(uint64(sample.Available), uint16(sample.Interval)),
 			tracking.PeerOptionTombstone(time.Now().Add(30*24*time.Hour)),
 		)
 
@@ -204,23 +197,25 @@ func DiscoverDHTInfoHashes(ctx context.Context, db sqlx.Queryer, s *dht.Server) 
 	const workloads = uint16(12)
 
 	querypeers := func(pool *asynccompute.Pool[tracking.Peer]) error {
-		q := tracking.PeerSearchBuilder().Where(
-			squirrel.And{
-				tracking.PeerQueryHasInfoHashes(),
-				tracking.PeerQueryNeedsCheck(),
-			},
-		).Limit(uint64(workloads) * 2)
+		for range workloads * 2 {
+			var (
+				p tracking.Peer
+			)
 
-		s := sqlx.Scan(tracking.PeerSearch(ctx, db, q))
+			if err := tracking.PeerNextCheck(ctx, db, time.Now().Add(time.Hour)).Scan(&p); errors.Is(err, sql.ErrNoRows) {
+				log.Println("no peers to check")
+				return nil
+			} else if err != nil {
+				return err
+			}
 
-		for p := range s.Iter() {
 			errorsx.Log(pool.Run(ctx, p))
 		}
 
-		return s.Err()
+		return nil
 	}
 
-	l := rate.NewLimiter(rate.Every(10*time.Second), 1)
+	l := rate.NewLimiter(rate.Every(time.Minute), 1)
 	getpending := func() int {
 		return errorsx.Zero(sqlx.Count(ctx, db, "SELECT COUNT (*) FROM torrents_unknown_infohashes WHERE next_check < NOW()"))
 	}
@@ -230,11 +225,11 @@ func DiscoverDHTInfoHashes(ctx context.Context, db sqlx.Queryer, s *dht.Server) 
 	}, asynccompute.Backlog[tracking.Peer](workloads))
 
 	for err, pending := l.Wait(ctx), getpending(); err == nil; err, pending = l.Wait(ctx), getpending() {
-		if pending < 100 {
-			log.Println("querying peers for info hashes", pending, "< 100")
-		} else {
+		if pending >= 100 {
 			continue
 		}
+
+		log.Println("querying peers for info hashes", pending, "< 100")
 
 		if err := querypeers(samplers); err != nil {
 			log.Println("failed to query peers", err)
@@ -439,7 +434,7 @@ func AutoDiscovery(ctx context.Context, q sqlx.Queryer, dhts *dht.Server, tstore
 	go func() {
 		log.Println("autodiscovery of samplable peers initiated")
 		defer log.Println("autodiscovery of samplable peers completed")
-		if err := DiscoverDHTBEP51Peers(ctx, q, dhts); err != nil {
+		if err := DiscoverDHTBEP51Peers(ctx, q, dhts, int160x.NewRangeDynamic(dhts, 16)); err != nil {
 			log.Println("peer locating failed", err)
 		}
 	}()
