@@ -413,7 +413,7 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 				const samplerate = 0.1
 				ctx, done := context.WithTimeout(context.Background(), time.Second)
 				defer done()
-				errorsx.Log(errorsx.Wrap(tracking.SamplePeer(ctx, t.db, samplerate, query.A.ID.Int160(), source), "unable to sample announce peer"))
+				errorsx.Log(errorsx.Wrap(tracking.SamplePeer(ctx, t.db, samplerate, peerid, source), "unable to sample announce peer"))
 			})),
 			dht.OptionUPnP,
 			dhtdebug,
