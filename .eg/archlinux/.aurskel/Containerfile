@@ -1,0 +1,12 @@
+FROM eg:latest
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update
+
+# pacman-package-manager provides makepkg, used to generate the AUR's .SRCINFO from PKGBUILD.
+# openssh-client is required for pushing the AUR package over git+ssh.
+# gettext-base provides envsubst, used to inject pkgver into PKGBUILD.
+RUN apt-get -y install pacman-package-manager openssh-client gettext-base
+
+# preload the AUR's host key so git+ssh pushes don't prompt for host verification.
+RUN ssh-keyscan -H aur.archlinux.org >> /etc/ssh/ssh_known_hosts
