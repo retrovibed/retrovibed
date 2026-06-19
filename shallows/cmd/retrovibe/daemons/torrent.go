@@ -403,11 +403,17 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 			dht.OptionMuxer(tmux),
 			dht.OptionHostResolver(t._dnscache),
 			dht.OptionOnQuery(func(source netip.AddrPort, query *krpc.Msg) (propagate bool) {
-				log.Println("DERP DERP QUERY", query.Q, spew.Sdump(query))
+				const samplerate = 0.1
+				ctx, done := context.WithTimeout(context.Background(), time.Second)
+				defer done()
+				errorsx.Log(errorsx.Wrap(tracking.SamplePeer(ctx, t.db, samplerate, query.A.ID.Int160(), source), "unable to sample peer"))
 				return true
 			}),
 			dht.OptionOnAnnouncePeer(dht.PeerAnnounceFn(func(peerid int160.T, source netip.AddrPort, portOk bool) {
-				log.Println("DERP DERP ANNOUNCE", peerid, source, portOk)
+				const samplerate = 0.1
+				ctx, done := context.WithTimeout(context.Background(), time.Second)
+				defer done()
+				errorsx.Log(errorsx.Wrap(tracking.SamplePeer(ctx, t.db, samplerate, query.A.ID.Int160(), source), "unable to sample announce peer"))
 			})),
 			dht.OptionUPnP,
 			dhtdebug,

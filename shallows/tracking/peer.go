@@ -2,6 +2,7 @@ package tracking
 
 import (
 	"context"
+	"math/rand"
 	"net/netip"
 	"time"
 
@@ -118,6 +119,18 @@ func PeerQueryNeedsCheck() squirrel.Sqlizer {
 
 func PeerQueryHasInfoHashes() squirrel.Sqlizer {
 	return squirrel.Expr("torrents_peers.bep51_available > 0")
+}
+
+// SamplePeer randomly records a peer with the given probability (rate in [0,1]).
+// A rate of 0 never inserts, a rate of 1 always inserts.
+func SamplePeer(ctx context.Context, q sqlx.Queryer, rate float64, id int160.T, addr netip.AddrPort) error {
+	if rand.Float64() >= rate {
+		return nil
+	}
+
+	peer := NewPeer(id, PeerOptionIP(addr))
+
+	return PeerInsertWithDefaults(ctx, q, peer).Scan(&peer)
 }
 
 func PeerSearch(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilder) PeerScanner {
