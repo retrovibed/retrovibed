@@ -105,7 +105,7 @@ func TestNullNetAddr(t *testing.T) {
 		t.Run("map with big.Int IPv4", func(t *testing.T) {
 			var n ducktype.NullNetAddr
 			b := new(big.Int).SetBytes([]byte{192, 168, 0, 1})
-			require.NoError(t, n.Scan(map[string]any{"address": b}))
+			require.NoError(t, n.Scan(map[string]any{"address": b, "ip_type": uint8(1)}))
 			require.True(t, n.Valid)
 			addr, ok := netip.AddrFromSlice([]byte{192, 168, 0, 1})
 			require.True(t, ok)
@@ -114,9 +114,20 @@ func TestNullNetAddr(t *testing.T) {
 
 		t.Run("map with big.Int IPv6", func(t *testing.T) {
 			var n ducktype.NullNetAddr
+			offset := new(big.Int).Lsh(big.NewInt(1), 127)
 			b := new(big.Int).SetBytes([]byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1})
-			require.NoError(t, n.Scan(map[string]any{"address": b}))
+			b.Sub(b, offset)
+			require.NoError(t, n.Scan(map[string]any{"address": b, "ip_type": uint8(2)}))
 			require.True(t, n.Valid)
+			addr, ok := netip.AddrFromSlice([]byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1})
+			require.True(t, ok)
+			require.Equal(t, addr, n.V)
+		})
+
+		t.Run("map with big.Int missing ip_type", func(t *testing.T) {
+			var n ducktype.NullNetAddr
+			b := new(big.Int).SetBytes([]byte{192, 168, 0, 1})
+			require.Error(t, n.Scan(map[string]any{"address": b}))
 		})
 
 		t.Run("map with unknown address type", func(t *testing.T) {

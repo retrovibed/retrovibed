@@ -51,13 +51,11 @@ func (n *NullNetAddr) Scan(src any) error {
 			n.V = addr
 			return nil
 		case *big.Int:
-			const IPv4BitLen = 32
-
 			// DuckDB stores INET addresses as a hugeint. IPv6 addresses are
 			// biased by -2^127 (sign bit flipped) so that signed comparison
 			// matches unsigned address ordering; IPv4 addresses are plain
-			// unsigned values. Detect IPv6 via the ip_type column when
-			// present, falling back to the byte-length heuristic otherwise.
+			// unsigned values. The ip_type column distinguishes the two and
+			// must be present.
 			addr := _addr
 			decoded := make([]byte, 4)
 			ipType, ok := v["ip_type"].(uint8)
