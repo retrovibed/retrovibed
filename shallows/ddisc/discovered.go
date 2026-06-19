@@ -2,6 +2,8 @@ package ddisc
 
 import (
 	"context"
+	"strings"
+	"unicode/utf8"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/gofrs/uuid/v5"
@@ -38,6 +40,19 @@ func DiscoveredOptionFromTorrentInfo(i *metainfo.Info) func(*Discovered) {
 		d.Title = i.Name
 		d.Bytes = uint64(i.TotalLength())
 	}
+}
+
+// DiscoveredOptionDetectCorrupted detects torrent metadata that cannot be stored
+// as-is (e.g. a name that is not valid UTF8) and prevents it from propagating
+// to other nodes: the title is sanitized with the unicode replacement glyph and
+// the record is excluded from sync by zeroing its sync uid.
+func DiscoveredOptionDetectCorrupted(d *Discovered) {
+	if utf8.ValidString(d.Title) {
+		return
+	}
+
+	d.Title = strings.ToValidUTF8(d.Title, "�")
+	d.SyncUID = uuid.Nil.String()
 }
 
 func DiscoveredOptionKnownMedia(id string) func(*Discovered) {

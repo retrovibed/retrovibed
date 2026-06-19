@@ -62,6 +62,7 @@ const (
 	DHTDebug                   = "RETROVIBED_DHT_DEBUG"                        // enable dht debug logging
 	SelfSignedHosts            = "RETROVIBED_SELF_SIGNED_HOSTS"                // list of hosts to add to the self signed certificate.
 	DDiscFrequency             = "RETROVIBED_DDISC_ANNOUNCE_FREQUENCY"         // how frequently to announce partitions frequency
+	DDiscIndexRatio            = "RETROVIBED_DDISC_INDEX_RATIO"                // what percentage of discovered media to attempt to index.
 	LoggingVerbosity           = "RETROVIBED_LOGGING_VERBOSITY"                // controls logging verbosity level
 )
 

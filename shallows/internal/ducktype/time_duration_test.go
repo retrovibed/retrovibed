@@ -119,4 +119,22 @@ func TestNullDuration(t *testing.T) {
 			require.False(t, n.Valid)
 		})
 	})
+
+	t.Run("insert into duckdb", func(t *testing.T) {
+		t.Run("interval column", func(t *testing.T) {
+			db := newDB(t)
+			_, err := db.ExecContext(t.Context(), `CREATE TABLE t (d INTERVAL NOT NULL)`)
+			require.NoError(t, err)
+
+			in := ducktype.NullDuration{V: 90 * time.Minute, Valid: true}
+			_, err = db.ExecContext(t.Context(), `INSERT INTO t (d) VALUES ($1)`, in)
+			require.NoError(t, err)
+
+			var out ducktype.NullDuration
+			row := db.QueryRowContext(t.Context(), `SELECT d FROM t`)
+			require.NoError(t, row.Scan(&out))
+			require.True(t, out.Valid)
+			require.Equal(t, in.V, out.V)
+		})
+	})
 }

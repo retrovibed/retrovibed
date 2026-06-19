@@ -51,6 +51,17 @@ func HashUID(md *int160.T) string {
 	return md5x.FormatUUID(md5x.Digest(md.Bytes()))
 }
 
+// ClientAddress returns the first dialable address the client is listening on.
+func ClientAddress(c *torrent.Client) (addr netip.AddrPort) {
+	for _, la := range c.ListenAddrs() {
+		if ap := netx.AddrPort(la); ap != nil && ap.IsValid() {
+			return *ap
+		}
+	}
+
+	return addr
+}
+
 func ClearIdleTorrents(ctx context.Context, d time.Duration, c *torrent.Client) {
 	timex.Every(d, func() {
 		errorsx.Log(c.Tune(torrent.ClientOperationClearIdleTorrents(func(stats torrent.Stats) bool {
