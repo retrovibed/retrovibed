@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:window_manager/window_manager.dart';
 
 import 'package:retrovibed/navbar.dart' as navbar;
 import 'package:retrovibed/billing.dart' as billing;
@@ -154,7 +155,7 @@ class Retrovibed extends StatelessWidget {
                                         ],
                                       );
 
-                                      final tabs = DecoratedBox(
+                                      Widget tabs = DecoratedBox(
                                         decoration: BoxDecoration(
                                           border: Border(
                                             bottom: BorderSide(
@@ -163,13 +164,21 @@ class Retrovibed extends StatelessWidget {
                                             ),
                                           ),
                                         ),
-                                        child: Row(
-                                          children: [
-                                            Expanded(child: tabbar),
-                                            if (defaults.desktop) navbar.Hamburger(),
-                                          ],
+                                        child: DragToMoveArea(
+                                          child: Row(
+                                            children: [
+                                              Expanded(
+                                                child: tabbar,
+                                              ),
+                                              if (defaults.desktop) navbar.Hamburger(),
+                                            ],
+                                          ),
                                         ),
                                       );
+                                      if (defaults.desktop) {
+                                        tabs = DragToMoveArea(child: tabs);
+                                      }
+
                                       return Scaffold(
                                         appBar: (!compact && !nochrome)
                                             ? PreferredSize(
