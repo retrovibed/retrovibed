@@ -2,5 +2,4 @@
 
 package goosex
 
-const inetSQL = "LOAD inet;"
-const vssSQL = "LOAD vss;"
+const extensionSQL = "LOAD icu; LOAD inet; LOAD vss;"

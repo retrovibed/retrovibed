@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"io"
 	"math/big"
+	"net/netip"
 	"sort"
 
 	"github.com/gofrs/uuid/v5"
@@ -35,6 +36,28 @@ func SeededN(n uint16, s io.Reader) (res []Paired[uuid.UUID]) {
 		errorsx.Must(io.ReadFull(s, buf[:]))
 		bi.SetBytes(buf[:])
 		res = append(res, Paired[uuid.UUID]{N: buf, Bi: bi})
+	}
+
+	return res
+}
+
+func SeededAddr(s io.Reader) Paired[netip.Addr] {
+	var buf [16]byte
+	bi := new(big.Int).Lsh(big.NewInt(1), uint(len(buf))*8)
+	errorsx.Must(io.ReadFull(s, buf[:]))
+	bi.SetBytes(buf[:])
+	return Paired[netip.Addr]{N: netip.AddrFrom16(buf), Bi: bi}
+}
+
+func SeededAddrN(n uint16, s io.Reader) (res []Paired[netip.Addr]) {
+	res = make([]Paired[netip.Addr], 0, n)
+	for range n {
+		var buf [16]byte
+
+		bi := new(big.Int).Lsh(big.NewInt(1), uint(len(buf))*8)
+		errorsx.Must(io.ReadFull(s, buf[:]))
+		bi.SetBytes(buf[:])
+		res = append(res, Paired[netip.Addr]{N: netip.AddrFrom16(buf), Bi: bi})
 	}
 
 	return res

@@ -209,6 +209,7 @@ func RunDev(cmd string) eg.OpFn {
 	return func(ctx context.Context, _ eg.Op) error {
 		runtime := flutterRuntimev2(shell.Runtime()).
 			// Environ("RETROVIBED_TORRENT_DEBUG", "true").
+			Environ("RETROVIBED_TORRENT_AUTO_DISCOVERY", "true").
 			Environ("RETROVIBED_METADATA_AUTODOWNLOAD", "false").
 			// Environ("RETROVIBED_META_ENDPOINT", "api.retrovibe.space").
 			// Environ("RETROVIBED_CONSOLE_ENDPOINT", "console.retrovibe.space")

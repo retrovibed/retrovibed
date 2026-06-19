@@ -104,12 +104,8 @@ func InitializeDatabase(ctx context.Context, db *sql.DB, migrations fs.FS) (err 
 		log.Println("detected duckdb", version)
 	}
 
-	if _, err := db.ExecContext(ctx, inetSQL); err != nil {
+	if _, err := db.ExecContext(ctx, extensionSQL); err != nil {
 		return errorsx.Wrap(err, "failed to load inet extension")
-	}
-
-	if _, err := db.ExecContext(ctx, vssSQL); err != nil {
-		return errorsx.Wrap(err, "failed to load vss extension")
 	}
 
 	if _, err := db.ExecContext(ctx, "SET GLOBAL hnsw_enable_experimental_persistence = true;"); err != nil {

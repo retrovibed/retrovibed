@@ -198,7 +198,8 @@ func (t communityScannerStatic) Scan(i *Community) error {
 		if uid, err := uuid.FromBytes([]byte(c0.String)); err != nil {
 			return err
 		} else {
-			i.AccountID = uid.String()
+			tmp := uid.String()
+			i.AccountID = tmp
 		}
 	}
 
@@ -225,7 +226,8 @@ func (t communityScannerStatic) Scan(i *Community) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c4.Time
+		tmp := c4.Time
+		i.CreatedAt = tmp
 	}
 
 	if c5.Valid {
@@ -267,7 +269,8 @@ func (t communityScannerStatic) Scan(i *Community) error {
 		if uid, err := uuid.FromBytes([]byte(c12.String)); err != nil {
 			return err
 		} else {
-			i.ID = uid.String()
+			tmp := uid.String()
+			i.ID = tmp
 		}
 	}
 
@@ -279,7 +282,8 @@ func (t communityScannerStatic) Scan(i *Community) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.LastSyncAt = tmp
 	default:
-		i.LastSyncAt = c13.Time
+		tmp := c13.Time
+		i.LastSyncAt = tmp
 	}
 
 	if c14.Valid {
@@ -295,14 +299,16 @@ func (t communityScannerStatic) Scan(i *Community) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.SubscribedAt = tmp
 	default:
-		i.SubscribedAt = c15.Time
+		tmp := c15.Time
+		i.SubscribedAt = tmp
 	}
 
 	if c16.Valid {
 		if uid, err := uuid.FromBytes([]byte(c16.String)); err != nil {
 			return err
 		} else {
-			i.SyncCursorPublishedContent = uid.String()
+			tmp := uid.String()
+			i.SyncCursorPublishedContent = tmp
 		}
 	}
 
@@ -314,7 +320,8 @@ func (t communityScannerStatic) Scan(i *Community) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.SyncFeedAt = tmp
 	default:
-		i.SyncFeedAt = c17.Time
+		tmp := c17.Time
+		i.SyncFeedAt = tmp
 	}
 
 	switch c18.InfinityModifier {
@@ -325,7 +332,8 @@ func (t communityScannerStatic) Scan(i *Community) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		i.UpdatedAt = c18.Time
+		tmp := c18.Time
+		i.UpdatedAt = tmp
 	}
 
 	if c19.Valid {
@@ -405,7 +413,8 @@ func (t CommunityScannerStaticRow) Scan(i *Community) error {
 		if uid, err := uuid.FromBytes([]byte(c0.String)); err != nil {
 			return err
 		} else {
-			i.AccountID = uid.String()
+			tmp := uid.String()
+			i.AccountID = tmp
 		}
 	}
 
@@ -432,7 +441,8 @@ func (t CommunityScannerStaticRow) Scan(i *Community) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c4.Time
+		tmp := c4.Time
+		i.CreatedAt = tmp
 	}
 
 	if c5.Valid {
@@ -474,7 +484,8 @@ func (t CommunityScannerStaticRow) Scan(i *Community) error {
 		if uid, err := uuid.FromBytes([]byte(c12.String)); err != nil {
 			return err
 		} else {
-			i.ID = uid.String()
+			tmp := uid.String()
+			i.ID = tmp
 		}
 	}
 
@@ -486,7 +497,8 @@ func (t CommunityScannerStaticRow) Scan(i *Community) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.LastSyncAt = tmp
 	default:
-		i.LastSyncAt = c13.Time
+		tmp := c13.Time
+		i.LastSyncAt = tmp
 	}
 
 	if c14.Valid {
@@ -502,14 +514,16 @@ func (t CommunityScannerStaticRow) Scan(i *Community) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.SubscribedAt = tmp
 	default:
-		i.SubscribedAt = c15.Time
+		tmp := c15.Time
+		i.SubscribedAt = tmp
 	}
 
 	if c16.Valid {
 		if uid, err := uuid.FromBytes([]byte(c16.String)); err != nil {
 			return err
 		} else {
-			i.SyncCursorPublishedContent = uid.String()
+			tmp := uid.String()
+			i.SyncCursorPublishedContent = tmp
 		}
 	}
 
@@ -521,7 +535,8 @@ func (t CommunityScannerStaticRow) Scan(i *Community) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.SyncFeedAt = tmp
 	default:
-		i.SyncFeedAt = c17.Time
+		tmp := c17.Time
+		i.SyncFeedAt = tmp
 	}
 
 	switch c18.InfinityModifier {
@@ -532,7 +547,8 @@ func (t CommunityScannerStaticRow) Scan(i *Community) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		i.UpdatedAt = c18.Time
+		tmp := c18.Time
+		i.UpdatedAt = tmp
 	}
 
 	if c19.Valid {
@@ -681,7 +697,8 @@ func (t communityScannerDynamic) Scan(i *Community) error {
 				if uid, err := uuid.FromBytes([]byte(c0.String)); err != nil {
 					return err
 				} else {
-					i.AccountID = uid.String()
+					tmp := uid.String()
+					i.AccountID = tmp
 				}
 			}
 
@@ -712,7 +729,8 @@ func (t communityScannerDynamic) Scan(i *Community) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.CreatedAt = tmp
 			default:
-				i.CreatedAt = c4.Time
+				tmp := c4.Time
+				i.CreatedAt = tmp
 			}
 
 		case cn5:
@@ -762,7 +780,8 @@ func (t communityScannerDynamic) Scan(i *Community) error {
 				if uid, err := uuid.FromBytes([]byte(c12.String)); err != nil {
 					return err
 				} else {
-					i.ID = uid.String()
+					tmp := uid.String()
+					i.ID = tmp
 				}
 			}
 
@@ -775,7 +794,8 @@ func (t communityScannerDynamic) Scan(i *Community) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.LastSyncAt = tmp
 			default:
-				i.LastSyncAt = c13.Time
+				tmp := c13.Time
+				i.LastSyncAt = tmp
 			}
 
 		case cn14:
@@ -793,7 +813,8 @@ func (t communityScannerDynamic) Scan(i *Community) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.SubscribedAt = tmp
 			default:
-				i.SubscribedAt = c15.Time
+				tmp := c15.Time
+				i.SubscribedAt = tmp
 			}
 
 		case cn16:
@@ -801,7 +822,8 @@ func (t communityScannerDynamic) Scan(i *Community) error {
 				if uid, err := uuid.FromBytes([]byte(c16.String)); err != nil {
 					return err
 				} else {
-					i.SyncCursorPublishedContent = uid.String()
+					tmp := uid.String()
+					i.SyncCursorPublishedContent = tmp
 				}
 			}
 
@@ -814,7 +836,8 @@ func (t communityScannerDynamic) Scan(i *Community) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.SyncFeedAt = tmp
 			default:
-				i.SyncFeedAt = c17.Time
+				tmp := c17.Time
+				i.SyncFeedAt = tmp
 			}
 
 		case cn18:
@@ -826,7 +849,8 @@ func (t communityScannerDynamic) Scan(i *Community) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.UpdatedAt = tmp
 			default:
-				i.UpdatedAt = c18.Time
+				tmp := c18.Time
+				i.UpdatedAt = tmp
 			}
 
 		case cn19:
@@ -940,7 +964,8 @@ func (t publishedContentScannerStatic) Scan(i *PublishedContent) error {
 		if uid, err := uuid.FromBytes([]byte(c1.String)); err != nil {
 			return err
 		} else {
-			i.CommunityID = uid.String()
+			tmp := uid.String()
+			i.CommunityID = tmp
 		}
 	}
 
@@ -952,7 +977,8 @@ func (t publishedContentScannerStatic) Scan(i *PublishedContent) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c2.Time
+		tmp := c2.Time
+		i.CreatedAt = tmp
 	}
 
 	if c3.Valid {
@@ -964,7 +990,8 @@ func (t publishedContentScannerStatic) Scan(i *PublishedContent) error {
 		if uid, err := uuid.FromBytes([]byte(c4.String)); err != nil {
 			return err
 		} else {
-			i.ID = uid.String()
+			tmp := uid.String()
+			i.ID = tmp
 		}
 	}
 
@@ -972,7 +999,8 @@ func (t publishedContentScannerStatic) Scan(i *PublishedContent) error {
 		if uid, err := uuid.FromBytes([]byte(c5.String)); err != nil {
 			return err
 		} else {
-			i.KnownMediaID = uid.String()
+			tmp := uid.String()
+			i.KnownMediaID = tmp
 		}
 	}
 
@@ -980,7 +1008,8 @@ func (t publishedContentScannerStatic) Scan(i *PublishedContent) error {
 		if uid, err := uuid.FromBytes([]byte(c6.String)); err != nil {
 			return err
 		} else {
-			i.LibraryID = uid.String()
+			tmp := uid.String()
+			i.LibraryID = tmp
 		}
 	}
 
@@ -998,7 +1027,8 @@ func (t publishedContentScannerStatic) Scan(i *PublishedContent) error {
 		if uid, err := uuid.FromBytes([]byte(c9.String)); err != nil {
 			return err
 		} else {
-			i.OAuthGoogleID = uid.String()
+			tmp := uid.String()
+			i.OAuthGoogleID = tmp
 		}
 	}
 
@@ -1015,7 +1045,8 @@ func (t publishedContentScannerStatic) Scan(i *PublishedContent) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.PublishedAt = tmp
 	default:
-		i.PublishedAt = c11.Time
+		tmp := c11.Time
+		i.PublishedAt = tmp
 	}
 
 	if c12.Valid {
@@ -1031,7 +1062,8 @@ func (t publishedContentScannerStatic) Scan(i *PublishedContent) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.TombstonedAt = tmp
 	default:
-		i.TombstonedAt = c13.Time
+		tmp := c13.Time
+		i.TombstonedAt = tmp
 	}
 
 	switch c14.InfinityModifier {
@@ -1042,7 +1074,8 @@ func (t publishedContentScannerStatic) Scan(i *PublishedContent) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		i.UpdatedAt = c14.Time
+		tmp := c14.Time
+		i.UpdatedAt = tmp
 	}
 
 	return t.Rows.Err()
@@ -1117,7 +1150,8 @@ func (t PublishedContentScannerStaticRow) Scan(i *PublishedContent) error {
 		if uid, err := uuid.FromBytes([]byte(c1.String)); err != nil {
 			return err
 		} else {
-			i.CommunityID = uid.String()
+			tmp := uid.String()
+			i.CommunityID = tmp
 		}
 	}
 
@@ -1129,7 +1163,8 @@ func (t PublishedContentScannerStaticRow) Scan(i *PublishedContent) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c2.Time
+		tmp := c2.Time
+		i.CreatedAt = tmp
 	}
 
 	if c3.Valid {
@@ -1141,7 +1176,8 @@ func (t PublishedContentScannerStaticRow) Scan(i *PublishedContent) error {
 		if uid, err := uuid.FromBytes([]byte(c4.String)); err != nil {
 			return err
 		} else {
-			i.ID = uid.String()
+			tmp := uid.String()
+			i.ID = tmp
 		}
 	}
 
@@ -1149,7 +1185,8 @@ func (t PublishedContentScannerStaticRow) Scan(i *PublishedContent) error {
 		if uid, err := uuid.FromBytes([]byte(c5.String)); err != nil {
 			return err
 		} else {
-			i.KnownMediaID = uid.String()
+			tmp := uid.String()
+			i.KnownMediaID = tmp
 		}
 	}
 
@@ -1157,7 +1194,8 @@ func (t PublishedContentScannerStaticRow) Scan(i *PublishedContent) error {
 		if uid, err := uuid.FromBytes([]byte(c6.String)); err != nil {
 			return err
 		} else {
-			i.LibraryID = uid.String()
+			tmp := uid.String()
+			i.LibraryID = tmp
 		}
 	}
 
@@ -1175,7 +1213,8 @@ func (t PublishedContentScannerStaticRow) Scan(i *PublishedContent) error {
 		if uid, err := uuid.FromBytes([]byte(c9.String)); err != nil {
 			return err
 		} else {
-			i.OAuthGoogleID = uid.String()
+			tmp := uid.String()
+			i.OAuthGoogleID = tmp
 		}
 	}
 
@@ -1192,7 +1231,8 @@ func (t PublishedContentScannerStaticRow) Scan(i *PublishedContent) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.PublishedAt = tmp
 	default:
-		i.PublishedAt = c11.Time
+		tmp := c11.Time
+		i.PublishedAt = tmp
 	}
 
 	if c12.Valid {
@@ -1208,7 +1248,8 @@ func (t PublishedContentScannerStaticRow) Scan(i *PublishedContent) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.TombstonedAt = tmp
 	default:
-		i.TombstonedAt = c13.Time
+		tmp := c13.Time
+		i.TombstonedAt = tmp
 	}
 
 	switch c14.InfinityModifier {
@@ -1219,7 +1260,8 @@ func (t PublishedContentScannerStaticRow) Scan(i *PublishedContent) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		i.UpdatedAt = c14.Time
+		tmp := c14.Time
+		i.UpdatedAt = tmp
 	}
 
 	return nil
@@ -1349,7 +1391,8 @@ func (t publishedContentScannerDynamic) Scan(i *PublishedContent) error {
 				if uid, err := uuid.FromBytes([]byte(c1.String)); err != nil {
 					return err
 				} else {
-					i.CommunityID = uid.String()
+					tmp := uid.String()
+					i.CommunityID = tmp
 				}
 			}
 
@@ -1362,7 +1405,8 @@ func (t publishedContentScannerDynamic) Scan(i *PublishedContent) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.CreatedAt = tmp
 			default:
-				i.CreatedAt = c2.Time
+				tmp := c2.Time
+				i.CreatedAt = tmp
 			}
 
 		case cn3:
@@ -1376,7 +1420,8 @@ func (t publishedContentScannerDynamic) Scan(i *PublishedContent) error {
 				if uid, err := uuid.FromBytes([]byte(c4.String)); err != nil {
 					return err
 				} else {
-					i.ID = uid.String()
+					tmp := uid.String()
+					i.ID = tmp
 				}
 			}
 
@@ -1385,7 +1430,8 @@ func (t publishedContentScannerDynamic) Scan(i *PublishedContent) error {
 				if uid, err := uuid.FromBytes([]byte(c5.String)); err != nil {
 					return err
 				} else {
-					i.KnownMediaID = uid.String()
+					tmp := uid.String()
+					i.KnownMediaID = tmp
 				}
 			}
 
@@ -1394,7 +1440,8 @@ func (t publishedContentScannerDynamic) Scan(i *PublishedContent) error {
 				if uid, err := uuid.FromBytes([]byte(c6.String)); err != nil {
 					return err
 				} else {
-					i.LibraryID = uid.String()
+					tmp := uid.String()
+					i.LibraryID = tmp
 				}
 			}
 
@@ -1415,7 +1462,8 @@ func (t publishedContentScannerDynamic) Scan(i *PublishedContent) error {
 				if uid, err := uuid.FromBytes([]byte(c9.String)); err != nil {
 					return err
 				} else {
-					i.OAuthGoogleID = uid.String()
+					tmp := uid.String()
+					i.OAuthGoogleID = tmp
 				}
 			}
 
@@ -1434,7 +1482,8 @@ func (t publishedContentScannerDynamic) Scan(i *PublishedContent) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.PublishedAt = tmp
 			default:
-				i.PublishedAt = c11.Time
+				tmp := c11.Time
+				i.PublishedAt = tmp
 			}
 
 		case cn12:
@@ -1452,7 +1501,8 @@ func (t publishedContentScannerDynamic) Scan(i *PublishedContent) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.TombstonedAt = tmp
 			default:
-				i.TombstonedAt = c13.Time
+				tmp := c13.Time
+				i.TombstonedAt = tmp
 			}
 
 		case cn14:
@@ -1464,7 +1514,8 @@ func (t publishedContentScannerDynamic) Scan(i *PublishedContent) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.UpdatedAt = tmp
 			default:
-				i.UpdatedAt = c14.Time
+				tmp := c14.Time
+				i.UpdatedAt = tmp
 			}
 
 		}
@@ -1559,7 +1610,8 @@ func (t communityMetricScannerStatic) Scan(i *CommunityMetric) error {
 		if uid, err := uuid.FromBytes([]byte(c0.String)); err != nil {
 			return err
 		} else {
-			i.CommunityID = uid.String()
+			tmp := uid.String()
+			i.CommunityID = tmp
 		}
 	}
 
@@ -1571,14 +1623,16 @@ func (t communityMetricScannerStatic) Scan(i *CommunityMetric) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c1.Time
+		tmp := c1.Time
+		i.CreatedAt = tmp
 	}
 
 	if c2.Valid {
 		if uid, err := uuid.FromBytes([]byte(c2.String)); err != nil {
 			return err
 		} else {
-			i.ID = uid.String()
+			tmp := uid.String()
+			i.ID = tmp
 		}
 	}
 
@@ -1590,7 +1644,8 @@ func (t communityMetricScannerStatic) Scan(i *CommunityMetric) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.PeriodEnd = tmp
 	default:
-		i.PeriodEnd = c3.Time
+		tmp := c3.Time
+		i.PeriodEnd = tmp
 	}
 
 	switch c4.InfinityModifier {
@@ -1601,7 +1656,8 @@ func (t communityMetricScannerStatic) Scan(i *CommunityMetric) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.PeriodStart = tmp
 	default:
-		i.PeriodStart = c4.Time
+		tmp := c4.Time
+		i.PeriodStart = tmp
 	}
 
 	if c5.Valid {
@@ -1617,7 +1673,8 @@ func (t communityMetricScannerStatic) Scan(i *CommunityMetric) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		i.UpdatedAt = c6.Time
+		tmp := c6.Time
+		i.UpdatedAt = tmp
 	}
 
 	return t.Rows.Err()
@@ -1679,7 +1736,8 @@ func (t CommunityMetricScannerStaticRow) Scan(i *CommunityMetric) error {
 		if uid, err := uuid.FromBytes([]byte(c0.String)); err != nil {
 			return err
 		} else {
-			i.CommunityID = uid.String()
+			tmp := uid.String()
+			i.CommunityID = tmp
 		}
 	}
 
@@ -1691,14 +1749,16 @@ func (t CommunityMetricScannerStaticRow) Scan(i *CommunityMetric) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c1.Time
+		tmp := c1.Time
+		i.CreatedAt = tmp
 	}
 
 	if c2.Valid {
 		if uid, err := uuid.FromBytes([]byte(c2.String)); err != nil {
 			return err
 		} else {
-			i.ID = uid.String()
+			tmp := uid.String()
+			i.ID = tmp
 		}
 	}
 
@@ -1710,7 +1770,8 @@ func (t CommunityMetricScannerStaticRow) Scan(i *CommunityMetric) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.PeriodEnd = tmp
 	default:
-		i.PeriodEnd = c3.Time
+		tmp := c3.Time
+		i.PeriodEnd = tmp
 	}
 
 	switch c4.InfinityModifier {
@@ -1721,7 +1782,8 @@ func (t CommunityMetricScannerStaticRow) Scan(i *CommunityMetric) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.PeriodStart = tmp
 	default:
-		i.PeriodStart = c4.Time
+		tmp := c4.Time
+		i.PeriodStart = tmp
 	}
 
 	if c5.Valid {
@@ -1737,7 +1799,8 @@ func (t CommunityMetricScannerStaticRow) Scan(i *CommunityMetric) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		i.UpdatedAt = c6.Time
+		tmp := c6.Time
+		i.UpdatedAt = tmp
 	}
 
 	return nil
@@ -1829,7 +1892,8 @@ func (t communityMetricScannerDynamic) Scan(i *CommunityMetric) error {
 				if uid, err := uuid.FromBytes([]byte(c0.String)); err != nil {
 					return err
 				} else {
-					i.CommunityID = uid.String()
+					tmp := uid.String()
+					i.CommunityID = tmp
 				}
 			}
 
@@ -1842,7 +1906,8 @@ func (t communityMetricScannerDynamic) Scan(i *CommunityMetric) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.CreatedAt = tmp
 			default:
-				i.CreatedAt = c1.Time
+				tmp := c1.Time
+				i.CreatedAt = tmp
 			}
 
 		case cn2:
@@ -1850,7 +1915,8 @@ func (t communityMetricScannerDynamic) Scan(i *CommunityMetric) error {
 				if uid, err := uuid.FromBytes([]byte(c2.String)); err != nil {
 					return err
 				} else {
-					i.ID = uid.String()
+					tmp := uid.String()
+					i.ID = tmp
 				}
 			}
 
@@ -1863,7 +1929,8 @@ func (t communityMetricScannerDynamic) Scan(i *CommunityMetric) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.PeriodEnd = tmp
 			default:
-				i.PeriodEnd = c3.Time
+				tmp := c3.Time
+				i.PeriodEnd = tmp
 			}
 
 		case cn4:
@@ -1875,7 +1942,8 @@ func (t communityMetricScannerDynamic) Scan(i *CommunityMetric) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.PeriodStart = tmp
 			default:
-				i.PeriodStart = c4.Time
+				tmp := c4.Time
+				i.PeriodStart = tmp
 			}
 
 		case cn5:
@@ -1893,7 +1961,8 @@ func (t communityMetricScannerDynamic) Scan(i *CommunityMetric) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.UpdatedAt = tmp
 			default:
-				i.UpdatedAt = c6.Time
+				tmp := c6.Time
+				i.UpdatedAt = tmp
 			}
 
 		}
@@ -1987,7 +2056,8 @@ func (t communitySyncStateScannerStatic) Scan(i *CommunitySyncState) error {
 		if uid, err := uuid.FromBytes([]byte(c0.String)); err != nil {
 			return err
 		} else {
-			i.CommunityID = uid.String()
+			tmp := uid.String()
+			i.CommunityID = tmp
 		}
 	}
 
@@ -1999,14 +2069,16 @@ func (t communitySyncStateScannerStatic) Scan(i *CommunitySyncState) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c1.Time
+		tmp := c1.Time
+		i.CreatedAt = tmp
 	}
 
 	if c2.Valid {
 		if uid, err := uuid.FromBytes([]byte(c2.String)); err != nil {
 			return err
 		} else {
-			i.ID = uid.String()
+			tmp := uid.String()
+			i.ID = tmp
 		}
 	}
 
@@ -2018,7 +2090,8 @@ func (t communitySyncStateScannerStatic) Scan(i *CommunitySyncState) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.LastSyncAt = tmp
 	default:
-		i.LastSyncAt = c3.Time
+		tmp := c3.Time
+		i.LastSyncAt = tmp
 	}
 
 	switch c4.InfinityModifier {
@@ -2029,7 +2102,8 @@ func (t communitySyncStateScannerStatic) Scan(i *CommunitySyncState) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.SyncFeedAt = tmp
 	default:
-		i.SyncFeedAt = c4.Time
+		tmp := c4.Time
+		i.SyncFeedAt = tmp
 	}
 
 	switch c5.InfinityModifier {
@@ -2040,7 +2114,8 @@ func (t communitySyncStateScannerStatic) Scan(i *CommunitySyncState) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		i.UpdatedAt = c5.Time
+		tmp := c5.Time
+		i.UpdatedAt = tmp
 	}
 
 	return t.Rows.Err()
@@ -2101,7 +2176,8 @@ func (t CommunitySyncStateScannerStaticRow) Scan(i *CommunitySyncState) error {
 		if uid, err := uuid.FromBytes([]byte(c0.String)); err != nil {
 			return err
 		} else {
-			i.CommunityID = uid.String()
+			tmp := uid.String()
+			i.CommunityID = tmp
 		}
 	}
 
@@ -2113,14 +2189,16 @@ func (t CommunitySyncStateScannerStaticRow) Scan(i *CommunitySyncState) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c1.Time
+		tmp := c1.Time
+		i.CreatedAt = tmp
 	}
 
 	if c2.Valid {
 		if uid, err := uuid.FromBytes([]byte(c2.String)); err != nil {
 			return err
 		} else {
-			i.ID = uid.String()
+			tmp := uid.String()
+			i.ID = tmp
 		}
 	}
 
@@ -2132,7 +2210,8 @@ func (t CommunitySyncStateScannerStaticRow) Scan(i *CommunitySyncState) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.LastSyncAt = tmp
 	default:
-		i.LastSyncAt = c3.Time
+		tmp := c3.Time
+		i.LastSyncAt = tmp
 	}
 
 	switch c4.InfinityModifier {
@@ -2143,7 +2222,8 @@ func (t CommunitySyncStateScannerStaticRow) Scan(i *CommunitySyncState) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.SyncFeedAt = tmp
 	default:
-		i.SyncFeedAt = c4.Time
+		tmp := c4.Time
+		i.SyncFeedAt = tmp
 	}
 
 	switch c5.InfinityModifier {
@@ -2154,7 +2234,8 @@ func (t CommunitySyncStateScannerStaticRow) Scan(i *CommunitySyncState) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		i.UpdatedAt = c5.Time
+		tmp := c5.Time
+		i.UpdatedAt = tmp
 	}
 
 	return nil
@@ -2242,7 +2323,8 @@ func (t communitySyncStateScannerDynamic) Scan(i *CommunitySyncState) error {
 				if uid, err := uuid.FromBytes([]byte(c0.String)); err != nil {
 					return err
 				} else {
-					i.CommunityID = uid.String()
+					tmp := uid.String()
+					i.CommunityID = tmp
 				}
 			}
 
@@ -2255,7 +2337,8 @@ func (t communitySyncStateScannerDynamic) Scan(i *CommunitySyncState) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.CreatedAt = tmp
 			default:
-				i.CreatedAt = c1.Time
+				tmp := c1.Time
+				i.CreatedAt = tmp
 			}
 
 		case cn2:
@@ -2263,7 +2346,8 @@ func (t communitySyncStateScannerDynamic) Scan(i *CommunitySyncState) error {
 				if uid, err := uuid.FromBytes([]byte(c2.String)); err != nil {
 					return err
 				} else {
-					i.ID = uid.String()
+					tmp := uid.String()
+					i.ID = tmp
 				}
 			}
 
@@ -2276,7 +2360,8 @@ func (t communitySyncStateScannerDynamic) Scan(i *CommunitySyncState) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.LastSyncAt = tmp
 			default:
-				i.LastSyncAt = c3.Time
+				tmp := c3.Time
+				i.LastSyncAt = tmp
 			}
 
 		case cn4:
@@ -2288,7 +2373,8 @@ func (t communitySyncStateScannerDynamic) Scan(i *CommunitySyncState) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.SyncFeedAt = tmp
 			default:
-				i.SyncFeedAt = c4.Time
+				tmp := c4.Time
+				i.SyncFeedAt = tmp
 			}
 
 		case cn5:
@@ -2300,7 +2386,8 @@ func (t communitySyncStateScannerDynamic) Scan(i *CommunitySyncState) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.UpdatedAt = tmp
 			default:
-				i.UpdatedAt = c5.Time
+				tmp := c5.Time
+				i.UpdatedAt = tmp
 			}
 
 		}
@@ -2399,7 +2486,8 @@ func (t communitySubscriptionScannerStatic) Scan(i *CommunitySubscription) error
 		if uid, err := uuid.FromBytes([]byte(c1.String)); err != nil {
 			return err
 		} else {
-			i.CommunityID = uid.String()
+			tmp := uid.String()
+			i.CommunityID = tmp
 		}
 	}
 
@@ -2411,14 +2499,16 @@ func (t communitySubscriptionScannerStatic) Scan(i *CommunitySubscription) error
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c2.Time
+		tmp := c2.Time
+		i.CreatedAt = tmp
 	}
 
 	if c3.Valid {
 		if uid, err := uuid.FromBytes([]byte(c3.String)); err != nil {
 			return err
 		} else {
-			i.ID = uid.String()
+			tmp := uid.String()
+			i.ID = tmp
 		}
 	}
 
@@ -2430,7 +2520,8 @@ func (t communitySubscriptionScannerStatic) Scan(i *CommunitySubscription) error
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.LastSyncAt = tmp
 	default:
-		i.LastSyncAt = c4.Time
+		tmp := c4.Time
+		i.LastSyncAt = tmp
 	}
 
 	switch c5.InfinityModifier {
@@ -2441,7 +2532,8 @@ func (t communitySubscriptionScannerStatic) Scan(i *CommunitySubscription) error
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		i.UpdatedAt = c5.Time
+		tmp := c5.Time
+		i.UpdatedAt = tmp
 	}
 
 	return t.Rows.Err()
@@ -2507,7 +2599,8 @@ func (t CommunitySubscriptionScannerStaticRow) Scan(i *CommunitySubscription) er
 		if uid, err := uuid.FromBytes([]byte(c1.String)); err != nil {
 			return err
 		} else {
-			i.CommunityID = uid.String()
+			tmp := uid.String()
+			i.CommunityID = tmp
 		}
 	}
 
@@ -2519,14 +2612,16 @@ func (t CommunitySubscriptionScannerStaticRow) Scan(i *CommunitySubscription) er
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c2.Time
+		tmp := c2.Time
+		i.CreatedAt = tmp
 	}
 
 	if c3.Valid {
 		if uid, err := uuid.FromBytes([]byte(c3.String)); err != nil {
 			return err
 		} else {
-			i.ID = uid.String()
+			tmp := uid.String()
+			i.ID = tmp
 		}
 	}
 
@@ -2538,7 +2633,8 @@ func (t CommunitySubscriptionScannerStaticRow) Scan(i *CommunitySubscription) er
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.LastSyncAt = tmp
 	default:
-		i.LastSyncAt = c4.Time
+		tmp := c4.Time
+		i.LastSyncAt = tmp
 	}
 
 	switch c5.InfinityModifier {
@@ -2549,7 +2645,8 @@ func (t CommunitySubscriptionScannerStaticRow) Scan(i *CommunitySubscription) er
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		i.UpdatedAt = c5.Time
+		tmp := c5.Time
+		i.UpdatedAt = tmp
 	}
 
 	return nil
@@ -2643,7 +2740,8 @@ func (t communitySubscriptionScannerDynamic) Scan(i *CommunitySubscription) erro
 				if uid, err := uuid.FromBytes([]byte(c1.String)); err != nil {
 					return err
 				} else {
-					i.CommunityID = uid.String()
+					tmp := uid.String()
+					i.CommunityID = tmp
 				}
 			}
 
@@ -2656,7 +2754,8 @@ func (t communitySubscriptionScannerDynamic) Scan(i *CommunitySubscription) erro
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.CreatedAt = tmp
 			default:
-				i.CreatedAt = c2.Time
+				tmp := c2.Time
+				i.CreatedAt = tmp
 			}
 
 		case cn3:
@@ -2664,7 +2763,8 @@ func (t communitySubscriptionScannerDynamic) Scan(i *CommunitySubscription) erro
 				if uid, err := uuid.FromBytes([]byte(c3.String)); err != nil {
 					return err
 				} else {
-					i.ID = uid.String()
+					tmp := uid.String()
+					i.ID = tmp
 				}
 			}
 
@@ -2677,7 +2777,8 @@ func (t communitySubscriptionScannerDynamic) Scan(i *CommunitySubscription) erro
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.LastSyncAt = tmp
 			default:
-				i.LastSyncAt = c4.Time
+				tmp := c4.Time
+				i.LastSyncAt = tmp
 			}
 
 		case cn5:
@@ -2689,7 +2790,8 @@ func (t communitySubscriptionScannerDynamic) Scan(i *CommunitySubscription) erro
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.UpdatedAt = tmp
 			default:
-				i.UpdatedAt = c5.Time
+				tmp := c5.Time
+				i.UpdatedAt = tmp
 			}
 
 		}
@@ -2800,14 +2902,16 @@ func (t publishedCASMetricScannerStatic) Scan(i *PublishedCASMetric) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c2.Time
+		tmp := c2.Time
+		i.CreatedAt = tmp
 	}
 
 	if c3.Valid {
 		if uid, err := uuid.FromBytes([]byte(c3.String)); err != nil {
 			return err
 		} else {
-			i.ID = uid.String()
+			tmp := uid.String()
+			i.ID = tmp
 		}
 	}
 
@@ -2819,7 +2923,8 @@ func (t publishedCASMetricScannerStatic) Scan(i *PublishedCASMetric) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.PeriodEnd = tmp
 	default:
-		i.PeriodEnd = c4.Time
+		tmp := c4.Time
+		i.PeriodEnd = tmp
 	}
 
 	switch c5.InfinityModifier {
@@ -2830,14 +2935,16 @@ func (t publishedCASMetricScannerStatic) Scan(i *PublishedCASMetric) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.PeriodStart = tmp
 	default:
-		i.PeriodStart = c5.Time
+		tmp := c5.Time
+		i.PeriodStart = tmp
 	}
 
 	if c6.Valid {
 		if uid, err := uuid.FromBytes([]byte(c6.String)); err != nil {
 			return err
 		} else {
-			i.PublishedContentID = uid.String()
+			tmp := uid.String()
+			i.PublishedContentID = tmp
 		}
 	}
 
@@ -2854,7 +2961,8 @@ func (t publishedCASMetricScannerStatic) Scan(i *PublishedCASMetric) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		i.UpdatedAt = c8.Time
+		tmp := c8.Time
+		i.UpdatedAt = tmp
 	}
 
 	return t.Rows.Err()
@@ -2932,14 +3040,16 @@ func (t PublishedCASMetricScannerStaticRow) Scan(i *PublishedCASMetric) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c2.Time
+		tmp := c2.Time
+		i.CreatedAt = tmp
 	}
 
 	if c3.Valid {
 		if uid, err := uuid.FromBytes([]byte(c3.String)); err != nil {
 			return err
 		} else {
-			i.ID = uid.String()
+			tmp := uid.String()
+			i.ID = tmp
 		}
 	}
 
@@ -2951,7 +3061,8 @@ func (t PublishedCASMetricScannerStaticRow) Scan(i *PublishedCASMetric) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.PeriodEnd = tmp
 	default:
-		i.PeriodEnd = c4.Time
+		tmp := c4.Time
+		i.PeriodEnd = tmp
 	}
 
 	switch c5.InfinityModifier {
@@ -2962,14 +3073,16 @@ func (t PublishedCASMetricScannerStaticRow) Scan(i *PublishedCASMetric) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.PeriodStart = tmp
 	default:
-		i.PeriodStart = c5.Time
+		tmp := c5.Time
+		i.PeriodStart = tmp
 	}
 
 	if c6.Valid {
 		if uid, err := uuid.FromBytes([]byte(c6.String)); err != nil {
 			return err
 		} else {
-			i.PublishedContentID = uid.String()
+			tmp := uid.String()
+			i.PublishedContentID = tmp
 		}
 	}
 
@@ -2986,7 +3099,8 @@ func (t PublishedCASMetricScannerStaticRow) Scan(i *PublishedCASMetric) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		i.UpdatedAt = c8.Time
+		tmp := c8.Time
+		i.UpdatedAt = tmp
 	}
 
 	return nil
@@ -3102,7 +3216,8 @@ func (t publishedCASMetricScannerDynamic) Scan(i *PublishedCASMetric) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.CreatedAt = tmp
 			default:
-				i.CreatedAt = c2.Time
+				tmp := c2.Time
+				i.CreatedAt = tmp
 			}
 
 		case cn3:
@@ -3110,7 +3225,8 @@ func (t publishedCASMetricScannerDynamic) Scan(i *PublishedCASMetric) error {
 				if uid, err := uuid.FromBytes([]byte(c3.String)); err != nil {
 					return err
 				} else {
-					i.ID = uid.String()
+					tmp := uid.String()
+					i.ID = tmp
 				}
 			}
 
@@ -3123,7 +3239,8 @@ func (t publishedCASMetricScannerDynamic) Scan(i *PublishedCASMetric) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.PeriodEnd = tmp
 			default:
-				i.PeriodEnd = c4.Time
+				tmp := c4.Time
+				i.PeriodEnd = tmp
 			}
 
 		case cn5:
@@ -3135,7 +3252,8 @@ func (t publishedCASMetricScannerDynamic) Scan(i *PublishedCASMetric) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.PeriodStart = tmp
 			default:
-				i.PeriodStart = c5.Time
+				tmp := c5.Time
+				i.PeriodStart = tmp
 			}
 
 		case cn6:
@@ -3143,7 +3261,8 @@ func (t publishedCASMetricScannerDynamic) Scan(i *PublishedCASMetric) error {
 				if uid, err := uuid.FromBytes([]byte(c6.String)); err != nil {
 					return err
 				} else {
-					i.PublishedContentID = uid.String()
+					tmp := uid.String()
+					i.PublishedContentID = tmp
 				}
 			}
 
@@ -3162,7 +3281,8 @@ func (t publishedCASMetricScannerDynamic) Scan(i *PublishedCASMetric) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.UpdatedAt = tmp
 			default:
-				i.UpdatedAt = c8.Time
+				tmp := c8.Time
+				i.UpdatedAt = tmp
 			}
 
 		}
@@ -3267,7 +3387,8 @@ func (t oAuth2GoogleScannerStatic) Scan(i *OAuth2Google) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c1.Time
+		tmp := c1.Time
+		i.CreatedAt = tmp
 	}
 
 	switch c2.InfinityModifier {
@@ -3278,14 +3399,16 @@ func (t oAuth2GoogleScannerStatic) Scan(i *OAuth2Google) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.Expiry = tmp
 	default:
-		i.Expiry = c2.Time
+		tmp := c2.Time
+		i.Expiry = tmp
 	}
 
 	if c3.Valid {
 		if uid, err := uuid.FromBytes([]byte(c3.String)); err != nil {
 			return err
 		} else {
-			i.ID = uid.String()
+			tmp := uid.String()
+			i.ID = tmp
 		}
 	}
 
@@ -3312,7 +3435,8 @@ func (t oAuth2GoogleScannerStatic) Scan(i *OAuth2Google) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		i.UpdatedAt = c7.Time
+		tmp := c7.Time
+		i.UpdatedAt = tmp
 	}
 
 	return t.Rows.Err()
@@ -3384,7 +3508,8 @@ func (t OAuth2GoogleScannerStaticRow) Scan(i *OAuth2Google) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c1.Time
+		tmp := c1.Time
+		i.CreatedAt = tmp
 	}
 
 	switch c2.InfinityModifier {
@@ -3395,14 +3520,16 @@ func (t OAuth2GoogleScannerStaticRow) Scan(i *OAuth2Google) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.Expiry = tmp
 	default:
-		i.Expiry = c2.Time
+		tmp := c2.Time
+		i.Expiry = tmp
 	}
 
 	if c3.Valid {
 		if uid, err := uuid.FromBytes([]byte(c3.String)); err != nil {
 			return err
 		} else {
-			i.ID = uid.String()
+			tmp := uid.String()
+			i.ID = tmp
 		}
 	}
 
@@ -3429,7 +3556,8 @@ func (t OAuth2GoogleScannerStaticRow) Scan(i *OAuth2Google) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		i.UpdatedAt = c7.Time
+		tmp := c7.Time
+		i.UpdatedAt = tmp
 	}
 
 	return nil
@@ -3535,7 +3663,8 @@ func (t oAuth2GoogleScannerDynamic) Scan(i *OAuth2Google) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.CreatedAt = tmp
 			default:
-				i.CreatedAt = c1.Time
+				tmp := c1.Time
+				i.CreatedAt = tmp
 			}
 
 		case cn2:
@@ -3547,7 +3676,8 @@ func (t oAuth2GoogleScannerDynamic) Scan(i *OAuth2Google) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.Expiry = tmp
 			default:
-				i.Expiry = c2.Time
+				tmp := c2.Time
+				i.Expiry = tmp
 			}
 
 		case cn3:
@@ -3555,7 +3685,8 @@ func (t oAuth2GoogleScannerDynamic) Scan(i *OAuth2Google) error {
 				if uid, err := uuid.FromBytes([]byte(c3.String)); err != nil {
 					return err
 				} else {
-					i.ID = uid.String()
+					tmp := uid.String()
+					i.ID = tmp
 				}
 			}
 
@@ -3586,7 +3717,8 @@ func (t oAuth2GoogleScannerDynamic) Scan(i *OAuth2Google) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.UpdatedAt = tmp
 			default:
-				i.UpdatedAt = c7.Time
+				tmp := c7.Time
+				i.UpdatedAt = tmp
 			}
 
 		}

@@ -79,46 +79,48 @@ func AutoTorrentSettings(defaults *TorrentSettings, options ...func(*TorrentSett
 
 func newTorrenting(db *sql.DB, id ssh.Signer, root, media, tvfs fsx.Virtual, mc library.QueryCleaner, tstore storage.ClientImpl, socks5 net.Listener) _torrenting {
 	return _torrenting{
-		cond:          sync.NewCond(&sync.Mutex{}),
-		cfgpath:       userx.DefaultConfigDir(userx.DefaultRelRoot(), "torrent.cfg"),
-		ddiscidpath:   userx.DefaultConfigDir(userx.DefaultRelRoot(), "ddisc.id"),
-		peercachepath: userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "torrent.peers"),
-		machineid:     cmdopts.MachineID(),
-		wgconfigdir:   wireguardx.ConfigDirectory(),
-		wglatest:      wireguardx.Latest(),
-		db:            db,
-		id:            id,
-		rootstore:     root,
-		mediastore:    media,
-		tvfs:          tvfs,
-		tstore:        tstore,
-		socks5:        socks5,
-		mc:            mc,
-		_tclient:      &atomic.Pointer[torrent.Client]{},
-		_dnscache:     dnscache.AutoProxyResolver(),
-		_wgdev:        &atomic.Pointer[device.Device]{},
+		cond:            sync.NewCond(&sync.Mutex{}),
+		cfgpath:         userx.DefaultConfigDir(userx.DefaultRelRoot(), "torrent.cfg"),
+		ddiscidpath:     userx.DefaultConfigDir(userx.DefaultRelRoot(), "ddisc.id"),
+		peercachepath:   userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "torrent.peers"),
+		samplecachepath: userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "torrent.bep51.samples"),
+		machineid:       cmdopts.MachineID(),
+		wgconfigdir:     wireguardx.ConfigDirectory(),
+		wglatest:        wireguardx.Latest(),
+		db:              db,
+		id:              id,
+		rootstore:       root,
+		mediastore:      media,
+		tvfs:            tvfs,
+		tstore:          tstore,
+		socks5:          socks5,
+		mc:              mc,
+		_tclient:        &atomic.Pointer[torrent.Client]{},
+		_dnscache:       dnscache.AutoProxyResolver(),
+		_wgdev:          &atomic.Pointer[device.Device]{},
 	}
 }
 
 type _torrenting struct {
-	cfgpath       string
-	ddiscidpath   string
-	peercachepath string
-	machineid     string
-	wgconfigdir   string
-	wglatest      string
-	db            *sql.DB
-	id            ssh.Signer
-	rootstore     fsx.Virtual
-	mediastore    fsx.Virtual
-	tvfs          fsx.Virtual
-	mc            library.QueryCleaner
-	tstore        storage.ClientImpl
-	socks5        net.Listener
-	_tclient      *atomic.Pointer[torrent.Client]
-	_dnscache     *dnscache.ProxyPtr
-	_wgdev        *atomic.Pointer[device.Device]
-	cond          *sync.Cond
+	cfgpath         string
+	ddiscidpath     string
+	peercachepath   string
+	samplecachepath string
+	machineid       string
+	wgconfigdir     string
+	wglatest        string
+	db              *sql.DB
+	id              ssh.Signer
+	rootstore       fsx.Virtual
+	mediastore      fsx.Virtual
+	tvfs            fsx.Virtual
+	mc              library.QueryCleaner
+	tstore          storage.ClientImpl
+	socks5          net.Listener
+	_tclient        *atomic.Pointer[torrent.Client]
+	_dnscache       *dnscache.ProxyPtr
+	_wgdev          *atomic.Pointer[device.Device]
+	cond            *sync.Cond
 }
 
 func (t _torrenting) loadcfg(path string, v proto.Message) error {
@@ -338,7 +340,7 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 	}
 
 	tmux := dht.DefaultMuxer().
-		Method(bep0051.Query, bep0051.NewEndpoint(bep0051.EmptySampler{})).
+		Method(bep0051.Query, bep0051.NewEndpoint(NewSampler(t.db, time.Duration(bep0051.TTLMax)*time.Second, t.samplecachepath))).
 		Method(ddisctorrent.MethodMeta, ddisctorrent.NewMeta(localpartition)).
 		Method(ddisctorrent.MethodSearch, ddisctorrent.NewSearch(t.db)).
 		Method(ddisctorrent.MethodSync, ddisctorrent.NewSync(t.db)).
@@ -379,9 +381,6 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 		if err != nil {
 			return errorsx.Wrap(err, "unable to setup dht server")
 		}
-
-		// go torrentx.AnnouncePort1(dctx, int160.Zero().Prefix([]byte{0x1}), dhts)
-		// go torrentx.AnnouncePort2(dctx, int160.Zero().Prefix([]byte{0x2}), dhts)
 
 		limit = retronetx.NewConnLimited(langx.FirstNonZero(wgcfg.MaximumConnections, math.MaxUint64))
 		tnetwork, err = torrentx.SetupTorrentBinder(

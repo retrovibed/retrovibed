@@ -77,6 +77,13 @@ func MetadataFindByInfohash(
 	gql = gql.Query(`SELECT ` + MetadataScannerStaticColumns + ` FROM torrents_metadata WHERE "infohash" = unhex({id})`)
 }
 
+func MetadataSamplePublic(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer) NewMetadataScannerStatic,
+) {
+	gql = gql.Query(`SELECT ` + MetadataScannerStaticColumns + ` FROM (SELECT ` + MetadataScannerStaticColumns + ` FROM torrents_metadata WHERE seeding AND NOT private) AS torrents_metadata USING SAMPLE 512`)
+}
+
 func MetadataPausedByID(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewMetadataScannerStaticRow,
@@ -175,7 +182,7 @@ func PeerInsertWithDefaults(
 	gql genieql.Insert,
 	pattern func(ctx context.Context, q sqlx.Queryer, a Peer) NewPeerScannerStaticRow,
 ) {
-	gql.Into("torrents_peers").Default("created_at", "updated_at", "next_check").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, ip = EXCLUDED.ip, port = EXCLUDED.port, description = EXCLUDED.description, bep51_available = EXCLUDED.bep51_available, ddisc = EXCLUDED.ddisc, ddisc_partition = EXCLUDED.ddisc_partition, ddisc_syncoffset = EXCLUDED.ddisc_syncoffset")
+	gql.Into("torrents_peers").Default("created_at", "updated_at", "next_check").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, peer = EXCLUDED.peer, ip = EXCLUDED.ip, port = EXCLUDED.port, description = EXCLUDED.description, bep51_available = EXCLUDED.bep51_available, ddisc = EXCLUDED.ddisc, ddisc_partition = EXCLUDED.ddisc_partition, ddisc_syncoffset = EXCLUDED.ddisc_syncoffset, tombstoned_at = EXCLUDED.tombstoned_at")
 }
 
 func PeerUpdateDdisc(
@@ -211,6 +218,13 @@ func PeerClearTombstoned(
 	pattern func(ctx context.Context, q sqlx.Queryer, ts time.Time) NewPeerScannerStatic,
 ) {
 	gql = gql.Query(`DELETE FROM torrents_peers WHERE "tombstoned_at" <= {ts} RETURNING ` + PeerScannerStaticColumns)
+}
+
+func PeerNextCheck(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, ts time.Time) NewPeerScannerStaticRow,
+) {
+	gql = gql.Query(`UPDATE torrents_peers SET next_check = {ts} WHERE id IN (SELECT id FROM torrents_peers WHERE next_check < NOW() AND bep51_available > 0 LIMIT 1) RETURNING ` + PeerScannerStaticColumns)
 }
 
 func UnknownHash(gql genieql.Structure) {

@@ -169,14 +169,16 @@ func (t recommendationScannerStatic) Scan(i *Recommendation) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c0.Time
+		tmp := c0.Time
+		i.CreatedAt = tmp
 	}
 
 	if c1.Valid {
 		if uid, err := uuid.FromBytes([]byte(c1.String)); err != nil {
 			return err
 		} else {
-			i.ID = uid.String()
+			tmp := uid.String()
+			i.ID = tmp
 		}
 	}
 
@@ -184,7 +186,8 @@ func (t recommendationScannerStatic) Scan(i *Recommendation) error {
 		if uid, err := uuid.FromBytes([]byte(c2.String)); err != nil {
 			return err
 		} else {
-			i.KnownMediaID = uid.String()
+			tmp := uid.String()
+			i.KnownMediaID = tmp
 		}
 	}
 
@@ -202,7 +205,8 @@ func (t recommendationScannerStatic) Scan(i *Recommendation) error {
 		if uid, err := uuid.FromBytes([]byte(c5.String)); err != nil {
 			return err
 		} else {
-			i.Source = uid.String()
+			tmp := uid.String()
+			i.Source = tmp
 		}
 	}
 
@@ -214,7 +218,8 @@ func (t recommendationScannerStatic) Scan(i *Recommendation) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.TombstoneAt = tmp
 	default:
-		i.TombstoneAt = c6.Time
+		tmp := c6.Time
+		i.TombstoneAt = tmp
 	}
 
 	switch c7.InfinityModifier {
@@ -225,7 +230,8 @@ func (t recommendationScannerStatic) Scan(i *Recommendation) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		i.UpdatedAt = c7.Time
+		tmp := c7.Time
+		i.UpdatedAt = tmp
 	}
 
 	return t.Rows.Err()
@@ -292,14 +298,16 @@ func (t RecommendationScannerStaticRow) Scan(i *Recommendation) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c0.Time
+		tmp := c0.Time
+		i.CreatedAt = tmp
 	}
 
 	if c1.Valid {
 		if uid, err := uuid.FromBytes([]byte(c1.String)); err != nil {
 			return err
 		} else {
-			i.ID = uid.String()
+			tmp := uid.String()
+			i.ID = tmp
 		}
 	}
 
@@ -307,7 +315,8 @@ func (t RecommendationScannerStaticRow) Scan(i *Recommendation) error {
 		if uid, err := uuid.FromBytes([]byte(c2.String)); err != nil {
 			return err
 		} else {
-			i.KnownMediaID = uid.String()
+			tmp := uid.String()
+			i.KnownMediaID = tmp
 		}
 	}
 
@@ -325,7 +334,8 @@ func (t RecommendationScannerStaticRow) Scan(i *Recommendation) error {
 		if uid, err := uuid.FromBytes([]byte(c5.String)); err != nil {
 			return err
 		} else {
-			i.Source = uid.String()
+			tmp := uid.String()
+			i.Source = tmp
 		}
 	}
 
@@ -337,7 +347,8 @@ func (t RecommendationScannerStaticRow) Scan(i *Recommendation) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.TombstoneAt = tmp
 	default:
-		i.TombstoneAt = c6.Time
+		tmp := c6.Time
+		i.TombstoneAt = tmp
 	}
 
 	switch c7.InfinityModifier {
@@ -348,7 +359,8 @@ func (t RecommendationScannerStaticRow) Scan(i *Recommendation) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		i.UpdatedAt = c7.Time
+		tmp := c7.Time
+		i.UpdatedAt = tmp
 	}
 
 	return nil
@@ -448,7 +460,8 @@ func (t recommendationScannerDynamic) Scan(i *Recommendation) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.CreatedAt = tmp
 			default:
-				i.CreatedAt = c0.Time
+				tmp := c0.Time
+				i.CreatedAt = tmp
 			}
 
 		case cn1:
@@ -456,7 +469,8 @@ func (t recommendationScannerDynamic) Scan(i *Recommendation) error {
 				if uid, err := uuid.FromBytes([]byte(c1.String)); err != nil {
 					return err
 				} else {
-					i.ID = uid.String()
+					tmp := uid.String()
+					i.ID = tmp
 				}
 			}
 
@@ -465,7 +479,8 @@ func (t recommendationScannerDynamic) Scan(i *Recommendation) error {
 				if uid, err := uuid.FromBytes([]byte(c2.String)); err != nil {
 					return err
 				} else {
-					i.KnownMediaID = uid.String()
+					tmp := uid.String()
+					i.KnownMediaID = tmp
 				}
 			}
 
@@ -486,7 +501,8 @@ func (t recommendationScannerDynamic) Scan(i *Recommendation) error {
 				if uid, err := uuid.FromBytes([]byte(c5.String)); err != nil {
 					return err
 				} else {
-					i.Source = uid.String()
+					tmp := uid.String()
+					i.Source = tmp
 				}
 			}
 
@@ -499,7 +515,8 @@ func (t recommendationScannerDynamic) Scan(i *Recommendation) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.TombstoneAt = tmp
 			default:
-				i.TombstoneAt = c6.Time
+				tmp := c6.Time
+				i.TombstoneAt = tmp
 			}
 
 		case cn7:
@@ -511,7 +528,8 @@ func (t recommendationScannerDynamic) Scan(i *Recommendation) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.UpdatedAt = tmp
 			default:
-				i.UpdatedAt = c7.Time
+				tmp := c7.Time
+				i.UpdatedAt = tmp
 			}
 
 		}
@@ -612,7 +630,8 @@ func (t recentSessionScannerStatic) Scan(i *RecentSession) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c0.Time
+		tmp := c0.Time
+		i.CreatedAt = tmp
 	}
 
 	if c1.Valid {
@@ -624,7 +643,8 @@ func (t recentSessionScannerStatic) Scan(i *RecentSession) error {
 		if uid, err := uuid.FromBytes([]byte(c2.String)); err != nil {
 			return err
 		} else {
-			i.ID = uid.String()
+			tmp := uid.String()
+			i.ID = tmp
 		}
 	}
 
@@ -636,14 +656,16 @@ func (t recentSessionScannerStatic) Scan(i *RecentSession) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.LastPlayedAt = tmp
 	default:
-		i.LastPlayedAt = c3.Time
+		tmp := c3.Time
+		i.LastPlayedAt = tmp
 	}
 
 	if c4.Valid {
 		if uid, err := uuid.FromBytes([]byte(c4.String)); err != nil {
 			return err
 		} else {
-			i.MediaID = uid.String()
+			tmp := uid.String()
+			i.MediaID = tmp
 		}
 	}
 
@@ -667,7 +689,8 @@ func (t recentSessionScannerStatic) Scan(i *RecentSession) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		i.UpdatedAt = c8.Time
+		tmp := c8.Time
+		i.UpdatedAt = tmp
 	}
 
 	return t.Rows.Err()
@@ -735,7 +758,8 @@ func (t RecentSessionScannerStaticRow) Scan(i *RecentSession) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c0.Time
+		tmp := c0.Time
+		i.CreatedAt = tmp
 	}
 
 	if c1.Valid {
@@ -747,7 +771,8 @@ func (t RecentSessionScannerStaticRow) Scan(i *RecentSession) error {
 		if uid, err := uuid.FromBytes([]byte(c2.String)); err != nil {
 			return err
 		} else {
-			i.ID = uid.String()
+			tmp := uid.String()
+			i.ID = tmp
 		}
 	}
 
@@ -759,14 +784,16 @@ func (t RecentSessionScannerStaticRow) Scan(i *RecentSession) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.LastPlayedAt = tmp
 	default:
-		i.LastPlayedAt = c3.Time
+		tmp := c3.Time
+		i.LastPlayedAt = tmp
 	}
 
 	if c4.Valid {
 		if uid, err := uuid.FromBytes([]byte(c4.String)); err != nil {
 			return err
 		} else {
-			i.MediaID = uid.String()
+			tmp := uid.String()
+			i.MediaID = tmp
 		}
 	}
 
@@ -790,7 +817,8 @@ func (t RecentSessionScannerStaticRow) Scan(i *RecentSession) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		i.UpdatedAt = c8.Time
+		tmp := c8.Time
+		i.UpdatedAt = tmp
 	}
 
 	return nil
@@ -894,7 +922,8 @@ func (t recentSessionScannerDynamic) Scan(i *RecentSession) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.CreatedAt = tmp
 			default:
-				i.CreatedAt = c0.Time
+				tmp := c0.Time
+				i.CreatedAt = tmp
 			}
 
 		case cn1:
@@ -908,7 +937,8 @@ func (t recentSessionScannerDynamic) Scan(i *RecentSession) error {
 				if uid, err := uuid.FromBytes([]byte(c2.String)); err != nil {
 					return err
 				} else {
-					i.ID = uid.String()
+					tmp := uid.String()
+					i.ID = tmp
 				}
 			}
 
@@ -921,7 +951,8 @@ func (t recentSessionScannerDynamic) Scan(i *RecentSession) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.LastPlayedAt = tmp
 			default:
-				i.LastPlayedAt = c3.Time
+				tmp := c3.Time
+				i.LastPlayedAt = tmp
 			}
 
 		case cn4:
@@ -929,7 +960,8 @@ func (t recentSessionScannerDynamic) Scan(i *RecentSession) error {
 				if uid, err := uuid.FromBytes([]byte(c4.String)); err != nil {
 					return err
 				} else {
-					i.MediaID = uid.String()
+					tmp := uid.String()
+					i.MediaID = tmp
 				}
 			}
 
@@ -957,7 +989,8 @@ func (t recentSessionScannerDynamic) Scan(i *RecentSession) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.UpdatedAt = tmp
 			default:
-				i.UpdatedAt = c8.Time
+				tmp := c8.Time
+				i.UpdatedAt = tmp
 			}
 
 		}
@@ -1072,7 +1105,8 @@ func (t recentSessionLibraryScannerStatic) Scan(i *RecentSession, md *Metadata) 
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c0.Time
+		tmp := c0.Time
+		i.CreatedAt = tmp
 	}
 
 	if c1.Valid {
@@ -1084,7 +1118,8 @@ func (t recentSessionLibraryScannerStatic) Scan(i *RecentSession, md *Metadata) 
 		if uid, err := uuid.FromBytes([]byte(c2.String)); err != nil {
 			return err
 		} else {
-			i.ID = uid.String()
+			tmp := uid.String()
+			i.ID = tmp
 		}
 	}
 
@@ -1096,14 +1131,16 @@ func (t recentSessionLibraryScannerStatic) Scan(i *RecentSession, md *Metadata) 
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.LastPlayedAt = tmp
 	default:
-		i.LastPlayedAt = c3.Time
+		tmp := c3.Time
+		i.LastPlayedAt = tmp
 	}
 
 	if c4.Valid {
 		if uid, err := uuid.FromBytes([]byte(c4.String)); err != nil {
 			return err
 		} else {
-			i.MediaID = uid.String()
+			tmp := uid.String()
+			i.MediaID = tmp
 		}
 	}
 
@@ -1127,14 +1164,16 @@ func (t recentSessionLibraryScannerStatic) Scan(i *RecentSession, md *Metadata) 
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		i.UpdatedAt = c8.Time
+		tmp := c8.Time
+		i.UpdatedAt = tmp
 	}
 
 	if c9.Valid {
 		if uid, err := uuid.FromBytes([]byte(c9.String)); err != nil {
 			return err
 		} else {
-			md.ArchiveID = uid.String()
+			tmp := uid.String()
+			md.ArchiveID = tmp
 		}
 	}
 
@@ -1156,7 +1195,8 @@ func (t recentSessionLibraryScannerStatic) Scan(i *RecentSession, md *Metadata) 
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		md.CreatedAt = tmp
 	default:
-		md.CreatedAt = c12.Time
+		tmp := c12.Time
+		md.CreatedAt = tmp
 	}
 
 	if c13.Valid {
@@ -1178,7 +1218,8 @@ func (t recentSessionLibraryScannerStatic) Scan(i *RecentSession, md *Metadata) 
 		if uid, err := uuid.FromBytes([]byte(c16.String)); err != nil {
 			return err
 		} else {
-			md.EncryptionSeed = uid.String()
+			tmp := uid.String()
+			md.EncryptionSeed = tmp
 		}
 	}
 
@@ -1190,14 +1231,16 @@ func (t recentSessionLibraryScannerStatic) Scan(i *RecentSession, md *Metadata) 
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		md.HiddenAt = tmp
 	default:
-		md.HiddenAt = c17.Time
+		tmp := c17.Time
+		md.HiddenAt = tmp
 	}
 
 	if c18.Valid {
 		if uid, err := uuid.FromBytes([]byte(c18.String)); err != nil {
 			return err
 		} else {
-			md.ID = uid.String()
+			tmp := uid.String()
+			md.ID = tmp
 		}
 	}
 
@@ -1210,7 +1253,8 @@ func (t recentSessionLibraryScannerStatic) Scan(i *RecentSession, md *Metadata) 
 		if uid, err := uuid.FromBytes([]byte(c20.String)); err != nil {
 			return err
 		} else {
-			md.KnownMediaID = uid.String()
+			tmp := uid.String()
+			md.KnownMediaID = tmp
 		}
 	}
 
@@ -1232,14 +1276,16 @@ func (t recentSessionLibraryScannerStatic) Scan(i *RecentSession, md *Metadata) 
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		md.TombstonedAt = tmp
 	default:
-		md.TombstonedAt = c23.Time
+		tmp := c23.Time
+		md.TombstonedAt = tmp
 	}
 
 	if c24.Valid {
 		if uid, err := uuid.FromBytes([]byte(c24.String)); err != nil {
 			return err
 		} else {
-			md.TorrentID = uid.String()
+			tmp := uid.String()
+			md.TorrentID = tmp
 		}
 	}
 
@@ -1251,7 +1297,8 @@ func (t recentSessionLibraryScannerStatic) Scan(i *RecentSession, md *Metadata) 
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		md.UpdatedAt = tmp
 	default:
-		md.UpdatedAt = c25.Time
+		tmp := c25.Time
+		md.UpdatedAt = tmp
 	}
 
 	return t.Rows.Err()
@@ -1336,7 +1383,8 @@ func (t RecentSessionLibraryScannerStaticRow) Scan(i *RecentSession, md *Metadat
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c0.Time
+		tmp := c0.Time
+		i.CreatedAt = tmp
 	}
 
 	if c1.Valid {
@@ -1348,7 +1396,8 @@ func (t RecentSessionLibraryScannerStaticRow) Scan(i *RecentSession, md *Metadat
 		if uid, err := uuid.FromBytes([]byte(c2.String)); err != nil {
 			return err
 		} else {
-			i.ID = uid.String()
+			tmp := uid.String()
+			i.ID = tmp
 		}
 	}
 
@@ -1360,14 +1409,16 @@ func (t RecentSessionLibraryScannerStaticRow) Scan(i *RecentSession, md *Metadat
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.LastPlayedAt = tmp
 	default:
-		i.LastPlayedAt = c3.Time
+		tmp := c3.Time
+		i.LastPlayedAt = tmp
 	}
 
 	if c4.Valid {
 		if uid, err := uuid.FromBytes([]byte(c4.String)); err != nil {
 			return err
 		} else {
-			i.MediaID = uid.String()
+			tmp := uid.String()
+			i.MediaID = tmp
 		}
 	}
 
@@ -1391,14 +1442,16 @@ func (t RecentSessionLibraryScannerStaticRow) Scan(i *RecentSession, md *Metadat
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		i.UpdatedAt = c8.Time
+		tmp := c8.Time
+		i.UpdatedAt = tmp
 	}
 
 	if c9.Valid {
 		if uid, err := uuid.FromBytes([]byte(c9.String)); err != nil {
 			return err
 		} else {
-			md.ArchiveID = uid.String()
+			tmp := uid.String()
+			md.ArchiveID = tmp
 		}
 	}
 
@@ -1420,7 +1473,8 @@ func (t RecentSessionLibraryScannerStaticRow) Scan(i *RecentSession, md *Metadat
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		md.CreatedAt = tmp
 	default:
-		md.CreatedAt = c12.Time
+		tmp := c12.Time
+		md.CreatedAt = tmp
 	}
 
 	if c13.Valid {
@@ -1442,7 +1496,8 @@ func (t RecentSessionLibraryScannerStaticRow) Scan(i *RecentSession, md *Metadat
 		if uid, err := uuid.FromBytes([]byte(c16.String)); err != nil {
 			return err
 		} else {
-			md.EncryptionSeed = uid.String()
+			tmp := uid.String()
+			md.EncryptionSeed = tmp
 		}
 	}
 
@@ -1454,14 +1509,16 @@ func (t RecentSessionLibraryScannerStaticRow) Scan(i *RecentSession, md *Metadat
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		md.HiddenAt = tmp
 	default:
-		md.HiddenAt = c17.Time
+		tmp := c17.Time
+		md.HiddenAt = tmp
 	}
 
 	if c18.Valid {
 		if uid, err := uuid.FromBytes([]byte(c18.String)); err != nil {
 			return err
 		} else {
-			md.ID = uid.String()
+			tmp := uid.String()
+			md.ID = tmp
 		}
 	}
 
@@ -1474,7 +1531,8 @@ func (t RecentSessionLibraryScannerStaticRow) Scan(i *RecentSession, md *Metadat
 		if uid, err := uuid.FromBytes([]byte(c20.String)); err != nil {
 			return err
 		} else {
-			md.KnownMediaID = uid.String()
+			tmp := uid.String()
+			md.KnownMediaID = tmp
 		}
 	}
 
@@ -1496,14 +1554,16 @@ func (t RecentSessionLibraryScannerStaticRow) Scan(i *RecentSession, md *Metadat
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		md.TombstonedAt = tmp
 	default:
-		md.TombstonedAt = c23.Time
+		tmp := c23.Time
+		md.TombstonedAt = tmp
 	}
 
 	if c24.Valid {
 		if uid, err := uuid.FromBytes([]byte(c24.String)); err != nil {
 			return err
 		} else {
-			md.TorrentID = uid.String()
+			tmp := uid.String()
+			md.TorrentID = tmp
 		}
 	}
 
@@ -1515,7 +1575,8 @@ func (t RecentSessionLibraryScannerStaticRow) Scan(i *RecentSession, md *Metadat
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		md.UpdatedAt = tmp
 	default:
-		md.UpdatedAt = c25.Time
+		tmp := c25.Time
+		md.UpdatedAt = tmp
 	}
 
 	return nil
@@ -1597,14 +1658,16 @@ func (t locateScannerStatic) Scan(i *Locate) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c0.Time
+		tmp := c0.Time
+		i.CreatedAt = tmp
 	}
 
 	if c1.Valid {
 		if uid, err := uuid.FromBytes([]byte(c1.String)); err != nil {
 			return err
 		} else {
-			i.ID = uid.String()
+			tmp := uid.String()
+			i.ID = tmp
 		}
 	}
 
@@ -1612,7 +1675,8 @@ func (t locateScannerStatic) Scan(i *Locate) error {
 		if uid, err := uuid.FromBytes([]byte(c2.String)); err != nil {
 			return err
 		} else {
-			i.KnownMediaID = uid.String()
+			tmp := uid.String()
+			i.KnownMediaID = tmp
 		}
 	}
 
@@ -1620,7 +1684,8 @@ func (t locateScannerStatic) Scan(i *Locate) error {
 		if uid, err := uuid.FromBytes([]byte(c3.String)); err != nil {
 			return err
 		} else {
-			i.LocatedTorrentID = uid.String()
+			tmp := uid.String()
+			i.LocatedTorrentID = tmp
 		}
 	}
 
@@ -1632,7 +1697,8 @@ func (t locateScannerStatic) Scan(i *Locate) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		i.UpdatedAt = c4.Time
+		tmp := c4.Time
+		i.UpdatedAt = tmp
 	}
 
 	return t.Rows.Err()
@@ -1696,14 +1762,16 @@ func (t LocateScannerStaticRow) Scan(i *Locate) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c0.Time
+		tmp := c0.Time
+		i.CreatedAt = tmp
 	}
 
 	if c1.Valid {
 		if uid, err := uuid.FromBytes([]byte(c1.String)); err != nil {
 			return err
 		} else {
-			i.ID = uid.String()
+			tmp := uid.String()
+			i.ID = tmp
 		}
 	}
 
@@ -1711,7 +1779,8 @@ func (t LocateScannerStaticRow) Scan(i *Locate) error {
 		if uid, err := uuid.FromBytes([]byte(c2.String)); err != nil {
 			return err
 		} else {
-			i.KnownMediaID = uid.String()
+			tmp := uid.String()
+			i.KnownMediaID = tmp
 		}
 	}
 
@@ -1719,7 +1788,8 @@ func (t LocateScannerStaticRow) Scan(i *Locate) error {
 		if uid, err := uuid.FromBytes([]byte(c3.String)); err != nil {
 			return err
 		} else {
-			i.LocatedTorrentID = uid.String()
+			tmp := uid.String()
+			i.LocatedTorrentID = tmp
 		}
 	}
 
@@ -1731,7 +1801,8 @@ func (t LocateScannerStaticRow) Scan(i *Locate) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		i.UpdatedAt = c4.Time
+		tmp := c4.Time
+		i.UpdatedAt = tmp
 	}
 
 	return nil
@@ -1819,7 +1890,8 @@ func (t locateScannerDynamic) Scan(i *Locate) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.CreatedAt = tmp
 			default:
-				i.CreatedAt = c0.Time
+				tmp := c0.Time
+				i.CreatedAt = tmp
 			}
 
 		case cn1:
@@ -1827,7 +1899,8 @@ func (t locateScannerDynamic) Scan(i *Locate) error {
 				if uid, err := uuid.FromBytes([]byte(c1.String)); err != nil {
 					return err
 				} else {
-					i.ID = uid.String()
+					tmp := uid.String()
+					i.ID = tmp
 				}
 			}
 
@@ -1836,7 +1909,8 @@ func (t locateScannerDynamic) Scan(i *Locate) error {
 				if uid, err := uuid.FromBytes([]byte(c2.String)); err != nil {
 					return err
 				} else {
-					i.KnownMediaID = uid.String()
+					tmp := uid.String()
+					i.KnownMediaID = tmp
 				}
 			}
 
@@ -1845,7 +1919,8 @@ func (t locateScannerDynamic) Scan(i *Locate) error {
 				if uid, err := uuid.FromBytes([]byte(c3.String)); err != nil {
 					return err
 				} else {
-					i.LocatedTorrentID = uid.String()
+					tmp := uid.String()
+					i.LocatedTorrentID = tmp
 				}
 			}
 
@@ -1858,7 +1933,8 @@ func (t locateScannerDynamic) Scan(i *Locate) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.UpdatedAt = tmp
 			default:
-				i.UpdatedAt = c4.Time
+				tmp := c4.Time
+				i.UpdatedAt = tmp
 			}
 
 		}
@@ -2180,14 +2256,16 @@ func (t recommendationKnownScannerStatic) Scan(i *Recommendation, k *Known) erro
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c0.Time
+		tmp := c0.Time
+		i.CreatedAt = tmp
 	}
 
 	if c1.Valid {
 		if uid, err := uuid.FromBytes([]byte(c1.String)); err != nil {
 			return err
 		} else {
-			i.ID = uid.String()
+			tmp := uid.String()
+			i.ID = tmp
 		}
 	}
 
@@ -2195,7 +2273,8 @@ func (t recommendationKnownScannerStatic) Scan(i *Recommendation, k *Known) erro
 		if uid, err := uuid.FromBytes([]byte(c2.String)); err != nil {
 			return err
 		} else {
-			i.KnownMediaID = uid.String()
+			tmp := uid.String()
+			i.KnownMediaID = tmp
 		}
 	}
 
@@ -2213,7 +2292,8 @@ func (t recommendationKnownScannerStatic) Scan(i *Recommendation, k *Known) erro
 		if uid, err := uuid.FromBytes([]byte(c5.String)); err != nil {
 			return err
 		} else {
-			i.Source = uid.String()
+			tmp := uid.String()
+			i.Source = tmp
 		}
 	}
 
@@ -2225,7 +2305,8 @@ func (t recommendationKnownScannerStatic) Scan(i *Recommendation, k *Known) erro
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.TombstoneAt = tmp
 	default:
-		i.TombstoneAt = c6.Time
+		tmp := c6.Time
+		i.TombstoneAt = tmp
 	}
 
 	switch c7.InfinityModifier {
@@ -2236,7 +2317,8 @@ func (t recommendationKnownScannerStatic) Scan(i *Recommendation, k *Known) erro
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		i.UpdatedAt = c7.Time
+		tmp := c7.Time
+		i.UpdatedAt = tmp
 	}
 
 	if c8.Valid {
@@ -2262,7 +2344,8 @@ func (t recommendationKnownScannerStatic) Scan(i *Recommendation, k *Known) erro
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		k.CreatedAt = tmp
 	default:
-		k.CreatedAt = c11.Time
+		tmp := c11.Time
+		k.CreatedAt = tmp
 	}
 
 	if c12.Valid {
@@ -2279,7 +2362,8 @@ func (t recommendationKnownScannerStatic) Scan(i *Recommendation, k *Known) erro
 		if uid, err := uuid.FromBytes([]byte(c14.String)); err != nil {
 			return err
 		} else {
-			k.Md5 = uid.String()
+			tmp := uid.String()
+			k.Md5 = tmp
 		}
 	}
 
@@ -2326,7 +2410,8 @@ func (t recommendationKnownScannerStatic) Scan(i *Recommendation, k *Known) erro
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		k.Released = tmp
 	default:
-		k.Released = c22.Time
+		tmp := c22.Time
+		k.Released = tmp
 	}
 
 	if c23.Valid {
@@ -2343,7 +2428,8 @@ func (t recommendationKnownScannerStatic) Scan(i *Recommendation, k *Known) erro
 		if uid, err := uuid.FromBytes([]byte(c25.String)); err != nil {
 			return err
 		} else {
-			k.UID = uid.String()
+			tmp := uid.String()
+			k.UID = tmp
 		}
 	}
 
@@ -2429,14 +2515,16 @@ func (t RecommendationKnownScannerStaticRow) Scan(i *Recommendation, k *Known) e
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c0.Time
+		tmp := c0.Time
+		i.CreatedAt = tmp
 	}
 
 	if c1.Valid {
 		if uid, err := uuid.FromBytes([]byte(c1.String)); err != nil {
 			return err
 		} else {
-			i.ID = uid.String()
+			tmp := uid.String()
+			i.ID = tmp
 		}
 	}
 
@@ -2444,7 +2532,8 @@ func (t RecommendationKnownScannerStaticRow) Scan(i *Recommendation, k *Known) e
 		if uid, err := uuid.FromBytes([]byte(c2.String)); err != nil {
 			return err
 		} else {
-			i.KnownMediaID = uid.String()
+			tmp := uid.String()
+			i.KnownMediaID = tmp
 		}
 	}
 
@@ -2462,7 +2551,8 @@ func (t RecommendationKnownScannerStaticRow) Scan(i *Recommendation, k *Known) e
 		if uid, err := uuid.FromBytes([]byte(c5.String)); err != nil {
 			return err
 		} else {
-			i.Source = uid.String()
+			tmp := uid.String()
+			i.Source = tmp
 		}
 	}
 
@@ -2474,7 +2564,8 @@ func (t RecommendationKnownScannerStaticRow) Scan(i *Recommendation, k *Known) e
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.TombstoneAt = tmp
 	default:
-		i.TombstoneAt = c6.Time
+		tmp := c6.Time
+		i.TombstoneAt = tmp
 	}
 
 	switch c7.InfinityModifier {
@@ -2485,7 +2576,8 @@ func (t RecommendationKnownScannerStaticRow) Scan(i *Recommendation, k *Known) e
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		i.UpdatedAt = c7.Time
+		tmp := c7.Time
+		i.UpdatedAt = tmp
 	}
 
 	if c8.Valid {
@@ -2511,7 +2603,8 @@ func (t RecommendationKnownScannerStaticRow) Scan(i *Recommendation, k *Known) e
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		k.CreatedAt = tmp
 	default:
-		k.CreatedAt = c11.Time
+		tmp := c11.Time
+		k.CreatedAt = tmp
 	}
 
 	if c12.Valid {
@@ -2528,7 +2621,8 @@ func (t RecommendationKnownScannerStaticRow) Scan(i *Recommendation, k *Known) e
 		if uid, err := uuid.FromBytes([]byte(c14.String)); err != nil {
 			return err
 		} else {
-			k.Md5 = uid.String()
+			tmp := uid.String()
+			k.Md5 = tmp
 		}
 	}
 
@@ -2575,7 +2669,8 @@ func (t RecommendationKnownScannerStaticRow) Scan(i *Recommendation, k *Known) e
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		k.Released = tmp
 	default:
-		k.Released = c22.Time
+		tmp := c22.Time
+		k.Released = tmp
 	}
 
 	if c23.Valid {
@@ -2592,7 +2687,8 @@ func (t RecommendationKnownScannerStaticRow) Scan(i *Recommendation, k *Known) e
 		if uid, err := uuid.FromBytes([]byte(c25.String)); err != nil {
 			return err
 		} else {
-			k.UID = uid.String()
+			tmp := uid.String()
+			k.UID = tmp
 		}
 	}
 
@@ -2703,7 +2799,8 @@ func (t knownScannerStatic) Scan(i *Known) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c3.Time
+		tmp := c3.Time
+		i.CreatedAt = tmp
 	}
 
 	if c4.Valid {
@@ -2720,7 +2817,8 @@ func (t knownScannerStatic) Scan(i *Known) error {
 		if uid, err := uuid.FromBytes([]byte(c6.String)); err != nil {
 			return err
 		} else {
-			i.Md5 = uid.String()
+			tmp := uid.String()
+			i.Md5 = tmp
 		}
 	}
 
@@ -2767,7 +2865,8 @@ func (t knownScannerStatic) Scan(i *Known) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.Released = tmp
 	default:
-		i.Released = c14.Time
+		tmp := c14.Time
+		i.Released = tmp
 	}
 
 	if c15.Valid {
@@ -2784,7 +2883,8 @@ func (t knownScannerStatic) Scan(i *Known) error {
 		if uid, err := uuid.FromBytes([]byte(c17.String)); err != nil {
 			return err
 		} else {
-			i.UID = uid.String()
+			tmp := uid.String()
+			i.UID = tmp
 		}
 	}
 
@@ -2877,7 +2977,8 @@ func (t KnownScannerStaticRow) Scan(i *Known) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c3.Time
+		tmp := c3.Time
+		i.CreatedAt = tmp
 	}
 
 	if c4.Valid {
@@ -2894,7 +2995,8 @@ func (t KnownScannerStaticRow) Scan(i *Known) error {
 		if uid, err := uuid.FromBytes([]byte(c6.String)); err != nil {
 			return err
 		} else {
-			i.Md5 = uid.String()
+			tmp := uid.String()
+			i.Md5 = tmp
 		}
 	}
 
@@ -2941,7 +3043,8 @@ func (t KnownScannerStaticRow) Scan(i *Known) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.Released = tmp
 	default:
-		i.Released = c14.Time
+		tmp := c14.Time
+		i.Released = tmp
 	}
 
 	if c15.Valid {
@@ -2958,7 +3061,8 @@ func (t KnownScannerStaticRow) Scan(i *Known) error {
 		if uid, err := uuid.FromBytes([]byte(c17.String)); err != nil {
 			return err
 		} else {
-			i.UID = uid.String()
+			tmp := uid.String()
+			i.UID = tmp
 		}
 	}
 
@@ -3117,7 +3221,8 @@ func (t knownScannerDynamic) Scan(i *Known) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.CreatedAt = tmp
 			default:
-				i.CreatedAt = c3.Time
+				tmp := c3.Time
+				i.CreatedAt = tmp
 			}
 
 		case cn4:
@@ -3137,7 +3242,8 @@ func (t knownScannerDynamic) Scan(i *Known) error {
 				if uid, err := uuid.FromBytes([]byte(c6.String)); err != nil {
 					return err
 				} else {
-					i.Md5 = uid.String()
+					tmp := uid.String()
+					i.Md5 = tmp
 				}
 			}
 
@@ -3192,7 +3298,8 @@ func (t knownScannerDynamic) Scan(i *Known) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.Released = tmp
 			default:
-				i.Released = c14.Time
+				tmp := c14.Time
+				i.Released = tmp
 			}
 
 		case cn15:
@@ -3212,7 +3319,8 @@ func (t knownScannerDynamic) Scan(i *Known) error {
 				if uid, err := uuid.FromBytes([]byte(c17.String)); err != nil {
 					return err
 				} else {
-					i.UID = uid.String()
+					tmp := uid.String()
+					i.UID = tmp
 				}
 			}
 
@@ -3318,7 +3426,8 @@ func (t metadataScannerStatic) Scan(i *Metadata) error {
 		if uid, err := uuid.FromBytes([]byte(c0.String)); err != nil {
 			return err
 		} else {
-			i.ArchiveID = uid.String()
+			tmp := uid.String()
+			i.ArchiveID = tmp
 		}
 	}
 
@@ -3340,7 +3449,8 @@ func (t metadataScannerStatic) Scan(i *Metadata) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c3.Time
+		tmp := c3.Time
+		i.CreatedAt = tmp
 	}
 
 	if c4.Valid {
@@ -3362,7 +3472,8 @@ func (t metadataScannerStatic) Scan(i *Metadata) error {
 		if uid, err := uuid.FromBytes([]byte(c7.String)); err != nil {
 			return err
 		} else {
-			i.EncryptionSeed = uid.String()
+			tmp := uid.String()
+			i.EncryptionSeed = tmp
 		}
 	}
 
@@ -3374,14 +3485,16 @@ func (t metadataScannerStatic) Scan(i *Metadata) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.HiddenAt = tmp
 	default:
-		i.HiddenAt = c8.Time
+		tmp := c8.Time
+		i.HiddenAt = tmp
 	}
 
 	if c9.Valid {
 		if uid, err := uuid.FromBytes([]byte(c9.String)); err != nil {
 			return err
 		} else {
-			i.ID = uid.String()
+			tmp := uid.String()
+			i.ID = tmp
 		}
 	}
 
@@ -3394,7 +3507,8 @@ func (t metadataScannerStatic) Scan(i *Metadata) error {
 		if uid, err := uuid.FromBytes([]byte(c11.String)); err != nil {
 			return err
 		} else {
-			i.KnownMediaID = uid.String()
+			tmp := uid.String()
+			i.KnownMediaID = tmp
 		}
 	}
 
@@ -3416,14 +3530,16 @@ func (t metadataScannerStatic) Scan(i *Metadata) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.TombstonedAt = tmp
 	default:
-		i.TombstonedAt = c14.Time
+		tmp := c14.Time
+		i.TombstonedAt = tmp
 	}
 
 	if c15.Valid {
 		if uid, err := uuid.FromBytes([]byte(c15.String)); err != nil {
 			return err
 		} else {
-			i.TorrentID = uid.String()
+			tmp := uid.String()
+			i.TorrentID = tmp
 		}
 	}
 
@@ -3435,7 +3551,8 @@ func (t metadataScannerStatic) Scan(i *Metadata) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		i.UpdatedAt = c16.Time
+		tmp := c16.Time
+		i.UpdatedAt = tmp
 	}
 
 	return t.Rows.Err()
@@ -3507,7 +3624,8 @@ func (t MetadataScannerStaticRow) Scan(i *Metadata) error {
 		if uid, err := uuid.FromBytes([]byte(c0.String)); err != nil {
 			return err
 		} else {
-			i.ArchiveID = uid.String()
+			tmp := uid.String()
+			i.ArchiveID = tmp
 		}
 	}
 
@@ -3529,7 +3647,8 @@ func (t MetadataScannerStaticRow) Scan(i *Metadata) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.CreatedAt = tmp
 	default:
-		i.CreatedAt = c3.Time
+		tmp := c3.Time
+		i.CreatedAt = tmp
 	}
 
 	if c4.Valid {
@@ -3551,7 +3670,8 @@ func (t MetadataScannerStaticRow) Scan(i *Metadata) error {
 		if uid, err := uuid.FromBytes([]byte(c7.String)); err != nil {
 			return err
 		} else {
-			i.EncryptionSeed = uid.String()
+			tmp := uid.String()
+			i.EncryptionSeed = tmp
 		}
 	}
 
@@ -3563,14 +3683,16 @@ func (t MetadataScannerStaticRow) Scan(i *Metadata) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.HiddenAt = tmp
 	default:
-		i.HiddenAt = c8.Time
+		tmp := c8.Time
+		i.HiddenAt = tmp
 	}
 
 	if c9.Valid {
 		if uid, err := uuid.FromBytes([]byte(c9.String)); err != nil {
 			return err
 		} else {
-			i.ID = uid.String()
+			tmp := uid.String()
+			i.ID = tmp
 		}
 	}
 
@@ -3583,7 +3705,8 @@ func (t MetadataScannerStaticRow) Scan(i *Metadata) error {
 		if uid, err := uuid.FromBytes([]byte(c11.String)); err != nil {
 			return err
 		} else {
-			i.KnownMediaID = uid.String()
+			tmp := uid.String()
+			i.KnownMediaID = tmp
 		}
 	}
 
@@ -3605,14 +3728,16 @@ func (t MetadataScannerStaticRow) Scan(i *Metadata) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.TombstonedAt = tmp
 	default:
-		i.TombstonedAt = c14.Time
+		tmp := c14.Time
+		i.TombstonedAt = tmp
 	}
 
 	if c15.Valid {
 		if uid, err := uuid.FromBytes([]byte(c15.String)); err != nil {
 			return err
 		} else {
-			i.TorrentID = uid.String()
+			tmp := uid.String()
+			i.TorrentID = tmp
 		}
 	}
 
@@ -3624,7 +3749,8 @@ func (t MetadataScannerStaticRow) Scan(i *Metadata) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		i.UpdatedAt = c16.Time
+		tmp := c16.Time
+		i.UpdatedAt = tmp
 	}
 
 	return nil
@@ -3756,7 +3882,8 @@ func (t metadataScannerDynamic) Scan(i *Metadata) error {
 				if uid, err := uuid.FromBytes([]byte(c0.String)); err != nil {
 					return err
 				} else {
-					i.ArchiveID = uid.String()
+					tmp := uid.String()
+					i.ArchiveID = tmp
 				}
 			}
 
@@ -3781,7 +3908,8 @@ func (t metadataScannerDynamic) Scan(i *Metadata) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.CreatedAt = tmp
 			default:
-				i.CreatedAt = c3.Time
+				tmp := c3.Time
+				i.CreatedAt = tmp
 			}
 
 		case cn4:
@@ -3807,7 +3935,8 @@ func (t metadataScannerDynamic) Scan(i *Metadata) error {
 				if uid, err := uuid.FromBytes([]byte(c7.String)); err != nil {
 					return err
 				} else {
-					i.EncryptionSeed = uid.String()
+					tmp := uid.String()
+					i.EncryptionSeed = tmp
 				}
 			}
 
@@ -3820,7 +3949,8 @@ func (t metadataScannerDynamic) Scan(i *Metadata) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.HiddenAt = tmp
 			default:
-				i.HiddenAt = c8.Time
+				tmp := c8.Time
+				i.HiddenAt = tmp
 			}
 
 		case cn9:
@@ -3828,7 +3958,8 @@ func (t metadataScannerDynamic) Scan(i *Metadata) error {
 				if uid, err := uuid.FromBytes([]byte(c9.String)); err != nil {
 					return err
 				} else {
-					i.ID = uid.String()
+					tmp := uid.String()
+					i.ID = tmp
 				}
 			}
 
@@ -3843,7 +3974,8 @@ func (t metadataScannerDynamic) Scan(i *Metadata) error {
 				if uid, err := uuid.FromBytes([]byte(c11.String)); err != nil {
 					return err
 				} else {
-					i.KnownMediaID = uid.String()
+					tmp := uid.String()
+					i.KnownMediaID = tmp
 				}
 			}
 
@@ -3868,7 +4000,8 @@ func (t metadataScannerDynamic) Scan(i *Metadata) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.TombstonedAt = tmp
 			default:
-				i.TombstonedAt = c14.Time
+				tmp := c14.Time
+				i.TombstonedAt = tmp
 			}
 
 		case cn15:
@@ -3876,7 +4009,8 @@ func (t metadataScannerDynamic) Scan(i *Metadata) error {
 				if uid, err := uuid.FromBytes([]byte(c15.String)); err != nil {
 					return err
 				} else {
-					i.TorrentID = uid.String()
+					tmp := uid.String()
+					i.TorrentID = tmp
 				}
 			}
 
@@ -3889,7 +4023,8 @@ func (t metadataScannerDynamic) Scan(i *Metadata) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.UpdatedAt = tmp
 			default:
-				i.UpdatedAt = c16.Time
+				tmp := c16.Time
+				i.UpdatedAt = tmp
 			}
 
 		}
