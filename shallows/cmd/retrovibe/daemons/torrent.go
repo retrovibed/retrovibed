@@ -486,7 +486,7 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 	}
 
 	if disc.Enabled && disc.Ratio > 0 {
-		go WaitForMinimumNodes(dctx, 32, dhts, func() {
+		go dhtx.WaitForMinimumNodes(dctx, 32, dhts, func() {
 			// go func() {
 			// 	log.Println("auto retrieval of infohashes initiated")
 			// 	defer log.Println("auto retrieval of infohashes completed")
@@ -526,7 +526,6 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 					return
 				}
 			}()
-
 		})
 
 		log.Println("autodiscovery is enabled. this is an experimental feature.")

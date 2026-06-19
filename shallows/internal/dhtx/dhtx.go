@@ -8,6 +8,7 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/james-lawrence/torrent/dht"
+	"github.com/retrovibed/retrovibed/shallows/internal/backoffx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 )
@@ -54,4 +55,18 @@ func PopulateTable(ctx context.Context, d *dht.Server, path string) {
 	} else {
 		log.Println("unable to read peers", err)
 	}
+}
+
+func WaitForMinimumNodes(ctx context.Context, min int, dhts *dht.Server, do func()) {
+	b := backoffx.New(backoffx.Exponential(time.Second), backoffx.Maximum(time.Minute))
+	for attempts := 0; ; attempts++ {
+		if dhts.NumNodes() > 32 {
+			break
+		}
+
+		log.Printf("minimum nodes not available, waiting %p %d\n", dhts, dhts.NumNodes())
+		time.Sleep(b.Backoff(attempts))
+	}
+
+	do()
 }

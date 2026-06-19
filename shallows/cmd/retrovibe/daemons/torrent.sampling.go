@@ -131,9 +131,6 @@ func DiscoverDHTInfoHashes(ctx context.Context, db sqlx.Queryer, s *dht.Server) 
 		dst := netip.AddrPortFrom(p.IP, p.Port)
 		dstaddr := dht.NewAddr(dst)
 
-		log.Println("infohash sample initiated", p.IP, dstaddr.String())
-		defer log.Println("infohash sample completed", p.IP, dstaddr.String())
-
 		defer func() {
 			if err == nil {
 				return
@@ -145,10 +142,11 @@ func DiscoverDHTInfoHashes(ctx context.Context, db sqlx.Queryer, s *dht.Server) 
 			}
 		}()
 
-		n := krpc.NewInfo(krpc.ID(p.Peer), krpc.NewNodeAddrFromAddrPort(dst))
-		if sample, err = bep0051.LatestSampleForNodeInfo(ctx, s, n); err != nil {
+		log.Println("infohash sample initiated", p.IP, dstaddr.String())
+		if sample, err = bep0051.LatestSampleForNodeInfo(ctx, s, krpc.NewInfo(krpc.ID(p.Peer), krpc.NewNodeAddrFromAddrPort(dst))); err != nil {
 			return errorsx.Wrapf(err, "unable to retrieve sample: %s", p.IP)
 		}
+		defer log.Println("infohash sample completed", p.IP, dstaddr.String(), sample.Available, len(sample.Sample)/20)
 
 		for id := range slices.Chunk(sample.Sample, 20) {
 			var (
@@ -160,12 +158,14 @@ func DiscoverDHTInfoHashes(ctx context.Context, db sqlx.Queryer, s *dht.Server) 
 			id := int160.FromBytes(id)
 
 			if err := ddisc.DiscoveredFindByID(ctx, db, torrentx.HashUID(new(id))).Scan(&discovered); err == nil {
+				log.Println("ignoring infohash already known disc")
 				continue
 			} else if sqlx.IgnoreNoRows(err) != nil {
 				return errorsx.Wrap(err, "unable to determine if infohash is in discovered")
 			}
 
 			if err := tracking.MetadataFindByID(ctx, db, torrentx.HashUID(new(id))).Scan(&known); err == nil {
+				log.Println("ignoring infohash already known metadata")
 				continue
 			} else if sqlx.IgnoreNoRows(err) != nil {
 				return errorsx.Wrap(err, "unable to determine if infohash is known")
@@ -237,20 +237,6 @@ func DiscoverDHTInfoHashes(ctx context.Context, db sqlx.Queryer, s *dht.Server) 
 	}
 
 	return errorsx.Compact(ctx.Err(), asynccompute.Shutdown(context.Background(), samplers))
-}
-
-func WaitForMinimumNodes(ctx context.Context, min int, dhts *dht.Server, do func()) {
-	b := backoffx.New(backoffx.Exponential(time.Second), backoffx.Maximum(time.Minute))
-	for attempts := 0; ; attempts++ {
-		if dhts.NumNodes() > 32 {
-			break
-		}
-
-		log.Printf("minimum nodes not available, waiting %p %d\n", dhts, dhts.NumNodes())
-		time.Sleep(b.Backoff(attempts))
-	}
-
-	do()
 }
 
 // request samples from the domain space.
