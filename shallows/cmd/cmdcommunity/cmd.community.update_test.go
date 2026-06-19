@@ -12,7 +12,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
-	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -53,7 +52,7 @@ func TestCommunityUpdate(t *testing.T) {
 
 		cmd := cmdCommunityUpdate{
 			Name:        "test-community",
-			Description: langx.Autoptr("updated description"),
+			Description: new("updated description"),
 		}
 		gctx := &cmdopts.Global{
 			Context:  ctx,
@@ -80,7 +79,7 @@ func TestCommunityUpdate(t *testing.T) {
 
 		cmd := cmdCommunityUpdate{
 			Name:        "test-community",
-			Description: langx.Autoptr("updated description"),
+			Description: new("updated description"),
 		}
 		gctx := &cmdopts.Global{
 			Context:  ctx,
@@ -114,7 +113,7 @@ func TestCommunityUpdate(t *testing.T) {
 
 		cmd := cmdCommunityUpdate{
 			Name:        "test-community",
-			Description: langx.Autoptr("updated description"),
+			Description: new("updated description"),
 		}
 		gctx := &cmdopts.Global{
 			Context:  ctx,
@@ -162,7 +161,7 @@ func TestCommunityUpdate(t *testing.T) {
 		// only override description; all other fields should come from current
 		cmd := cmdCommunityUpdate{
 			Name:        "test-community",
-			Description: langx.Autoptr("new description"),
+			Description: new("new description"),
 		}
 		gctx := &cmdopts.Global{
 			Context:  ctx,
@@ -211,7 +210,7 @@ func TestCommunityUpdate(t *testing.T) {
 
 		cmd := cmdCommunityUpdate{
 			Name:               "test-community",
-			DefaultPublishMode: langx.Autoptr("SYNDICATED"),
+			DefaultPublishMode: new("SYNDICATED"),
 		}
 		gctx := &cmdopts.Global{
 			Context:  ctx,

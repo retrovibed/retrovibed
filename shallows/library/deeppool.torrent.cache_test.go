@@ -15,7 +15,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/cryptox"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/library"
@@ -102,7 +101,7 @@ func TestDeeppoolTorrentCache(t *testing.T) {
 			t.Context(),
 			db,
 			tracking.NewMetadata(
-				langx.Autoptr(md.ID),
+				new(md.ID),
 				tracking.MetadataOptionFromInfo(mi),
 			),
 		).Scan(&tmd)
@@ -186,7 +185,7 @@ func TestDeeppoolTorrentCache(t *testing.T) {
 			t.Context(),
 			db,
 			tracking.NewMetadata(
-				langx.Autoptr(md.ID),
+				new(md.ID),
 				tracking.MetadataOptionFromInfo(mi),
 			),
 		).Scan(&tmd)
@@ -271,7 +270,7 @@ func TestDeeppoolTorrentCache(t *testing.T) {
 			t.Context(),
 			db,
 			tracking.NewMetadata(
-				langx.Autoptr(md.ID),
+				new(md.ID),
 				tracking.MetadataOptionFromInfo(mi),
 			),
 		).Scan(&tmd)
@@ -343,7 +342,7 @@ func TestDeeppoolTorrentCache(t *testing.T) {
 			t.Context(),
 			db,
 			tracking.NewMetadata(
-				langx.Autoptr(md.ID),
+				new(md.ID),
 				tracking.MetadataOptionFromInfo(mi),
 			),
 		).Scan(&tmd)
@@ -416,7 +415,7 @@ func TestDeeppoolTorrentCache(t *testing.T) {
 			t.Context(),
 			db,
 			tracking.NewMetadata(
-				langx.Autoptr(md.ID),
+				new(md.ID),
 				tracking.MetadataOptionFromInfo(mi),
 			),
 		).Scan(&tmd)

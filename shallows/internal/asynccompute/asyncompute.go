@@ -77,7 +77,7 @@ func Compose[T any](options ...Option[T]) Option[T] {
 }
 
 func New[T any](async func(ctx context.Context, w T) error, options ...Option[T]) *Pool[T] {
-	return langx.Autoptr(langx.Clone(Pool[T]{
+	return new(langx.Clone(Pool[T]{
 		workers: runtime.NumCPU(),
 		queued:  make(chan pending, runtime.NumCPU()),
 		async:   async,

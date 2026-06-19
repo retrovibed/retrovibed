@@ -15,7 +15,6 @@ import (
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/library"
@@ -71,7 +70,7 @@ func ImportTorrent(q sqlx.Queryer, mvfs, tvfs fsx.Virtual) library.ImportOp {
 			ctx,
 			q,
 			NewMetadata(
-				langx.Autoptr(md.ID),
+				new(md.ID),
 				MetadataOptionFromInfo(&info),
 				MetadataOptionAutoDescription,
 				MetadataOptionAutoHidden,

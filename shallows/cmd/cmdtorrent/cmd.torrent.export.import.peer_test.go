@@ -13,7 +13,6 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 	"github.com/stretchr/testify/require"
 )
@@ -71,7 +70,7 @@ func TestExportImportPeer(t *testing.T) {
 		dbPath := xdgDBPath(xdgConfig)
 		db, err := cmdopts.DatabaseCustom(ctx, dbPath)
 		require.NoError(t, err)
-		lmd := tracking.NewMetadata(langx.Autoptr(md.ID), tracking.MetadataOptionEncryptionSeed(knownSeed))
+		lmd := tracking.NewMetadata(new(md.ID), tracking.MetadataOptionEncryptionSeed(knownSeed))
 		require.NoError(t, tracking.MetadataInsertWithDefaults(ctx, db, lmd).Scan(&lmd))
 		db.Close()
 

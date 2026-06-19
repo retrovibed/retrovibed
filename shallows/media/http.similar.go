@@ -35,7 +35,7 @@ func HTTPSimilarOptionJWTSecret(j jwtx.SecretSource) HTTPSimilarOption {
 }
 
 func NewHTTPSimilar(q sqlx.Queryer, options ...HTTPSimilarOption) *HTTPSimilar {
-	return langx.Autoptr(langx.Clone(HTTPSimilar{
+	return new(langx.Clone(HTTPSimilar{
 		q:         q,
 		jwtsecret: env.JWTSecret,
 	}, options...))
@@ -113,7 +113,7 @@ func (t *HTTPSimilar) similar(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-		resp.Items = append(resp.Items, langx.Autoptr(langx.Clone(
+		resp.Items = append(resp.Items, new(langx.Clone(
 			Media{},
 			MediaOptionFromLibraryMetadata(langx.Clone(md, timex.JSONSafeEncodeOption)),
 			MediaOptionImageAuto(r),

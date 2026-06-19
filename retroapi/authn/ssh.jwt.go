@@ -14,7 +14,7 @@ import (
 )
 
 func JWTSSHTokenSource(endpoint oauth2.Endpoint, c *http.Client, opts ...SSHTokenSourceOption) *sshtokensource {
-	return langx.Autoptr(langx.Clone(sshtokensource{
+	return new(langx.Clone(sshtokensource{
 		endpoint: endpoint,
 		c:        c,
 	}, langx.Compose(opts...), SSHTokenSourceOptionAutoSigner))

@@ -5,7 +5,6 @@ import (
 
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
-	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/stretchr/testify/require"
@@ -18,7 +17,7 @@ func TestNewMetadata(t *testing.T) {
 	q := sqltestx.Metadatabase(t)
 
 	lmd := NewMetadata(
-		langx.Autoptr(int160.Random()),
+		new(int160.Random()),
 		MetadataOptionDescription("Hello World"),
 	)
 

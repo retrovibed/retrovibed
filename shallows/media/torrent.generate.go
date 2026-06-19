@@ -11,7 +11,6 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
@@ -58,7 +57,7 @@ func GenerateTorrent(ctx context.Context, q sqlx.Queryer, mvfs, tvfs fsx.Virtual
 
 	infohash := md.HashInfoBytes()
 	tmd = tracking.NewMetadata(
-		langx.Autoptr(int160.FromByteArray(infohash)),
+		new(int160.FromByteArray(infohash)),
 		tracking.MetadataOptionFromInfo(info),
 		tracking.MetadataOptionBytes(lmd.Bytes),
 		tracking.MetadataOptionDownloaded(lmd.Bytes),

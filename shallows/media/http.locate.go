@@ -125,7 +125,7 @@ func (t *HTTPLocate) find(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &LocateLookupResponse{
-		Locate: langx.Autoptr(
+		Locate: new(
 			langx.Clone(
 				Locate{},
 				LocateOptionFromLibraryLocate(langx.Clone(meta, timex.JSONSafeEncodeOption)),
@@ -163,7 +163,7 @@ func (t *HTTPLocate) create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &LocateCreateResponse{
-		Locate: langx.Autoptr(
+		Locate: new(
 			langx.Clone(
 				Locate{},
 				LocateOptionFromLibraryLocate(langx.Clone(d, timex.JSONSafeEncodeOption)),

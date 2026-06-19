@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/james-lawrence/torrent/dht/int160"
-	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/stretchr/testify/require"
@@ -14,7 +13,7 @@ import (
 func TestMetadataOptionAutoHidden(t *testing.T) {
 	t.Run("media archive sets hidden", func(t *testing.T) {
 		md := NewMetadata(
-			langx.Autoptr(int160.Random()),
+			new(int160.Random()),
 			MetadataOptionMimetype(mimex.RetrovibedMediaArchive),
 			MetadataOptionAutoHidden,
 		)
@@ -25,7 +24,7 @@ func TestMetadataOptionAutoHidden(t *testing.T) {
 
 	t.Run("neural sets hidden", func(t *testing.T) {
 		md := NewMetadata(
-			langx.Autoptr(int160.Random()),
+			new(int160.Random()),
 			MetadataOptionMimetype(mimex.RetrovibedNeural),
 			MetadataOptionAutoHidden,
 		)
@@ -36,7 +35,7 @@ func TestMetadataOptionAutoHidden(t *testing.T) {
 
 	t.Run("bittorrent does not set hidden", func(t *testing.T) {
 		md := NewMetadata(
-			langx.Autoptr(int160.Random()),
+			new(int160.Random()),
 			MetadataOptionMimetype(mimex.Bittorrent),
 			MetadataOptionAutoHidden,
 		)
@@ -46,7 +45,7 @@ func TestMetadataOptionAutoHidden(t *testing.T) {
 
 	t.Run("unknown mimetype does not set hidden", func(t *testing.T) {
 		md := NewMetadata(
-			langx.Autoptr(int160.Random()),
+			new(int160.Random()),
 			MetadataOptionMimetype("application/octet-stream"),
 			MetadataOptionAutoHidden,
 		)

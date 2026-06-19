@@ -8,7 +8,6 @@ import (
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/daemons"
-	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 	"github.com/stretchr/testify/require"
@@ -37,23 +36,23 @@ func TestBEP0051SamplerSnapshot(t *testing.T) {
 		q := sqltestx.Metadatabase(t)
 		cachepath := filepath.Join(t.TempDir(), "sample.cache")
 
-		one := tracking.NewMetadata(langx.Autoptr(int160.Random()))
+		one := tracking.NewMetadata(new(int160.Random()))
 		one.Private = false
 		one.Seeding = true
 		require.NoError(t, tracking.MetadataInsertWithDefaults(t.Context(), q, one).Scan(&one))
 
-		two := tracking.NewMetadata(langx.Autoptr(int160.Random()))
+		two := tracking.NewMetadata(new(int160.Random()))
 		two.Private = false
 		two.Seeding = true
 		require.NoError(t, tracking.MetadataInsertWithDefaults(t.Context(), q, two).Scan(&two))
 
 		// noise that must never appear in the sample.
-		priv := tracking.NewMetadata(langx.Autoptr(int160.Random()))
+		priv := tracking.NewMetadata(new(int160.Random()))
 		priv.Private = true
 		priv.Seeding = true
 		require.NoError(t, tracking.MetadataInsertWithDefaults(t.Context(), q, priv).Scan(&priv))
 
-		notSeeding := tracking.NewMetadata(langx.Autoptr(int160.Random()))
+		notSeeding := tracking.NewMetadata(new(int160.Random()))
 		notSeeding.Private = false
 		notSeeding.Seeding = false
 		require.NoError(t, tracking.MetadataInsertWithDefaults(t.Context(), q, notSeeding).Scan(&notSeeding))
@@ -83,7 +82,7 @@ func TestBEP0051SamplerSnapshot(t *testing.T) {
 		cachepath := filepath.Join(t.TempDir(), "sample.cache")
 
 		for i := 0; i < 5; i++ {
-			m := tracking.NewMetadata(langx.Autoptr(int160.Random()))
+			m := tracking.NewMetadata(new(int160.Random()))
 			m.Private = false
 			m.Seeding = true
 			require.NoError(t, tracking.MetadataInsertWithDefaults(t.Context(), q, m).Scan(&m))
@@ -103,7 +102,7 @@ func TestBEP0051SamplerSnapshot(t *testing.T) {
 		q := sqltestx.Metadatabase(t)
 		cachepath := filepath.Join(t.TempDir(), "sample.cache")
 
-		first := tracking.NewMetadata(langx.Autoptr(int160.Random()))
+		first := tracking.NewMetadata(new(int160.Random()))
 		first.Private = false
 		first.Seeding = true
 		require.NoError(t, tracking.MetadataInsertWithDefaults(t.Context(), q, first).Scan(&first))
@@ -116,7 +115,7 @@ func TestBEP0051SamplerSnapshot(t *testing.T) {
 
 		// a new qualifying row appears, but the cached sample should still
 		// be served until the ttl elapses.
-		second := tracking.NewMetadata(langx.Autoptr(int160.Random()))
+		second := tracking.NewMetadata(new(int160.Random()))
 		second.Private = false
 		second.Seeding = true
 		require.NoError(t, tracking.MetadataInsertWithDefaults(t.Context(), q, second).Scan(&second))

@@ -12,7 +12,6 @@ import (
 	"github.com/james-lawrence/torrent/dht/krpc"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/daemons"
-	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 	"github.com/stretchr/testify/require"
@@ -30,18 +29,18 @@ func TestBEP51EndpointServesSamplerOverDHT(t *testing.T) {
 		q := sqltestx.Metadatabase(t)
 		cachepath := filepath.Join(t.TempDir(), "sample.cache")
 
-		one := tracking.NewMetadata(langx.Autoptr(int160.Random()))
+		one := tracking.NewMetadata(new(int160.Random()))
 		one.Private = false
 		one.Seeding = true
 		require.NoError(t, tracking.MetadataInsertWithDefaults(t.Context(), q, one).Scan(&one))
 
-		two := tracking.NewMetadata(langx.Autoptr(int160.Random()))
+		two := tracking.NewMetadata(new(int160.Random()))
 		two.Private = false
 		two.Seeding = true
 		require.NoError(t, tracking.MetadataInsertWithDefaults(t.Context(), q, two).Scan(&two))
 
 		// noise that must never appear in the sample.
-		priv := tracking.NewMetadata(langx.Autoptr(int160.Random()))
+		priv := tracking.NewMetadata(new(int160.Random()))
 		priv.Private = true
 		priv.Seeding = true
 		require.NoError(t, tracking.MetadataInsertWithDefaults(t.Context(), q, priv).Scan(&priv))

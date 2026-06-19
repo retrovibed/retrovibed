@@ -30,7 +30,7 @@ func HTTPRecommendationsOptionJWTSecret(j jwtx.SecretSource) HTTPRecommendations
 }
 
 func NewHTTPRecommendations(q sqlx.Queryer, options ...HTTPRecommendationsOption) *HTTPRecommendations {
-	return langx.Autoptr(langx.Clone(HTTPRecommendations{
+	return new(langx.Clone(HTTPRecommendations{
 		q:         q,
 		jwtsecret: env.JWTSecret,
 		decoder:   formx.NewDecoder(),

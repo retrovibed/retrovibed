@@ -47,7 +47,7 @@ type Client struct {
 // Create a NAT-PMP client for the NAT-PMP server at the gateway.
 // Uses default timeout which is around 128 seconds.
 func NewClient(gateway netip.Addr, options ...Option) (nat *Client) {
-	return langx.Autoptr(langx.Clone(Client{
+	return new(langx.Clone(Client{
 		timeout: 0,
 		gateway: gateway,
 		dialer:  &net.Dialer{},

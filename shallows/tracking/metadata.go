@@ -134,7 +134,7 @@ func MetadataOptionAutoSeeding(m *Metadata) {
 
 func MetadataOptionTestDefaults(m *Metadata) {
 	*m = NewMetadata(
-		langx.Autoptr(int160.Random()),
+		new(int160.Random()),
 		MetadataOptionBytes(max(m.Bytes, 1)),
 		MetadataOptionDownloaded(max(m.Downloaded, 1)),
 		MetadataOptionUploaded(max(m.Uploaded, 1)),

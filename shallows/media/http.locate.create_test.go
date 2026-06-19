@@ -48,7 +48,7 @@ func TestLocateCreate(t *testing.T) {
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
-		encoded, err := json.Marshal(&media.LocateCreateRequest{Locate: langx.Autoptr(langx.Clone(media.Locate{}, media.LocateOptionFromLibraryLocate(d)))})
+		encoded, err := json.Marshal(&media.LocateCreateRequest{Locate: new(langx.Clone(media.Locate{}, media.LocateOptionFromLibraryLocate(d)))})
 		require.NoError(t, err)
 
 		resp, req, err := httptestx.BuildRequestBytes(
@@ -98,7 +98,7 @@ func TestLocateCreate(t *testing.T) {
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
-		encoded, err := json.Marshal(&media.LocateCreateRequest{Locate: langx.Autoptr(langx.Clone(media.Locate{}, media.LocateOptionFromLibraryLocate(d)))})
+		encoded, err := json.Marshal(&media.LocateCreateRequest{Locate: new(langx.Clone(media.Locate{}, media.LocateOptionFromLibraryLocate(d)))})
 		require.NoError(t, err)
 
 		resp, req, err := httptestx.BuildRequestBytes(

@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/james-lawrence/torrent/dht/int160"
-	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/stretchr/testify/require"
@@ -15,12 +14,12 @@ func TestMetadataSamplePublic(t *testing.T) {
 		ctx := t.Context()
 		q := sqltestx.Metadatabase(t)
 
-		pub := NewMetadata(langx.Autoptr(int160.Random()), MetadataOptionDescription("public"))
+		pub := NewMetadata(new(int160.Random()), MetadataOptionDescription("public"))
 		pub.Private = false
 		pub.Seeding = true
 		require.NoError(t, MetadataInsertWithDefaults(ctx, q, pub).Scan(&pub))
 
-		priv := NewMetadata(langx.Autoptr(int160.Random()), MetadataOptionDescription("private"))
+		priv := NewMetadata(new(int160.Random()), MetadataOptionDescription("private"))
 		priv.Private = true
 		priv.Seeding = true
 		require.NoError(t, MetadataInsertWithDefaults(ctx, q, priv).Scan(&priv))
@@ -36,12 +35,12 @@ func TestMetadataSamplePublic(t *testing.T) {
 		ctx := t.Context()
 		q := sqltestx.Metadatabase(t)
 
-		seeding := NewMetadata(langx.Autoptr(int160.Random()), MetadataOptionDescription("seeding"))
+		seeding := NewMetadata(new(int160.Random()), MetadataOptionDescription("seeding"))
 		seeding.Private = false
 		seeding.Seeding = true
 		require.NoError(t, MetadataInsertWithDefaults(ctx, q, seeding).Scan(&seeding))
 
-		notSeeding := NewMetadata(langx.Autoptr(int160.Random()), MetadataOptionDescription("not seeding"))
+		notSeeding := NewMetadata(new(int160.Random()), MetadataOptionDescription("not seeding"))
 		notSeeding.Private = false
 		notSeeding.Seeding = false
 		require.NoError(t, MetadataInsertWithDefaults(ctx, q, notSeeding).Scan(&notSeeding))
@@ -57,12 +56,12 @@ func TestMetadataSamplePublic(t *testing.T) {
 		ctx := t.Context()
 		q := sqltestx.Metadatabase(t)
 
-		priv := NewMetadata(langx.Autoptr(int160.Random()), MetadataOptionDescription("private"))
+		priv := NewMetadata(new(int160.Random()), MetadataOptionDescription("private"))
 		priv.Private = true
 		priv.Seeding = true
 		require.NoError(t, MetadataInsertWithDefaults(ctx, q, priv).Scan(&priv))
 
-		notSeeding := NewMetadata(langx.Autoptr(int160.Random()), MetadataOptionDescription("not seeding"))
+		notSeeding := NewMetadata(new(int160.Random()), MetadataOptionDescription("not seeding"))
 		notSeeding.Private = false
 		notSeeding.Seeding = false
 		require.NoError(t, MetadataInsertWithDefaults(ctx, q, notSeeding).Scan(&notSeeding))
@@ -78,7 +77,7 @@ func TestMetadataSamplePublic(t *testing.T) {
 
 		expected := map[string]struct{}{}
 		for i := 0; i < 5; i++ {
-			lmd := NewMetadata(langx.Autoptr(int160.Random()), MetadataOptionDescription("public"))
+			lmd := NewMetadata(new(int160.Random()), MetadataOptionDescription("public"))
 			lmd.Private = false
 			lmd.Seeding = true
 			require.NoError(t, MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
@@ -86,12 +85,12 @@ func TestMetadataSamplePublic(t *testing.T) {
 		}
 
 		// noise that should never appear in the results.
-		priv := NewMetadata(langx.Autoptr(int160.Random()), MetadataOptionDescription("private"))
+		priv := NewMetadata(new(int160.Random()), MetadataOptionDescription("private"))
 		priv.Private = true
 		priv.Seeding = true
 		require.NoError(t, MetadataInsertWithDefaults(ctx, q, priv).Scan(&priv))
 
-		notSeeding := NewMetadata(langx.Autoptr(int160.Random()), MetadataOptionDescription("not seeding"))
+		notSeeding := NewMetadata(new(int160.Random()), MetadataOptionDescription("not seeding"))
 		notSeeding.Private = false
 		notSeeding.Seeding = false
 		require.NoError(t, MetadataInsertWithDefaults(ctx, q, notSeeding).Scan(&notSeeding))

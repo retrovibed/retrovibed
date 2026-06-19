@@ -30,7 +30,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/envx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/torrentx"
 	"github.com/retrovibed/retrovibed/shallows/internal/userx"
@@ -255,7 +254,7 @@ func (t importPeer) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) (err error) 
 		}
 
 		lmd := tracking.NewMetadata(
-			langx.Autoptr(w.meta.ID),
+			new(w.meta.ID),
 			tracking.MetadataOptionFromInfo(info),
 			tracking.MetadataOptionTrackers(w.meta.Trackers...),
 			tracking.MetadataOptionAutoArchive(t.Archive),

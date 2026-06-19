@@ -14,7 +14,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/daemons"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
@@ -56,7 +55,7 @@ func TestNeuralImport(t *testing.T) {
 		require.NoError(t, err)
 
 		lmd := tracking.NewMetadata(
-			langx.Autoptr(md.ID),
+			new(md.ID),
 			tracking.MetadataOptionFromInfo(info),
 			tracking.MetadataOptionMimetype(mimex.RetrovibedNeural),
 			tracking.MetadataOptionCompleted,
@@ -101,7 +100,7 @@ func TestNeuralImport(t *testing.T) {
 			require.NoError(t, err)
 
 			lmd := tracking.NewMetadata(
-				langx.Autoptr(md.ID),
+				new(md.ID),
 				tracking.MetadataOptionFromInfo(info),
 				tracking.MetadataOptionMimetype(mimex.RetrovibedNeural),
 				tracking.MetadataOptionCompleted,
@@ -137,7 +136,7 @@ func TestNeuralImport(t *testing.T) {
 		neuraldir := t.TempDir()
 
 		lmd := tracking.NewMetadata(
-			langx.Autoptr(int160.Random()),
+			new(int160.Random()),
 			tracking.MetadataOptionMimetype(mimex.RetrovibedNeural),
 			tracking.MetadataOptionDescription("weights.bin"),
 			// no MetadataOptionCompleted — completed_at remains at infinity
@@ -159,7 +158,7 @@ func TestNeuralImport(t *testing.T) {
 		neuraldir := t.TempDir()
 
 		lmd := tracking.NewMetadata(
-			langx.Autoptr(int160.Random()),
+			new(int160.Random()),
 			tracking.MetadataOptionMimetype(mimex.RetrovibedNeural),
 			tracking.MetadataOptionCompleted,
 			tracking.MetadataOptionDescription("weights.bin"),

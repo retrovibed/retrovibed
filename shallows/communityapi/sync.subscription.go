@@ -10,7 +10,6 @@ import (
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
@@ -45,7 +44,7 @@ func SyncPublishedContentItem(ctx context.Context, q sqlx.Queryer, pc *Published
 	}
 
 	tmeta := tracking.NewMetadata(
-		langx.Autoptr(int160.FromByteArray(md.InfoHash)),
+		new(int160.FromByteArray(md.InfoHash)),
 		tracking.MetadataOptionFromMagnet(&md),
 		tracking.MetadataOptionDescription(md.DisplayName),
 		tracking.MetadataOptionKnownMediaID(stringsx.FirstNonBlank(pc.KnownMediaId, uuid.Max.String())),

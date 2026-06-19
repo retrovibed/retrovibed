@@ -25,13 +25,13 @@ type cmdCommunityUpdate struct {
 func (t cmdCommunityUpdate) publishmode(m string, fallback communityapi.PublishMode) *communityapi.PublishMode {
 	switch langx.Autoderef(t.DefaultPublishMode) {
 	case communityapi.PublishMode_UNLISTED.String():
-		return langx.Autoptr(communityapi.PublishMode_UNLISTED)
+		return new(communityapi.PublishMode_UNLISTED)
 	case communityapi.PublishMode_LISTED.String():
-		return langx.Autoptr(communityapi.PublishMode_LISTED)
+		return new(communityapi.PublishMode_LISTED)
 	case communityapi.PublishMode_SYNDICATED.String():
-		return langx.Autoptr(communityapi.PublishMode_SYNDICATED)
+		return new(communityapi.PublishMode_SYNDICATED)
 	default:
-		return langx.Autoptr(fallback)
+		return new(fallback)
 	}
 }
 

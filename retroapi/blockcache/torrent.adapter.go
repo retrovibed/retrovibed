@@ -20,7 +20,7 @@ func OptionTorrentCacheStorageBlockLength(n uint64) OptionTorrentCacheStorage {
 }
 
 func NewTorrentFromVirtualFS(v fsx.Virtual, options ...OptionTorrentCacheStorage) *TorrentCacheStorage {
-	return langx.Autoptr(langx.Clone(TorrentCacheStorage{v: v, blength: DefaultBlockLength}, options...))
+	return new(langx.Clone(TorrentCacheStorage{v: v, blength: DefaultBlockLength}, options...))
 }
 
 var _ storage.ClientImpl = &TorrentCacheStorage{}

@@ -56,7 +56,7 @@ import (
 
 func AutoTorrentSettings(defaults *TorrentSettings, options ...func(*TorrentSettings)) *TorrentSettings {
 	// highly conservative settings for vpn providers like protonvpn.
-	return langx.Autoptr(langx.Clone(TorrentSettings{
+	return new(langx.Clone(TorrentSettings{
 		Seed:            defaults.Seed,
 		Pex:             defaults.Pex,
 		Log:             defaults.Log,
@@ -69,9 +69,9 @@ func AutoTorrentSettings(defaults *TorrentSettings, options ...func(*TorrentSett
 		Port:            defaults.Port,
 		AutoBootstrap:   defaults.AutoBootstrap,
 		AutoLocateMedia: defaults.AutoLocateMedia,
-		Peers:           &Peers{Min: 4, Max: 8},
-		Upload:          &Limit{Rate: 1 * bytesx.MiB, Burst: 1 * bytesx.MiB},
-		Download:        &Limit{Rate: 1 * bytesx.MiB, Burst: 1 * bytesx.MiB},
+		Peers:           &Peers{Min: 16, Max: 64},
+		Upload:          &Limit{Rate: 128 * bytesx.MiB, Burst: 128 * bytesx.MiB},
+		Download:        &Limit{Rate: 128 * bytesx.MiB, Burst: 128 * bytesx.MiB},
 		Outbound:        &Limit{Rate: 4, Burst: 1},
 		Inbound:         &Limit{Rate: 4, Burst: 1},
 	}, options...))

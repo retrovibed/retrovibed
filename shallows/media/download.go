@@ -22,7 +22,7 @@ func (t *DownloadUpdateRequest) UnmarshalJSON(b []byte) error {
 type DownloadOption func(*Download)
 
 func MetadataFromDownload(dl *Download) (md tracking.Metadata, err error) {
-	md = tracking.NewMetadata(langx.Autoptr(int160.Zero()))
+	md = tracking.NewMetadata(new(int160.Zero()))
 	md.Bytes = dl.Bytes
 	md.Downloaded = dl.Downloaded
 	md.Peers = uint16(dl.Peers)
@@ -53,7 +53,7 @@ func MetadataFromDownload(dl *Download) (md tracking.Metadata, err error) {
 
 func DownloadOptionFromTorrentMetadata(cc tracking.Metadata) DownloadOption {
 	return func(c *Download) {
-		c.Media = langx.Autoptr(langx.Clone(Media{}, MediaOptionFromTorrentMetadata(cc)))
+		c.Media = new(langx.Clone(Media{}, MediaOptionFromTorrentMetadata(cc)))
 		c.Bytes = cc.Bytes
 		c.Downloaded = cc.Downloaded
 		c.Peers = uint32(cc.Peers)

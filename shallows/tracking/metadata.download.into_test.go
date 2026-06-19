@@ -18,7 +18,6 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
@@ -82,7 +81,7 @@ func TestDownloadInto(t *testing.T) {
 		defer leecher.Close()
 
 		lmd := tracking.NewMetadata(
-			langx.Autoptr(md.ID),
+			new(md.ID),
 			tracking.MetadataOptionFromInfo(mi),
 			tracking.MetadataOptionAutoDescription,
 		)
@@ -175,7 +174,7 @@ func TestDownloadInto(t *testing.T) {
 		defer leecher.Close()
 
 		lmd := tracking.NewMetadata(
-			langx.Autoptr(md.ID),
+			new(md.ID),
 			tracking.MetadataOptionFromInfo(mi),
 			tracking.MetadataOptionAutoDescription,
 		)
@@ -278,7 +277,7 @@ func TestDownloadInto(t *testing.T) {
 		defer leecher.Close()
 
 		lmd := tracking.NewMetadata(
-			langx.Autoptr(md.ID),
+			new(md.ID),
 			tracking.MetadataOptionFromInfo(mi),
 			tracking.MetadataOptionAutoDescription,
 		)
@@ -372,7 +371,7 @@ func TestDownloadInto(t *testing.T) {
 		defer leecher.Close()
 
 		lmd := tracking.NewMetadata(
-			langx.Autoptr(md.ID),
+			new(md.ID),
 			tracking.MetadataOptionFromInfo(mi),
 			tracking.MetadataOptionAutoDescription,
 		)
@@ -465,7 +464,7 @@ func TestDownloadInto(t *testing.T) {
 
 		const rawDesc = "My.Test.Movie.2024"
 		lmd := tracking.NewMetadata(
-			langx.Autoptr(md.ID),
+			new(md.ID),
 			tracking.MetadataOptionFromInfo(mi),
 			tracking.MetadataOptionDescription(rawDesc),
 			tracking.MetadataOptionAutoDescription,
@@ -561,7 +560,7 @@ func TestDownloadInto(t *testing.T) {
 		defer leecher.Close()
 
 		lmd := tracking.NewMetadata(
-			langx.Autoptr(md.ID),
+			new(md.ID),
 			tracking.MetadataOptionFromInfo(mi),
 			tracking.MetadataOptionAutoDescription,
 		)

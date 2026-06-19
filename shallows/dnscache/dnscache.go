@@ -52,7 +52,7 @@ type Cache struct {
 }
 
 func New(r Resolver, options ...func(*Cache)) *Cache {
-	return langx.Autoptr(langx.Clone(Cache{
+	return new(langx.Clone(Cache{
 		Resolver: r,
 		ttl:      10 * time.Minute,
 		limiter:  rate.NewLimiter(rate.Inf, 0),

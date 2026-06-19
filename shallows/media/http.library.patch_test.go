@@ -55,7 +55,7 @@ func TestMediaUpdate(t *testing.T) {
 	claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
 	encoded, err := json.Marshal(media.MediaUpdateRequest{
-		Media: langx.Autoptr(langx.Clone(media.Media{}, media.MediaOptionFromLibraryMetadata(v))),
+		Media: new(langx.Clone(media.Media{}, media.MediaOptionFromLibraryMetadata(v))),
 	})
 	require.NoError(t, err)
 

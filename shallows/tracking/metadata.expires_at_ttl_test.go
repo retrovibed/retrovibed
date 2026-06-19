@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/james-lawrence/torrent/dht/int160"
-	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/stretchr/testify/require"
 )
@@ -13,7 +12,7 @@ import (
 func TestMetadataOptionExpiresAtTTL(t *testing.T) {
 	t.Run("duration > 0", func(t *testing.T) {
 		md := NewMetadata(
-			langx.Autoptr(int160.Random()),
+			new(int160.Random()),
 			MetadataOptionExpiresAtTTL(5*time.Minute),
 		)
 
@@ -23,7 +22,7 @@ func TestMetadataOptionExpiresAtTTL(t *testing.T) {
 
 	t.Run("duration == 0 should use the default", func(t *testing.T) {
 		md := NewMetadata(
-			langx.Autoptr(int160.Random()),
+			new(int160.Random()),
 			MetadataOptionExpiresAtTTL(0),
 		)
 

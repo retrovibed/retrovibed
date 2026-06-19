@@ -209,7 +209,7 @@ func DiscoverFromRSSFeedsOnce(
 
 			if err = tracking.MetadataInsertWithDefaults(
 				ctx, q, tracking.NewMetadata(
-					langx.Autoptr(md.ID()),
+					new(md.ID()),
 					tracking.MetadataOptionFromInfo(&mi),
 					tracking.MetadataOptionDescription(stringsx.FirstNonBlank(mi.Name, i.Title)),
 					tracking.MetadataOptionTrackers(md.Announce),

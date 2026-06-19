@@ -11,7 +11,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/lucenex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/library"
@@ -50,7 +49,7 @@ func LocateTorrentMedia(ctx context.Context, db sqlx.Queryer, c *torrent.Client)
 			}
 
 			lmd := tracking.NewMetadata(
-				langx.Autoptr(int160.FromBytes(d.Infohash)),
+				new(int160.FromBytes(d.Infohash)),
 				tracking.MetadataOptionFromInfo(info),
 				tracking.MetadataOptionAutoDescription,
 				tracking.MetadataOptionAutoHidden,

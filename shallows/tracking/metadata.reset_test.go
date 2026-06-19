@@ -15,7 +15,6 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
 	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
@@ -64,7 +63,7 @@ func TestReset(t *testing.T) {
 		defer leecher.Close()
 
 		lmd := tracking.NewMetadata(
-			langx.Autoptr(md.ID),
+			new(md.ID),
 			tracking.MetadataOptionFromInfo(mi),
 			tracking.MetadataOptionAutoDescription,
 		)
@@ -124,7 +123,7 @@ func TestReset(t *testing.T) {
 		defer leecher.Close()
 
 		lmd := tracking.NewMetadata(
-			langx.Autoptr(md.ID),
+			new(md.ID),
 			tracking.MetadataOptionFromInfo(mi),
 			tracking.MetadataOptionAutoDescription,
 		)
@@ -187,7 +186,7 @@ func TestReset(t *testing.T) {
 		defer leecher.Close()
 
 		lmd := tracking.NewMetadata(
-			langx.Autoptr(md.ID),
+			new(md.ID),
 			tracking.MetadataOptionFromInfo(mi),
 			tracking.MetadataOptionAutoDescription,
 		)
@@ -224,7 +223,7 @@ func TestReset(t *testing.T) {
 		require.NoError(t, fsx.MkDirs(0700, vfs.Path("media"), vfs.Path("torrent")))
 
 		lmd := tracking.NewMetadata(
-			langx.Autoptr(int160.Random()),
+			new(int160.Random()),
 			tracking.MetadataOptionDescription("test torrent"),
 		)
 		require.NoError(t, tracking.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))

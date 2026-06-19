@@ -100,7 +100,7 @@ func (t *HTTPMetrics) search(w http.ResponseWriter, r *http.Request) {
 	}
 
 	msg := CommunityMetricsResponse{
-		Summary: langx.Autoptr(langx.Clone(
+		Summary: new(langx.Clone(
 			CommunityMetric{},
 			CommunityMetricOptionFromDB(langx.Clone(summary, timex.JSONSafeEncodeOption)),
 		)),

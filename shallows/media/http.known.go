@@ -146,7 +146,7 @@ func (t *HTTPKnown) find(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &KnownLookupResponse{
-		Known: langx.Autoptr(
+		Known: new(
 			langx.Clone(
 				Known{},
 				KnownOptionFromLibraryKnown(langx.Clone(meta, timex.JSONSafeEncodeOption)),
@@ -237,7 +237,7 @@ func (t *HTTPKnown) create(w http.ResponseWriter, r *http.Request) {
 
 	if err := library.KnownFindByMd5(r.Context(), t.q, uidmd5.String()).Scan(&meta); err == nil {
 		if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &KnownCreateResponse{
-			Known: langx.Autoptr(
+			Known: new(
 				langx.Clone(
 					Known{},
 					KnownOptionFromLibraryKnown(langx.Clone(meta, timex.JSONSafeEncodeOption)),
@@ -273,7 +273,7 @@ func (t *HTTPKnown) create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &KnownCreateResponse{
-		Known: langx.Autoptr(
+		Known: new(
 			langx.Clone(
 				Known{},
 				KnownOptionFromLibraryKnown(langx.Clone(meta, timex.JSONSafeEncodeOption)),

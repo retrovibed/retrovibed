@@ -7,7 +7,6 @@ import (
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/daemons"
-	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
@@ -27,7 +26,7 @@ func TestTorrentMetadataIdentify(t *testing.T) {
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 
 		lmd := tracking.NewMetadata(
-			langx.Autoptr(int160.Random()),
+			new(int160.Random()),
 			tracking.MetadataOptionDescription("The Grand Budapest Hotel"),
 		)
 		require.NoError(t, tracking.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
@@ -45,7 +44,7 @@ func TestTorrentMetadataIdentify(t *testing.T) {
 		q := sqltestx.Metadatabase(t)
 
 		lmd := tracking.NewMetadata(
-			langx.Autoptr(int160.Random()),
+			new(int160.Random()),
 			tracking.MetadataOptionDescription("xyzzy completely unknown title 99999"),
 		)
 		require.NoError(t, tracking.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
@@ -63,7 +62,7 @@ func TestTorrentMetadataIdentify(t *testing.T) {
 		q := sqltestx.Metadatabase(t)
 
 		lmd := tracking.NewMetadata(
-			langx.Autoptr(int160.Random()),
+			new(int160.Random()),
 			tracking.MetadataOptionDescription("some description"),
 		)
 		require.NoError(t, tracking.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))

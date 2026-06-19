@@ -17,7 +17,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 )
 
 type filesystemVerify struct{}
@@ -68,7 +67,7 @@ func (t filesystemVerify) Run(gctx *cmdopts.Global) (err error) {
 			return errorsx.Wrapf(err, "unable to open storage of %s", id)
 		}
 
-		missing, verified, err := torrent.VerifyStored(gctx.Context, langx.Autoptr(md.Metainfo()), disk)
+		missing, verified, err := torrent.VerifyStored(gctx.Context, new(md.Metainfo()), disk)
 		if err != nil {
 			return errorsx.Wrapf(err, "unable to verify data of %s", id)
 		}

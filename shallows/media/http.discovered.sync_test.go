@@ -78,7 +78,7 @@ func TestDownloadSyncMetadata(t *testing.T) {
 
 	tmd.KnownMediaID = m.ID
 	encoded, err := json.Marshal(media.MetadataSyncRequest{
-		Media: langx.Autoptr(langx.Clone(media.Media{}, media.MediaOptionFromTorrentMetadata(tmd))),
+		Media: new(langx.Clone(media.Media{}, media.MediaOptionFromTorrentMetadata(tmd))),
 	})
 	require.NoError(t, err)
 

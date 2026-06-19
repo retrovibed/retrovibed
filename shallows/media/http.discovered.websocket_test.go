@@ -22,7 +22,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/grpcx"
-	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/torrenttestx"
@@ -69,7 +68,7 @@ func TestWebsocket(t *testing.T) {
 		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
 
 		md = tracking.NewMetadata(
-			langx.Autoptr(smd.ID),
+			new(smd.ID),
 			tracking.MetadataOptionFromInfo(info),
 			tracking.MetadataOptionAutoDescription,
 		)

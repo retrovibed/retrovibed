@@ -5,7 +5,6 @@ import (
 
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
-	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/stretchr/testify/require"
 )
@@ -18,7 +17,7 @@ func TestMetadataQueryIncomplete(t *testing.T) {
 		q := sqltestx.Metadatabase(t)
 
 		lmd := NewMetadata(
-			langx.Autoptr(int160.Random()),
+			new(int160.Random()),
 			MetadataOptionBytes(0),
 			MetadataOptionDownloaded(0),
 		)
@@ -36,7 +35,7 @@ func TestMetadataQueryIncomplete(t *testing.T) {
 		q := sqltestx.Metadatabase(t)
 
 		lmd := NewMetadata(
-			langx.Autoptr(int160.Random()),
+			new(int160.Random()),
 			MetadataOptionBytes(1000),
 			MetadataOptionDownloaded(500),
 		)
@@ -54,7 +53,7 @@ func TestMetadataQueryIncomplete(t *testing.T) {
 		q := sqltestx.Metadatabase(t)
 
 		lmd := NewMetadata(
-			langx.Autoptr(int160.Random()),
+			new(int160.Random()),
 			MetadataOptionBytes(1000),
 			MetadataOptionDownloaded(1000),
 			MetadataOptionCompleted,

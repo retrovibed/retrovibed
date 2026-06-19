@@ -209,7 +209,7 @@ func (t *HTTPDiscovered) magnet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	lmd := tracking.NewMetadata(
-		langx.Autoptr(int160.FromByteArray(m.InfoHash)),
+		new(int160.FromByteArray(m.InfoHash)),
 		tracking.MetadataOptionFromMagnet(&m),
 		tracking.MetadataOptionTrackers(m.Trackers...),
 		tracking.MetadataOptionAutoDescription,
@@ -244,7 +244,7 @@ func (t *HTTPDiscovered) magnet(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &MagnetCreateResponse{
-		Download: langx.Autoptr(
+		Download: new(
 			langx.Clone(
 				Download{},
 				DownloadOptionFromTorrentMetadata(langx.Clone(lmd, timex.JSONSafeEncodeOption)),
@@ -344,7 +344,7 @@ func (t *HTTPDiscovered) publish(w http.ResponseWriter, r *http.Request) {
 	}
 
 	lmd := tracking.NewMetadata(
-		langx.Autoptr(int160.FromByteArray(meta.HashInfoBytes())),
+		new(int160.FromByteArray(meta.HashInfoBytes())),
 		tracking.MetadataOptionFromInfo(&info),
 		tracking.MetadataOptionDownloaded(n),
 		tracking.MetadataOptionTrackers(slicesx.Flatten(meta.UpvertedAnnounceList()...)...),
@@ -364,7 +364,7 @@ func (t *HTTPDiscovered) publish(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &PublishedUploadResponse{
-		Published: langx.Autoptr(
+		Published: new(
 			langx.Clone(
 				Published{},
 				PublishedOptionFromTorrentMetadata(langx.Clone(lmd, timex.JSONSafeEncodeOption)),
@@ -436,7 +436,7 @@ func (t *HTTPDiscovered) upload(w http.ResponseWriter, r *http.Request) {
 	info.Name = fh.Filename
 
 	lmd := tracking.NewMetadata(
-		langx.Autoptr(int160.FromByteArray(meta.HashInfoBytes())),
+		new(int160.FromByteArray(meta.HashInfoBytes())),
 		tracking.MetadataOptionFromInfo(&info),
 		tracking.MetadataOptionTrackers(slicesx.Flatten(meta.UpvertedAnnounceList()...)...),
 		tracking.MetadataOptionAutoDescription,
@@ -493,7 +493,7 @@ func (t *HTTPDiscovered) upload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &MediaUploadResponse{
-		Media: langx.Autoptr(
+		Media: new(
 			langx.Clone(
 				Media{},
 				MediaOptionFromTorrentMetadata(lmd),
@@ -541,7 +541,7 @@ func (t *HTTPDiscovered) pause(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &DownloadPauseResponse{
-		Download: langx.Autoptr(
+		Download: new(
 			langx.Clone(
 				Download{},
 				DownloadOptionFromTorrentMetadata(langx.Clone(md, timex.JSONSafeEncodeOption))),
@@ -588,7 +588,7 @@ func (t *HTTPDiscovered) reset(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &DownloadDeleteResponse{
-		Download: langx.Autoptr(
+		Download: new(
 			langx.Clone(
 				Download{},
 				DownloadOptionFromTorrentMetadata(langx.Clone(md, timex.JSONSafeEncodeOption))),
@@ -719,7 +719,7 @@ func (t *HTTPDiscovered) download(w http.ResponseWriter, r *http.Request) {
 	}(meta)
 
 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &DownloadBeginResponse{
-		Download: langx.Autoptr(
+		Download: new(
 			langx.Clone(
 				Download{},
 				DownloadOptionFromTorrentMetadata(langx.Clone(meta, timex.JSONSafeEncodeOption))),
@@ -789,7 +789,7 @@ func (t *HTTPDiscovered) websocket(w http.ResponseWriter, r *http.Request) {
 
 	genmsg := func(_ctx context.Context) error {
 		buf.Reset()
-		msg := langx.Autoptr(
+		msg := new(
 			langx.Clone(
 				Download{},
 				DownloadOptionFromTorrentMetadata(langx.Clone(md, timex.JSONSafeEncodeOption)),
@@ -858,7 +858,7 @@ func (t *HTTPDiscovered) update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &DownloadUpdateResponse{
-		Download: langx.Autoptr(
+		Download: new(
 			langx.Clone(
 				Download{},
 				DownloadOptionFromTorrentMetadata(langx.Clone(md, timex.JSONSafeEncodeOption))),
@@ -886,7 +886,7 @@ func (t *HTTPDiscovered) metadata(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &DownloadMetadataResponse{
-		Download: langx.Autoptr(
+		Download: new(
 			langx.Clone(
 				Download{},
 				DownloadOptionFromTorrentMetadata(langx.Clone(meta, timex.JSONSafeEncodeOption))),
@@ -923,7 +923,7 @@ func (t *HTTPDiscovered) metadatasync(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &MetadataSyncResponse{
-		Media: langx.Autoptr(
+		Media: new(
 			langx.Clone(
 				Media{},
 				MediaOptionFromTorrentMetadata(langx.Clone(tmd, timex.JSONSafeEncodeOption))),

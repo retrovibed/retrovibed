@@ -156,7 +156,7 @@ func (t *HTTPLibrary) delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &MediaDeleteResponse{
-		Media: langx.Autoptr(
+		Media: new(
 			langx.Clone(
 				Media{},
 				MediaOptionFromLibraryMetadata(langx.Clone(md, timex.JSONSafeEncodeOption)),
@@ -199,7 +199,7 @@ func (t *HTTPLibrary) patch(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &MediaUpdateResponse{
-		Media: langx.Autoptr(
+		Media: new(
 			langx.Clone(
 				Media{},
 				MediaOptionFromLibraryMetadata(langx.Clone(md, timex.JSONSafeEncodeOption)),
@@ -289,7 +289,7 @@ func (t *HTTPLibrary) upload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &MediaUploadResponse{
-		Media: langx.Autoptr(
+		Media: new(
 			langx.Clone(
 				Media{},
 				MediaOptionFromLibraryMetadata(lmd),
@@ -344,7 +344,7 @@ func (t *HTTPLibrary) random(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result.Media = langx.Autoptr(
+	result.Media = new(
 		langx.Clone(
 			Media{},
 			MediaOptionFromLibraryMetadata(langx.Clone(tmp, timex.JSONSafeEncodeOption)),

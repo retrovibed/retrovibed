@@ -16,7 +16,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
-	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
@@ -75,7 +74,7 @@ func TestMediaMetadataImport(t *testing.T) {
 		require.NoError(t, err)
 
 		lmd := tracking.NewMetadata(
-			langx.Autoptr(md.ID),
+			new(md.ID),
 			tracking.MetadataOptionFromInfo(info),
 			tracking.MetadataOptionCompleted,
 			tracking.MetadataOptionMimetype(mimex.RetrovibedMediaArchive),
@@ -119,7 +118,7 @@ func TestMediaMetadataImport(t *testing.T) {
 		require.NoError(t, err)
 
 		lmd := tracking.NewMetadata(
-			langx.Autoptr(md.ID),
+			new(md.ID),
 			tracking.MetadataOptionFromInfo(info),
 			tracking.MetadataOptionCompleted,
 			tracking.MetadataOptionMimetype(mimex.RetrovibedMediaArchive),
@@ -139,7 +138,7 @@ func TestMediaMetadataImport(t *testing.T) {
 		tstore := blockcache.NewTorrentFromVirtualFS(tvfs)
 
 		lmd := tracking.NewMetadata(
-			langx.Autoptr(int160.Random()),
+			new(int160.Random()),
 			tracking.MetadataOptionMimetype(mimex.RetrovibedMediaArchive),
 			// no MetadataOptionCompleted — completed_at remains at infinity
 		)
@@ -158,7 +157,7 @@ func TestMediaMetadataImport(t *testing.T) {
 		tstore := blockcache.NewTorrentFromVirtualFS(tvfs)
 
 		lmd := tracking.NewMetadata(
-			langx.Autoptr(int160.Random()),
+			new(int160.Random()),
 			tracking.MetadataOptionMimetype(mimex.RetrovibedMediaArchive),
 			tracking.MetadataOptionCompleted,
 		)

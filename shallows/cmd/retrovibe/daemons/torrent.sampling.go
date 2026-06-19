@@ -159,13 +159,13 @@ func DiscoverDHTInfoHashes(ctx context.Context, db sqlx.Queryer, s *dht.Server) 
 
 			id := int160.FromBytes(id)
 
-			if err := ddisc.DiscoveredFindByID(ctx, db, torrentx.HashUID(langx.Autoptr(id))).Scan(&discovered); err == nil {
+			if err := ddisc.DiscoveredFindByID(ctx, db, torrentx.HashUID(new(id))).Scan(&discovered); err == nil {
 				continue
 			} else if sqlx.IgnoreNoRows(err) != nil {
 				return errorsx.Wrap(err, "unable to determine if infohash is in discovered")
 			}
 
-			if err := tracking.MetadataFindByID(ctx, db, torrentx.HashUID(langx.Autoptr(id))).Scan(&known); err == nil {
+			if err := tracking.MetadataFindByID(ctx, db, torrentx.HashUID(new(id))).Scan(&known); err == nil {
 				continue
 			} else if sqlx.IgnoreNoRows(err) != nil {
 				return errorsx.Wrap(err, "unable to determine if infohash is known")
@@ -177,7 +177,7 @@ func DiscoverDHTInfoHashes(ctx context.Context, db sqlx.Queryer, s *dht.Server) 
 			)
 
 			if err = tracking.UnknownHashInsertWithDefaults(ctx, db, unknown).Scan(&unknown); err != nil {
-				return errorsx.Wrapf(err, "unable to track hash: %s", torrentx.HashUID(langx.Autoptr(id)))
+				return errorsx.Wrapf(err, "unable to track hash: %s", torrentx.HashUID(new(id)))
 			}
 		}
 

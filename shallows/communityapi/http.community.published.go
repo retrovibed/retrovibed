@@ -145,7 +145,7 @@ func (t *HTTPPublished) tombstoned(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &PublishContentDeleteResponse{
-		PublishedContent: langx.Autoptr(
+		PublishedContent: new(
 			langx.Clone(
 				PublishedContent{},
 				PublishedContentOptionFromDB(langx.Clone(pc, timex.JSONSafeEncodeOption)),
@@ -215,7 +215,7 @@ func (t *HTTPPublished) publish(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err = httpx.WriteJSON(w, httpx.GetBuffer(r), &PublishContentResponse{
-		PublishedContent: langx.Autoptr(
+		PublishedContent: new(
 			langx.Clone(
 				PublishedContent{},
 				PublishedContentOptionFromDB(langx.Clone(pc, timex.JSONSafeEncodeOption)),

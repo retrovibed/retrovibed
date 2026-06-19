@@ -145,7 +145,7 @@ func TokenOptionFromAuthz(a meta.Authz) TokenOption {
 }
 
 func TokenFromRegisterClaims(claims jwt.RegisteredClaims, options ...TokenOption) *Token {
-	return langx.Autoptr(langx.Clone(Token{
+	return new(langx.Clone(Token{
 		Id:        claims.ID,
 		Issuer:    claims.Issuer,
 		ProfileId: claims.Subject,

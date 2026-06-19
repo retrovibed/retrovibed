@@ -67,7 +67,7 @@ func WithReset(val uint64) FileOption {
 
 // NewFile function updated to use the option pattern.
 func NewFile(dca cache, ts time.Time, path string, _len uint64, mod fs.FileMode, opts ...FileOption) (f *File) {
-	return langx.Autoptr(langx.Clone(File{
+	return new(langx.Clone(File{
 		cache:  dca,
 		Path:   path,
 		Length: _len,
@@ -88,7 +88,7 @@ type File struct {
 }
 
 func (t *File) Clone() *File {
-	return langx.Autoptr(langx.Clone(*t, WithReset(0)))
+	return new(langx.Clone(*t, WithReset(0)))
 }
 
 func (t *File) Info() (fs.FileInfo, error) {

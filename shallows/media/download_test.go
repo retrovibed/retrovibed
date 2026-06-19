@@ -29,7 +29,7 @@ func TestDownloadOptionFromTorrent(t *testing.T) {
 
 		result := langx.Clone(
 			media.Download{},
-			media.DownloadOptionFromTorrentMetadata(tracking.NewMetadata(langx.Autoptr(tmd.ID))),
+			media.DownloadOptionFromTorrentMetadata(tracking.NewMetadata(new(tmd.ID))),
 			media.DownloadOptionFromTorrent(dl),
 		)
 
@@ -53,7 +53,7 @@ func TestDownloadOptionFromTorrent(t *testing.T) {
 
 		result := langx.Clone(
 			media.Download{},
-			media.DownloadOptionFromTorrentMetadata(tracking.NewMetadata(langx.Autoptr(tmd.ID))),
+			media.DownloadOptionFromTorrentMetadata(tracking.NewMetadata(new(tmd.ID))),
 			media.DownloadOptionFromTorrent(dl),
 		)
 

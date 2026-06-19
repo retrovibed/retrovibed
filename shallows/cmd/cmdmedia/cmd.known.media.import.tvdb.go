@@ -48,7 +48,7 @@ func (t *tvdbimport) records(c *tvdb.Client) iter.Seq[library.Known] {
 		epochts := time.Unix(0, 0).Format(time.DateOnly)
 
 		for i := 0.; i < langx.FirstNonZero(t.Limit, math.MaxFloat64); i++ {
-			page, err := c.GetAllSeries(langx.Autoptr(i))
+			page, err := c.GetAllSeries(new(i))
 			if err != nil {
 				t.cause = errorsx.Wrap(err, "failed to discover records")
 				return
@@ -68,8 +68,8 @@ func (t *tvdbimport) records(c *tvdb.Client) iter.Seq[library.Known] {
 				}, mr.Aliases...)
 
 				var translation = &shared.Translation{
-					Name:     langx.Autoptr(langx.FirstNonZero(langx.Autoderef(alias.Name), langx.Autoderef(mr.Name))),
-					Overview: langx.Autoptr(langx.Autoderef(mr.Overview)),
+					Name:     new(langx.FirstNonZero(langx.Autoderef(alias.Name), langx.Autoderef(mr.Name))),
+					Overview: new(langx.Autoderef(mr.Overview)),
 				}
 
 				if langx.Autoderef(mr.OriginalLanguage) != t.Lang && slicesx.FindOrZero(func(lang string) bool { return t.Lang == lang }, mr.OverviewTranslations...) != "" {
