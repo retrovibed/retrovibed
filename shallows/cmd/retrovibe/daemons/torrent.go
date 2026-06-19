@@ -487,26 +487,8 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 
 	if disc.Enabled && disc.Ratio > 0 {
 		go dhtx.WaitForMinimumNodes(dctx, 32, dhts, func() {
-			// go func() {
-			// 	log.Println("auto retrieval of infohashes initiated")
-			// 	defer log.Println("auto retrieval of infohashes completed")
-
-			// 	var (
-			// 		block ddisc.Filter = ddisc.FilterNone
-			// 	)
-
-			// 	if disc.Ratio < 100 {
-			// 		n := partitions.Max(peerid.Bytes())
-			// 		block = ddisc.FilterRatio(cryptox.NewChaCha8(n[:]), uint8(disc.Ratio)).Filter
-			// 	}
-
-			// 	if err := DiscoverDHTMetadata(dctx, uint64(disc.Workloads), t.db, tclient, block); err != nil {
-			// 		asyncfailure(errorsx.Wrap(err, "infohash sampling failed"))
-			// 		return
-			// 	}
-			// }()
-
 			go func() {
+				// finds infohashes from the dht
 				if err := AutoDiscovery(dctx, t.db, dhts, t.tstore); err != nil {
 					asyncfailure(errorsx.Wrap(err, "autodiscovery from peers failed"))
 					return
@@ -514,6 +496,7 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 			}()
 
 			go func() {
+				// extracts media metadata we've been able to download the metadata for.
 				if err := DiscoverMedia(dctx, t.db, dhts, tclient); err != nil {
 					asyncfailure(errorsx.Wrap(err, "index discovered media failed"))
 					return
@@ -526,8 +509,26 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 					return
 				}
 			}()
-		})
 
+			go func() {
+				log.Println("auto retrieval of unknown infohashes initiated")
+				defer log.Println("auto retrieval of unknown infohashes completed")
+
+				var (
+					block ddisc.Filter = ddisc.FilterNone
+				)
+
+				if disc.Ratio < 100 {
+					n := partitions.Max(peerid.Bytes())
+					block = ddisc.FilterRatio(cryptox.NewChaCha8(n[:]), uint8(disc.Ratio)).Filter
+				}
+
+				if err := DiscoverDHTMetadata(dctx, uint64(disc.Workloads), t.db, tclient, block); err != nil {
+					asyncfailure(errorsx.Wrap(err, "infohash sampling failed"))
+					return
+				}
+			}()
+		})
 		log.Println("autodiscovery is enabled. this is an experimental feature.")
 	} else if disc.Ratio == 0 {
 		log.Println("autodiscovery is disabled, to enable remove --discovery-ratio=0 flag, this is an experimental feature.")

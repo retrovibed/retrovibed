@@ -94,6 +94,7 @@ func DiscoverMedia(ctx context.Context, db sqlx.Queryer, dhts *dht.Server, tclie
 		if err != nil {
 			return errorsx.Wrapf(err, "unable to create metadata from info %s", id)
 		}
+
 		tt, _, err := tclient.Start(
 			metadata,
 			torrent.TuneResetBitmaps,
