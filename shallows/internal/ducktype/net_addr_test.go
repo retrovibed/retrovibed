@@ -163,5 +163,273 @@ func TestNullNetAddr(t *testing.T) {
 			require.NoError(t, row.Scan(&n))
 			require.False(t, n.Valid)
 		})
+
+		t.Run("IPv4-mapped IPv6 example 1", func(t *testing.T) {
+			db := newDB(t)
+			var n ducktype.NullNetAddr
+			row := db.QueryRowContext(t.Context(), "SELECT '::ffff:5.79.77.51'::INET")
+			require.NoError(t, row.Scan(&n))
+			require.True(t, n.Valid)
+			require.Equal(t, netip.MustParseAddr("::ffff:5.79.77.51"), n.V)
+		})
+
+		t.Run("IPv4 private address", func(t *testing.T) {
+			db := newDB(t)
+			var n ducktype.NullNetAddr
+			row := db.QueryRowContext(t.Context(), "SELECT '192.168.1.100'::INET")
+			require.NoError(t, row.Scan(&n))
+			require.True(t, n.Valid)
+			require.Equal(t, netip.MustParseAddr("192.168.1.100"), n.V)
+		})
+
+		t.Run("IPv4 loopback", func(t *testing.T) {
+			db := newDB(t)
+			var n ducktype.NullNetAddr
+			row := db.QueryRowContext(t.Context(), "SELECT '127.0.0.1'::INET")
+			require.NoError(t, row.Scan(&n))
+			require.True(t, n.Valid)
+			require.Equal(t, netip.MustParseAddr("127.0.0.1"), n.V)
+		})
+
+		t.Run("IPv4 unspecified", func(t *testing.T) {
+			db := newDB(t)
+			var n ducktype.NullNetAddr
+			row := db.QueryRowContext(t.Context(), "SELECT '0.0.0.0'::INET")
+			require.NoError(t, row.Scan(&n))
+			require.True(t, n.Valid)
+			require.Equal(t, netip.MustParseAddr("0.0.0.0"), n.V)
+		})
+
+		t.Run("IPv4 broadcast", func(t *testing.T) {
+			db := newDB(t)
+			var n ducktype.NullNetAddr
+			row := db.QueryRowContext(t.Context(), "SELECT '255.255.255.255'::INET")
+			require.NoError(t, row.Scan(&n))
+			require.True(t, n.Valid)
+			require.Equal(t, netip.MustParseAddr("255.255.255.255"), n.V)
+		})
+
+		t.Run("IPv4 multicast", func(t *testing.T) {
+			db := newDB(t)
+			var n ducktype.NullNetAddr
+			row := db.QueryRowContext(t.Context(), "SELECT '224.0.0.1'::INET")
+			require.NoError(t, row.Scan(&n))
+			require.True(t, n.Valid)
+			require.Equal(t, netip.MustParseAddr("224.0.0.1"), n.V)
+		})
+
+		t.Run("IPv6 loopback", func(t *testing.T) {
+			db := newDB(t)
+			var n ducktype.NullNetAddr
+			row := db.QueryRowContext(t.Context(), "SELECT '::1'::INET")
+			require.NoError(t, row.Scan(&n))
+			require.True(t, n.Valid)
+			require.Equal(t, netip.MustParseAddr("::1"), n.V)
+		})
+
+		t.Run("IPv6 unspecified", func(t *testing.T) {
+			db := newDB(t)
+			var n ducktype.NullNetAddr
+			row := db.QueryRowContext(t.Context(), "SELECT '::'::INET")
+			require.NoError(t, row.Scan(&n))
+			require.True(t, n.Valid)
+			require.Equal(t, netip.MustParseAddr("::"), n.V)
+		})
+
+		t.Run("IPv6 multicast", func(t *testing.T) {
+			db := newDB(t)
+			var n ducktype.NullNetAddr
+			row := db.QueryRowContext(t.Context(), "SELECT 'ff02::1'::INET")
+			require.NoError(t, row.Scan(&n))
+			require.True(t, n.Valid)
+			require.Equal(t, netip.MustParseAddr("ff02::1"), n.V)
+		})
+
+		t.Run("IPv6 link-local", func(t *testing.T) {
+			db := newDB(t)
+			var n ducktype.NullNetAddr
+			row := db.QueryRowContext(t.Context(), "SELECT 'fe80::1'::INET")
+			require.NoError(t, row.Scan(&n))
+			require.True(t, n.Valid)
+			require.Equal(t, netip.MustParseAddr("fe80::1"), n.V)
+		})
+
+		t.Run("IPv6 unique local", func(t *testing.T) {
+			db := newDB(t)
+			var n ducktype.NullNetAddr
+			row := db.QueryRowContext(t.Context(), "SELECT 'fc00::1'::INET")
+			require.NoError(t, row.Scan(&n))
+			require.True(t, n.Valid)
+			require.Equal(t, netip.MustParseAddr("fc00::1"), n.V)
+		})
+
+		t.Run("IPv6 documentation prefix", func(t *testing.T) {
+			db := newDB(t)
+			var n ducktype.NullNetAddr
+			row := db.QueryRowContext(t.Context(), "SELECT '2001:db8::1'::INET")
+			require.NoError(t, row.Scan(&n))
+			require.True(t, n.Valid)
+			require.Equal(t, netip.MustParseAddr("2001:db8::1"), n.V)
+		})
+
+		t.Run("IPv6 max value", func(t *testing.T) {
+			db := newDB(t)
+			var n ducktype.NullNetAddr
+			row := db.QueryRowContext(t.Context(), "SELECT 'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff'::INET")
+			require.NoError(t, row.Scan(&n))
+			require.True(t, n.Valid)
+			require.Equal(t, netip.MustParseAddr("ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"), n.V)
+		})
+
+		t.Run("IPv6 boundary 8000::", func(t *testing.T) {
+			db := newDB(t)
+			var n ducktype.NullNetAddr
+			row := db.QueryRowContext(t.Context(), "SELECT '8000::'::INET")
+			require.NoError(t, row.Scan(&n))
+			require.True(t, n.Valid)
+			require.Equal(t, netip.MustParseAddr("8000::"), n.V)
+		})
+
+		t.Run("IPv6 boundary 8000::1", func(t *testing.T) {
+			db := newDB(t)
+			var n ducktype.NullNetAddr
+			row := db.QueryRowContext(t.Context(), "SELECT '8000::1'::INET")
+			require.NoError(t, row.Scan(&n))
+			require.True(t, n.Valid)
+			require.Equal(t, netip.MustParseAddr("8000::1"), n.V)
+		})
+
+		t.Run("IPv6 boundary 7fff:ffff:ffff:ffff:ffff:ffff:ffff:ffff", func(t *testing.T) {
+			db := newDB(t)
+			var n ducktype.NullNetAddr
+			row := db.QueryRowContext(t.Context(), "SELECT '7fff:ffff:ffff:ffff:ffff:ffff:ffff:ffff'::INET")
+			require.NoError(t, row.Scan(&n))
+			require.True(t, n.Valid)
+			require.Equal(t, netip.MustParseAddr("7fff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"), n.V)
+		})
+
+		t.Run("IPv4-mapped IPv6 zero", func(t *testing.T) {
+			db := newDB(t)
+			var n ducktype.NullNetAddr
+			row := db.QueryRowContext(t.Context(), "SELECT '::ffff:0.0.0.0'::INET")
+			require.NoError(t, row.Scan(&n))
+			require.True(t, n.Valid)
+			require.Equal(t, netip.MustParseAddr("::ffff:0.0.0.0"), n.V)
+		})
+
+		t.Run("IPv4-mapped IPv6 broadcast", func(t *testing.T) {
+			db := newDB(t)
+			var n ducktype.NullNetAddr
+			row := db.QueryRowContext(t.Context(), "SELECT '::ffff:255.255.255.255'::INET")
+			require.NoError(t, row.Scan(&n))
+			require.True(t, n.Valid)
+			require.Equal(t, netip.MustParseAddr("::ffff:255.255.255.255"), n.V)
+		})
+
+		t.Run("IPv4-mapped IPv6 loopback", func(t *testing.T) {
+			db := newDB(t)
+			var n ducktype.NullNetAddr
+			row := db.QueryRowContext(t.Context(), "SELECT '::ffff:127.0.0.1'::INET")
+			require.NoError(t, row.Scan(&n))
+			require.True(t, n.Valid)
+			require.Equal(t, netip.MustParseAddr("::ffff:127.0.0.1"), n.V)
+		})
+
+		t.Run("IPv4 CIDR network address", func(t *testing.T) {
+			db := newDB(t)
+			var n ducktype.NullNetAddr
+			row := db.QueryRowContext(t.Context(), "SELECT '192.168.1.0/24'::INET")
+			require.NoError(t, row.Scan(&n))
+			require.True(t, n.Valid)
+			require.Equal(t, netip.MustParseAddr("192.168.1.0"), n.V)
+		})
+
+		t.Run("IPv6 CIDR network address", func(t *testing.T) {
+			db := newDB(t)
+			var n ducktype.NullNetAddr
+			row := db.QueryRowContext(t.Context(), "SELECT '2001:db8::/32'::INET")
+			require.NoError(t, row.Scan(&n))
+			require.True(t, n.Valid)
+			require.Equal(t, netip.MustParseAddr("2001:db8::"), n.V)
+		})
+
+		t.Run("null via INET", func(t *testing.T) {
+			db := newDB(t)
+			var n ducktype.NullNetAddr
+			row := db.QueryRowContext(t.Context(), "SELECT NULL::INET")
+			require.NoError(t, row.Scan(&n))
+			require.False(t, n.Valid)
+		})
+
+		t.Run("roundtrip IPv4 through INET column", func(t *testing.T) {
+			db := newDB(t)
+			ctx := t.Context()
+
+			_, err := db.ExecContext(ctx, "CREATE TABLE inet_test_ipv4 (v INET)")
+			require.NoError(t, err)
+
+			in := ducktype.NullNetAddr{V: netip.MustParseAddr("192.168.1.100"), Valid: true}
+			_, err = db.ExecContext(ctx, "INSERT INTO inet_test_ipv4 VALUES (?)", in)
+			require.NoError(t, err)
+
+			var out ducktype.NullNetAddr
+			row := db.QueryRowContext(ctx, "SELECT v FROM inet_test_ipv4")
+			require.NoError(t, row.Scan(&out))
+			require.True(t, out.Valid)
+			require.Equal(t, netip.MustParseAddr("192.168.1.100"), out.V)
+		})
+
+		t.Run("roundtrip IPv6 through INET column", func(t *testing.T) {
+			db := newDB(t)
+			ctx := t.Context()
+
+			_, err := db.ExecContext(ctx, "CREATE TABLE inet_test_ipv6 (v INET)")
+			require.NoError(t, err)
+
+			in := ducktype.NullNetAddr{V: netip.MustParseAddr("2001:db8::1"), Valid: true}
+			_, err = db.ExecContext(ctx, "INSERT INTO inet_test_ipv6 VALUES (?)", in)
+			require.NoError(t, err)
+
+			var out ducktype.NullNetAddr
+			row := db.QueryRowContext(ctx, "SELECT v FROM inet_test_ipv6")
+			require.NoError(t, row.Scan(&out))
+			require.True(t, out.Valid)
+			require.Equal(t, netip.MustParseAddr("2001:db8::1"), out.V)
+		})
+
+		t.Run("roundtrip IPv4-mapped IPv6 through INET column", func(t *testing.T) {
+			db := newDB(t)
+			ctx := t.Context()
+
+			_, err := db.ExecContext(ctx, "CREATE TABLE inet_test_mapped (v INET)")
+			require.NoError(t, err)
+
+			in := ducktype.NullNetAddr{V: netip.MustParseAddr("::ffff:5.79.77.51"), Valid: true}
+			_, err = db.ExecContext(ctx, "INSERT INTO inet_test_mapped VALUES (?)", in)
+			require.NoError(t, err)
+
+			var out ducktype.NullNetAddr
+			row := db.QueryRowContext(ctx, "SELECT v FROM inet_test_mapped")
+			require.NoError(t, row.Scan(&out))
+			require.True(t, out.Valid)
+			require.Equal(t, netip.MustParseAddr("::ffff:5.79.77.51"), out.V)
+		})
+
+		t.Run("roundtrip null through INET column", func(t *testing.T) {
+			db := newDB(t)
+			ctx := t.Context()
+
+			_, err := db.ExecContext(ctx, "CREATE TABLE inet_test_null (v INET)")
+			require.NoError(t, err)
+
+			in := ducktype.NullNetAddr{Valid: false}
+			_, err = db.ExecContext(ctx, "INSERT INTO inet_test_null VALUES (?)", in)
+			require.NoError(t, err)
+
+			var out ducktype.NullNetAddr
+			row := db.QueryRowContext(ctx, "SELECT v FROM inet_test_null")
+			require.NoError(t, row.Scan(&out))
+			require.False(t, out.Valid)
+		})
 	})
 }

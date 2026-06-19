@@ -51,27 +51,31 @@ func (n *NullNetAddr) Scan(src any) error {
 			n.V = addr
 			return nil
 		case *big.Int:
-			const (
-				IPv6BitLen = 64
-				IPv4BitLen = 32
-			)
-			var (
-				decoded []byte
-				ip4buf  [4]byte
-				ip6buf  [16]byte
-			)
+			const IPv4BitLen = 32
 
-			if _addr.BitLen() <= IPv4BitLen {
-				decoded = ip4buf[:]
-			} else {
-				decoded = ip6buf[:]
+			// DuckDB stores INET addresses as a hugeint. IPv6 addresses are
+			// biased by -2^127 (sign bit flipped) so that signed comparison
+			// matches unsigned address ordering; IPv4 addresses are plain
+			// unsigned values. Detect IPv6 via the ip_type column when
+			// present, falling back to the byte-length heuristic otherwise.
+			addr := _addr
+			decoded := make([]byte, 4)
+			ipType, ok := v["ip_type"].(uint8)
+			if !ok {
+				return fmt.Errorf("NullNetAddr: ip_type: %T - %v", v, spew.Sdump(v))
 			}
 
-			addr, ok := netip.AddrFromSlice(_addr.FillBytes(decoded))
+			if isIPv6 := ipType == 2; isIPv6 {
+				decoded = make([]byte, 16)
+				offset := new(big.Int).Lsh(big.NewInt(1), 127)
+				addr = new(big.Int).Add(_addr, offset)
+			}
+
+			netipAddr, ok := netip.AddrFromSlice(addr.FillBytes(decoded))
 			if !ok {
 				return fmt.Errorf("NullNetAddr: failed to convert big.Int as netip.Addr: %v - %v - %v", _addr, _addr.BitLen(), spew.Sdump(v))
 			}
-			n.V = addr
+			n.V = netipAddr
 			return nil
 		default:
 			return fmt.Errorf("NullNetAddr: address returned is an unknown type: %T - %v", _addr, spew.Sdump(v))
