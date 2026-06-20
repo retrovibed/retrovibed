@@ -83,12 +83,12 @@ func (t *HTTPSimilar) similar(w http.ResponseWriter, r *http.Request) {
 	}
 
 	seedVec, err := acoustics.FetchFeatures(r.Context(), t.q, mediaID)
-	if sqlx.IgnoreNoRows(err) == nil {
-		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
-		return
-	} else if err != nil {
+	if sqlx.IgnoreNoRows(err) != nil {
 		log.Println(errorsx.Wrap(err, "acoustics: fetch seed vector"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	} else if err != nil {
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
 		return
 	}
 
@@ -101,12 +101,13 @@ func (t *HTTPSimilar) similar(w http.ResponseWriter, r *http.Request) {
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
+
 	rand.Shuffle(len(ids), func(i, j int) {
 		ids[i], ids[j] = ids[j], ids[i]
 	})
 
 	for _, id := range ids {
-		if err = library.MetadataFindByID(r.Context(), t.q, id.String()).Scan(&md); sqlx.ErrNoRows(err) == nil {
+		if err = library.MetadataFindByID(r.Context(), t.q, id.String()).Scan(&md); sqlx.ErrNoRows(err) != nil {
 			continue
 		} else if err != nil {
 			log.Println(errorsx.Wrap(err, "acoustics: metadata"))
