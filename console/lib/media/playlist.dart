@@ -13,8 +13,7 @@ import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/debug.dart' as debug;
 import 'package:retrovibed/designkit.dart' as ds;
 import 'api.dart' as api;
-import 'play.queue.dart';
-import 'play.queue.dart' as queue;
+import 'play.queue.dart' as playqueue;
 
 class Playlist extends StatefulWidget {
   static void _noop(
@@ -161,9 +160,9 @@ class Playlist extends StatefulWidget {
 }
 
 class _PlaylistState extends State<Playlist> {
-  final PlayQueue _queue = PlayQueue();
+  final playqueue.PlayQueue _queue = playqueue.PlayQueue();
   final Player player = Player();
-  RangeFn autoqueue = queue.search;
+  playqueue.RangeFn autoqueue = playqueue.search;
   final TextEditingController controller = TextEditingController();
   final FocusNode playerfocus = FocusNode(
     debugLabel: 'playlist.player.focus',
@@ -182,7 +181,8 @@ class _PlaylistState extends State<Playlist> {
   );
 
   Known get known => _queue.current.value.known;
-  ValueNotifier<PlayableMedia?> get current => _queue.current;
+  ValueNotifier<playqueue.PlayableMedia?> get current => _queue.current;
+  playqueue.PlayQueue get queue => _queue;
 
   void setState(VoidCallback fn) {
     if (!mounted) return;
@@ -195,8 +195,8 @@ class _PlaylistState extends State<Playlist> {
     search.addListener(() {
       setState(() {
         autoqueue = switch (mimex.category(search.value.next.mimetypes)) {
-          mimex.audio => queue.acoustic,
-          _ => queue.search,
+          mimex.audio => playqueue.acoustic,
+          _ => playqueue.search,
         };
       });
     });
@@ -255,7 +255,7 @@ class _PlaylistState extends State<Playlist> {
   void setPlaylist(
     api.MediaSearchRequest q,
     api.Media current,
-    RangeFn autoqueue, {
+    playqueue.RangeFn autoqueue, {
     Duration pos = const Duration(milliseconds: 0),
   }) {
     setState(() {
@@ -297,14 +297,14 @@ class _PlaylistState extends State<Playlist> {
     });
   }
 
-  Future<PlayableMedia?> _reverse() {
+  Future<playqueue.PlayableMedia?> _reverse() {
     return authn.bearer(authn.AuthzCache.meta(context)).then((auth) => _queue.reverse(auth, player)).then((m) {
       if (m != null) setState(() {});
       return m;
     });
   }
 
-  Future<PlayableMedia?> _advance() {
+  Future<playqueue.PlayableMedia?> _advance() {
     return authn.bearer(authn.AuthzCache.meta(context)).then((auth) => _queue.advance(auth, player)).then((m) {
       if (m != null) setState(() {});
       return m;

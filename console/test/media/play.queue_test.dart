@@ -91,7 +91,7 @@ void main() {
 
       q.reset(Stream.empty(), api.Media(id: 'z', description: 'Z'));
       expect(q.previous, 0);
-      expect(q.recent, ['z']); // recent always includes whatever's now current
+      expect(q.recent.map((m) => m.current.id), ['z']); // recent always includes whatever's now current
     });
   });
 
@@ -170,11 +170,11 @@ void main() {
 
       await q.advance("", player); // current -> stream's 'x'; seed must not land in previous
       expect(q.previous, 0);
-      expect(q.recent, ['x']); // just current, no previous entry yet
+      expect(q.recent.map((m) => m.current.id), ['x']); // just current, no previous entry yet
 
       await q.advance("", player); // current -> 'y'; 'x' lands in previous exactly once
       expect(q.previous, 1);
-      expect(q.recent, ['x', 'y']);
+      expect(q.recent.map((m) => m.current.id), ['x', 'y']);
     });
   });
 

@@ -53,7 +53,7 @@ class PlayQueue {
   // autoqueue(...) has already returned its Stream object.
   final ValueNotifier<PlayableMedia?> current = ValueNotifier(null);
   final RingBuffer<PlayableMedia> _upcoming = RingBuffer(128);
-  final RingBuffer<PlayableMedia> _previous = RingBuffer(100);
+  final RingBuffer<PlayableMedia> _previous = RingBuffer(128);
   StreamIterator<PlayableMedia> _stream = StreamIterator(Stream.empty());
 
   int get upcoming => _upcoming.length;
@@ -65,9 +65,9 @@ class PlayQueue {
   // oldest -> newest, ending with the currently playing track (if any) - so
   // recent.last is always "what's playing right now", with no separate
   // current/seed parameter needed wherever this feeds an exclusion list.
-  List<String> get recent => [
-    ..._previous.toList().map((m) => m.current.id),
-    if (current.value != null) current.value!.current.id,
+  List<PlayableMedia> get recent => [
+    ..._previous.toList(),
+    if (current.value != null) current.value!,
   ];
 
   void reset(Stream<PlayableMedia> stream, Media media, {Duration pos = const Duration(milliseconds: 0)}) {
@@ -103,6 +103,10 @@ class PlayQueue {
       print("unable to pull next media from playlist $cause");
       return null;
     }
+  }
+
+  void push(PlayableMedia media) {
+    _upcoming.insert(media);
   }
 
   Future<PlayableMedia?> reverse(String auth, mediakit.Player player) async {
@@ -190,7 +194,7 @@ Stream<PlayableMedia> range(
   while (true) {
     i.next.excluded
       ..clear()
-      ..addAll(queue.recent);
+      ..addAll(queue.recent.map((m) => m.current.id));
     final v = await random(i.next, options: options());
     yield PlayableMedia(v.media);
   }

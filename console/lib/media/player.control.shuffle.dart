@@ -3,6 +3,7 @@ import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/designkit.dart' as ds;
 import './play.queue.dart';
 import './playlist.dart' as internal;
+import './play.list.history.dart';
 
 class PlayerControlShuffle extends StatelessWidget {
   final ValueNotifier<PlayableMedia?> events;
@@ -30,12 +31,19 @@ class PlayerControlShuffle extends StatelessWidget {
                   ds.modals
                       .asyncfn<RangeFn>(
                         context,
-                        (completion) => _PlaybackStrategyMenu(
+                        (completion) => PlaybackStrategyModal(
                           current: playlist.autoqueue,
-                          onSelected: completion.complete,
+                          history: playlist.queue.recent,
+                          onModeSelected: completion.complete,
+                          onHistorySelected: (item) {
+                            playlist.queue.push(item);
+                            playlist.next();
+                            completion.complete(playlist.autoqueue);
+                          },
                         ),
                       )
                       .then((mode) {
+                        if (mode == playlist.autoqueue) return;
                         final current = media?.current;
                         if (current == null) return;
                         playlist.setPlaylist(
@@ -72,37 +80,60 @@ class PlayerControlShuffle extends StatelessWidget {
   }
 }
 
+class PlaybackStrategyModal extends StatelessWidget {
+  final RangeFn current;
+  final List<PlayableMedia> history;
+  final void Function(RangeFn mode) onModeSelected;
+  final void Function(PlayableMedia media) onHistorySelected;
+  const PlaybackStrategyModal({
+    super.key,
+    required this.current,
+    required this.history,
+    required this.onModeSelected,
+    required this.onHistorySelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return PlayListHistory(
+      history,
+      constraints: const BoxConstraints(maxWidth: 512),
+      leading: [
+        _PlaybackStrategyMenu(current: current, onSelected: onModeSelected),
+      ],
+      onTap: onHistorySelected,
+    );
+  }
+}
+
 class _PlaybackStrategyMenu extends StatelessWidget {
   static const _options = <(RangeFn, String)>[
+    (acoustic, 'Auto'),
     (search, 'Search'),
     (random, 'Random'),
-    (acoustic, 'Auto'),
   ];
 
   final RangeFn current;
   final void Function(RangeFn mode) onSelected;
-  const _PlaybackStrategyMenu({required this.current, required this.onSelected});
+  const _PlaybackStrategyMenu({
+    required this.current,
+    required this.onSelected,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final defaults = ds.Defaults.of(context);
     final theme = Theme.of(context);
-    return ds.Container(
-      padding: defaults.padding,
-      margin: defaults.margin,
-      constraints: const BoxConstraints(maxWidth: 256),
-      Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          for (final (mode, label) in _options)
-            IconButton(
-              tooltip: label,
-              color: mode == current ? theme.colorScheme.primary : null,
-              icon: Icon(PlayerControlShuffle._icon(mode)),
-              onPressed: () => onSelected(mode),
-            ),
-        ],
-      ),
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (final (mode, label) in _options)
+          IconButton(
+            tooltip: label,
+            color: mode == current ? theme.colorScheme.primary : null,
+            icon: Icon(PlayerControlShuffle._icon(mode)),
+            onPressed: () => onSelected(mode),
+          ),
+      ],
     );
   }
 }
