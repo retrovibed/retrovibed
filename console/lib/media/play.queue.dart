@@ -135,6 +135,8 @@ Stream<PlayableMedia> range(
   api.FnMediaSearch search = api.media.search,
   api.FnMediaRandom random = api.media.random,
 }) async* {
+  print("DERP DERP current ${current}");
+  print("DERP DERP ${req}");
   MediaSearchResponse i = await search(req, options: options());
   final initial = i.items.sublist(
     max(i.items.indexWhere((m) => m.id == current.id), 0),
@@ -163,4 +165,46 @@ Stream<PlayableMedia> range(
     final v = await random(i.next, options: options());
     yield PlayableMedia(v.media);
   }
+}
+
+typedef RangeFn =
+    Stream<PlayableMedia> Function(
+      MediaSearchRequest req,
+      Media current, {
+      Duration pos,
+      List<httpx.Option> Function() options,
+    });
+
+Stream<PlayableMedia> search(
+  MediaSearchRequest req,
+  Media current, {
+  Duration pos = const Duration(milliseconds: 0),
+  List<httpx.Option> Function() options = httpx.Request.empty,
+}) {
+  return range(req, current, pos: pos, options: options, random: api.media.random);
+}
+
+Stream<PlayableMedia> random(
+  MediaSearchRequest req,
+  Media current, {
+  Duration pos = const Duration(milliseconds: 0),
+  List<httpx.Option> Function() options = httpx.Request.empty,
+}) {
+  return range(req, current, pos: pos, options: options, search: api.media.emptysearch, random: api.media.random);
+}
+
+Stream<PlayableMedia> acoustic(
+  MediaSearchRequest req,
+  Media current, {
+  Duration pos = const Duration(milliseconds: 0),
+  List<httpx.Option> Function() options = httpx.Request.empty,
+}) {
+  return range(
+    req,
+    current,
+    pos: pos,
+    options: options,
+    search: api.media.emptysearch,
+    random: api.media.acoustic(current.id),
+  );
 }

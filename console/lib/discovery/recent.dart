@@ -116,12 +116,9 @@ class _RecentState extends State<Recent> {
 
                 playlist?.setPlaylist(
                   item.query,
-                  media.range(
-                    item.query,
-                    item.media,
-                    pos: delta < 0 ? Duration(milliseconds: 0) : Duration(milliseconds: item.position.toInt()),
-                    options: () => [authn.request(authn.AuthzCache.meta(context))],
-                  ),
+                  item.media,
+                  playlist.autoqueue,
+                  pos: delta < 0 ? Duration(milliseconds: 0) : Duration(milliseconds: item.position.toInt()),
                 );
               },
               onLongPress: deletion,

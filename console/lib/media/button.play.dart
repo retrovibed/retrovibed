@@ -16,22 +16,19 @@ Future<void> Function()? PlayAction(
 ) {
   switch (mimex.icon(current.mimetype)) {
     case mimex.icomovie:
+      final playlist = Playlist.of(context);
+      if (playlist == null) return null;
+      return () {
+        return Future.sync(
+          () => playlist.setPlaylist(s.next, current, playlist.autoqueue),
+        );
+      };
     case mimex.icoaudio:
       final playlist = Playlist.of(context);
       if (playlist == null) return null;
       return () {
         return Future.sync(
-          () => playlist.setPlaylist(
-            s.next,
-            range(
-              s.next,
-              current,
-              options: () => [authn.request(authn.AuthzCache.meta(context))],
-              random: mimex.icon(current.mimetype) == mimex.icoaudio
-                  ? api.media.acoustic(current.id)
-                  : api.media.random,
-            ),
-          ),
+          () => playlist.setPlaylist(s.next, current, playlist.autoqueue),
         );
       };
     default:
@@ -61,10 +58,9 @@ Future<void> Function() DownloadAction(BuildContext context, Media current) {
     }
 
     return getDownloadsDirectory().then((downloads) {
-      final sink =
-          File(
-            '${downloads!.path}/${current.description.trim().replaceAll(" ", ".")}',
-          ).openWrite();
+      final sink = File(
+        '${downloads!.path}/${current.description.trim().replaceAll(" ", ".")}',
+      ).openWrite();
       return api.media
           .download(current.id, options: [authn.request(authn.AuthzCache.meta(context))])
           .then((resp) => resp.stream.pipe(sink))

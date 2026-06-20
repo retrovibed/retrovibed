@@ -184,6 +184,7 @@ class MediaSearchRequest extends $pb.GeneratedMessage {
     $core.Iterable<$core.String>? mimetypes,
     $core.bool? adult,
     $core.bool? hidden,
+    $core.Iterable<$core.String>? excluded,
     $fixnum.Int64? offset,
     $fixnum.Int64? limit,
   }) {
@@ -192,6 +193,7 @@ class MediaSearchRequest extends $pb.GeneratedMessage {
     if (mimetypes != null) result.mimetypes.addAll(mimetypes);
     if (adult != null) result.adult = adult;
     if (hidden != null) result.hidden = hidden;
+    if (excluded != null) result.excluded.addAll(excluded);
     if (offset != null) result.offset = offset;
     if (limit != null) result.limit = limit;
     return result;
@@ -214,6 +216,7 @@ class MediaSearchRequest extends $pb.GeneratedMessage {
     ..pPS(2, _omitFieldNames ? '' : 'mimetypes')
     ..aOB(3, _omitFieldNames ? '' : 'adult')
     ..aOB(4, _omitFieldNames ? '' : 'hidden')
+    ..pPS(5, _omitFieldNames ? '' : 'excluded')
     ..a<$fixnum.Int64>(
         900, _omitFieldNames ? '' : 'offset', $pb.PbFieldType.OU6,
         defaultOrMaker: $fixnum.Int64.ZERO)
@@ -270,21 +273,24 @@ class MediaSearchRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   void clearHidden() => $_clearField(4);
 
+  @$pb.TagNumber(5)
+  $pb.PbList<$core.String> get excluded => $_getList(4);
+
   @$pb.TagNumber(900)
-  $fixnum.Int64 get offset => $_getI64(4);
+  $fixnum.Int64 get offset => $_getI64(5);
   @$pb.TagNumber(900)
-  set offset($fixnum.Int64 value) => $_setInt64(4, value);
+  set offset($fixnum.Int64 value) => $_setInt64(5, value);
   @$pb.TagNumber(900)
-  $core.bool hasOffset() => $_has(4);
+  $core.bool hasOffset() => $_has(5);
   @$pb.TagNumber(900)
   void clearOffset() => $_clearField(900);
 
   @$pb.TagNumber(901)
-  $fixnum.Int64 get limit => $_getI64(5);
+  $fixnum.Int64 get limit => $_getI64(6);
   @$pb.TagNumber(901)
-  set limit($fixnum.Int64 value) => $_setInt64(5, value);
+  set limit($fixnum.Int64 value) => $_setInt64(6, value);
   @$pb.TagNumber(901)
-  $core.bool hasLimit() => $_has(5);
+  $core.bool hasLimit() => $_has(6);
   @$pb.TagNumber(901)
   void clearLimit() => $_clearField(901);
 }

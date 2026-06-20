@@ -14,6 +14,7 @@ import 'package:retrovibed/debug.dart' as debug;
 import 'package:retrovibed/designkit.dart' as ds;
 import 'api.dart' as api;
 import 'play.queue.dart';
+import 'play.queue.dart' as queue;
 
 class Playlist extends StatefulWidget {
   static void _noop(
@@ -162,6 +163,7 @@ class Playlist extends StatefulWidget {
 class _PlaylistState extends State<Playlist> {
   final PlayQueue _queue = PlayQueue();
   final Player player = Player();
+  RangeFn autoqueue = queue.search;
   final TextEditingController controller = TextEditingController();
   final FocusNode playerfocus = FocusNode(
     debugLabel: 'playlist.player.focus',
@@ -190,18 +192,26 @@ class _PlaylistState extends State<Playlist> {
   @override
   void initState() {
     super.initState();
+    search.addListener(() {
+      setState(() {
+        autoqueue = switch (mimex.category(search.value.next.mimetypes)) {
+          mimex.audio => queue.acoustic,
+          _ => queue.search,
+        };
+      });
+    });
+
     player.stream.tracks.listen((track) {
       final current = LanguageCode.code;
       final audio = track.audio.firstWhere((t) {
         return langcodex.match(current, t.language ?? "");
       }, orElse: AudioTrack.auto);
 
-      final subtitles =
-          audio.id != AudioTrack.auto().id
-              ? SubtitleTrack.no()
-              : track.subtitle.firstWhere((t) {
-                return langcodex.match(current, t.language ?? "");
-              }, orElse: SubtitleTrack.auto);
+      final subtitles = audio.id != AudioTrack.auto().id
+          ? SubtitleTrack.no()
+          : track.subtitle.firstWhere((t) {
+              return langcodex.match(current, t.language ?? "");
+            }, orElse: SubtitleTrack.auto);
       player.setAudioTrack(audio);
       player.setSubtitleTrack(subtitles);
 
@@ -242,9 +252,22 @@ class _PlaylistState extends State<Playlist> {
     });
   }
 
-  void setPlaylist(api.MediaSearchRequest q, Stream<PlayableMedia> pl) {
+  void setPlaylist(
+    api.MediaSearchRequest q,
+    api.Media current,
+    RangeFn autoqueue, {
+    Duration pos = const Duration(milliseconds: 0),
+  }) {
     setState(() {
-      _queue.reset(pl);
+      this.autoqueue = autoqueue;
+      _queue.reset(
+        autoqueue(
+          q,
+          current,
+          pos: pos,
+          options: () => [authn.request(authn.AuthzCache.meta(context))],
+        ),
+      );
       search.value..next = q;
       controller.text = q.query;
     });

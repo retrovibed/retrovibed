@@ -48,6 +48,15 @@ abstract class media {
   static MediaSearchResponse response({MediaSearchRequest? next}) =>
       MediaSearchResponse(next: next ?? request(limit: 100), items: []);
 
+  static Future<MediaSearchResponse> emptysearch(
+    MediaSearchRequest req, {
+    List<httpx.Option> options = const [],
+  }) async {
+    return Future.value(
+      MediaSearchResponse(items: [], next: req),
+    );
+  }
+
   static Future<MediaSearchResponse> search(
     MediaSearchRequest req, {
     List<httpx.Option> options = const [],
@@ -58,7 +67,7 @@ abstract class media {
             httpx.host(),
             "/m/",
           ).replace(query: qs.encode(req.toProto3Json())),
-          options: [httpx.Accept.json, ...options],
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
@@ -104,7 +113,7 @@ abstract class media {
         });
   }
 
-  static Future<List<Media>> similar(
+  static Future<MediaFindResponse> similar(
     String mediaId, {
     List<String> exclude = const [],
     List<httpx.Option> options = const [],
@@ -113,13 +122,13 @@ abstract class media {
     if (exclude.isNotEmpty) query['exclude'] = exclude.join(',');
     return httpx
         .get(
-          Uri.https(httpx.host(), "/similar/$mediaId").replace(queryParameters: query),
+          Uri.https(httpx.host(), "/similar/$mediaId").replace(query: qs.encode(query)),
           options: options,
         )
         .then((v) {
-          final body = jsonDecode(v.body) as Map<String, dynamic>;
-          final items = (body['items'] as List?) ?? [];
-          return items.map<Media>((e) => Media.create()..mergeFromProto3Json(e)).toList();
+          return Future.value(
+            MediaFindResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+          );
         });
   }
 
@@ -132,22 +141,26 @@ abstract class media {
     final buffered = <Media>[];
 
     return (MediaSearchRequest req, {List<httpx.Option> options = const []}) async {
-      if (buffered.isEmpty) {
-        try {
-          for (final m in await similar(seed, exclude: exclude.toList(), options: options)) {
-            exclude.add(m.id);
-            buffered.add(m);
-          }
-        } catch (cause) {
-          print("acoustic similarity lookup failed, falling back to random: $cause");
-        }
-      }
+      print("DERP DERP DERP ${req}");
+      return similar(seed, exclude: exclude.toList(), options: options).catchError((cause) {
+        return random(req, options: options);
+      });
+      // if (buffered.isEmpty) {
+      //   try {
+      //     for (final m in await ) {
+      //       exclude.add(m.id);
+      //       buffered.add(m);
+      //     }
+      //   } catch (cause) {
+      //     print("acoustic similarity lookup failed, falling back to random: $cause");
+      //   }
+      // }
 
-      if (buffered.isNotEmpty) {
-        return MediaFindResponse(media: buffered.removeAt(0));
-      }
+      // if (buffered.isNotEmpty) {
+      //   return MediaFindResponse(media: buffered.removeAt(0));
+      // }
 
-      return random(req, options: options);
+      // return random(req, options: options);
     };
   }
 
