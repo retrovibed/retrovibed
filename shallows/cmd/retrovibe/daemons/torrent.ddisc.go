@@ -19,6 +19,8 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/asynccompute"
 	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
+	"github.com/retrovibed/retrovibed/shallows/internal/env"
+	"github.com/retrovibed/retrovibed/shallows/internal/envx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
@@ -27,10 +29,37 @@ import (
 	"golang.org/x/time/rate"
 )
 
-func DiscoverMedia(ctx context.Context, db sqlx.Queryer, dhts *dht.Server, tclient *torrent.Client) error {
-	ttstore := storage.NewFile(userx.DefaultCacheDirectory("torrentddisc"))
-	l := rate.NewLimiter(rate.Every(time.Hour), 1)
-	identifyone := asynccompute.New(func(ctx context.Context, disc ddisc.Discovered) (err error) {
+type discoverMediaOptions struct {
+	frequency   time.Duration
+	peerTimeout time.Duration
+	infoTimeout time.Duration
+}
+
+type DiscoverMediaOption func(*discoverMediaOptions)
+
+func DiscoverMediaOptionFrequency(d time.Duration) DiscoverMediaOption {
+	return func(o *discoverMediaOptions) {
+		o.frequency = d
+	}
+}
+
+func DiscoverMediaOptionPeerTimeout(d time.Duration) DiscoverMediaOption {
+	return func(o *discoverMediaOptions) {
+		o.peerTimeout = d
+	}
+}
+
+func DiscoverMediaOptionInfoTimeout(d time.Duration) DiscoverMediaOption {
+	return func(o *discoverMediaOptions) {
+		o.infoTimeout = d
+	}
+}
+
+// newIdentifyOne builds the worker that locates, downloads, and identifies a single
+// discovered torrent. peerTimeout bounds the DHT peer lookup; infoTimeout bounds the
+// wait for torrent metadata/info once peers are being searched for.
+func newIdentifyOne(db sqlx.Queryer, dhts *dht.Server, tclient *torrent.Client, ttstore storage.ClientImpl, peerTimeout, infoTimeout time.Duration) func(ctx context.Context, disc ddisc.Discovered) error {
+	return func(ctx context.Context, disc ddisc.Discovered) (err error) {
 		defer func() {
 			if err == nil {
 				return
@@ -44,8 +73,9 @@ func DiscoverMedia(ctx context.Context, db sqlx.Queryer, dhts *dht.Server, tclie
 				),
 			)
 		}()
+
 		available := func(ctx context.Context, disc ddisc.Discovered) ([]dht.Peer, error) {
-			dctx, done := context.WithTimeout(ctx, time.Minute)
+			dctx, done := context.WithTimeout(ctx, peerTimeout)
 			defer done()
 			return torrentx.Peers(dctx, dhts, int160.FromBytes(disc.Infohash))
 		}
@@ -56,7 +86,7 @@ func DiscoverMedia(ctx context.Context, db sqlx.Queryer, dhts *dht.Server, tclie
 		}
 		log.Println("located", len(peers), "initial peers")
 
-		dctx, done := context.WithTimeout(ctx, 10*time.Minute)
+		dctx, done := context.WithTimeout(ctx, infoTimeout)
 		defer done()
 
 		log.Println("identify initiated", disc.ID, hex.EncodeToString(disc.Infohash), disc.NextCheckAt)
@@ -129,8 +159,26 @@ func DiscoverMedia(ctx context.Context, db sqlx.Queryer, dhts *dht.Server, tclie
 			return errorsx.Wrapf(err, "unable to mark as indexed: %s", disc.ID)
 		}
 
+		log.Println("successfully downloaded media", disc.Description)
+
 		return nil
-	}, asynccompute.Workers[ddisc.Discovered](32))
+	}
+}
+
+func DiscoverMedia(ctx context.Context, db sqlx.Queryer, dhts *dht.Server, tclient *torrent.Client, options ...DiscoverMediaOption) error {
+	opts := langx.Clone(discoverMediaOptions{
+		frequency:   envx.Duration(time.Hour, env.DDiscFrequency),
+		peerTimeout: time.Minute,
+		infoTimeout: 10 * time.Minute,
+	}, options...)
+
+	ttstore := storage.NewFile(userx.DefaultCacheDirectory("torrentddisc"))
+
+	l := rate.NewLimiter(rate.Every(opts.frequency), 1)
+	identifyone := asynccompute.New(
+		newIdentifyOne(db, dhts, tclient, ttstore, opts.peerTimeout, opts.infoTimeout),
+		asynccompute.Workers[ddisc.Discovered](envx.Uint[uint16](1, env.DDiscBackgroundWorkers)),
+	)
 
 	for err := l.Wait(ctx); err == nil; err = l.Wait(ctx) {
 		q := ddisc.DiscoveredSearchBuilder().Where(
@@ -142,12 +190,6 @@ func DiscoverMedia(ctx context.Context, db sqlx.Queryer, dhts *dht.Server, tclie
 		s := sqlx.Scan(ddisc.DiscoveredSearch(ctx, db, q))
 
 		for disc := range s.Iter() {
-			// errorsx.Log(
-			// 	errorsx.Wrap(
-			// 		ddisc.DiscoveredCooldown(ctx, db, disc).Scan(&disc),
-			// 		"failed to mark discovered media for cooldown",
-			// 	),
-			// )
 			if err := identifyone.Run(ctx, disc); err != nil {
 				log.Println(err)
 				continue

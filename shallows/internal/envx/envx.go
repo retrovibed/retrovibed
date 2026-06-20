@@ -22,7 +22,16 @@ import (
 
 // Int retrieve a integer flag from the environment, checks each key in order
 // first to parse successfully is returned.
-func Int[T int | int64](fallback T, keys ...string) T {
+func Int[T int | int8 | int16 | int32 | int64](fallback T, keys ...string) T {
+	return envval(fallback, func(s string) (T, error) {
+		decoded, err := strconv.ParseInt(s, 10, 64)
+		return T(decoded), errorsx.Wrapf(err, "integer '%s' is invalid", s)
+	}, keys...)
+}
+
+// Int retrieve a unsigned integer flag from the environment, checks each key in order
+// first to parse successfully is returned.
+func Uint[T uint | uint8 | uint16 | uint32 | uint64](fallback T, keys ...string) T {
 	return envval(fallback, func(s string) (T, error) {
 		decoded, err := strconv.ParseInt(s, 10, 64)
 		return T(decoded), errorsx.Wrapf(err, "integer '%s' is invalid", s)
