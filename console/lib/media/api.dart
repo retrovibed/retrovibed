@@ -16,7 +16,7 @@ typedef FnMediaSearch =
       List<httpx.Option> options,
     });
 
-typedef FnMediaRandom =
+typedef FnMediaFind =
     Future<MediaFindResponse> Function(
       MediaSearchRequest req, {
       List<httpx.Option> options,
@@ -48,6 +48,15 @@ abstract class media {
   static MediaSearchResponse response({MediaSearchRequest? next}) =>
       MediaSearchResponse(next: next ?? request(limit: 100), items: []);
 
+  static Future<MediaSearchResponse> emptysearch(
+    MediaSearchRequest req, {
+    List<httpx.Option> options = const [],
+  }) async {
+    return Future.value(
+      MediaSearchResponse(items: [], next: req),
+    );
+  }
+
   static Future<MediaSearchResponse> search(
     MediaSearchRequest req, {
     List<httpx.Option> options = const [],
@@ -58,7 +67,7 @@ abstract class media {
             httpx.host(),
             "/m/",
           ).replace(query: qs.encode(req.toProto3Json())),
-          options: [httpx.Accept.json, ...options],
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
@@ -104,51 +113,39 @@ abstract class media {
         });
   }
 
-  static Future<List<Media>> similar(
-    String mediaId, {
-    List<String> exclude = const [],
+  static Future<MediaFindResponse> similar(
+    String mediaId,
+    MediaSearchRequest req, {
     List<httpx.Option> options = const [],
   }) async {
-    final query = <String, String>{};
-    if (exclude.isNotEmpty) query['exclude'] = exclude.join(',');
     return httpx
         .get(
-          Uri.https(httpx.host(), "/similar/$mediaId").replace(queryParameters: query),
+          Uri.https(httpx.host(), "/similar/$mediaId").replace(query: qs.encode(req.toProto3Json())),
           options: options,
         )
         .then((v) {
-          final body = jsonDecode(v.body) as Map<String, dynamic>;
-          final items = (body['items'] as List?) ?? [];
-          return items.map<Media>((e) => Media.create()..mergeFromProto3Json(e)).toList();
+          return Future.value(
+            MediaFindResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+          );
         });
   }
 
-  // acoustic returns a random function anchored to seed: it serves acoustically
-  // similar tracks, refilling from /similar as its buffer drains, and falls back
-  // to random once the similarity engine has nothing left (cold start, below
-  // threshold, or library too small).
-  static FnMediaRandom acoustic(String seed) {
-    final exclude = <String>{seed};
-    final buffered = <Media>[];
-
-    return (MediaSearchRequest req, {List<httpx.Option> options = const []}) async {
-      if (buffered.isEmpty) {
-        try {
-          for (final m in await similar(seed, exclude: exclude.toList(), options: options)) {
-            exclude.add(m.id);
-            buffered.add(m);
-          }
-        } catch (cause) {
-          print("acoustic similarity lookup failed, falling back to random: $cause");
-        }
-      }
-
-      if (buffered.isNotEmpty) {
-        return MediaFindResponse(media: buffered.removeAt(0));
-      }
-
+  // acoustic returns a random function anchored to seed: each call fetches one
+  // acoustically similar track from /similar, excluding what's already been played,
+  // and falls back to random once the similarity engine has nothing left (cold start,
+  // below threshold, or library too small).
+  // the seed is the last excluded id - by construction (see PlayQueue.recent)
+  // that's always whatever's currently playing, so no separate seed parameter
+  // is needed here.
+  static Future<MediaFindResponse> acoustic(
+    MediaSearchRequest req, {
+    List<httpx.Option> options = const [],
+  }) async {
+    // if excluded is empty, its a bug.
+    return similar(req.excluded.last, req, options: options).catchError((cause) {
+      print("acoustic similarity lookup failed, falling back to random: $cause");
       return random(req, options: options);
-    };
+    });
   }
 
   static Future<http.StreamedResponse> download(

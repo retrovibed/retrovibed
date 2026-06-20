@@ -49,11 +49,12 @@ const MediaSearchRequest$json = {
     {'1': 'mimetypes', '3': 2, '4': 3, '5': 9, '10': 'mimetypes'},
     {'1': 'adult', '3': 3, '4': 1, '5': 8, '10': 'adult'},
     {'1': 'hidden', '3': 4, '4': 1, '5': 8, '10': 'hidden'},
+    {'1': 'excluded', '3': 5, '4': 3, '5': 9, '10': 'excluded'},
     {'1': 'offset', '3': 900, '4': 1, '5': 4, '10': 'offset'},
     {'1': 'limit', '3': 901, '4': 1, '5': 4, '10': 'limit'},
   ],
   '9': [
-    {'1': 5, '2': 900},
+    {'1': 6, '2': 900},
     {'1': 902, '2': 1000},
   ],
 };
@@ -62,8 +63,8 @@ const MediaSearchRequest$json = {
 final $typed_data.Uint8List mediaSearchRequestDescriptor = $convert.base64Decode(
     'ChJNZWRpYVNlYXJjaFJlcXVlc3QSFAoFcXVlcnkYASABKAlSBXF1ZXJ5EhwKCW1pbWV0eXBlcx'
     'gCIAMoCVIJbWltZXR5cGVzEhQKBWFkdWx0GAMgASgIUgVhZHVsdBIWCgZoaWRkZW4YBCABKAhS'
-    'BmhpZGRlbhIXCgZvZmZzZXQYhAcgASgEUgZvZmZzZXQSFQoFbGltaXQYhQcgASgEUgVsaW1pdE'
-    'oFCAUQhAdKBgiGBxDoBw==');
+    'BmhpZGRlbhIaCghleGNsdWRlZBgFIAMoCVIIZXhjbHVkZWQSFwoGb2Zmc2V0GIQHIAEoBFIGb2'
+    'Zmc2V0EhUKBWxpbWl0GIUHIAEoBFIFbGltaXRKBQgGEIQHSgYIhgcQ6Ac=');
 
 @$core.Deprecated('Use mediaSearchResponseDescriptor instead')
 const MediaSearchResponse$json = {

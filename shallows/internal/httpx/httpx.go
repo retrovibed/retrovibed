@@ -281,6 +281,12 @@ func WriteEmptyJSON(resp http.ResponseWriter, code int) (err error) {
 	return err
 }
 
+// WriteRetryJSON emits a 503 with a Retry-After header set to the provided duration.
+func WriteRetryJSON(resp http.ResponseWriter, after time.Duration) error {
+	resp.Header().Set("Retry-After", fmt.Sprintf("%d", int(after/time.Second)))
+	return WriteEmptyJSON(resp, http.StatusServiceUnavailable)
+}
+
 // RedirectHTTPRequest generates a url to redirect to from the provided
 // request and destination node
 func RedirectHTTPRequest(req *http.Request, dst string, defaultPort string) *url.URL {

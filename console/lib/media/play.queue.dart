@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:collection';
-import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:media_kit/media_kit.dart' as mediakit;
@@ -48,6 +47,10 @@ class RingBuffer<T> {
 }
 
 class PlayQueue {
+  // current/pos/recent are read lazily from inside range()'s async generator
+  // body - never synchronously at the point search()/random()/acoustic() are
+  // called, since reset() (which seeds current) doesn't run until after
+  // autoqueue(...) has already returned its Stream object.
   final ValueNotifier<PlayableMedia?> current = ValueNotifier(null);
   final RingBuffer<PlayableMedia> _upcoming = RingBuffer(128);
   final RingBuffer<PlayableMedia> _previous = RingBuffer(128);
@@ -57,11 +60,21 @@ class PlayQueue {
   int get previous => _previous.length;
 
   Known get known => current.value.known;
-  Duration get currentStart => current.value?.pos ?? Duration.zero;
+  Duration get pos => current.value?.pos ?? Duration.zero;
 
-  void reset(Stream<PlayableMedia> stream) {
+  // oldest -> newest, ending with the currently playing track (if any) - so
+  // recent.last is always "what's playing right now", with no separate
+  // current/seed parameter needed wherever this feeds an exclusion list.
+  List<PlayableMedia> get recent => [
+    ..._previous.toList(),
+    if (current.value != null) current.value!,
+  ];
+
+  void reset(Stream<PlayableMedia> stream, Media media, {Duration pos = const Duration(milliseconds: 0)}) {
     _stream = StreamIterator(stream);
     _upcoming.clear();
+    _previous.clear();
+    current.value = PlayableMedia(media, pos: pos);
   }
 
   Future<PlayableMedia?> advance(String auth, mediakit.Player player) async {
@@ -78,13 +91,22 @@ class PlayQueue {
 
     try {
       await player.open(m.playable(auth));
-      _previous.insert(current.value);
+      // skips the push when the outgoing and incoming track are the same -
+      // notably true for the very first advance after reset(), since the
+      // seed media and the stream's first (re-fetched) item share an id.
+      if (current.value?.current.id != m.current.id) {
+        _previous.insert(current.value);
+      }
       current.value = m;
       return m;
     } catch (cause) {
       print("unable to pull next media from playlist $cause");
       return null;
     }
+  }
+
+  void push(PlayableMedia media) {
+    _upcoming.insert(media);
   }
 
   Future<PlayableMedia?> reverse(String auth, mediakit.Player player) async {
@@ -129,22 +151,32 @@ extension PlayableMediaNullable on PlayableMedia? {
 
 Stream<PlayableMedia> range(
   MediaSearchRequest req,
-  Media current, {
-  Duration pos = const Duration(milliseconds: 0),
+  PlayQueue queue, {
   List<httpx.Option> Function() options = httpx.Request.empty,
   api.FnMediaSearch search = api.media.search,
-  api.FnMediaRandom random = api.media.random,
+  api.FnMediaFind random = api.media.random,
 }) async* {
-  MediaSearchResponse i = await search(req, options: options());
-  final initial = i.items.sublist(
-    max(i.items.indexWhere((m) => m.id == current.id), 0),
-  );
+  final playable = queue.current.value;
 
-  for (var (idx, m) in initial.indexed) {
+  MediaSearchResponse i = await search(req, options: options());
+
+  // the anchor (queue.current) is always yielded directly below, using the
+  // Media + position already known to the queue - it doesn't need to be
+  // present in the search results. when it is present, skip it here so it
+  // isn't yielded twice.
+  final anchor = playable?.current.id ?? uuidx.min();
+  final idx = i.items.indexWhere((m) => m.id == anchor);
+  final initial = idx == -1 ? i.items : i.items.sublist(idx + 1);
+
+  if (playable != null) {
     yield PlayableMedia(
-      m,
-      pos: idx == 0 ? pos : const Duration(milliseconds: 0),
+      playable.current,
+      pos: queue.pos,
     );
+  }
+
+  for (var m in initial) {
+    yield PlayableMedia(m);
   }
 
   while (i.items.length == i.next.limit.toInt()) {
@@ -160,7 +192,53 @@ Stream<PlayableMedia> range(
   // from the initial request. we'll eventually add in more coherent
   // results to keep a trend going.
   while (true) {
+    i.next.excluded
+      ..clear()
+      ..addAll(queue.recent.map((m) => m.current.id));
     final v = await random(i.next, options: options());
     yield PlayableMedia(v.media);
   }
+}
+
+typedef RangeFn =
+    Stream<PlayableMedia> Function(
+      MediaSearchRequest req,
+      PlayQueue queue, {
+      List<httpx.Option> Function() options,
+    });
+
+Stream<PlayableMedia> search(
+  MediaSearchRequest req,
+  PlayQueue queue, {
+  List<httpx.Option> Function() options = httpx.Request.empty,
+}) {
+  return range(req, queue, options: options, random: api.media.random);
+}
+
+Stream<PlayableMedia> random(
+  MediaSearchRequest req,
+  PlayQueue queue, {
+  List<httpx.Option> Function() options = httpx.Request.empty,
+}) {
+  return range(
+    req,
+    queue,
+    options: options,
+    search: api.media.emptysearch,
+    random: api.media.random,
+  );
+}
+
+Stream<PlayableMedia> acoustic(
+  MediaSearchRequest req,
+  PlayQueue queue, {
+  List<httpx.Option> Function() options = httpx.Request.empty,
+}) {
+  return range(
+    req,
+    queue,
+    options: options,
+    search: api.media.emptysearch,
+    random: api.media.acoustic,
+  );
 }

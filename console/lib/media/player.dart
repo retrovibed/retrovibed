@@ -4,6 +4,7 @@ import 'package:media_kit/media_kit.dart'; // Provides [Player], [Media], [Playl
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/debug.dart' as debug;
+import 'package:retrovibed/media/player.control.shuffle.dart';
 import 'package:retrovibed/uuidx.dart' as uuidx;
 import './playlist.dart' as internal;
 import './player.control.previous.dart';
@@ -77,6 +78,7 @@ class _VideoState extends State<VideoScreen> {
     final defaults = ds.Defaults.of(context);
     final plist = internal.Playlist.of(context)!;
     _controls = [
+      PlayerControlShuffle(plist.current),
       PlayerControlPrevious(),
       MaterialPlayOrPauseButton(),
       PlayerControlNext(),

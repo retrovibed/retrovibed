@@ -143,6 +143,7 @@ type MediaSearchRequest struct {
 	Mimetypes     []string               `protobuf:"bytes,2,rep,name=mimetypes,proto3" json:"mimetypes,omitempty"`
 	Adult         bool                   `protobuf:"varint,3,opt,name=adult,proto3" json:"adult,omitempty"`
 	Hidden        bool                   `protobuf:"varint,4,opt,name=hidden,proto3" json:"hidden,omitempty"`
+	Excluded      []string               `protobuf:"bytes,5,rep,name=excluded,proto3" json:"excluded,omitempty"`
 	Offset        uint64                 `protobuf:"varint,900,opt,name=offset,proto3" json:"offset,omitempty"`
 	Limit         uint64                 `protobuf:"varint,901,opt,name=limit,proto3" json:"limit,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -205,6 +206,13 @@ func (x *MediaSearchRequest) GetHidden() bool {
 		return x.Hidden
 	}
 	return false
+}
+
+func (x *MediaSearchRequest) GetExcluded() []string {
+	if x != nil {
+		return x.Excluded
+	}
+	return nil
 }
 
 func (x *MediaSearchRequest) GetOffset() uint64 {
@@ -1777,14 +1785,15 @@ const file_media_proto_rawDesc = "" +
 	"updated_at\x12&\n" +
 	"\x0eknown_media_id\x18\t \x01(\tR\x0eknown_media_id\x12(\n" +
 	"\x0fencryption_seed\x18\n" +
-	" \x01(\tR\x0fencryption_seed\"\xb5\x01\n" +
+	" \x01(\tR\x0fencryption_seed\"\xd1\x01\n" +
 	"\x12MediaSearchRequest\x12\x14\n" +
 	"\x05query\x18\x01 \x01(\tR\x05query\x12\x1c\n" +
 	"\tmimetypes\x18\x02 \x03(\tR\tmimetypes\x12\x14\n" +
 	"\x05adult\x18\x03 \x01(\bR\x05adult\x12\x16\n" +
-	"\x06hidden\x18\x04 \x01(\bR\x06hidden\x12\x17\n" +
+	"\x06hidden\x18\x04 \x01(\bR\x06hidden\x12\x1a\n" +
+	"\bexcluded\x18\x05 \x03(\tR\bexcluded\x12\x17\n" +
 	"\x06offset\x18\x84\a \x01(\x04R\x06offset\x12\x15\n" +
-	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\x05\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"h\n" +
+	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\x06\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"h\n" +
 	"\x13MediaSearchResponse\x12-\n" +
 	"\x04next\x18\x01 \x01(\v2\x19.media.MediaSearchRequestR\x04next\x12\"\n" +
 	"\x05items\x18\x02 \x03(\v2\f.media.MediaR\x05items\"7\n" +

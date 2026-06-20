@@ -2,9 +2,10 @@ package media
 
 import (
 	"log"
+	"math/rand"
 	"net/http"
-	"strings"
 
+	"github.com/go-playground/form/v4"
 	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
@@ -13,6 +14,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/acoustics"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/formx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
@@ -38,12 +40,14 @@ func NewHTTPSimilar(q sqlx.Queryer, options ...HTTPSimilarOption) *HTTPSimilar {
 	return new(langx.Clone(HTTPSimilar{
 		q:         q,
 		jwtsecret: env.JWTSecret,
+		decoder:   formx.NewDecoder(),
 	}, options...))
 }
 
 type HTTPSimilar struct {
 	q         sqlx.Queryer
 	jwtsecret jwtx.SecretSource
+	decoder   *form.Decoder
 }
 
 func (t *HTTPSimilar) Bind(r *mux.Router) {
@@ -55,15 +59,13 @@ func (t *HTTPSimilar) Bind(r *mux.Router) {
 	).ThenFunc(t.similar))
 }
 
-type SimilarResponse struct {
-	Items []*Media `json:"items"`
-}
-
 func (t *HTTPSimilar) similar(w http.ResponseWriter, r *http.Request) {
 	var (
 		err     error
 		mediaID uuid.UUID
 		md      library.Metadata
+		result  MediaFindResponse
+		req     MediaSearchRequest
 	)
 
 	log.Println("acoustic similarity initiated")
@@ -74,30 +76,23 @@ func (t *HTTPSimilar) similar(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	count, err := acoustics.IndexedCount(r.Context(), t.q, acoustics.StatsVersion)
-	if err != nil {
-		log.Println(errorsx.Wrap(err, "acoustics: count indexed"))
-		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
-		return
-	}
-	if count < acoustics.ColdStartThreshold {
-		w.Header().Set("Retry-After", "60")
-		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusServiceUnavailable))
+	if err = t.decoder.Decode(&req, r.Form); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to decode request"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
 	}
 
 	seedVec, err := acoustics.FetchFeatures(r.Context(), t.q, mediaID)
-	if err != nil {
-		if sqlx.IgnoreNoRows(err) == nil {
-			errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
-			return
-		}
+	if sqlx.IgnoreNoRows(err) != nil {
 		log.Println(errorsx.Wrap(err, "acoustics: fetch seed vector"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
+	} else if err != nil {
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
+		return
 	}
 
-	parsed, _ := slicesx.MapTransformErr(uuid.FromString, strings.Split(r.FormValue("exclude"), ",")...)
+	parsed := slicesx.MapTransform(uuid.FromStringOrNil, req.Excluded...)
 	exclude := append([]uuid.UUID{mediaID}, parsed...)
 
 	ids, err := acoustics.SimilarMediaIDs(r.Context(), t.q, seedVec, exclude, similarLimit, similarityThreshold)
@@ -107,20 +102,34 @@ func (t *HTTPSimilar) similar(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp := SimilarResponse{Items: make([]*Media, 0, len(ids))}
+	rand.Shuffle(len(ids), func(i, j int) {
+		ids[i], ids[j] = ids[j], ids[i]
+	})
+
 	for _, id := range ids {
-		if err = library.MetadataFindByID(r.Context(), t.q, id.String()).Scan(&md); err != nil {
+		if err = library.MetadataFindByID(r.Context(), t.q, id.String()).Scan(&md); sqlx.ErrNoRows(err) != nil {
 			continue
+		} else if err != nil {
+			log.Println(errorsx.Wrap(err, "acoustics: metadata"))
+			errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+			return
 		}
 
-		resp.Items = append(resp.Items, new(langx.Clone(
-			Media{},
-			MediaOptionFromLibraryMetadata(langx.Clone(md, timex.JSONSafeEncodeOption)),
-			MediaOptionImageAuto(r),
-		)))
+		result.Media = new(
+			langx.Clone(
+				Media{},
+				MediaOptionFromLibraryMetadata(langx.Clone(md, timex.JSONSafeEncodeOption)),
+				MediaOptionImageAuto(r),
+			),
+		)
+
+		if err = httpx.WriteJSON(w, httpx.GetBuffer(r), &result); err != nil {
+			log.Println(errorsx.Wrap(err, "acoustics: write response"))
+			return
+		}
+
+		return
 	}
 
-	if err = httpx.WriteJSON(w, httpx.GetBuffer(r), &resp); err != nil {
-		log.Println(errorsx.Wrap(err, "acoustics: write response"))
-	}
+	errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
 }

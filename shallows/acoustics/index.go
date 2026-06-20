@@ -10,7 +10,6 @@ const (
 	MinTrackDuration   = 10.0 // seconds; shorter tracks excluded
 	MaxSegmentDuration = 30.0 // cap per segment
 	NumSegments        = 3
-	ColdStartThreshold = 50
 	StatsVersion       = 1
 )
 

@@ -635,4 +635,48 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   });
+
+  group('Help content close button', () {
+    testWidgets('closing the help content does not throw after the originating widget is removed', (tester) async {
+      final show = ValueNotifier(true);
+
+      await tester.pumpApp(
+        modals.Node(
+          HelpScope(
+            ValueListenableBuilder<bool>(
+              valueListenable: show,
+              builder: (_, visible, __) {
+                if (!visible) return Text('removed');
+                return Help(Text('child'), Hint(const Text('desc')), key: Key('help'));
+              },
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.altLeft);
+      await tester.sendKeyEvent(LogicalKeyboardKey.slash);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.clear));
+      await tester.pumpAndSettle();
+      await tester.tap(find.descendant(of: find.byKey(Key('help')), matching: find.byType(InkWell)));
+      await tester.pumpAndSettle();
+      expect(find.text('desc'), findsOneWidget);
+
+      // Remove the widget that originally opened the help content while its
+      // modal is still showing. The close button must not depend on that
+      // widget's (now deactivated) BuildContext to find the modal node.
+      show.value = false;
+      await tester.pumpAndSettle();
+      expect(find.text('desc'), findsOneWidget);
+
+      await tester.tap(find.byIcon(Icons.clear));
+      await tester.pumpAndSettle();
+
+      expect(find.text('desc'), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+  });
 }

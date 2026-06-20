@@ -13,7 +13,7 @@ import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/debug.dart' as debug;
 import 'package:retrovibed/designkit.dart' as ds;
 import 'api.dart' as api;
-import 'play.queue.dart';
+import 'play.queue.dart' as playqueue;
 
 class Playlist extends StatefulWidget {
   static void _noop(
@@ -160,8 +160,9 @@ class Playlist extends StatefulWidget {
 }
 
 class _PlaylistState extends State<Playlist> {
-  final PlayQueue _queue = PlayQueue();
+  final playqueue.PlayQueue _queue = playqueue.PlayQueue();
   final Player player = Player();
+  playqueue.RangeFn autoqueue = playqueue.search;
   final TextEditingController controller = TextEditingController();
   final FocusNode playerfocus = FocusNode(
     debugLabel: 'playlist.player.focus',
@@ -180,7 +181,8 @@ class _PlaylistState extends State<Playlist> {
   );
 
   Known get known => _queue.current.value.known;
-  ValueNotifier<PlayableMedia?> get current => _queue.current;
+  ValueNotifier<playqueue.PlayableMedia?> get current => _queue.current;
+  playqueue.PlayQueue get queue => _queue;
 
   void setState(VoidCallback fn) {
     if (!mounted) return;
@@ -190,18 +192,26 @@ class _PlaylistState extends State<Playlist> {
   @override
   void initState() {
     super.initState();
+    search.addListener(() {
+      setState(() {
+        autoqueue = switch (mimex.category(search.value.next.mimetypes)) {
+          mimex.audio => playqueue.acoustic,
+          _ => playqueue.search,
+        };
+      });
+    });
+
     player.stream.tracks.listen((track) {
       final current = LanguageCode.code;
       final audio = track.audio.firstWhere((t) {
         return langcodex.match(current, t.language ?? "");
       }, orElse: AudioTrack.auto);
 
-      final subtitles =
-          audio.id != AudioTrack.auto().id
-              ? SubtitleTrack.no()
-              : track.subtitle.firstWhere((t) {
-                return langcodex.match(current, t.language ?? "");
-              }, orElse: SubtitleTrack.auto);
+      final subtitles = audio.id != AudioTrack.auto().id
+          ? SubtitleTrack.no()
+          : track.subtitle.firstWhere((t) {
+              return langcodex.match(current, t.language ?? "");
+            }, orElse: SubtitleTrack.auto);
       player.setAudioTrack(audio);
       player.setSubtitleTrack(subtitles);
 
@@ -242,9 +252,23 @@ class _PlaylistState extends State<Playlist> {
     });
   }
 
-  void setPlaylist(api.MediaSearchRequest q, Stream<PlayableMedia> pl) {
+  void setPlaylist(
+    api.MediaSearchRequest q,
+    api.Media current,
+    playqueue.RangeFn autoqueue, {
+    Duration pos = const Duration(milliseconds: 0),
+  }) {
     setState(() {
-      _queue.reset(pl);
+      this.autoqueue = autoqueue;
+      _queue.reset(
+        autoqueue(
+          q,
+          _queue,
+          options: () => [authn.request(authn.AuthzCache.meta(context))],
+        ),
+        current,
+        pos: pos,
+      );
       search.value..next = q;
       controller.text = q.query;
     });
@@ -253,7 +277,7 @@ class _PlaylistState extends State<Playlist> {
 
   void next() {
     print(
-      "next initiated: ${_queue.previous} | ${known.description} - ${_queue.currentStart} | ${_queue.upcoming}",
+      "next initiated: ${_queue.previous} | ${known.description} - ${_queue.pos} | ${_queue.upcoming}",
     );
     _advance().whenComplete(() {
       print(
@@ -273,14 +297,14 @@ class _PlaylistState extends State<Playlist> {
     });
   }
 
-  Future<PlayableMedia?> _reverse() {
+  Future<playqueue.PlayableMedia?> _reverse() {
     return authn.bearer(authn.AuthzCache.meta(context)).then((auth) => _queue.reverse(auth, player)).then((m) {
       if (m != null) setState(() {});
       return m;
     });
   }
 
-  Future<PlayableMedia?> _advance() {
+  Future<playqueue.PlayableMedia?> _advance() {
     return authn.bearer(authn.AuthzCache.meta(context)).then((auth) => _queue.advance(auth, player)).then((m) {
       if (m != null) setState(() {});
       return m;

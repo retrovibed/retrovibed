@@ -76,10 +76,10 @@ class _HelpState extends State<Help> {
     return InkWell(
       mouseCursor: SystemMouseCursors.click,
       onTap: () {
-        modals.asyncfn(context, (_) {
+        modals.asyncfn<void>(context, (completion) {
           return _HelpContent(
             widget.description,
-            () => modals.of(context)?.push(null),
+            () => completion.complete(),
           );
         });
       },

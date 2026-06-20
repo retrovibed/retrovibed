@@ -1,0 +1,139 @@
+import 'package:flutter/material.dart';
+import 'package:retrovibed/mimex.dart' as mimex;
+import 'package:retrovibed/designkit.dart' as ds;
+import './play.queue.dart';
+import './playlist.dart' as internal;
+import './play.list.history.dart';
+
+class PlayerControlShuffle extends StatelessWidget {
+  final ValueNotifier<PlayableMedia?> events;
+  const PlayerControlShuffle(this.events, {Key? key}) : super(key: key);
+
+  static IconData _icon(RangeFn mode) {
+    if (mode == random) return Icons.shuffle;
+    if (mode == acoustic) return Icons.graphic_eq;
+    return Icons.queue;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<PlayableMedia?>(
+      valueListenable: events,
+      builder: (context, media, _) {
+        switch (mimex.icon(media?.current.mimetype ?? mimex.binary)) {
+          case mimex.icoaudio:
+            final playlist = internal.Playlist.of(context);
+            if (playlist == null) return ds.Empty;
+            return ds.Help(
+              IconButton(
+                icon: Icon(_icon(playlist.autoqueue)),
+                onPressed: () {
+                  ds.modals
+                      .asyncfn<RangeFn>(
+                        context,
+                        (completion) => PlaybackStrategyModal(
+                          current: playlist.autoqueue,
+                          history: playlist.queue.recent,
+                          onModeSelected: completion.complete,
+                          onHistorySelected: (item) {
+                            playlist.queue.push(item);
+                            playlist.next();
+                            completion.complete(playlist.autoqueue);
+                          },
+                        ),
+                      )
+                      .then((mode) {
+                        if (mode == playlist.autoqueue) return;
+                        final current = media?.current;
+                        if (current == null) return;
+                        playlist.setPlaylist(
+                          playlist.search.value.next,
+                          current,
+                          mode,
+                          pos: playlist.player.state.position,
+                        );
+                      });
+                },
+              ),
+              Column(
+                children: [
+                  Text("Auto queue strategy"),
+                  ds.Hint.multiline(const [
+                    ds.HelpLabelled(
+                      label: Text("Auto"),
+                      description: Text("play media that sounds similar to what's currently playing"),
+                    ),
+                    ds.HelpLabelled(
+                      label: Text("Search"),
+                      description: Text("play through the current search results, then fall back to random media"),
+                    ),
+                    ds.HelpLabelled(label: Text("Random"), description: Text("play random media")),
+                  ]),
+                ],
+              ),
+            );
+          default:
+            return ds.Empty;
+        }
+      },
+    );
+  }
+}
+
+class PlaybackStrategyModal extends StatelessWidget {
+  final RangeFn current;
+  final List<PlayableMedia> history;
+  final void Function(RangeFn mode) onModeSelected;
+  final void Function(PlayableMedia media) onHistorySelected;
+  const PlaybackStrategyModal({
+    super.key,
+    required this.current,
+    required this.history,
+    required this.onModeSelected,
+    required this.onHistorySelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return PlayListHistory(
+      history,
+      constraints: const BoxConstraints(maxWidth: 512),
+      leading: [
+        _PlaybackStrategyMenu(current: current, onSelected: onModeSelected),
+      ],
+      onTap: onHistorySelected,
+    );
+  }
+}
+
+class _PlaybackStrategyMenu extends StatelessWidget {
+  static const _options = <(RangeFn, String)>[
+    (acoustic, 'Auto'),
+    (search, 'Search'),
+    (random, 'Random'),
+  ];
+
+  final RangeFn current;
+  final void Function(RangeFn mode) onSelected;
+  const _PlaybackStrategyMenu({
+    required this.current,
+    required this.onSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (final (mode, label) in _options)
+          IconButton(
+            tooltip: label,
+            color: mode == current ? theme.colorScheme.primary : null,
+            icon: Icon(PlayerControlShuffle._icon(mode)),
+            onPressed: () => onSelected(mode),
+          ),
+      ],
+    );
+  }
+}

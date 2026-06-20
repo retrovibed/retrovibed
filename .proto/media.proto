@@ -20,7 +20,8 @@ message MediaSearchRequest {
   repeated string mimetypes = 2 [ json_name = "mimetypes" ];
   bool adult = 3 [ json_name = "adult" ];
   bool hidden = 4 [ json_name = "hidden" ];
-  reserved 5 to 899;
+  repeated string excluded = 5 [ json_name = "excluded" ];
+  reserved 6 to 899;
   uint64 offset = 900 [ json_name = "offset" ];
   uint64 limit = 901 [ json_name = "limit" ];
   reserved 902 to 999;
