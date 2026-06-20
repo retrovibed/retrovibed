@@ -48,20 +48,28 @@ class RingBuffer<T> {
 }
 
 class PlayQueue {
+  // current/currentStart/recent are read lazily from inside range()'s async
+  // generator body (or from a callback invoked later, like acoustic()'s seed
+  // function) - never synchronously at the point search()/random()/acoustic()
+  // are called, since reset() (which seeds current) doesn't run until after
+  // autoqueue(...) has already returned its Stream object.
   final ValueNotifier<PlayableMedia?> current = ValueNotifier(null);
   final RingBuffer<PlayableMedia> _upcoming = RingBuffer(128);
-  final RingBuffer<PlayableMedia> _previous = RingBuffer(128);
+  final RingBuffer<PlayableMedia> _previous = RingBuffer(100);
   StreamIterator<PlayableMedia> _stream = StreamIterator(Stream.empty());
 
   int get upcoming => _upcoming.length;
   int get previous => _previous.length;
 
   Known get known => current.value.known;
-  Duration get currentStart => current.value?.pos ?? Duration.zero;
+  Duration get pos => current.value?.pos ?? Duration.zero;
+  List<String> get recent => _previous.toList().map((m) => m.current.id).toList();
 
-  void reset(Stream<PlayableMedia> stream) {
+  void reset(Stream<PlayableMedia> stream, Media media, {Duration pos = const Duration(milliseconds: 0)}) {
     _stream = StreamIterator(stream);
     _upcoming.clear();
+    _previous.clear();
+    current.value = PlayableMedia(media, pos: pos);
   }
 
   Future<PlayableMedia?> advance(String auth, mediakit.Player player) async {
@@ -78,7 +86,12 @@ class PlayQueue {
 
     try {
       await player.open(m.playable(auth));
-      _previous.insert(current.value);
+      // skips the push when the outgoing and incoming track are the same -
+      // notably true for the very first advance after reset(), since the
+      // seed media and the stream's first (re-fetched) item share an id.
+      if (current.value?.current.id != m.current.id) {
+        _previous.insert(current.value);
+      }
       current.value = m;
       return m;
     } catch (cause) {
@@ -129,23 +142,21 @@ extension PlayableMediaNullable on PlayableMedia? {
 
 Stream<PlayableMedia> range(
   MediaSearchRequest req,
-  Media current, {
-  Duration pos = const Duration(milliseconds: 0),
+  PlayQueue queue, {
   List<httpx.Option> Function() options = httpx.Request.empty,
   api.FnMediaSearch search = api.media.search,
-  api.FnMediaRandom random = api.media.random,
+  api.FnMediaFind random = api.media.random,
 }) async* {
-  print("DERP DERP current ${current}");
-  print("DERP DERP ${req}");
   MediaSearchResponse i = await search(req, options: options());
+  final anchor = queue.current.value!.current.id;
   final initial = i.items.sublist(
-    max(i.items.indexWhere((m) => m.id == current.id), 0),
+    max(i.items.indexWhere((m) => m.id == anchor), 0),
   );
 
   for (var (idx, m) in initial.indexed) {
     yield PlayableMedia(
       m,
-      pos: idx == 0 ? pos : const Duration(milliseconds: 0),
+      pos: idx == 0 ? queue.pos : const Duration(milliseconds: 0),
     );
   }
 
@@ -162,6 +173,9 @@ Stream<PlayableMedia> range(
   // from the initial request. we'll eventually add in more coherent
   // results to keep a trend going.
   while (true) {
+    i.next.excluded
+      ..clear()
+      ..addAll(queue.recent);
     final v = await random(i.next, options: options());
     yield PlayableMedia(v.media);
   }
@@ -170,41 +184,42 @@ Stream<PlayableMedia> range(
 typedef RangeFn =
     Stream<PlayableMedia> Function(
       MediaSearchRequest req,
-      Media current, {
-      Duration pos,
+      PlayQueue queue, {
       List<httpx.Option> Function() options,
     });
 
 Stream<PlayableMedia> search(
   MediaSearchRequest req,
-  Media current, {
-  Duration pos = const Duration(milliseconds: 0),
+  PlayQueue queue, {
   List<httpx.Option> Function() options = httpx.Request.empty,
 }) {
-  return range(req, current, pos: pos, options: options, random: api.media.random);
+  return range(req, queue, options: options, random: api.media.random);
 }
 
 Stream<PlayableMedia> random(
   MediaSearchRequest req,
-  Media current, {
-  Duration pos = const Duration(milliseconds: 0),
-  List<httpx.Option> Function() options = httpx.Request.empty,
-}) {
-  return range(req, current, pos: pos, options: options, search: api.media.emptysearch, random: api.media.random);
-}
-
-Stream<PlayableMedia> acoustic(
-  MediaSearchRequest req,
-  Media current, {
-  Duration pos = const Duration(milliseconds: 0),
+  PlayQueue queue, {
   List<httpx.Option> Function() options = httpx.Request.empty,
 }) {
   return range(
     req,
-    current,
-    pos: pos,
+    queue,
     options: options,
     search: api.media.emptysearch,
-    random: api.media.acoustic(current.id),
+    random: api.media.random,
+  );
+}
+
+Stream<PlayableMedia> acoustic(
+  MediaSearchRequest req,
+  PlayQueue queue, {
+  List<httpx.Option> Function() options = httpx.Request.empty,
+}) {
+  return range(
+    req,
+    queue,
+    options: options,
+    search: api.media.emptysearch,
+    random: api.media.acoustic(() => queue.current.value!.current.id),
   );
 }

@@ -46,7 +46,7 @@ void main() {
 
   group('PlayQueue.currentStart', () {
     test('returns Duration.zero when no media is loaded', () {
-      expect(PlayQueue().currentStart, Duration.zero);
+      expect(PlayQueue().pos, Duration.zero);
     });
   });
 
@@ -150,16 +150,17 @@ void main() {
           next: _req(limit),
         );
 
-    api.FnMediaRandom _random(String id) => (req, {options = const []}) async => api.MediaFindResponse(media: _m(id));
+    api.FnMediaFind _random(String id) =>
+        (req, {options = const []}) async => api.MediaFindResponse(media: _m(id));
 
     test('yields items starting from current', () async {
-      final results =
-          await range(
-            _req(10),
-            _m('b'),
-            search: _search([_m('a'), _m('b'), _m('c')], 10),
-            random: _random('rand'),
-          ).take(3).toList();
+      final results = await range(
+        _req(10),
+        _m('b'),
+        PlayQueue(),
+        search: _search([_m('a'), _m('b'), _m('c')], 10),
+        random: _random('rand'),
+      ).take(3).toList();
 
       expect(_id(results[0]), 'b');
       expect(_id(results[1]), 'c');
@@ -167,13 +168,13 @@ void main() {
     });
 
     test('falls back to index 0 when current not found', () async {
-      final results =
-          await range(
-            _req(10),
-            _m('missing'),
-            search: _search([_m('a'), _m('b')], 10),
-            random: _random('rand'),
-          ).take(2).toList();
+      final results = await range(
+        _req(10),
+        _m('missing'),
+        PlayQueue(),
+        search: _search([_m('a'), _m('b')], 10),
+        random: _random('rand'),
+      ).take(2).toList();
 
       expect(_id(results[0]), 'a');
       expect(_id(results[1]), 'b');
@@ -182,14 +183,14 @@ void main() {
     test('applies pos to first item only', () async {
       const pos = Duration(seconds: 5);
 
-      final results =
-          await range(
-            _req(10),
-            _m('a'),
-            pos: pos,
-            search: _search([_m('a'), _m('b')], 10),
-            random: _random('rand'),
-          ).take(2).toList();
+      final results = await range(
+        _req(10),
+        _m('a'),
+        PlayQueue(),
+        pos: pos,
+        search: _search([_m('a'), _m('b')], 10),
+        random: _random('rand'),
+      ).take(2).toList();
 
       expect(results[0].pos, pos);
       expect(results[1].pos, Duration.zero);
@@ -208,13 +209,13 @@ void main() {
             : api.MediaSearchResponse(items: [_m('c')], next: _req(2));
       }
 
-      final results =
-          await range(
-            _req(2),
-            _m('a'),
-            search: search,
-            random: _random('rand'),
-          ).take(4).toList();
+      final results = await range(
+        _req(2),
+        _m('a'),
+        PlayQueue(),
+        search: search,
+        random: _random('rand'),
+      ).take(4).toList();
 
       expect(_id(results[0]), 'a');
       expect(_id(results[1]), 'b');
@@ -226,16 +227,16 @@ void main() {
     test('falls back to random after search exhausted', () async {
       var randomCalled = false;
 
-      final results =
-          await range(
-            _req(10),
-            _m('a'),
-            search: _search([_m('a')], 10),
-            random: (req, {options = const []}) async {
-              randomCalled = true;
-              return api.MediaFindResponse(media: _m('rand'));
-            },
-          ).take(2).toList();
+      final results = await range(
+        _req(10),
+        _m('a'),
+        PlayQueue(),
+        search: _search([_m('a')], 10),
+        random: (req, {options = const []}) async {
+          randomCalled = true;
+          return api.MediaFindResponse(media: _m('rand'));
+        },
+      ).take(2).toList();
 
       expect(randomCalled, isTrue);
       expect(_id(results[1]), 'rand');

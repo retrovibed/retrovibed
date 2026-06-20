@@ -263,10 +263,11 @@ class _PlaylistState extends State<Playlist> {
       _queue.reset(
         autoqueue(
           q,
-          current,
-          pos: pos,
+          _queue,
           options: () => [authn.request(authn.AuthzCache.meta(context))],
         ),
+        current,
+        pos: pos,
       );
       search.value..next = q;
       controller.text = q.query;
@@ -276,7 +277,7 @@ class _PlaylistState extends State<Playlist> {
 
   void next() {
     print(
-      "next initiated: ${_queue.previous} | ${known.description} - ${_queue.currentStart} | ${_queue.upcoming}",
+      "next initiated: ${_queue.previous} | ${known.description} - ${_queue.pos} | ${_queue.upcoming}",
     );
     _advance().whenComplete(() {
       print(
