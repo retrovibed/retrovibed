@@ -90,45 +90,43 @@ class _RecentState extends State<Recent> {
   @override
   Widget build(BuildContext context) {
     return ds.CarouselRow(
-      title: const Text('Continue Watching'),
+      title: const Text('Continue'),
       constraints: BoxConstraints.tightForFinite(height: 256),
       background: ds.Repeat(() => lib.KnownMediaCard(lib.Known(), icon: null)),
       empty: Text(
         'Media you watch will appear here',
         style: TextStyle(color: Colors.grey),
       ),
-      items:
-          _result.items.map((item) {
-            final deletion = () {
-              return httpx.withRetry(
-                () => widget
-                    .tombstone(item.id, options: [authn.request(authn.AuthzCache.meta(context))])
-                    .then((_) => _load(context)),
-              );
-            };
-            return lib.KnownMediaCard.future(
-              lib.known.autodetect(item.media, options: [authn.request(authn.AuthzCache.meta(context))]),
-              onTap: () {
-                final pos = Duration(milliseconds: item.position.toInt());
-                final dur = Duration(milliseconds: item.duration.toInt());
-                final delta = (dur - pos).compareTo(Duration(seconds: 1));
-                final playlist = media.Playlist.of(context);
+      items: _result.items.map((item) {
+        final deletion = () {
+          return httpx.withRetry(
+            () => widget
+                .tombstone(item.id, options: [authn.request(authn.AuthzCache.meta(context))])
+                .then((_) => _load(context)),
+          );
+        };
+        return lib.KnownMediaCard.future(
+          lib.known.autodetect(item.media, options: [authn.request(authn.AuthzCache.meta(context))]),
+          onTap: () {
+            final pos = Duration(milliseconds: item.position.toInt());
+            final dur = Duration(milliseconds: item.duration.toInt());
+            final delta = (dur - pos).compareTo(Duration(seconds: 1));
+            final playlist = media.Playlist.of(context);
 
-                playlist?.setPlaylist(
-                  item.query,
-                  item.media,
-                  playlist.autoqueue,
-                  pos: delta < 0 ? Duration(milliseconds: 0) : Duration(milliseconds: item.position.toInt()),
-                );
-              },
-              onLongPress: deletion,
-              onSecondaryTap:
-                  () => ds.modals.push(
-                    context,
-                    RecentEdit(item, constraints: const BoxConstraints(maxWidth: 400)),
-                  ),
+            playlist?.setPlaylist(
+              item.query,
+              item.media,
+              playlist.autoqueue,
+              pos: delta < 0 ? Duration(milliseconds: 0) : Duration(milliseconds: item.position.toInt()),
             );
-          }).toList(),
+          },
+          onLongPress: deletion,
+          onSecondaryTap: () => ds.modals.push(
+            context,
+            RecentEdit(item, constraints: const BoxConstraints(maxWidth: 400)),
+          ),
+        );
+      }).toList(),
       loading: _loading,
       cause: _cause,
     );
