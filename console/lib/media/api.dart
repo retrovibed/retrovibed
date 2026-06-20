@@ -134,19 +134,18 @@ abstract class media {
   // acoustically similar track from /similar, excluding what's already been played,
   // and falls back to random once the similarity engine has nothing left (cold start,
   // below threshold, or library too small).
-  static FnMediaFind acoustic(String Function() seed) {
-    return (MediaSearchRequest req, {List<httpx.Option> options = const []}) async {
-      final s = seed();
-      req.excluded.add(s);
-      return similar(s, req, options: options)
-          .then((v) {
-            return v;
-          })
-          .catchError((cause) {
-            print("acoustic similarity lookup failed, falling back to random: $cause");
-            return random(req, options: options);
-          });
-    };
+  // the seed is the last excluded id - by construction (see PlayQueue.recent)
+  // that's always whatever's currently playing, so no separate seed parameter
+  // is needed here.
+  static Future<MediaFindResponse> acoustic(
+    MediaSearchRequest req, {
+    List<httpx.Option> options = const [],
+  }) async {
+    // if excluded is empty, its a bug.
+    return similar(req.excluded.last, req, options: options).catchError((cause) {
+      print("acoustic similarity lookup failed, falling back to random: $cause");
+      return random(req, options: options);
+    });
   }
 
   static Future<http.StreamedResponse> download(

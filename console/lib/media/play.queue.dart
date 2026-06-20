@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:collection';
-import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:media_kit/media_kit.dart' as mediakit;
@@ -48,10 +47,9 @@ class RingBuffer<T> {
 }
 
 class PlayQueue {
-  // current/currentStart/recent are read lazily from inside range()'s async
-  // generator body (or from a callback invoked later, like acoustic()'s seed
-  // function) - never synchronously at the point search()/random()/acoustic()
-  // are called, since reset() (which seeds current) doesn't run until after
+  // current/pos/recent are read lazily from inside range()'s async generator
+  // body - never synchronously at the point search()/random()/acoustic() are
+  // called, since reset() (which seeds current) doesn't run until after
   // autoqueue(...) has already returned its Stream object.
   final ValueNotifier<PlayableMedia?> current = ValueNotifier(null);
   final RingBuffer<PlayableMedia> _upcoming = RingBuffer(128);
@@ -63,7 +61,14 @@ class PlayQueue {
 
   Known get known => current.value.known;
   Duration get pos => current.value?.pos ?? Duration.zero;
-  List<String> get recent => _previous.toList().map((m) => m.current.id).toList();
+
+  // oldest -> newest, ending with the currently playing track (if any) - so
+  // recent.last is always "what's playing right now", with no separate
+  // current/seed parameter needed wherever this feeds an exclusion list.
+  List<String> get recent => [
+    ..._previous.toList().map((m) => m.current.id),
+    if (current.value != null) current.value!.current.id,
+  ];
 
   void reset(Stream<PlayableMedia> stream, Media media, {Duration pos = const Duration(milliseconds: 0)}) {
     _stream = StreamIterator(stream);
@@ -147,17 +152,27 @@ Stream<PlayableMedia> range(
   api.FnMediaSearch search = api.media.search,
   api.FnMediaFind random = api.media.random,
 }) async* {
-  MediaSearchResponse i = await search(req, options: options());
-  final anchor = queue.current.value!.current.id;
-  final initial = i.items.sublist(
-    max(i.items.indexWhere((m) => m.id == anchor), 0),
-  );
+  final playable = queue.current.value;
 
-  for (var (idx, m) in initial.indexed) {
+  MediaSearchResponse i = await search(req, options: options());
+
+  // the anchor (queue.current) is always yielded directly below, using the
+  // Media + position already known to the queue - it doesn't need to be
+  // present in the search results. when it is present, skip it here so it
+  // isn't yielded twice.
+  final anchor = playable?.current.id ?? uuidx.min();
+  final idx = i.items.indexWhere((m) => m.id == anchor);
+  final initial = idx == -1 ? i.items : i.items.sublist(idx + 1);
+
+  if (playable != null) {
     yield PlayableMedia(
-      m,
-      pos: idx == 0 ? queue.pos : const Duration(milliseconds: 0),
+      playable.current,
+      pos: queue.pos,
     );
+  }
+
+  for (var m in initial) {
+    yield PlayableMedia(m);
   }
 
   while (i.items.length == i.next.limit.toInt()) {
@@ -220,6 +235,6 @@ Stream<PlayableMedia> acoustic(
     queue,
     options: options,
     search: api.media.emptysearch,
-    random: api.media.acoustic(() => queue.current.value!.current.id),
+    random: api.media.acoustic,
   );
 }

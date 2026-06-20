@@ -36,7 +36,7 @@ void main() {
       addTearDown(player.dispose);
 
       final q = PlayQueue();
-      q.reset(Stream.fromIterable([_media('abc', 'My Song')]));
+      q.reset(Stream.fromIterable([_media('abc', 'My Song')]), api.Media(id: 'abc', description: 'My Song'));
       await q.advance("", player);
 
       expect(q.known.id, 'abc');
@@ -44,9 +44,15 @@ void main() {
     });
   });
 
-  group('PlayQueue.currentStart', () {
+  group('PlayQueue.pos', () {
     test('returns Duration.zero when no media is loaded', () {
       expect(PlayQueue().pos, Duration.zero);
+    });
+
+    test('reflects the position seeded via reset', () {
+      final q = PlayQueue();
+      q.reset(Stream.empty(), api.Media(id: 'a', description: 'A'), pos: const Duration(seconds: 5));
+      expect(q.pos, const Duration(seconds: 5));
     });
   });
 
@@ -64,13 +70,28 @@ void main() {
       addTearDown(player.dispose);
 
       final q = PlayQueue();
-      q.reset(Stream.fromIterable([_media('a', 'A'), _media('b', 'B')]));
+      q.reset(Stream.fromIterable([_media('a', 'A'), _media('b', 'B')]), api.Media(id: 'a', description: 'A'));
       await q.advance("", player); // pulls 'a' into current, nothing in upcoming yet
       await q.advance("", player); // pulls 'b' into current, 'a' moves to previous
 
       // reset should clear upcoming
-      q.reset(Stream.empty());
+      q.reset(Stream.empty(), api.Media(id: 'z', description: 'Z'));
       expect(q.upcoming, 0);
+    });
+
+    test('clears previous history', () async {
+      final player = _fakePlayer();
+      addTearDown(player.dispose);
+
+      final q = PlayQueue();
+      q.reset(Stream.fromIterable([_media('a', 'A'), _media('b', 'B')]), api.Media(id: 'a', description: 'A'));
+      await q.advance("", player);
+      await q.advance("", player);
+      expect(q.previous, 1);
+
+      q.reset(Stream.empty(), api.Media(id: 'z', description: 'Z'));
+      expect(q.previous, 0);
+      expect(q.recent, ['z']); // recent always includes whatever's now current
     });
   });
 
@@ -80,11 +101,11 @@ void main() {
       addTearDown(player.dispose);
 
       final q = PlayQueue();
-      q.reset(Stream.empty());
+      q.reset(Stream.empty(), api.Media(id: 'seed', description: 'Seed'));
       final result = await q.advance("", player);
 
       expect(result, isNull);
-      expect(q.known.id, uuidx.min());
+      expect(q.known.id, 'seed'); // current is untouched by a failed advance
     });
 
     test('advances through stream items in order', () async {
@@ -92,7 +113,10 @@ void main() {
       addTearDown(player.dispose);
 
       final q = PlayQueue();
-      q.reset(Stream.fromIterable([_media('1', 'First'), _media('2', 'Second')]));
+      q.reset(
+        Stream.fromIterable([_media('1', 'First'), _media('2', 'Second')]),
+        api.Media(id: '1', description: 'First'),
+      );
 
       await q.advance("", player);
       expect(q.known.id, '1');
@@ -108,7 +132,7 @@ void main() {
       addTearDown(player.dispose);
 
       final q = PlayQueue();
-      q.reset(Stream.fromIterable([_media('a', 'A'), _media('b', 'B')]));
+      q.reset(Stream.fromIterable([_media('a', 'A'), _media('b', 'B')]), api.Media(id: 'a', description: 'A'));
       await q.advance("", player); // current = 'a'
       await q.advance("", player); // current = 'b', previous has 'a'
 
@@ -130,11 +154,27 @@ void main() {
       // Provide a stream that errors on open by using a player override
       // Instead: test the catch path by exhausting the stream first
       final q = PlayQueue();
-      q.reset(Stream.empty());
+      q.reset(Stream.empty(), api.Media(id: 'seed', description: 'Seed'));
       final result = await q.advance("", player);
 
       expect(result, isNull);
-      expect(q.known.id, uuidx.min());
+      expect(q.known.id, 'seed');
+    });
+
+    test('does not double-count the seed track when the stream starts with the same media', () async {
+      final player = _fakePlayer();
+      addTearDown(player.dispose);
+
+      final q = PlayQueue();
+      q.reset(Stream.fromIterable([_media('x', 'X'), _media('y', 'Y')]), api.Media(id: 'x', description: 'X'));
+
+      await q.advance("", player); // current -> stream's 'x'; seed must not land in previous
+      expect(q.previous, 0);
+      expect(q.recent, ['x']); // just current, no previous entry yet
+
+      await q.advance("", player); // current -> 'y'; 'x' lands in previous exactly once
+      expect(q.previous, 1);
+      expect(q.recent, ['x', 'y']);
     });
   });
 
@@ -154,10 +194,12 @@ void main() {
         (req, {options = const []}) async => api.MediaFindResponse(media: _m(id));
 
     test('yields items starting from current', () async {
+      final q = PlayQueue();
+      q.reset(Stream.empty(), _m('b'));
+
       final results = await range(
         _req(10),
-        _m('b'),
-        PlayQueue(),
+        q,
         search: _search([_m('a'), _m('b'), _m('c')], 10),
         random: _random('rand'),
       ).take(3).toList();
@@ -167,27 +209,31 @@ void main() {
       expect(_id(results[2]), 'rand');
     });
 
-    test('falls back to index 0 when current not found', () async {
+    test('yields current first even when missing from search results, then falls back to index 0', () async {
+      final q = PlayQueue();
+      q.reset(Stream.empty(), _m('missing'));
+
       final results = await range(
         _req(10),
-        _m('missing'),
-        PlayQueue(),
+        q,
         search: _search([_m('a'), _m('b')], 10),
         random: _random('rand'),
-      ).take(2).toList();
+      ).take(3).toList();
 
-      expect(_id(results[0]), 'a');
-      expect(_id(results[1]), 'b');
+      expect(_id(results[0]), 'missing');
+      expect(_id(results[1]), 'a');
+      expect(_id(results[2]), 'b');
     });
 
     test('applies pos to first item only', () async {
       const pos = Duration(seconds: 5);
 
+      final q = PlayQueue();
+      q.reset(Stream.empty(), _m('a'), pos: pos);
+
       final results = await range(
         _req(10),
-        _m('a'),
-        PlayQueue(),
-        pos: pos,
+        q,
         search: _search([_m('a'), _m('b')], 10),
         random: _random('rand'),
       ).take(2).toList();
@@ -209,10 +255,12 @@ void main() {
             : api.MediaSearchResponse(items: [_m('c')], next: _req(2));
       }
 
+      final q = PlayQueue();
+      q.reset(Stream.empty(), _m('a'));
+
       final results = await range(
         _req(2),
-        _m('a'),
-        PlayQueue(),
+        q,
         search: search,
         random: _random('rand'),
       ).take(4).toList();
@@ -227,10 +275,12 @@ void main() {
     test('falls back to random after search exhausted', () async {
       var randomCalled = false;
 
+      final q = PlayQueue();
+      q.reset(Stream.empty(), _m('a'));
+
       final results = await range(
         _req(10),
-        _m('a'),
-        PlayQueue(),
+        q,
         search: _search([_m('a')], 10),
         random: (req, {options = const []}) async {
           randomCalled = true;
@@ -258,7 +308,7 @@ void main() {
       addTearDown(player.dispose);
 
       final q = PlayQueue();
-      q.reset(Stream.fromIterable([_media('x', 'X'), _media('y', 'Y')]));
+      q.reset(Stream.fromIterable([_media('x', 'X'), _media('y', 'Y')]), api.Media(id: 'x', description: 'X'));
       await q.advance("", player); // current = 'x'
       await q.advance("", player); // current = 'y', previous has 'x'
 
@@ -272,7 +322,7 @@ void main() {
       addTearDown(player.dispose);
 
       final q = PlayQueue();
-      q.reset(Stream.fromIterable([_media('x', 'X'), _media('y', 'Y')]));
+      q.reset(Stream.fromIterable([_media('x', 'X'), _media('y', 'Y')]), api.Media(id: 'x', description: 'X'));
       await q.advance("", player); // current = 'x'
       await q.advance("", player); // current = 'y'
 
@@ -292,6 +342,7 @@ void main() {
           _media('2', 'Two'),
           _media('3', 'Three'),
         ]),
+        api.Media(id: '1', description: 'One'),
       );
       await q.advance("", player);
       await q.advance("", player);

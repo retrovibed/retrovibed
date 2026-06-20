@@ -47,12 +47,22 @@ class PlayerControlShuffle extends StatelessWidget {
                       });
                 },
               ),
-              ds.Hint.multiline(const [
-                Text("choose playback strategy"),
-                Text("Search: play through the current search results, then fall back to random media"),
-                Text("Random: skip the search results and play random media"),
-                Text("Auto: play media that sounds similar to what's currently playing"),
-              ]),
+              Column(
+                children: [
+                  Text("Auto queue strategy"),
+                  ds.Hint.multiline(const [
+                    ds.HelpLabelled(
+                      label: Text("Auto"),
+                      description: Text("play media that sounds similar to what's currently playing"),
+                    ),
+                    ds.HelpLabelled(
+                      label: Text("Search"),
+                      description: Text("play through the current search results, then fall back to random media"),
+                    ),
+                    ds.HelpLabelled(label: Text("Random"), description: Text("play random media")),
+                  ]),
+                ],
+              ),
             );
           default:
             return ds.Empty;
