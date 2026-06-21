@@ -11,7 +11,10 @@ override_dh_auto_build:
 
 	# ccache -s
 
-	GEN=ninja OVERRIDE_GIT_DESCRIBE="v${PACKAGE_VERSION}" GIT_COMMIT_HASH="${GIT_COMMIT_HASH}" ENABLE_EXTENSION_AUTOLOADING=1 ENABLE_EXTENSION_AUTOINSTALL=1 BUILD_EXTENSIONS='autocomplete;json;parquet;icu;inet;vss' DUCKDB_BUILD=Static make -C src
+	# inet and vss are out-of-tree extensions fetched via network during cmake configure,
+	# which Launchpad's sandboxed builders block. Leave them out and rely on
+	# ENABLE_EXTENSION_AUTOLOADING/AUTOINSTALL to pull them in at runtime instead.
+	GEN=ninja OVERRIDE_GIT_DESCRIBE="v${PACKAGE_VERSION}" GIT_COMMIT_HASH="${GIT_COMMIT_HASH}" ENABLE_EXTENSION_AUTOLOADING=1 ENABLE_EXTENSION_AUTOINSTALL=1 BUILD_EXTENSIONS='autocomplete;json;parquet;icu' DUCKDB_BUILD=Static make -C src
 	DESTDIR="linux" cmake --install src/build/release --prefix="/usr"
 
 
