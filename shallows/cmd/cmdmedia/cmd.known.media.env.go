@@ -10,10 +10,13 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/envx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
+	"github.com/retrovibed/retrovibed/shallows/internal/squirrelx"
+	"github.com/retrovibed/retrovibed/shallows/library"
 )
 
 type knownenv struct {
-	Database string `flag:"" name:"database" help:"database to read" default:"${vars_user_configuration_directory}/meta.db"`
+	Database      string   `flag:"" name:"database" help:"database to read" default:"${vars_user_configuration_directory}/meta.db"`
+	ExcludeSource []string `flag:"" name:"exclude-source" help:"exclude the specified source(s) from the calculation" optional:""`
 }
 
 func (t knownenv) Run(gctx *cmdopts.Global) (err error) {
@@ -28,7 +31,17 @@ func (t knownenv) Run(gctx *cmdopts.Global) (err error) {
 }
 
 func (t knownenv) run(ctx context.Context, db *sql.DB, w io.Writer) (err error) {
-	begin, err := sqlx.Timestamp(ctx, db, `SELECT COALESCE(MAX(released), '-infinity'::TIMESTAMP) AS start FROM library_known_media WHERE released < NOW()`)
+	query, args, err := squirrelx.PSQL.
+		Select("COALESCE(MAX(released), '-infinity'::TIMESTAMP) AS start").
+		From("library_known_media").
+		Where("released < NOW()").
+		Where(library.KnownQueryExcludeSource(t.ExcludeSource...)).
+		ToSql()
+	if err != nil {
+		return err
+	}
+
+	begin, err := sqlx.Timestamp(ctx, db, query, args...)
 	if err != nil {
 		return err
 	}

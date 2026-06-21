@@ -60,6 +60,12 @@ func KnownOptionMimetype(v string) func(*Known) {
 	}
 }
 
+func KnownOptionSource(v string) func(*Known) {
+	return func(t *Known) {
+		t.Source = v
+	}
+}
+
 func KnownOptionTestNoPoster(t *Known) {
 	t.PosterPath = ""
 	t.BackdropPath = ""
@@ -125,6 +131,10 @@ func KnownQueryMimetype(v string) squirrel.Sqlizer {
 	}
 
 	return squirrel.Expr("library_known_media.mimetype = ?", v)
+}
+
+func KnownQueryExcludeSource(sources ...string) squirrel.Sqlizer {
+	return squirrelx.NotIn("library_known_media.source", sources...)
 }
 
 func KnownQueryDetectLanguage(v string) squirrel.Sqlizer {

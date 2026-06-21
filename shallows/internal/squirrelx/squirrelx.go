@@ -26,11 +26,24 @@ func In[T any](expr string, values ...T) squirrel.Sqlizer {
 		return Noop{}
 	}
 
-	r := make([]interface{}, 0, len(values))
+	r := make([]any, 0, len(values))
 	for _, v := range values {
 		r = append(r, v)
 	}
 	return squirrel.Expr(expr+" IN ("+squirrel.Placeholders(len(values))+")", r...)
+}
+
+// NotIn predicate.
+func NotIn[T any](expr string, values ...T) squirrel.Sqlizer {
+	if len(values) == 0 {
+		return Noop{}
+	}
+
+	r := make([]any, 0, len(values))
+	for _, v := range values {
+		r = append(r, v)
+	}
+	return squirrel.Expr(expr+" NOT IN ("+squirrel.Placeholders(len(values))+")", r...)
 }
 
 var psqlplaceholder = regexp.MustCompile(`\$\d+`)

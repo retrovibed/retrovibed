@@ -99,6 +99,25 @@ func TestMediaEnvRun(t *testing.T) {
 		require.Contains(t, buf.String(), "RETROVIBED_ARCHIVE_START_DATE="+timex.NegInf().Format(time.DateOnly))
 	})
 
+	t.Run("excludes sources from the max calculation", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+		db := sqltestx.Metadatabase(t)
+
+		var a, b library.Known
+		require.NoError(t, testx.Fake(&a, library.KnownOptionTestDefaults, library.KnownOptionSource("excluded"), library.KnownOptionReleased(time.Date(2023, 3, 1, 0, 0, 0, 0, time.UTC))))
+		require.NoError(t, testx.Fake(&b, library.KnownOptionTestDefaults, library.KnownOptionSource("kept"), library.KnownOptionReleased(time.Date(2020, 6, 15, 0, 0, 0, 0, time.UTC))))
+
+		var input bytes.Buffer
+		require.NoError(t, jsonl.NewEncoder(&input).Encode(a, b))
+		knownimport{}.run(ctx, db, &input) //nolint:errcheck
+
+		excluding := knownenv{ExcludeSource: []string{"excluded"}}
+		var buf bytes.Buffer
+		require.NoError(t, excluding.run(ctx, db, &buf))
+		require.Contains(t, buf.String(), "RETROVIBED_ARCHIVE_START_DATE=2020-06-15")
+	})
+
 	t.Run("output is newline terminated env format", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
