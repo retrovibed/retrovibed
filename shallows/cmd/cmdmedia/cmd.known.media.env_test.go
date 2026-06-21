@@ -9,7 +9,6 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
-	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/stretchr/testify/require"
 )
@@ -54,14 +53,14 @@ func TestMediaEnvRun(t *testing.T) {
 		require.Contains(t, buf.String(), "RETROVIBED_ARCHIVE_START_DATE=2022-12-31")
 	})
 
-	t.Run("empty database outputs NegInf date", func(t *testing.T) {
+	t.Run("empty database outputs fallback date", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 		db := sqltestx.Metadatabase(t)
 
 		var buf bytes.Buffer
 		require.NoError(t, cmd.run(ctx, db, &buf))
-		require.Contains(t, buf.String(), "RETROVIBED_ARCHIVE_START_DATE="+timex.NegInf().Format(time.DateOnly))
+		require.Contains(t, buf.String(), "RETROVIBED_ARCHIVE_START_DATE=1700-01-01")
 	})
 
 	t.Run("excludes future released dates from max", func(t *testing.T) {
@@ -82,7 +81,7 @@ func TestMediaEnvRun(t *testing.T) {
 		require.Contains(t, buf.String(), "RETROVIBED_ARCHIVE_START_DATE=2022-12-31")
 	})
 
-	t.Run("all future released dates outputs NegInf date", func(t *testing.T) {
+	t.Run("all future released dates outputs fallback date", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 		db := sqltestx.Metadatabase(t)
@@ -96,7 +95,7 @@ func TestMediaEnvRun(t *testing.T) {
 
 		var buf bytes.Buffer
 		require.NoError(t, cmd.run(ctx, db, &buf))
-		require.Contains(t, buf.String(), "RETROVIBED_ARCHIVE_START_DATE="+timex.NegInf().Format(time.DateOnly))
+		require.Contains(t, buf.String(), "RETROVIBED_ARCHIVE_START_DATE=1700-01-01")
 	})
 
 	t.Run("excludes sources from the max calculation", func(t *testing.T) {
