@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/stretchr/testify/require"
@@ -30,7 +31,9 @@ func TestKnownQueryRun(t *testing.T) {
 		known.Title = "Inception"
 		known.Overview = "A mind-bending thriller about dreams within dreams"
 
-		require.NoError(t, knownimport{}.run(ctx, db, jsonlBuffer(t, known)))
+		var input bytes.Buffer
+		require.NoError(t, jsonl.NewEncoder(&input).Encode(known))
+		require.NoError(t, knownimport{}.run(ctx, db, &input))
 		require.NoError(t, knownquery{}.run(ctx, strings.NewReader("{\"query\":\"Inception\"}\n"), db, library.QueryCleanerNoop()))
 	})
 
@@ -43,7 +46,9 @@ func TestKnownQueryRun(t *testing.T) {
 		require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults))
 		known.Title = "The Dark Knight"
 
-		require.NoError(t, knownimport{}.run(ctx, db, jsonlBuffer(t, known)))
+		var input bytes.Buffer
+		require.NoError(t, jsonl.NewEncoder(&input).Encode(known))
+		require.NoError(t, knownimport{}.run(ctx, db, &input))
 		require.NoError(t, knownquery{}.run(ctx, strings.NewReader("{\"query\":\"Dark Knight\"}\n"), db, library.QueryCleanerNoop()))
 	})
 

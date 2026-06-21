@@ -28,7 +28,7 @@ func (t knownenv) Run(gctx *cmdopts.Global) (err error) {
 }
 
 func (t knownenv) run(ctx context.Context, db *sql.DB, w io.Writer) (err error) {
-	begin, err := sqlx.Timestamp(ctx, db, `SELECT COALESCE(MAX(released), '-infinity'::TIMESTAMP) AS start FROM library_known_media`)
+	begin, err := sqlx.Timestamp(ctx, db, `SELECT COALESCE(MAX(released), '-infinity'::TIMESTAMP) AS start FROM library_known_media WHERE released < NOW()`)
 	if err != nil {
 		return err
 	}

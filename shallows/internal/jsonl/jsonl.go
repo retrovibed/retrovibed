@@ -24,10 +24,15 @@ func NewEncoder(w io.Writer) *Encoder {
 	}
 }
 
-// Encode writes the JSON encoding of v to the stream, followed by a newline.
+// Encode writes the JSON encoding of each v to the stream, each followed by a newline.
 // Any error during JSON marshaling or writing to the underlying writer is returned.
-func (e *Encoder) Encode(v any) error {
-	return e.encoder.Encode(v)
+func (e *Encoder) Encode(vs ...any) error {
+	for _, v := range vs {
+		if err := e.encoder.Encode(v); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // Decoder reads JSON lines from an underlying io.Reader.

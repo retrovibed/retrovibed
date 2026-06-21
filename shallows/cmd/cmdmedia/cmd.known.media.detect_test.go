@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/stretchr/testify/require"
@@ -21,7 +22,9 @@ func TestKnownDetectRun(t *testing.T) {
 		require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults))
 		known.Title = "The Grand Budapest Hotel"
 
-		require.NoError(t, knownimport{}.run(ctx, db, jsonlBuffer(t, known)))
+		var input bytes.Buffer
+		require.NoError(t, jsonl.NewEncoder(&input).Encode(known))
+		require.NoError(t, knownimport{}.run(ctx, db, &input))
 
 		require.NoError(t, knowndetect{}.run(ctx, strings.NewReader("{\"query\":\"The Grand Budapest Hotel\"}\n"), db, library.QueryCleanerNoop()))
 	})
