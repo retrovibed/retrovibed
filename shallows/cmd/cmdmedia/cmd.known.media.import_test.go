@@ -69,7 +69,7 @@ func TestKnownImportRun(t *testing.T) {
 		var input bytes.Buffer
 		items := slicesx.MapTransform(func(v library.Known) any { return v }, records...)
 		require.NoError(t, jsonl.NewEncoder(&input).Encode(items...))
-		require.NoError(t, knownimport{Batch: 50}.run(ctx, db, &input))
+		require.NoError(t, knownimport{Batch: 1, Backlog: 150}.run(ctx, db, &input))
 		require.Equal(t, 150, sqltestx.Count(t, db, `SELECT COUNT(*) FROM library_known_media`))
 	})
 
