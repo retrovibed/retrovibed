@@ -10,9 +10,11 @@ import (
 
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
+	"github.com/retrovibed/retrovibed/shallows/internal/asynccompute"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
 	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
+	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 )
@@ -34,34 +36,33 @@ func (t knownimport) Run(gctx *cmdopts.Global) (err error) {
 }
 
 func (t knownimport) run(ctx context.Context, db *sql.DB, r io.Reader) (err error) {
+	type batch []library.Known
+	inserts := asynccompute.New(func(ctx context.Context, chunk batch) (err error) {
+		ts := time.Now()
+		s := library.NewKnownBatchInsertWithDefaults(ctx, db, chunk...)
+
+		if err := sqlx.Discard(sqlx.Scan(s)); err != nil {
+			return errorsx.Wrap(err, "failed to insert batch")
+		}
+
+		log.Println("imported", time.Since(ts), len(chunk), "records")
+		return nil
+	}, asynccompute.Backlog[batch](32), asynccompute.Workers[batch](1))
+
 	d := jsonl.Iter[library.Known](jsonl.NewDecoder(r))
+
 	for chunk := range iterx.Chunk(d.Each(ctx), t.Batch) {
 		chunk = slicesx.Map(func(v library.Known) library.Known {
 			v.AutoDescription = stringsx.Join("\n", v.Title, v.OriginalTitle, v.Overview)
 			return v
 		}, chunk...)
 
-		ts := time.Now()
-		s := library.NewKnownBatchInsertWithDefaults(ctx, db, chunk...)
-		for s.Next() {
-			var v library.Known
-			if err = s.Scan(&v); err != nil {
-				return errorsx.Wrap(err, "failed to scan inserted record")
-			}
+		if err = inserts.Run(ctx, chunk); err != nil {
+			return errorsx.Compact(err, asynccompute.Shutdown(ctx, inserts))
 		}
-
-		if err = s.Err(); err != nil {
-			return errorsx.Wrap(err, "failed to insert batch")
-		}
-
-		if err = s.Close(); err != nil {
-			return errorsx.Wrap(err, "failed to close batch")
-		}
-
-		log.Println("imported", time.Since(ts), len(chunk), "records")
 	}
 
-	if err = d.Err(); err != nil {
+	if err = errorsx.Compact(d.Err(), asynccompute.Shutdown(ctx, inserts)); err != nil {
 		return err
 	}
 

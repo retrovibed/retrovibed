@@ -2,11 +2,12 @@ package cmdmedia
 
 import (
 	"bytes"
-	"encoding/json"
 	"strings"
 	"testing"
 
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
+	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/stretchr/testify/require"
@@ -14,16 +15,6 @@ import (
 
 func TestKnownImportRun(t *testing.T) {
 	cmd := knownimport{}
-
-	jsonl := func(t *testing.T, records ...library.Known) *bytes.Buffer {
-		t.Helper()
-		var buf bytes.Buffer
-		enc := json.NewEncoder(&buf)
-		for _, r := range records {
-			require.NoError(t, enc.Encode(r))
-		}
-		return &buf
-	}
 
 	t.Run("inserts records from JSONL", func(t *testing.T) {
 		ctx, done := testx.Context(t)
@@ -34,7 +25,9 @@ func TestKnownImportRun(t *testing.T) {
 		require.NoError(t, testx.Fake(&a, library.KnownOptionTestDefaults))
 		require.NoError(t, testx.Fake(&b, library.KnownOptionTestDefaults))
 
-		require.NoError(t, cmd.run(ctx, db, jsonl(t, a, b)))
+		var input bytes.Buffer
+		require.NoError(t, jsonl.NewEncoder(&input).Encode(a, b))
+		require.NoError(t, cmd.run(ctx, db, &input))
 		require.Equal(t, 2, sqltestx.Count(t, db, `SELECT COUNT(*) FROM library_known_media`))
 	})
 
@@ -49,7 +42,9 @@ func TestKnownImportRun(t *testing.T) {
 		known.OriginalTitle = "Original Title"
 		known.Overview = "A brief overview"
 
-		require.NoError(t, cmd.run(ctx, db, jsonl(t, known)))
+		var input bytes.Buffer
+		require.NoError(t, jsonl.NewEncoder(&input).Encode(known))
+		require.NoError(t, cmd.run(ctx, db, &input))
 		expected := strings.Join([]string{"My Title", "Original Title", "A brief overview"}, "\n")
 		require.Equal(t, expected, sqltestx.String(t, db, `SELECT auto_description FROM library_known_media LIMIT 1`))
 	})
@@ -73,7 +68,10 @@ func TestKnownImportRun(t *testing.T) {
 			require.NoError(t, testx.Fake(&records[i], library.KnownOptionTestDefaults, library.KnownOptionRandomID))
 		}
 
-		require.NoError(t, cmd.run(ctx, db, jsonl(t, records...)))
+		var input bytes.Buffer
+		items := slicesx.MapTransform(func(v library.Known) any { return v }, records...)
+		require.NoError(t, jsonl.NewEncoder(&input).Encode(items...))
+		require.NoError(t, cmd.run(ctx, db, &input))
 		require.Equal(t, 150, sqltestx.Count(t, db, `SELECT COUNT(*) FROM library_known_media`))
 	})
 
@@ -85,8 +83,11 @@ func TestKnownImportRun(t *testing.T) {
 		var known library.Known
 		require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults))
 
-		require.NoError(t, cmd.run(ctx, db, jsonl(t, known)))
-		require.NoError(t, cmd.run(ctx, db, jsonl(t, known)))
+		var first, second bytes.Buffer
+		require.NoError(t, jsonl.NewEncoder(&first).Encode(known))
+		require.NoError(t, jsonl.NewEncoder(&second).Encode(known))
+		require.NoError(t, cmd.run(ctx, db, &first))
+		require.NoError(t, cmd.run(ctx, db, &second))
 		require.Equal(t, 1, sqltestx.Count(t, db, `SELECT COUNT(*) FROM library_known_media`))
 		require.Equal(t, 1, sqltestx.Count(t, db, `SELECT duplicates FROM library_known_media WHERE uid = '`+known.UID+`'`))
 	})
