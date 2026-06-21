@@ -64,12 +64,6 @@ func Runner() eg.ContainerRunner {
 
 func Build(ctx context.Context, o eg.Op) error {
 	return eg.Sequential(
-		// useful for resolving build issues on ubuntu's workers
-		// egdebuild.Build(gcfg, egdebuild.Option.Distro("oracular"), egdebuild.Option.BuildBinary(time.Minute)),
-		// shell.Op(shell.New("false")),
-		egdebuild.Build(gcfg, egdebuild.Option.Distro("jammy")),
-		egdebuild.Build(gcfg, egdebuild.Option.Distro("noble"), egdebuild.Option.NoLint()),
-		egdebuild.Build(gcfg, egdebuild.Option.Distro("questing"), egdebuild.Option.NoLint()),
 		egdebuild.Build(gcfg, egdebuild.Option.Distro(egdebuild.UbuntuLatestCodename), egdebuild.Option.NoLint()), // resolute
 		egdebuild.Build(
 			gcfg,
