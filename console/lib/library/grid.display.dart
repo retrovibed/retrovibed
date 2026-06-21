@@ -89,40 +89,41 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
 
   @override
   Widget build(BuildContext context) {
-    final upload = (
-      ds.FilesEvent v, {
-      ValueNotifier<int>? progress,
-    }) {
-      final multiparts = v.files.map((c) {
-        return media.media.uploadable(c.path, c.name, c.mimeType!, progress: progress);
-      });
+    final upload =
+        (
+          ds.FilesEvent v, {
+          ValueNotifier<int>? progress,
+        }) {
+          final multiparts = v.files.map((c) {
+            return media.media.uploadable(c.path, c.name, c.mimeType!, progress: progress);
+          });
 
-      return Future.microtask(() {
-        return Future.wait(
-          multiparts.map((fv) {
-            return fv.then((v) {
-              return widget
-                  .apiupload((req) {
-                    req..files.add(v);
-                    return req;
-                  })
-                  .then((uploaded) {
-                    setState(() {
-                      widget.search.value..items.add(uploaded.media);
-                    });
-                  })
-                  .catchError((cause) {
-                    setState(() {
-                      _cause = ds.Error.unknown(cause, onTap: reseterr);
-                    });
-                  });
+          return Future.microtask(() {
+            return Future.wait(
+              multiparts.map((fv) {
+                return fv.then((v) {
+                  return widget
+                      .apiupload((req) {
+                        req..files.add(v);
+                        return req;
+                      })
+                      .then((uploaded) {
+                        setState(() {
+                          widget.search.value..items.add(uploaded.media);
+                        });
+                      })
+                      .catchError((cause) {
+                        setState(() {
+                          _cause = ds.Error.unknown(cause, onTap: reseterr);
+                        });
+                      });
+                });
+              }),
+            ).then((v) => ds.NullWidget).catchError((cause) {
+              return ds.Error.unknown(cause, onTap: reseterr);
             });
-          }),
-        ).then((v) => ds.NullWidget).catchError((cause) {
-          return ds.Error.unknown(cause, onTap: reseterr);
-        });
-      });
-    };
+          });
+        };
 
     final replace = (media.Media v) {
       final replaced = widget.search.value.items.map((o) => o.id == v.id ? v : o);
@@ -211,81 +212,79 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                       ),
                       (widget.search.value.next.query.isEmpty)
                           ? disc.Home(
-                            category,
-                            padding: defaults.padding.copyWith(
-                              top: 0.0,
-                              bottom: 0.0,
-                            ),
-                          )
+                              category,
+                              padding: defaults.padding.copyWith(
+                                top: 0.0,
+                                bottom: 0.0,
+                              ),
+                            )
                           : ds.Empty,
                     ],
-                    empty:
-                        widget.search.value.items.isEmpty
-                            ? ds.Empty
-                            : KnownMediaDownload.query(
-                              () {
-                                final search = widget.search.value;
-                                if (_loading) return Future.value([]);
-                                if (search.items.isNotEmpty) return Future.value([]);
-                                if (search.next.mimetypes.isNotEmpty && !mimex.isVideo(category))
-                                  return Future.value([]);
+                    empty: widget.search.value.items.isNotEmpty
+                        ? ds.Empty
+                        : KnownMediaDownload.query(
+                            () {
+                              final search = widget.search.value;
+                              if (_loading) return Future.value([]);
+                              if (search.items.isNotEmpty) return Future.value([]);
+                              if (search.next.mimetypes.isNotEmpty && !mimex.isVideo(category)) return Future.value([]);
 
-                                return httpx.withRetry(
-                                  () => api.known
-                                      .search(
-                                        api.known.request(
-                                          language: LanguageCode.code.locale.languageCode,
-                                          adult: search.next.adult,
-                                          query: search.next.query,
-                                          limit: search.next.limit.toInt(),
-                                        ),
-                                        options: [authn.request(authz)],
-                                      )
-                                      .then((v) => v.items),
-                                );
-                              },
-                              leading: Center(
-                                child: Padding(
-                                  padding: defaults.padding,
-                                  child: Text(
-                                    "no results in library. select below to automatically locate and download",
-                                    style: TextStyle(
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.onSurface.withValues(alpha: 0.6),
-                                    ),
+                              return httpx.withRetry(
+                                () => api.known
+                                    .search(
+                                      api.known.request(
+                                        language: LanguageCode.code.locale.languageCode,
+                                        adult: search.next.adult,
+                                        query: search.next.query,
+                                        limit: search.next.limit.toInt(),
+                                      ),
+                                      options: [authn.request(authz)],
+                                    )
+                                    .then((v) => v.items),
+                              );
+                            },
+                            leading: Center(
+                              child: Padding(
+                                padding: defaults.padding,
+                                child: Text(
+                                  "no results in library. select below to automatically locate and download",
+                                  style: TextStyle(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface.withValues(alpha: 0.6),
                                   ),
                                 ),
                               ),
-                              onTap: (v) {
-                                return api.locate
-                                    .create(
-                                      api.Locate.create()..knownMediaId = v.id,
-                                      options: [authn.request(authz)],
-                                    )
-                                    .then((_) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            'enqueued to be found and downloaded',
-                                          ),
-                                        ),
-                                      );
-                                      return v;
-                                    })
-                                    .catchError((e) {
-                                      print("failed to initiate media location ${e}");
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            'failed to enqueue media locate and download',
-                                          ),
-                                        ),
-                                      );
-                                      throw e;
-                                    });
-                              },
                             ),
+                            onTap: (v) {
+                              return api.locate
+                                  .create(
+                                    api.Locate.create()..knownMediaId = v.id,
+                                    options: [authn.request(authz)],
+                                  )
+                                  .then((_) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          'enqueued to be found and downloaded',
+                                        ),
+                                      ),
+                                    );
+                                    return v;
+                                  })
+                                  .catchError((e) {
+                                    print("failed to initiate media location ${e}");
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          'failed to enqueue media locate and download',
+                                        ),
+                                      ),
+                                    );
+                                    throw e;
+                                  });
+                            },
+                          ),
                     (context, _media) {
                       var onSettings = () {
                         ds.modals.asyncfn<media.Media>(
