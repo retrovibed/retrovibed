@@ -52,12 +52,12 @@ func (t knownimport) run(ctx context.Context, db *sql.DB, r io.Reader) (err erro
 	d := jsonl.Iter[library.Known](jsonl.NewDecoder(r))
 
 	for chunk := range iterx.Chunk(d.Each(ctx), t.Batch) {
-		chunk = slicesx.Map(func(v library.Known) library.Known {
+		owned := slicesx.Map(func(v library.Known) library.Known {
 			v.AutoDescription = stringsx.Join("\n", v.Title, v.OriginalTitle, v.Overview)
 			return v
-		}, chunk...)
+		}, append(batch{}, chunk...)...)
 
-		if err = inserts.Run(ctx, chunk); err != nil {
+		if err = inserts.Run(ctx, owned); err != nil {
 			return errorsx.Compact(err, asynccompute.Shutdown(ctx, inserts))
 		}
 	}
