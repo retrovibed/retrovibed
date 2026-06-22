@@ -71,6 +71,7 @@ func SyncPublishedContentItem(ctx context.Context, q sqlx.Queryer, pc *Published
 		OAuthGoogleID: pc.OauthGoogleId,
 		KnownMediaID:  tmeta.KnownMediaID,
 		Title:         pc.Title,
+		Description:   pc.Description,
 	})
 
 	if err = community.PublishedContentInsertWithDefaults(ctx, q, dbpc).Scan(&dbpc); err != nil {
