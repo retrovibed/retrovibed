@@ -90,14 +90,26 @@ func New[T any](async func(ctx context.Context, w T) error, options ...Option[T]
 	}, options...)).init()
 }
 
-// gracefully shutdown by invoking close and waiting until all workers
-// complete or the context times out.
-func Shutdown[T any](ctx context.Context, p *Pool[T]) error {
-	dctx, cancelled := context.WithCancelCause(ctx)
-	go func() {
-		cancelled(p.Close())
-	}()
+type closers interface {
+	Close() error
+}
 
-	<-dctx.Done()
-	return contextx.IgnoreCancelled(context.Cause(dctx))
+// gracefully shutdown by invoking close and waiting until all workers
+// complete or the context times out. Pools are shut down in the order
+// given; every pool is closed even if an earlier one errors, so callers
+// passing multiple pools that feed one another (e.g. pool -> insert)
+// should list them in drain order.
+func Shutdown(ctx context.Context, pools ...closers) error {
+	var err error
+	for _, p := range pools {
+		dctx, cancelled := context.WithCancelCause(ctx)
+		go func() {
+			cancelled(p.Close())
+		}()
+
+		<-dctx.Done()
+		err = errorsx.Compact(err, contextx.IgnoreCancelled(context.Cause(dctx)))
+	}
+
+	return err
 }
