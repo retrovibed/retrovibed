@@ -27,7 +27,7 @@ func PublishedContentInsertWithDefaults(
 	gql genieql.Insert,
 	pattern func(ctx context.Context, q sqlx.Queryer, a PublishedContent) NewPublishedContentScannerStaticRow,
 ) {
-	gql.Into("published_content").Default("id", "created_at", "updated_at", "tombstoned_at").Conflict("ON CONFLICT (community_id, library_id) DO UPDATE SET magnet_uri = EXCLUDED.magnet_uri, known_media_id = EXCLUDED.known_media_id, publish_mode = EXCLUDED.publish_mode, oauth_google_id = EXCLUDED.oauth_google_id, bytes = EXCLUDED.bytes, published_at = COALESCE(NULLIF(published_at, 'infinity'), EXCLUDED.published_at), updated_at = DEFAULT")
+	gql.Into("published_content").Default("id", "created_at", "updated_at", "tombstoned_at").Conflict("ON CONFLICT (community_id, library_id) DO UPDATE SET magnet_uri = COALESCE(NULLIF(EXCLUDED.magnet_uri, ''), published_content.magnet_uri), known_media_id = EXCLUDED.known_media_id, publish_mode = EXCLUDED.publish_mode, oauth_google_id = EXCLUDED.oauth_google_id, bytes = EXCLUDED.bytes, published_at = COALESCE(NULLIF(published_at, 'infinity'), EXCLUDED.published_at), updated_at = DEFAULT")
 }
 
 func PublishedContentFindByID(
