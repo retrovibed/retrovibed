@@ -282,4 +282,33 @@ func TestGenerate(t *testing.T) {
 		require.Contains(t, buf2.String(), "Initial Content")
 		require.Contains(t, buf2.String(), "New Content")
 	})
+
+	t.Run("omits enclosure with a blank url", func(t *testing.T) {
+		var (
+			buf bytes.Buffer
+		)
+		ts := time.Date(2025, time.July, 22, 13, 02, 40, 0, time.UTC)
+
+		err := rss.Generator().Generate(&buf, rss.Channel{
+			Title:         "Blank Enclosure Test",
+			Link:          "https://test.retrovibe.space",
+			Description:   "Test item with a not-yet-resolved enclosure",
+			TTL:           1440,
+			LastBuildDate: ts,
+			Language:      "en",
+		}, iterx.From(rss.Item{
+			Guid:        "item-pending-001",
+			Title:       "Pending Content",
+			PublishDate: ts,
+			Enclosures: []rss.Enclosure{{
+				URL:      "",
+				Mimetype: mimex.Bittorrent,
+				Length:   1024,
+			}},
+		}))
+		require.NoError(t, err)
+
+		content := buf.String()
+		require.NotContains(t, content, "<enclosure")
+	})
 }

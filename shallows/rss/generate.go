@@ -172,6 +172,10 @@ func genitem(encoder *xml.Encoder, item Item) error {
 	}
 
 	for _, enc := range item.Enclosures {
+		if !stringsx.Present(enc.URL) {
+			continue
+		}
+
 		enclosureStart := xml.StartElement{
 			Name: xml.Name{Local: "enclosure"},
 			Attr: []xml.Attr{
