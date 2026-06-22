@@ -10,6 +10,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
@@ -52,11 +53,15 @@ func ensureTorrent(ctx context.Context, q sqlx.Queryer, mvfs, tvfs fsx.Virtual, 
 }
 
 // SyncPendingToDeeppool syncs pending published content to deeppool and regenerates affected feeds.
-func SyncPendingToDeeppool(ctx context.Context, q sqlx.Queryer, httpc *http.Client, metrics MetricsPublisher, published FeedPublisher, archiver library.Archiver, mvfs, tvfs fsx.Virtual) error {
+func SyncPendingToDeeppool(ctx context.Context, q sqlx.Queryer, httpc *http.Client, metrics MetricsPublisher, publisher FeedPublisher, archiver library.Archiver, mvfs, tvfs fsx.Virtual) error {
 	pending := sqlx.Scan(community.PublishedContentFindByPendingSync(ctx, q))
 
 	for pc := range pending.Iter() {
-		var lmd library.Metadata
+		var (
+			lmd       library.Metadata
+			known     library.Known
+			published *PublishContentResponse
+		)
 
 		if err := library.MetadataFindByID(ctx, q, pc.LibraryID).Scan(&lmd); err != nil {
 			log.Println(errorsx.Wrap(err, "failed to find library metadata"))
@@ -75,7 +80,6 @@ func SyncPendingToDeeppool(ctx context.Context, q sqlx.Queryer, httpc *http.Clie
 			continue
 		}
 
-		var known library.Known
 		if pc.KnownMediaID != "" {
 			if err := library.KnownFindByID(ctx, q, pc.KnownMediaID).Scan(&known); sqlx.IgnoreNoRows(err) != nil {
 				log.Println(errorsx.Wrap(err, "failed to find known media"))
@@ -101,7 +105,7 @@ func SyncPendingToDeeppool(ctx context.Context, q sqlx.Queryer, httpc *http.Clie
 				continue
 			}
 
-			if err := RegenerateFeed(ctx, q, published, pc.CommunityID); err != nil {
+			if err := RegenerateFeed(ctx, q, publisher, pc.CommunityID); err != nil {
 				log.Println(errorsx.Wrap(err, "feed regeneration failed for community "+pc.CommunityID))
 				continue
 			}
@@ -125,33 +129,36 @@ func SyncPendingToDeeppool(ctx context.Context, q sqlx.Queryer, httpc *http.Clie
 			continue
 		}
 
-		_, err = metrics.Publish(ctx, &PublishContentRequest{
+		req := PublishContentRequest{
 			PublishedContent: &PublishedContent{
 				Id:             pc.ID,
 				CommunityId:    pc.CommunityID,
 				KnownMediaId:   pc.KnownMediaID,
 				MagnetUri:      pc.MagnetURI,
-				ArchivedId:     lmd.ArchiveID,
 				Title:          stringsx.FirstNonBlank(known.Title, lmd.Description),
 				Description:    known.Overview,
-				Mimetype:       stringsx.FirstNonBlank(known.Mimetype, lmd.Mimetype),
+				ArchivedId:     lmd.ArchiveID,
+				Mimetype:       lmd.Mimetype,
 				EncryptionSeed: lmd.EncryptionSeed,
 				Bytes:          lmd.Bytes,
 			},
-		}, io.NopCloser(bytes.NewReader(encoded)))
-
-		if err != nil {
+		}
+		if published, err = metrics.Publish(ctx, &req, io.NopCloser(bytes.NewReader(encoded))); err != nil {
 			log.Println(errorsx.Wrap(err, "failed to sync to deeppool"))
 			continue
 		}
+
+		log.Println("sent", spew.Sdump(req.PublishedContent))
+		log.Println("returned", spew.Sdump(published.PublishedContent))
 
 		if err := community.PublishedContentUpdatePublishedAt(ctx, q, pc.ID, time.Now()).Scan(&pc); err != nil {
 			log.Println(errorsx.Wrap(err, "failed to update published_at"))
 			continue
 		}
 
-		if err := RegenerateFeed(ctx, q, published, pc.CommunityID); err != nil {
-			log.Println(errorsx.Wrap(err, "feed regeneration failed for community "+pc.CommunityID))
+		if err := RegenerateFeed(ctx, q, publisher, pc.CommunityID); err != nil {
+			log.Println(errorsx.Wrapf(err, "feed regeneration failed for community: %s", pc.CommunityID))
+			continue
 		}
 
 		log.Printf("synced published content %s to deeppool with archive_id %s", pc.ID, lmd.ArchiveID)
