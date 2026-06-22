@@ -7,7 +7,6 @@ import (
 	"eg/compute/neurals"
 	"eg/compute/release"
 	"eg/compute/tarballs"
-	"fmt"
 	"log"
 	"path/filepath"
 	"time"
@@ -76,9 +75,9 @@ func main() {
 			egbug.DebugFailure(
 				shell.Op(
 					flutter.New("rm -rf build/macos/{x64,arm64}/debug").Lenient(true),
-					flutter.New(fmt.Sprintf("flutter build macos --build-name=%s --build-number=%s --release lib/main.dart", tarballs.Version(), commit.StringReplace("%git.commit.unix%"))).Timeout(10*time.Minute),
+					flutter.Newf("flutter build macos --build-name=%s --build-number=%s --release lib/main.dart", tarballs.Version(), commit.StringReplace("%git.commit.unix%")).Timeout(10*time.Minute),
 				),
-				shell.Op(shell.New("flutter failed to build app")),
+				egbug.Log("flutter failed to build app"),
 			),
 			shell.Op(
 				flutter.Newf("CGO_LDFLAGS=\"%s %s\" go -C retrovibedbind build --tags duckdb_use_static_lib,retrovibed,neural -buildmode=c-shared -o ../build/macos/Build/Products/Release/retrovibed.app/Contents/Frameworks/retrovibed.dylib ./...", duckdbldflags, neuralsldflags),
