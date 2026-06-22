@@ -24,7 +24,13 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 )
 
-func MediaMetadataImport(ctx context.Context, db sqlx.Queryer, tvfs fsx.Virtual, tstore storage.ClientImpl) error {
+func MediaMetadataImport(ctx context.Context, db sqlx.Queryer, tvfs fsx.Virtual, tstore storage.ClientImpl) (err error) {
+	type metadataImportBatch struct {
+		metadata  tracking.Metadata
+		records   []library.Known
+		completed bool
+	}
+
 	log.Println("import latest media metadata initiated")
 	defer log.Println("import latest media metadata completed")
 
@@ -39,9 +45,9 @@ func MediaMetadataImport(ctx context.Context, db sqlx.Queryer, tvfs fsx.Virtual,
 	mdcache := torrent.NewMetadataCache(tvfs.Path())
 	iter := sqlx.Scan(tracking.MetadataSearch(ctx, db, q))
 
-	insert := asynccompute.New(func(ctx context.Context, chunk []library.Known) error {
+	insert := asynccompute.New(func(ctx context.Context, batch metadataImportBatch) error {
 		ts := time.Now()
-		s := library.NewKnownBatchInsertWithDefaults(ctx, db, chunk...)
+		s := library.NewKnownBatchInsertWithDefaults(ctx, db, batch.records...)
 
 		if err := sqlx.Discard(sqlx.Scan(s)); err != nil {
 			return errorsx.Wrap(err, "failed to insert batch")
@@ -51,9 +57,16 @@ func MediaMetadataImport(ctx context.Context, db sqlx.Queryer, tvfs fsx.Virtual,
 			return errorsx.Wrap(err, "failed to checkpoint batch")
 		}
 
-		log.Println("imported", time.Since(ts), len(chunk), "records")
+		log.Println("imported", time.Since(ts), len(batch.records), "records")
+
+		if batch.completed {
+			if err := tracking.MetadataImportedByID(ctx, db, batch.metadata.ID).Scan(&batch.metadata); err != nil {
+				return errorsx.Wrap(err, "unable to mark archive as imported")
+			}
+		}
+
 		return nil
-	}, asynccompute.Workers[[]library.Known](1))
+	}, asynccompute.Workers[metadataImportBatch](1))
 
 	pool := asynccompute.New(func(ctx context.Context, _md tracking.Metadata) error {
 		id := int160.FromBytes(_md.Infohash)
@@ -88,7 +101,7 @@ func MediaMetadataImport(ctx context.Context, db sqlx.Queryer, tvfs fsx.Virtual,
 					return v
 				}, chunk...)
 
-				if err := insert.Run(ctx, chunk); err != nil {
+				if err := insert.Run(ctx, metadataImportBatch{metadata: _md, records: chunk}); err != nil {
 					return err
 				}
 			}
@@ -97,16 +110,25 @@ func MediaMetadataImport(ctx context.Context, db sqlx.Queryer, tvfs fsx.Virtual,
 
 		for header, content := range iter {
 			if err := importtarfile(header, content); err != nil {
+				log.Println("failed to import tarfile", header.Name)
 				return err
 			}
 		}
 
-		if err = tracking.MetadataImportedByID(ctx, db, _md.ID).Scan(&_md); err != nil {
+		if err := insert.Run(ctx, metadataImportBatch{metadata: _md, completed: true}); err != nil {
 			return errorsx.Wrap(err, "unable to mark archive as imported")
 		}
 
 		return nil
 	})
+
+	// pool must drain before insert is shut down, since pool's workers feed
+	// insert; deferring unconditionally ensures both run even if this
+	// function returns early (e.g. iter.Err()), so no enqueued metadata is
+	// abandoned mid-import.
+	defer func() {
+		err = errorsx.Compact(err, asynccompute.Shutdown(ctx, pool, insert))
+	}()
 
 	for _md := range iter.Iter() {
 		if err := pool.Run(ctx, _md); err != nil {
@@ -118,9 +140,5 @@ func MediaMetadataImport(ctx context.Context, db sqlx.Queryer, tvfs fsx.Virtual,
 		return errorsx.Wrap(iter.Err(), "failed to ingest latest media metadata")
 	}
 
-	if err := asynccompute.Shutdown(ctx, pool); err != nil {
-		return err
-	}
-
-	return asynccompute.Shutdown(ctx, insert)
+	return nil
 }
