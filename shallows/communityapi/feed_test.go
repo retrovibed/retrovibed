@@ -226,4 +226,66 @@ func TestFeedGeneration(t *testing.T) {
 		require.Len(t, items, 1)
 		require.Equal(t, pc1.ID, items[0].Guid)
 	})
+
+	t.Run("excludes published content missing a magnet uri", func(t *testing.T) {
+		var (
+			ctx, done   = testx.Context(t)
+			q           = sqltestx.Metadatabase(t)
+			communityID = uuid.Must(uuid.NewV7()).String()
+		)
+		defer done()
+
+		var lmd1 library.Metadata
+		require.NoError(t, testx.Fake(&lmd1, library.MetadataOptionTestDefaults, func(m *library.Metadata) {
+			m.ID = uuid.Must(uuid.NewV7()).String()
+			m.Description = "synced-media.mp4"
+			m.Bytes = bytesx.KiB
+			m.Mimetype = "video/mp4"
+		}))
+		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd1).Scan(&lmd1))
+
+		var lmd2 library.Metadata
+		require.NoError(t, testx.Fake(&lmd2, library.MetadataOptionTestDefaults, func(m *library.Metadata) {
+			m.ID = uuid.Must(uuid.NewV7()).String()
+			m.Description = "urlless-media.mp4"
+			m.Bytes = 2 * bytesx.KiB
+			m.Mimetype = "video/mp4"
+		}))
+		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd2).Scan(&lmd2))
+
+		var pc1 community.PublishedContent
+		require.NoError(t, testx.Fake(&pc1, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
+			p.CommunityID = communityID
+			p.MagnetURI = "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33"
+			p.LibraryID = lmd1.ID
+			p.PublishMode = int32(PublishMode_LISTED)
+		}))
+		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc1).Scan(&pc1))
+		require.NoError(t, community.PublishedContentUpdatePublishedAt(ctx, q, pc1.ID, time.Now()).Scan(&pc1))
+
+		// published_at has already been stamped (e.g. by a stale sync) but the
+		// magnet uri never landed, so the item has no usable link/enclosure.
+		var pc2 community.PublishedContent
+		require.NoError(t, testx.Fake(&pc2, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
+			p.CommunityID = communityID
+			p.MagnetURI = ""
+			p.LibraryID = lmd2.ID
+			p.PublishMode = int32(PublishMode_LISTED)
+		}))
+		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc2).Scan(&pc2))
+		require.NoError(t, community.PublishedContentUpdatePublishedAt(ctx, q, pc2.ID, time.Now()).Scan(&pc2))
+
+		community := &Community{
+			Id:          communityID,
+			Domain:      "testcommunity",
+			Description: "test",
+			Entropy:     "test-entropy",
+			Mimetype:    "video/*",
+		}
+
+		items, err := buildFeedItems(ctx, q, community)
+		require.NoError(t, err)
+		require.Len(t, items, 1)
+		require.Equal(t, pc1.ID, items[0].Guid)
+	})
 }

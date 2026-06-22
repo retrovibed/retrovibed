@@ -82,6 +82,10 @@ func buildFeedItems(ctx context.Context, q sqlx.Queryer, c *Community) ([]rss.It
 			continue
 		}
 
+		if pc.MagnetURI == "" {
+			continue
+		}
+
 		items = append(items, rss.Item{
 			Guid:        pc.ID,
 			Title:       stringsx.FirstNonBlank(known.Title, known.OriginalTitle, lmd.Description),
