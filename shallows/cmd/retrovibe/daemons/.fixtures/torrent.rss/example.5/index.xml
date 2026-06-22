@@ -1,0 +1,226 @@
+<rss version="2.0"
+  xmlns:retrovibed="https://retrovibed.com/rss/feed"
+  xmlns:atom="http://www.w3.org/2005/Atom"
+  xmlns:content="http://purl.org/rss/1.0/modules/content/"
+  xmlns:media="http://search.yahoo.com/mrss/">
+  <channel>
+    <title>media</title>
+    <link>https://media.community.retrovibe.space</link>
+    <description>magnet links for media metadata archives for use by the retrovibed application</description>
+    <copyright></copyright>
+    <language>eng</language>
+    <lastBuildDate>Mon, 22 Jun 2026 13:05:02 +0000</lastBuildDate>
+    <ttl>1440</ttl>
+    <retrovibed:metadata entropy="ce7fd130-c0d3-4da3-abc8-c666c63a791e" mimetype="application/vnd.retrovibed.media.archive"></retrovibed:metadata>
+    <item>
+      <guid isPermaLink="false">019eef6c-6edf-7f23-a23a-167774a1e043</guid>
+      <title>retrovibed.media.metadata.archive.05.tar.gz</title>
+      <link>magnet:?xt=urn:btih:a582cb5069d066433d8a3d52132b659b8cbb9e69&amp;dn=retrovibed.media.metadata.archive.05.tar.gz</link>
+      <pubDate>Mon, 22 Jun 2026 13:05:02 +0000</pubDate>
+      <enclosure url="magnet:?xt=urn:btih:a582cb5069d066433d8a3d52132b659b8cbb9e69&amp;dn=retrovibed.media.metadata.archive.05.tar.gz" type="application/vnd.retrovibed.media.archive" length="14266525"></enclosure>
+    </item>
+    <item>
+      <guid isPermaLink="false">019eef6c-702f-7e69-bc9a-fd936363bdb3</guid>
+      <title>retrovibed.media.metadata.archive.18.tar.gz</title>
+      <link>magnet:?xt=urn:btih:356628a3ba5bb4980e7b1552d99487b14536cc58&amp;dn=retrovibed.media.metadata.archive.18.tar.gz</link>
+      <pubDate>Mon, 22 Jun 2026 13:05:00 +0000</pubDate>
+      <enclosure url="magnet:?xt=urn:btih:356628a3ba5bb4980e7b1552d99487b14536cc58&amp;dn=retrovibed.media.metadata.archive.18.tar.gz" type="application/vnd.retrovibed.media.archive" length="19206320"></enclosure>
+    </item>
+    <item>
+      <guid isPermaLink="false">019eef6c-7025-7ca6-b7be-42e63872248b</guid>
+      <title>retrovibed.media.metadata.archive.19.tar.gz</title>
+      <link>magnet:?xt=urn:btih:5b528acf48d9cda03d0a22237d8c163f4945114c&amp;dn=retrovibed.media.metadata.archive.19.tar.gz</link>
+      <pubDate>Mon, 22 Jun 2026 13:04:57 +0000</pubDate>
+      <enclosure url="magnet:?xt=urn:btih:5b528acf48d9cda03d0a22237d8c163f4945114c&amp;dn=retrovibed.media.metadata.archive.19.tar.gz" type="application/vnd.retrovibed.media.archive" length="26655517"></enclosure>
+    </item>
+    <item>
+      <guid isPermaLink="false">019eef6c-701c-7d21-8153-beb8be912797</guid>
+      <title>retrovibed.media.metadata.archive.09.tar.gz</title>
+      <link>magnet:?xt=urn:btih:9d7bbba14d54d90da3966c2d9c7b9f37d8c0cf98&amp;dn=retrovibed.media.metadata.archive.09.tar.gz</link>
+      <pubDate>Mon, 22 Jun 2026 13:04:54 +0000</pubDate>
+      <enclosure url="magnet:?xt=urn:btih:9d7bbba14d54d90da3966c2d9c7b9f37d8c0cf98&amp;dn=retrovibed.media.metadata.archive.09.tar.gz" type="application/vnd.retrovibed.media.archive" length="23979650"></enclosure>
+    </item>
+    <item>
+      <guid isPermaLink="false">019eef6c-7010-7f54-9b75-dbfbda46c428</guid>
+      <title>retrovibed.media.metadata.archive.15.tar.gz</title>
+      <link>magnet:?xt=urn:btih:bcf6b2239c90e93c1e7a1dc401a29f9a262b49ae&amp;dn=retrovibed.media.metadata.archive.15.tar.gz</link>
+      <pubDate>Mon, 22 Jun 2026 13:04:50 +0000</pubDate>
+      <enclosure url="magnet:?xt=urn:btih:bcf6b2239c90e93c1e7a1dc401a29f9a262b49ae&amp;dn=retrovibed.media.metadata.archive.15.tar.gz" type="application/vnd.retrovibed.media.archive" length="21100071"></enclosure>
+    </item>
+    <item>
+      <guid isPermaLink="false">019eef6c-7007-75fb-b44a-9259f56ba95b</guid>
+      <title>retrovibed.media.metadata.archive.02.tar.gz</title>
+      <link>magnet:?xt=urn:btih:4a06e35053aabba76c96aefe468d0ef60699fbc9&amp;dn=retrovibed.media.metadata.archive.02.tar.gz</link>
+      <pubDate>Mon, 22 Jun 2026 13:04:47 +0000</pubDate>
+      <enclosure url="magnet:?xt=urn:btih:4a06e35053aabba76c96aefe468d0ef60699fbc9&amp;dn=retrovibed.media.metadata.archive.02.tar.gz" type="application/vnd.retrovibed.media.archive" length="19465206"></enclosure>
+    </item>
+    <item>
+      <guid isPermaLink="false">019eef6c-6ffe-7517-8846-3e671d9bd905</guid>
+      <title>retrovibed.media.metadata.archive.06.tar.gz</title>
+      <link>magnet:?xt=urn:btih:a68ff0c0256d99fc514635a850aeebe54f4265f1&amp;dn=retrovibed.media.metadata.archive.06.tar.gz</link>
+      <pubDate>Mon, 22 Jun 2026 13:04:45 +0000</pubDate>
+      <enclosure url="magnet:?xt=urn:btih:a68ff0c0256d99fc514635a850aeebe54f4265f1&amp;dn=retrovibed.media.metadata.archive.06.tar.gz" type="application/vnd.retrovibed.media.archive" length="18864979"></enclosure>
+    </item>
+    <item>
+      <guid isPermaLink="false">019eef6c-6ff5-76b4-bc60-2de7627843e6</guid>
+      <title>retrovibed.media.metadata.archive.1d.tar.gz</title>
+      <link>magnet:?xt=urn:btih:f2cf7d30e207fd4b10959d59cf0117c0909208f2&amp;dn=retrovibed.media.metadata.archive.1d.tar.gz</link>
+      <pubDate>Mon, 22 Jun 2026 13:04:41 +0000</pubDate>
+      <enclosure url="magnet:?xt=urn:btih:f2cf7d30e207fd4b10959d59cf0117c0909208f2&amp;dn=retrovibed.media.metadata.archive.1d.tar.gz" type="application/vnd.retrovibed.media.archive" length="18405585"></enclosure>
+    </item>
+    <item>
+      <guid isPermaLink="false">019eef6c-6feb-7f8f-bd83-1b24a7f47a11</guid>
+      <title>retrovibed.media.metadata.archive.1f.tar.gz</title>
+      <link>magnet:?xt=urn:btih:dbbbf20d995b92b01d0d56107d0510d799ed79fc&amp;dn=retrovibed.media.metadata.archive.1f.tar.gz</link>
+      <pubDate>Mon, 22 Jun 2026 13:04:38 +0000</pubDate>
+      <enclosure url="magnet:?xt=urn:btih:dbbbf20d995b92b01d0d56107d0510d799ed79fc&amp;dn=retrovibed.media.metadata.archive.1f.tar.gz" type="application/vnd.retrovibed.media.archive" length="17908209"></enclosure>
+    </item>
+    <item>
+      <guid isPermaLink="false">019eef6c-6fe2-7e78-9d4c-cce906aa67a6</guid>
+      <title>retrovibed.media.metadata.archive.0f.tar.gz</title>
+      <link>magnet:?xt=urn:btih:fd96c938b9e9aaa517f46dcba1329b3283ae4917&amp;dn=retrovibed.media.metadata.archive.0f.tar.gz</link>
+      <pubDate>Mon, 22 Jun 2026 13:04:36 +0000</pubDate>
+      <enclosure url="magnet:?xt=urn:btih:fd96c938b9e9aaa517f46dcba1329b3283ae4917&amp;dn=retrovibed.media.metadata.archive.0f.tar.gz" type="application/vnd.retrovibed.media.archive" length="17991909"></enclosure>
+    </item>
+    <item>
+      <guid isPermaLink="false">019eef6c-6fd8-723f-a722-878f8b2004d9</guid>
+      <title>retrovibed.media.metadata.archive.0a.tar.gz</title>
+      <link>magnet:?xt=urn:btih:787c1b7a484a35c57dc97e3899caf21e3a0037f9&amp;dn=retrovibed.media.metadata.archive.0a.tar.gz</link>
+      <pubDate>Mon, 22 Jun 2026 13:04:33 +0000</pubDate>
+      <enclosure url="magnet:?xt=urn:btih:787c1b7a484a35c57dc97e3899caf21e3a0037f9&amp;dn=retrovibed.media.metadata.archive.0a.tar.gz" type="application/vnd.retrovibed.media.archive" length="17447445"></enclosure>
+    </item>
+    <item>
+      <guid isPermaLink="false">019eef6c-6fcf-7f0a-944d-57cf81a79e05</guid>
+      <title>retrovibed.media.metadata.archive.0d.tar.gz</title>
+      <link>magnet:?xt=urn:btih:6db180d09091fcc4053b8b87c03769a985835db9&amp;dn=retrovibed.media.metadata.archive.0d.tar.gz</link>
+      <pubDate>Mon, 22 Jun 2026 13:04:30 +0000</pubDate>
+      <enclosure url="magnet:?xt=urn:btih:6db180d09091fcc4053b8b87c03769a985835db9&amp;dn=retrovibed.media.metadata.archive.0d.tar.gz" type="application/vnd.retrovibed.media.archive" length="18339195"></enclosure>
+    </item>
+    <item>
+      <guid isPermaLink="false">019eef6c-6fc5-7c03-8a35-cfe00f8e3c6c</guid>
+      <title>retrovibed.media.metadata.archive.10.tar.gz</title>
+      <link>magnet:?xt=urn:btih:41c8bb84c3e6fb3e590cfb34b6e59d328f8e2d43&amp;dn=retrovibed.media.metadata.archive.10.tar.gz</link>
+      <pubDate>Mon, 22 Jun 2026 13:04:27 +0000</pubDate>
+      <enclosure url="magnet:?xt=urn:btih:41c8bb84c3e6fb3e590cfb34b6e59d328f8e2d43&amp;dn=retrovibed.media.metadata.archive.10.tar.gz" type="application/vnd.retrovibed.media.archive" length="17190571"></enclosure>
+    </item>
+    <item>
+      <guid isPermaLink="false">019eef6c-6fbc-7ec8-85aa-3b965c9cdf4f</guid>
+      <title>retrovibed.media.metadata.archive.0b.tar.gz</title>
+      <link>magnet:?xt=urn:btih:3631f23154666f5d1f8b425c17adceb8eac69755&amp;dn=retrovibed.media.metadata.archive.0b.tar.gz</link>
+      <pubDate>Mon, 22 Jun 2026 13:04:24 +0000</pubDate>
+      <enclosure url="magnet:?xt=urn:btih:3631f23154666f5d1f8b425c17adceb8eac69755&amp;dn=retrovibed.media.metadata.archive.0b.tar.gz" type="application/vnd.retrovibed.media.archive" length="17821750"></enclosure>
+    </item>
+    <item>
+      <guid isPermaLink="false">019eef6c-6fb2-70ab-bb56-3ed22efbb525</guid>
+      <title>retrovibed.media.metadata.archive.0e.tar.gz</title>
+      <link>magnet:?xt=urn:btih:70e2ad25d6f6877bf6931238477e7f18a16fd35f&amp;dn=retrovibed.media.metadata.archive.0e.tar.gz</link>
+      <pubDate>Mon, 22 Jun 2026 13:04:21 +0000</pubDate>
+      <enclosure url="magnet:?xt=urn:btih:70e2ad25d6f6877bf6931238477e7f18a16fd35f&amp;dn=retrovibed.media.metadata.archive.0e.tar.gz" type="application/vnd.retrovibed.media.archive" length="17788092"></enclosure>
+    </item>
+    <item>
+      <guid isPermaLink="false">019eef6c-6fa9-71b1-bff8-7a90d4815eaa</guid>
+      <title>retrovibed.media.metadata.archive.03.tar.gz</title>
+      <link>magnet:?xt=urn:btih:1f9ffe1f23ea3f576c23c7cd943221b3cd901919&amp;dn=retrovibed.media.metadata.archive.03.tar.gz</link>
+      <pubDate>Mon, 22 Jun 2026 13:04:18 +0000</pubDate>
+      <enclosure url="magnet:?xt=urn:btih:1f9ffe1f23ea3f576c23c7cd943221b3cd901919&amp;dn=retrovibed.media.metadata.archive.03.tar.gz" type="application/vnd.retrovibed.media.archive" length="17356447"></enclosure>
+    </item>
+    <item>
+      <guid isPermaLink="false">019eef6c-6f9c-7ad3-a321-e2b1a311cb33</guid>
+      <title>retrovibed.media.metadata.archive.1c.tar.gz</title>
+      <link>magnet:?xt=urn:btih:e7c731b27b85091b2899fc2b270abab564efa043&amp;dn=retrovibed.media.metadata.archive.1c.tar.gz</link>
+      <pubDate>Mon, 22 Jun 2026 13:04:16 +0000</pubDate>
+      <enclosure url="magnet:?xt=urn:btih:e7c731b27b85091b2899fc2b270abab564efa043&amp;dn=retrovibed.media.metadata.archive.1c.tar.gz" type="application/vnd.retrovibed.media.archive" length="16807945"></enclosure>
+    </item>
+    <item>
+      <guid isPermaLink="false">019eef6c-6f8f-71dc-93fe-035d707cb377</guid>
+      <title>retrovibed.media.metadata.archive.0c.tar.gz</title>
+      <link>magnet:?xt=urn:btih:af683f7a903883f6d36befed26e6cb7cd005342e&amp;dn=retrovibed.media.metadata.archive.0c.tar.gz</link>
+      <pubDate>Mon, 22 Jun 2026 13:04:13 +0000</pubDate>
+      <enclosure url="magnet:?xt=urn:btih:af683f7a903883f6d36befed26e6cb7cd005342e&amp;dn=retrovibed.media.metadata.archive.0c.tar.gz" type="application/vnd.retrovibed.media.archive" length="17525914"></enclosure>
+    </item>
+    <item>
+      <guid isPermaLink="false">019eef6c-6f7e-7c66-814e-a07605517afa</guid>
+      <title>retrovibed.media.metadata.archive.17.tar.gz</title>
+      <link>magnet:?xt=urn:btih:9edf420f77336156f8d791fe2f4638faf280a030&amp;dn=retrovibed.media.metadata.archive.17.tar.gz</link>
+      <pubDate>Mon, 22 Jun 2026 13:04:10 +0000</pubDate>
+      <enclosure url="magnet:?xt=urn:btih:9edf420f77336156f8d791fe2f4638faf280a030&amp;dn=retrovibed.media.metadata.archive.17.tar.gz" type="application/vnd.retrovibed.media.archive" length="15887608"></enclosure>
+    </item>
+    <item>
+      <guid isPermaLink="false">019eef6c-6f71-7f21-a9db-19d2ddb58019</guid>
+      <title>retrovibed.media.metadata.archive.11.tar.gz</title>
+      <link>magnet:?xt=urn:btih:0e57db23f1ca9b38ea91eb3758bd5210837d9de5&amp;dn=retrovibed.media.metadata.archive.11.tar.gz</link>
+      <pubDate>Mon, 22 Jun 2026 13:04:07 +0000</pubDate>
+      <enclosure url="magnet:?xt=urn:btih:0e57db23f1ca9b38ea91eb3758bd5210837d9de5&amp;dn=retrovibed.media.metadata.archive.11.tar.gz" type="application/vnd.retrovibed.media.archive" length="16208605"></enclosure>
+    </item>
+    <item>
+      <guid isPermaLink="false">019eef6c-6f65-7a1a-82c9-691bf3f9a67e</guid>
+      <title>retrovibed.media.metadata.archive.07.tar.gz</title>
+      <link>magnet:?xt=urn:btih:3a931ed91419482ce56a262fa77950af85f9bbe3&amp;dn=retrovibed.media.metadata.archive.07.tar.gz</link>
+      <pubDate>Mon, 22 Jun 2026 13:04:04 +0000</pubDate>
+      <enclosure url="magnet:?xt=urn:btih:3a931ed91419482ce56a262fa77950af85f9bbe3&amp;dn=retrovibed.media.metadata.archive.07.tar.gz" type="application/vnd.retrovibed.media.archive" length="16410552"></enclosure>
+    </item>
+    <item>
+      <guid isPermaLink="false">019eef6c-6f55-76fe-ada7-956b927a45fb</guid>
+      <title>retrovibed.media.metadata.archive.1e.tar.gz</title>
+      <link>magnet:?xt=urn:btih:c6ac69ba00762e51c2fddf3772af2e9bfa292244&amp;dn=retrovibed.media.metadata.archive.1e.tar.gz</link>
+      <pubDate>Mon, 22 Jun 2026 13:04:02 +0000</pubDate>
+      <enclosure url="magnet:?xt=urn:btih:c6ac69ba00762e51c2fddf3772af2e9bfa292244&amp;dn=retrovibed.media.metadata.archive.1e.tar.gz" type="application/vnd.retrovibed.media.archive" length="17421549"></enclosure>
+    </item>
+    <item>
+      <guid isPermaLink="false">019eef6c-6f48-794d-9503-c0eb45f4ab78</guid>
+      <title>retrovibed.media.metadata.archive.1a.tar.gz</title>
+      <link>magnet:?xt=urn:btih:c8c196e63340b4682c25519843e6a89bd2c8a08f&amp;dn=retrovibed.media.metadata.archive.1a.tar.gz</link>
+      <pubDate>Mon, 22 Jun 2026 13:03:59 +0000</pubDate>
+      <enclosure url="magnet:?xt=urn:btih:c8c196e63340b4682c25519843e6a89bd2c8a08f&amp;dn=retrovibed.media.metadata.archive.1a.tar.gz" type="application/vnd.retrovibed.media.archive" length="15665696"></enclosure>
+    </item>
+    <item>
+      <guid isPermaLink="false">019eef6c-6f3c-7a86-b553-6301d93e4b75</guid>
+      <title>retrovibed.media.metadata.archive.08.tar.gz</title>
+      <link>magnet:?xt=urn:btih:de9e660921f0b6ddbaf9e27528f85fd9a2537ec8&amp;dn=retrovibed.media.metadata.archive.08.tar.gz</link>
+      <pubDate>Mon, 22 Jun 2026 13:03:56 +0000</pubDate>
+      <enclosure url="magnet:?xt=urn:btih:de9e660921f0b6ddbaf9e27528f85fd9a2537ec8&amp;dn=retrovibed.media.metadata.archive.08.tar.gz" type="application/vnd.retrovibed.media.archive" length="15739649"></enclosure>
+    </item>
+    <item>
+      <guid isPermaLink="false">019eef6c-6f2f-76d3-bc4c-c2d41aae2f36</guid>
+      <title>retrovibed.media.metadata.archive.12.tar.gz</title>
+      <link>magnet:?xt=urn:btih:89b884138506b84cf2966a8769892e2867b90cb7&amp;dn=retrovibed.media.metadata.archive.12.tar.gz</link>
+      <pubDate>Mon, 22 Jun 2026 13:03:53 +0000</pubDate>
+      <enclosure url="magnet:?xt=urn:btih:89b884138506b84cf2966a8769892e2867b90cb7&amp;dn=retrovibed.media.metadata.archive.12.tar.gz" type="application/vnd.retrovibed.media.archive" length="15612775"></enclosure>
+    </item>
+    <item>
+      <guid isPermaLink="false">019eef6c-6f22-703d-9dc4-a58e24a2c4f4</guid>
+      <title>retrovibed.media.metadata.archive.13.tar.gz</title>
+      <link>magnet:?xt=urn:btih:74845fe5f62c1f0ba50b4cfa40b8fc3ddf8f8986&amp;dn=retrovibed.media.metadata.archive.13.tar.gz</link>
+      <pubDate>Mon, 22 Jun 2026 13:03:50 +0000</pubDate>
+      <enclosure url="magnet:?xt=urn:btih:74845fe5f62c1f0ba50b4cfa40b8fc3ddf8f8986&amp;dn=retrovibed.media.metadata.archive.13.tar.gz" type="application/vnd.retrovibed.media.archive" length="15262466"></enclosure>
+    </item>
+    <item>
+      <guid isPermaLink="false">019eef6c-6f15-7dfe-9283-1150a110abfa</guid>
+      <title>retrovibed.media.metadata.archive.04.tar.gz</title>
+      <link>magnet:?xt=urn:btih:c3bbc2e72a76ecf3fbe0a29b0684484beb5b00d8&amp;dn=retrovibed.media.metadata.archive.04.tar.gz</link>
+      <pubDate>Mon, 22 Jun 2026 13:03:47 +0000</pubDate>
+      <enclosure url="magnet:?xt=urn:btih:c3bbc2e72a76ecf3fbe0a29b0684484beb5b00d8&amp;dn=retrovibed.media.metadata.archive.04.tar.gz" type="application/vnd.retrovibed.media.archive" length="15098264"></enclosure>
+    </item>
+    <item>
+      <guid isPermaLink="false">019eef6c-6f02-785f-98ff-e121299c228b</guid>
+      <title>retrovibed.media.metadata.archive.16.tar.gz</title>
+      <link>magnet:?xt=urn:btih:9f874da166a55b3c976caccaeef4a7bebd9e1a95&amp;dn=retrovibed.media.metadata.archive.16.tar.gz</link>
+      <pubDate>Mon, 22 Jun 2026 13:03:45 +0000</pubDate>
+      <enclosure url="magnet:?xt=urn:btih:9f874da166a55b3c976caccaeef4a7bebd9e1a95&amp;dn=retrovibed.media.metadata.archive.16.tar.gz" type="application/vnd.retrovibed.media.archive" length="13861601"></enclosure>
+    </item>
+    <item>
+      <guid isPermaLink="false">019eef6c-6ef1-762c-8495-5e4f912ac56b</guid>
+      <title>retrovibed.media.metadata.archive.1b.tar.gz</title>
+      <link>magnet:?xt=urn:btih:b0901e621b281633963574a48ceab52d8e49cbfe&amp;dn=retrovibed.media.metadata.archive.1b.tar.gz</link>
+      <pubDate>Mon, 22 Jun 2026 13:03:42 +0000</pubDate>
+      <enclosure url="magnet:?xt=urn:btih:b0901e621b281633963574a48ceab52d8e49cbfe&amp;dn=retrovibed.media.metadata.archive.1b.tar.gz" type="application/vnd.retrovibed.media.archive" length="14389004"></enclosure>
+    </item>
+    <item>
+      <guid isPermaLink="false">019eef6c-6ed0-77de-8409-62fd4a18727b</guid>
+      <title>retrovibed.media.metadata.archive.00.tar.gz</title>
+      <link>magnet:?xt=urn:btih:0d6fcdd1d4fe59ffc254d3b00a6f2d61de2ad2c9&amp;dn=retrovibed.media.metadata.archive.00.tar.gz</link>
+      <pubDate>Mon, 22 Jun 2026 13:03:39 +0000</pubDate>
+      <enclosure url="magnet:?xt=urn:btih:0d6fcdd1d4fe59ffc254d3b00a6f2d61de2ad2c9&amp;dn=retrovibed.media.metadata.archive.00.tar.gz" type="application/vnd.retrovibed.media.archive" length="12804929"></enclosure>
+    </item>
+  </channel>
+</rss>

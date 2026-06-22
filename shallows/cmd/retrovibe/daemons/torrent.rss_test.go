@@ -227,37 +227,84 @@ func TestDiscoverFromRSSFeeds(t *testing.T) {
 		require.Equal(t, 1, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT (*) FROM torrents_metadata")))
 	})
 
-	t.Run("should mark media metadata as hidden", func(t *testing.T) {
-		q := sqltestx.Metadatabase(t)
+	t.Run("metadata", func(t *testing.T) {
+		t.Run("should be marked as hidden", func(t *testing.T) {
+			q := sqltestx.Metadatabase(t)
 
-		tclient := torrenttestx.QuickClient(t)
-		vfs := fsx.DirVirtual(t.TempDir())
-		tstore := blockcache.NewTorrentFromVirtualFS(vfs)
+			tclient := torrenttestx.QuickClient(t)
+			vfs := fsx.DirVirtual(t.TempDir())
+			tstore := blockcache.NewTorrentFromVirtualFS(vfs)
 
-		mux := http.NewServeMux()
+			mux := http.NewServeMux()
 
-		mux.HandleFunc("/index.xml", func(w http.ResponseWriter, r *http.Request) {
-			httptestx.HandleIO(testx.Read(testx.Fixture("torrent.rss", "example.4", "index.xml")))(w, r)
+			mux.HandleFunc("/index.xml", func(w http.ResponseWriter, r *http.Request) {
+				httptestx.HandleIO(testx.Read(testx.Fixture("torrent.rss", "example.4", "index.xml")))(w, r)
+			})
+
+			srv := httptest.NewServer(mux)
+			defer srv.Close()
+
+			require.NoError(t, fsx.MkDirs(0700, vfs.Path("torrent")))
+
+			feed := langx.Clone(tracking.RSS{}, tracking.RSSOptionDefaultFeeds(tracking.RSS{
+				Description:  t.Name(),
+				URL:          fmt.Sprintf("%s/index.xml", srv.URL),
+				Contributing: true,
+				LastBuiltAt:  time.Date(2025, time.July, 01, 17, 0, 0, 0, time.UTC),
+			}), tracking.RSSOptionDefaultEncryptionSeed)
+
+			require.NoError(t, tracking.RSSInsertDefaultFeed(t.Context(), q, feed).Scan(&feed))
+
+			require.Equal(t, 0, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT (*) FROM torrents_metadata")))
+			require.NoError(t, daemons.DiscoverFromRSSFeedsOnce(t.Context(), q, vfs, library.QueryCleanerNoop(), tclient, tstore))
+			require.Equal(t, 1, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT (*) FROM torrents_metadata")))
+			assert.Equal(t, mimex.RetrovibedMediaArchive, sqltestx.String(t, q, "SELECT mimetype FROM torrents_metadata"))
+			assert.WithinDuration(t, time.Now(), sqltestx.Timestamp(t, q, "SELECT hidden_at FROM torrents_metadata"), 100*time.Millisecond)
 		})
 
-		srv := httptest.NewServer(mux)
-		defer srv.Close()
+		t.Run("should set mimetype, hidden, and description from a feed of magnet links", func(t *testing.T) {
+			q := sqltestx.Metadatabase(t)
 
-		require.NoError(t, fsx.MkDirs(0700, vfs.Path("torrent")))
+			tclient := torrenttestx.QuickClient(t)
+			vfs := fsx.DirVirtual(t.TempDir())
+			tstore := blockcache.NewTorrentFromVirtualFS(vfs)
 
-		feed := langx.Clone(tracking.RSS{}, tracking.RSSOptionDefaultFeeds(tracking.RSS{
-			Description:  t.Name(),
-			URL:          fmt.Sprintf("%s/index.xml", srv.URL),
-			Contributing: true,
-			LastBuiltAt:  time.Date(2025, time.July, 01, 17, 0, 0, 0, time.UTC),
-		}), tracking.RSSOptionDefaultEncryptionSeed)
+			mux := http.NewServeMux()
 
-		require.NoError(t, tracking.RSSInsertDefaultFeed(t.Context(), q, feed).Scan(&feed))
+			mux.HandleFunc("/index.xml", func(w http.ResponseWriter, r *http.Request) {
+				httptestx.HandleIO(testx.Read(testx.Fixture("torrent.rss", "example.5", "index.xml")))(w, r)
+			})
 
-		require.Equal(t, 0, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT (*) FROM torrents_metadata")))
-		require.NoError(t, daemons.DiscoverFromRSSFeedsOnce(t.Context(), q, vfs, library.QueryCleanerNoop(), tclient, tstore))
-		require.Equal(t, 1, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT (*) FROM torrents_metadata")))
-		assert.Equal(t, mimex.RetrovibedMediaArchive, sqltestx.String(t, q, "SELECT mimetype FROM torrents_metadata"))
-		assert.WithinDuration(t, time.Now(), sqltestx.Timestamp(t, q, "SELECT hidden_at FROM torrents_metadata"), 100*time.Millisecond)
+			srv := httptest.NewServer(mux)
+			defer srv.Close()
+
+			require.NoError(t, fsx.MkDirs(0700, vfs.Path("torrent")))
+
+			feed := langx.Clone(tracking.RSS{}, tracking.RSSOptionDefaultFeeds(tracking.RSS{
+				Description:  t.Name(),
+				URL:          fmt.Sprintf("%s/index.xml", srv.URL),
+				Contributing: true,
+				LastBuiltAt:  time.Date(2024, time.July, 01, 17, 0, 0, 0, time.UTC),
+			}), tracking.RSSOptionDefaultEncryptionSeed)
+
+			require.NoError(t, tracking.RSSInsertDefaultFeed(t.Context(), q, feed).Scan(&feed))
+
+			require.NoError(t, daemons.DiscoverFromRSSFeedsOnce(t.Context(), q, vfs, library.QueryCleanerNoop(), tclient, tstore))
+			require.Equal(t, 30, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT (*) FROM torrents_metadata")))
+			require.Equal(t, 30, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT (*) FROM torrents_metadata WHERE mimetype = ?", mimex.RetrovibedMediaArchive)))
+
+			const query = "SELECT mimetype, description, hidden_at FROM torrents_metadata WHERE description = 'retrovibed.media.metadata.archive.05.tar.gz'"
+
+			var (
+				mimetype    string
+				description string
+				hiddenAt    time.Time
+			)
+			require.NoError(t, q.QueryRowContext(t.Context(), query).Scan(&mimetype, &description, &hiddenAt))
+
+			assert.Equal(t, mimex.RetrovibedMediaArchive, mimetype)
+			assert.Equal(t, "retrovibed.media.metadata.archive.05.tar.gz", description)
+			assert.WithinDuration(t, time.Now(), hiddenAt, time.Second)
+		})
 	})
 }
