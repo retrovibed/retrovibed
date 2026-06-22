@@ -10,7 +10,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
@@ -58,9 +57,8 @@ func SyncPendingToDeeppool(ctx context.Context, q sqlx.Queryer, httpc *http.Clie
 
 	for pc := range pending.Iter() {
 		var (
-			lmd       library.Metadata
-			known     library.Known
-			published *PublishContentResponse
+			lmd   library.Metadata
+			known library.Known
 		)
 
 		if err := library.MetadataFindByID(ctx, q, pc.LibraryID).Scan(&lmd); err != nil {
@@ -143,13 +141,10 @@ func SyncPendingToDeeppool(ctx context.Context, q sqlx.Queryer, httpc *http.Clie
 				Bytes:          lmd.Bytes,
 			},
 		}
-		if published, err = metrics.Publish(ctx, &req, io.NopCloser(bytes.NewReader(encoded))); err != nil {
+		if _, err = metrics.Publish(ctx, &req, io.NopCloser(bytes.NewReader(encoded))); err != nil {
 			log.Println(errorsx.Wrap(err, "failed to sync to deeppool"))
 			continue
 		}
-
-		log.Println("sent", spew.Sdump(req.PublishedContent))
-		log.Println("returned", spew.Sdump(published.PublishedContent))
 
 		if err := community.PublishedContentUpdatePublishedAt(ctx, q, pc.ID, time.Now()).Scan(&pc); err != nil {
 			log.Println(errorsx.Wrap(err, "failed to update published_at"))
