@@ -25,7 +25,7 @@ func TestKnownImportRun(t *testing.T) {
 
 		var input bytes.Buffer
 		require.NoError(t, jsonl.NewEncoder(&input).Encode(a, b))
-		require.NoError(t, knownimport{}.run(ctx, db, &input))
+		require.NoError(t, knownimport{Workers: 1}.run(ctx, db, &input))
 		require.Equal(t, 2, sqltestx.Count(t, db, `SELECT COUNT(*) FROM library_known_media`))
 	})
 
@@ -42,7 +42,7 @@ func TestKnownImportRun(t *testing.T) {
 
 		var input bytes.Buffer
 		require.NoError(t, jsonl.NewEncoder(&input).Encode(known))
-		require.NoError(t, knownimport{}.run(ctx, db, &input))
+		require.NoError(t, knownimport{Workers: 1}.run(ctx, db, &input))
 		expected := strings.Join([]string{"My Title", "Original Title", "A brief overview"}, "\n")
 		require.Equal(t, expected, sqltestx.String(t, db, `SELECT auto_description FROM library_known_media LIMIT 1`))
 	})
@@ -52,7 +52,7 @@ func TestKnownImportRun(t *testing.T) {
 		defer done()
 		db := sqltestx.Metadatabase(t)
 
-		require.NoError(t, knownimport{}.run(ctx, db, &bytes.Buffer{}))
+		require.NoError(t, knownimport{Workers: 1}.run(ctx, db, &bytes.Buffer{}))
 		require.Equal(t, 0, sqltestx.Count(t, db, `SELECT COUNT(*) FROM library_known_media`))
 	})
 
@@ -69,11 +69,29 @@ func TestKnownImportRun(t *testing.T) {
 		var input bytes.Buffer
 		items := slicesx.MapTransform(func(v library.Known) any { return v }, records...)
 		require.NoError(t, jsonl.NewEncoder(&input).Encode(items...))
-		require.NoError(t, knownimport{Batch: 1, Backlog: 150}.run(ctx, db, &input))
+		require.NoError(t, knownimport{Workers: 1, Batch: 1, Backlog: 150}.run(ctx, db, &input))
+		require.Equal(t, 150, sqltestx.Count(t, db, `SELECT COUNT(*) FROM library_known_media`))
+	})
+
+	t.Run("inserts more than one batch with multiple workers", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+		db := sqltestx.Metadatabase(t)
+
+		records := make([]library.Known, 150)
+		for i := range records {
+			require.NoError(t, testx.Fake(&records[i], library.KnownOptionTestDefaults, library.KnownOptionRandomID))
+		}
+
+		var input bytes.Buffer
+		items := slicesx.MapTransform(func(v library.Known) any { return v }, records...)
+		require.NoError(t, jsonl.NewEncoder(&input).Encode(items...))
+		require.NoError(t, knownimport{Workers: 8, Batch: 1, Backlog: 150}.run(ctx, db, &input))
 		require.Equal(t, 150, sqltestx.Count(t, db, `SELECT COUNT(*) FROM library_known_media`))
 	})
 
 	t.Run("upserts on conflict", func(t *testing.T) {
+		cmd := knownimport{Workers: 1}
 		ctx, done := testx.Context(t)
 		defer done()
 		db := sqltestx.Metadatabase(t)
@@ -84,8 +102,8 @@ func TestKnownImportRun(t *testing.T) {
 		var first, second bytes.Buffer
 		require.NoError(t, jsonl.NewEncoder(&first).Encode(known))
 		require.NoError(t, jsonl.NewEncoder(&second).Encode(known))
-		require.NoError(t, knownimport{}.run(ctx, db, &first))
-		require.NoError(t, knownimport{}.run(ctx, db, &second))
+		require.NoError(t, cmd.run(ctx, db, &first))
+		require.NoError(t, cmd.run(ctx, db, &second))
 		require.Equal(t, 1, sqltestx.Count(t, db, `SELECT COUNT(*) FROM library_known_media`))
 		require.Equal(t, 1, sqltestx.Count(t, db, `SELECT duplicates FROM library_known_media WHERE uid = ?`, known.UID))
 	})

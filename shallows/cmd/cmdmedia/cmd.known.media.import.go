@@ -22,7 +22,8 @@ import (
 type knownimport struct {
 	Database string `flag:"" name:"database" help:"database to read" default:"${vars_user_configuration_directory}/meta.db"`
 	Batch    int    `flag:"" name:"batch" help:"number of records to insert per batch" default:"8192"`
-	Backlog  uint16 `flag:"" name:"batch" help:"number of batches to allowed to queue up" default:"128"`
+	Backlog  uint16 `flag:"" name:"backlog" help:"number of batches to allowed to queue up" default:"128"`
+	Workers  uint16 `flag:"" name:"workers" help:"number of async database workers to run" default:"1"`
 }
 
 func (t knownimport) Run(gctx *cmdopts.Global) (err error) {
@@ -48,7 +49,7 @@ func (t knownimport) run(ctx context.Context, db *sql.DB, r io.Reader) (err erro
 
 		log.Println("imported", time.Since(ts), len(chunk), "records")
 		return nil
-	}, asynccompute.Backlog[batch](t.Backlog), asynccompute.Workers[batch](1))
+	}, asynccompute.Backlog[batch](t.Backlog), asynccompute.Workers[batch](t.Workers))
 
 	d := jsonl.Iter[library.Known](jsonl.NewDecoder(r))
 
