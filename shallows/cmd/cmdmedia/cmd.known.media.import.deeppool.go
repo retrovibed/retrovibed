@@ -18,6 +18,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/internal/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 )
@@ -38,7 +39,10 @@ func (t deeppoolimport) Run(gctx *cmdopts.Global) error {
 
 func (t deeppoolimport) run(ctx context.Context, enc *json.Encoder, httpc *http.Client) error {
 	client := communityapi.NewDeeppoolPublished(httpc)
-	cursor := uuid.Must(uuid.NewV7AtTime(t.StartAt)).String()
+	// UUIDv7 timestamps are an unsigned 48 bit count of milliseconds since the
+	// Unix epoch; offsets before the epoch wrap around instead of clamping.
+	// This is safe for now because retrovibed was created well after the Unix epoch.
+	cursor := uuid.Must(uuid.NewV7AtTime(timex.Max(t.StartAt, time.Unix(0, 0)))).String()
 
 	for {
 		resp, err := client.Sync(ctx, cursor)

@@ -79,13 +79,6 @@ func TestDeeppoolImportRun(t *testing.T) {
 		return communityapi.PublishedContentSearchResponse{Items: items}
 	}
 
-	newHTTPClient := func(t *testing.T, srv *httptest.Server) *http.Client {
-		t.Helper()
-		c := &http.Client{}
-		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
-		return c
-	}
-
 	decodeAll := func(t *testing.T, buf *bytes.Buffer) []library.Known {
 		t.Helper()
 		var results []library.Known
@@ -114,7 +107,7 @@ func TestDeeppoolImportRun(t *testing.T) {
 		defer srv.Close()
 
 		m := deeppoolimport{StartAt: startAt, Source: "deeppool"}
-		require.NoError(t, m.run(ctx, json.NewEncoder(&bytes.Buffer{}), newHTTPClient(t, srv)))
+		require.NoError(t, m.run(ctx, json.NewEncoder(&bytes.Buffer{}), &http.Client{Transport: httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), nil)}))
 
 		parsed := uuid.FromStringOrNil(firstCursor)
 		require.False(t, parsed.IsNil())
@@ -122,6 +115,33 @@ func TestDeeppoolImportRun(t *testing.T) {
 		// top 48 bits of UUID v7 are milliseconds since Unix epoch
 		ms := int64(binary.BigEndian.Uint64(parsed[:8]) >> 16)
 		require.Equal(t, startAt.UnixMilli(), ms)
+	})
+
+	t.Run("zero state cursor", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		startAt := time.Date(1700, 1, 1, 0, 0, 0, 0, time.UTC)
+		var firstCursor string
+
+		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if firstCursor == "" {
+				firstCursor = r.URL.Query().Get("sync")
+			}
+			require.NoError(t, json.NewEncoder(w).Encode(syncResponse()))
+		}))
+		defer srv.Close()
+
+		m := deeppoolimport{StartAt: startAt, Source: "deeppool"}
+		require.NoError(t, m.run(ctx, json.NewEncoder(&bytes.Buffer{}), &http.Client{Transport: httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), nil)}))
+
+		parsed := uuid.FromStringOrNil(firstCursor)
+		require.False(t, parsed.IsNil())
+		require.Equal(t, uuid.V7, parsed.Version())
+		// top 48 bits of UUID v7 are milliseconds since Unix epoch; dates before
+		// 1970 clamp to the epoch instead of wrapping around.
+		ms := int64(binary.BigEndian.Uint64(parsed[:8]) >> 16)
+		require.Zero(t, ms)
 	})
 
 	t.Run("returns records from a single page", func(t *testing.T) {
@@ -148,7 +168,7 @@ func TestDeeppoolImportRun(t *testing.T) {
 
 		var buf bytes.Buffer
 		m := deeppoolimport{Source: "deeppool"}
-		require.NoError(t, m.run(ctx, json.NewEncoder(&buf), newHTTPClient(t, srv)))
+		require.NoError(t, m.run(ctx, json.NewEncoder(&buf), &http.Client{Transport: httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), nil)}))
 
 		results := decodeAll(t, &buf)
 		require.Len(t, results, 2)
@@ -176,7 +196,7 @@ func TestDeeppoolImportRun(t *testing.T) {
 
 		var buf bytes.Buffer
 		m := deeppoolimport{Source: "deeppool"}
-		require.NoError(t, m.run(ctx, json.NewEncoder(&buf), newHTTPClient(t, srv)))
+		require.NoError(t, m.run(ctx, json.NewEncoder(&buf), &http.Client{Transport: httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), nil)}))
 		require.Len(t, decodeAll(t, &buf), 2)
 		require.Equal(t, 2, call)
 	})
@@ -203,7 +223,7 @@ func TestDeeppoolImportRun(t *testing.T) {
 		defer srv.Close()
 
 		m := deeppoolimport{Source: "deeppool"}
-		require.NoError(t, m.run(ctx, json.NewEncoder(&bytes.Buffer{}), newHTTPClient(t, srv)))
+		require.NoError(t, m.run(ctx, json.NewEncoder(&bytes.Buffer{}), &http.Client{Transport: httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), nil)}))
 		require.Len(t, seenCursors, 2)
 		require.Equal(t, page1LastID, seenCursors[1])
 	})
@@ -218,6 +238,6 @@ func TestDeeppoolImportRun(t *testing.T) {
 		defer srv.Close()
 
 		m := deeppoolimport{Source: "deeppool"}
-		require.Error(t, m.run(ctx, json.NewEncoder(&bytes.Buffer{}), newHTTPClient(t, srv)))
+		require.Error(t, m.run(ctx, json.NewEncoder(&bytes.Buffer{}), &http.Client{Transport: httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), nil)}))
 	})
 }
