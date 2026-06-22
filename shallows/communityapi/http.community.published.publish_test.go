@@ -2,7 +2,6 @@ package communityapi_test
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"testing"
 	"time"
@@ -171,9 +170,7 @@ func TestPublishEndpoint(t *testing.T) {
 		var result communityapi.PublishContentResponse
 		require.NoError(t, json.Unmarshal(resp.Body.Bytes(), &result))
 		require.NotEmpty(t, result.PublishedContent.Id)
-		log.Println("WAAAT", lmd.Mimetype, result.PublishedContent.Mimetype)
 		require.Equal(t, lmd.Mimetype, result.PublishedContent.Mimetype)
-		require.True(t, false)
 
 		var pc community.PublishedContent
 		require.NoError(t, community.PublishedContentFindByID(ctx, q, result.PublishedContent.Id).Scan(&pc))
