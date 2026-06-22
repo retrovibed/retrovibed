@@ -31,9 +31,12 @@ jobs:
           check-latest: true # Ensures the latest stable version is always used
       - uses: tecolicom/actions-use-homebrew-tools@v1
         with:
-          tools: "duckdb gpgme flutter tree ffmpeg@7"
-          # tools: 'duckdb gpgme tree'
+          tools: "duckdb gpgme tree ffmpeg@8"
           verbose: false
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
       - name: Install EG
         uses: nick-fields/retry@v3
         with:
