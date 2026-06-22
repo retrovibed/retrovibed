@@ -3,20 +3,20 @@
 package duckdbx
 
 import (
+	"errors"
+
 	"github.com/duckdb/duckdb-go/v2"
 )
 
 // checks if the error is a unique constraint violation.
 func ErrUniqueConstraintViolation(err error) error {
-	switch cause := err.(type) {
-	case *duckdb.Error:
+	if cause, ok := errors.AsType[*duckdb.Error](err); ok {
 		switch cause.Type {
 		case duckdb.ErrorTypeConstraint:
 			return err
 		default:
 			return nil
 		}
-	default:
 	}
 
 	return nil
