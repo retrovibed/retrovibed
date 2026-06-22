@@ -235,58 +235,6 @@ func (t *HTTPPublished) publish(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// func (t *HTTPPublished) resync(w http.ResponseWriter, r *http.Request) {
-// 	var (
-// 		cid   = mux.Vars(r)["id"]
-// 		syncd community.Community
-// 	)
-
-// 	if err := community.CommunityFindByID(r.Context(), t.q, cid).Scan(&syncd); err != nil {
-// 		log.Println(errorsx.Wrap(err, "unable lookup community"))
-// 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
-// 		return
-// 	}
-
-// 	published := NewDeeppoolPublished(t.httpc)
-// 	// TODO JAL 2026-06-02: kickoff background async if # of results equals the limit.
-// 	pubed, err := published.List(r.Context(), cid, &PublishedContentSearchRequest{
-// 		Sync:   syncd.SyncCursorPublishedContent,
-// 		Limit:  1024,
-// 		Offset: 0,
-// 	})
-// 	if err != nil {
-// 		log.Println(errorsx.Wrap(err, "unable lookup published content to sync"))
-// 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
-// 		return
-// 	}
-
-// 	for _, pc := range pubed.Items {
-// 		dbpc := community.NewPublishedContent(community.PublishedContent{
-// 			ID:            pc.Id,
-// 			CommunityID:   pc.CommunityId,
-// 			MagnetURI:     pc.MagnetUri,
-// 			LibraryID:     stringsx.FirstNonBlank(pc.LibraryId, uuid.Nil.String()),
-// 			OAuthGoogleID: pc.OauthGoogleId,
-// 			KnownMediaID:  pc.KnownMediaId,
-// 		})
-// 		if err := community.PublishedContentInsertWithDefaults(r.Context(), t.q, dbpc).Scan(&dbpc); err != nil {
-// 			log.Println(errorsx.Wrap(err, "failed to sync published content item"))
-// 		}
-// 	}
-
-// 	syncd.SyncCursorPublishedContent = langx.FirstNonZero(pubed.GetNext().GetSync(), syncd.SyncCursorPublishedContent)
-// 	if err := community.CommunityInsertWithDefaults(r.Context(), t.q, syncd).Scan(&syncd); err != nil {
-// 		log.Println(errorsx.Wrap(err, "failed to update sync cursor"))
-// 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
-// 		return
-// 	}
-
-// 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), pubed); err != nil {
-// 		log.Println(errorsx.Wrap(err, "unable to write response"))
-// 		return
-// 	}
-// }
-
 func (t *HTTPPublished) search(w http.ResponseWriter, r *http.Request) {
 	communityID := mux.Vars(r)["cid"]
 
