@@ -291,7 +291,7 @@ func DiscoverFromRSSFeedsOnce(
 		}
 
 		for _, item := range items {
-			uri := slicesx.FirstOrDefault(rss.ItemToEnclosure(item, mimex.Bittorrent), rss.FindEnclosureURLByMimetype(mimex.Bittorrent, item)...)
+			uri := slicesx.FirstOrDefault(rss.ItemToEnclosure(item, mimex.Bittorrent), rss.FindBittorrentEnclosures(item)...)
 
 			if err := handlehttp(uri, item); err != nil {
 				errorsx.Log(errorsx.Ignore(err, context.Canceled))

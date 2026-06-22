@@ -12,6 +12,7 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 )
 
@@ -79,14 +80,21 @@ func extractSource(urlRaw string) string {
 	return u.Hostname()
 }
 
-func FindEnclosureURLByMimetype(mimetype string, items ...Item) (enc []Enclosure) {
+// FindBittorrentEnclosures returns enclosures that represent bittorrent-transportable
+// content: magnet URIs (whose type attribute commonly describes the content
+// rather than the transport) or enclosures explicitly tagged with the
+// bittorrent mimetype.
+func FindBittorrentEnclosures(items ...Item) (enc []Enclosure) {
 	for _, i := range items {
-		for _, i := range i.Enclosures {
-			if i.Mimetype != mimetype {
+		for _, e := range i.Enclosures {
+			u, err := url.Parse(e.URL)
+			if err != nil {
 				continue
 			}
 
-			enc = append(enc, i)
+			if u.Scheme == "magnet" || e.Mimetype == mimex.Bittorrent {
+				enc = append(enc, e)
+			}
 		}
 	}
 
