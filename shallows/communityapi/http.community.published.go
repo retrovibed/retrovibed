@@ -208,7 +208,11 @@ func (t *HTTPPublished) publish(w http.ResponseWriter, r *http.Request) {
 		PublishedAt:   errorsx.Zero(grpcx.DecodeTime(langx.FirstNonZero(req.PublishedContent.PublishedAt, grpcx.EncodeTime(timex.Inf())))),
 	})
 
-	if err = community.PublishedContentInsertWithDefaults(r.Context(), t.q, pc).Scan(&pc); err != nil {
+	if err = community.PublishedContentInsertWithDefaults(r.Context(), t.q, pc).Scan(&pc); duckdbx.ErrUniqueConstraintViolation(err) != nil {
+		log.Println(errorsx.Wrap(err, "unable to insert published content data constraint violation"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		return
+	} else if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to insert published content"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return

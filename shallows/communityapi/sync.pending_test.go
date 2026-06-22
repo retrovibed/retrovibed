@@ -83,13 +83,14 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
-		pc := community.NewPublishedContent(community.PublishedContent{
-			CommunityID:  communityID,
-			KnownMediaID: uuid.Must(uuid.NewV7()).String(),
-			MagnetURI:    "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33",
-			LibraryID:    libraryID,
-			PublishMode:  int32(PublishMode_SYNDICATED),
-		})
+		var pc community.PublishedContent
+		require.NoError(t, testx.Fake(&pc, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
+			p.CommunityID = communityID
+			p.KnownMediaID = uuid.Must(uuid.NewV7()).String()
+			p.MagnetURI = "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33"
+			p.LibraryID = libraryID
+			p.PublishMode = int32(PublishMode_SYNDICATED)
+		}))
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
 		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, fsx.DirVirtual(t.TempDir()), fsx.DirVirtual(t.TempDir()))
@@ -121,13 +122,14 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
-		pc := community.NewPublishedContent(community.PublishedContent{
-			CommunityID:  communityID,
-			KnownMediaID: uuid.Must(uuid.NewV7()).String(),
-			MagnetURI:    "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33",
-			LibraryID:    libraryID,
-			PublishMode:  int32(PublishMode_SYNDICATED),
-		})
+		var pc community.PublishedContent
+		require.NoError(t, testx.Fake(&pc, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
+			p.CommunityID = communityID
+			p.KnownMediaID = uuid.Must(uuid.NewV7()).String()
+			p.MagnetURI = "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33"
+			p.LibraryID = libraryID
+			p.PublishMode = int32(PublishMode_SYNDICATED)
+		}))
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
 		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, fsx.DirVirtual(t.TempDir()), fsx.DirVirtual(t.TempDir()))
@@ -165,13 +167,14 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
-		pc := community.NewPublishedContent(community.PublishedContent{
-			CommunityID:  communityID,
-			KnownMediaID: uuid.Must(uuid.NewV7()).String(),
-			MagnetURI:    "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33",
-			LibraryID:    libraryID,
-			PublishMode:  int32(PublishMode_SYNDICATED),
-		})
+		var pc community.PublishedContent
+		require.NoError(t, testx.Fake(&pc, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
+			p.CommunityID = communityID
+			p.KnownMediaID = uuid.Must(uuid.NewV7()).String()
+			p.MagnetURI = "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33"
+			p.LibraryID = libraryID
+			p.PublishMode = int32(PublishMode_SYNDICATED)
+		}))
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 		require.NoError(t, community.PublishedContentUpdatePublishedAt(ctx, q, pc.ID, time.Now()).Scan(&pc))
 
@@ -211,13 +214,14 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
-		pc := community.NewPublishedContent(community.PublishedContent{
-			CommunityID:  communityID,
-			KnownMediaID: uuid.Must(uuid.NewV7()).String(),
-			MagnetURI:    "",
-			LibraryID:    libraryID,
-			PublishMode:  int32(PublishMode_SYNDICATED),
-		})
+		var pc community.PublishedContent
+		require.NoError(t, testx.Fake(&pc, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
+			p.CommunityID = communityID
+			p.KnownMediaID = uuid.Must(uuid.NewV7()).String()
+			p.MagnetURI = ""
+			p.LibraryID = libraryID
+			p.PublishMode = int32(PublishMode_SYNDICATED)
+		}))
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
 		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, fsx.DirVirtual(mediaDir), fsx.DirVirtual(torrentDir))
@@ -260,13 +264,14 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
-		pc := community.NewPublishedContent(community.PublishedContent{
-			CommunityID:  communityID,
-			KnownMediaID: uuid.Must(uuid.NewV7()).String(),
-			MagnetURI:    "",
-			LibraryID:    libraryID,
-			PublishMode:  int32(PublishMode_SYNDICATED),
-		})
+		var pc community.PublishedContent
+		require.NoError(t, testx.Fake(&pc, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
+			p.CommunityID = communityID
+			p.KnownMediaID = uuid.Must(uuid.NewV7()).String()
+			p.MagnetURI = ""
+			p.LibraryID = libraryID
+			p.PublishMode = int32(PublishMode_SYNDICATED)
+		}))
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
 		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, fsx.DirVirtual(mediaDir), fsx.DirVirtual(torrentDir))
@@ -336,13 +341,14 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
-		pc := community.NewPublishedContent(community.PublishedContent{
-			CommunityID:  communityID,
-			KnownMediaID: uuid.Must(uuid.NewV7()).String(),
-			MagnetURI:    "",
-			LibraryID:    libraryID,
-			PublishMode:  int32(PublishMode_SYNDICATED),
-		})
+		var pc community.PublishedContent
+		require.NoError(t, testx.Fake(&pc, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
+			p.CommunityID = communityID
+			p.KnownMediaID = uuid.Must(uuid.NewV7()).String()
+			p.MagnetURI = ""
+			p.LibraryID = libraryID
+			p.PublishMode = int32(PublishMode_SYNDICATED)
+		}))
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
 		err = SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, fsx.DirVirtual(mediaDir), fsx.DirVirtual(torrentDir))
@@ -377,13 +383,14 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
-		pc := community.NewPublishedContent(community.PublishedContent{
-			CommunityID:  communityID,
-			KnownMediaID: uuid.Must(uuid.NewV7()).String(),
-			MagnetURI:    "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33",
-			LibraryID:    libraryID,
-			PublishMode:  int32(PublishMode_UNLISTED),
-		})
+		var pc community.PublishedContent
+		require.NoError(t, testx.Fake(&pc, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
+			p.CommunityID = communityID
+			p.KnownMediaID = uuid.Must(uuid.NewV7()).String()
+			p.MagnetURI = "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33"
+			p.LibraryID = libraryID
+			p.PublishMode = int32(PublishMode_UNLISTED)
+		}))
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
 		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, fsx.DirVirtual(t.TempDir()), fsx.DirVirtual(t.TempDir()))
@@ -451,13 +458,14 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
-		pc := community.NewPublishedContent(community.PublishedContent{
-			CommunityID:  communityID,
-			KnownMediaID: uuid.Must(uuid.NewV7()).String(),
-			MagnetURI:    "",
-			LibraryID:    libraryID,
-			PublishMode:  int32(PublishMode_SYNDICATED),
-		})
+		var pc community.PublishedContent
+		require.NoError(t, testx.Fake(&pc, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
+			p.CommunityID = communityID
+			p.KnownMediaID = uuid.Must(uuid.NewV7()).String()
+			p.MagnetURI = ""
+			p.LibraryID = libraryID
+			p.PublishMode = int32(PublishMode_SYNDICATED)
+		}))
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
 		err = SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, mvfs, tvfs)
@@ -498,13 +506,14 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
-		pc := community.NewPublishedContent(community.PublishedContent{
-			CommunityID:  communityID,
-			KnownMediaID: uuid.Must(uuid.NewV7()).String(),
-			MagnetURI:    "",
-			LibraryID:    libraryID,
-			PublishMode:  int32(PublishMode_SYNDICATED),
-		})
+		var pc community.PublishedContent
+		require.NoError(t, testx.Fake(&pc, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
+			p.CommunityID = communityID
+			p.KnownMediaID = uuid.Must(uuid.NewV7()).String()
+			p.MagnetURI = ""
+			p.LibraryID = libraryID
+			p.PublishMode = int32(PublishMode_SYNDICATED)
+		}))
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
 		mvfs := fsx.DirVirtual(mediaDir)
@@ -555,12 +564,13 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
-		pc := community.NewPublishedContent(community.PublishedContent{
-			CommunityID:  communityID,
-			KnownMediaID: uuid.Must(uuid.NewV7()).String(),
-			LibraryID:    libraryID,
-			PublishMode:  int32(PublishMode_SYNDICATED),
-		})
+		var pc community.PublishedContent
+		require.NoError(t, testx.Fake(&pc, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
+			p.CommunityID = communityID
+			p.KnownMediaID = uuid.Must(uuid.NewV7()).String()
+			p.LibraryID = libraryID
+			p.PublishMode = int32(PublishMode_SYNDICATED)
+		}))
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
 		mvfs := fsx.DirVirtual(mediaDir)
@@ -610,13 +620,14 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
-		pc := community.NewPublishedContent(community.PublishedContent{
-			CommunityID:  communityID,
-			KnownMediaID: uuid.Must(uuid.NewV7()).String(),
-			MagnetURI:    "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33",
-			LibraryID:    libraryID,
-			PublishMode:  int32(PublishMode_LISTED),
-		})
+		var pc community.PublishedContent
+		require.NoError(t, testx.Fake(&pc, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
+			p.CommunityID = communityID
+			p.KnownMediaID = uuid.Must(uuid.NewV7()).String()
+			p.MagnetURI = "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33"
+			p.LibraryID = libraryID
+			p.PublishMode = int32(PublishMode_LISTED)
+		}))
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
 		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, fsx.DirVirtual(t.TempDir()), fsx.DirVirtual(t.TempDir()))
@@ -658,13 +669,14 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
-		pc := community.NewPublishedContent(community.PublishedContent{
-			CommunityID:  communityID,
-			KnownMediaID: known.UID,
-			MagnetURI:    "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33",
-			LibraryID:    libraryID,
-			PublishMode:  int32(PublishMode_SYNDICATED),
-		})
+		var pc community.PublishedContent
+		require.NoError(t, testx.Fake(&pc, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
+			p.CommunityID = communityID
+			p.KnownMediaID = known.UID
+			p.MagnetURI = "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33"
+			p.LibraryID = libraryID
+			p.PublishMode = int32(PublishMode_SYNDICATED)
+		}))
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
 		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, fsx.DirVirtual(t.TempDir()), fsx.DirVirtual(t.TempDir()))
@@ -698,13 +710,14 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
-		pc := community.NewPublishedContent(community.PublishedContent{
-			CommunityID:  communityID,
-			KnownMediaID: uuid.Must(uuid.NewV7()).String(),
-			MagnetURI:    "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33",
-			LibraryID:    libraryID,
-			PublishMode:  int32(PublishMode_SYNDICATED),
-		})
+		var pc community.PublishedContent
+		require.NoError(t, testx.Fake(&pc, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
+			p.CommunityID = communityID
+			p.KnownMediaID = uuid.Must(uuid.NewV7()).String()
+			p.MagnetURI = "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33"
+			p.LibraryID = libraryID
+			p.PublishMode = int32(PublishMode_SYNDICATED)
+		}))
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
 		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, fsx.DirVirtual(t.TempDir()), fsx.DirVirtual(t.TempDir()))
@@ -735,13 +748,14 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
-		pc := community.NewPublishedContent(community.PublishedContent{
-			CommunityID:  communityID,
-			KnownMediaID: uuid.Must(uuid.NewV7()).String(),
-			MagnetURI:    "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33",
-			LibraryID:    libraryID,
-			PublishMode:  int32(PublishMode_SYNDICATED),
-		})
+		var pc community.PublishedContent
+		require.NoError(t, testx.Fake(&pc, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
+			p.CommunityID = communityID
+			p.KnownMediaID = uuid.Must(uuid.NewV7()).String()
+			p.MagnetURI = "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33"
+			p.LibraryID = libraryID
+			p.PublishMode = int32(PublishMode_SYNDICATED)
+		}))
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
 		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, fsx.DirVirtual(t.TempDir()), fsx.DirVirtual(t.TempDir()))
@@ -786,13 +800,14 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
-		pc := community.NewPublishedContent(community.PublishedContent{
-			CommunityID:  communityID,
-			KnownMediaID: uuid.Must(uuid.NewV7()).String(),
-			MagnetURI:    "",
-			LibraryID:    libraryID,
-			PublishMode:  int32(PublishMode_SYNDICATED),
-		})
+		var pc community.PublishedContent
+		require.NoError(t, testx.Fake(&pc, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
+			p.CommunityID = communityID
+			p.KnownMediaID = uuid.Must(uuid.NewV7()).String()
+			p.MagnetURI = ""
+			p.LibraryID = libraryID
+			p.PublishMode = int32(PublishMode_SYNDICATED)
+		}))
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
 		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, archiver, fsx.DirVirtual(mediaDir), fsx.DirVirtual(torrentDir))
@@ -811,5 +826,78 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		require.NoError(t, community.PublishedContentFindByID(ctx, q, pc.ID).Scan(&updatedPC))
 		require.True(t, updatedPC.PublishedAt.Before(time.Now()))
 		require.True(t, updatedPC.PublishedAt.After(time.Now().Add(-time.Minute)))
+	})
+
+	t.Run("does not leak a still-pending sibling into a feed regenerated mid-sync", func(t *testing.T) {
+		var (
+			ctx, done   = testx.Context(t)
+			q           = sqltestx.Metadatabase(t)
+			mock        = &mockMetrics{}
+			feeds       = &mockFeedPublisher{}
+			communityID = uuid.Must(uuid.NewV7()).String()
+			mediaDir    = t.TempDir()
+			torrentDir  = t.TempDir()
+			testContent = []byte("test media content for mid-sync feed race")
+		)
+		defer done()
+
+		// pc1: fully resolvable, completes within this sync pass and
+		// triggers a feed regeneration for communityID.
+		var lmd1 library.Metadata
+		require.NoError(t, testx.Fake(&lmd1, library.MetadataOptionTestDefaults, func(m *library.Metadata) {
+			m.ID = uuid.Must(uuid.NewV7()).String()
+			m.Description = "ready media"
+			m.Bytes = uint64(len(testContent))
+		}))
+		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd1).Scan(&lmd1))
+
+		mediaPath := filepath.Join(mediaDir, lmd1.ID)
+		require.NoError(t, os.MkdirAll(mediaPath, 0700))
+		require.NoError(t, os.WriteFile(filepath.Join(mediaPath, "0"), testContent, 0600))
+
+		var pc1 community.PublishedContent
+		require.NoError(t, testx.Fake(&pc1, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
+			p.CommunityID = communityID
+			p.MagnetURI = ""
+			p.LibraryID = lmd1.ID
+			p.PublishMode = int32(PublishMode_LISTED)
+		}))
+		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc1).Scan(&pc1))
+
+		// pc2: same community, but its media is never written to mediaDir,
+		// so ensureTorrent fails every pass and it never reaches
+		// published_at - it stays permanently pending, exactly like a
+		// sibling row mid-flight when a regeneration fires.
+		var lmd2 library.Metadata
+		require.NoError(t, testx.Fake(&lmd2, library.MetadataOptionTestDefaults, func(m *library.Metadata) {
+			m.ID = uuid.Must(uuid.NewV7()).String()
+			m.Description = "pending media"
+			m.Bytes = bytesx.KiB
+		}))
+		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd2).Scan(&lmd2))
+
+		var pc2 community.PublishedContent
+		require.NoError(t, testx.Fake(&pc2, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
+			p.CommunityID = communityID
+			p.MagnetURI = ""
+			p.LibraryID = lmd2.ID
+			p.PublishMode = int32(PublishMode_SYNDICATED)
+		}))
+		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc2).Scan(&pc2))
+
+		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, fsx.DirVirtual(mediaDir), fsx.DirVirtual(torrentDir))
+		require.NoError(t, err)
+		require.Contains(t, feeds.feeds, communityID)
+
+		// pc2 must still be pending: this is the state a mid-sync feed
+		// regeneration would have observed for it.
+		var updatedPC2 community.PublishedContent
+		require.NoError(t, community.PublishedContentFindByID(ctx, q, pc2.ID).Scan(&updatedPC2))
+		require.True(t, updatedPC2.PublishedAt.Equal(timex.Inf()))
+
+		items, err := buildFeedItems(ctx, q, &Community{Id: communityID})
+		require.NoError(t, err)
+		require.Len(t, items, 1)
+		require.Equal(t, pc1.ID, items[0].Guid)
 	})
 }

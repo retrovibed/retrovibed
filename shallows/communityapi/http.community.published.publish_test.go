@@ -416,6 +416,68 @@ func TestPublishEndpoint(t *testing.T) {
 		require.WithinDuration(t, storedPublishedAt, pc.PublishedAt, time.Second)
 	})
 
+	t.Run("rejects empty title", func(t *testing.T) {
+		var (
+			ctx, done   = testx.Context(t)
+			q           = sqltestx.Metadatabase(t)
+			p           meta.Profile
+			v           meta.Authz
+			communityID = uuid.Must(uuid.NewV7()).String()
+			libraryID   = uuid.Must(uuid.NewV7()).String()
+			mediaDir    = t.TempDir()
+			torrentDir  = t.TempDir()
+		)
+		defer done()
+
+		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
+		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
+		require.NoError(t, testx.Fake(&v, meta.AuthzOptionProfileID(p.ID), meta.AuthzOptionAdmin))
+		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
+
+		lmd := library.Metadata{
+			ID:             libraryID,
+			Description:    "",
+			Bytes:          1024,
+			Mimetype:       "audio/mpeg",
+			TorrentID:      uuid.Nil.String(),
+			KnownMediaID:   uuid.Nil.String(),
+			ArchiveID:      uuid.Nil.String(),
+			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+		}
+		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
+
+		routes := mux.NewRouter()
+		communityapi.NewHTTPPublished(
+			q,
+			communityapi.HTTPPublishedOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			communityapi.HTTPPublishedOptionHTTPClient(&http.Client{}),
+			communityapi.HTTPPublishedOptionMediaStorage(fsx.DirVirtual(mediaDir)),
+			communityapi.HTTPPublishedOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
+		).Bind(routes.PathPrefix("/c").Subrouter())
+
+		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
+		body, err := json.Marshal(&communityapi.PublishContentRequest{
+			PublishedContent: &communityapi.PublishedContent{
+				LibraryId: libraryID,
+				Title:     "",
+			},
+		})
+		require.NoError(t, err)
+
+		resp, req, err := httptestx.BuildRequestContextBytes(
+			ctx,
+			http.MethodPost,
+			"/c/"+communityID,
+			body,
+			httptestx.RequestOptionAuthorization("Bearer "+httpauthtest.UnsafeToken(claims, httpauthtest.UnsafeJWTSecretSource)),
+			httptestx.RequestOptionContent("application/json"),
+		)
+		require.NoError(t, err)
+
+		routes.ServeHTTP(resp, req)
+		require.Equal(t, http.StatusBadRequest, resp.Code)
+	})
+
 	t.Run("returns immediately without magnet uri even when torrent exists", func(t *testing.T) {
 		var (
 			ctx, done   = testx.Context(t)

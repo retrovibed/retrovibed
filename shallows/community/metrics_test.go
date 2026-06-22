@@ -147,13 +147,14 @@ func TestPublishedCASMetricPerContentSearch(t *testing.T) {
 		now := time.Now()
 		communityID := uuid.Must(uuid.NewV4()).String()
 
-		pcA := NewPublishedContent(PublishedContent{
-			ID:           uuid.Must(uuid.NewV4()).String(),
-			CommunityID:  communityID,
-			KnownMediaID: uuid.Must(uuid.NewV4()).String(),
-			MagnetURI:    "magnet:?xt=urn:btih:contentA",
-			LibraryID:    uuid.Must(uuid.NewV4()).String(),
-		})
+		var pcA PublishedContent
+		require.NoError(t, testx.Fake(&pcA, PublishedContentOptionTestDefaults, func(p *PublishedContent) {
+			p.ID = uuid.Must(uuid.NewV4()).String()
+			p.CommunityID = communityID
+			p.KnownMediaID = uuid.Must(uuid.NewV4()).String()
+			p.MagnetURI = "magnet:?xt=urn:btih:contentA"
+			p.LibraryID = uuid.Must(uuid.NewV4()).String()
+		}))
 		require.NoError(t, PublishedContentInsertWithDefaults(ctx, q, pcA).Scan(&pcA))
 
 		metricA1 := PublishedCASMetric{
@@ -203,21 +204,23 @@ func TestPublishedContentMultipleCommunities(t *testing.T) {
 		communityA := uuid.Must(uuid.NewV4()).String()
 		communityB := uuid.Must(uuid.NewV4()).String()
 
-		pcA := NewPublishedContent(PublishedContent{
-			CommunityID:  communityA,
-			KnownMediaID: knownMediaID,
-			MagnetURI:    "magnet:?xt=urn:btih:abc123",
-			LibraryID:    libraryID,
-		})
+		var pcA PublishedContent
+		require.NoError(t, testx.Fake(&pcA, PublishedContentOptionTestDefaults, func(p *PublishedContent) {
+			p.CommunityID = communityA
+			p.KnownMediaID = knownMediaID
+			p.MagnetURI = "magnet:?xt=urn:btih:abc123"
+			p.LibraryID = libraryID
+		}))
 		require.NoError(t, PublishedContentInsertWithDefaults(ctx, q, pcA).Scan(&pcA))
 		require.NotEmpty(t, pcA.ID)
 
-		pcB := NewPublishedContent(PublishedContent{
-			CommunityID:  communityB,
-			KnownMediaID: knownMediaID,
-			MagnetURI:    "magnet:?xt=urn:btih:abc123",
-			LibraryID:    libraryID,
-		})
+		var pcB PublishedContent
+		require.NoError(t, testx.Fake(&pcB, PublishedContentOptionTestDefaults, func(p *PublishedContent) {
+			p.CommunityID = communityB
+			p.KnownMediaID = knownMediaID
+			p.MagnetURI = "magnet:?xt=urn:btih:abc123"
+			p.LibraryID = libraryID
+		}))
 		require.NoError(t, PublishedContentInsertWithDefaults(ctx, q, pcB).Scan(&pcB))
 		require.NotEmpty(t, pcB.ID)
 		require.NotEqual(t, pcA.ID, pcB.ID)
@@ -245,22 +248,24 @@ func TestPublishedContentRepublish(t *testing.T) {
 		knownMediaID := uuid.Must(uuid.NewV4()).String()
 		communityID := uuid.Must(uuid.NewV4()).String()
 
-		pc := NewPublishedContent(PublishedContent{
-			CommunityID:  communityID,
-			KnownMediaID: knownMediaID,
-			MagnetURI:    "magnet:?xt=urn:btih:original",
-			LibraryID:    libraryID,
-		})
+		var pc PublishedContent
+		require.NoError(t, testx.Fake(&pc, PublishedContentOptionTestDefaults, func(p *PublishedContent) {
+			p.CommunityID = communityID
+			p.KnownMediaID = knownMediaID
+			p.MagnetURI = "magnet:?xt=urn:btih:original"
+			p.LibraryID = libraryID
+		}))
 		require.NoError(t, PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 		originalID := pc.ID
 		require.NotEmpty(t, originalID)
 
-		pc2 := NewPublishedContent(PublishedContent{
-			CommunityID:  communityID,
-			KnownMediaID: knownMediaID,
-			MagnetURI:    "magnet:?xt=urn:btih:updated",
-			LibraryID:    libraryID,
-		})
+		var pc2 PublishedContent
+		require.NoError(t, testx.Fake(&pc2, PublishedContentOptionTestDefaults, func(p *PublishedContent) {
+			p.CommunityID = communityID
+			p.KnownMediaID = knownMediaID
+			p.MagnetURI = "magnet:?xt=urn:btih:updated"
+			p.LibraryID = libraryID
+		}))
 		require.NoError(t, PublishedContentInsertWithDefaults(ctx, q, pc2).Scan(&pc2))
 		require.Equal(t, originalID, pc2.ID)
 		require.Equal(t, "magnet:?xt=urn:btih:updated", pc2.MagnetURI)
@@ -281,21 +286,23 @@ func TestPublishedContentRepublish(t *testing.T) {
 		knownMediaIDUpdated := uuid.Must(uuid.NewV4()).String()
 		communityID := uuid.Must(uuid.NewV4()).String()
 
-		pc := NewPublishedContent(PublishedContent{
-			CommunityID:  communityID,
-			KnownMediaID: knownMediaIDOriginal,
-			MagnetURI:    "magnet:?xt=urn:btih:abc123",
-			LibraryID:    libraryID,
-		})
+		var pc PublishedContent
+		require.NoError(t, testx.Fake(&pc, PublishedContentOptionTestDefaults, func(p *PublishedContent) {
+			p.CommunityID = communityID
+			p.KnownMediaID = knownMediaIDOriginal
+			p.MagnetURI = "magnet:?xt=urn:btih:abc123"
+			p.LibraryID = libraryID
+		}))
 		require.NoError(t, PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 		originalID := pc.ID
 
-		pc2 := NewPublishedContent(PublishedContent{
-			CommunityID:  communityID,
-			KnownMediaID: knownMediaIDUpdated,
-			MagnetURI:    "magnet:?xt=urn:btih:abc123",
-			LibraryID:    libraryID,
-		})
+		var pc2 PublishedContent
+		require.NoError(t, testx.Fake(&pc2, PublishedContentOptionTestDefaults, func(p *PublishedContent) {
+			p.CommunityID = communityID
+			p.KnownMediaID = knownMediaIDUpdated
+			p.MagnetURI = "magnet:?xt=urn:btih:abc123"
+			p.LibraryID = libraryID
+		}))
 		require.NoError(t, PublishedContentInsertWithDefaults(ctx, q, pc2).Scan(&pc2))
 		require.Equal(t, originalID, pc2.ID)
 
@@ -315,22 +322,24 @@ func TestPublishedCASMetricAggregateSearch(t *testing.T) {
 		now := time.Now()
 		communityID := uuid.Must(uuid.NewV4()).String()
 
-		pcA := NewPublishedContent(PublishedContent{
-			ID:           uuid.Must(uuid.NewV4()).String(),
-			CommunityID:  communityID,
-			KnownMediaID: uuid.Must(uuid.NewV4()).String(),
-			MagnetURI:    "magnet:?xt=urn:btih:contentA",
-			LibraryID:    uuid.Must(uuid.NewV4()).String(),
-		})
+		var pcA PublishedContent
+		require.NoError(t, testx.Fake(&pcA, PublishedContentOptionTestDefaults, func(p *PublishedContent) {
+			p.ID = uuid.Must(uuid.NewV4()).String()
+			p.CommunityID = communityID
+			p.KnownMediaID = uuid.Must(uuid.NewV4()).String()
+			p.MagnetURI = "magnet:?xt=urn:btih:contentA"
+			p.LibraryID = uuid.Must(uuid.NewV4()).String()
+		}))
 		require.NoError(t, PublishedContentInsertWithDefaults(ctx, q, pcA).Scan(&pcA))
 
-		pcB := NewPublishedContent(PublishedContent{
-			ID:           uuid.Must(uuid.NewV4()).String(),
-			CommunityID:  communityID,
-			KnownMediaID: uuid.Must(uuid.NewV4()).String(),
-			MagnetURI:    "magnet:?xt=urn:btih:contentB",
-			LibraryID:    uuid.Must(uuid.NewV4()).String(),
-		})
+		var pcB PublishedContent
+		require.NoError(t, testx.Fake(&pcB, PublishedContentOptionTestDefaults, func(p *PublishedContent) {
+			p.ID = uuid.Must(uuid.NewV4()).String()
+			p.CommunityID = communityID
+			p.KnownMediaID = uuid.Must(uuid.NewV4()).String()
+			p.MagnetURI = "magnet:?xt=urn:btih:contentB"
+			p.LibraryID = uuid.Must(uuid.NewV4()).String()
+		}))
 		require.NoError(t, PublishedContentInsertWithDefaults(ctx, q, pcB).Scan(&pcB))
 
 		metricA1 := PublishedCASMetric{

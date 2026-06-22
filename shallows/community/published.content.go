@@ -23,6 +23,21 @@ func NewPublishedContent(prototype PublishedContent, options ...PublishedContent
 	return prototype
 }
 
+// PublishedContentOptionTestDefaults normalizes the identifier/temporal fields
+// to valid, deterministic values for tests. Combine with testx.Fake so free-form
+// fields (Title, Description, MagnetURI, ...) are populated with non-empty fakes
+// rather than Go zero values, which would otherwise trip the title CHECK constraint.
+func PublishedContentOptionTestDefaults(t *PublishedContent) {
+	t.ID = uuid.Nil.String()
+	t.CommunityID = uuid.Nil.String()
+	t.KnownMediaID = uuid.Nil.String()
+	t.LibraryID = uuid.Nil.String()
+	t.OAuthGoogleID = uuid.Nil.String()
+	t.PublishMode = 0
+	t.PublishedAt = timex.Inf()
+	t.TombstonedAt = timex.Inf()
+}
+
 func PublishedContentSearch(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilder) PublishedContentScanner {
 	return NewPublishedContentScannerStatic(b.RunWith(q).QueryContext(ctx))
 }

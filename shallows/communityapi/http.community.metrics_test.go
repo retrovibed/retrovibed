@@ -152,10 +152,10 @@ func TestMetricsSearchEndpoint(t *testing.T) {
 		require.NoError(t, testx.Fake(&v, meta.AuthzOptionProfileID(p.ID), meta.AuthzOptionAdmin))
 		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
 
-		publishedContent = community.NewPublishedContent(community.PublishedContent{
-			CommunityID: communityID,
-			LibraryID:   uuid.Nil.String(),
-		})
+		require.NoError(t, testx.Fake(&publishedContent, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
+			p.CommunityID = communityID
+			p.LibraryID = uuid.Nil.String()
+		}))
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, publishedContent).Scan(&publishedContent))
 
 		pcm := community.PublishedCASMetric{
@@ -314,10 +314,10 @@ func TestMetricsSyncEndpoint(t *testing.T) {
 		com := community.Community{ID: communityID}
 		require.NoError(t, community.CommunityUpsertAutoDownload(ctx, q, com).Scan(&com))
 
-		publishedContent = community.NewPublishedContent(community.PublishedContent{
-			CommunityID: communityID,
-			LibraryID:   uuid.Nil.String(),
-		})
+		require.NoError(t, testx.Fake(&publishedContent, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
+			p.CommunityID = communityID
+			p.LibraryID = uuid.Nil.String()
+		}))
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, publishedContent).Scan(&publishedContent))
 
 		syncResp := &communityapi.MetricsSyncResponse{

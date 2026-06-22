@@ -10,6 +10,7 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 
@@ -23,8 +24,6 @@ func TestFeedGeneration(t *testing.T) {
 			ctx, done   = testx.Context(t)
 			q           = sqltestx.Metadatabase(t)
 			communityID = uuid.Must(uuid.NewV7()).String()
-			libraryID1  = uuid.Must(uuid.NewV7()).String()
-			libraryID2  = uuid.Must(uuid.NewV7()).String()
 			knownID     = uuid.Must(uuid.NewV7()).String()
 		)
 		defer done()
@@ -39,46 +38,43 @@ func TestFeedGeneration(t *testing.T) {
 		}
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 
-		lmd1 := library.Metadata{
-			ID:             libraryID1,
-			Description:    "test-media-1.mp4",
-			Bytes:          1024 * 1024 * 100,
-			Mimetype:       "video/mp4",
-			TorrentID:      uuid.Nil.String(),
-			KnownMediaID:   known.UID,
-			ArchiveID:      uuid.Must(uuid.NewV7()).String(),
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
-		}
+		var lmd1 library.Metadata
+		require.NoError(t, testx.Fake(&lmd1, library.MetadataOptionTestDefaults, func(m *library.Metadata) {
+			m.ID = uuid.Must(uuid.NewV7()).String()
+			m.Description = "test-media-1.mp4"
+			m.Bytes = 100 * bytesx.MiB
+			m.Mimetype = "video/mp4"
+			m.KnownMediaID = known.UID
+		}))
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd1).Scan(&lmd1))
 
-		lmd2 := library.Metadata{
-			ID:             libraryID2,
-			Description:    "unknown-media.mkv",
-			Bytes:          1024 * 1024 * 500,
-			Mimetype:       "video/x-matroska",
-			TorrentID:      uuid.Nil.String(),
-			KnownMediaID:   uuid.Nil.String(),
-			ArchiveID:      uuid.Must(uuid.NewV7()).String(),
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
-		}
+		var lmd2 library.Metadata
+		require.NoError(t, testx.Fake(&lmd2, library.MetadataOptionTestDefaults, func(m *library.Metadata) {
+			m.ID = uuid.Must(uuid.NewV7()).String()
+			m.Description = "unknown-media.mkv"
+			m.Bytes = 500 * bytesx.MiB
+			m.Mimetype = "video/x-matroska"
+		}))
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd2).Scan(&lmd2))
 
-		pc1 := community.NewPublishedContent(community.PublishedContent{
-			CommunityID:  communityID,
-			KnownMediaID: known.UID,
-			MagnetURI:    "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33&dn=Test+Movie",
-			LibraryID:    libraryID1,
-			PublishMode:  int32(PublishMode_LISTED),
-		})
+		var pc1 community.PublishedContent
+		require.NoError(t, testx.Fake(&pc1, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
+			p.CommunityID = communityID
+			p.KnownMediaID = known.UID
+			p.MagnetURI = "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33&dn=Test+Movie"
+			p.LibraryID = lmd1.ID
+			p.PublishMode = int32(PublishMode_LISTED)
+		}))
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc1).Scan(&pc1))
 		require.NoError(t, community.PublishedContentUpdatePublishedAt(ctx, q, pc1.ID, time.Now().Add(-time.Hour)).Scan(&pc1))
 
-		pc2 := community.NewPublishedContent(community.PublishedContent{
-			CommunityID: communityID,
-			MagnetURI:   "magnet:?xt=urn:btih:1234567890abcdef1234567890abcdef12345678&dn=Unknown+Media",
-			LibraryID:   libraryID2,
-			PublishMode: int32(PublishMode_SYNDICATED),
-		})
+		var pc2 community.PublishedContent
+		require.NoError(t, testx.Fake(&pc2, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
+			p.CommunityID = communityID
+			p.MagnetURI = "magnet:?xt=urn:btih:1234567890abcdef1234567890abcdef12345678&dn=Unknown+Media"
+			p.LibraryID = lmd2.ID
+			p.PublishMode = int32(PublishMode_SYNDICATED)
+		}))
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc2).Scan(&pc2))
 		require.NoError(t, community.PublishedContentUpdatePublishedAt(ctx, q, pc2.ID, time.Now()).Scan(&pc2))
 
@@ -114,50 +110,44 @@ func TestFeedGeneration(t *testing.T) {
 			ctx, done   = testx.Context(t)
 			q           = sqltestx.Metadatabase(t)
 			communityID = uuid.Must(uuid.NewV7()).String()
-			libraryID1  = uuid.Must(uuid.NewV7()).String()
-			libraryID2  = uuid.Must(uuid.NewV7()).String()
 		)
 		defer done()
 
-		lmd1 := library.Metadata{
-			ID:             libraryID1,
-			Description:    "unlisted-media.mp4",
-			Bytes:          1024,
-			Mimetype:       "video/mp4",
-			TorrentID:      uuid.Nil.String(),
-			KnownMediaID:   uuid.Nil.String(),
-			ArchiveID:      uuid.Nil.String(),
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
-		}
+		var lmd1 library.Metadata
+		require.NoError(t, testx.Fake(&lmd1, library.MetadataOptionTestDefaults, func(m *library.Metadata) {
+			m.ID = uuid.Must(uuid.NewV7()).String()
+			m.Description = "unlisted-media.mp4"
+			m.Bytes = bytesx.KiB
+			m.Mimetype = "video/mp4"
+		}))
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd1).Scan(&lmd1))
 
-		lmd2 := library.Metadata{
-			ID:             libraryID2,
-			Description:    "hosted-media.mp4",
-			Bytes:          2048,
-			Mimetype:       "video/mp4",
-			TorrentID:      uuid.Nil.String(),
-			KnownMediaID:   uuid.Nil.String(),
-			ArchiveID:      uuid.Nil.String(),
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
-		}
+		var lmd2 library.Metadata
+		require.NoError(t, testx.Fake(&lmd2, library.MetadataOptionTestDefaults, func(m *library.Metadata) {
+			m.ID = uuid.Must(uuid.NewV7()).String()
+			m.Description = "hosted-media.mp4"
+			m.Bytes = 2 * bytesx.KiB
+			m.Mimetype = "video/mp4"
+		}))
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd2).Scan(&lmd2))
 
-		pc1 := community.NewPublishedContent(community.PublishedContent{
-			CommunityID: communityID,
-			MagnetURI:   "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33",
-			LibraryID:   libraryID1,
-			PublishMode: int32(PublishMode_UNLISTED),
-		})
+		var pc1 community.PublishedContent
+		require.NoError(t, testx.Fake(&pc1, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
+			p.CommunityID = communityID
+			p.MagnetURI = "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33"
+			p.LibraryID = lmd1.ID
+			p.PublishMode = int32(PublishMode_UNLISTED)
+		}))
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc1).Scan(&pc1))
 		require.NoError(t, community.PublishedContentUpdatePublishedAt(ctx, q, pc1.ID, time.Now()).Scan(&pc1))
 
-		pc2 := community.NewPublishedContent(community.PublishedContent{
-			CommunityID: communityID,
-			MagnetURI:   "magnet:?xt=urn:btih:1234567890abcdef1234567890abcdef12345678",
-			LibraryID:   libraryID2,
-			PublishMode: int32(PublishMode_LISTED),
-		})
+		var pc2 community.PublishedContent
+		require.NoError(t, testx.Fake(&pc2, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
+			p.CommunityID = communityID
+			p.MagnetURI = "magnet:?xt=urn:btih:1234567890abcdef1234567890abcdef12345678"
+			p.LibraryID = lmd2.ID
+			p.PublishMode = int32(PublishMode_LISTED)
+		}))
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc2).Scan(&pc2))
 		require.NoError(t, community.PublishedContentUpdatePublishedAt(ctx, q, pc2.ID, time.Now()).Scan(&pc2))
 
@@ -173,5 +163,67 @@ func TestFeedGeneration(t *testing.T) {
 		require.NoError(t, err)
 		require.Len(t, items, 1)
 		require.Equal(t, pc2.ID, items[0].Guid)
+	})
+
+	t.Run("excludes pending (not yet synced) content from feed", func(t *testing.T) {
+		var (
+			ctx, done   = testx.Context(t)
+			q           = sqltestx.Metadatabase(t)
+			communityID = uuid.Must(uuid.NewV7()).String()
+		)
+		defer done()
+
+		var lmd1 library.Metadata
+		require.NoError(t, testx.Fake(&lmd1, library.MetadataOptionTestDefaults, func(m *library.Metadata) {
+			m.ID = uuid.Must(uuid.NewV7()).String()
+			m.Description = "synced-media.mp4"
+			m.Bytes = bytesx.KiB
+			m.Mimetype = "video/mp4"
+		}))
+		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd1).Scan(&lmd1))
+
+		var lmd2 library.Metadata
+		require.NoError(t, testx.Fake(&lmd2, library.MetadataOptionTestDefaults, func(m *library.Metadata) {
+			m.ID = uuid.Must(uuid.NewV7()).String()
+			m.Description = "pending-media.mp4"
+			m.Bytes = 2 * bytesx.KiB
+			m.Mimetype = "video/mp4"
+		}))
+		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd2).Scan(&lmd2))
+
+		var pc1 community.PublishedContent
+		require.NoError(t, testx.Fake(&pc1, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
+			p.CommunityID = communityID
+			p.MagnetURI = "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33"
+			p.LibraryID = lmd1.ID
+			p.PublishMode = int32(PublishMode_LISTED)
+		}))
+		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc1).Scan(&pc1))
+		require.NoError(t, community.PublishedContentUpdatePublishedAt(ctx, q, pc1.ID, time.Now()).Scan(&pc1))
+
+		// still mid-sync: no magnet_uri yet and published_at left at its
+		// default 'infinity', simulating a sibling row caught by a feed
+		// regeneration that fires while it's still being processed.
+		var pc2 community.PublishedContent
+		require.NoError(t, testx.Fake(&pc2, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
+			p.CommunityID = communityID
+			p.MagnetURI = ""
+			p.LibraryID = lmd2.ID
+			p.PublishMode = int32(PublishMode_LISTED)
+		}))
+		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc2).Scan(&pc2))
+
+		community := &Community{
+			Id:          communityID,
+			Domain:      "testcommunity",
+			Description: "test",
+			Entropy:     "test-entropy",
+			Mimetype:    "video/*",
+		}
+
+		items, err := buildFeedItems(ctx, q, community)
+		require.NoError(t, err)
+		require.Len(t, items, 1)
+		require.Equal(t, pc1.ID, items[0].Guid)
 	})
 }

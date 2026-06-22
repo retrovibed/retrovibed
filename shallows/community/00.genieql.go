@@ -90,7 +90,7 @@ func PublishedContentFindByCommunityIDForFeed(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer, communityID string) NewPublishedContentScannerStatic,
 ) {
-	gql = gql.Query(`SELECT ` + PublishedContentScannerStaticColumns + ` FROM published_content WHERE "community_id" = {communityID} AND publish_mode > 0 ORDER BY published_at DESC`)
+	gql = gql.Query(`SELECT ` + PublishedContentScannerStaticColumns + ` FROM published_content WHERE "community_id" = {communityID} AND publish_mode > 0 AND published_at < 'infinity' ORDER BY published_at DESC`)
 }
 
 func PublishedContentUpdateMagnetURI(
