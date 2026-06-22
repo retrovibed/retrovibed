@@ -10,6 +10,7 @@ import (
 
 	"github.com/dashotv/tvdb"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/library"
@@ -44,14 +45,14 @@ func TestTvdbImportRecords(t *testing.T) {
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			require.Equal(t, "/v4/series", r.URL.Path)
 			w.Header().Set("Content-Type", "application/json")
-			fmt.Fprint(w, `{"data":[{
+			errorsx.Zero(fmt.Fprint(w, `{"data":[{
 				"id": 121361,
 				"name": "Game of Thrones",
 				"originalLanguage": "eng",
 				"overview": "Seven noble families fight for control.",
 				"image": "/banners/posters/121361-1.jpg",
 				"firstAired": "2011-04-17"
-			}], "links": {}}`)
+			}], "links": {}}`))
 		}))
 		defer srv.Close()
 
@@ -82,10 +83,10 @@ func TestTvdbImportRecords(t *testing.T) {
 	t.Run("skips records with no poster image", func(t *testing.T) {
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "application/json")
-			fmt.Fprint(w, `{"data":[
+			errorsx.Zero(fmt.Fprint(w, `{"data":[
 				{"id": 1, "name": "No Poster", "originalLanguage": "eng", "overview": "missing image"},
 				{"id": 2, "name": "Has Poster", "originalLanguage": "eng", "overview": "has image", "image": "/poster.jpg"}
-			], "links": {}}`)
+			], "links": {}}`))
 		}))
 		defer srv.Close()
 
@@ -104,11 +105,11 @@ func TestTvdbImportRecords(t *testing.T) {
 	t.Run("prefers the alias name in the configured language", func(t *testing.T) {
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "application/json")
-			fmt.Fprint(w, `{"data":[{
+			errorsx.Zero(fmt.Fprint(w, `{"data":[{
 				"id": 5, "name": "Game of Thrones", "originalLanguage": "eng",
 				"overview": "base overview", "image": "/poster.jpg",
 				"aliases": [{"language": "eng", "name": "Thrones (EN Alias)"}]
-			}], "links": {}}`)
+			}], "links": {}}`))
 		}))
 		defer srv.Close()
 
@@ -129,14 +130,14 @@ func TestTvdbImportRecords(t *testing.T) {
 			w.Header().Set("Content-Type", "application/json")
 			switch r.URL.Path {
 			case "/v4/series":
-				fmt.Fprint(w, `{"data":[{
+				errorsx.Zero(fmt.Fprint(w, `{"data":[{
 					"id": 555, "name": "Attack on Titan JP", "originalLanguage": "jpn",
 					"overview": "JP overview", "image": "/poster.jpg",
 					"overviewTranslations": ["eng"],
 					"aliases": [{"language": "eng", "name": "Attack on Titan EN Alias"}]
-				}], "links": {}}`)
+				}], "links": {}}`))
 			case "/v4/series/555/translations/eng":
-				fmt.Fprint(w, `{"data":{"name":"Attack on Titan","overview":"English overview from tvdb translation"}}`)
+				errorsx.Zero(fmt.Fprint(w, `{"data":{"name":"Attack on Titan","overview":"English overview from tvdb translation"}}`))
 			default:
 				t.Fatalf("unexpected request path: %s", r.URL.Path)
 			}
@@ -162,12 +163,12 @@ func TestTvdbImportRecords(t *testing.T) {
 			switch r.URL.Path {
 			case "/v4/series":
 				w.Header().Set("Content-Type", "application/json")
-				fmt.Fprint(w, `{"data":[{
+				errorsx.Zero(fmt.Fprint(w, `{"data":[{
 					"id": 556, "name": "Show JP", "originalLanguage": "jpn",
 					"overview": "JP overview", "image": "/poster.jpg",
 					"overviewTranslations": ["eng"],
 					"aliases": [{"language": "eng", "name": "Show EN Alias"}]
-				}], "links": {}}`)
+				}], "links": {}}`))
 			case "/v4/series/556/translations/eng":
 				w.WriteHeader(http.StatusInternalServerError)
 			default:
@@ -193,7 +194,7 @@ func TestTvdbImportRecords(t *testing.T) {
 	t.Run("released falls back to the epoch when firstAired is blank", func(t *testing.T) {
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "application/json")
-			fmt.Fprint(w, `{"data":[{"id": 9, "name": "No Air Date", "originalLanguage": "eng", "overview": "x", "image": "/poster.jpg"}], "links": {}}`)
+			errorsx.Zero(fmt.Fprint(w, `{"data":[{"id": 9, "name": "No Air Date", "originalLanguage": "eng", "overview": "x", "image": "/poster.jpg"}], "links": {}}`))
 		}))
 		defer srv.Close()
 
@@ -221,14 +222,14 @@ func TestTvdbImportRecords(t *testing.T) {
 			w.Header().Set("Content-Type", "application/json")
 			switch r.URL.Query().Get("page") {
 			case "0":
-				fmt.Fprint(w, `{"data":[
+				errorsx.Zero(fmt.Fprint(w, `{"data":[
 					{"id": 1, "name": "A", "originalLanguage": "eng", "overview": "a", "image": "/a.jpg"},
 					{"id": 2, "name": "B", "originalLanguage": "eng", "overview": "b", "image": "/b.jpg"}
-				], "links": {"next": "1"}}`)
+				], "links": {"next": "1"}}`))
 			case "1":
-				fmt.Fprint(w, `{"data":[
+				errorsx.Zero(fmt.Fprint(w, `{"data":[
 					{"id": 3, "name": "C", "originalLanguage": "eng", "overview": "c", "image": "/c.jpg"}
-				], "links": {}}`)
+				], "links": {}}`))
 			default:
 				t.Fatalf("unexpected page requested: %s", r.URL.Query().Get("page"))
 			}
@@ -248,7 +249,7 @@ func TestTvdbImportRecords(t *testing.T) {
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			requests++
 			w.Header().Set("Content-Type", "application/json")
-			fmt.Fprint(w, `{"data":[{"id": 1, "name": "A", "originalLanguage": "eng", "overview": "a", "image": "/a.jpg"}], "links": {"next": "1"}}`)
+			errorsx.Zero(fmt.Fprint(w, `{"data":[{"id": 1, "name": "A", "originalLanguage": "eng", "overview": "a", "image": "/a.jpg"}], "links": {"next": "1"}}`))
 		}))
 		defer srv.Close()
 
@@ -279,10 +280,10 @@ func TestTvdbImportRecords(t *testing.T) {
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			requests++
 			w.Header().Set("Content-Type", "application/json")
-			fmt.Fprint(w, `{"data":[
+			errorsx.Zero(fmt.Fprint(w, `{"data":[
 				{"id": 1, "name": "A", "originalLanguage": "eng", "overview": "a", "image": "/a.jpg"},
 				{"id": 2, "name": "B", "originalLanguage": "eng", "overview": "b", "image": "/b.jpg"}
-			], "links": {"next": "1"}}`)
+			], "links": {"next": "1"}}`))
 		}))
 		defer srv.Close()
 
@@ -303,7 +304,7 @@ func TestTvdbImportRecords(t *testing.T) {
 		newClient := func() (*tvdb.Client, func()) {
 			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.Header().Set("Content-Type", "application/json")
-				fmt.Fprint(w, `{"data":[{"id": 121361, "name": "Game of Thrones", "originalLanguage": "eng", "overview": "x", "image": "/poster.jpg", "firstAired": "2011-04-17"}], "links": {}}`)
+				errorsx.Zero(fmt.Fprint(w, `{"data":[{"id": 121361, "name": "Game of Thrones", "originalLanguage": "eng", "overview": "x", "image": "/poster.jpg", "firstAired": "2011-04-17"}], "links": {}}`))
 			}))
 			return newTvdbTestClient(t, srv), srv.Close
 		}

@@ -9,6 +9,7 @@ import (
 
 	tmdb "github.com/cyruzin/golang-tmdb"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/stretchr/testify/require"
@@ -45,10 +46,10 @@ func TestTmdbImportSeries(t *testing.T) {
 			if requests > 500 {
 				// mirrors the real TMDB error body that triggered the production incident.
 				w.WriteHeader(http.StatusInternalServerError)
-				fmt.Fprint(w, `{"status_code":22,"status_message":"Invalid page: Pages start at 1 and max at 500. They are expected to be an integer.","success":false}`)
+				_ = errorsx.Zero(fmt.Fprint(w, `{"status_code":22,"status_message":"Invalid page: Pages start at 1 and max at 500. They are expected to be an integer.","success":false}`))
 				return
 			}
-			fmt.Fprint(w, `{"page":1,"total_results":0,"total_pages":0,"results":[]}`)
+			errorsx.Zero(fmt.Fprint(w, `{"page":1,"total_results":0,"total_pages":0,"results":[]}`))
 		}))
 		defer srv.Close()
 
@@ -73,9 +74,9 @@ func TestTmdbImportSeries(t *testing.T) {
 			page := r.URL.Query().Get("page")
 			switch page {
 			case "1":
-				fmt.Fprint(w, `{"page":1,"total_results":2,"total_pages":2,"results":[{"id":1,"name":"Show One"}]}`)
+				_ = errorsx.Zero(fmt.Fprint(w, `{"page":1,"total_results":2,"total_pages":2,"results":[{"id":1,"name":"Show One"}]}`))
 			case "2":
-				fmt.Fprint(w, `{"page":2,"total_results":2,"total_pages":2,"results":[{"id":2,"name":"Show Two"}]}`)
+				_ = errorsx.Zero(fmt.Fprint(w, `{"page":2,"total_results":2,"total_pages":2,"results":[{"id":2,"name":"Show Two"}]}`))
 			default:
 				t.Fatalf("unexpected page requested: %s", page)
 			}
@@ -100,7 +101,7 @@ func TestTmdbImportSeries(t *testing.T) {
 		defer done()
 
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			fmt.Fprint(w, `{"page":1,"total_results":1,"total_pages":1,"results":[{
+			errorsx.Zero(fmt.Fprint(w, `{"page":1,"total_results":1,"total_pages":1,"results":[{
 				"id": 42,
 				"name": "Mystery Theater",
 				"original_name": "Mystery Theater Original",
@@ -111,7 +112,7 @@ func TestTmdbImportSeries(t *testing.T) {
 				"backdrop_path": "/backdrop.jpg",
 				"popularity": 12.5,
 				"adult": true
-			}]}`)
+			}]}`))
 		}))
 		defer srv.Close()
 
@@ -150,7 +151,7 @@ func TestTmdbImportSeries(t *testing.T) {
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			requests++
 			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprint(w, `{"status_code":34,"status_message":"The resource you requested could not be found.","success":false}`)
+			errorsx.Zero(fmt.Fprint(w, `{"status_code":34,"status_message":"The resource you requested could not be found.","success":false}`))
 		}))
 		defer srv.Close()
 
@@ -175,7 +176,7 @@ func TestTmdbImportSeries(t *testing.T) {
 		requests := 0
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			requests++
-			fmt.Fprint(w, `{"page":1,"total_results":2,"total_pages":2,"results":[{"id":1,"name":"Show One"},{"id":2,"name":"Show Two"}]}`)
+			errorsx.Zero(fmt.Fprint(w, `{"page":1,"total_results":2,"total_pages":2,"results":[{"id":1,"name":"Show One"},{"id":2,"name":"Show Two"}]}`))
 		}))
 		defer srv.Close()
 
@@ -203,10 +204,10 @@ func TestTmdbImportMovies(t *testing.T) {
 			requests++
 			if requests > 500 {
 				w.WriteHeader(http.StatusInternalServerError)
-				fmt.Fprint(w, `{"status_code":22,"status_message":"Invalid page: Pages start at 1 and max at 500. They are expected to be an integer.","success":false}`)
+				errorsx.Zero(fmt.Fprint(w, `{"status_code":22,"status_message":"Invalid page: Pages start at 1 and max at 500. They are expected to be an integer.","success":false}`))
 				return
 			}
-			fmt.Fprint(w, `{"page":1,"total_results":0,"total_pages":0,"results":[]}`)
+			errorsx.Zero(fmt.Fprint(w, `{"page":1,"total_results":0,"total_pages":0,"results":[]}`))
 		}))
 		defer srv.Close()
 
@@ -231,9 +232,9 @@ func TestTmdbImportMovies(t *testing.T) {
 			page := r.URL.Query().Get("page")
 			switch page {
 			case "1":
-				fmt.Fprint(w, `{"page":1,"total_results":2,"total_pages":2,"results":[{"id":1,"title":"Movie One"}]}`)
+				errorsx.Zero(fmt.Fprint(w, `{"page":1,"total_results":2,"total_pages":2,"results":[{"id":1,"title":"Movie One"}]}`))
 			case "2":
-				fmt.Fprint(w, `{"page":2,"total_results":2,"total_pages":2,"results":[{"id":2,"title":"Movie Two"}]}`)
+				errorsx.Zero(fmt.Fprint(w, `{"page":2,"total_results":2,"total_pages":2,"results":[{"id":2,"title":"Movie Two"}]}`))
 			default:
 				t.Fatalf("unexpected page requested: %s", page)
 			}
@@ -258,7 +259,7 @@ func TestTmdbImportMovies(t *testing.T) {
 		defer done()
 
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			fmt.Fprint(w, `{"page":1,"total_results":1,"total_pages":1,"results":[{
+			errorsx.Zero(fmt.Fprint(w, `{"page":1,"total_results":1,"total_pages":1,"results":[{
 				"id": 7,
 				"title": "The Great Heist",
 				"original_title": "The Great Heist Original",
@@ -269,7 +270,7 @@ func TestTmdbImportMovies(t *testing.T) {
 				"backdrop_path": "/backdrop.jpg",
 				"popularity": 8.25,
 				"adult": false
-			}]}`)
+			}]}`))
 		}))
 		defer srv.Close()
 
@@ -306,7 +307,7 @@ func TestTmdbImportMovies(t *testing.T) {
 
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprint(w, `{"status_code":34,"status_message":"The resource you requested could not be found.","success":false}`)
+			errorsx.Zero(fmt.Fprint(w, `{"status_code":34,"status_message":"The resource you requested could not be found.","success":false}`))
 		}))
 		defer srv.Close()
 

@@ -26,13 +26,17 @@ func TestCommunitySync(t *testing.T) {
 		publishedContentID := uuid.Must(uuid.NewV7()).String()
 		libraryID := uuid.Must(uuid.NewV7()).String()
 
-		err := communityapi.SyncPublishedContentItem(ctx, db, &communityapi.PublishedContent{
-			Id:           publishedContentID,
-			CommunityId:  communityID,
-			KnownMediaId: knownMediaID,
-			MagnetUri:    "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33&dn=testfile.txt",
-			LibraryId:    libraryID,
-		}, false)
+		var pc communityapi.PublishedContent
+		require.NoError(t, testx.Fake(&pc, func(p *communityapi.PublishedContent) {
+			p.Id = publishedContentID
+			p.CommunityId = communityID
+			p.KnownMediaId = knownMediaID
+			p.MagnetUri = "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33&dn=testfile.txt"
+			p.LibraryId = libraryID
+			p.OauthGoogleId = uuid.Nil.String()
+		}))
+
+		err := communityapi.SyncPublishedContentItem(ctx, db, &pc, false)
 		require.NoError(t, err)
 
 		require.Equal(t, 1, errorsx.Zero(sqlx.Count(ctx, db, "SELECT COUNT(*) FROM torrents_metadata")))
@@ -57,28 +61,24 @@ func TestCommunitySync(t *testing.T) {
 
 		communityID := uuid.Must(uuid.NewV7()).String()
 
-		items := []*communityapi.PublishedContent{
-			{
-				Id:           uuid.Must(uuid.NewV7()).String(),
-				CommunityId:  communityID,
-				KnownMediaId: uuid.Must(uuid.NewV7()).String(),
-				MagnetUri:    "magnet:?xt=urn:btih:1111111111111111111111111111111111111111&dn=file1.txt",
-				LibraryId:    uuid.Must(uuid.NewV7()).String(),
-			},
-			{
-				Id:           uuid.Must(uuid.NewV7()).String(),
-				CommunityId:  communityID,
-				KnownMediaId: uuid.Must(uuid.NewV7()).String(),
-				MagnetUri:    "magnet:?xt=urn:btih:2222222222222222222222222222222222222222&dn=file2.txt",
-				LibraryId:    uuid.Must(uuid.NewV7()).String(),
-			},
-			{
-				Id:           uuid.Must(uuid.NewV7()).String(),
-				CommunityId:  communityID,
-				KnownMediaId: uuid.Must(uuid.NewV7()).String(),
-				MagnetUri:    "magnet:?xt=urn:btih:3333333333333333333333333333333333333333&dn=file3.txt",
-				LibraryId:    uuid.Must(uuid.NewV7()).String(),
-			},
+		magnets := []string{
+			"magnet:?xt=urn:btih:1111111111111111111111111111111111111111&dn=file1.txt",
+			"magnet:?xt=urn:btih:2222222222222222222222222222222222222222&dn=file2.txt",
+			"magnet:?xt=urn:btih:3333333333333333333333333333333333333333&dn=file3.txt",
+		}
+
+		items := make([]*communityapi.PublishedContent, 0, len(magnets))
+		for _, magnet := range magnets {
+			var pc communityapi.PublishedContent
+			require.NoError(t, testx.Fake(&pc, func(p *communityapi.PublishedContent) {
+				p.Id = uuid.Must(uuid.NewV7()).String()
+				p.CommunityId = communityID
+				p.KnownMediaId = uuid.Must(uuid.NewV7()).String()
+				p.MagnetUri = magnet
+				p.LibraryId = uuid.Must(uuid.NewV7()).String()
+				p.OauthGoogleId = uuid.Nil.String()
+			}))
+			items = append(items, &pc)
 		}
 
 		for _, item := range items {
@@ -100,26 +100,30 @@ func TestCommunitySync(t *testing.T) {
 		publishedContentID := uuid.Must(uuid.NewV7()).String()
 		libraryID := uuid.Must(uuid.NewV7()).String()
 
-		pc := &communityapi.PublishedContent{
-			Id:           publishedContentID,
-			CommunityId:  communityID,
-			KnownMediaId: uuid.Must(uuid.NewV7()).String(),
-			MagnetUri:    "magnet:?xt=urn:btih:4444444444444444444444444444444444444444&dn=duplicate.txt",
-			LibraryId:    libraryID,
-		}
+		var pc communityapi.PublishedContent
+		require.NoError(t, testx.Fake(&pc, func(p *communityapi.PublishedContent) {
+			p.Id = publishedContentID
+			p.CommunityId = communityID
+			p.KnownMediaId = uuid.Must(uuid.NewV7()).String()
+			p.MagnetUri = "magnet:?xt=urn:btih:4444444444444444444444444444444444444444&dn=duplicate.txt"
+			p.LibraryId = libraryID
+			p.OauthGoogleId = uuid.Nil.String()
+		}))
 
-		require.NoError(t, communityapi.SyncPublishedContentItem(ctx, db, pc, false))
+		require.NoError(t, communityapi.SyncPublishedContentItem(ctx, db, &pc, false))
 		require.Equal(t, 1, errorsx.Zero(sqlx.Count(ctx, db, "SELECT COUNT(*) FROM torrents_metadata")))
 		require.Equal(t, 1, errorsx.Zero(sqlx.Count(ctx, db, "SELECT COUNT(*) FROM published_content")))
 
-		pc2 := &communityapi.PublishedContent{
-			Id:           uuid.Must(uuid.NewV7()).String(),
-			CommunityId:  communityID,
-			KnownMediaId: uuid.Must(uuid.NewV7()).String(),
-			MagnetUri:    "magnet:?xt=urn:btih:4444444444444444444444444444444444444444&dn=duplicate.txt",
-			LibraryId:    uuid.Must(uuid.NewV7()).String(),
-		}
-		require.NoError(t, communityapi.SyncPublishedContentItem(ctx, db, pc2, false))
+		var pc2 communityapi.PublishedContent
+		require.NoError(t, testx.Fake(&pc2, func(p *communityapi.PublishedContent) {
+			p.Id = uuid.Must(uuid.NewV7()).String()
+			p.CommunityId = communityID
+			p.KnownMediaId = uuid.Must(uuid.NewV7()).String()
+			p.MagnetUri = "magnet:?xt=urn:btih:4444444444444444444444444444444444444444&dn=duplicate.txt"
+			p.LibraryId = uuid.Must(uuid.NewV7()).String()
+			p.OauthGoogleId = uuid.Nil.String()
+		}))
+		require.NoError(t, communityapi.SyncPublishedContentItem(ctx, db, &pc2, false))
 		require.Equal(t, 1, errorsx.Zero(sqlx.Count(ctx, db, "SELECT COUNT(*) FROM torrents_metadata")), "should not create duplicate torrent metadata")
 		require.Equal(t, 2, errorsx.Zero(sqlx.Count(ctx, db, "SELECT COUNT(*) FROM published_content")), "should create separate published content records")
 	})
@@ -133,15 +137,17 @@ func TestCommunitySync(t *testing.T) {
 
 		communityID := uuid.Must(uuid.NewV7()).String()
 
-		pc := &communityapi.PublishedContent{
-			Id:           uuid.Must(uuid.NewV7()).String(),
-			CommunityId:  communityID,
-			KnownMediaId: uuid.Must(uuid.NewV7()).String(),
-			MagnetUri:    "not-a-valid-magnet-uri",
-			LibraryId:    uuid.Must(uuid.NewV7()).String(),
-		}
+		var pc communityapi.PublishedContent
+		require.NoError(t, testx.Fake(&pc, func(p *communityapi.PublishedContent) {
+			p.Id = uuid.Must(uuid.NewV7()).String()
+			p.CommunityId = communityID
+			p.KnownMediaId = uuid.Must(uuid.NewV7()).String()
+			p.MagnetUri = "not-a-valid-magnet-uri"
+			p.LibraryId = uuid.Must(uuid.NewV7()).String()
+			p.OauthGoogleId = uuid.Nil.String()
+		}))
 
-		err := communityapi.SyncPublishedContentItem(ctx, db, pc, false)
+		err := communityapi.SyncPublishedContentItem(ctx, db, &pc, false)
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "failed to parse magnet URI")
 	})
@@ -156,15 +162,17 @@ func TestCommunitySync(t *testing.T) {
 		communityID := uuid.Must(uuid.NewV7()).String()
 		publishedContentID := uuid.Must(uuid.NewV7()).String()
 
-		pc := &communityapi.PublishedContent{
-			Id:           publishedContentID,
-			CommunityId:  communityID,
-			KnownMediaId: uuid.Must(uuid.NewV7()).String(),
-			MagnetUri:    "magnet:?xt=urn:btih:5555555555555555555555555555555555555555&dn=autodownload.txt",
-			LibraryId:    uuid.Must(uuid.NewV7()).String(),
-		}
+		var pc communityapi.PublishedContent
+		require.NoError(t, testx.Fake(&pc, func(p *communityapi.PublishedContent) {
+			p.Id = publishedContentID
+			p.CommunityId = communityID
+			p.KnownMediaId = uuid.Must(uuid.NewV7()).String()
+			p.MagnetUri = "magnet:?xt=urn:btih:5555555555555555555555555555555555555555&dn=autodownload.txt"
+			p.LibraryId = uuid.Must(uuid.NewV7()).String()
+			p.OauthGoogleId = uuid.Nil.String()
+		}))
 
-		require.NoError(t, communityapi.SyncPublishedContentItem(ctx, db, pc, true))
+		require.NoError(t, communityapi.SyncPublishedContentItem(ctx, db, &pc, true))
 
 		var tmeta tracking.Metadata
 		require.NoError(t, tracking.MetadataFindByID(ctx, db, errorsx.Must(sqlx.String(ctx, db, "SELECT id::text FROM torrents_metadata"))).Scan(&tmeta))
@@ -182,15 +190,17 @@ func TestCommunitySync(t *testing.T) {
 		knownMediaID := uuid.Must(uuid.NewV7()).String()
 		publishedContentID := uuid.Must(uuid.NewV7()).String()
 
-		pc := &communityapi.PublishedContent{
-			Id:           publishedContentID,
-			CommunityId:  communityID,
-			KnownMediaId: knownMediaID,
-			MagnetUri:    "magnet:?xt=urn:btih:6666666666666666666666666666666666666666&dn=knownmedia.txt",
-			LibraryId:    uuid.Must(uuid.NewV7()).String(),
-		}
+		var pc communityapi.PublishedContent
+		require.NoError(t, testx.Fake(&pc, func(p *communityapi.PublishedContent) {
+			p.Id = publishedContentID
+			p.CommunityId = communityID
+			p.KnownMediaId = knownMediaID
+			p.MagnetUri = "magnet:?xt=urn:btih:6666666666666666666666666666666666666666&dn=knownmedia.txt"
+			p.LibraryId = uuid.Must(uuid.NewV7()).String()
+			p.OauthGoogleId = uuid.Nil.String()
+		}))
 
-		require.NoError(t, communityapi.SyncPublishedContentItem(ctx, db, pc, false))
+		require.NoError(t, communityapi.SyncPublishedContentItem(ctx, db, &pc, false))
 
 		var tmeta tracking.Metadata
 		require.NoError(t, tracking.MetadataFindByID(ctx, db, errorsx.Must(sqlx.String(ctx, db, "SELECT id::text FROM torrents_metadata"))).Scan(&tmeta))
