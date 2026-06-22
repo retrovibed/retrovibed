@@ -30,7 +30,13 @@ func AutoPublishing(ctx context.Context, q sqlx.Queryer, c *http.Client, mvfs, t
 		errorsx.Log(asyncx.Run(ctx, async, func(ctx context.Context) error {
 			if err := communityapi.SyncPendingToDeeppool(ctx, q, c, metrics, published, deeppool.NewArchiver(c), mvfs, tvfs); err != nil {
 				log.Println(errorsx.Wrap(err, "publishing sync failed"))
+				return nil
 			}
+
+			if _, err := q.ExecContext(ctx, "CHECKPOINT;"); err != nil {
+				return errorsx.Wrap(err, "post sync pending checkpoint failed")
+			}
+
 			return nil
 		}))
 	})
