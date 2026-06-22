@@ -20,6 +20,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
+	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/library"
@@ -60,6 +61,7 @@ func TestCommunityLibraryPublish(t *testing.T) {
 			KnownMediaID:   uuid.Nil.String(),
 			ArchiveID:      uuid.Nil.String(),
 			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+			Mimetype:       mimex.RetrovibedMediaArchive,
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
@@ -86,6 +88,7 @@ func TestCommunityLibraryPublish(t *testing.T) {
 		var decoded library.Metadata
 		require.NoError(t, json.NewDecoder(&output).Decode(&decoded))
 		require.Equal(t, libraryID, decoded.ID)
+		require.Equal(t, mimex.RetrovibedMediaArchive, decoded.Mimetype)
 	})
 
 	t.Run("publishes library item to community", func(t *testing.T) {
@@ -113,6 +116,7 @@ func TestCommunityLibraryPublish(t *testing.T) {
 			KnownMediaID:   uuid.Nil.String(),
 			ArchiveID:      uuid.Nil.String(),
 			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+			Mimetype:       mimex.RetrovibedMediaArchive,
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
@@ -138,11 +142,13 @@ func TestCommunityLibraryPublish(t *testing.T) {
 		require.NotEmpty(t, result.Id)
 		require.Equal(t, libraryID, result.LibraryId)
 		require.Equal(t, communityID, result.CommunityId)
+		require.Equal(t, mimex.RetrovibedMediaArchive, result.Mimetype)
 
 		var pc community.PublishedContent
 		require.NoError(t, community.PublishedContentFindByID(ctx, q, result.Id).Scan(&pc))
 		require.Equal(t, libraryID, pc.LibraryID)
 		require.Equal(t, communityID, pc.CommunityID)
+		require.Equal(t, mimex.RetrovibedMediaArchive, pc.Mimetype)
 	})
 
 	t.Run("publishes multiple library items", func(t *testing.T) {
@@ -179,6 +185,7 @@ func TestCommunityLibraryPublish(t *testing.T) {
 				KnownMediaID:   uuid.Nil.String(),
 				ArchiveID:      uuid.Nil.String(),
 				EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+				Mimetype:       mimex.RetrovibedMediaArchive,
 			}
 			require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 			require.NoError(t, enc.Encode(langx.Clone(lmd, timex.JSONSafeEncodeOption)))
@@ -208,6 +215,7 @@ func TestCommunityLibraryPublish(t *testing.T) {
 		for i, result := range results {
 			require.Equal(t, libraryIDs[i], result.LibraryId)
 			require.Equal(t, communityID, result.CommunityId)
+			require.Equal(t, mimex.RetrovibedMediaArchive, result.Mimetype)
 		}
 	})
 
