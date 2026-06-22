@@ -13,6 +13,7 @@ func PublishedContentOptionFromDB(pc community.PublishedContent) func(*Published
 		p.Description = pc.Description
 		p.CommunityId = pc.CommunityID
 		p.KnownMediaId = pc.KnownMediaID
+		p.Mimetype = pc.Mimetype
 		p.MagnetUri = pc.MagnetURI
 		p.LibraryId = pc.LibraryID
 		p.OauthGoogleId = pc.OAuthGoogleID
