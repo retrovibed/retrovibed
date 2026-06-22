@@ -42,19 +42,13 @@ func MediaMetadataImport(ctx context.Context, db sqlx.Queryer, tvfs fsx.Virtual,
 	insert := asynccompute.New(func(ctx context.Context, chunk []library.Known) error {
 		ts := time.Now()
 		s := library.NewKnownBatchInsertWithDefaults(ctx, db, chunk...)
-		for s.Next() {
-			var v library.Known
-			if err := s.Scan(&v); err != nil {
-				return errorsx.Wrap(err, "failed to scan inserted record")
-			}
-		}
 
-		if err := s.Err(); err != nil {
+		if err := sqlx.Discard(sqlx.Scan(s)); err != nil {
 			return errorsx.Wrap(err, "failed to insert batch")
 		}
 
-		if err := s.Close(); err != nil {
-			return errorsx.Wrap(err, "failed to close batch")
+		if _, err := db.ExecContext(ctx, "CHECKPOINT"); err != nil {
+			return errorsx.Wrap(err, "failed to checkpoint batch")
 		}
 
 		log.Println("imported", time.Since(ts), len(chunk), "records")
