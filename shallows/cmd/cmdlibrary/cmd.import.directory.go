@@ -27,10 +27,11 @@ import (
 )
 
 type importDirectory struct {
-	Endpoint    string `flag:"" name:"peer" help:"http address for the daemon you want to import to" default:"localhost:9998"`
-	Concurrency uint16 `flag:"" name:"concurrency" help:"number of files to upload concurrently, defaults to the number of cpus" default:"${vars_cores}"`
-	Mimetype    string `flag:"" name:"mimetype" help:"override the mimetype for all uploaded files" optional:""`
-	Directory   string `arg:"" name:"directory" help:"directory to import; each immediate file is uploaded to the library"`
+	Endpoint        string `flag:"" name:"peer" help:"http address for the daemon you want to import to" default:"localhost:9998"`
+	Concurrency     uint16 `flag:"" name:"concurrency" help:"number of files to upload concurrently, defaults to the number of cpus" default:"${vars_cores}"`
+	Mimetype        string `flag:"" name:"mimetype" help:"override the mimetype for all uploaded files" optional:""`
+	DirectoryPrefix bool   `flag:"" name:"directory-prefix" help:"whether to include the directory in the filename or not" negatable:"" default:"true"`
+	Directory       string `arg:"" name:"directory" help:"directory to import; each immediate file is uploaded to the library"`
 }
 
 func (t importDirectory) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig) error {
@@ -66,9 +67,13 @@ func (t importDirectory) run(ctx context.Context, enc *jsonl.Encoder, c *http.Cl
 		}
 		defer f.Close()
 
-		filename := strings.TrimPrefix(w.Path, filepath.Dir(strings.TrimSuffix(t.Directory, string(filepath.Separator))))
+		filename := filepath.Base(w.Path)
+		if t.DirectoryPrefix {
+			filename = strings.TrimPrefix(w.Path, filepath.Dir(strings.TrimSuffix(t.Directory, string(filepath.Separator))))
+		}
+
 		filename = strings.ReplaceAll(filename, string(filepath.Separator), " ")
-		mimetype := langx.FirstNonZero(t.Mimetype, mime.TypeByExtension(filepath.Ext(filename)), mimex.Binary)
+		mimetype := langx.FirstNonZero(t.Mimetype, mime.TypeByExtension(filepath.Ext(w.Path)), mimex.Binary)
 
 		contentType, body, err := httpx.Multipart(func(mw *multipart.Writer) error {
 			part, lerr := mw.CreatePart(httpx.NewMultipartHeader(mimetype, "content", filename))

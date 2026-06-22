@@ -118,7 +118,7 @@ func TestImportDirectory(t *testing.T) {
 		require.NoError(t, os.WriteFile(filepath.Join(dir, "my-video.mp4"), []byte("data"), 0600))
 
 		var buf bytes.Buffer
-		cmd := importDirectory{Endpoint: "localhost:9998", Concurrency: 1, Directory: dir}
+		cmd := importDirectory{Endpoint: "localhost:9998", Concurrency: 1, Directory: dir, DirectoryPrefix: true}
 		require.NoError(t, cmd.run(ctx, jsonl.NewEncoder(&buf), newImportDirectoryServer(t, q)))
 
 		results := decodeAll(t, &buf)
@@ -127,6 +127,27 @@ func TestImportDirectory(t *testing.T) {
 		var md library.Metadata
 		require.NoError(t, library.MetadataFindByID(ctx, q, results[0].Id).Scan(&md))
 		require.Equal(t, " media my-video.mp4", md.Description)
+	})
+
+	t.Run("disabling directory prefix excludes directory name from filename", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		q := sqltestx.Metadatabase(t)
+		dir := filepath.Join(t.TempDir(), "media")
+		require.NoError(t, os.MkdirAll(dir, 0700))
+		require.NoError(t, os.WriteFile(filepath.Join(dir, "my-video.mp4"), []byte("data"), 0600))
+
+		var buf bytes.Buffer
+		cmd := importDirectory{Endpoint: "localhost:9998", Concurrency: 1, Directory: dir, DirectoryPrefix: false}
+		require.NoError(t, cmd.run(ctx, jsonl.NewEncoder(&buf), newImportDirectoryServer(t, q)))
+
+		results := decodeAll(t, &buf)
+		require.Len(t, results, 1)
+
+		var md library.Metadata
+		require.NoError(t, library.MetadataFindByID(ctx, q, results[0].Id).Scan(&md))
+		require.Equal(t, "my-video.mp4", md.Description)
 	})
 
 	t.Run("mime type detected from extension", func(t *testing.T) {
@@ -140,7 +161,7 @@ func TestImportDirectory(t *testing.T) {
 		require.NoError(t, os.WriteFile(filepath.Join(dir, "unknown.xyz"), []byte("unknown data"), 0600))
 
 		var buf bytes.Buffer
-		cmd := importDirectory{Endpoint: "localhost:9998", Concurrency: 1, Directory: dir}
+		cmd := importDirectory{Endpoint: "localhost:9998", Concurrency: 1, Directory: dir, DirectoryPrefix: true}
 		require.NoError(t, cmd.run(ctx, jsonl.NewEncoder(&buf), newImportDirectoryServer(t, q)))
 
 		results := decodeAll(t, &buf)
@@ -190,7 +211,7 @@ func TestImportDirectory(t *testing.T) {
 		require.NoError(t, os.WriteFile(filepath.Join(dir, "clip.mp4"), []byte("content"), 0600))
 
 		var buf bytes.Buffer
-		cmd := importDirectory{Endpoint: "localhost:9998", Concurrency: 1, Directory: dir}
+		cmd := importDirectory{Endpoint: "localhost:9998", Concurrency: 1, Directory: dir, DirectoryPrefix: true}
 		require.NoError(t, cmd.run(ctx, jsonl.NewEncoder(&buf), newImportDirectoryServer(t, q)))
 
 		results := decodeAll(t, &buf)
