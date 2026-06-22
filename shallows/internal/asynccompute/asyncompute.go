@@ -56,15 +56,21 @@ type pending struct {
 
 type Option[T any] func(*Pool[T])
 
+// Backlog sets the number of pending workloads allowed to queue up before
+// Pool.Run blocks. n == 0 falls back to runtime.NumCPU(), since an unbuffered
+// queue paired with the default worker count can deadlock.
 func Backlog[T any](n uint16) Option[T] {
 	return func(p *Pool[T]) {
-		p.queued = make(chan pending, n)
+		p.queued = make(chan pending, langx.FirstNonZero(n, uint16(runtime.NumCPU())))
 	}
 }
 
+// Workers sets the number of worker goroutines draining the queue. n == 0
+// falls back to runtime.NumCPU(), since zero workers would leave queued
+// workloads unprocessed forever.
 func Workers[T any](n uint16) Option[T] {
 	return func(p *Pool[T]) {
-		p.workers = int(n)
+		p.workers = int(langx.FirstNonZero(n, uint16(runtime.NumCPU())))
 	}
 }
 
