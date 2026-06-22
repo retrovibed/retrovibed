@@ -27,9 +27,11 @@ see the [site](https://retrovibe.space) for more details
 - [x] communities to reduce costs for sharable content.
 - [x] integrated at cost archival service available that encrypts and offloads data from your devices.
 - [x] monetarily support your favorite artists and communities directly by archiving their content.
-- [ ] distributed indexing/search for content discovery and exchange.
+- [x] distributed indexing/search for content discovery and exchange.
+- [x] autoplay for music.
 - [ ] PVR functionality.
 - [ ] recommendation engine.
+- [ ] multi device support
 
 #### community sharing
 
