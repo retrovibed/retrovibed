@@ -53,12 +53,13 @@ func RecommendationOptionKnownMediaID(kid string) func(*Recommendation) {
 	}
 }
 
-func RecommendationFromRandomKnown(ctx context.Context, q sqlx.Queryer, mimetype string) (rec Recommendation, err error) {
+func RecommendationFromRandomKnown(ctx context.Context, q sqlx.Queryer, mimetype string, lang string, adult bool) (rec Recommendation, err error) {
 	var known Known
 
 	scanner := KnownSearch(ctx, q, KnownSearchBuilder().Where(squirrel.And{
-		KnownQueryExplicit(false),
 		KnownQueryWithPoster(),
+		KnownQueryExplicit(adult),
+		KnownQueryLanguage(lang),
 		KnownQueryMimetype(mimetype),
 	}).OrderBy("random()").Limit(1))
 	if known, err = sqlx.ScanOne(scanner); err != nil {

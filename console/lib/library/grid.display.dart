@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:language_code/language_code.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/uuidx.dart' as uuidx;
+import 'package:retrovibed/langcodex.dart' as langcodex;
 import 'package:retrovibed/lucene.dart' as lucene;
 import 'package:retrovibed/discovery.dart' as disc;
 import 'api.dart' as api;
-import 'known.media.download.dart';
+import 'known.media.download.list.dart';
 import 'known.media.display.dart';
 import 'media.settings.dart';
 import 'search.mimetype.dropdown.dart';
@@ -222,18 +222,19 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                     ],
                     empty: widget.search.value.items.isNotEmpty
                         ? ds.Empty
-                        : KnownMediaDownload.query(
+                        : KnownMediaDownloadList.query(
                             () {
                               final search = widget.search.value;
                               if (_loading) return Future.value([]);
                               if (search.items.isNotEmpty) return Future.value([]);
-                              if (search.next.mimetypes.isNotEmpty && !mimex.isVideo(category)) return Future.value([]);
+                              if (category.isEmpty) return Future.value([]);
 
                               return httpx.withRetry(
                                 () => api.known
                                     .search(
                                       api.known.request(
-                                        language: LanguageCode.code.locale.languageCode,
+                                        language: langcodex.locale().languageCode,
+                                        mimetype: category,
                                         adult: search.next.adult,
                                         query: search.next.query,
                                         limit: search.next.limit.toInt(),
@@ -256,34 +257,6 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                                 ),
                               ),
                             ),
-                            onTap: (v) {
-                              return api.locate
-                                  .create(
-                                    api.Locate.create()..knownMediaId = v.id,
-                                    options: [authn.request(authz)],
-                                  )
-                                  .then((_) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          'enqueued to be found and downloaded',
-                                        ),
-                                      ),
-                                    );
-                                    return v;
-                                  })
-                                  .catchError((e) {
-                                    print("failed to initiate media location ${e}");
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          'failed to enqueue media locate and download',
-                                        ),
-                                      ),
-                                    );
-                                    throw e;
-                                  });
-                            },
                           ),
                     (context, _media) {
                       var onSettings = () {

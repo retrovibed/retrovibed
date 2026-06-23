@@ -54,10 +54,10 @@ void main() {
     });
 
     testWidgets('renders items returned from the api', (tester) async {
-      await tester.pumpApp(Recommendations(mimex.video, latest:_withItems));
+      await tester.pumpApp(Recommendations(mimex.video, latest:_withItems), isolatecache: true);
       await tester.pumpAndSettle();
       expect(find.text('Recommendations'), findsOneWidget);
-      expect(find.byType(lib.KnownMediaCard), findsWidgets);
+      expect(find.byType(lib.KnownMediaLocator), findsWidgets);
     });
 
     testWidgets('silently ignores not implemented response', (tester) async {

@@ -44,8 +44,10 @@ message KnownCreateResponse { Known known = 1 [ json_name = "known" ]; }
 
 message KnownLatestRequest {
   meta.DateRange released = 1 [ json_name = "released" ];
-  string mimetype = 2 [ json_name = "mimetype" ];
-  reserved 3 to 899;
+  bool adult = 2 [ json_name = "adult" ];
+  string language = 3 [ json_name = "language" ];
+  string mimetype = 4 [ json_name = "mimetype" ];
+  reserved 5 to 899;
   uint64 offset = 900 [ json_name = "offset" ];
   uint64 limit = 901 [ json_name = "limit" ];
   reserved 902 to 999;
@@ -58,7 +60,9 @@ message KnownLatestResponse {
 
 message RecommendationsRequest {
   string mimetype = 1 [ json_name = "mimetype" ];
-  reserved 2 to 899;
+  bool adult = 2 [ json_name = "adult" ];
+  string language = 3 [ json_name = "language" ];
+  reserved 4 to 899;
   uint64 offset = 900 [ json_name = "offset" ];
   uint64 limit = 901 [ json_name = "limit" ];
   reserved 902 to 999;
@@ -67,9 +71,4 @@ message RecommendationsRequest {
 message RecommendationsResponse {
   RecommendationsRequest next = 1 [ json_name = "next" ];
   repeated Known items = 2 [ json_name = "items" ];
-}
-
-message RecommendationsRandomRequest {
-  string mimetype = 1 [ json_name = "mimetype" ];
-  reserved 2 to 899;
 }

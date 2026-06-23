@@ -19,8 +19,7 @@ String lookup(Iterable<String> key, Map<String, String?> env, String fallback) {
   return fallback;
 }
 
-String string(Iterable<String> key, {String fallback = ''}) =>
-    lookup(key, Platform.environment, fallback);
+String string(Iterable<String> key, {String fallback = ''}) => lookup(key, Platform.environment, fallback);
 
 void printSystemEnv() {
   Platform.environment.forEach((key, value) {
@@ -28,23 +27,37 @@ void printSystemEnv() {
   });
 }
 
-Future<void> xdg() async {
-  if (Platform.isLinux || Platform.isMacOS) {
-    return;
-  }
-
+Future<({String configDir, String dataDir, String cacheDir, String downloadDir})> xdg() async {
   final configDir = await getApplicationSupportDirectory();
   final dataDir = await getApplicationDocumentsDirectory();
   final cacheDir = await getApplicationCacheDirectory();
   final downloadDir = Platform.isIOS ? dataDir : await getDownloadsDirectory();
+
   print("config ${configDir}");
   print("data ${dataDir}");
   print("cache ${cacheDir}");
   print("download ${downloadDir}");
+
+  if (Platform.isLinux || Platform.isMacOS) {
+    return (
+      configDir: configDir.path,
+      dataDir: dataDir.path,
+      cacheDir: cacheDir.path,
+      downloadDir: downloadDir?.path ?? "",
+    );
+  }
+
   retro.setenv("XDG_CONFIG_HOME", configDir.path);
   retro.setenv("XDG_DATA_HOME", dataDir.path);
   retro.setenv("XDG_CACHE_HOME", cacheDir.path);
   retro.setenv("XDG_DOWNLOAD_DIR", downloadDir?.path ?? "");
+
+  return (
+    configDir: configDir.path,
+    dataDir: dataDir.path,
+    cacheDir: cacheDir.path,
+    downloadDir: downloadDir?.path ?? "",
+  );
 }
 
 class vars {

@@ -694,12 +694,16 @@ class KnownCreateResponse extends $pb.GeneratedMessage {
 class KnownLatestRequest extends $pb.GeneratedMessage {
   factory KnownLatestRequest({
     $0.DateRange? released,
+    $core.bool? adult,
+    $core.String? language,
     $core.String? mimetype,
     $fixnum.Int64? offset,
     $fixnum.Int64? limit,
   }) {
     final result = create();
     if (released != null) result.released = released;
+    if (adult != null) result.adult = adult;
+    if (language != null) result.language = language;
     if (mimetype != null) result.mimetype = mimetype;
     if (offset != null) result.offset = offset;
     if (limit != null) result.limit = limit;
@@ -721,7 +725,9 @@ class KnownLatestRequest extends $pb.GeneratedMessage {
       createEmptyInstance: create)
     ..aOM<$0.DateRange>(1, _omitFieldNames ? '' : 'released',
         subBuilder: $0.DateRange.create)
-    ..aOS(2, _omitFieldNames ? '' : 'mimetype')
+    ..aOB(2, _omitFieldNames ? '' : 'adult')
+    ..aOS(3, _omitFieldNames ? '' : 'language')
+    ..aOS(4, _omitFieldNames ? '' : 'mimetype')
     ..a<$fixnum.Int64>(
         900, _omitFieldNames ? '' : 'offset', $pb.PbFieldType.OU6,
         defaultOrMaker: $fixnum.Int64.ZERO)
@@ -760,29 +766,47 @@ class KnownLatestRequest extends $pb.GeneratedMessage {
   $0.DateRange ensureReleased() => $_ensure(0);
 
   @$pb.TagNumber(2)
-  $core.String get mimetype => $_getSZ(1);
+  $core.bool get adult => $_getBF(1);
   @$pb.TagNumber(2)
-  set mimetype($core.String value) => $_setString(1, value);
+  set adult($core.bool value) => $_setBool(1, value);
   @$pb.TagNumber(2)
-  $core.bool hasMimetype() => $_has(1);
+  $core.bool hasAdult() => $_has(1);
   @$pb.TagNumber(2)
-  void clearMimetype() => $_clearField(2);
+  void clearAdult() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get language => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set language($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasLanguage() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearLanguage() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.String get mimetype => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set mimetype($core.String value) => $_setString(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasMimetype() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearMimetype() => $_clearField(4);
 
   @$pb.TagNumber(900)
-  $fixnum.Int64 get offset => $_getI64(2);
+  $fixnum.Int64 get offset => $_getI64(4);
   @$pb.TagNumber(900)
-  set offset($fixnum.Int64 value) => $_setInt64(2, value);
+  set offset($fixnum.Int64 value) => $_setInt64(4, value);
   @$pb.TagNumber(900)
-  $core.bool hasOffset() => $_has(2);
+  $core.bool hasOffset() => $_has(4);
   @$pb.TagNumber(900)
   void clearOffset() => $_clearField(900);
 
   @$pb.TagNumber(901)
-  $fixnum.Int64 get limit => $_getI64(3);
+  $fixnum.Int64 get limit => $_getI64(5);
   @$pb.TagNumber(901)
-  set limit($fixnum.Int64 value) => $_setInt64(3, value);
+  set limit($fixnum.Int64 value) => $_setInt64(5, value);
   @$pb.TagNumber(901)
-  $core.bool hasLimit() => $_has(3);
+  $core.bool hasLimit() => $_has(5);
   @$pb.TagNumber(901)
   void clearLimit() => $_clearField(901);
 }
@@ -853,11 +877,15 @@ class KnownLatestResponse extends $pb.GeneratedMessage {
 class RecommendationsRequest extends $pb.GeneratedMessage {
   factory RecommendationsRequest({
     $core.String? mimetype,
+    $core.bool? adult,
+    $core.String? language,
     $fixnum.Int64? offset,
     $fixnum.Int64? limit,
   }) {
     final result = create();
     if (mimetype != null) result.mimetype = mimetype;
+    if (adult != null) result.adult = adult;
+    if (language != null) result.language = language;
     if (offset != null) result.offset = offset;
     if (limit != null) result.limit = limit;
     return result;
@@ -877,6 +905,8 @@ class RecommendationsRequest extends $pb.GeneratedMessage {
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
       createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'mimetype')
+    ..aOB(2, _omitFieldNames ? '' : 'adult')
+    ..aOS(3, _omitFieldNames ? '' : 'language')
     ..a<$fixnum.Int64>(
         900, _omitFieldNames ? '' : 'offset', $pb.PbFieldType.OU6,
         defaultOrMaker: $fixnum.Int64.ZERO)
@@ -913,21 +943,39 @@ class RecommendationsRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   void clearMimetype() => $_clearField(1);
 
+  @$pb.TagNumber(2)
+  $core.bool get adult => $_getBF(1);
+  @$pb.TagNumber(2)
+  set adult($core.bool value) => $_setBool(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasAdult() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearAdult() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get language => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set language($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasLanguage() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearLanguage() => $_clearField(3);
+
   @$pb.TagNumber(900)
-  $fixnum.Int64 get offset => $_getI64(1);
+  $fixnum.Int64 get offset => $_getI64(3);
   @$pb.TagNumber(900)
-  set offset($fixnum.Int64 value) => $_setInt64(1, value);
+  set offset($fixnum.Int64 value) => $_setInt64(3, value);
   @$pb.TagNumber(900)
-  $core.bool hasOffset() => $_has(1);
+  $core.bool hasOffset() => $_has(3);
   @$pb.TagNumber(900)
   void clearOffset() => $_clearField(900);
 
   @$pb.TagNumber(901)
-  $fixnum.Int64 get limit => $_getI64(2);
+  $fixnum.Int64 get limit => $_getI64(4);
   @$pb.TagNumber(901)
-  set limit($fixnum.Int64 value) => $_setInt64(2, value);
+  set limit($fixnum.Int64 value) => $_setInt64(4, value);
   @$pb.TagNumber(901)
-  $core.bool hasLimit() => $_has(2);
+  $core.bool hasLimit() => $_has(4);
   @$pb.TagNumber(901)
   void clearLimit() => $_clearField(901);
 }
@@ -994,63 +1042,6 @@ class RecommendationsResponse extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(2)
   $pb.PbList<Known> get items => $_getList(1);
-}
-
-class RecommendationsRandomRequest extends $pb.GeneratedMessage {
-  factory RecommendationsRandomRequest({
-    $core.String? mimetype,
-  }) {
-    final result = create();
-    if (mimetype != null) result.mimetype = mimetype;
-    return result;
-  }
-
-  RecommendationsRandomRequest._();
-
-  factory RecommendationsRandomRequest.fromBuffer($core.List<$core.int> data,
-          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
-  factory RecommendationsRandomRequest.fromJson($core.String json,
-          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      _omitMessageNames ? '' : 'RecommendationsRandomRequest',
-      package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
-    ..aOS(1, _omitFieldNames ? '' : 'mimetype')
-    ..hasRequiredFields = false;
-
-  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  RecommendationsRandomRequest clone() => deepCopy();
-  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  RecommendationsRandomRequest copyWith(
-          void Function(RecommendationsRandomRequest) updates) =>
-      super.copyWith(
-              (message) => updates(message as RecommendationsRandomRequest))
-          as RecommendationsRandomRequest;
-
-  @$core.override
-  $pb.BuilderInfo get info_ => _i;
-
-  @$core.pragma('dart2js:noInline')
-  static RecommendationsRandomRequest create() =>
-      RecommendationsRandomRequest._();
-  @$core.override
-  RecommendationsRandomRequest createEmptyInstance() => create();
-  @$core.pragma('dart2js:noInline')
-  static RecommendationsRandomRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<RecommendationsRandomRequest>(create);
-  static RecommendationsRandomRequest? _defaultInstance;
-
-  @$pb.TagNumber(1)
-  $core.String get mimetype => $_getSZ(0);
-  @$pb.TagNumber(1)
-  set mimetype($core.String value) => $_setString(0, value);
-  @$pb.TagNumber(1)
-  $core.bool hasMimetype() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearMimetype() => $_clearField(1);
 }
 
 const $core.bool _omitFieldNames =

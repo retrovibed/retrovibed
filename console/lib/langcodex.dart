@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:language_code/language_code.dart';
 
 LanguageCodes normalizeCode(String code) {
@@ -13,4 +15,8 @@ LanguageCodes normalizeCode(String code) {
 bool match(LanguageCodes current, String code) {
   // return current.locale.languageCode == normalizeCode(code).locale.languageCode;
   return current.englishName.startsWith(normalizeCode(code).englishName);
+}
+
+Locale locale() {
+  return LanguageCode.code.locale;
 }

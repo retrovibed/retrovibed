@@ -176,12 +176,14 @@ const KnownLatestRequest$json = {
       '6': '.meta.DateRange',
       '10': 'released'
     },
-    {'1': 'mimetype', '3': 2, '4': 1, '5': 9, '10': 'mimetype'},
+    {'1': 'adult', '3': 2, '4': 1, '5': 8, '10': 'adult'},
+    {'1': 'language', '3': 3, '4': 1, '5': 9, '10': 'language'},
+    {'1': 'mimetype', '3': 4, '4': 1, '5': 9, '10': 'mimetype'},
     {'1': 'offset', '3': 900, '4': 1, '5': 4, '10': 'offset'},
     {'1': 'limit', '3': 901, '4': 1, '5': 4, '10': 'limit'},
   ],
   '9': [
-    {'1': 3, '2': 900},
+    {'1': 5, '2': 900},
     {'1': 902, '2': 1000},
   ],
 };
@@ -189,8 +191,9 @@ const KnownLatestRequest$json = {
 /// Descriptor for `KnownLatestRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List knownLatestRequestDescriptor = $convert.base64Decode(
     'ChJLbm93bkxhdGVzdFJlcXVlc3QSKwoIcmVsZWFzZWQYASABKAsyDy5tZXRhLkRhdGVSYW5nZV'
-    'IIcmVsZWFzZWQSGgoIbWltZXR5cGUYAiABKAlSCG1pbWV0eXBlEhcKBm9mZnNldBiEByABKARS'
-    'Bm9mZnNldBIVCgVsaW1pdBiFByABKARSBWxpbWl0SgUIAxCEB0oGCIYHEOgH');
+    'IIcmVsZWFzZWQSFAoFYWR1bHQYAiABKAhSBWFkdWx0EhoKCGxhbmd1YWdlGAMgASgJUghsYW5n'
+    'dWFnZRIaCghtaW1ldHlwZRgEIAEoCVIIbWltZXR5cGUSFwoGb2Zmc2V0GIQHIAEoBFIGb2Zmc2'
+    'V0EhUKBWxpbWl0GIUHIAEoBFIFbGltaXRKBQgFEIQHSgYIhgcQ6Ac=');
 
 @$core.Deprecated('Use knownLatestResponseDescriptor instead')
 const KnownLatestResponse$json = {
@@ -218,20 +221,22 @@ const RecommendationsRequest$json = {
   '1': 'RecommendationsRequest',
   '2': [
     {'1': 'mimetype', '3': 1, '4': 1, '5': 9, '10': 'mimetype'},
+    {'1': 'adult', '3': 2, '4': 1, '5': 8, '10': 'adult'},
+    {'1': 'language', '3': 3, '4': 1, '5': 9, '10': 'language'},
     {'1': 'offset', '3': 900, '4': 1, '5': 4, '10': 'offset'},
     {'1': 'limit', '3': 901, '4': 1, '5': 4, '10': 'limit'},
   ],
   '9': [
-    {'1': 2, '2': 900},
+    {'1': 4, '2': 900},
     {'1': 902, '2': 1000},
   ],
 };
 
 /// Descriptor for `RecommendationsRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List recommendationsRequestDescriptor = $convert.base64Decode(
-    'ChZSZWNvbW1lbmRhdGlvbnNSZXF1ZXN0EhoKCG1pbWV0eXBlGAEgASgJUghtaW1ldHlwZRIXCg'
-    'ZvZmZzZXQYhAcgASgEUgZvZmZzZXQSFQoFbGltaXQYhQcgASgEUgVsaW1pdEoFCAIQhAdKBgiG'
-    'BxDoBw==');
+    'ChZSZWNvbW1lbmRhdGlvbnNSZXF1ZXN0EhoKCG1pbWV0eXBlGAEgASgJUghtaW1ldHlwZRIUCg'
+    'VhZHVsdBgCIAEoCFIFYWR1bHQSGgoIbGFuZ3VhZ2UYAyABKAlSCGxhbmd1YWdlEhcKBm9mZnNl'
+    'dBiEByABKARSBm9mZnNldBIVCgVsaW1pdBiFByABKARSBWxpbWl0SgUIBBCEB0oGCIYHEOgH');
 
 @$core.Deprecated('Use recommendationsResponseDescriptor instead')
 const RecommendationsResponse$json = {
@@ -254,20 +259,3 @@ final $typed_data.Uint8List recommendationsResponseDescriptor = $convert.base64D
     'ChdSZWNvbW1lbmRhdGlvbnNSZXNwb25zZRIxCgRuZXh0GAEgASgLMh0ubWVkaWEuUmVjb21tZW'
     '5kYXRpb25zUmVxdWVzdFIEbmV4dBIiCgVpdGVtcxgCIAMoCzIMLm1lZGlhLktub3duUgVpdGVt'
     'cw==');
-
-@$core.Deprecated('Use recommendationsRandomRequestDescriptor instead')
-const RecommendationsRandomRequest$json = {
-  '1': 'RecommendationsRandomRequest',
-  '2': [
-    {'1': 'mimetype', '3': 1, '4': 1, '5': 9, '10': 'mimetype'},
-  ],
-  '9': [
-    {'1': 2, '2': 900},
-  ],
-};
-
-/// Descriptor for `RecommendationsRandomRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List recommendationsRandomRequestDescriptor =
-    $convert.base64Decode(
-        'ChxSZWNvbW1lbmRhdGlvbnNSYW5kb21SZXF1ZXN0EhoKCG1pbWV0eXBlGAEgASgJUghtaW1ldH'
-        'lwZUoFCAIQhAc=');

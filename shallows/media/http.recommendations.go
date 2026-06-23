@@ -138,14 +138,14 @@ func (t *HTTPRecommendations) delete(w http.ResponseWriter, r *http.Request) {
 }
 
 func (t *HTTPRecommendations) random(w http.ResponseWriter, r *http.Request) {
-	var req RecommendationsRandomRequest
+	var req RecommendationsRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to decode request"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
 	}
 
-	rec, err := library.RecommendationFromRandomKnown(r.Context(), t.q, req.Mimetype)
+	rec, err := library.RecommendationFromRandomKnown(r.Context(), t.q, req.Mimetype, req.Language, req.Adult)
 	if sqlx.ErrNoRows(err) != nil {
 		log.Println(errorsx.Wrap(err, "no recommendation available"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
@@ -176,16 +176,16 @@ func (t *HTTPRecommendations) random(w http.ResponseWriter, r *http.Request) {
 func (t *HTTPRecommendations) refresh(w http.ResponseWriter, r *http.Request) {
 	var (
 		err error
-		msg RecommendationsRequest
+		req RecommendationsRequest
 	)
 
-	if err = json.NewDecoder(r.Body).Decode(&msg); err != nil {
+	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to decode request"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
 	}
 
-	if _, err = library.RecommendationFromRandomKnown(r.Context(), t.q, msg.Mimetype); sqlx.ErrNoRows(err) != nil {
+	if _, err = library.RecommendationFromRandomKnown(r.Context(), t.q, req.Mimetype, req.Language, req.Adult); sqlx.ErrNoRows(err) != nil {
 		// no known media available - nothing to do
 	} else if err != nil {
 		log.Println(errorsx.Wrap(err, "refresh failed"))
