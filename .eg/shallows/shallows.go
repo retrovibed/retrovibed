@@ -73,6 +73,9 @@ func GenerateProtocol(ctx context.Context, op eg.Op) error {
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmeta.daemon.proto=github.com/retrovibed/retrovibed/shallows/metaapi --go_opt=paths=source_relative --go_out=metaapi meta.daemon.proto"),
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmeta.wireguard.proto=github.com/retrovibed/retrovibed/shallows/metaapi --go_opt=paths=source_relative --go_out=metaapi meta.wireguard.proto"),
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmeta.network.proto=github.com/retrovibed/retrovibed/shallows/metaapi --go_opt=paths=source_relative --go_out=metaapi meta.network.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmeta.torrent.proto=github.com/retrovibed/retrovibed/shallows/metaapi --go_opt=paths=source_relative --go_out=metaapi meta.torrent.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmeta.dht.proto=github.com/retrovibed/retrovibed/shallows/metaapi --go_opt=paths=source_relative --go_out=metaapi meta.dht.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmeta.discovery.proto=github.com/retrovibed/retrovibed/shallows/metaapi --go_opt=paths=source_relative --go_out=metaapi meta.discovery.proto"),
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmeta.authn.proto=github.com/retrovibed/retrovibed/retroapi/authn --go_opt=Mmeta.account.proto=github.com/retrovibed/retrovibed/retroapi/authn --go_opt=Mmeta.profile.proto=github.com/retrovibed/retrovibed/retroapi/authn --go_opt=paths=source_relative --go_out=../retroapi/authn meta.authn.proto"),
 		// media
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmedia.proto=github.com/retrovibed/retrovibed/shallows/media --go_opt=paths=source_relative --go_out=media media.proto"),

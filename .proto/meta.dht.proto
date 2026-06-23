@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package meta;
+
+message DHTDiagnostics {
+  string node_id                                    = 1 [ json_name = "node_id" ];
+  int32  good_nodes                                 = 2 [ json_name = "good_nodes" ];
+  int32  nodes                                      = 3 [ json_name = "nodes" ];
+  int32  outstanding_transactions                   = 4 [ json_name = "outstanding_transactions" ];
+  int64  successful_outbound_announce_peer_queries  = 5 [ json_name = "successful_outbound_announce_peer_queries" ];
+  uint32 bad_nodes                                  = 6 [ json_name = "bad_nodes" ];
+  int64  outbound_queries_attempted                 = 7 [ json_name = "outbound_queries_attempted" ];
+}
+
+message DHTMetricsResponse {
+  DHTDiagnostics dht = 1 [ json_name = "dht" ];
+}

@@ -230,6 +230,7 @@ class _DisplayState extends State<Display> {
                             child: debug.Card(margin: EdgeInsets.zero),
                           ),
                           if (authn.developer(context).debug) debug.MeteredCard(onPressed: full, margin: EdgeInsets.zero),
+                          if (authn.developer(context).debug) debug.DiagnosticsCard(onPressed: full, margin: EdgeInsets.zero),
                         ],
                       );
                     }),

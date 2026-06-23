@@ -98,6 +98,8 @@ func newTorrenting(db *sql.DB, id ssh.Signer, root, media, tvfs fsx.Virtual, mc 
 		_tclient:        &atomic.Pointer[torrent.Client]{},
 		_dnscache:       dnscache.AutoProxyResolver(),
 		_wgdev:          &atomic.Pointer[device.Device]{},
+		_dhts:           &atomic.Pointer[dht.Server]{},
+		_discovery:      &atomic.Pointer[ddisc.Snapshot]{},
 	}
 }
 
@@ -120,6 +122,8 @@ type _torrenting struct {
 	_tclient        *atomic.Pointer[torrent.Client]
 	_dnscache       *dnscache.ProxyPtr
 	_wgdev          *atomic.Pointer[device.Device]
+	_dhts           *atomic.Pointer[dht.Server]
+	_discovery      *atomic.Pointer[ddisc.Snapshot]
 	cond            *sync.Cond
 }
 
@@ -149,6 +153,20 @@ func (t *_torrenting) WireguardSnapshot() (wireguardx.Statistics, error) {
 		return wireguardx.Snapshot(dev)
 	}
 	return wireguardx.Statistics{}, nil
+}
+
+func (t *_torrenting) DHTSnapshot() (dht.ServerStats, error) {
+	if d := t._dhts.Load(); d != nil {
+		return d.Stats(), nil
+	}
+	return dht.ServerStats{}, nil
+}
+
+func (t *_torrenting) DiscoverySnapshot() (ddisc.Snapshot, error) {
+	if d := t._discovery.Load(); d != nil {
+		return *d, nil
+	}
+	return ddisc.Snapshot{}, nil
 }
 
 func (t *_torrenting) Reload(ctx context.Context, cfg *TorrentSettings, disc *DiscoverySettings) error {
@@ -301,6 +319,13 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 
 	partitions := ddisc.Partitions(uint16(disc.Partitions), cryptox.NewChaCha8(disc.Seed))
 	localpartition := partitions.Max(ddisckey)
+	t._discovery.Store(&ddisc.Snapshot{
+		Enabled:        disc.Enabled,
+		Ratio:          disc.Ratio,
+		Partitions:     disc.Partitions,
+		Workloads:      disc.Workloads,
+		LocalPartition: localpartition.String(),
+	})
 
 	log.Println("dht peer id", peerid.String())
 	log.Println("ddisc partitions digest", disc.Partitions, disc.Seed, "->", ddisc.PartitionsDigest(partitions).String())
@@ -381,6 +406,7 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 		if err != nil {
 			return errorsx.Wrap(err, "unable to setup dht server")
 		}
+		t._dhts.Store(dhts)
 
 		limit = retronetx.NewConnLimited(langx.FirstNonZero(wgcfg.MaximumConnections, math.MaxUint64))
 		tnetwork, err = torrentx.SetupTorrentBinder(
@@ -422,6 +448,7 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 		if err != nil {
 			return errorsx.Wrap(err, "unable to setup dht server")
 		}
+		t._dhts.Store(dhts)
 
 		log.Println("------------------------------------", cfg.Port, wgcfg.Port, "------------------------------------")
 		if tnetwork, err = torrentx.Autosocket(dhts, uint16(cfg.Port), limit); err != nil {

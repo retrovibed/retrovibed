@@ -10,12 +10,14 @@ import (
 
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/autobind"
+	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/james-lawrence/torrent/torrenttest"
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/dnscache"
 	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
@@ -24,6 +26,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/torrenttestx"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 	"github.com/stretchr/testify/require"
+	"golang.zx2c4.com/wireguard/device"
 )
 
 func newTestTorrenting(t *testing.T, q *sql.DB) _torrenting {
@@ -52,6 +55,9 @@ func newTestTorrenting(t *testing.T, q *sql.DB) _torrenting {
 		tstore:        tstore,
 		_tclient:      &atomic.Pointer[torrent.Client]{},
 		_dnscache:     dnscache.AutoProxyResolver(),
+		_wgdev:        &atomic.Pointer[device.Device]{},
+		_dhts:         &atomic.Pointer[dht.Server]{},
+		_discovery:    &atomic.Pointer[ddisc.Snapshot]{},
 	}
 }
 
@@ -108,6 +114,9 @@ func TestInit(t *testing.T) {
 			tstore:        tstore,
 			_tclient:      &atomic.Pointer[torrent.Client]{},
 			_dnscache:     dnscache.AutoProxyResolver(),
+			_wgdev:        &atomic.Pointer[device.Device]{},
+			_dhts:         &atomic.Pointer[dht.Server]{},
+			_discovery:    &atomic.Pointer[ddisc.Snapshot]{},
 		}
 
 		cfg := AutoTorrentSettings(&TorrentSettings{
