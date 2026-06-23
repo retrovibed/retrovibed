@@ -304,6 +304,7 @@ type DiscoverySettings struct {
 	Partitions    uint32                 `protobuf:"varint,3,opt,name=partitions,proto3" json:"partitions,omitempty"`
 	Workloads     uint32                 `protobuf:"varint,4,opt,name=workloads,proto3" json:"workloads,omitempty"`
 	Seed          string                 `protobuf:"bytes,5,opt,name=seed,proto3" json:"seed,omitempty"`
+	LocateP2P     bool                   `protobuf:"varint,1000,opt,name=locate_p2p,proto3" json:"locate_p2p,omitempty"` // enable downloading p2p content. disabled by default.
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -373,6 +374,13 @@ func (x *DiscoverySettings) GetSeed() string {
 	return ""
 }
 
+func (x *DiscoverySettings) GetLocateP2P() bool {
+	if x != nil {
+		return x.LocateP2P
+	}
+	return false
+}
+
 var File_torrent_proto protoreflect.FileDescriptor
 
 const file_torrent_proto_rawDesc = "" +
@@ -404,7 +412,7 @@ const file_torrent_proto_rawDesc = "" +
 	"\boutbound\x18\xeb\a \x01(\v2\x0f.torrents.LimitR\boutbound\x12&\n" +
 	"\x05peers\x18\xec\a \x01(\v2\x0f.torrents.PeersR\x05peers\x12+\n" +
 	"\x10maximum_requests\x18\xed\a \x01(\x04R\x10maximum_requestsJ\x05\b\n" +
-	"\x10\xe6\a\"\x95\x01\n" +
+	"\x10\xe6\a\"\xb6\x01\n" +
 	"\x11DiscoverySettings\x12\x18\n" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12\x14\n" +
 	"\x05ratio\x18\x02 \x01(\rR\x05ratio\x12\x1e\n" +
@@ -412,7 +420,10 @@ const file_torrent_proto_rawDesc = "" +
 	"partitions\x18\x03 \x01(\rR\n" +
 	"partitions\x12\x1c\n" +
 	"\tworkloads\x18\x04 \x01(\rR\tworkloads\x12\x12\n" +
-	"\x04seed\x18\x05 \x01(\tR\x04seedb\x06proto3"
+	"\x04seed\x18\x05 \x01(\tR\x04seed\x12\x1f\n" +
+	"\n" +
+	"locate_p2p\x18\xe8\a \x01(\bR\n" +
+	"locate_p2pb\x06proto3"
 
 var (
 	file_torrent_proto_rawDescOnce sync.Once

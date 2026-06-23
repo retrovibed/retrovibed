@@ -92,6 +92,22 @@ String username() {
   return _convertstring(bridge.username());
 }
 
+String xdg_dir_config() {
+  return _convertstring(bridge.xdg_dir_config());
+}
+
+String xdg_dir_cache() {
+  return _convertstring(bridge.xdg_dir_cache());
+}
+
+String xdg_dir_data() {
+  return _convertstring(bridge.xdg_dir_data());
+}
+
+String xdg_dir_download() {
+  return _convertstring(bridge.xdg_dir_download());
+}
+
 // returns an empty string on success, non empty contains the error.
 String seed(String passphrase) {
   return _convertstring(bridge.seed(passphrase.toNativeUtf8().cast<Char>()));

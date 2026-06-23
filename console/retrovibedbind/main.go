@@ -7,6 +7,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
+	"runtime"
 	"time"
 	"unsafe"
 
@@ -18,6 +20,21 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/meta/identityssh"
 	"golang.org/x/oauth2"
 )
+
+func envOrDefault(key, fallback string) string {
+	if v := os.Getenv(key); v != "" {
+		return v
+	}
+	return fallback
+}
+
+func userHomeDir() string {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		log.Println("unable to determine home directory", err)
+	}
+	return home
+}
 
 //export fault
 func fault(code C.int) {
@@ -229,6 +246,41 @@ func checkpointdb() {
 		return
 	}
 	defer db.Close()
+}
+
+//export xdg_dir_config
+func xdg_dir_config() *C.char {
+	cfg, err := os.UserConfigDir()
+	if err != nil {
+		log.Println("unable to determine config directory", err)
+		cfg = filepath.Join(userHomeDir(), ".config")
+	}
+	return C.CString(cfg)
+}
+
+//export xdg_dir_cache
+func xdg_dir_cache() *C.char {
+	cache, err := os.UserCacheDir()
+	if err != nil {
+		log.Println("unable to determine cache directory", err)
+		cache = filepath.Join(userHomeDir(), ".cache")
+	}
+	return C.CString(cache)
+}
+
+//export xdg_dir_data
+func xdg_dir_data() *C.char {
+	home := userHomeDir()
+	data := envOrDefault("XDG_DATA_HOME", filepath.Join(home, ".local", "share"))
+	if runtime.GOOS == "darwin" {
+		data = filepath.Join(home, "Documents")
+	}
+	return C.CString(data)
+}
+
+//export xdg_dir_download
+func xdg_dir_download() *C.char {
+	return C.CString(envOrDefault("XDG_DOWNLOAD_DIR", filepath.Join(userHomeDir(), "Downloads")))
 }
 
 //export validatecert

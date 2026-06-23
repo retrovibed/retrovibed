@@ -39,4 +39,7 @@ message DiscoverySettings {
   uint32 partitions = 3 [ json_name = "partitions" ];
   uint32 workloads = 4 [ json_name = "workloads" ];
   string seed = 5 [ json_name = "seed" ];
+  bool locate_p2p = 1000 [
+    json_name = "locate_p2p"
+  ]; // enable downloading p2p content. disabled by default.
 }

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:retrovibed/retrovibed.dart' as retro;
 
@@ -28,24 +29,24 @@ void printSystemEnv() {
 }
 
 Future<({String configDir, String dataDir, String cacheDir, String downloadDir})> xdg() async {
-  final configDir = await getApplicationSupportDirectory();
+  if (Platform.isLinux || Platform.isMacOS) {
+    return (
+      configDir: retro.xdg_dir_config(),
+      dataDir: retro.xdg_dir_data(),
+      cacheDir: retro.xdg_dir_cache(),
+      downloadDir: retro.xdg_dir_download(),
+    );
+  }
+
   final dataDir = await getApplicationDocumentsDirectory();
   final cacheDir = await getApplicationCacheDirectory();
   final downloadDir = Platform.isIOS ? dataDir : await getDownloadsDirectory();
+  final configDir = await getApplicationSupportDirectory();
 
   print("config ${configDir}");
   print("data ${dataDir}");
   print("cache ${cacheDir}");
   print("download ${downloadDir}");
-
-  if (Platform.isLinux || Platform.isMacOS) {
-    return (
-      configDir: configDir.path,
-      dataDir: dataDir.path,
-      cacheDir: cacheDir.path,
-      downloadDir: downloadDir?.path ?? "",
-    );
-  }
 
   retro.setenv("XDG_CONFIG_HOME", configDir.path);
   retro.setenv("XDG_DATA_HOME", dataDir.path);

@@ -416,6 +416,7 @@ class DiscoverySettings extends $pb.GeneratedMessage {
     $core.int? partitions,
     $core.int? workloads,
     $core.String? seed,
+    $core.bool? locateP2p,
   }) {
     final result = create();
     if (enabled != null) result.enabled = enabled;
@@ -423,6 +424,7 @@ class DiscoverySettings extends $pb.GeneratedMessage {
     if (partitions != null) result.partitions = partitions;
     if (workloads != null) result.workloads = workloads;
     if (seed != null) result.seed = seed;
+    if (locateP2p != null) result.locateP2p = locateP2p;
     return result;
   }
 
@@ -444,6 +446,7 @@ class DiscoverySettings extends $pb.GeneratedMessage {
     ..aI(3, _omitFieldNames ? '' : 'partitions', fieldType: $pb.PbFieldType.OU3)
     ..aI(4, _omitFieldNames ? '' : 'workloads', fieldType: $pb.PbFieldType.OU3)
     ..aOS(5, _omitFieldNames ? '' : 'seed')
+    ..aOB(1000, _omitFieldNames ? '' : 'locate_p2p')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -509,6 +512,15 @@ class DiscoverySettings extends $pb.GeneratedMessage {
   $core.bool hasSeed() => $_has(4);
   @$pb.TagNumber(5)
   void clearSeed() => $_clearField(5);
+
+  @$pb.TagNumber(1000)
+  $core.bool get locateP2p => $_getBF(5);
+  @$pb.TagNumber(1000)
+  set locateP2p($core.bool value) => $_setBool(5, value);
+  @$pb.TagNumber(1000)
+  $core.bool hasLocateP2p() => $_has(5);
+  @$pb.TagNumber(1000)
+  void clearLocateP2p() => $_clearField(1000);
 }
 
 const $core.bool _omitFieldNames =
