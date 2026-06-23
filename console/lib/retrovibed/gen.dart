@@ -217,6 +217,13 @@ class DaemonBridge {
   late final _xdg_dir_downloadPtr = _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function()>>('xdg_dir_download');
   late final _xdg_dir_download = _xdg_dir_downloadPtr.asFunction<ffi.Pointer<ffi.Char> Function()>();
 
+  ffi.Pointer<ffi.Char> xdg_relroot() {
+    return _xdg_relroot();
+  }
+
+  late final _xdg_relrootPtr = _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function()>>('xdg_relroot');
+  late final _xdg_relroot = _xdg_relrootPtr.asFunction<ffi.Pointer<ffi.Char> Function()>();
+
   int validatecert(
     ffi.Pointer<ffi.Char> hostname,
     ffi.Pointer<ffi.UnsignedChar> certData,

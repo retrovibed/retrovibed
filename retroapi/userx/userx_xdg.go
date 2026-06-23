@@ -3,15 +3,14 @@
 package userx
 
 import (
-	"os"
 	"path/filepath"
 
-	"github.com/retrovibed/retrovibed/shallows/internal/envx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/envx"
 )
 
 // returns the relative root that should be used for all well known directories.
 func DefaultRelRoot() string {
-	return filepath.Base(os.Args[0])
+	return "retrovibed"
 }
 
 // platform specific config directory resolution

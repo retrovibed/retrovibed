@@ -12,8 +12,7 @@ import (
 
 // returns the relative root that should be used for all well known directories.
 func DefaultRelRoot() string {
-	const DefaultDir = "space.retrovibe.retrovibed"
-	return DefaultDir
+	return "retrovibed"
 }
 
 // platform specific config directory resolution

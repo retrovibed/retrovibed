@@ -22,6 +22,7 @@ import (
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
 	retronetx "github.com/retrovibed/retrovibed/retroapi/netx"
+	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/daemons"
 	"github.com/retrovibed/retrovibed/shallows/internal/asynccompute"
@@ -32,7 +33,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/torrentx"
-	"github.com/retrovibed/retrovibed/shallows/internal/userx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 )

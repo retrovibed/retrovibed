@@ -19,12 +19,10 @@ class Card extends StatelessWidget {
     final billing = Registered.of(context);
     final plan = PlanSummary.fromID(billing.plan.id);
     final defaults = ds.Defaults.of(context);
-    final tappable =
-        !(Platform.isAndroid || Platform.isIOS || Platform.isMacOS) || authn.developer(context).subscription;
-    final tap =
-        () => onPressed(
-          Settings(margin: EdgeInsets.zero, padding: EdgeInsets.zero),
-        );
+    final tappable = authn.developer(context).subscription;
+    final tap = () => onPressed(
+      Settings(margin: EdgeInsets.zero, padding: EdgeInsets.zero),
+    );
 
     return ds.Card(
       alignment: Alignment.center,

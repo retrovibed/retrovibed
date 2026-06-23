@@ -5,13 +5,37 @@ import (
 	"os"
 	"os/user"
 	"path/filepath"
+	"strings"
 
 	"github.com/retrovibed/retrovibed/retroapi/internal/debugx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/envx"
+	"golang.org/x/text/language"
 )
 
 func Locale() string {
 	return envx.String("", "LANG", "LC_ALL")
+}
+
+// LocaleLanguage returns the BCP-47 base language tag derived from the
+// system locale (e.g. "en_US.UTF-8" -> "en"). returns "" when no locale is
+// configured or it cannot be parsed.
+func LocaleLanguage() string {
+	locale := Locale()
+	if locale == "" || locale == "C" || locale == "POSIX" {
+		return ""
+	}
+
+	if idx := strings.IndexByte(locale, '.'); idx >= 0 {
+		locale = locale[:idx]
+	}
+
+	tag, err := language.Parse(strings.ReplaceAll(locale, "_", "-"))
+	if err != nil {
+		return ""
+	}
+
+	base, _ := tag.Base()
+	return base.String()
 }
 
 func Root() user.User {

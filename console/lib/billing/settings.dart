@@ -93,10 +93,9 @@ class _Settings extends State<Settings> {
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
-    final visible =
-        _plans.where((p) {
-          return !p.$1.hidden || p.$1.key == current.key;
-        }).toList();
+    final visible = _plans.where((p) {
+      return !p.$1.hidden || p.$1.key == current.key;
+    }).toList();
     return ds.ErrorScreen(
       cause: _cause,
       forms.Container(
@@ -106,7 +105,7 @@ class _Settings extends State<Settings> {
         Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (authn.developer(context).subscription || !(Platform.isIOS || Platform.isMacOS)) ...[
+            if (authn.developer(context).subscription) ...[
               forms.Field(
                 label: Text("plan"),
                 input: DropdownButton(

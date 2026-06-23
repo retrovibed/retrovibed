@@ -108,6 +108,10 @@ String xdg_dir_download() {
   return _convertstring(bridge.xdg_dir_download());
 }
 
+String xdg_relroot() {
+  return _convertstring(bridge.xdg_relroot());
+}
+
 // returns an empty string on success, non empty contains the error.
 String seed(String passphrase) {
   return _convertstring(bridge.seed(passphrase.toNativeUtf8().cast<Char>()));

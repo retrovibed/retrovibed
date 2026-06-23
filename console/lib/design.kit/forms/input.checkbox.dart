@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart' as m;
 import 'package:retrovibed/design.kit/theme.defaults.dart' as theming;
+import '../help.dart';
 
 class Checkbox extends m.StatelessWidget {
   final m.Widget? label;
   final m.Widget? description;
   final m.Widget? trailing;
+  final m.Widget help;
   final bool dense;
   final bool value;
   final m.Alignment alignment;
@@ -15,6 +17,7 @@ class Checkbox extends m.StatelessWidget {
     this.onChanged,
     this.trailing,
     this.description,
+    this.help = HelpScope.None,
     this.value = false,
     this.dense = false,
     this.alignment = m.Alignment.center,
@@ -23,21 +26,24 @@ class Checkbox extends m.StatelessWidget {
   @override
   m.Widget build(m.BuildContext context) {
     final defaults = theming.Defaults.of(context);
-    return m.Material(
-      color: m.Colors.transparent,
-      child: m.CheckboxListTile(
-        dense: dense,
-        title: label,
-        secondary: trailing,
-        subtitle: description,
-        value: value,
-        onChanged: onChanged,
-        controlAffinity: m.ListTileControlAffinity.leading,
-        visualDensity: m.VisualDensity.compact,
-        materialTapTargetSize: m.MaterialTapTargetSize.shrinkWrap,
-        contentPadding: m.EdgeInsets.zero,
-        shape: m.RoundedRectangleBorder(borderRadius: defaults.borderRadius),
+    return Help(
+      m.Material(
+        color: m.Colors.transparent,
+        child: m.CheckboxListTile(
+          dense: dense,
+          title: label,
+          secondary: trailing,
+          subtitle: description,
+          value: value,
+          onChanged: onChanged,
+          controlAffinity: m.ListTileControlAffinity.leading,
+          visualDensity: m.VisualDensity.compact,
+          materialTapTargetSize: m.MaterialTapTargetSize.shrinkWrap,
+          contentPadding: m.EdgeInsets.zero,
+          shape: m.RoundedRectangleBorder(borderRadius: defaults.borderRadius),
+        ),
       ),
+      help,
     );
   }
 }

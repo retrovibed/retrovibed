@@ -30,10 +30,11 @@ void printSystemEnv() {
 
 Future<({String configDir, String dataDir, String cacheDir, String downloadDir})> xdg() async {
   if (Platform.isLinux || Platform.isMacOS) {
+    final relroot = retro.xdg_relroot();
     return (
-      configDir: retro.xdg_dir_config(),
-      dataDir: retro.xdg_dir_data(),
-      cacheDir: retro.xdg_dir_cache(),
+      configDir: p.join(retro.xdg_dir_config(), relroot),
+      dataDir: p.join(retro.xdg_dir_data(), relroot),
+      cacheDir: p.join(retro.xdg_dir_cache(), relroot),
       downloadDir: retro.xdg_dir_download(),
     );
   }

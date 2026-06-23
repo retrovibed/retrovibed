@@ -17,7 +17,11 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 )
 
-func LocateTorrentMedia(ctx context.Context, db sqlx.Queryer, c *torrent.Client) error {
+func LocateMedia(ctx context.Context, db sqlx.Queryer, c *torrent.Client, disc *DiscoverySettings) error {
+	if !disc.LocateP2P {
+		return nil
+	}
+
 	q := library.KnownSearchBuilder().InnerJoin("library_locate ON library_locate.known_media_id = library_known_media.uid").Where(squirrel.And{
 		library.LocateQueryPending(),
 		library.KnownQueryExplicit(false),

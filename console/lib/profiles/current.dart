@@ -79,7 +79,7 @@ class _CurrentState extends State<Current> {
               label: Text("name"),
               input: Text(current.account.description),
             ),
-            if (authn.developer(context).subscription || !(Platform.isIOS || Platform.isMacOS))
+            if (authn.developer(context).subscription)
               TextButton(
                 child: Text("open web console"),
                 onPressed: () {

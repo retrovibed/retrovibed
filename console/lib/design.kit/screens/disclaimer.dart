@@ -23,8 +23,9 @@ class Disclaimer extends StatefulWidget {
       fscache.Dir(Directory(p.join(fscache.global().cache, prefix))).maybe(id, () => false);
 
   static void acknowledge(String id) => defaultwrite('disclaimer', id);
-  static void defaultwrite(String prefix, String id) =>
-      fscache.Dir(Directory(p.join(fscache.global().cache, prefix))).write(id, true);
+  static void defaultwrite(String prefix, String id) {
+    fscache.Dir(Directory(p.join(fscache.global().cache, prefix))).write(id, true);
+  }
 
   @override
   State<Disclaimer> createState() => _DisclaimerState();

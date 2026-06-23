@@ -65,8 +65,51 @@ func TestMediaLocate(t *testing.T) {
 
 		require.Equal(t, 0, testx.Must(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM torrents_metadata"))(t))
 
-		require.NoError(t, daemons.LocateTorrentMedia(t.Context(), q, tclient))
+		require.NoError(t, daemons.LocateMedia(t.Context(), q, tclient, &daemons.DiscoverySettings{LocateP2P: true}))
 
 		require.Equal(t, 1, testx.Must(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM torrents_metadata WHERE initiated_at <= NOW()"))(t))
+	})
+
+	t.Run("should not query ddisc when p2p locate is disabled", func(t *testing.T) {
+		var (
+			k library.Known
+			l library.Locate
+			d ddisc.Discovered
+		)
+		q := sqltestx.Metadatabase(t)
+
+		require.NoError(t, testx.Fake(&k, library.KnownOptionTestDefaults))
+		require.NoError(t, library.KnownInsertWithDefaults(t.Context(), q, k).Scan(&k))
+		require.NoError(t, library.LocateInsertWithDefaults(t.Context(), q, library.Locate{KnownMediaID: k.UID}).Scan(&l))
+
+		seedir := t.TempDir()
+		mcache := torrent.NewMetadataCache(seedir)
+		info, _, err := torrenttest.Random(seedir, 128*bytesx.KiB, metainfo.OptionDisplayName(k.Title))
+		require.NoError(t, err)
+
+		tclient := torrenttestx.Client(
+			t,
+			autobind.NewLoopback(
+				autobind.EnableDHT(torrenttestx.QuickDHT(t)),
+			),
+			mcache,
+			storage.NewFile(seedir),
+		)
+		defer tclient.Close()
+
+		id := int160.New(testx.Must(metainfo.Encode(info))(t))
+
+		d = ddisc.NewDiscovered(
+			&id,
+			ddisc.DiscoveredOptionIndex(true),
+			ddisc.DiscoveredOptionMimetype(mimex.Binary),
+			ddisc.DiscoveredOptionFromTorrentInfo(info),
+		)
+
+		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(t.Context(), q, d).Scan(&d))
+
+		require.NoError(t, daemons.LocateMedia(t.Context(), q, tclient, &daemons.DiscoverySettings{LocateP2P: false}))
+
+		require.Equal(t, 0, testx.Must(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM torrents_metadata"))(t))
 	})
 }

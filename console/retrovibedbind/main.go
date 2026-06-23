@@ -14,6 +14,7 @@ import (
 
 	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/retroapi/netmonx"
+	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdglobalmain"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdmeta"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
@@ -281,6 +282,11 @@ func xdg_dir_data() *C.char {
 //export xdg_dir_download
 func xdg_dir_download() *C.char {
 	return C.CString(envOrDefault("XDG_DOWNLOAD_DIR", filepath.Join(userHomeDir(), "Downloads")))
+}
+
+//export xdg_relroot
+func xdg_relroot() *C.char {
+	return C.CString(userx.DefaultRelRoot())
 }
 
 //export validatecert
