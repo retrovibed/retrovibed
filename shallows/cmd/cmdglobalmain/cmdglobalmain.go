@@ -16,6 +16,7 @@ import (
 
 	"github.com/alecthomas/kong"
 	"github.com/gofrs/uuid/v5"
+	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdcommunity"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdddisc"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdetl"
@@ -32,7 +33,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/userx"
 	"github.com/willabides/kongplete"
 	"golang.zx2c4.com/wireguard/device"
 

@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/authn.dart' as authn;
@@ -118,9 +117,15 @@ class _CardState extends State<Card> {
               onPressed: ds.decorated(
                 ds.Copyable.copy(_session.account.id),
                 (pending) => pending
-                    .then((_) => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Account ID copied'))))
+                    .then(
+                      (_) => ScaffoldMessenger.of(
+                        context,
+                      ).showSnackBar(const SnackBar(content: Text('Account ID copied'))),
+                    )
                     .catchError(
-                      (e) => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to copy account ID'))),
+                      (e) => ScaffoldMessenger.of(
+                        context,
+                      ).showSnackBar(const SnackBar(content: Text('Failed to copy account ID'))),
                     ),
               ),
             ),
@@ -138,13 +143,19 @@ class _CardState extends State<Card> {
               onPressed: ds.decorated(
                 ds.Copyable.copy(retro.public_key()),
                 (pending) => pending
-                    .then((_) => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Public key copied'))))
+                    .then(
+                      (_) => ScaffoldMessenger.of(
+                        context,
+                      ).showSnackBar(const SnackBar(content: Text('Public key copied'))),
+                    )
                     .catchError(
-                      (e) => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to copy public key'))),
+                      (e) => ScaffoldMessenger.of(
+                        context,
+                      ).showSnackBar(const SnackBar(content: Text('Failed to copy public key'))),
                     ),
               ),
             ),
-            if (authn.developer(context).subscription || !(Platform.isIOS || Platform.isMacOS))
+            if (authn.developer(context).subscription)
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton(

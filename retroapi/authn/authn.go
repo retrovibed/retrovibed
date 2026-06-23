@@ -25,7 +25,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/internal/oauth2x"
 	"github.com/retrovibed/retrovibed/retroapi/internal/sshx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/stringsx"
-	"github.com/retrovibed/retrovibed/retroapi/internal/userx"
+	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/oauth2"

@@ -16,6 +16,7 @@ import (
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
+	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/asynccompute"
 	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
@@ -25,7 +26,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/torrentx"
-	"github.com/retrovibed/retrovibed/shallows/internal/userx"
 	"golang.org/x/time/rate"
 )
 

@@ -1,27 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
-import 'known.media.card.dart';
+import 'package:retrovibed/httpx.dart' as httpx;
 import './api.dart' as api;
+import './known.media.locator.dart';
 import './known.media.source.dart';
 
-class KnownMediaDownload extends StatefulWidget {
+class KnownMediaDownloadList extends StatelessWidget {
   final Widget leading;
   final List<api.Known> children;
-  final Future<api.Known> Function(api.Known k) onTap;
-  final Future<api.Known> Function(api.Known k)? onDoubleTap;
-  const KnownMediaDownload({
+  final Future<api.LocateCreateResponse> Function(api.Locate req, {List<httpx.Option> options}) locate;
+
+  const KnownMediaDownloadList({
     super.key,
     this.children = const [],
     this.leading = const SizedBox(),
-    required this.onTap,
-    this.onDoubleTap,
+    this.locate = api.locate.create,
   });
 
   static Widget query(
     Future<List<api.Known>> Function() query, {
     Key? key,
-    required Future<api.Known> Function(api.Known k) onTap,
-    Future<api.Known> Function(api.Known k)? onDoubleTap,
+    Future<api.LocateCreateResponse> Function(api.Locate req, {List<httpx.Option> options}) locate = api.locate.create,
     Widget leading = const SizedBox(),
   }) {
     return FutureBuilder<List<api.Known>>(
@@ -31,11 +30,10 @@ class KnownMediaDownload extends StatefulWidget {
         return ds.Loading(
           loading: !(snapshot.hasData || snapshot.hasError),
           cause: ds.Error.maybeErr(snapshot.error),
-          KnownMediaDownload(
+          KnownMediaDownloadList(
             leading: leading,
             children: snapshot.data ?? [],
-            onTap: onTap,
-            onDoubleTap: onDoubleTap,
+            locate: locate,
           ),
         );
       },
@@ -43,25 +41,13 @@ class KnownMediaDownload extends StatefulWidget {
   }
 
   @override
-  State<StatefulWidget> createState() => _KnownMediaDownload();
-}
-
-class _KnownMediaDownload extends State<KnownMediaDownload> {
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
-
-  @override
   Widget build(BuildContext context) {
     return ds.Grid(
-      leading: [widget.leading],
-      children: widget.children,
-      (context, v) => KnownMediaCard(
+      leading: [leading],
+      children: children,
+      (context, v) => KnownMediaLocator(
         v,
-        icon: Icons.search,
-        onTap: () => widget.onTap(v),
-        onDoubleTap: widget.onDoubleTap == null ? null : () => widget.onDoubleTap!(v),
+        locate: locate,
         trailing: Center(child: KnownMediaSource(v, height: 24)),
       ),
     );

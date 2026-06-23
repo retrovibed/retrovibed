@@ -54,10 +54,7 @@ func (t *mbjsonlimport) releases(ctx context.Context, r io.Reader) iter.Seq[libr
 	return func(yield func(library.Known) bool) {
 		seq := jsonl.Iter[mbJSONRelease](jsonl.NewDecoder(r))
 		for rel := range seq.Each(ctx) {
-			rawID := rel.ReleaseGroup.ID
-			if rawID == "" {
-				rawID = rel.ID
-			}
+			rawID := langx.FirstNonZero(rel.ReleaseGroup.ID, rel.ID)
 			id := uuid.FromStringOrNil(rawID)
 
 			uidmd5 := uuid.FromBytesOrNil(md5x.JSON(rel).Sum(nil))

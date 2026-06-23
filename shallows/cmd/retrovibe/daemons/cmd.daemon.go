@@ -19,6 +19,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/netmonx"
 	"github.com/retrovibed/retrovibed/retroapi/tlsx"
+	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
@@ -35,7 +36,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/netx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
-	"github.com/retrovibed/retrovibed/shallows/internal/userx"
 	"github.com/retrovibed/retrovibed/shallows/internal/wireguardx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/retrovibed/retrovibed/shallows/media"
@@ -368,6 +368,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 
 	metaapi.NewHTTPFileConfig(vpncfgpath).Bind(httpmux.PathPrefix("/s/wireguard").Subrouter())
 	metaapi.NewHTTPFileConfig(torrenting.cfgpath).Bind(httpmux.PathPrefix("/s/torrents").Subrouter())
+	metaapi.NewHTTPFileConfig(torrenting.discoverycfgpath).Bind(httpmux.PathPrefix("/s/discovery").Subrouter())
 	metaapi.NewHTTPFileConfig(storagecfgpath).Bind(httpmux.PathPrefix("/s/storage").Subrouter())
 
 	communityapi.NewHTTPMetrics(

@@ -3,6 +3,7 @@ import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/library.dart' as lib;
+import 'package:retrovibed/langcodex.dart' as langcodex;
 import '../media/media.known.pb.dart' as known;
 
 class Recommendations extends StatefulWidget {
@@ -50,7 +51,14 @@ class _RecommendationsState extends State<Recommendations> {
     final auth = authn.request(authn.AuthzCache.meta(context));
     return httpx
         .withRetry(
-          () => widget.latest(lib.recommendations.request(mimetype: widget.mimetype), options: [auth]),
+          () => widget.latest(
+            lib.recommendations.request(
+              mimetype: widget.mimetype,
+              language: langcodex.locale().languageCode,
+              adult: false,
+            ),
+            options: [auth],
+          ),
         )
         .then(
           (resp) => setState(() {
@@ -91,7 +99,11 @@ class _RecommendationsState extends State<Recommendations> {
                 return httpx
                     .withRetry(
                       () => lib.recommendations.random(
-                        mimetype: widget.mimetype,
+                        lib.RecommendationsRequest(
+                          mimetype: widget.mimetype,
+                          language: langcodex.locale().languageCode,
+                          adult: false,
+                        ),
                         options: [authn.request(authn.AuthzCache.meta(context))],
                       ),
                     )
@@ -111,26 +123,15 @@ class _RecommendationsState extends State<Recommendations> {
           'Content partnerships pending',
           style: TextStyle(color: Colors.grey),
         ),
-        items:
-            _items
-                .map(
-                  (item) => lib.KnownMediaCard(
-                    item,
-                    icon: Icons.download,
-                    help: lib.KnownMediaDisplay.hintRecommendations,
-                    onTap: () {
-                      ds.modals.asyncfn(
-                        context,
-                        (completion) => ds.Confirmation.ok(
-                          content: Text("automatic media discovery is not yet implemented"),
-                          onConfirm: (_) => completion.complete(),
-                          onCancel: (_) => completion.complete(),
-                        ),
-                      );
-                    },
-                  ),
-                )
-                .toList(),
+        items: _items
+            .map(
+              (item) => lib.KnownMediaLocator(
+                item,
+                icon: Icons.download,
+                help: lib.KnownMediaDisplay.hintRecommendations,
+              ),
+            )
+            .toList(),
         loading: _loading,
         cause: _cause,
       ),

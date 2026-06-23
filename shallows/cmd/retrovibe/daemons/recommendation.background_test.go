@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/daemons"
 	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
@@ -21,6 +22,7 @@ func TestRecommendationsBackgroundRun(t *testing.T) {
 
 		var known library.Known
 		require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults, library.KnownOptionMimetype(mimex.Video)))
+		known.OriginalLanguage = userx.LocaleLanguage()
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 
 		require.NoError(t, daemons.RecommendationsBackgroundRun(ctx, q))
@@ -38,6 +40,7 @@ func TestRecommendationsBackgroundRun(t *testing.T) {
 
 		var known library.Known
 		require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults, library.KnownOptionMimetype(mimex.Audio)))
+		known.OriginalLanguage = userx.LocaleLanguage()
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 
 		require.NoError(t, daemons.RecommendationsBackgroundRun(ctx, q))
@@ -55,6 +58,7 @@ func TestRecommendationsBackgroundRun(t *testing.T) {
 
 		var known library.Known
 		require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults, library.KnownOptionMimetype(mimex.Video)))
+		known.OriginalLanguage = userx.LocaleLanguage()
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 
 		// generate the first recommendation

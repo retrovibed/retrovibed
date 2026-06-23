@@ -5,6 +5,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:retrovibed/authn.dart' as authn;
+import 'package:retrovibed/caching.dart' as caching;
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/meta.dart' as meta;
 
@@ -31,10 +32,22 @@ extension WidgetTesterExtensions on WidgetTester {
     FlexFit fit = FlexFit.loose,
     Size physicalSize = const Size(800, 600),
     Future<meta.AuthzResponse> Function({String? host}) authzCurrent = authn.AuthzCache.fake,
+    bool isolatecache = false,
   }) async {
     view.physicalSize = physicalSize;
     view.devicePixelRatio = 1.0;
     addTearDown(view.reset);
+
+    if (isolatecache) {
+      final tempDir = Directory.systemTemp.createTempSync('retrovibed_test_');
+      addTearDown(() {
+        if (tempDir.existsSync()) tempDir.deleteSync(recursive: true);
+      });
+      caching.setglobal(caching.DirsWellKnown(cache: tempDir.path));
+    } else {
+      caching.setglobal(caching.DirsWellKnown(cache: Directory.systemTemp.path));
+    }
+
     await _loadRoboto();
     final base = theme ?? ThemeData();
     final defaultTextButtonStyle = TextButton.styleFrom(

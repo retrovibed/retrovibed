@@ -3,15 +3,15 @@ syntax = "proto3";
 package meta;
 
 message DiscoveryDiagnostics {
-  bool   enabled         = 1 [ json_name = "enabled" ];
-  uint32 ratio           = 2 [ json_name = "ratio" ];
-  uint32 partitions      = 3 [ json_name = "partitions" ];
-  uint32 workloads       = 4 [ json_name = "workloads" ];
+  bool enabled = 1 [ json_name = "enabled" ];
+  uint32 ratio = 2 [ json_name = "ratio" ];
+  uint32 partitions = 3 [ json_name = "partitions" ];
+  uint32 workloads = 4 [ json_name = "workloads" ];
   string local_partition = 5 [ json_name = "local_partition" ];
-  uint64 peers           = 6 [ json_name = "peers" ];
-  uint64 peers_ddisc     = 7 [ json_name = "peers_ddisc" ];
-  uint64 peers_bep51     = 8 [ json_name = "peers_bep51" ];
-  uint64 unknown_hashes  = 9 [ json_name = "unknown_hashes" ];
+  uint64 peers = 6 [ json_name = "peers" ];
+  uint64 peers_ddisc = 7 [ json_name = "peers_ddisc" ];
+  uint64 peers_bep51 = 8 [ json_name = "peers_bep51" ];
+  uint64 unknown_hashes = 9 [ json_name = "unknown_hashes" ];
 }
 
 message DiscoveryMetricsResponse {

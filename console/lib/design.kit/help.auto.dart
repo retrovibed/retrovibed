@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
-import 'package:retrovibed/caching/fscache.dart' as fscache;
+// import 'package:path_provider/path_provider.dart';
+import 'package:retrovibed/caching.dart' as fscache;
 import 'flutterx.dart';
 import 'screens.dart' as screens;
 import 'buttons.dart';
@@ -34,8 +34,7 @@ class _HelpAutoState extends State<HelpAuto> {
   }
 
   Future<void> _activate() async {
-    final cacheDir = await getApplicationCacheDirectory();
-    final cache = fscache.Dir(Directory(p.join(cacheDir.path, 'help')));
+    final cache = fscache.Dir(Directory(p.join(fscache.global().cache, 'help')));
     final alreadyActivated = cache.maybe<bool>(widget.cacheid, () => false);
     if (!alreadyActivated) {
       cache.write<bool>(widget.cacheid, true);

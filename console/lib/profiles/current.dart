@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/design.kit/forms.dart' as forms;
@@ -79,7 +78,7 @@ class _CurrentState extends State<Current> {
               label: Text("name"),
               input: Text(current.account.description),
             ),
-            if (authn.developer(context).subscription || !(Platform.isIOS || Platform.isMacOS))
+            if (authn.developer(context).subscription)
               TextButton(
                 child: Text("open web console"),
                 onPressed: () {

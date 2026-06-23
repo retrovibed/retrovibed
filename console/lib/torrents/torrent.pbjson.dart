@@ -138,6 +138,7 @@ const DiscoverySettings$json = {
     {'1': 'partitions', '3': 3, '4': 1, '5': 13, '10': 'partitions'},
     {'1': 'workloads', '3': 4, '4': 1, '5': 13, '10': 'workloads'},
     {'1': 'seed', '3': 5, '4': 1, '5': 9, '10': 'seed'},
+    {'1': 'locate_p2p', '3': 1000, '4': 1, '5': 8, '10': 'locate_p2p'},
   ],
 };
 
@@ -145,4 +146,5 @@ const DiscoverySettings$json = {
 final $typed_data.Uint8List discoverySettingsDescriptor = $convert.base64Decode(
     'ChFEaXNjb3ZlcnlTZXR0aW5ncxIYCgdlbmFibGVkGAEgASgIUgdlbmFibGVkEhQKBXJhdGlvGA'
     'IgASgNUgVyYXRpbxIeCgpwYXJ0aXRpb25zGAMgASgNUgpwYXJ0aXRpb25zEhwKCXdvcmtsb2Fk'
-    'cxgEIAEoDVIJd29ya2xvYWRzEhIKBHNlZWQYBSABKAlSBHNlZWQ=');
+    'cxgEIAEoDVIJd29ya2xvYWRzEhIKBHNlZWQYBSABKAlSBHNlZWQSHwoKbG9jYXRlX3AycBjoBy'
+    'ABKAhSCmxvY2F0ZV9wMnA=');

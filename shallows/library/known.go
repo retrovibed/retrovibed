@@ -113,8 +113,15 @@ func KnownQueryUIDGreaterThan(uid string) squirrel.Sqlizer {
 	return squirrel.Expr("library_known_media.uid > ?", uid)
 }
 
-func KnownQueryExplicit(b bool) squirrel.Sqlizer {
-	return squirrel.Expr("library_known_media.adult = ?", b)
+// KnownQueryExplicit toggles whether adult content is allowed in results.
+// allow=false restricts results to non-adult content; allow=true permits
+// both adult and non-adult content (it does not restrict to adult-only).
+func KnownQueryExplicit(allow bool) squirrel.Sqlizer {
+	if allow {
+		return squirrelx.Noop{}
+	}
+
+	return squirrel.Expr("library_known_media.adult = ?", false)
 }
 
 func KnownQueryLanguage(v string) squirrel.Sqlizer {

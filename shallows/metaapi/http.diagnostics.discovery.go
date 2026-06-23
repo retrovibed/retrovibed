@@ -13,6 +13,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 )
 
@@ -29,15 +30,13 @@ type HTTPDiscoveryDiagnostics struct {
 }
 
 func NewHTTPDiscoveryDiagnostics(db *sql.DB, discoverySnapshot func() (ddisc.Snapshot, error), options ...HTTPDiscoveryDiagnosticsOption) *HTTPDiscoveryDiagnostics {
-	d := &HTTPDiscoveryDiagnostics{
+	d := langx.Clone(HTTPDiscoveryDiagnostics{
 		db:                db,
 		discoverySnapshot: discoverySnapshot,
 		jwtsecret:         env.JWTSecret,
-	}
-	for _, o := range options {
-		o(d)
-	}
-	return d
+	}, options...)
+
+	return new(d)
 }
 
 func (t *HTTPDiscoveryDiagnostics) Bind(r *mux.Router) {

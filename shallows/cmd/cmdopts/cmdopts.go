@@ -11,13 +11,13 @@ import (
 
 	"github.com/james-lawrence/torrent/dht/krpc"
 	"github.com/pkg/errors"
+	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/envx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sshx"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/userx"
 	"golang.org/x/crypto/ssh"
 )
 

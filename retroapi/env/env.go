@@ -3,7 +3,7 @@ package env
 import (
 	"path/filepath"
 
-	"github.com/retrovibed/retrovibed/retroapi/internal/userx"
+	"github.com/retrovibed/retrovibed/retroapi/userx"
 )
 
 const (

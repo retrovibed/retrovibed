@@ -26,6 +26,7 @@ import (
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/retrovibed/retrovibed/retroapi/netmonx"
 	retronetx "github.com/retrovibed/retrovibed/retroapi/netx"
+	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/ddisc/ddisctorrent"
@@ -42,7 +43,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/internal/torrentx"
-	"github.com/retrovibed/retrovibed/shallows/internal/userx"
 	"github.com/retrovibed/retrovibed/shallows/internal/wireguardx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/retrovibed/retrovibed/shallows/meta"
@@ -79,52 +79,54 @@ func AutoTorrentSettings(defaults *TorrentSettings, options ...func(*TorrentSett
 
 func newTorrenting(db *sql.DB, id ssh.Signer, root, media, tvfs fsx.Virtual, mc library.QueryCleaner, tstore storage.ClientImpl, socks5 net.Listener) _torrenting {
 	return _torrenting{
-		cond:            sync.NewCond(&sync.Mutex{}),
-		cfgpath:         userx.DefaultConfigDir(userx.DefaultRelRoot(), "torrent.cfg"),
-		ddiscidpath:     userx.DefaultConfigDir(userx.DefaultRelRoot(), "ddisc.id"),
-		peercachepath:   userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "torrent.peers"),
-		samplecachepath: userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "torrent.bep51.samples"),
-		machineid:       cmdopts.MachineID(),
-		wgconfigdir:     wireguardx.ConfigDirectory(),
-		wglatest:        wireguardx.Latest(),
-		db:              db,
-		id:              id,
-		rootstore:       root,
-		mediastore:      media,
-		tvfs:            tvfs,
-		tstore:          tstore,
-		socks5:          socks5,
-		mc:              mc,
-		_tclient:        &atomic.Pointer[torrent.Client]{},
-		_dnscache:       dnscache.AutoProxyResolver(),
-		_wgdev:          &atomic.Pointer[device.Device]{},
-		_dhts:           &atomic.Pointer[dht.Server]{},
-		_discovery:      &atomic.Pointer[ddisc.Snapshot]{},
+		cond:             sync.NewCond(&sync.Mutex{}),
+		cfgpath:          userx.DefaultConfigDir(userx.DefaultRelRoot(), "torrent.cfg"),
+		discoverycfgpath: userx.DefaultConfigDir(userx.DefaultRelRoot(), "discovery.cfg"),
+		ddiscidpath:      userx.DefaultConfigDir(userx.DefaultRelRoot(), "ddisc.id"),
+		peercachepath:    userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "torrent.peers"),
+		samplecachepath:  userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "torrent.bep51.samples"),
+		machineid:        cmdopts.MachineID(),
+		wgconfigdir:      wireguardx.ConfigDirectory(),
+		wglatest:         wireguardx.Latest(),
+		db:               db,
+		id:               id,
+		rootstore:        root,
+		mediastore:       media,
+		tvfs:             tvfs,
+		tstore:           tstore,
+		socks5:           socks5,
+		mc:               mc,
+		_tclient:         &atomic.Pointer[torrent.Client]{},
+		_dnscache:        dnscache.AutoProxyResolver(),
+		_wgdev:           &atomic.Pointer[device.Device]{},
+		_dhts:            &atomic.Pointer[dht.Server]{},
+		_discovery:       &atomic.Pointer[ddisc.Snapshot]{},
 	}
 }
 
 type _torrenting struct {
-	cfgpath         string
-	ddiscidpath     string
-	peercachepath   string
-	samplecachepath string
-	machineid       string
-	wgconfigdir     string
-	wglatest        string
-	db              *sql.DB
-	id              ssh.Signer
-	rootstore       fsx.Virtual
-	mediastore      fsx.Virtual
-	tvfs            fsx.Virtual
-	mc              library.QueryCleaner
-	tstore          storage.ClientImpl
-	socks5          net.Listener
-	_tclient        *atomic.Pointer[torrent.Client]
-	_dnscache       *dnscache.ProxyPtr
-	_wgdev          *atomic.Pointer[device.Device]
-	_dhts           *atomic.Pointer[dht.Server]
-	_discovery      *atomic.Pointer[ddisc.Snapshot]
-	cond            *sync.Cond
+	cfgpath          string
+	discoverycfgpath string
+	ddiscidpath      string
+	peercachepath    string
+	samplecachepath  string
+	machineid        string
+	wgconfigdir      string
+	wglatest         string
+	db               *sql.DB
+	id               ssh.Signer
+	rootstore        fsx.Virtual
+	mediastore       fsx.Virtual
+	tvfs             fsx.Virtual
+	mc               library.QueryCleaner
+	tstore           storage.ClientImpl
+	socks5           net.Listener
+	_tclient         *atomic.Pointer[torrent.Client]
+	_dnscache        *dnscache.ProxyPtr
+	_wgdev           *atomic.Pointer[device.Device]
+	_dhts            *atomic.Pointer[dht.Server]
+	_discovery       *atomic.Pointer[ddisc.Snapshot]
+	cond             *sync.Cond
 }
 
 func (t _torrenting) loadcfg(path string, v proto.Message) error {
@@ -174,7 +176,8 @@ func (t *_torrenting) Reload(ctx context.Context, cfg *TorrentSettings, disc *Di
 		limiter := rate.NewLimiter(rate.Every(5*time.Second), 1)
 		for {
 			var (
-				mcfg = proto.CloneOf(cfg)
+				mcfg  = proto.CloneOf(cfg)
+				mdisc = proto.CloneOf(disc)
 			)
 
 			log.Println("torrent settings initiated", spew.Sdump(mcfg))
@@ -184,6 +187,13 @@ func (t *_torrenting) Reload(ctx context.Context, cfg *TorrentSettings, disc *Di
 			}
 			log.Println("torrent settings completed", spew.Sdump(mcfg))
 
+			log.Println("discovery settings initiated", spew.Sdump(mdisc))
+			if err := t.loadcfg(t.discoverycfgpath, mdisc); err != nil {
+				errorsx.Log(errorsx.Wrap(err, "failed to read discovery config"))
+				continue
+			}
+			log.Println("discovery settings completed", spew.Sdump(mdisc))
+
 			if metered := netmonx.Metered(); metered {
 				log.Println("applying metered settings to configuration")
 				mcfg.Inbound.Rate = 0         // block inbound connections.
@@ -191,19 +201,19 @@ func (t *_torrenting) Reload(ctx context.Context, cfg *TorrentSettings, disc *Di
 				mcfg.Seed = false             // dont seed
 				mcfg.Resumable = false        // dont attempt to resume downloads
 				mcfg.AutoLocateMedia = false  // dont attempt to index the swarm
-				disc.Enabled = false          // dont attempt to discover content from the swarm
+				mdisc.Enabled = false         // dont attempt to discover content from the swarm
 			}
 
 			_ctx, _done := context.WithCancelCause(ctx)
 			log.Println("torrent settings", spew.Sdump(mcfg))
-			log.Println("discovery settings", spew.Sdump(disc))
+			log.Println("discovery settings", spew.Sdump(mdisc))
 			asyncfailure := func(cause error) {
 				defer t.cond.Broadcast()
 				errorsx.Log(errorsx.Wrap(cause, "async failure"))
 				_done(contextx.IgnoreCancelled(cause))
 			}
 
-			if err := t.Init(_ctx, asyncfailure, mcfg, disc); err != nil {
+			if err := t.Init(_ctx, asyncfailure, mcfg, mdisc); err != nil {
 				_done(err)
 				errorsx.Log(errorsx.Wrap(err, "reloading torrent failed"))
 				if err := limiter.Wait(ctx); err != nil {
@@ -250,6 +260,10 @@ func (t *_torrenting) Watch(ctx context.Context, paths ...string) error {
 		return err
 	}
 
+	if err := t.loadcfg(t.discoverycfgpath, &DiscoverySettings{}); err != nil {
+		return err
+	}
+
 	w, err := fsnotify.NewWatcher()
 	if err != nil {
 		return err
@@ -263,6 +277,7 @@ func (t *_torrenting) Watch(ctx context.Context, paths ...string) error {
 	}
 
 	addpath(t.cfgpath)
+	addpath(t.discoverycfgpath)
 	addpath(t.wgconfigdir)
 
 	for _, path := range paths {
@@ -429,18 +444,12 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 			dht.OptionMuxer(tmux),
 			dht.OptionHostResolver(t._dnscache),
 			dht.OptionOnQuery(func(source netip.AddrPort, query *krpc.Msg) (propagate bool) {
-				const samplerate = 0.1
+				const samplerate = 0.01
 				ctx, done := context.WithTimeout(context.Background(), time.Second)
 				defer done()
 				errorsx.Log(errorsx.Wrap(tracking.SamplePeer(ctx, t.db, samplerate, query.A.ID.Int160(), source), "unable to sample peer"))
 				return true
 			}),
-			dht.OptionOnAnnouncePeer(dht.PeerAnnounceFn(func(peerid int160.T, source netip.AddrPort, portOk bool) {
-				const samplerate = 0.1
-				ctx, done := context.WithTimeout(context.Background(), time.Second)
-				defer done()
-				errorsx.Log(errorsx.Wrap(tracking.SamplePeer(ctx, t.db, samplerate, peerid, source), "unable to sample announce peer"))
-			})),
 			dht.OptionUPnP,
 			dhtdebug,
 			bootstrap,
@@ -589,7 +598,7 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 
 	if cfg.AutoLocateMedia {
 		go timex.NowAndEvery(dctx, 15*time.Minute, func(ctx context.Context) error {
-			errorsx.Log(LocateTorrentMedia(dctx, t.db, tclient))
+			errorsx.Log(LocateMedia(dctx, t.db, tclient, disc))
 			return nil
 		})
 	} else {

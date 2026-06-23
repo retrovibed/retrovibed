@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/billing/api.dart' as api;
 import 'package:retrovibed/billing/registered.dart';
 import 'package:retrovibed/billing/settings.dart';
@@ -13,6 +14,17 @@ api.BillingPlansResponse _plansResponse(List<api.Plan> plans) {
 
 api.Plan _plan(String id, {bool hidden = false}) {
   return api.Plan(id: id, token: 'tok.$id', stripeId: id, hidden: hidden);
+}
+
+// Settings gates the plan dropdown on authn.developer(context).subscription,
+// which is read from the Login ancestor's cached flags. Without a real Login
+// ancestor (as in plain pumpApp), those flags default to all-false.
+Widget _withLogin(Widget child) {
+  return authn.Login(
+    child,
+    publicKey: () => 'ssh-ed25519 AAAA...',
+    seed: (_) => '',
+  );
 }
 
 Widget _withRegistered(Widget child, {String planId = '', String customerId = ''}) {
@@ -31,8 +43,10 @@ void main() {
     group('layout', () {
       testWidgets('renders plan label', (WidgetTester tester) async {
         await tester.pumpApp(
-          Settings(
-            apibillingplans: ({options = const []}) => Future.value(_plansResponse([])),
+          _withLogin(
+            Settings(
+              apibillingplans: ({options = const []}) => Future.value(_plansResponse([])),
+            ),
           ),
         );
         await tester.pumpAndSettle();
@@ -47,8 +61,10 @@ void main() {
         await tester.pumpApp(
           ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 400, maxHeight: 600),
-            child: Settings(
-              apibillingplans: ({options = const []}) => Future.value(_plansResponse([])),
+            child: _withLogin(
+              Settings(
+                apibillingplans: ({options = const []}) => Future.value(_plansResponse([])),
+              ),
             ),
           ),
         );
@@ -65,8 +81,10 @@ void main() {
             children: [
               Expanded(
                 child: SingleChildScrollView(
-                  child: Settings(
-                    apibillingplans: ({options = const []}) => Future.value(_plansResponse([])),
+                  child: _withLogin(
+                    Settings(
+                      apibillingplans: ({options = const []}) => Future.value(_plansResponse([])),
+                    ),
                   ),
                 ),
               ),
@@ -85,8 +103,10 @@ void main() {
           Row(
             children: [
               Expanded(
-                child: Settings(
-                  apibillingplans: ({options = const []}) => Future.value(_plansResponse([])),
+                child: _withLogin(
+                  Settings(
+                    apibillingplans: ({options = const []}) => Future.value(_plansResponse([])),
+                  ),
                 ),
               ),
             ],
@@ -105,8 +125,10 @@ void main() {
             width: 400,
             height: 600,
             child: SingleChildScrollView(
-              child: Settings(
-                apibillingplans: ({options = const []}) => Future.value(_plansResponse([])),
+              child: _withLogin(
+                Settings(
+                  apibillingplans: ({options = const []}) => Future.value(_plansResponse([])),
+                ),
               ),
             ),
           ),
@@ -120,10 +142,12 @@ void main() {
         WidgetTester tester,
       ) async {
         await tester.pumpApp(
-          Settings(
-            margin: const EdgeInsets.all(8),
-            padding: const EdgeInsets.all(8),
-            apibillingplans: ({options = const []}) => Future.value(_plansResponse([])),
+          _withLogin(
+            Settings(
+              margin: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(8),
+              apibillingplans: ({options = const []}) => Future.value(_plansResponse([])),
+            ),
           ),
         );
         await tester.pumpAndSettle();
@@ -135,9 +159,11 @@ void main() {
         WidgetTester tester,
       ) async {
         await tester.pumpApp(
-          Settings(
-            alignment: Alignment.topLeft,
-            apibillingplans: ({options = const []}) => Future.value(_plansResponse([])),
+          _withLogin(
+            Settings(
+              alignment: Alignment.topLeft,
+              apibillingplans: ({options = const []}) => Future.value(_plansResponse([])),
+            ),
           ),
         );
         await tester.pumpAndSettle();
@@ -149,9 +175,11 @@ void main() {
         WidgetTester tester,
       ) async {
         await tester.pumpApp(
-          Settings(
-            alignment: Alignment.center,
-            apibillingplans: ({options = const []}) => Future.value(_plansResponse([])),
+          _withLogin(
+            Settings(
+              alignment: Alignment.center,
+              apibillingplans: ({options = const []}) => Future.value(_plansResponse([])),
+            ),
           ),
         );
         await tester.pumpAndSettle();
@@ -165,8 +193,10 @@ void main() {
         final entry = _resolutions.currentValue!;
         await tester.pumpApp(
           physicalSize: entry.value,
-          Settings(
-            apibillingplans: ({options = const []}) => Future.value(_plansResponse([])),
+          _withLogin(
+            Settings(
+              apibillingplans: ({options = const []}) => Future.value(_plansResponse([])),
+            ),
           ),
         );
         await tester.pumpAndSettle();
@@ -181,14 +211,16 @@ void main() {
         WidgetTester tester,
       ) async {
         await tester.pumpApp(
-          Settings(
-            apibillingplans:
-                ({options = const []}) => Future.value(
-                  _plansResponse([
-                    _plan('plans.free'),
-                    _plan('plans.founder'),
-                  ]),
-                ),
+          _withLogin(
+            Settings(
+              apibillingplans:
+                  ({options = const []}) => Future.value(
+                    _plansResponse([
+                      _plan('plans.free'),
+                      _plan('plans.founder'),
+                    ]),
+                  ),
+            ),
           ),
         );
         await tester.pumpAndSettle();
@@ -206,15 +238,17 @@ void main() {
         WidgetTester tester,
       ) async {
         await tester.pumpApp(
-          Settings(
-            apibillingplans:
-                ({options = const []}) => Future.value(
-                  _plansResponse([
-                    _plan('plans.free'),
-                    _plan('plans.personal.2025', hidden: true),
-                    _plan('plans.founder'),
-                  ]),
-                ),
+          _withLogin(
+            Settings(
+              apibillingplans:
+                  ({options = const []}) => Future.value(
+                    _plansResponse([
+                      _plan('plans.free'),
+                      _plan('plans.personal.2025', hidden: true),
+                      _plan('plans.founder'),
+                    ]),
+                  ),
+            ),
           ),
         );
         await tester.pumpAndSettle();
@@ -234,19 +268,21 @@ void main() {
         WidgetTester tester,
       ) async {
         await tester.pumpApp(
-          _withRegistered(
-            Settings(
-              apibillingplans:
-                  ({options = const []}) => Future.value(
-                    _plansResponse([
-                      _plan('plans.free'),
-                      _plan('plans.personal.2025', hidden: true),
-                      _plan('plans.founder'),
-                    ]),
-                  ),
+          _withLogin(
+            _withRegistered(
+              Settings(
+                apibillingplans:
+                    ({options = const []}) => Future.value(
+                      _plansResponse([
+                        _plan('plans.free'),
+                        _plan('plans.personal.2025', hidden: true),
+                        _plan('plans.founder'),
+                      ]),
+                    ),
+              ),
+              planId: 'plans.personal.2025',
+              customerId: 'derpy',
             ),
-            planId: 'plans.personal.2025',
-            customerId: 'derpy',
           ),
         );
         await tester.pumpAndSettle();
@@ -260,8 +296,10 @@ void main() {
         WidgetTester tester,
       ) async {
         await tester.pumpApp(
-          Settings(
-            apibillingplans: ({options = const []}) => Future.error(Exception('plans unavailable')),
+          _withLogin(
+            Settings(
+              apibillingplans: ({options = const []}) => Future.error(Exception('plans unavailable')),
+            ),
           ),
         );
         await tester.pumpAndSettle();
@@ -273,12 +311,14 @@ void main() {
       testWidgets('clears error on retry tap', (WidgetTester tester) async {
         var callCount = 0;
         await tester.pumpApp(
-          Settings(
-            apibillingplans: ({options = const []}) {
-              callCount++;
-              if (callCount == 1) return Future.error(Exception('fail'));
-              return Future.value(_plansResponse([_plan('plans.free')]));
-            },
+          _withLogin(
+            Settings(
+              apibillingplans: ({options = const []}) {
+                callCount++;
+                if (callCount == 1) return Future.error(Exception('fail'));
+                return Future.value(_plansResponse([_plan('plans.free')]));
+              },
+            ),
           ),
         );
         await tester.pumpAndSettle();

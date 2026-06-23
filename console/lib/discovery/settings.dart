@@ -1,26 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
+import 'package:retrovibed/authn.dart' as authn;
 import 'settings.video.dart';
 import 'settings.audio.dart';
+import 'settings.locate.dart';
+import 'api.dart' as api;
 
 class Settings extends StatelessWidget {
   const Settings({super.key});
-  // static api.StorageSettingsResponse zero = api.StorageSettingsResponse();
-  // final api.StorageSettingsResponse current;
-  // final Future<api.StorageSettingsResponse> Function(
-  //   api.StorageSettingsResponse,
-  // )? onChange;
-  // const MinimalSettings(this.current, {super.key, this.onChange});
-
-  // static FutureBuilder<api.StorageSettingsResponse> future(
-  //   Future<api.StorageSettingsResponse> pending, {
-  //   Future<api.StorageSettingsResponse> Function(api.StorageSettingsResponse)?
-  //   onChange,
-  // }) {
-  //   return ds.future(MinimalSettings.zero, pending, (v) {
-  //     return MinimalSettings(v, key: UniqueKey(), onChange: onChange);
-  //   });
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +16,11 @@ class Settings extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       spacing: defaults.spacing / 2.5,
       children: [
+        ds.Heading(Text("discovery")),
+        LocateSettings.future(
+          api.discoveryapi.get(options: [authn.request(authn.AuthzCache.meta(context))]),
+          onChange: (v) => api.discoveryapi.create(v, options: [authn.request(authn.AuthzCache.meta(context))]),
+        ),
         ds.Heading(Text("video")),
         VideoSettings(),
         ds.Heading(Text("audio")),

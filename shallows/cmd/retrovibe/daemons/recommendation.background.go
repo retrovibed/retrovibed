@@ -6,6 +6,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/backoffx"
 	"github.com/retrovibed/retrovibed/shallows/internal/contextx"
@@ -26,13 +27,15 @@ func RecommendationsBackgroundRun(ctx context.Context, q sqlx.Queryer) error {
 		return nil
 	}
 
-	if _, err = library.RecommendationFromRandomKnown(ctx, q, mimex.Audio); errorsx.Ignore(err, sql.ErrNoRows) != nil {
+	lang := userx.LocaleLanguage()
+
+	if _, err = library.RecommendationFromRandomKnown(ctx, q, mimex.Audio, lang, false); errorsx.Ignore(err, sql.ErrNoRows) != nil {
 		return errorsx.Wrap(err, "recommendations audio background failed to generate recommendation")
 	} else if err == nil {
 		log.Println("recommendations background generated recommendation")
 	}
 
-	if _, err = library.RecommendationFromRandomKnown(ctx, q, mimex.Video); errorsx.Ignore(err, sql.ErrNoRows) != nil {
+	if _, err = library.RecommendationFromRandomKnown(ctx, q, mimex.Video, lang, false); errorsx.Ignore(err, sql.ErrNoRows) != nil {
 		return errorsx.Wrap(err, "recommendations video background failed to generate recommendation")
 	} else if err == nil {
 		log.Println("recommendations background generated recommendation")

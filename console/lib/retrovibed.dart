@@ -6,6 +6,7 @@ import 'package:ffi/ffi.dart' as ffi;
 import 'package:flutter/widgets.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:retrovibed/retrovibed/gen.dart' as lib;
+import 'package:retrovibed/caching.dart' as caching;
 import 'package:retrovibed/design.kit/theme.defaults.dart' as theming;
 import 'package:retrovibed/env.dart' as env;
 import 'package:retrovibed/meta.dart' as meta;
@@ -89,6 +90,26 @@ String public_key() {
 
 String username() {
   return _convertstring(bridge.username());
+}
+
+String xdg_dir_config() {
+  return _convertstring(bridge.xdg_dir_config());
+}
+
+String xdg_dir_cache() {
+  return _convertstring(bridge.xdg_dir_cache());
+}
+
+String xdg_dir_data() {
+  return _convertstring(bridge.xdg_dir_data());
+}
+
+String xdg_dir_download() {
+  return _convertstring(bridge.xdg_dir_download());
+}
+
+String xdg_relroot() {
+  return _convertstring(bridge.xdg_relroot());
 }
 
 // returns an empty string on success, non empty contains the error.
@@ -184,7 +205,7 @@ Future<void> run(void Function() fn) async {
   print("cp 2");
   logging();
   print("cp 3");
-  await env.xdg();
+  caching.setglobal(await caching.DirsWellKnown.xdg(await env.xdg()));
   print("cp 4");
   // checkpointing the database on initialization prevents
   // a significant number of issues due to hard shutdowns and state corruption

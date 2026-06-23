@@ -15,10 +15,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/retrovibed/retrovibed/shallows/internal/backoffx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
-	"github.com/retrovibed/retrovibed/shallows/internal/userx"
 	"golang.org/x/text/encoding/unicode"
 	"golang.zx2c4.com/wireguard/device"
 	"golang.zx2c4.com/wireguard/tun/netstack"

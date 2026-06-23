@@ -11,10 +11,10 @@ import (
 
 	_ "github.com/duckdb/duckdb-go/v2"
 
+	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/retrovibed/retrovibed/shallows/internal/debugx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/goosex"
-	"github.com/retrovibed/retrovibed/shallows/internal/userx"
 )
 
 //go:embed .migrations/*.sql

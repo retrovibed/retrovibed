@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:retrovibed/designkit.dart' as ds;
@@ -124,8 +122,7 @@ class _DisplayState extends State<Display> {
         final defaults = ds.Defaults.of(context);
         final compact = defaults.isCompact;
         final _billing = billing.Registered.of(context);
-        final _displaybilling =
-            !(_billing.current.subscriptionId.isEmpty && Platform.isMacOS) || authn.developer(context).subscription;
+        final _displaybilling = !(_billing.current.subscriptionId.isEmpty) || authn.developer(context).subscription;
 
         return SelectionArea(
           child: Column(
@@ -138,31 +135,31 @@ class _DisplayState extends State<Display> {
                 trailing: [
                   _overlay == ds.Empty
                       ? IconButton(
-                        onPressed: () {
-                          masked(
-                            ds.Confirmation.yesNo(
-                              content: Text(
-                                'Delete ${_library.value.description}?',
+                          onPressed: () {
+                            masked(
+                              ds.Confirmation.yesNo(
+                                content: Text(
+                                  'Delete ${_library.value.description}?',
+                                ),
+                                onCancel: (_) => overlay(ds.Empty),
+                                onConfirm: (_) {
+                                  httpx.withRetry(
+                                    () => meta.daemons.delete(_library.value.id).then((_) {
+                                      overlay(ds.Empty);
+                                    }),
+                                  );
+                                },
                               ),
-                              onCancel: (_) => overlay(ds.Empty),
-                              onConfirm: (_) {
-                                httpx.withRetry(
-                                  () => meta.daemons.delete(_library.value.id).then((_) {
-                                    overlay(ds.Empty);
-                                  }),
-                                );
-                              },
-                            ),
-                          );
-                        },
-                        icon: Icon(Icons.delete),
-                      )
+                            );
+                          },
+                          icon: Icon(Icons.delete),
+                        )
                       : ds.LoadingIconButton.close(
-                        onPressed: () {
-                          overlay(ds.Empty);
-                          return Future.value(null);
-                        },
-                      ),
+                          onPressed: () {
+                            overlay(ds.Empty);
+                            return Future.value(null);
+                          },
+                        ),
                 ],
               ),
               Expanded(
@@ -229,8 +226,10 @@ class _DisplayState extends State<Display> {
                             },
                             child: debug.Card(margin: EdgeInsets.zero),
                           ),
-                          if (authn.developer(context).debug) debug.MeteredCard(onPressed: full, margin: EdgeInsets.zero),
-                          if (authn.developer(context).debug) debug.DiagnosticsCard(onPressed: full, margin: EdgeInsets.zero),
+                          if (authn.developer(context).debug)
+                            debug.MeteredCard(onPressed: full, margin: EdgeInsets.zero),
+                          if (authn.developer(context).debug)
+                            debug.DiagnosticsCard(onPressed: full, margin: EdgeInsets.zero),
                         ],
                       );
                     }),

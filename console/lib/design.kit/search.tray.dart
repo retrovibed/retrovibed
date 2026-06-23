@@ -147,6 +147,7 @@ class _SearchTrayState extends State<SearchTray> {
           onPressed:
               () =>
                   _tuningwidget.value = _tuningwidget.value == SearchTray.zerobox ? widget.tuning : SearchTray.zerobox,
+          help: Hint(Text("display advance settings")),
         ),
     ];
 
