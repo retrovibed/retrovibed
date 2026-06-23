@@ -30,7 +30,9 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('child'));
+      // the catcher's opaque overlay sits in front of the child, so the tap
+      // target is intentionally not the Text widget itself.
+      await tester.tap(find.text('child'), warnIfMissed: false);
       await tester.pumpAndSettle();
 
       expect(tapped, isFalse);
@@ -59,7 +61,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('child'));
+      // same overlay-over-child situation as above.
+      await tester.tap(find.text('child'), warnIfMissed: false);
       await tester.pumpAndSettle();
 
       expect(tapped, isFalse);

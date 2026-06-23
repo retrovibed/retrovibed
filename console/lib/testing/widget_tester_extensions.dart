@@ -44,6 +44,8 @@ extension WidgetTesterExtensions on WidgetTester {
         if (tempDir.existsSync()) tempDir.deleteSync(recursive: true);
       });
       caching.setglobal(caching.DirsWellKnown(cache: tempDir.path));
+    } else {
+      caching.setglobal(caching.DirsWellKnown(cache: Directory.systemTemp.path));
     }
 
     await _loadRoboto();

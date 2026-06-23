@@ -11,6 +11,7 @@ import (
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/torrenttest"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
@@ -43,13 +44,13 @@ func seedTorrentDir(t *testing.T, torrentDir string) torrent.Metadata {
 // xdgTorrentDir computes the torrent directory that env.TorrentDir() will
 // return for a given XDG_DATA_HOME root.
 func xdgTorrentDir(xdgData string) string {
-	return filepath.Join(xdgData, filepath.Base(os.Args[0]), "torrent")
+	return filepath.Join(xdgData, userx.DefaultRelRoot(), "torrent")
 }
 
 // xdgDBPath computes the database path that cmdopts.DatabaseMeta() will
 // open for a given XDG_CONFIG_HOME root.
 func xdgDBPath(xdgConfig string) string {
-	return filepath.Join(xdgConfig, filepath.Base(os.Args[0]), "meta.db")
+	return filepath.Join(xdgConfig, userx.DefaultRelRoot(), "meta.db")
 }
 
 func TestExportImportPeer(t *testing.T) {

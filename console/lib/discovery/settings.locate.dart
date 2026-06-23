@@ -82,7 +82,10 @@ class _LocateEditView extends State<LocateSettings> {
       acknowledge: widget.acknowledge ?? ds.Disclaimer.acknowledge,
       overlay: (complete) => ds.Confirmation.yesNo(
         content: const Text(_disclaimerText),
-        onConfirm: (_) => complete(true),
+        onConfirm: (_) {
+          complete(true);
+          _update(current..locateP2p = !current.locateP2p);
+        },
         onCancel: (_) => complete(false),
       ),
     );

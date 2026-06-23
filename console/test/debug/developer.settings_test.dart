@@ -92,12 +92,12 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('subscription:false'), findsOneWidget);
+        expect(find.text('subscription:true'), findsOneWidget);
 
         await tester.tap(find.byType(Checkbox).at(1));
         await tester.pumpAndSettle();
 
-        expect(find.text('subscription:true'), findsOneWidget);
+        expect(find.text('subscription:false'), findsOneWidget);
         expect(tester.takeException(), isNull);
       });
 
@@ -126,7 +126,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('networking:true'), findsOneWidget);
-        expect(find.text('subscription:false'), findsOneWidget);
+        expect(find.text('subscription:true'), findsOneWidget);
         expect(tester.takeException(), isNull);
       });
 

@@ -8,11 +8,16 @@ void main() {
   group('LocateSettings', () {
     testWidgets('renders the p2p locate checkbox', (tester) async {
       await tester.pumpApp(
-        modals.Node(LocateSettings(api.DiscoverySettings(locateP2p: false))),
+        modals.Node(
+          LocateSettings(
+            api.DiscoverySettings(locateP2p: false),
+            disclaimer: (_) => false,
+          ),
+        ),
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('p2p locate'), findsOneWidget);
+      expect(find.text('p2p'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
@@ -32,7 +37,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('p2p locate'));
+      // the disclaimer's opaque tap-catcher overlays the checkbox text until
+      // acknowledged, so the geometric tap target is intentionally not the
+      // Text widget itself.
+      await tester.tap(find.text('p2p'), warnIfMissed: false);
       await tester.pumpAndSettle();
 
       expect(find.text('Yes'), findsOneWidget);
@@ -58,7 +66,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('p2p locate'));
+      await tester.tap(find.text('p2p'), warnIfMissed: false);
       await tester.pumpAndSettle();
       await tester.tap(find.text('No'));
       await tester.pumpAndSettle();
@@ -86,7 +94,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('p2p locate'));
+      await tester.tap(find.text('p2p'), warnIfMissed: false);
       await tester.pumpAndSettle();
       await tester.tap(find.text('Yes'));
       await tester.pumpAndSettle();
@@ -112,7 +120,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('p2p locate'));
+      await tester.tap(find.text('p2p'));
       await tester.pumpAndSettle();
 
       expect(find.text('Yes'), findsNothing);
