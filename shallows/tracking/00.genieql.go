@@ -168,6 +168,19 @@ func MetadataAssignKnownMediaID(
 	gql = gql.Query(`UPDATE torrents_metadata SET updated_at = NOW(), known_media_id = {kid} WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
 }
 
+func MetadataDiagnosticsScanner(
+	gql genieql.Scanner,
+	pattern func(total int64, seeding int64, bytes int64, downloaded int64, uploaded int64, peers int64),
+) {
+}
+
+func MetadataDiagnostics(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer) NewMetadataDiagnosticsScannerStaticRow,
+) {
+	gql = gql.Query(`SELECT COUNT(*) AS total, COUNT(*) FILTER (WHERE seeding) AS seeding, COALESCE(SUM(bytes), 0) AS bytes, COALESCE(SUM(downloaded), 0) AS downloaded, COALESCE(SUM(uploaded), 0) AS uploaded, COALESCE(SUM(peers), 0) AS peers FROM torrents_metadata WHERE tombstoned_at = 'infinity'`)
+}
+
 func Peer(gql genieql.Structure) {
 	gql.From(
 		gql.Table("torrents_peers"),
@@ -227,6 +240,21 @@ func PeerNextCheck(
 	gql = gql.Query(`UPDATE torrents_peers SET next_check = {ts} WHERE id IN (SELECT id FROM torrents_peers WHERE next_check < NOW() AND bep51_available > 0 LIMIT 1) RETURNING ` + PeerScannerStaticColumns)
 }
 
+func CountScanner(gql genieql.Scanner, pattern func(count int64)) {}
+
+func PeerTotalsScanner(
+	gql genieql.Scanner,
+	pattern func(total int64, ddisc int64, bep51 int64),
+) {
+}
+
+func PeerTotals(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer) NewPeerTotalsScannerStaticRow,
+) {
+	gql = gql.Query(`SELECT COUNT(*) AS total, COUNT(*) FILTER (WHERE ddisc) AS ddisc, COUNT(*) FILTER (WHERE bep51_available > 0) AS bep51 FROM torrents_peers WHERE tombstoned_at > NOW()`)
+}
+
 func UnknownHash(gql genieql.Structure) {
 	gql.From(
 		gql.Table("torrents_unknown_infohashes"),
@@ -256,6 +284,13 @@ func UnknownHashCooldown(
 	pattern func(ctx context.Context, q sqlx.Queryer, a UnknownHash) NewUnknownHashScannerStaticRow,
 ) {
 	gql.Into("torrents_unknown_infohashes").Default("created_at", "updated_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, attempts = EXCLUDED.attempts + 1, next_check = NOW() + least(to_minutes(CAST(EXCLUDED.attempts AS INT)*2), to_hours(24))")
+}
+
+func UnknownHashCount(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer) NewCountScannerStaticRow,
+) {
+	gql = gql.Query(`SELECT COUNT(*) AS count FROM torrents_unknown_infohashes`)
 }
 
 func RSS(

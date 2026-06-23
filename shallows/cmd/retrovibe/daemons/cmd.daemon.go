@@ -340,6 +340,9 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 
 	diagmux := httpmux.PathPrefix("/diagnostics").Subrouter()
 	metaapi.NewHTTPDiagnostics(torrenting.WireguardSnapshot).Bind(diagmux.PathPrefix("/network").Subrouter())
+	metaapi.NewHTTPTorrentDiagnostics(db).Bind(diagmux.PathPrefix("/torrent").Subrouter())
+	metaapi.NewHTTPDHTDiagnostics(torrenting.DHTSnapshot).Bind(diagmux.PathPrefix("/dht").Subrouter())
+	metaapi.NewHTTPDiscoveryDiagnostics(db, torrenting.DiscoverySnapshot).Bind(diagmux.PathPrefix("/discovery").Subrouter())
 	media.NewHTTPLibrary(
 		db,
 		archival,
