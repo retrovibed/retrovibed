@@ -79,8 +79,8 @@ class _ManagementState extends State<Management> {
                       onPressed: () {
                         setState(() {
                           _overlay = QRScannerModal(
-                            onScanned:
-                                (community, attribution) => handleSubscribeAction(context, community, attribution).then(
+                            onScanned: (community, attribution) =>
+                                handleSubscribeAction(context, community, attribution).then(
                                   (_) => setState(() {
                                     _overlay = ds.Empty;
                                   }),
@@ -90,7 +90,7 @@ class _ManagementState extends State<Management> {
                         });
                         return Future.value();
                       },
-                      help: ds.Hint(const Text("scan a QR code to subscribe or link content")),
+                      help: ds.Hint(const Text("scan a QR code to subscribe to content")),
                     ),
                 ],
               ),
