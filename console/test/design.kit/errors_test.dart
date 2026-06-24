@@ -325,12 +325,30 @@ void main() {
       WidgetTester tester,
     ) async {
       final cause = Exception('copy me');
+      String? copiedText;
+
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, (
+        call,
+      ) async {
+        if (call.method == 'Clipboard.setData') {
+          copiedText = (call.arguments as Map)['text'] as String?;
+        }
+        return null;
+      });
+      addTearDown(
+        () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+          SystemChannels.platform,
+          null,
+        ),
+      );
 
       await tester.pumpApp(
-        SizedBox(
-          width: 200,
-          height: 100,
-          child: ds.Error.unknown(cause),
+        Scaffold(
+          body: SizedBox(
+            width: 200,
+            height: 100,
+            child: ds.Error.unknown(cause),
+          ),
         ),
       );
       await tester.pumpAndSettle();
@@ -341,8 +359,7 @@ void main() {
       await tester.tap(find.text('Copy'));
       await tester.pumpAndSettle();
 
-      final clipboard = await Clipboard.getData(Clipboard.kTextPlain);
-      expect(clipboard?.text, contains(cause.toString()));
+      expect(copiedText, contains(cause.toString()));
       expect(find.text('Error details copied'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
