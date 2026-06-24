@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:retrovibed/httpx.dart' as httpx;
 import './screens.dart' as screens;
-import "./theme.defaults.dart" as theming;
+import './theme.defaults.dart' as theming;
+import './typography/copyable.dart' show Copyable;
 
 final EDNSRESOLUTION = -2;
 final ECONNREFUSED = 111;
@@ -233,20 +234,48 @@ class Error extends StatelessWidget {
     };
   }
 
+  String _diagnosticText(Object? cause, StackTrace trace) {
+    if (cause is http.Response) {
+      final r = cause;
+      return [
+        'Status: ${r.statusCode}',
+        if (r.request?.url != null) 'URL: ${r.request!.url}',
+        if (r.body.isNotEmpty) r.body,
+        trace.toString(),
+      ].join('\n\n');
+    }
+
+    return [cause.toString(), trace.toString()].join('\n\n');
+  }
+
   void _showCauseDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder:
-          (_) => AlertDialog(
-            title: const Text('Error Details'),
-            content: _ErrorDiagnostic(cause: cause, trace: trace),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Close'),
-              ),
-            ],
+      builder: (_) => AlertDialog(
+        title: const Text('Error Details'),
+        content: _ErrorDiagnostic(cause: cause, trace: trace),
+        actionsAlignment: MainAxisAlignment.spaceBetween,
+        actions: [
+          TextButton(
+            onPressed: () => Copyable.copy(_diagnosticText(cause, trace))()
+                .then(
+                  (_) => ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(const SnackBar(content: Text('Error details copied'))),
+                )
+                .catchError(
+                  (e) => ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(const SnackBar(content: Text('Failed to copy error details'))),
+                ),
+            child: const Text('Copy'),
           ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
     );
   }
 

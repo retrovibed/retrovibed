@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
@@ -317,6 +318,32 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Error Details'), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('dialog copy button copies diagnostic text to clipboard', (
+      WidgetTester tester,
+    ) async {
+      final cause = Exception('copy me');
+
+      await tester.pumpApp(
+        SizedBox(
+          width: 200,
+          height: 100,
+          child: ds.Error.unknown(cause),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.longPress(find.text('an unexpected problem has occurred'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Copy'));
+      await tester.pumpAndSettle();
+
+      final clipboard = await Clipboard.getData(Clipboard.kTextPlain);
+      expect(clipboard?.text, contains(cause.toString()));
+      expect(find.text('Error details copied'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
