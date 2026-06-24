@@ -73,7 +73,22 @@ class Playlist extends StatefulWidget {
               const SingleActivator(LogicalKeyboardKey.escape): (
                 const Text('play/pause'),
                 () {
-                  print("shortcut: play/pause");
+                  // when we're dealing with audio content opening the search overlay
+                  // shouldnt pause playback.
+                  if (mimex.isAudio(s.current.value?.current.mimetype ?? mimex.binary)) {
+                    print("shortcut: play/pause - skipped audio");
+                    return KeyEventResult.handled;
+                  } else {
+                    print("shortcut: play/pause");
+                    s.player.playOrPause();
+                  }
+                  return KeyEventResult.handled;
+                },
+              ),
+              const SingleActivator(LogicalKeyboardKey.pause): (
+                const Text('pause'),
+                () {
+                  print("shortcut: pause");
                   s.player.playOrPause();
                   return KeyEventResult.handled;
                 },
