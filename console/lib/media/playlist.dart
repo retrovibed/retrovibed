@@ -78,6 +78,7 @@ class Playlist extends StatefulWidget {
                   if (mimex.isAudio(s.current.value?.current.mimetype ?? mimex.binary)) {
                     print("shortcut: play/pause (esc) -  audio");
                     s.overlay.value = !s.overlay.value;
+                    s.player.play();
                   } else {
                     print("shortcut: play/pause (esc) - non-audio");
                     s.player.playOrPause();

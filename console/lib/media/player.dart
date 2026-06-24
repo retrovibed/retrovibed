@@ -156,7 +156,7 @@ class _VideoState extends State<VideoScreen> {
                       ),
                       Visibility(
                         visible: !uuidx.isMin(uuidx.fromString(current.id)),
-                        child: PlayerControlResume(widget.player, current),
+                        child: PlayerControlResume(widget.player, current, widget.overlay),
                       ),
                     ],
                   ),
