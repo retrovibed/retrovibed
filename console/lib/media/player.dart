@@ -19,7 +19,8 @@ class VideoScreen extends StatefulWidget {
   final Widget child;
   final Player player;
   final FocusNode focus;
-  const VideoScreen(this.child, this.player, this.focus, {Key? key}) : super(key: key);
+  final ValueNotifier<bool> overlay;
+  const VideoScreen(this.child, this.player, this.focus, this.overlay, {Key? key}) : super(key: key);
 
   static _VideoState? of(BuildContext context) {
     return context.findAncestorStateOfType<_VideoState>();
@@ -30,13 +31,11 @@ class VideoScreen extends StatefulWidget {
 }
 
 class _VideoState extends State<VideoScreen> {
-  bool _playing = false;
   FocusScopeNode _selffocus = FocusScopeNode(
     debugLabel: "focus.video.player.scope",
   );
   final controller;
   late final StreamSubscription<Tracks> sub0;
-  late final StreamSubscription<bool> sub1;
   // Stable list so MaterialDesktopVideoControlsThemeData identity doesn't
   // change on every setState, which would cause VideoControlsThemeDataInjector
   // to deactivate mid-frame and abort Impeller on macOS.
@@ -59,14 +58,8 @@ class _VideoState extends State<VideoScreen> {
   void initState() {
     super.initState();
 
-    _playing = widget.player.state.playing;
     sub0 = widget.player.stream.tracks.listen((state) {
       setState(() {});
-    });
-    sub1 = widget.player.stream.playing.listen((playing) {
-      setState(() {
-        _playing = playing;
-      });
     });
 
     widget.player.stream.log.listen((log) => print(log));
@@ -99,7 +92,6 @@ class _VideoState extends State<VideoScreen> {
   @override
   void dispose() {
     sub0.cancel();
-    sub1.cancel();
     super.dispose();
   }
 
@@ -136,10 +128,14 @@ class _VideoState extends State<VideoScreen> {
                     child: Video(focusNode: widget.focus, controller: controller),
                   ),
                 ),
-                Visibility(
-                  maintainState: true,
-                  maintainFocusability: true,
-                  visible: !_playing,
+                ValueListenableBuilder<bool>(
+                  valueListenable: widget.overlay,
+                  builder: (context, overlay, child) => Visibility(
+                    maintainState: true,
+                    maintainFocusability: true,
+                    visible: overlay,
+                    child: child!,
+                  ),
                   child: Column(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.start,

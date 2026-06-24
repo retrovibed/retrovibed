@@ -205,6 +205,7 @@ class Retrovibed extends StatelessWidget {
                                                       ),
                                                       s.player,
                                                       s.playerfocus,
+                                                      s.overlay,
                                                     );
                                                   }),
                                                 ),

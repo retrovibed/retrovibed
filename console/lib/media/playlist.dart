@@ -76,12 +76,13 @@ class Playlist extends StatefulWidget {
                   // when we're dealing with audio content opening the search overlay
                   // shouldnt pause playback.
                   if (mimex.isAudio(s.current.value?.current.mimetype ?? mimex.binary)) {
-                    print("shortcut: play/pause - skipped audio");
-                    return KeyEventResult.handled;
+                    print("shortcut: play/pause (esc) -  audio");
+                    s.overlay.value = !s.overlay.value;
                   } else {
-                    print("shortcut: play/pause");
+                    print("shortcut: play/pause (esc) - non-audio");
                     s.player.playOrPause();
                   }
+
                   return KeyEventResult.handled;
                 },
               ),
@@ -194,6 +195,7 @@ class _PlaylistState extends State<Playlist> {
       next: api.media.request(limit: 32, mimetypes: mimex.of(mimex.icoaudio)),
     ),
   );
+  final ValueNotifier<bool> overlay = ValueNotifier<bool>(true);
 
   Known get known => _queue.current.value.known;
   ValueNotifier<playqueue.PlayableMedia?> get current => _queue.current;
@@ -264,6 +266,7 @@ class _PlaylistState extends State<Playlist> {
       final focus = playing || defaults.mobile ? playerfocus : searchfocus;
       print("playlist.playing: ${playing} - ${focus}");
       focus.requestFocus();
+      overlay.value = !playing;
     });
   }
 
