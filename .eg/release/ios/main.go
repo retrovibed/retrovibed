@@ -82,8 +82,7 @@ func main() {
 				).Timeout(10*time.Minute),
 				flutter.New("xcrun altool --upload-app --type ios -f build/ios/ipa/*.ipa --apiKey ${RETROVIBED_APPLE_API_KEY} --apiIssuer ${RETROVIBED_APPLE_ISSUER_ID}").
 					Environ("RETROVIBED_APPLE_ISSUER_ID", egenv.String("", "RETROVIBED_APPLE_ISSUER_ID")).
-					Environ("RETROVIBED_APPLE_API_KEY", egenv.String("", "RETROVIBED_APPLE_API_KEY")).
-					Debug(),
+					Environ("RETROVIBED_APPLE_API_KEY", egenv.String("", "RETROVIBED_APPLE_API_KEY")),
 			),
 		),
 	)
