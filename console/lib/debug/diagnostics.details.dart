@@ -94,7 +94,22 @@ class _DiagnosticsDetailsState extends State<DiagnosticsDetails> {
           mainAxisSize: MainAxisSize.min,
           spacing: defaults.spacing / 4,
           children: [
-            Text("Diagnostics", style: theme.textTheme.titleMedium),
+            Row(
+              children: [
+                Expanded(child: Text("Diagnostics", style: theme.textTheme.titleMedium)),
+                ds.LoadingIconButton(
+                  icon: const Icon(Icons.bug_report),
+                  tooltip: "throw a test error",
+                  onPressed: () async {
+                    await Future<void>(() => throw Exception("synthetic diagnostics error")).catchError((e) {
+                      setState(() {
+                        _cause = ds.Error.unknown(e, onTap: _fetch);
+                      });
+                    });
+                  },
+                ),
+              ],
+            ),
             ds.Loading(
               loading: _loading,
               cause: _cause,
