@@ -5,15 +5,19 @@ import './api.dart' as api;
 
 const String _disclaimerCacheId = 'discovery.p2p';
 
-const String _disclaimerText =
-    'Retrovibed operates on an entirely peer-to-peer (p2p) system.\n\n'
-    'The p2p system allows journalists, musicians, and other content creators to directly '
-    'interact with users and be discovered, preventing censorship by third parties '
-    '(including retrovibed).\n\n'
-    'As a result, it can locate media that has been published by third parties who do not '
-    'have distribution rights. Retrovibed takes no responsibility for such content.\n\n'
-    'P2P: operate in fully p2p mode, allowing discovery of publicly available content. '
-    'You take responsibility for your activities and for obeying all legal laws of your region.';
+const String _disclaimerText = '''
+Retrovibed supports an entirely peer-to-peer (p2p) environment.
+
+The p2p system allows journalists, musicians, and other content creators to
+directly interact with users and be discovered, preventing censorship by
+third parties (including retrovibed).
+
+As a result, it can locate media that has been published by parties who do not
+have distribution rights. Such content is not a part of Retrovibed's platform and
+we takes no responsibility for such content.
+
+By enabling P2P discovery of available content. You take responsibility for your
+activities and for obeying the laws within your region.''';
 
 class LocateSettings extends StatefulWidget {
   static api.DiscoverySettings zero = api.DiscoverySettings(locateP2p: false);
