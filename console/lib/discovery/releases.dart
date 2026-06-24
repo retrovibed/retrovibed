@@ -95,11 +95,8 @@ class _NewReleasesState extends State<NewReleases> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            'New releases pending...',
-            style: TextStyle(color: Colors.grey),
-          ),
-          Text(
-            'The media library is still initializing and will be available in a bit.',
+            'media library is initializing...',
+            textAlign: TextAlign.center,
             style: TextStyle(color: Colors.grey),
           ),
         ],
