@@ -8,6 +8,7 @@ import (
 	"io"
 	"iter"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
@@ -17,6 +18,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
+	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"golang.org/x/text/language"
@@ -26,11 +28,12 @@ import (
 // This is distinct from gomusicbrainz.Release, which uses XML tags and Go
 // PascalCase field names.
 type mbJSONRelease struct {
-	ID                 string             `json:"id"`
-	Title              string             `json:"title"`
-	TextRepresentation mbJSONTextRepr     `json:"text-representation"`
-	ReleaseGroup       mbJSONReleaseGroup `json:"release-group"`
-	Asin               string             `json:"asin"`
+	ID                 string               `json:"id"`
+	Title              string               `json:"title"`
+	TextRepresentation mbJSONTextRepr       `json:"text-representation"`
+	ReleaseGroup       mbJSONReleaseGroup   `json:"release-group"`
+	ArtistCredit       []mbJSONArtistCredit `json:"artist-credit"`
+	Asin               string               `json:"asin"`
 }
 
 type mbJSONTextRepr struct {
@@ -42,6 +45,16 @@ type mbJSONReleaseGroup struct {
 	ID               string `json:"id"`
 	Title            string `json:"title"`
 	FirstReleaseDate string `json:"first-release-date"`
+}
+
+type mbJSONArtistCredit struct {
+	JoinPhrase string       `json:"joinphrase"`
+	Artist     mbJSONArtist `json:"artist"`
+}
+
+type mbJSONArtist struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
 }
 
 type mbjsonlimport struct {
@@ -65,6 +78,7 @@ func (t *mbjsonlimport) releases(ctx context.Context, r io.Reader) iter.Seq[libr
 			)
 
 			title := langx.FirstNonZero(rel.ReleaseGroup.Title, rel.Title)
+			credit := slicesx.FirstOrZero(rel.ArtistCredit...)
 
 			v := library.Known{
 				Source:           t.Source,
@@ -73,7 +87,7 @@ func (t *mbjsonlimport) releases(ctx context.Context, r io.Reader) iter.Seq[libr
 				Md5Lower:         binary.LittleEndian.Uint64(uuidx.LowN(uidmd5, 64)),
 				ID:               id.String(),
 				OriginalTitle:    title,
-				Title:            title,
+				Title:            strings.TrimSpace(fmt.Sprintf("%s %s", credit.Artist.Name, title)),
 				Released:         mbjsonlParseDate(rel.ReleaseGroup.FirstReleaseDate),
 				PosterPath:       fmt.Sprintf("https://coverartarchive.org/release-group/%s/front-500", id),
 				OriginalLanguage: lang.String(),

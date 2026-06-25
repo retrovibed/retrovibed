@@ -96,18 +96,16 @@ func MapTransformErr[T, X any](m func(T) (X, error), items ...T) (zero []X, err 
 }
 
 // First returns first element in the slice if it exists.
-func First[T comparable](items ...T) (zero T, _ bool) {
+func First[T any](items ...T) (zero T, _ bool) {
 	for _, v := range items {
-		if v != zero {
-			return v, true
-		}
+		return v, true
 	}
 
 	return zero, false
 }
 
 // First returns first element in the slice if it exists, the zero value otherwise.
-func FirstOrZero[T comparable](items ...T) (zero T) {
+func FirstOrZero[T any](items ...T) (zero T) {
 	l, _ := First(items...)
 	return l
 }

@@ -27,6 +27,10 @@ func TestMBImportReleases(t *testing.T) {
 		return fmt.Sprintf(`<release id="%s"><title>%s</title><date>%s</date><text-representation><language>%s</language></text-representation><release-group id="%s"><title>%s</title></release-group></release>`, id, title, date, lang, id, title)
 	}
 
+	releaseEntryWithArtistXML := func(id, artist, title, date, lang string) string {
+		return fmt.Sprintf(`<release id="%s"><title>%s</title><date>%s</date><text-representation><language>%s</language></text-representation><artist-credit><name-credit><artist><name>%s</name></artist></name-credit></artist-credit><release-group id="%s"><title>%s</title></release-group></release>`, id, title, date, lang, artist, id, title)
+	}
+
 	releaseXML := func(count, offset int, releases ...string) string {
 		var b strings.Builder
 		fmt.Fprintf(&b, `<?xml version="1.0"?><metadata><release-list count="%d" offset="%d">`, count, offset)
@@ -93,6 +97,43 @@ func TestMBImportReleases(t *testing.T) {
 			{"Album One", "Album One", "en", "https://coverartarchive.org/release-group/8f6a4a2b-e29b-41d4-a716-446655440001/front-500"},
 			{"Album Two", "Album Two", "fr", "https://coverartarchive.org/release-group/8f6a4a2b-e29b-41d4-a716-446655440002/front-500"},
 		}, results)
+	})
+
+	t.Run("includes artist credit in title", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			errorsx.Must(fmt.Fprint(w, releaseXML(1, 0,
+				releaseEntryWithArtistXML("8f6a4a2b-e29b-41d4-a716-446655440003", "Dropkick Murphys", "Sing Loud, Sing Proud!", "2001-01-23", "eng"),
+			)))
+		}))
+		defer srv.Close()
+
+		c, err := gomusicbrainz.NewWS2Client(
+			testx.Must(url.Parse(srv.URL))(t).String(),
+			"TestApp",
+			"0.0.1",
+			"test@example.com",
+		)
+		require.NoError(t, err)
+
+		m := mbimport{
+			StartAt:  testDate,
+			EndAt:    testDate,
+			Source:   "musicbrainz",
+			Attempts: 1,
+		}
+
+		var titles, originalTitles []string
+		for known := range m.releases(ctx, c, unlimited, immediate) {
+			titles = append(titles, known.Title)
+			originalTitles = append(originalTitles, known.OriginalTitle)
+		}
+
+		require.NoError(t, m.cause)
+		require.Equal(t, []string{"Dropkick Murphys Sing Loud, Sing Proud!"}, titles)
+		require.Equal(t, []string{"Sing Loud, Sing Proud!"}, originalTitles)
 	})
 
 	t.Run("paginates across multiple pages", func(t *testing.T) {

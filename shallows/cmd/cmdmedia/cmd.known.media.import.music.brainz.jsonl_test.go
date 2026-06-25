@@ -167,6 +167,18 @@ func TestMBJSONLImportReleases(t *testing.T) {
 		require.Equal(t, uint64(0), testx.SeqCount(m.releases(ctx, strings.NewReader("not valid json"))))
 		require.Error(t, m.cause)
 	})
+
+	t.Run("prefixes title with artist from release-level artist-credit", func(t *testing.T) {
+		raw := testx.ReadString(".fixtures", "musicbrainz", "example.1.json")
+		var compact bytes.Buffer
+		require.NoError(t, json.Compact(&compact, []byte(raw)))
+
+		results := collect(t, compact.String())
+		require.Len(t, results, 1)
+		require.Equal(t, "Dropkick Murphys Sing Loud, Sing Proud!", results[0].Title)
+		require.Equal(t, "Sing Loud, Sing Proud!", results[0].OriginalTitle)
+		require.Equal(t, time.Date(2001, 1, 23, 0, 0, 0, 0, time.UTC), results[0].Released)
+	})
 }
 
 func TestMBJSONLImportRun(t *testing.T) {
@@ -204,5 +216,22 @@ func TestMBJSONLImportRun(t *testing.T) {
 
 		m := mbjsonlimport{Source: "musicbrainz"}
 		require.Error(t, m.run(ctx, strings.NewReader("not json"), jsonl.NewEncoder(&bytes.Buffer{})))
+	})
+
+	t.Run("encodes artist-prefixed title from musicbrainz fixture", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		raw := testx.ReadString(".fixtures", "musicbrainz", "example.1.json")
+		var input bytes.Buffer
+		require.NoError(t, json.Compact(&input, []byte(raw)))
+
+		var buf bytes.Buffer
+		m := mbjsonlimport{Source: "musicbrainz"}
+		require.NoError(t, m.run(ctx, &input, jsonl.NewEncoder(&buf)))
+
+		results := decodeAll(t, &buf)
+		require.Len(t, results, 1)
+		require.Equal(t, "Dropkick Murphys Sing Loud, Sing Proud!", results[0].Title)
 	})
 }

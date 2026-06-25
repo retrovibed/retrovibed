@@ -1,0 +1,5347 @@
+{
+  "barcode": null,
+  "media": [
+    {
+      "format": null,
+      "position": 1,
+      "tracks": [
+        {
+          "position": 1,
+          "length": 93120,
+          "recording": {
+            "disambiguation": "",
+            "isrcs": [
+              "USHEL0306301"
+            ],
+            "length": 93120,
+            "aliases": [],
+            "title": "For Boston",
+            "tags": [
+              {
+                "count": 1,
+                "name": "alternative & punk"
+              },
+              {
+                "count": 2,
+                "name": "alternative and punk"
+              },
+              {
+                "count": 1,
+                "name": "alternative/indie rock"
+              },
+              {
+                "name": "folk punk",
+                "count": 1
+              },
+              {
+                "name": "hardcore punk",
+                "count": 1
+              },
+              {
+                "count": 1,
+                "name": "oi!"
+              },
+              {
+                "name": "pop/rock",
+                "count": 2
+              },
+              {
+                "count": 4,
+                "name": "punk"
+              },
+              {
+                "count": 1,
+                "name": "punk revival"
+              },
+              {
+                "name": "punk rock",
+                "count": 1
+              },
+              {
+                "name": "punk/new wave",
+                "count": 1
+              },
+              {
+                "name": "rock",
+                "count": 3
+              },
+              {
+                "name": "skatepunk",
+                "count": 2
+              }
+            ],
+            "id": "789e486f-d198-42bc-9001-07a8de939168",
+            "artist-credit": [
+              {
+                "name": "Dropkick Murphys",
+                "joinphrase": "",
+                "artist": {
+                  "id": "e8374874-4178-4869-b92e-fef6bf30dc04",
+                  "country": "US",
+                  "name": "Dropkick Murphys",
+                  "type": "Group",
+                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                  "disambiguation": "",
+                  "sort-name": "Dropkick Murphys"
+                }
+              }
+            ],
+            "video": false,
+            "relations": [
+              {
+                "attribute-ids": {},
+                "type-id": "5dcc52af-7064-4051-8d62-7d80f4c3c907",
+                "target-type": "artist",
+                "target-credit": "",
+                "source-credit": "",
+                "ended": false,
+                "direction": "backward",
+                "attribute-values": {},
+                "begin": null,
+                "type": "engineer",
+                "artist": {
+                  "sort-name": "Siegel, Jim",
+                  "disambiguation": "Boston hardcore producer/engineer",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "name": "Jim Siegel",
+                  "type": "Person",
+                  "country": "US",
+                  "id": "a1c734b2-0d24-42dc-b21d-9666b35f2120"
+                },
+                "end": null,
+                "attributes": []
+              },
+              {
+                "attributes": [
+                  "additional",
+                  "bagpipe"
+                ],
+                "end": null,
+                "artist": {
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "disambiguation": "",
+                  "id": "9037f49f-c272-442a-a447-cbfcebb9022c",
+                  "name": "Joe Delaney",
+                  "type": "Person",
+                  "country": null,
+                  "sort-name": "Delaney, Joe"
+                },
+                "type": "instrument",
+                "begin": null,
+                "target-credit": "",
+                "ended": false,
+                "direction": "backward",
+                "attribute-values": {},
+                "source-credit": "",
+                "target-type": "artist",
+                "attribute-credits": {},
+                "type-id": "59054b12-01ac-43ee-a618-285fd397e461",
+                "attribute-ids": {
+                  "additional": "0a5341f8-3b1d-4f99-a0c6-26b7f4e42c7f",
+                  "bagpipe": "1d865ced-d86a-4277-8914-009740e37887"
+                }
+              },
+              {
+                "begin": null,
+                "type": "mix",
+                "attributes": [],
+                "end": null,
+                "artist": {
+                  "sort-name": "Siegel, Jim",
+                  "disambiguation": "Boston hardcore producer/engineer",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "type": "Person",
+                  "name": "Jim Siegel",
+                  "country": "US",
+                  "id": "a1c734b2-0d24-42dc-b21d-9666b35f2120"
+                },
+                "type-id": "3e3102e1-1896-4f50-b5b2-dd9824e46efe",
+                "attribute-ids": {},
+                "target-credit": "",
+                "direction": "backward",
+                "attribute-values": {},
+                "ended": false,
+                "source-credit": "",
+                "target-type": "artist"
+              },
+              {
+                "artist": {
+                  "sort-name": "Casey, Ken",
+                  "name": "Ken Casey",
+                  "type": "Person",
+                  "country": "US",
+                  "id": "622083a6-a011-4354-af39-5fdbbfccd585",
+                  "disambiguation": "",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+                },
+                "end": null,
+                "attributes": [],
+                "begin": null,
+                "type": "producer",
+                "target-type": "artist",
+                "source-credit": "",
+                "ended": false,
+                "direction": "backward",
+                "attribute-values": {},
+                "target-credit": "",
+                "attribute-ids": {},
+                "type-id": "5c0ceac3-feb4-41f0-868d-dc06f6e27fc0"
+              },
+              {
+                "type": "recorded at",
+                "begin": null,
+                "attributes": [],
+                "place": {
+                  "type-id": "05fa6a09-ff92-3d34-bdbb-5141d3c24f38",
+                  "area": {
+                    "disambiguation": "",
+                    "sort-name": "Stoughton",
+                    "type-id": "6fd8f29a-3d0a-32fc-980d-ea697b69da78",
+                    "name": "Stoughton",
+                    "type": "City",
+                    "id": "584ed680-a1df-4af8-a10f-62e1bcf2e96b"
+                  },
+                  "disambiguation": "Stoughton, Massachusetts",
+                  "coordinates": null,
+                  "address": "",
+                  "id": "736e3a49-8fc4-4e47-ad89-1301932545a3",
+                  "type": "Studio",
+                  "name": "The Outpost"
+                },
+                "end": null,
+                "type-id": "ad462279-14b0-4180-9b58-571d0eef7c51",
+                "attribute-ids": {},
+                "ended": false,
+                "direction": "backward",
+                "attribute-values": {},
+                "source-credit": "",
+                "target-credit": "",
+                "target-type": "place"
+              },
+              {
+                "attribute-ids": {},
+                "type-id": "a3005666-a872-32c3-ad06-98af558e99b0",
+                "target-type": "work",
+                "target-credit": "",
+                "attribute-values": {},
+                "ended": false,
+                "direction": "forward",
+                "source-credit": "",
+                "begin": null,
+                "type": "performance",
+                "work": {
+                  "language": null,
+                  "attributes": [],
+                  "id": "00001e1b-1389-4d30-a013-d5434349bd34",
+                  "type": "Song",
+                  "title": "For Boston",
+                  "languages": [],
+                  "type-id": "f061270a-2fd6-32f1-a641-f0f8676d14e6",
+                  "iswcs": [
+                    "T-902.085.076-4"
+                  ],
+                  "disambiguation": ""
+                },
+                "attributes": [],
+                "end": null
+              }
+            ],
+            "genres": [
+              {
+                "id": "6cec5b4d-3c64-44a6-914d-3e833432f631",
+                "name": "folk punk",
+                "count": 1,
+                "disambiguation": ""
+              },
+              {
+                "count": 1,
+                "disambiguation": "",
+                "id": "055a6e4d-d929-42ac-ba7a-9d063b254ea5",
+                "name": "hardcore punk"
+              },
+              {
+                "disambiguation": "",
+                "count": 4,
+                "name": "punk",
+                "id": "8cc9b280-230b-4a3a-b1e2-8acab0744dd3"
+              },
+              {
+                "count": 1,
+                "disambiguation": "",
+                "id": "bd7e1d40-43b1-4ba5-97b3-05b891466962",
+                "name": "punk rock"
+              },
+              {
+                "disambiguation": "",
+                "count": 3,
+                "name": "rock",
+                "id": "0e3fc579-2d24-4f20-9dae-736e1ec78798"
+              }
+            ]
+          },
+          "title": "For Boston",
+          "id": "4cb2bda6-0944-32c2-aa7c-9ce3795a9a2f",
+          "artist-credit": [
+            {
+              "artist": {
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "aliases": [
+                  {
+                    "type-id": null,
+                    "primary": null,
+                    "begin": null,
+                    "type": null,
+                    "name": "Dropkick Murphies",
+                    "end": null,
+                    "sort-name": "Dropkick Murphies",
+                    "ended": false,
+                    "locale": null
+                  },
+                  {
+                    "begin": null,
+                    "type": null,
+                    "name": "Dropkick Murphy's",
+                    "primary": null,
+                    "type-id": null,
+                    "locale": null,
+                    "end": null,
+                    "ended": false,
+                    "sort-name": "Dropkick Murphy's"
+                  }
+                ],
+                "disambiguation": "",
+                "id": "e8374874-4178-4869-b92e-fef6bf30dc04",
+                "country": "US",
+                "type": "Group",
+                "name": "Dropkick Murphys",
+                "sort-name": "Dropkick Murphys"
+              },
+              "joinphrase": "",
+              "name": "Dropkick Murphys"
+            }
+          ],
+          "number": "1"
+        },
+        {
+          "number": "2",
+          "position": 2,
+          "recording": {
+            "disambiguation": "",
+            "length": 134853,
+            "aliases": [],
+            "isrcs": [
+              "USHEL0306302"
+            ],
+            "title": "The Legend of Finn MacCumhail",
+            "tags": [
+              {
+                "count": 1,
+                "name": "alternative & punk"
+              },
+              {
+                "name": "alternative and punk",
+                "count": 2
+              },
+              {
+                "name": "alternative/indie rock",
+                "count": 1
+              },
+              {
+                "name": "hardcore punk",
+                "count": 1
+              },
+              {
+                "count": 1,
+                "name": "oi!"
+              },
+              {
+                "name": "pop/rock",
+                "count": 2
+              },
+              {
+                "name": "punk",
+                "count": 4
+              },
+              {
+                "count": 1,
+                "name": "punk revival"
+              },
+              {
+                "count": 1,
+                "name": "punk/new wave"
+              },
+              {
+                "count": 3,
+                "name": "rock"
+              },
+              {
+                "count": 2,
+                "name": "skatepunk"
+              }
+            ],
+            "id": "23c35deb-a7b0-4c4a-a02b-e0ed3ef333bf",
+            "artist-credit": [
+              {
+                "joinphrase": "",
+                "artist": {
+                  "sort-name": "Dropkick Murphys",
+                  "id": "e8374874-4178-4869-b92e-fef6bf30dc04",
+                  "name": "Dropkick Murphys",
+                  "type": "Group",
+                  "country": "US",
+                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                  "disambiguation": ""
+                },
+                "name": "Dropkick Murphys"
+              }
+            ],
+            "video": false,
+            "relations": [
+              {
+                "type-id": "5dcc52af-7064-4051-8d62-7d80f4c3c907",
+                "attribute-ids": {},
+                "target-credit": "",
+                "source-credit": "",
+                "ended": false,
+                "attribute-values": {},
+                "direction": "backward",
+                "target-type": "artist",
+                "begin": null,
+                "type": "engineer",
+                "end": null,
+                "attributes": [],
+                "artist": {
+                  "sort-name": "Siegel, Jim",
+                  "id": "a1c734b2-0d24-42dc-b21d-9666b35f2120",
+                  "country": "US",
+                  "type": "Person",
+                  "name": "Jim Siegel",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "disambiguation": "Boston hardcore producer/engineer"
+                }
+              },
+              {
+                "type": "mix",
+                "begin": null,
+                "artist": {
+                  "sort-name": "Siegel, Jim",
+                  "country": "US",
+                  "name": "Jim Siegel",
+                  "type": "Person",
+                  "id": "a1c734b2-0d24-42dc-b21d-9666b35f2120",
+                  "disambiguation": "Boston hardcore producer/engineer",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+                },
+                "end": null,
+                "attributes": [],
+                "attribute-ids": {},
+                "type-id": "3e3102e1-1896-4f50-b5b2-dd9824e46efe",
+                "target-type": "artist",
+                "source-credit": "",
+                "attribute-values": {},
+                "direction": "backward",
+                "ended": false,
+                "target-credit": ""
+              },
+              {
+                "artist": {
+                  "name": "Ken Casey",
+                  "type": "Person",
+                  "country": "US",
+                  "id": "622083a6-a011-4354-af39-5fdbbfccd585",
+                  "disambiguation": "",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "sort-name": "Casey, Ken"
+                },
+                "attributes": [],
+                "end": null,
+                "type": "producer",
+                "begin": null,
+                "target-type": "artist",
+                "target-credit": "",
+                "direction": "backward",
+                "ended": false,
+                "attribute-values": {},
+                "source-credit": "",
+                "attribute-ids": {},
+                "type-id": "5c0ceac3-feb4-41f0-868d-dc06f6e27fc0"
+              },
+              {
+                "target-type": "place",
+                "source-credit": "",
+                "attribute-values": {},
+                "ended": false,
+                "direction": "backward",
+                "target-credit": "",
+                "attribute-ids": {},
+                "type-id": "ad462279-14b0-4180-9b58-571d0eef7c51",
+                "end": null,
+                "attributes": [],
+                "place": {
+                  "name": "The Outpost",
+                  "type": "Studio",
+                  "id": "736e3a49-8fc4-4e47-ad89-1301932545a3",
+                  "coordinates": null,
+                  "address": "",
+                  "area": {
+                    "disambiguation": "",
+                    "sort-name": "Stoughton",
+                    "type-id": "6fd8f29a-3d0a-32fc-980d-ea697b69da78",
+                    "name": "Stoughton",
+                    "type": "City",
+                    "id": "584ed680-a1df-4af8-a10f-62e1bcf2e96b"
+                  },
+                  "disambiguation": "Stoughton, Massachusetts",
+                  "type-id": "05fa6a09-ff92-3d34-bdbb-5141d3c24f38"
+                },
+                "begin": null,
+                "type": "recorded at"
+              },
+              {
+                "type-id": "a3005666-a872-32c3-ad06-98af558e99b0",
+                "attribute-ids": {},
+                "target-credit": "",
+                "source-credit": "",
+                "attribute-values": {},
+                "ended": false,
+                "direction": "forward",
+                "target-type": "work",
+                "type": "performance",
+                "begin": null,
+                "work": {
+                  "type": "Song",
+                  "title": "The Legend of Finn MacCumhail",
+                  "id": "e0c84865-1bbd-4e00-adae-4d9f966fbd29",
+                  "disambiguation": "",
+                  "languages": [],
+                  "type-id": "f061270a-2fd6-32f1-a641-f0f8676d14e6",
+                  "iswcs": [
+                    "T-071.889.736-9"
+                  ],
+                  "attributes": [],
+                  "language": null
+                },
+                "end": null,
+                "attributes": []
+              }
+            ],
+            "genres": [
+              {
+                "name": "hardcore punk",
+                "id": "055a6e4d-d929-42ac-ba7a-9d063b254ea5",
+                "disambiguation": "",
+                "count": 1
+              },
+              {
+                "disambiguation": "",
+                "count": 4,
+                "name": "punk",
+                "id": "8cc9b280-230b-4a3a-b1e2-8acab0744dd3"
+              },
+              {
+                "count": 3,
+                "disambiguation": "",
+                "id": "0e3fc579-2d24-4f20-9dae-736e1ec78798",
+                "name": "rock"
+              }
+            ]
+          },
+          "length": 134853,
+          "title": "The Legend of Finn MacCumhail",
+          "artist-credit": [
+            {
+              "name": "Dropkick Murphys",
+              "artist": {
+                "sort-name": "Dropkick Murphys",
+                "disambiguation": "",
+                "aliases": [
+                  {
+                    "sort-name": "Dropkick Murphies",
+                    "ended": false,
+                    "end": null,
+                    "locale": null,
+                    "type-id": null,
+                    "primary": null,
+                    "type": null,
+                    "begin": null,
+                    "name": "Dropkick Murphies"
+                  },
+                  {
+                    "sort-name": "Dropkick Murphy's",
+                    "ended": false,
+                    "end": null,
+                    "locale": null,
+                    "type-id": null,
+                    "primary": null,
+                    "begin": null,
+                    "type": null,
+                    "name": "Dropkick Murphy's"
+                  }
+                ],
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "country": "US",
+                "type": "Group",
+                "name": "Dropkick Murphys",
+                "id": "e8374874-4178-4869-b92e-fef6bf30dc04"
+              },
+              "joinphrase": ""
+            }
+          ],
+          "id": "1aab12f4-4926-3282-a960-0f6c92063d86"
+        },
+        {
+          "title": "Which Side Are You On?",
+          "artist-credit": [
+            {
+              "artist": {
+                "sort-name": "Dropkick Murphys",
+                "disambiguation": "",
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "aliases": [
+                  {
+                    "end": null,
+                    "sort-name": "Dropkick Murphies",
+                    "ended": false,
+                    "locale": null,
+                    "type-id": null,
+                    "primary": null,
+                    "begin": null,
+                    "type": null,
+                    "name": "Dropkick Murphies"
+                  },
+                  {
+                    "locale": null,
+                    "ended": false,
+                    "sort-name": "Dropkick Murphy's",
+                    "end": null,
+                    "name": "Dropkick Murphy's",
+                    "begin": null,
+                    "type": null,
+                    "primary": null,
+                    "type-id": null
+                  }
+                ],
+                "country": "US",
+                "name": "Dropkick Murphys",
+                "type": "Group",
+                "id": "e8374874-4178-4869-b92e-fef6bf30dc04"
+              },
+              "joinphrase": "",
+              "name": "Dropkick Murphys"
+            }
+          ],
+          "id": "70c9bebb-b582-302f-b980-504a5faf3103",
+          "position": 3,
+          "length": 148613,
+          "recording": {
+            "title": "Which Side Are You On?",
+            "artist-credit": [
+              {
+                "joinphrase": "",
+                "artist": {
+                  "disambiguation": "",
+                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                  "country": "US",
+                  "type": "Group",
+                  "name": "Dropkick Murphys",
+                  "id": "e8374874-4178-4869-b92e-fef6bf30dc04",
+                  "sort-name": "Dropkick Murphys"
+                },
+                "name": "Dropkick Murphys"
+              }
+            ],
+            "tags": [
+              {
+                "count": 1,
+                "name": "alternative & punk"
+              },
+              {
+                "name": "alternative and punk",
+                "count": 2
+              },
+              {
+                "count": 2,
+                "name": "alternative/indie rock"
+              },
+              {
+                "name": "folk punk",
+                "count": 1
+              },
+              {
+                "count": 1,
+                "name": "hardcore punk"
+              },
+              {
+                "name": "oi!",
+                "count": 1
+              },
+              {
+                "name": "pop/rock",
+                "count": 2
+              },
+              {
+                "count": 4,
+                "name": "punk"
+              },
+              {
+                "name": "punk revival",
+                "count": 1
+              },
+              {
+                "count": 1,
+                "name": "punk rock"
+              },
+              {
+                "name": "punk/new wave",
+                "count": 1
+              },
+              {
+                "name": "rock",
+                "count": 3
+              },
+              {
+                "count": 2,
+                "name": "skatepunk"
+              }
+            ],
+            "id": "300aae78-4805-4519-89aa-268a8a207f92",
+            "disambiguation": "",
+            "isrcs": [
+              "USHEL0306303"
+            ],
+            "length": 148613,
+            "aliases": [],
+            "genres": [
+              {
+                "id": "6cec5b4d-3c64-44a6-914d-3e833432f631",
+                "name": "folk punk",
+                "count": 1,
+                "disambiguation": ""
+              },
+              {
+                "count": 1,
+                "disambiguation": "",
+                "id": "055a6e4d-d929-42ac-ba7a-9d063b254ea5",
+                "name": "hardcore punk"
+              },
+              {
+                "disambiguation": "",
+                "count": 4,
+                "name": "punk",
+                "id": "8cc9b280-230b-4a3a-b1e2-8acab0744dd3"
+              },
+              {
+                "id": "bd7e1d40-43b1-4ba5-97b3-05b891466962",
+                "name": "punk rock",
+                "count": 1,
+                "disambiguation": ""
+              },
+              {
+                "count": 3,
+                "disambiguation": "",
+                "id": "0e3fc579-2d24-4f20-9dae-736e1ec78798",
+                "name": "rock"
+              }
+            ],
+            "video": false,
+            "relations": [
+              {
+                "type-id": "5dcc52af-7064-4051-8d62-7d80f4c3c907",
+                "attribute-ids": {},
+                "target-credit": "",
+                "source-credit": "",
+                "attribute-values": {},
+                "direction": "backward",
+                "ended": false,
+                "target-type": "artist",
+                "type": "engineer",
+                "begin": null,
+                "end": null,
+                "attributes": [],
+                "artist": {
+                  "sort-name": "Siegel, Jim",
+                  "id": "a1c734b2-0d24-42dc-b21d-9666b35f2120",
+                  "country": "US",
+                  "name": "Jim Siegel",
+                  "type": "Person",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "disambiguation": "Boston hardcore producer/engineer"
+                }
+              },
+              {
+                "target-type": "artist",
+                "target-credit": "",
+                "source-credit": "",
+                "attribute-values": {},
+                "direction": "backward",
+                "ended": false,
+                "attribute-ids": {},
+                "type-id": "3e3102e1-1896-4f50-b5b2-dd9824e46efe",
+                "artist": {
+                  "sort-name": "Siegel, Jim",
+                  "id": "a1c734b2-0d24-42dc-b21d-9666b35f2120",
+                  "country": "US",
+                  "name": "Jim Siegel",
+                  "type": "Person",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "disambiguation": "Boston hardcore producer/engineer"
+                },
+                "end": null,
+                "attributes": [],
+                "type": "mix",
+                "begin": null
+              },
+              {
+                "begin": null,
+                "type": "producer",
+                "attributes": [],
+                "end": null,
+                "artist": {
+                  "sort-name": "Casey, Ken",
+                  "id": "622083a6-a011-4354-af39-5fdbbfccd585",
+                  "name": "Ken Casey",
+                  "type": "Person",
+                  "country": "US",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "disambiguation": ""
+                },
+                "type-id": "5c0ceac3-feb4-41f0-868d-dc06f6e27fc0",
+                "attribute-ids": {},
+                "attribute-values": {},
+                "direction": "backward",
+                "ended": false,
+                "source-credit": "",
+                "target-credit": "",
+                "target-type": "artist"
+              },
+              {
+                "target-type": "place",
+                "ended": false,
+                "direction": "backward",
+                "attribute-values": {},
+                "source-credit": "",
+                "target-credit": "",
+                "attribute-ids": {},
+                "type-id": "ad462279-14b0-4180-9b58-571d0eef7c51",
+                "attributes": [],
+                "place": {
+                  "coordinates": null,
+                  "address": "",
+                  "area": {
+                    "type": "City",
+                    "name": "Stoughton",
+                    "id": "584ed680-a1df-4af8-a10f-62e1bcf2e96b",
+                    "disambiguation": "",
+                    "sort-name": "Stoughton",
+                    "type-id": "6fd8f29a-3d0a-32fc-980d-ea697b69da78"
+                  },
+                  "disambiguation": "Stoughton, Massachusetts",
+                  "type-id": "05fa6a09-ff92-3d34-bdbb-5141d3c24f38",
+                  "type": "Studio",
+                  "name": "The Outpost",
+                  "id": "736e3a49-8fc4-4e47-ad89-1301932545a3"
+                },
+                "end": null,
+                "type": "recorded at",
+                "begin": null
+              },
+              {
+                "source-credit": "",
+                "attribute-values": {},
+                "ended": false,
+                "direction": "forward",
+                "target-credit": "",
+                "target-type": "work",
+                "type-id": "a3005666-a872-32c3-ad06-98af558e99b0",
+                "attribute-ids": {},
+                "end": null,
+                "attributes": [],
+                "work": {
+                  "attributes": [],
+                  "language": "eng",
+                  "title": "Which Side Are You On?",
+                  "type": "Song",
+                  "id": "d5afc31b-ea04-336e-a42d-c5757bdde20a",
+                  "disambiguation": "original version by Florence Reece",
+                  "type-id": "f061270a-2fd6-32f1-a641-f0f8676d14e6",
+                  "iswcs": [
+                    "T-042.098.403-7",
+                    "T-700.080.020-6"
+                  ],
+                  "languages": [
+                    "eng"
+                  ]
+                },
+                "type": "performance",
+                "begin": null
+              }
+            ]
+          },
+          "number": "3"
+        },
+        {
+          "number": "4",
+          "length": 157053,
+          "recording": {
+            "tags": [
+              {
+                "count": 1,
+                "name": "alternative & punk"
+              },
+              {
+                "count": 2,
+                "name": "alternative and punk"
+              },
+              {
+                "count": 1,
+                "name": "alternative/indie rock"
+              },
+              {
+                "count": 1,
+                "name": "celtic"
+              },
+              {
+                "name": "folk",
+                "count": 1
+              },
+              {
+                "count": 1,
+                "name": "hardcore punk"
+              },
+              {
+                "name": "oi!",
+                "count": 1
+              },
+              {
+                "name": "pop/rock",
+                "count": 2
+              },
+              {
+                "count": 4,
+                "name": "punk"
+              },
+              {
+                "name": "punk revival",
+                "count": 1
+              },
+              {
+                "count": 1,
+                "name": "punk rock"
+              },
+              {
+                "count": 1,
+                "name": "punk/new wave"
+              },
+              {
+                "count": 3,
+                "name": "rock"
+              },
+              {
+                "name": "skatepunk",
+                "count": 2
+              }
+            ],
+            "id": "3b8a5f36-70f9-4502-9929-4f3866cc9d91",
+            "artist-credit": [
+              {
+                "artist": {
+                  "sort-name": "Dropkick Murphys",
+                  "id": "e8374874-4178-4869-b92e-fef6bf30dc04",
+                  "country": "US",
+                  "name": "Dropkick Murphys",
+                  "type": "Group",
+                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                  "disambiguation": ""
+                },
+                "joinphrase": "",
+                "name": "Dropkick Murphys"
+              }
+            ],
+            "title": "The Rocky Road to Dublin",
+            "length": 157053,
+            "aliases": [],
+            "isrcs": [
+              "USHEL0306304"
+            ],
+            "disambiguation": "",
+            "genres": [
+              {
+                "id": "34edc6ac-d431-4b36-be15-ecd17533e5e2",
+                "name": "celtic",
+                "count": 1,
+                "disambiguation": ""
+              },
+              {
+                "disambiguation": "",
+                "count": 1,
+                "name": "folk",
+                "id": "a91eed3a-fdd0-494e-ade0-95ea4117f6eb"
+              },
+              {
+                "count": 1,
+                "disambiguation": "",
+                "id": "055a6e4d-d929-42ac-ba7a-9d063b254ea5",
+                "name": "hardcore punk"
+              },
+              {
+                "name": "punk",
+                "id": "8cc9b280-230b-4a3a-b1e2-8acab0744dd3",
+                "disambiguation": "",
+                "count": 4
+              },
+              {
+                "id": "bd7e1d40-43b1-4ba5-97b3-05b891466962",
+                "name": "punk rock",
+                "count": 1,
+                "disambiguation": ""
+              },
+              {
+                "id": "0e3fc579-2d24-4f20-9dae-736e1ec78798",
+                "name": "rock",
+                "count": 3,
+                "disambiguation": ""
+              }
+            ],
+            "relations": [
+              {
+                "source-credit": "",
+                "direction": "backward",
+                "attribute-values": {},
+                "ended": false,
+                "target-credit": "",
+                "target-type": "artist",
+                "type-id": "22661fb8-cdb7-4f67-8385-b2a8be6c9f0d",
+                "attribute-ids": {},
+                "end": null,
+                "attributes": [],
+                "artist": {
+                  "id": "e8374874-4178-4869-b92e-fef6bf30dc04",
+                  "name": "Dropkick Murphys",
+                  "type": "Group",
+                  "country": "US",
+                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                  "disambiguation": "",
+                  "sort-name": "Dropkick Murphys"
+                },
+                "begin": null,
+                "type": "arranger"
+              },
+              {
+                "attribute-ids": {},
+                "type-id": "5dcc52af-7064-4051-8d62-7d80f4c3c907",
+                "target-type": "artist",
+                "ended": false,
+                "direction": "backward",
+                "attribute-values": {},
+                "source-credit": "",
+                "target-credit": "",
+                "begin": null,
+                "type": "engineer",
+                "artist": {
+                  "type": "Person",
+                  "name": "Jim Siegel",
+                  "country": "US",
+                  "id": "a1c734b2-0d24-42dc-b21d-9666b35f2120",
+                  "disambiguation": "Boston hardcore producer/engineer",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "sort-name": "Siegel, Jim"
+                },
+                "attributes": [],
+                "end": null
+              },
+              {
+                "end": null,
+                "attributes": [
+                  "tin whistle"
+                ],
+                "artist": {
+                  "sort-name": "Queally, Brian",
+                  "disambiguation": "",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "name": "Brian Queally",
+                  "type": "Person",
+                  "country": null,
+                  "id": "76708d16-7292-4099-8893-8b6934612635"
+                },
+                "begin": null,
+                "type": "instrument",
+                "target-credit": "",
+                "source-credit": "",
+                "ended": false,
+                "direction": "backward",
+                "attribute-values": {},
+                "target-type": "artist",
+                "attribute-credits": {},
+                "type-id": "59054b12-01ac-43ee-a618-285fd397e461",
+                "attribute-ids": {
+                  "tin whistle": "c1b42be7-f713-449b-a3a4-925351b5acbc"
+                }
+              },
+              {
+                "type-id": "3e3102e1-1896-4f50-b5b2-dd9824e46efe",
+                "attribute-ids": {},
+                "source-credit": "",
+                "attribute-values": {},
+                "direction": "backward",
+                "ended": false,
+                "target-credit": "",
+                "target-type": "artist",
+                "type": "mix",
+                "begin": null,
+                "end": null,
+                "attributes": [],
+                "artist": {
+                  "sort-name": "Siegel, Jim",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "disambiguation": "Boston hardcore producer/engineer",
+                  "id": "a1c734b2-0d24-42dc-b21d-9666b35f2120",
+                  "type": "Person",
+                  "name": "Jim Siegel",
+                  "country": "US"
+                }
+              },
+              {
+                "target-credit": "",
+                "attribute-values": {},
+                "direction": "backward",
+                "ended": false,
+                "source-credit": "",
+                "target-type": "artist",
+                "type-id": "5c0ceac3-feb4-41f0-868d-dc06f6e27fc0",
+                "attribute-ids": {},
+                "attributes": [],
+                "end": null,
+                "artist": {
+                  "sort-name": "Casey, Ken",
+                  "id": "622083a6-a011-4354-af39-5fdbbfccd585",
+                  "country": "US",
+                  "type": "Person",
+                  "name": "Ken Casey",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "disambiguation": ""
+                },
+                "type": "producer",
+                "begin": null
+              },
+              {
+                "attributes": [
+                  "guest"
+                ],
+                "end": null,
+                "artist": {
+                  "sort-name": "Queally, Desi",
+                  "id": "21756b5c-a77e-4bc7-8efc-aef2e4098323",
+                  "type": "Person",
+                  "name": "Desi Queally",
+                  "country": null,
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "disambiguation": ""
+                },
+                "type": "vocal",
+                "begin": null,
+                "target-credit": "",
+                "direction": "backward",
+                "ended": false,
+                "attribute-values": {},
+                "source-credit": "",
+                "target-type": "artist",
+                "type-id": "0fdbe3c6-7700-4a31-ae54-b53f06ae1cfa",
+                "attribute-ids": {
+                  "guest": "b3045913-62ac-433e-9211-ac683cdf6b5c"
+                }
+              },
+              {
+                "target-type": "place",
+                "ended": false,
+                "direction": "backward",
+                "attribute-values": {},
+                "source-credit": "",
+                "target-credit": "",
+                "attribute-ids": {},
+                "type-id": "ad462279-14b0-4180-9b58-571d0eef7c51",
+                "place": {
+                  "name": "The Outpost",
+                  "type": "Studio",
+                  "id": "736e3a49-8fc4-4e47-ad89-1301932545a3",
+                  "area": {
+                    "id": "584ed680-a1df-4af8-a10f-62e1bcf2e96b",
+                    "type": "City",
+                    "name": "Stoughton",
+                    "sort-name": "Stoughton",
+                    "type-id": "6fd8f29a-3d0a-32fc-980d-ea697b69da78",
+                    "disambiguation": ""
+                  },
+                  "disambiguation": "Stoughton, Massachusetts",
+                  "coordinates": null,
+                  "address": "",
+                  "type-id": "05fa6a09-ff92-3d34-bdbb-5141d3c24f38"
+                },
+                "attributes": [],
+                "end": null,
+                "begin": null,
+                "type": "recorded at"
+              },
+              {
+                "attributes": [],
+                "end": null,
+                "type": "performance",
+                "begin": null,
+                "work": {
+                  "title": "The Rocky Road to Dublin",
+                  "type": "Song",
+                  "id": "e0d34bdc-9625-4862-8226-a74060853e14",
+                  "disambiguation": "",
+                  "type-id": "f061270a-2fd6-32f1-a641-f0f8676d14e6",
+                  "languages": [
+                    "eng"
+                  ],
+                  "iswcs": [],
+                  "attributes": [],
+                  "language": "eng"
+                },
+                "target-type": "work",
+                "target-credit": "",
+                "attribute-values": {},
+                "ended": false,
+                "direction": "forward",
+                "source-credit": "",
+                "attribute-ids": {},
+                "type-id": "a3005666-a872-32c3-ad06-98af558e99b0"
+              }
+            ],
+            "video": false
+          },
+          "position": 4,
+          "artist-credit": [
+            {
+              "artist": {
+                "sort-name": "Dropkick Murphys",
+                "disambiguation": "",
+                "aliases": [
+                  {
+                    "end": null,
+                    "ended": false,
+                    "sort-name": "Dropkick Murphies",
+                    "locale": null,
+                    "type-id": null,
+                    "begin": null,
+                    "type": null,
+                    "name": "Dropkick Murphies",
+                    "primary": null
+                  },
+                  {
+                    "type": null,
+                    "begin": null,
+                    "name": "Dropkick Murphy's",
+                    "primary": null,
+                    "type-id": null,
+                    "locale": null,
+                    "end": null,
+                    "ended": false,
+                    "sort-name": "Dropkick Murphy's"
+                  }
+                ],
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "country": "US",
+                "name": "Dropkick Murphys",
+                "type": "Group",
+                "id": "e8374874-4178-4869-b92e-fef6bf30dc04"
+              },
+              "joinphrase": "",
+              "name": "Dropkick Murphys"
+            }
+          ],
+          "id": "a8d9eb69-4149-3781-9d53-7b3051eb280d",
+          "title": "The Rocky Road to Dublin"
+        },
+        {
+          "recording": {
+            "disambiguation": "",
+            "aliases": [],
+            "isrcs": [
+              "USHEL0306305"
+            ],
+            "title": "Heroes From Our Past",
+            "id": "59b51c55-9f6d-41c0-bc1c-f3728500f089",
+            "first-release-date": "2001-01-23",
+            "length": 210600,
+            "tags": [
+              {
+                "name": "alternative & punk",
+                "count": 1
+              },
+              {
+                "name": "alternative and punk",
+                "count": 2
+              },
+              {
+                "name": "alternative/indie rock",
+                "count": 1
+              },
+              {
+                "count": 1,
+                "name": "celtic"
+              },
+              {
+                "name": "folk",
+                "count": 1
+              },
+              {
+                "name": "hardcore punk",
+                "count": 1
+              },
+              {
+                "count": 1,
+                "name": "oi!"
+              },
+              {
+                "name": "pop/rock",
+                "count": 2
+              },
+              {
+                "count": 4,
+                "name": "punk"
+              },
+              {
+                "name": "punk revival",
+                "count": 1
+              },
+              {
+                "count": 1,
+                "name": "punk rock"
+              },
+              {
+                "count": 1,
+                "name": "punk/new wave"
+              },
+              {
+                "count": 3,
+                "name": "rock"
+              },
+              {
+                "count": 2,
+                "name": "skatepunk"
+              }
+            ],
+            "artist-credit": [
+              {
+                "artist": {
+                  "sort-name": "Dropkick Murphys",
+                  "disambiguation": "",
+                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                  "name": "Dropkick Murphys",
+                  "type": "Group",
+                  "country": "US",
+                  "id": "e8374874-4178-4869-b92e-fef6bf30dc04"
+                },
+                "joinphrase": "",
+                "name": "Dropkick Murphys"
+              }
+            ],
+            "video": false,
+            "relations": [
+              {
+                "begin": null,
+                "type": "engineer",
+                "attributes": [],
+                "end": null,
+                "artist": {
+                  "sort-name": "Siegel, Jim",
+                  "disambiguation": "Boston hardcore producer/engineer",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "country": "US",
+                  "type": "Person",
+                  "name": "Jim Siegel",
+                  "id": "a1c734b2-0d24-42dc-b21d-9666b35f2120"
+                },
+                "type-id": "5dcc52af-7064-4051-8d62-7d80f4c3c907",
+                "attribute-ids": {},
+                "direction": "backward",
+                "attribute-values": {},
+                "ended": false,
+                "source-credit": "",
+                "target-credit": "",
+                "target-type": "artist"
+              },
+              {
+                "type-id": "59054b12-01ac-43ee-a618-285fd397e461",
+                "attribute-credits": {},
+                "attribute-ids": {
+                  "bagpipe": "1d865ced-d86a-4277-8914-009740e37887",
+                  "additional": "0a5341f8-3b1d-4f99-a0c6-26b7f4e42c7f"
+                },
+                "source-credit": "",
+                "direction": "backward",
+                "ended": false,
+                "attribute-values": {},
+                "target-credit": "",
+                "target-type": "artist",
+                "type": "instrument",
+                "begin": null,
+                "end": null,
+                "attributes": [
+                  "additional",
+                  "bagpipe"
+                ],
+                "artist": {
+                  "id": "9037f49f-c272-442a-a447-cbfcebb9022c",
+                  "type": "Person",
+                  "name": "Joe Delaney",
+                  "country": null,
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "disambiguation": "",
+                  "sort-name": "Delaney, Joe"
+                }
+              },
+              {
+                "source-credit": "",
+                "ended": false,
+                "direction": "backward",
+                "attribute-values": {},
+                "target-credit": "",
+                "target-type": "artist",
+                "type-id": "3e3102e1-1896-4f50-b5b2-dd9824e46efe",
+                "attribute-ids": {},
+                "end": null,
+                "attributes": [],
+                "artist": {
+                  "sort-name": "Siegel, Jim",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "disambiguation": "Boston hardcore producer/engineer",
+                  "id": "a1c734b2-0d24-42dc-b21d-9666b35f2120",
+                  "country": "US",
+                  "name": "Jim Siegel",
+                  "type": "Person"
+                },
+                "type": "mix",
+                "begin": null
+              },
+              {
+                "attribute-ids": {},
+                "type-id": "5c0ceac3-feb4-41f0-868d-dc06f6e27fc0",
+                "target-type": "artist",
+                "target-credit": "",
+                "ended": false,
+                "attribute-values": {},
+                "direction": "backward",
+                "source-credit": "",
+                "type": "producer",
+                "begin": null,
+                "artist": {
+                  "type": "Person",
+                  "name": "Ken Casey",
+                  "country": "US",
+                  "id": "622083a6-a011-4354-af39-5fdbbfccd585",
+                  "disambiguation": "",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "sort-name": "Casey, Ken"
+                },
+                "attributes": [],
+                "end": null
+              },
+              {
+                "target-type": "place",
+                "direction": "backward",
+                "ended": false,
+                "attribute-values": {},
+                "source-credit": "",
+                "target-credit": "",
+                "attribute-ids": {},
+                "type-id": "ad462279-14b0-4180-9b58-571d0eef7c51",
+                "place": {
+                  "type-id": "05fa6a09-ff92-3d34-bdbb-5141d3c24f38",
+                  "area": {
+                    "name": "Stoughton",
+                    "type": "City",
+                    "id": "584ed680-a1df-4af8-a10f-62e1bcf2e96b",
+                    "disambiguation": "",
+                    "sort-name": "Stoughton",
+                    "type-id": "6fd8f29a-3d0a-32fc-980d-ea697b69da78"
+                  },
+                  "disambiguation": "Stoughton, Massachusetts",
+                  "address": "",
+                  "coordinates": null,
+                  "id": "736e3a49-8fc4-4e47-ad89-1301932545a3",
+                  "type": "Studio",
+                  "name": "The Outpost"
+                },
+                "attributes": [],
+                "end": null,
+                "type": "recorded at",
+                "begin": null
+              },
+              {
+                "work": {
+                  "attributes": [],
+                  "language": "eng",
+                  "disambiguation": "",
+                  "iswcs": [
+                    "T-071.596.774-0"
+                  ],
+                  "type-id": "f061270a-2fd6-32f1-a641-f0f8676d14e6",
+                  "languages": [
+                    "eng"
+                  ],
+                  "title": "Heroes From Our Past",
+                  "type": "Song",
+                  "id": "57ac1a7d-727a-464b-be82-cb3b025695ba"
+                },
+                "begin": null,
+                "type": "performance",
+                "end": null,
+                "attributes": [],
+                "type-id": "a3005666-a872-32c3-ad06-98af558e99b0",
+                "attribute-ids": {},
+                "source-credit": "",
+                "ended": false,
+                "direction": "forward",
+                "attribute-values": {},
+                "target-credit": "",
+                "target-type": "work"
+              }
+            ],
+            "genres": [
+              {
+                "name": "celtic",
+                "id": "34edc6ac-d431-4b36-be15-ecd17533e5e2",
+                "disambiguation": "",
+                "count": 1
+              },
+              {
+                "count": 1,
+                "disambiguation": "",
+                "id": "a91eed3a-fdd0-494e-ade0-95ea4117f6eb",
+                "name": "folk"
+              },
+              {
+                "id": "055a6e4d-d929-42ac-ba7a-9d063b254ea5",
+                "name": "hardcore punk",
+                "count": 1,
+                "disambiguation": ""
+              },
+              {
+                "count": 4,
+                "disambiguation": "",
+                "id": "8cc9b280-230b-4a3a-b1e2-8acab0744dd3",
+                "name": "punk"
+              },
+              {
+                "id": "bd7e1d40-43b1-4ba5-97b3-05b891466962",
+                "name": "punk rock",
+                "count": 1,
+                "disambiguation": ""
+              },
+              {
+                "id": "0e3fc579-2d24-4f20-9dae-736e1ec78798",
+                "name": "rock",
+                "count": 3,
+                "disambiguation": ""
+              }
+            ]
+          },
+          "length": 211280,
+          "position": 5,
+          "id": "a3134713-bcd2-331c-a6c1-611fba3a7578",
+          "artist-credit": [
+            {
+              "name": "Dropkick Murphys",
+              "joinphrase": "",
+              "artist": {
+                "sort-name": "Dropkick Murphys",
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "aliases": [
+                  {
+                    "sort-name": "Dropkick Murphies",
+                    "ended": false,
+                    "end": null,
+                    "locale": null,
+                    "type-id": null,
+                    "primary": null,
+                    "begin": null,
+                    "type": null,
+                    "name": "Dropkick Murphies"
+                  },
+                  {
+                    "type-id": null,
+                    "type": null,
+                    "begin": null,
+                    "name": "Dropkick Murphy's",
+                    "primary": null,
+                    "end": null,
+                    "ended": false,
+                    "sort-name": "Dropkick Murphy's",
+                    "locale": null
+                  }
+                ],
+                "disambiguation": "",
+                "id": "e8374874-4178-4869-b92e-fef6bf30dc04",
+                "country": "US",
+                "name": "Dropkick Murphys",
+                "type": "Group"
+              }
+            }
+          ],
+          "title": "Heroes From Our Past",
+          "number": "5"
+        },
+        {
+          "position": 6,
+          "length": 188920,
+          "recording": {
+            "video": false,
+            "relations": [
+              {
+                "source-credit": "",
+                "direction": "backward",
+                "ended": false,
+                "attribute-values": {},
+                "target-credit": "",
+                "target-type": "artist",
+                "type-id": "5dcc52af-7064-4051-8d62-7d80f4c3c907",
+                "attribute-ids": {},
+                "end": null,
+                "attributes": [],
+                "artist": {
+                  "sort-name": "Siegel, Jim",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "disambiguation": "Boston hardcore producer/engineer",
+                  "id": "a1c734b2-0d24-42dc-b21d-9666b35f2120",
+                  "country": "US",
+                  "name": "Jim Siegel",
+                  "type": "Person"
+                },
+                "type": "engineer",
+                "begin": null
+              },
+              {
+                "artist": {
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "disambiguation": "",
+                  "id": "28665ab9-69df-4fe4-aac8-0a0abfc96221",
+                  "country": null,
+                  "type": "Person",
+                  "name": "Carl Kelly",
+                  "sort-name": "Kelly, Carl"
+                },
+                "end": null,
+                "attributes": [
+                  "uilleann pipes"
+                ],
+                "begin": null,
+                "type": "instrument",
+                "target-type": "artist",
+                "source-credit": "",
+                "ended": false,
+                "direction": "backward",
+                "attribute-values": {},
+                "target-credit": "",
+                "attribute-ids": {
+                  "uilleann pipes": "d307828e-e4e4-42ee-bce9-e1cd15ad3ec1"
+                },
+                "type-id": "59054b12-01ac-43ee-a618-285fd397e461",
+                "attribute-credits": {}
+              },
+              {
+                "artist": {
+                  "country": "US",
+                  "name": "Jim Siegel",
+                  "type": "Person",
+                  "id": "a1c734b2-0d24-42dc-b21d-9666b35f2120",
+                  "disambiguation": "Boston hardcore producer/engineer",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "sort-name": "Siegel, Jim"
+                },
+                "end": null,
+                "attributes": [],
+                "begin": null,
+                "type": "mix",
+                "target-type": "artist",
+                "source-credit": "",
+                "attribute-values": {},
+                "ended": false,
+                "direction": "backward",
+                "target-credit": "",
+                "attribute-ids": {},
+                "type-id": "3e3102e1-1896-4f50-b5b2-dd9824e46efe"
+              },
+              {
+                "type-id": "5c0ceac3-feb4-41f0-868d-dc06f6e27fc0",
+                "attribute-ids": {},
+                "target-credit": "",
+                "ended": false,
+                "attribute-values": {},
+                "direction": "backward",
+                "source-credit": "",
+                "target-type": "artist",
+                "begin": null,
+                "type": "producer",
+                "attributes": [],
+                "end": null,
+                "artist": {
+                  "type": "Person",
+                  "name": "Ken Casey",
+                  "country": "US",
+                  "id": "622083a6-a011-4354-af39-5fdbbfccd585",
+                  "disambiguation": "",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "sort-name": "Casey, Ken"
+                }
+              },
+              {
+                "end": null,
+                "place": {
+                  "type-id": "05fa6a09-ff92-3d34-bdbb-5141d3c24f38",
+                  "address": "",
+                  "coordinates": null,
+                  "disambiguation": "Stoughton, Massachusetts",
+                  "area": {
+                    "type": "City",
+                    "name": "Stoughton",
+                    "id": "584ed680-a1df-4af8-a10f-62e1bcf2e96b",
+                    "disambiguation": "",
+                    "type-id": "6fd8f29a-3d0a-32fc-980d-ea697b69da78",
+                    "sort-name": "Stoughton"
+                  },
+                  "id": "736e3a49-8fc4-4e47-ad89-1301932545a3",
+                  "name": "The Outpost",
+                  "type": "Studio"
+                },
+                "attributes": [],
+                "begin": null,
+                "type": "recorded at",
+                "source-credit": "",
+                "ended": false,
+                "attribute-values": {},
+                "direction": "backward",
+                "target-credit": "",
+                "target-type": "place",
+                "type-id": "ad462279-14b0-4180-9b58-571d0eef7c51",
+                "attribute-ids": {}
+              },
+              {
+                "attributes": [],
+                "end": null,
+                "type": "performance",
+                "begin": null,
+                "work": {
+                  "disambiguation": "",
+                  "type-id": "f061270a-2fd6-32f1-a641-f0f8676d14e6",
+                  "iswcs": [
+                    "T-072.105.682-1"
+                  ],
+                  "languages": [],
+                  "title": "Forever",
+                  "type": "Song",
+                  "id": "26d21947-b939-434e-ad0e-5fdd3d81f458",
+                  "attributes": [],
+                  "language": null
+                },
+                "target-credit": "",
+                "direction": "forward",
+                "ended": false,
+                "attribute-values": {},
+                "source-credit": "",
+                "target-type": "work",
+                "type-id": "a3005666-a872-32c3-ad06-98af558e99b0",
+                "attribute-ids": {}
+              }
+            ],
+            "genres": [
+              {
+                "name": "hardcore punk",
+                "id": "055a6e4d-d929-42ac-ba7a-9d063b254ea5",
+                "disambiguation": "",
+                "count": 1
+              },
+              {
+                "id": "8cc9b280-230b-4a3a-b1e2-8acab0744dd3",
+                "name": "punk",
+                "count": 4,
+                "disambiguation": ""
+              },
+              {
+                "name": "punk rock",
+                "id": "bd7e1d40-43b1-4ba5-97b3-05b891466962",
+                "disambiguation": "",
+                "count": 1
+              },
+              {
+                "disambiguation": "",
+                "count": 3,
+                "name": "rock",
+                "id": "0e3fc579-2d24-4f20-9dae-736e1ec78798"
+              }
+            ],
+            "disambiguation": "",
+            "isrcs": [
+              "USHEL0306306"
+            ],
+            "length": 188920,
+            "aliases": [],
+            "title": "Forever",
+            "artist-credit": [
+              {
+                "name": "Dropkick Murphys",
+                "artist": {
+                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                  "disambiguation": "",
+                  "id": "e8374874-4178-4869-b92e-fef6bf30dc04",
+                  "country": "US",
+                  "name": "Dropkick Murphys",
+                  "type": "Group",
+                  "sort-name": "Dropkick Murphys"
+                },
+                "joinphrase": ""
+              }
+            ],
+            "tags": [
+              {
+                "name": "alternative & punk",
+                "count": 1
+              },
+              {
+                "count": 2,
+                "name": "alternative and punk"
+              },
+              {
+                "name": "alternative/indie rock",
+                "count": 1
+              },
+              {
+                "count": 1,
+                "name": "hardcore punk"
+              },
+              {
+                "name": "oi!",
+                "count": 1
+              },
+              {
+                "count": 2,
+                "name": "pop/rock"
+              },
+              {
+                "count": 4,
+                "name": "punk"
+              },
+              {
+                "name": "punk revival",
+                "count": 1
+              },
+              {
+                "count": 1,
+                "name": "punk rock"
+              },
+              {
+                "name": "punk/new wave",
+                "count": 1
+              },
+              {
+                "name": "rock",
+                "count": 3
+              },
+              {
+                "count": 2,
+                "name": "skatepunk"
+              }
+            ],
+            "id": "b88b610e-4a5c-477a-a5b0-22525ccc276a"
+          },
+          "title": "Forever",
+          "id": "b69ea9ee-6151-3923-9053-059c951d4f1d",
+          "artist-credit": [
+            {
+              "name": "Dropkick Murphys",
+              "artist": {
+                "sort-name": "Dropkick Murphys",
+                "disambiguation": "",
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "aliases": [
+                  {
+                    "sort-name": "Dropkick Murphies",
+                    "ended": false,
+                    "end": null,
+                    "locale": null,
+                    "type-id": null,
+                    "primary": null,
+                    "begin": null,
+                    "type": null,
+                    "name": "Dropkick Murphies"
+                  },
+                  {
+                    "sort-name": "Dropkick Murphy's",
+                    "ended": false,
+                    "end": null,
+                    "locale": null,
+                    "type-id": null,
+                    "primary": null,
+                    "begin": null,
+                    "name": "Dropkick Murphy's",
+                    "type": null
+                  }
+                ],
+                "country": "US",
+                "type": "Group",
+                "name": "Dropkick Murphys",
+                "id": "e8374874-4178-4869-b92e-fef6bf30dc04"
+              },
+              "joinphrase": ""
+            }
+          ],
+          "number": "6"
+        },
+        {
+          "number": "7",
+          "title": "The Gauntlet",
+          "id": "39fc049b-8e45-35f8-bf30-4dec6087d376",
+          "artist-credit": [
+            {
+              "name": "Dropkick Murphys",
+              "artist": {
+                "sort-name": "Dropkick Murphys",
+                "name": "Dropkick Murphys",
+                "type": "Group",
+                "country": "US",
+                "id": "e8374874-4178-4869-b92e-fef6bf30dc04",
+                "disambiguation": "",
+                "aliases": [
+                  {
+                    "locale": null,
+                    "end": null,
+                    "ended": false,
+                    "sort-name": "Dropkick Murphies",
+                    "name": "Dropkick Murphies",
+                    "begin": null,
+                    "type": null,
+                    "primary": null,
+                    "type-id": null
+                  },
+                  {
+                    "type-id": null,
+                    "primary": null,
+                    "type": null,
+                    "begin": null,
+                    "name": "Dropkick Murphy's",
+                    "sort-name": "Dropkick Murphy's",
+                    "ended": false,
+                    "end": null,
+                    "locale": null
+                  }
+                ],
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+              },
+              "joinphrase": ""
+            }
+          ],
+          "position": 7,
+          "length": 169066,
+          "recording": {
+            "aliases": [],
+            "isrcs": [
+              "USHEL0306307"
+            ],
+            "disambiguation": "",
+            "id": "3095e419-f5ea-4cd0-ab8d-34890c66a9c3",
+            "title": "The Gauntlet",
+            "first-release-date": "2001-01-23",
+            "length": 169066,
+            "tags": [
+              {
+                "count": 1,
+                "name": "alternative & punk"
+              },
+              {
+                "name": "alternative and punk",
+                "count": 2
+              },
+              {
+                "count": 1,
+                "name": "alternative/indie rock"
+              },
+              {
+                "count": 1,
+                "name": "hardcore punk"
+              },
+              {
+                "count": 1,
+                "name": "oi!"
+              },
+              {
+                "count": 2,
+                "name": "pop/rock"
+              },
+              {
+                "name": "punk",
+                "count": 5
+              },
+              {
+                "name": "punk revival",
+                "count": 1
+              },
+              {
+                "count": 1,
+                "name": "punk rock"
+              },
+              {
+                "name": "punk/new wave",
+                "count": 1
+              },
+              {
+                "count": 3,
+                "name": "rock"
+              },
+              {
+                "count": 2,
+                "name": "skatepunk"
+              }
+            ],
+            "artist-credit": [
+              {
+                "joinphrase": "",
+                "artist": {
+                  "disambiguation": "",
+                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                  "country": "US",
+                  "type": "Group",
+                  "name": "Dropkick Murphys",
+                  "id": "e8374874-4178-4869-b92e-fef6bf30dc04",
+                  "sort-name": "Dropkick Murphys"
+                },
+                "name": "Dropkick Murphys"
+              }
+            ],
+            "relations": [
+              {
+                "artist": {
+                  "id": "a1c734b2-0d24-42dc-b21d-9666b35f2120",
+                  "name": "Jim Siegel",
+                  "type": "Person",
+                  "country": "US",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "disambiguation": "Boston hardcore producer/engineer",
+                  "sort-name": "Siegel, Jim"
+                },
+                "end": null,
+                "attributes": [],
+                "type": "engineer",
+                "begin": null,
+                "target-type": "artist",
+                "source-credit": "",
+                "attribute-values": {},
+                "ended": false,
+                "direction": "backward",
+                "target-credit": "",
+                "attribute-ids": {},
+                "type-id": "5dcc52af-7064-4051-8d62-7d80f4c3c907"
+              },
+              {
+                "end": null,
+                "attributes": [],
+                "artist": {
+                  "sort-name": "Siegel, Jim",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "disambiguation": "Boston hardcore producer/engineer",
+                  "id": "a1c734b2-0d24-42dc-b21d-9666b35f2120",
+                  "type": "Person",
+                  "name": "Jim Siegel",
+                  "country": "US"
+                },
+                "type": "mix",
+                "begin": null,
+                "target-credit": "",
+                "source-credit": "",
+                "direction": "backward",
+                "ended": false,
+                "attribute-values": {},
+                "target-type": "artist",
+                "type-id": "3e3102e1-1896-4f50-b5b2-dd9824e46efe",
+                "attribute-ids": {}
+              },
+              {
+                "end": null,
+                "attributes": [],
+                "artist": {
+                  "sort-name": "Casey, Ken",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "disambiguation": "",
+                  "id": "622083a6-a011-4354-af39-5fdbbfccd585",
+                  "name": "Ken Casey",
+                  "type": "Person",
+                  "country": "US"
+                },
+                "type": "producer",
+                "begin": null,
+                "source-credit": "",
+                "ended": false,
+                "direction": "backward",
+                "attribute-values": {},
+                "target-credit": "",
+                "target-type": "artist",
+                "type-id": "5c0ceac3-feb4-41f0-868d-dc06f6e27fc0",
+                "attribute-ids": {}
+              },
+              {
+                "end": null,
+                "place": {
+                  "address": "",
+                  "coordinates": null,
+                  "area": {
+                    "disambiguation": "",
+                    "type-id": "6fd8f29a-3d0a-32fc-980d-ea697b69da78",
+                    "sort-name": "Stoughton",
+                    "type": "City",
+                    "name": "Stoughton",
+                    "id": "584ed680-a1df-4af8-a10f-62e1bcf2e96b"
+                  },
+                  "disambiguation": "Stoughton, Massachusetts",
+                  "type-id": "05fa6a09-ff92-3d34-bdbb-5141d3c24f38",
+                  "name": "The Outpost",
+                  "type": "Studio",
+                  "id": "736e3a49-8fc4-4e47-ad89-1301932545a3"
+                },
+                "attributes": [],
+                "begin": null,
+                "type": "recorded at",
+                "target-type": "place",
+                "source-credit": "",
+                "attribute-values": {},
+                "direction": "backward",
+                "ended": false,
+                "target-credit": "",
+                "attribute-ids": {},
+                "type-id": "ad462279-14b0-4180-9b58-571d0eef7c51"
+              },
+              {
+                "end": null,
+                "attributes": [],
+                "type": "music video",
+                "begin": null,
+                "target-type": "recording",
+                "target-credit": "",
+                "source-credit": "",
+                "ended": false,
+                "attribute-values": {},
+                "direction": "forward",
+                "attribute-ids": {},
+                "recording": {
+                  "id": "08d35ef4-7592-4120-866a-038c4e69d5ae",
+                  "artist-credit": [
+                    {
+                      "artist": {
+                        "type": null,
+                        "name": "Dropkick Murphys",
+                        "country": "US",
+                        "id": "e8374874-4178-4869-b92e-fef6bf30dc04",
+                        "disambiguation": "",
+                        "type-id": null,
+                        "sort-name": "Dropkick Murphys"
+                      },
+                      "joinphrase": "",
+                      "name": "Dropkick Murphys"
+                    }
+                  ],
+                  "title": "The Gauntlet",
+                  "length": 175000,
+                  "isrcs": [],
+                  "disambiguation": "music video",
+                  "video": true
+                },
+                "type-id": "ce3de655-7451-44d1-9224-87eb948c205d"
+              },
+              {
+                "target-credit": "",
+                "source-credit": "",
+                "ended": false,
+                "direction": "forward",
+                "attribute-values": {},
+                "target-type": "work",
+                "type-id": "a3005666-a872-32c3-ad06-98af558e99b0",
+                "attribute-ids": {},
+                "end": null,
+                "attributes": [],
+                "type": "performance",
+                "begin": null,
+                "work": {
+                  "language": "eng",
+                  "attributes": [],
+                  "id": "c9aedd12-80db-4a96-81c9-3c9091909263",
+                  "title": "The Gauntlet",
+                  "type": "Song",
+                  "type-id": "f061270a-2fd6-32f1-a641-f0f8676d14e6",
+                  "languages": [
+                    "eng"
+                  ],
+                  "iswcs": [
+                    "T-071.497.035-0"
+                  ],
+                  "disambiguation": ""
+                }
+              }
+            ],
+            "video": false,
+            "genres": [
+              {
+                "name": "hardcore punk",
+                "id": "055a6e4d-d929-42ac-ba7a-9d063b254ea5",
+                "disambiguation": "",
+                "count": 1
+              },
+              {
+                "name": "punk",
+                "id": "8cc9b280-230b-4a3a-b1e2-8acab0744dd3",
+                "disambiguation": "",
+                "count": 5
+              },
+              {
+                "id": "bd7e1d40-43b1-4ba5-97b3-05b891466962",
+                "name": "punk rock",
+                "count": 1,
+                "disambiguation": ""
+              },
+              {
+                "id": "0e3fc579-2d24-4f20-9dae-736e1ec78798",
+                "name": "rock",
+                "count": 3,
+                "disambiguation": ""
+              }
+            ]
+          }
+        },
+        {
+          "artist-credit": [
+            {
+              "artist": {
+                "sort-name": "Dropkick Murphys",
+                "id": "e8374874-4178-4869-b92e-fef6bf30dc04",
+                "country": "US",
+                "type": "Group",
+                "name": "Dropkick Murphys",
+                "aliases": [
+                  {
+                    "type-id": null,
+                    "type": null,
+                    "begin": null,
+                    "name": "Dropkick Murphies",
+                    "primary": null,
+                    "ended": false,
+                    "sort-name": "Dropkick Murphies",
+                    "end": null,
+                    "locale": null
+                  },
+                  {
+                    "locale": null,
+                    "ended": false,
+                    "sort-name": "Dropkick Murphy's",
+                    "end": null,
+                    "name": "Dropkick Murphy's",
+                    "begin": null,
+                    "type": null,
+                    "primary": null,
+                    "type-id": null
+                  }
+                ],
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "disambiguation": ""
+              },
+              "joinphrase": "",
+              "name": "Dropkick Murphys"
+            }
+          ],
+          "id": "004f2d90-910b-3d6e-97ee-cff453753398",
+          "title": "Good Rats",
+          "recording": {
+            "first-release-date": "2000-06-06",
+            "disambiguation": "",
+            "aliases": [],
+            "isrcs": [
+              "USHEL0306308"
+            ],
+            "title": "Good Rats",
+            "id": "9470c338-b473-4989-bb2e-a3cf52bed985",
+            "video": false,
+            "relations": [
+              {
+                "type-id": "5dcc52af-7064-4051-8d62-7d80f4c3c907",
+                "attribute-ids": {},
+                "source-credit": "",
+                "ended": false,
+                "direction": "backward",
+                "attribute-values": {},
+                "target-credit": "",
+                "target-type": "artist",
+                "type": "engineer",
+                "begin": null,
+                "end": null,
+                "attributes": [],
+                "artist": {
+                  "disambiguation": "Boston hardcore producer/engineer",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "country": "US",
+                  "name": "Jim Siegel",
+                  "type": "Person",
+                  "id": "a1c734b2-0d24-42dc-b21d-9666b35f2120",
+                  "sort-name": "Siegel, Jim"
+                }
+              },
+              {
+                "begin": null,
+                "type": "instrument",
+                "attributes": [
+                  "additional",
+                  "mandolin"
+                ],
+                "end": null,
+                "artist": {
+                  "sort-name": "Cunningham, Johnny",
+                  "disambiguation": "Scottish fiddler",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "type": "Person",
+                  "name": "Johnny Cunningham",
+                  "country": "GB",
+                  "id": "d01f722d-f9b4-47d3-b0e8-0217378b6664"
+                },
+                "attribute-credits": {},
+                "type-id": "59054b12-01ac-43ee-a618-285fd397e461",
+                "attribute-ids": {
+                  "additional": "0a5341f8-3b1d-4f99-a0c6-26b7f4e42c7f",
+                  "mandolin": "37fa9bb5-d5d7-4b0f-aa4d-531339ba9c32"
+                },
+                "target-credit": "",
+                "direction": "backward",
+                "attribute-values": {},
+                "ended": false,
+                "source-credit": "",
+                "target-type": "artist"
+              },
+              {
+                "type-id": "3e3102e1-1896-4f50-b5b2-dd9824e46efe",
+                "attribute-ids": {},
+                "ended": false,
+                "attribute-values": {},
+                "direction": "backward",
+                "source-credit": "",
+                "target-credit": "",
+                "target-type": "artist",
+                "begin": null,
+                "type": "mix",
+                "attributes": [],
+                "end": null,
+                "artist": {
+                  "sort-name": "Siegel, Jim",
+                  "id": "a1c734b2-0d24-42dc-b21d-9666b35f2120",
+                  "country": "US",
+                  "type": "Person",
+                  "name": "Jim Siegel",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "disambiguation": "Boston hardcore producer/engineer"
+                }
+              },
+              {
+                "attribute-ids": {},
+                "type-id": "5c0ceac3-feb4-41f0-868d-dc06f6e27fc0",
+                "target-type": "artist",
+                "target-credit": "",
+                "ended": false,
+                "attribute-values": {},
+                "direction": "backward",
+                "source-credit": "",
+                "type": "producer",
+                "begin": null,
+                "artist": {
+                  "sort-name": "Casey, Ken",
+                  "disambiguation": "",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "country": "US",
+                  "name": "Ken Casey",
+                  "type": "Person",
+                  "id": "622083a6-a011-4354-af39-5fdbbfccd585"
+                },
+                "attributes": [],
+                "end": null
+              },
+              {
+                "target-type": "artist",
+                "target-credit": "",
+                "source-credit": "",
+                "attribute-values": {},
+                "ended": false,
+                "direction": "backward",
+                "attribute-ids": {
+                  "guest": "b3045913-62ac-433e-9211-ac683cdf6b5c"
+                },
+                "type-id": "0fdbe3c6-7700-4a31-ae54-b53f06ae1cfa",
+                "artist": {
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "disambiguation": "",
+                  "id": "29bec046-e58b-4b9e-9853-c0bdeb84a5c7",
+                  "type": "Person",
+                  "name": "Shane MacGowan",
+                  "country": "GB",
+                  "sort-name": "MacGowan, Shane"
+                },
+                "end": null,
+                "attributes": [
+                  "guest"
+                ],
+                "type": "vocal",
+                "begin": null
+              },
+              {
+                "attributes": [],
+                "place": {
+                  "id": "736e3a49-8fc4-4e47-ad89-1301932545a3",
+                  "name": "The Outpost",
+                  "type": "Studio",
+                  "type-id": "05fa6a09-ff92-3d34-bdbb-5141d3c24f38",
+                  "area": {
+                    "id": "584ed680-a1df-4af8-a10f-62e1bcf2e96b",
+                    "type": "City",
+                    "name": "Stoughton",
+                    "type-id": "6fd8f29a-3d0a-32fc-980d-ea697b69da78",
+                    "sort-name": "Stoughton",
+                    "disambiguation": ""
+                  },
+                  "disambiguation": "Stoughton, Massachusetts",
+                  "address": "",
+                  "coordinates": null
+                },
+                "end": null,
+                "type": "recorded at",
+                "begin": null,
+                "target-type": "place",
+                "attribute-values": {},
+                "direction": "backward",
+                "ended": false,
+                "source-credit": "",
+                "target-credit": "",
+                "attribute-ids": {},
+                "type-id": "ad462279-14b0-4180-9b58-571d0eef7c51"
+              },
+              {
+                "target-type": "work",
+                "target-credit": "",
+                "source-credit": "",
+                "attribute-values": {},
+                "ended": false,
+                "direction": "forward",
+                "attribute-ids": {},
+                "type-id": "a3005666-a872-32c3-ad06-98af558e99b0",
+                "end": null,
+                "attributes": [],
+                "begin": null,
+                "type": "performance",
+                "work": {
+                  "title": "Good Rats",
+                  "type": "Song",
+                  "id": "13bcdb8c-a661-470f-a49d-3b02c8077bf7",
+                  "disambiguation": "",
+                  "iswcs": [
+                    "T-071.395.549-7"
+                  ],
+                  "type-id": "f061270a-2fd6-32f1-a641-f0f8676d14e6",
+                  "languages": [],
+                  "attributes": [],
+                  "language": null
+                }
+              }
+            ],
+            "genres": [
+              {
+                "id": "6cec5b4d-3c64-44a6-914d-3e833432f631",
+                "name": "folk punk",
+                "count": 1,
+                "disambiguation": ""
+              },
+              {
+                "count": 1,
+                "disambiguation": "",
+                "id": "055a6e4d-d929-42ac-ba7a-9d063b254ea5",
+                "name": "hardcore punk"
+              },
+              {
+                "disambiguation": "",
+                "count": 4,
+                "name": "punk",
+                "id": "8cc9b280-230b-4a3a-b1e2-8acab0744dd3"
+              },
+              {
+                "id": "bd7e1d40-43b1-4ba5-97b3-05b891466962",
+                "name": "punk rock",
+                "count": 3,
+                "disambiguation": ""
+              },
+              {
+                "disambiguation": "",
+                "count": 3,
+                "name": "rock",
+                "id": "0e3fc579-2d24-4f20-9dae-736e1ec78798"
+              }
+            ],
+            "length": 183880,
+            "tags": [
+              {
+                "count": 1,
+                "name": "alternative & punk"
+              },
+              {
+                "count": 2,
+                "name": "alternative and punk"
+              },
+              {
+                "name": "alternative/indie rock",
+                "count": 1
+              },
+              {
+                "count": 1,
+                "name": "folk punk"
+              },
+              {
+                "name": "hardcore punk",
+                "count": 1
+              },
+              {
+                "name": "oi!",
+                "count": 1
+              },
+              {
+                "name": "pop/rock",
+                "count": 2
+              },
+              {
+                "name": "punk",
+                "count": 4
+              },
+              {
+                "name": "punk revival",
+                "count": 1
+              },
+              {
+                "name": "punk rock",
+                "count": 3
+              },
+              {
+                "count": 1,
+                "name": "punk/new wave"
+              },
+              {
+                "name": "rock",
+                "count": 3
+              },
+              {
+                "count": 2,
+                "name": "skatepunk"
+              }
+            ],
+            "artist-credit": [
+              {
+                "name": "Dropkick Murphys",
+                "artist": {
+                  "name": "Dropkick Murphys",
+                  "type": "Group",
+                  "country": "US",
+                  "id": "e8374874-4178-4869-b92e-fef6bf30dc04",
+                  "disambiguation": "",
+                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                  "sort-name": "Dropkick Murphys"
+                },
+                "joinphrase": ""
+              }
+            ]
+          },
+          "length": 183880,
+          "position": 8,
+          "number": "8"
+        },
+        {
+          "artist-credit": [
+            {
+              "artist": {
+                "type": "Group",
+                "name": "Dropkick Murphys",
+                "country": "US",
+                "id": "e8374874-4178-4869-b92e-fef6bf30dc04",
+                "disambiguation": "",
+                "aliases": [
+                  {
+                    "type-id": null,
+                    "primary": null,
+                    "begin": null,
+                    "type": null,
+                    "name": "Dropkick Murphies",
+                    "end": null,
+                    "sort-name": "Dropkick Murphies",
+                    "ended": false,
+                    "locale": null
+                  },
+                  {
+                    "end": null,
+                    "sort-name": "Dropkick Murphy's",
+                    "ended": false,
+                    "locale": null,
+                    "type-id": null,
+                    "primary": null,
+                    "begin": null,
+                    "type": null,
+                    "name": "Dropkick Murphy's"
+                  }
+                ],
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "sort-name": "Dropkick Murphys"
+              },
+              "joinphrase": "",
+              "name": "Dropkick Murphys"
+            }
+          ],
+          "id": "874b35b7-3c65-3062-b29c-ca728fb8f20b",
+          "title": "The New American Way",
+          "length": 212320,
+          "recording": {
+            "video": false,
+            "relations": [
+              {
+                "begin": null,
+                "type": "engineer",
+                "artist": {
+                  "sort-name": "Siegel, Jim",
+                  "disambiguation": "Boston hardcore producer/engineer",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "country": "US",
+                  "type": "Person",
+                  "name": "Jim Siegel",
+                  "id": "a1c734b2-0d24-42dc-b21d-9666b35f2120"
+                },
+                "attributes": [],
+                "end": null,
+                "attribute-ids": {},
+                "type-id": "5dcc52af-7064-4051-8d62-7d80f4c3c907",
+                "target-type": "artist",
+                "direction": "backward",
+                "ended": false,
+                "attribute-values": {},
+                "source-credit": "",
+                "target-credit": ""
+              },
+              {
+                "target-type": "artist",
+                "direction": "backward",
+                "ended": false,
+                "attribute-values": {},
+                "source-credit": "",
+                "target-credit": "",
+                "attribute-ids": {
+                  "additional": "0a5341f8-3b1d-4f99-a0c6-26b7f4e42c7f",
+                  "guitar": "63021302-86cd-4aee-80df-2270d54f4978"
+                },
+                "type-id": "59054b12-01ac-43ee-a618-285fd397e461",
+                "attribute-credits": {},
+                "artist": {
+                  "id": "59fbb464-a4e0-4598-a219-1eca484e1462",
+                  "name": "Rick Barton",
+                  "type": "Person",
+                  "country": "US",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "disambiguation": "",
+                  "sort-name": "Barton, Rick"
+                },
+                "attributes": [
+                  "additional",
+                  "guitar"
+                ],
+                "end": null,
+                "type": "instrument",
+                "begin": null
+              },
+              {
+                "begin": null,
+                "type": "mix",
+                "artist": {
+                  "sort-name": "Siegel, Jim",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "disambiguation": "Boston hardcore producer/engineer",
+                  "id": "a1c734b2-0d24-42dc-b21d-9666b35f2120",
+                  "country": "US",
+                  "type": "Person",
+                  "name": "Jim Siegel"
+                },
+                "attributes": [],
+                "end": null,
+                "attribute-ids": {},
+                "type-id": "3e3102e1-1896-4f50-b5b2-dd9824e46efe",
+                "target-type": "artist",
+                "target-credit": "",
+                "direction": "backward",
+                "ended": false,
+                "attribute-values": {},
+                "source-credit": ""
+              },
+              {
+                "artist": {
+                  "disambiguation": "",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "type": "Person",
+                  "name": "Ken Casey",
+                  "country": "US",
+                  "id": "622083a6-a011-4354-af39-5fdbbfccd585",
+                  "sort-name": "Casey, Ken"
+                },
+                "attributes": [],
+                "end": null,
+                "type": "producer",
+                "begin": null,
+                "target-type": "artist",
+                "direction": "backward",
+                "ended": false,
+                "attribute-values": {},
+                "source-credit": "",
+                "target-credit": "",
+                "attribute-ids": {},
+                "type-id": "5c0ceac3-feb4-41f0-868d-dc06f6e27fc0"
+              },
+              {
+                "type-id": "ad462279-14b0-4180-9b58-571d0eef7c51",
+                "attribute-ids": {},
+                "target-credit": "",
+                "source-credit": "",
+                "ended": false,
+                "direction": "backward",
+                "attribute-values": {},
+                "target-type": "place",
+                "type": "recorded at",
+                "begin": null,
+                "end": null,
+                "attributes": [],
+                "place": {
+                  "type-id": "05fa6a09-ff92-3d34-bdbb-5141d3c24f38",
+                  "address": "",
+                  "coordinates": null,
+                  "disambiguation": "Stoughton, Massachusetts",
+                  "area": {
+                    "disambiguation": "",
+                    "type-id": "6fd8f29a-3d0a-32fc-980d-ea697b69da78",
+                    "sort-name": "Stoughton",
+                    "name": "Stoughton",
+                    "type": "City",
+                    "id": "584ed680-a1df-4af8-a10f-62e1bcf2e96b"
+                  },
+                  "id": "736e3a49-8fc4-4e47-ad89-1301932545a3",
+                  "type": "Studio",
+                  "name": "The Outpost"
+                }
+              },
+              {
+                "end": null,
+                "attributes": [],
+                "type": "performance",
+                "begin": null,
+                "work": {
+                  "attributes": [],
+                  "language": null,
+                  "type": "Song",
+                  "title": "The New American Way",
+                  "id": "39bc80b5-3507-4c66-8062-2649dd83b530",
+                  "disambiguation": "",
+                  "languages": [],
+                  "type-id": "f061270a-2fd6-32f1-a641-f0f8676d14e6",
+                  "iswcs": [
+                    "T-071.709.508-3"
+                  ]
+                },
+                "target-type": "work",
+                "target-credit": "",
+                "source-credit": "",
+                "ended": false,
+                "direction": "forward",
+                "attribute-values": {},
+                "attribute-ids": {},
+                "type-id": "a3005666-a872-32c3-ad06-98af558e99b0"
+              }
+            ],
+            "genres": [
+              {
+                "count": 1,
+                "disambiguation": "",
+                "id": "34edc6ac-d431-4b36-be15-ecd17533e5e2",
+                "name": "celtic"
+              },
+              {
+                "id": "a91eed3a-fdd0-494e-ade0-95ea4117f6eb",
+                "name": "folk",
+                "count": 1,
+                "disambiguation": ""
+              },
+              {
+                "count": 1,
+                "disambiguation": "",
+                "id": "055a6e4d-d929-42ac-ba7a-9d063b254ea5",
+                "name": "hardcore punk"
+              },
+              {
+                "disambiguation": "",
+                "count": 4,
+                "name": "punk",
+                "id": "8cc9b280-230b-4a3a-b1e2-8acab0744dd3"
+              },
+              {
+                "count": 1,
+                "disambiguation": "",
+                "id": "bd7e1d40-43b1-4ba5-97b3-05b891466962",
+                "name": "punk rock"
+              },
+              {
+                "name": "rock",
+                "id": "0e3fc579-2d24-4f20-9dae-736e1ec78798",
+                "disambiguation": "",
+                "count": 3
+              }
+            ],
+            "disambiguation": "",
+            "isrcs": [
+              "USHEL0306309"
+            ],
+            "length": 212320,
+            "aliases": [],
+            "title": "The New American Way",
+            "id": "cf1be6ba-1887-472d-8051-b3271149c874",
+            "tags": [
+              {
+                "name": "alternative & punk",
+                "count": 1
+              },
+              {
+                "count": 2,
+                "name": "alternative and punk"
+              },
+              {
+                "name": "alternative/indie rock",
+                "count": 1
+              },
+              {
+                "count": 1,
+                "name": "celtic"
+              },
+              {
+                "name": "folk",
+                "count": 1
+              },
+              {
+                "count": 1,
+                "name": "hardcore punk"
+              },
+              {
+                "count": 1,
+                "name": "oi!"
+              },
+              {
+                "name": "pop/rock",
+                "count": 2
+              },
+              {
+                "count": 4,
+                "name": "punk"
+              },
+              {
+                "count": 1,
+                "name": "punk revival"
+              },
+              {
+                "name": "punk rock",
+                "count": 1
+              },
+              {
+                "name": "punk/new wave",
+                "count": 1
+              },
+              {
+                "name": "rock",
+                "count": 3
+              },
+              {
+                "name": "skatepunk",
+                "count": 2
+              }
+            ],
+            "artist-credit": [
+              {
+                "artist": {
+                  "sort-name": "Dropkick Murphys",
+                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                  "disambiguation": "",
+                  "id": "e8374874-4178-4869-b92e-fef6bf30dc04",
+                  "name": "Dropkick Murphys",
+                  "type": "Group",
+                  "country": "US"
+                },
+                "joinphrase": "",
+                "name": "Dropkick Murphys"
+              }
+            ]
+          },
+          "position": 9,
+          "number": "9"
+        },
+        {
+          "number": "10",
+          "title": "The Torch",
+          "id": "bbbf625f-9c85-377c-8ae0-7162fb6ef378",
+          "artist-credit": [
+            {
+              "artist": {
+                "sort-name": "Dropkick Murphys",
+                "country": "US",
+                "name": "Dropkick Murphys",
+                "type": "Group",
+                "id": "e8374874-4178-4869-b92e-fef6bf30dc04",
+                "disambiguation": "",
+                "aliases": [
+                  {
+                    "type-id": null,
+                    "begin": null,
+                    "type": null,
+                    "name": "Dropkick Murphies",
+                    "primary": null,
+                    "end": null,
+                    "ended": false,
+                    "sort-name": "Dropkick Murphies",
+                    "locale": null
+                  },
+                  {
+                    "end": null,
+                    "sort-name": "Dropkick Murphy's",
+                    "ended": false,
+                    "locale": null,
+                    "type-id": null,
+                    "primary": null,
+                    "begin": null,
+                    "name": "Dropkick Murphy's",
+                    "type": null
+                  }
+                ],
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+              },
+              "joinphrase": "",
+              "name": "Dropkick Murphys"
+            }
+          ],
+          "position": 10,
+          "length": 197546,
+          "recording": {
+            "genres": [
+              {
+                "id": "6cec5b4d-3c64-44a6-914d-3e833432f631",
+                "name": "folk punk",
+                "count": 1,
+                "disambiguation": ""
+              },
+              {
+                "count": 1,
+                "disambiguation": "",
+                "id": "055a6e4d-d929-42ac-ba7a-9d063b254ea5",
+                "name": "hardcore punk"
+              },
+              {
+                "name": "punk",
+                "id": "8cc9b280-230b-4a3a-b1e2-8acab0744dd3",
+                "disambiguation": "",
+                "count": 4
+              },
+              {
+                "disambiguation": "",
+                "count": 1,
+                "name": "punk rock",
+                "id": "bd7e1d40-43b1-4ba5-97b3-05b891466962"
+              },
+              {
+                "id": "0e3fc579-2d24-4f20-9dae-736e1ec78798",
+                "name": "rock",
+                "count": 3,
+                "disambiguation": ""
+              }
+            ],
+            "video": false,
+            "relations": [
+              {
+                "type-id": "5dcc52af-7064-4051-8d62-7d80f4c3c907",
+                "attribute-ids": {},
+                "ended": false,
+                "attribute-values": {},
+                "direction": "backward",
+                "source-credit": "",
+                "target-credit": "",
+                "target-type": "artist",
+                "type": "engineer",
+                "begin": null,
+                "attributes": [],
+                "end": null,
+                "artist": {
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "disambiguation": "Boston hardcore producer/engineer",
+                  "id": "a1c734b2-0d24-42dc-b21d-9666b35f2120",
+                  "country": "US",
+                  "type": "Person",
+                  "name": "Jim Siegel",
+                  "sort-name": "Siegel, Jim"
+                }
+              },
+              {
+                "target-type": "artist",
+                "ended": false,
+                "attribute-values": {},
+                "direction": "backward",
+                "source-credit": "",
+                "target-credit": "",
+                "attribute-ids": {
+                  "additional": "0a5341f8-3b1d-4f99-a0c6-26b7f4e42c7f",
+                  "guitar": "63021302-86cd-4aee-80df-2270d54f4978"
+                },
+                "type-id": "59054b12-01ac-43ee-a618-285fd397e461",
+                "attribute-credits": {},
+                "artist": {
+                  "sort-name": "Barton, Rick",
+                  "disambiguation": "",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "name": "Rick Barton",
+                  "type": "Person",
+                  "country": "US",
+                  "id": "59fbb464-a4e0-4598-a219-1eca484e1462"
+                },
+                "attributes": [
+                  "additional",
+                  "guitar"
+                ],
+                "end": null,
+                "begin": null,
+                "type": "instrument"
+              },
+              {
+                "target-type": "artist",
+                "target-credit": "",
+                "ended": false,
+                "direction": "backward",
+                "attribute-values": {},
+                "source-credit": "",
+                "attribute-ids": {
+                  "additional": "0a5341f8-3b1d-4f99-a0c6-26b7f4e42c7f",
+                  "accordion": "bdf08ac2-b9c2-4391-85e5-9a7716bdd690"
+                },
+                "attribute-credits": {},
+                "type-id": "59054b12-01ac-43ee-a618-285fd397e461",
+                "artist": {
+                  "sort-name": "Kelly, Andreas",
+                  "country": null,
+                  "name": "Andreas Kelly",
+                  "type": "Person",
+                  "id": "6c0018ce-1597-435e-b28d-b3ac6e67174c",
+                  "disambiguation": "",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+                },
+                "attributes": [
+                  "accordion",
+                  "additional"
+                ],
+                "end": null,
+                "begin": null,
+                "type": "instrument"
+              },
+              {
+                "begin": null,
+                "type": "mix",
+                "attributes": [],
+                "end": null,
+                "artist": {
+                  "id": "a1c734b2-0d24-42dc-b21d-9666b35f2120",
+                  "country": "US",
+                  "name": "Jim Siegel",
+                  "type": "Person",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "disambiguation": "Boston hardcore producer/engineer",
+                  "sort-name": "Siegel, Jim"
+                },
+                "type-id": "3e3102e1-1896-4f50-b5b2-dd9824e46efe",
+                "attribute-ids": {},
+                "target-credit": "",
+                "ended": false,
+                "attribute-values": {},
+                "direction": "backward",
+                "source-credit": "",
+                "target-type": "artist"
+              },
+              {
+                "artist": {
+                  "sort-name": "Casey, Ken",
+                  "disambiguation": "",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "country": "US",
+                  "type": "Person",
+                  "name": "Ken Casey",
+                  "id": "622083a6-a011-4354-af39-5fdbbfccd585"
+                },
+                "attributes": [],
+                "end": null,
+                "begin": null,
+                "type": "producer",
+                "target-type": "artist",
+                "direction": "backward",
+                "ended": false,
+                "attribute-values": {},
+                "source-credit": "",
+                "target-credit": "",
+                "attribute-ids": {},
+                "type-id": "5c0ceac3-feb4-41f0-868d-dc06f6e27fc0"
+              },
+              {
+                "target-credit": "",
+                "source-credit": "",
+                "attribute-values": {},
+                "direction": "backward",
+                "ended": false,
+                "target-type": "place",
+                "type-id": "ad462279-14b0-4180-9b58-571d0eef7c51",
+                "attribute-ids": {},
+                "end": null,
+                "place": {
+                  "id": "736e3a49-8fc4-4e47-ad89-1301932545a3",
+                  "name": "The Outpost",
+                  "type": "Studio",
+                  "type-id": "05fa6a09-ff92-3d34-bdbb-5141d3c24f38",
+                  "coordinates": null,
+                  "address": "",
+                  "area": {
+                    "sort-name": "Stoughton",
+                    "type-id": "6fd8f29a-3d0a-32fc-980d-ea697b69da78",
+                    "disambiguation": "",
+                    "id": "584ed680-a1df-4af8-a10f-62e1bcf2e96b",
+                    "name": "Stoughton",
+                    "type": "City"
+                  },
+                  "disambiguation": "Stoughton, Massachusetts"
+                },
+                "attributes": [],
+                "type": "recorded at",
+                "begin": null
+              },
+              {
+                "work": {
+                  "id": "0212a868-0ab4-4769-b776-b8c710ece18b",
+                  "title": "The Torch",
+                  "type": "Song",
+                  "type-id": "f061270a-2fd6-32f1-a641-f0f8676d14e6",
+                  "iswcs": [
+                    "T-072.109.826-5"
+                  ],
+                  "languages": [],
+                  "disambiguation": "",
+                  "language": null,
+                  "attributes": []
+                },
+                "begin": null,
+                "type": "performance",
+                "end": null,
+                "attributes": [],
+                "type-id": "a3005666-a872-32c3-ad06-98af558e99b0",
+                "attribute-ids": {},
+                "source-credit": "",
+                "direction": "forward",
+                "ended": false,
+                "attribute-values": {},
+                "target-credit": "",
+                "target-type": "work"
+              }
+            ],
+            "title": "The Torch",
+            "tags": [
+              {
+                "name": "alternative & punk",
+                "count": 1
+              },
+              {
+                "name": "alternative and punk",
+                "count": 2
+              },
+              {
+                "name": "alternative/indie rock",
+                "count": 1
+              },
+              {
+                "count": 1,
+                "name": "folk punk"
+              },
+              {
+                "count": 1,
+                "name": "hardcore punk"
+              },
+              {
+                "count": 1,
+                "name": "oi!"
+              },
+              {
+                "count": 2,
+                "name": "pop/rock"
+              },
+              {
+                "count": 4,
+                "name": "punk"
+              },
+              {
+                "name": "punk revival",
+                "count": 1
+              },
+              {
+                "name": "punk rock",
+                "count": 1
+              },
+              {
+                "count": 1,
+                "name": "punk/new wave"
+              },
+              {
+                "count": 3,
+                "name": "rock"
+              },
+              {
+                "count": 2,
+                "name": "skatepunk"
+              }
+            ],
+            "id": "debc5dde-2568-450c-bd14-f7c0dd2ca2f1",
+            "artist-credit": [
+              {
+                "name": "Dropkick Murphys",
+                "joinphrase": "",
+                "artist": {
+                  "sort-name": "Dropkick Murphys",
+                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                  "disambiguation": "",
+                  "id": "e8374874-4178-4869-b92e-fef6bf30dc04",
+                  "type": "Group",
+                  "name": "Dropkick Murphys",
+                  "country": "US"
+                }
+              }
+            ],
+            "disambiguation": "",
+            "isrcs": [
+              "USHEL0306310"
+            ],
+            "aliases": [],
+            "length": 197546
+          }
+        },
+        {
+          "title": "The Fortunes of War",
+          "id": "b51a6f18-a76d-3b78-a789-bd4834f1cf48",
+          "artist-credit": [
+            {
+              "joinphrase": "",
+              "artist": {
+                "sort-name": "Dropkick Murphys",
+                "disambiguation": "",
+                "aliases": [
+                  {
+                    "type": null,
+                    "begin": null,
+                    "name": "Dropkick Murphies",
+                    "primary": null,
+                    "type-id": null,
+                    "locale": null,
+                    "ended": false,
+                    "sort-name": "Dropkick Murphies",
+                    "end": null
+                  },
+                  {
+                    "locale": null,
+                    "sort-name": "Dropkick Murphy's",
+                    "ended": false,
+                    "end": null,
+                    "primary": null,
+                    "begin": null,
+                    "name": "Dropkick Murphy's",
+                    "type": null,
+                    "type-id": null
+                  }
+                ],
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "type": "Group",
+                "name": "Dropkick Murphys",
+                "country": "US",
+                "id": "e8374874-4178-4869-b92e-fef6bf30dc04"
+              },
+              "name": "Dropkick Murphys"
+            }
+          ],
+          "position": 11,
+          "length": 163840,
+          "recording": {
+            "isrcs": [
+              "USHEL0306311"
+            ],
+            "aliases": [],
+            "length": 163840,
+            "disambiguation": "",
+            "tags": [
+              {
+                "name": "alternative & punk",
+                "count": 1
+              },
+              {
+                "count": 1,
+                "name": "alternative and punk"
+              },
+              {
+                "count": 1,
+                "name": "alternative/indie rock"
+              },
+              {
+                "name": "hardcore punk",
+                "count": 1
+              },
+              {
+                "count": 1,
+                "name": "oi!"
+              },
+              {
+                "count": 2,
+                "name": "pop/rock"
+              },
+              {
+                "name": "punk",
+                "count": 4
+              },
+              {
+                "name": "punk revival",
+                "count": 1
+              },
+              {
+                "count": 1,
+                "name": "punk rock"
+              },
+              {
+                "name": "punk/new wave",
+                "count": 1
+              },
+              {
+                "count": 3,
+                "name": "rock"
+              },
+              {
+                "count": 2,
+                "name": "skatepunk"
+              }
+            ],
+            "artist-credit": [
+              {
+                "joinphrase": "",
+                "artist": {
+                  "sort-name": "Dropkick Murphys",
+                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                  "disambiguation": "",
+                  "id": "e8374874-4178-4869-b92e-fef6bf30dc04",
+                  "country": "US",
+                  "name": "Dropkick Murphys",
+                  "type": "Group"
+                },
+                "name": "Dropkick Murphys"
+              }
+            ],
+            "id": "184f545b-ae09-4879-8cdc-4c4a0231dcd1",
+            "title": "The Fortunes of War",
+            "relations": [
+              {
+                "target-type": "artist",
+                "source-credit": "",
+                "attribute-values": {},
+                "ended": false,
+                "direction": "backward",
+                "target-credit": "",
+                "attribute-ids": {},
+                "type-id": "5dcc52af-7064-4051-8d62-7d80f4c3c907",
+                "artist": {
+                  "type": "Person",
+                  "name": "Jim Siegel",
+                  "country": "US",
+                  "id": "a1c734b2-0d24-42dc-b21d-9666b35f2120",
+                  "disambiguation": "Boston hardcore producer/engineer",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "sort-name": "Siegel, Jim"
+                },
+                "end": null,
+                "attributes": [],
+                "begin": null,
+                "type": "engineer"
+              },
+              {
+                "type": "instrument",
+                "begin": null,
+                "end": null,
+                "attributes": [
+                  "additional",
+                  "guitar"
+                ],
+                "artist": {
+                  "sort-name": "Barton, Rick",
+                  "id": "59fbb464-a4e0-4598-a219-1eca484e1462",
+                  "name": "Rick Barton",
+                  "type": "Person",
+                  "country": "US",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "disambiguation": ""
+                },
+                "attribute-credits": {},
+                "type-id": "59054b12-01ac-43ee-a618-285fd397e461",
+                "attribute-ids": {
+                  "additional": "0a5341f8-3b1d-4f99-a0c6-26b7f4e42c7f",
+                  "guitar": "63021302-86cd-4aee-80df-2270d54f4978"
+                },
+                "target-credit": "",
+                "source-credit": "",
+                "attribute-values": {},
+                "ended": false,
+                "direction": "backward",
+                "target-type": "artist"
+              },
+              {
+                "direction": "backward",
+                "ended": false,
+                "attribute-values": {},
+                "source-credit": "",
+                "target-credit": "",
+                "target-type": "artist",
+                "type-id": "3e3102e1-1896-4f50-b5b2-dd9824e46efe",
+                "attribute-ids": {},
+                "attributes": [],
+                "end": null,
+                "artist": {
+                  "sort-name": "Siegel, Jim",
+                  "disambiguation": "Boston hardcore producer/engineer",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "type": "Person",
+                  "name": "Jim Siegel",
+                  "country": "US",
+                  "id": "a1c734b2-0d24-42dc-b21d-9666b35f2120"
+                },
+                "begin": null,
+                "type": "mix"
+              },
+              {
+                "attributes": [],
+                "end": null,
+                "artist": {
+                  "disambiguation": "",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "name": "Ken Casey",
+                  "type": "Person",
+                  "country": "US",
+                  "id": "622083a6-a011-4354-af39-5fdbbfccd585",
+                  "sort-name": "Casey, Ken"
+                },
+                "type": "producer",
+                "begin": null,
+                "target-credit": "",
+                "attribute-values": {},
+                "ended": false,
+                "direction": "backward",
+                "source-credit": "",
+                "target-type": "artist",
+                "type-id": "5c0ceac3-feb4-41f0-868d-dc06f6e27fc0",
+                "attribute-ids": {}
+              },
+              {
+                "type": "vocal",
+                "begin": null,
+                "artist": {
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "disambiguation": "",
+                  "id": "3145e494-9983-4c8f-8218-7b1548cb0779",
+                  "country": "GB",
+                  "type": "Person",
+                  "name": "Colin McFaull",
+                  "sort-name": "McFaull, Colin"
+                },
+                "end": null,
+                "attributes": [
+                  "guest"
+                ],
+                "attribute-ids": {
+                  "guest": "b3045913-62ac-433e-9211-ac683cdf6b5c"
+                },
+                "type-id": "0fdbe3c6-7700-4a31-ae54-b53f06ae1cfa",
+                "target-type": "artist",
+                "target-credit": "",
+                "source-credit": "",
+                "direction": "backward",
+                "ended": false,
+                "attribute-values": {}
+              },
+              {
+                "attribute-ids": {},
+                "type-id": "ad462279-14b0-4180-9b58-571d0eef7c51",
+                "target-type": "place",
+                "target-credit": "",
+                "direction": "backward",
+                "ended": false,
+                "attribute-values": {},
+                "source-credit": "",
+                "begin": null,
+                "type": "recorded at",
+                "place": {
+                  "name": "The Outpost",
+                  "type": "Studio",
+                  "id": "736e3a49-8fc4-4e47-ad89-1301932545a3",
+                  "coordinates": null,
+                  "address": "",
+                  "area": {
+                    "type-id": "6fd8f29a-3d0a-32fc-980d-ea697b69da78",
+                    "sort-name": "Stoughton",
+                    "disambiguation": "",
+                    "id": "584ed680-a1df-4af8-a10f-62e1bcf2e96b",
+                    "name": "Stoughton",
+                    "type": "City"
+                  },
+                  "disambiguation": "Stoughton, Massachusetts",
+                  "type-id": "05fa6a09-ff92-3d34-bdbb-5141d3c24f38"
+                },
+                "attributes": [],
+                "end": null
+              },
+              {
+                "work": {
+                  "language": null,
+                  "attributes": [],
+                  "id": "24624dfd-fff3-4f12-bd5f-bbdc21fcd113",
+                  "type": "Song",
+                  "title": "The Fortunes of War",
+                  "type-id": "f061270a-2fd6-32f1-a641-f0f8676d14e6",
+                  "iswcs": [
+                    "T-071.394.255-2"
+                  ],
+                  "languages": [],
+                  "disambiguation": ""
+                },
+                "type": "performance",
+                "begin": null,
+                "attributes": [],
+                "end": null,
+                "type-id": "a3005666-a872-32c3-ad06-98af558e99b0",
+                "attribute-ids": {},
+                "direction": "forward",
+                "attribute-values": {},
+                "ended": false,
+                "source-credit": "",
+                "target-credit": "",
+                "target-type": "work"
+              }
+            ],
+            "video": false,
+            "genres": [
+              {
+                "name": "hardcore punk",
+                "id": "055a6e4d-d929-42ac-ba7a-9d063b254ea5",
+                "disambiguation": "",
+                "count": 1
+              },
+              {
+                "name": "punk",
+                "id": "8cc9b280-230b-4a3a-b1e2-8acab0744dd3",
+                "disambiguation": "",
+                "count": 4
+              },
+              {
+                "id": "bd7e1d40-43b1-4ba5-97b3-05b891466962",
+                "name": "punk rock",
+                "count": 1,
+                "disambiguation": ""
+              },
+              {
+                "count": 3,
+                "disambiguation": "",
+                "id": "0e3fc579-2d24-4f20-9dae-736e1ec78798",
+                "name": "rock"
+              }
+            ]
+          },
+          "number": "11"
+        },
+        {
+          "position": 12,
+          "length": 156480,
+          "recording": {
+            "isrcs": [
+              "USHEL0306312"
+            ],
+            "length": 156480,
+            "aliases": [],
+            "disambiguation": "",
+            "tags": [
+              {
+                "name": "alternative & punk",
+                "count": 1
+              },
+              {
+                "name": "alternative and punk",
+                "count": 2
+              },
+              {
+                "name": "alternative/indie rock",
+                "count": 1
+              },
+              {
+                "name": "hardcore punk",
+                "count": 1
+              },
+              {
+                "count": 1,
+                "name": "oi!"
+              },
+              {
+                "count": 2,
+                "name": "pop/rock"
+              },
+              {
+                "name": "punk",
+                "count": 4
+              },
+              {
+                "count": 1,
+                "name": "punk revival"
+              },
+              {
+                "count": 1,
+                "name": "punk rock"
+              },
+              {
+                "name": "punk/new wave",
+                "count": 1
+              },
+              {
+                "count": 3,
+                "name": "rock"
+              },
+              {
+                "name": "skatepunk",
+                "count": 2
+              }
+            ],
+            "id": "481fcd43-6c40-4534-b241-3af5ed292c01",
+            "artist-credit": [
+              {
+                "name": "Dropkick Murphys",
+                "artist": {
+                  "sort-name": "Dropkick Murphys",
+                  "type": "Group",
+                  "name": "Dropkick Murphys",
+                  "country": "US",
+                  "id": "e8374874-4178-4869-b92e-fef6bf30dc04",
+                  "disambiguation": "",
+                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+                },
+                "joinphrase": ""
+              }
+            ],
+            "title": "A Few Good Men",
+            "relations": [
+              {
+                "attribute-ids": {},
+                "type-id": "5dcc52af-7064-4051-8d62-7d80f4c3c907",
+                "target-type": "artist",
+                "source-credit": "",
+                "ended": false,
+                "attribute-values": {},
+                "direction": "backward",
+                "target-credit": "",
+                "begin": null,
+                "type": "engineer",
+                "artist": {
+                  "country": "US",
+                  "name": "Jim Siegel",
+                  "type": "Person",
+                  "id": "a1c734b2-0d24-42dc-b21d-9666b35f2120",
+                  "disambiguation": "Boston hardcore producer/engineer",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "sort-name": "Siegel, Jim"
+                },
+                "end": null,
+                "attributes": []
+              },
+              {
+                "type-id": "3e3102e1-1896-4f50-b5b2-dd9824e46efe",
+                "attribute-ids": {},
+                "ended": false,
+                "attribute-values": {},
+                "direction": "backward",
+                "source-credit": "",
+                "target-credit": "",
+                "target-type": "artist",
+                "begin": null,
+                "type": "mix",
+                "attributes": [],
+                "end": null,
+                "artist": {
+                  "disambiguation": "Boston hardcore producer/engineer",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "country": "US",
+                  "name": "Jim Siegel",
+                  "type": "Person",
+                  "id": "a1c734b2-0d24-42dc-b21d-9666b35f2120",
+                  "sort-name": "Siegel, Jim"
+                }
+              },
+              {
+                "end": null,
+                "attributes": [],
+                "artist": {
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "disambiguation": "",
+                  "id": "622083a6-a011-4354-af39-5fdbbfccd585",
+                  "country": "US",
+                  "name": "Ken Casey",
+                  "type": "Person",
+                  "sort-name": "Casey, Ken"
+                },
+                "type": "producer",
+                "begin": null,
+                "target-credit": "",
+                "source-credit": "",
+                "attribute-values": {},
+                "direction": "backward",
+                "ended": false,
+                "target-type": "artist",
+                "type-id": "5c0ceac3-feb4-41f0-868d-dc06f6e27fc0",
+                "attribute-ids": {}
+              },
+              {
+                "type": "recorded at",
+                "begin": null,
+                "end": null,
+                "place": {
+                  "address": "",
+                  "coordinates": null,
+                  "area": {
+                    "disambiguation": "",
+                    "type-id": "6fd8f29a-3d0a-32fc-980d-ea697b69da78",
+                    "sort-name": "Stoughton",
+                    "name": "Stoughton",
+                    "type": "City",
+                    "id": "584ed680-a1df-4af8-a10f-62e1bcf2e96b"
+                  },
+                  "disambiguation": "Stoughton, Massachusetts",
+                  "type-id": "05fa6a09-ff92-3d34-bdbb-5141d3c24f38",
+                  "name": "The Outpost",
+                  "type": "Studio",
+                  "id": "736e3a49-8fc4-4e47-ad89-1301932545a3"
+                },
+                "attributes": [],
+                "type-id": "ad462279-14b0-4180-9b58-571d0eef7c51",
+                "attribute-ids": {},
+                "target-credit": "",
+                "source-credit": "",
+                "direction": "backward",
+                "ended": false,
+                "attribute-values": {},
+                "target-type": "place"
+              },
+              {
+                "work": {
+                  "attributes": [],
+                  "language": null,
+                  "disambiguation": "",
+                  "iswcs": [
+                    "T-072.105.678-5"
+                  ],
+                  "type-id": "f061270a-2fd6-32f1-a641-f0f8676d14e6",
+                  "languages": [],
+                  "type": "Song",
+                  "title": "A Few Good Men",
+                  "id": "3d8b902a-d20c-442c-9caf-d7733fd09884"
+                },
+                "begin": null,
+                "type": "performance",
+                "end": null,
+                "attributes": [],
+                "attribute-ids": {},
+                "type-id": "a3005666-a872-32c3-ad06-98af558e99b0",
+                "target-type": "work",
+                "source-credit": "",
+                "attribute-values": {},
+                "ended": false,
+                "direction": "forward",
+                "target-credit": ""
+              }
+            ],
+            "video": false,
+            "genres": [
+              {
+                "name": "hardcore punk",
+                "id": "055a6e4d-d929-42ac-ba7a-9d063b254ea5",
+                "disambiguation": "",
+                "count": 1
+              },
+              {
+                "count": 4,
+                "disambiguation": "",
+                "id": "8cc9b280-230b-4a3a-b1e2-8acab0744dd3",
+                "name": "punk"
+              },
+              {
+                "name": "punk rock",
+                "id": "bd7e1d40-43b1-4ba5-97b3-05b891466962",
+                "disambiguation": "",
+                "count": 1
+              },
+              {
+                "id": "0e3fc579-2d24-4f20-9dae-736e1ec78798",
+                "name": "rock",
+                "count": 3,
+                "disambiguation": ""
+              }
+            ]
+          },
+          "title": "A Few Good Men",
+          "id": "d349dd41-74ec-363f-af3d-ac377a914d76",
+          "artist-credit": [
+            {
+              "joinphrase": "",
+              "artist": {
+                "sort-name": "Dropkick Murphys",
+                "aliases": [
+                  {
+                    "ended": false,
+                    "sort-name": "Dropkick Murphies",
+                    "end": null,
+                    "locale": null,
+                    "type-id": null,
+                    "begin": null,
+                    "type": null,
+                    "name": "Dropkick Murphies",
+                    "primary": null
+                  },
+                  {
+                    "sort-name": "Dropkick Murphy's",
+                    "ended": false,
+                    "end": null,
+                    "locale": null,
+                    "type-id": null,
+                    "primary": null,
+                    "name": "Dropkick Murphy's",
+                    "begin": null,
+                    "type": null
+                  }
+                ],
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "disambiguation": "",
+                "id": "e8374874-4178-4869-b92e-fef6bf30dc04",
+                "name": "Dropkick Murphys",
+                "type": "Group",
+                "country": "US"
+              },
+              "name": "Dropkick Murphys"
+            }
+          ],
+          "number": "12"
+        },
+        {
+          "number": "13",
+          "length": 119653,
+          "recording": {
+            "tags": [
+              {
+                "name": "alternative & punk",
+                "count": 1
+              },
+              {
+                "count": 2,
+                "name": "alternative and punk"
+              },
+              {
+                "count": 1,
+                "name": "alternative/indie rock"
+              },
+              {
+                "name": "hardcore punk",
+                "count": 1
+              },
+              {
+                "count": 1,
+                "name": "oi!"
+              },
+              {
+                "name": "pop/rock",
+                "count": 2
+              },
+              {
+                "name": "punk",
+                "count": 4
+              },
+              {
+                "name": "punk revival",
+                "count": 1
+              },
+              {
+                "count": 1,
+                "name": "punk rock"
+              },
+              {
+                "name": "punk/new wave",
+                "count": 1
+              },
+              {
+                "count": 3,
+                "name": "rock"
+              },
+              {
+                "name": "skatepunk",
+                "count": 2
+              }
+            ],
+            "artist-credit": [
+              {
+                "name": "Dropkick Murphys",
+                "artist": {
+                  "sort-name": "Dropkick Murphys",
+                  "country": "US",
+                  "type": "Group",
+                  "name": "Dropkick Murphys",
+                  "id": "e8374874-4178-4869-b92e-fef6bf30dc04",
+                  "disambiguation": "",
+                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+                },
+                "joinphrase": ""
+              }
+            ],
+            "id": "741b136e-9ae1-4900-b0d2-207f454090b0",
+            "title": "Ramble and Roll",
+            "aliases": [],
+            "length": 119653,
+            "isrcs": [
+              "USHEL0306313"
+            ],
+            "disambiguation": "",
+            "genres": [
+              {
+                "count": 1,
+                "disambiguation": "",
+                "id": "055a6e4d-d929-42ac-ba7a-9d063b254ea5",
+                "name": "hardcore punk"
+              },
+              {
+                "count": 4,
+                "disambiguation": "",
+                "id": "8cc9b280-230b-4a3a-b1e2-8acab0744dd3",
+                "name": "punk"
+              },
+              {
+                "name": "punk rock",
+                "id": "bd7e1d40-43b1-4ba5-97b3-05b891466962",
+                "disambiguation": "",
+                "count": 1
+              },
+              {
+                "disambiguation": "",
+                "count": 3,
+                "name": "rock",
+                "id": "0e3fc579-2d24-4f20-9dae-736e1ec78798"
+              }
+            ],
+            "relations": [
+              {
+                "artist": {
+                  "disambiguation": "Boston hardcore producer/engineer",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "type": "Person",
+                  "name": "Jim Siegel",
+                  "country": "US",
+                  "id": "a1c734b2-0d24-42dc-b21d-9666b35f2120",
+                  "sort-name": "Siegel, Jim"
+                },
+                "end": null,
+                "attributes": [],
+                "begin": null,
+                "type": "engineer",
+                "target-type": "artist",
+                "target-credit": "",
+                "source-credit": "",
+                "attribute-values": {},
+                "direction": "backward",
+                "ended": false,
+                "attribute-ids": {},
+                "type-id": "5dcc52af-7064-4051-8d62-7d80f4c3c907"
+              },
+              {
+                "attribute-ids": {
+                  "piano": "b3eac5f9-7859-4416-ac39-7154e2e8d348"
+                },
+                "attribute-credits": {},
+                "type-id": "59054b12-01ac-43ee-a618-285fd397e461",
+                "target-type": "artist",
+                "target-credit": "",
+                "direction": "backward",
+                "ended": false,
+                "attribute-values": {},
+                "source-credit": "",
+                "type": "instrument",
+                "begin": null,
+                "artist": {
+                  "sort-name": "Brines, Zack",
+                  "disambiguation": "",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "country": null,
+                  "name": "Zack Brines",
+                  "type": "Person",
+                  "id": "15fa2e05-76a6-4980-b8e2-96845f60db08"
+                },
+                "attributes": [
+                  "piano"
+                ],
+                "end": null
+              },
+              {
+                "begin": null,
+                "type": "mix",
+                "attributes": [],
+                "end": null,
+                "artist": {
+                  "id": "a1c734b2-0d24-42dc-b21d-9666b35f2120",
+                  "name": "Jim Siegel",
+                  "type": "Person",
+                  "country": "US",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "disambiguation": "Boston hardcore producer/engineer",
+                  "sort-name": "Siegel, Jim"
+                },
+                "type-id": "3e3102e1-1896-4f50-b5b2-dd9824e46efe",
+                "attribute-ids": {},
+                "attribute-values": {},
+                "ended": false,
+                "direction": "backward",
+                "source-credit": "",
+                "target-credit": "",
+                "target-type": "artist"
+              },
+              {
+                "attributes": [],
+                "end": null,
+                "artist": {
+                  "disambiguation": "",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "name": "Ken Casey",
+                  "type": "Person",
+                  "country": "US",
+                  "id": "622083a6-a011-4354-af39-5fdbbfccd585",
+                  "sort-name": "Casey, Ken"
+                },
+                "begin": null,
+                "type": "producer",
+                "ended": false,
+                "direction": "backward",
+                "attribute-values": {},
+                "source-credit": "",
+                "target-credit": "",
+                "target-type": "artist",
+                "type-id": "5c0ceac3-feb4-41f0-868d-dc06f6e27fc0",
+                "attribute-ids": {}
+              },
+              {
+                "target-type": "place",
+                "target-credit": "",
+                "source-credit": "",
+                "direction": "backward",
+                "ended": false,
+                "attribute-values": {},
+                "attribute-ids": {},
+                "type-id": "ad462279-14b0-4180-9b58-571d0eef7c51",
+                "end": null,
+                "attributes": [],
+                "place": {
+                  "name": "The Outpost",
+                  "type": "Studio",
+                  "id": "736e3a49-8fc4-4e47-ad89-1301932545a3",
+                  "coordinates": null,
+                  "address": "",
+                  "area": {
+                    "type-id": "6fd8f29a-3d0a-32fc-980d-ea697b69da78",
+                    "sort-name": "Stoughton",
+                    "disambiguation": "",
+                    "id": "584ed680-a1df-4af8-a10f-62e1bcf2e96b",
+                    "name": "Stoughton",
+                    "type": "City"
+                  },
+                  "disambiguation": "Stoughton, Massachusetts",
+                  "type-id": "05fa6a09-ff92-3d34-bdbb-5141d3c24f38"
+                },
+                "type": "recorded at",
+                "begin": null
+              },
+              {
+                "type-id": "a3005666-a872-32c3-ad06-98af558e99b0",
+                "attribute-ids": {},
+                "ended": false,
+                "attribute-values": {},
+                "direction": "forward",
+                "source-credit": "",
+                "target-credit": "",
+                "target-type": "work",
+                "work": {
+                  "attributes": [],
+                  "language": null,
+                  "type": "Song",
+                  "title": "Ramble and Roll",
+                  "id": "44ea7d95-7ca4-47b7-ac61-ec604ef24cc0",
+                  "disambiguation": "",
+                  "type-id": "f061270a-2fd6-32f1-a641-f0f8676d14e6",
+                  "iswcs": [],
+                  "languages": []
+                },
+                "type": "performance",
+                "begin": null,
+                "attributes": [],
+                "end": null
+              }
+            ],
+            "video": false
+          },
+          "position": 13,
+          "artist-credit": [
+            {
+              "artist": {
+                "sort-name": "Dropkick Murphys",
+                "name": "Dropkick Murphys",
+                "type": "Group",
+                "country": "US",
+                "id": "e8374874-4178-4869-b92e-fef6bf30dc04",
+                "disambiguation": "",
+                "aliases": [
+                  {
+                    "ended": false,
+                    "sort-name": "Dropkick Murphies",
+                    "end": null,
+                    "locale": null,
+                    "type-id": null,
+                    "type": null,
+                    "begin": null,
+                    "name": "Dropkick Murphies",
+                    "primary": null
+                  },
+                  {
+                    "end": null,
+                    "ended": false,
+                    "sort-name": "Dropkick Murphy's",
+                    "locale": null,
+                    "type-id": null,
+                    "begin": null,
+                    "type": null,
+                    "name": "Dropkick Murphy's",
+                    "primary": null
+                  }
+                ],
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+              },
+              "joinphrase": "",
+              "name": "Dropkick Murphys"
+            }
+          ],
+          "id": "b7951a9f-372d-34d1-9a5e-b68f48e6a728",
+          "title": "Ramble and Roll"
+        },
+        {
+          "number": "14",
+          "title": "Caps and Bottles",
+          "artist-credit": [
+            {
+              "artist": {
+                "sort-name": "Dropkick Murphys",
+                "aliases": [
+                  {
+                    "type": null,
+                    "begin": null,
+                    "name": "Dropkick Murphies",
+                    "primary": null,
+                    "type-id": null,
+                    "locale": null,
+                    "ended": false,
+                    "sort-name": "Dropkick Murphies",
+                    "end": null
+                  },
+                  {
+                    "type-id": null,
+                    "primary": null,
+                    "begin": null,
+                    "type": null,
+                    "name": "Dropkick Murphy's",
+                    "sort-name": "Dropkick Murphy's",
+                    "ended": false,
+                    "end": null,
+                    "locale": null
+                  }
+                ],
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "disambiguation": "",
+                "id": "e8374874-4178-4869-b92e-fef6bf30dc04",
+                "name": "Dropkick Murphys",
+                "type": "Group",
+                "country": "US"
+              },
+              "joinphrase": "",
+              "name": "Dropkick Murphys"
+            }
+          ],
+          "id": "9ea4e8fc-db73-3aba-9a9e-bcd5959574ae",
+          "position": 14,
+          "length": 161453,
+          "recording": {
+            "title": "Caps and Bottles",
+            "tags": [
+              {
+                "name": "alternative and punk",
+                "count": 1
+              },
+              {
+                "count": 3,
+                "name": "alternative/indie rock"
+              },
+              {
+                "count": 1,
+                "name": "celtic rock"
+              },
+              {
+                "count": 2,
+                "name": "oi"
+              },
+              {
+                "name": "pop/rock",
+                "count": 2
+              },
+              {
+                "name": "punk",
+                "count": 4
+              },
+              {
+                "count": 2,
+                "name": "punk revival"
+              },
+              {
+                "name": "punk rock",
+                "count": 3
+              },
+              {
+                "name": "rock",
+                "count": 3
+              }
+            ],
+            "artist-credit": [
+              {
+                "joinphrase": "",
+                "artist": {
+                  "id": "e8374874-4178-4869-b92e-fef6bf30dc04",
+                  "country": "US",
+                  "name": "Dropkick Murphys",
+                  "type": "Group",
+                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                  "disambiguation": "",
+                  "sort-name": "Dropkick Murphys"
+                },
+                "name": "Dropkick Murphys"
+              }
+            ],
+            "id": "d7b132bf-1911-4f14-baac-8b1342343a59",
+            "disambiguation": "",
+            "isrcs": [
+              "USHEL0306314"
+            ],
+            "aliases": [],
+            "length": 161453,
+            "genres": [
+              {
+                "disambiguation": "",
+                "count": 1,
+                "name": "celtic rock",
+                "id": "4ca72caf-956f-4b36-bab2-cf5d9a7b6549"
+              },
+              {
+                "count": 2,
+                "disambiguation": "",
+                "id": "221ff39c-4521-49e3-ab52-e4dde85efd1e",
+                "name": "oi"
+              },
+              {
+                "disambiguation": "",
+                "count": 4,
+                "name": "punk",
+                "id": "8cc9b280-230b-4a3a-b1e2-8acab0744dd3"
+              },
+              {
+                "count": 3,
+                "disambiguation": "",
+                "id": "bd7e1d40-43b1-4ba5-97b3-05b891466962",
+                "name": "punk rock"
+              },
+              {
+                "name": "rock",
+                "id": "0e3fc579-2d24-4f20-9dae-736e1ec78798",
+                "disambiguation": "",
+                "count": 3
+              }
+            ],
+            "video": false,
+            "relations": [
+              {
+                "attribute-ids": {},
+                "type-id": "5dcc52af-7064-4051-8d62-7d80f4c3c907",
+                "target-type": "artist",
+                "direction": "backward",
+                "ended": false,
+                "attribute-values": {},
+                "source-credit": "",
+                "target-credit": "",
+                "type": "engineer",
+                "begin": null,
+                "artist": {
+                  "disambiguation": "Boston hardcore producer/engineer",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "name": "Jim Siegel",
+                  "type": "Person",
+                  "country": "US",
+                  "id": "a1c734b2-0d24-42dc-b21d-9666b35f2120",
+                  "sort-name": "Siegel, Jim"
+                },
+                "attributes": [],
+                "end": null
+              },
+              {
+                "type": "mix",
+                "begin": null,
+                "end": null,
+                "attributes": [],
+                "artist": {
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "disambiguation": "Boston hardcore producer/engineer",
+                  "id": "a1c734b2-0d24-42dc-b21d-9666b35f2120",
+                  "name": "Jim Siegel",
+                  "type": "Person",
+                  "country": "US",
+                  "sort-name": "Siegel, Jim"
+                },
+                "type-id": "3e3102e1-1896-4f50-b5b2-dd9824e46efe",
+                "attribute-ids": {},
+                "target-credit": "",
+                "source-credit": "",
+                "direction": "backward",
+                "ended": false,
+                "attribute-values": {},
+                "target-type": "artist"
+              },
+              {
+                "target-type": "artist",
+                "source-credit": "",
+                "ended": false,
+                "attribute-values": {},
+                "direction": "backward",
+                "target-credit": "",
+                "attribute-ids": {},
+                "type-id": "5c0ceac3-feb4-41f0-868d-dc06f6e27fc0",
+                "artist": {
+                  "sort-name": "Casey, Ken",
+                  "id": "622083a6-a011-4354-af39-5fdbbfccd585",
+                  "country": "US",
+                  "name": "Ken Casey",
+                  "type": "Person",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "disambiguation": ""
+                },
+                "end": null,
+                "attributes": [],
+                "type": "producer",
+                "begin": null
+              },
+              {
+                "end": null,
+                "place": {
+                  "type-id": "05fa6a09-ff92-3d34-bdbb-5141d3c24f38",
+                  "area": {
+                    "sort-name": "Stoughton",
+                    "type-id": "6fd8f29a-3d0a-32fc-980d-ea697b69da78",
+                    "disambiguation": "",
+                    "id": "584ed680-a1df-4af8-a10f-62e1bcf2e96b",
+                    "type": "City",
+                    "name": "Stoughton"
+                  },
+                  "disambiguation": "Stoughton, Massachusetts",
+                  "coordinates": null,
+                  "address": "",
+                  "id": "736e3a49-8fc4-4e47-ad89-1301932545a3",
+                  "type": "Studio",
+                  "name": "The Outpost"
+                },
+                "attributes": [],
+                "type": "recorded at",
+                "begin": null,
+                "target-credit": "",
+                "source-credit": "",
+                "direction": "backward",
+                "ended": false,
+                "attribute-values": {},
+                "target-type": "place",
+                "type-id": "ad462279-14b0-4180-9b58-571d0eef7c51",
+                "attribute-ids": {}
+              },
+              {
+                "attribute-ids": {},
+                "type-id": "a3005666-a872-32c3-ad06-98af558e99b0",
+                "target-type": "work",
+                "target-credit": "",
+                "ended": false,
+                "attribute-values": {},
+                "direction": "forward",
+                "source-credit": "",
+                "type": "performance",
+                "begin": null,
+                "work": {
+                  "attributes": [],
+                  "language": null,
+                  "title": "Caps and Bottles",
+                  "type": "Song",
+                  "id": "718de0f2-c05c-4b80-9d08-5f9c49ee3f99",
+                  "disambiguation": "",
+                  "iswcs": [],
+                  "type-id": "f061270a-2fd6-32f1-a641-f0f8676d14e6",
+                  "languages": []
+                },
+                "attributes": [],
+                "end": null
+              }
+            ]
+          }
+        },
+        {
+          "length": 205613,
+          "recording": {
+            "length": 205613,
+            "aliases": [],
+            "isrcs": [
+              "USHEL0306315"
+            ],
+            "disambiguation": "",
+            "tags": [
+              {
+                "name": "alternative & punk",
+                "count": 1
+              },
+              {
+                "name": "alternative/indie rock",
+                "count": 2
+              },
+              {
+                "count": 1,
+                "name": "celtic"
+              },
+              {
+                "name": "folk",
+                "count": 1
+              },
+              {
+                "count": 1,
+                "name": "hardcore punk"
+              },
+              {
+                "name": "oi!",
+                "count": 1
+              },
+              {
+                "count": 2,
+                "name": "pop/rock"
+              },
+              {
+                "name": "punk",
+                "count": 4
+              },
+              {
+                "count": 1,
+                "name": "punk revival"
+              },
+              {
+                "count": 1,
+                "name": "punk rock"
+              },
+              {
+                "name": "punk/new wave",
+                "count": 1
+              },
+              {
+                "name": "rock",
+                "count": 3
+              },
+              {
+                "count": 2,
+                "name": "skatepunk"
+              }
+            ],
+            "artist-credit": [
+              {
+                "name": "Dropkick Murphys",
+                "joinphrase": "",
+                "artist": {
+                  "sort-name": "Dropkick Murphys",
+                  "disambiguation": "",
+                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                  "type": "Group",
+                  "name": "Dropkick Murphys",
+                  "country": "US",
+                  "id": "e8374874-4178-4869-b92e-fef6bf30dc04"
+                }
+              }
+            ],
+            "id": "b4dd6e0a-7834-48cd-8c61-64aba7518975",
+            "title": "The Wild Rover",
+            "relations": [
+              {
+                "target-type": "artist",
+                "target-credit": "",
+                "ended": false,
+                "attribute-values": {},
+                "direction": "backward",
+                "source-credit": "",
+                "attribute-ids": {},
+                "type-id": "5dcc52af-7064-4051-8d62-7d80f4c3c907",
+                "artist": {
+                  "sort-name": "Siegel, Jim",
+                  "disambiguation": "Boston hardcore producer/engineer",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "name": "Jim Siegel",
+                  "type": "Person",
+                  "country": "US",
+                  "id": "a1c734b2-0d24-42dc-b21d-9666b35f2120"
+                },
+                "attributes": [],
+                "end": null,
+                "begin": null,
+                "type": "engineer"
+              },
+              {
+                "attributes": [],
+                "end": null,
+                "artist": {
+                  "sort-name": "Siegel, Jim",
+                  "country": "US",
+                  "name": "Jim Siegel",
+                  "type": "Person",
+                  "id": "a1c734b2-0d24-42dc-b21d-9666b35f2120",
+                  "disambiguation": "Boston hardcore producer/engineer",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df"
+                },
+                "begin": null,
+                "type": "mix",
+                "target-credit": "",
+                "ended": false,
+                "direction": "backward",
+                "attribute-values": {},
+                "source-credit": "",
+                "target-type": "artist",
+                "type-id": "3e3102e1-1896-4f50-b5b2-dd9824e46efe",
+                "attribute-ids": {}
+              },
+              {
+                "target-type": "artist",
+                "target-credit": "",
+                "source-credit": "",
+                "attribute-values": {},
+                "ended": false,
+                "direction": "backward",
+                "attribute-ids": {},
+                "type-id": "5c0ceac3-feb4-41f0-868d-dc06f6e27fc0",
+                "artist": {
+                  "sort-name": "Casey, Ken",
+                  "disambiguation": "",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "name": "Ken Casey",
+                  "type": "Person",
+                  "country": "US",
+                  "id": "622083a6-a011-4354-af39-5fdbbfccd585"
+                },
+                "end": null,
+                "attributes": [],
+                "type": "producer",
+                "begin": null
+              },
+              {
+                "target-type": "place",
+                "direction": "backward",
+                "ended": false,
+                "attribute-values": {},
+                "source-credit": "",
+                "target-credit": "",
+                "attribute-ids": {},
+                "type-id": "ad462279-14b0-4180-9b58-571d0eef7c51",
+                "place": {
+                  "type-id": "05fa6a09-ff92-3d34-bdbb-5141d3c24f38",
+                  "disambiguation": "Stoughton, Massachusetts",
+                  "area": {
+                    "id": "584ed680-a1df-4af8-a10f-62e1bcf2e96b",
+                    "type": "City",
+                    "name": "Stoughton",
+                    "sort-name": "Stoughton",
+                    "type-id": "6fd8f29a-3d0a-32fc-980d-ea697b69da78",
+                    "disambiguation": ""
+                  },
+                  "coordinates": null,
+                  "address": "",
+                  "id": "736e3a49-8fc4-4e47-ad89-1301932545a3",
+                  "name": "The Outpost",
+                  "type": "Studio"
+                },
+                "attributes": [],
+                "end": null,
+                "type": "recorded at",
+                "begin": null
+              },
+              {
+                "type-id": "a3005666-a872-32c3-ad06-98af558e99b0",
+                "attribute-ids": {},
+                "source-credit": "",
+                "ended": false,
+                "direction": "forward",
+                "attribute-values": {},
+                "target-credit": "",
+                "target-type": "work",
+                "work": {
+                  "languages": [
+                    "eng"
+                  ],
+                  "type-id": "f061270a-2fd6-32f1-a641-f0f8676d14e6",
+                  "iswcs": [
+                    "T-903.274.960-3"
+                  ],
+                  "disambiguation": "Dropkick Murphys' arrangement",
+                  "id": "3490e60f-e83d-47e3-a12a-9ff9c4dd8567",
+                  "type": "Song",
+                  "title": "The Wild Rover",
+                  "language": "eng",
+                  "attributes": []
+                },
+                "type": "performance",
+                "begin": null,
+                "end": null,
+                "attributes": []
+              }
+            ],
+            "video": false,
+            "genres": [
+              {
+                "name": "celtic",
+                "id": "34edc6ac-d431-4b36-be15-ecd17533e5e2",
+                "disambiguation": "",
+                "count": 1
+              },
+              {
+                "id": "a91eed3a-fdd0-494e-ade0-95ea4117f6eb",
+                "name": "folk",
+                "count": 1,
+                "disambiguation": ""
+              },
+              {
+                "count": 1,
+                "disambiguation": "",
+                "id": "055a6e4d-d929-42ac-ba7a-9d063b254ea5",
+                "name": "hardcore punk"
+              },
+              {
+                "count": 4,
+                "disambiguation": "",
+                "id": "8cc9b280-230b-4a3a-b1e2-8acab0744dd3",
+                "name": "punk"
+              },
+              {
+                "disambiguation": "",
+                "count": 1,
+                "name": "punk rock",
+                "id": "bd7e1d40-43b1-4ba5-97b3-05b891466962"
+              },
+              {
+                "id": "0e3fc579-2d24-4f20-9dae-736e1ec78798",
+                "name": "rock",
+                "count": 3,
+                "disambiguation": ""
+              }
+            ]
+          },
+          "position": 15,
+          "artist-credit": [
+            {
+              "joinphrase": "",
+              "artist": {
+                "sort-name": "Dropkick Murphys",
+                "id": "e8374874-4178-4869-b92e-fef6bf30dc04",
+                "name": "Dropkick Murphys",
+                "type": "Group",
+                "country": "US",
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "aliases": [
+                  {
+                    "locale": null,
+                    "end": null,
+                    "sort-name": "Dropkick Murphies",
+                    "ended": false,
+                    "primary": null,
+                    "name": "Dropkick Murphies",
+                    "begin": null,
+                    "type": null,
+                    "type-id": null
+                  },
+                  {
+                    "end": null,
+                    "ended": false,
+                    "sort-name": "Dropkick Murphy's",
+                    "locale": null,
+                    "type-id": null,
+                    "begin": null,
+                    "type": null,
+                    "name": "Dropkick Murphy's",
+                    "primary": null
+                  }
+                ],
+                "disambiguation": ""
+              },
+              "name": "Dropkick Murphys"
+            }
+          ],
+          "id": "c3c94cc3-de40-3378-a4d3-9f2879749d2c",
+          "title": "The Wild Rover",
+          "number": "15"
+        },
+        {
+          "title": "The Spicy McHaggis Jig",
+          "id": "a107b7dd-6f9e-3acf-a170-79754ce5411a",
+          "artist-credit": [
+            {
+              "artist": {
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "aliases": [
+                  {
+                    "begin": null,
+                    "type": null,
+                    "name": "Dropkick Murphies",
+                    "primary": null,
+                    "type-id": null,
+                    "locale": null,
+                    "end": null,
+                    "ended": false,
+                    "sort-name": "Dropkick Murphies"
+                  },
+                  {
+                    "type-id": null,
+                    "name": "Dropkick Murphy's",
+                    "begin": null,
+                    "type": null,
+                    "primary": null,
+                    "ended": false,
+                    "sort-name": "Dropkick Murphy's",
+                    "end": null,
+                    "locale": null
+                  }
+                ],
+                "disambiguation": "",
+                "id": "e8374874-4178-4869-b92e-fef6bf30dc04",
+                "country": "US",
+                "type": "Group",
+                "name": "Dropkick Murphys",
+                "sort-name": "Dropkick Murphys"
+              },
+              "joinphrase": "",
+              "name": "Dropkick Murphys"
+            }
+          ],
+          "position": 16,
+          "length": 207093,
+          "recording": {
+            "video": false,
+            "relations": [
+              {
+                "target-credit": "",
+                "attribute-values": {},
+                "ended": false,
+                "direction": "backward",
+                "source-credit": "",
+                "target-type": "artist",
+                "type-id": "5dcc52af-7064-4051-8d62-7d80f4c3c907",
+                "attribute-ids": {},
+                "attributes": [],
+                "end": null,
+                "artist": {
+                  "name": "Jim Siegel",
+                  "type": "Person",
+                  "country": "US",
+                  "id": "a1c734b2-0d24-42dc-b21d-9666b35f2120",
+                  "disambiguation": "Boston hardcore producer/engineer",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "sort-name": "Siegel, Jim"
+                },
+                "begin": null,
+                "type": "engineer"
+              },
+              {
+                "type": "mix",
+                "begin": null,
+                "artist": {
+                  "id": "a1c734b2-0d24-42dc-b21d-9666b35f2120",
+                  "type": "Person",
+                  "name": "Jim Siegel",
+                  "country": "US",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "disambiguation": "Boston hardcore producer/engineer",
+                  "sort-name": "Siegel, Jim"
+                },
+                "end": null,
+                "attributes": [],
+                "attribute-ids": {},
+                "type-id": "3e3102e1-1896-4f50-b5b2-dd9824e46efe",
+                "target-type": "artist",
+                "target-credit": "",
+                "source-credit": "",
+                "attribute-values": {},
+                "direction": "backward",
+                "ended": false
+              },
+              {
+                "begin": null,
+                "type": "producer",
+                "artist": {
+                  "country": "US",
+                  "name": "Ken Casey",
+                  "type": "Person",
+                  "id": "622083a6-a011-4354-af39-5fdbbfccd585",
+                  "disambiguation": "",
+                  "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+                  "sort-name": "Casey, Ken"
+                },
+                "end": null,
+                "attributes": [],
+                "attribute-ids": {},
+                "type-id": "5c0ceac3-feb4-41f0-868d-dc06f6e27fc0",
+                "target-type": "artist",
+                "target-credit": "",
+                "source-credit": "",
+                "attribute-values": {},
+                "ended": false,
+                "direction": "backward"
+              },
+              {
+                "type": "recorded at",
+                "begin": null,
+                "end": null,
+                "attributes": [],
+                "place": {
+                  "disambiguation": "Stoughton, Massachusetts",
+                  "area": {
+                    "sort-name": "Stoughton",
+                    "type-id": "6fd8f29a-3d0a-32fc-980d-ea697b69da78",
+                    "disambiguation": "",
+                    "id": "584ed680-a1df-4af8-a10f-62e1bcf2e96b",
+                    "name": "Stoughton",
+                    "type": "City"
+                  },
+                  "address": "",
+                  "coordinates": null,
+                  "type-id": "05fa6a09-ff92-3d34-bdbb-5141d3c24f38",
+                  "type": "Studio",
+                  "name": "The Outpost",
+                  "id": "736e3a49-8fc4-4e47-ad89-1301932545a3"
+                },
+                "attribute-ids": {},
+                "type-id": "ad462279-14b0-4180-9b58-571d0eef7c51",
+                "target-type": "place",
+                "source-credit": "",
+                "ended": false,
+                "direction": "backward",
+                "attribute-values": {},
+                "target-credit": ""
+              },
+              {
+                "attribute-ids": {},
+                "type-id": "a3005666-a872-32c3-ad06-98af558e99b0",
+                "target-type": "work",
+                "target-credit": "",
+                "source-credit": "",
+                "ended": false,
+                "direction": "forward",
+                "attribute-values": {},
+                "begin": null,
+                "type": "performance",
+                "work": {
+                  "language": null,
+                  "attributes": [],
+                  "type-id": "f061270a-2fd6-32f1-a641-f0f8676d14e6",
+                  "iswcs": [
+                    "T-071.902.807-5"
+                  ],
+                  "languages": [],
+                  "disambiguation": "",
+                  "id": "17ac94f9-16b0-4ad1-9da3-fea03821bb3b",
+                  "title": "The Spicy McHaggis Jig",
+                  "type": "Song"
+                },
+                "end": null,
+                "attributes": []
+              }
+            ],
+            "genres": [
+              {
+                "count": 1,
+                "disambiguation": "",
+                "id": "34edc6ac-d431-4b36-be15-ecd17533e5e2",
+                "name": "celtic"
+              },
+              {
+                "name": "folk",
+                "id": "a91eed3a-fdd0-494e-ade0-95ea4117f6eb",
+                "disambiguation": "",
+                "count": 1
+              },
+              {
+                "disambiguation": "",
+                "count": 1,
+                "name": "hardcore punk",
+                "id": "055a6e4d-d929-42ac-ba7a-9d063b254ea5"
+              },
+              {
+                "name": "punk",
+                "id": "8cc9b280-230b-4a3a-b1e2-8acab0744dd3",
+                "disambiguation": "",
+                "count": 4
+              },
+              {
+                "disambiguation": "",
+                "count": 3,
+                "name": "rock",
+                "id": "0e3fc579-2d24-4f20-9dae-736e1ec78798"
+              }
+            ],
+            "disambiguation": "",
+            "aliases": [],
+            "length": 207093,
+            "isrcs": [
+              "USHEL0306316"
+            ],
+            "title": "The Spicy McHaggis Jig",
+            "tags": [
+              {
+                "count": 1,
+                "name": "alternative & punk"
+              },
+              {
+                "count": 1,
+                "name": "alternative and punk"
+              },
+              {
+                "count": 1,
+                "name": "alternative/indie rock"
+              },
+              {
+                "count": 1,
+                "name": "celtic"
+              },
+              {
+                "name": "folk",
+                "count": 1
+              },
+              {
+                "name": "hardcore punk",
+                "count": 1
+              },
+              {
+                "count": 1,
+                "name": "oi!"
+              },
+              {
+                "count": 2,
+                "name": "pop/rock"
+              },
+              {
+                "count": 4,
+                "name": "punk"
+              },
+              {
+                "name": "punk revival",
+                "count": 1
+              },
+              {
+                "name": "punk/new wave",
+                "count": 1
+              },
+              {
+                "name": "rock",
+                "count": 3
+              },
+              {
+                "count": 2,
+                "name": "skatepunk"
+              }
+            ],
+            "id": "f3beb6a9-242b-4159-9db2-7146534a8323",
+            "artist-credit": [
+              {
+                "joinphrase": "",
+                "artist": {
+                  "id": "e8374874-4178-4869-b92e-fef6bf30dc04",
+                  "type": "Group",
+                  "name": "Dropkick Murphys",
+                  "country": "US",
+                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                  "disambiguation": "",
+                  "sort-name": "Dropkick Murphys"
+                },
+                "name": "Dropkick Murphys"
+              }
+            ]
+          },
+          "number": "16"
+        }
+      ],
+      "track-offset": 0,
+      "title": "",
+      "discs": [
+        {
+          "offsets": [
+            165,
+            7149,
+            17263,
+            28409,
+            40188,
+            56034,
+            70203,
+            82883,
+            96674,
+            112598,
+            127414,
+            139702,
+            151438,
+            160412,
+            172521,
+            187942
+          ],
+          "offset-count": 16,
+          "sectors": 203474,
+          "id": "2L2eyor2eXHq7jM7.MRnYa1Fruw-"
+        }
+      ],
+      "id": "b7878760-e206-3b84-b50c-7c35c7ed88fd",
+      "format-id": null,
+      "track-count": 16
+    }
+  ],
+  "date": "2001-01-29",
+  "quality": "normal",
+  "release-events": [
+    {
+      "date": "2001-01-29",
+      "area": {
+        "disambiguation": "",
+        "type-id": null,
+        "type": null,
+        "name": "United Kingdom",
+        "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+        "sort-name": "United Kingdom",
+        "iso-3166-1-codes": [
+          "GB"
+        ]
+      }
+    }
+  ],
+  "label-info": [],
+  "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+  "country": "GB",
+  "aliases": [],
+  "id": "edc7a20b-3a84-4801-9c73-9418a9c75889",
+  "title": "Sing Loud, Sing Proud!",
+  "relations": [
+    {
+      "artist": {
+        "name": "Ken Casey",
+        "type": "Person",
+        "country": "US",
+        "id": "622083a6-a011-4354-af39-5fdbbfccd585",
+        "disambiguation": "",
+        "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+        "sort-name": "Casey, Ken"
+      },
+      "end": null,
+      "attributes": [],
+      "type": "producer",
+      "begin": null,
+      "target-type": "artist",
+      "target-credit": "",
+      "source-credit": "",
+      "direction": "backward",
+      "ended": false,
+      "attribute-values": {},
+      "attribute-ids": {},
+      "type-id": "8bf377ba-8d71-4ecc-97f2-7bb2d8a2a75f"
+    }
+  ],
+  "asin": null,
+  "text-representation": {
+    "language": "eng",
+    "script": "Latn"
+  },
+  "genres": [],
+  "packaging-id": null,
+  "tags": [],
+  "artist-credit": [
+    {
+      "joinphrase": "",
+      "artist": {
+        "id": "e8374874-4178-4869-b92e-fef6bf30dc04",
+        "tags": [
+          {
+            "name": "celtic punk",
+            "count": 13
+          },
+          {
+            "name": "folk punk",
+            "count": 7
+          },
+          {
+            "name": "folk rock",
+            "count": 1
+          },
+          {
+            "name": "hardcore punk",
+            "count": 2
+          },
+          {
+            "name": "oi!",
+            "count": 1
+          },
+          {
+            "count": 4,
+            "name": "punk"
+          },
+          {
+            "count": 4,
+            "name": "punk rock"
+          },
+          {
+            "count": 1,
+            "name": "street punk"
+          }
+        ],
+        "country": "US",
+        "name": "Dropkick Murphys",
+        "type": "Group",
+        "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+        "aliases": [
+          {
+            "primary": null,
+            "begin": null,
+            "type": null,
+            "name": "Dropkick Murphies",
+            "type-id": null,
+            "locale": null,
+            "sort-name": "Dropkick Murphies",
+            "ended": false,
+            "end": null
+          },
+          {
+            "type-id": null,
+            "primary": null,
+            "name": "Dropkick Murphy's",
+            "begin": null,
+            "type": null,
+            "sort-name": "Dropkick Murphy's",
+            "ended": false,
+            "end": null,
+            "locale": null
+          }
+        ],
+        "disambiguation": "",
+        "genres": [
+          {
+            "name": "celtic punk",
+            "id": "36c0f210-b6c1-4481-bc7c-33de031a4046",
+            "disambiguation": "",
+            "count": 13
+          },
+          {
+            "name": "folk punk",
+            "id": "6cec5b4d-3c64-44a6-914d-3e833432f631",
+            "disambiguation": "",
+            "count": 7
+          },
+          {
+            "count": 1,
+            "disambiguation": "",
+            "id": "445dc48f-5233-4b4f-987f-867ff9ade836",
+            "name": "folk rock"
+          },
+          {
+            "name": "hardcore punk",
+            "id": "055a6e4d-d929-42ac-ba7a-9d063b254ea5",
+            "disambiguation": "",
+            "count": 2
+          },
+          {
+            "count": 4,
+            "disambiguation": "",
+            "id": "8cc9b280-230b-4a3a-b1e2-8acab0744dd3",
+            "name": "punk"
+          },
+          {
+            "id": "bd7e1d40-43b1-4ba5-97b3-05b891466962",
+            "name": "punk rock",
+            "count": 4,
+            "disambiguation": ""
+          },
+          {
+            "name": "street punk",
+            "id": "c2ca3275-7e83-40cc-8f13-7ccae588144d",
+            "disambiguation": "",
+            "count": 1
+          }
+        ],
+        "sort-name": "Dropkick Murphys"
+      },
+      "name": "Dropkick Murphys"
+    }
+  ],
+  "status": "Official",
+  "cover-art-archive": {
+    "back": false,
+    "darkened": false,
+    "front": true,
+    "count": 1,
+    "artwork": true
+  },
+  "packaging": null,
+  "release-group": {
+    "first-release-date": "2001-01-23",
+    "secondary-types": [],
+    "title": "Sing Loud, Sing Proud!",
+    "secondary-type-ids": [],
+    "id": "7bb40d77-66fe-39d8-907b-2ada524047d4",
+    "disambiguation": "",
+    "aliases": [],
+    "genres": [
+      {
+        "disambiguation": "",
+        "count": 2,
+        "name": "hardcore punk",
+        "id": "055a6e4d-d929-42ac-ba7a-9d063b254ea5"
+      },
+      {
+        "disambiguation": "",
+        "count": 2,
+        "name": "oi",
+        "id": "221ff39c-4521-49e3-ab52-e4dde85efd1e"
+      },
+      {
+        "id": "8cc9b280-230b-4a3a-b1e2-8acab0744dd3",
+        "name": "punk",
+        "count": 5,
+        "disambiguation": ""
+      },
+      {
+        "disambiguation": "",
+        "count": 2,
+        "name": "punk rock",
+        "id": "bd7e1d40-43b1-4ba5-97b3-05b891466962"
+      },
+      {
+        "count": 3,
+        "disambiguation": "",
+        "id": "0e3fc579-2d24-4f20-9dae-736e1ec78798",
+        "name": "rock"
+      }
+    ],
+    "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+    "primary-type": "Album",
+    "tags": [
+      {
+        "count": 1,
+        "name": "alternative & punk"
+      },
+      {
+        "count": 3,
+        "name": "alternative and punk"
+      },
+      {
+        "name": "alternative/indie rock",
+        "count": 3
+      },
+      {
+        "count": 2,
+        "name": "hardcore punk"
+      },
+      {
+        "count": 2,
+        "name": "oi"
+      },
+      {
+        "name": "oi!",
+        "count": 1
+      },
+      {
+        "count": 2,
+        "name": "pop/rock"
+      },
+      {
+        "name": "punk",
+        "count": 5
+      },
+      {
+        "name": "punk revival",
+        "count": 1
+      },
+      {
+        "name": "punk rock",
+        "count": 2
+      },
+      {
+        "count": 1,
+        "name": "punk/new wave"
+      },
+      {
+        "count": 3,
+        "name": "rock"
+      },
+      {
+        "name": "skatepunk",
+        "count": 2
+      }
+    ],
+    "artist-credit": [
+      {
+        "artist": {
+          "aliases": [
+            {
+              "sort-name": "Dropkick Murphies",
+              "ended": false,
+              "end": null,
+              "locale": null,
+              "type-id": null,
+              "primary": null,
+              "begin": null,
+              "type": null,
+              "name": "Dropkick Murphies"
+            },
+            {
+              "end": null,
+              "sort-name": "Dropkick Murphy's",
+              "ended": false,
+              "locale": null,
+              "type-id": null,
+              "primary": null,
+              "type": null,
+              "begin": null,
+              "name": "Dropkick Murphy's"
+            }
+          ],
+          "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "disambiguation": "",
+          "id": "e8374874-4178-4869-b92e-fef6bf30dc04",
+          "name": "Dropkick Murphys",
+          "type": "Group",
+          "country": "US",
+          "sort-name": "Dropkick Murphys"
+        },
+        "joinphrase": "",
+        "name": "Dropkick Murphys"
+      }
+    ]
+  },
+  "disambiguation": "",
+  "annotation": "'''Catalogue #:''' 80430-2 ''Manufactured and Distributed by Epitaph''\r\n'''Catalogue #:''' 0430-2 ''Manufactured and Distributed by Epitaph Europe''\r\n----\r\nCurrent uncreatable relations:\r\n- Recorded at The Outpost, Stoughton, MA"
+}

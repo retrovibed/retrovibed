@@ -7,6 +7,7 @@ import (
 	"iter"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
@@ -18,6 +19,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
+	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"golang.org/x/text/language"
@@ -86,6 +88,8 @@ func (t *mbimport) releases(ctx context.Context, c *gomusicbrainz.WS2Client, l *
 						language.Und,
 					)
 
+					credit := slicesx.FirstOrZero(rel.ArtistCredit.NameCredits...)
+
 					// We use the RG ID so that all versions of this album collapse into one record.
 					id := uuid.FromStringOrNil(string(rel.ReleaseGroup.ID))
 
@@ -98,7 +102,7 @@ func (t *mbimport) releases(ctx context.Context, c *gomusicbrainz.WS2Client, l *
 						Md5Lower:         binary.LittleEndian.Uint64(uuidx.LowN(uidmd5, 64)),
 						ID:               id.String(),
 						OriginalTitle:    rel.ReleaseGroup.Title,
-						Title:            rel.ReleaseGroup.Title,
+						Title:            strings.TrimSpace(fmt.Sprintf("%s %s", credit.Artist.Name, rel.ReleaseGroup.Title)),
 						Released:         rel.ReleaseGroup.FirstReleaseDate.Time,
 						PosterPath:       fmt.Sprintf("https://coverartarchive.org/release-group/%s/front-500", id),
 						OriginalLanguage: lang.String(),
