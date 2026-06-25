@@ -60,7 +60,7 @@ type mbJSONArtist struct {
 type mbjsonlimport struct {
 	Source      string        `flag:"" name:"source" help:"short id for the data source" hidden:"true" default:"musicbrainz"`
 	Output      cmdopts.IOOut `flag:"" name:"output" default:"-" help:"output destination; '-' for stdout"`
-	RecordLimit int           `flag:"" name:"limit" help:"maximum jsonl record size in bytes defaults to 16 MiB"`
+	RecordLimit int           `flag:"" name:"limit" help:"maximum jsonl record size in bytes defaults to 128 MiB" default:"134217728"`
 	cause       error
 }
 

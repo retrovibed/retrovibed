@@ -11,6 +11,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/asynccompute"
+	"github.com/retrovibed/retrovibed/shallows/internal/backoffx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
 	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
@@ -40,15 +41,17 @@ func (t knownimport) Run(gctx *cmdopts.Global) (err error) {
 func (t knownimport) run(ctx context.Context, db *sql.DB, r io.Reader) (err error) {
 	type batch []library.Known
 	inserts := asynccompute.New(func(ctx context.Context, chunk batch) (err error) {
-		ts := time.Now()
-		s := library.NewKnownBatchInsertWithDefaults(ctx, db, chunk...)
+		return backoffx.Attempt(ctx, backoffx.Exponential(200*time.Millisecond), func(ctx context.Context) error {
+			ts := time.Now()
+			s := library.NewKnownBatchInsertWithDefaults(ctx, db, chunk...)
 
-		if err := sqlx.Discard(sqlx.Scan(s)); err != nil {
-			return errorsx.Wrap(err, "failed to insert batch")
-		}
+			if err := sqlx.Discard(sqlx.Scan(s)); err != nil {
+				return errorsx.Wrap(err, "failed to insert batch")
+			}
 
-		log.Println("imported", time.Since(ts), len(chunk), "records")
-		return nil
+			log.Println("imported", time.Since(ts), len(chunk), "records")
+			return nil
+		})
 	}, asynccompute.Backlog[batch](t.Backlog), asynccompute.Workers[batch](t.Workers))
 
 	d := jsonl.Iter[library.Known](jsonl.NewDecoder(r))
