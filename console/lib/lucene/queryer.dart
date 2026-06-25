@@ -1,111 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:retrovibed/designkit.dart' as ds;
-import './field.dart';
-import './suggestion.list.dart';
+import 'field.dart';
+import 'suggestion.list.dart';
 import 'parser.results.dart';
-import './parser.states.dart';
-
-class SuggestionKeyScope extends InheritedWidget {
-  final GlobalKey<SuggestionListState> suggestionKey;
-
-  const SuggestionKeyScope({required this.suggestionKey, required super.child});
-
-  static GlobalKey<SuggestionListState>? of(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<SuggestionKeyScope>()?.suggestionKey;
-
-  @override
-  bool updateShouldNotify(SuggestionKeyScope old) => old.suggestionKey != suggestionKey;
-}
-
-class FilterChip extends StatefulWidget {
-  final ParserResult filter;
-  final void Function(ParserResult, void Function(ParserResult), VoidCallback) onEdit;
-  final VoidCallback onRemove;
-
-  const FilterChip({
-    super.key,
-    required this.filter,
-    required this.onEdit,
-    required this.onRemove,
-  });
-
-  @override
-  State<FilterChip> createState() => FilterChipState();
-}
-
-class FilterChipState extends State<FilterChip> {
-  bool _open = false;
-
-  void _toggle() {
-    if (_open) {
-      setState(() => _open = false);
-      widget.onEdit(ParserResult.close, (_) {}, () {});
-    } else {
-      setState(() => _open = true);
-      widget.onEdit(widget.filter, (_) {}, accept);
-    }
-  }
-
-  void accept() {
-    if (!_open) return;
-    setState(() => _open = false);
-    widget.onEdit(ParserResult.close, (_) {}, () {});
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final chipTheme = theme.chipTheme;
-    final bgColor =
-        _open
-            ? (chipTheme.selectedColor ?? theme.colorScheme.secondaryContainer)
-            : (chipTheme.backgroundColor ?? theme.colorScheme.surfaceContainerLow);
-
-    return CallbackShortcuts(
-      bindings: {
-        const SingleActivator(LogicalKeyboardKey.backspace): widget.onRemove,
-        const SingleActivator(LogicalKeyboardKey.delete): widget.onRemove,
-      },
-      child: Tooltip(
-        message: _open ? 'Press Enter to accept' : '',
-        child: InkWell(
-          mouseCursor: SystemMouseCursors.click,
-          onTap: _toggle,
-          borderRadius: BorderRadius.circular(8),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: bgColor,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                widget.filter,
-                const SizedBox(width: 4),
-                GestureDetector(
-                  onTap: _open ? accept : widget.onRemove,
-                  child: Tooltip(
-                    message: _open ? 'Accept' : 'Remove',
-                    child: Icon(_open ? Icons.check : Icons.close, size: 18),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
+import 'parser.states.dart';
+import 'queryer.filter.dart';
+import 'queryer.mode.dart';
 
 class Queryer extends StatefulWidget {
   static const Widget zerobox = SizedBox();
+  static const defaultdecoration = InputDecoration(
+    hintText: 'Search… (@ for filters)',
+    isDense: true,
+    contentPadding: const EdgeInsets.symmetric(
+      horizontal: 8,
+      vertical: 12,
+    ),
+  );
 
   final void Function(String) onQuery;
   final List<Field> fields;
-  final InputDecoration? decoration;
+  final InputDecoration decoration;
   final bool autofocus;
   final bool disabled;
   final TextEditingController? controller;
@@ -118,7 +34,7 @@ class Queryer extends StatefulWidget {
     this.onQuery,
     this.fields, {
     super.key,
-    this.decoration,
+    this.decoration = defaultdecoration,
     this.autofocus = false,
     this.disabled = false,
     this.controller,
@@ -135,19 +51,20 @@ class Queryer extends StatefulWidget {
 class _QueryerState extends State<Queryer> {
   late TextEditingController _ctrl;
   final GlobalKey<SuggestionListState> _suggestionKey = GlobalKey();
+  ParserResult _mode = ParserResult.close;
   List<ParserResult> _filters = [];
   Widget? _updating;
   bool _editing = false;
-  Parser _parser = Parser([], (ctx, range, content, {completed}) {});
+  Parser _parser = Parser([], (ctx, range, content, {completed}) {}, GlobalKey());
 
-  void _resetParser() => _parser = Parser(widget.fields, _replace);
+  void _resetParser() => _parser = Parser(widget.fields, _replace, _suggestionKey);
 
   @override
   void initState() {
     super.initState();
     _ctrl = widget.controller ?? TextEditingController();
-    _resetParser();
     _ctrl.addListener(_onText);
+    _resetParser();
   }
 
   @override
@@ -167,10 +84,14 @@ class _QueryerState extends State<Queryer> {
     try {
       _editing = true;
       setState(() {
-        if (completed != null) {
+        if (completed == null) return;
+        if (completed.type() == ParserResultType.Mode) {
+          _mode = completed;
           completed.apply(_parser);
-          _filters.add(completed);
+          return;
         }
+        completed.apply(_parser);
+        _filters.add(completed);
       });
 
       ds.postframe(() {
@@ -185,7 +106,7 @@ class _QueryerState extends State<Queryer> {
   }
 
   void _onText() {
-    if (_ctrl.text.isEmpty && _filters.isEmpty) {
+    if (_ctrl.text.isEmpty && _filters.isEmpty && _mode == ParserResult.close) {
       return setState(_resetParser);
     }
 
@@ -209,20 +130,19 @@ class _QueryerState extends State<Queryer> {
         onChanged(upd);
       });
       final focusNode = FocusNode();
-      _updating =
-          _w == null
-              ? null
-              : Focus(
-                focusNode: focusNode,
-                onKeyEvent: (node, event) {
-                  if (event.logicalKey != LogicalKeyboardKey.enter) return KeyEventResult.ignored;
-                  if (event is! KeyDownEvent) return KeyEventResult.ignored;
+      _updating = _w == null
+          ? null
+          : Focus(
+              focusNode: focusNode,
+              onKeyEvent: (node, event) {
+                if (event.logicalKey != LogicalKeyboardKey.enter) return KeyEventResult.ignored;
+                if (event is! KeyDownEvent) return KeyEventResult.ignored;
 
-                  closeChip();
-                  return KeyEventResult.handled;
-                },
-                child: _w,
-              );
+                closeChip();
+                return KeyEventResult.handled;
+              },
+              child: _w,
+            );
       if (_w != null) focusNode.requestFocus();
     });
   }
@@ -243,14 +163,13 @@ class _QueryerState extends State<Queryer> {
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
-    final chips =
-        _filters.map((e) {
-          return FilterChip(
-            filter: e,
-            onEdit: (filter, onChanged, closeChip) => _editFilter(filter, onChanged, closeChip),
-            onRemove: () => _removeFilter(e),
-          );
-        }).toList();
+    final chips = _filters.map((e) {
+      return QueryerFilterChip(
+        filter: e,
+        onEdit: (filter, onChanged, closeChip) => _editFilter(filter, onChanged, closeChip),
+        onRemove: () => _removeFilter(e),
+      );
+    }).toList();
 
     return ds.Shortcuts(
       enabled: defaults.desktop,
@@ -291,10 +210,25 @@ class _QueryerState extends State<Queryer> {
             return KeyEventResult.ignored;
           },
         ),
+        const SingleActivator(LogicalKeyboardKey.backspace): (
+          const Text('remove search mode'),
+          () {
+            if (_ctrl.text.isNotEmpty) return KeyEventResult.ignored;
+            if (_mode == ParserResult.close) return KeyEventResult.ignored;
+            final current = _mode;
+            setState(() => _mode = ParserResult.close);
+            // Reset field to its default value and restore it in the parser's field list.
+            current.reset(_parser);
+            widget.onQuery(_ctrl.text);
+
+            return KeyEventResult.handled;
+          },
+        ),
       },
       Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: defaults.spacing / 2,
         children: [
           ds.CompactingMenu(
             ds.Help(
@@ -303,17 +237,7 @@ class _QueryerState extends State<Queryer> {
                 enabled: !widget.disabled,
                 autofocus: widget.autofocus,
                 focusNode: widget.focusNode,
-                decoration: (widget.decoration ??
-                        const InputDecoration(
-                          hintText: 'Search… (@ for filters)',
-                        ))
-                    .copyWith(
-                      isDense: true,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 12,
-                      ),
-                    ),
+                decoration: widget.decoration,
                 onSubmitted: (v) {
                   if (_partialParse()) return;
                   widget.onQuery(v);
@@ -323,20 +247,24 @@ class _QueryerState extends State<Queryer> {
               ),
               widget.help,
             ),
-            leading: widget.leading,
+            leading: [
+              ...widget.leading,
+              if (_mode != ParserResult.close) QueryerMode(mode: _mode),
+            ],
             trailing: widget.trailing,
           ),
-          TextFieldTapRegion(
-            child: Wrap(
-              spacing: defaults.spacing,
-              runSpacing: defaults.spacing / 2,
-              children: chips,
+          ds.Debug.blue(
+            TextFieldTapRegion(
+              child: _updating ?? _parser.current,
             ),
           ),
-          TextFieldTapRegion(
-            child: SuggestionKeyScope(
-              suggestionKey: _suggestionKey,
-              child: _updating ?? _parser.current,
+          ds.Debug.pink(
+            TextFieldTapRegion(
+              child: Wrap(
+                spacing: defaults.spacing,
+                runSpacing: defaults.spacing / 2,
+                children: chips,
+              ),
             ),
           ),
         ],

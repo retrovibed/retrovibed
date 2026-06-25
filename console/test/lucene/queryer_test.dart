@@ -21,7 +21,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.byType(lucene.FilterChip), findsNothing);
+      expect(find.byType(lucene.QueryerFilterChip), findsNothing);
       expect(tester.takeException(), isNull);
     });
   });
@@ -100,7 +100,7 @@ void main() {
       await tester.tap(find.text('hd'));
       await tester.pumpAndSettle();
 
-      expect(find.byType(lucene.FilterChip), findsOneWidget);
+      expect(find.byType(lucene.QueryerFilterChip), findsOneWidget);
     });
 
     testWidgets('tapping Boolean suggestion clears @ token from text field', (
@@ -130,12 +130,12 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('hd'));
       await tester.pumpAndSettle();
-      expect(find.byType(lucene.FilterChip), findsOneWidget);
+      expect(find.byType(lucene.QueryerFilterChip), findsOneWidget);
 
       await tester.tap(find.byIcon(Icons.close));
       await tester.pumpAndSettle();
 
-      expect(find.byType(lucene.FilterChip), findsNothing);
+      expect(find.byType(lucene.QueryerFilterChip), findsNothing);
     });
 
     testWidgets('deleted chip field reappears in suggestions', (tester) async {
@@ -149,12 +149,12 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('hd'));
       await tester.pumpAndSettle();
-      expect(find.byType(lucene.FilterChip), findsOneWidget);
+      expect(find.byType(lucene.QueryerFilterChip), findsOneWidget);
 
       // Delete the chip.
       await tester.tap(find.byIcon(Icons.close));
       await tester.pumpAndSettle();
-      expect(find.byType(lucene.FilterChip), findsNothing);
+      expect(find.byType(lucene.QueryerFilterChip), findsNothing);
 
       // Field should be available again in suggestions.
       await tester.enterText(find.byType(TextField), '@');
@@ -179,7 +179,7 @@ void main() {
         await tester.pumpAndSettle();
         await tester.sendKeyEvent(LogicalKeyboardKey.enter);
         await tester.pumpAndSettle();
-        expect(find.byType(lucene.FilterChip), findsOneWidget);
+        expect(find.byType(lucene.QueryerFilterChip), findsOneWidget);
 
         // Re-open suggestions — runtime must not appear.
         await tester.enterText(find.byType(TextField), '@');
@@ -220,6 +220,91 @@ void main() {
       // 'completed' is the only suggestion; 'hd' appears only in its chip.
       expect(find.text('completed'), findsOneWidget);
       expect(find.text('hd'), findsOneWidget); // chip label, not a suggestion
+    });
+  });
+
+  group('Queryer mode management', () {
+    testWidgets('backspace on empty field removes the active mode', (tester) async {
+      await tester.pumpApp(
+        lucene.Queryer((_) {}, [
+          lucene.Mode(lucene.Boolean('hd', false, false, (_) {})),
+        ]),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextField), '@');
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('hd'));
+      await tester.pumpAndSettle();
+      expect(find.byType(lucene.QueryerMode), findsOneWidget);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.backspace);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(lucene.QueryerMode), findsNothing);
+    });
+
+    testWidgets('backspace on non-empty field does not remove the active mode', (tester) async {
+      await tester.pumpApp(
+        lucene.Queryer((_) {}, [
+          lucene.Mode(lucene.Boolean('hd', false, false, (_) {})),
+        ]),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextField), '@');
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('hd'));
+      await tester.pumpAndSettle();
+      expect(find.byType(lucene.QueryerMode), findsOneWidget);
+
+      await tester.enterText(find.byType(TextField), 'batman');
+      await tester.pumpAndSettle();
+      await tester.sendKeyEvent(LogicalKeyboardKey.backspace);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(lucene.QueryerMode), findsOneWidget);
+    });
+
+    testWidgets('deleting the active mode invokes onQuery with the current text', (tester) async {
+      String? emitted;
+      await tester.pumpApp(
+        lucene.Queryer((q) => emitted = q, [
+          lucene.Mode(lucene.Boolean('hd', false, false, (_) {})),
+        ]),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextField), '@');
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('hd'));
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.backspace);
+      await tester.pumpAndSettle();
+
+      expect(emitted, '');
+    });
+
+    testWidgets('deleted mode field reappears in suggestions', (tester) async {
+      await tester.pumpApp(
+        lucene.Queryer((_) {}, [
+          lucene.Mode(lucene.Boolean('hd', false, false, (_) {})),
+        ]),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextField), '@');
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('hd'));
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.backspace);
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextField), '@');
+      await tester.pumpAndSettle();
+      expect(find.text('hd'), findsOneWidget);
     });
   });
 
@@ -433,7 +518,7 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.enter);
       await tester.pumpAndSettle();
 
-      expect(find.byType(lucene.FilterChip), findsOneWidget);
+      expect(find.byType(lucene.QueryerFilterChip), findsOneWidget);
       expect(captured, isTrue);
     });
 
@@ -455,7 +540,7 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.enter);
       await tester.pumpAndSettle();
 
-      expect(find.byType(lucene.FilterChip), findsOneWidget);
+      expect(find.byType(lucene.QueryerFilterChip), findsOneWidget);
       expect(captured, isTrue);
     });
 
@@ -521,7 +606,7 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.enter);
       await tester.pumpAndSettle();
 
-      expect(find.byType(lucene.FilterChip), findsOneWidget);
+      expect(find.byType(lucene.QueryerFilterChip), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
@@ -569,10 +654,10 @@ void main() {
       final ctrl = tester.widget<TextField>(find.byType(TextField)).controller!;
       ctrl.selection = const TextSelection.collapsed(offset: 0);
       await tester.pumpAndSettle();
-      expect(find.byType(lucene.FilterChip), findsOneWidget);
+      expect(find.byType(lucene.QueryerFilterChip), findsOneWidget);
 
       // Open the edit panel via chip press.
-      await tester.tap(find.byType(lucene.FilterChip));
+      await tester.tap(find.byType(lucene.QueryerFilterChip));
       await tester.pumpAndSettle();
       expect(find.byType(CalendarDatePicker), findsOneWidget);
 
@@ -600,10 +685,10 @@ void main() {
       final ctrl = tester.widget<TextField>(find.byType(TextField)).controller!;
       ctrl.selection = const TextSelection.collapsed(offset: 0);
       await tester.pumpAndSettle();
-      expect(find.byType(lucene.FilterChip), findsOneWidget);
+      expect(find.byType(lucene.QueryerFilterChip), findsOneWidget);
 
       // Open the edit panel via chip press.
-      await tester.tap(find.byType(lucene.FilterChip));
+      await tester.tap(find.byType(lucene.QueryerFilterChip));
       await tester.pumpAndSettle();
       expect(find.byType(CalendarDatePicker), findsOneWidget);
 
@@ -620,7 +705,7 @@ void main() {
         findsNothing,
         reason: 'edit panel must close after Enter accepts the date',
       );
-      expect(find.byType(lucene.FilterChip), findsOneWidget);
+      expect(find.byType(lucene.QueryerFilterChip), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
@@ -645,15 +730,15 @@ void main() {
       final ctrl = tester.widget<TextField>(find.byType(TextField)).controller!;
       ctrl.selection = const TextSelection.collapsed(offset: 0);
       await tester.pumpAndSettle();
-      expect(find.byType(lucene.FilterChip), findsOneWidget);
+      expect(find.byType(lucene.QueryerFilterChip), findsOneWidget);
 
       // Open the edit panel via chip press.
-      await tester.tap(find.byType(lucene.FilterChip));
+      await tester.tap(find.byType(lucene.QueryerFilterChip));
       await tester.pumpAndSettle();
       expect(find.byType(CalendarDatePicker), findsOneWidget);
 
       // Close the edit panel by pressing the chip again (toggle).
-      await tester.tap(find.byType(lucene.FilterChip));
+      await tester.tap(find.byType(lucene.QueryerFilterChip));
       await tester.pumpAndSettle();
       expect(find.byType(CalendarDatePicker), findsNothing);
 

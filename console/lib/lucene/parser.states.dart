@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import './field.dart';
 import './suggestion.list.dart';
-import './queryer.dart' show SuggestionKeyScope;
 import 'parser.results.dart';
 
 sealed class ParserState extends StatelessWidget {
@@ -22,11 +21,13 @@ class Context {
   })
   replacement;
   final List<Field<dynamic>> fields;
+  final GlobalKey<SuggestionListState> suggestionKey;
   const Context(
     this.fields,
     this.offset,
     this.partial,
-    this.replacement, {
+    this.replacement,
+    this.suggestionKey, {
     this.lastOffset = 0,
   });
 
@@ -47,6 +48,7 @@ class Query extends ParserState {
         ctx.offset,
         '',
         ctx.replacement,
+        ctx.suggestionKey,
         lastOffset: resetTo,
       );
       return (Query(next), next.remaining(ctrl));
@@ -64,6 +66,7 @@ class Query extends ParserState {
         ctx.offset,
         '',
         ctx.replacement,
+        ctx.suggestionKey,
         lastOffset: startPos,
       );
       return (Query(next), cursor - startPos);
@@ -78,6 +81,7 @@ class Query extends ParserState {
         ctx.lastOffset,
         '',
         ctx.replacement,
+        ctx.suggestionKey,
         lastOffset: nextLastOffset,
       );
       return (Input(next), cursor - nextLastOffset);
@@ -88,6 +92,7 @@ class Query extends ParserState {
       ctx.offset,
       ctx.partial + char,
       ctx.replacement,
+      ctx.suggestionKey,
       lastOffset: nextLastOffset,
     );
     return (Query(next), cursor - nextLastOffset);
@@ -110,6 +115,7 @@ class Input extends ParserState {
         ctx.offset,
         '',
         ctx.replacement,
+        ctx.suggestionKey,
         lastOffset: ctx.offset,
       );
       return (Query(next), next.remaining(ctrl));
@@ -127,18 +133,18 @@ class Input extends ParserState {
           ctx.offset,
           substring,
           ctx.replacement,
+          ctx.suggestionKey,
           lastOffset: nextLastOffset,
         );
         return (UnknownFieldError(next), cursor - nextLastOffset);
       }
 
       final defaultValue = field.autocomplete;
-      final upd =
-          ctx.fields
-              .map(
-                (f) => f.name == field.name ? field.withCurrent(defaultValue ?? field.defaultValue) : f,
-              )
-              .toList();
+      final upd = ctx.fields
+          .map(
+            (f) => f.name == field.name ? field.withCurrent(defaultValue ?? field.defaultValue) : f,
+          )
+          .toList();
 
       if (defaultValue != null) {
         final completed = field.of(defaultValue);
@@ -154,6 +160,7 @@ class Input extends ParserState {
           ctx.offset,
           '',
           ctx.replacement,
+          ctx.suggestionKey,
           lastOffset: nextLastOffset,
         );
         return (Query(next), 0);
@@ -164,6 +171,7 @@ class Input extends ParserState {
         ctx.offset,
         "@${substring}:",
         ctx.replacement,
+        ctx.suggestionKey,
         lastOffset: nextLastOffset,
       );
       return (Value(next, field), cursor - nextLastOffset);
@@ -174,6 +182,7 @@ class Input extends ParserState {
       ctx.offset,
       ctx.partial + char,
       ctx.replacement,
+      ctx.suggestionKey,
       lastOffset: nextLastOffset,
     );
     return (Input(next), cursor - nextLastOffset);
@@ -184,7 +193,7 @@ class Input extends ParserState {
     final matches = ctx.fields.where((f) => f.available && f.name.startsWith(ctx.partial)).toList();
     if (matches.isEmpty) return ds.Empty;
 
-    final key = SuggestionKeyScope.of(context);
+    final key = ctx.suggestionKey;
     return SuggestionList([
       for (final m in matches)
         (
@@ -215,6 +224,7 @@ class UnknownFieldError extends ParserState {
         -1,
         '',
         ctx.replacement,
+        ctx.suggestionKey,
         lastOffset: cursor,
       );
       return (Query(next), next.remaining(ctrl));
@@ -229,6 +239,7 @@ class UnknownFieldError extends ParserState {
         cursor - 1,
         '',
         ctx.replacement,
+        ctx.suggestionKey,
         lastOffset: cursor,
       );
       return (Query(next), next.remaining(ctrl));
@@ -247,6 +258,7 @@ class UnknownFieldError extends ParserState {
         ctx.offset,
         segment,
         ctx.replacement,
+        ctx.suggestionKey,
         lastOffset: cursor,
       );
       return (Input(next), next.remaining(ctrl));
@@ -260,6 +272,7 @@ class UnknownFieldError extends ParserState {
         ctx.offset,
         partial,
         ctx.replacement,
+        ctx.suggestionKey,
         lastOffset: cursor,
       );
       return (UnknownFieldError(next), next.remaining(ctrl));
@@ -270,6 +283,7 @@ class UnknownFieldError extends ParserState {
       ctx.offset,
       segment.substring(colonIdx + 1),
       ctx.replacement,
+      ctx.suggestionKey,
       lastOffset: cursor,
     );
     return (Value(next, field), next.remaining(ctrl));
@@ -298,6 +312,7 @@ class Value extends ParserState {
         -1,
         '',
         ctx.replacement,
+        ctx.suggestionKey,
         lastOffset: cursor < 0 ? 0 : cursor,
       );
       return (Query(next), next.remaining(ctrl));
@@ -317,6 +332,7 @@ class Value extends ParserState {
         ctx.offset,
         fieldPartial,
         ctx.replacement,
+        ctx.suggestionKey,
         lastOffset: cursor,
       );
       return (Input(next), next.remaining(ctrl));
@@ -327,6 +343,7 @@ class Value extends ParserState {
       ctx.offset,
       segment,
       ctx.replacement,
+      ctx.suggestionKey,
       lastOffset: cursor,
     );
     return (Value(next, field), next.remaining(ctrl));
@@ -357,7 +374,6 @@ class Value extends ParserState {
 
     if (!hasSuggestions && !hasRender) return ds.Empty;
 
-    final key = SuggestionKeyScope.of(context);
     if (!hasSuggestions) return renderWidget;
 
     final suggestionItems = [
@@ -370,6 +386,8 @@ class Value extends ParserState {
         ),
     ];
 
+    final key = ctx.suggestionKey;
+
     if (!hasRender) {
       return SuggestionList(suggestionItems, key: key);
     }
@@ -381,7 +399,10 @@ class Value extends ParserState {
       clipBehavior: Clip.antiAlias,
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        children: [renderWidget, SuggestionList(suggestionItems, key: key)],
+        children: [
+          renderWidget,
+          SuggestionList(suggestionItems, key: key),
+        ],
       ),
     );
   }
@@ -399,7 +420,8 @@ class Parser {
       ParserResult? completed,
     })
     replacement,
-  ) : current = Query(Context(fields, -1, '', replacement));
+    GlobalKey<SuggestionListState> suggestionKey,
+  ) : current = Query(Context(fields, -1, '', replacement, suggestionKey));
 
   /// Restores a single field in the current parser context, making it
   /// available in suggestions again (e.g. after its chip is deleted).
@@ -417,6 +439,7 @@ class Parser {
       ctx.offset,
       ctx.partial,
       ctx.replacement,
+      ctx.suggestionKey,
       lastOffset: ctx.lastOffset,
     );
     current = switch (current) {
