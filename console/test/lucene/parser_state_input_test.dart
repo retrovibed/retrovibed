@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:retrovibed/lucene/field.dart';
 import 'package:retrovibed/lucene/parser.results.dart';
 import 'package:retrovibed/lucene/parser.states.dart' as sm;
+import 'package:retrovibed/lucene/suggestion.list.dart';
 
 TextEditingController _ctrl(String text, {int? cursor}) {
   final c = TextEditingController(text: text);
@@ -28,7 +29,7 @@ void main() {
 
     test('single char appended to partial', () {
       // '@' at index 0, processing 'h' at index 1
-      final state = sm.Input(sm.Context(fields, 0, '', _noop, lastOffset: 1));
+      final state = sm.Input(sm.Context(fields, 0, '', _noop, GlobalKey<SuggestionListState>(), lastOffset: 1));
       final (next, remaining) = state.consume(_ctrl('@h', cursor: 2));
       final i = next as sm.Input;
       expect(next, isA<sm.Input>());
@@ -38,7 +39,7 @@ void main() {
     });
 
     test('advances lastOffset by 1 per char', () {
-      final state = sm.Input(sm.Context(fields, 0, 'h', _noop, lastOffset: 2));
+      final state = sm.Input(sm.Context(fields, 0, 'h', _noop, GlobalKey<SuggestionListState>(), lastOffset: 2));
       final (next, remaining) = state.consume(_ctrl('@hd', cursor: 3));
       final i = next as sm.Input;
       expect(i.ctx.partial, 'hd');
@@ -48,7 +49,7 @@ void main() {
 
     test('remaining counts unprocessed chars', () {
       // '@' at 0, processing 'h' at lastOffset=1, cursor at 4
-      final state = sm.Input(sm.Context(fields, 0, '', _noop, lastOffset: 1));
+      final state = sm.Input(sm.Context(fields, 0, '', _noop, GlobalKey<SuggestionListState>(), lastOffset: 1));
       final (_, remaining) = state.consume(_ctrl('@hd:', cursor: 4));
       // processes 'h', nextLastOffset=2, cursor=4 → remaining=2
       expect(remaining, 2);
@@ -56,7 +57,7 @@ void main() {
 
     test('offset is preserved as position of @', () {
       // '@' at index 6 in 'hello @hd'
-      final state = sm.Input(sm.Context(fields, 6, '', _noop, lastOffset: 7));
+      final state = sm.Input(sm.Context(fields, 6, '', _noop, GlobalKey<SuggestionListState>(), lastOffset: 7));
       final (next, _) = state.consume(_ctrl('hello @hd', cursor: 9));
       expect((next as sm.Input).ctx.offset, 6);
     });
@@ -76,7 +77,7 @@ void main() {
         Boolean('hd', false, false, (_) {}),
       ];
       final state = sm.Input(
-        sm.Context(captureFields, 0, 'hd', capture, lastOffset: 3),
+        sm.Context(captureFields, 0, 'hd', capture, GlobalKey<SuggestionListState>(), lastOffset: 3),
       );
       final (next, remaining) = state.consume(_ctrl('@hd:', cursor: 4));
       expect(next, isA<sm.Query>());
@@ -88,7 +89,7 @@ void main() {
       // Number field has no autocomplete
       final numFields = <Field<dynamic>>[numField];
       final state = sm.Input(
-        sm.Context(numFields, 0, 'peers', _noop, lastOffset: 6),
+        sm.Context(numFields, 0, 'peers', _noop, GlobalKey<SuggestionListState>(), lastOffset: 6),
       );
       final (next, remaining) = state.consume(_ctrl('@peers:', cursor: 7));
       expect(next, isA<sm.Value>());
@@ -97,7 +98,7 @@ void main() {
 
     test(': after unknown field name transitions to UnknownFieldError', () {
       final state = sm.Input(
-        sm.Context(fields, 0, 'foo', _noop, lastOffset: 4),
+        sm.Context(fields, 0, 'foo', _noop, GlobalKey<SuggestionListState>(), lastOffset: 4),
       );
       final (next, remaining) = state.consume(_ctrl('@foo:', cursor: 5));
       expect(next, isA<sm.UnknownFieldError>());
@@ -105,7 +106,7 @@ void main() {
     });
 
     test('full "@peers:" typed at once via Parser reaches Value', () {
-      final parser = sm.Parser([numField], _noop);
+      final parser = sm.Parser([numField], _noop, GlobalKey<SuggestionListState>());
       final result = parser.consume(_ctrl('@peers:', cursor: 7));
       expect(result, isA<sm.Value>());
     });
@@ -113,7 +114,7 @@ void main() {
     test(
       'full "@hd" typed at once via Parser reaches Input with full partial',
       () {
-        final parser = sm.Parser(fields, _noop);
+        final parser = sm.Parser(fields, _noop, GlobalKey<SuggestionListState>());
         final result = parser.consume(_ctrl('@hd', cursor: 3));
         expect(result, isA<sm.Input>());
         expect((result as sm.Input).ctx.partial, 'hd');
@@ -121,7 +122,7 @@ void main() {
     );
 
     test('replacing field char preserves Input state with updated partial', () {
-      final parser = sm.Parser(fields, _noop);
+      final parser = sm.Parser(fields, _noop, GlobalKey<SuggestionListState>());
       // Establish '@h' → Input with partial='h'
       parser.consume(_ctrl('@h', cursor: 2));
       // Replace 'h' with 'd' — cursor stays at 2

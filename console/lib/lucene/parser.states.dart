@@ -92,7 +92,7 @@ class Query extends ParserState {
       ctx.offset,
       ctx.partial + char,
       ctx.replacement,
-        ctx.suggestionKey,
+      ctx.suggestionKey,
       lastOffset: nextLastOffset,
     );
     return (Query(next), cursor - nextLastOffset);
@@ -133,7 +133,7 @@ class Input extends ParserState {
           ctx.offset,
           substring,
           ctx.replacement,
-        ctx.suggestionKey,
+          ctx.suggestionKey,
           lastOffset: nextLastOffset,
         );
         return (UnknownFieldError(next), cursor - nextLastOffset);
@@ -160,7 +160,7 @@ class Input extends ParserState {
           ctx.offset,
           '',
           ctx.replacement,
-        ctx.suggestionKey,
+          ctx.suggestionKey,
           lastOffset: nextLastOffset,
         );
         return (Query(next), 0);
@@ -182,7 +182,7 @@ class Input extends ParserState {
       ctx.offset,
       ctx.partial + char,
       ctx.replacement,
-        ctx.suggestionKey,
+      ctx.suggestionKey,
       lastOffset: nextLastOffset,
     );
     return (Input(next), cursor - nextLastOffset);
@@ -283,7 +283,7 @@ class UnknownFieldError extends ParserState {
       ctx.offset,
       segment.substring(colonIdx + 1),
       ctx.replacement,
-        ctx.suggestionKey,
+      ctx.suggestionKey,
       lastOffset: cursor,
     );
     return (Value(next, field), next.remaining(ctrl));
@@ -343,7 +343,7 @@ class Value extends ParserState {
       ctx.offset,
       segment,
       ctx.replacement,
-        ctx.suggestionKey,
+      ctx.suggestionKey,
       lastOffset: cursor,
     );
     return (Value(next, field), next.remaining(ctrl));
@@ -439,7 +439,7 @@ class Parser {
       ctx.offset,
       ctx.partial,
       ctx.replacement,
-        ctx.suggestionKey,
+      ctx.suggestionKey,
       lastOffset: ctx.lastOffset,
     );
     current = switch (current) {

@@ -13,6 +13,7 @@ sealed class ParserResult extends StatelessWidget {
 
   void reset(Parser parser);
   void apply(Parser parser);
+  ParserResultType type();
 }
 
 class _ParserResultClose extends ParserResult {
@@ -29,6 +30,9 @@ class _ParserResultClose extends ParserResult {
 
   @override
   void apply(Parser parser) {}
+
+  @override
+  ParserResultType type() => ParserResultType.Filter;
 }
 
 class ParserResultBool extends ParserResult {
@@ -56,6 +60,9 @@ class ParserResultBool extends ParserResult {
     field.apply(field.from(field.current));
     parser.replace(field.withCurrent(field.current));
   }
+
+  @override
+  ParserResultType type() => field.placement;
 }
 
 class ParserResultRange<T> extends ParserResult {
@@ -83,6 +90,9 @@ class ParserResultRange<T> extends ParserResult {
     field.apply(field.from(field.current));
     parser.replace(field.withCurrent(field.current));
   }
+
+  @override
+  ParserResultType type() => field.placement;
 }
 
 class ParserResultTimestamp extends ParserResult {
@@ -111,6 +121,9 @@ class ParserResultTimestamp extends ParserResult {
     field.apply(field.from(field.current));
     parser.replace(field.withCurrent(field.current));
   }
+
+  @override
+  ParserResultType type() => field.placement;
 }
 
 class ParserResultNumeric extends ParserResult {
@@ -138,6 +151,9 @@ class ParserResultNumeric extends ParserResult {
     field.apply(field.from(field.current));
     parser.replace(field.withCurrent(field.current));
   }
+
+  @override
+  ParserResultType type() => field.placement;
 }
 
 class ParserResultDuration extends ParserResult {
@@ -171,4 +187,7 @@ class ParserResultDuration extends ParserResult {
     field.apply(field.from(field.current));
     parser.replace(field.withCurrent(field.current));
   }
+
+  @override
+  ParserResultType type() => field.placement;
 }

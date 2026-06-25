@@ -128,8 +128,10 @@ class _SearchTrayState extends State<SearchTray> {
       ],
     );
 
-    final decoration = (widget.decoration ?? const InputDecoration(hintText: "search")).copyWith(
+    final decoration = (widget.decoration ?? lucene.Queryer.defaultdecoration).copyWith(
       suffixIcon: pagination,
+      isDense: lucene.Queryer.defaultdecoration.isDense,
+      contentPadding: lucene.Queryer.defaultdecoration.contentPadding,
     );
 
     final trailing = [

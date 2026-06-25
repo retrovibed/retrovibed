@@ -164,6 +164,12 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                         autoscroll: true,
                         decoration: InputDecoration(hintText: "search library"),
                         filters: [
+                          lucene.Mode(
+                            lucene.Boolean.auto('discover', false, (v) {
+                              print("DUN DUN DUN ${v}");
+                              _library = !v;
+                            }),
+                          ),
                           lucene.Boolean.auto('hidden', false, (v) {
                             setState(() => widget.search.value.next.hidden = v);
                             refresh(widget.search.value.next);

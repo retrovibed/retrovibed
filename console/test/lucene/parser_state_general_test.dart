@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:retrovibed/lucene/field.dart';
 import 'package:retrovibed/lucene/parser.results.dart';
 import 'package:retrovibed/lucene/parser.states.dart' as sm;
+import 'package:retrovibed/lucene/suggestion.list.dart';
 
 TextEditingController _ctrl(String text, {int? cursor}) {
   final c = TextEditingController(text: text);
@@ -23,7 +24,7 @@ void main() {
 
   group('UnknownFieldError', () {
     test('stays in error when text is unchanged', () {
-      final parser = sm.Parser(fields, _noop);
+      final parser = sm.Parser(fields, _noop, GlobalKey<SuggestionListState>());
       final result = parser.consume(_ctrl('@foo:', cursor: 5));
       expect(result, isA<sm.UnknownFieldError>());
       expect(
@@ -33,7 +34,7 @@ void main() {
     });
 
     test('partial updates when text changes but field is still unknown', () {
-      final parser = sm.Parser(fields, _noop);
+      final parser = sm.Parser(fields, _noop, GlobalKey<SuggestionListState>());
       parser.consume(_ctrl('@foo:', cursor: 5));
       final result = parser.consume(_ctrl('@bar:', cursor: 5));
       expect(result, isA<sm.UnknownFieldError>());
@@ -41,42 +42,42 @@ void main() {
     });
 
     test('transitions to Query when @ anchor is gone', () {
-      final parser = sm.Parser(fields, _noop);
+      final parser = sm.Parser(fields, _noop, GlobalKey<SuggestionListState>());
       parser.consume(_ctrl('@foo:', cursor: 5));
       final result = parser.consume(_ctrl('foo:', cursor: 4));
       expect(result, isA<sm.Query>());
     });
 
     test('transitions to Input when colon is removed', () {
-      final parser = sm.Parser(fields, _noop);
+      final parser = sm.Parser(fields, _noop, GlobalKey<SuggestionListState>());
       parser.consume(_ctrl('@foo:', cursor: 5));
       final result = parser.consume(_ctrl('@foo', cursor: 4));
       expect(result, isA<sm.Input>());
     });
 
     test('Input partial is restored when colon is removed', () {
-      final parser = sm.Parser(fields, _noop);
+      final parser = sm.Parser(fields, _noop, GlobalKey<SuggestionListState>());
       parser.consume(_ctrl('@foo:', cursor: 5));
       final result = parser.consume(_ctrl('@foo', cursor: 4));
       expect((result as sm.Input).ctx.partial, 'foo');
     });
 
     test('transitions to Value when partial corrected to a known field', () {
-      final parser = sm.Parser(numFields, _noop);
+      final parser = sm.Parser(numFields, _noop, GlobalKey<SuggestionListState>());
       parser.consume(_ctrl('@foo:', cursor: 5));
       final result = parser.consume(_ctrl('@peers:', cursor: 7));
       expect(result, isA<sm.Value>());
     });
 
     test('transitions to Query when cursor is at zero', () {
-      final parser = sm.Parser(fields, _noop);
+      final parser = sm.Parser(fields, _noop, GlobalKey<SuggestionListState>());
       parser.consume(_ctrl('@foo:', cursor: 5));
       final result = parser.consume(_ctrl('', cursor: 0));
       expect(result, isA<sm.Query>());
     });
 
     test('Input returns UnknownFieldError for unrecognised field', () {
-      final parser = sm.Parser(fields, _noop);
+      final parser = sm.Parser(fields, _noop, GlobalKey<SuggestionListState>());
       final result = parser.consume(_ctrl('@foo:', cursor: 5));
       expect(result, isA<sm.UnknownFieldError>());
     });
@@ -84,7 +85,7 @@ void main() {
     test(
       'stays in error with original partial when typing continues after colon',
       () {
-        final parser = sm.Parser(fields, _noop);
+        final parser = sm.Parser(fields, _noop, GlobalKey<SuggestionListState>());
         parser.consume(_ctrl('@foo:', cursor: 5));
         final inputs = [
           '@foo:@',

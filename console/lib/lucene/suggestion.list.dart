@@ -44,19 +44,21 @@ class SuggestionListState extends State<SuggestionList> {
       clipBehavior: Clip.antiAlias,
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        children: [
-          for (var i = 0; i < widget.items.length; i++)
-            SizedBox(
+        children: widget.items.indexed.map(
+          (entry) {
+            final (i, item) = entry;
+            return SizedBox(
               height: 32,
               child: ListTile(
                 dense: true,
                 selected: i == _selected,
-                title: widget.items[i].$1,
+                title: item.$1,
                 trailing: const Icon(Icons.chevron_right, size: 16),
-                onTap: widget.items[i].$2,
+                onTap: item.$2,
               ),
-            ),
-        ],
+            );
+          },
+        ).toList(),
       ),
     );
   }
