@@ -253,18 +253,14 @@ class _QueryerState extends State<Queryer> {
             ],
             trailing: widget.trailing,
           ),
-          ds.Debug.blue(
-            TextFieldTapRegion(
-              child: _updating ?? _parser.current,
-            ),
+          TextFieldTapRegion(
+            child: _updating ?? _parser.current,
           ),
-          ds.Debug.pink(
-            TextFieldTapRegion(
-              child: Wrap(
-                spacing: defaults.spacing,
-                runSpacing: defaults.spacing / 2,
-                children: chips,
-              ),
+          TextFieldTapRegion(
+            child: Wrap(
+              spacing: defaults.spacing,
+              runSpacing: defaults.spacing / 2,
+              children: chips,
             ),
           ),
         ],
