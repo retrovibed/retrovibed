@@ -58,14 +58,15 @@ type mbJSONArtist struct {
 }
 
 type mbjsonlimport struct {
-	Source string        `flag:"" name:"source" help:"short id for the data source" hidden:"true" default:"musicbrainz"`
-	Output cmdopts.IOOut `flag:"" name:"output" default:"-" help:"output destination; '-' for stdout"`
-	cause  error
+	Source      string        `flag:"" name:"source" help:"short id for the data source" hidden:"true" default:"musicbrainz"`
+	Output      cmdopts.IOOut `flag:"" name:"output" default:"-" help:"output destination; '-' for stdout"`
+	RecordLimit int           `flag:"" name:"limit" help:"maximum jsonl record size in bytes defaults to 16 MiB"`
+	cause       error
 }
 
 func (t *mbjsonlimport) releases(ctx context.Context, r io.Reader) iter.Seq[library.Known] {
 	return func(yield func(library.Known) bool) {
-		seq := jsonl.Iter[mbJSONRelease](jsonl.NewDecoder(r))
+		seq := jsonl.Iter[mbJSONRelease](jsonl.NewDecoderWithMax(t.RecordLimit, r))
 		for rel := range seq.Each(ctx) {
 			rawID := langx.FirstNonZero(rel.ReleaseGroup.ID, rel.ID)
 			id := uuid.FromStringOrNil(rawID)

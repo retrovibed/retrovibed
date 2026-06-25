@@ -9,6 +9,7 @@ import (
 
 	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 )
 
 type Encoder struct {
@@ -44,8 +45,13 @@ type Decoder struct {
 
 // NewDecoder returns a new Decoder that reads from r.
 func NewDecoder(r io.Reader) *Decoder {
+	return NewDecoderWithMax(16*bytesx.MiB, r)
+}
+
+// NewDecoder returns a new Decoder that reads from r.
+func NewDecoderWithMax(max int, r io.Reader) *Decoder {
 	s := bufio.NewScanner(r)
-	s.Buffer(make([]byte, bytesx.MiB), 16*bytesx.MiB)
+	s.Buffer(make([]byte, bytesx.MiB), langx.FirstNonZero(max, 16*bytesx.MiB))
 	return &Decoder{
 		scanner: s,
 	}
