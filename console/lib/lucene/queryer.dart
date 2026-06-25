@@ -249,7 +249,7 @@ class _QueryerState extends State<Queryer> {
             ),
             leading: [
               ...widget.leading,
-              if (_mode != ParserResult.close) QueryerMode(mode: _mode),
+              if (_mode != ParserResult.close) ds.CompactingMenu.pinned(QueryerMode(mode: _mode)),
             ],
             trailing: widget.trailing,
           ),
