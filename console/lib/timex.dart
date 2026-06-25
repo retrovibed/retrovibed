@@ -37,6 +37,10 @@ class Range {
     return Range(ts.subtract(d), ts);
   }
 
+  factory Range.everything() {
+    return Range(neginf, now());
+  }
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) || other is Range && begin == other.begin && end == other.end;

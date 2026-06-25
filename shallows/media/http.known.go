@@ -27,6 +27,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/internal/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/library"
+	meta "github.com/retrovibed/retrovibed/shallows/meta"
 )
 
 type HTTPKnownOption func(*HTTPKnown)
@@ -88,10 +89,12 @@ func (t *HTTPKnown) Bind(r *mux.Router) {
 
 func (t *HTTPKnown) search(w http.ResponseWriter, r *http.Request) {
 	var (
-		err error
-		msg = KnownSearchResponse{
+		err      error
+		released timex.Range
+		msg      = KnownSearchResponse{
 			Next: &KnownSearchRequest{
-				Limit: 100,
+				Limit:    100,
+				Released: meta.NewDateRange(timex.NewRangeEverything()),
 			},
 		}
 	)
@@ -101,6 +104,13 @@ func (t *HTTPKnown) search(w http.ResponseWriter, r *http.Request) {
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
 	}
+
+	if released, err = timex.NewRangeISO8601(msg.Next.Released.Oldest, msg.Next.Released.Newest); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to decode released"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		return
+	}
+
 	msg.Next.Limit = numericx.Min(msg.Next.Limit, 100)
 
 	q := sqlx.Scan(library.KnownSearch(r.Context(), t.q, library.KnownSearchBuilder().Where(squirrel.And{
@@ -108,6 +118,7 @@ func (t *HTTPKnown) search(w http.ResponseWriter, r *http.Request) {
 		library.KnownQueryLanguage(msg.Next.Language),
 		library.KnownQueryDetectLanguage(msg.Next.Language),
 		library.KnownQueryExplicit(msg.Next.Adult),
+		library.KnownQueryReleased(released),
 		library.KnownQueryWithPoster(),
 		lucenex.Query(t.fts, msg.Next.Query, lucenex.WithDefaultField("auto_description")),
 	}).OrderBy("released DESC").Offset(msg.Next.Offset*msg.Next.Limit).Limit(msg.Next.Limit)))
@@ -177,7 +188,7 @@ func (t *HTTPKnown) latest(w http.ResponseWriter, r *http.Request) {
 	msg.Next.Limit = numericx.Min(msg.Next.Limit, 100)
 
 	if released, err = timex.NewRangeISO8601(msg.Next.Released.Oldest, msg.Next.Released.Newest); err != nil {
-		log.Println(errorsx.Wrap(err, "unable to decode created"))
+		log.Println(errorsx.Wrap(err, "unable to decode released"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
 	}

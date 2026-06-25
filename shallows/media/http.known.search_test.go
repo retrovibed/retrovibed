@@ -5,14 +5,18 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
+	"github.com/retrovibed/retrovibed/shallows/internal/formx"
+	"github.com/retrovibed/retrovibed/shallows/internal/grpcx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
+	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/retrovibed/retrovibed/shallows/media"
 	"github.com/retrovibed/retrovibed/shallows/meta"
@@ -113,5 +117,91 @@ func TestKnownSearch(t *testing.T) {
 		for _, item := range result.Items {
 			require.Equal(t, mimex.Video, item.Mimetype)
 		}
+	})
+
+	t.Run("filters by released range", func(t *testing.T) {
+		var (
+			p     meta.Profile
+			authz meta.Authz
+		)
+		ctx, done := testx.Context(t)
+		defer done()
+
+		q := sqltestx.Metadatabase(t)
+
+		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
+		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
+		require.NoError(t, testx.Fake(&authz, meta.AuthzOptionProfileID(p.ID), meta.AuthzOptionAdmin))
+		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, authz).Scan(&authz))
+
+		ts := time.Now()
+		var inrange, outofrange library.Known
+		require.NoError(t, testx.Fake(&inrange, library.KnownOptionTestDefaults, library.KnownOptionReleased(ts.Add(-12*time.Hour))))
+		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, inrange).Scan(&inrange))
+
+		require.NoError(t, testx.Fake(&outofrange, library.KnownOptionTestDefaults, library.KnownOptionReleased(ts.Add(-48*time.Hour))))
+		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, outofrange).Scan(&outofrange))
+
+		routes := mux.NewRouter()
+		media.NewHTTPKnown(q, media.HTTPKnownOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
+
+		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
+
+		encoder := formx.NewEncoder()
+		query, err := encoder.Encode(&media.KnownSearchRequest{
+			Released: meta.NewDateRange(timex.NewRangeDuration(24 * time.Hour)),
+			Limit:    100,
+		})
+		require.NoError(t, err)
+
+		resp, req, err := httptestx.BuildRequestBytes(
+			http.MethodGet,
+			fmt.Sprintf("/?%s", query.Encode()),
+			nil,
+			httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)),
+		)
+		require.NoError(t, err)
+
+		routes.ServeHTTP(resp, req)
+
+		var result media.KnownSearchResponse
+		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
+		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.Len(t, result.Items, 1)
+		require.Equal(t, inrange.UID, result.Items[0].Id)
+		require.Equal(t, grpcx.EncodeTime(inrange.Released), result.Items[0].Released)
+	})
+
+	t.Run("rejects malformed released range", func(t *testing.T) {
+		var (
+			p     meta.Profile
+			authz meta.Authz
+		)
+		ctx, done := testx.Context(t)
+		defer done()
+
+		q := sqltestx.Metadatabase(t)
+
+		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
+		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
+		require.NoError(t, testx.Fake(&authz, meta.AuthzOptionProfileID(p.ID), meta.AuthzOptionAdmin))
+		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, authz).Scan(&authz))
+
+		routes := mux.NewRouter()
+		media.NewHTTPKnown(q, media.HTTPKnownOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
+
+		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
+
+		resp, req, err := httptestx.BuildRequestBytes(
+			http.MethodGet,
+			"/?released[oldest]=not-a-date&released[newest]=not-a-date",
+			nil,
+			httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)),
+		)
+		require.NoError(t, err)
+
+		routes.ServeHTTP(resp, req)
+
+		require.Equal(t, http.StatusBadRequest, resp.Result().StatusCode)
 	})
 }

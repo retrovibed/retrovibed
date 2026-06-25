@@ -64,13 +64,29 @@ abstract class known {
     capacity: 256,
     capacityInBytes: bytesx.MiB,
   );
+
   static KnownSearchRequest request({
     int limit = 0,
     String query = "",
     String mimetype = "",
     String? language,
     bool adult = false,
-  }) => KnownSearchRequest(query: query, mimetype: mimetype, language: language, adult: adult, limit: ds.Int64(limit));
+    timex.Range? released,
+  }) {
+    released = released ?? timex.Range.everything();
+    return KnownSearchRequest(
+      query: query,
+      mimetype: mimetype,
+      language: language,
+      adult: adult,
+      released: DateRange(
+        oldest: timex.formatISO8601(released.begin),
+        newest: timex.formatISO8601(released.end),
+      ),
+      limit: ds.Int64(limit),
+    );
+  }
+
   static KnownSearchResponse response({KnownSearchRequest? next}) =>
       KnownSearchResponse(next: next ?? request(limit: 100), items: []);
 

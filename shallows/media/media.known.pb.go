@@ -128,6 +128,7 @@ type KnownSearchRequest struct {
 	Adult         bool                   `protobuf:"varint,2,opt,name=adult,proto3" json:"adult,omitempty"`
 	Language      string                 `protobuf:"bytes,3,opt,name=language,proto3" json:"language,omitempty"`
 	Mimetype      string                 `protobuf:"bytes,4,opt,name=mimetype,proto3" json:"mimetype,omitempty"`
+	Released      *meta.DateRange        `protobuf:"bytes,5,opt,name=released,proto3" json:"released,omitempty"`
 	Offset        uint64                 `protobuf:"varint,900,opt,name=offset,proto3" json:"offset,omitempty"`
 	Limit         uint64                 `protobuf:"varint,901,opt,name=limit,proto3" json:"limit,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -190,6 +191,13 @@ func (x *KnownSearchRequest) GetMimetype() string {
 		return x.Mimetype
 	}
 	return ""
+}
+
+func (x *KnownSearchRequest) GetReleased() *meta.DateRange {
+	if x != nil {
+		return x.Released
+	}
+	return nil
 }
 
 func (x *KnownSearchRequest) GetOffset() uint64 {
@@ -827,14 +835,15 @@ const file_media_known_proto_rawDesc = "" +
 	"\asummary\x18\x05 \x01(\tR\asummary\x12\x14\n" +
 	"\x05image\x18\x06 \x01(\tR\x05image\x12\x1a\n" +
 	"\breleased\x18\a \x01(\tR\breleased\x12\x1a\n" +
-	"\bmimetype\x18\b \x01(\tR\bmimetype\"\xb7\x01\n" +
+	"\bmimetype\x18\b \x01(\tR\bmimetype\"\xe4\x01\n" +
 	"\x12KnownSearchRequest\x12\x14\n" +
 	"\x05query\x18\x01 \x01(\tR\x05query\x12\x14\n" +
 	"\x05adult\x18\x02 \x01(\bR\x05adult\x12\x1a\n" +
 	"\blanguage\x18\x03 \x01(\tR\blanguage\x12\x1a\n" +
-	"\bmimetype\x18\x04 \x01(\tR\bmimetype\x12\x17\n" +
+	"\bmimetype\x18\x04 \x01(\tR\bmimetype\x12+\n" +
+	"\breleased\x18\x05 \x01(\v2\x0f.meta.DateRangeR\breleased\x12\x17\n" +
 	"\x06offset\x18\x84\a \x01(\x04R\x06offset\x12\x15\n" +
-	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\x05\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"h\n" +
+	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\x06\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"h\n" +
 	"\x13KnownSearchResponse\x12-\n" +
 	"\x04next\x18\x01 \x01(\v2\x19.media.KnownSearchRequestR\x04next\x12\"\n" +
 	"\x05items\x18\x02 \x03(\v2\f.media.KnownR\x05items\")\n" +
@@ -901,22 +910,23 @@ var file_media_known_proto_goTypes = []any{
 	(*meta.DateRange)(nil),          // 14: meta.DateRange
 }
 var file_media_known_proto_depIdxs = []int32{
-	1,  // 0: media.KnownSearchResponse.next:type_name -> media.KnownSearchRequest
-	0,  // 1: media.KnownSearchResponse.items:type_name -> media.Known
-	0,  // 2: media.KnownLookupResponse.known:type_name -> media.Known
-	0,  // 3: media.KnownDownloadResponse.known:type_name -> media.Known
-	0,  // 4: media.KnownCreateRequest.known:type_name -> media.Known
-	0,  // 5: media.KnownCreateResponse.known:type_name -> media.Known
-	14, // 6: media.KnownLatestRequest.released:type_name -> meta.DateRange
-	10, // 7: media.KnownLatestResponse.next:type_name -> media.KnownLatestRequest
-	0,  // 8: media.KnownLatestResponse.items:type_name -> media.Known
-	12, // 9: media.RecommendationsResponse.next:type_name -> media.RecommendationsRequest
-	0,  // 10: media.RecommendationsResponse.items:type_name -> media.Known
-	11, // [11:11] is the sub-list for method output_type
-	11, // [11:11] is the sub-list for method input_type
-	11, // [11:11] is the sub-list for extension type_name
-	11, // [11:11] is the sub-list for extension extendee
-	0,  // [0:11] is the sub-list for field type_name
+	14, // 0: media.KnownSearchRequest.released:type_name -> meta.DateRange
+	1,  // 1: media.KnownSearchResponse.next:type_name -> media.KnownSearchRequest
+	0,  // 2: media.KnownSearchResponse.items:type_name -> media.Known
+	0,  // 3: media.KnownLookupResponse.known:type_name -> media.Known
+	0,  // 4: media.KnownDownloadResponse.known:type_name -> media.Known
+	0,  // 5: media.KnownCreateRequest.known:type_name -> media.Known
+	0,  // 6: media.KnownCreateResponse.known:type_name -> media.Known
+	14, // 7: media.KnownLatestRequest.released:type_name -> meta.DateRange
+	10, // 8: media.KnownLatestResponse.next:type_name -> media.KnownLatestRequest
+	0,  // 9: media.KnownLatestResponse.items:type_name -> media.Known
+	12, // 10: media.RecommendationsResponse.next:type_name -> media.RecommendationsRequest
+	0,  // 11: media.RecommendationsResponse.items:type_name -> media.Known
+	12, // [12:12] is the sub-list for method output_type
+	12, // [12:12] is the sub-list for method input_type
+	12, // [12:12] is the sub-list for extension type_name
+	12, // [12:12] is the sub-list for extension extendee
+	0,  // [0:12] is the sub-list for field type_name
 }
 
 func init() { file_media_known_proto_init() }

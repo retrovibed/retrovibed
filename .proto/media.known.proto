@@ -20,7 +20,8 @@ message KnownSearchRequest {
   bool adult = 2 [ json_name = "adult" ];
   string language = 3 [ json_name = "language" ];
   string mimetype = 4 [ json_name = "mimetype" ];
-  reserved 5 to 899;
+  meta.DateRange released = 5 [ json_name = "released" ];
+  reserved 6 to 899;
   uint64 offset = 900 [ json_name = "offset" ];
   uint64 limit = 901 [ json_name = "limit" ];
   reserved 902 to 999;

@@ -35,6 +35,27 @@ func (im InfinityModifier) String() string {
 	}
 }
 
+func NewNullTime(ts time.Time) NullTime {
+	// these two timestamps are what duckdb returns for pos/neg infinity.
+	var (
+		inf    = time.UnixMicro(9223372036854775807)
+		neginf = time.UnixMicro(-9223372036854775807)
+	)
+
+	if ts.Equal(inf) || ts.After(inf) {
+		return NullTime{Status: Present, InfinityModifier: Infinity, Time: ts}
+	}
+
+	if ts.Equal(neginf) || ts.Before(neginf) {
+		return NullTime{Status: Present, InfinityModifier: NegativeInfinity, Time: ts}
+	}
+
+	return NullTime{
+		Time:   ts,
+		Status: Present,
+	}
+}
+
 type NullTime struct {
 	Time             time.Time // Time must always be in UTC.
 	Status           Status
@@ -60,23 +81,7 @@ func (dst *NullTime) Scan(src interface{}) error {
 
 	switch src := src.(type) {
 	case time.Time:
-		// these two timestamps are what duckdb returns for pos/neg infinity.
-		var (
-			inf    = time.UnixMicro(9223372036854775807)
-			neginf = time.UnixMicro(-9223372036854775807)
-		)
-
-		if src.Equal(inf) {
-			*dst = NullTime{Status: Present, InfinityModifier: Infinity}
-			return nil
-		}
-
-		if src.Equal(neginf) {
-			*dst = NullTime{Status: Present, InfinityModifier: NegativeInfinity}
-			return nil
-		}
-
-		*dst = NullTime{Time: src, Status: Present}
+		*dst = NewNullTime(src)
 		return nil
 	}
 

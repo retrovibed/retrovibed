@@ -45,11 +45,19 @@ const KnownSearchRequest$json = {
     {'1': 'adult', '3': 2, '4': 1, '5': 8, '10': 'adult'},
     {'1': 'language', '3': 3, '4': 1, '5': 9, '10': 'language'},
     {'1': 'mimetype', '3': 4, '4': 1, '5': 9, '10': 'mimetype'},
+    {
+      '1': 'released',
+      '3': 5,
+      '4': 1,
+      '5': 11,
+      '6': '.meta.DateRange',
+      '10': 'released'
+    },
     {'1': 'offset', '3': 900, '4': 1, '5': 4, '10': 'offset'},
     {'1': 'limit', '3': 901, '4': 1, '5': 4, '10': 'limit'},
   ],
   '9': [
-    {'1': 5, '2': 900},
+    {'1': 6, '2': 900},
     {'1': 902, '2': 1000},
   ],
 };
@@ -58,8 +66,9 @@ const KnownSearchRequest$json = {
 final $typed_data.Uint8List knownSearchRequestDescriptor = $convert.base64Decode(
     'ChJLbm93blNlYXJjaFJlcXVlc3QSFAoFcXVlcnkYASABKAlSBXF1ZXJ5EhQKBWFkdWx0GAIgAS'
     'gIUgVhZHVsdBIaCghsYW5ndWFnZRgDIAEoCVIIbGFuZ3VhZ2USGgoIbWltZXR5cGUYBCABKAlS'
-    'CG1pbWV0eXBlEhcKBm9mZnNldBiEByABKARSBm9mZnNldBIVCgVsaW1pdBiFByABKARSBWxpbW'
-    'l0SgUIBRCEB0oGCIYHEOgH');
+    'CG1pbWV0eXBlEisKCHJlbGVhc2VkGAUgASgLMg8ubWV0YS5EYXRlUmFuZ2VSCHJlbGVhc2VkEh'
+    'cKBm9mZnNldBiEByABKARSBm9mZnNldBIVCgVsaW1pdBiFByABKARSBWxpbWl0SgUIBhCEB0oG'
+    'CIYHEOgH');
 
 @$core.Deprecated('Use knownSearchResponseDescriptor instead')
 const KnownSearchResponse$json = {

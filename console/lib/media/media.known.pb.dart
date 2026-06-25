@@ -162,6 +162,7 @@ class KnownSearchRequest extends $pb.GeneratedMessage {
     $core.bool? adult,
     $core.String? language,
     $core.String? mimetype,
+    $0.DateRange? released,
     $fixnum.Int64? offset,
     $fixnum.Int64? limit,
   }) {
@@ -170,6 +171,7 @@ class KnownSearchRequest extends $pb.GeneratedMessage {
     if (adult != null) result.adult = adult;
     if (language != null) result.language = language;
     if (mimetype != null) result.mimetype = mimetype;
+    if (released != null) result.released = released;
     if (offset != null) result.offset = offset;
     if (limit != null) result.limit = limit;
     return result;
@@ -192,6 +194,8 @@ class KnownSearchRequest extends $pb.GeneratedMessage {
     ..aOB(2, _omitFieldNames ? '' : 'adult')
     ..aOS(3, _omitFieldNames ? '' : 'language')
     ..aOS(4, _omitFieldNames ? '' : 'mimetype')
+    ..aOM<$0.DateRange>(5, _omitFieldNames ? '' : 'released',
+        subBuilder: $0.DateRange.create)
     ..a<$fixnum.Int64>(
         900, _omitFieldNames ? '' : 'offset', $pb.PbFieldType.OU6,
         defaultOrMaker: $fixnum.Int64.ZERO)
@@ -254,21 +258,32 @@ class KnownSearchRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   void clearMimetype() => $_clearField(4);
 
+  @$pb.TagNumber(5)
+  $0.DateRange get released => $_getN(4);
+  @$pb.TagNumber(5)
+  set released($0.DateRange value) => $_setField(5, value);
+  @$pb.TagNumber(5)
+  $core.bool hasReleased() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearReleased() => $_clearField(5);
+  @$pb.TagNumber(5)
+  $0.DateRange ensureReleased() => $_ensure(4);
+
   @$pb.TagNumber(900)
-  $fixnum.Int64 get offset => $_getI64(4);
+  $fixnum.Int64 get offset => $_getI64(5);
   @$pb.TagNumber(900)
-  set offset($fixnum.Int64 value) => $_setInt64(4, value);
+  set offset($fixnum.Int64 value) => $_setInt64(5, value);
   @$pb.TagNumber(900)
-  $core.bool hasOffset() => $_has(4);
+  $core.bool hasOffset() => $_has(5);
   @$pb.TagNumber(900)
   void clearOffset() => $_clearField(900);
 
   @$pb.TagNumber(901)
-  $fixnum.Int64 get limit => $_getI64(5);
+  $fixnum.Int64 get limit => $_getI64(6);
   @$pb.TagNumber(901)
-  set limit($fixnum.Int64 value) => $_setInt64(5, value);
+  set limit($fixnum.Int64 value) => $_setInt64(6, value);
   @$pb.TagNumber(901)
-  $core.bool hasLimit() => $_has(5);
+  $core.bool hasLimit() => $_has(6);
   @$pb.TagNumber(901)
   void clearLimit() => $_clearField(901);
 }

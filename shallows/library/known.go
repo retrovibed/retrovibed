@@ -8,6 +8,7 @@ import (
 
 	"github.com/Masterminds/squirrel"
 	"github.com/gofrs/uuid/v5"
+	"github.com/retrovibed/retrovibed/shallows/internal/ducktype"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
@@ -154,7 +155,7 @@ func KnownQueryDetectLanguage(v string) squirrel.Sqlizer {
 }
 
 func KnownQueryReleased(r timex.Range) squirrel.Sqlizer {
-	return squirrelx.Between("library_known_media.released", r.Start, r.End)
+	return squirrelx.Between("library_known_media.released", ducktype.NewNullTime(r.Start), ducktype.NewNullTime(r.End))
 }
 
 func KnownQueryWithPoster() squirrel.Sqlizer {
