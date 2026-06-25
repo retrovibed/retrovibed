@@ -1,22 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:retrovibed/designkit.dart' as ds;
-import './field.dart';
-import './suggestion.list.dart';
+import 'field.dart';
+import 'suggestion.list.dart';
 import 'parser.results.dart';
-import './parser.states.dart';
-
-class SuggestionKeyScope extends InheritedWidget {
-  final GlobalKey<SuggestionListState> suggestionKey;
-
-  const SuggestionKeyScope({required this.suggestionKey, required super.child});
-
-  static GlobalKey<SuggestionListState>? of(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<SuggestionKeyScope>()?.suggestionKey;
-
-  @override
-  bool updateShouldNotify(SuggestionKeyScope old) => old.suggestionKey != suggestionKey;
-}
+import 'parser.states.dart';
 
 class FilterChip extends StatefulWidget {
   final ParserResult filter;
@@ -57,10 +45,9 @@ class FilterChipState extends State<FilterChip> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final chipTheme = theme.chipTheme;
-    final bgColor =
-        _open
-            ? (chipTheme.selectedColor ?? theme.colorScheme.secondaryContainer)
-            : (chipTheme.backgroundColor ?? theme.colorScheme.surfaceContainerLow);
+    final bgColor = _open
+        ? (chipTheme.selectedColor ?? theme.colorScheme.secondaryContainer)
+        : (chipTheme.backgroundColor ?? theme.colorScheme.surfaceContainerLow);
 
     return CallbackShortcuts(
       bindings: {
@@ -105,7 +92,7 @@ class Queryer extends StatefulWidget {
 
   final void Function(String) onQuery;
   final List<Field> fields;
-  final InputDecoration? decoration;
+  final InputDecoration decoration;
   final bool autofocus;
   final bool disabled;
   final TextEditingController? controller;
@@ -118,7 +105,14 @@ class Queryer extends StatefulWidget {
     this.onQuery,
     this.fields, {
     super.key,
-    this.decoration,
+    this.decoration = const InputDecoration(
+      hintText: 'Search… (@ for filters)',
+      isDense: true,
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 8,
+        vertical: 12,
+      ),
+    ),
     this.autofocus = false,
     this.disabled = false,
     this.controller,
@@ -138,16 +132,16 @@ class _QueryerState extends State<Queryer> {
   List<ParserResult> _filters = [];
   Widget? _updating;
   bool _editing = false;
-  Parser _parser = Parser([], (ctx, range, content, {completed}) {});
+  Parser _parser = Parser([], (ctx, range, content, {completed}) {}, GlobalKey());
 
-  void _resetParser() => _parser = Parser(widget.fields, _replace);
+  void _resetParser() => _parser = Parser(widget.fields, _replace, _suggestionKey);
 
   @override
   void initState() {
     super.initState();
     _ctrl = widget.controller ?? TextEditingController();
-    _resetParser();
     _ctrl.addListener(_onText);
+    _resetParser();
   }
 
   @override
@@ -185,6 +179,7 @@ class _QueryerState extends State<Queryer> {
   }
 
   void _onText() {
+    print("DERP DERP TEXT");
     if (_ctrl.text.isEmpty && _filters.isEmpty) {
       return setState(_resetParser);
     }
@@ -209,20 +204,19 @@ class _QueryerState extends State<Queryer> {
         onChanged(upd);
       });
       final focusNode = FocusNode();
-      _updating =
-          _w == null
-              ? null
-              : Focus(
-                focusNode: focusNode,
-                onKeyEvent: (node, event) {
-                  if (event.logicalKey != LogicalKeyboardKey.enter) return KeyEventResult.ignored;
-                  if (event is! KeyDownEvent) return KeyEventResult.ignored;
+      _updating = _w == null
+          ? null
+          : Focus(
+              focusNode: focusNode,
+              onKeyEvent: (node, event) {
+                if (event.logicalKey != LogicalKeyboardKey.enter) return KeyEventResult.ignored;
+                if (event is! KeyDownEvent) return KeyEventResult.ignored;
 
-                  closeChip();
-                  return KeyEventResult.handled;
-                },
-                child: _w,
-              );
+                closeChip();
+                return KeyEventResult.handled;
+              },
+              child: _w,
+            );
       if (_w != null) focusNode.requestFocus();
     });
   }
@@ -243,14 +237,13 @@ class _QueryerState extends State<Queryer> {
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
-    final chips =
-        _filters.map((e) {
-          return FilterChip(
-            filter: e,
-            onEdit: (filter, onChanged, closeChip) => _editFilter(filter, onChanged, closeChip),
-            onRemove: () => _removeFilter(e),
-          );
-        }).toList();
+    final chips = _filters.map((e) {
+      return FilterChip(
+        filter: e,
+        onEdit: (filter, onChanged, closeChip) => _editFilter(filter, onChanged, closeChip),
+        onRemove: () => _removeFilter(e),
+      );
+    }).toList();
 
     return ds.Shortcuts(
       enabled: defaults.desktop,
@@ -295,6 +288,7 @@ class _QueryerState extends State<Queryer> {
       Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: defaults.spacing / 2,
         children: [
           ds.CompactingMenu(
             ds.Help(
@@ -303,17 +297,7 @@ class _QueryerState extends State<Queryer> {
                 enabled: !widget.disabled,
                 autofocus: widget.autofocus,
                 focusNode: widget.focusNode,
-                decoration: (widget.decoration ??
-                        const InputDecoration(
-                          hintText: 'Search… (@ for filters)',
-                        ))
-                    .copyWith(
-                      isDense: true,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 12,
-                      ),
-                    ),
+                decoration: widget.decoration,
                 onSubmitted: (v) {
                   if (_partialParse()) return;
                   widget.onQuery(v);
@@ -326,17 +310,18 @@ class _QueryerState extends State<Queryer> {
             leading: widget.leading,
             trailing: widget.trailing,
           ),
-          TextFieldTapRegion(
-            child: Wrap(
-              spacing: defaults.spacing,
-              runSpacing: defaults.spacing / 2,
-              children: chips,
+          ds.Debug.blue(
+            TextFieldTapRegion(
+              child: _updating ?? _parser.current,
             ),
           ),
-          TextFieldTapRegion(
-            child: SuggestionKeyScope(
-              suggestionKey: _suggestionKey,
-              child: _updating ?? _parser.current,
+          ds.Debug.pink(
+            TextFieldTapRegion(
+              child: Wrap(
+                spacing: defaults.spacing,
+                runSpacing: defaults.spacing / 2,
+                children: chips,
+              ),
             ),
           ),
         ],
