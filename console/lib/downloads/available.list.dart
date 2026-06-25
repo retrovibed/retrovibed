@@ -77,53 +77,54 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
     final theme = Theme.of(context);
-    final upload = (
-      FilesEvent v, {
-      ValueNotifier<int>? progress,
-    }) {
-      setState(() {
-        _loading = true;
-      });
+    final upload =
+        (
+          FilesEvent v, {
+          ValueNotifier<int>? progress,
+        }) {
+          setState(() {
+            _loading = true;
+          });
 
-      return Future.microtask(() {
-        final multiparts = v.files.map((c) {
-          return media.media.uploadable(c.path, c.name, c.mimeType!);
-        });
-        return Future.wait(
-              multiparts.map((fv) {
-                return fv
-                    .then((v) {
-                      return widget
-                          .upload((req) {
-                            req..files.add(v);
-                            return req;
-                          })
-                          .then((uploaded) {
-                            return media.discovered.download(uploaded.media.id);
-                          });
-                    })
-                    .whenComplete(() => widget.events?.value += 1);
-              }),
-            )
-            .then((v) => ds.NullWidget)
-            .catchError((cause) {
-              return ds.Error.unknown(cause, onTap: resetcause);
-            })
-            .whenComplete(() {
-              setState(() {
-                _loading = false;
-                widget.events?.value += 1;
-              });
+          return Future.microtask(() {
+            final multiparts = v.files.map((c) {
+              return media.media.uploadable(c.path, c.name, c.mimeType!);
             });
-      });
-    };
+            return Future.wait(
+                  multiparts.map((fv) {
+                    return fv
+                        .then((v) {
+                          return widget
+                              .upload((req) {
+                                req..files.add(v);
+                                return req;
+                              })
+                              .then((uploaded) {
+                                return media.discovered.download(uploaded.media.id);
+                              });
+                        })
+                        .whenComplete(() => widget.events?.value += 1);
+                  }),
+                )
+                .then((v) => ds.NullWidget)
+                .catchError((cause) {
+                  return ds.Error.unknown(cause, onTap: resetcause);
+                })
+                .whenComplete(() {
+                  setState(() {
+                    _loading = false;
+                    widget.events?.value += 1;
+                  });
+                });
+          });
+        };
 
     return ds.Table(
       loading: _loading,
       cause: _cause,
       children: _res.items,
       leading: ds.SearchTray(
-        ensureVisible: true,
+        autoscroll: true,
         autofocus: defaults.desktop,
         decoration: InputDecoration(hintText: "search downloadable content"),
         controller: widget.controller,
@@ -247,24 +248,23 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                               : "Start downloading this item.",
                         ),
                       ),
-                      onPressed:
-                          () => media.discovered
-                              .download(
-                                v.media.id,
-                                options: [authn.request(authn.AuthzCache.meta(context))],
-                              )
-                              .then((v) {
-                                widget.events ?? refresh(_res.next);
-                                widget.events?.value += 1;
-                              })
-                              .catchError((cause) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text("Failed to download: $cause"),
-                                  ),
-                                );
-                                return null;
-                              }),
+                      onPressed: () => media.discovered
+                          .download(
+                            v.media.id,
+                            options: [authn.request(authn.AuthzCache.meta(context))],
+                          )
+                          .then((v) {
+                            widget.events ?? refresh(_res.next);
+                            widget.events?.value += 1;
+                          })
+                          .catchError((cause) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Failed to download: $cause"),
+                              ),
+                            );
+                            return null;
+                          }),
                     ),
                   ],
                 ),
@@ -272,63 +272,61 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                   media.DownloadDisplay(
                     v,
                     background: theme.colorScheme.surfaceContainerLow,
-                    onVerify:
-                        (download) => ds.modals.asyncfn(
-                          context,
-                          (completion) => ds.Confirmation.yesNo(
-                            content: Text(
-                              "Are you sure you want to verify ${v.media.description}?",
-                            ),
-                            onConfirm: (context) {
-                              media.discovered
-                                  .update(
-                                    v.media.torrentId,
-                                    download..verifyAt = DateTime.now().toUtc().toIso8601String(),
-                                    options: [authn.request(authn.AuthzCache.meta(context))],
-                                  )
-                                  .then((_) => completion.complete())
-                                  .catchError((cause) {
-                                    completion.completeError(cause);
-                                  });
-                            },
-                            onCancel: (_) => completion.complete(),
-                          ),
+                    onVerify: (download) => ds.modals.asyncfn(
+                      context,
+                      (completion) => ds.Confirmation.yesNo(
+                        content: Text(
+                          "Are you sure you want to verify ${v.media.description}?",
                         ),
-                    onTap:
-                        () => ds.modals.asyncfn(
-                          context,
-                          (completion) => ds.Confirmation.yesNo(
-                            content: Text(
-                              "Are you sure you want to reset ${v.media.description}?",
-                            ),
-                            onConfirm: (context) {
-                              httpx
-                                  .withRetry(
-                                    () => media.discovered.reset(
-                                      v.media.id,
-                                      options: [
-                                        authn.request(authn.AuthzCache.meta(context)),
-                                      ],
+                        onConfirm: (context) {
+                          media.discovered
+                              .update(
+                                v.media.torrentId,
+                                download..verifyAt = DateTime.now().toUtc().toIso8601String(),
+                                options: [authn.request(authn.AuthzCache.meta(context))],
+                              )
+                              .then((_) => completion.complete())
+                              .catchError((cause) {
+                                completion.completeError(cause);
+                              });
+                        },
+                        onCancel: (_) => completion.complete(),
+                      ),
+                    ),
+                    onTap: () => ds.modals.asyncfn(
+                      context,
+                      (completion) => ds.Confirmation.yesNo(
+                        content: Text(
+                          "Are you sure you want to reset ${v.media.description}?",
+                        ),
+                        onConfirm: (context) {
+                          httpx
+                              .withRetry(
+                                () => media.discovered.reset(
+                                  v.media.id,
+                                  options: [
+                                    authn.request(authn.AuthzCache.meta(context)),
+                                  ],
+                                ),
+                              )
+                              .then((__v) {
+                                setState(() {
+                                  _res = media.DownloadSearchResponse(
+                                    items: _res.items.where(
+                                      (d) => d.media.id != v.media.id,
                                     ),
-                                  )
-                                  .then((__v) {
-                                    setState(() {
-                                      _res = media.DownloadSearchResponse(
-                                        items: _res.items.where(
-                                          (d) => d.media.id != v.media.id,
-                                        ),
-                                        next: _res.next,
-                                      );
-                                    });
-                                    completion.complete();
-                                  })
-                                  .catchError((cause) {
-                                    completion.completeError(cause);
-                                  });
-                            },
-                            onCancel: (_) => completion.complete(),
-                          ),
-                        ),
+                                    next: _res.next,
+                                  );
+                                });
+                                completion.complete();
+                              })
+                              .catchError((cause) {
+                                completion.completeError(cause);
+                              });
+                        },
+                        onCancel: (_) => completion.complete(),
+                      ),
+                    ),
                     trailing: [],
                   ),
               ],

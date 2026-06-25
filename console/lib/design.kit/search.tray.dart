@@ -44,7 +44,7 @@ class SearchTray extends StatefulWidget {
   final bool empty;
   final bool autofocus;
   final bool disabled;
-  final bool ensureVisible;
+  final bool autoscroll;
   final TextEditingController? controller;
   final FocusNode? focus;
   final InputDecoration? decoration;
@@ -59,7 +59,7 @@ class SearchTray extends StatefulWidget {
     this.trailing = const [],
     this.autofocus = false,
     this.disabled = false,
-    this.ensureVisible = false,
+    this.autoscroll = false,
     this.focus,
     this.decoration,
     this.padding,
@@ -83,7 +83,7 @@ class _SearchTrayState extends State<SearchTray> {
   @override
   void initState() {
     super.initState();
-    if (widget.ensureVisible) {
+    if (widget.autoscroll) {
       postframe(() {
         if (!mounted) return;
         Scrollable.ensureVisible(context);
@@ -144,9 +144,8 @@ class _SearchTrayState extends State<SearchTray> {
       ),
       if (widget.tuning != SearchTray.zerobox)
         buttons.settings(
-          onPressed:
-              () =>
-                  _tuningwidget.value = _tuningwidget.value == SearchTray.zerobox ? widget.tuning : SearchTray.zerobox,
+          onPressed: () =>
+              _tuningwidget.value = _tuningwidget.value == SearchTray.zerobox ? widget.tuning : SearchTray.zerobox,
           help: Hint(Text("display advance settings")),
         ),
     ];

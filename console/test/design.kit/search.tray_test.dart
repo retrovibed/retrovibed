@@ -25,7 +25,7 @@ Widget buildSearchTray({
     next: next ?? (_) {},
     current: current ?? fixnum.Int64.ZERO,
     empty: empty,
-    ensureVisible: ensureVisible,
+    autoscroll: ensureVisible,
     leading: leading,
     trailing: trailing,
     tuning: tuning ?? ds.SearchTray.zerobox,
@@ -208,7 +208,10 @@ void main() {
       await tester.pumpApp(
         Flex(
           direction: Axis.vertical,
-          children: [buildSearchTray(), Expanded(child: Text('Flex content'))],
+          children: [
+            buildSearchTray(),
+            Expanded(child: Text('Flex content')),
+          ],
         ),
       );
       await tester.pumpAndSettle();

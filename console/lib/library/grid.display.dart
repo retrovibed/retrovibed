@@ -159,7 +159,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                     cause: _cause,
                     leading: [
                       ds.SearchTray(
-                        ensureVisible: true,
+                        autoscroll: true,
                         decoration: InputDecoration(hintText: "search library"),
                         filters: [
                           lucene.Boolean.auto('hidden', false, (v) {
