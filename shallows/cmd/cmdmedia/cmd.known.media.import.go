@@ -41,7 +41,12 @@ func (t knownimport) Run(gctx *cmdopts.Global) (err error) {
 func (t knownimport) run(ctx context.Context, db *sql.DB, r io.Reader) (err error) {
 	type batch []library.Known
 	inserts := asynccompute.New(func(ctx context.Context, chunk batch) (err error) {
-		return backoffx.Attempt(ctx, backoffx.Exponential(200*time.Millisecond), func(ctx context.Context) error {
+		bs := backoffx.New(
+			backoffx.Exponential(200*time.Millisecond),
+			backoffx.Maximum(time.Minute),
+			backoffx.JitterRandom(time.Second),
+		)
+		return backoffx.Attempt(ctx, bs, func(ctx context.Context) error {
 			ts := time.Now()
 			s := library.NewKnownBatchInsertWithDefaults(ctx, db, chunk...)
 
