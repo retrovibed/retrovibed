@@ -40,6 +40,7 @@ class AvailableGridDisplay extends StatefulWidget {
 
 class _AvailableGridDisplay extends State<AvailableGridDisplay> {
   bool _loading = true;
+  bool _library = true; // search the library. when false we search known media.
   Widget _cause = ds.Error.zero;
 
   void setState(VoidCallback fn) {
@@ -62,6 +63,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
           setState(() {
             widget.search.value = v;
             _loading = false;
+            _library = v.items.isNotEmpty;
           });
 
           widget.focus?.requestFocus();
@@ -220,7 +222,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                             )
                           : ds.Empty,
                     ],
-                    empty: widget.search.value.items.isNotEmpty
+                    empty: _library
                         ? ds.Empty
                         : KnownMediaDownloadList.query(
                             () {
