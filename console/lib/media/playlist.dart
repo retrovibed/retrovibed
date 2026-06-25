@@ -95,7 +95,7 @@ class Playlist extends StatefulWidget {
                   return KeyEventResult.handled;
                 },
               ),
-              const SingleActivator(LogicalKeyboardKey.arrowRight): (
+              const SingleActivator(control: true, LogicalKeyboardKey.arrowRight): (
                 const Text('seek forward 10s'),
                 () {
                   final pos = s.player.state.position + const Duration(seconds: 10);
@@ -104,7 +104,7 @@ class Playlist extends StatefulWidget {
                   return KeyEventResult.handled;
                 },
               ),
-              const SingleActivator(LogicalKeyboardKey.arrowLeft): (
+              const SingleActivator(control: true, LogicalKeyboardKey.arrowLeft): (
                 const Text('seek backward 10s'),
                 () {
                   final pos = s.player.state.position - const Duration(seconds: 10);
