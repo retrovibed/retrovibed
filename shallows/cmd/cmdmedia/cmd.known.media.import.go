@@ -42,9 +42,8 @@ func (t knownimport) run(ctx context.Context, db *sql.DB, r io.Reader) (err erro
 	type batch []library.Known
 	inserts := asynccompute.New(func(ctx context.Context, chunk batch) (err error) {
 		bs := backoffx.New(
-			backoffx.Exponential(200*time.Millisecond),
-			backoffx.Maximum(time.Minute),
-			backoffx.JitterRandom(time.Second),
+			backoffx.Constant(time.Second),
+			backoffx.JitterRandom(200*time.Millisecond),
 		)
 		return backoffx.Attempt(ctx, bs, func(ctx context.Context) error {
 			ts := time.Now()
