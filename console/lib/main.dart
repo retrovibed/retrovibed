@@ -34,9 +34,7 @@ TextScaler autoscaling(BuildContext context) {
 
 void main() async {
   await retro.run(() {
-    FlutterError.onError = (FlutterErrorDetails details) {
-      FlutterError.dumpErrorToConsole(details);
-    };
+    FlutterError.onError = FlutterError.dumpErrorToConsole;
 
     ErrorWidget.builder = (FlutterErrorDetails details) {
       FlutterError.dumpErrorToConsole(details);
