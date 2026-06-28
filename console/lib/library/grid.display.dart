@@ -164,11 +164,9 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                         autoscroll: true,
                         decoration: InputDecoration(hintText: "search library"),
                         filters: [
-                          lucene.Mode(
-                            lucene.Boolean.auto('discover', false, (v) {
-                              _library = !v;
-                            }),
-                          ),
+                          lucene.Mode.auto('discover', false, (discover) {
+                            setState(() => _library = !discover);
+                          }),
                           lucene.Boolean.auto('hidden', false, (v) {
                             setState(() => widget.search.value.next.hidden = v);
                             refresh(widget.search.value.next);
@@ -217,7 +215,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                         tuning: GridSettings(),
                         help: ds.Hint(const Text("search your library, use @ to access advanced filtering")),
                       ),
-                      (widget.search.value.next.query.isEmpty && !_library)
+                      (widget.search.value.next.query.isEmpty)
                           ? disc.Home(
                               category,
                               padding: defaults.padding.copyWith(
@@ -255,7 +253,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                               child: Padding(
                                 padding: defaults.padding,
                                 child: Text(
-                                  widget.search.value.items.isEmpty
+                                  _library
                                       ? "no results in library. select below to automatically locate and download"
                                       : "select below to automatically locate and download",
                                   style: TextStyle(
