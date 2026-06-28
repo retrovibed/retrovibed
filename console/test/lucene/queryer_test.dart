@@ -286,6 +286,26 @@ void main() {
       expect(emitted, '');
     });
 
+    testWidgets('long press on the mode chip removes the active mode', (tester) async {
+      await tester.pumpApp(
+        lucene.Queryer((_) {}, [
+          lucene.Mode('hd', false, false, (_) {}),
+        ]),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextField), '@');
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('hd'));
+      await tester.pumpAndSettle();
+      expect(find.byType(lucene.QueryerMode), findsOneWidget);
+
+      await tester.longPress(find.byType(lucene.QueryerMode));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(lucene.QueryerMode), findsNothing);
+    });
+
     testWidgets('deleted mode field reappears in suggestions', (tester) async {
       await tester.pumpApp(
         lucene.Queryer((_) {}, [

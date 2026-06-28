@@ -149,6 +149,15 @@ class _QueryerState extends State<Queryer> {
     });
   }
 
+  void _resetMode() {
+    if (_mode == ParserResult.close) return;
+    final current = _mode;
+    setState(() => _mode = ParserResult.close);
+    // Reset field to its default value and restore it in the parser's field list.
+    current.reset(_parser);
+    widget.onQuery(_ctrl.text);
+  }
+
   void _removeFilter(ParserResult filter) {
     setState(() {
       _filters.removeWhere((v) => v == filter);
@@ -217,11 +226,7 @@ class _QueryerState extends State<Queryer> {
           () {
             if (_ctrl.text.isNotEmpty) return KeyEventResult.ignored;
             if (_mode == ParserResult.close) return KeyEventResult.ignored;
-            final current = _mode;
-            setState(() => _mode = ParserResult.close);
-            // Reset field to its default value and restore it in the parser's field list.
-            current.reset(_parser);
-            widget.onQuery(_ctrl.text);
+            _resetMode();
 
             return KeyEventResult.handled;
           },
@@ -251,7 +256,13 @@ class _QueryerState extends State<Queryer> {
             ),
             leading: [
               ...widget.leading,
-              if (_mode != ParserResult.close) ds.CompactingMenu.pinned(QueryerMode(mode: _mode)),
+              if (_mode != ParserResult.close)
+                ds.CompactingMenu.pinned(
+                  GestureDetector(
+                    onLongPress: _resetMode,
+                    child: QueryerMode(mode: _mode),
+                  ),
+                ),
             ],
             trailing: widget.trailing,
           ),
