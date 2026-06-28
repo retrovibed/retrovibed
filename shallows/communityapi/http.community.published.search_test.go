@@ -3,6 +3,7 @@ package communityapi_test
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"testing"
 	"time"
 
@@ -492,6 +493,102 @@ func TestPublishedListEndpoint(t *testing.T) {
 			ctx,
 			http.MethodGet,
 			"/c/"+communityID,
+			nil,
+			httptestx.RequestOptionAuthorization(token),
+		)
+		require.NoError(t, err)
+
+		routes.ServeHTTP(resp, req)
+		require.Equal(t, http.StatusOK, resp.Code)
+
+		var result communityapi.PublishedContentSearchResponse
+		require.NoError(t, json.Unmarshal(resp.Body.Bytes(), &result))
+		require.Empty(t, result.Items)
+	})
+
+	t.Run("paginates results using limit and offset", func(t *testing.T) {
+		var (
+			ctx, done  = testx.Context(t)
+			q          = sqltestx.Metadatabase(t)
+			p          meta.Profile
+			v          meta.Authz
+			mediaDir   = t.TempDir()
+			torrentDir = t.TempDir()
+		)
+		defer done()
+
+		communityID := uuid.Must(uuid.NewV7()).String()
+
+		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
+		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
+		require.NoError(t, testx.Fake(&v, meta.AuthzOptionProfileID(p.ID), meta.AuthzOptionAdmin))
+		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
+
+		now := time.Now()
+		lmds := make([]library.Metadata, 3)
+		pcs := make([]community.PublishedContent, 3)
+		for i := range lmds {
+			lmds[i] = library.Metadata{
+				ID:             uuid.Must(uuid.NewV7()).String(),
+				Bytes:          1024,
+				TorrentID:      uuid.Nil.String(),
+				KnownMediaID:   uuid.Nil.String(),
+				ArchiveID:      uuid.Nil.String(),
+				EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+			}
+			require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmds[i]).Scan(&lmds[i]))
+
+			require.NoError(t, testx.Fake(&pcs[i], community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
+				p.CommunityID = communityID
+				p.LibraryID = lmds[i].ID
+				p.Bytes = lmds[i].Bytes
+			}))
+			require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pcs[i]).Scan(&pcs[i]))
+			// oldest -> newest: lmds[0], lmds[1], lmds[2]; published_at DESC returns lmds[2] first.
+			require.NoError(t, community.PublishedContentUpdatePublishedAt(ctx, q, pcs[i].ID, now.Add(-time.Duration(len(lmds)-i)*24*time.Hour)).Scan(&pcs[i]))
+		}
+
+		routes := mux.NewRouter()
+		communityapi.NewHTTPPublished(
+			q,
+			communityapi.HTTPPublishedOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			communityapi.HTTPPublishedOptionHTTPClient(&http.Client{}),
+			communityapi.HTTPPublishedOptionMediaStorage(fsx.DirVirtual(mediaDir)),
+			communityapi.HTTPPublishedOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
+		).Bind(routes.PathPrefix("/c").Subrouter())
+
+		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
+		token := "Bearer " + httpauthtest.UnsafeToken(claims, httpauthtest.UnsafeJWTSecretSource)
+
+		expectedOrder := []string{lmds[2].ID, lmds[1].ID, lmds[0].ID}
+		var seen []string
+		for page, offset := range []int{0, 1, 2} {
+			resp, req, err := httptestx.BuildRequestContextBytes(
+				ctx,
+				http.MethodGet,
+				"/c/"+communityID+"?limit=1&offset="+strconv.Itoa(offset),
+				nil,
+				httptestx.RequestOptionAuthorization(token),
+			)
+			require.NoError(t, err)
+
+			routes.ServeHTTP(resp, req)
+			require.Equal(t, http.StatusOK, resp.Code)
+
+			var result communityapi.PublishedContentSearchResponse
+			require.NoError(t, json.Unmarshal(resp.Body.Bytes(), &result))
+			require.Len(t, result.Items, 1, "page %d", page)
+			require.Equal(t, expectedOrder[page], result.Items[0].LibraryId, "page %d", page)
+			seen = append(seen, result.Items[0].LibraryId)
+		}
+
+		require.ElementsMatch(t, expectedOrder, seen, "pagination must cover every item exactly once")
+
+		// requesting beyond the last page returns no items.
+		resp, req, err := httptestx.BuildRequestContextBytes(
+			ctx,
+			http.MethodGet,
+			"/c/"+communityID+"?limit=1&offset=3",
 			nil,
 			httptestx.RequestOptionAuthorization(token),
 		)

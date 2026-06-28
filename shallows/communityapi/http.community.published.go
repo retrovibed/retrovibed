@@ -251,20 +251,22 @@ func (t *HTTPPublished) search(w http.ResponseWriter, r *http.Request) {
 	}
 	msg.Next.Limit = numericx.Min(msg.Next.Limit, 100)
 
-	q := sqlx.Scan(community.PublishedContentSearch(r.Context(), t.q, community.PublishedContentSearchBuilder().Where(
+	q := community.PublishedContentSearch(r.Context(), t.q, community.PublishedContentSearchBuilder().Where(
 		squirrel.And{
 			community.PublishedContentQueryCommunityID(communityID),
 			community.PublishedContentQueryNotTombstoned(),
 			lucenex.Query(t.lucene, msg.Next.Query, lucenex.WithDefaultField("title")),
 		},
-	).OrderBy("published_at DESC")))
+	).OrderBy("published_at DESC").Offset(msg.Next.Offset*msg.Next.Limit).Limit(msg.Next.Limit))
 
-	for pc := range q.Iter() {
+	qi := sqlx.Scan(q)
+
+	for pc := range qi.Iter() {
 		tmp := langx.Clone(PublishedContent{}, PublishedContentOptionFromDB(langx.Clone(pc, timex.JSONSafeEncodeOption)))
 		msg.Items = append(msg.Items, &tmp)
 	}
 
-	if err := q.Err(); err != nil {
+	if err := qi.Err(); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to fetch published content"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
