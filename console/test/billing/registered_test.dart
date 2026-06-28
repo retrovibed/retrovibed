@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:retrovibed/billing/registered.dart';
 import 'package:retrovibed/billing/api.dart' as api;
 import 'package:retrovibed/billing/plan.summary.dart';
+import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
 
 void main() {
@@ -17,12 +18,15 @@ void main() {
         final completer = Completer<api.BillingLookupResponse>();
 
         await tester.pumpApp(
-          Registered(
-            const Text('child content'),
-            lookup: ({options = const []}) => completer.future,
-            create: ({options = const []}) => Future.error(Exception('not called')),
+          ds.LoadingGuard(
+            Registered(
+              const Text('child content'),
+              lookup: ({options = const []}) => completer.future,
+              create: ({options = const []}) => Future.error(Exception('not called')),
+            ),
           ),
         );
+        await tester.pump();
         await tester.pump();
 
         expect(find.byType(CircularProgressIndicator), findsOneWidget);

@@ -29,6 +29,7 @@ void main() {
   group('Releases', () {
     testWidgets('displays loading state initially', (tester) async {
       await tester.pumpApp(NewReleases(mimex.video, latest:_notimplemented));
+      await tester.pump();
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
       await tester.pumpAndSettle();
       expect(find.text('New Releases'), findsOneWidget);

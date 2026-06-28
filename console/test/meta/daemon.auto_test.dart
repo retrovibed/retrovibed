@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
+import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/meta/api.dart' as api;
 import 'package:retrovibed/meta/daemon.auto.dart';
 import 'package:retrovibed/meta/daemon.mdns.dart';
@@ -117,8 +118,7 @@ void main() {
       WidgetTester tester,
     ) async {
       final daemon = api.Daemon(hostname: 'localhost:8080');
-      Future<api.DaemonLookupResponse> mockLatest() async =>
-          api.DaemonLookupResponse(daemon: daemon);
+      Future<api.DaemonLookupResponse> mockLatest() async => api.DaemonLookupResponse(daemon: daemon);
       Future<api.Daemon> mockConnectable(api.Daemon d) async => d;
 
       await tester.pumpApp(
@@ -157,14 +157,15 @@ void main() {
       Future<api.Daemon> mockConnectable(api.Daemon d) async => d;
 
       await tester.pumpApp(
-        EndpointAuto(
-          latest: mockLatest,
-          connectable: mockConnectable,
-          backoff: httpx.Backoff.constant(Duration.zero),
-          const Placeholder(),
+        ds.LoadingGuard(
+          EndpointAuto(
+            latest: mockLatest,
+            connectable: mockConnectable,
+            backoff: httpx.Backoff.constant(Duration.zero),
+            const Placeholder(),
+          ),
         ),
       );
-
       await tester.pumpAndSettle();
 
       expect(attempts, equals(2));
@@ -185,11 +186,13 @@ void main() {
         }
 
         await tester.pumpApp(
-          EndpointAuto(
-            latest: mockLatest,
-            create: mockCreate,
-            backoff: httpx.Backoff.constant(Duration.zero),
-            const SizedBox(),
+          ds.LoadingGuard(
+            EndpointAuto(
+              latest: mockLatest,
+              create: mockCreate,
+              backoff: httpx.Backoff.constant(Duration.zero),
+              const SizedBox(),
+            ),
           ),
         );
 
@@ -203,18 +206,19 @@ void main() {
       WidgetTester tester,
     ) async {
       final daemon = api.Daemon(hostname: 'localhost:9998');
-      Future<api.DaemonLookupResponse> mockLatest() async =>
-          api.DaemonLookupResponse(daemon: daemon);
+      Future<api.DaemonLookupResponse> mockLatest() async => api.DaemonLookupResponse(daemon: daemon);
       Future<api.Daemon> mockConnectable(api.Daemon d) async {
         throw http.Response('', 401);
       }
 
       await tester.pumpApp(
-        EndpointAuto(
-          latest: mockLatest,
-          connectable: mockConnectable,
-          backoff: httpx.Backoff.constant(Duration.zero),
-          const SizedBox(),
+        ds.LoadingGuard(
+          EndpointAuto(
+            latest: mockLatest,
+            connectable: mockConnectable,
+            backoff: httpx.Backoff.constant(Duration.zero),
+            const SizedBox(),
+          ),
         ),
       );
 
@@ -244,11 +248,13 @@ void main() {
       Future<api.Daemon> mockConnectable(api.Daemon d) async => d;
 
       await tester.pumpApp(
-        EndpointAuto(
-          latest: mockLatest,
-          connectable: mockConnectable,
-          backoff: httpx.Backoff.constant(Duration.zero),
-          const Placeholder(),
+        ds.LoadingGuard(
+          EndpointAuto(
+            latest: mockLatest,
+            connectable: mockConnectable,
+            backoff: httpx.Backoff.constant(Duration.zero),
+            const Placeholder(),
+          ),
         ),
       );
 
@@ -263,18 +269,19 @@ void main() {
       WidgetTester tester,
     ) async {
       final daemon = api.Daemon(hostname: 'localhost:9998');
-      Future<api.DaemonLookupResponse> mockLatest() async =>
-          api.DaemonLookupResponse(daemon: daemon);
+      Future<api.DaemonLookupResponse> mockLatest() async => api.DaemonLookupResponse(daemon: daemon);
       Future<api.Daemon> mockConnectable(api.Daemon d) async {
         throw const httpx.MissingTokenError();
       }
 
       await tester.pumpApp(
-        EndpointAuto(
-          latest: mockLatest,
-          connectable: mockConnectable,
-          backoff: httpx.Backoff.constant(Duration.zero),
-          const SizedBox(),
+        ds.LoadingGuard(
+          EndpointAuto(
+            latest: mockLatest,
+            connectable: mockConnectable,
+            backoff: httpx.Backoff.constant(Duration.zero),
+            const SizedBox(),
+          ),
         ),
       );
 
@@ -288,18 +295,19 @@ void main() {
       'shows forbidden error when connectable returns 403',
       (WidgetTester tester) async {
         final daemon = api.Daemon(hostname: 'localhost:9998');
-        Future<api.DaemonLookupResponse> mockLatest() async =>
-            api.DaemonLookupResponse(daemon: daemon);
+        Future<api.DaemonLookupResponse> mockLatest() async => api.DaemonLookupResponse(daemon: daemon);
         Future<api.Daemon> mockConnectable(api.Daemon d) async {
           throw http.Response('', 403);
         }
 
         await tester.pumpApp(
-          EndpointAuto(
-            latest: mockLatest,
-            connectable: mockConnectable,
-            backoff: httpx.Backoff.constant(Duration.zero),
-            const SizedBox(),
+          ds.LoadingGuard(
+            EndpointAuto(
+              latest: mockLatest,
+              connectable: mockConnectable,
+              backoff: httpx.Backoff.constant(Duration.zero),
+              const SizedBox(),
+            ),
           ),
         );
 
@@ -320,8 +328,7 @@ void main() {
       (WidgetTester tester) async {
         final daemon = api.Daemon(hostname: 'localhost:9998');
         bool registerCalled = false;
-        Future<api.DaemonLookupResponse> mockLatest() async =>
-            api.DaemonLookupResponse(daemon: daemon);
+        Future<api.DaemonLookupResponse> mockLatest() async => api.DaemonLookupResponse(daemon: daemon);
         Future<api.Daemon> mockConnectable(api.Daemon d) async {
           throw http.Response('', 401);
         }
@@ -335,12 +342,14 @@ void main() {
         }
 
         await tester.pumpApp(
-          EndpointAuto(
-            latest: mockLatest,
-            connectable: mockConnectable,
-            register: mockRegister,
-            backoff: httpx.Backoff.constant(Duration.zero),
-            const Placeholder(),
+          ds.LoadingGuard(
+            EndpointAuto(
+              latest: mockLatest,
+              connectable: mockConnectable,
+              register: mockRegister,
+              backoff: httpx.Backoff.constant(Duration.zero),
+              const Placeholder(),
+            ),
           ),
         );
 
@@ -365,10 +374,12 @@ void main() {
       }
 
       await tester.pumpApp(
-        EndpointAuto(
-          latest: mockLatest,
-          backoff: httpx.Backoff.constant(Duration.zero),
-          const SizedBox(),
+        ds.LoadingGuard(
+          EndpointAuto(
+            latest: mockLatest,
+            backoff: httpx.Backoff.constant(Duration.zero),
+            const SizedBox(),
+          ),
         ),
       );
 
@@ -396,12 +407,14 @@ void main() {
 
       await tester.pumpApp(
         MaterialApp(
-          home: EndpointAuto(
-            latest: mockLatest,
-            create: mockCreate,
-            connectable: mockConnectable,
-            backoff: httpx.Backoff.constant(Duration.zero),
-            const Placeholder(),
+          home: ds.LoadingGuard(
+            EndpointAuto(
+              latest: mockLatest,
+              create: mockCreate,
+              connectable: mockConnectable,
+              backoff: httpx.Backoff.constant(Duration.zero),
+              const Placeholder(),
+            ),
           ),
         ),
       );
@@ -421,10 +434,12 @@ void main() {
 
           await tester.pumpApp(
             physicalSize: entry.value,
-            EndpointAuto(
-              latest: mockLatest,
-              backoff: httpx.Backoff.constant(Duration.zero),
-              const SizedBox(),
+            ds.LoadingGuard(
+              EndpointAuto(
+                latest: mockLatest,
+                backoff: httpx.Backoff.constant(Duration.zero),
+                const SizedBox(),
+              ),
             ),
             fit: FlexFit.loose,
           );
@@ -442,10 +457,12 @@ void main() {
 
           await tester.pumpApp(
             physicalSize: entry.value,
-            EndpointAuto(
-              latest: mockLatest,
-              backoff: httpx.Backoff.constant(Duration.zero),
-              const SizedBox(),
+            ds.LoadingGuard(
+              EndpointAuto(
+                latest: mockLatest,
+                backoff: httpx.Backoff.constant(Duration.zero),
+                const SizedBox(),
+              ),
             ),
             fit: FlexFit.tight,
           );
@@ -465,10 +482,12 @@ void main() {
 
           await tester.pumpApp(
             physicalSize: entry.value,
-            EndpointAuto(
-              latest: mockLatest,
-              backoff: httpx.Backoff.constant(Duration.zero),
-              const SizedBox(),
+            ds.LoadingGuard(
+              EndpointAuto(
+                latest: mockLatest,
+                backoff: httpx.Backoff.constant(Duration.zero),
+                const SizedBox(),
+              ),
             ),
             fit: FlexFit.loose,
           );
@@ -486,10 +505,12 @@ void main() {
 
           await tester.pumpApp(
             physicalSize: entry.value,
-            EndpointAuto(
-              latest: mockLatest,
-              backoff: httpx.Backoff.constant(Duration.zero),
-              const SizedBox(),
+            ds.LoadingGuard(
+              EndpointAuto(
+                latest: mockLatest,
+                backoff: httpx.Backoff.constant(Duration.zero),
+                const SizedBox(),
+              ),
             ),
             fit: FlexFit.tight,
           );
@@ -508,10 +529,12 @@ void main() {
           await tester.pumpApp(
             physicalSize: entry.value,
             Scaffold(
-              body: EndpointAuto(
-                latest: mockLatest,
-                backoff: httpx.Backoff.constant(Duration.zero),
-                const SizedBox(),
+              body: ds.LoadingGuard(
+                EndpointAuto(
+                  latest: mockLatest,
+                  backoff: httpx.Backoff.constant(Duration.zero),
+                  const SizedBox(),
+                ),
               ),
             ),
           );
@@ -535,18 +558,20 @@ void main() {
 
       await tester.pumpApp(
         MaterialApp(
-          home: EndpointAuto(
-            latest: mockLatest,
-            connectable: mockConnectable,
-            backoff: httpx.Backoff.constant(Duration.zero),
-            const SizedBox(),
+          home: ds.LoadingGuard(
+            EndpointAuto(
+              latest: mockLatest,
+              connectable: mockConnectable,
+              backoff: httpx.Backoff.constant(Duration.zero),
+              const SizedBox(),
+            ),
           ),
         ),
       );
+      await tester.pumpAndSettle();
 
       // still loading — MDNSDiscovery must not appear until loading completes
       expect(find.byType(MDNSDiscovery), findsNothing);
-
       await tester.pumpAndSettle();
     });
 
@@ -564,14 +589,18 @@ void main() {
 
       await tester.pumpApp(
         MaterialApp(
-          home: EndpointAuto(
-            latest: mockLatest,
-            connectable: mockConnectable,
-            backoff: httpx.Backoff.constant(Duration.zero),
-            const SizedBox(),
+          home: ds.LoadingGuard(
+            EndpointAuto(
+              latest: mockLatest,
+              connectable: mockConnectable,
+              backoff: httpx.Backoff.constant(Duration.zero),
+              const SizedBox(),
+            ),
           ),
         ),
       );
+      await tester.pump();
+      await tester.pump();
 
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
 

@@ -3,6 +3,7 @@ import 'package:fixnum/fixnum.dart' as fixnum;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:retrovibed/authn/cache.dart';
+import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/meta.dart' as meta;
 import 'package:retrovibed/uuidx.dart' as uuidx;
 
@@ -19,13 +20,16 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Material(
-            child: AuthzCache(
-              const Text('protected content'),
-              current: ({String? host}) => completer.future,
+            child: ds.LoadingGuard(
+              AuthzCache(
+                const Text('protected content'),
+                current: ({String? host}) => completer.future,
+              ),
             ),
           ),
         ),
       );
+      await tester.pump();
       await tester.pump();
 
       expect(find.text('protected content'), findsNothing);

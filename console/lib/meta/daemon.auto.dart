@@ -54,8 +54,8 @@ class _EndpointAuto extends State<EndpointAuto> with WidgetsBindingObserver {
   bool _loading = true;
   Widget _cause = ds.Error.zero;
   api.Daemon? _res;
-  Widget Function(void Function(api.Daemon) connect, {void Function()? retry}) _preamble =
-      (connect, {retry}) => mdns.NoLocalService(connect: connect, retry: retry);
+  Widget Function(void Function(api.Daemon) connect, {void Function()? retry}) _preamble = (connect, {retry}) =>
+      mdns.NoLocalService(connect: connect, retry: retry);
 
   Future<void> setdaemon(api.Daemon? d) {
     if (d == null) return Future.value(null);
@@ -158,11 +158,10 @@ class _EndpointAuto extends State<EndpointAuto> with WidgetsBindingObserver {
         .catchError((e) {
           // no service known
           setState(() {
-            _preamble =
-                (connect, {retry}) => mdns.InitialSetup(
-                  connect: (d) => refresh(Future.value(d)),
-                  retry: retry,
-                );
+            _preamble = (connect, {retry}) => mdns.InitialSetup(
+              connect: (d) => refresh(Future.value(d)),
+              retry: retry,
+            );
           });
         }, test: httpx.ErrorsTest.err404)
         .catchError((e) {
@@ -220,23 +219,24 @@ class _EndpointAuto extends State<EndpointAuto> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    final Widget fallback =
-        _loading
-            ? ds.Empty
-            : mdns.MDNSDiscovery(
-              daemon: (d) {
-                setState(() {
-                  _res = d;
-                });
-              },
-              preamble: _preamble,
-            );
+    final Widget fallback = _loading
+        ? ds.Empty
+        : mdns.MDNSDiscovery(
+            daemon: (d) {
+              setState(() {
+                _res = d;
+              });
+            },
+            preamble: _preamble,
+          );
 
     final failed = !(_res == null && _cause == ds.Error.zero);
-    return ds.Loading(
+    return ds.LoadingBoundary(
+      ds.ErrorScreen(
+        cause: failed ? _cause : fallback,
+        widget.child,
+      ),
       loading: _loading,
-      cause: failed ? _cause : fallback,
-      widget.child,
     );
   }
 }

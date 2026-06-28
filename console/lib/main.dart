@@ -107,119 +107,123 @@ class Retrovibed extends StatelessWidget {
       home: Material(
         child: SafeArea(
           child: ds.Full(
-            ds.ErrorBoundary(
-              ds.HelpScope(
-                authn.Login(
-                  authenticated: _startdaemon,
-                  meta.EndpointAuto(
-                    authn.Authenticated(
-                      authn.DeeppoolAuthzCache(
-                        authn.AuthzCache(
-                          Metered(
-                            DeepLink(
-                              billing.Registered(
-                                media.Playlist(
-                                  tracing: (ctx, pos, dur, q, id) {
-                                    medialib.recent
-                                        .record(
-                                          medialib.RecentRecordRequest(
-                                            media: medialib.Media(id: id),
-                                            position: ds.Int64(pos.inMilliseconds),
-                                            duration: ds.Int64(dur.inMilliseconds),
-                                            query: q,
-                                            mimetype: mimex.category(q.mimetypes),
-                                          ),
-                                          options: [authn.request(authn.AuthzCache.meta(ctx))],
-                                        )
-                                        .then((v) {})
-                                        .catchError((cause) {
-                                          print(
-                                            "failed to record watch event ${pos}/${dur} - ${q} - ${cause}",
-                                          );
-                                        })
-                                        .ignore();
-                                  },
-                                  DefaultTabController(
-                                    length: 4,
-                                    child: ds.build((context) {
-                                      final defaults = ds.Defaults.of(context);
-                                      final compact = defaults.isCompact;
-                                      final nochrome = ds.Full.nochrome(context);
-                                      final tabbar = TabBar(
-                                        dividerHeight: 0,
-                                        tabs: [
-                                          Tab(icon: Icon(Icons.movie)),
-                                          Tab(icon: Icon(Icons.download)),
-                                          Tab(icon: Icon(Icons.groups)),
-                                          Tab(icon: Icon(Icons.settings)),
-                                        ],
-                                      );
+            ds.LoadingGuard(
+              ds.ErrorBoundary(
+                ds.HelpScope(
+                  authn.Login(
+                    authenticated: _startdaemon,
+                    meta.EndpointAuto(
+                      authn.Authenticated(
+                        authn.DeeppoolAuthzCache(
+                          authn.AuthzCache(
+                            Metered(
+                              DeepLink(
+                                billing.Registered(
+                                  media.Playlist(
+                                    tracing: (ctx, pos, dur, q, id) {
+                                      medialib.recent
+                                          .record(
+                                            medialib.RecentRecordRequest(
+                                              media: medialib.Media(id: id),
+                                              position: ds.Int64(pos.inMilliseconds),
+                                              duration: ds.Int64(dur.inMilliseconds),
+                                              query: q,
+                                              mimetype: mimex.category(q.mimetypes),
+                                            ),
+                                            options: [authn.request(authn.AuthzCache.meta(ctx))],
+                                          )
+                                          .then((v) {})
+                                          .catchError((cause) {
+                                            print(
+                                              "failed to record watch event ${pos}/${dur} - ${q} - ${cause}",
+                                            );
+                                          })
+                                          .ignore();
+                                    },
+                                    DefaultTabController(
+                                      length: 4,
+                                      child: ds.build((context) {
+                                        final defaults = ds.Defaults.of(context);
+                                        final compact = defaults.isCompact;
+                                        final nochrome = ds.Full.nochrome(context);
+                                        final tabbar = TabBar(
+                                          dividerHeight: 0,
+                                          tabs: [
+                                            Tab(icon: Icon(Icons.movie)),
+                                            Tab(icon: Icon(Icons.download)),
+                                            Tab(icon: Icon(Icons.groups)),
+                                            Tab(icon: Icon(Icons.settings)),
+                                          ],
+                                        );
 
-                                      Widget tabs = DecoratedBox(
-                                        decoration: BoxDecoration(
-                                          border: Border(
-                                            bottom: BorderSide(
-                                              width: 1.0,
-                                              color: Theme.of(context).dividerColor,
+                                        Widget tabs = DecoratedBox(
+                                          decoration: BoxDecoration(
+                                            border: Border(
+                                              bottom: BorderSide(
+                                                width: 1.0,
+                                                color: Theme.of(context).dividerColor,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        child: DragToMoveArea(
-                                          child: Row(
-                                            children: [
-                                              Expanded(
-                                                child: tabbar,
-                                              ),
-                                              if (defaults.desktop) navbar.Hamburger(),
-                                            ],
-                                          ),
-                                        ),
-                                      );
-                                      if (defaults.desktop) {
-                                        tabs = DragToMoveArea(child: tabs);
-                                      }
-
-                                      return Scaffold(
-                                        appBar: (!compact && !nochrome)
-                                            ? PreferredSize(
-                                                preferredSize: Size.fromHeight(kTextTabBarHeight),
-                                                child: tabs,
-                                              )
-                                            : null,
-                                        bottomNavigationBar: (compact && !nochrome) ? tabs : null,
-                                        body: ds.ErrorBoundary(
-                                          TabBarView(
-                                            // disable scrolling so that people dont accidently scroll
-                                            // through the tabs
-                                            physics: const NeverScrollableScrollPhysics(),
-                                            children: [
-                                              modals.Node(
-                                                media.AutoHelp(
-                                                  media.Playlist.wrap((ctx, s) {
-                                                    return media.VideoScreen(
-                                                      medialib.AvailableGridDisplay(
-                                                        focus: defaults.mobile ? null : s.searchfocus,
-                                                        controller: s.controller,
-                                                        highlighted: s.known.id,
-                                                        search: s.search,
-                                                      ),
-                                                      s.player,
-                                                      s.playerfocus,
-                                                      s.overlay,
-                                                    );
-                                                  }),
+                                          child: DragToMoveArea(
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                  child: tabbar,
                                                 ),
-                                              ),
-                                              modals.Node(
-                                                downloads.AutoHelp(downloads.MeteredWarning(const downloads.Display())),
-                                              ),
-                                              modals.Node(community.AutoHelp(community.Management())),
-                                              modals.Node(settings.AutoHelp(const settings.Display())),
-                                            ],
+                                                if (defaults.desktop) navbar.Hamburger(),
+                                              ],
+                                            ),
                                           ),
-                                        ),
-                                      );
-                                    }),
+                                        );
+                                        if (defaults.desktop) {
+                                          tabs = DragToMoveArea(child: tabs);
+                                        }
+
+                                        return Scaffold(
+                                          appBar: (!compact && !nochrome)
+                                              ? PreferredSize(
+                                                  preferredSize: Size.fromHeight(kTextTabBarHeight),
+                                                  child: tabs,
+                                                )
+                                              : null,
+                                          bottomNavigationBar: (compact && !nochrome) ? tabs : null,
+                                          body: ds.ErrorBoundary(
+                                            TabBarView(
+                                              // disable scrolling so that people dont accidently scroll
+                                              // through the tabs
+                                              physics: const NeverScrollableScrollPhysics(),
+                                              children: [
+                                                modals.Node(
+                                                  media.AutoHelp(
+                                                    media.Playlist.wrap((ctx, s) {
+                                                      return media.VideoScreen(
+                                                        medialib.AvailableGridDisplay(
+                                                          focus: defaults.mobile ? null : s.searchfocus,
+                                                          controller: s.controller,
+                                                          highlighted: s.known.id,
+                                                          search: s.search,
+                                                        ),
+                                                        s.player,
+                                                        s.playerfocus,
+                                                        s.overlay,
+                                                      );
+                                                    }),
+                                                  ),
+                                                ),
+                                                modals.Node(
+                                                  downloads.AutoHelp(
+                                                    downloads.MeteredWarning(const downloads.Display()),
+                                                  ),
+                                                ),
+                                                modals.Node(community.AutoHelp(community.Management())),
+                                                modals.Node(settings.AutoHelp(const settings.Display())),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      }),
+                                    ),
                                   ),
                                 ),
                               ),

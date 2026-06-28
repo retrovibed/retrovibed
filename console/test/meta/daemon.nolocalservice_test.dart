@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/meta/api.dart' as api;
 import 'package:retrovibed/meta/daemon.auto.dart';
 import 'package:retrovibed/meta/daemon.mdns.dart';
@@ -20,10 +21,12 @@ void main() {
         await tester.pumpApp(
           physicalSize: entry.value,
           fit: FlexFit.loose,
-          EndpointAuto(
-            latest: _offlineLatest,
-            backoff: httpx.Backoff.constant(Duration.zero),
-            const SizedBox(),
+          ds.LoadingGuard(
+            EndpointAuto(
+              latest: _offlineLatest,
+              backoff: httpx.Backoff.constant(Duration.zero),
+              const SizedBox(),
+            ),
           ),
         );
 
@@ -44,10 +47,12 @@ void main() {
         await tester.pumpApp(
           physicalSize: entry.value,
           fit: FlexFit.tight,
-          EndpointAuto(
-            latest: _offlineLatest,
-            backoff: httpx.Backoff.constant(Duration.zero),
-            const SizedBox(),
+          ds.LoadingGuard(
+            EndpointAuto(
+              latest: _offlineLatest,
+              backoff: httpx.Backoff.constant(Duration.zero),
+              const SizedBox(),
+            ),
           ),
         );
 

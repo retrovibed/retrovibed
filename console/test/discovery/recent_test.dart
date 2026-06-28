@@ -26,6 +26,7 @@ void main() {
   group('Recent', () {
     testWidgets('displays loading state initially', (tester) async {
       await tester.pumpApp(Recent(mimex.video, latest: _notimplemented));
+      await tester.pump();
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
       await tester.pumpAndSettle();
       expect(find.text('Continue'), findsOneWidget);

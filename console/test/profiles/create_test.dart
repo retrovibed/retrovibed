@@ -172,7 +172,7 @@ void main() {
           forms.Checkbox,
           'Library Modify',
         );
-        await tester.tap(libraryModifyCheckbox);
+        await tester.tap(libraryModifyCheckbox, warnIfMissed: false);
 
         expect(changedProfile, testProfile);
         expect(changedKey, testPublicKey);

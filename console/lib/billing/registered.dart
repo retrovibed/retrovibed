@@ -105,15 +105,17 @@ class RegisteredState extends State<Registered> {
 
   @override
   Widget build(BuildContext context) {
-    return ds.Loading(
+    return ds.LoadingBoundary(
       key: ValueKey(
         uuidx.md5x(
           current.customerId + current.subscriptionId + current.planId,
         ),
       ),
       loading: _loading,
-      cause: _cause,
-      widget.child,
+      ds.ErrorScreen(
+        cause: _cause,
+        widget.child,
+      ),
     );
   }
 }

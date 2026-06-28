@@ -41,6 +41,7 @@ class _AuthenticatedState extends State<Authenticated> {
   Widget _cause = ds.Error.zero;
   DateTime _expires = DateTime.timestamp();
   api.Session _current = api.Session();
+  bool _loading = true;
 
   api.Session syncCurrent() {
     return _current;
@@ -84,11 +85,18 @@ class _AuthenticatedState extends State<Authenticated> {
   @override
   void initState() {
     super.initState();
-    current().ignore();
+    current().whenComplete(() {
+      setState(() {
+        _loading = false;
+      });
+    }).ignore();
   }
 
   @override
   Widget build(BuildContext context) {
-    return ds.Overlay(widget.child, overlay: _cause == ds.Error.zero ? const SizedBox() : _cause);
+    return ds.LoadingBoundary(
+      ds.Overlay(widget.child, overlay: _cause == ds.Error.zero ? const SizedBox() : _cause),
+      loading: _loading,
+    );
   }
 }

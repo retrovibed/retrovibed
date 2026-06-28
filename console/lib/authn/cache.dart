@@ -128,7 +128,7 @@ class _AuthzCache extends State<AuthzCache> {
   Widget build(BuildContext context) {
     return _AuthzTokenData(
       meta: meta,
-      child: ds.Loading(
+      child: ds.LoadingBoundary(
         loading: _loading,
         _loading ? SizedBox() : widget.child,
       ),
