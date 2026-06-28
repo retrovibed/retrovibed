@@ -227,7 +227,7 @@ void main() {
     testWidgets('backspace on empty field removes the active mode', (tester) async {
       await tester.pumpApp(
         lucene.Queryer((_) {}, [
-          lucene.Mode(lucene.Boolean('hd', false, false, (_) {})),
+          lucene.Mode('hd', false, false, (_) {}),
         ]),
       );
       await tester.pumpAndSettle();
@@ -247,7 +247,7 @@ void main() {
     testWidgets('backspace on non-empty field does not remove the active mode', (tester) async {
       await tester.pumpApp(
         lucene.Queryer((_) {}, [
-          lucene.Mode(lucene.Boolean('hd', false, false, (_) {})),
+          lucene.Mode('hd', false, false, (_) {}),
         ]),
       );
       await tester.pumpAndSettle();
@@ -270,7 +270,7 @@ void main() {
       String? emitted;
       await tester.pumpApp(
         lucene.Queryer((q) => emitted = q, [
-          lucene.Mode(lucene.Boolean('hd', false, false, (_) {})),
+          lucene.Mode('hd', false, false, (_) {}),
         ]),
       );
       await tester.pumpAndSettle();
@@ -289,7 +289,7 @@ void main() {
     testWidgets('deleted mode field reappears in suggestions', (tester) async {
       await tester.pumpApp(
         lucene.Queryer((_) {}, [
-          lucene.Mode(lucene.Boolean('hd', false, false, (_) {})),
+          lucene.Mode('hd', false, false, (_) {}),
         ]),
       );
       await tester.pumpAndSettle();

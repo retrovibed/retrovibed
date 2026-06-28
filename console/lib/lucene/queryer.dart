@@ -85,13 +85,15 @@ class _QueryerState extends State<Queryer> {
       _editing = true;
       setState(() {
         if (completed == null) return;
-        if (completed.type() == ParserResultType.Mode) {
-          _mode = completed;
-          completed.apply(_parser);
-          return;
+        switch (completed) {
+          case ParserResultMode():
+            _mode = completed;
+            completed.apply(_parser);
+            return;
+          default:
+            completed.apply(_parser);
+            _filters.add(completed);
         }
-        completed.apply(_parser);
-        _filters.add(completed);
       });
 
       ds.postframe(() {

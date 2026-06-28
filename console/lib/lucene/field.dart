@@ -3,38 +3,25 @@ import 'package:retrovibed/timex.dart' as timex;
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/design.kit/inputs.dart' as inputs;
 import 'package:retrovibed/design.kit/typography/timerange.dart' as tr;
-import './ast.dart';
-import './parser.dart' as lucene_parser;
+import 'ast.dart';
+import 'parser.dart' as lucene_parser;
 import 'parser.results.dart';
-
-enum ParserResultType {
-  Mode,
-  Filter,
-}
-
-// Have this field placed at the start of the search box.
-Field<X> Mode<X>(Field<X> field) {
-  return field.copyWith(placement: ParserResultType.Mode);
-}
 
 // A typed field definition.
 //
 // Binds a lucene field name to a setter callback.
 // Drives autocomplete suggestions and value parsing — independent of any UI.
 abstract class Field<T> {
-  final ParserResultType placement;
   final String name;
   final T current;
   final T defaultValue;
   final void Function(T) setter;
 
-  const Field(this.name, this.current, this.defaultValue, this.setter, {this.placement = ParserResultType.Filter});
+  const Field(this.name, this.current, this.defaultValue, this.setter);
 
   bool get available => current == defaultValue;
 
   Field<T> withCurrent(T value);
-
-  Field<T> copyWith({ParserResultType? placement});
 
   /// Returns a Field<T> with the
   ParserResult of(T value);
@@ -87,8 +74,7 @@ class RangeField<T> extends Field<({T min, T max})> {
     this.minField,
     this.maxField, {
     this.display,
-    ParserResultType placement = ParserResultType.Filter,
-  }) : super(name, current, defaultValue, setter, placement: placement);
+  }) : super(name, current, defaultValue, setter);
 
   @override
   RangeField<T> withCurrent(({T min, T max}) value) => RangeField(
@@ -99,19 +85,6 @@ class RangeField<T> extends Field<({T min, T max})> {
     minField.withCurrent(value.min),
     maxField.withCurrent(value.max),
     display: display,
-    placement: placement,
-  );
-
-  @override
-  RangeField<T> copyWith({ParserResultType? placement}) => RangeField(
-    name,
-    current,
-    defaultValue,
-    setter,
-    minField,
-    maxField,
-    display: display,
-    placement: placement ?? this.placement,
   );
 
   @override
@@ -201,33 +174,23 @@ List<String> applyQuery(Query query, List<Field> fields) {
   return unmatched;
 }
 
-class Boolean extends Field<bool> {
-  const Boolean(
+class Mode extends Field<bool> {
+  const Mode(
     String name,
     bool current,
     bool defaultValue,
-    void Function(bool) setter, {
-    ParserResultType placement = ParserResultType.Filter,
-  }) : super(name, current, defaultValue, setter, placement: placement);
+    void Function(bool) setter,
+  ) : super(name, current, defaultValue, setter);
 
-  factory Boolean.auto(
-    String name,
-    bool defaultValue,
-    void Function(bool) setter, {
-    ParserResultType placement = ParserResultType.Filter,
-  }) {
-    return Boolean(name, defaultValue, defaultValue, setter, placement: placement);
+  factory Mode.auto(String name, bool defaultValue, void Function(bool) setter) {
+    return Mode(name, defaultValue, defaultValue, setter);
   }
 
   @override
   bool? get autocomplete => !defaultValue;
 
   @override
-  Boolean withCurrent(bool value) => Boolean(name, value, defaultValue, setter, placement: placement);
-
-  @override
-  Boolean copyWith({ParserResultType? placement}) =>
-      Boolean(name, current, defaultValue, setter, placement: placement ?? this.placement);
+  Mode withCurrent(bool value) => Mode(name, value, defaultValue, setter);
 
   @override
   Node from(bool value) => Term(name, value.toString());
@@ -247,7 +210,43 @@ class Boolean extends Field<bool> {
 
   @override
   ParserResult of(bool value) {
-    return ParserResultBool(Boolean(name, value, defaultValue, setter, placement: placement));
+    return ParserResultMode(Mode(name, value, defaultValue, setter));
+  }
+}
+
+class Boolean extends Field<bool> {
+  const Boolean(String name, bool current, bool defaultValue, void Function(bool) setter)
+    : super(name, current, defaultValue, setter);
+
+  factory Boolean.auto(String name, bool defaultValue, void Function(bool) setter) {
+    return Boolean(name, defaultValue, defaultValue, setter);
+  }
+
+  @override
+  bool? get autocomplete => !defaultValue;
+
+  @override
+  Boolean withCurrent(bool value) => Boolean(name, value, defaultValue, setter);
+
+  @override
+  Node from(bool value) => Term(name, value.toString());
+
+  @override
+  bool parse(String raw) => switch (raw.toLowerCase()) {
+    'true' || '1' || 'yes' => true,
+    'false' || '0' || 'no' => false,
+    _ => defaultValue,
+  };
+
+  @override
+  List<Suggestion> suggestions(String partial) => [
+    Suggestion(field: this, label: 'on', completion: '$name:true'),
+    Suggestion(field: this, label: 'off', completion: '$name:false'),
+  ].where((s) => s.label.startsWith(partial)).toList();
+
+  @override
+  ParserResult of(bool value) {
+    return ParserResultBool(Boolean(name, value, defaultValue, setter));
   }
 }
 
@@ -256,25 +255,19 @@ class Timestamp extends Field<DateTime> {
     String name,
     DateTime current,
     DateTime defaultValue,
-    void Function(DateTime) setter, {
-    ParserResultType placement = ParserResultType.Filter,
-  }) : super(name, current, defaultValue, setter, placement: placement);
+    void Function(DateTime) setter,
+  ) : super(name, current, defaultValue, setter);
 
   factory Timestamp.auto(
     String name,
     DateTime defaultValue,
-    void Function(DateTime) setter, {
-    ParserResultType placement = ParserResultType.Filter,
-  }) {
-    return Timestamp(name, defaultValue, defaultValue, setter, placement: placement);
+    void Function(DateTime) setter,
+  ) {
+    return Timestamp(name, defaultValue, defaultValue, setter);
   }
 
   @override
-  Timestamp withCurrent(DateTime value) => Timestamp(name, value, defaultValue, setter, placement: placement);
-
-  @override
-  Timestamp copyWith({ParserResultType? placement}) =>
-      Timestamp(name, current, defaultValue, setter, placement: placement ?? this.placement);
+  Timestamp withCurrent(DateTime value) => Timestamp(name, value, defaultValue, setter);
 
   @override
   Node from(DateTime value) => Term(name, value.toIso8601String());
@@ -316,42 +309,39 @@ class DateRange extends RangeField<DateTime> {
     String name,
     timex.Range v,
     timex.Range defaultValue,
-    void Function(timex.Range) setter, {
-    ParserResultType placement = ParserResultType.Filter,
-  }) : super(
-         name,
-         (min: v.begin, max: v.end),
-         (min: defaultValue.begin, max: defaultValue.end),
-         (p) => setter(timex.Range(p.min, p.max)),
-         Timestamp(
-           name,
-           v.begin,
-           defaultValue.begin,
-           (d) => setter(timex.Range(d, v.end)),
-         ),
-         Timestamp(
-           name,
-           v.end,
-           defaultValue.end,
-           (d) => setter(timex.Range(v.begin, d)),
-         ),
-         display: (v) => Row(
-           mainAxisSize: MainAxisSize.min,
-           children: [
-             Text('$name: '),
-             tr.TimeRange(timex.Range(v.min, v.max)),
-           ],
-         ),
-         placement: placement,
-       );
+    void Function(timex.Range) setter,
+  ) : super(
+        name,
+        (min: v.begin, max: v.end),
+        (min: defaultValue.begin, max: defaultValue.end),
+        (p) => setter(timex.Range(p.min, p.max)),
+        Timestamp(
+          name,
+          v.begin,
+          defaultValue.begin,
+          (d) => setter(timex.Range(d, v.end)),
+        ),
+        Timestamp(
+          name,
+          v.end,
+          defaultValue.end,
+          (d) => setter(timex.Range(v.begin, d)),
+        ),
+        display: (v) => Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('$name: '),
+            tr.TimeRange(timex.Range(v.min, v.max)),
+          ],
+        ),
+      );
 
   factory DateRange.auto(
     String name,
     timex.Range defaultValue,
-    void Function(timex.Range) setter, {
-    ParserResultType placement = ParserResultType.Filter,
-  }) {
-    return DateRange(name, defaultValue, defaultValue, setter, placement: placement);
+    void Function(timex.Range) setter,
+  ) {
+    return DateRange(name, defaultValue, defaultValue, setter);
   }
 
   @override
@@ -360,16 +350,6 @@ class DateRange extends RangeField<DateTime> {
     timex.Range(value.min, value.max),
     timex.Range(defaultValue.min, defaultValue.max),
     (r) => setter((min: r.begin, max: r.end)),
-    placement: placement,
-  );
-
-  @override
-  DateRange copyWith({ParserResultType? placement}) => DateRange(
-    name,
-    timex.Range(current.min, current.max),
-    timex.Range(defaultValue.min, defaultValue.max),
-    (r) => setter((min: r.begin, max: r.end)),
-    placement: placement ?? this.placement,
   );
 
   @override
@@ -407,25 +387,19 @@ class Number extends Field<num> {
     String name,
     num v,
     num defaultValue,
-    void Function(num) setter, {
-    ParserResultType placement = ParserResultType.Filter,
-  }) : super(name, v, defaultValue, setter, placement: placement);
+    void Function(num) setter,
+  ) : super(name, v, defaultValue, setter);
 
   factory Number.auto(
     String name,
     num defaultValue,
-    void Function(num) setter, {
-    ParserResultType placement = ParserResultType.Filter,
-  }) {
-    return Number(name, defaultValue, defaultValue, setter, placement: placement);
+    void Function(num) setter,
+  ) {
+    return Number(name, defaultValue, defaultValue, setter);
   }
 
   @override
-  Number withCurrent(num value) => Number(name, value, defaultValue, setter, placement: placement);
-
-  @override
-  Number copyWith({ParserResultType? placement}) =>
-      Number(name, current, defaultValue, setter, placement: placement ?? this.placement);
+  Number withCurrent(num value) => Number(name, value, defaultValue, setter);
 
   @override
   Node from(num value) => Term(name, value.toString());
@@ -438,7 +412,7 @@ class Number extends Field<num> {
 
   @override
   ParserResult of(num value) {
-    return ParserResultNumeric(Number(name, value, defaultValue, setter, placement: placement));
+    return ParserResultNumeric(Number(name, value, defaultValue, setter));
   }
 }
 
@@ -454,21 +428,19 @@ class Elapsed extends Field<Duration> {
     String name,
     Duration v,
     Duration defaultValue,
-    void Function(Duration) setter, {
-    ParserResultType placement = ParserResultType.Filter,
-  }) : super(name, v, defaultValue, setter, placement: placement);
+    void Function(Duration) setter,
+  ) : super(name, v, defaultValue, setter);
 
   factory Elapsed.auto(
     String name,
     Duration defaultValue,
-    void Function(Duration) setter, {
-    ParserResultType placement = ParserResultType.Filter,
-  }) {
-    return Elapsed(name, defaultValue, defaultValue, setter, placement: placement);
+    void Function(Duration) setter,
+  ) {
+    return Elapsed(name, defaultValue, defaultValue, setter);
   }
 
   @override
-  Elapsed withCurrent(Duration value) => Elapsed(name, value, defaultValue, setter, placement: placement);
+  Elapsed withCurrent(Duration value) => Elapsed(name, value, defaultValue, setter);
 
   @override
   Node from(Duration value) {
@@ -491,10 +463,6 @@ class Elapsed extends Field<Duration> {
 
   @override
   ParserResult of(Duration value) {
-    return ParserResultDuration(Elapsed(name, value, defaultValue, setter, placement: placement));
+    return ParserResultDuration(Elapsed(name, value, defaultValue, setter));
   }
-
-  @override
-  Elapsed copyWith({ParserResultType? placement}) =>
-      Elapsed(name, current, defaultValue, setter, placement: placement ?? this.placement);
 }
