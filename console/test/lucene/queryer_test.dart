@@ -224,7 +224,7 @@ void main() {
   });
 
   group('Queryer mode management', () {
-    testWidgets('backspace on empty field removes the active mode', (tester) async {
+    testWidgets('first backspace on empty field highlights the mode without removing it', (tester) async {
       await tester.pumpApp(
         lucene.Queryer((_) {}, [
           lucene.Mode('hd', false, false, (_) {}),
@@ -241,7 +241,58 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.backspace);
       await tester.pumpAndSettle();
 
+      expect(find.byType(lucene.QueryerMode), findsOneWidget);
+      final focusWidget = tester.widget<Focus>(
+        find.descendant(of: find.byType(lucene.QueryerMode), matching: find.byType(Focus)),
+      );
+      expect(focusWidget.focusNode?.hasFocus, isTrue);
+    });
+
+    testWidgets('second backspace while the mode is highlighted removes it', (tester) async {
+      await tester.pumpApp(
+        lucene.Queryer((_) {}, [
+          lucene.Mode('hd', false, false, (_) {}),
+        ]),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextField), '@');
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('hd'));
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.backspace);
+      await tester.pumpAndSettle();
+      await tester.sendKeyEvent(LogicalKeyboardKey.backspace);
+      await tester.pumpAndSettle();
+
       expect(find.byType(lucene.QueryerMode), findsNothing);
+    });
+
+    testWidgets('delete key never clears the search mode', (tester) async {
+      await tester.pumpApp(
+        lucene.Queryer((_) {}, [
+          lucene.Mode('hd', false, false, (_) {}),
+        ]),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextField), '@');
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('hd'));
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.delete);
+      await tester.pumpAndSettle();
+      expect(find.byType(lucene.QueryerMode), findsOneWidget);
+
+      // Still inert once the mode chip is highlighted via backspace.
+      await tester.sendKeyEvent(LogicalKeyboardKey.backspace);
+      await tester.pumpAndSettle();
+      await tester.sendKeyEvent(LogicalKeyboardKey.delete);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(lucene.QueryerMode), findsOneWidget);
     });
 
     testWidgets('backspace on non-empty field does not remove the active mode', (tester) async {
@@ -266,7 +317,7 @@ void main() {
       expect(find.byType(lucene.QueryerMode), findsOneWidget);
     });
 
-    testWidgets('deleting the active mode invokes onQuery with the current text', (tester) async {
+    testWidgets('clearing the highlighted mode invokes onQuery with the current text', (tester) async {
       String? emitted;
       await tester.pumpApp(
         lucene.Queryer((q) => emitted = q, [
@@ -282,8 +333,33 @@ void main() {
 
       await tester.sendKeyEvent(LogicalKeyboardKey.backspace);
       await tester.pumpAndSettle();
+      await tester.sendKeyEvent(LogicalKeyboardKey.backspace);
+      await tester.pumpAndSettle();
 
       expect(emitted, '');
+    });
+
+    testWidgets('clearing the highlighted mode refocuses the search field', (tester) async {
+      final focusNode = FocusNode();
+      addTearDown(focusNode.dispose);
+      await tester.pumpApp(
+        lucene.Queryer((_) {}, [
+          lucene.Mode('hd', false, false, (_) {}),
+        ], focusNode: focusNode),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextField), '@');
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('hd'));
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.backspace);
+      await tester.pumpAndSettle();
+      await tester.sendKeyEvent(LogicalKeyboardKey.backspace);
+      await tester.pumpAndSettle();
+
+      expect(focusNode.hasFocus, isTrue);
     });
 
     testWidgets('long press on the mode chip removes the active mode', (tester) async {
@@ -319,6 +395,8 @@ void main() {
       await tester.tap(find.text('hd'));
       await tester.pumpAndSettle();
 
+      await tester.sendKeyEvent(LogicalKeyboardKey.backspace);
+      await tester.pumpAndSettle();
       await tester.sendKeyEvent(LogicalKeyboardKey.backspace);
       await tester.pumpAndSettle();
 

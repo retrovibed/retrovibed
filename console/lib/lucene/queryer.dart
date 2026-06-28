@@ -52,6 +52,7 @@ class _QueryerState extends State<Queryer> {
   late TextEditingController _ctrl;
   final GlobalKey<SuggestionListState> _suggestionKey = GlobalKey();
   ParserResult _mode = ParserResult.close;
+  final FocusNode _modeFocusNode = FocusNode();
   List<ParserResult> _filters = [];
   Widget? _updating;
   bool _editing = false;
@@ -71,6 +72,7 @@ class _QueryerState extends State<Queryer> {
   void dispose() {
     _ctrl.removeListener(_onText);
     if (widget.controller == null) _ctrl.dispose();
+    _modeFocusNode.dispose();
     super.dispose();
   }
 
@@ -158,6 +160,11 @@ class _QueryerState extends State<Queryer> {
     widget.onQuery(_ctrl.text);
   }
 
+  void _refocusQuery() {
+    widget.focusNode?.requestFocus();
+    ds.textediting.refocus(_ctrl);
+  }
+
   void _removeFilter(ParserResult filter) {
     setState(() {
       _filters.removeWhere((v) => v == filter);
@@ -222,11 +229,16 @@ class _QueryerState extends State<Queryer> {
           },
         ),
         const SingleActivator(LogicalKeyboardKey.backspace): (
-          const Text('remove search mode'),
+          const Text('highlight, then remove search mode'),
           () {
             if (_ctrl.text.isNotEmpty) return KeyEventResult.ignored;
             if (_mode == ParserResult.close) return KeyEventResult.ignored;
+            if (!_modeFocusNode.hasFocus) {
+              _modeFocusNode.requestFocus();
+              return KeyEventResult.handled;
+            }
             _resetMode();
+            _refocusQuery();
 
             return KeyEventResult.handled;
           },
@@ -260,7 +272,7 @@ class _QueryerState extends State<Queryer> {
                 ds.CompactingMenu.pinned(
                   GestureDetector(
                     onLongPress: _resetMode,
-                    child: QueryerMode(mode: _mode),
+                    child: QueryerMode(mode: _mode, focus: _modeFocusNode),
                   ),
                 ),
             ],
