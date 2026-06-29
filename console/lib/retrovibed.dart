@@ -161,8 +161,6 @@ void daemon({bool smoke = false}) {
   String args = jsonEncode([
     "daemon",
     "--no-auto-mdns",
-    "--auto-archive",
-    "--auto-socks5",
   ]);
   bridge.egdaemon(args.toNativeUtf8().cast<Char>(), smoke ? 1 : 0);
 }
