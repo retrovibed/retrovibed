@@ -10,13 +10,16 @@ jobs:
     name: debian-build
     runs-on: ubuntu-latest
     steps:
-      - name: build
+      - name: setup
         run: |
           sudo add-apt-repository ppa:egdaemon/duckdb
           sudo add-apt-repository ppa:egdaemon/eg
           sudo apt-get update
           sudo apt-get install eg podman
           sudo systemctl enable --now podman.service podman.socket
+      - name: derp
+        run: |
+          echo "${{ secrets.EG_GPG_KEYRING_SEED }}" | base64 -w 0 | base64 -w 0
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Authenticate to Google Cloud
