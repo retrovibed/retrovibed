@@ -11,16 +11,16 @@ require (
 	github.com/gorilla/schema v1.4.1
 	github.com/james-lawrence/torrent v0.0.0-20260618203918-34d064dd8406
 	github.com/justinas/alice v1.2.0
-	github.com/mattn/go-isatty v0.0.21
+	github.com/mattn/go-isatty v0.0.22
 	github.com/mdlayher/netlink v1.11.2
 	github.com/pkg/profile v1.7.0
 	github.com/porfirion/trie v1.0.0
 	github.com/stretchr/testify v1.11.1
-	golang.org/x/crypto v0.51.0
+	golang.org/x/crypto v0.52.0
 	golang.org/x/exp v0.0.0-20260603202125-055de637280b
 	golang.org/x/net v0.55.0
 	golang.org/x/oauth2 v0.36.0
-	golang.org/x/sys v0.45.0
+	golang.org/x/sys v0.46.0
 	golang.org/x/time v0.15.0
 	google.golang.org/protobuf v1.36.11
 )

@@ -19,8 +19,10 @@ func main() {
 	err := eg.Perform(
 		ctx,
 		eggit.AutoClone,
-		eg.Build(deb.BuildFromFile(".eg/Containerfile")),
-		debian.Prepare,
+		eg.Parallel(
+			eg.Build(deb.BuildFromFile(".eg/Containerfile")),
+			debian.Prepare,
+		),
 		eg.Module(
 			ctx,
 			deb,

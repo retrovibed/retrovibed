@@ -49,6 +49,9 @@ func Prepare(ctx context.Context, o eg.Op) error {
 	sruntime := shell.Runtime()
 	return eg.Sequential(
 		shell.Op(
+			sruntime.Newf("echo '-----------------------------------------'"),
+			sruntime.Newf("eg gpg keyring --name=\"${EG_GPG_KEYRING_NAME}\" --email=\"${EG_GPG_KEYRING_EMAIL}\" --seed=\"${EG_GPG_KEYRING_SEED}\""),
+			sruntime.Newf("echo '-----------------------------------------'"),
 			sruntime.Newf("rm -rf %s", debdir),
 			sruntime.Newf("mkdir -p %s", debdir),
 			sruntime.Newf("git clone --depth 1 file://${PWD}/ %s", debdir),
