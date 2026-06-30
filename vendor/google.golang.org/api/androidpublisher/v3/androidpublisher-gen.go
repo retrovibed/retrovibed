@@ -195,6 +195,7 @@ func (s *Service) userAgent() string {
 func NewApplicationsService(s *Service) *ApplicationsService {
 	rs := &ApplicationsService{s: s}
 	rs.DeviceTierConfigs = NewApplicationsDeviceTierConfigsService(s)
+	rs.Tracks = NewApplicationsTracksService(s)
 	return rs
 }
 
@@ -202,6 +203,8 @@ type ApplicationsService struct {
 	s *Service
 
 	DeviceTierConfigs *ApplicationsDeviceTierConfigsService
+
+	Tracks *ApplicationsTracksService
 }
 
 func NewApplicationsDeviceTierConfigsService(s *Service) *ApplicationsDeviceTierConfigsService {
@@ -210,6 +213,27 @@ func NewApplicationsDeviceTierConfigsService(s *Service) *ApplicationsDeviceTier
 }
 
 type ApplicationsDeviceTierConfigsService struct {
+	s *Service
+}
+
+func NewApplicationsTracksService(s *Service) *ApplicationsTracksService {
+	rs := &ApplicationsTracksService{s: s}
+	rs.Releases = NewApplicationsTracksReleasesService(s)
+	return rs
+}
+
+type ApplicationsTracksService struct {
+	s *Service
+
+	Releases *ApplicationsTracksReleasesService
+}
+
+func NewApplicationsTracksReleasesService(s *Service) *ApplicationsTracksReleasesService {
+	rs := &ApplicationsTracksReleasesService{s: s}
+	return rs
+}
+
+type ApplicationsTracksReleasesService struct {
 	s *Service
 }
 
@@ -1315,6 +1339,28 @@ func (s AppVersionRange) MarshalJSON() ([]byte, error) {
 type ArchiveSubscriptionRequest struct {
 }
 
+// ArtifactSummary: Summary of an artifact.
+type ArtifactSummary struct {
+	// VersionCode: Artifact's version code
+	VersionCode int64 `json:"versionCode,omitempty"`
+	// ForceSendFields is a list of field names (e.g. "VersionCode") to
+	// unconditionally include in API requests. By default, fields with empty or
+	// default values are omitted from API requests. See
+	// https://pkg.go.dev/google.golang.org/api#hdr-ForceSendFields for more
+	// details.
+	ForceSendFields []string `json:"-"`
+	// NullFields is a list of field names (e.g. "VersionCode") to include in API
+	// requests with the JSON null value. By default, fields with empty values are
+	// omitted from API requests. See
+	// https://pkg.go.dev/google.golang.org/api#hdr-NullFields for more details.
+	NullFields []string `json:"-"`
+}
+
+func (s ArtifactSummary) MarshalJSON() ([]byte, error) {
+	type NoMethod ArtifactSummary
+	return gensupport.MarshalJSON(NoMethod(s), s.ForceSendFields, s.NullFields)
+}
+
 // AssetModuleMetadata: Metadata of an asset module.
 type AssetModuleMetadata struct {
 	// DeliveryType: Indicates the delivery type for persistent install.
@@ -1461,7 +1507,7 @@ type AutoRenewingPlan struct {
 	PriceStepUpConsentDetails *PriceStepUpConsentDetails `json:"priceStepUpConsentDetails,omitempty"`
 	// RecurringPrice: The current recurring price of the auto renewing plan. Note
 	// that the price does not take into account discounts and does not include
-	// taxes for tax-exclusive pricing, please call orders.get API instead if
+	// taxes. For tax-exclusive pricing, please call orders.get API instead if
 	// transaction details are needed.
 	RecurringPrice *Money `json:"recurringPrice,omitempty"`
 	// ForceSendFields is a list of field names (e.g. "AutoRenewEnabled") to
@@ -4008,7 +4054,8 @@ func (s GeneratedApksListResponse) MarshalJSON() ([]byte, error) {
 }
 
 // GeneratedApksPerSigningKey: Download metadata for split, standalone and
-// universal APKs, as well as asset pack slices, signed with a given key.
+// universal APKs, as well as asset pack slices, signed with a given key. Next
+// ID: 10
 type GeneratedApksPerSigningKey struct {
 	// CertificateSha256Hash: SHA256 hash of the APK signing public key
 	// certificate.
@@ -4033,6 +4080,20 @@ type GeneratedApksPerSigningKey struct {
 	GeneratedUniversalApk *GeneratedUniversalApk `json:"generatedUniversalApk,omitempty"`
 	// TargetingInfo: Contains targeting information about the generated apks.
 	TargetingInfo *TargetingInfo `json:"targetingInfo,omitempty"`
+	// UnprotectedGeneratedSplitApks: List of generated split APKs without
+	// automatic protection, signed with a key corresponding to
+	// certificate_sha256_hash. This field is only present if the app uses
+	// automatic protection. In this case, `generated_split_apks` contains APKs
+	// with automatic protection enabled, whereas this field contains APKs without
+	// automatic protection.
+	UnprotectedGeneratedSplitApks []*GeneratedSplitApk `json:"unprotectedGeneratedSplitApks,omitempty"`
+	// UnprotectedGeneratedStandaloneApks: List of generated standalone APKs
+	// without automatic protection, signed with a key corresponding to
+	// certificate_sha256_hash. This field is only present if the app uses
+	// automatic protection. In this case, `generated_standalone_apks` contains
+	// APKs with automatic protection enabled, whereas this field contains APKs
+	// without automatic protection.
+	UnprotectedGeneratedStandaloneApks []*GeneratedStandaloneApk `json:"unprotectedGeneratedStandaloneApks,omitempty"`
 	// ForceSendFields is a list of field names (e.g. "CertificateSha256Hash") to
 	// unconditionally include in API requests. By default, fields with empty or
 	// default values are omitted from API requests. See
@@ -5164,6 +5225,34 @@ type ListOneTimeProductsResponse struct {
 
 func (s ListOneTimeProductsResponse) MarshalJSON() ([]byte, error) {
 	type NoMethod ListOneTimeProductsResponse
+	return gensupport.MarshalJSON(NoMethod(s), s.ForceSendFields, s.NullFields)
+}
+
+// ListReleaseSummariesResponse: Response listing all releases for a given
+// track that are either ready to be sent for review, in review, approved, not
+// approved or available.
+type ListReleaseSummariesResponse struct {
+	// Releases: List of releases for this track. A maximum of 20 releases can be
+	// returned.
+	Releases []*ReleaseSummary `json:"releases,omitempty"`
+
+	// ServerResponse contains the HTTP response code and headers from the server.
+	googleapi.ServerResponse `json:"-"`
+	// ForceSendFields is a list of field names (e.g. "Releases") to
+	// unconditionally include in API requests. By default, fields with empty or
+	// default values are omitted from API requests. See
+	// https://pkg.go.dev/google.golang.org/api#hdr-ForceSendFields for more
+	// details.
+	ForceSendFields []string `json:"-"`
+	// NullFields is a list of field names (e.g. "Releases") to include in API
+	// requests with the JSON null value. By default, fields with empty values are
+	// omitted from API requests. See
+	// https://pkg.go.dev/google.golang.org/api#hdr-NullFields for more details.
+	NullFields []string `json:"-"`
+}
+
+func (s ListReleaseSummariesResponse) MarshalJSON() ([]byte, error) {
+	type NoMethod ListReleaseSummariesResponse
 	return gensupport.MarshalJSON(NoMethod(s), s.ForceSendFields, s.NullFields)
 }
 
@@ -7827,6 +7916,49 @@ func (s RegionsVersion) MarshalJSON() ([]byte, error) {
 	return gensupport.MarshalJSON(NoMethod(s), s.ForceSendFields, s.NullFields)
 }
 
+// ReleaseSummary: Summary of a release.
+type ReleaseSummary struct {
+	// ActiveArtifacts: List of active artifacts on this release
+	ActiveArtifacts []*ArtifactSummary `json:"activeArtifacts,omitempty"`
+	// ReleaseLifecycleState: The lifecycle state of a release.
+	//
+	// Possible values:
+	//   "RELEASE_LIFECYCLE_STATE_UNSPECIFIED" - Not specified.
+	//   "RELEASE_LIFECYCLE_STATE_DRAFT" - The release is not yet ready and can
+	// still be edited.
+	//   "RELEASE_LIFECYCLE_STATE_NOT_SENT_FOR_REVIEW" - The release is ready to be
+	// sent for review and an action is required from developer
+	//   "RELEASE_LIFECYCLE_STATE_IN_REVIEW" - Submitted and in review
+	//   "RELEASE_LIFECYCLE_STATE_APPROVED_NOT_PUBLISHED" - Passed review and is
+	// ready to be published manually by developer
+	//   "RELEASE_LIFECYCLE_STATE_NOT_APPROVED" - App was rejected in review
+	//   "RELEASE_LIFECYCLE_STATE_PUBLISHED" - Available to users on the track.
+	// This includes fully- or partially-rolled out releases and any halted release
+	// that can be resumed.
+	ReleaseLifecycleState string `json:"releaseLifecycleState,omitempty"`
+	// ReleaseName: Name of the release.
+	ReleaseName string `json:"releaseName,omitempty"`
+	// Track: Identifier for the track. Learn more about track names.
+	// (https://developers.google.com/android-publisher/tracks).
+	Track string `json:"track,omitempty"`
+	// ForceSendFields is a list of field names (e.g. "ActiveArtifacts") to
+	// unconditionally include in API requests. By default, fields with empty or
+	// default values are omitted from API requests. See
+	// https://pkg.go.dev/google.golang.org/api#hdr-ForceSendFields for more
+	// details.
+	ForceSendFields []string `json:"-"`
+	// NullFields is a list of field names (e.g. "ActiveArtifacts") to include in
+	// API requests with the JSON null value. By default, fields with empty values
+	// are omitted from API requests. See
+	// https://pkg.go.dev/google.golang.org/api#hdr-NullFields for more details.
+	NullFields []string `json:"-"`
+}
+
+func (s ReleaseSummary) MarshalJSON() ([]byte, error) {
+	type NoMethod ReleaseSummary
+	return gensupport.MarshalJSON(NoMethod(s), s.ForceSendFields, s.NullFields)
+}
+
 // RemoteInAppUpdate: Object representation for Remote in-app update action
 // type.
 type RemoteInAppUpdate struct {
@@ -8648,7 +8780,7 @@ type SubscriptionListing struct {
 	// Ordered list of at most four benefits.
 	Benefits []string `json:"benefits,omitempty"`
 	// Description: The description of this subscription in the language of this
-	// listing. Maximum length - 80 characters. Plain text.
+	// listing. Maximum length - 200 characters. Plain text.
 	Description string `json:"description,omitempty"`
 	// LanguageCode: Required. The language of this listing, as defined by BCP-47,
 	// e.g. "en-US".
@@ -11129,6 +11261,118 @@ func (c *ApplicationsDeviceTierConfigsListCall) Pages(ctx context.Context, f fun
 	}
 }
 
+type ApplicationsTracksReleasesListCall struct {
+	s            *Service
+	parent       string
+	urlParams_   gensupport.URLParams
+	ifNoneMatch_ string
+	ctx_         context.Context
+	header_      http.Header
+}
+
+// List: Returns the list of all releases for a given track. This excludes any
+// releases that are obsolete.
+//
+//   - parent: The parent track, which owns this collection of releases. Format:
+//     applications/{package_name}/tracks/{track}.
+func (r *ApplicationsTracksReleasesService) List(parent string) *ApplicationsTracksReleasesListCall {
+	c := &ApplicationsTracksReleasesListCall{s: r.s, urlParams_: make(gensupport.URLParams)}
+	c.parent = parent
+	return c
+}
+
+// Fields allows partial responses to be retrieved. See
+// https://developers.google.com/gdata/docs/2.0/basics#PartialResponse for more
+// details.
+func (c *ApplicationsTracksReleasesListCall) Fields(s ...googleapi.Field) *ApplicationsTracksReleasesListCall {
+	c.urlParams_.Set("fields", googleapi.CombineFields(s))
+	return c
+}
+
+// IfNoneMatch sets an optional parameter which makes the operation fail if the
+// object's ETag matches the given value. This is useful for getting updates
+// only after the object has changed since the last request.
+func (c *ApplicationsTracksReleasesListCall) IfNoneMatch(entityTag string) *ApplicationsTracksReleasesListCall {
+	c.ifNoneMatch_ = entityTag
+	return c
+}
+
+// Context sets the context to be used in this call's Do method.
+func (c *ApplicationsTracksReleasesListCall) Context(ctx context.Context) *ApplicationsTracksReleasesListCall {
+	c.ctx_ = ctx
+	return c
+}
+
+// Header returns a http.Header that can be modified by the caller to add
+// headers to the request.
+func (c *ApplicationsTracksReleasesListCall) Header() http.Header {
+	if c.header_ == nil {
+		c.header_ = make(http.Header)
+	}
+	return c.header_
+}
+
+func (c *ApplicationsTracksReleasesListCall) doRequest(alt string) (*http.Response, error) {
+	reqHeaders := gensupport.SetHeaders(c.s.userAgent(), "", c.header_)
+	if c.ifNoneMatch_ != "" {
+		reqHeaders.Set("If-None-Match", c.ifNoneMatch_)
+	}
+	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
+	urls := googleapi.ResolveRelative(c.s.BasePath, "androidpublisher/v3/{+parent}/releases")
+	urls += "?" + c.urlParams_.Encode()
+	req, err := http.NewRequest("GET", urls, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header = reqHeaders
+	googleapi.Expand(req.URL, map[string]string{
+		"parent": c.parent,
+	})
+	c.s.logger.DebugContext(c.ctx_, "api request", "serviceName", apiName, "rpcName", "androidpublisher.applications.tracks.releases.list", "request", internallog.HTTPRequest(req, nil))
+	return gensupport.SendRequest(c.ctx_, c.s.client, req)
+}
+
+// Do executes the "androidpublisher.applications.tracks.releases.list" call.
+// Any non-2xx status code is an error. Response headers are in either
+// *ListReleaseSummariesResponse.ServerResponse.Header or (if a response was
+// returned at all) in error.(*googleapi.Error).Header. Use
+// googleapi.IsNotModified to check whether the returned error was because
+// http.StatusNotModified was returned.
+func (c *ApplicationsTracksReleasesListCall) Do(opts ...googleapi.CallOption) (*ListReleaseSummariesResponse, error) {
+	gensupport.SetOptions(c.urlParams_, opts...)
+	res, err := c.doRequest("json")
+	if res != nil && res.StatusCode == http.StatusNotModified {
+		if res.Body != nil {
+			res.Body.Close()
+		}
+		return nil, gensupport.WrapError(&googleapi.Error{
+			Code:   res.StatusCode,
+			Header: res.Header,
+		})
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, gensupport.WrapError(err)
+	}
+	ret := &ListReleaseSummariesResponse{
+		ServerResponse: googleapi.ServerResponse{
+			Header:         res.Header,
+			HTTPStatusCode: res.StatusCode,
+		},
+	}
+	target := &ret
+	b, err := gensupport.DecodeResponseBytes(target, res)
+	if err != nil {
+		return nil, err
+	}
+	c.s.logger.DebugContext(c.ctx_, "api response", "serviceName", apiName, "rpcName", "androidpublisher.applications.tracks.releases.list", "response", internallog.HTTPResponse(res, b))
+	return ret, nil
+}
+
 type ApprecoveryAddTargetingCall struct {
 	s                   *Service
 	packageName         string
@@ -11703,6 +11947,34 @@ func (r *EditsService) Commit(packageName string, editId string) *EditsCommitCal
 	c := &EditsCommitCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.packageName = packageName
 	c.editId = editId
+	return c
+}
+
+// ChangesInReviewBehavior sets the optional parameter
+// "changesInReviewBehavior": Specify how the API should behave if there are
+// changes currently in review. If this value is not set, it will default to
+// "CANCEL_IN_REVIEW_AND_SUBMIT", which will cancel the changes in review and
+// then send all the changes for publishing.
+//
+// Possible values:
+//
+//	"CHANGES_IN_REVIEW_BEHAVIOR_TYPE_UNSPECIFIED" - Defaults to
+//
+// CANCEL_IN_REVIEW_AND_SUBMIT.
+//
+//	"CANCEL_IN_REVIEW_AND_SUBMIT" - If there are changes already in review,
+//
+// then this will cancel that review first and then send all the changes for
+// publishing.
+//
+//	"ERROR_IF_IN_REVIEW" - If there are changes in review, then this will
+//
+// return an error. Please refer to the error message sample that is returned
+// when this happens. Note that this won't invalidate the edit. If there aren't
+// any changes in review, then this will continue and send the new changes for
+// publishing.
+func (c *EditsCommitCall) ChangesInReviewBehavior(changesInReviewBehavior string) *EditsCommitCall {
+	c.urlParams_.Set("changesInReviewBehavior", changesInReviewBehavior)
 	return c
 }
 

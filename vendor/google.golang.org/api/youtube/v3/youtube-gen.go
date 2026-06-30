@@ -4646,8 +4646,8 @@ type LiveChatGiftDetails struct {
 	GiftUrl string `json:"giftUrl,omitempty"`
 	// HasVisualEffect: Whether the gift involves a visual effect.
 	HasVisualEffect bool `json:"hasVisualEffect,omitempty"`
-	// JewelsCount: The cost of the gift in jewels.
-	JewelsCount int64 `json:"jewelsCount,omitempty"`
+	// JewelsAmount: The value of the gift in jewels.
+	JewelsAmount int64 `json:"jewelsAmount,omitempty"`
 	// Language: The BCP-47 language code of the gift.
 	Language string `json:"language,omitempty"`
 	// ForceSendFields is a list of field names (e.g. "AltText") to unconditionally
@@ -17671,6 +17671,13 @@ func (r *TestsService) Insert(part []string, testitem *TestItem) *TestsInsertCal
 // ExternalChannelId sets the optional parameter "externalChannelId":
 func (c *TestsInsertCall) ExternalChannelId(externalChannelId string) *TestsInsertCall {
 	c.urlParams_.Set("externalChannelId", externalChannelId)
+	return c
+}
+
+// OnBehalfOfContentOwnerChannel sets the optional parameter
+// "onBehalfOfContentOwnerChannel":
+func (c *TestsInsertCall) OnBehalfOfContentOwnerChannel(onBehalfOfContentOwnerChannel string) *TestsInsertCall {
+	c.urlParams_.Set("onBehalfOfContentOwnerChannel", onBehalfOfContentOwnerChannel)
 	return c
 }
 
