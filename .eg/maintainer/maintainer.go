@@ -3,7 +3,7 @@ package maintainer
 const (
 	Name           = "Retrovibed"
 	Email          = "engineering@retrovibe.space"
-	GPGID          = "0xA953F6DC11C77486"
-	GPGFingerprint = "1472F4128AD327A04323220509F9FEB7D4D09CF4"
+	GPGID          = "0x38EF85EBD62FACE4"
+	GPGFingerprint = "DEFAC831644D1BD9C7A4F98238EF85EBD62FACE4"
 	Container      = "retrovibe.ubuntu"
 )
