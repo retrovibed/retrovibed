@@ -11,6 +11,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/langx"
 )
 
@@ -20,6 +21,8 @@ var (
 )
 
 func Global() *Monitor {
+	log.Println("**********************************************************")
+	defer log.Println("**********************************************************")
 	globalOnce.Do(func() {
 		m, err := New()
 		if err != nil {
@@ -88,6 +91,7 @@ func New() (*Monitor, error) {
 		done:   make(chan struct{}),
 	}
 
+	s := errorsx.Zero(getState())
 	s, err := getState()
 	if err != nil {
 		return nil, err

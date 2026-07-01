@@ -40,6 +40,8 @@ func NewHTTPDiagnostics(wgSnapshot func() (wireguardx.Statistics, error), option
 
 func (t *HTTPDiagnostics) Bind(r *mux.Router) {
 	r.StrictSlash(false)
+	r.Use(httpx.RouteInvoked)
+
 	r.Path("/").Methods(http.MethodGet).Handler(alice.New(
 		httpx.ContextBufferPool512(),
 		httpauth.AuthenticateWithToken(t.jwtsecret),
@@ -50,7 +52,7 @@ func (t *HTTPDiagnostics) Bind(r *mux.Router) {
 func (t *HTTPDiagnostics) get(w http.ResponseWriter, r *http.Request) {
 	resp := NetworkMetricsResponse{
 		Wireguard: t.wireguardMetrics(),
-		Network:   t.networkMetrics(),
+		Network:   t.network(),
 	}
 
 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &resp); err != nil {
@@ -87,7 +89,7 @@ func (t *HTTPDiagnostics) wireguardMetrics() *WireguardDiagnostics {
 	}
 }
 
-func (t *HTTPDiagnostics) networkMetrics() *Network {
+func (t *HTTPDiagnostics) network() *Network {
 	mon := netmonx.Global()
 	if mon == nil {
 		return &Network{}
