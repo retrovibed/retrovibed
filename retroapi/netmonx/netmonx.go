@@ -21,8 +21,6 @@ var (
 )
 
 func Global() *Monitor {
-	log.Println("**********************************************************")
-	defer log.Println("**********************************************************")
 	globalOnce.Do(func() {
 		m, err := New()
 		if err != nil {
@@ -149,8 +147,6 @@ func startPoll(ctx context.Context, notify chan<- struct{}) {
 }
 
 func (m *Monitor) refresh() {
-	log.Println("----------------------------------------------------------------")
-	defer log.Println("----------------------------------------------------------------")
 	newState := langx.FirstNonNil(errorsx.Zero(getState()), getFallbackState())
 	if newState == nil {
 		return
