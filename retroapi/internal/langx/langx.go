@@ -51,6 +51,15 @@ func ComposeErr[T any, Y ~func(*T) error](options ...Y) Y {
 		return nil
 	}
 }
+func FirstNonNil[T any](s ...*T) *T {
+	for _, v := range s {
+		if v != nil {
+			return v
+		}
+	}
+	return nil
+}
+
 func FirstNonZero[T comparable](s ...T) T {
 	var (
 		x T

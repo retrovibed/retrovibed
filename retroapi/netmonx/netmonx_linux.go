@@ -61,6 +61,8 @@ func platformMetered(name string) bool {
 	return false
 }
 
+func getFallbackState() *State { return nil }
+
 func defaultRouteInterface() string {
 	f, err := os.Open("/proc/net/route")
 	if err != nil {

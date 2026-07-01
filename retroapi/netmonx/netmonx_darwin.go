@@ -43,6 +43,8 @@ func startWatcher(ctx context.Context, notify chan<- struct{}) error {
 
 func platformMetered(_ string) bool { return false }
 
+func getFallbackState() *State { return nil }
+
 func defaultRouteInterface() string {
 	rib, err := route.FetchRIB(syscall.AF_INET, route.RIBTypeRoute, 0)
 	if err != nil {
