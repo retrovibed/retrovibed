@@ -69,6 +69,7 @@ abstract class daemons {
   static DaemonSearchResponse response({DaemonSearchRequest? next}) =>
       DaemonSearchResponse(next: next ?? request(limit: 128), items: []);
 
+  static bool isLocalDevice(Daemon library) => library.hostname.startsWith("localhost:9998");
   static Future<DaemonSearchResponse> search(DaemonSearchRequest req) async {
     return http.Client()
         .get(
@@ -233,11 +234,10 @@ abstract class profiles {
     Profile current, {
     List<httpx.Option> options = const [],
   }) async {
-    final upd =
-        current
-          ..disabledAt = timex.inf.toIso8601String()
-          ..disabledManuallyAt = timex.inf.toIso8601String()
-          ..disabledPendingApprovalAt = timex.inf.toIso8601String();
+    final upd = current
+      ..disabledAt = timex.inf.toIso8601String()
+      ..disabledManuallyAt = timex.inf.toIso8601String()
+      ..disabledPendingApprovalAt = timex.inf.toIso8601String();
     return httpx
         .patch(
           Uri.https(httpx.host(), "/meta/u12t/${current.id}"),

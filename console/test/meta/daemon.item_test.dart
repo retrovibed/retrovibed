@@ -16,7 +16,7 @@ void main() {
           body: SizedBox(
             width: 200,
             height: 150,
-            child: DaemonDropdownItem(daemon: daemon, onTap: () {}),
+            child: DaemonDropdownItem(library: daemon, onTap: () {}),
           ),
         ),
       );
@@ -39,7 +39,7 @@ void main() {
             children: [
               SizedBox(
                 height: 100,
-                child: DaemonDropdownItem(daemon: daemon, onTap: () {}),
+                child: DaemonDropdownItem(library: daemon, onTap: () {}),
               ),
               Expanded(child: Container()),
             ],
@@ -62,7 +62,7 @@ void main() {
             children: [
               SizedBox(
                 width: 150,
-                child: DaemonDropdownItem(daemon: daemon, onTap: () {}),
+                child: DaemonDropdownItem(library: daemon, onTap: () {}),
               ),
               Expanded(child: Container()),
             ],
@@ -83,9 +83,9 @@ void main() {
         Scaffold(
           body: Center(
             child: SizedBox(
-              width: 50,
-              height: 50,
-              child: DaemonDropdownItem(daemon: daemon, onTap: () {}),
+              width: 80,
+              height: 64,
+              child: DaemonDropdownItem(library: daemon, onTap: () {}),
             ),
           ),
         ),
@@ -95,8 +95,8 @@ void main() {
       expect(tester.takeException(), isNull);
 
       final size = tester.getSize(find.byType(DaemonDropdownItem));
-      expect(size.width, equals(50));
-      expect(size.height, equals(50));
+      expect(size.width, equals(80));
+      expect(size.height, equals(64));
     });
 
     testWidgets('renders with zero width constraint', (
@@ -108,7 +108,7 @@ void main() {
             child: SizedBox(
               width: 0,
               height: 100,
-              child: DaemonDropdownItem(daemon: daemon, onTap: () {}),
+              child: DaemonDropdownItem(library: daemon, onTap: () {}),
             ),
           ),
         ),
@@ -127,7 +127,7 @@ void main() {
             child: SizedBox(
               width: 100,
               height: 0,
-              child: DaemonDropdownItem(daemon: daemon, onTap: () {}),
+              child: DaemonDropdownItem(library: daemon, onTap: () {}),
             ),
           ),
         ),
@@ -148,7 +148,7 @@ void main() {
             children: [
               SizedBox(
                 height: 200,
-                child: DaemonDropdownItem(daemon: daemon, onTap: () {}),
+                child: DaemonDropdownItem(library: daemon, onTap: () {}),
               ),
             ],
           ),
@@ -168,7 +168,7 @@ void main() {
           body: SingleChildScrollView(
             child: SizedBox(
               height: 300,
-              child: DaemonDropdownItem(daemon: daemon, onTap: () {}),
+              child: DaemonDropdownItem(library: daemon, onTap: () {}),
             ),
           ),
         ),
@@ -191,7 +191,7 @@ void main() {
               children: [
                 SizedBox(
                   width: 200,
-                  child: DaemonDropdownItem(daemon: daemon, onTap: () {}),
+                  child: DaemonDropdownItem(library: daemon, onTap: () {}),
                 ),
               ],
             ),

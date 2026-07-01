@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
-import './api.dart' as api;
-import './daemon.auto.dart';
-import './daemon.item.dart';
-import './daemon.manual.dart';
+import 'api.dart' as api;
+import 'daemon.auto.dart';
+import 'daemon.item.dart';
+import 'daemon.manual.dart';
+import 'daemon.typography.dart';
 
 class DaemonDropdown extends StatefulWidget {
   final ValueNotifier<api.Daemon> library;
   final List<Widget> trailing;
-  final Widget? help;
+  final Widget help;
   const DaemonDropdown({
     super.key,
     required this.library,
     this.trailing = const [],
-    this.help,
+    this.help = const ds.Hint(const Text("select which daemon instance to configure from the dropdown")),
   });
 
   @override
@@ -48,14 +49,12 @@ class _DaemonDropdownState extends State<DaemonDropdown> {
 
   @override
   Widget build(BuildContext context) {
-    final isDevice = widget.library.value.hostname.startsWith("localhost:9998");
-
     return ds.Help(
       Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           ds.SearchDropdown.text(
-            isDevice ? "local library" : widget.library.value.description,
+            DaemonTypography.description(widget.library.value),
             key: ValueKey(widget.library.value.id),
             controller: _search,
             textAlign: TextAlign.center,
@@ -84,6 +83,7 @@ class _DaemonDropdownState extends State<DaemonDropdown> {
             trailing: widget.trailing,
             onSearch: (query, onClick) {
               return api.daemons.search(api.DaemonSearchRequest()..query = query).then((response) {
+                if (response.items.length <= 1) return ds.Empty;
                 return Container(
                   constraints: BoxConstraints(maxHeight: 400),
                   child: ListView.builder(
@@ -91,9 +91,13 @@ class _DaemonDropdownState extends State<DaemonDropdown> {
                     itemCount: response.items.length,
                     itemBuilder: (context, index) {
                       final daemon = response.items[index];
+                      if (daemon.id == widget.library.value.id) {
+                        // no need to display the current library in the list.
+                        return ds.Empty;
+                      }
 
                       return DaemonDropdownItem(
-                        daemon: daemon,
+                        library: daemon,
                         onTap: onClick,
                       );
                     },
@@ -105,7 +109,7 @@ class _DaemonDropdownState extends State<DaemonDropdown> {
           ?_optional,
         ],
       ),
-      widget.help ?? ds.Hint(const Text("select which daemon instance to configure from the dropdown")),
+      widget.help,
     );
   }
 }

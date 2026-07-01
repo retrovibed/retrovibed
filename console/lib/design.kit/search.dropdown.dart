@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'flutterx.dart';
 import 'theme.defaults.dart';
+import 'empty.dart';
 
 class SearchDropdown extends StatefulWidget {
   static const InputDecoration defaultDecoration = const InputDecoration(
     hintText: "search",
     border: InputBorder.none,
   );
-  static const Widget empty = const SizedBox();
 
   final Future<Widget> Function(String query, Function() onClick) onSearch;
   final InputDecoration decoration;
@@ -54,7 +54,7 @@ class SearchDropdown extends StatefulWidget {
 }
 
 class _SearchDropdownState extends State<SearchDropdown> {
-  Widget _results = SearchDropdown.empty;
+  Widget _results = Empty;
   bool _loading = false;
   final TextEditingController controller;
   final FocusNode _focus = FocusNode(debugLabel: 'SearchDropdown');
@@ -67,7 +67,7 @@ class _SearchDropdownState extends State<SearchDropdown> {
 
   void _closed() {
     setState(() {
-      _results = SearchDropdown.empty;
+      _results = Empty;
       _loading = false;
     });
   }
@@ -116,7 +116,7 @@ class _SearchDropdownState extends State<SearchDropdown> {
   @override
   Widget build(BuildContext context) {
     final defaults = Defaults.of(context);
-    final open = _results != SearchDropdown.empty;
+    final open = _results != Empty;
 
     return TapRegion(
       onTapOutside: (event) {
@@ -156,19 +156,19 @@ class _SearchDropdownState extends State<SearchDropdown> {
               ),
               Visibility(
                 visible: open,
-                child: Container(
-                  margin: EdgeInsets.only(top: defaults.spacing / 2),
-                  decoration: BoxDecoration(
-                    border: defaults.border,
-                    borderRadius: defaults.borderRadius,
-                  ),
-                  child: Visibility(
-                    visible: _loading,
-                    replacement: _results,
-                    child: Padding(
-                      padding: defaults.padding,
-                      child: CircularProgressIndicator(),
+                child: Visibility(
+                  visible: _loading,
+                  replacement: Container(
+                    margin: EdgeInsets.only(top: defaults.spacing / 2),
+                    decoration: BoxDecoration(
+                      border: defaults.border,
+                      borderRadius: defaults.borderRadius,
                     ),
+                    child: _results,
+                  ),
+                  child: Padding(
+                    padding: defaults.padding,
+                    child: CircularProgressIndicator(),
                   ),
                 ),
               ),

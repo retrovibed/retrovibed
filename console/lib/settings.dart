@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:retrovibed/designkit.dart' as ds;
-import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/meta.dart' as meta;
 import 'package:retrovibed/billing.dart' as billing;
 import 'package:retrovibed/quotas.dart' as quotas;
@@ -110,7 +109,6 @@ class _DisplayState extends State<Display> {
     return ds.Shortcuts(
       bindings: {
         _konamiActivator: (
-          // const Text('developer mode'),
           ds.HelpScope.None,
           () {
             masked(debug.DeveloperSettings());
@@ -122,7 +120,7 @@ class _DisplayState extends State<Display> {
         final defaults = ds.Defaults.of(context);
         final compact = defaults.isCompact;
         final _billing = billing.Registered.of(context);
-        final _displaybilling = !(_billing.current.subscriptionId.isEmpty) || authn.developer(context).subscription;
+        final _displaybilling = (_billing.current.subscriptionId.isNotEmpty && authn.developer(context).subscription);
 
         return SelectionArea(
           child: Column(
@@ -134,26 +132,7 @@ class _DisplayState extends State<Display> {
                 library: _library,
                 trailing: [
                   _overlay == ds.Empty
-                      ? IconButton(
-                          onPressed: () {
-                            masked(
-                              ds.Confirmation.yesNo(
-                                content: Text(
-                                  'Delete ${_library.value.description}?',
-                                ),
-                                onCancel: (_) => overlay(ds.Empty),
-                                onConfirm: (_) {
-                                  httpx.withRetry(
-                                    () => meta.daemons.delete(_library.value.id).then((_) {
-                                      overlay(ds.Empty);
-                                    }),
-                                  );
-                                },
-                              ),
-                            );
-                          },
-                          icon: Icon(Icons.delete),
-                        )
+                      ? ds.Empty
                       : ds.LoadingIconButton.close(
                           onPressed: () {
                             overlay(ds.Empty);
