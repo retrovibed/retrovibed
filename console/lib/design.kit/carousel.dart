@@ -100,13 +100,22 @@ class _CarouselRowState extends State<CarouselRow> {
                         Listener(
                           onPointerSignal: (event) {
                             if (event is PointerScrollEvent) {
+                              final delta = event.scrollDelta.dx + event.scrollDelta.dy;
                               _scroll.jumpTo(
-                                (_scroll.offset + event.scrollDelta.dy).clamp(
+                                (_scroll.offset + delta).clamp(
                                   _scroll.position.minScrollExtent,
                                   _scroll.position.maxScrollExtent,
                                 ),
                               );
                             }
+                          },
+                          onPointerMove: (event) {
+                            _scroll.jumpTo(
+                              (_scroll.offset - event.delta.dx).clamp(
+                                _scroll.position.minScrollExtent,
+                                _scroll.position.maxScrollExtent,
+                              ),
+                            );
                           },
                           child: SingleChildScrollView(
                             controller: _scroll,

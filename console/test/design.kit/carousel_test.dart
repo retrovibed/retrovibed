@@ -113,6 +113,49 @@ void main() {
       expect(tester.getTopLeft(find.text('Item 0')).dx, lessThan(initialX));
     });
 
+    testWidgets('trackpad horizontal scroll (dx) scrolls content forward', (tester) async {
+      await tester.pumpApp(
+        CarouselRow(
+          title: const SizedBox(),
+          items: List.generate(
+            20,
+            (i) => SizedBox(width: 100, height: 100, child: Text('Item $i')),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final initialX = tester.getTopLeft(find.text('Item 0')).dx;
+
+      final center = tester.getCenter(find.byType(SingleChildScrollView));
+      await tester.sendEventToBinding(
+        PointerScrollEvent(position: center, scrollDelta: const Offset(200, 0)),
+      );
+      await tester.pump();
+
+      expect(tester.getTopLeft(find.text('Item 0')).dx, lessThan(initialX));
+    });
+
+    testWidgets('drag scrolls content horizontally', (tester) async {
+      await tester.pumpApp(
+        CarouselRow(
+          title: const SizedBox(),
+          items: List.generate(
+            20,
+            (i) => SizedBox(width: 100, height: 100, child: Text('Item $i')),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final initialX = tester.getTopLeft(find.text('Item 0')).dx;
+
+      await tester.drag(find.byType(SingleChildScrollView), const Offset(-200, 0));
+      await tester.pump();
+
+      expect(tester.getTopLeft(find.text('Item 0')).dx, lessThan(initialX));
+    });
+
     testWidgets('arrow right key scrolls content forward', (tester) async {
       await tester.pumpApp(
         CarouselRow(
