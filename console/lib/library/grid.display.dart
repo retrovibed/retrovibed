@@ -139,214 +139,207 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
 
     final category = mimex.category(widget.search.value.next.mimetypes);
 
+    final defaults = ds.Defaults.of(context);
+    final compact = defaults.isCompact;
+    final authz = authn.AuthzCache.meta(context);
+
     return RefreshIndicator(
       onRefresh: () => refresh(widget.search.value.next),
       child: LayoutBuilder(
-        builder: (context, constraints) {
-          final defaults = ds.Defaults.of(context);
-          final compact = defaults.isCompact;
-          final authz = authn.AuthzCache.meta(context);
-          return SingleChildScrollView(
-            physics: AlwaysScrollableScrollPhysics(),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: constraints.maxHeight),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.start,
-                verticalDirection: compact ? VerticalDirection.up : VerticalDirection.down,
-                children: [
-                  ds.Grid<media.Media>(
-                    children: widget.search.value.items,
-                    loading: _loading,
-                    cause: _cause,
-                    leading: [
-                      ds.SearchTray(
-                        autoscroll: true,
-                        decoration: InputDecoration(hintText: "search library"),
-                        filters: [
-                          lucene.Mode.auto('discover', false, (discover) {
-                            setState(() => _library = !discover);
-                          }),
-                          lucene.Boolean.auto('hidden', false, (v) {
-                            setState(() => widget.search.value.next.hidden = v);
-                            refresh(widget.search.value.next);
-                          }),
-                        ],
-                        controller: widget.controller,
-                        focus: widget.focus,
-                        autofocus: defaults.desktop,
-                        padding: defaults.padding.copyWith(bottom: 0.0),
-                        onSubmitted: (v) {
+        builder: (context, constraints) => SingleChildScrollView(
+          reverse: compact,
+          physics: AlwaysScrollableScrollPhysics(),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: ds.Grid<media.Media>(
+              children: widget.search.value.items,
+              loading: _loading,
+              cause: _cause,
+              leading: [
+                ds.SearchTray(
+                  autoscroll: true,
+                  decoration: InputDecoration(hintText: "search library"),
+                  filters: [
+                    lucene.Mode.auto('discover', false, (discover) {
+                      setState(() => _library = !discover);
+                    }),
+                    lucene.Boolean.auto('hidden', false, (v) {
+                      setState(() => widget.search.value.next.hidden = v);
+                      refresh(widget.search.value.next);
+                    }),
+                  ],
+                  controller: widget.controller,
+                  focus: widget.focus,
+                  autofocus: defaults.desktop,
+                  padding: defaults.padding.copyWith(bottom: 0.0),
+                  onSubmitted: (v) {
+                    setState(() {
+                      widget.search.value.next
+                        ..query = v
+                        ..offset = ds.Grid.int64(0);
+                      widget.search.value = widget.search.value;
+                    });
+                    return refresh(widget.search.value.next, refocus: true);
+                  },
+                  next: (i) {
+                    setState(() {
+                      widget.search.value.next.offset = i;
+                    });
+                    refresh(widget.search.value.next);
+                  },
+                  current: widget.search.value.next.offset,
+                  empty: ds.Grid.int64(widget.search.value.items.length) < widget.search.value.next.limit,
+                  leading: [
+                    ds.CompactingMenu.pinned(
+                      SearchMimetypeDropdown(
+                        widget.search.value.next,
+                        onChange: (upd) {
                           setState(() {
-                            widget.search.value.next
-                              ..query = v
-                              ..offset = ds.Grid.int64(0);
+                            widget.search.value.next = upd;
                             widget.search.value = widget.search.value;
-                          });
-                          return refresh(widget.search.value.next, refocus: true);
-                        },
-                        next: (i) {
-                          setState(() {
-                            widget.search.value.next.offset = i;
                           });
                           refresh(widget.search.value.next);
                         },
-                        current: widget.search.value.next.offset,
-                        empty: ds.Grid.int64(widget.search.value.items.length) < widget.search.value.next.limit,
-                        leading: [
-                          ds.CompactingMenu.pinned(
-                            SearchMimetypeDropdown(
-                              widget.search.value.next,
-                              onChange: (upd) {
-                                setState(() {
-                                  widget.search.value.next = upd;
-                                  widget.search.value = widget.search.value;
-                                });
-                                refresh(widget.search.value.next);
-                              },
-                            ),
-                          ),
-                          ds.FileDropWell.icon(
-                            upload,
-                            mimetypes: widget.search.value.next.mimetypes,
-                            help: ds.Hint(const Text("drag and drop files onto the grid to add media to your library")),
-                          ),
-                        ],
-                        tuning: GridSettings(),
-                        help: ds.Hint(const Text("search your library, use @ to access advanced filtering")),
                       ),
-                      (widget.search.value.next.query.isEmpty)
-                          ? disc.Home(
-                              category,
-                              padding: defaults.padding.copyWith(
-                                top: 0.0,
-                                bottom: 0.0,
-                              ),
-                            )
-                          : ds.Empty,
-                    ],
-                    empty: _library
-                        ? ds.Empty
-                        : KnownMediaDownloadList.query(
-                            () {
-                              final search = widget.search.value;
-                              if (_loading) return Future.value([]);
-                              if (search.items.isNotEmpty) return Future.value([]);
-                              if (category.isEmpty) return Future.value([]);
+                    ),
+                    ds.FileDropWell.icon(
+                      upload,
+                      mimetypes: widget.search.value.next.mimetypes,
+                      help: ds.Hint(const Text("drag and drop files onto the grid to add media to your library")),
+                    ),
+                  ],
+                  tuning: GridSettings(),
+                  help: ds.Hint(const Text("search your library, use @ to access advanced filtering")),
+                ),
+                (widget.search.value.next.query.isEmpty)
+                    ? disc.Home(
+                        category,
+                        padding: defaults.padding.copyWith(
+                          top: 0.0,
+                          bottom: 0.0,
+                        ),
+                      )
+                    : ds.Empty,
+              ],
+              empty: _library
+                  ? ds.Empty
+                  : KnownMediaDownloadList.query(
+                      () {
+                        final search = widget.search.value;
+                        if (_loading) return Future.value([]);
+                        if (search.items.isNotEmpty) return Future.value([]);
+                        if (category.isEmpty) return Future.value([]);
 
-                              return httpx.withRetry(
-                                () => api.known
-                                    .search(
-                                      api.known.request(
-                                        language: langcodex.locale().languageCode,
-                                        mimetype: category,
-                                        adult: search.next.adult,
-                                        query: search.next.query,
-                                        limit: search.next.limit.toInt(),
-                                      ),
-                                      options: [authn.request(authz)],
-                                    )
-                                    .then((v) => v.items),
-                              );
-                            },
-                            leading: Center(
-                              child: Padding(
-                                padding: defaults.padding,
-                                child: Text(
-                                  _library
-                                      ? "no results in library. select below to automatically locate and download"
-                                      : "select below to automatically locate and download",
-                                  style: TextStyle(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface.withValues(alpha: 0.6),
-                                  ),
+                        return httpx.withRetry(
+                          () => api.known
+                              .search(
+                                api.known.request(
+                                  language: langcodex.locale().languageCode,
+                                  mimetype: category,
+                                  adult: search.next.adult,
+                                  query: search.next.query,
+                                  limit: search.next.limit.toInt(),
                                 ),
-                              ),
-                            ),
-                          ),
-                    (context, _media) {
-                      var onSettings = () {
-                        ds.modals.asyncfn<media.Media>(
-                          context,
-                          (completion) => MediaSettings(
-                            current: _media,
-                            onChange: (pending, {bool forced = false, bool autoclose = false}) {
-                              pending
-                                  .then(replace)
-                                  .then((v) {
-                                    if (forced) refresh(widget.search.value.next, refocus: false);
-                                    if (autoclose) completion.complete(v);
-                                  })
-                                  .catchError((cause) {
-                                    setState(() {
-                                      _cause = ds.Error.unknown(cause, onTap: reseterr);
-                                    });
-                                  });
-                            },
-                          ),
+                                options: [authn.request(authz)],
+                              )
+                              .then((v) => v.items),
                         );
-                      };
-                      final trailing = [
-                        ds.LoadingIconButton.info(
-                          tooltip: "manually identify the media",
-                          help: ds.Hint(
-                            Text("search for and select the correct media identity from the known library"),
-                          ),
-                          onPressed: KnownMediaDropdown.modal(
-                            context,
-                            _media,
-                            onChange: replace,
-                            mimetype: category,
+                      },
+                      leading: Center(
+                        child: Padding(
+                          padding: defaults.padding,
+                          child: Text(
+                            _library
+                                ? "no results in library. select below to automatically locate and download"
+                                : "select below to automatically locate and download",
+                            style: TextStyle(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withValues(alpha: 0.6),
+                            ),
                           ),
                         ),
-                      ];
-
-                      final key = ValueKey(uuidx.md5x("${_media.id}.${_media.updatedAt}"));
-
-                      if (uuidx.isMinMax(
-                        uuidx.fromString(_media.knownMediaId),
-                      )) {
-                        return KnownMediaDisplay.missing(
-                          key: key,
-                          _media,
-                          onTap: media.PlayAction(context, _media, widget.search.value),
-                          onSettings: onSettings,
-                          onChange: replace,
-                          highlighted: _media.id == widget.highlighted,
-                          help: KnownMediaDisplay.hintPlayMedia,
-                          trailing: trailing,
-                        );
-                      }
-
-                      return KnownMediaDisplay(
-                        key: key,
-                        api.known
-                            .cached(
-                              _media.knownMediaId,
-                              () => api.known.get(
-                                _media.knownMediaId,
-                                options: [authn.request(authz)],
-                              ),
-                            )
-                            .then(
-                              (w) => (w.known..description = _media.description),
-                            ),
-                        onTap: media.PlayAction(context, _media, widget.search.value),
-                        onSettings: onSettings,
-                        onChange: replace,
-                        media: _media,
-                        highlighted: _media.id == widget.highlighted,
-                        help: KnownMediaDisplay.hintPlayMedia,
-                        trailing: trailing,
-                      );
-                    },
+                      ),
+                    ),
+              (context, _media) {
+                var onSettings = () {
+                  ds.modals.asyncfn<media.Media>(
+                    context,
+                    (completion) => MediaSettings(
+                      current: _media,
+                      onChange: (pending, {bool forced = false, bool autoclose = false}) {
+                        pending
+                            .then(replace)
+                            .then((v) {
+                              if (forced) refresh(widget.search.value.next, refocus: false);
+                              if (autoclose) completion.complete(v);
+                            })
+                            .catchError((cause) {
+                              setState(() {
+                                _cause = ds.Error.unknown(cause, onTap: reseterr);
+                              });
+                            });
+                      },
+                    ),
+                  );
+                };
+                final trailing = [
+                  ds.LoadingIconButton.info(
+                    tooltip: "manually identify the media",
+                    help: ds.Hint(
+                      Text("search for and select the correct media identity from the known library"),
+                    ),
+                    onPressed: KnownMediaDropdown.modal(
+                      context,
+                      _media,
+                      onChange: replace,
+                      mimetype: category,
+                    ),
                   ),
-                ],
-              ),
+                ];
+
+                final key = ValueKey(uuidx.md5x("${_media.id}.${_media.updatedAt}"));
+
+                if (uuidx.isMinMax(
+                  uuidx.fromString(_media.knownMediaId),
+                )) {
+                  return KnownMediaDisplay.missing(
+                    key: key,
+                    _media,
+                    onTap: media.PlayAction(context, _media, widget.search.value),
+                    onSettings: onSettings,
+                    onChange: replace,
+                    highlighted: _media.id == widget.highlighted,
+                    help: KnownMediaDisplay.hintPlayMedia,
+                    trailing: trailing,
+                  );
+                }
+
+                return KnownMediaDisplay(
+                  key: key,
+                  api.known
+                      .cached(
+                        _media.knownMediaId,
+                        () => api.known.get(
+                          _media.knownMediaId,
+                          options: [authn.request(authz)],
+                        ),
+                      )
+                      .then(
+                        (w) => (w.known..description = _media.description),
+                      ),
+                  onTap: media.PlayAction(context, _media, widget.search.value),
+                  onSettings: onSettings,
+                  onChange: replace,
+                  media: _media,
+                  highlighted: _media.id == widget.highlighted,
+                  help: KnownMediaDisplay.hintPlayMedia,
+                  trailing: trailing,
+                );
+              },
             ),
-          );
-        },
+          ),
+        ),
       ),
     );
   }
