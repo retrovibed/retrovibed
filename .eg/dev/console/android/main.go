@@ -5,6 +5,7 @@ import (
 	"eg/compute/android"
 	"eg/compute/console"
 	"eg/compute/debuild/duckdb"
+	"eg/compute/egx"
 	"eg/compute/maintainer"
 	"fmt"
 	"log"
@@ -14,6 +15,26 @@ import (
 	"github.com/egdaemon/eg/runtime/wasi/eggit"
 	"github.com/egdaemon/eg/runtime/wasi/shell"
 )
+
+func Device(ctx context.Context, o eg.Op) error {
+	return eg.Sequential(
+		shell.Op(shell.New("adb -d get-serialno")),
+		shell.Op(shell.New("adb -d wait-for-device shell 'while [ \"$(getprop sys.boot_completed)\" != \"1\" ]; do sleep 1; done'")),
+		console.RunDev("flutter pub get && flutter run -d $(adb -d get-serialno)"),
+	)(ctx, o)
+}
+
+func Emulator(port int) eg.OpFn {
+	return eg.Sequential(
+		shell.Op(
+			shell.New("sdkmanager 'system-images;android-34;google_apis;x86_64'"),
+			shell.New("echo 'no' | avdmanager create avd --force -n retrovibed -k 'system-images;android-34;google_apis;x86_64'"),
+			shell.Newf("systemctl --user is-active --quiet retrovibed-android || systemd-run --user --unit=retrovibed-android --setenv=QT_QPA_PLATFORM=xcb --collect /opt/android-sdk/emulator/emulator -avd retrovibed -port %d", port),
+			shell.Newf("adb -s emulator-%d wait-for-device shell 'while [ \"$(getprop sys.boot_completed)\" != \"1\" ]; do sleep 1; done'", port),
+		),
+		console.RunDev(fmt.Sprintf("flutter pub get && flutter run -d emulator-%d", port)),
+	)
+}
 
 func Debug(runtime shell.Command) eg.OpFn {
 	return shell.Op(
@@ -43,30 +64,40 @@ func main() {
 			deb,
 			eg.Sequential(
 				duckdb.Download,
-				duckdb.MaybeBuild(
-					egenv.WorkingDirectory("console/android/app/src/main/jniLibs/x86_64/libduckdb.a"),
-					duckdb.CompileAndroidRuntime("android_x86_64", "x86_64"),
-					duckdb.CompileAndroid,
-					duckdb.CloneBuild,
+				eg.Parallel(
+					duckdb.MaybeBuild(
+						egenv.WorkingDirectory("console/android/app/src/main/jniLibs/x86_64/libduckdb.a"),
+						duckdb.CompileAndroidRuntime("android_x86_64", "x86_64"),
+						duckdb.CompileAndroid,
+						duckdb.CloneBuild,
+					),
+					duckdb.MaybeBuild(
+						egenv.WorkingDirectory("console/android/app/src/main/jniLibs/arm64-v8a/libduckdb.a"),
+						duckdb.CompileAndroidRuntime("android_arm64", "arm64-v8a"),
+						duckdb.CompileAndroid,
+						duckdb.CloneBuild,
+					),
 				),
-				eg.Sequential(
-					console.Generate,
+				console.Generate,
+				eg.Parallel(
 					console.GenerateDevStaticBinding(
-						console.AndroidRuntime("x86_64-none-linux-android31"),
+						console.AndroidRuntime("x86_64-none-linux-android31").Environ("GOARCH", "amd64"),
 						egenv.WorkingDirectory("console/android/app/src/main/jniLibs/x86_64"),
 						egenv.WorkingDirectory("console/android/app/src/main/jniLibs/x86_64"),
 					),
-					console.BuildLinux,
+					console.GenerateDevStaticBinding(
+						console.AndroidRuntime("aarch64-none-linux-android31").Environ("GOARCH", "arm64"),
+						egenv.WorkingDirectory("console/android/app/src/main/jniLibs/arm64-v8a"),
+						egenv.WorkingDirectory("console/android/app/src/main/jniLibs/arm64-v8a"),
+					),
 				),
+				console.BuildLinux,
 			),
 		),
-		shell.Op(
-			shell.New("sdkmanager 'system-images;android-34;google_apis;x86_64'"),
-			shell.New("echo 'no' | avdmanager create avd --force -n retrovibed -k 'system-images;android-34;google_apis;x86_64'"),
-			shell.Newf("systemctl --user is-active --quiet retrovibed-android || systemd-run --user --unit=retrovibed-android --setenv=QT_QPA_PLATFORM=xcb --collect /opt/android-sdk/emulator/emulator -avd retrovibed -port %d", port),
-			shell.Newf("adb -s emulator-%d wait-for-device shell 'while [ \"$(getprop sys.boot_completed)\" != \"1\" ]; do sleep 1; done'", port),
+		egx.Fallback(
+			Device,
+			Emulator(port),
 		),
-		console.RunDev(fmt.Sprintf("flutter pub get && flutter run -d emulator-%d", port)),
 	)
 
 	if err != nil {

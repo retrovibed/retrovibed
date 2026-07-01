@@ -11,6 +11,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/langx"
 )
 
@@ -89,7 +90,8 @@ func New() (*Monitor, error) {
 	}
 
 	s, err := getState()
-	if err != nil {
+	s = langx.FirstNonNil(s, getFallbackState())
+	if s == nil {
 		return nil, err
 	}
 	m.current.Store(s)
@@ -145,8 +147,8 @@ func startPoll(ctx context.Context, notify chan<- struct{}) {
 }
 
 func (m *Monitor) refresh() {
-	newState, err := getState()
-	if err != nil {
+	newState := langx.FirstNonNil(errorsx.Zero(getState()), getFallbackState())
+	if newState == nil {
 		return
 	}
 
@@ -303,10 +305,10 @@ func getState() (*State, error) {
 }
 
 func isMeteredInterface(name string) bool {
-	return strings.HasPrefix(name, "wwan") ||
-		strings.HasPrefix(name, "rmnet") ||
-		strings.HasPrefix(name, "pdp_ip") ||
-		strings.HasPrefix(name, "ccmni")
+	return strings.Contains(name, "wwan") ||
+		strings.Contains(name, "rmnet") ||
+		strings.Contains(name, "pdp_ip") ||
+		strings.Contains(name, "ccmni")
 }
 
 func statesEqual(a, b *State) bool {

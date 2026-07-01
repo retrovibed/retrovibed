@@ -16,3 +16,5 @@ func platformMetered(_ string) bool { return false }
 func defaultRouteInterface() string {
 	return ""
 }
+
+func getFallbackState() *State { return nil }
