@@ -36,7 +36,10 @@ func main() {
 						console.Generate,
 						console.BuildLinux,
 					),
-					shallows.Compile(),
+					eg.Sequential(
+						shallows.NeuralsBuild(),
+						shallows.Compile(),
+					),
 				),
 				eg.Parallel(
 					build(),
