@@ -60,10 +60,11 @@ class _CardState extends State<Card> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _typography.Typography.future(_storageFuture, defaults: Storage),
+              _typography.Typography.future(_storageFuture, defaults: Storage, label: "Storage"),
               _typography.Typography.future(
                 _bandwidthFuture,
                 defaults: Bandwidth,
+                label: "Bandwidth",
               ),
             ],
           ),
