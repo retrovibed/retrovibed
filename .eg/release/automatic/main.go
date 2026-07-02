@@ -20,11 +20,11 @@ func main() {
 		shell.Op(
 			shell.New("gh workflow run release.ios.yml --ref main"),
 			shell.New("gh workflow run release.macosx.yml --ref main"),
-			shell.New("mkdir -p ~/.ssh && eg login --seed=\"${RETROVIBED_EG_LOGIN_SEED}\""),
-			shell.New("eg compute upload release/linux"),
-			shell.New("eg compute upload --secret ${RETROVIBED_RELEASE_AUTOMATIC_SECRET} release/debian"),
-			shell.New("eg compute upload --secret ${RETROVIBED_RELEASE_AUTOMATIC_SECRET} release/archlinux"),
-			// shell.New("eg compute upload release/android"), // TODO: android requires gcp credentials.
+			shell.Env().New("mkdir -p ~/.ssh && eg login --seed=\"${RETROVIBED_EG_LOGIN_SEED}\""),
+			shell.Env().New("eg compute upload release/linux"),
+			shell.Env().New("eg compute upload -e EG_SSH_KEY_SEED=${EG_SSH_KEY_SEED} release/archlinux"),
+			// shell.Env().New("eg compute upload --secret ${RETROVIBED_RELEASE_AUTOMATIC_SECRET} release/debian"), // TODO: gpg credentials investigation.
+			// shell.Env().New("eg compute upload release/android"), // TODO: android requires gcp credentials.
 		),
 	)
 
