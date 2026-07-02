@@ -26,7 +26,7 @@ class Typography extends StatelessWidget {
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
     final typography =
-        "${ds.bytesx(current.consumed.toInt()).toIEC600272Format()} of ${ds.bytesx(current.available().toInt()).toIEC600272Format()}";
+        "${ds.bytesx(current.consumed.toInt()).toIEC600272Format()} used of ${ds.bytesx(current.available().toInt()).toIEC600272Format()}";
 
     return Column(
       mainAxisSize: MainAxisSize.min,

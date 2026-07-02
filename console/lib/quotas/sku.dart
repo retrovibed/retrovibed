@@ -2,13 +2,13 @@ import './api.dart' as api;
 
 final Storage = api.Quota(
   sku: "59790d9e-9c74-152c-fceb-a26607f02146",
-  description: "storage usage",
+  description: "Storage",
   adjustable: true,
 );
 
 final Bandwidth = api.Quota(
   sku: "620cac69-da27-2e19-ae99-d162275e528d",
-  description: "bandwidth usage",
+  description: "Bandwidth",
   adjustable: true,
 );
 
