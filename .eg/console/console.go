@@ -18,7 +18,6 @@ import (
 
 func flutterRuntimev2(v shell.Command) shell.Command {
 	return v.
-		Debug().
 		Directory(egenv.WorkingDirectory("console")).
 		EnvironFrom(eggolang.Env()...).
 		Environ("PUB_CACHE", egenv.CacheDirectory(".eg", "dart"))
