@@ -6,19 +6,17 @@ import './usage.dart';
 class Typography extends StatelessWidget {
   static api.Quota zero = api.Quota();
   final api.Quota current;
-  final String label;
   final Future<api.Quota> Function(api.Quota)? onChange;
-  const Typography(this.current, {super.key, this.label = "", this.onChange});
+  const Typography(this.current, {super.key, this.onChange});
 
   static FutureBuilder<api.Quota> future(
     Future<api.Quota> pending, {
     Future<api.Quota> Function(api.Quota)? onChange,
     api.Quota? defaults,
-    String label = "",
   }) {
     return ds.future(defaults ?? Typography.zero, pending, (snapshot) {
       return ds.ErrorScreen(
-        Typography(snapshot.data ?? Typography.zero, key: ValueKey(snapshot.data?.updatedAt), label: label, onChange: onChange),
+        Typography(snapshot.data ?? Typography.zero, key: ValueKey(snapshot.data?.updatedAt), onChange: onChange),
         cause: snapshot.hasError ? ds.Error.unknown(snapshot.error!) : ds.Error.zero,
       );
     });
@@ -27,7 +25,6 @@ class Typography extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
-    final title = label.isEmpty ? current.description : label;
     final typography =
         "${ds.bytesx(current.consumed.toInt()).toIEC600272Format()} used of ${ds.bytesx(current.available().toInt()).toIEC600272Format()}";
 
@@ -36,7 +33,7 @@ class Typography extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: defaults.spacing / 2,
-      children: [Text(title), Usage(current), Text(typography)],
+      children: [Text(current.description), Usage(current), Text(typography)],
     );
   }
 }

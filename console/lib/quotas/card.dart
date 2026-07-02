@@ -27,18 +27,18 @@ class _CardState extends State<Card> {
   void initState() {
     super.initState();
     _storageFuture = httpx.withRetry(
-      () => quotas.api.get(Storage.sku, options: [authn.Authenticated.bearer(context)]).then((v) => v.quota).catchError(
-        (cause) {
-          return Storage;
-        },
-        test: httpx.ErrorsTest.err404,
-      ),
+      () => quotas.api
+          .get(Storage.sku, options: [authn.Authenticated.bearer(context)])
+          .then((v) => v.quota..description = Storage.description)
+          .catchError((cause) {
+            return Storage;
+          }, test: httpx.ErrorsTest.err404),
     );
 
     _bandwidthFuture = httpx.withRetry(
       () => quotas.api
           .get(Bandwidth.sku, options: [authn.Authenticated.bearer(context)])
-          .then((v) => v.quota)
+          .then((v) => v.quota..description = Bandwidth.description)
           .catchError((cause) {
             return Bandwidth;
           }, test: httpx.ErrorsTest.err404),
@@ -60,11 +60,10 @@ class _CardState extends State<Card> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _typography.Typography.future(_storageFuture, defaults: Storage, label: "Storage"),
+              _typography.Typography.future(_storageFuture, defaults: Storage),
               _typography.Typography.future(
                 _bandwidthFuture,
                 defaults: Bandwidth,
-                label: "Bandwidth",
               ),
             ],
           ),
