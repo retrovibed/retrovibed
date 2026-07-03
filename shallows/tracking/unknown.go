@@ -35,8 +35,19 @@ func NewUnknownHash(md int160.T, options ...func(*UnknownHash)) (m UnknownHash) 
 	}, options...)
 }
 
+func UnknownHashOptionTestDefaults(uh *UnknownHash) {
+	id := int160.Random()
+	uh.ID = torrentx.HashUID(&id)
+	uh.Infohash = id.Bytes()
+	uh.IP = netip.IPv6Unspecified()
+}
+
 func UnknownHashQueryNeedsCheck() squirrel.Sqlizer {
 	return squirrel.Expr("torrents_unknown_infohashes.next_check < NOW()")
+}
+
+func UnknownHashQueryByIDs(ids ...string) squirrel.Sqlizer {
+	return squirrel.Eq{"torrents_unknown_infohashes.id": ids}
 }
 
 func UnknownSearch(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilder) UnknownHashScanner {

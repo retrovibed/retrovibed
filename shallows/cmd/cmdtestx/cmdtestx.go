@@ -23,7 +23,6 @@ func Execute(t *testing.T, parser *kong.Kong, cmd ...string) error {
 
 	kctx, err := parser.Parse(cmd)
 	require.NoError(t, err)
-
 	return kctx.Run()
 }
 

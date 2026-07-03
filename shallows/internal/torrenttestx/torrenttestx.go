@@ -2,13 +2,16 @@ package torrenttestx
 
 import (
 	"log"
+	"net/netip"
 	"testing"
 
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/autobind"
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/storage"
+	"github.com/retrovibed/retrovibed/retroapi/netx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/time/rate"
 )
@@ -23,15 +26,29 @@ func QuickDHT(t testing.TB, options ...dht.Option) *dht.Server {
 }
 
 func QuickClient(t testing.TB, options ...torrent.ClientConfigOption) *torrent.Client {
-	cdir := t.TempDir()
-	return Client(t, autobind.NewLoopback(
-		autobind.EnableDHT(QuickDHT(t)), // dht should be optional, but refactor made it not for now default to a basic one
-	), torrent.NewMetadataCache(cdir), storage.NewFile(cdir), options...)
+	return QuickClientWithDHT(t,
+		QuickDHT(t), // dht should be optional, but refactor made it not for now default to a basic one
+		options...,
+	)
 }
 
 func QuickClientWithDHT(t testing.TB, dhts *dht.Server, options ...torrent.ClientConfigOption) *torrent.Client {
+	return QuickClientBinder(
+		t,
+		autobind.NewLoopback(autobind.EnableDHT(dhts)),
+		options...,
+	)
+}
+
+func QuickClientBinder(t testing.TB, binder autobind.Autobind, options ...torrent.ClientConfigOption) *torrent.Client {
 	cdir := t.TempDir()
-	return Client(t, autobind.NewLoopback(autobind.EnableDHT(dhts)), torrent.NewMetadataCache(cdir), storage.NewFile(cdir), options...)
+	return Client(
+		t,
+		binder,
+		torrent.NewMetadataCache(cdir),
+		storage.NewFile(cdir),
+		options...,
+	)
 }
 
 func Client(t testing.TB, binder autobind.Autobind, mdcache torrent.MetadataStore, scache storage.ClientImpl, options ...torrent.ClientConfigOption) *torrent.Client {
@@ -52,4 +69,12 @@ func Client(t testing.TB, binder autobind.Autobind, mdcache torrent.MetadataStor
 			),
 		),
 	))(t)
+}
+
+func ApprPorts(c *torrent.Client) (res []netip.AddrPort) {
+	for _, n := range c.ListenAddrs() {
+		res = append(res, langx.Autoderef(netx.AddrPort(n)))
+	}
+
+	return res
 }

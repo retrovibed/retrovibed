@@ -92,6 +92,8 @@ func GenerateProtocol(ctx context.Context, op eg.Op) error {
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mcommunity.publish.proto=github.com/retrovibed/retrovibed/shallows/communityapi --go_opt=Mcommunity.proto=github.com/retrovibed/retrovibed/shallows/communityapi --go_opt=paths=source_relative --go_out=communityapi community.publish.proto"),
 		// ddisc
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mddisc.peers.proto=github.com/retrovibed/retrovibed/shallows/ddiscapi --go_opt=paths=source_relative --go_out=ddiscapi ddisc.peers.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mddisc.discovery.proto=github.com/retrovibed/retrovibed/shallows/ddiscapi --go_opt=paths=source_relative --go_out=ddiscapi ddisc.discovery.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mddisc.media.proto=github.com/retrovibed/retrovibed/shallows/ddiscapi --go_opt=paths=source_relative --go_out=ddiscapi ddisc.media.proto"),
 		// settings
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mstorage.proto=github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/daemons --go_opt=paths=source_relative --go_out=cmd/retrovibe/daemons storage.proto"),
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mtorrent.proto=github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/daemons --go_opt=paths=source_relative --go_out=cmd/retrovibe/daemons torrent.proto"),

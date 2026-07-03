@@ -62,21 +62,21 @@ func (t *HTTPPeerManagement) Bind(r *mux.Router) {
 	r.Path("/").Methods(http.MethodPost).Handler(alice.New(
 		httpx.ContextBufferPool512(),
 		httpx.ParseForm,
-		metaapi.AuthzTokenHTTP(t.jwtsecret, AuthzPermPeerManagement),
+		metaapi.AuthzTokenHTTP(t.jwtsecret, AuthzPermPeer),
 		httpx.Timeout2s(),
 	).ThenFunc(t.create))
 
 	r.Path("/{id}").Methods(http.MethodDelete).Handler(alice.New(
 		httpx.ContextBufferPool512(),
 		httpx.ParseForm,
-		metaapi.AuthzTokenHTTP(t.jwtsecret, AuthzPermPeerManagement),
+		metaapi.AuthzTokenHTTP(t.jwtsecret, AuthzPermPeer),
 		httpx.Timeout2s(),
 	).ThenFunc(t.delete))
 
 	r.Path("/{id}").Methods(http.MethodPatch).Handler(alice.New(
 		httpx.ContextBufferPool512(),
 		httpx.ParseForm,
-		metaapi.AuthzTokenHTTP(t.jwtsecret, AuthzPermPeerManagement),
+		metaapi.AuthzTokenHTTP(t.jwtsecret, AuthzPermPeer),
 		httpx.Timeout2s(),
 	).ThenFunc(t.update))
 
