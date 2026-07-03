@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package ddisc;
+
+message Media {
+  string id = 1 [ json_name = "id" ];
+  bytes infohash = 2 [ json_name = "infohash" ];
+  string title = 3 [ json_name = "title" ];
+  string description = 4 [ json_name = "description" ];
+  string mimetype = 5 [ json_name = "mimetype" ];
+  string known_media_id = 6 [ json_name = "known_media_id" ];
+  string partition = 7 [ json_name = "partition" ];
+  uint64 bytes = 8 [ json_name = "bytes" ];
+  uint32 attempts = 9 [ json_name = "attempts" ];
+  string next_check_at = 10 [ json_name = "next_check_at" ];
+  string created_at = 11 [ json_name = "created_at" ];
+  string updated_at = 12 [ json_name = "updated_at" ];
+}
+
+message MediaSearchRequest {
+  string query = 1 [ json_name = "query" ];
+  string known_media_id = 2 [ json_name = "known_media_id" ];
+  bool needs_check = 3 [ json_name = "needs_check" ];
+  reserved 4 to 999;
+  uint64 offset = 1000 [ json_name = "offset" ];
+  uint64 limit = 1001 [ json_name = "limit" ];
+}
+
+message MediaSearchResponse {
+  MediaSearchRequest next = 1 [ json_name = "next" ];
+  repeated Media items = 2 [ json_name = "items" ];
+}
+
+message MediaCreateRequest {
+  Media media = 1 [ json_name = "media" ];
+}
+message MediaCreateResponse {
+  Media media = 1 [ json_name = "media" ];
+}
+
+message MediaDeleteRequest {}
+message MediaDeleteResponse {
+  Media media = 1 [ json_name = "media" ];
+}

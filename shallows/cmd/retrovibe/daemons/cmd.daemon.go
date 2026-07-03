@@ -362,6 +362,8 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	media.NewHTTPSimilar(db).Bind(httpmux.PathPrefix("/similar").Subrouter())
 	media.NewHTTPRecent(db).Bind(httpmux.PathPrefix("/w").Subrouter())
 	ddiscapi.NewHTTPPeerManagement(db).Bind(httpmux.PathPrefix("/ddisc").Subrouter())
+	ddiscapi.NewHTTPDiscovery(db).Bind(httpmux.PathPrefix("/ddisc/discovery").Subrouter())
+	ddiscapi.NewHTTPMedia(db).Bind(httpmux.PathPrefix("/ddisc/media").Subrouter())
 	media.NewHTTPRSSFeed(db).Bind(httpmux.PathPrefix("/rss").Subrouter())
 	media.NewHTTPKnown(db).Bind(httpmux.PathPrefix("/k").Subrouter())
 	media.NewHTTPLocate(db).Bind(httpmux.PathPrefix("/l").Subrouter())

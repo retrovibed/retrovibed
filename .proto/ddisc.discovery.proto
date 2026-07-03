@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package ddisc;
+
+message Discovery {
+  string id = 1 [ json_name = "id" ];
+  bytes infohash = 2 [ json_name = "infohash" ];
+  string attempts = 3 [ json_name = "attempts" ];
+  string next_check = 4 [ json_name = "next_check" ];
+  string created_at = 5 [ json_name = "created_at" ];
+  string updated_at = 6 [ json_name = "updated_at" ];
+}
+
+message DiscoverySearchRequest {
+  bool needs_check = 1 [ json_name = "needs_check" ];
+  repeated string id = 2 [ json_name = "id" ];
+  reserved 3 to 999;
+  uint64 offset = 1000 [ json_name = "offset" ];
+  uint64 limit = 1001 [ json_name = "limit" ];
+}
+
+message DiscoverySearchResponse {
+  DiscoverySearchRequest next = 1 [ json_name = "next" ];
+  repeated Discovery items = 2 [ json_name = "items" ];
+}
+
+message DiscoveryCreateRequest {
+  Discovery discovery = 1 [ json_name = "discovery" ];
+}
+message DiscoveryCreateResponse {
+  Discovery discovery = 1 [ json_name = "discovery" ];
+}
+
+message DiscoveryDeleteRequest {}
+message DiscoveryDeleteResponse {
+  Discovery discovery = 1 [ json_name = "discovery" ];
+}

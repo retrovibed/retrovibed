@@ -8,7 +8,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/metaapi"
 )
 
-func AuthzPermPeerManagement(ctx context.Context, cause error) (_ context.Context, token *metaapi.Token, err error) {
+func AuthzPermPeer(ctx context.Context, cause error) (_ context.Context, token *metaapi.Token, err error) {
 	if cause != nil {
 		return ctx, nil, errorsx.Authorization(fmt.Errorf("not authorized"))
 	}

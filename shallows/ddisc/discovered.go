@@ -129,6 +129,10 @@ func DiscoveredQueryNeedsCheck() squirrel.Sqlizer {
 	return squirrel.Expr("ddisc_media.next_check_at < NOW()")
 }
 
+func DiscoveredQueryKnownMediaID(id string) squirrel.Sqlizer {
+	return squirrel.Eq{"ddisc_media.known_media_id": id}
+}
+
 func DiscoveredQueryMimetypes(mimetypes ...string) squirrel.Sqlizer {
 	mimetypes = slicesx.MapTransform(func(s string) string {
 		return md5x.FormatUUID(md5x.Digest(s))

@@ -16,19 +16,17 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 )
 
-type cmdPeerCreate struct {
-	Endpoint  string `flag:"" name:"library" help:"http address for the library you want to connect to" default:"localhost:9998"`
-	Name      string `flag:"" name:"name" help:"name you wish to assign to this peer"`
-	ID        string `flag:"" name:"peer" help:"hex encoded public peer id"`
-	Partition string `flag:"" name:"partition" help:"partition this peer is responsible for" required:"true"`
+type cmdDiscoveryCreate struct {
+	Endpoint string `flag:"" name:"library" help:"http address for the library you want to connect to" default:"localhost:9998"`
+	Infohash string `flag:"" name:"infohash" help:"hex encoded infohash to start tracking" required:"true"`
 }
 
-func (t cmdPeerCreate) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.SSHID) (err error) {
+func (t cmdDiscoveryCreate) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.SSHID) (err error) {
 	var (
 		encoded []byte
 		req     *http.Request
 		resp    *http.Response
-		mrsp    ddiscapi.PeerCreateResponse
+		mrsp    ddiscapi.DiscoveryCreateResponse
 	)
 
 	signer, err := id.Signer()
@@ -39,24 +37,20 @@ func (t cmdPeerCreate) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmd
 	c := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(fmt.Sprintf("https://%s", t.Endpoint)), authn.SSHTokenSourceOptionSigner(signer))
 	cc := authn.AuthzClientLibrary(tls.Config(), c, t.Endpoint)
 
-	infohash, err := hex.DecodeString(t.ID)
+	infohash, err := hex.DecodeString(t.Infohash)
 	if err != nil {
-		return errorsx.Wrap(err, "failed to decode peer id")
+		return errorsx.Wrap(err, "failed to decode infohash")
 	}
 
-	if encoded, err = json.Marshal(&ddiscapi.PeerCreateRequest{
-		Peer: &ddiscapi.Peer{
-			Infohash:    infohash,
-			Description: t.Name,
-			Partition:   t.Partition,
-			Ddisc:       true,
-			Bep51:       true,
+	if encoded, err = json.Marshal(&ddiscapi.DiscoveryCreateRequest{
+		Discovery: &ddiscapi.Discovery{
+			Infohash: infohash,
 		},
 	}); err != nil {
-		return errorsx.Wrap(err, "unable to encode magnet request")
+		return errorsx.Wrap(err, "unable to encode request")
 	}
 
-	if req, err = http.NewRequestWithContext(gctx.Context, http.MethodPost, fmt.Sprintf("https://%s/ddisc/", t.Endpoint), bytes.NewReader(encoded)); err != nil {
+	if req, err = http.NewRequestWithContext(gctx.Context, http.MethodPost, fmt.Sprintf("https://%s/ddisc/discovery/", t.Endpoint), bytes.NewReader(encoded)); err != nil {
 		return errorsx.Wrap(err, "unable to create http request")
 	}
 
@@ -68,7 +62,7 @@ func (t cmdPeerCreate) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmd
 		return errorsx.Wrap(err, "unable to decode response")
 	}
 
-	log.Println("peered with", spew.Sdump(mrsp.Peer))
+	log.Println("discovery entry created", spew.Sdump(mrsp.Discovery))
 
 	return nil
 }
