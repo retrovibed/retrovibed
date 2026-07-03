@@ -2,6 +2,7 @@ package tracking
 
 import (
 	"context"
+	"math"
 	"net/netip"
 	"time"
 
@@ -40,14 +41,27 @@ func UnknownHashOptionTestDefaults(uh *UnknownHash) {
 	uh.ID = torrentx.HashUID(&id)
 	uh.Infohash = id.Bytes()
 	uh.IP = netip.IPv6Unspecified()
+	uh.Attempts &= math.MaxInt64
 }
 
-func UnknownHashQueryNeedsCheck() squirrel.Sqlizer {
+func UnknownHashQueryNeedsCheck(b bool) squirrel.Sqlizer {
+	if !b {
+		return squirrelx.Noop{}
+	}
+
 	return squirrel.Expr("torrents_unknown_infohashes.next_check < NOW()")
 }
 
 func UnknownHashQueryByIDs(ids ...string) squirrel.Sqlizer {
+	if len(ids) == 0 {
+		return squirrelx.Noop{}
+	}
+
 	return squirrel.Eq{"torrents_unknown_infohashes.id": ids}
+}
+
+func UnknownHashQueryAttemptsRange(min, max uint64) squirrel.Sqlizer {
+	return squirrelx.Between("torrents_unknown_infohashes.attempts", min, max)
 }
 
 func UnknownSearch(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilder) UnknownHashScanner {

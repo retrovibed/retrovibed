@@ -3,6 +3,7 @@ package ddiscapi
 import (
 	"encoding/json"
 	"log"
+	"math"
 	"net/http"
 	"net/netip"
 
@@ -78,8 +79,9 @@ func (t *HTTPDiscovery) search(w http.ResponseWriter, r *http.Request) {
 		err  error
 		resp = DiscoverySearchResponse{
 			Next: &DiscoverySearchRequest{
-				Offset: 0,
-				Limit:  100,
+				Offset:      0,
+				Limit:       100,
+				AttemptsMax: math.MaxInt64,
 			},
 		}
 	)
@@ -92,17 +94,12 @@ func (t *HTTPDiscovery) search(w http.ResponseWriter, r *http.Request) {
 	resp.Next.Limit = numericx.Min(resp.Next.Limit, 100)
 
 	query := tracking.UnknownSearchBuilder().
-		Offset(resp.Next.Offset * resp.Next.Limit).Limit(resp.Next.Limit)
-
-	if resp.Next.NeedsCheck {
-		query = query.Where(squirrel.And{
-			tracking.UnknownHashQueryNeedsCheck(),
+		Offset(resp.Next.Offset * resp.Next.Limit).Limit(resp.Next.Limit).
+		Where(squirrel.And{
+			tracking.UnknownHashQueryAttemptsRange(resp.Next.AttemptsMin, resp.Next.AttemptsMax),
+			tracking.UnknownHashQueryByIDs(resp.Next.Id...),
+			tracking.UnknownHashQueryNeedsCheck(resp.Next.NeedsCheck),
 		})
-	}
-
-	if len(resp.Next.Id) > 0 {
-		query = query.Where(tracking.UnknownHashQueryByIDs(resp.Next.Id...))
-	}
 
 	q := sqlx.Scan(tracking.UnknownSearch(r.Context(), t.q, query))
 	for uh := range q.Iter() {

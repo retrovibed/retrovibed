@@ -13,13 +13,11 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/httpauth"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
-	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
-	"github.com/retrovibed/retrovibed/shallows/internal/lucenex"
 	"github.com/retrovibed/retrovibed/shallows/internal/numericx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/metaapi"
@@ -93,25 +91,14 @@ func (t *HTTPMedia) search(w http.ResponseWriter, r *http.Request) {
 	resp.Next.Limit = numericx.Min(resp.Next.Limit, 100)
 
 	query := ddisc.DiscoveredSearchBuilder().
-		Offset(resp.Next.Offset * resp.Next.Limit).Limit(resp.Next.Limit)
-
-	if resp.Next.KnownMediaId != "" {
-		query = query.Where(squirrel.And{
+		Offset(resp.Next.Offset * resp.Next.Limit).Limit(resp.Next.Limit).
+		Where(squirrel.And{
+			squirrel.Expr("1=1"),
 			ddisc.DiscoveredQueryKnownMediaID(resp.Next.KnownMediaId),
+			ddisc.DiscoveredQueryByIDs(resp.Next.Id...),
+			ddisc.DiscoveredQueryNeedsCheck(resp.Next.NeedsCheck),
+			ddisc.DiscoveredQueryText(resp.Next.Query),
 		})
-	}
-
-	if resp.Next.NeedsCheck {
-		query = query.Where(squirrel.And{
-			ddisc.DiscoveredQueryNeedsCheck(),
-		})
-	}
-
-	if resp.Next.Query != "" {
-		query = query.Where(squirrel.And{
-			lucenex.Query(duckdbx.NewLucene(), resp.Next.Query, lucenex.WithDefaultField("description")),
-		})
-	}
 
 	q := sqlx.Scan(ddisc.DiscoveredSearch(r.Context(), t.q, query))
 	for d := range q.Iter() {

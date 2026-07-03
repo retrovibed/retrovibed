@@ -9,7 +9,9 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
+	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
+	"github.com/retrovibed/retrovibed/shallows/internal/lucenex"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
@@ -125,12 +127,32 @@ func NewDiscovered(md *int160.T, options ...func(*Discovered)) (m Discovered) {
 	return r
 }
 
-func DiscoveredQueryNeedsCheck() squirrel.Sqlizer {
+func DiscoveredQueryNeedsCheck(b bool) squirrel.Sqlizer {
+	if !b {
+		return squirrelx.Noop{}
+	}
 	return squirrel.Expr("ddisc_media.next_check_at < NOW()")
 }
 
 func DiscoveredQueryKnownMediaID(id string) squirrel.Sqlizer {
+	if id == "" {
+		return squirrelx.Noop{}
+	}
 	return squirrel.Eq{"ddisc_media.known_media_id": id}
+}
+
+func DiscoveredQueryByIDs(ids ...string) squirrel.Sqlizer {
+	if len(ids) == 0 {
+		return squirrelx.Noop{}
+	}
+	return squirrel.Eq{"ddisc_media.id": ids}
+}
+
+func DiscoveredQueryText(query string) squirrel.Sqlizer {
+	if query == "" {
+		return squirrelx.Noop{}
+	}
+	return lucenex.Query(duckdbx.NewLucene(), query, lucenex.WithDefaultField("description"))
 }
 
 func DiscoveredQueryMimetypes(mimetypes ...string) squirrel.Sqlizer {

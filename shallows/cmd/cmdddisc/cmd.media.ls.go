@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
@@ -14,10 +15,13 @@ import (
 )
 
 type cmdMediaLs struct {
-	Endpoint     string `flag:"" name:"library" help:"http address for the library you want to query" default:"localhost:9998"`
-	Query        string `flag:"" name:"query" help:"lucene text search (default field: description)" default:""`
-	KnownMediaID string `flag:"" name:"known-media-id" help:"filter by known media id"`
-	NeedsCheck   bool   `flag:"" name:"needs-check" help:"only include media due for a recheck"`
+	Endpoint     string   `flag:"" name:"library" help:"http address for the library you want to query" default:"localhost:9998"`
+	Query        string   `flag:"" name:"query" help:"lucene text search (default field: description)" default:""`
+	KnownMediaID string   `flag:"" name:"known-media-id" help:"filter by known media id"`
+	NeedsCheck   bool     `flag:"" name:"needs-check" help:"only include media due for a recheck"`
+	ID           []string `flag:"" name:"id" help:"only show entries matching the given id(s)"`
+	Offload      bool     `flag:"" name:"offload" help:"only show media marked to be offloaded / not indexed by this node"`
+	Indexing     bool     `flag:"" name:"indexing" help:"only show media still pending identification"`
 }
 
 func (t cmdMediaLs) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.SSHID) (err error) {
@@ -36,10 +40,19 @@ func (t cmdMediaLs) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopt
 	c := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(fmt.Sprintf("https://%s", t.Endpoint)), authn.SSHTokenSourceOptionSigner(signer))
 	cc := authn.AuthzClientLibrary(tls.Config(), c, t.Endpoint)
 
+	knownMediaID := t.KnownMediaID
+	switch {
+	case t.Offload:
+		knownMediaID = uuid.Nil.String()
+	case t.Indexing:
+		knownMediaID = uuid.Max.String()
+	}
+
 	if encoded, err = formx.NewEncoder().Encode(&ddiscapi.MediaSearchRequest{
 		Query:        t.Query,
-		KnownMediaId: t.KnownMediaID,
+		KnownMediaId: knownMediaID,
 		NeedsCheck:   t.NeedsCheck,
+		Id:           t.ID,
 		Limit:        100,
 	}); err != nil {
 		return errorsx.Wrap(err, "unable to encode request")

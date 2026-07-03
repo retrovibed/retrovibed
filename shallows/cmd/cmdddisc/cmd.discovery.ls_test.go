@@ -108,4 +108,67 @@ func TestDiscoveryLs(t *testing.T) {
 			"--id", wanted.ID,
 		))
 	})
+
+	t.Run("filters to entries within an attempts range", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		keypath := filepath.Join(t.TempDir(), "id")
+		q := sqltestx.Metadatabase(t)
+
+		cmdtestx.Admin(t, ctx, q, keypath)
+
+		var low tracking.UnknownHash
+		require.NoError(t, testx.Fake(&low, tracking.UnknownHashOptionTestDefaults))
+		low.Attempts = 1
+		require.NoError(t, tracking.UnknownHashInsertWithDefaults(ctx, q, low).Scan(&low))
+
+		var high tracking.UnknownHash
+		require.NoError(t, testx.Fake(&high, tracking.UnknownHashOptionTestDefaults))
+		high.Attempts = 10
+		require.NoError(t, tracking.UnknownHashInsertWithDefaults(ctx, q, high).Scan(&high))
+
+		routes := mux.NewRouter()
+		ddiscapi.NewHTTPDiscovery(
+			q,
+			ddiscapi.HTTPDiscoveryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+		).Bind(routes.PathPrefix("/ddisc/discovery").Subrouter())
+		srv := cmdtestx.NewTLSServer(t, q, routes)
+
+		require.NoError(t, cmdtestx.Execute(t, genparser(t), "discovery", "ls",
+			"--private-key-path", keypath,
+			"--insecure",
+			"--library", srv.Listener.Addr().String(),
+			"--min-attempts", "5",
+			"--max-attempts", "15",
+		))
+	})
+
+	t.Run("paginates via offset", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		keypath := filepath.Join(t.TempDir(), "id")
+		q := sqltestx.Metadatabase(t)
+
+		cmdtestx.Admin(t, ctx, q, keypath)
+
+		var uh tracking.UnknownHash
+		require.NoError(t, testx.Fake(&uh, tracking.UnknownHashOptionTestDefaults))
+		require.NoError(t, tracking.UnknownHashInsertWithDefaults(ctx, q, uh).Scan(&uh))
+
+		routes := mux.NewRouter()
+		ddiscapi.NewHTTPDiscovery(
+			q,
+			ddiscapi.HTTPDiscoveryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+		).Bind(routes.PathPrefix("/ddisc/discovery").Subrouter())
+		srv := cmdtestx.NewTLSServer(t, q, routes)
+
+		require.NoError(t, cmdtestx.Execute(t, genparser(t), "discovery", "ls",
+			"--private-key-path", keypath,
+			"--insecure",
+			"--library", srv.Listener.Addr().String(),
+			"--offset", "1",
+		))
+	})
 }

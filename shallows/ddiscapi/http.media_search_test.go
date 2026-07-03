@@ -110,4 +110,50 @@ func TestHTTPMediaSearch(t *testing.T) {
 		require.Contains(t, result.Items, encodedmatch)
 		require.Len(t, result.Items, 1)
 	})
+
+	t.Run("known media id filter disabled returns entries regardless of known_media_id", func(t *testing.T) {
+		var (
+			unresolved ddisc.Discovered
+			resolved   ddisc.Discovered
+			result     ddiscapi.MediaSearchResponse
+			claims     jwt.RegisteredClaims
+		)
+
+		ctx, done := testx.Context(t)
+		defer done()
+
+		q := sqltestx.Metadatabase(t)
+
+		unresolvedID := int160.Random()
+		unresolved = ddisc.NewDiscovered(&unresolvedID)
+		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, unresolved).Scan(&unresolved))
+
+		resolvedID := int160.Random()
+		resolved = ddisc.NewDiscovered(&resolvedID, ddisc.DiscoveredOptionKnownMedia(uuid.Must(uuid.NewV7()).String()))
+		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, resolved).Scan(&resolved))
+
+		routes := mux.NewRouter()
+		ddiscapi.NewHTTPMedia(
+			q,
+			ddiscapi.HTTPMediaOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+		).Bind(routes.PathPrefix("/").Subrouter())
+
+		b := testx.Must(formx.NewEncoder().Encode(&ddiscapi.MediaSearchRequest{}))(t)
+
+		claims = jwtx.NewJWTClaims(unresolved.ID, jwtx.ClaimsOptionAuthnExpiration())
+
+		resp, req, err := httptestx.BuildRequestBytes(http.MethodGet, "/?"+b.Encode(), nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
+		require.NoError(t, err)
+
+		routes.ServeHTTP(resp, req)
+
+		require.NoError(t, httpx.ErrorCode(resp.Result()))
+		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+
+		encodedunresolved := ddiscapi.NewMediaFromDiscovered(unresolved)
+		encodedresolved := ddiscapi.NewMediaFromDiscovered(resolved)
+		require.Contains(t, result.Items, encodedunresolved)
+		require.Contains(t, result.Items, encodedresolved)
+		require.Len(t, result.Items, 2)
+	})
 }

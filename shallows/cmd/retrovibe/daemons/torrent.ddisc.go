@@ -107,7 +107,7 @@ func DiscoverMedia(ctx context.Context, db sqlx.Queryer, dhts *dht.Server, tclie
 	for err := l.Wait(ctx); err == nil; err = l.Wait(ctx) {
 		q := ddisc.DiscoveredSearchBuilder().Where(
 			squirrel.And{
-				ddisc.DiscoveredQueryNeedsCheck(),
+				ddisc.DiscoveredQueryNeedsCheck(true),
 			},
 		).OrderBy("attempts ASC, created_at DESC")
 

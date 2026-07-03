@@ -332,7 +332,7 @@ func DiscoverDHTMetadata(ctx context.Context, workloads uint64, db sqlx.Queryer,
 		// consider newest unknown hashes first.
 		q := tracking.UnknownSearchBuilder().Where(
 			squirrel.And{
-				tracking.UnknownHashQueryNeedsCheck(),
+				tracking.UnknownHashQueryNeedsCheck(true),
 			},
 		).OrderBy("attempts ASC, created_at DESC").Limit(workloads * 10)
 		return sqlx.Scan(tracking.UnknownSearch(ctx, db, q))

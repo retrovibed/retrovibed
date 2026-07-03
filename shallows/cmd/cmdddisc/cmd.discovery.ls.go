@@ -14,9 +14,12 @@ import (
 )
 
 type cmdDiscoveryList struct {
-	Endpoint   string   `flag:"" name:"library" help:"http address for the library you want to connect to" default:"localhost:9998"`
-	NeedsCheck bool     `flag:"" name:"needs-check" help:"only show entries due for another check"`
-	ID         []string `flag:"" name:"id" help:"only show entries matching the given id(s)"`
+	Endpoint    string   `flag:"" name:"library" help:"http address for the library you want to connect to" default:"localhost:9998"`
+	NeedsCheck  bool     `flag:"" name:"needs-check" help:"only show entries due for another check" negatable:"" default:"false"`
+	ID          []string `flag:"" name:"id" help:"only show entries matching the given id(s)"`
+	Offset      uint64   `flag:"" name:"offset" help:"page offset for pagination (multiplied by the result limit)"`
+	MinAttempts uint64   `flag:"" name:"min-attempts" help:"only show entries with at least this many attempts"`
+	MaxAttempts uint64   `flag:"" name:"max-attempts" help:"only show entries with at most this many attempts"`
 }
 
 func (t cmdDiscoveryList) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.SSHID) (err error) {
@@ -36,9 +39,12 @@ func (t cmdDiscoveryList) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *
 	cc := authn.AuthzClientLibrary(tls.Config(), c, t.Endpoint)
 
 	if encoded, err = formx.NewEncoder().Encode(&ddiscapi.DiscoverySearchRequest{
-		NeedsCheck: t.NeedsCheck,
-		Id:         t.ID,
-		Limit:      100,
+		NeedsCheck:  t.NeedsCheck,
+		Id:          t.ID,
+		Offset:      t.Offset,
+		AttemptsMin: t.MinAttempts,
+		AttemptsMax: t.MaxAttempts,
+		Limit:       100,
 	}); err != nil {
 		return errorsx.Wrap(err, "unable to encode request")
 	}
@@ -56,7 +62,7 @@ func (t cmdDiscoveryList) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *
 	}
 
 	for _, d := range result.Items {
-		if _, err = fmt.Printf("id=%s infohash=%x attempts=%s next_check=%s\n", d.GetId(), d.GetInfohash(), d.GetAttempts(), d.GetNextCheck()); err != nil {
+		if _, err = fmt.Printf("id=%s infohash=%x attempts=%s next_check=%s\n", d.Id, d.Infohash, d.Attempts, d.NextCheck); err != nil {
 			return err
 		}
 	}

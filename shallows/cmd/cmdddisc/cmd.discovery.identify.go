@@ -7,7 +7,6 @@ import (
 	"log"
 	"net"
 	"net/http"
-	"net/netip"
 	"net/url"
 	"strconv"
 	"time"
@@ -26,6 +25,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
+	"github.com/retrovibed/retrovibed/shallows/internal/netipx"
 	"github.com/retrovibed/retrovibed/shallows/internal/torrentx"
 )
 
@@ -36,6 +36,7 @@ type cmdDiscoveryIdentify struct {
 	InfoTimeout time.Duration `flag:"" name:"info-timeout" help:"how long to wait for torrent metadata/content" default:"10m"`
 	DHTPeers    []string      `flag:"" name:"dht-peers" help:"use these dht peers as the sole bootstrap nodes instead of the public network" hidden:"true"`
 	Peer        []string      `flag:"" name:"peer" help:"connect directly to these torrent peer(s) (host:port)" hidden:"true"`
+	Bootstrap   bool          `flag:"" name:"dht-bootstrap" help:"bootstrap the DHT using well-known trackers" negatable:"" default:"true"`
 }
 
 func (t cmdDiscoveryIdentify) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.SSHID) (err error) {
@@ -147,19 +148,20 @@ func (t cmdDiscoveryIdentify) peerTuners(gctx *cmdopts.Global) (_ []torrent.Tune
 }
 
 func (t cmdDiscoveryIdentify) torrentClient() (dhts *dht.Server, tclient *torrent.Client, ttstore storage.ClientImpl, err error) {
+	var (
+		globalbootstrap dht.Option = dht.OptionNoop
+	)
+
 	cachedir := userx.DefaultCacheDirectory("torrentddisc")
 
-	dhtOptions := []dht.Option{dht.OptionMuxer(dht.DefaultMuxer())}
-	if len(t.DHTPeers) > 0 {
-		addrs := make([]dht.Addr, 0, len(t.DHTPeers))
-		for _, p := range t.DHTPeers {
-			addrport, perr := netip.ParseAddrPort(p)
-			if perr != nil {
-				return nil, nil, nil, errorsx.Wrapf(perr, "invalid dht peer address %s", p)
-			}
-			addrs = append(addrs, dht.NewAddr(addrport))
-		}
-		dhtOptions = append(dhtOptions, dht.OptionBootstrapNodesNone, dht.OptionBootstrapFixedAddrs(addrs...))
+	if t.Bootstrap {
+		globalbootstrap = dht.OptionBootstrapGlobal
+	}
+
+	dhtOptions := []dht.Option{
+		dht.OptionMuxer(dht.DefaultMuxer()),
+		dht.OptionBootstrapAddrPort(netipx.AddrPortFromStrings(t.DHTPeers...)...),
+		globalbootstrap,
 	}
 
 	if dhts, err = dht.NewServer(32, dhtOptions...); err != nil {

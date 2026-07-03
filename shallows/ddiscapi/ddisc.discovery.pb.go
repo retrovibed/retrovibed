@@ -109,6 +109,8 @@ type DiscoverySearchRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	NeedsCheck    bool                   `protobuf:"varint,1,opt,name=needs_check,proto3" json:"needs_check,omitempty"`
 	Id            []string               `protobuf:"bytes,2,rep,name=id,proto3" json:"id,omitempty"`
+	AttemptsMin   uint64                 `protobuf:"varint,3,opt,name=attempts_min,proto3" json:"attempts_min,omitempty"`
+	AttemptsMax   uint64                 `protobuf:"varint,4,opt,name=attempts_max,proto3" json:"attempts_max,omitempty"`
 	Offset        uint64                 `protobuf:"varint,1000,opt,name=offset,proto3" json:"offset,omitempty"`
 	Limit         uint64                 `protobuf:"varint,1001,opt,name=limit,proto3" json:"limit,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -157,6 +159,20 @@ func (x *DiscoverySearchRequest) GetId() []string {
 		return x.Id
 	}
 	return nil
+}
+
+func (x *DiscoverySearchRequest) GetAttemptsMin() uint64 {
+	if x != nil {
+		return x.AttemptsMin
+	}
+	return 0
+}
+
+func (x *DiscoverySearchRequest) GetAttemptsMax() uint64 {
+	if x != nil {
+		return x.AttemptsMax
+	}
+	return 0
 }
 
 func (x *DiscoverySearchRequest) GetOffset() uint64 {
@@ -410,12 +426,14 @@ const file_ddisc_discovery_proto_rawDesc = "" +
 	"created_at\x12\x1e\n" +
 	"\n" +
 	"updated_at\x18\x06 \x01(\tR\n" +
-	"updated_at\"\x81\x01\n" +
+	"updated_at\"\xc9\x01\n" +
 	"\x16DiscoverySearchRequest\x12 \n" +
 	"\vneeds_check\x18\x01 \x01(\bR\vneeds_check\x12\x0e\n" +
-	"\x02id\x18\x02 \x03(\tR\x02id\x12\x17\n" +
+	"\x02id\x18\x02 \x03(\tR\x02id\x12\"\n" +
+	"\fattempts_min\x18\x03 \x01(\x04R\fattempts_min\x12\"\n" +
+	"\fattempts_max\x18\x04 \x01(\x04R\fattempts_max\x12\x17\n" +
 	"\x06offset\x18\xe8\a \x01(\x04R\x06offset\x12\x15\n" +
-	"\x05limit\x18\xe9\a \x01(\x04R\x05limitJ\x05\b\x03\x10\xe8\a\"t\n" +
+	"\x05limit\x18\xe9\a \x01(\x04R\x05limitJ\x05\b\x05\x10\xe8\a\"t\n" +
 	"\x17DiscoverySearchResponse\x121\n" +
 	"\x04next\x18\x01 \x01(\v2\x1d.ddisc.DiscoverySearchRequestR\x04next\x12&\n" +
 	"\x05items\x18\x02 \x03(\v2\x10.ddisc.DiscoveryR\x05items\"H\n" +

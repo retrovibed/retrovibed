@@ -158,6 +158,7 @@ type MediaSearchRequest struct {
 	Query         string                 `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
 	KnownMediaId  string                 `protobuf:"bytes,2,opt,name=known_media_id,proto3" json:"known_media_id,omitempty"`
 	NeedsCheck    bool                   `protobuf:"varint,3,opt,name=needs_check,proto3" json:"needs_check,omitempty"`
+	Id            []string               `protobuf:"bytes,4,rep,name=id,proto3" json:"id,omitempty"`
 	Offset        uint64                 `protobuf:"varint,1000,opt,name=offset,proto3" json:"offset,omitempty"`
 	Limit         uint64                 `protobuf:"varint,1001,opt,name=limit,proto3" json:"limit,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -213,6 +214,13 @@ func (x *MediaSearchRequest) GetNeedsCheck() bool {
 		return x.NeedsCheck
 	}
 	return false
+}
+
+func (x *MediaSearchRequest) GetId() []string {
+	if x != nil {
+		return x.Id
+	}
+	return nil
 }
 
 func (x *MediaSearchRequest) GetOffset() uint64 {
@@ -471,13 +479,14 @@ const file_ddisc_media_proto_rawDesc = "" +
 	"created_at\x12\x1e\n" +
 	"\n" +
 	"updated_at\x18\f \x01(\tR\n" +
-	"updated_at\"\xab\x01\n" +
+	"updated_at\"\xbb\x01\n" +
 	"\x12MediaSearchRequest\x12\x14\n" +
 	"\x05query\x18\x01 \x01(\tR\x05query\x12&\n" +
 	"\x0eknown_media_id\x18\x02 \x01(\tR\x0eknown_media_id\x12 \n" +
-	"\vneeds_check\x18\x03 \x01(\bR\vneeds_check\x12\x17\n" +
+	"\vneeds_check\x18\x03 \x01(\bR\vneeds_check\x12\x0e\n" +
+	"\x02id\x18\x04 \x03(\tR\x02id\x12\x17\n" +
 	"\x06offset\x18\xe8\a \x01(\x04R\x06offset\x12\x15\n" +
-	"\x05limit\x18\xe9\a \x01(\x04R\x05limitJ\x05\b\x04\x10\xe8\a\"h\n" +
+	"\x05limit\x18\xe9\a \x01(\x04R\x05limitJ\x05\b\x05\x10\xe8\a\"h\n" +
 	"\x13MediaSearchResponse\x12-\n" +
 	"\x04next\x18\x01 \x01(\v2\x19.ddisc.MediaSearchRequestR\x04next\x12\"\n" +
 	"\x05items\x18\x02 \x03(\v2\f.ddisc.MediaR\x05items\"8\n" +

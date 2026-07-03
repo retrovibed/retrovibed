@@ -14,7 +14,9 @@ message Discovery {
 message DiscoverySearchRequest {
   bool needs_check = 1 [ json_name = "needs_check" ];
   repeated string id = 2 [ json_name = "id" ];
-  reserved 3 to 999;
+  uint64 attempts_min = 3 [ json_name = "attempts_min" ];
+  uint64 attempts_max = 4 [ json_name = "attempts_max" ];
+  reserved 5 to 999;
   uint64 offset = 1000 [ json_name = "offset" ];
   uint64 limit = 1001 [ json_name = "limit" ];
 }

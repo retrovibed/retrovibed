@@ -108,4 +108,51 @@ func TestHTTPDiscoverySearch(t *testing.T) {
 		require.Contains(t, result.Items, encodeddue)
 		require.Len(t, result.Items, 1)
 	})
+
+	t.Run("needs check disabled returns entries regardless of next_check", func(t *testing.T) {
+		var (
+			due    tracking.UnknownHash
+			future tracking.UnknownHash
+			result ddiscapi.DiscoverySearchResponse
+			claims jwt.RegisteredClaims
+		)
+
+		ctx, done := testx.Context(t)
+		defer done()
+
+		q := sqltestx.Metadatabase(t)
+
+		require.NoError(t, testx.Fake(&due, tracking.UnknownHashOptionTestDefaults))
+		due.NextCheck = time.Now().Add(-time.Minute)
+		require.NoError(t, tracking.UnknownHashInsertWithDefaults(ctx, q, due).Scan(&due))
+
+		require.NoError(t, testx.Fake(&future, tracking.UnknownHashOptionTestDefaults))
+		future.NextCheck = time.Now().Add(time.Hour)
+		require.NoError(t, tracking.UnknownHashInsertWithDefaults(ctx, q, future).Scan(&future))
+
+		routes := mux.NewRouter()
+
+		ddiscapi.NewHTTPDiscovery(
+			q,
+			ddiscapi.HTTPDiscoveryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+		).Bind(routes.PathPrefix("/").Subrouter())
+
+		b := testx.Must(formx.NewEncoder().Encode(&ddiscapi.DiscoverySearchRequest{}))(t)
+
+		claims = jwtx.NewJWTClaims(due.ID, jwtx.ClaimsOptionAuthnExpiration())
+
+		resp, req, err := httptestx.BuildRequestBytes(http.MethodGet, "/?"+b.Encode(), nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
+		require.NoError(t, err)
+
+		routes.ServeHTTP(resp, req)
+
+		require.NoError(t, httpx.ErrorCode(resp.Result()))
+		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+
+		encodeddue := testx.Must(ddiscapi.NewDiscoveryFromTrackingUnknownHash(due))(t)
+		encodedfuture := testx.Must(ddiscapi.NewDiscoveryFromTrackingUnknownHash(future))(t)
+		require.Contains(t, result.Items, encodeddue)
+		require.Contains(t, result.Items, encodedfuture)
+		require.Len(t, result.Items, 2)
+	})
 }
