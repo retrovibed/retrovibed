@@ -1,7 +1,7 @@
 package cmdddisc_test
 
 import (
-	"encoding/hex"
+	"fmt"
 	"path/filepath"
 	"testing"
 
@@ -41,7 +41,7 @@ func TestDiscoveryCreate(t *testing.T) {
 			"--private-key-path", keypath,
 			"--insecure",
 			"--library", srv.Listener.Addr().String(),
-			"--infohash", hex.EncodeToString(infohash.Bytes()),
+			"--magnet", fmt.Sprintf("magnet:?xt=urn:btih:%s", infohash.String()),
 		))
 
 		expectedID := torrentx.HashUID(&infohash)

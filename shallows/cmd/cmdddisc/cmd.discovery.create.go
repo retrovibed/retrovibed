@@ -2,13 +2,13 @@ package cmdddisc
 
 import (
 	"bytes"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/davecgh/go-spew/spew"
+	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
@@ -17,8 +17,8 @@ import (
 )
 
 type cmdDiscoveryCreate struct {
-	Endpoint string `flag:"" name:"library" help:"http address for the library you want to connect to" default:"localhost:9998"`
-	Infohash string `flag:"" name:"infohash" help:"hex encoded infohash to start tracking" required:"true"`
+	Endpoint  string `flag:"" name:"library" help:"http address for the library you want to connect to" default:"localhost:9998"`
+	MagnetURI string `flag:"" name:"magnet" help:"magnet uri to start tracking (e.g. magnet:?xt=urn:btih:...)" required:"true"`
 }
 
 func (t cmdDiscoveryCreate) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.SSHID) (err error) {
@@ -37,14 +37,14 @@ func (t cmdDiscoveryCreate) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id
 	c := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(fmt.Sprintf("https://%s", t.Endpoint)), authn.SSHTokenSourceOptionSigner(signer))
 	cc := authn.AuthzClientLibrary(tls.Config(), c, t.Endpoint)
 
-	infohash, err := hex.DecodeString(t.Infohash)
+	m, err := metainfo.ParseMagnetURI(t.MagnetURI)
 	if err != nil {
-		return errorsx.Wrap(err, "failed to decode infohash")
+		return errorsx.Wrap(err, "failed to parse magnet uri")
 	}
 
 	if encoded, err = json.Marshal(&ddiscapi.DiscoveryCreateRequest{
 		Discovery: &ddiscapi.Discovery{
-			Infohash: infohash,
+			Infohash: m.InfoHash.Bytes(),
 		},
 	}); err != nil {
 		return errorsx.Wrap(err, "unable to encode request")

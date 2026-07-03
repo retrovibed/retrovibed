@@ -1,7 +1,7 @@
 package cmdddisc_test
 
 import (
-	"encoding/hex"
+	"fmt"
 	"path/filepath"
 	"testing"
 
@@ -39,7 +39,7 @@ func TestMediaCreate(t *testing.T) {
 			"--private-key-path", keypath,
 			"--insecure",
 			"--library", srv.Listener.Addr().String(),
-			"--infohash", hex.EncodeToString(id.Bytes()),
+			"--magnet", fmt.Sprintf("magnet:?xt=urn:btih:%s", id.String()),
 			"--title", "derp",
 			"--description", "a description",
 			"--mimetype", "video/mp4",
