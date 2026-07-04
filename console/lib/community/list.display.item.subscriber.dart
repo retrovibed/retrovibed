@@ -37,10 +37,9 @@ class SubscriberListDisplayItem extends StatelessWidget {
           color: theme.colorScheme.surfaceContainerHighest.withValues(
             alpha: 0.3,
           ),
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(12),
-            bottomRight: Radius.circular(12),
-          ),
+          borderRadius: defaults.isCompact
+              ? BorderRadius.vertical(top: Radius.circular(12))
+              : BorderRadius.vertical(bottom: Radius.circular(12)),
         ),
         child: Column(
           spacing: defaults.spacing,
