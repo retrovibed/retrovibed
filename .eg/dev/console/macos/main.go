@@ -54,6 +54,7 @@ func main() {
 			),
 			egbug.DebugFailure(
 				shell.Op(
+					flutter.New("cp build/nativelib/retrovibed.h build/nativelib/libretrovibed.h"),
 					flutter.New("dart run ffigen --config ffigen.yaml --compiler-opts \"-I$(clang --print-resource-dir)/include\""),
 				),
 				eg.Sequential(
