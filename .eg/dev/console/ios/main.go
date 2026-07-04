@@ -73,10 +73,10 @@ func main() {
 		Environ("PUB_CACHE", egenv.CacheDirectory(".eg", "dart"))
 
 	flutter := runtime.Directory(egenv.WorkingDirectory("console"))
-	duckdbsrc := egenv.CacheDirectory("duckdb", "v1.4.3", "src")
-	duckdbinet := egenv.CacheDirectory("duckdb", "v1.4.3", "inet")
-	duckdbArm64 := egenv.CacheDirectory("duckdb", "v1.4.3", "ios-sim-arm64")
-	duckdbX86 := egenv.CacheDirectory("duckdb", "v1.4.3", "ios-sim-x86_64")
+	duckdbsrc := egenv.CacheDirectory("duckdb", "v1.5.3", "src")
+	duckdbinet := egenv.CacheDirectory("duckdb", "v1.5.3", "inet")
+	duckdbArm64 := egenv.CacheDirectory("duckdb", "v1.5.3", "ios-sim-arm64")
+	duckdbX86 := egenv.CacheDirectory("duckdb", "v1.5.3", "ios-sim-x86_64")
 
 	err := eg.Perform(
 		ctx,
@@ -109,7 +109,7 @@ func main() {
 			),
 			shell.Op(
 				flutter.New("lipo -create build/nativelib/ios-sim-arm64/libretrovibed.a build/nativelib/ios-sim-x86_64/libretrovibed.a -output ios/libretrovibed.a"),
-				flutter.Newf("libtool -static -o ios/libduckdb_static.a $(find %s %s -name '*.a' ! -path '*/test/*')", duckdbArm64, duckdbX86),
+				flutter.Newf("libtool -static -o ios/libduckdb_static.a %[1]s/src/libduckdb_static.a %[1]s/extension/*/lib*_extension.a %[1]s/extension/libduckdb_generated_extension_loader.a %[2]s/src/libduckdb_static.a %[2]s/extension/*/lib*_extension.a %[2]s/extension/libduckdb_generated_extension_loader.a", duckdbArm64, duckdbX86),
 				flutter.New("rm -rf ios/RetrovivedBind.framework ios/RetrovivedBind.xcframework && cp -r ios/RetrovivedBind ios/RetrovivedBind.framework"),
 				flutter.New("bash -c 'cd ios && xcrun clang -arch arm64 -arch x86_64 -isysroot \"$(xcrun --sdk iphonesimulator --show-sdk-path)\" -mios-simulator-version-min=16.0 -shared -o RetrovivedBind.framework/RetrovivedBind $(for f in *.a; do printf -- \"-Wl,-force_load,%s \" \"$f\"; done) -lc++ -lresolv -framework CoreFoundation -framework Security -Wl,-install_name,@rpath/RetrovivedBind.framework/RetrovivedBind'"),
 				flutter.New("bash -c 'cd ios && xcodebuild -create-xcframework -framework RetrovivedBind.framework -output RetrovivedBind.xcframework'"),

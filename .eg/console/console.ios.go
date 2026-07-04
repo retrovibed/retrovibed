@@ -20,7 +20,7 @@ const inetCMakeConfig = `duckdb_extension_load(inet
 func EnsureDuckDBSource(duckdbsrc, duckdbinet string) eg.OpFn {
 	return func(ctx context.Context, op eg.Op) error {
 		if err := shell.Op(
-			shell.Newf("git clone --depth 1 --branch v1.4.3 https://github.com/duckdb/duckdb.git %s", duckdbsrc).Lenient(true),
+			shell.Newf("git clone --depth 1 --branch v1.5.3 https://github.com/duckdb/duckdb.git %s", duckdbsrc).Lenient(true),
 			shell.Newf("git clone --depth 1 --branch v1.4-andium https://github.com/duckdb/duckdb_inet.git %s", duckdbinet).Lenient(true),
 		)(ctx, op); err != nil {
 			return err
