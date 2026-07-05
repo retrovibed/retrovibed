@@ -5,6 +5,7 @@ import 'flutterx.dart';
 import 'help.dart';
 import 'buttons.dart';
 import 'compacting.menu.dart';
+import 'theme.defaults.dart';
 
 abstract class textediting {
   static void refocus(TextEditingController? controller) {
@@ -101,6 +102,7 @@ class _SearchTrayState extends State<SearchTray> {
 
   @override
   Widget build(BuildContext context) {
+    final defaults = Defaults.of(context);
     final disabledStyle = IconButton.styleFrom(
       disabledForegroundColor: Theme.of(context).disabledColor,
     );
@@ -134,16 +136,15 @@ class _SearchTrayState extends State<SearchTray> {
       contentPadding: lucene.Queryer.defaultdecoration.contentPadding,
     );
 
+    final searchbutton = Help(
+      buttons.search(
+        onPressed: () => widget.onSubmitted((widget.controller ?? _defaultController).text),
+      ),
+      Hint(Text("refresh the search results")),
+    );
     final trailing = [
       ...widget.trailing,
-      CompactingMenu.pinned(
-        Help(
-          buttons.search(
-            onPressed: () => widget.onSubmitted((widget.controller ?? _defaultController).text),
-          ),
-          Hint(Text("refresh the search results")),
-        ),
-      ),
+      defaults.desktop ? CompactingMenu.pinned(searchbutton) : searchbutton,
       if (widget.tuning != SearchTray.zerobox)
         buttons.settings(
           onPressed: () =>
