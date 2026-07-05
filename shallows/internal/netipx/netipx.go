@@ -9,7 +9,7 @@ import (
 func AddrPortFromStrings(in ...string) (res []netip.AddrPort) {
 	for _, ap := range in {
 		v := errorsx.Zero(netip.ParseAddrPort(ap))
-		if v.IsValid() {
+		if !v.IsValid() {
 			continue
 		}
 
