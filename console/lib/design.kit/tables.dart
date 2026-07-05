@@ -16,7 +16,7 @@ class TableRow extends StatefulWidget {
   const TableRow(
     this.children, {
     super.key,
-    this.onTap = defaulttap,
+    this.onTap,
     this.padding,
     this.expanded = Empty,
     this.maintainState = true,
@@ -55,13 +55,14 @@ class _TableRowState extends State<TableRow> {
   Widget build(BuildContext context) {
     final themex = Theme.of(context);
     final defaults = Defaults.of(context);
+    final onTap = widget.expanded != Empty ? _toggle : widget.onTap;
     final row = Material(
       // Ensure Material doesn't block underlying colors
       color: Colors.transparent,
       child: InkWell(
-        onTap: widget.expanded != Empty ? _toggle : widget.onTap,
-        hoverColor: themex.hoverColor,
-        mouseCursor: SystemMouseCursors.click,
+        onTap: onTap,
+        hoverColor: onTap != null ? themex.hoverColor : Colors.transparent,
+        mouseCursor: onTap != null ? SystemMouseCursors.click : null,
         borderRadius: defaults.borderRadius,
         child: Container(
           padding: widget.padding ?? defaults.padding / 2,
@@ -180,7 +181,7 @@ class Table<T> extends StatelessWidget {
         builder: (context, constraints) {
           final defaults = Defaults.of(context);
           final compact = defaults.isCompact;
-          final bounded = constraints.maxHeight.isFinite;
+          final bounded = constraints.hasTightHeight;
 
           return Column(
             mainAxisSize: bounded ? MainAxisSize.max : MainAxisSize.min,
