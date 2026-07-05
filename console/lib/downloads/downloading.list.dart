@@ -20,9 +20,12 @@ class DownloadingListDisplay extends StatefulWidget {
 }
 
 class _DownloadingListState extends State<DownloadingListDisplay> {
-  Future<List<Widget>> _pending = Future.value([]);
-  List<Widget> items = [];
+  bool _loading = true;
+  Widget _cause = ds.Error.zero;
   Timer? period;
+  media.DownloadSearchResponse _res = media.discoveredsearch.response(
+    next: media.discoveredsearch.request(limit: 3),
+  );
 
   @override
   void setState(VoidCallback fn) {
@@ -30,43 +33,30 @@ class _DownloadingListState extends State<DownloadingListDisplay> {
     super.setState(fn);
   }
 
+  void resetcause() {
+    setState(() {
+      _cause = ds.Error.zero;
+    });
+  }
+
   void refresh() {
-    _pending = widget
+    widget
         .search(
-          media.discoveredsearch.request(limit: 3),
+          _res.next,
           options: [authn.request(authn.AuthzCache.meta(context))],
-        )
-        .then(
-          (v) =>
-              v.items
-                  .map(
-                    (v) =>
-                        ds.ErrorBoundary(
-                              media.RefreshingDownload(
-                                key: ValueKey(v.media.id),
-                                current: v,
-                                watch: widget.watch,
-                              ),
-                            )
-                            as Widget,
-                  )
-                  .toList(),
         )
         .then((v) {
           setState(() {
-            items = v;
+            _res = v;
+            _loading = false;
           });
-          return v;
         })
-        .catchError(
-          ds.Error.boundary(
-            context,
-            List<media.RefreshingDownload>.empty(),
-            ds.Error.offline,
-          ),
-          test: ds.ErrorTests.offline,
-        )
-        .catchError((e) => throw ds.Error.unknown(e));
+        .catchError((e) {
+          setState(() {
+            _cause = ds.Error.unknown(e, onTap: resetcause);
+            _loading = false;
+          });
+        });
   }
 
   @override
@@ -75,7 +65,7 @@ class _DownloadingListState extends State<DownloadingListDisplay> {
     ds.postframe(() => refresh());
     period = Timer.periodic(
       const Duration(seconds: 20),
-      (p) => setState(this.refresh),
+      (p) => refresh(),
     );
     widget.events?.addListener(() {
       refresh();
@@ -90,26 +80,25 @@ class _DownloadingListState extends State<DownloadingListDisplay> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      initialData: <Widget>[],
-      future: _pending,
-      builder: (BuildContext ctx, AsyncSnapshot<List<Widget>> snapshot) {
-        final defaults = ds.Defaults.of(context);
-        return ds.Loading(
-          cause: ds.Error.maybeErr(snapshot.error),
-          ds.RefreshBoundary(
-            onReset: () {
-              widget.events ?? setState(this.refresh);
-              widget.events?.value += 1;
-            },
-            ListView(
-              shrinkWrap: true,
-              padding: items.length > 0 ? defaults.padding.copyWith(left: 0, right: 0) : EdgeInsets.zero,
-              children: items,
+    return ds.RefreshBoundary(
+      onReset: () {
+        widget.events ?? refresh();
+        widget.events?.value += 1;
+      },
+      ds.Table(
+        loading: _loading,
+        cause: _cause,
+        children: _res.items,
+        ds.Table.inline<media.Download>(
+          (v) => ds.ErrorBoundary(
+            media.RefreshingDownload(
+              key: ValueKey(v.media.id),
+              current: v,
+              watch: widget.watch,
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }

@@ -15,12 +15,14 @@ class AvailableListDisplay extends StatefulWidget {
   final media.FnUploadRequest upload;
   final TextEditingController? controller;
   final ValueNotifier<int>? events;
+  final List<Widget> trailing;
   const AvailableListDisplay({
     super.key,
     this.search = media.discovered.available,
     this.upload = media.discovered.upload,
     this.controller,
     this.events,
+    this.trailing = const [],
   });
 
   @override
@@ -123,75 +125,81 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
       loading: _loading,
       cause: _cause,
       children: _res.items,
-      leading: ds.SearchTray(
-        autoscroll: true,
-        autofocus: defaults.desktop,
-        decoration: InputDecoration(hintText: "search downloadable content"),
-        controller: widget.controller,
-        filters: [
-          lucene.Mode.auto('completed', false, (v) {
-            setState(() => _res.next.completed = v);
-            refresh(_res.next);
-          }),
-          lucene.Mode.auto('hidden', false, (v) {
-            setState(() => _res.next.hidden = v);
-            refresh(_res.next);
-          }),
-        ],
-        onSubmitted: (v) {
-          setState(() {
-            _res.next.query = v;
-            _res.next.offset = ds.Table.offset(0);
-          });
-          return refresh(_res.next);
-        },
-        next: (i) {
-          setState(() {
-            _res.next.offset = i;
-          });
-          refresh(_res.next);
-        },
-        current: _res.next.offset,
-        empty: ds.Table.offset(_res.items.length) < _res.next.limit,
-        leading: [
-          ds.FileDropWell.icon(
-            upload,
-            mimetypes: [mimex.bittorrent],
-            tooltip: "upload",
-            help: ds.Hint(Text("upload torrent files to download")),
-          ),
-          ds.buttons.link(
-            onPressed: () {
-              ds.modals.push(
-                context,
-                MagnetDownloads(
-                  onSubmitted: (magents) {
-                    final pending = magents.map(
-                      (v) => media.discovered.magnet(
-                        media.MagnetCreateRequest(uri: v),
-                        options: [authn.request(authn.AuthzCache.meta(context))],
-                      ),
-                    );
-                    return Future.wait(pending, eagerError: true).then((_) {
-                      widget.events?.value += 1;
-                      ds.modals.of(context)?.reset();
-                    });
-                  },
-                ),
-              );
+      leading: Column(
+        verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
+        children: [
+          ds.SearchTray(
+            autoscroll: true,
+            autofocus: defaults.desktop,
+            decoration: InputDecoration(hintText: "search downloadable content"),
+            controller: widget.controller,
+            filters: [
+              lucene.Mode.auto('completed', false, (v) {
+                setState(() => _res.next.completed = v);
+                refresh(_res.next);
+              }),
+              lucene.Mode.auto('hidden', false, (v) {
+                setState(() => _res.next.hidden = v);
+                refresh(_res.next);
+              }),
+            ],
+            onSubmitted: (v) {
+              setState(() {
+                _res.next.query = v;
+                _res.next.offset = ds.Table.offset(0);
+              });
+              return refresh(_res.next);
             },
-            help: ds.Hint(Text("upload magnet urls to download")),
+            next: (i) {
+              setState(() {
+                _res.next.offset = i;
+              });
+              refresh(_res.next);
+            },
+            current: _res.next.offset,
+            empty: ds.Table.offset(_res.items.length) < _res.next.limit,
+            leading: [
+              ds.FileDropWell.icon(
+                upload,
+                mimetypes: [mimex.bittorrent],
+                tooltip: "upload",
+                help: ds.Hint(Text("upload torrent files to download")),
+              ),
+              ds.buttons.link(
+                onPressed: () {
+                  ds.modals.push(
+                    context,
+                    MagnetDownloads(
+                      onSubmitted: (magents) {
+                        final pending = magents.map(
+                          (v) => media.discovered.magnet(
+                            media.MagnetCreateRequest(uri: v),
+                            options: [authn.request(authn.AuthzCache.meta(context))],
+                          ),
+                        );
+                        return Future.wait(pending, eagerError: true).then((_) {
+                          widget.events?.value += 1;
+                          ds.modals.of(context)?.reset();
+                        });
+                      },
+                    ),
+                  );
+                },
+                help: ds.Hint(Text("upload magnet urls to download")),
+              ),
+            ],
+            tuning: GridSettings(
+              _res.next,
+              onChange: (media.DownloadSearchRequest n) {
+                setState(() {
+                  _res.next = n;
+                });
+              },
+            ),
+            help: ds.Hint(const Text("search discovered content, use @ to access advanced filtering")),
           ),
+          ...widget.trailing,
         ],
-        tuning: GridSettings(
-          _res.next,
-          onChange: (media.DownloadSearchRequest n) {
-            setState(() {
-              _res.next = n;
-            });
-          },
-        ),
-        help: ds.Hint(const Text("search discovered content, use @ to access advanced filtering")),
       ),
       ds.Table.expanded<media.Download>(
         (v) {

@@ -35,26 +35,19 @@ class _DisplayState extends State<Display> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final defaults = ds.Defaults.of(context);
-        final compact = defaults.isCompact;
         return SingleChildScrollView(
           child: ConstrainedBox(
             constraints: BoxConstraints(minHeight: constraints.maxHeight),
             child: Container(
               padding: defaults.padding,
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.start,
-                verticalDirection: compact ? VerticalDirection.up : VerticalDirection.down,
-                spacing: 0.0,
-                children: [
+              child: AvailableListDisplay(
+                search: widget.availableSearch,
+                controller: controller,
+                events: refresh,
+                trailing: [
                   DownloadingListDisplay(
                     search: widget.downloadingSearch,
                     watch: widget.downloadWatch,
-                    events: refresh,
-                  ),
-                  AvailableListDisplay(
-                    search: widget.availableSearch,
-                    controller: controller,
                     events: refresh,
                   ),
                 ],
