@@ -76,6 +76,7 @@ class _TableRowState extends State<TableRow> {
 
     return Column(
       mainAxisSize: MainAxisSize.min,
+      verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
       children: [
         row,
         Visibility(
