@@ -527,6 +527,16 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 		return errorsx.Wrap(err, "unable to setup torrent client")
 	}
 
+	// TODO: AutoLocateMedia should be located within distributed indexing.
+	if cfg.AutoLocateMedia {
+		go timex.NowAndEvery(dctx, 15*time.Minute, func(ctx context.Context) error {
+			errorsx.Log(LocateMedia(dctx, t.db, tclient, disc))
+			return nil
+		})
+	} else {
+		log.Println("auto locate media is disabled, to enable add --auto-locate-media flag.")
+	}
+
 	if disc.Enabled && disc.Ratio > 0 {
 		go dhtx.WaitForMinimumNodes(dctx, 32, dhts, func() {
 			go func() {
@@ -594,15 +604,6 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 		go ResumeDownloads(dctx, t.db, t.rootstore, t.mc, tclient, t.tstore)
 	} else {
 		log.Println("announce/resume disabled")
-	}
-
-	if cfg.AutoLocateMedia {
-		go timex.NowAndEvery(dctx, 15*time.Minute, func(ctx context.Context) error {
-			errorsx.Log(LocateMedia(dctx, t.db, tclient, disc))
-			return nil
-		})
-	} else {
-		log.Println("auto locate media is disabled, to enable add --auto-locate-media flag, this is an experimental feature.")
 	}
 
 	go torrentx.ClearIdleTorrents(dctx, time.Hour, tclient)
