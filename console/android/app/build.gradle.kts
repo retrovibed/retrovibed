@@ -35,6 +35,17 @@ android {
     buildTypes {
         release {
             signingConfig = signingConfigs.getByName("release")
+            // Explicit here (matching AGP 9's actual default for release) so
+            // proguard-rules.pro is guaranteed to apply. Needed to patch a
+            // gap in mobile_scanner's consumer rules that otherwise lets R8
+            // strip ML Kit classes it needs at runtime, crashing the QR
+            // scanner only in minified builds. See proguard-rules.pro and
+            // https://github.com/juliansteenbakker/mobile_scanner/pull/1726
+            isMinifyEnabled = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
         }
     }
 

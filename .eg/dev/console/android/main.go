@@ -14,13 +14,39 @@ import (
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
 	"github.com/egdaemon/eg/runtime/wasi/eggit"
 	"github.com/egdaemon/eg/runtime/wasi/shell"
+	"github.com/egdaemon/eg/runtime/x/wasi/egfs"
 )
+
+// devKeystorePath is a throwaway signing key used only to produce locally
+// installable release (minified/R8) builds for reproducing release-only bugs.
+// It must never be used to sign anything distributed to users.
+func devKeystorePath() string {
+	return egenv.CacheDirectory("android", "dev-keystore.jks")
+}
+
+func ensureDevKeystore(ctx context.Context, o eg.Op) error {
+	return shell.Run(
+		ctx,
+		shell.Newf(
+			"keytool -genkeypair -v -keystore %s -storepass android -keypass android -alias androiddevkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Retrovibed Dev,O=Retrovibed,C=US'",
+			devKeystorePath(),
+		),
+	)
+}
+
+func devSigningEnv(runtime shell.Command) shell.Command {
+	return runtime.
+		Environ("RETROVIBED_ANDROID_KEY_STORE_PATH", devKeystorePath()).
+		Environ("RETROVIBED_ANDROID_KEY_ALIAS", "androiddevkey").
+		Environ("RETROVIBED_ANDROID_STORE_PASSWORD", "android")
+}
 
 func Device(ctx context.Context, o eg.Op) error {
 	return eg.Sequential(
 		shell.Op(shell.New("adb -d get-serialno")),
 		shell.Op(shell.New("adb -d wait-for-device shell 'while [ \"$(getprop sys.boot_completed)\" != \"1\" ]; do sleep 1; done'")),
-		console.RunDev("flutter pub get && flutter run -d $(adb -d get-serialno)"),
+		eg.WhenFn(egfs.FileNotExistsFn(devKeystorePath()), ensureDevKeystore),
+		console.RunDev("flutter pub get && flutter run --release -d $(adb -d get-serialno)", devSigningEnv),
 	)(ctx, o)
 }
 
@@ -32,7 +58,8 @@ func Emulator(port int) eg.OpFn {
 			shell.Newf("systemctl --user is-active --quiet retrovibed-android || systemd-run --user --unit=retrovibed-android --setenv=QT_QPA_PLATFORM=xcb --collect /opt/android-sdk/emulator/emulator -avd retrovibed -port %d", port),
 			shell.Newf("adb -s emulator-%d wait-for-device shell 'while [ \"$(getprop sys.boot_completed)\" != \"1\" ]; do sleep 1; done'", port),
 		),
-		console.RunDev(fmt.Sprintf("flutter pub get && flutter run -d emulator-%d", port)),
+		eg.WhenFn(egfs.FileNotExistsFn(devKeystorePath()), ensureDevKeystore),
+		console.RunDev(fmt.Sprintf("flutter pub get && flutter run --release -d emulator-%d", port), devSigningEnv),
 	)
 }
 

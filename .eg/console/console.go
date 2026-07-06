@@ -207,7 +207,7 @@ func Install(b *tarballs.Build) eg.OpFn {
 	)
 }
 
-func RunDev(cmd string) eg.OpFn {
+func RunDev(cmd string, envopts ...func(shell.Command) shell.Command) eg.OpFn {
 	return func(ctx context.Context, _ eg.Op) error {
 		runtime := flutterRuntimev2(shell.Runtime()).
 			// Environ("RETROVIBED_TORRENT_DEBUG", "true").
@@ -220,6 +220,9 @@ func RunDev(cmd string) eg.OpFn {
 			// Environ("RETROVIBED_CONSOLE_ENDPOINT", "console.retrovibe.space")
 			Environ("RETROVIBED_META_ENDPOINT", "localhost:8081").
 			Environ("RETROVIBED_CONSOLE_ENDPOINT", "localhost:8080")
+		for _, envopt := range envopts {
+			runtime = envopt(runtime)
+		}
 		return shell.Run(
 			ctx,
 			runtime.New(cmd).Timeout(egenv.TTL()),
