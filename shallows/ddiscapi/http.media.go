@@ -130,7 +130,7 @@ func (t *HTTPMedia) create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	options := []func(*ddisc.Discovered){
+	options := []ddisc.DiscoveredOption{
 		func(d *ddisc.Discovered) {
 			d.Title = msg.Media.GetTitle()
 			d.Description = msg.Media.GetDescription()

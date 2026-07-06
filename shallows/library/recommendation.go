@@ -22,6 +22,10 @@ const (
 	RecommendationSourceGenerative = "generative"
 )
 
+const (
+	RecommendationTTL = 30 * 24 * time.Hour
+)
+
 func RecommendationKnownSearch(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilder) RecommendationKnownScanner {
 	return NewRecommendationKnownScannerStatic(b.RunWith(q).QueryContext(ctx))
 }
@@ -70,7 +74,7 @@ func RecommendationFromRandomKnown(ctx context.Context, q sqlx.Queryer, mimetype
 		ID:           uuid.Must(uuid.NewV7()).String(),
 		Source:       md5x.String(RecommendationSourceRandom),
 		KnownMediaID: known.UID,
-		TombstoneAt:  time.Now().Add(30 * 24 * time.Hour),
+		TombstoneAt:  time.Now().Add(RecommendationTTL),
 		Mimetype:     known.Mimetype,
 	}).Scan(&rec); err != nil {
 		return rec, err

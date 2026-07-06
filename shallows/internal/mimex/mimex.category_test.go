@@ -20,6 +20,11 @@ func TestCategory(t *testing.T) {
 		{"image/png", mimex.Image},
 		{"application/json", mimex.Application},
 		{"text/plain", mimex.Text},
+		{mimex.Video, mimex.Video},
+		{mimex.Audio, mimex.Audio},
+		{mimex.Image, mimex.Image},
+		{mimex.Text, mimex.Text},
+		{mimex.Application, mimex.Application},
 	}
 
 	for _, tc := range tests {

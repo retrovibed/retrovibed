@@ -9,19 +9,25 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
+	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
+	"github.com/retrovibed/retrovibed/shallows/internal/localex"
 	"github.com/retrovibed/retrovibed/shallows/internal/lucenex"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/squirrelx"
+	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/torrentx"
+	"golang.org/x/text/language"
 )
 
+type DiscoveredOption func(*Discovered)
+
 func DiscoveredOptionNoop(*Discovered) {}
-func DiscoveredOptionIndex(b bool) func(*Discovered) {
+func DiscoveredOptionIndex(b bool) DiscoveredOption {
 	if b {
 		return func(d *Discovered) {
 			d.KnownMediaID = uuid.Max.String()
@@ -31,13 +37,19 @@ func DiscoveredOptionIndex(b bool) func(*Discovered) {
 	return DiscoveredOptionNoop
 }
 
-func DiscoveredOptionMimetype(s string) func(*Discovered) {
+func DiscoveredOptionMimetype(s string) DiscoveredOption {
 	return func(d *Discovered) {
 		d.Mimetype = langx.FirstNonZero(s, string(mimex.Binary))
+		d.Category = mimex.Category(d.Mimetype)
 	}
 }
 
-func DiscoveredOptionFromTorrentInfo(i *metainfo.Info) func(*Discovered) {
+func DiscoveredOptionTestDefaults(d *Discovered) {
+	d.AudioDefaultLocale = localex.FirstDefined(userx.LocaleLanguage())
+	d.SubtitlesDefaultLocale = localex.FirstDefined(userx.LocaleLanguage())
+}
+
+func DiscoveredOptionFromTorrentInfo(i *metainfo.Info) DiscoveredOption {
 	return func(d *Discovered) {
 		d.Title = i.Name
 		d.Bytes = uint64(i.TotalLength())
@@ -57,13 +69,13 @@ func DiscoveredOptionDetectCorrupted(d *Discovered) {
 	d.SyncUID = uuid.Nil.String()
 }
 
-func DiscoveredOptionKnownMedia(id string) func(*Discovered) {
+func DiscoveredOptionKnownMedia(id string) DiscoveredOption {
 	return func(d *Discovered) {
 		d.KnownMediaID = id
 	}
 }
 
-func DiscoveredOptionPartitionAuto(partitions *Partition) func(*Discovered) {
+func DiscoveredOptionPartitionAuto(partitions *Partition) DiscoveredOption {
 	return func(d *Discovered) {
 		uid := uuid.FromStringOrNil(d.KnownMediaID)
 		if uid.IsZero() || uuid.Max == uid {
@@ -75,13 +87,13 @@ func DiscoveredOptionPartitionAuto(partitions *Partition) func(*Discovered) {
 	}
 }
 
-func DiscoveredOptionPartition(p string) func(*Discovered) {
+func DiscoveredOptionPartition(p string) DiscoveredOption {
 	return func(d *Discovered) {
 		d.Partition = p
 	}
 }
 
-func DiscoveredOptionFromExtracted(ex Extracted) func(*Discovered) {
+func DiscoveredOptionFromExtracted(ex Extracted) DiscoveredOption {
 	return func(d *Discovered) {
 		d.Title = langx.FirstNonZero(
 			langx.Autoderef(ex.Music).Title,
@@ -101,11 +113,13 @@ func DiscoveredOptionFromExtracted(ex Extracted) func(*Discovered) {
 			d.Collation,
 		)
 
-		d.Mimetype = langx.FirstNonZero(
-			langx.Autoderef(ex.Music).Mimetype,
-			langx.Autoderef(ex.Video).Mimetype,
-			d.Mimetype,
-		)
+		DiscoveredOptionMimetype(
+			langx.FirstNonZero(
+				langx.Autoderef(ex.Music).Mimetype,
+				langx.Autoderef(ex.Video).Mimetype,
+				d.Mimetype,
+			),
+		)(d)
 
 		d.ReleasedAt = langx.FirstNonZero(
 			langx.Autoderef(ex.Music).Date,
@@ -115,14 +129,17 @@ func DiscoveredOptionFromExtracted(ex Extracted) func(*Discovered) {
 	}
 }
 
-func NewDiscovered(md *int160.T, options ...func(*Discovered)) (m Discovered) {
+func NewDiscovered(md *int160.T, options ...DiscoveredOption) (m Discovered) {
 	r := langx.Clone(Discovered{
-		ID:           torrentx.HashUID(md),
-		Infohash:     md.Bytes(),
-		KnownMediaID: uuid.Nil.String(),
-		Mimetype:     mimex.Bittorrent,
-		SyncUID:      uuid.Must(uuid.NewV7()).String(),
-		Partition:    uuid.Nil.String(),
+		ID:                     torrentx.HashUID(md),
+		Infohash:               md.Bytes(),
+		KnownMediaID:           uuid.Nil.String(),
+		Mimetype:               mimex.Binary,
+		Category:               mimex.Application,
+		SyncUID:                uuid.Must(uuid.NewV7()).String(),
+		Partition:              uuid.Nil.String(),
+		AudioDefaultLocale:     language.Und.String(),
+		SubtitlesDefaultLocale: language.Und.String(),
 	}, options...)
 	return r
 }
@@ -141,6 +158,10 @@ func DiscoveredQueryKnownMediaID(id string) squirrel.Sqlizer {
 	return squirrel.Eq{"ddisc_media.known_media_id": id}
 }
 
+func DiscoveredQueryKnown() squirrel.Sqlizer {
+	return squirrel.Expr("ddisc_media.known_media_id NOT IN ('00000000-0000-0000-0000-000000000000', 'FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF')")
+}
+
 func DiscoveredQueryByIDs(ids ...string) squirrel.Sqlizer {
 	if len(ids) == 0 {
 		return squirrelx.Noop{}
@@ -148,11 +169,34 @@ func DiscoveredQueryByIDs(ids ...string) squirrel.Sqlizer {
 	return squirrel.Eq{"ddisc_media.id": ids}
 }
 
+// DiscoveredQueryExplicit toggles whether adult content is allowed in results.
+// allow=false restricts results to non-adult content; allow=true permits
+// both adult and non-adult content (it does not restrict to adult-only).
+func DiscoveredQueryExplicit(allow bool) squirrel.Sqlizer {
+	if allow {
+		return squirrelx.Noop{}
+	}
+
+	return squirrel.Expr("ddisc_media.adult = ?", false)
+}
+
+func DiscoveredQueryLanguage(v string) squirrel.Sqlizer {
+	if stringsx.Blank(v) {
+		return squirrelx.Noop{}
+	}
+
+	return squirrel.Expr("ddisc_media.audio_default_locale = ?", v)
+}
+
 func DiscoveredQueryText(query string) squirrel.Sqlizer {
 	if query == "" {
 		return squirrelx.Noop{}
 	}
 	return lucenex.Query(duckdbx.NewLucene(), query, lucenex.WithDefaultField("description"))
+}
+
+func DiscoveredQueryCategory(mimetype string) squirrel.Sqlizer {
+	return squirrel.Expr("ddisc_media.category = ?", mimex.Category(mimetype))
 }
 
 func DiscoveredQueryMimetypes(mimetypes ...string) squirrel.Sqlizer {

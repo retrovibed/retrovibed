@@ -3,9 +3,10 @@ package daemons_test
 import (
 	"testing"
 
+	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
-	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/daemons"
+	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
@@ -22,8 +23,11 @@ func TestRecommendationsBackgroundRun(t *testing.T) {
 
 		var known library.Known
 		require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults, library.KnownOptionMimetype(mimex.Video)))
-		known.OriginalLanguage = userx.LocaleLanguage()
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
+
+		id := int160.Random()
+		d := ddisc.NewDiscovered(&id, ddisc.DiscoveredOptionKnownMedia(known.UID), ddisc.DiscoveredOptionMimetype("video/mp4"), ddisc.DiscoveredOptionTestDefaults)
+		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
 
 		require.NoError(t, daemons.RecommendationsBackgroundRun(ctx, q))
 
@@ -40,8 +44,11 @@ func TestRecommendationsBackgroundRun(t *testing.T) {
 
 		var known library.Known
 		require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults, library.KnownOptionMimetype(mimex.Audio)))
-		known.OriginalLanguage = userx.LocaleLanguage()
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
+
+		id := int160.Random()
+		d := ddisc.NewDiscovered(&id, ddisc.DiscoveredOptionKnownMedia(known.UID), ddisc.DiscoveredOptionMimetype("audio/mpeg"), ddisc.DiscoveredOptionTestDefaults)
+		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
 
 		require.NoError(t, daemons.RecommendationsBackgroundRun(ctx, q))
 
@@ -58,8 +65,11 @@ func TestRecommendationsBackgroundRun(t *testing.T) {
 
 		var known library.Known
 		require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults, library.KnownOptionMimetype(mimex.Video)))
-		known.OriginalLanguage = userx.LocaleLanguage()
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
+
+		id := int160.Random()
+		d := ddisc.NewDiscovered(&id, ddisc.DiscoveredOptionKnownMedia(known.UID), ddisc.DiscoveredOptionMimetype("video/mp4"), ddisc.DiscoveredOptionTestDefaults)
+		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
 
 		// generate the first recommendation
 		require.NoError(t, daemons.RecommendationsBackgroundRun(ctx, q))

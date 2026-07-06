@@ -314,3 +314,10 @@ func RecommendationDeleteByID(
 ) {
 	gql = gql.Query(`DELETE FROM library_recommendations WHERE "id" = {id} RETURNING ` + RecommendationScannerStaticColumns)
 }
+
+func RecommendationDeleteTombstoned(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer) NewRecommendationScannerStaticRow,
+) {
+	gql = gql.Query(`DELETE FROM library_recommendations WHERE "tombstoned_at" < NOW() RETURNING ` + RecommendationScannerStaticColumns)
+}

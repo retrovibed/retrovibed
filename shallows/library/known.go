@@ -8,6 +8,7 @@ import (
 
 	"github.com/Masterminds/squirrel"
 	"github.com/gofrs/uuid/v5"
+	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/retrovibed/retrovibed/shallows/internal/ducktype"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
@@ -80,6 +81,7 @@ func KnownOptionTestDefaults(t *Known) {
 	t.Mimetype = mimex.Application
 	t.Duplicates = 0
 	t.Popularity = 0
+	t.OriginalLanguage = userx.LocaleLanguage()
 }
 
 // ImportPrefix is a type constraint for import source prefixes.
