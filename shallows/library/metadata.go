@@ -149,6 +149,10 @@ func MetadataQueryMimetypes(mimes ...string) squirrel.Sqlizer {
 	return squirrelx.In("library_metadata.mimetype", mimes...)
 }
 
+func MetadataQueryUpdatedBetween(r timex.Range) squirrel.Sqlizer {
+	return squirrelx.Between("library_metadata.updated_at", r.Start, r.End)
+}
+
 func MetadataQueryNotTombstoned() squirrel.Sqlizer {
 	return squirrel.Expr("library_metadata.tombstoned_at = 'infinity'")
 }

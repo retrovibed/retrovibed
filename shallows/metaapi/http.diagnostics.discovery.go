@@ -69,6 +69,13 @@ func (t *HTTPDiscoveryDiagnostics) get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	diag, err := QueryDiscoveryDiagnostics(r.Context(), t.db)
+	if err != nil {
+		log.Println(errorsx.Wrap(err, "unable to read discovery diagnostics"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
 	resp := DiscoveryMetricsResponse{
 		Discovery: &DiscoveryDiagnostics{
 			Enabled:        s.Enabled,
@@ -79,7 +86,11 @@ func (t *HTTPDiscoveryDiagnostics) get(w http.ResponseWriter, r *http.Request) {
 			Peers:          uint64(peers),
 			PeersDdisc:     uint64(peersddisc),
 			PeersBep51:     uint64(peersbep51),
-			UnknownHashes:  uint64(unknown),
+			Unidentified:   uint64(unknown),
+			Queued:         diag.Queued,
+			Indexing:       diag.Indexing,
+			Offload:        diag.Offload,
+			Indexed:        diag.Indexed,
 		},
 	}
 

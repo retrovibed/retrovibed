@@ -16,6 +16,8 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
+	"github.com/retrovibed/retrovibed/shallows/internal/timex"
+	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 	"github.com/stretchr/testify/require"
 )
@@ -62,7 +64,7 @@ func TestHTTPDiscoverySearch(t *testing.T) {
 		require.Contains(t, result.Items, encoded)
 	})
 
-	t.Run("needs check filter", func(t *testing.T) {
+	t.Run("next check filter", func(t *testing.T) {
 		var (
 			due    tracking.UnknownHash
 			future tracking.UnknownHash
@@ -91,7 +93,7 @@ func TestHTTPDiscoverySearch(t *testing.T) {
 		).Bind(routes.PathPrefix("/").Subrouter())
 
 		b := testx.Must(formx.NewEncoder().Encode(&ddiscapi.DiscoverySearchRequest{
-			NeedsCheck: true,
+			NextCheck: meta.NewDateRange(timex.NewRangeDuration(2 * time.Minute)),
 		}))(t)
 
 		claims = jwtx.NewJWTClaims(due.ID, jwtx.ClaimsOptionAuthnExpiration())

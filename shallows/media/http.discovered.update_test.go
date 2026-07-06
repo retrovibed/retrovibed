@@ -12,6 +12,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
+	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/atomicx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/grpcx"
@@ -53,6 +54,7 @@ func TestHTTPDiscoveredUpdate(t *testing.T) {
 			q,
 			atomicx.PointerPtr(tclient),
 			storage.NewFile(vfs.Path(), storage.FileOptionPathMakerInfohash),
+			asyncx.NewWakeup(ctx),
 			media.HTTPDiscoveredOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
@@ -132,6 +134,7 @@ func TestHTTPDiscoveredUpdate(t *testing.T) {
 			q,
 			atomicx.PointerPtr(tclient),
 			storage.NewFile(vfs.Path(), storage.FileOptionPathMakerInfohash),
+			asyncx.NewWakeup(ctx),
 			media.HTTPDiscoveredOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 

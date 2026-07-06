@@ -21,6 +21,8 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/numericx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
+	"github.com/retrovibed/retrovibed/shallows/internal/timex"
+	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/retrovibed/retrovibed/shallows/metaapi"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 )
@@ -81,6 +83,7 @@ func (t *HTTPDiscovery) search(w http.ResponseWriter, r *http.Request) {
 			Next: &DiscoverySearchRequest{
 				Offset:      0,
 				Limit:       100,
+				NextCheck:   meta.NewDateRange(timex.NewRangeEverything()),
 				AttemptsMax: math.MaxInt64,
 			},
 		}
@@ -98,10 +101,10 @@ func (t *HTTPDiscovery) search(w http.ResponseWriter, r *http.Request) {
 		Where(squirrel.And{
 			tracking.UnknownHashQueryAttemptsRange(resp.Next.AttemptsMin, resp.Next.AttemptsMax),
 			tracking.UnknownHashQueryByIDs(resp.Next.Id...),
-			tracking.UnknownHashQueryNeedsCheck(resp.Next.NeedsCheck),
+			tracking.UnknownHashQueryNextCheck(meta.TimexRange(resp.Next.NextCheck, timex.NewRangeEverything())),
 		})
 
-	q := sqlx.Scan(tracking.UnknownSearch(r.Context(), sqlx.Debug(t.q), query))
+	q := sqlx.Scan(tracking.UnknownSearch(r.Context(), t.q, query))
 	for uh := range q.Iter() {
 		var (
 			encoded *Discovery

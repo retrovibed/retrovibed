@@ -16,6 +16,7 @@ import (
 	"github.com/james-lawrence/torrent/torrenttest"
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
@@ -98,7 +99,7 @@ func TestDownloadInto(t *testing.T) {
 
 		require.NoError(t, ltor.Tune(torrent.TuneClientPeer(seeder)))
 
-		require.NoError(t, tracking.DownloadInto(t.Context(), q, root, library.QueryCleanerNoop(), &lmd, ltor, actual))
+		require.NoError(t, tracking.DownloadInto(t.Context(), q, root, library.QueryCleanerNoop(), &lmd, ltor, actual, asyncx.NewWakeup(t.Context())))
 
 		require.Equal(t, md5x.FormatUUID(expected), md5x.FormatUUID(actual))
 
@@ -191,7 +192,7 @@ func TestDownloadInto(t *testing.T) {
 
 		require.NoError(t, ltor.Tune(torrent.TuneClientPeer(seeder)))
 
-		require.NoError(t, tracking.DownloadInto(t.Context(), q, root, library.QueryCleanerNoop(), &lmd, ltor, actual))
+		require.NoError(t, tracking.DownloadInto(t.Context(), q, root, library.QueryCleanerNoop(), &lmd, ltor, actual, asyncx.NewWakeup(t.Context())))
 
 		require.Equal(t, md5x.FormatUUID(expected), md5x.FormatUUID(actual))
 
@@ -294,7 +295,7 @@ func TestDownloadInto(t *testing.T) {
 
 		require.NoError(t, ltor.Tune(torrent.TuneClientPeer(seeder)))
 
-		require.NoError(t, tracking.DownloadInto(t.Context(), q, root, library.QueryCleanerNoop(), &lmd, ltor, actual))
+		require.NoError(t, tracking.DownloadInto(t.Context(), q, root, library.QueryCleanerNoop(), &lmd, ltor, actual, asyncx.NewWakeup(t.Context())))
 
 		require.Equal(t, md5x.FormatUUID(expected), md5x.FormatUUID(actual))
 
@@ -388,7 +389,7 @@ func TestDownloadInto(t *testing.T) {
 
 		require.NoError(t, ltor.Tune(torrent.TuneClientPeer(seeder)))
 
-		require.NoError(t, tracking.DownloadInto(t.Context(), q, root, library.QueryCleanerNoop(), &lmd, ltor, actual))
+		require.NoError(t, tracking.DownloadInto(t.Context(), q, root, library.QueryCleanerNoop(), &lmd, ltor, actual, asyncx.NewWakeup(t.Context())))
 
 		require.Equal(t, md5x.FormatUUID(expected), md5x.FormatUUID(actual))
 
@@ -482,7 +483,7 @@ func TestDownloadInto(t *testing.T) {
 
 		require.NoError(t, ltor.Tune(torrent.TuneClientPeer(seeder)))
 
-		require.NoError(t, tracking.DownloadInto(t.Context(), q, root, library.QueryCleanerNoop(), &lmd, ltor, actual))
+		require.NoError(t, tracking.DownloadInto(t.Context(), q, root, library.QueryCleanerNoop(), &lmd, ltor, actual, asyncx.NewWakeup(t.Context())))
 
 		require.Equal(t, md5x.FormatUUID(expected), md5x.FormatUUID(actual))
 
@@ -575,7 +576,7 @@ func TestDownloadInto(t *testing.T) {
 
 		require.NoError(t, ltor.Tune(torrent.TuneClientPeer(seeder)))
 
-		require.NoError(t, tracking.DownloadInto(t.Context(), q, root, library.QueryCleanerNoop(), &lmd, ltor, actual))
+		require.NoError(t, tracking.DownloadInto(t.Context(), q, root, library.QueryCleanerNoop(), &lmd, ltor, actual, asyncx.NewWakeup(t.Context())))
 
 		require.Equal(t, md5x.FormatUUID(expected), md5x.FormatUUID(actual))
 

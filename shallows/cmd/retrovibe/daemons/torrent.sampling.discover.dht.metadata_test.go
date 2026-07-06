@@ -15,6 +15,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/daemons"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
+	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/torrenttestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/torrentx"
@@ -138,7 +139,7 @@ func TestDiscoverDHTMetadata(t *testing.T) {
 		q := sqltestx.Metadatabase(t)
 
 		seederdir := t.TempDir()
-		seederinfo, _, err := torrenttest.Random(seederdir, 16*1024)
+		seederinfo, _, err := torrenttest.Random(seederdir, 16*bytesx.KiB)
 		require.NoError(t, err)
 		seederinfo.Name = string([]byte{0xff, 0xfe, 0x00, 0x80})
 

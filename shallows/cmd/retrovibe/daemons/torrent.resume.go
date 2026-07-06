@@ -17,6 +17,7 @@ import (
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/james-lawrence/torrent/tracker"
 	"github.com/retrovibed/retrovibed/shallows/internal/asynccompute"
+	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/backoffx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
@@ -28,7 +29,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 )
 
-func ResumeDownloads(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual, mc library.QueryCleaner, tclient *torrent.Client, tstore storage.ClientImpl) {
+func ResumeDownloads(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual, mc library.QueryCleaner, tclient *torrent.Client, tstore storage.ClientImpl, pub *asyncx.Wakeup) {
 	q := tracking.MetadataSearchBuilder().Where(
 		squirrel.And{
 			tracking.MetadataQueryInitiated(),
@@ -73,7 +74,7 @@ func ResumeDownloads(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual
 				mhash = md5.New()
 			)
 
-			errorsx.Log(errorsx.Wrap(tracking.DownloadInto(ctx, db, rootstore, mc, &md, dl, mhash), "resume failed"))
+			errorsx.Log(errorsx.Wrap(tracking.DownloadInto(ctx, db, rootstore, mc, &md, dl, mhash, pub), "resume failed"))
 		}(infopath, md, t)
 
 		log.Println("resumed", md.ID, hex.EncodeToString(md.Infohash), md.Description)
@@ -82,7 +83,7 @@ func ResumeDownloads(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual
 	errorsx.Log(errorsx.Wrap(iter.Err(), "failed to resume all downloads"))
 }
 
-func VerifyTorrents(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual, mc library.QueryCleaner, tclient *torrent.Client, tstore storage.ClientImpl) {
+func VerifyTorrents(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual, mc library.QueryCleaner, tclient *torrent.Client, tstore storage.ClientImpl, pub *asyncx.Wakeup) {
 	q := tracking.MetadataSearchBuilder().Where(
 		squirrel.And{
 			tracking.MetadataQueryNeedsVerification(),
@@ -129,7 +130,7 @@ func VerifyTorrents(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual,
 			continue
 		}
 
-		if err = tracking.DownloadInto(ctx, db, rootstore, mc, &md, t, md5.New()); err != nil {
+		if err = tracking.DownloadInto(ctx, db, rootstore, mc, &md, t, md5.New(), pub); err != nil {
 			log.Println(errorsx.Wrapf(err, "unable reimport torrent %s - %s", md.ID, infopath))
 			continue
 		}

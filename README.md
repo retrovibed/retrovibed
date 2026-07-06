@@ -29,9 +29,9 @@ see the [site](https://retrovibe.space) for more details
 - [x] monetarily support your favorite artists and communities directly by archiving their content.
 - [x] distributed indexing/search for content discovery and exchange.
 - [x] autoplay for music.
-- [ ] PVR functionality.
+- [x] PVR functionality.
 - [ ] recommendation engine.
-- [ ] multi device support
+- [ ] multi device support.
 
 #### community sharing
 

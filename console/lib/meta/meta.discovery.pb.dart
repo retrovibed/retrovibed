@@ -27,7 +27,11 @@ class DiscoveryDiagnostics extends $pb.GeneratedMessage {
     $fixnum.Int64? peers,
     $fixnum.Int64? peersDdisc,
     $fixnum.Int64? peersBep51,
-    $fixnum.Int64? unknownHashes,
+    $fixnum.Int64? unidentified,
+    $fixnum.Int64? queued,
+    $fixnum.Int64? indexing,
+    $fixnum.Int64? offload,
+    $fixnum.Int64? indexed,
   }) {
     final result = create();
     if (enabled != null) result.enabled = enabled;
@@ -38,7 +42,11 @@ class DiscoveryDiagnostics extends $pb.GeneratedMessage {
     if (peers != null) result.peers = peers;
     if (peersDdisc != null) result.peersDdisc = peersDdisc;
     if (peersBep51 != null) result.peersBep51 = peersBep51;
-    if (unknownHashes != null) result.unknownHashes = unknownHashes;
+    if (unidentified != null) result.unidentified = unidentified;
+    if (queued != null) result.queued = queued;
+    if (indexing != null) result.indexing = indexing;
+    if (offload != null) result.offload = offload;
+    if (indexed != null) result.indexed = indexed;
     return result;
   }
 
@@ -69,7 +77,18 @@ class DiscoveryDiagnostics extends $pb.GeneratedMessage {
         8, _omitFieldNames ? '' : 'peers_bep51', $pb.PbFieldType.OU6,
         defaultOrMaker: $fixnum.Int64.ZERO)
     ..a<$fixnum.Int64>(
-        9, _omitFieldNames ? '' : 'unknown_hashes', $pb.PbFieldType.OU6,
+        9, _omitFieldNames ? '' : 'unidentified', $pb.PbFieldType.OU6,
+        defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(10, _omitFieldNames ? '' : 'queued', $pb.PbFieldType.OU6,
+        defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(
+        11, _omitFieldNames ? '' : 'indexing', $pb.PbFieldType.OU6,
+        defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(
+        12, _omitFieldNames ? '' : 'offload', $pb.PbFieldType.OU6,
+        defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(
+        13, _omitFieldNames ? '' : 'indexed', $pb.PbFieldType.OU6,
         defaultOrMaker: $fixnum.Int64.ZERO)
     ..hasRequiredFields = false;
 
@@ -165,13 +184,49 @@ class DiscoveryDiagnostics extends $pb.GeneratedMessage {
   void clearPeersBep51() => $_clearField(8);
 
   @$pb.TagNumber(9)
-  $fixnum.Int64 get unknownHashes => $_getI64(8);
+  $fixnum.Int64 get unidentified => $_getI64(8);
   @$pb.TagNumber(9)
-  set unknownHashes($fixnum.Int64 value) => $_setInt64(8, value);
+  set unidentified($fixnum.Int64 value) => $_setInt64(8, value);
   @$pb.TagNumber(9)
-  $core.bool hasUnknownHashes() => $_has(8);
+  $core.bool hasUnidentified() => $_has(8);
   @$pb.TagNumber(9)
-  void clearUnknownHashes() => $_clearField(9);
+  void clearUnidentified() => $_clearField(9);
+
+  @$pb.TagNumber(10)
+  $fixnum.Int64 get queued => $_getI64(9);
+  @$pb.TagNumber(10)
+  set queued($fixnum.Int64 value) => $_setInt64(9, value);
+  @$pb.TagNumber(10)
+  $core.bool hasQueued() => $_has(9);
+  @$pb.TagNumber(10)
+  void clearQueued() => $_clearField(10);
+
+  @$pb.TagNumber(11)
+  $fixnum.Int64 get indexing => $_getI64(10);
+  @$pb.TagNumber(11)
+  set indexing($fixnum.Int64 value) => $_setInt64(10, value);
+  @$pb.TagNumber(11)
+  $core.bool hasIndexing() => $_has(10);
+  @$pb.TagNumber(11)
+  void clearIndexing() => $_clearField(11);
+
+  @$pb.TagNumber(12)
+  $fixnum.Int64 get offload => $_getI64(11);
+  @$pb.TagNumber(12)
+  set offload($fixnum.Int64 value) => $_setInt64(11, value);
+  @$pb.TagNumber(12)
+  $core.bool hasOffload() => $_has(11);
+  @$pb.TagNumber(12)
+  void clearOffload() => $_clearField(12);
+
+  @$pb.TagNumber(13)
+  $fixnum.Int64 get indexed => $_getI64(12);
+  @$pb.TagNumber(13)
+  set indexed($fixnum.Int64 value) => $_setInt64(12, value);
+  @$pb.TagNumber(13)
+  $core.bool hasIndexed() => $_has(12);
+  @$pb.TagNumber(13)
+  void clearIndexed() => $_clearField(13);
 }
 
 class DiscoveryMetricsResponse extends $pb.GeneratedMessage {

@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/stretchr/testify/require"
 )
 
@@ -16,7 +17,10 @@ func TestLoadcfg(t *testing.T) {
 		require.NoError(t, testx.Fake(cfg))
 		expected := cfg.MaximumRequests
 
-		tr := _torrenting{cfgpath: path}
+		tr := _torrenting{
+			pub:     asyncx.NewWakeup(t.Context()),
+			cfgpath: path,
+		}
 		require.NoError(t, tr.loadcfg(path, cfg))
 
 		_, err := os.Stat(path)
@@ -42,7 +46,10 @@ func TestLoadcfg(t *testing.T) {
 		path := filepath.Join(t.TempDir(), "torrent.cfg")
 		require.NoError(t, os.WriteFile(path, []byte(`{}`), 0600))
 
-		tr := _torrenting{cfgpath: path}
+		tr := _torrenting{
+			pub:     asyncx.NewWakeup(t.Context()),
+			cfgpath: path,
+		}
 		dst := &TorrentSettings{
 			Peers:    &Peers{Min: 32, Max: 64},
 			Upload:   &Limit{Rate: 100, Burst: 10},
@@ -64,7 +71,10 @@ func TestLoadcfg(t *testing.T) {
 		path := filepath.Join(t.TempDir(), "torrent.cfg")
 		require.NoError(t, os.WriteFile(path, []byte(`{"maximum_requests":"1024"}`), 0600))
 
-		tr := _torrenting{cfgpath: path}
+		tr := _torrenting{
+			pub:     asyncx.NewWakeup(t.Context()),
+			cfgpath: path,
+		}
 		dst := &TorrentSettings{}
 		require.NoError(t, tr.loadcfg(path, dst))
 		require.Equal(t, uint64(1024), dst.MaximumRequests)

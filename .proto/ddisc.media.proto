@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package ddisc;
 
+import "meta.search.proto";
+
 message Media {
   string id = 1 [ json_name = "id" ];
   bytes infohash = 2 [ json_name = "infohash" ];
@@ -20,7 +22,7 @@ message Media {
 message MediaSearchRequest {
   string query = 1 [ json_name = "query" ];
   string known_media_id = 2 [ json_name = "known_media_id" ];
-  bool needs_check = 3 [ json_name = "needs_check" ];
+  meta.DateRange next_check = 3 [ json_name = "next_check" ];
   repeated string id = 4 [ json_name = "id" ];
   reserved 5 to 999;
   uint64 offset = 1000 [ json_name = "offset" ];

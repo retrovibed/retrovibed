@@ -7,6 +7,7 @@
 package ddiscapi
 
 import (
+	meta "github.com/retrovibed/retrovibed/shallows/meta"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -107,7 +108,7 @@ func (x *Discovery) GetUpdatedAt() string {
 
 type DiscoverySearchRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	NeedsCheck    bool                   `protobuf:"varint,1,opt,name=needs_check,proto3" json:"needs_check,omitempty"`
+	NextCheck     *meta.DateRange        `protobuf:"bytes,1,opt,name=next_check,proto3" json:"next_check,omitempty"`
 	Id            []string               `protobuf:"bytes,2,rep,name=id,proto3" json:"id,omitempty"`
 	AttemptsMin   uint64                 `protobuf:"varint,3,opt,name=attempts_min,proto3" json:"attempts_min,omitempty"`
 	AttemptsMax   uint64                 `protobuf:"varint,4,opt,name=attempts_max,proto3" json:"attempts_max,omitempty"`
@@ -147,11 +148,11 @@ func (*DiscoverySearchRequest) Descriptor() ([]byte, []int) {
 	return file_ddisc_discovery_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *DiscoverySearchRequest) GetNeedsCheck() bool {
+func (x *DiscoverySearchRequest) GetNextCheck() *meta.DateRange {
 	if x != nil {
-		return x.NeedsCheck
+		return x.NextCheck
 	}
-	return false
+	return nil
 }
 
 func (x *DiscoverySearchRequest) GetId() []string {
@@ -413,7 +414,7 @@ var File_ddisc_discovery_proto protoreflect.FileDescriptor
 
 const file_ddisc_discovery_proto_rawDesc = "" +
 	"\n" +
-	"\x15ddisc.discovery.proto\x12\x05ddisc\"\xb3\x01\n" +
+	"\x15ddisc.discovery.proto\x12\x05ddisc\x1a\x11meta.search.proto\"\xb3\x01\n" +
 	"\tDiscovery\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
 	"\binfohash\x18\x02 \x01(\fR\binfohash\x12\x1a\n" +
@@ -426,9 +427,11 @@ const file_ddisc_discovery_proto_rawDesc = "" +
 	"created_at\x12\x1e\n" +
 	"\n" +
 	"updated_at\x18\x06 \x01(\tR\n" +
-	"updated_at\"\xc9\x01\n" +
-	"\x16DiscoverySearchRequest\x12 \n" +
-	"\vneeds_check\x18\x01 \x01(\bR\vneeds_check\x12\x0e\n" +
+	"updated_at\"\xd8\x01\n" +
+	"\x16DiscoverySearchRequest\x12/\n" +
+	"\n" +
+	"next_check\x18\x01 \x01(\v2\x0f.meta.DateRangeR\n" +
+	"next_check\x12\x0e\n" +
 	"\x02id\x18\x02 \x03(\tR\x02id\x12\"\n" +
 	"\fattempts_min\x18\x03 \x01(\x04R\fattempts_min\x12\"\n" +
 	"\fattempts_max\x18\x04 \x01(\x04R\fattempts_max\x12\x17\n" +
@@ -466,18 +469,20 @@ var file_ddisc_discovery_proto_goTypes = []any{
 	(*DiscoveryCreateResponse)(nil), // 4: ddisc.DiscoveryCreateResponse
 	(*DiscoveryDeleteRequest)(nil),  // 5: ddisc.DiscoveryDeleteRequest
 	(*DiscoveryDeleteResponse)(nil), // 6: ddisc.DiscoveryDeleteResponse
+	(*meta.DateRange)(nil),          // 7: meta.DateRange
 }
 var file_ddisc_discovery_proto_depIdxs = []int32{
-	1, // 0: ddisc.DiscoverySearchResponse.next:type_name -> ddisc.DiscoverySearchRequest
-	0, // 1: ddisc.DiscoverySearchResponse.items:type_name -> ddisc.Discovery
-	0, // 2: ddisc.DiscoveryCreateRequest.discovery:type_name -> ddisc.Discovery
-	0, // 3: ddisc.DiscoveryCreateResponse.discovery:type_name -> ddisc.Discovery
-	0, // 4: ddisc.DiscoveryDeleteResponse.discovery:type_name -> ddisc.Discovery
-	5, // [5:5] is the sub-list for method output_type
-	5, // [5:5] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	7, // 0: ddisc.DiscoverySearchRequest.next_check:type_name -> meta.DateRange
+	1, // 1: ddisc.DiscoverySearchResponse.next:type_name -> ddisc.DiscoverySearchRequest
+	0, // 2: ddisc.DiscoverySearchResponse.items:type_name -> ddisc.Discovery
+	0, // 3: ddisc.DiscoveryCreateRequest.discovery:type_name -> ddisc.Discovery
+	0, // 4: ddisc.DiscoveryCreateResponse.discovery:type_name -> ddisc.Discovery
+	0, // 5: ddisc.DiscoveryDeleteResponse.discovery:type_name -> ddisc.Discovery
+	6, // [6:6] is the sub-list for method output_type
+	6, // [6:6] is the sub-list for method input_type
+	6, // [6:6] is the sub-list for extension type_name
+	6, // [6:6] is the sub-list for extension extendee
+	0, // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_ddisc_discovery_proto_init() }

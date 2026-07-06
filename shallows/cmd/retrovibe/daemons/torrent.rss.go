@@ -20,6 +20,7 @@ import (
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/retrovibed/retrovibed/retroapi/userx"
+	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/backoffx"
 	"github.com/retrovibed/retrovibed/shallows/internal/contextx"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
@@ -104,6 +105,7 @@ func DiscoverFromRSSFeedsOnce(
 	mc library.QueryCleaner,
 	tclient *torrent.Client,
 	tstore storage.ClientImpl,
+	pub *asyncx.Wakeup,
 ) (err error) {
 	const defaultttl = 1440 // 1 day in minutes
 	queryfeeds := func(ctx context.Context, done context.CancelCauseFunc) iter.Seq[tracking.RSS] {
@@ -321,7 +323,7 @@ func DiscoverFromRSSFeedsOnce(
 
 		log.Println("starting any downloads", feed.Description)
 		// begin any torrent provided by this feed
-		ResumeDownloads(ctx, q, rootstore, mc, tclient, tstore)
+		ResumeDownloads(ctx, q, rootstore, mc, tclient, tstore, pub)
 	}
 
 	if err := fctx.Err(); contextx.IgnoreCancelled(err) != nil {
@@ -332,7 +334,7 @@ func DiscoverFromRSSFeedsOnce(
 }
 
 // retrieve torrents from rss feeds.
-func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, mc library.QueryCleaner, tclient *torrent.Client, tstore storage.ClientImpl) (err error) {
+func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, mc library.QueryCleaner, tclient *torrent.Client, tstore storage.ClientImpl, pub *asyncx.Wakeup) (err error) {
 	bs := backoffx.New(
 		backoffx.Exponential(time.Minute),
 		backoffx.Maximum(15*time.Minute),
@@ -350,7 +352,7 @@ func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, rootstore fsx.Vir
 			attempts = -1
 		}
 
-		if err := DiscoverFromRSSFeedsOnce(ctx, q, rootstore, mc, tclient, tstore); err != nil {
+		if err := DiscoverFromRSSFeedsOnce(ctx, q, rootstore, mc, tclient, tstore, pub); err != nil {
 			log.Println("failed to discover torrents", err)
 			continue
 		}

@@ -31,6 +31,8 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/ddisc/ddisctorrent"
 	"github.com/retrovibed/retrovibed/shallows/dnscache"
+	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
+	"github.com/retrovibed/retrovibed/shallows/internal/backoffx"
 	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/contextx"
 	"github.com/retrovibed/retrovibed/shallows/internal/cryptox"
@@ -77,8 +79,9 @@ func AutoTorrentSettings(defaults *TorrentSettings, options ...func(*TorrentSett
 	}, options...))
 }
 
-func newTorrenting(db *sql.DB, id ssh.Signer, root, media, tvfs fsx.Virtual, mc library.QueryCleaner, tstore storage.ClientImpl, socks5 net.Listener) _torrenting {
+func newTorrenting(db *sql.DB, id ssh.Signer, root, media, tvfs fsx.Virtual, mc library.QueryCleaner, tstore storage.ClientImpl, socks5 net.Listener, pub *asyncx.Wakeup) _torrenting {
 	return _torrenting{
+		pub:              pub,
 		cond:             sync.NewCond(&sync.Mutex{}),
 		cfgpath:          userx.DefaultConfigDir(userx.DefaultRelRoot(), "torrent.cfg"),
 		discoverycfgpath: userx.DefaultConfigDir(userx.DefaultRelRoot(), "discovery.cfg"),
@@ -105,6 +108,7 @@ func newTorrenting(db *sql.DB, id ssh.Signer, root, media, tvfs fsx.Virtual, mc 
 }
 
 type _torrenting struct {
+	pub              *asyncx.Wakeup
 	cfgpath          string
 	discoverycfgpath string
 	ddiscidpath      string
@@ -588,20 +592,29 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 		log.Println("autodiscovery is disabled, due to no dht servers. this is an experimental feature.")
 	}
 
+	go asyncx.Periodic(dctx, t.pub, backoffx.New(
+		backoffx.Constant(15*time.Minute),
+		backoffx.JitterRandom(time.Second),
+	), "ddisc publish - periodic")
+
+	asyncx.Background(dctx, t.pub, func(ctx context.Context) error {
+		return errorsx.Wrap(PublishDiscoveredMedia(ctx, t.db), "failed to publish discovered media")
+	})
+
 	go func() {
-		if err := DiscoverFromRSSFeeds(dctx, t.db, t.rootstore, t.mc, tclient, t.tstore); errorsx.Ignore(err, context.Canceled) != nil {
+		if err := DiscoverFromRSSFeeds(dctx, t.db, t.rootstore, t.mc, tclient, t.tstore, t.pub); errorsx.Ignore(err, context.Canceled) != nil {
 			asyncfailure(errorsx.Wrap(err, "autodiscovery of RSS feeds failed"))
 			return
 		}
 	}()
 
 	go timex.NowAndEveryVoid(dctx, envx.Duration(24*time.Hour, env.TorrentVerifyFrequency), func(ctx context.Context) {
-		VerifyTorrents(dctx, t.db, t.rootstore, t.mc, tclient, t.tstore)
+		VerifyTorrents(dctx, t.db, t.rootstore, t.mc, tclient, t.tstore, t.pub)
 	})
 
 	if cfg.Resumable {
 		go AnnounceSeeded(dctx, t.db, dhts, t.rootstore, tclient, t.tstore)
-		go ResumeDownloads(dctx, t.db, t.rootstore, t.mc, tclient, t.tstore)
+		go ResumeDownloads(dctx, t.db, t.rootstore, t.mc, tclient, t.tstore, t.pub)
 	} else {
 		log.Println("announce/resume disabled")
 	}

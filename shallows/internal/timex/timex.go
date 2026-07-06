@@ -251,6 +251,14 @@ func NewRangeDuration(d time.Duration) Range {
 	}
 }
 
+func NewRangeWithin(d time.Duration) Range {
+	ts := time.Now()
+	return Range{
+		Start: NegInf(),
+		End:   ts.Add(d),
+	}
+}
+
 func NewRangeISO8601(b string, e string) (Range, error) {
 	begin, err := time.Parse(time.RFC3339Nano, b)
 	if err != nil {

@@ -20,6 +20,8 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/numericx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
+	"github.com/retrovibed/retrovibed/shallows/internal/timex"
+	meta "github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/retrovibed/retrovibed/shallows/metaapi"
 )
 
@@ -77,8 +79,9 @@ func (t *HTTPMedia) search(w http.ResponseWriter, r *http.Request) {
 		err  error
 		resp = MediaSearchResponse{
 			Next: &MediaSearchRequest{
-				Offset: 0,
-				Limit:  100,
+				Offset:    0,
+				Limit:     100,
+				NextCheck: meta.NewDateRange(timex.NewRangeEverything()),
 			},
 		}
 	)
@@ -96,7 +99,7 @@ func (t *HTTPMedia) search(w http.ResponseWriter, r *http.Request) {
 			squirrel.Expr("1=1"),
 			ddisc.DiscoveredQueryKnownMediaID(resp.Next.KnownMediaId),
 			ddisc.DiscoveredQueryByIDs(resp.Next.Id...),
-			ddisc.DiscoveredQueryNeedsCheck(resp.Next.NeedsCheck),
+			ddisc.DiscoveredQueryNextCheck(meta.TimexRange(resp.Next.NextCheck, timex.NewRangeEverything())),
 			ddisc.DiscoveredQueryText(resp.Next.Query),
 		})
 

@@ -16,6 +16,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/daemons"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/torrenttestx"
 	"github.com/stretchr/testify/require"
@@ -39,7 +40,11 @@ func TestDiscoverMedia(t *testing.T) {
 		// short test window (the seeder's announce can take the better part of
 		// a minute to land). The actual transfer below is wired directly via
 		// TuneClientPeer instead.
-		s := torrenttestx.QuickDHT(t, dht.OptionBootstrapNodesNone, dht.OptionBootstrapFixedAddrs(dht.NewAddr(target.DynamicAddrPort())))
+		s := torrenttestx.QuickDHT(
+			t,
+			dht.OptionBootstrapNodesNone,
+			dht.OptionBootstrapFixedAddrs(dht.NewAddr(target.DynamicAddrPort())),
+		)
 		consumer := torrenttestx.QuickClientWithDHT(t, s)
 		defer consumer.Close()
 
@@ -67,9 +72,9 @@ func TestDiscoverMedia(t *testing.T) {
 		go func() {
 			for ctx.Err() == nil {
 				if md, err := torrent.NewFromInfo(info, torrent.OptionStorage(consumerStorage)); err == nil {
-					_, _, _ = consumer.Start(md, torrent.TuneClientPeer(seeder), torrent.TuneAnnounceUntilComplete, torrent.TuneNewConns)
+					_, _, err = consumer.Start(md, torrent.TuneClientPeer(seeder), torrent.TuneAnnounceUntilComplete, torrent.TuneNewConns)
 				}
-				time.Sleep(5 * time.Millisecond)
+				time.Sleep(200 * time.Millisecond)
 			}
 		}()
 
@@ -77,12 +82,12 @@ func TestDiscoverMedia(t *testing.T) {
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, disc).Scan(&disc))
 
 		go func() {
-			_ = daemons.DiscoverMedia(
+			errorsx.Log(daemons.DiscoverMedia(
 				ctx, q, s, consumer,
 				daemons.DiscoverMediaOptionFrequency(10*time.Millisecond),
 				daemons.DiscoverMediaOptionPeerTimeout(5*time.Second),
 				daemons.DiscoverMediaOptionInfoTimeout(10*time.Second),
-			)
+			))
 		}()
 
 		require.Eventually(t, func() bool {

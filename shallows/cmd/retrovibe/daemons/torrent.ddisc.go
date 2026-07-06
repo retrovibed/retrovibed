@@ -19,6 +19,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
+	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"golang.org/x/time/rate"
 )
 
@@ -107,11 +108,11 @@ func DiscoverMedia(ctx context.Context, db sqlx.Queryer, dhts *dht.Server, tclie
 	for err := l.Wait(ctx); err == nil; err = l.Wait(ctx) {
 		q := ddisc.DiscoveredSearchBuilder().Where(
 			squirrel.And{
-				ddisc.DiscoveredQueryNeedsCheck(true),
+				ddisc.DiscoveredQueryNextCheck(timex.NewRangeWithin(0)),
 			},
 		).OrderBy("attempts ASC, created_at DESC")
 
-		s := sqlx.Scan(ddisc.DiscoveredSearch(ctx, db, q))
+		s := sqlx.Scan(ddisc.DiscoveredSearch(ctx, sqlx.Debug(db), q))
 
 		for disc := range s.Iter() {
 			if err := identifyone.Run(ctx, disc); err != nil {

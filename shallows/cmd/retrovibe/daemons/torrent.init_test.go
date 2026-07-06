@@ -19,6 +19,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/dnscache"
+	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
@@ -40,6 +41,7 @@ func newTestTorrenting(t *testing.T, q *sql.DB) _torrenting {
 	tstore := blockcache.NewTorrentFromVirtualFS(vfs)
 
 	return _torrenting{
+		pub:              asyncx.NewWakeup(t.Context()),
 		cond:             sync.NewCond(&sync.Mutex{}),
 		cfgpath:          rootstore.Path("torrent.cfg"),
 		discoverycfgpath: rootstore.Path("discovery.cfg"),
@@ -100,6 +102,7 @@ func TestInit(t *testing.T) {
 		require.NoError(t, tracking.MetadataInsertWithDefaults(t.Context(), q, md).Scan(&md))
 
 		tr := _torrenting{
+			pub:           asyncx.NewWakeup(t.Context()),
 			cond:          sync.NewCond(&sync.Mutex{}),
 			cfgpath:       rootstore.Path("torrent.cfg"),
 			ddiscidpath:   rootstore.Path("ddisc.id"),

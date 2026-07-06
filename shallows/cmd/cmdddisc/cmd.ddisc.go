@@ -35,7 +35,8 @@ type media struct {
 }
 
 type Commands struct {
-	Peers     peer      `cmd:"" help:"commands for managing library peering"`
-	Discovery discovery `cmd:"" help:"commands for managing infohashes currently being investigated"`
-	Media     media     `cmd:"" help:"commands for managing discovered media records"`
+	Peers       peer           `cmd:"" help:"commands for managing library peering"`
+	Discovery   discovery      `cmd:"" help:"commands for managing infohashes currently being investigated"`
+	Media       media          `cmd:"" help:"commands for managing discovered media records"`
+	Diagnostics cmdDiagnostics `cmd:"" help:"show discovery subsystem diagnostics (peers, partitions, identification pipeline)"`
 }

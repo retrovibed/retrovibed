@@ -28,6 +28,7 @@ import (
 	"github.com/justinas/alice"
 	"github.com/retrovibed/retrovibed/retroapi/httpauth"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
+	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
@@ -68,11 +69,12 @@ func HTTPDiscoveredOptionQueryCleaner(mc library.QueryCleaner) HTTPDiscoveredOpt
 	}
 }
 
-func NewHTTPDiscovered(q sqlx.Queryer, d *atomic.Pointer[torrent.Client], c storage.ClientImpl, options ...HTTPDiscoveredOption) *HTTPDiscovered {
+func NewHTTPDiscovered(q sqlx.Queryer, d *atomic.Pointer[torrent.Client], c storage.ClientImpl, pub *asyncx.Wakeup, options ...HTTPDiscoveredOption) *HTTPDiscovered {
 	svc := langx.Clone(HTTPDiscovered{
 		q:            q,
 		d:            d,
 		c:            c,
+		pub:          pub,
 		jwtsecret:    env.JWTSecret,
 		decoder:      formx.NewDecoder(),
 		rootstorage:  fsx.DirVirtual(os.TempDir()),
@@ -89,6 +91,7 @@ type HTTPDiscovered struct {
 	q            sqlx.Queryer
 	d            *atomic.Pointer[torrent.Client]
 	c            storage.ClientImpl
+	pub          *asyncx.Wakeup
 	jwtsecret    jwtx.SecretSource
 	decoder      *form.Decoder
 	rootstorage  fsx.Virtual
@@ -240,7 +243,7 @@ func (t *HTTPDiscovered) magnet(w http.ResponseWriter, r *http.Request) {
 			mhash = md5.New()
 		)
 
-		errorsx.Log(tracking.DownloadInto(context.Background(), t.q, t.rootstorage, t.mediacleaner, &lmd, dl, mhash))
+		errorsx.Log(tracking.DownloadInto(context.Background(), t.q, t.rootstorage, t.mediacleaner, &lmd, dl, mhash, t.pub))
 	}()
 
 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &MagnetCreateResponse{
@@ -479,7 +482,7 @@ func (t *HTTPDiscovered) upload(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		errorsx.Log(tracking.DownloadInto(context.Background(), t.q, t.rootstorage, t.mediacleaner, &lmd, dl, mhash))
+		errorsx.Log(tracking.DownloadInto(context.Background(), t.q, t.rootstorage, t.mediacleaner, &lmd, dl, mhash, t.pub))
 	}()
 
 	if err := tracking.MetadataDownloadByID(r.Context(), t.q, lmd.ID).Scan(&lmd); sqlx.ErrNoRows(err) != nil {
@@ -715,7 +718,7 @@ func (t *HTTPDiscovered) download(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		errorsx.Log(tracking.DownloadInto(context.Background(), t.q, t.rootstorage, t.mediacleaner, &meta, dl, mhash))
+		errorsx.Log(tracking.DownloadInto(context.Background(), t.q, t.rootstorage, t.mediacleaner, &meta, dl, mhash, t.pub))
 	}(meta)
 
 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &DownloadBeginResponse{

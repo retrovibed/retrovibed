@@ -13,6 +13,7 @@ import (
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/james-lawrence/torrent/torrenttest"
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
+	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
@@ -74,7 +75,7 @@ func TestReset(t *testing.T) {
 		assert.True(t, added)
 		require.NoError(t, ltor.Tune(torrent.TuneClientPeer(seeder)))
 
-		require.NoError(t, tracking.DownloadInto(t.Context(), q, root, library.QueryCleanerNoop(), &lmd, ltor, io.Discard))
+		require.NoError(t, tracking.DownloadInto(t.Context(), q, root, library.QueryCleanerNoop(), &lmd, ltor, io.Discard, asyncx.NewWakeup(t.Context())))
 
 		require.NoError(t, tracking.Reset(ctx, q, root, &lmd))
 
@@ -134,7 +135,7 @@ func TestReset(t *testing.T) {
 		assert.True(t, added)
 		require.NoError(t, ltor.Tune(torrent.TuneClientPeer(seeder)))
 
-		require.NoError(t, tracking.DownloadInto(t.Context(), q, root, library.QueryCleanerNoop(), &lmd, ltor, io.Discard))
+		require.NoError(t, tracking.DownloadInto(t.Context(), q, root, library.QueryCleanerNoop(), &lmd, ltor, io.Discard, asyncx.NewWakeup(t.Context())))
 
 		require.NoError(t, tracking.Reset(ctx, q, root, &lmd))
 
@@ -197,7 +198,7 @@ func TestReset(t *testing.T) {
 		assert.True(t, added)
 		require.NoError(t, ltor.Tune(torrent.TuneClientPeer(seeder)))
 
-		require.NoError(t, tracking.DownloadInto(t.Context(), q, root, library.QueryCleanerNoop(), &lmd, ltor, io.Discard))
+		require.NoError(t, tracking.DownloadInto(t.Context(), q, root, library.QueryCleanerNoop(), &lmd, ltor, io.Discard, asyncx.NewWakeup(t.Context())))
 
 		var libMDs []library.Metadata
 		require.NoError(t, sqlx.ScanInto(library.MetadataSearch(ctx, q,

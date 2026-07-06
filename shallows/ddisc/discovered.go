@@ -11,6 +11,7 @@ import (
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
+	"github.com/retrovibed/retrovibed/shallows/internal/ducktype"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/localex"
 	"github.com/retrovibed/retrovibed/shallows/internal/lucenex"
@@ -20,7 +21,9 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/squirrelx"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/internal/torrentx"
+	"github.com/retrovibed/retrovibed/shallows/library"
 	"golang.org/x/text/language"
 )
 
@@ -144,11 +147,32 @@ func NewDiscovered(md *int160.T, options ...DiscoveredOption) (m Discovered) {
 	return r
 }
 
-func DiscoveredQueryNeedsCheck(b bool) squirrel.Sqlizer {
-	if !b {
-		return squirrelx.Noop{}
-	}
-	return squirrel.Expr("ddisc_media.next_check_at < NOW()")
+// NewDiscoveredFromKnown builds a Discovered record for a specific known media entity found
+// within a torrent, keyed on (infohash, known media id) rather than infohash alone. This allows
+// multiple Discovered rows to exist for the same infohash (e.g. one per episode in a season
+// pack, or one per track in an album). known must already be resolved (never the Unknown()
+// sentinel) - that precondition is the caller's responsibility.
+func NewDiscoveredFromKnown(md int160.T, known library.Known, options ...DiscoveredOption) (m Discovered) {
+	r := langx.Clone(Discovered{
+		ID:                     md5x.FormatUUID(md5x.Digest(md.Bytes(), []byte(known.UID))),
+		Infohash:               md.Bytes(),
+		KnownMediaID:           known.UID,
+		Title:                  known.Title,
+		Description:            known.Overview,
+		ReleasedAt:             known.Released,
+		Adult:                  known.Adult,
+		Mimetype:               langx.FirstNonZero(known.Mimetype, mimex.Binary),
+		Category:               mimex.Category(langx.FirstNonZero(known.Mimetype, mimex.Application)),
+		SyncUID:                uuid.Must(uuid.NewV7()).String(),
+		Partition:              uuid.Nil.String(),
+		AudioDefaultLocale:     language.Und.String(),
+		SubtitlesDefaultLocale: language.Und.String(),
+	}, options...)
+	return r
+}
+
+func DiscoveredQueryNextCheck(r timex.Range) squirrel.Sqlizer {
+	return squirrelx.Between("ddisc_media.next_check_at", ducktype.NewNullTime(r.Start), ducktype.NewNullTime(r.End))
 }
 
 func DiscoveredQueryKnownMediaID(id string) squirrel.Sqlizer {

@@ -11,7 +11,11 @@ message DiscoveryDiagnostics {
   uint64 peers = 6 [ json_name = "peers" ];
   uint64 peers_ddisc = 7 [ json_name = "peers_ddisc" ];
   uint64 peers_bep51 = 8 [ json_name = "peers_bep51" ];
-  uint64 unknown_hashes = 9 [ json_name = "unknown_hashes" ];
+  uint64 unidentified = 9 [ json_name = "unidentified" ];
+  uint64 queued = 10 [ json_name = "queued" ];
+  uint64 indexing = 11 [ json_name = "indexing" ];
+  uint64 offload = 12 [ json_name = "offload" ];
+  uint64 indexed = 13 [ json_name = "indexed" ];
 }
 
 message DiscoveryMetricsResponse {

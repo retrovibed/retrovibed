@@ -11,6 +11,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
+	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/atomicx"
 	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -52,6 +53,7 @@ func TestDiscoveredUploadTorrent(t *testing.T) {
 		q,
 		atomicx.PointerPtr(tclient),
 		storage.NewFile(vfs.Path(), storage.FileOptionPathMakerInfohash),
+		asyncx.NewWakeup(ctx),
 		media.HTTPDiscoveredOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		media.HTTPDiscoveredOptionRootStorage(vfs),
 	).Bind(routes.PathPrefix("/").Subrouter())

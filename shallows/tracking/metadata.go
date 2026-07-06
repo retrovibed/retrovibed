@@ -21,6 +21,7 @@ import (
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
+	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/envx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -343,7 +344,7 @@ func Reset(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata) (
 	return nil
 }
 
-func DownloadInto(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, mc library.QueryCleaner, md *Metadata, t torrent.Torrent, dst io.Writer, options ...torrent.Tuner) (err error) {
+func DownloadInto(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, mc library.QueryCleaner, md *Metadata, t torrent.Torrent, dst io.Writer, pub *asyncx.Wakeup, options ...torrent.Tuner) (err error) {
 	var (
 		downloaded int64
 	)
@@ -421,6 +422,8 @@ func DownloadInto(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, mc libra
 	if err := MetadataCompleteByID(ctx, q, md.ID, 0, bytes, uint64(downloaded), stats.BytesWrittenData.Uint64()).Scan(md); err != nil {
 		return errorsx.Wrap(err, "unable to mark completed")
 	}
+
+	pub.Broadcast()
 
 	return nil
 }

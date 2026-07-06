@@ -83,7 +83,7 @@ func TestHTTPDiagnosticsDiscovery(t *testing.T) {
 		require.EqualValues(t, 2, result.Discovery.Peers)
 		require.EqualValues(t, 1, result.Discovery.PeersDdisc)
 		require.EqualValues(t, 1, result.Discovery.PeersBep51)
-		require.EqualValues(t, 1, result.Discovery.UnknownHashes)
+		require.EqualValues(t, 1, result.Discovery.Unidentified)
 	})
 
 	t.Run("snapshot error", func(t *testing.T) {

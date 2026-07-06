@@ -32,6 +32,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/internal/torrentx"
+	"github.com/retrovibed/retrovibed/shallows/metaapi"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 	"golang.org/x/time/rate"
 )
@@ -332,10 +333,10 @@ func DiscoverDHTMetadata(ctx context.Context, workloads uint64, db sqlx.Queryer,
 		// consider newest unknown hashes first.
 		q := tracking.UnknownSearchBuilder().Where(
 			squirrel.And{
-				tracking.UnknownHashQueryNeedsCheck(true),
+				tracking.UnknownHashQueryNextCheck(timex.NewRangeWithin(0)),
 			},
 		).OrderBy("attempts ASC, created_at DESC").Limit(workloads * 10)
-		return sqlx.Scan(tracking.UnknownSearch(ctx, sqlx.Debug(db), q))
+		return sqlx.Scan(tracking.UnknownSearch(ctx, db, q))
 	}
 
 	buff := make(chan tracking.UnknownHash, workloads)
@@ -385,7 +386,7 @@ func DiscoverDHTMetadata(ctx context.Context, workloads uint64, db sqlx.Queryer,
 func PrintStatistics(ctx context.Context, q sqlx.Queryer) {
 	timex.NowAndEveryVoid(ctx, 5*time.Minute, func(ctx context.Context) {
 		type stats struct {
-			Pending   int
+			Queued    int
 			Available int
 			Offload   int
 			Indexing  int
@@ -394,11 +395,16 @@ func PrintStatistics(ctx context.Context, q sqlx.Queryer) {
 			RSS       int
 		}
 
+		diag, err := metaapi.QueryDiscoveryDiagnostics(ctx, q)
+		if err != nil {
+			return
+		}
+
 		m := stats{
-			Pending:   errorsx.Zero(sqlx.Count(ctx, q, "SELECT COUNT (*) FROM torrents_unknown_infohashes WHERE next_check < NOW()")),
-			Indexing:  errorsx.Zero(sqlx.Count(ctx, q, "SELECT COUNT (*) FROM ddisc_media WHERE known_media_id = 'ffffffff-ffff-ffff-ffff-ffffffffffff'")),
-			Offload:   errorsx.Zero(sqlx.Count(ctx, q, "SELECT COUNT (*) FROM ddisc_media WHERE known_media_id = '00000000-0000-0000-0000-000000000000'")),
-			Indexed:   errorsx.Zero(sqlx.Count(ctx, q, "SELECT COUNT (*) FROM ddisc_media WHERE known_media_id NOT IN ('00000000-0000-0000-0000-000000000000', 'ffffffff-ffff-ffff-ffff-ffffffffffff')")),
+			Queued:    int(diag.Queued),
+			Indexing:  int(diag.Indexing),
+			Offload:   int(diag.Offload),
+			Indexed:   int(diag.Indexed),
 			Available: errorsx.Zero(sqlx.Count(ctx, q, "SELECT COUNT (*) FROM torrents_metadata")),
 			Peers:     errorsx.Zero(sqlx.Count(ctx, q, "SELECT COUNT (*) FROM torrents_peers WHERE next_check < NOW()")),
 			RSS:       errorsx.Zero(sqlx.Count(ctx, q, "SELECT COUNT (*) FROM torrents_feed_rss WHERE next_check < NOW()")),

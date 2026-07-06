@@ -27,7 +27,11 @@ const DiscoveryDiagnostics$json = {
     {'1': 'peers', '3': 6, '4': 1, '5': 4, '10': 'peers'},
     {'1': 'peers_ddisc', '3': 7, '4': 1, '5': 4, '10': 'peers_ddisc'},
     {'1': 'peers_bep51', '3': 8, '4': 1, '5': 4, '10': 'peers_bep51'},
-    {'1': 'unknown_hashes', '3': 9, '4': 1, '5': 4, '10': 'unknown_hashes'},
+    {'1': 'unidentified', '3': 9, '4': 1, '5': 4, '10': 'unidentified'},
+    {'1': 'queued', '3': 10, '4': 1, '5': 4, '10': 'queued'},
+    {'1': 'indexing', '3': 11, '4': 1, '5': 4, '10': 'indexing'},
+    {'1': 'offload', '3': 12, '4': 1, '5': 4, '10': 'offload'},
+    {'1': 'indexed', '3': 13, '4': 1, '5': 4, '10': 'indexed'},
   ],
 };
 
@@ -37,8 +41,10 @@ final $typed_data.Uint8List discoveryDiagnosticsDescriptor = $convert.base64Deco
     'lvGAIgASgNUgVyYXRpbxIeCgpwYXJ0aXRpb25zGAMgASgNUgpwYXJ0aXRpb25zEhwKCXdvcmts'
     'b2FkcxgEIAEoDVIJd29ya2xvYWRzEigKD2xvY2FsX3BhcnRpdGlvbhgFIAEoCVIPbG9jYWxfcG'
     'FydGl0aW9uEhQKBXBlZXJzGAYgASgEUgVwZWVycxIgCgtwZWVyc19kZGlzYxgHIAEoBFILcGVl'
-    'cnNfZGRpc2MSIAoLcGVlcnNfYmVwNTEYCCABKARSC3BlZXJzX2JlcDUxEiYKDnVua25vd25faG'
-    'FzaGVzGAkgASgEUg51bmtub3duX2hhc2hlcw==');
+    'cnNfZGRpc2MSIAoLcGVlcnNfYmVwNTEYCCABKARSC3BlZXJzX2JlcDUxEiIKDHVuaWRlbnRpZm'
+    'llZBgJIAEoBFIMdW5pZGVudGlmaWVkEhYKBnF1ZXVlZBgKIAEoBFIGcXVldWVkEhoKCGluZGV4'
+    'aW5nGAsgASgEUghpbmRleGluZxIYCgdvZmZsb2FkGAwgASgEUgdvZmZsb2FkEhgKB2luZGV4ZW'
+    'QYDSABKARSB2luZGV4ZWQ=');
 
 @$core.Deprecated('Use discoveryMetricsResponseDescriptor instead')
 const DiscoveryMetricsResponse$json = {

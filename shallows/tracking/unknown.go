@@ -9,9 +9,11 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/retrovibed/retrovibed/shallows/internal/backoffx"
+	"github.com/retrovibed/retrovibed/shallows/internal/ducktype"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/squirrelx"
+	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/internal/torrentx"
 )
 
@@ -44,12 +46,8 @@ func UnknownHashOptionTestDefaults(uh *UnknownHash) {
 	uh.Attempts &= math.MaxInt64
 }
 
-func UnknownHashQueryNeedsCheck(b bool) squirrel.Sqlizer {
-	if !b {
-		return squirrelx.Noop{}
-	}
-
-	return squirrel.Expr("torrents_unknown_infohashes.next_check < NOW()")
+func UnknownHashQueryNextCheck(r timex.Range) squirrel.Sqlizer {
+	return squirrelx.Between("torrents_unknown_infohashes.next_check", ducktype.NewNullTime(r.Start), ducktype.NewNullTime(r.End))
 }
 
 func UnknownHashQueryByIDs(ids ...string) squirrel.Sqlizer {

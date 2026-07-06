@@ -136,6 +136,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		archival            = asyncx.NewWakeup(gctx.Context)
 		publishing          = asyncx.NewWakeup(gctx.Context)
 		mediaidentification = asyncx.NewWakeup(gctx.Context)
+		ddiscpublish        = asyncx.NewWakeup(gctx.Context)
 		vpncfgpath          = userx.DefaultConfigDir(userx.DefaultRelRoot(), "vpn.cfg")
 		storagecfgpath      = userx.DefaultConfigDir(userx.DefaultRelRoot(), "storage.cfg")
 	)
@@ -211,7 +212,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		}
 	}
 
-	torrenting := newTorrenting(db, id, rootstore, mediastore, tvfs, mc, tstore, _socks5)
+	torrenting := newTorrenting(db, id, rootstore, mediastore, tvfs, mc, tstore, _socks5, ddiscpublish)
 
 	if err = torrenting.Reload(gctx.Context, t.torrentsettings(), t.discoverysettings()); err != nil {
 		return errorsx.Wrap(err, "failed to reload torrent")
@@ -357,6 +358,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		db,
 		torrenting._tclient,
 		tstore,
+		ddiscpublish,
 		media.HTTPDiscoveredOptionRootStorage(rootstore),
 		media.HTTPDiscoveredOptionQueryCleaner(mc),
 	).Bind(httpmux.PathPrefix("/d").Subrouter())

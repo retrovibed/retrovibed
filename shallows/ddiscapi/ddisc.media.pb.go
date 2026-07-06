@@ -7,6 +7,7 @@
 package ddiscapi
 
 import (
+	meta "github.com/retrovibed/retrovibed/shallows/meta"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -157,7 +158,7 @@ type MediaSearchRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Query         string                 `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
 	KnownMediaId  string                 `protobuf:"bytes,2,opt,name=known_media_id,proto3" json:"known_media_id,omitempty"`
-	NeedsCheck    bool                   `protobuf:"varint,3,opt,name=needs_check,proto3" json:"needs_check,omitempty"`
+	NextCheck     *meta.DateRange        `protobuf:"bytes,3,opt,name=next_check,proto3" json:"next_check,omitempty"`
 	Id            []string               `protobuf:"bytes,4,rep,name=id,proto3" json:"id,omitempty"`
 	Offset        uint64                 `protobuf:"varint,1000,opt,name=offset,proto3" json:"offset,omitempty"`
 	Limit         uint64                 `protobuf:"varint,1001,opt,name=limit,proto3" json:"limit,omitempty"`
@@ -209,11 +210,11 @@ func (x *MediaSearchRequest) GetKnownMediaId() string {
 	return ""
 }
 
-func (x *MediaSearchRequest) GetNeedsCheck() bool {
+func (x *MediaSearchRequest) GetNextCheck() *meta.DateRange {
 	if x != nil {
-		return x.NeedsCheck
+		return x.NextCheck
 	}
-	return false
+	return nil
 }
 
 func (x *MediaSearchRequest) GetId() []string {
@@ -461,7 +462,7 @@ var File_ddisc_media_proto protoreflect.FileDescriptor
 
 const file_ddisc_media_proto_rawDesc = "" +
 	"\n" +
-	"\x11ddisc.media.proto\x12\x05ddisc\"\xe5\x02\n" +
+	"\x11ddisc.media.proto\x12\x05ddisc\x1a\x11meta.search.proto\"\xe5\x02\n" +
 	"\x05Media\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
 	"\binfohash\x18\x02 \x01(\fR\binfohash\x12\x14\n" +
@@ -479,11 +480,13 @@ const file_ddisc_media_proto_rawDesc = "" +
 	"created_at\x12\x1e\n" +
 	"\n" +
 	"updated_at\x18\f \x01(\tR\n" +
-	"updated_at\"\xbb\x01\n" +
+	"updated_at\"\xca\x01\n" +
 	"\x12MediaSearchRequest\x12\x14\n" +
 	"\x05query\x18\x01 \x01(\tR\x05query\x12&\n" +
-	"\x0eknown_media_id\x18\x02 \x01(\tR\x0eknown_media_id\x12 \n" +
-	"\vneeds_check\x18\x03 \x01(\bR\vneeds_check\x12\x0e\n" +
+	"\x0eknown_media_id\x18\x02 \x01(\tR\x0eknown_media_id\x12/\n" +
+	"\n" +
+	"next_check\x18\x03 \x01(\v2\x0f.meta.DateRangeR\n" +
+	"next_check\x12\x0e\n" +
 	"\x02id\x18\x04 \x03(\tR\x02id\x12\x17\n" +
 	"\x06offset\x18\xe8\a \x01(\x04R\x06offset\x12\x15\n" +
 	"\x05limit\x18\xe9\a \x01(\x04R\x05limitJ\x05\b\x05\x10\xe8\a\"h\n" +
@@ -519,18 +522,20 @@ var file_ddisc_media_proto_goTypes = []any{
 	(*MediaCreateResponse)(nil), // 4: ddisc.MediaCreateResponse
 	(*MediaDeleteRequest)(nil),  // 5: ddisc.MediaDeleteRequest
 	(*MediaDeleteResponse)(nil), // 6: ddisc.MediaDeleteResponse
+	(*meta.DateRange)(nil),      // 7: meta.DateRange
 }
 var file_ddisc_media_proto_depIdxs = []int32{
-	1, // 0: ddisc.MediaSearchResponse.next:type_name -> ddisc.MediaSearchRequest
-	0, // 1: ddisc.MediaSearchResponse.items:type_name -> ddisc.Media
-	0, // 2: ddisc.MediaCreateRequest.media:type_name -> ddisc.Media
-	0, // 3: ddisc.MediaCreateResponse.media:type_name -> ddisc.Media
-	0, // 4: ddisc.MediaDeleteResponse.media:type_name -> ddisc.Media
-	5, // [5:5] is the sub-list for method output_type
-	5, // [5:5] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	7, // 0: ddisc.MediaSearchRequest.next_check:type_name -> meta.DateRange
+	1, // 1: ddisc.MediaSearchResponse.next:type_name -> ddisc.MediaSearchRequest
+	0, // 2: ddisc.MediaSearchResponse.items:type_name -> ddisc.Media
+	0, // 3: ddisc.MediaCreateRequest.media:type_name -> ddisc.Media
+	0, // 4: ddisc.MediaCreateResponse.media:type_name -> ddisc.Media
+	0, // 5: ddisc.MediaDeleteResponse.media:type_name -> ddisc.Media
+	6, // [6:6] is the sub-list for method output_type
+	6, // [6:6] is the sub-list for method input_type
+	6, // [6:6] is the sub-list for extension type_name
+	6, // [6:6] is the sub-list for extension extendee
+	0, // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_ddisc_media_proto_init() }

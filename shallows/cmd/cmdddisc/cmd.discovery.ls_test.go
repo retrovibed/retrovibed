@@ -73,7 +73,7 @@ func TestDiscoveryLs(t *testing.T) {
 			"--private-key-path", keypath,
 			"--insecure",
 			"--library", srv.Listener.Addr().String(),
-			"--needs-check",
+			"--next-check", "30m",
 		))
 	})
 

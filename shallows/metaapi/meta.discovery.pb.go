@@ -31,7 +31,11 @@ type DiscoveryDiagnostics struct {
 	Peers          uint64                 `protobuf:"varint,6,opt,name=peers,proto3" json:"peers,omitempty"`
 	PeersDdisc     uint64                 `protobuf:"varint,7,opt,name=peers_ddisc,proto3" json:"peers_ddisc,omitempty"`
 	PeersBep51     uint64                 `protobuf:"varint,8,opt,name=peers_bep51,proto3" json:"peers_bep51,omitempty"`
-	UnknownHashes  uint64                 `protobuf:"varint,9,opt,name=unknown_hashes,proto3" json:"unknown_hashes,omitempty"`
+	Unidentified   uint64                 `protobuf:"varint,9,opt,name=unidentified,proto3" json:"unidentified,omitempty"`
+	Queued         uint64                 `protobuf:"varint,10,opt,name=queued,proto3" json:"queued,omitempty"`
+	Indexing       uint64                 `protobuf:"varint,11,opt,name=indexing,proto3" json:"indexing,omitempty"`
+	Offload        uint64                 `protobuf:"varint,12,opt,name=offload,proto3" json:"offload,omitempty"`
+	Indexed        uint64                 `protobuf:"varint,13,opt,name=indexed,proto3" json:"indexed,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -122,9 +126,37 @@ func (x *DiscoveryDiagnostics) GetPeersBep51() uint64 {
 	return 0
 }
 
-func (x *DiscoveryDiagnostics) GetUnknownHashes() uint64 {
+func (x *DiscoveryDiagnostics) GetUnidentified() uint64 {
 	if x != nil {
-		return x.UnknownHashes
+		return x.Unidentified
+	}
+	return 0
+}
+
+func (x *DiscoveryDiagnostics) GetQueued() uint64 {
+	if x != nil {
+		return x.Queued
+	}
+	return 0
+}
+
+func (x *DiscoveryDiagnostics) GetIndexing() uint64 {
+	if x != nil {
+		return x.Indexing
+	}
+	return 0
+}
+
+func (x *DiscoveryDiagnostics) GetOffload() uint64 {
+	if x != nil {
+		return x.Offload
+	}
+	return 0
+}
+
+func (x *DiscoveryDiagnostics) GetIndexed() uint64 {
+	if x != nil {
+		return x.Indexed
 	}
 	return 0
 }
@@ -177,7 +209,7 @@ var File_meta_discovery_proto protoreflect.FileDescriptor
 
 const file_meta_discovery_proto_rawDesc = "" +
 	"\n" +
-	"\x14meta.discovery.proto\x12\x04meta\"\xb0\x02\n" +
+	"\x14meta.discovery.proto\x12\x04meta\"\x94\x03\n" +
 	"\x14DiscoveryDiagnostics\x12\x18\n" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12\x14\n" +
 	"\x05ratio\x18\x02 \x01(\rR\x05ratio\x12\x1e\n" +
@@ -188,8 +220,13 @@ const file_meta_discovery_proto_rawDesc = "" +
 	"\x0flocal_partition\x18\x05 \x01(\tR\x0flocal_partition\x12\x14\n" +
 	"\x05peers\x18\x06 \x01(\x04R\x05peers\x12 \n" +
 	"\vpeers_ddisc\x18\a \x01(\x04R\vpeers_ddisc\x12 \n" +
-	"\vpeers_bep51\x18\b \x01(\x04R\vpeers_bep51\x12&\n" +
-	"\x0eunknown_hashes\x18\t \x01(\x04R\x0eunknown_hashes\"T\n" +
+	"\vpeers_bep51\x18\b \x01(\x04R\vpeers_bep51\x12\"\n" +
+	"\funidentified\x18\t \x01(\x04R\funidentified\x12\x16\n" +
+	"\x06queued\x18\n" +
+	" \x01(\x04R\x06queued\x12\x1a\n" +
+	"\bindexing\x18\v \x01(\x04R\bindexing\x12\x18\n" +
+	"\aoffload\x18\f \x01(\x04R\aoffload\x12\x18\n" +
+	"\aindexed\x18\r \x01(\x04R\aindexed\"T\n" +
 	"\x18DiscoveryMetricsResponse\x128\n" +
 	"\tdiscovery\x18\x01 \x01(\v2\x1a.meta.DiscoveryDiagnosticsR\tdiscoveryb\x06proto3"
 

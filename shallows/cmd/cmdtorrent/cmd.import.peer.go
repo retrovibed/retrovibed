@@ -278,7 +278,7 @@ func (t importPeer) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) (err error) 
 		}()
 
 		log.Println("---------------------------------- downloading", w.meta.ID)
-		if cause := tracking.DownloadInto(ctx, db, rootstore, library.NewQueryerCleanerAuto(), &lmd, dl, io.Discard); cause != nil {
+		if cause := tracking.DownloadInto(ctx, db, rootstore, library.NewQueryerCleanerAuto(), &lmd, dl, io.Discard, async); cause != nil {
 			return errorsx.LogErr(errorsx.Wrapf(cause, "failed to download %s %v", w.meta.ID.String(), cause))
 		}
 
