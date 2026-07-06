@@ -335,7 +335,7 @@ func DiscoverDHTMetadata(ctx context.Context, workloads uint64, db sqlx.Queryer,
 				tracking.UnknownHashQueryNeedsCheck(true),
 			},
 		).OrderBy("attempts ASC, created_at DESC").Limit(workloads * 10)
-		return sqlx.Scan(tracking.UnknownSearch(ctx, db, q))
+		return sqlx.Scan(tracking.UnknownSearch(ctx, sqlx.Debug(db), q))
 	}
 
 	buff := make(chan tracking.UnknownHash, workloads)

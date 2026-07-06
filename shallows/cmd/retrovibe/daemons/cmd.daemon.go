@@ -89,9 +89,10 @@ type Command struct {
 	TorrentMaxRequests  uint32           `flag:"" name:"torrent-max-outstanding" help:"maximum piece requests to allow" default:"1024"`
 	TorrentFolderWatch  []string         `flag:"" name:"torrent-watch" help:"monitor the provided directories for torrent files to automatically download" env:"${env_torrent_directory_watch}" default:"${vars_downloads_directory}"`
 	DiscoveryWorkloads  uint64           `flag:"" name:"discovery-workloads" help:"maximum number of infohashes to concurrently process while indexing" default:"1"`
-	DiscoveryRatio      uint8            `flag:"" name:"discovery-ratio" help:"percentage of infohashes to index, range from 0-100. 0 = off, 100 = attempt to index every infohash, 1-99 percentage of the partition to index" default:"1"  env:"${env_discovery_index_ratio}"`
+	DiscoveryRatio      uint8            `flag:"" name:"discovery-ratio" help:"percentage of infohashes to index, range from 0-100. 0 = off, 100 = attempt to index everything, 1-99 percentage of the designated partition to index" default:"1"  env:"${env_discovery_index_ratio}"`
 	DiscoveryPartitions uint8            `flag:"" name:"discovery-partition" help:"number of partitions to split the infohash space into, adjustments to this value are not recommended as it'll seperate you from identifying synchronization peers" default:"128"`
 	DiscoverySeed       string           `flag:"" name:"discovery-seed" help:"seed to generate partition spaces, adjustments to this value are not recommended as it'll seperate you from identifying synchronization peers" default:"retrovibed-ddisc"`
+	DiscoveryLocateP2P  bool             `flag:"" name:"discovery-locate-p2p" help:"enable discovering media with peers, since we can't control what media people share you are legally responsible for any media you download and share from index" default:"false" negatable:"" env:"${env_discovery_p2p_locate}"`
 	HTTP                cmdopts.Listener `flag:"" name:"http-address" help:"address to serve daemon api from" default:"tcp://:9998" env:"${env_daemon_socket}"`
 	SelfSignedHosts     []string         `flag:"" name:"self-signed-hosts" help:"comma seperated list of hosts to add to the sign signed certificate" env:"${env_self_signed_hosts}"`
 }
@@ -120,6 +121,7 @@ func (t Command) discoverysettings() *DiscoverySettings {
 		Partitions: uint32(t.DiscoveryPartitions),
 		Workloads:  uint32(t.DiscoveryWorkloads),
 		Seed:       t.DiscoverySeed,
+		LocateP2P:  t.DiscoveryLocateP2P,
 	}
 }
 

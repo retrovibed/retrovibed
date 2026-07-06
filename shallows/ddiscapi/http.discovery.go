@@ -91,7 +91,7 @@ func (t *HTTPDiscovery) search(w http.ResponseWriter, r *http.Request) {
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
 	}
-	resp.Next.Limit = numericx.Min(resp.Next.Limit, 100)
+	resp.Next.Limit = numericx.Min(resp.Next.Limit, 1024)
 
 	query := tracking.UnknownSearchBuilder().
 		Offset(resp.Next.Offset * resp.Next.Limit).Limit(resp.Next.Limit).
@@ -101,7 +101,7 @@ func (t *HTTPDiscovery) search(w http.ResponseWriter, r *http.Request) {
 			tracking.UnknownHashQueryNeedsCheck(resp.Next.NeedsCheck),
 		})
 
-	q := sqlx.Scan(tracking.UnknownSearch(r.Context(), t.q, query))
+	q := sqlx.Scan(tracking.UnknownSearch(r.Context(), sqlx.Debug(t.q), query))
 	for uh := range q.Iter() {
 		var (
 			encoded *Discovery

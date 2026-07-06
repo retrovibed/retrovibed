@@ -467,9 +467,9 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 
 	// debugx.OnSignal(dctx, dhtx.Statistics(dhts), syscall.SIGUSR1)
 	// go dhtx.BackgroundStatistics(dctx, time.Minute, dhts)
-	go timex.NowAndEveryVoid(dctx, 5*time.Second, func(_ context.Context) {
-		retronetx.ConnLimitStatistics(os.Stderr, limit)
-	})
+	// go timex.NowAndEveryVoid(dctx, 5*time.Second, func(_ context.Context) {
+	// 	retronetx.ConnLimitStatistics(os.Stderr, limit)
+	// })
 	go dhtx.RecordBootstrapNodes(dctx, time.Minute, dhtminpeers, dhts, torrentpeers)
 	go dhts.TableMaintainer(dctx)
 

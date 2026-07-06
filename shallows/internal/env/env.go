@@ -61,7 +61,8 @@ const (
 	TorrentVerifyFrequency     = "RETROVIBED_TORRENT_VERIFY_FREQUENCY"         // specify how frequently to check for torrents to verify.
 	DHTDebug                   = "RETROVIBED_DHT_DEBUG"                        // enable dht debug logging
 	SelfSignedHosts            = "RETROVIBED_SELF_SIGNED_HOSTS"                // list of hosts to add to the self signed certificate.
-	DDiscFrequency             = "RETROVIBED_DDISC_ANNOUNCE_FREQUENCY"         // how frequently to announce partitions frequency
+	DDiscFrequency             = "RETROVIBED_DDISC_ANNOUNCE_FREQUENCY"         // how frequently to announce partitions frequency.
+	DDiscP2PLocate             = "RETROVIBED_DDISC_P2P_LOCATE"                 // enable the discovery of media from peers.
 	DDiscIndexRatio            = "RETROVIBED_DDISC_INDEX_RATIO"                // what percentage of discovered media to attempt to index.
 	DDiscBackgroundFrequency   = "RETROVIBED_DDISC_BACKGROUND_FREQUENCY"       // how frequently to push work into the queue.
 	DDiscBackgroundWorkers     = "RETROVIBED_DDISC_BACKGROUND_WORKERS"         // number of identifying workers
