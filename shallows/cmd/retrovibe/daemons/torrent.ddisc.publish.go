@@ -49,6 +49,11 @@ func publishDiscoveredMediaOne(ctx context.Context, db sqlx.Queryer, lmd library
 		return errorsx.Wrap(err, "unable to find torrent metadata")
 	}
 
+	if tmd.Private {
+		// don't attempt to index private media
+		return nil
+	}
+
 	var known library.Known
 	if err := library.KnownFindByID(ctx, db, lmd.KnownMediaID).Scan(&known); err != nil {
 		return errorsx.Wrap(err, "unable to find known media")
