@@ -110,8 +110,7 @@ class Error extends StatelessWidget {
         return;
       }
 
-      debugPrint(cause.toString());
-      debugPrint(trace.toString());
+      debugPrint(_diagnosticText(cause, trace));
     };
 
     printerr(this.cause, this.trace);
