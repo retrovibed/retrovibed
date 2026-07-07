@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fixnum/fixnum.dart' as fixnum;
 import 'empty.dart';
 import 'help.dart';
+import 'lazy.visible.dart';
 import 'theme.defaults.dart';
 import 'inputs.dart';
 import 'screens.dart' as screens;
@@ -80,10 +81,10 @@ class _TableRowState extends State<TableRow> {
       verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
       children: [
         row,
-        Visibility(
+        LazyVisible(
+          widget.expanded,
           visible: _expanded,
           maintainState: widget.maintainState,
-          child: widget.expanded,
         ),
       ],
     );

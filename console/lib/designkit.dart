@@ -5,7 +5,7 @@ import 'design.kit/flutterx.dart';
 
 export 'package:fixnum/fixnum.dart';
 export 'design.kit/screens.dart';
-export 'design.kit/accordian.dart';
+export 'design.kit/accordion.dart';
 export 'design.kit/buttons.dart';
 export 'design.kit/buttons.loading.icon.dart';
 export 'design.kit/buttons.loading.widget.dart';
@@ -26,6 +26,7 @@ export 'design.kit/help.dart';
 export 'design.kit/hyperlink.dart';
 export 'design.kit/image.dart';
 export 'design.kit/key.press.aware.dart';
+export 'design.kit/lazy.visible.dart';
 export 'design.kit/long.hold.dart';
 export 'design.kit/modals.dart';
 export 'design.kit/periodic.dart';
