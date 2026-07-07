@@ -112,7 +112,7 @@ func DiscoverMedia(ctx context.Context, db sqlx.Queryer, dhts *dht.Server, tclie
 			},
 		).OrderBy("attempts ASC, created_at DESC")
 
-		s := sqlx.Scan(ddisc.DiscoveredSearch(ctx, sqlx.Debug(db), q))
+		s := sqlx.Scan(ddisc.DiscoveredSearch(ctx, db, q))
 
 		for disc := range s.Iter() {
 			if err := identifyone.Run(ctx, disc); err != nil {
