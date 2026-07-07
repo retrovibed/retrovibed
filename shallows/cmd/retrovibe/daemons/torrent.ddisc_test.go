@@ -1,6 +1,7 @@
 package daemons_test
 
 import (
+	"log"
 	"testing"
 	"time"
 
@@ -73,6 +74,7 @@ func TestDiscoverMedia(t *testing.T) {
 			for ctx.Err() == nil {
 				if md, err := torrent.NewFromInfo(info, torrent.OptionStorage(consumerStorage)); err == nil {
 					_, _, err = consumer.Start(md, torrent.TuneClientPeer(seeder), torrent.TuneAnnounceUntilComplete, torrent.TuneNewConns)
+					log.Println("failed to start torrent", err)
 				}
 				time.Sleep(200 * time.Millisecond)
 			}
