@@ -57,7 +57,7 @@ func Keychain(base64key, keypassword string) eg.OpFn {
 			env.New("security set-keychain-settings -lut 21600 ${APPLE_KEYCHAIN_PATH}"),
 			env.New("security unlock-keychain -p ${APPLE_KEYCHAIN_PASSWORD} ${APPLE_KEYCHAIN_PATH}"),
 			env.New("security import ${APPLE_SIGNING_KEY_PATH} -P ${APPLE_SIGNING_KEY_PASSWORD} -A -k ${APPLE_KEYCHAIN_PATH}"),
-			env.New("curl -fLo ${APPLE_INTERMEDIATE_CERT} $(openssl pkcs12 -in ${APPLE_SIGNING_KEY_PATH} -nokeys -passin pass:${APPLE_SIGNING_KEY_PASSWORD} | openssl x509 -noout -text | grep \"CA Issuers - URI:\" | cut -d':' -f2- | xargs)"),
+			env.New("curl -fLo ${APPLE_INTERMEDIATE_CERT} $(openssl pkcs12 -legacy -in ${APPLE_SIGNING_KEY_PATH} -nokeys -passin pass:${APPLE_SIGNING_KEY_PASSWORD} | openssl x509 -noout -text | grep \"CA Issuers - URI:\" | cut -d':' -f2- | xargs)"),
 			env.New("security import ${APPLE_INTERMEDIATE_CERT} -k ${APPLE_KEYCHAIN_PATH}"),
 			env.New("security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k ${APPLE_KEYCHAIN_PASSWORD} ${APPLE_KEYCHAIN_PATH}"),
 			env.New("security list-keychains -d user -s ${APPLE_KEYCHAIN_PATH} login.keychain-db"),
