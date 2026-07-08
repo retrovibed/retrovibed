@@ -77,6 +77,28 @@ class _AuthenticatedState extends State<Authenticated> {
         });
   }
 
+  void _refresh() {
+    current()
+        .then((v) {
+          setState(() {
+            _loading = false;
+          });
+        })
+        .catchError((cause) {
+          setState(() {
+            _loading = false;
+            _cause = ds.Errors.httpauto(cause, onTap: _reseterr);
+          });
+        });
+  }
+
+  void _reseterr() {
+    _refresh();
+    setState(() {
+      _cause = ds.Error.zero;
+    });
+  }
+
   void setState(VoidCallback fn) {
     if (!mounted) return;
     super.setState(fn);
@@ -85,18 +107,15 @@ class _AuthenticatedState extends State<Authenticated> {
   @override
   void initState() {
     super.initState();
-    current().whenComplete(() {
-      setState(() {
-        _loading = false;
-      });
-    }).ignore();
+    _refresh();
   }
 
   @override
   Widget build(BuildContext context) {
     return ds.LoadingBoundary(
-      ds.Overlay(widget.child, overlay: _cause == ds.Error.zero ? const SizedBox() : _cause),
+      widget.child,
       loading: _loading,
+      cause: _cause,
     );
   }
 }
