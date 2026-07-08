@@ -138,7 +138,6 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
     };
 
     final category = mimex.category(widget.search.value.next.mimetypes);
-
     final defaults = ds.Defaults.of(context);
     final compact = defaults.isCompact;
     final authz = authn.AuthzCache.meta(context);
@@ -250,8 +249,8 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                           padding: defaults.padding,
                           child: Text(
                             _library
-                                ? "no results in library. select below to automatically locate and download"
-                                : "select below to automatically locate and download",
+                                ? "no results in library. select to automatically locate and download"
+                                : "select to automatically locate and download",
                             style: TextStyle(
                               color: Theme.of(
                                 context,
