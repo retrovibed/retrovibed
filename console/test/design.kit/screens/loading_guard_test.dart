@@ -170,4 +170,115 @@ void main() {
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
     expect(_TrackedWidgetState.active, contains('leaf'));
   });
+
+  group('LoadingBoundary error/cause handling', () {
+    testWidgets('default cause (Error.zero) never shows an error overlay', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpApp(ds.LoadingBoundary(const Text('hello world')));
+      await tester.pump();
+
+      expect(find.text('hello world'), findsOneWidget);
+      expect(find.byType(ds.Error), findsNothing);
+    });
+
+    testWidgets('non-zero cause shows the error overlay while the child remains mounted underneath', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpApp(
+        ds.LoadingBoundary(
+          const _TrackedWidget(tag: 'leaf'),
+          cause: ds.Error.text('boom'),
+        ),
+      );
+      await tester.pump();
+
+      expect(find.text('boom'), findsOneWidget);
+      expect(_TrackedWidgetState.active, contains('leaf'));
+    });
+
+    testWidgets('toggling LoadingBoundary.cause updates the overlay without unmounting the child', (
+      WidgetTester tester,
+    ) async {
+      late VoidCallback toggle;
+
+      await tester.pumpApp(
+        _Toggle(
+          builder: (context, t, noError) {
+            toggle = t;
+            return ds.LoadingBoundary(
+              const _TrackedWidget(tag: 'leaf'),
+              cause: noError ? ds.Error.zero : ds.Error.text('boom'),
+            );
+          },
+        ),
+      );
+      await tester.pump();
+      expect(find.text('boom'), findsNothing);
+      expect(_TrackedWidgetState.active, contains('leaf'));
+
+      toggle();
+      await tester.pump();
+      expect(find.text('boom'), findsOneWidget);
+      expect(_TrackedWidgetState.active, contains('leaf'));
+
+      toggle();
+      await tester.pump();
+      expect(find.text('boom'), findsNothing);
+      expect(_TrackedWidgetState.active, contains('leaf'));
+    });
+
+    testWidgets('cause is hidden behind the loading overlay until loading completes', (
+      WidgetTester tester,
+    ) async {
+      late VoidCallback toggle;
+
+      await tester.pumpApp(
+        ds.LoadingGuard(
+          _Toggle(
+            builder: (context, t, loading) {
+              toggle = t;
+              return ds.LoadingBoundary(
+                const Text('hello world'),
+                loading: loading,
+                cause: ds.Error.text('boom'),
+              );
+            },
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump();
+
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(find.text('boom'), findsNothing);
+      expect(find.text('boom', skipOffstage: false), findsOneWidget);
+
+      toggle();
+      await tester.pump();
+      await tester.pump();
+
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+      expect(find.text('boom'), findsOneWidget);
+    });
+
+    testWidgets('nested LoadingBoundary widgets each render their own distinct cause independently', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpApp(
+        ds.LoadingBoundary(
+          ds.LoadingBoundary(
+            const Text('leaf'),
+            cause: ds.Error.text('inner boom'),
+          ),
+          cause: ds.Error.text('outer boom'),
+        ),
+      );
+      await tester.pump();
+
+      expect(find.text('outer boom'), findsOneWidget);
+      expect(find.text('inner boom'), findsOneWidget);
+      expect(find.text('leaf'), findsOneWidget);
+    });
+  });
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../flutterx.dart' show postframe;
+import '../errors.dart' as errors;
 import 'loading.dart';
+import 'error.dart';
 
 class LoadingGuard extends StatefulWidget {
   final Widget child;
@@ -50,8 +52,14 @@ class LoadingGuardState extends State<LoadingGuard> {
 
 class LoadingBoundary extends StatefulWidget {
   final Widget child;
+  final Widget cause;
   final bool loading;
-  const LoadingBoundary(this.child, {super.key, this.loading = true});
+  const LoadingBoundary(
+    this.child, {
+    super.key,
+    this.loading = true,
+    this.cause = errors.Error.zero,
+  });
 
   @override
   State<LoadingBoundary> createState() => _LoadingBoundaryState();
@@ -81,5 +89,5 @@ class _LoadingBoundaryState extends State<LoadingBoundary> {
   }
 
   @override
-  Widget build(BuildContext context) => widget.child;
+  Widget build(BuildContext context) => ErrorScreen(widget.child, cause: widget.cause);
 }
