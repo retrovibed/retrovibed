@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import './../errors.dart' as errors;
-import './overlay.dart' as s;
-import './glow.dart' as g;
+import '../errors.dart' as errors;
+import 'overlay.dart' as s;
+import 'glow.dart' as g;
 
 class ErrorScreen extends StatelessWidget {
   final Widget child;
@@ -27,12 +27,13 @@ class ErrorScreen extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isBounded = constraints.hasBoundedWidth && constraints.hasBoundedHeight;
-        final content =
-            isBounded && hasError
-                ? SizedBox.expand(child: g.Glow(child, tint: _tint, borderRadius: borderRadius))
-                : g.Glow(child, tint: _tint, borderRadius: borderRadius);
+        final expand = isBounded && hasError;
         return s.Overlay(
-          content,
+          SizedBox(
+            width: expand ? double.infinity : null,
+            height: expand ? double.infinity : null,
+            child: g.Glow(child, tint: _tint, borderRadius: borderRadius),
+          ),
           overlay: Positioned.fill(child: _overlay),
           borderRadius: borderRadius,
         );
