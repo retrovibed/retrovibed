@@ -207,19 +207,15 @@ func Install(b *tarballs.Build) eg.OpFn {
 	)
 }
 
-func RunDev(cmd string, envopts ...func(shell.Command) shell.Command) eg.OpFn {
+func runDev(cmd string, rt shell.Command, envopts ...func(shell.Command) shell.Command) eg.OpFn {
 	return func(ctx context.Context, _ eg.Op) error {
-		runtime := flutterRuntimev2(shell.Runtime()).
+		runtime := flutterRuntimev2(rt).
 			// Environ("RETROVIBED_TORRENT_DEBUG", "true").
 			Environ("RETROVIBED_TORRENT_AUTO_DISCOVERY", "true").
 			Environ("RETROVIBED_METADATA_AUTODOWNLOAD", "false").
 			Environ("RETROVIBED_DDISC_INDEX_RATIO", "99").
 			Environ("RETROVIBED_DDISC_BACKGROUND_FREQUENCY", "20s").
-			Environ("RETROVIBED_DDISC_BACKGROUND_WORKERS", "1").
-			// Environ("RETROVIBED_META_ENDPOINT", "api.retrovibe.space").
-			// Environ("RETROVIBED_CONSOLE_ENDPOINT", "console.retrovibe.space")
-			Environ("RETROVIBED_META_ENDPOINT", "localhost:8081").
-			Environ("RETROVIBED_CONSOLE_ENDPOINT", "localhost:8080")
+			Environ("RETROVIBED_DDISC_BACKGROUND_WORKERS", "1")
 		for _, envopt := range envopts {
 			runtime = envopt(runtime)
 		}
@@ -228,4 +224,13 @@ func RunDev(cmd string, envopts ...func(shell.Command) shell.Command) eg.OpFn {
 			runtime.New(cmd).Timeout(egenv.TTL()),
 		)
 	}
+}
+
+func RunDev(cmd string, envopts ...func(shell.Command) shell.Command) eg.OpFn {
+	rt := shell.Runtime().
+		Environ("RETROVIBED_META_ENDPOINT", "localhost:8081").
+		Environ("RETROVIBED_CONSOLE_ENDPOINT", "localhost:8080")
+		// Environ("RETROVIBED_META_ENDPOINT", "api.retrovibe.space").
+		// Environ("RETROVIBED_CONSOLE_ENDPOINT", "console.retrovibe.space")
+	return runDev(cmd, rt, envopts...)
 }
