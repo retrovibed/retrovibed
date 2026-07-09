@@ -5,6 +5,7 @@ package ddisc
 
 import (
 	"context"
+	"time"
 
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 )
@@ -135,4 +136,14 @@ func SearchQueueCooldown(
 	pattern func(ctx context.Context, q sqlx.Queryer, kid string) NewSearchQueueScannerStaticRow,
 ) {
 	gql = gql.Query(`UPDATE ddisc_search_queue SET updated_at = NOW(), attempts = attempts + 1, next_check_at = NOW() + least(to_minutes(CAST(attempts AS INT)*2), to_hours(24)) WHERE "known_media_id" = {kid} RETURNING ` + SearchQueueScannerStaticColumns)
+}
+
+// SearchQueuePurge deletes entries older than maxAge (measured from
+// created_at) that have never resolved, so the queue doesn't grow unbounded
+// with known-media-ids no plugin will ever find.
+func SearchQueuePurge(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, maxAge time.Duration) NewSearchQueueScannerStatic,
+) {
+	gql = gql.Query(`DELETE FROM ddisc_search_queue WHERE created_at <= NOW() - to_seconds(CAST({maxAge} AS BIGINT) / 1000000000) RETURNING ` + SearchQueueScannerStaticColumns)
 }

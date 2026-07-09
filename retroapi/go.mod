@@ -26,6 +26,13 @@ require (
 )
 
 require (
+	github.com/egdaemon/wasinet/wasinet v0.0.0-20250806175613-49e153bd345a // indirect
+	github.com/egdaemon/wasinet/wazeronet v0.0.0-20250806175613-49e153bd345a // indirect
+	github.com/fsnotify/fsnotify v1.10.1 // indirect
+	github.com/tetratelabs/wazero v1.12.0 // indirect
+)
+
+require (
 	github.com/RoaringBitmap/roaring/v2 v2.18.2 // indirect
 	github.com/alecthomas/atomic v0.1.0-alpha2 // indirect
 	github.com/anacrolix/generics v0.2.0 // indirect
