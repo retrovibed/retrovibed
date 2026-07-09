@@ -3,12 +3,12 @@ syntax = "proto3";
 package meta;
 
 message TorrentDiagnostics {
-  uint64 total      = 1 [ json_name = "total" ];
-  uint64 seeding    = 2 [ json_name = "seeding" ];
-  uint64 bytes      = 3 [ json_name = "bytes" ];
+  uint64 total = 1 [ json_name = "total" ];
+  uint64 seeding = 2 [ json_name = "seeding" ];
+  uint64 bytes = 3 [ json_name = "bytes" ];
   uint64 downloaded = 4 [ json_name = "downloaded" ];
-  uint64 uploaded   = 5 [ json_name = "uploaded" ];
-  uint64 peers      = 6 [ json_name = "peers" ];
+  uint64 uploaded = 5 [ json_name = "uploaded" ];
+  uint64 peers = 6 [ json_name = "peers" ];
 }
 
 message TorrentMetricsResponse {

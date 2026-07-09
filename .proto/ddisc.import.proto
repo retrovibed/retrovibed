@@ -1,0 +1,5 @@
+syntax = "proto3";
+
+package ddisc;
+
+message Import { string magnet = 1 [ json_name = "magnet" ]; }
