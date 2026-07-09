@@ -24,6 +24,7 @@ const (
 type Import struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Magnet        string                 `protobuf:"bytes,1,opt,name=magnet,proto3" json:"magnet,omitempty"`
+	Health        uint32                 `protobuf:"varint,2,opt,name=health,proto3" json:"health,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -65,13 +66,21 @@ func (x *Import) GetMagnet() string {
 	return ""
 }
 
+func (x *Import) GetHealth() uint32 {
+	if x != nil {
+		return x.Health
+	}
+	return 0
+}
+
 var File_ddisc_import_proto protoreflect.FileDescriptor
 
 const file_ddisc_import_proto_rawDesc = "" +
 	"\n" +
-	"\x12ddisc.import.proto\x12\x05ddisc\" \n" +
+	"\x12ddisc.import.proto\x12\x05ddisc\"8\n" +
 	"\x06Import\x12\x16\n" +
-	"\x06magnet\x18\x01 \x01(\tR\x06magnetb\x06proto3"
+	"\x06magnet\x18\x01 \x01(\tR\x06magnet\x12\x16\n" +
+	"\x06health\x18\x02 \x01(\rR\x06healthb\x06proto3"
 
 var (
 	file_ddisc_import_proto_rawDescOnce sync.Once

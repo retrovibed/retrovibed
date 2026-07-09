@@ -2,4 +2,7 @@ syntax = "proto3";
 
 package ddisc;
 
-message Import { string magnet = 1 [ json_name = "magnet" ]; }
+message Import {
+  string magnet = 1 [ json_name = "magnet" ];
+  uint32 health = 2 [ json_name = "health" ];
+}
