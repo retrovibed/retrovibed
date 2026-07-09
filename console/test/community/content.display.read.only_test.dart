@@ -255,7 +255,7 @@ void main() {
         expect(tester.takeException(), isNull);
       });
 
-      testWidgets('detail is offstage before tap', (tester) async {
+      testWidgets('detail is not built before tap', (tester) async {
         await tester.pumpApp(
           physicalSize: const Size(1280, 720),
           ContentDisplayReadOnly(
@@ -265,8 +265,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.byType(PublishedContentDetail, skipOffstage: false), findsWidgets);
-        expect(find.byType(PublishedContentDetail), findsNothing);
+        expect(find.byType(PublishedContentDetail, skipOffstage: false), findsNothing);
         expect(tester.takeException(), isNull);
       });
 

@@ -280,7 +280,7 @@ void main() {
         expect(tester.takeException(), isNull);
       });
 
-      testWidgets('detail is offstage before tap', (tester) async {
+      testWidgets('detail is not built before tap', (tester) async {
         await tester.pumpApp(
           physicalSize: const Size(1280, 720),
           CommunityContentDisplay(
@@ -290,9 +290,9 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // with maintainState the widget is in tree but offstage - skipOffstage: false finds it
-        expect(find.byType(PublishedContentDetail, skipOffstage: false), findsWidgets);
-        // default skipOffstage: true should find nothing visible
+        // lazily built: not present in the tree at all until first expanded,
+        // so it doesn't fire its API call for every row on initial load.
+        expect(find.byType(PublishedContentDetail, skipOffstage: false), findsNothing);
         expect(find.byType(PublishedContentDetail), findsNothing);
         expect(tester.takeException(), isNull);
       });

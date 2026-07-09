@@ -12,15 +12,17 @@ class AuthzMetaEdit extends StatelessWidget {
   const AuthzMetaEdit(this.current, {super.key, this.onChange});
 
   static final meta.Token _zerotoken = meta.Token();
-  static FutureBuilder<meta.Token> future(
-    Future<meta.Token> pending, {
+  static Widget future(
+    Future<meta.Token> Function() pending, {
     Function(meta.Token)? onChange,
   }) {
-    return ds.future(_zerotoken, pending, (snapshot) {
-      return ds.ErrorScreen(
-        AuthzMetaEdit(snapshot.data ?? meta.Token(), onChange: onChange),
-        cause: snapshot.hasError ? ds.Error.unknown(snapshot.error!) : ds.Error.zero,
-      );
+    return ds.build((context) {
+      return ds.future(_zerotoken, pending(), (snapshot) {
+        return ds.ErrorScreen(
+          AuthzMetaEdit(snapshot.data ?? meta.Token(), onChange: onChange),
+          cause: snapshot.hasError ? ds.Error.unknown(snapshot.error!) : ds.Error.zero,
+        );
+      });
     });
   }
 

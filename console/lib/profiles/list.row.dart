@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/meta.dart' as meta;
@@ -29,7 +28,7 @@ typedef FnAuthzGrant =
       List<httpx.Option> options,
     });
 
-class ListRow extends StatefulWidget {
+class ListRow extends StatelessWidget {
   final meta.Profile current;
   final void Function(meta.Profile upd) onChange;
   final FnUpdate apiprofileupdate;
@@ -46,29 +45,14 @@ class ListRow extends StatefulWidget {
   });
 
   @override
-  State<ListRow> createState() => _ListRowState();
-}
-
-class _ListRowState extends State<ListRow> {
-  Future<meta.Token> _authzToken = Completer<meta.Token>().future;
-
-  @override
-  void initState() {
-    super.initState();
-    _authzToken = httpx.withRetry(
-      () => widget.apiauthzget(widget.current.id, options: [authn.request(authn.AuthzCache.meta(context))]).then((v) => v.token),
-    );
-  }
-
-  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     return ds.TableRow.single(
       typo.Typography(
-        widget.current,
+        current,
         onChange: (pending) {
-          pending.then((v) => widget.onChange(v));
+          pending.then((v) => onChange(v));
         },
       ),
       expanded: Container(
@@ -76,23 +60,23 @@ class _ListRowState extends State<ListRow> {
         child: Wrap(
           children: [
             Edit(
-              widget.current,
+              current,
               onChange: (u, _) {
-                widget
-                    .apiprofileupdate(
-                      meta.ProfileUpdateRequest(profile: u),
-                      options: [authn.request(authn.AuthzCache.meta(context))],
-                    )
-                    .then((resp) {
-                      widget.onChange(resp.profile);
-                    });
+                apiprofileupdate(
+                  meta.ProfileUpdateRequest(profile: u),
+                  options: [authn.request(authn.AuthzCache.meta(context))],
+                ).then((resp) {
+                  onChange(resp.profile);
+                });
               },
             ),
             AuthzMetaEdit.future(
-              _authzToken,
+              () => httpx.withRetry(
+                () => apiauthzget(current.id, options: [authn.request(authn.AuthzCache.meta(context))]).then((v) => v.token),
+              ),
               onChange: (t) {
-                widget.apiauthzgrant(widget.current.id, t, options: [authn.request(authn.AuthzCache.meta(context))]).then((_) {
-                  widget.onChange(widget.current);
+                apiauthzgrant(current.id, t, options: [authn.request(authn.AuthzCache.meta(context))]).then((_) {
+                  onChange(current);
                 });
               },
             ),
