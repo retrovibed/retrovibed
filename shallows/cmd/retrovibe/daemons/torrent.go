@@ -310,7 +310,7 @@ func (t *_torrenting) Watch(ctx context.Context, paths ...string) error {
 
 func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCauseFunc, cfg *TorrentSettings, disc *DiscoverySettings) (err error) {
 	const (
-		dhtk        = 128
+		dhtk        = 16 // 20 is standard for mainline dht
 		dhtminpeers = dhtk / 4
 	)
 
