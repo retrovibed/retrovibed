@@ -1,13 +1,10 @@
 package cmdddisc
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"log"
 	"net"
 	"net/http"
-	"net/url"
 	"strconv"
 	"time"
 
@@ -23,8 +20,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/formx"
-	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/netipx"
 	"github.com/retrovibed/retrovibed/shallows/internal/torrentx"
 )
@@ -84,30 +79,12 @@ func (t cmdDiscoveryIdentify) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, 
 }
 
 func (t cmdDiscoveryIdentify) lookup(gctx *cmdopts.Global, cc *http.Client) (_ ddisc.Discovered, err error) {
-	var (
-		encoded url.Values
-		req     *http.Request
-		resp    *http.Response
-		result  ddiscapi.DiscoverySearchResponse
-	)
-
-	if encoded, err = formx.NewEncoder().Encode(&ddiscapi.DiscoverySearchRequest{
+	result, err := ddiscapi.DiscoverySearch(gctx.Context, cc, t.Endpoint, &ddiscapi.DiscoverySearchRequest{
 		Id:    []string{t.ID},
 		Limit: 1,
-	}); err != nil {
-		return ddisc.Discovered{}, errorsx.Wrap(err, "unable to encode request")
-	}
-
-	if req, err = http.NewRequestWithContext(gctx.Context, http.MethodGet, fmt.Sprintf("https://%s/ddisc/discovery/?"+encoded.Encode(), t.Endpoint), nil); err != nil {
-		return ddisc.Discovered{}, errorsx.Wrap(err, "unable to create http request")
-	}
-
-	if resp, err = httpx.AsError(cc.Do(req)); err != nil {
-		return ddisc.Discovered{}, errorsx.Wrap(err, "http request failed")
-	}
-
-	if err = httpx.DecodeJSON(resp, &result); err != nil {
-		return ddisc.Discovered{}, errorsx.Wrap(err, "unable to decode response")
+	})
+	if err != nil {
+		return ddisc.Discovered{}, err
 	}
 
 	if len(result.Items) != 1 {
@@ -192,47 +169,17 @@ func (t cmdDiscoveryIdentify) torrentClient() (dhts *dht.Server, tclient *torren
 }
 
 func (t cmdDiscoveryIdentify) persist(gctx *cmdopts.Global, cc *http.Client, result ddisc.Discovered) (_ *ddiscapi.Media, err error) {
-	var (
-		encoded []byte
-		req     *http.Request
-		resp    *http.Response
-		mrsp    ddiscapi.MediaCreateResponse
-	)
-
-	if encoded, err = json.Marshal(&ddiscapi.MediaCreateRequest{
+	mrsp, err := ddiscapi.MediaCreate(gctx.Context, cc, t.Endpoint, &ddiscapi.MediaCreateRequest{
 		Media: ddiscapi.NewMediaFromDiscovered(result),
-	}); err != nil {
-		return nil, errorsx.Wrap(err, "unable to encode request")
-	}
-
-	if req, err = http.NewRequestWithContext(gctx.Context, http.MethodPost, fmt.Sprintf("https://%s/ddisc/media/", t.Endpoint), bytes.NewReader(encoded)); err != nil {
-		return nil, errorsx.Wrap(err, "unable to create http request")
-	}
-
-	if resp, err = httpx.AsError(cc.Do(req)); err != nil {
-		return nil, errorsx.Wrap(err, "http request failed")
-	}
-
-	if err = httpx.DecodeJSON(resp, &mrsp); err != nil {
-		return nil, errorsx.Wrap(err, "unable to decode response")
+	})
+	if err != nil {
+		return nil, err
 	}
 
 	return mrsp.Media, nil
 }
 
 func (t cmdDiscoveryIdentify) cleanup(gctx *cmdopts.Global, cc *http.Client) (err error) {
-	var (
-		req  *http.Request
-		resp *http.Response
-	)
-
-	if req, err = http.NewRequestWithContext(gctx.Context, http.MethodDelete, fmt.Sprintf("https://%s/ddisc/discovery/%s", t.Endpoint, t.ID), bytes.NewReader(nil)); err != nil {
-		return errorsx.Wrap(err, "unable to create http request")
-	}
-
-	if resp, err = httpx.AsError(cc.Do(req)); err != nil {
-		return errorsx.Wrap(err, "http request failed")
-	}
-
-	return errorsx.Wrap(httpx.DecodeJSON(resp, &ddiscapi.DiscoveryDeleteResponse{}), "unable to decode response")
+	_, err = ddiscapi.DiscoveryDelete(gctx.Context, cc, t.Endpoint, t.ID)
+	return err
 }

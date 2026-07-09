@@ -2,12 +2,10 @@ package cmdddisc
 
 import (
 	"fmt"
-	"net/http"
 
 	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/metaapi"
 )
 
@@ -26,19 +24,9 @@ func (t cmdDiagnostics) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cm
 	c := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(fmt.Sprintf("https://%s", t.Endpoint)), authn.SSHTokenSourceOptionSigner(signer))
 	cc := authn.AuthzClientLibrary(tls.Config(), c, t.Endpoint)
 
-	req, err := http.NewRequestWithContext(gctx.Context, http.MethodGet, fmt.Sprintf("https://%s/diagnostics/discovery/", t.Endpoint), nil)
+	result, err := metaapi.DiscoveryMetrics(gctx.Context, cc, t.Endpoint)
 	if err != nil {
-		return errorsx.Wrap(err, "unable to create http request")
-	}
-
-	resp, err := httpx.AsError(cc.Do(req))
-	if err != nil {
-		return errorsx.Wrap(err, "http request failed")
-	}
-
-	var result metaapi.DiscoveryMetricsResponse
-	if err = httpx.DecodeJSON(resp, &result); err != nil {
-		return errorsx.Wrap(err, "unable to decode response")
+		return err
 	}
 
 	d := result.GetDiscovery()

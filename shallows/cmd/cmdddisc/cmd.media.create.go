@@ -1,11 +1,8 @@
 package cmdddisc
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"log"
-	"net/http"
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/james-lawrence/torrent/metainfo"
@@ -13,7 +10,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 )
 
 type cmdMediaCreate struct {
@@ -27,13 +23,6 @@ type cmdMediaCreate struct {
 }
 
 func (t cmdMediaCreate) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.SSHID) (err error) {
-	var (
-		encoded []byte
-		req     *http.Request
-		resp    *http.Response
-		mrsp    ddiscapi.MediaCreateResponse
-	)
-
 	signer, err := id.Signer()
 	if err != nil {
 		return errorsx.Wrap(err, "failed to create signer")
@@ -47,7 +36,7 @@ func (t cmdMediaCreate) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cm
 		return errorsx.Wrap(err, "failed to parse magnet uri")
 	}
 
-	if encoded, err = json.Marshal(&ddiscapi.MediaCreateRequest{
+	mrsp, err := ddiscapi.MediaCreate(gctx.Context, cc, t.Endpoint, &ddiscapi.MediaCreateRequest{
 		Media: &ddiscapi.Media{
 			Infohash:     m.InfoHash.Bytes(),
 			Title:        t.Title,
@@ -56,20 +45,9 @@ func (t cmdMediaCreate) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cm
 			KnownMediaId: t.KnownMediaID,
 			Partition:    t.Partition,
 		},
-	}); err != nil {
-		return errorsx.Wrap(err, "unable to encode request")
-	}
-
-	if req, err = http.NewRequestWithContext(gctx.Context, http.MethodPost, fmt.Sprintf("https://%s/ddisc/media/", t.Endpoint), bytes.NewReader(encoded)); err != nil {
-		return errorsx.Wrap(err, "unable to create http request")
-	}
-
-	if resp, err = httpx.AsError(cc.Do(req)); err != nil {
-		return errorsx.Wrap(err, "http request failed")
-	}
-
-	if err = httpx.DecodeJSON(resp, &mrsp); err != nil {
-		return errorsx.Wrap(err, "unable to decode response")
+	})
+	if err != nil {
+		return err
 	}
 
 	log.Println("media created", spew.Sdump(mrsp.Media))

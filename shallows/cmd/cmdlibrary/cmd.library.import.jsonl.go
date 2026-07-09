@@ -47,8 +47,7 @@ func (t importJSONL) run(ctx context.Context, c *http.Client, endpoint string, r
 			return err
 		}
 
-		imported++
-		if imported%256 == 0 {
+		if imported++; imported%256 == 0 {
 			log.Println("imported", imported, "records")
 		}
 	}

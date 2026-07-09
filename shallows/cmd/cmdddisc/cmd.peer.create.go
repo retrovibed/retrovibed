@@ -1,19 +1,15 @@
 package cmdddisc
 
 import (
-	"bytes"
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
 	"log"
-	"net/http"
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 )
 
 type cmdPeerCreate struct {
@@ -24,13 +20,6 @@ type cmdPeerCreate struct {
 }
 
 func (t cmdPeerCreate) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.SSHID) (err error) {
-	var (
-		encoded []byte
-		req     *http.Request
-		resp    *http.Response
-		mrsp    ddiscapi.PeerCreateResponse
-	)
-
 	signer, err := id.Signer()
 	if err != nil {
 		return errorsx.Wrap(err, "failed to create signer")
@@ -44,7 +33,7 @@ func (t cmdPeerCreate) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmd
 		return errorsx.Wrap(err, "failed to decode peer id")
 	}
 
-	if encoded, err = json.Marshal(&ddiscapi.PeerCreateRequest{
+	mrsp, err := ddiscapi.PeerCreate(gctx.Context, cc, t.Endpoint, &ddiscapi.PeerCreateRequest{
 		Peer: &ddiscapi.Peer{
 			Infohash:    infohash,
 			Description: t.Name,
@@ -52,20 +41,9 @@ func (t cmdPeerCreate) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmd
 			Ddisc:       true,
 			Bep51:       true,
 		},
-	}); err != nil {
-		return errorsx.Wrap(err, "unable to encode magnet request")
-	}
-
-	if req, err = http.NewRequestWithContext(gctx.Context, http.MethodPost, fmt.Sprintf("https://%s/ddisc/", t.Endpoint), bytes.NewReader(encoded)); err != nil {
-		return errorsx.Wrap(err, "unable to create http request")
-	}
-
-	if resp, err = httpx.AsError(cc.Do(req)); err != nil {
-		return errorsx.Wrap(err, "http request failed")
-	}
-
-	if err = httpx.DecodeJSON(resp, &mrsp); err != nil {
-		return errorsx.Wrap(err, "unable to decode response")
+	})
+	if err != nil {
+		return err
 	}
 
 	log.Println("peered with", spew.Sdump(mrsp.Peer))

@@ -1,11 +1,8 @@
 package cmdddisc
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"log"
-	"net/http"
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/james-lawrence/torrent/metainfo"
@@ -13,7 +10,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 )
 
 type cmdDiscoveryCreate struct {
@@ -22,13 +18,6 @@ type cmdDiscoveryCreate struct {
 }
 
 func (t cmdDiscoveryCreate) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.SSHID) (err error) {
-	var (
-		encoded []byte
-		req     *http.Request
-		resp    *http.Response
-		mrsp    ddiscapi.DiscoveryCreateResponse
-	)
-
 	signer, err := id.Signer()
 	if err != nil {
 		return errorsx.Wrap(err, "failed to create signer")
@@ -42,24 +31,13 @@ func (t cmdDiscoveryCreate) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id
 		return errorsx.Wrap(err, "failed to parse magnet uri")
 	}
 
-	if encoded, err = json.Marshal(&ddiscapi.DiscoveryCreateRequest{
+	mrsp, err := ddiscapi.DiscoveryCreate(gctx.Context, cc, t.Endpoint, &ddiscapi.DiscoveryCreateRequest{
 		Discovery: &ddiscapi.Discovery{
 			Infohash: m.InfoHash.Bytes(),
 		},
-	}); err != nil {
-		return errorsx.Wrap(err, "unable to encode request")
-	}
-
-	if req, err = http.NewRequestWithContext(gctx.Context, http.MethodPost, fmt.Sprintf("https://%s/ddisc/discovery/", t.Endpoint), bytes.NewReader(encoded)); err != nil {
-		return errorsx.Wrap(err, "unable to create http request")
-	}
-
-	if resp, err = httpx.AsError(cc.Do(req)); err != nil {
-		return errorsx.Wrap(err, "http request failed")
-	}
-
-	if err = httpx.DecodeJSON(resp, &mrsp); err != nil {
-		return errorsx.Wrap(err, "unable to decode response")
+	})
+	if err != nil {
+		return err
 	}
 
 	log.Println("discovery entry created", spew.Sdump(mrsp.Discovery))

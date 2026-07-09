@@ -2,16 +2,12 @@ package cmdddisc
 
 import (
 	"fmt"
-	"net/http"
-	"net/url"
 	"time"
 
 	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/formx"
-	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/meta"
 )
@@ -26,13 +22,6 @@ type cmdDiscoveryList struct {
 }
 
 func (t cmdDiscoveryList) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.SSHID) (err error) {
-	var (
-		encoded url.Values
-		req     *http.Request
-		resp    *http.Response
-		result  ddiscapi.DiscoverySearchResponse
-	)
-
 	signer, err := id.Signer()
 	if err != nil {
 		return errorsx.Wrap(err, "failed to create signer")
@@ -41,27 +30,16 @@ func (t cmdDiscoveryList) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *
 	c := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(fmt.Sprintf("https://%s", t.Endpoint)), authn.SSHTokenSourceOptionSigner(signer))
 	cc := authn.AuthzClientLibrary(tls.Config(), c, t.Endpoint)
 
-	if encoded, err = formx.NewEncoder().Encode(&ddiscapi.DiscoverySearchRequest{
+	result, err := ddiscapi.DiscoverySearch(gctx.Context, cc, t.Endpoint, &ddiscapi.DiscoverySearchRequest{
 		NextCheck:   meta.NewDateRange(timex.NewRangeWithin(t.NextCheck)),
 		Id:          t.ID,
 		Offset:      t.Offset,
 		AttemptsMin: t.MinAttempts,
 		AttemptsMax: t.MaxAttempts,
 		Limit:       100,
-	}); err != nil {
-		return errorsx.Wrap(err, "unable to encode request")
-	}
-
-	if req, err = http.NewRequestWithContext(gctx.Context, http.MethodGet, fmt.Sprintf("https://%s/ddisc/discovery/?%s", t.Endpoint, encoded.Encode()), nil); err != nil {
-		return errorsx.Wrap(err, "unable to create http request")
-	}
-
-	if resp, err = httpx.AsError(cc.Do(req)); err != nil {
-		return errorsx.Wrap(err, "http request failed")
-	}
-
-	if err = httpx.DecodeJSON(resp, &result); err != nil {
-		return errorsx.Wrap(err, "unable to decode response")
+	})
+	if err != nil {
+		return err
 	}
 
 	for _, d := range result.Items {

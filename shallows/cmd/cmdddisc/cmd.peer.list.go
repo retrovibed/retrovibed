@@ -9,8 +9,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/formx"
-	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 )
 
 type cmdPeerList struct {
@@ -31,28 +29,11 @@ func (t cmdPeerList) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdop
 }
 
 func (t cmdPeerList) run(ctx context.Context, c *http.Client) (err error) {
-	req := ddiscapi.PeerSearchRequest{
+	result, err := ddiscapi.PeerSearch(ctx, c, t.Endpoint, &ddiscapi.PeerSearchRequest{
 		Query: t.Query,
 		Limit: 100,
-	}
-
-	encoded, err := formx.NewEncoder().Encode(&req)
+	})
 	if err != nil {
-		return errorsx.Wrap(err, "unable to encode request")
-	}
-
-	hreq, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf("https://%s/ddisc/?"+encoded.Encode(), t.Endpoint), nil)
-	if err != nil {
-		return errorsx.Wrap(err, "unable to create request")
-	}
-
-	resp, err := httpx.AsError(c.Do(hreq))
-	if err != nil {
-		return errorsx.Wrap(err, "request failed")
-	}
-
-	var result ddiscapi.PeerSearchResponse
-	if err = httpx.DecodeJSON(resp, &result); err != nil {
 		return err
 	}
 

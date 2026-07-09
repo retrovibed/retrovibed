@@ -2,9 +2,6 @@ package cmdddisc
 
 import (
 	"fmt"
-	"log"
-	"net/http"
-	"net/url"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
@@ -12,8 +9,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/formx"
-	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/meta"
 )
@@ -29,13 +24,6 @@ type cmdMediaLs struct {
 }
 
 func (t cmdMediaLs) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.SSHID) (err error) {
-	var (
-		encoded url.Values
-		req     *http.Request
-		resp    *http.Response
-		result  ddiscapi.MediaSearchResponse
-	)
-
 	signer, err := id.Signer()
 	if err != nil {
 		return errorsx.Wrap(err, "failed to create signer")
@@ -52,28 +40,15 @@ func (t cmdMediaLs) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopt
 		knownMediaID = uuid.Max.String()
 	}
 
-	if encoded, err = formx.NewEncoder().Encode(&ddiscapi.MediaSearchRequest{
+	result, err := ddiscapi.MediaSearch(gctx.Context, cc, t.Endpoint, &ddiscapi.MediaSearchRequest{
 		Query:        t.Query,
 		KnownMediaId: knownMediaID,
 		Id:           t.ID,
 		NextCheck:    meta.NewDateRange(timex.NewRangeWithin(t.NextCheck)),
 		Limit:        100,
-	}); err != nil {
-		return errorsx.Wrap(err, "unable to encode request")
-	}
-
-	log.Println("DERP DERP", encoded.Encode())
-
-	if req, err = http.NewRequestWithContext(gctx.Context, http.MethodGet, fmt.Sprintf("https://%s/ddisc/media/?%s", t.Endpoint, encoded.Encode()), nil); err != nil {
-		return errorsx.Wrap(err, "unable to create http request")
-	}
-
-	if resp, err = httpx.AsError(cc.Do(req)); err != nil {
-		return errorsx.Wrap(err, "http request failed")
-	}
-
-	if err = httpx.DecodeJSON(resp, &result); err != nil {
-		return errorsx.Wrap(err, "unable to decode response")
+	})
+	if err != nil {
+		return err
 	}
 
 	for _, m := range result.Items {
