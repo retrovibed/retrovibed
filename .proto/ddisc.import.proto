@@ -5,4 +5,5 @@ package ddisc;
 message Import {
   string magnet = 1 [ json_name = "magnet" ];
   uint32 health = 2 [ json_name = "health" ];
+  string mimetype = 3 [ json_name = "mimetype" ];
 }

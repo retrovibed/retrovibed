@@ -86,3 +86,53 @@ func DiscoveredByKnownID(
 ) {
 	gql = gql.Query(`SELECT ` + DiscoveredScannerStaticColumns + ` FROM ddisc_media WHERE known_media_id = {kid}`)
 }
+
+func SearchQueue(
+	gql genieql.Structure,
+) {
+	gql.From(
+		gql.Table("ddisc_search_queue"),
+	)
+}
+
+func SearchQueueScanner(
+	gql genieql.Scanner,
+	pattern func(i SearchQueue),
+) {
+	gql.ColumnNamePrefix("ddisc_search_queue.")
+}
+
+// SearchQueueEnqueue records a known_media_id as needing external search
+// plugin discovery. Idempotent: re-enqueuing an already-pending id just
+// touches updated_at.
+func SearchQueueEnqueue(
+	gql genieql.Insert,
+	pattern func(ctx context.Context, q sqlx.Queryer, a SearchQueue) NewSearchQueueScannerStaticRow,
+) {
+	gql.Into("ddisc_search_queue").Default("id", "created_at", "updated_at", "next_check_at", "attempts").Conflict("ON CONFLICT (known_media_id) DO UPDATE SET updated_at = NOW()")
+}
+
+func SearchQueuePending(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer) NewSearchQueueScannerStatic,
+) {
+	gql = gql.Query(`SELECT ` + SearchQueueScannerStaticColumns + ` FROM ddisc_search_queue WHERE next_check_at <= NOW()`)
+}
+
+// SearchQueueResolve removes a known_media_id from the queue once at least
+// one Discovered row has been persisted for it.
+func SearchQueueResolve(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, kid string) NewSearchQueueScannerStaticRow,
+) {
+	gql = gql.Query(`DELETE FROM ddisc_search_queue WHERE "known_media_id" = {kid} RETURNING ` + SearchQueueScannerStaticColumns)
+}
+
+// SearchQueueCooldown bumps attempts and pushes next_check_at out after a
+// drain attempt found nothing, same backoff shape as DiscoveredCooldown.
+func SearchQueueCooldown(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, kid string) NewSearchQueueScannerStaticRow,
+) {
+	gql = gql.Query(`UPDATE ddisc_search_queue SET updated_at = NOW(), attempts = attempts + 1, next_check_at = NOW() + least(to_minutes(CAST(attempts AS INT)*2), to_hours(24)) WHERE "known_media_id" = {kid} RETURNING ` + SearchQueueScannerStaticColumns)
+}
