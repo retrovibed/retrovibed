@@ -573,3 +573,28 @@ type dnsresolver struct {
 func (t dnsresolver) LookupHost(ctx context.Context, host string) (addrs []string, err error) {
 	return t.LookupContextHost(ctx, host)
 }
+
+// PacketDialerAdapter adapts wnet's UDP listening to the
+// ListenPacket(ctx, network, address string) (net.PacketConn, error) shape
+// (e.g. wnetruntime.PacketDialer).
+func PacketDialerAdapter(wnet *netstack.Net) packetdialer {
+	return packetdialer{Net: wnet}
+}
+
+type packetdialer struct {
+	*netstack.Net
+}
+
+func (t packetdialer) ListenPacket(ctx context.Context, network, address string) (net.PacketConn, error) {
+	host, portstr, err := net.SplitHostPort(address)
+	if err != nil {
+		return nil, err
+	}
+
+	port, err := strconv.Atoi(portstr)
+	if err != nil {
+		return nil, err
+	}
+
+	return t.ListenUDP(&net.UDPAddr{IP: net.ParseIP(host), Port: port})
+}

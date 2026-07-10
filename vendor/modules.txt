@@ -422,6 +422,8 @@ github.com/egdaemon/eg/runtime/x/wasi/execx
 github.com/egdaemon/eg/secrets
 # github.com/egdaemon/wasinet/wasinet v0.0.0-20250806175613-49e153bd345a
 ## explicit; go 1.23.4
+# github.com/egdaemon/wasinet/wasinet v0.0.0-20260710014825-eed0f978ee92
+## explicit; go 1.23.4
 github.com/egdaemon/wasinet/wasinet
 github.com/egdaemon/wasinet/wasinet/ffi
 github.com/egdaemon/wasinet/wasinet/ffierrors
@@ -431,7 +433,7 @@ github.com/egdaemon/wasinet/wasinet/internal/langx
 github.com/egdaemon/wasinet/wasinet/stdlib/wasip1net
 github.com/egdaemon/wasinet/wasinet/stdlib/wasip1syscall
 github.com/egdaemon/wasinet/wasinet/wnetruntime
-# github.com/egdaemon/wasinet/wazeronet v0.0.0-20250806175613-49e153bd345a
+# github.com/egdaemon/wasinet/wazeronet v0.0.0-20260710014825-eed0f978ee92
 ## explicit; go 1.23.4
 github.com/egdaemon/wasinet/wazeronet
 # github.com/ericlagergren/decimal v0.0.0-20240411145413-00de7ca16731

@@ -21,7 +21,7 @@ func TestRegistrySearchDecodesPluginOutput(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	r, err := newRegistry(ctx)
+	r, err := newRegistry(ctx, defaultSocket())
 	require.NoError(t, err)
 	require.NoError(t, r.Load(ctx, wasmPath))
 
@@ -56,7 +56,7 @@ func TestRegistrySearchSkipsFailingPluginWithoutAbortingOthers(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	r, err := newRegistry(ctx)
+	r, err := newRegistry(ctx, defaultSocket())
 	require.NoError(t, err)
 	require.NoError(t, r.Load(ctx, echoPath))
 	require.NoError(t, r.Load(ctx, failPath))

@@ -18,7 +18,6 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/netmonx"
-	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
 	"github.com/retrovibed/retrovibed/retroapi/tlsx"
 	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
@@ -310,12 +309,6 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		errorsx.Log(AcousticsBackground(gctx.Context, db, mediaFS))
 	} else {
 		log.Println("*************************************** acoustic indexing is disabled ***************************************")
-	}
-
-	if plugins, err := searchplugin.NewRegistry(gctx.Context); err != nil {
-		errorsx.Log(errorsx.Wrap(err, "unable to start search plugin registry"))
-	} else {
-		errorsx.Log(SearchQueueBackground(gctx.Context, db, plugins))
 	}
 
 	httpmux := mux.NewRouter()

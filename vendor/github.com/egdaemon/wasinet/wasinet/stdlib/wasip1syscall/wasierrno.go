@@ -8,6 +8,7 @@ import (
 )
 
 const (
+	EACCES        syscall.Errno = 0x2
 	EAGAIN        syscall.Errno = 0x6
 	ECANCELED     syscall.Errno = 0xB
 	EDOM          syscall.Errno = 0x12
@@ -28,6 +29,7 @@ const (
 
 var mapped = map[syscall.Errno]syscall.Errno{
 	ffierrors.ErrnoSuccess(): ffierrors.ErrnoSuccess(),
+	syscall.EACCES:           EACCES,
 	syscall.EINPROGRESS:      EINPROGRESS,
 	syscall.ECANCELED:        ECANCELED,
 	syscall.EIO:              EIO,

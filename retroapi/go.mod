@@ -5,6 +5,9 @@ go 1.26.3
 require (
 	github.com/brianvoe/gofakeit/v7 v7.15.0
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
+	github.com/egdaemon/wasinet/wasinet v0.0.0-20260710014825-eed0f978ee92
+	github.com/egdaemon/wasinet/wazeronet v0.0.0-20260710014825-eed0f978ee92
+	github.com/fsnotify/fsnotify v1.10.1
 	github.com/go-playground/form/v4 v4.3.0
 	github.com/gofrs/uuid/v5 v5.4.0
 	github.com/golang-jwt/jwt/v5 v5.3.1
@@ -16,6 +19,7 @@ require (
 	github.com/pkg/profile v1.7.0
 	github.com/porfirion/trie v1.0.0
 	github.com/stretchr/testify v1.11.1
+	github.com/tetratelabs/wazero v1.12.0
 	golang.org/x/crypto v0.53.0
 	golang.org/x/exp v0.0.0-20260603202125-055de637280b
 	golang.org/x/net v0.56.0
@@ -23,13 +27,6 @@ require (
 	golang.org/x/sys v0.46.0
 	golang.org/x/time v0.15.0
 	google.golang.org/protobuf v1.36.11
-)
-
-require (
-	github.com/egdaemon/wasinet/wasinet v0.0.0-20250806175613-49e153bd345a // indirect
-	github.com/egdaemon/wasinet/wazeronet v0.0.0-20250806175613-49e153bd345a // indirect
-	github.com/fsnotify/fsnotify v1.10.1 // indirect
-	github.com/tetratelabs/wazero v1.12.0 // indirect
 )
 
 require (

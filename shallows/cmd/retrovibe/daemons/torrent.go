@@ -26,6 +26,7 @@ import (
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/retrovibed/retrovibed/retroapi/netmonx"
 	retronetx "github.com/retrovibed/retrovibed/retroapi/netx"
+	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
 	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
@@ -539,6 +540,12 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 		})
 	} else {
 		log.Println("auto locate media is disabled, to enable add --auto-locate-media flag.")
+	}
+
+	if plugins, err := searchplugin.NewRegistryWithSocket(dctx, searchPluginSocket(wgnet)); err != nil {
+		errorsx.Log(errorsx.Wrap(err, "unable to start search plugin registry"))
+	} else {
+		errorsx.Log(SearchQueueBackground(dctx, t.db, plugins))
 	}
 
 	if disc.Enabled && disc.Ratio > 0 {

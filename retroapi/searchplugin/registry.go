@@ -2,9 +2,12 @@ package searchplugin
 
 import (
 	"context"
+	"maps"
+	"net"
 	"os"
 	"sync"
 
+	"github.com/egdaemon/wasinet/wasinet/wnetruntime"
 	"github.com/egdaemon/wasinet/wazeronet"
 	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/userx"
@@ -22,12 +25,22 @@ type Registry struct {
 	modules map[string]wazero.CompiledModule
 }
 
-// NewRegistry builds a Registry, wires up WASI + wasinet networking
-// (public addresses only), and starts watching the well-known search.d
-// plugin directory (${vars_user_configuration_directory}/search.d) for
-// changes. There is no configuration surface for any of this.
+// NewRegistry builds a Registry using wasinet's default Virtual socket
+// (public addresses only — plugins never open real kernel sockets, every
+// dial/lookup goes through the host's *net.Dialer/*net.Resolver instead).
+// See NewRegistryWithSocket to substitute a different wnetruntime.Socket.
 func NewRegistry(ctx context.Context) (*Registry, error) {
-	r, err := newRegistry(ctx)
+	return NewRegistryWithSocket(ctx, defaultSocket())
+}
+
+// NewRegistryWithSocket builds a Registry using sock for wasinet's guest
+// networking instead of the default Virtual/PublicFirewall socket — e.g. to
+// route plugin traffic through a different Dialer/Resolver (wireguard,
+// dnscache, a test double) — and starts watching the well-known search.d
+// plugin directory (${vars_user_configuration_directory}/search.d) for
+// changes. There is no other configuration surface.
+func NewRegistryWithSocket(ctx context.Context, sock wnetruntime.Socket) (*Registry, error) {
+	r, err := newRegistry(ctx, sock)
 	if err != nil {
 		return nil, err
 	}
@@ -39,17 +52,21 @@ func NewRegistry(ctx context.Context) (*Registry, error) {
 	return r, nil
 }
 
-// newRegistry builds the wazero runtime + WASI + wasinet wiring without
-// starting the search.d directory watch, so tests can Load plugins directly
-// without touching the real, hardcoded plugin directory.
-func newRegistry(ctx context.Context) (*Registry, error) {
+func defaultSocket() wnetruntime.Socket {
+	return wnetruntime.Virtual(&net.Dialer{}, &net.ListenConfig{}, net.DefaultResolver, wnetruntime.PublicFirewall())
+}
+
+// newRegistry builds the wazero runtime + WASI + wasinet wiring for sock
+// without starting the search.d directory watch, so tests can Load plugins
+// directly without touching the real, hardcoded plugin directory.
+func newRegistry(ctx context.Context, sock wnetruntime.Socket) (*Registry, error) {
 	runtime := wazero.NewRuntime(ctx)
 
 	if _, err := wasi_snapshot_preview1.Instantiate(ctx, runtime); err != nil {
 		return nil, errorsx.Wrap(err, "unable to instantiate wasi")
 	}
 
-	if _, err := wazeronet.Module(runtime, newPublicOnlySocket()).Instantiate(ctx); err != nil {
+	if _, err := wazeronet.Module(runtime, sock).Instantiate(ctx); err != nil {
 		return nil, errorsx.Wrap(err, "unable to instantiate wasinet")
 	}
 
@@ -96,8 +113,6 @@ func (r *Registry) compiled() map[string]wazero.CompiledModule {
 	defer r.mu.RUnlock()
 
 	out := make(map[string]wazero.CompiledModule, len(r.modules))
-	for k, v := range r.modules {
-		out[k] = v
-	}
+	maps.Copy(out, r.modules)
 	return out
 }
