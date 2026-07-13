@@ -8,10 +8,11 @@ import (
 	"errors"
 	"iter"
 	"log"
+	"os"
 
+	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
-	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/tetratelabs/wazero"
 	"github.com/tetratelabs/wazero/sys"
 )
@@ -51,11 +52,18 @@ func (t *searchSeq) Each(ctx context.Context) iter.Seq[*ddiscapi.Import] {
 			wazerofs := wazero.NewFSConfig().WithDirMount(t.r.sslCertDir, guestSSLCertDir)
 			cfg := wazero.NewModuleConfig().
 				WithName(path).
-				WithArgs("plugin", "--category", t.category, "--query", t.query).
+				// argv[0] is the conventional program-name slot every CLI
+				// parser (including kong.Parse, via os.Args[1:]) discards -
+				// "plugin" must come after it to be seen as the subcommand.
+				WithArgs(path, "plugin", "--category", t.category, "--query", t.query).
 				WithEnv("SSL_CERT_DIR", guestSSLCertDir).
 				WithFSConfig(wazerofs).
-				WithStdout(&buf)
+				WithStdout(&buf).
+				WithStderr(os.Stderr).
+				WithSysWalltime().
+				WithSysNanotime()
 
+			log.Println("running search plugin", path)
 			mod, err := t.r.runtime.InstantiateModule(ctx, compiled, cfg)
 			if mod != nil {
 				errorsx.Log(mod.Close(ctx))

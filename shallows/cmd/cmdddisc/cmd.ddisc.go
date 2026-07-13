@@ -36,6 +36,7 @@ type media struct {
 	Query       cmdMediaQuery       `cmd:"" help:"query the DHT directly for media matching a known-media id"`
 	Discover    cmdMediaDiscover    `cmd:"" help:"submit a locate request to a running daemon; it discovers and downloads in the background"`
 	LocateJSONL cmdMediaLocateJSONL `cmd:"" help:"submit locate requests in bulk from a jsonl stream of known-media records (see 'media known duckdb' export format)"`
+	Locate      cmdMediaLocate      `cmd:"" help:"run the full discover/rank/download pipeline locally for a single query, without a running daemon or its API"`
 }
 
 type Commands struct {
