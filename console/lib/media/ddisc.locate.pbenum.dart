@@ -1,6 +1,6 @@
 // This is a generated file - do not edit.
 //
-// Generated from media.locate.proto.
+// Generated from ddisc.locate.proto.
 
 // @dart = 3.3
 

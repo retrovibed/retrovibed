@@ -1,6 +1,6 @@
 // This is a generated file - do not edit.
 //
-// Generated from media.locate.proto.
+// Generated from ddisc.locate.proto.
 
 // @dart = 3.3
 
@@ -24,6 +24,9 @@ class Locate extends $pb.GeneratedMessage {
     $core.String? updatedAt,
     $core.String? knownMediaId,
     $core.String? locatedTorrentId,
+    $core.String? query,
+    $core.String? mimetype,
+    $core.String? tombstonedAt,
   }) {
     final result = create();
     if (id != null) result.id = id;
@@ -31,6 +34,9 @@ class Locate extends $pb.GeneratedMessage {
     if (updatedAt != null) result.updatedAt = updatedAt;
     if (knownMediaId != null) result.knownMediaId = knownMediaId;
     if (locatedTorrentId != null) result.locatedTorrentId = locatedTorrentId;
+    if (query != null) result.query = query;
+    if (mimetype != null) result.mimetype = mimetype;
+    if (tombstonedAt != null) result.tombstonedAt = tombstonedAt;
     return result;
   }
 
@@ -45,13 +51,16 @@ class Locate extends $pb.GeneratedMessage {
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'Locate',
-      package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'ddisc'),
       createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'id')
     ..aOS(2, _omitFieldNames ? '' : 'created_at')
     ..aOS(3, _omitFieldNames ? '' : 'updated_at')
     ..aOS(4, _omitFieldNames ? '' : 'known_media_id')
     ..aOS(5, _omitFieldNames ? '' : 'located_torrent_id')
+    ..aOS(6, _omitFieldNames ? '' : 'query')
+    ..aOS(7, _omitFieldNames ? '' : 'mimetype')
+    ..aOS(8, _omitFieldNames ? '' : 'tombstoned_at')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -116,6 +125,33 @@ class Locate extends $pb.GeneratedMessage {
   $core.bool hasLocatedTorrentId() => $_has(4);
   @$pb.TagNumber(5)
   void clearLocatedTorrentId() => $_clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.String get query => $_getSZ(5);
+  @$pb.TagNumber(6)
+  set query($core.String value) => $_setString(5, value);
+  @$pb.TagNumber(6)
+  $core.bool hasQuery() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearQuery() => $_clearField(6);
+
+  @$pb.TagNumber(7)
+  $core.String get mimetype => $_getSZ(6);
+  @$pb.TagNumber(7)
+  set mimetype($core.String value) => $_setString(6, value);
+  @$pb.TagNumber(7)
+  $core.bool hasMimetype() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearMimetype() => $_clearField(7);
+
+  @$pb.TagNumber(8)
+  $core.String get tombstonedAt => $_getSZ(7);
+  @$pb.TagNumber(8)
+  set tombstonedAt($core.String value) => $_setString(7, value);
+  @$pb.TagNumber(8)
+  $core.bool hasTombstonedAt() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearTombstonedAt() => $_clearField(8);
 }
 
 class LocateSearchRequest extends $pb.GeneratedMessage {
@@ -142,7 +178,7 @@ class LocateSearchRequest extends $pb.GeneratedMessage {
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'LocateSearchRequest',
-      package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'ddisc'),
       createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'query')
     ..a<$fixnum.Int64>(
@@ -221,7 +257,7 @@ class LocateSearchResponse extends $pb.GeneratedMessage {
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'LocateSearchResponse',
-      package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'ddisc'),
       createEmptyInstance: create)
     ..aOM<LocateSearchRequest>(1, _omitFieldNames ? '' : 'next',
         subBuilder: LocateSearchRequest.create)
@@ -262,60 +298,6 @@ class LocateSearchResponse extends $pb.GeneratedMessage {
   $pb.PbList<Locate> get items => $_getList(1);
 }
 
-class LocateMatchRequest extends $pb.GeneratedMessage {
-  factory LocateMatchRequest({
-    $core.String? query,
-  }) {
-    final result = create();
-    if (query != null) result.query = query;
-    return result;
-  }
-
-  LocateMatchRequest._();
-
-  factory LocateMatchRequest.fromBuffer($core.List<$core.int> data,
-          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
-  factory LocateMatchRequest.fromJson($core.String json,
-          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      _omitMessageNames ? '' : 'LocateMatchRequest',
-      package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
-    ..aOS(1, _omitFieldNames ? '' : 'query')
-    ..hasRequiredFields = false;
-
-  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  LocateMatchRequest clone() => deepCopy();
-  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  LocateMatchRequest copyWith(void Function(LocateMatchRequest) updates) =>
-      super.copyWith((message) => updates(message as LocateMatchRequest))
-          as LocateMatchRequest;
-
-  @$core.override
-  $pb.BuilderInfo get info_ => _i;
-
-  @$core.pragma('dart2js:noInline')
-  static LocateMatchRequest create() => LocateMatchRequest._();
-  @$core.override
-  LocateMatchRequest createEmptyInstance() => create();
-  @$core.pragma('dart2js:noInline')
-  static LocateMatchRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<LocateMatchRequest>(create);
-  static LocateMatchRequest? _defaultInstance;
-
-  @$pb.TagNumber(1)
-  $core.String get query => $_getSZ(0);
-  @$pb.TagNumber(1)
-  set query($core.String value) => $_setString(0, value);
-  @$pb.TagNumber(1)
-  $core.bool hasQuery() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearQuery() => $_clearField(1);
-}
-
 class LocateLookupRequest extends $pb.GeneratedMessage {
   factory LocateLookupRequest() => create();
 
@@ -330,7 +312,7 @@ class LocateLookupRequest extends $pb.GeneratedMessage {
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'LocateLookupRequest',
-      package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'ddisc'),
       createEmptyInstance: create)
     ..hasRequiredFields = false;
 
@@ -374,7 +356,7 @@ class LocateLookupResponse extends $pb.GeneratedMessage {
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'LocateLookupResponse',
-      package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'ddisc'),
       createEmptyInstance: create)
     ..aOM<Locate>(1, _omitFieldNames ? '' : 'locate', subBuilder: Locate.create)
     ..hasRequiredFields = false;
@@ -430,7 +412,7 @@ class LocateCreateRequest extends $pb.GeneratedMessage {
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'LocateCreateRequest',
-      package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'ddisc'),
       createEmptyInstance: create)
     ..aOM<Locate>(1, _omitFieldNames ? '' : 'locate', subBuilder: Locate.create)
     ..hasRequiredFields = false;
@@ -486,7 +468,7 @@ class LocateCreateResponse extends $pb.GeneratedMessage {
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'LocateCreateResponse',
-      package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'ddisc'),
       createEmptyInstance: create)
     ..aOM<Locate>(1, _omitFieldNames ? '' : 'locate', subBuilder: Locate.create)
     ..hasRequiredFields = false;

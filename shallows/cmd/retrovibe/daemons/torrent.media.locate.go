@@ -5,7 +5,6 @@ import (
 	"errors"
 	"log"
 
-	"github.com/Masterminds/squirrel"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/int160"
@@ -13,12 +12,12 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/ddisc/ddisctorrent"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
-	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 )
 
-// LocateMedia drains pending library_locate rows: for each, it runs (if dhts
+// LocateMedia drains pending ddisc_locate rows: for each, it runs (if dhts
 // and partitions are non-nil) the DHT partition-swarm peer query, then (if
 // plugins is non-nil) external search plugins to (re)populate ddisc_media,
 // then ranks every candidate already in ddisc_media for that known-media-id
@@ -28,12 +27,9 @@ func LocateMedia(ctx context.Context, db sqlx.Queryer, c *torrent.Client, disc *
 		return nil
 	}
 
-	q := library.KnownSearchBuilder().InnerJoin("library_locate ON library_locate.known_media_id = library_known_media.uid").Where(squirrel.And{
-		library.LocateQueryPending(),
-		library.KnownQueryExplicit(false),
-	})
+	q := ddisc.LocateSearchBuilder().Where(ddisc.LocateQueryPending())
 
-	download := func(r library.Known) (err error) {
+	download := func(loc ddisc.Locate) (err error) {
 		strategies := []ddisc.DiscoverStrategy{}
 		if dhts != nil && partitions != nil {
 			strategies = append(strategies, ddisctorrent.NewPartitionStrategy(dhts, partitions))
@@ -42,7 +38,13 @@ func LocateMedia(ctx context.Context, db sqlx.Queryer, c *torrent.Client, disc *
 			strategies = append(strategies, ddisc.PluginStrategy(db, plugins))
 		}
 
-		seq := ddisc.Discover(ctx, ddisc.DiscoverRequestFromKnown(r), strategies...)
+		req := ddisc.DiscoverRequest{
+			KnownMediaID: loc.KnownMediaID,
+			Title:        loc.Query,
+			Category:     mimex.Category(loc.Mimetype),
+		}
+
+		seq := ddisc.Discover(ctx, req, strategies...)
 		for range seq.Each(ctx) {
 			// draining for persistence side effects only; selection happens below
 		}
@@ -50,7 +52,7 @@ func LocateMedia(ctx context.Context, db sqlx.Queryer, c *torrent.Client, disc *
 			return err
 		}
 
-		d, err := ddisc.RankAndSelect(ctx, db, policy, r.UID)
+		d, err := ddisc.RankAndSelect(ctx, db, policy, loc.KnownMediaID)
 		if errors.Is(err, ddisc.ErrNoCandidate) {
 			return nil
 		} else if err != nil {
@@ -58,7 +60,7 @@ func LocateMedia(ctx context.Context, db sqlx.Queryer, c *torrent.Client, disc *
 		}
 
 		var (
-			l library.Locate
+			l ddisc.Locate
 		)
 		metadata, err := torrent.New(metainfo.Hash(d.Infohash))
 		if err != nil {
@@ -91,22 +93,22 @@ func LocateMedia(ctx context.Context, db sqlx.Queryer, c *torrent.Client, disc *
 		}
 
 		log.Println("marked for download", lmd.ID, lmd.Description)
-		if err = library.LocateMarkTorrent(ctx, db, r.ID, lmd.ID).Scan(&l); err != nil {
-			return errorsx.Wrapf(err, "unable to mark locate torrent %s", r.ID)
+		if err = ddisc.LocateLocated(ctx, db, loc.ID, lmd.ID).Scan(&l); err != nil {
+			return errorsx.Wrapf(err, "unable to mark locate torrent %s", loc.ID)
 		}
 
 		return nil
 	}
 
-	s := sqlx.Scan(library.KnownSearch(ctx, db, q))
+	s := sqlx.Scan(ddisc.LocateSearch(ctx, db, q))
 
-	for r := range s.Iter() {
-		log.Println("locating initiated", r.ID, r.Title)
-		if err := download(r); err != nil {
+	for loc := range s.Iter() {
+		log.Println("locating initiated", loc.ID, loc.Query)
+		if err := download(loc); err != nil {
 			errorsx.Log(err)
 			continue
 		}
-		log.Println("locating completed", r.ID, r.Title)
+		log.Println("locating completed", loc.ID, loc.Query)
 	}
 
 	return s.Err()

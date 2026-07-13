@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package media;
+package ddisc;
 
 message Locate {
   string id = 1 [ json_name = "id" ];
@@ -8,6 +8,9 @@ message Locate {
   string updated_at = 3 [ json_name = "updated_at" ];
   string known_media_id = 4 [ json_name = "known_media_id" ];
   string located_torrent_id = 5 [ json_name = "located_torrent_id" ];
+  string query = 6 [ json_name = "query" ];
+  string mimetype = 7 [ json_name = "mimetype" ];
+  string tombstoned_at = 8 [ json_name = "tombstoned_at" ];
 }
 
 message LocateSearchRequest {
@@ -21,10 +24,6 @@ message LocateSearchRequest {
 message LocateSearchResponse {
   LocateSearchRequest next = 1 [ json_name = "next" ];
   repeated Locate items = 2 [ json_name = "items" ];
-}
-
-message LocateMatchRequest {
-  string query = 1 [ json_name = "query" ];
 }
 
 message LocateLookupRequest {}

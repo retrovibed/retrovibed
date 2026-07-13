@@ -1,4 +1,4 @@
-package media
+package ddiscapi
 
 import (
 	"encoding/json"
@@ -6,10 +6,12 @@ import (
 	"net/http"
 
 	"github.com/go-playground/form/v4"
+	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
 	"github.com/retrovibed/retrovibed/retroapi/httpauth"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
+	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -20,7 +22,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/numericx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
-	"github.com/retrovibed/retrovibed/shallows/library"
 )
 
 type HTTPLocateOption func(*HTTPLocate)
@@ -89,10 +90,10 @@ func (t *HTTPLocate) search(w http.ResponseWriter, r *http.Request) {
 	}
 	msg.Next.Limit = numericx.Min(msg.Next.Limit, 100)
 
-	q := sqlx.Scan(library.LocateSearch(r.Context(), t.q, library.LocateSearchBuilder().OrderBy("id ASC").Offset(msg.Next.Offset*msg.Next.Limit).Limit(msg.Next.Limit)))
+	q := sqlx.Scan(ddisc.LocateSearch(r.Context(), t.q, ddisc.LocateSearchBuilder().OrderBy("id ASC").Offset(msg.Next.Offset*msg.Next.Limit).Limit(msg.Next.Limit)))
 
 	for v := range q.Iter() {
-		tmp := langx.Clone(Locate{}, LocateOptionFromLibraryLocate(langx.Clone(v, timex.JSONSafeEncodeOption)))
+		tmp := langx.Clone(Locate{}, LocateOptionFromDdiscLocate(langx.Clone(v, timex.JSONSafeEncodeOption)))
 		msg.Items = append(msg.Items, &tmp)
 	}
 
@@ -110,11 +111,11 @@ func (t *HTTPLocate) search(w http.ResponseWriter, r *http.Request) {
 
 func (t *HTTPLocate) find(w http.ResponseWriter, r *http.Request) {
 	var (
-		meta library.Locate
+		meta ddisc.Locate
 		id   = mux.Vars(r)["id"]
 	)
 
-	if err := library.LocateFindByID(r.Context(), t.q, id).Scan(&meta); sqlx.ErrNoRows(err) != nil {
+	if err := ddisc.LocateFindByID(r.Context(), t.q, id).Scan(&meta); sqlx.ErrNoRows(err) != nil {
 		log.Println(errorsx.Wrap(err, "unable to find metadata"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
 		return
@@ -128,7 +129,7 @@ func (t *HTTPLocate) find(w http.ResponseWriter, r *http.Request) {
 		Locate: new(
 			langx.Clone(
 				Locate{},
-				LocateOptionFromLibraryLocate(langx.Clone(meta, timex.JSONSafeEncodeOption)),
+				LocateOptionFromDdiscLocate(langx.Clone(meta, timex.JSONSafeEncodeOption)),
 			),
 		),
 	}); err != nil {
@@ -140,7 +141,7 @@ func (t *HTTPLocate) find(w http.ResponseWriter, r *http.Request) {
 func (t *HTTPLocate) create(w http.ResponseWriter, r *http.Request) {
 	var (
 		err error
-		d   library.Locate
+		d   ddisc.Locate
 		msg LocateCreateRequest
 	)
 
@@ -150,13 +151,15 @@ func (t *HTTPLocate) create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if d, err = NewLibraryLocateFromLocate(msg.Locate); err != nil {
+	if d, err = NewDdiscLocateFromLocate(msg.Locate); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to decode request"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 
-	if err := library.LocateInsertWithDefaults(r.Context(), t.q, d).Scan(&d); err != nil {
+	d = ddisc.NewLocate(d.Query, d.Mimetype, ddisc.LocateOptionKnownMedia(langx.FirstNonZero(d.KnownMediaID, uuid.Nil.String())))
+
+	if err := ddisc.LocateInsertWithDefaults(r.Context(), t.q, d).Scan(&d); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to create locate record"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
@@ -166,7 +169,7 @@ func (t *HTTPLocate) create(w http.ResponseWriter, r *http.Request) {
 		Locate: new(
 			langx.Clone(
 				Locate{},
-				LocateOptionFromLibraryLocate(langx.Clone(d, timex.JSONSafeEncodeOption)),
+				LocateOptionFromDdiscLocate(langx.Clone(d, timex.JSONSafeEncodeOption)),
 			),
 		),
 	}); err != nil {

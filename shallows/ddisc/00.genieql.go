@@ -97,6 +97,53 @@ func DiscoveredRank(
 	gql = gql.Query(`UPDATE ddisc_media SET updated_at = NOW(), health = {health}, policy_rank = {rank}, policy_rejection = {rejection} WHERE "id" = {id} RETURNING ` + DiscoveredScannerStaticColumns)
 }
 
+func Locate(
+	gql genieql.Structure,
+) {
+	gql.From(
+		gql.Table("ddisc_locate"),
+	)
+}
+
+func LocateScanner(
+	gql genieql.Scanner,
+	pattern func(i Locate),
+) {
+	gql.ColumnNamePrefix("ddisc_locate.")
+}
+
+func LocateInsertWithDefaults(
+	gql genieql.Insert,
+	pattern func(ctx context.Context, q sqlx.Queryer, a Locate) NewLocateScannerStaticRow,
+) {
+	gql.Into("ddisc_locate").Default("created_at", "updated_at", "tombstoned_at", "located_torrent_id").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = NOW()")
+}
+
+func LocateFindByID(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewLocateScannerStaticRow,
+) {
+	gql = gql.Query(`SELECT ` + LocateScannerStaticColumns + ` FROM ddisc_locate WHERE "id" = {id}`)
+}
+
+// LocateLocated records which torrent was picked for this request. Does not
+// close the request out - a better candidate may still show up later.
+func LocateLocated(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, id, tid string) NewLocateScannerStaticRow,
+) {
+	gql = gql.Query(`UPDATE ddisc_locate SET updated_at = NOW(), located_torrent_id = {tid} WHERE "id" = {id} RETURNING ` + LocateScannerStaticColumns)
+}
+
+// LocateCompleted tombstones the request once its located torrent has
+// actually finished downloading (not merely been picked/initiated).
+func LocateCompleted(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewLocateScannerStaticRow,
+) {
+	gql = gql.Query(`UPDATE ddisc_locate SET updated_at = NOW(), tombstoned_at = NOW() WHERE "id" = {id} RETURNING ` + LocateScannerStaticColumns)
+}
+
 func SearchQueue(
 	gql genieql.Structure,
 ) {

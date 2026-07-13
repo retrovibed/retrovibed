@@ -217,38 +217,6 @@ func KnownBestMatch(
 	gql = gql.Query(`WITH scored AS (SELECT uid, {terms} as q, (jaro_winkler_similarity(title, q, {cutoff}) + jaro_similarity(title, q, {cutoff})) / 2 AS relevance FROM library_known_media WHERE NOT adult AND ({mime} = '' OR mimetype = {mime}) ORDER BY relevance DESC) SELECT ` + KnownScannerStaticColumns + ` FROM library_known_media INNER JOIN scored ON library_known_media.uid = scored.uid WHERE scored.relevance > {cutoff} ORDER BY scored.relevance DESC`)
 }
 
-func Locate(gql genieql.Structure) {
-	gql.From(
-		gql.Table("library_locate"),
-	)
-}
-
-func LocateScanner(gql genieql.Scanner, pattern func(i Locate)) {
-	gql.ColumnNamePrefix("library_locate.")
-}
-
-// handle inserting duplicated known_media_id records
-func LocateInsertWithDefaults(
-	gql genieql.Insert,
-	pattern func(ctx context.Context, q sqlx.Queryer, a Locate) NewLocateScannerStaticRow,
-) {
-	gql.Into("library_locate").Default("id", "created_at", "updated_at", "located_torrent_id").Conflict("ON CONFLICT (known_media_id) DO UPDATE SET updated_at = NOW()")
-}
-
-func LocateFindByID(
-	gql genieql.Function,
-	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewLocateScannerStaticRow,
-) {
-	gql = gql.Query(`SELECT ` + LocateScannerStaticColumns + ` FROM library_locate WHERE "id" = {id}`)
-}
-
-func LocateMarkTorrent(
-	gql genieql.Function,
-	pattern func(ctx context.Context, q sqlx.Queryer, kid, tid string) NewLocateScannerStaticRow,
-) {
-	gql = gql.Query(`UPDATE library_locate SET located_torrent_id = {tid} WHERE "known_media_id" = {kid} RETURNING ` + LocateScannerStaticColumns)
-}
-
 func RecentSession(gql genieql.Structure) {
 	gql.From(
 		gql.Table("library_recent_sessions"),

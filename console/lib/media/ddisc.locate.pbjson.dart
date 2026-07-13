@@ -1,6 +1,6 @@
 // This is a generated file - do not edit.
 //
-// Generated from media.locate.proto.
+// Generated from ddisc.locate.proto.
 
 // @dart = 3.3
 
@@ -30,6 +30,9 @@ const Locate$json = {
       '5': 9,
       '10': 'located_torrent_id'
     },
+    {'1': 'query', '3': 6, '4': 1, '5': 9, '10': 'query'},
+    {'1': 'mimetype', '3': 7, '4': 1, '5': 9, '10': 'mimetype'},
+    {'1': 'tombstoned_at', '3': 8, '4': 1, '5': 9, '10': 'tombstoned_at'},
   ],
 };
 
@@ -38,7 +41,8 @@ final $typed_data.Uint8List locateDescriptor = $convert.base64Decode(
     'CgZMb2NhdGUSDgoCaWQYASABKAlSAmlkEh4KCmNyZWF0ZWRfYXQYAiABKAlSCmNyZWF0ZWRfYX'
     'QSHgoKdXBkYXRlZF9hdBgDIAEoCVIKdXBkYXRlZF9hdBImCg5rbm93bl9tZWRpYV9pZBgEIAEo'
     'CVIOa25vd25fbWVkaWFfaWQSLgoSbG9jYXRlZF90b3JyZW50X2lkGAUgASgJUhJsb2NhdGVkX3'
-    'RvcnJlbnRfaWQ=');
+    'RvcnJlbnRfaWQSFAoFcXVlcnkYBiABKAlSBXF1ZXJ5EhoKCG1pbWV0eXBlGAcgASgJUghtaW1l'
+    'dHlwZRIkCg10b21ic3RvbmVkX2F0GAggASgJUg10b21ic3RvbmVkX2F0');
 
 @$core.Deprecated('Use locateSearchRequestDescriptor instead')
 const LocateSearchRequest$json = {
@@ -68,7 +72,7 @@ const LocateSearchResponse$json = {
       '3': 1,
       '4': 1,
       '5': 11,
-      '6': '.media.LocateSearchRequest',
+      '6': '.ddisc.LocateSearchRequest',
       '10': 'next'
     },
     {
@@ -76,7 +80,7 @@ const LocateSearchResponse$json = {
       '3': 2,
       '4': 3,
       '5': 11,
-      '6': '.media.Locate',
+      '6': '.ddisc.Locate',
       '10': 'items'
     },
   ],
@@ -84,20 +88,8 @@ const LocateSearchResponse$json = {
 
 /// Descriptor for `LocateSearchResponse`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List locateSearchResponseDescriptor = $convert.base64Decode(
-    'ChRMb2NhdGVTZWFyY2hSZXNwb25zZRIuCgRuZXh0GAEgASgLMhoubWVkaWEuTG9jYXRlU2Vhcm'
-    'NoUmVxdWVzdFIEbmV4dBIjCgVpdGVtcxgCIAMoCzINLm1lZGlhLkxvY2F0ZVIFaXRlbXM=');
-
-@$core.Deprecated('Use locateMatchRequestDescriptor instead')
-const LocateMatchRequest$json = {
-  '1': 'LocateMatchRequest',
-  '2': [
-    {'1': 'query', '3': 1, '4': 1, '5': 9, '10': 'query'},
-  ],
-};
-
-/// Descriptor for `LocateMatchRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List locateMatchRequestDescriptor = $convert
-    .base64Decode('ChJMb2NhdGVNYXRjaFJlcXVlc3QSFAoFcXVlcnkYASABKAlSBXF1ZXJ5');
+    'ChRMb2NhdGVTZWFyY2hSZXNwb25zZRIuCgRuZXh0GAEgASgLMhouZGRpc2MuTG9jYXRlU2Vhcm'
+    'NoUmVxdWVzdFIEbmV4dBIjCgVpdGVtcxgCIAMoCzINLmRkaXNjLkxvY2F0ZVIFaXRlbXM=');
 
 @$core.Deprecated('Use locateLookupRequestDescriptor instead')
 const LocateLookupRequest$json = {
@@ -117,7 +109,7 @@ const LocateLookupResponse$json = {
       '3': 1,
       '4': 1,
       '5': 11,
-      '6': '.media.Locate',
+      '6': '.ddisc.Locate',
       '10': 'locate'
     },
   ],
@@ -125,7 +117,7 @@ const LocateLookupResponse$json = {
 
 /// Descriptor for `LocateLookupResponse`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List locateLookupResponseDescriptor = $convert.base64Decode(
-    'ChRMb2NhdGVMb29rdXBSZXNwb25zZRIlCgZsb2NhdGUYASABKAsyDS5tZWRpYS5Mb2NhdGVSBm'
+    'ChRMb2NhdGVMb29rdXBSZXNwb25zZRIlCgZsb2NhdGUYASABKAsyDS5kZGlzYy5Mb2NhdGVSBm'
     'xvY2F0ZQ==');
 
 @$core.Deprecated('Use locateCreateRequestDescriptor instead')
@@ -137,7 +129,7 @@ const LocateCreateRequest$json = {
       '3': 1,
       '4': 1,
       '5': 11,
-      '6': '.media.Locate',
+      '6': '.ddisc.Locate',
       '10': 'locate'
     },
   ],
@@ -145,7 +137,7 @@ const LocateCreateRequest$json = {
 
 /// Descriptor for `LocateCreateRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List locateCreateRequestDescriptor = $convert.base64Decode(
-    'ChNMb2NhdGVDcmVhdGVSZXF1ZXN0EiUKBmxvY2F0ZRgBIAEoCzINLm1lZGlhLkxvY2F0ZVIGbG'
+    'ChNMb2NhdGVDcmVhdGVSZXF1ZXN0EiUKBmxvY2F0ZRgBIAEoCzINLmRkaXNjLkxvY2F0ZVIGbG'
     '9jYXRl');
 
 @$core.Deprecated('Use locateCreateResponseDescriptor instead')
@@ -157,7 +149,7 @@ const LocateCreateResponse$json = {
       '3': 1,
       '4': 1,
       '5': 11,
-      '6': '.media.Locate',
+      '6': '.ddisc.Locate',
       '10': 'locate'
     },
   ],
@@ -165,5 +157,5 @@ const LocateCreateResponse$json = {
 
 /// Descriptor for `LocateCreateResponse`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List locateCreateResponseDescriptor = $convert.base64Decode(
-    'ChRMb2NhdGVDcmVhdGVSZXNwb25zZRIlCgZsb2NhdGUYASABKAsyDS5tZWRpYS5Mb2NhdGVSBm'
+    'ChRMb2NhdGVDcmVhdGVSZXNwb25zZRIlCgZsb2NhdGUYASABKAsyDS5kZGlzYy5Mb2NhdGVSBm'
     'xvY2F0ZQ==');

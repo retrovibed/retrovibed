@@ -544,8 +544,10 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 
 	// TODO: AutoLocateMedia should be located within distributed indexing.
 	if cfg.AutoLocateMedia {
+		// const freq = 15 * time.Minute
+		const freq = time.Minute
 		policy := ddisc.DefaultPolicy()
-		go timex.NowAndEvery(dctx, 15*time.Minute, func(ctx context.Context) error {
+		go timex.NowAndEvery(dctx, freq, func(ctx context.Context) error {
 			errorsx.Log(LocateMedia(dctx, t.db, tclient, disc, dhts, partitions, plugins, policy))
 			return nil
 		})

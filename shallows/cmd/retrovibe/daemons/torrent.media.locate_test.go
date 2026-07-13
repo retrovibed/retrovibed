@@ -25,14 +25,14 @@ func TestMediaLocate(t *testing.T) {
 	t.Run("should be able to locate and create torrent metadata from distributed discovery", func(t *testing.T) {
 		var (
 			k library.Known
-			l library.Locate
+			l ddisc.Locate
 			d ddisc.Discovered
 		)
 		q := sqltestx.Metadatabase(t)
 
 		require.NoError(t, testx.Fake(&k, library.KnownOptionTestDefaults))
 		require.NoError(t, library.KnownInsertWithDefaults(t.Context(), q, k).Scan(&k))
-		require.NoError(t, library.LocateInsertWithDefaults(t.Context(), q, library.Locate{KnownMediaID: k.UID}).Scan(&l))
+		require.NoError(t, ddisc.LocateInsertWithDefaults(t.Context(), q, ddisc.NewLocate(k.Title, mimex.Binary, ddisc.LocateOptionKnownMedia(k.UID))).Scan(&l))
 
 		seedir := t.TempDir()
 		mcache := torrent.NewMetadataCache(seedir)
@@ -73,14 +73,14 @@ func TestMediaLocate(t *testing.T) {
 	t.Run("should not query ddisc when p2p locate is disabled", func(t *testing.T) {
 		var (
 			k library.Known
-			l library.Locate
+			l ddisc.Locate
 			d ddisc.Discovered
 		)
 		q := sqltestx.Metadatabase(t)
 
 		require.NoError(t, testx.Fake(&k, library.KnownOptionTestDefaults))
 		require.NoError(t, library.KnownInsertWithDefaults(t.Context(), q, k).Scan(&k))
-		require.NoError(t, library.LocateInsertWithDefaults(t.Context(), q, library.Locate{KnownMediaID: k.UID}).Scan(&l))
+		require.NoError(t, ddisc.LocateInsertWithDefaults(t.Context(), q, ddisc.NewLocate(k.Title, mimex.Binary, ddisc.LocateOptionKnownMedia(k.UID))).Scan(&l))
 
 		seedir := t.TempDir()
 		mcache := torrent.NewMetadataCache(seedir)

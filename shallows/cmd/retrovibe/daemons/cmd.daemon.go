@@ -368,9 +368,9 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	ddiscapi.NewHTTPPeerManagement(db).Bind(httpmux.PathPrefix("/ddisc").Subrouter())
 	ddiscapi.NewHTTPDiscovery(db).Bind(httpmux.PathPrefix("/ddisc/discovery").Subrouter())
 	ddiscapi.NewHTTPMedia(db).Bind(httpmux.PathPrefix("/ddisc/media").Subrouter())
+	ddiscapi.NewHTTPLocate(db).Bind(httpmux.PathPrefix("/l").Subrouter())
 	media.NewHTTPRSSFeed(db).Bind(httpmux.PathPrefix("/rss").Subrouter())
 	media.NewHTTPKnown(db).Bind(httpmux.PathPrefix("/k").Subrouter())
-	media.NewHTTPLocate(db).Bind(httpmux.PathPrefix("/l").Subrouter())
 
 	metaapi.NewHTTPFileConfig(vpncfgpath).Bind(httpmux.PathPrefix("/s/wireguard").Subrouter())
 	metaapi.NewHTTPFileConfig(torrenting.cfgpath).Bind(httpmux.PathPrefix("/s/torrents").Subrouter())
