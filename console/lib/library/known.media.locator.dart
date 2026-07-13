@@ -16,7 +16,7 @@ class KnownMediaLocator extends StatefulWidget {
     this.current, {
     super.key,
     this.locate = api.locate.create,
-    this.icon = Icons.search,
+    this.icon = Icons.download_rounded,
     this.help = ds.HelpScope.None,
     this.trailing,
   });
@@ -26,6 +26,7 @@ class KnownMediaLocator extends StatefulWidget {
 }
 
 class _KnownMediaLocator extends State<KnownMediaLocator> {
+  bool _queued = false;
   bool _loading = false;
   Widget _cause = ds.Error.zero;
 
@@ -51,8 +52,10 @@ class _KnownMediaLocator extends State<KnownMediaLocator> {
           api.Locate.create()..knownMediaId = widget.current.id,
           options: [authn.request(authn.AuthzCache.meta(context))],
         )
-        .then((_) {
+        .then((v) {
+          print("located ${v}");
           setState(() {
+            _queued = true;
             _loading = false;
           });
         })
@@ -71,9 +74,9 @@ class _KnownMediaLocator extends State<KnownMediaLocator> {
       cause: _cause,
       KnownMediaCard(
         widget.current,
-        icon: widget.icon,
+        icon: _queued ? Icons.query_builder_rounded : widget.icon,
         help: widget.help,
-        onTap: _loading ? null : _onTap,
+        onTap: _loading || _queued ? null : _onTap,
         trailing: widget.trailing,
       ),
     );
