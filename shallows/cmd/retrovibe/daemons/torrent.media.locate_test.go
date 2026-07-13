@@ -56,7 +56,7 @@ func TestMediaLocate(t *testing.T) {
 
 		d = ddisc.NewDiscovered(
 			&id,
-			ddisc.DiscoveredOptionIndex(true),
+			ddisc.DiscoveredOptionKnownMedia(k.UID),
 			ddisc.DiscoveredOptionMimetype(mimex.Binary),
 			ddisc.DiscoveredOptionFromTorrentInfo(info),
 		)
@@ -65,7 +65,7 @@ func TestMediaLocate(t *testing.T) {
 
 		require.Equal(t, 0, testx.Must(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM torrents_metadata"))(t))
 
-		require.NoError(t, daemons.LocateMedia(t.Context(), q, tclient, &daemons.DiscoverySettings{LocateP2P: true}))
+		require.NoError(t, daemons.LocateMedia(t.Context(), q, tclient, &daemons.DiscoverySettings{LocateP2P: true}, nil, nil, nil, ddisc.DefaultPolicy()))
 
 		require.Equal(t, 1, testx.Must(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM torrents_metadata WHERE initiated_at <= NOW()"))(t))
 	})
@@ -108,7 +108,7 @@ func TestMediaLocate(t *testing.T) {
 
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(t.Context(), q, d).Scan(&d))
 
-		require.NoError(t, daemons.LocateMedia(t.Context(), q, tclient, &daemons.DiscoverySettings{LocateP2P: false}))
+		require.NoError(t, daemons.LocateMedia(t.Context(), q, tclient, &daemons.DiscoverySettings{LocateP2P: false}, nil, nil, nil, ddisc.DefaultPolicy()))
 
 		require.Equal(t, 0, testx.Must(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM torrents_metadata"))(t))
 	})

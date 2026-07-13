@@ -156,7 +156,7 @@ func (t *HTTPLocate) create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := library.LocateInsertWithDefaults2(r.Context(), t.q, d).Scan(&d); err != nil {
+	if err := library.LocateInsertWithDefaults(r.Context(), t.q, d).Scan(&d); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to create locate record"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return

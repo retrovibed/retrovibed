@@ -227,15 +227,8 @@ func LocateScanner(gql genieql.Scanner, pattern func(i Locate)) {
 	gql.ColumnNamePrefix("library_locate.")
 }
 
-func LocateInsertWithDefaults(
-	gql genieql.Insert,
-	pattern func(ctx context.Context, q sqlx.Queryer, a Locate) NewLocateScannerStaticRow,
-) {
-	gql.Into("library_locate").Default("id", "created_at", "updated_at", "located_torrent_id").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = NOW()")
-}
-
 // handle inserting duplicated known_media_id records
-func LocateInsertWithDefaults2(
+func LocateInsertWithDefaults(
 	gql genieql.Insert,
 	pattern func(ctx context.Context, q sqlx.Queryer, a Locate) NewLocateScannerStaticRow,
 ) {

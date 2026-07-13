@@ -29,7 +29,7 @@ func DiscoveredInsertWithDefaults(
 	gql genieql.Insert,
 	pattern func(ctx context.Context, q sqlx.Queryer, a Discovered) NewDiscoveredScannerStaticRow,
 ) {
-	gql.Into("ddisc_media").Default("created_at", "updated_at", "tombstoned_at", "released_at", "next_check_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT")
+	gql.Into("ddisc_media").Default("created_at", "updated_at", "tombstoned_at", "released_at", "next_check_at", "policy_rank", "policy_rejection").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT")
 }
 
 func DiscoveredFindByID(
@@ -64,7 +64,7 @@ func DiscoveredCooldown(
 	gql genieql.Insert,
 	pattern func(ctx context.Context, q sqlx.Queryer, a Discovered) NewDiscoveredScannerStaticRow,
 ) {
-	gql.Into("ddisc_media").Default("created_at", "updated_at", "tombstoned_at", "released_at", "next_check_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, attempts = EXCLUDED.attempts + 1, next_check_at = NOW() + least(to_minutes(CAST(EXCLUDED.attempts AS INT)*2), to_hours(24))")
+	gql.Into("ddisc_media").Default("created_at", "updated_at", "tombstoned_at", "released_at", "next_check_at", "policy_rank", "policy_rejection").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, attempts = EXCLUDED.attempts + 1, next_check_at = NOW() + least(to_minutes(CAST(EXCLUDED.attempts AS INT)*2), to_hours(24))")
 }
 
 func DiscoveredSinceSync(
@@ -86,6 +86,15 @@ func DiscoveredByKnownID(
 	pattern func(ctx context.Context, q sqlx.Queryer, kid string) NewDiscoveredScannerStatic,
 ) {
 	gql = gql.Query(`SELECT ` + DiscoveredScannerStaticColumns + ` FROM ddisc_media WHERE known_media_id = {kid}`)
+}
+
+// DiscoveredRank persists the result of running a ranking Policy against a
+// Discovered row: its computed health, policy_rank, and policy_rejection.
+func DiscoveredRank(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string, health uint32, rank uint16, rejection string) NewDiscoveredScannerStaticRow,
+) {
+	gql = gql.Query(`UPDATE ddisc_media SET updated_at = NOW(), health = {health}, policy_rank = {rank}, policy_rejection = {rejection} WHERE "id" = {id} RETURNING ` + DiscoveredScannerStaticColumns)
 }
 
 func SearchQueue(

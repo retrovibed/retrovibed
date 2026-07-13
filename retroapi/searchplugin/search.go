@@ -16,6 +16,11 @@ import (
 	"github.com/tetratelabs/wazero/sys"
 )
 
+// guestSSLCertDir is where each plugin invocation's TLS trust store is
+// mounted inside the guest — matched by the SSL_CERT_DIR env var so the
+// guest's crypto/x509 can find it.
+const guestSSLCertDir = "/etc/ssl/certs"
+
 // Search runs every loaded plugin as a WASI command with
 // --category category --query query, decoding each line of its stdout as a
 // *ddiscapi.Import and yielding it. One plugin's failure is logged and
@@ -43,9 +48,12 @@ func (t *searchSeq) Each(ctx context.Context) iter.Seq[*ddiscapi.Import] {
 			}
 
 			var buf bytes.Buffer
+			wazerofs := wazero.NewFSConfig().WithDirMount(t.r.sslCertDir, guestSSLCertDir)
 			cfg := wazero.NewModuleConfig().
 				WithName(path).
 				WithArgs("plugin", "--category", t.category, "--query", t.query).
+				WithEnv("SSL_CERT_DIR", guestSSLCertDir).
+				WithFSConfig(wazerofs).
 				WithStdout(&buf)
 
 			mod, err := t.r.runtime.InstantiateModule(ctx, compiled, cfg)

@@ -32,7 +32,7 @@ type fakeSearchPlugins struct {
 }
 
 func (t fakeSearchPlugins) Search(ctx context.Context, category, query string) iterx.Seq[*ddiscapi.Import] {
-	return fakeResultSeq{results: t.results}
+	return fakeResultSeq(t)
 }
 
 func TestSearchQueueBackgroundRunPersistsFoundResults(t *testing.T) {

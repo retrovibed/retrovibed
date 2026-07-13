@@ -532,19 +532,28 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 		return errorsx.Wrap(err, "unable to setup torrent client")
 	}
 
+	// plugins is left as a true nil searchPlugins interface on failure —
+	// not a typed-nil *searchplugin.Registry — so downstream `!= nil`
+	// checks (LocateMedia, SearchQueueBackground) behave correctly.
+	var plugins searchPlugins
+	if reg, err := searchplugin.NewRegistryWithSocket(dctx, searchPluginSocket(wgnet)); err != nil {
+		errorsx.Log(errorsx.Wrap(err, "unable to start search plugin registry"))
+	} else {
+		plugins = reg
+	}
+
 	// TODO: AutoLocateMedia should be located within distributed indexing.
 	if cfg.AutoLocateMedia {
+		policy := ddisc.DefaultPolicy()
 		go timex.NowAndEvery(dctx, 15*time.Minute, func(ctx context.Context) error {
-			errorsx.Log(LocateMedia(dctx, t.db, tclient, disc))
+			errorsx.Log(LocateMedia(dctx, t.db, tclient, disc, dhts, partitions, plugins, policy))
 			return nil
 		})
 	} else {
 		log.Println("auto locate media is disabled, to enable add --auto-locate-media flag.")
 	}
 
-	if plugins, err := searchplugin.NewRegistryWithSocket(dctx, searchPluginSocket(wgnet)); err != nil {
-		errorsx.Log(errorsx.Wrap(err, "unable to start search plugin registry"))
-	} else {
+	if plugins != nil {
 		errorsx.Log(SearchQueueBackground(dctx, t.db, plugins))
 	}
 

@@ -29,10 +29,11 @@ type discovery struct {
 // go -C shallows run ./cmd/retrovibe/... discovery media delete --insecure --library="eg:9998" --id="<id from ls>"
 // go -C shallows run ./cmd/retrovibe/... discovery media query "<known media id>" "127.0.0.1:3196"
 type media struct {
-	Ls     cmdMediaLs     `cmd:"" help:"list/search discovered media on a library"`
-	Create cmdMediaCreate `cmd:"" help:"create a discovered media record on a library"`
-	Delete cmdMediaDelete `cmd:"" help:"remove a discovered media record from a library"`
-	Query  cmdMediaQuery  `cmd:"" help:"query the DHT directly for media matching a known-media id"`
+	Ls       cmdMediaLs       `cmd:"" help:"list/search discovered media on a library"`
+	Create   cmdMediaCreate   `cmd:"" help:"create a discovered media record on a library"`
+	Delete   cmdMediaDelete   `cmd:"" help:"remove a discovered media record from a library"`
+	Query    cmdMediaQuery    `cmd:"" help:"query the DHT directly for media matching a known-media id"`
+	Discover cmdMediaDiscover `cmd:"" help:"run the full local/partition/plugin discovery chain for a known-media-id"`
 }
 
 type Commands struct {

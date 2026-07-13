@@ -10,6 +10,8 @@ import (
 	"github.com/egdaemon/wasinet/wasinet/wnetruntime"
 	"github.com/egdaemon/wasinet/wazeronet"
 	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/fsx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/langx"
 	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/tetratelabs/wazero"
 	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
@@ -20,6 +22,11 @@ import (
 // only happens once per plugin, when the directory watcher reports it.
 type Registry struct {
 	runtime wazero.Runtime
+	// sslCertDir is the host's real (symlink-resolved) TLS trust store
+	// directory, mounted read-only into every plugin invocation so guest
+	// TLS verification (system cert lookup via SSL_CERT_DIR) works —
+	// wasip1 has no trust store of its own.
+	sslCertDir string
 
 	mu      sync.RWMutex
 	modules map[string]wazero.CompiledModule
@@ -72,6 +79,10 @@ func newRegistry(ctx context.Context, sock wnetruntime.Socket) (*Registry, error
 
 	return &Registry{
 		runtime: runtime,
+		sslCertDir: langx.FirstNonZero(
+			fsx.LocatePhysicalPath("/etc/ssl/certs", "/etc/pki/tls/certs", "/usr/share/ca-certificates"),
+			"/etc/ssl/certs",
+		),
 		modules: map[string]wazero.CompiledModule{},
 	}, nil
 }

@@ -2,12 +2,9 @@ package daemons
 
 import (
 	"context"
-	"errors"
 	"log"
 	"time"
 
-	"github.com/james-lawrence/torrent/dht/int160"
-	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
@@ -15,13 +12,11 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/backoffx"
 	"github.com/retrovibed/retrovibed/shallows/internal/contextx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/langx"
-	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 )
 
-// searchPlugins is the narrow interface SearchQueueBackgroundRun needs from
+// searchPlugins is the narrow interface needed from
 // *retroapi/searchplugin.Registry, so tests can inject a fake without a real
 // compiled wasm plugin.
 type searchPlugins interface {
@@ -46,30 +41,23 @@ func SearchQueueBackgroundRun(ctx context.Context, q sqlx.Queryer, plugins searc
 		}
 
 		sctx, cancel := context.WithTimeout(ctx, 30*time.Second)
-		seq := iterx.NotFound(plugins.Search(sctx, mimex.Category(known.Mimetype), known.Title))
-		for r := range seq.Each(sctx) {
-			m, err := metainfo.ParseMagnetURI(r.Magnet)
-			if err != nil {
-				errorsx.Log(err)
-				continue
-			}
-			d := ddisc.NewDiscoveredFromKnown(
-				int160.FromBytes(m.InfoHash.Bytes()),
-				known,
-				ddisc.DiscoveredOptionMimetype(langx.FirstNonZero(r.Mimetype, known.Mimetype)),
-			)
-			errorsx.Log(ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
+		seq := ddisc.Discover(sctx, ddisc.DiscoverRequestFromKnown(known), ddisc.PluginStrategy(q, plugins))
+
+		found := false
+		for range seq.Each(sctx) {
+			found = true
 		}
+		err := seq.Err()
 		cancel()
 
-		// TODO: I dont think we care *what* error occurs here.
-		// we should cool down on any error.
-		if err := seq.Err(); errors.Is(err, iterx.ErrNotFound) {
-			log.Println("search queue: no candidates found", entry.KnownMediaID, known.Title)
-			errorsx.Log(ddisc.SearchQueueCooldown(ctx, q, entry.KnownMediaID).Scan(&entry))
-			continue
-		} else if err != nil {
-			log.Println("search queue failed:", entry.KnownMediaID, known.Title, err)
+		// we don't care *what* error occurs here (if any) — cool down on
+		// any failure to find a candidate, same as a clean not-found.
+		if !found || err != nil {
+			if err != nil {
+				log.Println("search queue failed:", entry.KnownMediaID, known.Title, err)
+			} else {
+				log.Println("search queue: no candidates found", entry.KnownMediaID, known.Title)
+			}
 			errorsx.Log(ddisc.SearchQueueCooldown(ctx, q, entry.KnownMediaID).Scan(&entry))
 			continue
 		}

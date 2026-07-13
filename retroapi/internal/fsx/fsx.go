@@ -102,6 +102,25 @@ func RemoveSymlink(path string) error {
 	return os.Remove(path)
 }
 
+// LocatePhysicalPath returns the first of paths that, after resolving
+// symlinks, is a directory that exists. Useful for finding a real
+// filesystem location behind distro-specific symlinks (e.g. /etc/ssl/certs
+// pointing elsewhere depending on the OS).
+func LocatePhysicalPath(paths ...string) string {
+	for _, path := range paths {
+		realPath, err := filepath.EvalSymlinks(path)
+		if err != nil {
+			continue
+		}
+
+		if info, err := os.Stat(realPath); err == nil && info.IsDir() {
+			return realPath
+		}
+	}
+
+	return ""
+}
+
 // resolves a symlink to its true path if an error occurs
 // it'll log to debug and return the original path provided.
 func ResolveSymlink(path string) string {

@@ -47,6 +47,12 @@ func DiscoveredOptionMimetype(s string) DiscoveredOption {
 	}
 }
 
+func DiscoveredOptionHealth(h uint32) DiscoveredOption {
+	return func(d *Discovered) {
+		d.Health = h
+	}
+}
+
 func DiscoveredOptionTestDefaults(d *Discovered) {
 	d.AudioDefaultLocale = localex.FirstDefined(userx.LocaleLanguage())
 	d.SubtitlesDefaultLocale = localex.FirstDefined(userx.LocaleLanguage())
