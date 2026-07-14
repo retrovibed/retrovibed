@@ -53,11 +53,13 @@ const KnownSearchRequest$json = {
       '6': '.meta.DateRange',
       '10': 'released'
     },
+    {'1': 'source', '3': 6, '4': 3, '5': 9, '10': 'source'},
+    {'1': 'id', '3': 7, '4': 3, '5': 9, '10': 'id'},
     {'1': 'offset', '3': 900, '4': 1, '5': 4, '10': 'offset'},
     {'1': 'limit', '3': 901, '4': 1, '5': 4, '10': 'limit'},
   ],
   '9': [
-    {'1': 6, '2': 900},
+    {'1': 8, '2': 900},
     {'1': 902, '2': 1000},
   ],
 };
@@ -67,8 +69,8 @@ final $typed_data.Uint8List knownSearchRequestDescriptor = $convert.base64Decode
     'ChJLbm93blNlYXJjaFJlcXVlc3QSFAoFcXVlcnkYASABKAlSBXF1ZXJ5EhQKBWFkdWx0GAIgAS'
     'gIUgVhZHVsdBIaCghsYW5ndWFnZRgDIAEoCVIIbGFuZ3VhZ2USGgoIbWltZXR5cGUYBCABKAlS'
     'CG1pbWV0eXBlEisKCHJlbGVhc2VkGAUgASgLMg8ubWV0YS5EYXRlUmFuZ2VSCHJlbGVhc2VkEh'
-    'cKBm9mZnNldBiEByABKARSBm9mZnNldBIVCgVsaW1pdBiFByABKARSBWxpbWl0SgUIBhCEB0oG'
-    'CIYHEOgH');
+    'YKBnNvdXJjZRgGIAMoCVIGc291cmNlEg4KAmlkGAcgAygJUgJpZBIXCgZvZmZzZXQYhAcgASgE'
+    'UgZvZmZzZXQSFQoFbGltaXQYhQcgASgEUgVsaW1pdEoFCAgQhAdKBgiGBxDoBw==');
 
 @$core.Deprecated('Use knownSearchResponseDescriptor instead')
 const KnownSearchResponse$json = {
@@ -188,11 +190,13 @@ const KnownLatestRequest$json = {
     {'1': 'adult', '3': 2, '4': 1, '5': 8, '10': 'adult'},
     {'1': 'language', '3': 3, '4': 1, '5': 9, '10': 'language'},
     {'1': 'mimetype', '3': 4, '4': 1, '5': 9, '10': 'mimetype'},
+    {'1': 'source', '3': 5, '4': 3, '5': 9, '10': 'source'},
+    {'1': 'id', '3': 6, '4': 3, '5': 9, '10': 'id'},
     {'1': 'offset', '3': 900, '4': 1, '5': 4, '10': 'offset'},
     {'1': 'limit', '3': 901, '4': 1, '5': 4, '10': 'limit'},
   ],
   '9': [
-    {'1': 5, '2': 900},
+    {'1': 7, '2': 900},
     {'1': 902, '2': 1000},
   ],
 };
@@ -201,8 +205,9 @@ const KnownLatestRequest$json = {
 final $typed_data.Uint8List knownLatestRequestDescriptor = $convert.base64Decode(
     'ChJLbm93bkxhdGVzdFJlcXVlc3QSKwoIcmVsZWFzZWQYASABKAsyDy5tZXRhLkRhdGVSYW5nZV'
     'IIcmVsZWFzZWQSFAoFYWR1bHQYAiABKAhSBWFkdWx0EhoKCGxhbmd1YWdlGAMgASgJUghsYW5n'
-    'dWFnZRIaCghtaW1ldHlwZRgEIAEoCVIIbWltZXR5cGUSFwoGb2Zmc2V0GIQHIAEoBFIGb2Zmc2'
-    'V0EhUKBWxpbWl0GIUHIAEoBFIFbGltaXRKBQgFEIQHSgYIhgcQ6Ac=');
+    'dWFnZRIaCghtaW1ldHlwZRgEIAEoCVIIbWltZXR5cGUSFgoGc291cmNlGAUgAygJUgZzb3VyY2'
+    'USDgoCaWQYBiADKAlSAmlkEhcKBm9mZnNldBiEByABKARSBm9mZnNldBIVCgVsaW1pdBiFByAB'
+    'KARSBWxpbWl0SgUIBxCEB0oGCIYHEOgH');
 
 @$core.Deprecated('Use knownLatestResponseDescriptor instead')
 const KnownLatestResponse$json = {

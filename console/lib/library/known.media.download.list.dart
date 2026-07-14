@@ -7,6 +7,7 @@ import './known.media.source.dart';
 
 class KnownMediaDownloadList extends StatelessWidget {
   final Widget leading;
+  final Widget empty;
   final List<api.Known> children;
   final Future<api.LocateCreateResponse> Function(api.Locate req, {List<httpx.Option> options}) locate;
 
@@ -14,6 +15,7 @@ class KnownMediaDownloadList extends StatelessWidget {
     super.key,
     this.children = const [],
     this.leading = const SizedBox(),
+    this.empty = const SizedBox(),
     this.locate = api.locate.create,
   });
 
@@ -22,6 +24,7 @@ class KnownMediaDownloadList extends StatelessWidget {
     Key? key,
     Future<api.LocateCreateResponse> Function(api.Locate req, {List<httpx.Option> options}) locate = api.locate.create,
     Widget leading = const SizedBox(),
+    Widget empty = const SizedBox(),
   }) {
     return FutureBuilder<List<api.Known>>(
       initialData: [],
@@ -32,6 +35,7 @@ class KnownMediaDownloadList extends StatelessWidget {
           cause: ds.Error.maybeErr(snapshot.error),
           KnownMediaDownloadList(
             leading: leading,
+            empty: empty,
             children: snapshot.data ?? [],
             locate: locate,
           ),
@@ -44,6 +48,7 @@ class KnownMediaDownloadList extends StatelessWidget {
   Widget build(BuildContext context) {
     return ds.Grid(
       leading: [leading],
+      empty: empty,
       children: children,
       (context, v) => KnownMediaLocator(
         v,

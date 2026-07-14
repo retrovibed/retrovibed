@@ -11,10 +11,11 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/james-lawrence/torrent/metainfo"
+	"github.com/retrovibed/retrovibed/retroapi/asynccompute"
 	"github.com/retrovibed/retrovibed/retroapi/authn"
+	ddiscapiimport "github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
-	"github.com/retrovibed/retrovibed/shallows/internal/asynccompute"
 	"github.com/retrovibed/retrovibed/shallows/internal/backoffx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
@@ -32,7 +33,7 @@ func (t cmdDiscoveryImportJSONL) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfi
 }
 
 func (t cmdDiscoveryImportJSONL) run(ctx context.Context, c *http.Client, endpoint string, r io.Reader) error {
-	inserts := asynccompute.New(func(ctx context.Context, v *ddiscapi.Import) (err error) {
+	inserts := asynccompute.New(func(ctx context.Context, v *ddiscapiimport.Import) (err error) {
 		bs := backoffx.New(
 			backoffx.Constant(time.Second),
 			backoffx.JitterRandom(200*time.Millisecond),
@@ -60,9 +61,9 @@ func (t cmdDiscoveryImportJSONL) run(ctx context.Context, c *http.Client, endpoi
 			return struct{}{}, nil
 		})
 		return err
-	}, asynccompute.Backlog[*ddiscapi.Import](t.Backlog), asynccompute.Workers[*ddiscapi.Import](t.Workers))
+	}, asynccompute.Backlog[*ddiscapiimport.Import](t.Backlog), asynccompute.Workers[*ddiscapiimport.Import](t.Workers))
 
-	d := jsonl.Iter[*ddiscapi.Import](jsonl.NewDecoder(r))
+	d := jsonl.Iter[*ddiscapiimport.Import](jsonl.NewDecoder(r))
 
 	for v := range d.Each(ctx) {
 		if err := inserts.Run(ctx, v); err != nil {

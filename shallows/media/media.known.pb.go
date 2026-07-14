@@ -129,6 +129,8 @@ type KnownSearchRequest struct {
 	Language      string                 `protobuf:"bytes,3,opt,name=language,proto3" json:"language,omitempty"`
 	Mimetype      string                 `protobuf:"bytes,4,opt,name=mimetype,proto3" json:"mimetype,omitempty"`
 	Released      *meta.DateRange        `protobuf:"bytes,5,opt,name=released,proto3" json:"released,omitempty"`
+	Source        []string               `protobuf:"bytes,6,rep,name=source,proto3" json:"source,omitempty"`
+	Id            []string               `protobuf:"bytes,7,rep,name=id,proto3" json:"id,omitempty"`
 	Offset        uint64                 `protobuf:"varint,900,opt,name=offset,proto3" json:"offset,omitempty"`
 	Limit         uint64                 `protobuf:"varint,901,opt,name=limit,proto3" json:"limit,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -196,6 +198,20 @@ func (x *KnownSearchRequest) GetMimetype() string {
 func (x *KnownSearchRequest) GetReleased() *meta.DateRange {
 	if x != nil {
 		return x.Released
+	}
+	return nil
+}
+
+func (x *KnownSearchRequest) GetSource() []string {
+	if x != nil {
+		return x.Source
+	}
+	return nil
+}
+
+func (x *KnownSearchRequest) GetId() []string {
+	if x != nil {
+		return x.Id
 	}
 	return nil
 }
@@ -564,6 +580,8 @@ type KnownLatestRequest struct {
 	Adult         bool                   `protobuf:"varint,2,opt,name=adult,proto3" json:"adult,omitempty"`
 	Language      string                 `protobuf:"bytes,3,opt,name=language,proto3" json:"language,omitempty"`
 	Mimetype      string                 `protobuf:"bytes,4,opt,name=mimetype,proto3" json:"mimetype,omitempty"`
+	Source        []string               `protobuf:"bytes,5,rep,name=source,proto3" json:"source,omitempty"`
+	Id            []string               `protobuf:"bytes,6,rep,name=id,proto3" json:"id,omitempty"`
 	Offset        uint64                 `protobuf:"varint,900,opt,name=offset,proto3" json:"offset,omitempty"`
 	Limit         uint64                 `protobuf:"varint,901,opt,name=limit,proto3" json:"limit,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -626,6 +644,20 @@ func (x *KnownLatestRequest) GetMimetype() string {
 		return x.Mimetype
 	}
 	return ""
+}
+
+func (x *KnownLatestRequest) GetSource() []string {
+	if x != nil {
+		return x.Source
+	}
+	return nil
+}
+
+func (x *KnownLatestRequest) GetId() []string {
+	if x != nil {
+		return x.Id
+	}
+	return nil
 }
 
 func (x *KnownLatestRequest) GetOffset() uint64 {
@@ -835,15 +867,17 @@ const file_media_known_proto_rawDesc = "" +
 	"\asummary\x18\x05 \x01(\tR\asummary\x12\x14\n" +
 	"\x05image\x18\x06 \x01(\tR\x05image\x12\x1a\n" +
 	"\breleased\x18\a \x01(\tR\breleased\x12\x1a\n" +
-	"\bmimetype\x18\b \x01(\tR\bmimetype\"\xe4\x01\n" +
+	"\bmimetype\x18\b \x01(\tR\bmimetype\"\x8c\x02\n" +
 	"\x12KnownSearchRequest\x12\x14\n" +
 	"\x05query\x18\x01 \x01(\tR\x05query\x12\x14\n" +
 	"\x05adult\x18\x02 \x01(\bR\x05adult\x12\x1a\n" +
 	"\blanguage\x18\x03 \x01(\tR\blanguage\x12\x1a\n" +
 	"\bmimetype\x18\x04 \x01(\tR\bmimetype\x12+\n" +
-	"\breleased\x18\x05 \x01(\v2\x0f.meta.DateRangeR\breleased\x12\x17\n" +
+	"\breleased\x18\x05 \x01(\v2\x0f.meta.DateRangeR\breleased\x12\x16\n" +
+	"\x06source\x18\x06 \x03(\tR\x06source\x12\x0e\n" +
+	"\x02id\x18\a \x03(\tR\x02id\x12\x17\n" +
 	"\x06offset\x18\x84\a \x01(\x04R\x06offset\x12\x15\n" +
-	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\x06\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"h\n" +
+	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\b\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"h\n" +
 	"\x13KnownSearchResponse\x12-\n" +
 	"\x04next\x18\x01 \x01(\v2\x19.media.KnownSearchRequestR\x04next\x12\"\n" +
 	"\x05items\x18\x02 \x03(\v2\f.media.KnownR\x05items\")\n" +
@@ -858,14 +892,16 @@ const file_media_known_proto_rawDesc = "" +
 	"\x12KnownCreateRequest\x12\"\n" +
 	"\x05known\x18\x01 \x01(\v2\f.media.KnownR\x05known\"9\n" +
 	"\x13KnownCreateResponse\x12\"\n" +
-	"\x05known\x18\x01 \x01(\v2\f.media.KnownR\x05known\"\xce\x01\n" +
+	"\x05known\x18\x01 \x01(\v2\f.media.KnownR\x05known\"\xf6\x01\n" +
 	"\x12KnownLatestRequest\x12+\n" +
 	"\breleased\x18\x01 \x01(\v2\x0f.meta.DateRangeR\breleased\x12\x14\n" +
 	"\x05adult\x18\x02 \x01(\bR\x05adult\x12\x1a\n" +
 	"\blanguage\x18\x03 \x01(\tR\blanguage\x12\x1a\n" +
-	"\bmimetype\x18\x04 \x01(\tR\bmimetype\x12\x17\n" +
+	"\bmimetype\x18\x04 \x01(\tR\bmimetype\x12\x16\n" +
+	"\x06source\x18\x05 \x03(\tR\x06source\x12\x0e\n" +
+	"\x02id\x18\x06 \x03(\tR\x02id\x12\x17\n" +
 	"\x06offset\x18\x84\a \x01(\x04R\x06offset\x12\x15\n" +
-	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\x05\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"h\n" +
+	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\a\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"h\n" +
 	"\x13KnownLatestResponse\x12-\n" +
 	"\x04next\x18\x01 \x01(\v2\x19.media.KnownLatestRequestR\x04next\x12\"\n" +
 	"\x05items\x18\x02 \x03(\v2\f.media.KnownR\x05items\"\xa5\x01\n" +

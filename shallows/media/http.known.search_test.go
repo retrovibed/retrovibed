@@ -119,6 +119,111 @@ func TestKnownSearch(t *testing.T) {
 		}
 	})
 
+	t.Run("filters by source", func(t *testing.T) {
+		var (
+			p     meta.Profile
+			authz meta.Authz
+			known library.Known
+		)
+		ctx, done := testx.Context(t)
+		defer done()
+
+		q := sqltestx.Metadatabase(t)
+
+		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
+		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
+		require.NoError(t, testx.Fake(&authz, meta.AuthzOptionProfileID(p.ID), meta.AuthzOptionAdmin))
+		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, authz).Scan(&authz))
+
+		for range 5 {
+			require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults, library.KnownOptionSource("source-a")))
+			require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
+		}
+		for range 5 {
+			require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults, library.KnownOptionSource("source-b")))
+			require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
+		}
+
+		routes := mux.NewRouter()
+		media.NewHTTPKnown(q, media.HTTPKnownOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
+
+		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
+
+		encoder := formx.NewEncoder()
+		query, err := encoder.Encode(&media.KnownSearchRequest{
+			Source: []string{"source-a"},
+			Limit:  100,
+		})
+		require.NoError(t, err)
+
+		resp, req, err := httptestx.BuildRequestBytes(
+			http.MethodGet,
+			fmt.Sprintf("/?%s", query.Encode()),
+			nil,
+			httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)),
+		)
+		require.NoError(t, err)
+
+		routes.ServeHTTP(resp, req)
+
+		var result media.KnownSearchResponse
+		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
+		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.Len(t, result.Items, 5)
+	})
+
+	t.Run("filters by id", func(t *testing.T) {
+		var (
+			p       meta.Profile
+			authz   meta.Authz
+			match   library.Known
+			nomatch library.Known
+		)
+		ctx, done := testx.Context(t)
+		defer done()
+
+		q := sqltestx.Metadatabase(t)
+
+		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
+		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
+		require.NoError(t, testx.Fake(&authz, meta.AuthzOptionProfileID(p.ID), meta.AuthzOptionAdmin))
+		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, authz).Scan(&authz))
+
+		require.NoError(t, testx.Fake(&match, library.KnownOptionTestDefaults))
+		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, match).Scan(&match))
+
+		require.NoError(t, testx.Fake(&nomatch, library.KnownOptionTestDefaults))
+		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, nomatch).Scan(&nomatch))
+
+		routes := mux.NewRouter()
+		media.NewHTTPKnown(q, media.HTTPKnownOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
+
+		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
+
+		encoder := formx.NewEncoder()
+		query, err := encoder.Encode(&media.KnownSearchRequest{
+			Id:    []string{match.UID},
+			Limit: 100,
+		})
+		require.NoError(t, err)
+
+		resp, req, err := httptestx.BuildRequestBytes(
+			http.MethodGet,
+			fmt.Sprintf("/?%s", query.Encode()),
+			nil,
+			httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)),
+		)
+		require.NoError(t, err)
+
+		routes.ServeHTTP(resp, req)
+
+		var result media.KnownSearchResponse
+		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
+		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.Len(t, result.Items, 1)
+		require.Equal(t, match.UID, result.Items[0].Id)
+	})
+
 	t.Run("filters by released range", func(t *testing.T) {
 		var (
 			p     meta.Profile

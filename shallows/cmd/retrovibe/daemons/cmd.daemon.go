@@ -137,6 +137,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		publishing          = asyncx.NewWakeup(gctx.Context)
 		mediaidentification = asyncx.NewWakeup(gctx.Context)
 		ddiscpublish        = asyncx.NewWakeup(gctx.Context)
+		locatemedia         = asyncx.NewWakeup(gctx.Context)
 		vpncfgpath          = userx.DefaultConfigDir(userx.DefaultRelRoot(), "vpn.cfg")
 		storagecfgpath      = userx.DefaultConfigDir(userx.DefaultRelRoot(), "storage.cfg")
 	)
@@ -212,7 +213,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		}
 	}
 
-	torrenting := newTorrenting(db, id, rootstore, mediastore, tvfs, mc, tstore, _socks5, ddiscpublish)
+	torrenting := newTorrenting(db, id, rootstore, mediastore, tvfs, mc, tstore, _socks5, ddiscpublish, locatemedia)
 
 	if err = torrenting.Reload(gctx.Context, t.torrentsettings(), t.discoverysettings()); err != nil {
 		return errorsx.Wrap(err, "failed to reload torrent")
@@ -368,9 +369,9 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	ddiscapi.NewHTTPPeerManagement(db).Bind(httpmux.PathPrefix("/ddisc").Subrouter())
 	ddiscapi.NewHTTPDiscovery(db).Bind(httpmux.PathPrefix("/ddisc/discovery").Subrouter())
 	ddiscapi.NewHTTPMedia(db).Bind(httpmux.PathPrefix("/ddisc/media").Subrouter())
+	ddiscapi.NewHTTPLocate(db, locatemedia).Bind(httpmux.PathPrefix("/l").Subrouter())
 	media.NewHTTPRSSFeed(db).Bind(httpmux.PathPrefix("/rss").Subrouter())
 	media.NewHTTPKnown(db).Bind(httpmux.PathPrefix("/k").Subrouter())
-	media.NewHTTPLocate(db).Bind(httpmux.PathPrefix("/l").Subrouter())
 
 	metaapi.NewHTTPFileConfig(vpncfgpath).Bind(httpmux.PathPrefix("/s/wireguard").Subrouter())
 	metaapi.NewHTTPFileConfig(torrenting.cfgpath).Bind(httpmux.PathPrefix("/s/torrents").Subrouter())

@@ -11,10 +11,10 @@ type peer struct {
 }
 
 // discovery command examples
-// go -C shallows run ./cmd/retrovibe/... discovery discovery ls --insecure --library="eg:9998"
-// go -C shallows run ./cmd/retrovibe/... discovery discovery create --insecure --library="eg:9998" --infohash="<hex infohash>"
-// go -C shallows run ./cmd/retrovibe/... discovery discovery delete --insecure --library="eg:9998" --id="<id from ls>"
-// go -C shallows run ./cmd/retrovibe/... discovery discovery identify --insecure --library="eg:9998" --id="<id from ls>"
+// go -C shallows run ./cmd/retrovibe/... disc discovery ls --insecure --library="eg:9998"
+// go -C shallows run ./cmd/retrovibe/... disc discovery create --insecure --library="eg:9998" --infohash="<hex infohash>"
+// go -C shallows run ./cmd/retrovibe/... disc discovery delete --insecure --library="eg:9998" --id="<id from ls>"
+// go -C shallows run ./cmd/retrovibe/... disc discovery identify --insecure --library="eg:9998" --id="<id from ls>"
 type discovery struct {
 	Ls       cmdDiscoveryList        `cmd:"" help:"list infohashes currently being investigated by discovery"`
 	Import   cmdDiscoveryImportJSONL `cmd:"" help:"import a jsonl stream of magnet links into the index"`
@@ -24,15 +24,19 @@ type discovery struct {
 }
 
 // media command examples
-// go -C shallows run ./cmd/retrovibe/... discovery media ls --insecure --library="eg:9998"
-// go -C shallows run ./cmd/retrovibe/... discovery media create --insecure --library="eg:9998" --infohash="<hex infohash>" --title="derp"
-// go -C shallows run ./cmd/retrovibe/... discovery media delete --insecure --library="eg:9998" --id="<id from ls>"
-// go -C shallows run ./cmd/retrovibe/... discovery media query "<known media id>" "127.0.0.1:3196"
+// go -C shallows run ./cmd/retrovibe/... disc media ls --insecure --library="eg:9998"
+// go -C shallows run ./cmd/retrovibe/... disc media create --insecure --library="eg:9998" --infohash="<hex infohash>" --title="derp"
+// go -C shallows run ./cmd/retrovibe/... disc media delete --insecure --library="eg:9998" --id="<id from ls>"
+// go -C shallows run ./cmd/retrovibe/... disc media query "<known media id>" "127.0.0.1:3196"
+// go -C shallows run ./cmd/retrovibe/... disc media discover "ubuntu" --mimetype=video --insecure --library="eg:9998"
 type media struct {
-	Ls     cmdMediaLs     `cmd:"" help:"list/search discovered media on a library"`
-	Create cmdMediaCreate `cmd:"" help:"create a discovered media record on a library"`
-	Delete cmdMediaDelete `cmd:"" help:"remove a discovered media record from a library"`
-	Query  cmdMediaQuery  `cmd:"" help:"query the DHT directly for media matching a known-media id"`
+	Ls          cmdMediaLs          `cmd:"" help:"list/search discovered media on a library"`
+	Create      cmdMediaCreate      `cmd:"" help:"create a discovered media record on a library"`
+	Delete      cmdMediaDelete      `cmd:"" help:"remove a discovered media record from a library"`
+	Query       cmdMediaQuery       `cmd:"" help:"query the DHT directly for media matching a known-media id"`
+	Discover    cmdMediaDiscover    `cmd:"" help:"submit a locate request to a running daemon; it discovers and downloads in the background"`
+	LocateJSONL cmdMediaLocateJSONL `cmd:"" help:"submit locate requests in bulk from a jsonl stream of known-media records (see 'media known duckdb' export format)"`
+	Locate      cmdMediaLocate      `cmd:"" help:"run the full discover/rank/download pipeline locally for a single query, without a running daemon or its API"`
 }
 
 type Commands struct {

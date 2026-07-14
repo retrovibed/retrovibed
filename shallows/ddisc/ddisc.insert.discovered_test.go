@@ -112,7 +112,7 @@ func TestDiscoveredInsertWithDefaults(t *testing.T) {
 		require.Equal(t, expected.VideoRuntime, d.VideoRuntime)
 	})
 
-	t.Run("on conflict only refreshes updated_at", func(t *testing.T) {
+	t.Run("on conflict a non-empty title overwrites, an empty one leaves the existing title untouched", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 
@@ -135,12 +135,18 @@ func TestDiscoveredInsertWithDefaults(t *testing.T) {
 
 		time.Sleep(10 * time.Millisecond)
 
-		conflict := d
-		conflict.Title = "changed title"
-		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, conflict).Scan(&conflict))
+		changed := d
+		changed.Title = "changed title"
+		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, changed).Scan(&changed))
 
-		require.Equal(t, "original title", conflict.Title, "conflict clause only refreshes updated_at, other columns are left untouched")
-		require.True(t, conflict.UpdatedAt.After(firstUpdatedAt))
+		require.Equal(t, "changed title", changed.Title, "a non-empty incoming title overwrites the stored one")
+		require.True(t, changed.UpdatedAt.After(firstUpdatedAt))
+
+		blank := changed
+		blank.Title = ""
+		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, blank).Scan(&blank))
+
+		require.Equal(t, "changed title", blank.Title, "an empty incoming title leaves the stored one untouched")
 	})
 
 	t.Run("rejects corrupted titles from syncing instead of failing the insert", func(t *testing.T) {

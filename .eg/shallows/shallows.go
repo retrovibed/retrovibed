@@ -81,7 +81,6 @@ func GenerateProtocol(ctx context.Context, op eg.Op) error {
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmedia.proto=github.com/retrovibed/retrovibed/shallows/media --go_opt=paths=source_relative --go_out=media media.proto"),
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmedia.known.proto=github.com/retrovibed/retrovibed/shallows/media --go_opt=Mmeta.search.proto=github.com/retrovibed/retrovibed/shallows/meta --go_opt=paths=source_relative --go_out=media media.known.proto"),
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmedia.recent.proto=github.com/retrovibed/retrovibed/shallows/media --go_opt=Mmeta.search.proto=github.com/retrovibed/retrovibed/shallows/meta --go_opt=Mmedia.proto=github.com/retrovibed/retrovibed/shallows/media --go_opt=paths=source_relative --go_out=media media.recent.proto"),
-		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmedia.locate.proto=github.com/retrovibed/retrovibed/shallows/media --go_opt=paths=source_relative --go_out=media media.locate.proto"),
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mrss.proto=github.com/retrovibed/retrovibed/shallows/rss --go_opt=paths=source_relative --go_out=rss rss.proto"),
 		// block cache
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mcontent.addressable.storage.proto=github.com/retrovibed/retroapi/deeppool --go_opt=paths=source_relative --go_out=../retroapi/deeppool content.addressable.storage.proto"),
@@ -94,7 +93,12 @@ func GenerateProtocol(ctx context.Context, op eg.Op) error {
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mddisc.peers.proto=github.com/retrovibed/retrovibed/shallows/ddiscapi --go_opt=paths=source_relative --go_out=ddiscapi ddisc.peers.proto"),
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mddisc.discovery.proto=github.com/retrovibed/retrovibed/shallows/ddiscapi --go_opt=Mmeta.search.proto=github.com/retrovibed/retrovibed/shallows/meta --go_opt=paths=source_relative --go_out=ddiscapi ddisc.discovery.proto"),
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mddisc.media.proto=github.com/retrovibed/retrovibed/shallows/ddiscapi --go_opt=Mmeta.search.proto=github.com/retrovibed/retrovibed/shallows/meta --go_opt=paths=source_relative --go_out=ddiscapi ddisc.media.proto"),
-		gruntime.New("protoc --proto_path=../.proto --go_opt=Mddisc.import.proto=github.com/retrovibed/retrovibed/shallows/ddiscapi --go_opt=paths=source_relative --go_out=ddiscapi ddisc.import.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mddisc.locate.proto=github.com/retrovibed/retrovibed/shallows/ddiscapi --go_opt=paths=source_relative --go_out=ddiscapi ddisc.locate.proto"),
+		// ddisc.import.proto is generated only into retroapi/ddiscapi (not shallows/ddiscapi) —
+		// shallows code imports retroapi/ddiscapi directly for the Import type instead of
+		// duplicating its own copy, since two packages registering the same proto file into
+		// the global protobuf registry in the same binary panics at init.
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mddisc.import.proto=github.com/retrovibed/retrovibed/retroapi/ddiscapi --go_opt=paths=source_relative --go_out=../retroapi/ddiscapi ddisc.import.proto"),
 		// settings
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mstorage.proto=github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/daemons --go_opt=paths=source_relative --go_out=cmd/retrovibe/daemons storage.proto"),
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mtorrent.proto=github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/daemons --go_opt=paths=source_relative --go_out=cmd/retrovibe/daemons torrent.proto"),

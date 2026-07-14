@@ -40,11 +40,17 @@ func NewSearchRequest(from int160.T, id string) (qi dht.QueryInput, err error) {
 }
 
 func NewSearch(q sqlx.Queryer) Search {
-	return Search{q: q}
+	return Search{
+		q:       q,
+		enqueue: ddisc.EnqueueUnknown(),
+	}
 }
 
 type Search struct {
 	q sqlx.Queryer
+	// enqueue bounds how often a miss enqueues a known_media_id for search
+	// plugin discovery; shared across every Handle call on this Search.
+	enqueue ddisc.UnknownEnqueue
 }
 
 func (t Search) Handle(ctx context.Context, source dht.Addr, s *dht.Server, b dht.Binding, raw []byte, _ *krpc.Msg) error {
@@ -60,7 +66,7 @@ func (t Search) Handle(ctx context.Context, source dht.Addr, s *dht.Server, b dh
 		return err
 	}
 
-	seq := ddisc.FindMedia(t.q, m.A.KnownMediaID)
+	seq := t.enqueue.Wrap(t.q, m.A.KnownMediaID, ddisc.FindMedia(t.q, m.A.KnownMediaID))
 	for v := range seq.Each(ctx) {
 		msg := Media{
 			Q: MethodMedia,

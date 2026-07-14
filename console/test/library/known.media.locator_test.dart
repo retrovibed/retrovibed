@@ -23,6 +23,7 @@ void main() {
       await tester.pumpApp(
         KnownMediaLocator(
           item,
+          ensureP2P: (context, {options = const []}) async => true,
           locate: (req, {options = const []}) async {
             requested = req;
             return api.LocateCreateResponse(locate: req);
@@ -41,6 +42,7 @@ void main() {
       await tester.pumpApp(
         KnownMediaLocator(
           item,
+          ensureP2P: (context, {options = const []}) async => true,
           locate: (req, {options = const []}) => Future.error('boom'),
         ),
       );

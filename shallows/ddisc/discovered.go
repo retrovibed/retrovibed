@@ -2,6 +2,7 @@ package ddisc
 
 import (
 	"context"
+	"math"
 	"strings"
 	"unicode/utf8"
 
@@ -44,6 +45,18 @@ func DiscoveredOptionMimetype(s string) DiscoveredOption {
 	return func(d *Discovered) {
 		d.Mimetype = langx.FirstNonZero(s, string(mimex.Binary))
 		d.Category = mimex.Category(d.Mimetype)
+	}
+}
+
+func DiscoveredOptionHealth(h uint32) DiscoveredOption {
+	return func(d *Discovered) {
+		d.Health = h
+	}
+}
+
+func DiscoveredOptionTitle(s string) DiscoveredOption {
+	return func(d *Discovered) {
+		d.Title = s
 	}
 }
 
@@ -132,6 +145,16 @@ func DiscoveredOptionFromExtracted(ex Extracted) DiscoveredOption {
 	}
 }
 
+// the worst possible discoverable candidate.
+// used for zero values when performing discovey.
+func Worst() Discovered {
+	return Discovered{
+		PolicyRank: math.MaxUint16,
+		Health:     0,
+		Bytes:      0,
+	}
+}
+
 func NewDiscovered(md *int160.T, options ...DiscoveredOption) (m Discovered) {
 	r := langx.Clone(Discovered{
 		ID:                     torrentx.HashUID(md),
@@ -217,6 +240,18 @@ func DiscoveredQueryText(query string) squirrel.Sqlizer {
 		return squirrelx.Noop{}
 	}
 	return lucenex.Query(duckdbx.NewLucene(), query, lucenex.WithDefaultField("description"))
+}
+
+// DiscoveredQueryTitle restricts results to candidates whose title contains
+// every term in query (bare terms combine with an implicit AND, so a
+// multi-word query like "nirvana utero" requires both words present in the
+// title) - this is what keeps RankAndSelect from picking a candidate whose
+// title has nothing to do with what was actually searched for.
+func DiscoveredQueryTitle(query string) squirrel.Sqlizer {
+	if query == "" {
+		return squirrelx.Noop{}
+	}
+	return lucenex.Query(duckdbx.NewLucene(), lucenex.Clean(query), lucenex.WithDefaultField("title"))
 }
 
 func DiscoveredQueryCategory(mimetype string) squirrel.Sqlizer {

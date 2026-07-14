@@ -21,7 +21,9 @@ message KnownSearchRequest {
   string language = 3 [ json_name = "language" ];
   string mimetype = 4 [ json_name = "mimetype" ];
   meta.DateRange released = 5 [ json_name = "released" ];
-  reserved 6 to 899;
+  repeated string source = 6 [ json_name = "source" ];
+  repeated string id = 7 [ json_name = "id" ];
+  reserved 8 to 899;
   uint64 offset = 900 [ json_name = "offset" ];
   uint64 limit = 901 [ json_name = "limit" ];
   reserved 902 to 999;
@@ -48,7 +50,9 @@ message KnownLatestRequest {
   bool adult = 2 [ json_name = "adult" ];
   string language = 3 [ json_name = "language" ];
   string mimetype = 4 [ json_name = "mimetype" ];
-  reserved 5 to 899;
+  repeated string source = 5 [ json_name = "source" ];
+  repeated string id = 6 [ json_name = "id" ];
+  reserved 7 to 899;
   uint64 offset = 900 [ json_name = "offset" ];
   uint64 limit = 901 [ json_name = "limit" ];
   reserved 902 to 999;

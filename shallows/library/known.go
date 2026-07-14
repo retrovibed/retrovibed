@@ -127,6 +127,10 @@ func KnownQueryExplicit(allow bool) squirrel.Sqlizer {
 	return squirrel.Expr("library_known_media.adult = ?", false)
 }
 
+func KnownQueryUID(ids ...string) squirrel.Sqlizer {
+	return squirrelx.In("library_known_media.uid", ids...)
+}
+
 func KnownQueryLanguage(v string) squirrel.Sqlizer {
 	if stringsx.Blank(v) {
 		return squirrelx.Noop{}
@@ -141,6 +145,10 @@ func KnownQueryMimetype(v string) squirrel.Sqlizer {
 	}
 
 	return squirrel.Expr("library_known_media.mimetype = ?", v)
+}
+
+func KnownQuerySource(sources ...string) squirrel.Sqlizer {
+	return squirrelx.In("library_known_media.source", sources...)
 }
 
 func KnownQueryExcludeSource(sources ...string) squirrel.Sqlizer {

@@ -5,6 +5,7 @@ package ddisc
 
 import (
 	"context"
+	"time"
 
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 )
@@ -28,7 +29,7 @@ func DiscoveredInsertWithDefaults(
 	gql genieql.Insert,
 	pattern func(ctx context.Context, q sqlx.Queryer, a Discovered) NewDiscoveredScannerStaticRow,
 ) {
-	gql.Into("ddisc_media").Default("created_at", "updated_at", "tombstoned_at", "released_at", "next_check_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT")
+	gql.Into("ddisc_media").Default("created_at", "updated_at", "tombstoned_at", "released_at", "next_check_at", "policy_rank", "policy_rejection").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, title = COALESCE(NULLIF(EXCLUDED.title, ''), ddisc_media.title), policy_rank = EXCLUDED.policy_rank, policy_rejection = DEFAULT")
 }
 
 func DiscoveredFindByID(
@@ -63,7 +64,7 @@ func DiscoveredCooldown(
 	gql genieql.Insert,
 	pattern func(ctx context.Context, q sqlx.Queryer, a Discovered) NewDiscoveredScannerStaticRow,
 ) {
-	gql.Into("ddisc_media").Default("created_at", "updated_at", "tombstoned_at", "released_at", "next_check_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, attempts = EXCLUDED.attempts + 1, next_check_at = NOW() + least(to_minutes(CAST(EXCLUDED.attempts AS INT)*2), to_hours(24))")
+	gql.Into("ddisc_media").Default("created_at", "updated_at", "tombstoned_at", "released_at", "next_check_at", "policy_rank", "policy_rejection").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, attempts = EXCLUDED.attempts + 1, next_check_at = NOW() + least(to_minutes(CAST(EXCLUDED.attempts AS INT)*2), to_hours(24)), policy_rank = DEFAULT, policy_rejection = DEFAULT")
 }
 
 func DiscoveredSinceSync(
@@ -85,4 +86,120 @@ func DiscoveredByKnownID(
 	pattern func(ctx context.Context, q sqlx.Queryer, kid string) NewDiscoveredScannerStatic,
 ) {
 	gql = gql.Query(`SELECT ` + DiscoveredScannerStaticColumns + ` FROM ddisc_media WHERE known_media_id = {kid}`)
+}
+
+// DiscoveredRank persists the result of running a ranking Policy against a
+// Discovered row: its computed health, policy_rank, and policy_rejection.
+func DiscoveredRank(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string, health uint32, rank uint16, rejection string) NewDiscoveredScannerStaticRow,
+) {
+	gql = gql.Query(`UPDATE ddisc_media SET updated_at = NOW(), health = {health}, policy_rank = {rank}, policy_rejection = {rejection} WHERE "id" = {id} RETURNING ` + DiscoveredScannerStaticColumns)
+}
+
+func Locate(
+	gql genieql.Structure,
+) {
+	gql.From(
+		gql.Table("ddisc_locate"),
+	)
+}
+
+func LocateScanner(
+	gql genieql.Scanner,
+	pattern func(i Locate),
+) {
+	gql.ColumnNamePrefix("ddisc_locate.")
+}
+
+func LocateInsertWithDefaults(
+	gql genieql.Insert,
+	pattern func(ctx context.Context, q sqlx.Queryer, a Locate) NewLocateScannerStaticRow,
+) {
+	gql.Into("ddisc_locate").Default("created_at", "updated_at", "tombstoned_at", "located_torrent_id").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = NOW()")
+}
+
+func LocateFindByID(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewLocateScannerStaticRow,
+) {
+	gql = gql.Query(`SELECT ` + LocateScannerStaticColumns + ` FROM ddisc_locate WHERE "id" = {id}`)
+}
+
+// LocateLocated records which torrent was picked for this request. Does not
+// close the request out - a better candidate may still show up later.
+func LocateLocated(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, id, tid string) NewLocateScannerStaticRow,
+) {
+	gql = gql.Query(`UPDATE ddisc_locate SET updated_at = NOW(), located_torrent_id = {tid} WHERE "id" = {id} RETURNING ` + LocateScannerStaticColumns)
+}
+
+// LocateCompleted tombstones the request once its located torrent has
+// actually finished downloading (not merely been picked/initiated).
+func LocateCompleted(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewLocateScannerStaticRow,
+) {
+	gql = gql.Query(`UPDATE ddisc_locate SET updated_at = NOW(), tombstoned_at = NOW() WHERE "id" = {id} RETURNING ` + LocateScannerStaticColumns)
+}
+
+func SearchQueue(
+	gql genieql.Structure,
+) {
+	gql.From(
+		gql.Table("ddisc_search_queue"),
+	)
+}
+
+func SearchQueueScanner(
+	gql genieql.Scanner,
+	pattern func(i SearchQueue),
+) {
+	gql.ColumnNamePrefix("ddisc_search_queue.")
+}
+
+// SearchQueueEnqueue records a known_media_id as needing external search
+// plugin discovery. Idempotent: re-enqueuing an already-pending id just
+// touches updated_at.
+func SearchQueueEnqueue(
+	gql genieql.Insert,
+	pattern func(ctx context.Context, q sqlx.Queryer, a SearchQueue) NewSearchQueueScannerStaticRow,
+) {
+	gql.Into("ddisc_search_queue").Default("id", "created_at", "updated_at", "next_check_at", "attempts").Conflict("ON CONFLICT (known_media_id) DO UPDATE SET updated_at = NOW()")
+}
+
+func SearchQueuePending(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer) NewSearchQueueScannerStatic,
+) {
+	gql = gql.Query(`SELECT ` + SearchQueueScannerStaticColumns + ` FROM ddisc_search_queue WHERE next_check_at <= NOW()`)
+}
+
+// SearchQueueResolve removes a known_media_id from the queue once at least
+// one Discovered row has been persisted for it.
+func SearchQueueResolve(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, kid string) NewSearchQueueScannerStaticRow,
+) {
+	gql = gql.Query(`DELETE FROM ddisc_search_queue WHERE "known_media_id" = {kid} RETURNING ` + SearchQueueScannerStaticColumns)
+}
+
+// SearchQueueCooldown bumps attempts and pushes next_check_at out after a
+// drain attempt found nothing, same backoff shape as DiscoveredCooldown.
+func SearchQueueCooldown(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, kid string) NewSearchQueueScannerStaticRow,
+) {
+	gql = gql.Query(`UPDATE ddisc_search_queue SET updated_at = NOW(), attempts = attempts + 1, next_check_at = NOW() + least(to_minutes(CAST(attempts AS INT)*2), to_hours(24)) WHERE "known_media_id" = {kid} RETURNING ` + SearchQueueScannerStaticColumns)
+}
+
+// SearchQueuePurge deletes entries older than maxAge (measured from
+// created_at) that have never resolved, so the queue doesn't grow unbounded
+// with known-media-ids no plugin will ever find.
+func SearchQueuePurge(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, maxAge time.Duration) NewSearchQueueScannerStatic,
+) {
+	gql = gql.Query(`DELETE FROM ddisc_search_queue WHERE created_at <= NOW() - to_seconds(CAST({maxAge} AS BIGINT) / 1000000000) RETURNING ` + SearchQueueScannerStaticColumns)
 }

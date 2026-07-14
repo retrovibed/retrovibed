@@ -1,6 +1,6 @@
 export 'media/api.dart';
 export 'media/media.known.pb.dart';
-export 'media/media.locate.pb.dart';
+export 'media/ddisc.locate.pb.dart';
 export 'media/media.recent.pb.dart';
 export 'media/media.row.display.dart';
 export 'media/download.display.dart';

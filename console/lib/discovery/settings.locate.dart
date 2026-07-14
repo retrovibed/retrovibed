@@ -5,7 +5,10 @@ import './api.dart' as api;
 
 const String _disclaimerCacheId = 'discovery.p2p';
 
-const String _disclaimerText = '''
+class LocateSettings extends StatefulWidget {
+  static api.DiscoverySettings zero = api.DiscoverySettings(locateP2p: false);
+
+  static const String disclaimerText = '''
 Retrovibed supports an entirely peer-to-peer (p2p) environment.
 
 The p2p system allows journalists, musicians, and other content creators to
@@ -18,9 +21,6 @@ we takes no responsibility for such content.
 
 By enabling P2P discovery of available content. You take responsibility for your
 activities and for obeying the laws within your region.''';
-
-class LocateSettings extends StatefulWidget {
-  static api.DiscoverySettings zero = api.DiscoverySettings(locateP2p: false);
   final api.DiscoverySettings defaults;
   final Future<api.DiscoverySettings> Function(api.DiscoverySettings)? onChange;
   final bool Function(String)? disclaimer;
@@ -85,7 +85,7 @@ class _LocateEditView extends State<LocateSettings> {
       cached: widget.disclaimer ?? ds.Disclaimer.disclaimerpath,
       acknowledge: widget.acknowledge ?? ds.Disclaimer.acknowledge,
       overlay: (complete) => ds.Confirmation.yesNo(
-        content: const Text(_disclaimerText),
+        content: const Text(LocateSettings.disclaimerText),
         onConfirm: (_) {
           complete(true);
           _update(current..locateP2p = !current.locateP2p);

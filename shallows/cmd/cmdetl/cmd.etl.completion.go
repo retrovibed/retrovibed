@@ -10,8 +10,8 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/retrovibed/retrovibed/retroapi/asynccompute"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
-	"github.com/retrovibed/retrovibed/shallows/internal/asynccompute"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"

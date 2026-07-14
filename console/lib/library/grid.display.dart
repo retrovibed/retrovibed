@@ -9,6 +9,7 @@ import 'package:retrovibed/langcodex.dart' as langcodex;
 import 'package:retrovibed/lucene.dart' as lucene;
 import 'package:retrovibed/discovery.dart' as disc;
 import 'api.dart' as api;
+import 'discovery.locator.dart';
 import 'known.media.download.list.dart';
 import 'known.media.display.dart';
 import 'media.settings.dart';
@@ -244,21 +245,29 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                               .then((v) => v.items),
                         );
                       },
-                      leading: Center(
-                        child: Padding(
-                          padding: defaults.padding,
-                          child: Text(
-                            _library
-                                ? "no results in library. select to automatically locate and download"
-                                : "select to automatically locate and download",
-                            style: TextStyle(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.onSurface.withValues(alpha: 0.6),
-                            ),
+                      leading: Column(
+                        children: [
+                          DiscoveryLocator(
+                            query: widget.search.value.next.query.trim(),
+                            mimetype: category,
                           ),
-                        ),
+                        ],
                       ),
+                      empty: _library
+                          ? Center(
+                              child: Padding(
+                                padding: defaults.padding,
+                                child: Text(
+                                  "no results in library",
+                                  style: TextStyle(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface.withValues(alpha: 0.6),
+                                  ),
+                                ),
+                              ),
+                            )
+                          : ds.Empty,
                     ),
               (context, _media) {
                 var onSettings = () {
