@@ -16,6 +16,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
+	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
@@ -40,6 +41,7 @@ func newLocateServer(t *testing.T, q *sql.DB) *http.Client {
 	routes := mux.NewRouter()
 	ddiscapi.NewHTTPLocate(
 		q,
+		asyncx.NewWakeup(t.Context()),
 		ddiscapi.HTTPLocateOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 	).Bind(routes.PathPrefix("/l").Subrouter())
 

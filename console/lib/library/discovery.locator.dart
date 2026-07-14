@@ -3,30 +3,31 @@ import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/discovery.dart' as disc;
-import 'known.media.card.dart';
 import './api.dart' as api;
 
-class KnownMediaLocator extends StatefulWidget {
-  final api.Known current;
+// DiscoveryLocator offers to search the wider p2p network for query/mimetype
+// when neither the local library nor the catalog (library.Known) have a
+// match - the free-text analog of KnownMediaLocator, which locates a
+// specific already-catalogued item.
+class DiscoveryLocator extends StatefulWidget {
+  final String query;
+  final String mimetype;
   final Future<api.LocateCreateResponse> Function(api.Locate req, {List<httpx.Option> options}) locate;
-  final IconData icon;
   final Widget help;
-  final Widget? trailing;
 
-  const KnownMediaLocator(
-    this.current, {
+  const DiscoveryLocator({
     super.key,
+    required this.query,
+    required this.mimetype,
     this.locate = api.locate.create,
-    this.icon = Icons.download_rounded,
     this.help = ds.HelpScope.None,
-    this.trailing,
   });
 
   @override
-  State<StatefulWidget> createState() => _KnownMediaLocator();
+  State<StatefulWidget> createState() => _DiscoveryLocator();
 }
 
-class _KnownMediaLocator extends State<KnownMediaLocator> {
+class _DiscoveryLocator extends State<DiscoveryLocator> {
   bool _queued = false;
   bool _loading = false;
   Widget _cause = ds.Error.zero;
@@ -62,11 +63,12 @@ class _KnownMediaLocator extends State<KnownMediaLocator> {
 
           return widget
               .locate(
-                api.Locate.create()..knownMediaId = widget.current.id,
+                api.Locate.create()
+                  ..query = widget.query
+                  ..mimetype = widget.mimetype,
                 options: options,
               )
               .then((v) {
-                print("located ${v}");
                 setState(() {
                   _queued = true;
                   _loading = false;
@@ -86,12 +88,23 @@ class _KnownMediaLocator extends State<KnownMediaLocator> {
     return ds.Loading(
       loading: _loading,
       cause: _cause,
-      KnownMediaCard(
-        widget.current,
-        icon: _queued ? Icons.query_builder_rounded : widget.icon,
-        help: widget.help,
+      ds.Card(
+        Center(
+          child: Icon(
+            _queued ? Icons.query_builder_rounded : Icons.travel_explore_rounded,
+            size: 48,
+          ),
+        ),
         onTap: _loading || _queued ? null : _onTap,
-        trailing: widget.trailing,
+        help: widget.help,
+        trailing: [
+          Center(
+            child: Text(
+              'search the network for "${widget.query}"',
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
       ),
     );
   }

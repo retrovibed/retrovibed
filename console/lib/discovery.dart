@@ -1,4 +1,5 @@
 export 'discovery/api.dart';
+export 'discovery/locate.p2p.prompt.dart';
 export 'discovery/display.dart';
 export 'discovery/settings.video.dart';
 export 'discovery/settings.locate.dart';

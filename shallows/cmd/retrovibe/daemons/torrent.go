@@ -80,9 +80,10 @@ func AutoTorrentSettings(defaults *TorrentSettings, options ...func(*TorrentSett
 	}, options...))
 }
 
-func newTorrenting(db *sql.DB, id ssh.Signer, root, media, tvfs fsx.Virtual, mc library.QueryCleaner, tstore storage.ClientImpl, socks5 net.Listener, pub *asyncx.Wakeup) _torrenting {
+func newTorrenting(db *sql.DB, id ssh.Signer, root, media, tvfs fsx.Virtual, mc library.QueryCleaner, tstore storage.ClientImpl, socks5 net.Listener, pub *asyncx.Wakeup, locate *asyncx.Wakeup) _torrenting {
 	return _torrenting{
 		pub:              pub,
+		locate:           locate,
 		cond:             sync.NewCond(&sync.Mutex{}),
 		cfgpath:          userx.DefaultConfigDir(userx.DefaultRelRoot(), "torrent.cfg"),
 		discoverycfgpath: userx.DefaultConfigDir(userx.DefaultRelRoot(), "discovery.cfg"),
@@ -110,6 +111,7 @@ func newTorrenting(db *sql.DB, id ssh.Signer, root, media, tvfs fsx.Virtual, mc 
 
 type _torrenting struct {
 	pub              *asyncx.Wakeup
+	locate           *asyncx.Wakeup
 	cfgpath          string
 	discoverycfgpath string
 	ddiscidpath      string
@@ -544,12 +546,14 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 
 	// TODO: AutoLocateMedia should be located within distributed indexing.
 	if cfg.AutoLocateMedia {
-		// const freq = 15 * time.Minute
-		const freq = time.Minute
+		const freq = 15 * time.Minute
 		policy := ddisc.DefaultPolicy()
-		go timex.NowAndEvery(dctx, freq, func(ctx context.Context) error {
-			errorsx.Log(LocateMedia(dctx, t.db, tclient, disc, dhts, partitions, plugins, policy))
-			return nil
+		go asyncx.Periodic(dctx, t.locate, backoffx.New(
+			backoffx.Constant(freq),
+			backoffx.JitterRandom(time.Second),
+		), "locate media - periodic")
+		asyncx.Background(dctx, t.locate, func(ctx context.Context) error {
+			return errorsx.Wrap(LocateMedia(dctx, t.db, tclient, disc, dhts, partitions, plugins, policy), "failed to locate media")
 		})
 	} else {
 		log.Println("auto locate media is disabled, to enable add --auto-locate-media flag.")

@@ -9,6 +9,7 @@ import 'package:retrovibed/langcodex.dart' as langcodex;
 import 'package:retrovibed/lucene.dart' as lucene;
 import 'package:retrovibed/discovery.dart' as disc;
 import 'api.dart' as api;
+import 'discovery.locator.dart';
 import 'known.media.download.list.dart';
 import 'known.media.display.dart';
 import 'media.settings.dart';
@@ -259,6 +260,13 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                           ),
                         ),
                       ),
+                      empty:
+                          (widget.search.value.next.query.trim().isEmpty || category.isEmpty)
+                              ? ds.Empty
+                              : DiscoveryLocator(
+                                  query: widget.search.value.next.query.trim(),
+                                  mimetype: category,
+                                ),
                     ),
               (context, _media) {
                 var onSettings = () {

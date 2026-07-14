@@ -11,6 +11,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
+	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
@@ -28,6 +29,7 @@ func TestHTTPLocateCreate(t *testing.T) {
 	routes := mux.NewRouter()
 	ddiscapi.NewHTTPLocate(
 		q,
+		asyncx.NewWakeup(t.Context()),
 		ddiscapi.HTTPLocateOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 	).Bind(routes.PathPrefix("/").Subrouter())
 
@@ -62,6 +64,7 @@ func TestHTTPLocateCreateRejectsEmpty(t *testing.T) {
 	routes := mux.NewRouter()
 	ddiscapi.NewHTTPLocate(
 		q,
+		asyncx.NewWakeup(t.Context()),
 		ddiscapi.HTTPLocateOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 	).Bind(routes.PathPrefix("/").Subrouter())
 

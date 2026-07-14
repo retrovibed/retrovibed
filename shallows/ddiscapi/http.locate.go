@@ -12,6 +12,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/httpauth"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
+	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -32,9 +33,10 @@ func HTTPLocateOptionJWTSecret(j jwtx.SecretSource) HTTPLocateOption {
 	}
 }
 
-func NewHTTPLocate(q sqlx.Queryer, options ...HTTPLocateOption) *HTTPLocate {
+func NewHTTPLocate(q sqlx.Queryer, pub *asyncx.Wakeup, options ...HTTPLocateOption) *HTTPLocate {
 	svc := langx.Clone(HTTPLocate{
 		q:         q,
+		locate:    pub,
 		jwtsecret: env.JWTSecret,
 		decoder:   formx.NewDecoder(),
 		lucene:    duckdbx.NewLucene(),
@@ -45,6 +47,7 @@ func NewHTTPLocate(q sqlx.Queryer, options ...HTTPLocateOption) *HTTPLocate {
 
 type HTTPLocate struct {
 	q         sqlx.Queryer
+	locate    *asyncx.Wakeup
 	jwtsecret jwtx.SecretSource
 	decoder   *form.Decoder
 	lucene    lucenex.Driver
@@ -170,6 +173,8 @@ func (t *HTTPLocate) create(w http.ResponseWriter, r *http.Request) {
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
+
+	t.locate.Broadcast()
 
 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &LocateCreateResponse{
 		Locate: new(
