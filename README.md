@@ -125,6 +125,34 @@ retrovibed torrent import directory --peer="localhost:9998" {directory} | retrov
 # retrovibed torrent export "query" | retrovibed community publish --dry-run foo
 ```
 
+#### generating a search plugin with an llm
+
+search plugins are `wasip1`/`wasm` binaries that `retroapi/searchplugin.Registry` loads and runs sandboxed against the real network. They are significantly safer than other search systems in that the plugins are not given any access to the local network or the filesystem.
+
+the API contract is small enough that an LLM can write a working plugin from a single reference file plus the name of the site to search:
+
+give an LLM `https://github.com/retrovibed/retrovibed/blob/main/retroapi/examples/searchplugin-noop/main.go` as context — its comments walk through
+the argv handling, the stdout contract, and why autohijack is required — along with the name of
+the website you want it to search. that's enough to prompt something like:
+
+```
+Read https://github.com/retrovibed/retrovibed/blob/main/retroapi/examples/searchplugin-noop/main.go — that's the protocol a retrovibed search
+plugin must satisfy. Write a new Go program in the same shape that searches <site> for
+<query>, parsing real results and emitting one ddiscapi.Import per result to stdout instead
+of the noop's fabricated one.
+```
+
+build and drop it in the well-known plugin directory, picked up live with no daemon restart:
+
+```bash
+# verify it natively first
+go run . plugin --category all --query ubuntu
+
+# then cross-compile for the registry
+GOOS=wasip1 GOARCH=wasm go build -o myplugin.wasm .
+cp myplugin.wasm ~/.config/retrovibed/search.d/
+```
+
 #### run flatpak from cli
 
 ```bash
