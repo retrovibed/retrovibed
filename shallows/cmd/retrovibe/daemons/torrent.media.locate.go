@@ -23,6 +23,8 @@ import (
 // then ranks every candidate already in ddisc_media for that known-media-id
 // with policy and downloads the best one.
 func LocateMedia(ctx context.Context, db sqlx.Queryer, c *torrent.Client, disc *DiscoverySettings, dhts *dht.Server, partitions *ddisc.Partition, plugins searchPlugins, policy ddisc.Policy) error {
+	log.Println("locate media initiated")
+	defer log.Println("locate media completed")
 	if !disc.LocateP2P {
 		return nil
 	}

@@ -15,6 +15,7 @@ require (
 	github.com/cyruzin/golang-tmdb v1.9.3
 	github.com/dashotv/tvdb v0.5.2
 	github.com/duckdb/duckdb-go/v2 v2.10503.1
+	github.com/egdaemon/wasinet/wasinet v0.0.0-20260714114633-11ce19bcbeeb
 	github.com/fsnotify/fsnotify v1.10.1
 	github.com/gabriel-vasile/mimetype v1.4.13
 	github.com/go-playground/form/v4 v4.3.0
@@ -172,7 +173,7 @@ require (
 	github.com/posener/complete v1.2.3 // indirect
 	github.com/riywo/loginshell v0.0.0-20200815045211-7d26008be1ab // indirect
 	golang.org/x/net v0.56.0 // indirect
-	golang.org/x/sys v0.46.0 // indirect
+	golang.org/x/sys v0.47.0 // indirect
 	golang.org/x/tools v0.45.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

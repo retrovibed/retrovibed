@@ -79,7 +79,6 @@ github.com/containers/podman/v5 v5.4.1/go.mod h1:Fjx8t5VU6M/RfZkCzaCmU9mfj/8SIQ/
 github.com/containers/psgo v1.9.0/go.mod h1:0YoluUm43Mz2UnBIh1P+6V6NWcbpTL5uRtXyOcH0B5A=
 github.com/containers/storage v1.57.1/go.mod h1:i/Hb4lu7YgFr9G0K6BMjqW0BLJO1sFsnWQwj2UoWCUM=
 github.com/coreos/go-systemd/v22 v22.5.1-0.20231103132048-7d375ecc2b09/go.mod h1:m2r/smMKsKwgMSAoFKHaa68ImdCSNuKE1MxvQ64xuCQ=
-github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/creasty/defaults v1.8.0/go.mod h1:iGzKe6pbEHnpMPtfDXZEr0NVxWnPTjb1bbDy08fPzYM=
 github.com/cyberphone/json-canonicalization v0.0.0-20231217050601-ba74d44ecf5f/go.mod h1:uzvlm1mxhHkdfqitSA92i7Se+S9ksOn3a3qmv/kyOCw=
 github.com/cyphar/filepath-securejoin v0.3.6/go.mod h1:Sdj7gXlvMcPZsbhwhQ33GguGLDGQL7h7bg04C/+u9jI=
@@ -102,6 +101,8 @@ github.com/duckdb/duckdb-go-bindings/windows-amd64 v0.1.5/go.mod h1:yghI/cr7VUFb
 github.com/duckdb/duckdb-go/v2 v2.5.1/go.mod h1:DRMOapsta2PlFZtlWrxyC5CqucD0q5GZH/KRkTTnPUU=
 github.com/ebitengine/purego v0.8.2/go.mod h1:iIjxzd6CiRiOG0UyXP+V1+jWqUXVjPKLAI0mRfJZTmQ=
 github.com/egdaemon/wasinet/wazeronet v0.0.0-20250205011224-d5f0e1da96d7/go.mod h1:64MD4OgWyYuKHTji15b9N8BXtzipKtR8+uLOSMEz2Es=
+github.com/egdaemon/wasinet/wazeronet v0.0.0-20260714110034-97594e9655ad/go.mod h1:24MLedTkSsszJFr4scqXeDTqieTAtdymhflkj1joXB4=
+github.com/egdaemon/wasinet/wazeronet v0.0.0-20260714114633-11ce19bcbeeb/go.mod h1:24MLedTkSsszJFr4scqXeDTqieTAtdymhflkj1joXB4=
 github.com/elastic/go-sysinfo v1.11.2/go.mod h1:GKqR8bbMK/1ITnez9NIsIfXQr25aLhRJa7AfT8HpBFQ=
 github.com/elastic/go-windows v1.0.1/go.mod h1:FoVvqWSun28vaDQPbj2Elfc0JahhPB7WQEGa3c814Ss=
 github.com/elastic/gosigar v0.14.3/go.mod h1:iXRIGg2tLnu7LBdpqzyQfGDEidKCfWcCMS0WKyPWoMs=
@@ -201,7 +202,6 @@ github.com/klauspost/cpuid/v2 v2.2.11/go.mod h1:hqwkgyIinND0mEev00jJYCxPNVRVXFQe
 github.com/klauspost/pgzip v1.2.6/go.mod h1:Ch1tH69qFZu15pkjo5kYi6mth2Zzwzt50oCQKQE9RUs=
 github.com/koron/go-ssdp v0.0.5/go.mod h1:Qm59B7hpKpDqfyRNWRNr00jGwLdXjDyZh6y7rH6VS0w=
 github.com/kr/fs v0.1.0/go.mod h1:FFnZGqtBN9Gxj7eW1uZ42v5BccTP0vu6NEaFoC2HwRg=
-github.com/kr/pretty v0.2.1/go.mod h1:ipq/a2n7PKx3OHsz4KJII5eveXtPO4qwEXGdVfWzfnI=
 github.com/kylelemons/godebug v1.1.0/go.mod h1:9/0rRGxNHcop5bhtWyNeEfOS8JIWk580+fNqagV/RAw=
 github.com/letsencrypt/boulder v0.0.0-20240620165639-de9c06129bec/go.mod h1:TmwEoGCwIti7BCeJ9hescZgRtatxRE+A72pCoPfmcfk=
 github.com/libp2p/go-buffer-pool v0.1.0/go.mod h1:N+vh8gMqimBzdKkSMVuydVDq+UV5QTWy5HSiZacSbPg=
@@ -293,7 +293,6 @@ github.com/pion/transport/v3 v3.0.7/go.mod h1:YleKiTZ4vqNxVwh77Z0zytYi7rXHl7j6uP
 github.com/pion/turn/v2 v2.1.6/go.mod h1:huEpByKKHix2/b9kmTAM3YoX6MKP+/D//0ClgUYR2fY=
 github.com/pion/webrtc/v3 v3.3.5/go.mod h1:liNa+E1iwyzyXqNUwvoMRNQ10x8h8FOeJKL8RkIbamE=
 github.com/pjbgf/sha1cd v0.3.2/go.mod h1:zQWigSxVmsHEZow5qaLtPYxpcKMMQpa09ixqBxuCS6A=
-github.com/pkg/diff v0.0.0-20210226163009-20ebb0f2a09e/go.mod h1:pJLUxLENpZxwdsKMEsNbx1VGcRFpLqf3715MtcvvzbA=
 github.com/pkg/sftp v1.13.7/go.mod h1:KMKI0t3T6hfA+lTR/ssZdunHo+uwq7ghoN09/FSu3DY=
 github.com/polydawn/refmt v0.89.0/go.mod h1:/zvteZs/GwLtCgZ4BL6CBsk9IKIlexP43ObX9AxTqTw=
 github.com/pressly/goose/v3 v3.24.2 h1:c/ie0Gm8rnIVKvnDQ/scHErv46jrDv9b4I0WRcFJzYU=
@@ -315,7 +314,6 @@ github.com/quic-go/qpack v0.5.1/go.mod h1:+PC4XFrEskIVkcLzpEkbLqq1uCoxPhQuvK5rH1
 github.com/quic-go/quic-go v0.48.2/go.mod h1:yBgs3rWBOADpga7F+jJsb6Ybg1LSYiQvwWlLX+/6HMs=
 github.com/quic-go/webtransport-go v0.8.1-0.20241018022711-4ac2c9250e66/go.mod h1:Vp72IJajgeOL6ddqrAhmp7IM9zbTcgkQxD/YdxrVwMw=
 github.com/raulk/go-watchdog v1.3.0/go.mod h1:fIvOnLbF0b0ZwkB9YU4mOW9Did//4vPZtDqv66NfsMU=
-github.com/rogpeppe/go-internal v1.9.0/go.mod h1:WtVeX8xhTBvf0smdhujwtBcq4Qrzq/fJaraNFVN+nFs=
 github.com/rogpeppe/go-internal v1.13.1/go.mod h1:uMEvuHeurkdAXX61udpOXGD/AzZDWNMNyH2VO9fmH0o=
 github.com/rymdport/portal v0.4.1/go.mod h1:kFF4jslnJ8pD5uCi17brj/ODlfIidOxlgUDTO5ncnC4=
 github.com/sahilm/fuzzy v0.1.1/go.mod h1:VFvziUEIMCrT6A6tw2RFIXPXXmzXbOsSHF0DOI8ZK9Y=
@@ -446,7 +444,6 @@ golang.org/x/term v0.0.0-20210615171337-6886f2dfbf5b/go.mod h1:jbD1KX2456YbFQfuX
 golang.org/x/term v0.32.0/go.mod h1:uZG1FhGx848Sqfsq4/DlJr3xGGsYMu/L5GW4abiaEPQ=
 golang.org/x/term v0.39.0/go.mod h1:yxzUCTP/U+FzoxfdKmLaA0RV1WgE0VY7hXBwKtY/4ww=
 golang.org/x/term v0.43.0/go.mod h1:lrhlHNdQJHO+1qVYiHfFKVuVioJIheAc3fBSMFYEIsk=
-golang.org/x/term v0.44.0/go.mod h1:7ze4MdzUzLXpSAoFP1H0bOI9aXDqveSvatT5vKcFh2Y=
 golang.org/x/text v0.23.0/go.mod h1:/BLNzu4aZCJ1+kcD0DNRotWKage4q2rGVAg4o22unh4=
 golang.org/x/text v0.26.0/go.mod h1:QK15LZJUUQVJxhz7wXgxSy/CJaTFjd0G+YLonydOVQA=
 golang.org/x/text v0.28.0/go.mod h1:U8nCwOR8jO/marOQ0QbDiOngZVEBB7MAiitBuMjXiNU=

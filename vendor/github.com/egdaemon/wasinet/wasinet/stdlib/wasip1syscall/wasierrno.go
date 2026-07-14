@@ -9,7 +9,10 @@ import (
 
 const (
 	EACCES        syscall.Errno = 0x2
+	EADDRNOTAVAIL syscall.Errno = 0x4
+	EAFNOSUPPORT  syscall.Errno = 0x5
 	EAGAIN        syscall.Errno = 0x6
+	EBADF         syscall.Errno = 0x8
 	ECANCELED     syscall.Errno = 0xB
 	EDOM          syscall.Errno = 0x12
 	EINPROGRESS   syscall.Errno = 0x1A
@@ -21,7 +24,6 @@ const (
 	ENOPROTOOPT   syscall.Errno = 0x32
 	ENOTCONN      syscall.Errno = 0x35
 	ETIMEDOUT     syscall.Errno = 0x49
-	EADDRNOTAVAIL syscall.Errno = 0x63
 	ECONNREFUSED  syscall.Errno = 0xE
 	ENOENT        syscall.Errno = 0x2C
 	EOPNOTSUPP    syscall.Errno = 0x3A
@@ -30,6 +32,8 @@ const (
 var mapped = map[syscall.Errno]syscall.Errno{
 	ffierrors.ErrnoSuccess(): ffierrors.ErrnoSuccess(),
 	syscall.EACCES:           EACCES,
+	syscall.EAFNOSUPPORT:     EAFNOSUPPORT,
+	syscall.EBADF:            EBADF,
 	syscall.EINPROGRESS:      EINPROGRESS,
 	syscall.ECANCELED:        ECANCELED,
 	syscall.EIO:              EIO,

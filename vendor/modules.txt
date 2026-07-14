@@ -420,10 +420,8 @@ github.com/egdaemon/eg/runtime/x/wasi/egsha256x
 github.com/egdaemon/eg/runtime/x/wasi/egtarball
 github.com/egdaemon/eg/runtime/x/wasi/execx
 github.com/egdaemon/eg/secrets
-# github.com/egdaemon/wasinet/wasinet v0.0.0-20250806175613-49e153bd345a
-## explicit; go 1.23.4
-# github.com/egdaemon/wasinet/wasinet v0.0.0-20260710014825-eed0f978ee92
-## explicit; go 1.23.4
+# github.com/egdaemon/wasinet/wasinet v0.0.0-20260714114633-11ce19bcbeeb
+## explicit; go 1.25.0
 github.com/egdaemon/wasinet/wasinet
 github.com/egdaemon/wasinet/wasinet/autohijack
 github.com/egdaemon/wasinet/wasinet/ffi
@@ -434,8 +432,8 @@ github.com/egdaemon/wasinet/wasinet/internal/langx
 github.com/egdaemon/wasinet/wasinet/stdlib/wasip1net
 github.com/egdaemon/wasinet/wasinet/stdlib/wasip1syscall
 github.com/egdaemon/wasinet/wasinet/wnetruntime
-# github.com/egdaemon/wasinet/wazeronet v0.0.0-20260710014825-eed0f978ee92
-## explicit; go 1.23.4
+# github.com/egdaemon/wasinet/wazeronet v0.0.0-20260714114633-11ce19bcbeeb
+## explicit; go 1.25.0
 github.com/egdaemon/wasinet/wazeronet
 # github.com/ericlagergren/decimal v0.0.0-20240411145413-00de7ca16731
 ## explicit; go 1.16
@@ -1032,7 +1030,7 @@ golang.org/x/oauth2/jwt
 ## explicit; go 1.25.0
 golang.org/x/sync/errgroup
 golang.org/x/sync/semaphore
-# golang.org/x/sys v0.46.0
+# golang.org/x/sys v0.47.0
 ## explicit; go 1.25.0
 golang.org/x/sys/cpu
 golang.org/x/sys/unix

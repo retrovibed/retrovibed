@@ -9,6 +9,7 @@ import (
 
 	"github.com/egdaemon/wasinet/wasinet/wnetruntime"
 	"github.com/egdaemon/wasinet/wazeronet"
+	"github.com/retrovibed/retrovibed/retroapi/asynccompute"
 	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/fsx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/langx"
@@ -30,6 +31,11 @@ type Registry struct {
 
 	mu      sync.RWMutex
 	modules map[string]wazero.CompiledModule
+
+	// pool runs plugin invocations for every Search call; it is shared and
+	// long-lived so concurrent searches reuse the same worker goroutines
+	// instead of spinning up new ones per call.
+	pool *asynccompute.Pool[workload]
 }
 
 // NewRegistry builds a Registry using wasinet's default Virtual socket
@@ -77,14 +83,21 @@ func newRegistry(ctx context.Context, sock wnetruntime.Socket) (*Registry, error
 		return nil, errorsx.Wrap(err, "unable to instantiate wasinet")
 	}
 
-	return &Registry{
+	r := &Registry{
 		runtime: runtime,
 		sslCertDir: langx.FirstNonZero(
-			fsx.LocatePhysicalPath("/etc/ssl/certs", "/etc/pki/tls/certs", "/usr/share/ca-certificates"),
+			fsx.LocatePhysicalPath(
+				"/etc/ssl/certs",
+				"/etc/pki/tls/certs",
+				"/usr/share/ca-certificates",
+			),
 			"/etc/ssl/certs",
 		),
 		modules: map[string]wazero.CompiledModule{},
-	}, nil
+	}
+	r.pool = asynccompute.New(r.runSearchJob)
+
+	return r, nil
 }
 
 func searchPluginDir() string {

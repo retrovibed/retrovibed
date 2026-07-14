@@ -106,10 +106,8 @@ github.com/eapache/go-xerial-snappy v0.0.0-20180814174437-776d5712da21/go.mod h1
 github.com/eapache/queue v1.1.0/go.mod h1:6eCeP0CKFpHLu8blIFXhExK/dRa7WDZfr6jVFPTqq+I=
 github.com/edsrzf/mmap-go v1.2.0 h1:hXLYlkbaPzt1SaQk+anYwKSRNhufIDCchSPkUD6dD84=
 github.com/edsrzf/mmap-go v1.2.0/go.mod h1:19H/e8pUPLicwkyNgOykDXkJ9F0MHE+Z52B8EIth78Q=
-github.com/egdaemon/wasinet/wasinet v0.0.0-20260710014825-eed0f978ee92 h1:Tk2GuSMmEtg9fv+nF/swk5wV/o3EF7cHSJbyN5Fcacw=
-github.com/egdaemon/wasinet/wasinet v0.0.0-20260710014825-eed0f978ee92/go.mod h1:vPVQ3HHYTa9Fe7lz+ZBqI49kw76LSTQfvKZlO8QpWsY=
-github.com/egdaemon/wasinet/wazeronet v0.0.0-20260710014825-eed0f978ee92 h1:7lF+InAzh1+IViiww/EXCE5r9ClCVMoyA5Yppn64N28=
-github.com/egdaemon/wasinet/wazeronet v0.0.0-20260710014825-eed0f978ee92/go.mod h1:64MD4OgWyYuKHTji15b9N8BXtzipKtR8+uLOSMEz2Es=
+github.com/egdaemon/wasinet/wasinet v0.0.0-20260714114633-11ce19bcbeeb h1:ImKjoO3D0C7bEY+iopzwK16Be+2TF8O85XpdeKEpS94=
+github.com/egdaemon/wasinet/wazeronet v0.0.0-20260714114633-11ce19bcbeeb h1:eVJHTf/M2vhqR5pemlWec6KXPsqeTo2qeQawHYfbtDQ=
 github.com/envoyproxy/go-control-plane v0.9.0/go.mod h1:YTl/9mNaCwkRvm6d1a2C3ymFceY/DCBVvsKhRF0iEA4=
 github.com/envoyproxy/go-control-plane v0.9.1-0.20191026205805-5f8ba28d4473/go.mod h1:YTl/9mNaCwkRvm6d1a2C3ymFceY/DCBVvsKhRF0iEA4=
 github.com/envoyproxy/go-control-plane v0.9.4/go.mod h1:6rpuAdCZL397s3pYoYcLgu1mIlRU8Am5FuJP05cCM98=
@@ -361,8 +359,7 @@ golang.org/x/sys v0.0.0-20200930185726-fdedc70b468f/go.mod h1:h1NjWce9XRLGQEsW7w
 golang.org/x/sys v0.0.0-20211007075335-d3039528d8ac/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20220310020820-b874c991c1a5/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.6.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
-golang.org/x/sys v0.46.0 h1:noSf2Fq6F8DBgS+LysIkx7rIExoNHJsxOAtPp4rthXw=
-golang.org/x/sys v0.46.0/go.mod h1:4GL1E5IUh+htKOUEOaiffhrAeqysfVGipDYzABqnCmw=
+golang.org/x/sys v0.47.0 h1:o7XGOvZQCADBQQ4Y7VNq2dRWQR7JmOUW8Kxx4ZsNgWs=
 golang.org/x/term v0.44.0 h1:0rLvDRCtNj0gZkyIXhCyOb2OAzEhLVqc4B+hrsBhrmc=
 golang.org/x/term v0.44.0/go.mod h1:7ze4MdzUzLXpSAoFP1H0bOI9aXDqveSvatT5vKcFh2Y=
 golang.org/x/text v0.3.0/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=

@@ -5,8 +5,8 @@ go 1.26.3
 require (
 	github.com/brianvoe/gofakeit/v7 v7.15.0
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
-	github.com/egdaemon/wasinet/wasinet v0.0.0-20260710014825-eed0f978ee92
-	github.com/egdaemon/wasinet/wazeronet v0.0.0-20260710014825-eed0f978ee92
+	github.com/egdaemon/wasinet/wasinet v0.0.0-20260714114633-11ce19bcbeeb
+	github.com/egdaemon/wasinet/wazeronet v0.0.0-20260714114633-11ce19bcbeeb
 	github.com/fsnotify/fsnotify v1.10.1
 	github.com/go-playground/form/v4 v4.3.0
 	github.com/gofrs/uuid/v5 v5.4.0
@@ -24,7 +24,7 @@ require (
 	golang.org/x/exp v0.0.0-20260603202125-055de637280b
 	golang.org/x/net v0.56.0
 	golang.org/x/oauth2 v0.36.0
-	golang.org/x/sys v0.46.0
+	golang.org/x/sys v0.47.0
 	golang.org/x/time v0.15.0
 	google.golang.org/protobuf v1.36.11
 )
