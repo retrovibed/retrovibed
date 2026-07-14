@@ -20,7 +20,12 @@ class DiscoveryLocator extends StatefulWidget {
     required this.query,
     required this.mimetype,
     this.locate = api.locate.create,
-    this.help = ds.HelpScope.None,
+    this.help = const ds.Hint(
+      Text(
+        "searches the peer-to-peer network and your search plugins for this title. "
+        "when a match is found its downloaded automatically.",
+      ),
+    ),
   });
 
   @override
@@ -85,25 +90,46 @@ class _DiscoveryLocator extends State<DiscoveryLocator> {
 
   @override
   Widget build(BuildContext context) {
+    final defaults = ds.Defaults.of(context);
+    final description = Center(
+      child: Padding(
+        padding: defaults.padding.copyWith(bottom: 0),
+        child: Text(
+          "select below to locate and download",
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+
+    if (widget.query.trim().isEmpty || widget.mimetype.isEmpty) {
+      return description;
+    }
+
     return ds.Loading(
       loading: _loading,
       cause: _cause,
-      ds.Card(
-        Center(
-          child: Icon(
-            _queued ? Icons.query_builder_rounded : Icons.travel_explore_rounded,
-            size: 48,
-          ),
-        ),
-        onTap: _loading || _queued ? null : _onTap,
-        help: widget.help,
-        trailing: [
-          Center(
-            child: Text(
-              'search the network for "${widget.query}"',
-              textAlign: TextAlign.center,
+      Column(
+        children: [
+          ds.Card(
+            margin: defaults.padding.copyWith(bottom: 0, top: 0),
+            Center(
+              child: Icon(
+                _queued ? Icons.query_builder_rounded : Icons.travel_explore_rounded,
+                size: 48,
+              ),
             ),
+            onTap: _loading || _queued ? null : _onTap,
+            help: widget.help,
+            trailing: [
+              Center(
+                child: Text(
+                  'search the network',
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
           ),
+          description,
         ],
       ),
     );
