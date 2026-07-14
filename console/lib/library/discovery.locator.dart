@@ -95,7 +95,7 @@ class _DiscoveryLocator extends State<DiscoveryLocator> {
       child: Padding(
         padding: defaults.padding.copyWith(bottom: 0),
         child: Text(
-          "select below to locate and download",
+          "select to locate and download well known media",
           textAlign: TextAlign.center,
         ),
       ),

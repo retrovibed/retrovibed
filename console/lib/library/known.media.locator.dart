@@ -9,6 +9,7 @@ import './api.dart' as api;
 class KnownMediaLocator extends StatefulWidget {
   final api.Known current;
   final Future<api.LocateCreateResponse> Function(api.Locate req, {List<httpx.Option> options}) locate;
+  final Future<bool> Function(BuildContext context, {List<httpx.Option> options}) ensureP2P;
   final IconData icon;
   final Widget help;
   final Widget? trailing;
@@ -17,6 +18,7 @@ class KnownMediaLocator extends StatefulWidget {
     this.current, {
     super.key,
     this.locate = api.locate.create,
+    this.ensureP2P = disc.ensureP2P,
     this.icon = Icons.download_rounded,
     this.help = ds.HelpScope.None,
     this.trailing,
@@ -50,7 +52,7 @@ class _KnownMediaLocator extends State<KnownMediaLocator> {
 
     final options = [authn.request(authn.AuthzCache.meta(context))];
 
-    disc
+    widget
         .ensureP2P(context, options: options)
         .then((proceed) {
           if (!proceed) {
