@@ -9,9 +9,7 @@ import (
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
-	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 )
 
 // searchPlugins is the narrow interface PluginStrategy needs from
@@ -21,15 +19,16 @@ type searchPlugins interface {
 }
 
 // PluginStrategy runs external search plugins (via a
-// *retroapi/searchplugin.Registry) and persists whatever they find into
-// ddisc_media. No-ops if req.Title is empty — plugins can't be usefully
-// queried without one.
-func PluginStrategy(q sqlx.Queryer, plugins searchPlugins) DiscoverStrategy {
-	return pluginStrategy{q: q, plugins: plugins}
+// *retroapi/searchplugin.Registry) and yields whatever they find. Yielded
+// candidates are neither ranked nor persisted here - Discover's central seq
+// does both for every candidate regardless of which strategy produced it.
+// No-ops if req.Title is empty — plugins can't be usefully queried without
+// one.
+func PluginStrategy(plugins searchPlugins) DiscoverStrategy {
+	return pluginStrategy{plugins: plugins}
 }
 
 type pluginStrategy struct {
-	q       sqlx.Queryer
 	plugins searchPlugins
 }
 
@@ -63,12 +62,8 @@ func (t *pluginSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 				DiscoveredOptionKnownMedia(t.req.KnownMediaID),
 				DiscoveredOptionMimetype(langx.FirstNonZero(imp.Mimetype, t.req.Category)),
 				DiscoveredOptionHealth(imp.Health),
+				DiscoveredOptionTitle(m.DisplayName),
 			)
-
-			if err := DiscoveredInsertWithDefaults(ctx, t.cfg.q, d).Scan(&d); err != nil {
-				errorsx.Log(errorsx.Wrap(err, "unable to persist search plugin result"))
-				continue
-			}
 
 			if !yield(d) {
 				return

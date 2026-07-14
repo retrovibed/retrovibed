@@ -16,11 +16,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-type fakePlugins struct {
-	results []*ddiscapi.Import
-}
-
-func (t fakePlugins) Search(ctx context.Context, category, query string) iterx.Seq[*ddiscapi.Import] {
+func (t fakePluginSeq) Search(ctx context.Context, category, query string) iterx.Seq[*ddiscapi.Import] {
 	return fakePluginSeq{results: t.results}
 }
 
@@ -34,15 +30,15 @@ func (t fakePluginSeq) Each(ctx context.Context) iter.Seq[*ddiscapi.Import] {
 
 func (t fakePluginSeq) Err() error { return nil }
 
-func TestPluginStrategyPersistsAndYields(t *testing.T) {
+func TestPluginStrategyYieldsUnpersisted(t *testing.T) {
 	q := sqltestx.Metadatabase(t)
 
 	id := int160.Random()
 	magnet := fmt.Sprintf("magnet:?xt=urn:btih:%s", id.String())
 	kid := uuid.Must(uuid.NewV4()).String()
 
-	plugins := fakePlugins{results: []*ddiscapi.Import{{Magnet: magnet, Health: 5, Mimetype: mimex.Video}}}
-	seq := ddisc.PluginStrategy(q, plugins).Discover(t.Context(), ddisc.DiscoverRequest{KnownMediaID: kid, Title: "ubuntu", Category: mimex.Video})
+	plugins := fakePluginSeq{results: []*ddiscapi.Import{{Magnet: magnet, Health: 5, Mimetype: mimex.Video}}}
+	seq := ddisc.PluginStrategy(plugins).Discover(t.Context(), ddisc.DiscoverRequest{KnownMediaID: kid, Title: "ubuntu", Category: mimex.Video})
 
 	var got []ddisc.Discovered
 	for v := range seq.Each(t.Context()) {
@@ -51,14 +47,12 @@ func TestPluginStrategyPersistsAndYields(t *testing.T) {
 	require.NoError(t, seq.Err())
 	require.Len(t, got, 1)
 	require.Equal(t, kid, got[0].KnownMediaID)
-	require.Equal(t, 1, sqltestx.Count(t, q, fmt.Sprintf("SELECT COUNT(*) FROM ddisc_media WHERE known_media_id = '%s'", kid)))
+	require.Equal(t, 0, sqltestx.Count(t, q, fmt.Sprintf("SELECT COUNT(*) FROM ddisc_media WHERE known_media_id = '%s'", kid)), "PluginStrategy itself must not persist - that's Discover's job")
 }
 
 func TestPluginStrategyNoopsWithoutTitle(t *testing.T) {
-	q := sqltestx.Metadatabase(t)
-
-	plugins := fakePlugins{results: []*ddiscapi.Import{{Magnet: "magnet:?xt=urn:btih:1111111111111111111111111111111111111111"}}}
-	seq := ddisc.PluginStrategy(q, plugins).Discover(t.Context(), ddisc.DiscoverRequest{KnownMediaID: uuid.Must(uuid.NewV4()).String()})
+	plugins := fakePluginSeq{results: []*ddiscapi.Import{{Magnet: "magnet:?xt=urn:btih:1111111111111111111111111111111111111111"}}}
+	seq := ddisc.PluginStrategy(plugins).Discover(t.Context(), ddisc.DiscoverRequest{KnownMediaID: uuid.Must(uuid.NewV4()).String()})
 
 	var count int
 	for range seq.Each(t.Context()) {

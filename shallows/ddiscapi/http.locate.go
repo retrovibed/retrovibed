@@ -159,6 +159,12 @@ func (t *HTTPLocate) create(w http.ResponseWriter, r *http.Request) {
 
 	d = ddisc.NewLocate(d.Query, d.Mimetype, ddisc.LocateOptionKnownMedia(langx.FirstNonZero(d.KnownMediaID, uuid.Nil.String())))
 
+	if d.KnownMediaID == uuid.Nil.String() && d.Query == "" {
+		log.Println("locate requires a known media id or a query")
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		return
+	}
+
 	if err := ddisc.LocateInsertWithDefaults(r.Context(), t.q, d).Scan(&d); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to create locate record"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))

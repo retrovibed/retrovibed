@@ -171,6 +171,7 @@ func Main(args ...string) {
 		kong.TypeMapper(reflect.TypeOf(&net.IP{}), kong.MapperFunc(cmdopts.ParseIP)),
 		kong.TypeMapper(reflect.TypeOf(&net.TCPAddr{}), kong.MapperFunc(cmdopts.ParseTCPAddr)),
 		kong.TypeMapper(reflect.TypeOf([]*net.TCPAddr(nil)), kong.MapperFunc(cmdopts.ParseTCPAddrArray)),
+		kong.NamedMapper("durationinf", kong.MapperFunc(cmdopts.ParseDurationInf)),
 	)
 
 	// Run kongplete.Complete to handle completion requests

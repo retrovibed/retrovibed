@@ -53,3 +53,28 @@ func TestHTTPLocateCreate(t *testing.T) {
 	require.NotEmpty(t, result.Locate.Id)
 	require.NotEmpty(t, result.Locate.KnownMediaId)
 }
+
+func TestHTTPLocateCreateRejectsEmpty(t *testing.T) {
+	var claims jwt.RegisteredClaims
+
+	q := sqltestx.Metadatabase(t)
+
+	routes := mux.NewRouter()
+	ddiscapi.NewHTTPLocate(
+		q,
+		ddiscapi.HTTPLocateOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+	).Bind(routes.PathPrefix("/").Subrouter())
+
+	claims = jwtx.NewJWTClaims("test-subject", jwtx.ClaimsOptionAuthnExpiration())
+
+	body := testx.Must(json.Marshal(ddiscapi.LocateCreateRequest{
+		Locate: &ddiscapi.Locate{},
+	}))(t)
+
+	resp, req, err := httptestx.BuildRequestBytes(http.MethodPost, "/", body, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
+	require.NoError(t, err)
+
+	routes.ServeHTTP(resp, req)
+
+	require.Equal(t, http.StatusBadRequest, resp.Result().StatusCode)
+}

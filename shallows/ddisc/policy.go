@@ -1,10 +1,12 @@
 package ddisc
 
 import (
+	"cmp"
 	"context"
 	"math"
 	"regexp"
 
+	"github.com/Masterminds/squirrel"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 )
@@ -12,12 +14,6 @@ import (
 // ErrNoCandidate indicates every Discovered row for a known-media-id was
 // either absent or hard-rejected by the Policy.
 var ErrNoCandidate = errorsx.String("no acceptable candidate")
-
-// healthMidTierDefault is used when a candidate's Health is unknown (its
-// zero value) rather than actually reported as zero seeds - e.g. anything
-// not sourced from a search plugin, since nothing else currently reports a
-// real health number. A placeholder pending real DHT BEP33 scrape support.
-const healthMidTierDefault uint32 = 25
 
 // Policy ranks a discovered candidate for download selection.
 type Policy interface {
@@ -126,25 +122,45 @@ func (defaultPolicy) Rank(d *Discovered) error {
 
 	// bracket must strictly dominate customFormatScore: even the best
 	// possible custom-format score can't outweigh a full bracket step.
-	combined := uint32(bracket)*1000 + uint32(clampInt(customFormatScore, -500, 500)+500)
-	d.PolicyRank = uint16(65534 - combined)
+	combined := uint16(bracket)*1000 + uint16(clampInt(customFormatScore, -500, 500)+500)
 
-	if d.Health == 0 {
-		d.Health = healthMidTierDefault
-	}
+	// PolicyRank ranks toward zero (best), so invert combined - which
+	// scores toward its max (best) - rather than subtracting from a
+	// magic ceiling.
+	d.PolicyRank = ^combined
 
 	return nil
 }
 
-// RankAndSelect ranks every Discovered row for knownMediaID with policy,
-// persists the result of each (health/policy_rank/policy_rejection), and
-// returns the lowest-PolicyRank non-rejected candidate. Health and Bytes
-// break ties between equally-ranked candidates.
-func RankAndSelect(ctx context.Context, q sqlx.Queryer, policy Policy, knownMediaID string) (Discovered, error) {
-	s := sqlx.Scan(DiscoveredByKnownID(ctx, q, knownMediaID))
+// compareDiscovered orders candidates by PolicyRank ascending, then Health
+// descending, then Bytes descending: negative when a should be preferred
+// over b.
+func compareDiscovered(a, b Discovered) int {
+	return cmp.Or(
+		cmp.Compare(a.PolicyRank, b.PolicyRank),
+		cmp.Compare(b.Health, a.Health),
+		cmp.Compare(b.Bytes, a.Bytes),
+	)
+}
+
+// RankAndSelect ranks every Discovered row for loc.KnownMediaID whose title
+// matches loc.Query with policy, persists the result of each
+// (health/policy_rank/policy_rejection), and returns the lowest-PolicyRank
+// non-rejected candidate. Health and Bytes break ties between equally-ranked
+// candidates. The title match is strict (every word in loc.Query must appear
+// in the candidate's title) - required because known-media-id alone isn't
+// enough to scope candidates: unresolved locates all share the same
+// known-media-id (uuid.Nil), so without the title filter a candidate from a
+// completely unrelated search could be selected.
+func RankAndSelect(ctx context.Context, q sqlx.Queryer, policy Policy, loc Locate) (Discovered, error) {
+	b := DiscoveredSearchBuilder().Where(squirrel.And{
+		DiscoveredQueryKnownMediaID(loc.KnownMediaID),
+		DiscoveredQueryTitle(loc.Query),
+	})
+	s := sqlx.Scan(DiscoveredSearch(ctx, q, b))
 
 	var (
-		best  Discovered
+		best  = Worst()
 		found bool
 	)
 
@@ -161,10 +177,7 @@ func RankAndSelect(ctx context.Context, q sqlx.Queryer, policy Policy, knownMedi
 			continue
 		}
 
-		if !found ||
-			d.PolicyRank < best.PolicyRank ||
-			(d.PolicyRank == best.PolicyRank && (d.Health > best.Health ||
-				(d.Health == best.Health && d.Bytes > best.Bytes))) {
+		if compareDiscovered(d, best) < 0 {
 			best, found = d, true
 		}
 	}

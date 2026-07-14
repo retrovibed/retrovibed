@@ -41,7 +41,7 @@ func SearchQueueBackgroundRun(ctx context.Context, q sqlx.Queryer, plugins searc
 		}
 
 		sctx, cancel := context.WithTimeout(ctx, 30*time.Second)
-		seq := ddisc.Discover(sctx, ddisc.DiscoverRequestFromKnown(known), ddisc.PluginStrategy(q, plugins))
+		seq := ddisc.Discover(sctx, q, ddisc.DefaultPolicy(), ddisc.DiscoverRequestFromKnown(known), ddisc.PluginStrategy(plugins))
 
 		found := false
 		for range seq.Each(sctx) {

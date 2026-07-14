@@ -9,6 +9,7 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/dht"
+	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
@@ -36,7 +37,7 @@ type searchPlugins interface {
 }
 
 // errLocateFound stops the retry loop in cmdMediaLocate.Run once the queued
-// locate request has been resolved to a downloaded torrent.
+// locate request has had a candidate ranked and selected.
 var errLocateFound = errorsx.String("locate: candidate found")
 
 type cmdMediaLocate struct {
@@ -46,8 +47,8 @@ type cmdMediaLocate struct {
 	KnownMediaID string        `flag:"" name:"known-media-id" help:"known media id, if already resolved from a catalog search" optional:""`
 	Partitions   uint8         `flag:"" name:"discovery-partition" help:"number of partitions to split the infohash space into, must match the swarm's configuration" default:"128"`
 	Seed         string        `flag:"" name:"discovery-seed" help:"seed to generate partition spaces, must match the swarm's configuration" default:"retrovibed-ddisc"`
-	Interval     time.Duration `flag:"" name:"interval" help:"how often to re-run the discover/rank/download pass while waiting on async DHT responses" default:"20s"`
-	Timeout      time.Duration `flag:"" name:"timeout" help:"give up waiting for a candidate after this long; the locate request itself remains queued for a running daemon to pick up later" default:"2m"`
+	Interval     time.Duration `flag:"" name:"interval" help:"how often to re-run the discover/rank pass while waiting on async DHT responses" default:"20s"`
+	Timeout      time.Duration `flag:"" name:"timeout" type:"durationinf" help:"give up waiting for a candidate after this long, use 'infinity' to wait forever; the locate request itself remains queued for a running daemon to pick up later" default:"infinity"`
 	Bootstrap    bool          `flag:"" name:"dht-bootstrap" help:"bootstrap the DHT using well-known trackers" negatable:"" default:"true"`
 	DHTPeers     []string      `flag:"" name:"dht-peers" help:"use these dht peers as the sole bootstrap nodes instead of the public network" hidden:"true"`
 }
@@ -90,28 +91,28 @@ func (t cmdMediaLocate) Run(gctx *cmdopts.Global) (err error) {
 	bctx, bcancel := context.WithTimeout(gctx.Context, t.Timeout)
 	defer bcancel()
 
+	var found ddisc.Discovered
 	err = timex.NowAndEvery(bctx, t.Interval, func(ctx context.Context) error {
-		if err := daemons.LocateMedia(ctx, db, tclient, disc, dhts, partitions, plugins, policy); err != nil {
-			return err
+		d, ferr := daemons.Locate(ctx, db, disc, dhts, partitions, plugins, policy, loc)
+		if errors.Is(ferr, ddisc.ErrNoCandidate) {
+			return nil
+		} else if ferr != nil {
+			return ferr
 		}
 
-		var found ddisc.Locate
-		if err := ddisc.LocateFindByID(ctx, db, loc.ID).Scan(&found); err != nil {
-			return err
-		}
-
-		if found.LocatedTorrentID != uuid.Max.String() {
-			log.Println("media located", found.ID, found.LocatedTorrentID)
-			return errLocateFound
-		}
-
-		return nil
+		found = d
+		return errLocateFound
 	})
 
-	if errors.Is(err, errLocateFound) || errors.Is(err, context.DeadlineExceeded) {
-		if errors.Is(err, context.DeadlineExceeded) {
-			log.Println("timed out waiting for a candidate; the locate request remains queued for a running daemon to pick up later")
+	if errors.Is(err, errLocateFound) {
+		log.Println("candidate found", found.ID, found.Title, found.PolicyRank, int160.FromBytes(found.Infohash))
+		if err := daemons.DiscoveredDownload(bctx, db, tclient, loc, found); err != nil {
+			return errorsx.Wrap(err, "unable to initiate download")
 		}
+		log.Println("media located", loc.ID, found.ID)
+		return nil
+	} else if errors.Is(err, context.DeadlineExceeded) {
+		log.Println("timed out waiting for a candidate; the locate request remains queued for a running daemon to pick up later")
 		return nil
 	}
 
