@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/authn.dart' as authn;
+import 'package:retrovibed/ddisc.dart' as ddisc;
 import 'package:retrovibed/discovery.dart' as disc;
 import 'known.media.card.dart';
 import './api.dart' as api;
@@ -9,6 +10,7 @@ import './api.dart' as api;
 class KnownMediaLocator extends StatefulWidget {
   final api.Known current;
   final Future<api.LocateCreateResponse> Function(api.Locate req, {List<httpx.Option> options}) locate;
+  final Future<ddisc.DiscoveryDownloadResponse> Function(String id, {List<httpx.Option> options}) download;
   final Future<bool> Function(BuildContext context, {List<httpx.Option> options}) ensureP2P;
   final IconData icon;
   final Widget help;
@@ -18,6 +20,7 @@ class KnownMediaLocator extends StatefulWidget {
     this.current, {
     super.key,
     this.locate = api.locate.create,
+    this.download = ddisc.api.download,
     this.ensureP2P = disc.ensureP2P,
     this.icon = Icons.download_rounded,
     this.help = ds.HelpScope.None,
@@ -62,18 +65,38 @@ class _KnownMediaLocator extends State<KnownMediaLocator> {
             return null;
           }
 
-          return widget
-              .locate(
-                api.Locate.create()..knownMediaId = widget.current.id,
-                options: options,
-              )
-              .then((v) {
-                print("located ${v}");
-                setState(() {
-                  _queued = true;
-                  _loading = false;
-                });
-              });
+          switch (widget.current.source) {
+            case ddisc.sources.discovered:
+              return httpx.withRetry(
+                () => widget
+                    .download(
+                      widget.current.id,
+                      options: options,
+                    )
+                    .then((v) {
+                      print("downloading ${v}");
+                      setState(() {
+                        _queued = true;
+                        _loading = false;
+                      });
+                    }),
+              );
+            default:
+              return httpx.withRetry(
+                () => widget
+                    .locate(
+                      api.Locate.create()..knownMediaId = widget.current.id,
+                      options: options,
+                    )
+                    .then((v) {
+                      print("located ${v}");
+                      setState(() {
+                        _queued = true;
+                        _loading = false;
+                      });
+                    }),
+              );
+          }
         })
         .catchError((e) {
           setState(() {

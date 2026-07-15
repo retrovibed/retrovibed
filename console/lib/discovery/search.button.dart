@@ -49,25 +49,26 @@ class _SearchButtonState extends State<SearchButton> {
     if (query.isEmpty || mimetype.isEmpty) return;
 
     final options = [authn.request(authn.AuthzCache.meta(context))];
+    final proceed = await p2p.ensureP2P(context, options: options);
+    if (!proceed) return;
 
-    try {
-      final proceed = await p2p.ensureP2P(context, options: options);
-      if (!proceed) return;
-
-      await widget.locate(
-        api.Locate.create()
-          ..query = query
-          ..mimetype = mimetype,
-        options: options,
-      );
-      setState(() {
-        _queued = true;
-      });
-    } catch (cause) {
-      setState(() {
-        _cause = ds.Error.unknown(cause, onTap: reseterr);
-      });
-    }
+    widget
+        .locate(
+          api.Locate.create()
+            ..query = query
+            ..mimetype = mimetype,
+          options: options,
+        )
+        .then((v) {
+          setState(() {
+            _queued = true;
+          });
+        })
+        .catchError((cause) {
+          setState(() {
+            _cause = ds.Error.unknown(cause, onTap: reseterr);
+          });
+        });
   }
 
   @override

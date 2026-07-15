@@ -4,7 +4,7 @@ import 'package:retrovibed/httpx.dart' as httpx;
 
 export 'package:retrovibed/torrents/torrent.pb.dart' show DiscoverySettings;
 
-abstract class discoveryapi {
+abstract class configuration {
   static Future<DiscoverySettings> get({
     List<httpx.Option> options = const [],
   }) async {

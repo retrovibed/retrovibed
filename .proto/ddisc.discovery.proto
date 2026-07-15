@@ -35,6 +35,11 @@ message DiscoveryCreateResponse {
   Discovery discovery = 1 [ json_name = "discovery" ];
 }
 
+message DiscoveryDownloadRequest {}
+message DiscoveryDownloadResponse {
+  Discovery discovery = 1 [ json_name = "discovery" ];
+}
+
 message DiscoveryDeleteRequest {}
 message DiscoveryDeleteResponse {
   Discovery discovery = 1 [ json_name = "discovery" ];

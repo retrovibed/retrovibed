@@ -1,6 +1,7 @@
 package ddiscapi
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"log"
 	"math"
@@ -14,6 +15,7 @@ import (
 	"github.com/justinas/alice"
 	"github.com/retrovibed/retrovibed/retroapi/httpauth"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
+	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
@@ -74,6 +76,57 @@ func (t *HTTPDiscovery) Bind(r *mux.Router) {
 		metaapi.AuthzTokenHTTP(t.jwtsecret, AuthzPermPeer),
 		httpx.Timeout2s(),
 	).ThenFunc(t.delete))
+
+	r.Path("/{id}").Methods(http.MethodPost).Handler(alice.New(
+		httpx.ContextBufferPool1024(),
+		httpauth.AuthenticateWithToken(t.jwtsecret),
+		httpx.Timeout2s(),
+	).ThenFunc(t.download))
+}
+
+func (t *HTTPDiscovery) download(w http.ResponseWriter, r *http.Request) {
+	var (
+		err       error
+		disc      ddisc.Discovered
+		md        tracking.Metadata
+		discovery *Discovery
+		id        = mux.Vars(r)["id"]
+	)
+
+	if err := ddisc.DiscoveredFindByID(r.Context(), t.q, id).Scan(&disc); sqlx.ErrNoRows(err) != nil {
+		log.Println(errorsx.Wrap(err, "unable to find discovered"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
+		return
+	} else if err != nil {
+		log.Println(errorsx.Wrap(err, "unable to find discovered"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	if err := tracking.MetadataFindByInfohash(r.Context(), t.q, hex.EncodeToString(disc.Infohash)).Scan(&md); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to find tracking data"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	if err := tracking.MetadataAutoDownloadByID(r.Context(), t.q, md.ID).Scan(&md); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to autodownload tracking"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	if discovery, err = NewDiscoveryFromDiscovered(disc); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to autodownload tracking"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), DiscoveryDownloadResponse{
+		Discovery: discovery,
+	}); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to find response"))
+		return
+	}
 }
 
 func (t *HTTPDiscovery) search(w http.ResponseWriter, r *http.Request) {

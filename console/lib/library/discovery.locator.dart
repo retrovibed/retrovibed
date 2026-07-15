@@ -69,7 +69,7 @@ class _DiscoveryLocator extends State<DiscoveryLocator> {
           return widget
               .locate(
                 api.Locate.create()
-                  // ..autodownload = false
+                  ..autodownload = false
                   ..query = widget.query
                   ..mimetype = widget.mimetype,
                 options: options,

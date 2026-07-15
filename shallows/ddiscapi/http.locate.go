@@ -55,6 +55,7 @@ type HTTPLocate struct {
 
 func (t *HTTPLocate) Bind(r *mux.Router) {
 	r.StrictSlash(false)
+	r.Use(httpx.RouteInvoked)
 
 	r.Path("/").Methods(http.MethodGet).Handler(alice.New(
 		httpx.ContextBufferPool1024(),

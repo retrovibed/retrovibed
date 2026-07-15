@@ -45,6 +45,19 @@ func RecommendationOptionTestDefaults(r *Recommendation) {
 	r.Mimetype = mimex.Binary
 }
 
+func RecommendationSourceString(uid string) string {
+	switch uid {
+	case md5x.String(RecommendationSourceRandom):
+		return RecommendationSourceRandom
+	case md5x.String(RecommendationSourceGenerative):
+		return RecommendationSourceGenerative
+	case md5x.String(RecommendationSourceDiscovered):
+		return RecommendationSourceDiscovered
+	default:
+		return ""
+	}
+}
+
 func RecommendationOptionID(id string) func(*Recommendation) {
 	return func(r *Recommendation) {
 		r.ID = id

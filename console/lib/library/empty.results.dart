@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/media.dart' as media;
+import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'package:retrovibed/discovery/search.button.dart';
 
 // EmptyResults is shown in place of the library grid/list when a search
@@ -29,7 +30,7 @@ class EmptyResults extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            SearchButton(search: search),
+            SearchButton(key: ValueKey(uuidx.md5x(search.next.query)), search: search),
           ],
         ),
       ),

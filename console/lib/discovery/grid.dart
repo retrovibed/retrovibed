@@ -4,6 +4,7 @@ import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/mimex.dart' as mimex;
+import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'package:retrovibed/langcodex.dart' as langcodex;
 import 'package:retrovibed/library/api.dart' as api;
 import 'package:retrovibed/library/known.media.download.list.dart';
@@ -98,7 +99,7 @@ class _DiscoveryGridState extends State<DiscoveryGrid> {
             leading: Column(
               children: [
                 DiscoveryLocator(
-                  key: ValueKey('library.disc.locator'),
+                  key: ValueKey("library.disc.locator.${uuidx.md5x(state.next.query.trim())}"),
                   query: state.next.query.trim(),
                   mimetype: category,
                 ),
