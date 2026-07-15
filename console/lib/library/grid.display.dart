@@ -8,6 +8,7 @@ import 'package:retrovibed/discovery.dart' as disc;
 import 'known.media.display.dart';
 import 'media.settings.dart';
 import 'known.media.dropdown.dart';
+import 'empty.results.dart';
 
 class Grid extends StatefulWidget {
   final media.FnMediaSearch apisearch;
@@ -108,17 +109,7 @@ class _GridState extends State<Grid> {
               ),
             ),
           ],
-          empty: Center(
-            child: Padding(
-              padding: defaults.padding,
-              child: Text(
-                "no results in library",
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                ),
-              ),
-            ),
-          ),
+          empty: EmptyResults(search: state),
           (context, _media) {
             final onSettings = () {
               ds.modals.asyncfn<media.Media>(

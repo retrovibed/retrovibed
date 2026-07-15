@@ -33,7 +33,7 @@ import (
 // type is unexported, so we can't reference it by name) - the narrow
 // interface daemons.LocateMedia actually needs from *searchplugin.Registry.
 type searchPlugins interface {
-	Search(ctx context.Context, category, query string) iterx.Seq[*ddiscapi.Import]
+	Search(ctx context.Context, mimetypes []string, query string) iterx.Seq[*ddiscapi.Import]
 }
 
 // errLocateFound stops the retry loop in cmdMediaLocate.Run once the queued

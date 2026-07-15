@@ -11,7 +11,7 @@ import (
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
-	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
+	"github.com/retrovibed/retrovibed/retroapi/mimex"
 )
 
 // PublishRequest a torrent to an http endpoint in its entirety

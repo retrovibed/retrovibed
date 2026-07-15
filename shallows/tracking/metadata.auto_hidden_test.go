@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/james-lawrence/torrent/dht/int160"
-	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
+	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/stretchr/testify/require"
 )
@@ -26,6 +26,17 @@ func TestMetadataOptionAutoHidden(t *testing.T) {
 		md := NewMetadata(
 			new(int160.Random()),
 			MetadataOptionMimetype(mimex.RetrovibedNeural),
+			MetadataOptionAutoHidden,
+		)
+
+		require.NotEqual(t, timex.Inf(), md.HiddenAt)
+		require.WithinDuration(t, time.Now(), md.HiddenAt, time.Second)
+	})
+
+	t.Run("discovery search module sets hidden", func(t *testing.T) {
+		md := NewMetadata(
+			new(int160.Random()),
+			MetadataOptionMimetype(mimex.RetrovibedDiscoverySearch),
 			MetadataOptionAutoHidden,
 		)
 

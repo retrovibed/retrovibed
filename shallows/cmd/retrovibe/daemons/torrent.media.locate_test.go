@@ -9,11 +9,11 @@ import (
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/james-lawrence/torrent/torrenttest"
+	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/daemons"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
-	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/torrenttestx"
@@ -23,6 +23,54 @@ import (
 
 func TestMediaLocate(t *testing.T) {
 	t.Run("should be able to locate and create torrent metadata from distributed discovery", func(t *testing.T) {
+		var (
+			k library.Known
+			l ddisc.Locate
+			d ddisc.Discovered
+		)
+		q := sqltestx.Metadatabase(t)
+
+		require.NoError(t, testx.Fake(&k, library.KnownOptionTestDefaults))
+		require.NoError(t, library.KnownInsertWithDefaults(t.Context(), q, k).Scan(&k))
+		require.NoError(t, ddisc.LocateInsertWithDefaults(t.Context(), q, ddisc.NewLocate(k.Title, mimex.Binary, ddisc.LocateOptionKnownMedia(k.UID), ddisc.LocateOptionAutoDownload(true))).Scan(&l))
+
+		seedir := t.TempDir()
+		mcache := torrent.NewMetadataCache(seedir)
+		info, _, err := torrenttest.Random(seedir, 128*bytesx.KiB, metainfo.OptionDisplayName(k.Title))
+		require.NoError(t, err)
+		md, err := torrent.NewFromInfo(info, torrent.OptionStorage(storage.NewFile(seedir)))
+		require.NoError(t, err)
+		require.NoError(t, mcache.Write(md))
+
+		tclient := torrenttestx.Client(
+			t,
+			autobind.NewLoopback(
+				autobind.EnableDHT(torrenttestx.QuickDHT(t)),
+			),
+			mcache,
+			storage.NewFile(seedir),
+		)
+		defer tclient.Close()
+
+		id := int160.New(testx.Must(metainfo.Encode(info))(t))
+
+		d = ddisc.NewDiscovered(
+			&id,
+			ddisc.DiscoveredOptionKnownMedia(k.UID),
+			ddisc.DiscoveredOptionMimetype(mimex.Binary),
+			ddisc.DiscoveredOptionFromTorrentInfo(info),
+		)
+
+		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(t.Context(), q, d).Scan(&d))
+
+		require.Equal(t, 0, testx.Must(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM torrents_metadata"))(t))
+
+		require.NoError(t, daemons.LocateMedia(t.Context(), q, tclient, &daemons.DiscoverySettings{LocateP2P: true}, nil, nil, nil, ddisc.DefaultPolicy()))
+
+		require.Equal(t, 1, testx.Must(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM torrents_metadata WHERE initiated_at <= NOW()"))(t))
+	})
+
+	t.Run("should record a recommendation instead of downloading when autodownload is disabled", func(t *testing.T) {
 		var (
 			k library.Known
 			l ddisc.Locate
@@ -63,11 +111,10 @@ func TestMediaLocate(t *testing.T) {
 
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(t.Context(), q, d).Scan(&d))
 
-		require.Equal(t, 0, testx.Must(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM torrents_metadata"))(t))
-
 		require.NoError(t, daemons.LocateMedia(t.Context(), q, tclient, &daemons.DiscoverySettings{LocateP2P: true}, nil, nil, nil, ddisc.DefaultPolicy()))
 
-		require.Equal(t, 1, testx.Must(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM torrents_metadata WHERE initiated_at <= NOW()"))(t))
+		require.Equal(t, 0, testx.Must(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM torrents_metadata WHERE initiated_at <= NOW()"))(t))
+		require.Equal(t, 1, testx.Must(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM library_recommendations"))(t))
 	})
 
 	t.Run("should not query ddisc when p2p locate is disabled", func(t *testing.T) {

@@ -157,7 +157,7 @@ func (t *HTTPRecommendations) random(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var known library.Known
-	if err = library.KnownFindByID(r.Context(), t.q, rec.KnownMediaID).Scan(&known); err != nil {
+	if err = library.KnownFindByID(r.Context(), t.q, rec.ContentID).Scan(&known); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to find known media"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return

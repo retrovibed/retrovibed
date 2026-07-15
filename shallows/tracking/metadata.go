@@ -28,7 +28,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
-	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
+	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/squirrelx"
@@ -149,7 +149,7 @@ func MetadataOptionAutoDescription(m *Metadata) {
 func MetadataOptionAutoHidden(m *Metadata) {
 	_, ok := slicesx.Find(func(mime string) bool {
 		return m.Mimetype == mime
-	}, mimex.RetrovibedMediaArchive, mimex.RetrovibedNeural)
+	}, mimex.RetrovibedMediaArchive, mimex.RetrovibedNeural, mimex.RetrovibedDiscoverySearch)
 
 	if !ok {
 		return
@@ -273,6 +273,14 @@ func MetadataQueryNeural() squirrel.Sqlizer {
 
 func MetadataQueryNotNeural() squirrel.Sqlizer {
 	return squirrel.Expr("torrents_metadata.mimetype != ?", mimex.RetrovibedNeural)
+}
+
+func MetadataQueryDiscoverySearch() squirrel.Sqlizer {
+	return squirrel.Expr("torrents_metadata.mimetype = ?", mimex.RetrovibedDiscoverySearch)
+}
+
+func MetadataQueryNotDiscoverySearch() squirrel.Sqlizer {
+	return squirrel.Expr("torrents_metadata.mimetype != ?", mimex.RetrovibedDiscoverySearch)
 }
 
 func MetadataQueryCreatedAfter(ts time.Time) squirrel.Sqlizer {

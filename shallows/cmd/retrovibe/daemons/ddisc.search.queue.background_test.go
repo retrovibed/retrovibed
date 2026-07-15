@@ -9,9 +9,9 @@ import (
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
+	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
-	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/stretchr/testify/require"
@@ -31,7 +31,7 @@ type fakeSearchPlugins struct {
 	results []*ddiscapi.Import
 }
 
-func (t fakeSearchPlugins) Search(ctx context.Context, category, query string) iterx.Seq[*ddiscapi.Import] {
+func (t fakeSearchPlugins) Search(ctx context.Context, mimetypes []string, query string) iterx.Seq[*ddiscapi.Import] {
 	return fakeResultSeq(t)
 }
 

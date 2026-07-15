@@ -3,7 +3,7 @@ package mimex_test
 import (
 	"testing"
 
-	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
+	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/stretchr/testify/require"
 )
 

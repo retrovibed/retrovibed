@@ -6,9 +6,9 @@ import (
 
 	"github.com/Masterminds/squirrel"
 	"github.com/gofrs/uuid/v5"
+	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
-	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/squirrelx"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
@@ -20,6 +20,7 @@ type RecommendationSource string
 const (
 	RecommendationSourceRandom     = "random"
 	RecommendationSourceGenerative = "generative"
+	RecommendationSourceDiscovered = "discovered"
 )
 
 const (
@@ -30,17 +31,22 @@ func RecommendationKnownSearch(ctx context.Context, q sqlx.Queryer, b squirrel.S
 	return NewRecommendationKnownScannerStatic(b.RunWith(q).QueryContext(ctx))
 }
 
+// RecommendationKnownSearchBuilder only returns known-media-backed
+// recommendations - the INNER JOIN excludes any row whose content_id
+// points at a ddisc_media row instead (e.g. RecommendationSourceDiscovered
+// rows written by ddisc.RecommendationFromDiscovered). There is currently
+// no read path for those; this is the join where that gap lives.
 func RecommendationKnownSearchBuilder() squirrel.SelectBuilder {
 	return squirrelx.PSQL.Select(sqlx.Columns(RecommendationScannerStaticColumns, KnownScannerStaticColumns)...).
 		From("library_recommendations").
-		InnerJoin("library_known_media ON library_known_media.uid = library_recommendations.known_media_id").
+		InnerJoin("library_known_media ON library_known_media.uid = library_recommendations.content_id").
 		Where(squirrel.Expr("'t'"))
 }
 
 func RecommendationOptionTestDefaults(r *Recommendation) {
 	r.ID = uuid.Nil.String()
 	r.Source = md5x.String(RecommendationSourceRandom)
-	r.KnownMediaID = uuid.Nil.String()
+	r.ContentID = uuid.Nil.String()
 	r.TombstoneAt = timex.Inf()
 	r.Mimetype = mimex.Binary
 }
@@ -51,9 +57,9 @@ func RecommendationOptionID(id string) func(*Recommendation) {
 	}
 }
 
-func RecommendationOptionKnownMediaID(kid string) func(*Recommendation) {
+func RecommendationOptionContentID(kid string) func(*Recommendation) {
 	return func(r *Recommendation) {
-		r.KnownMediaID = errorsx.Must(uuid.FromString(kid)).String()
+		r.ContentID = errorsx.Must(uuid.FromString(kid)).String()
 	}
 }
 
@@ -71,11 +77,10 @@ func RecommendationFromRandomKnown(ctx context.Context, q sqlx.Queryer, mimetype
 	}
 
 	if err = RecommendationInsertWithDefaults(ctx, q, Recommendation{
-		ID:           uuid.Must(uuid.NewV7()).String(),
-		Source:       md5x.String(RecommendationSourceRandom),
-		KnownMediaID: known.UID,
-		TombstoneAt:  time.Now().Add(RecommendationTTL),
-		Mimetype:     known.Mimetype,
+		Source:      md5x.String(RecommendationSourceRandom),
+		ContentID:   known.UID,
+		TombstoneAt: time.Now().Add(RecommendationTTL),
+		Mimetype:    known.Mimetype,
 	}).Scan(&rec); err != nil {
 		return rec, err
 	}
@@ -94,8 +99,8 @@ func RecommendationQueryNotTombstoned() squirrel.Sqlizer {
 	return squirrel.Expr("library_recommendations.tombstone_at > NOW()")
 }
 
-func RecommendationQueryByKnownMediaID(kid string) squirrel.Sqlizer {
-	return squirrel.Eq{"library_recommendations.known_media_id": kid}
+func RecommendationQueryByContentID(kid string) squirrel.Sqlizer {
+	return squirrel.Eq{"library_recommendations.content_id": kid}
 }
 
 func RecommendationQueryMimetype(v string) squirrel.Sqlizer {

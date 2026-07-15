@@ -18,6 +18,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/netmonx"
+	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
 	"github.com/retrovibed/retrovibed/retroapi/tlsx"
 	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
@@ -245,6 +246,9 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	})
 	asyncx.Background(gctx.Context, mediameta, func(ctx context.Context) error {
 		return errorsx.Wrap(NeuralImport(ctx, db, userx.DefaultCacheDirectory(userx.DefaultRelRoot()), tvfs, tstore), "media metadata import failed")
+	})
+	asyncx.Background(gctx.Context, mediameta, func(ctx context.Context) error {
+		return errorsx.Wrap(SearchPluginImport(ctx, db, searchplugin.SearchPluginDir(), tvfs, tstore), "search plugin import failed")
 	})
 
 	go func() {

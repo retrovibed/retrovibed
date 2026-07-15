@@ -13,8 +13,8 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/ddisc/ddisctorrent"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
+	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 )
 
@@ -41,7 +41,7 @@ func Locate(ctx context.Context, db sqlx.Queryer, disc *DiscoverySettings, dhts 
 	req := ddisc.DiscoverRequest{
 		KnownMediaID: loc.KnownMediaID,
 		Title:        loc.Query,
-		Category:     mimex.Category(loc.Mimetype),
+		Mimetypes:    ddisc.Category(loc.Mimetype),
 	}
 
 	seq := ddisc.Discover(ctx, db, policy, req, strategies...)
@@ -88,11 +88,19 @@ func DiscoveredDownload(ctx context.Context, db sqlx.Queryer, c *torrent.Client,
 		return errorsx.Wrapf(err, "unable to record metadata for download from infohash %s", d.ID)
 	}
 
-	if err = tracking.MetadataAutoDownloadByID(ctx, db, lmd.ID).Scan(&lmd); err != nil {
-		return errorsx.Wrapf(err, "unable to mark torrent for download from infohash %s", d.ID)
+	if loc.Autodownload {
+		if err = tracking.MetadataAutoDownloadByID(ctx, db, lmd.ID).Scan(&lmd); err != nil {
+			return errorsx.Wrapf(err, "unable to mark torrent for download from infohash %s", d.ID)
+		}
+		log.Println("marked for download", lmd.ID, lmd.Description)
+	} else {
+		var rec library.Recommendation
+		errorsx.Log(errorsx.Wrap(
+			library.RecommendationInsertWithDefaults(ctx, db, ddisc.RecommendationFromDiscovered(d)).Scan(&rec),
+			"unable to record recommendation for located media",
+		))
 	}
 
-	log.Println("marked for download", lmd.ID, lmd.Description)
 	if err = ddisc.LocateLocated(ctx, db, loc.ID, lmd.ID).Scan(&l); err != nil {
 		return errorsx.Wrapf(err, "unable to mark locate torrent %s", loc.ID)
 	}

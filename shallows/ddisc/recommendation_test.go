@@ -5,9 +5,10 @@ import (
 	"testing"
 
 	"github.com/james-lawrence/torrent/dht/int160"
+	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
-	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
+	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/stretchr/testify/require"
@@ -30,7 +31,7 @@ func TestRecommendation(t *testing.T) {
 
 		rec, err := ddisc.Recommendation(ctx, q, mimex.Application, "", false)
 		require.NoError(t, err)
-		require.Equal(t, known.UID, rec.KnownMediaID)
+		require.Equal(t, known.UID, rec.ContentID)
 		require.NotEmpty(t, rec.ID)
 	})
 
@@ -99,7 +100,7 @@ func TestRecommendation(t *testing.T) {
 
 		rec, err := ddisc.Recommendation(ctx, q, mimex.Application, "", true)
 		require.NoError(t, err)
-		require.Equal(t, known.UID, rec.KnownMediaID)
+		require.Equal(t, known.UID, rec.ContentID)
 		require.True(t, rec.Adult)
 	})
 
@@ -125,7 +126,7 @@ func TestRecommendation(t *testing.T) {
 
 		rec, err := ddisc.Recommendation(ctx, q, mimex.Video, "", false)
 		require.NoError(t, err)
-		require.Equal(t, video.UID, rec.KnownMediaID)
+		require.Equal(t, video.UID, rec.ContentID)
 		require.Equal(t, mimex.Video, rec.Mimetype)
 	})
 
@@ -191,4 +192,18 @@ func TestRecommendation(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, "fr", rec.Language)
 	})
+}
+
+func TestRecommendationFromDiscovered(t *testing.T) {
+	id := int160.Random()
+	d := ddisc.NewDiscovered(&id, ddisc.DiscoveredOptionMimetype("video/mp4"))
+	d.AudioDefaultLocale = "en"
+	d.Adult = true
+
+	rec := ddisc.RecommendationFromDiscovered(d)
+	require.Equal(t, d.ID, rec.ContentID)
+	require.Equal(t, md5x.String(library.RecommendationSourceDiscovered), rec.Source)
+	require.Equal(t, mimex.Category(d.Mimetype), rec.Mimetype)
+	require.Equal(t, "en", rec.Language)
+	require.True(t, rec.Adult)
 }

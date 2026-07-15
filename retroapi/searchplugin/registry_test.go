@@ -28,7 +28,7 @@ func TestRegistrySearchDecodesPluginOutput(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, r.Load(ctx, wasmPath))
 
-	seq := r.Search(ctx, "video", "ubuntu")
+	seq := r.Search(ctx, []string{"video"}, "ubuntu")
 
 	var results []string
 	for imp := range seq.Each(ctx) {
@@ -64,7 +64,7 @@ func TestRegistrySearchSkipsFailingPluginWithoutAbortingOthers(t *testing.T) {
 	require.NoError(t, r.Load(ctx, echoPath))
 	require.NoError(t, r.Load(ctx, failPath))
 
-	seq := r.Search(ctx, "video", "ubuntu")
+	seq := r.Search(ctx, []string{"video"}, "ubuntu")
 	var count int
 	for range seq.Each(ctx) {
 		count++
@@ -103,7 +103,7 @@ func TestRegistryBlocksNonPublicConnections(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, r.Load(ctx, wasmPath))
 
-	seq := r.Search(ctx, "test", ln.Addr().String())
+	seq := r.Search(ctx, []string{"test"}, ln.Addr().String())
 
 	var results []string
 	for imp := range seq.Each(ctx) {

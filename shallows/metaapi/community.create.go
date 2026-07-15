@@ -10,7 +10,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/deeppool"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
-	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
+	"github.com/retrovibed/retrovibed/retroapi/mimex"
 )
 
 func CommunityCreate(ctx context.Context, c *http.Client, com *communityapi.CommunityCreateRequest) (resp *communityapi.CommunityCreateResponse, err error) {
