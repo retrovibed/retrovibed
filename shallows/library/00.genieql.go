@@ -246,8 +246,6 @@ func RecommendationScanner(gql genieql.Scanner, pattern func(i Recommendation)) 
 	gql.ColumnNamePrefix("library_recommendations.")
 }
 
-func RecommendationKnownScanner(gql genieql.Scanner, pattern func(i Recommendation, k Known)) {}
-
 func RecommendationInsertWithDefaults(
 	gql genieql.Insert,
 	pattern func(ctx context.Context, q sqlx.Queryer, a Recommendation) NewRecommendationScannerStaticRow,

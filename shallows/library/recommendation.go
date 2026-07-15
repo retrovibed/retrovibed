@@ -27,26 +27,20 @@ const (
 	RecommendationTTL = 30 * 24 * time.Hour
 )
 
-func RecommendationKnownSearch(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilder) RecommendationKnownScanner {
-	return NewRecommendationKnownScannerStatic(b.RunWith(q).QueryContext(ctx))
+func RecommendationSearch(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilder) RecommendationScanner {
+	return NewRecommendationScannerStatic(b.RunWith(q).QueryContext(ctx))
 }
 
-// RecommendationKnownSearchBuilder only returns known-media-backed
-// recommendations - the INNER JOIN excludes any row whose content_id
-// points at a ddisc_media row instead (e.g. RecommendationSourceDiscovered
-// rows written by ddisc.RecommendationFromDiscovered). There is currently
-// no read path for those; this is the join where that gap lives.
-func RecommendationKnownSearchBuilder() squirrel.SelectBuilder {
-	return squirrelx.PSQL.Select(sqlx.Columns(RecommendationScannerStaticColumns, KnownScannerStaticColumns)...).
-		From("library_recommendations").
-		InnerJoin("library_known_media ON library_known_media.uid = library_recommendations.content_id").
-		Where(squirrel.Expr("'t'"))
+func RecommendationSearchBuilder() squirrel.SelectBuilder {
+	return squirrelx.PSQL.Select(sqlx.Columns(RecommendationScannerStaticColumns)...).
+		From("library_recommendations")
 }
 
 func RecommendationOptionTestDefaults(r *Recommendation) {
 	r.ID = uuid.Nil.String()
 	r.Source = md5x.String(RecommendationSourceRandom)
 	r.ContentID = uuid.Nil.String()
+	r.KnownMediaID = uuid.Nil.String()
 	r.TombstoneAt = timex.Inf()
 	r.Mimetype = mimex.Binary
 }
@@ -77,10 +71,17 @@ func RecommendationFromRandomKnown(ctx context.Context, q sqlx.Queryer, mimetype
 	}
 
 	if err = RecommendationInsertWithDefaults(ctx, q, Recommendation{
-		Source:      md5x.String(RecommendationSourceRandom),
-		ContentID:   known.UID,
-		TombstoneAt: time.Now().Add(RecommendationTTL),
-		Mimetype:    known.Mimetype,
+		Source:       md5x.String(RecommendationSourceRandom),
+		ContentID:    known.UID,
+		KnownMediaID: known.UID,
+		TombstoneAt:  time.Now().Add(RecommendationTTL),
+		Mimetype:     known.Mimetype,
+		Adult:        known.Adult,
+		Title:        known.Title,
+		Overview:     known.Overview,
+		Image:        stringsx.FirstNonBlank(known.PosterPath, known.BackdropPath),
+		Popularity:   known.Popularity,
+		Released:     known.Released,
 	}).Scan(&rec); err != nil {
 		return rec, err
 	}

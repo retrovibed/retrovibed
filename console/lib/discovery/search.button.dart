@@ -84,7 +84,7 @@ class _SearchButtonState extends State<SearchButton> {
           children: [
             Icon(_queued ? Icons.query_builder_rounded : Icons.travel_explore_rounded),
             const SizedBox(width: 8),
-            Text(_queued ? "queued" : "locate suggestions"),
+            Text(_queued ? "queued" : "discover"),
           ],
         ),
         onPressed: _onPressed,

@@ -28,7 +28,7 @@ class QueryerMode extends StatelessWidget {
               : (chipTheme.backgroundColor ?? theme.colorScheme.surfaceContainerLow);
 
           return ds.Help(
-            ds.Container(
+            Container(
               padding: EdgeInsets.symmetric(
                 horizontal: defaults.spacing,
                 vertical: 8.0,
@@ -37,7 +37,7 @@ class QueryerMode extends StatelessWidget {
                 color: bgColor,
                 borderRadius: BorderRadius.circular(8),
               ),
-              Center(
+              child: Center(
                 widthFactor: 1.0, // Prevents width from expanding infinitely horizontally
                 heightFactor: 1.0, // Dictates that the Center takes up exactly the child's height
                 child: mode,

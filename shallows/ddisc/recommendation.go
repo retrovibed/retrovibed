@@ -10,6 +10,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/localex"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
+	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 )
 
@@ -35,12 +36,18 @@ func Recommendation(ctx context.Context, q sqlx.Queryer, mimetype string, lang s
 	}
 
 	if err = library.RecommendationInsertWithDefaults(ctx, q, library.Recommendation{
-		Source:      md5x.String(library.RecommendationSourceRandom),
-		ContentID:   random.KnownMediaID,
-		Mimetype:    mimex.Category(random.Mimetype),
-		Language:    localex.FirstDefined(random.AudioDefaultLocale, known.OriginalLanguage),
-		Adult:       langx.FirstNonZero(random.Adult, known.Adult),
-		TombstoneAt: time.Now().Add(library.RecommendationTTL),
+		Source:       md5x.String(library.RecommendationSourceRandom),
+		ContentID:    random.KnownMediaID,
+		KnownMediaID: random.KnownMediaID,
+		Mimetype:     mimex.Category(random.Mimetype),
+		Language:     localex.FirstDefined(random.AudioDefaultLocale, known.OriginalLanguage),
+		Adult:        langx.FirstNonZero(random.Adult, known.Adult),
+		TombstoneAt:  time.Now().Add(library.RecommendationTTL),
+		Title:        known.Title,
+		Overview:     known.Overview,
+		Image:        stringsx.FirstNonBlank(known.PosterPath, known.BackdropPath),
+		Popularity:   known.Popularity,
+		Released:     known.Released,
 	}).Scan(&rec); err != nil {
 		return rec, err
 	}
@@ -54,11 +61,15 @@ func Recommendation(ctx context.Context, q sqlx.Queryer, mimetype string, lang s
 // via library.RecommendationInsertWithDefaults.
 func RecommendationFromDiscovered(d Discovered) library.Recommendation {
 	return library.Recommendation{
-		Source:      md5x.String(library.RecommendationSourceDiscovered),
-		ContentID:   d.ID,
-		Mimetype:    mimex.Category(d.Mimetype),
-		Language:    d.AudioDefaultLocale,
-		Adult:       d.Adult,
-		TombstoneAt: time.Now().Add(library.RecommendationTTL),
+		Source:       md5x.String(library.RecommendationSourceDiscovered),
+		ContentID:    d.ID,
+		KnownMediaID: d.KnownMediaID,
+		Mimetype:     mimex.Category(d.Mimetype),
+		Language:     d.AudioDefaultLocale,
+		Adult:        d.Adult,
+		TombstoneAt:  time.Now().Add(library.RecommendationTTL),
+		Title:        d.Title,
+		Overview:     d.Description,
+		Released:     d.ReleasedAt,
 	}
 }

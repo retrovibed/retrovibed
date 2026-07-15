@@ -29,6 +29,7 @@ class Known extends $pb.GeneratedMessage {
     $core.String? image,
     $core.String? released,
     $core.String? mimetype,
+    $core.String? source,
   }) {
     final result = create();
     if (id != null) result.id = id;
@@ -39,6 +40,7 @@ class Known extends $pb.GeneratedMessage {
     if (image != null) result.image = image;
     if (released != null) result.released = released;
     if (mimetype != null) result.mimetype = mimetype;
+    if (source != null) result.source = source;
     return result;
   }
 
@@ -63,6 +65,7 @@ class Known extends $pb.GeneratedMessage {
     ..aOS(6, _omitFieldNames ? '' : 'image')
     ..aOS(7, _omitFieldNames ? '' : 'released')
     ..aOS(8, _omitFieldNames ? '' : 'mimetype')
+    ..aOS(9, _omitFieldNames ? '' : 'source')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -154,6 +157,15 @@ class Known extends $pb.GeneratedMessage {
   $core.bool hasMimetype() => $_has(7);
   @$pb.TagNumber(8)
   void clearMimetype() => $_clearField(8);
+
+  @$pb.TagNumber(9)
+  $core.String get source => $_getSZ(8);
+  @$pb.TagNumber(9)
+  set source($core.String value) => $_setString(8, value);
+  @$pb.TagNumber(9)
+  $core.bool hasSource() => $_has(8);
+  @$pb.TagNumber(9)
+  void clearSource() => $_clearField(9);
 }
 
 class KnownSearchRequest extends $pb.GeneratedMessage {

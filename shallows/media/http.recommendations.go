@@ -90,16 +90,16 @@ func (t *HTTPRecommendations) latest(w http.ResponseWriter, r *http.Request) {
 	}
 	msg.Next.Limit = numericx.Min(msg.Next.Limit, 100)
 
-	query := library.RecommendationKnownSearchBuilder().
+	query := library.RecommendationSearchBuilder().
 		Where(library.RecommendationQueryNotTombstoned()).
 		Where(library.RecommendationQueryMimetype(msg.Next.Mimetype)).
 		OrderBy("library_recommendations.updated_at DESC").
 		Offset(msg.Next.Offset * msg.Next.Limit).
 		Limit(msg.Next.Limit)
 
-	q := sqlx.Scan2(library.RecommendationKnownSearch(r.Context(), t.q, query))
-	for _, k := range q.Iter() {
-		tmp := langx.Clone(Known{}, KnownOptionFromLibraryKnown(langx.Clone(k, timex.JSONSafeEncodeOption)))
+	q := sqlx.Scan(library.RecommendationSearch(r.Context(), t.q, query))
+	for rec := range q.Iter() {
+		tmp := langx.Clone(Known{}, KnownOptionFromRecommendation(langx.Clone(rec, timex.JSONSafeEncodeOption)))
 		msg.Items = append(msg.Items, &tmp)
 	}
 
@@ -156,14 +156,7 @@ func (t *HTTPRecommendations) random(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var known library.Known
-	if err = library.KnownFindByID(r.Context(), t.q, rec.ContentID).Scan(&known); err != nil {
-		log.Println(errorsx.Wrap(err, "unable to find known media"))
-		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
-		return
-	}
-
-	tmp := langx.Clone(Known{}, KnownOptionFromLibraryKnown(langx.Clone(known, timex.JSONSafeEncodeOption)))
+	tmp := langx.Clone(Known{}, KnownOptionFromRecommendation(langx.Clone(rec, timex.JSONSafeEncodeOption)))
 	if err = httpx.WriteJSON(w, httpx.GetBuffer(r), &RecommendationsResponse{
 		Next:  &RecommendationsRequest{},
 		Items: []*Known{&tmp},

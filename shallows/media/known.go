@@ -18,5 +18,20 @@ func KnownOptionFromLibraryKnown(cc library.Known) KnownOption {
 		c.Adult = cc.Adult
 		c.Released = grpcx.EncodeTime(cc.Released)
 		c.Mimetype = cc.Mimetype
+		c.Source = cc.Source
+	}
+}
+
+func KnownOptionFromRecommendation(cc library.Recommendation) KnownOption {
+	return func(c *Known) {
+		c.Id = cc.ContentID
+		c.Image = cc.Image
+		c.Rating = float32(cc.Popularity)
+		c.Description = cc.Title
+		c.Summary = cc.Overview
+		c.Adult = cc.Adult
+		c.Released = grpcx.EncodeTime(cc.Released)
+		c.Mimetype = cc.Mimetype
+		c.Source = cc.Source
 	}
 }

@@ -9,10 +9,10 @@ import (
 	"net/http"
 
 	"github.com/retrovibed/retrovibed/retroapi/deeppool"
+	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
-	"github.com/retrovibed/retrovibed/retroapi/mimex"
 )
 
 func CommunityPublish(ctx context.Context, c *http.Client, id string, in io.Reader) (resp *communityapi.CommunityUploadResponse, err error) {
