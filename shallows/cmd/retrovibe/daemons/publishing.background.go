@@ -33,10 +33,6 @@ func AutoPublishing(ctx context.Context, q sqlx.Queryer, c *http.Client, mvfs, t
 				return nil
 			}
 
-			if _, err := q.ExecContext(ctx, "CHECKPOINT;"); err != nil {
-				return errorsx.Wrap(err, "post sync pending checkpoint failed")
-			}
-
 			return nil
 		}))
 	})

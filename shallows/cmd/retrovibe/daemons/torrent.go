@@ -609,7 +609,7 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 		})
 		log.Println("autodiscovery is enabled. this is an experimental feature.")
 	} else if disc.Ratio == 0 {
-		log.Println("autodiscovery is disabled, to enable remove --discovery-ratio=0 flag, this is an experimental feature.")
+		log.Println("autodiscovery is disabled, to enable set --discovery-ratio=1, this is an experimental feature.")
 	} else {
 		log.Println("autodiscovery is disabled, due to no dht servers. this is an experimental feature.")
 	}

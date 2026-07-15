@@ -86,7 +86,6 @@ func (t *HTTPDiscovery) Bind(r *mux.Router) {
 
 func (t *HTTPDiscovery) download(w http.ResponseWriter, r *http.Request) {
 	var (
-		err       error
 		disc      ddisc.Discovered
 		md        tracking.Metadata
 		discovery *Discovery
@@ -115,11 +114,11 @@ func (t *HTTPDiscovery) download(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if discovery, err = NewDiscoveryFromDiscovered(disc); err != nil {
-		log.Println(errorsx.Wrap(err, "unable to autodownload tracking"))
-		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
-		return
-	}
+	// if discovery, err = NewDiscoveryFromDiscovered(disc); err != nil {
+	// 	log.Println(errorsx.Wrap(err, "unable to autodownload tracking"))
+	// 	errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+	// 	return
+	// }
 
 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), DiscoveryDownloadResponse{
 		Discovery: discovery,

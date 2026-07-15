@@ -136,6 +136,11 @@ func LocateMedia(ctx context.Context, db sqlx.Queryer, c *torrent.Client, disc *
 			continue
 		}
 
+		if err := ddisc.LocateCompleted(ctx, db, loc.ID).Scan(&loc); err != nil {
+			errorsx.Log(err)
+			continue
+		}
+
 		log.Println("locating completed", loc.ID, loc.Query)
 	}
 
