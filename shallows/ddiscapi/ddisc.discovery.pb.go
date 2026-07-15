@@ -26,7 +26,7 @@ type Discovery struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Infohash      []byte                 `protobuf:"bytes,2,opt,name=infohash,proto3" json:"infohash,omitempty"`
-	Attempts      string                 `protobuf:"bytes,3,opt,name=attempts,proto3" json:"attempts,omitempty"`
+	Attempts      uint32                 `protobuf:"varint,3,opt,name=attempts,proto3" json:"attempts,omitempty"`
 	NextCheck     string                 `protobuf:"bytes,4,opt,name=next_check,proto3" json:"next_check,omitempty"`
 	CreatedAt     string                 `protobuf:"bytes,5,opt,name=created_at,proto3" json:"created_at,omitempty"`
 	UpdatedAt     string                 `protobuf:"bytes,6,opt,name=updated_at,proto3" json:"updated_at,omitempty"`
@@ -78,11 +78,11 @@ func (x *Discovery) GetInfohash() []byte {
 	return nil
 }
 
-func (x *Discovery) GetAttempts() string {
+func (x *Discovery) GetAttempts() uint32 {
 	if x != nil {
 		return x.Attempts
 	}
-	return ""
+	return 0
 }
 
 func (x *Discovery) GetNextCheck() string {
@@ -498,7 +498,7 @@ const file_ddisc_discovery_proto_rawDesc = "" +
 	"\tDiscovery\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
 	"\binfohash\x18\x02 \x01(\fR\binfohash\x12\x1a\n" +
-	"\battempts\x18\x03 \x01(\tR\battempts\x12\x1e\n" +
+	"\battempts\x18\x03 \x01(\rR\battempts\x12\x1e\n" +
 	"\n" +
 	"next_check\x18\x04 \x01(\tR\n" +
 	"next_check\x12\x1e\n" +

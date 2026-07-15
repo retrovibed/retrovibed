@@ -23,7 +23,7 @@ class Discovery extends $pb.GeneratedMessage {
   factory Discovery({
     $core.String? id,
     $core.List<$core.int>? infohash,
-    $core.String? attempts,
+    $core.int? attempts,
     $core.String? nextCheck,
     $core.String? createdAt,
     $core.String? updatedAt,
@@ -54,7 +54,7 @@ class Discovery extends $pb.GeneratedMessage {
     ..aOS(1, _omitFieldNames ? '' : 'id')
     ..a<$core.List<$core.int>>(
         2, _omitFieldNames ? '' : 'infohash', $pb.PbFieldType.OY)
-    ..aOS(3, _omitFieldNames ? '' : 'attempts')
+    ..aI(3, _omitFieldNames ? '' : 'attempts', fieldType: $pb.PbFieldType.OU3)
     ..aOS(4, _omitFieldNames ? '' : 'next_check')
     ..aOS(5, _omitFieldNames ? '' : 'created_at')
     ..aOS(6, _omitFieldNames ? '' : 'updated_at')
@@ -97,9 +97,9 @@ class Discovery extends $pb.GeneratedMessage {
   void clearInfohash() => $_clearField(2);
 
   @$pb.TagNumber(3)
-  $core.String get attempts => $_getSZ(2);
+  $core.int get attempts => $_getIZ(2);
   @$pb.TagNumber(3)
-  set attempts($core.String value) => $_setString(2, value);
+  set attempts($core.int value) => $_setUnsignedInt32(2, value);
   @$pb.TagNumber(3)
   $core.bool hasAttempts() => $_has(2);
   @$pb.TagNumber(3)

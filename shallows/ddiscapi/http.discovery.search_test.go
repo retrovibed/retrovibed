@@ -59,9 +59,8 @@ func TestHTTPDiscoverySearch(t *testing.T) {
 		require.NoError(t, httpx.ErrorCode(resp.Result()))
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 
-		encoded := testx.Must(ddiscapi.NewDiscoveryFromTrackingUnknownHash(uh))(t)
 		require.Equal(t, result.Next.Offset, uint64(0))
-		require.Contains(t, result.Items, encoded)
+		require.Contains(t, result.Items, ddiscapi.NewDiscoveryFromTrackingUnknownHash(uh))
 	})
 
 	t.Run("next check filter", func(t *testing.T) {
@@ -106,8 +105,7 @@ func TestHTTPDiscoverySearch(t *testing.T) {
 		require.NoError(t, httpx.ErrorCode(resp.Result()))
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 
-		encodeddue := testx.Must(ddiscapi.NewDiscoveryFromTrackingUnknownHash(due))(t)
-		require.Contains(t, result.Items, encodeddue)
+		require.Contains(t, result.Items, ddiscapi.NewDiscoveryFromTrackingUnknownHash(due))
 		require.Len(t, result.Items, 1)
 	})
 
@@ -151,8 +149,8 @@ func TestHTTPDiscoverySearch(t *testing.T) {
 		require.NoError(t, httpx.ErrorCode(resp.Result()))
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 
-		encodeddue := testx.Must(ddiscapi.NewDiscoveryFromTrackingUnknownHash(due))(t)
-		encodedfuture := testx.Must(ddiscapi.NewDiscoveryFromTrackingUnknownHash(future))(t)
+		encodeddue := ddiscapi.NewDiscoveryFromTrackingUnknownHash(due)
+		encodedfuture := ddiscapi.NewDiscoveryFromTrackingUnknownHash(future)
 		require.Contains(t, result.Items, encodeddue)
 		require.Contains(t, result.Items, encodedfuture)
 		require.Len(t, result.Items, 2)

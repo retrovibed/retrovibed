@@ -3,29 +3,33 @@ package ddiscapi
 import (
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/grpcx"
-	"github.com/retrovibed/retrovibed/shallows/internal/langx"
-	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 )
 
-func NewDiscoveryFromTrackingUnknownHash(mu tracking.UnknownHash) (_ *Discovery, err error) {
-	var d Discovery
-	mu = langx.Clone(mu, timex.JSONSafeEncodeOption, timex.UTCEncodeOption)
-
-	if err = grpcx.JSONDecode(mu, &d); err != nil {
-		return nil, err
+func NewDiscoveryFromTrackingUnknownHash(mu tracking.UnknownHash) *Discovery {
+	return &Discovery{
+		Id:        mu.ID,
+		Infohash:  mu.Infohash,
+		Attempts:  uint32(mu.Attempts),
+		NextCheck: grpcx.EncodeTime(mu.NextCheck),
+		CreatedAt: grpcx.EncodeTime(mu.CreatedAt),
+		UpdatedAt: grpcx.EncodeTime(mu.UpdatedAt),
 	}
-
-	return &d, nil
 }
 
-func NewDiscoveryFromDiscovered(mu ddisc.Discovered) (_ *Discovery, err error) {
-	var d Discovery
-	mu = langx.Clone(mu, timex.JSONSafeEncodeOption, timex.UTCEncodeOption)
-
-	if err = grpcx.JSONDecode(mu, &d); err != nil {
-		return nil, err
+// NewDiscoveryFromDiscovered converts a ddisc.Discovered into its wire representation.
+//
+// this is a manual field mapping rather than the generic grpcx.JSONDecode round-trip
+// used for NewDiscoveryFromTrackingUnknownHash above, because ddisc.Discovered.NextCheckAt
+// doesn't share a json key with Discovery.NextCheck - same class of problem
+// NewMediaFromDiscovered documents for this same source type.
+func NewDiscoveryFromDiscovered(d ddisc.Discovered) *Discovery {
+	return &Discovery{
+		Id:        d.ID,
+		Infohash:  d.Infohash,
+		Attempts:  d.Attempts,
+		NextCheck: grpcx.EncodeTime(d.NextCheckAt),
+		CreatedAt: grpcx.EncodeTime(d.CreatedAt),
+		UpdatedAt: grpcx.EncodeTime(d.UpdatedAt),
 	}
-
-	return &d, nil
 }

@@ -21,7 +21,7 @@ const Discovery$json = {
   '2': [
     {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
     {'1': 'infohash', '3': 2, '4': 1, '5': 12, '10': 'infohash'},
-    {'1': 'attempts', '3': 3, '4': 1, '5': 9, '10': 'attempts'},
+    {'1': 'attempts', '3': 3, '4': 1, '5': 13, '10': 'attempts'},
     {'1': 'next_check', '3': 4, '4': 1, '5': 9, '10': 'next_check'},
     {'1': 'created_at', '3': 5, '4': 1, '5': 9, '10': 'created_at'},
     {'1': 'updated_at', '3': 6, '4': 1, '5': 9, '10': 'updated_at'},
@@ -31,7 +31,7 @@ const Discovery$json = {
 /// Descriptor for `Discovery`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List discoveryDescriptor = $convert.base64Decode(
     'CglEaXNjb3ZlcnkSDgoCaWQYASABKAlSAmlkEhoKCGluZm9oYXNoGAIgASgMUghpbmZvaGFzaB'
-    'IaCghhdHRlbXB0cxgDIAEoCVIIYXR0ZW1wdHMSHgoKbmV4dF9jaGVjaxgEIAEoCVIKbmV4dF9j'
+    'IaCghhdHRlbXB0cxgDIAEoDVIIYXR0ZW1wdHMSHgoKbmV4dF9jaGVjaxgEIAEoCVIKbmV4dF9j'
     'aGVjaxIeCgpjcmVhdGVkX2F0GAUgASgJUgpjcmVhdGVkX2F0Eh4KCnVwZGF0ZWRfYXQYBiABKA'
     'lSCnVwZGF0ZWRfYXQ=');
 

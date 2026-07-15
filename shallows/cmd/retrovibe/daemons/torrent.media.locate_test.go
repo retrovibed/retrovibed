@@ -68,6 +68,7 @@ func TestMediaLocate(t *testing.T) {
 		require.NoError(t, daemons.LocateMedia(t.Context(), q, tclient, &daemons.DiscoverySettings{LocateP2P: true}, nil, nil, nil, ddisc.DefaultPolicy()))
 
 		require.Equal(t, 1, testx.Must(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM torrents_metadata WHERE initiated_at <= NOW()"))(t))
+		require.Equal(t, 1, testx.Must(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM ddisc_locate WHERE tombstoned_at < 'infinity'"))(t))
 	})
 
 	t.Run("should record a recommendation instead of downloading when autodownload is disabled", func(t *testing.T) {
@@ -115,6 +116,7 @@ func TestMediaLocate(t *testing.T) {
 
 		require.Equal(t, 0, testx.Must(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM torrents_metadata WHERE initiated_at <= NOW()"))(t))
 		require.Equal(t, 1, testx.Must(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM library_recommendations"))(t))
+		require.Equal(t, 1, testx.Must(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM ddisc_locate WHERE tombstoned_at < 'infinity'"))(t))
 	})
 
 	t.Run("should not query ddisc when p2p locate is disabled", func(t *testing.T) {
@@ -158,5 +160,6 @@ func TestMediaLocate(t *testing.T) {
 		require.NoError(t, daemons.LocateMedia(t.Context(), q, tclient, &daemons.DiscoverySettings{LocateP2P: false}, nil, nil, nil, ddisc.DefaultPolicy()))
 
 		require.Equal(t, 0, testx.Must(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM torrents_metadata"))(t))
+		require.Equal(t, 0, testx.Must(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM ddisc_locate WHERE tombstoned_at < 'infinity'"))(t))
 	})
 }

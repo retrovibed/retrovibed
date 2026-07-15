@@ -86,10 +86,9 @@ func (t *HTTPDiscovery) Bind(r *mux.Router) {
 
 func (t *HTTPDiscovery) download(w http.ResponseWriter, r *http.Request) {
 	var (
-		disc      ddisc.Discovered
-		md        tracking.Metadata
-		discovery *Discovery
-		id        = mux.Vars(r)["id"]
+		disc ddisc.Discovered
+		md   tracking.Metadata
+		id   = mux.Vars(r)["id"]
 	)
 
 	if err := ddisc.DiscoveredFindByID(r.Context(), t.q, id).Scan(&disc); sqlx.ErrNoRows(err) != nil {
@@ -114,14 +113,8 @@ func (t *HTTPDiscovery) download(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// if discovery, err = NewDiscoveryFromDiscovered(disc); err != nil {
-	// 	log.Println(errorsx.Wrap(err, "unable to autodownload tracking"))
-	// 	errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
-	// 	return
-	// }
-
 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), DiscoveryDownloadResponse{
-		Discovery: discovery,
+		Discovery: NewDiscoveryFromDiscovered(disc),
 	}); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to find response"))
 		return
@@ -158,17 +151,7 @@ func (t *HTTPDiscovery) search(w http.ResponseWriter, r *http.Request) {
 
 	q := sqlx.Scan(tracking.UnknownSearch(r.Context(), t.q, query))
 	for uh := range q.Iter() {
-		var (
-			encoded *Discovery
-		)
-
-		if encoded, err = NewDiscoveryFromTrackingUnknownHash(uh); err != nil {
-			log.Println(errorsx.Wrap(err, "discovery encoding failed"))
-			errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
-			return
-		}
-
-		resp.Items = append(resp.Items, encoded)
+		resp.Items = append(resp.Items, NewDiscoveryFromTrackingUnknownHash(uh))
 	}
 
 	if err = q.Err(); err != nil {
@@ -207,15 +190,8 @@ func (t *HTTPDiscovery) create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	dd, err := NewDiscoveryFromTrackingUnknownHash(uh)
-	if err != nil {
-		log.Println(errorsx.Wrap(err, "conversion failed"))
-		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
-		return
-	}
-
 	if err = httpx.WriteJSON(w, httpx.GetBuffer(r), &DiscoveryCreateResponse{
-		Discovery: dd,
+		Discovery: NewDiscoveryFromTrackingUnknownHash(uh),
 	}); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to write response"))
 		return
@@ -227,7 +203,6 @@ func (t *HTTPDiscovery) delete(w http.ResponseWriter, r *http.Request) {
 		err  error
 		vars = mux.Vars(r)
 		uh   tracking.UnknownHash
-		dd   *Discovery
 	)
 
 	if err := tracking.UnknownHashDeleteByID(r.Context(), t.q, vars["id"]).Scan(&uh); err != nil {
@@ -236,14 +211,8 @@ func (t *HTTPDiscovery) delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if dd, err = NewDiscoveryFromTrackingUnknownHash(uh); err != nil {
-		log.Println(errorsx.Wrap(err, "conversion failed"))
-		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
-		return
-	}
-
 	if err = httpx.WriteJSON(w, httpx.GetBuffer(r), &DiscoveryDeleteResponse{
-		Discovery: dd,
+		Discovery: NewDiscoveryFromTrackingUnknownHash(uh),
 	}); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to write response"))
 		return

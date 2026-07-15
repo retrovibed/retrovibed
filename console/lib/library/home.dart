@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:retrovibed/design.kit/file.drop.well.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/lucene.dart' as lucene;
 import 'package:retrovibed/discovery.dart' as disc;
 import 'grid.display.dart';
+import 'grid.setting.dart';
 import 'search.mimetype.dropdown.dart';
 
 class Home extends StatefulWidget {
@@ -38,10 +40,56 @@ class _HomeState extends State<Home> {
     super.setState(fn);
   }
 
+  Widget _cause = ds.Error.zero;
+
+  void _reseterr() {
+    setState(() {
+      _cause = ds.Error.zero;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
     final compact = defaults.isCompact;
+
+    final upload =
+        (
+          FilesEvent v, {
+          ValueNotifier<int>? progress,
+        }) {
+          final multiparts = v.files.map((c) {
+            return media.media.uploadable(c.path, c.name, c.mimeType!);
+          });
+
+          return Future.microtask(() {
+            return Future.wait(
+              multiparts.map((fv) {
+                return fv.then((v) {
+                  return widget
+                      .apiupload((req) {
+                        req..files.add(v);
+                        return req;
+                      })
+                      .then((_) {
+                        final freshNext = widget.search.value.next.clone();
+                        widget.search.value = media.MediaSearchState(
+                          next: freshNext,
+                          count: widget.search.value.count,
+                        );
+                      })
+                      .catchError((cause) {
+                        setState(() {
+                          _cause = ds.Error.unknown(cause, onTap: _reseterr);
+                        });
+                      });
+                });
+              }),
+            ).then((v) => ds.NullWidget).catchError((cause) {
+              return ds.Error.unknown(cause, onTap: _reseterr);
+            });
+          });
+        };
 
     return LayoutBuilder(
       builder: (context, constraints) => SingleChildScrollView(
@@ -83,6 +131,7 @@ class _HomeState extends State<Home> {
                   ],
                   controller: widget.controller,
                   padding: defaults.padding.copyWith(bottom: 0.0),
+                  tuning: GridSettings(),
                   onSubmitted: (v) {
                     final freshNext = widget.search.value.next.clone()
                       ..query = v
@@ -116,18 +165,28 @@ class _HomeState extends State<Home> {
                         },
                       ),
                     ),
+                    ds.FileDropWell.icon(
+                      upload,
+                      mimetypes: state.next.mimetypes,
+                      help: ds.Hint(
+                        const Text("drag and drop files onto the grid to add media to your library"),
+                      ),
+                    ),
                   ],
                   help: ds.Hint(const Text("search your library, use @ to access advanced filtering")),
                 ),
               ),
-              switch (_mode) {
-                _Mode.library => Grid(
-                  apisearch: widget.apisearch,
-                  search: widget.search,
-                  highlighted: widget.highlighted,
-                ),
-                _Mode.discovery => disc.DiscoveryGrid(search: widget.search),
-              },
+              ds.ErrorScreen(
+                cause: _cause,
+                switch (_mode) {
+                  _Mode.library => Grid(
+                    apisearch: widget.apisearch,
+                    search: widget.search,
+                    highlighted: widget.highlighted,
+                  ),
+                  _Mode.discovery => disc.DiscoveryGrid(search: widget.search),
+                },
+              ),
             ],
           ),
         ),

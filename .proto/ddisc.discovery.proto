@@ -7,7 +7,7 @@ import "meta.search.proto";
 message Discovery {
   string id = 1 [ json_name = "id" ];
   bytes infohash = 2 [ json_name = "infohash" ];
-  string attempts = 3 [ json_name = "attempts" ];
+  uint32 attempts = 3 [ json_name = "attempts" ];
   string next_check = 4 [ json_name = "next_check" ];
   string created_at = 5 [ json_name = "created_at" ];
   string updated_at = 6 [ json_name = "updated_at" ];
