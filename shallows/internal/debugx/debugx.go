@@ -72,6 +72,7 @@ func DumpOnSignal(ctx context.Context, sigs ...os.Signal) {
 
 func OnSignal(ctx context.Context, do func(ctx context.Context) error, sigs ...os.Signal) {
 	signals := make(chan os.Signal, 1)
+	defer signal.Stop(signals)
 	signal.Notify(signals, sigs...)
 
 	for {

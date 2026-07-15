@@ -157,6 +157,19 @@ func (t _torrenting) loadcfg(path string, v proto.Message) error {
 	return nil
 }
 
+// resetPrevious tears down whatever the previous Init generation left
+// running before a new one is built.
+func (t *_torrenting) resetPrevious() {
+	if c := t._tclient.Load(); c != nil {
+		errorsx.Log(errorsx.Wrap(c.Close(), "failed to close previous client"))
+	}
+
+	if dev := t._wgdev.Load(); dev != nil {
+		dev.Close()
+		<-dev.Wait()
+	}
+}
+
 func (t *_torrenting) WireguardSnapshot() (wireguardx.Statistics, error) {
 	if dev := t._wgdev.Load(); dev != nil {
 		return wireguardx.Snapshot(dev)
@@ -353,9 +366,7 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 	log.Println("ddisc partitions digest", disc.Partitions, disc.Seed, "->", ddisc.PartitionsDigest(partitions).String())
 	log.Println("ddisc partition", localpartition)
 
-	if c := t._tclient.Load(); c != nil {
-		errorsx.Log(errorsx.Wrap(c.Close(), "failed to close previous client"))
-	}
+	t.resetPrevious()
 
 	log.Println("------------------------------------------------------- initiated torrent initialization -------------------------------------------------------")
 	defer log.Println("------------------------------------------------------- completed torrent initialization -------------------------------------------------------")
