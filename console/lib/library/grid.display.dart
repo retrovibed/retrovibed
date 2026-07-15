@@ -42,6 +42,7 @@ class AvailableGridDisplay extends StatefulWidget {
 class _AvailableGridDisplay extends State<AvailableGridDisplay> {
   bool _loading = true;
   bool _library = true; // search the library. when false we search known media.
+  bool _discovery = false; // true only when the user explicitly enabled the discover filter.
   Widget _cause = ds.Error.zero;
 
   void setState(VoidCallback fn) {
@@ -64,7 +65,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
           setState(() {
             widget.search.value = v;
             _loading = false;
-            _library = v.items.isNotEmpty;
+            _library = _discovery ? false : v.items.isNotEmpty;
           });
 
           widget.focus?.requestFocus();
@@ -144,6 +145,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
     final authz = authn.AuthzCache.meta(context);
 
     return RefreshIndicator(
+      key: ValueKey("library"),
       onRefresh: () => refresh(widget.search.value.next),
       child: LayoutBuilder(
         builder: (context, constraints) => SingleChildScrollView(
@@ -152,7 +154,7 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
           child: ConstrainedBox(
             constraints: BoxConstraints(minHeight: constraints.maxHeight),
             child: ds.Grid<media.Media>(
-              children: widget.search.value.items,
+              children: _library ? widget.search.value.items : const [],
               loading: _loading,
               cause: _cause,
               leading: [
@@ -160,8 +162,11 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                   autoscroll: true,
                   decoration: InputDecoration(hintText: "search library"),
                   filters: [
-                    lucene.Mode.auto('discover', false, (discover) {
-                      setState(() => _library = !discover);
+                    lucene.Mode.auto('discover', false, (discovery) {
+                      setState(() {
+                        _discovery = discovery;
+                        _library = !discovery;
+                      });
                     }),
                     lucene.Boolean.auto('hidden', false, (v) {
                       setState(() => widget.search.value.next.hidden = v);
@@ -211,64 +216,73 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
                   tuning: GridSettings(),
                   help: ds.Hint(const Text("search your library, use @ to access advanced filtering")),
                 ),
-                (widget.search.value.next.query.isEmpty)
-                    ? disc.Home(
-                        category,
-                        padding: defaults.padding.copyWith(
-                          top: 0.0,
-                          bottom: 0.0,
-                        ),
-                      )
-                    : ds.Empty,
-              ],
-              empty: _library
-                  ? ds.Empty
-                  : KnownMediaDownloadList.query(
-                      () {
-                        final search = widget.search.value;
-                        if (_loading) return Future.value([]);
-                        if (search.items.isNotEmpty) return Future.value([]);
-                        if (category.isEmpty) return Future.value([]);
-
-                        return httpx.withRetry(
-                          () => api.known
-                              .search(
-                                api.known.request(
-                                  language: langcodex.locale().languageCode,
-                                  mimetype: category,
-                                  adult: search.next.adult,
-                                  query: search.next.query,
-                                  limit: search.next.limit.toInt(),
-                                ),
-                                options: [authn.request(authz)],
-                              )
-                              .then((v) => v.items),
-                        );
-                      },
-                      leading: Column(
-                        children: [
-                          DiscoveryLocator(
-                            query: widget.search.value.next.query.trim(),
-                            mimetype: category,
-                          ),
-                        ],
-                      ),
-                      empty: _library
-                          ? Center(
-                              child: Padding(
-                                padding: defaults.padding,
-                                child: Text(
-                                  "no results in library",
-                                  style: TextStyle(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface.withValues(alpha: 0.6),
-                                  ),
-                                ),
-                              ),
-                            )
-                          : ds.Empty,
+                Visibility(
+                  key: ValueKey('library.query.disc.home'),
+                  visible: _library && widget.search.value.next.query.isEmpty,
+                  replacement: ds.Empty,
+                  child: disc.Home(
+                    category,
+                    key: ValueKey('library.disc.home'),
+                    padding: defaults.padding.copyWith(
+                      top: 0.0,
+                      bottom: 0.0,
                     ),
+                  ),
+                ),
+              ],
+              empty: Visibility(
+                visible: !_library,
+                child: KnownMediaDownloadList.query(
+                  () {
+                    final search = widget.search.value;
+                    if (_loading) return Future.value([]);
+                    if (search.items.isNotEmpty) return Future.value([]);
+                    if (category.isEmpty) return Future.value([]);
+
+                    return httpx.withRetry(
+                      () => api.known
+                          .search(
+                            api.known.request(
+                              language: langcodex.locale().languageCode,
+                              mimetype: category,
+                              adult: search.next.adult,
+                              query: search.next.query,
+                              limit: search.next.limit.toInt(),
+                            ),
+                            options: [authn.request(authz)],
+                          )
+                          .then((v) => v.items),
+                    );
+                  },
+                  key: ValueKey('library.download.list'),
+                  leading: Column(
+                    children: [
+                      DiscoveryLocator(
+                        key: ValueKey('library.disc.locator'),
+                        query: widget.search.value.next.query.trim(),
+                        mimetype: category,
+                      ),
+                    ],
+                  ),
+                  empty: Visibility(
+                    visible: !_library,
+                    replacement: Center(
+                      child: Padding(
+                        padding: defaults.padding,
+                        child: Text(
+                          "no results in library",
+                          style: TextStyle(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withValues(alpha: 0.6),
+                          ),
+                        ),
+                      ),
+                    ),
+                    child: ds.Empty,
+                  ),
+                ),
+              ),
               (context, _media) {
                 var onSettings = () {
                   ds.modals.asyncfn<media.Media>(

@@ -102,7 +102,15 @@ class _DiscoveryLocator extends State<DiscoveryLocator> {
     );
 
     if (widget.query.trim().isEmpty || widget.mimetype.isEmpty) {
-      return description;
+      return Center(
+        child: Padding(
+          padding: defaults.padding.copyWith(bottom: 0),
+          child: Text(
+            "discovery mode - search for content",
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
     }
 
     return ds.Loading(

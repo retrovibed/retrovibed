@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../empty.dart';
 
 class Guarded extends StatelessWidget {
   final Widget child;
@@ -8,7 +9,7 @@ class Guarded extends StatelessWidget {
   const Guarded({
     super.key,
     required this.child,
-    required this.overlay,
+    this.overlay = Empty,
     this.enabled = false,
   });
 

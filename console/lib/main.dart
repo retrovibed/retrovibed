@@ -195,6 +195,7 @@ class Retrovibed extends StatelessWidget {
                                                   media.Playlist.wrap((ctx, s) {
                                                     return media.VideoScreen(
                                                       medialib.AvailableGridDisplay(
+                                                        key: ValueKey("library"),
                                                         focus: defaults.mobile ? null : s.searchfocus,
                                                         controller: s.controller,
                                                         highlighted: s.known.id,
