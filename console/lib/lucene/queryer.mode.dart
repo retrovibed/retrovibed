@@ -27,13 +27,23 @@ class QueryerMode extends StatelessWidget {
               ? (chipTheme.selectedColor ?? theme.colorScheme.secondaryContainer)
               : (chipTheme.backgroundColor ?? theme.colorScheme.surfaceContainerLow);
 
-          return Container(
-            padding: EdgeInsets.symmetric(horizontal: defaults.spacing, vertical: 4),
-            decoration: BoxDecoration(
-              color: bgColor,
-              borderRadius: BorderRadius.circular(8),
+          return ds.Help(
+            Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: defaults.spacing,
+                vertical: 8.0,
+              ),
+              decoration: BoxDecoration(
+                color: bgColor,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Center(
+                widthFactor: 1.0, // Prevents width from expanding infinitely horizontally
+                heightFactor: 1.0, // Dictates that the Center takes up exactly the child's height
+                child: mode,
+              ),
             ),
-            child: mode,
+            mode.help,
           );
         },
       ),

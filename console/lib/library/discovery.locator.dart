@@ -23,7 +23,7 @@ class DiscoveryLocator extends StatefulWidget {
     this.help = const ds.Hint(
       Text(
         "searches the peer-to-peer network and your search plugins for this title. "
-        "when a match is found its downloaded automatically.",
+        "when a match is found its added to recommendations.",
       ),
     ),
   });
@@ -69,6 +69,7 @@ class _DiscoveryLocator extends State<DiscoveryLocator> {
           return widget
               .locate(
                 api.Locate.create()
+                  ..autodownload = false
                   ..query = widget.query
                   ..mimetype = widget.mimetype,
                 options: options,
@@ -91,18 +92,9 @@ class _DiscoveryLocator extends State<DiscoveryLocator> {
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
-    final description = Center(
-      child: Padding(
-        padding: defaults.padding.copyWith(bottom: 0),
-        child: Text(
-          "select to locate and download well known media",
-          textAlign: TextAlign.center,
-        ),
-      ),
-    );
 
     if (widget.query.trim().isEmpty || widget.mimetype.isEmpty) {
-      return description;
+      return ds.Empty;
     }
 
     return ds.Loading(
@@ -123,13 +115,12 @@ class _DiscoveryLocator extends State<DiscoveryLocator> {
             trailing: [
               Center(
                 child: Text(
-                  'search the network',
+                  'search the network for less known media',
                   textAlign: TextAlign.center,
                 ),
               ),
             ],
           ),
-          description,
         ],
       ),
     );

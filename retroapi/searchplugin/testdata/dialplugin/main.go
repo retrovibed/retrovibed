@@ -19,7 +19,7 @@ import (
 
 func main() {
 	fs := flag.NewFlagSet("plugin", flag.ExitOnError)
-	category := fs.String("category", "", "")
+	mimetype := fs.String("mimetype", "", "")
 	query := fs.String("query", "", "")
 	fs.Parse(os.Args[2:])
 
@@ -32,6 +32,6 @@ func main() {
 
 	json.NewEncoder(os.Stdout).Encode(&ddiscapi.Import{
 		Magnet:   status,
-		Mimetype: *category,
+		Mimetype: *mimetype,
 	})
 }

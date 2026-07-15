@@ -1,6 +1,7 @@
 package ddiscapi
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"log"
 	"math"
@@ -14,6 +15,7 @@ import (
 	"github.com/justinas/alice"
 	"github.com/retrovibed/retrovibed/retroapi/httpauth"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
+	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
@@ -74,6 +76,49 @@ func (t *HTTPDiscovery) Bind(r *mux.Router) {
 		metaapi.AuthzTokenHTTP(t.jwtsecret, AuthzPermPeer),
 		httpx.Timeout2s(),
 	).ThenFunc(t.delete))
+
+	r.Path("/{id}").Methods(http.MethodPost).Handler(alice.New(
+		httpx.ContextBufferPool1024(),
+		httpauth.AuthenticateWithToken(t.jwtsecret),
+		httpx.Timeout2s(),
+	).ThenFunc(t.download))
+}
+
+func (t *HTTPDiscovery) download(w http.ResponseWriter, r *http.Request) {
+	var (
+		disc ddisc.Discovered
+		md   tracking.Metadata
+		id   = mux.Vars(r)["id"]
+	)
+
+	if err := ddisc.DiscoveredFindByID(r.Context(), t.q, id).Scan(&disc); sqlx.ErrNoRows(err) != nil {
+		log.Println(errorsx.Wrap(err, "unable to find discovered"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
+		return
+	} else if err != nil {
+		log.Println(errorsx.Wrap(err, "unable to find discovered"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	if err := tracking.MetadataFindByInfohash(r.Context(), t.q, hex.EncodeToString(disc.Infohash)).Scan(&md); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to find tracking data"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	if err := tracking.MetadataAutoDownloadByID(r.Context(), t.q, md.ID).Scan(&md); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to autodownload tracking"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), DiscoveryDownloadResponse{
+		Discovery: NewDiscoveryFromDiscovered(disc),
+	}); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to find response"))
+		return
+	}
 }
 
 func (t *HTTPDiscovery) search(w http.ResponseWriter, r *http.Request) {
@@ -106,17 +151,7 @@ func (t *HTTPDiscovery) search(w http.ResponseWriter, r *http.Request) {
 
 	q := sqlx.Scan(tracking.UnknownSearch(r.Context(), t.q, query))
 	for uh := range q.Iter() {
-		var (
-			encoded *Discovery
-		)
-
-		if encoded, err = NewDiscoveryFromTrackingUnknownHash(uh); err != nil {
-			log.Println(errorsx.Wrap(err, "discovery encoding failed"))
-			errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
-			return
-		}
-
-		resp.Items = append(resp.Items, encoded)
+		resp.Items = append(resp.Items, NewDiscoveryFromTrackingUnknownHash(uh))
 	}
 
 	if err = q.Err(); err != nil {
@@ -155,15 +190,8 @@ func (t *HTTPDiscovery) create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	dd, err := NewDiscoveryFromTrackingUnknownHash(uh)
-	if err != nil {
-		log.Println(errorsx.Wrap(err, "conversion failed"))
-		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
-		return
-	}
-
 	if err = httpx.WriteJSON(w, httpx.GetBuffer(r), &DiscoveryCreateResponse{
-		Discovery: dd,
+		Discovery: NewDiscoveryFromTrackingUnknownHash(uh),
 	}); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to write response"))
 		return
@@ -175,7 +203,6 @@ func (t *HTTPDiscovery) delete(w http.ResponseWriter, r *http.Request) {
 		err  error
 		vars = mux.Vars(r)
 		uh   tracking.UnknownHash
-		dd   *Discovery
 	)
 
 	if err := tracking.UnknownHashDeleteByID(r.Context(), t.q, vars["id"]).Scan(&uh); err != nil {
@@ -184,14 +211,8 @@ func (t *HTTPDiscovery) delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if dd, err = NewDiscoveryFromTrackingUnknownHash(uh); err != nil {
-		log.Println(errorsx.Wrap(err, "conversion failed"))
-		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
-		return
-	}
-
 	if err = httpx.WriteJSON(w, httpx.GetBuffer(r), &DiscoveryDeleteResponse{
-		Discovery: dd,
+		Discovery: NewDiscoveryFromTrackingUnknownHash(uh),
 	}); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to write response"))
 		return

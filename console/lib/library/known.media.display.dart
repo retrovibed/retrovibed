@@ -58,6 +58,57 @@ class KnownMediaDisplay extends StatefulWidget {
     );
   }
 
+  factory KnownMediaDisplay.auto(
+    BuildContext context,
+    Media m, {
+    Key? key,
+    GestureTapCallback? onTap,
+    GestureTapCallback? onDoubleTap,
+    void Function()? onSettings,
+    void Function(_media.Media upd)? onChange,
+    List<Widget> trailing = const [],
+    bool highlighted = false,
+    Widget help = ds.HelpScope.None,
+  }) {
+    final resolvedKey = key ?? ValueKey(uuidx.md5x("${m.id}.${m.updatedAt}"));
+
+    if (uuidx.isMinMax(uuidx.fromString(m.knownMediaId))) {
+      return KnownMediaDisplay.missing(
+        m,
+        key: resolvedKey,
+        onTap: onTap,
+        onDoubleTap: onDoubleTap,
+        onSettings: onSettings,
+        onChange: onChange,
+        trailing: trailing,
+        highlighted: highlighted,
+        help: help,
+      );
+    }
+
+    final authz = authn.AuthzCache.meta(context);
+    return KnownMediaDisplay(
+      api.known
+          .cached(
+            m.knownMediaId,
+            () => api.known.get(
+              m.knownMediaId,
+              options: [authn.request(authz)],
+            ),
+          )
+          .then((w) => (w.known..description = m.description)),
+      media: m,
+      key: resolvedKey,
+      onTap: onTap,
+      onDoubleTap: onDoubleTap,
+      onSettings: onSettings,
+      onChange: onChange,
+      trailing: trailing,
+      highlighted: highlighted,
+      help: help,
+    );
+  }
+
   static const hintPlayMedia = ds.Hint(
     Column(
       crossAxisAlignment: CrossAxisAlignment.start,

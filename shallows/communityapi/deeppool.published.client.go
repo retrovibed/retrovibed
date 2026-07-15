@@ -13,7 +13,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 
-	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
+	"github.com/retrovibed/retrovibed/retroapi/mimex"
 )
 
 func NewDeeppoolPublished(c *http.Client) DeeppoolPublished {

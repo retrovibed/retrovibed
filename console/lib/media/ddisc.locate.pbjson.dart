@@ -33,6 +33,7 @@ const Locate$json = {
     {'1': 'query', '3': 6, '4': 1, '5': 9, '10': 'query'},
     {'1': 'mimetype', '3': 7, '4': 1, '5': 9, '10': 'mimetype'},
     {'1': 'tombstoned_at', '3': 8, '4': 1, '5': 9, '10': 'tombstoned_at'},
+    {'1': 'autodownload', '3': 9, '4': 1, '5': 8, '10': 'autodownload'},
   ],
 };
 
@@ -42,7 +43,8 @@ final $typed_data.Uint8List locateDescriptor = $convert.base64Decode(
     'QSHgoKdXBkYXRlZF9hdBgDIAEoCVIKdXBkYXRlZF9hdBImCg5rbm93bl9tZWRpYV9pZBgEIAEo'
     'CVIOa25vd25fbWVkaWFfaWQSLgoSbG9jYXRlZF90b3JyZW50X2lkGAUgASgJUhJsb2NhdGVkX3'
     'RvcnJlbnRfaWQSFAoFcXVlcnkYBiABKAlSBXF1ZXJ5EhoKCG1pbWV0eXBlGAcgASgJUghtaW1l'
-    'dHlwZRIkCg10b21ic3RvbmVkX2F0GAggASgJUg10b21ic3RvbmVkX2F0');
+    'dHlwZRIkCg10b21ic3RvbmVkX2F0GAggASgJUg10b21ic3RvbmVkX2F0EiIKDGF1dG9kb3dubG'
+    '9hZBgJIAEoCFIMYXV0b2Rvd25sb2Fk');
 
 @$core.Deprecated('Use locateSearchRequestDescriptor instead')
 const LocateSearchRequest$json = {

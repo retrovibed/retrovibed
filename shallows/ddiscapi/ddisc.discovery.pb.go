@@ -26,7 +26,7 @@ type Discovery struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Infohash      []byte                 `protobuf:"bytes,2,opt,name=infohash,proto3" json:"infohash,omitempty"`
-	Attempts      string                 `protobuf:"bytes,3,opt,name=attempts,proto3" json:"attempts,omitempty"`
+	Attempts      uint32                 `protobuf:"varint,3,opt,name=attempts,proto3" json:"attempts,omitempty"`
 	NextCheck     string                 `protobuf:"bytes,4,opt,name=next_check,proto3" json:"next_check,omitempty"`
 	CreatedAt     string                 `protobuf:"bytes,5,opt,name=created_at,proto3" json:"created_at,omitempty"`
 	UpdatedAt     string                 `protobuf:"bytes,6,opt,name=updated_at,proto3" json:"updated_at,omitempty"`
@@ -78,11 +78,11 @@ func (x *Discovery) GetInfohash() []byte {
 	return nil
 }
 
-func (x *Discovery) GetAttempts() string {
+func (x *Discovery) GetAttempts() uint32 {
 	if x != nil {
 		return x.Attempts
 	}
-	return ""
+	return 0
 }
 
 func (x *Discovery) GetNextCheck() string {
@@ -330,6 +330,86 @@ func (x *DiscoveryCreateResponse) GetDiscovery() *Discovery {
 	return nil
 }
 
+type DiscoveryDownloadRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DiscoveryDownloadRequest) Reset() {
+	*x = DiscoveryDownloadRequest{}
+	mi := &file_ddisc_discovery_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DiscoveryDownloadRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DiscoveryDownloadRequest) ProtoMessage() {}
+
+func (x *DiscoveryDownloadRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ddisc_discovery_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DiscoveryDownloadRequest.ProtoReflect.Descriptor instead.
+func (*DiscoveryDownloadRequest) Descriptor() ([]byte, []int) {
+	return file_ddisc_discovery_proto_rawDescGZIP(), []int{5}
+}
+
+type DiscoveryDownloadResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Discovery     *Discovery             `protobuf:"bytes,1,opt,name=discovery,proto3" json:"discovery,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DiscoveryDownloadResponse) Reset() {
+	*x = DiscoveryDownloadResponse{}
+	mi := &file_ddisc_discovery_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DiscoveryDownloadResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DiscoveryDownloadResponse) ProtoMessage() {}
+
+func (x *DiscoveryDownloadResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_ddisc_discovery_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DiscoveryDownloadResponse.ProtoReflect.Descriptor instead.
+func (*DiscoveryDownloadResponse) Descriptor() ([]byte, []int) {
+	return file_ddisc_discovery_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *DiscoveryDownloadResponse) GetDiscovery() *Discovery {
+	if x != nil {
+		return x.Discovery
+	}
+	return nil
+}
+
 type DiscoveryDeleteRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -338,7 +418,7 @@ type DiscoveryDeleteRequest struct {
 
 func (x *DiscoveryDeleteRequest) Reset() {
 	*x = DiscoveryDeleteRequest{}
-	mi := &file_ddisc_discovery_proto_msgTypes[5]
+	mi := &file_ddisc_discovery_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -350,7 +430,7 @@ func (x *DiscoveryDeleteRequest) String() string {
 func (*DiscoveryDeleteRequest) ProtoMessage() {}
 
 func (x *DiscoveryDeleteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_ddisc_discovery_proto_msgTypes[5]
+	mi := &file_ddisc_discovery_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -363,7 +443,7 @@ func (x *DiscoveryDeleteRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DiscoveryDeleteRequest.ProtoReflect.Descriptor instead.
 func (*DiscoveryDeleteRequest) Descriptor() ([]byte, []int) {
-	return file_ddisc_discovery_proto_rawDescGZIP(), []int{5}
+	return file_ddisc_discovery_proto_rawDescGZIP(), []int{7}
 }
 
 type DiscoveryDeleteResponse struct {
@@ -375,7 +455,7 @@ type DiscoveryDeleteResponse struct {
 
 func (x *DiscoveryDeleteResponse) Reset() {
 	*x = DiscoveryDeleteResponse{}
-	mi := &file_ddisc_discovery_proto_msgTypes[6]
+	mi := &file_ddisc_discovery_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -387,7 +467,7 @@ func (x *DiscoveryDeleteResponse) String() string {
 func (*DiscoveryDeleteResponse) ProtoMessage() {}
 
 func (x *DiscoveryDeleteResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_ddisc_discovery_proto_msgTypes[6]
+	mi := &file_ddisc_discovery_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -400,7 +480,7 @@ func (x *DiscoveryDeleteResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DiscoveryDeleteResponse.ProtoReflect.Descriptor instead.
 func (*DiscoveryDeleteResponse) Descriptor() ([]byte, []int) {
-	return file_ddisc_discovery_proto_rawDescGZIP(), []int{6}
+	return file_ddisc_discovery_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *DiscoveryDeleteResponse) GetDiscovery() *Discovery {
@@ -418,7 +498,7 @@ const file_ddisc_discovery_proto_rawDesc = "" +
 	"\tDiscovery\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
 	"\binfohash\x18\x02 \x01(\fR\binfohash\x12\x1a\n" +
-	"\battempts\x18\x03 \x01(\tR\battempts\x12\x1e\n" +
+	"\battempts\x18\x03 \x01(\rR\battempts\x12\x1e\n" +
 	"\n" +
 	"next_check\x18\x04 \x01(\tR\n" +
 	"next_check\x12\x1e\n" +
@@ -443,6 +523,9 @@ const file_ddisc_discovery_proto_rawDesc = "" +
 	"\x16DiscoveryCreateRequest\x12.\n" +
 	"\tdiscovery\x18\x01 \x01(\v2\x10.ddisc.DiscoveryR\tdiscovery\"I\n" +
 	"\x17DiscoveryCreateResponse\x12.\n" +
+	"\tdiscovery\x18\x01 \x01(\v2\x10.ddisc.DiscoveryR\tdiscovery\"\x1a\n" +
+	"\x18DiscoveryDownloadRequest\"K\n" +
+	"\x19DiscoveryDownloadResponse\x12.\n" +
 	"\tdiscovery\x18\x01 \x01(\v2\x10.ddisc.DiscoveryR\tdiscovery\"\x18\n" +
 	"\x16DiscoveryDeleteRequest\"I\n" +
 	"\x17DiscoveryDeleteResponse\x12.\n" +
@@ -460,29 +543,32 @@ func file_ddisc_discovery_proto_rawDescGZIP() []byte {
 	return file_ddisc_discovery_proto_rawDescData
 }
 
-var file_ddisc_discovery_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_ddisc_discovery_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_ddisc_discovery_proto_goTypes = []any{
-	(*Discovery)(nil),               // 0: ddisc.Discovery
-	(*DiscoverySearchRequest)(nil),  // 1: ddisc.DiscoverySearchRequest
-	(*DiscoverySearchResponse)(nil), // 2: ddisc.DiscoverySearchResponse
-	(*DiscoveryCreateRequest)(nil),  // 3: ddisc.DiscoveryCreateRequest
-	(*DiscoveryCreateResponse)(nil), // 4: ddisc.DiscoveryCreateResponse
-	(*DiscoveryDeleteRequest)(nil),  // 5: ddisc.DiscoveryDeleteRequest
-	(*DiscoveryDeleteResponse)(nil), // 6: ddisc.DiscoveryDeleteResponse
-	(*meta.DateRange)(nil),          // 7: meta.DateRange
+	(*Discovery)(nil),                 // 0: ddisc.Discovery
+	(*DiscoverySearchRequest)(nil),    // 1: ddisc.DiscoverySearchRequest
+	(*DiscoverySearchResponse)(nil),   // 2: ddisc.DiscoverySearchResponse
+	(*DiscoveryCreateRequest)(nil),    // 3: ddisc.DiscoveryCreateRequest
+	(*DiscoveryCreateResponse)(nil),   // 4: ddisc.DiscoveryCreateResponse
+	(*DiscoveryDownloadRequest)(nil),  // 5: ddisc.DiscoveryDownloadRequest
+	(*DiscoveryDownloadResponse)(nil), // 6: ddisc.DiscoveryDownloadResponse
+	(*DiscoveryDeleteRequest)(nil),    // 7: ddisc.DiscoveryDeleteRequest
+	(*DiscoveryDeleteResponse)(nil),   // 8: ddisc.DiscoveryDeleteResponse
+	(*meta.DateRange)(nil),            // 9: meta.DateRange
 }
 var file_ddisc_discovery_proto_depIdxs = []int32{
-	7, // 0: ddisc.DiscoverySearchRequest.next_check:type_name -> meta.DateRange
+	9, // 0: ddisc.DiscoverySearchRequest.next_check:type_name -> meta.DateRange
 	1, // 1: ddisc.DiscoverySearchResponse.next:type_name -> ddisc.DiscoverySearchRequest
 	0, // 2: ddisc.DiscoverySearchResponse.items:type_name -> ddisc.Discovery
 	0, // 3: ddisc.DiscoveryCreateRequest.discovery:type_name -> ddisc.Discovery
 	0, // 4: ddisc.DiscoveryCreateResponse.discovery:type_name -> ddisc.Discovery
-	0, // 5: ddisc.DiscoveryDeleteResponse.discovery:type_name -> ddisc.Discovery
-	6, // [6:6] is the sub-list for method output_type
-	6, // [6:6] is the sub-list for method input_type
-	6, // [6:6] is the sub-list for extension type_name
-	6, // [6:6] is the sub-list for extension extendee
-	0, // [0:6] is the sub-list for field type_name
+	0, // 5: ddisc.DiscoveryDownloadResponse.discovery:type_name -> ddisc.Discovery
+	0, // 6: ddisc.DiscoveryDeleteResponse.discovery:type_name -> ddisc.Discovery
+	7, // [7:7] is the sub-list for method output_type
+	7, // [7:7] is the sub-list for method input_type
+	7, // [7:7] is the sub-list for extension type_name
+	7, // [7:7] is the sub-list for extension extendee
+	0, // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_ddisc_discovery_proto_init() }
@@ -496,7 +582,7 @@ func file_ddisc_discovery_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_ddisc_discovery_proto_rawDesc), len(file_ddisc_discovery_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

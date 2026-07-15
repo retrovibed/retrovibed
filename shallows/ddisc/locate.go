@@ -41,3 +41,7 @@ func NewLocate(query, mimetype string, options ...LocateOption) (l Locate) {
 func LocateOptionKnownMedia(id string) LocateOption {
 	return func(l *Locate) { l.KnownMediaID = id }
 }
+
+func LocateOptionAutoDownload(v bool) LocateOption {
+	return func(l *Locate) { l.Autodownload = v }
+}

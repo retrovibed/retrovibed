@@ -58,7 +58,7 @@ func NewRegistryWithSocket(ctx context.Context, sock wnetruntime.Socket) (*Regis
 		return nil, err
 	}
 
-	if err := watch(ctx, r, searchPluginDir()); err != nil {
+	if err := watch(ctx, r, SearchPluginDir()); err != nil {
 		return nil, err
 	}
 
@@ -100,7 +100,9 @@ func newRegistry(ctx context.Context, sock wnetruntime.Socket) (*Registry, error
 	return r, nil
 }
 
-func searchPluginDir() string {
+// SearchPluginDir is the well-known directory watched for search-plugin
+// .wasm modules (${vars_user_configuration_directory}/search.d).
+func SearchPluginDir() string {
 	return userx.DefaultConfigDir(userx.DefaultRelRoot(), "search.d")
 }
 

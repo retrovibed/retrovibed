@@ -41,13 +41,13 @@ class Card extends material.StatelessWidget {
     final defaults = ds.Defaults.of(context);
 
     final interactive = onTap != null || onDoubleTap != null || onSecondaryTap != null || onLongPress != null;
-    return ds.Help(
-      material.MouseRegion(
-        cursor: interactive ? material.SystemMouseCursors.click : material.SystemMouseCursors.basic,
-        child: material.Card(
-          margin: margin,
-          clipBehavior: material.Clip.antiAlias,
-          child: material.InkWell(
+    return material.MouseRegion(
+      cursor: interactive ? material.SystemMouseCursors.click : material.SystemMouseCursors.basic,
+      child: material.Card(
+        margin: margin,
+        clipBehavior: material.Clip.antiAlias,
+        child: ds.Help(
+          material.InkWell(
             mouseCursor: material.MouseCursor.defer,
             onTap: onTap,
             onDoubleTap: onDoubleTap,
@@ -69,9 +69,9 @@ class Card extends material.StatelessWidget {
               ),
             ),
           ),
+          help,
         ),
       ),
-      help,
     );
   }
 }

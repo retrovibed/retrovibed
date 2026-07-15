@@ -10,7 +10,7 @@
 //	GOOS=wasip1 GOARCH=wasm go build -o noop.wasm ./retroapi/examples/searchplugin-noop
 //
 // and drop noop.wasm in the well-known search.d plugin directory (see
-// searchplugin.searchPluginDir) to have Registry load and run it.
+// searchplugin.SearchPluginDir) to have Registry load and run it.
 package main
 
 import (
@@ -18,6 +18,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 
@@ -33,22 +34,34 @@ import (
 	_ "github.com/egdaemon/wasinet/wasinet/autohijack"
 )
 
+// mimetypeFlag collects every --mimetype occurrence into a slice, since a
+// search request can carry several candidate discovery mimetypes (see
+// ddisc.Category) and stdlib flag has no built-in repeatable-flag type.
+type mimetypeFlag []string
+
+func (m *mimetypeFlag) String() string { return strings.Join(*m, ",") }
+func (m *mimetypeFlag) Set(v string) error {
+	*m = append(*m, v)
+	return nil
+}
+
 func main() {
 	// Registry.Search invokes every plugin as exactly:
-	//   <binary> plugin --category <category> --query <query>
+	//   <binary> plugin --mimetype <m> [--mimetype <m> ...] --query <query>
 	// argv[0] is the conventional program-name slot, discarded like any
 	// CLI; argv[1] is always the literal subcommand "plugin" (the registry
 	// has no other entrypoint), so flag parsing starts at argv[2:] rather
 	// than argv[1:] - a plugin that flag.Parse(os.Args[1:]) instead will
 	// see "plugin" as its first non-flag argument and stop parsing before
-	// it ever reaches --category/--query.
+	// it ever reaches --mimetype/--query.
 	if len(os.Args) < 2 || os.Args[1] != "plugin" {
 		fmt.Fprintln(os.Stderr, "searchplugin-noop: expected a \"plugin\" subcommand")
 		os.Exit(1)
 	}
 
 	fs := flag.NewFlagSet("plugin", flag.ExitOnError)
-	category := fs.String("category", "all", "category to search within")
+	var mimetypes mimetypeFlag
+	fs.Var(&mimetypes, "mimetype", "discovery mimetype to search within (repeatable)")
 	query := fs.String("query", "", "search text to query")
 	if err := fs.Parse(os.Args[2:]); err != nil {
 		fmt.Fprintln(os.Stderr, "searchplugin-noop:", err)
@@ -60,6 +73,11 @@ func main() {
 		os.Exit(1)
 	}
 
+	var mimetype string
+	if len(mimetypes) > 0 {
+		mimetype = mimetypes[0]
+	}
+
 	// A real plugin fetches results here - via net/http, reaching the real
 	// network through the autohijack wiring above - and emits one
 	// *ddiscapi.Import per result found, same as retrodscrape's leetx.go
@@ -69,7 +87,7 @@ func main() {
 	imp := &ddiscapi.Import{
 		Magnet:   "magnet:?xt=urn:btih:0000000000000000000000000000000000000000&dn=" + *query,
 		Health:   0,
-		Mimetype: *category,
+		Mimetype: mimetype,
 	}
 
 	// Registry.Search reads stdout as newline-delimited JSON, one

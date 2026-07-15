@@ -40,7 +40,7 @@ func TestRecommendationsDelete(t *testing.T) {
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 
 		var rec library.Recommendation
-		require.NoError(t, testx.Fake(&rec, library.RecommendationOptionTestDefaults, library.RecommendationOptionKnownMediaID(known.UID)))
+		require.NoError(t, testx.Fake(&rec, library.RecommendationOptionTestDefaults, library.RecommendationOptionContentID(known.UID)))
 		require.NoError(t, library.RecommendationInsertWithDefaults(ctx, q, rec).Scan(&rec))
 
 		routes := mux.NewRouter()

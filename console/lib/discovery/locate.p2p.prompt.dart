@@ -13,7 +13,7 @@ Future<bool> ensureP2P(
   BuildContext context, {
   List<httpx.Option> options = const [],
 }) async {
-  final settings = await api.discoveryapi.get(options: options);
+  final settings = await api.configuration.get(options: options);
   if (settings.locateP2p) return true;
 
   final proceed = await ds.modals.asyncfn<bool>(
@@ -26,6 +26,6 @@ Future<bool> ensureP2P(
   );
   if (proceed != true) return false;
 
-  await api.discoveryapi.create(settings..locateP2p = true, options: options);
+  await api.configuration.create(settings..locateP2p = true, options: options);
   return true;
 }

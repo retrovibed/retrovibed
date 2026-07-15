@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:retrovibed/httpx.dart' as httpx;
 
 export 'package:retrovibed/media/media.pb.dart';
+export 'search.state.dart';
 
 typedef FnMediaSearch =
     Future<MediaSearchResponse> Function(

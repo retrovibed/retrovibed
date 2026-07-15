@@ -17,7 +17,7 @@ func main() {
 	// subcommand a real kong-based plugin would consume before parsing
 	// its own flags, so skip it here too.
 	fs := flag.NewFlagSet("plugin", flag.ExitOnError)
-	category := fs.String("category", "", "")
+	mimetype := fs.String("mimetype", "", "")
 	query := fs.String("query", "", "")
 	fs.Parse(os.Args[2:])
 
@@ -25,6 +25,6 @@ func main() {
 	enc.Encode(result{
 		Magnet:   "magnet:?xt=urn:btih:1111111111111111111111111111111111111111&dn=" + *query,
 		Health:   42,
-		Mimetype: *category,
+		Mimetype: *mimetype,
 	})
 }

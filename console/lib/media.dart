@@ -1,4 +1,5 @@
 export 'media/api.dart';
+export 'media/search.state.dart';
 export 'media/media.known.pb.dart';
 export 'media/ddisc.locate.pb.dart';
 export 'media/media.recent.pb.dart';

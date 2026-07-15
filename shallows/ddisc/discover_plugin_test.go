@@ -10,13 +10,13 @@ import (
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
+	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
-	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/stretchr/testify/require"
 )
 
-func (t fakePluginSeq) Search(ctx context.Context, category, query string) iterx.Seq[*ddiscapi.Import] {
+func (t fakePluginSeq) Search(ctx context.Context, mimetypes []string, query string) iterx.Seq[*ddiscapi.Import] {
 	return fakePluginSeq{results: t.results}
 }
 
@@ -38,7 +38,7 @@ func TestPluginStrategyYieldsUnpersisted(t *testing.T) {
 	kid := uuid.Must(uuid.NewV4()).String()
 
 	plugins := fakePluginSeq{results: []*ddiscapi.Import{{Magnet: magnet, Health: 5, Mimetype: mimex.Video}}}
-	seq := ddisc.PluginStrategy(plugins).Discover(t.Context(), ddisc.DiscoverRequest{KnownMediaID: kid, Title: "ubuntu", Category: mimex.Video})
+	seq := ddisc.PluginStrategy(plugins).Discover(t.Context(), ddisc.DiscoverRequest{KnownMediaID: kid, Title: "ubuntu", Mimetypes: []string{mimex.Video}})
 
 	var got []ddisc.Discovered
 	for v := range seq.Each(t.Context()) {

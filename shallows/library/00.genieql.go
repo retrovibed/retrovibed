@@ -246,13 +246,11 @@ func RecommendationScanner(gql genieql.Scanner, pattern func(i Recommendation)) 
 	gql.ColumnNamePrefix("library_recommendations.")
 }
 
-func RecommendationKnownScanner(gql genieql.Scanner, pattern func(i Recommendation, k Known)) {}
-
 func RecommendationInsertWithDefaults(
 	gql genieql.Insert,
 	pattern func(ctx context.Context, q sqlx.Queryer, a Recommendation) NewRecommendationScannerStaticRow,
 ) {
-	gql.Into("library_recommendations").Default("created_at", "updated_at").Conflict("ON CONFLICT (known_media_id) DO UPDATE SET recommendations = recommendations + 1, updated_at = DEFAULT")
+	gql.Into("library_recommendations").Default("id", "created_at", "updated_at").Conflict("ON CONFLICT (content_id) DO UPDATE SET recommendations = recommendations + 1, updated_at = DEFAULT")
 }
 
 func RecommendationFindByID(
@@ -262,11 +260,11 @@ func RecommendationFindByID(
 	gql = gql.Query(`SELECT ` + RecommendationScannerStaticColumns + ` FROM library_recommendations WHERE "id" = {id}`)
 }
 
-func RecommendationFindByKnownMediaID(
+func RecommendationFindByContentID(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer, kid string) NewRecommendationScannerStaticRow,
 ) {
-	gql = gql.Query(`SELECT ` + RecommendationScannerStaticColumns + ` FROM library_recommendations WHERE "known_media_id" = {kid}`)
+	gql = gql.Query(`SELECT ` + RecommendationScannerStaticColumns + ` FROM library_recommendations WHERE "content_id" = {kid}`)
 }
 
 func RecommendationDeleteByID(

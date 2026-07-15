@@ -25,19 +25,20 @@ import (
 const guestSSLCertDir = "/etc/ssl/certs"
 
 // Search runs every loaded plugin as a WASI command with
-// --category category --query query, decoding each line of its stdout as a
-// *ddiscapi.Import and yielding it. One plugin's failure is logged and
-// skipped, not fatal to the whole sequence. ctx alone governs how long this
-// may run — wrap it with context.WithTimeout for a deadline.
-func (r *Registry) Search(ctx context.Context, category, query string) iterx.Seq[*ddiscapi.Import] {
-	return &searchSeq{r: r, category: category, query: query}
+// --mimetype mimetypes[0] [--mimetype mimetypes[1] ...] --query query,
+// decoding each line of its stdout as a *ddiscapi.Import and yielding it.
+// One plugin's failure is logged and skipped, not fatal to the whole
+// sequence. ctx alone governs how long this may run — wrap it with
+// context.WithTimeout for a deadline.
+func (r *Registry) Search(ctx context.Context, mimetypes []string, query string) iterx.Seq[*ddiscapi.Import] {
+	return &searchSeq{r: r, mimetypes: mimetypes, query: query}
 }
 
 type searchSeq struct {
-	r        *Registry
-	category string
-	query    string
-	err      error
+	r         *Registry
+	mimetypes []string
+	query     string
+	err       error
 }
 
 // workload is one plugin invocation dispatched onto the registry's shared
@@ -45,12 +46,12 @@ type searchSeq struct {
 // to a single searchSeq.Each call; wg lets the dispatcher know when it is
 // safe to close that channel.
 type workload struct {
-	path     string
-	compiled wazero.CompiledModule
-	category string
-	query    string
-	results  chan<- *ddiscapi.Import
-	wg       *sync.WaitGroup
+	path      string
+	compiled  wazero.CompiledModule
+	mimetypes []string
+	query     string
+	results   chan<- *ddiscapi.Import
+	wg        *sync.WaitGroup
 }
 
 // runSearchJob instantiates a single plugin, decodes its stdout as jsonl,
@@ -65,13 +66,17 @@ func (r *Registry) runSearchJob(ctx context.Context, j workload) error {
 	defer j.wg.Done()
 
 	stdoutr, stdoutw := io.Pipe()
+	// argv[0] is the conventional program-name slot every CLI parser
+	// (including kong.Parse, via os.Args[1:]) discards - "plugin" must come
+	// after it to be seen as the subcommand.
+	args := []string{j.path, "plugin", "--query", j.query}
+	for _, m := range j.mimetypes {
+		args = append(args, "--mimetype", m)
+	}
 	wazerofs := wazero.NewFSConfig().WithDirMount(r.sslCertDir, guestSSLCertDir)
 	cfg := wazero.NewModuleConfig().
 		WithName(j.path).
-		// argv[0] is the conventional program-name slot every CLI
-		// parser (including kong.Parse, via os.Args[1:]) discards -
-		// "plugin" must come after it to be seen as the subcommand.
-		WithArgs(j.path, "plugin", "--category", j.category, "--query", j.query).
+		WithArgs(args...).
 		WithEnv("SSL_CERT_DIR", guestSSLCertDir).
 		WithFSConfig(wazerofs).
 		WithStdout(stdoutw).
@@ -164,12 +169,12 @@ func (t *searchSeq) Each(ctx context.Context) iter.Seq[*ddiscapi.Import] {
 
 				wg.Add(1)
 				job := workload{
-					path:     path,
-					compiled: compiled,
-					category: t.category,
-					query:    t.query,
-					results:  results,
-					wg:       &wg,
+					path:      path,
+					compiled:  compiled,
+					mimetypes: t.mimetypes,
+					query:     t.query,
+					results:   results,
+					wg:        &wg,
 				}
 
 				if err := t.r.pool.Run(cctx, job); err != nil {

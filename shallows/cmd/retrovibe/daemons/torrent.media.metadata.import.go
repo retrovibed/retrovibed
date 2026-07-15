@@ -45,7 +45,10 @@ func MediaMetadataImport(ctx context.Context, db sqlx.Queryer, tvfs fsx.Virtual,
 	mdcache := torrent.NewMetadataCache(tvfs.Path())
 	iter := sqlx.Scan(tracking.MetadataSearch(ctx, db, q))
 
-	insert := asynccompute.New(func(ctx context.Context, batch metadataImportBatch) error {
+	insert := asynccompute.New(func(ctx context.Context, batch metadataImportBatch) (failed error) {
+		defer func() {
+			errorsx.Log(errorsx.Wrap(err, "unable to record known media batch"))
+		}()
 		ts := time.Now()
 		s := library.NewKnownBatchInsertWithDefaults(ctx, db, batch.records...)
 
@@ -53,11 +56,11 @@ func MediaMetadataImport(ctx context.Context, db sqlx.Queryer, tvfs fsx.Virtual,
 			return errorsx.Wrap(err, "failed to insert batch")
 		}
 
-		if _, err := db.ExecContext(ctx, "CHECKPOINT"); err != nil {
+		if _, err := db.ExecContext(ctx, "FORCE CHECKPOINT"); err != nil {
 			return errorsx.Wrap(err, "failed to checkpoint batch")
 		}
 
-		log.Println("imported", time.Since(ts), len(batch.records), "records")
+		log.Println("imported", time.Since(ts), len(batch.records), "records", "completed", batch.completed)
 
 		if batch.completed {
 			if err := tracking.MetadataImportedByID(ctx, db, batch.metadata.ID).Scan(&batch.metadata); err != nil {
@@ -115,12 +118,13 @@ func MediaMetadataImport(ctx context.Context, db sqlx.Queryer, tvfs fsx.Virtual,
 			}
 		}
 
+		log.Println("media metadata import completion batch", id, _md.Description)
 		if err := insert.Run(ctx, metadataImportBatch{metadata: _md, completed: true}); err != nil {
 			return errorsx.Wrap(err, "unable to mark archive as imported")
 		}
 
 		return nil
-	})
+	}, asynccompute.Workers[tracking.Metadata](1))
 
 	// pool must drain before insert is shut down, since pool's workers feed
 	// insert; deferring unconditionally ensures both run even if this
@@ -128,15 +132,18 @@ func MediaMetadataImport(ctx context.Context, db sqlx.Queryer, tvfs fsx.Virtual,
 	// abandoned mid-import.
 	defer func() {
 		err = errorsx.Compact(err, asynccompute.Shutdown(ctx, pool, insert))
+		errorsx.Log(err)
 	}()
 
 	for _md := range iter.Iter() {
 		if err := pool.Run(ctx, _md); err != nil {
+			log.Println("UG 0", err)
 			return errorsx.Wrap(err, "unable to enqueue for import")
 		}
 	}
 
 	if err := iter.Err(); err != nil {
+		log.Println("UG 1", err)
 		return errorsx.Wrap(iter.Err(), "failed to ingest latest media metadata")
 	}
 

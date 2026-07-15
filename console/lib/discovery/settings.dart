@@ -18,8 +18,8 @@ class Settings extends StatelessWidget {
       children: [
         ds.Heading(Text("discovery")),
         LocateSettings.future(
-          api.discoveryapi.get(options: [authn.request(authn.AuthzCache.meta(context))]),
-          onChange: (v) => api.discoveryapi.create(v, options: [authn.request(authn.AuthzCache.meta(context))]),
+          api.configuration.get(options: [authn.request(authn.AuthzCache.meta(context))]),
+          onChange: (v) => api.configuration.create(v, options: [authn.request(authn.AuthzCache.meta(context))]),
         ),
         ds.Heading(Text("video")),
         VideoSettings(),

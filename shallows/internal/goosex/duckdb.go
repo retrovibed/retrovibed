@@ -112,7 +112,12 @@ func InitializeDatabase(ctx context.Context, db *sql.DB, migrations fs.FS) (err 
 		return errorsx.Wrap(err, "failed to enable hnsw persistence")
 	}
 
-	if _, err := db.ExecContext(ctx, "CHECKPOINT;"); err != nil {
+	// debugging.
+	// if _, err := db.ExecContext(ctx, "CALL enable_logging('QueryLog', storage_path = '/tmp/retrovibed.duckdb.log', storage_buffer_size = 0);"); err != nil {
+	// 	return errorsx.Wrap(err, "failed to enable query logging to stderr")
+	// }
+
+	if _, err := db.ExecContext(ctx, "FORCE CHECKPOINT;"); err != nil {
 		return errorsx.Wrap(err, "failed to checkpoint database")
 	}
 
@@ -132,7 +137,7 @@ func InitializeDatabase(ctx context.Context, db *sql.DB, migrations fs.FS) (err 
 		return errorsx.Wrap(err, "unable to run migrations")
 	}
 
-	if _, err := db.ExecContext(ctx, "CHECKPOINT;"); err != nil {
+	if _, err := db.ExecContext(ctx, "FORCE CHECKPOINT;"); err != nil {
 		return errorsx.Wrap(err, "failed to checkpoint database")
 	}
 

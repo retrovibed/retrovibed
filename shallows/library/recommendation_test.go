@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"testing"
 
+	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
-	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/library"
@@ -74,7 +74,7 @@ func TestRecommendationFromRandomKnown(t *testing.T) {
 
 		rec, err := library.RecommendationFromRandomKnown(ctx, db, "", "", false)
 		require.NoError(t, err)
-		require.Equal(t, known.UID, rec.KnownMediaID)
+		require.Equal(t, known.UID, rec.ContentID)
 		require.NotEmpty(t, rec.ID)
 	})
 

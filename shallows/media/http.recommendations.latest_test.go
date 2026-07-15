@@ -9,11 +9,11 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
+	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
-	"github.com/retrovibed/retrovibed/shallows/internal/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/library"
@@ -78,7 +78,7 @@ func TestRecommendationsLatest(t *testing.T) {
 			require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 
 			var rec library.Recommendation
-			require.NoError(t, testx.Fake(&rec, library.RecommendationOptionTestDefaults, library.RecommendationOptionID(uuidx.WithSuffix(idx)), library.RecommendationOptionKnownMediaID(known.UID)))
+			require.NoError(t, testx.Fake(&rec, library.RecommendationOptionTestDefaults, library.RecommendationOptionID(uuidx.WithSuffix(idx)), library.RecommendationOptionContentID(known.UID)))
 			require.NoError(t, library.RecommendationInsertWithDefaults(ctx, q, rec).Scan(&rec))
 		}
 
@@ -120,7 +120,7 @@ func TestRecommendationsLatest(t *testing.T) {
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 
 		var rec library.Recommendation
-		require.NoError(t, testx.Fake(&rec, library.RecommendationOptionTestDefaults, library.RecommendationOptionKnownMediaID(known.UID), func(r *library.Recommendation) {
+		require.NoError(t, testx.Fake(&rec, library.RecommendationOptionTestDefaults, library.RecommendationOptionContentID(known.UID), func(r *library.Recommendation) {
 			r.TombstoneAt = time.Now().Add(30 * 24 * time.Hour)
 		}))
 		require.NoError(t, library.RecommendationInsertWithDefaults(ctx, q, rec).Scan(&rec))
@@ -163,7 +163,7 @@ func TestRecommendationsLatest(t *testing.T) {
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 
 		var rec library.Recommendation
-		require.NoError(t, testx.Fake(&rec, library.RecommendationOptionTestDefaults, library.RecommendationOptionKnownMediaID(known.UID), func(r *library.Recommendation) {
+		require.NoError(t, testx.Fake(&rec, library.RecommendationOptionTestDefaults, library.RecommendationOptionContentID(known.UID), func(r *library.Recommendation) {
 			r.TombstoneAt = time.Now().Add(-time.Hour)
 		}))
 		require.NoError(t, library.RecommendationInsertWithDefaults(ctx, q, rec).Scan(&rec))
@@ -207,7 +207,7 @@ func TestRecommendationsLatest(t *testing.T) {
 			require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 
 			var rec library.Recommendation
-			require.NoError(t, testx.Fake(&rec, library.RecommendationOptionTestDefaults, library.RecommendationOptionID(uuidx.WithSuffix(idx)), library.RecommendationOptionKnownMediaID(known.UID), func(r *library.Recommendation) {
+			require.NoError(t, testx.Fake(&rec, library.RecommendationOptionTestDefaults, library.RecommendationOptionID(uuidx.WithSuffix(idx)), library.RecommendationOptionContentID(known.UID), func(r *library.Recommendation) {
 				r.Mimetype = known.Mimetype
 			}))
 			require.NoError(t, library.RecommendationInsertWithDefaults(ctx, q, rec).Scan(&rec))
@@ -219,7 +219,7 @@ func TestRecommendationsLatest(t *testing.T) {
 			require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 
 			var rec library.Recommendation
-			require.NoError(t, testx.Fake(&rec, library.RecommendationOptionTestDefaults, library.RecommendationOptionID(uuidx.WithSuffix(idx+10)), library.RecommendationOptionKnownMediaID(known.UID), func(r *library.Recommendation) {
+			require.NoError(t, testx.Fake(&rec, library.RecommendationOptionTestDefaults, library.RecommendationOptionID(uuidx.WithSuffix(idx+10)), library.RecommendationOptionContentID(known.UID), func(r *library.Recommendation) {
 				r.Mimetype = known.Mimetype
 			}))
 			require.NoError(t, library.RecommendationInsertWithDefaults(ctx, q, rec).Scan(&rec))
@@ -273,7 +273,7 @@ func TestRecommendationsLatest(t *testing.T) {
 			require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 
 			var rec library.Recommendation
-			require.NoError(t, testx.Fake(&rec, library.RecommendationOptionTestDefaults, library.RecommendationOptionID(uuidx.WithSuffix(idx)), library.RecommendationOptionKnownMediaID(known.UID), func(r *library.Recommendation) {
+			require.NoError(t, testx.Fake(&rec, library.RecommendationOptionTestDefaults, library.RecommendationOptionID(uuidx.WithSuffix(idx)), library.RecommendationOptionContentID(known.UID), func(r *library.Recommendation) {
 				r.Mimetype = known.Mimetype
 			}))
 			require.NoError(t, library.RecommendationInsertWithDefaults(ctx, q, rec).Scan(&rec))
@@ -285,7 +285,7 @@ func TestRecommendationsLatest(t *testing.T) {
 			require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 
 			var rec library.Recommendation
-			require.NoError(t, testx.Fake(&rec, library.RecommendationOptionTestDefaults, library.RecommendationOptionID(uuidx.WithSuffix(idx+10)), library.RecommendationOptionKnownMediaID(known.UID), func(r *library.Recommendation) {
+			require.NoError(t, testx.Fake(&rec, library.RecommendationOptionTestDefaults, library.RecommendationOptionID(uuidx.WithSuffix(idx+10)), library.RecommendationOptionContentID(known.UID), func(r *library.Recommendation) {
 				r.Mimetype = known.Mimetype
 			}))
 			require.NoError(t, library.RecommendationInsertWithDefaults(ctx, q, rec).Scan(&rec))

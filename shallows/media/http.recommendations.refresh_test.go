@@ -55,8 +55,8 @@ func TestRecommendationsRefresh(t *testing.T) {
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
 
 		var rec library.Recommendation
-		require.NoError(t, library.RecommendationFindByKnownMediaID(ctx, q, known.UID).Scan(&rec))
-		require.Equal(t, known.UID, rec.KnownMediaID)
+		require.NoError(t, library.RecommendationFindByContentID(ctx, q, known.UID).Scan(&rec))
+		require.Equal(t, known.UID, rec.ContentID)
 	})
 
 	t.Run("increments counter on repeat", func(t *testing.T) {
@@ -97,7 +97,7 @@ func TestRecommendationsRefresh(t *testing.T) {
 		}
 
 		var rec library.Recommendation
-		require.NoError(t, library.RecommendationFindByKnownMediaID(ctx, q, known.UID).Scan(&rec))
+		require.NoError(t, library.RecommendationFindByContentID(ctx, q, known.UID).Scan(&rec))
 		require.EqualValues(t, 2, rec.Recommendations)
 	})
 

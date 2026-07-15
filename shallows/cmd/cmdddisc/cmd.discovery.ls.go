@@ -43,7 +43,7 @@ func (t cmdDiscoveryList) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *
 	}
 
 	for _, d := range result.Items {
-		if _, err = fmt.Printf("id=%s infohash=%x attempts=%s next_check=%s\n", d.Id, d.Infohash, d.Attempts, d.NextCheck); err != nil {
+		if _, err = fmt.Printf("id=%s infohash=%x attempts=%d next_check=%s\n", d.Id, d.Infohash, d.Attempts, d.NextCheck); err != nil {
 			return err
 		}
 	}

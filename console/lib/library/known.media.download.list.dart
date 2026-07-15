@@ -27,6 +27,7 @@ class KnownMediaDownloadList extends StatelessWidget {
     Widget empty = const SizedBox(),
   }) {
     return FutureBuilder<List<api.Known>>(
+      key: key,
       initialData: [],
       future: query(),
       builder: (BuildContext ctx, AsyncSnapshot<List<api.Known>> snapshot) {

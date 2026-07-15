@@ -45,12 +45,19 @@ class _CompactingMenuState extends State<CompactingMenu> {
         final spacing = 1.0;
 
         if (!compact) {
-          return Row(
-            spacing: spacing,
+          return Column(
+            mainAxisAlignment: widget.mainAxisAlignment,
+            mainAxisSize: widget.mainAxisSize,
+            crossAxisAlignment: widget.crossAxisAlignment,
             children: [
-              ...widget.leading,
-              Expanded(child: widget.child),
-              ...widget.trailing,
+              Row(
+                spacing: spacing,
+                children: [
+                  ...widget.leading,
+                  Expanded(child: widget.child),
+                  ...widget.trailing,
+                ],
+              ),
             ],
           );
         }
@@ -62,12 +69,19 @@ class _CompactingMenuState extends State<CompactingMenu> {
         final menuItems = [...?leadingGroups[false], ...?trailingGroups[false]];
 
         if (menuItems.isEmpty) {
-          return Row(
-            spacing: spacing,
+          return Column(
+            mainAxisAlignment: widget.mainAxisAlignment,
+            mainAxisSize: widget.mainAxisSize,
+            crossAxisAlignment: widget.crossAxisAlignment,
             children: [
-              ...widget.leading,
-              Expanded(child: widget.child),
-              ...widget.trailing,
+              Row(
+                spacing: spacing,
+                children: [
+                  ...widget.leading,
+                  Expanded(child: widget.child),
+                  ...widget.trailing,
+                ],
+              ),
             ],
           );
         }

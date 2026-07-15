@@ -15,7 +15,7 @@ import (
 // searchPlugins is the narrow interface PluginStrategy needs from
 // *retroapi/searchplugin.Registry.
 type searchPlugins interface {
-	Search(ctx context.Context, category, query string) iterx.Seq[*ddiscapi.Import]
+	Search(ctx context.Context, mimetypes []string, query string) iterx.Seq[*ddiscapi.Import]
 }
 
 // PluginStrategy runs external search plugins (via a
@@ -48,7 +48,7 @@ func (t *pluginSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 			return
 		}
 
-		seq := t.cfg.plugins.Search(ctx, t.req.Category, t.req.Title)
+		seq := t.cfg.plugins.Search(ctx, t.req.Mimetypes, t.req.Title)
 		for imp := range seq.Each(ctx) {
 			m, err := metainfo.ParseMagnetURI(imp.Magnet)
 			if err != nil {
@@ -56,11 +56,13 @@ func (t *pluginSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 				continue
 			}
 
+			mimetype := langx.FirstNonZero(imp.Mimetype, langx.FirstNonZero(t.req.Mimetypes...))
+
 			id := int160.FromBytes(m.InfoHash.Bytes())
 			d := NewDiscovered(
 				&id,
 				DiscoveredOptionKnownMedia(t.req.KnownMediaID),
-				DiscoveredOptionMimetype(langx.FirstNonZero(imp.Mimetype, t.req.Category)),
+				DiscoveredOptionMimetype(Generalize(mimetype)),
 				DiscoveredOptionHealth(imp.Health),
 				DiscoveredOptionTitle(m.DisplayName),
 			)
