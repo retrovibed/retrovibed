@@ -191,8 +191,8 @@ class _PlaylistState extends State<Playlist> {
   final FocusScopeNode _selffocus = FocusScopeNode(
     debugLabel: 'playlist.focus',
   );
-  ValueNotifier<api.MediaSearchResponse> search = ValueNotifier(
-    api.media.response(
+  ValueNotifier<api.MediaSearchState> search = ValueNotifier(
+    api.MediaSearchState(
       next: api.media.request(limit: 32, mimetypes: mimex.of(mimex.icoaudio)),
     ),
   );

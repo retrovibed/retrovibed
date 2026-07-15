@@ -16,8 +16,9 @@ abstract class Field<T> {
   final T current;
   final T defaultValue;
   final void Function(T) setter;
+  final Widget help;
 
-  const Field(this.name, this.current, this.defaultValue, this.setter);
+  const Field(this.name, this.current, this.defaultValue, this.setter, {this.help = ds.HelpScope.None});
 
   bool get available => current == defaultValue;
 
@@ -74,7 +75,8 @@ class RangeField<T> extends Field<({T min, T max})> {
     this.minField,
     this.maxField, {
     this.display,
-  }) : super(name, current, defaultValue, setter);
+    Widget help = ds.HelpScope.None,
+  }) : super(name, current, defaultValue, setter, help: help);
 
   @override
   RangeField<T> withCurrent(({T min, T max}) value) => RangeField(
@@ -85,6 +87,7 @@ class RangeField<T> extends Field<({T min, T max})> {
     minField.withCurrent(value.min),
     maxField.withCurrent(value.max),
     display: display,
+    help: help,
   );
 
   @override
@@ -179,18 +182,24 @@ class Mode extends Field<bool> {
     String name,
     bool current,
     bool defaultValue,
-    void Function(bool) setter,
-  ) : super(name, current, defaultValue, setter);
+    void Function(bool) setter, {
+    Widget help = ds.HelpScope.None,
+  }) : super(name, current, defaultValue, setter, help: help);
 
-  factory Mode.auto(String name, bool defaultValue, void Function(bool) setter) {
-    return Mode(name, defaultValue, defaultValue, setter);
+  factory Mode.auto(
+    String name,
+    bool defaultValue,
+    void Function(bool) setter, {
+    Widget help = ds.HelpScope.None,
+  }) {
+    return Mode(name, defaultValue, defaultValue, setter, help: help);
   }
 
   @override
   bool? get autocomplete => !defaultValue;
 
   @override
-  Mode withCurrent(bool value) => Mode(name, value, defaultValue, setter);
+  Mode withCurrent(bool value) => Mode(name, value, defaultValue, setter, help: help);
 
   @override
   Node from(bool value) => Term(name, value.toString());
@@ -210,23 +219,33 @@ class Mode extends Field<bool> {
 
   @override
   ParserResult of(bool value) {
-    return ParserResultMode(Mode(name, value, defaultValue, setter));
+    return ParserResultMode(Mode(name, value, defaultValue, setter, help: help));
   }
 }
 
 class Boolean extends Field<bool> {
-  const Boolean(String name, bool current, bool defaultValue, void Function(bool) setter)
-    : super(name, current, defaultValue, setter);
+  const Boolean(
+    String name,
+    bool current,
+    bool defaultValue,
+    void Function(bool) setter, {
+    Widget help = ds.HelpScope.None,
+  }) : super(name, current, defaultValue, setter, help: help);
 
-  factory Boolean.auto(String name, bool defaultValue, void Function(bool) setter) {
-    return Boolean(name, defaultValue, defaultValue, setter);
+  factory Boolean.auto(
+    String name,
+    bool defaultValue,
+    void Function(bool) setter, {
+    Widget help = ds.HelpScope.None,
+  }) {
+    return Boolean(name, defaultValue, defaultValue, setter, help: help);
   }
 
   @override
   bool? get autocomplete => !defaultValue;
 
   @override
-  Boolean withCurrent(bool value) => Boolean(name, value, defaultValue, setter);
+  Boolean withCurrent(bool value) => Boolean(name, value, defaultValue, setter, help: help);
 
   @override
   Node from(bool value) => Term(name, value.toString());
@@ -246,7 +265,7 @@ class Boolean extends Field<bool> {
 
   @override
   ParserResult of(bool value) {
-    return ParserResultBool(Boolean(name, value, defaultValue, setter));
+    return ParserResultBool(Boolean(name, value, defaultValue, setter, help: help));
   }
 }
 
@@ -255,19 +274,21 @@ class Timestamp extends Field<DateTime> {
     String name,
     DateTime current,
     DateTime defaultValue,
-    void Function(DateTime) setter,
-  ) : super(name, current, defaultValue, setter);
+    void Function(DateTime) setter, {
+    Widget help = ds.HelpScope.None,
+  }) : super(name, current, defaultValue, setter, help: help);
 
   factory Timestamp.auto(
     String name,
     DateTime defaultValue,
-    void Function(DateTime) setter,
-  ) {
-    return Timestamp(name, defaultValue, defaultValue, setter);
+    void Function(DateTime) setter, {
+    Widget help = ds.HelpScope.None,
+  }) {
+    return Timestamp(name, defaultValue, defaultValue, setter, help: help);
   }
 
   @override
-  Timestamp withCurrent(DateTime value) => Timestamp(name, value, defaultValue, setter);
+  Timestamp withCurrent(DateTime value) => Timestamp(name, value, defaultValue, setter, help: help);
 
   @override
   Node from(DateTime value) => Term(name, value.toIso8601String());
@@ -309,8 +330,9 @@ class DateRange extends RangeField<DateTime> {
     String name,
     timex.Range v,
     timex.Range defaultValue,
-    void Function(timex.Range) setter,
-  ) : super(
+    void Function(timex.Range) setter, {
+    Widget help = ds.HelpScope.None,
+  }) : super(
         name,
         (min: v.begin, max: v.end),
         (min: defaultValue.begin, max: defaultValue.end),
@@ -334,14 +356,16 @@ class DateRange extends RangeField<DateTime> {
             tr.TimeRange(timex.Range(v.min, v.max)),
           ],
         ),
+        help: help,
       );
 
   factory DateRange.auto(
     String name,
     timex.Range defaultValue,
-    void Function(timex.Range) setter,
-  ) {
-    return DateRange(name, defaultValue, defaultValue, setter);
+    void Function(timex.Range) setter, {
+    Widget help = ds.HelpScope.None,
+  }) {
+    return DateRange(name, defaultValue, defaultValue, setter, help: help);
   }
 
   @override
@@ -350,6 +374,7 @@ class DateRange extends RangeField<DateTime> {
     timex.Range(value.min, value.max),
     timex.Range(defaultValue.min, defaultValue.max),
     (r) => setter((min: r.begin, max: r.end)),
+    help: help,
   );
 
   @override
@@ -387,19 +412,21 @@ class Number extends Field<num> {
     String name,
     num v,
     num defaultValue,
-    void Function(num) setter,
-  ) : super(name, v, defaultValue, setter);
+    void Function(num) setter, {
+    Widget help = ds.HelpScope.None,
+  }) : super(name, v, defaultValue, setter, help: help);
 
   factory Number.auto(
     String name,
     num defaultValue,
-    void Function(num) setter,
-  ) {
-    return Number(name, defaultValue, defaultValue, setter);
+    void Function(num) setter, {
+    Widget help = ds.HelpScope.None,
+  }) {
+    return Number(name, defaultValue, defaultValue, setter, help: help);
   }
 
   @override
-  Number withCurrent(num value) => Number(name, value, defaultValue, setter);
+  Number withCurrent(num value) => Number(name, value, defaultValue, setter, help: help);
 
   @override
   Node from(num value) => Term(name, value.toString());
@@ -412,7 +439,7 @@ class Number extends Field<num> {
 
   @override
   ParserResult of(num value) {
-    return ParserResultNumeric(Number(name, value, defaultValue, setter));
+    return ParserResultNumeric(Number(name, value, defaultValue, setter, help: help));
   }
 }
 
@@ -428,19 +455,21 @@ class Elapsed extends Field<Duration> {
     String name,
     Duration v,
     Duration defaultValue,
-    void Function(Duration) setter,
-  ) : super(name, v, defaultValue, setter);
+    void Function(Duration) setter, {
+    Widget help = ds.HelpScope.None,
+  }) : super(name, v, defaultValue, setter, help: help);
 
   factory Elapsed.auto(
     String name,
     Duration defaultValue,
-    void Function(Duration) setter,
-  ) {
-    return Elapsed(name, defaultValue, defaultValue, setter);
+    void Function(Duration) setter, {
+    Widget help = ds.HelpScope.None,
+  }) {
+    return Elapsed(name, defaultValue, defaultValue, setter, help: help);
   }
 
   @override
-  Elapsed withCurrent(Duration value) => Elapsed(name, value, defaultValue, setter);
+  Elapsed withCurrent(Duration value) => Elapsed(name, value, defaultValue, setter, help: help);
 
   @override
   Node from(Duration value) {
@@ -463,6 +492,6 @@ class Elapsed extends Field<Duration> {
 
   @override
   ParserResult of(Duration value) {
-    return ParserResultDuration(Elapsed(name, value, defaultValue, setter));
+    return ParserResultDuration(Elapsed(name, value, defaultValue, setter, help: help));
   }
 }

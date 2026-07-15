@@ -4,46 +4,32 @@ import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/mimex.dart' as mimex;
-import 'package:retrovibed/uuidx.dart' as uuidx;
-import 'package:retrovibed/langcodex.dart' as langcodex;
-import 'package:retrovibed/lucene.dart' as lucene;
 import 'package:retrovibed/discovery.dart' as disc;
-import 'api.dart' as api;
-import 'discovery.locator.dart';
-import 'known.media.download.list.dart';
 import 'known.media.display.dart';
 import 'media.settings.dart';
-import 'search.mimetype.dropdown.dart';
-import 'grid.setting.dart';
 import 'known.media.dropdown.dart';
 
-class AvailableGridDisplay extends StatefulWidget {
+class Grid extends StatefulWidget {
   final media.FnMediaSearch apisearch;
-  final media.FnUploadRequest apiupload;
-  final TextEditingController? controller;
-  final FocusNode? focus;
+  final ValueNotifier<media.MediaSearchState> search;
   final String highlighted;
-  final ValueNotifier<media.MediaSearchResponse> search;
 
-  const AvailableGridDisplay({
+  const Grid({
     super.key,
     this.apisearch = media.media.search,
-    this.apiupload = media.media.upload,
-    this.controller,
-    this.focus,
-    required this.highlighted,
     required this.search,
+    required this.highlighted,
   });
 
   @override
-  State<StatefulWidget> createState() => _AvailableGridDisplay();
+  State<Grid> createState() => _GridState();
 }
 
-class _AvailableGridDisplay extends State<AvailableGridDisplay> {
+class _GridState extends State<Grid> {
   bool _loading = true;
-  bool _library = true; // search the library. when false we search known media.
-  bool _discovery = false; // true only when the user explicitly enabled the discover filter.
   Widget _cause = ds.Error.zero;
+  List<media.Media> _items = [];
+  media.MediaSearchRequest? _lastFetchedNext;
 
   void setState(VoidCallback fn) {
     if (!mounted) return;
@@ -56,20 +42,25 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
     });
   }
 
-  Future<void> refresh(media.MediaSearchRequest req, {bool refocus = false}) {
+  media.Media _replace(media.Media v) {
+    setState(() {
+      _items = _items.map((o) => o.id == v.id ? v : o).toList();
+    });
+    return v;
+  }
+
+  Future<void> refresh() {
+    final req = widget.search.value.next;
     return httpx
         .withRetry(
           () => widget.apisearch(req, options: [authn.request(authn.AuthzCache.meta(context))]),
         )
         .then((v) {
           setState(() {
-            widget.search.value = v;
+            _items = v.items;
             _loading = false;
-            _library = _discovery ? false : v.items.isNotEmpty;
           });
-
-          widget.focus?.requestFocus();
-          if (refocus) ds.textediting.refocus(widget.controller);
+          widget.search.value = media.MediaSearchState(next: req, count: v.items.length);
         })
         .catchError((cause) {
           setState(() {
@@ -86,283 +77,102 @@ class _AvailableGridDisplay extends State<AvailableGridDisplay> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    ds.postframe(() => refresh(widget.search.value.next));
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final upload =
-        (
-          ds.FilesEvent v, {
-          ValueNotifier<int>? progress,
-        }) {
-          final multiparts = v.files.map((c) {
-            return media.media.uploadable(c.path, c.name, c.mimeType!, progress: progress);
-          });
+    return ValueListenableBuilder<media.MediaSearchState>(
+      valueListenable: widget.search,
+      builder: (context, state, _) {
+        if (!identical(state.next, _lastFetchedNext)) {
+          _lastFetchedNext = state.next;
+          ds.postframe(() => refresh());
+        }
 
-          return Future.microtask(() {
-            return Future.wait(
-              multiparts.map((fv) {
-                return fv.then((v) {
-                  return widget
-                      .apiupload((req) {
-                        req..files.add(v);
-                        return req;
-                      })
-                      .then((uploaded) {
-                        setState(() {
-                          widget.search.value..items.add(uploaded.media);
-                        });
-                      })
-                      .catchError((cause) {
-                        setState(() {
-                          _cause = ds.Error.unknown(cause, onTap: reseterr);
-                        });
-                      });
-                });
-              }),
-            ).then((v) => ds.NullWidget).catchError((cause) {
-              return ds.Error.unknown(cause, onTap: reseterr);
-            });
-          });
-        };
+        final defaults = ds.Defaults.of(context);
+        final category = mimex.category(state.next.mimetypes);
 
-    final replace = (media.Media v) {
-      final replaced = widget.search.value.items.map((o) => o.id == v.id ? v : o);
-
-      setState(() {
-        widget.search.value = media.MediaSearchResponse(items: replaced, next: widget.search.value.next);
-      });
-
-      return v;
-    };
-
-    final category = mimex.category(widget.search.value.next.mimetypes);
-    final defaults = ds.Defaults.of(context);
-    final compact = defaults.isCompact;
-    final authz = authn.AuthzCache.meta(context);
-
-    return RefreshIndicator(
-      key: ValueKey("library"),
-      onRefresh: () => refresh(widget.search.value.next),
-      child: LayoutBuilder(
-        builder: (context, constraints) => SingleChildScrollView(
-          reverse: compact,
-          physics: AlwaysScrollableScrollPhysics(),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: constraints.maxHeight),
-            child: ds.Grid<media.Media>(
-              children: _library ? widget.search.value.items : const [],
-              loading: _loading,
-              cause: _cause,
-              leading: [
-                ds.SearchTray(
-                  autoscroll: true,
-                  decoration: InputDecoration(hintText: "search library"),
-                  filters: [
-                    lucene.Mode.auto('discover', false, (discovery) {
-                      setState(() {
-                        _discovery = discovery;
-                        _library = !discovery;
-                      });
-                    }),
-                    lucene.Boolean.auto('hidden', false, (v) {
-                      setState(() => widget.search.value.next.hidden = v);
-                      refresh(widget.search.value.next);
-                    }),
-                  ],
-                  controller: widget.controller,
-                  focus: widget.focus,
-                  autofocus: defaults.desktop,
-                  padding: defaults.padding.copyWith(bottom: 0.0),
-                  onSubmitted: (v) {
-                    setState(() {
-                      widget.search.value.next
-                        ..query = v
-                        ..offset = ds.Grid.int64(0);
-                      widget.search.value = widget.search.value;
-                    });
-                    return refresh(widget.search.value.next, refocus: true);
-                  },
-                  next: (i) {
-                    setState(() {
-                      widget.search.value.next.offset = i;
-                    });
-                    refresh(widget.search.value.next);
-                  },
-                  current: widget.search.value.next.offset,
-                  empty: ds.Grid.int64(widget.search.value.items.length) < widget.search.value.next.limit,
-                  leading: [
-                    ds.CompactingMenu.pinned(
-                      SearchMimetypeDropdown(
-                        widget.search.value.next,
-                        onChange: (upd) {
-                          setState(() {
-                            widget.search.value.next = upd;
-                            widget.search.value = widget.search.value;
-                          });
-                          refresh(widget.search.value.next);
-                        },
-                      ),
-                    ),
-                    ds.FileDropWell.icon(
-                      upload,
-                      mimetypes: widget.search.value.next.mimetypes,
-                      help: ds.Hint(const Text("drag and drop files onto the grid to add media to your library")),
-                    ),
-                  ],
-                  tuning: GridSettings(),
-                  help: ds.Hint(const Text("search your library, use @ to access advanced filtering")),
-                ),
-                Visibility(
-                  key: ValueKey('library.query.disc.home'),
-                  visible: _library && widget.search.value.next.query.isEmpty,
-                  replacement: ds.Empty,
-                  child: disc.Home(
-                    category,
-                    key: ValueKey('library.disc.home'),
-                    padding: defaults.padding.copyWith(
-                      top: 0.0,
-                      bottom: 0.0,
-                    ),
-                  ),
-                ),
-              ],
-              empty: Visibility(
-                visible: !_library,
-                child: KnownMediaDownloadList.query(
-                  () {
-                    final search = widget.search.value;
-                    if (_loading) return Future.value([]);
-                    if (search.items.isNotEmpty) return Future.value([]);
-                    if (category.isEmpty) return Future.value([]);
-
-                    return httpx.withRetry(
-                      () => api.known
-                          .search(
-                            api.known.request(
-                              language: langcodex.locale().languageCode,
-                              mimetype: category,
-                              adult: search.next.adult,
-                              query: search.next.query,
-                              limit: search.next.limit.toInt(),
-                            ),
-                            options: [authn.request(authz)],
-                          )
-                          .then((v) => v.items),
-                    );
-                  },
-                  key: ValueKey('library.download.list'),
-                  leading: Column(
-                    children: [
-                      DiscoveryLocator(
-                        key: ValueKey('library.disc.locator'),
-                        query: widget.search.value.next.query.trim(),
-                        mimetype: category,
-                      ),
-                    ],
-                  ),
-                  empty: Visibility(
-                    visible: !_library,
-                    replacement: Center(
-                      child: Padding(
-                        padding: defaults.padding,
-                        child: Text(
-                          "no results in library",
-                          style: TextStyle(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onSurface.withValues(alpha: 0.6),
-                          ),
-                        ),
-                      ),
-                    ),
-                    child: ds.Empty,
-                  ),
+        return ds.Grid<media.Media>(
+          children: _items,
+          loading: _loading,
+          cause: _cause,
+          leading: [
+            Visibility(
+              key: ValueKey('library.query.disc.home'),
+              visible: state.next.query.isEmpty,
+              replacement: ds.Empty,
+              child: disc.Home(
+                category,
+                key: ValueKey('library.disc.home'),
+                padding: defaults.padding.copyWith(
+                  top: 0.0,
+                  bottom: 0.0,
                 ),
               ),
-              (context, _media) {
-                var onSettings = () {
-                  ds.modals.asyncfn<media.Media>(
-                    context,
-                    (completion) => MediaSettings(
-                      current: _media,
-                      onChange: (pending, {bool forced = false, bool autoclose = false}) {
-                        pending
-                            .then(replace)
-                            .then((v) {
-                              if (forced) refresh(widget.search.value.next, refocus: false);
-                              if (autoclose) completion.complete(v);
-                            })
-                            .catchError((cause) {
-                              setState(() {
-                                _cause = ds.Error.unknown(cause, onTap: reseterr);
-                              });
-                            });
-                      },
-                    ),
-                  );
-                };
-                final trailing = [
-                  ds.LoadingIconButton.info(
-                    tooltip: "manually identify the media",
-                    help: ds.Hint(
-                      Text("search for and select the correct media identity from the known library"),
-                    ),
-                    onPressed: KnownMediaDropdown.modal(
-                      context,
-                      _media,
-                      onChange: replace,
-                      mimetype: category,
-                    ),
-                  ),
-                ];
-
-                final key = ValueKey(uuidx.md5x("${_media.id}.${_media.updatedAt}"));
-
-                if (uuidx.isMinMax(
-                  uuidx.fromString(_media.knownMediaId),
-                )) {
-                  return KnownMediaDisplay.missing(
-                    key: key,
-                    _media,
-                    onTap: media.PlayAction(context, _media, widget.search.value),
-                    onSettings: onSettings,
-                    onChange: replace,
-                    highlighted: _media.id == widget.highlighted,
-                    help: KnownMediaDisplay.hintPlayMedia,
-                    trailing: trailing,
-                  );
-                }
-
-                return KnownMediaDisplay(
-                  key: key,
-                  api.known
-                      .cached(
-                        _media.knownMediaId,
-                        () => api.known.get(
-                          _media.knownMediaId,
-                          options: [authn.request(authz)],
-                        ),
-                      )
-                      .then(
-                        (w) => (w.known..description = _media.description),
-                      ),
-                  onTap: media.PlayAction(context, _media, widget.search.value),
-                  onSettings: onSettings,
-                  onChange: replace,
-                  media: _media,
-                  highlighted: _media.id == widget.highlighted,
-                  help: KnownMediaDisplay.hintPlayMedia,
-                  trailing: trailing,
-                );
-              },
+            ),
+          ],
+          empty: Center(
+            child: Padding(
+              padding: defaults.padding,
+              child: Text(
+                "no results in library",
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                ),
+              ),
             ),
           ),
-        ),
-      ),
+          (context, _media) {
+            final onSettings = () {
+              ds.modals.asyncfn<media.Media>(
+                context,
+                (completion) => MediaSettings(
+                  current: _media,
+                  onChange: (pending, {bool forced = false, bool autoclose = false}) {
+                    pending
+                        .then(_replace)
+                        .then((v) {
+                          if (forced) refresh();
+                          if (autoclose) completion.complete(v);
+                        })
+                        .catchError((cause) {
+                          setState(() {
+                            _cause = ds.Error.unknown(cause, onTap: reseterr);
+                          });
+                        });
+                  },
+                ),
+              );
+            };
+            final trailing = [
+              ds.LoadingIconButton.info(
+                tooltip: "manually identify the media",
+                help: ds.Hint(
+                  Text("search for and select the correct media identity from the known library"),
+                ),
+                onPressed: KnownMediaDropdown.modal(
+                  context,
+                  _media,
+                  onChange: _replace,
+                  mimetype: category,
+                ),
+              ),
+            ];
+
+            return KnownMediaDisplay.auto(
+              context,
+              _media,
+              onTap: media.PlayAction(
+                context,
+                _media,
+                media.MediaSearchResponse(next: state.next, items: _items),
+              ),
+              onSettings: onSettings,
+              onChange: _replace,
+              highlighted: _media.id == widget.highlighted,
+              help: KnownMediaDisplay.hintPlayMedia,
+              trailing: trailing,
+            );
+          },
+        );
+      },
     );
   }
 }

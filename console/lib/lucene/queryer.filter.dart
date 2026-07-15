@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:retrovibed/designkit.dart' as ds;
 import 'parser.results.dart';
 
 class QueryerFilterChip extends StatefulWidget {
@@ -56,26 +57,29 @@ class QueryerFilterChipState extends State<QueryerFilterChip> {
           mouseCursor: SystemMouseCursors.click,
           onTap: _toggle,
           borderRadius: BorderRadius.circular(8),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: bgColor,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                widget.filter,
-                const SizedBox(width: 4),
-                GestureDetector(
-                  onTap: _open ? accept : widget.onRemove,
-                  child: Tooltip(
-                    message: _open ? 'Accept' : 'Remove',
-                    child: Icon(_open ? Icons.check : Icons.close, size: 18),
+          child: ds.Help(
+            ds.Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: bgColor,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  widget.filter,
+                  const SizedBox(width: 4),
+                  GestureDetector(
+                    onTap: _open ? accept : widget.onRemove,
+                    child: Tooltip(
+                      message: _open ? 'Accept' : 'Remove',
+                      child: Icon(_open ? Icons.check : Icons.close, size: 18),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
+            widget.filter.help,
           ),
         ),
       ),

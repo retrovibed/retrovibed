@@ -250,6 +250,16 @@ class _QueryerState extends State<Queryer> {
         spacing: defaults.spacing / 2,
         children: [
           ds.CompactingMenu(
+            leading: [
+              if (_mode != ParserResult.close)
+                ds.CompactingMenu.pinned(
+                  GestureDetector(
+                    onLongPress: _resetMode,
+                    child: QueryerMode(mode: _mode, focus: _modeFocusNode),
+                  ),
+                ),
+              ...widget.leading,
+            ],
             ds.Help(
               TextField(
                 controller: _ctrl,
@@ -266,16 +276,6 @@ class _QueryerState extends State<Queryer> {
               ),
               widget.help,
             ),
-            leading: [
-              ...widget.leading,
-              if (_mode != ParserResult.close)
-                ds.CompactingMenu.pinned(
-                  GestureDetector(
-                    onLongPress: _resetMode,
-                    child: QueryerMode(mode: _mode, focus: _modeFocusNode),
-                  ),
-                ),
-            ],
             trailing: widget.trailing,
           ),
           TextFieldTapRegion(

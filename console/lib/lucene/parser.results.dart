@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/design.kit/typography/duration.dart' as dur;
 import 'package:retrovibed/design.kit/typography/timestamp.dart' as ts;
+import 'package:retrovibed/designkit.dart' as ds;
 import './field.dart';
 import './parser.states.dart' show Parser;
 
@@ -13,6 +14,8 @@ sealed class ParserResult extends StatelessWidget {
 
   void reset(Parser parser);
   void apply(Parser parser);
+
+  Widget get help => ds.HelpScope.None;
 }
 
 class _ParserResultClose extends ParserResult {
@@ -34,6 +37,9 @@ class _ParserResultClose extends ParserResult {
 class ParserResultMode extends ParserResult {
   final Field<bool> field;
   const ParserResultMode(this.field, {super.key});
+
+  @override
+  Widget get help => field.help;
 
   @override
   Widget build(BuildContext context) {
@@ -63,6 +69,9 @@ class ParserResultBool extends ParserResult {
   const ParserResultBool(this.field, {super.key});
 
   @override
+  Widget get help => field.help;
+
+  @override
   Widget build(BuildContext context) {
     return Text(field.name);
   }
@@ -90,6 +99,9 @@ class ParserResultRange<T> extends ParserResult {
   const ParserResultRange(this.field, {super.key});
 
   @override
+  Widget get help => field.help;
+
+  @override
   Widget build(BuildContext context) {
     return field.display?.call(field.current) ?? Text('${field.name}: ${field.current}');
   }
@@ -115,6 +127,9 @@ class ParserResultRange<T> extends ParserResult {
 class ParserResultTimestamp extends ParserResult {
   final Field<DateTime> field;
   const ParserResultTimestamp(this.field, {super.key});
+
+  @override
+  Widget get help => field.help;
 
   @override
   Widget build(BuildContext context) {
@@ -145,6 +160,9 @@ class ParserResultNumeric extends ParserResult {
   const ParserResultNumeric(this.field, {super.key});
 
   @override
+  Widget get help => field.help;
+
+  @override
   Widget build(BuildContext context) {
     return Text('${field.name}: ${field.current}');
   }
@@ -170,6 +188,9 @@ class ParserResultNumeric extends ParserResult {
 class ParserResultDuration extends ParserResult {
   final Field<Duration> field;
   const ParserResultDuration(this.field, {super.key});
+
+  @override
+  Widget get help => field.help;
 
   @override
   Widget build(BuildContext context) {
