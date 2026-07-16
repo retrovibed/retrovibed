@@ -925,8 +925,8 @@ class KnownLatestResponse extends $pb.GeneratedMessage {
   $pb.PbList<Known> get items => $_getList(1);
 }
 
-class RecommendationsRequest extends $pb.GeneratedMessage {
-  factory RecommendationsRequest({
+class RecommendationSearchRequest extends $pb.GeneratedMessage {
+  factory RecommendationSearchRequest({
     $core.String? mimetype,
     $core.bool? adult,
     $core.String? language,
@@ -942,17 +942,17 @@ class RecommendationsRequest extends $pb.GeneratedMessage {
     return result;
   }
 
-  RecommendationsRequest._();
+  RecommendationSearchRequest._();
 
-  factory RecommendationsRequest.fromBuffer($core.List<$core.int> data,
+  factory RecommendationSearchRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromBuffer(data, registry);
-  factory RecommendationsRequest.fromJson($core.String json,
+  factory RecommendationSearchRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      _omitMessageNames ? '' : 'RecommendationsRequest',
+      _omitMessageNames ? '' : 'RecommendationSearchRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
       createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'mimetype')
@@ -966,24 +966,26 @@ class RecommendationsRequest extends $pb.GeneratedMessage {
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  RecommendationsRequest clone() => deepCopy();
+  RecommendationSearchRequest clone() => deepCopy();
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  RecommendationsRequest copyWith(
-          void Function(RecommendationsRequest) updates) =>
-      super.copyWith((message) => updates(message as RecommendationsRequest))
-          as RecommendationsRequest;
+  RecommendationSearchRequest copyWith(
+          void Function(RecommendationSearchRequest) updates) =>
+      super.copyWith(
+              (message) => updates(message as RecommendationSearchRequest))
+          as RecommendationSearchRequest;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  static RecommendationsRequest create() => RecommendationsRequest._();
+  static RecommendationSearchRequest create() =>
+      RecommendationSearchRequest._();
   @$core.override
-  RecommendationsRequest createEmptyInstance() => create();
+  RecommendationSearchRequest createEmptyInstance() => create();
   @$core.pragma('dart2js:noInline')
-  static RecommendationsRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<RecommendationsRequest>(create);
-  static RecommendationsRequest? _defaultInstance;
+  static RecommendationSearchRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<RecommendationSearchRequest>(create);
+  static RecommendationSearchRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.String get mimetype => $_getSZ(0);
@@ -1031,9 +1033,9 @@ class RecommendationsRequest extends $pb.GeneratedMessage {
   void clearLimit() => $_clearField(901);
 }
 
-class RecommendationsResponse extends $pb.GeneratedMessage {
-  factory RecommendationsResponse({
-    RecommendationsRequest? next,
+class RecommendationSearchResponse extends $pb.GeneratedMessage {
+  factory RecommendationSearchResponse({
+    RecommendationSearchRequest? next,
     $core.Iterable<Known>? items,
   }) {
     final result = create();
@@ -1042,57 +1044,261 @@ class RecommendationsResponse extends $pb.GeneratedMessage {
     return result;
   }
 
-  RecommendationsResponse._();
+  RecommendationSearchResponse._();
 
-  factory RecommendationsResponse.fromBuffer($core.List<$core.int> data,
+  factory RecommendationSearchResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromBuffer(data, registry);
-  factory RecommendationsResponse.fromJson($core.String json,
+  factory RecommendationSearchResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      _omitMessageNames ? '' : 'RecommendationsResponse',
+      _omitMessageNames ? '' : 'RecommendationSearchResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
       createEmptyInstance: create)
-    ..aOM<RecommendationsRequest>(1, _omitFieldNames ? '' : 'next',
-        subBuilder: RecommendationsRequest.create)
+    ..aOM<RecommendationSearchRequest>(1, _omitFieldNames ? '' : 'next',
+        subBuilder: RecommendationSearchRequest.create)
     ..pPM<Known>(2, _omitFieldNames ? '' : 'items', subBuilder: Known.create)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  RecommendationsResponse clone() => deepCopy();
+  RecommendationSearchResponse clone() => deepCopy();
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  RecommendationsResponse copyWith(
-          void Function(RecommendationsResponse) updates) =>
-      super.copyWith((message) => updates(message as RecommendationsResponse))
-          as RecommendationsResponse;
+  RecommendationSearchResponse copyWith(
+          void Function(RecommendationSearchResponse) updates) =>
+      super.copyWith(
+              (message) => updates(message as RecommendationSearchResponse))
+          as RecommendationSearchResponse;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  static RecommendationsResponse create() => RecommendationsResponse._();
+  static RecommendationSearchResponse create() =>
+      RecommendationSearchResponse._();
   @$core.override
-  RecommendationsResponse createEmptyInstance() => create();
+  RecommendationSearchResponse createEmptyInstance() => create();
   @$core.pragma('dart2js:noInline')
-  static RecommendationsResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<RecommendationsResponse>(create);
-  static RecommendationsResponse? _defaultInstance;
+  static RecommendationSearchResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<RecommendationSearchResponse>(create);
+  static RecommendationSearchResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
-  RecommendationsRequest get next => $_getN(0);
+  RecommendationSearchRequest get next => $_getN(0);
   @$pb.TagNumber(1)
-  set next(RecommendationsRequest value) => $_setField(1, value);
+  set next(RecommendationSearchRequest value) => $_setField(1, value);
   @$pb.TagNumber(1)
   $core.bool hasNext() => $_has(0);
   @$pb.TagNumber(1)
   void clearNext() => $_clearField(1);
   @$pb.TagNumber(1)
-  RecommendationsRequest ensureNext() => $_ensure(0);
+  RecommendationSearchRequest ensureNext() => $_ensure(0);
 
   @$pb.TagNumber(2)
   $pb.PbList<Known> get items => $_getList(1);
+}
+
+class RecommendationDeleteRequest extends $pb.GeneratedMessage {
+  factory RecommendationDeleteRequest() => create();
+
+  RecommendationDeleteRequest._();
+
+  factory RecommendationDeleteRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory RecommendationDeleteRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'RecommendationDeleteRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
+      createEmptyInstance: create)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  RecommendationDeleteRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  RecommendationDeleteRequest copyWith(
+          void Function(RecommendationDeleteRequest) updates) =>
+      super.copyWith(
+              (message) => updates(message as RecommendationDeleteRequest))
+          as RecommendationDeleteRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static RecommendationDeleteRequest create() =>
+      RecommendationDeleteRequest._();
+  @$core.override
+  RecommendationDeleteRequest createEmptyInstance() => create();
+  @$core.pragma('dart2js:noInline')
+  static RecommendationDeleteRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<RecommendationDeleteRequest>(create);
+  static RecommendationDeleteRequest? _defaultInstance;
+}
+
+class RecommendationDeleteResponse extends $pb.GeneratedMessage {
+  factory RecommendationDeleteResponse({
+    Known? recommendation,
+  }) {
+    final result = create();
+    if (recommendation != null) result.recommendation = recommendation;
+    return result;
+  }
+
+  RecommendationDeleteResponse._();
+
+  factory RecommendationDeleteResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory RecommendationDeleteResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'RecommendationDeleteResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
+      createEmptyInstance: create)
+    ..aOM<Known>(1, _omitFieldNames ? '' : 'recomendation',
+        protoName: 'recommendation', subBuilder: Known.create)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  RecommendationDeleteResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  RecommendationDeleteResponse copyWith(
+          void Function(RecommendationDeleteResponse) updates) =>
+      super.copyWith(
+              (message) => updates(message as RecommendationDeleteResponse))
+          as RecommendationDeleteResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static RecommendationDeleteResponse create() =>
+      RecommendationDeleteResponse._();
+  @$core.override
+  RecommendationDeleteResponse createEmptyInstance() => create();
+  @$core.pragma('dart2js:noInline')
+  static RecommendationDeleteResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<RecommendationDeleteResponse>(create);
+  static RecommendationDeleteResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  Known get recommendation => $_getN(0);
+  @$pb.TagNumber(1)
+  set recommendation(Known value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasRecommendation() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearRecommendation() => $_clearField(1);
+  @$pb.TagNumber(1)
+  Known ensureRecommendation() => $_ensure(0);
+}
+
+class RecommendationRefreshRequest extends $pb.GeneratedMessage {
+  factory RecommendationRefreshRequest() => create();
+
+  RecommendationRefreshRequest._();
+
+  factory RecommendationRefreshRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory RecommendationRefreshRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'RecommendationRefreshRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
+      createEmptyInstance: create)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  RecommendationRefreshRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  RecommendationRefreshRequest copyWith(
+          void Function(RecommendationRefreshRequest) updates) =>
+      super.copyWith(
+              (message) => updates(message as RecommendationRefreshRequest))
+          as RecommendationRefreshRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static RecommendationRefreshRequest create() =>
+      RecommendationRefreshRequest._();
+  @$core.override
+  RecommendationRefreshRequest createEmptyInstance() => create();
+  @$core.pragma('dart2js:noInline')
+  static RecommendationRefreshRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<RecommendationRefreshRequest>(create);
+  static RecommendationRefreshRequest? _defaultInstance;
+}
+
+class RecommendationRefreshResponse extends $pb.GeneratedMessage {
+  factory RecommendationRefreshResponse({
+    Known? recommendation,
+  }) {
+    final result = create();
+    if (recommendation != null) result.recommendation = recommendation;
+    return result;
+  }
+
+  RecommendationRefreshResponse._();
+
+  factory RecommendationRefreshResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory RecommendationRefreshResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'RecommendationRefreshResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
+      createEmptyInstance: create)
+    ..aOM<Known>(1, _omitFieldNames ? '' : 'recomendation',
+        protoName: 'recommendation', subBuilder: Known.create)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  RecommendationRefreshResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  RecommendationRefreshResponse copyWith(
+          void Function(RecommendationRefreshResponse) updates) =>
+      super.copyWith(
+              (message) => updates(message as RecommendationRefreshResponse))
+          as RecommendationRefreshResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static RecommendationRefreshResponse create() =>
+      RecommendationRefreshResponse._();
+  @$core.override
+  RecommendationRefreshResponse createEmptyInstance() => create();
+  @$core.pragma('dart2js:noInline')
+  static RecommendationRefreshResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<RecommendationRefreshResponse>(create);
+  static RecommendationRefreshResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  Known get recommendation => $_getN(0);
+  @$pb.TagNumber(1)
+  set recommendation(Known value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasRecommendation() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearRecommendation() => $_clearField(1);
+  @$pb.TagNumber(1)
+  Known ensureRecommendation() => $_ensure(0);
 }
 
 const $core.bool _omitFieldNames =

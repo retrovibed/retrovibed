@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/rss/list.searchable.dart';
+import 'package:retrovibed/rss/list.dart';
 import 'package:retrovibed/rss/api.dart' as api;
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
 
@@ -108,6 +109,56 @@ void main() {
       expect(find.text('url'), findsOneWidget);
       expect(find.text('description'), findsOneWidget);
 
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('onChange replaces the matching feed when given a value', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpApp(
+        SingleChildScrollView(child: ListSearchable(search: mockSearch)),
+      );
+      await tester.pumpAndSettle();
+
+      final items = tester.widgetList<Item>(find.byType(Item)).toList();
+      expect(items.length, 2);
+      final target = items.firstWhere((i) => i.current.id == 'test-feed-1');
+
+      target.onChange(
+        api.Feed(
+          id: 'test-feed-1',
+          description: 'Updated Feed 1',
+          url: 'https://example.com/feed1',
+        ),
+      );
+      await tester.pump();
+
+      expect(find.text('Updated Feed 1'), findsOneWidget);
+      expect(find.text('Test Feed 1'), findsNothing);
+      expect(find.text('Test Feed 2'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('onChange removes the matching feed when given null', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpApp(
+        SingleChildScrollView(child: ListSearchable(search: mockSearch)),
+      );
+      await tester.pumpAndSettle();
+
+      final items = tester.widgetList<Item>(find.byType(Item)).toList();
+      expect(items.length, 2);
+      final target = items.firstWhere((i) => i.current.id == 'test-feed-1');
+
+      target.onChange(null);
+      await tester.pump();
+
+      final remaining = tester.widgetList<Item>(find.byType(Item)).toList();
+      expect(remaining.length, 1);
+      expect(remaining.single.current.id, 'test-feed-2');
+      expect(find.text('Test Feed 1'), findsNothing);
+      expect(find.text('Test Feed 2'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   });

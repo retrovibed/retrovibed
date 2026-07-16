@@ -140,6 +140,7 @@ class KnownMediaDisplay extends StatefulWidget {
         Text("Suggested content for you."),
         Text("Hover over a card to reveal a summary and the download icon."),
         Text("Tap the card to add the item to your library."),
+        Text("Long Tap the card to clear the recommendation"),
         Text("Use the refresh button to generate a new set of recommendations."),
       ],
     ),

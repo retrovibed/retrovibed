@@ -29,6 +29,7 @@ export 'design.kit/key.press.aware.dart';
 export 'design.kit/lazy.visible.dart';
 export 'design.kit/long.hold.dart';
 export 'design.kit/modals.dart';
+export 'design.kit/noop.dart';
 export 'design.kit/periodic.dart';
 export 'design.kit/refresh.dart';
 export 'design.kit/repeat.dart';

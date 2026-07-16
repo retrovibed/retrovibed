@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:retrovibed/profiles.dart' as profiles;
+import 'package:retrovibed/profiles/list.row.dart';
 import 'package:retrovibed/meta.dart' as meta;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
@@ -84,6 +85,28 @@ void main() {
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
     }, variant: _resolutions);
+  });
+
+  group('Profile ListDisplay onChange wiring', () {
+    testWidgets('replaces the matching row in place when onChange fires', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpApp(profiles.ListDisplay(search: _mockSearchWithItems));
+      await tester.pumpAndSettle();
+
+      final rows = tester.widgetList<ListRow>(find.byType(ListRow)).toList();
+      expect(rows.length, 3);
+      final target = rows.firstWhere((r) => r.current.id == 'id-2');
+
+      target.onChange(_profile(id: 'id-2', display: 'Bob Updated'));
+      await tester.pump();
+
+      expect(find.text('Bob Updated'), findsOneWidget);
+      expect(find.text('Bob'), findsNothing);
+      expect(find.text('Alice'), findsOneWidget);
+      expect(find.text('Charlie'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
   });
 
   group('Profile ListDisplay Row Tests', () {

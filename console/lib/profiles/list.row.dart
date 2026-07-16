@@ -7,8 +7,6 @@ import './edit.dart';
 import './authz.meta.edit.dart';
 import './typography.dart' as typo;
 
-void _Noop(meta.Profile up) {}
-
 typedef FnUpdate =
     Future<meta.ProfileUpdateResponse> Function(
       meta.ProfileUpdateRequest req, {
@@ -38,7 +36,7 @@ class ListRow extends StatelessWidget {
   const ListRow(
     this.current, {
     super.key,
-    this.onChange = _Noop,
+    this.onChange = ds.fnNoop,
     this.apiprofileupdate = meta.profiles.update,
     this.apiauthzget = meta.authz.get,
     this.apiauthzgrant = meta.authz.grant,
@@ -72,7 +70,10 @@ class ListRow extends StatelessWidget {
             ),
             AuthzMetaEdit.future(
               () => httpx.withRetry(
-                () => apiauthzget(current.id, options: [authn.request(authn.AuthzCache.meta(context))]).then((v) => v.token),
+                () => apiauthzget(
+                  current.id,
+                  options: [authn.request(authn.AuthzCache.meta(context))],
+                ).then((v) => v.token),
               ),
               onChange: (t) {
                 apiauthzgrant(current.id, t, options: [authn.request(authn.AuthzCache.meta(context))]).then((_) {

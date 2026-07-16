@@ -254,15 +254,19 @@ class _LoadingIconButtonState extends State<LoadingIconButton> {
         mouseCursor: _isLoading || widget.disabled ? SystemMouseCursors.basic : SystemMouseCursors.click,
         onPressed: _isLoading || widget.disabled ? null : _handlePress,
         iconSize: widget.iconSize,
+        style: IconButton.styleFrom(
+          padding: EdgeInsets.all(widget.iconSize * 0.25),
+          minimumSize: Size.zero,
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        ),
         color: color,
-        icon:
-            _isLoading
-                ? SizedBox(
-                  width: widget.iconSize,
-                  height: widget.iconSize,
-                  child: CircularProgressIndicator(strokeWidth: 2.0, value: _sanitize(widget.value)),
-                )
-                : widget.icon,
+        icon: _isLoading
+            ? SizedBox(
+                width: widget.iconSize,
+                height: widget.iconSize,
+                child: CircularProgressIndicator(strokeWidth: 2.0, value: _sanitize(widget.value)),
+              )
+            : widget.icon,
       ),
       widget.help,
     );

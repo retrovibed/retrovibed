@@ -6,15 +6,13 @@ import 'feed.edit.dart';
 import 'feed.row.dart';
 import 'api.dart' as api;
 
-void _Noop(api.Feed? up) {}
-
 class Item extends StatelessWidget {
   final api.Feed current;
   final void Function(api.Feed? upd) onChange;
   const Item({
     super.key,
     required api.Feed this.current,
-    this.onChange = _Noop,
+    this.onChange = ds.fnNoop,
   });
 
   @override
