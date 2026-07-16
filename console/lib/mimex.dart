@@ -8,6 +8,7 @@ const image = "image";
 const metadataarchive = "application/vnd";
 const mediaarchive = "application/vnd.retrovibed.media.archive";
 const neural = "application/vnd.retrovibed.neural";
+const search = "application/vnd.retrovibed.discovery.search.module";
 const bittorrent = "application/x-bittorrent";
 const binary = "application/octet-stream";
 
