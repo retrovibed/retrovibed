@@ -14,6 +14,7 @@ class KnownMediaCard extends StatelessWidget {
   final IconData? icon;
   final bool highlighted;
   final Widget help;
+  final BoxConstraints? constraints;
 
   static const hint = ds.Hint(
     Column(
@@ -39,6 +40,7 @@ class KnownMediaCard extends StatelessWidget {
     bool highlighted = false,
     IconData? icon = Icons.play_circle_filled,
     Widget help = ds.HelpScope.None,
+    BoxConstraints? constraints,
   }) {
     return FutureBuilder<api.Known>(
       future: future,
@@ -54,6 +56,7 @@ class KnownMediaCard extends StatelessWidget {
           highlighted: highlighted,
           icon: icon,
           help: help,
+          constraints: constraints,
         );
       },
     );
@@ -71,6 +74,7 @@ class KnownMediaCard extends StatelessWidget {
     this.highlighted = false,
     this.icon = Icons.play_circle_filled,
     this.help = ds.HelpScope.None,
+    this.constraints,
   });
 
   Map<String, String>? _imageheaders(String original) {
@@ -83,74 +87,76 @@ class KnownMediaCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
-    final poster =
-        current.image == ""
-            ? ds.Empty
-            : Image.network(
-              current.image,
-              headers: _imageheaders(current.image),
-              errorBuilder: (context, error, stackTrace) => const Icon(Icons.image_outlined),
-            );
+    final poster = current.image == ""
+        ? ds.Empty
+        : Image.network(
+            current.image,
+            headers: _imageheaders(current.image),
+            errorBuilder: (context, error, stackTrace) => const Icon(Icons.image_outlined),
+          );
 
-    return AspectRatio(
-      aspectRatio: 2 / 3,
-      child: ds.Card(
-        SizedBox.expand(
-          child: ClipRRect(
-            borderRadius: defaults.borderRadius,
-            child: ds.Hover(
-              poster,
-              notifier: hovered,
-              overlay: ds.Hover.overlays.icon(
-                context,
-                icon: icon,
-                content: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Padding(
-                        child: Text(
-                          current.summary,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.start,
-                          maxLines: 10,
+    return ConstrainedBox(
+      constraints: constraints ?? const BoxConstraints(),
+      child: AspectRatio(
+        aspectRatio: 2 / 3,
+        child: ds.Card(
+          SizedBox.expand(
+            child: ClipRRect(
+              borderRadius: defaults.borderRadius,
+              child: ds.Hover(
+                poster,
+                notifier: hovered,
+                overlay: ds.Hover.overlays.icon(
+                  context,
+                  icon: icon,
+                  content: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          child: Text(
+                            current.summary,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.start,
+                            maxLines: 10,
+                          ),
+                          padding: defaults.padding / 2,
                         ),
-                        padding: defaults.padding / 2,
                       ),
-                    ),
-                    trailing ?? const SizedBox(),
-                  ],
+                      trailing ?? const SizedBox(),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-        tint: highlighted ? defaults.highlightTint : [],
-        alignment: Alignment.center,
-        onTap: onTap,
-        onDoubleTap: onDoubleTap,
-        onSecondaryTap: onSecondaryTap,
-        onLongPress: onLongPress,
-        help: help,
-        leading: [
-          Center(
-            child: Text(
-              current.description,
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
+          tint: highlighted ? defaults.highlightTint : [],
+          alignment: Alignment.center,
+          onTap: onTap,
+          onDoubleTap: onDoubleTap,
+          onSecondaryTap: onSecondaryTap,
+          onLongPress: onLongPress,
+          help: help,
+          leading: [
+            Center(
+              child: Text(
+                current.description,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
             ),
-          ),
-        ],
-        trailing: [
-          ds.Timestamp.iso8601(
-            current.released,
-            format: ds.Timestamp.year,
-            inf: ds.Empty,
-            neginf: ds.Empty,
-          ),
-        ],
-        fit: FlexFit.tight,
+          ],
+          trailing: [
+            ds.Timestamp.iso8601(
+              current.released,
+              format: ds.Timestamp.year,
+              inf: ds.Empty,
+              neginf: ds.Empty,
+            ),
+          ],
+          fit: FlexFit.tight,
+        ),
       ),
     );
   }

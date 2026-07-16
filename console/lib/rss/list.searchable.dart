@@ -153,10 +153,7 @@ class SearchableView extends State<ListSearchable> {
           key: ValueKey(w.id),
           current: w,
           onChange: (v) {
-            final upd =
-                v == null
-                    ? _res.items.where((old) => old.id != w.id).toList()
-                    : _res.items.map((old) => old.id == v.id ? v : old).toList();
+            final upd = ds.fnOnChange(_res.items, v, (old) => old.id == w.id);
             setState(() {
               _res = api.FeedSearchResponse(
                 next: _res.next.deepCopy(),

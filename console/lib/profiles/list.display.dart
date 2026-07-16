@@ -90,7 +90,7 @@ class _ListDisplay extends State<ListDisplay> {
   void _replace(meta.Profile v) {
     setState(() {
       _res = meta.ProfileSearchResponse(
-        items: _res.items.map((o) => o.id == v.id ? v : o).toList(),
+        items: ds.fnOnChange(_res.items, v, (o) => o.id == v.id),
         next: _res.next,
       );
     });

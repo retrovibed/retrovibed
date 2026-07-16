@@ -43,6 +43,7 @@ func genparser(t *testing.T, options ...kong.Option) *kong.Kong {
 				"vars_user_configuration_directory": t.TempDir(),
 			},
 			kong.NamedMapper("durationinf", kong.MapperFunc(cmdopts.ParseDurationInf)),
+			kong.NamedMapper("envvar", kong.MapperFunc(cmdopts.ParseEnviron)),
 		)...,
 	)
 }

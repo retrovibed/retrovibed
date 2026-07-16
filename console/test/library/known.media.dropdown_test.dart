@@ -10,7 +10,8 @@ import 'package:retrovibed/testing/widget_tester_extensions.dart';
 
 // A Known item returned by the mock search so the dropdown has a card to tap.
 final _knownItem = api.Known(
-  id: uuidx.withSuffix(99),
+  id: uuidx.withSuffix(98),
+  uid: uuidx.withSuffix(99),
   description: 'Test Known Media',
   summary: 'Test summary',
 );
@@ -66,7 +67,7 @@ void main() {
           knownMediaId: uuidx.min(),
         );
 
-        final synced = current.deepCopy()..knownMediaId = _knownItem.id;
+        final synced = current.deepCopy()..knownMediaId = _knownItem.uid;
 
         await tester.pumpApp(
           _wrap(
@@ -112,7 +113,7 @@ void main() {
           knownMediaId: uuidx.min(),
         );
 
-        final synced = current.deepCopy()..knownMediaId = _knownItem.id;
+        final synced = current.deepCopy()..knownMediaId = _knownItem.uid;
 
         await tester.pumpApp(
           _wrap(

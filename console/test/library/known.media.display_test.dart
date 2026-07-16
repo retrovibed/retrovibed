@@ -93,8 +93,8 @@ void _resolutionTests(String description, Media media, [api.Known? known]) {
   });
 }
 
-api.Known _known({String id = ''}) => api.Known(
-  id: id,
+api.Known _known({String uid = ''}) => api.Known(
+  uid: uid,
   description: 'Test Known',
   summary: 'Test summary',
   rating: 0.0,
@@ -103,7 +103,7 @@ api.Known _known({String id = ''}) => api.Known(
 
 void main() {
   _resolutionTests('no source icon', _media());
-  _resolutionTests('tmdb source icon', _media(), _known(id: '${KnownMediaSource.tmdb}-0000-0000-0000-000000000000'));
+  _resolutionTests('tmdb source icon', _media(), _known(uid: '${KnownMediaSource.tmdb}-0000-0000-0000-000000000000'));
 
   group('KnownMediaDisplay onTap', () {
     testWidgets('onTap is invoked when tapped', (tester) async {

@@ -320,9 +320,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                               .then((__v) {
                                 setState(() {
                                   _res = media.DownloadSearchResponse(
-                                    items: _res.items.where(
-                                      (d) => d.media.id != v.media.id,
-                                    ),
+                                    items: ds.fnOnChange(_res.items, null, (d) => d.media.id == v.media.id),
                                     next: _res.next,
                                   );
                                 });

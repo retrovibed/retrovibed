@@ -10,6 +10,8 @@ class Confirmation extends StatelessWidget {
   final Widget cancellation;
   final void Function(BuildContext)? onConfirm;
   final void Function(BuildContext)? onCancel;
+  final EdgeInsets? padding;
+  final EdgeInsets? margin;
 
   const Confirmation({
     super.key,
@@ -18,13 +20,37 @@ class Confirmation extends StatelessWidget {
     required this.cancellation,
     this.onConfirm,
     this.onCancel,
+    this.padding,
+    this.margin,
   });
+
+  // information display with no visual buttons.
+  factory Confirmation.info({
+    Key? key,
+    required Widget content,
+    void Function(BuildContext)? done,
+    EdgeInsets? padding,
+    EdgeInsets? margin,
+  }) {
+    return Confirmation(
+      key: key,
+      content: content,
+      confirmation: Empty,
+      cancellation: Empty,
+      onConfirm: done,
+      onCancel: done,
+      padding: padding,
+      margin: margin,
+    );
+  }
 
   factory Confirmation.ok({
     Key? key,
     required Widget content,
     void Function(BuildContext)? onConfirm,
     void Function(BuildContext)? onCancel,
+    EdgeInsets? padding,
+    EdgeInsets? margin,
   }) {
     return Confirmation(
       key: key,
@@ -33,6 +59,8 @@ class Confirmation extends StatelessWidget {
       cancellation: Empty,
       onConfirm: onConfirm,
       onCancel: onCancel,
+      padding: padding,
+      margin: margin,
     );
   }
 
@@ -41,6 +69,8 @@ class Confirmation extends StatelessWidget {
     required Widget content,
     void Function(BuildContext)? onConfirm,
     void Function(BuildContext)? onCancel,
+    EdgeInsets? padding,
+    EdgeInsets? margin,
   }) {
     return Confirmation(
       key: key,
@@ -49,6 +79,8 @@ class Confirmation extends StatelessWidget {
       cancellation: Text('No'),
       onConfirm: onConfirm,
       onCancel: onCancel,
+      padding: padding,
+      margin: margin,
     );
   }
 
@@ -57,6 +89,8 @@ class Confirmation extends StatelessWidget {
     required Widget content,
     void Function(BuildContext)? onConfirm,
     void Function(BuildContext)? onCancel,
+    EdgeInsets? padding,
+    EdgeInsets? margin,
   }) {
     return Confirmation(
       key: key,
@@ -65,21 +99,25 @@ class Confirmation extends StatelessWidget {
       cancellation: Text('Cancel'),
       onConfirm: onConfirm,
       onCancel: onCancel,
+      padding: padding,
+      margin: margin,
     );
   }
 
   static Widget Function(Completer<void>) dangerous({
     required Widget content,
     required Future<void> Function(BuildContext) onConfirm,
+    EdgeInsets? padding,
+    EdgeInsets? margin,
   }) {
     return (completion) => Confirmation.yesNo(
       content: content,
       onConfirm: (ctx) {
-        onConfirm(ctx)
-            .then((_) => completion.complete())
-            .catchError(completion.completeError);
+        onConfirm(ctx).then((_) => completion.complete()).catchError(completion.completeError);
       },
       onCancel: (_) => completion.complete(),
+      padding: padding,
+      margin: margin,
     );
   }
 
@@ -89,55 +127,58 @@ class Confirmation extends StatelessWidget {
     final theme = Theme.of(context);
 
     return _container.Container(
-      padding: defaults.padding,
+      padding: padding ?? defaults.padding,
+      margin: margin,
       Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
         spacing: defaults.spacing,
         children: [
           content,
-          Row(
-            spacing: defaults.spacing,
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              InkWell(
-                autofocus: true,
-                onTap: onCancel == null ? null : () => onCancel!(context),
-                mouseCursor: SystemMouseCursors.click,
-                borderRadius: defaults.borderRadius,
-                child: Container(
-                  padding: defaults.padding,
-                  decoration: BoxDecoration(
+          if (cancellation != Empty || confirmation != Empty)
+            Row(
+              spacing: defaults.spacing,
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (cancellation != Empty)
+                  InkWell(
+                    autofocus: true,
+                    onTap: onCancel == null ? null : () => onCancel!(context),
+                    mouseCursor: SystemMouseCursors.click,
                     borderRadius: defaults.borderRadius,
-                  ),
-                  child: DefaultTextStyle(
-                    style: theme.textTheme.labelLarge ?? TextStyle(),
-                    child: cancellation,
-                  ),
-                ),
-              ),
-              if (confirmation != Empty)
-                InkWell(
-                  onTap: onConfirm == null ? null : () => onConfirm!(context),
-                  mouseCursor: SystemMouseCursors.click,
-                  borderRadius: defaults.borderRadius,
-                  child: Container(
-                    padding: defaults.padding,
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primary,
-                      borderRadius: defaults.borderRadius,
-                    ),
-                    child: DefaultTextStyle(
-                      style: (theme.textTheme.labelLarge ?? TextStyle()).copyWith(
-                        color: theme.colorScheme.onPrimary,
+                    child: Container(
+                      padding: defaults.padding,
+                      decoration: BoxDecoration(
+                        borderRadius: defaults.borderRadius,
                       ),
-                      child: confirmation,
+                      child: DefaultTextStyle(
+                        style: theme.textTheme.labelLarge ?? TextStyle(),
+                        child: cancellation,
+                      ),
                     ),
                   ),
-                ),
-            ],
-          ),
+                if (confirmation != Empty)
+                  InkWell(
+                    onTap: onConfirm == null ? null : () => onConfirm!(context),
+                    mouseCursor: SystemMouseCursors.click,
+                    borderRadius: defaults.borderRadius,
+                    child: Container(
+                      padding: defaults.padding,
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primary,
+                        borderRadius: defaults.borderRadius,
+                      ),
+                      child: DefaultTextStyle(
+                        style: (theme.textTheme.labelLarge ?? TextStyle()).copyWith(
+                          color: theme.colorScheme.onPrimary,
+                        ),
+                        child: confirmation,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
         ],
       ),
     );

@@ -43,7 +43,7 @@ func TestRecommendationsRefresh(t *testing.T) {
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
-		body, err := json.Marshal(&media.RecommendationsSearchRequest{})
+		body, err := json.Marshal(&media.RecommendationSearchRequest{})
 		require.NoError(t, err)
 
 		resp, req, err := httptestx.BuildRequestBytes(
@@ -56,7 +56,7 @@ func TestRecommendationsRefresh(t *testing.T) {
 
 		var result media.RecommendationRefreshResponse
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
-		require.Equal(t, known.UID, result.Recommendation.Id)
+		require.Equal(t, known.UID, result.Recommendation.Uid)
 
 		var rec library.Recommendation
 		require.NoError(t, library.RecommendationFindByContentID(ctx, q, known.UID).Scan(&rec))
@@ -87,7 +87,7 @@ func TestRecommendationsRefresh(t *testing.T) {
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
-		body, err := json.Marshal(&media.RecommendationsSearchRequest{})
+		body, err := json.Marshal(&media.RecommendationSearchRequest{})
 		require.NoError(t, err)
 
 		for range 3 {
@@ -101,7 +101,7 @@ func TestRecommendationsRefresh(t *testing.T) {
 
 			var result media.RecommendationRefreshResponse
 			require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
-			require.Equal(t, known.UID, result.Recommendation.Id)
+			require.Equal(t, known.UID, result.Recommendation.Uid)
 		}
 
 		var rec library.Recommendation
@@ -129,7 +129,7 @@ func TestRecommendationsRefresh(t *testing.T) {
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
-		body, err := json.Marshal(&media.RecommendationsSearchRequest{})
+		body, err := json.Marshal(&media.RecommendationSearchRequest{})
 		require.NoError(t, err)
 
 		resp, req, err := httptestx.BuildRequestBytes(

@@ -6,8 +6,6 @@ import './api.dart' as api;
 import './edit.dart';
 import './icon.checkmark.dart';
 
-void _Noop(api.Wireguard up) {}
-
 class ListRow extends StatelessWidget {
   final api.Wireguard current;
   final bool active;
@@ -23,8 +21,8 @@ class ListRow extends StatelessWidget {
     this.active = false,
     this.leading = const SizedBox.shrink(),
     this.trailing = const SizedBox.shrink(),
-    this.onChange = _Noop,
-    this.onDelete = _Noop,
+    this.onChange = ds.fnNoop,
+    this.onDelete = ds.fnNoop,
     this.onTap,
   });
 

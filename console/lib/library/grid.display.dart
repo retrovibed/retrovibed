@@ -45,7 +45,7 @@ class _GridState extends State<Grid> {
 
   media.Media _replace(media.Media v) {
     setState(() {
-      _items = _items.map((o) => o.id == v.id ? v : o).toList();
+      _items = ds.fnOnChange(_items, v, (o) => o.id == v.id);
     });
     return v;
   }
@@ -132,20 +132,6 @@ class _GridState extends State<Grid> {
                 ),
               );
             };
-            final trailing = [
-              ds.LoadingIconButton.info(
-                tooltip: "manually identify the media",
-                help: ds.Hint(
-                  Text("search for and select the correct media identity from the known library"),
-                ),
-                onPressed: KnownMediaDropdown.modal(
-                  context,
-                  _media,
-                  onChange: _replace,
-                  mimetype: category,
-                ),
-              ),
-            ];
 
             return KnownMediaDisplay.auto(
               context,
@@ -159,7 +145,20 @@ class _GridState extends State<Grid> {
               onChange: _replace,
               highlighted: _media.id == widget.highlighted,
               help: KnownMediaDisplay.hintPlayMedia,
-              trailing: trailing,
+              trailing: [
+                ds.LoadingIconButton.info(
+                  tooltip: "manually identify the media",
+                  help: ds.Hint(
+                    Text("search for and select the correct media identity from the known library"),
+                  ),
+                  onPressed: KnownMediaDropdown.modal(
+                    context,
+                    _media,
+                    onChange: _replace,
+                    mimetype: category,
+                  ),
+                ),
+              ],
             );
           },
         );

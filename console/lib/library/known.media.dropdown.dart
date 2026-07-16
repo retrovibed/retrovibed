@@ -43,7 +43,7 @@ class KnownMediaDropdown extends StatefulWidget {
     if (known == null && uuidx.isMin(uuidx.fromString(current.knownMediaId))) {
       return Future.value(current);
     }
-    final updated = current..knownMediaId = known?.id ?? uuidx.min();
+    final updated = current..knownMediaId = known?.uid ?? uuidx.min();
     if (uuidx.isMin(uuidx.fromString(current.torrentId))) {
       return libraryMetadataSync(updated.id, updated, options: authOptions).then((v) => v.media);
     }

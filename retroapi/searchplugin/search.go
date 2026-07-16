@@ -9,6 +9,7 @@ import (
 	"iter"
 	"log"
 	"os"
+	"strings"
 	"sync"
 
 	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
@@ -83,6 +84,16 @@ func (r *Registry) runSearchJob(ctx context.Context, j workload) error {
 		WithStderr(os.Stderr).
 		WithSysWalltime().
 		WithSysNanotime()
+
+	envpath := strings.TrimSuffix(j.path, ".wasm") + ".env"
+	envpairs, err := readEnvFile(envpath)
+	if err != nil {
+		log.Println("unable to read search plugin configuration", envpath, err)
+	}
+	for _, kv := range envpairs {
+		k, v, _ := strings.Cut(kv, "=")
+		cfg = cfg.WithEnv(k, v)
+	}
 
 	log.Println("running search plugin", j.path)
 

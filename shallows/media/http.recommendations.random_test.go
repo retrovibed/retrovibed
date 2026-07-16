@@ -46,7 +46,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
 		resp, req, err := httptestx.BuildRequestBytes(
-			http.MethodPost, "/random", func() []byte { b, _ := json.Marshal(&media.RecommendationsSearchRequest{}); return b }(),
+			http.MethodPost, "/random", func() []byte { b, _ := json.Marshal(&media.RecommendationSearchRequest{}); return b }(),
 			httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)),
 		)
 		require.NoError(t, err)
@@ -79,7 +79,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
 		resp, req, err := httptestx.BuildRequestBytes(
-			http.MethodPost, "/random", func() []byte { b, _ := json.Marshal(&media.RecommendationsSearchRequest{}); return b }(),
+			http.MethodPost, "/random", func() []byte { b, _ := json.Marshal(&media.RecommendationSearchRequest{}); return b }(),
 			httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)),
 		)
 		require.NoError(t, err)
@@ -113,13 +113,13 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
 		resp, req, err := httptestx.BuildRequestBytes(
-			http.MethodPost, "/random", func() []byte { b, _ := json.Marshal(&media.RecommendationsSearchRequest{}); return b }(),
+			http.MethodPost, "/random", func() []byte { b, _ := json.Marshal(&media.RecommendationSearchRequest{}); return b }(),
 			httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)),
 		)
 		require.NoError(t, err)
 		routes.ServeHTTP(resp, req)
 
-		var result media.RecommendationsSearchResponse
+		var result media.RecommendationSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 		require.Len(t, result.Items, 1)
@@ -151,13 +151,13 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
 		resp, req, err := httptestx.BuildRequestBytes(
-			http.MethodPost, "/random", func() []byte { b, _ := json.Marshal(&media.RecommendationsSearchRequest{}); return b }(),
+			http.MethodPost, "/random", func() []byte { b, _ := json.Marshal(&media.RecommendationSearchRequest{}); return b }(),
 			httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)),
 		)
 		require.NoError(t, err)
 		routes.ServeHTTP(resp, req)
 
-		var result media.RecommendationsSearchResponse
+		var result media.RecommendationSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 		require.Len(t, result.Items, 1)
@@ -189,7 +189,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
-		body, err := json.Marshal(&media.RecommendationsSearchRequest{Mimetype: mimex.Video})
+		body, err := json.Marshal(&media.RecommendationSearchRequest{Mimetype: mimex.Video})
 		require.NoError(t, err)
 
 		resp, req, err := httptestx.BuildRequestBytes(
@@ -199,7 +199,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 		require.NoError(t, err)
 		routes.ServeHTTP(resp, req)
 
-		var result media.RecommendationsSearchResponse
+		var result media.RecommendationSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 		require.Len(t, result.Items, 1)
@@ -234,7 +234,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
-		body, err := json.Marshal(&media.RecommendationsSearchRequest{Language: "en"})
+		body, err := json.Marshal(&media.RecommendationSearchRequest{Language: "en"})
 		require.NoError(t, err)
 
 		resp, req, err := httptestx.BuildRequestBytes(
@@ -244,11 +244,11 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 		require.NoError(t, err)
 		routes.ServeHTTP(resp, req)
 
-		var result media.RecommendationsSearchResponse
+		var result media.RecommendationSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 		require.Len(t, result.Items, 1)
-		require.Equal(t, en.UID, result.Items[0].Id)
+		require.Equal(t, en.UID, result.Items[0].Uid)
 	})
 
 	t.Run("returns adult content when requested", func(t *testing.T) {
@@ -276,7 +276,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
-		body, err := json.Marshal(&media.RecommendationsSearchRequest{Adult: true})
+		body, err := json.Marshal(&media.RecommendationSearchRequest{Adult: true})
 		require.NoError(t, err)
 
 		resp, req, err := httptestx.BuildRequestBytes(
@@ -286,11 +286,11 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 		require.NoError(t, err)
 		routes.ServeHTTP(resp, req)
 
-		var result media.RecommendationsSearchResponse
+		var result media.RecommendationSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 		require.Len(t, result.Items, 1)
-		require.Equal(t, known.UID, result.Items[0].Id)
+		require.Equal(t, known.UID, result.Items[0].Uid)
 		require.True(t, result.Items[0].Adult)
 	})
 
@@ -318,7 +318,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
-		body, err := json.Marshal(&media.RecommendationsSearchRequest{Adult: true})
+		body, err := json.Marshal(&media.RecommendationSearchRequest{Adult: true})
 		require.NoError(t, err)
 
 		resp, req, err := httptestx.BuildRequestBytes(
@@ -328,11 +328,11 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 		require.NoError(t, err)
 		routes.ServeHTTP(resp, req)
 
-		var result media.RecommendationsSearchResponse
+		var result media.RecommendationSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 		require.Len(t, result.Items, 1)
-		require.Equal(t, known.UID, result.Items[0].Id)
+		require.Equal(t, known.UID, result.Items[0].Uid)
 	})
 
 	t.Run("returns known media with description and image", func(t *testing.T) {
@@ -360,13 +360,13 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
 		resp, req, err := httptestx.BuildRequestBytes(
-			http.MethodPost, "/random", func() []byte { b, _ := json.Marshal(&media.RecommendationsSearchRequest{}); return b }(),
+			http.MethodPost, "/random", func() []byte { b, _ := json.Marshal(&media.RecommendationSearchRequest{}); return b }(),
 			httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)),
 		)
 		require.NoError(t, err)
 		routes.ServeHTTP(resp, req)
 
-		var result media.RecommendationsSearchResponse
+		var result media.RecommendationSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 		require.Len(t, result.Items, 1)
@@ -401,7 +401,7 @@ func TestRecommendationsRandom(t *testing.T) {
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
-		body, err := json.Marshal(&media.RecommendationsSearchRequest{})
+		body, err := json.Marshal(&media.RecommendationSearchRequest{})
 		require.NoError(t, err)
 
 		resp, req, err := httptestx.BuildRequestBytes(
@@ -411,10 +411,10 @@ func TestRecommendationsRandom(t *testing.T) {
 		require.NoError(t, err)
 		routes.ServeHTTP(resp, req)
 
-		var result media.RecommendationsSearchResponse
+		var result media.RecommendationSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
-		require.Equal(t, known.UID, result.Items[0].Id)
+		require.Equal(t, known.UID, result.Items[0].Uid)
 	})
 
 	t.Run("empty database returns 404", func(t *testing.T) {
@@ -437,7 +437,7 @@ func TestRecommendationsRandom(t *testing.T) {
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
-		body, err := json.Marshal(&media.RecommendationsSearchRequest{})
+		body, err := json.Marshal(&media.RecommendationSearchRequest{})
 		require.NoError(t, err)
 
 		resp, req, err := httptestx.BuildRequestBytes(

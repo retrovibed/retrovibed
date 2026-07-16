@@ -25,6 +25,19 @@ Future<lib.KnownLatestResponse> _empty(
 }) =>
     Future.value(lib.KnownLatestResponse(items: []));
 
+Future<lib.KnownLatestResponse> _withItems(
+  lib.KnownLatestRequest req, {
+  List<httpx.Option> options = const [],
+}) =>
+    Future.value(
+      lib.KnownLatestResponse(
+        items: [
+          lib.Known(id: 'id-1', description: 'Release One'),
+          lib.Known(id: 'id-2', description: 'Release Two'),
+        ],
+      ),
+    );
+
 void main() {
   group('Releases', () {
     testWidgets('displays loading state initially', (tester) async {
@@ -33,6 +46,49 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
       await tester.pumpAndSettle();
       expect(find.text('New Releases'), findsOneWidget);
+    });
+
+    testWidgets('renders items returned from the api with onChange wired up', (tester) async {
+      await tester.pumpApp(NewReleases(mimex.video, latest: _withItems), isolatecache: true);
+      await tester.pumpAndSettle();
+      expect(find.text('New Releases'), findsOneWidget);
+      expect(find.byType(lib.KnownMediaLocator), findsWidgets);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('onChange folds an updated item back into the list', (tester) async {
+      await tester.pumpApp(NewReleases(mimex.video, latest: _withItems), isolatecache: true);
+      await tester.pumpAndSettle();
+
+      final locators = tester.widgetList<lib.KnownMediaLocator>(find.byType(lib.KnownMediaLocator)).toList();
+      expect(locators.length, 2);
+      final target = locators.firstWhere((l) => l.current.id == 'id-1');
+
+      target.onChange(lib.Known(id: 'id-1', description: 'Release One Updated'));
+      await tester.pump();
+
+      final updated = tester.widgetList<lib.KnownMediaLocator>(find.byType(lib.KnownMediaLocator)).toList();
+      expect(updated.length, 2);
+      expect(updated.firstWhere((l) => l.current.id == 'id-1').current.description, 'Release One Updated');
+      expect(updated.firstWhere((l) => l.current.id == 'id-2').current.description, 'Release Two');
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('onChange removes the item from the list when given null', (tester) async {
+      await tester.pumpApp(NewReleases(mimex.video, latest: _withItems), isolatecache: true);
+      await tester.pumpAndSettle();
+
+      final locators = tester.widgetList<lib.KnownMediaLocator>(find.byType(lib.KnownMediaLocator)).toList();
+      expect(locators.length, 2);
+      final target = locators.firstWhere((l) => l.current.id == 'id-1');
+
+      target.onChange(null);
+      await tester.pump();
+
+      final remaining = tester.widgetList<lib.KnownMediaLocator>(find.byType(lib.KnownMediaLocator)).toList();
+      expect(remaining.length, 1);
+      expect(remaining.single.current.id, 'id-2');
+      expect(tester.takeException(), isNull);
     });
 
     testWidgets('displays empty state after loading', (tester) async {

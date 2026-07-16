@@ -99,7 +99,7 @@ class _RecommendationsState extends State<Recommendations> {
                 return httpx
                     .withRetry(
                       () => lib.recommendations.random(
-                        lib.RecommendationsRequest(
+                        lib.RecommendationSearchRequest(
                           mimetype: widget.mimetype,
                           language: langcodex.locale().languageCode,
                           adult: false,
@@ -120,7 +120,7 @@ class _RecommendationsState extends State<Recommendations> {
         constraints: BoxConstraints.tightForFinite(height: 256),
         background: ds.Repeat(() => lib.KnownMediaCard(lib.Known(), icon: null)),
         empty: Text(
-          'Content partnerships pending',
+          'check back later',
           style: TextStyle(color: Colors.grey),
         ),
         items: _items
@@ -129,6 +129,37 @@ class _RecommendationsState extends State<Recommendations> {
                 item,
                 icon: Icons.download,
                 help: lib.KnownMediaDisplay.hintRecommendations,
+                onChange: (v) {
+                  final upd = ds.fnOnChange(_items, v, (o) => o.id == item.id);
+                  setState(() {
+                    _items = upd;
+                  });
+                },
+                trailing: Row(
+                  children: [
+                    Spacer(),
+                    ds.LoadingIconButton.info(
+                      iconSize: 18.0,
+                      onPressed: () => ds.asyncfn<void>(
+                        context,
+                        (completion) {
+                          return ds.Confirmation.info(
+                            padding: EdgeInsets.zero,
+                            content: LayoutBuilder(
+                              builder: (context, constraints) => lib.KnownMediaCard(
+                                item,
+                                constraints: BoxConstraints(
+                                  maxWidth: constraints.maxWidth < 512 ? constraints.maxWidth * 0.8 : 512,
+                                ),
+                              ),
+                            ),
+                            done: completion.complete,
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
               ),
             )
             .toList(),

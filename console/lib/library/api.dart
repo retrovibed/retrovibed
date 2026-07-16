@@ -26,8 +26,8 @@ typedef FnKnownLatest =
     });
 
 typedef FnRecommendations =
-    Future<RecommendationsResponse> Function(
-      RecommendationsRequest req, {
+    Future<RecommendationSearchResponse> Function(
+      RecommendationSearchRequest req, {
       List<httpx.Option> options,
     });
 
@@ -233,7 +233,7 @@ abstract class known {
 }
 
 abstract class recommendations {
-  static RecommendationsRequest request({
+  static RecommendationSearchRequest request({
     String mimetype = "",
     String language = "",
     bool adult = false,
@@ -241,13 +241,14 @@ abstract class recommendations {
     timex.Range? created,
   }) {
     created = created ?? timex.Range.latest(Duration(days: 30));
-    return RecommendationsRequest(mimetype: mimetype, language: language, adult: adult, limit: ds.Int64(limit));
+    return RecommendationSearchRequest(mimetype: mimetype, language: language, adult: adult, limit: ds.Int64(limit));
   }
 
-  static RecommendationsResponse response({RecommendationsRequest? next}) => RecommendationsResponse(items: []);
+  static RecommendationSearchResponse response({RecommendationSearchRequest? next}) =>
+      RecommendationSearchResponse(items: []);
 
-  static Future<RecommendationsResponse> latest(
-    RecommendationsRequest req, {
+  static Future<RecommendationSearchResponse> latest(
+    RecommendationSearchRequest req, {
     List<httpx.Option> options = const [],
   }) async {
     return httpx
@@ -261,13 +262,13 @@ abstract class recommendations {
         )
         .then((v) {
           return Future.value(
-            RecommendationsResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            RecommendationSearchResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
           );
         });
   }
 
   static Future<void> random(
-    RecommendationsRequest req, {
+    RecommendationSearchRequest req, {
     List<httpx.Option> options = const [],
   }) async {
     return httpx
@@ -284,18 +285,60 @@ abstract class recommendations {
         });
   }
 
-  static Future<RecommendationsResponse> refresh({
+  static Future<RecommendationFindResponse> find(
+    String id, {
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx.get(Uri.https(httpx.host(), "/r/${id}", {}), options: options).then((v) {
+      return Future.value(
+        RecommendationFindResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+      );
+    });
+  }
+
+  static Future<RecommendationFindResponse> content(
+    String id, {
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx.get(Uri.https(httpx.host(), "/r/content/${id}", {}), options: options).then((v) {
+      return Future.value(
+        RecommendationFindResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+      );
+    });
+  }
+
+  static Future<RecommendationDeleteResponse> delete(
+    String id, {
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx
+        .delete(
+          Uri.https(
+            httpx.host(),
+            "/r/${id}",
+          ),
+          options: [httpx.Content.json, httpx.Accept.json, ...options],
+          body: jsonEncode(RecommendationDeleteRequest().toProto3Json()),
+        )
+        .then((v) {
+          return Future.value(
+            RecommendationDeleteResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+          );
+        });
+  }
+
+  static Future<RecommendationSearchResponse> refresh({
     List<httpx.Option> options = const [],
   }) {
     return httpx
         .post(
           Uri.https(httpx.host(), "/r/"),
           options: options,
-          body: jsonEncode(RecommendationsResponse.create().toProto3Json()),
+          body: jsonEncode(RecommendationSearchResponse.create().toProto3Json()),
         )
         .then((v) {
           return Future.value(
-            RecommendationsResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            RecommendationSearchResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
           );
         });
   }

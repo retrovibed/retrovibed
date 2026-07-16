@@ -7,30 +7,30 @@ import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
 
-Future<lib.RecommendationsResponse> _notimplemented(
-  lib.RecommendationsRequest req, {
+Future<lib.RecommendationSearchResponse> _notimplemented(
+  lib.RecommendationSearchRequest req, {
   List<httpx.Option> options = const [],
 }) =>
     Future.error(http.Response('', 501));
 
-Future<lib.RecommendationsResponse> _unauthorized(
-  lib.RecommendationsRequest req, {
+Future<lib.RecommendationSearchResponse> _unauthorized(
+  lib.RecommendationSearchRequest req, {
   List<httpx.Option> options = const [],
 }) =>
     Future.error(http.Response('', 401));
 
-Future<lib.RecommendationsResponse> _empty(
-  lib.RecommendationsRequest req, {
+Future<lib.RecommendationSearchResponse> _empty(
+  lib.RecommendationSearchRequest req, {
   List<httpx.Option> options = const [],
 }) =>
-    Future.value(lib.RecommendationsResponse(items: []));
+    Future.value(lib.RecommendationSearchResponse(items: []));
 
-Future<lib.RecommendationsResponse> _withItems(
-  lib.RecommendationsRequest req, {
+Future<lib.RecommendationSearchResponse> _withItems(
+  lib.RecommendationSearchRequest req, {
   List<httpx.Option> options = const [],
 }) =>
     Future.value(
-      lib.RecommendationsResponse(
+      lib.RecommendationSearchResponse(
         items: [
           lib.Known(id: 'id-1', description: 'Recommendation One'),
           lib.Known(id: 'id-2', description: 'Recommendation Two'),

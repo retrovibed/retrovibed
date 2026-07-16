@@ -107,6 +107,14 @@ class _NewReleasesState extends State<NewReleases> {
               k,
               icon: Icons.download,
               help: lib.KnownMediaDisplay.hintReleases,
+              onChange: (v) {
+                setState(() {
+                  _result = lib.KnownLatestResponse(
+                    next: _result.next,
+                    items: ds.fnOnChange(_result.items, v, (o) => o.id == k.id),
+                  );
+                });
+              },
             ),
           )
           .toList(),

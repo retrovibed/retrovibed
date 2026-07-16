@@ -207,7 +207,7 @@ class _ListDisplay extends State<ListDisplay> {
           onTap: onTap,
           onChange: (upd) {
             final updated = api.WireguardSearchResponse(
-              items: _res.items.map((wg) => wg.id == upd.id ? upd : wg),
+              items: ds.fnOnChange(_res.items, upd, (wg) => wg.id == upd.id),
               next: _res.next,
             );
 
@@ -217,7 +217,7 @@ class _ListDisplay extends State<ListDisplay> {
           },
           onDelete: (deleted) {
             final updated = api.WireguardSearchResponse(
-              items: _res.items.where((wg) => wg.id != deleted.id),
+              items: ds.fnOnChange(_res.items, null, (wg) => wg.id == deleted.id),
               next: _res.next,
             );
             setState(() {
