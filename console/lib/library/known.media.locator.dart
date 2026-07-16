@@ -31,6 +31,43 @@ class KnownMediaLocator extends StatefulWidget {
     this.trailing = ds.Empty,
   });
 
+  static Widget future(
+    Future<api.Known> pending, {
+    Key? key,
+    void Function(api.Known? v) onChange = ds.fnNoop,
+    Future<bool> Function(BuildContext context, {List<httpx.Option> options}) ensureP2P = disc.ensureP2P,
+    Future<api.LocateCreateResponse> Function(api.Locate req, {List<httpx.Option> options}) locate = api.locate.create,
+    Future<ddisc.DiscoveryDownloadResponse> Function(String id, {List<httpx.Option> options}) download = ddisc.api.download,
+    Future<api.RecommendationDeleteResponse> Function(String id, {List<httpx.Option> options}) delete = api.recommendations.delete,
+    IconData icon = Icons.download_rounded,
+    Widget help = ds.HelpScope.None,
+    Widget trailing = ds.Empty,
+  }) {
+    return FutureBuilder<api.Known>(
+      future: pending,
+      builder: (context, snapshot) {
+        return ds.Loading(
+          loading: !(snapshot.hasData || snapshot.hasError),
+          cause: ds.Error.maybeErr(snapshot.error),
+          snapshot.data == null
+              ? const SizedBox()
+              : KnownMediaLocator(
+                  snapshot.data!,
+                  key: key,
+                  onChange: onChange,
+                  ensureP2P: ensureP2P,
+                  locate: locate,
+                  download: download,
+                  delete: delete,
+                  icon: icon,
+                  help: help,
+                  trailing: trailing,
+                ),
+        );
+      },
+    );
+  }
+
   @override
   State<StatefulWidget> createState() => _KnownMediaLocator();
 }

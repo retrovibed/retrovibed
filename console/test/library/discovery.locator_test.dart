@@ -11,7 +11,7 @@ void main() {
   group('DiscoveryLocator', () {
     testWidgets('renders nothing when the query is blank', (tester) async {
       await tester.pumpApp(
-        DiscoveryLocator(query: '  ', mimetype: 'video'),
+        DiscoveryLocator(query: '  ', mimetype: 'video', onFound: (located) => const SizedBox.shrink()),
       );
       await tester.pumpAndSettle();
       expect(find.byType(ds.Card), findsNothing);
@@ -20,7 +20,7 @@ void main() {
 
     testWidgets('renders without overflow', (tester) async {
       await tester.pumpApp(
-        DiscoveryLocator(query: 'ubuntu', mimetype: 'video'),
+        DiscoveryLocator(query: 'ubuntu', mimetype: 'video', onFound: (located) => const SizedBox.shrink()),
       );
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
@@ -32,6 +32,7 @@ void main() {
         DiscoveryLocator(
           query: 'ubuntu',
           mimetype: 'video',
+          onFound: (located) => const SizedBox.shrink(),
           ensureP2P: (context, {options = const []}) async => false,
           locate: (req, {options = const []}) async {
             locateCalled = true;
@@ -54,6 +55,7 @@ void main() {
         DiscoveryLocator(
           query: 'ubuntu',
           mimetype: 'video',
+          onFound: (located) => const SizedBox.shrink(),
           ensureP2P: (context, {options = const []}) async => true,
           locate: (req, {options = const []}) async {
             requested = req;
@@ -77,6 +79,7 @@ void main() {
         DiscoveryLocator(
           query: 'ubuntu',
           mimetype: 'video',
+          onFound: (located) => const SizedBox.shrink(),
           ensureP2P: (context, {options = const []}) async => true,
           locate: (req, {options = const []}) => Future.error('boom'),
         ),
@@ -94,6 +97,7 @@ void main() {
         DiscoveryLocator(
           query: 'ubuntu',
           mimetype: 'video',
+          onFound: (located) => const SizedBox.shrink(),
           ensureP2P: (context, {options = const []}) async => true,
           locate: (req, {options = const []}) async => api.LocateCreateResponse(locate: (req..id = 'locate-1')),
           lookup: (id, {options = const []}) async {
@@ -121,12 +125,19 @@ void main() {
 
     testWidgets('stops polling and shows the found media with a download action once located', (tester) async {
       int lookupCalls = 0;
-      String? requestedContentId;
+      api.Locate? foundWith;
       final found = api.Known(id: 'rec-1', uid: 'torrent-1', description: 'Ubuntu', summary: 'summary');
       await tester.pumpApp(
         DiscoveryLocator(
           query: 'ubuntu',
           mimetype: 'video',
+          onFound: (located) {
+            foundWith = located;
+            return ConstrainedBox(
+              constraints: BoxConstraints.tightForFinite(height: 256),
+              child: KnownMediaLocator.future(Future.value(found)),
+            );
+          },
           ensureP2P: (context, {options = const []}) async => true,
           locate: (req, {options = const []}) async => api.LocateCreateResponse(locate: (req..id = 'locate-1')),
           lookup: (id, {options = const []}) async {
@@ -134,10 +145,6 @@ void main() {
             return api.LocateLookupResponse(
               locate: api.Locate(id: id, locatedTorrentId: lookupCalls >= 2 ? 'torrent-1' : ''),
             );
-          },
-          content: (id, {options = const []}) async {
-            requestedContentId = id;
-            return api.RecommendationFindResponse(recommendation: found);
           },
         ),
       );
@@ -154,7 +161,7 @@ void main() {
       await tester.pump();
       await tester.pumpAndSettle();
       expect(lookupCalls, equals(2));
-      expect(requestedContentId, equals('torrent-1'));
+      expect(foundWith?.locatedTorrentId, equals('torrent-1'));
       expect(find.byType(KnownMediaLocator), findsOneWidget);
       expect(find.byType(KnownMediaCard), findsOneWidget);
       expect(find.text('found — added to recommendations'), findsNothing);
@@ -167,22 +174,18 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('a failed content lookup is handled internally and polling retries', (tester) async {
+    testWidgets('polling stops once found even if onFound renders an error state', (tester) async {
       int lookupCalls = 0;
-      int findCalls = 0;
       await tester.pumpApp(
         DiscoveryLocator(
           query: 'ubuntu',
           mimetype: 'video',
+          onFound: (located) => Text('failed to load ${located.locatedTorrentId}'),
           ensureP2P: (context, {options = const []}) async => true,
           locate: (req, {options = const []}) async => api.LocateCreateResponse(locate: (req..id = 'locate-1')),
           lookup: (id, {options = const []}) async {
             lookupCalls++;
             return api.LocateLookupResponse(locate: api.Locate(id: id, locatedTorrentId: 'torrent-1'));
-          },
-          content: (id, {options = const []}) {
-            findCalls++;
-            return Future.error('boom');
           },
         ),
       );
@@ -192,14 +195,12 @@ void main() {
 
       await tester.pump(const Duration(seconds: 10));
       await tester.pump();
-      expect(findCalls, equals(1));
-      expect(find.byType(KnownMediaLocator), findsNothing);
-      expect(find.byIcon(Icons.query_builder_rounded), findsOneWidget);
+      expect(lookupCalls, equals(1));
+      expect(find.text('failed to load torrent-1'), findsOneWidget);
 
       await tester.pump(const Duration(seconds: 10));
       await tester.pump();
-      expect(lookupCalls, equals(2), reason: 'polling should retry after a failed findByContentId');
-      expect(findCalls, equals(2));
+      expect(lookupCalls, equals(1), reason: 'polling should stop once found, regardless of onFound content');
 
       expect(tester.takeException(), isNull);
     });
@@ -210,6 +211,7 @@ void main() {
         DiscoveryLocator(
           query: 'ubuntu',
           mimetype: 'video',
+          onFound: (located) => const SizedBox.shrink(),
           ensureP2P: (context, {options = const []}) async => true,
           locate: (req, {options = const []}) async => api.LocateCreateResponse(locate: (req..id = 'locate-1')),
           lookup: (id, {options = const []}) {

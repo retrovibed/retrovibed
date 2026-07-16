@@ -19,6 +19,16 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
+    testWidgets('future factory renders without overflow', (tester) async {
+      await tester.pumpApp(
+        KnownMediaLocator.future(
+          Future.value(api.Known(description: 'Test', summary: 'summary')),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('tapping calls locate with the knownMediaId', (tester) async {
       api.Locate? requested;
       final item = api.Known(id: 'row-1', uid: 'known-1', description: 'Test', summary: 'summary');

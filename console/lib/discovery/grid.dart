@@ -8,6 +8,8 @@ import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'package:retrovibed/langcodex.dart' as langcodex;
 import 'package:retrovibed/library/api.dart' as api;
 import 'package:retrovibed/library/known.media.download.list.dart';
+import 'package:retrovibed/library/known.media.locator.dart';
+import 'package:retrovibed/library/known.media.card.dart';
 import 'package:retrovibed/library/discovery.locator.dart';
 
 class DiscoveryGrid extends StatefulWidget {
@@ -102,6 +104,15 @@ class _DiscoveryGridState extends State<DiscoveryGrid> {
                   key: ValueKey("library.disc.locator.${uuidx.md5x(state.next.query.trim())}"),
                   query: state.next.query.trim(),
                   mimetype: category,
+                  onFound: (located) => ConstrainedBox(
+                    constraints: BoxConstraints.tightForFinite(height: 256),
+                    child: KnownMediaLocator.future(
+                      api.recommendations
+                          .content(located.locatedTorrentId, options: [authn.request(authn.AuthzCache.meta(context))])
+                          .then((r) => r.recommendation),
+                      help: KnownMediaCard.hint,
+                    ),
+                  ),
                 ),
               ],
             ),

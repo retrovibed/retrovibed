@@ -4,8 +4,6 @@ import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/discovery.dart' as disc;
 import './api.dart' as api;
-import './known.media.locator.dart';
-import './known.media.card.dart';
 
 // DiscoveryLocator offers to search the wider p2p network for query/mimetype
 // when neither the local library nor the catalog (library.Known) have a
@@ -17,17 +15,17 @@ class DiscoveryLocator extends StatefulWidget {
   final Future<api.LocateCreateResponse> Function(api.Locate req, {List<httpx.Option> options}) locate;
   final Future<api.LocateLookupResponse> Function(String id, {List<httpx.Option> options}) lookup;
   final Future<bool> Function(BuildContext context, {List<httpx.Option> options}) ensureP2P;
-  final Future<api.RecommendationFindResponse> Function(String id, {List<httpx.Option> options}) content;
+  final Widget Function(api.Locate located) onFound;
   final Widget help;
 
   const DiscoveryLocator({
     super.key,
     required this.query,
     required this.mimetype,
+    required this.onFound,
     this.locate = api.locate.create,
     this.lookup = api.locate.get,
     this.ensureP2P = disc.ensureP2P,
-    this.content = api.recommendations.content,
     this.help = const ds.Hint(
       Text(
         "searches the peer-to-peer network and your search plugins for this title. "
@@ -47,7 +45,7 @@ class _DiscoveryLocator extends State<DiscoveryLocator> {
   String _locateId = '';
   Duration _interval = Duration.zero;
   Widget _cause = ds.Error.zero;
-  api.Known? _found;
+  api.Locate? _located;
 
   void setState(VoidCallback fn) {
     if (!mounted) return;
@@ -112,14 +110,12 @@ class _DiscoveryLocator extends State<DiscoveryLocator> {
             return false;
           }
 
-          return widget.content(v.locate.locatedTorrentId, options: options).then((r) {
-            setState(() {
-              _state = _LocateState.found;
-              _interval = Duration.zero;
-              _found = r.recommendation;
-            });
-            return true;
+          setState(() {
+            _state = _LocateState.found;
+            _interval = Duration.zero;
+            _located = v.locate;
           });
+          return true;
         })
         .catchError((e) {
           debugPrint('$e');
@@ -151,19 +147,7 @@ class _DiscoveryLocator extends State<DiscoveryLocator> {
 
     final content = switch (_state) {
       _LocateState.found =>
-        _found == null
-            ? Icon(icon, size: 48, color: iconColor)
-            : LayoutBuilder(
-                builder: (context, constraints) => ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxWidth: constraints.maxWidth < 512 ? constraints.maxWidth * 0.8 : 512,
-                  ),
-                  child: KnownMediaLocator(
-                    _found!,
-                    help: KnownMediaCard.hint,
-                  ),
-                ),
-              ),
+        _located == null ? Icon(icon, size: 48, color: iconColor) : widget.onFound(_located!),
       _ => Icon(icon, size: 48, color: iconColor),
     };
 
