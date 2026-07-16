@@ -133,7 +133,7 @@ func TestMediaLocateJSONL(t *testing.T) {
 		require.Equal(t, 0, sqltestx.Count(t, q, "SELECT COUNT(*) FROM ddisc_locate"))
 	})
 
-	t.Run("surfaces an error on a blank mimetype without hanging", func(t *testing.T) {
+	t.Run("skips a locate request with a blank mimetype without hanging", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 
@@ -147,13 +147,13 @@ func TestMediaLocateJSONL(t *testing.T) {
 		var buf bytes.Buffer
 		require.NoError(t, jsonl.NewEncoder(&buf).Encode(known))
 
-		// a blank mimetype is a permanent failure (rejected by the server's
-		// CHECK (mimetype <> '') constraint), but backoffx.AttemptV bounds
-		// retries to 5 attempts, so this should fail fast rather than hang.
+		// a blank mimetype is skipped up front rather than submitted to the
+		// server, so this should return immediately rather than hang.
 		bctx, bcancel := context.WithTimeout(ctx, 10*time.Second)
 		defer bcancel()
 
 		err := cmd.run(bctx, newLocateServer(t, q), "library.invalid", &buf)
-		require.Error(t, err)
+		require.NoError(t, err)
+		require.Equal(t, 0, sqltestx.Count(t, q, "SELECT COUNT(*) FROM ddisc_locate"))
 	})
 }

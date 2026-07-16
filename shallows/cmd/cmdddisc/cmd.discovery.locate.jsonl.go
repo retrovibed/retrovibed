@@ -16,6 +16,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/backoffx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
+	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 )
 
@@ -39,6 +40,11 @@ func (t cmdMediaLocateJSONL) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, i
 
 func (t cmdMediaLocateJSONL) run(ctx context.Context, c *http.Client, endpoint string, r io.Reader) error {
 	inserts := asynccompute.New(func(ctx context.Context, v library.Known) (err error) {
+		if stringsx.Blank(v.Mimetype) {
+			log.Println("skipping locate request, missing mimetype", v.UID, v.Title)
+			return nil
+		}
+
 		bs := backoffx.New(
 			backoffx.Constant(time.Second),
 			backoffx.JitterRandom(200*time.Millisecond),
