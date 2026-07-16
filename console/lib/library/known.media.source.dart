@@ -43,8 +43,8 @@ class KnownMediaSource extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (uuidx.prefix(tmdb, current.id)) return SvgPicture.string(tmdbicon, height: height, width: width);
-    if (uuidx.prefix(musicbrainz, current.id)) return SvgPicture.string(musicbrainzicon, height: height, width: width);
+    if (uuidx.prefix(tmdb, current.uid)) return SvgPicture.string(tmdbicon, height: height, width: width);
+    if (uuidx.prefix(musicbrainz, current.uid)) return SvgPicture.string(musicbrainzicon, height: height, width: width);
     // print("source ${current.id.length} ${current.id} - ${current}");
     return ds.Empty;
   }

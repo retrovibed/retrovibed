@@ -60,6 +60,6 @@ func TestKnownFind(t *testing.T) {
 
 	require.Equal(t, http.StatusOK, resp.Result().StatusCode)
 	require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
-	require.Equal(t, known.UID, result.Known.Id)
+	require.Equal(t, known.UID, result.Known.Uid)
 	require.Equal(t, grpcx.EncodeTime(known.Released), result.Known.Released)
 }

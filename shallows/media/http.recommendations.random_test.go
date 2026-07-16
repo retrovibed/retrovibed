@@ -248,7 +248,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 		require.Len(t, result.Items, 1)
-		require.Equal(t, en.UID, result.Items[0].Id)
+		require.Equal(t, en.UID, result.Items[0].Uid)
 	})
 
 	t.Run("returns adult content when requested", func(t *testing.T) {
@@ -290,7 +290,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 		require.Len(t, result.Items, 1)
-		require.Equal(t, known.UID, result.Items[0].Id)
+		require.Equal(t, known.UID, result.Items[0].Uid)
 		require.True(t, result.Items[0].Adult)
 	})
 
@@ -332,7 +332,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 		require.Len(t, result.Items, 1)
-		require.Equal(t, known.UID, result.Items[0].Id)
+		require.Equal(t, known.UID, result.Items[0].Uid)
 	})
 
 	t.Run("returns known media with description and image", func(t *testing.T) {
@@ -414,7 +414,7 @@ func TestRecommendationsRandom(t *testing.T) {
 		var result media.RecommendationSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
-		require.Equal(t, known.UID, result.Items[0].Id)
+		require.Equal(t, known.UID, result.Items[0].Uid)
 	})
 
 	t.Run("empty database returns 404", func(t *testing.T) {

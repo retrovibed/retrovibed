@@ -74,7 +74,7 @@ class _KnownMediaLocator extends State<KnownMediaLocator> {
               return httpx.withRetry(
                 () => widget
                     .download(
-                      widget.current.id,
+                      widget.current.uid,
                       options: options,
                     )
                     .then((v) {
@@ -95,7 +95,7 @@ class _KnownMediaLocator extends State<KnownMediaLocator> {
                 () => widget
                     .locate(
                       api.Locate.create()
-                        ..knownMediaId = widget.current.id
+                        ..knownMediaId = widget.current.uid
                         ..mimetype = widget.current.mimetype,
                       options: options,
                     )

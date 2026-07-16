@@ -128,7 +128,7 @@ class _PublishMetadataState extends State<PublishMetadata> {
     });
 
     final authOptions = [authn.request(authn.AuthzCache.meta(context))];
-    final updatedMedia = widget.download!.media..knownMediaId = known.id;
+    final updatedMedia = widget.download!.media..knownMediaId = known.uid;
 
     httpx
         .withRetry(

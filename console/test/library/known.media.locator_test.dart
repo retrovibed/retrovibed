@@ -21,7 +21,7 @@ void main() {
 
     testWidgets('tapping calls locate with the knownMediaId', (tester) async {
       api.Locate? requested;
-      final item = api.Known(id: 'known-1', description: 'Test', summary: 'summary');
+      final item = api.Known(id: 'row-1', uid: 'known-1', description: 'Test', summary: 'summary');
       await tester.pumpApp(
         KnownMediaLocator(
           item,
@@ -36,7 +36,7 @@ void main() {
       await tester.tap(find.byType(KnownMediaCard));
       await tester.pumpAndSettle();
 
-      expect(requested?.knownMediaId, equals(item.id));
+      expect(requested?.knownMediaId, equals(item.uid));
     });
 
     testWidgets('a failed locate is handled internally', (tester) async {

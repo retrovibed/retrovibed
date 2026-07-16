@@ -59,7 +59,7 @@ func TestRecommendationsDelete(t *testing.T) {
 
 		var result media.RecommendationDeleteResponse
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
-		require.Equal(t, known.UID, result.Recommendation.Id)
+		require.Equal(t, known.UID, result.Recommendation.Uid)
 
 		require.Error(t, library.RecommendationFindByID(ctx, q, rec.ID).Scan(&rec))
 	})

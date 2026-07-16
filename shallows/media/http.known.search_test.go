@@ -221,7 +221,7 @@ func TestKnownSearch(t *testing.T) {
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 		require.Len(t, result.Items, 1)
-		require.Equal(t, match.UID, result.Items[0].Id)
+		require.Equal(t, match.UID, result.Items[0].Uid)
 	})
 
 	t.Run("filters by released range", func(t *testing.T) {
@@ -273,7 +273,7 @@ func TestKnownSearch(t *testing.T) {
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 		require.Len(t, result.Items, 1)
-		require.Equal(t, inrange.UID, result.Items[0].Id)
+		require.Equal(t, inrange.UID, result.Items[0].Uid)
 		require.Equal(t, grpcx.EncodeTime(inrange.Released), result.Items[0].Released)
 	})
 

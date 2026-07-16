@@ -33,6 +33,7 @@ type Known struct {
 	Released      string                 `protobuf:"bytes,7,opt,name=released,proto3" json:"released,omitempty"`
 	Mimetype      string                 `protobuf:"bytes,8,opt,name=mimetype,proto3" json:"mimetype,omitempty"`
 	Source        string                 `protobuf:"bytes,9,opt,name=source,proto3" json:"source,omitempty"`
+	Uid           string                 `protobuf:"bytes,10,opt,name=uid,proto3" json:"uid,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -126,6 +127,13 @@ func (x *Known) GetMimetype() string {
 func (x *Known) GetSource() string {
 	if x != nil {
 		return x.Source
+	}
+	return ""
+}
+
+func (x *Known) GetUid() string {
+	if x != nil {
+		return x.Uid
 	}
 	return ""
 }
@@ -1026,7 +1034,7 @@ var File_media_known_proto protoreflect.FileDescriptor
 
 const file_media_known_proto_rawDesc = "" +
 	"\n" +
-	"\x11media.known.proto\x12\x05media\x1a\x11meta.search.proto\"\xe7\x01\n" +
+	"\x11media.known.proto\x12\x05media\x1a\x11meta.search.proto\"\xf9\x01\n" +
 	"\x05Known\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x16\n" +
 	"\x06rating\x18\x02 \x01(\x02R\x06rating\x12\x14\n" +
@@ -1036,7 +1044,9 @@ const file_media_known_proto_rawDesc = "" +
 	"\x05image\x18\x06 \x01(\tR\x05image\x12\x1a\n" +
 	"\breleased\x18\a \x01(\tR\breleased\x12\x1a\n" +
 	"\bmimetype\x18\b \x01(\tR\bmimetype\x12\x16\n" +
-	"\x06source\x18\t \x01(\tR\x06source\"\x8c\x02\n" +
+	"\x06source\x18\t \x01(\tR\x06source\x12\x10\n" +
+	"\x03uid\x18\n" +
+	" \x01(\tR\x03uid\"\x8c\x02\n" +
 	"\x12KnownSearchRequest\x12\x14\n" +
 	"\x05query\x18\x01 \x01(\tR\x05query\x12\x14\n" +
 	"\x05adult\x18\x02 \x01(\bR\x05adult\x12\x1a\n" +

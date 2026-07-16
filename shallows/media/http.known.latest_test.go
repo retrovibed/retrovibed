@@ -333,7 +333,7 @@ func TestKnownLatest(t *testing.T) {
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 		require.Len(t, result.Items, 1)
-		require.Equal(t, match.UID, result.Items[0].Id)
+		require.Equal(t, match.UID, result.Items[0].Uid)
 	})
 
 	t.Run("order by released date", func(t *testing.T) {
@@ -388,11 +388,11 @@ func TestKnownLatest(t *testing.T) {
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 		require.Len(t, result.Items, 3)
-		require.Equal(t, newest.UID, result.Items[0].Id)
+		require.Equal(t, newest.UID, result.Items[0].Uid)
 		require.Equal(t, grpcx.EncodeTime(newest.Released), result.Items[0].Released)
-		require.Equal(t, middle.UID, result.Items[1].Id)
+		require.Equal(t, middle.UID, result.Items[1].Uid)
 		require.Equal(t, grpcx.EncodeTime(middle.Released), result.Items[1].Released)
-		require.Equal(t, oldest.UID, result.Items[2].Id)
+		require.Equal(t, oldest.UID, result.Items[2].Uid)
 		require.Equal(t, grpcx.EncodeTime(oldest.Released), result.Items[2].Released)
 	})
 }

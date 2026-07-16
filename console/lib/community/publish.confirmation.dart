@@ -90,7 +90,7 @@ class _PublishConfirmationState extends State<PublishConfirmation> {
 
     _request.publishedContent
       ..communityId = widget.community?.id ?? uuidx.min()
-      ..knownMediaId = widget.knownMedia?.id ?? widget.download!.media.knownMediaId
+      ..knownMediaId = widget.knownMedia?.uid ?? widget.download!.media.knownMediaId
       ..libraryId = widget.download!.media.id;
 
     httpx

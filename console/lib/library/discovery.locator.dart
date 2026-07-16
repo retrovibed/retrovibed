@@ -115,7 +115,7 @@ class _DiscoveryLocator extends State<DiscoveryLocator> {
             trailing: [
               Center(
                 child: Text(
-                  'search the network for less known media',
+                  'search networks for media',
                   textAlign: TextAlign.center,
                 ),
               ),

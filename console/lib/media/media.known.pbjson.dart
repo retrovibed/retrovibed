@@ -28,6 +28,7 @@ const Known$json = {
     {'1': 'released', '3': 7, '4': 1, '5': 9, '10': 'released'},
     {'1': 'mimetype', '3': 8, '4': 1, '5': 9, '10': 'mimetype'},
     {'1': 'source', '3': 9, '4': 1, '5': 9, '10': 'source'},
+    {'1': 'uid', '3': 10, '4': 1, '5': 9, '10': 'uid'},
   ],
 };
 
@@ -37,7 +38,7 @@ final $typed_data.Uint8List knownDescriptor = $convert.base64Decode(
     'QYAyABKAhSBWFkdWx0EiAKC2Rlc2NyaXB0aW9uGAQgASgJUgtkZXNjcmlwdGlvbhIYCgdzdW1t'
     'YXJ5GAUgASgJUgdzdW1tYXJ5EhQKBWltYWdlGAYgASgJUgVpbWFnZRIaCghyZWxlYXNlZBgHIA'
     'EoCVIIcmVsZWFzZWQSGgoIbWltZXR5cGUYCCABKAlSCG1pbWV0eXBlEhYKBnNvdXJjZRgJIAEo'
-    'CVIGc291cmNl');
+    'CVIGc291cmNlEhAKA3VpZBgKIAEoCVIDdWlk');
 
 @$core.Deprecated('Use knownSearchRequestDescriptor instead')
 const KnownSearchRequest$json = {

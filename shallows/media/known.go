@@ -10,7 +10,8 @@ type KnownOption func(*Known)
 
 func KnownOptionFromLibraryKnown(cc library.Known) KnownOption {
 	return func(c *Known) {
-		c.Id = cc.UID
+		c.Id = cc.ID
+		c.Uid = cc.UID
 		c.Image = stringsx.FirstNonBlank(cc.PosterPath, cc.BackdropPath)
 		c.Rating = float32(cc.Popularity)
 		c.Description = cc.Title
@@ -24,7 +25,8 @@ func KnownOptionFromLibraryKnown(cc library.Known) KnownOption {
 
 func KnownOptionFromRecommendation(cc library.Recommendation) KnownOption {
 	return func(c *Known) {
-		c.Id = cc.ContentID
+		c.Id = cc.ID
+		c.Uid = cc.ContentID
 		c.Image = cc.Image
 		c.Rating = float32(cc.Popularity)
 		c.Description = cc.Title
