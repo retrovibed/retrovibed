@@ -43,7 +43,7 @@ func TestRecommendationsRefresh(t *testing.T) {
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
-		body, err := json.Marshal(&media.RecommendationsSearchRequest{})
+		body, err := json.Marshal(&media.RecommendationSearchRequest{})
 		require.NoError(t, err)
 
 		resp, req, err := httptestx.BuildRequestBytes(
@@ -87,7 +87,7 @@ func TestRecommendationsRefresh(t *testing.T) {
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
-		body, err := json.Marshal(&media.RecommendationsSearchRequest{})
+		body, err := json.Marshal(&media.RecommendationSearchRequest{})
 		require.NoError(t, err)
 
 		for range 3 {
@@ -129,7 +129,7 @@ func TestRecommendationsRefresh(t *testing.T) {
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
-		body, err := json.Marshal(&media.RecommendationsSearchRequest{})
+		body, err := json.Marshal(&media.RecommendationSearchRequest{})
 		require.NoError(t, err)
 
 		resp, req, err := httptestx.BuildRequestBytes(

@@ -77,8 +77,8 @@ func (t *HTTPRecommendations) Bind(r *mux.Router) {
 func (t *HTTPRecommendations) latest(w http.ResponseWriter, r *http.Request) {
 	var (
 		err error
-		msg = RecommendationsSearchResponse{
-			Next: &RecommendationsSearchRequest{
+		msg = RecommendationSearchResponse{
+			Next: &RecommendationSearchRequest{
 				Limit: 100,
 			},
 		}
@@ -141,7 +141,7 @@ func (t *HTTPRecommendations) delete(w http.ResponseWriter, r *http.Request) {
 }
 
 func (t *HTTPRecommendations) random(w http.ResponseWriter, r *http.Request) {
-	var req RecommendationsSearchRequest
+	var req RecommendationSearchRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to decode request"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
@@ -160,8 +160,8 @@ func (t *HTTPRecommendations) random(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tmp := langx.Clone(Known{}, KnownOptionFromRecommendation(langx.Clone(rec, timex.JSONSafeEncodeOption)))
-	if err = httpx.WriteJSON(w, httpx.GetBuffer(r), &RecommendationsSearchResponse{
-		Next:  &RecommendationsSearchRequest{},
+	if err = httpx.WriteJSON(w, httpx.GetBuffer(r), &RecommendationSearchResponse{
+		Next:  &RecommendationSearchRequest{},
 		Items: []*Known{&tmp},
 	}); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to write response"))
@@ -172,7 +172,7 @@ func (t *HTTPRecommendations) random(w http.ResponseWriter, r *http.Request) {
 func (t *HTTPRecommendations) refresh(w http.ResponseWriter, r *http.Request) {
 	var (
 		err error
-		req RecommendationsSearchRequest
+		req RecommendationSearchRequest
 		rec library.Recommendation
 	)
 

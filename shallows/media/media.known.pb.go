@@ -734,7 +734,7 @@ func (x *KnownLatestResponse) GetItems() []*Known {
 	return nil
 }
 
-type RecommendationsSearchRequest struct {
+type RecommendationSearchRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Mimetype      string                 `protobuf:"bytes,1,opt,name=mimetype,proto3" json:"mimetype,omitempty"`
 	Adult         bool                   `protobuf:"varint,2,opt,name=adult,proto3" json:"adult,omitempty"`
@@ -745,20 +745,20 @@ type RecommendationsSearchRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *RecommendationsSearchRequest) Reset() {
-	*x = RecommendationsSearchRequest{}
+func (x *RecommendationSearchRequest) Reset() {
+	*x = RecommendationSearchRequest{}
 	mi := &file_media_known_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *RecommendationsSearchRequest) String() string {
+func (x *RecommendationSearchRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*RecommendationsSearchRequest) ProtoMessage() {}
+func (*RecommendationSearchRequest) ProtoMessage() {}
 
-func (x *RecommendationsSearchRequest) ProtoReflect() protoreflect.Message {
+func (x *RecommendationSearchRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_media_known_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -770,68 +770,68 @@ func (x *RecommendationsSearchRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use RecommendationsSearchRequest.ProtoReflect.Descriptor instead.
-func (*RecommendationsSearchRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use RecommendationSearchRequest.ProtoReflect.Descriptor instead.
+func (*RecommendationSearchRequest) Descriptor() ([]byte, []int) {
 	return file_media_known_proto_rawDescGZIP(), []int{12}
 }
 
-func (x *RecommendationsSearchRequest) GetMimetype() string {
+func (x *RecommendationSearchRequest) GetMimetype() string {
 	if x != nil {
 		return x.Mimetype
 	}
 	return ""
 }
 
-func (x *RecommendationsSearchRequest) GetAdult() bool {
+func (x *RecommendationSearchRequest) GetAdult() bool {
 	if x != nil {
 		return x.Adult
 	}
 	return false
 }
 
-func (x *RecommendationsSearchRequest) GetLanguage() string {
+func (x *RecommendationSearchRequest) GetLanguage() string {
 	if x != nil {
 		return x.Language
 	}
 	return ""
 }
 
-func (x *RecommendationsSearchRequest) GetOffset() uint64 {
+func (x *RecommendationSearchRequest) GetOffset() uint64 {
 	if x != nil {
 		return x.Offset
 	}
 	return 0
 }
 
-func (x *RecommendationsSearchRequest) GetLimit() uint64 {
+func (x *RecommendationSearchRequest) GetLimit() uint64 {
 	if x != nil {
 		return x.Limit
 	}
 	return 0
 }
 
-type RecommendationsSearchResponse struct {
-	state         protoimpl.MessageState        `protogen:"open.v1"`
-	Next          *RecommendationsSearchRequest `protobuf:"bytes,1,opt,name=next,proto3" json:"next,omitempty"`
-	Items         []*Known                      `protobuf:"bytes,2,rep,name=items,proto3" json:"items,omitempty"`
+type RecommendationSearchResponse struct {
+	state         protoimpl.MessageState       `protogen:"open.v1"`
+	Next          *RecommendationSearchRequest `protobuf:"bytes,1,opt,name=next,proto3" json:"next,omitempty"`
+	Items         []*Known                     `protobuf:"bytes,2,rep,name=items,proto3" json:"items,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *RecommendationsSearchResponse) Reset() {
-	*x = RecommendationsSearchResponse{}
+func (x *RecommendationSearchResponse) Reset() {
+	*x = RecommendationSearchResponse{}
 	mi := &file_media_known_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *RecommendationsSearchResponse) String() string {
+func (x *RecommendationSearchResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*RecommendationsSearchResponse) ProtoMessage() {}
+func (*RecommendationSearchResponse) ProtoMessage() {}
 
-func (x *RecommendationsSearchResponse) ProtoReflect() protoreflect.Message {
+func (x *RecommendationSearchResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_media_known_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -843,19 +843,19 @@ func (x *RecommendationsSearchResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use RecommendationsSearchResponse.ProtoReflect.Descriptor instead.
-func (*RecommendationsSearchResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use RecommendationSearchResponse.ProtoReflect.Descriptor instead.
+func (*RecommendationSearchResponse) Descriptor() ([]byte, []int) {
 	return file_media_known_proto_rawDescGZIP(), []int{13}
 }
 
-func (x *RecommendationsSearchResponse) GetNext() *RecommendationsSearchRequest {
+func (x *RecommendationSearchResponse) GetNext() *RecommendationSearchRequest {
 	if x != nil {
 		return x.Next
 	}
 	return nil
 }
 
-func (x *RecommendationsSearchResponse) GetItems() []*Known {
+func (x *RecommendationSearchResponse) GetItems() []*Known {
 	if x != nil {
 		return x.Items
 	}
@@ -1073,15 +1073,15 @@ const file_media_known_proto_rawDesc = "" +
 	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\a\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"h\n" +
 	"\x13KnownLatestResponse\x12-\n" +
 	"\x04next\x18\x01 \x01(\v2\x19.media.KnownLatestRequestR\x04next\x12\"\n" +
-	"\x05items\x18\x02 \x03(\v2\f.media.KnownR\x05items\"\xab\x01\n" +
-	"\x1cRecommendationsSearchRequest\x12\x1a\n" +
+	"\x05items\x18\x02 \x03(\v2\f.media.KnownR\x05items\"\xaa\x01\n" +
+	"\x1bRecommendationSearchRequest\x12\x1a\n" +
 	"\bmimetype\x18\x01 \x01(\tR\bmimetype\x12\x14\n" +
 	"\x05adult\x18\x02 \x01(\bR\x05adult\x12\x1a\n" +
 	"\blanguage\x18\x03 \x01(\tR\blanguage\x12\x17\n" +
 	"\x06offset\x18\x84\a \x01(\x04R\x06offset\x12\x15\n" +
-	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\x04\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"|\n" +
-	"\x1dRecommendationsSearchResponse\x127\n" +
-	"\x04next\x18\x01 \x01(\v2#.media.RecommendationsSearchRequestR\x04next\x12\"\n" +
+	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\x04\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"z\n" +
+	"\x1cRecommendationSearchResponse\x126\n" +
+	"\x04next\x18\x01 \x01(\v2\".media.RecommendationSearchRequestR\x04next\x12\"\n" +
 	"\x05items\x18\x02 \x03(\v2\f.media.KnownR\x05items\"\x1d\n" +
 	"\x1bRecommendationDeleteRequest\"S\n" +
 	"\x1cRecommendationDeleteResponse\x123\n" +
@@ -1116,8 +1116,8 @@ var file_media_known_proto_goTypes = []any{
 	(*KnownCreateResponse)(nil),           // 9: media.KnownCreateResponse
 	(*KnownLatestRequest)(nil),            // 10: media.KnownLatestRequest
 	(*KnownLatestResponse)(nil),           // 11: media.KnownLatestResponse
-	(*RecommendationsSearchRequest)(nil),  // 12: media.RecommendationsSearchRequest
-	(*RecommendationsSearchResponse)(nil), // 13: media.RecommendationsSearchResponse
+	(*RecommendationSearchRequest)(nil),   // 12: media.RecommendationSearchRequest
+	(*RecommendationSearchResponse)(nil),  // 13: media.RecommendationSearchResponse
 	(*RecommendationDeleteRequest)(nil),   // 14: media.RecommendationDeleteRequest
 	(*RecommendationDeleteResponse)(nil),  // 15: media.RecommendationDeleteResponse
 	(*RecommendationRefreshRequest)(nil),  // 16: media.RecommendationRefreshRequest
@@ -1135,8 +1135,8 @@ var file_media_known_proto_depIdxs = []int32{
 	18, // 7: media.KnownLatestRequest.released:type_name -> meta.DateRange
 	10, // 8: media.KnownLatestResponse.next:type_name -> media.KnownLatestRequest
 	0,  // 9: media.KnownLatestResponse.items:type_name -> media.Known
-	12, // 10: media.RecommendationsSearchResponse.next:type_name -> media.RecommendationsSearchRequest
-	0,  // 11: media.RecommendationsSearchResponse.items:type_name -> media.Known
+	12, // 10: media.RecommendationSearchResponse.next:type_name -> media.RecommendationSearchRequest
+	0,  // 11: media.RecommendationSearchResponse.items:type_name -> media.Known
 	0,  // 12: media.RecommendationDeleteResponse.recommendation:type_name -> media.Known
 	0,  // 13: media.RecommendationRefreshResponse.recommendation:type_name -> media.Known
 	14, // [14:14] is the sub-list for method output_type
