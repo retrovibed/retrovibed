@@ -4,6 +4,8 @@ import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/discovery.dart' as disc;
 import './api.dart' as api;
+import './known.media.locator.dart';
+import './known.media.card.dart';
 
 // DiscoveryLocator offers to search the wider p2p network for query/mimetype
 // when neither the local library nor the catalog (library.Known) have a
@@ -13,6 +15,9 @@ class DiscoveryLocator extends StatefulWidget {
   final String query;
   final String mimetype;
   final Future<api.LocateCreateResponse> Function(api.Locate req, {List<httpx.Option> options}) locate;
+  final Future<api.LocateLookupResponse> Function(String id, {List<httpx.Option> options}) lookup;
+  final Future<bool> Function(BuildContext context, {List<httpx.Option> options}) ensureP2P;
+  final Future<api.RecommendationFindResponse> Function(String id, {List<httpx.Option> options}) content;
   final Widget help;
 
   const DiscoveryLocator({
@@ -20,10 +25,13 @@ class DiscoveryLocator extends StatefulWidget {
     required this.query,
     required this.mimetype,
     this.locate = api.locate.create,
+    this.lookup = api.locate.get,
+    this.ensureP2P = disc.ensureP2P,
+    this.content = api.recommendations.content,
     this.help = const ds.Hint(
       Text(
         "searches the peer-to-peer network and your search plugins for this title. "
-        "when a match is found its added to recommendations.",
+        "once found, you can download it immediately.",
       ),
     ),
   });
@@ -32,10 +40,14 @@ class DiscoveryLocator extends StatefulWidget {
   State<StatefulWidget> createState() => _DiscoveryLocator();
 }
 
+enum _LocateState { idle, loading, pending, found }
+
 class _DiscoveryLocator extends State<DiscoveryLocator> {
-  bool _queued = false;
-  bool _loading = false;
+  _LocateState _state = _LocateState.idle;
+  String _locateId = '';
+  Duration _interval = Duration.zero;
   Widget _cause = ds.Error.zero;
+  api.Known? _found;
 
   void setState(VoidCallback fn) {
     if (!mounted) return;
@@ -50,18 +62,18 @@ class _DiscoveryLocator extends State<DiscoveryLocator> {
 
   void _onTap() async {
     setState(() {
-      _loading = true;
+      _state = _LocateState.loading;
       _cause = ds.Error.zero;
     });
 
     final options = [authn.request(authn.AuthzCache.meta(context))];
 
-    disc
+    widget
         .ensureP2P(context, options: options)
         .then((proceed) {
           if (!proceed) {
             setState(() {
-              _loading = false;
+              _state = _LocateState.idle;
             });
             return null;
           }
@@ -75,17 +87,43 @@ class _DiscoveryLocator extends State<DiscoveryLocator> {
                 options: options,
               )
               .then((v) {
+                _locateId = v.locate.id;
                 setState(() {
-                  _queued = true;
-                  _loading = false;
+                  _state = _LocateState.pending;
+                  _interval = const Duration(seconds: 10);
                 });
               });
         })
         .catchError((e) {
           setState(() {
-            _loading = false;
+            _state = _LocateState.idle;
             _cause = ds.Error.unknown(e, onTap: reseterr);
           });
+        });
+  }
+
+  Future<bool> _checkLocated() {
+    final options = [authn.request(authn.AuthzCache.meta(context))];
+
+    return widget
+        .lookup(_locateId, options: options)
+        .then<bool>((v) {
+          if (v.locate.locatedTorrentId.isEmpty) {
+            return false;
+          }
+
+          return widget.content(v.locate.locatedTorrentId, options: options).then((r) {
+            setState(() {
+              _state = _LocateState.found;
+              _interval = Duration.zero;
+              _found = r.recommendation;
+            });
+            return true;
+          });
+        })
+        .catchError((e) {
+          debugPrint('$e');
+          return false;
         });
   }
 
@@ -97,31 +135,75 @@ class _DiscoveryLocator extends State<DiscoveryLocator> {
       return ds.Empty;
     }
 
-    return ds.Loading(
-      loading: _loading,
-      cause: _cause,
-      Column(
-        children: [
-          ds.Card(
-            margin: defaults.padding.copyWith(bottom: 0, top: 0),
-            Center(
-              child: Icon(
-                _queued ? Icons.query_builder_rounded : Icons.travel_explore_rounded,
-                size: 48,
-              ),
-            ),
-            onTap: _loading || _queued ? null : _onTap,
-            help: widget.help,
-            trailing: [
-              Center(
-                child: Text(
-                  'search networks for media',
-                  textAlign: TextAlign.center,
+    final icon = switch (_state) {
+      _LocateState.idle => Icons.travel_explore_rounded,
+      _LocateState.loading => Icons.travel_explore_rounded,
+      _LocateState.pending => Icons.query_builder_rounded,
+      _LocateState.found => Icons.check_circle_rounded,
+    };
+
+    final iconColor = switch (_state) {
+      _LocateState.idle => null,
+      _LocateState.loading => null,
+      _LocateState.pending => null,
+      _LocateState.found => defaults.success,
+    };
+
+    final content = switch (_state) {
+      _LocateState.found =>
+        _found == null
+            ? Icon(icon, size: 48, color: iconColor)
+            : LayoutBuilder(
+                builder: (context, constraints) => ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: constraints.maxWidth < 512 ? constraints.maxWidth * 0.8 : 512,
+                  ),
+                  child: KnownMediaLocator(
+                    _found!,
+                    help: KnownMediaCard.hint,
+                  ),
                 ),
               ),
-            ],
-          ),
-        ],
+      _ => Icon(icon, size: 48, color: iconColor),
+    };
+
+    final trailingText = switch (_state) {
+      _LocateState.idle => 'search networks for media',
+      _LocateState.loading => 'search networks for media',
+      _LocateState.pending => 'searching networks for media...',
+      _LocateState.found => 'found',
+    };
+
+    final onTap = switch (_state) {
+      _LocateState.idle => _onTap,
+      _LocateState.loading => null,
+      _LocateState.pending => null,
+      _LocateState.found => null,
+    };
+
+    return ds.Loading(
+      loading: _state == _LocateState.loading,
+      cause: _cause,
+      ds.Poll(
+        Column(
+          children: [
+            ds.Card(
+              margin: defaults.padding.copyWith(bottom: 0, top: 0),
+              Center(
+                child: content,
+              ),
+              onTap: onTap,
+              help: widget.help,
+              trailing: [
+                Center(
+                  child: Text(trailingText, textAlign: TextAlign.center),
+                ),
+              ],
+            ),
+          ],
+        ),
+        interval: _interval,
+        onTick: _checkLocated,
       ),
     );
   }

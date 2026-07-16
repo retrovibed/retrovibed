@@ -279,6 +279,36 @@ final $typed_data.Uint8List recommendationSearchResponseDescriptor =
         'NvbW1lbmRhdGlvblNlYXJjaFJlcXVlc3RSBG5leHQSIgoFaXRlbXMYAiADKAsyDC5tZWRpYS5L'
         'bm93blIFaXRlbXM=');
 
+@$core.Deprecated('Use recommendationFindRequestDescriptor instead')
+const RecommendationFindRequest$json = {
+  '1': 'RecommendationFindRequest',
+};
+
+/// Descriptor for `RecommendationFindRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List recommendationFindRequestDescriptor =
+    $convert.base64Decode('ChlSZWNvbW1lbmRhdGlvbkZpbmRSZXF1ZXN0');
+
+@$core.Deprecated('Use recommendationFindResponseDescriptor instead')
+const RecommendationFindResponse$json = {
+  '1': 'RecommendationFindResponse',
+  '2': [
+    {
+      '1': 'recommendation',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.media.Known',
+      '10': 'recomendation'
+    },
+  ],
+};
+
+/// Descriptor for `RecommendationFindResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List recommendationFindResponseDescriptor =
+    $convert.base64Decode(
+        'ChpSZWNvbW1lbmRhdGlvbkZpbmRSZXNwb25zZRIzCg5yZWNvbW1lbmRhdGlvbhgBIAEoCzIMLm'
+        '1lZGlhLktub3duUg1yZWNvbWVuZGF0aW9u');
+
 @$core.Deprecated('Use recommendationDeleteRequestDescriptor instead')
 const RecommendationDeleteRequest$json = {
   '1': 'RecommendationDeleteRequest',

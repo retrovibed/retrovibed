@@ -14,6 +14,7 @@ message Known {
   string released = 7 [ json_name = "released" ];
   string mimetype = 8 [ json_name = "mimetype" ];
   string source = 9 [ json_name = "source" ];
+  string uid = 10 [ json_name = "uid" ];
 }
 
 message KnownSearchRequest {
@@ -77,6 +78,11 @@ message RecommendationSearchRequest {
 message RecommendationSearchResponse {
   RecommendationSearchRequest next = 1 [ json_name = "next" ];
   repeated Known items = 2 [ json_name = "items" ];
+}
+
+message RecommendationFindRequest {}
+message RecommendationFindResponse {
+  Known recommendation = 1 [ json_name = "recomendation" ];
 }
 
 message RecommendationDeleteRequest {}

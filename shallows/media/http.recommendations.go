@@ -67,6 +67,18 @@ func (t *HTTPRecommendations) Bind(r *mux.Router) {
 		httpx.Timeout2s(),
 	).ThenFunc(t.random))
 
+	r.Path("/{id}").Methods(http.MethodGet).Handler(alice.New(
+		httpx.ContextBufferPool512(),
+		httpauth.AuthenticateWithToken(t.jwtsecret),
+		httpx.Timeout2s(),
+	).ThenFunc(t.find))
+
+	r.Path("/content/{id}").Methods(http.MethodGet).Handler(alice.New(
+		httpx.ContextBufferPool512(),
+		httpauth.AuthenticateWithToken(t.jwtsecret),
+		httpx.Timeout2s(),
+	).ThenFunc(t.content))
+
 	r.Path("/{id}").Methods(http.MethodDelete).Handler(alice.New(
 		httpx.ContextBufferPool512(),
 		httpauth.AuthenticateWithToken(t.jwtsecret),
@@ -111,6 +123,54 @@ func (t *HTTPRecommendations) latest(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err = httpx.WriteJSON(w, httpx.GetBuffer(r), &msg); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to write response"))
+		return
+	}
+}
+
+func (t *HTTPRecommendations) find(w http.ResponseWriter, r *http.Request) {
+	var (
+		rec library.Recommendation
+		id  = mux.Vars(r)["id"]
+	)
+
+	if err := library.RecommendationFindByID(r.Context(), t.q, id).Scan(&rec); sqlx.ErrNoRows(err) != nil {
+		log.Println(errorsx.Wrap(err, "unable to find recommendation"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
+		return
+	} else if err != nil {
+		log.Println(errorsx.Wrap(err, "unable to find recommendation"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &RecommendationFindResponse{
+		Recommendation: new(langx.Clone(Known{}, KnownOptionFromRecommendation(langx.Clone(rec, timex.JSONSafeEncodeOption)))),
+	}); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to write response"))
+		return
+	}
+}
+
+func (t *HTTPRecommendations) content(w http.ResponseWriter, r *http.Request) {
+	var (
+		rec library.Recommendation
+		id  = mux.Vars(r)["id"]
+	)
+
+	if err := library.RecommendationFindByContentID(r.Context(), t.q, id).Scan(&rec); sqlx.ErrNoRows(err) != nil {
+		log.Println(errorsx.Wrap(err, "unable to find recommendation"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
+		return
+	} else if err != nil {
+		log.Println(errorsx.Wrap(err, "unable to find recommendation"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &RecommendationFindResponse{
+		Recommendation: new(langx.Clone(Known{}, KnownOptionFromRecommendation(langx.Clone(rec, timex.JSONSafeEncodeOption)))),
+	}); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to write response"))
 		return
 	}

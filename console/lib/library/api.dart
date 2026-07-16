@@ -285,6 +285,28 @@ abstract class recommendations {
         });
   }
 
+  static Future<RecommendationFindResponse> find(
+    String id, {
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx.get(Uri.https(httpx.host(), "/r/${id}", {}), options: options).then((v) {
+      return Future.value(
+        RecommendationFindResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+      );
+    });
+  }
+
+  static Future<RecommendationFindResponse> content(
+    String id, {
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx.get(Uri.https(httpx.host(), "/r/content/${id}", {}), options: options).then((v) {
+      return Future.value(
+        RecommendationFindResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+      );
+    });
+  }
+
   static Future<RecommendationDeleteResponse> delete(
     String id, {
     List<httpx.Option> options = const [],
