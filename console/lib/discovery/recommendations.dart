@@ -120,7 +120,7 @@ class _RecommendationsState extends State<Recommendations> {
         constraints: BoxConstraints.tightForFinite(height: 256),
         background: ds.Repeat(() => lib.KnownMediaCard(lib.Known(), icon: null)),
         empty: Text(
-          'Content partnerships pending',
+          'check back later',
           style: TextStyle(color: Colors.grey),
         ),
         items: _items

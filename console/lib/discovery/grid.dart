@@ -104,15 +104,14 @@ class _DiscoveryGridState extends State<DiscoveryGrid> {
                   key: ValueKey("library.disc.locator.${uuidx.md5x(state.next.query.trim())}"),
                   query: state.next.query.trim(),
                   mimetype: category,
-                  onFound: (located) => ConstrainedBox(
-                    constraints: BoxConstraints.tightForFinite(height: 256),
-                    child: KnownMediaLocator.future(
-                      api.recommendations
-                          .content(located.locatedTorrentId, options: [authn.request(authn.AuthzCache.meta(context))])
-                          .then((r) => r.recommendation),
-                      help: KnownMediaCard.hint,
-                    ),
-                  ),
+                  onFound: (located) => api.recommendations
+                      .content(located.locatedTorrentId, options: [authn.request(authn.AuthzCache.meta(context))])
+                      .then(
+                        (r) => ConstrainedBox(
+                          constraints: BoxConstraints.tightForFinite(width: 384),
+                          child: KnownMediaLocator(r.recommendation, help: KnownMediaCard.hint),
+                        ),
+                      ),
                 ),
               ],
             ),

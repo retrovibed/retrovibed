@@ -322,3 +322,52 @@ func FromPath(n string) (environ []string, err error) {
 
 	return FromReader(env)
 }
+
+// Merge overlays updates onto existing, keyed by KEY: a key present in
+// both keeps its original position but takes the update's value; a key
+// only present in updates is appended, in the order given.
+func Merge(existing []string, updates ...string) []string {
+	merged := make([]string, len(existing))
+	copy(merged, existing)
+
+	index := make(map[string]int, len(existing))
+	for i, kv := range merged {
+		k, _, ok := strings.Cut(kv, "=")
+		if !ok {
+			continue
+		}
+		index[k] = i
+	}
+
+	for _, kv := range updates {
+		k, _, ok := strings.Cut(kv, "=")
+		if !ok {
+			continue
+		}
+
+		if i, exists := index[k]; exists {
+			merged[i] = kv
+			continue
+		}
+
+		index[k] = len(merged)
+		merged = append(merged, kv)
+	}
+
+	return merged
+}
+
+// WriteFile writes pairs to path as a .env-formatted file, one KEY=VALUE
+// pair per line.
+func WriteFile(path string, pairs []string) error {
+	var buf strings.Builder
+	for _, kv := range pairs {
+		fmt.Fprintf(&buf, "%s\n", kv)
+	}
+
+	if err := os.WriteFile(path, []byte(buf.String()), 0o600); err != nil {
+		return errorsx.Wrapf(err, "unable to write env file: %s", path)
+	}
+
+	return nil
+}

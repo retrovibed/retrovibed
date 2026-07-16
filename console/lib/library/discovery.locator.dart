@@ -3,6 +3,7 @@ import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/discovery.dart' as disc;
+import 'package:retrovibed/uuidx.dart' as uuidx;
 import './api.dart' as api;
 
 // DiscoveryLocator offers to search the wider p2p network for query/mimetype
@@ -15,7 +16,7 @@ class DiscoveryLocator extends StatefulWidget {
   final Future<api.LocateCreateResponse> Function(api.Locate req, {List<httpx.Option> options}) locate;
   final Future<api.LocateLookupResponse> Function(String id, {List<httpx.Option> options}) lookup;
   final Future<bool> Function(BuildContext context, {List<httpx.Option> options}) ensureP2P;
-  final Widget Function(api.Locate located) onFound;
+  final Future<Widget> Function(api.Locate located) onFound;
   final Widget help;
 
   const DiscoveryLocator({
@@ -45,7 +46,7 @@ class _DiscoveryLocator extends State<DiscoveryLocator> {
   String _locateId = '';
   Duration _interval = Duration.zero;
   Widget _cause = ds.Error.zero;
-  api.Locate? _located;
+  Future<Widget>? _foundContent;
 
   void setState(VoidCallback fn) {
     if (!mounted) return;
@@ -106,18 +107,21 @@ class _DiscoveryLocator extends State<DiscoveryLocator> {
     return widget
         .lookup(_locateId, options: options)
         .then<bool>((v) {
-          if (v.locate.locatedTorrentId.isEmpty) {
+          print("RECEIVED ${v}");
+          if (uuidx.isMax(uuidx.fromString(v.locate.locatedTorrentId))) {
             return false;
           }
 
+          print("FOUND ${v}");
           setState(() {
             _state = _LocateState.found;
             _interval = Duration.zero;
-            _located = v.locate;
+            _foundContent = widget.onFound(v.locate);
           });
           return true;
         })
         .catchError((e) {
+          print("WAKA");
           debugPrint('$e');
           return false;
         });
@@ -145,10 +149,22 @@ class _DiscoveryLocator extends State<DiscoveryLocator> {
       _LocateState.found => defaults.success,
     };
 
+    final idle = Icon(icon, size: 48, color: iconColor);
     final content = switch (_state) {
       _LocateState.found =>
-        _located == null ? Icon(icon, size: 48, color: iconColor) : widget.onFound(_located!),
-      _ => Icon(icon, size: 48, color: iconColor),
+        _foundContent == null
+            ? idle
+            : FutureBuilder<Widget>(
+                future: _foundContent,
+                builder: (context, snapshot) {
+                  return ds.Loading(
+                    snapshot.data ?? idle,
+                    loading: !(snapshot.hasData || snapshot.hasError),
+                    cause: snapshot.hasError ? ds.Errors.httpauto(snapshot.error!, onTap: _onTap) : ds.Error.zero,
+                  );
+                },
+              ),
+      _ => idle,
     };
 
     final trailingText = switch (_state) {

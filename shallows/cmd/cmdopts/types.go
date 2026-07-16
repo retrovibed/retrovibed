@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/alecthomas/kong"
+	"github.com/retrovibed/retrovibed/shallows/internal/envx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 )
 
@@ -100,6 +101,34 @@ func ParseTCPAddrArray(ctx *kong.DecodeContext, target reflect.Value) (err error
 	}
 
 	target.Set(reflect.ValueOf(results))
+	return nil
+}
+
+// ParseEnviron decodes one -e/--env flag occurrence into the accumulated
+// []string of "KEY=VALUE" pairs: the token is either a literal "KEY=VALUE"
+// pair, or a file://path referencing a .env-style file contributing one or
+// more pairs. Called once per repeated occurrence, so it appends to
+// whatever target already holds rather than overwriting it.
+func ParseEnviron(ctx *kong.DecodeContext, target reflect.Value) (err error) {
+	if ctx.Scan.Len() == 0 {
+		return nil
+	}
+
+	token := ctx.Scan.Pop().String()
+
+	var pairs []string
+	if path, ok := strings.CutPrefix(token, "file://"); ok {
+		if pairs, err = envx.FromPath(path); err != nil {
+			return errorsx.Wrapf(err, "unable to read env file: %s", path)
+		}
+	} else if _, _, ok := strings.Cut(token, "="); ok {
+		pairs = []string{token}
+	} else {
+		return errorsx.Errorf("invalid -e value %q: expected KEY=VALUE or file://path", token)
+	}
+
+	existing, _ := target.Interface().([]string)
+	target.Set(reflect.ValueOf(append(existing, pairs...)))
 	return nil
 }
 

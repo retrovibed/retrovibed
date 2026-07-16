@@ -95,10 +95,10 @@ func DiscoveredDownload(ctx context.Context, db sqlx.Queryer, c *torrent.Client,
 		log.Println("marked for download", lmd.ID, lmd.Description)
 	} else {
 		var rec library.Recommendation
-		errorsx.Log(errorsx.Wrap(
-			library.RecommendationInsertWithDefaults(ctx, db, ddisc.RecommendationFromDiscovered(d)).Scan(&rec),
-			"unable to record recommendation for located media",
-		))
+		if err = library.RecommendationInsertWithDefaults(ctx, db, ddisc.RecommendationFromDiscovered(d)).Scan(&rec); err != nil {
+			return errorsx.Wrap(err, "unable to record recommendation for located media")
+		}
+		log.Println("recommendation created", rec.ID, rec.Title)
 	}
 
 	if err = ddisc.LocateLocated(ctx, db, loc.ID, lmd.ID).Scan(&l); err != nil {

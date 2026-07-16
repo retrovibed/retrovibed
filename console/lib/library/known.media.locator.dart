@@ -48,7 +48,7 @@ class KnownMediaLocator extends StatefulWidget {
       builder: (context, snapshot) {
         return ds.Loading(
           loading: !(snapshot.hasData || snapshot.hasError),
-          cause: ds.Error.maybeErr(snapshot.error),
+          cause: snapshot.hasError ? ds.Errors.httpauto(snapshot.error!) : ds.Error.zero,
           snapshot.data == null
               ? const SizedBox()
               : KnownMediaLocator(

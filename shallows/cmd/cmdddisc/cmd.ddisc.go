@@ -39,9 +39,23 @@ type media struct {
 	Locate      cmdMediaLocate      `cmd:"" help:"run the full discover/rank/download pipeline locally for a single query, without a running daemon or its API"`
 }
 
+// search command examples
+// go -C shallows run ./cmd/retrovibe/... ddisc search plugin install ../myplugin
+// go -C shallows run ./cmd/retrovibe/... ddisc search plugin install https://example.com/myplugin.git --branch=main -e FOO=bar
+// go -C shallows run ./cmd/retrovibe/... ddisc search plugin config myplugin -e FOO=updated
+type searchPlugin struct {
+	Install cmdSearchPluginInstall `cmd:"" help:"compile a searchplugin repository to wasm and install it into search.d"`
+	Config  cmdSearchPluginConfig  `cmd:"" help:"merge -e configuration into an installed plugin's .env file"`
+}
+
+type search struct {
+	Plugin searchPlugin `cmd:"" help:"commands for managing search plugins"`
+}
+
 type Commands struct {
 	Peers       peer           `cmd:"" help:"commands for managing library peering"`
 	Discovery   discovery      `cmd:"" help:"commands for managing infohashes currently being investigated"`
 	Media       media          `cmd:"" help:"commands for managing discovered media records"`
+	Search      search         `cmd:"" help:"commands for managing search plugins"`
 	Diagnostics cmdDiagnostics `cmd:"" help:"show discovery subsystem diagnostics (peers, partitions, identification pipeline)"`
 }

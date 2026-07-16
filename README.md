@@ -153,6 +153,33 @@ GOOS=wasip1 GOARCH=wasm go build -o myplugin.wasm .
 cp myplugin.wasm ~/.config/retrovibed/search.d/
 ```
 
+`retrovibed ddisc search plugin install` automates that build+copy step - point it at a
+repository (a local checkout or a git URL) and it cross-compiles and installs for you. For
+example, to install `retroapi/examples/searchplugin-noop` (the reference plugin above) as
+`noop.wasm`:
+
+```bash
+retrovibed ddisc search plugin install ./retroapi --package=./examples/searchplugin-noop --name=noop
+```
+
+or a real plugin repository, either from a local checkout or straight from its git URL:
+
+```bash
+retrovibed ddisc search plugin install ../myplugin
+retrovibed ddisc search plugin install https://example.com/myplugin.git --branch=main
+```
+
+plugins needing configuration (API keys, etc.) get a matching `.env` sibling file
+(`search.d/noop.env`) that's injected into the plugin's sandbox at search time - no daemon
+restart required. Set it at install time or later with `search plugin config`, either flag
+being a literal `KEY=VALUE` pair or a `file://path` to a `.env`-formatted file contributing
+multiple pairs:
+
+```bash
+retrovibed ddisc search plugin install ../myplugin -e API_KEY=... -e file://./myplugin.env
+retrovibed ddisc search plugin config myplugin -e API_KEY=updated
+```
+
 #### run flatpak from cli
 
 ```bash
