@@ -1,6 +1,7 @@
 package media_test
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"testing"
@@ -55,6 +56,10 @@ func TestRecommendationsDelete(t *testing.T) {
 		require.NoError(t, err)
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
+
+		var result media.RecommendationDeleteResponse
+		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.Equal(t, known.UID, result.Recommendation.Id)
 
 		require.Error(t, library.RecommendationFindByID(ctx, q, rec.ID).Scan(&rec))
 	})

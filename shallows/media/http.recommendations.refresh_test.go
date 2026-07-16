@@ -43,7 +43,7 @@ func TestRecommendationsRefresh(t *testing.T) {
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
-		body, err := json.Marshal(&media.RecommendationsRequest{})
+		body, err := json.Marshal(&media.RecommendationsSearchRequest{})
 		require.NoError(t, err)
 
 		resp, req, err := httptestx.BuildRequestBytes(
@@ -53,6 +53,10 @@ func TestRecommendationsRefresh(t *testing.T) {
 		require.NoError(t, err)
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
+
+		var result media.RecommendationRefreshResponse
+		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.Equal(t, known.UID, result.Recommendation.Id)
 
 		var rec library.Recommendation
 		require.NoError(t, library.RecommendationFindByContentID(ctx, q, known.UID).Scan(&rec))
@@ -83,7 +87,7 @@ func TestRecommendationsRefresh(t *testing.T) {
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
-		body, err := json.Marshal(&media.RecommendationsRequest{})
+		body, err := json.Marshal(&media.RecommendationsSearchRequest{})
 		require.NoError(t, err)
 
 		for range 3 {
@@ -94,11 +98,51 @@ func TestRecommendationsRefresh(t *testing.T) {
 			require.NoError(t, err)
 			routes.ServeHTTP(resp, req)
 			require.Equal(t, http.StatusOK, resp.Result().StatusCode)
+
+			var result media.RecommendationRefreshResponse
+			require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+			require.Equal(t, known.UID, result.Recommendation.Id)
 		}
 
 		var rec library.Recommendation
 		require.NoError(t, library.RecommendationFindByContentID(ctx, q, known.UID).Scan(&rec))
 		require.EqualValues(t, 2, rec.Recommendations)
+	})
+
+	t.Run("empty database returns empty recommendation", func(t *testing.T) {
+		var (
+			p     meta.Profile
+			authz meta.Authz
+		)
+		ctx, done := testx.Context(t)
+		defer done()
+
+		q := sqltestx.Metadatabase(t)
+
+		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
+		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
+		require.NoError(t, testx.Fake(&authz, meta.AuthzOptionProfileID(p.ID), meta.AuthzOptionAdmin))
+		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, authz).Scan(&authz))
+
+		routes := mux.NewRouter()
+		media.NewHTTPRecommendations(q, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
+
+		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
+
+		body, err := json.Marshal(&media.RecommendationsSearchRequest{})
+		require.NoError(t, err)
+
+		resp, req, err := httptestx.BuildRequestBytes(
+			http.MethodPost, "/", body,
+			httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)),
+		)
+		require.NoError(t, err)
+		routes.ServeHTTP(resp, req)
+		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
+
+		var result media.RecommendationRefreshResponse
+		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.Empty(t, result.Recommendation.Id)
 	})
 
 	t.Run("malformed json returns 400", func(t *testing.T) {

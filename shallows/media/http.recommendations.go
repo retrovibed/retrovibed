@@ -77,8 +77,8 @@ func (t *HTTPRecommendations) Bind(r *mux.Router) {
 func (t *HTTPRecommendations) latest(w http.ResponseWriter, r *http.Request) {
 	var (
 		err error
-		msg = RecommendationsResponse{
-			Next: &RecommendationsRequest{
+		msg = RecommendationsSearchResponse{
+			Next: &RecommendationsSearchRequest{
 				Limit: 100,
 			},
 		}
@@ -132,14 +132,16 @@ func (t *HTTPRecommendations) delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := httpx.WriteEmptyJSON(w, http.StatusOK); err != nil {
+	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &RecommendationDeleteResponse{
+		Recommendation: new(langx.Clone(Known{}, KnownOptionFromRecommendation(langx.Clone(rec, timex.JSONSafeEncodeOption)))),
+	}); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to write response"))
 		return
 	}
 }
 
 func (t *HTTPRecommendations) random(w http.ResponseWriter, r *http.Request) {
-	var req RecommendationsRequest
+	var req RecommendationsSearchRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to decode request"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
@@ -158,8 +160,8 @@ func (t *HTTPRecommendations) random(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tmp := langx.Clone(Known{}, KnownOptionFromRecommendation(langx.Clone(rec, timex.JSONSafeEncodeOption)))
-	if err = httpx.WriteJSON(w, httpx.GetBuffer(r), &RecommendationsResponse{
-		Next:  &RecommendationsRequest{},
+	if err = httpx.WriteJSON(w, httpx.GetBuffer(r), &RecommendationsSearchResponse{
+		Next:  &RecommendationsSearchRequest{},
 		Items: []*Known{&tmp},
 	}); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to write response"))
@@ -170,7 +172,8 @@ func (t *HTTPRecommendations) random(w http.ResponseWriter, r *http.Request) {
 func (t *HTTPRecommendations) refresh(w http.ResponseWriter, r *http.Request) {
 	var (
 		err error
-		req RecommendationsRequest
+		req RecommendationsSearchRequest
+		rec library.Recommendation
 	)
 
 	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -179,7 +182,7 @@ func (t *HTTPRecommendations) refresh(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, err = library.RecommendationFromRandomKnown(r.Context(), t.q, req.Mimetype, req.Language, req.Adult); sqlx.ErrNoRows(err) != nil {
+	if rec, err = library.RecommendationFromRandomKnown(r.Context(), t.q, req.Mimetype, req.Language, req.Adult); sqlx.ErrNoRows(err) != nil {
 		// no known media available - nothing to do
 	} else if err != nil {
 		log.Println(errorsx.Wrap(err, "refresh failed"))
@@ -187,7 +190,9 @@ func (t *HTTPRecommendations) refresh(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = httpx.WriteJSON(w, httpx.GetBuffer(r), &RecommendationsResponse{}); err != nil {
+	if err = httpx.WriteJSON(w, httpx.GetBuffer(r), &RecommendationRefreshResponse{
+		Recommendation: new(langx.Clone(Known{}, KnownOptionFromRecommendation(langx.Clone(rec, timex.JSONSafeEncodeOption)))),
+	}); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to write response"))
 		return
 	}

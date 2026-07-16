@@ -51,7 +51,7 @@ func TestRecommendationsLatest(t *testing.T) {
 		require.NoError(t, err)
 		routes.ServeHTTP(resp, req)
 
-		var result media.RecommendationsResponse
+		var result media.RecommendationsSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 		require.Empty(t, result.Items)
@@ -94,7 +94,7 @@ func TestRecommendationsLatest(t *testing.T) {
 		require.NoError(t, err)
 		routes.ServeHTTP(resp, req)
 
-		var result media.RecommendationsResponse
+		var result media.RecommendationsSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 		require.Len(t, result.Items, 3)
@@ -137,7 +137,7 @@ func TestRecommendationsLatest(t *testing.T) {
 		require.NoError(t, err)
 		routes.ServeHTTP(resp, req)
 
-		var result media.RecommendationsResponse
+		var result media.RecommendationsSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 		require.Len(t, result.Items, 1)
@@ -180,7 +180,7 @@ func TestRecommendationsLatest(t *testing.T) {
 		require.NoError(t, err)
 		routes.ServeHTTP(resp, req)
 
-		var result media.RecommendationsResponse
+		var result media.RecommendationsSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 		require.Empty(t, result.Items)
@@ -231,7 +231,7 @@ func TestRecommendationsLatest(t *testing.T) {
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
 		encoder := formx.NewEncoder()
-		query, err := encoder.Encode(&media.RecommendationsRequest{Mimetype: mimex.Video})
+		query, err := encoder.Encode(&media.RecommendationsSearchRequest{Mimetype: mimex.Video})
 		require.NoError(t, err)
 
 		resp, req, err := httptestx.BuildRequestBytes(
@@ -243,7 +243,7 @@ func TestRecommendationsLatest(t *testing.T) {
 		require.NoError(t, err)
 		routes.ServeHTTP(resp, req)
 
-		var result media.RecommendationsResponse
+		var result media.RecommendationsSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 		require.Len(t, result.Items, 3)
@@ -303,7 +303,7 @@ func TestRecommendationsLatest(t *testing.T) {
 		require.NoError(t, err)
 		routes.ServeHTTP(resp, req)
 
-		var result media.RecommendationsResponse
+		var result media.RecommendationsSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 		require.Len(t, result.Items, 4)
