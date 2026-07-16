@@ -11,7 +11,7 @@ void main() {
   group('DiscoveryLocator', () {
     testWidgets('renders nothing when the query is blank', (tester) async {
       await tester.pumpApp(
-        DiscoveryLocator(query: '  ', mimetype: 'video', onFound: (located) => const SizedBox.shrink()),
+        DiscoveryLocator(query: '  ', mimetype: 'video', onFound: (located) async => const SizedBox.shrink()),
       );
       await tester.pumpAndSettle();
       expect(find.byType(ds.Card), findsNothing);
@@ -20,7 +20,7 @@ void main() {
 
     testWidgets('renders without overflow', (tester) async {
       await tester.pumpApp(
-        DiscoveryLocator(query: 'ubuntu', mimetype: 'video', onFound: (located) => const SizedBox.shrink()),
+        DiscoveryLocator(query: 'ubuntu', mimetype: 'video', onFound: (located) async => const SizedBox.shrink()),
       );
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
@@ -32,7 +32,7 @@ void main() {
         DiscoveryLocator(
           query: 'ubuntu',
           mimetype: 'video',
-          onFound: (located) => const SizedBox.shrink(),
+          onFound: (located) async => const SizedBox.shrink(),
           ensureP2P: (context, {options = const []}) async => false,
           locate: (req, {options = const []}) async {
             locateCalled = true;
@@ -55,7 +55,7 @@ void main() {
         DiscoveryLocator(
           query: 'ubuntu',
           mimetype: 'video',
-          onFound: (located) => const SizedBox.shrink(),
+          onFound: (located) async => const SizedBox.shrink(),
           ensureP2P: (context, {options = const []}) async => true,
           locate: (req, {options = const []}) async {
             requested = req;
@@ -79,7 +79,7 @@ void main() {
         DiscoveryLocator(
           query: 'ubuntu',
           mimetype: 'video',
-          onFound: (located) => const SizedBox.shrink(),
+          onFound: (located) async => const SizedBox.shrink(),
           ensureP2P: (context, {options = const []}) async => true,
           locate: (req, {options = const []}) => Future.error('boom'),
         ),
@@ -97,7 +97,7 @@ void main() {
         DiscoveryLocator(
           query: 'ubuntu',
           mimetype: 'video',
-          onFound: (located) => const SizedBox.shrink(),
+          onFound: (located) async => const SizedBox.shrink(),
           ensureP2P: (context, {options = const []}) async => true,
           locate: (req, {options = const []}) async => api.LocateCreateResponse(locate: (req..id = 'locate-1')),
           lookup: (id, {options = const []}) async {
@@ -131,7 +131,7 @@ void main() {
         DiscoveryLocator(
           query: 'ubuntu',
           mimetype: 'video',
-          onFound: (located) {
+          onFound: (located) async {
             foundWith = located;
             return ConstrainedBox(
               constraints: BoxConstraints.tightForFinite(height: 256),
@@ -180,7 +180,7 @@ void main() {
         DiscoveryLocator(
           query: 'ubuntu',
           mimetype: 'video',
-          onFound: (located) => Text('failed to load ${located.locatedTorrentId}'),
+          onFound: (located) async => Text('failed to load ${located.locatedTorrentId}'),
           ensureP2P: (context, {options = const []}) async => true,
           locate: (req, {options = const []}) async => api.LocateCreateResponse(locate: (req..id = 'locate-1')),
           lookup: (id, {options = const []}) async {
@@ -211,7 +211,7 @@ void main() {
         DiscoveryLocator(
           query: 'ubuntu',
           mimetype: 'video',
-          onFound: (located) => const SizedBox.shrink(),
+          onFound: (located) async => const SizedBox.shrink(),
           ensureP2P: (context, {options = const []}) async => true,
           locate: (req, {options = const []}) async => api.LocateCreateResponse(locate: (req..id = 'locate-1')),
           lookup: (id, {options = const []}) {

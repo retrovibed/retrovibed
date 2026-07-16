@@ -107,12 +107,10 @@ class _DiscoveryLocator extends State<DiscoveryLocator> {
     return widget
         .lookup(_locateId, options: options)
         .then<bool>((v) {
-          print("RECEIVED ${v}");
-          if (uuidx.isMax(uuidx.fromString(v.locate.locatedTorrentId))) {
+          if (uuidx.isMinMax(uuidx.fromString(v.locate.locatedTorrentId))) {
             return false;
           }
 
-          print("FOUND ${v}");
           setState(() {
             _state = _LocateState.found;
             _interval = Duration.zero;
@@ -121,7 +119,6 @@ class _DiscoveryLocator extends State<DiscoveryLocator> {
           return true;
         })
         .catchError((e) {
-          print("WAKA");
           debugPrint('$e');
           return false;
         });
