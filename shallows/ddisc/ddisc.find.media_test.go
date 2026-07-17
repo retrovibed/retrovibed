@@ -6,6 +6,7 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/torrenttest"
+	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
@@ -14,7 +15,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/cryptox"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/retroapi/uuidx"
-	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -40,7 +40,7 @@ func TestFindMedia(t *testing.T) {
 
 			d := ddisc.NewDiscovered(
 				&id,
-				ddisc.DiscoveredOptionKnownMedia(library.KnownImportedUUID("", uuid.FromStringOrNil(uuidx.WithSuffix(idx%32))).String()),
+				ddisc.DiscoveredOptionKnownMedia(ddiscapi.ImportedMediaUUID("", uuid.FromStringOrNil(uuidx.WithSuffix(idx%32))).String()),
 				ddisc.DiscoveredOptionMimetype(mimex.Binary),
 				ddisc.DiscoveredOptionFromTorrentInfo(info),
 				ddisc.DiscoveredOptionPartitionAuto(partitions),
@@ -88,7 +88,7 @@ func TestFindMedia(t *testing.T) {
 		}
 
 		for idx, n := range []int{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4} {
-			assertbatch(idx, n, ddisc.FindMedia(q, library.KnownImportedUUID("", uuid.FromStringOrNil(uuidx.WithSuffix(idx))).String()))
+			assertbatch(idx, n, ddisc.FindMedia(q, ddiscapi.ImportedMediaUUID("", uuid.FromStringOrNil(uuidx.WithSuffix(idx))).String()))
 		}
 
 	})

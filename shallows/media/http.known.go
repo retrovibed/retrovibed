@@ -12,6 +12,7 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
+	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/retroapi/httpauth"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
@@ -265,7 +266,7 @@ func (t *HTTPKnown) create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	localid := errorsx.Must(uuid.NewV7())
-	uid := library.KnownImportedUUID("local", localid)
+	uid := ddiscapi.ImportedMediaUUID(ddiscapi.SourceUnspecified, localid)
 
 	meta = library.Known{
 		ID:              localid.String(),

@@ -2,8 +2,6 @@ package library
 
 import (
 	"context"
-	"fmt"
-	"hash/fnv"
 	"time"
 
 	"github.com/Masterminds/squirrel"
@@ -82,24 +80,6 @@ func KnownOptionTestDefaults(t *Known) {
 	t.Duplicates = 0
 	t.Popularity = 0
 	t.OriginalLanguage = userx.LocaleLanguage()
-}
-
-// ImportPrefix is a type constraint for import source prefixes.
-type importprefix interface {
-	~string
-}
-
-// create a unique import id from a uint sequence.
-func KnownImportedUintID[P importprefix](prefix P, id uint64) string {
-	l := id & 0x0000FFFFFFFFFFFF
-	h := id & 0xFFFF000000000000 >> 56
-	return fmt.Sprintf("%x-0000-0000-%04x-%012x", fnv.New32().Sum([]byte(prefix))[:4], h, l)
-}
-
-// create a unique import id from a uuid by mutating its first 4 bytes with the prefix checksum.
-func KnownImportedUUID[P importprefix](prefix P, id uuid.UUID) uuid.UUID {
-	copy(id[:4], fnv.New32().Sum([]byte(prefix))[:4])
-	return id
 }
 
 func Unknown() Known {
