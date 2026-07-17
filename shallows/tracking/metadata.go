@@ -89,6 +89,12 @@ func MetadataOptionDisableKnownMedia(m *Metadata) {
 	m.KnownMediaID = uuid.Nil.String()
 }
 
+func MetadataOptionAutoEntropySeed(d []byte) func(*Metadata) {
+	return func(m *Metadata) {
+		m.EncryptionSeed = md5x.FormatUUID(md5x.Digest(m.Infohash, d))
+	}
+}
+
 func MetadataOptionEntropySeed(d ...[]byte) func(*Metadata) {
 	return func(m *Metadata) {
 		m.EncryptionSeed = md5x.FormatUUID(md5x.Digest(d...))
@@ -113,6 +119,17 @@ func MetadataOptionAutoArchive(b bool) func(*Metadata) {
 func MetadataOptionBytes[T constraints.Integer](b T) func(*Metadata) {
 	return func(m *Metadata) {
 		m.Bytes = uint64(b)
+	}
+}
+
+// MetadataOptionAutoBytes sets Bytes only when it hasn't already been
+// determined from an authoritative source (e.g. a downloaded torrent's info
+// dict). Useful for magnet uris, where the real size is unknown until the
+// info dict is fetched and an approximate size (e.g. from an rss enclosure)
+// is the best available hint.
+func MetadataOptionAutoBytes[T constraints.Integer](b T) func(*Metadata) {
+	return func(m *Metadata) {
+		m.Bytes = langx.FirstNonZero(m.Bytes, uint64(b))
 	}
 }
 

@@ -1,26 +1,20 @@
 package daemons
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
-	"io"
 	"iter"
 	"log"
 	"net/http"
-	"os"
-	"strings"
 	"time"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent"
-	"github.com/james-lawrence/torrent/dht/int160"
-	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/userx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/backoffx"
 	"github.com/retrovibed/retrovibed/shallows/internal/contextx"
@@ -34,11 +28,9 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
-	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/retrovibed/retrovibed/shallows/rss"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
-	"golang.org/x/time/rate"
 )
 
 func PrepareDefaultFeeds(ctx context.Context, q sqlx.Queryer) error {
@@ -101,6 +93,7 @@ func PrepareDefaultFeeds(ctx context.Context, q sqlx.Queryer) error {
 func DiscoverFromRSSFeedsOnce(
 	ctx context.Context,
 	q sqlx.Queryer,
+	c *http.Client,
 	rootstore fsx.Virtual,
 	mc library.QueryCleaner,
 	tclient *torrent.Client,
@@ -127,9 +120,6 @@ func DiscoverFromRSSFeedsOnce(
 			done(qiter.Err())
 		}
 	}
-
-	c := httpx.BindRetryTransport(http.DefaultClient, http.StatusTooManyRequests, http.StatusBadGateway)
-	l := rate.NewLimiter(rate.Every(3*time.Second), 1)
 
 	fctx, fdone := context.WithCancelCause(ctx)
 	for feed := range queryfeeds(fctx, fdone) {
@@ -165,144 +155,39 @@ func DiscoverFromRSSFeedsOnce(
 			log.Println("torrent rss feed changes detected", feed.ID, feed.Description, "fetching", len(items), "torrents", md5digest, "!=", feed.Digest)
 		}
 
-		handlehttp := func(uri rss.Enclosure, i rss.Item) error {
-			var (
-				meta tracking.Metadata
+		importer := tracking.NewURIImport(q, c, rootstore)
+		encryptionseed := uuidx.FirstNonNil(
+			uuid.FromStringOrNil(feed.EncryptionSeed),
+			uuid.FromStringOrNil(channel.Retrovibed.Entropy),
+		).Bytes()
+
+		for _, item := range items {
+			uri := slicesx.FirstOrDefault(rss.ItemToEnclosure(item, mimex.Bittorrent), rss.FindBittorrentEnclosures(item)...)
+			if uri.URL == "" {
+				continue
+			}
+
+			meta, err := importer.Import(
+				fctx,
+				uri.URL,
+				tracking.MetadataOptionMimetype(stringsx.FirstNonBlank(channel.Retrovibed.Mimetype, uri.Mimetype)),
+				tracking.MetadataOptionDescription(item.Title),
+				tracking.MetadataOptionKnownMediaID(uuid.Max.String()),
+				tracking.MetadataOptionAutoEntropySeed(encryptionseed),
+				tracking.MetadataOptionAutoArchive(feed.Autoarchive),
+				tracking.MetadataOptionAutoBytes(uri.Length),
 			)
-
-			if !strings.HasPrefix(uri.URL, "http") && !strings.HasPrefix(uri.URL, "https") {
-				return nil
-			}
-
-			if err = l.Wait(ctx); err != nil {
-				return errorsx.Wrap(err, "rate limited")
-			}
-
-			log.Println("handling", channel.Retrovibed.Entropy, channel.Retrovibed.Mimetype, uri)
-
-			req, err := http.NewRequestWithContext(ctx, http.MethodGet, uri.URL, nil)
 			if err != nil {
-				return errorsx.Wrapf(err, "unable to build torrent request: %s", feed.ID)
-			}
-
-			resp, err := httpx.AsError(http.DefaultClient.Do(req))
-			if err != nil {
-				return errorsx.Wrapf(err, "unable to retrieve feed: %s", feed.ID)
-			}
-
-			buf, err := io.ReadAll(resp.Body)
-			if err != nil {
-				return errorsx.Wrapf(err, "unable to read metainfo from response: %s", feed.ID)
-			}
-
-			md, err := metainfo.Load(bytes.NewReader(buf))
-			if err != nil {
-				return errorsx.Wrapf(err, "unable to read metainfo from response: %s", feed.ID)
-			}
-
-			mi, err := md.UnmarshalInfo()
-			if err != nil {
-				return errorsx.Wrapf(err, "unable to read info from metadata: %s", feed.ID)
-			}
-
-			if err = os.WriteFile(rootstore.Path("torrent", fmt.Sprintf("%s.torrent", md.HashInfoBytes().String())), buf, 0600); err != nil {
-				return errorsx.Wrapf(err, "unable to persist torrent to disk: %s", feed.ID)
-			}
-
-			if err = tracking.MetadataInsertWithDefaults(
-				ctx, q, tracking.NewMetadata(
-					new(md.ID()),
-					tracking.MetadataOptionFromInfo(&mi),
-					tracking.MetadataOptionDescription(stringsx.FirstNonBlank(mi.Name, i.Title)),
-					tracking.MetadataOptionTrackers(md.Announce),
-					tracking.MetadataOptionKnownMediaID(uuid.Max.String()),
-					tracking.MetadataOptionMimetype(stringsx.FirstNonBlank(channel.Retrovibed.Mimetype, uri.Mimetype)),
-					tracking.MetadataOptionEntropySeed(
-						md.HashInfoBytes().Bytes(),
-						uuidx.FirstNonNil(
-							uuid.FromStringOrNil(feed.EncryptionSeed),
-							uuid.FromStringOrNil(channel.Retrovibed.Entropy),
-						).Bytes(),
-					),
-					tracking.MetadataOptionAutoDescription,
-					tracking.MetadataOptionAutoArchive(feed.Autoarchive),
-					tracking.MetadataOptionAutoHidden,
-				)).Scan(&meta); err != nil {
-				return errorsx.Wrapf(err, "unable to record torrent metadata: %s", feed.ID)
+				log.Println("unable to import uri:", feed.ID, uri.URL, err)
+				continue
 			}
 
 			if feed.Autodownload {
 				log.Println("marking torrent to be automatically downloaded", meta.Description, feed.Autodownload)
-				if err = tracking.MetadataAutoDownloadByID(ctx, q, meta.ID).Scan(&meta); err != nil {
-					return errorsx.Wrapf(err, "unable to mark torrent for automatic download: %s", feed.ID)
+				if err := tracking.MetadataAutoDownloadByID(ctx, q, meta.ID).Scan(&meta); err != nil {
+					log.Println("unable to mark torrent for automatic download:", feed.ID, err)
+					continue
 				}
-			}
-
-			// log.Println("recorded", feed.ID, meta.ID, meta.Description)
-			return nil
-		}
-
-		handlemagnet := func(uri rss.Enclosure, i rss.Item) error {
-			var (
-				meta tracking.Metadata
-			)
-
-			if !strings.HasPrefix(uri.URL, "magnet") {
-				return nil
-			}
-
-			// log.Println("handling", channel.Retrovibed.Entropy, channel.Retrovibed.Mimetype, uri)
-			md, err := metainfo.ParseMagnetURI(uri.URL)
-			if err != nil {
-				return errorsx.Wrapf(err, "unable to parse magnet link: %s", feed.ID)
-			}
-
-			_md := tracking.NewMetadata(
-				new(int160.FromByteArray(md.InfoHash)),
-				tracking.MetadataOptionFromMagnet(&md),
-				tracking.MetadataOptionBytes(uri.Length),
-				tracking.MetadataOptionMimetype(stringsx.FirstNonBlank(channel.Retrovibed.Mimetype, uri.Mimetype)),
-				tracking.MetadataOptionDescription(i.Title),
-				tracking.MetadataOptionKnownMediaID(uuid.Max.String()),
-				tracking.MetadataOptionEntropySeed(
-					md.InfoHash.Bytes(),
-					uuidx.FirstNonNil(
-						uuid.FromStringOrNil(feed.EncryptionSeed),
-						uuid.FromStringOrNil(channel.Retrovibed.Entropy),
-					).Bytes(),
-				),
-				tracking.MetadataOptionAutoArchive(feed.Autoarchive),
-				tracking.MetadataOptionAutoDescription,
-				tracking.MetadataOptionAutoHidden,
-			)
-
-			if err = tracking.MetadataInsertWithDefaults(ctx, q, _md).Scan(&meta); err != nil {
-				return errorsx.Wrapf(err, "unable to record torrent metadata: %s", feed.ID)
-			}
-
-			if feed.Autodownload {
-				// log.Println("marking torrent to be automatically downloaded", meta.Description, feed.Autodownload)
-				if err = tracking.MetadataAutoDownloadByID(ctx, q, meta.ID).Scan(&meta); err != nil {
-					return errorsx.Wrapf(err, "unable to mark torrent for automatic download: %s", feed.ID)
-				}
-			}
-
-			log.Println("recorded", feed.ID, meta.ID, meta.Description)
-
-			return nil
-		}
-
-		for _, item := range items {
-			uri := slicesx.FirstOrDefault(rss.ItemToEnclosure(item, mimex.Bittorrent), rss.FindBittorrentEnclosures(item)...)
-
-			if err := handlehttp(uri, item); err != nil {
-				errorsx.Log(errorsx.Ignore(err, context.Canceled))
-				continue
-			}
-
-			if err := handlemagnet(uri, item); err != nil {
-				log.Println(err)
-				continue
 			}
 		}
 
@@ -334,7 +219,7 @@ func DiscoverFromRSSFeedsOnce(
 }
 
 // retrieve torrents from rss feeds.
-func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, rootstore fsx.Virtual, mc library.QueryCleaner, tclient *torrent.Client, tstore storage.ClientImpl, pub *asyncx.Wakeup) (err error) {
+func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, c *http.Client, rootstore fsx.Virtual, mc library.QueryCleaner, tclient *torrent.Client, tstore storage.ClientImpl, pub *asyncx.Wakeup) (err error) {
 	bs := backoffx.New(
 		backoffx.Exponential(time.Minute),
 		backoffx.Maximum(15*time.Minute),
@@ -352,7 +237,7 @@ func DiscoverFromRSSFeeds(ctx context.Context, q sqlx.Queryer, rootstore fsx.Vir
 			attempts = -1
 		}
 
-		if err := DiscoverFromRSSFeedsOnce(ctx, q, rootstore, mc, tclient, tstore, pub); err != nil {
+		if err := DiscoverFromRSSFeedsOnce(ctx, q, c, rootstore, mc, tclient, tstore, pub); err != nil {
 			log.Println("failed to discover torrents", err)
 			continue
 		}

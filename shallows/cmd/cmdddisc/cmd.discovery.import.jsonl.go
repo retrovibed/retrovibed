@@ -43,7 +43,7 @@ func (t cmdDiscoveryImportJSONL) run(ctx context.Context, c *http.Client, endpoi
 				return struct{}{}, backoffx.ErrStopAttempts
 			}
 
-			m, err := metainfo.ParseMagnetURI(v.Magnet)
+			m, err := metainfo.ParseMagnetURI(v.Uri)
 			if err != nil {
 				return struct{}{}, errorsx.Wrap(err, "failed to parse magnet uri")
 			}

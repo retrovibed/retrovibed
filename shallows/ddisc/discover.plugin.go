@@ -50,9 +50,9 @@ func (t *pluginSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 
 		seq := t.cfg.plugins.Search(ctx, t.req.Mimetypes, t.req.Title)
 		for imp := range seq.Each(ctx) {
-			m, err := metainfo.ParseMagnetURI(imp.Magnet)
+			m, err := metainfo.ParseMagnetURI(imp.Uri)
 			if err != nil {
-				log.Println("search plugin returned invalid magnet uri", err)
+				log.Println("search plugin returned an unresolvable uri", err)
 				continue
 			}
 
@@ -61,7 +61,7 @@ func (t *pluginSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 			id := int160.FromBytes(m.InfoHash.Bytes())
 			d := NewDiscovered(
 				&id,
-				DiscoveredOptionKnownMedia(t.req.KnownMediaID),
+				DiscoveredOptionKnownMedia(langx.FirstNonZero(imp.KnownMediaId, t.req.KnownMediaID)),
 				DiscoveredOptionMimetype(Generalize(mimetype)),
 				DiscoveredOptionHealth(imp.Health),
 				DiscoveredOptionTitle(m.DisplayName),

@@ -105,7 +105,7 @@ func TestDiscoveryImportJSONL(t *testing.T) {
 		ids := make([]string, 0, 3)
 		for range 3 {
 			uri, infohash := randomMagnetURI()
-			require.NoError(t, enc.Encode(&ddiscapiimport.Import{Magnet: uri}))
+			require.NoError(t, enc.Encode(&ddiscapiimport.Import{Uri: uri}))
 			ids = append(ids, torrentx.HashUID(&infohash))
 		}
 
@@ -126,7 +126,7 @@ func TestDiscoveryImportJSONL(t *testing.T) {
 		ids := make([]string, 0, 20)
 		for range 20 {
 			uri, infohash := randomMagnetURI()
-			require.NoError(t, enc.Encode(&ddiscapiimport.Import{Magnet: uri}))
+			require.NoError(t, enc.Encode(&ddiscapiimport.Import{Uri: uri}))
 			ids = append(ids, torrentx.HashUID(&infohash))
 		}
 
@@ -155,7 +155,7 @@ func TestDiscoveryImportJSONL(t *testing.T) {
 		cmd := cmdDiscoveryImportJSONL{}
 
 		var buf bytes.Buffer
-		require.NoError(t, jsonl.NewEncoder(&buf).Encode(&ddiscapiimport.Import{Magnet: "not a magnet uri"}))
+		require.NoError(t, jsonl.NewEncoder(&buf).Encode(&ddiscapiimport.Import{Uri: "not a magnet uri"}))
 
 		// a bad magnet uri is a permanent failure, but backoffx.Attempt has no
 		// concept of permanent vs transient errors and retries forever; bound

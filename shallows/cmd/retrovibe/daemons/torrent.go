@@ -7,6 +7,7 @@ import (
 	"log"
 	"math"
 	"net"
+	"net/http"
 	"net/netip"
 	"os"
 	"runtime"
@@ -42,6 +43,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/envx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
@@ -634,8 +636,13 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 		return errorsx.Wrap(PublishDiscoveredMedia(ctx, t.db), "failed to publish discovered media")
 	})
 
+	c := httpx.BindRetryTransport(&http.Client{
+		Transport: &http.Transport{
+			DialContext: DefaultDialer(wgnet, t._dnscache).DialContext,
+		},
+	}, http.StatusTooManyRequests, http.StatusBadGateway)
 	go func() {
-		if err := DiscoverFromRSSFeeds(dctx, t.db, t.rootstore, t.mc, tclient, t.tstore, t.pub); errorsx.Ignore(err, context.Canceled) != nil {
+		if err := DiscoverFromRSSFeeds(dctx, t.db, c, t.rootstore, t.mc, tclient, t.tstore, t.pub); errorsx.Ignore(err, context.Canceled) != nil {
 			asyncfailure(errorsx.Wrap(err, "autodiscovery of RSS feeds failed"))
 			return
 		}
