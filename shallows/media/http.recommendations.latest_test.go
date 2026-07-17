@@ -15,7 +15,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
-	"github.com/retrovibed/retrovibed/shallows/internal/uuidx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/retrovibed/retrovibed/shallows/media"
 	"github.com/retrovibed/retrovibed/shallows/meta"

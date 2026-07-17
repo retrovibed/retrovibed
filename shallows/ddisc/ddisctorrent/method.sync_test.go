@@ -15,7 +15,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/torrenttestx"
-	"github.com/retrovibed/retrovibed/shallows/internal/uuidx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/stretchr/testify/require"
 )

@@ -22,7 +22,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/uuidx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 )
 

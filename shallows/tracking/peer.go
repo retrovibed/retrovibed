@@ -14,7 +14,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/squirrelx"
-	"github.com/retrovibed/retrovibed/shallows/internal/uuidx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 )
 
 type PeerOption func(*Peer)

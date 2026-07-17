@@ -29,7 +29,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/internal/torrenttestx"
-	"github.com/retrovibed/retrovibed/shallows/internal/uuidx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/media"
 	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/retrovibed/retrovibed/shallows/metaapi"

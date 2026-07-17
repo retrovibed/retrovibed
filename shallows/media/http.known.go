@@ -25,7 +25,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/numericx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
-	"github.com/retrovibed/retrovibed/shallows/internal/uuidx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	meta "github.com/retrovibed/retrovibed/shallows/meta"
 )

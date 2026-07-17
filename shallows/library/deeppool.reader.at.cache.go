@@ -15,7 +15,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/cryptox"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/iox"
-	"github.com/retrovibed/retrovibed/shallows/internal/uuidx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 )
 
 type localstorage interface {
