@@ -195,3 +195,17 @@ func TestLowN(t *testing.T) {
 		runLowNTest(t, uuid.Nil, 16, []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0})
 	})
 }
+
+func TestIsMinMax(t *testing.T) {
+	t.Run("uuid.Nil is min/max", func(t *testing.T) {
+		require.True(t, IsMinMax(uuid.Nil))
+	})
+
+	t.Run("uuid.Max is min/max", func(t *testing.T) {
+		require.True(t, IsMinMax(uuid.Max))
+	})
+
+	t.Run("a random uuid is not min/max", func(t *testing.T) {
+		require.False(t, IsMinMax(uuid.Must(uuid.NewV4())))
+	})
+}

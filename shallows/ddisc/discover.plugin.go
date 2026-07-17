@@ -5,11 +5,15 @@ import (
 	"iter"
 	"log"
 
+	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
+	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
+	"github.com/retrovibed/retrovibed/shallows/library"
 )
 
 // searchPlugins is the narrow interface PluginStrategy needs from
@@ -23,12 +27,15 @@ type searchPlugins interface {
 // candidates are neither ranked nor persisted here - Discover's central seq
 // does both for every candidate regardless of which strategy produced it.
 // No-ops if req.Title is empty — plugins can't be usefully queried without
-// one.
-func PluginStrategy(plugins searchPlugins) DiscoverStrategy {
-	return pluginStrategy{plugins: plugins}
+// one. As a side effect, independent of what it yields, it TOFU-records
+// (see KnownMediaFromImport) any known-media catalog info a plugin result
+// carries — q is used only for that.
+func PluginStrategy(q sqlx.Queryer, plugins searchPlugins) DiscoverStrategy {
+	return pluginStrategy{q: q, plugins: plugins}
 }
 
 type pluginStrategy struct {
+	q       sqlx.Queryer
 	plugins searchPlugins
 }
 
@@ -57,6 +64,13 @@ func (t *pluginSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 			}
 
 			mimetype := langx.FirstNonZero(imp.Mimetype, langx.FirstNonZero(t.req.Mimetypes...))
+
+			if kid := uuid.FromStringOrNil(imp.KnownMediaId); !uuidx.IsMinMax(kid) {
+				known := KnownMediaFromImport(kid, mimetype, imp)
+				if err := library.KnownInsertWithDefaultsTOFU(ctx, t.cfg.q, known).Scan(&known); err != nil {
+					log.Println("unable to record known media from plugin", err)
+				}
+			}
 
 			id := int160.FromBytes(m.InfoHash.Bytes())
 			d := NewDiscovered(

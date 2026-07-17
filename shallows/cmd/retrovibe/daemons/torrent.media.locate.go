@@ -35,7 +35,7 @@ func Locate(ctx context.Context, db sqlx.Queryer, disc *DiscoverySettings, dhts 
 		strategies = append(strategies, ddisctorrent.NewPartitionStrategy(dhts, partitions))
 	}
 	if plugins != nil {
-		strategies = append(strategies, ddisc.PluginStrategy(plugins))
+		strategies = append(strategies, ddisc.PluginStrategy(db, plugins))
 	}
 
 	req := ddisc.DiscoverRequest{
