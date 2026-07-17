@@ -23,9 +23,16 @@ const (
 
 type Import struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Magnet        string                 `protobuf:"bytes,1,opt,name=magnet,proto3" json:"magnet,omitempty"`
+	Uri           string                 `protobuf:"bytes,1,opt,name=uri,proto3" json:"uri,omitempty"`
 	Health        uint32                 `protobuf:"varint,2,opt,name=health,proto3" json:"health,omitempty"`
 	Mimetype      string                 `protobuf:"bytes,3,opt,name=mimetype,proto3" json:"mimetype,omitempty"`
+	Uritype       string                 `protobuf:"bytes,4,opt,name=uritype,proto3" json:"uritype,omitempty"`
+	KnownMediaId  string                 `protobuf:"bytes,5,opt,name=known_media_id,proto3" json:"known_media_id,omitempty"`
+	Title         string                 `protobuf:"bytes,6,opt,name=title,proto3" json:"title,omitempty"`
+	Overview      string                 `protobuf:"bytes,7,opt,name=overview,proto3" json:"overview,omitempty"`
+	Popularity    float64                `protobuf:"fixed64,8,opt,name=popularity,proto3" json:"popularity,omitempty"`
+	PosterPath    string                 `protobuf:"bytes,9,opt,name=poster_path,proto3" json:"poster_path,omitempty"`
+	Source        string                 `protobuf:"bytes,10,opt,name=source,proto3" json:"source,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -60,9 +67,9 @@ func (*Import) Descriptor() ([]byte, []int) {
 	return file_ddisc_import_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *Import) GetMagnet() string {
+func (x *Import) GetUri() string {
 	if x != nil {
-		return x.Magnet
+		return x.Uri
 	}
 	return ""
 }
@@ -81,15 +88,74 @@ func (x *Import) GetMimetype() string {
 	return ""
 }
 
+func (x *Import) GetUritype() string {
+	if x != nil {
+		return x.Uritype
+	}
+	return ""
+}
+
+func (x *Import) GetKnownMediaId() string {
+	if x != nil {
+		return x.KnownMediaId
+	}
+	return ""
+}
+
+func (x *Import) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *Import) GetOverview() string {
+	if x != nil {
+		return x.Overview
+	}
+	return ""
+}
+
+func (x *Import) GetPopularity() float64 {
+	if x != nil {
+		return x.Popularity
+	}
+	return 0
+}
+
+func (x *Import) GetPosterPath() string {
+	if x != nil {
+		return x.PosterPath
+	}
+	return ""
+}
+
+func (x *Import) GetSource() string {
+	if x != nil {
+		return x.Source
+	}
+	return ""
+}
+
 var File_ddisc_import_proto protoreflect.FileDescriptor
 
 const file_ddisc_import_proto_rawDesc = "" +
 	"\n" +
-	"\x12ddisc.import.proto\x12\x05ddisc\"T\n" +
-	"\x06Import\x12\x16\n" +
-	"\x06magnet\x18\x01 \x01(\tR\x06magnet\x12\x16\n" +
+	"\x12ddisc.import.proto\x12\x05ddisc\"\x9c\x02\n" +
+	"\x06Import\x12\x10\n" +
+	"\x03uri\x18\x01 \x01(\tR\x03uri\x12\x16\n" +
 	"\x06health\x18\x02 \x01(\rR\x06health\x12\x1a\n" +
-	"\bmimetype\x18\x03 \x01(\tR\bmimetypeb\x06proto3"
+	"\bmimetype\x18\x03 \x01(\tR\bmimetype\x12\x18\n" +
+	"\auritype\x18\x04 \x01(\tR\auritype\x12&\n" +
+	"\x0eknown_media_id\x18\x05 \x01(\tR\x0eknown_media_id\x12\x14\n" +
+	"\x05title\x18\x06 \x01(\tR\x05title\x12\x1a\n" +
+	"\boverview\x18\a \x01(\tR\boverview\x12\x1e\n" +
+	"\n" +
+	"popularity\x18\b \x01(\x01R\n" +
+	"popularity\x12 \n" +
+	"\vposter_path\x18\t \x01(\tR\vposter_path\x12\x16\n" +
+	"\x06source\x18\n" +
+	" \x01(\tR\x06sourceb\x06proto3"
 
 var (
 	file_ddisc_import_proto_rawDescOnce sync.Once

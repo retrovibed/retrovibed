@@ -32,7 +32,7 @@ func TestRegistrySearchDecodesPluginOutput(t *testing.T) {
 
 	var results []string
 	for imp := range seq.Each(ctx) {
-		results = append(results, imp.Magnet)
+		results = append(results, imp.Uri)
 		require.EqualValues(t, 42, imp.Health)
 		require.Equal(t, "video", imp.Mimetype)
 	}
@@ -107,7 +107,7 @@ func TestRegistryBlocksNonPublicConnections(t *testing.T) {
 
 	var results []string
 	for imp := range seq.Each(ctx) {
-		results = append(results, imp.Magnet)
+		results = append(results, imp.Uri)
 	}
 	require.NoError(t, seq.Err())
 	require.Len(t, results, 1)

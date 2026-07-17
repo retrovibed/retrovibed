@@ -37,7 +37,7 @@ func TestPluginStrategyYieldsUnpersisted(t *testing.T) {
 	magnet := fmt.Sprintf("magnet:?xt=urn:btih:%s", id.String())
 	kid := uuid.Must(uuid.NewV4()).String()
 
-	plugins := fakePluginSeq{results: []*ddiscapi.Import{{Magnet: magnet, Health: 5, Mimetype: mimex.Video}}}
+	plugins := fakePluginSeq{results: []*ddiscapi.Import{{Uri: magnet, Uritype: mimex.Magnet, Health: 5, Mimetype: mimex.Video}}}
 	seq := ddisc.PluginStrategy(plugins).Discover(t.Context(), ddisc.DiscoverRequest{KnownMediaID: kid, Title: "ubuntu", Mimetypes: []string{mimex.Video}})
 
 	var got []ddisc.Discovered
@@ -51,7 +51,7 @@ func TestPluginStrategyYieldsUnpersisted(t *testing.T) {
 }
 
 func TestPluginStrategyNoopsWithoutTitle(t *testing.T) {
-	plugins := fakePluginSeq{results: []*ddiscapi.Import{{Magnet: "magnet:?xt=urn:btih:1111111111111111111111111111111111111111"}}}
+	plugins := fakePluginSeq{results: []*ddiscapi.Import{{Uri: "magnet:?xt=urn:btih:1111111111111111111111111111111111111111", Uritype: mimex.Magnet}}}
 	seq := ddisc.PluginStrategy(plugins).Discover(t.Context(), ddisc.DiscoverRequest{KnownMediaID: uuid.Must(uuid.NewV4()).String()})
 
 	var count int

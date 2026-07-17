@@ -31,7 +31,7 @@ func main() {
 	}
 
 	json.NewEncoder(os.Stdout).Encode(&ddiscapi.Import{
-		Magnet:   status,
+		Uri:      status,
 		Mimetype: *mimetype,
 	})
 }

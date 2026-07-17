@@ -21,6 +21,7 @@ import (
 	"strings"
 
 	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
+	"github.com/retrovibed/retrovibed/retroapi/mimex"
 
 	// autohijack points net.DefaultResolver and http.DefaultTransport at
 	// wasinet's virtual sockets when this is built for wasip1 (a no-op on
@@ -85,7 +86,8 @@ func main() {
 	// fabricates a single deterministic result instead, just to prove the
 	// rest of the contract end to end.
 	imp := &ddiscapi.Import{
-		Magnet:   "magnet:?xt=urn:btih:0000000000000000000000000000000000000000&dn=" + *query,
+		Uri:      "magnet:?xt=urn:btih:0000000000000000000000000000000000000000&dn=" + *query,
+		Uritype:  mimex.Magnet,
 		Health:   0,
 		Mimetype: mimetype,
 	}

@@ -14,6 +14,7 @@ const (
 	JSON                      = "application/json"
 	Binary                    = "application/octet-stream"
 	Bittorrent                = "application/x-bittorrent"
+	Magnet                    = "application/x-magnet"
 	RSS                       = "application/rss+xml"
 	ISO9660                   = "application/x-iso9660-image"
 	RetrovibedMediaArchive    = "application/vnd.retrovibed.media.archive"

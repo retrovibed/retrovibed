@@ -7,7 +7,7 @@ import (
 )
 
 type result struct {
-	Magnet   string `json:"magnet"`
+	Uri      string `json:"uri"`
 	Health   uint32 `json:"health"`
 	Mimetype string `json:"mimetype"`
 }
@@ -23,7 +23,7 @@ func main() {
 
 	enc := json.NewEncoder(os.Stdout)
 	enc.Encode(result{
-		Magnet:   "magnet:?xt=urn:btih:1111111111111111111111111111111111111111&dn=" + os.Getenv("PLUGIN_TOKEN"),
+		Uri:      "magnet:?xt=urn:btih:1111111111111111111111111111111111111111&dn=" + os.Getenv("PLUGIN_TOKEN"),
 		Health:   42,
 		Mimetype: *mimetype,
 	})

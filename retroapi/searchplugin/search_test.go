@@ -34,7 +34,7 @@ func TestRunSearchJobInjectsSiblingEnvFile(t *testing.T) {
 
 	var results []string
 	for imp := range seq.Each(ctx) {
-		results = append(results, imp.Magnet)
+		results = append(results, imp.Uri)
 	}
 	require.NoError(t, seq.Err())
 	require.Len(t, results, 1)
@@ -60,7 +60,7 @@ func TestRunSearchJobToleratesMissingEnvFile(t *testing.T) {
 
 	var results []string
 	for imp := range seq.Each(ctx) {
-		results = append(results, imp.Magnet)
+		results = append(results, imp.Uri)
 	}
 	require.NoError(t, seq.Err())
 	require.Len(t, results, 1)
