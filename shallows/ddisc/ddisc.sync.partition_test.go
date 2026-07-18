@@ -10,11 +10,11 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/cryptox"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
-	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/stretchr/testify/require"
 )
 
@@ -41,6 +41,7 @@ func TestSyncPartition(t *testing.T) {
 
 			d := ddisc.NewDiscovered(
 				&id,
+				"",
 				ddisc.DiscoveredOptionKnownMedia(ddiscapi.ImportedMediaUUID("", uuid.FromStringOrNil(uuidx.WithSuffix(idx))).String()),
 				ddisc.DiscoveredOptionMimetype(mimex.Binary),
 				ddisc.DiscoveredOptionFromTorrentInfo(info),
@@ -63,6 +64,7 @@ func TestSyncPartition(t *testing.T) {
 
 			d := ddisc.NewDiscovered(
 				&id,
+				"",
 				ddisc.DiscoveredOptionMimetype(mimex.Binary),
 				ddisc.DiscoveredOptionFromTorrentInfo(info),
 				ddisc.DiscoveredOptionPartitionAuto(partitions),
@@ -110,5 +112,46 @@ func TestSyncPartition(t *testing.T) {
 		last = assertbatch(prev, 7, ddisc.SyncPartition(q, n0.String(), prev.SyncUID))
 		require.NotEqual(t, uuid.Nil.String(), last.SyncUID)
 		assertbatch(ddisc.Discovered{SyncUID: uuid.Nil.String()}, 16, ddisc.SyncPartition(q, n0.String(), uuid.Nil.String()))
+	})
+
+	t.Run("never returns private media", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		tmpdir := t.TempDir()
+
+		q := sqltestx.Metadatabase(t)
+
+		partitions := ddisc.Partitions(16, cryptox.NewChaCha8(t.Name()))
+		p0 := uuid.FromStringOrNil("1a5c9e5a-0e1d-4f39-9d34-9a7ee9e3d6d3")
+		n0 := partitions.Max(p0.Bytes())
+
+		for idx := range 16 {
+			id := int160.Random()
+			info, _, err := torrenttest.Random(tmpdir, 128*bytesx.KiB)
+			require.NoError(t, err)
+			priv := true
+			info.Private = &priv
+
+			d := ddisc.NewDiscovered(
+				&id,
+				"",
+				ddisc.DiscoveredOptionKnownMedia(ddiscapi.ImportedMediaUUID("", uuid.FromStringOrNil(uuidx.WithSuffix(idx))).String()),
+				ddisc.DiscoveredOptionMimetype(mimex.Binary),
+				ddisc.DiscoveredOptionFromTorrentInfo(info),
+				ddisc.DiscoveredOptionPartitionAuto(partitions),
+			)
+			require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
+			require.True(t, d.Private)
+		}
+
+		count := 0
+		seq := ddisc.SyncPartition(q, n0.String(), uuid.Nil.String())
+		for d := range seq.Each(t.Context()) {
+			require.False(t, d.Private, "private media must never be synced to a peer")
+			count++
+		}
+		require.NoError(t, seq.Err())
+		require.Zero(t, count, "expected no private media to be returned")
 	})
 }

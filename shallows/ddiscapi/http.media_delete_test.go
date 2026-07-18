@@ -43,7 +43,7 @@ func TestHTTPMediaDelete(t *testing.T) {
 		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
 
 		id := int160.Random()
-		d = ddisc.NewDiscovered(&id)
+		d = ddisc.NewDiscovered(&id, "")
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
 
 		routes := mux.NewRouter()

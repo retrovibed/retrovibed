@@ -27,7 +27,7 @@ func TestMediaLs(t *testing.T) {
 		cmdtestx.Admin(t, ctx, q, keypath)
 
 		id := int160.Random()
-		d := ddisc.NewDiscovered(&id)
+		d := ddisc.NewDiscovered(&id, "")
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
 
 		routes := mux.NewRouter()
@@ -56,11 +56,11 @@ func TestMediaLs(t *testing.T) {
 		knownMediaID := uuid.Must(uuid.NewV7()).String()
 
 		matchID := int160.Random()
-		match := ddisc.NewDiscovered(&matchID, ddisc.DiscoveredOptionKnownMedia(knownMediaID))
+		match := ddisc.NewDiscovered(&matchID, "", ddisc.DiscoveredOptionKnownMedia(knownMediaID))
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, match).Scan(&match))
 
 		otherID := int160.Random()
-		other := ddisc.NewDiscovered(&otherID)
+		other := ddisc.NewDiscovered(&otherID, "")
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, other).Scan(&other))
 
 		routes := mux.NewRouter()
@@ -88,11 +88,11 @@ func TestMediaLs(t *testing.T) {
 		cmdtestx.Admin(t, ctx, q, keypath)
 
 		offloadID := int160.Random()
-		offload := ddisc.NewDiscovered(&offloadID, ddisc.DiscoveredOptionKnownMedia(uuid.Nil.String()))
+		offload := ddisc.NewDiscovered(&offloadID, "", ddisc.DiscoveredOptionKnownMedia(uuid.Nil.String()))
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, offload).Scan(&offload))
 
 		otherID := int160.Random()
-		other := ddisc.NewDiscovered(&otherID, ddisc.DiscoveredOptionKnownMedia(uuid.Must(uuid.NewV7()).String()))
+		other := ddisc.NewDiscovered(&otherID, "", ddisc.DiscoveredOptionKnownMedia(uuid.Must(uuid.NewV7()).String()))
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, other).Scan(&other))
 
 		routes := mux.NewRouter()
@@ -120,11 +120,11 @@ func TestMediaLs(t *testing.T) {
 		cmdtestx.Admin(t, ctx, q, keypath)
 
 		pendingID := int160.Random()
-		pending := ddisc.NewDiscovered(&pendingID, ddisc.DiscoveredOptionKnownMedia(uuid.Max.String()))
+		pending := ddisc.NewDiscovered(&pendingID, "", ddisc.DiscoveredOptionKnownMedia(uuid.Max.String()))
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, pending).Scan(&pending))
 
 		otherID := int160.Random()
-		other := ddisc.NewDiscovered(&otherID, ddisc.DiscoveredOptionKnownMedia(uuid.Must(uuid.NewV7()).String()))
+		other := ddisc.NewDiscovered(&otherID, "", ddisc.DiscoveredOptionKnownMedia(uuid.Must(uuid.NewV7()).String()))
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, other).Scan(&other))
 
 		routes := mux.NewRouter()
@@ -152,11 +152,11 @@ func TestMediaLs(t *testing.T) {
 		cmdtestx.Admin(t, ctx, q, keypath)
 
 		wantedID := int160.Random()
-		wanted := ddisc.NewDiscovered(&wantedID)
+		wanted := ddisc.NewDiscovered(&wantedID, "")
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, wanted).Scan(&wanted))
 
 		otherID := int160.Random()
-		other := ddisc.NewDiscovered(&otherID)
+		other := ddisc.NewDiscovered(&otherID, "")
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, other).Scan(&other))
 
 		routes := mux.NewRouter()

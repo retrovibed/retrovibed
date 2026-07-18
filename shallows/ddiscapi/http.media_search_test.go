@@ -35,7 +35,7 @@ func TestHTTPMediaSearch(t *testing.T) {
 		q := sqltestx.Metadatabase(t)
 
 		id := int160.Random()
-		d = ddisc.NewDiscovered(&id)
+		d = ddisc.NewDiscovered(&id, "")
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
 
 		routes := mux.NewRouter()
@@ -79,11 +79,11 @@ func TestHTTPMediaSearch(t *testing.T) {
 		knownMediaID := uuid.Must(uuid.NewV7()).String()
 
 		matchID := int160.Random()
-		match = ddisc.NewDiscovered(&matchID, ddisc.DiscoveredOptionKnownMedia(knownMediaID))
+		match = ddisc.NewDiscovered(&matchID, "", ddisc.DiscoveredOptionKnownMedia(knownMediaID))
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, match).Scan(&match))
 
 		otherID := int160.Random()
-		other = ddisc.NewDiscovered(&otherID)
+		other = ddisc.NewDiscovered(&otherID, "")
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, other).Scan(&other))
 
 		routes := mux.NewRouter()
@@ -125,11 +125,11 @@ func TestHTTPMediaSearch(t *testing.T) {
 		q := sqltestx.Metadatabase(t)
 
 		unresolvedID := int160.Random()
-		unresolved = ddisc.NewDiscovered(&unresolvedID)
+		unresolved = ddisc.NewDiscovered(&unresolvedID, "")
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, unresolved).Scan(&unresolved))
 
 		resolvedID := int160.Random()
-		resolved = ddisc.NewDiscovered(&resolvedID, ddisc.DiscoveredOptionKnownMedia(uuid.Must(uuid.NewV7()).String()))
+		resolved = ddisc.NewDiscovered(&resolvedID, "", ddisc.DiscoveredOptionKnownMedia(uuid.Must(uuid.NewV7()).String()))
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, resolved).Scan(&resolved))
 
 		routes := mux.NewRouter()

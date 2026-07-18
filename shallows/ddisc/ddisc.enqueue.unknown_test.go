@@ -30,6 +30,7 @@ func TestEnqueueUnknownWrapFound(t *testing.T) {
 
 	d := ddisc.NewDiscovered(
 		&id,
+		"",
 		ddisc.DiscoveredOptionKnownMedia(kid),
 		ddisc.DiscoveredOptionMimetype(mimex.Binary),
 		ddisc.DiscoveredOptionFromTorrentInfo(info),

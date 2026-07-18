@@ -11,12 +11,12 @@ import (
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/ddisc/ddisctorrent"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/torrenttestx"
-	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/stretchr/testify/require"
 )
 
@@ -64,6 +64,7 @@ func TestSyncProtocol(t *testing.T) {
 			id := int160.Random()
 			d := ddisc.NewDiscovered(
 				&id,
+				"",
 				ddisc.DiscoveredOptionKnownMedia(knownmedia.String()),
 				ddisc.DiscoveredOptionMimetype(mimex.Binary),
 				ddisc.DiscoveredOptionPartition(uuidx.WithSuffix(idx%2)),

@@ -60,6 +60,15 @@ func DiscoveredOptionTitle(s string) DiscoveredOption {
 	}
 }
 
+// DiscoveredOptionPrivate marks a candidate as sourced from a BEP 27 private
+// torrent. Private candidates are still persisted (so this node can use them
+// locally) but are excluded from every peer-facing sync/search response.
+func DiscoveredOptionPrivate(b bool) DiscoveredOption {
+	return func(d *Discovered) {
+		d.Private = b
+	}
+}
+
 func DiscoveredOptionTestDefaults(d *Discovered) {
 	d.AudioDefaultLocale = localex.FirstDefined(userx.LocaleLanguage())
 	d.SubtitlesDefaultLocale = localex.FirstDefined(userx.LocaleLanguage())
@@ -69,6 +78,7 @@ func DiscoveredOptionFromTorrentInfo(i *metainfo.Info) DiscoveredOption {
 	return func(d *Discovered) {
 		d.Title = i.Name
 		d.Bytes = uint64(i.TotalLength())
+		d.Private = langx.Autoderef(i.Private)
 	}
 }
 
@@ -155,10 +165,11 @@ func Worst() Discovered {
 	}
 }
 
-func NewDiscovered(md *int160.T, options ...DiscoveredOption) (m Discovered) {
+func NewDiscovered(md *int160.T, uri string, options ...DiscoveredOption) (m Discovered) {
 	r := langx.Clone(Discovered{
 		ID:                     torrentx.HashUID(md),
 		Infohash:               md.Bytes(),
+		URI:                    uri,
 		KnownMediaID:           uuid.Nil.String(),
 		Mimetype:               mimex.Binary,
 		Category:               mimex.Application,
@@ -175,10 +186,11 @@ func NewDiscovered(md *int160.T, options ...DiscoveredOption) (m Discovered) {
 // multiple Discovered rows to exist for the same infohash (e.g. one per episode in a season
 // pack, or one per track in an album). known must already be resolved (never the Unknown()
 // sentinel) - that precondition is the caller's responsibility.
-func NewDiscoveredFromKnown(md int160.T, known library.Known, options ...DiscoveredOption) (m Discovered) {
+func NewDiscoveredFromKnown(md int160.T, uri string, known library.Known, options ...DiscoveredOption) (m Discovered) {
 	r := langx.Clone(Discovered{
 		ID:                     md5x.FormatUUID(md5x.Digest(md.Bytes(), []byte(known.UID))),
 		Infohash:               md.Bytes(),
+		URI:                    uri,
 		KnownMediaID:           known.UID,
 		Title:                  known.Title,
 		Description:            known.Overview,

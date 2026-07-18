@@ -80,7 +80,7 @@ func TestDiscoverMedia(t *testing.T) {
 			}
 		}()
 
-		disc := ddisc.NewDiscovered(&id, ddisc.DiscoveredOptionFromTorrentInfo(info))
+		disc := ddisc.NewDiscovered(&id, "", ddisc.DiscoveredOptionFromTorrentInfo(info))
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, disc).Scan(&disc))
 
 		go func() {
@@ -112,7 +112,7 @@ func TestDiscoverMedia(t *testing.T) {
 		defer tclient.Close()
 
 		id := int160.Random()
-		disc := ddisc.NewDiscovered(&id)
+		disc := ddisc.NewDiscovered(&id, "")
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, disc).Scan(&disc))
 
 		go func() {
@@ -144,7 +144,7 @@ func TestDiscoverMedia(t *testing.T) {
 		defer tclient.Close()
 
 		id := int160.Random()
-		disc := ddisc.NewDiscovered(&id)
+		disc := ddisc.NewDiscovered(&id, "")
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, disc).Scan(&disc))
 		_, err := q.ExecContext(ctx, `UPDATE ddisc_media SET next_check_at = NOW() + INTERVAL '1 hour' WHERE id = $1`, disc.ID)
 		require.NoError(t, err)

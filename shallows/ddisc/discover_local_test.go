@@ -16,7 +16,7 @@ func TestLocalStrategyExactMatch(t *testing.T) {
 
 	kid := uuid.Must(uuid.NewV4()).String()
 	id := int160.Random()
-	d := ddisc.NewDiscovered(&id, ddisc.DiscoveredOptionKnownMedia(kid), ddisc.DiscoveredOptionMimetype(mimex.Binary))
+	d := ddisc.NewDiscovered(&id, "", ddisc.DiscoveredOptionKnownMedia(kid), ddisc.DiscoveredOptionMimetype(mimex.Binary))
 	require.NoError(t, ddisc.DiscoveredInsertWithDefaults(t.Context(), q, d).Scan(&d))
 
 	seq := ddisc.LocalStrategy(q).Discover(t.Context(), ddisc.DiscoverRequest{KnownMediaID: kid})

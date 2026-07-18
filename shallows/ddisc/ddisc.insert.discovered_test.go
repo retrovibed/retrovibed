@@ -32,6 +32,7 @@ func TestDiscoveredInsertWithDefaults(t *testing.T) {
 
 		d := ddisc.NewDiscovered(
 			&id,
+			"",
 			ddisc.DiscoveredOptionIndex(true),
 			ddisc.DiscoveredOptionMimetype(mimex.Binary),
 			ddisc.DiscoveredOptionFromTorrentInfo(info),
@@ -53,6 +54,7 @@ func TestDiscoveredInsertWithDefaults(t *testing.T) {
 
 		d := ddisc.NewDiscovered(
 			&id,
+			"",
 			ddisc.DiscoveredOptionMimetype(mimex.Binary),
 			ddisc.DiscoveredOptionFromTorrentInfo(info),
 		)
@@ -79,6 +81,7 @@ func TestDiscoveredInsertWithDefaults(t *testing.T) {
 
 		d := ddisc.NewDiscovered(
 			&id,
+			"",
 			ddisc.DiscoveredOptionMimetype(mimex.Binary),
 			ddisc.DiscoveredOptionFromTorrentInfo(info),
 		)
@@ -126,6 +129,7 @@ func TestDiscoveredInsertWithDefaults(t *testing.T) {
 
 		d := ddisc.NewDiscovered(
 			&id,
+			"",
 			ddisc.DiscoveredOptionMimetype(mimex.Binary),
 			ddisc.DiscoveredOptionFromTorrentInfo(info),
 		)
@@ -149,6 +153,38 @@ func TestDiscoveredInsertWithDefaults(t *testing.T) {
 		require.Equal(t, "changed title", blank.Title, "an empty incoming title leaves the stored one untouched")
 	})
 
+	t.Run("on conflict private is sticky - a later non-private write can never downgrade it", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		tmpdir := t.TempDir()
+
+		q := sqltestx.Metadatabase(t)
+
+		id := int160.Random()
+		info, _, err := torrenttest.Random(tmpdir, 128*bytesx.KiB)
+		require.NoError(t, err)
+
+		d := ddisc.NewDiscovered(
+			&id,
+			"",
+			ddisc.DiscoveredOptionMimetype(mimex.Binary),
+			ddisc.DiscoveredOptionFromTorrentInfo(info),
+		)
+		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
+		require.False(t, d.Private)
+
+		private := d
+		private.Private = true
+		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, private).Scan(&private))
+		require.True(t, private.Private, "a writer that knows a record is private must be able to mark it so")
+
+		reinserted := private
+		reinserted.Private = false
+		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, reinserted).Scan(&reinserted))
+		require.True(t, reinserted.Private, "a less-informed writer must never downgrade an already-private record")
+	})
+
 	t.Run("rejects corrupted titles from syncing instead of failing the insert", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
@@ -164,6 +200,7 @@ func TestDiscoveredInsertWithDefaults(t *testing.T) {
 
 		d := ddisc.NewDiscovered(
 			&id,
+			"",
 			ddisc.DiscoveredOptionMimetype(mimex.Binary),
 			ddisc.DiscoveredOptionFromTorrentInfo(info),
 			ddisc.DiscoveredOptionDetectCorrupted,
@@ -195,6 +232,7 @@ func TestDiscoveredInsertWithDefaults(t *testing.T) {
 
 				d := ddisc.NewDiscovered(
 					&id,
+					"",
 					ddisc.DiscoveredOptionMimetype(mimex.Binary),
 					ddisc.DiscoveredOptionFromTorrentInfo(info),
 				)

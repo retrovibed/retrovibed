@@ -7,6 +7,7 @@ import (
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/dht/krpc"
+	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 )
@@ -45,6 +46,7 @@ func (t SearchRecorder) Handle(ctx context.Context, source dht.Addr, s *dht.Serv
 
 	err := ddisc.DiscoveredInsertWithDefaults(ctx, t.q, ddisc.NewDiscovered(
 		new(int160.FromBytes(m.A.Infohash)),
+		metainfo.Magnet{InfoHash: metainfo.Hash(m.A.Infohash)}.String(),
 		ddisc.DiscoveredOptionMimetype(m.A.Mimetype),
 		ddisc.DiscoveredOptionKnownMedia(m.A.KnownMediaID),
 		mediaToDiscovered(m.A),

@@ -29,7 +29,7 @@ func DiscoveredInsertWithDefaults(
 	gql genieql.Insert,
 	pattern func(ctx context.Context, q sqlx.Queryer, a Discovered) NewDiscoveredScannerStaticRow,
 ) {
-	gql.Into("ddisc_media").Default("created_at", "updated_at", "tombstoned_at", "released_at", "next_check_at", "policy_rank", "policy_rejection").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, title = COALESCE(NULLIF(EXCLUDED.title, ''), ddisc_media.title), policy_rank = EXCLUDED.policy_rank, policy_rejection = DEFAULT")
+	gql.Into("ddisc_media").Default("created_at", "updated_at", "tombstoned_at", "released_at", "next_check_at", "policy_rank", "policy_rejection").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, title = COALESCE(NULLIF(EXCLUDED.title, ''), ddisc_media.title), policy_rank = EXCLUDED.policy_rank, policy_rejection = DEFAULT, private = ddisc_media.private OR EXCLUDED.private")
 }
 
 func DiscoveredFindByID(
@@ -64,28 +64,28 @@ func DiscoveredCooldown(
 	gql genieql.Insert,
 	pattern func(ctx context.Context, q sqlx.Queryer, a Discovered) NewDiscoveredScannerStaticRow,
 ) {
-	gql.Into("ddisc_media").Default("created_at", "updated_at", "tombstoned_at", "released_at", "next_check_at", "policy_rank", "policy_rejection").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, attempts = EXCLUDED.attempts + 1, next_check_at = NOW() + least(to_minutes(CAST(EXCLUDED.attempts AS INT)*2), to_hours(24)), policy_rank = DEFAULT, policy_rejection = DEFAULT")
+	gql.Into("ddisc_media").Default("created_at", "updated_at", "tombstoned_at", "released_at", "next_check_at", "policy_rank", "policy_rejection").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, attempts = EXCLUDED.attempts + 1, next_check_at = NOW() + least(to_minutes(CAST(EXCLUDED.attempts AS INT)*2), to_hours(24)), policy_rank = DEFAULT, policy_rejection = DEFAULT, private = ddisc_media.private OR EXCLUDED.private")
 }
 
 func DiscoveredSinceSync(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer, sync string) NewDiscoveredScannerStatic,
 ) {
-	gql = gql.Query(`SELECT ` + DiscoveredScannerStaticColumns + ` FROM ddisc_media WHERE sync_uid > {sync} AND known_media_id IN ('FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF'::uuid, '00000000-0000-0000-0000-000000000000'::uuid) ORDER BY "sync_uid" ASC`)
+	gql = gql.Query(`SELECT ` + DiscoveredScannerStaticColumns + ` FROM ddisc_media WHERE sync_uid > {sync} AND known_media_id IN ('FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF'::uuid, '00000000-0000-0000-0000-000000000000'::uuid) AND private = false ORDER BY "sync_uid" ASC`)
 }
 
 func DiscoveredPartitionSync(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer, sync, partition string) NewDiscoveredScannerStatic,
 ) {
-	gql = gql.Query(`SELECT ` + DiscoveredScannerStaticColumns + ` FROM ddisc_media WHERE sync_uid > {sync} AND partition = {partition} ORDER BY "sync_uid" ASC`)
+	gql = gql.Query(`SELECT ` + DiscoveredScannerStaticColumns + ` FROM ddisc_media WHERE sync_uid > {sync} AND partition = {partition} AND private = false ORDER BY "sync_uid" ASC`)
 }
 
 func DiscoveredByKnownID(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer, kid string) NewDiscoveredScannerStatic,
 ) {
-	gql = gql.Query(`SELECT ` + DiscoveredScannerStaticColumns + ` FROM ddisc_media WHERE known_media_id = {kid}`)
+	gql = gql.Query(`SELECT ` + DiscoveredScannerStaticColumns + ` FROM ddisc_media WHERE known_media_id = {kid} AND private = false`)
 }
 
 // DiscoveredRank persists the result of running a ranking Policy against a

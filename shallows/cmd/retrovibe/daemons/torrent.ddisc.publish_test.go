@@ -35,7 +35,7 @@ func TestPublishDiscoveredMediaOne(t *testing.T) {
 		require.NoError(t, publishDiscoveredMediaOne(ctx, q, lmd))
 
 		id := int160.FromBytes(tmd.Infohash)
-		expected := ddisc.NewDiscoveredFromKnown(id, known)
+		expected := ddisc.NewDiscoveredFromKnown(id, "", known)
 
 		var disc ddisc.Discovered
 		require.NoError(t, ddisc.DiscoveredFindByID(ctx, q, expected.ID).Scan(&disc))
@@ -63,7 +63,7 @@ func TestPublishDiscoveredMediaOne(t *testing.T) {
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
 		id := int160.FromBytes(tmd.Infohash)
-		existing := ddisc.NewDiscoveredFromKnown(id, known)
+		existing := ddisc.NewDiscoveredFromKnown(id, "", known)
 		existing.Title = "pre-existing title"
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, existing).Scan(&existing))
 
@@ -74,7 +74,7 @@ func TestPublishDiscoveredMediaOne(t *testing.T) {
 		require.Equal(t, "pre-existing title", disc.Title, "an already published record should not be overwritten")
 	})
 
-	t.Run("skips private torrents without publishing", func(t *testing.T) {
+	t.Run("publishes private torrents locally but marks them private", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 
@@ -96,10 +96,11 @@ func TestPublishDiscoveredMediaOne(t *testing.T) {
 		require.NoError(t, publishDiscoveredMediaOne(ctx, q, lmd))
 
 		id := int160.FromBytes(tmd.Infohash)
-		expected := ddisc.NewDiscoveredFromKnown(id, known)
+		expected := ddisc.NewDiscoveredFromKnown(id, "", known)
 
 		var disc ddisc.Discovered
-		require.Error(t, ddisc.DiscoveredFindByID(ctx, q, expected.ID).Scan(&disc), "private torrents should never be published")
+		require.NoError(t, ddisc.DiscoveredFindByID(ctx, q, expected.ID).Scan(&disc), "private torrents should still be recorded locally")
+		require.True(t, disc.Private, "private torrents must be marked private so they're excluded from peer sync")
 	})
 
 	t.Run("returns an error when the torrent metadata cannot be found", func(t *testing.T) {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"log"
+	"net/http"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
@@ -22,11 +23,13 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/ddisc/ddisctorrent"
 	"github.com/retrovibed/retrovibed/shallows/internal/cryptox"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/netipx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/internal/torrentx"
+	"github.com/retrovibed/retrovibed/shallows/tracking"
 )
 
 // searchPlugins mirrors daemons.searchPlugins' method set structurally (that
@@ -106,7 +109,8 @@ func (t cmdMediaLocate) Run(gctx *cmdopts.Global) (err error) {
 
 	if errors.Is(err, errLocateFound) {
 		log.Println("candidate found", found.ID, found.Title, found.PolicyRank, int160.FromBytes(found.Infohash))
-		if err := daemons.DiscoveredDownload(bctx, db, tclient, loc, found); err != nil {
+		importer := tracking.NewURIImport(db, http.DefaultClient, fsx.DirVirtual(userx.DefaultCacheDirectory("torrentddisc")))
+		if err := daemons.DiscoveredDownload(bctx, db, importer, loc, found); err != nil {
 			return errorsx.Wrap(err, "unable to initiate download")
 		}
 		log.Println("media located", loc.ID, found.ID)

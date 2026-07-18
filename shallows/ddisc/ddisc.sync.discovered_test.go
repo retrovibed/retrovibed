@@ -44,6 +44,7 @@ func TestSyncDiscovered(t *testing.T) {
 
 			d := ddisc.NewDiscovered(
 				&id,
+				"",
 				ddisc.DiscoveredOptionIndex(!block0.Filter(id.Bytes())),
 				ddisc.DiscoveredOptionMimetype(mimex.Binary),
 				ddisc.DiscoveredOptionFromTorrentInfo(info),
@@ -86,6 +87,7 @@ func TestSyncDiscovered(t *testing.T) {
 
 			d := ddisc.NewDiscovered(
 				&id,
+				"",
 				ddisc.DiscoveredOptionIndex(!block0.Filter(id.Bytes())),
 				ddisc.DiscoveredOptionMimetype(mimex.Binary),
 				ddisc.DiscoveredOptionFromTorrentInfo(info),
@@ -95,5 +97,43 @@ func TestSyncDiscovered(t *testing.T) {
 
 		next := assertbatch(last, ddisc.SyncDiscovered(q, block1, last.SyncUID))
 		require.NotEqual(t, last.SyncUID, next.SyncUID)
+	})
+
+	t.Run("never returns private media", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		tmpdir := t.TempDir()
+
+		q := sqltestx.Metadatabase(t)
+
+		nofilter := ddisc.FilterRatio(cryptox.NewChaCha8(t.Name()), 100)
+
+		for range 16 {
+			id := int160.Random()
+			info, _, err := torrenttest.Random(tmpdir, 128*bytesx.KiB)
+			require.NoError(t, err)
+			priv := true
+			info.Private = &priv
+
+			d := ddisc.NewDiscovered(
+				&id,
+				"",
+				ddisc.DiscoveredOptionIndex(true),
+				ddisc.DiscoveredOptionMimetype(mimex.Binary),
+				ddisc.DiscoveredOptionFromTorrentInfo(info),
+			)
+			require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
+			require.True(t, d.Private)
+		}
+
+		count := 0
+		seq := ddisc.SyncDiscovered(q, nofilter, uuid.Nil.String())
+		for d := range seq.Each(t.Context()) {
+			require.False(t, d.Private, "private media must never be synced to a peer")
+			count++
+		}
+		require.NoError(t, seq.Err())
+		require.Zero(t, count, "expected no private media to be returned")
 	})
 }

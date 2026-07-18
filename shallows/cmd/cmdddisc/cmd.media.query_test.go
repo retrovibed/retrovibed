@@ -31,7 +31,7 @@ func TestMediaQuery(t *testing.T) {
 		defer pdb.Close()
 
 		rid := int160.Random()
-		record := ddisc.NewDiscovered(&rid, ddisc.DiscoveredOptionKnownMedia(id))
+		record := ddisc.NewDiscovered(&rid, "", ddisc.DiscoveredOptionKnownMedia(id))
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, pdb, record).Scan(&record))
 
 		ptm := dht.DefaultMuxer().

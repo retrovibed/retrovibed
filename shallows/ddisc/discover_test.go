@@ -45,7 +45,7 @@ func (t fakeDiscoverSeq) Err() error { return t.err }
 // rather than being bare ID-only structs.
 func newDiscoverHit(kid string) ddisc.Discovered {
 	id := int160.Random()
-	return ddisc.NewDiscovered(&id,
+	return ddisc.NewDiscovered(&id, "",
 		ddisc.DiscoveredOptionKnownMedia(kid),
 		ddisc.DiscoveredOptionMimetype(mimex.Binary),
 		ddisc.DiscoveredOptionTitle("Some.Movie.2024.1080p.BluRay.x264"),

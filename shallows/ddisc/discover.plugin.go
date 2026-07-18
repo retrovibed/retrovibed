@@ -75,6 +75,7 @@ func (t *pluginSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 			id := int160.FromBytes(m.InfoHash.Bytes())
 			d := NewDiscovered(
 				&id,
+				imp.Uri,
 				DiscoveredOptionKnownMedia(langx.FirstNonZero(imp.KnownMediaId, t.req.KnownMediaID)),
 				DiscoveredOptionMimetype(Generalize(mimetype)),
 				DiscoveredOptionHealth(imp.Health),

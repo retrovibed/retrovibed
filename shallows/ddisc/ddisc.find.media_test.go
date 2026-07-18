@@ -10,11 +10,11 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/cryptox"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
-	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -40,6 +40,7 @@ func TestFindMedia(t *testing.T) {
 
 			d := ddisc.NewDiscovered(
 				&id,
+				"",
 				ddisc.DiscoveredOptionKnownMedia(ddiscapi.ImportedMediaUUID("", uuid.FromStringOrNil(uuidx.WithSuffix(idx%32))).String()),
 				ddisc.DiscoveredOptionMimetype(mimex.Binary),
 				ddisc.DiscoveredOptionFromTorrentInfo(info),
@@ -62,6 +63,7 @@ func TestFindMedia(t *testing.T) {
 
 			d := ddisc.NewDiscovered(
 				&id,
+				"",
 				ddisc.DiscoveredOptionMimetype(mimex.Binary),
 				ddisc.DiscoveredOptionFromTorrentInfo(info),
 				ddisc.DiscoveredOptionPartitionAuto(partitions),
@@ -91,5 +93,43 @@ func TestFindMedia(t *testing.T) {
 			assertbatch(idx, n, ddisc.FindMedia(q, ddiscapi.ImportedMediaUUID("", uuid.FromStringOrNil(uuidx.WithSuffix(idx))).String()))
 		}
 
+	})
+
+	t.Run("never returns private media", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		tmpdir := t.TempDir()
+
+		q := sqltestx.Metadatabase(t)
+
+		kid := ddiscapi.ImportedMediaUUID("", uuid.FromStringOrNil(uuidx.WithSuffix(0))).String()
+
+		for range 16 {
+			id := int160.Random()
+			info, _, err := torrenttest.Random(tmpdir, 128*bytesx.KiB)
+			require.NoError(t, err)
+			priv := true
+			info.Private = &priv
+
+			d := ddisc.NewDiscovered(
+				&id,
+				"",
+				ddisc.DiscoveredOptionKnownMedia(kid),
+				ddisc.DiscoveredOptionMimetype(mimex.Binary),
+				ddisc.DiscoveredOptionFromTorrentInfo(info),
+			)
+			require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
+			require.True(t, d.Private)
+		}
+
+		count := 0
+		seq := ddisc.FindMedia(q, kid)
+		for d := range seq.Each(t.Context()) {
+			require.False(t, d.Private, "private media must never be returned from a peer search")
+			count++
+		}
+		require.NoError(t, seq.Err())
+		require.Zero(t, count, "expected no private media to be returned")
 	})
 }

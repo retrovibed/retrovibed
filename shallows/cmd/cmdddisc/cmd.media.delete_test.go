@@ -27,7 +27,7 @@ func TestMediaDelete(t *testing.T) {
 		cmdtestx.Admin(t, ctx, q, keypath)
 
 		id := int160.Random()
-		d := ddisc.NewDiscovered(&id)
+		d := ddisc.NewDiscovered(&id, "")
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
 
 		routes := mux.NewRouter()

@@ -125,7 +125,7 @@ func TestDiscoveryIdentify(t *testing.T) {
 			"--peer", seederAddrs[0].String(),
 		))
 
-		expected := ddisc.NewDiscovered(&id)
+		expected := ddisc.NewDiscovered(&id, "")
 		var found ddisc.Discovered
 		require.NoError(t, ddisc.DiscoveredFindByID(ctx, q, expected.ID).Scan(&found))
 		require.NotEmpty(t, found.Mimetype)

@@ -81,6 +81,65 @@ func TestDiscoverDHTMetadata(t *testing.T) {
 		}, 10*time.Second, 100*time.Millisecond, "expected unknown hash record to be removed")
 	})
 
+	t.Run("records a private torrent's metadata locally but marks it private", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		q := sqltestx.Metadatabase(t)
+
+		seederdir := t.TempDir()
+		seederinfo, _, err := torrenttest.Random(seederdir, 16*1024)
+		require.NoError(t, err)
+		priv := true
+		seederinfo.Private = &priv
+
+		seeder := torrenttestx.QuickClient(t)
+		defer seeder.Close()
+
+		seedermd, err := torrent.NewFromInfo(seederinfo, torrent.OptionStorage(storage.NewFile(seederdir)))
+		require.NoError(t, err)
+		infohash := seedermd.ID
+
+		_, _, err = seeder.Start(seedermd)
+		require.NoError(t, err)
+
+		addr := torrentx.ClientAddress(seeder)
+		require.True(t, addr.IsValid(), "expected seeder to have a dialable listen address")
+
+		unk := tracking.NewUnknownHash(
+			infohash,
+			tracking.OptionUnknownHashPeer(int160.Random(), addr),
+			func(uh *tracking.UnknownHash) { uh.NextCheck = time.Now().Add(-time.Minute) },
+		)
+		require.NoError(t, tracking.UnknownHashInsertWithDefaults(ctx, q, unk).Scan(&unk))
+
+		tclient := torrenttestx.QuickClient(t)
+		defer tclient.Close()
+
+		notblocked := func(k []byte) bool { return false }
+
+		go func() {
+			_ = daemons.DiscoverDHTMetadata(ctx, 1, q, tclient, notblocked)
+		}()
+
+		expectedID := torrentx.HashUID(&infohash)
+
+		require.Eventually(t, func() bool {
+			var disc ddisc.Discovered
+			return ddisc.DiscoveredFindByID(ctx, q, expectedID).Scan(&disc) == nil
+		}, 20*time.Second, 200*time.Millisecond, "expected metadata to be discovered")
+
+		var disc ddisc.Discovered
+		require.NoError(t, ddisc.DiscoveredFindByID(ctx, q, expectedID).Scan(&disc))
+		require.True(t, disc.Private, "expected private torrent's metadata to be marked private")
+
+		sql, args, err := tracking.UnknownSearchBuilder().RemoveColumns().Columns("COUNT(*)").Where(squirrel.Eq{"id": expectedID}).ToSql()
+		require.NoError(t, err)
+		require.Eventually(t, func() bool {
+			return sqltestx.Count(t, q, sql, args...) == 0
+		}, 10*time.Second, 100*time.Millisecond, "expected unknown hash record to be removed")
+	})
+
 	t.Run("respects the blocked filter and records the metadata as unindexed", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
