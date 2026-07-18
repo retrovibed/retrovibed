@@ -117,7 +117,7 @@ func LocateInsertWithDefaults(
 	pattern func(ctx context.Context, q sqlx.Queryer, a Locate) NewLocateScannerStaticRow,
 ) {
 	gql.Into("ddisc_locate").Default("created_at", "updated_at", "tombstoned_at", "located_torrent_id").Conflict(
-		"ON CONFLICT (id) DO UPDATE SET updated_at = NOW(), tombstoned_at = EXCLUDED.tombstoned_at, located_torrent_id = EXCLUDED.located_torrent_id",
+		"ON CONFLICT (id) DO UPDATE SET updated_at = NOW(), tombstoned_at = EXCLUDED.tombstoned_at, located_torrent_id = EXCLUDED.located_torrent_id, adult = EXCLUDED.adult, autodownload = EXCLUDED.autodownload",
 	)
 }
 
