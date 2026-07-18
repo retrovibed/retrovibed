@@ -12,7 +12,9 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid/v5"
+	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/backoffx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -21,7 +23,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
-	"github.com/retrovibed/retrovibed/shallows/internal/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 
 	tmdb "github.com/cyruzin/golang-tmdb"
@@ -91,7 +92,7 @@ func (t *tmdbimport) movies(ctx context.Context, c *tmdb.Client) iter.Seq[librar
 				uidmd5 := uuid.FromBytesOrNil(_md5.Sum(nil))
 				v := library.Known{
 					Source:           t.Source,
-					UID:              library.KnownImportedUintID(t.Source, uint64(mr.ID)),
+					UID:              ddiscapi.ImportedMediaUintID(t.Source, uint64(mr.ID)),
 					Md5:              uidmd5.String(),
 					Md5Lower:         binary.LittleEndian.Uint64(uuidx.LowN(uidmd5, 64)),
 					ID:               strconv.FormatInt(mr.ID, 10),
@@ -172,7 +173,7 @@ func (t *tmdbimport) series(ctx context.Context, c *tmdb.Client) iter.Seq[librar
 				uidmd5 := uuid.FromBytesOrNil(_md5.Sum(nil))
 
 				v := library.Known{
-					UID:              library.KnownImportedUintID(t.Source, uint64(mr.ID)),
+					UID:              ddiscapi.ImportedMediaUintID(t.Source, uint64(mr.ID)),
 					Source:           t.Source,
 					Md5:              uidmd5.String(),
 					Md5Lower:         binary.LittleEndian.Uint64(uuidx.LowN(uidmd5, 64)),

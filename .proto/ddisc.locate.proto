@@ -12,6 +12,7 @@ message Locate {
   string mimetype = 7 [ json_name = "mimetype" ];
   string tombstoned_at = 8 [ json_name = "tombstoned_at" ];
   bool autodownload = 9 [ json_name = "autodownload" ];
+  bool adult = 10 [ json_name = "adult" ];
 }
 
 message LocateSearchRequest {

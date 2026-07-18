@@ -20,7 +20,7 @@ import (
 // *retroapi/searchplugin.Registry, so tests can inject a fake without a real
 // compiled wasm plugin.
 type searchPlugins interface {
-	Search(ctx context.Context, mimetypes []string, query string) iterx.Seq[*ddiscapi.Import]
+	Search(ctx context.Context, mimetypes []string, query string, adult bool) iterx.Seq[*ddiscapi.Import]
 }
 
 func SearchQueueBackgroundRun(ctx context.Context, q sqlx.Queryer, plugins searchPlugins) error {
@@ -41,7 +41,7 @@ func SearchQueueBackgroundRun(ctx context.Context, q sqlx.Queryer, plugins searc
 		}
 
 		sctx, cancel := context.WithTimeout(ctx, 30*time.Second)
-		seq := ddisc.Discover(sctx, q, ddisc.DefaultPolicy(), ddisc.DiscoverRequestFromKnown(known), ddisc.PluginStrategy(plugins))
+		seq := ddisc.Discover(sctx, q, ddisc.DefaultPolicy(), ddisc.DiscoverRequestFromKnown(known), ddisc.PluginStrategy(q, plugins))
 
 		found := false
 		for range seq.Each(sctx) {

@@ -11,7 +11,9 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 
+	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -19,7 +21,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
-	"github.com/retrovibed/retrovibed/shallows/internal/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 )
 
@@ -69,7 +70,7 @@ func (t deeppoolimport) knownFromPublished(pc *communityapi.PublishedContent) li
 	_md5 := md5x.JSON(pc)
 	uidmd5 := uuid.FromBytesOrNil(_md5.Sum(nil))
 
-	uid := stringsx.FirstNonBlank(pc.KnownMediaId, library.KnownImportedUUID(t.Source, uuid.FromStringOrNil(pc.Id)).String())
+	uid := stringsx.FirstNonBlank(pc.KnownMediaId, ddiscapi.ImportedMediaUUID(t.Source, uuid.FromStringOrNil(pc.Id)).String())
 
 	return library.Known{
 		Source:   t.Source,

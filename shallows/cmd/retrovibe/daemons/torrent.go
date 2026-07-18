@@ -7,6 +7,7 @@ import (
 	"log"
 	"math"
 	"net"
+	"net/http"
 	"net/netip"
 	"os"
 	"runtime"
@@ -42,6 +43,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/envx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
@@ -555,16 +557,23 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 		plugins = reg
 	}
 
+	c := httpx.BindRetryTransport(&http.Client{
+		Transport: &http.Transport{
+			DialContext: DefaultDialer(wgnet, t._dnscache).DialContext,
+		},
+	}, http.StatusTooManyRequests, http.StatusBadGateway)
+
 	// TODO: AutoLocateMedia should be located within distributed indexing.
 	if cfg.AutoLocateMedia {
 		const freq = 15 * time.Minute
 		policy := ddisc.DefaultPolicy()
+		importer := tracking.NewURIImport(t.db, c, t.rootstore)
 		go asyncx.Periodic(dctx, t.locate, backoffx.New(
 			backoffx.Constant(freq),
 			backoffx.JitterRandom(time.Second),
 		), "locate media - periodic")
 		asyncx.Background(dctx, t.locate, func(ctx context.Context) error {
-			return errorsx.Wrap(LocateMedia(dctx, t.db, tclient, disc, dhts, partitions, plugins, policy), "failed to locate media")
+			return errorsx.Wrap(LocateMedia(dctx, t.db, importer, disc, dhts, partitions, plugins, policy), "failed to locate media")
 		})
 	} else {
 		log.Println("auto locate media is disabled, to enable add --auto-locate-media flag.")
@@ -635,7 +644,7 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 	})
 
 	go func() {
-		if err := DiscoverFromRSSFeeds(dctx, t.db, t.rootstore, t.mc, tclient, t.tstore, t.pub); errorsx.Ignore(err, context.Canceled) != nil {
+		if err := DiscoverFromRSSFeeds(dctx, t.db, c, t.rootstore, t.mc, tclient, t.tstore, t.pub); errorsx.Ignore(err, context.Canceled) != nil {
 			asyncfailure(errorsx.Wrap(err, "autodiscovery of RSS feeds failed"))
 			return
 		}

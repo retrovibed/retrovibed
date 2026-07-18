@@ -49,6 +49,7 @@ func newDiscoverHit(kid string) ddisc.Discovered {
 		ddisc.DiscoveredOptionKnownMedia(kid),
 		ddisc.DiscoveredOptionMimetype(mimex.Binary),
 		ddisc.DiscoveredOptionTitle("Some.Movie.2024.1080p.BluRay.x264"),
+		ddisc.DiscoveredOptionAutoMagnet,
 	)
 }
 

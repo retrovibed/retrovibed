@@ -317,6 +317,7 @@ func DiscoverDHTMetadata(ctx context.Context, workloads uint64, db sqlx.Queryer,
 				ddisc.DiscoveredOptionMimetype(mimex.Binary),
 				ddisc.DiscoveredOptionFromTorrentInfo(info),
 				ddisc.DiscoveredOptionDetectCorrupted,
+				ddisc.DiscoveredOptionAutoMagnet,
 			),
 		).Scan(&disc); err != nil {
 			return errorsx.Wrap(err, "unable to insert discovered record")

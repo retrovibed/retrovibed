@@ -1,10 +1,13 @@
 package cmdddisc_test
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
+	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/envx"
@@ -56,6 +59,58 @@ func TestSearchPluginInstall(t *testing.T) {
 		require.NoError(t, err)
 		_, err = os.Stat(filepath.Join(searchplugin.SearchPluginDir(), "noop.wasm.wasm"))
 		require.True(t, os.IsNotExist(err))
+	})
+
+	t.Run("bakes -X ldflags into the compiled plugin", func(t *testing.T) {
+		t.Setenv("XDG_CONFIG_HOME", t.TempDir())
+
+		dir := t.TempDir()
+		require.NoError(t, os.WriteFile(filepath.Join(dir, "go.mod"), []byte("module searchplugintestdata\n\ngo 1.24\n"), 0600))
+		require.NoError(t, os.WriteFile(filepath.Join(dir, "main.go"), []byte(`package main
+
+import (
+	"encoding/json"
+	"flag"
+	"os"
+)
+
+type result struct {
+	Uri    string `+"`json:\"uri\"`"+`
+	Source string `+"`json:\"source\"`"+`
+}
+
+var tag = ""
+
+func main() {
+	fs := flag.NewFlagSet("plugin", flag.ExitOnError)
+	fs.String("mimetype", "", "")
+	query := fs.String("query", "", "")
+	fs.Parse(os.Args[2:])
+
+	json.NewEncoder(os.Stdout).Encode(result{Uri: "magnet:?xt=urn:btih:0&dn=" + *query, Source: tag})
+}
+`), 0600))
+
+		require.NoError(t, cmdtestx.Execute(t, genparser(t), "search", "plugin", "install", dir,
+			"--name", "baked",
+			"-b", "main.tag=baked-value",
+		))
+
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+
+		r, err := searchplugin.NewRegistry(ctx)
+		require.NoError(t, err)
+		require.NoError(t, r.Load(ctx, filepath.Join(searchplugin.SearchPluginDir(), "baked.wasm")))
+
+		var results []*ddiscapi.Import
+		seq := r.Search(ctx, []string{"video"}, "ubuntu", false)
+		for imp := range seq.Each(ctx) {
+			results = append(results, imp)
+		}
+		require.NoError(t, seq.Err())
+		require.Len(t, results, 1)
+		require.Equal(t, "baked-value", results[0].Source)
 	})
 
 	t.Run("defaults name to the repository's base name", func(t *testing.T) {

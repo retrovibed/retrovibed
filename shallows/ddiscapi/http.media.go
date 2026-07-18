@@ -150,6 +150,7 @@ func (t *HTTPMedia) create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	id := int160.FromBytesOrZero(msg.Media.GetInfohash())
+	options = append(options, ddisc.DiscoveredOptionAutoMagnet)
 	d = ddisc.NewDiscovered(&id, options...)
 
 	if err = ddisc.DiscoveredInsertWithDefaults(r.Context(), t.q, d).Scan(&d); err != nil {

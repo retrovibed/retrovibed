@@ -13,7 +13,9 @@ import (
 	"github.com/dashotv/tvdb"
 	"github.com/dashotv/tvdb/openapi/models/shared"
 	"github.com/gofrs/uuid/v5"
+	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/debugx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -22,7 +24,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 )
 
@@ -83,7 +84,7 @@ func (t *tvdbimport) records(c *tvdb.Client) iter.Seq[library.Known] {
 
 				v := library.Known{
 					Source:           t.Source,
-					UID:              library.KnownImportedUintID(t.Source, uint64(langx.Autoderef(mr.ID))),
+					UID:              ddiscapi.ImportedMediaUintID(t.Source, uint64(langx.Autoderef(mr.ID))),
 					Md5:              uidmd5.String(),
 					Md5Lower:         binary.LittleEndian.Uint64(uuidx.LowN(uidmd5, 64)),
 					ID:               strconv.FormatInt(int64(langx.Autoderef(mr.ID)), 10),

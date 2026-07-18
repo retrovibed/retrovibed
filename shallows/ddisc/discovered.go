@@ -60,6 +60,35 @@ func DiscoveredOptionTitle(s string) DiscoveredOption {
 	}
 }
 
+// DiscoveredOptionPrivate marks a candidate as sourced from a BEP 27 private
+// torrent. Private candidates are still persisted (so this node can use them
+// locally) but are excluded from every peer-facing sync/search response.
+func DiscoveredOptionPrivate(b bool) DiscoveredOption {
+	return func(d *Discovered) {
+		d.Private = b
+	}
+}
+
+func DiscoveredOptionURI(s string) DiscoveredOption {
+	return func(d *Discovered) {
+		d.URI = s
+	}
+}
+
+// DiscoveredOptionAutoMagnet synthesizes a minimal magnet uri from d.Infohash
+// when uri isn't already set (i.e. NewDiscovered/NewDiscoveredFromKnown was
+// called with an empty uri). Callers that only ever have a raw infohash in
+// hand (DHT/wire-sync, protobuf bridges, etc.) can use this instead of
+// constructing metainfo.Magnet{InfoHash: metainfo.Hash(id.Bytes())}.String()
+// themselves at every call site.
+func DiscoveredOptionAutoMagnet(d *Discovered) {
+	if d.URI != "" {
+		return
+	}
+
+	d.URI = metainfo.Magnet{InfoHash: metainfo.Hash(d.Infohash)}.String()
+}
+
 func DiscoveredOptionTestDefaults(d *Discovered) {
 	d.AudioDefaultLocale = localex.FirstDefined(userx.LocaleLanguage())
 	d.SubtitlesDefaultLocale = localex.FirstDefined(userx.LocaleLanguage())
@@ -69,6 +98,7 @@ func DiscoveredOptionFromTorrentInfo(i *metainfo.Info) DiscoveredOption {
 	return func(d *Discovered) {
 		d.Title = i.Name
 		d.Bytes = uint64(i.TotalLength())
+		d.Private = langx.Autoderef(i.Private)
 	}
 }
 

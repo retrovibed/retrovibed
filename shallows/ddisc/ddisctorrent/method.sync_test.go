@@ -9,14 +9,14 @@ import (
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/int160"
+	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/ddisc/ddisctorrent"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/torrenttestx"
-	"github.com/retrovibed/retrovibed/shallows/internal/uuidx"
-	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/stretchr/testify/require"
 )
 
@@ -59,7 +59,7 @@ func TestSyncProtocol(t *testing.T) {
 		)
 		defer tclient.Close()
 
-		knownmedia := library.KnownImportedUUID(t.Name(), uuid.Must(uuid.NewV7()))
+		knownmedia := ddiscapi.ImportedMediaUUID(t.Name(), uuid.Must(uuid.NewV7()))
 		genrecord := func(ctx context.Context, q sqlx.Queryer, idx int) {
 			id := int160.Random()
 			d := ddisc.NewDiscovered(
@@ -67,6 +67,7 @@ func TestSyncProtocol(t *testing.T) {
 				ddisc.DiscoveredOptionKnownMedia(knownmedia.String()),
 				ddisc.DiscoveredOptionMimetype(mimex.Binary),
 				ddisc.DiscoveredOptionPartition(uuidx.WithSuffix(idx%2)),
+				ddisc.DiscoveredOptionAutoMagnet,
 			)
 
 			require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))

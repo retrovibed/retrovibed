@@ -32,6 +32,7 @@ type Locate struct {
 	Mimetype         string                 `protobuf:"bytes,7,opt,name=mimetype,proto3" json:"mimetype,omitempty"`
 	TombstonedAt     string                 `protobuf:"bytes,8,opt,name=tombstoned_at,proto3" json:"tombstoned_at,omitempty"`
 	Autodownload     bool                   `protobuf:"varint,9,opt,name=autodownload,proto3" json:"autodownload,omitempty"`
+	Adult            bool                   `protobuf:"varint,10,opt,name=adult,proto3" json:"adult,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -125,6 +126,13 @@ func (x *Locate) GetTombstonedAt() string {
 func (x *Locate) GetAutodownload() bool {
 	if x != nil {
 		return x.Autodownload
+	}
+	return false
+}
+
+func (x *Locate) GetAdult() bool {
+	if x != nil {
+		return x.Adult
 	}
 	return false
 }
@@ -413,7 +421,7 @@ var File_ddisc_locate_proto protoreflect.FileDescriptor
 
 const file_ddisc_locate_proto_rawDesc = "" +
 	"\n" +
-	"\x12ddisc.locate.proto\x12\x05ddisc\"\xac\x02\n" +
+	"\x12ddisc.locate.proto\x12\x05ddisc\"\xc2\x02\n" +
 	"\x06Locate\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1e\n" +
 	"\n" +
@@ -427,7 +435,9 @@ const file_ddisc_locate_proto_rawDesc = "" +
 	"\x05query\x18\x06 \x01(\tR\x05query\x12\x1a\n" +
 	"\bmimetype\x18\a \x01(\tR\bmimetype\x12$\n" +
 	"\rtombstoned_at\x18\b \x01(\tR\rtombstoned_at\x12\"\n" +
-	"\fautodownload\x18\t \x01(\bR\fautodownload\"j\n" +
+	"\fautodownload\x18\t \x01(\bR\fautodownload\x12\x14\n" +
+	"\x05adult\x18\n" +
+	" \x01(\bR\x05adult\"j\n" +
 	"\x13LocateSearchRequest\x12\x14\n" +
 	"\x05query\x18\x01 \x01(\tR\x05query\x12\x17\n" +
 	"\x06offset\x18\x84\a \x01(\x04R\x06offset\x12\x15\n" +

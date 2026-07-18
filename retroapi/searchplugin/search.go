@@ -26,19 +26,22 @@ import (
 const guestSSLCertDir = "/etc/ssl/certs"
 
 // Search runs every loaded plugin as a WASI command with
-// --mimetype mimetypes[0] [--mimetype mimetypes[1] ...] --query query,
-// decoding each line of its stdout as a *ddiscapi.Import and yielding it.
-// One plugin's failure is logged and skipped, not fatal to the whole
-// sequence. ctx alone governs how long this may run — wrap it with
-// context.WithTimeout for a deadline.
-func (r *Registry) Search(ctx context.Context, mimetypes []string, query string) iterx.Seq[*ddiscapi.Import] {
-	return &searchSeq{r: r, mimetypes: mimetypes, query: query}
+// --mimetype mimetypes[0] [--mimetype mimetypes[1] ...] --query query
+// [--adult], decoding each line of its stdout as a *ddiscapi.Import and
+// yielding it. --adult is only ever appended when adult is true (see
+// runSearchJob) so a plugin built before this flag existed keeps working for
+// ordinary (adult=false) searches. One plugin's failure is logged and
+// skipped, not fatal to the whole sequence. ctx alone governs how long this
+// may run — wrap it with context.WithTimeout for a deadline.
+func (r *Registry) Search(ctx context.Context, mimetypes []string, query string, adult bool) iterx.Seq[*ddiscapi.Import] {
+	return &searchSeq{r: r, mimetypes: mimetypes, query: query, adult: adult}
 }
 
 type searchSeq struct {
 	r         *Registry
 	mimetypes []string
 	query     string
+	adult     bool
 	err       error
 }
 
@@ -51,6 +54,7 @@ type workload struct {
 	compiled  wazero.CompiledModule
 	mimetypes []string
 	query     string
+	adult     bool
 	results   chan<- *ddiscapi.Import
 	wg        *sync.WaitGroup
 }
@@ -73,6 +77,11 @@ func (r *Registry) runSearchJob(ctx context.Context, j workload) error {
 	args := []string{j.path, "plugin", "--query", j.query}
 	for _, m := range j.mimetypes {
 		args = append(args, "--mimetype", m)
+	}
+	// only ever appended when true - see Search's doc comment for why an
+	// explicit --adult=false is never emitted.
+	if j.adult {
+		args = append(args, "--adult")
 	}
 	wazerofs := wazero.NewFSConfig().WithDirMount(r.sslCertDir, guestSSLCertDir)
 	cfg := wazero.NewModuleConfig().
@@ -184,6 +193,7 @@ func (t *searchSeq) Each(ctx context.Context) iter.Seq[*ddiscapi.Import] {
 					compiled:  compiled,
 					mimetypes: t.mimetypes,
 					query:     t.query,
+					adult:     t.adult,
 					results:   results,
 					wg:        &wg,
 				}

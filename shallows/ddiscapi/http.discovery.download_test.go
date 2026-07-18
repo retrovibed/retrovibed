@@ -35,7 +35,7 @@ func TestHTTPDiscoveryDownload(t *testing.T) {
 		q := sqltestx.Metadatabase(t)
 
 		id := int160.Random()
-		disc = ddisc.NewDiscovered(&id)
+		disc = ddisc.NewDiscovered(&id, ddisc.DiscoveredOptionAutoMagnet)
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, disc).Scan(&disc))
 
 		md = tracking.NewMetadata(&id, tracking.MetadataOptionCompleted, tracking.MetadataOptionBytes(1), tracking.MetadataOptionDownloaded(1), tracking.MetadataOptionUploaded(1))
@@ -93,7 +93,7 @@ func TestHTTPDiscoveryDownload(t *testing.T) {
 		q := sqltestx.Metadatabase(t)
 
 		id := int160.Random()
-		disc = ddisc.NewDiscovered(&id)
+		disc = ddisc.NewDiscovered(&id, ddisc.DiscoveredOptionAutoMagnet)
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, disc).Scan(&disc))
 
 		routes := mux.NewRouter()

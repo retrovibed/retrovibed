@@ -12,14 +12,15 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid/v5"
+	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
-	"github.com/retrovibed/retrovibed/shallows/internal/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"golang.org/x/text/language"
 )
@@ -83,7 +84,7 @@ func (t *mbjsonlimport) releases(ctx context.Context, r io.Reader) iter.Seq[libr
 
 			v := library.Known{
 				Source:           t.Source,
-				UID:              library.KnownImportedUintID(t.Source, uint64(binary.BigEndian.Uint64(id.Bytes()[:8]))),
+				UID:              ddiscapi.ImportedMediaUintID(t.Source, uint64(binary.BigEndian.Uint64(id.Bytes()[:8]))),
 				Md5:              uidmd5.String(),
 				Md5Lower:         binary.LittleEndian.Uint64(uuidx.LowN(uidmd5, 64)),
 				ID:               id.String(),

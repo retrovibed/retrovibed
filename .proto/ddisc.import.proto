@@ -3,7 +3,14 @@ syntax = "proto3";
 package ddisc;
 
 message Import {
-  string magnet = 1 [ json_name = "magnet" ];
+  string uri = 1 [ json_name = "uri" ];
   uint32 health = 2 [ json_name = "health" ];
   string mimetype = 3 [ json_name = "mimetype" ];
+  string uritype = 4 [ json_name = "uritype" ];
+  string known_media_id = 5 [ json_name = "known_media_id" ];
+  string title = 6 [ json_name = "title" ];
+  string overview = 7 [ json_name = "overview" ];
+  double popularity = 8 [ json_name = "popularity" ];
+  string poster_path = 9 [ json_name = "poster_path" ];
+  string source = 10 [ json_name = "source" ];
 }

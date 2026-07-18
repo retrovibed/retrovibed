@@ -28,6 +28,7 @@ class Locate extends $pb.GeneratedMessage {
     $core.String? mimetype,
     $core.String? tombstonedAt,
     $core.bool? autodownload,
+    $core.bool? adult,
   }) {
     final result = create();
     if (id != null) result.id = id;
@@ -39,6 +40,7 @@ class Locate extends $pb.GeneratedMessage {
     if (mimetype != null) result.mimetype = mimetype;
     if (tombstonedAt != null) result.tombstonedAt = tombstonedAt;
     if (autodownload != null) result.autodownload = autodownload;
+    if (adult != null) result.adult = adult;
     return result;
   }
 
@@ -64,6 +66,7 @@ class Locate extends $pb.GeneratedMessage {
     ..aOS(7, _omitFieldNames ? '' : 'mimetype')
     ..aOS(8, _omitFieldNames ? '' : 'tombstoned_at')
     ..aOB(9, _omitFieldNames ? '' : 'autodownload')
+    ..aOB(10, _omitFieldNames ? '' : 'adult')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -164,6 +167,15 @@ class Locate extends $pb.GeneratedMessage {
   $core.bool hasAutodownload() => $_has(8);
   @$pb.TagNumber(9)
   void clearAutodownload() => $_clearField(9);
+
+  @$pb.TagNumber(10)
+  $core.bool get adult => $_getBF(9);
+  @$pb.TagNumber(10)
+  set adult($core.bool value) => $_setBool(9, value);
+  @$pb.TagNumber(10)
+  $core.bool hasAdult() => $_has(9);
+  @$pb.TagNumber(10)
+  void clearAdult() => $_clearField(10);
 }
 
 class LocateSearchRequest extends $pb.GeneratedMessage {

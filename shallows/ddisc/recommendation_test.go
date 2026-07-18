@@ -26,7 +26,7 @@ func TestRecommendation(t *testing.T) {
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 
 		id := int160.Random()
-		d := ddisc.NewDiscovered(&id, ddisc.DiscoveredOptionKnownMedia(known.UID))
+		d := ddisc.NewDiscovered(&id, ddisc.DiscoveredOptionKnownMedia(known.UID), ddisc.DiscoveredOptionAutoMagnet)
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
 
 		rec, err := ddisc.Recommendation(ctx, q, mimex.Application, "", false)
@@ -46,7 +46,7 @@ func TestRecommendation(t *testing.T) {
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 
 		id := int160.Random()
-		d := ddisc.NewDiscovered(&id, ddisc.DiscoveredOptionKnownMedia(known.UID))
+		d := ddisc.NewDiscovered(&id, ddisc.DiscoveredOptionKnownMedia(known.UID), ddisc.DiscoveredOptionAutoMagnet)
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
 
 		rec, err := ddisc.Recommendation(ctx, q, mimex.Application, "", false)
@@ -75,7 +75,7 @@ func TestRecommendation(t *testing.T) {
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 
 		id := int160.Random()
-		d := ddisc.NewDiscovered(&id, ddisc.DiscoveredOptionKnownMedia(known.UID))
+		d := ddisc.NewDiscovered(&id, ddisc.DiscoveredOptionKnownMedia(known.UID), ddisc.DiscoveredOptionAutoMagnet)
 		d.Adult = true
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
 
@@ -94,7 +94,7 @@ func TestRecommendation(t *testing.T) {
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 
 		id := int160.Random()
-		d := ddisc.NewDiscovered(&id, ddisc.DiscoveredOptionKnownMedia(known.UID))
+		d := ddisc.NewDiscovered(&id, ddisc.DiscoveredOptionKnownMedia(known.UID), ddisc.DiscoveredOptionAutoMagnet)
 		d.Adult = true
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
 
@@ -117,11 +117,11 @@ func TestRecommendation(t *testing.T) {
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, audio).Scan(&audio))
 
 		vid := int160.Random()
-		dv := ddisc.NewDiscovered(&vid, ddisc.DiscoveredOptionKnownMedia(video.UID), ddisc.DiscoveredOptionMimetype("video/mp4"))
+		dv := ddisc.NewDiscovered(&vid, ddisc.DiscoveredOptionKnownMedia(video.UID), ddisc.DiscoveredOptionMimetype("video/mp4"), ddisc.DiscoveredOptionAutoMagnet)
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, dv).Scan(&dv))
 
 		aid := int160.Random()
-		da := ddisc.NewDiscovered(&aid, ddisc.DiscoveredOptionKnownMedia(audio.UID), ddisc.DiscoveredOptionMimetype("audio/mpeg"))
+		da := ddisc.NewDiscovered(&aid, ddisc.DiscoveredOptionKnownMedia(audio.UID), ddisc.DiscoveredOptionMimetype("audio/mpeg"), ddisc.DiscoveredOptionAutoMagnet)
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, da).Scan(&da))
 
 		rec, err := ddisc.Recommendation(ctx, q, mimex.Video, "", false)
@@ -141,7 +141,7 @@ func TestRecommendation(t *testing.T) {
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 
 		id := int160.Random()
-		d := ddisc.NewDiscovered(&id, ddisc.DiscoveredOptionKnownMedia(known.UID))
+		d := ddisc.NewDiscovered(&id, ddisc.DiscoveredOptionKnownMedia(known.UID), ddisc.DiscoveredOptionAutoMagnet)
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
 
 		_, err := ddisc.Recommendation(ctx, q, mimex.Application, "", false)
@@ -164,7 +164,7 @@ func TestRecommendation(t *testing.T) {
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 
 		id := int160.Random()
-		d := ddisc.NewDiscovered(&id, ddisc.DiscoveredOptionKnownMedia(known.UID))
+		d := ddisc.NewDiscovered(&id, ddisc.DiscoveredOptionKnownMedia(known.UID), ddisc.DiscoveredOptionAutoMagnet)
 		d.AudioDefaultLocale = "en"
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
 
@@ -185,7 +185,7 @@ func TestRecommendation(t *testing.T) {
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 
 		id := int160.Random()
-		d := ddisc.NewDiscovered(&id, ddisc.DiscoveredOptionKnownMedia(known.UID))
+		d := ddisc.NewDiscovered(&id, ddisc.DiscoveredOptionKnownMedia(known.UID), ddisc.DiscoveredOptionAutoMagnet)
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
 
 		rec, err := ddisc.Recommendation(ctx, q, mimex.Application, "", false)
@@ -196,7 +196,7 @@ func TestRecommendation(t *testing.T) {
 
 func TestRecommendationFromDiscovered(t *testing.T) {
 	id := int160.Random()
-	d := ddisc.NewDiscovered(&id, ddisc.DiscoveredOptionMimetype("video/mp4"))
+	d := ddisc.NewDiscovered(&id, ddisc.DiscoveredOptionMimetype("video/mp4"), ddisc.DiscoveredOptionAutoMagnet)
 	d.AudioDefaultLocale = "en"
 	d.Adult = true
 

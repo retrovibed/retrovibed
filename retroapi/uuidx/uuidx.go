@@ -33,6 +33,13 @@ func Advance16(u uuid.UUID, by uint16) uuid.UUID {
 	return dup
 }
 
+// IsMinMax reports whether id is one of the two sentinel values used
+// throughout this codebase to mean "no real id": uuid.Nil (the all-zero
+// minimum) or uuid.Max (the all-ones maximum).
+func IsMinMax(id uuid.UUID) bool {
+	return id == uuid.Nil || id == uuid.Max
+}
+
 // returns the first non-zero uuid or zero if all are zero.
 func FirstNonNil(uids ...uuid.UUID) uuid.UUID {
 	for _, uid := range uids {

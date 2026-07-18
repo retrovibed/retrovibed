@@ -48,6 +48,7 @@ func (t SearchRecorder) Handle(ctx context.Context, source dht.Addr, s *dht.Serv
 		ddisc.DiscoveredOptionMimetype(m.A.Mimetype),
 		ddisc.DiscoveredOptionKnownMedia(m.A.KnownMediaID),
 		mediaToDiscovered(m.A),
+		ddisc.DiscoveredOptionAutoMagnet,
 	)).Scan(&d)
 
 	if err != nil {

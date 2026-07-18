@@ -15,7 +15,7 @@ import (
 func TestRunSearchJobInjectsSiblingEnvFile(t *testing.T) {
 	wasmPath := filepath.Join(t.TempDir(), "env.wasm")
 
-	build := exec.Command("go", "build", "-o", wasmPath, "./testdata/envplugin")
+	build := exec.Command("go", "build", "-o", wasmPath, "./.fixtures/envplugin")
 	build.Env = append(build.Environ(), "GOOS=wasip1", "GOARCH=wasm")
 	out, err := build.CombinedOutput()
 	require.NoError(t, err, string(out))
@@ -30,11 +30,11 @@ func TestRunSearchJobInjectsSiblingEnvFile(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, r.Load(ctx, wasmPath))
 
-	seq := r.Search(ctx, []string{"video"}, "ubuntu")
+	seq := r.Search(ctx, []string{"video"}, "ubuntu", false)
 
 	var results []string
 	for imp := range seq.Each(ctx) {
-		results = append(results, imp.Magnet)
+		results = append(results, imp.Uri)
 	}
 	require.NoError(t, seq.Err())
 	require.Len(t, results, 1)
@@ -44,7 +44,7 @@ func TestRunSearchJobInjectsSiblingEnvFile(t *testing.T) {
 func TestRunSearchJobToleratesMissingEnvFile(t *testing.T) {
 	wasmPath := filepath.Join(t.TempDir(), "env.wasm")
 
-	build := exec.Command("go", "build", "-o", wasmPath, "./testdata/envplugin")
+	build := exec.Command("go", "build", "-o", wasmPath, "./.fixtures/envplugin")
 	build.Env = append(build.Environ(), "GOOS=wasip1", "GOARCH=wasm")
 	out, err := build.CombinedOutput()
 	require.NoError(t, err, string(out))
@@ -56,11 +56,11 @@ func TestRunSearchJobToleratesMissingEnvFile(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, r.Load(ctx, wasmPath))
 
-	seq := r.Search(ctx, []string{"video"}, "ubuntu")
+	seq := r.Search(ctx, []string{"video"}, "ubuntu", false)
 
 	var results []string
 	for imp := range seq.Each(ctx) {
-		results = append(results, imp.Magnet)
+		results = append(results, imp.Uri)
 	}
 	require.NoError(t, seq.Err())
 	require.Len(t, results, 1)

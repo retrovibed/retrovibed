@@ -31,7 +31,7 @@ type fakeSearchPlugins struct {
 	results []*ddiscapi.Import
 }
 
-func (t fakeSearchPlugins) Search(ctx context.Context, mimetypes []string, query string) iterx.Seq[*ddiscapi.Import] {
+func (t fakeSearchPlugins) Search(ctx context.Context, mimetypes []string, query string, adult bool) iterx.Seq[*ddiscapi.Import] {
 	return fakeResultSeq(t)
 }
 
@@ -50,7 +50,7 @@ func TestSearchQueueBackgroundRunPersistsFoundResults(t *testing.T) {
 	id := int160.Random()
 	magnet := fmt.Sprintf("magnet:?xt=urn:btih:%s", id.String())
 
-	plugins := fakeSearchPlugins{results: []*ddiscapi.Import{{Magnet: magnet, Health: 10, Mimetype: mimex.Video}}}
+	plugins := fakeSearchPlugins{results: []*ddiscapi.Import{{Uri: magnet, Uritype: mimex.Magnet, Health: 10, Mimetype: mimex.Video}}}
 	require.NoError(t, SearchQueueBackgroundRun(ctx, q, plugins))
 
 	require.EqualValues(t, 1, sqltestx.Count(t, q, "SELECT COUNT(*) FROM ddisc_media WHERE known_media_id = ?", known.UID))

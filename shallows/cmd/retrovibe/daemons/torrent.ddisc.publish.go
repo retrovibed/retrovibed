@@ -18,7 +18,9 @@ import (
 // PublishDiscoveredMedia scans library media that has been matched to a known media entity and
 // belongs to a torrent, and publishes a ddisc.Discovered record for it so it can be
 // announced/synced to peers, even when this node downloaded the content on its own behalf
-// (i.e. outside of DHT-based discovery).
+// (i.e. outside of DHT-based discovery). Torrents flagged private are still published so
+// this node can use them locally, but are marked private so they're never handed to peers
+// (see ddisc.DiscoveredOptionPrivate and the private-excluding sync/search queries).
 func PublishDiscoveredMedia(ctx context.Context, db sqlx.Queryer) error {
 	q := library.MetadataSearchBuilder().Where(
 		squirrel.And{
@@ -49,11 +51,6 @@ func publishDiscoveredMediaOne(ctx context.Context, db sqlx.Queryer, lmd library
 		return errorsx.Wrap(err, "unable to find torrent metadata")
 	}
 
-	if tmd.Private {
-		// don't attempt to index private media
-		return nil
-	}
-
 	var known library.Known
 	if err := library.KnownFindByID(ctx, db, lmd.KnownMediaID).Scan(&known); err != nil {
 		return errorsx.Wrap(err, "unable to find known media")
@@ -62,7 +59,7 @@ func publishDiscoveredMediaOne(ctx context.Context, db sqlx.Queryer, lmd library
 	id := int160.FromBytes(tmd.Infohash)
 
 	// skip files already published, keyed deterministically on (infohash, known_media_id).
-	candidate := ddisc.NewDiscoveredFromKnown(id, known)
+	candidate := ddisc.NewDiscoveredFromKnown(id, known, ddisc.DiscoveredOptionPrivate(tmd.Private), ddisc.DiscoveredOptionAutoMagnet)
 	var existing ddisc.Discovered
 	if err := ddisc.DiscoveredFindByID(ctx, db, candidate.ID).Scan(&existing); err == nil {
 		return nil

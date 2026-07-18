@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/dashotv/tvdb"
+	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -328,6 +329,6 @@ func TestTvdbImportRecords(t *testing.T) {
 		require.Equal(t, a.Md5, b.Md5)
 		require.Equal(t, a.Md5Lower, b.Md5Lower)
 		require.Equal(t, a.UID, b.UID)
-		require.Equal(t, library.KnownImportedUintID("tvdb", uint64(121361)), a.UID)
+		require.Equal(t, ddiscapi.ImportedMediaUintID(ddiscapi.SourceTVDB, uint64(121361)), a.UID)
 	})
 }

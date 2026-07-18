@@ -17,6 +17,7 @@ func LocateOptionFromDdiscLocate(cc ddisc.Locate) LocateOption {
 		c.LocatedTorrentId = cc.LocatedTorrentID
 		c.Query = cc.Query
 		c.Mimetype = cc.Mimetype
+		c.Adult = cc.Adult
 	}
 }
 

@@ -66,6 +66,7 @@ func TestDiscoveredProtocol(t *testing.T) {
 				&id,
 				ddisc.DiscoveredOptionKnownMedia(uuid.Nil.String()),
 				ddisc.DiscoveredOptionMimetype(mimex.Binary),
+				ddisc.DiscoveredOptionAutoMagnet,
 			)
 
 			require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))

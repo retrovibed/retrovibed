@@ -33,6 +33,7 @@ func TestEnqueueUnknownWrapFound(t *testing.T) {
 		ddisc.DiscoveredOptionKnownMedia(kid),
 		ddisc.DiscoveredOptionMimetype(mimex.Binary),
 		ddisc.DiscoveredOptionFromTorrentInfo(info),
+		ddisc.DiscoveredOptionAutoMagnet,
 	)
 	require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
 
