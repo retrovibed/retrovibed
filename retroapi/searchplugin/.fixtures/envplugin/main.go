@@ -18,12 +18,13 @@ func main() {
 	// its own flags, so skip it here too.
 	fs := flag.NewFlagSet("plugin", flag.ExitOnError)
 	mimetype := fs.String("mimetype", "", "")
-	query := fs.String("query", "", "")
+	fs.String("query", "", "")
+	fs.Bool("adult", false, "")
 	fs.Parse(os.Args[2:])
 
 	enc := json.NewEncoder(os.Stdout)
 	enc.Encode(result{
-		Uri:      "magnet:?xt=urn:btih:1111111111111111111111111111111111111111&dn=" + *query,
+		Uri:      "magnet:?xt=urn:btih:1111111111111111111111111111111111111111&dn=" + os.Getenv("PLUGIN_TOKEN"),
 		Health:   42,
 		Mimetype: *mimetype,
 	})

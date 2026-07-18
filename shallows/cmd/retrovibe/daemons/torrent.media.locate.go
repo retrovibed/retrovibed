@@ -39,6 +39,7 @@ func Locate(ctx context.Context, db sqlx.Queryer, disc *DiscoverySettings, dhts 
 		KnownMediaID: loc.KnownMediaID,
 		Title:        loc.Query,
 		Mimetypes:    ddisc.Category(loc.Mimetype),
+		Adult:        loc.Adult,
 	}
 
 	seq := ddisc.Discover(ctx, db, policy, req, strategies...)

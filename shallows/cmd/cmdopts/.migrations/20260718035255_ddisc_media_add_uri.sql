@@ -4,7 +4,7 @@ ALTER TABLE ddisc_media RENAME TO ddisc_media_old;
 CREATE TABLE ddisc_media (
   id UUID PRIMARY KEY NOT NULL, -- md5 of infohash
   infohash BINARY NOT NULL CHECK (octet_length(infohash) = 20),
-  uri STRING NOT NULL DEFAULT '',
+  uri STRING NOT NULL CHECK (uri <> ''),
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   next_check_at TIMESTAMPTZ NOT NULL DEFAULT now(),

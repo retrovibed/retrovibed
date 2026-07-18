@@ -29,6 +29,7 @@ type cmdSearchPluginInstall struct {
 	Package    string   `flag:"" name:"package" help:"import path (relative to the module root) of the plugin's main package" default:"."`
 	Name       string   `flag:"" name:"name" optional:"" help:"filename (without .wasm) to install as; defaults to the repository's directory/base name"`
 	Env        []string `flag:"" name:"env" short:"e" type:"envvar" optional:"" help:"KEY=VALUE pair or file://path merged into the installed plugin's .env config"`
+	Bake       []string `flag:"" name:"bake" short:"b" optional:"" help:"main.KEY=VALUE pair baked into the binary at compile time via -ldflags -X; repeatable"`
 }
 
 func (t cmdSearchPluginInstall) Run(gctx *cmdopts.Global) (err error) {
@@ -55,7 +56,7 @@ func (t cmdSearchPluginInstall) Run(gctx *cmdopts.Global) (err error) {
 	tmp := dst + ".tmp"
 	defer os.Remove(tmp)
 
-	if err = compileWasm(gctx.Context, dir, t.Package, tmp); err != nil {
+	if err = compileWasm(gctx.Context, dir, t.Package, tmp, t.Bake); err != nil {
 		return errorsx.Wrapf(err, "unable to compile search plugin: %s", t.Repository)
 	}
 
@@ -100,11 +101,19 @@ func cloneRepository(ctx context.Context, uri, branch string) (dir string, err e
 }
 
 // compileWasm cross-compiles pkg (relative to dir, a go module root) to a
-// wasip1/wasm binary at output.
-func compileWasm(ctx context.Context, dir, pkg, output string) error {
-	cmd := exec.CommandContext(ctx, "go", "build", "-trimpath", "-o", output, pkg)
+// wasip1/wasm binary at output. Each bake entry ("main.KEY=VALUE") becomes
+// a `-X` linker flag, letting an install bake install-specific defaults
+// into the binary (see retroapi/examples/searchplugin-noop's source var for
+// what a plugin does with a baked value).
+func compileWasm(ctx context.Context, dir, pkg, output string, bake []string) error {
+	xflags := make([]string, 0, len(bake)*2)
+	for _, kv := range bake {
+		xflags = append(xflags, "-X", kv)
+	}
+
+	cmd := exec.CommandContext(ctx, "go", "build", "-trimpath", "-ldflags", strings.Join(xflags, " "), "-o", output, pkg)
 	cmd.Dir = dir
-	cmd.Env = append(os.Environ(), "GOOS=wasip1", "GOARCH=wasm")
+	cmd.Env = append(os.Environ(), "GOOS=wasip1", "GOARCH=wasm", "GOWORK=off")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	return cmd.Run()

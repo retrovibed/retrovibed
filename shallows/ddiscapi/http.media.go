@@ -9,7 +9,6 @@ import (
 	"github.com/go-playground/form/v4"
 	"github.com/gorilla/mux"
 	"github.com/james-lawrence/torrent/dht/int160"
-	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/justinas/alice"
 	"github.com/retrovibed/retrovibed/retroapi/httpauth"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
@@ -151,8 +150,8 @@ func (t *HTTPMedia) create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	id := int160.FromBytesOrZero(msg.Media.GetInfohash())
-	uri := metainfo.Magnet{InfoHash: metainfo.Hash(id.Bytes())}.String()
-	d = ddisc.NewDiscovered(&id, uri, options...)
+	options = append(options, ddisc.DiscoveredOptionAutoMagnet)
+	d = ddisc.NewDiscovered(&id, options...)
 
 	if err = ddisc.DiscoveredInsertWithDefaults(r.Context(), t.q, d).Scan(&d); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to create media"))

@@ -18,6 +18,7 @@ type DiscoverRequest struct {
 	KnownMediaID string
 	Title        string   // optional; needed by the plugin strategy, empty means "skip it"
 	Mimetypes    []string // optional; discovery mimetypes, needed by the plugin strategy
+	Adult        bool     // optional; enable adult content.
 }
 
 // DiscoverRequestFromKnown builds a DiscoverRequest from a library.Known
@@ -29,6 +30,7 @@ func DiscoverRequestFromKnown(known library.Known) DiscoverRequest {
 		KnownMediaID: known.UID,
 		Title:        known.Title,
 		Mimetypes:    Category(known.Mimetype),
+		Adult:        known.Adult,
 	}
 }
 

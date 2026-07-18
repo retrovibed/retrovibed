@@ -36,7 +36,7 @@ import (
 // type is unexported, so we can't reference it by name) - the narrow
 // interface daemons.LocateMedia actually needs from *searchplugin.Registry.
 type searchPlugins interface {
-	Search(ctx context.Context, mimetypes []string, query string) iterx.Seq[*ddiscapi.Import]
+	Search(ctx context.Context, mimetypes []string, query string, adult bool) iterx.Seq[*ddiscapi.Import]
 }
 
 // errLocateFound stops the retry loop in cmdMediaLocate.Run once the queued
@@ -53,6 +53,7 @@ type cmdMediaLocate struct {
 	Interval     time.Duration `flag:"" name:"interval" help:"how often to re-run the discover/rank pass while waiting on async DHT responses" default:"20s"`
 	Timeout      time.Duration `flag:"" name:"timeout" type:"durationinf" help:"give up waiting for a candidate after this long, use 'infinity' to wait forever; the locate request itself remains queued for a running daemon to pick up later" default:"infinity"`
 	Bootstrap    bool          `flag:"" name:"dht-bootstrap" help:"bootstrap the DHT using well-known trackers" negatable:"" default:"true"`
+	Adult        bool          `flag:"" name:"adult" help:"allow adult content in search plugin results" negatable:"" default:"false"`
 	DHTPeers     []string      `flag:"" name:"dht-peers" help:"use these dht peers as the sole bootstrap nodes instead of the public network" hidden:"true"`
 }
 
@@ -63,7 +64,7 @@ func (t cmdMediaLocate) Run(gctx *cmdopts.Global) (err error) {
 	}
 	defer db.Close()
 
-	loc := ddisc.NewLocate(t.Query, t.Mimetype, ddisc.LocateOptionKnownMedia(langx.FirstNonZero(t.KnownMediaID, uuid.Nil.String())))
+	loc := ddisc.NewLocate(t.Query, t.Mimetype, ddisc.LocateOptionKnownMedia(langx.FirstNonZero(t.KnownMediaID, uuid.Nil.String())), ddisc.LocateOptionAdult(t.Adult))
 	if err := ddisc.LocateInsertWithDefaults(gctx.Context, db, loc).Scan(&loc); err != nil {
 		return errorsx.Wrap(err, "failed to queue locate request")
 	}

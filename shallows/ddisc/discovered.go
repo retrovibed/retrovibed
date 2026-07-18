@@ -69,6 +69,26 @@ func DiscoveredOptionPrivate(b bool) DiscoveredOption {
 	}
 }
 
+func DiscoveredOptionURI(s string) DiscoveredOption {
+	return func(d *Discovered) {
+		d.URI = s
+	}
+}
+
+// DiscoveredOptionAutoMagnet synthesizes a minimal magnet uri from d.Infohash
+// when uri isn't already set (i.e. NewDiscovered/NewDiscoveredFromKnown was
+// called with an empty uri). Callers that only ever have a raw infohash in
+// hand (DHT/wire-sync, protobuf bridges, etc.) can use this instead of
+// constructing metainfo.Magnet{InfoHash: metainfo.Hash(id.Bytes())}.String()
+// themselves at every call site.
+func DiscoveredOptionAutoMagnet(d *Discovered) {
+	if d.URI != "" {
+		return
+	}
+
+	d.URI = metainfo.Magnet{InfoHash: metainfo.Hash(d.Infohash)}.String()
+}
+
 func DiscoveredOptionTestDefaults(d *Discovered) {
 	d.AudioDefaultLocale = localex.FirstDefined(userx.LocaleLanguage())
 	d.SubtitlesDefaultLocale = localex.FirstDefined(userx.LocaleLanguage())
@@ -165,11 +185,10 @@ func Worst() Discovered {
 	}
 }
 
-func NewDiscovered(md *int160.T, uri string, options ...DiscoveredOption) (m Discovered) {
+func NewDiscovered(md *int160.T, options ...DiscoveredOption) (m Discovered) {
 	r := langx.Clone(Discovered{
 		ID:                     torrentx.HashUID(md),
 		Infohash:               md.Bytes(),
-		URI:                    uri,
 		KnownMediaID:           uuid.Nil.String(),
 		Mimetype:               mimex.Binary,
 		Category:               mimex.Application,
@@ -186,11 +205,10 @@ func NewDiscovered(md *int160.T, uri string, options ...DiscoveredOption) (m Dis
 // multiple Discovered rows to exist for the same infohash (e.g. one per episode in a season
 // pack, or one per track in an album). known must already be resolved (never the Unknown()
 // sentinel) - that precondition is the caller's responsibility.
-func NewDiscoveredFromKnown(md int160.T, uri string, known library.Known, options ...DiscoveredOption) (m Discovered) {
+func NewDiscoveredFromKnown(md int160.T, known library.Known, options ...DiscoveredOption) (m Discovered) {
 	r := langx.Clone(Discovered{
 		ID:                     md5x.FormatUUID(md5x.Digest(md.Bytes(), []byte(known.UID))),
 		Infohash:               md.Bytes(),
-		URI:                    uri,
 		KnownMediaID:           known.UID,
 		Title:                  known.Title,
 		Description:            known.Overview,

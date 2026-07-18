@@ -18,7 +18,7 @@ func TestRankAndSelectPicksBestCandidate(t *testing.T) {
 
 	insert := func(title string) ddisc.Discovered {
 		id := int160.Random()
-		d := ddisc.NewDiscovered(&id, "",
+		d := ddisc.NewDiscovered(&id, ddisc.DiscoveredOptionAutoMagnet,
 			ddisc.DiscoveredOptionKnownMedia(kid),
 			ddisc.DiscoveredOptionMimetype(mimex.Binary),
 		)
@@ -48,7 +48,7 @@ func TestRankAndSelectNoCandidateWhenAllRejected(t *testing.T) {
 	kid := uuid.Must(uuid.NewV4()).String()
 
 	id := int160.Random()
-	d := ddisc.NewDiscovered(&id, "",
+	d := ddisc.NewDiscovered(&id, ddisc.DiscoveredOptionAutoMagnet,
 		ddisc.DiscoveredOptionKnownMedia(kid),
 		ddisc.DiscoveredOptionMimetype(mimex.Binary),
 	)
@@ -74,7 +74,7 @@ func TestRankAndSelectIgnoresCandidatesNotMatchingQuery(t *testing.T) {
 
 	insert := func(title string) ddisc.Discovered {
 		id := int160.Random()
-		d := ddisc.NewDiscovered(&id, "",
+		d := ddisc.NewDiscovered(&id, ddisc.DiscoveredOptionAutoMagnet,
 			ddisc.DiscoveredOptionKnownMedia(kid),
 			ddisc.DiscoveredOptionMimetype(mimex.Binary),
 		)
@@ -100,7 +100,7 @@ func TestRankAndSelectScopesNilKnownMediaIDByQuery(t *testing.T) {
 
 	insert := func(title string) ddisc.Discovered {
 		id := int160.Random()
-		d := ddisc.NewDiscovered(&id, "",
+		d := ddisc.NewDiscovered(&id, ddisc.DiscoveredOptionAutoMagnet,
 			ddisc.DiscoveredOptionKnownMedia(nilkid),
 			ddisc.DiscoveredOptionMimetype(mimex.Binary),
 		)
@@ -130,7 +130,7 @@ func TestRankAndSelectNoCandidateWhenNoneMatchQuery(t *testing.T) {
 	kid := uuid.Must(uuid.NewV4()).String()
 
 	id := int160.Random()
-	d := ddisc.NewDiscovered(&id, "",
+	d := ddisc.NewDiscovered(&id, ddisc.DiscoveredOptionAutoMagnet,
 		ddisc.DiscoveredOptionKnownMedia(kid),
 		ddisc.DiscoveredOptionMimetype(mimex.Binary),
 	)

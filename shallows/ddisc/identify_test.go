@@ -55,7 +55,7 @@ func TestIdentifyOne(t *testing.T) {
 			}
 		}()
 
-		disc := ddisc.NewDiscovered(&id, "", ddisc.DiscoveredOptionFromTorrentInfo(info))
+		disc := ddisc.NewDiscovered(&id, ddisc.DiscoveredOptionFromTorrentInfo(info), ddisc.DiscoveredOptionAutoMagnet)
 
 		result, err := ddisc.IdentifyOne(ctx, s, consumer, consumerStorage, 5*time.Second, 10*time.Second, disc)
 		require.NoError(t, err)

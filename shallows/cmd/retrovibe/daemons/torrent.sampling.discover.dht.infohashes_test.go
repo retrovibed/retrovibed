@@ -115,7 +115,7 @@ func TestDiscoverDHTInfoHashes(t *testing.T) {
 
 		infohash := int160.Random()
 
-		discovered := ddisc.NewDiscovered(&infohash, "")
+		discovered := ddisc.NewDiscovered(&infohash, ddisc.DiscoveredOptionAutoMagnet)
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, discovered).Scan(&discovered))
 
 		s, target, targetID := newDHTInfoHashesPair(t, fakeSampler{

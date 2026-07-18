@@ -44,10 +44,10 @@ func TestSyncDiscovered(t *testing.T) {
 
 			d := ddisc.NewDiscovered(
 				&id,
-				"",
 				ddisc.DiscoveredOptionIndex(!block0.Filter(id.Bytes())),
 				ddisc.DiscoveredOptionMimetype(mimex.Binary),
 				ddisc.DiscoveredOptionFromTorrentInfo(info),
+				ddisc.DiscoveredOptionAutoMagnet,
 			)
 			require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
 			require.Contains(t, []string{uuid.Nil.String(), uuid.Max.String()}, d.KnownMediaID)
@@ -87,10 +87,10 @@ func TestSyncDiscovered(t *testing.T) {
 
 			d := ddisc.NewDiscovered(
 				&id,
-				"",
 				ddisc.DiscoveredOptionIndex(!block0.Filter(id.Bytes())),
 				ddisc.DiscoveredOptionMimetype(mimex.Binary),
 				ddisc.DiscoveredOptionFromTorrentInfo(info),
+				ddisc.DiscoveredOptionAutoMagnet,
 			)
 			require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
 		}
@@ -118,10 +118,10 @@ func TestSyncDiscovered(t *testing.T) {
 
 			d := ddisc.NewDiscovered(
 				&id,
-				"",
 				ddisc.DiscoveredOptionIndex(true),
 				ddisc.DiscoveredOptionMimetype(mimex.Binary),
 				ddisc.DiscoveredOptionFromTorrentInfo(info),
+				ddisc.DiscoveredOptionAutoMagnet,
 			)
 			require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
 			require.True(t, d.Private)

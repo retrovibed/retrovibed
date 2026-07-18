@@ -12,7 +12,6 @@ import (
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/int160"
-	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/retrovibed/retrovibed/retroapi/authn"
 	retronetx "github.com/retrovibed/retrovibed/retroapi/netx"
@@ -93,9 +92,8 @@ func (t cmdDiscoveryIdentify) lookup(gctx *cmdopts.Global, cc *http.Client) (_ d
 	}
 
 	infohash := int160.FromBytesOrZero(result.Items[0].GetInfohash())
-	uri := metainfo.Magnet{InfoHash: metainfo.Hash(infohash.Bytes())}.String()
 
-	return ddisc.NewDiscovered(&infohash, uri), nil
+	return ddisc.NewDiscovered(&infohash, ddisc.DiscoveredOptionAutoMagnet), nil
 }
 
 func (t cmdDiscoveryIdentify) peerTuners(gctx *cmdopts.Global) (_ []torrent.Tuner, err error) {

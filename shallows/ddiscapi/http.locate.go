@@ -161,7 +161,7 @@ func (t *HTTPLocate) create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	d = ddisc.NewLocate(d.Query, d.Mimetype, ddisc.LocateOptionKnownMedia(langx.FirstNonZero(d.KnownMediaID, uuid.Nil.String())))
+	d = ddisc.NewLocate(d.Query, d.Mimetype, ddisc.LocateOptionKnownMedia(langx.FirstNonZero(d.KnownMediaID, uuid.Nil.String())), ddisc.LocateOptionAdult(d.Adult))
 
 	if d.KnownMediaID == uuid.Nil.String() && d.Query == "" {
 		log.Println("locate requires a known media id or a query")

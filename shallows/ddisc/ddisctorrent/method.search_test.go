@@ -63,9 +63,9 @@ func TestSearchProtocol(t *testing.T) {
 			id := int160.Random()
 			d := ddisc.NewDiscovered(
 				&id,
-				"",
 				ddisc.DiscoveredOptionKnownMedia(knownmedia.String()),
 				ddisc.DiscoveredOptionMimetype(mimex.Binary),
+				ddisc.DiscoveredOptionAutoMagnet,
 			)
 
 			require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))

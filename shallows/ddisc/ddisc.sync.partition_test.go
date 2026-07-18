@@ -41,11 +41,11 @@ func TestSyncPartition(t *testing.T) {
 
 			d := ddisc.NewDiscovered(
 				&id,
-				"",
 				ddisc.DiscoveredOptionKnownMedia(ddiscapi.ImportedMediaUUID("", uuid.FromStringOrNil(uuidx.WithSuffix(idx))).String()),
 				ddisc.DiscoveredOptionMimetype(mimex.Binary),
 				ddisc.DiscoveredOptionFromTorrentInfo(info),
 				ddisc.DiscoveredOptionPartitionAuto(partitions),
+				ddisc.DiscoveredOptionAutoMagnet,
 			)
 
 			require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
@@ -64,10 +64,10 @@ func TestSyncPartition(t *testing.T) {
 
 			d := ddisc.NewDiscovered(
 				&id,
-				"",
 				ddisc.DiscoveredOptionMimetype(mimex.Binary),
 				ddisc.DiscoveredOptionFromTorrentInfo(info),
 				ddisc.DiscoveredOptionPartitionAuto(partitions),
+				ddisc.DiscoveredOptionAutoMagnet,
 			)
 			require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
 			require.Equal(t, uuid.Nil.String(), d.KnownMediaID)
@@ -135,11 +135,11 @@ func TestSyncPartition(t *testing.T) {
 
 			d := ddisc.NewDiscovered(
 				&id,
-				"",
 				ddisc.DiscoveredOptionKnownMedia(ddiscapi.ImportedMediaUUID("", uuid.FromStringOrNil(uuidx.WithSuffix(idx))).String()),
 				ddisc.DiscoveredOptionMimetype(mimex.Binary),
 				ddisc.DiscoveredOptionFromTorrentInfo(info),
 				ddisc.DiscoveredOptionPartitionAuto(partitions),
+				ddisc.DiscoveredOptionAutoMagnet,
 			)
 			require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
 			require.True(t, d.Private)

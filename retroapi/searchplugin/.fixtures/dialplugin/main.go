@@ -21,6 +21,7 @@ func main() {
 	fs := flag.NewFlagSet("plugin", flag.ExitOnError)
 	mimetype := fs.String("mimetype", "", "")
 	query := fs.String("query", "", "")
+	fs.Bool("adult", false, "")
 	fs.Parse(os.Args[2:])
 
 	status := "connected"

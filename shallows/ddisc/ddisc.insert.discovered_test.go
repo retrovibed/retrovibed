@@ -32,7 +32,7 @@ func TestDiscoveredInsertWithDefaults(t *testing.T) {
 
 		d := ddisc.NewDiscovered(
 			&id,
-			"",
+			ddisc.DiscoveredOptionAutoMagnet,
 			ddisc.DiscoveredOptionIndex(true),
 			ddisc.DiscoveredOptionMimetype(mimex.Binary),
 			ddisc.DiscoveredOptionFromTorrentInfo(info),
@@ -54,7 +54,7 @@ func TestDiscoveredInsertWithDefaults(t *testing.T) {
 
 		d := ddisc.NewDiscovered(
 			&id,
-			"",
+			ddisc.DiscoveredOptionAutoMagnet,
 			ddisc.DiscoveredOptionMimetype(mimex.Binary),
 			ddisc.DiscoveredOptionFromTorrentInfo(info),
 		)
@@ -81,7 +81,7 @@ func TestDiscoveredInsertWithDefaults(t *testing.T) {
 
 		d := ddisc.NewDiscovered(
 			&id,
-			"",
+			ddisc.DiscoveredOptionAutoMagnet,
 			ddisc.DiscoveredOptionMimetype(mimex.Binary),
 			ddisc.DiscoveredOptionFromTorrentInfo(info),
 		)
@@ -129,7 +129,7 @@ func TestDiscoveredInsertWithDefaults(t *testing.T) {
 
 		d := ddisc.NewDiscovered(
 			&id,
-			"",
+			ddisc.DiscoveredOptionAutoMagnet,
 			ddisc.DiscoveredOptionMimetype(mimex.Binary),
 			ddisc.DiscoveredOptionFromTorrentInfo(info),
 		)
@@ -141,16 +141,20 @@ func TestDiscoveredInsertWithDefaults(t *testing.T) {
 
 		changed := d
 		changed.Title = "changed title"
+		changed.URI = "magnet:?xt=urn:btih:1111111111111111111111111111111111111111"
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, changed).Scan(&changed))
 
 		require.Equal(t, "changed title", changed.Title, "a non-empty incoming title overwrites the stored one")
+		require.Equal(t, "magnet:?xt=urn:btih:1111111111111111111111111111111111111111", changed.URI, "a non-empty incoming uri overwrites the stored one")
 		require.True(t, changed.UpdatedAt.After(firstUpdatedAt))
 
 		blank := changed
 		blank.Title = ""
+		blank.URI = ""
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, blank).Scan(&blank))
 
 		require.Equal(t, "changed title", blank.Title, "an empty incoming title leaves the stored one untouched")
+		require.Equal(t, "magnet:?xt=urn:btih:1111111111111111111111111111111111111111", blank.URI, "an empty incoming uri leaves the stored one untouched")
 	})
 
 	t.Run("on conflict private is sticky - a later non-private write can never downgrade it", func(t *testing.T) {
@@ -167,7 +171,7 @@ func TestDiscoveredInsertWithDefaults(t *testing.T) {
 
 		d := ddisc.NewDiscovered(
 			&id,
-			"",
+			ddisc.DiscoveredOptionAutoMagnet,
 			ddisc.DiscoveredOptionMimetype(mimex.Binary),
 			ddisc.DiscoveredOptionFromTorrentInfo(info),
 		)
@@ -200,7 +204,7 @@ func TestDiscoveredInsertWithDefaults(t *testing.T) {
 
 		d := ddisc.NewDiscovered(
 			&id,
-			"",
+			ddisc.DiscoveredOptionAutoMagnet,
 			ddisc.DiscoveredOptionMimetype(mimex.Binary),
 			ddisc.DiscoveredOptionFromTorrentInfo(info),
 			ddisc.DiscoveredOptionDetectCorrupted,
@@ -232,9 +236,9 @@ func TestDiscoveredInsertWithDefaults(t *testing.T) {
 
 				d := ddisc.NewDiscovered(
 					&id,
-					"",
 					ddisc.DiscoveredOptionMimetype(mimex.Binary),
 					ddisc.DiscoveredOptionFromTorrentInfo(info),
+					ddisc.DiscoveredOptionAutoMagnet,
 				)
 				d.HiddenAt = tc.ts
 				require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))

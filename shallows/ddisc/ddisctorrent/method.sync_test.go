@@ -64,10 +64,10 @@ func TestSyncProtocol(t *testing.T) {
 			id := int160.Random()
 			d := ddisc.NewDiscovered(
 				&id,
-				"",
 				ddisc.DiscoveredOptionKnownMedia(knownmedia.String()),
 				ddisc.DiscoveredOptionMimetype(mimex.Binary),
 				ddisc.DiscoveredOptionPartition(uuidx.WithSuffix(idx%2)),
+				ddisc.DiscoveredOptionAutoMagnet,
 			)
 
 			require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))

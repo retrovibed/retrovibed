@@ -40,11 +40,11 @@ func TestFindMedia(t *testing.T) {
 
 			d := ddisc.NewDiscovered(
 				&id,
-				"",
 				ddisc.DiscoveredOptionKnownMedia(ddiscapi.ImportedMediaUUID("", uuid.FromStringOrNil(uuidx.WithSuffix(idx%32))).String()),
 				ddisc.DiscoveredOptionMimetype(mimex.Binary),
 				ddisc.DiscoveredOptionFromTorrentInfo(info),
 				ddisc.DiscoveredOptionPartitionAuto(partitions),
+				ddisc.DiscoveredOptionAutoMagnet,
 			)
 
 			require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
@@ -63,10 +63,10 @@ func TestFindMedia(t *testing.T) {
 
 			d := ddisc.NewDiscovered(
 				&id,
-				"",
 				ddisc.DiscoveredOptionMimetype(mimex.Binary),
 				ddisc.DiscoveredOptionFromTorrentInfo(info),
 				ddisc.DiscoveredOptionPartitionAuto(partitions),
+				ddisc.DiscoveredOptionAutoMagnet,
 			)
 			require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
 			require.Equal(t, uuid.Nil.String(), d.KnownMediaID)
@@ -114,10 +114,10 @@ func TestFindMedia(t *testing.T) {
 
 			d := ddisc.NewDiscovered(
 				&id,
-				"",
 				ddisc.DiscoveredOptionKnownMedia(kid),
 				ddisc.DiscoveredOptionMimetype(mimex.Binary),
 				ddisc.DiscoveredOptionFromTorrentInfo(info),
+				ddisc.DiscoveredOptionAutoMagnet,
 			)
 			require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
 			require.True(t, d.Private)

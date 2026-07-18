@@ -36,7 +36,7 @@ func TestMediaLocate(t *testing.T) {
 
 		d = ddisc.NewDiscovered(
 			&id,
-			uri,
+			ddisc.DiscoveredOptionURI(uri),
 			ddisc.DiscoveredOptionKnownMedia(k.UID),
 			ddisc.DiscoveredOptionMimetype(mimex.Binary),
 			ddisc.DiscoveredOptionTitle(k.Title),
@@ -70,7 +70,7 @@ func TestMediaLocate(t *testing.T) {
 
 		d = ddisc.NewDiscovered(
 			&id,
-			uri,
+			ddisc.DiscoveredOptionURI(uri),
 			ddisc.DiscoveredOptionKnownMedia(k.UID),
 			ddisc.DiscoveredOptionMimetype(mimex.Binary),
 			ddisc.DiscoveredOptionTitle(k.Title),
@@ -102,7 +102,7 @@ func TestMediaLocate(t *testing.T) {
 
 		d = ddisc.NewDiscovered(
 			&id,
-			uri,
+			ddisc.DiscoveredOptionURI(uri),
 			ddisc.DiscoveredOptionKnownMedia(k.UID),
 			ddisc.DiscoveredOptionMimetype(mimex.Binary),
 			ddisc.DiscoveredOptionTitle(k.Title),
@@ -156,7 +156,7 @@ func TestMediaLocate(t *testing.T) {
 
 		d = ddisc.NewDiscovered(
 			&id,
-			uri,
+			ddisc.DiscoveredOptionURI(uri),
 			ddisc.DiscoveredOptionKnownMedia(k.UID),
 			ddisc.DiscoveredOptionMimetype(mimex.Binary),
 			ddisc.DiscoveredOptionTitle(k.Title),
@@ -190,7 +190,7 @@ func TestMediaLocate(t *testing.T) {
 		// so this fails fast at request construction rather than hanging.
 		d = ddisc.NewDiscovered(
 			&id,
-			"not-a-magnet-uri",
+			ddisc.DiscoveredOptionURI("not-a-magnet-uri"),
 			ddisc.DiscoveredOptionKnownMedia(k.UID),
 			ddisc.DiscoveredOptionMimetype(mimex.Binary),
 			ddisc.DiscoveredOptionTitle(k.Title),
@@ -219,7 +219,7 @@ func TestMediaLocate(t *testing.T) {
 
 		d = ddisc.NewDiscovered(
 			&id,
-			uri,
+			ddisc.DiscoveredOptionURI(uri),
 			ddisc.DiscoveredOptionIndex(true),
 			ddisc.DiscoveredOptionMimetype(mimex.Binary),
 		)

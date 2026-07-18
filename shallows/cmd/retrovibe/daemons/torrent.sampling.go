@@ -313,11 +313,11 @@ func DiscoverDHTMetadata(ctx context.Context, workloads uint64, db sqlx.Queryer,
 			db,
 			ddisc.NewDiscovered(
 				&id,
-				metainfo.Magnet{InfoHash: metainfo.Hash(id.Bytes())}.String(),
 				ddisc.DiscoveredOptionIndex(!blocked(id.Bytes())),
 				ddisc.DiscoveredOptionMimetype(mimex.Binary),
 				ddisc.DiscoveredOptionFromTorrentInfo(info),
 				ddisc.DiscoveredOptionDetectCorrupted,
+				ddisc.DiscoveredOptionAutoMagnet,
 			),
 		).Scan(&disc); err != nil {
 			return errorsx.Wrap(err, "unable to insert discovered record")

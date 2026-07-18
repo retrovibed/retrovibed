@@ -7,7 +7,6 @@ import (
 
 	"github.com/Masterminds/squirrel"
 	"github.com/james-lawrence/torrent/dht/int160"
-	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
@@ -58,10 +57,9 @@ func publishDiscoveredMediaOne(ctx context.Context, db sqlx.Queryer, lmd library
 	}
 
 	id := int160.FromBytes(tmd.Infohash)
-	uri := metainfo.Magnet{InfoHash: metainfo.Hash(id.Bytes())}.String()
 
 	// skip files already published, keyed deterministically on (infohash, known_media_id).
-	candidate := ddisc.NewDiscoveredFromKnown(id, uri, known, ddisc.DiscoveredOptionPrivate(tmd.Private))
+	candidate := ddisc.NewDiscoveredFromKnown(id, known, ddisc.DiscoveredOptionPrivate(tmd.Private), ddisc.DiscoveredOptionAutoMagnet)
 	var existing ddisc.Discovered
 	if err := ddisc.DiscoveredFindByID(ctx, db, candidate.ID).Scan(&existing); err == nil {
 		return nil

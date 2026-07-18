@@ -17,7 +17,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func (t fakePluginSeq) Search(ctx context.Context, mimetypes []string, query string) iterx.Seq[*ddiscapi.Import] {
+func (t fakePluginSeq) Search(ctx context.Context, mimetypes []string, query string, adult bool) iterx.Seq[*ddiscapi.Import] {
 	return fakePluginSeq{results: t.results}
 }
 

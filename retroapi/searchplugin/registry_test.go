@@ -16,7 +16,7 @@ import (
 func TestRegistrySearchDecodesPluginOutput(t *testing.T) {
 	wasmPath := filepath.Join(t.TempDir(), "echo.wasm")
 
-	build := exec.Command("go", "build", "-o", wasmPath, "./testdata/echoplugin")
+	build := exec.Command("go", "build", "-o", wasmPath, "./.fixtures/echoplugin")
 	build.Env = append(build.Environ(), "GOOS=wasip1", "GOARCH=wasm")
 	out, err := build.CombinedOutput()
 	require.NoError(t, err, string(out))
@@ -28,7 +28,7 @@ func TestRegistrySearchDecodesPluginOutput(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, r.Load(ctx, wasmPath))
 
-	seq := r.Search(ctx, []string{"video"}, "ubuntu")
+	seq := r.Search(ctx, []string{"video"}, "ubuntu", false)
 
 	var results []string
 	for imp := range seq.Each(ctx) {
@@ -45,13 +45,13 @@ func TestRegistrySearchSkipsFailingPluginWithoutAbortingOthers(t *testing.T) {
 	dir := t.TempDir()
 
 	echoPath := filepath.Join(dir, "echo.wasm")
-	build := exec.Command("go", "build", "-o", echoPath, "./testdata/echoplugin")
+	build := exec.Command("go", "build", "-o", echoPath, "./.fixtures/echoplugin")
 	build.Env = append(build.Environ(), "GOOS=wasip1", "GOARCH=wasm")
 	out, err := build.CombinedOutput()
 	require.NoError(t, err, string(out))
 
 	failPath := filepath.Join(dir, "fail.wasm")
-	build = exec.Command("go", "build", "-o", failPath, "./testdata/failplugin")
+	build = exec.Command("go", "build", "-o", failPath, "./.fixtures/failplugin")
 	build.Env = append(build.Environ(), "GOOS=wasip1", "GOARCH=wasm")
 	out, err = build.CombinedOutput()
 	require.NoError(t, err, string(out))
@@ -64,7 +64,7 @@ func TestRegistrySearchSkipsFailingPluginWithoutAbortingOthers(t *testing.T) {
 	require.NoError(t, r.Load(ctx, echoPath))
 	require.NoError(t, r.Load(ctx, failPath))
 
-	seq := r.Search(ctx, []string{"video"}, "ubuntu")
+	seq := r.Search(ctx, []string{"video"}, "ubuntu", false)
 	var count int
 	for range seq.Each(ctx) {
 		count++
@@ -91,7 +91,7 @@ func TestRegistryBlocksNonPublicConnections(t *testing.T) {
 	}()
 
 	wasmPath := filepath.Join(t.TempDir(), "dial.wasm")
-	build := exec.Command("go", "build", "-o", wasmPath, "./testdata/dialplugin")
+	build := exec.Command("go", "build", "-o", wasmPath, "./.fixtures/dialplugin")
 	build.Env = append(build.Environ(), "GOOS=wasip1", "GOARCH=wasm")
 	out, err := build.CombinedOutput()
 	require.NoError(t, err, string(out))
@@ -103,7 +103,7 @@ func TestRegistryBlocksNonPublicConnections(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, r.Load(ctx, wasmPath))
 
-	seq := r.Search(ctx, []string{"test"}, ln.Addr().String())
+	seq := r.Search(ctx, []string{"test"}, ln.Addr().String(), false)
 
 	var results []string
 	for imp := range seq.Each(ctx) {

@@ -45,3 +45,7 @@ func LocateOptionKnownMedia(id string) LocateOption {
 func LocateOptionAutoDownload(v bool) LocateOption {
 	return func(l *Locate) { l.Autodownload = v }
 }
+
+func LocateOptionAdult(v bool) LocateOption {
+	return func(l *Locate) { l.Adult = v }
+}
