@@ -22,6 +22,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/netx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sshx"
 	"github.com/retrovibed/retrovibed/shallows/internal/torrenttestx"
@@ -61,6 +62,7 @@ func newTestTorrenting(t *testing.T, q *sql.DB) _torrenting {
 		_wgdev:           &atomic.Pointer[device.Device]{},
 		_dhts:            &atomic.Pointer[dht.Server]{},
 		_discovery:       &atomic.Pointer[ddisc.Snapshot]{},
+		_dialer:          netx.NewDialerProxy(),
 	}
 }
 
@@ -121,6 +123,7 @@ func TestInit(t *testing.T) {
 			_wgdev:        &atomic.Pointer[device.Device]{},
 			_dhts:         &atomic.Pointer[dht.Server]{},
 			_discovery:    &atomic.Pointer[ddisc.Snapshot]{},
+			_dialer:       netx.NewDialerProxy(),
 		}
 
 		cfg := AutoTorrentSettings(&TorrentSettings{

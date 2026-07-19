@@ -9,6 +9,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
+	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
@@ -47,6 +48,7 @@ func TestHTTPDiscoveryDelete(t *testing.T) {
 		routes := mux.NewRouter()
 		ddiscapi.NewHTTPDiscovery(
 			q,
+			searchplugin.Unimplemented{},
 			ddiscapi.HTTPDiscoveryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 

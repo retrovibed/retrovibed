@@ -15,9 +15,7 @@ import (
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
-	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/retroapi/env"
-	"github.com/retrovibed/retrovibed/retroapi/iterx"
 	retronetx "github.com/retrovibed/retrovibed/retroapi/netx"
 	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
 	"github.com/retrovibed/retrovibed/retroapi/userx"
@@ -37,13 +35,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 )
-
-// searchPlugins mirrors daemons.searchPlugins' method set structurally (that
-// type is unexported, so we can't reference it by name) - the narrow
-// interface daemons.LocateMedia actually needs from *searchplugin.Registry.
-type searchPlugins interface {
-	Search(ctx context.Context, mimetypes []string, query string, adult bool) iterx.Seq[*ddiscapi.Import]
-}
 
 // errLocateFound stops the retry loop in cmdMediaLocate.Run once the queued
 // locate request has had a candidate ranked and selected.
@@ -84,7 +75,7 @@ func (t cmdMediaLocate) Run(gctx *cmdopts.Global) (err error) {
 	}
 	defer tclient.Close()
 
-	var plugins searchPlugins
+	var plugins searchplugin.T
 	if reg, err := searchplugin.NewRegistry(gctx.Context); err != nil {
 		log.Println("search plugins unavailable, continuing with DHT discovery only:", err)
 	} else {

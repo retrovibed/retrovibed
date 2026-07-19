@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/davecgh/go-spew/spew"
+	"github.com/egdaemon/wasinet/wasinet/wnetruntime"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/justinas/alice"
 	"golang.org/x/crypto/ssh"
@@ -217,7 +218,43 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		}
 	}
 
-	torrenting := newTorrenting(db, id, rootstore, mediastore, tvfs, mc, tstore, _socks5, ddiscpublish, locatemedia)
+	// plugins is built once, up front, decoupled from _torrenting.Init/Reload
+	// (NewRegistryWithSocket spins up a wazero runtime + WASI + a directory
+	// watcher - too expensive to rebuild every reload generation). It still
+	// needs to track the live wireguard-tunnel-or-host dialer the same way
+	// the torrent client's own dialer does, so privateDialer/pluginsResolver
+	// are handed into newTorrenting to become _torrenting's _dialer/
+	// _dnscache - Init's normal per-generation Store calls keep them live.
+	privateDialer := netx.NewDialerProxy()
+	privateResolver := dnscache.AutoProxyResolver()
+	plugins, err := searchplugin.NewRegistryWithSocket(
+		gctx.Context,
+		wnetruntime.Virtual(
+			privateDialer,
+			netx.UnsupportedListenConfig{},
+			privateResolver,
+			wnetruntime.PublicFirewall(),
+		),
+	)
+	if err != nil {
+		return errorsx.Wrap(err, "unable to start search plugin registry")
+	}
+
+	torrenting := newTorrenting(
+		db,
+		id,
+		rootstore,
+		mediastore,
+		tvfs,
+		mc,
+		tstore,
+		_socks5,
+		ddiscpublish,
+		locatemedia,
+		plugins,
+		privateDialer,
+		privateResolver,
+	)
 
 	if err = torrenting.Reload(gctx.Context, t.torrentsettings(), t.discoverysettings()); err != nil {
 		return errorsx.Wrap(err, "failed to reload torrent")
@@ -372,7 +409,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	media.NewHTTPSimilar(db).Bind(httpmux.PathPrefix("/similar").Subrouter())
 	media.NewHTTPRecent(db).Bind(httpmux.PathPrefix("/w").Subrouter())
 	ddiscapi.NewHTTPPeerManagement(db).Bind(httpmux.PathPrefix("/ddisc").Subrouter())
-	ddiscapi.NewHTTPDiscovery(db).Bind(httpmux.PathPrefix("/ddisc/discovery").Subrouter())
+	ddiscapi.NewHTTPDiscovery(db, plugins).Bind(httpmux.PathPrefix("/ddisc/discovery").Subrouter())
 	ddiscapi.NewHTTPMedia(db).Bind(httpmux.PathPrefix("/ddisc/media").Subrouter())
 	ddiscapi.NewHTTPLocate(db, locatemedia).Bind(httpmux.PathPrefix("/l").Subrouter())
 	media.NewHTTPRSSFeed(db).Bind(httpmux.PathPrefix("/rss").Subrouter())

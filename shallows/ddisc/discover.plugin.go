@@ -6,19 +6,13 @@ import (
 	"log"
 
 	"github.com/gofrs/uuid/v5"
-	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
+	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
 	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 )
-
-// searchPlugins is the narrow interface PluginStrategy needs from
-// *retroapi/searchplugin.Registry.
-type searchPlugins interface {
-	Search(ctx context.Context, mimetypes []string, query string, adult bool) iterx.Seq[*ddiscapi.Import]
-}
 
 // PluginStrategy runs external search plugins (via a
 // *retroapi/searchplugin.Registry) and yields whatever they find. Yielded
@@ -28,13 +22,13 @@ type searchPlugins interface {
 // one. As a side effect, independent of what it yields, it TOFU-records
 // (see KnownMediaFromImport) any known-media catalog info a plugin result
 // carries — q is used only for that.
-func PluginStrategy(q sqlx.Queryer, plugins searchPlugins) DiscoverStrategy {
+func PluginStrategy(q sqlx.Queryer, plugins searchplugin.T) DiscoverStrategy {
 	return pluginStrategy{q: q, plugins: plugins}
 }
 
 type pluginStrategy struct {
 	q       sqlx.Queryer
-	plugins searchPlugins
+	plugins searchplugin.T
 }
 
 func (t pluginStrategy) Discover(ctx context.Context, req DiscoverRequest) iterx.Seq[Discovered] {

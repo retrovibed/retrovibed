@@ -46,6 +46,8 @@ github.com/RoaringBitmap/roaring/v2/internal
 github.com/alecthomas/atomic
 # github.com/alecthomas/kong v1.15.0
 ## explicit; go 1.20
+# github.com/alecthomas/kong v1.16.0
+## explicit; go 1.20
 github.com/alecthomas/kong
 # github.com/anacrolix/generics v0.2.0
 ## explicit; go 1.18
@@ -831,6 +833,8 @@ github.com/pressly/goose/v3/lock
 github.com/pressly/goose/v3/lock/internal/store
 github.com/pressly/goose/v3/lock/internal/table
 # github.com/retrovibed/retrovibed/retroapi v0.0.0-20260709191625-d477a63d2e4b
+## explicit; go 1.26.3
+# github.com/retrovibed/retrovibed/retroapi v0.0.0-20260719003059-4c793e857543
 ## explicit; go 1.26.3
 # github.com/rivo/uniseg v0.4.7
 ## explicit; go 1.18

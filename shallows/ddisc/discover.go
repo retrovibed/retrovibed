@@ -5,8 +5,11 @@ import (
 	"errors"
 	"iter"
 
+	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
+	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
+	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 )
 
@@ -132,4 +135,18 @@ func (t *discoverSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 
 func (t *discoverSeq) Err() error {
 	return t.err
+}
+
+// SyncStrategies returns the synchronous (non-DHT) discovery strategies:
+// external search plugins (if plugins is non-nil) and the local ddisc_media
+// fallback (if knownMediaID resolves to something other than uuid.Nil).
+func SyncStrategies(q sqlx.Queryer, plugins searchplugin.T, knownMediaID string) []DiscoverStrategy {
+	strategies := []DiscoverStrategy{}
+	if plugins != nil {
+		strategies = append(strategies, PluginStrategy(q, plugins))
+	}
+	if knownMediaID != uuid.Nil.String() {
+		strategies = append(strategies, LocalStrategy(q))
+	}
+	return strategies
 }

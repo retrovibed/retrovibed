@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
@@ -32,6 +33,7 @@ func TestDiscoveryLs(t *testing.T) {
 		routes := mux.NewRouter()
 		ddiscapi.NewHTTPDiscovery(
 			q,
+			searchplugin.Unimplemented{},
 			ddiscapi.HTTPDiscoveryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/ddisc/discovery").Subrouter())
 		srv := cmdtestx.NewTLSServer(t, q, routes)
@@ -65,6 +67,7 @@ func TestDiscoveryLs(t *testing.T) {
 		routes := mux.NewRouter()
 		ddiscapi.NewHTTPDiscovery(
 			q,
+			searchplugin.Unimplemented{},
 			ddiscapi.HTTPDiscoveryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/ddisc/discovery").Subrouter())
 		srv := cmdtestx.NewTLSServer(t, q, routes)
@@ -97,6 +100,7 @@ func TestDiscoveryLs(t *testing.T) {
 		routes := mux.NewRouter()
 		ddiscapi.NewHTTPDiscovery(
 			q,
+			searchplugin.Unimplemented{},
 			ddiscapi.HTTPDiscoveryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/ddisc/discovery").Subrouter())
 		srv := cmdtestx.NewTLSServer(t, q, routes)
@@ -131,6 +135,7 @@ func TestDiscoveryLs(t *testing.T) {
 		routes := mux.NewRouter()
 		ddiscapi.NewHTTPDiscovery(
 			q,
+			searchplugin.Unimplemented{},
 			ddiscapi.HTTPDiscoveryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/ddisc/discovery").Subrouter())
 		srv := cmdtestx.NewTLSServer(t, q, routes)
@@ -160,6 +165,7 @@ func TestDiscoveryLs(t *testing.T) {
 		routes := mux.NewRouter()
 		ddiscapi.NewHTTPDiscovery(
 			q,
+			searchplugin.Unimplemented{},
 			ddiscapi.HTTPDiscoveryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/ddisc/discovery").Subrouter())
 		srv := cmdtestx.NewTLSServer(t, q, routes)

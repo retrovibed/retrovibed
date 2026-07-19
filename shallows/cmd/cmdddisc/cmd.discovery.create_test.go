@@ -7,6 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/james-lawrence/torrent/dht/int160"
+	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
@@ -33,6 +34,7 @@ func TestDiscoveryCreate(t *testing.T) {
 		routes := mux.NewRouter()
 		ddiscapi.NewHTTPDiscovery(
 			q,
+			searchplugin.Unimplemented{},
 			ddiscapi.HTTPDiscoveryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/ddisc/discovery").Subrouter())
 		srv := cmdtestx.NewTLSServer(t, q, routes)
