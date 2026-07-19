@@ -247,6 +247,7 @@ func NewDiscoveredFromImport(imp *ddiscapi.Import, options ...DiscoveredOption) 
 		Infohash:               placeholder.Bytes(),
 		Title:                  imp.Title,
 		Health:                 imp.Health,
+		Bytes:                  imp.Bytes,
 		KnownMediaID:           uuid.Nil.String(),
 		Mimetype:               mimex.Binary,
 		Category:               mimex.Application,

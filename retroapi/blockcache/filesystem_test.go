@@ -7,7 +7,7 @@ import (
 
 	"github.com/james-lawrence/torrent/torrenttest"
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
-	"github.com/retrovibed/retrovibed/retroapi/internal/bytesx"
+	"github.com/retrovibed/retrovibed/retroapi/bytesx"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

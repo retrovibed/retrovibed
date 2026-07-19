@@ -33,6 +33,7 @@ type Import struct {
 	Popularity    float64                `protobuf:"fixed64,8,opt,name=popularity,proto3" json:"popularity,omitempty"`
 	PosterPath    string                 `protobuf:"bytes,9,opt,name=poster_path,proto3" json:"poster_path,omitempty"`
 	Source        string                 `protobuf:"bytes,10,opt,name=source,proto3" json:"source,omitempty"`
+	Bytes         uint64                 `protobuf:"varint,11,opt,name=bytes,proto3" json:"bytes,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -137,11 +138,18 @@ func (x *Import) GetSource() string {
 	return ""
 }
 
+func (x *Import) GetBytes() uint64 {
+	if x != nil {
+		return x.Bytes
+	}
+	return 0
+}
+
 var File_ddisc_import_proto protoreflect.FileDescriptor
 
 const file_ddisc_import_proto_rawDesc = "" +
 	"\n" +
-	"\x12ddisc.import.proto\x12\x05ddisc\"\x9c\x02\n" +
+	"\x12ddisc.import.proto\x12\x05ddisc\"\xb2\x02\n" +
 	"\x06Import\x12\x10\n" +
 	"\x03uri\x18\x01 \x01(\tR\x03uri\x12\x16\n" +
 	"\x06health\x18\x02 \x01(\rR\x06health\x12\x1a\n" +
@@ -155,7 +163,8 @@ const file_ddisc_import_proto_rawDesc = "" +
 	"popularity\x12 \n" +
 	"\vposter_path\x18\t \x01(\tR\vposter_path\x12\x16\n" +
 	"\x06source\x18\n" +
-	" \x01(\tR\x06sourceb\x06proto3"
+	" \x01(\tR\x06source\x12\x14\n" +
+	"\x05bytes\x18\v \x01(\x04R\x05bytesb\x06proto3"
 
 var (
 	file_ddisc_import_proto_rawDescOnce sync.Once

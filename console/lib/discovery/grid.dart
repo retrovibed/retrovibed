@@ -20,7 +20,6 @@ class DiscoveryGrid extends StatefulWidget {
 }
 
 class _DiscoveryGridState extends State<DiscoveryGrid> {
-  bool _loading = true;
   Widget _cause = ds.Error.zero;
   List<ddisc.Discovery> _items = [];
   media.MediaSearchRequest? _lastFetchedNext;
@@ -48,7 +47,6 @@ class _DiscoveryGridState extends State<DiscoveryGrid> {
     if (category.isEmpty) {
       setState(() {
         _items = [];
-        _loading = false;
       });
       widget.search.value = media.MediaSearchState(next: req, count: 0);
       return Future.value();
@@ -56,7 +54,6 @@ class _DiscoveryGridState extends State<DiscoveryGrid> {
 
     setState(() {
       _items = [];
-      _loading = true;
       _cause = ds.Error.zero;
     });
 
@@ -71,6 +68,7 @@ class _DiscoveryGridState extends State<DiscoveryGrid> {
           final done = Completer<void>();
           _subscription = stream.listen(
             (item) {
+              print("DERP DERP ${item}");
               _found.add(item);
               widget.search.value = media.MediaSearchState(next: req, count: _found.length);
               setState(() {
@@ -83,15 +81,9 @@ class _DiscoveryGridState extends State<DiscoveryGrid> {
           );
           return done.future;
         })
-        .then((_) {
-          setState(() {
-            _loading = false;
-          });
-        })
         .catchError((cause) {
           setState(() {
             _cause = ds.Error.unknown(cause, onTap: reseterr);
-            _loading = false;
           });
         });
   }
@@ -114,8 +106,7 @@ class _DiscoveryGridState extends State<DiscoveryGrid> {
 
         final defaults = ds.Defaults.of(context);
 
-        return ds.Loading(
-          loading: _loading,
+        return ds.ErrorScreen(
           cause: _cause,
           ds.Grid<ddisc.Discovery>(
             key: ValueKey('discovery.grid'),
