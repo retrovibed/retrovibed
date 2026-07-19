@@ -8,6 +8,7 @@ export 'design.kit/screens.dart';
 export 'design.kit/accordion.dart';
 export 'design.kit/buttons.dart';
 export 'design.kit/buttons.loading.icon.dart';
+export 'design.kit/buttons.loading.tile.dart';
 export 'design.kit/buttons.loading.widget.dart';
 export 'design.kit/carousel.dart';
 export 'design.kit/card.dart';

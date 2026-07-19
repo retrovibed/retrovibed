@@ -8,10 +8,57 @@ class SearchMimetypeDropdown extends StatelessWidget {
   final void Function(media.MediaSearchRequest r) onChange;
   SearchMimetypeDropdown(this.current, {super.key, required this.onChange});
 
-  Icon _icon(int checksum) {
+  static Icon icon(int checksum) {
     if (checksum == mimex.checksumfor(mimex.icomovie)) return Icon(Icons.movie_filter);
     if (checksum == mimex.checksumfor(mimex.icoaudio)) return Icon(Icons.music_note);
     return Icon(Icons.file_open_rounded);
+  }
+
+  static String label(int checksum) {
+    if (checksum == mimex.checksumfor(mimex.icomovie)) return "Movies";
+    if (checksum == mimex.checksumfor(mimex.icoaudio)) return "Music";
+    return "Files";
+  }
+
+  static List<String> mimetypesFor(int checksum) {
+    if (checksum == mimex.checksumfor(mimex.icomovie)) return mimex.of(mimex.icomovie);
+    if (checksum == mimex.checksumfor(mimex.icoaudio)) return mimex.of(mimex.icoaudio);
+    return const [];
+  }
+
+  static void select(media.MediaSearchRequest current, int checksum) {
+    current.mimetypes
+      ..clear()
+      ..addAll(mimetypesFor(checksum));
+  }
+
+  static List<PopupMenuEntry<String>> menuItems(
+    media.MediaSearchRequest current,
+    void Function(media.MediaSearchRequest) onChange,
+  ) {
+    return [
+      _menuOption(current, onChange, mimex.checksumfor(mimex.icoaudio)),
+      _menuOption(current, onChange, mimex.checksumfor(mimex.icomovie)),
+      _menuOption(current, onChange, mimex.checksumfor(mimex.icobinary)),
+    ];
+  }
+
+  static PopupMenuItem<String> _menuOption(
+    media.MediaSearchRequest current,
+    void Function(media.MediaSearchRequest) onChange,
+    int checksum,
+  ) {
+    return PopupMenuItem<String>(
+      enabled: false,
+      child: ListTile(
+        leading: icon(checksum),
+        title: Text(label(checksum)),
+        onTap: () {
+          select(current, checksum);
+          onChange(current);
+        },
+      ),
+    );
   }
 
   @override
@@ -24,23 +71,9 @@ class SearchMimetypeDropdown extends StatelessWidget {
         position: PopupMenuPosition.under,
         color: Theme.of(context).colorScheme.surface,
         surfaceTintColor: Theme.of(context).colorScheme.surface,
-        icon: _icon(mimetypes),
+        icon: icon(mimetypes),
         onSelected: (v) {
-          if (v == mimex.checksumfor(mimex.icomovie)) {
-            current.mimetypes.clear();
-            current.mimetypes.addAll(mimex.of(mimex.icomovie));
-            onChange(current);
-            return;
-          }
-
-          if (v == mimex.checksumfor(mimex.icoaudio)) {
-            current.mimetypes.clear();
-            current.mimetypes.addAll(mimex.of(mimex.icoaudio));
-            onChange(current);
-            return;
-          }
-
-          current.mimetypes.clear();
+          select(current, v);
           onChange(current);
         },
         itemBuilder:

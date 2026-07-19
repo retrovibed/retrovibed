@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:retrovibed/design.kit/file.drop.well.dart';
 import 'package:retrovibed/designkit.dart' as ds;
+import 'package:retrovibed/downloads.dart' as downloads;
 import 'package:retrovibed/media.dart' as media;
+import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/lucene.dart' as lucene;
 import 'package:retrovibed/discovery.dart' as disc;
 import 'grid.display.dart';
 import 'grid.setting.dart';
+import 'menu.upload.files.dart';
 import 'search.mimetype.dropdown.dart';
+import 'dropdown.upload.dart';
 
 class Home extends StatefulWidget {
   final media.FnMediaSearch apisearch;
@@ -53,44 +56,6 @@ class _HomeState extends State<Home> {
     final defaults = ds.Defaults.of(context);
     final compact = defaults.isCompact;
 
-    final upload =
-        (
-          FilesEvent v, {
-          ValueNotifier<int>? progress,
-        }) {
-          final multiparts = v.files.map((c) {
-            return media.media.uploadable(c.path, c.name, c.mimeType!);
-          });
-
-          return Future.microtask(() {
-            return Future.wait(
-              multiparts.map((fv) {
-                return fv.then((v) {
-                  return widget
-                      .apiupload((req) {
-                        req..files.add(v);
-                        return req;
-                      })
-                      .then((_) {
-                        final freshNext = widget.search.value.next.clone();
-                        widget.search.value = media.MediaSearchState(
-                          next: freshNext,
-                          count: widget.search.value.count,
-                        );
-                      })
-                      .catchError((cause) {
-                        setState(() {
-                          _cause = ds.Error.unknown(cause, onTap: _reseterr);
-                        });
-                      });
-                });
-              }),
-            ).then((v) => ds.NullWidget).catchError((cause) {
-              return ds.Error.unknown(cause, onTap: _reseterr);
-            });
-          });
-        };
-
     return LayoutBuilder(
       builder: (context, constraints) => SingleChildScrollView(
         reverse: compact,
@@ -107,20 +72,6 @@ class _HomeState extends State<Home> {
                   autofocus: defaults.desktop,
                   decoration: InputDecoration(hintText: "search library, @... for filters"),
                   filters: [
-                    lucene.Mode.auto(
-                      'discover',
-                      false,
-                      (enabled) {
-                        setState(() {
-                          _mode = enabled ? _Mode.discovery : _Mode.library;
-                        });
-                      },
-                      help: ds.Hint(
-                        const Text(
-                          "switch to discover mode to find and download new media, instead of searching your existing library",
-                        ),
-                      ),
-                    ),
                     lucene.Boolean.auto('hidden', false, (v) {
                       final freshNext = widget.search.value.next.clone()..hidden = v;
                       widget.search.value = media.MediaSearchState(
@@ -155,21 +106,49 @@ class _HomeState extends State<Home> {
                   empty: ds.Grid.int64(state.count) < state.next.limit,
                   leading: [
                     ds.CompactingMenu.pinned(
-                      SearchMimetypeDropdown(
-                        state.next,
-                        onChange: (upd) {
-                          widget.search.value = media.MediaSearchState(
-                            next: upd.clone(),
-                            count: widget.search.value.count,
-                          );
-                        },
-                      ),
-                    ),
-                    ds.FileDropWell.icon(
-                      upload,
-                      mimetypes: state.next.mimetypes,
-                      help: ds.Hint(
-                        const Text("drag and drop files onto the grid to add media to your library"),
+                      DropdownUpload(
+                        icon: SearchMimetypeDropdown.icon(mimex.checksum(state.next.mimetypes)),
+                        help: ds.Hint(
+                          const Text(
+                            "filter by mimetype, upload files, torrents, magnet links, or switch to discover mode",
+                          ),
+                        ),
+                        items: [
+                          ...SearchMimetypeDropdown.menuItems(state.next, (upd) {
+                            widget.search.value = media.MediaSearchState(
+                              next: upd.clone(),
+                              count: widget.search.value.count,
+                            );
+                          }),
+                          const PopupMenuDivider(),
+                          PopupMenuItem<String>(
+                            enabled: false,
+                            child: mimex.CategoryOptionsLabel(state.next.mimetypes),
+                          ),
+                          MenuItemUploadFiles(
+                            context,
+                            widget.search,
+                            apiupload: widget.apiupload,
+                            mimetypes: state.next.mimetypes,
+                          ),
+                          downloads.MenuItemDownloadTorrent(context),
+                          downloads.MenuItemDownloadMagnet(context),
+                          PopupMenuItem<String>(
+                            child: ListTile(
+                              leading: Icon(_mode == _Mode.discovery ? Icons.check : Icons.travel_explore),
+                              title: const Text("Search / Discover"),
+                              onTap: () {
+                                final next = _mode == _Mode.discovery ? _Mode.library : _Mode.discovery;
+                                setState(() {
+                                  _mode = next;
+                                });
+                                if (next == _Mode.discovery) {
+                                  widget.focus?.requestFocus();
+                                }
+                              },
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
