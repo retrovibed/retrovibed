@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"iter"
+	"net/http"
 	"testing"
 
 	"github.com/james-lawrence/torrent/dht/int160"
@@ -12,8 +13,10 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
+	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/library"
+	"github.com/retrovibed/retrovibed/shallows/tracking"
 	"github.com/stretchr/testify/require"
 )
 
@@ -35,42 +38,47 @@ func (t fakeSearchPlugins) Search(ctx context.Context, mimetypes []string, query
 	return fakeResultSeq(t)
 }
 
-func TestSearchQueueBackgroundRunPersistsFoundResults(t *testing.T) {
-	ctx, done := testx.Context(t)
-	defer done()
+func TestSearchQueueBackgroundRun(t *testing.T) {
+	t.Run("should persist found results with the real resolved infohash", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
 
-	q := sqltestx.Metadatabase(t)
+		q := sqltestx.Metadatabase(t)
 
-	var known library.Known
-	require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults, library.KnownOptionMimetype(mimex.Video)))
-	require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
+		var known library.Known
+		require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults, library.KnownOptionMimetype(mimex.Video)))
+		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 
-	require.NoError(t, ddisc.SearchQueueEnqueue(ctx, q, ddisc.SearchQueue{KnownMediaID: known.UID}).Scan(&ddisc.SearchQueue{}))
+		require.NoError(t, ddisc.SearchQueueEnqueue(ctx, q, ddisc.SearchQueue{KnownMediaID: known.UID}).Scan(&ddisc.SearchQueue{}))
 
-	id := int160.Random()
-	magnet := fmt.Sprintf("magnet:?xt=urn:btih:%s", id.String())
+		id := int160.Random()
+		magnet := fmt.Sprintf("magnet:?xt=urn:btih:%s", id.String())
 
-	plugins := fakeSearchPlugins{results: []*ddiscapi.Import{{Uri: magnet, Uritype: mimex.Magnet, Health: 10, Mimetype: mimex.Video}}}
-	require.NoError(t, SearchQueueBackgroundRun(ctx, q, plugins))
+		plugins := fakeSearchPlugins{results: []*ddiscapi.Import{{Uri: magnet, Uritype: mimex.Magnet, Health: 10, Mimetype: mimex.Video}}}
+		importer := tracking.NewURIImport(q, http.DefaultClient, fsx.DirVirtual(t.TempDir()))
+		require.NoError(t, SearchQueueBackgroundRun(ctx, q, importer, plugins))
 
-	require.EqualValues(t, 1, sqltestx.Count(t, q, "SELECT COUNT(*) FROM ddisc_media WHERE known_media_id = ?", known.UID))
-	require.EqualValues(t, 0, sqltestx.Count(t, q, "SELECT COUNT(*) FROM ddisc_search_queue WHERE known_media_id = ?", known.UID))
-}
+		require.EqualValues(t, 1, sqltestx.Count(t, q, "SELECT COUNT(*) FROM ddisc_media WHERE known_media_id = ?", known.UID))
+		require.EqualValues(t, 0, sqltestx.Count(t, q, "SELECT COUNT(*) FROM ddisc_search_queue WHERE known_media_id = ?", known.UID))
+		require.EqualValues(t, 1, sqltestx.Count(t, q, "SELECT COUNT(*) FROM ddisc_media WHERE known_media_id = ? AND infohash = ?", known.UID, id.Bytes()), "the real infohash resolved from the magnet should be persisted, not a placeholder")
+	})
 
-func TestSearchQueueBackgroundRunCooldownOnEmptyResults(t *testing.T) {
-	ctx, done := testx.Context(t)
-	defer done()
+	t.Run("should cooldown when no results are found", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
 
-	q := sqltestx.Metadatabase(t)
+		q := sqltestx.Metadatabase(t)
 
-	var known library.Known
-	require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults, library.KnownOptionMimetype(mimex.Video)))
-	require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
+		var known library.Known
+		require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults, library.KnownOptionMimetype(mimex.Video)))
+		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 
-	require.NoError(t, ddisc.SearchQueueEnqueue(ctx, q, ddisc.SearchQueue{KnownMediaID: known.UID}).Scan(&ddisc.SearchQueue{}))
+		require.NoError(t, ddisc.SearchQueueEnqueue(ctx, q, ddisc.SearchQueue{KnownMediaID: known.UID}).Scan(&ddisc.SearchQueue{}))
 
-	require.NoError(t, SearchQueueBackgroundRun(ctx, q, fakeSearchPlugins{}))
+		importer := tracking.NewURIImport(q, http.DefaultClient, fsx.DirVirtual(t.TempDir()))
+		require.NoError(t, SearchQueueBackgroundRun(ctx, q, importer, fakeSearchPlugins{}))
 
-	require.EqualValues(t, 0, sqltestx.Count(t, q, "SELECT COUNT(*) FROM ddisc_media WHERE known_media_id = ?", known.UID))
-	require.EqualValues(t, 1, sqltestx.Count(t, q, "SELECT COUNT(*) FROM ddisc_search_queue WHERE known_media_id = ? AND attempts = 1", known.UID))
+		require.EqualValues(t, 0, sqltestx.Count(t, q, "SELECT COUNT(*) FROM ddisc_media WHERE known_media_id = ?", known.UID))
+		require.EqualValues(t, 1, sqltestx.Count(t, q, "SELECT COUNT(*) FROM ddisc_search_queue WHERE known_media_id = ? AND attempts = 1", known.UID))
+	})
 }

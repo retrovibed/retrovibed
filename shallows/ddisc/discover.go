@@ -7,8 +7,6 @@ import (
 
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 )
 
@@ -80,15 +78,19 @@ type DiscoverStrategy interface {
 // Discover tries each strategy in order, stopping at the first that yields a
 // result. Earlier strategies' side effects (e.g. a fired-and-forgotten peer
 // query) still happen even when that strategy doesn't yield anything itself.
-// Every yielded candidate is persisted into ddisc_media and ranked with
-// policy before being handed to the caller, so callers observe the real
-// policy rank rather than the unranked DB sentinel.
-func Discover(ctx context.Context, q sqlx.Queryer, policy Policy, req DiscoverRequest, strategies ...DiscoverStrategy) iterx.Seq[Discovered] {
-	return &discoverSeq{q: q, policy: policy, req: req, strategies: strategies}
+// Every yielded candidate is ranked with policy before being handed to the
+// caller, so callers observe the real policy rank rather than the unranked
+// sentinel - but candidates are not persisted here. Persisting is the
+// caller's job: only the caller knows whether a candidate is worth keeping
+// (e.g. daemons.DiscoveredDownload persists only the winner, once import has
+// resolved its real infohash) or whether every candidate should be recorded
+// regardless (e.g. daemons.SearchQueueBackgroundRun, which exists purely to
+// populate ddisc_media for background browsing).
+func Discover(ctx context.Context, policy Policy, req DiscoverRequest, strategies ...DiscoverStrategy) iterx.Seq[Discovered] {
+	return &discoverSeq{policy: policy, req: req, strategies: strategies}
 }
 
 type discoverSeq struct {
-	q          sqlx.Queryer
 	policy     Policy
 	req        DiscoverRequest
 	strategies []DiscoverStrategy
@@ -104,19 +106,9 @@ func (t *discoverSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 			for d := range seq.Each(ctx) {
 				found = true
 
-				if err := DiscoveredInsertWithDefaults(ctx, t.q, d).Scan(&d); err != nil {
-					errorsx.Log(errorsx.Wrap(err, "unable to persist discovered candidate"))
-					continue
-				}
-
 				if err := t.policy.Rank(&d); err != nil {
 					t.err = err
 					return
-				}
-
-				if err := DiscoveredRank(ctx, t.q, d.ID, d.Health, d.PolicyRank, d.PolicyRejection).Scan(&d); err != nil {
-					errorsx.Log(errorsx.Wrap(err, "unable to persist policy rank"))
-					continue
 				}
 
 				if !yield(d) {

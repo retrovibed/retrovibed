@@ -21,6 +21,7 @@ import (
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
+	rootenv "github.com/retrovibed/retrovibed/retroapi/env"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
@@ -328,8 +329,8 @@ func Verify(ctx context.Context, t torrent.Torrent) error {
 
 // clears out data from storage and resets any torrent data to zero.
 func Reset(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata) (err error) {
-	mediavfs := fsx.DirVirtual(vfs.Path("media"))
-	torrentvfs := fsx.DirVirtual(vfs.Path("torrent"))
+	mediavfs := fsx.DirVirtual(vfs.Path(rootenv.MediaDirName))
+	torrentvfs := fsx.DirVirtual(vfs.Path(rootenv.TorrentDirName))
 
 	log.Println("removing torrent initiated", md.ID, int160.FromBytes(md.Infohash).String())
 	defer log.Println("removing torrent completed", md.ID, int160.FromBytes(md.Infohash).String())
@@ -380,8 +381,8 @@ func DownloadInto(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, mc libra
 	// update the progress.
 	go DownloadProgress(pctx, q, md, t)
 
-	mediavfs := fsx.DirVirtual(vfs.Path("media"))
-	torrentvfs := fsx.DirVirtual(vfs.Path("torrent"))
+	mediavfs := fsx.DirVirtual(vfs.Path(rootenv.MediaDirName))
+	torrentvfs := fsx.DirVirtual(vfs.Path(rootenv.TorrentDirName))
 	bcache, err := blockcache.NewDirectoryCache(torrentvfs.Path(int160.FromBytes(md.Infohash).String()))
 	if err != nil {
 		return err

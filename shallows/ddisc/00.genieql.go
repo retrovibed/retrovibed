@@ -29,7 +29,7 @@ func DiscoveredInsertWithDefaults(
 	gql genieql.Insert,
 	pattern func(ctx context.Context, q sqlx.Queryer, a Discovered) NewDiscoveredScannerStaticRow,
 ) {
-	gql.Into("ddisc_media").Default("created_at", "updated_at", "tombstoned_at", "released_at", "next_check_at", "policy_rank", "policy_rejection").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, title = COALESCE(NULLIF(EXCLUDED.title, ''), ddisc_media.title), uri = COALESCE(NULLIF(EXCLUDED.uri, ''), ddisc_media.uri), policy_rank = EXCLUDED.policy_rank, policy_rejection = DEFAULT, private = ddisc_media.private OR EXCLUDED.private")
+	gql.Into("ddisc_media").Default("created_at", "updated_at", "released_at", "next_check_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, title = COALESCE(NULLIF(EXCLUDED.title, ''), ddisc_media.title), uri = COALESCE(NULLIF(EXCLUDED.uri, ''), ddisc_media.uri), infohash = EXCLUDED.infohash, policy_rank = EXCLUDED.policy_rank, policy_rejection = EXCLUDED.policy_rejection, private = ddisc_media.private OR EXCLUDED.private")
 }
 
 func DiscoveredFindByID(

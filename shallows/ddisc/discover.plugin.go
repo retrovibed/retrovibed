@@ -6,8 +6,6 @@ import (
 	"log"
 
 	"github.com/gofrs/uuid/v5"
-	"github.com/james-lawrence/torrent/dht/int160"
-	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
 	"github.com/retrovibed/retrovibed/retroapi/uuidx"
@@ -57,9 +55,7 @@ func (t *pluginSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 
 		seq := t.cfg.plugins.Search(ctx, t.req.Mimetypes, t.req.Title, t.req.Adult)
 		for imp := range seq.Each(ctx) {
-			m, err := metainfo.ParseMagnetURI(imp.Uri)
-			if err != nil {
-				log.Println("search plugin returned an unresolvable uri", err)
+			if imp.Uri == "" {
 				continue
 			}
 
@@ -72,14 +68,10 @@ func (t *pluginSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 				}
 			}
 
-			id := int160.FromBytes(m.InfoHash.Bytes())
-			d := NewDiscovered(
-				&id,
-				DiscoveredOptionURI(imp.Uri),
+			d := NewDiscoveredFromImport(
+				imp,
 				DiscoveredOptionKnownMedia(langx.FirstNonZero(imp.KnownMediaId, t.req.KnownMediaID)),
 				DiscoveredOptionMimetype(Generalize(mimetype)),
-				DiscoveredOptionHealth(imp.Health),
-				DiscoveredOptionTitle(m.DisplayName),
 			)
 
 			if !yield(d) {

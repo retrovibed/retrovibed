@@ -563,11 +563,12 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 		},
 	}, http.StatusTooManyRequests, http.StatusBadGateway)
 
+	importer := tracking.NewURIImport(t.db, c, t.rootstore)
+
 	// TODO: AutoLocateMedia should be located within distributed indexing.
 	if cfg.AutoLocateMedia {
 		const freq = 15 * time.Minute
 		policy := ddisc.DefaultPolicy()
-		importer := tracking.NewURIImport(t.db, c, t.rootstore)
 		go asyncx.Periodic(dctx, t.locate, backoffx.New(
 			backoffx.Constant(freq),
 			backoffx.JitterRandom(time.Second),
@@ -580,7 +581,7 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 	}
 
 	if plugins != nil {
-		errorsx.Log(SearchQueueBackground(dctx, t.db, plugins))
+		errorsx.Log(SearchQueueBackground(dctx, t.db, importer, plugins))
 	}
 
 	if disc.Enabled && disc.Ratio > 0 {

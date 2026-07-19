@@ -9,6 +9,13 @@ import (
 const (
 	// used for local dev to change default.
 	DeeppoolEndpoint = "RETROVIBED_META_ENDPOINT"
+
+	// MediaDirName and TorrentDirName are the on-disk subdirectory names
+	// media files and .torrent files/caches are stored under, relative to
+	// any rootstore - shared so every consumer of a shared fsx.Virtual root
+	// scopes into the same subdirectories.
+	MediaDirName   = "media"
+	TorrentDirName = "torrent"
 )
 
 func RootStorageDir(rel ...string) string {
@@ -16,11 +23,11 @@ func RootStorageDir(rel ...string) string {
 }
 
 func MediaDir() string {
-	return RootStorageDir("media")
+	return RootStorageDir(MediaDirName)
 }
 
 func TorrentDir() string {
-	return RootStorageDir("torrent")
+	return RootStorageDir(TorrentDirName)
 }
 
 func PrivateKeyPath() string {

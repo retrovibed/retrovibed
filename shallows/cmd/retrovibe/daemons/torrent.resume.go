@@ -17,6 +17,7 @@ import (
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/james-lawrence/torrent/tracker"
 	"github.com/retrovibed/retrovibed/retroapi/asynccompute"
+	"github.com/retrovibed/retrovibed/retroapi/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/backoffx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -42,7 +43,7 @@ func ResumeDownloads(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual
 
 	for md := range iter.Iter() {
 		id := metainfo.Hash(md.Infohash)
-		infopath := rootstore.Path("torrent", fmt.Sprintf("%s.torrent", id))
+		infopath := rootstore.Path(env.TorrentDirName, fmt.Sprintf("%s.torrent", id))
 		log.Println("resuming", md.ID, md.Description, md.Private, infopath)
 
 		metadata, err := torrent.New(
@@ -96,7 +97,7 @@ func VerifyTorrents(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual,
 
 	for md := range iter.Iter() {
 		id := metainfo.Hash(md.Infohash)
-		infopath := rootstore.Path("torrent", fmt.Sprintf("%s.torrent", id))
+		infopath := rootstore.Path(env.TorrentDirName, fmt.Sprintf("%s.torrent", id))
 		log.Println("verifying", md.ID, md.Description, md.Private, infopath)
 
 		metadata, err := torrent.New(

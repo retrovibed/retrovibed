@@ -12,6 +12,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
+	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/stretchr/testify/require"
@@ -48,7 +49,7 @@ func TestPluginStrategyYieldsUnpersisted(t *testing.T) {
 	require.NoError(t, seq.Err())
 	require.Len(t, got, 1)
 	require.Equal(t, kid, got[0].KnownMediaID)
-	require.Equal(t, 0, sqltestx.Count(t, q, fmt.Sprintf("SELECT COUNT(*) FROM ddisc_media WHERE known_media_id = '%s'", kid)), "PluginStrategy itself must not persist - that's Discover's job")
+	require.Equal(t, 0, sqltestx.Count(t, q, fmt.Sprintf("SELECT COUNT(*) FROM ddisc_media WHERE known_media_id = '%s'", kid)), "PluginStrategy itself must not persist - that's the caller's job")
 }
 
 func TestPluginStrategyNoopsWithoutTitle(t *testing.T) {
@@ -178,4 +179,30 @@ func TestPluginStrategySkipsSentinelKnownMediaID(t *testing.T) {
 			require.Equal(t, 0, sqltestx.Count(t, q, "SELECT COUNT(*) FROM library_known_media"))
 		})
 	}
+}
+
+func TestPluginStrategyResolvesNonMagnetURI(t *testing.T) {
+	q := sqltestx.Metadatabase(t)
+
+	uri := "https://tracker.example/download/1000.abc"
+	kid := uuid.Must(uuid.NewV4()).String()
+
+	plugins := fakePluginSeq{results: []*ddiscapi.Import{{
+		Uri:      uri,
+		Uritype:  mimex.Bittorrent,
+		Health:   7,
+		Mimetype: mimex.Video,
+		Title:    "Some Release",
+	}}}
+	seq := ddisc.PluginStrategy(q, plugins).Discover(t.Context(), ddisc.DiscoverRequest{KnownMediaID: kid, Title: "ubuntu", Mimetypes: []string{mimex.Video}})
+
+	var got []ddisc.Discovered
+	for v := range seq.Each(t.Context()) {
+		got = append(got, v)
+	}
+	require.NoError(t, seq.Err())
+	require.Len(t, got, 1, "a non-magnet uri (e.g. unit3d's download_link fallback) must still be usable, not dropped as unresolvable")
+	require.Equal(t, uri, got[0].URI)
+	require.Equal(t, md5x.FormatUUID(md5x.Digest(uri)), got[0].ID)
+	require.Equal(t, "Some Release", got[0].Title)
 }

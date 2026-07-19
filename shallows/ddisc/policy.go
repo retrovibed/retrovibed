@@ -2,13 +2,11 @@ package ddisc
 
 import (
 	"cmp"
-	"context"
+	"iter"
 	"math"
 	"regexp"
 
-	"github.com/Masterminds/squirrel"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 )
 
 // ErrNoCandidate indicates every Discovered row for a known-media-id was
@@ -132,10 +130,9 @@ func (defaultPolicy) Rank(d *Discovered) error {
 	return nil
 }
 
-// compareDiscovered orders candidates by PolicyRank ascending, then Health
-// descending, then Bytes descending: negative when a should be preferred
-// over b.
-func compareDiscovered(a, b Discovered) int {
+// Compare orders candidates by PolicyRank ascending, then Health descending,
+// then Bytes descending: negative when a should be preferred over b.
+func Compare(a, b Discovered) int {
 	return cmp.Or(
 		cmp.Compare(a.PolicyRank, b.PolicyRank),
 		cmp.Compare(b.Health, a.Health),
@@ -143,47 +140,24 @@ func compareDiscovered(a, b Discovered) int {
 	)
 }
 
-// RankAndSelect ranks every Discovered row for loc.KnownMediaID whose title
-// matches loc.Query with policy, persists the result of each
-// (health/policy_rank/policy_rejection), and returns the lowest-PolicyRank
-// non-rejected candidate. Health and Bytes break ties between equally-ranked
-// candidates. The title match is strict (every word in loc.Query must appear
-// in the candidate's title) - required because known-media-id alone isn't
-// enough to scope candidates: unresolved locates all share the same
-// known-media-id (uuid.Nil), so without the title filter a candidate from a
-// completely unrelated search could be selected.
-func RankAndSelect(ctx context.Context, q sqlx.Queryer, policy Policy, loc Locate) (Discovered, error) {
-	b := DiscoveredSearchBuilder().Where(squirrel.And{
-		DiscoveredQueryKnownMediaID(loc.KnownMediaID),
-		DiscoveredQueryTitle(loc.Query),
-	})
-	s := sqlx.Scan(DiscoveredSearch(ctx, q, b))
-
+// Select reduces seq - a sequence of candidates already ranked by a Policy
+// (e.g. by Discover, which ranks every candidate before yielding it) - to
+// the single best non-rejected one. Returns ErrNoCandidate if seq yielded
+// nothing or every candidate was rejected.
+func Select(seq iter.Seq[Discovered]) (Discovered, error) {
 	var (
 		best  = Worst()
 		found bool
 	)
 
-	for d := range s.Iter() {
-		if err := policy.Rank(&d); err != nil {
-			return best, err
-		}
-
-		if err := DiscoveredRank(ctx, q, d.ID, d.Health, d.PolicyRank, d.PolicyRejection).Scan(&d); err != nil {
-			return best, err
-		}
-
+	for d := range seq {
 		if d.PolicyRejection != "" {
 			continue
 		}
 
-		if compareDiscovered(d, best) < 0 {
+		if Compare(d, best) < 0 {
 			best, found = d, true
 		}
-	}
-
-	if err := s.Err(); err != nil {
-		return best, err
 	}
 
 	if !found {

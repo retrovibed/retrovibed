@@ -14,6 +14,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/library"
+	"github.com/retrovibed/retrovibed/shallows/tracking"
 )
 
 // searchPlugins is the narrow interface needed from
@@ -23,12 +24,14 @@ type searchPlugins interface {
 	Search(ctx context.Context, mimetypes []string, query string, adult bool) iterx.Seq[*ddiscapi.Import]
 }
 
-func SearchQueueBackgroundRun(ctx context.Context, q sqlx.Queryer, plugins searchPlugins) error {
+func SearchQueueBackgroundRun(ctx context.Context, q sqlx.Queryer, importer tracking.URIImport, plugins searchPlugins) error {
 	// SearchQueueBackgroundRun drains ddisc_search_queue: for each pending
-	// known-media-id, ask the loaded search plugins for candidates and persist
-	// whatever they find, or push the entry's cooldown out if nothing turned up.
-	// maxAge bounds how long a known-media-id stays queued for
-	// search-plugin discovery before it's given up on and purged.
+	// known-media-id, ask the loaded search plugins for candidates, resolve
+	// each candidate's real infohash (without importing/downloading it - see
+	// tracking.URIImport.Resolve) and persist whatever they find, or push the
+	// entry's cooldown out if nothing turned up. maxAge bounds how long a
+	// known-media-id stays queued for search-plugin discovery before it's
+	// given up on and purged.
 	const maxAge = 30 * 24 * time.Hour
 	errorsx.Log(sqlx.Discard(sqlx.Scan(ddisc.SearchQueuePurge(ctx, q, maxAge))))
 
@@ -41,11 +44,23 @@ func SearchQueueBackgroundRun(ctx context.Context, q sqlx.Queryer, plugins searc
 		}
 
 		sctx, cancel := context.WithTimeout(ctx, 30*time.Second)
-		seq := ddisc.Discover(sctx, q, ddisc.DefaultPolicy(), ddisc.DiscoverRequestFromKnown(known), ddisc.PluginStrategy(q, plugins))
+		seq := ddisc.Discover(sctx, ddisc.DefaultPolicy(), ddisc.DiscoverRequestFromKnown(known), ddisc.PluginStrategy(q, plugins))
 
 		found := false
-		for range seq.Each(sctx) {
+		for d := range seq.Each(sctx) {
 			found = true
+
+			if resolved, rerr := importer.Resolve(sctx, d.URI); rerr != nil {
+				errorsx.Log(errorsx.Wrap(rerr, "unable to resolve discovered candidate"))
+				continue
+			} else {
+				d.Infohash = resolved.Infohash
+			}
+
+			if err := ddisc.DiscoveredInsertWithDefaults(sctx, q, d).Scan(&d); err != nil {
+				errorsx.Log(errorsx.Wrap(err, "unable to persist discovered candidate"))
+				continue
+			}
 		}
 		err := seq.Err()
 		cancel()
@@ -70,7 +85,7 @@ func SearchQueueBackgroundRun(ctx context.Context, q sqlx.Queryer, plugins searc
 
 // SearchQueueBackground drains the queue, then polls for new entries on an
 // exponential backoff that maxes out at an hour.
-func SearchQueueBackground(ctx context.Context, q sqlx.Queryer, plugins searchPlugins) error {
+func SearchQueueBackground(ctx context.Context, q sqlx.Queryer, importer tracking.URIImport, plugins searchPlugins) error {
 	wakeup := asyncx.NewWakeup(ctx)
 	defer wakeup.Broadcast() // kick off an initial drain
 	s := backoffx.New(
@@ -82,7 +97,7 @@ func SearchQueueBackground(ctx context.Context, q sqlx.Queryer, plugins searchPl
 	go asyncx.Periodic(ctx, wakeup, s, "ddisc search queue drain")
 	contextx.Run(ctx, func() {
 		errorsx.Log(asyncx.Run(ctx, wakeup, func(ctx context.Context) error {
-			return SearchQueueBackgroundRun(ctx, q, plugins)
+			return SearchQueueBackgroundRun(ctx, q, importer, plugins)
 		}))
 	})
 

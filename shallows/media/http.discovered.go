@@ -26,6 +26,7 @@ import (
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/justinas/alice"
+	rootenv "github.com/retrovibed/retrovibed/retroapi/env"
 	"github.com/retrovibed/retrovibed/retroapi/httpauth"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
@@ -82,7 +83,7 @@ func NewHTTPDiscovered(q sqlx.Queryer, d *atomic.Pointer[torrent.Client], c stor
 		mediacleaner: library.QueryCleanerNoop(),
 	}, options...)
 
-	errorsx.Log(errorsx.Wrap(fsx.MkDirs(0700, svc.rootstorage.Path("torrent"), svc.rootstorage.Path("media")), "failed to prepare directories"))
+	errorsx.Log(errorsx.Wrap(fsx.MkDirs(0700, svc.rootstorage.Path(rootenv.TorrentDirName), svc.rootstorage.Path(rootenv.MediaDirName)), "failed to prepare directories"))
 
 	return &svc
 }
@@ -326,8 +327,8 @@ func (t *HTTPDiscovered) publish(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := os.WriteFile(t.rootstorage.Path("torrent", fmt.Sprintf("%s.torrent", meta.ID().String())), buf.Bytes(), 0600); err != nil {
-		log.Println(errorsx.Errorf("failed to write torrent file: %s", t.rootstorage.Path("torrent", fmt.Sprintf("%s.torrent", meta.ID().String()))))
+	if err := os.WriteFile(t.rootstorage.Path(rootenv.TorrentDirName, fmt.Sprintf("%s.torrent", meta.ID().String())), buf.Bytes(), 0600); err != nil {
+		log.Println(errorsx.Errorf("failed to write torrent file: %s", t.rootstorage.Path(rootenv.TorrentDirName, fmt.Sprintf("%s.torrent", meta.ID().String()))))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
 	}
@@ -452,7 +453,7 @@ func (t *HTTPDiscovered) upload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = os.Rename(tmp.Name(), t.rootstorage.Path("torrent", fmt.Sprintf("%s.torrent", metainfo.Hash(lmd.Infohash).String()))); err != nil {
+	if err = os.Rename(tmp.Name(), t.rootstorage.Path(rootenv.TorrentDirName, fmt.Sprintf("%s.torrent", metainfo.Hash(lmd.Infohash).String()))); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to failed to record torrent file"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return

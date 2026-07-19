@@ -16,6 +16,7 @@ import (
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
+	"github.com/retrovibed/retrovibed/retroapi/env"
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
 	retronetx "github.com/retrovibed/retrovibed/retroapi/netx"
 	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
@@ -149,7 +150,7 @@ func (t cmdMediaLocate) Run(gctx *cmdopts.Global) (err error) {
 // goroutine for a long-running daemon to track asynchronously, this is a
 // one-shot CLI invocation and --download means "wait for it".
 func (t cmdMediaLocate) awaitDownload(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual, tclient *torrent.Client, tstore storage.ClientImpl, md tracking.Metadata) error {
-	infopath := rootstore.Path("torrent", fmt.Sprintf("%s.torrent", metainfo.Hash(md.Infohash)))
+	infopath := rootstore.Path(env.TorrentDirName, fmt.Sprintf("%s.torrent", metainfo.Hash(md.Infohash)))
 
 	metadata, err := torrent.New(
 		metainfo.Hash(md.Infohash),

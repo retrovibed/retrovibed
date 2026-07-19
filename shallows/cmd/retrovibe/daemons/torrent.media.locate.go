@@ -17,22 +17,34 @@ import (
 
 // Locate runs (if dhts and partitions are non-nil, and loc has a resolved
 // known-media-id) the DHT partition-swarm peer query, then (if plugins is
-// non-nil) external search plugins to (re)populate ddisc_media, then ranks
-// every candidate already in ddisc_media for loc's known-media-id whose
-// title matches loc.Query with policy and returns the best one. Returns
-// ddisc.ErrNoCandidate if nothing ranks yet - this is a normal "nothing
-// found this pass" outcome, not a failure. Never downloads.
+// non-nil) external search plugins, then (if loc has a resolved
+// known-media-id) falls back to whatever's already recorded in ddisc_media,
+// and picks the best-ranked candidate yielded this pass. Returns
+// ddisc.ErrNoCandidate if nothing ranked yet - this is a normal "nothing
+// found this pass" outcome, not a failure. Never downloads, and never
+// persists a candidate itself - see DiscoveredDownload, which persists only
+// the winner, once import has resolved its real infohash.
+//
+// The DHT partition strategy never yields synchronously - any peer response
+// lands in ddisc_media asynchronously via the already-registered MethodMedia
+// responder (see ddisctorrent.NewPartitionStrategy). The local fallback
+// strategy is what notices those (and any previously-imported winner) on a
+// later pass, once the partition/plugin strategies come up empty that pass.
 func Locate(ctx context.Context, db sqlx.Queryer, disc *DiscoverySettings, dhts *dht.Server, partitions *ddisc.Partition, plugins searchPlugins, policy ddisc.Policy, loc ddisc.Locate) (ddisc.Discovered, error) {
 	strategies := []ddisc.DiscoverStrategy{}
-	// the DHT partition strategy and its peer-side responder both key
-	// strictly off known_media_id equality, which is meaningless for an
-	// unresolved (Nil) known_media_id: every free-text locate would converge
-	// on the same partition and query peers' unrelated Nil-tagged data.
+	// the DHT partition strategy, the local fallback strategy, and the
+	// partition's peer-side responder all key strictly off known_media_id
+	// equality, which is meaningless for an unresolved (Nil) known_media_id:
+	// every free-text locate would converge on the same partition/local scan
+	// and match unrelated Nil-tagged data from completely different searches.
 	if dhts != nil && partitions != nil && loc.KnownMediaID != uuid.Nil.String() {
 		strategies = append(strategies, ddisctorrent.NewPartitionStrategy(dhts, partitions))
 	}
 	if plugins != nil {
 		strategies = append(strategies, ddisc.PluginStrategy(db, plugins))
+	}
+	if loc.KnownMediaID != uuid.Nil.String() {
+		strategies = append(strategies, ddisc.LocalStrategy(db))
 	}
 
 	req := ddisc.DiscoverRequest{
@@ -42,16 +54,20 @@ func Locate(ctx context.Context, db sqlx.Queryer, disc *DiscoverySettings, dhts 
 		Adult:        loc.Adult,
 	}
 
-	seq := ddisc.Discover(ctx, db, policy, req, strategies...)
-	for v := range seq.Each(ctx) {
-		log.Println("located", v.Title, v.PolicyRank, v.PolicyRejection)
-		// draining for persistence side effects only; selection happens below
-	}
-	if err := seq.Err(); err != nil {
-		return ddisc.Discovered{}, err
+	seq := ddisc.Discover(ctx, policy, req, strategies...)
+	best, err := ddisc.Select(func(yield func(ddisc.Discovered) bool) {
+		for v := range seq.Each(ctx) {
+			log.Println("located", v.Title, v.PolicyRank, v.PolicyRejection)
+			if !yield(v) {
+				return
+			}
+		}
+	})
+	if serr := seq.Err(); serr != nil {
+		return ddisc.Discovered{}, serr
 	}
 
-	return ddisc.RankAndSelect(ctx, db, policy, loc)
+	return best, err
 }
 
 // DiscoveredDownload resolves d's torrent metadata via importer, records it
@@ -73,6 +89,16 @@ func DiscoveredDownload(ctx context.Context, db sqlx.Queryer, importer tracking.
 	)
 	if err != nil {
 		return errorsx.Wrapf(err, "unable to import uri for download %s", d.ID)
+	}
+
+	// import resolved the real infohash (parsed from the magnet, or hashed
+	// from the actually-fetched .torrent bytes) - persist d now, correcting
+	// the SHA1(uri) placeholder NewDiscoveredFromImport stores until this
+	// point. This is also the only ddisc_media write the whole locate ever
+	// makes: non-winning candidates are never persisted.
+	d.Infohash = lmd.Infohash
+	if err = ddisc.DiscoveredInsertWithDefaults(ctx, db, d).Scan(&d); err != nil {
+		return errorsx.Wrapf(err, "unable to persist located candidate %s", d.ID)
 	}
 
 	if loc.Autodownload {

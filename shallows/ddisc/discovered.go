@@ -4,12 +4,14 @@ import (
 	"context"
 	"math"
 	"strings"
+	"time"
 	"unicode/utf8"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
+	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
@@ -196,6 +198,8 @@ func NewDiscovered(md *int160.T, options ...DiscoveredOption) (m Discovered) {
 		Partition:              uuid.Nil.String(),
 		AudioDefaultLocale:     language.Und.String(),
 		SubtitlesDefaultLocale: language.Und.String(),
+		TombstonedAt:           timex.Inf(),
+		PolicyRank:             math.MaxUint16,
 	}, options...)
 	return r
 }
@@ -220,6 +224,38 @@ func NewDiscoveredFromKnown(md int160.T, known library.Known, options ...Discove
 		Partition:              uuid.Nil.String(),
 		AudioDefaultLocale:     language.Und.String(),
 		SubtitlesDefaultLocale: language.Und.String(),
+		TombstonedAt:           timex.Inf(),
+		PolicyRank:             math.MaxUint16,
+	}, options...)
+	return r
+}
+
+// NewDiscoveredFromImport builds a Discovered candidate directly from a
+// search-plugin result, before its real infohash is known - keyed by
+// md5(uri) (same pattern as ddisc.Locate's row id) rather than the real
+// infohash NewDiscovered's callers already have in hand. ddisc_media's
+// infohash column is NOT NULL and must be exactly 20 bytes, so
+// int160.FromHashedBytes(imp.Uri) (SHA1 of the uri) is stored as a
+// placeholder until the real infohash is resolved - which only happens
+// once this row is actually selected and handed to an importer (see
+// daemons.DiscoveredDownload), not for every candidate up front.
+func NewDiscoveredFromImport(imp *ddiscapi.Import, options ...DiscoveredOption) (m Discovered) {
+	placeholder := int160.FromHashedBytes([]byte(imp.Uri))
+	r := langx.Clone(Discovered{
+		ID:                     md5x.FormatUUID(md5x.Digest(imp.Uri)),
+		URI:                    imp.Uri,
+		Infohash:               placeholder.Bytes(),
+		Title:                  imp.Title,
+		Health:                 imp.Health,
+		KnownMediaID:           uuid.Nil.String(),
+		Mimetype:               mimex.Binary,
+		Category:               mimex.Application,
+		SyncUID:                uuid.Must(uuid.NewV7()).String(),
+		Partition:              uuid.Nil.String(),
+		AudioDefaultLocale:     language.Und.String(),
+		SubtitlesDefaultLocale: language.Und.String(),
+		TombstonedAt:           time.Now().Add(3 * time.Hour),
+		PolicyRank:             math.MaxUint16,
 	}, options...)
 	return r
 }
