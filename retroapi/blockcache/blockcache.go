@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"github.com/retrovibed/retrovibed/retroapi/internal/bytesx"
+	"github.com/retrovibed/retrovibed/retroapi/bytesx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/fsx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/langx"

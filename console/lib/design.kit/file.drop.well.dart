@@ -57,6 +57,32 @@ class FileDropWell extends StatefulWidget {
     this.tooltip,
   });
 
+  static Future<FilesEvent> files({
+    List<String> mimetypes = const [],
+    List<String> extensions = const [],
+  }) {
+    final XTypeGroup filter = XTypeGroup(
+      label: "Select File(s)",
+      extensions: extensions,
+      mimeTypes: mimetypes,
+    );
+
+    return openFiles(acceptedTypeGroups: [filter]).then((files) {
+      final eventfiles = files.map((f) {
+        final fh = File(f.path);
+        return fh.openSync().read(mimex.defaultMagicNumbersMaxLength).then((v) => v.toList()).then((bits) {
+          return DropItemFile(
+            f.path,
+            name: f.name,
+            mimeType: mimex.fromFile(f.name, magicbits: bits).toString(),
+          );
+        });
+      }).toList();
+
+      return Future.wait(eventfiles).then((files) => FilesEvent(files: files));
+    });
+  }
+
   factory FileDropWell.icon(
     Future<Widget?> Function(
       FilesEvent i, {
@@ -118,38 +144,14 @@ class _FileDropWell extends State<FileDropWell> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     Future<void> onPress() {
-      final XTypeGroup filter = XTypeGroup(
-        label: "Select File(s)",
-        extensions: widget.extensions,
-        mimeTypes: widget.mimetypes,
-      );
-
-      return openFiles(acceptedTypeGroups: [filter])
-          .then((files) {
-            var total = 0;
-            final eventfiles =
-                files.map((f) {
-                  final fh = File(f.path);
-                  return fh.openSync().read(mimex.defaultMagicNumbersMaxLength).then((v) => v.toList()).then((
-                    bits,
-                  ) {
-                    total += fh.lengthSync();
-                    return new DropItemFile(
-                      f.path,
-                      name: f.name,
-                      mimeType: mimex.fromFile(f.name, magicbits: bits).toString(),
-                    );
-                  });
-                }).toList();
-
-            return Future.wait(eventfiles).then((files) {
-              final resolved = FilesEvent(files: files);
-              setState(() {
-                _progress.value = 0;
-                _total = total;
-              });
-              return widget.onDropped(resolved, progress: _progress);
+      return FileDropWell.files(mimetypes: widget.mimetypes, extensions: widget.extensions)
+          .then((resolved) {
+            final total = resolved.files.fold<int>(0, (acc, f) => acc + File(f.path).lengthSync());
+            setState(() {
+              _progress.value = 0;
+              _total = total;
             });
+            return widget.onDropped(resolved, progress: _progress);
           })
           .catchError((cause) {
             return ds.Error.unknown(cause);

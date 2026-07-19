@@ -25,11 +25,16 @@ func NewDiscoveryFromTrackingUnknownHash(mu tracking.UnknownHash) *Discovery {
 // NewMediaFromDiscovered documents for this same source type.
 func NewDiscoveryFromDiscovered(d ddisc.Discovered) *Discovery {
 	return &Discovery{
-		Id:        d.ID,
-		Infohash:  d.Infohash,
-		Attempts:  d.Attempts,
-		NextCheck: grpcx.EncodeTime(d.NextCheckAt),
-		CreatedAt: grpcx.EncodeTime(d.CreatedAt),
-		UpdatedAt: grpcx.EncodeTime(d.UpdatedAt),
+		Id:          d.ID,
+		Infohash:    d.Infohash,
+		Attempts:    d.Attempts,
+		NextCheck:   grpcx.EncodeTime(d.NextCheckAt),
+		CreatedAt:   grpcx.EncodeTime(d.CreatedAt),
+		UpdatedAt:   grpcx.EncodeTime(d.UpdatedAt),
+		Title:       d.Title,
+		Description: d.Description,
+		Health:      d.Health,
+		Bytes:       d.Bytes,
+		PolicyRank:  uint32(d.PolicyRank),
 	}
 }

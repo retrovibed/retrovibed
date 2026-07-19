@@ -13,4 +13,5 @@ message Import {
   double popularity = 8 [ json_name = "popularity" ];
   string poster_path = 9 [ json_name = "poster_path" ];
   string source = 10 [ json_name = "source" ];
+  uint64 bytes = 11 [ json_name = "bytes" ];
 }

@@ -39,7 +39,7 @@ func TestPluginStrategyYieldsUnpersisted(t *testing.T) {
 	magnet := fmt.Sprintf("magnet:?xt=urn:btih:%s", id.String())
 	kid := uuid.Must(uuid.NewV4()).String()
 
-	plugins := fakePluginSeq{results: []*ddiscapi.Import{{Uri: magnet, Uritype: mimex.Magnet, Health: 5, Mimetype: mimex.Video}}}
+	plugins := fakePluginSeq{results: []*ddiscapi.Import{{Uri: magnet, Uritype: mimex.Magnet, Health: 5, Bytes: 1234, Mimetype: mimex.Video}}}
 	seq := ddisc.PluginStrategy(q, plugins).Discover(t.Context(), ddisc.DiscoverRequest{KnownMediaID: kid, Title: "ubuntu", Mimetypes: []string{mimex.Video}})
 
 	var got []ddisc.Discovered
@@ -49,6 +49,7 @@ func TestPluginStrategyYieldsUnpersisted(t *testing.T) {
 	require.NoError(t, seq.Err())
 	require.Len(t, got, 1)
 	require.Equal(t, kid, got[0].KnownMediaID)
+	require.EqualValues(t, 1234, got[0].Bytes)
 	require.Equal(t, 0, sqltestx.Count(t, q, fmt.Sprintf("SELECT COUNT(*) FROM ddisc_media WHERE known_media_id = '%s'", kid)), "PluginStrategy itself must not persist - that's the caller's job")
 }
 

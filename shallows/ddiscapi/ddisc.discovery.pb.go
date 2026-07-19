@@ -30,6 +30,11 @@ type Discovery struct {
 	NextCheck     string                 `protobuf:"bytes,4,opt,name=next_check,proto3" json:"next_check,omitempty"`
 	CreatedAt     string                 `protobuf:"bytes,5,opt,name=created_at,proto3" json:"created_at,omitempty"`
 	UpdatedAt     string                 `protobuf:"bytes,6,opt,name=updated_at,proto3" json:"updated_at,omitempty"`
+	Title         string                 `protobuf:"bytes,7,opt,name=title,proto3" json:"title,omitempty"`
+	Description   string                 `protobuf:"bytes,8,opt,name=description,proto3" json:"description,omitempty"`
+	Health        uint32                 `protobuf:"varint,9,opt,name=health,proto3" json:"health,omitempty"`
+	Bytes         uint64                 `protobuf:"varint,10,opt,name=bytes,proto3" json:"bytes,omitempty"`
+	PolicyRank    uint32                 `protobuf:"varint,11,opt,name=policy_rank,proto3" json:"policy_rank,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -104,6 +109,41 @@ func (x *Discovery) GetUpdatedAt() string {
 		return x.UpdatedAt
 	}
 	return ""
+}
+
+func (x *Discovery) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *Discovery) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *Discovery) GetHealth() uint32 {
+	if x != nil {
+		return x.Health
+	}
+	return 0
+}
+
+func (x *Discovery) GetBytes() uint64 {
+	if x != nil {
+		return x.Bytes
+	}
+	return 0
+}
+
+func (x *Discovery) GetPolicyRank() uint32 {
+	if x != nil {
+		return x.PolicyRank
+	}
+	return 0
 }
 
 type DiscoverySearchRequest struct {
@@ -494,7 +534,7 @@ var File_ddisc_discovery_proto protoreflect.FileDescriptor
 
 const file_ddisc_discovery_proto_rawDesc = "" +
 	"\n" +
-	"\x15ddisc.discovery.proto\x12\x05ddisc\x1a\x11meta.search.proto\"\xb3\x01\n" +
+	"\x15ddisc.discovery.proto\x12\x05ddisc\x1a\x11meta.search.proto\"\xbb\x02\n" +
 	"\tDiscovery\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
 	"\binfohash\x18\x02 \x01(\fR\binfohash\x12\x1a\n" +
@@ -507,7 +547,13 @@ const file_ddisc_discovery_proto_rawDesc = "" +
 	"created_at\x12\x1e\n" +
 	"\n" +
 	"updated_at\x18\x06 \x01(\tR\n" +
-	"updated_at\"\xd8\x01\n" +
+	"updated_at\x12\x14\n" +
+	"\x05title\x18\a \x01(\tR\x05title\x12 \n" +
+	"\vdescription\x18\b \x01(\tR\vdescription\x12\x16\n" +
+	"\x06health\x18\t \x01(\rR\x06health\x12\x14\n" +
+	"\x05bytes\x18\n" +
+	" \x01(\x04R\x05bytes\x12 \n" +
+	"\vpolicy_rank\x18\v \x01(\rR\vpolicy_rank\"\xd8\x01\n" +
 	"\x16DiscoverySearchRequest\x12/\n" +
 	"\n" +
 	"next_check\x18\x01 \x01(\v2\x0f.meta.DateRangeR\n" +

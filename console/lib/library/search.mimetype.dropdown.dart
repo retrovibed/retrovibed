@@ -8,10 +8,58 @@ class SearchMimetypeDropdown extends StatelessWidget {
   final void Function(media.MediaSearchRequest r) onChange;
   SearchMimetypeDropdown(this.current, {super.key, required this.onChange});
 
-  Icon _icon(int checksum) {
+  static Icon icon(int checksum) {
     if (checksum == mimex.checksumfor(mimex.icomovie)) return Icon(Icons.movie_filter);
     if (checksum == mimex.checksumfor(mimex.icoaudio)) return Icon(Icons.music_note);
     return Icon(Icons.file_open_rounded);
+  }
+
+  static String label(int checksum) {
+    if (checksum == mimex.checksumfor(mimex.icomovie)) return "Movies";
+    if (checksum == mimex.checksumfor(mimex.icoaudio)) return "Music";
+    return "Files";
+  }
+
+  static List<String> mimetypesFor(int checksum) {
+    if (checksum == mimex.checksumfor(mimex.icomovie)) return mimex.of(mimex.icomovie);
+    if (checksum == mimex.checksumfor(mimex.icoaudio)) return mimex.of(mimex.icoaudio);
+    return const [];
+  }
+
+  static void select(media.MediaSearchRequest current, int checksum) {
+    current.mimetypes
+      ..clear()
+      ..addAll(mimetypesFor(checksum));
+  }
+
+  static List<PopupMenuEntry<String>> menuItems(ValueNotifier<media.MediaSearchState> search) {
+    return [
+      _menuOption(search, mimex.checksumfor(mimex.icoaudio)),
+      _menuOption(search, mimex.checksumfor(mimex.icomovie)),
+      _menuOption(search, mimex.checksumfor(mimex.icobinary)),
+    ];
+  }
+
+  static PopupMenuItem<String> _menuOption(ValueNotifier<media.MediaSearchState> search, int checksum) {
+    return PopupMenuItem<String>(
+      child: ValueListenableBuilder<media.MediaSearchState>(
+        valueListenable: search,
+        builder: (context, state, _) {
+          final selected = mimex.checksum(state.next.mimetypes) == checksum;
+          return ListTile(
+            leading: icon(checksum),
+            title: Text(label(checksum)),
+            selected: selected,
+            enabled: !selected,
+            onTap: () {
+              final current = state.next;
+              select(current, checksum);
+              search.value = media.MediaSearchState(next: current.clone(), count: search.value.count);
+            },
+          );
+        },
+      ),
+    );
   }
 
   @override
@@ -24,23 +72,9 @@ class SearchMimetypeDropdown extends StatelessWidget {
         position: PopupMenuPosition.under,
         color: Theme.of(context).colorScheme.surface,
         surfaceTintColor: Theme.of(context).colorScheme.surface,
-        icon: _icon(mimetypes),
+        icon: icon(mimetypes),
         onSelected: (v) {
-          if (v == mimex.checksumfor(mimex.icomovie)) {
-            current.mimetypes.clear();
-            current.mimetypes.addAll(mimex.of(mimex.icomovie));
-            onChange(current);
-            return;
-          }
-
-          if (v == mimex.checksumfor(mimex.icoaudio)) {
-            current.mimetypes.clear();
-            current.mimetypes.addAll(mimex.of(mimex.icoaudio));
-            onChange(current);
-            return;
-          }
-
-          current.mimetypes.clear();
+          select(current, v);
           onChange(current);
         },
         itemBuilder:

@@ -20,7 +20,7 @@ import (
 
 	"github.com/justinas/alice"
 	"github.com/retrovibed/retrovibed/retroapi/internal/backoffx"
-	"github.com/retrovibed/retrovibed/retroapi/internal/bytesx"
+	"github.com/retrovibed/retrovibed/retroapi/bytesx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/debugx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/langx"

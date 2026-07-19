@@ -149,6 +149,26 @@ String category(List<String> mimes) {
   };
 }
 
+class CategoryOptionsLabel extends StatelessWidget {
+  final List<String> mimetypes;
+  const CategoryOptionsLabel(this.mimetypes, {super.key});
+
+  static String text(List<String> mimetypes) {
+    final sum = checksum(mimetypes);
+    return switch (sum) {
+      _ when sum == checksumfor(icomovie) => "Movie",
+      _ when sum == checksumfor(icoaudio) => "Music",
+      _ => "File",
+    };
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final category = text(mimetypes);
+    return Text("$category options", key: ValueKey(category));
+  }
+}
+
 IconData icon(String mimetype) {
   if (isVideo(mimetype)) {
     return icomovie;

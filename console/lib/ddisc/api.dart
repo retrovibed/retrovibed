@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:retrovibed/httpx.dart' as httpx;
+import 'package:retrovibed/media/ddisc.locate.pb.dart';
 import 'package:retrovibed/meta/meta.discovery.pb.dart';
 import 'ddisc.discovery.pb.dart';
 
@@ -27,6 +29,33 @@ abstract class api {
         .then((v) {
           return Future.value(
             DiscoveryDownloadResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+          );
+        });
+  }
+
+  // locate runs a live, ephemeral network search and streams each ranked
+  // candidate as it's found; the server always re-sends the best candidate
+  // as the final message before closing.
+  static Future<Stream<Discovery>> locate(
+    Locate req, {
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx
+        .websocket(
+          Uri.https(httpx.host(), "/ddisc/discovery/locate", httpx.params(req.toProto3Json())),
+          options: options,
+        )
+        .then((socket) {
+          return socket.transform(
+            StreamTransformer.fromHandlers(
+              handleData: (data, sink) {
+                if (data is List<int>) {
+                  sink.add(Discovery.create()..mergeFromProto3Json(jsonDecode(utf8.decode(data))));
+                } else {
+                  sink.addError('deserialization failed data: $data');
+                }
+              },
+            ),
           );
         });
   }
