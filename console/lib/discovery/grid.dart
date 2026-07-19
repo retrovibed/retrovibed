@@ -1,16 +1,14 @@
+import 'dart:async';
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/mimex.dart' as mimex;
-import 'package:retrovibed/uuidx.dart' as uuidx;
-import 'package:retrovibed/langcodex.dart' as langcodex;
-import 'package:retrovibed/library/api.dart' as api;
-import 'package:retrovibed/library/known.media.download.list.dart';
-import 'package:retrovibed/library/known.media.locator.dart';
-import 'package:retrovibed/library/known.media.card.dart';
-import 'package:retrovibed/library/discovery.locator.dart';
+import 'package:retrovibed/ddisc.dart' as ddisc;
+import 'discovery.card.dart';
 
 class DiscoveryGrid extends StatefulWidget {
   final ValueNotifier<media.MediaSearchState> search;
@@ -24,8 +22,10 @@ class DiscoveryGrid extends StatefulWidget {
 class _DiscoveryGridState extends State<DiscoveryGrid> {
   bool _loading = true;
   Widget _cause = ds.Error.zero;
-  List<api.Known> _items = [];
+  List<ddisc.Discovery> _items = [];
   media.MediaSearchRequest? _lastFetchedNext;
+  StreamSubscription<ddisc.Discovery>? _subscription;
+  final SplayTreeSet<ddisc.Discovery> _found = SplayTreeSet<ddisc.Discovery>(ddisc.compare);
 
   void setState(VoidCallback fn) {
     if (!mounted) return;
@@ -39,6 +39,9 @@ class _DiscoveryGridState extends State<DiscoveryGrid> {
   }
 
   Future<void> refresh() {
+    _subscription?.cancel();
+    _found.clear();
+
     final req = widget.search.value.next;
     final category = mimex.category(req.mimetypes);
 
@@ -51,25 +54,39 @@ class _DiscoveryGridState extends State<DiscoveryGrid> {
       return Future.value();
     }
 
+    setState(() {
+      _items = [];
+      _loading = true;
+      _cause = ds.Error.zero;
+    });
+
     return httpx
         .withRetry(
-          () => api.known.search(
-            api.known.request(
-              language: langcodex.locale().languageCode,
-              mimetype: category,
-              adult: req.adult,
-              query: req.query,
-              limit: req.limit.toInt(),
-            ),
+          () => ddisc.api.locate(
+            media.Locate(query: req.query, mimetype: category, adult: req.adult),
             options: [authn.request(authn.AuthzCache.meta(context))],
           ),
         )
-        .then((v) {
+        .then((stream) {
+          final done = Completer<void>();
+          _subscription = stream.listen(
+            (item) {
+              _found.add(item);
+              widget.search.value = media.MediaSearchState(next: req, count: _found.length);
+              setState(() {
+                _items = _found.toList();
+              });
+            },
+            cancelOnError: true,
+            onError: done.completeError,
+            onDone: done.complete,
+          );
+          return done.future;
+        })
+        .then((_) {
           setState(() {
-            _items = v.items;
             _loading = false;
           });
-          widget.search.value = media.MediaSearchState(next: req, count: v.items.length);
         })
         .catchError((cause) {
           setState(() {
@@ -77,6 +94,12 @@ class _DiscoveryGridState extends State<DiscoveryGrid> {
             _loading = false;
           });
         });
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
   }
 
   @override
@@ -90,36 +113,19 @@ class _DiscoveryGridState extends State<DiscoveryGrid> {
         }
 
         final defaults = ds.Defaults.of(context);
-        final category = mimex.category(state.next.mimetypes);
 
         return ds.Loading(
           loading: _loading,
           cause: _cause,
-          KnownMediaDownloadList(
-            key: ValueKey('library.download.list'),
+          ds.Grid<ddisc.Discovery>(
+            key: ValueKey('discovery.grid'),
+            (context, v) => DiscoveredCard(v),
             children: _items,
-            leading: Column(
-              children: [
-                DiscoveryLocator(
-                  key: ValueKey("library.disc.locator.${uuidx.md5x(state.next.query.trim())}"),
-                  query: state.next.query.trim(),
-                  mimetype: category,
-                  onFound: (located) => api.recommendations
-                      .content(located.locatedTorrentId, options: [authn.request(authn.AuthzCache.meta(context))])
-                      .then(
-                        (r) => ConstrainedBox(
-                          constraints: BoxConstraints.tightForFinite(width: 384),
-                          child: KnownMediaLocator(r.recommendation, help: KnownMediaCard.hint),
-                        ),
-                      ),
-                ),
-              ],
-            ),
             empty: Center(
               child: Padding(
                 padding: defaults.padding,
                 child: Text(
-                  "no known media matches the results",
+                  "no candidates found on the network for this search",
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                   ),

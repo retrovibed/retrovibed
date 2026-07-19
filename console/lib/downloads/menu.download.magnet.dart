@@ -12,10 +12,17 @@ Future<void> addMagnetLinks(BuildContext context) {
     MagnetDownloads(
       onSubmitted: (magnets) {
         final pending = magnets.map(
-          (v) => media.discovered.magnet(
-            media.MagnetCreateRequest(uri: v),
-            options: [authn.request(authn.AuthzCache.meta(context))],
-          ),
+          (v) => media.discovered
+              .magnet(
+                media.MagnetCreateRequest(uri: v),
+                options: [authn.request(authn.AuthzCache.meta(context))],
+              )
+              .then((created) {
+                return media.discovered.download(
+                  created.download.media.id,
+                  options: [authn.request(authn.AuthzCache.meta(context))],
+                );
+              }),
         );
         return Future.wait(pending, eagerError: true)
             .then((_) {

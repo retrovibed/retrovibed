@@ -27,6 +27,11 @@ class Discovery extends $pb.GeneratedMessage {
     $core.String? nextCheck,
     $core.String? createdAt,
     $core.String? updatedAt,
+    $core.String? title,
+    $core.String? description,
+    $core.int? health,
+    $fixnum.Int64? bytes,
+    $core.int? policyRank,
   }) {
     final result = create();
     if (id != null) result.id = id;
@@ -35,6 +40,11 @@ class Discovery extends $pb.GeneratedMessage {
     if (nextCheck != null) result.nextCheck = nextCheck;
     if (createdAt != null) result.createdAt = createdAt;
     if (updatedAt != null) result.updatedAt = updatedAt;
+    if (title != null) result.title = title;
+    if (description != null) result.description = description;
+    if (health != null) result.health = health;
+    if (bytes != null) result.bytes = bytes;
+    if (policyRank != null) result.policyRank = policyRank;
     return result;
   }
 
@@ -58,6 +68,13 @@ class Discovery extends $pb.GeneratedMessage {
     ..aOS(4, _omitFieldNames ? '' : 'next_check')
     ..aOS(5, _omitFieldNames ? '' : 'created_at')
     ..aOS(6, _omitFieldNames ? '' : 'updated_at')
+    ..aOS(7, _omitFieldNames ? '' : 'title')
+    ..aOS(8, _omitFieldNames ? '' : 'description')
+    ..aI(9, _omitFieldNames ? '' : 'health', fieldType: $pb.PbFieldType.OU3)
+    ..a<$fixnum.Int64>(10, _omitFieldNames ? '' : 'bytes', $pb.PbFieldType.OU6,
+        defaultOrMaker: $fixnum.Int64.ZERO)
+    ..aI(11, _omitFieldNames ? '' : 'policy_rank',
+        fieldType: $pb.PbFieldType.OU3)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -131,6 +148,51 @@ class Discovery extends $pb.GeneratedMessage {
   $core.bool hasUpdatedAt() => $_has(5);
   @$pb.TagNumber(6)
   void clearUpdatedAt() => $_clearField(6);
+
+  @$pb.TagNumber(7)
+  $core.String get title => $_getSZ(6);
+  @$pb.TagNumber(7)
+  set title($core.String value) => $_setString(6, value);
+  @$pb.TagNumber(7)
+  $core.bool hasTitle() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearTitle() => $_clearField(7);
+
+  @$pb.TagNumber(8)
+  $core.String get description => $_getSZ(7);
+  @$pb.TagNumber(8)
+  set description($core.String value) => $_setString(7, value);
+  @$pb.TagNumber(8)
+  $core.bool hasDescription() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearDescription() => $_clearField(8);
+
+  @$pb.TagNumber(9)
+  $core.int get health => $_getIZ(8);
+  @$pb.TagNumber(9)
+  set health($core.int value) => $_setUnsignedInt32(8, value);
+  @$pb.TagNumber(9)
+  $core.bool hasHealth() => $_has(8);
+  @$pb.TagNumber(9)
+  void clearHealth() => $_clearField(9);
+
+  @$pb.TagNumber(10)
+  $fixnum.Int64 get bytes => $_getI64(9);
+  @$pb.TagNumber(10)
+  set bytes($fixnum.Int64 value) => $_setInt64(9, value);
+  @$pb.TagNumber(10)
+  $core.bool hasBytes() => $_has(9);
+  @$pb.TagNumber(10)
+  void clearBytes() => $_clearField(10);
+
+  @$pb.TagNumber(11)
+  $core.int get policyRank => $_getIZ(10);
+  @$pb.TagNumber(11)
+  set policyRank($core.int value) => $_setUnsignedInt32(10, value);
+  @$pb.TagNumber(11)
+  $core.bool hasPolicyRank() => $_has(10);
+  @$pb.TagNumber(11)
+  void clearPolicyRank() => $_clearField(11);
 }
 
 class DiscoverySearchRequest extends $pb.GeneratedMessage {

@@ -11,6 +11,11 @@ message Discovery {
   string next_check = 4 [ json_name = "next_check" ];
   string created_at = 5 [ json_name = "created_at" ];
   string updated_at = 6 [ json_name = "updated_at" ];
+  string title = 7 [ json_name = "title" ];
+  string description = 8 [ json_name = "description" ];
+  uint32 health = 9 [ json_name = "health" ];
+  uint64 bytes = 10 [ json_name = "bytes" ];
+  uint32 policy_rank = 11 [ json_name = "policy_rank" ];
 }
 
 message DiscoverySearchRequest {

@@ -153,7 +153,7 @@ class CategoryOptionsLabel extends StatelessWidget {
   final List<String> mimetypes;
   const CategoryOptionsLabel(this.mimetypes, {super.key});
 
-  String get _category {
+  static String text(List<String> mimetypes) {
     final sum = checksum(mimetypes);
     return switch (sum) {
       _ when sum == checksumfor(icomovie) => "Movie",
@@ -164,7 +164,7 @@ class CategoryOptionsLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final category = _category;
+    final category = text(mimetypes);
     return Text("$category options", key: ValueKey(category));
   }
 }

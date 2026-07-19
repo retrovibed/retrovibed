@@ -32,30 +32,31 @@ class SearchMimetypeDropdown extends StatelessWidget {
       ..addAll(mimetypesFor(checksum));
   }
 
-  static List<PopupMenuEntry<String>> menuItems(
-    media.MediaSearchRequest current,
-    void Function(media.MediaSearchRequest) onChange,
-  ) {
+  static List<PopupMenuEntry<String>> menuItems(ValueNotifier<media.MediaSearchState> search) {
     return [
-      _menuOption(current, onChange, mimex.checksumfor(mimex.icoaudio)),
-      _menuOption(current, onChange, mimex.checksumfor(mimex.icomovie)),
-      _menuOption(current, onChange, mimex.checksumfor(mimex.icobinary)),
+      _menuOption(search, mimex.checksumfor(mimex.icoaudio)),
+      _menuOption(search, mimex.checksumfor(mimex.icomovie)),
+      _menuOption(search, mimex.checksumfor(mimex.icobinary)),
     ];
   }
 
-  static PopupMenuItem<String> _menuOption(
-    media.MediaSearchRequest current,
-    void Function(media.MediaSearchRequest) onChange,
-    int checksum,
-  ) {
+  static PopupMenuItem<String> _menuOption(ValueNotifier<media.MediaSearchState> search, int checksum) {
     return PopupMenuItem<String>(
-      enabled: false,
-      child: ListTile(
-        leading: icon(checksum),
-        title: Text(label(checksum)),
-        onTap: () {
-          select(current, checksum);
-          onChange(current);
+      child: ValueListenableBuilder<media.MediaSearchState>(
+        valueListenable: search,
+        builder: (context, state, _) {
+          final selected = mimex.checksum(state.next.mimetypes) == checksum;
+          return ListTile(
+            leading: icon(checksum),
+            title: Text(label(checksum)),
+            selected: selected,
+            enabled: !selected,
+            onTap: () {
+              final current = state.next;
+              select(current, checksum);
+              search.value = media.MediaSearchState(next: current.clone(), count: search.value.count);
+            },
+          );
         },
       ),
     );

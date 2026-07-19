@@ -114,22 +114,19 @@ class _HomeState extends State<Home> {
                           ),
                         ),
                         items: [
-                          ...SearchMimetypeDropdown.menuItems(state.next, (upd) {
-                            widget.search.value = media.MediaSearchState(
-                              next: upd.clone(),
-                              count: widget.search.value.count,
-                            );
-                          }),
+                          ...SearchMimetypeDropdown.menuItems(widget.search),
                           const PopupMenuDivider(),
                           PopupMenuItem<String>(
                             enabled: false,
-                            child: mimex.CategoryOptionsLabel(state.next.mimetypes),
+                            child: ValueListenableBuilder<media.MediaSearchState>(
+                              valueListenable: widget.search,
+                              builder: (context, s, _) => mimex.CategoryOptionsLabel(s.next.mimetypes),
+                            ),
                           ),
                           MenuItemUploadFiles(
                             context,
                             widget.search,
                             apiupload: widget.apiupload,
-                            mimetypes: state.next.mimetypes,
                           ),
                           downloads.MenuItemDownloadTorrent(context),
                           downloads.MenuItemDownloadMagnet(context),

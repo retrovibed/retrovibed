@@ -57,7 +57,7 @@ class FileDropWell extends StatefulWidget {
     this.tooltip,
   });
 
-  static Future<FilesEvent> pickFiles({
+  static Future<FilesEvent> files({
     List<String> mimetypes = const [],
     List<String> extensions = const [],
   }) {
@@ -144,7 +144,7 @@ class _FileDropWell extends State<FileDropWell> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     Future<void> onPress() {
-      return FileDropWell.pickFiles(mimetypes: widget.mimetypes, extensions: widget.extensions)
+      return FileDropWell.files(mimetypes: widget.mimetypes, extensions: widget.extensions)
           .then((resolved) {
             final total = resolved.files.fold<int>(0, (acc, f) => acc + File(f.path).lengthSync());
             setState(() {

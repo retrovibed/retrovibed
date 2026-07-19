@@ -9,7 +9,7 @@ Future<void> uploadTorrent(
   BuildContext context, {
   media.FnUploadRequest upload = media.discovered.upload,
 }) {
-  return FileDropWell.pickFiles(mimetypes: [mimex.bittorrent]).then((evt) {
+  final work = FileDropWell.files(mimetypes: [mimex.bittorrent]).then((evt) {
     return Future.wait(
       evt.files.map((c) {
         return media.media.uploadable(c.path, c.name, c.mimeType!).then((v) {
@@ -26,6 +26,8 @@ Future<void> uploadTorrent(
       }),
     );
   });
+
+  return work.then((_) {});
 }
 
 PopupMenuEntry<String> MenuItemDownloadTorrent(BuildContext context) {

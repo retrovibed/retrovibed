@@ -25,6 +25,11 @@ const Discovery$json = {
     {'1': 'next_check', '3': 4, '4': 1, '5': 9, '10': 'next_check'},
     {'1': 'created_at', '3': 5, '4': 1, '5': 9, '10': 'created_at'},
     {'1': 'updated_at', '3': 6, '4': 1, '5': 9, '10': 'updated_at'},
+    {'1': 'title', '3': 7, '4': 1, '5': 9, '10': 'title'},
+    {'1': 'description', '3': 8, '4': 1, '5': 9, '10': 'description'},
+    {'1': 'health', '3': 9, '4': 1, '5': 13, '10': 'health'},
+    {'1': 'bytes', '3': 10, '4': 1, '5': 4, '10': 'bytes'},
+    {'1': 'policy_rank', '3': 11, '4': 1, '5': 13, '10': 'policy_rank'},
   ],
 };
 
@@ -33,7 +38,9 @@ final $typed_data.Uint8List discoveryDescriptor = $convert.base64Decode(
     'CglEaXNjb3ZlcnkSDgoCaWQYASABKAlSAmlkEhoKCGluZm9oYXNoGAIgASgMUghpbmZvaGFzaB'
     'IaCghhdHRlbXB0cxgDIAEoDVIIYXR0ZW1wdHMSHgoKbmV4dF9jaGVjaxgEIAEoCVIKbmV4dF9j'
     'aGVjaxIeCgpjcmVhdGVkX2F0GAUgASgJUgpjcmVhdGVkX2F0Eh4KCnVwZGF0ZWRfYXQYBiABKA'
-    'lSCnVwZGF0ZWRfYXQ=');
+    'lSCnVwZGF0ZWRfYXQSFAoFdGl0bGUYByABKAlSBXRpdGxlEiAKC2Rlc2NyaXB0aW9uGAggASgJ'
+    'UgtkZXNjcmlwdGlvbhIWCgZoZWFsdGgYCSABKA1SBmhlYWx0aBIUCgVieXRlcxgKIAEoBFIFYn'
+    'l0ZXMSIAoLcG9saWN5X3JhbmsYCyABKA1SC3BvbGljeV9yYW5r');
 
 @$core.Deprecated('Use discoverySearchRequestDescriptor instead')
 const DiscoverySearchRequest$json = {
