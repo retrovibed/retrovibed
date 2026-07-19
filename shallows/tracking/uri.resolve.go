@@ -14,25 +14,29 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 )
 
 // Resolve resolves uri - a magnet: uri, or an http(s) url that serves a raw
 // .torrent file when fetched - into an in-memory Metadata carrying its real
 // infohash and torrent info, without persisting anything to the database.
-// The http(s) case still writes the fetched .torrent bytes to t.rootstore's
-// cache (so a later Import of the same uri doesn't need to re-fetch) and is
-// still rate-limited by t.l - only the database insert is skipped, so
-// callers that only need the real infohash (e.g. background search, which
-// checks many candidates it has no intention of downloading) aren't forced
-// to create a torrents_metadata row for every one of them.
-func (t URIImport) Resolve(ctx context.Context, uri string) (meta Metadata, err error) {
+// options are applied before the auto (AutoDescription/AutoHidden) options,
+// so a caller-supplied MetadataOptionMimetype/MetadataOptionDescription is
+// what AutoHidden/AutoDescription actually see. The http(s) case still
+// writes the fetched .torrent bytes to t.rootstore's cache (so a later
+// Import of the same uri doesn't need to re-fetch) and is still
+// rate-limited by t.l - only the database insert is skipped, so callers
+// that only need the real infohash (e.g. background search, which checks
+// many candidates it has no intention of downloading) aren't forced to
+// create a torrents_metadata row for every one of them.
+func (t URIImport) Resolve(ctx context.Context, uri string, options ...func(*Metadata)) (meta Metadata, err error) {
 	if strings.HasPrefix(uri, "magnet:") {
-		return t.resolveMagnet(uri)
+		return t.resolveMagnet(uri, options...)
 	}
-	return t.resolveHTTP(ctx, uri)
+	return t.resolveHTTP(ctx, uri, options...)
 }
 
-func (t URIImport) resolveMagnet(uri string) (meta Metadata, err error) {
+func (t URIImport) resolveMagnet(uri string, options ...func(*Metadata)) (meta Metadata, err error) {
 	md, err := metainfo.ParseMagnetURI(uri)
 	if err != nil {
 		return meta, errorsx.Wrap(err, "unable to parse magnet link")
@@ -41,12 +45,13 @@ func (t URIImport) resolveMagnet(uri string) (meta Metadata, err error) {
 	return NewMetadata(
 		new(int160.FromByteArray(md.InfoHash)),
 		MetadataOptionFromMagnet(&md),
+		langx.Compose(options...),
 		MetadataOptionAutoDescription,
 		MetadataOptionAutoHidden,
 	), nil
 }
 
-func (t URIImport) resolveHTTP(ctx context.Context, uri string) (meta Metadata, err error) {
+func (t URIImport) resolveHTTP(ctx context.Context, uri string, options ...func(*Metadata)) (meta Metadata, err error) {
 	if err := t.l.Wait(ctx); err != nil {
 		return meta, errorsx.Wrap(err, "rate limited")
 	}
@@ -86,6 +91,7 @@ func (t URIImport) resolveHTTP(ctx context.Context, uri string) (meta Metadata, 
 		new(md.ID()),
 		MetadataOptionFromInfo(&mi),
 		MetadataOptionTrackers(md.Announce),
+		langx.Compose(options...),
 		MetadataOptionAutoDescription,
 		MetadataOptionAutoHidden,
 	), nil

@@ -5,8 +5,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
-	"github.com/retrovibed/retrovibed/retroapi/iterx"
+	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/backoffx"
@@ -17,14 +16,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 )
 
-// searchPlugins is the narrow interface needed from
-// *retroapi/searchplugin.Registry, so tests can inject a fake without a real
-// compiled wasm plugin.
-type searchPlugins interface {
-	Search(ctx context.Context, mimetypes []string, query string, adult bool) iterx.Seq[*ddiscapi.Import]
-}
-
-func SearchQueueBackgroundRun(ctx context.Context, q sqlx.Queryer, importer tracking.URIImport, plugins searchPlugins) error {
+func SearchQueueBackgroundRun(ctx context.Context, q sqlx.Queryer, importer tracking.URIImport, plugins searchplugin.T) error {
 	// SearchQueueBackgroundRun drains ddisc_search_queue: for each pending
 	// known-media-id, ask the loaded search plugins for candidates, resolve
 	// each candidate's real infohash (without importing/downloading it - see
@@ -85,7 +77,7 @@ func SearchQueueBackgroundRun(ctx context.Context, q sqlx.Queryer, importer trac
 
 // SearchQueueBackground drains the queue, then polls for new entries on an
 // exponential backoff that maxes out at an hour.
-func SearchQueueBackground(ctx context.Context, q sqlx.Queryer, importer tracking.URIImport, plugins searchPlugins) error {
+func SearchQueueBackground(ctx context.Context, q sqlx.Queryer, importer tracking.URIImport, plugins searchplugin.T) error {
 	wakeup := asyncx.NewWakeup(ctx)
 	defer wakeup.Broadcast() // kick off an initial drain
 	s := backoffx.New(

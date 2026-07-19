@@ -8,11 +8,45 @@ import (
 	"net/netip"
 	"strconv"
 	"strings"
+	"sync/atomic"
+
+	"github.com/retrovibed/retrovibed/shallows/internal/atomicx"
 )
 
 // Dialer missing interface from the net package.
 type Dialer interface {
 	DialContext(ctx context.Context, network, address string) (net.Conn, error)
+}
+
+// ErrDialer is a drop-in replacement for Dialer that refuses to dial,
+// returning errors.ErrUnsupported instead.
+type ErrDialer struct{}
+
+func (t ErrDialer) DialContext(ctx context.Context, network, address string) (net.Conn, error) {
+	return nil, errors.ErrUnsupported
+}
+
+// DialerProxy forwards DialContext to whatever Dialer was most recently
+// Stored, letting a long-lived consumer dial through a dialer that gets
+// swapped out later without itself being torn down and rebuilt. It dials
+// through ErrDialer until the first Store call.
+type DialerProxy struct {
+	ptr *atomic.Pointer[Dialer]
+}
+
+func NewDialerProxy() DialerProxy {
+	var d Dialer = &ErrDialer{}
+	return DialerProxy{ptr: atomicx.PointerPtr(&d)}
+}
+
+func (d DialerProxy) DialContext(ctx context.Context, network, address string) (net.Conn, error) {
+	dialer := d.ptr.Load()
+	return (*dialer).DialContext(ctx, network, address)
+}
+
+// Store swaps the live dialer every consumer of this proxy dials through.
+func (d DialerProxy) Store(dialer Dialer) {
+	d.ptr.Store(&dialer)
 }
 
 func DefaultIfNil(d0, d1 Dialer) Dialer {
@@ -107,6 +141,25 @@ func AddrPort(a net.Addr) *netip.AddrPort {
 		return nil
 	}
 }
+
+// UnsupportedListenConfig is a drop-in replacement for *net.ListenConfig
+// that refuses to open any real socket, returning errors.ErrUnsupported
+// from every method instead.
+type UnsupportedListenConfig struct{}
+
+func (t UnsupportedListenConfig) Listen(ctx context.Context, network, address string) (net.Listener, error) {
+	return nil, errors.ErrUnsupported
+}
+
+func (t UnsupportedListenConfig) ListenPacket(ctx context.Context, network, address string) (net.PacketConn, error) {
+	return nil, errors.ErrUnsupported
+}
+
+func (t UnsupportedListenConfig) MultipathTCP() bool {
+	return false
+}
+
+func (t UnsupportedListenConfig) SetMultipathTCP(use bool) {}
 
 func IgnoreConnectionClosed(err error) error {
 	var (

@@ -9,6 +9,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
+	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
@@ -44,6 +45,7 @@ func TestHTTPDiscoveryDownload(t *testing.T) {
 		routes := mux.NewRouter()
 		ddiscapi.NewHTTPDiscovery(
 			q,
+			searchplugin.Unimplemented{},
 			ddiscapi.HTTPDiscoveryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
@@ -68,6 +70,7 @@ func TestHTTPDiscoveryDownload(t *testing.T) {
 		routes := mux.NewRouter()
 		ddiscapi.NewHTTPDiscovery(
 			q,
+			searchplugin.Unimplemented{},
 			ddiscapi.HTTPDiscoveryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
@@ -99,6 +102,7 @@ func TestHTTPDiscoveryDownload(t *testing.T) {
 		routes := mux.NewRouter()
 		ddiscapi.NewHTTPDiscovery(
 			q,
+			searchplugin.Unimplemented{},
 			ddiscapi.HTTPDiscoveryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 

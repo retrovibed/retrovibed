@@ -13,6 +13,7 @@ import (
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/james-lawrence/torrent/torrenttest"
+	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
@@ -43,6 +44,7 @@ func TestDiscoveryIdentify(t *testing.T) {
 		routes := mux.NewRouter()
 		ddiscapi.NewHTTPDiscovery(
 			q,
+			searchplugin.Unimplemented{},
 			ddiscapi.HTTPDiscoveryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/ddisc/discovery").Subrouter())
 		ddiscapi.NewHTTPMedia(
@@ -103,6 +105,7 @@ func TestDiscoveryIdentify(t *testing.T) {
 		routes := mux.NewRouter()
 		ddiscapi.NewHTTPDiscovery(
 			q,
+			searchplugin.Unimplemented{},
 			ddiscapi.HTTPDiscoveryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/ddisc/discovery").Subrouter())
 		ddiscapi.NewHTTPMedia(

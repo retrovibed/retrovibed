@@ -2,6 +2,8 @@ package searchplugin
 
 import (
 	"context"
+	"errors"
+	"iter"
 	"maps"
 	"net"
 	"os"
@@ -10,13 +12,42 @@ import (
 	"github.com/egdaemon/wasinet/wasinet/wnetruntime"
 	"github.com/egdaemon/wasinet/wazeronet"
 	"github.com/retrovibed/retrovibed/retroapi/asynccompute"
+	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/fsx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/langx"
+	"github.com/retrovibed/retrovibed/retroapi/iterx"
 	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/tetratelabs/wazero"
 	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
 )
+
+// T is the interface *Registry satisfies for Search — the seam every
+// consumer of a search-plugin registry should depend on instead of the
+// concrete type, so tests can substitute a fake.
+type T interface {
+	Search(ctx context.Context, mimetypes []string, query string, adult bool) iterx.Seq[*ddiscapi.Import]
+}
+
+// Unimplemented is a safe default T: every Search fails with
+// errors.ErrUnsupported instead of silently returning nothing, so callers
+// that haven't wired up a real registry get a clear signal rather than a
+// bare nil interface passed around.
+type Unimplemented struct{}
+
+func (Unimplemented) Search(ctx context.Context, mimetypes []string, query string, adult bool) iterx.Seq[*ddiscapi.Import] {
+	return unimplementedSeq{}
+}
+
+type unimplementedSeq struct{}
+
+func (unimplementedSeq) Each(ctx context.Context) iter.Seq[*ddiscapi.Import] {
+	return func(yield func(*ddiscapi.Import) bool) {}
+}
+
+func (unimplementedSeq) Err() error {
+	return errors.ErrUnsupported
+}
 
 // Registry loads and holds compiled search-plugin wasm modules, keeping them
 // resident so repeated searches never re-read or re-compile from disk — that

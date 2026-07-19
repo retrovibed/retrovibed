@@ -50,20 +50,19 @@ func NewURIImport(q sqlx.Queryer, c *http.Client, rootstore fsx.Virtual, options
 }
 
 // Import resolves uri (see Resolve) and records the result as Metadata.
-// options are applied after Resolve's own defaults, so a caller can
-// override any of them (e.g. MetadataOptionMimetype,
-// MetadataOptionDescription for a per-item title a shared URIImport
-// instance has no way to know) or layer on anything else MetadataOption
-// supports. Whether to auto-download the result is left to the caller,
-// using the returned Metadata's ID (see MetadataAutoDownloadByID) - that's
-// not URIImport's job.
+// options are forwarded to Resolve, which applies them before its own
+// AutoDescription/AutoHidden defaults, so a caller can override any of them
+// (e.g. MetadataOptionMimetype, MetadataOptionDescription for a per-item
+// title a shared URIImport instance has no way to know) or layer on
+// anything else MetadataOption supports, and have AutoHidden decide based
+// on the caller's final mimetype. Whether to auto-download the result is
+// left to the caller, using the returned Metadata's ID (see
+// MetadataAutoDownloadByID) - that's not URIImport's job.
 func (t URIImport) Import(ctx context.Context, uri string, options ...func(*Metadata)) (meta Metadata, err error) {
-	m, err := t.Resolve(ctx, uri)
+	m, err := t.Resolve(ctx, uri, options...)
 	if err != nil {
 		return meta, err
 	}
-
-	m = langx.Clone(m, options...)
 
 	if err = MetadataInsertWithDefaults(ctx, t.q, m).Scan(&meta); err != nil {
 		return meta, errorsx.Wrap(err, "unable to record torrent metadata")
