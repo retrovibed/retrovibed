@@ -44,9 +44,10 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(KnownMediaDisplay), findsOneWidget);
 
-      await tester.enterText(find.byType(TextField).first, '@');
+      await tester.tap(find.byTooltip('library tools'));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('discover'));
+      await tester.ensureVisible(find.text('Search / Discover'));
+      await tester.tap(find.text('Search / Discover'));
       await tester.pumpAndSettle();
 
       expect(find.byType(KnownMediaDisplay), findsNothing);

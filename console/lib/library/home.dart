@@ -43,14 +43,6 @@ class _HomeState extends State<Home> {
     super.setState(fn);
   }
 
-  Widget _cause = ds.Error.zero;
-
-  void _reseterr() {
-    setState(() {
-      _cause = ds.Error.zero;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
@@ -152,17 +144,14 @@ class _HomeState extends State<Home> {
                   help: ds.Hint(const Text("search your library, use @ to access advanced filtering")),
                 ),
               ),
-              ds.ErrorScreen(
-                cause: _cause,
-                switch (_mode) {
-                  _Mode.library => Grid(
-                    apisearch: widget.apisearch,
-                    search: widget.search,
-                    highlighted: widget.highlighted,
-                  ),
-                  _Mode.discovery => disc.DiscoveryGrid(search: widget.search),
-                },
-              ),
+              switch (_mode) {
+                _Mode.library => Grid(
+                  apisearch: widget.apisearch,
+                  search: widget.search,
+                  highlighted: widget.highlighted,
+                ),
+                _Mode.discovery => disc.DiscoveryGrid(search: widget.search),
+              },
             ],
           ),
         ),
