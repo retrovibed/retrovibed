@@ -46,105 +46,101 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
-    final compact = defaults.isCompact;
 
     return LayoutBuilder(
-      builder: (context, constraints) => SingleChildScrollView(
-        reverse: compact,
-        physics: AlwaysScrollableScrollPhysics(),
-        child: ConstrainedBox(
-          constraints: BoxConstraints(minHeight: constraints.maxHeight),
-          child: Column(
-            children: [
-              ValueListenableBuilder<media.MediaSearchState>(
-                valueListenable: widget.search,
-                builder: (context, state, _) => ds.SearchTray(
-                  autoscroll: true,
-                  focus: widget.focus,
-                  autofocus: defaults.desktop,
-                  decoration: InputDecoration(hintText: "search library, @... for filters"),
-                  filters: [
-                    lucene.Boolean.auto('hidden', false, (v) {
-                      final freshNext = widget.search.value.next.clone()..hidden = v;
-                      widget.search.value = media.MediaSearchState(
-                        next: freshNext,
-                        count: widget.search.value.count,
-                      );
-                    }),
-                  ],
-                  controller: widget.controller,
-                  padding: defaults.padding.copyWith(bottom: 0.0),
-                  tuning: GridSettings(),
-                  onSubmitted: (v) {
-                    final freshNext = widget.search.value.next.clone()
-                      ..query = v
-                      ..offset = ds.Grid.int64(0);
+      builder: (context, constraints) {
+        return Column(
+          children: [
+            ValueListenableBuilder<media.MediaSearchState>(
+              valueListenable: widget.search,
+              builder: (context, state, _) => ds.SearchTray(
+                autoscroll: true,
+                focus: widget.focus,
+                autofocus: defaults.desktop,
+                decoration: InputDecoration(hintText: "search library, @... for filters"),
+                filters: [
+                  lucene.Boolean.auto('hidden', false, (v) {
+                    final freshNext = widget.search.value.next.clone()..hidden = v;
                     widget.search.value = media.MediaSearchState(
                       next: freshNext,
                       count: widget.search.value.count,
                     );
-                    widget.focus?.requestFocus();
-                    ds.textediting.refocus(widget.controller);
-                    return Future.value();
-                  },
-                  next: (i) {
-                    final freshNext = widget.search.value.next.clone()..offset = i;
-                    widget.search.value = media.MediaSearchState(
-                      next: freshNext,
-                      count: widget.search.value.count,
-                    );
-                  },
-                  current: state.next.offset,
-                  empty: ds.Grid.int64(state.count) < state.next.limit,
-                  leading: [
-                    ds.CompactingMenu.pinned(
-                      DropdownUpload(
-                        icon: SearchMimetypeDropdown.icon(mimex.checksum(state.next.mimetypes)),
-                        help: ds.Hint(
-                          const Text(
-                            "filter by mimetype, upload files, torrents, magnet links, or switch to discover mode",
+                  }),
+                ],
+                controller: widget.controller,
+                padding: defaults.padding.copyWith(bottom: 0.0),
+                tuning: GridSettings(),
+                onSubmitted: (v) {
+                  final freshNext = widget.search.value.next.clone()
+                    ..query = v
+                    ..offset = ds.Grid.int64(0);
+                  widget.search.value = media.MediaSearchState(
+                    next: freshNext,
+                    count: widget.search.value.count,
+                  );
+                  widget.focus?.requestFocus();
+                  ds.textediting.refocus(widget.controller);
+                  return Future.value();
+                },
+                next: (i) {
+                  final freshNext = widget.search.value.next.clone()..offset = i;
+                  widget.search.value = media.MediaSearchState(
+                    next: freshNext,
+                    count: widget.search.value.count,
+                  );
+                },
+                current: state.next.offset,
+                empty: ds.Grid.int64(state.count) < state.next.limit,
+                leading: [
+                  ds.CompactingMenu.pinned(
+                    DropdownUpload(
+                      icon: SearchMimetypeDropdown.icon(mimex.checksum(state.next.mimetypes)),
+                      help: ds.Hint(
+                        const Text(
+                          "filter by mimetype, upload files, torrents, magnet links, or switch to discover mode",
+                        ),
+                      ),
+                      items: [
+                        ...SearchMimetypeDropdown.menuItems(widget.search),
+                        PopupMenuItem<String>(
+                          onTap: () {
+                            final next = _mode == _Mode.discovery ? _Mode.library : _Mode.discovery;
+                            setState(() {
+                              _mode = next;
+                            });
+                            if (next == _Mode.discovery) {
+                              widget.focus?.requestFocus();
+                            }
+                          },
+                          child: ListTile(
+                            leading: Icon(_mode == _Mode.discovery ? Icons.check : Icons.travel_explore),
+                            title: const Text("Search / Discover"),
                           ),
                         ),
-                        items: [
-                          ...SearchMimetypeDropdown.menuItems(widget.search),
-                          const PopupMenuDivider(),
-                          PopupMenuItem<String>(
-                            enabled: false,
-                            child: ValueListenableBuilder<media.MediaSearchState>(
-                              valueListenable: widget.search,
-                              builder: (context, s, _) => mimex.CategoryOptionsLabel(s.next.mimetypes),
-                            ),
+                        const PopupMenuDivider(),
+                        PopupMenuItem<String>(
+                          enabled: false,
+                          child: ValueListenableBuilder<media.MediaSearchState>(
+                            valueListenable: widget.search,
+                            builder: (context, s, _) => mimex.CategoryOptionsLabel(s.next.mimetypes),
                           ),
-                          MenuItemUploadFiles(
-                            context,
-                            widget.search,
-                            apiupload: widget.apiupload,
-                          ),
-                          downloads.MenuItemDownloadTorrent(context),
-                          downloads.MenuItemDownloadMagnet(context),
-                          PopupMenuItem<String>(
-                            child: ListTile(
-                              leading: Icon(_mode == _Mode.discovery ? Icons.check : Icons.travel_explore),
-                              title: const Text("Search / Discover"),
-                              onTap: () {
-                                final next = _mode == _Mode.discovery ? _Mode.library : _Mode.discovery;
-                                setState(() {
-                                  _mode = next;
-                                });
-                                if (next == _Mode.discovery) {
-                                  widget.focus?.requestFocus();
-                                }
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                        MenuItemUploadFiles(
+                          context,
+                          widget.search,
+                          apiupload: widget.apiupload,
+                        ),
+                        downloads.MenuItemDownloadTorrent(context),
+                        downloads.MenuItemDownloadMagnet(context),
+                      ],
                     ),
-                  ],
-                  help: ds.Hint(const Text("search your library, use @ to access advanced filtering")),
-                ),
+                  ),
+                ],
+                help: ds.Hint(const Text("search your library, use @ to access advanced filtering")),
               ),
-              switch (_mode) {
+            ),
+            Expanded(
+              child: switch (_mode) {
                 _Mode.library => Grid(
                   apisearch: widget.apisearch,
                   search: widget.search,
@@ -152,10 +148,10 @@ class _HomeState extends State<Home> {
                 ),
                 _Mode.discovery => disc.DiscoveryGrid(search: widget.search),
               },
-            ],
-          ),
-        ),
-      ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

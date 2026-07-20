@@ -133,7 +133,8 @@ class _KnownMediaLocator extends State<KnownMediaLocator> {
                     .locate(
                       api.Locate.create()
                         ..knownMediaId = widget.current.uid
-                        ..mimetype = widget.current.mimetype,
+                        ..mimetype = widget.current.mimetype
+                        ..adult = widget.current.adult,
                       options: options,
                     )
                     .then((v) {

@@ -54,6 +54,7 @@ class _LoadingListTileState extends State<LoadingListTile> {
           : widget.leading,
       title: widget.title,
       enabled: !disabled,
+      hoverColor: Colors.transparent,
       onTap: disabled ? null : _handlePress,
     );
   }

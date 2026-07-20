@@ -11,6 +11,8 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
 	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/lucenex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 )
@@ -19,7 +21,7 @@ import (
 // match for a known-media-id.
 type DiscoverRequest struct {
 	KnownMediaID string
-	Title        string   // optional; needed by the plugin strategy, empty means "skip it"
+	Query        string   // optional; needed by the plugin strategy, empty means "skip it"
 	Mimetypes    []string // optional; discovery mimetypes, needed by the plugin strategy
 	Adult        bool     // optional; enable adult content.
 }
@@ -31,7 +33,7 @@ type DiscoverRequest struct {
 func DiscoverRequestFromKnown(known library.Known) DiscoverRequest {
 	return DiscoverRequest{
 		KnownMediaID: known.UID,
-		Title:        known.Title,
+		Query:        known.Title,
 		Mimetypes:    Category(known.Mimetype),
 		Adult:        known.Adult,
 	}
@@ -167,10 +169,9 @@ func (t *discoverSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 			if err := seq.Err(); errors.Is(err, iterx.ErrNotFound) {
 				continue
 			} else if err != nil {
-				t.err = err
+				t.err = errorsx.Wrapf(err, "%T failed", strategy)
 				return
 			}
-
 		}
 	}
 }
@@ -192,7 +193,7 @@ func NewTitleFilter(q sqlx.Queryer, req DiscoverRequest) TitleFilter {
 
 func (t TitleFilter) Match(ctx context.Context, d Discovered) (bool, error) {
 	var matched bool
-	err := duckdbx.Search(t.req.Title, d.Title).RunWith(t.q).QueryRowContext(ctx).Scan(&matched)
+	err := duckdbx.Search(lucenex.Clean(t.req.Query), d.Title).RunWith(t.q).QueryRowContext(ctx).Scan(&matched)
 	if errors.Is(err, sql.ErrNoRows) {
 		return false, nil
 	}

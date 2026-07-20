@@ -17,7 +17,6 @@ class DropdownUpload extends StatelessWidget {
   Widget build(BuildContext context) {
     return ds.Help(
       PopupMenuButton<String>(
-        tooltip: "library tools",
         position: PopupMenuPosition.under,
         color: Theme.of(context).colorScheme.surface,
         surfaceTintColor: Theme.of(context).colorScheme.surface,

@@ -30,6 +30,10 @@ type localSeq struct {
 
 func (t *localSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 	return func(yield func(Discovered) bool) {
+		if t.kid == "" {
+			return
+		}
+
 		qq := DiscoveredSearchBuilder().Where(DiscoveredQueryKnownMediaID(t.kid))
 		s := sqlx.Scan(DiscoveredSearch(ctx, t.q, qq))
 

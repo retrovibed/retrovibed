@@ -40,7 +40,7 @@ func TestPluginStrategyYieldsUnpersisted(t *testing.T) {
 	kid := uuid.Must(uuid.NewV4()).String()
 
 	plugins := fakePluginSeq{results: []*ddiscapi.Import{{Uri: magnet, Uritype: mimex.Magnet, Health: 5, Bytes: 1234, Mimetype: mimex.Video}}}
-	seq := ddisc.PluginStrategy(q, plugins).Discover(t.Context(), ddisc.DiscoverRequest{KnownMediaID: kid, Title: "ubuntu", Mimetypes: []string{mimex.Video}})
+	seq := ddisc.PluginStrategy(q, plugins).Discover(t.Context(), ddisc.DiscoverRequest{KnownMediaID: kid, Query: "ubuntu", Mimetypes: []string{mimex.Video}})
 
 	var got []ddisc.Discovered
 	for v := range seq.Each(t.Context()) {
@@ -87,7 +87,7 @@ func TestPluginStrategyRecordsKnownMediaTOFU(t *testing.T) {
 		PosterPath:   "/ubuntu.jpg",
 		Source:       "unit3d",
 	}}}
-	seq := ddisc.PluginStrategy(q, plugins).Discover(t.Context(), ddisc.DiscoverRequest{KnownMediaID: kid, Title: "ubuntu", Mimetypes: []string{mimex.Video}})
+	seq := ddisc.PluginStrategy(q, plugins).Discover(t.Context(), ddisc.DiscoverRequest{KnownMediaID: kid, Query: "ubuntu", Mimetypes: []string{mimex.Video}})
 
 	for range seq.Each(t.Context()) {
 	}
@@ -114,7 +114,7 @@ func TestPluginStrategyKnownMediaTOFUDoesNotOverwrite(t *testing.T) {
 		Title:        "original title",
 		Source:       "unit3d",
 	}}}
-	seq := ddisc.PluginStrategy(q, first).Discover(t.Context(), ddisc.DiscoverRequest{KnownMediaID: kid, Title: "q", Mimetypes: []string{mimex.Video}})
+	seq := ddisc.PluginStrategy(q, first).Discover(t.Context(), ddisc.DiscoverRequest{KnownMediaID: kid, Query: "q", Mimetypes: []string{mimex.Video}})
 	for range seq.Each(t.Context()) {
 	}
 	require.NoError(t, seq.Err())
@@ -127,7 +127,7 @@ func TestPluginStrategyKnownMediaTOFUDoesNotOverwrite(t *testing.T) {
 		Title:        "different title",
 		Source:       "leetx",
 	}}}
-	seq2 := ddisc.PluginStrategy(q, second).Discover(t.Context(), ddisc.DiscoverRequest{KnownMediaID: kid, Title: "q", Mimetypes: []string{mimex.Video}})
+	seq2 := ddisc.PluginStrategy(q, second).Discover(t.Context(), ddisc.DiscoverRequest{KnownMediaID: kid, Query: "q", Mimetypes: []string{mimex.Video}})
 	for range seq2.Each(t.Context()) {
 	}
 	require.NoError(t, seq2.Err())
@@ -149,7 +149,7 @@ func TestPluginStrategyRecordsKnownMediaWithoutTitle(t *testing.T) {
 		KnownMediaId: kid,
 		Source:       "unit3d",
 	}}}
-	seq := ddisc.PluginStrategy(q, plugins).Discover(t.Context(), ddisc.DiscoverRequest{KnownMediaID: kid, Title: "q", Mimetypes: []string{mimex.Video}})
+	seq := ddisc.PluginStrategy(q, plugins).Discover(t.Context(), ddisc.DiscoverRequest{KnownMediaID: kid, Query: "q", Mimetypes: []string{mimex.Video}})
 	for range seq.Each(t.Context()) {
 	}
 	require.NoError(t, seq.Err())
@@ -173,7 +173,7 @@ func TestPluginStrategySkipsSentinelKnownMediaID(t *testing.T) {
 				Title:        "some title",
 				Source:       "unit3d",
 			}}}
-			seq := ddisc.PluginStrategy(q, plugins).Discover(t.Context(), ddisc.DiscoverRequest{KnownMediaID: uuid.Must(uuid.NewV4()).String(), Title: "q", Mimetypes: []string{mimex.Video}})
+			seq := ddisc.PluginStrategy(q, plugins).Discover(t.Context(), ddisc.DiscoverRequest{KnownMediaID: uuid.Must(uuid.NewV4()).String(), Query: "q", Mimetypes: []string{mimex.Video}})
 			for range seq.Each(t.Context()) {
 			}
 			require.NoError(t, seq.Err())
@@ -195,7 +195,7 @@ func TestPluginStrategyResolvesNonMagnetURI(t *testing.T) {
 		Mimetype: mimex.Video,
 		Title:    "Some Release",
 	}}}
-	seq := ddisc.PluginStrategy(q, plugins).Discover(t.Context(), ddisc.DiscoverRequest{KnownMediaID: kid, Title: "ubuntu", Mimetypes: []string{mimex.Video}})
+	seq := ddisc.PluginStrategy(q, plugins).Discover(t.Context(), ddisc.DiscoverRequest{KnownMediaID: kid, Query: "ubuntu", Mimetypes: []string{mimex.Video}})
 
 	var got []ddisc.Discovered
 	for v := range seq.Each(t.Context()) {

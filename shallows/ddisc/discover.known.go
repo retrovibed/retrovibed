@@ -48,7 +48,7 @@ type knownSeq struct {
 
 func (t *knownSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 	return func(yield func(Discovered) bool) {
-		if t.req.Title == "" {
+		if t.req.Query == "" {
 			return
 		}
 
@@ -60,7 +60,7 @@ func (t *knownSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 		qq := library.KnownSearchBuilder().Where(squirrel.And{
 			library.KnownQueryExplicit(t.req.Adult),
 			squirrelx.In("library_known_media.mimetype", mimetypes...),
-			library.KnownQuerySimilarity(t.req.Title, knownSimilarityCutoff),
+			library.KnownQuerySimilarity(t.req.Query, knownSimilarityCutoff),
 		}).Limit(knownStrategyLimit)
 
 		s := sqlx.Scan(library.KnownSearch(ctx, t.q, qq))

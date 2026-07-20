@@ -2,10 +2,12 @@ package ddisc_test
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"iter"
 	"testing"
 
+	_ "github.com/duckdb/duckdb-go/v2"
 	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
@@ -135,6 +137,25 @@ func TestDiscoverEmptyWhenAllStrategiesMiss(t *testing.T) {
 	}
 	require.NoError(t, seq.Err())
 	require.Equal(t, 0, count)
+}
+
+func TestTitleFilterCleansHostileFreeText(t *testing.T) {
+	db, err := sql.Open("duckdb", "")
+	require.NoError(t, err)
+	t.Cleanup(func() { db.Close() })
+
+	id := int160.Random()
+	candidate := ddisc.NewDiscovered(&id, ddisc.DiscoveredOptionTitle("Arch Linux ISO"))
+
+	// a trailing ":" is a dangling field:value token in lucene grammar -
+	// free-typed UI search text hits this whenever a query is submitted
+	// mid-word, so TitleFilter must sanitize it rather than handing it to
+	// the parser raw (previously surfaced as a DuckDB "Parser Error: syntax
+	// error at end of input").
+	filter := ddisc.NewTitleFilter(db, ddisc.DiscoverRequest{Query: "arch linux:"})
+	matched, err := filter.Match(context.Background(), candidate)
+	require.NoError(t, err)
+	require.True(t, matched)
 }
 
 func TestDiscoverRanksYieldedCandidates(t *testing.T) {

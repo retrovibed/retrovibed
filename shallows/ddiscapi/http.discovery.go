@@ -98,7 +98,6 @@ func (t *HTTPDiscovery) Bind(r *mux.Router) {
 		httpauth.AuthenticateWithToken(t.jwtsecret),
 		httpx.Timeout2s(),
 	).ThenFunc(t.download))
-
 }
 
 func (t *HTTPDiscovery) download(w http.ResponseWriter, r *http.Request) {
@@ -171,7 +170,7 @@ func (t *HTTPDiscovery) websocket(w http.ResponseWriter, r *http.Request) {
 
 	discreq := ddisc.DiscoverRequest{
 		KnownMediaID: req.KnownMediaId,
-		Title:        req.Query,
+		Query:        req.Query,
 		Mimetypes:    ddisc.Category(req.Mimetype),
 		Adult:        req.Adult,
 	}

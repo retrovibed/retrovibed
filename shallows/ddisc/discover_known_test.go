@@ -21,7 +21,7 @@ func TestKnownStrategyCatalogMatch(t *testing.T) {
 	require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults, library.KnownOptionMimetype(mimex.Video)))
 	require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 
-	seq := ddisc.KnownStrategy(q).Discover(ctx, ddisc.DiscoverRequest{Title: known.Title, Mimetypes: ddisc.Category(known.Mimetype)})
+	seq := ddisc.KnownStrategy(q).Discover(ctx, ddisc.DiscoverRequest{Query: known.Title, Mimetypes: ddisc.Category(known.Mimetype)})
 	var got []ddisc.Discovered
 	for v := range seq.Each(ctx) {
 		got = append(got, v)
@@ -40,7 +40,7 @@ func TestKnownStrategyMissReturnsEmpty(t *testing.T) {
 
 	q := sqltestx.Metadatabase(t)
 
-	seq := ddisc.KnownStrategy(q).Discover(ctx, ddisc.DiscoverRequest{Title: "zzzznonexistenttitlezzzz9182734"})
+	seq := ddisc.KnownStrategy(q).Discover(ctx, ddisc.DiscoverRequest{Query: "zzzznonexistenttitlezzzz9182734"})
 	var count int
 	for range seq.Each(ctx) {
 		count++

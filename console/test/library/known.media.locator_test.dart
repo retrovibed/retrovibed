@@ -49,6 +49,26 @@ void main() {
       expect(requested?.knownMediaId, equals(item.uid));
     });
 
+    testWidgets('tapping forwards the known item adult flag', (tester) async {
+      api.Locate? requested;
+      final item = api.Known(id: 'row-1', uid: 'known-1', description: 'Test', summary: 'summary', adult: true);
+      await tester.pumpApp(
+        KnownMediaLocator(
+          item,
+          ensureP2P: (context, {options = const []}) async => true,
+          locate: (req, {options = const []}) async {
+            requested = req;
+            return api.LocateCreateResponse(locate: req);
+          },
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(KnownMediaCard));
+      await tester.pumpAndSettle();
+
+      expect(requested?.adult, isTrue);
+    });
+
     testWidgets('a failed locate is handled internally', (tester) async {
       final item = api.Known(id: 'known-1', description: 'Test', summary: 'summary');
       await tester.pumpApp(

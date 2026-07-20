@@ -21,6 +21,7 @@ class DiscoveryGrid extends StatefulWidget {
 
 class _DiscoveryGridState extends State<DiscoveryGrid> {
   Widget _cause = ds.Error.zero;
+  bool _loading = false;
   List<ddisc.Discovery> _items = [];
   media.MediaSearchRequest? _lastFetchedNext;
   StreamSubscription<ddisc.Discovery>? _subscription;
@@ -37,7 +38,7 @@ class _DiscoveryGridState extends State<DiscoveryGrid> {
     });
   }
 
-  Future<void> refresh() {
+  Future<void> refresh({bool triggered = true}) {
     _subscription?.cancel();
     _found.clear();
 
@@ -55,6 +56,7 @@ class _DiscoveryGridState extends State<DiscoveryGrid> {
     setState(() {
       _items = [];
       _cause = ds.Error.zero;
+      _loading = widget.search.value.next.query.isNotEmpty;
     });
 
     return httpx
@@ -68,12 +70,12 @@ class _DiscoveryGridState extends State<DiscoveryGrid> {
           final done = Completer<void>();
           _subscription = stream.listen(
             (item) {
-              print("DERP DERP ${item}");
               _found.add(item);
-              widget.search.value = media.MediaSearchState(next: req, count: _found.length);
               setState(() {
                 _items = _found.toList();
+                _loading = false;
               });
+              widget.search.value = media.MediaSearchState(next: req, count: _found.length);
             },
             cancelOnError: true,
             onError: done.completeError,
@@ -84,6 +86,11 @@ class _DiscoveryGridState extends State<DiscoveryGrid> {
         .catchError((cause) {
           setState(() {
             _cause = ds.Error.unknown(cause, onTap: reseterr);
+          });
+        })
+        .whenComplete(() {
+          setState(() {
+            _loading = false;
           });
         });
   }
@@ -112,6 +119,8 @@ class _DiscoveryGridState extends State<DiscoveryGrid> {
             key: ValueKey('discovery.grid'),
             (context, v) => DiscoveredCard(v),
             children: _items,
+            loading: _loading,
+            physics: AlwaysScrollableScrollPhysics(),
             empty: Center(
               child: Padding(
                 padding: defaults.padding,

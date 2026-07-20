@@ -13,6 +13,7 @@ import './api.dart' as api;
 class DiscoveryLocator extends StatefulWidget {
   final String query;
   final String mimetype;
+  final bool adult;
   final Future<api.LocateCreateResponse> Function(api.Locate req, {List<httpx.Option> options}) locate;
   final Future<api.LocateLookupResponse> Function(String id, {List<httpx.Option> options}) lookup;
   final Future<bool> Function(BuildContext context, {List<httpx.Option> options}) ensureP2P;
@@ -23,6 +24,7 @@ class DiscoveryLocator extends StatefulWidget {
     super.key,
     required this.query,
     required this.mimetype,
+    this.adult = false,
     required this.onFound,
     this.locate = api.locate.create,
     this.lookup = api.locate.get,
@@ -82,7 +84,8 @@ class _DiscoveryLocator extends State<DiscoveryLocator> {
                 api.Locate.create()
                   ..autodownload = false
                   ..query = widget.query
-                  ..mimetype = widget.mimetype,
+                  ..mimetype = widget.mimetype
+                  ..adult = widget.adult,
                 options: options,
               )
               .then((v) {

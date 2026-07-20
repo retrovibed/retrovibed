@@ -49,7 +49,7 @@ class Grid<T> extends StatelessWidget {
         final grid = GridView.builder(
           shrinkWrap: true,
           reverse: compact,
-          physics: physics ?? NeverScrollableScrollPhysics(),
+          physics: const NeverScrollableScrollPhysics(),
           padding: padding ?? defaults.padding,
           itemCount: this.children.length,
           gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
@@ -73,16 +73,22 @@ class Grid<T> extends StatelessWidget {
         );
 
         return Help(
-          Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            mainAxisSize: MainAxisSize.max,
-            verticalDirection: compact ? VerticalDirection.up : VerticalDirection.down,
-            spacing: 0,
-            children: [
-              ...leading,
-              bounded ? Expanded(child: content) : content,
-              ...trailing,
-            ],
+          SingleChildScrollView(
+            physics: physics ?? NeverScrollableScrollPhysics(),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.max,
+              verticalDirection: compact ? VerticalDirection.up : VerticalDirection.down,
+              spacing: 0,
+              children: [
+                ...leading,
+                ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: bounded ? constraints.maxHeight : 0),
+                  child: content,
+                ),
+                ...trailing,
+              ],
+            ),
           ),
           help,
         );

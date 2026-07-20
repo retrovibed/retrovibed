@@ -74,6 +74,28 @@ void main() {
       expect(find.byType(ds.Card), findsOneWidget);
     });
 
+    testWidgets('tapping forwards the adult flag', (tester) async {
+      api.Locate? requested;
+      await tester.pumpApp(
+        DiscoveryLocator(
+          query: 'ubuntu',
+          mimetype: 'video',
+          adult: true,
+          onFound: (located) async => const SizedBox.shrink(),
+          ensureP2P: (context, {options = const []}) async => true,
+          locate: (req, {options = const []}) async {
+            requested = req;
+            return api.LocateCreateResponse(locate: (req..id = 'locate-1'));
+          },
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(ds.Card));
+      await tester.pumpAndSettle();
+
+      expect(requested?.adult, isTrue);
+    });
+
     testWidgets('a failed locate is handled internally', (tester) async {
       await tester.pumpApp(
         DiscoveryLocator(

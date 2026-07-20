@@ -86,6 +86,21 @@ type peerTubeSearchRow struct {
 	UUID        string `json:"uuid"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
+	URL         string `json:"url"`
+}
+
+// peerTubeRowOrigin resolves the PeerTube instance a search row actually
+// lives on. SepiaSearch is a federated index over many independent
+// instances, not an instance itself, so its own domain has no
+// /api/v1/videos/{uuid} resource - each row's url instead points at its true
+// origin. Falls back to fallback when the row has no usable absolute url,
+// which is the case when querying a single PeerTube instance directly.
+func peerTubeRowOrigin(row peerTubeSearchRow, fallback string) string {
+	u, err := url.Parse(row.URL)
+	if err != nil || u.Host == "" || (u.Scheme != "http" && u.Scheme != "https") {
+		return fallback
+	}
+	return u.Scheme + "://" + u.Host
 }
 
 type peerTubeSearchResponse struct {
@@ -232,7 +247,7 @@ type peerTubeSeq struct {
 
 func (t *peerTubeSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 	return func(yield func(Discovered) bool) {
-		if t.req.Title == "" {
+		if t.req.Query == "" {
 			return
 		}
 
@@ -286,7 +301,7 @@ func (t *peerTubeStrategy) run(ctx context.Context, req DiscoverRequest, results
 		}
 	}, asynccompute.Workers[peerTubeSearchRow](uint16(t.workers)))
 
-	serr := t.search(ctx, category, req.Title, req.Adult, pool)
+	serr := t.search(ctx, category, req.Query, req.Adult, pool)
 	cerr := pool.Close()
 	return errors.Join(serr, cerr)
 }
@@ -341,7 +356,8 @@ func (t *peerTubeStrategy) search(ctx context.Context, category, query string, a
 // Returns ok=false (no error) for videos with no usable magnet - not every
 // PeerTube result is a candidate.
 func (t *peerTubeStrategy) resolveRow(ctx context.Context, category string, row peerTubeSearchRow) (Discovered, bool, error) {
-	target := fmt.Sprintf("%s/api/v1/videos/%s", strings.TrimRight(t.domain, "/"), url.PathEscape(row.UUID))
+	origin := peerTubeRowOrigin(row, t.domain)
+	target := fmt.Sprintf("%s/api/v1/videos/%s", strings.TrimRight(origin, "/"), url.PathEscape(row.UUID))
 	body, err := t.fetch(ctx, target)
 	if err != nil {
 		return Discovered{}, false, err

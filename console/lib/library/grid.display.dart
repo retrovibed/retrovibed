@@ -94,6 +94,7 @@ class _GridState extends State<Grid> {
           children: _items,
           loading: _loading,
           cause: _cause,
+          physics: AlwaysScrollableScrollPhysics(),
           leading: [
             Visibility(
               key: ValueKey('library.query.disc.home'),

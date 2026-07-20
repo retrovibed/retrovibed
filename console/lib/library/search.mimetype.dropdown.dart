@@ -51,6 +51,7 @@ class SearchMimetypeDropdown extends StatelessWidget {
             title: Text(label(checksum)),
             selected: selected,
             enabled: !selected,
+            hoverColor: Colors.transparent,
             onTap: () {
               final current = state.next;
               select(current, checksum);

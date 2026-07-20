@@ -43,11 +43,11 @@ type pluginSeq struct {
 
 func (t *pluginSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 	return func(yield func(Discovered) bool) {
-		if t.req.Title == "" {
+		if t.req.Query == "" {
 			return
 		}
 
-		seq := t.cfg.plugins.Search(ctx, t.req.Mimetypes, t.req.Title, t.req.Adult)
+		seq := t.cfg.plugins.Search(ctx, t.req.Mimetypes, t.req.Query, t.req.Adult)
 		for imp := range seq.Each(ctx) {
 			if imp.Uri == "" {
 				continue

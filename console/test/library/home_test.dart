@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:retrovibed/library/dropdown.upload.dart';
 import 'package:retrovibed/library/home.dart';
 import 'package:retrovibed/library/known.media.display.dart';
 import 'package:retrovibed/media.dart' as media;
@@ -44,7 +45,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(KnownMediaDisplay), findsOneWidget);
 
-      await tester.tap(find.byTooltip('library tools'));
+      await tester.tap(find.byType(DropdownUpload));
       await tester.pumpAndSettle();
       await tester.ensureVisible(find.text('Search / Discover'));
       await tester.tap(find.text('Search / Discover'));
