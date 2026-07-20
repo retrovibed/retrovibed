@@ -52,17 +52,19 @@ func newDiscoverHit(kid string) ddisc.Discovered {
 	)
 }
 
-func TestDiscoverStopsAtFirstHit(t *testing.T) {
+func TestDiscoverTriesEveryStrategy(t *testing.T) {
 	kid := uuid.Must(uuid.NewV4()).String()
-	hit := newDiscoverHit(kid)
+	hit1 := newDiscoverHit(kid)
+	hit2 := newDiscoverHit(kid)
 	called2 := false
 
 	seq := ddisc.Discover(
 		context.Background(),
 		ddisc.DefaultPolicy(),
 		ddisc.DiscoverRequest{KnownMediaID: kid},
-		fakeDiscoverStrategy{results: []ddisc.Discovered{hit}},
-		fakeDiscoverStrategy{called: &called2},
+		nil,
+		fakeDiscoverStrategy{results: []ddisc.Discovered{hit1}},
+		fakeDiscoverStrategy{results: []ddisc.Discovered{hit2}, called: &called2},
 	)
 
 	var got []ddisc.Discovered
@@ -70,9 +72,10 @@ func TestDiscoverStopsAtFirstHit(t *testing.T) {
 		got = append(got, d)
 	}
 	require.NoError(t, seq.Err())
-	require.Len(t, got, 1)
-	require.Equal(t, hit.ID, got[0].ID)
-	require.False(t, called2, "second strategy should not run once the first finds something")
+	require.True(t, called2, "second strategy should still run even though the first already found something")
+	require.Len(t, got, 2)
+	require.Equal(t, hit1.ID, got[0].ID)
+	require.Equal(t, hit2.ID, got[1].ID)
 }
 
 func TestDiscoverFallsThroughOnMiss(t *testing.T) {
@@ -83,6 +86,7 @@ func TestDiscoverFallsThroughOnMiss(t *testing.T) {
 		context.Background(),
 		ddisc.DefaultPolicy(),
 		ddisc.DiscoverRequest{KnownMediaID: kid},
+		nil,
 		fakeDiscoverStrategy{},
 		fakeDiscoverStrategy{results: []ddisc.Discovered{hit}},
 	)
@@ -104,6 +108,7 @@ func TestDiscoverPropagatesGenuineErrorAndStopsChain(t *testing.T) {
 		context.Background(),
 		ddisc.DefaultPolicy(),
 		ddisc.DiscoverRequest{KnownMediaID: uuid.Must(uuid.NewV4()).String()},
+		nil,
 		fakeDiscoverStrategy{err: cause},
 		fakeDiscoverStrategy{called: &called2},
 	)
@@ -119,6 +124,7 @@ func TestDiscoverEmptyWhenAllStrategiesMiss(t *testing.T) {
 		context.Background(),
 		ddisc.DefaultPolicy(),
 		ddisc.DiscoverRequest{KnownMediaID: uuid.Must(uuid.NewV4()).String()},
+		nil,
 		fakeDiscoverStrategy{},
 		fakeDiscoverStrategy{},
 	)
@@ -139,6 +145,7 @@ func TestDiscoverRanksYieldedCandidates(t *testing.T) {
 		context.Background(),
 		ddisc.DefaultPolicy(),
 		ddisc.DiscoverRequest{KnownMediaID: kid},
+		nil,
 		fakeDiscoverStrategy{results: []ddisc.Discovered{hit}},
 	)
 

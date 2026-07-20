@@ -46,6 +46,7 @@ func TestHTTPDiscoveryDownload(t *testing.T) {
 		ddiscapi.NewHTTPDiscovery(
 			q,
 			searchplugin.Unimplemented{},
+			nil,
 			ddiscapi.HTTPDiscoveryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
@@ -71,6 +72,7 @@ func TestHTTPDiscoveryDownload(t *testing.T) {
 		ddiscapi.NewHTTPDiscovery(
 			q,
 			searchplugin.Unimplemented{},
+			nil,
 			ddiscapi.HTTPDiscoveryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
@@ -103,6 +105,7 @@ func TestHTTPDiscoveryDownload(t *testing.T) {
 		ddiscapi.NewHTTPDiscovery(
 			q,
 			searchplugin.Unimplemented{},
+			nil,
 			ddiscapi.HTTPDiscoveryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 

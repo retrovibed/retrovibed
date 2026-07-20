@@ -44,6 +44,8 @@ const (
 	AutoIdentifyMedia          = "RETROVIBED_MEDIA_AUTO_IDENTIFY"              // enable/disable automatically identified media.
 	AutoLocateMedia            = "RETROVIBED_MEDIA_AUTO_LOCATE"                // enable/disable automatically locate and download media.
 	AutoDiscovery              = "RETROVIBED_TORRENT_AUTO_DISCOVERY"           // enable/disable automatically discovering torrents from peers.
+	AutoPeerTube               = "RETROVIBED_AUTO_PEERTUBE"                    // enable/disable the built-in PeerTube/SepiaSearch discovery strategy.
+	PeerTubeDomain             = "PEERTUBE_DOMAIN"                             // base url of the PeerTube/SepiaSearch instance to search.
 	AutoBootstrap              = "RETROVIBED_TORRENT_AUTO_BOOTSTRAP"           // enable/disable the predefined set of public swarms to bootstrap from.
 	TorrentPort                = "RETROVIBED_TORRENT_PORT"                     // specify the port to listen to torrents on
 	TorrentPublicIP4           = "RETROVIBED_TORRENT_PUBLIC_IP4"               // specify the public ipv4 address the torrent service.

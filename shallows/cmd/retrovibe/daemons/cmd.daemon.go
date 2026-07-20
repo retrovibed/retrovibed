@@ -24,6 +24,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
+	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
 	"github.com/retrovibed/retrovibed/shallows/dnscache"
 	"github.com/retrovibed/retrovibed/shallows/downloads"
@@ -72,6 +73,8 @@ type Command struct {
 	AutoMDNS            bool             `flag:"" name:"auto-mdns" help:"enable the multicast dns service" env:"${env_auto_mdns}" default:"true" negatable:""`
 	AutoBootstrap       bool             `flag:"" name:"auto-bootstrap" help:"bootstrap from a predefined set of peers" env:"${env_auto_bootstrap}" default:"true" negatable:""`
 	AutoDiscovery       bool             `flag:"" name:"auto-discovery" help:"enable automatic discovery of content from peers" env:"${env_auto_discovery}" default:"true" negatable:""`
+	AutoPeerTube        bool             `flag:"" name:"auto-peertube" help:"enable the built-in PeerTube/SepiaSearch discovery strategy" env:"${env_auto_peertube}" default:"true" negatable:""`
+	PeerTubeDomain      string           `flag:"" name:"peertube-domain" help:"base url of the PeerTube/SepiaSearch instance to search" env:"${env_peertube_domain}" default:"https://sepiasearch.org"`
 	AutoIdentifyMedia   bool             `flag:"" name:"auto-identify-media" help:"enable automatically identifying media" env:"${env_auto_identify_media}" default:"true" negatable:""`
 	AutoLocateMedia     bool             `flag:"" name:"auto-locate-media" help:"enable automatically locating media from distributed index" env:"${env_auto_locate_media}" default:"true" negatable:""`
 	AutoArchive         bool             `flag:"" name:"auto-archive" help:"enable automatic archiving of eligible media" env:"${env_auto_archive}" negatable:"" default:"true"`
@@ -240,6 +243,19 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		return errorsx.Wrap(err, "unable to start search plugin registry")
 	}
 
+	// peertube, unlike plugins, is trusted first-party code that runs
+	// in-process (no wasm sandbox) - see ddisc.PeerTubeStrategy. It still
+	// dials through privateDialer, the same live wireguard-tunnel-or-host
+	// proxy dialer plugins' virtual socket uses, so PeerTube search traffic
+	// never bypasses the tunnel the user configured.
+	peertube := ddisc.DiscoverStrategy(ddisc.UnimplementedStrategy{})
+	if t.AutoPeerTube {
+		peertube = ddisc.PeerTubeStrategy(&http.Client{
+			Timeout:   30 * time.Second,
+			Transport: &http.Transport{DialContext: privateDialer.DialContext},
+		}, t.PeerTubeDomain)
+	}
+
 	torrenting := newTorrenting(
 		db,
 		id,
@@ -252,6 +268,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		ddiscpublish,
 		locatemedia,
 		plugins,
+		peertube,
 		privateDialer,
 		privateResolver,
 	)
@@ -409,7 +426,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	media.NewHTTPSimilar(db).Bind(httpmux.PathPrefix("/similar").Subrouter())
 	media.NewHTTPRecent(db).Bind(httpmux.PathPrefix("/w").Subrouter())
 	ddiscapi.NewHTTPPeerManagement(db).Bind(httpmux.PathPrefix("/ddisc").Subrouter())
-	ddiscapi.NewHTTPDiscovery(db, plugins).Bind(httpmux.PathPrefix("/ddisc/discovery").Subrouter())
+	ddiscapi.NewHTTPDiscovery(db, plugins, peertube).Bind(httpmux.PathPrefix("/ddisc/discovery").Subrouter())
 	ddiscapi.NewHTTPMedia(db).Bind(httpmux.PathPrefix("/ddisc/media").Subrouter())
 	ddiscapi.NewHTTPLocate(db, locatemedia).Bind(httpmux.PathPrefix("/l").Subrouter())
 	media.NewHTTPRSSFeed(db).Bind(httpmux.PathPrefix("/rss").Subrouter())

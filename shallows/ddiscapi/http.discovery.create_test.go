@@ -10,6 +10,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
@@ -45,6 +46,7 @@ func TestHTTPDiscoveringCreate(t *testing.T) {
 	ddiscapi.NewHTTPDiscovery(
 		q,
 		searchplugin.Unimplemented{},
+		ddisc.UnimplementedStrategy{},
 		ddiscapi.HTTPDiscoveryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 	).Bind(routes.PathPrefix("/").Subrouter())
 

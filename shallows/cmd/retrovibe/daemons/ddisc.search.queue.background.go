@@ -16,14 +16,15 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 )
 
-func SearchQueueBackgroundRun(ctx context.Context, q sqlx.Queryer, importer tracking.URIImport, plugins searchplugin.T) error {
+func SearchQueueBackgroundRun(ctx context.Context, q sqlx.Queryer, importer tracking.URIImport, plugins searchplugin.T, peertube ddisc.DiscoverStrategy) error {
 	// SearchQueueBackgroundRun drains ddisc_search_queue: for each pending
-	// known-media-id, ask the loaded search plugins for candidates, resolve
-	// each candidate's real infohash (without importing/downloading it - see
+	// known-media-id, ask the external search strategies (wasm plugins,
+	// PeerTube/SepiaSearch) for candidates, resolve each candidate's real
+	// infohash (without importing/downloading it - see
 	// tracking.URIImport.Resolve) and persist whatever they find, or push the
 	// entry's cooldown out if nothing turned up. maxAge bounds how long a
-	// known-media-id stays queued for search-plugin discovery before it's
-	// given up on and purged.
+	// known-media-id stays queued for external discovery before it's given
+	// up on and purged.
 	const maxAge = 30 * 24 * time.Hour
 	errorsx.Log(sqlx.Discard(sqlx.Scan(ddisc.SearchQueuePurge(ctx, q, maxAge))))
 
@@ -36,7 +37,9 @@ func SearchQueueBackgroundRun(ctx context.Context, q sqlx.Queryer, importer trac
 		}
 
 		sctx, cancel := context.WithTimeout(ctx, 30*time.Second)
-		seq := ddisc.Discover(sctx, ddisc.DefaultPolicy(), ddisc.DiscoverRequestFromKnown(known), ddisc.PluginStrategy(q, plugins))
+		req := ddisc.DiscoverRequestFromKnown(known)
+		options := []ddisc.DiscoverOption{ddisc.DiscoverOptionFilter(ddisc.NewTitleFilter(q, req).Match)}
+		seq := ddisc.Discover(sctx, ddisc.DefaultPolicy(), req, options, ddisc.ExternalStrategies(q, plugins, peertube)...)
 
 		found := false
 		for d := range seq.Each(sctx) {
@@ -57,14 +60,15 @@ func SearchQueueBackgroundRun(ctx context.Context, q sqlx.Queryer, importer trac
 		err := seq.Err()
 		cancel()
 
+		if err != nil {
+			log.Println("search queue failed:", entry.KnownMediaID, known.Title, err)
+		} else {
+			log.Println("search queue: no candidates found", entry.KnownMediaID, known.Title)
+		}
+
 		// we don't care *what* error occurs here (if any) — cool down on
 		// any failure to find a candidate, same as a clean not-found.
 		if !found || err != nil {
-			if err != nil {
-				log.Println("search queue failed:", entry.KnownMediaID, known.Title, err)
-			} else {
-				log.Println("search queue: no candidates found", entry.KnownMediaID, known.Title)
-			}
 			errorsx.Log(ddisc.SearchQueueCooldown(ctx, q, entry.KnownMediaID).Scan(&entry))
 			continue
 		}
@@ -77,7 +81,7 @@ func SearchQueueBackgroundRun(ctx context.Context, q sqlx.Queryer, importer trac
 
 // SearchQueueBackground drains the queue, then polls for new entries on an
 // exponential backoff that maxes out at an hour.
-func SearchQueueBackground(ctx context.Context, q sqlx.Queryer, importer tracking.URIImport, plugins searchplugin.T) error {
+func SearchQueueBackground(ctx context.Context, q sqlx.Queryer, importer tracking.URIImport, plugins searchplugin.T, peertube ddisc.DiscoverStrategy) error {
 	wakeup := asyncx.NewWakeup(ctx)
 	defer wakeup.Broadcast() // kick off an initial drain
 	s := backoffx.New(
@@ -89,7 +93,7 @@ func SearchQueueBackground(ctx context.Context, q sqlx.Queryer, importer trackin
 	go asyncx.Periodic(ctx, wakeup, s, "ddisc search queue drain")
 	contextx.Run(ctx, func() {
 		errorsx.Log(asyncx.Run(ctx, wakeup, func(ctx context.Context) error {
-			return SearchQueueBackgroundRun(ctx, q, importer, plugins)
+			return SearchQueueBackgroundRun(ctx, q, importer, plugins, peertube)
 		}))
 	})
 

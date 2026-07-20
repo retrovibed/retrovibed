@@ -8,7 +8,6 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	"unicode/utf8"
 )
 
 // Path records the nodes and parsed values from the current command-line.
@@ -188,21 +187,28 @@ func (c *Context) Empty() bool {
 
 // Validate the current context.
 func (c *Context) Validate() error { //nolint: gocyclo
-	// Only check nodes on the selected command path: an envar shared with
-	// another command may hold a value that is invalid there.
-	for _, path := range c.Path {
-		node := path.Node()
-		if node == nil {
-			continue
-		}
-		for _, value := range node.Values() {
-			ok := atLeastOneEnvSet(value.Tag.Envs)
-			if value.Enum != "" && (!value.Required || value.HasDefault || (len(value.Tag.Envs) != 0 && ok)) {
-				if err := checkEnum(value, value.Target); err != nil {
+	err := Visit(c.Model, func(node Visitable, next Next) error {
+		switch node := node.(type) {
+		case *Value:
+			ok := atLeastOneEnvSet(node.Tag.Envs)
+			if node.Enum != "" && (!node.Required || node.HasDefault || (len(node.Tag.Envs) != 0 && ok)) {
+				if err := checkEnum(node, node.Target); err != nil {
+					return err
+				}
+			}
+
+		case *Flag:
+			ok := atLeastOneEnvSet(node.Tag.Envs)
+			if node.Enum != "" && (!node.Required || node.HasDefault || (len(node.Tag.Envs) != 0 && ok)) {
+				if err := checkEnum(node.Value, node.Target); err != nil {
 					return err
 				}
 			}
 		}
+		return next(nil)
+	})
+	if err != nil {
+		return err
 	}
 	for _, el := range c.Path {
 		var (
@@ -226,7 +232,7 @@ func (c *Context) Validate() error { //nolint: gocyclo
 			value = node.Target
 			desc = node.Path()
 		}
-		for _, validate := range getValidators(value) {
+		if validate := isValidatable(value); validate != nil {
 			if err := validate.Validate(c); err != nil {
 				if desc != "" {
 					return fmt.Errorf("%s: %w", desc, err)
@@ -343,35 +349,12 @@ func (c *Context) FlagValue(flag *Flag) any {
 
 // Reset recursively resets values to defaults (as specified in the grammar) or the zero value.
 func (c *Context) Reset() error {
-	selected := c.selectedValues()
 	return Visit(c.Model.Node, func(node Visitable, next Next) error {
-		value, ok := node.(*Value)
-		if !ok {
-			return next(nil)
+		if value, ok := node.(*Value); ok {
+			return next(value.Reset())
 		}
-		err := value.Reset()
-		if err != nil && !selected[value] {
-			// An envar shared with a node outside the selected command path
-			// may not parse there; that must not fail this parse.
-			value.Target.Set(reflect.Zero(value.Target.Type()))
-			err = nil
-		}
-		return next(err)
+		return next(nil)
 	})
-}
-
-// selectedValues returns the set of values attached to nodes on the traced
-// command path.
-func (c *Context) selectedValues() map[*Value]bool {
-	selected := map[*Value]bool{}
-	for _, path := range c.Path {
-		if node := path.Node(); node != nil {
-			for _, value := range node.Values() {
-				selected[value] = true
-			}
-		}
-	}
-	return selected
 }
 
 func (c *Context) endParsing() {
@@ -763,12 +746,9 @@ func (c *Context) parseFlag(flags []*Flag, match string) (err error) {
 			candidates = append(candidates, short)
 		}
 		for _, alias := range flag.Aliases {
-			aliasFlag := "--" + alias
-			if utf8.RuneCountInString(alias) == 1 {
-				aliasFlag = "-" + alias
-			}
-			matched = matched || (aliasFlag == match)
-			candidates = append(candidates, aliasFlag)
+			alias = "--" + alias
+			matched = matched || (alias == match)
+			candidates = append(candidates, alias)
 		}
 
 		neg := negatableFlagName(flag.Name, flag.Tag.Negatable)
@@ -992,10 +972,6 @@ func checkMissingChildren(node *Node) error {
 		missing = append(missing, strconv.Quote(strings.Join(missingArgs, " ")))
 	}
 
-	// A node with a Run() method may run on its own, so it does not require one
-	// of its subcommands to be selected.
-	runnable := node.Target.IsValid() && getMethod(node.Target, "Run").IsValid()
-
 	for _, child := range node.Children {
 		if child.Hidden {
 			continue
@@ -1005,7 +981,7 @@ func checkMissingChildren(node *Node) error {
 				continue
 			}
 			missing = append(missing, strconv.Quote(child.Summary()))
-		} else if !runnable {
+		} else {
 			missing = append(missing, strconv.Quote(child.Name))
 		}
 	}
@@ -1200,17 +1176,6 @@ func isValidatable(v reflect.Value) extendedValidatable {
 		return isValidatable(v.Addr())
 	}
 	return nil
-}
-
-// getValidators returns validators implemented by v and by any embedded fields,
-// matching how hooks are discovered (see getMethods).
-func getValidators(v reflect.Value) (validators []extendedValidatable) {
-	walkEmbedded(v, func(v reflect.Value) {
-		if validate := isValidatable(v); validate != nil {
-			validators = append(validators, validate)
-		}
-	})
-	return
 }
 
 func atLeastOneEnvSet(envs []string) bool {

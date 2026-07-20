@@ -62,6 +62,12 @@ func DiscoveredOptionTitle(s string) DiscoveredOption {
 	}
 }
 
+func DiscoveredOptionDescription(s string) DiscoveredOption {
+	return func(d *Discovered) {
+		d.Description = s
+	}
+}
+
 // DiscoveredOptionPrivate marks a candidate as sourced from a BEP 27 private
 // torrent. Private candidates are still persisted (so this node can use them
 // locally) but are excluded from every peer-facing sync/search response.
@@ -121,6 +127,28 @@ func DiscoveredOptionKnownMedia(id string) DiscoveredOption {
 	return func(d *Discovered) {
 		d.KnownMediaID = id
 	}
+}
+
+// PolicyRejectionCatalogOnly marks a Discovered synthesized purely from the
+// library_known_media catalog (see KnownStrategy) - the catalog has never
+// actually resolved a downloadable source for it. Rank's happy path never
+// clears an already-set PolicyRejection, so this survives Discover's central
+// ranking pass and keeps Select from ever choosing it for download.
+const PolicyRejectionCatalogOnly = "catalog-only: no known download source yet"
+
+// DiscoveredOptionCatalogOnly marks d as a catalog-only candidate: not a real
+// downloadable source, just a hit against our library_known_media catalog.
+func DiscoveredOptionCatalogOnly(d *Discovered) {
+	d.PolicyRejection = PolicyRejectionCatalogOnly
+	d.PolicyRank = math.MaxUint16
+}
+
+// catalogURI synthesizes a non-empty placeholder URI for a catalog-only
+// Discovered - ddisc_media.uri is NOT NULL CHECK (uri <> ”), so anything
+// that might get persisted (e.g. daemons.SearchQueueBackgroundRun) needs a
+// well-formed value even though it's never a real fetchable source.
+func catalogURI(knownMediaID string) string {
+	return "retrovibed+catalog://" + knownMediaID
 }
 
 func DiscoveredOptionPartitionAuto(partitions *Partition) DiscoveredOption {

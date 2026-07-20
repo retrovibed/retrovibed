@@ -144,6 +144,8 @@ func Main(args ...string) {
 			"env_auto_mdns":                     env.AutoMDNS,
 			"env_auto_bootstrap":                env.AutoBootstrap,
 			"env_auto_discovery":                env.AutoDiscovery,
+			"env_auto_peertube":                 env.AutoPeerTube,
+			"env_peertube_domain":               env.PeerTubeDomain,
 			"env_self_signed_hosts":             env.SelfSignedHosts,
 			"env_daemon_socket":                 env.DaemonSocket,
 			"env_torrent_port":                  env.TorrentPort,

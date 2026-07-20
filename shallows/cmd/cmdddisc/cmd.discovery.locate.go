@@ -25,6 +25,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/ddisc/ddisctorrent"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/cryptox"
+	"github.com/retrovibed/retrovibed/shallows/internal/envx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
@@ -82,6 +83,8 @@ func (t cmdMediaLocate) Run(gctx *cmdopts.Global) (err error) {
 		plugins = reg
 	}
 
+	peertube := ddisc.PeerTubeStrategy(http.DefaultClient, envx.String("https://sepiasearch.org", "PEERTUBE_DOMAIN"))
+
 	partitions := ddisc.Partitions(uint16(t.Partitions), cryptox.NewChaCha8(t.Seed))
 	policy := ddisc.DefaultPolicy()
 	disc := &daemons.DiscoverySettings{
@@ -95,7 +98,7 @@ func (t cmdMediaLocate) Run(gctx *cmdopts.Global) (err error) {
 
 	var found ddisc.Discovered
 	err = timex.NowAndEvery(bctx, t.Interval, func(ctx context.Context) error {
-		d, ferr := daemons.Locate(ctx, db, disc, dhts, partitions, plugins, policy, loc)
+		d, ferr := daemons.Locate(ctx, db, disc, dhts, partitions, plugins, peertube, policy, loc)
 		if errors.Is(ferr, ddisc.ErrNoCandidate) {
 			return nil
 		} else if ferr != nil {

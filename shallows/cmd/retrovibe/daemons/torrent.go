@@ -83,7 +83,7 @@ func AutoTorrentSettings(defaults *TorrentSettings, options ...func(*TorrentSett
 	}, options...))
 }
 
-func newTorrenting(db *sql.DB, id ssh.Signer, root, media, tvfs fsx.Virtual, mc library.QueryCleaner, tstore storage.ClientImpl, socks5 net.Listener, pub *asyncx.Wakeup, locate *asyncx.Wakeup, plugins searchplugin.T, dialer netx.DialerProxy, dnscacheResolver *dnscache.ProxyPtr) _torrenting {
+func newTorrenting(db *sql.DB, id ssh.Signer, root, media, tvfs fsx.Virtual, mc library.QueryCleaner, tstore storage.ClientImpl, socks5 net.Listener, pub *asyncx.Wakeup, locate *asyncx.Wakeup, plugins searchplugin.T, peertube ddisc.DiscoverStrategy, dialer netx.DialerProxy, dnscacheResolver *dnscache.ProxyPtr) _torrenting {
 	return _torrenting{
 		pub:              pub,
 		locate:           locate,
@@ -105,6 +105,7 @@ func newTorrenting(db *sql.DB, id ssh.Signer, root, media, tvfs fsx.Virtual, mc 
 		socks5:           socks5,
 		mc:               mc,
 		plugins:          plugins,
+		peertube:         peertube,
 		_tclient:         &atomic.Pointer[torrent.Client]{},
 		_dnscache:        dnscacheResolver,
 		_wgdev:           &atomic.Pointer[device.Device]{},
@@ -134,6 +135,7 @@ type _torrenting struct {
 	tstore           storage.ClientImpl
 	socks5           net.Listener
 	plugins          searchplugin.T
+	peertube         ddisc.DiscoverStrategy
 	_tclient         *atomic.Pointer[torrent.Client]
 	_dnscache        *dnscache.ProxyPtr
 	_wgdev           *atomic.Pointer[device.Device]
@@ -572,14 +574,14 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 			backoffx.JitterRandom(time.Second),
 		), "locate media - periodic")
 		asyncx.Background(dctx, t.locate, func(ctx context.Context) error {
-			return errorsx.Wrap(LocateMedia(dctx, t.db, importer, disc, dhts, partitions, t.plugins, policy), "failed to locate media")
+			return errorsx.Wrap(LocateMedia(dctx, t.db, importer, disc, dhts, partitions, t.plugins, t.peertube, policy), "failed to locate media")
 		})
 	} else {
 		log.Println("auto locate media is disabled, to enable add --auto-locate-media flag.")
 	}
 
-	if t.plugins != nil {
-		errorsx.Log(SearchQueueBackground(dctx, t.db, importer, t.plugins))
+	if t.plugins != nil || t.peertube != nil {
+		errorsx.Log(SearchQueueBackground(dctx, t.db, importer, t.plugins, t.peertube))
 	}
 
 	if disc.Enabled && disc.Ratio > 0 {

@@ -2,6 +2,7 @@ package ddisc
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"iter"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
+	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 )
@@ -78,37 +80,80 @@ type DiscoverStrategy interface {
 	Discover(ctx context.Context, req DiscoverRequest) iterx.Seq[Discovered]
 }
 
-// Discover tries each strategy in order, stopping at the first that yields a
-// result. Earlier strategies' side effects (e.g. a fired-and-forgotten peer
-// query) still happen even when that strategy doesn't yield anything itself.
-// Every yielded candidate is ranked with policy before being handed to the
-// caller, so callers observe the real policy rank rather than the unranked
-// sentinel - but candidates are not persisted here. Persisting is the
-// caller's job: only the caller knows whether a candidate is worth keeping
-// (e.g. daemons.DiscoveredDownload persists only the winner, once import has
-// resolved its real infohash) or whether every candidate should be recorded
-// regardless (e.g. daemons.SearchQueueBackgroundRun, which exists purely to
-// populate ddisc_media for background browsing).
-func Discover(ctx context.Context, policy Policy, req DiscoverRequest, strategies ...DiscoverStrategy) iterx.Seq[Discovered] {
-	return &discoverSeq{policy: policy, req: req, strategies: strategies}
+// UnimplementedStrategy is a safe default DiscoverStrategy: every Discover
+// yields nothing and never errors, so a disabled/unavailable strategy slot
+// (e.g. peertube search turned off, or a test that doesn't care about it)
+// can use this instead of a nil DiscoverStrategy - mirrors
+// searchplugin.Unimplemented.
+type UnimplementedStrategy struct{}
+
+func (UnimplementedStrategy) Discover(ctx context.Context, req DiscoverRequest) iterx.Seq[Discovered] {
+	return unimplementedDiscoverSeq{}
+}
+
+type unimplementedDiscoverSeq struct{}
+
+func (unimplementedDiscoverSeq) Each(ctx context.Context) iter.Seq[Discovered] {
+	return func(yield func(Discovered) bool) {}
+}
+
+func (unimplementedDiscoverSeq) Err() error { return nil }
+
+// DiscoverOption customizes a Discover call.
+type DiscoverOption func(*discoverSeq)
+
+// DiscoverOptionFilter adds pred as a filter every candidate from every
+// strategy must pass before it's ranked and yielded. Omitted entirely,
+// every candidate passes through unfiltered (see discoverNoopFilter).
+func DiscoverOptionFilter(pred func(context.Context, Discovered) (bool, error)) DiscoverOption {
+	return func(t *discoverSeq) {
+		t.filter = pred
+	}
+}
+
+// discoverNoopFilter is discoverSeq's default filter: every candidate
+// passes. Keeps discoverSeq.filter always callable, no nil check needed.
+func discoverNoopFilter(context.Context, Discovered) (bool, error) {
+	return true, nil
+}
+
+// Discover tries every strategy in order, regardless of whether an earlier
+// strategy already yielded something - so a caller sees candidates from
+// every strategy, not just the first one to produce a hit. A genuine error
+// from any strategy stops the whole chain; a strategy simply coming up empty
+// (iterx.ErrNotFound) does not. Every yielded candidate passes the filter
+// (see DiscoverOptionFilter) and is ranked with policy before being handed
+// to the caller, so callers observe the real policy rank rather than the
+// unranked sentinel - but candidates are not persisted here. Persisting is
+// the caller's job: only the caller knows whether a candidate is worth
+// keeping (e.g. daemons.DiscoveredDownload persists only the winner, once
+// import has resolved its real infohash) or whether every candidate should
+// be recorded regardless (e.g. daemons.SearchQueueBackgroundRun, which
+// exists purely to populate ddisc_media for background browsing).
+func Discover(ctx context.Context, policy Policy, req DiscoverRequest, options []DiscoverOption, strategies ...DiscoverStrategy) iterx.Seq[Discovered] {
+	d := &discoverSeq{policy: policy, req: req, strategies: strategies, filter: discoverNoopFilter}
+	for _, opt := range options {
+		opt(d)
+	}
+	return d
 }
 
 type discoverSeq struct {
 	policy     Policy
 	req        DiscoverRequest
 	strategies []DiscoverStrategy
+	filter     func(context.Context, Discovered) (bool, error)
 	err        error
 }
 
 func (t *discoverSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 	return func(yield func(Discovered) bool) {
 		for _, strategy := range t.strategies {
-			seq := iterx.NotFound(strategy.Discover(ctx, t.req))
+			seq := strategy.Discover(ctx, t.req)
+			seq = iterx.Filter(seq, t.filter)
+			seq = iterx.NotFound(seq)
 
-			found := false
 			for d := range seq.Each(ctx) {
-				found = true
-
 				if err := t.policy.Rank(&d); err != nil {
 					t.err = err
 					return
@@ -126,9 +171,6 @@ func (t *discoverSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 				return
 			}
 
-			if found {
-				return
-			}
 		}
 	}
 }
@@ -137,14 +179,51 @@ func (t *discoverSeq) Err() error {
 	return t.err
 }
 
-// SyncStrategies returns the synchronous (non-DHT) discovery strategies:
-// external search plugins (if plugins is non-nil) and the local ddisc_media
-// fallback (if knownMediaID resolves to something other than uuid.Nil).
-func SyncStrategies(q sqlx.Queryer, plugins searchplugin.T, knownMediaID string) []DiscoverStrategy {
+// TitleFilter matches Discovered candidates whose Title satisfies req's
+// lucene query, run via duckdbx.Search against the single candidate title.
+type TitleFilter struct {
+	q   sqlx.Queryer
+	req DiscoverRequest
+}
+
+func NewTitleFilter(q sqlx.Queryer, req DiscoverRequest) TitleFilter {
+	return TitleFilter{q: q, req: req}
+}
+
+func (t TitleFilter) Match(ctx context.Context, d Discovered) (bool, error) {
+	var matched bool
+	err := duckdbx.Search(t.req.Title, d.Title).RunWith(t.q).QueryRowContext(ctx).Scan(&matched)
+	if errors.Is(err, sql.ErrNoRows) {
+		return false, nil
+	}
+	return err == nil, err
+}
+
+// ExternalStrategies returns the discovery strategies that reach outside
+// this node's own database: external wasm search plugins (if plugins is
+// non-nil) and the in-process PeerTube/SepiaSearch strategy (if peertube is
+// non-nil). Unlike SyncStrategies, this never includes LocalStrategy - a
+// caller that only wants "what can the outside world tell us" (e.g. a
+// background queue drain populating ddisc_media from scratch) would gain
+// nothing from a strategy that just reads ddisc_media back.
+func ExternalStrategies(q sqlx.Queryer, plugins searchplugin.T, peertube DiscoverStrategy) []DiscoverStrategy {
 	strategies := []DiscoverStrategy{}
 	if plugins != nil {
 		strategies = append(strategies, PluginStrategy(q, plugins))
 	}
+	if peertube != nil {
+		strategies = append(strategies, peertube)
+	}
+	return strategies
+}
+
+// SyncStrategies returns the synchronous (non-DHT) discovery strategies:
+// ExternalStrategies plus the local ddisc_media scan (if knownMediaID
+// resolves to something other than uuid.Nil). All of them always run
+// together via Discover - the local scan is not gated on the external
+// strategies coming up empty.
+func SyncStrategies(q sqlx.Queryer, plugins searchplugin.T, peertube DiscoverStrategy, knownMediaID string) []DiscoverStrategy {
+	strategies := append([]DiscoverStrategy{KnownStrategy(q)}, ExternalStrategies(q, plugins, peertube)...)
 	if knownMediaID != uuid.Nil.String() {
 		strategies = append(strategies, LocalStrategy(q))
 	}

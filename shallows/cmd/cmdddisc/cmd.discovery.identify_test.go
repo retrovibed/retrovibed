@@ -45,6 +45,7 @@ func TestDiscoveryIdentify(t *testing.T) {
 		ddiscapi.NewHTTPDiscovery(
 			q,
 			searchplugin.Unimplemented{},
+			ddisc.UnimplementedStrategy{},
 			ddiscapi.HTTPDiscoveryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/ddisc/discovery").Subrouter())
 		ddiscapi.NewHTTPMedia(
@@ -106,6 +107,7 @@ func TestDiscoveryIdentify(t *testing.T) {
 		ddiscapi.NewHTTPDiscovery(
 			q,
 			searchplugin.Unimplemented{},
+			ddisc.UnimplementedStrategy{},
 			ddiscapi.HTTPDiscoveryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/ddisc/discovery").Subrouter())
 		ddiscapi.NewHTTPMedia(

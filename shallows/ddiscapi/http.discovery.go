@@ -42,10 +42,11 @@ func HTTPDiscoveryOptionJWTSecret(j jwtx.SecretSource) HTTPDiscoveryOption {
 	}
 }
 
-func NewHTTPDiscovery(q sqlx.Queryer, plugins searchplugin.T, options ...HTTPDiscoveryOption) *HTTPDiscovery {
+func NewHTTPDiscovery(q sqlx.Queryer, plugins searchplugin.T, peertube ddisc.DiscoverStrategy, options ...HTTPDiscoveryOption) *HTTPDiscovery {
 	svc := langx.Clone(HTTPDiscovery{
 		q:         q,
 		plugins:   plugins,
+		peertube:  peertube,
 		jwtsecret: env.JWTSecret,
 		decoder:   formx.NewDecoder(),
 	}, options...)
@@ -56,6 +57,7 @@ func NewHTTPDiscovery(q sqlx.Queryer, plugins searchplugin.T, options ...HTTPDis
 type HTTPDiscovery struct {
 	q         sqlx.Queryer
 	plugins   searchplugin.T
+	peertube  ddisc.DiscoverStrategy
 	jwtsecret jwtx.SecretSource
 	decoder   *form.Decoder
 }
@@ -174,8 +176,9 @@ func (t *HTTPDiscovery) websocket(w http.ResponseWriter, r *http.Request) {
 		Adult:        req.Adult,
 	}
 
-	strategies := ddisc.SyncStrategies(t.q, t.plugins, discreq.KnownMediaID)
-	seq := ddisc.Discover(ctx, ddisc.DefaultPolicy(), discreq, strategies...)
+	strategies := ddisc.SyncStrategies(t.q, t.plugins, t.peertube, discreq.KnownMediaID)
+	options := []ddisc.DiscoverOption{ddisc.DiscoverOptionFilter(ddisc.NewTitleFilter(t.q, discreq).Match)}
+	seq := ddisc.Discover(ctx, ddisc.DefaultPolicy(), discreq, options, strategies...)
 
 	var (
 		buf   = bytes.NewBuffer(nil)

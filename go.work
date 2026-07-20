@@ -5,6 +5,5 @@ use (
 	./.eg
 	./console/retrovibedbind
 	./retroapi
-	./retrodsearch
 	./shallows
 )
