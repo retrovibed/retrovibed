@@ -73,7 +73,7 @@ type Command struct {
 	AutoMDNS            bool             `flag:"" name:"auto-mdns" help:"enable the multicast dns service" env:"${env_auto_mdns}" default:"true" negatable:""`
 	AutoBootstrap       bool             `flag:"" name:"auto-bootstrap" help:"bootstrap from a predefined set of peers" env:"${env_auto_bootstrap}" default:"true" negatable:""`
 	AutoDiscovery       bool             `flag:"" name:"auto-discovery" help:"enable automatic discovery of content from peers" env:"${env_auto_discovery}" default:"true" negatable:""`
-	AutoPeerTube        bool             `flag:"" name:"auto-peertube" help:"enable the built-in PeerTube/SepiaSearch discovery strategy" env:"${env_auto_peertube}" default:"true" negatable:""`
+	AutoPeerTube        bool             `flag:"" name:"auto-peertube" help:"enable the built-in PeerTube/SepiaSearch discovery strategy" env:"${env_auto_peertube}" default:"false" negatable:""`
 	PeerTubeDomain      string           `flag:"" name:"peertube-domain" help:"base url of the PeerTube/SepiaSearch instance to search" env:"${env_peertube_domain}" default:"https://sepiasearch.org"`
 	AutoIdentifyMedia   bool             `flag:"" name:"auto-identify-media" help:"enable automatically identifying media" env:"${env_auto_identify_media}" default:"true" negatable:""`
 	AutoLocateMedia     bool             `flag:"" name:"auto-locate-media" help:"enable automatically locating media from distributed index" env:"${env_auto_locate_media}" default:"true" negatable:""`
