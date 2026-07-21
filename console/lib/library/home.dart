@@ -46,10 +46,12 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
+    final compact = defaults.isCompact;
 
     return LayoutBuilder(
       builder: (context, constraints) {
         return Column(
+          verticalDirection: compact ? VerticalDirection.up : VerticalDirection.down,
           children: [
             ValueListenableBuilder<media.MediaSearchState>(
               valueListenable: widget.search,

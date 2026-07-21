@@ -44,7 +44,6 @@ class Grid<T> extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final defaults = Defaults.of(context);
-        final bounded = constraints.maxHeight.isFinite;
         final compact = defaults.isCompact;
         final grid = GridView.builder(
           shrinkWrap: true,
@@ -82,10 +81,7 @@ class Grid<T> extends StatelessWidget {
               spacing: 0,
               children: [
                 ...leading,
-                ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: bounded ? constraints.maxHeight : 0),
-                  child: content,
-                ),
+                content,
                 ...trailing,
               ],
             ),

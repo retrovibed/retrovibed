@@ -7,7 +7,11 @@ class Debug extends StatelessWidget {
   const Debug(this.child, {super.key, this.border});
 
   factory Debug.colored(Widget? child, {Key? key, required Color color}) {
-    return Debug(child, key: key, border: Border.all(color: color));
+    return Debug(
+      child,
+      key: key,
+      border: Border.all(color: color),
+    );
   }
 
   factory Debug.green(Widget? child, {Key? key}) =>
@@ -26,6 +30,10 @@ class Debug extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
+        final mediaQuerySize = MediaQuery.sizeOf(context);
+        print(
+          '${key} mediaQuery width: ${mediaQuerySize.width} height: ${mediaQuerySize.height}',
+        );
         print(
           '${key} width min: ${constraints.minWidth} max: ${constraints.maxWidth}',
         );

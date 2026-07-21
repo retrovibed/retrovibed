@@ -124,8 +124,6 @@ class _DisplayState extends State<Display> {
 
         return SelectionArea(
           child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.start,
             verticalDirection: compact ? VerticalDirection.up : VerticalDirection.down,
             children: [
               meta.DaemonDropdown(
@@ -142,83 +140,78 @@ class _DisplayState extends State<Display> {
                 ],
               ),
               Expanded(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: defaults.padding.horizontal / 2,
-                  ),
-                  child: ds.Overlay(
-                    alignment: Alignment.topLeft,
-                    ds.layout((context, constraints) {
-                      const mainAxisExtent = 192.0;
-                      const crossAxisExtent = 192.0;
-                      int crossAxisCount;
+                child: ds.Constrained(
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: defaults.padding.horizontal / 2,
+                    ),
+                    child: ds.Overlay(
+                      alignment: Alignment.topLeft,
+                      ds.layout((context, constraints) {
+                        const mainAxisExtent = 192.0;
+                        const crossAxisExtent = 192.0;
+                        int crossAxisCount;
 
-                      if (constraints.maxWidth > mainAxisExtent) {
-                        crossAxisCount = constraints.maxWidth ~/ mainAxisExtent;
-                      } else {
-                        crossAxisCount = 1;
-                      }
+                        if (constraints.maxWidth > mainAxisExtent) {
+                          crossAxisCount = constraints.maxWidth ~/ mainAxisExtent;
+                        } else {
+                          crossAxisCount = 1;
+                        }
 
-                      return GridView(
-                        reverse: compact,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: crossAxisCount,
-                          mainAxisExtent: mainAxisExtent,
-                          childAspectRatio: crossAxisExtent / mainAxisExtent,
-                          crossAxisSpacing: defaults.spacing / 2,
-                          mainAxisSpacing: defaults.spacing / 2,
-                        ),
-                        children: [
-                          billing.Card(
-                            onPressed: full,
-                            margin: EdgeInsets.zero,
+                        return GridView(
+                          reverse: compact,
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: crossAxisCount,
+                            mainAxisExtent: mainAxisExtent,
+                            childAspectRatio: crossAxisExtent / mainAxisExtent,
+                            crossAxisSpacing: defaults.spacing / 2,
+                            mainAxisSpacing: defaults.spacing / 2,
                           ),
-                          if (_displaybilling) ...[
-                            billing.ReferralCard(
+                          children: [
+                            billing.Card(
                               onPressed: full,
                               margin: EdgeInsets.zero,
                             ),
-                            billing.InviteCard(margin: EdgeInsets.zero),
-                            quotas.Card(),
+                            if (_displaybilling) ...[
+                              billing.ReferralCard(
+                                onPressed: full,
+                                margin: EdgeInsets.zero,
+                              ),
+                              billing.InviteCard(margin: EdgeInsets.zero),
+                              quotas.Card(),
+                            ],
+                            profiles.Card(
+                              onPressed: authn.developer(context).debug ? full : null,
+                            ),
+                            rss.Card(
+                              onPressed: full,
+                              margin: EdgeInsets.zero,
+                            ),
+                            wireguard.Card(
+                              onPressed: full,
+                              margin: EdgeInsets.zero,
+                            ),
+                            usermanagement.Card(
+                              onPressed: full,
+                              margin: EdgeInsets.zero,
+                            ),
+                            google.Card(onPressed: full),
+                            ds.LongHold(
+                              onHold: () {
+                                masked(
+                                  debug.DeveloperSettings(),
+                                );
+                              },
+                              child: debug.Card(margin: EdgeInsets.zero),
+                            ),
+                            if (authn.developer(context).debug)
+                              debug.MeteredCard(onPressed: full, margin: EdgeInsets.zero),
+                            if (authn.developer(context).debug)
+                              debug.DiagnosticsCard(onPressed: full, margin: EdgeInsets.zero),
                           ],
-                          profiles.Card(
-                            onPressed: authn.developer(context).debug ? full : null,
-                          ),
-                          rss.Card(
-                            onPressed: full,
-                            margin: EdgeInsets.zero,
-                          ),
-                          wireguard.Card(
-                            onPressed: full,
-                            margin: EdgeInsets.zero,
-                          ),
-                          usermanagement.Card(
-                            onPressed: full,
-                            margin: EdgeInsets.zero,
-                          ),
-                          google.Card(onPressed: full),
-                          ds.LongHold(
-                            onHold: () {
-                              masked(
-                                debug.DeveloperSettings(),
-                              );
-                            },
-                            child: debug.Card(margin: EdgeInsets.zero),
-                          ),
-                          if (authn.developer(context).debug)
-                            debug.MeteredCard(onPressed: full, margin: EdgeInsets.zero),
-                          if (authn.developer(context).debug)
-                            debug.DiagnosticsCard(onPressed: full, margin: EdgeInsets.zero),
-                        ],
-                      );
-                    }),
-                    overlay: MediaQuery(
-                      data: MediaQuery.of(context).copyWith(
-                        padding: EdgeInsets.only(
-                          top: 139,
-                        ), // compensate for the dropdown and titlebar
-                      ),
-                      child: _overlay,
+                        );
+                      }),
+                      overlay: _overlay,
                     ),
                   ),
                 ),

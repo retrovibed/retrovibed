@@ -10,6 +10,7 @@ export 'design.kit/buttons.dart';
 export 'design.kit/buttons.loading.icon.dart';
 export 'design.kit/buttons.loading.tile.dart';
 export 'design.kit/buttons.loading.widget.dart';
+export 'design.kit/constrained.dart';
 export 'design.kit/carousel.dart';
 export 'design.kit/card.dart';
 export 'design.kit/confirmation.dart';
