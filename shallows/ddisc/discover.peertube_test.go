@@ -15,10 +15,10 @@ func TestPeerTubeStrategyYieldsRealInfohash(t *testing.T) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/v1/search/videos", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, "ubuntu", r.URL.Query().Get("search"))
-		fmt.Fprint(w, `{"total":1,"data":[{"uuid":"abc-123","name":"Ubuntu Documentary","description":"a documentary about ubuntu"}]}`)
+		_, _ = fmt.Fprint(w, `{"total":1,"data":[{"uuid":"abc-123","name":"Ubuntu Documentary","description":"a documentary about ubuntu"}]}`)
 	})
 	mux.HandleFunc("GET /api/v1/videos/abc-123", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, `{"files":[{"resolution":{"id":1080},"magnetUri":"magnet:?xt=urn:btih:1111111111111111111111111111111111111111"}]}`)
+		_, _ = fmt.Fprint(w, `{"files":[{"resolution":{"id":1080},"magnetUri":"magnet:?xt=urn:btih:1111111111111111111111111111111111111111"}]}`)
 	})
 	srv := httptest.NewServer(mux)
 	t.Cleanup(srv.Close)
@@ -54,10 +54,10 @@ func TestPeerTubeStrategyNoopsWithoutTitle(t *testing.T) {
 func TestPeerTubeStrategySkipsFileWithNoMagnet(t *testing.T) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/v1/search/videos", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, `{"total":1,"data":[{"uuid":"abc-123","name":"Ubuntu Documentary"}]}`)
+		_, _ = fmt.Fprint(w, `{"total":1,"data":[{"uuid":"abc-123","name":"Ubuntu Documentary"}]}`)
 	})
 	mux.HandleFunc("GET /api/v1/videos/abc-123", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, `{"files":[{"resolution":{"id":1080},"magnetUri":""}]}`)
+		_, _ = fmt.Fprint(w, `{"files":[{"resolution":{"id":1080},"magnetUri":""}]}`)
 	})
 	srv := httptest.NewServer(mux)
 	t.Cleanup(srv.Close)
@@ -76,10 +76,10 @@ func TestPeerTubeStrategySkipsFileWithNoMagnet(t *testing.T) {
 func TestPeerTubeStrategyPicksHighestResolutionMagnet(t *testing.T) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/v1/search/videos", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, `{"total":1,"data":[{"uuid":"abc-123","name":"Ubuntu Documentary"}]}`)
+		_, _ = fmt.Fprint(w, `{"total":1,"data":[{"uuid":"abc-123","name":"Ubuntu Documentary"}]}`)
 	})
 	mux.HandleFunc("GET /api/v1/videos/abc-123", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, `{"files":[
+		_, _ = fmt.Fprint(w, `{"files":[
 			{"resolution":{"id":480},"magnetUri":"magnet:?xt=urn:btih:4444444444444444444444444444444444444444"},
 			{"resolution":{"id":1080},"magnetUri":"magnet:?xt=urn:btih:5555555555555555555555555555555555555555"},
 			{"resolution":{"id":720},"magnetUri":""}
@@ -103,10 +103,10 @@ func TestPeerTubeStrategyPicksHighestResolutionMagnet(t *testing.T) {
 func TestPeerTubeStrategySkipsVideoWithNoFiles(t *testing.T) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/v1/search/videos", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, `{"total":1,"data":[{"uuid":"abc-123","name":"Ubuntu Documentary"}]}`)
+		_, _ = fmt.Fprint(w, `{"total":1,"data":[{"uuid":"abc-123","name":"Ubuntu Documentary"}]}`)
 	})
 	mux.HandleFunc("GET /api/v1/videos/abc-123", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, `{"files":[]}`)
+		_, _ = fmt.Fprint(w, `{"files":[]}`)
 	})
 	srv := httptest.NewServer(mux)
 	t.Cleanup(srv.Close)
@@ -127,15 +127,15 @@ func TestPeerTubeStrategyPaginatesUntilTotalReached(t *testing.T) {
 	mux.HandleFunc("GET /api/v1/search/videos", func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Query().Get("start") {
 		case "0":
-			fmt.Fprint(w, `{"total":2,"data":[{"uuid":"v1","name":"one"}]}`)
+			_, _ = fmt.Fprint(w, `{"total":2,"data":[{"uuid":"v1","name":"one"}]}`)
 		case "1":
-			fmt.Fprint(w, `{"total":2,"data":[{"uuid":"v2","name":"two"}]}`)
+			_, _ = fmt.Fprint(w, `{"total":2,"data":[{"uuid":"v2","name":"two"}]}`)
 		default:
 			t.Fatalf("unexpected start=%s", r.URL.Query().Get("start"))
 		}
 	})
 	mux.HandleFunc("GET /api/v1/videos/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, `{"files":[{"resolution":{"id":720},"magnetUri":"magnet:?xt=urn:btih:2222222222222222222222222222222222222222"}]}`)
+		_, _ = fmt.Fprint(w, `{"files":[{"resolution":{"id":720},"magnetUri":"magnet:?xt=urn:btih:2222222222222222222222222222222222222222"}]}`)
 	})
 	srv := httptest.NewServer(mux)
 	t.Cleanup(srv.Close)
@@ -159,14 +159,14 @@ func TestPeerTubeStrategyCapsAtMaxResults(t *testing.T) {
 		switch r.URL.Query().Get("start") {
 		case "0":
 			require.Equal(t, "1", r.URL.Query().Get("count"))
-			fmt.Fprint(w, `{"total":2,"data":[{"uuid":"v1","name":"one"}]}`)
+			_, _ = fmt.Fprint(w, `{"total":2,"data":[{"uuid":"v1","name":"one"}]}`)
 		default:
 			page2Fetched = true
-			fmt.Fprint(w, `{"total":2,"data":[{"uuid":"v2","name":"two"}]}`)
+			_, _ = fmt.Fprint(w, `{"total":2,"data":[{"uuid":"v2","name":"two"}]}`)
 		}
 	})
 	mux.HandleFunc("GET /api/v1/videos/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, `{"files":[{"resolution":{"id":720},"magnetUri":"magnet:?xt=urn:btih:3333333333333333333333333333333333333333"}]}`)
+		_, _ = fmt.Fprint(w, `{"files":[{"resolution":{"id":720},"magnetUri":"magnet:?xt=urn:btih:3333333333333333333333333333333333333333"}]}`)
 	})
 	srv := httptest.NewServer(mux)
 	t.Cleanup(srv.Close)
@@ -185,14 +185,14 @@ func TestPeerTubeStrategyFetchesDetailFromRowOrigin(t *testing.T) {
 	var originHit bool
 	origin.HandleFunc("GET /api/v1/videos/abc-123", func(w http.ResponseWriter, r *http.Request) {
 		originHit = true
-		fmt.Fprint(w, `{"files":[{"resolution":{"id":1080},"magnetUri":"magnet:?xt=urn:btih:6666666666666666666666666666666666666666"}]}`)
+		_, _ = fmt.Fprint(w, `{"files":[{"resolution":{"id":1080},"magnetUri":"magnet:?xt=urn:btih:6666666666666666666666666666666666666666"}]}`)
 	})
 	originSrv := httptest.NewServer(origin)
 	t.Cleanup(originSrv.Close)
 
 	index := http.NewServeMux()
 	index.HandleFunc("GET /api/v1/search/videos", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, `{"total":1,"data":[{"uuid":"abc-123","name":"Ubuntu Documentary","url":"%s/videos/watch/abc-123"}]}`, originSrv.URL)
+		_, _ = fmt.Fprintf(w, `{"total":1,"data":[{"uuid":"abc-123","name":"Ubuntu Documentary","url":"%s/videos/watch/abc-123"}]}`, originSrv.URL)
 	})
 	index.HandleFunc("GET /api/v1/videos/abc-123", func(w http.ResponseWriter, r *http.Request) {
 		t.Fatal("must not fetch video detail from the index domain when the row carries its own origin url")
@@ -219,7 +219,7 @@ func TestPeerTubeStrategyForwardsAdultToNSFWParam(t *testing.T) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/v1/search/videos", func(w http.ResponseWriter, r *http.Request) {
 		gotNSFW = r.URL.Query().Get("nsfw")
-		fmt.Fprint(w, `{"total":0,"data":[]}`)
+		_, _ = fmt.Fprint(w, `{"total":0,"data":[]}`)
 	})
 	srv := httptest.NewServer(mux)
 	t.Cleanup(srv.Close)
