@@ -43,7 +43,7 @@ func GenerateBinding(ctx context.Context, _ eg.Op) error {
 	runtime := flutterRuntimev2(shell.Runtime())
 	return shell.Run(
 		ctx,
-		runtime.New("go -C retrovibedbind build -buildmode=c-shared -buildvcs=true --tags duckdb_use_lib -o ../build/nativelib/libretrovibed.so ./..."),
+		runtime.New("go -C retrovibedbind build -buildmode=c-shared -buildvcs=true --tags duckdb_use_lib,retrovibed,neural -o ../build/nativelib/libretrovibed.so ./..."),
 		runtime.New("dart run ffigen --config ffigen.yaml"),
 	)
 }
@@ -53,7 +53,7 @@ func CompileBinding(b *tarballs.Build) eg.OpFn {
 		runtime := flutterRuntimev2(shell.Runtime())
 		return shell.Run(
 			ctx,
-			runtime.New("go -C retrovibedbind build -buildmode=c-shared -buildvcs=true --tags duckdb_use_lib -o ../build/nativelib/libretrovibed.so ."),
+			runtime.New("go -C retrovibedbind build -buildmode=c-shared -buildvcs=true --tags duckdb_use_lib,retrovibed,neural -o ../build/nativelib/libretrovibed.so ."),
 		)
 	}
 }
@@ -63,7 +63,7 @@ func GenerateDevBinding(runtime shell.Command, outdir string, staticdirs ...stri
 		runtime := flutterRuntimev2(runtime)
 		return shell.Run(
 			ctx,
-			runtime.New("go -C retrovibedbind build -buildmode=c-shared -buildvcs=true --tags duckdb_use_lib,localdev -o ${OUTPUT}/libretrovibed.so ./...").
+			runtime.New("go -C retrovibedbind build -buildmode=c-shared -buildvcs=true --tags duckdb_use_lib,localdev,retrovibed,neural -o ${OUTPUT}/libretrovibed.so ./...").
 				Environ("OUTPUT", outdir),
 			runtime.New("dart run ffigen --config ffigen.yaml"),
 		)

@@ -24,7 +24,7 @@ build() {
   install -d -m 755 "${srcdir}/.dist/usr/bin"
   cp -r "${srcdir}/${pkgname}/.dist/linux/"* "${srcdir}/.dist"
   GOBIN="${srcdir}/.dist/usr/bin" go build -C "${srcdir}/${pkgname}/shallows" \
-    -buildmode=pie -trimpath -tags "duckdb_use_lib" -buildvcs=false \
+    -buildmode=pie -trimpath -tags "duckdb_use_lib,retrovibed,neural" -buildvcs=false \
     -o "${srcdir}/.dist/usr/bin" ./cmd/retrovibe/...
 }
 
