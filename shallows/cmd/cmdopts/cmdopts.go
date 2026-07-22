@@ -104,5 +104,5 @@ func (t *SSHID) Signer() (signer ssh.Signer, err error) {
 }
 
 type Endpoint struct {
-	Endpoint string `flag:"" name:"peer" help:"http address for the retrovibed daemon" default:"https://localhost:9998" env:"${env_http_endpoint}"`
+	Endpoint string `flag:"" name:"endpoint" help:"http address for the retrovibed daemon" default:"https://localhost:9998" env:"${env_http_endpoint}"`
 }

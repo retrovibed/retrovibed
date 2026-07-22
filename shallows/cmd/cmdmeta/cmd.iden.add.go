@@ -18,11 +18,11 @@ import (
 )
 
 type IdenAdd struct {
-	Endpoint  string `flag:"" name:"endpoint" help:"http address of the retrovibed instance" default:"localhost:9998"`
+	// Endpoint  string `flag:"" name:"endpoint" help:"http address of the retrovibed instance" default:"localhost:9998"`
 	PublicKey string `arg:"" name:"pubkey" help:"public key to add" required:"true"`
 }
 
-func (t IdenAdd) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.SSHID) (err error) {
+func (t IdenAdd) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.SSHID, daemon *cmdopts.Endpoint) (err error) {
 	ctx, done := context.WithTimeout(gctx.Context, 10*time.Second)
 	defer done()
 
@@ -31,13 +31,13 @@ func (t IdenAdd) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.S
 		return errorsx.Wrap(err, "failed to create signer")
 	}
 
-	c := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(fmt.Sprintf("https://%s", t.Endpoint)), authn.SSHTokenSourceOptionSigner(signer))
-	cc := authn.AuthzClientLibrary(tls.Config(), c, t.Endpoint)
+	c := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(daemon.Endpoint), authn.SSHTokenSourceOptionSigner(signer))
+	cc := authn.AuthzClientLibrary(tls.Config(), c, daemon.Endpoint)
 
-	return t.run(ctx, cc)
+	return t.run(ctx, daemon.Endpoint, cc)
 }
 
-func (t IdenAdd) run(ctx context.Context, c *http.Client) (err error) {
+func (t IdenAdd) run(ctx context.Context, endpoint string, c *http.Client) (err error) {
 	pubkey, comment, _, _, err := ssh.ParseAuthorizedKey([]byte(t.PublicKey))
 	if err != nil {
 		return errorsx.Wrap(err, "invalid public key")
@@ -53,7 +53,12 @@ func (t IdenAdd) run(ctx context.Context, c *http.Client) (err error) {
 		return errorsx.Wrap(err, "unable to encode request")
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, fmt.Sprintf("https://%s/meta/u12t/", t.Endpoint), bytes.NewReader(encoded))
+	req, err := http.NewRequestWithContext(
+		ctx,
+		http.MethodPost,
+		fmt.Sprintf("%s/meta/u12t/", endpoint),
+		bytes.NewReader(encoded),
+	)
 	if err != nil {
 		return errorsx.Wrap(err, "unable to create http request")
 	}
@@ -76,7 +81,14 @@ func (t IdenAdd) run(ctx context.Context, c *http.Client) (err error) {
 		return errorsx.Wrap(err, "unable to encode authz request")
 	}
 
-	req, err = http.NewRequestWithContext(ctx, http.MethodPost, fmt.Sprintf("https://%s/meta/authz/%s", t.Endpoint, result.Profile.GetId()), bytes.NewReader(encoded))
+	req, err = http.NewRequestWithContext(ctx,
+		http.MethodPost,
+		fmt.Sprintf("%s/meta/authz/%s",
+			endpoint,
+			result.Profile.GetId(),
+		),
+		bytes.NewReader(encoded),
+	)
 	if err != nil {
 		return errorsx.Wrap(err, "unable to create authz http request")
 	}

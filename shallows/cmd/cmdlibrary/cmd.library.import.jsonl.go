@@ -21,9 +21,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/media"
 )
 
-type importJSONL struct {
-	Endpoint string `flag:"" name:"peer" help:"http address for the daemon you want to import to" default:"localhost:9998"`
-}
+type importJSONL struct{}
 
 func (t importJSONL) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, daemon *cmdopts.Endpoint) error {
 	c := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(daemon.Endpoint))
@@ -125,7 +123,9 @@ func (t importJSONL) importItem(ctx context.Context, c *http.Client, endpoint st
 		return err
 	}
 
-	patchReq, err := http.NewRequestWithContext(ctx, http.MethodPost,
+	patchReq, err := http.NewRequestWithContext(
+		ctx,
+		http.MethodPost,
 		endpoint+"/m/"+uploadResp.Media.Id+"/metadatasync",
 		bytes.NewReader(patch))
 	if err != nil {
