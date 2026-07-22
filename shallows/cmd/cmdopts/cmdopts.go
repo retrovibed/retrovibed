@@ -102,3 +102,7 @@ func (t *SSHID) Signer() (signer ssh.Signer, err error) {
 	signer, err = sshx.Load(t.KeyPath)
 	return signer, errors.Wrapf(err, "failed to generate signer: %s", t.KeyPath)
 }
+
+type Endpoint struct {
+	Endpoint string `flag:"" name:"peer" help:"http address for the retrovibed daemon" default:"https://localhost:9998" env:"${env_http_endpoint}"`
+}

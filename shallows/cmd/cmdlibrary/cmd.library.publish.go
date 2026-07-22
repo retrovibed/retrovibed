@@ -23,16 +23,15 @@ import (
 )
 
 type cmdPublish struct {
-	Endpoint string `flag:"" name:"peer" help:"http address for the retrovibed daemon" default:"https://localhost:9998"`
-	DryRun   bool   `flag:"" name:"dry-run" help:"print what would be published without actually publishing" negatable:"" default:"true"`
+	DryRun bool `flag:"" name:"dry-run" help:"print what would be published without actually publishing" negatable:"" default:"true"`
 }
 
-func (t cmdPublish) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig) (err error) {
-	httpc := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(t.Endpoint))
-	return t.run(gctx.Context, jsonl.NewEncoder(os.Stdout), os.Stdin, httpc)
+func (t cmdPublish) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, daemon *cmdopts.Endpoint) (err error) {
+	httpc := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(daemon.Endpoint))
+	return t.run(gctx.Context, daemon.Endpoint, jsonl.NewEncoder(os.Stdout), os.Stdin, httpc)
 }
 
-func (t cmdPublish) run(ctx context.Context, enc *jsonl.Encoder, r io.Reader, c *http.Client) error {
+func (t cmdPublish) run(ctx context.Context, endpoint string, enc *jsonl.Encoder, r io.Reader, c *http.Client) error {
 	var com communityapi.Community
 
 	debugx.Println("reading community from stdin")
@@ -51,7 +50,7 @@ func (t cmdPublish) run(ctx context.Context, enc *jsonl.Encoder, r io.Reader, c 
 			continue
 		}
 
-		resp, err := t.publishItem(ctx, c, &com, lmd.ID)
+		resp, err := t.publishItem(ctx, endpoint, c, &com, lmd.ID)
 		if err != nil {
 			return errorsx.Wrapf(err, "failed to publish library content: %s", lmd.ID)
 		}
@@ -64,7 +63,7 @@ func (t cmdPublish) run(ctx context.Context, enc *jsonl.Encoder, r io.Reader, c 
 	return errorsx.Ignore(derr, io.EOF)
 }
 
-func (t cmdPublish) publishItem(ctx context.Context, c *http.Client, com *communityapi.Community, libraryID string) (*communityapi.PublishContentResponse, error) {
+func (t cmdPublish) publishItem(ctx context.Context, endpoint string, c *http.Client, com *communityapi.Community, libraryID string) (*communityapi.PublishContentResponse, error) {
 	var (
 		err  error
 		req  *http.Request
@@ -83,7 +82,7 @@ func (t cmdPublish) publishItem(ctx context.Context, c *http.Client, com *commun
 		return nil, err
 	}
 
-	uri := fmt.Sprintf("%s/c/p/%s", t.Endpoint, com.Id)
+	uri := fmt.Sprintf("%s/c/p/%s", endpoint, com.Id)
 	if req, err = http.NewRequestWithContext(ctx, http.MethodPost, uri, bytes.NewReader(body)); err != nil {
 		return nil, err
 	}

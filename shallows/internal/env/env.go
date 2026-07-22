@@ -33,8 +33,8 @@ const (
 	DeeppoolEndpoint = "RETROVIBED_META_ENDPOINT"
 
 	// JWTSharedSecret used to create jwt tokens
-	JWTSharedSecret = "RETROVIBED_JWT_SECRET"
-
+	JWTSharedSecret            = "RETROVIBED_JWT_SECRET"
+	Endpoint                   = "RETROVIBED_HTTP_ENDPOINT"                    // http address for the retrovibed daemon
 	NeuralMediaID              = "RETROVIBED_NEURALS_MEDIA_ID"                 // model for extracting media metadata from essentially file names. used in identification of media.
 	AutoDownloadNeurals        = "RETROVIBED_NEURALS_AUTODOWNLOAD"             // enable/disable automatically downloading ai models.
 	AutoDownloadMetadata       = "RETROVIBED_METADATA_AUTODOWNLOAD"            // enable/disable automatically downloading metadata.

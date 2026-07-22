@@ -54,6 +54,7 @@ func Main(args ...string) {
 		cmdopts.TLSConfig
 		cmdopts.PeerID
 		cmdopts.SSHID
+		cmdopts.Endpoint
 		Version   cmdopts.Version        `cmd:"" help:"display versioning information"`
 		Identity  cmdmeta.Identity       `cmd:"" help:"identity management commands"`
 		Cloud     cmdmeta.Cloud          `cmd:"" name:"cloud" help:"retrovibe.space cloud service commands"`
@@ -141,6 +142,7 @@ func Main(args ...string) {
 			"vars_cores":                        strconv.Itoa(runtime.GOMAXPROCS(0)),
 			"vars_downloads_directory":          userx.DefaultDownloadDirectory(),
 			"vars_media_directory":              env.MediaDir(),
+			"env_http_endpoint":                 env.Endpoint,
 			"env_auto_mdns":                     env.AutoMDNS,
 			"env_auto_bootstrap":                env.AutoBootstrap,
 			"env_auto_discovery":                env.AutoDiscovery,

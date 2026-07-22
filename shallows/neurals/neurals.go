@@ -1,5 +1,7 @@
 package neurals
 
+import "github.com/retrovibed/retrovibed/shallows/internal/langx"
+
 type Text struct {
 	model     string
 	seqLen    int
@@ -44,7 +46,7 @@ func (t TextOption) OutputLen(n int) TextOption {
 }
 
 func NewText(path string, options ...func(*Text)) *Text {
-	t := Text{
+	return new(langx.Clone(Text{
 		model:     path,
 		seqLen:    256,
 		numTokens: 4096,
@@ -52,11 +54,7 @@ func NewText(path string, options ...func(*Text)) *Text {
 		bos:       1,
 		eos:       2,
 		outputLen: 4096,
-	}
-	for _, o := range options {
-		o(&t)
-	}
-	return &t
+	}, options...))
 }
 
 func (t *Text) Predict(input string) (string, error) {
