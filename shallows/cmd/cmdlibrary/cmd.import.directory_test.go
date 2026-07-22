@@ -73,8 +73,8 @@ func TestImportDirectory(t *testing.T) {
 		require.NoError(t, os.WriteFile(filepath.Join(dir, "b.mp4"), []byte("more video"), 0600))
 
 		var buf bytes.Buffer
-		cmd := importDirectory{Endpoint: "localhost:9998", Concurrency: 1, Directory: dir}
-		require.NoError(t, cmd.run(ctx, jsonl.NewEncoder(&buf), newImportDirectoryServer(t, q)))
+		cmd := importDirectory{Concurrency: 1, Directory: dir}
+		require.NoError(t, cmd.run(ctx, "https://localhost:9998", jsonl.NewEncoder(&buf), newImportDirectoryServer(t, q)))
 
 		require.Equal(t, 2, testx.Must(sqlx.Count(ctx, q, "SELECT COUNT(*) FROM library_metadata"))(t))
 		require.Len(t, decodeAll(t, &buf), 2)
@@ -90,8 +90,8 @@ func TestImportDirectory(t *testing.T) {
 		require.NoError(t, os.MkdirAll(filepath.Join(dir, "subdir"), 0700))
 		require.NoError(t, os.WriteFile(filepath.Join(dir, "subdir", "nested.mp4"), []byte("nested"), 0600))
 
-		cmd := importDirectory{Endpoint: "localhost:9998", Concurrency: 1, Directory: dir}
-		require.NoError(t, cmd.run(ctx, jsonl.NewEncoder(&bytes.Buffer{}), newImportDirectoryServer(t, q)))
+		cmd := importDirectory{Concurrency: 1, Directory: dir}
+		require.NoError(t, cmd.run(ctx, "https://localhost:9998", jsonl.NewEncoder(&bytes.Buffer{}), newImportDirectoryServer(t, q)))
 
 		require.Equal(t, 2, testx.Must(sqlx.Count(ctx, q, "SELECT COUNT(*) FROM library_metadata"))(t))
 	})
@@ -102,8 +102,8 @@ func TestImportDirectory(t *testing.T) {
 
 		q := sqltestx.Metadatabase(t)
 
-		cmd := importDirectory{Endpoint: "localhost:9998", Concurrency: 1, Directory: t.TempDir()}
-		require.NoError(t, cmd.run(ctx, jsonl.NewEncoder(&bytes.Buffer{}), newImportDirectoryServer(t, q)))
+		cmd := importDirectory{Concurrency: 1, Directory: t.TempDir()}
+		require.NoError(t, cmd.run(ctx, "https://localhost:9998", jsonl.NewEncoder(&bytes.Buffer{}), newImportDirectoryServer(t, q)))
 
 		require.Equal(t, 0, testx.Must(sqlx.Count(ctx, q, "SELECT COUNT(*) FROM library_metadata"))(t))
 	})
@@ -118,8 +118,8 @@ func TestImportDirectory(t *testing.T) {
 		require.NoError(t, os.WriteFile(filepath.Join(dir, "my-video.mp4"), []byte("data"), 0600))
 
 		var buf bytes.Buffer
-		cmd := importDirectory{Endpoint: "localhost:9998", Concurrency: 1, Directory: dir, DirectoryPrefix: true}
-		require.NoError(t, cmd.run(ctx, jsonl.NewEncoder(&buf), newImportDirectoryServer(t, q)))
+		cmd := importDirectory{Concurrency: 1, Directory: dir, DirectoryPrefix: true}
+		require.NoError(t, cmd.run(ctx, "https://localhost:9998", jsonl.NewEncoder(&buf), newImportDirectoryServer(t, q)))
 
 		results := decodeAll(t, &buf)
 		require.Len(t, results, 1)
@@ -139,8 +139,8 @@ func TestImportDirectory(t *testing.T) {
 		require.NoError(t, os.WriteFile(filepath.Join(dir, "my-video.mp4"), []byte("data"), 0600))
 
 		var buf bytes.Buffer
-		cmd := importDirectory{Endpoint: "localhost:9998", Concurrency: 1, Directory: dir, DirectoryPrefix: false}
-		require.NoError(t, cmd.run(ctx, jsonl.NewEncoder(&buf), newImportDirectoryServer(t, q)))
+		cmd := importDirectory{Concurrency: 1, Directory: dir, DirectoryPrefix: false}
+		require.NoError(t, cmd.run(ctx, "https://localhost:9998", jsonl.NewEncoder(&buf), newImportDirectoryServer(t, q)))
 
 		results := decodeAll(t, &buf)
 		require.Len(t, results, 1)
@@ -161,8 +161,8 @@ func TestImportDirectory(t *testing.T) {
 		require.NoError(t, os.WriteFile(filepath.Join(dir, "unknown.xyz"), []byte("unknown data"), 0600))
 
 		var buf bytes.Buffer
-		cmd := importDirectory{Endpoint: "localhost:9998", Concurrency: 1, Directory: dir, DirectoryPrefix: true}
-		require.NoError(t, cmd.run(ctx, jsonl.NewEncoder(&buf), newImportDirectoryServer(t, q)))
+		cmd := importDirectory{Concurrency: 1, Directory: dir, DirectoryPrefix: true}
+		require.NoError(t, cmd.run(ctx, "https://localhost:9998", jsonl.NewEncoder(&buf), newImportDirectoryServer(t, q)))
 
 		results := decodeAll(t, &buf)
 		require.Len(t, results, 2)
@@ -188,8 +188,8 @@ func TestImportDirectory(t *testing.T) {
 		require.NoError(t, os.WriteFile(filepath.Join(dir, "unknown.xyz"), []byte("unknown data"), 0600))
 
 		var buf bytes.Buffer
-		cmd := importDirectory{Endpoint: "localhost:9998", Concurrency: 1, Mimetype: "video/quicktime", Directory: dir}
-		require.NoError(t, cmd.run(ctx, jsonl.NewEncoder(&buf), newImportDirectoryServer(t, q)))
+		cmd := importDirectory{Concurrency: 1, Mimetype: "video/quicktime", Directory: dir}
+		require.NoError(t, cmd.run(ctx, "https://localhost:9998", jsonl.NewEncoder(&buf), newImportDirectoryServer(t, q)))
 
 		results := decodeAll(t, &buf)
 		require.Len(t, results, 2)
@@ -211,8 +211,8 @@ func TestImportDirectory(t *testing.T) {
 		require.NoError(t, os.WriteFile(filepath.Join(dir, "clip.mp4"), []byte("content"), 0600))
 
 		var buf bytes.Buffer
-		cmd := importDirectory{Endpoint: "localhost:9998", Concurrency: 1, Directory: dir, DirectoryPrefix: true}
-		require.NoError(t, cmd.run(ctx, jsonl.NewEncoder(&buf), newImportDirectoryServer(t, q)))
+		cmd := importDirectory{Concurrency: 1, Directory: dir, DirectoryPrefix: true}
+		require.NoError(t, cmd.run(ctx, "https://localhost:9998", jsonl.NewEncoder(&buf), newImportDirectoryServer(t, q)))
 
 		results := decodeAll(t, &buf)
 		require.Len(t, results, 1)

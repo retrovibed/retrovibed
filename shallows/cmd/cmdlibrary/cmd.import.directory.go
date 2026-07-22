@@ -27,19 +27,18 @@ import (
 )
 
 type importDirectory struct {
-	Endpoint        string `flag:"" name:"peer" help:"http address for the daemon you want to import to" default:"localhost:9998"`
 	Concurrency     uint16 `flag:"" name:"concurrency" help:"number of files to upload concurrently, defaults to the number of cpus" default:"${vars_cores}"`
 	Mimetype        string `flag:"" name:"mimetype" help:"override the mimetype for all uploaded files" optional:""`
 	DirectoryPrefix bool   `flag:"" name:"directory-prefix" help:"whether to include the directory in the filename or not" negatable:"" default:"true"`
 	Directory       string `arg:"" name:"directory" help:"directory to import; each immediate file is uploaded to the library"`
 }
 
-func (t importDirectory) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig) error {
-	c := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(fmt.Sprintf("https://%s", t.Endpoint)))
-	return t.run(gctx.Context, jsonl.NewEncoder(os.Stdout), c)
+func (t importDirectory) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, daemon *cmdopts.Endpoint) error {
+	c := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(daemon.Endpoint))
+	return t.run(gctx.Context, daemon.Endpoint, jsonl.NewEncoder(os.Stdout), c)
 }
 
-func (t importDirectory) run(ctx context.Context, enc *jsonl.Encoder, c *http.Client) error {
+func (t importDirectory) run(ctx context.Context, endpoint string, enc *jsonl.Encoder, c *http.Client) error {
 	type Workload struct {
 		Path  string
 		Entry fs.DirEntry
@@ -88,7 +87,7 @@ func (t importDirectory) run(ctx context.Context, enc *jsonl.Encoder, c *http.Cl
 		}
 		defer body.Close()
 
-		req, err := http.NewRequestWithContext(ctx, http.MethodPost, fmt.Sprintf("https://%s/m/", t.Endpoint), body)
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, fmt.Sprintf("%s/m/", endpoint), body)
 		if err != nil {
 			return err
 		}
