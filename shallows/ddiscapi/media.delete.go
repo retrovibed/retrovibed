@@ -11,7 +11,7 @@ import (
 
 // MediaDelete removes a media entry, identified by id, on the given library endpoint.
 func MediaDelete(ctx context.Context, c *http.Client, endpoint string, id string) (resp *MediaDeleteResponse, err error) {
-	hreq, err := http.NewRequestWithContext(ctx, http.MethodDelete, fmt.Sprintf("https://%s/ddisc/media/%s", endpoint, id), nil)
+	hreq, err := http.NewRequestWithContext(ctx, http.MethodDelete, fmt.Sprintf("%s/ddisc/media/%s", endpoint, id), nil)
 	if err != nil {
 		return nil, errorsx.Wrap(err, "unable to create http request")
 	}

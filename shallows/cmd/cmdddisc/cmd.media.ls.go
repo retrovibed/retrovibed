@@ -14,7 +14,6 @@ import (
 )
 
 type cmdMediaLs struct {
-	Endpoint     string        `flag:"" name:"library" help:"http address for the library you want to query" default:"localhost:9998"`
 	Query        string        `flag:"" name:"query" help:"lucene text search (default field: description)" default:""`
 	KnownMediaID string        `flag:"" name:"known-media-id" help:"filter by known media id"`
 	NextCheck    time.Duration `flag:"" name:"next-check" help:"only show entries due within the the next window" default:"30m"`
@@ -23,14 +22,14 @@ type cmdMediaLs struct {
 	Indexing     bool          `flag:"" name:"indexing" help:"only show media still pending identification"`
 }
 
-func (t cmdMediaLs) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.SSHID) (err error) {
+func (t cmdMediaLs) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.SSHID, daemon *cmdopts.Endpoint) (err error) {
 	signer, err := id.Signer()
 	if err != nil {
 		return errorsx.Wrap(err, "failed to create signer")
 	}
 
-	c := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(fmt.Sprintf("https://%s", t.Endpoint)), authn.SSHTokenSourceOptionSigner(signer))
-	cc := authn.AuthzClientLibrary(tls.Config(), c, t.Endpoint)
+	c := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(daemon.Endpoint), authn.SSHTokenSourceOptionSigner(signer))
+	cc := authn.AuthzClientLibrary(tls.Config(), c, daemon.Endpoint)
 
 	knownMediaID := t.KnownMediaID
 	switch {
@@ -40,7 +39,7 @@ func (t cmdMediaLs) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopt
 		knownMediaID = uuid.Max.String()
 	}
 
-	result, err := ddiscapi.MediaSearch(gctx.Context, cc, t.Endpoint, &ddiscapi.MediaSearchRequest{
+	result, err := ddiscapi.MediaSearch(gctx.Context, cc, daemon.Endpoint, &ddiscapi.MediaSearchRequest{
 		Query:        t.Query,
 		KnownMediaId: knownMediaID,
 		Id:           t.ID,

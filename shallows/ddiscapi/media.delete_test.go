@@ -28,7 +28,7 @@ func TestMediaDelete(t *testing.T) {
 		c := &http.Client{}
 		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
 
-		_, err := ddiscapi.MediaDelete(t.Context(), c, "example.com", "some-id")
+		_, err := ddiscapi.MediaDelete(t.Context(), c, srv.URL, "some-id")
 		require.NoError(t, err)
 	})
 
@@ -41,7 +41,7 @@ func TestMediaDelete(t *testing.T) {
 		c := &http.Client{}
 		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
 
-		_, err := ddiscapi.MediaDelete(t.Context(), c, "example.com", "some-id")
+		_, err := ddiscapi.MediaDelete(t.Context(), c, srv.URL, "some-id")
 		require.Error(t, err)
 	})
 }

@@ -2,7 +2,6 @@ package cmdddisc
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -21,21 +20,20 @@ import (
 )
 
 type cmdMediaLocateJSONL struct {
-	Endpoint string `flag:"" name:"library" help:"http address for the library you want to connect to" default:"localhost:9998"`
-	Backlog  uint16 `flag:"" name:"backlog" help:"number of batches to allowed to queue up" default:"128"`
-	Workers  uint16 `flag:"" name:"workers" help:"number of async database workers to run" default:"1"`
+	Backlog uint16 `flag:"" name:"backlog" help:"number of batches to allowed to queue up" default:"128"`
+	Workers uint16 `flag:"" name:"workers" help:"number of async database workers to run" default:"1"`
 }
 
-func (t cmdMediaLocateJSONL) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.SSHID) (err error) {
+func (t cmdMediaLocateJSONL) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.SSHID, daemon *cmdopts.Endpoint) (err error) {
 	signer, err := id.Signer()
 	if err != nil {
 		return errorsx.Wrap(err, "failed to create signer")
 	}
 
-	c := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(fmt.Sprintf("https://%s", t.Endpoint)), authn.SSHTokenSourceOptionSigner(signer))
-	cc := authn.AuthzClientLibrary(tls.Config(), c, t.Endpoint)
+	c := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(daemon.Endpoint), authn.SSHTokenSourceOptionSigner(signer))
+	cc := authn.AuthzClientLibrary(tls.Config(), c, daemon.Endpoint)
 
-	return t.run(gctx.Context, cc, t.Endpoint, os.Stdin)
+	return t.run(gctx.Context, cc, daemon.Endpoint, os.Stdin)
 }
 
 func (t cmdMediaLocateJSONL) run(ctx context.Context, c *http.Client, endpoint string, r io.Reader) error {

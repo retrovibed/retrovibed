@@ -28,7 +28,7 @@ func TestPeerSearch(t *testing.T) {
 		c := &http.Client{}
 		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
 
-		resp, err := ddiscapi.PeerSearch(t.Context(), c, "example.com", &ddiscapi.PeerSearchRequest{Query: "derp"})
+		resp, err := ddiscapi.PeerSearch(t.Context(), c, srv.URL, &ddiscapi.PeerSearchRequest{Query: "derp"})
 		require.NoError(t, err)
 		require.Equal(t, len(expected.Items), len(resp.Items))
 	})
@@ -42,7 +42,7 @@ func TestPeerSearch(t *testing.T) {
 		c := &http.Client{}
 		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
 
-		_, err := ddiscapi.PeerSearch(t.Context(), c, "example.com", &ddiscapi.PeerSearchRequest{})
+		_, err := ddiscapi.PeerSearch(t.Context(), c, srv.URL, &ddiscapi.PeerSearchRequest{})
 		require.Error(t, err)
 	})
 }

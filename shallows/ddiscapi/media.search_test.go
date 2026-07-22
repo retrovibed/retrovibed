@@ -28,7 +28,7 @@ func TestMediaSearch(t *testing.T) {
 		c := &http.Client{}
 		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
 
-		resp, err := ddiscapi.MediaSearch(t.Context(), c, "example.com", &ddiscapi.MediaSearchRequest{Query: "derp"})
+		resp, err := ddiscapi.MediaSearch(t.Context(), c, srv.URL, &ddiscapi.MediaSearchRequest{Query: "derp"})
 		require.NoError(t, err)
 		require.Equal(t, len(expected.Items), len(resp.Items))
 	})
@@ -42,7 +42,7 @@ func TestMediaSearch(t *testing.T) {
 		c := &http.Client{}
 		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
 
-		_, err := ddiscapi.MediaSearch(t.Context(), c, "example.com", &ddiscapi.MediaSearchRequest{})
+		_, err := ddiscapi.MediaSearch(t.Context(), c, srv.URL, &ddiscapi.MediaSearchRequest{})
 		require.Error(t, err)
 	})
 }

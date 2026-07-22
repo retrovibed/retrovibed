@@ -32,7 +32,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func newDiscoveryImportServer(t *testing.T, q *sql.DB) *http.Client {
+func newDiscoveryImportServer(t *testing.T, q *sql.DB) (*http.Client, *httptest.Server) {
 	t.Helper()
 
 	var (
@@ -65,7 +65,7 @@ func newDiscoveryImportServer(t *testing.T, q *sql.DB) *http.Client {
 		Transport: httpx.NewHeadersTransport(headers, httpx.HTORoundTripper(
 			httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), nil),
 		)),
-	}
+	}, srv
 }
 
 func randomMagnetURI() (string, int160.T) {
@@ -92,7 +92,8 @@ func TestDiscoveryImportJSONL(t *testing.T) {
 		q := sqltestx.Metadatabase(t)
 		cmd := cmdDiscoveryImportJSONL{}
 
-		require.NoError(t, cmd.run(ctx, newDiscoveryImportServer(t, q), "library.invalid", &bytes.Buffer{}))
+		c, srv := newDiscoveryImportServer(t, q)
+		require.NoError(t, cmd.run(ctx, c, srv.URL, &bytes.Buffer{}))
 		require.Equal(t, 0, testx.Must(sqlx.Count(ctx, q, "SELECT COUNT(*) FROM torrents_unknown_infohashes"))(t))
 	})
 
@@ -113,7 +114,8 @@ func TestDiscoveryImportJSONL(t *testing.T) {
 			ids = append(ids, torrentx.HashUID(&infohash))
 		}
 
-		require.NoError(t, cmd.run(ctx, newDiscoveryImportServer(t, q), "library.invalid", &buf))
+		c, srv := newDiscoveryImportServer(t, q)
+		require.NoError(t, cmd.run(ctx, c, srv.URL, &buf))
 		require.Equal(t, len(ids), countDiscovery(ctx, t, q, ids...))
 	})
 
@@ -134,7 +136,8 @@ func TestDiscoveryImportJSONL(t *testing.T) {
 			ids = append(ids, torrentx.HashUID(&infohash))
 		}
 
-		require.NoError(t, cmd.run(ctx, newDiscoveryImportServer(t, q), "library.invalid", &buf))
+		c, srv := newDiscoveryImportServer(t, q)
+		require.NoError(t, cmd.run(ctx, c, srv.URL, &buf))
 		require.Equal(t, len(ids), countDiscovery(ctx, t, q, ids...))
 	})
 
@@ -146,7 +149,8 @@ func TestDiscoveryImportJSONL(t *testing.T) {
 		cmd := cmdDiscoveryImportJSONL{}
 
 		buf := bytes.NewBufferString("not valid json\n")
-		err := cmd.run(ctx, newDiscoveryImportServer(t, q), "library.invalid", buf)
+		c, srv := newDiscoveryImportServer(t, q)
+		err := cmd.run(ctx, c, srv.URL, buf)
 		require.Error(t, err)
 		require.Equal(t, 0, testx.Must(sqlx.Count(ctx, q, "SELECT COUNT(*) FROM torrents_unknown_infohashes"))(t))
 	})
@@ -168,7 +172,8 @@ func TestDiscoveryImportJSONL(t *testing.T) {
 		bctx, bcancel := context.WithTimeout(ctx, 200*time.Millisecond)
 		defer bcancel()
 
-		err := cmd.run(bctx, newDiscoveryImportServer(t, q), "library.invalid", &buf)
+		c, srv := newDiscoveryImportServer(t, q)
+		err := cmd.run(bctx, c, srv.URL, &buf)
 		require.Error(t, err)
 	})
 }

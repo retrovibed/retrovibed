@@ -18,7 +18,7 @@ func LocateCreate(ctx context.Context, c *http.Client, endpoint string, req *Loc
 		return nil, errorsx.Wrap(err, "unable to encode request")
 	}
 
-	hreq, err := http.NewRequestWithContext(ctx, http.MethodPost, fmt.Sprintf("https://%s/l/", endpoint), bytes.NewReader(encoded))
+	hreq, err := http.NewRequestWithContext(ctx, http.MethodPost, fmt.Sprintf("%s/l/", endpoint), bytes.NewReader(encoded))
 	if err != nil {
 		return nil, errorsx.Wrap(err, "unable to create http request")
 	}

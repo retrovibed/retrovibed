@@ -11,7 +11,7 @@ import (
 
 // DiscoveryMetrics reports the state of the infohash identification pipeline on the given library endpoint.
 func DiscoveryMetrics(ctx context.Context, c *http.Client, endpoint string) (resp *DiscoveryMetricsResponse, err error) {
-	hreq, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf("https://%s/diagnostics/discovery/", endpoint), nil)
+	hreq, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf("%s/diagnostics/discovery/", endpoint), nil)
 	if err != nil {
 		return nil, errorsx.Wrap(err, "unable to create http request")
 	}

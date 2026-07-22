@@ -18,7 +18,6 @@ import (
 )
 
 type IdenAdd struct {
-	// Endpoint  string `flag:"" name:"endpoint" help:"http address of the retrovibed instance" default:"localhost:9998"`
 	PublicKey string `arg:"" name:"pubkey" help:"public key to add" required:"true"`
 }
 
@@ -31,7 +30,12 @@ func (t IdenAdd) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.S
 		return errorsx.Wrap(err, "failed to create signer")
 	}
 
-	c := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(daemon.Endpoint), authn.SSHTokenSourceOptionSigner(signer))
+	c := authn.AutoOauth2Client(
+		gctx.Context,
+		tls.Config(),
+		authn.EndpointSSHAuth(daemon.Endpoint),
+		authn.SSHTokenSourceOptionSigner(signer),
+	)
 	cc := authn.AuthzClientLibrary(tls.Config(), c, daemon.Endpoint)
 
 	return t.run(ctx, daemon.Endpoint, cc)

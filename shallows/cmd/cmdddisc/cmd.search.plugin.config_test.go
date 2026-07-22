@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
+	"github.com/retrovibed/retrovibed/shallows/cmd/cmdddisc"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/envx"
 	"github.com/stretchr/testify/require"
@@ -19,7 +20,7 @@ func TestSearchPluginConfig(t *testing.T) {
 		require.NoError(t, os.MkdirAll(filepath.Dir(envpath), 0o700))
 		require.NoError(t, envx.WriteFile(envpath, []string{"FOO=bar"}))
 
-		require.NoError(t, cmdtestx.Execute(t, genparser(t), "search", "plugin", "config", "noop",
+		require.NoError(t, cmdtestx.Execute(t, cmdtestx.Genparser(cmdddisc.Commands{})(t), "command", "search", "plugin", "config", "noop",
 			"-e", "FOO=updated",
 			"-e", "BAZ=qux",
 		))
@@ -32,7 +33,7 @@ func TestSearchPluginConfig(t *testing.T) {
 	t.Run("creates the env file when none exists", func(t *testing.T) {
 		t.Setenv("XDG_CONFIG_HOME", t.TempDir())
 
-		require.NoError(t, cmdtestx.Execute(t, genparser(t), "search", "plugin", "config", "noop",
+		require.NoError(t, cmdtestx.Execute(t, cmdtestx.Genparser(cmdddisc.Commands{})(t), "command", "search", "plugin", "config", "noop",
 			"-e", "FOO=bar",
 		))
 
@@ -45,7 +46,7 @@ func TestSearchPluginConfig(t *testing.T) {
 	t.Run("accepts a .wasm suffixed name", func(t *testing.T) {
 		t.Setenv("XDG_CONFIG_HOME", t.TempDir())
 
-		require.NoError(t, cmdtestx.Execute(t, genparser(t), "search", "plugin", "config", "noop.wasm",
+		require.NoError(t, cmdtestx.Execute(t, cmdtestx.Genparser(cmdddisc.Commands{})(t), "command", "search", "plugin", "config", "noop.wasm",
 			"-e", "FOO=bar",
 		))
 

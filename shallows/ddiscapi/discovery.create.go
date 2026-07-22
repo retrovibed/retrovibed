@@ -18,7 +18,7 @@ func DiscoveryCreate(ctx context.Context, c *http.Client, endpoint string, req *
 		return nil, errorsx.Wrap(err, "unable to encode request")
 	}
 
-	hreq, err := http.NewRequestWithContext(ctx, http.MethodPost, fmt.Sprintf("https://%s/ddisc/discovery/", endpoint), bytes.NewReader(encoded))
+	hreq, err := http.NewRequestWithContext(ctx, http.MethodPost, fmt.Sprintf("%s/ddisc/discovery/", endpoint), bytes.NewReader(encoded))
 	if err != nil {
 		return nil, errorsx.Wrap(err, "unable to create http request")
 	}

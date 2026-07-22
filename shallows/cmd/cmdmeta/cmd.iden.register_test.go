@@ -1,20 +1,15 @@
 package cmdmeta_test
 
 import (
-	"context"
 	"net/http/httptest"
 	"path/filepath"
-	"sync"
 	"testing"
 
-	"github.com/alecthomas/kong"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdmeta"
-	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
-	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sshx"
@@ -24,28 +19,7 @@ import (
 )
 
 func TestIdenRegister(t *testing.T) {
-	genparser := func(t *testing.T) *kong.Kong {
-		var cli struct {
-			cmdopts.Global
-			cmdopts.TLSConfig
-			cmdopts.SSHID
-			Identity cmdmeta.Identity `cmd:""`
-		}
-
-		cli.Context, cli.Shutdown = context.WithCancel(context.Background())
-		cli.Cleanup = &sync.WaitGroup{}
-
-		return kong.Must(
-			&cli,
-			kong.Bind(&cli.TLSConfig),
-			kong.Bind(&cli.Global),
-			kong.Bind(&cli.SSHID),
-			kong.Vars{
-				"vars_private_key":                  env.PrivateKeyPath(),
-				"vars_user_configuration_directory": t.TempDir(),
-			},
-		)
-	}
+	genparser := cmdtestx.Genparser(cmdmeta.Identity{})
 
 	newServer := func(t *testing.T, q sqlx.Queryer) *httptest.Server {
 		t.Helper()
@@ -68,7 +42,7 @@ func TestIdenRegister(t *testing.T) {
 		q := sqltestx.Metadatabase(t)
 		srv := newServer(t, q)
 
-		require.NoError(t, cmdtestx.Execute(t, genparser(t), "identity", "register", "--private-key-path", keypath, "--insecure", "--endpoint", srv.Listener.Addr().String()))
+		require.NoError(t, cmdtestx.Execute(t, genparser(t), "command", "register", "--private-key-path", keypath, "--endpoint", srv.URL))
 
 		require.Equal(t, 1, testx.Must(sqlx.Count(ctx, q, "SELECT COUNT(*) FROM meta_profiles"))(t))
 		require.Equal(t, 1, testx.Must(sqlx.Count(ctx, q, "SELECT COUNT(*) FROM meta_sso_identity_ssh"))(t))
@@ -93,8 +67,8 @@ func TestIdenRegister(t *testing.T) {
 		srv := newServer(t, q)
 		parser := genparser(t)
 
-		require.NoError(t, cmdtestx.Execute(t, parser, "identity", "register", "--private-key-path", keypath, "--insecure", "--endpoint", srv.Listener.Addr().String()))
-		require.NoError(t, cmdtestx.Execute(t, parser, "identity", "register", "--private-key-path", keypath, "--insecure", "--endpoint", srv.Listener.Addr().String()))
+		require.NoError(t, cmdtestx.Execute(t, parser, "command", "register", "--private-key-path", keypath, "--endpoint", srv.URL))
+		require.NoError(t, cmdtestx.Execute(t, parser, "command", "register", "--private-key-path", keypath, "--endpoint", srv.URL))
 
 		require.Equal(t, 1, testx.Must(sqlx.Count(ctx, q, "SELECT COUNT(*) FROM meta_profiles"))(t))
 		require.Equal(t, 1, testx.Must(sqlx.Count(ctx, q, "SELECT COUNT(*) FROM meta_sso_identity_ssh"))(t))

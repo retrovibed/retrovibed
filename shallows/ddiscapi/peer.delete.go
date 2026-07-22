@@ -18,7 +18,7 @@ func PeerDelete(ctx context.Context, c *http.Client, endpoint string, hexPeerID 
 		return nil, errorsx.Wrap(err, "failed to decode peer id")
 	}
 
-	hreq, err := http.NewRequestWithContext(ctx, http.MethodDelete, fmt.Sprintf("https://%s/ddisc/%s", endpoint, tracking.PeerUID(infohash)), nil)
+	hreq, err := http.NewRequestWithContext(ctx, http.MethodDelete, fmt.Sprintf("%s/ddisc/%s", endpoint, tracking.PeerUID(infohash)), nil)
 	if err != nil {
 		return nil, errorsx.Wrap(err, "unable to create http request")
 	}

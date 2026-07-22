@@ -13,7 +13,6 @@ import (
 )
 
 type cmdDiscoveryList struct {
-	Endpoint    string        `flag:"" name:"library" help:"http address for the library you want to connect to" default:"localhost:9998"`
 	NextCheck   time.Duration `flag:"" name:"next-check" help:"only show entries due within the the next window" default:"0m"`
 	ID          []string      `flag:"" name:"id" help:"only show entries matching the given id(s)"`
 	Offset      uint64        `flag:"" name:"offset" help:"page offset for pagination (multiplied by the result limit)"`
@@ -21,16 +20,16 @@ type cmdDiscoveryList struct {
 	MaxAttempts uint64        `flag:"" name:"max-attempts" help:"only show entries with at most this many attempts"`
 }
 
-func (t cmdDiscoveryList) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.SSHID) (err error) {
+func (t cmdDiscoveryList) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.SSHID, daemon *cmdopts.Endpoint) (err error) {
 	signer, err := id.Signer()
 	if err != nil {
 		return errorsx.Wrap(err, "failed to create signer")
 	}
 
-	c := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(fmt.Sprintf("https://%s", t.Endpoint)), authn.SSHTokenSourceOptionSigner(signer))
-	cc := authn.AuthzClientLibrary(tls.Config(), c, t.Endpoint)
+	c := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(daemon.Endpoint), authn.SSHTokenSourceOptionSigner(signer))
+	cc := authn.AuthzClientLibrary(tls.Config(), c, daemon.Endpoint)
 
-	result, err := ddiscapi.DiscoverySearch(gctx.Context, cc, t.Endpoint, &ddiscapi.DiscoverySearchRequest{
+	result, err := ddiscapi.DiscoverySearch(gctx.Context, cc, daemon.Endpoint, &ddiscapi.DiscoverySearchRequest{
 		NextCheck:   meta.NewDateRange(timex.NewRangeWithin(t.NextCheck)),
 		Id:          t.ID,
 		Offset:      t.Offset,

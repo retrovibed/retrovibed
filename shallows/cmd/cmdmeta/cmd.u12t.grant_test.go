@@ -1,20 +1,15 @@
 package cmdmeta_test
 
 import (
-	"context"
 	"net/http/httptest"
 	"path/filepath"
-	"sync"
 	"testing"
 
-	"github.com/alecthomas/kong"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdmeta"
-	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
-	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/meta"
@@ -24,28 +19,7 @@ import (
 )
 
 func TestGrant(t *testing.T) {
-	genparser := func(t *testing.T) *kong.Kong {
-		var cli struct {
-			cmdopts.Global
-			cmdopts.TLSConfig
-			cmdopts.SSHID
-			Usermanagement cmdmeta.Usermanagement `cmd:""`
-		}
-
-		cli.Context, cli.Shutdown = context.WithCancel(context.Background())
-		cli.Cleanup = &sync.WaitGroup{}
-
-		return kong.Must(
-			&cli,
-			kong.Bind(&cli.TLSConfig),
-			kong.Bind(&cli.Global),
-			kong.Bind(&cli.SSHID),
-			kong.Vars{
-				"vars_private_key":                  env.PrivateKeyPath(),
-				"vars_user_configuration_directory": t.TempDir(),
-			},
-		)
-	}
+	genparser := cmdtestx.Genparser(cmdmeta.Usermanagement{})
 
 	newServer := func(t *testing.T, q sqlx.Queryer) *httptest.Server {
 		t.Helper()
@@ -72,7 +46,7 @@ func TestGrant(t *testing.T) {
 		parser := genparser(t)
 		srv := newServer(t, q)
 
-		require.NoError(t, cmdtestx.Execute(t, parser, "usermanagement", "grant", "--private-key-path", keypath, "--insecure", "--endpoint", srv.Listener.Addr().String(), p.ID))
+		require.NoError(t, cmdtestx.Execute(t, parser, "command", "grant", "--private-key-path", keypath, "--endpoint", srv.URL, p.ID))
 
 		var authz meta.Authz
 		require.NoError(t, meta.AuthzFindByProfileID(ctx, q, sqlx.NewNullString(p.ID)).Scan(&authz))
@@ -100,7 +74,7 @@ func TestGrant(t *testing.T) {
 		parser := genparser(t)
 		srv := newServer(t, q)
 
-		require.NoError(t, cmdtestx.Execute(t, parser, "usermanagement", "grant", "--private-key-path", keypath, "--insecure", "--endpoint", srv.Listener.Addr().String(), "--no-library-read", "--library-modify", "--usermanagement", p.ID))
+		require.NoError(t, cmdtestx.Execute(t, parser, "command", "grant", "--private-key-path", keypath, "--endpoint", srv.URL, "--no-library-read", "--library-modify", "--usermanagement", p.ID))
 
 		var authz meta.Authz
 		require.NoError(t, meta.AuthzFindByProfileID(ctx, q, sqlx.NewNullString(p.ID)).Scan(&authz))
@@ -127,7 +101,7 @@ func TestGrant(t *testing.T) {
 		parser := genparser(t)
 		srv := newServer(t, q)
 
-		require.NoError(t, cmdtestx.Execute(t, parser, "usermanagement", "grant", "--private-key-path", keypath, "--insecure", "--endpoint", srv.Listener.Addr().String(), "--library-read", "--library-modify", "--billing-read", "--billing-modify", "--community-modify", "--usermanagement", p.ID))
+		require.NoError(t, cmdtestx.Execute(t, parser, "command", "grant", "--private-key-path", keypath, "--endpoint", srv.URL, "--library-read", "--library-modify", "--billing-read", "--billing-modify", "--community-modify", "--usermanagement", p.ID))
 
 		var authz meta.Authz
 		require.NoError(t, meta.AuthzFindByProfileID(ctx, q, sqlx.NewNullString(p.ID)).Scan(&authz))
@@ -154,8 +128,8 @@ func TestGrant(t *testing.T) {
 		parser := genparser(t)
 		srv := newServer(t, q)
 
-		require.NoError(t, cmdtestx.Execute(t, parser, "usermanagement", "grant", "--private-key-path", keypath, "--insecure", "--endpoint", srv.Listener.Addr().String(), p.ID))
-		require.NoError(t, cmdtestx.Execute(t, parser, "usermanagement", "grant", "--private-key-path", keypath, "--insecure", "--endpoint", srv.Listener.Addr().String(), p.ID))
+		require.NoError(t, cmdtestx.Execute(t, parser, "command", "grant", "--private-key-path", keypath, "--endpoint", srv.URL, p.ID))
+		require.NoError(t, cmdtestx.Execute(t, parser, "command", "grant", "--private-key-path", keypath, "--endpoint", srv.URL, p.ID))
 
 		var authz meta.Authz
 		require.NoError(t, meta.AuthzFindByProfileID(ctx, q, sqlx.NewNullString(p.ID)).Scan(&authz))

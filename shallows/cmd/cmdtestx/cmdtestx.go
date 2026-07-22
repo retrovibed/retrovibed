@@ -4,12 +4,15 @@ import (
 	"context"
 	"database/sql"
 	"net/http/httptest"
+	"sync"
 	"testing"
 
 	"github.com/alecthomas/kong"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
+	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sshx"
 	"github.com/retrovibed/retrovibed/shallows/meta"
@@ -17,6 +20,38 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/metaapi"
 	"github.com/stretchr/testify/require"
 )
+
+func Genparser[T any](cmd T, opts ...kong.Option) func(t *testing.T) *kong.Kong {
+	return func(t *testing.T) *kong.Kong {
+		t.Helper()
+		var cli struct {
+			cmdopts.Global
+			cmdopts.TLSConfig
+			cmdopts.SSHID
+			cmdopts.Endpoint
+			Command T `cmd:""`
+		}
+
+		cli.Context, cli.Shutdown = context.WithCancel(context.Background())
+		cli.Cleanup = &sync.WaitGroup{}
+		return kong.Must(
+			&cli,
+			append(opts,
+				kong.Bind(&cli.TLSConfig),
+				kong.Bind(&cli.Global),
+				kong.Bind(&cli.SSHID),
+				kong.Bind(&cli.Endpoint),
+				kong.Vars{
+					"vars_private_key":                  env.PrivateKeyPath(),
+					"vars_user_configuration_directory": t.TempDir(),
+					"env_http_endpoint":                 env.Endpoint,
+				},
+				kong.NamedMapper("durationinf", kong.MapperFunc(cmdopts.ParseDurationInf)),
+				kong.NamedMapper("envvar", kong.MapperFunc(cmdopts.ParseEnviron)),
+			)...,
+		)
+	}
+}
 
 func Execute(t *testing.T, parser *kong.Kong, cmd ...string) error {
 	t.Helper()

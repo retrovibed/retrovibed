@@ -32,7 +32,7 @@ func TestPeerCreate(t *testing.T) {
 		c := &http.Client{}
 		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
 
-		resp, err := ddiscapi.PeerCreate(t.Context(), c, "example.com", &ddiscapi.PeerCreateRequest{Peer: &peer})
+		resp, err := ddiscapi.PeerCreate(t.Context(), c, srv.URL, &ddiscapi.PeerCreateRequest{Peer: &peer})
 		require.NoError(t, err)
 		require.Equal(t, expected.Peer.Id, resp.Peer.Id)
 	})
@@ -46,7 +46,7 @@ func TestPeerCreate(t *testing.T) {
 		c := &http.Client{}
 		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
 
-		_, err := ddiscapi.PeerCreate(t.Context(), c, "example.com", &ddiscapi.PeerCreateRequest{})
+		_, err := ddiscapi.PeerCreate(t.Context(), c, srv.URL, &ddiscapi.PeerCreateRequest{})
 		require.Error(t, err)
 	})
 }

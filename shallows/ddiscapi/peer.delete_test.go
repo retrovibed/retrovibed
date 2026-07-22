@@ -32,14 +32,14 @@ func TestPeerDelete(t *testing.T) {
 		c := &http.Client{}
 		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
 
-		_, err := ddiscapi.PeerDelete(t.Context(), c, "example.com", infohash.String())
+		_, err := ddiscapi.PeerDelete(t.Context(), c, srv.URL, infohash.String())
 		require.NoError(t, err)
 	})
 
 	t.Run("returns error on invalid peer id", func(t *testing.T) {
 		c := &http.Client{}
 
-		_, err := ddiscapi.PeerDelete(t.Context(), c, "example.com", "not-hex")
+		_, err := ddiscapi.PeerDelete(t.Context(), c, "https://example.com", "not-hex")
 		require.Error(t, err)
 	})
 
@@ -52,7 +52,7 @@ func TestPeerDelete(t *testing.T) {
 		c := &http.Client{}
 		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
 
-		_, err := ddiscapi.PeerDelete(t.Context(), c, "example.com", int160.Random().String())
+		_, err := ddiscapi.PeerDelete(t.Context(), c, srv.URL, int160.Random().String())
 		require.Error(t, err)
 	})
 }

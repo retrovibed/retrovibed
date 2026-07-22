@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"time"
 
-	
 	"github.com/retrovibed/retrovibed/retroapi/deeppool"
 	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/httpx"
@@ -83,7 +82,7 @@ func AuthzClient(oauth2c *http.Client) *http.Client {
 
 func AuthzClientLibrary(tls *tls.Config, oauth2c *http.Client, endpoint string) *http.Client {
 	cc := HTTPClientLocalDefaults(tls)
-	return AuthzClientEndpoint(context.WithValue(context.Background(), oauth2.HTTPClient, cc), oauth2c, fmt.Sprintf("https://%s/meta/authz/", endpoint))
+	return AuthzClientEndpoint(context.WithValue(context.Background(), oauth2.HTTPClient, cc), oauth2c, fmt.Sprintf("%s/meta/authz/", endpoint))
 }
 
 func AuthzClientEndpoint(ctx context.Context, oauth2c *http.Client, endpoint string) *http.Client {

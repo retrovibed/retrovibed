@@ -12,6 +12,8 @@ import (
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/shallows/cmd/cmdddisc"
+	"github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/ddisc/ddisctorrent"
 	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
@@ -53,8 +55,9 @@ func TestMediaQuery(t *testing.T) {
 
 		peers := slicesx.MapTransform(func(n netip.AddrPort) string { return n.String() }, torrenttestx.ApprPorts(tpeer)...)
 
-		kctx, err := genparser(t, kong.Writers(nil, &buf)).Parse(
+		kctx, err := cmdtestx.Genparser(cmdddisc.Commands{}, kong.Writers(nil, &buf))(t).Parse(
 			append([]string{
+				"command",
 				"media",
 				"query",
 				"--no-bootstrap",

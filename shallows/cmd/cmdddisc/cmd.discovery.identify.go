@@ -1,7 +1,6 @@
 package cmdddisc
 
 import (
-	"fmt"
 	"log"
 	"net"
 	"net/http"
@@ -25,7 +24,6 @@ import (
 )
 
 type cmdDiscoveryIdentify struct {
-	Endpoint    string        `flag:"" name:"library" help:"http address for the library you want to connect to" default:"localhost:9998"`
 	ID          string        `flag:"" name:"id" help:"unknown-hash id to identify" required:"true"`
 	PeerTimeout time.Duration `flag:"" name:"peer-timeout" help:"how long to wait for a reachable peer" default:"1m"`
 	InfoTimeout time.Duration `flag:"" name:"info-timeout" help:"how long to wait for torrent metadata/content" default:"10m"`
@@ -34,16 +32,16 @@ type cmdDiscoveryIdentify struct {
 	Bootstrap   bool          `flag:"" name:"dht-bootstrap" help:"bootstrap the DHT using well-known trackers" negatable:"" default:"true"`
 }
 
-func (t cmdDiscoveryIdentify) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.SSHID) (err error) {
+func (t cmdDiscoveryIdentify) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.SSHID, daemon *cmdopts.Endpoint) (err error) {
 	signer, err := id.Signer()
 	if err != nil {
 		return errorsx.Wrap(err, "failed to create signer")
 	}
 
-	c := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(fmt.Sprintf("https://%s", t.Endpoint)), authn.SSHTokenSourceOptionSigner(signer))
-	cc := authn.AuthzClientLibrary(tls.Config(), c, t.Endpoint)
+	c := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(daemon.Endpoint), authn.SSHTokenSourceOptionSigner(signer))
+	cc := authn.AuthzClientLibrary(tls.Config(), c, daemon.Endpoint)
 
-	disc, err := t.lookup(gctx, cc)
+	disc, err := t.lookup(gctx, daemon.Endpoint, cc)
 	if err != nil {
 		return err
 	}
@@ -64,12 +62,12 @@ func (t cmdDiscoveryIdentify) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, 
 		return errorsx.Wrap(err, "unable to identify media")
 	}
 
-	media, err := t.persist(gctx, cc, result)
+	media, err := t.persist(gctx, daemon.Endpoint, cc, result)
 	if err != nil {
 		return err
 	}
 
-	if err = t.cleanup(gctx, cc); err != nil {
+	if err = t.cleanup(gctx, daemon.Endpoint, cc); err != nil {
 		return err
 	}
 
@@ -78,8 +76,8 @@ func (t cmdDiscoveryIdentify) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, 
 	return nil
 }
 
-func (t cmdDiscoveryIdentify) lookup(gctx *cmdopts.Global, cc *http.Client) (_ ddisc.Discovered, err error) {
-	result, err := ddiscapi.DiscoverySearch(gctx.Context, cc, t.Endpoint, &ddiscapi.DiscoverySearchRequest{
+func (t cmdDiscoveryIdentify) lookup(gctx *cmdopts.Global, endpoint string, cc *http.Client) (_ ddisc.Discovered, err error) {
+	result, err := ddiscapi.DiscoverySearch(gctx.Context, cc, endpoint, &ddiscapi.DiscoverySearchRequest{
 		Id:    []string{t.ID},
 		Limit: 1,
 	})
@@ -168,8 +166,8 @@ func (t cmdDiscoveryIdentify) torrentClient() (dhts *dht.Server, tclient *torren
 	return dhts, tclient, ttstore, nil
 }
 
-func (t cmdDiscoveryIdentify) persist(gctx *cmdopts.Global, cc *http.Client, result ddisc.Discovered) (_ *ddiscapi.Media, err error) {
-	mrsp, err := ddiscapi.MediaCreate(gctx.Context, cc, t.Endpoint, &ddiscapi.MediaCreateRequest{
+func (t cmdDiscoveryIdentify) persist(gctx *cmdopts.Global, endpoint string, cc *http.Client, result ddisc.Discovered) (_ *ddiscapi.Media, err error) {
+	mrsp, err := ddiscapi.MediaCreate(gctx.Context, cc, endpoint, &ddiscapi.MediaCreateRequest{
 		Media: ddiscapi.NewMediaFromDiscovered(result),
 	})
 	if err != nil {
@@ -179,7 +177,7 @@ func (t cmdDiscoveryIdentify) persist(gctx *cmdopts.Global, cc *http.Client, res
 	return mrsp.Media, nil
 }
 
-func (t cmdDiscoveryIdentify) cleanup(gctx *cmdopts.Global, cc *http.Client) (err error) {
-	_, err = ddiscapi.DiscoveryDelete(gctx.Context, cc, t.Endpoint, t.ID)
+func (t cmdDiscoveryIdentify) cleanup(gctx *cmdopts.Global, endpoint string, cc *http.Client) (err error) {
+	_, err = ddiscapi.DiscoveryDelete(gctx.Context, cc, endpoint, t.ID)
 	return err
 }

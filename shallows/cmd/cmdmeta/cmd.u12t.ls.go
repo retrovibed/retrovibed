@@ -15,14 +15,13 @@ import (
 )
 
 type U12TLs struct {
-	Endpoint string `flag:"" name:"endpoint" help:"http address of the retrovibed instance" default:"localhost:9998"`
 	Pending  bool   `flag:"" name:"pending"  help:"include pending profiles"`
 	Enabled  bool   `flag:"" name:"enabled"  help:"include enabled profiles"`
 	Disabled bool   `flag:"" name:"disabled" help:"include disabled profiles"`
 	Query    string `flag:"" name:"query"    help:"lucene text search (default field: display)" default:""`
 }
 
-func (t U12TLs) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.SSHID) (err error) {
+func (t U12TLs) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.SSHID, daemon *cmdopts.Endpoint) (err error) {
 	ctx, done := context.WithTimeout(gctx.Context, 10*time.Second)
 	defer done()
 
@@ -31,10 +30,10 @@ func (t U12TLs) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.SS
 		return errorsx.Wrap(err, "failed to create signer")
 	}
 
-	c := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(fmt.Sprintf("https://%s", t.Endpoint)), authn.SSHTokenSourceOptionSigner(signer))
-	cc := authn.AuthzClientLibrary(tls.Config(), c, t.Endpoint)
+	c := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(daemon.Endpoint), authn.SSHTokenSourceOptionSigner(signer))
+	cc := authn.AuthzClientLibrary(tls.Config(), c, daemon.Endpoint)
 
-	return t.run(ctx, cc)
+	return t.run(ctx, daemon.Endpoint, cc)
 }
 
 func (t U12TLs) statuses() []uint32 {
@@ -54,16 +53,16 @@ func (t U12TLs) statuses() []uint32 {
 	return s
 }
 
-func (t U12TLs) run(ctx context.Context, c *http.Client) (err error) {
+func (t U12TLs) run(ctx context.Context, endpoint string, c *http.Client) (err error) {
 	for _, status := range t.statuses() {
-		if err = t.search(ctx, c, status); err != nil {
+		if err = t.search(ctx, endpoint, c, status); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (t U12TLs) search(ctx context.Context, c *http.Client, status uint32) (err error) {
+func (t U12TLs) search(ctx context.Context, endpoint string, c *http.Client, status uint32) (err error) {
 	req := metaapi.ProfileSearchRequest{
 		Query:  t.Query,
 		Status: status,
@@ -75,7 +74,7 @@ func (t U12TLs) search(ctx context.Context, c *http.Client, status uint32) (err 
 		return errorsx.Wrap(err, "unable to encode request")
 	}
 
-	hreq, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf("https://%s/meta/u12t/?"+encoded.Encode(), t.Endpoint), nil)
+	hreq, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf("%s/meta/u12t/?"+encoded.Encode(), endpoint), nil)
 	if err != nil {
 		return errorsx.Wrap(err, "unable to create request")
 	}

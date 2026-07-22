@@ -9,6 +9,7 @@ import (
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/shallows/cmd/cmdddisc"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
@@ -41,10 +42,12 @@ func TestDiscoveryCreate(t *testing.T) {
 		).Bind(routes.PathPrefix("/ddisc/discovery").Subrouter())
 		srv := cmdtestx.NewTLSServer(t, q, routes)
 
-		require.NoError(t, cmdtestx.Execute(t, genparser(t), "discovery", "create",
+		require.NoError(t, cmdtestx.Execute(
+			t,
+			cmdtestx.Genparser(cmdddisc.Commands{})(t), "command",
+			"discovery", "create",
 			"--private-key-path", keypath,
-			"--insecure",
-			"--library", srv.Listener.Addr().String(),
+			"--endpoint", srv.URL,
 			"--magnet", fmt.Sprintf("magnet:?xt=urn:btih:%s", infohash.String()),
 		))
 

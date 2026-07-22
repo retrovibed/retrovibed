@@ -26,7 +26,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func newLocateServer(t *testing.T, q *sql.DB) *http.Client {
+func newLocateServer(t *testing.T, q *sql.DB) (*http.Client, *httptest.Server) {
 	t.Helper()
 
 	var (
@@ -58,7 +58,7 @@ func newLocateServer(t *testing.T, q *sql.DB) *http.Client {
 		Transport: httpx.NewHeadersTransport(headers, httpx.HTORoundTripper(
 			httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), nil),
 		)),
-	}
+	}, srv
 }
 
 func TestMediaLocateJSONL(t *testing.T) {
@@ -69,7 +69,8 @@ func TestMediaLocateJSONL(t *testing.T) {
 		q := sqltestx.Metadatabase(t)
 		cmd := cmdMediaLocateJSONL{}
 
-		require.NoError(t, cmd.run(ctx, newLocateServer(t, q), "library.invalid", &bytes.Buffer{}))
+		c, srv := newLocateServer(t, q)
+		require.NoError(t, cmd.run(ctx, c, srv.URL, &bytes.Buffer{}))
 		require.Equal(t, 0, sqltestx.Count(t, q, "SELECT COUNT(*) FROM ddisc_locate"))
 	})
 
@@ -88,7 +89,8 @@ func TestMediaLocateJSONL(t *testing.T) {
 		var buf bytes.Buffer
 		require.NoError(t, jsonl.NewEncoder(&buf).Encode(known))
 
-		require.NoError(t, cmd.run(ctx, newLocateServer(t, q), "library.invalid", &buf))
+		c, srv := newLocateServer(t, q)
+		require.NoError(t, cmd.run(ctx, c, srv.URL, &buf))
 
 		expected := ddisc.NewLocate(known.Title, known.Mimetype)
 		var found ddisc.Locate
@@ -116,7 +118,8 @@ func TestMediaLocateJSONL(t *testing.T) {
 			_ = i
 		}
 
-		require.NoError(t, cmd.run(ctx, newLocateServer(t, q), "library.invalid", &buf))
+		c, srv := newLocateServer(t, q)
+		require.NoError(t, cmd.run(ctx, c, srv.URL, &buf))
 		require.Equal(t, 20, sqltestx.Count(t, q, "SELECT COUNT(*) FROM ddisc_locate"))
 	})
 
@@ -128,7 +131,9 @@ func TestMediaLocateJSONL(t *testing.T) {
 		cmd := cmdMediaLocateJSONL{}
 
 		buf := bytes.NewBufferString("not valid json\n")
-		err := cmd.run(ctx, newLocateServer(t, q), "library.invalid", buf)
+
+		c, srv := newLocateServer(t, q)
+		err := cmd.run(ctx, c, srv.URL, buf)
 		require.Error(t, err)
 		require.Equal(t, 0, sqltestx.Count(t, q, "SELECT COUNT(*) FROM ddisc_locate"))
 	})
@@ -152,7 +157,8 @@ func TestMediaLocateJSONL(t *testing.T) {
 		bctx, bcancel := context.WithTimeout(ctx, 10*time.Second)
 		defer bcancel()
 
-		err := cmd.run(bctx, newLocateServer(t, q), "library.invalid", &buf)
+		c, srv := newLocateServer(t, q)
+		err := cmd.run(bctx, c, srv.URL, &buf)
 		require.NoError(t, err)
 		require.Equal(t, 0, sqltestx.Count(t, q, "SELECT COUNT(*) FROM ddisc_locate"))
 	})

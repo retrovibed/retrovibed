@@ -32,7 +32,7 @@ func TestDiscoveryCreate(t *testing.T) {
 		c := &http.Client{}
 		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
 
-		resp, err := ddiscapi.DiscoveryCreate(t.Context(), c, "example.com", &ddiscapi.DiscoveryCreateRequest{Discovery: &discovery})
+		resp, err := ddiscapi.DiscoveryCreate(t.Context(), c, srv.URL, &ddiscapi.DiscoveryCreateRequest{Discovery: &discovery})
 		require.NoError(t, err)
 		require.Equal(t, expected.Discovery.Id, resp.Discovery.Id)
 	})
@@ -46,7 +46,7 @@ func TestDiscoveryCreate(t *testing.T) {
 		c := &http.Client{}
 		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
 
-		_, err := ddiscapi.DiscoveryCreate(t.Context(), c, "example.com", &ddiscapi.DiscoveryCreateRequest{})
+		_, err := ddiscapi.DiscoveryCreate(t.Context(), c, srv.URL, &ddiscapi.DiscoveryCreateRequest{})
 		require.Error(t, err)
 	})
 }

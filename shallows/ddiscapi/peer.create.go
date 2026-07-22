@@ -18,7 +18,7 @@ func PeerCreate(ctx context.Context, c *http.Client, endpoint string, req *PeerC
 		return nil, errorsx.Wrap(err, "unable to encode request")
 	}
 
-	hreq, err := http.NewRequestWithContext(ctx, http.MethodPost, fmt.Sprintf("https://%s/ddisc/", endpoint), bytes.NewReader(encoded))
+	hreq, err := http.NewRequestWithContext(ctx, http.MethodPost, fmt.Sprintf("%s/ddisc/", endpoint), bytes.NewReader(encoded))
 	if err != nil {
 		return nil, errorsx.Wrap(err, "unable to create http request")
 	}

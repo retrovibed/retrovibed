@@ -32,7 +32,7 @@ func TestMediaCreate(t *testing.T) {
 		c := &http.Client{}
 		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
 
-		resp, err := ddiscapi.MediaCreate(t.Context(), c, "example.com", &ddiscapi.MediaCreateRequest{Media: &media})
+		resp, err := ddiscapi.MediaCreate(t.Context(), c, srv.URL, &ddiscapi.MediaCreateRequest{Media: &media})
 		require.NoError(t, err)
 		require.Equal(t, expected.Media.Id, resp.Media.Id)
 	})
@@ -46,7 +46,7 @@ func TestMediaCreate(t *testing.T) {
 		c := &http.Client{}
 		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
 
-		_, err := ddiscapi.MediaCreate(t.Context(), c, "example.com", &ddiscapi.MediaCreateRequest{})
+		_, err := ddiscapi.MediaCreate(t.Context(), c, srv.URL, &ddiscapi.MediaCreateRequest{})
 		require.Error(t, err)
 	})
 }

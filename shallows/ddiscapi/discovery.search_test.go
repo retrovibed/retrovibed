@@ -28,7 +28,7 @@ func TestDiscoverySearch(t *testing.T) {
 		c := &http.Client{}
 		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
 
-		resp, err := ddiscapi.DiscoverySearch(t.Context(), c, "example.com", &ddiscapi.DiscoverySearchRequest{Limit: 1})
+		resp, err := ddiscapi.DiscoverySearch(t.Context(), c, srv.URL, &ddiscapi.DiscoverySearchRequest{Limit: 1})
 		require.NoError(t, err)
 		require.Equal(t, len(expected.Items), len(resp.Items))
 	})
@@ -42,7 +42,7 @@ func TestDiscoverySearch(t *testing.T) {
 		c := &http.Client{}
 		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
 
-		_, err := ddiscapi.DiscoverySearch(t.Context(), c, "example.com", &ddiscapi.DiscoverySearchRequest{})
+		_, err := ddiscapi.DiscoverySearch(t.Context(), c, srv.URL, &ddiscapi.DiscoverySearchRequest{})
 		require.Error(t, err)
 	})
 }

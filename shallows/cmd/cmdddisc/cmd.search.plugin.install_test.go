@@ -9,6 +9,7 @@ import (
 
 	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
+	"github.com/retrovibed/retrovibed/shallows/cmd/cmdddisc"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/envx"
 	"github.com/stretchr/testify/require"
@@ -33,7 +34,7 @@ func TestSearchPluginInstall(t *testing.T) {
 		t.Setenv("XDG_CONFIG_HOME", t.TempDir())
 		dir := writeFixturePlugin(t)
 
-		require.NoError(t, cmdtestx.Execute(t, genparser(t), "search", "plugin", "install", dir,
+		require.NoError(t, cmdtestx.Execute(t, cmdtestx.Genparser(cmdddisc.Commands{})(t), "command", "search", "plugin", "install", dir,
 			"--name", "noop",
 			"-e", "FOO=bar",
 		))
@@ -51,7 +52,7 @@ func TestSearchPluginInstall(t *testing.T) {
 		t.Setenv("XDG_CONFIG_HOME", t.TempDir())
 		dir := writeFixturePlugin(t)
 
-		require.NoError(t, cmdtestx.Execute(t, genparser(t), "search", "plugin", "install", dir,
+		require.NoError(t, cmdtestx.Execute(t, cmdtestx.Genparser(cmdddisc.Commands{})(t), "command", "search", "plugin", "install", dir,
 			"--name", "noop.wasm",
 		))
 
@@ -91,7 +92,7 @@ func main() {
 }
 `), 0600))
 
-		require.NoError(t, cmdtestx.Execute(t, genparser(t), "search", "plugin", "install", dir,
+		require.NoError(t, cmdtestx.Execute(t, cmdtestx.Genparser(cmdddisc.Commands{})(t), "command", "search", "plugin", "install", dir,
 			"--name", "baked",
 			"-b", "main.tag=baked-value",
 		))
@@ -119,7 +120,7 @@ func main() {
 		renamed := filepath.Join(filepath.Dir(dir), "myplugin")
 		require.NoError(t, os.Rename(dir, renamed))
 
-		require.NoError(t, cmdtestx.Execute(t, genparser(t), "search", "plugin", "install", renamed))
+		require.NoError(t, cmdtestx.Execute(t, cmdtestx.Genparser(cmdddisc.Commands{})(t), "command", "search", "plugin", "install", renamed))
 
 		_, err := os.Stat(filepath.Join(searchplugin.SearchPluginDir(), "myplugin.wasm"))
 		require.NoError(t, err)

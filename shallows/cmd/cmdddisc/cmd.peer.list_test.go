@@ -6,6 +6,7 @@ import (
 
 	"github.com/james-lawrence/torrent/dht/krpc"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/shallows/cmd/cmdddisc"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
@@ -28,10 +29,10 @@ func TestPeerList(t *testing.T) {
 		routes := bindPeerManagement(t, q)
 		srv := cmdtestx.NewTLSServer(t, q, routes)
 
-		require.NoError(t, cmdtestx.Execute(t, genparser(t), "peers", "list",
+		require.NoError(t, cmdtestx.Execute(t, cmdtestx.Genparser(cmdddisc.Commands{})(t), "command", "peers", "list",
 			"--private-key-path", keypath,
 			"--insecure",
-			"--library", srv.Listener.Addr().String(),
+			"--endpoint", srv.URL,
 		))
 	})
 
@@ -50,10 +51,10 @@ func TestPeerList(t *testing.T) {
 		routes := bindPeerManagement(t, q)
 		srv := cmdtestx.NewTLSServer(t, q, routes)
 
-		require.NoError(t, cmdtestx.Execute(t, genparser(t), "peers", "list",
+		require.NoError(t, cmdtestx.Execute(t, cmdtestx.Genparser(cmdddisc.Commands{})(t), "command", "peers", "list",
 			"--private-key-path", keypath,
 			"--insecure",
-			"--library", srv.Listener.Addr().String(),
+			"--endpoint", srv.URL,
 			"--query", "searchable",
 		))
 	})

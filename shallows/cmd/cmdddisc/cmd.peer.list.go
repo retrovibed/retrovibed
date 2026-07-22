@@ -12,24 +12,23 @@ import (
 )
 
 type cmdPeerList struct {
-	Endpoint string `flag:"" name:"library" help:"http address for the library you want to connect to" default:"localhost:9998"`
-	Query    string `flag:"" name:"query" help:"lucene text search (default field: description)" default:""`
+	Query string `flag:"" name:"query" help:"lucene text search (default field: description)" default:""`
 }
 
-func (t cmdPeerList) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.SSHID) (err error) {
+func (t cmdPeerList) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.SSHID, daemon *cmdopts.Endpoint) (err error) {
 	signer, err := id.Signer()
 	if err != nil {
 		return errorsx.Wrap(err, "failed to create signer")
 	}
 
-	c := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(fmt.Sprintf("https://%s", t.Endpoint)), authn.SSHTokenSourceOptionSigner(signer))
-	cc := authn.AuthzClientLibrary(tls.Config(), c, t.Endpoint)
+	c := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(daemon.Endpoint), authn.SSHTokenSourceOptionSigner(signer))
+	cc := authn.AuthzClientLibrary(tls.Config(), c, daemon.Endpoint)
 
-	return t.run(gctx.Context, cc)
+	return t.run(gctx.Context, daemon.Endpoint, cc)
 }
 
-func (t cmdPeerList) run(ctx context.Context, c *http.Client) (err error) {
-	result, err := ddiscapi.PeerSearch(ctx, c, t.Endpoint, &ddiscapi.PeerSearchRequest{
+func (t cmdPeerList) run(ctx context.Context, endpoint string, c *http.Client) (err error) {
+	result, err := ddiscapi.PeerSearch(ctx, c, endpoint, &ddiscapi.PeerSearchRequest{
 		Query: t.Query,
 		Limit: 100,
 	})

@@ -15,6 +15,7 @@ import (
 	"github.com/james-lawrence/torrent/torrenttest"
 	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/shallows/cmd/cmdddisc"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
@@ -54,10 +55,12 @@ func TestDiscoveryIdentify(t *testing.T) {
 		).Bind(routes.PathPrefix("/ddisc/media").Subrouter())
 		srv := cmdtestx.NewTLSServer(t, q, routes)
 
-		require.Error(t, cmdtestx.Execute(t, genparser(t), "discovery", "identify",
+		require.Error(t, cmdtestx.Execute(
+			t,
+			cmdtestx.Genparser(cmdddisc.Commands{})(t), "command",
+			"discovery", "identify",
 			"--private-key-path", keypath,
-			"--insecure",
-			"--library", srv.Listener.Addr().String(),
+			"--endpoint", srv.URL,
 			"--id", uh.ID,
 			"--peer-timeout", "1s",
 			"--info-timeout", "1s",
@@ -119,10 +122,12 @@ func TestDiscoveryIdentify(t *testing.T) {
 		seederAddrs := torrenttestx.ApprPorts(seeder)
 		require.NotEmpty(t, seederAddrs)
 
-		require.NoError(t, cmdtestx.Execute(t, genparser(t), "discovery", "identify",
+		require.NoError(t, cmdtestx.Execute(
+			t,
+			cmdtestx.Genparser(cmdddisc.Commands{})(t), "command",
+			"discovery", "identify",
 			"--private-key-path", keypath,
-			"--insecure",
-			"--library", srv.Listener.Addr().String(),
+			"--endpoint", srv.URL,
 			"--id", uh.ID,
 			"--peer-timeout", "5s",
 			"--info-timeout", "10s",

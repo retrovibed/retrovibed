@@ -28,7 +28,7 @@ func TestDiscoveryMetrics(t *testing.T) {
 		c := &http.Client{}
 		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
 
-		resp, err := metaapi.DiscoveryMetrics(t.Context(), c, "example.com")
+		resp, err := metaapi.DiscoveryMetrics(t.Context(), c, srv.URL)
 		require.NoError(t, err)
 		require.Equal(t, expected.Discovery.Enabled, resp.Discovery.Enabled)
 	})
@@ -42,7 +42,7 @@ func TestDiscoveryMetrics(t *testing.T) {
 		c := &http.Client{}
 		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
 
-		_, err := metaapi.DiscoveryMetrics(t.Context(), c, "example.com")
+		_, err := metaapi.DiscoveryMetrics(t.Context(), c, srv.URL)
 		require.Error(t, err)
 	})
 }

@@ -32,7 +32,7 @@ func TestLocateCreate(t *testing.T) {
 		c := &http.Client{}
 		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
 
-		resp, err := ddiscapi.LocateCreate(t.Context(), c, "example.com", &ddiscapi.LocateCreateRequest{Locate: &locate})
+		resp, err := ddiscapi.LocateCreate(t.Context(), c, srv.URL, &ddiscapi.LocateCreateRequest{Locate: &locate})
 		require.NoError(t, err)
 		require.Equal(t, expected.Locate.Id, resp.Locate.Id)
 	})
@@ -46,7 +46,7 @@ func TestLocateCreate(t *testing.T) {
 		c := &http.Client{}
 		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
 
-		_, err := ddiscapi.LocateCreate(t.Context(), c, "example.com", &ddiscapi.LocateCreateRequest{})
+		_, err := ddiscapi.LocateCreate(t.Context(), c, srv.URL, &ddiscapi.LocateCreateRequest{})
 		require.Error(t, err)
 	})
 }

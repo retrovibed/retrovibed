@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/shallows/cmd/cmdddisc"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
@@ -37,10 +38,12 @@ func TestMediaLs(t *testing.T) {
 		).Bind(routes.PathPrefix("/ddisc/media").Subrouter())
 		srv := cmdtestx.NewTLSServer(t, q, routes)
 
-		require.NoError(t, cmdtestx.Execute(t, genparser(t), "media", "ls",
+		require.NoError(t, cmdtestx.Execute(
+			t,
+			cmdtestx.Genparser(cmdddisc.Commands{})(t), "command",
+			"media", "ls",
 			"--private-key-path", keypath,
-			"--insecure",
-			"--library", srv.Listener.Addr().String(),
+			"--endpoint", srv.URL,
 		))
 	})
 
@@ -70,10 +73,12 @@ func TestMediaLs(t *testing.T) {
 		).Bind(routes.PathPrefix("/ddisc/media").Subrouter())
 		srv := cmdtestx.NewTLSServer(t, q, routes)
 
-		require.NoError(t, cmdtestx.Execute(t, genparser(t), "media", "ls",
+		require.NoError(t, cmdtestx.Execute(
+			t,
+			cmdtestx.Genparser(cmdddisc.Commands{})(t), "command",
+			"media", "ls",
 			"--private-key-path", keypath,
-			"--insecure",
-			"--library", srv.Listener.Addr().String(),
+			"--endpoint", srv.URL,
 			"--known-media-id", knownMediaID,
 		))
 	})
@@ -102,10 +107,10 @@ func TestMediaLs(t *testing.T) {
 		).Bind(routes.PathPrefix("/ddisc/media").Subrouter())
 		srv := cmdtestx.NewTLSServer(t, q, routes)
 
-		require.NoError(t, cmdtestx.Execute(t, genparser(t), "media", "ls",
+		require.NoError(t, cmdtestx.Execute(t, cmdtestx.Genparser(cmdddisc.Commands{})(t), "command",
+			"media", "ls",
 			"--private-key-path", keypath,
-			"--insecure",
-			"--library", srv.Listener.Addr().String(),
+			"--endpoint", srv.URL,
 			"--offload",
 		))
 	})
@@ -134,10 +139,12 @@ func TestMediaLs(t *testing.T) {
 		).Bind(routes.PathPrefix("/ddisc/media").Subrouter())
 		srv := cmdtestx.NewTLSServer(t, q, routes)
 
-		require.NoError(t, cmdtestx.Execute(t, genparser(t), "media", "ls",
+		require.NoError(t, cmdtestx.Execute(
+			t,
+			cmdtestx.Genparser(cmdddisc.Commands{})(t), "command",
+			"media", "ls",
 			"--private-key-path", keypath,
-			"--insecure",
-			"--library", srv.Listener.Addr().String(),
+			"--endpoint", srv.URL,
 			"--indexing",
 		))
 	})
@@ -166,10 +173,12 @@ func TestMediaLs(t *testing.T) {
 		).Bind(routes.PathPrefix("/ddisc/media").Subrouter())
 		srv := cmdtestx.NewTLSServer(t, q, routes)
 
-		require.NoError(t, cmdtestx.Execute(t, genparser(t), "media", "ls",
+		require.NoError(t, cmdtestx.Execute(
+			t,
+			cmdtestx.Genparser(cmdddisc.Commands{})(t), "command",
+			"media", "ls",
 			"--private-key-path", keypath,
-			"--insecure",
-			"--library", srv.Listener.Addr().String(),
+			"--endpoint", srv.URL,
 			"--id", wanted.ID,
 		))
 	})

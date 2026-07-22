@@ -15,22 +15,26 @@ import (
 )
 
 type IdenRegister struct {
-	Endpoint string `flag:"" name:"endpoint" help:"http address of the retrovibed instance" default:"localhost:9998"`
 }
 
-func (t IdenRegister) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.SSHID) (err error) {
+func (t IdenRegister) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.SSHID, daemon *cmdopts.Endpoint) (err error) {
 	signer, err := id.Signer()
 	if err != nil {
 		return err
 	}
 
-	c := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(fmt.Sprintf("https://%s", t.Endpoint)), authn.SSHTokenSourceOptionSigner(signer))
+	c := authn.AutoOauth2Client(
+		gctx.Context,
+		tls.Config(),
+		authn.EndpointSSHAuth(daemon.Endpoint),
+		authn.SSHTokenSourceOptionSigner(signer),
+	)
 
-	return t.run(gctx.Context, c)
+	return t.run(gctx.Context, daemon.Endpoint, c)
 }
 
-func (t IdenRegister) run(ctx context.Context, c *http.Client) (err error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, fmt.Sprintf("https://%s/sso/register", t.Endpoint), nil)
+func (t IdenRegister) run(ctx context.Context, endpoint string, c *http.Client) (err error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, fmt.Sprintf("%s/sso/register", endpoint), nil)
 	if err != nil {
 		return errorsx.Wrap(err, "unable to create http request")
 	}

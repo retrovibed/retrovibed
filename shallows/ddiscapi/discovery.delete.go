@@ -11,7 +11,7 @@ import (
 
 // DiscoveryDelete removes a discovery entry, identified by id, on the given library endpoint.
 func DiscoveryDelete(ctx context.Context, c *http.Client, endpoint string, id string) (resp *DiscoveryDeleteResponse, err error) {
-	hreq, err := http.NewRequestWithContext(ctx, http.MethodDelete, fmt.Sprintf("https://%s/ddisc/discovery/%s", endpoint, id), nil)
+	hreq, err := http.NewRequestWithContext(ctx, http.MethodDelete, fmt.Sprintf("%s/ddisc/discovery/%s", endpoint, id), nil)
 	if err != nil {
 		return nil, errorsx.Wrap(err, "unable to create http request")
 	}

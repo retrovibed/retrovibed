@@ -1,7 +1,6 @@
 package cmdddisc
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/davecgh/go-spew/spew"
@@ -13,7 +12,6 @@ import (
 )
 
 type cmdMediaCreate struct {
-	Endpoint     string `flag:"" name:"library" help:"http address for the library you want to connect to" default:"localhost:9998"`
 	MagnetURI    string `flag:"" name:"magnet" help:"magnet uri of the media" required:"true"`
 	Title        string `flag:"" name:"title" help:"title of the media"`
 	Description  string `flag:"" name:"description" help:"description of the media"`
@@ -22,21 +20,21 @@ type cmdMediaCreate struct {
 	Partition    string `flag:"" name:"partition" help:"partition uuid this record belongs to"`
 }
 
-func (t cmdMediaCreate) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.SSHID) (err error) {
+func (t cmdMediaCreate) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.SSHID, daemon *cmdopts.Endpoint) (err error) {
 	signer, err := id.Signer()
 	if err != nil {
 		return errorsx.Wrap(err, "failed to create signer")
 	}
 
-	c := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(fmt.Sprintf("https://%s", t.Endpoint)), authn.SSHTokenSourceOptionSigner(signer))
-	cc := authn.AuthzClientLibrary(tls.Config(), c, t.Endpoint)
+	c := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(daemon.Endpoint), authn.SSHTokenSourceOptionSigner(signer))
+	cc := authn.AuthzClientLibrary(tls.Config(), c, daemon.Endpoint)
 
 	m, err := metainfo.ParseMagnetURI(t.MagnetURI)
 	if err != nil {
 		return errorsx.Wrap(err, "failed to parse magnet uri")
 	}
 
-	mrsp, err := ddiscapi.MediaCreate(gctx.Context, cc, t.Endpoint, &ddiscapi.MediaCreateRequest{
+	mrsp, err := ddiscapi.MediaCreate(gctx.Context, cc, daemon.Endpoint, &ddiscapi.MediaCreateRequest{
 		Media: &ddiscapi.Media{
 			Infohash:     m.InfoHash.Bytes(),
 			Title:        t.Title,

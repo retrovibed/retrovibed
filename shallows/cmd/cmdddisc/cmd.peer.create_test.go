@@ -1,52 +1,21 @@
 package cmdddisc_test
 
 import (
-	"context"
 	"database/sql"
 	"path/filepath"
-	"sync"
 	"testing"
 
-	"github.com/alecthomas/kong"
 	"github.com/gorilla/mux"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdddisc"
-	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
-	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 	"github.com/stretchr/testify/require"
 )
-
-func genparser(t *testing.T, options ...kong.Option) *kong.Kong {
-	var cli struct {
-		cmdopts.Global
-		cmdopts.TLSConfig
-		cmdopts.SSHID
-		cmdddisc.Commands
-	}
-	cli.Context, cli.Shutdown = context.WithCancel(context.Background())
-	cli.Cleanup = &sync.WaitGroup{}
-
-	return kong.Must(
-		&cli,
-		append(options,
-			kong.Bind(&cli.TLSConfig),
-			kong.Bind(&cli.Global),
-			kong.Bind(&cli.SSHID),
-			kong.Vars{
-				"vars_private_key":                  env.PrivateKeyPath(),
-				"vars_user_configuration_directory": t.TempDir(),
-			},
-			kong.NamedMapper("durationinf", kong.MapperFunc(cmdopts.ParseDurationInf)),
-			kong.NamedMapper("envvar", kong.MapperFunc(cmdopts.ParseEnviron)),
-		)...,
-	)
-}
 
 func bindPeerManagement(t *testing.T, q *sql.DB) *mux.Router {
 	t.Helper()
@@ -73,10 +42,9 @@ func TestPeerCreate(t *testing.T) {
 		routes := bindPeerManagement(t, q)
 		srv := cmdtestx.NewTLSServer(t, q, routes)
 
-		require.NoError(t, cmdtestx.Execute(t, genparser(t), "peers", "create",
+		require.NoError(t, cmdtestx.Execute(t, cmdtestx.Genparser(cmdddisc.Commands{})(t), "command", "peers", "create",
 			"--private-key-path", keypath,
-			"--insecure",
-			"--library", srv.Listener.Addr().String(),
+			"--endpoint", srv.URL,
 			"--name", "derp",
 			"--peer", "34363564353033612d643263352d363338332d30",
 			"--partition", "033292b1-98c2-5e96-38a4-956548a40b55",

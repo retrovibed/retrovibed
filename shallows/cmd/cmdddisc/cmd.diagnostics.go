@@ -10,21 +10,20 @@ import (
 )
 
 // diagnostics command examples
-// go -C shallows run ./cmd/retrovibe/... discovery diagnostics --insecure --library="eg:9998"
+// go -C shallows run ./cmd/retrovibe/... discovery diagnostics --endpoint="eg:9998"
 type cmdDiagnostics struct {
-	Endpoint string `flag:"" name:"library" help:"http address for the library you want to connect to" default:"localhost:9998"`
 }
 
-func (t cmdDiagnostics) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.SSHID) (err error) {
+func (t cmdDiagnostics) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.SSHID, daemon *cmdopts.Endpoint) (err error) {
 	signer, err := id.Signer()
 	if err != nil {
 		return errorsx.Wrap(err, "failed to create signer")
 	}
 
-	c := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(fmt.Sprintf("https://%s", t.Endpoint)), authn.SSHTokenSourceOptionSigner(signer))
-	cc := authn.AuthzClientLibrary(tls.Config(), c, t.Endpoint)
+	c := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(daemon.Endpoint), authn.SSHTokenSourceOptionSigner(signer))
+	cc := authn.AuthzClientLibrary(tls.Config(), c, daemon.Endpoint)
 
-	result, err := metaapi.DiscoveryMetrics(gctx.Context, cc, t.Endpoint)
+	result, err := metaapi.DiscoveryMetrics(gctx.Context, cc, daemon.Endpoint)
 	if err != nil {
 		return err
 	}
