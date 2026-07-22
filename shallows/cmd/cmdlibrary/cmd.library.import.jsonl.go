@@ -6,7 +6,6 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"mime/multipart"
@@ -26,9 +25,9 @@ type importJSONL struct {
 	Endpoint string `flag:"" name:"peer" help:"http address for the daemon you want to import to" default:"localhost:9998"`
 }
 
-func (t importJSONL) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig) error {
-	c := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(fmt.Sprintf("https://%s", t.Endpoint)))
-	return t.run(gctx.Context, c, fmt.Sprintf("https://%s", t.Endpoint), os.Stdin)
+func (t importJSONL) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, daemon *cmdopts.Endpoint) error {
+	c := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(daemon.Endpoint))
+	return t.run(gctx.Context, c, daemon.Endpoint, os.Stdin)
 }
 
 func (t importJSONL) run(ctx context.Context, c *http.Client, endpoint string, r io.Reader) error {
