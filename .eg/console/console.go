@@ -60,11 +60,18 @@ func CompileBinding(b *tarballs.Build) eg.OpFn {
 
 func GenerateDevBinding(runtime shell.Command, outdir string, staticdirs ...string) eg.OpFn {
 	return func(ctx context.Context, _ eg.Op) error {
+		var cgoFlags strings.Builder
+
+		for _, dir := range staticdirs {
+			fmt.Fprintf(&cgoFlags, " -L%s", dir)
+		}
+
 		runtime := flutterRuntimev2(runtime)
 		return shell.Run(
 			ctx,
 			runtime.New("go -C retrovibedbind build -buildmode=c-shared -buildvcs=true --tags duckdb_use_lib,localdev,retrovibed,neural -o ${OUTPUT}/libretrovibed.so ./...").
-				Environ("OUTPUT", outdir),
+				Environ("OUTPUT", outdir).
+				Environ("CGO_LDFLAGS", strings.TrimSpace(cgoFlags.String())),
 			runtime.New("dart run ffigen --config ffigen.yaml"),
 		)
 	}

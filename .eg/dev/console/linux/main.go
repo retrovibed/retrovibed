@@ -40,7 +40,11 @@ func main() {
 				),
 				console.MaskDartTool,
 				console.Generate,
-				console.GenerateDevBinding(shell.Runtime(), egenv.WorkingDirectory("console", "build", "nativelib"), egenv.CacheDirectory("dev.native.libs")),
+				console.GenerateDevBinding(
+					shell.Runtime(),
+					egenv.WorkingDirectory("console", "build", "nativelib"),
+					egenv.CacheDirectory("dev.native.libs"),
+				),
 				console.BuildLinux,
 			),
 		),

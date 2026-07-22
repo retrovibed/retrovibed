@@ -13,6 +13,7 @@ depends=(
 
 makedepends=(
   'go'
+  'rust'
 )
 
 backup=('etc/retrovibed/config.env')
@@ -22,7 +23,14 @@ sha1sums=('SKIP')
 
 build() {
   install -d -m 755 "${srcdir}/.dist/usr/bin"
+
   cp -r "${srcdir}/${pkgname}/.dist/linux/"* "${srcdir}/.dist"
+
+  # build neurals
+  CARGO_TARGET_DIR="native" cargo build --manifest-path "${srcdir}/${pkgname}/neurals/Cargo.toml" --release
+  cp native/release/libpredicttext.{a,so} "${srcdir}/.dist/usr/lib/retrovibed/"
+
+  CGO_LDFLAGS="-L${srcdir}/.dist/usr/lib/retrovibed -Wl,-rpath,/usr/lib/retrovibed" \
   GOBIN="${srcdir}/.dist/usr/bin" go build -C "${srcdir}/${pkgname}/shallows" \
     -buildmode=pie -trimpath -tags "duckdb_use_lib,retrovibed,neural" -buildvcs=false \
     -o "${srcdir}/.dist/usr/bin" ./cmd/retrovibe/...

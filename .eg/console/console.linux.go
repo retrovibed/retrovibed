@@ -104,16 +104,6 @@ func flatpak(final egflatpak.Module) *egflatpak.Builder {
 		)...)
 }
 
-// // build ensures that the flatpak has all the necessary componentry for the generated manifest.
-// func FlatpakBuild(ctx context.Context, op eg.Op) error {
-// 	return egflatpak.Build(ctx, shell.Runtime().Timeout(30*time.Minute), flatpak(
-// 		egflatpak.ModuleTarball(
-// 			eggithub.DownloadURL(tarballs.Retrovibed()),
-// 			egtarball.SHA256(tarballs.Retrovibed()),
-// 		),
-// 	))
-// }
-
 // Manifest generates the manifest for distribution.
 func FlatpakManifest(b *tarballs.Build) eg.OpFn {
 	return func(ctx context.Context, o eg.Op) error {
