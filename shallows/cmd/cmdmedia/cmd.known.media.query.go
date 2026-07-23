@@ -66,10 +66,9 @@ func (t knownquery) run(ctx context.Context, in io.Reader, db *sql.DB, cleaner l
 		}
 		query = lucenex.Clean(query)
 
-		if rec.Query != query {
-			log.Println("query cleaned", rec.Query, "->", query)
-		}
+		query, release, episode := library.ParseReleaseEpisode(query)
 
+		log.Println("query cleaned", query, release, episode)
 		result := ScoredKnown{Relevance: t.MinRelevance}
 
 		{
