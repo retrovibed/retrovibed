@@ -21,9 +21,10 @@ import (
 )
 
 type knownquery struct {
-	Database string  `flag:"" name:"database" help:"database to read" default:"${vars_user_configuration_directory}/meta.db"`
-	Explicit bool    `flag:"" name:"explicit" help:"include explicit content in results" default:"false"`
-	Cutoff   float32 `flag:"" name:"cutoff" help:"similarity cutoff for scoring" default:"0.7"`
+	Database     string  `flag:"" name:"database" help:"database to read" default:"${vars_user_configuration_directory}/meta.db"`
+	Explicit     bool    `flag:"" name:"explicit" help:"include explicit content in results" default:"false"`
+	Cutoff       float32 `flag:"" name:"cutoff" help:"similarity cutoff for scoring" default:"0.7"`
+	MinRelevance float64 `flag:"" name:"min-relevance" help:"minimum relevance score" default: "0.7"`
 }
 
 func (t knownquery) Run(gctx *cmdopts.Global) (err error) {
@@ -69,7 +70,7 @@ func (t knownquery) run(ctx context.Context, in io.Reader, db *sql.DB, cleaner l
 			log.Println("query cleaned", rec.Query, "->", query)
 		}
 
-		result := ScoredKnown{Relevance: 0.0}
+		result := ScoredKnown{Relevance: t.MinRelevance}
 
 		{
 			q := library.KnownSearchBuilder().Where(squirrel.And{
