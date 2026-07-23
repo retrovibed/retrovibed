@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:retrovibed/media/download.row.display.dart';
+import 'package:retrovibed/media/download.watch.dart';
 import 'package:retrovibed/media/api.dart' as api;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/uuidx.dart' as uuidx;

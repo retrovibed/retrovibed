@@ -46,7 +46,7 @@ func TestMediaLocate(t *testing.T) {
 
 		require.Equal(t, 0, testx.Must(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM torrents_metadata"))(t))
 
-		require.NoError(t, daemons.LocateMedia(t.Context(), q, tracking.NewURIImport(q, http.DefaultClient, fsx.DirVirtual(t.TempDir())), &daemons.DiscoverySettings{LocateP2P: true}, nil, nil, nil, ddisc.UnimplementedStrategy{}, ddisc.DefaultPolicy()))
+		require.NoError(t, daemons.LocateMedia(t.Context(), q, tracking.NewURIImport(q, http.DefaultClient, fsx.DirVirtual(t.TempDir())), &daemons.DiscoverySettings{LocateP2P: true}, nil, nil, nil, ddisc.UnimplementedStrategy{}, ddisc.DefaultPolicy(), library.QueryCleanerNoop()))
 
 		require.Equal(t, 1, testx.Must(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM torrents_metadata WHERE initiated_at <= NOW()"))(t))
 		require.Equal(t, 1, testx.Must(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM ddisc_locate WHERE tombstoned_at < 'infinity'"))(t))
@@ -78,7 +78,7 @@ func TestMediaLocate(t *testing.T) {
 
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(t.Context(), q, d).Scan(&d))
 
-		require.NoError(t, daemons.LocateMedia(t.Context(), q, tracking.NewURIImport(q, http.DefaultClient, fsx.DirVirtual(t.TempDir())), &daemons.DiscoverySettings{LocateP2P: true}, nil, nil, nil, ddisc.UnimplementedStrategy{}, ddisc.DefaultPolicy()))
+		require.NoError(t, daemons.LocateMedia(t.Context(), q, tracking.NewURIImport(q, http.DefaultClient, fsx.DirVirtual(t.TempDir())), &daemons.DiscoverySettings{LocateP2P: true}, nil, nil, nil, ddisc.UnimplementedStrategy{}, ddisc.DefaultPolicy(), library.QueryCleanerNoop()))
 
 		require.Equal(t, 0, testx.Must(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM torrents_metadata WHERE initiated_at <= NOW()"))(t))
 		require.Equal(t, 1, testx.Must(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM library_recommendations"))(t))
@@ -111,7 +111,7 @@ func TestMediaLocate(t *testing.T) {
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(t.Context(), q, d).Scan(&d))
 
 		importer := tracking.NewURIImport(q, http.DefaultClient, fsx.DirVirtual(t.TempDir()))
-		require.NoError(t, daemons.LocateMedia(t.Context(), q, importer, &daemons.DiscoverySettings{LocateP2P: true}, nil, nil, nil, ddisc.UnimplementedStrategy{}, ddisc.DefaultPolicy()))
+		require.NoError(t, daemons.LocateMedia(t.Context(), q, importer, &daemons.DiscoverySettings{LocateP2P: true}, nil, nil, nil, ddisc.UnimplementedStrategy{}, ddisc.DefaultPolicy(), library.QueryCleanerNoop()))
 
 		var located ddisc.Locate
 		require.NoError(t, ddisc.LocateFindByID(t.Context(), q, l.ID).Scan(&located))
@@ -129,7 +129,7 @@ func TestMediaLocate(t *testing.T) {
 		// than silently handing back the now-dangling located_torrent_id.
 		require.NoError(t, ddisc.LocateInsertWithDefaults(t.Context(), q, ddisc.NewLocate(k.Title, mimex.Binary, ddisc.LocateOptionKnownMedia(k.UID))).Scan(&l))
 
-		require.NoError(t, daemons.LocateMedia(t.Context(), q, importer, &daemons.DiscoverySettings{LocateP2P: true}, nil, nil, nil, ddisc.UnimplementedStrategy{}, ddisc.DefaultPolicy()))
+		require.NoError(t, daemons.LocateMedia(t.Context(), q, importer, &daemons.DiscoverySettings{LocateP2P: true}, nil, nil, nil, ddisc.UnimplementedStrategy{}, ddisc.DefaultPolicy(), library.QueryCleanerNoop()))
 
 		require.NoError(t, ddisc.LocateFindByID(t.Context(), q, l.ID).Scan(&located))
 		require.NotEqual(t, "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF", located.LocatedTorrentID)
@@ -226,7 +226,7 @@ func TestMediaLocate(t *testing.T) {
 
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(t.Context(), q, d).Scan(&d))
 
-		require.NoError(t, daemons.LocateMedia(t.Context(), q, tracking.NewURIImport(q, http.DefaultClient, fsx.DirVirtual(t.TempDir())), &daemons.DiscoverySettings{LocateP2P: false}, nil, nil, nil, ddisc.UnimplementedStrategy{}, ddisc.DefaultPolicy()))
+		require.NoError(t, daemons.LocateMedia(t.Context(), q, tracking.NewURIImport(q, http.DefaultClient, fsx.DirVirtual(t.TempDir())), &daemons.DiscoverySettings{LocateP2P: false}, nil, nil, nil, ddisc.UnimplementedStrategy{}, ddisc.DefaultPolicy(), library.QueryCleanerNoop()))
 
 		require.Equal(t, 0, testx.Must(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM torrents_metadata"))(t))
 		require.Equal(t, 0, testx.Must(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM ddisc_locate WHERE tombstoned_at < 'infinity'"))(t))

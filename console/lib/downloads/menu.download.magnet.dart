@@ -5,8 +5,8 @@ import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/media.dart' as media;
 import 'magnet.links.dart';
 
-Future<void> addMagnetLinks(BuildContext context) {
-  final completer = Completer<void>();
+Future<List<media.Download>> addMagnetLinks(BuildContext context) {
+  final completer = Completer<List<media.Download>>();
   ds.modals.push(
     context,
     MagnetDownloads(
@@ -25,9 +25,9 @@ Future<void> addMagnetLinks(BuildContext context) {
               }),
         );
         return Future.wait(pending, eagerError: true)
-            .then((_) {
+            .then((v) {
               ds.modals.of(context)?.reset();
-              completer.complete();
+              completer.complete(v.map((v) => v.download).toList());
             })
             .catchError((cause) {
               completer.completeError(cause);
@@ -38,12 +38,12 @@ Future<void> addMagnetLinks(BuildContext context) {
   return completer.future;
 }
 
-PopupMenuEntry<String> MenuItemDownloadMagnet(BuildContext context) {
+PopupMenuEntry<String> MenuItemDownloadMagnet(BuildContext context, Function(Future<List<media.Download>>) onDownload) {
   return PopupMenuItem<String>(
     child: ds.LoadingListTile(
       leading: const Icon(Icons.link),
       title: const Text("Download Magnet"),
-      onPressed: () => addMagnetLinks(context).catchError((cause) => debugPrint('add magnet link failed: $cause')),
+      onPressed: () => onDownload(addMagnetLinks(context)),
     ),
   );
 }

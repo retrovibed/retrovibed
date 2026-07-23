@@ -119,6 +119,25 @@ func discoverNoopFilter(context.Context, Discovered) (bool, error) {
 	return true, nil
 }
 
+// DiscoverOptionDetectMedia sets detectMedia as the transform discoverSeq
+// runs every strategy's candidate seq through, letting it fill in
+// KnownMediaID on any Discovered candidate that doesn't already carry one
+// (e.g. a plugin/peertube hit for a free-text query) - see
+// KnownMediaDetector for the concrete clean+match implementation. Omitted
+// entirely, no candidate is touched (see discoverNoopDetectMedia).
+func DiscoverOptionDetectMedia(detectMedia func(iterx.Seq[Discovered]) iterx.Seq[Discovered]) DiscoverOption {
+	return func(t *discoverSeq) {
+		t.detectMedia = detectMedia
+	}
+}
+
+// discoverNoopDetectMedia is discoverSeq's default detectMedia transform:
+// every candidate passes through unchanged. Keeps discoverSeq.detectMedia
+// always callable, no nil check needed.
+func discoverNoopDetectMedia(s iterx.Seq[Discovered]) iterx.Seq[Discovered] {
+	return s
+}
+
 // Discover tries every strategy in order, regardless of whether an earlier
 // strategy already yielded something - so a caller sees candidates from
 // every strategy, not just the first one to produce a hit. A genuine error
@@ -133,7 +152,7 @@ func discoverNoopFilter(context.Context, Discovered) (bool, error) {
 // be recorded regardless (e.g. daemons.SearchQueueBackgroundRun, which
 // exists purely to populate ddisc_media for background browsing).
 func Discover(ctx context.Context, policy Policy, req DiscoverRequest, options []DiscoverOption, strategies ...DiscoverStrategy) iterx.Seq[Discovered] {
-	d := &discoverSeq{policy: policy, req: req, strategies: strategies, filter: discoverNoopFilter}
+	d := &discoverSeq{policy: policy, req: req, strategies: strategies, filter: discoverNoopFilter, detectMedia: discoverNoopDetectMedia}
 	for _, opt := range options {
 		opt(d)
 	}
@@ -141,11 +160,12 @@ func Discover(ctx context.Context, policy Policy, req DiscoverRequest, options [
 }
 
 type discoverSeq struct {
-	policy     Policy
-	req        DiscoverRequest
-	strategies []DiscoverStrategy
-	filter     func(context.Context, Discovered) (bool, error)
-	err        error
+	policy      Policy
+	req         DiscoverRequest
+	strategies  []DiscoverStrategy
+	filter      func(context.Context, Discovered) (bool, error)
+	detectMedia func(iterx.Seq[Discovered]) iterx.Seq[Discovered]
+	err         error
 }
 
 func (t *discoverSeq) Each(ctx context.Context) iter.Seq[Discovered] {
@@ -154,6 +174,7 @@ func (t *discoverSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 			seq := strategy.Discover(ctx, t.req)
 			seq = iterx.Filter(seq, t.filter)
 			seq = iterx.NotFound(seq)
+			seq = t.detectMedia(seq)
 
 			for d := range seq.Each(ctx) {
 				if err := t.policy.Rank(&d); err != nil {

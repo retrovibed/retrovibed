@@ -8,6 +8,7 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/lucenex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/library"
@@ -46,7 +47,10 @@ func IdentifyLibraryMedia(ctx context.Context, db sqlx.Queryer, mc library.Query
 			continue
 		}
 
-		if known, err = library.DetectKnownMedia(ctx, db, mimex.Category(stringsx.FirstNonBlank(md.Mimetype, mimex.Binary)), cleaned); err != nil {
+		cleaned = lucenex.Clean(cleaned)
+		title, _, _ := library.ParseReleaseEpisode(cleaned)
+
+		if known, err = library.DetectKnownMedia(ctx, db, mimex.Category(stringsx.FirstNonBlank(md.Mimetype, mimex.Binary)), title); err != nil {
 			log.Println("unable to detect known media for library media", md.ID, md.Description, "|", err)
 			continue
 		}

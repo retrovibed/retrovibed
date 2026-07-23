@@ -5,7 +5,7 @@ import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/mimex.dart' as mimex;
 
-Future<void> uploadTorrent(
+Future<List<media.Download>> uploadTorrent(
   BuildContext context, {
   media.FnUploadRequest upload = media.discovered.upload,
 }) {
@@ -27,15 +27,22 @@ Future<void> uploadTorrent(
     );
   });
 
-  return work.then((_) {});
+  return work.then((v) => v.map((v) => v.download).toList());
 }
 
-PopupMenuEntry<String> MenuItemDownloadTorrent(BuildContext context) {
+PopupMenuEntry<String> MenuItemDownloadTorrent(
+  BuildContext context,
+  Function(Future<List<media.Download>>) onDownload,
+) {
   return PopupMenuItem<String>(
     child: ds.LoadingListTile(
       leading: const Icon(Icons.file_download_outlined),
       title: const Text("Download Torrent"),
-      onPressed: () => uploadTorrent(context).catchError((cause) => debugPrint('upload torrent failed: $cause')),
+      onPressed: () => onDownload(
+        uploadTorrent(
+          context,
+        ),
+      ).catchError((cause) => debugPrint('upload torrent failed: $cause')),
     ),
   );
 }

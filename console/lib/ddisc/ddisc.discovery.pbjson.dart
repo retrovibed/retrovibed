@@ -30,6 +30,7 @@ const Discovery$json = {
     {'1': 'health', '3': 9, '4': 1, '5': 13, '10': 'health'},
     {'1': 'bytes', '3': 10, '4': 1, '5': 4, '10': 'bytes'},
     {'1': 'policy_rank', '3': 11, '4': 1, '5': 13, '10': 'policy_rank'},
+    {'1': 'known_media_id', '3': 12, '4': 1, '5': 9, '10': 'known_media_id'},
   ],
 };
 
@@ -40,7 +41,8 @@ final $typed_data.Uint8List discoveryDescriptor = $convert.base64Decode(
     'aGVjaxIeCgpjcmVhdGVkX2F0GAUgASgJUgpjcmVhdGVkX2F0Eh4KCnVwZGF0ZWRfYXQYBiABKA'
     'lSCnVwZGF0ZWRfYXQSFAoFdGl0bGUYByABKAlSBXRpdGxlEiAKC2Rlc2NyaXB0aW9uGAggASgJ'
     'UgtkZXNjcmlwdGlvbhIWCgZoZWFsdGgYCSABKA1SBmhlYWx0aBIUCgVieXRlcxgKIAEoBFIFYn'
-    'l0ZXMSIAoLcG9saWN5X3JhbmsYCyABKA1SC3BvbGljeV9yYW5r');
+    'l0ZXMSIAoLcG9saWN5X3JhbmsYCyABKA1SC3BvbGljeV9yYW5rEiYKDmtub3duX21lZGlhX2lk'
+    'GAwgASgJUg5rbm93bl9tZWRpYV9pZA==');
 
 @$core.Deprecated('Use discoverySearchRequestDescriptor instead')
 const DiscoverySearchRequest$json = {

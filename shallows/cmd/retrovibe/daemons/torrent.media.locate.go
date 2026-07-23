@@ -34,7 +34,7 @@ import (
 // responder (see ddisctorrent.NewPartitionStrategy). The local ddisc_media
 // scan is what notices those (and any previously-imported winner) on a
 // later pass.
-func Locate(ctx context.Context, db sqlx.Queryer, disc *DiscoverySettings, dhts *dht.Server, partitions *ddisc.Partition, plugins searchplugin.T, peertube ddisc.DiscoverStrategy, policy ddisc.Policy, loc ddisc.Locate) (ddisc.Discovered, error) {
+func Locate(ctx context.Context, db sqlx.Queryer, disc *DiscoverySettings, dhts *dht.Server, partitions *ddisc.Partition, plugins searchplugin.T, peertube ddisc.DiscoverStrategy, policy ddisc.Policy, mc library.QueryCleaner, loc ddisc.Locate) (ddisc.Discovered, error) {
 	strategies := []ddisc.DiscoverStrategy{}
 	// the DHT partition strategy, the local fallback strategy, and the
 	// partition's peer-side responder all key strictly off known_media_id
@@ -53,7 +53,10 @@ func Locate(ctx context.Context, db sqlx.Queryer, disc *DiscoverySettings, dhts 
 		Adult:        loc.Adult,
 	}
 
-	options := []ddisc.DiscoverOption{ddisc.DiscoverOptionFilter(ddisc.NewTitleFilter(db, req).Match)}
+	options := []ddisc.DiscoverOption{
+		ddisc.DiscoverOptionFilter(ddisc.NewTitleFilter(db, req).Match),
+		ddisc.DiscoverOptionDetectMedia(ddisc.KnownMediaDetector(db, mc)),
+	}
 	seq := ddisc.Discover(ctx, policy, req, options, strategies...)
 	best, err := ddisc.Select(func(yield func(ddisc.Discovered) bool) {
 		for v := range seq.Each(ctx) {
@@ -123,7 +126,7 @@ func DiscoveredDownload(ctx context.Context, db sqlx.Queryer, importer tracking.
 
 // LocateMedia drains pending ddisc_locate rows, locating and downloading
 // the best candidate for each.
-func LocateMedia(ctx context.Context, db sqlx.Queryer, importer tracking.URIImport, disc *DiscoverySettings, dhts *dht.Server, partitions *ddisc.Partition, plugins searchplugin.T, peertube ddisc.DiscoverStrategy, policy ddisc.Policy) error {
+func LocateMedia(ctx context.Context, db sqlx.Queryer, importer tracking.URIImport, disc *DiscoverySettings, dhts *dht.Server, partitions *ddisc.Partition, plugins searchplugin.T, peertube ddisc.DiscoverStrategy, policy ddisc.Policy, mc library.QueryCleaner) error {
 	log.Println("locate media initiated")
 	defer log.Println("locate media completed")
 	if !disc.LocateP2P {
@@ -136,7 +139,7 @@ func LocateMedia(ctx context.Context, db sqlx.Queryer, importer tracking.URIImpo
 	for loc := range s.Iter() {
 		log.Println("locating initiated", loc.ID, loc.Query)
 
-		d, err := Locate(ctx, db, disc, dhts, partitions, plugins, peertube, policy, loc)
+		d, err := Locate(ctx, db, disc, dhts, partitions, plugins, peertube, policy, mc, loc)
 		if errors.Is(err, ddisc.ErrNoCandidate) {
 			continue
 		} else if err != nil {
