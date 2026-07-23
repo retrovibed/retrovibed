@@ -47,8 +47,8 @@ void main() {
 
       await tester.tap(find.byType(DropdownUpload));
       await tester.pumpAndSettle();
-      await tester.ensureVisible(find.text('Search / Discover'));
-      await tester.tap(find.text('Search / Discover'));
+      await tester.ensureVisible(find.text('Search'));
+      await tester.tap(find.text('Search'));
       await tester.pumpAndSettle();
 
       expect(find.byType(KnownMediaDisplay), findsNothing);
