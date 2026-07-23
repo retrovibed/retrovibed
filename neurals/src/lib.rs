@@ -56,7 +56,7 @@ fn run_predict(
         .map_err(|e| format!("{0} execution error: {e}", model.path))?;
 
     let logits = outputs
-        .remove(0)
+        .remove(1)
         .to_array_view::<f32>()
         .map_err(|e| format!("{0} output type mismatch: {e}", model.path))?
         .into_owned();
