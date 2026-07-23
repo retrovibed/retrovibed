@@ -98,7 +98,7 @@ func (t knownquery) run(ctx context.Context, in io.Reader, db *sql.DB, cleaner l
 			}
 		}
 
-		if result.Relevance > 0 {
+		if stringsx.Present(result.Title) {
 			log.Println("result", result.Relevance, result.UID, result.Title, result.Released, result.Mimetype)
 			continue
 		}
@@ -131,7 +131,11 @@ func (t knownquery) run(ctx context.Context, in io.Reader, db *sql.DB, cleaner l
 			}
 		}
 
-		log.Println("result", result.Relevance, result.UID, result.Title, result.Released, result.Mimetype)
+		if stringsx.Present(result.Title) {
+			log.Println("result", result.Relevance, result.UID, result.Title, result.Released, result.Mimetype)
+		} else {
+			log.Println("no result found")
+		}
 	}
 
 	if err := seq.Err(); err != nil {
