@@ -48,6 +48,10 @@ func NewQueryerCleanerV0(path string, options ...func(*neurals.Text)) *QueryerCl
 	return &QueryerCleanerV0{text: neurals.NewText(path, options...)}
 }
 
-func (t QueryerCleanerV0) Clean(_ context.Context, text string) (r string, err error) {
-	return t.text.Predict(text)
+func (t QueryerCleanerV0) Clean(_ context.Context, input string) (r string, err error) {
+	if stringsx.Blank(input) {
+		return "", nil
+	}
+
+	return t.text.Predict(input)
 }
