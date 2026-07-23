@@ -87,6 +87,7 @@ func (t cmdMediaLocate) Run(gctx *cmdopts.Global) (err error) {
 
 	partitions := ddisc.Partitions(uint16(t.Partitions), cryptox.NewChaCha8(t.Seed))
 	policy := ddisc.DefaultPolicy()
+	mc := library.NewQueryerCleanerAuto()
 	disc := &daemons.DiscoverySettings{
 		LocateP2P:  true,
 		Partitions: uint32(t.Partitions),
@@ -98,7 +99,7 @@ func (t cmdMediaLocate) Run(gctx *cmdopts.Global) (err error) {
 
 	var found ddisc.Discovered
 	err = timex.NowAndEvery(bctx, t.Interval, func(ctx context.Context) error {
-		d, ferr := daemons.Locate(ctx, db, disc, dhts, partitions, plugins, peertube, policy, loc)
+		d, ferr := daemons.Locate(ctx, db, disc, dhts, partitions, plugins, peertube, policy, mc, loc)
 		if errors.Is(ferr, ddisc.ErrNoCandidate) {
 			return nil
 		} else if ferr != nil {

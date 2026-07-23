@@ -574,7 +574,7 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 			backoffx.JitterRandom(time.Second),
 		), "locate media - periodic")
 		asyncx.Background(dctx, t.locate, func(ctx context.Context) error {
-			return errorsx.Wrap(LocateMedia(dctx, t.db, importer, disc, dhts, partitions, t.plugins, t.peertube, policy), "failed to locate media")
+			return errorsx.Wrap(LocateMedia(dctx, t.db, importer, disc, dhts, partitions, t.plugins, t.peertube, policy, t.mc), "failed to locate media")
 		})
 	} else {
 		log.Println("auto locate media is disabled, to enable add --auto-locate-media flag.")
