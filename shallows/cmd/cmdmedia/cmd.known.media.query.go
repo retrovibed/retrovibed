@@ -69,7 +69,7 @@ func (t knownquery) run(ctx context.Context, in io.Reader, db *sql.DB, cleaner l
 			log.Println("query cleaned", rec.Query, "->", query)
 		}
 
-		result := ScoredKnown{Relevance: -1.0}
+		result := ScoredKnown{Relevance: 0.0}
 
 		{
 			q := library.KnownSearchBuilder().Where(squirrel.And{

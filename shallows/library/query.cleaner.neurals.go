@@ -7,6 +7,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/envx"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
@@ -53,5 +54,13 @@ func (t QueryerCleanerV0) Clean(_ context.Context, input string) (r string, err 
 		return "", nil
 	}
 
-	return t.text.Predict(input)
+	if r, err = t.text.Predict(input); err != nil {
+		return "", errorsx.Wrapf(err, "failed cleaning input: %s", input)
+	}
+
+	if len(r) > len(input) {
+		return "", errorsx.Errorf("result long than input: %s v %s", input, r)
+	}
+
+	return r, nil
 }
