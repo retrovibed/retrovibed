@@ -7,6 +7,7 @@ import 'package:retrovibed/media/media.pb.dart';
 import 'package:retrovibed/media/content.addressable.storage.pb.dart' as cas;
 import 'package:http/http.dart' as http;
 import 'package:retrovibed/httpx.dart' as httpx;
+import 'package:retrovibed/timex.dart' as timex;
 
 export 'package:retrovibed/media/media.pb.dart';
 export 'search.state.dart';
@@ -229,6 +230,10 @@ abstract class media {
       });
     });
   }
+}
+
+abstract class download {
+  static bool completed(Download d) => timex.iso8601(d.completedAt).isBefore(timex.inf);
 }
 
 abstract class discoveredsearch {

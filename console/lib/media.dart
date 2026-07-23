@@ -7,6 +7,8 @@ export 'media/media.row.display.dart';
 export 'media/download.display.dart';
 export 'media/download.row.display.dart';
 export 'media/download.row.controls.dart';
+export 'media/download.watch.dart';
+export 'media/download.queue.dart';
 export 'media/player.dart';
 export 'media/button.play.dart';
 export 'media/button.share.dart';

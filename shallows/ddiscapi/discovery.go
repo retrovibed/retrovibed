@@ -1,6 +1,7 @@
 package ddiscapi
 
 import (
+	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/grpcx"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
@@ -8,12 +9,13 @@ import (
 
 func NewDiscoveryFromTrackingUnknownHash(mu tracking.UnknownHash) *Discovery {
 	return &Discovery{
-		Id:        mu.ID,
-		Infohash:  mu.Infohash,
-		Attempts:  uint32(mu.Attempts),
-		NextCheck: grpcx.EncodeTime(mu.NextCheck),
-		CreatedAt: grpcx.EncodeTime(mu.CreatedAt),
-		UpdatedAt: grpcx.EncodeTime(mu.UpdatedAt),
+		Id:           mu.ID,
+		Infohash:     mu.Infohash,
+		Attempts:     uint32(mu.Attempts),
+		NextCheck:    grpcx.EncodeTime(mu.NextCheck),
+		CreatedAt:    grpcx.EncodeTime(mu.CreatedAt),
+		UpdatedAt:    grpcx.EncodeTime(mu.UpdatedAt),
+		KnownMediaId: uuid.Nil.String(),
 	}
 }
 
@@ -25,16 +27,17 @@ func NewDiscoveryFromTrackingUnknownHash(mu tracking.UnknownHash) *Discovery {
 // NewMediaFromDiscovered documents for this same source type.
 func NewDiscoveryFromDiscovered(d ddisc.Discovered) *Discovery {
 	return &Discovery{
-		Id:          d.ID,
-		Infohash:    d.Infohash,
-		Attempts:    d.Attempts,
-		NextCheck:   grpcx.EncodeTime(d.NextCheckAt),
-		CreatedAt:   grpcx.EncodeTime(d.CreatedAt),
-		UpdatedAt:   grpcx.EncodeTime(d.UpdatedAt),
-		Title:       d.Title,
-		Description: d.Description,
-		Health:      d.Health,
-		Bytes:       d.Bytes,
-		PolicyRank:  uint32(d.PolicyRank),
+		Id:           d.ID,
+		Infohash:     d.Infohash,
+		Attempts:     d.Attempts,
+		NextCheck:    grpcx.EncodeTime(d.NextCheckAt),
+		CreatedAt:    grpcx.EncodeTime(d.CreatedAt),
+		UpdatedAt:    grpcx.EncodeTime(d.UpdatedAt),
+		Title:        d.Title,
+		Description:  d.Description,
+		Health:       d.Health,
+		Bytes:        d.Bytes,
+		PolicyRank:   uint32(d.PolicyRank),
+		KnownMediaId: uuid.FromStringOrNil(d.KnownMediaID).String(),
 	}
 }

@@ -36,6 +36,7 @@ class Home extends StatefulWidget {
 enum _Mode { library, discovery }
 
 class _HomeState extends State<Home> {
+  Widget _downloading = ds.Empty;
   _Mode _mode = _Mode.library;
 
   void setState(VoidCallback fn) {
@@ -116,7 +117,7 @@ class _HomeState extends State<Home> {
                           },
                           child: ListTile(
                             leading: Icon(_mode == _Mode.discovery ? Icons.check : Icons.travel_explore),
-                            title: const Text("Search / Discover"),
+                            title: const Text("Search"),
                           ),
                         ),
                         const PopupMenuDivider(),
@@ -132,8 +133,24 @@ class _HomeState extends State<Home> {
                           widget.search,
                           apiupload: widget.apiupload,
                         ),
-                        downloads.MenuItemDownloadTorrent(context),
-                        downloads.MenuItemDownloadMagnet(context),
+                        downloads.MenuItemDownloadTorrent(context, (downloads) {
+                          setState(() {
+                            _downloading = media.DownloadQueue(
+                              downloads,
+                              onQueueComplete: () => setState(() => _downloading = ds.Empty),
+                            );
+                          });
+                          print("downloading torrents ${downloads}");
+                        }),
+                        downloads.MenuItemDownloadMagnet(context, (downloads) {
+                          setState(() {
+                            _downloading = media.DownloadQueue(
+                              downloads,
+                              onQueueComplete: () => setState(() => _downloading = ds.Empty),
+                            );
+                          });
+                          print("downloading magnets ${downloads}");
+                        }),
                       ],
                     ),
                   ),
@@ -141,6 +158,7 @@ class _HomeState extends State<Home> {
                 help: ds.Hint(const Text("search your library, use @ to access advanced filtering")),
               ),
             ),
+            _downloading,
             Expanded(
               child: switch (_mode) {
                 _Mode.library => Grid(

@@ -4,6 +4,8 @@ import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/design.kit/bytesx.dart';
 import 'package:retrovibed/ddisc.dart' as ddisc;
+import 'package:retrovibed/library.dart' as lib;
+import 'package:retrovibed/uuidx.dart' as uuidx;
 
 class DiscoveredCard extends StatefulWidget {
   final ddisc.Discovery current;
@@ -26,7 +28,16 @@ class DiscoveredCard extends StatefulWidget {
 class _DiscoveredCardState extends State<DiscoveredCard> {
   bool _loading = false;
   bool _queued = false;
+  bool _resolved = false;
   Widget _cause = ds.Error.zero;
+
+  late lib.Known _known = lib.Known(
+    id: "",
+    description: widget.current.title,
+    summary: widget.current.description,
+    rating: 0.0,
+    image: "",
+  );
 
   void setState(VoidCallback fn) {
     if (!mounted) return;
@@ -37,6 +48,22 @@ class _DiscoveredCardState extends State<DiscoveredCard> {
     setState(() {
       _cause = ds.Error.zero;
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_resolved) return;
+    if (uuidx.isMinMax(uuidx.fromString(widget.current.knownMediaId))) return;
+    _resolved = true;
+
+    final authz = authn.AuthzCache.meta(context);
+    lib.known
+        .cached(
+          widget.current.knownMediaId,
+          () => lib.known.get(widget.current.knownMediaId, options: [authn.request(authz)]),
+        )
+        .then((w) => setState(() => _known = w.known..description = widget.current.title));
   }
 
   void _onTap() {
@@ -77,36 +104,12 @@ class _DiscoveredCardState extends State<DiscoveredCard> {
     return ds.Loading(
       loading: _loading,
       cause: _cause,
-      ds.Card(
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              widget.current.title,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            if (widget.current.description.isNotEmpty)
-              Text(
-                widget.current.description,
-                maxLines: 4,
-                overflow: TextOverflow.ellipsis,
-              ),
-          ],
-        ),
-        onTap: _queued || _loading ? null : _onTap,
+      lib.KnownMediaCard(
+        _known,
+        icon: _queued ? Icons.query_builder_rounded : Icons.download_rounded,
         help: widget.help,
-        trailing: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(size),
-              Icon(_queued ? Icons.query_builder_rounded : Icons.download_rounded),
-            ],
-          ),
-        ],
+        onTap: _queued || _loading ? null : _onTap,
+        trailing: Text(size),
       ),
     );
   }
