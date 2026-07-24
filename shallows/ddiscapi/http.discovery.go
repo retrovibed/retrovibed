@@ -29,6 +29,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/internal/websocketx"
+	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/retrovibed/retrovibed/shallows/metaapi"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
@@ -42,6 +43,12 @@ func HTTPDiscoveryOptionJWTSecret(j jwtx.SecretSource) HTTPDiscoveryOption {
 	}
 }
 
+func HTTPDiscoveryOptionQueryCleaner(mc library.QueryCleaner) HTTPDiscoveryOption {
+	return func(t *HTTPDiscovery) {
+		t.cleaner = mc
+	}
+}
+
 func NewHTTPDiscovery(q sqlx.Queryer, plugins searchplugin.T, peertube ddisc.DiscoverStrategy, options ...HTTPDiscoveryOption) *HTTPDiscovery {
 	svc := langx.Clone(HTTPDiscovery{
 		q:         q,
@@ -49,6 +56,7 @@ func NewHTTPDiscovery(q sqlx.Queryer, plugins searchplugin.T, peertube ddisc.Dis
 		peertube:  peertube,
 		jwtsecret: env.JWTSecret,
 		decoder:   formx.NewDecoder(),
+		cleaner:   library.QueryCleanerNoop(),
 	}, options...)
 
 	return &svc
@@ -60,6 +68,7 @@ type HTTPDiscovery struct {
 	peertube  ddisc.DiscoverStrategy
 	jwtsecret jwtx.SecretSource
 	decoder   *form.Decoder
+	cleaner   library.QueryCleaner
 }
 
 func (t *HTTPDiscovery) Bind(r *mux.Router) {
@@ -176,8 +185,18 @@ func (t *HTTPDiscovery) websocket(w http.ResponseWriter, r *http.Request) {
 	}
 
 	strategies := ddisc.SyncStrategies(t.q, t.plugins, t.peertube, discreq.KnownMediaID)
-	options := []ddisc.DiscoverOption{ddisc.DiscoverOptionFilter(ddisc.NewTitleFilter(t.q, discreq).Match)}
-	seq := ddisc.Discover(ctx, ddisc.DefaultPolicy(), discreq, options, strategies...)
+	seq := ddisc.Discover(
+		ctx,
+		ddisc.DefaultPolicy(),
+		discreq,
+		[]ddisc.DiscoverOption{
+			ddisc.DiscoverOptionFilter(ddisc.NewTitleFilter(t.q, discreq).Match),
+			ddisc.DiscoverOptionDetectMedia(
+				ddisc.KnownMediaDetector(t.q, t.cleaner),
+			),
+		},
+		strategies...,
+	)
 
 	var (
 		buf   = bytes.NewBuffer(nil)

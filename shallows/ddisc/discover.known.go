@@ -3,8 +3,10 @@ package ddisc
 import (
 	"context"
 	"iter"
+	"log"
 
 	"github.com/Masterminds/squirrel"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
@@ -138,6 +140,8 @@ func (t *knownMediaDetectSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 				t.err = errorsx.Wrap(err, "unable to detect known media")
 				return
 			}
+
+			log.Println("known media", cleaned, "->", title, spew.Sdump(known))
 
 			if !uuidx.IsMinMax(uuid.FromStringOrNil(known.UID)) {
 				d.KnownMediaID = known.UID
