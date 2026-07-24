@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"log"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
@@ -85,13 +86,24 @@ func IdentifyOne(ctx context.Context, dhts *dht.Server, tclient *torrent.Client,
 
 	log.Println("attempting to download", id, bytesx.Unit(length))
 	r := torrent.DownloadRange(dctx, tt, off, min(length, 32*bytesx.KiB))
-	go func() {
+	var cleanup sync.WaitGroup
+
+	cleanup.Go(func() {
 		torrentx.DownloadProgress(dctx, tt)
 		errorsx.Log(errorsx.Wrapf(r.Close(), "%s failed to close reader", id))
 		errorsx.Log(errorsx.Wrapf(tclient.Stop(metadata), "%s failed to stop torrent", id))
-	}()
+	})
 
 	mime, err := Mimetype(r)
+
+	// Mimetype only needs the leading bytes; DownloadProgress keeps driving
+	// connections/pieces concurrently with that read, so cancel it now and
+	// wait for its close/stop cleanup to actually finish before returning -
+	// otherwise callers can observe IdentifyOne as done while its torrent
+	// client is still writing cache files out from under them.
+	done()
+	cleanup.Wait()
+
 	if err != nil {
 		return disc, errorsx.Wrapf(err, "unable to initialize torrent for %s", disc.ID)
 	}

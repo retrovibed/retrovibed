@@ -2,6 +2,7 @@ package daemons_test
 
 import (
 	"log"
+	"sync"
 	"testing"
 	"time"
 
@@ -70,7 +71,8 @@ func TestDiscoverMedia(t *testing.T) {
 		// cheap cache hit whenever the torrent is already registered, and only
 		// does real work (reconnecting) right after DiscoverMedia drops it.
 		consumerStorage := storage.NewFile(t.TempDir())
-		go func() {
+		var wg sync.WaitGroup
+		wg.Go(func() {
 			for ctx.Err() == nil {
 				if md, err := torrent.NewFromInfo(info, torrent.OptionStorage(consumerStorage)); err == nil {
 					_, _, err = consumer.Start(md, torrent.TuneClientPeer(seeder), torrent.TuneAnnounceUntilComplete, torrent.TuneNewConns)
@@ -78,19 +80,19 @@ func TestDiscoverMedia(t *testing.T) {
 				}
 				time.Sleep(200 * time.Millisecond)
 			}
-		}()
+		})
 
 		disc := ddisc.NewDiscovered(&id, ddisc.DiscoveredOptionFromTorrentInfo(info), ddisc.DiscoveredOptionAutoMagnet)
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, disc).Scan(&disc))
 
-		go func() {
+		wg.Go(func() {
 			errorsx.Log(daemons.DiscoverMedia(
 				ctx, q, s, consumer,
 				daemons.DiscoverMediaOptionFrequency(10*time.Millisecond),
 				daemons.DiscoverMediaOptionPeerTimeout(5*time.Second),
 				daemons.DiscoverMediaOptionInfoTimeout(10*time.Second),
 			))
-		}()
+		})
 
 		require.Eventually(t, func() bool {
 			var updated ddisc.Discovered
@@ -99,6 +101,13 @@ func TestDiscoverMedia(t *testing.T) {
 			}
 			return updated.KnownMediaID == uuid.Max.String() && updated.Mimetype != ""
 		}, 30*time.Second, 100*time.Millisecond, "expected discovered media to be identified and indexed")
+
+		// Stop both background goroutines and wait for them to actually
+		// return before the deferred Close()/TempDir cleanups below run -
+		// otherwise they can still be writing into those directories when
+		// cleanup tries to remove them.
+		done()
+		wg.Wait()
 	})
 
 	t.Run("pushes a row into cooldown when its content cannot be located within the configured timeouts", func(t *testing.T) {
