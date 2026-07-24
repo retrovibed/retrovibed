@@ -17,6 +17,7 @@ void main() {
             Defaults(desktop: false),
           ],
         ),
+        fit: FlexFit.tight,
       );
       await tester.pumpAndSettle();
 

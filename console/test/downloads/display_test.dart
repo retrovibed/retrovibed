@@ -1,7 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:retrovibed/downloads/display.dart';
+import 'package:retrovibed/downloads/grid.settings.dart';
+import 'package:retrovibed/design.kit/modals.dart' as modals;
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/uuidx.dart' as uuidx;
@@ -70,13 +73,18 @@ Future<media.DownloadSearchResponse> _mockSearchWithLongNames(
   );
 }
 
-Future<media.DownloadSearchResponse> _mockSearchWith100Items(
+// Mirrors the real backend (shallows/media/http.discovered.go), which caps
+// its SQL `.Limit(...)` clause at the caller's requested limit (max 100) and
+// echoes the decoded request back as `next`. A mock that ignores the request
+// and always returns 100 items can't happen against the real server.
+Future<media.DownloadSearchResponse> _mockSearchHonoringLimit(
   media.DownloadSearchRequest req, {
   List<httpx.Option> options = const [],
 }) async {
+  final limit = req.limit.toInt().clamp(0, 100);
   return media.DownloadSearchResponse(
     items: List.generate(
-      100,
+      limit,
       (i) => media.Download(
         media: media.Media(
           id: 'test-id-$i',
@@ -89,7 +97,7 @@ Future<media.DownloadSearchResponse> _mockSearchWith100Items(
         ),
       ),
     ),
-    next: media.discoveredsearch.request(limit: 32),
+    next: req,
   );
 }
 
@@ -122,13 +130,13 @@ void main() {
     }, variant: _resolutions);
 
     testWidgets(
-      'renders without overflow with 100 results from both searches',
+      'renders without overflow with a full page of results from both searches',
       (WidgetTester tester) async {
         final entry = _resolutions.currentValue!;
         await tester.pumpApp(
           Display(
-            downloadingSearch: _mockSearchWith100Items,
-            availableSearch: _mockSearchWith100Items,
+            downloadingSearch: _mockSearchHonoringLimit,
+            availableSearch: _mockSearchHonoringLimit,
             downloadWatch: _mockWatch,
           ),
           physicalSize: entry.value,
@@ -178,39 +186,47 @@ void main() {
       testWidgets('opens', (WidgetTester tester) async {
         final entry = _resolutions.currentValue!;
         await tester.pumpApp(
-          Display(downloadingSearch: _mockSearchWithItems, availableSearch: _mockSearchWithItems, downloadWatch: _mockWatch),
+          modals.Node(
+            Display(downloadingSearch: _mockSearchWithItems, availableSearch: _mockSearchWithItems, downloadWatch: _mockWatch),
+          ),
           physicalSize: entry.value,
           fit: FlexFit.tight,
         );
         await tester.pumpAndSettle();
         await openTuning(tester);
+        expect(find.byType(GridSettings), findsOneWidget);
       }, variant: _resolutions);
 
       testWidgets('opens at narrow 300x600', (WidgetTester tester) async {
         await tester.pumpApp(
-          Display(downloadingSearch: _mockSearchWithItems, availableSearch: _mockSearchWithItems, downloadWatch: _mockWatch),
+          modals.Node(
+            Display(downloadingSearch: _mockSearchWithItems, availableSearch: _mockSearchWithItems, downloadWatch: _mockWatch),
+          ),
           physicalSize: const Size(300, 600),
           fit: FlexFit.tight,
         );
         await tester.pumpAndSettle();
         await openTuning(tester);
+        expect(find.byType(GridSettings), findsOneWidget);
       });
 
       testWidgets('opens and closes at narrow 300x600', (
         WidgetTester tester,
       ) async {
         await tester.pumpApp(
-          Display(downloadingSearch: _mockSearchWithItems, availableSearch: _mockSearchWithItems, downloadWatch: _mockWatch),
+          modals.Node(
+            Display(downloadingSearch: _mockSearchWithItems, availableSearch: _mockSearchWithItems, downloadWatch: _mockWatch),
+          ),
           physicalSize: const Size(300, 600),
           fit: FlexFit.tight,
         );
         await tester.pumpAndSettle();
         await openTuning(tester);
-        final tuneButton = find.byIcon(Icons.tune).first;
-        await tester.ensureVisible(tuneButton);
+        expect(find.byType(GridSettings), findsOneWidget);
+
+        await tester.sendKeyEvent(LogicalKeyboardKey.escape);
         await tester.pumpAndSettle();
-        await tester.tap(tuneButton);
-        await tester.pumpAndSettle();
+        expect(find.byType(GridSettings), findsNothing);
       });
     });
   });
