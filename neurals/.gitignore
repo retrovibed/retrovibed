@@ -1,1 +1,11 @@
+# cargo's own build output directory.
 target
+
+# the "target" pattern above matches any path component named "target"
+# anywhere in the tree, including vendor/cc/src/target/ (the cc crate's own
+# source subdirectory, unrelated to cargo's build dir). re-include vendor/
+# wholesale so no ignore rule - this one or any other, e.g. the repo root
+# .gitignore's *.bin - can hide files cargo vendor committed here; cargo
+# verifies each vendored file's checksum, so a missing file breaks the build.
+!vendor
+!vendor/**
