@@ -170,6 +170,7 @@ func Main(args ...string) {
 			&shellCli.Global,
 			&shellCli.PeerID,
 			&shellCli.SSHID,
+			&shellCli.Endpoint,
 		),
 		kong.BindTo(cmdopts.DeeppoolClientDefault{}, (*cmdopts.DeeppoolClient)(nil)),
 		kong.TypeMapper(reflect.TypeOf(&net.IP{}), kong.MapperFunc(cmdopts.ParseIP)),
