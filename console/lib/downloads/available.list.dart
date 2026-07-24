@@ -33,6 +33,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
   bool _loading = true;
   String _focused = '';
   Widget _cause = ds.Error.zero;
+  Widget _tuning = ds.Empty;
   media.DownloadSearchResponse _res = media.discoveredsearch.response(
     next: media.discoveredsearch.request(limit: 32),
   );
@@ -188,13 +189,20 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                 help: ds.Hint(Text("upload magnet urls to download")),
               ),
             ],
-            tuning: GridSettings(
-              _res.next,
-              onChange: (media.DownloadSearchRequest n) {
-                setState(() {
-                  _res.next = n;
-                });
-              },
+            tuning: ds.buttons.settings(
+              onPressed: () => setState(() {
+                _tuning = _tuning == ds.Empty
+                    ? GridSettings(
+                        _res.next,
+                        onChange: (media.DownloadSearchRequest n) {
+                          setState(() {
+                            _res.next = n;
+                          });
+                        },
+                      )
+                    : ds.Empty;
+              }),
+              help: ds.Hint(Text("display advance settings")),
             ),
             help: ds.Hint(const Text("search discovered content, use @ to access advanced filtering")),
           ),
@@ -339,6 +347,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
             ),
           );
         },
+        leading: [_tuning],
       ),
     );
   }

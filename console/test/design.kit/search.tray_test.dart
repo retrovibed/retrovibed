@@ -28,7 +28,7 @@ Widget buildSearchTray({
     autoscroll: ensureVisible,
     leading: leading,
     trailing: trailing,
-    tuning: tuning ?? ds.SearchTray.zerobox,
+    tuning: tuning ?? ds.Empty,
     padding: padding,
     help: help,
   );
@@ -330,11 +330,7 @@ void main() {
           width: 500,
           height: 200,
           child: buildSearchTray(
-            tuning: Container(
-              height: 50,
-              color: Colors.grey,
-              child: Text('Tuning panel'),
-            ),
+            tuning: ds.buttons.settings(onPressed: () {}),
           ),
         ),
       );
@@ -351,7 +347,7 @@ void main() {
       await tester.pumpApp(
         ListView(
           children: [
-            buildSearchTray(tuning: Text('Tuning options')),
+            buildSearchTray(tuning: ds.buttons.settings(onPressed: () {})),
             Text('Other content'),
           ],
         ),

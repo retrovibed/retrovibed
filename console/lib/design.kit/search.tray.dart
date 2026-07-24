@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fixnum/fixnum.dart' as fixnum;
 import 'package:retrovibed/lucene.dart' as lucene;
+import 'empty.dart';
 import 'flutterx.dart';
 import 'help.dart';
 import 'buttons.dart';
@@ -31,8 +32,6 @@ class SearchFilters extends StatelessWidget {
 
 class SearchTray extends StatefulWidget {
   static fixnum.Int64 Zero = fixnum.Int64.ZERO;
-
-  static const Widget zerobox = const SizedBox();
 
   final List<Widget> leading;
   final List<Widget> trailing;
@@ -65,7 +64,7 @@ class SearchTray extends StatefulWidget {
     this.decoration,
     this.padding,
     this.filters = const [],
-    this.tuning = SearchTray.zerobox,
+    this.tuning = Empty,
     this.help = HelpScope.None,
     this.controller,
   });
@@ -77,9 +76,6 @@ class SearchTray extends StatefulWidget {
 class _SearchTrayState extends State<SearchTray> {
   final TextEditingController _defaultController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
-  final ValueNotifier<Widget> _tuningwidget = ValueNotifier<Widget>(
-    SearchTray.zerobox,
-  );
 
   @override
   void initState() {
@@ -96,7 +92,6 @@ class _SearchTrayState extends State<SearchTray> {
   void dispose() {
     _defaultController.dispose();
     _focusNode.dispose();
-    _tuningwidget.dispose();
     super.dispose();
   }
 
@@ -145,36 +140,20 @@ class _SearchTrayState extends State<SearchTray> {
     final trailing = [
       ...widget.trailing,
       defaults.desktop ? CompactingMenu.pinned(searchbutton) : searchbutton,
-      if (widget.tuning != SearchTray.zerobox)
-        buttons.settings(
-          onPressed: () =>
-              _tuningwidget.value = _tuningwidget.value == SearchTray.zerobox ? widget.tuning : SearchTray.zerobox,
-          help: Hint(Text("display advance settings")),
-        ),
+      widget.tuning,
     ];
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        lucene.Queryer(
-          (v) => widget.onSubmitted(v),
-          widget.filters,
-          decoration: decoration,
-          autofocus: widget.autofocus,
-          disabled: widget.disabled,
-          controller: widget.controller ?? _defaultController,
-          focusNode: widget.focus ?? _focusNode,
-          leading: widget.leading,
-          trailing: trailing,
-          help: widget.help,
-        ),
-        ValueListenableBuilder<Widget>(
-          valueListenable: _tuningwidget,
-          builder: (BuildContext context, Widget v, Widget? child) {
-            return v;
-          },
-        ),
-      ],
+    return lucene.Queryer(
+      (v) => widget.onSubmitted(v),
+      widget.filters,
+      decoration: decoration,
+      autofocus: widget.autofocus,
+      disabled: widget.disabled,
+      controller: widget.controller ?? _defaultController,
+      focusNode: widget.focus ?? _focusNode,
+      leading: widget.leading,
+      trailing: trailing,
+      help: widget.help,
     );
   }
 }

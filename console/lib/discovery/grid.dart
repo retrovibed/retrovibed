@@ -12,8 +12,9 @@ import 'discovery.card.dart';
 
 class DiscoveryGrid extends StatefulWidget {
   final ValueNotifier<media.MediaSearchState> search;
+  final List<Widget> leading;
 
-  const DiscoveryGrid({super.key, required this.search});
+  const DiscoveryGrid({super.key, required this.search, this.leading = const []});
 
   @override
   State<DiscoveryGrid> createState() => _DiscoveryGridState();
@@ -121,6 +122,7 @@ class _DiscoveryGridState extends State<DiscoveryGrid> {
             children: _items,
             loading: _loading,
             physics: AlwaysScrollableScrollPhysics(),
+            leading: widget.leading,
             empty: Center(
               child: Padding(
                 padding: defaults.padding,

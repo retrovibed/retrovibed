@@ -37,6 +37,7 @@ enum _Mode { library, discovery }
 
 class _HomeState extends State<Home> {
   Widget _downloading = ds.Empty;
+  Widget _tuning = ds.Empty;
   _Mode _mode = _Mode.library;
 
   void setState(VoidCallback fn) {
@@ -49,129 +50,139 @@ class _HomeState extends State<Home> {
     final defaults = ds.Defaults.of(context);
     final compact = defaults.isCompact;
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Column(
-          verticalDirection: compact ? VerticalDirection.up : VerticalDirection.down,
-          children: [
-            ValueListenableBuilder<media.MediaSearchState>(
-              valueListenable: widget.search,
-              builder: (context, state, _) => ds.SearchTray(
-                autoscroll: true,
-                focus: widget.focus,
-                autofocus: defaults.desktop,
-                decoration: InputDecoration(hintText: "search library, @... for filters"),
-                filters: [
-                  lucene.Boolean.auto('hidden', false, (v) {
-                    final freshNext = widget.search.value.next.clone()..hidden = v;
-                    widget.search.value = media.MediaSearchState(
-                      next: freshNext,
-                      count: widget.search.value.count,
-                    );
-                  }),
-                ],
-                controller: widget.controller,
-                padding: defaults.padding.copyWith(bottom: 0.0),
-                tuning: GridSettings(),
-                onSubmitted: (v) {
-                  final freshNext = widget.search.value.next.clone()
-                    ..query = v
-                    ..offset = ds.Grid.int64(0);
-                  widget.search.value = media.MediaSearchState(
-                    next: freshNext,
-                    count: widget.search.value.count,
-                  );
-                  widget.focus?.requestFocus();
-                  ds.textediting.refocus(widget.controller);
-                  return Future.value();
-                },
-                next: (i) {
-                  final freshNext = widget.search.value.next.clone()..offset = i;
-                  widget.search.value = media.MediaSearchState(
-                    next: freshNext,
-                    count: widget.search.value.count,
-                  );
-                },
-                current: state.next.offset,
-                empty: ds.Grid.int64(state.count) < state.next.limit,
-                leading: [
-                  ds.CompactingMenu.pinned(
-                    DropdownUpload(
-                      icon: SearchMimetypeDropdown.icon(mimex.checksum(state.next.mimetypes)),
-                      help: ds.Hint(
-                        const Text(
-                          "filter by mimetype, upload files, torrents, magnet links, or switch to discover mode",
-                        ),
-                      ),
-                      items: [
-                        ...SearchMimetypeDropdown.menuItems(widget.search),
-                        PopupMenuItem<String>(
-                          onTap: () {
-                            final next = _mode == _Mode.discovery ? _Mode.library : _Mode.discovery;
-                            setState(() {
-                              _mode = next;
-                            });
-                            if (next == _Mode.discovery) {
-                              widget.focus?.requestFocus();
-                            }
-                          },
-                          child: ListTile(
-                            leading: Icon(_mode == _Mode.discovery ? Icons.check : Icons.travel_explore),
-                            title: const Text("Search"),
-                          ),
-                        ),
-                        const PopupMenuDivider(),
-                        PopupMenuItem<String>(
-                          enabled: false,
-                          child: ValueListenableBuilder<media.MediaSearchState>(
-                            valueListenable: widget.search,
-                            builder: (context, s, _) => mimex.CategoryOptionsLabel(s.next.mimetypes),
-                          ),
-                        ),
-                        MenuItemUploadFiles(
-                          context,
-                          widget.search,
-                          apiupload: widget.apiupload,
-                        ),
-                        downloads.MenuItemDownloadTorrent(context, (downloads) {
-                          setState(() {
-                            _downloading = media.DownloadQueue(
-                              downloads,
-                              onQueueComplete: () => setState(() => _downloading = ds.Empty),
-                            );
-                          });
-                          print("downloading torrents ${downloads}");
-                        }),
-                        downloads.MenuItemDownloadMagnet(context, (downloads) {
-                          setState(() {
-                            _downloading = media.DownloadQueue(
-                              downloads,
-                              onQueueComplete: () => setState(() => _downloading = ds.Empty),
-                            );
-                          });
-                          print("downloading magnets ${downloads}");
-                        }),
-                      ],
+    return Column(
+      verticalDirection: compact ? VerticalDirection.up : VerticalDirection.down,
+      children: [
+        ValueListenableBuilder<media.MediaSearchState>(
+          valueListenable: widget.search,
+          builder: (context, state, _) => ds.SearchTray(
+            autoscroll: true,
+            focus: widget.focus,
+            autofocus: defaults.desktop,
+            decoration: InputDecoration(hintText: "search library, @... for filters"),
+            filters: [
+              lucene.Boolean.auto('hidden', false, (v) {
+                final freshNext = widget.search.value.next.clone()..hidden = v;
+                widget.search.value = media.MediaSearchState(
+                  next: freshNext,
+                  count: widget.search.value.count,
+                );
+              }),
+            ],
+            controller: widget.controller,
+            padding: defaults.padding.copyWith(bottom: 0.0),
+            tuning: ds.buttons.settings(
+              onPressed: () => setState(() {
+                _tuning = _tuning == ds.Empty ? GridSettings() : ds.Empty;
+              }),
+              help: ds.Hint(Text("display advance settings")),
+            ),
+            onSubmitted: (v) {
+              final freshNext = widget.search.value.next.clone()
+                ..query = v
+                ..offset = ds.Grid.int64(0);
+              widget.search.value = media.MediaSearchState(
+                next: freshNext,
+                count: widget.search.value.count,
+              );
+              widget.focus?.requestFocus();
+              ds.textediting.refocus(widget.controller);
+              return Future.value();
+            },
+            next: (i) {
+              final freshNext = widget.search.value.next.clone()..offset = i;
+              widget.search.value = media.MediaSearchState(
+                next: freshNext,
+                count: widget.search.value.count,
+              );
+            },
+            current: state.next.offset,
+            empty: ds.Grid.int64(state.count) < state.next.limit,
+            leading: [
+              ds.CompactingMenu.pinned(
+                DropdownUpload(
+                  icon: SearchMimetypeDropdown.icon(mimex.checksum(state.next.mimetypes)),
+                  help: ds.Hint(
+                    const Text(
+                      "filter by mimetype, upload files, torrents, magnet links, or switch to discover mode",
                     ),
                   ),
-                ],
-                help: ds.Hint(const Text("search your library, use @ to access advanced filtering")),
-              ),
-            ),
-            _downloading,
-            Expanded(
-              child: switch (_mode) {
-                _Mode.library => Grid(
-                  apisearch: widget.apisearch,
-                  search: widget.search,
-                  highlighted: widget.highlighted,
+                  items: [
+                    ...SearchMimetypeDropdown.menuItems(widget.search),
+                    PopupMenuItem<String>(
+                      onTap: () {
+                        final next = _mode == _Mode.discovery ? _Mode.library : _Mode.discovery;
+                        setState(() {
+                          _mode = next;
+                        });
+                        if (next == _Mode.discovery) {
+                          widget.focus?.requestFocus();
+                        }
+                      },
+                      child: ListTile(
+                        leading: Icon(_mode == _Mode.discovery ? Icons.check : Icons.travel_explore),
+                        title: const Text("Search"),
+                      ),
+                    ),
+                    const PopupMenuDivider(),
+                    PopupMenuItem<String>(
+                      enabled: false,
+                      child: ValueListenableBuilder<media.MediaSearchState>(
+                        valueListenable: widget.search,
+                        builder: (context, s, _) => mimex.CategoryOptionsLabel(s.next.mimetypes),
+                      ),
+                    ),
+                    MenuItemUploadFiles(
+                      context,
+                      widget.search,
+                      apiupload: widget.apiupload,
+                    ),
+                    downloads.MenuItemDownloadTorrent(context, (downloads) {
+                      setState(() {
+                        _downloading = media.DownloadQueue(
+                          downloads,
+                          onQueueComplete: () => setState(() => _downloading = ds.Empty),
+                        );
+                      });
+                      print("downloading torrents ${downloads}");
+                    }),
+                    downloads.MenuItemDownloadMagnet(context, (downloads) {
+                      setState(() {
+                        _downloading = media.DownloadQueue(
+                          downloads,
+                          onQueueComplete: () => setState(() => _downloading = ds.Empty),
+                        );
+                      });
+                      print("downloading magnets ${downloads}");
+                    }),
+                  ],
                 ),
-                _Mode.discovery => disc.DiscoveryGrid(search: widget.search),
-              },
+              ),
+            ],
+            help: ds.Hint(const Text("search your library, use @ to access advanced filtering")),
+          ),
+        ),
+        Expanded(
+          child: switch (_mode) {
+            _Mode.library => Grid(
+              apisearch: widget.apisearch,
+              search: widget.search,
+              highlighted: widget.highlighted,
+              leading: [
+                _tuning,
+                _downloading,
+              ],
             ),
-          ],
-        );
-      },
+            _Mode.discovery => disc.DiscoveryGrid(
+              search: widget.search,
+              leading: [
+                _tuning,
+                _downloading,
+              ],
+            ),
+          },
+        ),
+      ],
     );
   }
 }

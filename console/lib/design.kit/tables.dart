@@ -118,7 +118,10 @@ class TableHeader extends StatelessWidget {
 
 class Table<T> extends StatelessWidget {
   static fixnum.Int64 offset(int n) => fixnum.Int64(n);
-  static Widget Function(List<T> i) expanded<T>(Widget Function(T i) render) {
+  static Widget Function(List<T> i) expanded<T>(
+    Widget Function(T i) render, {
+    List<Widget> leading = const [],
+  }) {
     return (List<T> items) {
       return Builder(
         builder: (context) {
@@ -128,7 +131,7 @@ class Table<T> extends StatelessWidget {
             reverse: defaults.isCompact,
             child: Column(
               mainAxisSize: MainAxisSize.max,
-              children: list,
+              children: [...leading, ...list],
             ),
           );
         },

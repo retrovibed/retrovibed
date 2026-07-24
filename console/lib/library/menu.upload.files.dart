@@ -4,7 +4,7 @@ import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/mimex.dart' as mimex;
 
-Future<void> uploadFiles(
+Future<void> uploadfiles(
   BuildContext context,
   ValueNotifier<media.MediaSearchState> search, {
   media.FnUploadRequest apiupload = media.media.upload,
@@ -38,12 +38,12 @@ PopupMenuEntry<String> MenuItemUploadFiles(
       builder: (context, state, _) => ds.LoadingListTile(
         leading: const Icon(Icons.file_upload_outlined),
         title: Text("Upload ${mimex.CategoryOptionsLabel.text(state.next.mimetypes)}"),
-        onPressed: () => uploadFiles(
+        onPressed: () => uploadfiles(
           context,
           search,
           apiupload: apiupload,
           mimetypes: state.next.mimetypes,
-        ).catchError((cause) => debugPrint('upload files failed: $cause')),
+        ),
       ),
     ),
   );

@@ -1,10 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:retrovibed/downloads/display.dart';
 import 'package:retrovibed/downloads/grid.settings.dart';
-import 'package:retrovibed/design.kit/modals.dart' as modals;
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/uuidx.dart' as uuidx;
@@ -186,9 +184,7 @@ void main() {
       testWidgets('opens', (WidgetTester tester) async {
         final entry = _resolutions.currentValue!;
         await tester.pumpApp(
-          modals.Node(
-            Display(downloadingSearch: _mockSearchWithItems, availableSearch: _mockSearchWithItems, downloadWatch: _mockWatch),
-          ),
+          Display(downloadingSearch: _mockSearchWithItems, availableSearch: _mockSearchWithItems, downloadWatch: _mockWatch),
           physicalSize: entry.value,
           fit: FlexFit.tight,
         );
@@ -199,9 +195,7 @@ void main() {
 
       testWidgets('opens at narrow 300x600', (WidgetTester tester) async {
         await tester.pumpApp(
-          modals.Node(
-            Display(downloadingSearch: _mockSearchWithItems, availableSearch: _mockSearchWithItems, downloadWatch: _mockWatch),
-          ),
+          Display(downloadingSearch: _mockSearchWithItems, availableSearch: _mockSearchWithItems, downloadWatch: _mockWatch),
           physicalSize: const Size(300, 600),
           fit: FlexFit.tight,
         );
@@ -214,9 +208,7 @@ void main() {
         WidgetTester tester,
       ) async {
         await tester.pumpApp(
-          modals.Node(
-            Display(downloadingSearch: _mockSearchWithItems, availableSearch: _mockSearchWithItems, downloadWatch: _mockWatch),
-          ),
+          Display(downloadingSearch: _mockSearchWithItems, availableSearch: _mockSearchWithItems, downloadWatch: _mockWatch),
           physicalSize: const Size(300, 600),
           fit: FlexFit.tight,
         );
@@ -224,7 +216,7 @@ void main() {
         await openTuning(tester);
         expect(find.byType(GridSettings), findsOneWidget);
 
-        await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+        await tester.tap(find.byIcon(Icons.tune).first);
         await tester.pumpAndSettle();
         expect(find.byType(GridSettings), findsNothing);
       });
