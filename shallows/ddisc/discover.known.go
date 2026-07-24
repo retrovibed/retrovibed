@@ -126,10 +126,11 @@ func (t *knownMediaDetectSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 				continue
 			}
 
+			log.Println("attempting to identify discovered media")
 			cleaned, err := t.mc.Clean(ctx, d.Title)
 			if err != nil {
-				t.err = errorsx.Wrapf(err, "unable to clean title: %s", d.Title)
-				return
+				errorsx.Log(errorsx.Wrapf(err, "unable to clean title: %s", d.Title))
+				continue
 			}
 
 			cleaned = lucenex.Clean(cleaned)
@@ -137,8 +138,8 @@ func (t *knownMediaDetectSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 
 			known, err := library.DetectKnownMedia(ctx, t.q, d.Mimetype, title)
 			if err != nil {
-				t.err = errorsx.Wrap(err, "unable to detect known media")
-				return
+				errorsx.Log(errorsx.Wrap(err, "unable to detect known media"))
+				continue
 			}
 
 			log.Println("known media", cleaned, "->", title, spew.Sdump(known))

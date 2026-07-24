@@ -1,6 +1,8 @@
 package ddisc_test
 
 import (
+	"context"
+	"errors"
 	"testing"
 
 	"github.com/gofrs/uuid/v5"
@@ -66,5 +68,46 @@ func TestKnownMediaDetector(t *testing.T) {
 		require.NoError(t, seq.Err())
 		require.Len(t, got, 1)
 		require.Equal(t, kid, got[0].KnownMediaID, "a candidate that already carries a known-media-id must not be overwritten")
+	})
+
+	t.Run("should drop a candidate whose title fails to clean but keep processing the rest", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		q := sqltestx.Metadatabase(t)
+
+		var known library.Known
+		require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults, library.KnownOptionMimetype(mimex.Video)))
+		known.Title = "The Grand Budapest Hotel"
+		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
+
+		failingID := int160.Random()
+		failing := ddisc.NewDiscovered(&failingID,
+			ddisc.DiscoveredOptionTitle("trigger clean failure"),
+			ddisc.DiscoveredOptionMimetype(mimex.Video),
+		)
+
+		okID := int160.Random()
+		ok := ddisc.NewDiscovered(&okID,
+			ddisc.DiscoveredOptionTitle(known.Title),
+			ddisc.DiscoveredOptionMimetype(mimex.Video),
+		)
+
+		cleaner := library.QueryCleanerFn(func(_ context.Context, text string) (string, error) {
+			if text == failing.Title {
+				return "", errors.New("boom")
+			}
+			return text, nil
+		})
+
+		seq := ddisc.KnownMediaDetector(q, cleaner)(fakeDiscoverSeq{results: []ddisc.Discovered{failing, ok}})
+
+		var got []ddisc.Discovered
+		for d := range seq.Each(ctx) {
+			got = append(got, d)
+		}
+		require.NoError(t, seq.Err(), "a per-candidate clean failure must be logged, not surfaced as the sequence error")
+		require.Len(t, got, 1, "the failing candidate must be dropped while the rest of the sequence keeps processing")
+		require.Equal(t, known.UID, got[0].KnownMediaID)
 	})
 }
