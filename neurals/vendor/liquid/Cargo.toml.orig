@@ -1,0 +1,88 @@
+[workspace]
+resolver = "2"
+members = [
+  "crates/*",
+]
+
+[workspace.package]
+license = "MIT OR Apache-2.0"
+edition = "2021"
+rust-version = "1.74"  # MSRV
+include = [
+  "build.rs",
+  "src/**/*",
+  "Cargo.toml",
+  "Cargo.lock",
+  "LICENSE*",
+  "README.md",
+  "benches/**/*",
+  "examples/**/*"
+]
+
+[package]
+name = "liquid"
+version = "0.26.8"
+description = "The liquid templating language for Rust"
+repository = "https://github.com/cobalt-org/liquid-rust"
+documentation = "https://docs.rs/liquid"
+readme = "README.md"
+categories = ["template-engine"]
+keywords = ["liquid", "template", "templating", "language", "html"]
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+include.workspace = true
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[package.metadata.release]
+pre-release-replacements = [
+  {file="CHANGELOG.md", search="Unreleased", replace="{{version}}", min=1},
+  {file="CHANGELOG.md", search="\\.\\.\\.HEAD", replace="...{{tag_name}}", exactly=1},
+  {file="CHANGELOG.md", search="ReleaseDate", replace="{{date}}", min=1},
+  {file="CHANGELOG.md", search="<!-- next-header -->", replace="<!-- next-header -->\n## [Unreleased] - ReleaseDate\n", exactly=1},
+  {file="CHANGELOG.md", search="<!-- next-url -->", replace="<!-- next-url -->\n[Unreleased]: https://github.com/cobalt-org/liquid-rust/compare/{{tag_name}}...HEAD", exactly=1},
+]
+
+[features]
+default = ["stdlib"]
+stdlib = ["liquid-lib/stdlib"]
+
+[dependencies]
+doc-comment = "0.3"
+liquid-core = { version = "^0.26.8", path = "crates/core" }
+liquid-derive = { version = "^0.26.7", path = "crates/derive" }
+liquid-lib = { version = "^0.26.8", path = "crates/lib", optional = true }
+serde = { version = "1.0.157", features = ["derive"] }
+
+[dev-dependencies]
+serde_yaml = "0.8"
+tera = { version = "1.19", default-features = false }
+handlebars = "5.1"
+serde_derive = "1.0"
+serde_json = "1.0"
+regex = "1.10"
+criterion = "0.5"
+snapbox = "0.6.5"
+
+[[bench]]
+name = "liquid"
+harness = false
+
+[[bench]]
+name = "handlebars"
+harness = false
+
+[[bench]]
+name = "tera_bigcontext"
+harness = false
+
+[[bench]]
+name = "tera_template"
+harness = false
+
+[[bench]]
+name = "tera_tera"
+harness = false

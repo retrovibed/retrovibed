@@ -24,7 +24,13 @@ override_dh_auto_build:
 	cp $(CURDIR)/src/LICENSE $(CURDIR)/debian/copyright
 
 	# build neurals
-	CARGO_TARGET_DIR="native" cargo build --manifest-path src/neurals/Cargo.toml --release
+	# dependencies are vendored (see src/neurals/vendor, generated via `cargo vendor`)
+	# since launchpad builders have no network access; --config avoids relying on
+	# .cargo/config.toml file-discovery, which starts from CURDIR, not the manifest's directory.
+	CARGO_TARGET_DIR="native" cargo build --manifest-path src/neurals/Cargo.toml --release \
+		--config 'source.crates-io.replace-with="vendored-sources"' \
+		--config 'source.vendored-sources.directory="src/neurals/vendor"' \
+		--offline
 	tree -L 1 $(CURDIR)/native/release
 	cp $(CURDIR)/native/release/libpredicttext.a native/release/libpredicttext.so $(CURDIR)/linux/usr/lib/retrovibed/
 

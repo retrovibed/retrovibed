@@ -1,0 +1,25 @@
+[package]
+name = "dyn-hash"
+version = "0.2.2"
+authors = ["David Tolnay <dtolnay@gmail.com>"]
+categories = ["rust-patterns", "no-std"]
+description = "Hash trait that is dyn-compatible"
+documentation = "https://docs.rs/dyn-hash"
+edition = "2021"
+keywords = ["dyn", "hash", "trait-object", "object-safe"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/dtolnay/dyn-hash"
+rust-version = "1.56"
+
+[dev-dependencies]
+rustversion = "1"
+trybuild = { version = "1.0.103", features = ["diff"] }
+
+[package.metadata.docs.rs]
+targets = ["x86_64-unknown-linux-gnu"]
+rustdoc-args = [
+    "--generate-link-to-definition",
+    "--extern-html-root-url=core=https://doc.rust-lang.org",
+    "--extern-html-root-url=alloc=https://doc.rust-lang.org",
+    "--extern-html-root-url=std=https://doc.rust-lang.org",
+]

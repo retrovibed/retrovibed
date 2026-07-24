@@ -1,0 +1,6 @@
+{
+  "git": {
+    "sha1": "ab5045b742b9600dbad966c8e100b1d72d03b2e4"
+  },
+  "path_in_vcs": "crates/derive"
+}

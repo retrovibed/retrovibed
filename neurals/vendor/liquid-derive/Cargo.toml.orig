@@ -1,0 +1,25 @@
+[package]
+name = "liquid-derive"
+version = "0.26.8"
+authors = ["Pedro Gonçalo Correia <goncalerta@gmail.com>"]
+description = "The liquid templating language for Rust"
+readme = "README.md"
+categories = ["template-engine"]
+keywords = ["liquid", "template", "templating", "language", "html"]
+repository = "https://github.com/cobalt-org/liquid-rust"
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+include.workspace = true
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[lib]
+proc-macro = true
+
+[dependencies]
+proc-macro2 = "1.0"
+quote = "1.0.28"
+syn = "2.0"
