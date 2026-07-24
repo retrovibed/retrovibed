@@ -1,0 +1,5 @@
+# dpkg-source's default tar-ignore list drops *.orig files, but cargo's
+# vendored crates each ship a legitimate Cargo.toml.orig (kept for
+# provenance) that the build needs; un-ignore that pattern so vendoring
+# survives into the source tarball.
+tar-ignore = "!*.orig"
