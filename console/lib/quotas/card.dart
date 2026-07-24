@@ -53,12 +53,9 @@ class _CardState extends State<Card> {
       margin: widget.margin,
       help: ds.Hint(const Text("check storage usage and limits")),
       Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text("Usage", style: theme.textTheme.titleMedium),
           Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _typography.Typography.future(_storageFuture, defaults: Storage),
               _typography.Typography.future(

@@ -19,9 +19,8 @@ class DeveloperSettings extends StatelessWidget {
       constraints: constraints,
       help: ds.Hint(const Text("developer-only feature flags")),
       Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Developer Settings", style: theme.textTheme.titleMedium),
+          Text("Developer Settings", textAlign: TextAlign.center, style: theme.textTheme.titleMedium),
           forms.Checkbox(
             const Text('Networking'),
             description: const Text('Enable networking functionality UX'),

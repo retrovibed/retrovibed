@@ -33,15 +33,14 @@ class Card extends StatelessWidget {
       help: ds.Hint(const Text("device and display information")),
       SingleChildScrollView(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: defaults.spacing / 4,
+          spacing: defaults.spacing / 12,
           children: [
-            Text("Device Info", style: theme.textTheme.titleMedium),
+            Text("Device Info", textAlign: TextAlign.center, style: theme.textTheme.titleMedium),
             ...rows.map(
               (r) => Row(
                 children: [
-                  SizedBox(
-                    width: 84,
+                  Expanded(
+                    flex: 3,
                     child: Text(
                       r.$1,
                       style: theme.textTheme.bodySmall?.copyWith(
@@ -50,6 +49,7 @@ class Card extends StatelessWidget {
                     ),
                   ),
                   Expanded(
+                    flex: 5,
                     child: Text(
                       r.$2,
                       style: theme.textTheme.bodySmall,

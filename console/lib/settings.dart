@@ -86,7 +86,17 @@ class _DisplayState extends State<Display> {
 
   void masked(Widget w) {
     overlay(
-      ds.Masked(alignment: Alignment.center, reset: () => overlay(ds.Empty), w),
+      ds.build((context) {
+        final defaults = ds.Defaults.of(context);
+        return ds.Debug.blue(
+          ds.Masked(
+            alignment: defaults.isCompact ? Alignment.bottomCenter : Alignment.topCenter,
+            reset: () => overlay(ds.Empty),
+            borderRadius: defaults.borderRadius,
+            ds.Debug.pink(w),
+          ),
+        );
+      }),
     );
   }
 
@@ -146,7 +156,6 @@ class _DisplayState extends State<Display> {
                       horizontal: defaults.padding.horizontal / 2,
                     ),
                     child: ds.Overlay(
-                      alignment: Alignment.topLeft,
                       ds.layout((context, constraints) {
                         const mainAxisExtent = 192.0;
                         const crossAxisExtent = 192.0;

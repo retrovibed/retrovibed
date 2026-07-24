@@ -41,6 +41,7 @@ class Masked extends StatelessWidget {
               constraints: BoxConstraints.tight(calculated),
               decoration: BoxDecoration(
                 color: Colors.transparent.withValues(alpha: defaults.opaque.a),
+                borderRadius: borderRadius,
               ),
               child: GestureDetector(
                 onTap: () {},

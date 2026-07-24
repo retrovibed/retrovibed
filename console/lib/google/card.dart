@@ -16,26 +16,25 @@ class Card extends StatelessWidget {
     final theme = Theme.of(context);
     final defaults = ds.Defaults.of(context);
 
-    final tap =
-        () => onPressed(
-          ds.Container(
-            padding: defaults.padding,
-            margin: EdgeInsets.zero,
-            Settings(),
-          ),
-        );
+    final tap = () => onPressed(
+      ds.Container(
+        padding: defaults.padding,
+        margin: EdgeInsets.zero,
+        Settings(),
+      ),
+    );
     return ds.Card(
       alignment: Alignment.center,
       margin: margin,
       onTap: tap,
       help: ds.Hint(const Text("connect Google services")),
       Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         spacing: defaults.spacing / 2,
         children: [
-          Text("Google", style: theme.textTheme.titleMedium),
+          Text("Google", textAlign: TextAlign.center, style: theme.textTheme.titleMedium),
           Text(
             "Connect Google services",
+            textAlign: TextAlign.center,
             style: theme.textTheme.bodySmall,
           ),
         ],

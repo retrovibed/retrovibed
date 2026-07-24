@@ -12,22 +12,21 @@ class Card extends StatelessWidget {
     final theme = Theme.of(context);
     final defaults = ds.Defaults.of(context);
 
-    final tap =
-        () => onPressed(
-          Display(margin: EdgeInsets.zero, padding: EdgeInsets.zero),
-        );
+    final tap = () => onPressed(
+      Display(margin: EdgeInsets.zero, padding: EdgeInsets.zero),
+    );
     return ds.Card(
       alignment: Alignment.center,
       margin: margin ?? defaults.margin,
       onTap: tap,
       help: ds.Hint(const Text("administer user accounts and roles")),
       Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         spacing: defaults.spacing / 2,
         children: [
-          Text("User Management", style: theme.textTheme.titleMedium),
+          Text("User Management", textAlign: TextAlign.center, style: theme.textTheme.titleMedium),
           Text(
             "Manage permissions and access controls",
+            textAlign: TextAlign.center,
             style: theme.textTheme.bodySmall,
           ),
         ],

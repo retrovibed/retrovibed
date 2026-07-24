@@ -12,27 +12,27 @@ class MeteredCard extends StatelessWidget {
     final theme = Theme.of(context);
     final defaults = ds.Defaults.of(context);
 
-    final tap =
-        () => onPressed(
-          ds.Container(
-            alignment: Alignment.topCenter,
-            padding: defaults.padding,
-            margin: EdgeInsets.zero,
-            const MeteredDetails(),
-          ),
-        );
+    final tap = () => onPressed(
+      ds.Container(
+        alignment: Alignment.topCenter,
+        padding: defaults.padding,
+        margin: EdgeInsets.zero,
+        const MeteredDetails(),
+      ),
+    );
     return ds.Card(
       alignment: Alignment.center,
       margin: margin ?? defaults.margin,
       onTap: tap,
       help: ds.Hint(const Text("simulate a metered network connection")),
       Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        // crossAxisAlignment: CrossAxisAlignment.start,
         spacing: defaults.spacing / 2,
         children: [
-          Text("Metered Network", style: theme.textTheme.titleMedium),
+          Text("Metered Network", textAlign: TextAlign.center, style: theme.textTheme.titleMedium),
           Text(
             "Simulate and inspect metered network conditions",
+            textAlign: TextAlign.center,
             style: theme.textTheme.bodySmall,
           ),
         ],

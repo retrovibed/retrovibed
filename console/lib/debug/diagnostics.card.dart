@@ -26,12 +26,12 @@ class DiagnosticsCard extends StatelessWidget {
       onTap: tap,
       help: ds.Hint(const Text("dht, discovery, and various other subsystem diagnostics")),
       Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         spacing: defaults.spacing / 2,
         children: [
-          Text("Diagnostics", style: theme.textTheme.titleMedium),
+          Text("Diagnostics", textAlign: TextAlign.center, style: theme.textTheme.titleMedium),
           Text(
             "Inspect system diagnostics",
+            textAlign: TextAlign.center,
             style: theme.textTheme.bodySmall,
           ),
         ],

@@ -99,7 +99,6 @@ class _CardState extends State<Card> {
         loading: _loading,
         cause: _cause,
         Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           spacing: defaults.spacing / 4,
           children: [
