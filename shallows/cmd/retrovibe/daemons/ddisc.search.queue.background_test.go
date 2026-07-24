@@ -56,7 +56,7 @@ func TestSearchQueueBackgroundRun(t *testing.T) {
 
 		plugins := fakeSearchPlugins{results: []*ddiscapi.Import{{Uri: magnet, Uritype: mimex.Magnet, Health: 10, Mimetype: mimex.Video, Title: known.Title}}}
 		importer := tracking.NewURIImport(q, http.DefaultClient, fsx.DirVirtual(t.TempDir()))
-		require.NoError(t, SearchQueueBackgroundRun(ctx, q, importer, plugins, ddisc.UnimplementedStrategy{}))
+		require.NoError(t, SearchQueueBackgroundRun(ctx, q, importer, plugins, ddisc.UnimplementedStrategy{}, library.QueryCleanerNoop()))
 
 		require.EqualValues(t, 1, sqltestx.Count(t, q, "SELECT COUNT(*) FROM ddisc_media WHERE known_media_id = ?", known.UID))
 		require.EqualValues(t, 0, sqltestx.Count(t, q, "SELECT COUNT(*) FROM ddisc_search_queue WHERE known_media_id = ?", known.UID))
@@ -76,7 +76,7 @@ func TestSearchQueueBackgroundRun(t *testing.T) {
 		require.NoError(t, ddisc.SearchQueueEnqueue(ctx, q, ddisc.SearchQueue{KnownMediaID: known.UID}).Scan(&ddisc.SearchQueue{}))
 
 		importer := tracking.NewURIImport(q, http.DefaultClient, fsx.DirVirtual(t.TempDir()))
-		require.NoError(t, SearchQueueBackgroundRun(ctx, q, importer, fakeSearchPlugins{}, ddisc.UnimplementedStrategy{}))
+		require.NoError(t, SearchQueueBackgroundRun(ctx, q, importer, fakeSearchPlugins{}, ddisc.UnimplementedStrategy{}, library.QueryCleanerNoop()))
 
 		require.EqualValues(t, 0, sqltestx.Count(t, q, "SELECT COUNT(*) FROM ddisc_media WHERE known_media_id = ?", known.UID))
 		require.EqualValues(t, 1, sqltestx.Count(t, q, "SELECT COUNT(*) FROM ddisc_search_queue WHERE known_media_id = ? AND attempts = 1", known.UID))
