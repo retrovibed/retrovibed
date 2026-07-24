@@ -1,6 +1,6 @@
 //go:build !localdev
 
-package deeppool
+package env
 
 func Deeppool() string {
 	return "api.retrovibe.space"

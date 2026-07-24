@@ -8,14 +8,14 @@ import (
 	"mime/multipart"
 	"net/http"
 
-	deepool "github.com/retrovibed/retrovibed/retroapi/deeppool"
+	"github.com/retrovibed/retrovibed/retroapi/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 )
 
 func NewMetrics(c *http.Client) Metrics {
 	return Metrics{
 		c:        c,
-		endpoint: deepool.Deeppool(),
+		endpoint: env.Deeppool(),
 	}
 }
 

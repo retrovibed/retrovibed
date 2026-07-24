@@ -16,7 +16,6 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/gofrs/uuid/v5"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/retrovibed/retrovibed/retroapi/deeppool"
 	"github.com/retrovibed/retrovibed/retroapi/env"
 	"github.com/retrovibed/retrovibed/retroapi/internal/debugx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
@@ -36,7 +35,7 @@ func RetryClient(c *http.Client) *http.Client {
 }
 
 func DeeppoolEndpoint() oauth2.Endpoint {
-	return EndpointSSHAuth(fmt.Sprintf("https://%s", deeppool.Deeppool()))
+	return EndpointSSHAuth(fmt.Sprintf("https://%s", env.Deeppool()))
 }
 
 func NoRedirectFn(req *http.Request, via []*http.Request) error {
@@ -55,7 +54,7 @@ func HTTPClientDefaults() *http.Client {
 			IdleConnTimeout:       90 * time.Second,
 			TLSHandshakeTimeout:   10 * time.Second,
 			ExpectContinueTimeout: 1 * time.Second,
-			TLSClientConfig:       &tls.Config{ServerName: deeppool.Deeppool(), InsecureSkipVerify: InsecureSkipVerify()},
+			TLSClientConfig:       &tls.Config{ServerName: env.Deeppool(), InsecureSkipVerify: InsecureSkipVerify()},
 		},
 		CheckRedirect: NoRedirectFn,
 	}

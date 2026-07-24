@@ -6,13 +6,13 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/retrovibed/retrovibed/retroapi/deeppool"
+	"github.com/retrovibed/retrovibed/retroapi/env"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 )
 
 func CommunityInfo(ctx context.Context, c *http.Client, domainOrId string) (resp *communityapi.CommunityFindResponse, err error) {
-	_resp, err := httpx.AsError(c.Get(fmt.Sprintf("https://%s/c/%s", deeppool.Deeppool(), domainOrId)))
+	_resp, err := httpx.AsError(c.Get(fmt.Sprintf("https://%s/c/%s", env.Deeppool(), domainOrId)))
 	if err != nil {
 		return nil, err
 	}

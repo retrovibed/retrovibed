@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/retrovibed/retrovibed/retroapi/deeppool"
+	"github.com/retrovibed/retrovibed/retroapi/env"
 	"github.com/retrovibed/retrovibed/retroapi/internal/backoffx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/httpx"
@@ -42,7 +42,7 @@ func Register(ctx context.Context) (*Session, error) {
 
 			log.Println("registration failed", err)
 		}()
-		resp, err := httpx.AsError(c.Post(fmt.Sprintf("https://%s/authn/ssh", deeppool.Deeppool()), "", nil))
+		resp, err := httpx.AsError(c.Post(fmt.Sprintf("https://%s/authn/ssh", env.Deeppool()), "", nil))
 		if err != nil {
 			return nil, err
 		}
@@ -65,7 +65,7 @@ func Register(ctx context.Context) (*Session, error) {
 			return nil, errors.New("multiple profiles not supported yet")
 		}
 
-		req, err := http.NewRequestWithContext(ctx, http.MethodPost, fmt.Sprintf("https://%s/authn/signup", deeppool.Deeppool()), nil)
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, fmt.Sprintf("https://%s/authn/signup", env.Deeppool()), nil)
 		if err != nil {
 			return nil, err
 		}
@@ -88,7 +88,7 @@ func Register(ctx context.Context) (*Session, error) {
 // received token or the context is cancelled. Uses exponential backoff capped
 // at 30 seconds between attempts.
 func AwaitAuthorized(ctx context.Context, c *http.Client, granted func(*Token) bool) error {
-	endpoint := fmt.Sprintf("https://%s/m/authz/", deeppool.Deeppool())
+	endpoint := fmt.Sprintf("https://%s/m/authz/", env.Deeppool())
 	bs := backoffx.New(backoffx.Exponential(500*time.Millisecond), backoffx.Maximum(30*time.Second))
 
 	err := backoffx.Attempt(ctx, bs, func(ctx context.Context) error {

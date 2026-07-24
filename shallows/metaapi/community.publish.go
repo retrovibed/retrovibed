@@ -8,7 +8,7 @@ import (
 	"mime/multipart"
 	"net/http"
 
-	"github.com/retrovibed/retrovibed/retroapi/deeppool"
+	"github.com/retrovibed/retrovibed/retroapi/env"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -30,7 +30,7 @@ func CommunityPublish(ctx context.Context, c *http.Client, id string, in io.Read
 	})
 	defer reader.Close()
 
-	_resp, err := httpx.AsError(c.Post(fmt.Sprintf("https://%s/c/%s", deeppool.Deeppool(), id), boundary, reader))
+	_resp, err := httpx.AsError(c.Post(fmt.Sprintf("https://%s/c/%s", env.Deeppool(), id), boundary, reader))
 	if err != nil {
 		return nil, err
 	}

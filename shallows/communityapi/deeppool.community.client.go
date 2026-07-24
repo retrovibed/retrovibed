@@ -8,7 +8,7 @@ import (
 	"mime/multipart"
 	"net/http"
 
-	"github.com/retrovibed/retrovibed/retroapi/deeppool"
+	"github.com/retrovibed/retrovibed/retroapi/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
@@ -19,7 +19,7 @@ import (
 func NewDeeppoolCommunity(c *http.Client) DeeppoolCommunity {
 	return DeeppoolCommunity{
 		c:        c,
-		endpoint: deeppool.Deeppool(),
+		endpoint: env.Deeppool(),
 	}
 }
 

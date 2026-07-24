@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/retrovibed/retrovibed/retroapi/env"
 	"github.com/retrovibed/retrovibed/retroapi/internal/httpx"
 	"golang.org/x/oauth2"
 )
@@ -24,7 +25,7 @@ type GoogleTokenResponse struct {
 func NewYouTube(c *http.Client) YouTube {
 	return YouTube{
 		c:        c,
-		endpoint: Deeppool(),
+		endpoint: env.Deeppool(),
 	}
 }
 

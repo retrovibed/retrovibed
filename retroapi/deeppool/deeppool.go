@@ -8,6 +8,7 @@ import (
 	"mime/multipart"
 	"net/http"
 
+	"github.com/retrovibed/retrovibed/retroapi/env"
 	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/httpx"
 )
@@ -15,7 +16,7 @@ import (
 func NewArchiver(c *http.Client) Archiver {
 	return Archiver{
 		c:        c,
-		endpoint: Deeppool(),
+		endpoint: env.Deeppool(),
 	}
 }
 
@@ -78,7 +79,7 @@ func (t Archiver) Upload(ctx context.Context, mimetype string, r io.Reader) (m *
 func NewRetrieval(c *http.Client) Retrieval {
 	return Retrieval{
 		c:        c,
-		endpoint: Deeppool(),
+		endpoint: env.Deeppool(),
 	}
 }
 
@@ -104,7 +105,7 @@ func (t Retrieval) Download(ctx context.Context, id string, into io.Writer) erro
 func NewRanger(c *http.Client) Ranger {
 	return Ranger{
 		c:        c,
-		endpoint: Deeppool(),
+		endpoint: env.Deeppool(),
 	}
 }
 
