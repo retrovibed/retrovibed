@@ -44,10 +44,9 @@ class Grid<T> extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final defaults = Defaults.of(context);
-        final compact = defaults.isCompact;
         final grid = GridView.builder(
           shrinkWrap: true,
-          reverse: compact,
+          reverse: defaults.isCompact,
           physics: const NeverScrollableScrollPhysics(),
           padding: padding ?? defaults.padding,
           itemCount: this.children.length,
@@ -74,10 +73,11 @@ class Grid<T> extends StatelessWidget {
         return Help(
           SingleChildScrollView(
             physics: physics ?? NeverScrollableScrollPhysics(),
+            reverse: defaults.isCompact,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               mainAxisSize: MainAxisSize.max,
-              verticalDirection: compact ? VerticalDirection.up : VerticalDirection.down,
+              verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
               spacing: 0,
               children: [
                 ...leading,

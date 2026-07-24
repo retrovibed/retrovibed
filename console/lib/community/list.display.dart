@@ -5,6 +5,8 @@ import 'package:retrovibed/authn.dart' as authn;
 import 'api.dart';
 import 'list.display.item.dart';
 import 'community.create.dart';
+import 'qr.scanner.dart';
+import 'link.content.dart';
 
 typedef FnSearch =
     Future<CommunitySearchResponse> Function(
@@ -149,6 +151,30 @@ class _ListDisplayState extends State<ListDisplay> {
               help: ds.Hint(const Text("create a new community with a domain and description")),
             ),
           ),
+        ],
+        trailing: [
+          if (!defaults.desktop)
+            ds.CompactingMenu.pinned(
+              ds.LoadingIconButton(
+                icon: Icon(Icons.qr_code_scanner),
+                onPressed: () {
+                  setState(() {
+                    _overlay = QRScannerModal(
+                      onScanned: (community, attribution) =>
+                          handleSubscribeAction(context, community, attribution).then(
+                            (_) {
+                              _resetoverlay();
+                              return _refresh(_resp.next);
+                            },
+                          ),
+                      onCancel: _resetoverlay,
+                    );
+                  });
+                  return Future.value();
+                },
+                help: ds.Hint(const Text("scan a QR code to subscribe to content")),
+              ),
+            ),
         ],
       ),
       ds.Table.expanded<Community>(

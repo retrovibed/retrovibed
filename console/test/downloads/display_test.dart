@@ -102,6 +102,7 @@ void main() {
       await tester.pumpApp(
         Display(downloadingSearch: _mockSearchWithItems, availableSearch: _mockSearchWithItems, downloadWatch: _mockWatch),
         physicalSize: entry.value,
+        fit: FlexFit.tight,
       );
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
@@ -114,6 +115,7 @@ void main() {
       await tester.pumpApp(
         Display(downloadingSearch: _mockSearchWithLongNames, availableSearch: _mockSearchWithLongNames, downloadWatch: _mockWatch),
         physicalSize: entry.value,
+        fit: FlexFit.tight,
       );
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
@@ -130,6 +132,7 @@ void main() {
             downloadWatch: _mockWatch,
           ),
           physicalSize: entry.value,
+          fit: FlexFit.tight,
         );
         await tester.pumpAndSettle();
         expect(tester.takeException(), isNull);
@@ -143,6 +146,7 @@ void main() {
       await tester.pumpApp(
         Display(downloadingSearch: _mockSearchWithItems, availableSearch: _mockSearchWithItems, downloadWatch: _mockWatch),
         physicalSize: const Size(300, 600),
+        fit: FlexFit.tight,
       );
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
@@ -154,6 +158,7 @@ void main() {
       await tester.pumpApp(
         Display(downloadingSearch: _mockSearchWithLongNames, availableSearch: _mockSearchWithLongNames, downloadWatch: _mockWatch),
         physicalSize: const Size(300, 600),
+        fit: FlexFit.tight,
       );
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
@@ -175,6 +180,7 @@ void main() {
         await tester.pumpApp(
           Display(downloadingSearch: _mockSearchWithItems, availableSearch: _mockSearchWithItems, downloadWatch: _mockWatch),
           physicalSize: entry.value,
+          fit: FlexFit.tight,
         );
         await tester.pumpAndSettle();
         await openTuning(tester);
@@ -184,6 +190,7 @@ void main() {
         await tester.pumpApp(
           Display(downloadingSearch: _mockSearchWithItems, availableSearch: _mockSearchWithItems, downloadWatch: _mockWatch),
           physicalSize: const Size(300, 600),
+          fit: FlexFit.tight,
         );
         await tester.pumpAndSettle();
         await openTuning(tester);
@@ -195,6 +202,7 @@ void main() {
         await tester.pumpApp(
           Display(downloadingSearch: _mockSearchWithItems, availableSearch: _mockSearchWithItems, downloadWatch: _mockWatch),
           physicalSize: const Size(300, 600),
+          fit: FlexFit.tight,
         );
         await tester.pumpAndSettle();
         await openTuning(tester);

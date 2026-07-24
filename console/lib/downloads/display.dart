@@ -35,24 +35,19 @@ class _DisplayState extends State<Display> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final defaults = ds.Defaults.of(context);
-        return SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: constraints.maxHeight),
-            child: Container(
-              padding: defaults.padding,
-              child: AvailableListDisplay(
-                search: widget.availableSearch,
-                controller: controller,
+        return Container(
+          padding: defaults.padding,
+          child: AvailableListDisplay(
+            search: widget.availableSearch,
+            controller: controller,
+            events: refresh,
+            trailing: [
+              DownloadingListDisplay(
+                search: widget.downloadingSearch,
+                watch: widget.downloadWatch,
                 events: refresh,
-                trailing: [
-                  DownloadingListDisplay(
-                    search: widget.downloadingSearch,
-                    watch: widget.downloadWatch,
-                    events: refresh,
-                  ),
-                ],
               ),
-            ),
+            ],
           ),
         );
       },
