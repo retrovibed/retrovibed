@@ -53,7 +53,8 @@ func CompileBinding(b *tarballs.Build) eg.OpFn {
 		runtime := flutterRuntimev2(shell.Runtime())
 		return shell.Run(
 			ctx,
-			runtime.New("go -C retrovibedbind build -buildmode=c-shared -buildvcs=true --tags duckdb_use_lib,retrovibed,neural -o ../build/nativelib/libretrovibed.so ."),
+			runtime.New("go -C retrovibedbind build -buildmode=c-shared -buildvcs=true --tags duckdb_use_lib,retrovibed,neural -o ../build/nativelib/libretrovibed.so .").
+				Environ("CGO_LDFLAGS", "-L"+egenv.CacheDirectory("neurals")),
 		)
 	}
 }
