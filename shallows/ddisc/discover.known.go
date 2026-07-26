@@ -130,6 +130,9 @@ func (t *knownMediaDetectSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 			cleaned, err := t.mc.Clean(ctx, d.Title)
 			if err != nil {
 				errorsx.Log(errorsx.Wrapf(err, "unable to clean title: %s", d.Title))
+				if !yield(d) {
+					return
+				}
 				continue
 			}
 
@@ -139,6 +142,9 @@ func (t *knownMediaDetectSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 			known, err := library.DetectKnownMedia(ctx, t.q, d.Mimetype, title)
 			if err != nil {
 				errorsx.Log(errorsx.Wrap(err, "unable to detect known media"))
+				if !yield(d) {
+					return
+				}
 				continue
 			}
 
