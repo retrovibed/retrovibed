@@ -30,16 +30,14 @@ func main() {
 			ctx,
 			deb,
 			eg.Sequential(
+				shallows.NeuralsBuild(),
 				eg.Parallel(
 					eg.Sequential(
 						console.MaskDartTool,
 						console.Generate,
 						console.BuildLinux,
 					),
-					eg.Sequential(
-						shallows.NeuralsBuild(),
-						shallows.Compile(),
-					),
+					shallows.Compile(),
 				),
 				eg.Parallel(
 					build(),
