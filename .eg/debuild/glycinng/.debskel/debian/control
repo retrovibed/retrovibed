@@ -9,7 +9,13 @@ Package: ${DEB_PACKAGE_NAME}
 Section: libs
 Architecture: ${DEB_ARCHITECTURE}
 Description: ${DEB_DESCRIPTION}
-Provides: libglycin-2-0, glycin-loaders
+# versioned Provides: libgdk-pixbuf-2.0-0 depends on "libglycin-2-0 (>= X)",
+# and an unversioned Provides can't satisfy a versioned dependency check per
+# Debian policy -- apt only accepts a Provides for a versioned constraint if
+# the Provides line itself carries a version. Providing a version far above
+# anything Ubuntu will ever ship keeps this satisfied permanently, without
+# having to track the real libglycin-2-0 package's version over time.
+Provides: libglycin-2-0 (= 9999.0.0), glycin-loaders (= 9999.0.0)
 Conflicts: libglycin-2-0, glycin-loaders
 Replaces: libglycin-2-0, glycin-loaders
 Depends: ${DEB_DEPENDS_RUNTIME}
