@@ -118,22 +118,14 @@ type knownMediaDetectSeq struct {
 
 func (t *knownMediaDetectSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 	return func(yield func(Discovered) bool) {
-		for d := range t.inner.Each(ctx) {
+		identify := func(d Discovered) (Discovered, error) {
 			if stringsx.Blank(d.Title) {
-				if !yield(d) {
-					return
-				}
-				continue
+				return d, errorsx.Errorf("unable to identify media missing title")
 			}
 
-			log.Println("attempting to identify discovered media")
 			cleaned, err := t.mc.Clean(ctx, d.Title)
 			if err != nil {
-				errorsx.Log(errorsx.Wrapf(err, "unable to clean title: %s", d.Title))
-				if !yield(d) {
-					return
-				}
-				continue
+				return d, errorsx.Wrapf(err, "unable to clean title: %s", d.Title)
 			}
 
 			cleaned = lucenex.Clean(cleaned)
@@ -141,11 +133,7 @@ func (t *knownMediaDetectSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 
 			known, err := library.DetectKnownMedia(ctx, t.q, d.Mimetype, title)
 			if err != nil {
-				errorsx.Log(errorsx.Wrap(err, "unable to detect known media"))
-				if !yield(d) {
-					return
-				}
-				continue
+				return d, errorsx.Wrap(err, "unable to detect known media")
 			}
 
 			log.Println("known media", cleaned, "->", title, spew.Sdump(known))
@@ -154,6 +142,13 @@ func (t *knownMediaDetectSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 				d.KnownMediaID = known.UID
 			}
 
+			return d, nil
+		}
+
+		for d := range t.inner.Each(ctx) {
+			log.Println("attempting to identify discovered media")
+			d, err := identify(d)
+			errorsx.Log(err)
 			if !yield(d) {
 				return
 			}

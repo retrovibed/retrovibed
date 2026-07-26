@@ -70,7 +70,7 @@ func TestKnownMediaDetector(t *testing.T) {
 		require.Equal(t, kid, got[0].KnownMediaID, "a candidate that already carries a known-media-id must not be overwritten")
 	})
 
-	t.Run("should drop a candidate whose title fails to clean but keep processing the rest", func(t *testing.T) {
+	t.Run("should leave a candidate unresolved when its title fails to clean but keep processing the rest", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 
@@ -107,7 +107,8 @@ func TestKnownMediaDetector(t *testing.T) {
 			got = append(got, d)
 		}
 		require.NoError(t, seq.Err(), "a per-candidate clean failure must be logged, not surfaced as the sequence error")
-		require.Len(t, got, 1, "the failing candidate must be dropped while the rest of the sequence keeps processing")
-		require.Equal(t, known.UID, got[0].KnownMediaID)
+		require.Len(t, got, 2, "a clean failure must not drop the candidate, the rest of the sequence keeps processing")
+		require.Equal(t, uuid.Nil.String(), got[0].KnownMediaID, "the failing candidate is yielded unresolved")
+		require.Equal(t, known.UID, got[1].KnownMediaID)
 	})
 }
