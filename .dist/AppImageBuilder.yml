@@ -15,23 +15,20 @@
 # snapshot libass comes from -- we don't want to rely on host libraries when we
 # can avoid it.
 #
-# THIRD PARTY BUG: GTK aborts with a core dump the first time it needs to render a
-# fallback icon (Gtk:ERROR ... ensure_surface_for_gicon ... Could not spawn
-# ".../glycin-loaders/2+/glycin-svg" ... No such file or directory). GTK's
-# icon-theme rendering routes SVG loading through glycin, a sandboxed helper
-# spawned via a hardcoded absolute path (e.g. /usr/libexec/glycin-loaders/2+/glycin-svg)
-# baked in at compile time. AppImage's mount doesn't remap /usr the way Flatpak's
-# sandbox does, so that lookup always hits the real host filesystem instead of the
-# bundle, and fails on hosts that don't have glycin installed at that exact path
-# (or at all). appimage-builder's own runtime setup requires app_info.exec to be a
-# real ELF binary (it errors out with "Main executable is not an elf executable"
-# otherwise), so we can't point it at a wrapper script directly. Fixed instead via
-# after_runtime, which renames the real binary to retrovibed.bin once
-# appimage-builder's own setup has finished with it, and puts a wrapper script in
-# its place at the original path: it relaunches retrovibed.bin under bubblewrap
-# (bundled, see apt.include) with a synthetic /usr grafting in the bundle's own
-# glycin-loaders. See .dist/linux/usr/lib/retrovibed/appimage-launcher.sh for the
-# full explanation.
+# THIRD PARTY BUG: (worked around by replacement, not a runtime patch): GTK's
+# icon-theme rendering routes SVG loading through glycin, which spawns a sandboxed
+# helper at a hardcoded absolute path (e.g. /usr/libexec/glycin-loaders/2+/glycin-svg).
+# AppImage's mount doesn't remap /usr the way Flatpak's sandbox does, so that lookup
+# always hits the real host filesystem, which usually doesn't have glycin at that
+# exact path -- and even a bwrap-relaunch grafting the bundle's own glycin-loaders in
+# still crashes on hosts missing the loader binaries' own dependency closure (they
+# have no RPATH). Rather than patch around that, apt.exclude the stock
+# glycin/glycin-loaders/libglycin-2-0 packages and apt.include glycin-ng instead: a
+# from-scratch, permissively-licensed reimplementation (github.com/QaidVoid/glycin-ng,
+# packaged in .eg/debuild/glycinng) that decodes in-process (Landlock/seccomp on a
+# worker thread) instead of spawning subprocess helpers, so this whole class of bug
+# doesn't apply. It ships a same-ABI libglycin-2.so.0 shim, so nothing downstream
+# (gdk-pixbuf/GTK) needs to change.
 
 version: 1
 
@@ -50,10 +47,6 @@ AppDir:
     mkdir -p "${APPDIR}/runtime/compat/lib64"
     ln -sf ../usr/lib64/ld-linux-x86-64.so.2 "${APPDIR}/runtime/compat/lib64/ld-linux-x86-64.so.2"
 
-    # switch the binary with the appimage launcher script.
-    mv "${APPDIR}/usr/lib/retrovibed/retrovibed" "${APPDIR}/usr/lib/retrovibed/retrovibed.bin"
-    mv "${APPDIR}/usr/lib/retrovibed/appimage-launcher.sh" "${APPDIR}/usr/lib/retrovibed/retrovibed"
-
   apt:
     arch: !ENV "${APT_ARCH}"
     sources:
@@ -65,6 +58,8 @@ AppDir:
         key_url: "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x871920D1991BC93C"
       - sourceline: "deb http://security.ubuntu.com/ubuntu resolute-security main restricted universe multiverse"
         key_url: "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x871920D1991BC93C"
+      - sourceline: "deb https://ppa.launchpadcontent.net/jljatone/retrovibed/ubuntu resolute main"
+        key_url: "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x872D11DA822A34E7E8499E6DA953F6DC11C77486"
     include:
       - libgtk-3-0t64
       - libglu1-mesa
@@ -78,9 +73,11 @@ AppDir:
       - hicolor-icon-theme
       - adwaita-icon-theme
       - ubuntu-mono
-      - bubblewrap
+      - glycin-ng
     exclude:
       - libglib2.0-data
+      - libglycin-2-0
+      - glycin-loaders
 
   files:
     exclude:
