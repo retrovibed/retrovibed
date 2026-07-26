@@ -1,0 +1,61 @@
+#!/usr/bin/make -f
+# See debhelper(7) (uncomment to enable)
+# output every command that modifies files on the build system.
+DH_VERBOSE=1
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	echo "DH AUTO BUILD OVERRIDE pkg version '${PACKAGE_VERSION}'"
+	mkdir -p $(CURDIR)/linux/usr/lib/x86_64-linux-gnu
+
+	# dependencies are vendored (see src/vendor, generated via `cargo vendor`
+	# in Download) since launchpad builders have no network access; --config
+	# avoids relying on .cargo/config.toml file-discovery, which starts from
+	# CURDIR, not the manifest's directory.
+	#
+	# glycin-ng-libglycin-shim's own build.rs links against libglycin_ng.so via
+	# a relative linker path (../target/release) that assumes both crates
+	# share one workspace target/ dir at the glycin-ng repo root -- so this
+	# has to run from inside src (glycin-ng's own checkout root) using cargo's
+	# default target dir, not a flattened/relocated copy. There's also no
+	# Cargo-level dependency between the two crates (the shim links against
+	# the decoder via a raw linker flag, not a Rust `use`), so they must be
+	# built as two SEPARATE, sequential invocations: glycin-ng-c first
+	# (producing libglycin_ng.so), then the shim (which fails to link if
+	# built first/concurrently, since libglycin_ng.so wouldn't exist yet).
+	#
+	# RUSTFLAGS forces lld: glycin-ng-c's build.rs feeds the linker a version
+	# script with named version nodes to narrow the exported symbol set, and
+	# rustc's own default symbol-hiding also emits an anonymous version node
+	# on Linux cdylibs -- combining both trips up Ubuntu's default cc/ld.bfd
+	# ("anonymous version tag cannot be combined with other version tags").
+	# lld accepts the combination fine.
+	cd $(CURDIR)/src && RUSTFLAGS="-C link-arg=-fuse-ld=lld" cargo build --release -p glycin-ng-c \
+		--config 'source.crates-io.replace-with="vendored-sources"' \
+		--config 'source.vendored-sources.directory="vendor"' \
+		--offline
+	cd $(CURDIR)/src && RUSTFLAGS="-C link-arg=-fuse-ld=lld" cargo build --release -p glycin-ng-libglycin-shim \
+		--config 'source.crates-io.replace-with="vendored-sources"' \
+		--config 'source.vendored-sources.directory="vendor"' \
+		--offline
+	tree -L 1 $(CURDIR)/src/target/release
+
+	cp $(CURDIR)/src/target/release/libglycin_ng.so $(CURDIR)/linux/usr/lib/x86_64-linux-gnu/
+	# soname is already set to libglycin-2.so.0 by the shim's own build.rs.
+	cp $(CURDIR)/src/target/release/libglycin_2.so $(CURDIR)/linux/usr/lib/x86_64-linux-gnu/libglycin-2.so.0
+	tree $(CURDIR)/linux
+
+override_dh_auto_test:
+	echo "DH AUTO TEST OVERRIDE - nothing to run at build time"
+
+override_dh_shlibdeps:
+	# hand-copied cdylib outputs carry no auto-generated shlibs metadata.
+	dh_shlibdeps --dpkg-shlibdeps-params=--ignore-missing-info
+
+override_dh_clean:
+	# dh_clean's default sweep deletes *.orig anywhere in the tree (meant for
+	# patch-reject droppings), which also deletes the Cargo.toml.orig files
+	# cargo vendor ships inside src/vendor; exclude that path.
+	dh_clean -Xsrc/vendor

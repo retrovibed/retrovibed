@@ -1,0 +1,15 @@
+Source: ${DEB_PACKAGE_NAME}
+Section: libs
+Maintainer: ${DEB_MAINTAINER_FULLNAME} <${DEB_MAINTAINER_EMAIL}>
+Standards-Version: 4.6.0.1
+Priority: extra
+Build-Depends: ${DEB_DEPENDS_BUILD}
+
+Package: ${DEB_PACKAGE_NAME}
+Section: libs
+Architecture: ${DEB_ARCHITECTURE}
+Description: ${DEB_DESCRIPTION}
+Provides: libglycin-2-0, glycin-loaders
+Conflicts: libglycin-2-0, glycin-loaders
+Replaces: libglycin-2-0, glycin-loaders
+Depends: ${DEB_DEPENDS_RUNTIME}
