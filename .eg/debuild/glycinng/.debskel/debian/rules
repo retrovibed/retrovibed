@@ -40,12 +40,10 @@ override_dh_auto_build:
 		--config 'source.crates-io.replace-with="vendored-sources"' \
 		--config 'source.vendored-sources.directory="vendor"' \
 		--offline
-	tree -L 1 $(CURDIR)/src/target/release
 
 	cp $(CURDIR)/src/target/release/libglycin_ng.so $(CURDIR)/linux/usr/lib/x86_64-linux-gnu/
 	# soname is already set to libglycin-2.so.0 by the shim's own build.rs.
 	cp $(CURDIR)/src/target/release/libglycin_2.so $(CURDIR)/linux/usr/lib/x86_64-linux-gnu/libglycin-2.so.0
-	tree $(CURDIR)/linux
 
 override_dh_auto_test:
 	echo "DH AUTO TEST OVERRIDE - nothing to run at build time"
