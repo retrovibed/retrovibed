@@ -55,11 +55,24 @@ fn run_predict(
         .run(tvec!(src.into()))
         .map_err(|e| format!("{0} execution error: {e}", model.path))?;
 
+    if outputs.is_empty() {
+        return Err(format!("{0} model defines no outputs", model.path));
+    }
+
     let logits = outputs
         .remove(0)
         .to_array_view::<f32>()
         .map_err(|e| format!("{0} output type mismatch: {e}", model.path))?
         .into_owned();
+
+    let want_shape = [1, seq_len, num_tokens as usize];
+    if logits.shape() != want_shape {
+        return Err(format!(
+            "{0} unexpected output shape: got {1:?}, want {want_shape:?}",
+            model.path,
+            logits.shape(),
+        ));
+    }
 
     let mut token_ids: Vec<i64> = Vec::new();
     for i in 0..seq_len {
