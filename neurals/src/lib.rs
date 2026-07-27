@@ -120,6 +120,13 @@ pub extern "C" fn predict(
             };
             0
         }
-        Err(_) => 1,
+        // The C ABI only carries a 0/1 status back to Go, so the failure
+        // reason (which run_predict branch, which model, etc.) would
+        // otherwise be silently discarded. Logging it here to stderr is
+        // the only way to see why a specific predict call failed.
+        Err(e) => {
+            eprintln!("predict error: {e}");
+            1
+        }
     }
 }
