@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:fixnum/fixnum.dart' as fixnum;
-import './errors.dart' as errors;
-import './help.dart';
-import './theme.defaults.dart';
-import './screens.dart' as screens;
+import 'errors.dart' as errors;
+import 'help.dart';
+import 'theme.defaults.dart';
+import 'screens.dart' as screens;
+import 'debug.dart';
 
 class Grid<T> extends StatelessWidget {
   static fixnum.Int64 int64(int n) => fixnum.Int64(n);
@@ -61,30 +62,27 @@ class Grid<T> extends StatelessWidget {
           },
         );
 
-        final content = screens.Loading(
-          screens.Overlay(
-            children.length == 0 ? empty : grid,
-            overlay: overlay,
-          ),
-          loading: loading,
-          cause: cause,
-        );
-
         return Help(
-          SingleChildScrollView(
-            physics: physics ?? NeverScrollableScrollPhysics(),
-            reverse: defaults.isCompact,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              mainAxisSize: MainAxisSize.max,
-              verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
-              spacing: 0,
-              children: [
-                ...leading,
-                content,
-                ...trailing,
-              ],
+          screens.Loading(
+            SingleChildScrollView(
+              physics: physics ?? NeverScrollableScrollPhysics(),
+              reverse: defaults.isCompact,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.max,
+                verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
+                children: [
+                  ...leading,
+                  screens.Overlay(
+                    children.length == 0 ? empty : grid,
+                    overlay: overlay,
+                  ),
+                  ...trailing,
+                ],
+              ),
             ),
+            loading: loading,
+            cause: cause,
           ),
           help,
         );
