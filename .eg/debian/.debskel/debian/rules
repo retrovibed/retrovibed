@@ -32,6 +32,7 @@ override_dh_auto_build:
 		--config 'source.vendored-sources.directory="src/neurals/vendor"' \
 		--offline
 	tree -L 1 $(CURDIR)/native/release
+	mkdir -p $(CURDIR)/linux/usr/lib/retrovibed
 	cp $(CURDIR)/native/release/libpredicttext.a native/release/libpredicttext.so $(CURDIR)/linux/usr/lib/retrovibed/
 
 	CGO_LDFLAGS="-L$(CURDIR)/linux/usr/lib/retrovibed -Wl,-rpath,/usr/lib/retrovibed" GOPROXY="direct" GOCACHE="$(CURDIR)/.gocache" GOMODCACHE="$(CURDIR)/.gomod" GOBIN="$(CURDIR)/linux/usr/bin" /usr/lib/go-1.26/bin/go build -C src/shallows -mod=vendor -buildmode=pie -tags "duckdb_use_lib,retrovibed,neural" -buildvcs=false -o "$(CURDIR)/linux/usr/bin" ./cmd/retrovibe/...
