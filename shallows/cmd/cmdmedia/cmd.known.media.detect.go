@@ -61,7 +61,7 @@ func (t knowndetect) run(ctx context.Context, in io.Reader, db sqlx.Queryer, cle
 			log.Println("query cleaned", rec.Query, "->", query)
 		}
 
-		result, err := library.DetectKnownMedia(ctx, db, mimex.Category(rec.Mimetype), query)
+		result, err := library.DetectKnownMedia(ctx, db, mimex.Category(rec.Mimetype), query, library.KnownMatchCutoff)
 		if err != nil {
 			return err
 		}

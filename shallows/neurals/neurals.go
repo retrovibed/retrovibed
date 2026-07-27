@@ -1,6 +1,8 @@
 package neurals
 
-import "github.com/retrovibed/retrovibed/shallows/internal/langx"
+import (
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
+)
 
 type Text struct {
 	model     string
@@ -58,5 +60,5 @@ func NewText(path string, options ...func(*Text)) *Text {
 }
 
 func (t *Text) Predict(input string) (string, error) {
-	return predict(t, input)
+	return predict(t, LimitVocab(input, t.numTokens))
 }

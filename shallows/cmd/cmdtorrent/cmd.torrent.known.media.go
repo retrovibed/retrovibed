@@ -38,7 +38,7 @@ func (t cmdKnownMedia) Run(ctx *cmdopts.Global) (err error) {
 			known library.Known
 		)
 
-		if known, err = library.DetectKnownMedia(ctx.Context, db, mimex.Category(md.Mimetype), md.Description); err != nil {
+		if known, err = library.DetectKnownMedia(ctx.Context, db, mimex.Category(md.Mimetype), md.Description, library.KnownMatchCutoff); err != nil {
 			log.Println("failed to detect known media", err)
 			continue
 		}

@@ -131,7 +131,7 @@ func (t *knownMediaDetectSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 			cleaned = lucenex.Clean(cleaned)
 			title, _, _ := library.ParseReleaseEpisode(cleaned)
 
-			known, err := library.DetectKnownMedia(ctx, t.q, d.Mimetype, title)
+			known, err := library.DetectKnownMedia(ctx, t.q, d.Mimetype, title, library.KnownMatchCutoff)
 			if err != nil {
 				return d, errorsx.Wrap(err, "unable to detect known media")
 			}

@@ -152,18 +152,24 @@ func KnownQueryWithPoster() squirrel.Sqlizer {
 	return squirrel.Expr("(library_known_media.poster_path != '' OR library_known_media.backdrop_path != '')")
 }
 
+// KnownMatchCutoff is the default minimum combined jaro-winkler/jaro
+// similarity required to accept a known-media match. Jaro-family metrics
+// degrade on long strings, so this is set well above the point where two
+// unrelated titles can score deceptively high by chance.
+const KnownMatchCutoff float32 = 0.85
+
 func KnownQuerySimilarity(q string, cutoff float32) squirrel.Sqlizer {
-	return squirrel.Expr("((jaro_winkler_similarity(library_known_media.title, ?, ?) + jaro_similarity(library_known_media.title, ?, ?)) / 2) > 0.5", q, cutoff, q, cutoff)
+	return squirrel.Expr("((jaro_winkler_similarity(library_known_media.title, ?, ?) + jaro_similarity(library_known_media.title, ?, ?)) / 2) > ?", q, cutoff, q, cutoff, cutoff)
 }
 
 func KnownSearchBuilder() squirrel.SelectBuilder {
 	return squirrelx.PSQL.Select(sqlx.Columns(KnownScannerStaticColumns)...).From("library_known_media")
 }
 
-func DetectKnownMedia(ctx context.Context, db sqlx.Queryer, mimecat string, query string) (k Known, err error) {
+func DetectKnownMedia(ctx context.Context, db sqlx.Queryer, mimecat string, query string, similarity float32) (k Known, err error) {
 	k = Unknown()
 
-	if err := KnownBestMatch(ctx, db, mimecat, query, 0.7).Scan(&k); sqlx.IgnoreNoRows(err) != nil {
+	if err := KnownBestMatch(ctx, db, mimecat, query, similarity).Scan(&k); sqlx.IgnoreNoRows(err) != nil {
 		return k, errorsx.Wrap(err, "unable to score")
 	}
 
