@@ -134,6 +134,7 @@ type Token struct {
 	LibraryModify   bool   `protobuf:"varint,1008,opt,name=library_modify,proto3" json:"library_modify,omitempty"`
 	ArchiveSync     bool   `protobuf:"varint,1009,opt,name=archive_sync,proto3" json:"archive_sync,omitempty"`
 	CommunitySync   bool   `protobuf:"varint,1010,opt,name=community_sync,proto3" json:"community_sync,omitempty"`
+	CustomerSupport bool   `protobuf:"varint,1011,opt,name=customer_support,proto3" json:"customer_support,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -283,6 +284,13 @@ func (x *Token) GetArchiveSync() bool {
 func (x *Token) GetCommunitySync() bool {
 	if x != nil {
 		return x.CommunitySync
+	}
+	return false
+}
+
+func (x *Token) GetCustomerSupport() bool {
+	if x != nil {
+		return x.CustomerSupport
 	}
 	return false
 }
@@ -654,7 +662,7 @@ const file_meta_authz_proto_rawDesc = "" +
 	"\x06issued\x18\x05 \x01(\x03R\x03iat\x12\x14\n" +
 	"\aexpires\x18\x06 \x01(\x03R\x03exp\x12\x17\n" +
 	"\n" +
-	"not_before\x18\a \x01(\x03R\x03nbf\"\xc0\x04\n" +
+	"not_before\x18\a \x01(\x03R\x03nbf\"\xed\x04\n" +
 	"\x05Token\x12\x0f\n" +
 	"\x02id\x18\x01 \x01(\tR\x03jti\x12\x13\n" +
 	"\x06issuer\x18\x02 \x01(\tR\x03iss\x12\x17\n" +
@@ -675,7 +683,8 @@ const file_meta_authz_proto_rawDesc = "" +
 	"\flibrary_read\x18\xef\a \x01(\bR\flibrary_read\x12'\n" +
 	"\x0elibrary_modify\x18\xf0\a \x01(\bR\x0elibrary_modify\x12#\n" +
 	"\farchive_sync\x18\xf1\a \x01(\bR\farchive_sync\x12'\n" +
-	"\x0ecommunity_sync\x18\xf2\a \x01(\bR\x0ecommunity_syncJ\x05\b\t\x10\xe8\a\"\x0e\n" +
+	"\x0ecommunity_sync\x18\xf2\a \x01(\bR\x0ecommunity_sync\x12+\n" +
+	"\x10customer_support\x18\xf3\a \x01(\bR\x10customer_supportJ\x05\b\t\x10\xe8\a\"\x0e\n" +
 	"\fAuthzRequest\"J\n" +
 	"\rAuthzResponse\x12\x16\n" +
 	"\x06bearer\x18\x01 \x01(\tR\x06bearer\x12!\n" +

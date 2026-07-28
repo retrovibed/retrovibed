@@ -8,6 +8,7 @@ import 'package:retrovibed/profiles.dart' as profiles;
 import 'package:retrovibed/rss.dart' as rss;
 import 'package:retrovibed/wireguard.dart' as wireguard;
 import 'package:retrovibed/google.dart' as google;
+import 'package:retrovibed/feedback.dart' as feedback;
 import 'package:retrovibed/usermanagement.dart' as usermanagement;
 import 'package:retrovibed/debug.dart' as debug;
 import 'package:retrovibed/authn.dart' as authn;
@@ -131,6 +132,7 @@ class _DisplayState extends State<Display> {
         final compact = defaults.isCompact;
         final _billing = billing.Registered.of(context);
         final _displaybilling = (_billing.current.subscriptionId.isNotEmpty && authn.developer(context).subscription);
+        final _customerSupport = authn.AuthzCache.authzmetadata(context).customerSupport;
 
         return SelectionArea(
           child: Column(
@@ -205,6 +207,7 @@ class _DisplayState extends State<Display> {
                               margin: EdgeInsets.zero,
                             ),
                             google.Card(onPressed: full),
+                            if (_customerSupport) feedback.Card(onPressed: full, margin: EdgeInsets.zero),
                             ds.LongHold(
                               onHold: () {
                                 masked(

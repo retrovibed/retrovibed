@@ -68,6 +68,13 @@ const Token$json = {
     {'1': 'library_modify', '3': 1008, '4': 1, '5': 8, '10': 'library_modify'},
     {'1': 'archive_sync', '3': 1009, '4': 1, '5': 8, '10': 'archive_sync'},
     {'1': 'community_sync', '3': 1010, '4': 1, '5': 8, '10': 'community_sync'},
+    {
+      '1': 'customer_support',
+      '3': 1011,
+      '4': 1,
+      '5': 8,
+      '10': 'customer_support'
+    },
   ],
   '9': [
     {'1': 9, '2': 1000},
@@ -86,7 +93,8 @@ final $typed_data.Uint8List tokenDescriptor = $convert.base64Decode(
     'juByABKARSEGFyY2hpdmVfZG93bmxvYWQSIwoMbGlicmFyeV9yZWFkGO8HIAEoCFIMbGlicmFy'
     'eV9yZWFkEicKDmxpYnJhcnlfbW9kaWZ5GPAHIAEoCFIObGlicmFyeV9tb2RpZnkSIwoMYXJjaG'
     'l2ZV9zeW5jGPEHIAEoCFIMYXJjaGl2ZV9zeW5jEicKDmNvbW11bml0eV9zeW5jGPIHIAEoCFIO'
-    'Y29tbXVuaXR5X3N5bmNKBQgJEOgH');
+    'Y29tbXVuaXR5X3N5bmMSKwoQY3VzdG9tZXJfc3VwcG9ydBjzByABKAhSEGN1c3RvbWVyX3N1cH'
+    'BvcnRKBQgJEOgH');
 
 @$core.Deprecated('Use authzRequestDescriptor instead')
 const AuthzRequest$json = {

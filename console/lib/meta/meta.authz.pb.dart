@@ -162,6 +162,7 @@ class Token extends $pb.GeneratedMessage {
     $core.bool? libraryModify,
     $core.bool? archiveSync,
     $core.bool? communitySync,
+    $core.bool? customerSupport,
   }) {
     final result = create();
     if (id != null) result.id = id;
@@ -181,6 +182,7 @@ class Token extends $pb.GeneratedMessage {
     if (libraryModify != null) result.libraryModify = libraryModify;
     if (archiveSync != null) result.archiveSync = archiveSync;
     if (communitySync != null) result.communitySync = communitySync;
+    if (customerSupport != null) result.customerSupport = customerSupport;
     return result;
   }
 
@@ -218,6 +220,7 @@ class Token extends $pb.GeneratedMessage {
     ..aOB(1008, _omitFieldNames ? '' : 'library_modify')
     ..aOB(1009, _omitFieldNames ? '' : 'archive_sync')
     ..aOB(1010, _omitFieldNames ? '' : 'community_sync')
+    ..aOB(1011, _omitFieldNames ? '' : 'customer_support')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -391,6 +394,15 @@ class Token extends $pb.GeneratedMessage {
   $core.bool hasCommunitySync() => $_has(16);
   @$pb.TagNumber(1010)
   void clearCommunitySync() => $_clearField(1010);
+
+  @$pb.TagNumber(1011)
+  $core.bool get customerSupport => $_getBF(17);
+  @$pb.TagNumber(1011)
+  set customerSupport($core.bool value) => $_setBool(17, value);
+  @$pb.TagNumber(1011)
+  $core.bool hasCustomerSupport() => $_has(17);
+  @$pb.TagNumber(1011)
+  void clearCustomerSupport() => $_clearField(1011);
 }
 
 class AuthzRequest extends $pb.GeneratedMessage {
