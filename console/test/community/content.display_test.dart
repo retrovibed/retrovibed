@@ -12,8 +12,13 @@ import 'package:retrovibed/testing/widget_tester_extensions.dart';
 
 final _resolutions = Resolutions.variant();
 
+// accountId must match the fallback session's account id
+// (uuidx.min(), see Authenticated._zeroSession) since pumpApp doesn't wrap
+// children in an Authenticated widget - otherwise "owned" is always false
+// and the delete affordance never renders.
 Community _testCommunity({String? lastSyncAt}) => Community(
   id: 'community-1',
+  accountId: uuidx.min(),
   domain: 'testdomain',
   description: 'A test community',
   lastSyncAt: lastSyncAt ?? DateTime.now().toUtc().toIso8601String(),

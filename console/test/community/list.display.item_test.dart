@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
+import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'package:retrovibed/community/list.display.item.dart';
 import 'package:retrovibed/community/community.pb.dart';
 import 'package:retrovibed/community/community.button.publish.dart';
@@ -12,7 +13,7 @@ void main() {
 		testWidgets('owned community shows publish, delete buttons', (tester) async {
 			final community = Community(
 				id: 'c1',
-				accountId: '',
+				accountId: uuidx.min(),
 				domain: 'owned',
 				description: 'my community',
 			);
@@ -44,7 +45,7 @@ void main() {
 		testWidgets('owned community shows metrics when expanded', (tester) async {
 			final community = Community(
 				id: 'c1',
-				accountId: '',
+				accountId: uuidx.min(),
 				domain: 'owned',
 			);
 
@@ -106,7 +107,7 @@ void main() {
 		testWidgets('subscribed owned community shows check_circle', (tester) async {
 			final community = Community(
 				id: 'c1',
-				accountId: '',
+				accountId: uuidx.min(),
 				domain: 'owned',
 				subscribedAt: '2026-03-20T00:00:00Z',
 			);
