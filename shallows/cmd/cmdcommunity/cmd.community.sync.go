@@ -40,7 +40,7 @@ func (t cmdCommunitySync) Run(gctx *cmdopts.Global) (err error) {
 	defer db.Close()
 
 	client := communityapi.NewDeeppoolPublished(httpc)
-	synced, err := communityapi.SyncContentFromDeeppool(gctx.Context, db, client, t.Community, t.Autodownload)
+	synced, err := communityapi.SyncContentFromDeeppool(gctx.Context, db, client, t.Community, t.Autodownload, 0)
 	if err != nil {
 		return err
 	}

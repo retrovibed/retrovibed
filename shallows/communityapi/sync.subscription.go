@@ -9,17 +9,18 @@ import (
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/retrovibed/retrovibed/shallows/community"
+	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
+	"github.com/retrovibed/retrovibed/shallows/internal/backoffx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 )
 
 // SyncContentFromDeeppool fetches published content for a community from deeppool
 // and imports it into the local database. Returns the number of items synced.
-func SyncContentFromDeeppool(ctx context.Context, q sqlx.Queryer, client DeeppoolPublished, communityID string, autodownload bool) (int, error) {
-	resp, err := client.List(ctx, communityID, &PublishedContentSearchRequest{})
+func SyncContentFromDeeppool(ctx context.Context, q sqlx.Queryer, client DeeppoolPublished, communityID string, autodownload bool, limit uint64) (int, error) {
+	resp, err := client.List(ctx, communityID, &PublishedContentSearchRequest{Limit: limit})
 	if err != nil {
 		return 0, errorsx.Wrap(err, "failed to fetch published content from deeppool")
 	}
@@ -82,12 +83,16 @@ func SyncPublishedContentItem(ctx context.Context, q sqlx.Queryer, pc *Published
 }
 
 // NewSubscriptionSync creates a background worker that periodically syncs
-// content from all subscribed communities.
-func NewSubscriptionSync(ctx context.Context, q sqlx.Queryer, client DeeppoolPublished, interval time.Duration) error {
+// content from all subscribed communities. async can also be Broadcast() to
+// trigger an immediate sync pass on demand (e.g. from an HTTP-triggered resync).
+func NewSubscriptionSync(ctx context.Context, q sqlx.Queryer, client DeeppoolPublished, async *asyncx.Wakeup, interval time.Duration) error {
 	log.Println("subscription sync worker initiated")
 	defer log.Println("subscription sync worker completed")
 
-	return timex.NowAndEvery(ctx, interval, func(ctx context.Context) error {
+	s := backoffx.New(backoffx.Constant(interval), backoffx.Jitter(0.1))
+	go asyncx.Periodic(ctx, async, s, "subscription sync initiated")
+
+	return asyncx.Run(ctx, async, func(ctx context.Context) error {
 		return syncSubscriptions(ctx, q, client)
 	})
 }
@@ -96,7 +101,7 @@ func syncSubscriptions(ctx context.Context, q sqlx.Queryer, client DeeppoolPubli
 	subs := sqlx.Scan(community.CommunitySearch(ctx, q, community.CommunitySearchBuilder()))
 	for sub := range subs.Iter() {
 		autodownload := sub.AutoDownload != 0
-		synced, err := SyncContentFromDeeppool(ctx, q, client, sub.ID, autodownload)
+		synced, err := SyncContentFromDeeppool(ctx, q, client, sub.ID, autodownload, 0)
 		if err != nil {
 			log.Println(errorsx.Wrap(err, "subscription sync failed for "+sub.ID))
 			continue

@@ -140,6 +140,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		mediameta           = asyncx.NewWakeup(gctx.Context)
 		archival            = asyncx.NewWakeup(gctx.Context)
 		publishing          = asyncx.NewWakeup(gctx.Context)
+		communitysync       = asyncx.NewWakeup(gctx.Context)
 		mediaidentification = asyncx.NewWakeup(gctx.Context)
 		ddiscpublish        = asyncx.NewWakeup(gctx.Context)
 		locatemedia         = asyncx.NewWakeup(gctx.Context)
@@ -207,7 +208,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		errorsx.Log(AutoArchival(gctx.Context, db, mediastore, archival, t.AutoArchive))
 		errorsx.Log(AutoPublishing(gctx.Context, db, deepjwt, mediastore, tvfs, publishing))
 		errorsx.Log(AutoFeedSync(gctx.Context, db, deepjwt, publishing))
-		errorsx.Log(SubscriptionSync(gctx.Context, db, deepjwt))
+		errorsx.Log(SubscriptionSync(gctx.Context, db, deepjwt, communitysync))
 		tstore = library.NewTorrentStorageFromHTTP(deepjwt, db, tstore)
 	} else {
 		log.Println("automatic archival is disabled")
@@ -453,6 +454,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	communityapi.NewHTTP(
 		db,
 		envx.Toggle(communityapi.HTTPOptionNoop, communityapi.HTTPOptionHTTPClient(deepjwt), t.AutoArchive),
+		communityapi.HTTPOptionCommunitySync(communitysync),
 	).Bind(httpmux.PathPrefix("/c").Subrouter())
 
 	communityapi.NewHTTPYouTube(db, deepjwt).Bind(httpmux.PathPrefix("/integrations/youtube").Subrouter())

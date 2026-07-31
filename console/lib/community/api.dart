@@ -244,4 +244,20 @@ class API {
           );
         });
   }
+
+  static Future<PublishedContentSearchResponse> resync(
+    String id, {
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx
+        .post(
+          Uri.https(httpx.host(), "/c/$id/resync"),
+          options: [httpx.Accept.json, ...options],
+        )
+        .then((v) {
+          return Future.value(
+            PublishedContentSearchResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+          );
+        });
+  }
 }

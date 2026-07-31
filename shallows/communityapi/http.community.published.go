@@ -112,13 +112,6 @@ func (t *HTTPPublished) Bind(r *mux.Router) {
 		httpauth.AuthenticateWithToken(t.jwtsecret),
 		httpx.Timeout2s(),
 	).ThenFunc(t.tombstoned))
-
-	// r.Path("/{id}").Methods(http.MethodGet).Handler(alice.New(
-	// 	httpx.RouteInvoked,
-	// 	httpx.ContextBufferPool512(),
-	// 	httpauth.AuthenticateWithToken(t.jwtsecret),
-	// 	httpx.Timeout2s(),
-	// ).ThenFunc(t.resync))
 }
 
 func (t *HTTPPublished) tombstoned(w http.ResponseWriter, r *http.Request) {

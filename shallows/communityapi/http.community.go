@@ -1,15 +1,18 @@
 package communityapi
 
 import (
+	"context"
 	"log"
 	"net/http"
 
+	"github.com/Masterminds/squirrel"
 	"github.com/go-playground/form/v4"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
 	"github.com/retrovibed/retrovibed/retroapi/httpauth"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/community"
+	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -41,23 +44,31 @@ func HTTPOptionHTTPClient(c *http.Client) HTTPOption {
 	}
 }
 
+func HTTPOptionCommunitySync(w *asyncx.Wakeup) HTTPOption {
+	return func(t *HTTP) {
+		t.communitysync = w
+	}
+}
+
 func NewHTTP(q sqlx.Queryer, options ...HTTPOption) *HTTP {
 	svc := langx.Clone(HTTP{
-		q:         q,
-		jwtsecret: env.JWTSecret,
-		decoder:   formx.NewDecoder(),
-		lucene:    duckdbx.NewLucene(),
+		q:             q,
+		jwtsecret:     env.JWTSecret,
+		decoder:       formx.NewDecoder(),
+		lucene:        duckdbx.NewLucene(),
+		communitysync: asyncx.NewWakeup(context.Background()),
 	}, options...)
 
 	return &svc
 }
 
 type HTTP struct {
-	q         sqlx.Queryer
-	jwtsecret jwtx.SecretSource
-	decoder   *form.Decoder
-	httpc     *http.Client
-	lucene    lucenex.Driver
+	q             sqlx.Queryer
+	jwtsecret     jwtx.SecretSource
+	decoder       *form.Decoder
+	httpc         *http.Client
+	lucene        lucenex.Driver
+	communitysync *asyncx.Wakeup
 }
 
 func (t *HTTP) Bind(r *mux.Router) {
@@ -76,6 +87,13 @@ func (t *HTTP) Bind(r *mux.Router) {
 		httpauth.AuthenticateWithToken(t.jwtsecret),
 		httpx.Timeout2s(),
 	).ThenFunc(t.subscribe))
+
+	r.Path("/{id}/resync").Methods(http.MethodPost).Handler(alice.New(
+		httpx.RouteInvoked,
+		httpx.ContextBufferPool512(),
+		httpauth.AuthenticateWithToken(t.jwtsecret),
+		httpx.Timeout10s(),
+	).ThenFunc(t.resync))
 }
 
 func (t *HTTP) search(w http.ResponseWriter, r *http.Request) {
@@ -194,4 +212,49 @@ func (t *HTTP) subscribe(w http.ResponseWriter, r *http.Request) {
 	}
 
 	errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusOK))
+}
+
+func (t *HTTP) resync(w http.ResponseWriter, r *http.Request) {
+	cid := mux.Vars(r)["id"]
+
+	if t.httpc == nil {
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusServiceUnavailable))
+		return
+	}
+
+	existing, err := ResyncOne(r.Context(), t.q, t.httpc, cid)
+	if err != nil {
+		log.Println(errorsx.Wrap(err, "unable to resync community"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadGateway))
+		return
+	}
+
+	t.communitysync.Broadcast()
+
+	var msg PublishedContentSearchResponse
+	msg.Community = new(langx.Clone(Community{}, CommunityOptionFromDB(langx.Clone(*existing, timex.JSONSafeEncodeOption))))
+	msg.Next = &PublishedContentSearchRequest{CommunityId: cid, Offset: 1, Limit: 128}
+
+	q := community.PublishedContentSearch(r.Context(), t.q, community.PublishedContentSearchBuilder().Where(
+		squirrel.And{
+			community.PublishedContentQueryCommunityID(cid),
+			community.PublishedContentQueryNotTombstoned(),
+		},
+	).OrderBy("published_at DESC").Limit(128))
+
+	qi := sqlx.Scan(q)
+	for pc := range qi.Iter() {
+		tmp := langx.Clone(PublishedContent{}, PublishedContentOptionFromDB(langx.Clone(pc, timex.JSONSafeEncodeOption)))
+		msg.Items = append(msg.Items, &tmp)
+	}
+	if err := qi.Err(); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to fetch published content"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &msg); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to write response"))
+		return
+	}
 }

@@ -1,0 +1,107 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:retrovibed/testing/widget_tester_extensions.dart';
+import 'package:retrovibed/community/community.button.resync.dart';
+import 'package:retrovibed/community/community.pb.dart';
+import 'package:retrovibed/community/community.publish.pb.dart';
+
+final _community = Community(id: 'c1', domain: 'example-community');
+
+void main() {
+  group('ResyncButton', () {
+    testWidgets('renders refresh icon', (tester) async {
+      await tester.pumpApp(
+        ResyncButton(community: _community, apiresync: (id, {options = const []}) async => throw UnimplementedError()),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byIcon(Icons.refresh), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('tapping calls apiresync with the community id', (tester) async {
+      String? calledWith;
+
+      await tester.pumpApp(
+        ResyncButton(
+          community: _community,
+          apiresync: (id, {options = const []}) async {
+            calledWith = id;
+            return PublishedContentSearchResponse(community: _community);
+          },
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.refresh));
+      await tester.pumpAndSettle();
+
+      expect(calledWith, equals('c1'));
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('shows loading spinner while the request is pending', (tester) async {
+      final completer = Completer<PublishedContentSearchResponse>();
+
+      await tester.pumpApp(
+        ResyncButton(community: _community, apiresync: (id, {options = const []}) => completer.future),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.refresh));
+      await tester.pump();
+
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(tester.takeException(), isNull);
+
+      completer.complete(PublishedContentSearchResponse(community: _community));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('invokes onResynced with the refreshed community', (tester) async {
+      Community? resynced;
+      final refreshed = Community(id: 'c1', domain: 'refreshed-domain');
+
+      await tester.pumpApp(
+        ResyncButton(
+          community: _community,
+          onResynced: (c) => resynced = c,
+          apiresync: (id, {options = const []}) async => PublishedContentSearchResponse(community: refreshed),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.refresh));
+      await tester.pumpAndSettle();
+
+      expect(resynced?.domain, equals('refreshed-domain'));
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('failed request clears the loading spinner without calling onResynced', (tester) async {
+      bool onResyncedCalled = false;
+
+      await tester.pumpApp(
+        Scaffold(
+          body: ResyncButton(
+            community: _community,
+            onResynced: (_) => onResyncedCalled = true,
+            apiresync: (id, {options = const []}) => Future<PublishedContentSearchResponse>.error(Exception('boom')),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.refresh));
+      await tester.pumpAndSettle();
+
+      expect(onResyncedCalled, isFalse);
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+    });
+  });
+}

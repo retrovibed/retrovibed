@@ -8,6 +8,7 @@ import 'metrics.dashboard.dart';
 import 'community.detail.dart';
 import 'community.button.subscribe.dart';
 import 'community.button.publish.dart';
+import 'community.button.resync.dart';
 import 'community.button.delete.dart';
 import 'community.button.share.dart';
 import 'community.update.dart';
@@ -44,6 +45,7 @@ class ManagementListDisplayItem extends StatelessWidget {
           ),
           ShareButton(community: community),
           PublishButton(community: community),
+          ResyncButton(community: community, onResynced: onChanged),
           DeleteButton(
             community: community,
             onDeleted: onChanged,

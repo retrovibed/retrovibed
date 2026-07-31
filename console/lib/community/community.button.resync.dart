@@ -1,0 +1,32 @@
+import 'package:flutter/material.dart';
+import 'package:retrovibed/designkit.dart' as ds;
+import 'package:retrovibed/httpx.dart' as httpx;
+import 'package:retrovibed/community/api.dart';
+import 'package:retrovibed/authn.dart' as authn;
+
+class ResyncButton extends StatelessWidget {
+  final Community community;
+  final void Function(Community)? onResynced;
+  final Future<PublishedContentSearchResponse> Function(String id, {List<httpx.Option> options}) apiresync;
+
+  const ResyncButton({
+    super.key,
+    required this.community,
+    this.onResynced,
+    this.apiresync = API.resync,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ds.LoadingIconButton.refresh(
+      tooltip: 'Resync Community',
+      help: ds.Hint(const Text("refetch metadata and latest published content from the source")),
+      onPressed: () {
+        final auth = [authn.DeeppoolAuthzCache.bearer(context)];
+        return httpx
+            .withRetry(() => apiresync(community.id, options: auth))
+            .then((resp) => onResynced?.call(resp.community));
+      },
+    );
+  }
+}
