@@ -87,15 +87,15 @@ func Seeded(ctx context.Context, seed string, force bool, path string) (s ssh.Si
 }
 
 func Unseeded() error {
-	return sshx.Unseeded(env.PrivateKeyPath())
+	return sshx.Unseeded(env.PrivateKeyPath(userx.DefaultRelRoot()))
 }
 
 func PrivateKeyPath() string {
-	return env.PrivateKeyPath()
+	return env.PrivateKeyPath(userx.DefaultRelRoot())
 }
 
 func PublicKeyPath() string {
-	return env.PrivateKeyPath() + ".pub"
+	return env.PrivateKeyPath(userx.DefaultRelRoot()) + ".pub"
 }
 
 func UserDisplayName() string {
@@ -103,12 +103,7 @@ func UserDisplayName() string {
 	return stringsx.FirstNonBlank(u.Name, u.Username)
 }
 
-func Oauth2DeeppoolHTTPClient(ctx context.Context) (*http.Client, error) {
-	signer, err := sshx.AutoCached(sshx.NewKeyGen(), env.PrivateKeyPath())
-	if err != nil {
-		return nil, errorsx.Wrap(err, "unable to read identity")
-	}
-
+func Oauth2DeeppoolHTTPClient(ctx context.Context, signer ssh.Signer) (*http.Client, error) {
 	cfg := oauth2SSHConfig(signer, "", DeeppoolEndpoint())
 
 	c := HTTPClientDefaults()
@@ -122,7 +117,7 @@ func Oauth2DeeppoolHTTPClient(ctx context.Context) (*http.Client, error) {
 }
 
 func SSHSigner() (ssh.Signer, error) {
-	return sshx.AutoCached(sshx.NewKeyGen(), env.PrivateKeyPath())
+	return sshx.AutoCached(sshx.NewKeyGen(), env.PrivateKeyPath(userx.DefaultRelRoot()))
 }
 
 func oauth2Bearer(ctx context.Context, signer ssh.Signer, c *http.Client, cfg oauth2.Config, email, displayname string) (*oauth2.Token, error) {
@@ -176,7 +171,7 @@ func (t FnTokenSource) Token() (*oauth2.Token, error) {
 }
 
 func AutomaticTokenSource(jwtsecret func() []byte) (*oauth2.Token, error) {
-	signer, err := sshx.AutoCached(sshx.NewKeyGen(), env.PrivateKeyPath())
+	signer, err := sshx.AutoCached(sshx.NewKeyGen(), env.PrivateKeyPath(userx.DefaultRelRoot()))
 	if err != nil {
 		return nil, errorsx.Wrap(err, "unable to read identity")
 	}
@@ -204,7 +199,7 @@ func AutomaticTokenSource(jwtsecret func() []byte) (*oauth2.Token, error) {
 }
 
 func NewBearer(jwtsecret func() []byte) (string, error) {
-	signer, err := sshx.AutoCached(sshx.NewKeyGen(), env.PrivateKeyPath())
+	signer, err := sshx.AutoCached(sshx.NewKeyGen(), env.PrivateKeyPath(userx.DefaultRelRoot()))
 	if err != nil {
 		return "", errorsx.Wrap(err, "unable to read identity")
 	}
@@ -225,7 +220,7 @@ func NewBearer(jwtsecret func() []byte) (string, error) {
 }
 
 func BearerForHost(ctx context.Context, c *http.Client, host string) (*oauth2.Token, error) {
-	signer, err := sshx.AutoCached(sshx.NewKeyGen(), env.PrivateKeyPath())
+	signer, err := sshx.AutoCached(sshx.NewKeyGen(), env.PrivateKeyPath(userx.DefaultRelRoot()))
 	if err != nil {
 		return nil, errorsx.Wrap(err, "unable to read identity")
 	}

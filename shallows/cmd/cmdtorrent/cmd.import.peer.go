@@ -123,8 +123,13 @@ func (t importPeer) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) (err error) 
 		return err
 	}
 
+	id, err := sshid.Signer()
+	if err != nil {
+		return err
+	}
+
 	async := asyncx.NewWakeup(gctx.Context)
-	errorsx.Log(daemons.AutoArchival(gctx.Context, db, mediastore, async, t.Reclaim))
+	errorsx.Log(daemons.AutoArchival(gctx.Context, id, db, mediastore, async, t.Reclaim))
 
 	peers := make([]torrent.Peer, 0, 128)
 	for _, p := range t.Peer {

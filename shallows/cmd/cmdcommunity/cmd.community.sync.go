@@ -17,7 +17,7 @@ type cmdCommunitySync struct {
 	Autodownload bool   `flag:"" name:"autodownload" help:"automatically download synced torrents" default:"false"`
 }
 
-func (t cmdCommunitySync) Run(gctx *cmdopts.Global) (err error) {
+func (t cmdCommunitySync) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) (err error) {
 	var (
 		db    *sql.DB
 		httpc *http.Client
@@ -26,11 +26,16 @@ func (t cmdCommunitySync) Run(gctx *cmdopts.Global) (err error) {
 	log.Println("community sync initiated", t.Community)
 	defer log.Println("community sync completed", t.Community)
 
-	if _, err = authn.Register(gctx.Context); err != nil {
+	id, err := sshid.Signer()
+	if err != nil {
+		return errorsx.Wrap(err, "unable to generate signer id")
+	}
+
+	if _, err = authn.Register(gctx.Context, id); err != nil {
 		return errorsx.Wrap(err, "unable to register with archival service")
 	}
 
-	if httpc, err = authn.AutoJWTClient(gctx.Context); err != nil {
+	if httpc, err = authn.AutoJWTClient(gctx.Context, id); err != nil {
 		return errorsx.Wrap(err, "unable to create api client")
 	}
 

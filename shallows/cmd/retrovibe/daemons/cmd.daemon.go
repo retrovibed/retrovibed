@@ -161,7 +161,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	jwt.RegisterSigningMethod(sshjwt.Alg(), func() jwt.SigningMethod { return sshjwt })
 	jwtx.RegisterAlgorithms(sshjwt, jwt.SigningMethodHS512)
 
-	if c, err := authn.AutoJWTClient(gctx.Context); err == nil {
+	if c, err := authn.AutoJWTClient(gctx.Context, id); err == nil {
 		deepjwt = c
 	} else {
 		// we allow creation to fail the application should function even without the api.
@@ -205,7 +205,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 
 	if t.AutoArchive && deepjwt != http.DefaultClient {
 		log.Println("automatic archival is enabled")
-		errorsx.Log(AutoArchival(gctx.Context, db, mediastore, archival, t.AutoArchive))
+		errorsx.Log(AutoArchival(gctx.Context, id, db, mediastore, archival, t.AutoArchive))
 		errorsx.Log(AutoPublishing(gctx.Context, db, deepjwt, mediastore, tvfs, publishing))
 		errorsx.Log(AutoFeedSync(gctx.Context, db, deepjwt, publishing))
 		errorsx.Log(SubscriptionSync(gctx.Context, db, deepjwt, communitysync))

@@ -5,12 +5,13 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/env"
+	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/retrovibed/retrovibed/shallows/internal/envx"
 )
 
 func MediaDir() string                    { return env.MediaDir() }
 func TorrentDir() string                  { return env.TorrentDir() }
-func PrivateKeyPath() string              { return env.PrivateKeyPath() }
+func PrivateKeyPath() string              { return env.PrivateKeyPath(userx.DefaultRelRoot()) }
 func TLSPoolDir() string                  { return env.TLSPoolDir() }
 func RootStorageDir(rel ...string) string { return env.RootStorageDir(rel...) }
 

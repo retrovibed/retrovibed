@@ -9,6 +9,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/langx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/sshx"
+	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/oauth2"
 )
@@ -38,7 +39,7 @@ func SSHTokenSourceOptionAutoSigner(s *sshtokensource) {
 	if s.signer != nil {
 		return
 	}
-	s.signer = errorsx.Must(sshx.AutoCached(sshx.NewKeyGen(), env.PrivateKeyPath()))
+	s.signer = errorsx.Must(sshx.AutoCached(sshx.NewKeyGen(), env.PrivateKeyPath(userx.DefaultRelRoot())))
 }
 
 func (t *sshtokensource) Token() (*oauth2.Token, error) {

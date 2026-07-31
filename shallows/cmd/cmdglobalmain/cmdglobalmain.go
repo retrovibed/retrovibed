@@ -172,7 +172,7 @@ func Main(args ...string) {
 			&shellCli.SSHID,
 			&shellCli.Endpoint,
 		),
-		kong.BindTo(cmdopts.DeeppoolClientDefault{}, (*cmdopts.DeeppoolClient)(nil)),
+		kong.BindTo(cmdopts.DeeppoolClientDefault{SSHID: &shellCli.SSHID}, (*cmdopts.DeeppoolClient)(nil)),
 		kong.TypeMapper(reflect.TypeOf(&net.IP{}), kong.MapperFunc(cmdopts.ParseIP)),
 		kong.TypeMapper(reflect.TypeOf(&net.TCPAddr{}), kong.MapperFunc(cmdopts.ParseTCPAddr)),
 		kong.TypeMapper(reflect.TypeOf([]*net.TCPAddr(nil)), kong.MapperFunc(cmdopts.ParseTCPAddrArray)),

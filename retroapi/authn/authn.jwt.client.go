@@ -11,11 +11,12 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/env"
 	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/httpx"
+	"golang.org/x/crypto/ssh"
 	"golang.org/x/oauth2"
 )
 
-func AutoJWTClient(ctx context.Context) (c *http.Client, err error) {
-	c, err = Oauth2DeeppoolHTTPClient(ctx)
+func AutoJWTClient(ctx context.Context, signer ssh.Signer) (c *http.Client, err error) {
+	c, err = Oauth2DeeppoolHTTPClient(ctx, signer)
 	if err != nil {
 		return nil, errorsx.Wrap(err, "failed to create oauth2 http client")
 	}

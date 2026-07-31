@@ -15,14 +15,21 @@ type DeeppoolClient interface {
 
 // DeeppoolClientDefault is the production implementation that registers
 // with deeppool and creates an authenticated client.
-type DeeppoolClientDefault struct{}
+type DeeppoolClientDefault struct {
+	SSHID *SSHID
+}
 
 func (t DeeppoolClientDefault) HTTPClient(ctx context.Context) (*http.Client, error) {
-	if _, err := authn.Register(ctx); err != nil {
+	signer, err := t.SSHID.Signer()
+	if err != nil {
+		return nil, errorsx.Wrap(err, "unable to generate signer id")
+	}
+
+	if _, err := authn.Register(ctx, signer); err != nil {
 		return nil, errorsx.Wrap(err, "unable to register with archival service")
 	}
 
-	c, err := authn.AutoJWTClient(ctx)
+	c, err := authn.AutoJWTClient(ctx, signer)
 	if err != nil {
 		return nil, errorsx.Wrap(err, "unable to create api client")
 	}

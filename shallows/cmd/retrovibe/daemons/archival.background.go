@@ -13,16 +13,17 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/library"
+	"golang.org/x/crypto/ssh"
 )
 
-func AutoArchival(ctx context.Context, q sqlx.Queryer, mediastore fsx.Virtual, async *asyncx.Wakeup, archive bool) error {
+func AutoArchival(ctx context.Context, signer ssh.Signer, q sqlx.Queryer, mediastore fsx.Virtual, async *asyncx.Wakeup, archive bool) error {
 	if archive {
-		if _, err := authn.Register(ctx); err != nil {
+		if _, err := authn.Register(ctx, signer); err != nil {
 			return errorsx.Wrap(err, "unable to register with archival service")
 		}
 	}
 
-	c, err := authn.AutoJWTClient(ctx)
+	c, err := authn.AutoJWTClient(ctx, signer)
 	if err != nil {
 		return errorsx.Wrap(err, "failed to create oauth2 bearer token")
 	}

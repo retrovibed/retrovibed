@@ -21,7 +21,7 @@ func (t CloudRegister) Run(gctx *cmdopts.Global) (err error) {
 		return err
 	}
 
-	session, err := authn.Register(gctx.Context)
+	session, err := authn.Register(gctx.Context, id)
 	if err != nil {
 		return errorsx.Wrap(err, "unable to register")
 	}

@@ -30,8 +30,8 @@ func TorrentDir() string {
 	return RootStorageDir(TorrentDirName)
 }
 
-func PrivateKeyPath() string {
-	return userx.DefaultConfigDir(userx.DefaultRelRoot(), "id")
+func PrivateKeyPath(root string) string {
+	return userx.DefaultConfigDir(root, "id")
 }
 
 func TLSPoolDir() string {

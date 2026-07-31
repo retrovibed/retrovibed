@@ -20,8 +20,8 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-func Register(ctx context.Context) (*Session, error) {
-	c, err := Oauth2DeeppoolHTTPClient(ctx)
+func Register(ctx context.Context, signer ssh.Signer) (*Session, error) {
+	c, err := Oauth2DeeppoolHTTPClient(ctx, signer)
 	if err != nil {
 		return nil, err
 	}

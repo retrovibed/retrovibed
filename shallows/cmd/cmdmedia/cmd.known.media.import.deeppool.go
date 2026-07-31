@@ -29,8 +29,8 @@ type deeppoolimport struct {
 	Source  string    `flag:"" name:"source" help:"short id for the data source" hidden:"true" default:"deeppool"`
 }
 
-func (t deeppoolimport) Run(gctx *cmdopts.Global) error {
-	httpc, err := cmdopts.DeeppoolClientDefault{}.HTTPClient(gctx.Context)
+func (t deeppoolimport) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) error {
+	httpc, err := cmdopts.DeeppoolClientDefault{SSHID: sshid}.HTTPClient(gctx.Context)
 	if err != nil {
 		return errorsx.Wrap(err, "unable to create deeppool client")
 	}
