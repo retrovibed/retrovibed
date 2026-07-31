@@ -151,7 +151,7 @@ func (t *HTTPMetrics) sync(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if resp, err = metrics.Sync(r.Context(), communityID); err != nil {
-		log.Println(errorsx.Wrap(err, "failed to fetch metrics from deeppool"))
+		log.Println(errorsx.Wrapf(err, "failed to fetch metrics from deeppool: %s", communityID))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
