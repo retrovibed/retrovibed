@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -14,6 +15,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"os"
+	"strconv"
 	"strings"
 	"sync/atomic"
 	"time"
@@ -311,10 +313,22 @@ func AsError(r *http.Response, err error) (*http.Response, error) {
 	}
 
 	if r.StatusCode >= 400 {
-		return r, &Error{Code: r.StatusCode, cause: errorsx.New(r.Status)}
+		return r, retryAfterError(r.Header, &Error{Code: r.StatusCode, cause: errorsx.New(r.Status)})
 	}
 
 	return r, nil
+}
+
+// retryAfterError wraps cause with errorsx.RetryAfter when h carries a
+// parseable Retry-After header (integer seconds - the only form this
+// codebase ever emits), otherwise returns cause unwrapped.
+func retryAfterError(h http.Header, cause error) error {
+	seconds, err := strconv.Atoi(h.Get("Retry-After"))
+	if err != nil {
+		return cause
+	}
+
+	return errorsx.RetryAfter(cause, time.Duration(seconds)*time.Second)
 }
 
 // TryClose attempts to close the response body if it exists.
@@ -332,7 +346,7 @@ func ErrorCode(resp *http.Response) error {
 		return nil
 	}
 
-	return &Error{Code: resp.StatusCode, cause: errorsx.New(resp.Status)}
+	return retryAfterError(resp.Header, &Error{Code: resp.StatusCode, cause: errorsx.New(resp.Status)})
 }
 
 // Error ...
@@ -357,6 +371,41 @@ func IgnoreError(err error, code ...int) bool {
 	}
 
 	return CheckStatusCode(cause.Code, code...)
+}
+
+// ErrorWithCode reports whether err is (or wraps) an *Error whose Code
+// matches one of codes, returning that *Error when it does.
+func ErrorWithCode(err error, codes ...int) (*Error, bool) {
+	if err == nil {
+		return nil, false
+	}
+
+	cause, ok := errors.AsType[*Error](err)
+	if !ok || !CheckStatusCode(cause.Code, codes...) {
+		return nil, false
+	}
+
+	return cause, true
+}
+
+// WriteRetryError writes code to the response, and if err carries a
+// Backoff hint, sets Retry-After accordingly.
+func WriteRetryError(w http.ResponseWriter, err error, code int) error {
+	backoff, ok := errors.AsType[errorsx.Backoff](err)
+	if !ok {
+		return WriteEmptyJSON(w, code)
+	}
+
+	when, ok := backoff.When()
+	if !ok {
+		return WriteEmptyJSON(w, code)
+	}
+
+	if d := time.Until(when); d > 0 {
+		w.Header().Set("Retry-After", strconv.Itoa(int(d/time.Second)))
+	}
+
+	return WriteEmptyJSON(w, code)
 }
 
 // MimeType extracts mimetype from request, defaults to application/

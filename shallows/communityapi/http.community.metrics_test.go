@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -37,6 +38,19 @@ func newMetricsMockClient(communityID string, resp *communityapi.MetricsSyncResp
 			StatusCode: http.StatusNotFound,
 			Body:       io.NopCloser(strings.NewReader(`{}`)),
 			Header:     make(http.Header),
+		}
+	})
+}
+
+func newMetricsMockClientWithStatus(status int, header http.Header) *http.Client {
+	return httptestx.NewTestClient(func(req *http.Request) *http.Response {
+		if header == nil {
+			header = make(http.Header)
+		}
+		return &http.Response{
+			StatusCode: status,
+			Body:       io.NopCloser(strings.NewReader(`{}`)),
+			Header:     header,
 		}
 	})
 }
@@ -288,6 +302,85 @@ func TestMetricsSyncEndpoint(t *testing.T) {
 
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusServiceUnavailable, resp.Code)
+	})
+
+	t.Run("returns 412 when deeppool doesn't recognize the community", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		var (
+			p           meta.Profile
+			v           meta.Authz
+			q           = sqltestx.Metadatabase(t)
+			communityID = uuid.Must(uuid.NewV7()).String()
+		)
+
+		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
+		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
+		require.NoError(t, testx.Fake(&v, meta.AuthzOptionProfileID(p.ID), meta.AuthzOptionAdmin))
+		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
+
+		routes := mux.NewRouter()
+		communityapi.NewHTTPMetrics(
+			q,
+			communityapi.HTTPMetricsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			communityapi.HTTPMetricsOptionHTTPClient(newMetricsMockClientWithStatus(http.StatusPreconditionFailed, nil)),
+		).Bind(routes.PathPrefix("/c/m").Subrouter())
+
+		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
+		resp, req, err := httptestx.BuildRequestContextBytes(
+			ctx,
+			http.MethodPost,
+			"/c/m/"+communityID,
+			nil,
+			httptestx.RequestOptionAuthorization("Bearer "+httpauthtest.UnsafeToken(claims, httpauthtest.UnsafeJWTSecretSource)),
+		)
+		require.NoError(t, err)
+
+		routes.ServeHTTP(resp, req)
+		require.Equal(t, http.StatusPreconditionFailed, resp.Code)
+	})
+
+	t.Run("returns 429 and forwards Retry-After when deeppool rate limits the request", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		var (
+			p           meta.Profile
+			v           meta.Authz
+			q           = sqltestx.Metadatabase(t)
+			communityID = uuid.Must(uuid.NewV7()).String()
+			header      = http.Header{"Retry-After": []string{"30"}}
+		)
+
+		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
+		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
+		require.NoError(t, testx.Fake(&v, meta.AuthzOptionProfileID(p.ID), meta.AuthzOptionAdmin))
+		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
+
+		routes := mux.NewRouter()
+		communityapi.NewHTTPMetrics(
+			q,
+			communityapi.HTTPMetricsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			communityapi.HTTPMetricsOptionHTTPClient(newMetricsMockClientWithStatus(http.StatusTooManyRequests, header)),
+		).Bind(routes.PathPrefix("/c/m").Subrouter())
+
+		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
+		resp, req, err := httptestx.BuildRequestContextBytes(
+			ctx,
+			http.MethodPost,
+			"/c/m/"+communityID,
+			nil,
+			httptestx.RequestOptionAuthorization("Bearer "+httpauthtest.UnsafeToken(claims, httpauthtest.UnsafeJWTSecretSource)),
+		)
+		require.NoError(t, err)
+
+		routes.ServeHTTP(resp, req)
+		require.Equal(t, http.StatusTooManyRequests, resp.Code)
+
+		retryAfter, err := strconv.Atoi(resp.Header().Get("Retry-After"))
+		require.NoError(t, err)
+		require.InDelta(t, 30, retryAfter, 1, "Retry-After should be ~30s, allowing for elapsed processing time")
 	})
 
 	t.Run("stores community and content metrics from deeppool response", func(t *testing.T) {

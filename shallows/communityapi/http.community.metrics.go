@@ -150,7 +150,16 @@ func (t *HTTPMetrics) sync(w http.ResponseWriter, r *http.Request) {
 		metrics     = NewMetrics(t.httpc)
 	)
 
-	if resp, err = metrics.Sync(r.Context(), communityID); err != nil {
+	resp, err = metrics.Sync(r.Context(), communityID)
+	if _, ok := httpx.ErrorWithCode(err, http.StatusPreconditionFailed); ok {
+		log.Println(errorsx.Wrapf(err, "community not registered with deeppool: %s", communityID))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusPreconditionFailed))
+		return
+	} else if _, ok := httpx.ErrorWithCode(err, http.StatusTooManyRequests); ok {
+		log.Println(errorsx.Wrapf(err, "rate limited by deeppool: %s", communityID))
+		errorsx.Log(httpx.WriteRetryError(w, err, http.StatusTooManyRequests))
+		return
+	} else if err != nil {
 		log.Println(errorsx.Wrapf(err, "failed to fetch metrics from deeppool: %s", communityID))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return

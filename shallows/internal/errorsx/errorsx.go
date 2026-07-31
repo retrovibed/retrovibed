@@ -142,6 +142,33 @@ func (t timeout) Timedout() time.Duration {
 	return t.d
 }
 
+// Backoff error - signals the point in time the caller should retry at,
+// and whether that time is actually known.
+type Backoff interface {
+	error
+	When() (time.Time, bool)
+}
+
+// RetryAfter wraps cause with a backoff hint of duration d, anchored to the
+// moment this error was created.
+func RetryAfter(cause error, d time.Duration) error {
+	return backoff{error: cause, ts: time.Now(), d: d}
+}
+
+type backoff struct {
+	error
+	ts time.Time
+	d  time.Duration
+}
+
+func (t backoff) When() (time.Time, bool) {
+	return t.ts.Add(t.d), true
+}
+
+func (t backoff) Unwrap() error {
+	return t.error
+}
+
 // Notification presents an error that will be displayed to the user
 // to provide notifications.
 func Notification(err error) error {
