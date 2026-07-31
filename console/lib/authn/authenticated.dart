@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/httpx.dart' as httpx;
+import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'api.dart' as api;
+
+// an unloaded/unauthenticated session must never carry an empty account id -
+// it would coincidentally equal other records whose account id also isn't
+// populated yet, producing a false-positive ownership match.
+api.Session _zeroSession() => api.Session(account: api.Account(id: uuidx.min()));
 
 class Authenticated extends StatefulWidget {
   final Widget child;
@@ -18,11 +24,11 @@ class Authenticated extends StatefulWidget {
   });
 
   static api.Session syncSession(BuildContext context) {
-    return context.findAncestorStateOfType<_AuthenticatedState>()?.syncCurrent() ?? api.Session();
+    return context.findAncestorStateOfType<_AuthenticatedState>()?.syncCurrent() ?? _zeroSession();
   }
 
   static Future<api.Session> session(BuildContext context) {
-    return context.findAncestorStateOfType<_AuthenticatedState>()?.current() ?? Future.value(api.Session());
+    return context.findAncestorStateOfType<_AuthenticatedState>()?.current() ?? Future.value(_zeroSession());
   }
 
   static httpx.Option bearer(BuildContext context) {
@@ -40,7 +46,7 @@ class Authenticated extends StatefulWidget {
 class _AuthenticatedState extends State<Authenticated> {
   Widget _cause = ds.Error.zero;
   DateTime _expires = DateTime.timestamp();
-  api.Session _current = api.Session();
+  api.Session _current = _zeroSession();
   bool _loading = true;
 
   api.Session syncCurrent() {
