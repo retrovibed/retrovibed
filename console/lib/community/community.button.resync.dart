@@ -22,10 +22,10 @@ class ResyncButton extends StatelessWidget {
       tooltip: 'Resync Community',
       help: ds.Hint(const Text("refetch metadata and latest published content from the source")),
       onPressed: () {
-        final auth = [authn.DeeppoolAuthzCache.bearer(context)];
-        return httpx
-            .withRetry(() => apiresync(community.id, options: auth))
-            .then((resp) => onResynced?.call(resp.community));
+        final auth = [authn.request(authn.AuthzCache.meta(context))];
+        return httpx.withRetry(() => apiresync(community.id, options: auth)).then((resp) {
+          onResynced?.call(resp.community);
+        });
       },
     );
   }

@@ -89,14 +89,14 @@ class _ContentDisplayReadOnlyState extends State<ContentDisplayReadOnly> {
     () => widget.apipublished(
       widget.community.id,
       req: req,
-      options: [authn.DeeppoolAuthzCache.bearer(context)],
+      options: [authn.request(authn.AuthzCache.meta(context))],
     ),
   );
 
   Future<void> _resync() => _load(
     () => widget.apiresync(
       widget.community.id,
-      options: [authn.DeeppoolAuthzCache.bearer(context)],
+      options: [authn.request(authn.AuthzCache.meta(context))],
     ),
   );
 
@@ -119,10 +119,9 @@ class _ContentDisplayReadOnlyState extends State<ContentDisplayReadOnly> {
         decoration: InputDecoration(hintText: "search content"),
         onSubmitted: (q) {
           setState(
-            () =>
-                _resp.next
-                  ..query = q
-                  ..offset = ds.Int64(0),
+            () => _resp.next
+              ..query = q
+              ..offset = ds.Int64(0),
           );
           return _refresh(_resp.next);
         },
