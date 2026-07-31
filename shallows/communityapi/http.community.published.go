@@ -22,7 +22,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/grpcx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/lucenex"
@@ -188,18 +187,18 @@ func (t *HTTPPublished) publish(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pc := community.NewPublishedContent(community.PublishedContent{
-		Title:         stringsx.FirstNonBlank(req.PublishedContent.Title, lmd.Description),
-		Description:   req.PublishedContent.Description,
-		CommunityID:   cid,
-		KnownMediaID:  stringsx.FirstNonBlank(req.PublishedContent.KnownMediaId, lmd.KnownMediaID),
-		LibraryID:     lmd.ID,
-		PublishMode:   int32(req.PublishMode),
-		OAuthGoogleID: req.PublishedContent.OauthGoogleId,
-		Bytes:         lmd.Bytes,
-		Mimetype:      lmd.Mimetype,
-		PublishedAt:   errorsx.Zero(grpcx.DecodeTime(langx.FirstNonZero(req.PublishedContent.PublishedAt, grpcx.EncodeTime(timex.Inf())))),
-	})
+	req.PublishedContent.CommunityId = cid
+	req.PublishedContent.Title = stringsx.FirstNonBlank(req.PublishedContent.Title, lmd.Description)
+	req.PublishedContent.KnownMediaId = stringsx.FirstNonBlank(req.PublishedContent.KnownMediaId, lmd.KnownMediaID)
+
+	pc := community.NewPublishedContent(
+		community.PublishedContent{
+			PublishMode:  int32(req.PublishMode),
+			KnownMediaID: req.PublishedContent.KnownMediaId,
+		},
+		PublishedContentOptionFromProto(req.PublishedContent),
+		PublishedContentOptionFromLibraryMetadata(lmd),
+	)
 
 	if err = community.PublishedContentInsertWithDefaults(r.Context(), t.q, pc).Scan(&pc); duckdbx.ErrUniqueConstraintViolation(err) != nil {
 		log.Println(errorsx.Wrap(err, "unable to insert published content data constraint violation"))

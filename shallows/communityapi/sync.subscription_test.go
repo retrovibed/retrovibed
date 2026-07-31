@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid/v5"
+	"github.com/retrovibed/retrovibed/retroapi/bytesx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
@@ -37,6 +38,40 @@ func TestSyncPublishedContentItem(t *testing.T) {
 		stored, err := sqlx.ScanOne(community.PublishedContentSearch(ctx, q, community.PublishedContentSearchBuilder().Where(community.PublishedContentQueryCommunityID(pc.CommunityId))))
 		require.NoError(t, err)
 		require.Equal(t, pc.Description, stored.Description)
+	})
+
+	t.Run("round-trips proto through the database unchanged", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		q := sqltestx.Metadatabase(t)
+
+		pc := &PublishedContent{
+			Id:            uuid.Must(uuid.NewV7()).String(),
+			CommunityId:   uuid.Must(uuid.NewV7()).String(),
+			MagnetUri:     "magnet:?xt=urn:btih:2beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a35",
+			Title:         "Test Title",
+			Description:   "a detailed description of the content",
+			OauthGoogleId: uuid.Must(uuid.NewV7()).String(),
+			Bytes:         uint64(3 * bytesx.MiB),
+			Mimetype:      "video/mp4",
+		}
+
+		require.NoError(t, SyncPublishedContentItem(ctx, q, pc, false))
+
+		stored, err := sqlx.ScanOne(community.PublishedContentSearch(ctx, q, community.PublishedContentSearchBuilder().Where(community.PublishedContentQueryCommunityID(pc.CommunityId))))
+		require.NoError(t, err)
+
+		roundtripped := &PublishedContent{}
+		PublishedContentOptionFromDB(stored)(roundtripped)
+
+		require.Equal(t, pc.CommunityId, roundtripped.CommunityId)
+		require.Equal(t, pc.MagnetUri, roundtripped.MagnetUri)
+		require.Equal(t, pc.Title, roundtripped.Title)
+		require.Equal(t, pc.Description, roundtripped.Description)
+		require.Equal(t, pc.OauthGoogleId, roundtripped.OauthGoogleId)
+		require.Equal(t, pc.Bytes, roundtripped.Bytes)
+		require.Equal(t, pc.Mimetype, roundtripped.Mimetype)
 	})
 }
 
