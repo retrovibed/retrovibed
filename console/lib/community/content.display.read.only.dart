@@ -9,12 +9,14 @@ import 'content.detail.dart';
 class ContentDisplayReadOnly extends StatefulWidget {
   final api.Community community;
   final api.FnPublishingSearch apipublished;
+  final api.FnPublishingSearch apiresync;
   final Widget help;
 
   const ContentDisplayReadOnly({
     super.key,
     required this.community,
     this.apipublished = api.API.published,
+    this.apiresync = api.API.resync,
     this.help = ds.HelpScope.None,
   });
 
@@ -47,23 +49,17 @@ class _ContentDisplayReadOnlyState extends State<ContentDisplayReadOnly> {
   @override
   void initState() {
     super.initState();
-    ds.postframe(() => _refresh(_resp.next));
+    ds.postframe(() => api.isStale(widget.community) ? _resync() : _refresh(_resp.next));
   }
 
-  Future<void> _refresh(api.PublishedContentSearchRequest req) {
+  Future<void> _load(Future<api.PublishedContentSearchResponse> Function() fn) {
     setState(() {
       _loading = true;
       _cause = ds.Error.zero;
     });
 
     return httpx
-        .withRetry(
-          () => widget.apipublished(
-            widget.community.id,
-            req: req,
-            options: [authn.DeeppoolAuthzCache.bearer(context)],
-          ),
-        )
+        .withRetry(fn)
         .then((response) {
           setState(() {
             _resp = response;
@@ -88,6 +84,21 @@ class _ContentDisplayReadOnlyState extends State<ContentDisplayReadOnly> {
           });
         });
   }
+
+  Future<void> _refresh(api.PublishedContentSearchRequest req) => _load(
+    () => widget.apipublished(
+      widget.community.id,
+      req: req,
+      options: [authn.DeeppoolAuthzCache.bearer(context)],
+    ),
+  );
+
+  Future<void> _resync() => _load(
+    () => widget.apiresync(
+      widget.community.id,
+      options: [authn.DeeppoolAuthzCache.bearer(context)],
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {

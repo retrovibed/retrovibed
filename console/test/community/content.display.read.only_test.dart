@@ -11,10 +11,11 @@ import 'package:retrovibed/testing/widget_tester_extensions.dart';
 
 final _resolutions = Resolutions.variant();
 
-Community _testCommunity() => Community(
+Community _testCommunity({String? lastSyncAt}) => Community(
   id: 'community-1',
   domain: 'testdomain',
   description: 'A test community',
+  lastSyncAt: lastSyncAt ?? DateTime.now().toUtc().toIso8601String(),
 );
 
 Future<PublishedContentSearchResponse> _empty(
@@ -319,6 +320,90 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('No content published yet'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
+    });
+
+    group('staleness / auto-resync', () {
+      testWidgets('stale community triggers apiresync on mount, not apipublished', (tester) async {
+        bool apipublishedCalled = false;
+        Future<PublishedContentSearchResponse> failPublished(
+          String id, {
+          List<httpx.Option> options = const [],
+          PublishedContentSearchRequest? req,
+        }) async {
+          apipublishedCalled = true;
+          throw StateError('apipublished should not be called for a stale community');
+        }
+
+        await tester.pumpApp(
+          physicalSize: const Size(1280, 720),
+          ContentDisplayReadOnly(
+            community: _testCommunity(
+              lastSyncAt: DateTime.now().toUtc().subtract(const Duration(hours: 2)).toIso8601String(),
+            ),
+            apipublished: failPublished,
+            apiresync: _withContent,
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(apipublishedCalled, isFalse);
+        expect(find.text('Movie One'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('fresh community calls apipublished, not apiresync', (tester) async {
+        bool apiresyncCalled = false;
+        Future<PublishedContentSearchResponse> failResync(
+          String id, {
+          List<httpx.Option> options = const [],
+          PublishedContentSearchRequest? req,
+        }) async {
+          apiresyncCalled = true;
+          throw StateError('apiresync should not be called for a fresh community');
+        }
+
+        await tester.pumpApp(
+          physicalSize: const Size(1280, 720),
+          ContentDisplayReadOnly(
+            community: _testCommunity(
+              lastSyncAt: DateTime.now().toUtc().subtract(const Duration(minutes: 10)).toIso8601String(),
+            ),
+            apipublished: _withContent,
+            apiresync: failResync,
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(apiresyncCalled, isFalse);
+        expect(find.text('Movie One'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('never-synced community (empty last_sync_at) triggers apiresync', (tester) async {
+        bool apiresyncCalled = false;
+        Future<PublishedContentSearchResponse> captureResync(
+          String id, {
+          List<httpx.Option> options = const [],
+          PublishedContentSearchRequest? req,
+        }) {
+          apiresyncCalled = true;
+          return _withContent(id, options: options, req: req);
+        }
+
+        await tester.pumpApp(
+          physicalSize: const Size(1280, 720),
+          ContentDisplayReadOnly(
+            community: _testCommunity(lastSyncAt: ''),
+            apipublished: _noop,
+            apiresync: captureResync,
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(apiresyncCalled, isTrue);
+        expect(find.text('Movie One'), findsOneWidget);
         expect(tester.takeException(), isNull);
       });
     });

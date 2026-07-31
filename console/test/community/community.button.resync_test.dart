@@ -13,7 +13,7 @@ void main() {
   group('ResyncButton', () {
     testWidgets('renders refresh icon', (tester) async {
       await tester.pumpApp(
-        ResyncButton(community: _community, apiresync: (id, {options = const []}) async => throw UnimplementedError()),
+        ResyncButton(community: _community, apiresync: (id, {options = const [], req}) async => throw UnimplementedError()),
       );
       await tester.pumpAndSettle();
 
@@ -27,7 +27,7 @@ void main() {
       await tester.pumpApp(
         ResyncButton(
           community: _community,
-          apiresync: (id, {options = const []}) async {
+          apiresync: (id, {options = const [], req}) async {
             calledWith = id;
             return PublishedContentSearchResponse(community: _community);
           },
@@ -46,7 +46,7 @@ void main() {
       final completer = Completer<PublishedContentSearchResponse>();
 
       await tester.pumpApp(
-        ResyncButton(community: _community, apiresync: (id, {options = const []}) => completer.future),
+        ResyncButton(community: _community, apiresync: (id, {options = const [], req}) => completer.future),
       );
       await tester.pumpAndSettle();
 
@@ -71,7 +71,7 @@ void main() {
         ResyncButton(
           community: _community,
           onResynced: (c) => resynced = c,
-          apiresync: (id, {options = const []}) async => PublishedContentSearchResponse(community: refreshed),
+          apiresync: (id, {options = const [], req}) async => PublishedContentSearchResponse(community: refreshed),
         ),
       );
       await tester.pumpAndSettle();
@@ -91,7 +91,7 @@ void main() {
           body: ResyncButton(
             community: _community,
             onResynced: (_) => onResyncedCalled = true,
-            apiresync: (id, {options = const []}) => Future<PublishedContentSearchResponse>.error(Exception('boom')),
+            apiresync: (id, {options = const [], req}) => Future<PublishedContentSearchResponse>.error(Exception('boom')),
           ),
         ),
       );

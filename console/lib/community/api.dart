@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:fixnum/fixnum.dart' as fixnum;
 import 'package:retrovibed/httpx.dart' as httpx;
+import 'package:retrovibed/timex.dart' as timex;
 import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'community.pb.dart';
 import 'community.metrics.pb.dart';
@@ -9,6 +10,10 @@ import 'community.publish.pb.dart';
 export 'community.pb.dart';
 export 'community.metrics.pb.dart';
 export 'community.publish.pb.dart';
+
+bool isStale(Community c, {Duration threshold = const Duration(hours: 1)}) {
+  return timex.now().difference(timex.iso8601(c.lastSyncAt)) > threshold;
+}
 
 typedef FnSubscribe = Future<CommunitySubscribeResponse> Function(String communityId, {List<httpx.Option> options});
 
@@ -248,6 +253,7 @@ class API {
   static Future<PublishedContentSearchResponse> resync(
     String id, {
     List<httpx.Option> options = const [],
+    PublishedContentSearchRequest? req,
   }) async {
     return httpx
         .post(

@@ -7,7 +7,7 @@ import 'package:retrovibed/authn.dart' as authn;
 class ResyncButton extends StatelessWidget {
   final Community community;
   final void Function(Community)? onResynced;
-  final Future<PublishedContentSearchResponse> Function(String id, {List<httpx.Option> options}) apiresync;
+  final FnPublishingSearch apiresync;
 
   const ResyncButton({
     super.key,

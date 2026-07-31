@@ -26,6 +26,8 @@ message Community {
   uint64 default_ttl = 16 [ json_name = "default_ttl" ];
   string default_language = 17 [ json_name = "default_language" ];
   reserved 18 to 999;
+  // private fields for retrovibed use only, not populated by clients.
+  string last_sync_at = 1000 [ json_name = "last_sync_at" ];
 }
 
 message CommunitySearchRequest {

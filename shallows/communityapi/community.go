@@ -69,6 +69,7 @@ func CommunityOptionFromDB(c community.Community) func(*Community) {
 		p.Adult = c.Adult
 		p.DefaultTtl = uint64(c.DefaultTTL)
 		p.DefaultLanguage = c.DefaultLanguage
+		p.LastSyncAt = grpcx.EncodeTime(c.LastSyncAt)
 	}
 }
 

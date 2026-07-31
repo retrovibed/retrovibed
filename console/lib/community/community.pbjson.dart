@@ -63,6 +63,7 @@ const Community$json = {
       '5': 9,
       '10': 'default_language'
     },
+    {'1': 'last_sync_at', '3': 1000, '4': 1, '5': 9, '10': 'last_sync_at'},
   ],
   '9': [
     {'1': 18, '2': 1000},
@@ -80,7 +81,8 @@ final $typed_data.Uint8List communityDescriptor = $convert.base64Decode(
     'dmliZWQuY29tbXVuaXR5LlB1Ymxpc2hNb2RlUhRkZWZhdWx0X3B1Ymxpc2hfbW9kZRIWCgZoaW'
     'RkZW4YDSABKAhSBmhpZGRlbhIQCgN1cmwYDiABKAlSA3VybBIUCgVhZHVsdBgPIAEoCFIFYWR1'
     'bHQSIAoLZGVmYXVsdF90dGwYECABKARSC2RlZmF1bHRfdHRsEioKEGRlZmF1bHRfbGFuZ3VhZ2'
-    'UYESABKAlSEGRlZmF1bHRfbGFuZ3VhZ2VKBQgSEOgH');
+    'UYESABKAlSEGRlZmF1bHRfbGFuZ3VhZ2USIwoMbGFzdF9zeW5jX2F0GOgHIAEoCVIMbGFzdF9z'
+    'eW5jX2F0SgUIEhDoBw==');
 
 @$core.Deprecated('Use communitySearchRequestDescriptor instead')
 const CommunitySearchRequest$json = {

@@ -88,8 +88,10 @@ type Community struct {
 	Adult              bool                   `protobuf:"varint,15,opt,name=adult,proto3" json:"adult,omitempty"`
 	DefaultTtl         uint64                 `protobuf:"varint,16,opt,name=default_ttl,proto3" json:"default_ttl,omitempty"`
 	DefaultLanguage    string                 `protobuf:"bytes,17,opt,name=default_language,proto3" json:"default_language,omitempty"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
+	// private fields for retrovibed use only, not populated by clients.
+	LastSyncAt    string `protobuf:"bytes,1000,opt,name=last_sync_at,proto3" json:"last_sync_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Community) Reset() {
@@ -230,6 +232,13 @@ func (x *Community) GetDefaultTtl() uint64 {
 func (x *Community) GetDefaultLanguage() string {
 	if x != nil {
 		return x.DefaultLanguage
+	}
+	return ""
+}
+
+func (x *Community) GetLastSyncAt() string {
+	if x != nil {
+		return x.LastSyncAt
 	}
 	return ""
 }
@@ -898,7 +907,7 @@ var File_community_proto protoreflect.FileDescriptor
 
 const file_community_proto_rawDesc = "" +
 	"\n" +
-	"\x0fcommunity.proto\x12\x14retrovibed.community\"\x93\x04\n" +
+	"\x0fcommunity.proto\x12\x14retrovibed.community\"\xb8\x04\n" +
 	"\tCommunity\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1e\n" +
 	"\n" +
@@ -922,7 +931,8 @@ const file_community_proto_rawDesc = "" +
 	"\x03url\x18\x0e \x01(\tR\x03url\x12\x14\n" +
 	"\x05adult\x18\x0f \x01(\bR\x05adult\x12 \n" +
 	"\vdefault_ttl\x18\x10 \x01(\x04R\vdefault_ttl\x12*\n" +
-	"\x10default_language\x18\x11 \x01(\tR\x10default_languageJ\x05\b\x12\x10\xe8\a\"c\n" +
+	"\x10default_language\x18\x11 \x01(\tR\x10default_language\x12#\n" +
+	"\flast_sync_at\x18\xe8\a \x01(\tR\flast_sync_atJ\x05\b\x12\x10\xe8\a\"c\n" +
 	"\x16CommunitySearchRequest\x12\x14\n" +
 	"\x05query\x18\x01 \x01(\tR\x05query\x12\x16\n" +
 	"\x06offset\x18\x02 \x01(\x04R\x06offset\x12\x14\n" +

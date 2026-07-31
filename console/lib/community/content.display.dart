@@ -10,6 +10,7 @@ import 'content.detail.dart';
 class CommunityContentDisplay extends StatefulWidget {
   final api.Community community;
   final api.FnPublishingSearch apipublished;
+  final api.FnPublishingSearch apiresync;
   final api.FnPublishingTombstone apitombstone;
   final Widget help;
 
@@ -17,6 +18,7 @@ class CommunityContentDisplay extends StatefulWidget {
     super.key,
     required this.community,
     this.apipublished = api.publishing.search,
+    this.apiresync = api.API.resync,
     this.apitombstone = api.publishing.tombstone,
     this.help = ds.HelpScope.None,
   });
@@ -50,23 +52,17 @@ class _CommunityContentDisplayState extends State<CommunityContentDisplay> {
   @override
   void initState() {
     super.initState();
-    ds.postframe(() => _refresh(_resp.next));
+    ds.postframe(() => api.isStale(widget.community) ? _resync() : _refresh(_resp.next));
   }
 
-  Future<void> _refresh(api.PublishedContentSearchRequest req) {
+  Future<void> _load(Future<api.PublishedContentSearchResponse> Function() fn) {
     setState(() {
       _loading = true;
       _cause = ds.Error.zero;
     });
 
     return httpx
-        .withRetry(
-          () => widget.apipublished(
-            widget.community.id,
-            req: req,
-            options: [authn.request(authn.AuthzCache.meta(context))],
-          ),
-        )
+        .withRetry(fn)
         .then((response) {
           setState(() {
             _resp = response;
@@ -88,6 +84,21 @@ class _CommunityContentDisplayState extends State<CommunityContentDisplay> {
           });
         });
   }
+
+  Future<void> _refresh(api.PublishedContentSearchRequest req) => _load(
+    () => widget.apipublished(
+      widget.community.id,
+      req: req,
+      options: [authn.request(authn.AuthzCache.meta(context))],
+    ),
+  );
+
+  Future<void> _resync() => _load(
+    () => widget.apiresync(
+      widget.community.id,
+      options: [authn.request(authn.AuthzCache.meta(context))],
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
