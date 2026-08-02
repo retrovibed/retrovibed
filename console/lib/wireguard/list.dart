@@ -96,60 +96,61 @@ class _ListDisplay extends State<ListDisplay> {
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
-    final upload = (
-      ds.FilesEvent v, {
-      ValueNotifier<int>? progress,
-    }) {
-      setState(() {
-        _loading = true;
-      });
+    final upload =
+        (
+          ds.FilesEvent v, {
+          ValueNotifier<int>? progress,
+        }) {
+          setState(() {
+            _loading = true;
+          });
 
-      final multiparts = v.files.map((c) {
-        return api.wireguard.uploadable(c.path, c.name, c.mimeType!);
-      });
+          final multiparts = v.files.map((c) {
+            return api.wireguard.uploadable(c.path, c.name, c.mimeType!);
+          });
 
-      return Future.microtask(() {
-        return Future.wait(
-              multiparts.map((fv) {
-                return fv.then((v) {
-                  return widget
-                      .upload((req) {
-                        req..files.add(v);
-                        return req;
-                      })
-                      .then(
-                        (v) => api.wireguard
-                            .touch(
-                              v.wireguard.id,
-                              options: [authn.request(authn.AuthzCache.meta(context))],
-                            )
-                            .then((_) => v),
-                      )
-                      .then((uploaded) {
-                        setState(() {
-                          _res.items.add(uploaded.wireguard);
-                          _current = uploaded.wireguard;
-                        });
-                      })
-                      .catchError((cause) {
-                        setState(() {
-                          _cause = ds.Error.unknown(cause, onTap: reseterr);
-                        });
-                      });
-                });
-              }),
-            )
-            .then((v) => ds.NullWidget)
-            .catchError((cause) {
-              return ds.Error.unknown(cause, onTap: reseterr);
-            })
-            .whenComplete(
-              () => setState(() {
-                _loading = false;
-              }),
-            );
-      });
-    };
+          return Future.microtask(() {
+            return Future.wait(
+                  multiparts.map((fv) {
+                    return fv.then((v) {
+                      return widget
+                          .upload((req) {
+                            req..files.add(v);
+                            return req;
+                          })
+                          .then(
+                            (v) => api.wireguard
+                                .touch(
+                                  v.wireguard.id,
+                                  options: [authn.request(authn.AuthzCache.meta(context))],
+                                )
+                                .then((_) => v),
+                          )
+                          .then((uploaded) {
+                            setState(() {
+                              _res.items.add(uploaded.wireguard);
+                              _current = uploaded.wireguard;
+                            });
+                          })
+                          .catchError((cause) {
+                            setState(() {
+                              _cause = ds.Error.unknown(cause, onTap: reseterr);
+                            });
+                          });
+                    });
+                  }),
+                )
+                .then((v) => ds.NullWidget)
+                .catchError((cause) {
+                  return ds.Error.unknown(cause, onTap: reseterr);
+                })
+                .whenComplete(
+                  () => setState(() {
+                    _loading = false;
+                  }),
+                );
+          });
+        };
 
     return ds.Table(
       loading: _loading,
