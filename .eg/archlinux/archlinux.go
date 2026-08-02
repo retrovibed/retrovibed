@@ -40,35 +40,50 @@ func Prepare(ctx context.Context, o eg.Op) error {
 	return eg.Build(AURRunner().BuildFromFile(".eg/archlinux/.aurskel/Containerfile"))(ctx, o)
 }
 
+// Generate renders the PKGBUILD template (substituting $PKGVER) into path.
+// It has no dependency on the AUR git repository, so the rendered file is
+// available (e.g. for the GitHub release upload) even when the AUR git
+// remote is unreachable.
+func Generate(path string) eg.OpFn {
+	templatedir := egenv.WorkingDirectory(".eg", "archlinux")
+
+	runtime := shell.Runtime().Environ("PKGVER", pkgver())
+
+	return shell.Op(
+		runtime.Newf("envsubst '$PKGVER' < %s/PKGBUILD > %s", templatedir, path),
+	)
+}
+
 // Publish generates the AUR .SRCINFO from the PKGBUILD via makepkg, derives a
 // deterministic SSH keypair from the EG_SSH_KEY_SEED environment variable
 // (via `eg ssh key`), and pushes PKGBUILD/.SRCINFO to the AUR git repository
 // for the retrovibed package, committing and pushing only when something changed.
-func Publish(ctx context.Context, o eg.Op) error {
-	if egenv.String("", "EG_SSH_KEY_SEED") == "" {
-		return fmt.Errorf("EG_SSH_KEY_SEED environment variable is required to publish to the AUR")
+// It consumes the PKGBUILD rendered by Generate from path.
+func Publish(path string) eg.OpFn {
+	return func(ctx context.Context, o eg.Op) error {
+		if egenv.String("", "EG_SSH_KEY_SEED") == "" {
+			return fmt.Errorf("EG_SSH_KEY_SEED environment variable is required to publish to the AUR")
+		}
+
+		aurdir := egenv.EphemeralDirectory("aur-retrovibed")
+		commitmsg := fmt.Sprintf("update retrovibed to %s", eggit.EnvCommit().Hash)
+
+		runtime := shell.Runtime().
+			Environ("GIT_AUTHOR_NAME", maintainer.Name).
+			Environ("GIT_AUTHOR_EMAIL", maintainer.Email).
+			Environ("GIT_COMMITTER_NAME", maintainer.Name).
+			Environ("GIT_COMMITTER_EMAIL", maintainer.Email)
+
+		return eg.Sequential(
+			shell.Op(
+				// generate into a default ssh key name so ssh/git pick it up automatically.
+				runtime.New(`eg ssh key --seed "$EG_SSH_KEY_SEED" --path "$HOME/.ssh/id_ed25519"`),
+				runtime.Newf("if [ -d %s/.git ]; then git -C %s pull --ff-only origin master; else git clone %s %s; fi", aurdir, aurdir, AURRepoSSHURI, aurdir),
+				runtime.Newf("cp %s %s/PKGBUILD", path, aurdir),
+				runtime.New("makepkg --printsrcinfo > .SRCINFO").Directory(aurdir),
+				runtime.New("git add PKGBUILD .SRCINFO").Directory(aurdir),
+				runtime.Newf("git diff --cached --quiet || (git commit -m %q && git push origin master)", commitmsg).Directory(aurdir),
+			),
+		)(ctx, o)
 	}
-
-	templatedir := egenv.WorkingDirectory(".eg", "archlinux")
-	aurdir := egenv.EphemeralDirectory("aur-retrovibed")
-	commitmsg := fmt.Sprintf("update retrovibed to %s", eggit.EnvCommit().Hash)
-
-	runtime := shell.Runtime().
-		Environ("GIT_AUTHOR_NAME", maintainer.Name).
-		Environ("GIT_AUTHOR_EMAIL", maintainer.Email).
-		Environ("GIT_COMMITTER_NAME", maintainer.Name).
-		Environ("GIT_COMMITTER_EMAIL", maintainer.Email).
-		Environ("PKGVER", pkgver())
-
-	return eg.Sequential(
-		shell.Op(
-			// generate into a default ssh key name so ssh/git pick it up automatically.
-			runtime.New(`eg ssh key --seed "$EG_SSH_KEY_SEED" --path "$HOME/.ssh/id_ed25519"`),
-			runtime.Newf("if [ -d %s/.git ]; then git -C %s pull --ff-only origin master; else git clone %s %s; fi", aurdir, aurdir, AURRepoSSHURI, aurdir),
-			runtime.Newf("envsubst '$PKGVER' < %s/PKGBUILD > %s/PKGBUILD", templatedir, aurdir),
-			runtime.New("makepkg --printsrcinfo > .SRCINFO").Directory(aurdir),
-			runtime.New("git add PKGBUILD .SRCINFO").Directory(aurdir),
-			runtime.Newf("git diff --cached --quiet || (git commit -m %q && git push origin master)", commitmsg).Directory(aurdir),
-		),
-	)(ctx, o)
 }

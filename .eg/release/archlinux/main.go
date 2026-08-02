@@ -9,6 +9,7 @@ import (
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
 	"github.com/egdaemon/eg/runtime/wasi/eggit"
+	"github.com/egdaemon/eg/runtime/x/wasi/eggithub"
 )
 
 func main() {
@@ -20,7 +21,17 @@ func main() {
 		eggit.AutoClone,
 		eg.Build(eg.DefaultModule()),
 		archlinux.Prepare,
-		eg.Module(ctx, archlinux.AURRunner(), archlinux.Publish),
+		eg.Module(
+			ctx,
+			archlinux.AURRunner(),
+			eg.Sequential(
+				archlinux.Generate(egenv.CacheDirectory("PKGBUILD")),
+				eg.Parallel(
+					archlinux.Publish(egenv.CacheDirectory("PKGBUILD")),
+					eggithub.Release(egenv.CacheDirectory("PKGBUILD")),
+				),
+			),
+		),
 	)
 
 	if err != nil {
