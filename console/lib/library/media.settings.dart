@@ -84,7 +84,7 @@ class _MediaSettingsState extends State<MediaSettings> {
       child: ds.Container(
         padding: defaults.padding,
         margin: widget.margin ?? defaults.margin,
-        background: theme.colorScheme.surfaceContainerLow,
+        decoration: BoxDecoration(color: theme.colorScheme.surfaceContainerLow),
         Column(
           mainAxisAlignment: MainAxisAlignment.start,
           mainAxisSize: MainAxisSize.max,

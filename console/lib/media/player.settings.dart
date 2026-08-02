@@ -10,7 +10,6 @@ class PlayerSettings extends StatefulWidget {
   final BoxDecoration? decoration;
   final BoxConstraints? constraints;
   final Alignment? alignment;
-  final Color? background;
 
   const PlayerSettings({
     super.key,
@@ -20,7 +19,6 @@ class PlayerSettings extends StatefulWidget {
     this.decoration,
     this.constraints,
     this.alignment,
-    this.background,
   });
 
   @override
@@ -132,10 +130,9 @@ class _PlayerSettingsState extends State<PlayerSettings> {
       ),
       padding: widget.padding,
       margin: widget.margin,
-      decoration: widget.decoration,
+      decoration: widget.decoration ?? const BoxDecoration(),
       constraints: widget.constraints,
       alignment: widget.alignment,
-      background: widget.background,
     );
   }
 }

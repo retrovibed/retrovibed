@@ -48,7 +48,6 @@ class SearchTray extends StatefulWidget {
   final TextEditingController? controller;
   final FocusNode? focus;
   final InputDecoration? decoration;
-  final EdgeInsets? padding;
   const SearchTray({
     super.key,
     required this.onSubmitted,
@@ -62,7 +61,6 @@ class SearchTray extends StatefulWidget {
     this.autoscroll = false,
     this.focus,
     this.decoration,
-    this.padding,
     this.filters = const [],
     this.tuning = Empty,
     this.help = HelpScope.None,

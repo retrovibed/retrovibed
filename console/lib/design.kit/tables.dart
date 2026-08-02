@@ -157,6 +157,7 @@ class Table<T> extends StatelessWidget {
   final Widget help;
   final bool loading;
   final Widget cause;
+  final EdgeInsets padding;
 
   const Table(
     this.render, {
@@ -169,6 +170,7 @@ class Table<T> extends StatelessWidget {
     this.loading = false,
     this.cause = const SizedBox(),
     this.help = HelpScope.None,
+    this.padding = EdgeInsets.zero,
   });
 
   @override
@@ -187,14 +189,17 @@ class Table<T> extends StatelessWidget {
           final compact = defaults.isCompact;
           final bounded = constraints.hasTightHeight;
 
-          return Column(
-            mainAxisSize: bounded ? MainAxisSize.max : MainAxisSize.min,
-            verticalDirection: compact ? VerticalDirection.up : VerticalDirection.down,
-            children: [
-              leading,
-              bounded ? Expanded(child: wrapped) : wrapped,
-              trailing,
-            ],
+          return Padding(
+            padding: padding,
+            child: Column(
+              mainAxisSize: bounded ? MainAxisSize.max : MainAxisSize.min,
+              verticalDirection: compact ? VerticalDirection.up : VerticalDirection.down,
+              children: [
+                leading,
+                bounded ? Expanded(child: wrapped) : wrapped,
+                trailing,
+              ],
+            ),
           );
         },
       ),

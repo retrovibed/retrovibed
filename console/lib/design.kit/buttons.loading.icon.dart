@@ -17,6 +17,7 @@ class LoadingIconButton extends StatefulWidget {
   final Widget help;
   final double? value;
   final double iconSize;
+  final FocusNode? focusNode;
 
   final bool? toggled;
 
@@ -30,6 +31,7 @@ class LoadingIconButton extends StatefulWidget {
     this.disabled = false,
     this.toggled,
     this.help = HelpScope.None,
+    this.focusNode,
   });
 
   factory LoadingIconButton.create({
@@ -253,6 +255,7 @@ class _LoadingIconButtonState extends State<LoadingIconButton> {
         tooltip: widget.tooltip,
         mouseCursor: _isLoading || widget.disabled ? SystemMouseCursors.basic : SystemMouseCursors.click,
         onPressed: _isLoading || widget.disabled ? null : _handlePress,
+        focusNode: widget.focusNode,
         iconSize: widget.iconSize,
         style: IconButton.styleFrom(
           padding: EdgeInsets.all(widget.iconSize * 0.25),

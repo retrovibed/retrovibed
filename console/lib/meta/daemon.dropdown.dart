@@ -23,6 +23,10 @@ class DaemonDropdown extends StatefulWidget {
 
 class _DaemonDropdownState extends State<DaemonDropdown> {
   final TextEditingController _search = TextEditingController();
+  // canRequestFocus is false so this button never leaves the FocusScope with
+  // a focused descendant, which would otherwise block ManualConfiguration's
+  // autofocus when it opens.
+  final FocusNode _addFocus = FocusNode(canRequestFocus: false, skipTraversal: true);
   Widget? _optional;
 
   void setState(VoidCallback fn) {
@@ -43,37 +47,44 @@ class _DaemonDropdownState extends State<DaemonDropdown> {
 
   @override
   void dispose() {
+    _addFocus.dispose();
     super.dispose();
     widget.library.removeListener(_refresh);
   }
 
   @override
   Widget build(BuildContext context) {
+    final defaults = ds.Defaults.of(context);
     return ds.Help(
       Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           ds.SearchDropdown.text(
             DaemonTypography.description(widget.library.value),
+            padding: defaults.padding,
             key: ValueKey(widget.library.value.id),
             controller: _search,
             textAlign: TextAlign.center,
             leading: [
-              IconButton(
+              ds.LoadingIconButton(
                 tooltip: "connect to another library",
-                onPressed: () {
+                focusNode: _addFocus,
+                onPressed: () async {
                   setState(() {
                     _optional = _optional != null
                         ? null
-                        : ManualConfiguration(
-                            connect: (daemon) {
-                              setState(() {
-                                _optional = null;
-                              });
-                              EndpointAuto.of(
-                                context,
-                              )?.setdaemon(daemon).ignore();
-                            },
+                        : ds.Container(
+                            padding: defaults.padding.copyWith(top: 0),
+                            ManualConfiguration(
+                              connect: (daemon) {
+                                setState(() {
+                                  _optional = null;
+                                });
+                                EndpointAuto.of(
+                                  context,
+                                )?.setdaemon(daemon).ignore();
+                              },
+                            ),
                           );
                   });
                 },

@@ -10,7 +10,6 @@ class RecentEdit extends StatelessWidget {
   final BoxDecoration? decoration;
   final BoxConstraints? constraints;
   final Alignment? alignment;
-  final Color? background;
   final Clip clipBehavior;
 
   const RecentEdit(
@@ -21,7 +20,6 @@ class RecentEdit extends StatelessWidget {
     this.decoration,
     this.constraints,
     this.alignment,
-    this.background,
     this.clipBehavior = Clip.none,
   });
 
@@ -35,10 +33,9 @@ class RecentEdit extends StatelessWidget {
     return ds.Container(
       padding: padding ?? defaults.padding,
       margin: margin,
-      decoration: decoration,
+      decoration: decoration ?? const BoxDecoration(),
       constraints: constraints,
       alignment: alignment,
-      background: background,
       clipBehavior: clipBehavior,
       Column(
         mainAxisSize: MainAxisSize.min,

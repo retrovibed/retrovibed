@@ -88,13 +88,11 @@ class _DisplayState extends State<Display> {
     overlay(
       ds.build((context) {
         final defaults = ds.Defaults.of(context);
-        return ds.Debug.blue(
-          ds.Masked(
-            alignment: defaults.isCompact ? Alignment.bottomCenter : Alignment.topCenter,
-            reset: () => overlay(ds.Empty),
-            borderRadius: defaults.borderRadius,
-            ds.Debug.pink(w),
-          ),
+        return ds.Masked(
+          alignment: defaults.isCompact ? Alignment.bottomCenter : Alignment.topCenter,
+          reset: () => overlay(ds.Empty),
+          borderRadius: defaults.borderRadius,
+          w,
         );
       }),
     );
@@ -104,10 +102,16 @@ class _DisplayState extends State<Display> {
     overlay(
       ds.build((context) {
         final defaults = ds.Defaults.of(context);
+        final theme = Theme.of(context);
         return ds.Container(
           alignment: defaults.isCompact ? Alignment.bottomCenter : Alignment.topCenter,
-          margin: EdgeInsets.zero,
+          margin: EdgeInsets.zero.copyWith(bottom: defaults.padding.bottom),
           padding: EdgeInsets.zero,
+          decoration: BoxDecoration(
+            border: defaults.border,
+            borderRadius: defaults.borderRadius,
+            color: theme.colorScheme.surface,
+          ),
           SingleChildScrollView(child: w),
         );
       }),

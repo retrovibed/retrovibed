@@ -37,7 +37,7 @@ class MediaDownloadAccordian extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return ds.Container(
-      background: theme.colorScheme.surface,
+      decoration: BoxDecoration(color: theme.colorScheme.surface),
       ds.Accordion(
         expanded: true,
         description: Text("source details"),

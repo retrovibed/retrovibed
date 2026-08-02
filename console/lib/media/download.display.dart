@@ -61,7 +61,7 @@ class DownloadDisplay extends StatelessWidget {
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
     return ds.Container(
-      background: background,
+      decoration: BoxDecoration(color: background),
       padding: defaults.padding,
       Column(
         mainAxisSize: MainAxisSize.min,

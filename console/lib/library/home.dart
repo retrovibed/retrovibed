@@ -70,7 +70,6 @@ class _HomeState extends State<Home> {
               }),
             ],
             controller: widget.controller,
-            padding: defaults.padding.copyWith(bottom: 0.0),
             tuning: ds.buttons.settings(
               onPressed: () => setState(() {
                 _tuning = _tuning == ds.Empty ? GridSettings() : ds.Empty;

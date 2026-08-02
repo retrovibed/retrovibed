@@ -31,19 +31,12 @@ class _DisplayState extends State<Display> {
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
-    final theme = Theme.of(context);
     return ds.Container(
       padding: widget.padding ?? defaults.padding,
       margin: widget.margin ?? defaults.margin,
       Column(
         spacing: defaults.spacing,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text("User Management", style: theme.textTheme.titleLarge),
-            ],
-          ),
           profiles.ListDisplay(controller: controller, events: events),
         ],
       ),

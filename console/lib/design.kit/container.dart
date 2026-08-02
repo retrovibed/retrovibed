@@ -5,10 +5,9 @@ class Container extends m.StatelessWidget {
   final m.Widget child;
   final m.EdgeInsets? padding;
   final m.EdgeInsets? margin;
-  final m.BoxDecoration? decoration;
+  final m.BoxDecoration decoration;
   final m.BoxConstraints? constraints;
   final m.Alignment? alignment;
-  final m.Color? background;
   final m.Clip clipBehavior;
 
   Container(
@@ -16,10 +15,9 @@ class Container extends m.StatelessWidget {
     super.key,
     this.alignment,
     this.constraints,
-    this.decoration,
+    this.decoration = const m.BoxDecoration(),
     this.padding,
     this.margin,
-    this.background,
     this.clipBehavior = m.Clip.none,
   });
 
@@ -33,12 +31,10 @@ class Container extends m.StatelessWidget {
       clipBehavior: clipBehavior,
       margin: margin ?? m.EdgeInsets.zero,
       padding: padding ?? m.EdgeInsets.zero,
-      decoration:
-          decoration ??
-          m.BoxDecoration(
-            color: background ?? theme.colorScheme.surface,
-            borderRadius: defaults.borderRadius,
-          ),
+      decoration: decoration.copyWith(
+        color: decoration.color ?? theme.colorScheme.surface,
+        borderRadius: decoration.borderRadius ?? defaults.borderRadius,
+      ),
       child: m.SelectionArea(child: child),
     );
   }

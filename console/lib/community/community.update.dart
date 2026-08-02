@@ -14,7 +14,6 @@ class CommunityUpdate extends StatefulWidget {
   final BoxDecoration? decoration;
   final BoxConstraints? constraints;
   final Alignment? alignment;
-  final Color? background;
   final Clip clipBehavior;
 
   const CommunityUpdate({
@@ -28,7 +27,6 @@ class CommunityUpdate extends StatefulWidget {
     this.decoration,
     this.constraints,
     this.alignment,
-    this.background,
     this.clipBehavior = Clip.none,
   });
 
@@ -82,10 +80,9 @@ class _CommunityUpdateState extends State<CommunityUpdate> {
     return ds.Container(
       padding: widget.padding ?? defaults.padding,
       margin: widget.margin,
-      decoration: widget.decoration,
+      decoration: widget.decoration ?? const BoxDecoration(),
       constraints: widget.constraints,
       alignment: widget.alignment,
-      background: widget.background,
       clipBehavior: widget.clipBehavior,
       Column(
         spacing: defaults.spacing,

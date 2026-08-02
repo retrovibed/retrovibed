@@ -14,7 +14,6 @@ class Home extends StatelessWidget {
     this.decoration,
     this.constraints,
     this.alignment,
-    this.background,
     this.clipBehavior = Clip.none,
   });
 
@@ -24,7 +23,6 @@ class Home extends StatelessWidget {
   final BoxDecoration? decoration;
   final BoxConstraints? constraints;
   final Alignment? alignment;
-  final Color? background;
   final Clip clipBehavior;
 
   @override
@@ -34,10 +32,11 @@ class Home extends StatelessWidget {
       final compact = defaults.isCompact;
       return ds.Container(
         alignment: alignment ?? Alignment.topCenter,
-        background: background ?? Colors.transparent,
         padding: padding,
         margin: margin,
-        decoration: decoration,
+        decoration: (decoration ?? const BoxDecoration()).copyWith(
+          color: decoration?.color ?? Colors.transparent,
+        ),
         constraints: constraints,
         clipBehavior: clipBehavior,
         Column(

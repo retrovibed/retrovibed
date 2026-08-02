@@ -101,16 +101,16 @@ class _ListDisplay extends State<ListDisplay> {
     final defaults = ds.Defaults.of(context);
 
     final togglecreate = () {
-      final reset =
-          () => setState(() {
-            _create = ds.Empty;
-          });
+      final reset = () => setState(() {
+        _create = ds.Empty;
+      });
       setState(() {
         _create = _create == ds.Empty ? CreateInlined(onClose: () => Future.microtask(reset)) : ds.Empty;
       });
     };
 
     return ds.Table(
+      padding: defaults.padding.copyWith(top: 0, bottom: 0),
       loading: _loading,
       cause: _cause,
       children: _res.items,
@@ -157,12 +157,15 @@ class _ListDisplay extends State<ListDisplay> {
           Builder(
             builder: (context) {
               final compact = defaults.isCompact;
-              return ds.TableHeader([
-                SizedBox.square(dimension: 12),
-                if (!compact) Expanded(child: Text("id")),
-                Expanded(child: Text("username")),
-                if (!compact) Expanded(child: Text("updated")),
-              ]);
+              return ds.TableHeader(
+                [
+                  SizedBox.square(dimension: 12),
+                  if (!compact) Expanded(child: Text("id")),
+                  Expanded(child: Text("username")),
+                  if (!compact) Expanded(child: Text("updated")),
+                ],
+                padding: defaults.padding / 2,
+              );
             },
           ),
         ],

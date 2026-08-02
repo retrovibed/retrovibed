@@ -31,6 +31,10 @@ class _ManualConfigurationView extends State<ManualConfiguration> with LoadingSt
     return forms.Container(
       alignment: widget.alignment,
       padding: defaults.padding,
+      decoration: BoxDecoration(
+        border: defaults.border,
+        borderRadius: defaults.borderRadius,
+      ),
       ds.ErrorScreen(
         cause: cause,
         Column(
@@ -53,14 +57,17 @@ class _ManualConfigurationView extends State<ManualConfiguration> with LoadingSt
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
+              spacing: defaults.spacing,
               children: [
                 if (widget.retry != null)
                   ds.LoadingButton(
                     Text("retry"),
+                    border: defaults.border,
                     onPressed: () async => widget.retry!(),
                   ),
                 ds.LoadingButton(
                   Text("connect"),
+                  border: defaults.border,
                   onPressed: () {
                     return api.daemons
                         .create(
