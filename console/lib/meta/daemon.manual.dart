@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/design.kit/forms.dart' as forms;
+import 'package:retrovibed/design.kit/stateful.dart';
 import 'package:retrovibed/httpx.dart' as httpx;
 import './api.dart' as api;
 
@@ -20,21 +21,9 @@ class ManualConfiguration extends StatefulWidget {
   State<ManualConfiguration> createState() => _ManualConfigurationView();
 }
 
-class _ManualConfigurationView extends State<ManualConfiguration> {
+class _ManualConfigurationView extends State<ManualConfiguration> with LoadingState {
   final String defaultLocalhost = httpx.localhost();
-  Widget _cause = ds.Error.zero;
   String _hostname = '';
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
-
-  void _reseterr() {
-    setState(() {
-      _cause = ds.Error.zero;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +32,7 @@ class _ManualConfigurationView extends State<ManualConfiguration> {
       alignment: widget.alignment,
       padding: defaults.padding,
       ds.ErrorScreen(
-        cause: _cause,
+        cause: cause,
         Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -51,7 +40,7 @@ class _ManualConfigurationView extends State<ManualConfiguration> {
               label: SelectableText("hostname"),
               input: TextFormField(
                 autofocus: true,
-                decoration: new InputDecoration(
+                decoration: InputDecoration(
                   hintText: defaultLocalhost,
                   helperText: "hostname and port for the retrovibed instance",
                 ),
@@ -84,17 +73,17 @@ class _ManualConfigurationView extends State<ManualConfiguration> {
                         .then((d) {
                           return widget.connect(d.daemon);
                         })
-                        .catchError((cause) {
+                        .catchError((error) {
                           setState(() {
-                            _cause = ds.Errors.httpauto(
-                              cause,
-                              onTap: _reseterr,
+                            cause = ds.Errors.httpauto(
+                              error,
+                              onTap: resetCause,
                             );
                           });
                         }, test: httpx.ErrorsTest.httpauto)
-                        .catchError((cause) {
+                        .catchError((error) {
                           setState(() {
-                            _cause = ds.Error.unknown(cause, onTap: _reseterr);
+                            cause = ds.Error.unknown(error, onTap: resetCause);
                           });
                         });
                   },
