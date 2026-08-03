@@ -29,6 +29,23 @@
 # worker thread) instead of spawning subprocess helpers, so this whole class of bug
 # doesn't apply. It ships a same-ABI libglycin-2.so.0 shim, so nothing downstream
 # (gdk-pixbuf/GTK) needs to change.
+#
+# THIRD PARTY BUG: media_kit (the Flutter video/audio player) segfaults inside
+# libluajit-5.1.so.2, deep in mpv's bundled ytdl_hook.lua (thread "lua/ytdl_hook",
+# SEGV_MAPERR via lua_cpcall) whenever it opens our own internal stream URL
+# (https://localhost:.../m/<id>). apt.include only pulls libmpv2, which brings in
+# a versioned libmpv.so.2 -- there's no unversioned libmpv.so in the bundle. Flutter's
+# media_kit opens the library by the bare "libmpv.so" soname, which isn't present in
+# $APPDIR_LIBRARY_PATH, so AppRun's search falls through to
+# $APPRUN_ORIGINAL_LD_LIBRARY_PATH and silently loads the HOST's system libmpv.so
+# instead -- which on distros like Arch is linked against libluajit-5.1, an
+# incompatible/crashing combination with modern kernel ASLR (LuaJIT's NaN-tagged
+# pointers assume <=47-bit addresses; mmap on newer kernels can return higher).
+# The bundled libmpv2 (from Ubuntu apt) links plain liblua5.2 instead and doesn't
+# hit this at all -- the fix is just making sure the bare soname resolves inside the
+# bundle rather than leaking out to the host. Fixed via after_bundle, which adds the
+# missing libmpv.so -> libmpv.so.2 symlink once apt has installed libmpv2 but before
+# appimage-builder's own symlink/runtime setup runs.
 
 version: 1
 
@@ -82,6 +99,10 @@ AppDir:
       - libglib2.0-data
       - libglycin-2-0
       - glycin-loaders
+
+  # media_kit libmpv.so symlink bug -- see note above.
+  after_bundle: |
+    ln -sf libmpv.so.2 "${APPDIR}/usr/lib/x86_64-linux-gnu/libmpv.so"
 
   files:
     exclude:

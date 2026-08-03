@@ -45,6 +45,7 @@ func main() {
 				),
 			),
 		),
+		release.AppImageSmokeTest(tarinfo()),
 		release.Release(tarinfo()),
 	)
 

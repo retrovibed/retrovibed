@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -31,8 +33,18 @@ TextScaler autoscaling(BuildContext context) {
   return TextScaler.linear(1.0);
 }
 
-void main() async {
+void main(List<String> args) async {
+  // --smoke: initialize exactly as a normal launch would (proving things like
+  // media_kit/libmpv wiring loaded successfully), then exit gracefully
+  // instead of presenting the UI. Used by the AppImage smoke test to verify
+  // the shipped artifact starts cleanly without needing a real display session.
+  final smoke = args.contains('--smoke');
+
   await retro.run(() {
+    if (smoke) {
+      exit(0);
+    }
+
     FlutterError.onError = FlutterError.dumpErrorToConsole;
 
     ErrorWidget.builder = (FlutterErrorDetails details) {

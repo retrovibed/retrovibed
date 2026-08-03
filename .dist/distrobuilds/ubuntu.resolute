@@ -1,0 +1,9 @@
+FROM ubuntu:resolute
+ARG DEBIAN_FRONTEND=noninteractive
+
+# deliberately does NOT install mpv/ffmpeg/libmpv2: this image exists to prove
+# the AppImage is self-contained, not to provide libraries it should be
+# bundling itself.
+RUN echo "cache buster 4283fd6a-2fba-4eb2-9814-3eba37f4d808"
+RUN apt-get update
+RUN apt-get install -y xwayland-run
