@@ -131,9 +131,7 @@ search plugins are `wasip1`/`wasm` binaries that `retroapi/searchplugin.Registry
 
 the API contract is small enough that an LLM can write a working plugin from a single reference file plus the name of the site to search:
 
-give an LLM `https://github.com/retrovibed/retrovibed/blob/main/retroapi/examples/searchplugin-noop/main.go` as context — its comments walk through
-the argv handling, the stdout contract, and why autohijack is required — along with the name of
-the website you want it to search. that's enough to prompt something like:
+give an LLM `https://github.com/retrovibed/retrovibed/blob/main/retroapi/examples/searchplugin-noop/main.go` as context — it's comments walk through the argv handling, the stdout contract, and why autohijack is required — along with the name of the website you want it to search. that's enough to prompt something like:
 
 ```
 Read https://github.com/retrovibed/retrovibed/blob/main/retroapi/examples/searchplugin-noop/main.go — that's the protocol a retrovibed search

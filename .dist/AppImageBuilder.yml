@@ -61,6 +61,10 @@ AppDir:
       - sourceline: "deb https://ppa.launchpadcontent.net/jljatone/retrovibed/ubuntu resolute main"
         key_url: "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x872D11DA822A34E7E8499E6DA953F6DC11C77486"
     include:
+      # direct
+      - libmpv2
+      - ffmpeg
+      # platform/transitive
       - libgtk-3-0t64
       - libglu1-mesa
       - librsvg2-common
