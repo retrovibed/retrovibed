@@ -9,6 +9,7 @@ import (
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
+	"github.com/egdaemon/eg/runtime/wasi/egunsafe/ffiegcontainer"
 	"github.com/egdaemon/eg/runtime/wasi/shell"
 	"github.com/egdaemon/eg/runtime/x/wasi/egdmg"
 	"github.com/egdaemon/eg/runtime/x/wasi/eggithub"
@@ -52,12 +53,15 @@ func AppImageBuild(b *tarballs.Build) eg.OpFn {
 }
 
 // SmokeTest builds every Containerfile in .dist/distrobuilds (each becomes
-// retrovibed.<filename>) in parallel, then runs test inside each one in
-// parallel. Used to verify build output (e.g. the AppImage) behaves
-// correctly in clean environments rather than ones shaped by whatever the
-// build container happens to already have installed.
-func SmokeTest(test eg.OpFn) eg.OpFn {
+// retrovibed.smoke.<filename>) in parallel, then runs the AppImage inside
+// each one sequentially (they'd otherwise fight over the same bind-mounted
+// host /root's retrovibed config db). None of these containers have
+// mpv/ffmpeg/libmpv preinstalled -- so this can't pass by accident off
+// libraries the AppImage should be bundling itself, it only proves the
+// AppImage is self-contained.
+func SmokeTest(b *tarballs.Build) eg.OpFn {
 	const dir = ".dist/distrobuilds"
+	appimage := egenv.CacheDirectory(tarballs.AppImage(b))
 
 	return func(ctx context.Context, o eg.Op) error {
 		entries, err := os.ReadDir(dir)
@@ -65,38 +69,32 @@ func SmokeTest(test eg.OpFn) eg.OpFn {
 			return err
 		}
 
-		containers := make([]eg.ContainerRunner, 0, len(entries))
+		builds := make([]eg.OpFn, 0, len(entries))
+		runs := make([]eg.OpFn, 0, len(entries))
 		for _, entry := range entries {
 			if entry.IsDir() {
 				continue
 			}
 
-			containers = append(containers, eg.Container("retrovibed."+entry.Name()).BuildFromFile(filepath.Join(dir, entry.Name())))
-		}
-
-		builds := make([]eg.OpFn, 0, len(containers))
-		runs := make([]eg.OpFn, 0, len(containers))
-		for _, container := range containers {
+			image := "retrovibed.smoke." + entry.Name()
+			container := eg.Container(image).BuildFromFile(filepath.Join(dir, entry.Name()))
 			builds = append(builds, eg.Build(container))
-			runs = append(runs, eg.Module(ctx, container, test))
+			runs = append(runs, func(ctx context.Context, _ eg.Op) error {
+				return ffiegcontainer.Run(
+					ctx,
+					image,
+					appimage,
+					[]string{"wlheadless-run", "--", "/retrovibed.AppImage", "--appimage-extract-and-run", "--smoke"},
+					[]string{"--replace", "--volume", appimage + ":/retrovibed.AppImage:ro"},
+				)
+			})
 		}
 
 		return eg.Sequential(
 			eg.Parallel(builds...),
-			eg.Parallel(runs...),
+			eg.Sequential(runs...),
 		)(ctx, o)
 	}
-}
-
-// AppImageSmokeTest runs the built AppImage inside every container defined in
-// .dist/distrobuilds, none of which have mpv/ffmpeg/libmpv preinstalled -- so
-// this can't pass by accident off libraries the AppImage should be bundling
-// itself, it only proves the AppImage is self-contained.
-func AppImageSmokeTest(b *tarballs.Build) eg.OpFn {
-	appimage := egenv.CacheDirectory(tarballs.AppImage(b))
-	return SmokeTest(
-		shell.Op(shell.Newf("wlheadless-run -- %s --appimage-extract-and-run --smoke", appimage)),
-	)
 }
 
 func Tarball(b *tarballs.Build) eg.OpFn {

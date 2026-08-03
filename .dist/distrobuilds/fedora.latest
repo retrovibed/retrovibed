@@ -1,0 +1,7 @@
+FROM fedora:latest
+
+# deliberately does NOT install mpv/ffmpeg/libmpv2: this image exists to prove
+# the AppImage is self-contained, not to provide libraries it should be
+# bundling itself.
+RUN echo "cache buster 6c1e1c1a-8b7b-4f7f-9a0a-3f2a8e5d2b41"
+RUN dnf install -y xwayland-run

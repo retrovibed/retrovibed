@@ -81,10 +81,13 @@ AppDir:
       # direct
       - libmpv2
       - ffmpeg
+      - duckdb
       # platform/transitive
       - libgtk-3-0t64
       - libglu1-mesa
       - librsvg2-common
+      - libxcb-shape0
+      - shared-mime-info
       - dash
       - bash
       - perl
