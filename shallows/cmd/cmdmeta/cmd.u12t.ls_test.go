@@ -1,9 +1,12 @@
 package cmdmeta_test
 
 import (
+	"bytes"
+	"fmt"
 	"path/filepath"
 	"testing"
 
+	"github.com/alecthomas/kong"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdmeta"
@@ -16,8 +19,6 @@ import (
 )
 
 func TestLs(t *testing.T) {
-	genparser := cmdtestx.Genparser(cmdmeta.Usermanagement{})
-
 	t.Run("lists all profiles when no filters specified", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
@@ -37,7 +38,13 @@ func TestLs(t *testing.T) {
 		).Bind(routes.PathPrefix("/meta/u12t").Subrouter())
 		srv := cmdtestx.NewTLSServer(t, q, routes)
 
+		var buf bytes.Buffer
+		genparser := cmdtestx.Genparser(cmdmeta.Usermanagement{}, kong.Writers(&buf, nil))
 		require.NoError(t, cmdtestx.Execute(t, genparser(t), "command", "ls", "--private-key-path", keypath, "--endpoint", srv.URL))
+
+		expected, err := metaapi.NewProfileFromMetaProfile(p)
+		require.NoError(t, err)
+		require.Contains(t, buf.String(), fmt.Sprintf("id='%s' created='%s' display='%s'", p.ID, expected.CreatedAt, p.Display))
 	})
 
 	t.Run("filters to pending profiles", func(t *testing.T) {
@@ -59,7 +66,13 @@ func TestLs(t *testing.T) {
 		).Bind(routes.PathPrefix("/meta/u12t").Subrouter())
 		srv := cmdtestx.NewTLSServer(t, q, routes)
 
+		var buf bytes.Buffer
+		genparser := cmdtestx.Genparser(cmdmeta.Usermanagement{}, kong.Writers(&buf, nil))
 		require.NoError(t, cmdtestx.Execute(t, genparser(t), "command", "ls", "--private-key-path", keypath, "--pending", "--endpoint", srv.URL))
+
+		expected, err := metaapi.NewProfileFromMetaProfile(p)
+		require.NoError(t, err)
+		require.Contains(t, buf.String(), fmt.Sprintf("id='%s' created='%s' display='%s'", p.ID, expected.CreatedAt, p.Display))
 	})
 
 	t.Run("filters to enabled profiles", func(t *testing.T) {
@@ -82,7 +95,13 @@ func TestLs(t *testing.T) {
 		).Bind(routes.PathPrefix("/meta/u12t").Subrouter())
 		srv := cmdtestx.NewTLSServer(t, q, routes)
 
+		var buf bytes.Buffer
+		genparser := cmdtestx.Genparser(cmdmeta.Usermanagement{}, kong.Writers(&buf, nil))
 		require.NoError(t, cmdtestx.Execute(t, genparser(t), "command", "ls", "--private-key-path", keypath, "--enabled", "--endpoint", srv.URL))
+
+		expected, err := metaapi.NewProfileFromMetaProfile(p)
+		require.NoError(t, err)
+		require.Contains(t, buf.String(), fmt.Sprintf("id='%s' created='%s' display='%s'", p.ID, expected.CreatedAt, p.Display))
 	})
 
 	t.Run("filters to disabled profiles", func(t *testing.T) {
@@ -105,7 +124,13 @@ func TestLs(t *testing.T) {
 		).Bind(routes.PathPrefix("/meta/u12t").Subrouter())
 		srv := cmdtestx.NewTLSServer(t, q, routes)
 
+		var buf bytes.Buffer
+		genparser := cmdtestx.Genparser(cmdmeta.Usermanagement{}, kong.Writers(&buf, nil))
 		require.NoError(t, cmdtestx.Execute(t, genparser(t), "command", "ls", "--private-key-path", keypath, "--disabled", "--endpoint", srv.URL))
+
+		expected, err := metaapi.NewProfileFromMetaProfile(p)
+		require.NoError(t, err)
+		require.Contains(t, buf.String(), fmt.Sprintf("id='%s' created='%s' display='%s'", p.ID, expected.CreatedAt, p.Display))
 	})
 
 	t.Run("combines status filters additively", func(t *testing.T) {
@@ -131,7 +156,16 @@ func TestLs(t *testing.T) {
 		).Bind(routes.PathPrefix("/meta/u12t").Subrouter())
 		srv := cmdtestx.NewTLSServer(t, q, routes)
 
+		var buf bytes.Buffer
+		genparser := cmdtestx.Genparser(cmdmeta.Usermanagement{}, kong.Writers(&buf, nil))
 		require.NoError(t, cmdtestx.Execute(t, genparser(t), "command", "ls", "--private-key-path", keypath, "--pending", "--enabled", "--endpoint", srv.URL))
+
+		expectedPending, err := metaapi.NewProfileFromMetaProfile(pending)
+		require.NoError(t, err)
+		expectedEnabled, err := metaapi.NewProfileFromMetaProfile(enabled)
+		require.NoError(t, err)
+		require.Contains(t, buf.String(), fmt.Sprintf("id='%s' created='%s' display='%s'", pending.ID, expectedPending.CreatedAt, pending.Display))
+		require.Contains(t, buf.String(), fmt.Sprintf("id='%s' created='%s' display='%s'", enabled.ID, expectedEnabled.CreatedAt, enabled.Display))
 	})
 
 	t.Run("text search with --query", func(t *testing.T) {
@@ -154,6 +188,12 @@ func TestLs(t *testing.T) {
 		).Bind(routes.PathPrefix("/meta/u12t").Subrouter())
 		srv := cmdtestx.NewTLSServer(t, q, routes)
 
+		var buf bytes.Buffer
+		genparser := cmdtestx.Genparser(cmdmeta.Usermanagement{}, kong.Writers(&buf, nil))
 		require.NoError(t, cmdtestx.Execute(t, genparser(t), "command", "ls", "--private-key-path", keypath, "--query", "searchable", "--endpoint", srv.URL))
+
+		expected, err := metaapi.NewProfileFromMetaProfile(p)
+		require.NoError(t, err)
+		require.Contains(t, buf.String(), fmt.Sprintf("id='%s' created='%s' display='%s'", p.ID, expected.CreatedAt, p.Display))
 	})
 }

@@ -3,9 +3,11 @@ package cmdmeta
 import (
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 
+	"github.com/alecthomas/kong"
 	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -21,7 +23,7 @@ type U12TLs struct {
 	Query    string `flag:"" name:"query"    help:"lucene text search (default field: display)" default:""`
 }
 
-func (t U12TLs) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.SSHID, daemon *cmdopts.Endpoint) (err error) {
+func (t U12TLs) Run(kctx *kong.Context, gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.SSHID, daemon *cmdopts.Endpoint) (err error) {
 	ctx, done := context.WithTimeout(gctx.Context, 10*time.Second)
 	defer done()
 
@@ -33,7 +35,7 @@ func (t U12TLs) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.SS
 	c := authn.AutoOauth2Client(gctx.Context, tls.Config(), authn.EndpointSSHAuth(daemon.Endpoint), authn.SSHTokenSourceOptionSigner(signer))
 	cc := authn.AuthzClientLibrary(tls.Config(), c, daemon.Endpoint)
 
-	return t.run(ctx, daemon.Endpoint, cc)
+	return t.run(ctx, kctx.Stdout, daemon.Endpoint, cc)
 }
 
 func (t U12TLs) statuses() []uint32 {
@@ -53,16 +55,16 @@ func (t U12TLs) statuses() []uint32 {
 	return s
 }
 
-func (t U12TLs) run(ctx context.Context, endpoint string, c *http.Client) (err error) {
+func (t U12TLs) run(ctx context.Context, w io.Writer, endpoint string, c *http.Client) (err error) {
 	for _, status := range t.statuses() {
-		if err = t.search(ctx, endpoint, c, status); err != nil {
+		if err = t.search(ctx, w, endpoint, c, status); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (t U12TLs) search(ctx context.Context, endpoint string, c *http.Client, status uint32) (err error) {
+func (t U12TLs) search(ctx context.Context, w io.Writer, endpoint string, c *http.Client, status uint32) (err error) {
 	req := metaapi.ProfileSearchRequest{
 		Query:  t.Query,
 		Status: status,
@@ -90,11 +92,11 @@ func (t U12TLs) search(ctx context.Context, endpoint string, c *http.Client, sta
 	}
 
 	for _, p := range result.Items {
-		line := fmt.Sprintf("id=%s display=%s", p.GetId(), p.GetDisplay())
+		line := fmt.Sprintf("id='%s' created='%s' display='%s'", p.GetId(), p.CreatedAt, p.GetDisplay())
 		if label := u12tStatusLabel(status); label != "" {
 			line += " status=" + label
 		}
-		if _, err = fmt.Println(line); err != nil {
+		if _, err = fmt.Fprintln(w, line); err != nil {
 			return err
 		}
 	}
