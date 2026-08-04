@@ -37,14 +37,14 @@ cloud.google.com/go/secretmanager/internal
 # github.com/Masterminds/squirrel v1.5.4
 ## explicit; go 1.14
 github.com/Masterminds/squirrel
-# github.com/RoaringBitmap/roaring/v2 v2.18.2
+# github.com/RoaringBitmap/roaring/v2 v2.24.0
 ## explicit; go 1.24.0
 github.com/RoaringBitmap/roaring/v2
 github.com/RoaringBitmap/roaring/v2/internal
 # github.com/alecthomas/atomic v0.1.0-alpha2
 ## explicit; go 1.18
 github.com/alecthomas/atomic
-# github.com/alecthomas/kong v1.15.0
+# github.com/alecthomas/kong v1.16.0
 ## explicit; go 1.20
 github.com/alecthomas/kong
 # github.com/anacrolix/generics v0.2.0
@@ -307,7 +307,7 @@ github.com/coder/websocket/internal/wsjs
 github.com/csnewman/flutter-go-bridge/cmd/flutter-go-bridge
 github.com/csnewman/flutter-go-bridge/generator
 github.com/csnewman/flutter-go-bridge/parser
-# github.com/cyruzin/golang-tmdb v1.9.3
+# github.com/cyruzin/golang-tmdb v1.9.4
 ## explicit; go 1.24
 github.com/cyruzin/golang-tmdb
 # github.com/dashotv/tvdb v0.5.2
@@ -327,26 +327,26 @@ github.com/davecgh/go-spew/spew
 # github.com/djthorpe/go-errors v1.0.3
 ## explicit; go 1.17
 github.com/djthorpe/go-errors
-# github.com/duckdb/duckdb-go-bindings v0.10503.0
+# github.com/duckdb/duckdb-go-bindings v0.10505.0
 ## explicit; go 1.24
 github.com/duckdb/duckdb-go-bindings
 github.com/duckdb/duckdb-go-bindings/include
-# github.com/duckdb/duckdb-go-bindings/lib/darwin-amd64 v0.10503.0
+# github.com/duckdb/duckdb-go-bindings/lib/darwin-amd64 v0.10505.0
 ## explicit; go 1.24
 github.com/duckdb/duckdb-go-bindings/lib/darwin-amd64
-# github.com/duckdb/duckdb-go-bindings/lib/darwin-arm64 v0.10503.0
+# github.com/duckdb/duckdb-go-bindings/lib/darwin-arm64 v0.10505.0
 ## explicit; go 1.24
 github.com/duckdb/duckdb-go-bindings/lib/darwin-arm64
-# github.com/duckdb/duckdb-go-bindings/lib/linux-amd64 v0.10503.0
+# github.com/duckdb/duckdb-go-bindings/lib/linux-amd64 v0.10505.0
 ## explicit; go 1.24
 github.com/duckdb/duckdb-go-bindings/lib/linux-amd64
-# github.com/duckdb/duckdb-go-bindings/lib/linux-arm64 v0.10503.0
+# github.com/duckdb/duckdb-go-bindings/lib/linux-arm64 v0.10505.0
 ## explicit; go 1.24
 github.com/duckdb/duckdb-go-bindings/lib/linux-arm64
-# github.com/duckdb/duckdb-go-bindings/lib/windows-amd64 v0.10503.0
+# github.com/duckdb/duckdb-go-bindings/lib/windows-amd64 v0.10505.0
 ## explicit; go 1.24
 github.com/duckdb/duckdb-go-bindings/lib/windows-amd64
-# github.com/duckdb/duckdb-go/v2 v2.10503.1
+# github.com/duckdb/duckdb-go/v2 v2.10505.0
 ## explicit; go 1.24.0
 github.com/duckdb/duckdb-go/v2
 github.com/duckdb/duckdb-go/v2/arrowmapping
@@ -500,8 +500,8 @@ github.com/goccy/go-json/internal/encoder/vm_color_indent
 github.com/goccy/go-json/internal/encoder/vm_indent
 github.com/goccy/go-json/internal/errors
 github.com/goccy/go-json/internal/runtime
-# github.com/gofrs/uuid/v5 v5.4.0
-## explicit; go 1.19
+# github.com/gofrs/uuid/v5 v5.5.1
+## explicit; go 1.25
 github.com/gofrs/uuid/v5
 # github.com/golang-jwt/jwt/v5 v5.3.1
 ## explicit; go 1.21
@@ -830,7 +830,7 @@ github.com/pressly/goose/v3/internal/sqlparser
 github.com/pressly/goose/v3/lock
 github.com/pressly/goose/v3/lock/internal/store
 github.com/pressly/goose/v3/lock/internal/table
-# github.com/retrovibed/retrovibed/retroapi v0.0.0-20260709191625-d477a63d2e4b
+# github.com/retrovibed/retrovibed/retroapi v0.0.0-20260804202116-1a4f850b87e4
 ## explicit; go 1.26.3
 # github.com/rivo/uniseg v0.4.7
 ## explicit; go 1.18
