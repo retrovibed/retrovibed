@@ -4,6 +4,7 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/grpcx"
+	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 )
 
@@ -12,9 +13,9 @@ func NewDiscoveryFromTrackingUnknownHash(mu tracking.UnknownHash) *Discovery {
 		Id:           mu.ID,
 		Infohash:     mu.Infohash,
 		Attempts:     uint32(mu.Attempts),
-		NextCheck:    grpcx.EncodeTime(mu.NextCheck),
-		CreatedAt:    grpcx.EncodeTime(mu.CreatedAt),
-		UpdatedAt:    grpcx.EncodeTime(mu.UpdatedAt),
+		NextCheck:    grpcx.EncodeTime(timex.RFC3339NanoEncode(mu.NextCheck)),
+		CreatedAt:    grpcx.EncodeTime(timex.RFC3339NanoEncode(mu.CreatedAt)),
+		UpdatedAt:    grpcx.EncodeTime(timex.RFC3339NanoEncode(mu.UpdatedAt)),
 		KnownMediaId: uuid.Nil.String(),
 	}
 }
@@ -30,9 +31,9 @@ func NewDiscoveryFromDiscovered(d ddisc.Discovered) *Discovery {
 		Id:           d.ID,
 		Infohash:     d.Infohash,
 		Attempts:     d.Attempts,
-		NextCheck:    grpcx.EncodeTime(d.NextCheckAt),
-		CreatedAt:    grpcx.EncodeTime(d.CreatedAt),
-		UpdatedAt:    grpcx.EncodeTime(d.UpdatedAt),
+		NextCheck:    grpcx.EncodeTime(timex.RFC3339NanoEncode(d.NextCheckAt)),
+		CreatedAt:    grpcx.EncodeTime(timex.RFC3339NanoEncode(d.CreatedAt)),
+		UpdatedAt:    grpcx.EncodeTime(timex.RFC3339NanoEncode(d.UpdatedAt)),
 		Title:        d.Title,
 		Description:  d.Description,
 		Health:       d.Health,

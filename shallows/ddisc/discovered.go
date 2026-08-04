@@ -226,6 +226,9 @@ func NewDiscovered(md *int160.T, options ...DiscoveredOption) (m Discovered) {
 		Partition:              uuid.Nil.String(),
 		AudioDefaultLocale:     language.Und.String(),
 		SubtitlesDefaultLocale: language.Und.String(),
+		CreatedAt:              timex.NegInf(),
+		UpdatedAt:              timex.NegInf(),
+		NextCheckAt:            timex.NegInf(),
 		TombstonedAt:           timex.Inf(),
 		PolicyRank:             math.MaxUint16,
 	}, options...)
@@ -239,6 +242,7 @@ func NewDiscovered(md *int160.T, options ...DiscoveredOption) (m Discovered) {
 // sentinel) - that precondition is the caller's responsibility.
 func NewDiscoveredFromKnown(md int160.T, known library.Known, options ...DiscoveredOption) (m Discovered) {
 	r := langx.Clone(Discovered{
+		Source:                 "retrovibed.media.archive",
 		ID:                     md5x.FormatUUID(md5x.Digest(md.Bytes(), []byte(known.UID))),
 		Infohash:               md.Bytes(),
 		KnownMediaID:           known.UID,
@@ -252,6 +256,9 @@ func NewDiscoveredFromKnown(md int160.T, known library.Known, options ...Discove
 		Partition:              uuid.Nil.String(),
 		AudioDefaultLocale:     language.Und.String(),
 		SubtitlesDefaultLocale: language.Und.String(),
+		CreatedAt:              timex.NegInf(),
+		UpdatedAt:              timex.NegInf(),
+		NextCheckAt:            timex.NegInf(),
 		TombstonedAt:           timex.Inf(),
 		PolicyRank:             math.MaxUint16,
 	}, options...)
@@ -271,6 +278,7 @@ func NewDiscoveredFromImport(imp *ddiscapi.Import, options ...DiscoveredOption) 
 	placeholder := int160.FromHashedBytes([]byte(imp.Uri))
 	r := langx.Clone(Discovered{
 		ID:                     md5x.FormatUUID(md5x.Digest(imp.Uri)),
+		Source:                 imp.Source,
 		URI:                    imp.Uri,
 		Infohash:               placeholder.Bytes(),
 		Title:                  imp.Title,
@@ -283,6 +291,9 @@ func NewDiscoveredFromImport(imp *ddiscapi.Import, options ...DiscoveredOption) 
 		Partition:              uuid.Nil.String(),
 		AudioDefaultLocale:     language.Und.String(),
 		SubtitlesDefaultLocale: language.Und.String(),
+		CreatedAt:              timex.NegInf(),
+		UpdatedAt:              timex.NegInf(),
+		NextCheckAt:            timex.NegInf(),
 		TombstonedAt:           time.Now().Add(3 * time.Hour),
 		PolicyRank:             math.MaxUint16,
 	}, options...)
