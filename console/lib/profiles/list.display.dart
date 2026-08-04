@@ -161,7 +161,12 @@ class _ListDisplay extends State<ListDisplay> {
                 [
                   SizedBox.square(dimension: 12),
                   if (!compact) Expanded(child: Text("id")),
-                  Expanded(child: Text("username")),
+                  Expanded(
+                    child: Text(
+                      "username",
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
                   if (!compact) Expanded(child: Text("updated")),
                 ],
                 padding: defaults.padding / 2,

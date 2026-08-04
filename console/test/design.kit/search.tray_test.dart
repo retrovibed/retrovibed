@@ -29,7 +29,6 @@ Widget buildSearchTray({
     leading: leading,
     trailing: trailing,
     tuning: tuning ?? ds.Empty,
-    padding: padding,
     help: help,
   );
 }

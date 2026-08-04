@@ -244,15 +244,13 @@ void main() {
         WidgetTester tester,
       ) async {
         await tester.pumpApp(
-          SizedBox(
-            width: 260,
-            child: Column(
-              children: [
-                Expanded(
-                  child: profiles.ListDisplay(search: _mockSearchWithLongNames),
-                ),
-              ],
-            ),
+          physicalSize: Size(260, 600),
+          Column(
+            children: [
+              Expanded(
+                child: profiles.ListDisplay(search: _mockSearchWithLongNames),
+              ),
+            ],
           ),
         );
         await tester.pumpAndSettle();
