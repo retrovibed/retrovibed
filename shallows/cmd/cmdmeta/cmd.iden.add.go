@@ -13,12 +13,14 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/metaapi"
 	"golang.org/x/crypto/ssh"
 )
 
 type IdenAdd struct {
 	PublicKey string `arg:"" name:"pubkey" help:"public key to add" required:"true"`
+	Username  string `field:"" name:"username" help:"username for the profile, defaults to the ssh comment if not provided"`
 }
 
 func (t IdenAdd) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.SSHID, daemon *cmdopts.Endpoint) (err error) {
@@ -50,7 +52,7 @@ func (t IdenAdd) run(ctx context.Context, endpoint string, c *http.Client) (err 
 	var result metaapi.ProfileCreateResponse
 
 	encoded, err := json.Marshal(&metaapi.ProfileCreateRequest{
-		Profile:   &metaapi.Profile{Display: comment},
+		Profile:   &metaapi.Profile{Display: langx.FirstNonZero(t.Username, comment)},
 		PublicKey: strings.TrimSpace(string(ssh.MarshalAuthorizedKey(pubkey))),
 	})
 	if err != nil {

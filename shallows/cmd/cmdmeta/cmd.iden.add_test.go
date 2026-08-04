@@ -83,6 +83,60 @@ func TestIdenAdd(t *testing.T) {
 		assert.True(t, authz.LibraryRead)
 	})
 
+	t.Run("display defaults to the ssh key comment when username not provided", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		keypath := filepath.Join(t.TempDir(), "id")
+		q := sqltestx.Metadatabase(t)
+
+		cmdtestx.Admin(t, ctx, q, keypath)
+
+		routes := mux.NewRouter()
+		metaapi.NewHTTPUsermanagement(
+			q,
+			metaapi.HTTPUsermanagementOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+		).Bind(routes.PathPrefix("/meta/u12t").Subrouter())
+		srv := cmdtestx.NewTLSServer(t, q, routes)
+
+		_, pub, err := sshx.UnsafeNewKeyGen().Generate()
+		require.NoError(t, err)
+		pub = sshx.Comment(pub, "alice@example.com")
+
+		require.NoError(t, cmdtestx.Execute(t, parser, "identity", "add", "--private-key-path", keypath, "--endpoint", srv.URL, string(pub)))
+
+		display, err := sqlx.String(ctx, q, "SELECT display FROM meta_profiles WHERE id = (SELECT profile_id FROM meta_sso_identity_ssh ORDER BY created_at DESC LIMIT 1)")
+		require.NoError(t, err)
+		require.Equal(t, "alice@example.com", display)
+	})
+
+	t.Run("display uses provided username over the ssh key comment", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		keypath := filepath.Join(t.TempDir(), "id")
+		q := sqltestx.Metadatabase(t)
+
+		cmdtestx.Admin(t, ctx, q, keypath)
+
+		routes := mux.NewRouter()
+		metaapi.NewHTTPUsermanagement(
+			q,
+			metaapi.HTTPUsermanagementOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+		).Bind(routes.PathPrefix("/meta/u12t").Subrouter())
+		srv := cmdtestx.NewTLSServer(t, q, routes)
+
+		_, pub, err := sshx.UnsafeNewKeyGen().Generate()
+		require.NoError(t, err)
+		pub = sshx.Comment(pub, "alice@example.com")
+
+		require.NoError(t, cmdtestx.Execute(t, parser, "identity", "add", "--private-key-path", keypath, "--endpoint", srv.URL, "--username", "alice", string(pub)))
+
+		display, err := sqlx.String(ctx, q, "SELECT display FROM meta_profiles WHERE id = (SELECT profile_id FROM meta_sso_identity_ssh ORDER BY created_at DESC LIMIT 1)")
+		require.NoError(t, err)
+		require.Equal(t, "alice", display)
+	})
+
 	t.Run("idempotent - same key does not create duplicates", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
