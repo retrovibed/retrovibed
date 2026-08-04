@@ -2,6 +2,7 @@ package ddiscapi_test
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"testing"
 
@@ -63,6 +64,42 @@ func TestHTTPDiscoveryDownload(t *testing.T) {
 
 		require.Equal(t, disc.ID, result.Discovery.Id)
 		require.Equal(t, 1, testx.Must(sqlx.Count(ctx, q, "SELECT COUNT(*) FROM torrents_metadata WHERE initiated_at <= NOW()"))(t))
+	})
+
+	t.Run("proto3-json encoded uint64 fields (bytes as string) decode successfully", func(t *testing.T) {
+		var result ddiscapi.DiscoveryDownloadResponse
+
+		ctx, done := testx.Context(t)
+		defer done()
+
+		q := sqltestx.Metadatabase(t)
+
+		id := int160.Random()
+		disc := ddisc.NewDiscovered(&id, ddisc.DiscoveredOptionAutoMagnet)
+		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, disc).Scan(&disc))
+
+		routes := mux.NewRouter()
+		ddiscapi.NewHTTPDiscovery(
+			q,
+			searchplugin.Unimplemented{},
+			nil,
+			tracking.NewURIImport(q, http.DefaultClient, fsx.DirVirtual(t.TempDir())),
+			ddiscapi.HTTPDiscoveryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+		).Bind(routes.PathPrefix("/").Subrouter())
+
+		claims := jwtx.NewJWTClaims(disc.ID, jwtx.ClaimsOptionAuthnExpiration())
+		token := httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)
+
+		body := fmt.Appendf(nil, `{"discovery":{"id":%q,"bytes":"12345"},"autodownload":true}`, disc.ID)
+		resp, req, err := httptestx.BuildRequestBytes(http.MethodPost, "/download", body, httptestx.RequestOptionAuthorization(token))
+		require.NoError(t, err)
+
+		routes.ServeHTTP(resp, req)
+
+		require.NoError(t, httpx.ErrorCode(resp.Result()))
+		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+
+		require.Equal(t, disc.ID, result.Discovery.Id)
 	})
 
 	t.Run("downloads an ephemeral candidate never persisted by the websocket search", func(t *testing.T) {

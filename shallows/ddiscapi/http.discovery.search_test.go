@@ -23,6 +23,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/encoding/prototext"
 )
 
 func TestHTTPDiscoverySearch(t *testing.T) {
@@ -66,7 +67,8 @@ func TestHTTPDiscoverySearch(t *testing.T) {
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 
 		require.Equal(t, result.Next.Offset, uint64(0))
-		require.Contains(t, result.Items, ddiscapi.NewDiscoveryFromTrackingUnknownHash(uh))
+		require.Len(t, result.Items, 1)
+		require.EqualValues(t, prototext.Format(result.Items[0]), prototext.Format(ddiscapi.NewDiscoveryFromTrackingUnknownHash(uh)))
 	})
 
 	t.Run("next check filter", func(t *testing.T) {
@@ -114,8 +116,8 @@ func TestHTTPDiscoverySearch(t *testing.T) {
 		require.NoError(t, httpx.ErrorCode(resp.Result()))
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 
-		require.Contains(t, result.Items, ddiscapi.NewDiscoveryFromTrackingUnknownHash(due))
 		require.Len(t, result.Items, 1)
+		require.EqualValues(t, prototext.Format(result.Items[0]), prototext.Format(ddiscapi.NewDiscoveryFromTrackingUnknownHash(due)))
 	})
 
 	t.Run("needs check disabled returns entries regardless of next_check", func(t *testing.T) {
@@ -163,8 +165,9 @@ func TestHTTPDiscoverySearch(t *testing.T) {
 
 		encodeddue := ddiscapi.NewDiscoveryFromTrackingUnknownHash(due)
 		encodedfuture := ddiscapi.NewDiscoveryFromTrackingUnknownHash(future)
-		require.Contains(t, result.Items, encodeddue)
-		require.Contains(t, result.Items, encodedfuture)
+
 		require.Len(t, result.Items, 2)
+		require.EqualValues(t, prototext.Format(result.Items[0]), prototext.Format(encodeddue))
+		require.EqualValues(t, prototext.Format(result.Items[1]), prototext.Format(encodedfuture))
 	})
 }
