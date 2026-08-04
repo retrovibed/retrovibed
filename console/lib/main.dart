@@ -37,7 +37,7 @@ void main(List<String> args) async {
   // --smoke: initialize exactly as a normal launch would (proving things like
   // media_kit/libmpv wiring loaded successfully), then exit gracefully
   // instead of presenting the UI. Used by the AppImage smoke test to verify
-  // the shipped artifact starts cleanly without needing a real display session.
+  // the shipped artifact starts cleanly.
   final smoke = args.contains('--smoke');
 
   await retro.run(() {

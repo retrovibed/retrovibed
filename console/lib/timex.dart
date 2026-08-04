@@ -2,7 +2,7 @@ import 'package:iso_duration_parser/iso_duration_parser.dart' as derp;
 
 final DateTime inf = DateTime.fromMillisecondsSinceEpoch(253402300799999, isUtc: true).toUtc();
 final DateTime epoch = DateTime.fromMillisecondsSinceEpoch(0, isUtc: true).toUtc();
-final DateTime neginf = DateTime.fromMillisecondsSinceEpoch(0, isUtc: true).toUtc(); // todo.
+final DateTime neginf = DateTime.utc(0, 1, 1, 1, 1, 1); // matches backend timex.RFC3339NegInf()
 
 class durations {
   static Duration? tryParse(
