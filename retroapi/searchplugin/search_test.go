@@ -9,7 +9,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
+	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/encoding/prototext"
 )
 
 func TestRunSearchJobInjectsSiblingEnvFile(t *testing.T) {
@@ -42,7 +45,7 @@ func TestRunSearchJobInjectsSiblingEnvFile(t *testing.T) {
 }
 
 func TestRunSearchJobToleratesMissingEnvFile(t *testing.T) {
-	wasmPath := filepath.Join(t.TempDir(), "env.wasm")
+	wasmPath := filepath.Join(t.TempDir(), "derp.wasm")
 
 	build := exec.Command("go", "build", "-o", wasmPath, "./.fixtures/envplugin")
 	build.Env = append(build.Environ(), "GOOS=wasip1", "GOARCH=wasm")
@@ -58,11 +61,16 @@ func TestRunSearchJobToleratesMissingEnvFile(t *testing.T) {
 
 	seq := r.Search(ctx, []string{"video"}, "ubuntu", false)
 
-	var results []string
+	var results []*ddiscapi.Import
 	for imp := range seq.Each(ctx) {
-		results = append(results, imp.Uri)
+		results = append(results, imp)
 	}
 	require.NoError(t, seq.Err())
 	require.Len(t, results, 1)
-	require.Equal(t, "magnet:?xt=urn:btih:1111111111111111111111111111111111111111&dn=", results[0])
+	require.EqualValues(t, prototext.Format(&ddiscapi.Import{
+		Source:   "derp",
+		Health:   42,
+		Mimetype: mimex.Video,
+		Uri:      "magnet:?xt=urn:btih:1111111111111111111111111111111111111111&dn=",
+	}), prototext.Format(results[0]))
 }

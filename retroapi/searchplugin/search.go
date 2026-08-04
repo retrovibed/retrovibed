@@ -9,6 +9,7 @@ import (
 	"iter"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 
@@ -70,6 +71,7 @@ type workload struct {
 func (r *Registry) runSearchJob(ctx context.Context, j workload) error {
 	defer j.wg.Done()
 
+	id := strings.TrimSuffix(filepath.Base(j.path), ".wasm")
 	stdoutr, stdoutw := io.Pipe()
 	// argv[0] is the conventional program-name slot every CLI parser
 	// (including kong.Parse, via os.Args[1:]) discards - "plugin" must come
@@ -117,7 +119,7 @@ func (r *Registry) runSearchJob(ctx context.Context, j workload) error {
 		stdoutw.CloseWithError(err)
 	}()
 
-	cause := scanResults(ctx, stdoutr, j)
+	cause := scanResults(ctx, id, stdoutr, j)
 
 	// unblocks the writer goroutine if the module is still running so it
 	// can observe the failed write and exit instead of leaking; a no-op if
@@ -137,7 +139,7 @@ func (r *Registry) runSearchJob(ctx context.Context, j workload) error {
 // scanResults decodes stdout as jsonl and streams each line onto j.results.
 // A malformed line is logged and skipped. Returns non-nil only if ctx is
 // done while blocked handing a result to the dispatcher.
-func scanResults(ctx context.Context, stdout io.Reader, j workload) (failed error) {
+func scanResults(ctx context.Context, id string, stdout io.Reader, j workload) (failed error) {
 	scanner := bufio.NewScanner(stdout)
 	defer func() {
 		failed = langx.FirstNonZero(failed, scanner.Err())
@@ -149,7 +151,10 @@ func scanResults(ctx context.Context, stdout io.Reader, j workload) (failed erro
 			continue
 		}
 
-		imp := &ddiscapi.Import{}
+		imp := &ddiscapi.Import{
+			Source: id,
+		}
+
 		if err := json.Unmarshal(line, imp); err != nil {
 			log.Println("search plugin emitted invalid jsonl", j.path, err)
 			continue
