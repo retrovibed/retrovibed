@@ -21,7 +21,7 @@ var debskel embed.FS
 
 const (
 	container = "retrovibed.deb.duckdb"
-	version   = "1.5.2"
+	version   = "1.5.5"
 )
 
 var (
