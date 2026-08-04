@@ -136,10 +136,11 @@ func (t *knownMediaDetectSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 				return d, errorsx.Wrap(err, "unable to detect known media")
 			}
 
-			log.Println("known media", cleaned, "->", title, spew.Sdump(known))
-
 			if !uuidx.IsMinMax(uuid.FromStringOrNil(known.UID)) {
+				log.Println("known media", cleaned, "->", title, spew.Sdump(known))
 				d.KnownMediaID = known.UID
+			} else {
+				log.Println("unknown media", cleaned, "->", title)
 			}
 
 			return d, nil
