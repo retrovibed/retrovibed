@@ -8,6 +8,11 @@ type Plan = SimplePlan<TypedFact, Box<dyn TypedOp>, Graph<TypedFact, Box<dyn Typ
 struct Model {
     path: String,
     plan: Plan,
+    seq_len: usize,
+    num_tokens: i64,
+    pad: i64,
+    bos: i64,
+    eos: i64,
 }
 
 static INSTANCE: OnceLock<Result<Model, String>> = OnceLock::new();
@@ -22,8 +27,31 @@ fn run_predict(
     eos: i64,
 ) -> Result<String, String> {
     let instance = INSTANCE.get_or_init(|| {
-        let plan = tract_onnx::onnx()
-            .model_for_path(model_path)
+        let onnx = tract_onnx::onnx();
+        let proto = onnx
+            .proto_model_for_path(model_path)
+            .map_err(|e| format!("Failed to read ONNX proto: {e}"))?;
+
+        let meta: std::collections::HashMap<&str, &str> = proto
+            .metadata_props
+            .iter()
+            .map(|kv| (kv.key.as_str(), kv.value.as_str()))
+            .collect();
+
+        // Falls back to the value Go passed in when the loaded model predates
+        // metadata export, or is missing a specific key.
+        let resolved_i64 = |key: &str, fallback: i64| -> i64 {
+            meta.get(key).and_then(|v| v.parse::<i64>().ok()).unwrap_or(fallback)
+        };
+
+        let resolved_seq_len = resolved_i64("seq_len", seq_len as i64) as usize;
+        let resolved_num_tokens = resolved_i64("num_tokens", num_tokens);
+        let resolved_pad = resolved_i64("pad", pad);
+        let resolved_bos = resolved_i64("bos", bos);
+        let resolved_eos = resolved_i64("eos", eos);
+
+        let plan = onnx
+            .model_for_proto_model(&proto)
             .map_err(|e| format!("Failed to parse ONNX: {e}"))?
             .into_optimized()
             .map_err(|e| format!("Optimization failed: {e}"))?
@@ -32,10 +60,20 @@ fn run_predict(
         Ok(Model {
             path: model_path.to_string(),
             plan,
+            seq_len: resolved_seq_len,
+            num_tokens: resolved_num_tokens,
+            pad: resolved_pad,
+            bos: resolved_bos,
+            eos: resolved_eos,
         })
     });
 
     let model = instance.as_ref().map_err(|e| e.clone())?;
+    let seq_len = model.seq_len;
+    let num_tokens = model.num_tokens;
+    let pad = model.pad;
+    let bos = model.bos;
+    let eos = model.eos;
 
     let mut flat = vec![pad; seq_len];
     for (i, c) in input.chars().enumerate() {
