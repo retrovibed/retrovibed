@@ -82,7 +82,7 @@ class DiscoveryDetails extends StatelessWidget {
             forms.Field(label: const Text("poster"), input: Text(known.image)),
             forms.Field(
               label: const Text("discovered"),
-              input: Text(current.source.isEmpty ? '—' : known.source),
+              input: Text(current.source.isEmpty ? '—' : current.source),
             ),
             forms.Field(label: const Text("id"), input: Text(current.id)),
           ],
