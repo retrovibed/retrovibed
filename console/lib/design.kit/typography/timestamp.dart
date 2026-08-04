@@ -73,9 +73,12 @@ class Timestamp extends StatelessWidget {
           );
         }
 
-        return Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [leading, Flexible(child: content), trailing],
+        return Tooltip(
+          message: timestamp.toIso8601String(),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [leading, Flexible(child: content), trailing],
+          ),
         );
       },
     );
