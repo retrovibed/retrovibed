@@ -12,6 +12,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/backoffx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
@@ -65,7 +66,9 @@ func SyncPublishedContentItem(ctx context.Context, q sqlx.Queryer, pc *Published
 	}
 
 	dbpc := community.NewPublishedContent(community.PublishedContent{
-		LibraryID:    stringsx.FirstNonBlank(pc.LibraryId, uuid.Nil.String()),
+		// the md5x uuid is a partial hack due to duckdb not supporting partial indexes.
+		// the likelyhood of a real collision  with an actual bit of library data is miniscule.
+		LibraryID:    stringsx.FirstNonBlank(pc.LibraryId, md5x.FormatUUID(md5x.Digest(pc.CommunityId, pc.MagnetUri))),
 		KnownMediaID: tmeta.KnownMediaID,
 	}, PublishedContentOptionFromProto(pc))
 

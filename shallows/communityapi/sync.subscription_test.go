@@ -73,6 +73,35 @@ func TestSyncPublishedContentItem(t *testing.T) {
 		require.Equal(t, pc.Bytes, roundtripped.Bytes)
 		require.Equal(t, pc.Mimetype, roundtripped.Mimetype)
 	})
+
+	t.Run("stores items separately when multiple lack a local library association", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		q := sqltestx.Metadatabase(t)
+
+		communityID := uuid.Must(uuid.NewV7()).String()
+
+		pc1 := &PublishedContent{
+			Id:          uuid.Must(uuid.NewV7()).String(),
+			CommunityId: communityID,
+			MagnetUri:   "magnet:?xt=urn:btih:3beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a36",
+			Title:       "Test Title 1",
+		}
+		pc2 := &PublishedContent{
+			Id:          uuid.Must(uuid.NewV7()).String(),
+			CommunityId: communityID,
+			MagnetUri:   "magnet:?xt=urn:btih:4beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a37",
+			Title:       "Test Title 2",
+		}
+
+		require.NoError(t, SyncPublishedContentItem(ctx, q, pc1, false))
+		require.NoError(t, SyncPublishedContentItem(ctx, q, pc2, false))
+
+		var stored []community.PublishedContent
+		require.NoError(t, sqlx.ScanInto(community.PublishedContentSearch(ctx, q, community.PublishedContentSearchBuilder().Where(community.PublishedContentQueryCommunityID(communityID))), &stored))
+		require.Len(t, stored, 2, "items with distinct magnet URIs should be stored separately even without a local library association")
+	})
 }
 
 func TestSyncSubscriptions(t *testing.T) {
