@@ -36,6 +36,7 @@ type Discovery struct {
 	Bytes         uint64                 `protobuf:"varint,10,opt,name=bytes,proto3" json:"bytes,omitempty"`
 	PolicyRank    uint32                 `protobuf:"varint,11,opt,name=policy_rank,proto3" json:"policy_rank,omitempty"`
 	KnownMediaId  string                 `protobuf:"bytes,12,opt,name=known_media_id,proto3" json:"known_media_id,omitempty"`
+	Source        string                 `protobuf:"bytes,13,opt,name=source,proto3" json:"source,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -150,6 +151,13 @@ func (x *Discovery) GetPolicyRank() uint32 {
 func (x *Discovery) GetKnownMediaId() string {
 	if x != nil {
 		return x.KnownMediaId
+	}
+	return ""
+}
+
+func (x *Discovery) GetSource() string {
+	if x != nil {
+		return x.Source
 	}
 	return ""
 }
@@ -542,7 +550,7 @@ var File_ddisc_discovery_proto protoreflect.FileDescriptor
 
 const file_ddisc_discovery_proto_rawDesc = "" +
 	"\n" +
-	"\x15ddisc.discovery.proto\x12\x05ddisc\x1a\x11meta.search.proto\"\xe3\x02\n" +
+	"\x15ddisc.discovery.proto\x12\x05ddisc\x1a\x11meta.search.proto\"\xfb\x02\n" +
 	"\tDiscovery\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
 	"\binfohash\x18\x02 \x01(\fR\binfohash\x12\x1a\n" +
@@ -562,7 +570,8 @@ const file_ddisc_discovery_proto_rawDesc = "" +
 	"\x05bytes\x18\n" +
 	" \x01(\x04R\x05bytes\x12 \n" +
 	"\vpolicy_rank\x18\v \x01(\rR\vpolicy_rank\x12&\n" +
-	"\x0eknown_media_id\x18\f \x01(\tR\x0eknown_media_id\"\xd8\x01\n" +
+	"\x0eknown_media_id\x18\f \x01(\tR\x0eknown_media_id\x12\x16\n" +
+	"\x06source\x18\r \x01(\tR\x06source\"\xd8\x01\n" +
 	"\x16DiscoverySearchRequest\x12/\n" +
 	"\n" +
 	"next_check\x18\x01 \x01(\v2\x0f.meta.DateRangeR\n" +

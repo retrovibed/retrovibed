@@ -33,6 +33,7 @@ class Discovery extends $pb.GeneratedMessage {
     $fixnum.Int64? bytes,
     $core.int? policyRank,
     $core.String? knownMediaId,
+    $core.String? source,
   }) {
     final result = create();
     if (id != null) result.id = id;
@@ -47,6 +48,7 @@ class Discovery extends $pb.GeneratedMessage {
     if (bytes != null) result.bytes = bytes;
     if (policyRank != null) result.policyRank = policyRank;
     if (knownMediaId != null) result.knownMediaId = knownMediaId;
+    if (source != null) result.source = source;
     return result;
   }
 
@@ -78,6 +80,7 @@ class Discovery extends $pb.GeneratedMessage {
     ..aI(11, _omitFieldNames ? '' : 'policy_rank',
         fieldType: $pb.PbFieldType.OU3)
     ..aOS(12, _omitFieldNames ? '' : 'known_media_id')
+    ..aOS(13, _omitFieldNames ? '' : 'source')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -205,6 +208,15 @@ class Discovery extends $pb.GeneratedMessage {
   $core.bool hasKnownMediaId() => $_has(11);
   @$pb.TagNumber(12)
   void clearKnownMediaId() => $_clearField(12);
+
+  @$pb.TagNumber(13)
+  $core.String get source => $_getSZ(12);
+  @$pb.TagNumber(13)
+  set source($core.String value) => $_setString(12, value);
+  @$pb.TagNumber(13)
+  $core.bool hasSource() => $_has(12);
+  @$pb.TagNumber(13)
+  void clearSource() => $_clearField(13);
 }
 
 class DiscoverySearchRequest extends $pb.GeneratedMessage {

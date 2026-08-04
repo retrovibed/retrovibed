@@ -11,6 +11,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/encoding/prototext"
 )
 
 func TestDiscoverySearch(t *testing.T) {
@@ -31,6 +32,7 @@ func TestDiscoverySearch(t *testing.T) {
 		resp, err := ddiscapi.DiscoverySearch(t.Context(), c, srv.URL, &ddiscapi.DiscoverySearchRequest{Limit: 1})
 		require.NoError(t, err)
 		require.Equal(t, len(expected.Items), len(resp.Items))
+		require.Equal(t, prototext.Format(expected.Items[0]), prototext.Format(resp.Items[0]))
 	})
 
 	t.Run("returns error on server failure", func(t *testing.T) {

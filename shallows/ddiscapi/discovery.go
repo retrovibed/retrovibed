@@ -29,6 +29,7 @@ func NewDiscoveryFromTrackingUnknownHash(mu tracking.UnknownHash) *Discovery {
 func NewDiscoveryFromDiscovered(d ddisc.Discovered) *Discovery {
 	return &Discovery{
 		Id:           d.ID,
+		Source:       d.Source,
 		Infohash:     d.Infohash,
 		Attempts:     d.Attempts,
 		NextCheck:    grpcx.EncodeTime(timex.RFC3339NanoEncode(d.NextCheckAt)),

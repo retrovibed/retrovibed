@@ -6,6 +6,7 @@ import 'package:retrovibed/design.kit/bytesx.dart';
 import 'package:retrovibed/ddisc.dart' as ddisc;
 import 'package:retrovibed/library.dart' as lib;
 import 'package:retrovibed/uuidx.dart' as uuidx;
+import 'discovery.details.dart';
 
 class DiscoveredCard extends StatefulWidget {
   final ddisc.Discovery current;
@@ -106,6 +107,7 @@ class _DiscoveredCardState extends State<DiscoveredCard> {
       cause: _cause,
       lib.KnownMediaCard(
         _known,
+        overlay: DiscoveryDetails(widget.current, _known),
         icon: _queued ? Icons.query_builder_rounded : Icons.download_rounded,
         help: widget.help,
         onTap: _queued || _loading ? null : _onTap,

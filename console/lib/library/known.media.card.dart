@@ -10,10 +10,11 @@ class KnownMediaCard extends StatelessWidget {
   final GestureTapCallback? onSecondaryTap;
   final GestureLongPressCallback? onLongPress;
   final ValueNotifier<bool>? hovered;
+  final Widget help;
+  final Widget? overlay;
   final Widget? trailing;
   final IconData? icon;
   final bool highlighted;
-  final Widget help;
   final BoxConstraints? constraints;
 
   static const hint = ds.Hint(
@@ -74,8 +75,30 @@ class KnownMediaCard extends StatelessWidget {
     this.highlighted = false,
     this.icon = Icons.play_circle_filled,
     this.help = ds.HelpScope.None,
+    this.overlay,
     this.constraints,
   });
+
+  Widget _defaultOverlay(ds.Defaults defaults, api.Known c) {
+    return Column(
+      mainAxisSize: MainAxisSize.max,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Padding(
+            child: Text(
+              c.summary,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.start,
+              maxLines: 10,
+            ),
+            padding: defaults.padding / 2,
+          ),
+        ),
+        trailing ?? const SizedBox(),
+      ],
+    );
+  }
 
   Map<String, String>? _imageheaders(String original) {
     if (original.isEmpty) return null;
@@ -109,24 +132,7 @@ class KnownMediaCard extends StatelessWidget {
                 overlay: ds.Hover.overlays.icon(
                   context,
                   icon: icon,
-                  content: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Padding(
-                          child: Text(
-                            current.summary,
-                            overflow: TextOverflow.ellipsis,
-                            textAlign: TextAlign.start,
-                            maxLines: 10,
-                          ),
-                          padding: defaults.padding / 2,
-                        ),
-                      ),
-                      trailing ?? const SizedBox(),
-                    ],
-                  ),
+                  content: overlay ?? _defaultOverlay(defaults, current),
                 ),
               ),
             ),

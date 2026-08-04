@@ -17,6 +17,7 @@ message Discovery {
   uint64 bytes = 10 [ json_name = "bytes" ];
   uint32 policy_rank = 11 [ json_name = "policy_rank" ];
   string known_media_id = 12 [ json_name = "known_media_id" ];
+  string source = 13 [ json_name = "source" ];
 }
 
 message DiscoverySearchRequest {
