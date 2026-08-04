@@ -2,6 +2,8 @@ package ddiscapi
 
 import (
 	"github.com/gofrs/uuid/v5"
+	"github.com/james-lawrence/torrent/dht/int160"
+	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/grpcx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
@@ -9,6 +11,10 @@ import (
 )
 
 func NewDiscoveryFromTrackingUnknownHash(mu tracking.UnknownHash) *Discovery {
+	mg := metainfo.Magnet{
+		InfoHash: metainfo.Hash(mu.Infohash),
+	}
+
 	return &Discovery{
 		Id:           mu.ID,
 		Infohash:     mu.Infohash,
@@ -17,6 +23,7 @@ func NewDiscoveryFromTrackingUnknownHash(mu tracking.UnknownHash) *Discovery {
 		CreatedAt:    grpcx.EncodeTime(timex.RFC3339NanoEncode(mu.CreatedAt)),
 		UpdatedAt:    grpcx.EncodeTime(timex.RFC3339NanoEncode(mu.UpdatedAt)),
 		KnownMediaId: uuid.Nil.String(),
+		Uri:          mg.String(),
 	}
 }
 
@@ -28,18 +35,43 @@ func NewDiscoveryFromTrackingUnknownHash(mu tracking.UnknownHash) *Discovery {
 // NewMediaFromDiscovered documents for this same source type.
 func NewDiscoveryFromDiscovered(d ddisc.Discovered) *Discovery {
 	return &Discovery{
-		Id:           d.ID,
-		Source:       d.Source,
-		Infohash:     d.Infohash,
-		Attempts:     d.Attempts,
-		NextCheck:    grpcx.EncodeTime(timex.RFC3339NanoEncode(d.NextCheckAt)),
-		CreatedAt:    grpcx.EncodeTime(timex.RFC3339NanoEncode(d.CreatedAt)),
-		UpdatedAt:    grpcx.EncodeTime(timex.RFC3339NanoEncode(d.UpdatedAt)),
-		Title:        d.Title,
-		Description:  d.Description,
-		Health:       d.Health,
-		Bytes:        d.Bytes,
-		PolicyRank:   uint32(d.PolicyRank),
-		KnownMediaId: uuid.FromStringOrNil(d.KnownMediaID).String(),
+		Id:               d.ID,
+		Source:           d.Source,
+		Infohash:         d.Infohash,
+		Attempts:         d.Attempts,
+		NextCheck:        grpcx.EncodeTime(timex.RFC3339NanoEncode(d.NextCheckAt)),
+		CreatedAt:        grpcx.EncodeTime(timex.RFC3339NanoEncode(d.CreatedAt)),
+		UpdatedAt:        grpcx.EncodeTime(timex.RFC3339NanoEncode(d.UpdatedAt)),
+		Title:            d.Title,
+		Description:      d.Description,
+		Health:           d.Health,
+		Bytes:            d.Bytes,
+		PolicyRank:       uint32(d.PolicyRank),
+		KnownMediaId:     uuid.FromStringOrNil(d.KnownMediaID).String(),
+		Uri:              d.URI,
+		AcquisitionState: AcquisitionState(d.AcquisitionState),
 	}
+}
+
+// NewDiscoveredFromDiscovery converts a client-submitted Discovery back into
+// a ddisc.Discovered - the inverse of NewDiscoveryFromDiscovered. Used only
+// for candidates the caller streamed from an ephemeral (never persisted)
+// strategy (Known/Plugin/PeerTube) and is now asking to download; d.Id is
+// preserved as-is so the corrected-infohash insert in
+// ddisc.DownloadDiscovered lands on the identity the client already has.
+func NewDiscoveredFromDiscovery(d *Discovery) ddisc.Discovered {
+	ih := int160.FromBytesOrZero(d.Infohash)
+	m := ddisc.NewDiscovered(
+		&ih,
+		ddisc.DiscoveredOptionTitle(d.Title),
+		ddisc.DiscoveredOptionDescription(d.Description),
+		ddisc.DiscoveredOptionHealth(d.Health),
+		ddisc.DiscoveredOptionURI(d.Uri),
+		ddisc.DiscoveredOptionKnownMedia(uuid.FromStringOrNil(d.KnownMediaId).String()),
+	)
+	m.ID = d.Id
+	m.Source = d.Source
+	m.Bytes = d.Bytes
+	m.Attempts = d.Attempts
+	return m
 }

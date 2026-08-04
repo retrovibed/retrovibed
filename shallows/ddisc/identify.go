@@ -112,6 +112,7 @@ func IdentifyOne(ctx context.Context, dhts *dht.Server, tclient *torrent.Client,
 		disc,
 		DiscoveredOptionMimetype(mime.String()),
 		DiscoveredOptionKnownMedia(uuid.Max.String()),
+		DiscoveredOptionAcquisitionState(AcquisitionStateAvailable),
 	)
 
 	return disc, nil

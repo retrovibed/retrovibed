@@ -57,7 +57,7 @@ func DiscoveredIndexed(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer, disc Discovered) NewDiscoveredScannerStaticRow,
 ) {
-	gql = gql.Query(`UPDATE ddisc_media SET updated_at = NOW(), next_check_at = 'infinity', known_media_id = {disc.KnownMediaID}, mimetype = {disc.Mimetype}, category = {disc.Category} WHERE id = {disc.ID} RETURNING ` + DiscoveredScannerStaticColumns)
+	gql = gql.Query(`UPDATE ddisc_media SET updated_at = NOW(), next_check_at = 'infinity', known_media_id = {disc.KnownMediaID}, mimetype = {disc.Mimetype}, category = {disc.Category}, acquisition_state = {disc.AcquisitionState} WHERE id = {disc.ID} RETURNING ` + DiscoveredScannerStaticColumns)
 }
 
 func DiscoveredCooldown(

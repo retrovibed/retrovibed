@@ -44,6 +44,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/media"
 	"github.com/retrovibed/retrovibed/shallows/meta/identityssh"
 	"github.com/retrovibed/retrovibed/shallows/metaapi"
+	"github.com/retrovibed/retrovibed/shallows/tracking"
 
 	_ "github.com/duckdb/duckdb-go/v2"
 
@@ -427,7 +428,10 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	media.NewHTTPSimilar(db).Bind(httpmux.PathPrefix("/similar").Subrouter())
 	media.NewHTTPRecent(db).Bind(httpmux.PathPrefix("/w").Subrouter())
 	ddiscapi.NewHTTPPeerManagement(db).Bind(httpmux.PathPrefix("/ddisc").Subrouter())
-	ddiscapi.NewHTTPDiscovery(db, plugins, peertube, ddiscapi.HTTPDiscoveryOptionQueryCleaner(mc)).Bind(httpmux.PathPrefix("/ddisc/discovery").Subrouter())
+	discoveryimporter := tracking.NewURIImport(db, httpx.BindRetryTransport(&http.Client{
+		Transport: &http.Transport{DialContext: privateDialer.DialContext},
+	}, http.StatusTooManyRequests, http.StatusBadGateway), rootstore)
+	ddiscapi.NewHTTPDiscovery(db, plugins, peertube, discoveryimporter, ddiscapi.HTTPDiscoveryOptionQueryCleaner(mc)).Bind(httpmux.PathPrefix("/ddisc/discovery").Subrouter())
 	ddiscapi.NewHTTPMedia(db).Bind(httpmux.PathPrefix("/ddisc/media").Subrouter())
 	ddiscapi.NewHTTPLocate(db, locatemedia).Bind(httpmux.PathPrefix("/l").Subrouter())
 	media.NewHTTPRSSFeed(db).Bind(httpmux.PathPrefix("/rss").Subrouter())

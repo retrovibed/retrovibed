@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/authn.dart' as authn;
-import 'package:retrovibed/design.kit/bytesx.dart';
 import 'package:retrovibed/ddisc.dart' as ddisc;
 import 'package:retrovibed/library.dart' as lib;
 import 'package:retrovibed/uuidx.dart' as uuidx;
@@ -10,7 +9,7 @@ import 'discovery.details.dart';
 
 class DiscoveredCard extends StatefulWidget {
   final ddisc.Discovery current;
-  final Future<ddisc.DiscoveryDownloadResponse> Function(String id, {List<httpx.Option> options}) download;
+  final Future<ddisc.DiscoveryDownloadResponse> Function(String id, {ddisc.Discovery? discovery, bool autodownload, List<httpx.Option> options}) download;
   final void Function(ddisc.Discovery current) onDownloaded;
   final Widget help;
 
@@ -76,7 +75,9 @@ class _DiscoveredCardState extends State<DiscoveredCard> {
     final options = [authn.request(authn.AuthzCache.meta(context))];
 
     httpx
-        .withRetry(() => widget.download(widget.current.id, options: options))
+        .withRetry(
+          () => widget.download(widget.current.id, discovery: widget.current, autodownload: true, options: options),
+        )
         .then((v) {
           widget.onDownloaded(widget.current);
           setState(() {
@@ -100,8 +101,6 @@ class _DiscoveredCardState extends State<DiscoveredCard> {
 
   @override
   Widget build(BuildContext context) {
-    final size = bytesx(widget.current.bytes.toInt()).toIEC600272Format();
-
     return ds.Loading(
       loading: _loading,
       cause: _cause,
@@ -111,7 +110,20 @@ class _DiscoveredCardState extends State<DiscoveredCard> {
         icon: _queued ? Icons.query_builder_rounded : Icons.download_rounded,
         help: widget.help,
         onTap: _queued || _loading ? null : _onTap,
-        trailing: Text(size),
+        trailing: Row(
+          children: [
+            ds.Bytes(widget.current.bytes),
+            Spacer(),
+            ds.Timestamp.iso8601(
+              _known.released,
+              format: ds.Timestamp.year,
+              inf: ds.Empty,
+              neginf: ds.Empty,
+            ),
+            Spacer(),
+            Text("${widget.current.health}"),
+          ],
+        ),
       ),
     );
   }

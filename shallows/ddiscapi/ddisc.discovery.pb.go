@@ -22,23 +22,81 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type AcquisitionState int32
+
+const (
+	AcquisitionState_Unknown   AcquisitionState = 0
+	AcquisitionState_Ephemeral AcquisitionState = 1 // search result, not persisted.
+	AcquisitionState_Available AcquisitionState = 2 // was persisted but download was not initaited. generally
+	// means it was put into the recommendations queue.
+	AcquisitionState_Downloading AcquisitionState = 3 // actively being downloaded.
+	AcquisitionState_Completed   AcquisitionState = 4 // we completed a download of this record.
+)
+
+// Enum value maps for AcquisitionState.
+var (
+	AcquisitionState_name = map[int32]string{
+		0: "Unknown",
+		1: "Ephemeral",
+		2: "Available",
+		3: "Downloading",
+		4: "Completed",
+	}
+	AcquisitionState_value = map[string]int32{
+		"Unknown":     0,
+		"Ephemeral":   1,
+		"Available":   2,
+		"Downloading": 3,
+		"Completed":   4,
+	}
+)
+
+func (x AcquisitionState) Enum() *AcquisitionState {
+	p := new(AcquisitionState)
+	*p = x
+	return p
+}
+
+func (x AcquisitionState) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (AcquisitionState) Descriptor() protoreflect.EnumDescriptor {
+	return file_ddisc_discovery_proto_enumTypes[0].Descriptor()
+}
+
+func (AcquisitionState) Type() protoreflect.EnumType {
+	return &file_ddisc_discovery_proto_enumTypes[0]
+}
+
+func (x AcquisitionState) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use AcquisitionState.Descriptor instead.
+func (AcquisitionState) EnumDescriptor() ([]byte, []int) {
+	return file_ddisc_discovery_proto_rawDescGZIP(), []int{0}
+}
+
 type Discovery struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Infohash      []byte                 `protobuf:"bytes,2,opt,name=infohash,proto3" json:"infohash,omitempty"`
-	Attempts      uint32                 `protobuf:"varint,3,opt,name=attempts,proto3" json:"attempts,omitempty"`
-	NextCheck     string                 `protobuf:"bytes,4,opt,name=next_check,proto3" json:"next_check,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,5,opt,name=created_at,proto3" json:"created_at,omitempty"`
-	UpdatedAt     string                 `protobuf:"bytes,6,opt,name=updated_at,proto3" json:"updated_at,omitempty"`
-	Title         string                 `protobuf:"bytes,7,opt,name=title,proto3" json:"title,omitempty"`
-	Description   string                 `protobuf:"bytes,8,opt,name=description,proto3" json:"description,omitempty"`
-	Health        uint32                 `protobuf:"varint,9,opt,name=health,proto3" json:"health,omitempty"`
-	Bytes         uint64                 `protobuf:"varint,10,opt,name=bytes,proto3" json:"bytes,omitempty"`
-	PolicyRank    uint32                 `protobuf:"varint,11,opt,name=policy_rank,proto3" json:"policy_rank,omitempty"`
-	KnownMediaId  string                 `protobuf:"bytes,12,opt,name=known_media_id,proto3" json:"known_media_id,omitempty"`
-	Source        string                 `protobuf:"bytes,13,opt,name=source,proto3" json:"source,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	Id               string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Infohash         []byte                 `protobuf:"bytes,2,opt,name=infohash,proto3" json:"infohash,omitempty"`
+	Attempts         uint32                 `protobuf:"varint,3,opt,name=attempts,proto3" json:"attempts,omitempty"`
+	NextCheck        string                 `protobuf:"bytes,4,opt,name=next_check,proto3" json:"next_check,omitempty"`
+	CreatedAt        string                 `protobuf:"bytes,5,opt,name=created_at,proto3" json:"created_at,omitempty"`
+	UpdatedAt        string                 `protobuf:"bytes,6,opt,name=updated_at,proto3" json:"updated_at,omitempty"`
+	Title            string                 `protobuf:"bytes,7,opt,name=title,proto3" json:"title,omitempty"`
+	Description      string                 `protobuf:"bytes,8,opt,name=description,proto3" json:"description,omitempty"`
+	Health           uint32                 `protobuf:"varint,9,opt,name=health,proto3" json:"health,omitempty"`
+	Bytes            uint64                 `protobuf:"varint,10,opt,name=bytes,proto3" json:"bytes,omitempty"`
+	PolicyRank       uint32                 `protobuf:"varint,11,opt,name=policy_rank,proto3" json:"policy_rank,omitempty"`
+	KnownMediaId     string                 `protobuf:"bytes,12,opt,name=known_media_id,proto3" json:"known_media_id,omitempty"`
+	Source           string                 `protobuf:"bytes,13,opt,name=source,proto3" json:"source,omitempty"`
+	Uri              string                 `protobuf:"bytes,14,opt,name=uri,proto3" json:"uri,omitempty"`
+	AcquisitionState AcquisitionState       `protobuf:"varint,15,opt,name=acquisition_state,proto3,enum=ddisc.AcquisitionState" json:"acquisition_state,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *Discovery) Reset() {
@@ -160,6 +218,20 @@ func (x *Discovery) GetSource() string {
 		return x.Source
 	}
 	return ""
+}
+
+func (x *Discovery) GetUri() string {
+	if x != nil {
+		return x.Uri
+	}
+	return ""
+}
+
+func (x *Discovery) GetAcquisitionState() AcquisitionState {
+	if x != nil {
+		return x.AcquisitionState
+	}
+	return AcquisitionState_Unknown
 }
 
 type DiscoverySearchRequest struct {
@@ -388,6 +460,8 @@ func (x *DiscoveryCreateResponse) GetDiscovery() *Discovery {
 
 type DiscoveryDownloadRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	Discovery     *Discovery             `protobuf:"bytes,1,opt,name=discovery,proto3" json:"discovery,omitempty"`
+	Autodownload  bool                   `protobuf:"varint,2,opt,name=autodownload,proto3" json:"autodownload,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -420,6 +494,20 @@ func (x *DiscoveryDownloadRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use DiscoveryDownloadRequest.ProtoReflect.Descriptor instead.
 func (*DiscoveryDownloadRequest) Descriptor() ([]byte, []int) {
 	return file_ddisc_discovery_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *DiscoveryDownloadRequest) GetDiscovery() *Discovery {
+	if x != nil {
+		return x.Discovery
+	}
+	return nil
+}
+
+func (x *DiscoveryDownloadRequest) GetAutodownload() bool {
+	if x != nil {
+		return x.Autodownload
+	}
+	return false
 }
 
 type DiscoveryDownloadResponse struct {
@@ -550,7 +638,7 @@ var File_ddisc_discovery_proto protoreflect.FileDescriptor
 
 const file_ddisc_discovery_proto_rawDesc = "" +
 	"\n" +
-	"\x15ddisc.discovery.proto\x12\x05ddisc\x1a\x11meta.search.proto\"\xfb\x02\n" +
+	"\x15ddisc.discovery.proto\x12\x05ddisc\x1a\x11meta.search.proto\"\xd4\x03\n" +
 	"\tDiscovery\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
 	"\binfohash\x18\x02 \x01(\fR\binfohash\x12\x1a\n" +
@@ -571,7 +659,9 @@ const file_ddisc_discovery_proto_rawDesc = "" +
 	" \x01(\x04R\x05bytes\x12 \n" +
 	"\vpolicy_rank\x18\v \x01(\rR\vpolicy_rank\x12&\n" +
 	"\x0eknown_media_id\x18\f \x01(\tR\x0eknown_media_id\x12\x16\n" +
-	"\x06source\x18\r \x01(\tR\x06source\"\xd8\x01\n" +
+	"\x06source\x18\r \x01(\tR\x06source\x12\x10\n" +
+	"\x03uri\x18\x0e \x01(\tR\x03uri\x12E\n" +
+	"\x11acquisition_state\x18\x0f \x01(\x0e2\x17.ddisc.AcquisitionStateR\x11acquisition_state\"\xd8\x01\n" +
 	"\x16DiscoverySearchRequest\x12/\n" +
 	"\n" +
 	"next_check\x18\x01 \x01(\v2\x0f.meta.DateRangeR\n" +
@@ -587,13 +677,21 @@ const file_ddisc_discovery_proto_rawDesc = "" +
 	"\x16DiscoveryCreateRequest\x12.\n" +
 	"\tdiscovery\x18\x01 \x01(\v2\x10.ddisc.DiscoveryR\tdiscovery\"I\n" +
 	"\x17DiscoveryCreateResponse\x12.\n" +
-	"\tdiscovery\x18\x01 \x01(\v2\x10.ddisc.DiscoveryR\tdiscovery\"\x1a\n" +
-	"\x18DiscoveryDownloadRequest\"K\n" +
+	"\tdiscovery\x18\x01 \x01(\v2\x10.ddisc.DiscoveryR\tdiscovery\"n\n" +
+	"\x18DiscoveryDownloadRequest\x12.\n" +
+	"\tdiscovery\x18\x01 \x01(\v2\x10.ddisc.DiscoveryR\tdiscovery\x12\"\n" +
+	"\fautodownload\x18\x02 \x01(\bR\fautodownload\"K\n" +
 	"\x19DiscoveryDownloadResponse\x12.\n" +
 	"\tdiscovery\x18\x01 \x01(\v2\x10.ddisc.DiscoveryR\tdiscovery\"\x18\n" +
 	"\x16DiscoveryDeleteRequest\"I\n" +
 	"\x17DiscoveryDeleteResponse\x12.\n" +
-	"\tdiscovery\x18\x01 \x01(\v2\x10.ddisc.DiscoveryR\tdiscoveryb\x06proto3"
+	"\tdiscovery\x18\x01 \x01(\v2\x10.ddisc.DiscoveryR\tdiscovery*]\n" +
+	"\x10AcquisitionState\x12\v\n" +
+	"\aUnknown\x10\x00\x12\r\n" +
+	"\tEphemeral\x10\x01\x12\r\n" +
+	"\tAvailable\x10\x02\x12\x0f\n" +
+	"\vDownloading\x10\x03\x12\r\n" +
+	"\tCompleted\x10\x04b\x06proto3"
 
 var (
 	file_ddisc_discovery_proto_rawDescOnce sync.Once
@@ -607,32 +705,36 @@ func file_ddisc_discovery_proto_rawDescGZIP() []byte {
 	return file_ddisc_discovery_proto_rawDescData
 }
 
+var file_ddisc_discovery_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_ddisc_discovery_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_ddisc_discovery_proto_goTypes = []any{
-	(*Discovery)(nil),                 // 0: ddisc.Discovery
-	(*DiscoverySearchRequest)(nil),    // 1: ddisc.DiscoverySearchRequest
-	(*DiscoverySearchResponse)(nil),   // 2: ddisc.DiscoverySearchResponse
-	(*DiscoveryCreateRequest)(nil),    // 3: ddisc.DiscoveryCreateRequest
-	(*DiscoveryCreateResponse)(nil),   // 4: ddisc.DiscoveryCreateResponse
-	(*DiscoveryDownloadRequest)(nil),  // 5: ddisc.DiscoveryDownloadRequest
-	(*DiscoveryDownloadResponse)(nil), // 6: ddisc.DiscoveryDownloadResponse
-	(*DiscoveryDeleteRequest)(nil),    // 7: ddisc.DiscoveryDeleteRequest
-	(*DiscoveryDeleteResponse)(nil),   // 8: ddisc.DiscoveryDeleteResponse
-	(*meta.DateRange)(nil),            // 9: meta.DateRange
+	(AcquisitionState)(0),             // 0: ddisc.AcquisitionState
+	(*Discovery)(nil),                 // 1: ddisc.Discovery
+	(*DiscoverySearchRequest)(nil),    // 2: ddisc.DiscoverySearchRequest
+	(*DiscoverySearchResponse)(nil),   // 3: ddisc.DiscoverySearchResponse
+	(*DiscoveryCreateRequest)(nil),    // 4: ddisc.DiscoveryCreateRequest
+	(*DiscoveryCreateResponse)(nil),   // 5: ddisc.DiscoveryCreateResponse
+	(*DiscoveryDownloadRequest)(nil),  // 6: ddisc.DiscoveryDownloadRequest
+	(*DiscoveryDownloadResponse)(nil), // 7: ddisc.DiscoveryDownloadResponse
+	(*DiscoveryDeleteRequest)(nil),    // 8: ddisc.DiscoveryDeleteRequest
+	(*DiscoveryDeleteResponse)(nil),   // 9: ddisc.DiscoveryDeleteResponse
+	(*meta.DateRange)(nil),            // 10: meta.DateRange
 }
 var file_ddisc_discovery_proto_depIdxs = []int32{
-	9, // 0: ddisc.DiscoverySearchRequest.next_check:type_name -> meta.DateRange
-	1, // 1: ddisc.DiscoverySearchResponse.next:type_name -> ddisc.DiscoverySearchRequest
-	0, // 2: ddisc.DiscoverySearchResponse.items:type_name -> ddisc.Discovery
-	0, // 3: ddisc.DiscoveryCreateRequest.discovery:type_name -> ddisc.Discovery
-	0, // 4: ddisc.DiscoveryCreateResponse.discovery:type_name -> ddisc.Discovery
-	0, // 5: ddisc.DiscoveryDownloadResponse.discovery:type_name -> ddisc.Discovery
-	0, // 6: ddisc.DiscoveryDeleteResponse.discovery:type_name -> ddisc.Discovery
-	7, // [7:7] is the sub-list for method output_type
-	7, // [7:7] is the sub-list for method input_type
-	7, // [7:7] is the sub-list for extension type_name
-	7, // [7:7] is the sub-list for extension extendee
-	0, // [0:7] is the sub-list for field type_name
+	0,  // 0: ddisc.Discovery.acquisition_state:type_name -> ddisc.AcquisitionState
+	10, // 1: ddisc.DiscoverySearchRequest.next_check:type_name -> meta.DateRange
+	2,  // 2: ddisc.DiscoverySearchResponse.next:type_name -> ddisc.DiscoverySearchRequest
+	1,  // 3: ddisc.DiscoverySearchResponse.items:type_name -> ddisc.Discovery
+	1,  // 4: ddisc.DiscoveryCreateRequest.discovery:type_name -> ddisc.Discovery
+	1,  // 5: ddisc.DiscoveryCreateResponse.discovery:type_name -> ddisc.Discovery
+	1,  // 6: ddisc.DiscoveryDownloadRequest.discovery:type_name -> ddisc.Discovery
+	1,  // 7: ddisc.DiscoveryDownloadResponse.discovery:type_name -> ddisc.Discovery
+	1,  // 8: ddisc.DiscoveryDeleteResponse.discovery:type_name -> ddisc.Discovery
+	9,  // [9:9] is the sub-list for method output_type
+	9,  // [9:9] is the sub-list for method input_type
+	9,  // [9:9] is the sub-list for extension type_name
+	9,  // [9:9] is the sub-list for extension extendee
+	0,  // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_ddisc_discovery_proto_init() }
@@ -645,13 +747,14 @@ func file_ddisc_discovery_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_ddisc_discovery_proto_rawDesc), len(file_ddisc_discovery_proto_rawDesc)),
-			NumEnums:      0,
+			NumEnums:      1,
 			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_ddisc_discovery_proto_goTypes,
 		DependencyIndexes: file_ddisc_discovery_proto_depIdxs,
+		EnumInfos:         file_ddisc_discovery_proto_enumTypes,
 		MessageInfos:      file_ddisc_discovery_proto_msgTypes,
 	}.Build()
 	File_ddisc_discovery_proto = out.File

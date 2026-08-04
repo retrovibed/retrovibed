@@ -15,6 +15,23 @@ import 'dart:convert' as $convert;
 import 'dart:core' as $core;
 import 'dart:typed_data' as $typed_data;
 
+@$core.Deprecated('Use acquisitionStateDescriptor instead')
+const AcquisitionState$json = {
+  '1': 'AcquisitionState',
+  '2': [
+    {'1': 'Unknown', '2': 0},
+    {'1': 'Ephemeral', '2': 1},
+    {'1': 'Available', '2': 2},
+    {'1': 'Downloading', '2': 3},
+    {'1': 'Completed', '2': 4},
+  ],
+};
+
+/// Descriptor for `AcquisitionState`. Decode as a `google.protobuf.EnumDescriptorProto`.
+final $typed_data.Uint8List acquisitionStateDescriptor = $convert.base64Decode(
+    'ChBBY3F1aXNpdGlvblN0YXRlEgsKB1Vua25vd24QABINCglFcGhlbWVyYWwQARINCglBdmFpbG'
+    'FibGUQAhIPCgtEb3dubG9hZGluZxADEg0KCUNvbXBsZXRlZBAE');
+
 @$core.Deprecated('Use discoveryDescriptor instead')
 const Discovery$json = {
   '1': 'Discovery',
@@ -32,6 +49,15 @@ const Discovery$json = {
     {'1': 'policy_rank', '3': 11, '4': 1, '5': 13, '10': 'policy_rank'},
     {'1': 'known_media_id', '3': 12, '4': 1, '5': 9, '10': 'known_media_id'},
     {'1': 'source', '3': 13, '4': 1, '5': 9, '10': 'source'},
+    {'1': 'uri', '3': 14, '4': 1, '5': 9, '10': 'uri'},
+    {
+      '1': 'acquisition_state',
+      '3': 15,
+      '4': 1,
+      '5': 14,
+      '6': '.ddisc.AcquisitionState',
+      '10': 'acquisition_state'
+    },
   ],
 };
 
@@ -43,7 +69,9 @@ final $typed_data.Uint8List discoveryDescriptor = $convert.base64Decode(
     'lSCnVwZGF0ZWRfYXQSFAoFdGl0bGUYByABKAlSBXRpdGxlEiAKC2Rlc2NyaXB0aW9uGAggASgJ'
     'UgtkZXNjcmlwdGlvbhIWCgZoZWFsdGgYCSABKA1SBmhlYWx0aBIUCgVieXRlcxgKIAEoBFIFYn'
     'l0ZXMSIAoLcG9saWN5X3JhbmsYCyABKA1SC3BvbGljeV9yYW5rEiYKDmtub3duX21lZGlhX2lk'
-    'GAwgASgJUg5rbm93bl9tZWRpYV9pZBIWCgZzb3VyY2UYDSABKAlSBnNvdXJjZQ==');
+    'GAwgASgJUg5rbm93bl9tZWRpYV9pZBIWCgZzb3VyY2UYDSABKAlSBnNvdXJjZRIQCgN1cmkYDi'
+    'ABKAlSA3VyaRJFChFhY3F1aXNpdGlvbl9zdGF0ZRgPIAEoDjIXLmRkaXNjLkFjcXVpc2l0aW9u'
+    'U3RhdGVSEWFjcXVpc2l0aW9uX3N0YXRl');
 
 @$core.Deprecated('Use discoverySearchRequestDescriptor instead')
 const DiscoverySearchRequest$json = {
@@ -149,11 +177,23 @@ final $typed_data.Uint8List discoveryCreateResponseDescriptor =
 @$core.Deprecated('Use discoveryDownloadRequestDescriptor instead')
 const DiscoveryDownloadRequest$json = {
   '1': 'DiscoveryDownloadRequest',
+  '2': [
+    {
+      '1': 'discovery',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.ddisc.Discovery',
+      '10': 'discovery'
+    },
+    {'1': 'autodownload', '3': 2, '4': 1, '5': 8, '10': 'autodownload'},
+  ],
 };
 
 /// Descriptor for `DiscoveryDownloadRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List discoveryDownloadRequestDescriptor =
-    $convert.base64Decode('ChhEaXNjb3ZlcnlEb3dubG9hZFJlcXVlc3Q=');
+final $typed_data.Uint8List discoveryDownloadRequestDescriptor = $convert.base64Decode(
+    'ChhEaXNjb3ZlcnlEb3dubG9hZFJlcXVlc3QSLgoJZGlzY292ZXJ5GAEgASgLMhAuZGRpc2MuRG'
+    'lzY292ZXJ5UglkaXNjb3ZlcnkSIgoMYXV0b2Rvd25sb2FkGAIgASgIUgxhdXRvZG93bmxvYWQ=');
 
 @$core.Deprecated('Use discoveryDownloadResponseDescriptor instead')
 const DiscoveryDownloadResponse$json = {

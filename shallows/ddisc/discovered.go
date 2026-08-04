@@ -56,6 +56,23 @@ func DiscoveredOptionHealth(h uint32) DiscoveredOption {
 	}
 }
 
+// acquisition_state is a plain int32 mirroring the AcquisitionState enum
+// ordinals (both this package's AcquisitionState and ddisc.discovery.proto's
+// generated equivalent). Kept as a bare int32 rather than the AcquisitionState
+// type itself because genieql has no per-field type-override mechanism - it
+// always generates the DB-driven primitive type for a column.
+func DiscoveredOptionAcquisitionState(s AcquisitionState) DiscoveredOption {
+	return func(d *Discovered) {
+		d.AcquisitionState = int32(s)
+	}
+}
+
+func DiscoveredOptionInfoHash(i []byte) DiscoveredOption {
+	return func(d *Discovered) {
+		d.Infohash = i
+	}
+}
+
 func DiscoveredOptionTitle(s string) DiscoveredOption {
 	return func(d *Discovered) {
 		d.Title = s
@@ -77,6 +94,14 @@ func DiscoveredOptionPrivate(b bool) DiscoveredOption {
 	}
 }
 
+// DiscoveredOptionContentMime sets ContentMime directly - how the uri is
+// fetched (mimex.Bittorrent, mimex.HTTP), not the media's own Mimetype.
+func DiscoveredOptionContentMime(s string) DiscoveredOption {
+	return func(d *Discovered) {
+		d.Contentmime = s
+	}
+}
+
 func DiscoveredOptionURI(s string) DiscoveredOption {
 	return func(d *Discovered) {
 		d.URI = s
@@ -95,6 +120,7 @@ func DiscoveredOptionAutoMagnet(d *Discovered) {
 	}
 
 	d.URI = metainfo.Magnet{InfoHash: metainfo.Hash(d.Infohash)}.String()
+	d.Contentmime = mimex.Bittorrent
 }
 
 func DiscoveredOptionTestDefaults(d *Discovered) {
@@ -215,12 +241,18 @@ func Worst() Discovered {
 	}
 }
 
+// defaults content mimetype to bittorrent.
+// as that was the initial usecase for uris. the uri was either magnet or a
+// http torrent file uri.
+// non-torrent results from plugins *must* set their contentmime for resolution
+// to work properly.
 func NewDiscovered(md *int160.T, options ...DiscoveredOption) (m Discovered) {
 	r := langx.Clone(Discovered{
 		ID:                     torrentx.HashUID(md),
 		Infohash:               md.Bytes(),
 		KnownMediaID:           uuid.Nil.String(),
 		Mimetype:               mimex.Binary,
+		Contentmime:            mimex.Bittorrent,
 		Category:               mimex.Application,
 		SyncUID:                uuid.Must(uuid.NewV7()).String(),
 		Partition:              uuid.Nil.String(),
@@ -231,7 +263,10 @@ func NewDiscovered(md *int160.T, options ...DiscoveredOption) (m Discovered) {
 		NextCheckAt:            timex.NegInf(),
 		TombstonedAt:           timex.Inf(),
 		PolicyRank:             math.MaxUint16,
-	}, options...)
+	},
+		DiscoveredOptionAcquisitionState(AcquisitionStateEphemeral),
+		langx.Compose(options...),
+	)
 	return r
 }
 
@@ -251,6 +286,7 @@ func NewDiscoveredFromKnown(md int160.T, known library.Known, options ...Discove
 		ReleasedAt:             known.Released,
 		Adult:                  known.Adult,
 		Mimetype:               langx.FirstNonZero(known.Mimetype, mimex.Binary),
+		Contentmime:            mimex.Bittorrent,
 		Category:               mimex.Category(langx.FirstNonZero(known.Mimetype, mimex.Application)),
 		SyncUID:                uuid.Must(uuid.NewV7()).String(),
 		Partition:              uuid.Nil.String(),
@@ -261,7 +297,10 @@ func NewDiscoveredFromKnown(md int160.T, known library.Known, options ...Discove
 		NextCheckAt:            timex.NegInf(),
 		TombstonedAt:           timex.Inf(),
 		PolicyRank:             math.MaxUint16,
-	}, options...)
+	},
+		DiscoveredOptionAcquisitionState(AcquisitionStateEphemeral),
+		langx.Compose(options...),
+	)
 	return r
 }
 
@@ -286,6 +325,7 @@ func NewDiscoveredFromImport(imp *ddiscapi.Import, options ...DiscoveredOption) 
 		Bytes:                  imp.Bytes,
 		KnownMediaID:           uuid.Nil.String(),
 		Mimetype:               mimex.Binary,
+		Contentmime:            mimex.Bittorrent,
 		Category:               mimex.Application,
 		SyncUID:                uuid.Must(uuid.NewV7()).String(),
 		Partition:              uuid.Nil.String(),
@@ -296,7 +336,10 @@ func NewDiscoveredFromImport(imp *ddiscapi.Import, options ...DiscoveredOption) 
 		NextCheckAt:            timex.NegInf(),
 		TombstonedAt:           time.Now().Add(3 * time.Hour),
 		PolicyRank:             math.MaxUint16,
-	}, options...)
+	},
+		DiscoveredOptionAcquisitionState(AcquisitionStateEphemeral),
+		langx.Compose(options...),
+	)
 	return r
 }
 

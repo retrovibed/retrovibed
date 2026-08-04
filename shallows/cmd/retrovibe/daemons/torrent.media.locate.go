@@ -77,44 +77,20 @@ func Locate(ctx context.Context, db sqlx.Queryer, disc *DiscoverySettings, dhts 
 // for download, marks it for auto-download, and stamps loc as located. Full
 // info-dict resolution (if not already available from d.URI) is left to the
 // normal download/resume machinery (see ResumeDownloads) once initiated_at
-// is set - same as every other ingestion path (RSS, etc.).
+// is set - same as every other ingestion path (RSS, etc.). This is also the
+// only ddisc_media write the whole locate ever makes: non-winning candidates
+// are never persisted.
 func DiscoveredDownload(ctx context.Context, db sqlx.Queryer, importer tracking.URIImport, loc ddisc.Locate, d ddisc.Discovered) (err error) {
-	var (
-		l ddisc.Locate
-	)
+	var l ddisc.Locate
 
-	lmd, err := importer.Import(
-		ctx,
-		d.URI,
-		tracking.MetadataOptionKnownMediaID(d.KnownMediaID),
-		tracking.MetadataOptionAutoDescription,
-		tracking.MetadataOptionAutoHidden,
-	)
-	if err != nil {
-		return errorsx.Wrapf(err, "unable to import uri for download %s", d.ID)
-	}
-
-	// import resolved the real infohash (parsed from the magnet, or hashed
-	// from the actually-fetched .torrent bytes) - persist d now, correcting
-	// the SHA1(uri) placeholder NewDiscoveredFromImport stores until this
-	// point. This is also the only ddisc_media write the whole locate ever
-	// makes: non-winning candidates are never persisted.
-	d.Infohash = lmd.Infohash
-	if err = ddisc.DiscoveredInsertWithDefaults(ctx, db, d).Scan(&d); err != nil {
-		return errorsx.Wrapf(err, "unable to persist located candidate %s", d.ID)
-	}
-
+	acquisition := ddisc.AcquisitionStateAvailable
 	if loc.Autodownload {
-		if err = tracking.MetadataAutoDownloadByID(ctx, db, lmd.ID).Scan(&lmd); err != nil {
-			return errorsx.Wrapf(err, "unable to mark torrent for download from uri %s", d.ID)
-		}
-		log.Println("marked for download", lmd.ID, lmd.Description)
-	} else {
-		var rec library.Recommendation
-		if err = library.RecommendationInsertWithDefaults(ctx, db, ddisc.RecommendationFromDiscovered(d)).Scan(&rec); err != nil {
-			return errorsx.Wrap(err, "unable to record recommendation for located media")
-		}
-		log.Println("recommendation created", rec.ID, rec.Title)
+		acquisition = ddisc.AcquisitionStateDownloading
+	}
+
+	_, lmd, err := ddisc.DownloadDiscovered(ctx, db, importer, d, acquisition)
+	if err != nil {
+		return err
 	}
 
 	if err = ddisc.LocateLocated(ctx, db, loc.ID, lmd.ID).Scan(&l); err != nil {

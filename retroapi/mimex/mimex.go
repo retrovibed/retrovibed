@@ -15,6 +15,7 @@ const (
 	Binary                    = "application/octet-stream"
 	Bittorrent                = "application/x-bittorrent"
 	Magnet                    = "application/x-magnet"
+	HTTP                      = "application/x-http-url" // content fetched directly over http(s), not via bittorrent.
 	RSS                       = "application/rss+xml"
 	ISO9660                   = "application/x-iso9660-image"
 	RetrovibedMediaArchive    = "application/vnd.retrovibed.media.archive"

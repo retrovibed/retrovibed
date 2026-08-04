@@ -59,7 +59,12 @@ func publishDiscoveredMediaOne(ctx context.Context, db sqlx.Queryer, lmd library
 	id := int160.FromBytes(tmd.Infohash)
 
 	// skip files already published, keyed deterministically on (infohash, known_media_id).
-	candidate := ddisc.NewDiscoveredFromKnown(id, known, ddisc.DiscoveredOptionPrivate(tmd.Private), ddisc.DiscoveredOptionAutoMagnet)
+	candidate := ddisc.NewDiscoveredFromKnown(
+		id, known,
+		ddisc.DiscoveredOptionPrivate(tmd.Private),
+		ddisc.DiscoveredOptionAutoMagnet,
+		ddisc.DiscoveredOptionAcquisitionState(ddisc.AcquisitionStateCompleted),
+	)
 	var existing ddisc.Discovered
 	if err := ddisc.DiscoveredFindByID(ctx, db, candidate.ID).Scan(&existing); err == nil {
 		return nil

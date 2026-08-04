@@ -15,9 +15,12 @@ import 'dart:core' as $core;
 import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
 
+import 'ddisc.discovery.pbenum.dart';
 import 'meta.search.pb.dart' as $0;
 
 export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
+
+export 'ddisc.discovery.pbenum.dart';
 
 class Discovery extends $pb.GeneratedMessage {
   factory Discovery({
@@ -34,6 +37,8 @@ class Discovery extends $pb.GeneratedMessage {
     $core.int? policyRank,
     $core.String? knownMediaId,
     $core.String? source,
+    $core.String? uri,
+    AcquisitionState? acquisitionState,
   }) {
     final result = create();
     if (id != null) result.id = id;
@@ -49,6 +54,8 @@ class Discovery extends $pb.GeneratedMessage {
     if (policyRank != null) result.policyRank = policyRank;
     if (knownMediaId != null) result.knownMediaId = knownMediaId;
     if (source != null) result.source = source;
+    if (uri != null) result.uri = uri;
+    if (acquisitionState != null) result.acquisitionState = acquisitionState;
     return result;
   }
 
@@ -81,6 +88,9 @@ class Discovery extends $pb.GeneratedMessage {
         fieldType: $pb.PbFieldType.OU3)
     ..aOS(12, _omitFieldNames ? '' : 'known_media_id')
     ..aOS(13, _omitFieldNames ? '' : 'source')
+    ..aOS(14, _omitFieldNames ? '' : 'uri')
+    ..aE<AcquisitionState>(15, _omitFieldNames ? '' : 'acquisition_state',
+        enumValues: AcquisitionState.values)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -217,6 +227,24 @@ class Discovery extends $pb.GeneratedMessage {
   $core.bool hasSource() => $_has(12);
   @$pb.TagNumber(13)
   void clearSource() => $_clearField(13);
+
+  @$pb.TagNumber(14)
+  $core.String get uri => $_getSZ(13);
+  @$pb.TagNumber(14)
+  set uri($core.String value) => $_setString(13, value);
+  @$pb.TagNumber(14)
+  $core.bool hasUri() => $_has(13);
+  @$pb.TagNumber(14)
+  void clearUri() => $_clearField(14);
+
+  @$pb.TagNumber(15)
+  AcquisitionState get acquisitionState => $_getN(14);
+  @$pb.TagNumber(15)
+  set acquisitionState(AcquisitionState value) => $_setField(15, value);
+  @$pb.TagNumber(15)
+  $core.bool hasAcquisitionState() => $_has(14);
+  @$pb.TagNumber(15)
+  void clearAcquisitionState() => $_clearField(15);
 }
 
 class DiscoverySearchRequest extends $pb.GeneratedMessage {
@@ -521,7 +549,15 @@ class DiscoveryCreateResponse extends $pb.GeneratedMessage {
 }
 
 class DiscoveryDownloadRequest extends $pb.GeneratedMessage {
-  factory DiscoveryDownloadRequest() => create();
+  factory DiscoveryDownloadRequest({
+    Discovery? discovery,
+    $core.bool? autodownload,
+  }) {
+    final result = create();
+    if (discovery != null) result.discovery = discovery;
+    if (autodownload != null) result.autodownload = autodownload;
+    return result;
+  }
 
   DiscoveryDownloadRequest._();
 
@@ -536,6 +572,9 @@ class DiscoveryDownloadRequest extends $pb.GeneratedMessage {
       _omitMessageNames ? '' : 'DiscoveryDownloadRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'ddisc'),
       createEmptyInstance: create)
+    ..aOM<Discovery>(1, _omitFieldNames ? '' : 'discovery',
+        subBuilder: Discovery.create)
+    ..aOB(2, _omitFieldNames ? '' : 'autodownload')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -557,6 +596,26 @@ class DiscoveryDownloadRequest extends $pb.GeneratedMessage {
   static DiscoveryDownloadRequest getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<DiscoveryDownloadRequest>(create);
   static DiscoveryDownloadRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  Discovery get discovery => $_getN(0);
+  @$pb.TagNumber(1)
+  set discovery(Discovery value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasDiscovery() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearDiscovery() => $_clearField(1);
+  @$pb.TagNumber(1)
+  Discovery ensureDiscovery() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  $core.bool get autodownload => $_getBF(1);
+  @$pb.TagNumber(2)
+  set autodownload($core.bool value) => $_setBool(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasAutodownload() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearAutodownload() => $_clearField(2);
 }
 
 class DiscoveryDownloadResponse extends $pb.GeneratedMessage {

@@ -5,10 +5,10 @@ import 'package:retrovibed/design.kit/bytesx.dart';
 class Bytes extends StatelessWidget {
   static String FormatIEC600272(Int64 v) => bytesx(v.toInt()).toIEC600272Format();
   static String FormatSI(Int64 v) => bytesx(v.toInt()).toSIFormat();
-  final Int64 duration;
+  final Int64 value;
   final String Function(Int64 v) format;
 
-  const Bytes(this.duration, {super.key, this.format = Bytes.FormatIEC600272});
+  const Bytes(this.value, {super.key, this.format = Bytes.FormatIEC600272});
 
   factory Bytes.SI(Int64 v) {
     return Bytes(v, format: Bytes.FormatSI);
@@ -20,6 +20,6 @@ class Bytes extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(format(duration));
+    return Text(format(value));
   }
 }

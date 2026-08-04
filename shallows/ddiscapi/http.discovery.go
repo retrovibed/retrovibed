@@ -3,8 +3,8 @@ package ddiscapi
 import (
 	"bytes"
 	"context"
-	"encoding/hex"
 	"encoding/json"
+	"io"
 	"log"
 	"math"
 	"net/http"
@@ -49,11 +49,12 @@ func HTTPDiscoveryOptionQueryCleaner(mc library.QueryCleaner) HTTPDiscoveryOptio
 	}
 }
 
-func NewHTTPDiscovery(q sqlx.Queryer, plugins searchplugin.T, peertube ddisc.DiscoverStrategy, options ...HTTPDiscoveryOption) *HTTPDiscovery {
+func NewHTTPDiscovery(q sqlx.Queryer, plugins searchplugin.T, peertube ddisc.DiscoverStrategy, importer tracking.URIImport, options ...HTTPDiscoveryOption) *HTTPDiscovery {
 	svc := langx.Clone(HTTPDiscovery{
 		q:         q,
 		plugins:   plugins,
 		peertube:  peertube,
+		importer:  importer,
 		jwtsecret: env.JWTSecret,
 		decoder:   formx.NewDecoder(),
 		cleaner:   library.QueryCleanerNoop(),
@@ -66,6 +67,7 @@ type HTTPDiscovery struct {
 	q         sqlx.Queryer
 	plugins   searchplugin.T
 	peertube  ddisc.DiscoverStrategy
+	importer  tracking.URIImport
 	jwtsecret jwtx.SecretSource
 	decoder   *form.Decoder
 	cleaner   library.QueryCleaner
@@ -95,45 +97,60 @@ func (t *HTTPDiscovery) Bind(r *mux.Router) {
 		httpx.Timeout2s(),
 	).ThenFunc(t.create))
 
+	r.Path("/download").Methods(http.MethodPost).Handler(alice.New(
+		httpx.ContextBufferPool1024(),
+		httpauth.AuthenticateWithToken(t.jwtsecret),
+		httpx.Timeout2s(),
+	).ThenFunc(t.download))
+
 	r.Path("/{id}").Methods(http.MethodDelete).Handler(alice.New(
 		httpx.ContextBufferPool512(),
 		httpx.ParseForm,
 		metaapi.AuthzTokenHTTP(t.jwtsecret, AuthzPermPeer),
 		httpx.Timeout2s(),
 	).ThenFunc(t.delete))
-
-	r.Path("/{id}").Methods(http.MethodPost).Handler(alice.New(
-		httpx.ContextBufferPool1024(),
-		httpauth.AuthenticateWithToken(t.jwtsecret),
-		httpx.Timeout2s(),
-	).ThenFunc(t.download))
 }
 
 func (t *HTTPDiscovery) download(w http.ResponseWriter, r *http.Request) {
 	var (
-		disc ddisc.Discovered
-		md   tracking.Metadata
-		id   = mux.Vars(r)["id"]
+		msg DiscoveryDownloadRequest
 	)
 
-	if err := ddisc.DiscoveredFindByID(r.Context(), t.q, id).Scan(&disc); sqlx.ErrNoRows(err) != nil {
-		log.Println(errorsx.Wrap(err, "unable to find discovered"))
+	if err := json.NewDecoder(r.Body).Decode(&msg); err != nil && err != io.EOF {
+		log.Println(errorsx.Wrap(err, "unable to decode request"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		return
+	}
+
+	// the client resends the full payload it was streamed (whether already a
+	// real ddisc_media row, e.g. the Local strategy's scan, or a candidate
+	// never persisted, e.g. Known/Plugin/PeerTube) - there's genuinely
+	// nothing to go on without it. Callers that only have an id in hand (e.g.
+	// KnownMediaLocator, downloading an already-persisted row it never
+	// streamed itself) send a Discovery with just the id and a blank uri;
+	// look the rest up in that case.
+	if msg.Discovery == nil {
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
 		return
-	} else if err != nil {
-		log.Println(errorsx.Wrap(err, "unable to find discovered"))
-		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
-		return
 	}
 
-	if err := tracking.MetadataFindByInfohash(r.Context(), t.q, hex.EncodeToString(disc.Infohash)).Scan(&md); err != nil {
-		log.Println(errorsx.Wrap(err, "unable to find tracking data"))
-		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
-		return
+	disc := NewDiscoveredFromDiscovery(msg.Discovery)
+	if msg.Discovery.Uri == "" {
+		if err := ddisc.DiscoveredFindByID(r.Context(), t.q, msg.Discovery.Id).Scan(&disc); err != nil {
+			log.Println(errorsx.Wrap(err, "unable to find discovered"))
+			errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
+			return
+		}
 	}
 
-	if err := tracking.MetadataAutoDownloadByID(r.Context(), t.q, md.ID).Scan(&md); err != nil {
-		log.Println(errorsx.Wrap(err, "unable to autodownload tracking"))
+	acquisition := ddisc.AcquisitionStateAvailable
+	if msg.Autodownload {
+		acquisition = ddisc.AcquisitionStateDownloading
+	}
+
+	disc, _, err := ddisc.DownloadDiscovered(r.Context(), t.q, t.importer, disc, acquisition)
+	if err != nil {
+		log.Println(errorsx.Wrap(err, "unable to download discovered"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}

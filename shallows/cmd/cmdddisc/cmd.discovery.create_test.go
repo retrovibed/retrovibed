@@ -2,6 +2,7 @@ package cmdddisc_test
 
 import (
 	"fmt"
+	"net/http"
 	"path/filepath"
 	"testing"
 
@@ -14,6 +15,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
+	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/torrentx"
@@ -38,6 +40,7 @@ func TestDiscoveryCreate(t *testing.T) {
 			q,
 			searchplugin.Unimplemented{},
 			ddisc.UnimplementedStrategy{},
+			tracking.NewURIImport(q, http.DefaultClient, fsx.DirVirtual(t.TempDir())),
 			ddiscapi.HTTPDiscoveryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/ddisc/discovery").Subrouter())
 		srv := cmdtestx.NewTLSServer(t, q, routes)

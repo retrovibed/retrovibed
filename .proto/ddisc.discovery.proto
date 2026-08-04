@@ -4,6 +4,15 @@ package ddisc;
 
 import "meta.search.proto";
 
+enum AcquisitionState {
+  Unknown = 0;
+  Ephemeral = 1;   // search result, not persisted.
+  Available = 2;   // was persisted but download was not initaited. generally
+                   // means it was put into the recommendations queue.
+  Downloading = 3; // actively being downloaded.
+  Completed = 4;   // we completed a download of this record.
+}
+
 message Discovery {
   string id = 1 [ json_name = "id" ];
   bytes infohash = 2 [ json_name = "infohash" ];
@@ -18,6 +27,8 @@ message Discovery {
   uint32 policy_rank = 11 [ json_name = "policy_rank" ];
   string known_media_id = 12 [ json_name = "known_media_id" ];
   string source = 13 [ json_name = "source" ];
+  string uri = 14 [ json_name = "uri" ];
+  AcquisitionState acquisition_state = 15 [ json_name = "acquisition_state" ];
 }
 
 message DiscoverySearchRequest {
@@ -42,7 +53,10 @@ message DiscoveryCreateResponse {
   Discovery discovery = 1 [ json_name = "discovery" ];
 }
 
-message DiscoveryDownloadRequest {}
+message DiscoveryDownloadRequest {
+  Discovery discovery = 1 [ json_name = "discovery" ];
+  bool autodownload = 2 [ json_name = "autodownload" ];
+}
 message DiscoveryDownloadResponse {
   Discovery discovery = 1 [ json_name = "discovery" ];
 }

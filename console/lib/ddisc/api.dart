@@ -18,13 +18,20 @@ abstract class sources {
 abstract class api {
   static Future<DiscoveryDownloadResponse> download(
     String id, {
+    Discovery? discovery,
+    bool autodownload = true,
     List<httpx.Option> options = const [],
   }) async {
     return httpx
         .post(
-          Uri.https(httpx.host(), "/ddisc/discovery/${id}", {}),
+          Uri.https(httpx.host(), "/ddisc/discovery/download", {}),
           options: options,
-          body: jsonEncode(DiscoveryDownloadRequest().toProto3Json()),
+          body: jsonEncode(
+            DiscoveryDownloadRequest(
+              discovery: discovery ?? (Discovery.create()..id = id),
+              autodownload: autodownload,
+            ).toProto3Json(),
+          ),
         )
         .then((v) {
           return Future.value(

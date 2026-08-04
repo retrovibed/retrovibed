@@ -18,7 +18,9 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
+	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
+	"github.com/retrovibed/retrovibed/shallows/tracking"
 	"github.com/stretchr/testify/require"
 )
 
@@ -54,6 +56,7 @@ func TestHTTPDiscoveryLocateSocket(t *testing.T) {
 			q,
 			searchplugin.Unimplemented{},
 			nil,
+			tracking.NewURIImport(q, http.DefaultClient, fsx.DirVirtual(t.TempDir())),
 			ddiscapi.HTTPDiscoveryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 

@@ -15,6 +15,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
+	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
@@ -46,6 +47,7 @@ func TestHTTPDiscoverySearch(t *testing.T) {
 			q,
 			searchplugin.Unimplemented{},
 			ddisc.UnimplementedStrategy{},
+			tracking.NewURIImport(q, http.DefaultClient, fsx.DirVirtual(t.TempDir())),
 			ddiscapi.HTTPDiscoveryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
@@ -94,6 +96,7 @@ func TestHTTPDiscoverySearch(t *testing.T) {
 			q,
 			searchplugin.Unimplemented{},
 			ddisc.UnimplementedStrategy{},
+			tracking.NewURIImport(q, http.DefaultClient, fsx.DirVirtual(t.TempDir())),
 			ddiscapi.HTTPDiscoveryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
@@ -142,6 +145,7 @@ func TestHTTPDiscoverySearch(t *testing.T) {
 			q,
 			searchplugin.Unimplemented{},
 			ddisc.UnimplementedStrategy{},
+			tracking.NewURIImport(q, http.DefaultClient, fsx.DirVirtual(t.TempDir())),
 			ddiscapi.HTTPDiscoveryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 

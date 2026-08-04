@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart' as material;
+import 'package:flutter/widgets.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 
 class Card extends material.StatelessWidget {
@@ -61,6 +62,7 @@ class Card extends material.StatelessWidget {
               child: material.Column(
                 spacing: defaults.spacing / 2.5,
                 mainAxisSize: material.MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   ...leading,
                   material.Flexible(child: child, fit: fit),

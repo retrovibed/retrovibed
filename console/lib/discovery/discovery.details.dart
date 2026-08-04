@@ -22,7 +22,6 @@ class DiscoveryDetails extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final defaults = ds.Defaults.of(context);
-
     return ds.Card(
       alignment: Alignment.topLeft,
       margin: margin,
@@ -37,20 +36,13 @@ class DiscoveryDetails extends StatelessWidget {
               known.description.isNotEmpty ? known.description : current.title,
               style: theme.textTheme.titleMedium,
             ),
-            Text("Media", style: theme.textTheme.titleSmall),
-            forms.Field(
-              label: const Text("summary"),
-              input: Text(known.summary.isEmpty ? '—' : known.summary),
-            ),
-            forms.Field(
-              label: const Text("rating"),
-              input: ds.Rating(rating: known.rating),
-            ),
+            Text(known.summary.isEmpty ? '—' : known.summary),
+            ds.Rating(rating: known.rating),
             forms.Field(
               label: const Text("released"),
               input: ds.Timestamp.iso8601(
                 known.released,
-                neginf: Text("unknown"),
+                inf: Text("unknown"),
               ),
             ),
             forms.Field(
@@ -72,7 +64,7 @@ class DiscoveryDetails extends StatelessWidget {
             ),
             forms.Field(
               label: const Text("updated"),
-              input: ds.Debug.pink(ds.Timestamp.iso8601(current.updatedAt, neginf: ds.Empty)),
+              input: ds.Timestamp.iso8601(current.updatedAt, neginf: ds.Empty),
             ),
             forms.Field(
               label: const Text("next check"),
