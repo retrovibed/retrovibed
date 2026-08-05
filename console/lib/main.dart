@@ -1,13 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:window_manager/window_manager.dart';
 
-import 'package:retrovibed/navbar.dart' as navbar;
 import 'package:retrovibed/billing.dart' as billing;
 import 'package:retrovibed/authn.dart' as authn;
-import 'package:retrovibed/downloads.dart' as downloads;
-import 'package:retrovibed/settings.dart' as settings;
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/library.dart' as medialib;
 import 'package:retrovibed/designkit.dart' as ds;
@@ -15,9 +11,8 @@ import 'package:retrovibed/meta.dart' as meta;
 import 'package:retrovibed/retrovibed.dart' as retro;
 import 'package:retrovibed/deeplink.dart';
 import 'package:retrovibed/design.kit/theme.defaults.dart' as theming;
-import 'package:retrovibed/design.kit/modals.dart' as modals;
-import 'package:retrovibed/community.dart' as community;
 import 'package:retrovibed/mimex.dart' as mimex;
+import 'package:retrovibed/routes.dart' as routes;
 
 TextScaler autoscaling(BuildContext context) {
   // final width = MediaQuery.of(context).size.width;
@@ -148,91 +143,7 @@ class Retrovibed extends StatelessWidget {
                                         })
                                         .ignore();
                                   },
-                                  DefaultTabController(
-                                    length: 4,
-                                    child: ds.build((context) {
-                                      final defaults = ds.Defaults.of(context);
-                                      final compact = defaults.isCompact;
-                                      final nochrome = ds.Full.nochrome(context);
-                                      final tabbar = TabBar(
-                                        dividerHeight: 0,
-                                        tabs: [
-                                          Tab(icon: Icon(Icons.movie)),
-                                          Tab(icon: Icon(Icons.download)),
-                                          Tab(icon: Icon(Icons.groups)),
-                                          Tab(icon: Icon(Icons.settings)),
-                                        ],
-                                      );
-
-                                      Widget tabs = DecoratedBox(
-                                        decoration: BoxDecoration(
-                                          border: Border(
-                                            bottom: BorderSide(
-                                              width: 1.0,
-                                              color: Theme.of(context).dividerColor,
-                                            ),
-                                          ),
-                                        ),
-                                        child: DragToMoveArea(
-                                          child: Row(
-                                            children: [
-                                              Expanded(
-                                                child: tabbar,
-                                              ),
-                                              if (defaults.desktop) navbar.Hamburger(),
-                                            ],
-                                          ),
-                                        ),
-                                      );
-                                      if (defaults.desktop) {
-                                        tabs = DragToMoveArea(child: tabs);
-                                      }
-
-                                      return Scaffold(
-                                        appBar: (!compact && !nochrome)
-                                            ? PreferredSize(
-                                                preferredSize: Size.fromHeight(kTextTabBarHeight),
-                                                child: tabs,
-                                              )
-                                            : null,
-                                        bottomNavigationBar: (compact && !nochrome) ? tabs : null,
-                                        body: ds.ErrorBoundary(
-                                          TabBarView(
-                                            // disable scrolling so that people dont accidently scroll
-                                            // through the tabs
-                                            physics: const NeverScrollableScrollPhysics(),
-                                            children: [
-                                              modals.Node(
-                                                media.AutoHelp(
-                                                  media.Playlist.wrap((ctx, s) {
-                                                    return media.VideoScreen(
-                                                      medialib.Home(
-                                                        key: ValueKey("library"),
-                                                        focus: defaults.mobile ? null : s.searchfocus,
-                                                        controller: s.controller,
-                                                        highlighted: s.known.id,
-                                                        search: s.search,
-                                                      ),
-                                                      s.player,
-                                                      s.playerfocus,
-                                                      s.overlay,
-                                                    );
-                                                  }),
-                                                ),
-                                              ),
-                                              modals.Node(
-                                                downloads.AutoHelp(
-                                                  downloads.MeteredWarning(const downloads.Display()),
-                                                ),
-                                              ),
-                                              modals.Node(community.AutoHelp(community.Management())),
-                                              modals.Node(settings.AutoHelp(const settings.Display())),
-                                            ],
-                                          ),
-                                        ),
-                                      );
-                                    }),
-                                  ),
+                                  const routes.Routes(),
                                 ),
                               ),
                             ),

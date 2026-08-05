@@ -8,10 +8,10 @@ import 'package:retrovibed/discovery.dart' as disc;
 import 'known.media.display.dart';
 import 'media.settings.dart';
 import 'known.media.dropdown.dart';
-import 'empty.results.dart';
 
 class Grid extends StatefulWidget {
   final List<Widget> leading;
+  final Widget empty;
   final media.FnMediaSearch apisearch;
   final ValueNotifier<media.MediaSearchState> search;
   final String highlighted;
@@ -20,6 +20,7 @@ class Grid extends StatefulWidget {
     super.key,
     this.apisearch = media.media.search,
     this.leading = const [],
+    required this.empty,
     required this.search,
     required this.highlighted,
   });
@@ -113,7 +114,7 @@ class _GridState extends State<Grid> {
               ),
             ),
           ],
-          empty: EmptyResults(search: state),
+          empty: widget.empty,
           (context, _media) {
             final onSettings = () {
               ds.modals.asyncfn<media.Media>(

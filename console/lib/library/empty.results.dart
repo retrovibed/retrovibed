@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
-import 'package:retrovibed/media.dart' as media;
-import 'package:retrovibed/uuidx.dart' as uuidx;
-import 'package:retrovibed/discovery/search.button.dart';
 
 // EmptyResults is shown in place of the library grid/list when a search
-// turns up nothing locally, offering to locate suggestions from the wider
-// network via SearchButton.
+// turns up nothing locally, offering to switch into discovery mode to
+// search the wider network via the same suggestions.
 class EmptyResults extends StatelessWidget {
-  final media.MediaSearchState search;
+  final VoidCallback onDiscover;
 
-  const EmptyResults({super.key, required this.search});
+  const EmptyResults({super.key, required this.onDiscover});
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +27,11 @@ class EmptyResults extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            SearchButton(key: ValueKey(uuidx.md5x(search.next.query)), search: search),
+            ElevatedButton.icon(
+              onPressed: onDiscover,
+              icon: const Icon(Icons.travel_explore_rounded),
+              label: const Text("discover"),
+            ),
           ],
         ),
       ),

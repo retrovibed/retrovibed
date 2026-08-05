@@ -1,11 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:retrovibed/discovery.dart' as disc;
 import 'package:retrovibed/library/dropdown.upload.dart';
 import 'package:retrovibed/library/home.dart';
 import 'package:retrovibed/library/known.media.display.dart';
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
+
+IconData _searchMenuItemIcon(WidgetTester tester) {
+  final icon = find.descendant(
+    of: find.ancestor(of: find.text('Search'), matching: find.byType(ListTile)),
+    matching: find.byType(Icon),
+  );
+  return tester.widget<Icon>(icon).icon!;
+}
 
 final _resolutions = Resolutions.variant();
 
@@ -52,6 +61,90 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(KnownMediaDisplay), findsNothing);
+    }, variant: _resolutions);
+
+    testWidgets('keeps the discover-mode check icon after switching mimetype filters', (
+      WidgetTester tester,
+    ) async {
+      final entry = _resolutions.currentValue!;
+      final search = ValueNotifier<media.MediaSearchState>(
+        media.MediaSearchState(next: media.media.request(limit: 32)),
+      );
+      addTearDown(search.dispose);
+      await tester.pumpApp(
+        Home(
+          apisearch: (req, {options = const []}) async {
+            return media.MediaSearchResponse(items: [], next: req);
+          },
+          search: search,
+          highlighted: '',
+        ),
+        physicalSize: entry.value,
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(DropdownUpload));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Search'));
+      await tester.tap(find.text('Search'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(DropdownUpload));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Search'));
+      expect(_searchMenuItemIcon(tester), equals(Icons.check));
+
+      // Switching mimetype filters doesn't close the menu; the Search item's
+      // icon should still reflect discovery mode within the same open session.
+      await tester.ensureVisible(find.text('Movies'));
+      await tester.tap(find.text('Movies'));
+      await tester.pumpAndSettle();
+      expect(_searchMenuItemIcon(tester), equals(Icons.check));
+
+      await tester.ensureVisible(find.text('Search'));
+      await tester.tap(find.text('Search'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(DropdownUpload));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Search'));
+      expect(_searchMenuItemIcon(tester), equals(Icons.travel_explore));
+    }, variant: _resolutions);
+
+    testWidgets('switches to discovery mode when the empty-results discover button is tapped', (
+      WidgetTester tester,
+    ) async {
+      final entry = _resolutions.currentValue!;
+      final search = ValueNotifier<media.MediaSearchState>(
+        media.MediaSearchState(next: media.media.request(limit: 32, query: 'something')),
+      );
+      addTearDown(search.dispose);
+      await tester.pumpApp(
+        Home(
+          apisearch: (req, {options = const []}) async {
+            return media.MediaSearchResponse(items: [], next: req);
+          },
+          search: search,
+          highlighted: '',
+        ),
+        physicalSize: entry.value,
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.widgetWithText(ElevatedButton, 'discover'), findsOneWidget);
+      expect(find.byType(disc.DiscoveryGrid), findsNothing);
+
+      await tester.tap(find.widgetWithText(ElevatedButton, 'discover'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(disc.DiscoveryGrid), findsOneWidget);
+
+      await tester.tap(find.byType(DropdownUpload));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Search'));
+      expect(_searchMenuItemIcon(tester), equals(Icons.check));
+
+      expect(tester.takeException(), isNull);
     }, variant: _resolutions);
   });
 }

@@ -36,6 +36,7 @@ void main() {
             return media.MediaSearchResponse(items: [], next: req);
           },
           search: search,
+          empty: const SizedBox.shrink(),
           highlighted: '',
         ),
         physicalSize: entry.value,
@@ -71,6 +72,7 @@ void main() {
             );
           },
           search: search,
+          empty: const SizedBox.shrink(),
           highlighted: '',
         ),
         physicalSize: entry.value,
@@ -107,6 +109,7 @@ void main() {
             );
           },
           search: search,
+          empty: const SizedBox.shrink(),
           highlighted: '',
         ),
         physicalSize: entry.value,
@@ -142,6 +145,7 @@ void main() {
             );
           },
           search: search,
+          empty: const SizedBox.shrink(),
           highlighted: uuidx.withSuffix(1),
         ),
         physicalSize: entry.value,
@@ -169,6 +173,7 @@ void main() {
             );
           },
           search: search,
+          empty: const SizedBox.shrink(),
           highlighted: '',
         ),
       );

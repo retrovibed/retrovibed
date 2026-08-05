@@ -81,7 +81,7 @@ class _SearchTrayState extends State<SearchTray> {
     if (widget.autoscroll) {
       postframe(() {
         if (!mounted) return;
-        Scrollable.ensureVisible(context);
+        context.findRenderObject()?.showOnScreen();
       });
     }
   }

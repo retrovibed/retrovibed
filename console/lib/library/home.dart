@@ -10,6 +10,7 @@ import 'grid.setting.dart';
 import 'menu.upload.files.dart';
 import 'search.mimetype.dropdown.dart';
 import 'dropdown.upload.dart';
+import 'empty.results.dart';
 
 class Home extends StatefulWidget {
   final media.FnMediaSearch apisearch;
@@ -38,11 +39,22 @@ enum _Mode { library, discovery }
 class _HomeState extends State<Home> {
   Widget _downloading = ds.Empty;
   Widget _tuning = ds.Empty;
-  _Mode _mode = _Mode.library;
+  final ValueNotifier<_Mode> _mode = ValueNotifier(_Mode.library);
 
   void setState(VoidCallback fn) {
     if (!mounted) return;
     super.setState(fn);
+  }
+
+  void _switchToDiscovery() {
+    _mode.value = _Mode.discovery;
+    widget.focus?.requestFocus();
+  }
+
+  @override
+  void dispose() {
+    _mode.dispose();
+    super.dispose();
   }
 
   @override
@@ -110,17 +122,18 @@ class _HomeState extends State<Home> {
                     ...SearchMimetypeDropdown.menuItems(widget.search),
                     PopupMenuItem<String>(
                       onTap: () {
-                        final next = _mode == _Mode.discovery ? _Mode.library : _Mode.discovery;
-                        setState(() {
-                          _mode = next;
-                        });
-                        if (next == _Mode.discovery) {
-                          widget.focus?.requestFocus();
+                        if (_mode.value == _Mode.discovery) {
+                          _mode.value = _Mode.library;
+                        } else {
+                          _switchToDiscovery();
                         }
                       },
-                      child: ListTile(
-                        leading: Icon(_mode == _Mode.discovery ? Icons.check : Icons.travel_explore),
-                        title: const Text("Search"),
+                      child: ValueListenableBuilder<_Mode>(
+                        valueListenable: _mode,
+                        builder: (context, mode, _) => ListTile(
+                          leading: Icon(mode == _Mode.discovery ? Icons.check : Icons.travel_explore),
+                          title: const Text("Search"),
+                        ),
                       ),
                     ),
                     const PopupMenuDivider(),
@@ -162,24 +175,28 @@ class _HomeState extends State<Home> {
           ),
         ),
         Expanded(
-          child: switch (_mode) {
-            _Mode.library => Grid(
-              apisearch: widget.apisearch,
-              search: widget.search,
-              highlighted: widget.highlighted,
-              leading: [
-                _tuning,
-                _downloading,
-              ],
-            ),
-            _Mode.discovery => disc.DiscoveryGrid(
-              search: widget.search,
-              leading: [
-                _tuning,
-                _downloading,
-              ],
-            ),
-          },
+          child: ValueListenableBuilder<_Mode>(
+            valueListenable: _mode,
+            builder: (context, mode, _) => switch (mode) {
+              _Mode.library => Grid(
+                apisearch: widget.apisearch,
+                search: widget.search,
+                highlighted: widget.highlighted,
+                empty: EmptyResults(onDiscover: _switchToDiscovery),
+                leading: [
+                  _tuning,
+                  _downloading,
+                ],
+              ),
+              _Mode.discovery => disc.DiscoveryGrid(
+                search: widget.search,
+                leading: [
+                  _tuning,
+                  _downloading,
+                ],
+              ),
+            },
+          ),
         ),
       ],
     );
