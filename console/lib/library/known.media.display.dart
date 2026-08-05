@@ -242,9 +242,10 @@ class _KnownMediaDisplayState extends State<KnownMediaDisplay> {
           (context, constraints) {
             final defaults = ds.Defaults.of(context);
             return Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 if (constraints.maxWidth >= 260) ds.Rating(rating: current.rating),
-                Expanded(child: KnownMediaSource(current)),
+                Flexible(child: KnownMediaSource(current)),
                 Visibility(
                   visible: (authn.AuthzCache.of(context).meta.current.token.archiveUpload.toInt()) > 0,
                   child: uuidx.pattern(widget.media.archiveId, archivable, archiving, purge),

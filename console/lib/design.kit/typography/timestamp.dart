@@ -77,7 +77,11 @@ class Timestamp extends StatelessWidget {
           message: timestamp.toIso8601String(),
           child: Row(
             mainAxisSize: MainAxisSize.min,
-            children: [leading, Flexible(child: content), trailing],
+            children: [
+              leading,
+              Flexible(child: content),
+              trailing,
+            ],
           ),
         );
       },

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/discovery.dart' as disc;
 import 'package:retrovibed/library/dropdown.upload.dart';
 import 'package:retrovibed/library/home.dart';
 import 'package:retrovibed/library/known.media.display.dart';
 import 'package:retrovibed/media.dart' as media;
+import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
 
@@ -145,6 +147,63 @@ void main() {
       expect(_searchMenuItemIcon(tester), equals(Icons.check));
 
       expect(tester.takeException(), isNull);
+    }, variant: _resolutions);
+
+    testWidgets('shows the search tray discover button only in discovery mode', (
+      WidgetTester tester,
+    ) async {
+      final entry = _resolutions.currentValue!;
+      final search = ValueNotifier<media.MediaSearchState>(
+        media.MediaSearchState(
+          next: media.media.request(limit: 32, mimetypes: mimex.of(mimex.icomovie))..query = 'something',
+        ),
+      );
+      addTearDown(search.dispose);
+      await tester.pumpApp(
+        Home(
+          apisearch: (req, {options = const []}) async {
+            return media.MediaSearchResponse(items: [], next: req);
+          },
+          search: search,
+          highlighted: '',
+        ),
+        physicalSize: entry.value,
+      );
+      await tester.pumpAndSettle();
+
+      final traySearchButton = find.descendant(
+        of: find.byType(ds.SearchTray),
+        matching: find.byType(disc.SearchButton),
+      );
+
+      expect(traySearchButton, findsNothing);
+
+      await tester.tap(find.byType(DropdownUpload));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Search'));
+      await tester.tap(find.text('Search'));
+      await tester.pumpAndSettle();
+
+      // On compact layouts unpinned trailing widgets collapse into the
+      // search tray's overflow menu until it's opened.
+      final traySearchOverflow = find.descendant(
+        of: find.byType(ds.SearchTray),
+        matching: find.byIcon(Icons.more_vert),
+      );
+      if (traySearchOverflow.evaluate().isNotEmpty) {
+        await tester.tap(traySearchOverflow);
+        await tester.pumpAndSettle();
+      }
+
+      expect(traySearchButton, findsOneWidget);
+
+      await tester.tap(find.byType(DropdownUpload));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Search'));
+      await tester.tap(find.text('Search'));
+      await tester.pumpAndSettle();
+
+      expect(traySearchButton, findsNothing);
     }, variant: _resolutions);
   });
 }

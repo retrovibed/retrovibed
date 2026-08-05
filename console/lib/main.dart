@@ -41,7 +41,6 @@ void main(List<String> args) async {
     }
 
     FlutterError.onError = FlutterError.dumpErrorToConsole;
-
     ErrorWidget.builder = (FlutterErrorDetails details) {
       FlutterError.dumpErrorToConsole(details);
       return Material(

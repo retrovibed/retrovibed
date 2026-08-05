@@ -11,13 +11,18 @@ import 'locate.p2p.prompt.dart' as p2p;
 // current library search state - the free-text analog of KnownMediaLocator,
 // which locates a specific already-catalogued item.
 class SearchButton extends StatefulWidget {
+  static const Widget _help = ds.Hint(Text("queue the search for automatic discovery and recommendation"));
   final media.MediaSearchState search;
   final Future<api.LocateCreateResponse> Function(api.Locate req, {List<httpx.Option> options}) locate;
+  final Widget? label;
+  final Widget help;
 
   const SearchButton({
     super.key,
     required this.search,
     this.locate = api.locate.create,
+    this.label,
+    this.help = _help,
   });
 
   @override
@@ -77,20 +82,28 @@ class _SearchButtonState extends State<SearchButton> {
     final mimetype = mimex.category(widget.search.next.mimetypes);
     if (query.isEmpty || mimetype.isEmpty) return ds.Empty;
 
+    final label = widget.label ?? Text(_queued ? "queued" : "discover");
+    final icon = Icon(_queued ? Icons.query_builder_rounded : Icons.travel_explore_rounded);
+    final btn = label == ds.Empty
+        ? ds.LoadingIconButton(
+            onPressed: _onPressed,
+            icon: icon,
+            tooltip: _queued ? "queued" : "discover",
+            disabled: _queued,
+          )
+        : ds.LoadingButton(
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              spacing: 8,
+              children: [icon, label],
+            ),
+            onPressed: _onPressed,
+            disabled: _queued,
+          );
+
     return ds.Loading(
       cause: _cause,
-      ds.LoadingButton(
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(_queued ? Icons.query_builder_rounded : Icons.travel_explore_rounded),
-            const SizedBox(width: 8),
-            Text(_queued ? "queued" : "discover"),
-          ],
-        ),
-        onPressed: _onPressed,
-        disabled: _queued,
-      ),
+      btn,
     );
   }
 }

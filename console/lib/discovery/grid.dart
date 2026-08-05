@@ -9,6 +9,8 @@ import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/ddisc.dart' as ddisc;
 import 'discovery.card.dart';
+import 'empty.results.dart';
+import 'search.button.dart';
 
 class DiscoveryGrid extends StatefulWidget {
   final ValueNotifier<media.MediaSearchState> search;
@@ -112,8 +114,6 @@ class _DiscoveryGridState extends State<DiscoveryGrid> {
           ds.postframe(() => refresh());
         }
 
-        final defaults = ds.Defaults.of(context);
-
         return ds.ErrorScreen(
           cause: _cause,
           ds.Grid<ddisc.Discovery>(
@@ -123,17 +123,7 @@ class _DiscoveryGridState extends State<DiscoveryGrid> {
             loading: _loading,
             physics: AlwaysScrollableScrollPhysics(),
             leading: widget.leading,
-            empty: Center(
-              child: Padding(
-                padding: defaults.padding,
-                child: Text(
-                  "no candidates found on the network for this search",
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                  ),
-                ),
-              ),
-            ),
+            empty: EmptyResults(SearchButton(search: state)),
           ),
         );
       },

@@ -32,17 +32,13 @@ class DiscoveryDetails extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           spacing: defaults.spacing / 4,
           children: [
-            Text(
-              known.description.isNotEmpty ? known.description : current.title,
-              style: theme.textTheme.titleMedium,
-            ),
             Text(known.summary.isEmpty ? '—' : known.summary),
             ds.Rating(rating: known.rating),
             forms.Field(
               label: const Text("released"),
               input: ds.Timestamp.iso8601(
                 known.released,
-                inf: Text("unknown"),
+                inf: ds.Empty,
               ),
             ),
             forms.Field(
@@ -70,7 +66,6 @@ class DiscoveryDetails extends StatelessWidget {
               label: const Text("next check"),
               input: ds.Timestamp.iso8601(current.nextCheck, neginf: ds.Empty),
             ),
-            forms.Field(label: const Text("updated"), input: Text(current.updatedAt)),
             forms.Field(label: const Text("poster"), input: Text(known.image)),
             forms.Field(
               label: const Text("discovered"),

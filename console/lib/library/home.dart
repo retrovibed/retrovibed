@@ -82,6 +82,12 @@ class _HomeState extends State<Home> {
               }),
             ],
             controller: widget.controller,
+            trailing: [
+              ValueListenableBuilder<_Mode>(
+                valueListenable: _mode,
+                builder: (context, mode, _) => mode == _Mode.discovery ? disc.SearchButton(search: state, label: ds.Empty) : ds.Empty,
+              ),
+            ],
             tuning: ds.buttons.settings(
               onPressed: () => setState(() {
                 _tuning = _tuning == ds.Empty ? GridSettings() : ds.Empty;

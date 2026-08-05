@@ -159,7 +159,7 @@ void main() {
         physicalSize: entry.value,
         KnownMediaCard(
           api.Known(description: 'Test Known', summary: 'Test summary'),
-          trailing: const Text('trailing'),
+          trailing: const [Text('trailing')],
         ),
       );
       await tester.pumpAndSettle();

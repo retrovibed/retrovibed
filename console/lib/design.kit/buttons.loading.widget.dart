@@ -7,6 +7,7 @@ class LoadingButton extends StatefulWidget {
   final Widget child;
   final bool disabled;
   final Border? border;
+  final ButtonStyle? style;
 
   const LoadingButton(
     this.child, {
@@ -14,6 +15,7 @@ class LoadingButton extends StatefulWidget {
     required this.onPressed,
     this.disabled = false,
     this.border,
+    this.style,
   });
 
   @override
@@ -51,6 +53,7 @@ class _LoadingButtonState extends State<LoadingButton> {
   Widget build(BuildContext context) {
     return OutlinedButton(
       onPressed: (_isLoading || widget.disabled) ? null : _handlePress,
+      style: widget.style,
       child: screens.Loading(
         widget.child,
         loading: _isLoading,

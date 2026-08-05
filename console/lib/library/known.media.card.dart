@@ -83,7 +83,7 @@ class KnownMediaCard extends StatelessWidget {
   });
 
   static Widget description(String description) {
-    return Expanded(
+    return Flexible(
       child: Tooltip(
         message: description,
         child: Center(
@@ -176,7 +176,12 @@ class KnownMediaCard extends StatelessWidget {
               children: leading.isEmpty ? [KnownMediaCard.description(current.description)] : leading,
             ),
           ],
-          trailing: trailing.isEmpty ? [KnownMediaCard.released(current.released)] : trailing,
+          trailing: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: trailing.isEmpty ? [KnownMediaCard.released(current.released)] : trailing,
+            ),
+          ],
           fit: FlexFit.tight,
         ),
       ),
