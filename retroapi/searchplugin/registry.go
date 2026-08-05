@@ -7,6 +7,7 @@ import (
 	"maps"
 	"net"
 	"os"
+	"path/filepath"
 	"sync"
 
 	"github.com/egdaemon/wasinet/wasinet/wnetruntime"
@@ -60,6 +61,15 @@ type Registry struct {
 	// wasip1 has no trust store of its own.
 	sslCertDir string
 
+	// configDir is the config root (e.g. userx.DefaultConfigDir(...)) this
+	// registry's plugins read per-plugin config from
+	// (PluginConfigDir(configDir, name), under SearchPluginDir(configDir)).
+	configDir string
+	// cacheDir is the cache root (e.g. userx.DefaultCacheDirectory(...))
+	// this registry's plugins write per-plugin cache state to
+	// (PluginCacheDir(cacheDir, name), under SearchPluginDir(cacheDir)).
+	cacheDir string
+
 	mu      sync.RWMutex
 	modules map[string]wazero.CompiledModule
 
@@ -69,27 +79,45 @@ type Registry struct {
 	pool *asynccompute.Pool[workload]
 }
 
+// Option customizes a Registry built by NewRegistry/NewRegistryWithSocket.
+type Option func(*Registry)
+
+// OptionConfigDir overrides the config root a Registry's plugins read
+// per-plugin config from (default: userx.DefaultConfigDir(userx.DefaultRelRoot())).
+// Also where the search.d plugin directory itself is watched from.
+func OptionConfigDir(dir string) Option {
+	return func(r *Registry) { r.configDir = dir }
+}
+
+// OptionCacheDir overrides the cache root a Registry's plugins write
+// per-plugin cache state to (default: userx.DefaultCacheDirectory(userx.DefaultRelRoot())).
+func OptionCacheDir(dir string) Option {
+	return func(r *Registry) { r.cacheDir = dir }
+}
+
 // NewRegistry builds a Registry using wasinet's default Virtual socket
 // (public addresses only — plugins never open real kernel sockets, every
 // dial/lookup goes through the host's *net.Dialer/*net.Resolver instead).
 // See NewRegistryWithSocket to substitute a different wnetruntime.Socket.
-func NewRegistry(ctx context.Context) (*Registry, error) {
-	return NewRegistryWithSocket(ctx, defaultSocket())
+func NewRegistry(ctx context.Context, options ...Option) (*Registry, error) {
+	return NewRegistryWithSocket(ctx, defaultSocket(), options...)
 }
 
 // NewRegistryWithSocket builds a Registry using sock for wasinet's guest
 // networking instead of the default Virtual/PublicFirewall socket — e.g. to
 // route plugin traffic through a different Dialer/Resolver (wireguard,
 // dnscache, a test double) — and starts watching the well-known search.d
-// plugin directory (${vars_user_configuration_directory}/search.d) for
-// changes. There is no other configuration surface.
-func NewRegistryWithSocket(ctx context.Context, sock wnetruntime.Socket) (*Registry, error) {
-	r, err := newRegistry(ctx, sock)
+// plugin directory (SearchPluginDir(${vars_user_configuration_directory}))
+// for changes. Pass OptionConfigDir/OptionCacheDir to point a Registry at
+// different roots (e.g. a t.TempDir() in tests) instead of the real,
+// hardcoded userx directories.
+func NewRegistryWithSocket(ctx context.Context, sock wnetruntime.Socket, options ...Option) (*Registry, error) {
+	r, err := newRegistry(ctx, sock, options...)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := watch(ctx, r, SearchPluginDir()); err != nil {
+	if err := watch(ctx, r, SearchPluginDir(r.configDir)); err != nil {
 		return nil, err
 	}
 
@@ -103,7 +131,7 @@ func defaultSocket() wnetruntime.Socket {
 // newRegistry builds the wazero runtime + WASI + wasinet wiring for sock
 // without starting the search.d directory watch, so tests can Load plugins
 // directly without touching the real, hardcoded plugin directory.
-func newRegistry(ctx context.Context, sock wnetruntime.Socket) (*Registry, error) {
+func newRegistry(ctx context.Context, sock wnetruntime.Socket, options ...Option) (*Registry, error) {
 	runtime := wazero.NewRuntime(ctx)
 
 	if _, err := wasi_snapshot_preview1.Instantiate(ctx, runtime); err != nil {
@@ -124,17 +152,47 @@ func newRegistry(ctx context.Context, sock wnetruntime.Socket) (*Registry, error
 			),
 			"/etc/ssl/certs",
 		),
-		modules: map[string]wazero.CompiledModule{},
+		configDir: userx.DefaultConfigDir(userx.DefaultRelRoot()),
+		cacheDir:  userx.DefaultCacheDirectory(userx.DefaultRelRoot()),
+		modules:   map[string]wazero.CompiledModule{},
+	}
+	for _, opt := range options {
+		opt(r)
 	}
 	r.pool = asynccompute.New(r.runSearchJob)
 
 	return r, nil
 }
 
-// SearchPluginDir is the well-known directory watched for search-plugin
-// .wasm modules (${vars_user_configuration_directory}/search.d).
-func SearchPluginDir() string {
-	return userx.DefaultConfigDir(userx.DefaultRelRoot(), "search.d")
+// SearchPluginDir is the well-known search.d directory nested under root —
+// the config-rooted form (root = userx.DefaultConfigDir(userx.DefaultRelRoot()))
+// is where plugin .wasm/.env files live; the cache-rooted form
+// (root = userx.DefaultCacheDirectory(userx.DefaultRelRoot())) is its
+// cache-side analogue.
+func SearchPluginDir(root string) string {
+	return filepath.Join(root, "search.d")
+}
+
+// PluginConfigDir is the well-known per-plugin configuration directory,
+// nested under root's search.d: {root}/search.d/{name}.config.d.
+func PluginConfigDir(root string, name string) string {
+	return filepath.Join(SearchPluginDir(root), name+".config.d")
+}
+
+// PluginCacheDir is the well-known per-plugin cache directory, nested under
+// root's search.d: {root}/search.d/{name}.cache.d.
+func PluginCacheDir(root string, name string) string {
+	return filepath.Join(SearchPluginDir(root), name+".cache.d")
+}
+
+// PluginConfigDir returns this registry's per-plugin config directory for name.
+func (r *Registry) PluginConfigDir(name string) string {
+	return PluginConfigDir(r.configDir, name)
+}
+
+// PluginCacheDir returns this registry's per-plugin cache directory for name.
+func (r *Registry) PluginCacheDir(name string) string {
+	return PluginCacheDir(r.cacheDir, name)
 }
 
 // Load compiles path (a .wasm file) and adds it to the registry. Compiling

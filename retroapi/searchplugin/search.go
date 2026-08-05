@@ -26,6 +26,14 @@ import (
 // guest's crypto/x509 can find it.
 const guestSSLCertDir = "/etc/ssl/certs"
 
+// guestPluginConfigDir and guestPluginCacheDir are where each plugin
+// invocation's per-plugin config/cache directories are mounted inside the
+// guest — matched by the CONFIGURATION_DIRECTORY/CACHE_DIRECTORY env vars
+// (systemd's ConfigurationDirectory=/CacheDirectory= convention) so the
+// plugin can find them without hardcoding the mount point.
+const guestPluginConfigDir = "/plugin/config.d"
+const guestPluginCacheDir = "/plugin/cache.d"
+
 // Search runs every loaded plugin as a WASI command with
 // --mimetype mimetypes[0] [--mimetype mimetypes[1] ...] --query query
 // [--adult], decoding each line of its stdout as a *ddiscapi.Import and
@@ -85,11 +93,26 @@ func (r *Registry) runSearchJob(ctx context.Context, j workload) error {
 	if j.adult {
 		args = append(args, "--adult")
 	}
-	wazerofs := wazero.NewFSConfig().WithDirMount(r.sslCertDir, guestSSLCertDir)
+
+	hostConfigDir := r.PluginConfigDir(id)
+	hostCacheDir := r.PluginCacheDir(id)
+	if err := os.MkdirAll(hostConfigDir, 0700); err != nil {
+		return errorsx.Wrapf(err, "unable to create plugin config directory: %s", hostConfigDir)
+	}
+	if err := os.MkdirAll(hostCacheDir, 0700); err != nil {
+		return errorsx.Wrapf(err, "unable to create plugin cache directory: %s", hostCacheDir)
+	}
+
+	wazerofs := wazero.NewFSConfig().
+		WithDirMount(r.sslCertDir, guestSSLCertDir).
+		WithDirMount(hostConfigDir, guestPluginConfigDir).
+		WithDirMount(hostCacheDir, guestPluginCacheDir)
 	cfg := wazero.NewModuleConfig().
 		WithName(j.path).
 		WithArgs(args...).
 		WithEnv("SSL_CERT_DIR", guestSSLCertDir).
+		WithEnv("CONFIGURATION_DIRECTORY", guestPluginConfigDir).
+		WithEnv("CACHE_DIRECTORY", guestPluginCacheDir).
 		WithFSConfig(wazerofs).
 		WithStdout(stdoutw).
 		WithStderr(os.Stderr).

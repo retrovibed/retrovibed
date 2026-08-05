@@ -36,6 +36,19 @@ import (
 	_ "github.com/egdaemon/wasinet/wasinet/autohijack"
 )
 
+// Registry mounts two per-plugin host directories into the wasm guest,
+// following the systemd ConfigurationDirectory=/CacheDirectory= convention:
+// a config directory at guest path /plugin/config.d, host-side
+// searchplugin.PluginConfigDir(root, name) ({root}/search.d/{name}.config.d),
+// and a cache directory at guest path /plugin/cache.d, host-side
+// searchplugin.PluginCacheDir(root, name) ({root}/search.d/{name}.cache.d).
+// A plugin reads these paths from the CONFIGURATION_DIRECTORY and
+// CACHE_DIRECTORY env vars rather than hardcoding them - e.g. an API key or
+// site-specific settings file would live under CONFIGURATION_DIRECTORY, and
+// anything safe to lose (an HTTP response cache, a session cookie jar) under
+// CACHE_DIRECTORY. This noop plugin needs neither and doesn't read them, but
+// a real plugin typically does.
+
 // mimetypeFlag collects every --mimetype occurrence into a slice, since a
 // search request can carry several candidate discovery mimetypes (see
 // ddisc.Category) and stdlib flag has no built-in repeatable-flag type.
@@ -88,6 +101,12 @@ func main() {
 		fmt.Fprintln(os.Stderr, "searchplugin-noop: --query is required")
 		os.Exit(1)
 	}
+
+	// Registry.Search only parses stdout, so the mounted directories are
+	// reported on stderr - proof, when reading plugin logs, that the mounts
+	// and env vars described above actually reach the guest.
+	fmt.Fprintln(os.Stderr, "searchplugin-noop: CONFIGURATION_DIRECTORY =", os.Getenv("CONFIGURATION_DIRECTORY"))
+	fmt.Fprintln(os.Stderr, "searchplugin-noop: CACHE_DIRECTORY =", os.Getenv("CACHE_DIRECTORY"))
 
 	var mimetype string
 	if len(mimetypes) > 0 {

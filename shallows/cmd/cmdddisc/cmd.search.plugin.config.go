@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
+	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/envx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -21,7 +22,7 @@ type cmdSearchPluginConfig struct {
 
 func (t cmdSearchPluginConfig) Run(gctx *cmdopts.Global) error {
 	name := strings.TrimSuffix(t.Name, ".wasm")
-	plugindir := searchplugin.SearchPluginDir()
+	plugindir := searchplugin.SearchPluginDir(userx.DefaultConfigDir(userx.DefaultRelRoot()))
 	if err := os.MkdirAll(plugindir, 0o700); err != nil {
 		return errorsx.Wrapf(err, "unable to create search plugin directory: %s", plugindir)
 	}

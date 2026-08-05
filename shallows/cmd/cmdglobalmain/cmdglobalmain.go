@@ -136,6 +136,7 @@ func Main(args ...string) {
 		kong.Vars{
 			"vars_private_key":                  env.PrivateKeyPath(),
 			"vars_user_configuration_directory": userx.DefaultConfigDir(userx.DefaultRelRoot()),
+			"vars_user_cache_directory":         userx.DefaultCacheDirectory(userx.DefaultRelRoot()),
 			"vars_date_started":                 tsstarted.UTC().Format(time.DateOnly),
 			"vars_timestamp_started":            tsstarted.UTC().Format(time.RFC3339),
 			"vars_random_seed":                  uuid.Must(uuid.NewV4()).String(),

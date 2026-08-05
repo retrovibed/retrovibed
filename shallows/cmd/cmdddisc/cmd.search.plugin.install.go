@@ -1,7 +1,6 @@
 package cmdddisc
 
 import (
-	"bytes"
 	"context"
 	"log"
 	"os"
@@ -10,19 +9,15 @@ import (
 	"strings"
 
 	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
+	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/envx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 )
 
-// wasmMagic is the 4-byte binary header every valid wasm module begins with
-// ("\0asm"), used to verify a freshly compiled plugin before it's installed
-// into search.d.
-var wasmMagic = []byte{0x00, 0x61, 0x73, 0x6D}
-
 // cmdSearchPluginInstall compiles a searchplugin repository to wasip1/wasm
-// and installs it into searchplugin.SearchPluginDir(), where the
-// registry's fsnotify watch picks it up automatically.
+// and installs it into searchplugin.SearchPluginDir(userx.DefaultConfigDir(...)),
+// where the registry's fsnotify watch picks it up automatically.
 type cmdSearchPluginInstall struct {
 	Repository string   `arg:"" name:"repository" help:"local directory or git URL of a go module implementing the searchplugin protocol"`
 	Branch     string   `flag:"" name:"branch" help:"branch to clone when repository is a git URL" default:"main"`
@@ -47,7 +42,7 @@ func (t cmdSearchPluginInstall) Run(gctx *cmdopts.Global) (err error) {
 	}
 	name = strings.TrimSuffix(name, ".wasm")
 
-	plugindir := searchplugin.SearchPluginDir()
+	plugindir := searchplugin.SearchPluginDir(userx.DefaultConfigDir(userx.DefaultRelRoot()))
 	if err = os.MkdirAll(plugindir, 0o700); err != nil {
 		return errorsx.Wrapf(err, "unable to create search plugin directory: %s", plugindir)
 	}
@@ -60,7 +55,7 @@ func (t cmdSearchPluginInstall) Run(gctx *cmdopts.Global) (err error) {
 		return errorsx.Wrapf(err, "unable to compile search plugin: %s", t.Repository)
 	}
 
-	if err = verifyWasmMagic(tmp); err != nil {
+	if err = searchplugin.VerifyWasmMagic(tmp); err != nil {
 		return err
 	}
 
@@ -117,25 +112,4 @@ func compileWasm(ctx context.Context, dir, pkg, output string, bake []string) er
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
-}
-
-// verifyWasmMagic confirms path begins with the wasm binary header, so an
-// unexpected build output never gets installed into search.d.
-func verifyWasmMagic(path string) error {
-	f, err := os.Open(path)
-	if err != nil {
-		return errorsx.Wrapf(err, "unable to open compiled plugin: %s", path)
-	}
-	defer f.Close()
-
-	magic := make([]byte, len(wasmMagic))
-	if _, err := f.Read(magic); err != nil {
-		return errorsx.Wrapf(err, "unable to read compiled plugin: %s", path)
-	}
-
-	if !bytes.Equal(magic, wasmMagic) {
-		return errorsx.Errorf("compiled output is not a valid wasm module: %s", path)
-	}
-
-	return nil
 }

@@ -1,0 +1,80 @@
+package ddiscapi_test
+
+import (
+	"net/http"
+	"os"
+	"path/filepath"
+	"testing"
+
+	"github.com/gofrs/uuid/v5"
+	"github.com/gorilla/mux"
+	"github.com/retrovibed/retrovibed/retroapi/jwtx"
+	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
+	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
+	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
+	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
+	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
+	"github.com/retrovibed/retrovibed/shallows/meta"
+	"github.com/retrovibed/retrovibed/shallows/metaapi"
+	"github.com/stretchr/testify/require"
+)
+
+func TestHTTPPluginEnvironmentGet(t *testing.T) {
+	configDir := t.TempDir()
+
+	routes := mux.NewRouter()
+	ddiscapi.NewHTTPPluginEnvironment(
+		ddiscapi.HTTPPluginEnvironmentOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+		ddiscapi.HTTPPluginEnvironmentOptionDir(searchplugin.SearchPluginDir(configDir)),
+	).Bind(routes.PathPrefix("/").Subrouter())
+
+	var v meta.Authz
+	require.NoError(t, testx.Fake(&v, meta.AuthzOptionAdmin))
+	claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
+	token := httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)
+
+	t.Run("returns raw content, comments included", func(t *testing.T) {
+		const content = "FOO=\"bar\" # derp 0\n# derp 1\nBAR=\"baz\"\nBIZ=\"BAN\"\n# derp 2\n"
+
+		require.NoError(t, os.MkdirAll(searchplugin.SearchPluginDir(configDir), 0o700))
+		require.NoError(t, os.WriteFile(filepath.Join(searchplugin.SearchPluginDir(configDir), "foo.env"), []byte(content), 0o600))
+
+		resp, req, err := httptestx.BuildRequestBytes(http.MethodGet, "/foo", nil, httptestx.RequestOptionAuthorization(token))
+		require.NoError(t, err)
+
+		routes.ServeHTTP(resp, req)
+
+		require.NoError(t, httpx.ErrorCode(resp.Result()))
+		require.Equal(t, content, resp.Body.String())
+	})
+
+	t.Run("missing environment returns empty body", func(t *testing.T) {
+		resp, req, err := httptestx.BuildRequestBytes(http.MethodGet, "/missing", nil, httptestx.RequestOptionAuthorization(token))
+		require.NoError(t, err)
+
+		routes.ServeHTTP(resp, req)
+
+		require.NoError(t, httpx.ErrorCode(resp.Result()))
+		require.Empty(t, resp.Body.String())
+	})
+
+	t.Run("unauthenticated rejected", func(t *testing.T) {
+		resp, req, err := httptestx.BuildRequestBytes(http.MethodGet, "/foo", nil)
+		require.NoError(t, err)
+
+		routes.ServeHTTP(resp, req)
+
+		require.Equal(t, http.StatusUnauthorized, resp.Code)
+	})
+
+	t.Run("requires privileged token", func(t *testing.T) {
+		unprivileged := jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
+		resp, req, err := httptestx.BuildRequestBytes(http.MethodGet, "/foo", nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&unprivileged, httpauthtest.UnsafeJWTSecretSource)))
+		require.NoError(t, err)
+
+		routes.ServeHTTP(resp, req)
+
+		require.Equal(t, http.StatusUnauthorized, resp.Code)
+	})
+}

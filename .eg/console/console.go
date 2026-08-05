@@ -189,6 +189,7 @@ func GenerateProtocol(ctx context.Context, _ eg.Op) error {
 		// frontend exclusive
 		runtime.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib/storage -I.proto .proto/storage.proto"),
 		runtime.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib/torrents -I.proto .proto/torrent.proto"),
+		runtime.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib/ddisc/plugin -I.proto .proto/searchplugin.proto"),
 	)
 }
 

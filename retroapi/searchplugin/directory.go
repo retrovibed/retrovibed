@@ -76,3 +76,18 @@ func watch(ctx context.Context, r *Registry, dir string) error {
 func isWasm(name string) bool {
 	return strings.HasSuffix(name, ".wasm")
 }
+
+// SanitizeName strips any character unsafe for use as a single path
+// component under the search plugin directory - keeping only letters,
+// digits, '-', and '_' - so the result cannot contain "..", an absolute
+// path, or a path separator regardless of what an HTTP client supplies.
+func SanitizeName(name string) string {
+	return strings.Map(func(r rune) rune {
+		switch {
+		case r >= 'a' && r <= 'z', r >= 'A' && r <= 'Z', r >= '0' && r <= '9', r == '-', r == '_':
+			return r
+		default:
+			return -1
+		}
+	}, name)
+}

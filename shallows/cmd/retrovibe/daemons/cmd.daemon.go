@@ -307,7 +307,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		return errorsx.Wrap(NeuralImport(ctx, db, userx.DefaultCacheDirectory(userx.DefaultRelRoot()), tvfs, tstore), "media metadata import failed")
 	})
 	asyncx.Background(gctx.Context, mediameta, func(ctx context.Context) error {
-		return errorsx.Wrap(SearchPluginImport(ctx, db, searchplugin.SearchPluginDir(), tvfs, tstore), "search plugin import failed")
+		return errorsx.Wrap(SearchPluginImport(ctx, db, searchplugin.SearchPluginDir(userx.DefaultConfigDir(userx.DefaultRelRoot())), tvfs, tstore), "search plugin import failed")
 	})
 
 	go func() {
@@ -433,6 +433,8 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	}, http.StatusTooManyRequests, http.StatusBadGateway), rootstore)
 	ddiscapi.NewHTTPDiscovery(db, plugins, peertube, discoveryimporter, ddiscapi.HTTPDiscoveryOptionQueryCleaner(mc)).Bind(httpmux.PathPrefix("/ddisc/discovery").Subrouter())
 	ddiscapi.NewHTTPMedia(db).Bind(httpmux.PathPrefix("/ddisc/media").Subrouter())
+	ddiscapi.NewHTTPPluginEnvironment().Bind(httpmux.PathPrefix("/ddisc/plugin/environment").Subrouter())
+	ddiscapi.NewHTTPPluginManagement(plugins).Bind(httpmux.PathPrefix("/ddisc/plugin").Subrouter())
 	ddiscapi.NewHTTPLocate(db, locatemedia).Bind(httpmux.PathPrefix("/l").Subrouter())
 	media.NewHTTPRSSFeed(db).Bind(httpmux.PathPrefix("/rss").Subrouter())
 	media.NewHTTPKnown(db).Bind(httpmux.PathPrefix("/k").Subrouter())

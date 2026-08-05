@@ -9,6 +9,7 @@ import (
 
 	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
+	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdddisc"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/envx"
@@ -39,11 +40,11 @@ func TestSearchPluginInstall(t *testing.T) {
 			"-e", "FOO=bar",
 		))
 
-		wasm, err := os.ReadFile(filepath.Join(searchplugin.SearchPluginDir(), "noop.wasm"))
+		wasm, err := os.ReadFile(filepath.Join(searchplugin.SearchPluginDir(userx.DefaultConfigDir(userx.DefaultRelRoot())), "noop.wasm"))
 		require.NoError(t, err)
 		require.Equal(t, []byte{0x00, 0x61, 0x73, 0x6D}, wasm[:4])
 
-		pairs, err := envx.FromPath(filepath.Join(searchplugin.SearchPluginDir(), "noop.env"))
+		pairs, err := envx.FromPath(filepath.Join(searchplugin.SearchPluginDir(userx.DefaultConfigDir(userx.DefaultRelRoot())), "noop.env"))
 		require.NoError(t, err)
 		require.Equal(t, []string{"FOO=bar"}, pairs)
 	})
@@ -56,9 +57,9 @@ func TestSearchPluginInstall(t *testing.T) {
 			"--name", "noop.wasm",
 		))
 
-		_, err := os.Stat(filepath.Join(searchplugin.SearchPluginDir(), "noop.wasm"))
+		_, err := os.Stat(filepath.Join(searchplugin.SearchPluginDir(userx.DefaultConfigDir(userx.DefaultRelRoot())), "noop.wasm"))
 		require.NoError(t, err)
-		_, err = os.Stat(filepath.Join(searchplugin.SearchPluginDir(), "noop.wasm.wasm"))
+		_, err = os.Stat(filepath.Join(searchplugin.SearchPluginDir(userx.DefaultConfigDir(userx.DefaultRelRoot())), "noop.wasm.wasm"))
 		require.True(t, os.IsNotExist(err))
 	})
 
@@ -102,7 +103,7 @@ func main() {
 
 		r, err := searchplugin.NewRegistry(ctx)
 		require.NoError(t, err)
-		require.NoError(t, r.Load(ctx, filepath.Join(searchplugin.SearchPluginDir(), "baked.wasm")))
+		require.NoError(t, r.Load(ctx, filepath.Join(searchplugin.SearchPluginDir(userx.DefaultConfigDir(userx.DefaultRelRoot())), "baked.wasm")))
 
 		var results []*ddiscapi.Import
 		seq := r.Search(ctx, []string{"video"}, "ubuntu", false)
@@ -122,7 +123,7 @@ func main() {
 
 		require.NoError(t, cmdtestx.Execute(t, cmdtestx.Genparser(cmdddisc.Commands{})(t), "command", "search", "plugin", "install", renamed))
 
-		_, err := os.Stat(filepath.Join(searchplugin.SearchPluginDir(), "myplugin.wasm"))
+		_, err := os.Stat(filepath.Join(searchplugin.SearchPluginDir(userx.DefaultConfigDir(userx.DefaultRelRoot())), "myplugin.wasm"))
 		require.NoError(t, err)
 	})
 }

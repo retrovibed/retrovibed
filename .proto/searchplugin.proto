@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package searchplugin;
+
+message Plugin {
+  string id = 1 [ json_name = "id" ];
+  string name = 2 [ json_name = "name" ];
+  uint64 size = 3 [ json_name = "size" ];
+  string installed_at = 4 [ json_name = "installed_at" ];
+}
+
+message PluginSearchRequest {
+  uint64 offset = 1 [ json_name = "offset" ];
+  uint64 limit = 2 [ json_name = "limit" ];
+}
+message PluginSearchResponse {
+  PluginSearchRequest next = 1 [ json_name = "next" ];
+  repeated Plugin items = 2 [ json_name = "items" ];
+}
+
+message PluginCreateRequest {}
+message PluginCreateResponse {
+  Plugin plugin = 1 [ json_name = "plugin" ];
+}
+
+message PluginFindRequest {}
+message PluginFindResponse {
+  Plugin plugin = 1 [ json_name = "plugin" ];
+}
+
+message PluginDeleteRequest {}
+message PluginDeleteResponse {
+  Plugin plugin = 1 [ json_name = "plugin" ];
+}

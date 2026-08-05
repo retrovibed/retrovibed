@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
+	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdddisc"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/envx"
@@ -16,7 +17,7 @@ func TestSearchPluginConfig(t *testing.T) {
 	t.Run("merges into an existing env file", func(t *testing.T) {
 		t.Setenv("XDG_CONFIG_HOME", t.TempDir())
 
-		envpath := filepath.Join(searchplugin.SearchPluginDir(), "noop.env")
+		envpath := filepath.Join(searchplugin.SearchPluginDir(userx.DefaultConfigDir(userx.DefaultRelRoot())), "noop.env")
 		require.NoError(t, os.MkdirAll(filepath.Dir(envpath), 0o700))
 		require.NoError(t, envx.WriteFile(envpath, []string{"FOO=bar"}))
 
@@ -37,7 +38,7 @@ func TestSearchPluginConfig(t *testing.T) {
 			"-e", "FOO=bar",
 		))
 
-		envpath := filepath.Join(searchplugin.SearchPluginDir(), "noop.env")
+		envpath := filepath.Join(searchplugin.SearchPluginDir(userx.DefaultConfigDir(userx.DefaultRelRoot())), "noop.env")
 		pairs, err := envx.FromPath(envpath)
 		require.NoError(t, err)
 		require.Equal(t, []string{"FOO=bar"}, pairs)
@@ -50,7 +51,7 @@ func TestSearchPluginConfig(t *testing.T) {
 			"-e", "FOO=bar",
 		))
 
-		envpath := filepath.Join(searchplugin.SearchPluginDir(), "noop.env")
+		envpath := filepath.Join(searchplugin.SearchPluginDir(userx.DefaultConfigDir(userx.DefaultRelRoot())), "noop.env")
 		pairs, err := envx.FromPath(envpath)
 		require.NoError(t, err)
 		require.Equal(t, []string{"FOO=bar"}, pairs)

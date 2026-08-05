@@ -94,6 +94,7 @@ func GenerateProtocol(ctx context.Context, op eg.Op) error {
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mddisc.discovery.proto=github.com/retrovibed/retrovibed/shallows/ddiscapi --go_opt=Mmeta.search.proto=github.com/retrovibed/retrovibed/shallows/meta --go_opt=paths=source_relative --go_out=ddiscapi ddisc.discovery.proto"),
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mddisc.media.proto=github.com/retrovibed/retrovibed/shallows/ddiscapi --go_opt=Mmeta.search.proto=github.com/retrovibed/retrovibed/shallows/meta --go_opt=paths=source_relative --go_out=ddiscapi ddisc.media.proto"),
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mddisc.locate.proto=github.com/retrovibed/retrovibed/shallows/ddiscapi --go_opt=paths=source_relative --go_out=ddiscapi ddisc.locate.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Msearchplugin.proto=github.com/retrovibed/retrovibed/shallows/ddiscapi --go_opt=paths=source_relative --go_out=ddiscapi searchplugin.proto"),
 		// ddisc.import.proto is generated only into retroapi/ddiscapi (not shallows/ddiscapi) —
 		// shallows code imports retroapi/ddiscapi directly for the Import type instead of
 		// duplicating its own copy, since two packages registering the same proto file into
