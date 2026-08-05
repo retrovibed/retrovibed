@@ -15,6 +15,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
+	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/retrovibed/retrovibed/shallows/metaapi"
 	"github.com/stretchr/testify/require"
@@ -38,9 +39,10 @@ func TestHTTPPluginEnvironmentGet(t *testing.T) {
 		const content = "FOO=\"bar\" # derp 0\n# derp 1\nBAR=\"baz\"\nBIZ=\"BAN\"\n# derp 2\n"
 
 		require.NoError(t, os.MkdirAll(searchplugin.SearchPluginDir(configDir), 0o700))
+		require.NoError(t, os.WriteFile(filepath.Join(searchplugin.SearchPluginDir(configDir), "foo.wasm"), []byte("foocontent"), 0o600))
 		require.NoError(t, os.WriteFile(filepath.Join(searchplugin.SearchPluginDir(configDir), "foo.env"), []byte(content), 0o600))
 
-		resp, req, err := httptestx.BuildRequestBytes(http.MethodGet, "/foo", nil, httptestx.RequestOptionAuthorization(token))
+		resp, req, err := httptestx.BuildRequestBytes(http.MethodGet, "/"+md5x.String("foo"), nil, httptestx.RequestOptionAuthorization(token))
 		require.NoError(t, err)
 
 		routes.ServeHTTP(resp, req)
@@ -50,7 +52,9 @@ func TestHTTPPluginEnvironmentGet(t *testing.T) {
 	})
 
 	t.Run("missing environment returns empty body", func(t *testing.T) {
-		resp, req, err := httptestx.BuildRequestBytes(http.MethodGet, "/missing", nil, httptestx.RequestOptionAuthorization(token))
+		require.NoError(t, os.WriteFile(filepath.Join(searchplugin.SearchPluginDir(configDir), "missing.wasm"), []byte("missingcontent"), 0o600))
+
+		resp, req, err := httptestx.BuildRequestBytes(http.MethodGet, "/"+md5x.String("missing"), nil, httptestx.RequestOptionAuthorization(token))
 		require.NoError(t, err)
 
 		routes.ServeHTTP(resp, req)
@@ -59,8 +63,17 @@ func TestHTTPPluginEnvironmentGet(t *testing.T) {
 		require.Empty(t, resp.Body.String())
 	})
 
+	t.Run("unknown id not found", func(t *testing.T) {
+		resp, req, err := httptestx.BuildRequestBytes(http.MethodGet, "/"+md5x.String("nonexistent"), nil, httptestx.RequestOptionAuthorization(token))
+		require.NoError(t, err)
+
+		routes.ServeHTTP(resp, req)
+
+		require.Equal(t, http.StatusNotFound, resp.Code)
+	})
+
 	t.Run("unauthenticated rejected", func(t *testing.T) {
-		resp, req, err := httptestx.BuildRequestBytes(http.MethodGet, "/foo", nil)
+		resp, req, err := httptestx.BuildRequestBytes(http.MethodGet, "/"+md5x.String("foo"), nil)
 		require.NoError(t, err)
 
 		routes.ServeHTTP(resp, req)
@@ -70,7 +83,7 @@ func TestHTTPPluginEnvironmentGet(t *testing.T) {
 
 	t.Run("requires privileged token", func(t *testing.T) {
 		unprivileged := jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
-		resp, req, err := httptestx.BuildRequestBytes(http.MethodGet, "/foo", nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&unprivileged, httpauthtest.UnsafeJWTSecretSource)))
+		resp, req, err := httptestx.BuildRequestBytes(http.MethodGet, "/"+md5x.String("foo"), nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&unprivileged, httpauthtest.UnsafeJWTSecretSource)))
 		require.NoError(t, err)
 
 		routes.ServeHTTP(resp, req)

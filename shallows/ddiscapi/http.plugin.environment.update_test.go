@@ -15,6 +15,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
+	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/retrovibed/retrovibed/shallows/metaapi"
 	"github.com/stretchr/testify/require"
@@ -37,7 +38,10 @@ func TestHTTPPluginEnvironmentUpdate(t *testing.T) {
 	t.Run("writes raw content, comments included", func(t *testing.T) {
 		const content = "FOO=\"bar\" # derp 0\n# derp 1\nBAR=\"baz\"\nBIZ=\"BAN\"\n# derp 2\n"
 
-		resp, req, err := httptestx.BuildRequestBytes(http.MethodPost, "/foo", []byte(content), httptestx.RequestOptionAuthorization(token))
+		require.NoError(t, os.MkdirAll(searchplugin.SearchPluginDir(configDir), 0o700))
+		require.NoError(t, os.WriteFile(filepath.Join(searchplugin.SearchPluginDir(configDir), "foo.wasm"), []byte("foocontent"), 0o600))
+
+		resp, req, err := httptestx.BuildRequestBytes(http.MethodPost, "/"+md5x.String("foo"), []byte(content), httptestx.RequestOptionAuthorization(token))
 		require.NoError(t, err)
 
 		routes.ServeHTTP(resp, req)
@@ -51,12 +55,14 @@ func TestHTTPPluginEnvironmentUpdate(t *testing.T) {
 	})
 
 	t.Run("overwrites existing content", func(t *testing.T) {
+		require.NoError(t, os.WriteFile(filepath.Join(searchplugin.SearchPluginDir(configDir), "bar.wasm"), []byte("barcontent"), 0o600))
+
 		path := filepath.Join(searchplugin.SearchPluginDir(configDir), "bar.env")
 		require.NoError(t, os.MkdirAll(filepath.Dir(path), 0o700))
 		require.NoError(t, os.WriteFile(path, []byte("OLD=value\n"), 0o600))
 
 		const content = "NEW=value\n"
-		resp, req, err := httptestx.BuildRequestBytes(http.MethodPost, "/bar", []byte(content), httptestx.RequestOptionAuthorization(token))
+		resp, req, err := httptestx.BuildRequestBytes(http.MethodPost, "/"+md5x.String("bar"), []byte(content), httptestx.RequestOptionAuthorization(token))
 		require.NoError(t, err)
 
 		routes.ServeHTTP(resp, req)
@@ -69,10 +75,12 @@ func TestHTTPPluginEnvironmentUpdate(t *testing.T) {
 	})
 
 	t.Run("requires privileged token", func(t *testing.T) {
+		require.NoError(t, os.WriteFile(filepath.Join(searchplugin.SearchPluginDir(configDir), "baz.wasm"), []byte("bazcontent"), 0o600))
+
 		claims := jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
 		unprivileged := httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)
 
-		resp, req, err := httptestx.BuildRequestBytes(http.MethodPost, "/baz", []byte("FOO=bar\n"), httptestx.RequestOptionAuthorization(unprivileged))
+		resp, req, err := httptestx.BuildRequestBytes(http.MethodPost, "/"+md5x.String("baz"), []byte("FOO=bar\n"), httptestx.RequestOptionAuthorization(unprivileged))
 		require.NoError(t, err)
 
 		routes.ServeHTTP(resp, req)

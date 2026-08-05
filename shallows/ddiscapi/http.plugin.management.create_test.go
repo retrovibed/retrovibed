@@ -20,6 +20,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
+	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/retrovibed/retrovibed/shallows/metaapi"
 	"github.com/stretchr/testify/require"
@@ -85,6 +86,7 @@ func TestHTTPPluginManagementCreate(t *testing.T) {
 		var result ddiscapi.PluginCreateResponse
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 		require.Equal(t, "noop", result.Plugin.Name)
+		require.Equal(t, md5x.String("noop"), result.Plugin.Id)
 		require.EqualValues(t, len(wasm), result.Plugin.Size)
 		require.FileExists(t, filepath.Join(searchplugin.SearchPluginDir(configDir), "noop.wasm"))
 	})
@@ -121,7 +123,7 @@ func TestHTTPPluginManagementCreate(t *testing.T) {
 		require.NoFileExists(t, filepath.Join(searchplugin.SearchPluginDir(configDir), "bogus.wasm"))
 	})
 
-	t.Run("path traversal via name rejected", func(t *testing.T) {
+	t.Run("path traversal via name sanitized", func(t *testing.T) {
 		mimetype, body, err := httpx.Multipart(func(w *multipart.Writer) error {
 			if err := w.WriteField("name", "../evil"); err != nil {
 				return err
@@ -149,8 +151,9 @@ func TestHTTPPluginManagementCreate(t *testing.T) {
 
 		routes.ServeHTTP(resp, req)
 
-		require.Equal(t, http.StatusBadRequest, resp.Code)
+		require.NoError(t, httpx.ErrorCode(resp.Result()))
 		require.NoFileExists(t, filepath.Join(searchplugin.SearchPluginDir(configDir), "..", "evil.wasm"))
+		require.FileExists(t, filepath.Join(searchplugin.SearchPluginDir(configDir), "evil.wasm"))
 	})
 
 	t.Run("requires privileged token", func(t *testing.T) {
