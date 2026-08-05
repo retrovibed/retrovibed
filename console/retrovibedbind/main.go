@@ -13,6 +13,7 @@ import (
 	"unsafe"
 
 	"github.com/retrovibed/retrovibed/retroapi/authn"
+	"github.com/retrovibed/retrovibed/retroapi/envfile"
 	"github.com/retrovibed/retrovibed/retroapi/netmonx"
 	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdglobalmain"
@@ -300,6 +301,27 @@ func validatecert(hostname *C.char, certData *C.uchar, certLen C.int) C.int {
 		return 1
 	}
 	return 0
+}
+
+//export envfile_parse
+func envfile_parse(content *C.char) *C.char {
+	encoded, err := json.Marshal(envfile.Parse(C.GoString(content)))
+	if err != nil {
+		log.Println(err)
+		return C.CString("[]")
+	}
+	return C.CString(string(encoded))
+}
+
+//export envfile_apply
+func envfile_apply(content *C.char, editsjson *C.char) *C.char {
+	var edits []envfile.Variable
+	if err := json.Unmarshal([]byte(C.GoString(editsjson)), &edits); err != nil {
+		log.Println(err)
+		return C.CString(C.GoString(content))
+	}
+
+	return C.CString(envfile.Apply(C.GoString(content), edits))
 }
 
 func main() {}

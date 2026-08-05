@@ -242,6 +242,36 @@ class DaemonBridge {
       );
   late final _validatecert = _validatecertPtr
       .asFunction<int Function(ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.UnsignedChar>, int)>();
+
+  ffi.Pointer<ffi.Char> envfile_parse(
+    ffi.Pointer<ffi.Char> content,
+  ) {
+    return _envfile_parse(
+      content,
+    );
+  }
+
+  late final _envfile_parsePtr = _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function(ffi.Pointer<ffi.Char>)>>(
+    'envfile_parse',
+  );
+  late final _envfile_parse = _envfile_parsePtr.asFunction<ffi.Pointer<ffi.Char> Function(ffi.Pointer<ffi.Char>)>();
+
+  ffi.Pointer<ffi.Char> envfile_apply(
+    ffi.Pointer<ffi.Char> content,
+    ffi.Pointer<ffi.Char> editsjson,
+  ) {
+    return _envfile_apply(
+      content,
+      editsjson,
+    );
+  }
+
+  late final _envfile_applyPtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function(ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>)>>(
+        'envfile_apply',
+      );
+  late final _envfile_apply = _envfile_applyPtr
+      .asFunction<ffi.Pointer<ffi.Char> Function(ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>)>();
 }
 
 typedef ptrdiff_t = ffi.Long;

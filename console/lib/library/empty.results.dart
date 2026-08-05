@@ -20,7 +20,7 @@ class EmptyResults extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              "no results in your library, would you like to attempt to discover results?",
+              "no results in your library, would you like to attempt to discover content?",
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
