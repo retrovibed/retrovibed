@@ -106,14 +106,22 @@ class _DisplayState extends State<Display> {
         final theme = Theme.of(context);
         return ds.Container(
           alignment: defaults.isCompact ? Alignment.bottomCenter : Alignment.topCenter,
-          margin: EdgeInsets.zero.copyWith(bottom: defaults.padding.bottom),
+          margin: EdgeInsets.zero,
           padding: EdgeInsets.zero,
-          decoration: BoxDecoration(
-            border: defaults.border,
-            borderRadius: defaults.borderRadius,
-            color: theme.colorScheme.surface,
+          clipBehavior: Clip.antiAlias,
+          decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.zero)),
+          ds.Container(
+            alignment: defaults.isCompact ? Alignment.bottomCenter : Alignment.topCenter,
+            margin: defaults.isCompact
+                ? EdgeInsets.zero.copyWith(top: defaults.padding.top)
+                : EdgeInsets.zero.copyWith(bottom: defaults.padding.bottom),
+            decoration: BoxDecoration(
+              border: defaults.border,
+              borderRadius: defaults.borderRadius,
+              color: theme.colorScheme.surface,
+            ),
+            SingleChildScrollView(child: w),
           ),
-          SingleChildScrollView(child: w),
         );
       }),
     );

@@ -40,6 +40,7 @@ class SearchDropdown extends StatefulWidget {
   }) {
     return SearchDropdown(
       key: key,
+      padding: padding,
       controller: controller,
       onSearch: onSearch,
       textAlign: textAlign,

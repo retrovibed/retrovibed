@@ -26,7 +26,6 @@ class MeteredCard extends StatelessWidget {
       onTap: tap,
       help: ds.Hint(const Text("simulate a metered network connection")),
       Column(
-        // crossAxisAlignment: CrossAxisAlignment.start,
         spacing: defaults.spacing / 2,
         children: [
           Text("Metered Network", textAlign: TextAlign.center, style: theme.textTheme.titleMedium),

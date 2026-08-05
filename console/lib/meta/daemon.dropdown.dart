@@ -58,10 +58,14 @@ class _DaemonDropdownState extends State<DaemonDropdown> {
     return ds.Help(
       Column(
         mainAxisSize: MainAxisSize.min,
+        spacing: defaults.spacing / 2,
         children: [
           ds.SearchDropdown.text(
             DaemonTypography.description(widget.library.value),
-            padding: defaults.padding,
+            padding: defaults.padding.copyWith(
+              top: defaults.padding.left / 4,
+              bottom: defaults.padding.right / 4,
+            ),
             key: ValueKey(widget.library.value.id),
             controller: _search,
             textAlign: TextAlign.center,
