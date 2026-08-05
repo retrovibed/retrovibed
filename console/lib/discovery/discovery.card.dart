@@ -9,7 +9,13 @@ import 'discovery.details.dart';
 
 class DiscoveredCard extends StatefulWidget {
   final ddisc.Discovery current;
-  final Future<ddisc.DiscoveryDownloadResponse> Function(String id, {ddisc.Discovery? discovery, bool autodownload, List<httpx.Option> options}) download;
+  final Future<ddisc.DiscoveryDownloadResponse> Function(
+    String id, {
+    ddisc.Discovery? discovery,
+    bool autodownload,
+    List<httpx.Option> options,
+  })
+  download;
   final void Function(ddisc.Discovery current) onDownloaded;
   final Widget help;
 
@@ -110,20 +116,18 @@ class _DiscoveredCardState extends State<DiscoveredCard> {
         icon: _queued ? Icons.query_builder_rounded : Icons.download_rounded,
         help: widget.help,
         onTap: _queued || _loading ? null : _onTap,
-        trailing: Row(
-          children: [
-            ds.Bytes(widget.current.bytes),
-            Spacer(),
-            ds.Timestamp.iso8601(
-              _known.released,
-              format: ds.Timestamp.year,
-              inf: ds.Empty,
-              neginf: ds.Empty,
-            ),
-            Spacer(),
-            Text("${widget.current.health}"),
-          ],
-        ),
+        trailing: [
+          ds.Bytes(widget.current.bytes),
+          Spacer(),
+          ds.Timestamp.iso8601(
+            _known.released,
+            format: ds.Timestamp.year,
+            inf: ds.Empty,
+            neginf: ds.Empty,
+          ),
+          Spacer(),
+          Text("${widget.current.health}"),
+        ],
       ),
     );
   }

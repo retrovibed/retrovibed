@@ -135,31 +135,29 @@ class _RecommendationsState extends State<Recommendations> {
                     _items = upd;
                   });
                 },
-                trailing: Row(
-                  children: [
-                    Spacer(),
-                    ds.LoadingIconButton.info(
-                      iconSize: 18.0,
-                      onPressed: () => ds.asyncfn<void>(
-                        context,
-                        (completion) {
-                          return ds.Confirmation.info(
-                            padding: EdgeInsets.zero,
-                            content: LayoutBuilder(
-                              builder: (context, constraints) => lib.KnownMediaCard(
-                                item,
-                                constraints: BoxConstraints(
-                                  maxWidth: constraints.maxWidth < 512 ? constraints.maxWidth * 0.8 : 512,
-                                ),
+                leading: [
+                  lib.KnownMediaCard.description(item.description),
+                  ds.LoadingIconButton.info(
+                    iconSize: 18.0,
+                    onPressed: () => ds.asyncfn<void>(
+                      context,
+                      (completion) {
+                        return ds.Confirmation.info(
+                          padding: EdgeInsets.zero,
+                          content: LayoutBuilder(
+                            builder: (context, constraints) => lib.KnownMediaCard(
+                              item,
+                              constraints: BoxConstraints(
+                                maxWidth: constraints.maxWidth < 512 ? constraints.maxWidth * 0.8 : 512,
                               ),
                             ),
-                            done: completion.complete,
-                          );
-                        },
-                      ),
+                          ),
+                          done: completion.complete,
+                        );
+                      },
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             )
             .toList(),

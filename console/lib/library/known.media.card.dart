@@ -12,7 +12,8 @@ class KnownMediaCard extends StatelessWidget {
   final ValueNotifier<bool>? hovered;
   final Widget help;
   final Widget? overlay;
-  final Widget? trailing;
+  final List<Widget> leading;
+  final List<Widget> trailing;
   final IconData? icon;
   final bool highlighted;
   final BoxConstraints? constraints;
@@ -37,7 +38,8 @@ class KnownMediaCard extends StatelessWidget {
     GestureTapCallback? onDoubleTap,
     GestureTapCallback? onSecondaryTap,
     GestureLongPressCallback? onLongPress,
-    Widget? trailing,
+    List<Widget> leading = const [],
+    List<Widget> trailing = const [],
     bool highlighted = false,
     IconData? icon = Icons.play_circle_filled,
     Widget help = ds.HelpScope.None,
@@ -71,13 +73,38 @@ class KnownMediaCard extends StatelessWidget {
     this.onSecondaryTap,
     this.onLongPress,
     this.hovered,
-    this.trailing,
+    this.leading = const [],
+    this.trailing = const [],
     this.highlighted = false,
     this.icon = Icons.play_circle_filled,
     this.help = ds.HelpScope.None,
     this.overlay,
     this.constraints,
   });
+
+  static Widget description(String description) {
+    return Expanded(
+      child: Tooltip(
+        message: description,
+        child: Center(
+          child: Text(
+            description,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+          ),
+        ),
+      ),
+    );
+  }
+
+  static Widget released(String released) {
+    return ds.Timestamp.iso8601(
+      released,
+      format: ds.Timestamp.year,
+      inf: ds.Empty,
+      neginf: ds.Empty,
+    );
+  }
 
   Widget _defaultOverlay(ds.Defaults defaults, api.Known c) {
     return Column(
@@ -95,7 +122,6 @@ class KnownMediaCard extends StatelessWidget {
             padding: defaults.padding / 2,
           ),
         ),
-        trailing ?? const SizedBox(),
       ],
     );
   }
@@ -145,23 +171,12 @@ class KnownMediaCard extends StatelessWidget {
           onLongPress: onLongPress,
           help: help,
           leading: [
-            Center(
-              child: Text(
-                current.description,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: leading.isEmpty ? [KnownMediaCard.description(current.description)] : leading,
             ),
           ],
-          trailing: [
-            trailing ??
-                ds.Timestamp.iso8601(
-                  current.released,
-                  format: ds.Timestamp.year,
-                  inf: ds.Empty,
-                  neginf: ds.Empty,
-                ),
-          ],
+          trailing: trailing.isEmpty ? [KnownMediaCard.released(current.released)] : trailing,
           fit: FlexFit.tight,
         ),
       ),

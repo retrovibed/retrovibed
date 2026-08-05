@@ -16,7 +16,8 @@ class KnownMediaLocator extends StatefulWidget {
   final void Function(api.Known? v) onChange;
   final IconData icon;
   final Widget help;
-  final Widget trailing;
+  final List<Widget> leading;
+  final List<Widget> trailing;
 
   const KnownMediaLocator(
     this.current, {
@@ -28,7 +29,8 @@ class KnownMediaLocator extends StatefulWidget {
     this.delete = api.recommendations.delete,
     this.icon = Icons.download_rounded,
     this.help = ds.HelpScope.None,
-    this.trailing = ds.Empty,
+    this.leading = const [],
+    this.trailing = const [],
   });
 
   static Widget future(
@@ -37,11 +39,14 @@ class KnownMediaLocator extends StatefulWidget {
     void Function(api.Known? v) onChange = ds.fnNoop,
     Future<bool> Function(BuildContext context, {List<httpx.Option> options}) ensureP2P = disc.ensureP2P,
     Future<api.LocateCreateResponse> Function(api.Locate req, {List<httpx.Option> options}) locate = api.locate.create,
-    Future<ddisc.DiscoveryDownloadResponse> Function(String id, {List<httpx.Option> options}) download = ddisc.api.download,
-    Future<api.RecommendationDeleteResponse> Function(String id, {List<httpx.Option> options}) delete = api.recommendations.delete,
+    Future<ddisc.DiscoveryDownloadResponse> Function(String id, {List<httpx.Option> options}) download =
+        ddisc.api.download,
+    Future<api.RecommendationDeleteResponse> Function(String id, {List<httpx.Option> options}) delete =
+        api.recommendations.delete,
     IconData icon = Icons.download_rounded,
     Widget help = ds.HelpScope.None,
-    Widget trailing = ds.Empty,
+    List<Widget> leading = const [],
+    List<Widget> trailing = const [],
   }) {
     return FutureBuilder<api.Known>(
       future: pending,
@@ -62,6 +67,7 @@ class KnownMediaLocator extends StatefulWidget {
                   icon: icon,
                   help: help,
                   trailing: trailing,
+                  leading: leading,
                 ),
         );
       },
@@ -218,6 +224,7 @@ class _KnownMediaLocator extends State<KnownMediaLocator> {
         help: widget.help,
         onTap: _loading || _queued ? null : _onTap,
         onLongPress: _loading ? null : _onPress,
+        leading: widget.leading,
         trailing: widget.trailing,
       ),
     );

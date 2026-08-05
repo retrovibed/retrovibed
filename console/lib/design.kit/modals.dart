@@ -13,8 +13,43 @@ Future<T> asyncfn<T>(
 ) {
   final completion = Completer<T>();
   final node = of(context);
-  node?.push(builder(completion));
+  node?.push(
+    _DismissGuard(
+      onDismiss: () {
+        if (completion.isCompleted) return;
+        // Content was removed (e.g. tapping outside the modal) without an
+        // explicit completion value; only succeeds for nullable/void T.
+        try {
+          completion.complete();
+        } catch (e) {
+          print("failed to dismiss async modal ${e}");
+        }
+      },
+      child: builder(completion),
+    ),
+  );
   return completion.future.whenComplete(() => node?.push(null));
+}
+
+class _DismissGuard extends StatefulWidget {
+  final Widget child;
+  final VoidCallback onDismiss;
+
+  const _DismissGuard({required this.child, required this.onDismiss});
+
+  @override
+  State<_DismissGuard> createState() => _DismissGuardState();
+}
+
+class _DismissGuardState extends State<_DismissGuard> {
+  @override
+  Widget build(BuildContext context) => widget.child;
+
+  @override
+  void dispose() {
+    widget.onDismiss();
+    super.dispose();
+  }
 }
 
 class Node extends StatefulWidget {

@@ -33,71 +33,46 @@ Future<void> _pumpTabSwitch(WidgetTester tester) async {
   }
 }
 
-// Below Defaults._defaultCompact (400.0 logical pixels), forcing
-// ds.Defaults.isCompact true, which switches routes.dart to
-// bottomNavigationBar and reverses ds.Table's leading/trailing order.
-const _compactPhysicalSize = Size(360, 640);
-
 void main() {
   setUpAll(() {
     MediaKit.ensureInitialized();
   });
 
-  testWidgets('movie -> download selects download, not community', (
-    WidgetTester tester,
-  ) async {
-    await tester.pumpApp(_harness(), fit: FlexFit.tight);
-    await _pumpUntilTabBarVisible(tester);
-    expect(_selectedTabIndex(tester), _movieIndex);
+  // Runs against Resolutions.all (mobile through desktop) so both the
+  // compact (bottomNavigationBar, reversed ds.Table leading/trailing) and
+  // non-compact (appBar) layouts in routes.dart are exercised.
+  final resolutions = Resolutions.variant();
 
-    await tester.tap(find.byIcon(Icons.download));
-    await _pumpTabSwitch(tester);
+  testWidgets(
+    'movie -> download selects download, not community',
+    (WidgetTester tester) async {
+      await tester.pumpApp(_harness(), fit: FlexFit.tight, physicalSize: resolutions.currentValue!.value);
+      await _pumpUntilTabBarVisible(tester);
+      expect(_selectedTabIndex(tester), _movieIndex);
 
-    expect(_selectedTabIndex(tester), _downloadIndex);
-  });
+      await tester.tap(find.byIcon(Icons.download));
+      await _pumpTabSwitch(tester);
 
-  testWidgets('movie -> settings -> download selects download, not community', (
-    WidgetTester tester,
-  ) async {
-    await tester.pumpApp(_harness(), fit: FlexFit.tight);
-    await _pumpUntilTabBarVisible(tester);
+      expect(_selectedTabIndex(tester), _downloadIndex);
+    },
+    variant: resolutions,
+  );
 
-    await tester.tap(find.byIcon(Icons.settings));
-    await _pumpTabSwitch(tester);
-    expect(_selectedTabIndex(tester), _settingsIndex);
+  testWidgets(
+    'movie -> settings -> download selects download, not community',
+    (WidgetTester tester) async {
+      await tester.pumpApp(_harness(), fit: FlexFit.tight, physicalSize: resolutions.currentValue!.value);
+      await _pumpUntilTabBarVisible(tester);
 
-    await tester.tap(find.byIcon(Icons.download));
-    await _pumpTabSwitch(tester);
+      await tester.tap(find.byIcon(Icons.settings));
+      await _pumpTabSwitch(tester);
+      expect(_selectedTabIndex(tester), _settingsIndex);
 
-    expect(_selectedTabIndex(tester), _downloadIndex);
-  });
+      await tester.tap(find.byIcon(Icons.download));
+      await _pumpTabSwitch(tester);
 
-  testWidgets('compact: movie -> download selects download, not community', (
-    WidgetTester tester,
-  ) async {
-    await tester.pumpApp(_harness(), fit: FlexFit.tight, physicalSize: _compactPhysicalSize);
-    await _pumpUntilTabBarVisible(tester);
-    expect(_selectedTabIndex(tester), _movieIndex);
-
-    await tester.tap(find.byIcon(Icons.download));
-    await _pumpTabSwitch(tester);
-
-    expect(_selectedTabIndex(tester), _downloadIndex);
-  });
-
-  testWidgets('compact: movie -> settings -> download selects download, not community', (
-    WidgetTester tester,
-  ) async {
-    await tester.pumpApp(_harness(), fit: FlexFit.tight, physicalSize: _compactPhysicalSize);
-    await _pumpUntilTabBarVisible(tester);
-
-    await tester.tap(find.byIcon(Icons.settings));
-    await _pumpTabSwitch(tester);
-    expect(_selectedTabIndex(tester), _settingsIndex);
-
-    await tester.tap(find.byIcon(Icons.download));
-    await _pumpTabSwitch(tester);
-
-    expect(_selectedTabIndex(tester), _downloadIndex);
-  });
+      expect(_selectedTabIndex(tester), _downloadIndex);
+    },
+    variant: resolutions,
+  );
 }

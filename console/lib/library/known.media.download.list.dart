@@ -54,7 +54,7 @@ class KnownMediaDownloadList extends StatelessWidget {
       (context, v) => KnownMediaLocator(
         v,
         locate: locate,
-        trailing: Center(child: KnownMediaSource(v, height: 24)),
+        trailing: [Center(child: KnownMediaSource(v, height: 24))],
       ),
     );
   }

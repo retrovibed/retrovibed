@@ -745,5 +745,58 @@ void main() {
       expect(await result, 'hello');
       expect(tester.takeException(), isNull);
     });
+
+    testWidgets('future completes when dismissed by tapping outside the modal', (
+      WidgetTester tester,
+    ) async {
+      late Future<void> result;
+
+      await tester.pumpApp(
+        SizedBox(
+          width: 400,
+          height: 400,
+          child: modals.Node(
+            Builder(
+              builder: (context) => TextButton(
+                onPressed: () {
+                  result = modals.asyncfn<void>(
+                    context,
+                    (completion) => Center(
+                      child: Container(
+                        width: 100,
+                        height: 100,
+                        child: Text('Waiting'),
+                      ),
+                    ),
+                  );
+                },
+                child: Text('Open'),
+              ),
+            ),
+          ),
+        ),
+        alignment: Alignment.topLeft,
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Waiting'), findsOneWidget);
+
+      var completed = false;
+      result.then((_) => completed = true);
+
+      // Tap the background, outside the modal content, to dismiss it.
+      await tester.tapAt(Offset(10, 10));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Waiting'), findsNothing);
+      // Reproduces the bug: reset() (triggered by the outside tap) clears the
+      // modal without ever resolving the Completer asyncfn handed out, so
+      // callers awaiting this future (e.g. LoadingIconButton) hang forever.
+      expect(completed, isTrue);
+      expect(tester.takeException(), isNull);
+    });
   });
 }

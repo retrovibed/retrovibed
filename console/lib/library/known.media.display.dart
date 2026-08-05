@@ -237,38 +237,40 @@ class _KnownMediaDisplayState extends State<KnownMediaDisplay> {
         setState(() => hovered.value = !hovered.value);
       },
       icon: mimex.icon(widget.media.mimetype),
-      trailing: ds.layout(
-        (context, constraints) {
-          final defaults = ds.Defaults.of(context);
-          return Row(
-            children: [
-              if (constraints.maxWidth >= 260) ds.Rating(rating: current.rating),
-              Expanded(child: KnownMediaSource(current)),
-              Visibility(
-                visible: (authn.AuthzCache.of(context).meta.current.token.archiveUpload.toInt()) > 0,
-                child: uuidx.pattern(widget.media.archiveId, archivable, archiving, purge),
-              ),
-              ds.LoadingIconButton(
-                tooltip: "download this file to your downloads folder",
-                onPressed: _media.DownloadAction(context, widget.media),
-                icon: Icon(Icons.download),
-              ),
-              ds.LoadingIconButton(
-                tooltip: "file information and management",
-                onPressed: ds.LoadingIconButton.convert(widget.onSettings),
-                icon: Icon(Icons.tune),
-              ),
-              if (defaults.mobile)
-                ds.LoadingIconButton.info(
-                  tooltip: "show media details",
-                  toggled: hovered.value,
-                  onPressed: () async => setState(() => hovered.value = !hovered.value),
+      trailing: [
+        ds.layout(
+          (context, constraints) {
+            final defaults = ds.Defaults.of(context);
+            return Row(
+              children: [
+                if (constraints.maxWidth >= 260) ds.Rating(rating: current.rating),
+                Expanded(child: KnownMediaSource(current)),
+                Visibility(
+                  visible: (authn.AuthzCache.of(context).meta.current.token.archiveUpload.toInt()) > 0,
+                  child: uuidx.pattern(widget.media.archiveId, archivable, archiving, purge),
                 ),
-              ...widget.trailing,
-            ],
-          );
-        },
-      ),
+                ds.LoadingIconButton(
+                  tooltip: "download this file to your downloads folder",
+                  onPressed: _media.DownloadAction(context, widget.media),
+                  icon: Icon(Icons.download),
+                ),
+                ds.LoadingIconButton(
+                  tooltip: "file information and management",
+                  onPressed: ds.LoadingIconButton.convert(widget.onSettings),
+                  icon: Icon(Icons.tune),
+                ),
+                if (defaults.mobile)
+                  ds.LoadingIconButton.info(
+                    tooltip: "show media details",
+                    toggled: hovered.value,
+                    onPressed: () async => setState(() => hovered.value = !hovered.value),
+                  ),
+                ...widget.trailing,
+              ],
+            );
+          },
+        ),
+      ],
     );
   }
 }
