@@ -47,7 +47,7 @@ func Download(ctx context.Context, op eg.Op) error {
 		// 3 attempts to deal with racey behavior around cloning the repo multiple times in parallel.
 		sruntime.Newf("test -d duckdb || git clone -b v%s --depth 1 https://github.com/duckdb/duckdb.git duckdb", version).Attempts(3),
 		sruntime.New("md5sum duckdb/src/include/duckdb.h"),
-		sruntime.New("echo \"fcdba922a5ef1ac7373134cb915d204b  duckdb/src/include/duckdb.h\" > duckdb.md5"),
+		sruntime.New("echo \"c937c8e9f1c86fa8ad10442bd79e006d  duckdb/src/include/duckdb.h\" > duckdb.md5"),
 		sruntime.New("md5sum -c duckdb.md5"),
 	)
 }
