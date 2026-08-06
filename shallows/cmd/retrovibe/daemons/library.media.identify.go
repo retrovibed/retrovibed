@@ -47,8 +47,9 @@ func IdentifyLibraryMedia(ctx context.Context, db sqlx.Queryer, mc library.Query
 			continue
 		}
 
-		cleaned = lucenex.Clean(cleaned)
 		title, _, _ := library.ParseReleaseEpisode(cleaned)
+		title = library.StripHallucinations(md.Description, title)
+		title = lucenex.Clean(title)
 
 		if known, err = library.DetectKnownMedia(ctx, db, mimex.Category(stringsx.FirstNonBlank(md.Mimetype, mimex.Binary)), title, library.KnownMatchCutoff); err != nil {
 			log.Println("unable to detect known media for library media", md.ID, md.Description, "|", err)

@@ -64,9 +64,10 @@ func (t knownquery) run(ctx context.Context, in io.Reader, db *sql.DB, cleaner l
 			log.Println("unable to clean query", err)
 			query = rec.Query
 		}
-		query = lucenex.Clean(query)
 
 		query, release, episode := library.ParseReleaseEpisode(query)
+		query = library.StripHallucinations(rec.Query, query)
+		query = lucenex.Clean(query)
 
 		log.Println("query cleaned", query, release, episode)
 		result := ScoredKnown{Relevance: t.MinRelevance}

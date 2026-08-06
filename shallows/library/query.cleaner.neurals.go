@@ -104,5 +104,27 @@ func ParseReleaseEpisode(input string) (remaining, datish, episodish string) {
 	}
 
 	remaining = strings.Join(tokens[:end], " ")
+
 	return remaining, datish, episodish
+}
+
+// removes any hallucinated strings from the title.
+func StripHallucinations(input string, generated string) string {
+	var b strings.Builder
+	for s := range strings.FieldsSeq(generated) {
+		if !strings.Contains(input, s) {
+			continue
+		}
+
+		if _, err := b.WriteString(" "); err != nil {
+			log.Println("failed to write fragment", err)
+			return ""
+		}
+		if _, err := b.WriteString(s); err != nil {
+			log.Println("failed to write fragment", err)
+			return ""
+		}
+	}
+
+	return strings.TrimSpace(b.String())
 }
