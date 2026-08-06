@@ -20,6 +20,7 @@ import (
 type reindex struct {
 	Database  string `flag:"" name:"database" help:"database to read" default:"${vars_user_configuration_directory}/meta.db"`
 	Unindexed bool   `flag:"" name:"unindexed" help:"only run against records that havent been indexed" default:"false"`
+	DryRun    bool   `flag:"" name:"dry-run" help:"dont actually update" negatable:"" default:"true"`
 }
 
 func (t reindex) Run(gctx *cmdopts.Global) (err error) {
@@ -72,6 +73,9 @@ func (t reindex) Run(gctx *cmdopts.Global) (err error) {
 		_, desc, auto := tracking.GenerateDescription(resolved, &tmd)
 		log.Println("resetting description", md.ID, md.Description, "->", desc)
 		log.Println("resetting autodescription", md.ID, md.AutoDescription, "->", auto)
+		if t.DryRun {
+			continue
+		}
 
 		if err = library.MetadataUpdateDescriptionByID(gctx.Context, db, md.ID, desc).Scan(&md); err != nil {
 			return err
@@ -80,6 +84,10 @@ func (t reindex) Run(gctx *cmdopts.Global) (err error) {
 		if err = library.MetadataUpdateAutodescriptionByID(gctx.Context, db, md.ID, library.NormalizedDescription(md.Description)).Scan(&md); err != nil {
 			return err
 		}
+	}
+
+	if t.DryRun {
+		log.Println("dry run - no records changed")
 	}
 
 	return s.Err()
