@@ -25,12 +25,12 @@ class Timestamp extends StatelessWidget {
 
   factory Timestamp.iso8601(
     String ts, {
-    DateTime? empty,
     String Function(DateTime)? format,
     Widget leading = const SizedBox(),
     Widget trailing = const SizedBox(),
     Widget inf = _defaultInf,
     Widget neginf = _defaultNeginf,
+    DateTime? empty,
   }) {
     return Timestamp(
       timex.iso8601(ts, empty: empty),

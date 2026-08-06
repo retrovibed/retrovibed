@@ -50,7 +50,7 @@ class Range {
 }
 
 DateTime iso8601(String ts, {DateTime? empty}) {
-  return ts.isEmpty ? empty ?? epoch : DateTime.parse(ts).toUtc();
+  return ts.isEmpty ? empty ?? neginf : DateTime.parse(ts).toUtc();
 }
 
 String formatISO8601(DateTime ts) {

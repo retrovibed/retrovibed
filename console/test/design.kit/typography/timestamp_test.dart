@@ -279,4 +279,61 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   });
+
+  group('default rendering', () {
+    testWidgets('neginf default rendering', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpApp(
+        Scaffold(
+          body: SizedBox(
+            width: 80,
+            height: 50,
+            child: ds.Timestamp(timex.neginf),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('always'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('inf default rendering', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpApp(
+        Scaffold(
+          body: SizedBox(
+            width: 80,
+            height: 50,
+            child: ds.Timestamp(timex.inf),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('never'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('empty string default rendering', (
+      WidgetTester tester,
+    ) async {
+      // empty strings should render identically to neginf.
+      await tester.pumpApp(
+        Scaffold(
+          body: SizedBox(
+            width: 80,
+            height: 50,
+            child: ds.Timestamp.iso8601(""),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('always'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+  });
 }
