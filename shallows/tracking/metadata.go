@@ -405,13 +405,7 @@ func DownloadInto(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, mc libra
 			continue
 		}
 
-		desc, cause := mc.Clean(ctx, stringsx.Join(" ", md.Description, DescriptionFromPath(md, tx.Path)))
-		if err != nil {
-			log.Println("import failed", cause)
-			err = errorsx.Compact(err, cause)
-			continue
-		}
-
+		desc := stringsx.Join(" ", md.Description, DescriptionFromPath(md, tx.Path))
 		log.Println("------------------------------------------- cleaned", md.Description, tx.Path, "->", desc)
 
 		lmd := library.NewMetadata(
