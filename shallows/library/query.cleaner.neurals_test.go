@@ -32,6 +32,7 @@ func TestParseReleaseEpisode(t *testing.T) {
 		{name: "date MM/YYYY", input: "God of Japan 01/2006", remaining: "God of Japan", date: "01/2006", episode: ""},
 		{name: "date YYYY/MM/DD", input: "God of Japan 2006/01/02", remaining: "God of Japan", date: "2006/01/02", episode: ""},
 		{name: "date MM-DD-YYYY", input: "God of Japan 01-02-2006", remaining: "God of Japan", date: "01-02-2006", episode: ""},
+		{name: "v2 title date episode", input: "God of Japan\n2021-09-09\ne49", remaining: "God of Japan", date: "2021-09-09", episode: "e49"},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			remaining, datish, episodish := library.ParseReleaseEpisode(tc.input)

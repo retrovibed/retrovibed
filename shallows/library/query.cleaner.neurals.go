@@ -87,7 +87,10 @@ var (
 // Release always precedes episode, so the episode marker is only looked
 // for as the final token, and the release marker only immediately before it.
 func ParseReleaseEpisode(input string) (remaining, datish, episodish string) {
-	tokens := strings.Fields(input)
+	tokens := strings.FieldsFunc(input, func(r rune) bool { return r == '\n' })
+	if len(tokens) == 1 {
+		tokens = strings.Fields(input)
+	}
 
 	end := len(tokens)
 	if end > 0 && reEpisode.MatchString(tokens[end-1]) {
