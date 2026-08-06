@@ -405,13 +405,13 @@ func DownloadInto(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, mc libra
 			continue
 		}
 
-		desc := stringsx.Join(" ", md.Description, DescriptionFromPath(md, tx.Path))
-		log.Println("------------------------------------------- cleaned", md.Description, tx.Path, "->", desc)
+		o, desc, auto := GenerateDescription(tx.Path, md)
+		log.Println("------------------------------------------- cleaned", md.Description, tx.Path, "->", o)
 
 		lmd := library.NewMetadata(
 			md5x.FormatUUID(tx.MD5),
-			library.MetadataOptionDescription(strings.TrimSpace(desc)),
-			library.MetadataOptionAutoDescription(library.NormalizedDescription(desc)),
+			library.MetadataOptionDescription(desc),
+			library.MetadataOptionAutoDescription(auto),
 			library.MetadataOptionBytes(tx.Bytes),
 			library.MetadataOptionOffset(tx.Offset),
 			library.MetadataOptionTorrentID(md.ID),
@@ -611,4 +611,16 @@ func ImportSymlink(id int160.T, srcvfs, vfs fsx.Virtual) library.ImportOp {
 
 		return tx, nil
 	}
+}
+
+func GenerateDescription(path string, md *Metadata) (o string, desc string, auto string) {
+	o = stringsx.Join(
+		" ",
+		md.Description,
+		DescriptionFromPath(md, path),
+	)
+
+	desc = strings.Join(strings.Fields(o), " ")
+	auto = library.NormalizedDescription(desc)
+	return o, desc, auto
 }
