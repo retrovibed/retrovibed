@@ -22,4 +22,5 @@ func TestClean(t *testing.T) {
 	assert.Equal(t, "foo bar", lucenex.Clean("foo.bar.not"))
 	assert.Equal(t, "foo bar", lucenex.Clean("foo.bar.to"))
 	assert.Equal(t, "how school 101 brilliant ideas", lucenex.Clean("How to School 101 Brilliant Ideas to"))
+	assert.Equal(t, "the pitt", lucenex.Clean("\"the pitt"))
 }

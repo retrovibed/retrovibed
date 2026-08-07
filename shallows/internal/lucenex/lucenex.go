@@ -33,6 +33,16 @@ func WithDefaultField(s string) Option {
 	}
 }
 
+func Parsable(s string, options ...Option) bool {
+	if stringsx.Blank(s) {
+		return false
+	}
+
+	cfg := langx.Clone(config{}, options...)
+	_, err := lucene.Parse(s, lucene.WithDefaultField(cfg.DefaultField))
+	return err == nil
+}
+
 func Query(d Driver, s string, options ...Option) squirrel.Sqlizer {
 	if stringsx.Blank(s) {
 		return squirrelx.Noop{}

@@ -22,6 +22,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/meta/identityssh"
 	"golang.org/x/oauth2"
 )
+import "github.com/retrovibed/retrovibed/shallows/internal/lucenex"
 
 func envOrDefault(key, fallback string) string {
 	if v := os.Getenv(key); v != "" {
@@ -322,6 +323,14 @@ func envfile_apply(content *C.char, editsjson *C.char) *C.char {
 	}
 
 	return C.CString(envfile.Apply(C.GoString(content), edits))
+}
+
+//export parsable
+func parsable(query *C.char) C.int {
+	if lucenex.Parsable(C.GoString(query)) {
+		return 1
+	}
+	return 0
 }
 
 func main() {}

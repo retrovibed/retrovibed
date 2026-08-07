@@ -14,6 +14,5 @@ func TestQuery(t *testing.T) {
 		require.NoError(t, err)
 		require.EqualValues(t, "(\"mimetype\" ILIKE '%' || ? || '%') OR (\"mimetype\" ILIKE '%' || ? || '%')", q)
 		require.EqualValues(t, []any{"video/webm", "video/ogg"}, args)
-
 	})
 }
