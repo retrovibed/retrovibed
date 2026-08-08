@@ -101,9 +101,12 @@ class _SearchButtonState extends State<SearchButton> {
             disabled: _queued,
           );
 
-    return ds.Loading(
-      cause: _cause,
-      btn,
+    return ds.Help(
+      ds.Loading(
+        cause: _cause,
+        btn,
+      ),
+      ds.Hint(Text("adds the search to background discovery to generate recommendations")),
     );
   }
 }
