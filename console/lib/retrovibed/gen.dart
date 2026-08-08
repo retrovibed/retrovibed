@@ -272,6 +272,17 @@ class DaemonBridge {
       );
   late final _envfile_apply = _envfile_applyPtr
       .asFunction<ffi.Pointer<ffi.Char> Function(ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>)>();
+
+  int parsable(
+    ffi.Pointer<ffi.Char> query,
+  ) {
+    return _parsable(
+      query,
+    );
+  }
+
+  late final _parsablePtr = _lookup<ffi.NativeFunction<ffi.Int Function(ffi.Pointer<ffi.Char>)>>('parsable');
+  late final _parsable = _parsablePtr.asFunction<int Function(ffi.Pointer<ffi.Char>)>();
 }
 
 typedef ptrdiff_t = ffi.Long;
