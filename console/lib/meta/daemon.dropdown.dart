@@ -9,11 +9,13 @@ import 'daemon.typography.dart';
 class DaemonDropdown extends StatefulWidget {
   final ValueNotifier<api.Daemon> library;
   final List<Widget> trailing;
+  final List<Widget> leading;
   final Widget help;
   const DaemonDropdown({
     super.key,
     required this.library,
     this.trailing = const [],
+    this.leading = const [],
     this.help = const ds.Hint(const Text("select which daemon instance to configure from the dropdown")),
   });
 
@@ -70,6 +72,7 @@ class _DaemonDropdownState extends State<DaemonDropdown> {
             controller: _search,
             textAlign: TextAlign.center,
             leading: [
+              ...widget.leading,
               ds.LoadingIconButton(
                 tooltip: "connect to another library",
                 focusNode: _addFocus,

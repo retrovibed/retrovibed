@@ -16,4 +16,5 @@ export 'media/playlist.dart';
 export 'media/play.queue.dart' show range;
 export 'media/autohelp.dart';
 export 'media/menu.upload.files.dart';
+export 'media/search.mode.dart';
 export 'media/search.mode.toggle.dart';

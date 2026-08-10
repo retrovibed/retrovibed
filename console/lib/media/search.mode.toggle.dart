@@ -1,13 +1,29 @@
 import 'package:flutter/material.dart';
+import 'search.mode.dart';
 
-// Reused by both the library and discovery search trays to flip between
-// searching the local library and discovering content over the network.
-PopupMenuItem<String> SearchModeToggle({required bool discovering, required VoidCallback onToggle}) {
+// Reused by the library, discovery, and remote search trays to switch
+// between modes; icon/label are caller-supplied so each mode's presentation
+// stays with the screen that knows about it.
+PopupMenuItem<String> SearchModeToggle({
+  required SearchMode mode,
+  required ValueNotifier<SearchMode> current,
+  required IconData icon,
+  required String label,
+  required void Function(SearchMode) onSelect,
+}) {
   return PopupMenuItem<String>(
-    onTap: onToggle,
-    child: ListTile(
-      leading: Icon(discovering ? Icons.check : Icons.travel_explore),
-      title: const Text("Search"),
+    child: ValueListenableBuilder<SearchMode>(
+      valueListenable: current,
+      builder: (context, currentMode, _) {
+        final selected = mode == currentMode;
+        return ListTile(
+          leading: Icon(selected ? Icons.check : icon),
+          title: Text(label),
+          selected: selected,
+          hoverColor: Colors.transparent,
+          onTap: () => onSelect(selected ? SearchMode.library : mode),
+        );
+      },
     ),
   );
 }
