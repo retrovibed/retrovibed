@@ -228,6 +228,7 @@ class _LoadingIconButtonState extends State<LoadingIconButton> {
         .onPressed()
         .catchError((cause) {
           debugPrint('$cause');
+          if (!mounted) return;
           // Handle any errors that occur during the asynchronous operation
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text("An error occurred: $cause")),

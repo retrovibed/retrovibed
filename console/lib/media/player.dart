@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart'; // Provides [Player], [Media], [Playlist] etc.
 import 'package:media_kit_video/media_kit_video.dart';
+import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/debug.dart' as debug;
 import 'package:retrovibed/media/player.control.shuffle.dart';
@@ -12,6 +13,7 @@ import './player.control.next.dart';
 import './player.control.title.dart';
 import './player.control.settings.dart';
 import './player.control.filedrop.dart';
+import './player.control.stream.dart';
 import './player.control.fullscreen.dart';
 import './player.control.resume.dart';
 
@@ -85,6 +87,8 @@ class _VideoState extends State<VideoScreen> {
       SizedBox.square(dimension: defaults.spacing),
       PlayerControlFiledrop(widget.player),
       SizedBox.square(dimension: defaults.spacing),
+      if (authn.developer(context).debug) PlayerControlStream(widget.player),
+      if (authn.developer(context).debug) SizedBox.square(dimension: defaults.spacing),
       PlayerControlFullscreen(widget.player),
     ];
   }

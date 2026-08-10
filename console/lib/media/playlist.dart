@@ -178,7 +178,9 @@ class Playlist extends StatefulWidget {
 
 class _PlaylistState extends State<Playlist> {
   final playqueue.PlayQueue _queue = playqueue.PlayQueue();
-  final Player player = Player();
+  final Player player = Player(
+    // configuration: const PlayerConfiguration(logLevel: MPVLogLevel.v),
+  );
   playqueue.RangeFn autoqueue = playqueue.search;
   final TextEditingController controller = TextEditingController();
   final FocusNode playerfocus = FocusNode(
@@ -256,7 +258,7 @@ class _PlaylistState extends State<Playlist> {
     player.stream.completed.listen((completed) {
       if (!completed) return;
 
-      print(
+      debugPrint(
         "advancing through playlist ${player.state.playlist.medias.length} ${player.state.playlist.medias}",
       );
       completed ? next() : player.pause();
@@ -265,7 +267,7 @@ class _PlaylistState extends State<Playlist> {
     player.stream.playing.listen((playing) {
       final defaults = ds.Defaults.of(context);
       final focus = playing || defaults.mobile ? playerfocus : searchfocus;
-      print("playlist.playing: ${playing} - ${focus}");
+      debugPrint("playlist.playing: ${playing} - ${focus}");
       focus.requestFocus();
       overlay.value = !playing;
     });
