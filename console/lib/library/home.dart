@@ -26,7 +26,7 @@ class Home extends StatefulWidget {
   State<StatefulWidget> createState() => _HomeState();
 }
 
-enum _Mode { library, discovery }
+enum _Mode { library, discovery, remote }
 
 class _HomeState extends State<Home> {
   Widget _downloading = ds.Empty;
@@ -37,13 +37,8 @@ class _HomeState extends State<Home> {
     super.setState(fn);
   }
 
-  void _switchToDiscovery() {
-    _mode.value = _Mode.discovery;
-    widget.focus?.requestFocus();
-  }
-
-  void _switchToLibrary() {
-    _mode.value = _Mode.library;
+  void _switchToMode(_Mode m) {
+    _mode.value = m;
     widget.focus?.requestFocus();
   }
 
@@ -66,7 +61,7 @@ class _HomeState extends State<Home> {
           highlighted: widget.highlighted,
           search: widget.search,
           discovering: false,
-          onToggleMode: _switchToDiscovery,
+          onToggleMode: () => _switchToMode(_Mode.library),
           downloading: _downloading,
           onDownloadingChanged: (w) => setState(() => _downloading = w),
         ),
@@ -76,10 +71,11 @@ class _HomeState extends State<Home> {
           focus: widget.focus,
           search: widget.search,
           discovering: true,
-          onToggleMode: _switchToLibrary,
+          onToggleMode: () => _switchToMode(_Mode.discovery),
           downloading: _downloading,
           onDownloadingChanged: (w) => setState(() => _downloading = w),
         ),
+        _Mode.remote => remote.Display(),
       },
     );
   }
