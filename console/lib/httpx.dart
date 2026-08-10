@@ -231,7 +231,7 @@ class Request {
     return (Request request) {
       return token().then((v) {
         if (v.isEmpty) throw const MissingTokenError();
-        request.headers["Authorization"] = "Bearer ${v}";
+        request.headers["Authorization"] = v.toLowerCase().startsWith("bearer ") ? v : "Bearer ${v}";
         return Future.value(
           request,
         ); // Returns a completed Future with the modified request

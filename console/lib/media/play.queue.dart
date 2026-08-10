@@ -128,17 +128,20 @@ class PlayableMedia {
   Known get known => Known(
     id: current.id,
     description: current.description,
+    image: current.image,
   );
 
-  mediakit.Media playable(String auth) => mediakit.Media(
-    api.media.download_uri(current.id),
-    extras: Map.of(<String, String>{
-      "id": current.id,
-      "title": current.description,
-    }),
-    start: pos,
-    httpHeaders: <String, String>{"Authorization": httpx.auto_bearer_host()},
-  );
+  mediakit.Media playable(String auth) {
+    return mediakit.Media(
+      api.media.download_uri(current.id),
+      extras: Map.of(<String, String>{
+        "id": current.id,
+        "title": current.description,
+      }),
+      start: pos,
+      httpHeaders: <String, String>{"Authorization": auth},
+    );
+  }
 }
 
 extension PlayableMediaNullable on PlayableMedia? {
