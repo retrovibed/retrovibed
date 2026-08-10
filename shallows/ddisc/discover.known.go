@@ -4,6 +4,7 @@ import (
 	"context"
 	"iter"
 	"log"
+	"time"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/davecgh/go-spew/spew"
@@ -29,6 +30,12 @@ const knownSimilarityCutoff = 0.6
 // knownStrategyLimit caps how many catalog matches a single Discover call
 // can surface.
 const knownStrategyLimit = 10
+
+// knownMediaTOFUTTL is how long a TOFU placeholder survives without being
+// rediscovered before library.NewKnownMediaTombstonedCleanup reaps it.
+// KnownInsertWithDefaultsTOFU's ON CONFLICT refreshes tombstoned_at on every
+// rediscovery, so this is a sliding window, not a fixed expiry from creation.
+const knownMediaTOFUTTL = 7 * 24 * time.Hour
 
 // KnownStrategy searches the library_known_media catalog by fuzzy title
 // match. Unlike LocalStrategy (which requires an exact known-media-id to

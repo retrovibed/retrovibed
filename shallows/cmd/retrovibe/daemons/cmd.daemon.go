@@ -319,6 +319,10 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		errorsx.Log(library.NewTombstonedCleanup(ctx, mediastore, db))
 	})
 
+	go timex.NowAndEveryVoid(gctx.Context, 24*time.Hour, func(ctx context.Context) {
+		errorsx.Log(library.NewKnownMediaTombstonedCleanup(ctx, db))
+	})
+
 	if len(t.TorrentFolderWatch) > 0 {
 		dwatcher, err := downloads.NewDirectoryWatcher(gctx.Context, tlsx.MustClone(tlscfg.Config(), tlsx.OptionInsecureSkipVerify), db)
 		if err != nil {

@@ -2,6 +2,7 @@ package ddisc
 
 import (
 	"encoding/binary"
+	"time"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/uuidx"
@@ -14,7 +15,10 @@ import (
 // resolved known-media id, e.g. after KnownMediaDetector has run) to a
 // library.Known catalog entry keyed by kid - see KnownMediaDynamic, which is
 // the only caller. Callers are responsible for only calling this with a
-// resolved, non-sentinel kid.
+// resolved, non-sentinel kid. TombstonedAt is stamped knownMediaTOFUTTL out
+// from now, since this only ever feeds KnownInsertWithDefaultsTOFU - a
+// discovery placeholder self-expires unless rediscovered (see that
+// function's ON CONFLICT, which refreshes tombstoned_at on every write).
 func KnownMediaFromDiscovered(kid uuid.UUID, d Discovered) library.Known {
 	// kid is folded into the hash (not just Title/Description) so the md5
 	// column's UNIQUE NOT NULL constraint can't collide across two
@@ -35,5 +39,6 @@ func KnownMediaFromDiscovered(kid uuid.UUID, d Discovered) library.Known {
 		Mimetype:        Generalize(d.Mimetype),
 		Released:        timex.Inf(), // no release date available from the wire format
 		AutoDescription: d.Title,
+		TombstonedAt:    time.Now().Add(knownMediaTOFUTTL),
 	}
 }

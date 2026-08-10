@@ -2,6 +2,7 @@ package library
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/Masterminds/squirrel"
@@ -166,6 +167,14 @@ func KnownSearchBuilder() squirrel.SelectBuilder {
 	return squirrelx.PSQL.Select(sqlx.Columns(KnownScannerStaticColumns)...).From("library_known_media")
 }
 
+func KnownQueryNotTombstoned() squirrel.Sqlizer {
+	return squirrel.Expr("library_known_media.tombstoned_at = 'infinity'")
+}
+
+func KnownQueryTombstoned() squirrel.Sqlizer {
+	return squirrel.Expr("library_known_media.tombstoned_at < 'infinity'")
+}
+
 func DetectKnownMedia(ctx context.Context, db sqlx.Queryer, mimecat string, query string, similarity float32) (k Known, err error) {
 	k = Unknown()
 
@@ -174,4 +183,13 @@ func DetectKnownMedia(ctx context.Context, db sqlx.Queryer, mimecat string, quer
 	}
 
 	return k, nil
+}
+
+// NewKnownMediaTombstonedCleanup purges known-media catalog rows (e.g. stale
+// TOFU placeholders from the discovery pipeline) once tombstoned.
+func NewKnownMediaTombstonedCleanup(ctx context.Context, q sqlx.Queryer) error {
+	log.Println("known media tombstoned cleanup initiated")
+	defer log.Println("known media tombstoned cleanup completed")
+
+	return sqlx.Discard(sqlx.Scan(KnownDeleteTombstoned(ctx, q)))
 }
