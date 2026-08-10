@@ -133,6 +133,7 @@ func bestPeerTubeFile(files []peerTubeFile) (peerTubeFile, bool) {
 		if f.MagnetUri == "" {
 			continue
 		}
+
 		if !found || f.Resolution.ID > best.Resolution.ID {
 			best = f
 			found = true
@@ -395,13 +396,11 @@ func (t *peerTubeStrategy) resolveRow(ctx context.Context, category string, row 
 // exponential backoff, and respecting t.limiter as a politeness rate limit
 // against the configured domain.
 func (t *peerTubeStrategy) fetch(ctx context.Context, target string) ([]byte, error) {
-	attempts := t.attempts
-	if attempts == 0 {
-		attempts = 1
-	}
+	c := t.client
+	attempts := langx.FirstNonZero(t.attempts, 1)
 
 	var lastErr error
-	for attempt := uint(0); attempt < attempts; attempt++ {
+	for attempt := range attempts {
 		if attempt > 0 {
 			select {
 			case <-time.After(time.Duration(attempt) * time.Second):
@@ -415,7 +414,7 @@ func (t *peerTubeStrategy) fetch(ctx context.Context, target string) ([]byte, er
 		}
 
 		attemptCtx, cancel := context.WithTimeout(ctx, 15*time.Second)
-		body, err := doPeerTubeFetch(attemptCtx, t.client, target)
+		body, err := doPeerTubeFetch(attemptCtx, c, target)
 		cancel()
 		if err != nil {
 			lastErr = err
