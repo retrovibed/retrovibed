@@ -1,6 +1,7 @@
 export 'discovery/api.dart';
 export 'discovery/discovery.card.dart';
 export 'discovery/grid.dart';
+export 'discovery/search.dart';
 export 'discovery/locate.p2p.prompt.dart';
 export 'discovery/search.button.dart';
 export 'discovery/display.dart';
