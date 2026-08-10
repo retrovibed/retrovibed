@@ -211,6 +211,7 @@ func (t *HTTPDiscovery) websocket(w http.ResponseWriter, r *http.Request) {
 			ddisc.DiscoverOptionDetectMedia(
 				ddisc.KnownMediaDetector(t.q, t.cleaner),
 			),
+			ddisc.DiscoverOptionKnownMediaDynamic(ddisc.KnownMediaDynamic(t.q)),
 		},
 		strategies...,
 	)

@@ -83,7 +83,7 @@ func (t cmdMediaLocate) Run(gctx *cmdopts.Global) (err error) {
 		plugins = reg
 	}
 
-	peertube := ddisc.PeerTubeStrategy(http.DefaultClient, envx.String("https://sepiasearch.org", "PEERTUBE_DOMAIN"), db)
+	peertube := ddisc.PeerTubeStrategy(http.DefaultClient, envx.String("https://sepiasearch.org", "PEERTUBE_DOMAIN"))
 
 	partitions := ddisc.Partitions(uint16(t.Partitions), cryptox.NewChaCha8(t.Seed))
 	policy := ddisc.DefaultPolicy()

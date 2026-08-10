@@ -85,6 +85,16 @@ func DiscoveredOptionDescription(s string) DiscoveredOption {
 	}
 }
 
+// DiscoveredOptionPosterURI sets a thumbnail/poster image url a strategy
+// surfaced for the candidate (e.g. PeerTube's video thumbnails). See
+// KnownMediaTOFU, which reads this back off once a candidate's known-media
+// id is resolved and TOFU-records it onto library_known_media.poster_path.
+func DiscoveredOptionPosterURI(s string) DiscoveredOption {
+	return func(d *Discovered) {
+		d.PosterURI = s
+	}
+}
+
 // DiscoveredOptionPrivate marks a candidate as sourced from a BEP 27 private
 // torrent. Private candidates are still persisted (so this node can use them
 // locally) but are excluded from every peer-facing sync/search response.
@@ -330,6 +340,7 @@ func NewDiscoveredFromImport(imp *ddiscapi.Import, options ...DiscoveredOption) 
 		Infohash:               infohash.Bytes(),
 		Title:                  imp.Title,
 		Description:            imp.Overview,
+		PosterURI:              imp.PosterPath,
 		Health:                 imp.Health,
 		Bytes:                  imp.Bytes,
 		KnownMediaID:           uuid.Nil.String(),

@@ -5,7 +5,9 @@ import (
 	"database/sql"
 	"errors"
 	"iter"
+	"log"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
@@ -138,6 +140,18 @@ func discoverNoopDetectMedia(s iterx.Seq[Discovered]) iterx.Seq[Discovered] {
 	return s
 }
 
+// DiscoverOptionKnownMediaDynamic sets tofu as the transform discoverSeq runs
+// every strategy's candidate seq through right after detectMedia, letting it
+// TOFU-record catalog info (poster included) onto library_known_media for
+// any candidate that ends up with a resolved known-media id - see
+// KnownMediaTOFU. Omitted entirely, no candidate is touched (see
+// discoverNoopDetectMedia).
+func DiscoverOptionKnownMediaDynamic(tofu func(iterx.Seq[Discovered]) iterx.Seq[Discovered]) DiscoverOption {
+	return func(t *discoverSeq) {
+		t.dynamicMedia = tofu
+	}
+}
+
 // Discover tries every strategy in order, regardless of whether an earlier
 // strategy already yielded something - so a caller sees candidates from
 // every strategy, not just the first one to produce a hit. A genuine error
@@ -152,7 +166,14 @@ func discoverNoopDetectMedia(s iterx.Seq[Discovered]) iterx.Seq[Discovered] {
 // be recorded regardless (e.g. daemons.SearchQueueBackgroundRun, which
 // exists purely to populate ddisc_media for background browsing).
 func Discover(ctx context.Context, policy Policy, req DiscoverRequest, options []DiscoverOption, strategies ...DiscoverStrategy) iterx.Seq[Discovered] {
-	d := &discoverSeq{policy: policy, req: req, strategies: strategies, filter: discoverNoopFilter, detectMedia: discoverNoopDetectMedia}
+	d := &discoverSeq{
+		policy:       policy,
+		req:          req,
+		strategies:   strategies,
+		filter:       discoverNoopFilter,
+		detectMedia:  discoverNoopDetectMedia,
+		dynamicMedia: discoverNoopDetectMedia,
+	}
 	for _, opt := range options {
 		opt(d)
 	}
@@ -160,12 +181,13 @@ func Discover(ctx context.Context, policy Policy, req DiscoverRequest, options [
 }
 
 type discoverSeq struct {
-	policy      Policy
-	req         DiscoverRequest
-	strategies  []DiscoverStrategy
-	filter      func(context.Context, Discovered) (bool, error)
-	detectMedia func(iterx.Seq[Discovered]) iterx.Seq[Discovered]
-	err         error
+	policy       Policy
+	req          DiscoverRequest
+	strategies   []DiscoverStrategy
+	filter       func(context.Context, Discovered) (bool, error)
+	detectMedia  func(iterx.Seq[Discovered]) iterx.Seq[Discovered]
+	dynamicMedia func(iterx.Seq[Discovered]) iterx.Seq[Discovered]
+	err          error
 }
 
 func (t *discoverSeq) Each(ctx context.Context) iter.Seq[Discovered] {
@@ -175,8 +197,10 @@ func (t *discoverSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 			seq = iterx.Filter(seq, t.filter)
 			seq = iterx.NotFound(seq)
 			seq = t.detectMedia(seq)
+			seq = t.dynamicMedia(seq)
 
 			for d := range seq.Each(ctx) {
+				log.Println("DERP DERP 1", spew.Sdump(d))
 				if err := t.policy.Rank(&d); err != nil {
 					t.err = err
 					return
@@ -228,10 +252,10 @@ func (t TitleFilter) Match(ctx context.Context, d Discovered) (bool, error) {
 // caller that only wants "what can the outside world tell us" (e.g. a
 // background queue drain populating ddisc_media from scratch) would gain
 // nothing from a strategy that just reads ddisc_media back.
-func ExternalStrategies(q sqlx.Queryer, plugins searchplugin.T, peertube DiscoverStrategy) []DiscoverStrategy {
+func ExternalStrategies(plugins searchplugin.T, peertube DiscoverStrategy) []DiscoverStrategy {
 	strategies := []DiscoverStrategy{}
 	if plugins != nil {
-		strategies = append(strategies, PluginStrategy(q, plugins))
+		strategies = append(strategies, PluginStrategy(plugins))
 	}
 	if peertube != nil {
 		strategies = append(strategies, peertube)
@@ -245,7 +269,7 @@ func ExternalStrategies(q sqlx.Queryer, plugins searchplugin.T, peertube Discove
 // together via Discover - the local scan is not gated on the external
 // strategies coming up empty.
 func SyncStrategies(q sqlx.Queryer, plugins searchplugin.T, peertube DiscoverStrategy, knownMediaID string) []DiscoverStrategy {
-	strategies := append([]DiscoverStrategy{KnownStrategy(q)}, ExternalStrategies(q, plugins, peertube)...)
+	strategies := append([]DiscoverStrategy{KnownStrategy(q)}, ExternalStrategies(plugins, peertube)...)
 	if knownMediaID != uuid.Nil.String() {
 		strategies = append(strategies, LocalStrategy(q))
 	}

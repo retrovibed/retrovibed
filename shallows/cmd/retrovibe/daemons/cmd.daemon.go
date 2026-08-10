@@ -255,7 +255,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		peertube = ddisc.PeerTubeStrategy(&http.Client{
 			Timeout:   30 * time.Second,
 			Transport: &http.Transport{DialContext: privateDialer.DialContext},
-		}, t.PeerTubeDomain, db)
+		}, t.PeerTubeDomain)
 	}
 
 	torrenting := newTorrenting(

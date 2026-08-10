@@ -163,3 +163,52 @@ func (t *knownMediaDetectSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 func (t *knownMediaDetectSeq) Err() error {
 	return t.err
 }
+
+// KnownMediaDynamic builds a DiscoverOptionKnownMediaDynamic transform that
+// mints a new library_known_media catalog entry (see KnownMediaFromDiscovered)
+// for a candidate that doesn't already have one, provided the candidate
+// carries enough content to be worth cataloging (a title and a poster) -
+// without this, a candidate KnownMediaDetector couldn't match against the
+// existing catalog would otherwise never get a known-media id, and so would
+// never show up anywhere the UI renders by known media (e.g.
+// library.Recommendation). Intended to run after KnownMediaDetector, so it
+// only ever mints an entry once title-matching has already had its chance to
+// resolve one. On a successful insert, the candidate is stamped with the new
+// id so it flows through Discover linked to the row it just created.
+func KnownMediaDynamic(q sqlx.Queryer) func(iterx.Seq[Discovered]) iterx.Seq[Discovered] {
+	return func(s iterx.Seq[Discovered]) iterx.Seq[Discovered] {
+		return &knownMediaDynamicSeq{inner: s, q: q}
+	}
+}
+
+type knownMediaDynamicSeq struct {
+	inner iterx.Seq[Discovered]
+	q     sqlx.Queryer
+	err   error
+}
+
+func (t *knownMediaDynamicSeq) Each(ctx context.Context) iter.Seq[Discovered] {
+	return func(yield func(Discovered) bool) {
+		for d := range t.inner.Each(ctx) {
+			if uuidx.IsMinMax(uuid.FromStringOrNil(d.KnownMediaID)) && stringsx.Present(d.Title) && stringsx.Present(d.PosterURI) {
+				kid := uuid.Must(uuid.NewV4())
+				known := KnownMediaFromDiscovered(kid, d)
+				if err := library.KnownInsertWithDefaultsTOFU(ctx, t.q, known).Scan(&known); err != nil {
+					log.Println("unable to record known media from discovered candidate", err)
+				} else {
+					d.KnownMediaID = known.UID
+				}
+			}
+
+			if !yield(d) {
+				return
+			}
+		}
+
+		t.err = t.inner.Err()
+	}
+}
+
+func (t *knownMediaDynamicSeq) Err() error {
+	return t.err
+}
