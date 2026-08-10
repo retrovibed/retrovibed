@@ -29,8 +29,7 @@ type MetricsPublisher interface {
 }
 
 func magnetURI(tmd tracking.Metadata, name string) string {
-	ih := int160.FromBytes(tmd.Infohash)
-	return metainfo.Magnet{InfoHash: metainfo.Hash(ih.AsByteArray()), DisplayName: name}.String()
+	return metainfo.NewMagnetFromInfohash(tmd.Infohash, metainfo.MagnetOptionDisplayName(name)).String()
 }
 
 func ensureTorrent(ctx context.Context, q sqlx.Queryer, mvfs, tvfs fsx.Virtual, lmd *library.Metadata) (tmd tracking.Metadata, err error) {

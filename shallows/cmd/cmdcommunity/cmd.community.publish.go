@@ -46,10 +46,10 @@ func (t cmdCommunityPublish) items(c *communityapi.Community, r io.Reader) iter.
 		d := jsonl.NewDecoder(r)
 
 		for derr = d.Decode(&v); derr == nil; derr = d.Decode(&v) {
-			uri := metainfo.Magnet{
-				InfoHash:    metainfo.Hash(errorsx.Must(int160.FromHexEncodedString(v.Id)).AsByteArray()),
-				DisplayName: v.Description,
-			}
+			uri := metainfo.NewMagnetFromInfohash(
+				errorsx.Must(int160.FromHexEncodedString(v.Id)).Bytes(),
+				metainfo.MagnetOptionDisplayName(v.Description),
+			)
 
 			if !yield(rss.Item{
 				Guid:        v.Id,

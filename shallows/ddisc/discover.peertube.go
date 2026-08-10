@@ -14,12 +14,16 @@ import (
 	"strings"
 	"time"
 
-	"github.com/james-lawrence/torrent/dht/int160"
+	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/retrovibed/retrovibed/retroapi/asynccompute"
+	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
+	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
+	"github.com/retrovibed/retrovibed/shallows/library"
 	"golang.org/x/time/rate"
 )
 
@@ -117,8 +121,31 @@ type peerTubeFile struct {
 	MagnetUri  string             `json:"magnetUri"`
 }
 
+type peerTubeThumbnail struct {
+	Height  int    `json:"height"`
+	Width   int    `json:"width"`
+	FileUrl string `json:"fileUrl"`
+}
+
 type peerTubeVideoResponse struct {
-	Files []peerTubeFile `json:"files"`
+	Files      []peerTubeFile      `json:"files"`
+	Thumbnails []peerTubeThumbnail `json:"thumbnails"`
+}
+
+// bestPeerTubeThumbnail picks the largest (by pixel area) thumbnail among
+// thumbnails, returning its fileUrl. Unlike bestPeerTubeFile, an empty list
+// is not disqualifying - a thumbnail is a nice-to-have, not a requirement
+// for a candidate to be usable.
+func bestPeerTubeThumbnail(thumbnails []peerTubeThumbnail) (string, bool) {
+	var best peerTubeThumbnail
+	found := false
+	for _, th := range thumbnails {
+		if !found || th.Width*th.Height > best.Width*best.Height {
+			best = th
+			found = true
+		}
+	}
+	return best.FileUrl, found
 }
 
 // bestPeerTubeFile picks the highest-resolution entry among files that
@@ -179,6 +206,7 @@ func (t peerTubeHeaderTransport) RoundTrip(req *http.Request) (*http.Response, e
 type peerTubeStrategy struct {
 	client     *http.Client
 	domain     string
+	q          sqlx.Queryer
 	limiter    *rate.Limiter
 	maxResults uint
 	attempts   uint
@@ -216,13 +244,14 @@ func PeerTubeOptionWorkers(n uint) PeerTubeOption {
 // sandboxes external, untrusted plugins through wazero, this is trusted,
 // first-party code with no wasm compile/install step, so it runs the same
 // way LocalStrategy does.
-func PeerTubeStrategy(c *http.Client, domain string, options ...PeerTubeOption) DiscoverStrategy {
+func PeerTubeStrategy(c *http.Client, domain string, q sqlx.Queryer, options ...PeerTubeOption) DiscoverStrategy {
 	client := *c
 	client.Transport = peerTubeHeaderTransport{next: langx.FirstNonZero(client.Transport, http.DefaultTransport)}
 
 	t := &peerTubeStrategy{
 		client:     &client,
 		domain:     domain,
+		q:          q,
 		limiter:    rate.NewLimiter(1, 1),
 		maxResults: 128,
 		attempts:   5,
@@ -285,7 +314,7 @@ func (t *peerTubeStrategy) run(ctx context.Context, req DiscoverRequest, results
 	category := resolvePeerTubeCategory(req.Mimetypes)
 
 	pool := asynccompute.New(func(ctx context.Context, row peerTubeSearchRow) error {
-		d, ok, err := t.resolveRow(ctx, category, row)
+		d, ok, err := t.resolveRow(ctx, category, row, req.KnownMediaID)
 		if err != nil {
 			log.Printf("ddisc: peertube: failed to resolve %s: %v", row.UUID, err)
 			return nil
@@ -353,10 +382,12 @@ func (t *peerTubeStrategy) search(ctx context.Context, category, query string, a
 }
 
 // resolveRow fetches row's video detail page, picks the best magnet-bearing
-// file, and builds a Discovered keyed by that magnet's real infohash.
-// Returns ok=false (no error) for videos with no usable magnet - not every
-// PeerTube result is a candidate.
-func (t *peerTubeStrategy) resolveRow(ctx context.Context, category string, row peerTubeSearchRow) (Discovered, bool, error) {
+// file, and builds a Discovered from a ddiscapi.Import - the same
+// construction path search plugins use (see pluginSeq.Each) - so a resolved
+// known-media id also gets its catalog entry TOFU-recorded (poster
+// included). Returns ok=false (no error) for videos with no usable magnet -
+// not every PeerTube result is a candidate.
+func (t *peerTubeStrategy) resolveRow(ctx context.Context, category string, row peerTubeSearchRow, knownMediaID string) (Discovered, bool, error) {
 	origin := peerTubeRowOrigin(row, t.domain)
 	target := fmt.Sprintf("%s/api/v1/videos/%s", strings.TrimRight(origin, "/"), url.PathEscape(row.UUID))
 	body, err := t.fetch(ctx, target)
@@ -374,18 +405,37 @@ func (t *peerTubeStrategy) resolveRow(ctx context.Context, category string, row 
 		return Discovered{}, false, nil
 	}
 
-	magnet, err := metainfo.ParseMagnetURI(file.MagnetUri)
-	if err != nil {
+	if _, err := metainfo.ParseMagnetURI(file.MagnetUri); err != nil {
 		return Discovered{}, false, fmt.Errorf("unable to parse magnet uri: %w", err)
 	}
 
-	infohash := int160.FromByteArray(magnet.InfoHash)
-	d := NewDiscovered(
-		&infohash,
-		DiscoveredOptionURI(file.MagnetUri),
-		DiscoveredOptionTitle(row.Name),
-		DiscoveredOptionDescription(row.Description),
-		DiscoveredOptionMimetype(peerTubeCategoryMimetype(category)),
+	thumbnail, _ := bestPeerTubeThumbnail(video.Thumbnails)
+	imp := &ddiscapi.Import{
+		Uri:          file.MagnetUri,
+		Title:        row.Name,
+		Overview:     row.Description,
+		PosterPath:   thumbnail,
+		Source:       "retrovibed.discovery.peertube",
+		Mimetype:     peerTubeCategoryMimetype(category),
+		KnownMediaId: knownMediaID,
+	}
+
+	// mirrors pluginSeq.Each: a resolved (non-sentinel) known-media id means
+	// this candidate targets a specific catalog entry, so TOFU-record
+	// whatever catalog info (poster included) it carries - see
+	// KnownMediaFromImport. The TOFU conflict clause never overwrites an
+	// already-persisted row, so this can only backfill a missing poster.
+	if kid := uuid.FromStringOrNil(imp.KnownMediaId); !uuidx.IsMinMax(kid) {
+		known := KnownMediaFromImport(kid, imp.Mimetype, imp)
+		if err := library.KnownInsertWithDefaultsTOFU(ctx, t.q, known).Scan(&known); err != nil {
+			log.Printf("ddisc: peertube: unable to record known media from %s: %v", row.UUID, err)
+		}
+	}
+
+	d := NewDiscoveredFromImport(
+		imp,
+		DiscoveredOptionKnownMedia(imp.KnownMediaId),
+		DiscoveredOptionMimetype(imp.Mimetype),
 		DiscoveredOptionDetectCorrupted,
 	)
 

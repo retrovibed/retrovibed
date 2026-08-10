@@ -112,14 +112,14 @@ func DiscoveredOptionURI(s string) DiscoveredOption {
 // when uri isn't already set (i.e. NewDiscovered/NewDiscoveredFromKnown was
 // called with an empty uri). Callers that only ever have a raw infohash in
 // hand (DHT/wire-sync, protobuf bridges, etc.) can use this instead of
-// constructing metainfo.Magnet{InfoHash: metainfo.Hash(id.Bytes())}.String()
-// themselves at every call site.
+// calling metainfo.NewMagnetFromInfohash(id.Bytes()).String() themselves at
+// every call site.
 func DiscoveredOptionAutoMagnet(d *Discovered) {
 	if d.URI != "" {
 		return
 	}
 
-	d.URI = metainfo.Magnet{InfoHash: metainfo.Hash(d.Infohash)}.String()
+	d.URI = metainfo.NewMagnetFromInfohash(d.Infohash).String()
 	d.Contentmime = mimex.Bittorrent
 }
 
@@ -305,22 +305,31 @@ func NewDiscoveredFromKnown(md int160.T, known library.Known, options ...Discove
 }
 
 // NewDiscoveredFromImport builds a Discovered candidate directly from a
-// search-plugin result, before its real infohash is known - keyed by
-// md5(uri) (same pattern as ddisc.Locate's row id) rather than the real
-// infohash NewDiscovered's callers already have in hand. ddisc_media's
+// search-plugin (or first-party in-process strategy, e.g. PeerTubeStrategy)
+// result. When imp.Uri is itself a magnet uri, its real infohash is parsed
+// out and used directly - same identity (torrentx.HashUID) NewDiscovered's
+// callers get. Otherwise the real infohash isn't known yet - keyed by
+// md5(uri) (same pattern as ddisc.Locate's row id) instead. ddisc_media's
 // infohash column is NOT NULL and must be exactly 20 bytes, so
 // int160.FromHashedBytes(imp.Uri) (SHA1 of the uri) is stored as a
 // placeholder until the real infohash is resolved - which only happens
 // once this row is actually selected and handed to an importer (see
 // daemons.DiscoveredDownload), not for every candidate up front.
 func NewDiscoveredFromImport(imp *ddiscapi.Import, options ...DiscoveredOption) (m Discovered) {
-	placeholder := int160.FromHashedBytes([]byte(imp.Uri))
+	id := md5x.FormatUUID(md5x.Digest(imp.Uri))
+	infohash := int160.FromHashedBytes([]byte(imp.Uri))
+	if magnet, err := metainfo.ParseMagnetURI(imp.Uri); err == nil {
+		infohash = int160.FromByteArray(magnet.InfoHash)
+		id = torrentx.HashUID(&infohash)
+	}
+
 	r := langx.Clone(Discovered{
-		ID:                     md5x.FormatUUID(md5x.Digest(imp.Uri)),
+		ID:                     id,
 		Source:                 imp.Source,
 		URI:                    imp.Uri,
-		Infohash:               placeholder.Bytes(),
+		Infohash:               infohash.Bytes(),
 		Title:                  imp.Title,
+		Description:            imp.Overview,
 		Health:                 imp.Health,
 		Bytes:                  imp.Bytes,
 		KnownMediaID:           uuid.Nil.String(),
