@@ -42,6 +42,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/wireguardx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/retrovibed/retrovibed/shallows/media"
+	"github.com/retrovibed/retrovibed/shallows/mediaapi"
 	"github.com/retrovibed/retrovibed/shallows/meta/identityssh"
 	"github.com/retrovibed/retrovibed/shallows/metaapi"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
@@ -431,6 +432,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	media.NewHTTPRecommendations(db).Bind(httpmux.PathPrefix("/r").Subrouter())
 	media.NewHTTPSimilar(db).Bind(httpmux.PathPrefix("/similar").Subrouter())
 	media.NewHTTPRecent(db).Bind(httpmux.PathPrefix("/w").Subrouter())
+	mediaapi.NewHTTPRemoteControl().Bind(httpmux.PathPrefix("/rc").Subrouter())
 	ddiscapi.NewHTTPPeerManagement(db).Bind(httpmux.PathPrefix("/ddisc").Subrouter())
 	discoveryimporter := tracking.NewURIImport(db, httpx.BindRetryTransport(&http.Client{
 		Transport: &http.Transport{DialContext: privateDialer.DialContext},
