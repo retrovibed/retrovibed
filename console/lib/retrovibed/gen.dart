@@ -76,6 +76,16 @@ class DaemonBridge {
   late final _authn_bearerPtr = _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function()>>('authn_bearer');
   late final _authn_bearer = _authn_bearerPtr.asFunction<ffi.Pointer<ffi.Char> Function()>();
 
+  ffi.Pointer<ffi.Char> remote_control_listen_token() {
+    return _remote_control_listen_token();
+  }
+
+  late final _remote_control_listen_tokenPtr = _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function()>>(
+    'remote_control_listen_token',
+  );
+  late final _remote_control_listen_token = _remote_control_listen_tokenPtr
+      .asFunction<ffi.Pointer<ffi.Char> Function()>();
+
   ffi.Pointer<ffi.Char> authn_bearer_host(
     ffi.Pointer<ffi.Char> hostname,
   ) {

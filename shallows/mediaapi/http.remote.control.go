@@ -22,7 +22,7 @@ import (
 // generated once per process, never persisted to disk - dies with the
 // process so a leaked/logged listen token can never outlive it or be
 // replayed against a different run.
-var remoteControlListenSecret = sync.OnceValue(func() []byte {
+var remoteControlSecret = sync.OnceValue(func() []byte {
 	b := make([]byte, 32)
 	if _, err := rand.Read(b); err != nil {
 		panic(errorsx.Wrap(err, "unable to generate remote control listen secret"))
@@ -40,7 +40,7 @@ func RemoteControlListenToken() (string, error) {
 		jwtx.ClaimsOptionIssuer("remotecontrol"),
 	)
 
-	bearer, err := jwtx.Signed(remoteControlListenSecret(), claims)
+	bearer, err := jwtx.Signed(remoteControlSecret(), claims)
 	return bearer, errorsx.Wrap(err, "unable to sign remote control listen token")
 }
 
@@ -84,7 +84,7 @@ func (t *HTTPRemoteControl) Bind(r *mux.Router) {
 	r.Path("/listen").Methods(http.MethodGet).Handler(alice.New(
 		httpx.ContextBufferPool512(),
 		httpx.ParseForm,
-		httpauth.AuthenticateWithToken(remoteControlListenSecret),
+		httpauth.AuthenticateWithToken(remoteControlSecret),
 		httpx.Timeout2s(),
 	).ThenFunc(t.listen))
 

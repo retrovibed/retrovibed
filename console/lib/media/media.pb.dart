@@ -29,6 +29,7 @@ class Media extends $pb.GeneratedMessage {
     $core.String? updatedAt,
     $core.String? knownMediaId,
     $core.String? encryptionSeed,
+    $core.String? uri,
   }) {
     final result = create();
     if (id != null) result.id = id;
@@ -41,6 +42,7 @@ class Media extends $pb.GeneratedMessage {
     if (updatedAt != null) result.updatedAt = updatedAt;
     if (knownMediaId != null) result.knownMediaId = knownMediaId;
     if (encryptionSeed != null) result.encryptionSeed = encryptionSeed;
+    if (uri != null) result.uri = uri;
     return result;
   }
 
@@ -67,6 +69,7 @@ class Media extends $pb.GeneratedMessage {
     ..aOS(8, _omitFieldNames ? '' : 'updated_at')
     ..aOS(9, _omitFieldNames ? '' : 'known_media_id')
     ..aOS(10, _omitFieldNames ? '' : 'encryption_seed')
+    ..aOS(11, _omitFieldNames ? '' : 'uri')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -176,6 +179,15 @@ class Media extends $pb.GeneratedMessage {
   $core.bool hasEncryptionSeed() => $_has(9);
   @$pb.TagNumber(10)
   void clearEncryptionSeed() => $_clearField(10);
+
+  @$pb.TagNumber(11)
+  $core.String get uri => $_getSZ(10);
+  @$pb.TagNumber(11)
+  set uri($core.String value) => $_setString(10, value);
+  @$pb.TagNumber(11)
+  $core.bool hasUri() => $_has(10);
+  @$pb.TagNumber(11)
+  void clearUri() => $_clearField(11);
 }
 
 class MediaSearchRequest extends $pb.GeneratedMessage {

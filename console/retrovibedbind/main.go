@@ -98,6 +98,16 @@ func authn_bearer() *C.char {
 	return C.CString(bearer)
 }
 
+//export remote_control_listen_token
+func remote_control_listen_token() *C.char {
+	bearer, err := retrovibedbindx.RemoteControlListenToken()
+	if err != nil {
+		log.Println("failed to mint remote control listen token", err)
+		return C.CString("")
+	}
+	return C.CString(bearer)
+}
+
 //export authn_bearer_host
 func authn_bearer_host(hostname *C.char) *C.char {
 	ctx, done := context.WithTimeout(context.Background(), 10*time.Second)

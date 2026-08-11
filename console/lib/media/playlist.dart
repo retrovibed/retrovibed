@@ -178,9 +178,7 @@ class Playlist extends StatefulWidget {
 
 class _PlaylistState extends State<Playlist> {
   final playqueue.PlayQueue _queue = playqueue.PlayQueue();
-  final Player player = Player(
-    // configuration: const PlayerConfiguration(logLevel: MPVLogLevel.v),
-  );
+  final Player player = Player();
   playqueue.RangeFn autoqueue = playqueue.search;
   final TextEditingController controller = TextEditingController();
   final FocusNode playerfocus = FocusNode(
