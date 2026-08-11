@@ -181,6 +181,8 @@ func GenerateProtocol(ctx context.Context, _ eg.Op) error {
 		runtime.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib/media -I.proto .proto/media.recent.proto"),
 		runtime.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib/media -I.proto .proto/ddisc.locate.proto"),
 		runtime.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib/media -I.proto .proto/content.addressable.storage.proto"),
+		// remote control command stream
+		runtime.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib/media -I.proto .proto/media.proto .proto/media.remote.control.proto"),
 		runtime.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib/ddisc -I.proto .proto/meta.search.proto .proto/ddisc.discovery.proto"),
 		runtime.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib/rss -I.proto .proto/rss.proto"),
 		runtime.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib/community -I.proto .proto/community.proto"),
@@ -238,9 +240,9 @@ func runDev(cmd string, rt shell.Command, envopts ...func(shell.Command) shell.C
 
 func RunDev(cmd string, envopts ...func(shell.Command) shell.Command) eg.OpFn {
 	rt := shell.Runtime().
-		Environ("RETROVIBED_META_ENDPOINT", "localhost:8081").
-		Environ("RETROVIBED_CONSOLE_ENDPOINT", "localhost:8080")
-		// Environ("RETROVIBED_META_ENDPOINT", "api.retrovibe.space").
-		// Environ("RETROVIBED_CONSOLE_ENDPOINT", "console.retrovibe.space")
+		// Environ("RETROVIBED_META_ENDPOINT", "localhost:8081").
+		// Environ("RETROVIBED_CONSOLE_ENDPOINT", "localhost:8080")
+		Environ("RETROVIBED_META_ENDPOINT", "api.retrovibe.space").
+		Environ("RETROVIBED_CONSOLE_ENDPOINT", "console.retrovibe.space")
 	return runDev(cmd, rt, envopts...)
 }

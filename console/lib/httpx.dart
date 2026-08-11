@@ -41,14 +41,18 @@ void set(String uri) {
   _host = uri;
 }
 
-// return an identity token for the local device.
+// return an deeppool identity token for retrovibed api.
 String oauth2_bearer() {
-  return "bearer ${retro.oauth2_bearer()}";
+  final token = retro.oauth2_bearer();
+  if (token.isEmpty) return "";
+  return "bearer ${token}";
 }
 
 // return an identity token for the local device.
 String auto_bearer() {
-  return "bearer ${retro.bearer_token()}";
+  final token = retro.bearer_token();
+  if (token.isEmpty) return "";
+  return "bearer ${token}";
 }
 
 // return a identity token from the currently connected host.
@@ -231,7 +235,7 @@ class Request {
     return (Request request) {
       return token().then((v) {
         if (v.isEmpty) throw const MissingTokenError();
-        request.headers["Authorization"] = "Bearer ${v}";
+        request.headers["Authorization"] = v.toLowerCase().startsWith("bearer ") ? v : "Bearer ${v}";
         return Future.value(
           request,
         ); // Returns a completed Future with the modified request

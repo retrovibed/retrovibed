@@ -36,9 +36,7 @@ func (t *DiscoveryDownloadResponse) UnmarshalJSON(b []byte) error {
 }
 
 func NewDiscoveryFromTrackingUnknownHash(mu tracking.UnknownHash) *Discovery {
-	mg := metainfo.Magnet{
-		InfoHash: metainfo.Hash(mu.Infohash),
-	}
+	mg := metainfo.NewMagnetFromInfohash(mu.Infohash)
 
 	return &Discovery{
 		Id:           mu.ID,

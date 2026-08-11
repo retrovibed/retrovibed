@@ -46,9 +46,9 @@ func main() {
 					egenv.CacheDirectory("dev.native.libs"),
 				),
 				console.BuildLinux,
+				console.RunDev(`flutter run -d linux`),
 			),
 		),
-		console.RunDev("flutter run -d linux"),
 	)
 
 	if err != nil {

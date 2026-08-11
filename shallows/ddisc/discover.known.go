@@ -4,6 +4,7 @@ import (
 	"context"
 	"iter"
 	"log"
+	"time"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/davecgh/go-spew/spew"
@@ -29,6 +30,12 @@ const knownSimilarityCutoff = 0.6
 // knownStrategyLimit caps how many catalog matches a single Discover call
 // can surface.
 const knownStrategyLimit = 10
+
+// knownMediaTOFUTTL is how long a TOFU placeholder survives without being
+// rediscovered before library.NewKnownMediaTombstonedCleanup reaps it.
+// KnownInsertWithDefaultsTOFU's ON CONFLICT refreshes tombstoned_at on every
+// rediscovery, so this is a sliding window, not a fixed expiry from creation.
+const knownMediaTOFUTTL = 7 * 24 * time.Hour
 
 // KnownStrategy searches the library_known_media catalog by fuzzy title
 // match. Unlike LocalStrategy (which requires an exact known-media-id to
@@ -161,5 +168,54 @@ func (t *knownMediaDetectSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 }
 
 func (t *knownMediaDetectSeq) Err() error {
+	return t.err
+}
+
+// KnownMediaDynamic builds a DiscoverOptionKnownMediaDynamic transform that
+// mints a new library_known_media catalog entry (see KnownMediaFromDiscovered)
+// for a candidate that doesn't already have one, provided the candidate
+// carries enough content to be worth cataloging (a title and a poster) -
+// without this, a candidate KnownMediaDetector couldn't match against the
+// existing catalog would otherwise never get a known-media id, and so would
+// never show up anywhere the UI renders by known media (e.g.
+// library.Recommendation). Intended to run after KnownMediaDetector, so it
+// only ever mints an entry once title-matching has already had its chance to
+// resolve one. On a successful insert, the candidate is stamped with the new
+// id so it flows through Discover linked to the row it just created.
+func KnownMediaDynamic(q sqlx.Queryer) func(iterx.Seq[Discovered]) iterx.Seq[Discovered] {
+	return func(s iterx.Seq[Discovered]) iterx.Seq[Discovered] {
+		return &knownMediaDynamicSeq{inner: s, q: q}
+	}
+}
+
+type knownMediaDynamicSeq struct {
+	inner iterx.Seq[Discovered]
+	q     sqlx.Queryer
+	err   error
+}
+
+func (t *knownMediaDynamicSeq) Each(ctx context.Context) iter.Seq[Discovered] {
+	return func(yield func(Discovered) bool) {
+		for d := range t.inner.Each(ctx) {
+			if uuidx.IsMinMax(uuid.FromStringOrNil(d.KnownMediaID)) && stringsx.Present(d.Title) && stringsx.Present(d.PosterURI) {
+				kid := uuid.Must(uuid.NewV4())
+				known := KnownMediaFromDiscovered(kid, d)
+				if err := library.KnownInsertWithDefaultsTOFU(ctx, t.q, known).Scan(&known); err != nil {
+					log.Println("unable to record known media from discovered candidate", err)
+				} else {
+					d.KnownMediaID = known.UID
+				}
+			}
+
+			if !yield(d) {
+				return
+			}
+		}
+
+		t.err = t.inner.Err()
+	}
+}
+
+func (t *knownMediaDynamicSeq) Err() error {
 	return t.err
 }

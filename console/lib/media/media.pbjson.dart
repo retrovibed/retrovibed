@@ -29,6 +29,7 @@ const Media$json = {
     {'1': 'updated_at', '3': 8, '4': 1, '5': 9, '10': 'updated_at'},
     {'1': 'known_media_id', '3': 9, '4': 1, '5': 9, '10': 'known_media_id'},
     {'1': 'encryption_seed', '3': 10, '4': 1, '5': 9, '10': 'encryption_seed'},
+    {'1': 'uri', '3': 11, '4': 1, '5': 9, '10': 'uri'},
   ],
 };
 
@@ -39,7 +40,8 @@ final $typed_data.Uint8List mediaDescriptor = $convert.base64Decode(
     'YXJjaGl2ZV9pZBgFIAEoCVIKYXJjaGl2ZV9pZBIeCgp0b3JyZW50X2lkGAYgASgJUgp0b3JyZW'
     '50X2lkEh4KCmNyZWF0ZWRfYXQYByABKAlSCmNyZWF0ZWRfYXQSHgoKdXBkYXRlZF9hdBgIIAEo'
     'CVIKdXBkYXRlZF9hdBImCg5rbm93bl9tZWRpYV9pZBgJIAEoCVIOa25vd25fbWVkaWFfaWQSKA'
-    'oPZW5jcnlwdGlvbl9zZWVkGAogASgJUg9lbmNyeXB0aW9uX3NlZWQ=');
+    'oPZW5jcnlwdGlvbl9zZWVkGAogASgJUg9lbmNyeXB0aW9uX3NlZWQSEAoDdXJpGAsgASgJUgN1'
+    'cmk=');
 
 @$core.Deprecated('Use mediaSearchRequestDescriptor instead')
 const MediaSearchRequest$json = {

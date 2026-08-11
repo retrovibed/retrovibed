@@ -42,6 +42,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/wireguardx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/retrovibed/retrovibed/shallows/media"
+	"github.com/retrovibed/retrovibed/shallows/mediaapi"
 	"github.com/retrovibed/retrovibed/shallows/meta/identityssh"
 	"github.com/retrovibed/retrovibed/shallows/metaapi"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
@@ -74,7 +75,7 @@ type Command struct {
 	AutoMDNS            bool             `flag:"" name:"auto-mdns" help:"enable the multicast dns service" env:"${env_auto_mdns}" default:"true" negatable:""`
 	AutoBootstrap       bool             `flag:"" name:"auto-bootstrap" help:"bootstrap from a predefined set of peers" env:"${env_auto_bootstrap}" default:"true" negatable:""`
 	AutoDiscovery       bool             `flag:"" name:"auto-discovery" help:"enable automatic discovery of content from peers" env:"${env_auto_discovery}" default:"true" negatable:""`
-	AutoPeerTube        bool             `flag:"" name:"auto-peertube" help:"enable the built-in PeerTube/SepiaSearch discovery strategy" env:"${env_auto_peertube}" default:"false" negatable:""`
+	AutoPeerTube        bool             `flag:"" name:"auto-peertube" help:"enable the built-in PeerTube/SepiaSearch discovery strategy" env:"${env_auto_peertube}" default:"true" negatable:""`
 	PeerTubeDomain      string           `flag:"" name:"peertube-domain" help:"base url of the PeerTube/SepiaSearch instance to search" env:"${env_peertube_domain}" default:"https://sepiasearch.org"`
 	AutoIdentifyMedia   bool             `flag:"" name:"auto-identify-media" help:"enable automatically identifying media" env:"${env_auto_identify_media}" default:"true" negatable:""`
 	AutoLocateMedia     bool             `flag:"" name:"auto-locate-media" help:"enable automatically locating media from distributed index" env:"${env_auto_locate_media}" default:"true" negatable:""`
@@ -319,6 +320,10 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		errorsx.Log(library.NewTombstonedCleanup(ctx, mediastore, db))
 	})
 
+	go timex.NowAndEveryVoid(gctx.Context, 24*time.Hour, func(ctx context.Context) {
+		errorsx.Log(library.NewKnownMediaTombstonedCleanup(ctx, db))
+	})
+
 	if len(t.TorrentFolderWatch) > 0 {
 		dwatcher, err := downloads.NewDirectoryWatcher(gctx.Context, tlsx.MustClone(tlscfg.Config(), tlsx.OptionInsecureSkipVerify), db)
 		if err != nil {
@@ -427,6 +432,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	media.NewHTTPRecommendations(db).Bind(httpmux.PathPrefix("/r").Subrouter())
 	media.NewHTTPSimilar(db).Bind(httpmux.PathPrefix("/similar").Subrouter())
 	media.NewHTTPRecent(db).Bind(httpmux.PathPrefix("/w").Subrouter())
+	mediaapi.NewHTTPRemoteControl().Bind(httpmux.PathPrefix("/rc").Subrouter())
 	ddiscapi.NewHTTPPeerManagement(db).Bind(httpmux.PathPrefix("/ddisc").Subrouter())
 	discoveryimporter := tracking.NewURIImport(db, httpx.BindRetryTransport(&http.Client{
 		Transport: &http.Transport{DialContext: privateDialer.DialContext},

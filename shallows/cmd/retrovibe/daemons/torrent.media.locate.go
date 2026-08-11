@@ -56,6 +56,7 @@ func Locate(ctx context.Context, db sqlx.Queryer, disc *DiscoverySettings, dhts 
 	options := []ddisc.DiscoverOption{
 		ddisc.DiscoverOptionFilter(ddisc.NewTitleFilter(db, req).Match),
 		ddisc.DiscoverOptionDetectMedia(ddisc.KnownMediaDetector(db, mc)),
+		ddisc.DiscoverOptionKnownMediaDynamic(ddisc.KnownMediaDynamic(db)),
 	}
 	seq := ddisc.Discover(ctx, policy, req, options, strategies...)
 	best, err := ddisc.Select(func(yield func(ddisc.Discovered) bool) {

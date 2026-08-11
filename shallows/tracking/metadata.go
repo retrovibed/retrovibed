@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -58,6 +59,7 @@ func MetadataOptionFromInfo(i *metainfo.Info) func(*Metadata) {
 func MetadataOptionFromMagnet(i *metainfo.Magnet) func(*Metadata) {
 	return func(m *Metadata) {
 		m.Description = strings.ToValidUTF8(i.DisplayName, "\uFFFD")
+		MetadataOptionTrackers(i.Trackers...)(m)
 	}
 }
 
@@ -73,10 +75,31 @@ func MetadataOptionDescription(d string) func(*Metadata) {
 	}
 }
 
-// Currently will select just the first tracker due to poor list support in duckdb.
+// trackerSchemePriority ranks tracker announce URLs by scheme so
+// MetadataOptionTrackers can prefer https over http over udp; wss is ranked
+// lowest since it's unsupported.
+func trackerSchemePriority(uri string) int {
+	switch {
+	case strings.HasPrefix(uri, "https://"):
+		return 3
+	case strings.HasPrefix(uri, "http://"):
+		return 2
+	case strings.HasPrefix(uri, "udp://"):
+		return 1
+	default: // wss/other unspported schemes.
+		return 0
+	}
+}
+
+// Currently will select just the highest priority tracker (by scheme) due
+// to poor list support in duckdb.
 func MetadataOptionTrackers(d ...string) func(*Metadata) {
 	return func(m *Metadata) {
-		m.Tracker = slicesx.FirstOrZero(d...)
+		sorted := slices.Clone(d)
+		slices.SortFunc(sorted, func(a, b string) int {
+			return trackerSchemePriority(b) - trackerSchemePriority(a)
+		})
+		m.Tracker = langx.FirstNonZero(sorted...)
 	}
 }
 

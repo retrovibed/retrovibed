@@ -56,11 +56,11 @@ func (t exportMagnets) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) 
 
 	scanner := sqlx.Scan(tracking.MetadataSearch(gctx.Context, db, q))
 	for lmd := range scanner.Iter() {
-		mg := metainfo.Magnet{
-			InfoHash:    metainfo.Hash(lmd.Infohash),
-			Trackers:    []string{lmd.Tracker},
-			DisplayName: lmd.Description,
-		}
+		mg := metainfo.NewMagnetFromInfohash(
+			lmd.Infohash,
+			metainfo.MagnetOptionTrackers(lmd.Tracker),
+			metainfo.MagnetOptionDisplayName(lmd.Description),
+		)
 		rec := torrentRecord{Magnet: mg.String(), EncryptionSeed: lmd.EncryptionSeed}
 		if err = enc.Encode(rec); err != nil {
 			return err

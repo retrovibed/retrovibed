@@ -14,7 +14,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
-	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/stretchr/testify/require"
 )
 
@@ -40,7 +39,7 @@ func TestPluginStrategyYieldsUnpersisted(t *testing.T) {
 	kid := uuid.Must(uuid.NewV4()).String()
 
 	plugins := fakePluginSeq{results: []*ddiscapi.Import{{Uri: magnet, Uritype: mimex.Magnet, Health: 5, Bytes: 1234, Mimetype: mimex.Video}}}
-	seq := ddisc.PluginStrategy(q, plugins).Discover(t.Context(), ddisc.DiscoverRequest{KnownMediaID: kid, Query: "ubuntu", Mimetypes: []string{mimex.Video}})
+	seq := ddisc.PluginStrategy(plugins).Discover(t.Context(), ddisc.DiscoverRequest{KnownMediaID: kid, Query: "ubuntu", Mimetypes: []string{mimex.Video}})
 
 	var got []ddisc.Discovered
 	for v := range seq.Each(t.Context()) {
@@ -57,7 +56,7 @@ func TestPluginStrategyNoopsWithoutTitle(t *testing.T) {
 	q := sqltestx.Metadatabase(t)
 
 	plugins := fakePluginSeq{results: []*ddiscapi.Import{{Uri: "magnet:?xt=urn:btih:1111111111111111111111111111111111111111", Uritype: mimex.Magnet}}}
-	seq := ddisc.PluginStrategy(q, plugins).Discover(t.Context(), ddisc.DiscoverRequest{KnownMediaID: uuid.Must(uuid.NewV4()).String()})
+	seq := ddisc.PluginStrategy(plugins).Discover(t.Context(), ddisc.DiscoverRequest{KnownMediaID: uuid.Must(uuid.NewV4()).String()})
 
 	var count int
 	for range seq.Each(t.Context()) {
@@ -68,123 +67,7 @@ func TestPluginStrategyNoopsWithoutTitle(t *testing.T) {
 	require.Equal(t, 0, sqltestx.Count(t, q, "SELECT COUNT(*) FROM library_known_media"))
 }
 
-func TestPluginStrategyRecordsKnownMediaTOFU(t *testing.T) {
-	q := sqltestx.Metadatabase(t)
-
-	id := int160.Random()
-	magnet := fmt.Sprintf("magnet:?xt=urn:btih:%s", id.String())
-	kid := uuid.Must(uuid.NewV4()).String()
-
-	plugins := fakePluginSeq{results: []*ddiscapi.Import{{
-		Uri:          magnet,
-		Uritype:      mimex.Magnet,
-		Health:       5,
-		Mimetype:     mimex.Video,
-		KnownMediaId: kid,
-		Title:        "Ubuntu Documentary",
-		Overview:     "a documentary about ubuntu",
-		Popularity:   4.2,
-		PosterPath:   "/ubuntu.jpg",
-		Source:       "unit3d",
-	}}}
-	seq := ddisc.PluginStrategy(q, plugins).Discover(t.Context(), ddisc.DiscoverRequest{KnownMediaID: kid, Query: "ubuntu", Mimetypes: []string{mimex.Video}})
-
-	for range seq.Each(t.Context()) {
-	}
-	require.NoError(t, seq.Err())
-
-	var known library.Known
-	require.NoError(t, library.KnownFindByID(t.Context(), q, kid).Scan(&known))
-	require.Equal(t, "Ubuntu Documentary", known.Title)
-	require.Equal(t, "a documentary about ubuntu", known.Overview)
-	require.Equal(t, 4.2, known.Popularity)
-	require.Equal(t, "/ubuntu.jpg", known.PosterPath)
-	require.Equal(t, "unit3d", known.Source)
-}
-
-func TestPluginStrategyKnownMediaTOFUDoesNotOverwrite(t *testing.T) {
-	q := sqltestx.Metadatabase(t)
-	kid := uuid.Must(uuid.NewV4()).String()
-
-	first := fakePluginSeq{results: []*ddiscapi.Import{{
-		Uri:          fmt.Sprintf("magnet:?xt=urn:btih:%s", int160.Random()),
-		Uritype:      mimex.Magnet,
-		Mimetype:     mimex.Video,
-		KnownMediaId: kid,
-		Title:        "original title",
-		Source:       "unit3d",
-	}}}
-	seq := ddisc.PluginStrategy(q, first).Discover(t.Context(), ddisc.DiscoverRequest{KnownMediaID: kid, Query: "q", Mimetypes: []string{mimex.Video}})
-	for range seq.Each(t.Context()) {
-	}
-	require.NoError(t, seq.Err())
-
-	second := fakePluginSeq{results: []*ddiscapi.Import{{
-		Uri:          fmt.Sprintf("magnet:?xt=urn:btih:%s", int160.Random()),
-		Uritype:      mimex.Magnet,
-		Mimetype:     mimex.Video,
-		KnownMediaId: kid,
-		Title:        "different title",
-		Source:       "leetx",
-	}}}
-	seq2 := ddisc.PluginStrategy(q, second).Discover(t.Context(), ddisc.DiscoverRequest{KnownMediaID: kid, Query: "q", Mimetypes: []string{mimex.Video}})
-	for range seq2.Each(t.Context()) {
-	}
-	require.NoError(t, seq2.Err())
-
-	var known library.Known
-	require.NoError(t, library.KnownFindByID(t.Context(), q, kid).Scan(&known))
-	require.Equal(t, "original title", known.Title)
-	require.Equal(t, "unit3d", known.Source)
-}
-
-func TestPluginStrategyRecordsKnownMediaWithoutTitle(t *testing.T) {
-	q := sqltestx.Metadatabase(t)
-	kid := uuid.Must(uuid.NewV4()).String()
-
-	plugins := fakePluginSeq{results: []*ddiscapi.Import{{
-		Uri:          fmt.Sprintf("magnet:?xt=urn:btih:%s", int160.Random()),
-		Uritype:      mimex.Magnet,
-		Mimetype:     mimex.Video,
-		KnownMediaId: kid,
-		Source:       "unit3d",
-	}}}
-	seq := ddisc.PluginStrategy(q, plugins).Discover(t.Context(), ddisc.DiscoverRequest{KnownMediaID: kid, Query: "q", Mimetypes: []string{mimex.Video}})
-	for range seq.Each(t.Context()) {
-	}
-	require.NoError(t, seq.Err())
-
-	var known library.Known
-	require.NoError(t, library.KnownFindByID(t.Context(), q, kid).Scan(&known))
-	require.Equal(t, kid, known.UID)
-	require.Equal(t, "unit3d", known.Source)
-}
-
-func TestPluginStrategySkipsSentinelKnownMediaID(t *testing.T) {
-	for _, kid := range []string{"", uuid.Nil.String(), uuid.Max.String()} {
-		t.Run(fmt.Sprintf("known_media_id=%q", kid), func(t *testing.T) {
-			q := sqltestx.Metadatabase(t)
-
-			plugins := fakePluginSeq{results: []*ddiscapi.Import{{
-				Uri:          fmt.Sprintf("magnet:?xt=urn:btih:%s", int160.Random()),
-				Uritype:      mimex.Magnet,
-				Mimetype:     mimex.Video,
-				KnownMediaId: kid,
-				Title:        "some title",
-				Source:       "unit3d",
-			}}}
-			seq := ddisc.PluginStrategy(q, plugins).Discover(t.Context(), ddisc.DiscoverRequest{KnownMediaID: uuid.Must(uuid.NewV4()).String(), Query: "q", Mimetypes: []string{mimex.Video}})
-			for range seq.Each(t.Context()) {
-			}
-			require.NoError(t, seq.Err())
-			require.Equal(t, 0, sqltestx.Count(t, q, "SELECT COUNT(*) FROM library_known_media"))
-		})
-	}
-}
-
 func TestPluginStrategyResolvesNonMagnetURI(t *testing.T) {
-	q := sqltestx.Metadatabase(t)
-
 	uri := "https://tracker.example/download/1000.abc"
 	kid := uuid.Must(uuid.NewV4()).String()
 
@@ -195,7 +78,7 @@ func TestPluginStrategyResolvesNonMagnetURI(t *testing.T) {
 		Mimetype: mimex.Video,
 		Title:    "Some Release",
 	}}}
-	seq := ddisc.PluginStrategy(q, plugins).Discover(t.Context(), ddisc.DiscoverRequest{KnownMediaID: kid, Query: "ubuntu", Mimetypes: []string{mimex.Video}})
+	seq := ddisc.PluginStrategy(plugins).Discover(t.Context(), ddisc.DiscoverRequest{KnownMediaID: kid, Query: "ubuntu", Mimetypes: []string{mimex.Video}})
 
 	var got []ddisc.Discovered
 	for v := range seq.Each(t.Context()) {

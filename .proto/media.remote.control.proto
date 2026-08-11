@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package media;
+
+import "media.proto";
+
+// enqueue a bit of media for playback.
+message Queue { Media media = 1 [ json_name = "media" ]; }
+// dequeue the media with the given id.
+message Dequeue { string id = 1 [ json_name = "id" ]; }
+// playpause commands the device to toggle media playback.
+// the paused flag is to
+message PlayPause { bool paused = 1 [ json_name = "paused" ]; }
+
+// Seek - move forward/back the given amount of time (milliseconds), relative
+// to the current position. offset == int32 max/min is a sentinel meaning
+// "skip to next/previous track" rather than a literal seek.
+message Seek { int32 offset = 1 [ json_name = "offset" ]; }
+
+// represents a stream of commands / responses for the remote control.
+// each command / response will contain a 'sid' representing the sequentialish
+// id.
+message Stream {
+  string sid = 1 [ json_name = "sid" ];
+  oneof Command {
+    Queue queue = 1000 [ json_name = "queue" ];
+    Dequeue dequeue = 1002 [ json_name = "dequeue" ];
+    PlayPause playpause = 1003 [ json_name = "playpause" ];
+    Seek seek = 1004 [ json_name = "seek" ];
+  }
+}

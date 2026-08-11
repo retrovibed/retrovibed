@@ -78,6 +78,12 @@ String bearer_token() {
   return _convertstring(bridge.authn_bearer());
 }
 
+// return a bearer authorized to connect to this process's own local
+// remote control listen socket. never valid outside this process.
+String remote_control_listen_token() {
+  return _convertstring(bridge.remote_control_listen_token());
+}
+
 String bearer_token_host(String hostname) {
   return _convertstring(
     bridge.authn_bearer_host(hostname.toNativeUtf8().cast<Char>()),

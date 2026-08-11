@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:retrovibed/billing.dart' as billing;
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/media.dart' as media;
+import 'package:retrovibed/remote.dart' as remote;
 import 'package:retrovibed/library.dart' as medialib;
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/meta.dart' as meta;
@@ -142,7 +143,9 @@ class Retrovibed extends StatelessWidget {
                                         })
                                         .ignore();
                                   },
-                                  const routes.Routes(),
+                                  remote.RemoteControlListener(
+                                    child: const routes.Routes(),
+                                  ),
                                 ),
                               ),
                             ),

@@ -41,8 +41,9 @@ func SearchQueueBackgroundRun(ctx context.Context, q sqlx.Queryer, importer trac
 		options := []ddisc.DiscoverOption{
 			ddisc.DiscoverOptionFilter(ddisc.NewTitleFilter(q, req).Match),
 			ddisc.DiscoverOptionDetectMedia(ddisc.KnownMediaDetector(q, mc)),
+			ddisc.DiscoverOptionKnownMediaDynamic(ddisc.KnownMediaDynamic(q)),
 		}
-		seq := ddisc.Discover(sctx, ddisc.DefaultPolicy(), req, options, ddisc.ExternalStrategies(q, plugins, peertube)...)
+		seq := ddisc.Discover(sctx, ddisc.DefaultPolicy(), req, options, ddisc.ExternalStrategies(plugins, peertube)...)
 
 		found := false
 		for d := range seq.Each(sctx) {

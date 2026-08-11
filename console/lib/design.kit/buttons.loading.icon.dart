@@ -80,6 +80,29 @@ class LoadingIconButton extends StatefulWidget {
     );
   }
 
+  factory LoadingIconButton.logout({
+    required AsyncVoidCallback onPressed,
+    Key? key,
+    String? tooltip,
+    bool disabled = false,
+    bool? toggled,
+    double iconSize = _defaultIconSize,
+    double? value,
+    Widget help = HelpScope.None,
+  }) {
+    return LoadingIconButton(
+      key: key,
+      onPressed: onPressed,
+      icon: const Icon(Icons.logout),
+      tooltip: tooltip,
+      disabled: disabled,
+      toggled: toggled,
+      iconSize: iconSize,
+      value: value,
+      help: help,
+    );
+  }
+
   factory LoadingIconButton.close({
     required AsyncVoidCallback onPressed,
     Key? key,
@@ -228,6 +251,7 @@ class _LoadingIconButtonState extends State<LoadingIconButton> {
         .onPressed()
         .catchError((cause) {
           debugPrint('$cause');
+          if (!mounted) return;
           // Handle any errors that occur during the asynchronous operation
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text("An error occurred: $cause")),

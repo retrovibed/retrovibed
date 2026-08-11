@@ -12,7 +12,7 @@ export 'authn/api.dart';
 export 'authn/developer.mode.dart';
 
 Future<String> bearer<T>(authz.Cached<T> c) {
-  return c.auto().then((v) => v.bearer);
+  return c.auto().then((v) => v.bearer.isNotEmpty ? "bearer ${v.bearer}" : "");
 }
 
 httpx.Option request<T>(authz.Cached<T> c) {

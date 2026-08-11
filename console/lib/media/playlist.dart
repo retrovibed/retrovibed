@@ -256,7 +256,7 @@ class _PlaylistState extends State<Playlist> {
     player.stream.completed.listen((completed) {
       if (!completed) return;
 
-      print(
+      debugPrint(
         "advancing through playlist ${player.state.playlist.medias.length} ${player.state.playlist.medias}",
       );
       completed ? next() : player.pause();
@@ -265,7 +265,7 @@ class _PlaylistState extends State<Playlist> {
     player.stream.playing.listen((playing) {
       final defaults = ds.Defaults.of(context);
       final focus = playing || defaults.mobile ? playerfocus : searchfocus;
-      print("playlist.playing: ${playing} - ${focus}");
+      debugPrint("playlist.playing: ${playing} - ${focus}");
       focus.requestFocus();
       overlay.value = !playing;
     });

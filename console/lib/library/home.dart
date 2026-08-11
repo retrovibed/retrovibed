@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/discovery.dart' as disc;
+import 'package:retrovibed/remote.dart' as remote;
 import 'search.dart';
 
 class Home extends StatefulWidget {
@@ -26,24 +27,17 @@ class Home extends StatefulWidget {
   State<StatefulWidget> createState() => _HomeState();
 }
 
-enum _Mode { library, discovery }
-
 class _HomeState extends State<Home> {
   Widget _downloading = ds.Empty;
-  final ValueNotifier<_Mode> _mode = ValueNotifier(_Mode.library);
+  final ValueNotifier<media.SearchMode> _mode = ValueNotifier(media.SearchMode.library);
 
   void setState(VoidCallback fn) {
     if (!mounted) return;
     super.setState(fn);
   }
 
-  void _switchToDiscovery() {
-    _mode.value = _Mode.discovery;
-    widget.focus?.requestFocus();
-  }
-
-  void _switchToLibrary() {
-    _mode.value = _Mode.library;
+  void _switchToMode(media.SearchMode m) {
+    _mode.value = m;
     widget.focus?.requestFocus();
   }
 
@@ -55,28 +49,36 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<_Mode>(
+    return ValueListenableBuilder<media.SearchMode>(
       valueListenable: _mode,
       builder: (context, mode, _) => switch (mode) {
-        _Mode.library => LibrarySearch(
+        media.SearchMode.library => Search(
           apisearch: widget.apisearch,
           apiupload: widget.apiupload,
           controller: widget.controller,
           focus: widget.focus,
           highlighted: widget.highlighted,
           search: widget.search,
-          discovering: false,
-          onToggleMode: _switchToDiscovery,
+          mode: _mode,
+          onModeChanged: _switchToMode,
           downloading: _downloading,
           onDownloadingChanged: (w) => setState(() => _downloading = w),
         ),
-        _Mode.discovery => disc.DiscoverySearch(
+        media.SearchMode.discovery => disc.Search(
           apiupload: widget.apiupload,
           controller: widget.controller,
           focus: widget.focus,
           search: widget.search,
-          discovering: true,
-          onToggleMode: _switchToLibrary,
+          mode: _mode,
+          onModeChanged: _switchToMode,
+          downloading: _downloading,
+          onDownloadingChanged: (w) => setState(() => _downloading = w),
+        ),
+        media.SearchMode.remote => remote.Display(
+          apiupload: widget.apiupload,
+          search: widget.search,
+          mode: _mode,
+          onModeChanged: _switchToMode,
           downloading: _downloading,
           onDownloadingChanged: (w) => setState(() => _downloading = w),
         ),

@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 
 class DropdownUpload extends StatelessWidget {
+  static const Widget defaultHelp = ds.Hint(
+    Text("filter by mimetype, upload files, torrents, magnet links, or switch to library/discover mode"),
+  );
+
   final Widget icon;
   final List<PopupMenuEntry<String>> items;
   final Widget help;
@@ -10,7 +14,7 @@ class DropdownUpload extends StatelessWidget {
     super.key,
     required this.icon,
     required this.items,
-    this.help = ds.HelpScope.None,
+    this.help = defaultHelp,
   });
 
   @override

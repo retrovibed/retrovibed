@@ -117,8 +117,31 @@ type peerTubeFile struct {
 	MagnetUri  string             `json:"magnetUri"`
 }
 
+type peerTubeThumbnail struct {
+	Height  int    `json:"height"`
+	Width   int    `json:"width"`
+	FileUrl string `json:"fileUrl"`
+}
+
 type peerTubeVideoResponse struct {
-	Files []peerTubeFile `json:"files"`
+	Files      []peerTubeFile      `json:"files"`
+	Thumbnails []peerTubeThumbnail `json:"thumbnails"`
+}
+
+// bestPeerTubeThumbnail picks the largest (by pixel area) thumbnail among
+// thumbnails, returning its fileUrl. Unlike bestPeerTubeFile, an empty list
+// is not disqualifying - a thumbnail is a nice-to-have, not a requirement
+// for a candidate to be usable.
+func bestPeerTubeThumbnail(thumbnails []peerTubeThumbnail) (string, bool) {
+	var best peerTubeThumbnail
+	found := false
+	for _, th := range thumbnails {
+		if !found || th.Width*th.Height > best.Width*best.Height {
+			best = th
+			found = true
+		}
+	}
+	return best.FileUrl, found
 }
 
 // bestPeerTubeFile picks the highest-resolution entry among files that
@@ -133,6 +156,7 @@ func bestPeerTubeFile(files []peerTubeFile) (peerTubeFile, bool) {
 		if f.MagnetUri == "" {
 			continue
 		}
+
 		if !found || f.Resolution.ID > best.Resolution.ID {
 			best = f
 			found = true
@@ -284,7 +308,7 @@ func (t *peerTubeStrategy) run(ctx context.Context, req DiscoverRequest, results
 	category := resolvePeerTubeCategory(req.Mimetypes)
 
 	pool := asynccompute.New(func(ctx context.Context, row peerTubeSearchRow) error {
-		d, ok, err := t.resolveRow(ctx, category, row)
+		d, ok, err := t.resolveRow(ctx, category, row, req.KnownMediaID)
 		if err != nil {
 			log.Printf("ddisc: peertube: failed to resolve %s: %v", row.UUID, err)
 			return nil
@@ -352,10 +376,13 @@ func (t *peerTubeStrategy) search(ctx context.Context, category, query string, a
 }
 
 // resolveRow fetches row's video detail page, picks the best magnet-bearing
-// file, and builds a Discovered keyed by that magnet's real infohash.
-// Returns ok=false (no error) for videos with no usable magnet - not every
-// PeerTube result is a candidate.
-func (t *peerTubeStrategy) resolveRow(ctx context.Context, category string, row peerTubeSearchRow) (Discovered, bool, error) {
+// file, and builds a Discovered directly - unlike search plugins (see
+// pluginSeq.Each), PeerTube already hands over a real infohash via its
+// magnet uri, so there's no need to route through the
+// placeholder-hash-until-resolved NewDiscoveredFromImport path. Returns
+// ok=false (no error) for videos with no usable magnet - not every PeerTube
+// result is a candidate.
+func (t *peerTubeStrategy) resolveRow(ctx context.Context, category string, row peerTubeSearchRow, knownMediaID string) (Discovered, bool, error) {
 	origin := peerTubeRowOrigin(row, t.domain)
 	target := fmt.Sprintf("%s/api/v1/videos/%s", strings.TrimRight(origin, "/"), url.PathEscape(row.UUID))
 	body, err := t.fetch(ctx, target)
@@ -377,13 +404,18 @@ func (t *peerTubeStrategy) resolveRow(ctx context.Context, category string, row 
 	if err != nil {
 		return Discovered{}, false, fmt.Errorf("unable to parse magnet uri: %w", err)
 	}
-
 	infohash := int160.FromByteArray(magnet.InfoHash)
+
+	thumbnail, _ := bestPeerTubeThumbnail(video.Thumbnails)
+
 	d := NewDiscovered(
 		&infohash,
+		DiscoveredOptionSource("retrovibed.discovery.peertube"),
 		DiscoveredOptionURI(file.MagnetUri),
 		DiscoveredOptionTitle(row.Name),
 		DiscoveredOptionDescription(row.Description),
+		DiscoveredOptionPosterURI(thumbnail),
+		DiscoveredOptionKnownMedia(knownMediaID),
 		DiscoveredOptionMimetype(peerTubeCategoryMimetype(category)),
 		DiscoveredOptionDetectCorrupted,
 	)
@@ -395,13 +427,11 @@ func (t *peerTubeStrategy) resolveRow(ctx context.Context, category string, row 
 // exponential backoff, and respecting t.limiter as a politeness rate limit
 // against the configured domain.
 func (t *peerTubeStrategy) fetch(ctx context.Context, target string) ([]byte, error) {
-	attempts := t.attempts
-	if attempts == 0 {
-		attempts = 1
-	}
+	c := t.client
+	attempts := langx.FirstNonZero(t.attempts, 1)
 
 	var lastErr error
-	for attempt := uint(0); attempt < attempts; attempt++ {
+	for attempt := range attempts {
 		if attempt > 0 {
 			select {
 			case <-time.After(time.Duration(attempt) * time.Second):
@@ -415,7 +445,7 @@ func (t *peerTubeStrategy) fetch(ctx context.Context, target string) ([]byte, er
 		}
 
 		attemptCtx, cancel := context.WithTimeout(ctx, 15*time.Second)
-		body, err := doPeerTubeFetch(attemptCtx, t.client, target)
+		body, err := doPeerTubeFetch(attemptCtx, c, target)
 		cancel()
 		if err != nil {
 			lastErr = err

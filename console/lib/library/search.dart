@@ -10,19 +10,19 @@ import 'search.mimetype.dropdown.dart';
 import 'dropdown.upload.dart';
 import 'empty.results.dart';
 
-class LibrarySearch extends StatefulWidget {
+class Search extends StatefulWidget {
   final media.FnMediaSearch apisearch;
   final media.FnUploadRequest apiupload;
   final TextEditingController? controller;
   final FocusNode? focus;
   final String highlighted;
   final ValueNotifier<media.MediaSearchState> search;
-  final bool discovering;
-  final VoidCallback onToggleMode;
+  final ValueNotifier<media.SearchMode> mode;
+  final void Function(media.SearchMode) onModeChanged;
   final Widget downloading;
   final void Function(Widget) onDownloadingChanged;
 
-  const LibrarySearch({
+  const Search({
     super.key,
     this.apisearch = media.media.search,
     this.apiupload = media.media.upload,
@@ -30,17 +30,17 @@ class LibrarySearch extends StatefulWidget {
     this.focus,
     required this.highlighted,
     required this.search,
-    required this.discovering,
-    required this.onToggleMode,
+    required this.mode,
+    required this.onModeChanged,
     required this.downloading,
     required this.onDownloadingChanged,
   });
 
   @override
-  State<LibrarySearch> createState() => _LibrarySearchState();
+  State<Search> createState() => _SearchState();
 }
 
-class _LibrarySearchState extends State<LibrarySearch> {
+class _SearchState extends State<Search> {
   Widget _tuning = ds.Empty;
 
   void setState(VoidCallback fn) {
@@ -110,7 +110,20 @@ class _LibrarySearchState extends State<LibrarySearch> {
                   ),
                   items: [
                     ...SearchMimetypeDropdown.menuItems(widget.search),
-                    media.SearchModeToggle(discovering: widget.discovering, onToggle: widget.onToggleMode),
+                    media.SearchModeToggle(
+                      mode: media.SearchMode.discovery,
+                      current: widget.mode,
+                      icon: Icons.travel_explore,
+                      label: "Discover",
+                      onSelect: widget.onModeChanged,
+                    ),
+                    media.SearchModeToggle(
+                      mode: media.SearchMode.remote,
+                      current: widget.mode,
+                      icon: Icons.settings_remote,
+                      label: "Remote",
+                      onSelect: widget.onModeChanged,
+                    ),
                     const PopupMenuDivider(),
                     PopupMenuItem<String>(
                       enabled: false,
@@ -154,7 +167,7 @@ class _LibrarySearchState extends State<LibrarySearch> {
             apisearch: widget.apisearch,
             search: widget.search,
             highlighted: widget.highlighted,
-            empty: EmptyResults(onDiscover: widget.onToggleMode),
+            empty: EmptyResults(onDiscover: () => widget.onModeChanged(media.SearchMode.discovery)),
             leading: [
               _tuning,
               widget.downloading,
