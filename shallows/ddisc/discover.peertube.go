@@ -14,7 +14,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/retrovibed/retrovibed/retroapi/asynccompute"
@@ -411,6 +410,7 @@ func (t *peerTubeStrategy) resolveRow(ctx context.Context, category string, row 
 
 	d := NewDiscovered(
 		&infohash,
+		DiscoveredOptionSource("retrovibed.discovery.peertube"),
 		DiscoveredOptionURI(file.MagnetUri),
 		DiscoveredOptionTitle(row.Name),
 		DiscoveredOptionDescription(row.Description),
@@ -419,9 +419,7 @@ func (t *peerTubeStrategy) resolveRow(ctx context.Context, category string, row 
 		DiscoveredOptionMimetype(peerTubeCategoryMimetype(category)),
 		DiscoveredOptionDetectCorrupted,
 	)
-	d.Source = "retrovibed.discovery.peertube"
 
-	log.Println("DERP DERP 0", spew.Sdump(d))
 	return d, true, nil
 }
 

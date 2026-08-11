@@ -112,6 +112,12 @@ func DiscoveredOptionContentMime(s string) DiscoveredOption {
 	}
 }
 
+func DiscoveredOptionSource(s string) DiscoveredOption {
+	return func(d *Discovered) {
+		d.Source = s
+	}
+}
+
 func DiscoveredOptionURI(s string) DiscoveredOption {
 	return func(d *Discovered) {
 		d.URI = s
