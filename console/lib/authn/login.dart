@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' as foundation;
+import 'package:window_manager/window_manager.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/design.kit/forms.dart' as forms;
 import 'package:retrovibed/retrovibed.dart' as retro;
@@ -165,10 +166,20 @@ class _LoginState extends State<Login> {
                     mainAxisSize: MainAxisSize.min,
                     spacing: defaults.spacing,
                     children: [
-                      Text(
-                        'Welcome to Retrovibed',
-                        style: Theme.of(context).textTheme.headlineSmall,
-                        textAlign: TextAlign.center,
+                      Row(
+                        children: [
+                          Spacer(),
+                          Text(
+                            'Welcome to Retrovibed',
+                            style: Theme.of(context).textTheme.headlineSmall,
+                            textAlign: TextAlign.center,
+                          ),
+                          Spacer(),
+                          ds.LoadingIconButton.close(
+                            tooltip: "exit application",
+                            onPressed: windowManager.close,
+                          ),
+                        ],
                       ),
                       Text(
                         'setup your device',

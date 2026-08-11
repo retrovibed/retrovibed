@@ -32,10 +32,11 @@ Future<Session> otp({List<httpx.Option> options = const []}) async {
 }
 
 Future<Authed> ssh() async {
+  final token = httpx.oauth2_bearer();
   return httpx
       .post(
         Uri.https(httpx.metaendpoint(), "/authn/ssh"),
-        options: [httpx.Request.authorization(httpx.oauth2_bearer())],
+        options: [httpx.Request.authorization(token)],
       )
       .then((v) {
         return Authed.create()..mergeFromProto3Json(jsonDecode(v.body));
