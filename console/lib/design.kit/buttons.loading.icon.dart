@@ -80,6 +80,29 @@ class LoadingIconButton extends StatefulWidget {
     );
   }
 
+  factory LoadingIconButton.logout({
+    required AsyncVoidCallback onPressed,
+    Key? key,
+    String? tooltip,
+    bool disabled = false,
+    bool? toggled,
+    double iconSize = _defaultIconSize,
+    double? value,
+    Widget help = HelpScope.None,
+  }) {
+    return LoadingIconButton(
+      key: key,
+      onPressed: onPressed,
+      icon: const Icon(Icons.logout),
+      tooltip: tooltip,
+      disabled: disabled,
+      toggled: toggled,
+      iconSize: iconSize,
+      value: value,
+      help: help,
+    );
+  }
+
   factory LoadingIconButton.close({
     required AsyncVoidCallback onPressed,
     Key? key,

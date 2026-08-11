@@ -1,20 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:retrovibed/media/playlist.dart' as internal;
+import 'package:retrovibed/uuidx.dart' as uuidx;
+import 'api.dart' as remote;
 
 class PlayerControlPlayPause extends StatelessWidget {
-  const PlayerControlPlayPause({Key? key}) : super(key: key);
+  final remote.RemoteControlSocket socket;
+  final Stream<remote.Stream> status;
+
+  const PlayerControlPlayPause({Key? key, required this.socket, required this.status}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final playlist = internal.Playlist.of(context);
-    if (playlist == null) return const SizedBox.shrink();
-    return StreamBuilder<bool>(
-      stream: playlist.player.stream.playing,
-      initialData: playlist.player.state.playing,
+    return StreamBuilder<remote.Stream>(
+      stream: status,
       builder: (context, snapshot) {
-        final playing = snapshot.data ?? false;
+        final msg = snapshot.data;
+        final playing = msg == null || msg.whichCommand() != remote.Stream_Command.playpause || !msg.playpause.paused;
         return IconButton(
-          onPressed: () => playlist.player.playOrPause(),
+          onPressed: () {
+            socket.send(remote.Stream(sid: uuidx.random(), playpause: remote.PlayPause(paused: playing)));
+          },
           icon: Icon(playing ? Icons.pause_rounded : Icons.play_arrow_rounded),
         );
       },

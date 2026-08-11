@@ -158,7 +158,9 @@ func (x *PlayPause) GetPaused() bool {
 	return false
 }
 
-// Seek - move forward/back the given amount of time (millisecopnds)
+// Seek - move forward/back the given amount of time (milliseconds), relative
+// to the current position. offset == int32 max/min is a sentinel meaning
+// "skip to next/previous track" rather than a literal seek.
 type Seek struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Offset        int32                  `protobuf:"varint,1,opt,name=offset,proto3" json:"offset,omitempty"`

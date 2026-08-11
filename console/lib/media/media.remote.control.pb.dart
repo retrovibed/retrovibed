@@ -184,7 +184,9 @@ class PlayPause extends $pb.GeneratedMessage {
   void clearPaused() => $_clearField(1);
 }
 
-/// Seek - move forward/back the given amount of time (millisecopnds)
+/// Seek - move forward/back the given amount of time (milliseconds), relative
+/// to the current position. offset == int32 max/min is a sentinel meaning
+/// "skip to next/previous track" rather than a literal seek.
 class Seek extends $pb.GeneratedMessage {
   factory Seek({
     $core.int? offset,

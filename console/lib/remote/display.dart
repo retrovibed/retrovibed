@@ -1,12 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/meta.dart' as meta;
 import 'package:retrovibed/media.dart' as media;
-import 'package:retrovibed/media/play.list.history.dart';
 import 'package:retrovibed/downloads.dart' as downloads;
 import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/library/dropdown.upload.dart';
 import 'package:retrovibed/library/search.mimetype.dropdown.dart';
+import 'api.dart' as remote;
 import 'player.control.fastforward.dart';
 import 'player.control.next.dart';
 import 'player.control.playpause.dart';
@@ -37,9 +39,42 @@ class Display extends StatefulWidget {
 
 class _State extends State<Display> {
   ValueNotifier<meta.Daemon> _library = ValueNotifier(meta.Daemon());
+  remote.RemoteControlSocket? _socket;
+  late Stream<remote.Stream> _messages;
 
   void refresh() {
     setState(() {}); // force rebuild
+  }
+
+  void _reconnect() {
+    if (!mounted) return;
+    Future.delayed(const Duration(seconds: 2), _connect);
+  }
+
+  void _connect() {
+    remote.remotecontrol
+        .connect()
+        .then((socket) {
+          _messages = socket.messages.asBroadcastStream();
+          setState(() => _socket = socket);
+          final c = Completer();
+
+          _messages.listen(
+            (_) {},
+            cancelOnError: true,
+            onError: c.completeError,
+            onDone: c.complete,
+          );
+
+          return c.future;
+        })
+        .catchError((cause) {
+          debugPrint("remote control connect socket failed: ${cause}");
+        })
+        .whenComplete(() {
+          setState(() => _socket = null);
+          _reconnect();
+        });
   }
 
   @override
@@ -47,17 +82,18 @@ class _State extends State<Display> {
     super.initState();
     _library = meta.EndpointAuto.of(context)?.changed ?? _library;
     _library.addListener(refresh);
+    _connect();
   }
 
   @override
   void dispose() {
     super.dispose();
     _library.removeListener(refresh);
+    _socket?.close();
   }
 
   @override
   Widget build(BuildContext context) {
-    final playlist = media.Playlist.of(context);
     final defaults = ds.Defaults.of(context);
     return ds.Container(
       Column(
@@ -131,19 +167,18 @@ class _State extends State<Display> {
               verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
               mainAxisSize: MainAxisSize.min,
               children: [
-                if (playlist != null) ...[
+                if (_socket != null) ...[
                   const Divider(),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      PlayerControlPrevious(),
-                      PlayerControlPlayPause(),
-                      PlayerControlFastForward(),
-                      PlayerControlNext(),
+                      PlayerControlPrevious(socket: _socket!),
+                      PlayerControlPlayPause(socket: _socket!, status: _messages),
+                      PlayerControlFastForward(socket: _socket!),
+                      PlayerControlNext(socket: _socket!),
                     ],
                   ),
-                  PlaylistCurrent(playlist.queue.current),
-                  PlayListHistory(playlist.queue.recent.take(5).toList()),
+                  PlaylistCurrent(_messages),
                 ],
               ],
             ),

@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:retrovibed/media/playlist.dart' as internal;
+import 'package:retrovibed/uuidx.dart' as uuidx;
+import 'api.dart' as remote;
 
 class PlayerControlPrevious extends StatelessWidget {
-  const PlayerControlPrevious({Key? key}) : super(key: key);
+  final remote.RemoteControlSocket socket;
+
+  const PlayerControlPrevious({Key? key, required this.socket}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      onPressed: () => internal.Playlist.of(context)?.previous(),
+      onPressed: () {
+        // int32 min is a sentinel meaning "skip to previous track", see media.remote.control.proto's Seek.
+        socket.send(remote.Stream(sid: uuidx.random(), seek: remote.Seek(offset: -0x80000000)));
+      },
       icon: Icon(Icons.skip_previous_rounded),
     );
   }

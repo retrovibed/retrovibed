@@ -12,7 +12,7 @@ import 'package:retrovibed/testing/widget_tester_extensions.dart';
 
 IconData _searchMenuItemIcon(WidgetTester tester) {
   final icon = find.descendant(
-    of: find.ancestor(of: find.text('Search'), matching: find.byType(ListTile)),
+    of: find.ancestor(of: find.text('Discover'), matching: find.byType(ListTile)),
     matching: find.byType(Icon),
   );
   return tester.widget<Icon>(icon).icon!;
@@ -58,8 +58,8 @@ void main() {
 
       await tester.tap(find.byType(DropdownUpload));
       await tester.pumpAndSettle();
-      await tester.ensureVisible(find.text('Search'));
-      await tester.tap(find.text('Search'));
+      await tester.ensureVisible(find.text('Discover'));
+      await tester.tap(find.text('Discover'));
       await tester.pumpAndSettle();
 
       expect(find.byType(KnownMediaDisplay), findsNothing);
@@ -87,29 +87,22 @@ void main() {
 
       await tester.tap(find.byType(DropdownUpload));
       await tester.pumpAndSettle();
-      await tester.ensureVisible(find.text('Search'));
-      await tester.tap(find.text('Search'));
+      await tester.ensureVisible(find.text('Discover'));
+      await tester.tap(find.text('Discover'));
       await tester.pumpAndSettle();
-
-      await tester.tap(find.byType(DropdownUpload));
-      await tester.pumpAndSettle();
-      await tester.ensureVisible(find.text('Search'));
       expect(_searchMenuItemIcon(tester), equals(Icons.check));
 
-      // Switching mimetype filters doesn't close the menu; the Search item's
+      // Switching mimetype filters doesn't close the menu; the Discover item's
       // icon should still reflect discovery mode within the same open session.
       await tester.ensureVisible(find.text('Movies'));
       await tester.tap(find.text('Movies'));
       await tester.pumpAndSettle();
       expect(_searchMenuItemIcon(tester), equals(Icons.check));
 
-      await tester.ensureVisible(find.text('Search'));
-      await tester.tap(find.text('Search'));
+      // Selecting the mode item again doesn't close the menu either; keep
+      // interacting with the same open session rather than reopening it.
+      await tester.tap(find.text('Discover'));
       await tester.pumpAndSettle();
-
-      await tester.tap(find.byType(DropdownUpload));
-      await tester.pumpAndSettle();
-      await tester.ensureVisible(find.text('Search'));
       expect(_searchMenuItemIcon(tester), equals(Icons.travel_explore));
     }, variant: _resolutions);
 
@@ -143,7 +136,7 @@ void main() {
 
       await tester.tap(find.byType(DropdownUpload));
       await tester.pumpAndSettle();
-      await tester.ensureVisible(find.text('Search'));
+      await tester.ensureVisible(find.text('Discover'));
       expect(_searchMenuItemIcon(tester), equals(Icons.check));
 
       expect(tester.takeException(), isNull);
@@ -180,8 +173,13 @@ void main() {
 
       await tester.tap(find.byType(DropdownUpload));
       await tester.pumpAndSettle();
-      await tester.ensureVisible(find.text('Search'));
-      await tester.tap(find.text('Search'));
+      await tester.ensureVisible(find.text('Discover'));
+      await tester.tap(find.text('Discover'));
+      await tester.pumpAndSettle();
+
+      // Selecting the mode item doesn't close the menu; dismiss it explicitly
+      // so it doesn't intercept later taps on the (now different) screen.
+      await tester.tapAt(const Offset(1, 1));
       await tester.pumpAndSettle();
 
       // On compact layouts unpinned trailing widgets collapse into the
@@ -199,8 +197,8 @@ void main() {
 
       await tester.tap(find.byType(DropdownUpload));
       await tester.pumpAndSettle();
-      await tester.ensureVisible(find.text('Search'));
-      await tester.tap(find.text('Search'));
+      await tester.ensureVisible(find.text('Discover'));
+      await tester.tap(find.text('Discover'));
       await tester.pumpAndSettle();
 
       expect(traySearchButton, findsNothing);

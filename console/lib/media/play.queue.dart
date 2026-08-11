@@ -44,6 +44,10 @@ class RingBuffer<T> {
   void clear() {
     _queue.clear();
   }
+
+  void removeWhere(bool Function(T) test) {
+    _queue.removeWhere(test);
+  }
 }
 
 class PlayQueue {
@@ -107,6 +111,10 @@ class PlayQueue {
 
   void push(PlayableMedia media) {
     _upcoming.insert(media);
+  }
+
+  void remove(String id) {
+    _upcoming.removeWhere((m) => m.current.id == id);
   }
 
   Future<PlayableMedia?> reverse(String auth, mediakit.Player player) async {

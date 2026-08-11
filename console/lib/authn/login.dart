@@ -166,20 +166,25 @@ class _LoginState extends State<Login> {
                     mainAxisSize: MainAxisSize.min,
                     spacing: defaults.spacing,
                     children: [
-                      Row(
-                        children: [
-                          Spacer(),
-                          Text(
-                            'Welcome to Retrovibed',
-                            style: Theme.of(context).textTheme.headlineSmall,
-                            textAlign: TextAlign.center,
-                          ),
-                          Spacer(),
-                          ds.LoadingIconButton.close(
-                            tooltip: "exit application",
-                            onPressed: windowManager.close,
-                          ),
-                        ],
+                      SizedBox(
+                        width: double.infinity,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Text(
+                              'Welcome to Retrovibed',
+                              style: Theme.of(context).textTheme.headlineSmall,
+                              textAlign: TextAlign.center,
+                            ),
+                            Positioned(
+                              right: 0,
+                              child: ds.LoadingIconButton.close(
+                                tooltip: "exit application",
+                                onPressed: windowManager.close,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                       Text(
                         'setup your device',
