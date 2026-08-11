@@ -61,3 +61,4 @@ ENV PATH=/home/egd/.cargo/bin:$PATH
 RUN apt-get update && apt-get install -y cargo rustc
 RUN systemd-tmpfiles --create
 RUN systemd-tmpfiles --clean
+RUN apt-get update && apt-get install -y wayland-utils waypipe

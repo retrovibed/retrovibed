@@ -13,6 +13,7 @@ import (
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
 	"github.com/egdaemon/eg/runtime/wasi/eggit"
 	"github.com/egdaemon/eg/runtime/wasi/shell"
+	"github.com/egdaemon/eg/runtime/x/wasi/wayland"
 )
 
 func main() {
@@ -46,9 +47,10 @@ func main() {
 					egenv.CacheDirectory("dev.native.libs"),
 				),
 				console.BuildLinux,
+				wayland.Backport(), // TODO remove once the container is updated to the new version.
+				console.RunDev(`flutter run -d linux`),
 			),
 		),
-		console.RunDev("flutter run -d linux"),
 	)
 
 	if err != nil {

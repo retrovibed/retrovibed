@@ -364,7 +364,7 @@ github.com/ebitengine/purego/internal/xreflect
 # github.com/edsrzf/mmap-go v1.2.0
 ## explicit; go 1.17
 github.com/edsrzf/mmap-go
-# github.com/egdaemon/eg v0.0.0-20260702021939-f38e30808bf3
+# github.com/egdaemon/eg v0.0.0-20260811000109-2881fbdb470e
 ## explicit; go 1.25.7
 github.com/egdaemon/eg
 github.com/egdaemon/eg/backoff
@@ -419,6 +419,7 @@ github.com/egdaemon/eg/runtime/x/wasi/egsecrets
 github.com/egdaemon/eg/runtime/x/wasi/egsha256x
 github.com/egdaemon/eg/runtime/x/wasi/egtarball
 github.com/egdaemon/eg/runtime/x/wasi/execx
+github.com/egdaemon/eg/runtime/x/wasi/wayland
 github.com/egdaemon/eg/secrets
 # github.com/egdaemon/wasinet/wasinet v0.0.0-20260714114633-11ce19bcbeeb
 ## explicit; go 1.25.0

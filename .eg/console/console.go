@@ -238,9 +238,9 @@ func runDev(cmd string, rt shell.Command, envopts ...func(shell.Command) shell.C
 
 func RunDev(cmd string, envopts ...func(shell.Command) shell.Command) eg.OpFn {
 	rt := shell.Runtime().
-		Environ("RETROVIBED_META_ENDPOINT", "localhost:8081").
-		Environ("RETROVIBED_CONSOLE_ENDPOINT", "localhost:8080")
-		// Environ("RETROVIBED_META_ENDPOINT", "api.retrovibe.space").
-		// Environ("RETROVIBED_CONSOLE_ENDPOINT", "console.retrovibe.space")
+		// Environ("RETROVIBED_META_ENDPOINT", "localhost:8081").
+		// Environ("RETROVIBED_CONSOLE_ENDPOINT", "localhost:8080")
+		Environ("RETROVIBED_META_ENDPOINT", "api.retrovibe.space").
+		Environ("RETROVIBED_CONSOLE_ENDPOINT", "console.retrovibe.space")
 	return runDev(cmd, rt, envopts...)
 }
