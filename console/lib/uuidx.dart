@@ -22,6 +22,8 @@ T pattern<T>(String v, T min, T max, T value) {
   };
 }
 
+String v7() => uuid.Uuid().v7();
+
 String random() => uuid.Uuid().v4();
 
 String withSuffix(int v) => '00000000-0000-0000-0000-${v.toString().padLeft(12, '0')}';

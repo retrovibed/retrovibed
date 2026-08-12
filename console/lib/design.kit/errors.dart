@@ -244,6 +244,14 @@ class Error extends StatelessWidget {
       ].join('\n\n');
     }
 
+    if (cause is HttpClientResponse) {
+      final r = cause;
+      return [
+        'Status: ${r.statusCode} ${r.reasonPhrase}',
+        trace.toString(),
+      ].join('\n\n');
+    }
+
     return [cause.toString(), trace.toString()].join('\n\n');
   }
 

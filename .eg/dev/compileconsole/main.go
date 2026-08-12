@@ -21,7 +21,14 @@ func main() {
 		ctx,
 		eggit.AutoClone,
 		eg.Build(deb.BuildFromFile(".eg/Containerfile")),
-		eg.Module(ctx, deb, console.GenerateBinding),
+		eg.Module(
+			ctx,
+			deb,
+			eg.Sequential(
+				console.GenerateBinding,
+				console.BuildLinux,
+			),
+		),
 	)
 
 	if err != nil {

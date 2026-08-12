@@ -1,6 +1,7 @@
 package mediaapi
 
 import (
+	"context"
 	"crypto/rand"
 	"log"
 	"net/http"
@@ -119,7 +120,7 @@ func (t *HTTPRemoteControl) listen(w http.ResponseWriter, r *http.Request) {
 		errorsx.Log(c.Close(websocket.StatusNormalClosure, ""))
 	}()
 
-	ctx := r.Context()
+	ctx := context.Background()
 	for {
 		_, data, err := c.Read(ctx)
 		if err != nil {
@@ -161,7 +162,7 @@ func (t *HTTPRemoteControl) connect(w http.ResponseWriter, r *http.Request) {
 		errorsx.Log(c.Close(websocket.StatusNormalClosure, ""))
 	}()
 
-	ctx := r.Context()
+	ctx := context.Background()
 	for {
 		_, data, err := c.Read(ctx)
 		if err != nil {

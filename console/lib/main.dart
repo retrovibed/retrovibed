@@ -144,7 +144,7 @@ class Retrovibed extends StatelessWidget {
                                         .ignore();
                                   },
                                   remote.RemoteControlListener(
-                                    child: const routes.Routes(),
+                                    const routes.Routes(),
                                   ),
                                 ),
                               ),

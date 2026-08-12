@@ -1,9 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:retrovibed/uuidx.dart' as uuidx;
+import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/media/play.queue.dart' as playqueue;
-import 'package:retrovibed/uuidx.dart' as uuidx;
+import 'package:retrovibed/retrovibed.dart' as retro;
 import 'api.dart' as remote;
 
 // Mounted as an ancestor of media.Playlist's UI-consuming subtree, drives the
@@ -12,7 +14,7 @@ import 'api.dart' as remote;
 // reaching into Playlist's private state directly.
 class RemoteControlListener extends StatefulWidget {
   final Widget child;
-  const RemoteControlListener({super.key, required this.child});
+  const RemoteControlListener(this.child, {super.key});
 
   @override
   State<RemoteControlListener> createState() => _State();
@@ -22,11 +24,19 @@ class _State extends State<RemoteControlListener> {
   remote.RemoteControlSocket? _rc;
   StreamSubscription<remote.Stream>? _rcSubscription;
   StreamSubscription<bool>? _playingSubscription;
+  // Cached in initState because dispose() runs after the element tree is
+  // deactivated, when context.findAncestorStateOfType is unsafe to call.
+  ValueNotifier<playqueue.PlayableMedia?>? _current;
 
   void _echoCurrent() {
     final cur = media.Playlist.of(context)?.queue.current.value;
     if (cur == null) return;
-    _rc?.send(remote.Stream(sid: uuidx.random(), queue: remote.Queue(media: cur.current)));
+    _rc?.send(
+      remote.Stream(
+        sid: uuidx.random(),
+        queue: remote.Queue(media: cur.current),
+      ),
+    );
   }
 
   void _rcReconnect() {
@@ -38,7 +48,7 @@ class _State extends State<RemoteControlListener> {
   // in, so it connects unconditionally and reconnects forever on close.
   void _rcConnect() {
     remote.remotecontrol
-        .listen()
+        .listen(options: [httpx.Request.bearer(() => Future.value(retro.remote_control_listen_token()))])
         .then((socket) {
           _rc = socket;
           final c = Completer();
@@ -98,9 +108,15 @@ class _State extends State<RemoteControlListener> {
     // echo local state back over the listen socket so any /rc/connect
     // observers can see what this device is doing.
     _playingSubscription = media.Playlist.of(context)?.player.stream.playing.listen((playing) {
-      _rc?.send(remote.Stream(sid: uuidx.random(), playpause: remote.PlayPause(paused: !playing)));
+      _rc?.send(
+        remote.Stream(
+          sid: uuidx.v7(),
+          playpause: remote.PlayPause(paused: !playing),
+        ),
+      );
     });
-    media.Playlist.of(context)?.queue.current.addListener(_echoCurrent);
+    _current = media.Playlist.of(context)?.queue.current;
+    _current?.addListener(_echoCurrent);
 
     _rcConnect();
   }
@@ -108,7 +124,7 @@ class _State extends State<RemoteControlListener> {
   @override
   void dispose() {
     super.dispose();
-    media.Playlist.of(context)?.queue.current.removeListener(_echoCurrent);
+    _current?.removeListener(_echoCurrent);
     _playingSubscription?.cancel();
     _rcSubscription?.cancel();
     _rc?.close();

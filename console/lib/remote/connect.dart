@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/meta.dart' as meta;
 import 'package:retrovibed/media.dart' as media;
@@ -8,6 +9,7 @@ import 'package:retrovibed/downloads.dart' as downloads;
 import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/library/dropdown.upload.dart';
 import 'package:retrovibed/library/search.mimetype.dropdown.dart';
+import 'package:retrovibed/library/search.minimal.dart';
 import 'api.dart' as remote;
 import 'player.control.fastforward.dart';
 import 'player.control.next.dart';
@@ -15,7 +17,7 @@ import 'player.control.playpause.dart';
 import 'player.control.previous.dart';
 import 'playlist.current.dart';
 
-class Display extends StatefulWidget {
+class Connect extends StatefulWidget {
   final ValueNotifier<media.MediaSearchState> search;
   final media.FnUploadRequest apiupload;
   final ValueNotifier<media.SearchMode> mode;
@@ -23,7 +25,7 @@ class Display extends StatefulWidget {
   final Widget downloading;
   final void Function(Widget) onDownloadingChanged;
 
-  const Display({
+  const Connect({
     super.key,
     required this.search,
     this.apiupload = media.media.upload,
@@ -34,13 +36,13 @@ class Display extends StatefulWidget {
   });
 
   @override
-  State<Display> createState() => _State();
+  State<Connect> createState() => _State();
 }
 
-class _State extends State<Display> {
+class _State extends State<Connect> {
   ValueNotifier<meta.Daemon> _library = ValueNotifier(meta.Daemon());
-  remote.RemoteControlSocket? _socket;
-  late Stream<remote.Stream> _messages;
+  remote.RemoteControlSocket _socket = remote.RemoteControlSocket.noop;
+  Stream<remote.Stream> _messages = Stream.empty();
 
   void refresh() {
     setState(() {}); // force rebuild
@@ -48,15 +50,16 @@ class _State extends State<Display> {
 
   void _reconnect() {
     if (!mounted) return;
+    setState(() => _socket = remote.RemoteControlSocket.noop);
     Future.delayed(const Duration(seconds: 2), _connect);
   }
 
   void _connect() {
     remote.remotecontrol
-        .connect()
+        .connect(options: [authn.request(authn.AuthzCache.meta(context))])
         .then((socket) {
-          _messages = socket.messages.asBroadcastStream();
           setState(() => _socket = socket);
+          _messages = socket.messages.asBroadcastStream();
           final c = Completer();
 
           _messages.listen(
@@ -71,10 +74,7 @@ class _State extends State<Display> {
         .catchError((cause) {
           debugPrint("remote control connect socket failed: ${cause}");
         })
-        .whenComplete(() {
-          setState(() => _socket = null);
-          _reconnect();
-        });
+        .whenComplete(_reconnect);
   }
 
   @override
@@ -82,14 +82,14 @@ class _State extends State<Display> {
     super.initState();
     _library = meta.EndpointAuto.of(context)?.changed ?? _library;
     _library.addListener(refresh);
-    _connect();
+    ds.postframe(_connect);
   }
 
   @override
   void dispose() {
     super.dispose();
     _library.removeListener(refresh);
-    _socket?.close();
+    _socket.close();
   }
 
   @override
@@ -98,7 +98,6 @@ class _State extends State<Display> {
     return ds.Container(
       Column(
         verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
-        mainAxisSize: MainAxisSize.min,
         children: [
           meta.DaemonDropdown(
             library: _library,
@@ -161,28 +160,34 @@ class _State extends State<Display> {
               ),
             ],
           ),
-          ds.Container(
-            padding: defaults.padding,
-            Column(
-              verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (_socket != null) ...[
-                  const Divider(),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+          ds.Debug.blue(
+            ds.Container(
+              padding: defaults.padding,
+              ds.Debug.pink(
+                ds.Loading(
+                  loading: _socket == remote.RemoteControlSocket.noop,
+                  Column(
+                    verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      PlayerControlPrevious(socket: _socket!),
-                      PlayerControlPlayPause(socket: _socket!, status: _messages),
-                      PlayerControlFastForward(socket: _socket!),
-                      PlayerControlNext(socket: _socket!),
+                      const Divider(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          PlayerControlPrevious(socket: _socket),
+                          PlayerControlPlayPause(socket: _socket, status: _messages),
+                          PlayerControlFastForward(socket: _socket),
+                          PlayerControlNext(socket: _socket),
+                        ],
+                      ),
+                      PlaylistCurrent(_messages),
                     ],
                   ),
-                  PlaylistCurrent(_messages),
-                ],
-              ],
+                ),
+              ),
             ),
           ),
+          const Expanded(child: SearchMinimal()),
         ],
       ),
     );

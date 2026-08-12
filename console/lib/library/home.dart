@@ -74,7 +74,7 @@ class _HomeState extends State<Home> {
           downloading: _downloading,
           onDownloadingChanged: (w) => setState(() => _downloading = w),
         ),
-        media.SearchMode.remote => remote.Display(
+        media.SearchMode.remote => remote.Connect(
           apiupload: widget.apiupload,
           search: widget.search,
           mode: _mode,

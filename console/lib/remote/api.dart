@@ -8,11 +8,33 @@ import 'package:retrovibed/retrovibed.dart' as retro;
 
 export 'package:retrovibed/media/media.remote.control.pb.dart';
 
-class RemoteControlSocket {
+abstract class RemoteControlSocket {
+  // placeholder used before a real connection exists, so callers never need
+  // to null-check (e.g. `_socket!`) while waiting to connect.
+  static final RemoteControlSocket noop = _NoopRemoteControlSocket();
+
+  Stream<rc.Stream> get messages;
+  void send(rc.Stream msg);
+  Future<void> close();
+}
+
+class _NoopRemoteControlSocket implements RemoteControlSocket {
+  @override
+  Stream<rc.Stream> get messages => const Stream.empty();
+
+  @override
+  void send(rc.Stream msg) {}
+
+  @override
+  Future<void> close() => Future.value();
+}
+
+class _WebSocketRemoteControlSocket implements RemoteControlSocket {
   final WebSocket _socket;
 
-  RemoteControlSocket._(this._socket);
+  _WebSocketRemoteControlSocket(this._socket);
 
+  @override
   Stream<rc.Stream> get messages => _socket.transform(
     StreamTransformer.fromHandlers(
       handleData: (data, sink) {
@@ -26,10 +48,12 @@ class RemoteControlSocket {
     ),
   );
 
+  @override
   void send(rc.Stream msg) {
     _socket.add(utf8.encode(jsonEncode(msg.toProto3Json())));
   }
 
+  @override
   Future<void> close() => _socket.close();
 }
 
@@ -48,7 +72,7 @@ abstract class remotecontrol {
         )
         .then((socket) {
           socket.pingInterval = Duration(seconds: 10);
-          return RemoteControlSocket._(socket);
+          return _WebSocketRemoteControlSocket(socket);
         });
   }
 
@@ -57,7 +81,7 @@ abstract class remotecontrol {
         .websocket(Uri.https(httpx.host(), "/rc/connect", null), options: options)
         .then((socket) {
           socket.pingInterval = Duration(seconds: 10);
-          return RemoteControlSocket._(socket);
+          return _WebSocketRemoteControlSocket(socket);
         });
   }
 }
