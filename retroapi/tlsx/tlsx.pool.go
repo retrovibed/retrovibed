@@ -162,3 +162,8 @@ func (t Pool) Validate(ctx context.Context, hostname string, certs []*x509.Certi
 
 	return errorsx.Errorf("certificate mismatch: certificate has changed since first use: %s", hostname)
 }
+
+// Reset removes all trust-on-first-use entries, forcing re-enrollment on next connect.
+func (t Pool) Reset() error {
+	return errorsx.WithStack(os.RemoveAll(t.dir))
+}

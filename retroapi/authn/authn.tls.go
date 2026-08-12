@@ -35,3 +35,8 @@ func ValidateCertificate(ctx context.Context, hostname string, der []byte) error
 
 	return initpool().Validate(ctx, hostname, cert)
 }
+
+// ResetCertificates clears the process-wide TOFU pool.
+func ResetCertificates() error {
+	return initpool().Reset()
+}

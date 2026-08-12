@@ -5,6 +5,7 @@ import 'package:retrovibed/design.kit/forms.dart' as forms;
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/dhtx/api.dart' as dhtx;
 import 'package:retrovibed/httpx.dart' as httpx;
+import 'package:retrovibed/retrovibed.dart' as retro;
 import 'package:retrovibed/torrentx/api.dart' as torrentx;
 
 class DiagnosticsDetails extends StatefulWidget {
@@ -102,6 +103,21 @@ class _DiagnosticsDetailsState extends State<DiagnosticsDetails> {
                   tooltip: "throw a test error",
                   onPressed: () async {
                     await Future<void>(() => throw Exception("synthetic diagnostics error")).catchError((e) {
+                      setState(() {
+                        _cause = ds.Error.unknown(e, onTap: _fetch);
+                      });
+                    });
+                  },
+                ),
+                ds.LoadingIconButton(
+                  icon: const Icon(Icons.no_encryption_gmailerrorred),
+                  tooltip: "clear all trusted (TOFU) certificates",
+                  onPressed: () async {
+                    await Future<void>(() {
+                      if (!retro.resetcerts()) {
+                        throw Exception("failed to reset certificates");
+                      }
+                    }).catchError((e) {
                       setState(() {
                         _cause = ds.Error.unknown(e, onTap: _fetch);
                       });

@@ -163,6 +163,12 @@ bool validatecert(String hostname, Uint8List derBytes) {
   }
 }
 
+// Clears all locally trusted (TOFU) certificates, forcing re-enrollment on next connect.
+// Returns true on success.
+bool resetcerts() {
+  return bridge.resetcerts() == 0;
+}
+
 void daemon({bool smoke = false}) {
   String args = jsonEncode([
     "daemon",

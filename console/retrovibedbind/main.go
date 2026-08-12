@@ -314,6 +314,15 @@ func validatecert(hostname *C.char, certData *C.uchar, certLen C.int) C.int {
 	return 0
 }
 
+//export resetcerts
+func resetcerts() C.int {
+	if err := authn.ResetCertificates(); err != nil {
+		log.Println(err)
+		return 1
+	}
+	return 0
+}
+
 //export envfile_parse
 func envfile_parse(content *C.char) *C.char {
 	encoded, err := json.Marshal(envfile.Parse(C.GoString(content)))

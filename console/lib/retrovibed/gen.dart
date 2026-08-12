@@ -253,6 +253,13 @@ class DaemonBridge {
   late final _validatecert = _validatecertPtr
       .asFunction<int Function(ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.UnsignedChar>, int)>();
 
+  int resetcerts() {
+    return _resetcerts();
+  }
+
+  late final _resetcertsPtr = _lookup<ffi.NativeFunction<ffi.Int Function()>>('resetcerts');
+  late final _resetcerts = _resetcertsPtr.asFunction<int Function()>();
+
   ffi.Pointer<ffi.Char> envfile_parse(
     ffi.Pointer<ffi.Char> content,
   ) {
