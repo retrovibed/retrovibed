@@ -93,7 +93,7 @@ void main() {
         expect(find.text('Billing Read'), findsOneWidget);
         expect(find.text('Billing Modify'), findsOneWidget);
         expect(find.text('Can manage user access'), findsOneWidget);
-        expect(find.text("Can use remote control to connect to and drive another device's playback"), findsOneWidget);
+        expect(find.text("Can connect to and drive another device's playback"), findsOneWidget);
         expect(find.text('Can view library content'), findsOneWidget);
         expect(find.text('Can modify library content'), findsOneWidget);
         expect(find.text('Can modify community content'), findsOneWidget);
