@@ -17,7 +17,10 @@ import 'player.control.seek.dart';
 import 'player.control.playpause.dart';
 import 'playlist.current.dart';
 
-class Connect extends StatefulWidget {
+// Public entrypoint: wraps _Connect in an authn.AuthedEndpoint so it can target a
+// user-selected remote daemon (via its DaemonDropdown) with a matching
+// scoped auth token, independent of the app-root EndpointAuto/AuthzCache.
+class Connect extends StatelessWidget {
   final ValueNotifier<media.MediaSearchState> search;
   final media.FnUploadRequest apiupload;
   final ValueNotifier<media.SearchMode> mode;
@@ -36,13 +39,46 @@ class Connect extends StatefulWidget {
   });
 
   @override
-  State<Connect> createState() => _State();
+  Widget build(BuildContext context) {
+    return authn.AuthedEndpoint(
+      _Connect(
+        search: search,
+        apiupload: apiupload,
+        mode: mode,
+        onModeChanged: onModeChanged,
+        downloading: downloading,
+        onDownloadingChanged: onDownloadingChanged,
+      ),
+    );
+  }
 }
 
-class _State extends State<Connect> with LoadingState {
-  final ValueNotifier<meta.Daemon> _endpoint = ValueNotifier(meta.Daemon());
+class _Connect extends StatefulWidget {
+  final ValueNotifier<media.MediaSearchState> search;
+  final media.FnUploadRequest apiupload;
+  final ValueNotifier<media.SearchMode> mode;
+  final void Function(media.SearchMode) onModeChanged;
+  final Widget downloading;
+  final void Function(Widget) onDownloadingChanged;
+
+  const _Connect({
+    required this.search,
+    this.apiupload = media.media.upload,
+    required this.mode,
+    required this.onModeChanged,
+    required this.downloading,
+    required this.onDownloadingChanged,
+  });
+
+  @override
+  State<_Connect> createState() => _State();
+}
+
+class _State extends State<_Connect> with LoadingState {
   remote.RemoteControlSocket _socket = remote.RemoteControlSocket.noop;
   Stream<remote.Stream> _messages = Stream.empty();
+
+  ValueNotifier<meta.Daemon> get _endpoint => authn.AuthedEndpoint.daemon(context);
 
   void _onEndpointChanged() {
     _socket.close();
@@ -63,7 +99,7 @@ class _State extends State<Connect> with LoadingState {
     setState(() => loading = true);
 
     remote.remotecontrol
-        .connect(host: _endpoint.value.hostname, options: [authn.request(authn.AuthzCache.meta(context))])
+        .connect(host: _endpoint.value.hostname, options: [authn.request(authn.AuthedEndpoint.token(context))])
         .then((socket) {
           final c = Completer();
           setState(() {
@@ -112,7 +148,6 @@ class _State extends State<Connect> with LoadingState {
   @override
   void initState() {
     super.initState();
-    _endpoint.value = meta.EndpointAuto.of(context)?.changed.value ?? _endpoint.value;
     _endpoint.addListener(_onEndpointChanged);
     ds.postframe(_connect);
   }

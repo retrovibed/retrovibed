@@ -71,7 +71,7 @@ abstract class remotecontrol {
   static Future<RemoteControlSocket> listen({List<httpx.Option> options = const []}) async {
     return httpx
         .websocket(
-          Uri.https(httpx.host(), "/rc/listen", null),
+          Uri.https(httpx.localhost(), "/rc/listen", null),
           options: [
             httpx.Request.authorization("bearer ${retro.remote_control_listen_token()}"),
             ...options,
