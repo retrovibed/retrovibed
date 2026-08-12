@@ -2,18 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'api.dart' as api;
-import 'daemon.auto.dart';
 import 'daemon.typography.dart';
+
+typedef DaemonOnSelect = Future<api.Daemon> Function(BuildContext context, api.Daemon daemon);
 
 class DaemonDropdownItem extends StatefulWidget {
   final api.Daemon library;
-  final VoidCallback onTap;
+  final void Function(api.Daemon) onTap;
   final bool readonly;
+  final DaemonOnSelect onSelect;
 
   const DaemonDropdownItem({
     super.key,
     required this.library,
     required this.onTap,
+    required this.onSelect,
     this.readonly = false,
   });
 
@@ -75,9 +78,7 @@ class _DaemonDropdownItemState extends State<DaemonDropdownItem> {
           ],
         ),
         onTap: () {
-          EndpointAuto.of(
-            context,
-          )?.refreshNoErrHandling(Future.value(widget.library)).then((_) => widget.onTap()).catchError((e) {
+          widget.onSelect(context, widget.library).then((v) => widget.onTap(v)).catchError((e) {
             setState(() {
               _cause = ds.Error.unknown(e, onTap: reseterr);
             });

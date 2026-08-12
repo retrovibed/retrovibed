@@ -335,7 +335,9 @@ Future<WebSocket> websocket(
           r0.headers.forEach((k, v) => r.headers.add(k, v));
           return r.close();
         })
-        .then((resp) => resp.detachSocket())
+        .then(
+          (resp) => resp.statusCode == HttpStatus.switchingProtocols ? resp.detachSocket() : Future.error(resp),
+        )
         .then((s) => WebSocket.fromUpgradedSocket(s, serverSide: false));
   });
 }

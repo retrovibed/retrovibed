@@ -86,6 +86,7 @@ type Command struct {
 	AutoAcousticsIndex  bool             `flag:"" name:"auto-acoustics-index" help:"acoustic indexing for currently playing song" default:"true" negatable:""`
 	Socks5              cmdopts.Listener `flag:"" name:"socks5-address" help:"enable socks5 proxy, requires a vpn to be configured" default:"tcp://:9999"`
 	DHTLogging          bool             `flag:"" name:"dht-logging" help:"enable debug logging for the dht" default:"false" negatable:"" hidden:"true"`
+	RemoteControl       bool             `flag:"" name:"remote-control" help:"enable the remote control websocket relay" default:"false" negatable:""`
 	TorrentResume       bool             `flag:"" name:"torrent-resume" help:"enable announcing and resuming torrents" default:"true" negatable:""`
 	TorrentFirewalled   bool             `flag:"" name:"torrent-firewalled" help:"restrict torrent connections to private networks" env:"${env_torrent_private}"`
 	TorrentLogging      bool             `flag:"" name:"torrent-logging" help:"enable torrent logging" default:"false" negatable:"" env:"${env_torrent_logging}"`
@@ -432,7 +433,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	media.NewHTTPRecommendations(db).Bind(httpmux.PathPrefix("/r").Subrouter())
 	media.NewHTTPSimilar(db).Bind(httpmux.PathPrefix("/similar").Subrouter())
 	media.NewHTTPRecent(db).Bind(httpmux.PathPrefix("/w").Subrouter())
-	mediaapi.NewHTTPRemoteControl().Bind(httpmux.PathPrefix("/rc").Subrouter())
+	mediaapi.NewHTTPRemoteControl(t.RemoteControl).Bind(httpmux.PathPrefix("/rc").Subrouter())
 	ddiscapi.NewHTTPPeerManagement(db).Bind(httpmux.PathPrefix("/ddisc").Subrouter())
 	discoveryimporter := tracking.NewURIImport(db, httpx.BindRetryTransport(&http.Client{
 		Transport: &http.Transport{DialContext: privateDialer.DialContext},

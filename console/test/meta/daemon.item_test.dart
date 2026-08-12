@@ -6,6 +6,7 @@ import 'package:retrovibed/testing/widget_tester_extensions.dart';
 
 void main() {
   final daemon = api.Daemon(description: 'Test Library');
+  Future<api.Daemon> onSelect(BuildContext context, api.Daemon daemon) async => daemon;
 
   group('DaemonDropdownItem constrained parent', () {
     testWidgets('renders within fixed SizedBox constraints', (
@@ -16,7 +17,7 @@ void main() {
           body: SizedBox(
             width: 200,
             height: 150,
-            child: DaemonDropdownItem(library: daemon, onTap: () {}),
+            child: DaemonDropdownItem(library: daemon, onTap: (_) {}, onSelect: onSelect),
           ),
         ),
       );
@@ -39,7 +40,7 @@ void main() {
             children: [
               SizedBox(
                 height: 100,
-                child: DaemonDropdownItem(library: daemon, onTap: () {}),
+                child: DaemonDropdownItem(library: daemon, onTap: (_) {}, onSelect: onSelect),
               ),
               Expanded(child: Container()),
             ],
@@ -62,7 +63,7 @@ void main() {
             children: [
               SizedBox(
                 width: 150,
-                child: DaemonDropdownItem(library: daemon, onTap: () {}),
+                child: DaemonDropdownItem(library: daemon, onTap: (_) {}, onSelect: onSelect),
               ),
               Expanded(child: Container()),
             ],
@@ -85,7 +86,7 @@ void main() {
             child: SizedBox(
               width: 80,
               height: 64,
-              child: DaemonDropdownItem(library: daemon, onTap: () {}),
+              child: DaemonDropdownItem(library: daemon, onTap: (_) {}, onSelect: onSelect),
             ),
           ),
         ),
@@ -108,7 +109,7 @@ void main() {
             child: SizedBox(
               width: 0,
               height: 100,
-              child: DaemonDropdownItem(library: daemon, onTap: () {}),
+              child: DaemonDropdownItem(library: daemon, onTap: (_) {}, onSelect: onSelect),
             ),
           ),
         ),
@@ -127,7 +128,7 @@ void main() {
             child: SizedBox(
               width: 100,
               height: 0,
-              child: DaemonDropdownItem(library: daemon, onTap: () {}),
+              child: DaemonDropdownItem(library: daemon, onTap: (_) {}, onSelect: onSelect),
             ),
           ),
         ),
@@ -148,7 +149,7 @@ void main() {
             children: [
               SizedBox(
                 height: 200,
-                child: DaemonDropdownItem(library: daemon, onTap: () {}),
+                child: DaemonDropdownItem(library: daemon, onTap: (_) {}, onSelect: onSelect),
               ),
             ],
           ),
@@ -168,7 +169,7 @@ void main() {
           body: SingleChildScrollView(
             child: SizedBox(
               height: 300,
-              child: DaemonDropdownItem(library: daemon, onTap: () {}),
+              child: DaemonDropdownItem(library: daemon, onTap: (_) {}, onSelect: onSelect),
             ),
           ),
         ),
@@ -191,7 +192,7 @@ void main() {
               children: [
                 SizedBox(
                   width: 200,
-                  child: DaemonDropdownItem(library: daemon, onTap: () {}),
+                  child: DaemonDropdownItem(library: daemon, onTap: (_) {}, onSelect: onSelect),
                 ),
               ],
             ),

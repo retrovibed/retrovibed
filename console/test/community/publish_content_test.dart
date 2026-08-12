@@ -16,7 +16,7 @@ void main() {
         SingleChildScrollView(
           child: PublishContent(
             onSelect: (_) {},
-            search: (req, {options = const []}) => Future.value(
+            search: (req, {host, options = const []}) => Future.value(
               MediaSearchResponse(
                 next: MediaSearchRequest(),
                 items: [],
@@ -39,7 +39,7 @@ void main() {
       await tester.pumpApp(
         PublishContent(
           onSelect: (d) => received = d,
-          search: (req, {options = const []}) => Future.value(
+          search: (req, {host, options = const []}) => Future.value(
             MediaSearchResponse(
               next: MediaSearchRequest(),
               items: [item],

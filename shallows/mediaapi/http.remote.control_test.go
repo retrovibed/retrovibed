@@ -23,6 +23,7 @@ func TestHTTPRemoteControl(t *testing.T) {
 	t.Run("connect relays to listen and listen broadcasts to all connects", func(t *testing.T) {
 		routes := mux.NewRouter()
 		mediaapi.NewHTTPRemoteControl(
+			true,
 			mediaapi.HTTPRemoteControlOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/rc").Subrouter())
 		server := httptest.NewServer(routes)
@@ -96,7 +97,7 @@ func TestHTTPRemoteControl(t *testing.T) {
 
 	t.Run("listen rejects a bearer signed with the wrong secret", func(t *testing.T) {
 		routes := mux.NewRouter()
-		mediaapi.NewHTTPRemoteControl().Bind(routes.PathPrefix("/rc").Subrouter())
+		mediaapi.NewHTTPRemoteControl(true).Bind(routes.PathPrefix("/rc").Subrouter())
 		server := httptest.NewServer(routes)
 		defer server.Close()
 
@@ -116,6 +117,7 @@ func TestHTTPRemoteControl(t *testing.T) {
 	t.Run("connect closes with try again later when no listener is attached", func(t *testing.T) {
 		routes := mux.NewRouter()
 		mediaapi.NewHTTPRemoteControl(
+			true,
 			mediaapi.HTTPRemoteControlOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/rc").Subrouter())
 		server := httptest.NewServer(routes)
@@ -149,7 +151,7 @@ func TestHTTPRemoteControl(t *testing.T) {
 
 	t.Run("second listen connection evicts the first", func(t *testing.T) {
 		routes := mux.NewRouter()
-		mediaapi.NewHTTPRemoteControl().Bind(routes.PathPrefix("/rc").Subrouter())
+		mediaapi.NewHTTPRemoteControl(true).Bind(routes.PathPrefix("/rc").Subrouter())
 		server := httptest.NewServer(routes)
 		defer server.Close()
 
@@ -178,5 +180,39 @@ func TestHTTPRemoteControl(t *testing.T) {
 		_, _, err = first.Read(ctx)
 		require.Error(t, err)
 		require.Equal(t, websocketx.PrivateStatus(http.StatusConflict), websocket.CloseStatus(err))
+	})
+
+	t.Run("disabled rejects listen and connect with forbidden", func(t *testing.T) {
+		routes := mux.NewRouter()
+		mediaapi.NewHTTPRemoteControl(
+			false,
+			mediaapi.HTTPRemoteControlOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+		).Bind(routes.PathPrefix("/rc").Subrouter())
+		server := httptest.NewServer(routes)
+		defer server.Close()
+
+		listentoken, err := mediaapi.RemoteControlListenToken()
+		require.NoError(t, err)
+
+		_, resp, err := websocket.Dial(t.Context(), fmt.Sprintf("ws://%s/rc/listen", server.Listener.Addr().String()), &websocket.DialOptions{
+			HTTPHeader: http.Header{
+				"Authorization": []string{fmt.Sprintf("Bearer %s", listentoken)},
+			},
+		})
+		require.Error(t, err)
+		require.NotNil(t, resp)
+		require.Equal(t, http.StatusForbidden, resp.StatusCode)
+
+		var claims jwt.RegisteredClaims
+		token := httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)
+
+		_, resp, err = websocket.Dial(t.Context(), fmt.Sprintf("ws://%s/rc/connect", server.Listener.Addr().String()), &websocket.DialOptions{
+			HTTPHeader: http.Header{
+				"Authorization": []string{fmt.Sprintf("Bearer %s", token)},
+			},
+		})
+		require.Error(t, err)
+		require.NotNil(t, resp)
+		require.Equal(t, http.StatusForbidden, resp.StatusCode)
 	})
 }

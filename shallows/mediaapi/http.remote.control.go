@@ -53,8 +53,9 @@ func HTTPRemoteControlOptionJWTSecret(j jwtx.SecretSource) HTTPRemoteControlOpti
 	}
 }
 
-func NewHTTPRemoteControl(options ...HTTPRemoteControlOption) *HTTPRemoteControl {
+func NewHTTPRemoteControl(enabled bool, options ...HTTPRemoteControlOption) *HTTPRemoteControl {
 	svc := &HTTPRemoteControl{
+		enabled:   enabled,
 		jwtsecret: env.JWTSecret,
 		connects:  make(map[*websocket.Conn]struct{}),
 	}
@@ -72,6 +73,7 @@ func NewHTTPRemoteControl(options ...HTTPRemoteControlOption) *HTTPRemoteControl
 // fire-and-forget: commands are relayed to listen without correlation, and
 // anything listen writes back is broadcast to every open connect socket.
 type HTTPRemoteControl struct {
+	enabled   bool
 	jwtsecret jwtx.SecretSource
 
 	mu       sync.Mutex // guards everything below, including all conn writes
@@ -83,6 +85,7 @@ func (t *HTTPRemoteControl) Bind(r *mux.Router) {
 	r.StrictSlash(false)
 
 	r.Path("/listen").Methods(http.MethodGet).Handler(alice.New(
+		httpx.GatedResponse(t.enabled, http.StatusForbidden),
 		httpx.ContextBufferPool512(),
 		httpx.ParseForm,
 		httpauth.AuthenticateWithToken(remoteControlSecret),
@@ -90,6 +93,7 @@ func (t *HTTPRemoteControl) Bind(r *mux.Router) {
 	).ThenFunc(t.listen))
 
 	r.Path("/connect").Methods(http.MethodGet).Handler(alice.New(
+		httpx.GatedResponse(t.enabled, http.StatusForbidden),
 		httpx.ContextBufferPool512(),
 		httpx.ParseForm,
 		httpauth.AuthenticateWithToken(t.jwtsecret),

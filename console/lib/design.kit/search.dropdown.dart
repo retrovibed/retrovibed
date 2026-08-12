@@ -129,6 +129,7 @@ class _SearchDropdownState extends State<SearchDropdown> {
         child: Container(
           padding: widget.padding ?? defaults.padding,
           child: Column(
+            verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(

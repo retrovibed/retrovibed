@@ -1,0 +1,44 @@
+import 'package:flutter/material.dart';
+import 'package:retrovibed/uuidx.dart' as uuidx;
+import 'api.dart' as remote;
+
+class PlayerControlSeek extends StatelessWidget {
+  final remote.RemoteControlSocket socket;
+  final int offset;
+  final IconData icon;
+
+  const PlayerControlSeek._({Key? key, required this.socket, required this.offset, required this.icon}) : super(key: key);
+
+  factory PlayerControlSeek.forward({Key? key, required remote.RemoteControlSocket socket, Duration step = const Duration(seconds: 10)}) {
+    return PlayerControlSeek._(key: key, socket: socket, offset: step.inMilliseconds, icon: Icons.fast_forward_rounded);
+  }
+
+  factory PlayerControlSeek.backward({Key? key, required remote.RemoteControlSocket socket, Duration step = const Duration(seconds: 10)}) {
+    return PlayerControlSeek._(key: key, socket: socket, offset: -step.inMilliseconds, icon: Icons.fast_rewind_rounded);
+  }
+
+  // int32 max is a sentinel meaning "skip to next track", see media.remote.control.proto's Seek.
+  factory PlayerControlSeek.next({Key? key, required remote.RemoteControlSocket socket}) {
+    return PlayerControlSeek._(key: key, socket: socket, offset: 0x7FFFFFFF, icon: Icons.skip_next_rounded);
+  }
+
+  // int32 min is a sentinel meaning "skip to previous track", see media.remote.control.proto's Seek.
+  factory PlayerControlSeek.prev({Key? key, required remote.RemoteControlSocket socket}) {
+    return PlayerControlSeek._(key: key, socket: socket, offset: -0x80000000, icon: Icons.skip_previous_rounded);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: () {
+        socket.send(
+          remote.Stream(
+            sid: uuidx.random(),
+            seek: remote.Seek(offset: offset),
+          ),
+        );
+      },
+      icon: Icon(icon),
+    );
+  }
+}

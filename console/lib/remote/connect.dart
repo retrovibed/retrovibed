@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/designkit.dart' as ds;
+import 'package:retrovibed/design.kit/stateful.dart';
+import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/meta.dart' as meta;
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/downloads.dart' as downloads;
@@ -11,10 +13,8 @@ import 'package:retrovibed/library/dropdown.upload.dart';
 import 'package:retrovibed/library/search.mimetype.dropdown.dart';
 import 'package:retrovibed/library/search.minimal.dart';
 import 'api.dart' as remote;
-import 'player.control.fastforward.dart';
-import 'player.control.next.dart';
+import 'player.control.seek.dart';
 import 'player.control.playpause.dart';
-import 'player.control.previous.dart';
 import 'playlist.current.dart';
 
 class Connect extends StatefulWidget {
@@ -39,13 +39,15 @@ class Connect extends StatefulWidget {
   State<Connect> createState() => _State();
 }
 
-class _State extends State<Connect> {
-  ValueNotifier<meta.Daemon> _library = ValueNotifier(meta.Daemon());
+class _State extends State<Connect> with LoadingState {
+  final ValueNotifier<meta.Daemon> _endpoint = ValueNotifier(meta.Daemon());
   remote.RemoteControlSocket _socket = remote.RemoteControlSocket.noop;
   Stream<remote.Stream> _messages = Stream.empty();
 
-  void refresh() {
-    setState(() {}); // force rebuild
+  void _onEndpointChanged() {
+    _socket.close();
+    setState(() => _socket = remote.RemoteControlSocket.noop);
+    _connect();
   }
 
   void _reconnect() {
@@ -56,11 +58,17 @@ class _State extends State<Connect> {
   }
 
   void _connect() {
+    if (_endpoint.value.hostname.isEmpty) return;
+
+    setState(() => loading = true);
+
     remote.remotecontrol
-        .connect(options: [authn.request(authn.AuthzCache.meta(context))])
+        .connect(host: _endpoint.value.hostname, options: [authn.request(authn.AuthzCache.meta(context))])
         .then((socket) {
           final c = Completer();
           setState(() {
+            loading = false;
+            cause = ds.Error.zero;
             _socket = socket;
             _messages = socket.messages.asBroadcastStream();
             _messages.listen(
@@ -73,8 +81,30 @@ class _State extends State<Connect> {
 
           return c.future;
         })
-        .catchError((cause) {
-          debugPrint("remote control connect socket failed: ${cause}");
+        .catchError((error) {
+          setState(() {
+            loading = false;
+            _socket = remote.RemoteControlSocket.noop;
+            cause = ds.Error.unauthorized(
+              error,
+              message: const Text("remote control is disabled on this daemon"),
+              onTap: resetCause,
+            );
+          });
+        }, test: httpx.ErrorsTest.forbidden)
+        .catchError((error) {
+          setState(() {
+            loading = false;
+            _socket = remote.RemoteControlSocket.noop;
+            cause = ds.Errors.httpauto(error, onTap: resetCause);
+          });
+        }, test: httpx.ErrorsTest.httpauto)
+        .catchError((error) {
+          setState(() {
+            loading = false;
+            _socket = remote.RemoteControlSocket.noop;
+            cause = ds.Error.unknown(error, onTap: resetCause);
+          });
         })
         .whenComplete(_reconnect);
   }
@@ -82,15 +112,15 @@ class _State extends State<Connect> {
   @override
   void initState() {
     super.initState();
-    _library = meta.EndpointAuto.of(context)?.changed ?? _library;
-    _library.addListener(refresh);
+    _endpoint.value = meta.EndpointAuto.of(context)?.changed.value ?? _endpoint.value;
+    _endpoint.addListener(_onEndpointChanged);
     ds.postframe(_connect);
   }
 
   @override
   void dispose() {
     super.dispose();
-    _library.removeListener(refresh);
+    _endpoint.removeListener(_onEndpointChanged);
     _socket.close();
   }
 
@@ -102,7 +132,8 @@ class _State extends State<Connect> {
         verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
         children: [
           meta.DaemonDropdown(
-            library: _library,
+            library: _endpoint,
+            onSelect: meta.DaemonDropdown.local,
             remoteonly: true,
             readonly: true,
             leading: [
@@ -173,18 +204,20 @@ class _State extends State<Connect> {
                   verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Divider(),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        PlayerControlPrevious(socket: _socket),
+                        PlayerControlSeek.prev(socket: _socket),
+                        PlayerControlSeek.backward(socket: _socket),
                         PlayerControlPlayPause(socket: _socket, status: _messages),
-                        PlayerControlFastForward(socket: _socket),
-                        PlayerControlNext(socket: _socket),
+                        PlayerControlSeek.forward(socket: _socket),
+                        PlayerControlSeek.next(socket: _socket),
                       ],
                     ),
                     PlaylistCurrent(_messages),
                     SearchMinimal(
+                      apisearch: (req, {host, options = const []}) =>
+                          media.media.search(req, host: _endpoint.value.hostname, options: options),
                       empty: ds.Empty,
                     ),
                   ],

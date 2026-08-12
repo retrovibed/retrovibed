@@ -84,8 +84,8 @@ abstract class remotecontrol {
         });
   }
 
-  static Future<RemoteControlSocket> connect({List<httpx.Option> options = const []}) async {
-    return httpx.websocket(Uri.https(httpx.host(), "/rc/connect", null), options: options).then((socket) {
+  static Future<RemoteControlSocket> connect({required String host, List<httpx.Option> options = const []}) async {
+    return httpx.websocket(Uri.https(host, "/rc/connect", null), options: options).then((socket) {
       socket.pingInterval = Duration(seconds: 10);
       return _WebSocketRemoteControlSocket(socket);
     });

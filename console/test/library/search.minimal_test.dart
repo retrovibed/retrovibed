@@ -8,6 +8,7 @@ import 'package:retrovibed/testing/widget_tester_extensions.dart';
 
 Future<media.MediaSearchResponse> _mockSearchEmpty(
   media.MediaSearchRequest req, {
+  String? host,
   List<httpx.Option> options = const [],
 }) async {
   return media.media.response(
@@ -17,6 +18,7 @@ Future<media.MediaSearchResponse> _mockSearchEmpty(
 
 Future<media.MediaSearchResponse> _mockSearchWithItems(
   media.MediaSearchRequest req, {
+  String? host,
   List<httpx.Option> options = const [],
 }) async {
   return media.MediaSearchResponse(
@@ -46,6 +48,7 @@ Future<media.MediaSearchResponse> _mockSearchWithItems(
 
 Future<media.MediaSearchResponse> _mockSearchWithLongNames(
   media.MediaSearchRequest req, {
+  String? host,
   List<httpx.Option> options = const [],
 }) async {
   return media.MediaSearchResponse(

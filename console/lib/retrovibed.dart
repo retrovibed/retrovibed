@@ -167,6 +167,7 @@ void daemon({bool smoke = false}) {
   String args = jsonEncode([
     "daemon",
     "--no-auto-mdns",
+    "--remote-control",
   ]);
   bridge.egdaemon(args.toNativeUtf8().cast<Char>(), smoke ? 1 : 0);
 }

@@ -14,6 +14,7 @@ class DaemonDropdown extends StatefulWidget {
   final bool readonly;
   final bool remoteonly;
   final Future<api.DaemonSearchResponse> Function(api.DaemonSearchRequest) search;
+  final DaemonOnSelect onSelect;
   const DaemonDropdown({
     super.key,
     required this.library,
@@ -23,7 +24,18 @@ class DaemonDropdown extends StatefulWidget {
     this.remoteonly = false,
     this.readonly = false,
     this.search = api.daemons.search,
+    this.onSelect = global,
   });
+
+  // validates via EndpointAuto and mutates the app-wide active host (httpx.set + EndpointAuto.changed).
+  static Future<api.Daemon> global(BuildContext context, api.Daemon daemon) {
+    return (EndpointAuto.of(context)?.refreshNoErrHandling(Future.value(daemon)) ?? Future.value()).then((_) => daemon);
+  }
+
+  // validates connectability only; never touches EndpointAuto/httpx globals.
+  static Future<api.Daemon> local(BuildContext context, api.Daemon daemon) {
+    return api.daemons.connectable(daemon);
+  }
 
   @override
   State<DaemonDropdown> createState() => _DaemonDropdownState();
@@ -127,7 +139,11 @@ class _DaemonDropdownState extends State<DaemonDropdown> {
                       return DaemonDropdownItem(
                         library: daemon,
                         readonly: widget.readonly,
-                        onTap: onClick,
+                        onSelect: widget.onSelect,
+                        onTap: (v) {
+                          widget.library.value = v;
+                          onClick();
+                        },
                       );
                     },
                   ),

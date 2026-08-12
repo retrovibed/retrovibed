@@ -32,7 +32,7 @@ void main() {
       addTearDown(search.dispose);
       await tester.pumpApp(
         Home(
-          apisearch: (req, {options = const []}) async {
+          apisearch: (req, {host, options = const []}) async {
             return media.MediaSearchResponse(
               items: [
                 media.Media(
@@ -75,7 +75,7 @@ void main() {
       addTearDown(search.dispose);
       await tester.pumpApp(
         Home(
-          apisearch: (req, {options = const []}) async {
+          apisearch: (req, {host, options = const []}) async {
             return media.MediaSearchResponse(items: [], next: req);
           },
           search: search,
@@ -116,7 +116,7 @@ void main() {
       addTearDown(search.dispose);
       await tester.pumpApp(
         Home(
-          apisearch: (req, {options = const []}) async {
+          apisearch: (req, {host, options = const []}) async {
             return media.MediaSearchResponse(items: [], next: req);
           },
           search: search,
@@ -154,7 +154,7 @@ void main() {
       addTearDown(search.dispose);
       await tester.pumpApp(
         Home(
-          apisearch: (req, {options = const []}) async {
+          apisearch: (req, {host, options = const []}) async {
             return media.MediaSearchResponse(items: [], next: req);
           },
           search: search,

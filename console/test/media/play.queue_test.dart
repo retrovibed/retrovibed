@@ -185,7 +185,7 @@ void main() {
     api.MediaSearchRequest _req(int limit) => api.MediaSearchRequest(limit: Int64(limit));
 
     api.FnMediaSearch _search(List<api.Media> items, int limit) =>
-        (req, {options = const []}) async => api.MediaSearchResponse(
+        (req, {host, options = const []}) async => api.MediaSearchResponse(
           items: items,
           next: _req(limit),
         );
@@ -247,6 +247,7 @@ void main() {
 
       Future<api.MediaSearchResponse> search(
         api.MediaSearchRequest req, {
+        String? host,
         List<httpx.Option> options = const [],
       }) async {
         calls++;

@@ -53,7 +53,7 @@ void main() {
         PublishContainer(
           onPublished: () {},
           onCancel: () {},
-          search: (req, {options = const []}) => Future.value(
+          search: (req, {host, options = const []}) => Future.value(
             MediaSearchResponse(
               next: MediaSearchRequest(),
               items: [Media(description: 'Test Video', mimetype: 'video/mp4')],

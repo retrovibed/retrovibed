@@ -15,6 +15,7 @@ export 'search.state.dart';
 typedef FnMediaSearch =
     Future<MediaSearchResponse> Function(
       MediaSearchRequest req, {
+      String? host,
       List<httpx.Option> options,
     });
 
@@ -52,6 +53,7 @@ abstract class media {
 
   static Future<MediaSearchResponse> emptysearch(
     MediaSearchRequest req, {
+    String? host,
     List<httpx.Option> options = const [],
   }) async {
     return Future.value(
@@ -61,12 +63,13 @@ abstract class media {
 
   static Future<MediaSearchResponse> search(
     MediaSearchRequest req, {
+    String? host,
     List<httpx.Option> options = const [],
   }) async {
     return httpx
         .get(
           Uri.https(
-            httpx.host(),
+            host ?? httpx.host(),
             "/m/",
           ).replace(query: qs.encode(req.toProto3Json())),
           options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
