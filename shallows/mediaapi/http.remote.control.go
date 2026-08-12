@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	"github.com/coder/websocket"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -138,6 +139,8 @@ func (t *HTTPRemoteControl) listen(w http.ResponseWriter, r *http.Request) {
 			log.Println(errorsx.Wrap(err, "unable to decode remote control frame"))
 			continue
 		}
+
+		log.Println("received command", spew.Sdump(msg))
 
 		t.mu.Lock()
 		for conn := range t.connects {
