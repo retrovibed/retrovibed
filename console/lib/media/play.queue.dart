@@ -140,6 +140,7 @@ class PlayableMedia {
   );
 
   mediakit.Media playable(String auth) {
+    print("DERP DERP playable... ${current} ${auth}");
     return mediakit.Media(
       api.media.download_uri(current.id),
       extras: Map.of(<String, String>{

@@ -80,7 +80,7 @@ class _State extends State<RemoteControlListener> {
 
     switch (msg.whichCommand()) {
       case remote.Stream_Command.queue:
-        playlist.queue.push(playqueue.PlayableMedia(msg.queue.media));
+        playlist.maybeNext(playqueue.PlayableMedia(msg.queue.media));
         break;
       case remote.Stream_Command.dequeue:
         playlist.queue.remove(msg.dequeue.id);

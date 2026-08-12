@@ -294,6 +294,23 @@ class _PlaylistState extends State<Playlist> {
     next();
   }
 
+  // jump start playback if its not already running, otherwise just ignore.
+  void maybeNext(playqueue.PlayableMedia m) {
+    print(
+      "maybe next initiated: ${player.state.playing} ${_queue.previous} | ${known.description} - ${_queue.pos} | ${_queue.upcoming}",
+    );
+
+    _queue.push(m);
+
+    if (player.state.playing) return;
+
+    _advance().whenComplete(() {
+      print(
+        "next completed: ${_queue.previous} | ${known.description} | ${_queue.upcoming}",
+      );
+    });
+  }
+
   void next() {
     print(
       "next initiated: ${_queue.previous} | ${known.description} - ${_queue.pos} | ${_queue.upcoming}",
