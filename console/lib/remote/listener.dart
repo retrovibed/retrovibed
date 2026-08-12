@@ -90,9 +90,9 @@ class _State extends State<RemoteControlListener> {
         break;
       case remote.Stream_Command.seek:
         final offset = msg.seek.offset;
-        if (offset == 0x7FFFFFFF) {
+        if (offset == remote.SeekOffset.next) {
           playlist.next();
-        } else if (offset == -0x80000000) {
+        } else if (offset == remote.SeekOffset.previous) {
           playlist.previous();
         } else {
           playlist.player.seek(playlist.player.state.position + Duration(milliseconds: offset));

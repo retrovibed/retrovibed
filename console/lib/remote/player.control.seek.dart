@@ -17,14 +17,12 @@ class PlayerControlSeek extends StatelessWidget {
     return PlayerControlSeek._(key: key, socket: socket, offset: -step.inMilliseconds, icon: Icons.fast_rewind_rounded);
   }
 
-  // int32 max is a sentinel meaning "skip to next track", see media.remote.control.proto's Seek.
   factory PlayerControlSeek.next({Key? key, required remote.RemoteControlSocket socket}) {
-    return PlayerControlSeek._(key: key, socket: socket, offset: 0x7FFFFFFF, icon: Icons.skip_next_rounded);
+    return PlayerControlSeek._(key: key, socket: socket, offset: remote.SeekOffset.next, icon: Icons.skip_next_rounded);
   }
 
-  // int32 min is a sentinel meaning "skip to previous track", see media.remote.control.proto's Seek.
   factory PlayerControlSeek.prev({Key? key, required remote.RemoteControlSocket socket}) {
-    return PlayerControlSeek._(key: key, socket: socket, offset: -0x80000000, icon: Icons.skip_previous_rounded);
+    return PlayerControlSeek._(key: key, socket: socket, offset: remote.SeekOffset.previous, icon: Icons.skip_previous_rounded);
   }
 
   @override

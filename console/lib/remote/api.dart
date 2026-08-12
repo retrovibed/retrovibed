@@ -8,6 +8,13 @@ import 'package:retrovibed/retrovibed.dart' as retro;
 
 export 'package:retrovibed/media/media.remote.control.pb.dart';
 
+// Sentinel Seek.offset values meaning "skip to next/previous track" rather
+// than a relative seek, per media.remote.control.proto's Seek.
+abstract class SeekOffset {
+  static const int next = 0x7FFFFFFF; // int32 max
+  static const int previous = -0x80000000; // int32 min
+}
+
 abstract class RemoteControlSocket {
   // placeholder used before a real connection exists, so callers never need
   // to null-check (e.g. `_socket!`) while waiting to connect.
