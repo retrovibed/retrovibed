@@ -12,10 +12,35 @@ import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/library/dropdown.upload.dart';
 import 'package:retrovibed/library/search.mimetype.dropdown.dart';
 import 'package:retrovibed/library/search.minimal.dart';
+import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'api.dart' as remote;
 import 'player.control.seek.dart';
 import 'player.control.playpause.dart';
 import 'playlist.current.dart';
+
+// Mirrors media.PlayAction's shape but queues the media on the connected
+// remote daemon's playlist instead of this device's local Playlist, since
+// SearchMinimal here searches the app's own library to feed *that* daemon.
+Future<void> Function()? Function(BuildContext, media.Media, media.MediaSearchResponse) RemotePlayAction(
+  remote.RemoteControlSocket socket,
+) {
+  return (context, current, s) {
+    switch (mimex.icon(current.mimetype)) {
+      case mimex.icomovie:
+      case mimex.icoaudio:
+        return () async {
+          socket.send(
+            remote.Stream(
+              sid: uuidx.v7(),
+              queue: remote.Queue(media: current),
+            ),
+          );
+        };
+      default:
+        return null;
+    }
+  };
+}
 
 // Public entrypoint: wraps _Connect in an authn.AuthedEndpoint so it can target a
 // user-selected remote daemon (via its DaemonDropdown) with a matching
@@ -118,6 +143,7 @@ class _State extends State<_Connect> with LoadingState {
 
           return c.future;
         })
+        .then((_) => _reconnect())
         .catchError((error) {
           setState(() {
             loading = false;
@@ -135,6 +161,7 @@ class _State extends State<_Connect> with LoadingState {
             _socket = remote.RemoteControlSocket.noop;
             cause = ds.Errors.httpauto(error, onTap: resetCause);
           });
+          _reconnect();
         }, test: httpx.ErrorsTest.httpauto)
         .catchError((error) {
           setState(() {
@@ -142,8 +169,8 @@ class _State extends State<_Connect> with LoadingState {
             _socket = remote.RemoteControlSocket.noop;
             cause = ds.Error.unknown(error, onTap: resetCause);
           });
-        })
-        .whenComplete(_reconnect);
+          _reconnect();
+        });
   }
 
   @override
@@ -231,14 +258,13 @@ class _State extends State<_Connect> with LoadingState {
               ),
             ],
           ),
-          SingleChildScrollView(
+          Expanded(
             child: ds.Container(
               padding: defaults.padding,
               ds.Loading(
                 loading: _socket == remote.RemoteControlSocket.noop,
                 Column(
                   verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
-                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -251,10 +277,11 @@ class _State extends State<_Connect> with LoadingState {
                       ],
                     ),
                     PlaylistCurrent(_messages),
-                    SearchMinimal(
-                      apisearch: (req, {host, options = const []}) =>
-                          media.media.search(req, host: _endpoint.value.hostname, options: options),
-                      empty: ds.Empty,
+                    Expanded(
+                      child: SearchMinimal(
+                        empty: ds.Empty,
+                        onPlay: RemotePlayAction(_socket),
+                      ),
                     ),
                   ],
                 ),

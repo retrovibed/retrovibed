@@ -73,8 +73,10 @@ class _State extends State<RemoteControlListener> {
   }
 
   void _applyRemoteCommand(remote.Stream msg) {
+    print("received remote command ${msg}");
     final playlist = media.Playlist.of(context);
     if (playlist == null) return;
+    print("executing remote command ${msg}");
 
     switch (msg.whichCommand()) {
       case remote.Stream_Command.queue:

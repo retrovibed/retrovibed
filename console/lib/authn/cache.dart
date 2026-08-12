@@ -33,8 +33,8 @@ class AuthzCache extends StatefulWidget {
     return context.findAncestorStateOfType<_AuthzCache>() ?? _AuthzCache();
   }
 
-  static _AuthzTokenData cached(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<_AuthzTokenData>() ?? _AuthzTokenData.empty;
+  static AuthzTokenData cached(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<AuthzTokenData>() ?? AuthzTokenData.empty;
   }
 
   static _meta.Token authzmetadata(BuildContext context) => cached(context).meta.current.token;
@@ -43,20 +43,26 @@ class AuthzCache extends StatefulWidget {
 
   @override
   State<AuthzCache> createState() => _AuthzCache();
+
+  // Hook allowing a subclass (e.g. a daemon-scoped variant) to publish its
+  // token under a distinct InheritedWidget type, so plain AuthzCache.meta()
+  // lookups from descendants skip past it and keep resolving the nearest
+  // "real" AuthzCache ancestor instead of this scoped one.
+  AuthzTokenData publish(authz.Cached<_meta.Token> meta, Widget child) => AuthzTokenData(meta: meta, child: child);
 }
 
-class _AuthzTokenData extends InheritedWidget {
+class AuthzTokenData extends InheritedWidget {
   final authz.Cached<_meta.Token> meta;
 
-  const _AuthzTokenData({required this.meta, required super.child});
+  const AuthzTokenData({required this.meta, required super.child});
 
-  static final empty = _AuthzTokenData(
+  static final empty = AuthzTokenData(
     meta: authz.Cached(authz.Bearer(_meta.Token(), ""), authz.Cached.pending),
     child: const SizedBox(),
   );
 
   @override
-  bool updateShouldNotify(_AuthzTokenData old) => meta != old.meta;
+  bool updateShouldNotify(AuthzTokenData old) => meta != old.meta;
 }
 
 class _AuthzCache extends State<AuthzCache> {
@@ -126,9 +132,9 @@ class _AuthzCache extends State<AuthzCache> {
 
   @override
   Widget build(BuildContext context) {
-    return _AuthzTokenData(
-      meta: meta,
-      child: ds.LoadingBoundary(
+    return widget.publish(
+      meta,
+      ds.LoadingBoundary(
         loading: _loading,
         _loading ? SizedBox() : widget.child,
       ),

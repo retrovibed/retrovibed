@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fixnum/fixnum.dart' as fixnum;
+import 'errors.dart' as errors;
 import 'empty.dart';
 import 'help.dart';
 import 'lazy.visible.dart';
@@ -168,7 +169,7 @@ class Table<T> extends StatelessWidget {
     this.overlay = const SizedBox(),
     this.children = const [],
     this.loading = false,
-    this.cause = const SizedBox(),
+    this.cause = errors.Error.zero,
     this.help = HelpScope.None,
     this.padding = EdgeInsets.zero,
   });
@@ -188,6 +189,7 @@ class Table<T> extends StatelessWidget {
           final defaults = Defaults.of(context);
           final compact = defaults.isCompact;
           final bounded = constraints.hasTightHeight;
+
           return Padding(
             padding: padding,
             child: Column(

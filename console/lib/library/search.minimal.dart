@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/media.dart' as media;
-import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/authn.dart' as authn;
+import 'known.media.icon.dart';
 
 class SearchMinimal extends StatefulWidget {
   final media.FnMediaSearch apisearch;
   final Widget empty;
+  final Future<void> Function()? Function(BuildContext, media.Media, media.MediaSearchResponse) onPlay;
 
   const SearchMinimal({
     super.key,
     this.apisearch = media.media.search,
     this.empty = const Text("no results"),
+    this.onPlay = media.PlayAction,
   });
 
   @override
@@ -72,7 +74,7 @@ class _SearchMinimal extends State<SearchMinimal> {
       loading: _loading,
       cause: _cause,
       leading: ds.SearchTray(
-        decoration: InputDecoration(hintText: "search library"),
+        decoration: InputDecoration(hintText: "search ${httpx.host()}'s library"),
         onSubmitted: (v) {
           setState(() {
             _res.next.query = v;
@@ -93,8 +95,8 @@ class _SearchMinimal extends State<SearchMinimal> {
       ds.Table.expanded<media.Media>(
         (v) => media.RowDisplay(
           media: v,
-          leading: [Icon(mimex.icon(v.mimetype))],
-          onTap: media.PlayAction(context, v, _res),
+          leading: [KnownMediaIcon(v)],
+          onTap: widget.onPlay(context, v, _res),
         ),
       ),
       empty: Center(child: widget.empty),

@@ -1,38 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/authz.dart' as authz;
-import 'package:retrovibed/meta.dart' as meta;
+import 'package:retrovibed/meta.dart' as _meta;
 import 'cache.dart' as authn;
 import 'endpoint.dart';
 
 // Scopes a device and its matching auth token together around a subtree, so
 // a caller can target a specific (possibly remote) device without disturbing
 // the app-root EndpointAuto/AuthzCache. Owns its ValueNotifier<Daemon>
-// internally (mirroring how meta.EndpointAuto owns `changed`) rather than
+// internally (mirroring how _meta.EndpointAuto owns `changed`) rather than
 // taking one from the caller, so wrapping a subtree is a single,
 // stateless-friendly widget.
 class AuthedEndpoint extends StatefulWidget {
   final Widget child;
-  final meta.Daemon? initial;
+  final _meta.Daemon? initial;
   final authn.FnAuthzCurrent current;
 
   const AuthedEndpoint(
     this.child, {
     super.key,
     this.initial,
-    this.current = meta.authz.current,
+    this.current = _meta.authz.current,
   });
 
-  static ValueNotifier<meta.Daemon> daemon(BuildContext context) => Endpoint.of(context)!.widget.daemon;
+  static ValueNotifier<_meta.Daemon> daemon(BuildContext context) => Endpoint.of(context)!.widget.daemon;
 
-  static authz.Cached<meta.Token> token(BuildContext context) => authn.AuthzCache.meta(context);
+  static authz.Cached<_meta.Token> token(BuildContext context) => _EndpointAuthzCache.meta(context);
 
   @override
   State<AuthedEndpoint> createState() => _AuthedEndpoint();
 }
 
 class _AuthedEndpoint extends State<AuthedEndpoint> {
-  late final ValueNotifier<meta.Daemon> _daemon = ValueNotifier(
-    widget.initial ?? meta.EndpointAuto.of(context)?.changed.value ?? meta.Daemon(),
+  late final ValueNotifier<_meta.Daemon> _daemon = ValueNotifier(
+    widget.initial ?? _meta.EndpointAuto.of(context)?.changed.value ?? _meta.Daemon(),
   );
 
   @override
@@ -53,11 +53,39 @@ class _AuthedEndpoint extends State<AuthedEndpoint> {
   Widget build(BuildContext context) {
     return Endpoint(
       daemon: _daemon,
-      authn.AuthzCache(
+      _EndpointAuthzCache(
         key: ValueKey(_daemon.value.hostname),
         current: ({String? host}) => widget.current(host: host ?? _daemon.value.hostname),
         widget.child,
       ),
     );
   }
+}
+
+// A device-scoped counterpart to authn.AuthzCache, kept as its own type (via
+// AuthzCache.publish) so it doesn't shadow the app-root AuthzCache for
+// descendants that still want the default/global token (e.g. a widget doing
+// an unrelated request against httpx.host() while nested under AuthedEndpoint
+// for an unrelated remote daemon). authn.AuthzCache.meta(context) walks past
+// this InheritedWidget (exact-type lookup) straight to the app-root one; only
+// AuthedEndpoint.token resolves this scoped instance.
+class _EndpointAuthzCache extends authn.AuthzCache {
+  const _EndpointAuthzCache(super.child, {super.key, required super.current});
+
+  static authz.Cached<_meta.Token> meta(BuildContext context) {
+    return (context.dependOnInheritedWidgetOfExactType<_ScopedAuthzTokenData>() ?? _ScopedAuthzTokenData.empty).meta;
+  }
+
+  @override
+  _ScopedAuthzTokenData publish(authz.Cached<_meta.Token> meta, Widget child) =>
+      _ScopedAuthzTokenData(meta: meta, child: child);
+}
+
+class _ScopedAuthzTokenData extends authn.AuthzTokenData {
+  const _ScopedAuthzTokenData({required super.meta, required super.child});
+
+  static final empty = _ScopedAuthzTokenData(
+    meta: authz.Cached(authz.Bearer(_meta.Token(), ""), authz.Cached.pending),
+    child: const SizedBox(),
+  );
 }
