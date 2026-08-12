@@ -6,6 +6,7 @@ import 'package:retrovibed/ddisc.dart' as ddisc;
 import 'package:retrovibed/library.dart' as lib;
 import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'discovery.details.dart';
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class DiscoveredCard extends StatefulWidget {
   final ddisc.Discovery current;
@@ -31,7 +32,7 @@ class DiscoveredCard extends StatefulWidget {
   State<DiscoveredCard> createState() => _DiscoveredCardState();
 }
 
-class _DiscoveredCardState extends State<DiscoveredCard> {
+class _DiscoveredCardState extends State<DiscoveredCard> with LoadingState {
   bool _loading = false;
   bool _queued = false;
   bool _resolved = false;
@@ -44,11 +45,6 @@ class _DiscoveredCardState extends State<DiscoveredCard> {
     rating: 0.0,
     image: "",
   );
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void _reseterr() {
     setState(() {

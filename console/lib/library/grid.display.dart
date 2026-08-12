@@ -8,6 +8,7 @@ import 'package:retrovibed/discovery.dart' as disc;
 import 'known.media.display.dart';
 import 'media.settings.dart';
 import 'known.media.dropdown.dart';
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class Grid extends StatefulWidget {
   final List<Widget> leading;
@@ -29,16 +30,11 @@ class Grid extends StatefulWidget {
   State<Grid> createState() => _GridState();
 }
 
-class _GridState extends State<Grid> {
+class _GridState extends State<Grid> with LoadingState {
   bool _loading = true;
   Widget _cause = ds.Error.zero;
   List<media.Media> _items = [];
   media.MediaSearchRequest? _lastFetchedNext;
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void reseterr() {
     setState(() {

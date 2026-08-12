@@ -5,6 +5,7 @@ import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/library.dart' as lib;
 import 'package:retrovibed/langcodex.dart' as langcodex;
 import '../media/media.known.pb.dart' as known;
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class Recommendations extends StatefulWidget {
   const Recommendations(this.mimetype, {super.key, this.latest = lib.recommendations.latest});
@@ -16,15 +17,10 @@ class Recommendations extends StatefulWidget {
   State<Recommendations> createState() => _RecommendationsState();
 }
 
-class _RecommendationsState extends State<Recommendations> {
+class _RecommendationsState extends State<Recommendations> with LoadingState {
   Widget _cause = ds.Error.zero;
   bool _loading = true;
   List<known.Known> _items = [];
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void reseterr() {
     setState(() {

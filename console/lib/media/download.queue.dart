@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'api.dart' as api;
 import 'download.watch.dart';
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class DownloadQueue extends StatefulWidget {
   final Future<List<api.Download>> queue;
@@ -22,16 +23,11 @@ class DownloadQueue extends StatefulWidget {
   State<DownloadQueue> createState() => _DownloadQueue();
 }
 
-class _DownloadQueue extends State<DownloadQueue> {
+class _DownloadQueue extends State<DownloadQueue> with LoadingState {
   bool _loading = true;
   Widget _cause = ds.Error.zero;
   List<api.Download> _pending = [];
   int _index = 0;
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void _resetcause() {
     setState(() => _cause = ds.Error.zero);

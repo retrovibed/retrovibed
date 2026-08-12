@@ -9,6 +9,7 @@ import 'package:retrovibed/lucene.dart' as lucene;
 import 'package:retrovibed/timex.dart' as timex;
 import './grid.settings.dart';
 import './magnet.links.dart';
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class AvailableListDisplay extends StatefulWidget {
   final media.FnDownloadSearch search;
@@ -29,7 +30,7 @@ class AvailableListDisplay extends StatefulWidget {
   State<StatefulWidget> createState() => _AvailableListDisplay();
 }
 
-class _AvailableListDisplay extends State<AvailableListDisplay> {
+class _AvailableListDisplay extends State<AvailableListDisplay> with LoadingState {
   bool _loading = true;
   String _focused = '';
   Widget _cause = ds.Error.zero;
@@ -37,12 +38,6 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
   media.DownloadSearchResponse _res = media.discoveredsearch.response(
     next: media.discoveredsearch.request(limit: 32),
   );
-
-  @override
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void resetcause() {
     setState(() {

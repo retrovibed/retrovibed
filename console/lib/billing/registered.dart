@@ -4,6 +4,7 @@ import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'api.dart' as api;
+import 'package:retrovibed/design.kit/stateful.dart';
 import 'plan.summary.dart';
 
 class Registered extends StatefulWidget {
@@ -28,7 +29,7 @@ class Registered extends StatefulWidget {
   State<StatefulWidget> createState() => RegisteredState();
 }
 
-class RegisteredState extends State<Registered> {
+class RegisteredState extends State<Registered> with LoadingState {
   final ValueNotifier<api.Billing> refresh = ValueNotifier(api.Billing());
   api.Billing current = api.Billing();
   api.Plan plan = PlanSummary.plan(free());
@@ -36,11 +37,6 @@ class RegisteredState extends State<Registered> {
   Widget _cause = ds.Error.zero;
   int attributionCount = 0;
   int attributionRate = 0;
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void replace(api.BillingLookupResponse upd) {
     setState(() {

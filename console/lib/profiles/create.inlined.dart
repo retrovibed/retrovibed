@@ -4,6 +4,7 @@ import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/meta.dart' as meta;
 import 'package:retrovibed/profiles.dart' as profiles;
 import 'package:retrovibed/httpx.dart' as httpx;
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class CreateInlined extends StatefulWidget {
   final ds.AsyncVoidCallback onClose;
@@ -15,18 +16,12 @@ class CreateInlined extends StatefulWidget {
   State<CreateInlined> createState() => _CreateInlinedState();
 }
 
-class _CreateInlinedState extends State<CreateInlined> {
+class _CreateInlinedState extends State<CreateInlined> with LoadingState {
   bool _loading = false;
   Widget _cause = ds.Error.zero;
   meta.Profile _profile = meta.Profile();
   meta.Token _token = meta.Token()..libraryRead = true;
   String _publicKey = '';
-
-  @override
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void _clearCause() => setState(() => _cause = ds.Error.zero);
 

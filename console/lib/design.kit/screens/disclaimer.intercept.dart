@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../modals.dart' as modals;
 import 'disclaimer.dart';
+import '../stateful.dart';
 
 // DisclaimerIntercept renders [child] behind an invisible tap-catcher until
 // [cacheid] has been acknowledged. Tapping shows [overlay] (built with a
@@ -30,12 +31,7 @@ class DisclaimerIntercept extends StatefulWidget {
   State<DisclaimerIntercept> createState() => _DisclaimerInterceptState();
 }
 
-class _DisclaimerInterceptState extends State<DisclaimerIntercept> {
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
-
+class _DisclaimerInterceptState extends State<DisclaimerIntercept> with LoadingState {
   Future<void> _handleTap(BuildContext context) async {
     final proceed = await modals.asyncfn<bool>(
       context,

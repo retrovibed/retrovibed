@@ -4,6 +4,7 @@ import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:file_selector/file_selector.dart';
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class FilesEvent {
   final List<DropItemFile> files;
@@ -114,7 +115,7 @@ class FileDropWell extends StatefulWidget {
   _FileDropWell createState() => _FileDropWell();
 }
 
-class _FileDropWell extends State<FileDropWell> {
+class _FileDropWell extends State<FileDropWell> with LoadingState {
   final ValueNotifier<int> _progress = ValueNotifier(0);
   int _total = 0;
   bool _dragging = false;
@@ -132,12 +133,6 @@ class _FileDropWell extends State<FileDropWell> {
   void dispose() {
     _progress.dispose();
     super.dispose();
-  }
-
-  @override
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
   }
 
   @override

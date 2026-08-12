@@ -6,6 +6,7 @@ import 'package:retrovibed/meta/api.dart' as meta;
 import 'package:retrovibed/retrovibed.dart' as retro;
 import 'package:url_launcher/url_launcher.dart';
 import './overview.dart';
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class Card extends StatefulWidget {
   final EdgeInsets margin;
@@ -24,17 +25,12 @@ class Card extends StatefulWidget {
   State<Card> createState() => _CardState();
 }
 
-class _CardState extends State<Card> {
+class _CardState extends State<Card> with LoadingState {
   String _fallbackUsername = retro.username();
   bool _loading = true;
   Widget _cause = ds.Error.zero;
   authn.Session _session = authn.Session();
   meta.Authn _authn = meta.Authn();
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   @override
   void initState() {

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:retrovibed/design.kit/theme.defaults.dart';
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class CancelIntent extends Intent {
   const CancelIntent();
@@ -25,15 +26,9 @@ class ItemListManager<T> extends StatefulWidget {
   _ItemListManagerState<T> createState() => _ItemListManagerState<T>();
 }
 
-class _ItemListManagerState<T> extends State<ItemListManager<T>> {
+class _ItemListManagerState<T> extends State<ItemListManager<T>> with LoadingState {
   List<T> _items = [];
   StreamSubscription<T>? _addItemSubscription;
-
-  @override
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   @override
   void initState() {

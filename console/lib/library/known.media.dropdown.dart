@@ -8,6 +8,7 @@ import 'package:retrovibed/media.dart' as _media;
 import 'known.media.card.dart';
 import 'known.media.typography.dart';
 import './api.dart' as api;
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class KnownMediaDropdown extends StatefulWidget {
   final api.FnKnownSearch search;
@@ -119,18 +120,13 @@ class KnownMediaDropdown extends StatefulWidget {
   State<StatefulWidget> createState() => _KnownMediaDropdown();
 }
 
-class _KnownMediaDropdown extends State<KnownMediaDropdown> {
+class _KnownMediaDropdown extends State<KnownMediaDropdown> with LoadingState {
   bool _loading = true;
   Widget _cause = ds.Error.zero;
   api.KnownSearchResponse _res = api.known.response(
     next: api.known.request(limit: 4),
   );
   api.Known? current = null;
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void reseterr() {
     setState(() {

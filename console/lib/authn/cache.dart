@@ -5,6 +5,7 @@ import 'package:retrovibed/meta.dart' as _meta;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/authz.dart' as authz;
 import 'package:retrovibed/uuidx.dart' as uuidx;
+import 'package:retrovibed/design.kit/stateful.dart';
 
 typedef FnAuthzCurrent = Future<_meta.AuthzResponse> Function({String? host});
 
@@ -59,18 +60,12 @@ class _AuthzTokenData extends InheritedWidget {
   bool updateShouldNotify(_AuthzTokenData old) => meta != old.meta;
 }
 
-class _AuthzCache extends State<AuthzCache> {
+class _AuthzCache extends State<AuthzCache> with LoadingState {
   bool _loading = true;
   authz.Cached<_meta.Token> meta = authz.Cached(
     authz.Bearer(_meta.Token(), ""),
     authz.Cached.pending,
   );
-
-  @override
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void refresh() {
     setState(() {

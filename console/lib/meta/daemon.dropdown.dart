@@ -5,6 +5,7 @@ import 'daemon.auto.dart';
 import 'daemon.item.dart';
 import 'daemon.manual.dart';
 import 'daemon.typography.dart';
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class DaemonDropdown extends StatefulWidget {
   final ValueNotifier<api.Daemon> library;
@@ -23,18 +24,13 @@ class DaemonDropdown extends StatefulWidget {
   State<DaemonDropdown> createState() => _DaemonDropdownState();
 }
 
-class _DaemonDropdownState extends State<DaemonDropdown> {
+class _DaemonDropdownState extends State<DaemonDropdown> with LoadingState {
   final TextEditingController _search = TextEditingController();
   // canRequestFocus is false so this button never leaves the FocusScope with
   // a focused descendant, which would otherwise block ManualConfiguration's
   // autofocus when it opens.
   final FocusNode _addFocus = FocusNode(canRequestFocus: false, skipTraversal: true);
   Widget? _optional;
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void _refresh() {
     _search.clear();

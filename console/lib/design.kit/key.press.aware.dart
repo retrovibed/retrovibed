@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import './screens.dart' as screens;
+import './stateful.dart';
 
 class KeyPressAware extends StatefulWidget {
   final Future<void> Function() onPress;
@@ -46,13 +47,8 @@ class KeyPressAware extends StatefulWidget {
   State<KeyPressAware> createState() => _KeyPressAwareState();
 }
 
-class _KeyPressAwareState extends State<KeyPressAware> {
+class _KeyPressAwareState extends State<KeyPressAware> with LoadingState {
   bool _processing = false;
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   KeyEventResult _handleKeyPress(FocusNode node, KeyEvent event) {
     if (event is! KeyDownEvent || _processing) {

@@ -6,6 +6,7 @@ import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/httpx.dart' as httpx;
 import './api.dart' as api;
 import './daemon.manual.dart';
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class MDNSDiscovery extends StatefulWidget {
   final void Function(api.Daemon) daemon;
@@ -89,14 +90,9 @@ class MDNSDiscovery extends StatefulWidget {
   State<StatefulWidget> createState() => _MDNSDiscovery();
 }
 
-class _MDNSDiscovery extends State<MDNSDiscovery> {
+class _MDNSDiscovery extends State<MDNSDiscovery> with LoadingState {
   bool _loading = true;
   Widget _cause = ds.Error.zero;
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void reseterr() {
     setState(() {

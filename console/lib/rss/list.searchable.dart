@@ -5,6 +5,7 @@ import 'package:retrovibed/design.kit/forms.dart' as forms;
 import 'list.dart';
 import 'feed.new.dart';
 import 'api.dart' as api;
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class ListSearchable extends StatefulWidget {
   final api.FnSearch search;
@@ -15,7 +16,7 @@ class ListSearchable extends StatefulWidget {
   State<ListSearchable> createState() => SearchableView();
 }
 
-class SearchableView extends State<ListSearchable> {
+class SearchableView extends State<ListSearchable> with LoadingState {
   bool _loading = true;
   Widget _cause = ds.Error.zero;
   Widget _overlay = ds.Empty;
@@ -28,11 +29,6 @@ class SearchableView extends State<ListSearchable> {
     ),
     items: [],
   );
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void reseterr() {
     setState(() {

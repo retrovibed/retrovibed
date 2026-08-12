@@ -6,6 +6,7 @@ import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/authn.dart' as authn;
 import './search.mimetype.dropdown.dart';
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class AvailableListDisplay extends StatefulWidget {
   final media.FnMediaSearch search;
@@ -26,17 +27,12 @@ class AvailableListDisplay extends StatefulWidget {
   State<StatefulWidget> createState() => _AvailableListDisplay();
 }
 
-class _AvailableListDisplay extends State<AvailableListDisplay> {
+class _AvailableListDisplay extends State<AvailableListDisplay> with LoadingState {
   bool _loading = true;
   Widget _cause = ds.Error.zero;
   media.MediaSearchResponse _res = media.media.response(
     next: media.media.request(limit: 32),
   );
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void reseterr() {
     setState(() {

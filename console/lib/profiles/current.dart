@@ -4,6 +4,7 @@ import 'package:retrovibed/design.kit/forms.dart' as forms;
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:url_launcher/url_launcher.dart';
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class Current extends StatefulWidget {
   @override
@@ -12,15 +13,10 @@ class Current extends StatefulWidget {
   }
 }
 
-class _CurrentState extends State<Current> {
+class _CurrentState extends State<Current> with LoadingState {
   bool _loading = true;
   Widget _cause = ds.Error.zero;
   authn.Session current = authn.Session();
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void refresh() {
     setState(() {

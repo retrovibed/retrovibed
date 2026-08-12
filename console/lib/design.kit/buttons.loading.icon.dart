@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/design.kit/help.dart';
+import 'package:retrovibed/design.kit/stateful.dart';
 
 // The original nullable synchronous function type
 // typedef _NullableVoidCallback = void Function()?;
@@ -228,13 +229,8 @@ class LoadingIconButton extends StatefulWidget {
   _LoadingIconButtonState createState() => _LoadingIconButtonState();
 }
 
-class _LoadingIconButtonState extends State<LoadingIconButton> {
+class _LoadingIconButtonState extends State<LoadingIconButton> with LoadingState {
   bool _isLoading = false;
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void _handlePress() {
     if (_isLoading) {

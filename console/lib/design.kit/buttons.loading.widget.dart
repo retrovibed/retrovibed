@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import './screens.dart' as screens;
+import './stateful.dart';
 
 // The custom button that handles the asynchronous state
 class LoadingButton extends StatefulWidget {
@@ -22,14 +23,9 @@ class LoadingButton extends StatefulWidget {
   _LoadingButtonState createState() => _LoadingButtonState();
 }
 
-class _LoadingButtonState extends State<LoadingButton> {
+class _LoadingButtonState extends State<LoadingButton> with LoadingState {
   bool _isLoading = false;
   static const double _iconSize = 24.0;
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   _handlePress() {
     if (_isLoading) {

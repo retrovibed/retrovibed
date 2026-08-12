@@ -4,6 +4,7 @@ import 'qr.dart';
 import 'qr.camera.dart';
 import 'community.pb.dart';
 import 'community.detail.dart';
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class QRScannerModal extends StatefulWidget {
   final Future<void> Function(Community community, String attribution) onScanned;
@@ -21,7 +22,7 @@ class QRScannerModal extends StatefulWidget {
   State<QRScannerModal> createState() => _QRScannerModalState();
 }
 
-class _QRScannerModalState extends State<QRScannerModal> {
+class _QRScannerModalState extends State<QRScannerModal> with LoadingState {
   Widget _cause = ds.Error.zero;
   bool _processing = false;
 
@@ -30,12 +31,6 @@ class _QRScannerModalState extends State<QRScannerModal> {
       _cause = ds.Error.zero;
       _processing = false;
     });
-  }
-
-  @override
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
   }
 
   void _processQRData(String data) {

@@ -6,6 +6,7 @@ import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/dhtx/api.dart' as dhtx;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/torrentx/api.dart' as torrentx;
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class DiagnosticsDetails extends StatefulWidget {
   final EdgeInsets margin;
@@ -24,17 +25,12 @@ class DiagnosticsDetails extends StatefulWidget {
   State<DiagnosticsDetails> createState() => _DiagnosticsDetailsState();
 }
 
-class _DiagnosticsDetailsState extends State<DiagnosticsDetails> {
+class _DiagnosticsDetailsState extends State<DiagnosticsDetails> with LoadingState {
   bool _loading = true;
   Widget _cause = ds.Error.zero;
   torrentx.TorrentMetricsResponse _torrent = torrentx.TorrentMetricsResponse();
   dhtx.DHTMetricsResponse _dht = dhtx.DHTMetricsResponse();
   ddisc.DiscoveryMetricsResponse _discovery = ddisc.DiscoveryMetricsResponse();
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   @override
   void initState() {

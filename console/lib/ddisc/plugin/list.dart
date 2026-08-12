@@ -4,6 +4,7 @@ import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/authn.dart' as authn;
 import './api.dart' as api;
 import './list.row.dart';
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class ListDisplay extends StatefulWidget {
   const ListDisplay({super.key});
@@ -12,17 +13,12 @@ class ListDisplay extends StatefulWidget {
   State<StatefulWidget> createState() => _ListDisplay();
 }
 
-class _ListDisplay extends State<ListDisplay> {
+class _ListDisplay extends State<ListDisplay> with LoadingState {
   bool _loading = true;
   Widget _cause = ds.Error.zero;
   api.PluginSearchResponse _res = api.plugins.response(
     next: api.plugins.request(limit: 32),
   );
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void reseterr() {
     setState(() {

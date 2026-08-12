@@ -5,6 +5,7 @@ import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/library.dart' as lib;
 import 'package:retrovibed/media.dart' as media;
 import 'recent.edit.dart';
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class Recent extends StatefulWidget {
   const Recent(
@@ -22,16 +23,11 @@ class Recent extends StatefulWidget {
   State<Recent> createState() => _RecentState();
 }
 
-class _RecentState extends State<Recent> {
+class _RecentState extends State<Recent> with LoadingState {
   Widget _cause = ds.Error.zero;
   bool _loading = true;
 
   media.RecentSearchResponse _result = media.RecentSearchResponse();
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void reseterr() {
     setState(() {

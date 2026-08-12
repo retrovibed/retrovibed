@@ -6,6 +6,7 @@ import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/library/api.dart' as api;
 import 'locate.p2p.prompt.dart' as p2p;
+import 'package:retrovibed/design.kit/stateful.dart';
 
 // SearchButton requests the peer-to-peer network locate media matching the
 // current library search state - the free-text analog of KnownMediaLocator,
@@ -29,14 +30,9 @@ class SearchButton extends StatefulWidget {
   State<SearchButton> createState() => _SearchButtonState();
 }
 
-class _SearchButtonState extends State<SearchButton> {
+class _SearchButtonState extends State<SearchButton> with LoadingState {
   bool _queued = false;
   Widget _cause = ds.Error.zero;
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void reseterr() {
     setState(() {

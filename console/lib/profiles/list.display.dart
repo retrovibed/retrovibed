@@ -6,6 +6,7 @@ import 'package:retrovibed/meta.dart' as meta;
 import './create.inlined.dart';
 import './filter.status.dart';
 import './list.row.dart';
+import 'package:retrovibed/design.kit/stateful.dart';
 
 typedef FnSearch =
     Future<meta.ProfileSearchResponse> Function(
@@ -30,7 +31,7 @@ class ListDisplay extends StatefulWidget {
   State<StatefulWidget> createState() => _ListDisplay();
 }
 
-class _ListDisplay extends State<ListDisplay> {
+class _ListDisplay extends State<ListDisplay> with LoadingState {
   bool _loading = true;
   Widget _cause = ds.Error.zero;
   Widget _create = ds.Empty;
@@ -38,12 +39,6 @@ class _ListDisplay extends State<ListDisplay> {
     next: meta.profiles.request(limit: 32),
   );
   VoidCallback? _eventsListener;
-
-  @override
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void resetcause() {
     setState(() {

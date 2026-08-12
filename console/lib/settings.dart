@@ -12,6 +12,7 @@ import 'package:retrovibed/google.dart' as google;
 import 'package:retrovibed/usermanagement.dart' as usermanagement;
 import 'package:retrovibed/debug.dart' as debug;
 import 'package:retrovibed/authn.dart' as authn;
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class AutoHelp extends StatelessWidget {
   final Widget child;
@@ -40,7 +41,7 @@ class Display extends StatefulWidget {
   State<Display> createState() => _DisplayState();
 }
 
-class _DisplayState extends State<Display> {
+class _DisplayState extends State<Display> with LoadingState {
   Widget _overlay = ds.Empty;
   ValueNotifier<meta.Daemon> _library = ValueNotifier(meta.Daemon());
 
@@ -56,11 +57,6 @@ class _DisplayState extends State<Display> {
     LogicalKeyboardKey.keyB,
     LogicalKeyboardKey.keyA,
   ]);
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void refresh() {
     setState(() {}); // force rebuild

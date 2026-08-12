@@ -7,6 +7,7 @@ import 'package:retrovibed/design.kit/theme.defaults.dart';
 import 'package:retrovibed/design.kit/help.labelled.dart';
 import 'buttons.dart';
 import 'shake.dart';
+import 'stateful.dart';
 
 class _HelpVisibility extends InheritedWidget {
   final bool visible;
@@ -35,17 +36,12 @@ class HelpScope extends StatefulWidget {
   State<HelpScope> createState() => HelpScopeState();
 }
 
-class HelpScopeState extends State<HelpScope> {
+class HelpScopeState extends State<HelpScope> with LoadingState {
   final ValueNotifier<bool> visibility = ValueNotifier(false);
   final List<Widget> _descriptions = [];
   final List<Widget> _globals = [];
   List<Widget> get descriptions => List.unmodifiable(_descriptions);
   List<Widget> get globals => List.unmodifiable(_globals);
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void register(Widget description) {
     if (identical(description, HelpScope.None)) return;

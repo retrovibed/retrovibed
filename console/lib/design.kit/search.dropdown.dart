@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'flutterx.dart';
 import 'theme.defaults.dart';
 import 'empty.dart';
+import 'stateful.dart';
 
 class SearchDropdown extends StatefulWidget {
   static const InputDecoration defaultDecoration = const InputDecoration(
@@ -54,17 +55,12 @@ class SearchDropdown extends StatefulWidget {
   State<SearchDropdown> createState() => _SearchDropdownState(controller: controller ?? TextEditingController());
 }
 
-class _SearchDropdownState extends State<SearchDropdown> {
+class _SearchDropdownState extends State<SearchDropdown> with LoadingState {
   Widget _results = Empty;
   bool _loading = false;
   final TextEditingController controller;
   final FocusNode _focus = FocusNode(debugLabel: 'SearchDropdown');
   _SearchDropdownState({required this.controller});
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void _closed() {
     setState(() {

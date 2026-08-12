@@ -6,6 +6,7 @@ import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'api.dart' as api;
 import 'content.detail.dart';
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class CommunityContentDisplay extends StatefulWidget {
   final api.Community community;
@@ -27,7 +28,7 @@ class CommunityContentDisplay extends StatefulWidget {
   State<CommunityContentDisplay> createState() => _CommunityContentDisplayState();
 }
 
-class _CommunityContentDisplayState extends State<CommunityContentDisplay> {
+class _CommunityContentDisplayState extends State<CommunityContentDisplay> with LoadingState {
   api.PublishedContentSearchResponse _resp = api.PublishedContentSearchResponse(
     next: api.PublishedContentSearchRequest(
       offset: ds.Int64(0),
@@ -37,11 +38,6 @@ class _CommunityContentDisplayState extends State<CommunityContentDisplay> {
   );
   bool _loading = true;
   Widget _cause = ds.Error.zero;
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void _clearCause() {
     setState(() {

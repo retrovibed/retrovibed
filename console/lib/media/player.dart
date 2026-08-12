@@ -16,6 +16,7 @@ import './player.control.filedrop.dart';
 import './player.control.stream.dart';
 import './player.control.fullscreen.dart';
 import './player.control.resume.dart';
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class VideoScreen extends StatefulWidget {
   final Widget child;
@@ -32,7 +33,7 @@ class VideoScreen extends StatefulWidget {
   State<VideoScreen> createState() => _VideoState(player);
 }
 
-class _VideoState extends State<VideoScreen> {
+class _VideoState extends State<VideoScreen> with LoadingState {
   FocusScopeNode _selffocus = FocusScopeNode(
     debugLabel: "focus.video.player.scope",
   );
@@ -44,11 +45,6 @@ class _VideoState extends State<VideoScreen> {
   List<Widget> _controls = const [];
 
   _VideoState(Player player) : controller = VideoController(player);
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void add(Media m) {
     widget.player.add(m).then((v) {

@@ -6,6 +6,7 @@ import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/design.kit/forms.dart' as forms;
 import 'package:retrovibed/retrovibed.dart' as retro;
 import 'package:retrovibed/design.kit/modals.dart' as modals;
+import 'package:retrovibed/design.kit/stateful.dart';
 import 'developer.mode.dart';
 
 class Login extends StatefulWidget {
@@ -54,7 +55,7 @@ class _LoginCachedData extends InheritedWidget {
   bool updateShouldNotify(_LoginCachedData old) => flags != old.flags;
 }
 
-class _LoginState extends State<Login> {
+class _LoginState extends State<Login> with LoadingState {
   Widget _cause = ds.Error.zero;
   bool _isObscured = true;
   bool _hasKey = false;
@@ -76,11 +77,6 @@ class _LoginState extends State<Login> {
     super.initState();
     _register = !widget.publicKey().isNotEmpty;
     _checkKey();
-  }
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
   }
 
   void _logout() {

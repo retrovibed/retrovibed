@@ -5,6 +5,7 @@ import 'package:retrovibed/httpx.dart' as httpx;
 import './sku.dart';
 import './api.dart' as quotas;
 import './typography.dart' as _typography;
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class Card extends StatefulWidget {
   final EdgeInsets margin;
@@ -14,14 +15,9 @@ class Card extends StatefulWidget {
   State<Card> createState() => _CardState();
 }
 
-class _CardState extends State<Card> {
+class _CardState extends State<Card> with LoadingState {
   Future<quotas.Quota> _storageFuture = Future.value(quotas.Quota());
   Future<quotas.Quota> _bandwidthFuture = Future.value(quotas.Quota());
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   @override
   void initState() {

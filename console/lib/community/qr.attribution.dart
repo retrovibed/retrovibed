@@ -4,6 +4,7 @@ import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/community/community.pb.dart';
 import 'package:retrovibed/community/qr.dart';
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class QRAttribution extends StatefulWidget {
   final Community community;
@@ -14,14 +15,8 @@ class QRAttribution extends StatefulWidget {
   State<QRAttribution> createState() => _QRAttributionState();
 }
 
-class _QRAttributionState extends State<QRAttribution> {
+class _QRAttributionState extends State<QRAttribution> with LoadingState {
   String _attribution = '';
-
-  @override
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   @override
   void initState() {

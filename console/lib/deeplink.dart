@@ -8,6 +8,7 @@ import 'package:retrovibed/billing/api.dart' as billing;
 import 'package:retrovibed/community/api.dart' as community;
 import 'package:retrovibed/community/community.detail.dart';
 import 'package:retrovibed/community/link.content.dart';
+import 'package:retrovibed/design.kit/stateful.dart';
 
 typedef SearchCommunity =
     Future<community.CommunitySearchResponse> Function(
@@ -44,14 +45,9 @@ class DeepLink extends StatefulWidget {
   State<DeepLink> createState() => _DeepLinkState();
 }
 
-class _DeepLinkState extends State<DeepLink> {
+class _DeepLinkState extends State<DeepLink> with LoadingState {
   StreamSubscription<Uri>? _sub;
   Widget _overlay = const SizedBox();
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   @override
   void initState() {

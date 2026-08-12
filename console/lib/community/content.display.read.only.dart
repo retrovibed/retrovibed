@@ -5,6 +5,7 @@ import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/mimex.dart' as mimex;
 import 'api.dart' as api;
 import 'content.detail.dart';
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class ContentDisplayReadOnly extends StatefulWidget {
   final api.Community community;
@@ -24,7 +25,7 @@ class ContentDisplayReadOnly extends StatefulWidget {
   State<ContentDisplayReadOnly> createState() => _ContentDisplayReadOnlyState();
 }
 
-class _ContentDisplayReadOnlyState extends State<ContentDisplayReadOnly> {
+class _ContentDisplayReadOnlyState extends State<ContentDisplayReadOnly> with LoadingState {
   api.PublishedContentSearchResponse _resp = api.PublishedContentSearchResponse(
     next: api.PublishedContentSearchRequest(
       offset: ds.Int64(0),
@@ -34,11 +35,6 @@ class _ContentDisplayReadOnlyState extends State<ContentDisplayReadOnly> {
   );
   bool _loading = true;
   Widget _cause = ds.Error.zero;
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void _clearCause() {
     setState(() {

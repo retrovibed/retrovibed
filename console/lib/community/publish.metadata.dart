@@ -8,6 +8,7 @@ import 'package:retrovibed/library/api.dart' as library_api;
 import 'package:retrovibed/media/api.dart' as media_api;
 import 'package:retrovibed/media/media.pb.dart';
 import 'package:retrovibed/media/media.known.pb.dart';
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class PublishMetadata extends StatefulWidget {
   final Download? download;
@@ -29,7 +30,7 @@ class PublishMetadata extends StatefulWidget {
   State<PublishMetadata> createState() => _PublishMetadataState();
 }
 
-class _PublishMetadataState extends State<PublishMetadata> {
+class _PublishMetadataState extends State<PublishMetadata> with LoadingState {
   Known _formData = Known(
     released: DateTime.now().toIso8601String().split('T').first,
     adult: false,
@@ -38,11 +39,6 @@ class _PublishMetadataState extends State<PublishMetadata> {
   bool _loadingMetadata = false;
   bool _hasExistingMetadata = false;
   Widget _cause = ds.Error.zero;
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void _clearCause() {
     setState(() {

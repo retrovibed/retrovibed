@@ -7,6 +7,7 @@ import 'package:retrovibed/community/community.pb.dart';
 import 'package:retrovibed/community/publish.content.dart';
 import 'package:retrovibed/community/publish.metadata.dart';
 import 'package:retrovibed/community/publish.confirmation.dart';
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class _StepIndicator extends StatelessWidget {
   final List<(Widget, Widget, Widget Function(_PublishContainerState))> steps;
@@ -89,17 +90,12 @@ class PublishContainer extends StatefulWidget {
   State<PublishContainer> createState() => _PublishContainerState();
 }
 
-class _PublishContainerState extends State<PublishContainer> {
+class _PublishContainerState extends State<PublishContainer> with LoadingState {
   int _step = 0;
   Download? _download;
   Known? _known;
   Community? _community;
   Widget _cause = ds.Error.zero;
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   @override
   void initState() {

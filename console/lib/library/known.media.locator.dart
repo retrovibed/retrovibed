@@ -6,6 +6,7 @@ import 'package:retrovibed/ddisc.dart' as ddisc;
 import 'package:retrovibed/discovery.dart' as disc;
 import 'api.dart' as api;
 import 'known.media.card.dart';
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class KnownMediaLocator extends StatefulWidget {
   final api.Known current;
@@ -78,15 +79,10 @@ class KnownMediaLocator extends StatefulWidget {
   State<StatefulWidget> createState() => _KnownMediaLocator();
 }
 
-class _KnownMediaLocator extends State<KnownMediaLocator> {
+class _KnownMediaLocator extends State<KnownMediaLocator> with LoadingState {
   bool _queued = false;
   bool _loading = false;
   Widget _cause = ds.Error.zero;
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void reseterr() {
     setState(() {

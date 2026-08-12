@@ -10,6 +10,7 @@ import 'package:retrovibed/mimex.dart' as mimex;
 import 'api.dart';
 import 'publish.mode.edit.dart';
 import 'package:retrovibed/google/api.dart' as google;
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class PublishConfirmation extends StatefulWidget {
   final Download? download;
@@ -38,7 +39,7 @@ class PublishConfirmation extends StatefulWidget {
   State<PublishConfirmation> createState() => _PublishConfirmationState();
 }
 
-class _PublishConfirmationState extends State<PublishConfirmation> {
+class _PublishConfirmationState extends State<PublishConfirmation> with LoadingState {
   late PublishContentRequest _request;
   String _oauthGoogleId = '';
   bool _loading = false;
@@ -69,11 +70,6 @@ class _PublishConfirmationState extends State<PublishConfirmation> {
             });
           }, test: httpx.ErrorsTest.httpauto);
     });
-  }
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
   }
 
   void _reseterr() {

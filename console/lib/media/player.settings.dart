@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart'; // Provides [Player], [Media], [Playlist] etc.
 import 'package:retrovibed/design.kit/forms.dart' as forms;
 import 'package:retrovibed/designkit.dart' as ds;
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class PlayerSettings extends StatefulWidget {
   final Player current;
@@ -25,13 +26,8 @@ class PlayerSettings extends StatefulWidget {
   State<PlayerSettings> createState() => _PlayerSettingsState();
 }
 
-class _PlayerSettingsState extends State<PlayerSettings> {
+class _PlayerSettingsState extends State<PlayerSettings> with LoadingState {
   Track _track = Track();
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   @override
   void initState() {

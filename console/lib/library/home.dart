@@ -4,6 +4,7 @@ import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/discovery.dart' as disc;
 import 'package:retrovibed/remote.dart' as remote;
 import 'search.dart';
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class Home extends StatefulWidget {
   final media.FnMediaSearch apisearch;
@@ -27,14 +28,9 @@ class Home extends StatefulWidget {
   State<StatefulWidget> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeState extends State<Home> with LoadingState {
   Widget _downloading = ds.Empty;
   final ValueNotifier<media.SearchMode> _mode = ValueNotifier(media.SearchMode.library);
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void _switchToMode(media.SearchMode m) {
     _mode.value = m;

@@ -8,6 +8,7 @@ import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'package:retrovibed/mimex.dart' as mimex;
 import 'api.dart' as api;
 import 'known.media.source.dart';
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class KnownMediaDisplay extends StatefulWidget {
   final Future<api.Known> pending;
@@ -154,7 +155,7 @@ class KnownMediaDisplay extends StatefulWidget {
   State<StatefulWidget> createState() => _KnownMediaDisplayState();
 }
 
-class _KnownMediaDisplayState extends State<KnownMediaDisplay> {
+class _KnownMediaDisplayState extends State<KnownMediaDisplay> with LoadingState {
   final hovered = ValueNotifier(false);
 
   api.Known current = api.Known(
@@ -164,11 +165,6 @@ class _KnownMediaDisplayState extends State<KnownMediaDisplay> {
     rating: 0.0,
     image: "",
   );
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   @override
   void initState() {

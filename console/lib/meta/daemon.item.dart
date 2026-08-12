@@ -4,6 +4,7 @@ import 'package:retrovibed/httpx.dart' as httpx;
 import 'api.dart' as api;
 import 'daemon.auto.dart';
 import 'daemon.typography.dart';
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class DaemonDropdownItem extends StatefulWidget {
   final api.Daemon library;
@@ -19,13 +20,8 @@ class DaemonDropdownItem extends StatefulWidget {
   State<DaemonDropdownItem> createState() => _DaemonDropdownItemState();
 }
 
-class _DaemonDropdownItemState extends State<DaemonDropdownItem> {
+class _DaemonDropdownItemState extends State<DaemonDropdownItem> with LoadingState {
   Widget _cause = ds.Error.zero;
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void reseterr() {
     setState(() {

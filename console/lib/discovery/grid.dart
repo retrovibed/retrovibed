@@ -11,6 +11,7 @@ import 'package:retrovibed/ddisc.dart' as ddisc;
 import 'discovery.card.dart';
 import 'empty.results.dart';
 import 'search.button.dart';
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class DiscoveryGrid extends StatefulWidget {
   final ValueNotifier<media.MediaSearchState> search;
@@ -22,18 +23,13 @@ class DiscoveryGrid extends StatefulWidget {
   State<DiscoveryGrid> createState() => _DiscoveryGridState();
 }
 
-class _DiscoveryGridState extends State<DiscoveryGrid> {
+class _DiscoveryGridState extends State<DiscoveryGrid> with LoadingState {
   Widget _cause = ds.Error.zero;
   bool _loading = false;
   List<ddisc.Discovery> _items = [];
   media.MediaSearchRequest? _lastFetchedNext;
   StreamSubscription<ddisc.Discovery>? _subscription;
   final SplayTreeSet<ddisc.Discovery> _found = SplayTreeSet<ddisc.Discovery>(ddisc.compare);
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void reseterr() {
     setState(() {

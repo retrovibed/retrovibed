@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/uuidx.dart' as uuidx;
+import 'package:retrovibed/design.kit/stateful.dart';
 import 'api.dart' as api;
 
 // an unloaded/unauthenticated session must never carry an empty account id -
@@ -43,7 +44,7 @@ class Authenticated extends StatefulWidget {
   State<Authenticated> createState() => _AuthenticatedState();
 }
 
-class _AuthenticatedState extends State<Authenticated> {
+class _AuthenticatedState extends State<Authenticated> with LoadingState {
   Widget _cause = ds.Error.zero;
   DateTime _expires = DateTime.timestamp();
   api.Session _current = _zeroSession();
@@ -103,11 +104,6 @@ class _AuthenticatedState extends State<Authenticated> {
     setState(() {
       _cause = ds.Error.zero;
     });
-  }
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
   }
 
   @override

@@ -4,6 +4,7 @@ import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'community.pb.dart';
 import 'community.edit.dart';
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class CommunityCreate extends StatefulWidget {
   final Future<CommunityCreateResponse> Function(Community) create;
@@ -27,15 +28,10 @@ class CommunityCreate extends StatefulWidget {
   _CommunityCreateState createState() => _CommunityCreateState();
 }
 
-class _CommunityCreateState extends State<CommunityCreate> {
+class _CommunityCreateState extends State<CommunityCreate> with LoadingState {
   Community _community = Community(mimetype: mimex.binary);
   bool _creating = false;
   Widget _cause = ds.Error.zero;
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void _clearCause() {
     setState(() {

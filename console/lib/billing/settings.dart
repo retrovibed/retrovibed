@@ -7,6 +7,7 @@ import './api.dart' as api;
 import './plan.summary.dart';
 import './purchase.dart';
 import './registered.dart';
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class Settings extends StatefulWidget {
   final Alignment alignment;
@@ -26,17 +27,12 @@ class Settings extends StatefulWidget {
   State<Settings> createState() => _Settings();
 }
 
-class _Settings extends State<Settings> {
+class _Settings extends State<Settings> with LoadingState {
   Widget _cause = ds.Error.zero;
   RegisteredState? _billing;
   List<(PlanSummary, api.Plan)> _plans = [];
   PlanSummary current = free();
   (PlanSummary, api.Plan) desired = (free(), PlanSummary.plan(free()));
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void refresh() {
     final pid = Registered.of(context).current.planId;

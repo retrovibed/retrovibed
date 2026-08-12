@@ -14,6 +14,7 @@ import 'package:retrovibed/debug.dart' as debug;
 import 'package:retrovibed/designkit.dart' as ds;
 import 'api.dart' as api;
 import 'play.queue.dart' as playqueue;
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class Playlist extends StatefulWidget {
   static void _noop(
@@ -176,7 +177,7 @@ class Playlist extends StatefulWidget {
   }
 }
 
-class _PlaylistState extends State<Playlist> {
+class _PlaylistState extends State<Playlist> with LoadingState {
   final playqueue.PlayQueue _queue = playqueue.PlayQueue();
   final Player player = Player();
   playqueue.RangeFn autoqueue = playqueue.search;
@@ -201,11 +202,6 @@ class _PlaylistState extends State<Playlist> {
   Known get known => _queue.current.value.known;
   ValueNotifier<playqueue.PlayableMedia?> get current => _queue.current;
   playqueue.PlayQueue get queue => _queue;
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   @override
   void initState() {

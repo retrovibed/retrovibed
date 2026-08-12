@@ -5,6 +5,7 @@ import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/meta.dart' as meta;
 import './pending.typography.dart' as local;
+import 'package:retrovibed/design.kit/stateful.dart';
 
 typedef FnPendingSearch =
     Future<meta.ProfileSearchResponse> Function(
@@ -27,16 +28,10 @@ class PendingListDisplay extends StatefulWidget {
   State<StatefulWidget> createState() => _PendingListDisplay();
 }
 
-class _PendingListDisplay extends State<PendingListDisplay> {
+class _PendingListDisplay extends State<PendingListDisplay> with LoadingState {
   bool _loading = true;
   Widget _cause = ds.Error.zero;
   meta.ProfileSearchResponse _res = meta.profiles.pending();
-
-  @override
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void resetcause() {
     setState(() {

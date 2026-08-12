@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import './buttons.loading.icon.dart' show AsyncVoidCallback;
+import './stateful.dart';
 
 // A full-width ListTile that shows a spinner in place of [leading] while
 // [onPressed] is pending and disables re-tap until it completes.
@@ -21,13 +22,8 @@ class LoadingListTile extends StatefulWidget {
   State<LoadingListTile> createState() => _LoadingListTileState();
 }
 
-class _LoadingListTileState extends State<LoadingListTile> {
+class _LoadingListTileState extends State<LoadingListTile> with LoadingState {
   bool _isLoading = false;
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void _handlePress() {
     if (_isLoading) return;

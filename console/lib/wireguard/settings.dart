@@ -4,6 +4,7 @@ import 'package:retrovibed/design.kit/forms.dart' as forms;
 import 'package:retrovibed/design.kit/inputs.dart' as inputs;
 import 'package:retrovibed/uuidx.dart' as uuidx;
 import './api.dart' as api;
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class Settings extends StatefulWidget {
   static api.Wireguard zero = api.Wireguard();
@@ -36,15 +37,10 @@ class Settings extends StatefulWidget {
   State<Settings> createState() => _SettingsState(this.current);
 }
 
-class _SettingsState extends State<Settings> {
+class _SettingsState extends State<Settings> with LoadingState {
   api.Wireguard current;
 
   _SettingsState(this.current);
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   @override
   Widget build(BuildContext context) {

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:fixnum/fixnum.dart';
 import '../bytesx.dart';
 import '../theme.defaults.dart';
+import '../stateful.dart';
 
 class Bytes extends StatefulWidget {
   final ValueChanged<Int64>? onChange;
@@ -27,7 +28,7 @@ class Bytes extends StatefulWidget {
   );
 }
 
-class _ByteInputWidgetState extends State<Bytes> {
+class _ByteInputWidgetState extends State<Bytes> with LoadingState {
   final TextEditingController _controller;
   int _magnitude;
   Int64 _bytes;
@@ -41,12 +42,6 @@ class _ByteInputWidgetState extends State<Bytes> {
        _magnitude = magnitude,
        _decoration = decoration,
        _controller = TextEditingController(text: bytes.toString());
-
-  @override
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   @override
   void initState() {

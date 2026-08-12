@@ -6,6 +6,7 @@ import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/google/api.dart' as api;
 import 'package:url_launcher/url_launcher.dart';
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class Settings extends StatefulWidget {
   const Settings({super.key});
@@ -14,16 +15,11 @@ class Settings extends StatefulWidget {
   State<Settings> createState() => _SettingsState();
 }
 
-class _SettingsState extends State<Settings> {
+class _SettingsState extends State<Settings> with LoadingState {
   bool _loading = true;
   Timer? _poll;
   Widget _cause = ds.Error.zero;
   api.YouTubeStatus _youtube = api.YouTubeStatus();
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   @override
   void initState() {

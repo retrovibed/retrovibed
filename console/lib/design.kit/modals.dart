@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import './screens.dart' as screens;
+import './stateful.dart';
 
 NodeState? of(BuildContext context) {
   return Node.of(context);
@@ -66,16 +67,11 @@ class Node extends StatefulWidget {
   State<StatefulWidget> createState() => NodeState();
 }
 
-class NodeState extends State<Node> {
+class NodeState extends State<Node> with LoadingState {
   static const zeromodal = const SizedBox();
   final FocusScopeNode _selffocus = FocusScopeNode(debugLabel: "modal.node");
   Widget current = zeromodal;
   List<Widget> stack = [];
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void push(Widget? m) {
     setState(() {

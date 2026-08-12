@@ -4,6 +4,7 @@ import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/library.dart' as lib;
 import 'package:retrovibed/langcodex.dart' as langcodex;
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class NewReleases extends StatefulWidget {
   const NewReleases(String this.mimetype, {super.key, this.latest = lib.known.latest});
@@ -15,15 +16,10 @@ class NewReleases extends StatefulWidget {
   State<NewReleases> createState() => _NewReleasesState();
 }
 
-class _NewReleasesState extends State<NewReleases> {
+class _NewReleasesState extends State<NewReleases> with LoadingState {
   Widget _cause = ds.Error.zero;
   bool _loading = true;
   lib.KnownLatestResponse _result = lib.KnownLatestResponse();
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void reseterr() {
     setState(() {

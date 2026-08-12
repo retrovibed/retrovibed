@@ -5,6 +5,7 @@ import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/netmonx/api.dart' as api;
 import './metered.toggle.dart';
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class MeteredDetails extends StatefulWidget {
   final EdgeInsets margin;
@@ -15,15 +16,10 @@ class MeteredDetails extends StatefulWidget {
   State<MeteredDetails> createState() => _MeteredDetailsState();
 }
 
-class _MeteredDetailsState extends State<MeteredDetails> {
+class _MeteredDetailsState extends State<MeteredDetails> with LoadingState {
   bool _loading = true;
   Widget _cause = ds.Error.zero;
   api.NetworkMetricsResponse _data = api.NetworkMetricsResponse();
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   @override
   void initState() {

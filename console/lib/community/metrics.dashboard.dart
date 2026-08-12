@@ -4,6 +4,7 @@ import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/timex.dart' as timex;
 import 'package:retrovibed/design.kit/inputs.dart' as inputs;
+import 'package:retrovibed/design.kit/stateful.dart';
 import 'api.dart' as communityapi;
 
 List<timex.Range> _defaultSegments() {
@@ -44,16 +45,11 @@ class MetricsDashboard extends StatefulWidget {
   State<MetricsDashboard> createState() => _MetricsDashboardState();
 }
 
-class _MetricsDashboardState extends State<MetricsDashboard> {
+class _MetricsDashboardState extends State<MetricsDashboard> with LoadingState {
   communityapi.CommunityMetricsResponse _metrics = communityapi.CommunityMetricsResponse();
   bool _loading = true;
   Widget _cause = ds.Error.zero;
   timex.Range _selected = _defaultSegments().first;
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void _clearCause() {
     setState(() {

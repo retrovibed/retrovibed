@@ -3,6 +3,7 @@ import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'community.pb.dart';
 import 'community.edit.dart';
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class CommunityUpdate extends StatefulWidget {
   final Community community;
@@ -34,7 +35,7 @@ class CommunityUpdate extends StatefulWidget {
   _CommunityUpdateState createState() => _CommunityUpdateState();
 }
 
-class _CommunityUpdateState extends State<CommunityUpdate> {
+class _CommunityUpdateState extends State<CommunityUpdate> with LoadingState {
   Community _community = Community();
   Widget _cause = ds.Error.zero;
 
@@ -42,11 +43,6 @@ class _CommunityUpdateState extends State<CommunityUpdate> {
   void initState() {
     super.initState();
     _community = widget.community.deepCopy();
-  }
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
   }
 
   void _clearCause() {

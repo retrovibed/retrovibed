@@ -5,6 +5,7 @@ import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/discovery.dart' as disc;
 import 'package:retrovibed/uuidx.dart' as uuidx;
 import './api.dart' as api;
+import 'package:retrovibed/design.kit/stateful.dart';
 
 // DiscoveryLocator offers to search the wider p2p network for query/mimetype
 // when neither the local library nor the catalog (library.Known) have a
@@ -43,17 +44,12 @@ class DiscoveryLocator extends StatefulWidget {
 
 enum _LocateState { idle, loading, pending, found }
 
-class _DiscoveryLocator extends State<DiscoveryLocator> {
+class _DiscoveryLocator extends State<DiscoveryLocator> with LoadingState {
   _LocateState _state = _LocateState.idle;
   String _locateId = '';
   Duration _interval = Duration.zero;
   Widget _cause = ds.Error.zero;
   Future<Widget>? _foundContent;
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void reseterr() {
     setState(() {

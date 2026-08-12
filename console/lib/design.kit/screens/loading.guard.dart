@@ -3,6 +3,7 @@ import '../flutterx.dart' show postframe;
 import '../errors.dart' as errors;
 import 'loading.dart';
 import 'error.dart';
+import '../stateful.dart';
 
 class LoadingGuard extends StatefulWidget {
   final Widget child;
@@ -24,14 +25,9 @@ class LoadingGuard extends StatefulWidget {
   State<LoadingGuard> createState() => LoadingGuardState();
 }
 
-class LoadingGuardState extends State<LoadingGuard> {
+class LoadingGuardState extends State<LoadingGuard> with LoadingState {
   int _count = 0;
   bool get loading => _count > 0;
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void delta(int d) {
     _count += d;

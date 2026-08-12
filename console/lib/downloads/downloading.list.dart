@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/media.dart' as media;
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class DownloadingListDisplay extends StatefulWidget {
   final media.FnDownloadSearch search;
@@ -19,19 +20,13 @@ class DownloadingListDisplay extends StatefulWidget {
   State<StatefulWidget> createState() => _DownloadingListState();
 }
 
-class _DownloadingListState extends State<DownloadingListDisplay> {
+class _DownloadingListState extends State<DownloadingListDisplay> with LoadingState {
   bool _loading = true;
   Widget _cause = ds.Error.zero;
   Timer? period;
   media.DownloadSearchResponse _res = media.discoveredsearch.response(
     next: media.discoveredsearch.request(limit: 3),
   );
-
-  @override
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void resetcause() {
     setState(() {

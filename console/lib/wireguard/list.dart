@@ -6,6 +6,7 @@ import 'package:retrovibed/authn.dart' as authn;
 import './meta.wireguard.pb.dart';
 import './api.dart' as api;
 import './list.row.dart';
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class ListDisplay extends StatefulWidget {
   final api.FnWireguardSearch search;
@@ -24,18 +25,13 @@ class ListDisplay extends StatefulWidget {
   State<StatefulWidget> createState() => _ListDisplay();
 }
 
-class _ListDisplay extends State<ListDisplay> {
+class _ListDisplay extends State<ListDisplay> with LoadingState {
   bool _loading = true;
   Widget _cause = ds.Error.zero;
   Wireguard _current = Wireguard();
   api.WireguardSearchResponse _res = api.wireguard.response(
     next: api.wireguard.request(limit: 32),
   );
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void reseterr() {
     setState(() {

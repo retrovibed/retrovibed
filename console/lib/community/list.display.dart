@@ -7,6 +7,7 @@ import 'list.display.item.dart';
 import 'community.create.dart';
 import 'qr.scanner.dart';
 import 'link.content.dart';
+import 'package:retrovibed/design.kit/stateful.dart';
 
 typedef FnSearch =
     Future<CommunitySearchResponse> Function(
@@ -28,7 +29,7 @@ class ListDisplay extends StatefulWidget {
   State<ListDisplay> createState() => _ListDisplayState();
 }
 
-class _ListDisplayState extends State<ListDisplay> {
+class _ListDisplayState extends State<ListDisplay> with LoadingState {
   CommunitySearchResponse _resp = CommunitySearchResponse(
     next: CommunitySearchRequest(
       offset: ds.Int64(0),
@@ -38,12 +39,6 @@ class _ListDisplayState extends State<ListDisplay> {
   bool _loading = true;
   Widget _cause = ds.Error.zero;
   Widget _overlay = ds.Empty;
-
-  @override
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void _resetCause() {
     setState(() {

@@ -5,6 +5,7 @@ import 'package:retrovibed/authn.dart' as authn;
 import 'api.dart' as api;
 import 'download.row.controls.dart';
 import 'download.row.display.dart';
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class RefreshingDownload extends StatefulWidget {
   static _noopOnCompleted(api.Download v) {}
@@ -24,7 +25,7 @@ class RefreshingDownload extends StatefulWidget {
   State<RefreshingDownload> createState() => _DownloadingState();
 }
 
-class _DownloadingState extends State<RefreshingDownload> {
+class _DownloadingState extends State<RefreshingDownload> with LoadingState {
   Widget _cause = ds.Error.zero;
   api.Download current = api.Download();
   StreamSubscription<api.Download>? _subscription;
@@ -34,11 +35,6 @@ class _DownloadingState extends State<RefreshingDownload> {
     if (_notifiedCompleted || !api.download.completed(current)) return;
     _notifiedCompleted = true;
     widget.onCompleted(current);
-  }
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
   }
 
   void _resetcause() {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:retrovibed/design.kit/forms.dart' as forms;
 import 'package:retrovibed/designkit.dart' as ds;
 import './api.dart' as api;
+import 'package:retrovibed/design.kit/stateful.dart';
 
 const String _disclaimerCacheId = 'discovery.p2p';
 
@@ -54,15 +55,10 @@ activities and for obeying the laws within your region.''';
   State<LocateSettings> createState() => _LocateEditView(this.defaults);
 }
 
-class _LocateEditView extends State<LocateSettings> {
+class _LocateEditView extends State<LocateSettings> with LoadingState {
   api.DiscoverySettings current;
 
   _LocateEditView(this.current);
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void _update(api.DiscoverySettings updated) {
     setState(() => current = updated);

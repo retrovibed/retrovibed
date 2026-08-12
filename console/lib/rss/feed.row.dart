@@ -5,6 +5,7 @@ import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/storage.dart' as storage;
 import 'package:retrovibed/uuidx.dart' as uuidx;
 import './api.dart' as api;
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class FeedRow extends StatefulWidget {
   final api.Feed current;
@@ -16,13 +17,8 @@ class FeedRow extends StatefulWidget {
   State<FeedRow> createState() => _FeedRowState();
 }
 
-class _FeedRowState extends State<FeedRow> {
+class _FeedRowState extends State<FeedRow> with LoadingState {
   Widget _cause = ds.Error.zero;
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void _resetCause() {
     setState(() {

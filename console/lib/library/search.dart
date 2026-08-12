@@ -9,6 +9,7 @@ import 'grid.setting.dart';
 import 'search.mimetype.dropdown.dart';
 import 'dropdown.upload.dart';
 import 'empty.results.dart';
+import 'package:retrovibed/design.kit/stateful.dart';
 
 class Search extends StatefulWidget {
   final media.FnMediaSearch apisearch;
@@ -40,13 +41,8 @@ class Search extends StatefulWidget {
   State<Search> createState() => _SearchState();
 }
 
-class _SearchState extends State<Search> {
+class _SearchState extends State<Search> with LoadingState {
   Widget _tuning = ds.Empty;
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   @override
   Widget build(BuildContext context) {
