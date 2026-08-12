@@ -140,7 +140,7 @@ func (t *HTTPRemoteControl) listen(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-		log.Println("received command", spew.Sdump(msg))
+		log.Println("received command", spew.Sdump(&msg))
 
 		t.mu.Lock()
 		for conn := range t.connects {
