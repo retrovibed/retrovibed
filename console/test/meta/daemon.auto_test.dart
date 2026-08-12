@@ -366,6 +366,47 @@ void main() {
       },
     );
 
+    testWidgets(
+      'register flow: connectable 401 then tap Yes with register 409 shows conflict error',
+      (WidgetTester tester) async {
+        final daemon = api.Daemon(hostname: 'localhost:9998');
+        Future<api.DaemonLookupResponse> mockLatest() async => api.DaemonLookupResponse(daemon: daemon);
+        Future<api.Daemon> mockConnectable(api.Daemon d) async {
+          throw http.Response('', 401);
+        }
+
+        Future<api.Session> mockRegister(
+          api.Identity identity, {
+          String? host,
+        }) async {
+          throw http.Response('', 409);
+        }
+
+        await tester.pumpApp(
+          ds.LoadingGuard(
+            EndpointAuto(
+              latest: mockLatest,
+              connectable: mockConnectable,
+              register: mockRegister,
+              backoff: httpx.Backoff.constant(Duration.zero),
+              const Placeholder(),
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+
+        expect(find.text('Yes'), findsOneWidget);
+        await tester.tap(find.text('Yes'));
+        await tester.pumpAndSettle();
+
+        expect(
+          find.text("you've not yet been approved to access this library"),
+          findsOneWidget,
+        );
+      },
+    );
+
     testWidgets('shows NoLocalService on ENOROUTE socket error', (
       WidgetTester tester,
     ) async {
