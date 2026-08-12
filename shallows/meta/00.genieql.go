@@ -184,7 +184,7 @@ func AuthzUpsertWithDefaults(
 ) {
 	gql.Into("authz_meta").
 		Default("id", "created_at", "updated_at").
-		Conflict("ON CONFLICT (profile_id) DO UPDATE SET usermanagement = EXCLUDED.usermanagement, billing_read = EXCLUDED.billing_read, billing_modify = EXCLUDED.billing_modify, community_modify = EXCLUDED.community_modify, library_read = EXCLUDED.library_read, library_modify = EXCLUDED.library_modify, updated_at = DEFAULT")
+		Conflict("ON CONFLICT (profile_id) DO UPDATE SET usermanagement = EXCLUDED.usermanagement, remote_control = EXCLUDED.remote_control, billing_read = EXCLUDED.billing_read, billing_modify = EXCLUDED.billing_modify, community_modify = EXCLUDED.community_modify, library_read = EXCLUDED.library_read, library_modify = EXCLUDED.library_modify, updated_at = DEFAULT")
 }
 
 func AuthzDeleteByProfileID(

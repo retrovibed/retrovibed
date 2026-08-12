@@ -94,6 +94,7 @@ class _State extends State<_Connect> with LoadingState {
   }
 
   void _connect() {
+    if (!mounted) return;
     if (_endpoint.value.hostname.isEmpty) return;
 
     setState(() => loading = true);

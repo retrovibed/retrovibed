@@ -45,7 +45,7 @@ class AuthzMetaEdit extends StatelessWidget {
           ),
           AuthzPermissionRow(
             "Remote Control",
-            description: "Can use remote control to connect to and drive another device's playback",
+            description: "Can connect to and drive another device's playback",
             value: current.remoteControl,
             onChanged: (v) => onChange?.call(current..remoteControl = v),
           ),

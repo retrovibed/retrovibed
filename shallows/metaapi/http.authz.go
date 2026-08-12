@@ -61,6 +61,7 @@ func (t *HTTPAuthz) Bind(r *mux.Router) {
 	).ThenFunc(t.profile))
 
 	r.Path("/{id}").Methods(http.MethodPost).Handler(alice.New(
+		httpx.DebugRequest,
 		httpx.ContextBufferPool512(),
 		AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
 		httpx.ParseForm,
