@@ -52,6 +52,20 @@ func AuthzPermUsermanagement(ctx context.Context, cause error) (_ context.Contex
 	return ctx, token, nil
 }
 
+func AuthzPermRemoteControl(ctx context.Context, cause error) (_ context.Context, token *Token, err error) {
+	if cause != nil {
+		return ctx, nil, errorsx.Authorization(fmt.Errorf("not authorized"))
+	}
+
+	if token, err = FromContext(ctx); err != nil {
+		return ctx, token, errorsx.Wrap(errorsx.Authorization(err), "not authorized")
+	} else if !token.RemoteControl {
+		return ctx, token, errorsx.Authorization(errorsx.WithStack(fmt.Errorf("not authorized: permission denied")))
+	}
+
+	return ctx, token, nil
+}
+
 func AuthzPermLibraryRead(ctx context.Context, cause error) (_ context.Context, token *Token, err error) {
 	if cause != nil {
 		return ctx, nil, errorsx.Authorization(fmt.Errorf("not authorized"))
@@ -136,6 +150,7 @@ type TokenOption func(*Token)
 func TokenOptionFromAuthz(a meta.Authz) TokenOption {
 	return func(t *Token) {
 		t.Usermanagement = a.Usermanagement
+		t.RemoteControl = a.RemoteControl
 		t.BillingRead = a.BillingRead
 		t.BillingModify = a.BillingModify
 		t.CommunityModify = a.CommunityModify

@@ -125,6 +125,7 @@ type Token struct {
 	Expires         int64  `protobuf:"varint,6,opt,name=expires,json=exp,proto3" json:"expires,omitempty"`
 	NotBefore       int64  `protobuf:"varint,7,opt,name=not_before,json=nbf,proto3" json:"not_before,omitempty"`
 	Usermanagement  bool   `protobuf:"varint,1000,opt,name=usermanagement,proto3" json:"usermanagement,omitempty"`
+	RemoteControl   bool   `protobuf:"varint,1001,opt,name=remote_control,proto3" json:"remote_control,omitempty"`
 	BillingRead     bool   `protobuf:"varint,1002,opt,name=billing_read,proto3" json:"billing_read,omitempty"`
 	BillingModify   bool   `protobuf:"varint,1003,opt,name=billing_modify,proto3" json:"billing_modify,omitempty"`
 	CommunityModify bool   `protobuf:"varint,1004,opt,name=community_modify,proto3" json:"community_modify,omitempty"`
@@ -220,6 +221,13 @@ func (x *Token) GetNotBefore() int64 {
 func (x *Token) GetUsermanagement() bool {
 	if x != nil {
 		return x.Usermanagement
+	}
+	return false
+}
+
+func (x *Token) GetRemoteControl() bool {
+	if x != nil {
+		return x.RemoteControl
 	}
 	return false
 }
@@ -654,7 +662,7 @@ const file_meta_authz_proto_rawDesc = "" +
 	"\x06issued\x18\x05 \x01(\x03R\x03iat\x12\x14\n" +
 	"\aexpires\x18\x06 \x01(\x03R\x03exp\x12\x17\n" +
 	"\n" +
-	"not_before\x18\a \x01(\x03R\x03nbf\"\xc0\x04\n" +
+	"not_before\x18\a \x01(\x03R\x03nbf\"\xe9\x04\n" +
 	"\x05Token\x12\x0f\n" +
 	"\x02id\x18\x01 \x01(\tR\x03jti\x12\x13\n" +
 	"\x06issuer\x18\x02 \x01(\tR\x03iss\x12\x17\n" +
@@ -666,7 +674,8 @@ const file_meta_authz_proto_rawDesc = "" +
 	"\aexpires\x18\x06 \x01(\x03R\x03exp\x12\x17\n" +
 	"\n" +
 	"not_before\x18\a \x01(\x03R\x03nbf\x12'\n" +
-	"\x0eusermanagement\x18\xe8\a \x01(\bR\x0eusermanagement\x12#\n" +
+	"\x0eusermanagement\x18\xe8\a \x01(\bR\x0eusermanagement\x12'\n" +
+	"\x0eremote_control\x18\xe9\a \x01(\bR\x0eremote_control\x12#\n" +
 	"\fbilling_read\x18\xea\a \x01(\bR\fbilling_read\x12'\n" +
 	"\x0ebilling_modify\x18\xeb\a \x01(\bR\x0ebilling_modify\x12+\n" +
 	"\x10community_modify\x18\xec\a \x01(\bR\x10community_modify\x12'\n" +

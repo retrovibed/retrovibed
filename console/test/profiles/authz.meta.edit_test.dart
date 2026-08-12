@@ -28,6 +28,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('User Management'), findsOneWidget);
+        expect(find.text('Remote Control'), findsOneWidget);
         expect(find.text('Library Read'), findsOneWidget);
         expect(find.text('Library Modify'), findsOneWidget);
         expect(find.text('Community Modify'), findsOneWidget);
@@ -59,7 +60,7 @@ void main() {
       ) async {
         await tester.pumpApp(
           ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: 400, maxHeight: 500),
+            constraints: BoxConstraints(maxWidth: 400, maxHeight: 560),
             child: Column(
               children: [
                 profiles.AuthzMetaEdit(testToken),
@@ -85,12 +86,14 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('User Management'), findsOneWidget);
+        expect(find.text('Remote Control'), findsOneWidget);
         expect(find.text('Library Read'), findsOneWidget);
         expect(find.text('Library Modify'), findsOneWidget);
         expect(find.text('Community Modify'), findsOneWidget);
         expect(find.text('Billing Read'), findsOneWidget);
         expect(find.text('Billing Modify'), findsOneWidget);
         expect(find.text('Can manage user access'), findsOneWidget);
+        expect(find.text("Can use remote control to connect to and drive another device's playback"), findsOneWidget);
         expect(find.text('Can view library content'), findsOneWidget);
         expect(find.text('Can modify library content'), findsOneWidget);
         expect(find.text('Can modify community content'), findsOneWidget);
@@ -107,6 +110,7 @@ void main() {
         final token =
             meta.Token()
               ..usermanagement = true
+              ..remoteControl = false
               ..libraryRead = true
               ..libraryModify = false
               ..communityModify = true
@@ -119,13 +123,14 @@ void main() {
         final checkboxes = tester.widgetList<Checkbox>(find.byType(Checkbox));
         final checkboxList = checkboxes.toList();
 
-        expect(checkboxList.length, equals(6));
+        expect(checkboxList.length, equals(7));
         expect(checkboxList[0].value, equals(true)); // usermanagement
-        expect(checkboxList[1].value, equals(true)); // libraryRead
-        expect(checkboxList[2].value, equals(false)); // libraryModify
-        expect(checkboxList[3].value, equals(true)); // communityModify
-        expect(checkboxList[4].value, equals(false)); // billingRead
-        expect(checkboxList[5].value, equals(false)); // billingModify
+        expect(checkboxList[1].value, equals(false)); // remoteControl
+        expect(checkboxList[2].value, equals(true)); // libraryRead
+        expect(checkboxList[3].value, equals(false)); // libraryModify
+        expect(checkboxList[4].value, equals(true)); // communityModify
+        expect(checkboxList[5].value, equals(false)); // billingRead
+        expect(checkboxList[6].value, equals(false)); // billingModify
       });
 
       testWidgets('handles all permissions disabled', (
@@ -134,6 +139,7 @@ void main() {
         final token =
             meta.Token()
               ..usermanagement = false
+              ..remoteControl = false
               ..libraryRead = false
               ..libraryModify = false
               ..communityModify = false
@@ -156,6 +162,7 @@ void main() {
         final token =
             meta.Token()
               ..usermanagement = true
+              ..remoteControl = true
               ..libraryRead = true
               ..libraryModify = true
               ..communityModify = true
@@ -194,6 +201,29 @@ void main() {
         expect(changedToken?.usermanagement, isTrue);
       });
 
+      testWidgets('calls onChange when remoteControl is toggled', (
+        WidgetTester tester,
+      ) async {
+        meta.Token? changedToken;
+        final token = meta.Token()..remoteControl = false;
+
+        await tester.pumpApp(
+          profiles.AuthzMetaEdit(
+            token,
+            onChange: (t) {
+              changedToken = t;
+            },
+          ),
+          authzCurrent: authn.AuthzCache.fakeWith(meta.Token()..usermanagement = true),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byType(Checkbox).at(1));
+
+        expect(changedToken, isNotNull);
+        expect(changedToken?.remoteControl, isTrue);
+      });
+
       testWidgets('calls onChange when libraryRead is toggled', (
         WidgetTester tester,
       ) async {
@@ -211,7 +241,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        await tester.tap(find.byType(Checkbox).at(1));
+        await tester.tap(find.byType(Checkbox).at(2));
 
         expect(changedToken, isNotNull);
         expect(changedToken?.libraryRead, isTrue);
@@ -256,8 +286,8 @@ void main() {
         await tester.pumpAndSettle();
 
         await tester.tap(find.byType(Checkbox).at(0)); // User Management
-        await tester.tap(find.byType(Checkbox).at(2)); // Library Modify
-        await tester.tap(find.byType(Checkbox).at(4)); // Billing Read
+        await tester.tap(find.byType(Checkbox).at(3)); // Library Modify
+        await tester.tap(find.byType(Checkbox).at(5)); // Billing Read
 
         expect(changedTokens.length, equals(3));
         expect(changedTokens[0].usermanagement, isTrue);

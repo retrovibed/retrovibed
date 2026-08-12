@@ -43,6 +43,11 @@ class AuthzMetaDisplay extends StatelessWidget {
           value: token.usermanagement,
         ),
         AuthzPermissionRow(
+          "Remote Control",
+          description: "Can use remote control to connect to and drive another device's playback",
+          value: token.remoteControl,
+        ),
+        AuthzPermissionRow(
           "Library Read",
           description: "Can view library content",
           value: token.libraryRead,

@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
@@ -27,7 +28,7 @@ func Tests(ctx context.Context, _ eg.Op) error {
 	runtime := flutterRuntimev2(shell.Runtime())
 	return shell.Run(
 		ctx,
-		runtime.New("flutter test"),
+		runtime.New("flutter test").Timeout(10*time.Minute),
 	)
 }
 

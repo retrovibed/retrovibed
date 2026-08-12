@@ -153,6 +153,7 @@ class Token extends $pb.GeneratedMessage {
     $fixnum.Int64? expires,
     $fixnum.Int64? notBefore,
     $core.bool? usermanagement,
+    $core.bool? remoteControl,
     $core.bool? billingRead,
     $core.bool? billingModify,
     $core.bool? communityModify,
@@ -172,6 +173,7 @@ class Token extends $pb.GeneratedMessage {
     if (expires != null) result.expires = expires;
     if (notBefore != null) result.notBefore = notBefore;
     if (usermanagement != null) result.usermanagement = usermanagement;
+    if (remoteControl != null) result.remoteControl = remoteControl;
     if (billingRead != null) result.billingRead = billingRead;
     if (billingModify != null) result.billingModify = billingModify;
     if (communityModify != null) result.communityModify = communityModify;
@@ -205,6 +207,7 @@ class Token extends $pb.GeneratedMessage {
     ..aInt64(6, _omitFieldNames ? '' : 'exp', protoName: 'expires')
     ..aInt64(7, _omitFieldNames ? '' : 'nbf', protoName: 'not_before')
     ..aOB(1000, _omitFieldNames ? '' : 'usermanagement')
+    ..aOB(1001, _omitFieldNames ? '' : 'remote_control')
     ..aOB(1002, _omitFieldNames ? '' : 'billing_read')
     ..aOB(1003, _omitFieldNames ? '' : 'billing_modify')
     ..aOB(1004, _omitFieldNames ? '' : 'community_modify')
@@ -311,84 +314,93 @@ class Token extends $pb.GeneratedMessage {
   @$pb.TagNumber(1000)
   void clearUsermanagement() => $_clearField(1000);
 
+  @$pb.TagNumber(1001)
+  $core.bool get remoteControl => $_getBF(8);
+  @$pb.TagNumber(1001)
+  set remoteControl($core.bool value) => $_setBool(8, value);
+  @$pb.TagNumber(1001)
+  $core.bool hasRemoteControl() => $_has(8);
+  @$pb.TagNumber(1001)
+  void clearRemoteControl() => $_clearField(1001);
+
   @$pb.TagNumber(1002)
-  $core.bool get billingRead => $_getBF(8);
+  $core.bool get billingRead => $_getBF(9);
   @$pb.TagNumber(1002)
-  set billingRead($core.bool value) => $_setBool(8, value);
+  set billingRead($core.bool value) => $_setBool(9, value);
   @$pb.TagNumber(1002)
-  $core.bool hasBillingRead() => $_has(8);
+  $core.bool hasBillingRead() => $_has(9);
   @$pb.TagNumber(1002)
   void clearBillingRead() => $_clearField(1002);
 
   @$pb.TagNumber(1003)
-  $core.bool get billingModify => $_getBF(9);
+  $core.bool get billingModify => $_getBF(10);
   @$pb.TagNumber(1003)
-  set billingModify($core.bool value) => $_setBool(9, value);
+  set billingModify($core.bool value) => $_setBool(10, value);
   @$pb.TagNumber(1003)
-  $core.bool hasBillingModify() => $_has(9);
+  $core.bool hasBillingModify() => $_has(10);
   @$pb.TagNumber(1003)
   void clearBillingModify() => $_clearField(1003);
 
   @$pb.TagNumber(1004)
-  $core.bool get communityModify => $_getBF(10);
+  $core.bool get communityModify => $_getBF(11);
   @$pb.TagNumber(1004)
-  set communityModify($core.bool value) => $_setBool(10, value);
+  set communityModify($core.bool value) => $_setBool(11, value);
   @$pb.TagNumber(1004)
-  $core.bool hasCommunityModify() => $_has(10);
+  $core.bool hasCommunityModify() => $_has(11);
   @$pb.TagNumber(1004)
   void clearCommunityModify() => $_clearField(1004);
 
   @$pb.TagNumber(1005)
-  $fixnum.Int64 get archiveUpload => $_getI64(11);
+  $fixnum.Int64 get archiveUpload => $_getI64(12);
   @$pb.TagNumber(1005)
-  set archiveUpload($fixnum.Int64 value) => $_setInt64(11, value);
+  set archiveUpload($fixnum.Int64 value) => $_setInt64(12, value);
   @$pb.TagNumber(1005)
-  $core.bool hasArchiveUpload() => $_has(11);
+  $core.bool hasArchiveUpload() => $_has(12);
   @$pb.TagNumber(1005)
   void clearArchiveUpload() => $_clearField(1005);
 
   @$pb.TagNumber(1006)
-  $fixnum.Int64 get archiveDownload => $_getI64(12);
+  $fixnum.Int64 get archiveDownload => $_getI64(13);
   @$pb.TagNumber(1006)
-  set archiveDownload($fixnum.Int64 value) => $_setInt64(12, value);
+  set archiveDownload($fixnum.Int64 value) => $_setInt64(13, value);
   @$pb.TagNumber(1006)
-  $core.bool hasArchiveDownload() => $_has(12);
+  $core.bool hasArchiveDownload() => $_has(13);
   @$pb.TagNumber(1006)
   void clearArchiveDownload() => $_clearField(1006);
 
   @$pb.TagNumber(1007)
-  $core.bool get libraryRead => $_getBF(13);
+  $core.bool get libraryRead => $_getBF(14);
   @$pb.TagNumber(1007)
-  set libraryRead($core.bool value) => $_setBool(13, value);
+  set libraryRead($core.bool value) => $_setBool(14, value);
   @$pb.TagNumber(1007)
-  $core.bool hasLibraryRead() => $_has(13);
+  $core.bool hasLibraryRead() => $_has(14);
   @$pb.TagNumber(1007)
   void clearLibraryRead() => $_clearField(1007);
 
   @$pb.TagNumber(1008)
-  $core.bool get libraryModify => $_getBF(14);
+  $core.bool get libraryModify => $_getBF(15);
   @$pb.TagNumber(1008)
-  set libraryModify($core.bool value) => $_setBool(14, value);
+  set libraryModify($core.bool value) => $_setBool(15, value);
   @$pb.TagNumber(1008)
-  $core.bool hasLibraryModify() => $_has(14);
+  $core.bool hasLibraryModify() => $_has(15);
   @$pb.TagNumber(1008)
   void clearLibraryModify() => $_clearField(1008);
 
   @$pb.TagNumber(1009)
-  $core.bool get archiveSync => $_getBF(15);
+  $core.bool get archiveSync => $_getBF(16);
   @$pb.TagNumber(1009)
-  set archiveSync($core.bool value) => $_setBool(15, value);
+  set archiveSync($core.bool value) => $_setBool(16, value);
   @$pb.TagNumber(1009)
-  $core.bool hasArchiveSync() => $_has(15);
+  $core.bool hasArchiveSync() => $_has(16);
   @$pb.TagNumber(1009)
   void clearArchiveSync() => $_clearField(1009);
 
   @$pb.TagNumber(1010)
-  $core.bool get communitySync => $_getBF(16);
+  $core.bool get communitySync => $_getBF(17);
   @$pb.TagNumber(1010)
-  set communitySync($core.bool value) => $_setBool(16, value);
+  set communitySync($core.bool value) => $_setBool(17, value);
   @$pb.TagNumber(1010)
-  $core.bool hasCommunitySync() => $_has(16);
+  $core.bool hasCommunitySync() => $_has(17);
   @$pb.TagNumber(1010)
   void clearCommunitySync() => $_clearField(1010);
 }

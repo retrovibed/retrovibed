@@ -18,6 +18,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/websocketx"
+	"github.com/retrovibed/retrovibed/shallows/metaapi"
 )
 
 // generated once per process, never persisted to disk - dies with the
@@ -96,7 +97,7 @@ func (t *HTTPRemoteControl) Bind(r *mux.Router) {
 		httpx.GatedResponse(t.enabled, http.StatusForbidden),
 		httpx.ContextBufferPool512(),
 		httpx.ParseForm,
-		httpauth.AuthenticateWithToken(t.jwtsecret),
+		metaapi.AuthzTokenHTTP(t.jwtsecret, metaapi.AuthzPermRemoteControl),
 		httpx.Timeout2s(),
 	).ThenFunc(t.connect))
 }

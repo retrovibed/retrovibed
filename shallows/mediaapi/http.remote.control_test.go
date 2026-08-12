@@ -14,9 +14,11 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/encoding/protojson"
 
+	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/websocketx"
 	"github.com/retrovibed/retrovibed/shallows/mediaapi"
+	"github.com/retrovibed/retrovibed/shallows/metaapi"
 )
 
 func TestHTTPRemoteControl(t *testing.T) {
@@ -40,8 +42,13 @@ func TestHTTPRemoteControl(t *testing.T) {
 		require.NoError(t, err)
 		defer listenconn.Close(websocket.StatusNormalClosure, "") //nolint: errcheck
 
-		var connectclaims jwt.RegisteredClaims
-		connecttoken := httpauthtest.UnsafeClaimsToken(&connectclaims, httpauthtest.UnsafeJWTSecretSource)
+		connecttoken := httpauthtest.UnsafeClaimsToken(
+			metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(
+				jwtx.NewJWTClaims("profile-1", jwtx.ClaimsOptionAuthnExpiration()),
+				func(t *metaapi.Token) { t.RemoteControl = true },
+			)),
+			httpauthtest.UnsafeJWTSecretSource,
+		)
 
 		connect1, _, err := websocket.Dial(t.Context(), fmt.Sprintf("ws://%s/rc/connect", server.Listener.Addr().String()), &websocket.DialOptions{
 			HTTPHeader: http.Header{
@@ -123,8 +130,13 @@ func TestHTTPRemoteControl(t *testing.T) {
 		server := httptest.NewServer(routes)
 		defer server.Close()
 
-		var claims jwt.RegisteredClaims
-		token := httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)
+		token := httpauthtest.UnsafeClaimsToken(
+			metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(
+				jwtx.NewJWTClaims("profile-1", jwtx.ClaimsOptionAuthnExpiration()),
+				func(t *metaapi.Token) { t.RemoteControl = true },
+			)),
+			httpauthtest.UnsafeJWTSecretSource,
+		)
 
 		conn, _, err := websocket.Dial(t.Context(), fmt.Sprintf("ws://%s/rc/connect", server.Listener.Addr().String()), &websocket.DialOptions{
 			HTTPHeader: http.Header{
@@ -147,6 +159,32 @@ func TestHTTPRemoteControl(t *testing.T) {
 		_, _, err = conn.Read(ctx)
 		require.Error(t, err)
 		require.Equal(t, websocket.StatusTryAgainLater, websocket.CloseStatus(err))
+	})
+
+	t.Run("connect rejects a token without the remote control permission", func(t *testing.T) {
+		routes := mux.NewRouter()
+		mediaapi.NewHTTPRemoteControl(
+			true,
+			mediaapi.HTTPRemoteControlOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+		).Bind(routes.PathPrefix("/rc").Subrouter())
+		server := httptest.NewServer(routes)
+		defer server.Close()
+
+		token := httpauthtest.UnsafeClaimsToken(
+			metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(
+				jwtx.NewJWTClaims("profile-1", jwtx.ClaimsOptionAuthnExpiration()),
+			)),
+			httpauthtest.UnsafeJWTSecretSource,
+		)
+
+		_, resp, err := websocket.Dial(t.Context(), fmt.Sprintf("ws://%s/rc/connect", server.Listener.Addr().String()), &websocket.DialOptions{
+			HTTPHeader: http.Header{
+				"Authorization": []string{fmt.Sprintf("Bearer %s", token)},
+			},
+		})
+		require.Error(t, err)
+		require.NotNil(t, resp)
+		require.Equal(t, http.StatusUnauthorized, resp.StatusCode)
 	})
 
 	t.Run("second listen connection evicts the first", func(t *testing.T) {

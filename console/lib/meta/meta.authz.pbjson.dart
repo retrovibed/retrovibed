@@ -47,6 +47,7 @@ const Token$json = {
     {'1': 'expires', '3': 6, '4': 1, '5': 3, '10': 'exp'},
     {'1': 'not_before', '3': 7, '4': 1, '5': 3, '10': 'nbf'},
     {'1': 'usermanagement', '3': 1000, '4': 1, '5': 8, '10': 'usermanagement'},
+    {'1': 'remote_control', '3': 1001, '4': 1, '5': 8, '10': 'remote_control'},
     {'1': 'billing_read', '3': 1002, '4': 1, '5': 8, '10': 'billing_read'},
     {'1': 'billing_modify', '3': 1003, '4': 1, '5': 8, '10': 'billing_modify'},
     {
@@ -79,14 +80,15 @@ final $typed_data.Uint8List tokenDescriptor = $convert.base64Decode(
     'CgVUb2tlbhIPCgJpZBgBIAEoCVIDanRpEhMKBmlzc3VlchgCIAEoCVIDaXNzEhcKCnByb2ZpbG'
     'VfaWQYAyABKAlSA3N1YhIXCgpzZXNzaW9uX2lkGAQgASgJUgNzaWQSEwoGaXNzdWVkGAUgASgD'
     'UgNpYXQSFAoHZXhwaXJlcxgGIAEoA1IDZXhwEhcKCm5vdF9iZWZvcmUYByABKANSA25iZhInCg'
-    '51c2VybWFuYWdlbWVudBjoByABKAhSDnVzZXJtYW5hZ2VtZW50EiMKDGJpbGxpbmdfcmVhZBjq'
-    'ByABKAhSDGJpbGxpbmdfcmVhZBInCg5iaWxsaW5nX21vZGlmeRjrByABKAhSDmJpbGxpbmdfbW'
-    '9kaWZ5EisKEGNvbW11bml0eV9tb2RpZnkY7AcgASgIUhBjb21tdW5pdHlfbW9kaWZ5EicKDmFy'
-    'Y2hpdmVfdXBsb2FkGO0HIAEoBFIOYXJjaGl2ZV91cGxvYWQSKwoQYXJjaGl2ZV9kb3dubG9hZB'
-    'juByABKARSEGFyY2hpdmVfZG93bmxvYWQSIwoMbGlicmFyeV9yZWFkGO8HIAEoCFIMbGlicmFy'
-    'eV9yZWFkEicKDmxpYnJhcnlfbW9kaWZ5GPAHIAEoCFIObGlicmFyeV9tb2RpZnkSIwoMYXJjaG'
-    'l2ZV9zeW5jGPEHIAEoCFIMYXJjaGl2ZV9zeW5jEicKDmNvbW11bml0eV9zeW5jGPIHIAEoCFIO'
-    'Y29tbXVuaXR5X3N5bmNKBQgJEOgH');
+    '51c2VybWFuYWdlbWVudBjoByABKAhSDnVzZXJtYW5hZ2VtZW50EicKDnJlbW90ZV9jb250cm9s'
+    'GOkHIAEoCFIOcmVtb3RlX2NvbnRyb2wSIwoMYmlsbGluZ19yZWFkGOoHIAEoCFIMYmlsbGluZ1'
+    '9yZWFkEicKDmJpbGxpbmdfbW9kaWZ5GOsHIAEoCFIOYmlsbGluZ19tb2RpZnkSKwoQY29tbXVu'
+    'aXR5X21vZGlmeRjsByABKAhSEGNvbW11bml0eV9tb2RpZnkSJwoOYXJjaGl2ZV91cGxvYWQY7Q'
+    'cgASgEUg5hcmNoaXZlX3VwbG9hZBIrChBhcmNoaXZlX2Rvd25sb2FkGO4HIAEoBFIQYXJjaGl2'
+    'ZV9kb3dubG9hZBIjCgxsaWJyYXJ5X3JlYWQY7wcgASgIUgxsaWJyYXJ5X3JlYWQSJwoObGlicm'
+    'FyeV9tb2RpZnkY8AcgASgIUg5saWJyYXJ5X21vZGlmeRIjCgxhcmNoaXZlX3N5bmMY8QcgASgI'
+    'UgxhcmNoaXZlX3N5bmMSJwoOY29tbXVuaXR5X3N5bmMY8gcgASgIUg5jb21tdW5pdHlfc3luY0'
+    'oFCAkQ6Ac=');
 
 @$core.Deprecated('Use authzRequestDescriptor instead')
 const AuthzRequest$json = {

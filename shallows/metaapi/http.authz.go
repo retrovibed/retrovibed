@@ -158,6 +158,7 @@ func (t *HTTPAuthz) grant(w http.ResponseWriter, r *http.Request) {
 	a = meta.Authz{
 		ProfileID:       pid,
 		Usermanagement:  msg.Token.Usermanagement,
+		RemoteControl:   msg.Token.RemoteControl,
 		BillingRead:     msg.Token.BillingRead,
 		BillingModify:   msg.Token.BillingModify,
 		CommunityModify: msg.Token.CommunityModify,

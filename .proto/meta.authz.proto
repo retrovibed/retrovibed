@@ -26,6 +26,7 @@ message Token {
   // END OF STANDARD FIELDS
   reserved 9 to 999;
   bool usermanagement = 1000 [ json_name = "usermanagement" ];
+  bool remote_control = 1001 [ json_name = "remote_control" ];
   bool billing_read = 1002 [ json_name = "billing_read" ];
   bool billing_modify = 1003 [ json_name = "billing_modify" ];
   bool community_modify = 1004 [ json_name = "community_modify" ];

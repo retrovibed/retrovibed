@@ -52,6 +52,7 @@ func TestGrant(t *testing.T) {
 		require.NoError(t, meta.AuthzFindByProfileID(ctx, q, sqlx.NewNullString(p.ID)).Scan(&authz))
 		assert.True(t, authz.LibraryRead)
 		assert.False(t, authz.LibraryModify)
+		assert.False(t, authz.RemoteControl)
 		assert.False(t, authz.BillingRead)
 		assert.False(t, authz.BillingModify)
 		assert.False(t, authz.CommunityModify)
@@ -74,12 +75,13 @@ func TestGrant(t *testing.T) {
 		parser := genparser(t)
 		srv := newServer(t, q)
 
-		require.NoError(t, cmdtestx.Execute(t, parser, "command", "grant", "--private-key-path", keypath, "--endpoint", srv.URL, "--no-library-read", "--library-modify", "--usermanagement", p.ID))
+		require.NoError(t, cmdtestx.Execute(t, parser, "command", "grant", "--private-key-path", keypath, "--endpoint", srv.URL, "--no-library-read", "--library-modify", "--remote-control", "--usermanagement", p.ID))
 
 		var authz meta.Authz
 		require.NoError(t, meta.AuthzFindByProfileID(ctx, q, sqlx.NewNullString(p.ID)).Scan(&authz))
 		assert.False(t, authz.LibraryRead)
 		assert.True(t, authz.LibraryModify)
+		assert.True(t, authz.RemoteControl)
 		assert.False(t, authz.BillingRead)
 		assert.False(t, authz.BillingModify)
 		assert.False(t, authz.CommunityModify)
@@ -101,12 +103,13 @@ func TestGrant(t *testing.T) {
 		parser := genparser(t)
 		srv := newServer(t, q)
 
-		require.NoError(t, cmdtestx.Execute(t, parser, "command", "grant", "--private-key-path", keypath, "--endpoint", srv.URL, "--library-read", "--library-modify", "--billing-read", "--billing-modify", "--community-modify", "--usermanagement", p.ID))
+		require.NoError(t, cmdtestx.Execute(t, parser, "command", "grant", "--private-key-path", keypath, "--endpoint", srv.URL, "--library-read", "--library-modify", "--remote-control", "--billing-read", "--billing-modify", "--community-modify", "--usermanagement", p.ID))
 
 		var authz meta.Authz
 		require.NoError(t, meta.AuthzFindByProfileID(ctx, q, sqlx.NewNullString(p.ID)).Scan(&authz))
 		assert.True(t, authz.LibraryRead)
 		assert.True(t, authz.LibraryModify)
+		assert.True(t, authz.RemoteControl)
 		assert.True(t, authz.BillingRead)
 		assert.True(t, authz.BillingModify)
 		assert.True(t, authz.CommunityModify)

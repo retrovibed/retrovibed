@@ -44,6 +44,12 @@ class AuthzMetaEdit extends StatelessWidget {
             onChanged: (v) => onChange?.call(current..usermanagement = v),
           ),
           AuthzPermissionRow(
+            "Remote Control",
+            description: "Can use remote control to connect to and drive another device's playback",
+            value: current.remoteControl,
+            onChanged: (v) => onChange?.call(current..remoteControl = v),
+          ),
+          AuthzPermissionRow(
             "Library Read",
             description: "Can view library content",
             value: current.libraryRead,

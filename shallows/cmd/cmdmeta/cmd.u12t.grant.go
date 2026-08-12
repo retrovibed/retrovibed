@@ -20,6 +20,7 @@ import (
 type U12TGrant struct {
 	LibraryRead     bool   `flag:"" name:"library-read"     help:"grant library read access"               negatable:"" default:"true"`
 	LibraryModify   bool   `flag:"" name:"library-modify"   help:"grant library modify access"             negatable:"" default:"false"`
+	RemoteControl   bool   `flag:"" name:"remote-control"   help:"grant remote control access"             negatable:"" default:"false"`
 	BillingRead     bool   `flag:"" name:"billing-read"     help:"grant billing read access"               negatable:"" default:"false"`
 	BillingModify   bool   `flag:"" name:"billing-modify"   help:"grant billing modify access"             negatable:"" default:"false"`
 	CommunityModify bool   `flag:"" name:"community-modify" help:"grant community modify access"           negatable:"" default:"false"`
@@ -85,6 +86,7 @@ func (t U12TGrant) run(ctx context.Context, endpoint string, c *http.Client) (er
 		Token: &metaapi.Token{
 			LibraryRead:     t.LibraryRead,
 			LibraryModify:   t.LibraryModify,
+			RemoteControl:   t.RemoteControl,
 			BillingRead:     t.BillingRead,
 			BillingModify:   t.BillingModify,
 			CommunityModify: t.CommunityModify,

@@ -213,6 +213,7 @@ func TestHTTPGrant(t *testing.T) {
 	require.NoError(t, httpx.ErrorCode(resp.Result()))
 	require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 	require.False(t, result.Token.Usermanagement)
+	require.False(t, result.Token.RemoteControl)
 
 	resp, req, err = httptestx.BuildRequestBytes(http.MethodPost, fmt.Sprintf("/%s", p2.ID), encoded, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)))
 	require.NoError(t, err)
@@ -222,6 +223,7 @@ func TestHTTPGrant(t *testing.T) {
 	require.NoError(t, httpx.ErrorCode(resp.Result()))
 	require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 	require.True(t, result.Token.Usermanagement)
+	require.True(t, result.Token.RemoteControl)
 }
 
 func TestHTTPRevokeUnauthorized(t *testing.T) {
