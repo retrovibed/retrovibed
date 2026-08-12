@@ -11,12 +11,18 @@ class DaemonDropdown extends StatefulWidget {
   final List<Widget> trailing;
   final List<Widget> leading;
   final Widget help;
+  final bool readonly;
+  final bool remoteonly;
+  final Future<api.DaemonSearchResponse> Function(api.DaemonSearchRequest) search;
   const DaemonDropdown({
     super.key,
     required this.library,
     this.trailing = const [],
     this.leading = const [],
     this.help = const ds.Hint(const Text("select which daemon instance to configure from the dropdown")),
+    this.remoteonly = false,
+    this.readonly = false,
+    this.search = api.daemons.search,
   });
 
   @override
@@ -73,34 +79,35 @@ class _DaemonDropdownState extends State<DaemonDropdown> {
             textAlign: TextAlign.center,
             leading: [
               ...widget.leading,
-              ds.LoadingIconButton(
-                tooltip: "connect to another library",
-                focusNode: _addFocus,
-                onPressed: () async {
-                  setState(() {
-                    _optional = _optional != null
-                        ? null
-                        : ds.Container(
-                            padding: defaults.padding.copyWith(top: 0),
-                            ManualConfiguration(
-                              connect: (daemon) {
-                                setState(() {
-                                  _optional = null;
-                                });
-                                EndpointAuto.of(
-                                  context,
-                                )?.setdaemon(daemon).ignore();
-                              },
-                            ),
-                          );
-                  });
-                },
-                icon: Icon(_optional == null ? Icons.add : Icons.remove),
-              ),
+              if (!widget.readonly)
+                ds.LoadingIconButton(
+                  tooltip: "connect to another library",
+                  focusNode: _addFocus,
+                  onPressed: () async {
+                    setState(() {
+                      _optional = _optional != null
+                          ? null
+                          : ds.Container(
+                              padding: defaults.padding.copyWith(top: 0),
+                              ManualConfiguration(
+                                connect: (daemon) {
+                                  setState(() {
+                                    _optional = null;
+                                  });
+                                  EndpointAuto.of(
+                                    context,
+                                  )?.setdaemon(daemon).ignore();
+                                },
+                              ),
+                            );
+                    });
+                  },
+                  icon: Icon(_optional == null ? Icons.add : Icons.remove),
+                ),
             ],
             trailing: widget.trailing,
             onSearch: (query, onClick) {
-              return api.daemons.search(api.DaemonSearchRequest()..query = query).then((response) {
+              return widget.search(api.DaemonSearchRequest()..query = query).then((response) {
                 if (response.items.length <= 1) return ds.Empty;
                 return Container(
                   constraints: BoxConstraints(maxHeight: 400),
@@ -113,9 +120,13 @@ class _DaemonDropdownState extends State<DaemonDropdown> {
                         // no need to display the current library in the list.
                         return ds.Empty;
                       }
+                      if (widget.remoteonly && api.daemons.isLocalDevice(daemon)) {
+                        return ds.Empty;
+                      }
 
                       return DaemonDropdownItem(
                         library: daemon,
+                        readonly: widget.readonly,
                         onTap: onClick,
                       );
                     },

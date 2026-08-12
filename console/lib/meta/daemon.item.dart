@@ -8,11 +8,13 @@ import 'daemon.typography.dart';
 class DaemonDropdownItem extends StatefulWidget {
   final api.Daemon library;
   final VoidCallback onTap;
+  final bool readonly;
 
   const DaemonDropdownItem({
     super.key,
     required this.library,
     required this.onTap,
+    this.readonly = false,
   });
 
   @override
@@ -45,7 +47,7 @@ class _DaemonDropdownItemState extends State<DaemonDropdownItem> {
           widget.library,
           trailing: [
             Visibility(
-              visible: !isDevice,
+              visible: !(widget.readonly || isDevice),
               maintainSize: true,
               maintainAnimation: true,
               maintainState: true,

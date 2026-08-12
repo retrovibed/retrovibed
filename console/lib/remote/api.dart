@@ -45,6 +45,13 @@ class _WebSocketRemoteControlSocket implements RemoteControlSocket {
           sink.addError('deserialization failed data: $data');
         }
       },
+      handleError: (cause, trace, sink) {
+        print("DERP DERP ${cause}");
+      },
+      handleDone: (sink) {
+        print("websocket closed: code=${_socket.closeCode} reason=${_socket.closeReason}");
+        sink.close();
+      },
     ),
   );
 
@@ -71,17 +78,16 @@ abstract class remotecontrol {
           ],
         )
         .then((socket) {
+          print("WAKA ${socket.closeCode} ${socket.closeReason}");
           socket.pingInterval = Duration(seconds: 10);
           return _WebSocketRemoteControlSocket(socket);
         });
   }
 
   static Future<RemoteControlSocket> connect({List<httpx.Option> options = const []}) async {
-    return httpx
-        .websocket(Uri.https(httpx.host(), "/rc/connect", null), options: options)
-        .then((socket) {
-          socket.pingInterval = Duration(seconds: 10);
-          return _WebSocketRemoteControlSocket(socket);
-        });
+    return httpx.websocket(Uri.https(httpx.host(), "/rc/connect", null), options: options).then((socket) {
+      socket.pingInterval = Duration(seconds: 10);
+      return _WebSocketRemoteControlSocket(socket);
+    });
   }
 }

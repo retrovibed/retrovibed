@@ -7,10 +7,12 @@ import 'package:retrovibed/authn.dart' as authn;
 
 class SearchMinimal extends StatefulWidget {
   final media.FnMediaSearch apisearch;
+  final Widget empty;
 
   const SearchMinimal({
     super.key,
     this.apisearch = media.media.search,
+    this.empty = const Text("no results"),
   });
 
   @override
@@ -95,7 +97,7 @@ class _SearchMinimal extends State<SearchMinimal> {
           onTap: media.PlayAction(context, v, _res),
         ),
       ),
-      empty: Center(child: Text("no results")),
+      empty: Center(child: widget.empty),
     );
   }
 }

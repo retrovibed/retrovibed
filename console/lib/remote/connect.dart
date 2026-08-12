@@ -50,6 +50,7 @@ class _State extends State<Connect> {
 
   void _reconnect() {
     if (!mounted) return;
+    print("reconnecting");
     setState(() => _socket = remote.RemoteControlSocket.noop);
     Future.delayed(const Duration(seconds: 2), _connect);
   }
@@ -58,16 +59,17 @@ class _State extends State<Connect> {
     remote.remotecontrol
         .connect(options: [authn.request(authn.AuthzCache.meta(context))])
         .then((socket) {
-          setState(() => _socket = socket);
-          _messages = socket.messages.asBroadcastStream();
           final c = Completer();
-
-          _messages.listen(
-            (_) {},
-            cancelOnError: true,
-            onError: c.completeError,
-            onDone: c.complete,
-          );
+          setState(() {
+            _socket = socket;
+            _messages = socket.messages.asBroadcastStream();
+            _messages.listen(
+              (_) {},
+              cancelOnError: true,
+              onError: c.completeError,
+              onDone: c.complete,
+            );
+          });
 
           return c.future;
         })
@@ -101,6 +103,8 @@ class _State extends State<Connect> {
         children: [
           meta.DaemonDropdown(
             library: _library,
+            remoteonly: true,
+            readonly: true,
             leading: [
               ValueListenableBuilder<media.MediaSearchState>(
                 valueListenable: widget.search,
@@ -160,34 +164,34 @@ class _State extends State<Connect> {
               ),
             ],
           ),
-          ds.Debug.blue(
-            ds.Container(
+          SingleChildScrollView(
+            child: ds.Container(
               padding: defaults.padding,
-              ds.Debug.pink(
-                ds.Loading(
-                  loading: _socket == remote.RemoteControlSocket.noop,
-                  Column(
-                    verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Divider(),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          PlayerControlPrevious(socket: _socket),
-                          PlayerControlPlayPause(socket: _socket, status: _messages),
-                          PlayerControlFastForward(socket: _socket),
-                          PlayerControlNext(socket: _socket),
-                        ],
-                      ),
-                      PlaylistCurrent(_messages),
-                    ],
-                  ),
+              ds.Loading(
+                loading: _socket == remote.RemoteControlSocket.noop,
+                Column(
+                  verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Divider(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        PlayerControlPrevious(socket: _socket),
+                        PlayerControlPlayPause(socket: _socket, status: _messages),
+                        PlayerControlFastForward(socket: _socket),
+                        PlayerControlNext(socket: _socket),
+                      ],
+                    ),
+                    PlaylistCurrent(_messages),
+                    SearchMinimal(
+                      empty: ds.Empty,
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
-          const Expanded(child: SearchMinimal()),
         ],
       ),
     );
