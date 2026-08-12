@@ -48,6 +48,7 @@ Future<Authn> current({String? host}) {
 }
 
 Future<Session> register(Identity iden, {String? host}) {
+  print("registering ${httpx.libraryhost(host: host)} -> ${iden}");
   return httpx
       .post(
         Uri.https(
