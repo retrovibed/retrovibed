@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.12
 // 	protoc        v3.21.12
-// source: torrent.proto
+// source: torrents/torrent.proto
 
 package daemons
 
@@ -31,7 +31,7 @@ type Peers struct {
 
 func (x *Peers) Reset() {
 	*x = Peers{}
-	mi := &file_torrent_proto_msgTypes[0]
+	mi := &file_torrents_torrent_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -43,7 +43,7 @@ func (x *Peers) String() string {
 func (*Peers) ProtoMessage() {}
 
 func (x *Peers) ProtoReflect() protoreflect.Message {
-	mi := &file_torrent_proto_msgTypes[0]
+	mi := &file_torrents_torrent_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -56,7 +56,7 @@ func (x *Peers) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Peers.ProtoReflect.Descriptor instead.
 func (*Peers) Descriptor() ([]byte, []int) {
-	return file_torrent_proto_rawDescGZIP(), []int{0}
+	return file_torrents_torrent_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *Peers) GetMin() uint32 {
@@ -83,7 +83,7 @@ type Limit struct {
 
 func (x *Limit) Reset() {
 	*x = Limit{}
-	mi := &file_torrent_proto_msgTypes[1]
+	mi := &file_torrents_torrent_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -95,7 +95,7 @@ func (x *Limit) String() string {
 func (*Limit) ProtoMessage() {}
 
 func (x *Limit) ProtoReflect() protoreflect.Message {
-	mi := &file_torrent_proto_msgTypes[1]
+	mi := &file_torrents_torrent_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -108,7 +108,7 @@ func (x *Limit) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Limit.ProtoReflect.Descriptor instead.
 func (*Limit) Descriptor() ([]byte, []int) {
-	return file_torrent_proto_rawDescGZIP(), []int{1}
+	return file_torrents_torrent_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *Limit) GetRate() uint32 {
@@ -150,7 +150,7 @@ type TorrentSettings struct {
 
 func (x *TorrentSettings) Reset() {
 	*x = TorrentSettings{}
-	mi := &file_torrent_proto_msgTypes[2]
+	mi := &file_torrents_torrent_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -162,7 +162,7 @@ func (x *TorrentSettings) String() string {
 func (*TorrentSettings) ProtoMessage() {}
 
 func (x *TorrentSettings) ProtoReflect() protoreflect.Message {
-	mi := &file_torrent_proto_msgTypes[2]
+	mi := &file_torrents_torrent_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -175,7 +175,7 @@ func (x *TorrentSettings) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TorrentSettings.ProtoReflect.Descriptor instead.
 func (*TorrentSettings) Descriptor() ([]byte, []int) {
-	return file_torrent_proto_rawDescGZIP(), []int{2}
+	return file_torrents_torrent_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *TorrentSettings) GetSeed() bool {
@@ -311,7 +311,7 @@ type DiscoverySettings struct {
 
 func (x *DiscoverySettings) Reset() {
 	*x = DiscoverySettings{}
-	mi := &file_torrent_proto_msgTypes[3]
+	mi := &file_torrents_torrent_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -323,7 +323,7 @@ func (x *DiscoverySettings) String() string {
 func (*DiscoverySettings) ProtoMessage() {}
 
 func (x *DiscoverySettings) ProtoReflect() protoreflect.Message {
-	mi := &file_torrent_proto_msgTypes[3]
+	mi := &file_torrents_torrent_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -336,7 +336,7 @@ func (x *DiscoverySettings) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DiscoverySettings.ProtoReflect.Descriptor instead.
 func (*DiscoverySettings) Descriptor() ([]byte, []int) {
-	return file_torrent_proto_rawDescGZIP(), []int{3}
+	return file_torrents_torrent_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *DiscoverySettings) GetEnabled() bool {
@@ -381,11 +381,11 @@ func (x *DiscoverySettings) GetLocateP2P() bool {
 	return false
 }
 
-var File_torrent_proto protoreflect.FileDescriptor
+var File_torrents_torrent_proto protoreflect.FileDescriptor
 
-const file_torrent_proto_rawDesc = "" +
+const file_torrents_torrent_proto_rawDesc = "" +
 	"\n" +
-	"\rtorrent.proto\x12\btorrents\"+\n" +
+	"\x16torrents/torrent.proto\x12\btorrents\"+\n" +
 	"\x05Peers\x12\x10\n" +
 	"\x03min\x18\x01 \x01(\rR\x03min\x12\x10\n" +
 	"\x03max\x18\x02 \x01(\rR\x03max\"1\n" +
@@ -426,25 +426,25 @@ const file_torrent_proto_rawDesc = "" +
 	"locate_p2pb\x06proto3"
 
 var (
-	file_torrent_proto_rawDescOnce sync.Once
-	file_torrent_proto_rawDescData []byte
+	file_torrents_torrent_proto_rawDescOnce sync.Once
+	file_torrents_torrent_proto_rawDescData []byte
 )
 
-func file_torrent_proto_rawDescGZIP() []byte {
-	file_torrent_proto_rawDescOnce.Do(func() {
-		file_torrent_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_torrent_proto_rawDesc), len(file_torrent_proto_rawDesc)))
+func file_torrents_torrent_proto_rawDescGZIP() []byte {
+	file_torrents_torrent_proto_rawDescOnce.Do(func() {
+		file_torrents_torrent_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_torrents_torrent_proto_rawDesc), len(file_torrents_torrent_proto_rawDesc)))
 	})
-	return file_torrent_proto_rawDescData
+	return file_torrents_torrent_proto_rawDescData
 }
 
-var file_torrent_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
-var file_torrent_proto_goTypes = []any{
+var file_torrents_torrent_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_torrents_torrent_proto_goTypes = []any{
 	(*Peers)(nil),             // 0: torrents.Peers
 	(*Limit)(nil),             // 1: torrents.Limit
 	(*TorrentSettings)(nil),   // 2: torrents.TorrentSettings
 	(*DiscoverySettings)(nil), // 3: torrents.DiscoverySettings
 }
-var file_torrent_proto_depIdxs = []int32{
+var file_torrents_torrent_proto_depIdxs = []int32{
 	1, // 0: torrents.TorrentSettings.download:type_name -> torrents.Limit
 	1, // 1: torrents.TorrentSettings.upload:type_name -> torrents.Limit
 	1, // 2: torrents.TorrentSettings.inbound:type_name -> torrents.Limit
@@ -457,26 +457,26 @@ var file_torrent_proto_depIdxs = []int32{
 	0, // [0:5] is the sub-list for field type_name
 }
 
-func init() { file_torrent_proto_init() }
-func file_torrent_proto_init() {
-	if File_torrent_proto != nil {
+func init() { file_torrents_torrent_proto_init() }
+func file_torrents_torrent_proto_init() {
+	if File_torrents_torrent_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_torrent_proto_rawDesc), len(file_torrent_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_torrents_torrent_proto_rawDesc), len(file_torrents_torrent_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_torrent_proto_goTypes,
-		DependencyIndexes: file_torrent_proto_depIdxs,
-		MessageInfos:      file_torrent_proto_msgTypes,
+		GoTypes:           file_torrents_torrent_proto_goTypes,
+		DependencyIndexes: file_torrents_torrent_proto_depIdxs,
+		MessageInfos:      file_torrents_torrent_proto_msgTypes,
 	}.Build()
-	File_torrent_proto = out.File
-	file_torrent_proto_goTypes = nil
-	file_torrent_proto_depIdxs = nil
+	File_torrents_torrent_proto = out.File
+	file_torrents_torrent_proto_goTypes = nil
+	file_torrents_torrent_proto_depIdxs = nil
 }

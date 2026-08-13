@@ -1,6 +1,6 @@
 // This is a generated file - do not edit.
 //
-// Generated from rss.proto.
+// Generated from rss/rss.proto.
 
 // @dart = 3.3
 

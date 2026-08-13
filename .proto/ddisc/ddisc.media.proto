@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package ddisc;
 
-import "meta.search.proto";
+import "meta/meta.search.proto";
 
 message Media {
   string id = 1 [ json_name = "id" ];

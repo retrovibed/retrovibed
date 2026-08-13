@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.12
 // 	protoc        v3.21.12
-// source: meta.dht.proto
+// source: meta/meta.dht.proto
 
 package metaapi
 
@@ -36,7 +36,7 @@ type DHTDiagnostics struct {
 
 func (x *DHTDiagnostics) Reset() {
 	*x = DHTDiagnostics{}
-	mi := &file_meta_dht_proto_msgTypes[0]
+	mi := &file_meta_meta_dht_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -48,7 +48,7 @@ func (x *DHTDiagnostics) String() string {
 func (*DHTDiagnostics) ProtoMessage() {}
 
 func (x *DHTDiagnostics) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_dht_proto_msgTypes[0]
+	mi := &file_meta_meta_dht_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -61,7 +61,7 @@ func (x *DHTDiagnostics) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DHTDiagnostics.ProtoReflect.Descriptor instead.
 func (*DHTDiagnostics) Descriptor() ([]byte, []int) {
-	return file_meta_dht_proto_rawDescGZIP(), []int{0}
+	return file_meta_meta_dht_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *DHTDiagnostics) GetNodeId() string {
@@ -122,7 +122,7 @@ type DHTMetricsResponse struct {
 
 func (x *DHTMetricsResponse) Reset() {
 	*x = DHTMetricsResponse{}
-	mi := &file_meta_dht_proto_msgTypes[1]
+	mi := &file_meta_meta_dht_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -134,7 +134,7 @@ func (x *DHTMetricsResponse) String() string {
 func (*DHTMetricsResponse) ProtoMessage() {}
 
 func (x *DHTMetricsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_dht_proto_msgTypes[1]
+	mi := &file_meta_meta_dht_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -147,7 +147,7 @@ func (x *DHTMetricsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DHTMetricsResponse.ProtoReflect.Descriptor instead.
 func (*DHTMetricsResponse) Descriptor() ([]byte, []int) {
-	return file_meta_dht_proto_rawDescGZIP(), []int{1}
+	return file_meta_meta_dht_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *DHTMetricsResponse) GetDht() *DHTDiagnostics {
@@ -157,11 +157,11 @@ func (x *DHTMetricsResponse) GetDht() *DHTDiagnostics {
 	return nil
 }
 
-var File_meta_dht_proto protoreflect.FileDescriptor
+var File_meta_meta_dht_proto protoreflect.FileDescriptor
 
-const file_meta_dht_proto_rawDesc = "" +
+const file_meta_meta_dht_proto_rawDesc = "" +
 	"\n" +
-	"\x0emeta.dht.proto\x12\x04meta\"\xd8\x02\n" +
+	"\x13meta/meta.dht.proto\x12\x04meta\"\xd8\x02\n" +
 	"\x0eDHTDiagnostics\x12\x18\n" +
 	"\anode_id\x18\x01 \x01(\tR\anode_id\x12\x1e\n" +
 	"\n" +
@@ -176,23 +176,23 @@ const file_meta_dht_proto_rawDesc = "" +
 	"\x03dht\x18\x01 \x01(\v2\x14.meta.DHTDiagnosticsR\x03dhtb\x06proto3"
 
 var (
-	file_meta_dht_proto_rawDescOnce sync.Once
-	file_meta_dht_proto_rawDescData []byte
+	file_meta_meta_dht_proto_rawDescOnce sync.Once
+	file_meta_meta_dht_proto_rawDescData []byte
 )
 
-func file_meta_dht_proto_rawDescGZIP() []byte {
-	file_meta_dht_proto_rawDescOnce.Do(func() {
-		file_meta_dht_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_meta_dht_proto_rawDesc), len(file_meta_dht_proto_rawDesc)))
+func file_meta_meta_dht_proto_rawDescGZIP() []byte {
+	file_meta_meta_dht_proto_rawDescOnce.Do(func() {
+		file_meta_meta_dht_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_meta_meta_dht_proto_rawDesc), len(file_meta_meta_dht_proto_rawDesc)))
 	})
-	return file_meta_dht_proto_rawDescData
+	return file_meta_meta_dht_proto_rawDescData
 }
 
-var file_meta_dht_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-var file_meta_dht_proto_goTypes = []any{
+var file_meta_meta_dht_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_meta_meta_dht_proto_goTypes = []any{
 	(*DHTDiagnostics)(nil),     // 0: meta.DHTDiagnostics
 	(*DHTMetricsResponse)(nil), // 1: meta.DHTMetricsResponse
 }
-var file_meta_dht_proto_depIdxs = []int32{
+var file_meta_meta_dht_proto_depIdxs = []int32{
 	0, // 0: meta.DHTMetricsResponse.dht:type_name -> meta.DHTDiagnostics
 	1, // [1:1] is the sub-list for method output_type
 	1, // [1:1] is the sub-list for method input_type
@@ -201,26 +201,26 @@ var file_meta_dht_proto_depIdxs = []int32{
 	0, // [0:1] is the sub-list for field type_name
 }
 
-func init() { file_meta_dht_proto_init() }
-func file_meta_dht_proto_init() {
-	if File_meta_dht_proto != nil {
+func init() { file_meta_meta_dht_proto_init() }
+func file_meta_meta_dht_proto_init() {
+	if File_meta_meta_dht_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_meta_dht_proto_rawDesc), len(file_meta_dht_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_meta_meta_dht_proto_rawDesc), len(file_meta_meta_dht_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_meta_dht_proto_goTypes,
-		DependencyIndexes: file_meta_dht_proto_depIdxs,
-		MessageInfos:      file_meta_dht_proto_msgTypes,
+		GoTypes:           file_meta_meta_dht_proto_goTypes,
+		DependencyIndexes: file_meta_meta_dht_proto_depIdxs,
+		MessageInfos:      file_meta_meta_dht_proto_msgTypes,
 	}.Build()
-	File_meta_dht_proto = out.File
-	file_meta_dht_proto_goTypes = nil
-	file_meta_dht_proto_depIdxs = nil
+	File_meta_meta_dht_proto = out.File
+	file_meta_meta_dht_proto_goTypes = nil
+	file_meta_meta_dht_proto_depIdxs = nil
 }

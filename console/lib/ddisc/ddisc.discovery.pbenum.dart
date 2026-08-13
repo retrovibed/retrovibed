@@ -1,6 +1,6 @@
 // This is a generated file - do not edit.
 //
-// Generated from ddisc.discovery.proto.
+// Generated from ddisc/ddisc.discovery.proto.
 
 // @dart = 3.3
 

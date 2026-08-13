@@ -1,6 +1,6 @@
 // This is a generated file - do not edit.
 //
-// Generated from meta.torrent.proto.
+// Generated from meta/meta.torrent.proto.
 
 // @dart = 3.3
 

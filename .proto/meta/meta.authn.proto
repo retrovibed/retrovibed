@@ -2,8 +2,8 @@ syntax = "proto3";
 
 package meta;
 
-import "meta.account.proto";
-import "meta.profile.proto";
+import "meta/meta.account.proto";
+import "meta/meta.profile.proto";
 
 // options during login
 message LoginOptions {

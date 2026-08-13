@@ -1,6 +1,6 @@
 // This is a generated file - do not edit.
 //
-// Generated from content.addressable.storage.proto.
+// Generated from media/content.addressable.storage.proto.
 
 // @dart = 3.3
 

@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.12
 // 	protoc        v3.21.12
-// source: media.id.proto
+// source: media/media.id.proto
 
 package deeppool
 
@@ -30,7 +30,7 @@ type CleanIDRequest struct {
 
 func (x *CleanIDRequest) Reset() {
 	*x = CleanIDRequest{}
-	mi := &file_media_id_proto_msgTypes[0]
+	mi := &file_media_media_id_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -42,7 +42,7 @@ func (x *CleanIDRequest) String() string {
 func (*CleanIDRequest) ProtoMessage() {}
 
 func (x *CleanIDRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_media_id_proto_msgTypes[0]
+	mi := &file_media_media_id_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -55,7 +55,7 @@ func (x *CleanIDRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CleanIDRequest.ProtoReflect.Descriptor instead.
 func (*CleanIDRequest) Descriptor() ([]byte, []int) {
-	return file_media_id_proto_rawDescGZIP(), []int{0}
+	return file_media_media_id_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *CleanIDRequest) GetText() string {
@@ -74,7 +74,7 @@ type CleanIDResponse struct {
 
 func (x *CleanIDResponse) Reset() {
 	*x = CleanIDResponse{}
-	mi := &file_media_id_proto_msgTypes[1]
+	mi := &file_media_media_id_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -86,7 +86,7 @@ func (x *CleanIDResponse) String() string {
 func (*CleanIDResponse) ProtoMessage() {}
 
 func (x *CleanIDResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_media_id_proto_msgTypes[1]
+	mi := &file_media_media_id_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -99,7 +99,7 @@ func (x *CleanIDResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CleanIDResponse.ProtoReflect.Descriptor instead.
 func (*CleanIDResponse) Descriptor() ([]byte, []int) {
-	return file_media_id_proto_rawDescGZIP(), []int{1}
+	return file_media_media_id_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *CleanIDResponse) GetText() string {
@@ -109,34 +109,34 @@ func (x *CleanIDResponse) GetText() string {
 	return ""
 }
 
-var File_media_id_proto protoreflect.FileDescriptor
+var File_media_media_id_proto protoreflect.FileDescriptor
 
-const file_media_id_proto_rawDesc = "" +
+const file_media_media_id_proto_rawDesc = "" +
 	"\n" +
-	"\x0emedia.id.proto\x12\x10retrovibed.media\"$\n" +
+	"\x14media/media.id.proto\x12\x10retrovibed.media\"$\n" +
 	"\x0eCleanIDRequest\x12\x12\n" +
 	"\x04text\x18\x01 \x01(\tR\x04text\"%\n" +
 	"\x0fCleanIDResponse\x12\x12\n" +
 	"\x04text\x18\x01 \x01(\tR\x04textb\x06proto3"
 
 var (
-	file_media_id_proto_rawDescOnce sync.Once
-	file_media_id_proto_rawDescData []byte
+	file_media_media_id_proto_rawDescOnce sync.Once
+	file_media_media_id_proto_rawDescData []byte
 )
 
-func file_media_id_proto_rawDescGZIP() []byte {
-	file_media_id_proto_rawDescOnce.Do(func() {
-		file_media_id_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_media_id_proto_rawDesc), len(file_media_id_proto_rawDesc)))
+func file_media_media_id_proto_rawDescGZIP() []byte {
+	file_media_media_id_proto_rawDescOnce.Do(func() {
+		file_media_media_id_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_media_media_id_proto_rawDesc), len(file_media_media_id_proto_rawDesc)))
 	})
-	return file_media_id_proto_rawDescData
+	return file_media_media_id_proto_rawDescData
 }
 
-var file_media_id_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-var file_media_id_proto_goTypes = []any{
+var file_media_media_id_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_media_media_id_proto_goTypes = []any{
 	(*CleanIDRequest)(nil),  // 0: retrovibed.media.CleanIDRequest
 	(*CleanIDResponse)(nil), // 1: retrovibed.media.CleanIDResponse
 }
-var file_media_id_proto_depIdxs = []int32{
+var file_media_media_id_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
 	0, // [0:0] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -144,26 +144,26 @@ var file_media_id_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_media_id_proto_init() }
-func file_media_id_proto_init() {
-	if File_media_id_proto != nil {
+func init() { file_media_media_id_proto_init() }
+func file_media_media_id_proto_init() {
+	if File_media_media_id_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_media_id_proto_rawDesc), len(file_media_id_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_media_media_id_proto_rawDesc), len(file_media_media_id_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_media_id_proto_goTypes,
-		DependencyIndexes: file_media_id_proto_depIdxs,
-		MessageInfos:      file_media_id_proto_msgTypes,
+		GoTypes:           file_media_media_id_proto_goTypes,
+		DependencyIndexes: file_media_media_id_proto_depIdxs,
+		MessageInfos:      file_media_media_id_proto_msgTypes,
 	}.Build()
-	File_media_id_proto = out.File
-	file_media_id_proto_goTypes = nil
-	file_media_id_proto_depIdxs = nil
+	File_media_media_id_proto = out.File
+	file_media_media_id_proto_goTypes = nil
+	file_media_media_id_proto_depIdxs = nil
 }

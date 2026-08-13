@@ -1,6 +1,6 @@
 // This is a generated file - do not edit.
 //
-// Generated from meta.authn.proto.
+// Generated from meta/meta.authn.proto.
 
 // @dart = 3.3
 

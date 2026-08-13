@@ -1,6 +1,6 @@
 // This is a generated file - do not edit.
 //
-// Generated from meta.wireguard.proto.
+// Generated from wireguard/meta.wireguard.proto.
 
 // @dart = 3.3
 

@@ -1,6 +1,6 @@
 // This is a generated file - do not edit.
 //
-// Generated from searchplugin.proto.
+// Generated from ddisc/plugin/searchplugin.proto.
 
 // @dart = 3.3
 

@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.12
 // 	protoc        v3.21.12
-// source: meta.torrent.proto
+// source: meta/meta.torrent.proto
 
 package metaapi
 
@@ -35,7 +35,7 @@ type TorrentDiagnostics struct {
 
 func (x *TorrentDiagnostics) Reset() {
 	*x = TorrentDiagnostics{}
-	mi := &file_meta_torrent_proto_msgTypes[0]
+	mi := &file_meta_meta_torrent_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -47,7 +47,7 @@ func (x *TorrentDiagnostics) String() string {
 func (*TorrentDiagnostics) ProtoMessage() {}
 
 func (x *TorrentDiagnostics) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_torrent_proto_msgTypes[0]
+	mi := &file_meta_meta_torrent_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -60,7 +60,7 @@ func (x *TorrentDiagnostics) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TorrentDiagnostics.ProtoReflect.Descriptor instead.
 func (*TorrentDiagnostics) Descriptor() ([]byte, []int) {
-	return file_meta_torrent_proto_rawDescGZIP(), []int{0}
+	return file_meta_meta_torrent_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *TorrentDiagnostics) GetTotal() uint64 {
@@ -114,7 +114,7 @@ type TorrentMetricsResponse struct {
 
 func (x *TorrentMetricsResponse) Reset() {
 	*x = TorrentMetricsResponse{}
-	mi := &file_meta_torrent_proto_msgTypes[1]
+	mi := &file_meta_meta_torrent_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -126,7 +126,7 @@ func (x *TorrentMetricsResponse) String() string {
 func (*TorrentMetricsResponse) ProtoMessage() {}
 
 func (x *TorrentMetricsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_torrent_proto_msgTypes[1]
+	mi := &file_meta_meta_torrent_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -139,7 +139,7 @@ func (x *TorrentMetricsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TorrentMetricsResponse.ProtoReflect.Descriptor instead.
 func (*TorrentMetricsResponse) Descriptor() ([]byte, []int) {
-	return file_meta_torrent_proto_rawDescGZIP(), []int{1}
+	return file_meta_meta_torrent_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *TorrentMetricsResponse) GetTorrent() *TorrentDiagnostics {
@@ -149,11 +149,11 @@ func (x *TorrentMetricsResponse) GetTorrent() *TorrentDiagnostics {
 	return nil
 }
 
-var File_meta_torrent_proto protoreflect.FileDescriptor
+var File_meta_meta_torrent_proto protoreflect.FileDescriptor
 
-const file_meta_torrent_proto_rawDesc = "" +
+const file_meta_meta_torrent_proto_rawDesc = "" +
 	"\n" +
-	"\x12meta.torrent.proto\x12\x04meta\"\xac\x01\n" +
+	"\x17meta/meta.torrent.proto\x12\x04meta\"\xac\x01\n" +
 	"\x12TorrentDiagnostics\x12\x14\n" +
 	"\x05total\x18\x01 \x01(\x04R\x05total\x12\x18\n" +
 	"\aseeding\x18\x02 \x01(\x04R\aseeding\x12\x14\n" +
@@ -167,23 +167,23 @@ const file_meta_torrent_proto_rawDesc = "" +
 	"\atorrent\x18\x01 \x01(\v2\x18.meta.TorrentDiagnosticsR\atorrentb\x06proto3"
 
 var (
-	file_meta_torrent_proto_rawDescOnce sync.Once
-	file_meta_torrent_proto_rawDescData []byte
+	file_meta_meta_torrent_proto_rawDescOnce sync.Once
+	file_meta_meta_torrent_proto_rawDescData []byte
 )
 
-func file_meta_torrent_proto_rawDescGZIP() []byte {
-	file_meta_torrent_proto_rawDescOnce.Do(func() {
-		file_meta_torrent_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_meta_torrent_proto_rawDesc), len(file_meta_torrent_proto_rawDesc)))
+func file_meta_meta_torrent_proto_rawDescGZIP() []byte {
+	file_meta_meta_torrent_proto_rawDescOnce.Do(func() {
+		file_meta_meta_torrent_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_meta_meta_torrent_proto_rawDesc), len(file_meta_meta_torrent_proto_rawDesc)))
 	})
-	return file_meta_torrent_proto_rawDescData
+	return file_meta_meta_torrent_proto_rawDescData
 }
 
-var file_meta_torrent_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-var file_meta_torrent_proto_goTypes = []any{
+var file_meta_meta_torrent_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_meta_meta_torrent_proto_goTypes = []any{
 	(*TorrentDiagnostics)(nil),     // 0: meta.TorrentDiagnostics
 	(*TorrentMetricsResponse)(nil), // 1: meta.TorrentMetricsResponse
 }
-var file_meta_torrent_proto_depIdxs = []int32{
+var file_meta_meta_torrent_proto_depIdxs = []int32{
 	0, // 0: meta.TorrentMetricsResponse.torrent:type_name -> meta.TorrentDiagnostics
 	1, // [1:1] is the sub-list for method output_type
 	1, // [1:1] is the sub-list for method input_type
@@ -192,26 +192,26 @@ var file_meta_torrent_proto_depIdxs = []int32{
 	0, // [0:1] is the sub-list for field type_name
 }
 
-func init() { file_meta_torrent_proto_init() }
-func file_meta_torrent_proto_init() {
-	if File_meta_torrent_proto != nil {
+func init() { file_meta_meta_torrent_proto_init() }
+func file_meta_meta_torrent_proto_init() {
+	if File_meta_meta_torrent_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_meta_torrent_proto_rawDesc), len(file_meta_torrent_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_meta_meta_torrent_proto_rawDesc), len(file_meta_meta_torrent_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_meta_torrent_proto_goTypes,
-		DependencyIndexes: file_meta_torrent_proto_depIdxs,
-		MessageInfos:      file_meta_torrent_proto_msgTypes,
+		GoTypes:           file_meta_meta_torrent_proto_goTypes,
+		DependencyIndexes: file_meta_meta_torrent_proto_depIdxs,
+		MessageInfos:      file_meta_meta_torrent_proto_msgTypes,
 	}.Build()
-	File_meta_torrent_proto = out.File
-	file_meta_torrent_proto_goTypes = nil
-	file_meta_torrent_proto_depIdxs = nil
+	File_meta_meta_torrent_proto = out.File
+	file_meta_meta_torrent_proto_goTypes = nil
+	file_meta_meta_torrent_proto_depIdxs = nil
 }

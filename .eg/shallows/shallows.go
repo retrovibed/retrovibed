@@ -66,45 +66,59 @@ func GenerateProtocol(ctx context.Context, op eg.Op) error {
 	gruntime := shellruntime()
 	return shell.Run(
 		ctx,
-		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmeta.search.proto=github.com/retrovibed/retrovibed/shallows/meta --go_opt=paths=source_relative --go_out=meta meta.search.proto"),
-		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmeta.account.proto=github.com/retrovibed/retrovibed/retroapi/authn --go_opt=paths=source_relative --go_out=../retroapi/authn meta.account.proto"),
-		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmeta.profile.proto=github.com/retrovibed/retrovibed/retroapi/authn --go_opt=paths=source_relative --go_out=../retroapi/authn meta.profile.proto"),
-		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmeta.authz.proto=github.com/retrovibed/retrovibed/retroapi/authn --go_opt=paths=source_relative --go_out=../retroapi/authn meta.authz.proto"),
-		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmeta.daemon.proto=github.com/retrovibed/retrovibed/shallows/metaapi --go_opt=paths=source_relative --go_out=metaapi meta.daemon.proto"),
-		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmeta.wireguard.proto=github.com/retrovibed/retrovibed/shallows/metaapi --go_opt=paths=source_relative --go_out=metaapi meta.wireguard.proto"),
-		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmeta.network.proto=github.com/retrovibed/retrovibed/shallows/metaapi --go_opt=paths=source_relative --go_out=metaapi meta.network.proto"),
-		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmeta.torrent.proto=github.com/retrovibed/retrovibed/shallows/metaapi --go_opt=paths=source_relative --go_out=metaapi meta.torrent.proto"),
-		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmeta.dht.proto=github.com/retrovibed/retrovibed/shallows/metaapi --go_opt=paths=source_relative --go_out=metaapi meta.dht.proto"),
-		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmeta.discovery.proto=github.com/retrovibed/retrovibed/shallows/metaapi --go_opt=paths=source_relative --go_out=metaapi meta.discovery.proto"),
-		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmeta.authn.proto=github.com/retrovibed/retrovibed/retroapi/authn --go_opt=Mmeta.account.proto=github.com/retrovibed/retrovibed/retroapi/authn --go_opt=Mmeta.profile.proto=github.com/retrovibed/retrovibed/retroapi/authn --go_opt=paths=source_relative --go_out=../retroapi/authn meta.authn.proto"),
+		// Every invocation below uses paths=import with an explicit module= (rather than
+		// paths=source_relative): output location is then computed purely from the Go
+		// package's import path (the --go_opt=M value), completely independent of the
+		// .proto file's own directory. That's what lets .proto/ be organized into
+		// per-package subdirectories (needed so protoc-gen-dart can resolve cross-package
+		// Dart imports, which has no M-option equivalent) without perturbing where any
+		// generated .pb.go file lands, and without the nested-vs-flat descriptor-name
+		// mismatches that paths=source_relative + a bucket-local proto_path produced for
+		// files that share a Go package with a sibling that imports them (protoc-gen-go
+		// chains sibling file-init calls by descriptor name, so those need to agree).
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmeta/meta.search.proto=github.com/retrovibed/retrovibed/shallows/meta --go_opt=paths=import --go_opt=module=github.com/retrovibed/retrovibed/shallows --go_out=. meta/meta.search.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmeta/meta.account.proto=github.com/retrovibed/retrovibed/retroapi/authn --go_opt=paths=import --go_opt=module=github.com/retrovibed/retrovibed/retroapi --go_out=../retroapi meta/meta.account.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmeta/meta.profile.proto=github.com/retrovibed/retrovibed/retroapi/authn --go_opt=paths=import --go_opt=module=github.com/retrovibed/retrovibed/retroapi --go_out=../retroapi meta/meta.profile.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmeta/meta.authz.proto=github.com/retrovibed/retrovibed/retroapi/authn --go_opt=paths=import --go_opt=module=github.com/retrovibed/retrovibed/retroapi --go_out=../retroapi meta/meta.authz.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmeta/meta.daemon.proto=github.com/retrovibed/retrovibed/shallows/metaapi --go_opt=paths=import --go_opt=module=github.com/retrovibed/retrovibed/shallows --go_out=. meta/meta.daemon.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mwireguard/meta.wireguard.proto=github.com/retrovibed/retrovibed/shallows/metaapi --go_opt=paths=import --go_opt=module=github.com/retrovibed/retrovibed/shallows --go_out=. wireguard/meta.wireguard.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmeta/meta.network.proto=github.com/retrovibed/retrovibed/shallows/metaapi --go_opt=paths=import --go_opt=module=github.com/retrovibed/retrovibed/shallows --go_out=. meta/meta.network.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmeta/meta.torrent.proto=github.com/retrovibed/retrovibed/shallows/metaapi --go_opt=paths=import --go_opt=module=github.com/retrovibed/retrovibed/shallows --go_out=. meta/meta.torrent.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmeta/meta.dht.proto=github.com/retrovibed/retrovibed/shallows/metaapi --go_opt=paths=import --go_opt=module=github.com/retrovibed/retrovibed/shallows --go_out=. meta/meta.dht.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmeta/meta.discovery.proto=github.com/retrovibed/retrovibed/shallows/metaapi --go_opt=paths=import --go_opt=module=github.com/retrovibed/retrovibed/shallows --go_out=. meta/meta.discovery.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmeta/meta.authn.proto=github.com/retrovibed/retrovibed/retroapi/authn --go_opt=Mmeta/meta.account.proto=github.com/retrovibed/retrovibed/retroapi/authn --go_opt=Mmeta/meta.profile.proto=github.com/retrovibed/retrovibed/retroapi/authn --go_opt=paths=import --go_opt=module=github.com/retrovibed/retrovibed/retroapi --go_out=../retroapi meta/meta.authn.proto"),
 		// media
-		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmedia.proto=github.com/retrovibed/retrovibed/shallows/media --go_opt=paths=source_relative --go_out=media media.proto"),
-		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmedia.known.proto=github.com/retrovibed/retrovibed/shallows/media --go_opt=Mmeta.search.proto=github.com/retrovibed/retrovibed/shallows/meta --go_opt=paths=source_relative --go_out=media media.known.proto"),
-		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmedia.recent.proto=github.com/retrovibed/retrovibed/shallows/media --go_opt=Mmeta.search.proto=github.com/retrovibed/retrovibed/shallows/meta --go_opt=Mmedia.proto=github.com/retrovibed/retrovibed/shallows/media --go_opt=paths=source_relative --go_out=media media.recent.proto"),
-		gruntime.New("protoc --proto_path=../.proto --go_opt=Mrss.proto=github.com/retrovibed/retrovibed/shallows/rss --go_opt=paths=source_relative --go_out=rss rss.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmedia/media.proto=github.com/retrovibed/retrovibed/shallows/media --go_opt=paths=import --go_opt=module=github.com/retrovibed/retrovibed/shallows --go_out=. media/media.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmedia/media.known.proto=github.com/retrovibed/retrovibed/shallows/media --go_opt=Mmeta/meta.search.proto=github.com/retrovibed/retrovibed/shallows/meta --go_opt=paths=import --go_opt=module=github.com/retrovibed/retrovibed/shallows --go_out=. media/media.known.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmedia/media.recent.proto=github.com/retrovibed/retrovibed/shallows/media --go_opt=Mmeta/meta.search.proto=github.com/retrovibed/retrovibed/shallows/meta --go_opt=Mmedia/media.proto=github.com/retrovibed/retrovibed/shallows/media --go_opt=paths=import --go_opt=module=github.com/retrovibed/retrovibed/shallows --go_out=. media/media.recent.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mrss/rss.proto=github.com/retrovibed/retrovibed/shallows/rss --go_opt=paths=import --go_opt=module=github.com/retrovibed/retrovibed/shallows --go_out=. rss/rss.proto"),
 		// remote control
-		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmedia.remote.control.proto=github.com/retrovibed/retrovibed/shallows/mediaapi --go_opt=Mmedia.proto=github.com/retrovibed/retrovibed/shallows/media --go_opt=Mmeta.daemon.proto=github.com/retrovibed/retrovibed/shallows/metaapi --go_opt=paths=source_relative --go_out=mediaapi media.remote.control.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmedia/media.remote.control.proto=github.com/retrovibed/retrovibed/shallows/mediaapi --go_opt=Mmedia/media.proto=github.com/retrovibed/retrovibed/shallows/media --go_opt=Mmeta/meta.daemon.proto=github.com/retrovibed/retrovibed/shallows/metaapi --go_opt=paths=import --go_opt=module=github.com/retrovibed/retrovibed/shallows --go_out=. media/media.remote.control.proto"),
 		// block cache
-		gruntime.New("protoc --proto_path=../.proto --go_opt=Mcontent.addressable.storage.proto=github.com/retrovibed/retroapi/deeppool --go_opt=paths=source_relative --go_out=../retroapi/deeppool content.addressable.storage.proto"),
-		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmedia.id.proto=github.com/retrovibed/retrovibed/retroapi/deeppool --go_opt=paths=source_relative --go_out=../retroapi/deeppool media.id.proto"),
+		// content.addressable.storage.proto's M value below doesn't actually match the
+		// retroapi module's real path (missing a "retrovibed" segment) - a pre-existing
+		// inconsistency, left untouched (paths=import requires the M value to start with
+		// module=, so this one keeps the old bucket-local-proto_path/source_relative form).
+		gruntime.New("protoc --proto_path=../.proto --proto_path=../.proto/media --go_opt=Mcontent.addressable.storage.proto=github.com/retrovibed/retroapi/deeppool --go_opt=paths=source_relative --go_out=../retroapi/deeppool content.addressable.storage.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmedia/media.id.proto=github.com/retrovibed/retrovibed/retroapi/deeppool --go_opt=paths=import --go_opt=module=github.com/retrovibed/retrovibed/retroapi --go_out=../retroapi media/media.id.proto"),
 		// community
-		gruntime.New("protoc --proto_path=../.proto --go_opt=Mcommunity.proto=github.com/retrovibed/retrovibed/shallows/communityapi --go_opt=paths=source_relative --go_out=communityapi community.proto"),
-		gruntime.New("protoc --proto_path=../.proto --go_opt=Mcommunity.metrics.proto=github.com/retrovibed/retrovibed/shallows/communityapi --go_opt=paths=source_relative --go_out=communityapi community.metrics.proto"),
-		gruntime.New("protoc --proto_path=../.proto --go_opt=Mcommunity.publish.proto=github.com/retrovibed/retrovibed/shallows/communityapi --go_opt=Mcommunity.proto=github.com/retrovibed/retrovibed/shallows/communityapi --go_opt=paths=source_relative --go_out=communityapi community.publish.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mcommunity/community.proto=github.com/retrovibed/retrovibed/shallows/communityapi --go_opt=paths=import --go_opt=module=github.com/retrovibed/retrovibed/shallows --go_out=. community/community.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mcommunity/community.metrics.proto=github.com/retrovibed/retrovibed/shallows/communityapi --go_opt=paths=import --go_opt=module=github.com/retrovibed/retrovibed/shallows --go_out=. community/community.metrics.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mcommunity/community.publish.proto=github.com/retrovibed/retrovibed/shallows/communityapi --go_opt=Mcommunity/community.proto=github.com/retrovibed/retrovibed/shallows/communityapi --go_opt=paths=import --go_opt=module=github.com/retrovibed/retrovibed/shallows --go_out=. community/community.publish.proto"),
 		// ddisc
-		gruntime.New("protoc --proto_path=../.proto --go_opt=Mddisc.peers.proto=github.com/retrovibed/retrovibed/shallows/ddiscapi --go_opt=paths=source_relative --go_out=ddiscapi ddisc.peers.proto"),
-		gruntime.New("protoc --proto_path=../.proto --go_opt=Mddisc.discovery.proto=github.com/retrovibed/retrovibed/shallows/ddiscapi --go_opt=Mmeta.search.proto=github.com/retrovibed/retrovibed/shallows/meta --go_opt=paths=source_relative --go_out=ddiscapi ddisc.discovery.proto"),
-		gruntime.New("protoc --proto_path=../.proto --go_opt=Mddisc.media.proto=github.com/retrovibed/retrovibed/shallows/ddiscapi --go_opt=Mmeta.search.proto=github.com/retrovibed/retrovibed/shallows/meta --go_opt=paths=source_relative --go_out=ddiscapi ddisc.media.proto"),
-		gruntime.New("protoc --proto_path=../.proto --go_opt=Mddisc.locate.proto=github.com/retrovibed/retrovibed/shallows/ddiscapi --go_opt=paths=source_relative --go_out=ddiscapi ddisc.locate.proto"),
-		gruntime.New("protoc --proto_path=../.proto --go_opt=Msearchplugin.proto=github.com/retrovibed/retrovibed/shallows/ddiscapi --go_opt=paths=source_relative --go_out=ddiscapi searchplugin.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mddisc/ddisc.peers.proto=github.com/retrovibed/retrovibed/shallows/ddiscapi --go_opt=paths=import --go_opt=module=github.com/retrovibed/retrovibed/shallows --go_out=. ddisc/ddisc.peers.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mddisc/ddisc.discovery.proto=github.com/retrovibed/retrovibed/shallows/ddiscapi --go_opt=Mmeta/meta.search.proto=github.com/retrovibed/retrovibed/shallows/meta --go_opt=paths=import --go_opt=module=github.com/retrovibed/retrovibed/shallows --go_out=. ddisc/ddisc.discovery.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mddisc/ddisc.media.proto=github.com/retrovibed/retrovibed/shallows/ddiscapi --go_opt=Mmeta/meta.search.proto=github.com/retrovibed/retrovibed/shallows/meta --go_opt=paths=import --go_opt=module=github.com/retrovibed/retrovibed/shallows --go_out=. ddisc/ddisc.media.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmedia/ddisc.locate.proto=github.com/retrovibed/retrovibed/shallows/ddiscapi --go_opt=paths=import --go_opt=module=github.com/retrovibed/retrovibed/shallows --go_out=. media/ddisc.locate.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mddisc/plugin/searchplugin.proto=github.com/retrovibed/retrovibed/shallows/ddiscapi --go_opt=paths=import --go_opt=module=github.com/retrovibed/retrovibed/shallows --go_out=. ddisc/plugin/searchplugin.proto"),
 		// ddisc.import.proto is generated only into retroapi/ddiscapi (not shallows/ddiscapi) —
 		// shallows code imports retroapi/ddiscapi directly for the Import type instead of
 		// duplicating its own copy, since two packages registering the same proto file into
 		// the global protobuf registry in the same binary panics at init.
-		gruntime.New("protoc --proto_path=../.proto --go_opt=Mddisc.import.proto=github.com/retrovibed/retrovibed/retroapi/ddiscapi --go_opt=paths=source_relative --go_out=../retroapi/ddiscapi ddisc.import.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mddisc/ddisc.import.proto=github.com/retrovibed/retrovibed/retroapi/ddiscapi --go_opt=paths=import --go_opt=module=github.com/retrovibed/retrovibed/retroapi --go_out=../retroapi ddisc/ddisc.import.proto"),
 		// settings
-		gruntime.New("protoc --proto_path=../.proto --go_opt=Mstorage.proto=github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/daemons --go_opt=paths=source_relative --go_out=cmd/retrovibe/daemons storage.proto"),
-		gruntime.New("protoc --proto_path=../.proto --go_opt=Mtorrent.proto=github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/daemons --go_opt=paths=source_relative --go_out=cmd/retrovibe/daemons torrent.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mstorage/storage.proto=github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/daemons --go_opt=paths=import --go_opt=module=github.com/retrovibed/retrovibed/shallows --go_out=. storage/storage.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mtorrents/torrent.proto=github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/daemons --go_opt=paths=import --go_opt=module=github.com/retrovibed/retrovibed/shallows --go_out=. torrents/torrent.proto"),
 	)
 }
 

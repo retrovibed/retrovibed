@@ -1,6 +1,6 @@
 // This is a generated file - do not edit.
 //
-// Generated from media.known.proto.
+// Generated from media/media.known.proto.
 
 // @dart = 3.3
 
@@ -15,7 +15,7 @@ import 'dart:core' as $core;
 import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
 
-import 'meta.search.pb.dart' as $0;
+import '../meta/meta.search.pb.dart' as $0;
 
 export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
 

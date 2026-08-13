@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package ddisc;
 
-import "meta.search.proto";
+import "meta/meta.search.proto";
 
 enum AcquisitionState {
   Unknown = 0;

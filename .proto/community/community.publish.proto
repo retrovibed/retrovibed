@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package retrovibed.community;
 
-import "community.proto";
+import "community/community.proto";
 
 message PublishedContent {
   string id = 1 [ json_name = "id" ];

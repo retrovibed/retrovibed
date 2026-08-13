@@ -1,6 +1,6 @@
 // This is a generated file - do not edit.
 //
-// Generated from meta.dht.proto.
+// Generated from meta/meta.dht.proto.
 
 // @dart = 3.3
 

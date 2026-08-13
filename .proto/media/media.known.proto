@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package media;
 
-import "meta.search.proto";
+import "meta/meta.search.proto";
 
 message Known {
   string id = 1 [ json_name = "id" ];

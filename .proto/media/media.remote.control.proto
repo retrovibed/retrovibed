@@ -2,8 +2,8 @@ syntax = "proto3";
 
 package media;
 
-import "media.proto";
-import "meta.daemon.proto";
+import "media/media.proto";
+import "meta/meta.daemon.proto";
 
 // enqueue a bit of media for playback.
 message Queue { Media media = 1 [ json_name = "media" ]; }

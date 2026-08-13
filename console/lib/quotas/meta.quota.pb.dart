@@ -1,6 +1,6 @@
 // This is a generated file - do not edit.
 //
-// Generated from meta.quota.proto.
+// Generated from quotas/meta.quota.proto.
 
 // @dart = 3.3
 

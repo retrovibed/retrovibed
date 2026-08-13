@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.12
 // 	protoc        v3.21.12
-// source: ddisc.locate.proto
+// source: media/ddisc.locate.proto
 
 package ddiscapi
 
@@ -39,7 +39,7 @@ type Locate struct {
 
 func (x *Locate) Reset() {
 	*x = Locate{}
-	mi := &file_ddisc_locate_proto_msgTypes[0]
+	mi := &file_media_ddisc_locate_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -51,7 +51,7 @@ func (x *Locate) String() string {
 func (*Locate) ProtoMessage() {}
 
 func (x *Locate) ProtoReflect() protoreflect.Message {
-	mi := &file_ddisc_locate_proto_msgTypes[0]
+	mi := &file_media_ddisc_locate_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -64,7 +64,7 @@ func (x *Locate) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Locate.ProtoReflect.Descriptor instead.
 func (*Locate) Descriptor() ([]byte, []int) {
-	return file_ddisc_locate_proto_rawDescGZIP(), []int{0}
+	return file_media_ddisc_locate_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *Locate) GetId() string {
@@ -148,7 +148,7 @@ type LocateSearchRequest struct {
 
 func (x *LocateSearchRequest) Reset() {
 	*x = LocateSearchRequest{}
-	mi := &file_ddisc_locate_proto_msgTypes[1]
+	mi := &file_media_ddisc_locate_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -160,7 +160,7 @@ func (x *LocateSearchRequest) String() string {
 func (*LocateSearchRequest) ProtoMessage() {}
 
 func (x *LocateSearchRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_ddisc_locate_proto_msgTypes[1]
+	mi := &file_media_ddisc_locate_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -173,7 +173,7 @@ func (x *LocateSearchRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LocateSearchRequest.ProtoReflect.Descriptor instead.
 func (*LocateSearchRequest) Descriptor() ([]byte, []int) {
-	return file_ddisc_locate_proto_rawDescGZIP(), []int{1}
+	return file_media_ddisc_locate_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *LocateSearchRequest) GetQuery() string {
@@ -207,7 +207,7 @@ type LocateSearchResponse struct {
 
 func (x *LocateSearchResponse) Reset() {
 	*x = LocateSearchResponse{}
-	mi := &file_ddisc_locate_proto_msgTypes[2]
+	mi := &file_media_ddisc_locate_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -219,7 +219,7 @@ func (x *LocateSearchResponse) String() string {
 func (*LocateSearchResponse) ProtoMessage() {}
 
 func (x *LocateSearchResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_ddisc_locate_proto_msgTypes[2]
+	mi := &file_media_ddisc_locate_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -232,7 +232,7 @@ func (x *LocateSearchResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LocateSearchResponse.ProtoReflect.Descriptor instead.
 func (*LocateSearchResponse) Descriptor() ([]byte, []int) {
-	return file_ddisc_locate_proto_rawDescGZIP(), []int{2}
+	return file_media_ddisc_locate_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *LocateSearchResponse) GetNext() *LocateSearchRequest {
@@ -257,7 +257,7 @@ type LocateLookupRequest struct {
 
 func (x *LocateLookupRequest) Reset() {
 	*x = LocateLookupRequest{}
-	mi := &file_ddisc_locate_proto_msgTypes[3]
+	mi := &file_media_ddisc_locate_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -269,7 +269,7 @@ func (x *LocateLookupRequest) String() string {
 func (*LocateLookupRequest) ProtoMessage() {}
 
 func (x *LocateLookupRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_ddisc_locate_proto_msgTypes[3]
+	mi := &file_media_ddisc_locate_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -282,7 +282,7 @@ func (x *LocateLookupRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LocateLookupRequest.ProtoReflect.Descriptor instead.
 func (*LocateLookupRequest) Descriptor() ([]byte, []int) {
-	return file_ddisc_locate_proto_rawDescGZIP(), []int{3}
+	return file_media_ddisc_locate_proto_rawDescGZIP(), []int{3}
 }
 
 type LocateLookupResponse struct {
@@ -294,7 +294,7 @@ type LocateLookupResponse struct {
 
 func (x *LocateLookupResponse) Reset() {
 	*x = LocateLookupResponse{}
-	mi := &file_ddisc_locate_proto_msgTypes[4]
+	mi := &file_media_ddisc_locate_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -306,7 +306,7 @@ func (x *LocateLookupResponse) String() string {
 func (*LocateLookupResponse) ProtoMessage() {}
 
 func (x *LocateLookupResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_ddisc_locate_proto_msgTypes[4]
+	mi := &file_media_ddisc_locate_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -319,7 +319,7 @@ func (x *LocateLookupResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LocateLookupResponse.ProtoReflect.Descriptor instead.
 func (*LocateLookupResponse) Descriptor() ([]byte, []int) {
-	return file_ddisc_locate_proto_rawDescGZIP(), []int{4}
+	return file_media_ddisc_locate_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *LocateLookupResponse) GetLocate() *Locate {
@@ -338,7 +338,7 @@ type LocateCreateRequest struct {
 
 func (x *LocateCreateRequest) Reset() {
 	*x = LocateCreateRequest{}
-	mi := &file_ddisc_locate_proto_msgTypes[5]
+	mi := &file_media_ddisc_locate_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -350,7 +350,7 @@ func (x *LocateCreateRequest) String() string {
 func (*LocateCreateRequest) ProtoMessage() {}
 
 func (x *LocateCreateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_ddisc_locate_proto_msgTypes[5]
+	mi := &file_media_ddisc_locate_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -363,7 +363,7 @@ func (x *LocateCreateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LocateCreateRequest.ProtoReflect.Descriptor instead.
 func (*LocateCreateRequest) Descriptor() ([]byte, []int) {
-	return file_ddisc_locate_proto_rawDescGZIP(), []int{5}
+	return file_media_ddisc_locate_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *LocateCreateRequest) GetLocate() *Locate {
@@ -382,7 +382,7 @@ type LocateCreateResponse struct {
 
 func (x *LocateCreateResponse) Reset() {
 	*x = LocateCreateResponse{}
-	mi := &file_ddisc_locate_proto_msgTypes[6]
+	mi := &file_media_ddisc_locate_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -394,7 +394,7 @@ func (x *LocateCreateResponse) String() string {
 func (*LocateCreateResponse) ProtoMessage() {}
 
 func (x *LocateCreateResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_ddisc_locate_proto_msgTypes[6]
+	mi := &file_media_ddisc_locate_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -407,7 +407,7 @@ func (x *LocateCreateResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LocateCreateResponse.ProtoReflect.Descriptor instead.
 func (*LocateCreateResponse) Descriptor() ([]byte, []int) {
-	return file_ddisc_locate_proto_rawDescGZIP(), []int{6}
+	return file_media_ddisc_locate_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *LocateCreateResponse) GetLocate() *Locate {
@@ -417,11 +417,11 @@ func (x *LocateCreateResponse) GetLocate() *Locate {
 	return nil
 }
 
-var File_ddisc_locate_proto protoreflect.FileDescriptor
+var File_media_ddisc_locate_proto protoreflect.FileDescriptor
 
-const file_ddisc_locate_proto_rawDesc = "" +
+const file_media_ddisc_locate_proto_rawDesc = "" +
 	"\n" +
-	"\x12ddisc.locate.proto\x12\x05ddisc\"\xc2\x02\n" +
+	"\x18media/ddisc.locate.proto\x12\x05ddisc\"\xc2\x02\n" +
 	"\x06Locate\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1e\n" +
 	"\n" +
@@ -454,19 +454,19 @@ const file_ddisc_locate_proto_rawDesc = "" +
 	"\x06locate\x18\x01 \x01(\v2\r.ddisc.LocateR\x06locateb\x06proto3"
 
 var (
-	file_ddisc_locate_proto_rawDescOnce sync.Once
-	file_ddisc_locate_proto_rawDescData []byte
+	file_media_ddisc_locate_proto_rawDescOnce sync.Once
+	file_media_ddisc_locate_proto_rawDescData []byte
 )
 
-func file_ddisc_locate_proto_rawDescGZIP() []byte {
-	file_ddisc_locate_proto_rawDescOnce.Do(func() {
-		file_ddisc_locate_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_ddisc_locate_proto_rawDesc), len(file_ddisc_locate_proto_rawDesc)))
+func file_media_ddisc_locate_proto_rawDescGZIP() []byte {
+	file_media_ddisc_locate_proto_rawDescOnce.Do(func() {
+		file_media_ddisc_locate_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_media_ddisc_locate_proto_rawDesc), len(file_media_ddisc_locate_proto_rawDesc)))
 	})
-	return file_ddisc_locate_proto_rawDescData
+	return file_media_ddisc_locate_proto_rawDescData
 }
 
-var file_ddisc_locate_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
-var file_ddisc_locate_proto_goTypes = []any{
+var file_media_ddisc_locate_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_media_ddisc_locate_proto_goTypes = []any{
 	(*Locate)(nil),               // 0: ddisc.Locate
 	(*LocateSearchRequest)(nil),  // 1: ddisc.LocateSearchRequest
 	(*LocateSearchResponse)(nil), // 2: ddisc.LocateSearchResponse
@@ -475,7 +475,7 @@ var file_ddisc_locate_proto_goTypes = []any{
 	(*LocateCreateRequest)(nil),  // 5: ddisc.LocateCreateRequest
 	(*LocateCreateResponse)(nil), // 6: ddisc.LocateCreateResponse
 }
-var file_ddisc_locate_proto_depIdxs = []int32{
+var file_media_ddisc_locate_proto_depIdxs = []int32{
 	1, // 0: ddisc.LocateSearchResponse.next:type_name -> ddisc.LocateSearchRequest
 	0, // 1: ddisc.LocateSearchResponse.items:type_name -> ddisc.Locate
 	0, // 2: ddisc.LocateLookupResponse.locate:type_name -> ddisc.Locate
@@ -488,26 +488,26 @@ var file_ddisc_locate_proto_depIdxs = []int32{
 	0, // [0:5] is the sub-list for field type_name
 }
 
-func init() { file_ddisc_locate_proto_init() }
-func file_ddisc_locate_proto_init() {
-	if File_ddisc_locate_proto != nil {
+func init() { file_media_ddisc_locate_proto_init() }
+func file_media_ddisc_locate_proto_init() {
+	if File_media_ddisc_locate_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_ddisc_locate_proto_rawDesc), len(file_ddisc_locate_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_media_ddisc_locate_proto_rawDesc), len(file_media_ddisc_locate_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_ddisc_locate_proto_goTypes,
-		DependencyIndexes: file_ddisc_locate_proto_depIdxs,
-		MessageInfos:      file_ddisc_locate_proto_msgTypes,
+		GoTypes:           file_media_ddisc_locate_proto_goTypes,
+		DependencyIndexes: file_media_ddisc_locate_proto_depIdxs,
+		MessageInfos:      file_media_ddisc_locate_proto_msgTypes,
 	}.Build()
-	File_ddisc_locate_proto = out.File
-	file_ddisc_locate_proto_goTypes = nil
-	file_ddisc_locate_proto_depIdxs = nil
+	File_media_ddisc_locate_proto = out.File
+	file_media_ddisc_locate_proto_goTypes = nil
+	file_media_ddisc_locate_proto_depIdxs = nil
 }

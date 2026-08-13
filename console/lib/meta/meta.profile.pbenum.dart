@@ -1,6 +1,6 @@
 // This is a generated file - do not edit.
 //
-// Generated from meta.profile.proto.
+// Generated from meta/meta.profile.proto.
 
 // @dart = 3.3
 

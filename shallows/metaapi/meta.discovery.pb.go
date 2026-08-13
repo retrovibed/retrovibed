@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.12
 // 	protoc        v3.21.12
-// source: meta.discovery.proto
+// source: meta/meta.discovery.proto
 
 package metaapi
 
@@ -42,7 +42,7 @@ type DiscoveryDiagnostics struct {
 
 func (x *DiscoveryDiagnostics) Reset() {
 	*x = DiscoveryDiagnostics{}
-	mi := &file_meta_discovery_proto_msgTypes[0]
+	mi := &file_meta_meta_discovery_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -54,7 +54,7 @@ func (x *DiscoveryDiagnostics) String() string {
 func (*DiscoveryDiagnostics) ProtoMessage() {}
 
 func (x *DiscoveryDiagnostics) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_discovery_proto_msgTypes[0]
+	mi := &file_meta_meta_discovery_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -67,7 +67,7 @@ func (x *DiscoveryDiagnostics) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DiscoveryDiagnostics.ProtoReflect.Descriptor instead.
 func (*DiscoveryDiagnostics) Descriptor() ([]byte, []int) {
-	return file_meta_discovery_proto_rawDescGZIP(), []int{0}
+	return file_meta_meta_discovery_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *DiscoveryDiagnostics) GetEnabled() bool {
@@ -170,7 +170,7 @@ type DiscoveryMetricsResponse struct {
 
 func (x *DiscoveryMetricsResponse) Reset() {
 	*x = DiscoveryMetricsResponse{}
-	mi := &file_meta_discovery_proto_msgTypes[1]
+	mi := &file_meta_meta_discovery_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -182,7 +182,7 @@ func (x *DiscoveryMetricsResponse) String() string {
 func (*DiscoveryMetricsResponse) ProtoMessage() {}
 
 func (x *DiscoveryMetricsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_discovery_proto_msgTypes[1]
+	mi := &file_meta_meta_discovery_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -195,7 +195,7 @@ func (x *DiscoveryMetricsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DiscoveryMetricsResponse.ProtoReflect.Descriptor instead.
 func (*DiscoveryMetricsResponse) Descriptor() ([]byte, []int) {
-	return file_meta_discovery_proto_rawDescGZIP(), []int{1}
+	return file_meta_meta_discovery_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *DiscoveryMetricsResponse) GetDiscovery() *DiscoveryDiagnostics {
@@ -205,11 +205,11 @@ func (x *DiscoveryMetricsResponse) GetDiscovery() *DiscoveryDiagnostics {
 	return nil
 }
 
-var File_meta_discovery_proto protoreflect.FileDescriptor
+var File_meta_meta_discovery_proto protoreflect.FileDescriptor
 
-const file_meta_discovery_proto_rawDesc = "" +
+const file_meta_meta_discovery_proto_rawDesc = "" +
 	"\n" +
-	"\x14meta.discovery.proto\x12\x04meta\"\x94\x03\n" +
+	"\x19meta/meta.discovery.proto\x12\x04meta\"\x94\x03\n" +
 	"\x14DiscoveryDiagnostics\x12\x18\n" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12\x14\n" +
 	"\x05ratio\x18\x02 \x01(\rR\x05ratio\x12\x1e\n" +
@@ -231,23 +231,23 @@ const file_meta_discovery_proto_rawDesc = "" +
 	"\tdiscovery\x18\x01 \x01(\v2\x1a.meta.DiscoveryDiagnosticsR\tdiscoveryb\x06proto3"
 
 var (
-	file_meta_discovery_proto_rawDescOnce sync.Once
-	file_meta_discovery_proto_rawDescData []byte
+	file_meta_meta_discovery_proto_rawDescOnce sync.Once
+	file_meta_meta_discovery_proto_rawDescData []byte
 )
 
-func file_meta_discovery_proto_rawDescGZIP() []byte {
-	file_meta_discovery_proto_rawDescOnce.Do(func() {
-		file_meta_discovery_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_meta_discovery_proto_rawDesc), len(file_meta_discovery_proto_rawDesc)))
+func file_meta_meta_discovery_proto_rawDescGZIP() []byte {
+	file_meta_meta_discovery_proto_rawDescOnce.Do(func() {
+		file_meta_meta_discovery_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_meta_meta_discovery_proto_rawDesc), len(file_meta_meta_discovery_proto_rawDesc)))
 	})
-	return file_meta_discovery_proto_rawDescData
+	return file_meta_meta_discovery_proto_rawDescData
 }
 
-var file_meta_discovery_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-var file_meta_discovery_proto_goTypes = []any{
+var file_meta_meta_discovery_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_meta_meta_discovery_proto_goTypes = []any{
 	(*DiscoveryDiagnostics)(nil),     // 0: meta.DiscoveryDiagnostics
 	(*DiscoveryMetricsResponse)(nil), // 1: meta.DiscoveryMetricsResponse
 }
-var file_meta_discovery_proto_depIdxs = []int32{
+var file_meta_meta_discovery_proto_depIdxs = []int32{
 	0, // 0: meta.DiscoveryMetricsResponse.discovery:type_name -> meta.DiscoveryDiagnostics
 	1, // [1:1] is the sub-list for method output_type
 	1, // [1:1] is the sub-list for method input_type
@@ -256,26 +256,26 @@ var file_meta_discovery_proto_depIdxs = []int32{
 	0, // [0:1] is the sub-list for field type_name
 }
 
-func init() { file_meta_discovery_proto_init() }
-func file_meta_discovery_proto_init() {
-	if File_meta_discovery_proto != nil {
+func init() { file_meta_meta_discovery_proto_init() }
+func file_meta_meta_discovery_proto_init() {
+	if File_meta_meta_discovery_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_meta_discovery_proto_rawDesc), len(file_meta_discovery_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_meta_meta_discovery_proto_rawDesc), len(file_meta_meta_discovery_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_meta_discovery_proto_goTypes,
-		DependencyIndexes: file_meta_discovery_proto_depIdxs,
-		MessageInfos:      file_meta_discovery_proto_msgTypes,
+		GoTypes:           file_meta_meta_discovery_proto_goTypes,
+		DependencyIndexes: file_meta_meta_discovery_proto_depIdxs,
+		MessageInfos:      file_meta_meta_discovery_proto_msgTypes,
 	}.Build()
-	File_meta_discovery_proto = out.File
-	file_meta_discovery_proto_goTypes = nil
-	file_meta_discovery_proto_depIdxs = nil
+	File_meta_meta_discovery_proto = out.File
+	file_meta_meta_discovery_proto_goTypes = nil
+	file_meta_meta_discovery_proto_depIdxs = nil
 }

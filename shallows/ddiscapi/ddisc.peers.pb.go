@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.12
 // 	protoc        v3.21.12
-// source: ddisc.peers.proto
+// source: ddisc/ddisc.peers.proto
 
 package ddiscapi
 
@@ -37,7 +37,7 @@ type Peer struct {
 
 func (x *Peer) Reset() {
 	*x = Peer{}
-	mi := &file_ddisc_peers_proto_msgTypes[0]
+	mi := &file_ddisc_ddisc_peers_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -49,7 +49,7 @@ func (x *Peer) String() string {
 func (*Peer) ProtoMessage() {}
 
 func (x *Peer) ProtoReflect() protoreflect.Message {
-	mi := &file_ddisc_peers_proto_msgTypes[0]
+	mi := &file_ddisc_ddisc_peers_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -62,7 +62,7 @@ func (x *Peer) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Peer.ProtoReflect.Descriptor instead.
 func (*Peer) Descriptor() ([]byte, []int) {
-	return file_ddisc_peers_proto_rawDescGZIP(), []int{0}
+	return file_ddisc_ddisc_peers_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *Peer) GetId() string {
@@ -132,7 +132,7 @@ type PeerSearchRequest struct {
 
 func (x *PeerSearchRequest) Reset() {
 	*x = PeerSearchRequest{}
-	mi := &file_ddisc_peers_proto_msgTypes[1]
+	mi := &file_ddisc_ddisc_peers_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -144,7 +144,7 @@ func (x *PeerSearchRequest) String() string {
 func (*PeerSearchRequest) ProtoMessage() {}
 
 func (x *PeerSearchRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_ddisc_peers_proto_msgTypes[1]
+	mi := &file_ddisc_ddisc_peers_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -157,7 +157,7 @@ func (x *PeerSearchRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PeerSearchRequest.ProtoReflect.Descriptor instead.
 func (*PeerSearchRequest) Descriptor() ([]byte, []int) {
-	return file_ddisc_peers_proto_rawDescGZIP(), []int{1}
+	return file_ddisc_ddisc_peers_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *PeerSearchRequest) GetQuery() string {
@@ -191,7 +191,7 @@ type PeerSearchResponse struct {
 
 func (x *PeerSearchResponse) Reset() {
 	*x = PeerSearchResponse{}
-	mi := &file_ddisc_peers_proto_msgTypes[2]
+	mi := &file_ddisc_ddisc_peers_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -203,7 +203,7 @@ func (x *PeerSearchResponse) String() string {
 func (*PeerSearchResponse) ProtoMessage() {}
 
 func (x *PeerSearchResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_ddisc_peers_proto_msgTypes[2]
+	mi := &file_ddisc_ddisc_peers_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -216,7 +216,7 @@ func (x *PeerSearchResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PeerSearchResponse.ProtoReflect.Descriptor instead.
 func (*PeerSearchResponse) Descriptor() ([]byte, []int) {
-	return file_ddisc_peers_proto_rawDescGZIP(), []int{2}
+	return file_ddisc_ddisc_peers_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *PeerSearchResponse) GetNext() *PeerSearchRequest {
@@ -242,7 +242,7 @@ type PeerCreateRequest struct {
 
 func (x *PeerCreateRequest) Reset() {
 	*x = PeerCreateRequest{}
-	mi := &file_ddisc_peers_proto_msgTypes[3]
+	mi := &file_ddisc_ddisc_peers_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -254,7 +254,7 @@ func (x *PeerCreateRequest) String() string {
 func (*PeerCreateRequest) ProtoMessage() {}
 
 func (x *PeerCreateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_ddisc_peers_proto_msgTypes[3]
+	mi := &file_ddisc_ddisc_peers_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -267,7 +267,7 @@ func (x *PeerCreateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PeerCreateRequest.ProtoReflect.Descriptor instead.
 func (*PeerCreateRequest) Descriptor() ([]byte, []int) {
-	return file_ddisc_peers_proto_rawDescGZIP(), []int{3}
+	return file_ddisc_ddisc_peers_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *PeerCreateRequest) GetPeer() *Peer {
@@ -286,7 +286,7 @@ type PeerCreateResponse struct {
 
 func (x *PeerCreateResponse) Reset() {
 	*x = PeerCreateResponse{}
-	mi := &file_ddisc_peers_proto_msgTypes[4]
+	mi := &file_ddisc_ddisc_peers_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -298,7 +298,7 @@ func (x *PeerCreateResponse) String() string {
 func (*PeerCreateResponse) ProtoMessage() {}
 
 func (x *PeerCreateResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_ddisc_peers_proto_msgTypes[4]
+	mi := &file_ddisc_ddisc_peers_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -311,7 +311,7 @@ func (x *PeerCreateResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PeerCreateResponse.ProtoReflect.Descriptor instead.
 func (*PeerCreateResponse) Descriptor() ([]byte, []int) {
-	return file_ddisc_peers_proto_rawDescGZIP(), []int{4}
+	return file_ddisc_ddisc_peers_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *PeerCreateResponse) GetPeer() *Peer {
@@ -329,7 +329,7 @@ type PeerSyncRequest struct {
 
 func (x *PeerSyncRequest) Reset() {
 	*x = PeerSyncRequest{}
-	mi := &file_ddisc_peers_proto_msgTypes[5]
+	mi := &file_ddisc_ddisc_peers_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -341,7 +341,7 @@ func (x *PeerSyncRequest) String() string {
 func (*PeerSyncRequest) ProtoMessage() {}
 
 func (x *PeerSyncRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_ddisc_peers_proto_msgTypes[5]
+	mi := &file_ddisc_ddisc_peers_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -354,7 +354,7 @@ func (x *PeerSyncRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PeerSyncRequest.ProtoReflect.Descriptor instead.
 func (*PeerSyncRequest) Descriptor() ([]byte, []int) {
-	return file_ddisc_peers_proto_rawDescGZIP(), []int{5}
+	return file_ddisc_ddisc_peers_proto_rawDescGZIP(), []int{5}
 }
 
 type PeerSyncResponse struct {
@@ -366,7 +366,7 @@ type PeerSyncResponse struct {
 
 func (x *PeerSyncResponse) Reset() {
 	*x = PeerSyncResponse{}
-	mi := &file_ddisc_peers_proto_msgTypes[6]
+	mi := &file_ddisc_ddisc_peers_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -378,7 +378,7 @@ func (x *PeerSyncResponse) String() string {
 func (*PeerSyncResponse) ProtoMessage() {}
 
 func (x *PeerSyncResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_ddisc_peers_proto_msgTypes[6]
+	mi := &file_ddisc_ddisc_peers_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -391,7 +391,7 @@ func (x *PeerSyncResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PeerSyncResponse.ProtoReflect.Descriptor instead.
 func (*PeerSyncResponse) Descriptor() ([]byte, []int) {
-	return file_ddisc_peers_proto_rawDescGZIP(), []int{6}
+	return file_ddisc_ddisc_peers_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *PeerSyncResponse) GetPeer() *Peer {
@@ -409,7 +409,7 @@ type PeerFindRequest struct {
 
 func (x *PeerFindRequest) Reset() {
 	*x = PeerFindRequest{}
-	mi := &file_ddisc_peers_proto_msgTypes[7]
+	mi := &file_ddisc_ddisc_peers_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -421,7 +421,7 @@ func (x *PeerFindRequest) String() string {
 func (*PeerFindRequest) ProtoMessage() {}
 
 func (x *PeerFindRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_ddisc_peers_proto_msgTypes[7]
+	mi := &file_ddisc_ddisc_peers_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -434,7 +434,7 @@ func (x *PeerFindRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PeerFindRequest.ProtoReflect.Descriptor instead.
 func (*PeerFindRequest) Descriptor() ([]byte, []int) {
-	return file_ddisc_peers_proto_rawDescGZIP(), []int{7}
+	return file_ddisc_ddisc_peers_proto_rawDescGZIP(), []int{7}
 }
 
 type PeerFindResponse struct {
@@ -446,7 +446,7 @@ type PeerFindResponse struct {
 
 func (x *PeerFindResponse) Reset() {
 	*x = PeerFindResponse{}
-	mi := &file_ddisc_peers_proto_msgTypes[8]
+	mi := &file_ddisc_ddisc_peers_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -458,7 +458,7 @@ func (x *PeerFindResponse) String() string {
 func (*PeerFindResponse) ProtoMessage() {}
 
 func (x *PeerFindResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_ddisc_peers_proto_msgTypes[8]
+	mi := &file_ddisc_ddisc_peers_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -471,7 +471,7 @@ func (x *PeerFindResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PeerFindResponse.ProtoReflect.Descriptor instead.
 func (*PeerFindResponse) Descriptor() ([]byte, []int) {
-	return file_ddisc_peers_proto_rawDescGZIP(), []int{8}
+	return file_ddisc_ddisc_peers_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *PeerFindResponse) GetPeer() *Peer {
@@ -490,7 +490,7 @@ type PeerUpdateRequest struct {
 
 func (x *PeerUpdateRequest) Reset() {
 	*x = PeerUpdateRequest{}
-	mi := &file_ddisc_peers_proto_msgTypes[9]
+	mi := &file_ddisc_ddisc_peers_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -502,7 +502,7 @@ func (x *PeerUpdateRequest) String() string {
 func (*PeerUpdateRequest) ProtoMessage() {}
 
 func (x *PeerUpdateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_ddisc_peers_proto_msgTypes[9]
+	mi := &file_ddisc_ddisc_peers_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -515,7 +515,7 @@ func (x *PeerUpdateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PeerUpdateRequest.ProtoReflect.Descriptor instead.
 func (*PeerUpdateRequest) Descriptor() ([]byte, []int) {
-	return file_ddisc_peers_proto_rawDescGZIP(), []int{9}
+	return file_ddisc_ddisc_peers_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *PeerUpdateRequest) GetPeer() *Peer {
@@ -534,7 +534,7 @@ type PeerUpdateResponse struct {
 
 func (x *PeerUpdateResponse) Reset() {
 	*x = PeerUpdateResponse{}
-	mi := &file_ddisc_peers_proto_msgTypes[10]
+	mi := &file_ddisc_ddisc_peers_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -546,7 +546,7 @@ func (x *PeerUpdateResponse) String() string {
 func (*PeerUpdateResponse) ProtoMessage() {}
 
 func (x *PeerUpdateResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_ddisc_peers_proto_msgTypes[10]
+	mi := &file_ddisc_ddisc_peers_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -559,7 +559,7 @@ func (x *PeerUpdateResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PeerUpdateResponse.ProtoReflect.Descriptor instead.
 func (*PeerUpdateResponse) Descriptor() ([]byte, []int) {
-	return file_ddisc_peers_proto_rawDescGZIP(), []int{10}
+	return file_ddisc_ddisc_peers_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *PeerUpdateResponse) GetPeer() *Peer {
@@ -577,7 +577,7 @@ type PeerDeleteRequest struct {
 
 func (x *PeerDeleteRequest) Reset() {
 	*x = PeerDeleteRequest{}
-	mi := &file_ddisc_peers_proto_msgTypes[11]
+	mi := &file_ddisc_ddisc_peers_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -589,7 +589,7 @@ func (x *PeerDeleteRequest) String() string {
 func (*PeerDeleteRequest) ProtoMessage() {}
 
 func (x *PeerDeleteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_ddisc_peers_proto_msgTypes[11]
+	mi := &file_ddisc_ddisc_peers_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -602,7 +602,7 @@ func (x *PeerDeleteRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PeerDeleteRequest.ProtoReflect.Descriptor instead.
 func (*PeerDeleteRequest) Descriptor() ([]byte, []int) {
-	return file_ddisc_peers_proto_rawDescGZIP(), []int{11}
+	return file_ddisc_ddisc_peers_proto_rawDescGZIP(), []int{11}
 }
 
 type PeerDeleteResponse struct {
@@ -614,7 +614,7 @@ type PeerDeleteResponse struct {
 
 func (x *PeerDeleteResponse) Reset() {
 	*x = PeerDeleteResponse{}
-	mi := &file_ddisc_peers_proto_msgTypes[12]
+	mi := &file_ddisc_ddisc_peers_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -626,7 +626,7 @@ func (x *PeerDeleteResponse) String() string {
 func (*PeerDeleteResponse) ProtoMessage() {}
 
 func (x *PeerDeleteResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_ddisc_peers_proto_msgTypes[12]
+	mi := &file_ddisc_ddisc_peers_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -639,7 +639,7 @@ func (x *PeerDeleteResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PeerDeleteResponse.ProtoReflect.Descriptor instead.
 func (*PeerDeleteResponse) Descriptor() ([]byte, []int) {
-	return file_ddisc_peers_proto_rawDescGZIP(), []int{12}
+	return file_ddisc_ddisc_peers_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *PeerDeleteResponse) GetPeer() *Peer {
@@ -649,11 +649,11 @@ func (x *PeerDeleteResponse) GetPeer() *Peer {
 	return nil
 }
 
-var File_ddisc_peers_proto protoreflect.FileDescriptor
+var File_ddisc_ddisc_peers_proto protoreflect.FileDescriptor
 
-const file_ddisc_peers_proto_rawDesc = "" +
+const file_ddisc_ddisc_peers_proto_rawDesc = "" +
 	"\n" +
-	"\x11ddisc.peers.proto\x12\x05ddisc\"\xdf\x01\n" +
+	"\x17ddisc/ddisc.peers.proto\x12\x05ddisc\"\xdf\x01\n" +
 	"\x04Peer\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
 	"\binfohash\x18\x02 \x01(\fR\binfohash\x12\x1e\n" +
@@ -693,19 +693,19 @@ const file_ddisc_peers_proto_rawDesc = "" +
 	"\x04peer\x18\x01 \x01(\v2\v.ddisc.PeerR\x04peerb\x06proto3"
 
 var (
-	file_ddisc_peers_proto_rawDescOnce sync.Once
-	file_ddisc_peers_proto_rawDescData []byte
+	file_ddisc_ddisc_peers_proto_rawDescOnce sync.Once
+	file_ddisc_ddisc_peers_proto_rawDescData []byte
 )
 
-func file_ddisc_peers_proto_rawDescGZIP() []byte {
-	file_ddisc_peers_proto_rawDescOnce.Do(func() {
-		file_ddisc_peers_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_ddisc_peers_proto_rawDesc), len(file_ddisc_peers_proto_rawDesc)))
+func file_ddisc_ddisc_peers_proto_rawDescGZIP() []byte {
+	file_ddisc_ddisc_peers_proto_rawDescOnce.Do(func() {
+		file_ddisc_ddisc_peers_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_ddisc_ddisc_peers_proto_rawDesc), len(file_ddisc_ddisc_peers_proto_rawDesc)))
 	})
-	return file_ddisc_peers_proto_rawDescData
+	return file_ddisc_ddisc_peers_proto_rawDescData
 }
 
-var file_ddisc_peers_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
-var file_ddisc_peers_proto_goTypes = []any{
+var file_ddisc_ddisc_peers_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
+var file_ddisc_ddisc_peers_proto_goTypes = []any{
 	(*Peer)(nil),               // 0: ddisc.Peer
 	(*PeerSearchRequest)(nil),  // 1: ddisc.PeerSearchRequest
 	(*PeerSearchResponse)(nil), // 2: ddisc.PeerSearchResponse
@@ -720,7 +720,7 @@ var file_ddisc_peers_proto_goTypes = []any{
 	(*PeerDeleteRequest)(nil),  // 11: ddisc.PeerDeleteRequest
 	(*PeerDeleteResponse)(nil), // 12: ddisc.PeerDeleteResponse
 }
-var file_ddisc_peers_proto_depIdxs = []int32{
+var file_ddisc_ddisc_peers_proto_depIdxs = []int32{
 	1, // 0: ddisc.PeerSearchResponse.next:type_name -> ddisc.PeerSearchRequest
 	0, // 1: ddisc.PeerSearchResponse.items:type_name -> ddisc.Peer
 	0, // 2: ddisc.PeerCreateRequest.peer:type_name -> ddisc.Peer
@@ -737,26 +737,26 @@ var file_ddisc_peers_proto_depIdxs = []int32{
 	0, // [0:9] is the sub-list for field type_name
 }
 
-func init() { file_ddisc_peers_proto_init() }
-func file_ddisc_peers_proto_init() {
-	if File_ddisc_peers_proto != nil {
+func init() { file_ddisc_ddisc_peers_proto_init() }
+func file_ddisc_ddisc_peers_proto_init() {
+	if File_ddisc_ddisc_peers_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_ddisc_peers_proto_rawDesc), len(file_ddisc_peers_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_ddisc_ddisc_peers_proto_rawDesc), len(file_ddisc_ddisc_peers_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_ddisc_peers_proto_goTypes,
-		DependencyIndexes: file_ddisc_peers_proto_depIdxs,
-		MessageInfos:      file_ddisc_peers_proto_msgTypes,
+		GoTypes:           file_ddisc_ddisc_peers_proto_goTypes,
+		DependencyIndexes: file_ddisc_ddisc_peers_proto_depIdxs,
+		MessageInfos:      file_ddisc_ddisc_peers_proto_msgTypes,
 	}.Build()
-	File_ddisc_peers_proto = out.File
-	file_ddisc_peers_proto_goTypes = nil
-	file_ddisc_peers_proto_depIdxs = nil
+	File_ddisc_ddisc_peers_proto = out.File
+	file_ddisc_ddisc_peers_proto_goTypes = nil
+	file_ddisc_ddisc_peers_proto_depIdxs = nil
 }

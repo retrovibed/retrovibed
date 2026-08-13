@@ -1,6 +1,6 @@
 // This is a generated file - do not edit.
 //
-// Generated from media.remote.control.proto.
+// Generated from media/media.remote.control.proto.
 
 // @dart = 3.3
 

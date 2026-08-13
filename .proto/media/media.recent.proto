@@ -2,8 +2,8 @@ syntax = "proto3";
 
 package media;
 
-import "media.proto";
-import "meta.search.proto";
+import "media/media.proto";
+import "meta/meta.search.proto";
 
 message RecentSearchRequest {
   meta.DateRange created = 1 [ json_name = "created" ];

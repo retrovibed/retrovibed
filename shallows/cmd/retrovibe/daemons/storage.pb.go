@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.12
 // 	protoc        v3.21.12
-// source: storage.proto
+// source: storage/storage.proto
 
 package daemons
 
@@ -31,7 +31,7 @@ type Local struct {
 
 func (x *Local) Reset() {
 	*x = Local{}
-	mi := &file_storage_proto_msgTypes[0]
+	mi := &file_storage_storage_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -43,7 +43,7 @@ func (x *Local) String() string {
 func (*Local) ProtoMessage() {}
 
 func (x *Local) ProtoReflect() protoreflect.Message {
-	mi := &file_storage_proto_msgTypes[0]
+	mi := &file_storage_storage_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -56,7 +56,7 @@ func (x *Local) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Local.ProtoReflect.Descriptor instead.
 func (*Local) Descriptor() ([]byte, []int) {
-	return file_storage_proto_rawDescGZIP(), []int{0}
+	return file_storage_storage_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *Local) GetReclaim() bool {
@@ -82,7 +82,7 @@ type StorageSettingsRequest struct {
 
 func (x *StorageSettingsRequest) Reset() {
 	*x = StorageSettingsRequest{}
-	mi := &file_storage_proto_msgTypes[1]
+	mi := &file_storage_storage_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -94,7 +94,7 @@ func (x *StorageSettingsRequest) String() string {
 func (*StorageSettingsRequest) ProtoMessage() {}
 
 func (x *StorageSettingsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_storage_proto_msgTypes[1]
+	mi := &file_storage_storage_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -107,7 +107,7 @@ func (x *StorageSettingsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StorageSettingsRequest.ProtoReflect.Descriptor instead.
 func (*StorageSettingsRequest) Descriptor() ([]byte, []int) {
-	return file_storage_proto_rawDescGZIP(), []int{1}
+	return file_storage_storage_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *StorageSettingsRequest) GetLocal() *Local {
@@ -126,7 +126,7 @@ type StorageSettingsResponse struct {
 
 func (x *StorageSettingsResponse) Reset() {
 	*x = StorageSettingsResponse{}
-	mi := &file_storage_proto_msgTypes[2]
+	mi := &file_storage_storage_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -138,7 +138,7 @@ func (x *StorageSettingsResponse) String() string {
 func (*StorageSettingsResponse) ProtoMessage() {}
 
 func (x *StorageSettingsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_storage_proto_msgTypes[2]
+	mi := &file_storage_storage_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -151,7 +151,7 @@ func (x *StorageSettingsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StorageSettingsResponse.ProtoReflect.Descriptor instead.
 func (*StorageSettingsResponse) Descriptor() ([]byte, []int) {
-	return file_storage_proto_rawDescGZIP(), []int{2}
+	return file_storage_storage_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *StorageSettingsResponse) GetLocal() *Local {
@@ -161,11 +161,11 @@ func (x *StorageSettingsResponse) GetLocal() *Local {
 	return nil
 }
 
-var File_storage_proto protoreflect.FileDescriptor
+var File_storage_storage_proto protoreflect.FileDescriptor
 
-const file_storage_proto_rawDesc = "" +
+const file_storage_storage_proto_rawDesc = "" +
 	"\n" +
-	"\rstorage.proto\x12\astorage\";\n" +
+	"\x15storage/storage.proto\x12\astorage\";\n" +
 	"\x05Local\x12\x18\n" +
 	"\areclaim\x18\x01 \x01(\bR\areclaim\x12\x18\n" +
 	"\amaximum\x18\x02 \x01(\x04R\amaximum\">\n" +
@@ -175,24 +175,24 @@ const file_storage_proto_rawDesc = "" +
 	"\x05local\x18\x01 \x01(\v2\x0e.storage.LocalR\x05localb\x06proto3"
 
 var (
-	file_storage_proto_rawDescOnce sync.Once
-	file_storage_proto_rawDescData []byte
+	file_storage_storage_proto_rawDescOnce sync.Once
+	file_storage_storage_proto_rawDescData []byte
 )
 
-func file_storage_proto_rawDescGZIP() []byte {
-	file_storage_proto_rawDescOnce.Do(func() {
-		file_storage_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_storage_proto_rawDesc), len(file_storage_proto_rawDesc)))
+func file_storage_storage_proto_rawDescGZIP() []byte {
+	file_storage_storage_proto_rawDescOnce.Do(func() {
+		file_storage_storage_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_storage_storage_proto_rawDesc), len(file_storage_storage_proto_rawDesc)))
 	})
-	return file_storage_proto_rawDescData
+	return file_storage_storage_proto_rawDescData
 }
 
-var file_storage_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
-var file_storage_proto_goTypes = []any{
+var file_storage_storage_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_storage_storage_proto_goTypes = []any{
 	(*Local)(nil),                   // 0: storage.Local
 	(*StorageSettingsRequest)(nil),  // 1: storage.StorageSettingsRequest
 	(*StorageSettingsResponse)(nil), // 2: storage.StorageSettingsResponse
 }
-var file_storage_proto_depIdxs = []int32{
+var file_storage_storage_proto_depIdxs = []int32{
 	0, // 0: storage.StorageSettingsRequest.local:type_name -> storage.Local
 	0, // 1: storage.StorageSettingsResponse.local:type_name -> storage.Local
 	2, // [2:2] is the sub-list for method output_type
@@ -202,26 +202,26 @@ var file_storage_proto_depIdxs = []int32{
 	0, // [0:2] is the sub-list for field type_name
 }
 
-func init() { file_storage_proto_init() }
-func file_storage_proto_init() {
-	if File_storage_proto != nil {
+func init() { file_storage_storage_proto_init() }
+func file_storage_storage_proto_init() {
+	if File_storage_storage_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_storage_proto_rawDesc), len(file_storage_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_storage_storage_proto_rawDesc), len(file_storage_storage_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_storage_proto_goTypes,
-		DependencyIndexes: file_storage_proto_depIdxs,
-		MessageInfos:      file_storage_proto_msgTypes,
+		GoTypes:           file_storage_storage_proto_goTypes,
+		DependencyIndexes: file_storage_storage_proto_depIdxs,
+		MessageInfos:      file_storage_storage_proto_msgTypes,
 	}.Build()
-	File_storage_proto = out.File
-	file_storage_proto_goTypes = nil
-	file_storage_proto_depIdxs = nil
+	File_storage_storage_proto = out.File
+	file_storage_storage_proto_goTypes = nil
+	file_storage_storage_proto_depIdxs = nil
 }

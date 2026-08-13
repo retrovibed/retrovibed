@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.12
 // 	protoc        v3.21.12
-// source: meta.network.proto
+// source: meta/meta.network.proto
 
 package metaapi
 
@@ -35,7 +35,7 @@ type WireguardDiagnostics struct {
 
 func (x *WireguardDiagnostics) Reset() {
 	*x = WireguardDiagnostics{}
-	mi := &file_meta_network_proto_msgTypes[0]
+	mi := &file_meta_meta_network_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -47,7 +47,7 @@ func (x *WireguardDiagnostics) String() string {
 func (*WireguardDiagnostics) ProtoMessage() {}
 
 func (x *WireguardDiagnostics) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_network_proto_msgTypes[0]
+	mi := &file_meta_meta_network_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -60,7 +60,7 @@ func (x *WireguardDiagnostics) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WireguardDiagnostics.ProtoReflect.Descriptor instead.
 func (*WireguardDiagnostics) Descriptor() ([]byte, []int) {
-	return file_meta_network_proto_rawDescGZIP(), []int{0}
+	return file_meta_meta_network_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *WireguardDiagnostics) GetPeerKey() string {
@@ -116,7 +116,7 @@ type NetworkInterface struct {
 
 func (x *NetworkInterface) Reset() {
 	*x = NetworkInterface{}
-	mi := &file_meta_network_proto_msgTypes[1]
+	mi := &file_meta_meta_network_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -128,7 +128,7 @@ func (x *NetworkInterface) String() string {
 func (*NetworkInterface) ProtoMessage() {}
 
 func (x *NetworkInterface) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_network_proto_msgTypes[1]
+	mi := &file_meta_meta_network_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -141,7 +141,7 @@ func (x *NetworkInterface) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NetworkInterface.ProtoReflect.Descriptor instead.
 func (*NetworkInterface) Descriptor() ([]byte, []int) {
-	return file_meta_network_proto_rawDescGZIP(), []int{1}
+	return file_meta_meta_network_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *NetworkInterface) GetName() string {
@@ -177,7 +177,7 @@ type Network struct {
 
 func (x *Network) Reset() {
 	*x = Network{}
-	mi := &file_meta_network_proto_msgTypes[2]
+	mi := &file_meta_meta_network_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -189,7 +189,7 @@ func (x *Network) String() string {
 func (*Network) ProtoMessage() {}
 
 func (x *Network) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_network_proto_msgTypes[2]
+	mi := &file_meta_meta_network_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -202,7 +202,7 @@ func (x *Network) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Network.ProtoReflect.Descriptor instead.
 func (*Network) Descriptor() ([]byte, []int) {
-	return file_meta_network_proto_rawDescGZIP(), []int{2}
+	return file_meta_meta_network_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *Network) GetInterfaces() []*NetworkInterface {
@@ -243,7 +243,7 @@ type NetworkMetricsResponse struct {
 
 func (x *NetworkMetricsResponse) Reset() {
 	*x = NetworkMetricsResponse{}
-	mi := &file_meta_network_proto_msgTypes[3]
+	mi := &file_meta_meta_network_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -255,7 +255,7 @@ func (x *NetworkMetricsResponse) String() string {
 func (*NetworkMetricsResponse) ProtoMessage() {}
 
 func (x *NetworkMetricsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_network_proto_msgTypes[3]
+	mi := &file_meta_meta_network_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -268,7 +268,7 @@ func (x *NetworkMetricsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NetworkMetricsResponse.ProtoReflect.Descriptor instead.
 func (*NetworkMetricsResponse) Descriptor() ([]byte, []int) {
-	return file_meta_network_proto_rawDescGZIP(), []int{3}
+	return file_meta_meta_network_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *NetworkMetricsResponse) GetWireguard() *WireguardDiagnostics {
@@ -285,11 +285,11 @@ func (x *NetworkMetricsResponse) GetNetwork() *Network {
 	return nil
 }
 
-var File_meta_network_proto protoreflect.FileDescriptor
+var File_meta_meta_network_proto protoreflect.FileDescriptor
 
-const file_meta_network_proto_rawDesc = "" +
+const file_meta_meta_network_proto_rawDesc = "" +
 	"\n" +
-	"\x12meta.network.proto\x12\x04meta\"\xe2\x01\n" +
+	"\x17meta/meta.network.proto\x12\x04meta\"\xe2\x01\n" +
 	"\x14WireguardDiagnostics\x12\x1a\n" +
 	"\bpeer_key\x18\x01 \x01(\tR\bpeer_key\x12.\n" +
 	"\x12keepalive_interval\x18\x02 \x01(\x04R\x12keepalive_interval\x12\x1a\n" +
@@ -313,25 +313,25 @@ const file_meta_network_proto_rawDesc = "" +
 	"\anetwork\x18\x02 \x01(\v2\r.meta.NetworkR\anetworkb\x06proto3"
 
 var (
-	file_meta_network_proto_rawDescOnce sync.Once
-	file_meta_network_proto_rawDescData []byte
+	file_meta_meta_network_proto_rawDescOnce sync.Once
+	file_meta_meta_network_proto_rawDescData []byte
 )
 
-func file_meta_network_proto_rawDescGZIP() []byte {
-	file_meta_network_proto_rawDescOnce.Do(func() {
-		file_meta_network_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_meta_network_proto_rawDesc), len(file_meta_network_proto_rawDesc)))
+func file_meta_meta_network_proto_rawDescGZIP() []byte {
+	file_meta_meta_network_proto_rawDescOnce.Do(func() {
+		file_meta_meta_network_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_meta_meta_network_proto_rawDesc), len(file_meta_meta_network_proto_rawDesc)))
 	})
-	return file_meta_network_proto_rawDescData
+	return file_meta_meta_network_proto_rawDescData
 }
 
-var file_meta_network_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
-var file_meta_network_proto_goTypes = []any{
+var file_meta_meta_network_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_meta_meta_network_proto_goTypes = []any{
 	(*WireguardDiagnostics)(nil),   // 0: meta.WireguardDiagnostics
 	(*NetworkInterface)(nil),       // 1: meta.NetworkInterface
 	(*Network)(nil),                // 2: meta.Network
 	(*NetworkMetricsResponse)(nil), // 3: meta.NetworkMetricsResponse
 }
-var file_meta_network_proto_depIdxs = []int32{
+var file_meta_meta_network_proto_depIdxs = []int32{
 	1, // 0: meta.Network.interfaces:type_name -> meta.NetworkInterface
 	0, // 1: meta.NetworkMetricsResponse.wireguard:type_name -> meta.WireguardDiagnostics
 	2, // 2: meta.NetworkMetricsResponse.network:type_name -> meta.Network
@@ -342,26 +342,26 @@ var file_meta_network_proto_depIdxs = []int32{
 	0, // [0:3] is the sub-list for field type_name
 }
 
-func init() { file_meta_network_proto_init() }
-func file_meta_network_proto_init() {
-	if File_meta_network_proto != nil {
+func init() { file_meta_meta_network_proto_init() }
+func file_meta_meta_network_proto_init() {
+	if File_meta_meta_network_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_meta_network_proto_rawDesc), len(file_meta_network_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_meta_meta_network_proto_rawDesc), len(file_meta_meta_network_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_meta_network_proto_goTypes,
-		DependencyIndexes: file_meta_network_proto_depIdxs,
-		MessageInfos:      file_meta_network_proto_msgTypes,
+		GoTypes:           file_meta_meta_network_proto_goTypes,
+		DependencyIndexes: file_meta_meta_network_proto_depIdxs,
+		MessageInfos:      file_meta_meta_network_proto_msgTypes,
 	}.Build()
-	File_meta_network_proto = out.File
-	file_meta_network_proto_goTypes = nil
-	file_meta_network_proto_depIdxs = nil
+	File_meta_meta_network_proto = out.File
+	file_meta_meta_network_proto_goTypes = nil
+	file_meta_meta_network_proto_depIdxs = nil
 }

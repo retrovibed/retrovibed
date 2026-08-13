@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.12
 // 	protoc        v3.21.12
-// source: meta.wireguard.proto
+// source: wireguard/meta.wireguard.proto
 
 package metaapi
 
@@ -37,7 +37,7 @@ type Wireguard struct {
 
 func (x *Wireguard) Reset() {
 	*x = Wireguard{}
-	mi := &file_meta_wireguard_proto_msgTypes[0]
+	mi := &file_wireguard_meta_wireguard_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -49,7 +49,7 @@ func (x *Wireguard) String() string {
 func (*Wireguard) ProtoMessage() {}
 
 func (x *Wireguard) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_wireguard_proto_msgTypes[0]
+	mi := &file_wireguard_meta_wireguard_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -62,7 +62,7 @@ func (x *Wireguard) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Wireguard.ProtoReflect.Descriptor instead.
 func (*Wireguard) Descriptor() ([]byte, []int) {
-	return file_meta_wireguard_proto_rawDescGZIP(), []int{0}
+	return file_wireguard_meta_wireguard_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *Wireguard) GetId() string {
@@ -132,7 +132,7 @@ type WireguardSearchRequest struct {
 
 func (x *WireguardSearchRequest) Reset() {
 	*x = WireguardSearchRequest{}
-	mi := &file_meta_wireguard_proto_msgTypes[1]
+	mi := &file_wireguard_meta_wireguard_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -144,7 +144,7 @@ func (x *WireguardSearchRequest) String() string {
 func (*WireguardSearchRequest) ProtoMessage() {}
 
 func (x *WireguardSearchRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_wireguard_proto_msgTypes[1]
+	mi := &file_wireguard_meta_wireguard_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -157,7 +157,7 @@ func (x *WireguardSearchRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WireguardSearchRequest.ProtoReflect.Descriptor instead.
 func (*WireguardSearchRequest) Descriptor() ([]byte, []int) {
-	return file_meta_wireguard_proto_rawDescGZIP(), []int{1}
+	return file_wireguard_meta_wireguard_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *WireguardSearchRequest) GetQuery() string {
@@ -191,7 +191,7 @@ type WireguardSearchResponse struct {
 
 func (x *WireguardSearchResponse) Reset() {
 	*x = WireguardSearchResponse{}
-	mi := &file_meta_wireguard_proto_msgTypes[2]
+	mi := &file_wireguard_meta_wireguard_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -203,7 +203,7 @@ func (x *WireguardSearchResponse) String() string {
 func (*WireguardSearchResponse) ProtoMessage() {}
 
 func (x *WireguardSearchResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_wireguard_proto_msgTypes[2]
+	mi := &file_wireguard_meta_wireguard_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -216,7 +216,7 @@ func (x *WireguardSearchResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WireguardSearchResponse.ProtoReflect.Descriptor instead.
 func (*WireguardSearchResponse) Descriptor() ([]byte, []int) {
-	return file_meta_wireguard_proto_rawDescGZIP(), []int{2}
+	return file_wireguard_meta_wireguard_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *WireguardSearchResponse) GetNext() *WireguardSearchRequest {
@@ -242,7 +242,7 @@ type WireguardUpdateRequest struct {
 
 func (x *WireguardUpdateRequest) Reset() {
 	*x = WireguardUpdateRequest{}
-	mi := &file_meta_wireguard_proto_msgTypes[3]
+	mi := &file_wireguard_meta_wireguard_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -254,7 +254,7 @@ func (x *WireguardUpdateRequest) String() string {
 func (*WireguardUpdateRequest) ProtoMessage() {}
 
 func (x *WireguardUpdateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_wireguard_proto_msgTypes[3]
+	mi := &file_wireguard_meta_wireguard_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -267,7 +267,7 @@ func (x *WireguardUpdateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WireguardUpdateRequest.ProtoReflect.Descriptor instead.
 func (*WireguardUpdateRequest) Descriptor() ([]byte, []int) {
-	return file_meta_wireguard_proto_rawDescGZIP(), []int{3}
+	return file_wireguard_meta_wireguard_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *WireguardUpdateRequest) GetWireguard() *Wireguard {
@@ -286,7 +286,7 @@ type WireguardUpdateResponse struct {
 
 func (x *WireguardUpdateResponse) Reset() {
 	*x = WireguardUpdateResponse{}
-	mi := &file_meta_wireguard_proto_msgTypes[4]
+	mi := &file_wireguard_meta_wireguard_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -298,7 +298,7 @@ func (x *WireguardUpdateResponse) String() string {
 func (*WireguardUpdateResponse) ProtoMessage() {}
 
 func (x *WireguardUpdateResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_wireguard_proto_msgTypes[4]
+	mi := &file_wireguard_meta_wireguard_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -311,7 +311,7 @@ func (x *WireguardUpdateResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WireguardUpdateResponse.ProtoReflect.Descriptor instead.
 func (*WireguardUpdateResponse) Descriptor() ([]byte, []int) {
-	return file_meta_wireguard_proto_rawDescGZIP(), []int{4}
+	return file_wireguard_meta_wireguard_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *WireguardUpdateResponse) GetWireguard() *Wireguard {
@@ -329,7 +329,7 @@ type WireguardTouchRequest struct {
 
 func (x *WireguardTouchRequest) Reset() {
 	*x = WireguardTouchRequest{}
-	mi := &file_meta_wireguard_proto_msgTypes[5]
+	mi := &file_wireguard_meta_wireguard_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -341,7 +341,7 @@ func (x *WireguardTouchRequest) String() string {
 func (*WireguardTouchRequest) ProtoMessage() {}
 
 func (x *WireguardTouchRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_wireguard_proto_msgTypes[5]
+	mi := &file_wireguard_meta_wireguard_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -354,7 +354,7 @@ func (x *WireguardTouchRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WireguardTouchRequest.ProtoReflect.Descriptor instead.
 func (*WireguardTouchRequest) Descriptor() ([]byte, []int) {
-	return file_meta_wireguard_proto_rawDescGZIP(), []int{5}
+	return file_wireguard_meta_wireguard_proto_rawDescGZIP(), []int{5}
 }
 
 type WireguardTouchResponse struct {
@@ -366,7 +366,7 @@ type WireguardTouchResponse struct {
 
 func (x *WireguardTouchResponse) Reset() {
 	*x = WireguardTouchResponse{}
-	mi := &file_meta_wireguard_proto_msgTypes[6]
+	mi := &file_wireguard_meta_wireguard_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -378,7 +378,7 @@ func (x *WireguardTouchResponse) String() string {
 func (*WireguardTouchResponse) ProtoMessage() {}
 
 func (x *WireguardTouchResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_wireguard_proto_msgTypes[6]
+	mi := &file_wireguard_meta_wireguard_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -391,7 +391,7 @@ func (x *WireguardTouchResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WireguardTouchResponse.ProtoReflect.Descriptor instead.
 func (*WireguardTouchResponse) Descriptor() ([]byte, []int) {
-	return file_meta_wireguard_proto_rawDescGZIP(), []int{6}
+	return file_wireguard_meta_wireguard_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *WireguardTouchResponse) GetWireguard() *Wireguard {
@@ -409,7 +409,7 @@ type WireguardUploadRequest struct {
 
 func (x *WireguardUploadRequest) Reset() {
 	*x = WireguardUploadRequest{}
-	mi := &file_meta_wireguard_proto_msgTypes[7]
+	mi := &file_wireguard_meta_wireguard_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -421,7 +421,7 @@ func (x *WireguardUploadRequest) String() string {
 func (*WireguardUploadRequest) ProtoMessage() {}
 
 func (x *WireguardUploadRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_wireguard_proto_msgTypes[7]
+	mi := &file_wireguard_meta_wireguard_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -434,7 +434,7 @@ func (x *WireguardUploadRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WireguardUploadRequest.ProtoReflect.Descriptor instead.
 func (*WireguardUploadRequest) Descriptor() ([]byte, []int) {
-	return file_meta_wireguard_proto_rawDescGZIP(), []int{7}
+	return file_wireguard_meta_wireguard_proto_rawDescGZIP(), []int{7}
 }
 
 type WireguardUploadResponse struct {
@@ -446,7 +446,7 @@ type WireguardUploadResponse struct {
 
 func (x *WireguardUploadResponse) Reset() {
 	*x = WireguardUploadResponse{}
-	mi := &file_meta_wireguard_proto_msgTypes[8]
+	mi := &file_wireguard_meta_wireguard_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -458,7 +458,7 @@ func (x *WireguardUploadResponse) String() string {
 func (*WireguardUploadResponse) ProtoMessage() {}
 
 func (x *WireguardUploadResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_wireguard_proto_msgTypes[8]
+	mi := &file_wireguard_meta_wireguard_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -471,7 +471,7 @@ func (x *WireguardUploadResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WireguardUploadResponse.ProtoReflect.Descriptor instead.
 func (*WireguardUploadResponse) Descriptor() ([]byte, []int) {
-	return file_meta_wireguard_proto_rawDescGZIP(), []int{8}
+	return file_wireguard_meta_wireguard_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *WireguardUploadResponse) GetWireguard() *Wireguard {
@@ -489,7 +489,7 @@ type WireguardCurrentRequest struct {
 
 func (x *WireguardCurrentRequest) Reset() {
 	*x = WireguardCurrentRequest{}
-	mi := &file_meta_wireguard_proto_msgTypes[9]
+	mi := &file_wireguard_meta_wireguard_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -501,7 +501,7 @@ func (x *WireguardCurrentRequest) String() string {
 func (*WireguardCurrentRequest) ProtoMessage() {}
 
 func (x *WireguardCurrentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_wireguard_proto_msgTypes[9]
+	mi := &file_wireguard_meta_wireguard_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -514,7 +514,7 @@ func (x *WireguardCurrentRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WireguardCurrentRequest.ProtoReflect.Descriptor instead.
 func (*WireguardCurrentRequest) Descriptor() ([]byte, []int) {
-	return file_meta_wireguard_proto_rawDescGZIP(), []int{9}
+	return file_wireguard_meta_wireguard_proto_rawDescGZIP(), []int{9}
 }
 
 type WireguardCurrentResponse struct {
@@ -529,7 +529,7 @@ type WireguardCurrentResponse struct {
 
 func (x *WireguardCurrentResponse) Reset() {
 	*x = WireguardCurrentResponse{}
-	mi := &file_meta_wireguard_proto_msgTypes[10]
+	mi := &file_wireguard_meta_wireguard_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -541,7 +541,7 @@ func (x *WireguardCurrentResponse) String() string {
 func (*WireguardCurrentResponse) ProtoMessage() {}
 
 func (x *WireguardCurrentResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_wireguard_proto_msgTypes[10]
+	mi := &file_wireguard_meta_wireguard_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -554,7 +554,7 @@ func (x *WireguardCurrentResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WireguardCurrentResponse.ProtoReflect.Descriptor instead.
 func (*WireguardCurrentResponse) Descriptor() ([]byte, []int) {
-	return file_meta_wireguard_proto_rawDescGZIP(), []int{10}
+	return file_wireguard_meta_wireguard_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *WireguardCurrentResponse) GetWireguard() *Wireguard {
@@ -593,7 +593,7 @@ type WireguardDeleteRequest struct {
 
 func (x *WireguardDeleteRequest) Reset() {
 	*x = WireguardDeleteRequest{}
-	mi := &file_meta_wireguard_proto_msgTypes[11]
+	mi := &file_wireguard_meta_wireguard_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -605,7 +605,7 @@ func (x *WireguardDeleteRequest) String() string {
 func (*WireguardDeleteRequest) ProtoMessage() {}
 
 func (x *WireguardDeleteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_wireguard_proto_msgTypes[11]
+	mi := &file_wireguard_meta_wireguard_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -618,7 +618,7 @@ func (x *WireguardDeleteRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WireguardDeleteRequest.ProtoReflect.Descriptor instead.
 func (*WireguardDeleteRequest) Descriptor() ([]byte, []int) {
-	return file_meta_wireguard_proto_rawDescGZIP(), []int{11}
+	return file_wireguard_meta_wireguard_proto_rawDescGZIP(), []int{11}
 }
 
 type WireguardDeleteResponse struct {
@@ -630,7 +630,7 @@ type WireguardDeleteResponse struct {
 
 func (x *WireguardDeleteResponse) Reset() {
 	*x = WireguardDeleteResponse{}
-	mi := &file_meta_wireguard_proto_msgTypes[12]
+	mi := &file_wireguard_meta_wireguard_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -642,7 +642,7 @@ func (x *WireguardDeleteResponse) String() string {
 func (*WireguardDeleteResponse) ProtoMessage() {}
 
 func (x *WireguardDeleteResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_wireguard_proto_msgTypes[12]
+	mi := &file_wireguard_meta_wireguard_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -655,7 +655,7 @@ func (x *WireguardDeleteResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WireguardDeleteResponse.ProtoReflect.Descriptor instead.
 func (*WireguardDeleteResponse) Descriptor() ([]byte, []int) {
-	return file_meta_wireguard_proto_rawDescGZIP(), []int{12}
+	return file_wireguard_meta_wireguard_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *WireguardDeleteResponse) GetWireguard() *Wireguard {
@@ -665,11 +665,11 @@ func (x *WireguardDeleteResponse) GetWireguard() *Wireguard {
 	return nil
 }
 
-var File_meta_wireguard_proto protoreflect.FileDescriptor
+var File_wireguard_meta_wireguard_proto protoreflect.FileDescriptor
 
-const file_meta_wireguard_proto_rawDesc = "" +
+const file_wireguard_meta_wireguard_proto_rawDesc = "" +
 	"\n" +
-	"\x14meta.wireguard.proto\x12\x04meta\"\x85\x02\n" +
+	"\x1ewireguard/meta.wireguard.proto\x12\x04meta\"\x85\x02\n" +
 	"\tWireguard\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1e\n" +
 	"\n" +
@@ -711,19 +711,19 @@ const file_meta_wireguard_proto_rawDesc = "" +
 	"\tWireguard\x18\x01 \x01(\v2\x0f.meta.WireguardR\twireguardb\x06proto3"
 
 var (
-	file_meta_wireguard_proto_rawDescOnce sync.Once
-	file_meta_wireguard_proto_rawDescData []byte
+	file_wireguard_meta_wireguard_proto_rawDescOnce sync.Once
+	file_wireguard_meta_wireguard_proto_rawDescData []byte
 )
 
-func file_meta_wireguard_proto_rawDescGZIP() []byte {
-	file_meta_wireguard_proto_rawDescOnce.Do(func() {
-		file_meta_wireguard_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_meta_wireguard_proto_rawDesc), len(file_meta_wireguard_proto_rawDesc)))
+func file_wireguard_meta_wireguard_proto_rawDescGZIP() []byte {
+	file_wireguard_meta_wireguard_proto_rawDescOnce.Do(func() {
+		file_wireguard_meta_wireguard_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_wireguard_meta_wireguard_proto_rawDesc), len(file_wireguard_meta_wireguard_proto_rawDesc)))
 	})
-	return file_meta_wireguard_proto_rawDescData
+	return file_wireguard_meta_wireguard_proto_rawDescData
 }
 
-var file_meta_wireguard_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
-var file_meta_wireguard_proto_goTypes = []any{
+var file_wireguard_meta_wireguard_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
+var file_wireguard_meta_wireguard_proto_goTypes = []any{
 	(*Wireguard)(nil),                // 0: meta.Wireguard
 	(*WireguardSearchRequest)(nil),   // 1: meta.WireguardSearchRequest
 	(*WireguardSearchResponse)(nil),  // 2: meta.WireguardSearchResponse
@@ -738,7 +738,7 @@ var file_meta_wireguard_proto_goTypes = []any{
 	(*WireguardDeleteRequest)(nil),   // 11: meta.WireguardDeleteRequest
 	(*WireguardDeleteResponse)(nil),  // 12: meta.WireguardDeleteResponse
 }
-var file_meta_wireguard_proto_depIdxs = []int32{
+var file_wireguard_meta_wireguard_proto_depIdxs = []int32{
 	1, // 0: meta.WireguardSearchResponse.next:type_name -> meta.WireguardSearchRequest
 	0, // 1: meta.WireguardSearchResponse.items:type_name -> meta.Wireguard
 	0, // 2: meta.WireguardUpdateRequest.Wireguard:type_name -> meta.Wireguard
@@ -754,26 +754,26 @@ var file_meta_wireguard_proto_depIdxs = []int32{
 	0, // [0:8] is the sub-list for field type_name
 }
 
-func init() { file_meta_wireguard_proto_init() }
-func file_meta_wireguard_proto_init() {
-	if File_meta_wireguard_proto != nil {
+func init() { file_wireguard_meta_wireguard_proto_init() }
+func file_wireguard_meta_wireguard_proto_init() {
+	if File_wireguard_meta_wireguard_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_meta_wireguard_proto_rawDesc), len(file_meta_wireguard_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_wireguard_meta_wireguard_proto_rawDesc), len(file_wireguard_meta_wireguard_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_meta_wireguard_proto_goTypes,
-		DependencyIndexes: file_meta_wireguard_proto_depIdxs,
-		MessageInfos:      file_meta_wireguard_proto_msgTypes,
+		GoTypes:           file_wireguard_meta_wireguard_proto_goTypes,
+		DependencyIndexes: file_wireguard_meta_wireguard_proto_depIdxs,
+		MessageInfos:      file_wireguard_meta_wireguard_proto_msgTypes,
 	}.Build()
-	File_meta_wireguard_proto = out.File
-	file_meta_wireguard_proto_goTypes = nil
-	file_meta_wireguard_proto_depIdxs = nil
+	File_wireguard_meta_wireguard_proto = out.File
+	file_wireguard_meta_wireguard_proto_goTypes = nil
+	file_wireguard_meta_wireguard_proto_depIdxs = nil
 }

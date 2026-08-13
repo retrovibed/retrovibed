@@ -1,6 +1,6 @@
 // This is a generated file - do not edit.
 //
-// Generated from media.remote.control.proto.
+// Generated from media/media.remote.control.proto.
 
 // @dart = 3.3
 
@@ -14,8 +14,8 @@ import 'dart:core' as $core;
 
 import 'package:protobuf/protobuf.dart' as $pb;
 
+import '../meta/meta.daemon.pb.dart' as $1;
 import 'media.pb.dart' as $0;
-import 'meta.daemon.pb.dart' as $1;
 
 export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
 

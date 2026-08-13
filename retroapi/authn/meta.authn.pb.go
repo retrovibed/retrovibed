@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.12
 // 	protoc        v3.21.12
-// source: meta.authn.proto
+// source: meta/meta.authn.proto
 
 package authn
 
@@ -42,7 +42,7 @@ type LoginOptions struct {
 
 func (x *LoginOptions) Reset() {
 	*x = LoginOptions{}
-	mi := &file_meta_authn_proto_msgTypes[0]
+	mi := &file_meta_meta_authn_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -54,7 +54,7 @@ func (x *LoginOptions) String() string {
 func (*LoginOptions) ProtoMessage() {}
 
 func (x *LoginOptions) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_authn_proto_msgTypes[0]
+	mi := &file_meta_meta_authn_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -67,7 +67,7 @@ func (x *LoginOptions) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LoginOptions.ProtoReflect.Descriptor instead.
 func (*LoginOptions) Descriptor() ([]byte, []int) {
-	return file_meta_authn_proto_rawDescGZIP(), []int{0}
+	return file_meta_meta_authn_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *LoginOptions) GetId() string {
@@ -114,7 +114,7 @@ type LoginOptionsResponse struct {
 
 func (x *LoginOptionsResponse) Reset() {
 	*x = LoginOptionsResponse{}
-	mi := &file_meta_authn_proto_msgTypes[1]
+	mi := &file_meta_meta_authn_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -126,7 +126,7 @@ func (x *LoginOptionsResponse) String() string {
 func (*LoginOptionsResponse) ProtoMessage() {}
 
 func (x *LoginOptionsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_authn_proto_msgTypes[1]
+	mi := &file_meta_meta_authn_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -139,7 +139,7 @@ func (x *LoginOptionsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LoginOptionsResponse.ProtoReflect.Descriptor instead.
 func (*LoginOptionsResponse) Descriptor() ([]byte, []int) {
-	return file_meta_authn_proto_rawDescGZIP(), []int{1}
+	return file_meta_meta_authn_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *LoginOptionsResponse) GetToken() string {
@@ -162,7 +162,7 @@ type Identity struct {
 
 func (x *Identity) Reset() {
 	*x = Identity{}
-	mi := &file_meta_authn_proto_msgTypes[2]
+	mi := &file_meta_meta_authn_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -174,7 +174,7 @@ func (x *Identity) String() string {
 func (*Identity) ProtoMessage() {}
 
 func (x *Identity) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_authn_proto_msgTypes[2]
+	mi := &file_meta_meta_authn_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -187,7 +187,7 @@ func (x *Identity) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Identity.ProtoReflect.Descriptor instead.
 func (*Identity) Descriptor() ([]byte, []int) {
-	return file_meta_authn_proto_rawDescGZIP(), []int{2}
+	return file_meta_meta_authn_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *Identity) GetId() string {
@@ -236,7 +236,7 @@ type Authn struct {
 
 func (x *Authn) Reset() {
 	*x = Authn{}
-	mi := &file_meta_authn_proto_msgTypes[3]
+	mi := &file_meta_meta_authn_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -248,7 +248,7 @@ func (x *Authn) String() string {
 func (*Authn) ProtoMessage() {}
 
 func (x *Authn) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_authn_proto_msgTypes[3]
+	mi := &file_meta_meta_authn_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -261,7 +261,7 @@ func (x *Authn) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Authn.ProtoReflect.Descriptor instead.
 func (*Authn) Descriptor() ([]byte, []int) {
-	return file_meta_authn_proto_rawDescGZIP(), []int{3}
+	return file_meta_meta_authn_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *Authn) GetToken() string {
@@ -297,7 +297,7 @@ type Authed struct {
 
 func (x *Authed) Reset() {
 	*x = Authed{}
-	mi := &file_meta_authn_proto_msgTypes[4]
+	mi := &file_meta_meta_authn_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -309,7 +309,7 @@ func (x *Authed) String() string {
 func (*Authed) ProtoMessage() {}
 
 func (x *Authed) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_authn_proto_msgTypes[4]
+	mi := &file_meta_meta_authn_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -322,7 +322,7 @@ func (x *Authed) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Authed.ProtoReflect.Descriptor instead.
 func (*Authed) Descriptor() ([]byte, []int) {
-	return file_meta_authn_proto_rawDescGZIP(), []int{4}
+	return file_meta_meta_authn_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *Authed) GetSignupToken() string {
@@ -366,7 +366,7 @@ type Session struct {
 
 func (x *Session) Reset() {
 	*x = Session{}
-	mi := &file_meta_authn_proto_msgTypes[5]
+	mi := &file_meta_meta_authn_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -378,7 +378,7 @@ func (x *Session) String() string {
 func (*Session) ProtoMessage() {}
 
 func (x *Session) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_authn_proto_msgTypes[5]
+	mi := &file_meta_meta_authn_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -391,7 +391,7 @@ func (x *Session) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Session.ProtoReflect.Descriptor instead.
 func (*Session) Descriptor() ([]byte, []int) {
-	return file_meta_authn_proto_rawDescGZIP(), []int{5}
+	return file_meta_meta_authn_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *Session) GetToken() string {
@@ -429,11 +429,11 @@ func (x *Session) GetRedirect() string {
 	return ""
 }
 
-var File_meta_authn_proto protoreflect.FileDescriptor
+var File_meta_meta_authn_proto protoreflect.FileDescriptor
 
-const file_meta_authn_proto_rawDesc = "" +
+const file_meta_meta_authn_proto_rawDesc = "" +
 	"\n" +
-	"\x10meta.authn.proto\x12\x04meta\x1a\x12meta.account.proto\x1a\x12meta.profile.proto\"\x98\x01\n" +
+	"\x15meta/meta.authn.proto\x12\x04meta\x1a\x17meta/meta.account.proto\x1a\x17meta/meta.profile.proto\"\x98\x01\n" +
 	"\fLoginOptions\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1e\n" +
 	"\n" +
@@ -469,19 +469,19 @@ const file_meta_authn_proto_rawDesc = "" +
 	"\bredirect\x18\x05 \x01(\tR\bredirectb\x06proto3"
 
 var (
-	file_meta_authn_proto_rawDescOnce sync.Once
-	file_meta_authn_proto_rawDescData []byte
+	file_meta_meta_authn_proto_rawDescOnce sync.Once
+	file_meta_meta_authn_proto_rawDescData []byte
 )
 
-func file_meta_authn_proto_rawDescGZIP() []byte {
-	file_meta_authn_proto_rawDescOnce.Do(func() {
-		file_meta_authn_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_meta_authn_proto_rawDesc), len(file_meta_authn_proto_rawDesc)))
+func file_meta_meta_authn_proto_rawDescGZIP() []byte {
+	file_meta_meta_authn_proto_rawDescOnce.Do(func() {
+		file_meta_meta_authn_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_meta_meta_authn_proto_rawDesc), len(file_meta_meta_authn_proto_rawDesc)))
 	})
-	return file_meta_authn_proto_rawDescData
+	return file_meta_meta_authn_proto_rawDescData
 }
 
-var file_meta_authn_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
-var file_meta_authn_proto_goTypes = []any{
+var file_meta_meta_authn_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_meta_meta_authn_proto_goTypes = []any{
 	(*LoginOptions)(nil),         // 0: meta.LoginOptions
 	(*LoginOptionsResponse)(nil), // 1: meta.LoginOptionsResponse
 	(*Identity)(nil),             // 2: meta.Identity
@@ -491,7 +491,7 @@ var file_meta_authn_proto_goTypes = []any{
 	(*Profile)(nil),              // 6: meta.Profile
 	(*Account)(nil),              // 7: meta.Account
 }
-var file_meta_authn_proto_depIdxs = []int32{
+var file_meta_meta_authn_proto_depIdxs = []int32{
 	6, // 0: meta.Authn.profile:type_name -> meta.Profile
 	7, // 1: meta.Authn.account:type_name -> meta.Account
 	2, // 2: meta.Authed.identity:type_name -> meta.Identity
@@ -506,28 +506,28 @@ var file_meta_authn_proto_depIdxs = []int32{
 	0, // [0:7] is the sub-list for field type_name
 }
 
-func init() { file_meta_authn_proto_init() }
-func file_meta_authn_proto_init() {
-	if File_meta_authn_proto != nil {
+func init() { file_meta_meta_authn_proto_init() }
+func file_meta_meta_authn_proto_init() {
+	if File_meta_meta_authn_proto != nil {
 		return
 	}
-	file_meta_account_proto_init()
-	file_meta_profile_proto_init()
+	file_meta_meta_account_proto_init()
+	file_meta_meta_profile_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_meta_authn_proto_rawDesc), len(file_meta_authn_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_meta_meta_authn_proto_rawDesc), len(file_meta_meta_authn_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_meta_authn_proto_goTypes,
-		DependencyIndexes: file_meta_authn_proto_depIdxs,
-		MessageInfos:      file_meta_authn_proto_msgTypes,
+		GoTypes:           file_meta_meta_authn_proto_goTypes,
+		DependencyIndexes: file_meta_meta_authn_proto_depIdxs,
+		MessageInfos:      file_meta_meta_authn_proto_msgTypes,
 	}.Build()
-	File_meta_authn_proto = out.File
-	file_meta_authn_proto_goTypes = nil
-	file_meta_authn_proto_depIdxs = nil
+	File_meta_meta_authn_proto = out.File
+	file_meta_meta_authn_proto_goTypes = nil
+	file_meta_meta_authn_proto_depIdxs = nil
 }

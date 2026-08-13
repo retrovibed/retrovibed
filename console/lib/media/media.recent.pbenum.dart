@@ -1,6 +1,6 @@
 // This is a generated file - do not edit.
 //
-// Generated from media.recent.proto.
+// Generated from media/media.recent.proto.
 
 // @dart = 3.3
 

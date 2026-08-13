@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.12
 // 	protoc        v3.21.12
-// source: meta.daemon.proto
+// source: meta/meta.daemon.proto
 
 package metaapi
 
@@ -36,7 +36,7 @@ type Daemon struct {
 
 func (x *Daemon) Reset() {
 	*x = Daemon{}
-	mi := &file_meta_daemon_proto_msgTypes[0]
+	mi := &file_meta_meta_daemon_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -48,7 +48,7 @@ func (x *Daemon) String() string {
 func (*Daemon) ProtoMessage() {}
 
 func (x *Daemon) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_daemon_proto_msgTypes[0]
+	mi := &file_meta_meta_daemon_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -61,7 +61,7 @@ func (x *Daemon) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Daemon.ProtoReflect.Descriptor instead.
 func (*Daemon) Descriptor() ([]byte, []int) {
-	return file_meta_daemon_proto_rawDescGZIP(), []int{0}
+	return file_meta_meta_daemon_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *Daemon) GetId() string {
@@ -124,7 +124,7 @@ type DaemonSearchRequest struct {
 
 func (x *DaemonSearchRequest) Reset() {
 	*x = DaemonSearchRequest{}
-	mi := &file_meta_daemon_proto_msgTypes[1]
+	mi := &file_meta_meta_daemon_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -136,7 +136,7 @@ func (x *DaemonSearchRequest) String() string {
 func (*DaemonSearchRequest) ProtoMessage() {}
 
 func (x *DaemonSearchRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_daemon_proto_msgTypes[1]
+	mi := &file_meta_meta_daemon_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -149,7 +149,7 @@ func (x *DaemonSearchRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DaemonSearchRequest.ProtoReflect.Descriptor instead.
 func (*DaemonSearchRequest) Descriptor() ([]byte, []int) {
-	return file_meta_daemon_proto_rawDescGZIP(), []int{1}
+	return file_meta_meta_daemon_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *DaemonSearchRequest) GetQuery() string {
@@ -183,7 +183,7 @@ type DaemonSearchResponse struct {
 
 func (x *DaemonSearchResponse) Reset() {
 	*x = DaemonSearchResponse{}
-	mi := &file_meta_daemon_proto_msgTypes[2]
+	mi := &file_meta_meta_daemon_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -195,7 +195,7 @@ func (x *DaemonSearchResponse) String() string {
 func (*DaemonSearchResponse) ProtoMessage() {}
 
 func (x *DaemonSearchResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_daemon_proto_msgTypes[2]
+	mi := &file_meta_meta_daemon_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -208,7 +208,7 @@ func (x *DaemonSearchResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DaemonSearchResponse.ProtoReflect.Descriptor instead.
 func (*DaemonSearchResponse) Descriptor() ([]byte, []int) {
-	return file_meta_daemon_proto_rawDescGZIP(), []int{2}
+	return file_meta_meta_daemon_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *DaemonSearchResponse) GetNext() *DaemonSearchRequest {
@@ -234,7 +234,7 @@ type DaemonCreateRequest struct {
 
 func (x *DaemonCreateRequest) Reset() {
 	*x = DaemonCreateRequest{}
-	mi := &file_meta_daemon_proto_msgTypes[3]
+	mi := &file_meta_meta_daemon_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -246,7 +246,7 @@ func (x *DaemonCreateRequest) String() string {
 func (*DaemonCreateRequest) ProtoMessage() {}
 
 func (x *DaemonCreateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_daemon_proto_msgTypes[3]
+	mi := &file_meta_meta_daemon_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -259,7 +259,7 @@ func (x *DaemonCreateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DaemonCreateRequest.ProtoReflect.Descriptor instead.
 func (*DaemonCreateRequest) Descriptor() ([]byte, []int) {
-	return file_meta_daemon_proto_rawDescGZIP(), []int{3}
+	return file_meta_meta_daemon_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *DaemonCreateRequest) GetDaemon() *Daemon {
@@ -278,7 +278,7 @@ type DaemonCreateResponse struct {
 
 func (x *DaemonCreateResponse) Reset() {
 	*x = DaemonCreateResponse{}
-	mi := &file_meta_daemon_proto_msgTypes[4]
+	mi := &file_meta_meta_daemon_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -290,7 +290,7 @@ func (x *DaemonCreateResponse) String() string {
 func (*DaemonCreateResponse) ProtoMessage() {}
 
 func (x *DaemonCreateResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_daemon_proto_msgTypes[4]
+	mi := &file_meta_meta_daemon_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -303,7 +303,7 @@ func (x *DaemonCreateResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DaemonCreateResponse.ProtoReflect.Descriptor instead.
 func (*DaemonCreateResponse) Descriptor() ([]byte, []int) {
-	return file_meta_daemon_proto_rawDescGZIP(), []int{4}
+	return file_meta_meta_daemon_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *DaemonCreateResponse) GetDaemon() *Daemon {
@@ -321,7 +321,7 @@ type DaemonDeleteRequest struct {
 
 func (x *DaemonDeleteRequest) Reset() {
 	*x = DaemonDeleteRequest{}
-	mi := &file_meta_daemon_proto_msgTypes[5]
+	mi := &file_meta_meta_daemon_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -333,7 +333,7 @@ func (x *DaemonDeleteRequest) String() string {
 func (*DaemonDeleteRequest) ProtoMessage() {}
 
 func (x *DaemonDeleteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_daemon_proto_msgTypes[5]
+	mi := &file_meta_meta_daemon_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -346,7 +346,7 @@ func (x *DaemonDeleteRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DaemonDeleteRequest.ProtoReflect.Descriptor instead.
 func (*DaemonDeleteRequest) Descriptor() ([]byte, []int) {
-	return file_meta_daemon_proto_rawDescGZIP(), []int{5}
+	return file_meta_meta_daemon_proto_rawDescGZIP(), []int{5}
 }
 
 type DaemonDeleteResponse struct {
@@ -358,7 +358,7 @@ type DaemonDeleteResponse struct {
 
 func (x *DaemonDeleteResponse) Reset() {
 	*x = DaemonDeleteResponse{}
-	mi := &file_meta_daemon_proto_msgTypes[6]
+	mi := &file_meta_meta_daemon_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -370,7 +370,7 @@ func (x *DaemonDeleteResponse) String() string {
 func (*DaemonDeleteResponse) ProtoMessage() {}
 
 func (x *DaemonDeleteResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_daemon_proto_msgTypes[6]
+	mi := &file_meta_meta_daemon_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -383,7 +383,7 @@ func (x *DaemonDeleteResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DaemonDeleteResponse.ProtoReflect.Descriptor instead.
 func (*DaemonDeleteResponse) Descriptor() ([]byte, []int) {
-	return file_meta_daemon_proto_rawDescGZIP(), []int{6}
+	return file_meta_meta_daemon_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *DaemonDeleteResponse) GetDaemon() *Daemon {
@@ -401,7 +401,7 @@ type DaemonLookupRequest struct {
 
 func (x *DaemonLookupRequest) Reset() {
 	*x = DaemonLookupRequest{}
-	mi := &file_meta_daemon_proto_msgTypes[7]
+	mi := &file_meta_meta_daemon_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -413,7 +413,7 @@ func (x *DaemonLookupRequest) String() string {
 func (*DaemonLookupRequest) ProtoMessage() {}
 
 func (x *DaemonLookupRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_daemon_proto_msgTypes[7]
+	mi := &file_meta_meta_daemon_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -426,7 +426,7 @@ func (x *DaemonLookupRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DaemonLookupRequest.ProtoReflect.Descriptor instead.
 func (*DaemonLookupRequest) Descriptor() ([]byte, []int) {
-	return file_meta_daemon_proto_rawDescGZIP(), []int{7}
+	return file_meta_meta_daemon_proto_rawDescGZIP(), []int{7}
 }
 
 type DaemonLookupResponse struct {
@@ -438,7 +438,7 @@ type DaemonLookupResponse struct {
 
 func (x *DaemonLookupResponse) Reset() {
 	*x = DaemonLookupResponse{}
-	mi := &file_meta_daemon_proto_msgTypes[8]
+	mi := &file_meta_meta_daemon_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -450,7 +450,7 @@ func (x *DaemonLookupResponse) String() string {
 func (*DaemonLookupResponse) ProtoMessage() {}
 
 func (x *DaemonLookupResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_daemon_proto_msgTypes[8]
+	mi := &file_meta_meta_daemon_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -463,7 +463,7 @@ func (x *DaemonLookupResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DaemonLookupResponse.ProtoReflect.Descriptor instead.
 func (*DaemonLookupResponse) Descriptor() ([]byte, []int) {
-	return file_meta_daemon_proto_rawDescGZIP(), []int{8}
+	return file_meta_meta_daemon_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *DaemonLookupResponse) GetDaemon() *Daemon {
@@ -482,7 +482,7 @@ type DaemonUpdateRequest struct {
 
 func (x *DaemonUpdateRequest) Reset() {
 	*x = DaemonUpdateRequest{}
-	mi := &file_meta_daemon_proto_msgTypes[9]
+	mi := &file_meta_meta_daemon_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -494,7 +494,7 @@ func (x *DaemonUpdateRequest) String() string {
 func (*DaemonUpdateRequest) ProtoMessage() {}
 
 func (x *DaemonUpdateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_daemon_proto_msgTypes[9]
+	mi := &file_meta_meta_daemon_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -507,7 +507,7 @@ func (x *DaemonUpdateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DaemonUpdateRequest.ProtoReflect.Descriptor instead.
 func (*DaemonUpdateRequest) Descriptor() ([]byte, []int) {
-	return file_meta_daemon_proto_rawDescGZIP(), []int{9}
+	return file_meta_meta_daemon_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *DaemonUpdateRequest) GetDaemon() *Daemon {
@@ -526,7 +526,7 @@ type DaemonUpdateResponse struct {
 
 func (x *DaemonUpdateResponse) Reset() {
 	*x = DaemonUpdateResponse{}
-	mi := &file_meta_daemon_proto_msgTypes[10]
+	mi := &file_meta_meta_daemon_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -538,7 +538,7 @@ func (x *DaemonUpdateResponse) String() string {
 func (*DaemonUpdateResponse) ProtoMessage() {}
 
 func (x *DaemonUpdateResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_daemon_proto_msgTypes[10]
+	mi := &file_meta_meta_daemon_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -551,7 +551,7 @@ func (x *DaemonUpdateResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DaemonUpdateResponse.ProtoReflect.Descriptor instead.
 func (*DaemonUpdateResponse) Descriptor() ([]byte, []int) {
-	return file_meta_daemon_proto_rawDescGZIP(), []int{10}
+	return file_meta_meta_daemon_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *DaemonUpdateResponse) GetDaemon() *Daemon {
@@ -570,7 +570,7 @@ type DaemonDisableRequest struct {
 
 func (x *DaemonDisableRequest) Reset() {
 	*x = DaemonDisableRequest{}
-	mi := &file_meta_daemon_proto_msgTypes[11]
+	mi := &file_meta_meta_daemon_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -582,7 +582,7 @@ func (x *DaemonDisableRequest) String() string {
 func (*DaemonDisableRequest) ProtoMessage() {}
 
 func (x *DaemonDisableRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_daemon_proto_msgTypes[11]
+	mi := &file_meta_meta_daemon_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -595,7 +595,7 @@ func (x *DaemonDisableRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DaemonDisableRequest.ProtoReflect.Descriptor instead.
 func (*DaemonDisableRequest) Descriptor() ([]byte, []int) {
-	return file_meta_daemon_proto_rawDescGZIP(), []int{11}
+	return file_meta_meta_daemon_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *DaemonDisableRequest) GetDaemon() *Daemon {
@@ -614,7 +614,7 @@ type DaemonDisableResponse struct {
 
 func (x *DaemonDisableResponse) Reset() {
 	*x = DaemonDisableResponse{}
-	mi := &file_meta_daemon_proto_msgTypes[12]
+	mi := &file_meta_meta_daemon_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -626,7 +626,7 @@ func (x *DaemonDisableResponse) String() string {
 func (*DaemonDisableResponse) ProtoMessage() {}
 
 func (x *DaemonDisableResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_daemon_proto_msgTypes[12]
+	mi := &file_meta_meta_daemon_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -639,7 +639,7 @@ func (x *DaemonDisableResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DaemonDisableResponse.ProtoReflect.Descriptor instead.
 func (*DaemonDisableResponse) Descriptor() ([]byte, []int) {
-	return file_meta_daemon_proto_rawDescGZIP(), []int{12}
+	return file_meta_meta_daemon_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *DaemonDisableResponse) GetDaemon() *Daemon {
@@ -649,11 +649,11 @@ func (x *DaemonDisableResponse) GetDaemon() *Daemon {
 	return nil
 }
 
-var File_meta_daemon_proto protoreflect.FileDescriptor
+var File_meta_meta_daemon_proto protoreflect.FileDescriptor
 
-const file_meta_daemon_proto_rawDesc = "" +
+const file_meta_meta_daemon_proto_rawDesc = "" +
 	"\n" +
-	"\x11meta.daemon.proto\x12\x04meta\"\xce\x01\n" +
+	"\x16meta/meta.daemon.proto\x12\x04meta\"\xce\x01\n" +
 	"\x06Daemon\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1e\n" +
 	"\n" +
@@ -693,19 +693,19 @@ const file_meta_daemon_proto_rawDesc = "" +
 	"\x06daemon\x18\x01 \x01(\v2\f.meta.DaemonR\x06daemonb\x06proto3"
 
 var (
-	file_meta_daemon_proto_rawDescOnce sync.Once
-	file_meta_daemon_proto_rawDescData []byte
+	file_meta_meta_daemon_proto_rawDescOnce sync.Once
+	file_meta_meta_daemon_proto_rawDescData []byte
 )
 
-func file_meta_daemon_proto_rawDescGZIP() []byte {
-	file_meta_daemon_proto_rawDescOnce.Do(func() {
-		file_meta_daemon_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_meta_daemon_proto_rawDesc), len(file_meta_daemon_proto_rawDesc)))
+func file_meta_meta_daemon_proto_rawDescGZIP() []byte {
+	file_meta_meta_daemon_proto_rawDescOnce.Do(func() {
+		file_meta_meta_daemon_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_meta_meta_daemon_proto_rawDesc), len(file_meta_meta_daemon_proto_rawDesc)))
 	})
-	return file_meta_daemon_proto_rawDescData
+	return file_meta_meta_daemon_proto_rawDescData
 }
 
-var file_meta_daemon_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
-var file_meta_daemon_proto_goTypes = []any{
+var file_meta_meta_daemon_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
+var file_meta_meta_daemon_proto_goTypes = []any{
 	(*Daemon)(nil),                // 0: meta.Daemon
 	(*DaemonSearchRequest)(nil),   // 1: meta.DaemonSearchRequest
 	(*DaemonSearchResponse)(nil),  // 2: meta.DaemonSearchResponse
@@ -720,7 +720,7 @@ var file_meta_daemon_proto_goTypes = []any{
 	(*DaemonDisableRequest)(nil),  // 11: meta.DaemonDisableRequest
 	(*DaemonDisableResponse)(nil), // 12: meta.DaemonDisableResponse
 }
-var file_meta_daemon_proto_depIdxs = []int32{
+var file_meta_meta_daemon_proto_depIdxs = []int32{
 	1,  // 0: meta.DaemonSearchResponse.next:type_name -> meta.DaemonSearchRequest
 	0,  // 1: meta.DaemonSearchResponse.items:type_name -> meta.Daemon
 	0,  // 2: meta.DaemonCreateRequest.daemon:type_name -> meta.Daemon
@@ -738,26 +738,26 @@ var file_meta_daemon_proto_depIdxs = []int32{
 	0,  // [0:10] is the sub-list for field type_name
 }
 
-func init() { file_meta_daemon_proto_init() }
-func file_meta_daemon_proto_init() {
-	if File_meta_daemon_proto != nil {
+func init() { file_meta_meta_daemon_proto_init() }
+func file_meta_meta_daemon_proto_init() {
+	if File_meta_meta_daemon_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_meta_daemon_proto_rawDesc), len(file_meta_daemon_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_meta_meta_daemon_proto_rawDesc), len(file_meta_meta_daemon_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_meta_daemon_proto_goTypes,
-		DependencyIndexes: file_meta_daemon_proto_depIdxs,
-		MessageInfos:      file_meta_daemon_proto_msgTypes,
+		GoTypes:           file_meta_meta_daemon_proto_goTypes,
+		DependencyIndexes: file_meta_meta_daemon_proto_depIdxs,
+		MessageInfos:      file_meta_meta_daemon_proto_msgTypes,
 	}.Build()
-	File_meta_daemon_proto = out.File
-	file_meta_daemon_proto_goTypes = nil
-	file_meta_daemon_proto_depIdxs = nil
+	File_meta_meta_daemon_proto = out.File
+	file_meta_meta_daemon_proto_goTypes = nil
+	file_meta_meta_daemon_proto_depIdxs = nil
 }

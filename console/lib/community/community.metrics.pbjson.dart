@@ -1,6 +1,6 @@
 // This is a generated file - do not edit.
 //
-// Generated from community.metrics.proto.
+// Generated from community/community.metrics.proto.
 
 // @dart = 3.3
 

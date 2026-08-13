@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.12
 // 	protoc        v3.21.12
-// source: media.remote.control.proto
+// source: media/media.remote.control.proto
 
 package mediaapi
 
@@ -33,7 +33,7 @@ type Queue struct {
 
 func (x *Queue) Reset() {
 	*x = Queue{}
-	mi := &file_media_remote_control_proto_msgTypes[0]
+	mi := &file_media_media_remote_control_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -45,7 +45,7 @@ func (x *Queue) String() string {
 func (*Queue) ProtoMessage() {}
 
 func (x *Queue) ProtoReflect() protoreflect.Message {
-	mi := &file_media_remote_control_proto_msgTypes[0]
+	mi := &file_media_media_remote_control_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -58,7 +58,7 @@ func (x *Queue) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Queue.ProtoReflect.Descriptor instead.
 func (*Queue) Descriptor() ([]byte, []int) {
-	return file_media_remote_control_proto_rawDescGZIP(), []int{0}
+	return file_media_media_remote_control_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *Queue) GetMedia() *media.Media {
@@ -78,7 +78,7 @@ type Dequeue struct {
 
 func (x *Dequeue) Reset() {
 	*x = Dequeue{}
-	mi := &file_media_remote_control_proto_msgTypes[1]
+	mi := &file_media_media_remote_control_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -90,7 +90,7 @@ func (x *Dequeue) String() string {
 func (*Dequeue) ProtoMessage() {}
 
 func (x *Dequeue) ProtoReflect() protoreflect.Message {
-	mi := &file_media_remote_control_proto_msgTypes[1]
+	mi := &file_media_media_remote_control_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -103,7 +103,7 @@ func (x *Dequeue) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Dequeue.ProtoReflect.Descriptor instead.
 func (*Dequeue) Descriptor() ([]byte, []int) {
-	return file_media_remote_control_proto_rawDescGZIP(), []int{1}
+	return file_media_media_remote_control_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *Dequeue) GetId() string {
@@ -124,7 +124,7 @@ type PlayPause struct {
 
 func (x *PlayPause) Reset() {
 	*x = PlayPause{}
-	mi := &file_media_remote_control_proto_msgTypes[2]
+	mi := &file_media_media_remote_control_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -136,7 +136,7 @@ func (x *PlayPause) String() string {
 func (*PlayPause) ProtoMessage() {}
 
 func (x *PlayPause) ProtoReflect() protoreflect.Message {
-	mi := &file_media_remote_control_proto_msgTypes[2]
+	mi := &file_media_media_remote_control_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -149,7 +149,7 @@ func (x *PlayPause) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PlayPause.ProtoReflect.Descriptor instead.
 func (*PlayPause) Descriptor() ([]byte, []int) {
-	return file_media_remote_control_proto_rawDescGZIP(), []int{2}
+	return file_media_media_remote_control_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *PlayPause) GetPaused() bool {
@@ -171,7 +171,7 @@ type Seek struct {
 
 func (x *Seek) Reset() {
 	*x = Seek{}
-	mi := &file_media_remote_control_proto_msgTypes[3]
+	mi := &file_media_media_remote_control_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -183,7 +183,7 @@ func (x *Seek) String() string {
 func (*Seek) ProtoMessage() {}
 
 func (x *Seek) ProtoReflect() protoreflect.Message {
-	mi := &file_media_remote_control_proto_msgTypes[3]
+	mi := &file_media_media_remote_control_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -196,7 +196,7 @@ func (x *Seek) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Seek.ProtoReflect.Descriptor instead.
 func (*Seek) Descriptor() ([]byte, []int) {
-	return file_media_remote_control_proto_rawDescGZIP(), []int{3}
+	return file_media_media_remote_control_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *Seek) GetOffset() int32 {
@@ -222,7 +222,7 @@ type Sync struct {
 
 func (x *Sync) Reset() {
 	*x = Sync{}
-	mi := &file_media_remote_control_proto_msgTypes[4]
+	mi := &file_media_media_remote_control_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -234,7 +234,7 @@ func (x *Sync) String() string {
 func (*Sync) ProtoMessage() {}
 
 func (x *Sync) ProtoReflect() protoreflect.Message {
-	mi := &file_media_remote_control_proto_msgTypes[4]
+	mi := &file_media_media_remote_control_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -247,7 +247,7 @@ func (x *Sync) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Sync.ProtoReflect.Descriptor instead.
 func (*Sync) Descriptor() ([]byte, []int) {
-	return file_media_remote_control_proto_rawDescGZIP(), []int{4}
+	return file_media_media_remote_control_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *Sync) GetLibrary() *metaapi.Daemon {
@@ -298,7 +298,7 @@ type Stream struct {
 
 func (x *Stream) Reset() {
 	*x = Stream{}
-	mi := &file_media_remote_control_proto_msgTypes[5]
+	mi := &file_media_media_remote_control_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -310,7 +310,7 @@ func (x *Stream) String() string {
 func (*Stream) ProtoMessage() {}
 
 func (x *Stream) ProtoReflect() protoreflect.Message {
-	mi := &file_media_remote_control_proto_msgTypes[5]
+	mi := &file_media_media_remote_control_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -323,7 +323,7 @@ func (x *Stream) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Stream.ProtoReflect.Descriptor instead.
 func (*Stream) Descriptor() ([]byte, []int) {
-	return file_media_remote_control_proto_rawDescGZIP(), []int{5}
+	return file_media_media_remote_control_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *Stream) GetSid() string {
@@ -419,11 +419,11 @@ func (*Stream_Seek) isStream_Command() {}
 
 func (*Stream_Sync) isStream_Command() {}
 
-var File_media_remote_control_proto protoreflect.FileDescriptor
+var File_media_media_remote_control_proto protoreflect.FileDescriptor
 
-const file_media_remote_control_proto_rawDesc = "" +
+const file_media_media_remote_control_proto_rawDesc = "" +
 	"\n" +
-	"\x1amedia.remote.control.proto\x12\x05media\x1a\vmedia.proto\x1a\x11meta.daemon.proto\"+\n" +
+	" media/media.remote.control.proto\x12\x05media\x1a\x11media/media.proto\x1a\x16meta/meta.daemon.proto\"+\n" +
 	"\x05Queue\x12\"\n" +
 	"\x05media\x18\x01 \x01(\v2\f.media.MediaR\x05media\"\x19\n" +
 	"\aDequeue\x12\x0e\n" +
@@ -447,19 +447,19 @@ const file_media_remote_control_proto_rawDesc = "" +
 	"\aCommandb\x06proto3"
 
 var (
-	file_media_remote_control_proto_rawDescOnce sync.Once
-	file_media_remote_control_proto_rawDescData []byte
+	file_media_media_remote_control_proto_rawDescOnce sync.Once
+	file_media_media_remote_control_proto_rawDescData []byte
 )
 
-func file_media_remote_control_proto_rawDescGZIP() []byte {
-	file_media_remote_control_proto_rawDescOnce.Do(func() {
-		file_media_remote_control_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_media_remote_control_proto_rawDesc), len(file_media_remote_control_proto_rawDesc)))
+func file_media_media_remote_control_proto_rawDescGZIP() []byte {
+	file_media_media_remote_control_proto_rawDescOnce.Do(func() {
+		file_media_media_remote_control_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_media_media_remote_control_proto_rawDesc), len(file_media_media_remote_control_proto_rawDesc)))
 	})
-	return file_media_remote_control_proto_rawDescData
+	return file_media_media_remote_control_proto_rawDescData
 }
 
-var file_media_remote_control_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
-var file_media_remote_control_proto_goTypes = []any{
+var file_media_media_remote_control_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_media_media_remote_control_proto_goTypes = []any{
 	(*Queue)(nil),          // 0: media.Queue
 	(*Dequeue)(nil),        // 1: media.Dequeue
 	(*PlayPause)(nil),      // 2: media.PlayPause
@@ -469,7 +469,7 @@ var file_media_remote_control_proto_goTypes = []any{
 	(*media.Media)(nil),    // 6: media.Media
 	(*metaapi.Daemon)(nil), // 7: meta.Daemon
 }
-var file_media_remote_control_proto_depIdxs = []int32{
+var file_media_media_remote_control_proto_depIdxs = []int32{
 	6, // 0: media.Queue.media:type_name -> media.Media
 	7, // 1: media.Sync.library:type_name -> meta.Daemon
 	6, // 2: media.Sync.current:type_name -> media.Media
@@ -486,12 +486,12 @@ var file_media_remote_control_proto_depIdxs = []int32{
 	0, // [0:9] is the sub-list for field type_name
 }
 
-func init() { file_media_remote_control_proto_init() }
-func file_media_remote_control_proto_init() {
-	if File_media_remote_control_proto != nil {
+func init() { file_media_media_remote_control_proto_init() }
+func file_media_media_remote_control_proto_init() {
+	if File_media_media_remote_control_proto != nil {
 		return
 	}
-	file_media_remote_control_proto_msgTypes[5].OneofWrappers = []any{
+	file_media_media_remote_control_proto_msgTypes[5].OneofWrappers = []any{
 		(*Stream_Queue)(nil),
 		(*Stream_Dequeue)(nil),
 		(*Stream_Playpause)(nil),
@@ -502,17 +502,17 @@ func file_media_remote_control_proto_init() {
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_media_remote_control_proto_rawDesc), len(file_media_remote_control_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_media_media_remote_control_proto_rawDesc), len(file_media_media_remote_control_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_media_remote_control_proto_goTypes,
-		DependencyIndexes: file_media_remote_control_proto_depIdxs,
-		MessageInfos:      file_media_remote_control_proto_msgTypes,
+		GoTypes:           file_media_media_remote_control_proto_goTypes,
+		DependencyIndexes: file_media_media_remote_control_proto_depIdxs,
+		MessageInfos:      file_media_media_remote_control_proto_msgTypes,
 	}.Build()
-	File_media_remote_control_proto = out.File
-	file_media_remote_control_proto_goTypes = nil
-	file_media_remote_control_proto_depIdxs = nil
+	File_media_media_remote_control_proto = out.File
+	file_media_media_remote_control_proto_goTypes = nil
+	file_media_media_remote_control_proto_depIdxs = nil
 }

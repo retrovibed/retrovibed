@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.12
 // 	protoc        v3.21.12
-// source: searchplugin.proto
+// source: ddisc/plugin/searchplugin.proto
 
 package ddiscapi
 
@@ -33,7 +33,7 @@ type Plugin struct {
 
 func (x *Plugin) Reset() {
 	*x = Plugin{}
-	mi := &file_searchplugin_proto_msgTypes[0]
+	mi := &file_ddisc_plugin_searchplugin_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -45,7 +45,7 @@ func (x *Plugin) String() string {
 func (*Plugin) ProtoMessage() {}
 
 func (x *Plugin) ProtoReflect() protoreflect.Message {
-	mi := &file_searchplugin_proto_msgTypes[0]
+	mi := &file_ddisc_plugin_searchplugin_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -58,7 +58,7 @@ func (x *Plugin) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Plugin.ProtoReflect.Descriptor instead.
 func (*Plugin) Descriptor() ([]byte, []int) {
-	return file_searchplugin_proto_rawDescGZIP(), []int{0}
+	return file_ddisc_plugin_searchplugin_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *Plugin) GetId() string {
@@ -99,7 +99,7 @@ type PluginSearchRequest struct {
 
 func (x *PluginSearchRequest) Reset() {
 	*x = PluginSearchRequest{}
-	mi := &file_searchplugin_proto_msgTypes[1]
+	mi := &file_ddisc_plugin_searchplugin_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -111,7 +111,7 @@ func (x *PluginSearchRequest) String() string {
 func (*PluginSearchRequest) ProtoMessage() {}
 
 func (x *PluginSearchRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_searchplugin_proto_msgTypes[1]
+	mi := &file_ddisc_plugin_searchplugin_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -124,7 +124,7 @@ func (x *PluginSearchRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PluginSearchRequest.ProtoReflect.Descriptor instead.
 func (*PluginSearchRequest) Descriptor() ([]byte, []int) {
-	return file_searchplugin_proto_rawDescGZIP(), []int{1}
+	return file_ddisc_plugin_searchplugin_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *PluginSearchRequest) GetOffset() uint64 {
@@ -151,7 +151,7 @@ type PluginSearchResponse struct {
 
 func (x *PluginSearchResponse) Reset() {
 	*x = PluginSearchResponse{}
-	mi := &file_searchplugin_proto_msgTypes[2]
+	mi := &file_ddisc_plugin_searchplugin_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -163,7 +163,7 @@ func (x *PluginSearchResponse) String() string {
 func (*PluginSearchResponse) ProtoMessage() {}
 
 func (x *PluginSearchResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_searchplugin_proto_msgTypes[2]
+	mi := &file_ddisc_plugin_searchplugin_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -176,7 +176,7 @@ func (x *PluginSearchResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PluginSearchResponse.ProtoReflect.Descriptor instead.
 func (*PluginSearchResponse) Descriptor() ([]byte, []int) {
-	return file_searchplugin_proto_rawDescGZIP(), []int{2}
+	return file_ddisc_plugin_searchplugin_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *PluginSearchResponse) GetNext() *PluginSearchRequest {
@@ -201,7 +201,7 @@ type PluginCreateRequest struct {
 
 func (x *PluginCreateRequest) Reset() {
 	*x = PluginCreateRequest{}
-	mi := &file_searchplugin_proto_msgTypes[3]
+	mi := &file_ddisc_plugin_searchplugin_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -213,7 +213,7 @@ func (x *PluginCreateRequest) String() string {
 func (*PluginCreateRequest) ProtoMessage() {}
 
 func (x *PluginCreateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_searchplugin_proto_msgTypes[3]
+	mi := &file_ddisc_plugin_searchplugin_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -226,7 +226,7 @@ func (x *PluginCreateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PluginCreateRequest.ProtoReflect.Descriptor instead.
 func (*PluginCreateRequest) Descriptor() ([]byte, []int) {
-	return file_searchplugin_proto_rawDescGZIP(), []int{3}
+	return file_ddisc_plugin_searchplugin_proto_rawDescGZIP(), []int{3}
 }
 
 type PluginCreateResponse struct {
@@ -238,7 +238,7 @@ type PluginCreateResponse struct {
 
 func (x *PluginCreateResponse) Reset() {
 	*x = PluginCreateResponse{}
-	mi := &file_searchplugin_proto_msgTypes[4]
+	mi := &file_ddisc_plugin_searchplugin_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -250,7 +250,7 @@ func (x *PluginCreateResponse) String() string {
 func (*PluginCreateResponse) ProtoMessage() {}
 
 func (x *PluginCreateResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_searchplugin_proto_msgTypes[4]
+	mi := &file_ddisc_plugin_searchplugin_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -263,7 +263,7 @@ func (x *PluginCreateResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PluginCreateResponse.ProtoReflect.Descriptor instead.
 func (*PluginCreateResponse) Descriptor() ([]byte, []int) {
-	return file_searchplugin_proto_rawDescGZIP(), []int{4}
+	return file_ddisc_plugin_searchplugin_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *PluginCreateResponse) GetPlugin() *Plugin {
@@ -281,7 +281,7 @@ type PluginFindRequest struct {
 
 func (x *PluginFindRequest) Reset() {
 	*x = PluginFindRequest{}
-	mi := &file_searchplugin_proto_msgTypes[5]
+	mi := &file_ddisc_plugin_searchplugin_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -293,7 +293,7 @@ func (x *PluginFindRequest) String() string {
 func (*PluginFindRequest) ProtoMessage() {}
 
 func (x *PluginFindRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_searchplugin_proto_msgTypes[5]
+	mi := &file_ddisc_plugin_searchplugin_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -306,7 +306,7 @@ func (x *PluginFindRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PluginFindRequest.ProtoReflect.Descriptor instead.
 func (*PluginFindRequest) Descriptor() ([]byte, []int) {
-	return file_searchplugin_proto_rawDescGZIP(), []int{5}
+	return file_ddisc_plugin_searchplugin_proto_rawDescGZIP(), []int{5}
 }
 
 type PluginFindResponse struct {
@@ -318,7 +318,7 @@ type PluginFindResponse struct {
 
 func (x *PluginFindResponse) Reset() {
 	*x = PluginFindResponse{}
-	mi := &file_searchplugin_proto_msgTypes[6]
+	mi := &file_ddisc_plugin_searchplugin_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -330,7 +330,7 @@ func (x *PluginFindResponse) String() string {
 func (*PluginFindResponse) ProtoMessage() {}
 
 func (x *PluginFindResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_searchplugin_proto_msgTypes[6]
+	mi := &file_ddisc_plugin_searchplugin_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -343,7 +343,7 @@ func (x *PluginFindResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PluginFindResponse.ProtoReflect.Descriptor instead.
 func (*PluginFindResponse) Descriptor() ([]byte, []int) {
-	return file_searchplugin_proto_rawDescGZIP(), []int{6}
+	return file_ddisc_plugin_searchplugin_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *PluginFindResponse) GetPlugin() *Plugin {
@@ -361,7 +361,7 @@ type PluginDeleteRequest struct {
 
 func (x *PluginDeleteRequest) Reset() {
 	*x = PluginDeleteRequest{}
-	mi := &file_searchplugin_proto_msgTypes[7]
+	mi := &file_ddisc_plugin_searchplugin_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -373,7 +373,7 @@ func (x *PluginDeleteRequest) String() string {
 func (*PluginDeleteRequest) ProtoMessage() {}
 
 func (x *PluginDeleteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_searchplugin_proto_msgTypes[7]
+	mi := &file_ddisc_plugin_searchplugin_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -386,7 +386,7 @@ func (x *PluginDeleteRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PluginDeleteRequest.ProtoReflect.Descriptor instead.
 func (*PluginDeleteRequest) Descriptor() ([]byte, []int) {
-	return file_searchplugin_proto_rawDescGZIP(), []int{7}
+	return file_ddisc_plugin_searchplugin_proto_rawDescGZIP(), []int{7}
 }
 
 type PluginDeleteResponse struct {
@@ -398,7 +398,7 @@ type PluginDeleteResponse struct {
 
 func (x *PluginDeleteResponse) Reset() {
 	*x = PluginDeleteResponse{}
-	mi := &file_searchplugin_proto_msgTypes[8]
+	mi := &file_ddisc_plugin_searchplugin_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -410,7 +410,7 @@ func (x *PluginDeleteResponse) String() string {
 func (*PluginDeleteResponse) ProtoMessage() {}
 
 func (x *PluginDeleteResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_searchplugin_proto_msgTypes[8]
+	mi := &file_ddisc_plugin_searchplugin_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -423,7 +423,7 @@ func (x *PluginDeleteResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PluginDeleteResponse.ProtoReflect.Descriptor instead.
 func (*PluginDeleteResponse) Descriptor() ([]byte, []int) {
-	return file_searchplugin_proto_rawDescGZIP(), []int{8}
+	return file_ddisc_plugin_searchplugin_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *PluginDeleteResponse) GetPlugin() *Plugin {
@@ -433,11 +433,11 @@ func (x *PluginDeleteResponse) GetPlugin() *Plugin {
 	return nil
 }
 
-var File_searchplugin_proto protoreflect.FileDescriptor
+var File_ddisc_plugin_searchplugin_proto protoreflect.FileDescriptor
 
-const file_searchplugin_proto_rawDesc = "" +
+const file_ddisc_plugin_searchplugin_proto_rawDesc = "" +
 	"\n" +
-	"\x12searchplugin.proto\x12\fsearchplugin\"d\n" +
+	"\x1fddisc/plugin/searchplugin.proto\x12\fsearchplugin\"d\n" +
 	"\x06Plugin\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x12\n" +
@@ -460,19 +460,19 @@ const file_searchplugin_proto_rawDesc = "" +
 	"\x06plugin\x18\x01 \x01(\v2\x14.searchplugin.PluginR\x06pluginb\x06proto3"
 
 var (
-	file_searchplugin_proto_rawDescOnce sync.Once
-	file_searchplugin_proto_rawDescData []byte
+	file_ddisc_plugin_searchplugin_proto_rawDescOnce sync.Once
+	file_ddisc_plugin_searchplugin_proto_rawDescData []byte
 )
 
-func file_searchplugin_proto_rawDescGZIP() []byte {
-	file_searchplugin_proto_rawDescOnce.Do(func() {
-		file_searchplugin_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_searchplugin_proto_rawDesc), len(file_searchplugin_proto_rawDesc)))
+func file_ddisc_plugin_searchplugin_proto_rawDescGZIP() []byte {
+	file_ddisc_plugin_searchplugin_proto_rawDescOnce.Do(func() {
+		file_ddisc_plugin_searchplugin_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_ddisc_plugin_searchplugin_proto_rawDesc), len(file_ddisc_plugin_searchplugin_proto_rawDesc)))
 	})
-	return file_searchplugin_proto_rawDescData
+	return file_ddisc_plugin_searchplugin_proto_rawDescData
 }
 
-var file_searchplugin_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
-var file_searchplugin_proto_goTypes = []any{
+var file_ddisc_plugin_searchplugin_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_ddisc_plugin_searchplugin_proto_goTypes = []any{
 	(*Plugin)(nil),               // 0: searchplugin.Plugin
 	(*PluginSearchRequest)(nil),  // 1: searchplugin.PluginSearchRequest
 	(*PluginSearchResponse)(nil), // 2: searchplugin.PluginSearchResponse
@@ -483,7 +483,7 @@ var file_searchplugin_proto_goTypes = []any{
 	(*PluginDeleteRequest)(nil),  // 7: searchplugin.PluginDeleteRequest
 	(*PluginDeleteResponse)(nil), // 8: searchplugin.PluginDeleteResponse
 }
-var file_searchplugin_proto_depIdxs = []int32{
+var file_ddisc_plugin_searchplugin_proto_depIdxs = []int32{
 	1, // 0: searchplugin.PluginSearchResponse.next:type_name -> searchplugin.PluginSearchRequest
 	0, // 1: searchplugin.PluginSearchResponse.items:type_name -> searchplugin.Plugin
 	0, // 2: searchplugin.PluginCreateResponse.plugin:type_name -> searchplugin.Plugin
@@ -496,26 +496,26 @@ var file_searchplugin_proto_depIdxs = []int32{
 	0, // [0:5] is the sub-list for field type_name
 }
 
-func init() { file_searchplugin_proto_init() }
-func file_searchplugin_proto_init() {
-	if File_searchplugin_proto != nil {
+func init() { file_ddisc_plugin_searchplugin_proto_init() }
+func file_ddisc_plugin_searchplugin_proto_init() {
+	if File_ddisc_plugin_searchplugin_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_searchplugin_proto_rawDesc), len(file_searchplugin_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_ddisc_plugin_searchplugin_proto_rawDesc), len(file_ddisc_plugin_searchplugin_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_searchplugin_proto_goTypes,
-		DependencyIndexes: file_searchplugin_proto_depIdxs,
-		MessageInfos:      file_searchplugin_proto_msgTypes,
+		GoTypes:           file_ddisc_plugin_searchplugin_proto_goTypes,
+		DependencyIndexes: file_ddisc_plugin_searchplugin_proto_depIdxs,
+		MessageInfos:      file_ddisc_plugin_searchplugin_proto_msgTypes,
 	}.Build()
-	File_searchplugin_proto = out.File
-	file_searchplugin_proto_goTypes = nil
-	file_searchplugin_proto_depIdxs = nil
+	File_ddisc_plugin_searchplugin_proto = out.File
+	file_ddisc_plugin_searchplugin_proto_goTypes = nil
+	file_ddisc_plugin_searchplugin_proto_depIdxs = nil
 }

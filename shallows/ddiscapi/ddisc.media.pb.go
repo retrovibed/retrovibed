@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.12
 // 	protoc        v3.21.12
-// source: ddisc.media.proto
+// source: ddisc/ddisc.media.proto
 
 package ddiscapi
 
@@ -42,7 +42,7 @@ type Media struct {
 
 func (x *Media) Reset() {
 	*x = Media{}
-	mi := &file_ddisc_media_proto_msgTypes[0]
+	mi := &file_ddisc_ddisc_media_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -54,7 +54,7 @@ func (x *Media) String() string {
 func (*Media) ProtoMessage() {}
 
 func (x *Media) ProtoReflect() protoreflect.Message {
-	mi := &file_ddisc_media_proto_msgTypes[0]
+	mi := &file_ddisc_ddisc_media_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -67,7 +67,7 @@ func (x *Media) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Media.ProtoReflect.Descriptor instead.
 func (*Media) Descriptor() ([]byte, []int) {
-	return file_ddisc_media_proto_rawDescGZIP(), []int{0}
+	return file_ddisc_ddisc_media_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *Media) GetId() string {
@@ -168,7 +168,7 @@ type MediaSearchRequest struct {
 
 func (x *MediaSearchRequest) Reset() {
 	*x = MediaSearchRequest{}
-	mi := &file_ddisc_media_proto_msgTypes[1]
+	mi := &file_ddisc_ddisc_media_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -180,7 +180,7 @@ func (x *MediaSearchRequest) String() string {
 func (*MediaSearchRequest) ProtoMessage() {}
 
 func (x *MediaSearchRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_ddisc_media_proto_msgTypes[1]
+	mi := &file_ddisc_ddisc_media_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -193,7 +193,7 @@ func (x *MediaSearchRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MediaSearchRequest.ProtoReflect.Descriptor instead.
 func (*MediaSearchRequest) Descriptor() ([]byte, []int) {
-	return file_ddisc_media_proto_rawDescGZIP(), []int{1}
+	return file_ddisc_ddisc_media_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *MediaSearchRequest) GetQuery() string {
@@ -248,7 +248,7 @@ type MediaSearchResponse struct {
 
 func (x *MediaSearchResponse) Reset() {
 	*x = MediaSearchResponse{}
-	mi := &file_ddisc_media_proto_msgTypes[2]
+	mi := &file_ddisc_ddisc_media_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -260,7 +260,7 @@ func (x *MediaSearchResponse) String() string {
 func (*MediaSearchResponse) ProtoMessage() {}
 
 func (x *MediaSearchResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_ddisc_media_proto_msgTypes[2]
+	mi := &file_ddisc_ddisc_media_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -273,7 +273,7 @@ func (x *MediaSearchResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MediaSearchResponse.ProtoReflect.Descriptor instead.
 func (*MediaSearchResponse) Descriptor() ([]byte, []int) {
-	return file_ddisc_media_proto_rawDescGZIP(), []int{2}
+	return file_ddisc_ddisc_media_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *MediaSearchResponse) GetNext() *MediaSearchRequest {
@@ -299,7 +299,7 @@ type MediaCreateRequest struct {
 
 func (x *MediaCreateRequest) Reset() {
 	*x = MediaCreateRequest{}
-	mi := &file_ddisc_media_proto_msgTypes[3]
+	mi := &file_ddisc_ddisc_media_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -311,7 +311,7 @@ func (x *MediaCreateRequest) String() string {
 func (*MediaCreateRequest) ProtoMessage() {}
 
 func (x *MediaCreateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_ddisc_media_proto_msgTypes[3]
+	mi := &file_ddisc_ddisc_media_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -324,7 +324,7 @@ func (x *MediaCreateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MediaCreateRequest.ProtoReflect.Descriptor instead.
 func (*MediaCreateRequest) Descriptor() ([]byte, []int) {
-	return file_ddisc_media_proto_rawDescGZIP(), []int{3}
+	return file_ddisc_ddisc_media_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *MediaCreateRequest) GetMedia() *Media {
@@ -343,7 +343,7 @@ type MediaCreateResponse struct {
 
 func (x *MediaCreateResponse) Reset() {
 	*x = MediaCreateResponse{}
-	mi := &file_ddisc_media_proto_msgTypes[4]
+	mi := &file_ddisc_ddisc_media_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -355,7 +355,7 @@ func (x *MediaCreateResponse) String() string {
 func (*MediaCreateResponse) ProtoMessage() {}
 
 func (x *MediaCreateResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_ddisc_media_proto_msgTypes[4]
+	mi := &file_ddisc_ddisc_media_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -368,7 +368,7 @@ func (x *MediaCreateResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MediaCreateResponse.ProtoReflect.Descriptor instead.
 func (*MediaCreateResponse) Descriptor() ([]byte, []int) {
-	return file_ddisc_media_proto_rawDescGZIP(), []int{4}
+	return file_ddisc_ddisc_media_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *MediaCreateResponse) GetMedia() *Media {
@@ -386,7 +386,7 @@ type MediaDeleteRequest struct {
 
 func (x *MediaDeleteRequest) Reset() {
 	*x = MediaDeleteRequest{}
-	mi := &file_ddisc_media_proto_msgTypes[5]
+	mi := &file_ddisc_ddisc_media_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -398,7 +398,7 @@ func (x *MediaDeleteRequest) String() string {
 func (*MediaDeleteRequest) ProtoMessage() {}
 
 func (x *MediaDeleteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_ddisc_media_proto_msgTypes[5]
+	mi := &file_ddisc_ddisc_media_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -411,7 +411,7 @@ func (x *MediaDeleteRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MediaDeleteRequest.ProtoReflect.Descriptor instead.
 func (*MediaDeleteRequest) Descriptor() ([]byte, []int) {
-	return file_ddisc_media_proto_rawDescGZIP(), []int{5}
+	return file_ddisc_ddisc_media_proto_rawDescGZIP(), []int{5}
 }
 
 type MediaDeleteResponse struct {
@@ -423,7 +423,7 @@ type MediaDeleteResponse struct {
 
 func (x *MediaDeleteResponse) Reset() {
 	*x = MediaDeleteResponse{}
-	mi := &file_ddisc_media_proto_msgTypes[6]
+	mi := &file_ddisc_ddisc_media_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -435,7 +435,7 @@ func (x *MediaDeleteResponse) String() string {
 func (*MediaDeleteResponse) ProtoMessage() {}
 
 func (x *MediaDeleteResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_ddisc_media_proto_msgTypes[6]
+	mi := &file_ddisc_ddisc_media_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -448,7 +448,7 @@ func (x *MediaDeleteResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MediaDeleteResponse.ProtoReflect.Descriptor instead.
 func (*MediaDeleteResponse) Descriptor() ([]byte, []int) {
-	return file_ddisc_media_proto_rawDescGZIP(), []int{6}
+	return file_ddisc_ddisc_media_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *MediaDeleteResponse) GetMedia() *Media {
@@ -458,11 +458,11 @@ func (x *MediaDeleteResponse) GetMedia() *Media {
 	return nil
 }
 
-var File_ddisc_media_proto protoreflect.FileDescriptor
+var File_ddisc_ddisc_media_proto protoreflect.FileDescriptor
 
-const file_ddisc_media_proto_rawDesc = "" +
+const file_ddisc_ddisc_media_proto_rawDesc = "" +
 	"\n" +
-	"\x11ddisc.media.proto\x12\x05ddisc\x1a\x11meta.search.proto\"\xe5\x02\n" +
+	"\x17ddisc/ddisc.media.proto\x12\x05ddisc\x1a\x16meta/meta.search.proto\"\xe5\x02\n" +
 	"\x05Media\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
 	"\binfohash\x18\x02 \x01(\fR\binfohash\x12\x14\n" +
@@ -502,19 +502,19 @@ const file_ddisc_media_proto_rawDesc = "" +
 	"\x05media\x18\x01 \x01(\v2\f.ddisc.MediaR\x05mediab\x06proto3"
 
 var (
-	file_ddisc_media_proto_rawDescOnce sync.Once
-	file_ddisc_media_proto_rawDescData []byte
+	file_ddisc_ddisc_media_proto_rawDescOnce sync.Once
+	file_ddisc_ddisc_media_proto_rawDescData []byte
 )
 
-func file_ddisc_media_proto_rawDescGZIP() []byte {
-	file_ddisc_media_proto_rawDescOnce.Do(func() {
-		file_ddisc_media_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_ddisc_media_proto_rawDesc), len(file_ddisc_media_proto_rawDesc)))
+func file_ddisc_ddisc_media_proto_rawDescGZIP() []byte {
+	file_ddisc_ddisc_media_proto_rawDescOnce.Do(func() {
+		file_ddisc_ddisc_media_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_ddisc_ddisc_media_proto_rawDesc), len(file_ddisc_ddisc_media_proto_rawDesc)))
 	})
-	return file_ddisc_media_proto_rawDescData
+	return file_ddisc_ddisc_media_proto_rawDescData
 }
 
-var file_ddisc_media_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
-var file_ddisc_media_proto_goTypes = []any{
+var file_ddisc_ddisc_media_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_ddisc_ddisc_media_proto_goTypes = []any{
 	(*Media)(nil),               // 0: ddisc.Media
 	(*MediaSearchRequest)(nil),  // 1: ddisc.MediaSearchRequest
 	(*MediaSearchResponse)(nil), // 2: ddisc.MediaSearchResponse
@@ -524,7 +524,7 @@ var file_ddisc_media_proto_goTypes = []any{
 	(*MediaDeleteResponse)(nil), // 6: ddisc.MediaDeleteResponse
 	(*meta.DateRange)(nil),      // 7: meta.DateRange
 }
-var file_ddisc_media_proto_depIdxs = []int32{
+var file_ddisc_ddisc_media_proto_depIdxs = []int32{
 	7, // 0: ddisc.MediaSearchRequest.next_check:type_name -> meta.DateRange
 	1, // 1: ddisc.MediaSearchResponse.next:type_name -> ddisc.MediaSearchRequest
 	0, // 2: ddisc.MediaSearchResponse.items:type_name -> ddisc.Media
@@ -538,26 +538,26 @@ var file_ddisc_media_proto_depIdxs = []int32{
 	0, // [0:6] is the sub-list for field type_name
 }
 
-func init() { file_ddisc_media_proto_init() }
-func file_ddisc_media_proto_init() {
-	if File_ddisc_media_proto != nil {
+func init() { file_ddisc_ddisc_media_proto_init() }
+func file_ddisc_ddisc_media_proto_init() {
+	if File_ddisc_ddisc_media_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_ddisc_media_proto_rawDesc), len(file_ddisc_media_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_ddisc_ddisc_media_proto_rawDesc), len(file_ddisc_ddisc_media_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_ddisc_media_proto_goTypes,
-		DependencyIndexes: file_ddisc_media_proto_depIdxs,
-		MessageInfos:      file_ddisc_media_proto_msgTypes,
+		GoTypes:           file_ddisc_ddisc_media_proto_goTypes,
+		DependencyIndexes: file_ddisc_ddisc_media_proto_depIdxs,
+		MessageInfos:      file_ddisc_ddisc_media_proto_msgTypes,
 	}.Build()
-	File_ddisc_media_proto = out.File
-	file_ddisc_media_proto_goTypes = nil
-	file_ddisc_media_proto_depIdxs = nil
+	File_ddisc_ddisc_media_proto = out.File
+	file_ddisc_ddisc_media_proto_goTypes = nil
+	file_ddisc_ddisc_media_proto_depIdxs = nil
 }

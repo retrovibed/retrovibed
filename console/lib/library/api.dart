@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
-import 'package:retrovibed/media/meta.search.pb.dart';
+import 'package:retrovibed/meta/meta.search.pb.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:lru/lru.dart';
 import 'package:retrovibed/designkit.dart' as ds;

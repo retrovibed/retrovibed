@@ -1,6 +1,6 @@
 // This is a generated file - do not edit.
 //
-// Generated from community.publish.proto.
+// Generated from community/community.publish.proto.
 
 // @dart = 3.3
 

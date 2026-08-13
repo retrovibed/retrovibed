@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.12
 // 	protoc        v3.21.12
-// source: meta.search.proto
+// source: meta/meta.search.proto
 
 package meta
 
@@ -31,7 +31,7 @@ type DateRange struct {
 
 func (x *DateRange) Reset() {
 	*x = DateRange{}
-	mi := &file_meta_search_proto_msgTypes[0]
+	mi := &file_meta_meta_search_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -43,7 +43,7 @@ func (x *DateRange) String() string {
 func (*DateRange) ProtoMessage() {}
 
 func (x *DateRange) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_search_proto_msgTypes[0]
+	mi := &file_meta_meta_search_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -56,7 +56,7 @@ func (x *DateRange) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DateRange.ProtoReflect.Descriptor instead.
 func (*DateRange) Descriptor() ([]byte, []int) {
-	return file_meta_search_proto_rawDescGZIP(), []int{0}
+	return file_meta_meta_search_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *DateRange) GetOldest() string {
@@ -73,32 +73,32 @@ func (x *DateRange) GetNewest() string {
 	return ""
 }
 
-var File_meta_search_proto protoreflect.FileDescriptor
+var File_meta_meta_search_proto protoreflect.FileDescriptor
 
-const file_meta_search_proto_rawDesc = "" +
+const file_meta_meta_search_proto_rawDesc = "" +
 	"\n" +
-	"\x11meta.search.proto\x12\x04meta\";\n" +
+	"\x16meta/meta.search.proto\x12\x04meta\";\n" +
 	"\tDateRange\x12\x16\n" +
 	"\x06oldest\x18\x01 \x01(\tR\x06oldest\x12\x16\n" +
 	"\x06newest\x18\x02 \x01(\tR\x06newestb\x06proto3"
 
 var (
-	file_meta_search_proto_rawDescOnce sync.Once
-	file_meta_search_proto_rawDescData []byte
+	file_meta_meta_search_proto_rawDescOnce sync.Once
+	file_meta_meta_search_proto_rawDescData []byte
 )
 
-func file_meta_search_proto_rawDescGZIP() []byte {
-	file_meta_search_proto_rawDescOnce.Do(func() {
-		file_meta_search_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_meta_search_proto_rawDesc), len(file_meta_search_proto_rawDesc)))
+func file_meta_meta_search_proto_rawDescGZIP() []byte {
+	file_meta_meta_search_proto_rawDescOnce.Do(func() {
+		file_meta_meta_search_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_meta_meta_search_proto_rawDesc), len(file_meta_meta_search_proto_rawDesc)))
 	})
-	return file_meta_search_proto_rawDescData
+	return file_meta_meta_search_proto_rawDescData
 }
 
-var file_meta_search_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
-var file_meta_search_proto_goTypes = []any{
+var file_meta_meta_search_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_meta_meta_search_proto_goTypes = []any{
 	(*DateRange)(nil), // 0: meta.DateRange
 }
-var file_meta_search_proto_depIdxs = []int32{
+var file_meta_meta_search_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
 	0, // [0:0] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -106,26 +106,26 @@ var file_meta_search_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_meta_search_proto_init() }
-func file_meta_search_proto_init() {
-	if File_meta_search_proto != nil {
+func init() { file_meta_meta_search_proto_init() }
+func file_meta_meta_search_proto_init() {
+	if File_meta_meta_search_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_meta_search_proto_rawDesc), len(file_meta_search_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_meta_meta_search_proto_rawDesc), len(file_meta_meta_search_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_meta_search_proto_goTypes,
-		DependencyIndexes: file_meta_search_proto_depIdxs,
-		MessageInfos:      file_meta_search_proto_msgTypes,
+		GoTypes:           file_meta_meta_search_proto_goTypes,
+		DependencyIndexes: file_meta_meta_search_proto_depIdxs,
+		MessageInfos:      file_meta_meta_search_proto_msgTypes,
 	}.Build()
-	File_meta_search_proto = out.File
-	file_meta_search_proto_goTypes = nil
-	file_meta_search_proto_depIdxs = nil
+	File_meta_meta_search_proto = out.File
+	file_meta_meta_search_proto_goTypes = nil
+	file_meta_meta_search_proto_depIdxs = nil
 }

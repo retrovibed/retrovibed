@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.12
 // 	protoc        v3.21.12
-// source: meta.account.proto
+// source: meta/meta.account.proto
 
 package authn
 
@@ -36,7 +36,7 @@ type Account struct {
 
 func (x *Account) Reset() {
 	*x = Account{}
-	mi := &file_meta_account_proto_msgTypes[0]
+	mi := &file_meta_meta_account_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -48,7 +48,7 @@ func (x *Account) String() string {
 func (*Account) ProtoMessage() {}
 
 func (x *Account) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_account_proto_msgTypes[0]
+	mi := &file_meta_meta_account_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -61,7 +61,7 @@ func (x *Account) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Account.ProtoReflect.Descriptor instead.
 func (*Account) Descriptor() ([]byte, []int) {
-	return file_meta_account_proto_rawDescGZIP(), []int{0}
+	return file_meta_meta_account_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *Account) GetId() string {
@@ -121,7 +121,7 @@ type AccountLookupRequest struct {
 
 func (x *AccountLookupRequest) Reset() {
 	*x = AccountLookupRequest{}
-	mi := &file_meta_account_proto_msgTypes[1]
+	mi := &file_meta_meta_account_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -133,7 +133,7 @@ func (x *AccountLookupRequest) String() string {
 func (*AccountLookupRequest) ProtoMessage() {}
 
 func (x *AccountLookupRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_account_proto_msgTypes[1]
+	mi := &file_meta_meta_account_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -146,7 +146,7 @@ func (x *AccountLookupRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AccountLookupRequest.ProtoReflect.Descriptor instead.
 func (*AccountLookupRequest) Descriptor() ([]byte, []int) {
-	return file_meta_account_proto_rawDescGZIP(), []int{1}
+	return file_meta_meta_account_proto_rawDescGZIP(), []int{1}
 }
 
 type AccountLookupResponse struct {
@@ -158,7 +158,7 @@ type AccountLookupResponse struct {
 
 func (x *AccountLookupResponse) Reset() {
 	*x = AccountLookupResponse{}
-	mi := &file_meta_account_proto_msgTypes[2]
+	mi := &file_meta_meta_account_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -170,7 +170,7 @@ func (x *AccountLookupResponse) String() string {
 func (*AccountLookupResponse) ProtoMessage() {}
 
 func (x *AccountLookupResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_account_proto_msgTypes[2]
+	mi := &file_meta_meta_account_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -183,7 +183,7 @@ func (x *AccountLookupResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AccountLookupResponse.ProtoReflect.Descriptor instead.
 func (*AccountLookupResponse) Descriptor() ([]byte, []int) {
-	return file_meta_account_proto_rawDescGZIP(), []int{2}
+	return file_meta_meta_account_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *AccountLookupResponse) GetAccount() *Account {
@@ -202,7 +202,7 @@ type AccountUpdateRequest struct {
 
 func (x *AccountUpdateRequest) Reset() {
 	*x = AccountUpdateRequest{}
-	mi := &file_meta_account_proto_msgTypes[3]
+	mi := &file_meta_meta_account_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -214,7 +214,7 @@ func (x *AccountUpdateRequest) String() string {
 func (*AccountUpdateRequest) ProtoMessage() {}
 
 func (x *AccountUpdateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_account_proto_msgTypes[3]
+	mi := &file_meta_meta_account_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -227,7 +227,7 @@ func (x *AccountUpdateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AccountUpdateRequest.ProtoReflect.Descriptor instead.
 func (*AccountUpdateRequest) Descriptor() ([]byte, []int) {
-	return file_meta_account_proto_rawDescGZIP(), []int{3}
+	return file_meta_meta_account_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *AccountUpdateRequest) GetAccount() *Account {
@@ -246,7 +246,7 @@ type AccountUpdateResponse struct {
 
 func (x *AccountUpdateResponse) Reset() {
 	*x = AccountUpdateResponse{}
-	mi := &file_meta_account_proto_msgTypes[4]
+	mi := &file_meta_meta_account_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -258,7 +258,7 @@ func (x *AccountUpdateResponse) String() string {
 func (*AccountUpdateResponse) ProtoMessage() {}
 
 func (x *AccountUpdateResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_meta_account_proto_msgTypes[4]
+	mi := &file_meta_meta_account_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -271,7 +271,7 @@ func (x *AccountUpdateResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AccountUpdateResponse.ProtoReflect.Descriptor instead.
 func (*AccountUpdateResponse) Descriptor() ([]byte, []int) {
-	return file_meta_account_proto_rawDescGZIP(), []int{4}
+	return file_meta_meta_account_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *AccountUpdateResponse) GetAccount() *Account {
@@ -281,11 +281,11 @@ func (x *AccountUpdateResponse) GetAccount() *Account {
 	return nil
 }
 
-var File_meta_account_proto protoreflect.FileDescriptor
+var File_meta_meta_account_proto protoreflect.FileDescriptor
 
-const file_meta_account_proto_rawDesc = "" +
+const file_meta_meta_account_proto_rawDesc = "" +
 	"\n" +
-	"\x12meta.account.proto\x12\x04meta\"\xc9\x01\n" +
+	"\x17meta/meta.account.proto\x12\x04meta\"\xc9\x01\n" +
 	"\aAccount\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x12\x1e\n" +
@@ -307,26 +307,26 @@ const file_meta_account_proto_rawDesc = "" +
 	"\aaccount\x18\x01 \x01(\v2\r.meta.AccountR\aaccountb\x06proto3"
 
 var (
-	file_meta_account_proto_rawDescOnce sync.Once
-	file_meta_account_proto_rawDescData []byte
+	file_meta_meta_account_proto_rawDescOnce sync.Once
+	file_meta_meta_account_proto_rawDescData []byte
 )
 
-func file_meta_account_proto_rawDescGZIP() []byte {
-	file_meta_account_proto_rawDescOnce.Do(func() {
-		file_meta_account_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_meta_account_proto_rawDesc), len(file_meta_account_proto_rawDesc)))
+func file_meta_meta_account_proto_rawDescGZIP() []byte {
+	file_meta_meta_account_proto_rawDescOnce.Do(func() {
+		file_meta_meta_account_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_meta_meta_account_proto_rawDesc), len(file_meta_meta_account_proto_rawDesc)))
 	})
-	return file_meta_account_proto_rawDescData
+	return file_meta_meta_account_proto_rawDescData
 }
 
-var file_meta_account_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
-var file_meta_account_proto_goTypes = []any{
+var file_meta_meta_account_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_meta_meta_account_proto_goTypes = []any{
 	(*Account)(nil),               // 0: meta.Account
 	(*AccountLookupRequest)(nil),  // 1: meta.AccountLookupRequest
 	(*AccountLookupResponse)(nil), // 2: meta.AccountLookupResponse
 	(*AccountUpdateRequest)(nil),  // 3: meta.AccountUpdateRequest
 	(*AccountUpdateResponse)(nil), // 4: meta.AccountUpdateResponse
 }
-var file_meta_account_proto_depIdxs = []int32{
+var file_meta_meta_account_proto_depIdxs = []int32{
 	0, // 0: meta.AccountLookupResponse.account:type_name -> meta.Account
 	0, // 1: meta.AccountUpdateRequest.account:type_name -> meta.Account
 	0, // 2: meta.AccountUpdateResponse.account:type_name -> meta.Account
@@ -337,26 +337,26 @@ var file_meta_account_proto_depIdxs = []int32{
 	0, // [0:3] is the sub-list for field type_name
 }
 
-func init() { file_meta_account_proto_init() }
-func file_meta_account_proto_init() {
-	if File_meta_account_proto != nil {
+func init() { file_meta_meta_account_proto_init() }
+func file_meta_meta_account_proto_init() {
+	if File_meta_meta_account_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_meta_account_proto_rawDesc), len(file_meta_account_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_meta_meta_account_proto_rawDesc), len(file_meta_meta_account_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_meta_account_proto_goTypes,
-		DependencyIndexes: file_meta_account_proto_depIdxs,
-		MessageInfos:      file_meta_account_proto_msgTypes,
+		GoTypes:           file_meta_meta_account_proto_goTypes,
+		DependencyIndexes: file_meta_meta_account_proto_depIdxs,
+		MessageInfos:      file_meta_meta_account_proto_msgTypes,
 	}.Build()
-	File_meta_account_proto = out.File
-	file_meta_account_proto_goTypes = nil
-	file_meta_account_proto_depIdxs = nil
+	File_meta_meta_account_proto = out.File
+	file_meta_meta_account_proto_goTypes = nil
+	file_meta_meta_account_proto_depIdxs = nil
 }

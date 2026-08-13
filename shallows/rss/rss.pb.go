@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.12
 // 	protoc        v3.21.12
-// source: rss.proto
+// source: rss/rss.proto
 
 package rss
 
@@ -42,7 +42,7 @@ type Feed struct {
 
 func (x *Feed) Reset() {
 	*x = Feed{}
-	mi := &file_rss_proto_msgTypes[0]
+	mi := &file_rss_rss_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -54,7 +54,7 @@ func (x *Feed) String() string {
 func (*Feed) ProtoMessage() {}
 
 func (x *Feed) ProtoReflect() protoreflect.Message {
-	mi := &file_rss_proto_msgTypes[0]
+	mi := &file_rss_rss_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -67,7 +67,7 @@ func (x *Feed) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Feed.ProtoReflect.Descriptor instead.
 func (*Feed) Descriptor() ([]byte, []int) {
-	return file_rss_proto_rawDescGZIP(), []int{0}
+	return file_rss_rss_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *Feed) GetId() string {
@@ -172,7 +172,7 @@ type FeedSearchRequest struct {
 
 func (x *FeedSearchRequest) Reset() {
 	*x = FeedSearchRequest{}
-	mi := &file_rss_proto_msgTypes[1]
+	mi := &file_rss_rss_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -184,7 +184,7 @@ func (x *FeedSearchRequest) String() string {
 func (*FeedSearchRequest) ProtoMessage() {}
 
 func (x *FeedSearchRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rss_proto_msgTypes[1]
+	mi := &file_rss_rss_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -197,7 +197,7 @@ func (x *FeedSearchRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FeedSearchRequest.ProtoReflect.Descriptor instead.
 func (*FeedSearchRequest) Descriptor() ([]byte, []int) {
-	return file_rss_proto_rawDescGZIP(), []int{1}
+	return file_rss_rss_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *FeedSearchRequest) GetQuery() string {
@@ -231,7 +231,7 @@ type FeedSearchResponse struct {
 
 func (x *FeedSearchResponse) Reset() {
 	*x = FeedSearchResponse{}
-	mi := &file_rss_proto_msgTypes[2]
+	mi := &file_rss_rss_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -243,7 +243,7 @@ func (x *FeedSearchResponse) String() string {
 func (*FeedSearchResponse) ProtoMessage() {}
 
 func (x *FeedSearchResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_rss_proto_msgTypes[2]
+	mi := &file_rss_rss_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -256,7 +256,7 @@ func (x *FeedSearchResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FeedSearchResponse.ProtoReflect.Descriptor instead.
 func (*FeedSearchResponse) Descriptor() ([]byte, []int) {
-	return file_rss_proto_rawDescGZIP(), []int{2}
+	return file_rss_rss_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *FeedSearchResponse) GetNext() *FeedSearchRequest {
@@ -282,7 +282,7 @@ type FeedCreateRequest struct {
 
 func (x *FeedCreateRequest) Reset() {
 	*x = FeedCreateRequest{}
-	mi := &file_rss_proto_msgTypes[3]
+	mi := &file_rss_rss_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -294,7 +294,7 @@ func (x *FeedCreateRequest) String() string {
 func (*FeedCreateRequest) ProtoMessage() {}
 
 func (x *FeedCreateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rss_proto_msgTypes[3]
+	mi := &file_rss_rss_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -307,7 +307,7 @@ func (x *FeedCreateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FeedCreateRequest.ProtoReflect.Descriptor instead.
 func (*FeedCreateRequest) Descriptor() ([]byte, []int) {
-	return file_rss_proto_rawDescGZIP(), []int{3}
+	return file_rss_rss_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *FeedCreateRequest) GetFeed() *Feed {
@@ -326,7 +326,7 @@ type FeedCreateResponse struct {
 
 func (x *FeedCreateResponse) Reset() {
 	*x = FeedCreateResponse{}
-	mi := &file_rss_proto_msgTypes[4]
+	mi := &file_rss_rss_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -338,7 +338,7 @@ func (x *FeedCreateResponse) String() string {
 func (*FeedCreateResponse) ProtoMessage() {}
 
 func (x *FeedCreateResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_rss_proto_msgTypes[4]
+	mi := &file_rss_rss_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -351,7 +351,7 @@ func (x *FeedCreateResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FeedCreateResponse.ProtoReflect.Descriptor instead.
 func (*FeedCreateResponse) Descriptor() ([]byte, []int) {
-	return file_rss_proto_rawDescGZIP(), []int{4}
+	return file_rss_rss_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *FeedCreateResponse) GetFeed() *Feed {
@@ -370,7 +370,7 @@ type FeedUpdateRequest struct {
 
 func (x *FeedUpdateRequest) Reset() {
 	*x = FeedUpdateRequest{}
-	mi := &file_rss_proto_msgTypes[5]
+	mi := &file_rss_rss_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -382,7 +382,7 @@ func (x *FeedUpdateRequest) String() string {
 func (*FeedUpdateRequest) ProtoMessage() {}
 
 func (x *FeedUpdateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rss_proto_msgTypes[5]
+	mi := &file_rss_rss_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -395,7 +395,7 @@ func (x *FeedUpdateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FeedUpdateRequest.ProtoReflect.Descriptor instead.
 func (*FeedUpdateRequest) Descriptor() ([]byte, []int) {
-	return file_rss_proto_rawDescGZIP(), []int{5}
+	return file_rss_rss_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *FeedUpdateRequest) GetFeed() *Feed {
@@ -414,7 +414,7 @@ type FeedUpdateResponse struct {
 
 func (x *FeedUpdateResponse) Reset() {
 	*x = FeedUpdateResponse{}
-	mi := &file_rss_proto_msgTypes[6]
+	mi := &file_rss_rss_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -426,7 +426,7 @@ func (x *FeedUpdateResponse) String() string {
 func (*FeedUpdateResponse) ProtoMessage() {}
 
 func (x *FeedUpdateResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_rss_proto_msgTypes[6]
+	mi := &file_rss_rss_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -439,7 +439,7 @@ func (x *FeedUpdateResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FeedUpdateResponse.ProtoReflect.Descriptor instead.
 func (*FeedUpdateResponse) Descriptor() ([]byte, []int) {
-	return file_rss_proto_rawDescGZIP(), []int{6}
+	return file_rss_rss_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *FeedUpdateResponse) GetFeed() *Feed {
@@ -457,7 +457,7 @@ type FeedDeleteRequest struct {
 
 func (x *FeedDeleteRequest) Reset() {
 	*x = FeedDeleteRequest{}
-	mi := &file_rss_proto_msgTypes[7]
+	mi := &file_rss_rss_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -469,7 +469,7 @@ func (x *FeedDeleteRequest) String() string {
 func (*FeedDeleteRequest) ProtoMessage() {}
 
 func (x *FeedDeleteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_rss_proto_msgTypes[7]
+	mi := &file_rss_rss_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -482,7 +482,7 @@ func (x *FeedDeleteRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FeedDeleteRequest.ProtoReflect.Descriptor instead.
 func (*FeedDeleteRequest) Descriptor() ([]byte, []int) {
-	return file_rss_proto_rawDescGZIP(), []int{7}
+	return file_rss_rss_proto_rawDescGZIP(), []int{7}
 }
 
 type FeedDeleteResponse struct {
@@ -494,7 +494,7 @@ type FeedDeleteResponse struct {
 
 func (x *FeedDeleteResponse) Reset() {
 	*x = FeedDeleteResponse{}
-	mi := &file_rss_proto_msgTypes[8]
+	mi := &file_rss_rss_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -506,7 +506,7 @@ func (x *FeedDeleteResponse) String() string {
 func (*FeedDeleteResponse) ProtoMessage() {}
 
 func (x *FeedDeleteResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_rss_proto_msgTypes[8]
+	mi := &file_rss_rss_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -519,7 +519,7 @@ func (x *FeedDeleteResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FeedDeleteResponse.ProtoReflect.Descriptor instead.
 func (*FeedDeleteResponse) Descriptor() ([]byte, []int) {
-	return file_rss_proto_rawDescGZIP(), []int{8}
+	return file_rss_rss_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *FeedDeleteResponse) GetFeed() *Feed {
@@ -529,11 +529,11 @@ func (x *FeedDeleteResponse) GetFeed() *Feed {
 	return nil
 }
 
-var File_rss_proto protoreflect.FileDescriptor
+var File_rss_rss_proto protoreflect.FileDescriptor
 
-const file_rss_proto_rawDesc = "" +
+const file_rss_rss_proto_rawDesc = "" +
 	"\n" +
-	"\trss.proto\x12\x03rss\"\x9a\x03\n" +
+	"\rrss/rss.proto\x12\x03rss\"\x9a\x03\n" +
 	"\x04Feed\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1e\n" +
 	"\n" +
@@ -575,19 +575,19 @@ const file_rss_proto_rawDesc = "" +
 	"\x04feed\x18\x01 \x01(\v2\t.rss.FeedR\x04feedb\x06proto3"
 
 var (
-	file_rss_proto_rawDescOnce sync.Once
-	file_rss_proto_rawDescData []byte
+	file_rss_rss_proto_rawDescOnce sync.Once
+	file_rss_rss_proto_rawDescData []byte
 )
 
-func file_rss_proto_rawDescGZIP() []byte {
-	file_rss_proto_rawDescOnce.Do(func() {
-		file_rss_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_rss_proto_rawDesc), len(file_rss_proto_rawDesc)))
+func file_rss_rss_proto_rawDescGZIP() []byte {
+	file_rss_rss_proto_rawDescOnce.Do(func() {
+		file_rss_rss_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_rss_rss_proto_rawDesc), len(file_rss_rss_proto_rawDesc)))
 	})
-	return file_rss_proto_rawDescData
+	return file_rss_rss_proto_rawDescData
 }
 
-var file_rss_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
-var file_rss_proto_goTypes = []any{
+var file_rss_rss_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_rss_rss_proto_goTypes = []any{
 	(*Feed)(nil),               // 0: rss.Feed
 	(*FeedSearchRequest)(nil),  // 1: rss.FeedSearchRequest
 	(*FeedSearchResponse)(nil), // 2: rss.FeedSearchResponse
@@ -598,7 +598,7 @@ var file_rss_proto_goTypes = []any{
 	(*FeedDeleteRequest)(nil),  // 7: rss.FeedDeleteRequest
 	(*FeedDeleteResponse)(nil), // 8: rss.FeedDeleteResponse
 }
-var file_rss_proto_depIdxs = []int32{
+var file_rss_rss_proto_depIdxs = []int32{
 	1, // 0: rss.FeedSearchResponse.next:type_name -> rss.FeedSearchRequest
 	0, // 1: rss.FeedSearchResponse.items:type_name -> rss.Feed
 	0, // 2: rss.FeedCreateRequest.feed:type_name -> rss.Feed
@@ -613,26 +613,26 @@ var file_rss_proto_depIdxs = []int32{
 	0, // [0:7] is the sub-list for field type_name
 }
 
-func init() { file_rss_proto_init() }
-func file_rss_proto_init() {
-	if File_rss_proto != nil {
+func init() { file_rss_rss_proto_init() }
+func file_rss_rss_proto_init() {
+	if File_rss_rss_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_rss_proto_rawDesc), len(file_rss_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_rss_rss_proto_rawDesc), len(file_rss_rss_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_rss_proto_goTypes,
-		DependencyIndexes: file_rss_proto_depIdxs,
-		MessageInfos:      file_rss_proto_msgTypes,
+		GoTypes:           file_rss_rss_proto_goTypes,
+		DependencyIndexes: file_rss_rss_proto_depIdxs,
+		MessageInfos:      file_rss_rss_proto_msgTypes,
 	}.Build()
-	File_rss_proto = out.File
-	file_rss_proto_goTypes = nil
-	file_rss_proto_depIdxs = nil
+	File_rss_rss_proto = out.File
+	file_rss_rss_proto_goTypes = nil
+	file_rss_rss_proto_depIdxs = nil
 }
