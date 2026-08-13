@@ -41,7 +41,7 @@ class _State extends State<RemoteControlListener> {
     final library = _library.value;
     final cached = authn.AuthzCache.meta(context);
     // forces a refresh if expired, so token is never blank
-    return cached.refresh(cached).then((bearer) {
+    return cached.auto().then((bearer) {
       if (!mounted) return;
       _socket.send(
         remote.messages.sync(
