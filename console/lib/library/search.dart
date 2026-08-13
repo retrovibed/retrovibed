@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
-import 'package:retrovibed/downloads.dart' as downloads;
 import 'package:retrovibed/media.dart' as media;
-import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/lucene.dart' as lucene;
 import 'grid.display.dart';
 import 'grid.setting.dart';
-import 'search.mimetype.dropdown.dart';
-import 'dropdown.upload.dart';
+import 'search.dropdown.dart';
 import 'empty.results.dart';
 
 class Search extends StatefulWidget {
@@ -101,61 +98,17 @@ class _SearchState extends State<Search> {
             empty: ds.Grid.int64(state.count) < state.next.limit,
             leading: [
               ds.CompactingMenu.pinned(
-                DropdownUpload(
-                  icon: SearchMimetypeDropdown.icon(mimex.checksum(state.next.mimetypes)),
+                SearchUploadDropdown(
+                  search: widget.search,
+                  mode: widget.mode,
+                  onModeChanged: widget.onModeChanged,
+                  apiupload: widget.apiupload,
+                  onDownloadingChanged: widget.onDownloadingChanged,
                   help: ds.Hint(
                     const Text(
                       "filter by mimetype, upload files, torrents, magnet links, or switch to discover mode",
                     ),
                   ),
-                  items: [
-                    ...SearchMimetypeDropdown.menuItems(widget.search),
-                    media.SearchModeToggle(
-                      mode: media.SearchMode.discovery,
-                      current: widget.mode,
-                      icon: Icons.travel_explore,
-                      label: "Discover",
-                      onSelect: widget.onModeChanged,
-                    ),
-                    media.SearchModeToggle(
-                      mode: media.SearchMode.remote,
-                      current: widget.mode,
-                      icon: Icons.settings_remote,
-                      label: "Remote",
-                      onSelect: widget.onModeChanged,
-                    ),
-                    const PopupMenuDivider(),
-                    PopupMenuItem<String>(
-                      enabled: false,
-                      child: ValueListenableBuilder<media.MediaSearchState>(
-                        valueListenable: widget.search,
-                        builder: (context, s, _) => mimex.CategoryOptionsLabel(s.next.mimetypes),
-                      ),
-                    ),
-                    media.MenuItemUploadFiles(
-                      context,
-                      widget.search,
-                      apiupload: widget.apiupload,
-                    ),
-                    downloads.MenuItemDownloadTorrent(context, (downloads) {
-                      widget.onDownloadingChanged(
-                        media.DownloadQueue(
-                          downloads,
-                          onQueueComplete: () => widget.onDownloadingChanged(ds.Empty),
-                        ),
-                      );
-                      print("downloading torrents ${downloads}");
-                    }),
-                    downloads.MenuItemDownloadMagnet(context, (downloads) {
-                      widget.onDownloadingChanged(
-                        media.DownloadQueue(
-                          downloads,
-                          onQueueComplete: () => widget.onDownloadingChanged(ds.Empty),
-                        ),
-                      );
-                      print("downloading magnets ${downloads}");
-                    }),
-                  ],
                 ),
               ),
             ],

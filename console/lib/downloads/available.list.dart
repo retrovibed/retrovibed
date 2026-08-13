@@ -15,6 +15,7 @@ class AvailableListDisplay extends StatefulWidget {
   final media.FnUploadRequest upload;
   final TextEditingController? controller;
   final ValueNotifier<int>? events;
+  final List<Widget> leading;
   final List<Widget> trailing;
   const AvailableListDisplay({
     super.key,
@@ -22,6 +23,7 @@ class AvailableListDisplay extends StatefulWidget {
     this.upload = media.discovered.upload,
     this.controller,
     this.events,
+    this.leading = const [],
     this.trailing = const [],
   });
 
@@ -160,6 +162,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
             current: _res.next.offset,
             empty: ds.Table.offset(_res.items.length) < _res.next.limit,
             leading: [
+              ...widget.leading,
               ds.FileDropWell.icon(
                 upload,
                 mimetypes: [mimex.bittorrent],

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'package:retrovibed/navbar.dart' as navbar;
-import 'package:retrovibed/downloads.dart' as downloads;
+import 'package:retrovibed/remote.dart' as remote;
 import 'package:retrovibed/settings.dart' as settings;
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/library.dart' as medialib;
@@ -10,8 +10,8 @@ import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/design.kit/modals.dart' as modals;
 import 'package:retrovibed/community.dart' as community;
 
-/// The app's tab-based navigation: movie/library, download, community, and
-/// settings, each behind a [DefaultTabController]-driven [TabBar] and
+/// The app's tab-based navigation: movie/library, remote control, community,
+/// and settings, each behind a [DefaultTabController]-driven [TabBar] and
 /// [TabBarView]. Self-contained so it can be tested without the auth/media
 /// playback/network gates that wrap it in main.dart.
 class Routes extends StatelessWidget {
@@ -29,7 +29,7 @@ class Routes extends StatelessWidget {
           dividerHeight: 0,
           tabs: [
             Tab(icon: Icon(Icons.movie)),
-            Tab(icon: Icon(Icons.download)),
+            Tab(icon: Icon(Icons.settings_remote)),
             Tab(icon: Icon(Icons.groups)),
             Tab(icon: Icon(Icons.settings)),
           ],
@@ -89,9 +89,9 @@ class Routes extends StatelessWidget {
                   ),
                 ),
                 modals.Node(
-                  downloads.AutoHelp(
-                    downloads.MeteredWarning(const downloads.Display()),
-                  ),
+                  media.Playlist.wrap((ctx, s) {
+                    return remote.Connect(search: s.search);
+                  }),
                 ),
                 modals.Node(community.AutoHelp(community.Management())),
                 modals.Node(settings.AutoHelp(const settings.Display())),

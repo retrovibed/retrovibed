@@ -8,7 +8,7 @@ import 'package:retrovibed/testing/widget_tester_extensions.dart';
 Widget _harness() => media.Playlist(const routes.Routes());
 
 const _movieIndex = 0;
-const _downloadIndex = 1;
+const _remoteIndex = 1;
 const _settingsIndex = 3;
 
 Future<void> _pumpUntilTabBarVisible(WidgetTester tester) async {
@@ -25,7 +25,7 @@ int _selectedTabIndex(WidgetTester tester) {
 // A single large pump(duration) advances the clock in one jump and can skip
 // over the frame where the community page's Scrollable.ensureVisible call
 // (fired from its search tray mounting as a cache-adjacent neighbor of the
-// download page) overrides the tap-driven animateTo. Pumping in small
+// remote page) overrides the tap-driven animateTo. Pumping in small
 // increments lets that frame actually land.
 Future<void> _pumpTabSwitch(WidgetTester tester) async {
   for (var i = 0; i < 10; i++) {
@@ -44,22 +44,22 @@ void main() {
   final resolutions = Resolutions.variant();
 
   testWidgets(
-    'movie -> download selects download, not community',
+    'movie -> remote selects remote, not community',
     (WidgetTester tester) async {
       await tester.pumpApp(_harness(), fit: FlexFit.tight, physicalSize: resolutions.currentValue!.value);
       await _pumpUntilTabBarVisible(tester);
       expect(_selectedTabIndex(tester), _movieIndex);
 
-      await tester.tap(find.byIcon(Icons.download));
+      await tester.tap(find.byIcon(Icons.settings_remote));
       await _pumpTabSwitch(tester);
 
-      expect(_selectedTabIndex(tester), _downloadIndex);
+      expect(_selectedTabIndex(tester), _remoteIndex);
     },
     variant: resolutions,
   );
 
   testWidgets(
-    'movie -> settings -> download selects download, not community',
+    'movie -> settings -> remote selects remote, not community',
     (WidgetTester tester) async {
       await tester.pumpApp(_harness(), fit: FlexFit.tight, physicalSize: resolutions.currentValue!.value);
       await _pumpUntilTabBarVisible(tester);
@@ -68,10 +68,10 @@ void main() {
       await _pumpTabSwitch(tester);
       expect(_selectedTabIndex(tester), _settingsIndex);
 
-      await tester.tap(find.byIcon(Icons.download));
+      await tester.tap(find.byIcon(Icons.settings_remote));
       await _pumpTabSwitch(tester);
 
-      expect(_selectedTabIndex(tester), _downloadIndex);
+      expect(_selectedTabIndex(tester), _remoteIndex);
     },
     variant: resolutions,
   );

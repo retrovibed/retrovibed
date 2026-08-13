@@ -7,7 +7,6 @@ import 'package:retrovibed/design.kit/stateful.dart';
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/meta.dart' as meta;
 import 'package:retrovibed/media.dart' as media;
-import 'package:retrovibed/downloads.dart' as downloads;
 import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/library/dropdown.upload.dart';
 import 'package:retrovibed/library/search.mimetype.dropdown.dart';
@@ -44,53 +43,24 @@ Future<void> Function()? Function(BuildContext, media.Media, media.MediaSearchRe
 // scoped auth token, independent of the app-root EndpointAuto/AuthzCache.
 class Connect extends StatelessWidget {
   final ValueNotifier<media.MediaSearchState> search;
-  final media.FnUploadRequest apiupload;
-  final ValueNotifier<media.SearchMode> mode;
-  final void Function(media.SearchMode) onModeChanged;
-  final Widget downloading;
-  final void Function(Widget) onDownloadingChanged;
 
   const Connect({
     super.key,
     required this.search,
-    this.apiupload = media.media.upload,
-    required this.mode,
-    required this.onModeChanged,
-    required this.downloading,
-    required this.onDownloadingChanged,
   });
 
   @override
   Widget build(BuildContext context) {
     return authn.AuthedEndpoint(
-      _Connect(
-        search: search,
-        apiupload: apiupload,
-        mode: mode,
-        onModeChanged: onModeChanged,
-        downloading: downloading,
-        onDownloadingChanged: onDownloadingChanged,
-      ),
+      _Connect(search: search),
     );
   }
 }
 
 class _Connect extends StatefulWidget {
   final ValueNotifier<media.MediaSearchState> search;
-  final media.FnUploadRequest apiupload;
-  final ValueNotifier<media.SearchMode> mode;
-  final void Function(media.SearchMode) onModeChanged;
-  final Widget downloading;
-  final void Function(Widget) onDownloadingChanged;
 
-  const _Connect({
-    required this.search,
-    this.apiupload = media.media.upload,
-    required this.mode,
-    required this.onModeChanged,
-    required this.downloading,
-    required this.onDownloadingChanged,
-  });
+  const _Connect({required this.search});
 
   @override
   State<_Connect> createState() => _State();
@@ -234,20 +204,6 @@ class _State extends State<_Connect> with LoadingState {
                     icon: SearchMimetypeDropdown.icon(mimex.checksum(state.next.mimetypes)),
                     items: [
                       ...SearchMimetypeDropdown.menuItems(widget.search),
-                      media.SearchModeToggle(
-                        mode: media.SearchMode.discovery,
-                        current: widget.mode,
-                        icon: Icons.travel_explore,
-                        label: "Discover",
-                        onSelect: widget.onModeChanged,
-                      ),
-                      media.SearchModeToggle(
-                        mode: media.SearchMode.remote,
-                        current: widget.mode,
-                        icon: Icons.settings_remote,
-                        label: "Remote",
-                        onSelect: widget.onModeChanged,
-                      ),
                       const PopupMenuDivider(),
                       PopupMenuItem<String>(
                         enabled: false,
@@ -256,29 +212,6 @@ class _State extends State<_Connect> with LoadingState {
                           builder: (context, s, _) => mimex.CategoryOptionsLabel(s.next.mimetypes),
                         ),
                       ),
-                      media.MenuItemUploadFiles(
-                        context,
-                        widget.search,
-                        apiupload: widget.apiupload,
-                      ),
-                      downloads.MenuItemDownloadTorrent(context, (downloads) {
-                        widget.onDownloadingChanged(
-                          media.DownloadQueue(
-                            downloads,
-                            onQueueComplete: () => widget.onDownloadingChanged(ds.Empty),
-                          ),
-                        );
-                        print("downloading torrents ${downloads}");
-                      }),
-                      downloads.MenuItemDownloadMagnet(context, (downloads) {
-                        widget.onDownloadingChanged(
-                          media.DownloadQueue(
-                            downloads,
-                            onQueueComplete: () => widget.onDownloadingChanged(ds.Empty),
-                          ),
-                        );
-                        print("downloading magnets ${downloads}");
-                      }),
                     ],
                   ),
                 ),

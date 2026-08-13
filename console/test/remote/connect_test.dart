@@ -16,10 +16,6 @@ void main() {
           return visible
               ? Connect(
                   search: ValueNotifier(media.MediaSearchState(next: media.MediaSearchRequest())),
-                  mode: ValueNotifier(media.SearchMode.library),
-                  onModeChanged: (_) {},
-                  downloading: const SizedBox(),
-                  onDownloadingChanged: (_) {},
                 )
               : const SizedBox();
         },

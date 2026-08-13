@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/discovery.dart' as disc;
-import 'package:retrovibed/remote.dart' as remote;
+import 'package:retrovibed/downloads.dart' as downloads;
+import 'dropdown.upload.dart';
 import 'search.dart';
 
 class Home extends StatefulWidget {
@@ -74,13 +75,35 @@ class _HomeState extends State<Home> {
           downloading: _downloading,
           onDownloadingChanged: (w) => setState(() => _downloading = w),
         ),
-        media.SearchMode.remote => remote.Connect(
-          apiupload: widget.apiupload,
-          search: widget.search,
-          mode: _mode,
-          onModeChanged: _switchToMode,
-          downloading: _downloading,
-          onDownloadingChanged: (w) => setState(() => _downloading = w),
+        media.SearchMode.downloads => downloads.AutoHelp(
+          downloads.MeteredWarning(
+            downloads.Display(
+              leading: [
+                ds.CompactingMenu.pinned(
+                  DropdownUpload(
+                    icon: const Icon(Icons.apps),
+                    help: ds.Hint(const Text("switch to library or discover mode")),
+                    items: [
+                      media.SearchModeToggle(
+                        mode: media.SearchMode.library,
+                        current: _mode,
+                        icon: Icons.video_library,
+                        label: "Library",
+                        onSelect: _switchToMode,
+                      ),
+                      media.SearchModeToggle(
+                        mode: media.SearchMode.discovery,
+                        current: _mode,
+                        icon: Icons.travel_explore,
+                        label: "Discover",
+                        onSelect: _switchToMode,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       },
     );

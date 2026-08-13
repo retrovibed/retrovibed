@@ -6,13 +6,15 @@ import 'available.list.dart';
 
 class Display extends StatefulWidget {
   final media.FnDownloadSearch downloadingSearch;
-  final media.FnDownloadSearch availableSearch;
+  final media.FnDownloadSearch apiavailablesearch;
   final media.FnDownloadWatch downloadWatch;
+  final List<Widget> leading;
   const Display({
     super.key,
     this.downloadingSearch = media.discovered.downloading,
-    this.availableSearch = media.discovered.available,
+    this.apiavailablesearch = media.discovered.available,
     this.downloadWatch = media.discovered.watch,
+    this.leading = const [],
   });
 
   @override
@@ -38,9 +40,10 @@ class _DisplayState extends State<Display> {
         return Container(
           padding: defaults.padding,
           child: AvailableListDisplay(
-            search: widget.availableSearch,
+            search: widget.apiavailablesearch,
             controller: controller,
             events: refresh,
+            leading: widget.leading,
             trailing: [
               DownloadingListDisplay(
                 search: widget.downloadingSearch,
