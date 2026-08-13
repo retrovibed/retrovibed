@@ -79,79 +79,77 @@ class _DaemonDropdownState extends State<DaemonDropdown> {
       mainAxisSize: MainAxisSize.min,
       spacing: defaults.spacing / 2,
       children: [
-        ds.Help(
-          ds.SearchDropdown.text(
-            DaemonTypography.description(widget.library.value),
-            padding: defaults.padding.copyWith(
-              top: defaults.padding.left / 4,
-              bottom: defaults.padding.right / 4,
-            ),
-            key: ValueKey(widget.library.value.id),
-            controller: _search,
-            textAlign: TextAlign.center,
-            leading: [
-              ...widget.leading,
-              if (!widget.readonly)
-                ds.LoadingIconButton(
-                  tooltip: "connect to another library",
-                  focusNode: _addFocus,
-                  onPressed: () async {
-                    setState(() {
-                      _optional = _optional != null
-                          ? null
-                          : ds.Container(
-                              padding: defaults.padding.copyWith(top: 0),
-                              ManualConfiguration(
-                                connect: (daemon) {
-                                  setState(() {
-                                    _optional = null;
-                                  });
-                                  EndpointAuto.of(
-                                    context,
-                                  )?.setdaemon(daemon).ignore();
-                                },
-                              ),
-                            );
-                    });
-                  },
-                  icon: Icon(_optional == null ? Icons.add : Icons.remove),
-                ),
-            ],
-            trailing: widget.trailing,
-            onSearch: (query, onClick) {
-              return widget.search(api.DaemonSearchRequest()..query = query).then((response) {
-                if (response.items.length <= 1) return ds.Empty;
-                return Container(
-                  constraints: BoxConstraints(maxHeight: 400),
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: response.items.length,
-                    itemBuilder: (context, index) {
-                      final daemon = response.items[index];
-                      if (daemon.id == widget.library.value.id) {
-                        // no need to display the current library in the list.
-                        return ds.Empty;
-                      }
-                      if (widget.remoteonly && api.daemons.isLocalDevice(daemon)) {
-                        return ds.Empty;
-                      }
-
-                      return DaemonDropdownItem(
-                        library: daemon,
-                        readonly: widget.readonly,
-                        onSelect: widget.onSelect,
-                        onTap: (v) {
-                          widget.library.value = v;
-                          onClick();
-                        },
-                      );
-                    },
-                  ),
-                );
-              });
-            },
+        ds.SearchDropdown.text(
+          DaemonTypography.description(widget.library.value),
+          padding: defaults.padding.copyWith(
+            top: defaults.padding.left / 4,
+            bottom: defaults.padding.right / 4,
           ),
-          widget.help,
+          key: ValueKey(widget.library.value.id),
+          controller: _search,
+          textAlign: TextAlign.center,
+          help: widget.help,
+          leading: [
+            ...widget.leading,
+            if (!widget.readonly)
+              ds.LoadingIconButton(
+                tooltip: "connect to another library",
+                focusNode: _addFocus,
+                onPressed: () async {
+                  setState(() {
+                    _optional = _optional != null
+                        ? null
+                        : ds.Container(
+                            padding: defaults.padding.copyWith(top: 0),
+                            ManualConfiguration(
+                              connect: (daemon) {
+                                setState(() {
+                                  _optional = null;
+                                });
+                                EndpointAuto.of(
+                                  context,
+                                )?.setdaemon(daemon).ignore();
+                              },
+                            ),
+                          );
+                  });
+                },
+                icon: Icon(_optional == null ? Icons.add : Icons.remove),
+              ),
+          ],
+          trailing: widget.trailing,
+          onSearch: (query, onClick) {
+            return widget.search(api.DaemonSearchRequest()..query = query).then((response) {
+              if (response.items.length <= 1) return ds.Empty;
+              return Container(
+                constraints: BoxConstraints(maxHeight: 400),
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: response.items.length,
+                  itemBuilder: (context, index) {
+                    final daemon = response.items[index];
+                    if (daemon.id == widget.library.value.id) {
+                      // no need to display the current library in the list.
+                      return ds.Empty;
+                    }
+                    if (widget.remoteonly && api.daemons.isLocalDevice(daemon)) {
+                      return ds.Empty;
+                    }
+
+                    return DaemonDropdownItem(
+                      library: daemon,
+                      readonly: widget.readonly,
+                      onSelect: widget.onSelect,
+                      onTap: (v) {
+                        widget.library.value = v;
+                        onClick();
+                      },
+                    );
+                  },
+                ),
+              );
+            });
+          },
         ),
         ?_optional,
       ],

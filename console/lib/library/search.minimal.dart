@@ -6,6 +6,7 @@ import 'package:retrovibed/authn.dart' as authn;
 import 'known.media.icon.dart';
 
 class SearchMinimal extends StatefulWidget {
+  final int capacity;
   final media.FnMediaSearch apisearch;
   final Widget empty;
   final Future<void> Function()? Function(BuildContext, media.Media, media.MediaSearchResponse) onPlay;
@@ -15,6 +16,7 @@ class SearchMinimal extends StatefulWidget {
     this.apisearch = media.media.search,
     this.empty = const Text("no results"),
     this.onPlay = media.PlayAction,
+    this.capacity = 32,
   });
 
   @override
@@ -65,6 +67,7 @@ class _SearchMinimal extends State<SearchMinimal> {
   @override
   void initState() {
     super.initState();
+    _res.next.limit = ds.Int64(widget.capacity);
     ds.postframe(() => refresh(_res.next));
   }
 

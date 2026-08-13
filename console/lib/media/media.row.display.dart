@@ -9,6 +9,7 @@ class RowDisplay extends StatelessWidget {
   final Future<void> Function()? onTap;
   final Future<void> Function()? onDoubleTap;
   final Widget help;
+  final bool highlighted;
   const RowDisplay({
     super.key,
     required this.media,
@@ -17,17 +18,23 @@ class RowDisplay extends StatelessWidget {
     this.onTap,
     this.onDoubleTap,
     this.help = ds.HelpScope.None,
+    this.highlighted = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
     return ds.Help(
-      ds.TableRow(padding: defaults.padding, onTap: onTap, [
-        ...leading,
-        Expanded(child: Text(media.description, overflow: TextOverflow.ellipsis)),
-        ...trailing,
-      ]),
+      ds.TableRow(
+        padding: defaults.padding,
+        onTap: onTap,
+        tint: highlighted ? defaults.highlightTint : [],
+        [
+          ...leading,
+          Expanded(child: Text(media.description, overflow: TextOverflow.ellipsis)),
+          ...trailing,
+        ],
+      ),
       help,
     );
   }

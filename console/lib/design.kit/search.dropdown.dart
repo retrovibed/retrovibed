@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'flutterx.dart';
 import 'theme.defaults.dart';
 import 'empty.dart';
+import 'help.dart';
 
 class SearchDropdown extends StatefulWidget {
   static const InputDecoration defaultDecoration = const InputDecoration(
@@ -16,6 +17,7 @@ class SearchDropdown extends StatefulWidget {
   final List<Widget> leading;
   final List<Widget> trailing;
   final TextEditingController? controller;
+  final Widget help;
 
   const SearchDropdown({
     super.key,
@@ -26,6 +28,7 @@ class SearchDropdown extends StatefulWidget {
     this.leading = const [],
     this.trailing = const [],
     this.controller,
+    this.help = HelpScope.None,
   });
 
   factory SearchDropdown.text(
@@ -37,6 +40,7 @@ class SearchDropdown extends StatefulWidget {
     List<Widget> leading = const [],
     List<Widget> trailing = const [],
     TextEditingController? controller,
+    Widget help = HelpScope.None,
   }) {
     return SearchDropdown(
       key: key,
@@ -47,6 +51,7 @@ class SearchDropdown extends StatefulWidget {
       decoration: SearchDropdown.defaultDecoration.copyWith(hintText: text),
       leading: leading,
       trailing: trailing,
+      help: help,
     );
   }
 
@@ -132,29 +137,32 @@ class _SearchDropdownState extends State<SearchDropdown> {
             verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: defaults.spacing,
-                  vertical: defaults.spacing / 2,
-                ),
-                decoration: BoxDecoration(
-                  border: defaults.border,
-                  borderRadius: defaults.borderRadius,
-                ),
-                child: Row(
-                  children: [
-                    ...widget.leading,
-                    Expanded(
-                      child: TextField(
-                        controller: controller,
-                        decoration: widget.decoration,
-                        textAlign: widget.textAlign,
-                        onChanged: _query,
+              Help(
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: defaults.spacing,
+                    vertical: defaults.spacing / 2,
+                  ),
+                  decoration: BoxDecoration(
+                    border: defaults.border,
+                    borderRadius: defaults.borderRadius,
+                  ),
+                  child: Row(
+                    children: [
+                      ...widget.leading,
+                      Expanded(
+                        child: TextField(
+                          controller: controller,
+                          decoration: widget.decoration,
+                          textAlign: widget.textAlign,
+                          onChanged: _query,
+                        ),
                       ),
-                    ),
-                    ...widget.trailing,
-                  ],
+                      ...widget.trailing,
+                    ],
+                  ),
                 ),
+                widget.help,
               ),
               Visibility(
                 visible: open,

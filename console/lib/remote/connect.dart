@@ -8,8 +8,6 @@ import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/meta.dart' as meta;
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/mimex.dart' as mimex;
-import 'package:retrovibed/library/dropdown.upload.dart';
-import 'package:retrovibed/library/search.mimetype.dropdown.dart';
 import 'package:retrovibed/library/search.minimal.dart';
 import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'api.dart' as remote;
@@ -113,7 +111,6 @@ class _State extends State<_Connect> with LoadingState {
             _messages = socket.messages.asBroadcastStream();
             _messages.listen(
               (msg) {
-                print("received command ${msg}");
                 if (msg.whichCommand() != remote.Stream_Command.sync) return;
                 if (msg.sid.compareTo(_latest.sid) <= 0) return;
                 setState(() => _latest = msg);
@@ -176,7 +173,6 @@ class _State extends State<_Connect> with LoadingState {
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
-    print("current sync: ${_latest.sync}");
     final search = SearchMinimal(
       key: const ValueKey("search"),
       empty: ds.Empty,
@@ -196,26 +192,15 @@ class _State extends State<_Connect> with LoadingState {
             onSelect: meta.DaemonDropdown.local,
             remoteonly: true,
             readonly: true,
-            leading: [
-              ValueListenableBuilder<media.MediaSearchState>(
-                valueListenable: widget.search,
-                builder: (context, state, _) => ds.CompactingMenu.pinned(
-                  DropdownUpload(
-                    icon: SearchMimetypeDropdown.icon(mimex.checksum(state.next.mimetypes)),
-                    items: [
-                      ...SearchMimetypeDropdown.menuItems(widget.search),
-                      const PopupMenuDivider(),
-                      PopupMenuItem<String>(
-                        enabled: false,
-                        child: ValueListenableBuilder<media.MediaSearchState>(
-                          valueListenable: widget.search,
-                          builder: (context, s, _) => mimex.CategoryOptionsLabel(s.next.mimetypes),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+            trailing: [
+              _focused == null
+                  ? ds.Empty
+                  : ds.LoadingIconButton.close(
+                      onPressed: () {
+                        setState(() => _focused = null);
+                        return Future.value(null);
+                      },
+                    ),
             ],
           ),
           Expanded(
@@ -223,32 +208,34 @@ class _State extends State<_Connect> with LoadingState {
               padding: defaults.padding,
               ds.Loading(
                 loading: _socket == remote.RemoteControlSocket.noop,
-                Column(
-                  verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                _focused ??
+                    Column(
+                      verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
                       children: [
-                        PlayerControlSeek.prev(socket: _socket),
-                        PlayerControlSeek.backward(socket: _socket),
-                        PlayerControlPlayPause(socket: _socket, status: _messages),
-                        PlayerControlSeek.forward(socket: _socket),
-                        PlayerControlSeek.next(socket: _socket),
-                        ds.LoadingIconButton.search(
-                          toggled: _focused?.key == search.key,
-                          onPressed: ds.LoadingIconButton.convert(
-                            () => setState(() => _focused = _focused?.key == search.key ? null : search),
-                          ),
-                          tooltip: "search the remote device's library",
-                          help: ds.Hint(const Text("search the remote device's library to queue media on it")),
+                        Row(
+                          spacing: defaults.spacing,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            PlayerControlSeek.prev(socket: _socket),
+                            PlayerControlSeek.backward(socket: _socket),
+                            PlayerControlPlayPause(socket: _socket, status: _messages),
+                            PlayerControlSeek.forward(socket: _socket),
+                            PlayerControlSeek.next(socket: _socket),
+                            ds.LoadingIconButton.search(
+                              toggled: _focused?.key == search.key,
+                              onPressed: ds.LoadingIconButton.convert(
+                                () => setState(() => _focused = _focused?.key == search.key ? ds.Empty : search),
+                              ),
+                              tooltip: "search the remote device's library",
+                              help: ds.Hint(const Text("search the remote device's library to queue media on it")),
+                            ),
+                            if (authn.developer(context).debug) PlayerControlSync(socket: _socket),
+                          ],
                         ),
-                        PlayerControlSync(socket: _socket),
+                        PlaylistCurrent(_latest.sync.current),
+                        Expanded(child: queue),
                       ],
                     ),
-                    PlaylistCurrent(_messages),
-                    Expanded(child: _focused ?? queue),
-                  ],
-                ),
               ),
             ),
           ),

@@ -14,6 +14,7 @@ class TableRow extends StatefulWidget {
   final EdgeInsets? padding;
   final Widget expanded;
   final bool maintainState;
+  final List<BoxShadow> tint;
 
   const TableRow(
     this.children, {
@@ -22,6 +23,7 @@ class TableRow extends StatefulWidget {
     this.padding,
     this.expanded = Empty,
     this.maintainState = true,
+    this.tint = const [],
   });
 
   factory TableRow.single(
@@ -31,6 +33,7 @@ class TableRow extends StatefulWidget {
     EdgeInsets? padding,
     Widget expanded = Empty,
     bool maintainState = true,
+    List<BoxShadow> tint = const [],
   }) {
     return TableRow(
       [Expanded(child: child)],
@@ -39,6 +42,7 @@ class TableRow extends StatefulWidget {
       padding: padding,
       expanded: expanded,
       maintainState: maintainState,
+      tint: tint,
     );
   }
 
@@ -68,6 +72,7 @@ class _TableRowState extends State<TableRow> {
         borderRadius: defaults.borderRadius,
         child: Container(
           padding: widget.padding ?? defaults.padding / 2,
+          decoration: BoxDecoration(boxShadow: widget.tint),
           child: Row(
             mainAxisSize: MainAxisSize.max,
             spacing: defaults.spacing,
