@@ -177,7 +177,7 @@ void main() {
         final entry = _resolutions.currentValue!;
         await tester.pumpApp(
           physicalSize: entry.value,
-          ListRow(_wireguard()),
+          SingleChildScrollView(child: ListRow(_wireguard())),
         );
         await tester.pumpAndSettle();
 
