@@ -75,11 +75,11 @@ class _DaemonDropdownState extends State<DaemonDropdown> {
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
-    return ds.Help(
-      Column(
-        mainAxisSize: MainAxisSize.min,
-        spacing: defaults.spacing / 2,
-        children: [
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      spacing: defaults.spacing / 2,
+      children: [
+        ds.Help(
           ds.SearchDropdown.text(
             DaemonTypography.description(widget.library.value),
             padding: defaults.padding.copyWith(
@@ -151,10 +151,10 @@ class _DaemonDropdownState extends State<DaemonDropdown> {
               });
             },
           ),
-          ?_optional,
-        ],
-      ),
-      widget.help,
+          widget.help,
+        ),
+        ?_optional,
+      ],
     );
   }
 }

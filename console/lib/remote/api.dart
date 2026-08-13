@@ -113,21 +113,13 @@ abstract class messages {
   }
 
   // sync with no fields set requests the listener's current library and
-  // playback queue;
-  static rc.Stream syncreq() {
-    return rc.Stream(
-      sid: uuidx.v7(),
-      sync: rc.Sync(),
-    );
-  }
-
-  // syncrsp reports the listener's current library and playback queue,
-  // unsolicited or in reply to a syncreq.
-  static rc.Stream syncrsp({
+  // playback queue; with fields set it reports the listener's current
+  // library and playback queue, unsolicited or in reply to a request.
+  static rc.Stream sync({
     meta.Daemon? library,
     String token = "",
     fixnum.Int64? expiration,
-    required int capacity,
+    int capacity = 0,
     media.Media? current,
     List<media.Media> queue = const [],
   }) {

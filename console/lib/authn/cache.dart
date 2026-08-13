@@ -71,6 +71,9 @@ class _AuthzCache extends State<AuthzCache> {
     authz.Bearer(_meta.Token(), ""),
     authz.Cached.pending,
   );
+  final ValueNotifier<authz.Bearer<_meta.Token>> changed = ValueNotifier<authz.Bearer<_meta.Token>>(
+    authz.Bearer(_meta.Token(), ""),
+  );
 
   @override
   void setState(VoidCallback fn) {
@@ -95,6 +98,7 @@ class _AuthzCache extends State<AuthzCache> {
                 final bearer = authz.Bearer(v.token, v.bearer);
                 setState(() {
                   meta.current = bearer;
+                  changed.value = bearer;
                   _loading = false;
                 });
                 return bearer;
@@ -128,6 +132,12 @@ class _AuthzCache extends State<AuthzCache> {
   void deactivate() {
     _meta.EndpointAuto.of(context)?.changed.removeListener(refresh);
     super.deactivate();
+  }
+
+  @override
+  void dispose() {
+    changed.dispose();
+    super.dispose();
   }
 
   @override

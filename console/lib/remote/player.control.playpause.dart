@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:retrovibed/designkit.dart' as ds;
 import 'api.dart' as remote;
 
 class PlayerControlPlayPause extends StatelessWidget {
@@ -14,11 +15,12 @@ class PlayerControlPlayPause extends StatelessWidget {
       builder: (context, snapshot) {
         final msg = snapshot.data;
         final playing = msg == null || msg.whichCommand() != remote.Stream_Command.playpause || !msg.playpause.paused;
-        return IconButton(
-          onPressed: () {
-            socket.send(remote.messages.playpause(playing));
-          },
+        final help = playing ? "pause playback on the remote device" : "resume playback on the remote device";
+        return ds.LoadingIconButton(
+          onPressed: ds.LoadingIconButton.convert(() => socket.send(remote.messages.playpause(playing))),
           icon: Icon(playing ? Icons.pause_rounded : Icons.play_arrow_rounded),
+          tooltip: help,
+          help: ds.Hint(Text(help)),
         );
       },
     );

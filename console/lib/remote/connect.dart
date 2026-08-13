@@ -16,6 +16,7 @@ import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'api.dart' as remote;
 import 'player.control.seek.dart';
 import 'player.control.playpause.dart';
+import 'player.control.sync.dart';
 import 'playlist.current.dart';
 import 'playlist.queue.dart';
 
@@ -142,6 +143,7 @@ class _State extends State<_Connect> with LoadingState {
             _messages = socket.messages.asBroadcastStream();
             _messages.listen(
               (msg) {
+                print("received command ${msg}");
                 if (msg.whichCommand() != remote.Stream_Command.sync) return;
                 if (msg.sid.compareTo(_latest.sid) <= 0) return;
                 setState(() => _latest = msg);
@@ -152,7 +154,7 @@ class _State extends State<_Connect> with LoadingState {
             );
           });
 
-          socket.send(remote.messages.syncreq());
+          socket.send(remote.messages.sync());
 
           return c.future;
         })
@@ -204,6 +206,7 @@ class _State extends State<_Connect> with LoadingState {
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
+    print("current sync: ${_latest.sync}");
     final search = SearchMinimal(
       key: const ValueKey("search"),
       empty: ds.Empty,
@@ -303,7 +306,10 @@ class _State extends State<_Connect> with LoadingState {
                           onPressed: ds.LoadingIconButton.convert(
                             () => setState(() => _focused = _focused?.key == search.key ? null : search),
                           ),
+                          tooltip: "search the remote device's library",
+                          help: ds.Hint(const Text("search the remote device's library to queue media on it")),
                         ),
+                        PlayerControlSync(socket: _socket),
                       ],
                     ),
                     PlaylistCurrent(_messages),
