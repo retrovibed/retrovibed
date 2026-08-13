@@ -30,34 +30,36 @@ class ListRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return ds.TableRow(
       key: ValueKey(current.id),
-      expanded: Edit(
-        current,
-        onChange: (upd) {
-          return httpx
-              .withRetry(
-                () => api.wireguard.update(
-                  upd,
-                  options: [authn.request(authn.AuthzCache.meta(context))],
-                ),
-              )
-              .then((resp) {
-                if (resp.wireguard.default_5) {
-                  return httpx.withRetry(
-                    () => api.wireguard
-                        .touch(
-                          resp.wireguard.id,
-                          options: [authn.request(authn.AuthzCache.meta(context))],
-                        )
-                        .then((_) => resp),
-                  );
-                }
+      expanded: SingleChildScrollView(
+        child: Edit(
+          current,
+          onChange: (upd) {
+            return httpx
+                .withRetry(
+                  () => api.wireguard.update(
+                    upd,
+                    options: [authn.request(authn.AuthzCache.meta(context))],
+                  ),
+                )
+                .then((resp) {
+                  if (resp.wireguard.default_5) {
+                    return httpx.withRetry(
+                      () => api.wireguard
+                          .touch(
+                            resp.wireguard.id,
+                            options: [authn.request(authn.AuthzCache.meta(context))],
+                          )
+                          .then((_) => resp),
+                    );
+                  }
 
-                return Future.value(resp);
-              })
-              .then((resp) {
-                onChange(resp.wireguard);
-              });
-        },
+                  return Future.value(resp);
+                })
+                .then((resp) {
+                  onChange(resp.wireguard);
+                });
+          },
+        ),
       ),
       [
         IconCheckmark(active, onTap: onTap),

@@ -31,6 +31,7 @@ type Wireguard struct {
 	Port               uint32                 `protobuf:"varint,6,opt,name=port,proto3" json:"port,omitempty"`
 	DnsRateLimit       uint32                 `protobuf:"varint,7,opt,name=dns_rate_limit,proto3" json:"dns_rate_limit,omitempty"`
 	MaximumConnections uint64                 `protobuf:"varint,8,opt,name=maximum_connections,proto3" json:"maximum_connections,omitempty"`
+	OutboundRateLimit  uint32                 `protobuf:"varint,9,opt,name=outbound_rate_limit,proto3" json:"outbound_rate_limit,omitempty"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
@@ -117,6 +118,13 @@ func (x *Wireguard) GetDnsRateLimit() uint32 {
 func (x *Wireguard) GetMaximumConnections() uint64 {
 	if x != nil {
 		return x.MaximumConnections
+	}
+	return 0
+}
+
+func (x *Wireguard) GetOutboundRateLimit() uint32 {
+	if x != nil {
+		return x.OutboundRateLimit
 	}
 	return 0
 }
@@ -669,7 +677,7 @@ var File_wireguard_meta_wireguard_proto protoreflect.FileDescriptor
 
 const file_wireguard_meta_wireguard_proto_rawDesc = "" +
 	"\n" +
-	"\x1ewireguard/meta.wireguard.proto\x12\x04meta\"\x85\x02\n" +
+	"\x1ewireguard/meta.wireguard.proto\x12\x04meta\"\xb7\x02\n" +
 	"\tWireguard\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1e\n" +
 	"\n" +
@@ -682,7 +690,8 @@ const file_wireguard_meta_wireguard_proto_rawDesc = "" +
 	"\adefault\x18\x05 \x01(\bR\adefault\x12\x12\n" +
 	"\x04port\x18\x06 \x01(\rR\x04port\x12&\n" +
 	"\x0edns_rate_limit\x18\a \x01(\rR\x0edns_rate_limit\x120\n" +
-	"\x13maximum_connections\x18\b \x01(\x04R\x13maximum_connections\"\\\n" +
+	"\x13maximum_connections\x18\b \x01(\x04R\x13maximum_connections\x120\n" +
+	"\x13outbound_rate_limit\x18\t \x01(\rR\x13outbound_rate_limit\"\\\n" +
 	"\x16WireguardSearchRequest\x12\x14\n" +
 	"\x05query\x18\x01 \x01(\tR\x05query\x12\x16\n" +
 	"\x06offset\x18\x02 \x01(\x04R\x06offset\x12\x14\n" +

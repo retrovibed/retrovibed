@@ -33,6 +33,13 @@ const Wireguard$json = {
       '5': 4,
       '10': 'maximum_connections'
     },
+    {
+      '1': 'outbound_rate_limit',
+      '3': 9,
+      '4': 1,
+      '5': 13,
+      '10': 'outbound_rate_limit'
+    },
   ],
 };
 
@@ -42,7 +49,8 @@ final $typed_data.Uint8List wireguardDescriptor = $convert.base64Decode(
     'RfYXQSHgoKdXBkYXRlZF9hdBgDIAEoCVIKdXBkYXRlZF9hdBIgCgtkZXNjcmlwdGlvbhgEIAEo'
     'CVILZGVzY3JpcHRpb24SGAoHZGVmYXVsdBgFIAEoCFIHZGVmYXVsdBISCgRwb3J0GAYgASgNUg'
     'Rwb3J0EiYKDmRuc19yYXRlX2xpbWl0GAcgASgNUg5kbnNfcmF0ZV9saW1pdBIwChNtYXhpbXVt'
-    'X2Nvbm5lY3Rpb25zGAggASgEUhNtYXhpbXVtX2Nvbm5lY3Rpb25z');
+    'X2Nvbm5lY3Rpb25zGAggASgEUhNtYXhpbXVtX2Nvbm5lY3Rpb25zEjAKE291dGJvdW5kX3JhdG'
+    'VfbGltaXQYCSABKA1SE291dGJvdW5kX3JhdGVfbGltaXQ=');
 
 @$core.Deprecated('Use wireguardSearchRequestDescriptor instead')
 const WireguardSearchRequest$json = {

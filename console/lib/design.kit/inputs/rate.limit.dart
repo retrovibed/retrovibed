@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import './../../design.kit/theme.defaults.dart';
+import '../theme.defaults.dart';
+import '../empty.dart';
 
 /// RateLimit input for configuring rate limits.
 ///
@@ -36,6 +37,22 @@ class _RateLimitState extends State<RateLimit> {
   bool _expanded = false;
 
   _RateLimitState({required int value, String unit = 'sec'}) : _value = value, _unit = unit;
+
+  @override
+  void didUpdateWidget(covariant RateLimit oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // `_value` already tracks the last value this widget itself emitted via
+    // onChanged, so a mismatch here means something external (e.g. a preset
+    // applied to the whole form) changed `value` without going through us.
+    // Only remount in that case - otherwise every keystroke round-trips
+    // through the parent and forces a new key, dropping focus mid-edit.
+    if (widget.value != _value) {
+      setState(() {
+        _value = widget.value;
+        _generation++;
+      });
+    }
+  }
 
   void _selectUnit(String unit) {
     setState(() {
@@ -106,27 +123,26 @@ class _RateLimitState extends State<RateLimit> {
                       spacing: defaults.spacing,
                       runSpacing: defaults.spacing,
                       alignment: WrapAlignment.start,
-                      children:
-                          widget.units
-                              .map(
-                                (u) => SizedBox(
-                                  width: buttonWidth,
-                                  child: OutlinedButton(
-                                    onPressed: () => _selectUnit(u),
-                                    style: OutlinedButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                        vertical: 8,
-                                      ),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                    child: Text(u),
+                      children: widget.units
+                          .map(
+                            (u) => SizedBox(
+                              width: buttonWidth,
+                              child: OutlinedButton(
+                                onPressed: () => _selectUnit(u),
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 8,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
                                   ),
                                 ),
-                              )
-                              .toList(),
+                                child: Text(u),
+                              ),
+                            ),
+                          )
+                          .toList(),
                     );
                   },
                 ),
@@ -138,7 +154,7 @@ class _RateLimitState extends State<RateLimit> {
                       bottom: BorderSide(color: Theme.of(context).dividerColor),
                     ),
                   ),
-                  child: const Text('presets'),
+                  child: Empty,
                 ),
                 LayoutBuilder(
                   builder: (context, constraints) {
@@ -147,27 +163,26 @@ class _RateLimitState extends State<RateLimit> {
                       spacing: defaults.spacing,
                       runSpacing: defaults.spacing,
                       alignment: WrapAlignment.start,
-                      children:
-                          widget.presets
-                              .map(
-                                (p) => SizedBox(
-                                  width: buttonWidth,
-                                  child: OutlinedButton(
-                                    onPressed: () => _selectPreset(p),
-                                    style: OutlinedButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                        vertical: 8,
-                                      ),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                    child: Text(p.label),
+                      children: widget.presets
+                          .map(
+                            (p) => SizedBox(
+                              width: buttonWidth,
+                              child: OutlinedButton(
+                                onPressed: () => _selectPreset(p),
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 8,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
                                   ),
                                 ),
-                              )
-                              .toList(),
+                                child: Text(p.label),
+                              ),
+                            ),
+                          )
+                          .toList(),
                     );
                   },
                 ),

@@ -33,6 +33,12 @@ func WireguardOptionDNSRateLimit(n uint32) func(*Wireguard) {
 	}
 }
 
+func WireguardOptionOutboundRateLimit(n uint32) func(*Wireguard) {
+	return func(w *Wireguard) {
+		w.OutboundRateLimit = n
+	}
+}
+
 func NewWireguard(uid string, options ...func(*Wireguard)) Wireguard {
 	return langx.Clone(Wireguard{
 		ID:          uid,

@@ -78,7 +78,7 @@ func AutoTorrentSettings(defaults *TorrentSettings, options ...func(*TorrentSett
 		Peers:           &Peers{Min: 16, Max: 64},
 		Upload:          &Limit{Rate: 128 * bytesx.MiB, Burst: 128 * bytesx.MiB},
 		Download:        &Limit{Rate: 128 * bytesx.MiB, Burst: 128 * bytesx.MiB},
-		Outbound:        &Limit{Rate: 4, Burst: 1},
+		Outbound:        &Limit{Rate: 0, Burst: 1},
 		Inbound:         &Limit{Rate: 4, Burst: 1},
 	}, options...))
 }
@@ -526,7 +526,7 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 		torrent.ClientConfigDialTimeouts(time.Second, 4*time.Second),
 		torrent.ClientConfigHandshakeTimeout(30*time.Second),
 		torrent.ClientConfigDialPoolSize(128*runtime.NumCPU()),
-		torrent.ClientConfigDialRateLimit(rate.NewLimiter(rate.Limit(cfg.Outbound.Rate), int(cfg.Outbound.Burst))),
+		torrent.ClientConfigDialRateLimit(rate.NewLimiter(rate.Limit(langx.FirstNonZero(wgcfg.OutboundRateLimit, cfg.Outbound.Rate, math.MaxUint32)), int(cfg.Outbound.Burst))),
 		torrent.ClientConfigAcceptLimit(rate.NewLimiter(rate.Limit(cfg.Inbound.Rate), int(cfg.Inbound.Burst))),
 		torrent.ClientConfigMaxOutstandingRequests(int(cfg.MaximumRequests)),
 		torrent.ClientConfigPeerLimits(cfg.Peers.Min, cfg.Peers.Max),

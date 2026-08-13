@@ -27,6 +27,7 @@ class Wireguard extends $pb.GeneratedMessage {
     $core.int? port,
     $core.int? dnsRateLimit,
     $fixnum.Int64? maximumConnections,
+    $core.int? outboundRateLimit,
   }) {
     final result = create();
     if (id != null) result.id = id;
@@ -38,6 +39,7 @@ class Wireguard extends $pb.GeneratedMessage {
     if (dnsRateLimit != null) result.dnsRateLimit = dnsRateLimit;
     if (maximumConnections != null)
       result.maximumConnections = maximumConnections;
+    if (outboundRateLimit != null) result.outboundRateLimit = outboundRateLimit;
     return result;
   }
 
@@ -65,6 +67,8 @@ class Wireguard extends $pb.GeneratedMessage {
     ..a<$fixnum.Int64>(
         8, _omitFieldNames ? '' : 'maximum_connections', $pb.PbFieldType.OU6,
         defaultOrMaker: $fixnum.Int64.ZERO)
+    ..aI(9, _omitFieldNames ? '' : 'outbound_rate_limit',
+        fieldType: $pb.PbFieldType.OU3)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -156,6 +160,15 @@ class Wireguard extends $pb.GeneratedMessage {
   $core.bool hasMaximumConnections() => $_has(7);
   @$pb.TagNumber(8)
   void clearMaximumConnections() => $_clearField(8);
+
+  @$pb.TagNumber(9)
+  $core.int get outboundRateLimit => $_getIZ(8);
+  @$pb.TagNumber(9)
+  set outboundRateLimit($core.int value) => $_setUnsignedInt32(8, value);
+  @$pb.TagNumber(9)
+  $core.bool hasOutboundRateLimit() => $_has(8);
+  @$pb.TagNumber(9)
+  void clearOutboundRateLimit() => $_clearField(9);
 }
 
 class WireguardSearchRequest extends $pb.GeneratedMessage {

@@ -11,6 +11,7 @@ message Wireguard {
   uint32 port = 6 [ json_name = "port" ];
   uint32 dns_rate_limit = 7 [ json_name = "dns_rate_limit" ];
   uint64 maximum_connections = 8 [ json_name = "maximum_connections" ];
+  uint32 outbound_rate_limit = 9 [ json_name = "outbound_rate_limit" ];
 }
 
 message WireguardSearchRequest {

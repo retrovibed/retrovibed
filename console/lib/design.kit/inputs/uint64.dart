@@ -28,15 +28,33 @@ class Uint64 extends StatefulWidget {
 class _Uint64State extends State<Uint64> {
   bool _expanded = false;
   int _generation = 0;
+  Int64? _lastEmitted;
+
+  @override
+  void didUpdateWidget(covariant Uint64 oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Only remount the field when `value` changed for a reason other than
+    // our own onChanged callback (e.g. a preset applied to the whole form) -
+    // otherwise every keystroke round-trips through the parent and forces a
+    // new key, dropping focus mid-edit.
+    if (widget.value != oldWidget.value && widget.value != _lastEmitted) {
+      setState(() {
+        _generation++;
+      });
+    }
+  }
 
   String _display(Int64 v) => v > Int64.ZERO ? v.toString() : '';
 
   void _onTextChanged(String text) {
     final n = int.tryParse(text);
-    widget.onChanged(n != null && n > 0 ? Int64(n) : Int64.ZERO);
+    final value = n != null && n > 0 ? Int64(n) : Int64.ZERO;
+    _lastEmitted = value;
+    widget.onChanged(value);
   }
 
   void _selectPreset(({String label, Int64 value}) preset) {
+    _lastEmitted = preset.value;
     setState(() {
       _expanded = false;
       _generation++;

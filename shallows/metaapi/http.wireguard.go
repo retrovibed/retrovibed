@@ -64,6 +64,7 @@ type HTTPWireguard struct {
 
 func (t *HTTPWireguard) Bind(r *mux.Router) {
 	r.StrictSlash(false)
+	r.Use(httpx.RouteInvoked)
 	// r.Use(httpx.DebugRequest)
 
 	r.Path("/").Methods(http.MethodGet).Handler(alice.New(
