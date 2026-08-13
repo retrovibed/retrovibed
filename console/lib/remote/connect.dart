@@ -17,6 +17,7 @@ import 'api.dart' as remote;
 import 'player.control.seek.dart';
 import 'player.control.playpause.dart';
 import 'playlist.current.dart';
+import 'playlist.queue.dart';
 
 // Mirrors media.PlayAction's shape but queues the media on the connected
 // remote daemon's playlist instead of this device's local Playlist, since
@@ -29,12 +30,7 @@ Future<void> Function()? Function(BuildContext, media.Media, media.MediaSearchRe
       case mimex.icomovie:
       case mimex.icoaudio:
         return () async {
-          socket.send(
-            remote.Stream(
-              sid: uuidx.v7(),
-              queue: remote.Queue(media: current),
-            ),
-          );
+          socket.send(remote.messages.queue(current));
         };
       default:
         return null;
@@ -102,12 +98,23 @@ class _Connect extends StatefulWidget {
 class _State extends State<_Connect> with LoadingState {
   remote.RemoteControlSocket _socket = remote.RemoteControlSocket.noop;
   Stream<remote.Stream> _messages = Stream.empty();
-
-  ValueNotifier<meta.Daemon> get _endpoint => authn.AuthedEndpoint.daemon(context);
+  // nil-sid sentinel; unset oneof -> _latest.sync reads as a zero Sync.
+  remote.Stream _latest = remote.Stream(sid: uuidx.min());
+  // which widget occupies the focused slot below the transport controls,
+  // defaulting to the pending-queue view. Kept in sync with the live
+  // search/queue widgets at the top of build() (matched by key, since
+  // search/queue are rebuilt fresh every build() - they close over live
+  // _socket/_latest - so a stale reference here would stop updating).
+  Widget? _focused;
+  ValueNotifier<meta.Daemon> _endpoint = ValueNotifier(meta.Daemon());
 
   void _onEndpointChanged() {
     _socket.close();
-    setState(() => _socket = remote.RemoteControlSocket.noop);
+    setState(() {
+      _socket = remote.RemoteControlSocket.noop;
+      _latest = remote.Stream(sid: uuidx.min());
+      _focused = const PlaylistQueue(<media.Media>[], key: ValueKey("queue"));
+    });
     _connect();
   }
 
@@ -134,14 +141,18 @@ class _State extends State<_Connect> with LoadingState {
             _socket = socket;
             _messages = socket.messages.asBroadcastStream();
             _messages.listen(
-              (_) {},
+              (msg) {
+                if (msg.whichCommand() != remote.Stream_Command.sync) return;
+                if (msg.sid.compareTo(_latest.sid) <= 0) return;
+                setState(() => _latest = msg);
+              },
               cancelOnError: true,
               onError: c.completeError,
               onDone: c.complete,
             );
           });
 
-          socket.send(remote.Stream(sid: uuidx.v7(), sync: remote.Sync()));
+          socket.send(remote.messages.syncreq());
 
           return c.future;
         })
@@ -178,6 +189,7 @@ class _State extends State<_Connect> with LoadingState {
   @override
   void initState() {
     super.initState();
+    _endpoint = authn.AuthedEndpoint.daemon(context);
     _endpoint.addListener(_onEndpointChanged);
     ds.postframe(_connect);
   }
@@ -192,6 +204,16 @@ class _State extends State<_Connect> with LoadingState {
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
+    final search = SearchMinimal(
+      key: const ValueKey("search"),
+      empty: ds.Empty,
+      onPlay: RemotePlayAction(_socket),
+      apisearch: media.media.searchendpoint(
+        _latest.sync.library.hostname,
+        [httpx.Request.bearer(() => Future.value(_latest.sync.token))],
+      ),
+    );
+    final queue = PlaylistQueue(_latest.sync.queue, key: const ValueKey("queue"));
     return ds.Container(
       Column(
         verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
@@ -276,15 +298,16 @@ class _State extends State<_Connect> with LoadingState {
                         PlayerControlPlayPause(socket: _socket, status: _messages),
                         PlayerControlSeek.forward(socket: _socket),
                         PlayerControlSeek.next(socket: _socket),
+                        ds.LoadingIconButton.search(
+                          toggled: _focused?.key == search.key,
+                          onPressed: ds.LoadingIconButton.convert(
+                            () => setState(() => _focused = _focused?.key == search.key ? null : search),
+                          ),
+                        ),
                       ],
                     ),
                     PlaylistCurrent(_messages),
-                    Expanded(
-                      child: SearchMinimal(
-                        empty: ds.Empty,
-                        onPlay: RemotePlayAction(_socket),
-                      ),
-                    ),
+                    Expanded(child: _focused ?? queue),
                   ],
                 ),
               ),

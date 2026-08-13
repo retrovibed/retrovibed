@@ -61,6 +61,9 @@ String auto_bearer_host({String? host}) {
   return token.isEmpty ? "" : "bearer ${token}";
 }
 
+// formats an already-known token as a bearer credential, or "" if empty.
+String bearer(String token) => token.isEmpty ? "" : "bearer $token";
+
 abstract class mimetypes {
   static MediaType parse(String s) {
     try {
@@ -245,9 +248,14 @@ class Request {
 
   static Option authorization(String token) {
     return (Request request) {
-      if (token.isNotEmpty) {
-        request.headers["Authorization"] = token;
+      if (token.isEmpty) {
+        return Future.error(
+          const MissingTokenError(),
+          StackTrace.current,
+        );
       }
+
+      request.headers["Authorization"] = token;
       return Future.value(
         request,
       ); // Returns a completed Future with the modified request

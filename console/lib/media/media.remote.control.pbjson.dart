@@ -84,6 +84,8 @@ const Sync$json = {
       '6': '.media.Media',
       '10': 'current'
     },
+    {'1': 'token', '3': 4, '4': 1, '5': 9, '10': 'token'},
+    {'1': 'expiration', '3': 5, '4': 1, '5': 3, '10': 'expiration'},
     {
       '1': 'queue',
       '3': 1000,
@@ -94,7 +96,7 @@ const Sync$json = {
     },
   ],
   '9': [
-    {'1': 4, '2': 1000},
+    {'1': 6, '2': 1000},
   ],
 };
 
@@ -102,7 +104,8 @@ const Sync$json = {
 final $typed_data.Uint8List syncDescriptor = $convert.base64Decode(
     'CgRTeW5jEiYKB2xpYnJhcnkYASABKAsyDC5tZXRhLkRhZW1vblIHbGlicmFyeRIaCghjYXBhY2'
     'l0eRgCIAEoDVIIY2FwYWNpdHkSJgoHY3VycmVudBgDIAEoCzIMLm1lZGlhLk1lZGlhUgdjdXJy'
-    'ZW50EiMKBXF1ZXVlGOgHIAMoCzIMLm1lZGlhLk1lZGlhUgVxdWV1ZUoFCAQQ6Ac=');
+    'ZW50EhQKBXRva2VuGAQgASgJUgV0b2tlbhIeCgpleHBpcmF0aW9uGAUgASgDUgpleHBpcmF0aW'
+    '9uEiMKBXF1ZXVlGOgHIAMoCzIMLm1lZGlhLk1lZGlhUgVxdWV1ZUoFCAYQ6Ac=');
 
 @$core.Deprecated('Use streamDescriptor instead')
 const Stream$json = {

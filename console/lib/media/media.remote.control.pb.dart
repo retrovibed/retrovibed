@@ -12,6 +12,7 @@
 
 import 'dart:core' as $core;
 
+import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
 
 import '../meta/meta.daemon.pb.dart' as $1;
@@ -250,12 +251,16 @@ class Sync extends $pb.GeneratedMessage {
     $1.Daemon? library,
     $core.int? capacity,
     $0.Media? current,
+    $core.String? token,
+    $fixnum.Int64? expiration,
     $core.Iterable<$0.Media>? queue,
   }) {
     final result = create();
     if (library != null) result.library = library;
     if (capacity != null) result.capacity = capacity;
     if (current != null) result.current = current;
+    if (token != null) result.token = token;
+    if (expiration != null) result.expiration = expiration;
     if (queue != null) result.queue.addAll(queue);
     return result;
   }
@@ -278,6 +283,8 @@ class Sync extends $pb.GeneratedMessage {
     ..aI(2, _omitFieldNames ? '' : 'capacity', fieldType: $pb.PbFieldType.OU3)
     ..aOM<$0.Media>(3, _omitFieldNames ? '' : 'current',
         subBuilder: $0.Media.create)
+    ..aOS(4, _omitFieldNames ? '' : 'token')
+    ..aInt64(5, _omitFieldNames ? '' : 'expiration')
     ..pPM<$0.Media>(1000, _omitFieldNames ? '' : 'queue',
         subBuilder: $0.Media.create)
     ..hasRequiredFields = false;
@@ -331,8 +338,26 @@ class Sync extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $0.Media ensureCurrent() => $_ensure(2);
 
+  @$pb.TagNumber(4)
+  $core.String get token => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set token($core.String value) => $_setString(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasToken() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearToken() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $fixnum.Int64 get expiration => $_getI64(4);
+  @$pb.TagNumber(5)
+  set expiration($fixnum.Int64 value) => $_setInt64(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasExpiration() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearExpiration() => $_clearField(5);
+
   @$pb.TagNumber(1000)
-  $pb.PbList<$0.Media> get queue => $_getList(3);
+  $pb.PbList<$0.Media> get queue => $_getList(5);
 }
 
 enum Stream_Command { queue, dequeue, playpause, seek, sync, notSet }

@@ -1,8 +1,12 @@
 import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
+import 'package:fixnum/fixnum.dart' as fixnum;
 // aliased: its Stream message would otherwise collide with dart:async's Stream, used unprefixed throughout this file.
 import 'package:retrovibed/media/media.remote.control.pb.dart' as rc;
+import 'package:retrovibed/media/media.pb.dart' as media;
+import 'package:retrovibed/meta/meta.daemon.pb.dart' as meta;
+import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/retrovibed.dart' as retro;
 
@@ -69,6 +73,76 @@ class _WebSocketRemoteControlSocket implements RemoteControlSocket {
 
   @override
   Future<void> close() => _socket.close();
+}
+
+abstract class messages {
+  static rc.Stream queue(media.Media m) {
+    return rc.Stream(
+      sid: uuidx.v7(),
+      queue: rc.Queue(media: m),
+    );
+  }
+
+  static rc.Stream dequeue(String id) {
+    return rc.Stream(
+      sid: uuidx.v7(),
+      dequeue: rc.Dequeue(id: id),
+    );
+  }
+
+  static rc.Stream playpause(bool paused) {
+    return rc.Stream(
+      sid: uuidx.v7(),
+      playpause: rc.PlayPause(paused: paused),
+    );
+  }
+
+  static rc.Stream seek(int offset) {
+    return rc.Stream(
+      sid: uuidx.v7(),
+      seek: rc.Seek(offset: offset),
+    );
+  }
+
+  static rc.Stream previous() {
+    return seek(SeekOffset.previous);
+  }
+
+  static rc.Stream next() {
+    return seek(SeekOffset.next);
+  }
+
+  // sync with no fields set requests the listener's current library and
+  // playback queue;
+  static rc.Stream syncreq() {
+    return rc.Stream(
+      sid: uuidx.v7(),
+      sync: rc.Sync(),
+    );
+  }
+
+  // syncrsp reports the listener's current library and playback queue,
+  // unsolicited or in reply to a syncreq.
+  static rc.Stream syncrsp({
+    meta.Daemon? library,
+    String token = "",
+    fixnum.Int64? expiration,
+    required int capacity,
+    media.Media? current,
+    List<media.Media> queue = const [],
+  }) {
+    return rc.Stream(
+      sid: uuidx.v7(),
+      sync: rc.Sync(
+        library: library,
+        token: token,
+        expiration: expiration,
+        capacity: capacity,
+        current: current,
+        queue: queue,
+      ),
+    );
+  }
 }
 
 abstract class remotecontrol {

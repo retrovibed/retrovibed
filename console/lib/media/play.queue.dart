@@ -59,6 +59,7 @@ class PlayQueue {
   final RingBuffer<PlayableMedia> _upcoming = RingBuffer(128);
   final RingBuffer<PlayableMedia> _previous = RingBuffer(128);
   StreamIterator<PlayableMedia> _stream = StreamIterator(Stream.empty());
+  final ValueNotifier<int> revision = ValueNotifier(0);
 
   int get upcoming => _upcoming.length;
   int get previous => _previous.length;
@@ -82,6 +83,7 @@ class PlayQueue {
     _upcoming.clear();
     _previous.clear();
     current.value = PlayableMedia(media, pos: pos);
+    revision.value++;
   }
 
   Future<PlayableMedia?> advance(String auth, mediakit.Player player) async {
@@ -114,10 +116,12 @@ class PlayQueue {
 
   void push(PlayableMedia media) {
     _upcoming.insert(media);
+    revision.value++;
   }
 
   void remove(String id) {
     _upcoming.removeWhere((m) => m.current.id == id);
+    revision.value++;
   }
 
   Future<PlayableMedia?> reverse(String auth, mediakit.Player player) async {

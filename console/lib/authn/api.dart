@@ -5,15 +5,11 @@ import 'package:retrovibed/meta/meta.authn.pb.dart';
 export 'package:retrovibed/meta/meta.account.pb.dart';
 export 'package:retrovibed/meta/meta.authn.pb.dart';
 
-String bearer(String token) {
-  return token.isNotEmpty ? "bearer ${token}" : "";
-}
-
 Future<Session> current(String token) async {
   return httpx
       .get(
         Uri.https(httpx.metaendpoint(), "/authn/current"),
-        options: [httpx.Request.authorization(bearer(token))],
+        options: [httpx.Request.authorization(httpx.bearer(token))],
       )
       .then((v) {
         return Session.create()..mergeFromProto3Json(jsonDecode(v.body));

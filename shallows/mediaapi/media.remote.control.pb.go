@@ -215,6 +215,8 @@ type Sync struct {
 	Library       *metaapi.Daemon        `protobuf:"bytes,1,opt,name=library,proto3" json:"library,omitempty"`
 	Capacity      uint32                 `protobuf:"varint,2,opt,name=capacity,proto3" json:"capacity,omitempty"`
 	Current       *media.Media           `protobuf:"bytes,3,opt,name=current,proto3" json:"current,omitempty"`
+	Token         string                 `protobuf:"bytes,4,opt,name=token,proto3" json:"token,omitempty"`
+	Expiration    int64                  `protobuf:"varint,5,opt,name=expiration,proto3" json:"expiration,omitempty"`
 	Queue         []*media.Media         `protobuf:"bytes,1000,rep,name=queue,proto3" json:"queue,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -269,6 +271,20 @@ func (x *Sync) GetCurrent() *media.Media {
 		return x.Current
 	}
 	return nil
+}
+
+func (x *Sync) GetToken() string {
+	if x != nil {
+		return x.Token
+	}
+	return ""
+}
+
+func (x *Sync) GetExpiration() int64 {
+	if x != nil {
+		return x.Expiration
+	}
+	return 0
 }
 
 func (x *Sync) GetQueue() []*media.Media {
@@ -431,12 +447,16 @@ const file_media_media_remote_control_proto_rawDesc = "" +
 	"\tPlayPause\x12\x16\n" +
 	"\x06paused\x18\x01 \x01(\bR\x06paused\"\x1e\n" +
 	"\x04Seek\x12\x16\n" +
-	"\x06offset\x18\x01 \x01(\x05R\x06offset\"\x9e\x01\n" +
+	"\x06offset\x18\x01 \x01(\x05R\x06offset\"\xd4\x01\n" +
 	"\x04Sync\x12&\n" +
 	"\alibrary\x18\x01 \x01(\v2\f.meta.DaemonR\alibrary\x12\x1a\n" +
 	"\bcapacity\x18\x02 \x01(\rR\bcapacity\x12&\n" +
-	"\acurrent\x18\x03 \x01(\v2\f.media.MediaR\acurrent\x12#\n" +
-	"\x05queue\x18\xe8\a \x03(\v2\f.media.MediaR\x05queueJ\x05\b\x04\x10\xe8\a\"\xf4\x01\n" +
+	"\acurrent\x18\x03 \x01(\v2\f.media.MediaR\acurrent\x12\x14\n" +
+	"\x05token\x18\x04 \x01(\tR\x05token\x12\x1e\n" +
+	"\n" +
+	"expiration\x18\x05 \x01(\x03R\n" +
+	"expiration\x12#\n" +
+	"\x05queue\x18\xe8\a \x03(\v2\f.media.MediaR\x05queueJ\x05\b\x06\x10\xe8\a\"\xf4\x01\n" +
 	"\x06Stream\x12\x10\n" +
 	"\x03sid\x18\x01 \x01(\tR\x03sid\x12%\n" +
 	"\x05queue\x18\xe8\a \x01(\v2\f.media.QueueH\x00R\x05queue\x12+\n" +

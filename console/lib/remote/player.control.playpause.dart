@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'api.dart' as remote;
 
 class PlayerControlPlayPause extends StatelessWidget {
@@ -17,7 +16,7 @@ class PlayerControlPlayPause extends StatelessWidget {
         final playing = msg == null || msg.whichCommand() != remote.Stream_Command.playpause || !msg.playpause.paused;
         return IconButton(
           onPressed: () {
-            socket.send(remote.Stream(sid: uuidx.random(), playpause: remote.PlayPause(paused: playing)));
+            socket.send(remote.messages.playpause(playing));
           },
           icon: Icon(playing ? Icons.pause_rounded : Icons.play_arrow_rounded),
         );

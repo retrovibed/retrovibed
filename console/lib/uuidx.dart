@@ -24,6 +24,17 @@ T pattern<T>(String v, T min, T max, T value) {
 
 String v7() => uuid.Uuid().v7();
 
+DateTime v7timestamp(String s) {
+  final bytes = fromString(s).toBytes();
+  final ms = (bytes[0] << 40) |
+      (bytes[1] << 32) |
+      (bytes[2] << 24) |
+      (bytes[3] << 16) |
+      (bytes[4] << 8) |
+      bytes[5];
+  return DateTime.fromMillisecondsSinceEpoch(ms, isUtc: true);
+}
+
 String random() => uuid.Uuid().v4();
 
 String withSuffix(int v) => '00000000-0000-0000-0000-${v.toString().padLeft(12, '0')}';

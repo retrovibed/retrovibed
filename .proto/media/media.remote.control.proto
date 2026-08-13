@@ -26,7 +26,9 @@ message Sync {
   meta.Daemon library = 1 [ json_name = "library" ];
   uint32 capacity = 2 [ json_name = "capacity" ];
   Media current = 3 [ json_name = "current" ];
-  reserved 4 to 999;
+  string token = 4 [ json_name = "token" ];
+  int64 expiration = 5 [ json_name = "expiration" ];
+  reserved 6 to 999;
   repeated Media queue = 1000 [ json_name = "queue" ];
 }
 

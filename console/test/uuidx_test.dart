@@ -41,4 +41,19 @@ void main() {
           isFalse);
     });
   });
+
+  group('v7timestamp', () {
+    test('extracts a known embedded timestamp', () {
+      final ts = uuidx.v7timestamp('018bcfe5-6800-7000-8000-000000000000');
+      expect(ts, DateTime.fromMillisecondsSinceEpoch(1700000000000, isUtc: true));
+    });
+
+    test('generated v7 UUID embeds the current time', () {
+      final before = DateTime.now().toUtc();
+      final ts = uuidx.v7timestamp(uuidx.v7());
+      final after = DateTime.now().toUtc();
+      expect(ts.isBefore(before.subtract(const Duration(seconds: 1))), isFalse);
+      expect(ts.isAfter(after.add(const Duration(seconds: 1))), isFalse);
+    });
+  });
 }

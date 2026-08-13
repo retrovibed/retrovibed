@@ -81,6 +81,13 @@ abstract class media {
         });
   }
 
+  static FnMediaSearch searchendpoint(String host, List<httpx.Option> options) {
+    final endpointHost = host;
+    final endpointOptions = options;
+    return (req, {String? host, List<httpx.Option> options = const []}) =>
+        media.search(req, host: endpointHost, options: endpointOptions);
+  }
+
   static Future<MediaUpdateResponse> metadatasync(
     String id,
     Media upd, {

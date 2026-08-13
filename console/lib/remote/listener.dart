@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:retrovibed/uuidx.dart' as uuidx;
+import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/media/play.queue.dart' as playqueue;
@@ -28,35 +28,29 @@ class _State extends State<RemoteControlListener> {
   // Cached in initState because dispose() runs after the element tree is
   // deactivated, when context.findAncestorStateOfType is unsafe to call.
   ValueNotifier<playqueue.PlayableMedia?>? _current;
+  ValueNotifier<meta.Daemon>? _library;
+  ValueNotifier<int>? _queueRevision;
 
-  void _echoCurrent() {
-    final cur = media.Playlist.of(context)?.queue.current.value;
-    if (cur == null) return;
-    _rc?.send(
-      remote.Stream(
-        sid: uuidx.random(),
-        queue: remote.Queue(media: cur.current),
-      ),
-    );
-  }
+  // now that Sync carries the full state, redirect the old ad-hoc track-change
+  // echo through it instead of sending a bare Queue frame.
+  void _echoCurrent() => _echoSync();
 
+  // proactively (not just in reply to a request) reports the listener's
+  // current library, playback queue, and a token valid against this device -
+  // triggered by track/library/queue changes and by didChangeDependencies
+  // whenever the token cache actually refreshes.
   void _echoSync() {
-    final playlist = media.Playlist.of(context);
+    final queue = media.Playlist.of(context)?.queue ?? playqueue.PlayQueue();
     final library = meta.EndpointAuto.of(context)?.changed.value;
-    final current = playlist?.queue.current.value;
-    // no playlist yet (e.g. still starting up) is a valid state to report -
-    // send an empty queue rather than skipping the reply.
-    _rc?.send(
-      remote.Stream(
-        sid: uuidx.v7(),
-        sync: remote.Sync(
-          library: library,
-          capacity: playlist?.queue.capacity ?? 0,
-          current: current?.current,
-          queue: playlist?.queue.queued.map((m) => m.current).toList() ?? [],
-        ),
-      ),
-    );
+    final cached = authn.AuthzCache.meta(context).current; // authz.Bearer<meta.Token>
+    _rc?.send(remote.messages.syncrsp(
+      library: library,
+      token: httpx.bearer(cached.bearer),
+      expiration: cached.token.expires,
+      capacity: queue.capacity,
+      current: queue.current.value?.current,
+      queue: queue.queued.map((m) => m.current).toList(),
+    ));
   }
 
   void _rcReconnect() {
@@ -137,23 +131,31 @@ class _State extends State<RemoteControlListener> {
     // echo local state back over the listen socket so any /rc/connect
     // observers can see what this device is doing.
     _playingSubscription = media.Playlist.of(context)?.player.stream.playing.listen((playing) {
-      _rc?.send(
-        remote.Stream(
-          sid: uuidx.v7(),
-          playpause: remote.PlayPause(paused: !playing),
-        ),
-      );
+      _rc?.send(remote.messages.playpause(!playing));
     });
     _current = media.Playlist.of(context)?.queue.current;
     _current?.addListener(_echoCurrent);
+    _library = meta.EndpointAuto.of(context)?.changed;
+    _library?.addListener(_echoSync);
+    _queueRevision = media.Playlist.of(context)?.queue.revision;
+    _queueRevision?.addListener(_echoSync);
 
     _rcConnect();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    authn.AuthzCache.meta(context); // registers this State's dependency on AuthzTokenData
+    _echoSync();
   }
 
   @override
   void dispose() {
     super.dispose();
     _current?.removeListener(_echoCurrent);
+    _library?.removeListener(_echoSync);
+    _queueRevision?.removeListener(_echoSync);
     _playingSubscription?.cancel();
     _rcSubscription?.cancel();
     _rc?.close();
