@@ -63,6 +63,47 @@ const Seek$json = {
 final $typed_data.Uint8List seekDescriptor =
     $convert.base64Decode('CgRTZWVrEhYKBm9mZnNldBgBIAEoBVIGb2Zmc2V0');
 
+@$core.Deprecated('Use syncDescriptor instead')
+const Sync$json = {
+  '1': 'Sync',
+  '2': [
+    {
+      '1': 'library',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.meta.Daemon',
+      '10': 'library'
+    },
+    {'1': 'capacity', '3': 2, '4': 1, '5': 13, '10': 'capacity'},
+    {
+      '1': 'current',
+      '3': 3,
+      '4': 1,
+      '5': 11,
+      '6': '.media.Media',
+      '10': 'current'
+    },
+    {
+      '1': 'queue',
+      '3': 1000,
+      '4': 3,
+      '5': 11,
+      '6': '.media.Media',
+      '10': 'queue'
+    },
+  ],
+  '9': [
+    {'1': 4, '2': 1000},
+  ],
+};
+
+/// Descriptor for `Sync`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List syncDescriptor = $convert.base64Decode(
+    'CgRTeW5jEiYKB2xpYnJhcnkYASABKAsyDC5tZXRhLkRhZW1vblIHbGlicmFyeRIaCghjYXBhY2'
+    'l0eRgCIAEoDVIIY2FwYWNpdHkSJgoHY3VycmVudBgDIAEoCzIMLm1lZGlhLk1lZGlhUgdjdXJy'
+    'ZW50EiMKBXF1ZXVlGOgHIAMoCzIMLm1lZGlhLk1lZGlhUgVxdWV1ZUoFCAQQ6Ac=');
+
 @$core.Deprecated('Use streamDescriptor instead')
 const Stream$json = {
   '1': 'Stream',
@@ -104,6 +145,15 @@ const Stream$json = {
       '9': 0,
       '10': 'seek'
     },
+    {
+      '1': 'sync',
+      '3': 1005,
+      '4': 1,
+      '5': 11,
+      '6': '.media.Sync',
+      '9': 0,
+      '10': 'sync'
+    },
   ],
   '8': [
     {'1': 'Command'},
@@ -115,4 +165,5 @@ final $typed_data.Uint8List streamDescriptor = $convert.base64Decode(
     'CgZTdHJlYW0SEAoDc2lkGAEgASgJUgNzaWQSJQoFcXVldWUY6AcgASgLMgwubWVkaWEuUXVldW'
     'VIAFIFcXVldWUSKwoHZGVxdWV1ZRjqByABKAsyDi5tZWRpYS5EZXF1ZXVlSABSB2RlcXVldWUS'
     'MQoJcGxheXBhdXNlGOsHIAEoCzIQLm1lZGlhLlBsYXlQYXVzZUgAUglwbGF5cGF1c2USIgoEc2'
-    'VlaxjsByABKAsyCy5tZWRpYS5TZWVrSABSBHNlZWtCCQoHQ29tbWFuZA==');
+    'VlaxjsByABKAsyCy5tZWRpYS5TZWVrSABSBHNlZWsSIgoEc3luYxjtByABKAsyCy5tZWRpYS5T'
+    'eW5jSABSBHN5bmNCCQoHQ29tbWFuZA==');

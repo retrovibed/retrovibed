@@ -3,6 +3,7 @@ syntax = "proto3";
 package media;
 
 import "media.proto";
+import "meta.daemon.proto";
 
 // enqueue a bit of media for playback.
 message Queue { Media media = 1 [ json_name = "media" ]; }
@@ -17,6 +18,18 @@ message PlayPause { bool paused = 1 [ json_name = "paused" ]; }
 // "skip to next/previous track" rather than a literal seek.
 message Seek { int32 offset = 1 [ json_name = "offset" ]; }
 
+// Sync requests (when sent with no fields set) or reports (when sent
+// populated) the listener's current library and playback queue. A connect
+// client sends an empty Sync to ask the listener to reply with its state;
+// the listener responds on the same tag with library + queue populated.
+message Sync {
+  meta.Daemon library = 1 [ json_name = "library" ];
+  uint32 capacity = 2 [ json_name = "capacity" ];
+  Media current = 3 [ json_name = "current" ];
+  reserved 4 to 999;
+  repeated Media queue = 1000 [ json_name = "queue" ];
+}
+
 // represents a stream of commands / responses for the remote control.
 // each command / response will contain a 'sid' representing the sequentialish
 // id.
@@ -27,5 +40,6 @@ message Stream {
     Dequeue dequeue = 1002 [ json_name = "dequeue" ];
     PlayPause playpause = 1003 [ json_name = "playpause" ];
     Seek seek = 1004 [ json_name = "seek" ];
+    Sync sync = 1005 [ json_name = "sync" ];
   }
 }

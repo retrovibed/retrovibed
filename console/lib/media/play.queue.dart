@@ -62,6 +62,9 @@ class PlayQueue {
 
   int get upcoming => _upcoming.length;
   int get previous => _previous.length;
+  int get capacity => _upcoming.capacity;
+
+  List<PlayableMedia> get queued => _upcoming.toList();
 
   Known get known => current.value.known;
   Duration get pos => current.value?.pos ?? Duration.zero;

@@ -15,6 +15,7 @@ import 'dart:core' as $core;
 import 'package:protobuf/protobuf.dart' as $pb;
 
 import 'media.pb.dart' as $0;
+import 'meta.daemon.pb.dart' as $1;
 
 export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
 
@@ -240,7 +241,101 @@ class Seek extends $pb.GeneratedMessage {
   void clearOffset() => $_clearField(1);
 }
 
-enum Stream_Command { queue, dequeue, playpause, seek, notSet }
+/// Sync requests (when sent with no fields set) or reports (when sent
+/// populated) the listener's current library and playback queue. A connect
+/// client sends an empty Sync to ask the listener to reply with its state;
+/// the listener responds on the same tag with library + queue populated.
+class Sync extends $pb.GeneratedMessage {
+  factory Sync({
+    $1.Daemon? library,
+    $core.int? capacity,
+    $0.Media? current,
+    $core.Iterable<$0.Media>? queue,
+  }) {
+    final result = create();
+    if (library != null) result.library = library;
+    if (capacity != null) result.capacity = capacity;
+    if (current != null) result.current = current;
+    if (queue != null) result.queue.addAll(queue);
+    return result;
+  }
+
+  Sync._();
+
+  factory Sync.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory Sync.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'Sync',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
+      createEmptyInstance: create)
+    ..aOM<$1.Daemon>(1, _omitFieldNames ? '' : 'library',
+        subBuilder: $1.Daemon.create)
+    ..aI(2, _omitFieldNames ? '' : 'capacity', fieldType: $pb.PbFieldType.OU3)
+    ..aOM<$0.Media>(3, _omitFieldNames ? '' : 'current',
+        subBuilder: $0.Media.create)
+    ..pPM<$0.Media>(1000, _omitFieldNames ? '' : 'queue',
+        subBuilder: $0.Media.create)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  Sync clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  Sync copyWith(void Function(Sync) updates) =>
+      super.copyWith((message) => updates(message as Sync)) as Sync;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static Sync create() => Sync._();
+  @$core.override
+  Sync createEmptyInstance() => create();
+  @$core.pragma('dart2js:noInline')
+  static Sync getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Sync>(create);
+  static Sync? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $1.Daemon get library => $_getN(0);
+  @$pb.TagNumber(1)
+  set library($1.Daemon value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasLibrary() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearLibrary() => $_clearField(1);
+  @$pb.TagNumber(1)
+  $1.Daemon ensureLibrary() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  $core.int get capacity => $_getIZ(1);
+  @$pb.TagNumber(2)
+  set capacity($core.int value) => $_setUnsignedInt32(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasCapacity() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearCapacity() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $0.Media get current => $_getN(2);
+  @$pb.TagNumber(3)
+  set current($0.Media value) => $_setField(3, value);
+  @$pb.TagNumber(3)
+  $core.bool hasCurrent() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearCurrent() => $_clearField(3);
+  @$pb.TagNumber(3)
+  $0.Media ensureCurrent() => $_ensure(2);
+
+  @$pb.TagNumber(1000)
+  $pb.PbList<$0.Media> get queue => $_getList(3);
+}
+
+enum Stream_Command { queue, dequeue, playpause, seek, sync, notSet }
 
 /// represents a stream of commands / responses for the remote control.
 /// each command / response will contain a 'sid' representing the sequentialish
@@ -252,6 +347,7 @@ class Stream extends $pb.GeneratedMessage {
     Dequeue? dequeue,
     PlayPause? playpause,
     Seek? seek,
+    Sync? sync,
   }) {
     final result = create();
     if (sid != null) result.sid = sid;
@@ -259,6 +355,7 @@ class Stream extends $pb.GeneratedMessage {
     if (dequeue != null) result.dequeue = dequeue;
     if (playpause != null) result.playpause = playpause;
     if (seek != null) result.seek = seek;
+    if (sync != null) result.sync = sync;
     return result;
   }
 
@@ -276,13 +373,14 @@ class Stream extends $pb.GeneratedMessage {
     1002: Stream_Command.dequeue,
     1003: Stream_Command.playpause,
     1004: Stream_Command.seek,
+    1005: Stream_Command.sync,
     0: Stream_Command.notSet
   };
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'Stream',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
       createEmptyInstance: create)
-    ..oo(0, [1000, 1002, 1003, 1004])
+    ..oo(0, [1000, 1002, 1003, 1004, 1005])
     ..aOS(1, _omitFieldNames ? '' : 'sid')
     ..aOM<Queue>(1000, _omitFieldNames ? '' : 'queue', subBuilder: Queue.create)
     ..aOM<Dequeue>(1002, _omitFieldNames ? '' : 'dequeue',
@@ -290,6 +388,7 @@ class Stream extends $pb.GeneratedMessage {
     ..aOM<PlayPause>(1003, _omitFieldNames ? '' : 'playpause',
         subBuilder: PlayPause.create)
     ..aOM<Seek>(1004, _omitFieldNames ? '' : 'seek', subBuilder: Seek.create)
+    ..aOM<Sync>(1005, _omitFieldNames ? '' : 'sync', subBuilder: Sync.create)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -314,11 +413,13 @@ class Stream extends $pb.GeneratedMessage {
   @$pb.TagNumber(1002)
   @$pb.TagNumber(1003)
   @$pb.TagNumber(1004)
+  @$pb.TagNumber(1005)
   Stream_Command whichCommand() => _Stream_CommandByTag[$_whichOneof(0)]!;
   @$pb.TagNumber(1000)
   @$pb.TagNumber(1002)
   @$pb.TagNumber(1003)
   @$pb.TagNumber(1004)
+  @$pb.TagNumber(1005)
   void clearCommand() => $_clearField($_whichOneof(0));
 
   @$pb.TagNumber(1)
@@ -373,6 +474,17 @@ class Stream extends $pb.GeneratedMessage {
   void clearSeek() => $_clearField(1004);
   @$pb.TagNumber(1004)
   Seek ensureSeek() => $_ensure(4);
+
+  @$pb.TagNumber(1005)
+  Sync get sync => $_getN(5);
+  @$pb.TagNumber(1005)
+  set sync(Sync value) => $_setField(1005, value);
+  @$pb.TagNumber(1005)
+  $core.bool hasSync() => $_has(5);
+  @$pb.TagNumber(1005)
+  void clearSync() => $_clearField(1005);
+  @$pb.TagNumber(1005)
+  Sync ensureSync() => $_ensure(5);
 }
 
 const $core.bool _omitFieldNames =

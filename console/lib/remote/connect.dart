@@ -141,6 +141,8 @@ class _State extends State<_Connect> with LoadingState {
             );
           });
 
+          socket.send(remote.Stream(sid: uuidx.v7(), sync: remote.Sync()));
+
           return c.future;
         })
         .then((_) => _reconnect())

@@ -12,13 +12,23 @@ class PlaylistCurrent extends StatelessWidget {
       stream: status,
       builder: (context, snapshot) {
         final msg = snapshot.data;
-        if (msg == null || msg.whichCommand() != remote.Stream_Command.queue) {
-          return const SizedBox.shrink();
+        if (msg == null) return const SizedBox.shrink();
+
+        switch (msg.whichCommand()) {
+          case remote.Stream_Command.queue:
+            return media.RowDisplay(
+              media: msg.queue.media,
+              leading: const [Icon(Icons.play_arrow_rounded)],
+            );
+          case remote.Stream_Command.sync:
+            if (!msg.sync.hasCurrent()) return const SizedBox.shrink();
+            return media.RowDisplay(
+              media: msg.sync.current,
+              leading: const [Icon(Icons.play_arrow_rounded)],
+            );
+          default:
+            return const SizedBox.shrink();
         }
-        return media.RowDisplay(
-          media: msg.queue.media,
-          leading: const [Icon(Icons.play_arrow_rounded)],
-        );
       },
     );
   }

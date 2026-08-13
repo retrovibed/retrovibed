@@ -5,6 +5,7 @@ import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/media/play.queue.dart' as playqueue;
+import 'package:retrovibed/meta.dart' as meta;
 import 'package:retrovibed/retrovibed.dart' as retro;
 import 'api.dart' as remote;
 
@@ -35,6 +36,25 @@ class _State extends State<RemoteControlListener> {
       remote.Stream(
         sid: uuidx.random(),
         queue: remote.Queue(media: cur.current),
+      ),
+    );
+  }
+
+  void _echoSync() {
+    final playlist = media.Playlist.of(context);
+    final library = meta.EndpointAuto.of(context)?.changed.value;
+    final current = playlist?.queue.current.value;
+    // no playlist yet (e.g. still starting up) is a valid state to report -
+    // send an empty queue rather than skipping the reply.
+    _rc?.send(
+      remote.Stream(
+        sid: uuidx.v7(),
+        sync: remote.Sync(
+          library: library,
+          capacity: playlist?.queue.capacity ?? 0,
+          current: current?.current,
+          queue: playlist?.queue.queued.map((m) => m.current).toList() ?? [],
+        ),
       ),
     );
   }
@@ -74,6 +94,12 @@ class _State extends State<RemoteControlListener> {
 
   void _applyRemoteCommand(remote.Stream msg) {
     print("received remote command ${msg}");
+
+    if (msg.whichCommand() == remote.Stream_Command.sync) {
+      _echoSync();
+      return;
+    }
+
     final playlist = media.Playlist.of(context);
     if (playlist == null) return;
     print("executing remote command ${msg}");
@@ -98,6 +124,7 @@ class _State extends State<RemoteControlListener> {
           playlist.player.seek(playlist.player.state.position + Duration(milliseconds: offset));
         }
         break;
+      case remote.Stream_Command.sync:
       case remote.Stream_Command.notSet:
         break;
     }

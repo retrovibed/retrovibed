@@ -83,7 +83,7 @@ func GenerateProtocol(ctx context.Context, op eg.Op) error {
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmedia.recent.proto=github.com/retrovibed/retrovibed/shallows/media --go_opt=Mmeta.search.proto=github.com/retrovibed/retrovibed/shallows/meta --go_opt=Mmedia.proto=github.com/retrovibed/retrovibed/shallows/media --go_opt=paths=source_relative --go_out=media media.recent.proto"),
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mrss.proto=github.com/retrovibed/retrovibed/shallows/rss --go_opt=paths=source_relative --go_out=rss rss.proto"),
 		// remote control
-		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmedia.remote.control.proto=github.com/retrovibed/retrovibed/shallows/mediaapi --go_opt=Mmedia.proto=github.com/retrovibed/retrovibed/shallows/media --go_opt=paths=source_relative --go_out=mediaapi media.remote.control.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmedia.remote.control.proto=github.com/retrovibed/retrovibed/shallows/mediaapi --go_opt=Mmedia.proto=github.com/retrovibed/retrovibed/shallows/media --go_opt=Mmeta.daemon.proto=github.com/retrovibed/retrovibed/shallows/metaapi --go_opt=paths=source_relative --go_out=mediaapi media.remote.control.proto"),
 		// block cache
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mcontent.addressable.storage.proto=github.com/retrovibed/retroapi/deeppool --go_opt=paths=source_relative --go_out=../retroapi/deeppool content.addressable.storage.proto"),
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmedia.id.proto=github.com/retrovibed/retrovibed/retroapi/deeppool --go_opt=paths=source_relative --go_out=../retroapi/deeppool media.id.proto"),
