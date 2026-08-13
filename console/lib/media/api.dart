@@ -88,6 +88,13 @@ abstract class media {
         media.search(req, host: endpointHost, options: endpointOptions);
   }
 
+  static FnMediaFind randomendpoint(String host, List<httpx.Option> options) {
+    final endpointHost = host;
+    final endpointOptions = options;
+    return (req, {List<httpx.Option> options = const []}) =>
+        media.random(req, host: endpointHost, options: endpointOptions);
+  }
+
   static Future<MediaUpdateResponse> metadatasync(
     String id,
     Media upd, {
@@ -108,12 +115,13 @@ abstract class media {
 
   static Future<MediaFindResponse> random(
     MediaSearchRequest req, {
+    String? host,
     List<httpx.Option> options = const [],
   }) async {
     return httpx
         .get(
           Uri.https(
-            httpx.host(),
+            host ?? httpx.host(),
             "/m/random",
           ).replace(query: qs.encode(req.toProto3Json())),
           options: options,

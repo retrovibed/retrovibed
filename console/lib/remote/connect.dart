@@ -7,6 +7,7 @@ import 'package:retrovibed/design.kit/stateful.dart';
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/meta.dart' as meta;
 import 'package:retrovibed/media.dart' as media;
+import 'package:retrovibed/media/play.queue.dart' as playqueue;
 import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/library/search.minimal.dart';
 import 'package:retrovibed/uuidx.dart' as uuidx;
@@ -16,25 +17,6 @@ import 'player.control.playpause.dart';
 import 'player.control.sync.dart';
 import 'playlist.current.dart';
 import 'playlist.queue.dart';
-
-// Mirrors media.PlayAction's shape but queues the media on the connected
-// remote daemon's playlist instead of this device's local Playlist, since
-// SearchMinimal here searches the app's own library to feed *that* daemon.
-Future<void> Function()? Function(BuildContext, media.Media, media.MediaSearchResponse) RemotePlayAction(
-  remote.RemoteControlSocket socket,
-) {
-  return (context, current, s) {
-    switch (mimex.icon(current.mimetype)) {
-      case mimex.icomovie:
-      case mimex.icoaudio:
-        return () async {
-          socket.send(remote.messages.queue(current));
-        };
-      default:
-        return null;
-    }
-  };
-}
 
 // Public entrypoint: wraps _Connect in an authn.AuthedEndpoint so it can target a
 // user-selected remote daemon (via its DaemonDropdown) with a matching
@@ -77,12 +59,88 @@ class _State extends State<_Connect> with LoadingState {
   Widget? _focused;
   ValueNotifier<meta.Daemon> _endpoint = ValueNotifier(meta.Daemon());
 
+  // long-lived autoqueue: tapping a search result seeds this from the tapped
+  // item's search results, and _fillQueue tops it back up toward
+  // _autoqueueTarget every time the daemon echoes a sync showing its
+  // upcoming queue drained below that. Never null - starts as an empty
+  // stream (mirrors PlayQueue._stream) so _fillQueue needs no null check.
+  static const int _autoqueueTarget = 5;
+  StreamIterator<playqueue.PlayableMedia> _autoqueue = StreamIterator(const Stream.empty());
+  // serializes _fillQueue: sync echoes can arrive faster than a fill pass
+  // completes.
+  bool _filling = false;
+
+  // resolved fresh on every access (not cached) since _latest changes over
+  // the widget's lifetime and these must always target whatever
+  // daemon/hostname/token is current, whether read from build() or later
+  // from _onPlay/_fillQueue.
+  List<httpx.Option> get _bearerOptions => [httpx.Request.bearer(() => Future.value(_latest.sync.token))];
+  media.FnMediaSearch get _apisearch => media.media.searchendpoint(_latest.sync.library.hostname, _bearerOptions);
+  media.FnMediaFind get _apirandom => media.media.randomendpoint(_latest.sync.library.hostname, _bearerOptions);
+
+  // Mirrors media.PlayAction's shape but queues the media on the connected
+  // remote daemon's playlist instead of this device's local Playlist, since
+  // SearchMinimal here searches the app's own library to feed *that* daemon.
+  Future<void> Function()? _onPlay(BuildContext context, media.Media current, media.MediaSearchResponse s) {
+    switch (mimex.icon(current.mimetype)) {
+      case mimex.icomovie:
+      case mimex.icoaudio:
+        return () async {
+          await _autoqueue.cancel();
+          final anchor = playqueue.PlayQueue()..current.value = playqueue.PlayableMedia(current);
+          setState(() {
+            _autoqueue = StreamIterator(
+              playqueue.range(s.next, anchor, search: _apisearch, random: _apirandom),
+            );
+          });
+          await _fillQueue();
+          setState(() => _focused = null);
+        };
+      default:
+        return null;
+    }
+  }
+
+  bool _casfilling(bool o) {
+    if (o) return o;
+    _filling = true;
+    return false;
+  }
+
+  // tops the daemon's upcoming queue back up toward _autoqueueTarget by
+  // pulling more results from _autoqueue - called after every tap and after
+  // every sync that shows the daemon's queue has drained, which is what
+  // makes this a long-lived queue rather than a one-shot burst.
+  // sync echoes can arrive faster than a fill pass completes (each queued
+  // item advancing the daemon triggers its own echo); a call that comes in
+  // while one's already running is just dropped - the next sync will
+  // trigger another pass anyway.
+  Future<void> _fillQueue() async {
+    // cache the queue while filling so a later _onPlay's new _autoqueue
+    // doesn't get spliced into an in-flight pass - _socket is read fresh at
+    // send time instead since it can be swapped/closed independently (e.g.
+    // by _onEndpointChanged) partway through a pass.
+    final needed = _autoqueueTarget - _latest.sync.queue.length;
+    final queue = _autoqueue;
+    if (needed <= 0) return;
+    if (_casfilling(_filling)) return;
+    try {
+      for (var sent = 0; sent < needed && await queue.moveNext(); sent++) {
+        _socket.send(remote.messages.queue(queue.current.current));
+      }
+    } finally {
+      _filling = false;
+    }
+  }
+
   void _onEndpointChanged() {
     _socket.close();
+    _autoqueue.cancel();
+    _autoqueue = StreamIterator(const Stream.empty());
     setState(() {
       _socket = remote.RemoteControlSocket.noop;
       _latest = remote.Stream(sid: uuidx.min());
-      _focused = const PlaylistQueue(<media.Media>[], key: ValueKey("queue"));
+      _focused = PlaylistQueue(<media.Media>[], remote.RemoteControlSocket.noop, key: const ValueKey("queue"));
     });
     _connect();
   }
@@ -114,6 +172,7 @@ class _State extends State<_Connect> with LoadingState {
                 if (msg.whichCommand() != remote.Stream_Command.sync) return;
                 if (msg.sid.compareTo(_latest.sid) <= 0) return;
                 setState(() => _latest = msg);
+                _fillQueue();
               },
               cancelOnError: true,
               onError: c.completeError,
@@ -168,6 +227,7 @@ class _State extends State<_Connect> with LoadingState {
     super.dispose();
     _endpoint.removeListener(_onEndpointChanged);
     _socket.close();
+    _autoqueue.cancel();
   }
 
   @override
@@ -176,13 +236,10 @@ class _State extends State<_Connect> with LoadingState {
     final search = SearchMinimal(
       key: const ValueKey("search"),
       empty: ds.Empty,
-      onPlay: RemotePlayAction(_socket),
-      apisearch: media.media.searchendpoint(
-        _latest.sync.library.hostname,
-        [httpx.Request.bearer(() => Future.value(_latest.sync.token))],
-      ),
+      onPlay: _onPlay,
+      apisearch: _apisearch,
     );
-    final queue = PlaylistQueue(_latest.sync.queue, key: const ValueKey("queue"));
+    final queue = PlaylistQueue(_latest.sync.queue, _socket, key: const ValueKey("queue"));
     return ds.Container(
       Column(
         verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,

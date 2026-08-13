@@ -151,7 +151,6 @@ abstract class remotecontrol {
           ],
         )
         .then((socket) {
-          print("WAKA ${socket.closeCode} ${socket.closeReason}");
           socket.pingInterval = Duration(seconds: 10);
           return _WebSocketRemoteControlSocket(socket);
         });

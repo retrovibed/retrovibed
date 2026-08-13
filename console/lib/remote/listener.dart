@@ -93,8 +93,6 @@ class _State extends State<RemoteControlListener> {
   }
 
   void _applyRemoteCommand(remote.Stream msg) {
-    print("received remote command ${msg}");
-
     if (msg.whichCommand() == remote.Stream_Command.sync) {
       _echoSync();
       return;
