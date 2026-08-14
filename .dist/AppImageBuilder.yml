@@ -62,7 +62,8 @@ AppDir:
 
   after_runtime: |
     mkdir -p "${APPDIR}/runtime/compat/lib64"
-    ln -sf ../usr/lib64/ld-linux-x86-64.so.2 "${APPDIR}/runtime/compat/lib64/ld-linux-x86-64.so.2"
+    linker="$(basename "$(ls ${APPDIR}/usr/lib64/ld-linux-*.so.* 2>/dev/null | head -n1)")"
+    ln -sf "../usr/lib64/${linker}" "${APPDIR}/runtime/compat/lib64/${linker}"
 
   apt:
     arch: !ENV "${APT_ARCH}"
