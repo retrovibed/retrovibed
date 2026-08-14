@@ -187,6 +187,11 @@ class ErrorsTest {
     const code = 501;
     return (obj is http.Response && obj.statusCode == code) || (obj is HttpClientResponse && obj.statusCode == code);
   }
+
+  static bool unavailable(Object obj) {
+    const code = 503;
+    return (obj is http.Response && obj.statusCode == code) || (obj is HttpClientResponse && obj.statusCode == code);
+  }
 }
 
 class Content {

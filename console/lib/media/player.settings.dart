@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart'; // Provides [Player], [Media], [Playlist] etc.
+import 'package:retrovibed/audio/settings.audio.sink.dart';
 import 'package:retrovibed/design.kit/forms.dart' as forms;
 import 'package:retrovibed/designkit.dart' as ds;
 
@@ -126,6 +127,7 @@ class _PlayerSettingsState extends State<PlayerSettings> {
               },
             ),
           ),
+          const SettingsAudioSink(padding: EdgeInsets.zero),
         ],
       ),
       padding: widget.padding,

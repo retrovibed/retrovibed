@@ -16,7 +16,7 @@ class PlayerControlSettings extends StatelessWidget {
           ds.modals.push(
             context,
             PlayerSettings(
-              constraints: BoxConstraints(maxWidth: 256),
+              constraints: BoxConstraints(maxWidth: 384),
               padding: defaults.padding,
               current: player,
             ),

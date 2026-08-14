@@ -82,6 +82,11 @@ class ErrorBoundaryState extends State<ErrorBoundary> {
   }
 }
 
+abstract class ErrorDecorations {
+  static const error = BoxDecoration(color: Color.fromRGBO(110, 1, 1, 0.75));
+  static const info = BoxDecoration(color: Colors.transparent);
+}
+
 class Error extends StatelessWidget {
   static const zero = const Error(child: const SizedBox(), trace: StackTrace.empty);
   final Object? cause;
@@ -89,6 +94,8 @@ class Error extends StatelessWidget {
   final Widget child;
   final void Function()? onTap;
   final Color? color;
+  final BorderRadius? borderRadius;
+  final BoxDecoration decoration;
 
   const Error({
     super.key,
@@ -97,6 +104,8 @@ class Error extends StatelessWidget {
     this.cause,
     this.onTap,
     this.color,
+    this.borderRadius,
+    this.decoration = ErrorDecorations.error,
   });
 
   @override
@@ -138,6 +147,8 @@ class Error extends StatelessWidget {
     void Function()? onTap,
     Widget? message,
     Color? color,
+    BoxDecoration decoration = ErrorDecorations.error,
+    BorderRadius? borderRadius,
   }) {
     return Error(
       child: message ?? Text("you lack sufficient permissions"),
@@ -145,6 +156,8 @@ class Error extends StatelessWidget {
       trace: trace ?? StackTrace.current,
       onTap: onTap,
       color: color,
+      decoration: decoration,
+      borderRadius: borderRadius,
     );
   }
 
@@ -193,6 +206,8 @@ class Error extends StatelessWidget {
     void Function()? onTap,
     Widget? message,
     Color? color,
+    BoxDecoration decoration = ErrorDecorations.error,
+    BorderRadius? borderRadius,
   }) {
     return Error(
       child: message ?? Text("a conflict occurred, the resource may already exist"),
@@ -200,6 +215,28 @@ class Error extends StatelessWidget {
       trace: trace ?? StackTrace.current,
       onTap: onTap,
       color: color,
+      decoration: decoration,
+      borderRadius: borderRadius,
+    );
+  }
+
+  static Error unavailable(
+    Object obj, {
+    StackTrace? trace,
+    void Function()? onTap,
+    Widget? message,
+    Color? color,
+    BoxDecoration decoration = ErrorDecorations.error,
+    BorderRadius? borderRadius,
+  }) {
+    return Error(
+      child: message ?? Text("not supported on this device"),
+      cause: obj,
+      trace: trace ?? StackTrace.current,
+      onTap: onTap,
+      color: color,
+      decoration: decoration,
+      borderRadius: borderRadius,
     );
   }
 
@@ -209,6 +246,8 @@ class Error extends StatelessWidget {
     void Function()? onTap,
     Widget? message,
     Color? color,
+    BoxDecoration decoration = ErrorDecorations.error,
+    BorderRadius? borderRadius,
   }) {
     return Error(
       child: message ?? Text("you're currently rate limited try again later"),
@@ -216,6 +255,8 @@ class Error extends StatelessWidget {
       trace: trace ?? StackTrace.current,
       onTap: onTap,
       color: color,
+      decoration: decoration,
+      borderRadius: borderRadius,
     );
   }
 
@@ -299,9 +340,9 @@ class Error extends StatelessWidget {
         onPointerUp: onTap != null ? (_) => onTap!() : null,
         child: Container(
           alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: color ?? (zero ? Colors.transparent : defaults.danger),
-            borderRadius: defaults.borderRadius,
+          decoration: decoration.copyWith(
+            color: color ?? decoration.color,
+            borderRadius: borderRadius ?? decoration.borderRadius ?? defaults.borderRadius,
           ),
           child: SelectionArea(
             child: GestureDetector(

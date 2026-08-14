@@ -5,6 +5,7 @@ import 'settings.video.dart';
 import 'settings.audio.dart';
 import 'settings.locate.dart';
 import 'api.dart' as api;
+import 'package:retrovibed/audio/settings.audio.sink.dart';
 
 class Settings extends StatelessWidget {
   const Settings({super.key});
@@ -25,6 +26,8 @@ class Settings extends StatelessWidget {
         VideoSettings(),
         ds.Heading(Text("audio")),
         SettingsAudio(),
+        ds.Heading(Text("speakers")),
+        SettingsAudioSink(),
       ],
     );
   }

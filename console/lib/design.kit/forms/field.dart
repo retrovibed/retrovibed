@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../errors.dart' show Error;
 import '../help.dart';
 
 class Field extends StatelessWidget {
@@ -8,6 +9,7 @@ class Field extends StatelessWidget {
   final List<Widget> trailing;
   final EdgeInsets margin;
   final EdgeInsets padding;
+  final Widget cause;
 
   const Field({
     super.key,
@@ -17,11 +19,13 @@ class Field extends StatelessWidget {
     this.trailing = const [],
     this.margin = EdgeInsets.zero,
     this.padding = EdgeInsets.zero,
+    this.cause = Error.zero,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
     return Help(
       SelectionArea(
         child: Container(
@@ -31,7 +35,16 @@ class Field extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Row(children: [Expanded(child: input), ...trailing]),
+              Row(
+                children: [
+                  Expanded(
+                    child: cause == Error.zero
+                        ? input
+                        : SizedBox(height: kMinInteractiveDimension, child: cause),
+                  ),
+                  ...trailing,
+                ],
+              ),
               DefaultTextStyle(
                 style: theme.textTheme.bodySmall!.copyWith(
                   color: theme.hintColor,
