@@ -41,6 +41,7 @@ func AppImageBuild(b *tarballs.Build) eg.OpFn {
 			builddir,
 		).Directory(egenv.WorkspaceDirectory()).
 			Attempts(3).
+			Timeout(egenv.TTL()).
 			Environ("APPDIR", egtarball.Path(tarballs.Retrovibed(b))).
 			Environ("VERSION", tarballs.Version()).
 			Environ("APT_ARCH", b.Arch).
