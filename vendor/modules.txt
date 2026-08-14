@@ -419,7 +419,6 @@ github.com/egdaemon/eg/runtime/x/wasi/egsecrets
 github.com/egdaemon/eg/runtime/x/wasi/egsha256x
 github.com/egdaemon/eg/runtime/x/wasi/egtarball
 github.com/egdaemon/eg/runtime/x/wasi/execx
-github.com/egdaemon/eg/runtime/x/wasi/wayland
 github.com/egdaemon/eg/secrets
 # github.com/egdaemon/wasinet/wasinet v0.0.0-20260714114633-11ce19bcbeeb
 ## explicit; go 1.25.0
@@ -709,6 +708,10 @@ github.com/james-lawrence/torrent/storage
 github.com/james-lawrence/torrent/torrenttest
 github.com/james-lawrence/torrent/tracker
 github.com/james-lawrence/torrent/upnp
+# github.com/jfreymuth/pulse v0.1.2
+## explicit; go 1.12
+github.com/jfreymuth/pulse
+github.com/jfreymuth/pulse/proto
 # github.com/justinas/alice v1.2.0
 ## explicit; go 1.12
 github.com/justinas/alice

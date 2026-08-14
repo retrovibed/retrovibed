@@ -405,6 +405,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 
 	metaapi.NewHTTP(db).Bind(httpmux.PathPrefix("/sso").Subrouter())
 	metaapi.NewHTTPWireguard(wireguardx.ConfigDirectory(), db).Bind(httpmux.PathPrefix("/wireguard").Subrouter())
+	metaapi.NewHTTPAudioSink().Bind(httpmux.PathPrefix("/audio/sinks").Subrouter())
 	metaapi.NewHTTPUsermanagement(db).Bind(metamux.PathPrefix("/u12t").Subrouter())
 	metaapi.NewHTTPDaemons(db).Bind(metamux.PathPrefix("/d").Subrouter())
 	metaapi.NewHTTPAuthz(db).Bind(metamux.PathPrefix("/authz").Subrouter())

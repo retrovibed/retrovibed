@@ -26,7 +26,7 @@ func BuildLinux(ctx context.Context, _ eg.Op) error {
 		// and a stale cached JAVA_JVM_LIBRARY path breaks the build in containers without one.
 		runtime.New("rm -rf build/linux").Lenient(true),
 		runtime.New("mkdir -p build/native_assets/linux"),
-		runtime.New("flutter build linux --release lib/main.dart"),
+		runtime.New("flutter build linux --release lib/main.dart").Timeout(egenv.TTL()),
 	)
 }
 

@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package meta;
+
+message AudioSink {
+  string id = 1 [ json_name = "id" ];
+  string name = 2 [ json_name = "name" ];
+}
+
+message AudioSinkSearchResponse {
+  repeated AudioSink items = 1 [ json_name = "items" ];
+}
+
+message AudioSinkCurrentResponse {
+  AudioSink sink = 1 [ json_name = "sink" ];
+}
+
+message AudioSinkTouchRequest {
+  string id = 1 [ json_name = "id" ];
+}
+
+message AudioSinkTouchResponse {
+  AudioSink sink = 1 [ json_name = "sink" ];
+}
