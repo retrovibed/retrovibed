@@ -3,12 +3,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:retrovibed/discovery/settings.dart' as discovery;
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
 
-// discovery.Settings's natural content height exceeds ~473px at full width.
-// It's always hosted inside a bounded-height grid card in production, never
-// given the raw full-screen height, so resolutions shorter than that are not
-// a real scenario for this widget — the other resolution tests in this file
-// already cover the real card-body constraint.
-const _minimumSupportedHeight = 480.0;
+// discovery.Settings's natural content height exceeds ~633px at full width
+// now that the "speakers" section (SettingsAudioSink) is wired in (commit
+// b4d0dc33). It's always hosted inside a bounded-height grid card in
+// production, never given the raw full-screen height, so resolutions shorter
+// than that are not a real scenario for this widget — the other resolution
+// tests in this file already cover the real card-body constraint.
+const _minimumSupportedHeight = 634.0;
 final _resolutions = ValueVariant<MapEntry<String, Size>>(
   Resolutions.all.entries.where((e) => e.value.height >= _minimumSupportedHeight).toSet(),
 );
@@ -17,7 +18,8 @@ void main() {
   group('Discovery Settings layout behaviors', () {
     testWidgets('renders within constrained size', (WidgetTester tester) async {
       await tester.pumpApp(
-        SizedBox(width: 512, height: 480.0, child: discovery.Settings()),
+        physicalSize: const Size(512, 700),
+        SizedBox(width: 512, height: 640.0, child: discovery.Settings()),
       );
       await tester.pumpAndSettle();
 
@@ -33,7 +35,8 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpApp(
-        SizedBox(width: 400, height: 500, child: discovery.Settings()),
+        physicalSize: const Size(400, 700),
+        SizedBox(width: 400, height: 640, child: discovery.Settings()),
       );
       await tester.pumpAndSettle();
 
@@ -47,9 +50,10 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpApp(
+        physicalSize: const Size(800, 700),
         Column(
           children: [
-            SizedBox(height: 480, child: discovery.Settings()),
+            SizedBox(height: 640, child: discovery.Settings()),
             Expanded(child: Container()),
           ],
         ),
@@ -75,17 +79,18 @@ void main() {
     // The card constraint from GridSettings: aspectRatio 9.62/16 at 300px wide
     // gives card height = 300 * (16/9.62) ≈ 498px. The card body (Flexible
     // inside ds.Card) is smaller — approximately 403px after heading/padding.
-    // discovery.Settings's natural height grew past that budget (~473px) once
-    // LocateSettings was wired in (commit bd5fe1fe), so this test's height is
-    // raised to the widget's current natural height rather than the original
-    // card-body budget. GridSettings's actual card sizing is unchanged and may
-    // still clip this content at 300px-wide cards in production — tracked
-    // separately.
-    testWidgets('renders without overflow at 300px wide card height (480px)', (
+    // discovery.Settings's natural height grew past that budget (~633px) once
+    // SettingsAudioSink was wired in (commit b4d0dc33), so this test's height
+    // is raised to the widget's current natural height rather than the
+    // original card-body budget. GridSettings's actual card sizing is
+    // unchanged and may still clip this content at 300px-wide cards in
+    // production — tracked separately.
+    testWidgets('renders without overflow at 300px wide card height (640px)', (
       WidgetTester tester,
     ) async {
       await tester.pumpApp(
-        SizedBox(width: 300, height: 480, child: discovery.Settings()),
+        physicalSize: const Size(300, 700),
+        SizedBox(width: 300, height: 640, child: discovery.Settings()),
       );
       await tester.pumpAndSettle();
 
@@ -95,12 +100,12 @@ void main() {
     // Measures the widget's natural height (excluding text, which is
     // font-dependent in tests) by asserting the non-text overhead — padding,
     // margin, spacing — stays within budget, catching regressions to
-    // spacing/padding. Budget raised from the original ~403.7px GridSettings
-    // card-body constraint to ~478px to account for LocateSettings (see above).
-    // Measure inside SingleChildScrollView (unbounded) so Column(min) sizes to
-    // content — not to the screen.
+    // spacing/padding. Budget raised from the original ~478px (LocateSettings)
+    // to ~634px to account for SettingsAudioSink (see above). Measure inside
+    // SingleChildScrollView (unbounded) so Column(min) sizes to content — not
+    // to the screen.
     testWidgets(
-      'natural height fits updated budget (226x478)',
+      'natural height fits updated budget (226x634)',
       (WidgetTester tester) async {
         await tester.pumpApp(
           SingleChildScrollView(
@@ -110,26 +115,28 @@ void main() {
         await tester.pumpAndSettle();
 
         final size = tester.getSize(find.byType(discovery.Settings));
-        expect(size.height, lessThanOrEqualTo(478.0));
+        expect(size.height, lessThanOrEqualTo(634.0));
       },
     );
 
-    testWidgets('renders without overflow at 300x480', (
+    testWidgets('renders without overflow at 300x640', (
       WidgetTester tester,
     ) async {
       await tester.pumpApp(
-        SizedBox(width: 300, height: 480, child: discovery.Settings()),
+        physicalSize: const Size(300, 700),
+        SizedBox(width: 300, height: 640, child: discovery.Settings()),
       );
       await tester.pumpAndSettle();
 
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('renders without overflow at 400x500', (
+    testWidgets('renders without overflow at 400x640', (
       WidgetTester tester,
     ) async {
       await tester.pumpApp(
-        SizedBox(width: 400, height: 500, child: discovery.Settings()),
+        physicalSize: const Size(400, 700),
+        SizedBox(width: 400, height: 640, child: discovery.Settings()),
       );
       await tester.pumpAndSettle();
 
@@ -140,6 +147,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpApp(
+        physicalSize: const Size(640, 900),
         SizedBox(width: 640, height: 800, child: discovery.Settings()),
       );
       await tester.pumpAndSettle();

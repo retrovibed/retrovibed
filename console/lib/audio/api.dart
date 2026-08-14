@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:retrovibed/audio/meta.audio.pb.dart';
 import 'package:retrovibed/httpx.dart' as httpx;
 
