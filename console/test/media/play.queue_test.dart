@@ -51,7 +51,11 @@ void main() {
 
     test('reflects the position seeded via reset', () {
       final q = PlayQueue();
-      q.reset(Stream.empty(), api.Media(id: 'a', description: 'A'), pos: const Duration(seconds: 5));
+      q.reset(
+        Stream.empty(),
+        api.Media(id: 'a', description: 'A'),
+        pos: const Duration(seconds: 5),
+      );
       expect(q.pos, const Duration(seconds: 5));
     });
   });
@@ -291,6 +295,31 @@ void main() {
 
       expect(randomCalled, isTrue);
       expect(_id(results[1]), 'rand');
+    });
+
+    test('retries the random fallback after a transient failure instead of terminating the stream', () async {
+      var calls = 0;
+
+      final q = PlayQueue();
+      q.reset(Stream.empty(), _m('a'));
+
+      final s = range(
+        _req(10),
+        q,
+        search: _search([_m('a')], 10),
+        random: (req, {options = const []}) async {
+          calls++;
+          if (calls == 1) throw Exception('network blip');
+          return api.MediaFindResponse(media: _m('rand'));
+        },
+        backoff: Duration(),
+      );
+
+      final results = await s.take(3).toList();
+
+      expect(calls, 3); // first call failed, second (post-retry) succeeded
+
+      expect(results.map(_id), ['a', 'rand', 'rand']);
     });
   });
 

@@ -147,7 +147,6 @@ class PlayableMedia {
   );
 
   mediakit.Media playable(String auth) {
-    print("DERP DERP playable... ${current} ${auth}");
     return mediakit.Media(
       api.media.download_uri(current.id),
       extras: Map.of(<String, String>{
@@ -174,6 +173,7 @@ Stream<PlayableMedia> range(
   List<httpx.Option> Function() options = httpx.Request.empty,
   api.FnMediaSearch search = api.media.search,
   api.FnMediaFind random = api.media.random,
+  Duration backoff = const Duration(seconds: 2),
 }) async* {
   final playable = queue.current.value;
 
@@ -210,11 +210,24 @@ Stream<PlayableMedia> range(
   // lets play random content. using things like the mimetypes from
   // from the initial request. we'll eventually add in more coherent
   // results to keep a trend going.
+  //
+  // this branch is meant to run indefinitely for long-lived queues, so a
+  // transient failure (network blip, expired token) must not be allowed to
+  // close the stream permanently - retry after a short delay instead of
+  // letting the exception propagate out of the generator.
   while (true) {
     i.next.excluded
       ..clear()
       ..addAll(queue.recent.map((m) => m.current.id));
-    final v = await random(i.next, options: options());
+    final v = await random(i.next, options: options())
+        .then<MediaFindResponse?>(
+          (v) => v,
+        )
+        .catchError((cause) {
+          print("range(): fallback failed, retrying: $cause");
+          return Future.delayed(backoff).then((_) => null);
+        });
+    if (v == null) continue;
     yield PlayableMedia(v.media);
   }
 }

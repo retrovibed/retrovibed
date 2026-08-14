@@ -56,9 +56,6 @@ class _WebSocketRemoteControlSocket implements RemoteControlSocket {
           sink.addError('deserialization failed data: $data');
         }
       },
-      handleError: (cause, trace, sink) {
-        print("DERP DERP ${cause}");
-      },
       handleDone: (sink) {
         print("websocket closed: code=${_socket.closeCode} reason=${_socket.closeReason}");
         sink.close();
