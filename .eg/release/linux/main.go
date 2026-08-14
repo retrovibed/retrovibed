@@ -88,7 +88,7 @@ func build() eg.OpFn {
 		shell.Op(
 			shell.Newf("echo 'tarballing %s -> %s'", egtarball.Path(archive), egtarball.Archive(archive)),
 		),
-		eg.Parallel(
+		eg.Sequential(
 			release.Tarball(b),
 			release.AppImageBuild(b),
 		),
