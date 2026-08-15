@@ -61,14 +61,16 @@ AppDir:
     exec_args: $@
 
   after_runtime: |
-    # appimage-builder deploys the dynamic linker into runtime/compat/usr/lib64/ but
-    # never creates the root-level symlink AppRun's execv() needs (relative to wherever
-    # it chdir()s). That symlink's directory name is arch-dependent (x86_64: "lib64",
-    # aarch64: "lib"), so populate both -- the unused one is just a harmless extra link.
+    # appimage-builder deploys the dynamic linker somewhere under runtime/compat/usr
+    # (usr/lib64/ on x86_64, usr/lib/aarch64-linux-gnu/ on aarch64) but never creates
+    # the root-level symlink AppRun's execv() needs (relative to wherever it chdir()s).
+    # That symlink's directory name is also arch-dependent (x86_64: "lib64", aarch64:
+    # "lib"), so populate both -- the unused one is just a harmless extra link.
     mkdir -p "${APPDIR}/runtime/compat/lib" "${APPDIR}/runtime/compat/lib64"
-    linker="$(basename "$(find "${APPDIR}/runtime/compat/usr/lib64" -name 'ld-linux-*.so.*' 2>/dev/null | head -n1)")"
-    ln -sf "../usr/lib64/${linker}" "${APPDIR}/runtime/compat/lib64/${linker}"
-    ln -sf "../usr/lib64/${linker}" "${APPDIR}/runtime/compat/lib/${linker}"
+    linker_src="$(find "${APPDIR}/runtime/compat/usr" -name 'ld-linux-*.so.*' 2>/dev/null | head -n1)"
+    linker="$(basename "$linker_src")"
+    ln -sf "$linker_src" "${APPDIR}/runtime/compat/lib64/${linker}"
+    ln -sf "$linker_src" "${APPDIR}/runtime/compat/lib/${linker}"
 
   apt:
     arch: !ENV "${APT_ARCH}"
