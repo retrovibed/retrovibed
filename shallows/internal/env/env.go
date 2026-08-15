@@ -39,7 +39,8 @@ const (
 	NeuralMediaID              = "RETROVIBED_NEURALS_MEDIA_ID"                 // model for extracting media metadata from essentially file names. used in identification of media.
 	AutoDownloadNeurals        = "RETROVIBED_NEURALS_AUTODOWNLOAD"             // enable/disable automatically downloading ai models.
 	AutoDownloadMetadata       = "RETROVIBED_METADATA_AUTODOWNLOAD"            // enable/disable automatically downloading metadata.
-	AutoMDNS                   = "RETROVIBED_AUTO_MDNS"                        // enable/disable multicast dns registration, allows for the frontend to automatically find daemons on the local network.
+	MDNSAdvertise              = "RETROVIBED_MDNS_ADVERTISE"                   // enable/disable multicast dns registration, allows for the frontend to automatically find daemons on the local network.
+	MDNSDiscovery              = "RETROVIBED_MDNS_DISCOVERY"                   // enable/disable api driven mdns lan peer discovery.
 	AutoArchive                = "RETROVIBED_MEDIA_AUTO_ARCHIVE"               // enable/disable automatic archiving of eligible media.
 	AutoReclaim                = "RETROVIBED_MEDIA_AUTO_RECLAIM"               // enable/disable automatic reclaiming of disk space for media that has been archived.
 	AutoIdentifyMedia          = "RETROVIBED_MEDIA_AUTO_IDENTIFY"              // enable/disable automatically identified media.

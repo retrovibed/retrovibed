@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/coder/websocket"
 	"github.com/go-playground/form/v4"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
@@ -18,6 +19,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/numericx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
+	"github.com/retrovibed/retrovibed/shallows/internal/websocketx"
 	"github.com/retrovibed/retrovibed/shallows/meta"
 )
 
@@ -29,24 +31,46 @@ func HTTPDaemonsOptionJWTSecret(j jwtx.SecretSource) HTTPDaemonsOption {
 	}
 }
 
+func HTTPDaemonsOptionMDNSDiscovery(enabled bool) HTTPDaemonsOption {
+	return func(t *HTTPDaemons) {
+		t.mdnsDiscovery = enabled
+	}
+}
+
+func HTTPDaemonsOptionMDNSLookup(l meta.MDNSLookup) HTTPDaemonsOption {
+	return func(t *HTTPDaemons) {
+		t.mdnsLookup = l
+	}
+}
+
 func NewHTTPDaemons(q sqlx.Queryer, options ...HTTPDaemonsOption) *HTTPDaemons {
 	svc := langx.Clone(HTTPDaemons{
-		q:         q,
-		jwtsecret: env.JWTSecret,
-		decoder:   formx.NewDecoder(),
+		q:          q,
+		jwtsecret:  env.JWTSecret,
+		decoder:    formx.NewDecoder(),
+		mdnsLookup: meta.DefaultMDNSLookup,
 	}, options...)
 
 	return &svc
 }
 
 type HTTPDaemons struct {
-	q         sqlx.Queryer
-	jwtsecret jwtx.SecretSource
-	decoder   *form.Decoder
+	q             sqlx.Queryer
+	jwtsecret     jwtx.SecretSource
+	decoder       *form.Decoder
+	mdnsDiscovery bool
+	mdnsLookup    meta.MDNSLookup
 }
 
 func (t *HTTPDaemons) Bind(r *mux.Router) {
 	r.StrictSlash(false)
+
+	r.Path("/discover").Methods(http.MethodGet).MatcherFunc(isWebsocketUpgrade).Handler(alice.New(
+		httpx.GatedResponse(t.mdnsDiscovery, http.StatusServiceUnavailable),
+		httpx.ContextBufferPool512(),
+		httpauth.AuthenticateWithToken(t.jwtsecret),
+		httpx.Timeout2s(),
+	).ThenFunc(t.discover))
 
 	r.Path("/latest").Methods(http.MethodGet).Handler(alice.New(
 		httpx.ContextBufferPool512(),
@@ -84,6 +108,52 @@ func (t *HTTPDaemons) Bind(r *mux.Router) {
 		httpauth.AuthenticateWithToken(t.jwtsecret),
 		httpx.Timeout2s(),
 	).ThenFunc(t.delete))
+}
+
+func (t *HTTPDaemons) discover(w http.ResponseWriter, r *http.Request) {
+	c, err := websocket.Accept(w, r, nil)
+	if err != nil {
+		log.Println(errorsx.Wrap(err, "failed to accept mdns discovery websocket"))
+		return
+	}
+	defer func() {
+		errorsx.Log(c.Close(websocket.StatusNormalClosure, ""))
+	}()
+
+	seq := meta.DiscoverOnce(t.q, t.mdnsLookup)
+	for p := range seq.Each(r.Context()) {
+		// only stream newly discovered peers — ones already known to
+		// meta_daemons were touched (updated_at bumped) by the scan but
+		// aren't new information for the client.
+		if !p.CreatedAt.Equal(p.UpdatedAt) {
+			continue
+		}
+
+		encoded, err := NewDaemonFromMetaDaemon(p)
+		if err != nil {
+			log.Println(errorsx.Wrap(err, "response generation failed"))
+			errorsx.Log(c.Close(websocketx.PrivateStatus(http.StatusInternalServerError), "internal service error"))
+			return
+		}
+
+		data, err := json.Marshal(encoded)
+		if err != nil {
+			log.Println(errorsx.Wrap(err, "unable to encode discovered peer"))
+			errorsx.Log(c.Close(websocketx.PrivateStatus(http.StatusInternalServerError), "internal service error"))
+			return
+		}
+
+		if err := c.Write(r.Context(), websocket.MessageText, data); err != nil {
+			log.Println(errorsx.Wrap(err, "unable to write discovered peer"))
+			return
+		}
+	}
+
+	if err := seq.Err(); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to discover mdns peers"))
+		errorsx.Log(c.Close(websocketx.PrivateStatus(http.StatusInternalServerError), "internal service error"))
+		return
+	}
 }
 
 func (t *HTTPDaemons) search(w http.ResponseWriter, r *http.Request) {

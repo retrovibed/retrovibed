@@ -172,7 +172,8 @@ bool resetcerts() {
 void daemon({bool smoke = false}) {
   String args = jsonEncode([
     "daemon",
-    "--no-auto-mdns",
+    "--no-mdns-advertise",
+    "--mdns-discovery",
     "--remote-control",
   ]);
   bridge.egdaemon(args.toNativeUtf8().cast<Char>(), smoke ? 1 : 0);

@@ -72,7 +72,8 @@ func DefaultResolver(d netx.Dialer) *net.Resolver {
 
 type Command struct {
 	Alpha               bool             `flag:"" name:"alpha" help:"enable alpha functionality" default:"false" negatable:"" hidden:"true"`
-	AutoMDNS            bool             `flag:"" name:"auto-mdns" help:"enable the multicast dns service" env:"${env_auto_mdns}" default:"true" negatable:""`
+	MDNSAdvertise       bool             `flag:"" name:"mdns-advertise" help:"enable the multicast dns service" env:"${env_mdns_advertise}" default:"true" negatable:""`
+	MDNSDiscovery       bool             `flag:"" name:"mdns-discovery" help:"enable API-driven mDNS LAN peer discovery over websocket (experimental)" env:"${env_mdns_discovery}" default:"false" negatable:""`
 	AutoBootstrap       bool             `flag:"" name:"auto-bootstrap" help:"bootstrap from a predefined set of peers" env:"${env_auto_bootstrap}" default:"true" negatable:""`
 	AutoDiscovery       bool             `flag:"" name:"auto-discovery" help:"enable automatic discovery of content from peers" env:"${env_auto_discovery}" default:"true" negatable:""`
 	AutoPeerTube        bool             `flag:"" name:"auto-peertube" help:"enable the built-in PeerTube/SepiaSearch discovery strategy" env:"${env_auto_peertube}" default:"true" negatable:""`
@@ -407,7 +408,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	metaapi.NewHTTPWireguard(wireguardx.ConfigDirectory(), db).Bind(httpmux.PathPrefix("/wireguard").Subrouter())
 	metaapi.NewHTTPAudioSink().Bind(httpmux.PathPrefix("/audio/sinks").Subrouter())
 	metaapi.NewHTTPUsermanagement(db).Bind(metamux.PathPrefix("/u12t").Subrouter())
-	metaapi.NewHTTPDaemons(db).Bind(metamux.PathPrefix("/d").Subrouter())
+	metaapi.NewHTTPDaemons(db, metaapi.HTTPDaemonsOptionMDNSDiscovery(t.MDNSDiscovery)).Bind(metamux.PathPrefix("/d").Subrouter())
 	metaapi.NewHTTPAuthz(db).Bind(metamux.PathPrefix("/authz").Subrouter())
 
 	diagmux := httpmux.PathPrefix("/diagnostics").Subrouter()
@@ -486,7 +487,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		return nil
 	})
 
-	if t.AutoMDNS {
+	if t.MDNSAdvertise {
 		if err := MulticastService(gctx.Context, httpbind); err != nil {
 			return errorsx.Wrap(err, "unable to setup multicast service")
 		}
