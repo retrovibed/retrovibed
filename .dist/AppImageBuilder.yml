@@ -69,8 +69,15 @@ AppDir:
     mkdir -p "${APPDIR}/runtime/compat/lib" "${APPDIR}/runtime/compat/lib64"
     linker_src="$(find "${APPDIR}/runtime/compat/usr" -name 'ld-linux-*.so.*' 2>/dev/null | head -n1)"
     linker="$(basename "$linker_src")"
-    ln -sf "$linker_src" "${APPDIR}/runtime/compat/lib64/${linker}"
-    ln -sf "$linker_src" "${APPDIR}/runtime/compat/lib/${linker}"
+    # must stay a relative symlink: $linker_src is an absolute build-time path under
+    # $APPDIR, which won't exist once the AppImage is mounted/extracted elsewhere at
+    # runtime -- only the AppDir's internal structure is preserved, so the target has
+    # to be expressed relative to where the symlink itself lives.
+    ln -sf "$(realpath --relative-to="${APPDIR}/runtime/compat/lib64" "$linker_src")" "${APPDIR}/runtime/compat/lib64/${linker}"
+    ln -sf "$(realpath --relative-to="${APPDIR}/runtime/compat/lib" "$linker_src")" "${APPDIR}/runtime/compat/lib/${linker}"
+
+    echo "---- runtime tree after linker symlink fixup ----"
+    tree -L 4 "${APPDIR}/runtime"
 
   apt:
     arch: !ENV "${APT_ARCH}"
