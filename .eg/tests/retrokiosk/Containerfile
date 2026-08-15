@@ -1,0 +1,11 @@
+FROM ubuntu:resolute
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update
+RUN apt-get install -y software-properties-common build-essential ca-certificates curl sudo rsync tree dh-make debhelper devscripts dpkg-dev git
+RUN add-apt-repository -n ppa:egdaemon/eg
+RUN add-apt-repository -n ppa:egdaemon/duckdb
+RUN apt-get update
+RUN apt-get install -y --no-install-recommends egworkload
+
+RUN systemd-tmpfiles --create

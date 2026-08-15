@@ -1,0 +1,21 @@
+#!/usr/bin/make -f
+# See debhelper(7) (uncomment to enable)
+# output every command that modifies files on the build system.
+DH_VERBOSE=1
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	echo "DH AUTO BUILD OVERRIDE"
+	echo "$(CURDIR)"
+
+	rsync --recursive --progress src/ linux
+
+	mkdir -p $(CURDIR)/linux/usr/lib/retrokiosk
+	curl -fL -o $(CURDIR)/linux/usr/lib/retrokiosk/retrovibed.AppImage \
+		https://github.com/retrovibed/retrovibed/releases/latest/download/retrovibed.linux.$$(dpkg-architecture -qDEB_HOST_ARCH).AppImage
+	chmod +x $(CURDIR)/linux/usr/lib/retrokiosk/retrovibed.AppImage
+
+override_dh_usrlocal:
+	echo "DH usrlocal override due to over restrict rules"

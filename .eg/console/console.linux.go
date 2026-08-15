@@ -90,7 +90,7 @@ func flatpak(final egflatpak.Module) *egflatpak.Builder {
 			"--filesystem=xdg-run/gvfsd",                    // enable standard desktop functionality. (probably unnnecessary)
 			"--env=LC_NUMERIC=C",                            // for mpv
 			"--env=TMPDIR=/var/tmp/",                        // enaure golang sets its os.TempDir() to a working value.
-			"--env=RETROVIBED_MDNS_DISABLED=true",           // disable MDNS when running in flatpak since it doesn't work.
+			"--env=RETROVIBED_MDNS_ADVERTISE=false",         // disable MDNS advertising when running in flatpak since it doesn't work.
 			"--env=RETROVIBED_AUTO_IDENTIFY_MEDIA=false",    // automatically identify metadata for content. experimental.
 			"--env=RETROVIBED_MEDIA_AUTO_ARCHIVE=true",      // enable content marked for archiving being uploaded into storage.
 			"--env=RETROVIBED_MEDIA_AUTO_RECLAIM=false",     // allow automatically reclaiming disk space by removing archived data.

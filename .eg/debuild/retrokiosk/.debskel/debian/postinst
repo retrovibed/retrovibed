@@ -1,0 +1,20 @@
+#!/bin/sh
+
+set -e
+
+systemd-sysusers
+systemd-tmpfiles --create
+
+# see: usr/lib/systemd/system-preset/51.retrokiosk.preset
+# greetd.service belongs to the greetd package and retrokiosk-greetd.service
+# to this one, so we use systemctl preset (which reads both units' presets)
+# rather than deb-systemd-helper, which only knows how to enable units the
+# package itself ships.
+systemctl preset greetd.service retrokiosk-greetd.service
+
+# see: usr/lib/systemd/user-preset/51.retrokiosk.preset
+# --global enable is the documented way to apply a user-unit preset
+# system-wide (--global preset is not documented as supported).
+systemctl --global enable retrokiosk.service
+
+#DEBHELPER#

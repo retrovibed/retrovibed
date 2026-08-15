@@ -70,7 +70,7 @@ apt-get update && apt-get install retrovibed
 # /etc/retrovibed/config.env has documentation
 # around the available settings.
 cat | tee -a /etc/retrovibed/config.env << EOF
-RETROVIBED_MDNS_DISABLED=true
+RETROVIBED_MDNS_ADVERTISE=false
 RETROVIBED_TORRENT_AUTO_DISCOVERY=false
 RETROVIBED_TORRENT_AUTO_BOOTSTRAP=true
 RETROVIBED_TORRENT_PORT=10000
@@ -87,6 +87,25 @@ retrovibed identity bootstrap public-key "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB
 retrovibed identity bootstrap authorized-file /root/.ssh/authorized_keys
 
 systemctl enable --now retrovibed.service
+```
+
+#### install kiosk appliance
+
+`retrokiosk` turns a machine (e.g. a Raspberry Pi) into a single-purpose appliance that boots straight into a fullscreen retrovibed Console, no desktop or login required. Like every retrovibed instance it runs its own local daemon, but here it's acting as a display, not a library - pick which library's daemon to browse/play from the Console's daemon dropdown.
+
+```bash
+add-apt-repository ppa:jljatone/retrovibed
+apt-get update && apt-get install retrokiosk
+
+reboot
+```
+
+on first boot, once the Console is on screen, pick the remote daemon to connect to from its daemon dropdown - that choice persists across reboots.
+
+to remove the kiosk and get a normal login back:
+
+```bash
+apt-get remove retrokiosk
 ```
 
 ### determine ssh public key for client side
