@@ -5,7 +5,6 @@ import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/retrovibed.dart' as retro;
 import './api.dart' as api;
-import './daemon.mdns.dart' as mdns;
 
 class DaemonHttpOverrides extends HttpOverrides {
   DaemonHttpOverrides() {}
@@ -53,9 +52,6 @@ class _EndpointAuto extends State<EndpointAuto> with WidgetsBindingObserver {
   );
   bool _loading = true;
   Widget _cause = ds.Error.zero;
-  api.Daemon? _res;
-  Widget Function(void Function(api.Daemon) connect, {void Function()? retry}) _preamble = (connect, {retry}) =>
-      mdns.NoLocalService(connect: connect, retry: retry);
 
   Future<void> setdaemon(api.Daemon? d) {
     if (d == null) return Future.value(null);
@@ -144,10 +140,20 @@ class _EndpointAuto extends State<EndpointAuto> with WidgetsBindingObserver {
         .then((v) {
           setState(() {
             httpx.set(v.hostname);
-            _res = v;
             changed.value = v;
           });
         });
+  }
+
+  // no daemon could be resolved automatically — default to the local daemon
+  // rather than presenting a discovery/setup flow; the daemon picker lets
+  // the user override this afterwards.
+  void _defaultLocal() {
+    final v = api.Daemon(hostname: httpx.localhost());
+    setState(() {
+      httpx.set(v.hostname);
+      changed.value = v;
+    });
   }
 
   Future<void> refresh(Future<api.Daemon> pending) {
@@ -157,12 +163,7 @@ class _EndpointAuto extends State<EndpointAuto> with WidgetsBindingObserver {
     return refreshNoErrHandling(pending)
         .catchError((e) {
           // no service known
-          setState(() {
-            _preamble = (connect, {retry}) => mdns.InitialSetup(
-              connect: (d) => refresh(Future.value(d)),
-              retry: retry,
-            );
-          });
+          _defaultLocal();
         }, test: httpx.ErrorsTest.err404)
         .catchError((e) {
           setState(() {
@@ -189,15 +190,13 @@ class _EndpointAuto extends State<EndpointAuto> with WidgetsBindingObserver {
           });
         }, test: httpx.ErrorsTest.conflict)
         .catchError((e) {
-          // fallback to manual setup.
+          _defaultLocal();
         }, test: ds.ErrorTests.offline)
         .catchError((e) {
-          // fallback to manual setup.
+          _defaultLocal();
         }, test: ds.ErrorTests.dnsresolution)
         .catchError((e) {
-          setState(() {
-            _cause = ds.Error.unknown(e, onTap: reseterr);
-          });
+          _defaultLocal();
         })
         .whenComplete(() {
           setState(() {
@@ -219,23 +218,8 @@ class _EndpointAuto extends State<EndpointAuto> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    final Widget fallback = _loading
-        ? ds.Empty
-        : mdns.MDNSDiscovery(
-            daemon: (d) {
-              setState(() {
-                _res = d;
-              });
-            },
-            preamble: _preamble,
-          );
-
-    final failed = !(_res == null && _cause == ds.Error.zero);
     return ds.LoadingBoundary(
-      ds.ErrorScreen(
-        cause: failed ? _cause : fallback,
-        widget.child,
-      ),
+      ds.ErrorScreen(cause: _cause, widget.child),
       loading: _loading,
     );
   }

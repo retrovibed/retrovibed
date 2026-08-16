@@ -18,6 +18,11 @@ class SearchDropdown extends StatefulWidget {
   final List<Widget> trailing;
   final TextEditingController? controller;
   final Widget help;
+  // when notified, re-runs onSearch with the current query in place — but
+  // only while the field is focused/open. Lets an external event (e.g. a
+  // background discovery result) refresh an already-open result list
+  // without discarding it.
+  final Listenable? refresh;
 
   const SearchDropdown({
     super.key,
@@ -29,6 +34,7 @@ class SearchDropdown extends StatefulWidget {
     this.trailing = const [],
     this.controller,
     this.help = HelpScope.None,
+    this.refresh,
   });
 
   factory SearchDropdown.text(
@@ -41,6 +47,7 @@ class SearchDropdown extends StatefulWidget {
     List<Widget> trailing = const [],
     TextEditingController? controller,
     Widget help = HelpScope.None,
+    Listenable? refresh,
   }) {
     return SearchDropdown(
       key: key,
@@ -52,6 +59,7 @@ class SearchDropdown extends StatefulWidget {
       leading: leading,
       trailing: trailing,
       help: help,
+      refresh: refresh,
     );
   }
 
@@ -86,16 +94,23 @@ class _SearchDropdownState extends State<SearchDropdown> {
     });
   }
 
+  void _externalRefresh() {
+    if (!_focus.hasFocus) return;
+    _query(controller.text);
+  }
+
   @override
   void initState() {
     super.initState();
     _focus.addListener(_focused);
+    widget.refresh?.addListener(_externalRefresh);
   }
 
   @override
   void dispose() {
     _focus.removeListener(_focused);
     _focus.dispose();
+    widget.refresh?.removeListener(_externalRefresh);
     super.dispose();
   }
 

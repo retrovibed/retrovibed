@@ -5,7 +5,6 @@ import 'package:http/http.dart' as http;
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/meta/api.dart' as api;
 import 'package:retrovibed/meta/daemon.auto.dart';
-import 'package:retrovibed/meta/daemon.mdns.dart';
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
 
@@ -40,7 +39,7 @@ void main() {
       expect(latestCalled, true);
     });
 
-    testWidgets('shows unknown error on non-retryable exception', (
+    testWidgets('defaults to the local daemon on non-retryable exception', (
       WidgetTester tester,
     ) async {
       Future<api.DaemonLookupResponse> mockLatest() async {
@@ -52,14 +51,14 @@ void main() {
           home: EndpointAuto(
             latest: mockLatest,
             backoff: httpx.Backoff.constant(Duration.zero),
-            const SizedBox(),
+            const Placeholder(),
           ),
         ),
       );
 
       await tester.pumpAndSettle();
 
-      expect(find.text('an unexpected problem has occurred'), findsOneWidget);
+      expect(find.byType(Placeholder), findsOneWidget);
     });
 
     testWidgets('shows conflict error on http 409', (
@@ -173,7 +172,7 @@ void main() {
     });
 
     testWidgets(
-      'shows initial setup when no daemon exists (404 on latest and create)',
+      'defaults to the local daemon when no daemon exists (404 on latest and create)',
       (WidgetTester tester) async {
         Future<api.DaemonLookupResponse> mockLatest() async {
           throw http.Response('', 404);
@@ -191,14 +190,14 @@ void main() {
               latest: mockLatest,
               create: mockCreate,
               backoff: httpx.Backoff.constant(Duration.zero),
-              const SizedBox(),
+              const Placeholder(),
             ),
           ),
         );
 
         await tester.pumpAndSettle();
 
-        expect(find.byType(InitialSetup), findsOneWidget);
+        expect(find.byType(Placeholder), findsOneWidget);
       },
     );
 
@@ -265,7 +264,7 @@ void main() {
       expect(find.byType(Placeholder), findsOneWidget);
     });
 
-    testWidgets('shows unknown error when connectable throws MissingTokenError', (
+    testWidgets('defaults to the local daemon when connectable throws MissingTokenError', (
       WidgetTester tester,
     ) async {
       final daemon = api.Daemon(hostname: 'localhost:9998');
@@ -280,7 +279,7 @@ void main() {
             latest: mockLatest,
             connectable: mockConnectable,
             backoff: httpx.Backoff.constant(Duration.zero),
-            const SizedBox(),
+            const Placeholder(),
           ),
         ),
       );
@@ -288,7 +287,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(tester.takeException(), isNull);
-      expect(find.text('an unexpected problem has occurred'), findsOneWidget);
+      expect(find.byType(Placeholder), findsOneWidget);
     });
 
     testWidgets(
@@ -407,7 +406,7 @@ void main() {
       },
     );
 
-    testWidgets('shows NoLocalService on ENOROUTE socket error', (
+    testWidgets('defaults to the local daemon on ENOROUTE socket error', (
       WidgetTester tester,
     ) async {
       Future<api.DaemonLookupResponse> mockLatest() async {
@@ -419,7 +418,7 @@ void main() {
           EndpointAuto(
             latest: mockLatest,
             backoff: httpx.Backoff.constant(Duration.zero),
-            const SizedBox(),
+            const Placeholder(),
           ),
         ),
       );
@@ -427,7 +426,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(tester.takeException(), isNull);
-      expect(find.byType(NoLocalService), findsOneWidget);
+      expect(find.byType(Placeholder), findsOneWidget);
     });
 
     testWidgets('creates daemon when latest returns 404 and connects', (
@@ -467,7 +466,7 @@ void main() {
 
     for (final entry in Resolutions.all.entries) {
       testWidgets(
-        'shows NoLocalService on offline socket error (loose) at ${entry.key}',
+        'defaults to the local daemon on offline socket error (loose) at ${entry.key}',
         (WidgetTester tester) async {
           Future<api.DaemonLookupResponse> mockLatest() async {
             throw SocketException('', osError: OSError('', 111));
@@ -479,18 +478,18 @@ void main() {
               EndpointAuto(
                 latest: mockLatest,
                 backoff: httpx.Backoff.constant(Duration.zero),
-                const SizedBox(),
+                const Placeholder(),
               ),
             ),
             fit: FlexFit.loose,
           );
           await tester.pumpAndSettle();
-          expect(find.byType(NoLocalService), findsOneWidget);
+          expect(find.byType(Placeholder), findsOneWidget);
         },
       );
 
       testWidgets(
-        'shows NoLocalService on offline socket error (tight) at ${entry.key}',
+        'defaults to the local daemon on offline socket error (tight) at ${entry.key}',
         (WidgetTester tester) async {
           Future<api.DaemonLookupResponse> mockLatest() async {
             throw SocketException('', osError: OSError('', 111));
@@ -502,20 +501,20 @@ void main() {
               EndpointAuto(
                 latest: mockLatest,
                 backoff: httpx.Backoff.constant(Duration.zero),
-                const SizedBox(),
+                const Placeholder(),
               ),
             ),
             fit: FlexFit.tight,
           );
           await tester.pumpAndSettle();
-          expect(find.byType(NoLocalService), findsOneWidget);
+          expect(find.byType(Placeholder), findsOneWidget);
         },
       );
     }
 
     for (final entry in Resolutions.all.entries) {
       testWidgets(
-        'shows NoLocalService on dns resolution failure (loose) at ${entry.key}',
+        'defaults to the local daemon on dns resolution failure (loose) at ${entry.key}',
         (WidgetTester tester) async {
           Future<api.DaemonLookupResponse> mockLatest() async {
             throw SocketException('', osError: OSError('', -2));
@@ -527,18 +526,18 @@ void main() {
               EndpointAuto(
                 latest: mockLatest,
                 backoff: httpx.Backoff.constant(Duration.zero),
-                const SizedBox(),
+                const Placeholder(),
               ),
             ),
             fit: FlexFit.loose,
           );
           await tester.pumpAndSettle();
-          expect(find.byType(NoLocalService), findsOneWidget);
+          expect(find.byType(Placeholder), findsOneWidget);
         },
       );
 
       testWidgets(
-        'shows NoLocalService on dns resolution failure (tight) at ${entry.key}',
+        'defaults to the local daemon on dns resolution failure (tight) at ${entry.key}',
         (WidgetTester tester) async {
           Future<api.DaemonLookupResponse> mockLatest() async {
             throw SocketException('', osError: OSError('', -2));
@@ -550,18 +549,18 @@ void main() {
               EndpointAuto(
                 latest: mockLatest,
                 backoff: httpx.Backoff.constant(Duration.zero),
-                const SizedBox(),
+                const Placeholder(),
               ),
             ),
             fit: FlexFit.tight,
           );
           await tester.pumpAndSettle();
-          expect(find.byType(NoLocalService), findsOneWidget);
+          expect(find.byType(Placeholder), findsOneWidget);
         },
       );
 
       testWidgets(
-        'shows NoLocalService on dns resolution failure (MaterialApp) at ${entry.key}',
+        'defaults to the local daemon on dns resolution failure (MaterialApp) at ${entry.key}',
         (WidgetTester tester) async {
           Future<api.DaemonLookupResponse> mockLatest() async {
             throw SocketException('', osError: OSError('', -2));
@@ -574,47 +573,16 @@ void main() {
                 EndpointAuto(
                   latest: mockLatest,
                   backoff: httpx.Backoff.constant(Duration.zero),
-                  const SizedBox(),
+                  const Placeholder(),
                 ),
               ),
             ),
           );
           await tester.pumpAndSettle();
-          expect(find.byType(NoLocalService), findsOneWidget);
+          expect(find.byType(Placeholder), findsOneWidget);
         },
       );
     }
-
-    testWidgets('does not show MDNSDiscovery while loading', (
-      WidgetTester tester,
-    ) async {
-      Future<api.DaemonLookupResponse> mockLatest() async {
-        await Future.delayed(const Duration(seconds: 1));
-        return api.DaemonLookupResponse(
-          daemon: api.Daemon(hostname: 'localhost:9998'),
-        );
-      }
-
-      Future<api.Daemon> mockConnectable(api.Daemon d) async => d;
-
-      await tester.pumpApp(
-        MaterialApp(
-          home: ds.LoadingGuard(
-            EndpointAuto(
-              latest: mockLatest,
-              connectable: mockConnectable,
-              backoff: httpx.Backoff.constant(Duration.zero),
-              const SizedBox(),
-            ),
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      // still loading — MDNSDiscovery must not appear until loading completes
-      expect(find.byType(MDNSDiscovery), findsNothing);
-      await tester.pumpAndSettle();
-    });
 
     testWidgets('shows loading indicator during daemon lookup', (
       WidgetTester tester,

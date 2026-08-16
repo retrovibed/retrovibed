@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
+import 'package:retrovibed/httpx.dart' as httpx;
 import 'api.dart' as api;
 import 'daemon.auto.dart';
 import 'daemon.item.dart';
@@ -14,6 +15,7 @@ class DaemonDropdown extends StatefulWidget {
   final bool readonly;
   final bool remoteonly;
   final Future<api.DaemonSearchResponse> Function(api.DaemonSearchRequest) search;
+  final Future<Stream<api.Daemon>> Function({List<httpx.Option> options}) discover;
   final DaemonOnSelect onSelect;
   const DaemonDropdown({
     super.key,
@@ -24,6 +26,7 @@ class DaemonDropdown extends StatefulWidget {
     this.remoteonly = false,
     this.readonly = false,
     this.search = api.daemons.search,
+    this.discover = api.daemons.discover,
     this.onSelect = global,
   });
 
@@ -47,6 +50,8 @@ class _DaemonDropdownState extends State<DaemonDropdown> {
   // a focused descendant, which would otherwise block ManualConfiguration's
   // autofocus when it opens.
   final FocusNode _addFocus = FocusNode(canRequestFocus: false, skipTraversal: true);
+  final ValueNotifier<int> _discovered = ValueNotifier<int>(0);
+  bool _scanning = false;
   Widget? _optional;
 
   void setState(VoidCallback fn) {
@@ -63,11 +68,28 @@ class _DaemonDropdownState extends State<DaemonDropdown> {
   void initState() {
     super.initState();
     widget.library.addListener(_refresh);
+    ds.postframe(_scanForPeers);
+  }
+
+  Future<void> _scanForPeers() async {
+    setState(() => _scanning = true);
+    widget
+        .discover()
+        .then((s) {
+          return s.forEach((d) {
+            _discovered.value++;
+          });
+        })
+        .whenComplete(() => setState(() => _scanning = false))
+        .catchError((cause) {
+          debugPrint(cause);
+        });
   }
 
   @override
   void dispose() {
     _addFocus.dispose();
+    _discovered.dispose();
     super.dispose();
     widget.library.removeListener(_refresh);
   }
@@ -89,6 +111,7 @@ class _DaemonDropdownState extends State<DaemonDropdown> {
           controller: _search,
           textAlign: TextAlign.center,
           help: widget.help,
+          refresh: _discovered,
           leading: [
             ...widget.leading,
             if (!widget.readonly)
@@ -117,7 +140,18 @@ class _DaemonDropdownState extends State<DaemonDropdown> {
                 icon: Icon(_optional == null ? Icons.add : Icons.remove),
               ),
           ],
-          trailing: widget.trailing,
+          trailing: [
+            if (_scanning)
+              Padding(
+                padding: const EdgeInsets.all(4),
+                child: SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2.0),
+                ),
+              ),
+            ...widget.trailing,
+          ],
           onSearch: (query, onClick) {
             return widget.search(api.DaemonSearchRequest()..query = query).then((response) {
               if (response.items.length <= 1) return ds.Empty;

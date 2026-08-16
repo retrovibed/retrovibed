@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:retrovibed/designkit.dart' as ds;
@@ -156,6 +157,31 @@ abstract class daemons {
         .then((v) {
           return Future.value(
             DaemonDisableResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+          );
+        });
+  }
+
+  // discover triggers a LAN mDNS scan on the connected daemon and streams
+  // each discovered peer as it's found and persisted server-side.
+  static Future<Stream<Daemon>> discover({
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx
+        .websocket(
+          Uri.https(httpx.localhost(), "/meta/d/discover"),
+          options: [httpx.Request.authorization(httpx.auto_bearer()), ...options],
+        )
+        .then((socket) {
+          return socket.transform(
+            StreamTransformer.fromHandlers(
+              handleData: (data, sink) {
+                if (data is List<int>) {
+                  sink.add(Daemon.create()..mergeFromProto3Json(jsonDecode(utf8.decode(data))));
+                } else {
+                  sink.addError('deserialization failed data: $data');
+                }
+              },
+            ),
           );
         });
   }
