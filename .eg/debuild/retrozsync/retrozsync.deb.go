@@ -1,8 +1,8 @@
 // Package retrozsync builds a debian package for github.com/cph6/zsync, a Go
 // rewrite of zsync that uses net/http and so supports HTTPS out of the box
 // (the classic C zsync package in Ubuntu/Debian has no TLS support at all).
-// installs to /usr/local/bin since it isn't the distro's zsync package and
-// doesn't replace/conflict with it.
+// installs to /usr/bin as retrozsync/retrozsyncmake — distinct filenames from
+// the distro's zsync package, so it coexists without conflict.
 package retrozsync
 
 import (
@@ -43,7 +43,7 @@ func init() {
 		egdebuild.Option.SigningKeyID(maintainer.GPGFingerprint),
 		egdebuild.Option.ChangeLogDate(c.Committer.When),
 		egdebuild.Option.Version(fmt.Sprintf("%s.:autopatch:", version)),
-		egdebuild.Option.Description("Go rewrite of zsync with HTTPS support", "installs zsync and zsyncmake built from github.com/cph6/zsync to /usr/local/bin"),
+		egdebuild.Option.Description("Go rewrite of zsync with HTTPS support", "installs retrozsync and retrozsyncmake built from github.com/cph6/zsync to /usr/bin"),
 		egdebuild.Option.Debian(errorsx.Must(fs.Sub(debskel, ".debskel"))),
 		egdebuild.Option.DependsBuild("golang-1.26", "tree"),
 	)

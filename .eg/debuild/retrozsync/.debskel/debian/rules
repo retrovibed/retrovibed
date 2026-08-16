@@ -9,17 +9,21 @@ DH_VERBOSE=1
 override_dh_auto_build:
 	echo "DH AUTO BUILD OVERRIDE"
 	echo "$(CURDIR)"
-	mkdir -p $(CURDIR)/linux/usr/local/bin
+	mkdir -p $(CURDIR)/linux/usr/bin
 	cp $(CURDIR)/src/LICENSE $(CURDIR)/debian/copyright
 
 	# github.com/cph6/zsync is a Go rewrite of zsync using net/http, giving it
 	# HTTPS support for free (the classic C zsync package has none). its module
 	# dependencies are vendored (see src/vendor, generated via `go mod vendor`)
-	# since launchpad builders have no network access.
+	# since launchpad builders have no network access. binaries are named
+	# retrozsync/retrozsyncmake (not zsync/zsyncmake) so they coexist in
+	# /usr/bin alongside the stock zsync package without conflict — launchpad's
+	# builder rejects packages shipping files under /usr/local entirely, so
+	# that's not an option here.
 	GOFLAGS="-mod=vendor" GOCACHE="$(CURDIR)/.gocache" CGO_ENABLED=0 \
-		/usr/lib/go-1.26/bin/go build -C src -buildvcs=false -o "$(CURDIR)/linux/usr/local/bin/retrozsync" ./cmd/zsync
+		/usr/lib/go-1.26/bin/go build -C src -buildvcs=false -o "$(CURDIR)/linux/usr/bin/retrozsync" ./cmd/zsync
 	GOFLAGS="-mod=vendor" GOCACHE="$(CURDIR)/.gocache" CGO_ENABLED=0 \
-		/usr/lib/go-1.26/bin/go build -C src -buildvcs=false -o "$(CURDIR)/linux/usr/local/bin/retrozsyncmake" ./cmd/zsyncmake
+		/usr/lib/go-1.26/bin/go build -C src -buildvcs=false -o "$(CURDIR)/linux/usr/bin/retrozsyncmake" ./cmd/zsyncmake
 	tree $(CURDIR)/linux
 
 override_dh_auto_test:
@@ -27,6 +31,3 @@ override_dh_auto_test:
 
 override_dh_dwz:
 	# Do nothing - this effectively disables dwz. golang does its own thing.
-
-override_dh_usrlocal:
-	echo "DH usrlocal override due to over restrict rules"
