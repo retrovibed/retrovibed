@@ -3,6 +3,8 @@
 # output every command that modifies files on the build system.
 DH_VERBOSE=1
 
+ARCH := $(shell dpkg-architecture -qDEB_HOST_ARCH)
+
 %:
 	dh $@
 
@@ -12,10 +14,7 @@ override_dh_auto_build:
 
 	rsync --recursive --progress src/ linux
 
-	RETROKIOSK_ARCH=$$(dpkg-architecture -qDEB_HOST_ARCH) envsubst '$$RETROKIOSK_ARCH' \
-		< linux/usr/lib/systemd/user/retrokiosk.service \
-		> linux/usr/lib/systemd/user/retrokiosk.service.tmp
-	mv linux/usr/lib/systemd/user/retrokiosk.service.tmp linux/usr/lib/systemd/user/retrokiosk.service
+	sed -i "s/@RETROKIOSK_ARCH@/$(ARCH)/" linux/usr/lib/systemd/user/retrokiosk.service
 
 override_dh_usrlocal:
 	echo "DH usrlocal override due to over restrict rules"

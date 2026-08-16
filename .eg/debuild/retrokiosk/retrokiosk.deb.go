@@ -38,7 +38,7 @@ func init() {
 		egdebuild.Option.Version("0.0.:autopatch:"),
 		egdebuild.Option.Description("retrovibed console kiosk appliance", "boots a machine directly into a fullscreen retrovibed Console session, no desktop or login required"),
 		egdebuild.Option.Debian(errorsx.Must(fs.Sub(debskel, ".debskel"))),
-		egdebuild.Option.DependsBuild("rsync", "tree", "dpkg-dev", "gettext-base"),
+		egdebuild.Option.DependsBuild("rsync", "tree"),
 		egdebuild.Option.Depends("labwc", "greetd", "seatd", "libfuse2", "zsync"),
 	)
 }
