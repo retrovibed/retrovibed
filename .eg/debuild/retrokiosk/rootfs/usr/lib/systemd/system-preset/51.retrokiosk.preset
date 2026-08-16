@@ -1,4 +1,2 @@
-# boot straight into the kiosk session via our own unit, not the greetd
-# package's default one (which we leave untouched).
-disable greetd.service
-enable retrokiosk-greetd.service
+# see: usr/lib/systemd/system/retrokiosk@.service
+enable retrokiosk@3.service

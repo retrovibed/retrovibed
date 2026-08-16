@@ -14,7 +14,7 @@ override_dh_auto_build:
 
 	rsync --recursive --progress src/ linux
 
-	sed -i "s/@RETROKIOSK_ARCH@/$(ARCH)/" linux/usr/lib/systemd/user/retrokiosk.service
+	sed -i "s/@RETROKIOSK_ARCH@/$(ARCH)/" linux/usr/lib/systemd/system/retrokiosk@.service
 
 override_dh_usrlocal:
 	echo "DH usrlocal override due to over restrict rules"

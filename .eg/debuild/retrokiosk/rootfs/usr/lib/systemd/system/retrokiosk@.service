@@ -1,0 +1,21 @@
+[Unit]
+Description=retrovibed Console kiosk session on tty%I
+After=systemd-user-sessions.service getty@tty%i.service network-online.target
+Wants=network-online.target
+Conflicts=getty@tty%i.service
+
+[Service]
+User=retrokiosk
+Group=retrokiosk
+PAMName=login
+TTYPath=/dev/tty%I
+TTYReset=yes
+TTYVTDisallocate=yes
+ExecStartPre=+/usr/bin/chvt %I
+ExecStartPre=/usr/bin/zsync -o /usr/lib/retrokiosk/retrovibed.AppImage https://github.com/retrovibed/retrovibed/releases/latest/download/retrovibed.linux.@RETROKIOSK_ARCH@.AppImage.zsync
+ExecStart=/usr/bin/cage -- /usr/lib/retrokiosk/retrovibed.AppImage --appimage-extract-and-run --fullscreen
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=graphical.target

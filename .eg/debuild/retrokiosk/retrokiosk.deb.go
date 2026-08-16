@@ -15,7 +15,6 @@ import (
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
 	"github.com/egdaemon/eg/runtime/wasi/eggit"
 	"github.com/egdaemon/eg/runtime/wasi/shell"
-	"github.com/egdaemon/eg/runtime/x/wasi/egbug"
 	"github.com/egdaemon/eg/runtime/x/wasi/egdebuild"
 )
 
@@ -39,7 +38,7 @@ func init() {
 		egdebuild.Option.Description("retrovibed console kiosk appliance", "boots a machine directly into a fullscreen retrovibed Console session, no desktop or login required"),
 		egdebuild.Option.Debian(errorsx.Must(fs.Sub(debskel, ".debskel"))),
 		egdebuild.Option.DependsBuild("rsync", "tree"),
-		egdebuild.Option.Depends("labwc", "greetd", "seatd", "libfuse2", "zsync"),
+		egdebuild.Option.Depends("cage", "kbd", "libfuse2", "zsync"),
 	)
 }
 
@@ -54,13 +53,23 @@ func Runner() eg.ContainerRunner {
 }
 
 func Build(ctx context.Context, o eg.Op) error {
-	return eg.Parallel(
-		egdebuild.Build(gcfg, egdebuild.Option.Distro(egdebuild.UbuntuLatestCodename)),
-		egdebuild.Build(
-			gcfg,
-			egdebuild.Option.Distro(egdebuild.UbuntuLatestCodename),
-			egdebuild.Option.BuildBinary(20*time.Minute),
-			egdebuild.Option.NoLint(),
+	debroot := egenv.EphemeralDirectory("deb.retrokiosk")
+	cachedir := egenv.CacheDirectory(".dist")
+	runtime := shell.Runtime().Timeout(egenv.TTL())
+
+	return eg.Sequential(
+		eg.Parallel(
+			egdebuild.Build(gcfg, egdebuild.Option.Distro(egdebuild.UbuntuLatestCodename)),
+			egdebuild.Build(
+				gcfg,
+				egdebuild.Option.Distro(egdebuild.UbuntuLatestCodename),
+				egdebuild.Option.BuildBinary(20*time.Minute),
+				egdebuild.Option.NoLint(),
+			),
+		),
+		shell.Op(
+			runtime.Newf("mkdir -p %s", cachedir),
+			runtime.Newf(`find %s -maxdepth 2 -name 'retrokiosk_*.deb' -exec cp -v {} %s \;`, debroot, cachedir),
 		),
 	)(ctx, o)
 }
@@ -71,11 +80,9 @@ func Upload(ctx context.Context, o eg.Op) error {
 
 // Verify installs the .deb produced by Build (staged by egdebuild under
 // EphemeralDirectory("deb.retrokiosk"), matching the root egdebuild.Build
-// computes internally) and checks the services it enables come up. There's
-// no real display/seat backend in a container, so this only proves service
-// startup, not that pixels reach a screen. It checks enablement of the user
-// unit rather than starting it live: that needs a working systemd-logind
-// user session, which a plain container doesn't have.
+// computes internally) and checks the package sets up cleanly: unit installed
+// and preset-enabled, unit file well-formed. It does not start the service —
+// that requires a real VT/DRM, which test containers don't have.
 func Verify(ctx context.Context, op eg.Op) error {
 	debroot := egenv.EphemeralDirectory("deb.retrokiosk")
 	runtime := shell.Runtime().Timeout(egenv.TTL())
@@ -85,20 +92,10 @@ func Verify(ctx context.Context, op eg.Op) error {
 			runtime.Newf("apt-get install -y $(find %s -maxdepth 2 -name 'retrokiosk_*.deb' | head -n1)", debroot).Privileged(),
 		),
 		shell.Op(
-			runtime.New("test -L /etc/systemd/system/display-manager.service"),
-			runtime.New("test -L /etc/systemd/user/graphical-session.target.wants/retrokiosk.service"),
-		),
-		egbug.DebugFailure(
-			shell.Op(
-				runtime.New("systemctl start retrokiosk-greetd.service").Privileged(),
-				runtime.New("systemctl is-active retrokiosk-greetd.service").Privileged(),
-			),
-			shell.Op(
-				runtime.New("journalctl --since -2m -u retrokiosk-greetd.service").Privileged(),
-			),
+			runtime.New("test -L /etc/systemd/system/graphical.target.wants/retrokiosk@3.service"),
 		),
 		shell.Op(
-			runtime.New("systemctl status").Privileged(),
+			runtime.New("systemd-analyze verify /usr/lib/systemd/system/retrokiosk@.service").Privileged(),
 		),
 	)(ctx, op)
 }

@@ -1,2 +1,0 @@
-# see: usr/lib/systemd/user/retrokiosk.service
-enable retrokiosk.service
