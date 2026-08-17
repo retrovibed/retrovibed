@@ -1,4 +1,4 @@
-qq### Notice
+### Notice
 
 this is public alpha software. its under active development and testing. expect issues.
 

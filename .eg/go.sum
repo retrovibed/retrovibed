@@ -51,6 +51,10 @@ github.com/egdaemon/eg v0.0.0-20260702021939-f38e30808bf3 h1:Dbgd9RCE0KK3Kmx3unx
 github.com/egdaemon/eg v0.0.0-20260702021939-f38e30808bf3/go.mod h1:JpL5fcSlwOXHGVIYBYeXqoU1WyT0H8DJxR+B4fmDyys=
 github.com/egdaemon/eg v0.0.0-20260811000109-2881fbdb470e h1:tpcPuXnEM5GV/xg9BhPu1J7L3S3Qq99E0PXUW5LtIfw=
 github.com/egdaemon/eg v0.0.0-20260811000109-2881fbdb470e/go.mod h1:JpL5fcSlwOXHGVIYBYeXqoU1WyT0H8DJxR+B4fmDyys=
+github.com/egdaemon/eg v0.0.0-20260817140706-c6c42141aa06 h1:fSKyov2Qf4ixr0Hy+Cmn+zBChfkBDrAZc8LdFb6DNiE=
+github.com/egdaemon/eg v0.0.0-20260817140706-c6c42141aa06/go.mod h1:79qqNDYRwMxbdVd2Yf8+oih5HIiF5+IV4TJyqWDhc2Y=
+github.com/egdaemon/eg v0.0.0-20260817144319-8626ff7b355c h1:/pATDRTg3EFAnRzM8oYVnhIy5pZQ7KVYUpXoh4iHGxQ=
+github.com/egdaemon/eg v0.0.0-20260817144319-8626ff7b355c/go.mod h1:79qqNDYRwMxbdVd2Yf8+oih5HIiF5+IV4TJyqWDhc2Y=
 github.com/egdaemon/wasinet/wasinet v0.0.0-20260714114633-11ce19bcbeeb h1:ImKjoO3D0C7bEY+iopzwK16Be+2TF8O85XpdeKEpS94=
 github.com/egdaemon/wasinet/wasinet v0.0.0-20260714114633-11ce19bcbeeb/go.mod h1:cjnQxCq4L+ZxasldxabXzQojFttfeniF1CNx95Qu/3c=
 github.com/envoyproxy/go-control-plane v0.14.0 h1:hbG2kr4RuFj222B6+7T83thSPqLjwBIfQawTkC++2HA=
@@ -91,6 +95,8 @@ github.com/rogpeppe/go-internal v1.14.1 h1:UQB4HGPB6osV0SQTLymcB4TgvyWu6ZyliaW0t
 github.com/rogpeppe/go-internal v1.14.1/go.mod h1:MaRKkUm5W0goXpeCfT7UZI6fk/L7L7so1lCWt35ZSgc=
 github.com/stretchr/testify v1.11.1 h1:7s2iGBzp5EwR7/aIZr8ao5+dra3wiQyKjjFuvgVKu7U=
 github.com/stretchr/testify v1.11.1/go.mod h1:wZwfW3scLgRK+23gO65QZefKpKQRnfz6sD981Nm4B6U=
+github.com/stretchr/testify v1.12.0 h1:K6Mr6jO9JICuend/5xzTM03ydSV3vdNRYAdPSukj8uI=
+github.com/stretchr/testify v1.12.0/go.mod h1:bOYBZb5qJ00vPzWfIqBUZPaxK8jWiXc6d3ErP4Ca9Gw=
 go.opentelemetry.io/auto/sdk v1.2.1 h1:jXsnJ4Lmnqd11kwkBV2LgLoFMZKizbCi5fNZ/ipaZ64=
 go.opentelemetry.io/auto/sdk v1.2.1/go.mod h1:KRTj+aOaElaLi+wW1kO/DZRXwkF4C5xPbEe3ZiIhN7Y=
 go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.67.0 h1:yI1/OhfEPy7J9eoa6Sj051C7n5dvpj0QX8g4sRchg04=

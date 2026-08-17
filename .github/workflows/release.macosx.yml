@@ -31,7 +31,7 @@ jobs:
           check-latest: true # Ensures the latest stable version is always used
       - uses: tecolicom/actions-use-homebrew-tools@v1
         with:
-          tools: "duckdb gpgme tree ffmpeg@8"
+          tools: "duckdb gpgme tree ffmpeg"
           verbose: false
       - name: Install Flutter
         uses: subosito/flutter-action@v2

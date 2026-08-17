@@ -81,3 +81,21 @@ func Build(ctx context.Context, o eg.Op) error {
 func Upload(ctx context.Context, o eg.Op) error {
 	return egdebuild.UploadDPut(gcfg, errorsx.Must(fs.Sub(debskel, ".debskel")))(ctx, o)
 }
+
+// Release builds and uploads the debian package.
+func Release(ctx context.Context, o eg.Op) error {
+	deb := eg.Container(maintainer.Container)
+	return eg.Perform(
+		ctx,
+		eg.Parallel(
+			eg.Build(deb.BuildFromFile(".eg/Containerfile")),
+			Prepare,
+		),
+		eg.Module(
+			ctx,
+			deb,
+			Build,
+			Upload,
+		),
+	)
+}

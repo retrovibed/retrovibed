@@ -17,12 +17,14 @@ import (
 )
 
 func Release(b *tarballs.Build) eg.OpFn {
-	return eggithub.Release(
-		egtarball.Archive(tarballs.RetrovibedSource()),
-		egtarball.Archive(tarballs.Retrovibed(b)),
-		egenv.CacheDirectory(tarballs.Flatpak(b)),
-		egenv.WorkspaceDirectory(tarballs.AppImage(b)),
-		egenv.WorkspaceDirectory(tarballs.AppImageZsync(b)),
+	return eg.Sequential(
+		eggithub.Draft(
+			egtarball.Archive(tarballs.RetrovibedSource()),
+			egtarball.Archive(tarballs.Retrovibed(b)),
+			egenv.CacheDirectory(tarballs.Flatpak(b)),
+			egenv.WorkspaceDirectory(tarballs.AppImage(b)),
+			egenv.WorkspaceDirectory(tarballs.AppImageZsync(b)),
+		),
 	)
 }
 
