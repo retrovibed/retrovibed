@@ -1,7 +1,8 @@
 [Unit]
 Description=retrovibed Console kiosk session on tty%I
-After=systemd-user-sessions.service getty@tty%i.service network-online.target
+After=systemd-user-sessions.service getty@tty%i.service network-online.target ssh.service
 Wants=network-online.target
+Requires=ssh.service
 Conflicts=getty@tty%i.service
 
 [Service]

@@ -38,7 +38,7 @@ func init() {
 		egdebuild.Option.Description("retrovibed console kiosk appliance", "boots a machine directly into a fullscreen retrovibed Console session, no desktop or login required"),
 		egdebuild.Option.Debian(errorsx.Must(fs.Sub(debskel, ".debskel"))),
 		egdebuild.Option.DependsBuild("rsync", "tree"),
-		egdebuild.Option.Depends("cage", "kbd", "libfuse2", "retrozsync"),
+		egdebuild.Option.Depends("cage", "kbd", "libfuse2", "retrozsync", "ssh"),
 	)
 }
 
