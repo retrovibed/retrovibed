@@ -4,6 +4,8 @@ After=systemd-user-sessions.service getty@tty%i.service network-online.target ss
 Wants=network-online.target
 Requires=ssh.service
 Conflicts=getty@tty%i.service
+StartLimitIntervalSec=30
+StartLimitBurst=3
 
 [Service]
 User=retrokiosk
