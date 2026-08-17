@@ -273,7 +273,7 @@ github.com/charmbracelet/bubbletea
 # github.com/charmbracelet/colorprofile v0.3.1
 ## explicit; go 1.23.0
 github.com/charmbracelet/colorprofile
-# github.com/charmbracelet/huh v0.8.0
+# github.com/charmbracelet/huh v1.0.0
 ## explicit; go 1.23.0
 github.com/charmbracelet/huh
 github.com/charmbracelet/huh/internal/accessibility
@@ -295,6 +295,9 @@ github.com/charmbracelet/x/exp/strings
 # github.com/charmbracelet/x/term v0.2.1
 ## explicit; go 1.18
 github.com/charmbracelet/x/term
+# github.com/clipperhouse/uax29/v2 v2.7.0
+## explicit; go 1.18
+github.com/clipperhouse/uax29/v2/graphemes
 # github.com/coder/websocket v1.8.14
 ## explicit; go 1.23
 github.com/coder/websocket
@@ -364,7 +367,7 @@ github.com/ebitengine/purego/internal/xreflect
 # github.com/edsrzf/mmap-go v1.2.0
 ## explicit; go 1.17
 github.com/edsrzf/mmap-go
-# github.com/egdaemon/eg v0.0.0-20260811000109-2881fbdb470e
+# github.com/egdaemon/eg v0.0.0-20260817144319-8626ff7b355c
 ## explicit; go 1.25.7
 github.com/egdaemon/eg
 github.com/egdaemon/eg/backoff
@@ -748,8 +751,8 @@ github.com/mattn/go-isatty
 # github.com/mattn/go-localereader v0.0.1
 ## explicit
 github.com/mattn/go-localereader
-# github.com/mattn/go-runewidth v0.0.16
-## explicit; go 1.9
+# github.com/mattn/go-runewidth v0.0.23
+## explicit; go 1.20
 github.com/mattn/go-runewidth
 # github.com/mdlayher/netlink v1.11.2
 ## explicit; go 1.25.0
@@ -859,10 +862,12 @@ github.com/spf13/cobra
 # github.com/spf13/pflag v1.0.10
 ## explicit; go 1.12
 github.com/spf13/pflag
-# github.com/stretchr/testify v1.11.1
+# github.com/stretchr/testify v1.12.0
 ## explicit; go 1.17
 github.com/stretchr/testify/assert
 github.com/stretchr/testify/assert/yaml
+github.com/stretchr/testify/internal/difflib
+github.com/stretchr/testify/internal/spew
 github.com/stretchr/testify/require
 # github.com/tetratelabs/wazero v1.12.0
 ## explicit; go 1.25.0

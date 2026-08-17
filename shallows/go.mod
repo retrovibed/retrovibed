@@ -10,7 +10,7 @@ require (
 	github.com/anacrolix/missinggo v1.3.0
 	github.com/anacrolix/utp v0.2.0
 	github.com/benbjohnson/immutable v0.4.3
-	github.com/charmbracelet/huh v0.8.0
+	github.com/charmbracelet/huh v1.0.0
 	github.com/coder/websocket v1.8.14
 	github.com/cyruzin/golang-tmdb v1.9.4
 	github.com/dashotv/tvdb v0.5.2
@@ -28,6 +28,7 @@ require (
 	github.com/hashicorp/mdns v1.0.6
 	github.com/james-lawrence/genieql v0.0.0-20260421144153-ebaab114ac1d
 	github.com/james-lawrence/torrent v0.0.0-20260810145001-03f67cc47e59
+	github.com/jfreymuth/pulse v0.1.2
 	github.com/justinas/alice v1.2.0
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/michiwend/gomusicbrainz v0.0.0-20181012083520-6c07e13dd396
@@ -37,7 +38,7 @@ require (
 	github.com/pressly/goose/v3 v3.27.1
 	github.com/retrovibed/retrovibed/retroapi v0.0.0-20260804202116-1a4f850b87e4
 	github.com/shirou/gopsutil/v4 v4.26.5
-	github.com/stretchr/testify v1.11.1
+	github.com/stretchr/testify v1.12.0
 	github.com/things-go/go-socks5 v0.1.1
 	github.com/willabides/kongplete v0.4.0
 	golang.org/x/crypto v0.54.0
@@ -81,6 +82,7 @@ require (
 	github.com/charmbracelet/x/cellbuf v0.0.13 // indirect
 	github.com/charmbracelet/x/exp/strings v0.0.0-20250313150240-c09addb0e197 // indirect
 	github.com/charmbracelet/x/term v0.2.1 // indirect
+	github.com/clipperhouse/uax29/v2 v2.7.0 // indirect
 	github.com/csnewman/flutter-go-bridge v0.2.0 // indirect
 	github.com/djthorpe/go-errors v1.0.3 // indirect
 	github.com/duckdb/duckdb-go-bindings v0.10505.0 // indirect
@@ -120,7 +122,6 @@ require (
 	github.com/jackc/pgtype v1.14.4 // indirect
 	github.com/jackc/pgx/v5 v5.9.2 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
-	github.com/jfreymuth/pulse v0.1.2 // indirect
 	github.com/klauspost/compress v1.18.5 // indirect
 	github.com/klauspost/cpuid/v2 v2.4.0 // indirect
 	github.com/lann/builder v0.0.0-20180802200727-47ae307949d0 // indirect
@@ -129,7 +130,7 @@ require (
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/mattn/go-isatty v0.0.22 // indirect
 	github.com/mattn/go-localereader v0.0.1 // indirect
-	github.com/mattn/go-runewidth v0.0.16 // indirect
+	github.com/mattn/go-runewidth v0.0.23 // indirect
 	github.com/mdlayher/netlink v1.11.2 // indirect
 	github.com/mdlayher/socket v0.6.0 // indirect
 	github.com/mfridman/interpolate v0.0.2 // indirect
@@ -176,7 +177,6 @@ require (
 	github.com/google/pprof v0.0.0-20260402051712-545e8a4df936 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
-	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/posener/complete v1.2.3 // indirect
 	github.com/riywo/loginshell v0.0.0-20200815045211-7d26008be1ab // indirect
 	golang.org/x/net v0.57.0 // indirect

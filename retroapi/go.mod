@@ -18,7 +18,7 @@ require (
 	github.com/mdlayher/netlink v1.11.2
 	github.com/pkg/profile v1.7.0
 	github.com/porfirion/trie v1.0.0
-	github.com/stretchr/testify v1.11.1
+	github.com/stretchr/testify v1.12.0
 	github.com/tetratelabs/wazero v1.12.0
 	golang.org/x/crypto v0.54.0
 	golang.org/x/exp v0.0.0-20260727155853-b88d891fe743
@@ -55,7 +55,6 @@ require (
 	github.com/huandu/xstrings v1.5.0 // indirect
 	github.com/mdlayher/socket v0.6.0 // indirect
 	github.com/mschoch/smat v0.2.0 // indirect
-	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	golang.org/x/sync v0.22.0 // indirect
 	golang.org/x/text v0.40.0
