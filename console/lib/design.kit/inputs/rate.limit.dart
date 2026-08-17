@@ -148,6 +148,7 @@ class _RateLimitState extends State<RateLimit> {
                 ),
               if (widget.presets.isNotEmpty) ...[
                 Container(
+                  key: const ValueKey('presets'),
                   width: double.infinity,
                   decoration: BoxDecoration(
                     border: Border(

@@ -23,24 +23,27 @@ import 'playlist.queue.dart';
 // scoped auth token, independent of the app-root EndpointAuto/AuthzCache.
 class Connect extends StatelessWidget {
   final ValueNotifier<media.MediaSearchState> search;
+  final Future<Stream<meta.Daemon>> Function({List<httpx.Option> options}) daemonDiscover;
 
   const Connect({
     super.key,
     required this.search,
+    this.daemonDiscover = meta.daemons.discover,
   });
 
   @override
   Widget build(BuildContext context) {
     return authn.AuthedEndpoint(
-      _Connect(search: search),
+      _Connect(search: search, daemonDiscover: daemonDiscover),
     );
   }
 }
 
 class _Connect extends StatefulWidget {
   final ValueNotifier<media.MediaSearchState> search;
+  final Future<Stream<meta.Daemon>> Function({List<httpx.Option> options}) daemonDiscover;
 
-  const _Connect({required this.search});
+  const _Connect({required this.search, required this.daemonDiscover});
 
   @override
   State<_Connect> createState() => _State();
@@ -246,6 +249,7 @@ class _State extends State<_Connect> with LoadingState {
         children: [
           meta.DaemonDropdown(
             library: _endpoint,
+            discover: widget.daemonDiscover,
             onSelect: meta.DaemonDropdown.local,
             remoteonly: true,
             readonly: true,

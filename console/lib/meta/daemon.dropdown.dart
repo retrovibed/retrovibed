@@ -82,7 +82,7 @@ class _DaemonDropdownState extends State<DaemonDropdown> {
         })
         .whenComplete(() => setState(() => _scanning = false))
         .catchError((cause) {
-          debugPrint(cause);
+          debugPrint(cause.toString());
         });
   }
 

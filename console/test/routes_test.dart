@@ -1,11 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:media_kit/media_kit.dart';
+import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/media.dart' as media;
+import 'package:retrovibed/meta.dart' as meta;
 import 'package:retrovibed/routes.dart' as routes;
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
 
-Widget _harness() => media.Playlist(const routes.Routes());
+// DaemonDropdown mounts on both the remote and settings tabs and scans for
+// peers via api.daemons.discover/search on initState. Those hit a real
+// socket/HTTP client, which flutter_test's HttpOverrides blocks with its own
+// non-String error object - so every tab-switch test needs a no-op fake here
+// rather than the live network defaults.
+Future<meta.DaemonSearchResponse> _fakeDaemonSearch(meta.DaemonSearchRequest req) {
+  return Future.value(meta.DaemonSearchResponse());
+}
+
+Future<Stream<meta.Daemon>> _noopDaemonDiscover({List<httpx.Option> options = const []}) async {
+  return const Stream<meta.Daemon>.empty();
+}
+
+Widget _harness() => media.Playlist(
+  routes.Routes(daemonSearch: _fakeDaemonSearch, daemonDiscover: _noopDaemonDiscover),
+);
 
 const _movieIndex = 0;
 const _remoteIndex = 1;

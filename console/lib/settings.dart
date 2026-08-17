@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:retrovibed/designkit.dart' as ds;
+import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/meta.dart' as meta;
 import 'package:retrovibed/billing.dart' as billing;
 import 'package:retrovibed/quotas.dart' as quotas;
@@ -34,7 +35,14 @@ class AutoHelp extends StatelessWidget {
 }
 
 class Display extends StatefulWidget {
-  const Display({super.key});
+  final Future<meta.DaemonSearchResponse> Function(meta.DaemonSearchRequest) daemonSearch;
+  final Future<Stream<meta.Daemon>> Function({List<httpx.Option> options}) daemonDiscover;
+
+  const Display({
+    super.key,
+    this.daemonSearch = meta.daemons.search,
+    this.daemonDiscover = meta.daemons.discover,
+  });
 
   @override
   State<Display> createState() => _DisplayState();
@@ -151,6 +159,8 @@ class _DisplayState extends State<Display> {
             children: [
               meta.DaemonDropdown(
                 library: _library,
+                search: widget.daemonSearch,
+                discover: widget.daemonDiscover,
                 trailing: [
                   _overlay == ds.Empty
                       ? ds.Empty

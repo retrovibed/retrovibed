@@ -197,14 +197,14 @@ void main() {
       await tester.pumpAndSettle();
 
       // Initially expanded should be false - presets not visible
-      expect(find.text('presets'), findsNothing);
+      expect(find.byKey(const ValueKey('presets')), findsNothing);
 
       // Tap dropdown to expand
       await tester.tap(find.byType(IconButton));
       await tester.pumpAndSettle();
 
       // Now expanded should be true - presets visible
-      expect(find.text('presets'), findsOneWidget);
+      expect(find.byKey(const ValueKey('presets')), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
@@ -336,7 +336,7 @@ void main() {
       await tester.tap(find.byType(IconButton));
       await tester.pumpAndSettle();
 
-      expect(find.text('presets'), findsNothing);
+      expect(find.byKey(const ValueKey('presets')), findsNothing);
       expect(find.text('sec'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });

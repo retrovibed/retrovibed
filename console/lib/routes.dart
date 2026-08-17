@@ -9,13 +9,22 @@ import 'package:retrovibed/library.dart' as medialib;
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/design.kit/modals.dart' as modals;
 import 'package:retrovibed/community.dart' as community;
+import 'package:retrovibed/httpx.dart' as httpx;
+import 'package:retrovibed/meta.dart' as meta;
 
 /// The app's tab-based navigation: movie/library, remote control, community,
 /// and settings, each behind a [DefaultTabController]-driven [TabBar] and
 /// [TabBarView]. Self-contained so it can be tested without the auth/media
 /// playback/network gates that wrap it in main.dart.
 class Routes extends StatelessWidget {
-  const Routes({super.key});
+  final Future<meta.DaemonSearchResponse> Function(meta.DaemonSearchRequest) daemonSearch;
+  final Future<Stream<meta.Daemon>> Function({List<httpx.Option> options}) daemonDiscover;
+
+  const Routes({
+    super.key,
+    this.daemonSearch = meta.daemons.search,
+    this.daemonDiscover = meta.daemons.discover,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -90,11 +99,15 @@ class Routes extends StatelessWidget {
                 ),
                 modals.Node(
                   media.Playlist.wrap((ctx, s) {
-                    return remote.Connect(search: s.search);
+                    return remote.Connect(search: s.search, daemonDiscover: daemonDiscover);
                   }),
                 ),
                 modals.Node(community.AutoHelp(community.Management())),
-                modals.Node(settings.AutoHelp(const settings.Display())),
+                modals.Node(
+                  settings.AutoHelp(
+                    settings.Display(daemonSearch: daemonSearch, daemonDiscover: daemonDiscover),
+                  ),
+                ),
               ],
             ),
           ),
