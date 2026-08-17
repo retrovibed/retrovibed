@@ -118,8 +118,8 @@ class Retrovibed extends StatelessWidget {
                     authenticated: _startdaemon,
                     meta.EndpointAuto(
                       authn.Authenticated(
-                        authn.DeeppoolAuthzCache(
-                          authn.AuthzCache(
+                        authn.AuthzCache(
+                          authn.DeeppoolAuthzCacheGuard(
                             DeepLink(
                               billing.Registered(
                                 media.Playlist(

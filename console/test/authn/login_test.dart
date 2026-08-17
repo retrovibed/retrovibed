@@ -530,6 +530,75 @@ void main() {
       });
     });
 
+    group('guest interaction', () {
+      testWidgets('shows child after successful guest login', (WidgetTester tester) async {
+        var guestCalled = false;
+
+        await tester.pumpApp(
+          authn.Login(
+            const Text('authenticated content'),
+            publicKey: () => guestCalled ? 'ssh-ed25519 AAAA...' : '',
+            guest: () {
+              guestCalled = true;
+              return true;
+            },
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('authenticated content'), findsNothing);
+
+        await tester.tap(find.byTooltip('continue as guest'));
+        await tester.pumpAndSettle();
+
+        expect(guestCalled, isTrue);
+        expect(find.text('authenticated content'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('shows error on guest login failure', (WidgetTester tester) async {
+        await tester.pumpApp(
+          authn.Login(
+            const Text('authenticated content'),
+            publicKey: () => '',
+            guest: () => false,
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byTooltip('continue as guest'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('guest login failed'), findsOneWidget);
+        expect(find.text('authenticated content'), findsNothing);
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('does not require username, password, or terms acceptance', (WidgetTester tester) async {
+        var guestCalled = false;
+
+        await tester.pumpApp(
+          authn.Login(
+            const Text('authenticated content'),
+            publicKey: () => guestCalled ? 'ssh-ed25519 AAAA...' : '',
+            guest: () {
+              guestCalled = true;
+              return true;
+            },
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // no text entered, no checkboxes ticked
+        await tester.tap(find.byTooltip('continue as guest'));
+        await tester.pumpAndSettle();
+
+        expect(guestCalled, isTrue);
+        expect(find.text('authenticated content'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
+    });
+
     group('logout', () {
       testWidgets('returns to login screen after logout', (
         WidgetTester tester,

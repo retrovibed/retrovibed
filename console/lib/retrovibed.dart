@@ -128,6 +128,12 @@ String unseed() {
   return _convertstring(bridge.unseed());
 }
 
+// bootstraps a local-only guest identity derived from this device's hostname
+// and machine id. returns true on success.
+bool guest() {
+  return bridge.guest() == 0;
+}
+
 List<String> ips() {
   final String? ipaddrs = _convertstring(bridge.ips());
   final List<dynamic> res = jsonDecode(ipaddrs ?? "") ?? [];

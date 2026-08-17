@@ -8,6 +8,12 @@ import 'package:retrovibed/uuidx.dart' as uuidx;
 
 typedef FnAuthzCurrent = Future<_meta.AuthzResponse> Function({String? host});
 
+// Placeholder token used while the real /meta/authz/ fetch is still in
+// flight. Defaults local_only to true so anything reading the token before
+// the real one lands fails safe (assumes guest, makes no remote calls)
+// instead of fails open.
+_meta.Token _pendingToken() => _meta.Token()..localOnly = true;
+
 class AuthzCache extends StatefulWidget {
   final Widget child;
   final FnAuthzCurrent current;
@@ -57,7 +63,7 @@ class AuthzTokenData extends InheritedWidget {
   const AuthzTokenData({required this.meta, required super.child});
 
   static final empty = AuthzTokenData(
-    meta: authz.Cached(authz.Bearer(_meta.Token(), ""), authz.Cached.pending),
+    meta: authz.Cached(authz.Bearer(_pendingToken(), ""), authz.Cached.pending),
     child: const SizedBox(),
   );
 
@@ -68,11 +74,11 @@ class AuthzTokenData extends InheritedWidget {
 class _AuthzCache extends State<AuthzCache> {
   bool _loading = true;
   authz.Cached<_meta.Token> meta = authz.Cached(
-    authz.Bearer(_meta.Token(), ""),
+    authz.Bearer(_pendingToken(), ""),
     authz.Cached.pending,
   );
   final ValueNotifier<authz.Bearer<_meta.Token>> changed = ValueNotifier<authz.Bearer<_meta.Token>>(
-    authz.Bearer(_meta.Token(), ""),
+    authz.Bearer(_pendingToken(), ""),
   );
 
   @override
@@ -84,7 +90,7 @@ class _AuthzCache extends State<AuthzCache> {
   void refresh() {
     setState(() {
       meta = authz.Cached(
-        authz.Bearer(_meta.Token(), ""),
+        authz.Bearer(_pendingToken(), ""),
         authz.refresh(
           (c) => httpx
               .withRetry(

@@ -184,6 +184,28 @@ func seed(s *C.char) *C.char {
 	return C.CString("")
 }
 
+// returns 0 on success, 1 on failure.
+//
+//export guest
+func guest() C.int {
+	ctx, done := context.WithTimeout(context.Background(), 10*time.Second)
+	defer done()
+
+	db, err := cmdopts.DatabaseMeta(ctx)
+	if err != nil {
+		log.Println("failed to connect to db", err)
+		return 1
+	}
+	defer db.Close()
+
+	if err = identityssh.GuestLogin(ctx, db); err != nil {
+		log.Println("failed guest login", err)
+		return 1
+	}
+
+	return 0
+}
+
 //export ips
 func ips() *C.char {
 	ctx, done := context.WithTimeout(context.Background(), 10*time.Second)

@@ -12,6 +12,7 @@ class Login extends StatefulWidget {
   final Widget child;
   final String Function() publicKey;
   final String Function(String) seed;
+  final bool Function() guest;
   final Future<void> Function() authenticated;
 
   const Login(
@@ -19,6 +20,7 @@ class Login extends StatefulWidget {
     super.key,
     this.publicKey = retro.public_key,
     this.seed = retro.seed,
+    this.guest = retro.guest,
     this.authenticated = _noop,
   });
 
@@ -133,6 +135,17 @@ class _LoginState extends State<Login> {
     _checkKey();
   }
 
+  Future<void> _guestLogin() async {
+    _reseterr();
+    if (!widget.guest()) {
+      setState(() {
+        _cause = ds.Error.text("guest login failed", onTap: _reseterr);
+      });
+      return;
+    }
+    _checkKey();
+  }
+
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
@@ -175,6 +188,13 @@ class _LoginState extends State<Login> {
                               'Welcome to Retrovibed',
                               style: Theme.of(context).textTheme.headlineSmall,
                               textAlign: TextAlign.center,
+                            ),
+                            Positioned(
+                              left: 0,
+                              child: ds.LoadingIconButton.guest(
+                                tooltip: "continue as guest",
+                                onPressed: _guestLogin,
+                              ),
                             ),
                             Positioned(
                               right: 0,

@@ -132,6 +132,13 @@ class DaemonBridge {
   late final _seedPtr = _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function(ffi.Pointer<ffi.Char>)>>('seed');
   late final _seed = _seedPtr.asFunction<ffi.Pointer<ffi.Char> Function(ffi.Pointer<ffi.Char>)>();
 
+  int guest() {
+    return _guest();
+  }
+
+  late final _guestPtr = _lookup<ffi.NativeFunction<ffi.Int Function()>>('guest');
+  late final _guest = _guestPtr.asFunction<int Function()>();
+
   ffi.Pointer<ffi.Char> ips() {
     return _ips();
   }

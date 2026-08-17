@@ -1,8 +1,11 @@
 import 'package:fixnum/fixnum.dart' as fixnum;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:retrovibed/authn/cache.dart';
 import 'package:retrovibed/authn/deeppool.cache.dart';
 import 'package:retrovibed/billing/meta.billing.pb.dart' as billing;
+import 'package:retrovibed/designkit.dart' as ds;
+import 'package:retrovibed/meta.dart' as meta;
 import 'package:retrovibed/meta/api.deeppool.dart' as deeppool;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
@@ -313,6 +316,121 @@ void main() {
         expect(secondToken.bearer, equals('bearer-v2'));
         expect(tester.takeException(), isNull);
       });
+    });
+  });
+
+  group('DeeppoolAuthzCacheGuard', () {
+    meta.AuthzResponse localMetaResponse(bool localOnly) => meta.AuthzResponse(
+      bearer: 'meta-bearer',
+      token: meta.Token()
+        ..localOnly = localOnly
+        ..expires = _futureExpiry(),
+    );
+
+    testWidgets('does not mount DeeppoolAuthzCache while the local identity is local_only', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Material(
+            child: ds.LoadingGuard(
+              AuthzCache(
+                DeeppoolAuthzCacheGuard(const Text('protected')),
+                current: ({String? host}) => Future.value(localMetaResponse(true)),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('protected'), findsOneWidget);
+      expect(find.byType(DeeppoolAuthzCache), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('mounts DeeppoolAuthzCache once the local token is not local_only', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Material(
+            child: ds.LoadingGuard(
+              AuthzCache(
+                DeeppoolAuthzCacheGuard(const Text('protected')),
+                current: ({String? host}) => Future.value(localMetaResponse(false)),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('protected'), findsOneWidget);
+      expect(find.byType(DeeppoolAuthzCache), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('reacts when the meta token refreshes from local_only to a registered account', (
+      WidgetTester tester,
+    ) async {
+      var localOnly = true;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Material(
+            child: ds.LoadingGuard(
+              AuthzCache(
+                DeeppoolAuthzCacheGuard(const Text('protected')),
+                current: ({String? host}) => Future.value(localMetaResponse(localOnly)),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(DeeppoolAuthzCache), findsNothing);
+
+      localOnly = false;
+      final ctx = tester.element(find.text('protected'));
+      AuthzCache.of(ctx).refresh();
+      await tester.pump(); // let the new Cached reach AuthzTokenData before forcing a fetch on it
+      await AuthzCache.meta(ctx).auto();
+      await tester.pumpAndSettle();
+
+      expect(find.byType(DeeppoolAuthzCache), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('reacts when the meta token refreshes from a registered account to local_only', (
+      WidgetTester tester,
+    ) async {
+      var localOnly = false;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Material(
+            child: ds.LoadingGuard(
+              AuthzCache(
+                DeeppoolAuthzCacheGuard(const Text('protected')),
+                current: ({String? host}) => Future.value(localMetaResponse(localOnly)),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(DeeppoolAuthzCache), findsOneWidget);
+
+      localOnly = true;
+      final ctx = tester.element(find.text('protected'));
+      AuthzCache.of(ctx).refresh();
+      await tester.pump(); // let the new Cached reach AuthzTokenData before forcing a fetch on it
+      await AuthzCache.meta(ctx).auto();
+      await tester.pumpAndSettle();
+
+      expect(find.byType(DeeppoolAuthzCache), findsNothing);
+      expect(tester.takeException(), isNull);
     });
   });
 }
