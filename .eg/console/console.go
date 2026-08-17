@@ -155,7 +155,7 @@ func GenerateFlutter(ctx context.Context, _ eg.Op) error {
 	return shell.Run(
 		ctx,
 		// runtime.New("flutter clean"), // This should not be committed if uncommented. should only be needed rarely
-		runtime.New("flutter create --org space.retrovibe --platforms=linux,macos,ios,android ."),
+		runtime.New("flutter create --org space.retrovibe --platforms=linux,macos,ios,android .").Timeout(egenv.TTL()),
 		runtime.New("flutter pub get"),
 		runtime.New("dart run flutter_launcher_icons"),
 	)
