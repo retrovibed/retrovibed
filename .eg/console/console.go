@@ -55,6 +55,7 @@ func CompileBinding(b *tarballs.Build) eg.OpFn {
 		return shell.Run(
 			ctx,
 			runtime.New("go -C retrovibedbind build -buildmode=c-shared -buildvcs=true --tags duckdb_use_lib,retrovibed,neural -o ../build/nativelib/libretrovibed.so .").
+				Timeout(egenv.TTL()).
 				Environ("CGO_LDFLAGS", "-L"+egenv.CacheDirectory("neurals")),
 		)
 	}
