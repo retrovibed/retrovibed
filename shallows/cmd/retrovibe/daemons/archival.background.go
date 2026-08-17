@@ -17,12 +17,6 @@ import (
 )
 
 func AutoArchival(ctx context.Context, signer ssh.Signer, q sqlx.Queryer, mediastore fsx.Virtual, async *asyncx.Wakeup, archive bool) error {
-	if archive {
-		if _, err := authn.Register(ctx, signer); err != nil {
-			return errorsx.Wrap(err, "unable to register with archival service")
-		}
-	}
-
 	c, err := authn.AutoJWTClient(ctx, signer)
 	if err != nil {
 		return errorsx.Wrap(err, "failed to create oauth2 bearer token")

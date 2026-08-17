@@ -82,8 +82,18 @@ func oauth2SSHConfig(signer ssh.Signer, otp string, endpoint oauth2.Endpoint) oa
 	}
 }
 
-func Seeded(ctx context.Context, seed string, force bool, path string) (s ssh.Signer, err error) {
-	return sshx.Seeded(ctx, seed, force, path)
+type SeededOption = sshx.SeededOption
+
+func SeededOptionForce(force bool) SeededOption {
+	return sshx.SeededOptionForce(force)
+}
+
+func SeededOptionPath(path string) SeededOption {
+	return sshx.SeededOptionPath(path)
+}
+
+func Seeded(ctx context.Context, seed string, force bool, path string, options ...SeededOption) (s ssh.Signer, err error) {
+	return sshx.Seeded(ctx, seed, force, path, options...)
 }
 
 func Unseeded() error {

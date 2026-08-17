@@ -25,13 +25,13 @@ func (t DeeppoolClientDefault) HTTPClient(ctx context.Context) (*http.Client, er
 		return nil, errorsx.Wrap(err, "unable to generate signer id")
 	}
 
-	if _, err := authn.Register(ctx, signer); err != nil {
-		return nil, errorsx.Wrap(err, "unable to register with archival service")
-	}
-
 	c, err := authn.AutoJWTClient(ctx, signer)
 	if err != nil {
 		return nil, errorsx.Wrap(err, "unable to create api client")
+	}
+
+	if _, err := authn.Register(ctx, c); err != nil {
+		return nil, errorsx.Wrap(err, "unable to register with archival service")
 	}
 
 	return c, nil

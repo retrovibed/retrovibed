@@ -20,12 +20,7 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-func Register(ctx context.Context, signer ssh.Signer) (*Session, error) {
-	c, err := Oauth2DeeppoolHTTPClient(ctx, signer)
-	if err != nil {
-		return nil, err
-	}
-
+func Register(ctx context.Context, c *http.Client) (*Session, error) {
 	bs := backoffx.New(backoffx.Exponential(200*time.Millisecond), backoffx.Maximum(30*time.Second))
 	ctx, done := context.WithTimeout(ctx, 5*time.Minute)
 	defer done()

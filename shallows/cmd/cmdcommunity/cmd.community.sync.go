@@ -31,12 +31,12 @@ func (t cmdCommunitySync) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) (err e
 		return errorsx.Wrap(err, "unable to generate signer id")
 	}
 
-	if _, err = authn.Register(gctx.Context, id); err != nil {
-		return errorsx.Wrap(err, "unable to register with archival service")
-	}
-
 	if httpc, err = authn.AutoJWTClient(gctx.Context, id); err != nil {
 		return errorsx.Wrap(err, "unable to create api client")
+	}
+
+	if _, err = authn.Register(gctx.Context, httpc); err != nil {
+		return errorsx.Wrap(err, "unable to register with archival service")
 	}
 
 	if db, err = cmdopts.DatabaseMeta(gctx.Context); err != nil {

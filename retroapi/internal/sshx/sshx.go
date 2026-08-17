@@ -19,6 +19,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/cryptox"
 	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/fsx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/langx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/md5x"
 	"golang.org/x/crypto/ssh"
 )
@@ -130,28 +131,45 @@ func SignerFromGenerator(kg keygen) (s ssh.Signer, err error) {
 	return s, nil
 }
 
-func Seeded(ctx context.Context, seed string, force bool, path string) (s ssh.Signer, err error) {
-	ts := time.Now().Unix()
-	backup := fmt.Sprintf("%s.%d", path, ts)
-	backuppub := fmt.Sprintf("%s.pub.%d", path, ts)
+type seededOptions struct {
+	force bool
+	path  string
+}
 
-	if exists := fsx.Exists(path); exists && !force {
-		return nil, errorsx.Errorf("an identity already exists at %s, use --force to backup and replace", path)
+type SeededOption func(*seededOptions)
+
+func SeededOptionForce(force bool) SeededOption {
+	return func(o *seededOptions) { o.force = force }
+}
+
+func SeededOptionPath(path string) SeededOption {
+	return func(o *seededOptions) { o.path = path }
+}
+
+func Seeded(ctx context.Context, seed string, force bool, path string, options ...SeededOption) (s ssh.Signer, err error) {
+	o := langx.Clone(seededOptions{force: force, path: path}, options...)
+
+	ts := time.Now().Unix()
+	backup := fmt.Sprintf("%s.%d", o.path, ts)
+	backuppub := fmt.Sprintf("%s.pub.%d", o.path, ts)
+
+	if exists := fsx.Exists(o.path); exists && !o.force {
+		return nil, errorsx.Errorf("an identity already exists at %s, use --force to backup and replace", o.path)
 	} else if exists {
-		if err := os.Rename(path, backup); errors.Is(err, os.ErrNotExist) {
-			log.Println("an identity already existed, renamed to", path, backup)
+		if err := os.Rename(o.path, backup); errors.Is(err, os.ErrNotExist) {
+			log.Println("an identity already existed, renamed to", o.path, backup)
 		} else if err != nil {
 			return nil, errorsx.Wrap(err, "unable to rename old key")
 		}
 
-		if err := os.Rename(fmt.Sprintf("%s.pub", path), backuppub); errors.Is(err, os.ErrNotExist) {
-			log.Println("an identity already existed, renamed to", fmt.Sprintf("%s.pub", path), backuppub)
+		if err := os.Rename(fmt.Sprintf("%s.pub", o.path), backuppub); errors.Is(err, os.ErrNotExist) {
+			log.Println("an identity already existed, renamed to", fmt.Sprintf("%s.pub", o.path), backuppub)
 		} else if err != nil {
 			return nil, errorsx.Wrap(err, "unable to rename old public key")
 		}
 	}
 
-	return AutoCached(NewKeyGenSeeded(seed), path)
+	return AutoCached(NewKeyGenSeeded(seed), o.path)
 }
 
 func Unseeded(path string) error {

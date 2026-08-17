@@ -165,6 +165,7 @@ func (t *HTTPAuthz) grant(w http.ResponseWriter, r *http.Request) {
 		CommunityModify: msg.Token.CommunityModify,
 		LibraryRead:     msg.Token.LibraryRead,
 		LibraryModify:   msg.Token.LibraryModify,
+		LocalOnly:       msg.Token.LocalOnly,
 	}
 
 	if err = meta.AuthzUpsertWithDefaults(r.Context(), t.q, a).Scan(&a); err != nil {

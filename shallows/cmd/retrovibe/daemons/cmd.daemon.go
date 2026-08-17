@@ -38,11 +38,14 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/netx"
+	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
+	"github.com/retrovibed/retrovibed/shallows/internal/sshx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/internal/wireguardx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/retrovibed/retrovibed/shallows/media"
 	"github.com/retrovibed/retrovibed/shallows/mediaapi"
+	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/retrovibed/retrovibed/shallows/meta/identityssh"
 	"github.com/retrovibed/retrovibed/shallows/metaapi"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
@@ -165,14 +168,6 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	jwt.RegisterSigningMethod(sshjwt.Alg(), func() jwt.SigningMethod { return sshjwt })
 	jwtx.RegisterAlgorithms(sshjwt, jwt.SigningMethodHS512)
 
-	if c, err := authn.AutoJWTClient(gctx.Context, id); err == nil {
-		deepjwt = c
-	} else {
-		// we allow creation to fail the application should function even without the api.
-		// just warn that the api is unavailable.
-		errorsx.Log(errorsx.Wrap(err, "failed to create oauth2, api will fail"))
-	}
-
 	httpbind, err := t.HTTP.Socket()
 	if err != nil {
 		return errorsx.Wrap(err, "unable to setup http socket")
@@ -195,6 +190,11 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		return errorsx.Wrap(err, "unable to import ssh identity")
 	}
 
+	var authz meta.Authz
+	if err = meta.AuthzFindByProfileID(gctx.Context, db, sqlx.NewNullString(sshx.FingerprintMD5(id.PublicKey()))).Scan(&authz); err != nil {
+		return errorsx.Wrap(err, "unable to load authorization")
+	}
+
 	errorsx.Log(errorsx.Wrap(PrepareDefaultFeeds(gctx.Context, db), "unable to initialize default rss feeds"))
 
 	rootstore := fsx.DirVirtual(env.RootStorageDir())
@@ -203,6 +203,20 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 
 	if err := fsx.MkDirs(0700, rootstore.Path(), mediastore.Path(), tvfs.Path(), wireguardx.ConfigDirectory()); err != nil {
 		return err
+	}
+
+	if !authz.LocalOnly {
+		if c, err := authn.AutoJWTClient(gctx.Context, id); err == nil {
+			deepjwt = c
+		} else {
+			// we allow creation to fail the application should function even without the api.
+			// just warn that the api is unavailable.
+			errorsx.Log(errorsx.Wrap(err, "failed to create oauth2, api will fail"))
+		}
+
+		if _, err := authn.Register(gctx.Context, deepjwt); err != nil {
+			errorsx.Log(errorsx.Wrap(err, "unable to register with archival service"))
+		}
 	}
 
 	var tstore storage.ClientImpl = blockcache.NewTorrentFromVirtualFS(tvfs)

@@ -36,6 +36,7 @@ message Token {
   bool library_modify = 1008 [ json_name = "library_modify" ];
   bool archive_sync = 1009 [ json_name = "archive_sync" ];
   bool community_sync = 1010 [ json_name = "community_sync" ];
+  bool local_only = 1011 [ json_name = "local_only" ];
 }
 
 message AuthzRequest {}

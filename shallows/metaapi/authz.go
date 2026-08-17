@@ -156,6 +156,7 @@ func TokenOptionFromAuthz(a meta.Authz) TokenOption {
 		t.CommunityModify = a.CommunityModify
 		t.LibraryRead = a.LibraryRead
 		t.LibraryModify = a.LibraryModify
+		t.LocalOnly = a.LocalOnly
 	}
 }
 

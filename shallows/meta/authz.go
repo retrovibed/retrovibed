@@ -11,6 +11,16 @@ func AuthzOptionAdmin(v *Authz) {
 	v.BillingRead = true
 }
 
+func AuthzOptionGuest(v *Authz) {
+	v.Usermanagement = false
+	v.RemoteControl = true
+	v.LibraryRead = true
+	v.LibraryModify = false
+	v.BillingModify = false
+	v.BillingRead = false
+	v.LocalOnly = true
+}
+
 func AuthzOptionNoPrivileges(v *Authz) {
 	v.Usermanagement = false
 	v.RemoteControl = false
