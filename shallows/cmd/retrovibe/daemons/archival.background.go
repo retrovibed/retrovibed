@@ -3,9 +3,9 @@ package daemons
 import (
 	"context"
 	"log"
+	"net/http"
 	"time"
 
-	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/backoffx"
 	"github.com/retrovibed/retrovibed/shallows/internal/contextx"
@@ -13,15 +13,9 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/library"
-	"golang.org/x/crypto/ssh"
 )
 
-func AutoArchival(ctx context.Context, signer ssh.Signer, q sqlx.Queryer, mediastore fsx.Virtual, async *asyncx.Wakeup, archive bool) error {
-	c, err := authn.AutoJWTClient(ctx, signer)
-	if err != nil {
-		return errorsx.Wrap(err, "failed to create oauth2 bearer token")
-	}
-
+func AutoArchival(ctx context.Context, q sqlx.Queryer, c *http.Client, mediastore fsx.Virtual, async *asyncx.Wakeup, archive bool) error {
 	s := backoffx.New(
 		backoffx.Constant(time.Hour),
 		backoffx.Jitter(0.1),

@@ -79,7 +79,7 @@ type Command struct {
 	MDNSDiscovery       bool             `flag:"" name:"mdns-discovery" help:"enable API-driven mDNS LAN peer discovery over websocket (experimental)" env:"${env_mdns_discovery}" default:"false" negatable:""`
 	AutoBootstrap       bool             `flag:"" name:"auto-bootstrap" help:"bootstrap from a predefined set of peers" env:"${env_auto_bootstrap}" default:"true" negatable:""`
 	AutoDiscovery       bool             `flag:"" name:"auto-discovery" help:"enable automatic discovery of content from peers" env:"${env_auto_discovery}" default:"true" negatable:""`
-	AutoPeerTube        bool             `flag:"" name:"auto-peertube" help:"enable the built-in PeerTube/SepiaSearch discovery strategy" env:"${env_auto_peertube}" default:"true" negatable:""`
+	AutoPeerTube        bool             `flag:"" name:"auto-peertube" help:"enable the built-in PeerTube/SepiaSearch discovery strategy" env:"${env_auto_peertube}" default:"false" negatable:""`
 	PeerTubeDomain      string           `flag:"" name:"peertube-domain" help:"base url of the PeerTube/SepiaSearch instance to search" env:"${env_peertube_domain}" default:"https://sepiasearch.org"`
 	AutoIdentifyMedia   bool             `flag:"" name:"auto-identify-media" help:"enable automatically identifying media" env:"${env_auto_identify_media}" default:"true" negatable:""`
 	AutoLocateMedia     bool             `flag:"" name:"auto-locate-media" help:"enable automatically locating media from distributed index" env:"${env_auto_locate_media}" default:"true" negatable:""`
@@ -142,6 +142,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		mc                  = library.NewQueryerCleanerAuto()
 		db                  *sql.DB
 		id                  ssh.Signer
+		authz               meta.Authz
 		_socks5             net.Listener
 		deepjwt             = httpx.NewFixedStatusClient(http.StatusMethodNotAllowed)
 		mediameta           = asyncx.NewWakeup(gctx.Context)
@@ -190,7 +191,6 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		return errorsx.Wrap(err, "unable to import ssh identity")
 	}
 
-	var authz meta.Authz
 	if err = meta.AuthzFindByProfileID(gctx.Context, db, sqlx.NewNullString(sshx.FingerprintMD5(id.PublicKey()))).Scan(&authz); err != nil {
 		return errorsx.Wrap(err, "unable to load authorization")
 	}
@@ -208,14 +208,13 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	if !authz.LocalOnly {
 		if c, err := authn.AutoJWTClient(gctx.Context, id); err == nil {
 			deepjwt = c
+			if _, err := authn.Register(gctx.Context, deepjwt); err != nil {
+				errorsx.Log(errorsx.Wrap(err, "unable to register with archival service"))
+			}
 		} else {
 			// we allow creation to fail the application should function even without the api.
 			// just warn that the api is unavailable.
 			errorsx.Log(errorsx.Wrap(err, "failed to create oauth2, api will fail"))
-		}
-
-		if _, err := authn.Register(gctx.Context, deepjwt); err != nil {
-			errorsx.Log(errorsx.Wrap(err, "unable to register with archival service"))
 		}
 	}
 
@@ -223,11 +222,11 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 
 	if t.AutoArchive && deepjwt != http.DefaultClient {
 		log.Println("automatic archival is enabled")
-		errorsx.Log(AutoArchival(gctx.Context, id, db, mediastore, archival, t.AutoArchive))
+		errorsx.Log(AutoArchival(gctx.Context, db, deepjwt, mediastore, archival, t.AutoArchive))
 		errorsx.Log(AutoPublishing(gctx.Context, db, deepjwt, mediastore, tvfs, publishing))
 		errorsx.Log(AutoFeedSync(gctx.Context, db, deepjwt, publishing))
 		errorsx.Log(SubscriptionSync(gctx.Context, db, deepjwt, communitysync))
-		tstore = library.NewTorrentStorageFromHTTP(deepjwt, db, tstore)
+		tstore = library.NewTorrentStorageFromHTTP(db, deepjwt, tstore)
 	} else {
 		log.Println("automatic archival is disabled")
 	}

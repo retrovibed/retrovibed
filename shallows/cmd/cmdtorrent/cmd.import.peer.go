@@ -21,6 +21,7 @@ import (
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/retrovibed/retrovibed/retroapi/asynccompute"
+	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
 	retronetx "github.com/retrovibed/retrovibed/retroapi/netx"
 	"github.com/retrovibed/retrovibed/retroapi/userx"
@@ -128,8 +129,13 @@ func (t importPeer) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) (err error) 
 		return err
 	}
 
+	c, err := authn.AutoJWTClient(gctx.Context, id)
+	if err == nil {
+		return err
+	}
+
 	async := asyncx.NewWakeup(gctx.Context)
-	errorsx.Log(daemons.AutoArchival(gctx.Context, id, db, mediastore, async, t.Reclaim))
+	errorsx.Log(daemons.AutoArchival(gctx.Context, db, c, mediastore, async, t.Reclaim))
 
 	peers := make([]torrent.Peer, 0, 128)
 	for _, p := range t.Peer {

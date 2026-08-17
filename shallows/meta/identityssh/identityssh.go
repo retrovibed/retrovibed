@@ -38,10 +38,10 @@ func InitializeAdmin(ctx context.Context, q sqlx.Queryer, pub ssh.PublicKey) (er
 	return errorsx.Wrap(meta.ProfileAutoEnable(ctx, q, &p), "unable to enable profile")
 }
 
-func InitializeGuest(ctx context.Context, q sqlx.Queryer, pub ssh.PublicKey, hostname string) (err error) {
+func InitializeGuest(ctx context.Context, q sqlx.Queryer, pub ssh.PublicKey, username string) (err error) {
 	var (
 		p      meta.Profile
-		parsed = sshx.Parsed{PublicKey: pub, Comment: hostname}
+		parsed = sshx.Parsed{PublicKey: pub, Comment: username}
 	)
 
 	if p, err = importParsed(ctx, q, parsed); err != nil {

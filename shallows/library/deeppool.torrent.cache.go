@@ -27,7 +27,7 @@ const (
 	ErrCacheUnrecoverable = errorsx.String("cache layer blocked due to previous error")
 )
 
-func NewTorrentStorageFromHTTP(c *http.Client, q sqlx.Queryer, d storage.ClientImpl) *TorrentCacheStorage {
+func NewTorrentStorageFromHTTP(q sqlx.Queryer, c *http.Client, d storage.ClientImpl) *TorrentCacheStorage {
 	return NewTorrentStorage(deeppool.NewRanger(c), q, d, blockcache.DefaultBlockLength)
 }
 
