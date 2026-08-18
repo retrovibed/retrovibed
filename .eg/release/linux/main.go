@@ -33,7 +33,6 @@ func main() {
 				shallows.NeuralsBuild(),
 				eg.Parallel(
 					eg.Sequential(
-						console.MaskDartTool,
 						console.Generate,
 						console.BuildLinux,
 					),
