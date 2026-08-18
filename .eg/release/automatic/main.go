@@ -46,6 +46,7 @@ func main() {
 				30*time.Second,
 				eggithub.Promote(
 					"PKGBUILD",
+					"retrovibed.darwin.arm64.dmg",
 					"retrovibed.linux.amd64.AppImage",
 					"retrovibed.linux.amd64.AppImage.zsync",
 					"retrovibed.linux.amd64.tar.xz",
