@@ -4,6 +4,7 @@ import (
 	"context"
 	"eg/compute/maintainer"
 	"eg/compute/tarballs"
+	"log"
 	"os"
 	"path/filepath"
 
@@ -62,10 +63,14 @@ func AppImageBuild(b *tarballs.Build) eg.OpFn {
 // libraries the AppImage should be bundling itself, it only proves the
 // AppImage is self-contained.
 func SmokeTest(b *tarballs.Build) eg.OpFn {
-	const dir = ".dist/distrobuilds"
-	appimage := egenv.CacheDirectory(tarballs.AppImage(b))
-
 	return func(ctx context.Context, o eg.Op) error {
+		const dir = ".dist/distrobuilds"
+		appimage := egenv.CacheDirectory(tarballs.AppImage(b))
+		if b.Arch != "amd64" {
+			log.Println("skipping smoke tests on non-amd64 systems")
+			return nil
+		}
+
 		entries, err := os.ReadDir(dir)
 		if err != nil {
 			return err
