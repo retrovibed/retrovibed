@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -21,11 +22,7 @@ func AutoJWTClient(ctx context.Context, signer ssh.Signer) (c *http.Client, err 
 		return nil, errorsx.Wrap(err, "failed to create oauth2 http client")
 	}
 
-	return RetryClient(AuthzClient(JWTClient(c))), nil
-}
-
-func JWTClient(oauth2c *http.Client) *http.Client {
-	return JWTClientHostname(oauth2c, env.Deeppool())
+	return RetryClient(AuthzClient(JWTClientHostname(c, env.Deeppool()))), nil
 }
 
 func JWTClientHostname(oauth2c *http.Client, hostname string) *http.Client {
@@ -47,6 +44,8 @@ func (t *jwttokensource) Token() (*oauth2.Token, error) {
 	var (
 		authed Authed
 	)
+
+	defer log.Println("jwttokensource")
 
 	ctx, done := context.WithTimeout(context.Background(), 3*time.Second)
 	defer done()

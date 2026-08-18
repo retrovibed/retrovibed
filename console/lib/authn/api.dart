@@ -28,7 +28,7 @@ Future<Session> otp({List<httpx.Option> options = const []}) async {
 }
 
 Future<Authed> ssh() async {
-  final token = httpx.oauth2_bearer();
+  final token = httpx.deeppool_oauth2_bearer();
   return httpx
       .post(
         Uri.https(httpx.metaendpoint(), "/authn/ssh"),
@@ -43,7 +43,7 @@ Future<Session> signup() {
   return httpx
       .post(
         Uri.https(httpx.metaendpoint(), "/authn/signup"),
-        options: [httpx.Request.authorization(httpx.oauth2_bearer())],
+        options: [httpx.Request.authorization(httpx.deeppool_oauth2_bearer())],
       )
       .then((v) {
         return Session.create()..mergeFromProto3Json(jsonDecode(v.body));

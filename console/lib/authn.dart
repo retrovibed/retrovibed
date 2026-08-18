@@ -12,6 +12,7 @@ export 'authn/api.dart';
 export 'authn/developer.mode.dart';
 export 'authn/endpoint.dart';
 export 'authn/authed.endpoint.dart';
+export 'authn/local.only.guard.dart';
 
 Future<String> bearer<T>(authz.Cached<T> c) {
   return c.auto().then((v) => v.bearer.isNotEmpty ? "bearer ${v.bearer}" : "");

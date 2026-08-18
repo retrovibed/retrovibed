@@ -117,37 +117,38 @@ class Retrovibed extends StatelessWidget {
                   authn.Login(
                     authenticated: _startdaemon,
                     meta.EndpointAuto(
-                      authn.Authenticated(
-                        authn.AuthzCache(
-                          authn.DeeppoolAuthzCacheGuard(
-                            DeepLink(
-                              billing.Registered(
-                                media.Playlist(
-                                  tracing: (ctx, pos, dur, q, id) {
-                                    medialib.recent
-                                        .record(
-                                          medialib.RecentRecordRequest(
-                                            media: medialib.Media(id: id),
-                                            position: ds.Int64(pos.inMilliseconds),
-                                            duration: ds.Int64(dur.inMilliseconds),
-                                            query: q,
-                                            mimetype: mimex.category(q.mimetypes),
-                                          ),
-                                          options: [authn.request(authn.AuthzCache.meta(ctx))],
-                                        )
-                                        .then((v) {})
-                                        .catchError((cause) {
-                                          print(
-                                            "failed to record watch event ${pos}/${dur} - ${q} - ${cause}",
-                                          );
-                                        })
-                                        .ignore();
-                                  },
-                                  remote.RemoteControlListener(
-                                    const routes.Routes(),
-                                  ),
-                                ),
+                      authn.AuthzCache(
+                        authn.LocalOnlyGuard(
+                          DeepLink(
+                            media.Playlist(
+                              tracing: (ctx, pos, dur, q, id) {
+                                medialib.recent
+                                    .record(
+                                      medialib.RecentRecordRequest(
+                                        media: medialib.Media(id: id),
+                                        position: ds.Int64(pos.inMilliseconds),
+                                        duration: ds.Int64(dur.inMilliseconds),
+                                        query: q,
+                                        mimetype: mimex.category(q.mimetypes),
+                                      ),
+                                      options: [authn.request(authn.AuthzCache.meta(ctx))],
+                                    )
+                                    .then((v) {})
+                                    .catchError((cause) {
+                                      print(
+                                        "failed to record watch event ${pos}/${dur} - ${q} - ${cause}",
+                                      );
+                                    })
+                                    .ignore();
+                              },
+                              remote.RemoteControlListener(
+                                const routes.Routes(),
                               ),
+                            ),
+                          ),
+                          (child) => authn.DeeppoolAuthzCache(
+                            authn.Authenticated(
+                              billing.Registered(child),
                             ),
                           ),
                         ),

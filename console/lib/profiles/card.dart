@@ -4,6 +4,7 @@ import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/meta/api.dart' as meta;
 import 'package:retrovibed/retrovibed.dart' as retro;
+import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'package:url_launcher/url_launcher.dart';
 import './overview.dart';
 
@@ -107,7 +108,7 @@ class _CardState extends State<Card> {
               Text(
                 [
                   _session.account.description,
-                  _session.account.id,
+                  uuidx.isMin(uuidx.fromString(_session.account.id)) ? "guest" : _session.account.id,
                 ].firstWhere((v) => v.isNotEmpty, orElse: () => ''),
                 style: theme.textTheme.bodyLarge,
                 overflow: TextOverflow.ellipsis,

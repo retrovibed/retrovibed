@@ -37,7 +37,13 @@ func Register(ctx context.Context, c *http.Client) (*Session, error) {
 
 			log.Println("registration failed", err)
 		}()
-		resp, err := httpx.AsError(c.Post(fmt.Sprintf("https://%s/authn/ssh", env.Deeppool()), "", nil))
+
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, fmt.Sprintf("https://%s/authn/ssh", env.Deeppool()), nil)
+		if err != nil {
+			return nil, err
+		}
+
+		resp, err := httpx.AsError(c.Do(req))
 		if err != nil {
 			return nil, err
 		}
@@ -48,7 +54,7 @@ func Register(ctx context.Context, c *http.Client) (*Session, error) {
 
 		switch len(authed.Profiles) {
 		case 0:
-			// continue
+			// continue to registration
 		case 1:
 			session := authed.Profiles[0]
 			return &Session{
@@ -60,7 +66,7 @@ func Register(ctx context.Context, c *http.Client) (*Session, error) {
 			return nil, errors.New("multiple profiles not supported yet")
 		}
 
-		req, err := http.NewRequestWithContext(ctx, http.MethodPost, fmt.Sprintf("https://%s/authn/signup", env.Deeppool()), nil)
+		req, err = http.NewRequestWithContext(ctx, http.MethodPost, fmt.Sprintf("https://%s/authn/signup", env.Deeppool()), nil)
 		if err != nil {
 			return nil, err
 		}

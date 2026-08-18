@@ -25,6 +25,7 @@ func main() {
 			ctx,
 			deb,
 			eg.Sequential(
+				console.GenerateFlutter,
 				console.GenerateBinding,
 				console.BuildLinux,
 			),

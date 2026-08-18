@@ -98,11 +98,13 @@ func Main(args ...string) {
 			log.Println("unable to bind gdx debug socket", err)
 			return
 		}
-		defer l.Close()
+		defer func() {
+			errorsx.Log(errorsx.Wrap(l.Close(), "gdx shutdown"))
+		}()
 
 		go func() {
 			<-shellCli.Context.Done()
-			l.Close()
+			errorsx.Log(errorsx.Wrap(l.Close(), "gdx shutdown"))
 		}()
 
 		if err := http.Serve(l, gdx.NewHTTPFn(gdx.Options().FromEnv())); err != nil && shellCli.Context.Err() == nil {

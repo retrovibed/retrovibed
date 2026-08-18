@@ -3,9 +3,13 @@ description: Bindings to a local daemon.
 output: "lib/retrovibed/gen.dart"
 headers:
   entry-points:
-    - "build/nativelib/libretrovibed.h"
+    - "../../.eg.cache/dev.native.libs/libretrovibed.h"
+    - "../.eg.cache/dev.native.libs/libretrovibed.h"
 compiler-opts:
-  - "-I/usr/lib/clang/19/include/"
+  - "-I/usr/lib/clang/19/include"
+  - "-I/usr/lib/clang/20/include"
+  - "-I/usr/lib/clang/22/include"
+  - "-I/usr/include"
 preamble: |
   // ignore_for_file: always_specify_types
   // ignore_for_file: camel_case_types

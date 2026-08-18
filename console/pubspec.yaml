@@ -71,6 +71,7 @@ dev_dependencies:
   flutter_launcher_icons: "^0.14.3"
   flutter_lints: ^6.0.0
   ffigen: ^20.0.0
+  hooks: ^2.0.2
 
 flutter_launcher_icons:
   image_path: "icons/application.png"

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:retrovibed/authn/cache.dart';
 import 'package:retrovibed/authn/deeppool.cache.dart';
+import 'package:retrovibed/authn/local.only.guard.dart';
 import 'package:retrovibed/billing/meta.billing.pb.dart' as billing;
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/meta.dart' as meta;
@@ -59,8 +60,8 @@ void main() {
                 return const Text('child');
               },
             ),
-            apideeppoolauthz:
-                ({options = const []}) => Future.value(_response('bearer-from-deeppool', _futureExpiry())),
+            apideeppoolauthz: ({options = const []}) =>
+                Future.value(_response('bearer-from-deeppool', _futureExpiry())),
           ),
         );
         await tester.pumpAndSettle();
@@ -164,8 +165,8 @@ void main() {
               },
             ),
             apideeppoolauthz: ({options = const []}) => Future.value(_response('bearer', _futureExpiry())),
-            apibillingattribution:
-                ({options = const []}) => Future.value(billing.AttributionTokenResponse(token: 'attr-jwt-token')),
+            apibillingattribution: ({options = const []}) =>
+                Future.value(billing.AttributionTokenResponse(token: 'attr-jwt-token')),
           ),
         );
         await tester.pumpAndSettle();
@@ -319,7 +320,7 @@ void main() {
     });
   });
 
-  group('DeeppoolAuthzCacheGuard', () {
+  group('LocalOnlyGuard', () {
     meta.AuthzResponse localMetaResponse(bool localOnly) => meta.AuthzResponse(
       bearer: 'meta-bearer',
       token: meta.Token()
@@ -335,7 +336,7 @@ void main() {
           home: Material(
             child: ds.LoadingGuard(
               AuthzCache(
-                DeeppoolAuthzCacheGuard(const Text('protected')),
+                LocalOnlyGuard(const Text('protected'), (child) => DeeppoolAuthzCache(child)),
                 current: ({String? host}) => Future.value(localMetaResponse(true)),
               ),
             ),
@@ -355,7 +356,7 @@ void main() {
           home: Material(
             child: ds.LoadingGuard(
               AuthzCache(
-                DeeppoolAuthzCacheGuard(const Text('protected')),
+                LocalOnlyGuard(const Text('protected'), (child) => DeeppoolAuthzCache(child)),
                 current: ({String? host}) => Future.value(localMetaResponse(false)),
               ),
             ),
@@ -379,7 +380,7 @@ void main() {
           home: Material(
             child: ds.LoadingGuard(
               AuthzCache(
-                DeeppoolAuthzCacheGuard(const Text('protected')),
+                LocalOnlyGuard(const Text('protected'), (child) => DeeppoolAuthzCache(child)),
                 current: ({String? host}) => Future.value(localMetaResponse(localOnly)),
               ),
             ),
@@ -411,7 +412,7 @@ void main() {
           home: Material(
             child: ds.LoadingGuard(
               AuthzCache(
-                DeeppoolAuthzCacheGuard(const Text('protected')),
+                LocalOnlyGuard(const Text('protected'), (child) => DeeppoolAuthzCache(child)),
                 current: ({String? host}) => Future.value(localMetaResponse(localOnly)),
               ),
             ),

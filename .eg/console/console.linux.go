@@ -20,12 +20,6 @@ func BuildLinux(ctx context.Context, _ eg.Op) error {
 	runtime := flutterRuntimev2(shell.Runtime())
 	return shell.Run(
 		ctx,
-		// the whole tree (not just debug) must be wiped: CMakeCache.txt under
-		// build/linux/x64/release can be left behind by a prior run in a different
-		// container (e.g. dev/console/android, which has a JDK on it for gradle/adb),
-		// and a stale cached JAVA_JVM_LIBRARY path breaks the build in containers without one.
-		runtime.New("rm -rf build/linux").Lenient(true),
-		runtime.New("mkdir -p build/native_assets/linux"),
 		runtime.New("flutter build linux --release lib/main.dart").Timeout(egenv.TTL()),
 	)
 }

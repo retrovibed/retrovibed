@@ -62,12 +62,14 @@ class DaemonBridge {
   late final _build_versionPtr = _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function()>>('build_version');
   late final _build_version = _build_versionPtr.asFunction<ffi.Pointer<ffi.Char> Function()>();
 
-  ffi.Pointer<ffi.Char> oauth2_bearer() {
-    return _oauth2_bearer();
+  ffi.Pointer<ffi.Char> deeppool_oauth2_bearer() {
+    return _deeppool_oauth2_bearer();
   }
 
-  late final _oauth2_bearerPtr = _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function()>>('oauth2_bearer');
-  late final _oauth2_bearer = _oauth2_bearerPtr.asFunction<ffi.Pointer<ffi.Char> Function()>();
+  late final _deeppool_oauth2_bearerPtr = _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function()>>(
+    'deeppool_oauth2_bearer',
+  );
+  late final _deeppool_oauth2_bearer = _deeppool_oauth2_bearerPtr.asFunction<ffi.Pointer<ffi.Char> Function()>();
 
   ffi.Pointer<ffi.Char> authn_bearer() {
     return _authn_bearer();

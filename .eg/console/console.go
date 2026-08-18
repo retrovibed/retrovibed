@@ -21,7 +21,9 @@ func flutterRuntimev2(v shell.Command) shell.Command {
 	return v.
 		Directory(egenv.WorkingDirectory("console")).
 		EnvironFrom(eggolang.Env()...).
-		Environ("PUB_CACHE", egenv.CacheDirectory(".eg", "dart"))
+		Environ("PUB_CACHE", egenv.CacheDirectory(".eg", "dart")).
+		Environ("RETROVIBED_SHARED_NATIVE_LIBS_DIRECTORY", egenv.CacheDirectory("dev.native.libs")).
+		Environ("NIX_RETROVIBED_SHARED_NATIVE_LIBS", egenv.CacheDirectory("dev.native.libs", "example.so"))
 }
 
 func Tests(ctx context.Context, _ eg.Op) error {
@@ -44,7 +46,7 @@ func GenerateBinding(ctx context.Context, _ eg.Op) error {
 	runtime := flutterRuntimev2(shell.Runtime())
 	return shell.Run(
 		ctx,
-		runtime.New("go -C retrovibedbind build -buildmode=c-shared -buildvcs=true --tags duckdb_use_lib -o ../build/nativelib/libretrovibed.so ./..."),
+		runtime.New("go -C retrovibedbind build -buildmode=c-shared -buildvcs=true --tags duckdb_use_lib -o ${RETROVIBED_SHARED_NATIVE_LIBS_DIRECTORY}/libretrovibed.so ./..."),
 		runtime.New("dart run ffigen --config ffigen.yaml"),
 	)
 }
@@ -54,7 +56,7 @@ func CompileBinding(b *tarballs.Build) eg.OpFn {
 		runtime := flutterRuntimev2(shell.Runtime())
 		return shell.Run(
 			ctx,
-			runtime.New("go -C retrovibedbind build -buildmode=c-shared -buildvcs=true --tags duckdb_use_lib,retrovibed,neural -o ../build/nativelib/libretrovibed.so .").
+			runtime.New("go -C retrovibedbind build -buildmode=c-shared -buildvcs=true --tags duckdb_use_lib,retrovibed,neural -o ${RETROVIBED_SHARED_NATIVE_LIBS_DIRECTORY}/libretrovibed.so .").
 				Timeout(egenv.TTL()).
 				Environ("CGO_LDFLAGS", "-L"+egenv.CacheDirectory("neurals")),
 		)
@@ -72,8 +74,8 @@ func GenerateDevBinding(runtime shell.Command, outdir string, staticdirs ...stri
 		runtime := flutterRuntimev2(runtime)
 		return shell.Run(
 			ctx,
-			runtime.New("go -C retrovibedbind build -buildmode=c-shared -buildvcs=true --tags duckdb_use_lib,localdev,retrovibed,neural -o ${OUTPUT}/libretrovibed.so ./...").
-				Environ("OUTPUT", outdir).
+			runtime.New("go -C retrovibedbind build -buildmode=c-shared -buildvcs=true --tags duckdb_use_lib,localdev,retrovibed,neural -o ${OUTDIR}/libretrovibed.so ./...").
+				Environ("OUTDIR", outdir).
 				Environ("CGO_LDFLAGS", strings.TrimSpace(cgoFlags.String())),
 			runtime.New("dart run ffigen --config ffigen.yaml"),
 		)
@@ -97,9 +99,9 @@ func GenerateDevStaticBinding(rt shell.Command, outdir string, staticdirs ...str
 		return shell.Run(
 			ctx,
 			runtime.Newf(
-				"go -C retrovibedbind build -trimpath -buildmode=c-shared -buildvcs=true --tags duckdb_use_static_lib,localdev,retrovibed,neural -o %s/libretrovibed.so .",
-				outdir,
+				"go -C retrovibedbind build -trimpath -buildmode=c-shared -buildvcs=true --tags duckdb_use_static_lib,localdev,retrovibed,neural -o ${OUTDIR}/libretrovibed.so .",
 			).
+				Environ("OUTDIR", outdir).
 				Environ("CGO_LDFLAGS", strings.TrimSpace(cgoFlags.String())),
 		)
 	}
@@ -138,25 +140,12 @@ func Generate(ctx context.Context, op eg.Op) error {
 	)(ctx, op)
 }
 
-func MaskDartTool(ctx context.Context, _ eg.Op) error {
-	// dart relies on .dart_tool cached data to work properly.
-	// but it doesnt allow providing the directory location.
-	// so to behavior properly between host/guest runtimes
-	// we need to mask it.
-	runtime := flutterRuntimev2(shell.Runtime())
-	return shell.Run(
-		ctx,
-		runtime.New("rm -rf .dart_tool && mkdir .dart_tool && mount -t tmpfs tmpfs .dart_tool").Privileged(),
-		runtime.New("tree -L 1 .dart_tool"),
-	)
-}
-
 func GenerateFlutter(ctx context.Context, _ eg.Op) error {
 	runtime := flutterRuntimev2(shell.Runtime())
 	return shell.Run(
 		ctx,
-		// runtime.New("flutter clean"), // This should not be committed if uncommented. should only be needed rarely
 		runtime.New("flutter create --org space.retrovibe --platforms=linux,macos,ios,android .").Timeout(egenv.TTL()),
+		runtime.New("flutter config --enable-native-assets"),
 		runtime.New("flutter pub get"),
 		runtime.New("dart run flutter_launcher_icons"),
 	)
@@ -217,7 +206,6 @@ func Install(b *tarballs.Build) eg.OpFn {
 				runtime.Newf("ls -lha  %s/retrovibed", bundledir).Lenient(true),
 				runtime.Newf("cp -R %s/* %s", bundledir, dstdir),
 				runtime.Newf("cp -R %s/* %s/lib", libdir, dstdir),
-				// runtime.Newf("tree %s", dstdir),
 			)
 		},
 	)

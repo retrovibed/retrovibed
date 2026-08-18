@@ -134,6 +134,7 @@ extension WidgetTesterExtensions on WidgetTester {
   /// [device] defaults to 1, which is the device id assigned by
   /// [WidgetTester.createGesture] for the first mouse pointer in a test.
   MouseCursor? currentCursor({int device = 1}) {
+    // ignore: invalid_use_of_visible_for_testing_member
     return RendererBinding.instance.mouseTracker.debugDeviceActiveCursor(
       device,
     );

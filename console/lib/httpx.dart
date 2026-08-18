@@ -42,8 +42,8 @@ void set(String uri) {
 }
 
 // return an deeppool identity token for retrovibed api.
-String oauth2_bearer() {
-  final token = retro.oauth2_bearer();
+String deeppool_oauth2_bearer() {
+  final token = retro.deeppool_oauth2_bearer();
   if (token.isEmpty) return "";
   return "bearer ${token}";
 }

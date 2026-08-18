@@ -12,42 +12,18 @@ import 'package:retrovibed/env.dart' as env;
 import 'package:retrovibed/meta.dart' as meta;
 import 'package:window_manager/window_manager.dart';
 
-String _frameworksLib(String name) {
-  final execDir = File(Platform.resolvedExecutable).parent.path;
-  return "$execDir/../Frameworks/$name";
-}
-
 File _defaultlib() {
-  if (Platform.isMacOS) {
-    return File(_frameworksLib("retrovibed.dylib"));
-  }
-
-  return File("/app/lib/libretrovibed.so");
+  return File("libretrovibed.so");
 }
 
-String _path() {
-  if (Platform.isAndroid) {
-    return "libretrovibed.so";
-  }
-
-  if (Platform.isIOS) {
-    return 'RetrovivedBind.framework/RetrovivedBind';
-  }
-
+String _path({String name = "libretrovibed.so"}) {
   final files = () {
-    if (Platform.isMacOS) {
-      return [
-        File(_frameworksLib("retrovibed.dylib")),
-        File("build/nativelib/retrovibed.dylib"),
-      ];
-    }
-
-    final ldlibs = env.string(['LD_LIBRARY_PATH', 'APPDIR_LIBRARY_PATH'], fallback: '');
-
-    return [
-      ...ldlibs.split(":").map((path) => File("${path}/libretrovibed.so")),
-      File("build/nativelib/libretrovibed.so"),
-    ];
+    final ldlibs = env.string([
+      'LD_LIBRARY_PATH',
+      'APPDIR_LIBRARY_PATH',
+      'RETROVIBED_SHARED_NATIVE_LIBS_DIRECTORY',
+    ], fallback: '');
+    return ldlibs.split(":").map((path) => File("${path}/${name}"));
   }();
 
   final found = files.firstWhere((v) {
@@ -61,6 +37,18 @@ String _path() {
 }
 
 DynamicLibrary _loadLibrary() {
+  if (Platform.isAndroid || Platform.isLinux) {
+    return DynamicLibrary.open(_path());
+  }
+
+  if (Platform.isMacOS) {
+    return DynamicLibrary.open(_path(name: 'libretrovibed.dylib'));
+  }
+
+  if (Platform.isIOS) {
+    return DynamicLibrary.process();
+  }
+
   return DynamicLibrary.open(_path());
 }
 
@@ -70,8 +58,8 @@ String build_version() {
   return _convertstring(bridge.build_version());
 }
 
-String oauth2_bearer() {
-  return _convertstring(bridge.oauth2_bearer());
+String deeppool_oauth2_bearer() {
+  return _convertstring(bridge.deeppool_oauth2_bearer());
 }
 
 String bearer_token() {

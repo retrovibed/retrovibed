@@ -24,8 +24,8 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/internal/oauth2x"
 	"github.com/retrovibed/retrovibed/retroapi/internal/sshx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/stringsx"
-	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
+	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/oauth2"
 )
@@ -130,7 +130,7 @@ func SSHSigner() (ssh.Signer, error) {
 	return sshx.AutoCached(sshx.NewKeyGen(), env.PrivateKeyPath(userx.DefaultRelRoot()))
 }
 
-func oauth2Bearer(ctx context.Context, signer ssh.Signer, c *http.Client, cfg oauth2.Config, email, displayname string) (*oauth2.Token, error) {
+func oauth2Bearer(ctx context.Context, signer ssh.Signer, c *http.Client, cfg oauth2.Config, email, displayname string) (token *oauth2.Token, err error) {
 	type exstate struct {
 		Entropy   string `json:"uid"`
 		PublicKey []byte `json:"pkey"`
@@ -138,6 +138,7 @@ func oauth2Bearer(ctx context.Context, signer ssh.Signer, c *http.Client, cfg oa
 		Display   string `json:"display"`
 	}
 
+	// c = httpx.DebugClient(c)
 	c = httpx.BindRetryTransport(c, http.StatusBadGateway, http.StatusTooManyRequests)
 
 	state, err := jwtx.EncodeJSON(exstate{
@@ -165,7 +166,7 @@ func oauth2Bearer(ctx context.Context, signer ssh.Signer, c *http.Client, cfg oa
 	}
 
 	ctx = context.WithValue(ctx, oauth2.HTTPClient, c)
-	token, err := cfg.Exchange(ctx, exchanged.Code, oauth2.AccessTypeOffline)
+	token, err = cfg.Exchange(ctx, exchanged.Code, oauth2.AccessTypeOffline)
 
 	return token, errorsx.Wrap(err, "token signature failure")
 }

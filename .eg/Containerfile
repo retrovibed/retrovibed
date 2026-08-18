@@ -43,7 +43,7 @@ RUN sudo -H -S -u egd -g egd flutter --disable-analytics
 RUN sudo -H -S -u egd -g egd dart pub global activate protoc_plugin
 
 # install appimage-builder for AppImage packaging
-RUN apt-get update && apt-get -y install pipx python3-dev python3-venv python3-apt squashfs-tools patchelf desktop-file-utils libgdk-pixbuf-xlib-2.0-dev fakeroot gnupg2
+RUN apt-get update && apt-get -y install pipx python3-dev python3-venv python3-apt squashfs-tools patchelf desktop-file-utils libgdk-pixbuf-xlib-2.0-dev fakeroot gnupg2 zsync
 # Use pipx to install appimage-builder globally (available in /usr/local/bin)
 RUN PIPX_HOME=/opt/pipx PIPX_BIN_DIR=/usr/local/bin pipx install git+https://github.com/AppImageCrafters/appimage-builder.git
 
@@ -52,7 +52,6 @@ RUN curl -sSfL https://github.com/AppImage/appimagetool/releases/download/contin
 
 # noop apt-key (deprecated in newer Ubuntu, causes errors in some tools, specifically appimage-builder which doesnt use it but checks for it)
 RUN printf '#!/bin/sh\nexit 0\n' > /usr/local/bin/apt-key && chmod +x /usr/local/bin/apt-key
-RUN apt-get update && apt-get -y install zsync
 
 RUN apt-get install -y rustup
 RUN sudo -u egd rustup default stable

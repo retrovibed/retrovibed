@@ -53,8 +53,8 @@ func build_version() *C.char {
 	return C.CString(version)
 }
 
-//export oauth2_bearer
-func oauth2_bearer() *C.char {
+//export deeppool_oauth2_bearer
+func deeppool_oauth2_bearer() *C.char {
 	var (
 		err   error
 		token *oauth2.Token

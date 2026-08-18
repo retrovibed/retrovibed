@@ -208,9 +208,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	if !authz.LocalOnly {
 		if c, err := authn.AutoJWTClient(gctx.Context, id); err == nil {
 			deepjwt = c
-			if _, err := authn.Register(gctx.Context, deepjwt); err != nil {
-				errorsx.Log(errorsx.Wrap(err, "unable to register with archival service"))
-			}
+			go AutoRegistration(gctx.Context, deepjwt)
 		} else {
 			// we allow creation to fail the application should function even without the api.
 			// just warn that the api is unavailable.
