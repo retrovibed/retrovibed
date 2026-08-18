@@ -30,8 +30,8 @@ func main() {
 			debian.Release,
 		),
 		shell.Op(
-			// shell.New("gh workflow run release.ios.yml --ref main").Attempts(3),
-			// shell.New("gh workflow run release.macosx.yml --ref main").Attempts(3),
+			shell.New("gh workflow run release.ios.yml --ref main").Attempts(3),
+			shell.New("gh workflow run release.macosx.yml --ref main").Attempts(3),
 			shell.Env().New("eg login --seed=\"${RETROVIBED_EG_LOGIN_SEED}\""),
 			shell.Env().New("eg compute upload --arch=amd64 release/linux").Attempts(3),
 			shell.Env().New("eg compute upload --arch=arm64 --cores=3 --memory=2g release/linux").Attempts(3),
