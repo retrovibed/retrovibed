@@ -2,10 +2,10 @@ package cmdglobalmain
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
 	"net"
+	"net/http"
 	"os"
 	"reflect"
 	"runtime"
@@ -15,6 +15,8 @@ import (
 	"time"
 
 	"github.com/alecthomas/kong"
+	"github.com/egdaemon/gdx"
+	"github.com/egdaemon/gdx/konggdx"
 	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdcommunity"
@@ -28,9 +30,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/daemons"
 	"github.com/retrovibed/retrovibed/shallows/internal/debugx"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
-	"github.com/retrovibed/retrovibed/shallows/internal/envx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/willabides/kongplete"
@@ -65,6 +65,7 @@ func Main(args ...string) {
 		Community cmdcommunity.Commands  `cmd:"" help:"community commands"`
 		Ddisc     cmdddisc.Commands      `cmd:"" help:"media discovery commands, used to manage discovery of media"`
 		ETL       cmdetl.Commands        `cmd:"" help:"etl commands for processing jsonl through llm endpoints"`
+		Gdx       konggdx.Commands       `cmd:"" help:"pull profiles/traces from a running eg debug socket"`
 		Daemon    daemons.Command        `cmd:"" help:"run the backend daemon" default:"true"`
 		Console   cmdopts.CmdExec        `cmd:"" hidden:"" help:"open the retrovibe console (ui)"`
 	}
@@ -84,49 +85,30 @@ func Main(args ...string) {
 	log.Println("wireguard preallocated buffers per pool", device.PreallocatedBuffersPerPool)
 	debugx.Println("jwt checksum", md5x.FormatUUID(md5x.Digest(env.JWTSecret())))
 
-	go debugx.DumpOnSignal(shellCli.Context, syscall.SIGUSR2)
 	go cmdopts.Cleanup(shellCli.Context, shellCli.Shutdown, shellCli.Cleanup, os.Kill, os.Interrupt, syscall.SIGTERM)(func() {
 		log.Println("waiting for systems to shutdown")
 	})
 
-	go debugx.OnSignal(shellCli.Context, func(ctx context.Context) error {
-		type profilecfg struct {
-			Mode     string        `json:"mode,omitempty"`
-			Duration time.Duration `json:"duration,omitempty"`
+	go func() {
+		path := userx.DefaultRuntimeDirectory("gdx.socket")
+		os.Remove(path)
+
+		l, err := net.Listen("unix", path)
+		if err != nil {
+			log.Println("unable to bind gdx debug socket", err)
+			return
 		}
+		defer l.Close()
 
-		var (
-			cfg = profilecfg{
-				Mode:     "cpu",
-				Duration: time.Minute,
-			}
-		)
+		go func() {
+			<-shellCli.Context.Done()
+			l.Close()
+		}()
 
-		path := userx.DefaultRuntimeDirectory("profile.cfg")
-		if err := json.Unmarshal(errorsx.Zero(fsx.AutoCached(path, func() ([]byte, error) { return json.Marshal(cfg) })), &cfg); err != nil {
-			log.Println("failed to load profiling configuration", err)
+		if err := http.Serve(l, gdx.NewHTTPFn(gdx.Options().FromEnv())); err != nil && shellCli.Context.Err() == nil {
+			log.Println("gdx debug server stopped", err)
 		}
-
-		dctx, done := context.WithTimeout(ctx, cfg.Duration)
-		defer done()
-		log.Println("PROFILING INITIATED", cfg.Mode, cfg.Duration)
-		defer log.Println("PROFILING COMPLETED", cfg.Mode, cfg.Duration)
-
-		switch cfg.Mode {
-		case "trace":
-			return debugx.Trace(envx.String(os.TempDir(), userx.DefaultRuntimeDirectory()))(dctx)
-		case "heap":
-			return debugx.Heap(envx.String(os.TempDir(), userx.DefaultRuntimeDirectory()))(dctx)
-		case "mem":
-			return debugx.Memory(envx.String(os.TempDir(), userx.DefaultRuntimeDirectory()))(dctx)
-		case "alloc":
-			return debugx.Allocs(envx.String(os.TempDir(), userx.DefaultRuntimeDirectory()))(dctx)
-		case "block":
-			return debugx.Block(envx.String(os.TempDir(), userx.DefaultRuntimeDirectory()))(dctx)
-		default:
-			return debugx.CPU(envx.String(os.TempDir(), userx.DefaultRuntimeDirectory()))(dctx)
-		}
-	}, syscall.SIGUSR1)
+	}()
 
 	tsstarted := time.Now().UTC()
 	parser := kong.Must(
@@ -165,6 +147,7 @@ func Main(args ...string) {
 			"env_auto_locate_media":             env.AutoIdentifyMedia,
 			"env_auto_archive":                  env.AutoArchive,
 			"env_auto_reclaim":                  env.AutoReclaim,
+			"vars_gdx_socket":                   userx.DefaultRuntimeDirectory(gdx.DefaultSocket),
 		},
 		kong.UsageOnError(),
 		kong.Bind(
@@ -173,6 +156,7 @@ func Main(args ...string) {
 			&shellCli.PeerID,
 			&shellCli.SSHID,
 			&shellCli.Endpoint,
+			shellCli.Context,
 		),
 		kong.BindTo(cmdopts.DeeppoolClientDefault{SSHID: &shellCli.SSHID}, (*cmdopts.DeeppoolClient)(nil)),
 		kong.TypeMapper(reflect.TypeOf(&net.IP{}), kong.MapperFunc(cmdopts.ParseIP)),
