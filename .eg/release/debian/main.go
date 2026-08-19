@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"eg/compute/debian"
+	"eg/compute/maintainer"
 	"log"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
@@ -14,10 +15,20 @@ func main() {
 	ctx, done := context.WithTimeout(context.Background(), egenv.TTL())
 	defer done()
 
+	deb := eg.Container(maintainer.Container)
 	err := eg.Perform(
 		ctx,
 		eggit.AutoClone,
-		debian.Release,
+		eg.Parallel(
+			eg.Build(deb.BuildFromFile(".eg/Containerfile")),
+			debian.Prepare,
+		),
+		eg.Module(
+			ctx,
+			deb,
+			debian.Build,
+			debian.Upload,
+		),
 	)
 
 	if err != nil {

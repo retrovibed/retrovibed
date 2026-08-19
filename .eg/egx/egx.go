@@ -2,6 +2,7 @@ package egx
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
@@ -35,6 +36,7 @@ func RetryUntilSuccess(delay time.Duration, op eg.OpFn) eg.OpFn {
 			case <-ctx.Done():
 				return ctx.Err()
 			case <-time.After(delay):
+				log.Println("retrying")
 			}
 		}
 	}

@@ -20,7 +20,7 @@ import (
 var debskel embed.FS
 
 func cachedir() string {
-	return egenv.CacheDirectory(".dist", "retrovibed")
+	return egenv.WorkspaceDirectory(".git", "retrovibed")
 }
 
 var (
@@ -54,7 +54,7 @@ func Prepare(ctx context.Context, o eg.Op) error {
 			sruntime.Newf("echo '-----------------------------------------'"),
 			sruntime.Newf("rm -rf %s", debdir),
 			sruntime.Newf("mkdir -p %s", debdir),
-			sruntime.Newf("git clone --depth 1 file://${PWD}/ %s", debdir),
+			sruntime.Newf("git worktree add %s HEAD", debdir),
 		),
 		egdebuild.Prepare(Runner(), errorsx.Must(fs.Sub(debskel, ".debskel"))),
 	)(ctx, o)
@@ -82,20 +82,13 @@ func Upload(ctx context.Context, o eg.Op) error {
 	return egdebuild.UploadDPut(gcfg, errorsx.Must(fs.Sub(debskel, ".debskel")))(ctx, o)
 }
 
-// Release builds and uploads the debian package.
-func Release(ctx context.Context, o eg.Op) error {
-	deb := eg.Container(maintainer.Container)
-	return eg.Perform(
-		ctx,
-		eg.Parallel(
-			eg.Build(deb.BuildFromFile(".eg/Containerfile")),
-			Prepare,
-		),
-		eg.Module(
-			ctx,
-			deb,
-			Build,
-			Upload,
-		),
-	)
+func Copy(cachedir string) eg.OpFn {
+	return func(ctx context.Context, o eg.Op) error {
+		debroot := egenv.EphemeralDirectory("deb.retrovibed")
+		return shell.Op(
+			shell.Newf("tree -L 2 %s", debroot),
+			shell.Newf("tree -L 1 %s", cachedir),
+			shell.Newf(`rsync -av --include 'retrovibed_*.deb' --exclude '*' --mkpath %s/ %s/`, debroot, cachedir).Debug(),
+		)(ctx, o)
+	}
 }
