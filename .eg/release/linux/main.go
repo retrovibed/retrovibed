@@ -3,12 +3,14 @@ package main
 import (
 	"context"
 	"eg/compute/console"
+	"eg/compute/egarchx"
 	"eg/compute/flathub"
 	"eg/compute/maintainer"
 	"eg/compute/release"
 	"eg/compute/shallows"
 	"eg/compute/tarballs"
 	"log"
+	"runtime"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
@@ -24,6 +26,9 @@ func main() {
 	deb := eg.Container(maintainer.Container)
 	err := eg.Perform(
 		ctx,
+		shell.Op(
+			shell.Newf("echo '%s -> %s'", runtime.GOARCH, egarchx.Dart()),
+		),
 		eggit.AutoClone,
 		eg.Build(deb.BuildFromFile(".eg/Containerfile")),
 		eg.Module(

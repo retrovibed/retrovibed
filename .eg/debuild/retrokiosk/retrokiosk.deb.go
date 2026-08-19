@@ -44,6 +44,11 @@ func init() {
 
 func Prepare(ctx context.Context, o eg.Op) error {
 	return eg.Parallel(
+		shell.Op(
+			shell.Newf("echo '-----------------------------------------'"),
+			shell.Newf("eg gpg keyring --name=\"${EG_GPG_KEYRING_NAME}\" --email=\"${EG_GPG_KEYRING_EMAIL}\" --seed=\"${EG_GPG_KEYRING_SEED}\""),
+			shell.Newf("echo '-----------------------------------------'"),
+		),
 		egdebuild.Prepare(Runner(), nil),
 	)(ctx, o)
 }
