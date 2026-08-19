@@ -2,7 +2,6 @@ package console
 
 import (
 	"context"
-	"eg/compute/egarchx"
 	"eg/compute/tarballs"
 	"fmt"
 	"path/filepath"
@@ -190,7 +189,7 @@ func GenerateProtocol(ctx context.Context, _ eg.Op) error {
 func Install(b *tarballs.Build) eg.OpFn {
 	return func(ctx context.Context, o eg.Op) error {
 		dstdir := filepath.Join(egtarball.Path(tarballs.Retrovibed(b)), "usr", "lib", "retrovibed")
-		bundledir := egenv.WorkingDirectory("console", "build", "linux", egarchx.DartFrom(b.Arch), "release", "bundle")
+		bundledir := egenv.WorkingDirectory("console", "build", "linux", egarch.DartFrom(b.Arch), "release", "bundle")
 		runtime := shell.Runtime().
 			Environ("FLUTTER_RELEASE_BUNDLE", bundledir).
 			Environ("OUTPUTDIR", dstdir)

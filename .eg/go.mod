@@ -1,9 +1,9 @@
 module eg/compute
 
-go 1.25.8
+go 1.26.3
 
 require (
-	github.com/egdaemon/eg v0.0.0-20260818174756-cff6e31b1397
+	github.com/egdaemon/eg v0.0.0-20260819183316-ba7bb240df6d
 	github.com/egdaemon/wasinet/wasinet v0.0.0-20260714114633-11ce19bcbeeb
 	golang.org/x/net v0.57.0
 	google.golang.org/api v0.280.0
@@ -41,13 +41,14 @@ require (
 	github.com/googleapis/enterprise-certificate-proxy v0.3.15 // indirect
 	github.com/googleapis/gax-go/v2 v2.22.0 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
-	github.com/stretchr/testify v1.12.0 // indirect
+	github.com/stretchr/testify v1.12.1 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.68.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.69.0 // indirect
 	go.opentelemetry.io/otel v1.44.0 // indirect
 	go.opentelemetry.io/otel/metric v1.44.0 // indirect
 	go.opentelemetry.io/otel/trace v1.44.0 // indirect
+	go.yaml.in/yaml/v3 v3.0.5 // indirect
 	golang.org/x/crypto v0.54.0 // indirect
 	golang.org/x/oauth2 v0.36.0 // indirect
 	golang.org/x/sync v0.22.0 // indirect

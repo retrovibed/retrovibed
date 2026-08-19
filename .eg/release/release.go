@@ -2,7 +2,6 @@ package release
 
 import (
 	"context"
-	"eg/compute/egarchx"
 	"eg/compute/maintainer"
 	"eg/compute/tarballs"
 	"log"
@@ -13,6 +12,7 @@ import (
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
 	"github.com/egdaemon/eg/runtime/wasi/egunsafe/ffiegcontainer"
 	"github.com/egdaemon/eg/runtime/wasi/shell"
+	"github.com/egdaemon/eg/runtime/x/wasi/egarch"
 	"github.com/egdaemon/eg/runtime/x/wasi/egdmg"
 	"github.com/egdaemon/eg/runtime/x/wasi/eggithub"
 	"github.com/egdaemon/eg/runtime/x/wasi/egtarball"
@@ -49,7 +49,7 @@ func AppImageBuild(b *tarballs.Build) eg.OpFn {
 			Environ("APPDIR", egtarball.Path(tarballs.Retrovibed(b))).
 			Environ("VERSION", tarballs.Version()).
 			Environ("APT_ARCH", b.Arch).
-			Environ("APPIMAGE_ARCH", egarchx.POSIXFrom(b.Arch)).
+			Environ("APPIMAGE_ARCH", egarch.POSIXFrom(b.Arch)).
 			Environ("APPIMAGE_FILE_NAME", appimage).
 			Environ("GPG_ID", maintainer.GPGID),
 		shell.Newf("cp %s* %s", egenv.WorkspaceDirectory(appimage), egenv.CacheDirectory()),
