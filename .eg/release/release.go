@@ -2,6 +2,7 @@ package release
 
 import (
 	"context"
+	"eg/compute/egarchx"
 	"eg/compute/maintainer"
 	"eg/compute/tarballs"
 	"log"
@@ -48,7 +49,7 @@ func AppImageBuild(b *tarballs.Build) eg.OpFn {
 			Environ("APPDIR", egtarball.Path(tarballs.Retrovibed(b))).
 			Environ("VERSION", tarballs.Version()).
 			Environ("APT_ARCH", b.Arch).
-			Environ("APPIMAGE_ARCH", tarballs.ArchGoToMachine(b.Arch)).
+			Environ("APPIMAGE_ARCH", egarchx.POSIXFrom(b.Arch)).
 			Environ("APPIMAGE_FILE_NAME", appimage).
 			Environ("GPG_ID", maintainer.GPGID),
 		shell.Newf("cp %s* %s", egenv.WorkspaceDirectory(appimage), egenv.CacheDirectory()),

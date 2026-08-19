@@ -174,32 +174,3 @@ func Linting(ctx context.Context, _ eg.Op) error {
 		gruntime.New("golangci-lint run ./..."),
 	)
 }
-
-// func FlatpakManifest(ctx context.Context, o eg.Op) error {
-// 	b := egflatpak.New(
-// 		"space.retrovibe.Daemon", "retrovibed",
-// 		egflatpak.Option().SDK("org.gnome.Sdk", "47").Runtime("org.gnome.Platform", "47").
-// 			Modules(
-// 				flatpakmods.Libduckdb(),
-// 				egflatpak.NewModule("retrovibed", "simple", egflatpak.ModuleOptions().Commands(
-// 					"cp -r . /app/bin",
-// 				).Sources(
-// 					egflatpak.SourceTarball(
-// 						eggithub.DownloadURL(tarballs.Retrovibed()), egtarball.SHA256(tarballs.Retrovibed()),
-// 						egflatpak.SourceOptions().Destination("retrovibed.tar.xz")...,
-// 					),
-// 				)...),
-// 			).
-// 			AllowWayland().
-// 			AllowDRI().
-// 			AllowNetwork().
-// 			AllowDownload().
-// 			AllowMusic().
-// 			AllowVideos().Allow(
-// 			"--filesystem=~/Downloads:ro",  // bug in flatpak doesn't properly grant access to xdg-download
-// 			"--filesystem=~/Videos:create", // bug in flatpak doesn't properly grant full access to videos directory
-// 			"--filesystem=~/Music:create",  // bug in flatpak doesn't properly grant full access to music directory
-// 		)...)
-
-// 	return egflatpak.ManifestOp(egenv.CacheDirectory("flatpak.daemon.yml"), b)(ctx, o)
-// }

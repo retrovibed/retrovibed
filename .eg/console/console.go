@@ -2,9 +2,9 @@ package console
 
 import (
 	"context"
+	"eg/compute/egarchx"
 	"eg/compute/tarballs"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -12,7 +12,6 @@ import (
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
 	"github.com/egdaemon/eg/runtime/wasi/shell"
-	"github.com/egdaemon/eg/runtime/x/wasi/egfs"
 	"github.com/egdaemon/eg/runtime/x/wasi/eggolang"
 	"github.com/egdaemon/eg/runtime/x/wasi/egtarball"
 )
@@ -51,16 +50,16 @@ func GenerateBinding(ctx context.Context, _ eg.Op) error {
 	)
 }
 
-func CompileBinding(b *tarballs.Build) eg.OpFn {
-	return func(ctx context.Context, o eg.Op) error {
-		runtime := flutterRuntimev2(shell.Runtime())
-		return shell.Run(
-			ctx,
-			runtime.New("go -C retrovibedbind build -buildmode=c-shared -buildvcs=true --tags duckdb_use_lib,retrovibed,neural -o ${RETROVIBED_SHARED_NATIVE_LIBS_DIRECTORY}/libretrovibed.so .").
-				Timeout(egenv.TTL()).
-				Environ("CGO_LDFLAGS", "-L"+egenv.CacheDirectory("neurals")),
-		)
-	}
+func CompileBinding(ctx context.Context, o eg.Op) error {
+	runtime := flutterRuntimev2(shell.Runtime())
+
+	return shell.Run(
+		ctx,
+		runtime.New("mkdir -p ${RETROVIBED_SHARED_NATIVE_LIBS_DIRECTORY}"),
+		runtime.New("go -C retrovibedbind build -buildmode=c-shared -buildvcs=true --tags duckdb_use_lib,retrovibed,neural -o ${RETROVIBED_SHARED_NATIVE_LIBS_DIRECTORY}/libretrovibed.so .").
+			Timeout(egenv.TTL()).
+			Environ("CGO_LDFLAGS", "-L"+egenv.CacheDirectory("neurals")),
+	)
 }
 
 func GenerateDevBinding(runtime shell.Command, outdir string, staticdirs ...string) eg.OpFn {
@@ -189,26 +188,20 @@ func GenerateProtocol(ctx context.Context, _ eg.Op) error {
 }
 
 func Install(b *tarballs.Build) eg.OpFn {
-	runtime := shell.Runtime()
-	dstdir := filepath.Join(egtarball.Path(tarballs.Retrovibed(b)), "usr", "lib", "retrovibed")
-	builddir := egenv.WorkingDirectory("console", "build")
-	linuxdir := filepath.Join(builddir, "linux")
-	libdir := filepath.Join(builddir, "nativelib")
-	return eg.Sequential(
-		CompileBinding(b),
-		func(ctx context.Context, op eg.Op) error {
-			// resolved at execution time since the bundle directory only
-			// exists once console.BuildLinux has run.
-			bundledir := filepath.Join(linuxdir, egfs.FindFirst(os.DirFS(linuxdir), "bundle"))
-			return shell.Run(
-				ctx,
-				runtime.Newf("mkdir -p %s", dstdir),
-				runtime.Newf("ls -lha  %s/retrovibed", bundledir).Lenient(true),
-				runtime.Newf("cp -R %s/* %s", bundledir, dstdir),
-				runtime.Newf("cp -R %s/* %s/lib", libdir, dstdir),
-			)
-		},
-	)
+	return func(ctx context.Context, o eg.Op) error {
+		dstdir := filepath.Join(egtarball.Path(tarballs.Retrovibed(b)), "usr", "lib", "retrovibed")
+		bundledir := egenv.WorkingDirectory("console", "build", "linux", egarchx.DartFrom(b.Arch), "release", "bundle")
+		runtime := shell.Runtime().
+			Environ("FLUTTER_RELEASE_BUNDLE", bundledir).
+			Environ("OUTPUTDIR", dstdir)
+
+		return eg.Sequential(
+			shell.Op(
+				runtime.New("rsync --mkpath -av ${FLUTTER_RELEASE_BUNDLE}/* ${OUTPUTDIR}/"),
+				runtime.New("tree ${OUTPUTDIR}"),
+			),
+		)(ctx, o)
+	}
 }
 
 func runDev(cmd string, rt shell.Command, envopts ...func(shell.Command) shell.Command) eg.OpFn {

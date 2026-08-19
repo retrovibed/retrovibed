@@ -33,7 +33,8 @@ func main() {
 				shallows.NeuralsBuild(),
 				eg.Parallel(
 					eg.Sequential(
-						console.Generate,
+						console.GenerateFlutter,
+						console.CompileBinding,
 						console.BuildLinux,
 					),
 					shallows.Compile(),
@@ -89,8 +90,10 @@ func build() eg.OpFn {
 		),
 		eg.Sequential(
 			release.Tarball(b),
-			release.AppImageBuild(b),
+			eg.Parallel(
+				release.AppImageBuild(b),
+				console.FlatpakManifest(b),
+			),
 		),
-		console.FlatpakManifest(b),
 	)
 }
