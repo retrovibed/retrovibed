@@ -63,14 +63,24 @@ func Build(ctx context.Context, o eg.Op) error {
 	runtime := shell.Runtime().Timeout(egenv.TTL())
 
 	return eg.Sequential(
+		shell.Op(
+			shell.New("tree -L 2 ~/.gnupg"),
+		),
 		eg.Parallel(
-			egdebuild.Build(gcfg, egdebuild.Option.Distro(egdebuild.UbuntuLatestCodename)),
 			egdebuild.Build(
 				gcfg,
 				egdebuild.Option.Distro(egdebuild.UbuntuLatestCodename),
-				egdebuild.Option.BuildBinary(20*time.Minute),
-				egdebuild.Option.NoLint(),
+				egdebuild.Option.Environ("GNUPGHOME=/home/egd/.gnupg"),
+				// egdebuild.Option.BuildCommand(func(cfg *egdebuild.Config, runtime shell.Command) shell.Command {
+				// 	return runtime.Newf("debuild --no-lintian -S -k%s", cfg.SignatureKeyID)
+				// }),
 			),
+			// egdebuild.Build(
+			// 	gcfg,
+			// 	egdebuild.Option.Distro(egdebuild.UbuntuLatestCodename),
+			// 	egdebuild.Option.BuildBinary(20*time.Minute),
+			// 	egdebuild.Option.NoLint(),
+			// ),
 		),
 		shell.Op(
 			runtime.Newf("mkdir -p %s", cachedir),
