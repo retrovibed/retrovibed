@@ -57,7 +57,7 @@ func main() {
 func tarinfo() *tarballs.Build {
 	return &tarballs.Build{
 		OS:   egenv.String("linux", "EG_COMPUTE_HOST_OS"),
-		Arch: egenv.String("amd64", "EG_COMPUTE_HOST_ARCH"),
+		Arch: egarch.Host(),
 	}
 }
 
