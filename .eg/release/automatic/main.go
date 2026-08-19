@@ -30,11 +30,8 @@ func main() {
 			debian.Release,
 		),
 		shell.Op(
-			// eg broke local remote with the local clone/worktree work to allow updating
-			// go-git. we'll need to fix that.
-			shell.Env().New("git remote remove origin && git remote add origin git@github.com:retrovibed/retrovibed.git"),
-			shell.Env().New("gh workflow run release.ios.yml -R retrovibed/retrovibed --ref main").Debug().Attempts(3),
-			shell.Env().New("gh workflow run release.macosx.yml -R retrovibed/retrovibed --ref main").Attempts(3),
+			shell.Env().New("gh workflow run release.ios.yml --ref main").Attempts(3),
+			shell.Env().New("gh workflow run release.macosx.yml --ref main").Attempts(3),
 			shell.Env().New("eg login --seed=\"${RETROVIBED_EG_LOGIN_SEED}\""),
 			shell.Env().New("eg compute upload --arch=amd64 release/linux").Attempts(3),
 			shell.Env().New("eg compute upload --arch=arm64 --cores=3 --memory=2g release/linux").Attempts(3),

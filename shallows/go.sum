@@ -210,9 +210,10 @@ github.com/ebitengine/purego v0.10.0 h1:QIw4xfpWT6GWTzaW5XEKy3HXoqrJGx1ijYHzTF0/
 github.com/ebitengine/purego v0.10.0/go.mod h1:iIjxzd6CiRiOG0UyXP+V1+jWqUXVjPKLAI0mRfJZTmQ=
 github.com/edsrzf/mmap-go v1.2.0 h1:hXLYlkbaPzt1SaQk+anYwKSRNhufIDCchSPkUD6dD84=
 github.com/edsrzf/mmap-go v1.2.0/go.mod h1:19H/e8pUPLicwkyNgOykDXkJ9F0MHE+Z52B8EIth78Q=
-github.com/egdaemon/gdx v0.0.0-20260818162210-df9073320007 h1:LwIe6IHXsV5c2teXLhb3t/8Xd/g9fH1K6ju9jI7uFOU=
-github.com/egdaemon/gdx v0.0.0-20260818162210-df9073320007/go.mod h1:zXd9WfJPRaoir/hXAwJcf6AhbNB0r3vqIFqhZdMswFg=
-github.com/egdaemon/gdx/konggdx v0.0.0-20260818142539-2af0a2bf0a1c h1:4dlnNwqv7cSm3UzgZAl4/yhz9O42RUXHZ/R4B9azLXY=
+github.com/egdaemon/gdx v0.0.0-20260819130248-7185bb23536f h1:0eF/HBBo+jyTTJkXcXDFlcwwfukxu5UyBqfQ7owi5GI=
+github.com/egdaemon/gdx v0.0.0-20260819130248-7185bb23536f/go.mod h1:zXd9WfJPRaoir/hXAwJcf6AhbNB0r3vqIFqhZdMswFg=
+github.com/egdaemon/gdx/konggdx v0.0.0-20260819130248-7185bb23536f h1:kLLhyqUC/q/Wh8Gc7cG10ERgGSRt/GTWhypWny8VzBc=
+github.com/egdaemon/gdx/konggdx v0.0.0-20260819130248-7185bb23536f/go.mod h1:sxFiDGA2e8ATW1MfyDsiVv21OwmQLMjuA5XC8iwDp3k=
 github.com/egdaemon/wasinet/wasinet v0.0.0-20260714114633-11ce19bcbeeb h1:ImKjoO3D0C7bEY+iopzwK16Be+2TF8O85XpdeKEpS94=
 github.com/egdaemon/wasinet/wasinet v0.0.0-20260714114633-11ce19bcbeeb/go.mod h1:cjnQxCq4L+ZxasldxabXzQojFttfeniF1CNx95Qu/3c=
 github.com/egdaemon/wasinet/wazeronet v0.0.0-20260714114633-11ce19bcbeeb h1:eVJHTf/M2vhqR5pemlWec6KXPsqeTo2qeQawHYfbtDQ=

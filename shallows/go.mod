@@ -15,8 +15,8 @@ require (
 	github.com/cyruzin/golang-tmdb v1.9.4
 	github.com/dashotv/tvdb v0.5.2
 	github.com/duckdb/duckdb-go/v2 v2.10505.0
-	github.com/egdaemon/gdx v0.0.0-20260818162210-df9073320007
-	github.com/egdaemon/gdx/konggdx v0.0.0-20260818142539-2af0a2bf0a1c
+	github.com/egdaemon/gdx v0.0.0-20260819130248-7185bb23536f
+	github.com/egdaemon/gdx/konggdx v0.0.0-20260819130248-7185bb23536f
 	github.com/egdaemon/wasinet/wasinet v0.0.0-20260714114633-11ce19bcbeeb
 	github.com/fsnotify/fsnotify v1.10.1
 	github.com/gabriel-vasile/mimetype v1.4.13

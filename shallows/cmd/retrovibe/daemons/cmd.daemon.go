@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/davecgh/go-spew/spew"
+	"github.com/egdaemon/gdx"
 	"github.com/egdaemon/wasinet/wasinet/wnetruntime"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/justinas/alice"
@@ -159,6 +160,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	gctx.Cleanup.Add(1)
 	defer gctx.Cleanup.Done()
 
+	go gdx.AutoUnixServe(gctx.Context, gdx.Options().FromEnv()...)
 	// envx.Debug(os.Environ()...)
 
 	if id, err = sshid.Signer(); err != nil {

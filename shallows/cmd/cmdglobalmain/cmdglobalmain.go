@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"net/http"
 	"os"
 	"reflect"
 	"runtime"
@@ -49,7 +48,7 @@ func Username() string {
 }
 
 func Main(args ...string) {
-	var shellCli struct {
+	var shellcli struct {
 		cmdopts.Global
 		cmdopts.TLSConfig
 		cmdopts.PeerID
@@ -75,9 +74,10 @@ func Main(args ...string) {
 		ctx *kong.Context
 	)
 
-	shellCli.Context, shellCli.Shutdown = context.WithCancel(context.Background())
-	shellCli.Cleanup = &sync.WaitGroup{}
-	shellCli.Console = cmdopts.NewCmdExec("retrovibe")
+	gdxpath := gdx.AutoSocket()
+	shellcli.Context, shellcli.Shutdown = context.WithCancel(context.Background())
+	shellcli.Cleanup = &sync.WaitGroup{}
+	shellcli.Console = cmdopts.NewCmdExec("retrovibe")
 
 	log.SetFlags(log.Lshortfile | log.LUTC | log.Ltime)
 	log.SetPrefix(fmt.Sprintf("%d ", os.Getpid()))
@@ -85,36 +85,13 @@ func Main(args ...string) {
 	log.Println("wireguard preallocated buffers per pool", device.PreallocatedBuffersPerPool)
 	debugx.Println("jwt checksum", md5x.FormatUUID(md5x.Digest(env.JWTSecret())))
 
-	go cmdopts.Cleanup(shellCli.Context, shellCli.Shutdown, shellCli.Cleanup, os.Kill, os.Interrupt, syscall.SIGTERM)(func() {
+	go cmdopts.Cleanup(shellcli.Context, shellcli.Shutdown, shellcli.Cleanup, os.Kill, os.Interrupt, syscall.SIGTERM)(func() {
 		log.Println("waiting for systems to shutdown")
 	})
 
-	go func() {
-		path := userx.DefaultRuntimeDirectory("gdx.socket")
-		os.Remove(path)
-
-		l, err := net.Listen("unix", path)
-		if err != nil {
-			log.Println("unable to bind gdx debug socket", err)
-			return
-		}
-		defer func() {
-			errorsx.Log(errorsx.Wrap(l.Close(), "gdx shutdown"))
-		}()
-
-		go func() {
-			<-shellCli.Context.Done()
-			errorsx.Log(errorsx.Wrap(l.Close(), "gdx shutdown"))
-		}()
-
-		if err := http.Serve(l, gdx.NewHTTPFn(gdx.Options().FromEnv())); err != nil && shellCli.Context.Err() == nil {
-			log.Println("gdx debug server stopped", err)
-		}
-	}()
-
 	tsstarted := time.Now().UTC()
 	parser := kong.Must(
-		&shellCli,
+		&shellcli,
 		kong.Name(userx.DefaultRelRoot()),
 		kong.Description("daemon"),
 		kong.Vars{
@@ -149,18 +126,19 @@ func Main(args ...string) {
 			"env_auto_locate_media":             env.AutoIdentifyMedia,
 			"env_auto_archive":                  env.AutoArchive,
 			"env_auto_reclaim":                  env.AutoReclaim,
-			"vars_gdx_socket":                   userx.DefaultRuntimeDirectory(gdx.DefaultSocket),
+			"vars_gdx_socket":                   gdxpath,
+			"vars_gdx_default_output":           "-",
 		},
 		kong.UsageOnError(),
 		kong.Bind(
-			&shellCli.TLSConfig,
-			&shellCli.Global,
-			&shellCli.PeerID,
-			&shellCli.SSHID,
-			&shellCli.Endpoint,
-			shellCli.Context,
+			&shellcli.TLSConfig,
+			&shellcli.Global,
+			&shellcli.PeerID,
+			&shellcli.SSHID,
+			&shellcli.Endpoint,
 		),
-		kong.BindTo(cmdopts.DeeppoolClientDefault{SSHID: &shellCli.SSHID}, (*cmdopts.DeeppoolClient)(nil)),
+		kong.BindTo(shellcli.Context, (*context.Context)(nil)),
+		kong.BindTo(cmdopts.DeeppoolClientDefault{SSHID: &shellcli.SSHID}, (*cmdopts.DeeppoolClient)(nil)),
 		kong.TypeMapper(reflect.TypeOf(&net.IP{}), kong.MapperFunc(cmdopts.ParseIP)),
 		kong.TypeMapper(reflect.TypeOf(&net.TCPAddr{}), kong.MapperFunc(cmdopts.ParseTCPAddr)),
 		kong.TypeMapper(reflect.TypeOf([]*net.TCPAddr(nil)), kong.MapperFunc(cmdopts.ParseTCPAddrArray)),
@@ -177,10 +155,10 @@ func Main(args ...string) {
 	}
 
 	if err = errorsx.LogErr(ctx.Run()); err != nil {
-		shellCli.Shutdown()
+		shellcli.Shutdown()
 	}
 
-	shellCli.Cleanup.Wait()
+	shellcli.Cleanup.Wait()
 	debugx.Println("system cleanup completed")
 	ctx.FatalIfErrorf(err)
 }

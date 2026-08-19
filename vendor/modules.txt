@@ -443,17 +443,18 @@ github.com/egdaemon/eg/runtime/x/wasi/egsha256x
 github.com/egdaemon/eg/runtime/x/wasi/egtarball
 github.com/egdaemon/eg/runtime/x/wasi/execx
 github.com/egdaemon/eg/secrets
-# github.com/egdaemon/gdx v0.0.0-20260818162210-df9073320007
+# github.com/egdaemon/gdx v0.0.0-20260819130248-7185bb23536f
 ## explicit; go 1.25.8
 github.com/egdaemon/gdx
 github.com/egdaemon/gdx/gdxapi
 github.com/egdaemon/gdx/internal/envx
 github.com/egdaemon/gdx/internal/errorsx
 github.com/egdaemon/gdx/internal/langx
-# github.com/egdaemon/gdx/konggdx v0.0.0-20260818142539-2af0a2bf0a1c
-## explicit; go 1.26.3
+# github.com/egdaemon/gdx/konggdx v0.0.0-20260819130248-7185bb23536f
+## explicit; go 1.25.8
 github.com/egdaemon/gdx/konggdx
 github.com/egdaemon/gdx/konggdx/cmdopts
+github.com/egdaemon/gdx/konggdx/userx
 # github.com/egdaemon/wasinet/wasinet v0.0.0-20260714114633-11ce19bcbeeb
 ## explicit; go 1.25.0
 github.com/egdaemon/wasinet/wasinet
