@@ -198,7 +198,6 @@ func Install(b *tarballs.Build) eg.OpFn {
 		return eg.Sequential(
 			shell.Op(
 				runtime.New("rsync --mkpath -av ${FLUTTER_RELEASE_BUNDLE}/* ${OUTPUTDIR}/"),
-				runtime.New("tree ${OUTPUTDIR}"),
 			),
 		)(ctx, o)
 	}
