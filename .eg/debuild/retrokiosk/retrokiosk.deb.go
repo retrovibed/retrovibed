@@ -40,6 +40,7 @@ func init() {
 		egdebuild.Option.Debian(errorsx.Must(fs.Sub(debskel, ".debskel"))),
 		egdebuild.Option.DependsBuild("rsync", "tree"),
 		egdebuild.Option.Depends("cage", "kbd", "libfuse2", "retrozsync", "ssh"),
+		egdebuild.Option.Environ("GNUPGHOME=/home/egd/.gnupg"),
 	)
 }
 
@@ -60,22 +61,22 @@ func Build(ctx context.Context, o eg.Op) error {
 		Timeout(egenv.TTL())
 
 	return eg.Sequential(
-		eggpgx.Seed(eggpgx.Options()...),
-		eggpgx.Debug(eggpgx.Options()...),
+		// override eg compute local's setting of the home directory.
+		// ideally we should default to this except when performing local
+		// compute workloads.
+		eggpgx.Seed(eggpgx.Options().Home("/home/egd/.gnupg")...),
 		eg.Parallel(
 			egdebuild.Build(
 				gcfg,
 				egdebuild.Option.Distro(egdebuild.UbuntuLatestCodename),
-				egdebuild.Option.Environ("GNUPGHOME=/home/egd/.gnupg"),
 				egdebuild.Option.NoLint(),
-				egdebuild.Option.UnsafePrivileged(false),
 			),
-			// egdebuild.Build(
-			// 	gcfg,
-			// 	egdebuild.Option.Distro(egdebuild.UbuntuLatestCodename),
-			// 	egdebuild.Option.BuildBinary(20*time.Minute),
-			// 	egdebuild.Option.NoLint(),
-			// ),
+			egdebuild.Build(
+				gcfg,
+				egdebuild.Option.Distro(egdebuild.UbuntuLatestCodename),
+				egdebuild.Option.BuildBinary(20*time.Minute),
+				egdebuild.Option.NoLint(),
+			),
 		),
 		shell.Op(
 			runtime.Newf("mkdir -p %s", cachedir),
@@ -85,7 +86,11 @@ func Build(ctx context.Context, o eg.Op) error {
 }
 
 func Upload(ctx context.Context, o eg.Op) error {
-	return egdebuild.UploadDPut(gcfg, errorsx.Must(fs.Sub(debskel, ".debskel")), egdebuild.Option.Timeout(20*time.Minute))(ctx, o)
+	return egdebuild.UploadDPut(
+		gcfg,
+		errorsx.Must(fs.Sub(debskel, ".debskel")),
+		egdebuild.Option.Timeout(20*time.Minute),
+	)(ctx, o)
 }
 
 // Verify installs the .deb produced by Build (staged by egdebuild under
