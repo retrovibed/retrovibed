@@ -40,7 +40,7 @@ require (
 	github.com/pressly/goose/v3 v3.27.1
 	github.com/retrovibed/retrovibed/retroapi v0.0.0-20260804202116-1a4f850b87e4
 	github.com/shirou/gopsutil/v4 v4.26.5
-	github.com/stretchr/testify v1.12.0
+	github.com/stretchr/testify v1.12.1
 	github.com/things-go/go-socks5 v0.1.1
 	github.com/willabides/kongplete v0.4.0
 	golang.org/x/crypto v0.54.0
@@ -166,6 +166,7 @@ require (
 	go.opentelemetry.io/otel/metric v1.44.0 // indirect
 	go.opentelemetry.io/otel/trace v1.44.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
+	go.yaml.in/yaml/v3 v3.0.5 // indirect
 	golang.org/x/mod v0.38.0 // indirect
 	golang.org/x/sync v0.22.0 // indirect
 	golang.org/x/telemetry v0.0.0-20260708182218-49f421fb7959 // indirect

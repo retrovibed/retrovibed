@@ -387,8 +387,8 @@ github.com/ebitengine/purego/internal/xreflect
 # github.com/edsrzf/mmap-go v1.2.0
 ## explicit; go 1.17
 github.com/edsrzf/mmap-go
-# github.com/egdaemon/eg v0.0.0-20260818174756-cff6e31b1397
-## explicit; go 1.25.8
+# github.com/egdaemon/eg v0.0.0-20260819183316-ba7bb240df6d
+## explicit; go 1.26.3
 github.com/egdaemon/eg
 github.com/egdaemon/eg/backoff
 github.com/egdaemon/eg/internal/bytesx
@@ -429,6 +429,7 @@ github.com/egdaemon/eg/runtime/wasi/egunsafe/ffigit
 github.com/egdaemon/eg/runtime/wasi/egunsafe/ffigraph
 github.com/egdaemon/eg/runtime/wasi/env
 github.com/egdaemon/eg/runtime/wasi/shell
+github.com/egdaemon/eg/runtime/x/wasi/egarch
 github.com/egdaemon/eg/runtime/x/wasi/egbug
 github.com/egdaemon/eg/runtime/x/wasi/egccache
 github.com/egdaemon/eg/runtime/x/wasi/egdebuild
@@ -894,7 +895,7 @@ github.com/spf13/cobra
 # github.com/spf13/pflag v1.0.10
 ## explicit; go 1.12
 github.com/spf13/pflag
-# github.com/stretchr/testify v1.12.0
+# github.com/stretchr/testify v1.12.1
 ## explicit; go 1.17
 github.com/stretchr/testify/assert
 github.com/stretchr/testify/assert/yaml
@@ -1006,6 +1007,9 @@ go.opentelemetry.io/otel/trace/noop
 # go.uber.org/multierr v1.11.0
 ## explicit; go 1.19
 go.uber.org/multierr
+# go.yaml.in/yaml/v3 v3.0.5
+## explicit; go 1.16
+go.yaml.in/yaml/v3
 # golang.org/x/crypto v0.54.0
 ## explicit; go 1.25.0
 golang.org/x/crypto/argon2
