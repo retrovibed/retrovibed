@@ -8,6 +8,7 @@ import (
 	"io/fs"
 	"time"
 
+	"eg/compute/eggpgx"
 	"eg/compute/errorsx"
 	"eg/compute/maintainer"
 
@@ -44,11 +45,6 @@ func init() {
 
 func Prepare(ctx context.Context, o eg.Op) error {
 	return eg.Parallel(
-		shell.Op(
-			shell.Newf("echo '-----------------------------------------'"),
-			shell.Newf("eg gpg keyring --name=\"${EG_GPG_KEYRING_NAME}\" --email=\"${EG_GPG_KEYRING_EMAIL}\" --seed=\"${EG_GPG_KEYRING_SEED}\""),
-			shell.Newf("echo '-----------------------------------------'"),
-		),
 		egdebuild.Prepare(Runner(), nil),
 	)(ctx, o)
 }
@@ -60,20 +56,19 @@ func Runner() eg.ContainerRunner {
 func Build(ctx context.Context, o eg.Op) error {
 	debroot := egenv.EphemeralDirectory("deb.retrokiosk")
 	cachedir := egenv.CacheDirectory(".dist")
-	runtime := shell.Runtime().Timeout(egenv.TTL())
+	runtime := shell.Runtime().
+		Timeout(egenv.TTL())
 
 	return eg.Sequential(
-		shell.Op(
-			shell.New("tree -L 2 ~/.gnupg"),
-		),
+		eggpgx.Seed(eggpgx.Options()...),
+		eggpgx.Debug(eggpgx.Options()...),
 		eg.Parallel(
 			egdebuild.Build(
 				gcfg,
 				egdebuild.Option.Distro(egdebuild.UbuntuLatestCodename),
 				egdebuild.Option.Environ("GNUPGHOME=/home/egd/.gnupg"),
-				// egdebuild.Option.BuildCommand(func(cfg *egdebuild.Config, runtime shell.Command) shell.Command {
-				// 	return runtime.Newf("debuild --no-lintian -S -k%s", cfg.SignatureKeyID)
-				// }),
+				egdebuild.Option.NoLint(),
+				egdebuild.Option.UnsafePrivileged(false),
 			),
 			// egdebuild.Build(
 			// 	gcfg,
