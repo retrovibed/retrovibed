@@ -14,6 +14,7 @@ import (
 // cache locations outside the source tree, rooted in the neurals source dir.
 func runtime() shell.Command {
 	return shell.Runtime().
+		Debug().
 		Directory(egenv.WorkingDirectory("neurals")).
 		Environ("CARGO_TARGET_DIR", egenv.CacheDirectory("neurals", "target"))
 }

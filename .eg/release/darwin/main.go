@@ -44,15 +44,15 @@ func main() {
 	err := eg.Perform(
 		ctx,
 		eg.Sequential(
-			eg.Parallel(
-				duckdb.MaybeBuild(
-					egenv.CacheDirectory("dev.native.libs", "libduckdb.a"),
-					duckdb.CompileDarwinRuntime("osx_arm64", "arm64"),
-					duckdb.CompileDarwin,
-					duckdb.CloneBuild,
-				),
-				neurals.CompileDarwin(egenv.CacheDirectory("dev.native.libs")),
+			// eg.Parallel(
+			duckdb.MaybeBuild(
+				egenv.CacheDirectory("dev.native.libs", "libduckdb.a"),
+				duckdb.CompileDarwinRuntime("osx_arm64", "arm64"),
+				duckdb.CompileDarwin,
+				duckdb.CloneBuild,
 			),
+			neurals.CompileDarwin(egenv.CacheDirectory("dev.native.libs")),
+			// ),
 			egbug.DirectoryTree(egenv.CacheDirectory("dev.native.libs")),
 			console.GenerateFlutter,
 			egbug.DebugFailure(
@@ -64,13 +64,12 @@ func main() {
 				egbug.Log("flutter failed to build app"),
 			),
 			egbug.DirectoryTree(tarballapp),
-			// shell.Op(
-			// 	shallows.Newf(
-			// 		"CGO_LDFLAGS=\"%s %s -Wl,-rpath,@executable_path/../Frameworks\" go install --tags duckdb_use_static_lib,retrovibed,neural ./cmd/...",
-			// 		duckdbldflags, neuralsldflags,
-			// 	).Environ("GOBIN", filepath.Join(tarballapp, "Contents", "Helpers")),
-			// 	shell.Newf("cp %s/libpredicttext.dylib %s/Contents/Frameworks/", neuralsdir, tarballapp),
-			// ),
+			// Copy the built .app bundle to the staging workspace directory
+			shell.Op(
+				shell.Newf("mkdir -p %s", tarballapp),
+				shell.Newf("cp -R console/build/macos/Build/Products/Release/retrovibed.app/ %s/", tarballapp),
+			),
+			egbug.DirectoryTree(tarballapp),
 			release.KeychainPEM(
 				egenv.String("", "APPLE_SIGNING_KEY"),
 				egenv.String("", "APPLE_SIGNING_CER"),

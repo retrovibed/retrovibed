@@ -12,13 +12,10 @@ import (
 
 func CompileDarwinBinding(ctx context.Context, o eg.Op) error {
 	runtime := flutterRuntimev2(shell.Runtime())
-	neuralsdir := egenv.CacheDirectory("neurals")
-	neuralsflags := "-L" + neuralsdir + " -lpredicttext"
+	libsdir := egenv.CacheDirectory("dev.native.libs")
 
-	duckdblibs := egenv.CacheDirectory("duckdb", ".darwin-arm64")
-	duckdbldflags := "-L" + duckdblibs + " " +
-		"-Wl,-force_load," + duckdblibs + "/libduckdb.a " +
-		"-lc++"
+	neuralsflags := "-L" + libsdir + " -lpredicttext"
+	duckdbldflags := "-Wl,-force_load," + libsdir + "/libduckdb.a " + "-lc++"
 
 	return shell.Run(
 		ctx,
@@ -33,7 +30,8 @@ func BuildDarwin(ctx context.Context, _ eg.Op) error {
 	commit := eggit.EnvCommit()
 	runtime := flutterRuntimev2(shell.Runtime()).
 		Environ("BUILD_NAME", tarballs.Version()).
-		Environ("BUILD_NUMBER", commit.StringReplace("%git.commit.unix%"))
+		Environ("BUILD_NUMBER", commit.StringReplace("%git.commit.unix%")).
+		Environ("NIX_RETROVIBED_SHARED_NATIVE_LIBS", egenv.CacheDirectory("dev.native.libs", "example.dylib"))
 	return shell.Run(
 		ctx,
 		runtime.New("rm -rf build/macos/{x64,arm64}/debug").Lenient(true),
