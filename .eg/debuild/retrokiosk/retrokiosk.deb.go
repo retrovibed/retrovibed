@@ -8,7 +8,6 @@ import (
 	"io/fs"
 	"time"
 
-	"eg/compute/eggpgx"
 	"eg/compute/errorsx"
 	"eg/compute/maintainer"
 
@@ -17,6 +16,7 @@ import (
 	"github.com/egdaemon/eg/runtime/wasi/eggit"
 	"github.com/egdaemon/eg/runtime/wasi/shell"
 	"github.com/egdaemon/eg/runtime/x/wasi/egdebuild"
+	"github.com/egdaemon/eg/runtime/x/wasi/eggpg"
 )
 
 //go:embed .debskel
@@ -64,7 +64,7 @@ func Build(ctx context.Context, o eg.Op) error {
 		// override eg compute local's setting of the home directory.
 		// ideally we should default to this except when performing local
 		// compute workloads.
-		eggpgx.Seed(eggpgx.Options().Home("/home/egd/.gnupg")...),
+		eggpg.Seed(eggpg.Options().Home("/home/egd/.gnupg")...),
 		eg.Parallel(
 			egdebuild.Build(
 				gcfg,

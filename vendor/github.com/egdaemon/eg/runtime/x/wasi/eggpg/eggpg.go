@@ -1,4 +1,4 @@
-package eggpgx
+package eggpg
 
 import (
 	"context"
@@ -82,6 +82,7 @@ func Debug(options ...Option) eg.OpFn {
 	}
 }
 
+// Generate a usable gpg keyring from a seed.
 func Seed(options ...Option) eg.OpFn {
 	return func(ctx context.Context, o eg.Op) error {
 		runtime := runtime(options...)

@@ -74,13 +74,13 @@ func main() {
 			console.GenerateFlutter,
 			egbug.DebugFailure(
 				shell.Op(
-					flutter.New("rm -rf build/macos/{x64,arm64}/debug").Lenient(true),
+					flutter.New("mkdir -p ${RETROVIBED_SHARED_NATIVE_LIBS_DIRECTORY}"),
 					flutter.Newf("flutter build macos --build-name=%s --build-number=%s --release lib/main.dart", tarballs.Version(), commit.StringReplace("%git.commit.unix%")).Timeout(10*time.Minute),
 				),
 				egbug.Log("flutter failed to build app"),
 			),
 			shell.Op(
-				flutter.Newf("CGO_LDFLAGS=\"%s %s\" go -C retrovibedbind build --tags duckdb_use_static_lib,retrovibed,neural -buildmode=c-shared -o ../build/macos/Build/Products/Release/retrovibed.app/Contents/Frameworks/retrovibed.dylib ./...", duckdbldflags, neuralsldflags),
+				flutter.Newf("CGO_LDFLAGS=\"%s %s\" go -C retrovibedbind build --tags duckdb_use_static_lib,retrovibed,neural -buildmode=c-shared -o ${RETROVIBED_SHARED_NATIVE_LIBS_DIRECTORY}/retrovibed.dylib ./...", duckdbldflags, neuralsldflags),
 				flutter.New("tree build/macos/Build/Products/Release/retrovibed.app"),
 				shell.Newf("mkdir -p %s", tarballapp),
 				flutter.Newf("cp -R build/macos/Build/Products/Release/retrovibed.app/ %s/", tarballapp),

@@ -61,6 +61,7 @@ func main() {
 				neurals.CompileIOS(egenv.WorkingDirectory("console", "ios")),
 			),
 			console.GenerateFlutter,
+			console.CompileBinding,
 			gobuild,
 			iosbuild,
 			release.Keychain(
@@ -101,10 +102,11 @@ func gobuild(ctx context.Context, op eg.Op) error {
 		EnvironFrom(iOSCompilerEnv()...)
 	return egbug.DebugFailure(
 		shell.Op(
+			flutter.New("mkdir -p ${RETROVIBED_SHARED_NATIVE_LIBS_DIRECTORY}"),
 			flutter.Newf(
 				"CGO_CFLAGS=\"-target ${IOS_TARGET} -I%[1]s\" "+
 					"CGO_LDFLAGS=\"-target ${IOS_TARGET} -lc++ -framework CoreFoundation -framework Security -L$(pwd)/console/ios -lpredicttext -Wl,-force_load,libduckdb.a -Wl,-force_load,libpredicttext.a\" "+
-					"go -C retrovibedbind build -trimpath -buildmode=c-archive --tags duckdb_use_static_lib,retrovibed,neural -o ../ios/libretrovibed.a ./...",
+					"go -C retrovibedbind build -trimpath -buildmode=c-archive --tags duckdb_use_static_lib,retrovibed,neural -o ${RETROVIBED_SHARED_NATIVE_LIBS_DIRECTORY}/libretrovibed.a ./...",
 				egenv.CacheDirectory("duckdb", ".arm64"),
 			).
 				Environ("GOOS", "ios").
