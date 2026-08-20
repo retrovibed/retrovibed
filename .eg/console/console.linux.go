@@ -16,6 +16,18 @@ import (
 	"github.com/egdaemon/eg/runtime/x/wasi/egtarball"
 )
 
+func CompileBinding(ctx context.Context, o eg.Op) error {
+	runtime := flutterRuntimev2(shell.Runtime())
+
+	return shell.Run(
+		ctx,
+		runtime.New("mkdir -p ${RETROVIBED_SHARED_NATIVE_LIBS_DIRECTORY}"),
+		runtime.New("go -C retrovibedbind build -buildmode=c-shared -buildvcs=true --tags duckdb_use_lib,retrovibed,neural -o ${RETROVIBED_SHARED_NATIVE_LIBS_DIRECTORY}/libretrovibed.so .").
+			Timeout(egenv.TTL()).
+			Environ("CGO_LDFLAGS", "-L"+egenv.CacheDirectory("neurals")),
+	)
+}
+
 func BuildLinux(ctx context.Context, _ eg.Op) error {
 	runtime := flutterRuntimev2(shell.Runtime())
 	return shell.Run(

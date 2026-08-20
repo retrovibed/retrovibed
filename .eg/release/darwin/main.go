@@ -9,15 +9,12 @@ import (
 	"eg/compute/tarballs"
 	"log"
 	"path/filepath"
-	"time"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
-	"github.com/egdaemon/eg/runtime/wasi/eggit"
 	"github.com/egdaemon/eg/runtime/wasi/shell"
 	"github.com/egdaemon/eg/runtime/x/wasi/egbug"
 	"github.com/egdaemon/eg/runtime/x/wasi/eggithub"
-	"github.com/egdaemon/eg/runtime/x/wasi/eggolang"
 	"github.com/egdaemon/eg/runtime/x/wasi/egtarball"
 )
 
@@ -34,27 +31,14 @@ func main() {
 	ctx, done := context.WithTimeout(context.Background(), egenv.TTL())
 	defer done()
 
-	runtime := shell.Runtime().
-		EnvironFrom(eggolang.Env()...).
-		Environ("PUB_CACHE", egenv.CacheDirectory(".eg", "dart"))
-
 	tarballapp := filepath.Join(egtarball.Path(tarballs.Retrovibed(tarinfo())), "retrovibed.app")
 	appstoreapp := egenv.CacheDirectory("retrovibed.appstore.app")
 	dmgpath := egenv.CacheDirectory("retrovibed.darwin.arm64.dmg")
 	pkgpath := egenv.CacheDirectory("retrovibed.darwin.arm64.pkg")
 	entitlements := egenv.WorkingDirectory("console", "macos", "Runner", "Release.entitlements")
 	keychainPath := egenv.WorkspaceDirectory("apple.signing.keychain")
-	flutter := runtime.Directory(egenv.WorkingDirectory("console"))
-	shallows := runtime.Directory(egenv.WorkingDirectory("shallows"))
-	commit := eggit.EnvCommit()
 	duckdblibs := egenv.CacheDirectory("duckdb", ".darwin-arm64")
 	neuralsdir := egenv.CacheDirectory("neurals")
-
-	duckdbldflags := "-L" + duckdblibs + " " +
-		"-Wl,-force_load," + duckdblibs + "/libduckdb.a " +
-		"-lc++"
-
-	neuralsldflags := "-L" + neuralsdir + " -lpredicttext"
 
 	apikey := egenv.String("", "RETROVIBED_APPLE_API_KEY")
 	issuerid := egenv.String("", "RETROVIBED_APPLE_ISSUER_ID")
@@ -73,25 +57,20 @@ func main() {
 			),
 			console.GenerateFlutter,
 			egbug.DebugFailure(
-				shell.Op(
-					flutter.New("mkdir -p ${RETROVIBED_SHARED_NATIVE_LIBS_DIRECTORY}"),
-					flutter.Newf("flutter build macos --build-name=%s --build-number=%s --release lib/main.dart", tarballs.Version(), commit.StringReplace("%git.commit.unix%")).Timeout(10*time.Minute),
-				),
+				console.CompileDarwinBinding,
+				egbug.Log("flutter failed to build binding"),
+			),
+			egbug.DebugFailure(
+				console.BuildDarwin,
 				egbug.Log("flutter failed to build app"),
 			),
-			shell.Op(
-				flutter.Newf("CGO_LDFLAGS=\"%s %s\" go -C retrovibedbind build --tags duckdb_use_static_lib,retrovibed,neural -buildmode=c-shared -o ${RETROVIBED_SHARED_NATIVE_LIBS_DIRECTORY}/retrovibed.dylib ./...", duckdbldflags, neuralsldflags),
-				flutter.New("tree build/macos/Build/Products/Release/retrovibed.app"),
-				shell.Newf("mkdir -p %s", tarballapp),
-				flutter.Newf("cp -R build/macos/Build/Products/Release/retrovibed.app/ %s/", tarballapp),
-			),
-			shell.Op(
-				shallows.Newf(
-					"CGO_LDFLAGS=\"%s %s -Wl,-rpath,@executable_path/../Frameworks\" go install --tags duckdb_use_static_lib,retrovibed,neural ./cmd/...",
-					duckdbldflags, neuralsldflags,
-				).Environ("GOBIN", filepath.Join(tarballapp, "Contents", "Helpers")),
-				shell.Newf("cp %s/libpredicttext.dylib %s/Contents/Frameworks/", neuralsdir, tarballapp),
-			),
+			// shell.Op(
+			// 	shallows.Newf(
+			// 		"CGO_LDFLAGS=\"%s %s -Wl,-rpath,@executable_path/../Frameworks\" go install --tags duckdb_use_static_lib,retrovibed,neural ./cmd/...",
+			// 		duckdbldflags, neuralsldflags,
+			// 	).Environ("GOBIN", filepath.Join(tarballapp, "Contents", "Helpers")),
+			// 	shell.Newf("cp %s/libpredicttext.dylib %s/Contents/Frameworks/", neuralsdir, tarballapp),
+			// ),
 			release.KeychainPEM(
 				egenv.String("", "APPLE_SIGNING_KEY"),
 				egenv.String("", "APPLE_SIGNING_CER"),
