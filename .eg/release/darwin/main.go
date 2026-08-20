@@ -37,8 +37,6 @@ func main() {
 	pkgpath := egenv.CacheDirectory("retrovibed.darwin.arm64.pkg")
 	entitlements := egenv.WorkingDirectory("console", "macos", "Runner", "Release.entitlements")
 	keychainPath := egenv.WorkspaceDirectory("apple.signing.keychain")
-	duckdblibs := egenv.CacheDirectory("duckdb", ".darwin-arm64")
-	neuralsdir := egenv.CacheDirectory("neurals")
 
 	apikey := egenv.String("", "RETROVIBED_APPLE_API_KEY")
 	issuerid := egenv.String("", "RETROVIBED_APPLE_ISSUER_ID")
@@ -48,13 +46,14 @@ func main() {
 		eg.Sequential(
 			eg.Parallel(
 				duckdb.MaybeBuild(
-					filepath.Join(duckdblibs, "libduckdb.a"),
+					egenv.CacheDirectory("dev.native.libs", "libduckdb.a"),
 					duckdb.CompileDarwinRuntime("osx_arm64", "arm64"),
 					duckdb.CompileDarwin,
 					duckdb.CloneBuild,
 				),
-				neurals.CompileDarwin(neuralsdir),
+				neurals.CompileDarwin(egenv.CacheDirectory("dev.native.libs")),
 			),
+			egbug.DirectoryTree(egenv.CacheDirectory("dev.native.libs")),
 			console.GenerateFlutter,
 			egbug.DebugFailure(
 				console.CompileDarwinBinding,
@@ -64,6 +63,7 @@ func main() {
 				console.BuildDarwin,
 				egbug.Log("flutter failed to build app"),
 			),
+			egbug.DirectoryTree(tarballapp),
 			// shell.Op(
 			// 	shallows.Newf(
 			// 		"CGO_LDFLAGS=\"%s %s -Wl,-rpath,@executable_path/../Frameworks\" go install --tags duckdb_use_static_lib,retrovibed,neural ./cmd/...",
