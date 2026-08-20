@@ -197,7 +197,10 @@ func Install(b *tarballs.Build) eg.OpFn {
 
 		return eg.Sequential(
 			shell.Op(
-				runtime.New("rsync --mkpath -av ${FLUTTER_RELEASE_BUNDLE}/* ${OUTPUTDIR}/"),
+				runtime.Debug().
+					Environ("ARCH", b.Arch).
+					Environ("ARCH_ENV", egenv.String("", "EG_COMPUTE_HOST_ARCH")).
+					New("rsync --mkpath -av ${FLUTTER_RELEASE_BUNDLE}/* ${OUTPUTDIR}/"),
 			),
 		)(ctx, o)
 	}
