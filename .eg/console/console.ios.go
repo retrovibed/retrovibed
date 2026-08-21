@@ -13,6 +13,17 @@ import (
 	"github.com/egdaemon/eg/runtime/wasi/shell"
 )
 
+// iosDeploymentTarget is the minimum iOS version we build/link against — also
+// matches CMAKE_OSX_DEPLOYMENT_TARGET used for duckdb (.eg/debuild/duckdb/duckdb.build.go).
+const iosDeploymentTarget = "16.0"
+
+// iosTarget is the clang target triple for device builds. Shared between
+// GenIOSCompilerEnv (writes it to ios.compile.env for shell commands to read
+// via ${IOS_TARGET}) and CompileIOSBinding (needs the literal value: CGO_CFLAGS/
+// CGO_LDFLAGS are env-var values handed directly to clang, never shell-expanded,
+// so a ${IOS_TARGET} reference there is never substituted).
+const iosTarget = "arm64-apple-ios" + iosDeploymentTarget
+
 const extensionsCMakeConfig = `duckdb_extension_load(inet
     SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/../../inet
     LOAD_TESTS
@@ -39,7 +50,7 @@ func EnsureDuckDBSource(duckdbsrc, duckdbinet, duckdbvss string) eg.OpFn {
 }
 
 // baseIOSRuntime is flutterRuntimev2 plus the extras the iOS toolchain needs, but
-// without the compiler env (CC/CXX/SDKROOT/IOS_TARGET) loaded yet — used by
+// without the compiler env (CC/CXX/SDKROOT/IOS_TARGET/IPHONEOS_DEPLOYMENT_TARGET) loaded yet — used by
 // GenIOSCompilerEnv itself, which is what generates that env file in the first place.
 func baseIOSRuntime() shell.Command {
 	return flutterRuntimev2(shell.Runtime()).
@@ -48,7 +59,7 @@ func baseIOSRuntime() shell.Command {
 		Environ("LANG", "en_US.UTF-8")
 }
 
-// GenIOSCompilerEnv discovers the iOS toolchain (CC/CXX/SDKROOT/IOS_TARGET) via
+// GenIOSCompilerEnv discovers the iOS toolchain (CC/CXX/SDKROOT/IOS_TARGET/IPHONEOS_DEPLOYMENT_TARGET) via
 // xcrun and writes it to a file for iosRuntime to read back. Must run before any
 // step that calls iosRuntime.
 func GenIOSCompilerEnv(ctx context.Context, op eg.Op) error {
@@ -57,7 +68,8 @@ func GenIOSCompilerEnv(ctx context.Context, op eg.Op) error {
 		env.New("echo \"CC=$(xcrun --sdk iphoneos --find clang)\" | tee ${IOSENV}"),
 		env.New("echo \"CXX=$(xcrun --sdk iphoneos --find clang++)\" | tee -a ${IOSENV}"),
 		env.New("echo \"SDKROOT=$(xcrun --sdk iphoneos --show-sdk-path)\" | tee -a ${IOSENV}"),
-		env.New("echo \"IOS_TARGET=arm64-apple-ios16.0\" | tee -a ${IOSENV}"),
+		env.New("echo \"IOS_TARGET="+iosTarget+"\" | tee -a ${IOSENV}"),
+		env.New("echo \"IPHONEOS_DEPLOYMENT_TARGET="+iosDeploymentTarget+"\" | tee -a ${IOSENV}"),
 	)(ctx, op)
 }
 
@@ -76,8 +88,8 @@ func CompileIOSBinding(ctx context.Context, _ eg.Op) error {
 	runtime := iosRuntime()
 	libsdir := egenv.CacheDirectory("dev.native.libs")
 
-	cflags := "-target ${IOS_TARGET}"
-	ldflags := "-target ${IOS_TARGET} -lc++ -framework CoreFoundation -framework Security " +
+	cflags := "-arch arm64"
+	ldflags := "-arch arm64 -lc++ -framework CoreFoundation -framework Security " +
 		"-L" + libsdir + " -lpredicttext " +
 		"-Wl,-force_load," + filepath.Join(libsdir, "libduckdb.a") + " " +
 		"-Wl,-force_load," + filepath.Join(libsdir, "libpredicttext.a")
