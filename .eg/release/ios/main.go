@@ -47,15 +47,15 @@ func main() {
 				egbug.Log("flutter failed to build iOS app"),
 			),
 			egapplex.KeychainP12(
-				egapplex.Base64(nil, "RETROVIBED_APPLE_SIGNING_KEY"),
+				egenv.Base64URL(nil, "RETROVIBED_APPLE_SIGNING_KEY"),
 				egenv.String("", "RETROVIBED_APPLE_SIGNING_PASSWORD"),
 			),
 			egapplex.Provision(
-				egapplex.Base64(nil, "RETROVIBED_APPLE_PROFILE"),
+				egenv.Base64URL(nil, "RETROVIBED_APPLE_PROFILE"),
 			),
 			egapplex.AuthKey(
 				apikey,
-				egapplex.Base64(nil, "RETROVIBED_APPLE_AUTH_KEY"),
+				egenv.Base64URL(nil, "RETROVIBED_APPLE_AUTH_KEY"),
 			),
 			egapplex.UnlockKeychain(egenv.WorkspaceDirectory("apple.signing.keychain")),
 			shell.Op(
