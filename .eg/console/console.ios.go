@@ -2,10 +2,14 @@ package console
 
 import (
 	"context"
+	"eg/compute/tarballs"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
+	"github.com/egdaemon/eg/runtime/wasi/egenv"
+	"github.com/egdaemon/eg/runtime/wasi/eggit"
 	"github.com/egdaemon/eg/runtime/wasi/shell"
 )
 
@@ -34,11 +38,88 @@ func EnsureDuckDBSource(duckdbsrc, duckdbinet, duckdbvss string) eg.OpFn {
 	}
 }
 
-func BuildIOS(ctx context.Context, _ eg.Op) error {
-	runtime := flutterRuntimev2(shell.Runtime())
+// baseIOSRuntime is flutterRuntimev2 plus the extras the iOS toolchain needs, but
+// without the compiler env (CC/CXX/SDKROOT/IOS_TARGET) loaded yet — used by
+// GenIOSCompilerEnv itself, which is what generates that env file in the first place.
+func baseIOSRuntime() shell.Command {
+	return flutterRuntimev2(shell.Runtime()).
+		Debug().
+		Environ("IOSENV", egenv.WorkloadDirectory("ios.compile.env")).
+		Environ("LANG", "en_US.UTF-8")
+}
+
+// GenIOSCompilerEnv discovers the iOS toolchain (CC/CXX/SDKROOT/IOS_TARGET) via
+// xcrun and writes it to a file for iosRuntime to read back. Must run before any
+// step that calls iosRuntime.
+func GenIOSCompilerEnv(ctx context.Context, op eg.Op) error {
+	env := baseIOSRuntime().Directory(egenv.WorkloadDirectory())
+	return shell.Op(
+		env.New("echo \"CC=$(xcrun --sdk iphoneos --find clang)\" | tee ${IOSENV}"),
+		env.New("echo \"CXX=$(xcrun --sdk iphoneos --find clang++)\" | tee -a ${IOSENV}"),
+		env.New("echo \"SDKROOT=$(xcrun --sdk iphoneos --show-sdk-path)\" | tee -a ${IOSENV}"),
+		env.New("echo \"IOS_TARGET=arm64-apple-ios16.0\" | tee -a ${IOSENV}"),
+	)(ctx, op)
+}
+
+func iosCompilerEnv() []string {
+	return egenv.MustEnviron(egenv.Build().FromPath(egenv.WorkloadDirectory("ios.compile.env")))
+}
+
+func iosRuntime() shell.Command {
+	return baseIOSRuntime().EnvironFrom(iosCompilerEnv()...)
+}
+
+// CompileIOSBinding cross-compiles the Go binding as a static archive
+// (libretrovibed.a) for iOS/arm64, statically linking duckdb and predicttext
+// from dev.native.libs.
+func CompileIOSBinding(ctx context.Context, _ eg.Op) error {
+	runtime := iosRuntime()
+	libsdir := egenv.CacheDirectory("dev.native.libs")
+
+	cflags := "-target ${IOS_TARGET}"
+	ldflags := "-target ${IOS_TARGET} -lc++ -framework CoreFoundation -framework Security " +
+		"-L" + libsdir + " -lpredicttext " +
+		"-Wl,-force_load," + filepath.Join(libsdir, "libduckdb.a") + " " +
+		"-Wl,-force_load," + filepath.Join(libsdir, "libpredicttext.a")
+
 	return shell.Run(
 		ctx,
-		runtime.New("flutter build ios --release --no-codesign"),
+		runtime.New("mkdir -p ${RETROVIBED_SHARED_NATIVE_LIBS_DIRECTORY}"),
+		runtime.New("go -C retrovibedbind build -trimpath -buildmode=c-archive --tags duckdb_use_static_lib,retrovibed,neural -o ${RETROVIBED_SHARED_NATIVE_LIBS_DIRECTORY}/libretrovibed.a ./...").
+			Environ("GOOS", "ios").
+			Environ("GOARCH", "arm64").
+			Environ("CGO_ENABLED", "1").
+			Environ("CGO_CFLAGS", cflags).
+			Environ("CGO_LDFLAGS", ldflags).
+			Timeout(30*time.Minute),
+	)
+}
+
+// BuildIOS assembles RetrovivedBind.xcframework from the static archives built by
+// CompileIOSBinding (statically linked via -force_load, since code_assets'
+// StaticLinking LinkMode is not yet supported by the Dart/Flutter SDK), then
+// builds the signed-less release IPA.
+func BuildIOS(ctx context.Context, _ eg.Op) error {
+	runtime := iosRuntime()
+	commit := eggit.EnvCommit()
+	libsdir := egenv.CacheDirectory("dev.native.libs")
+
+	return shell.Run(
+		ctx,
+		runtime.New("rm -rf ios/RetrovivedBind.framework ios/RetrovivedBind.xcframework && cp -r ios/RetrovivedBind ios/RetrovivedBind.framework"),
+		runtime.Newf(
+			"xcrun clang -target ${IOS_TARGET} -isysroot ${SDKROOT} -shared -o RetrovivedBind.framework/RetrovivedBind "+
+				"-Wl,-force_load,%s -Wl,-force_load,%s -Wl,-force_load,%s "+
+				"-lc++ -lresolv -framework CoreFoundation -framework Security -Wl,-install_name,@rpath/RetrovivedBind.framework/RetrovivedBind",
+			filepath.Join(libsdir, "libretrovibed.a"),
+			filepath.Join(libsdir, "libduckdb.a"),
+			filepath.Join(libsdir, "libpredicttext.a"),
+		).Directory(egenv.WorkingDirectory("console", "ios")),
+		runtime.New("xcodebuild -create-xcframework -framework RetrovivedBind.framework -output RetrovivedBind.xcframework").Directory(egenv.WorkingDirectory("console", "ios")),
+		runtime.New("flutter pub get"),
+		runtime.New("pod install").Directory(egenv.WorkingDirectory("console", "ios")),
+		runtime.Newf("flutter build ipa --build-name=%s --build-number=%s --no-codesign --release", tarballs.Version(), commit.StringReplace("%git.commit.unix%")).
+			Timeout(15*time.Minute),
 	)
 }
 

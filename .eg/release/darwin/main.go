@@ -44,48 +44,18 @@ func main() {
 	err := eg.Perform(
 		ctx,
 		eg.Sequential(
-			// eg.Parallel(
-			duckdb.MaybeBuild(
-				egenv.CacheDirectory("dev.native.libs", "libduckdb.a"),
-				duckdb.CompileDarwinRuntime("osx_arm64", "arm64"),
-				duckdb.CompileDarwin,
-				duckdb.CloneBuild,
-			),
-			neurals.CompileDarwin(egenv.CacheDirectory("dev.native.libs")),
-			// ),
-			egbug.DirectoryTree(egenv.CacheDirectory("dev.native.libs")),
-			console.GenerateFlutter,
-			egbug.DebugFailure(
-				console.CompileDarwinBinding,
-				egbug.Log("flutter failed to build binding"),
-			),
-			egbug.DebugFailure(
-				console.BuildDarwin,
-				eg.Sequential(
-					egbug.Log("flutter failed to build app debug initiated"),
-					egbug.DirectoryTree(egenv.CacheDirectory("dev.native.libs")),
-					// tarballapp doesn't exist yet at this point (created later by the
-					// mkdir+cp step below); the flutter build's own output directory is
-					// what's actually populated here.
-					egbug.DirectoryTree(egenv.WorkingDirectory("console", "build", "macos", "Build", "Products", "Release")),
-					// architectures of every native lib in play, to catch lipo/universal-binary
-					// mismatches (e.g. a single-arch dylib handed to lipo for multiple slots).
-					shell.Op(
-						shell.Newf(
-							"find %s %s -name '*.dylib' -o -name '*.a' | xargs -I{} sh -c 'echo {}: $(lipo -info {} 2>&1)'",
-							egenv.CacheDirectory("dev.native.libs"),
-							egenv.WorkingDirectory("console", "build", "macos"),
-						).Lenient(true),
-						shell.Newf(
-							"xcodebuild -workspace %s -scheme Runner -configuration Release -showBuildSettings | grep -E 'ARCHS|EXCLUDED_ARCHS'",
-							egenv.WorkingDirectory("console", "macos", "Runner.xcworkspace"),
-						).Lenient(true),
-					),
-					egbug.DirectoryTree(tarballapp),
-					egbug.Log("flutter failed to build app debug completed"),
+			eg.Parallel(
+				duckdb.MaybeBuild(
+					egenv.CacheDirectory("dev.native.libs", "libduckdb.a"),
+					duckdb.CompileDarwinRuntime("osx_arm64", "arm64"),
+					duckdb.CompileDarwin,
+					duckdb.CloneBuild,
 				),
+				neurals.CompileDarwin(egenv.CacheDirectory("dev.native.libs")),
 			),
-			egbug.DirectoryTree(egenv.WorkingDirectory("console", "build", "macos", "Build", "Products", "Release", "retrovibed.app")),
+			console.GenerateFlutter,
+			console.CompileDarwinBinding,
+			console.BuildDarwin,
 			// Copy the built .app bundle to the staging workspace directory
 			shell.Op(
 				shell.Newf("mkdir -p %s", tarballapp),
