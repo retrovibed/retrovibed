@@ -5,6 +5,7 @@ import (
 	"eg/compute/console"
 	"eg/compute/debuild/duckdb"
 	"eg/compute/egapplex"
+	"eg/compute/egapplexdep"
 	"eg/compute/neurals"
 	"eg/compute/release"
 	"eg/compute/tarballs"
@@ -67,23 +68,23 @@ func main() {
 				),
 			),
 			egbug.DirectoryTree(tarballapp),
-			release.KeychainPEM(
+			egapplexdep.KeychainPEM(
 				egenv.String("", "APPLE_SIGNING_KEY"),
 				egenv.String("", "APPLE_SIGNING_CER"),
 			),
-			release.KeychainAppendPEM(
+			egapplexdep.KeychainAppendPEM(
 				"installer",
 				egenv.String("", "APPLE_MACOS_INSTALLER_KEY"),
 				egenv.String("", "APPLE_MACOS_INSTALLER_CERT"),
 			),
-			release.KeychainAppendPEM(
+			egapplexdep.KeychainAppendPEM(
 				"appstore",
 				egenv.String("", "APPLE_MACOS_APPSTORE_KEY"),
 				egenv.String("", "APPLE_MACOS_APPSTORE_CERT"),
 			),
 			egapplex.AuthKey(
 				apikey,
-				egapplex.Base64(nil, "RETROVIBED_APPLE_AUTH_KEY"),
+				egenv.Base64URL(nil, "RETROVIBED_APPLE_AUTH_KEY"),
 			),
 			egapplex.Sign("Developer ID Application", keychainPath, tarballapp, egapplex.SignDeep(), egapplex.SignRuntime()),
 			release.DarwinDmg(tarinfo()),
@@ -93,7 +94,7 @@ func main() {
 				shell.Newf("rm -rf %s && cp -R %s %s", appstoreapp, tarballapp, appstoreapp),
 			),
 			egapplex.Provision(
-				egapplex.Base64(nil, "APPLE_MACOS_APPSTORE_PROFILE"),
+				egenv.Base64URL(nil, "APPLE_MACOS_APPSTORE_PROFILE"),
 				filepath.Join(appstoreapp, "Contents", "embedded.provisionprofile"),
 			),
 			shell.Op(
