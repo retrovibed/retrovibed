@@ -22,7 +22,7 @@ Future<FeedSearchResponse> search(
       )
       .then((v) {
         return Future.value(
-          FeedSearchResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+          httpx.fromProto3JsonSafe(FeedSearchResponse.create(), jsonDecode(v.body)),
         );
       });
 }
@@ -38,7 +38,7 @@ Future<FeedCreateResponse> create(
         options: options,
       )
       .then((v) {
-        return FeedCreateResponse.create()..mergeFromProto3Json(jsonDecode(v.body));
+        return httpx.fromProto3JsonSafe(FeedCreateResponse.create(), jsonDecode(v.body));
       });
 }
 
@@ -55,7 +55,7 @@ Future<FeedCreateResponse> refresh(
         options: options,
       )
       .then((v) {
-        return FeedCreateResponse.create()..mergeFromProto3Json(jsonDecode(v.body));
+        return httpx.fromProto3JsonSafe(FeedCreateResponse.create(), jsonDecode(v.body));
       });
 }
 
@@ -64,6 +64,6 @@ Future<FeedDeleteResponse> delete(
   List<httpx.Option> options = const [],
 }) async {
   return httpx.delete(Uri.https(httpx.host(), "/rss/${id}"), options: options).then((v) {
-    return FeedDeleteResponse.create()..mergeFromProto3Json(jsonDecode(v.body));
+    return httpx.fromProto3JsonSafe(FeedDeleteResponse.create(), jsonDecode(v.body));
   });
 }

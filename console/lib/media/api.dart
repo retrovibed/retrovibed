@@ -76,7 +76,7 @@ abstract class media {
         )
         .then((v) {
           return Future.value(
-            MediaSearchResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(MediaSearchResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -108,7 +108,7 @@ abstract class media {
         )
         .then((v) {
           return Future.value(
-            MediaUpdateResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(MediaUpdateResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -128,7 +128,7 @@ abstract class media {
         )
         .then((v) {
           return Future.value(
-            MediaFindResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(MediaFindResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -145,7 +145,7 @@ abstract class media {
         )
         .then((v) {
           return Future.value(
-            MediaFindResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(MediaFindResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -190,7 +190,7 @@ abstract class media {
         )
         .then((v) {
           return Future.value(
-            MediaDeleteResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(MediaDeleteResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -208,7 +208,7 @@ abstract class media {
         )
         .then((v) {
           return Future.value(
-            MediaUpdateResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(MediaUpdateResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -219,7 +219,7 @@ abstract class media {
   }) async {
     return httpx.delete(Uri.https(httpx.metaendpoint(), "/m/${id}"), options: options).then((v) {
       return Future.value(
-        cas.MediaDeleteResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+        httpx.fromProto3JsonSafe(cas.MediaDeleteResponse.create(), jsonDecode(v.body)),
       );
     });
   }
@@ -243,7 +243,7 @@ abstract class media {
     return client.send(req).then((v) {
       return v.stream.bytesToString().then((s) {
         return Future.value(
-          MediaUploadResponse.create()..mergeFromProto3Json(jsonDecode(s)),
+          httpx.fromProto3JsonSafe(MediaUploadResponse.create(), jsonDecode(s)),
         );
       });
     });
@@ -276,7 +276,7 @@ abstract class discovered {
         )
         .then((v) {
           return Future.value(
-            DownloadSearchResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(DownloadSearchResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -296,7 +296,7 @@ abstract class discovered {
         )
         .then((v) {
           return Future.value(
-            DownloadSearchResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(DownloadSearchResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -313,7 +313,7 @@ abstract class discovered {
         )
         .then((v) {
           return Future.value(
-            MagnetCreateResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(MagnetCreateResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -330,7 +330,7 @@ abstract class discovered {
     return client.send(req).then((v) {
       return v.stream.bytesToString().then((s) {
         return Future.value(
-          MediaUploadResponse.create()..mergeFromProto3Json(jsonDecode(s)),
+          httpx.fromProto3JsonSafe(MediaUploadResponse.create(), jsonDecode(s)),
         );
       });
     });
@@ -348,7 +348,7 @@ abstract class discovered {
         )
         .then(httpx.auto_error)
         .then((v) {
-          return DownloadBeginResponse.create()..mergeFromProto3Json(jsonDecode(v.body));
+          return httpx.fromProto3JsonSafe(DownloadBeginResponse.create(), jsonDecode(v.body));
         });
   }
 
@@ -365,7 +365,7 @@ abstract class discovered {
         )
         .then((v) {
           return Future.value(
-            MetadataSyncResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(MetadataSyncResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -386,7 +386,7 @@ abstract class discovered {
               handleData: (data, sink) {
                 if (data is List<int>) {
                   // Inlined deserialization logic
-                  final download = Download.create()..mergeFromProto3Json(jsonDecode(utf8.decode(data)));
+                  final download = httpx.fromProto3JsonSafe(Download.create(), jsonDecode(utf8.decode(data)));
                   sink.add(download);
                 } else {
                   sink.addError('deserialization failed data: $data');
@@ -402,7 +402,7 @@ abstract class discovered {
     List<httpx.Option> options = const [],
   }) async {
     return httpx.get(Uri.https(httpx.host(), "/d/${id}", null), options: options).then((v) {
-      return DownloadMetadataResponse.create()..mergeFromProto3Json(jsonDecode(v.body));
+      return httpx.fromProto3JsonSafe(DownloadMetadataResponse.create(), jsonDecode(v.body));
     });
   }
 
@@ -419,7 +419,7 @@ abstract class discovered {
         )
         .then((v) {
           return Future.value(
-            DownloadUpdateResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(DownloadUpdateResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -437,7 +437,7 @@ abstract class discovered {
         .then(httpx.auto_error)
         .then((v) {
           return Future.value(
-            DownloadPauseResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(DownloadPauseResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -455,7 +455,7 @@ abstract class discovered {
         )
         .then((v) {
           return Future.value(
-            DownloadTuneResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(DownloadTuneResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -472,7 +472,7 @@ abstract class discovered {
         )
         .then((v) {
           return Future.value(
-            DownloadDeleteResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(DownloadDeleteResponse.create(), jsonDecode(v.body)),
           );
         });
   }

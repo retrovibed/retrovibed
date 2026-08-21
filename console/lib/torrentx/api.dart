@@ -16,6 +16,6 @@ abstract class diagnostics {
           Uri.https(httpx.host(), "/diagnostics/torrent/"),
           options: [httpx.Accept.json, ...options],
         )
-        .then((v) => TorrentMetricsResponse()..mergeFromProto3Json(jsonDecode(v.body)));
+        .then((v) => httpx.fromProto3JsonSafe(TorrentMetricsResponse(), jsonDecode(v.body)));
   }
 }

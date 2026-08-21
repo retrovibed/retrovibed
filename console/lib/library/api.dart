@@ -143,7 +143,7 @@ abstract class known {
           options: options,
         )
         .then((v) {
-          final resp = KnownSearchResponse.create()..mergeFromProto3Json(jsonDecode(v.body));
+          final resp = httpx.fromProto3JsonSafe(KnownSearchResponse.create(), jsonDecode(v.body));
           return Future.value(resp);
         });
   }
@@ -169,7 +169,7 @@ abstract class known {
   }) async {
     return httpx.get(Uri.https(httpx.host(), "/k/${id}", {}), options: options).then((v) {
       return Future.value(
-        KnownLookupResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+        httpx.fromProto3JsonSafe(KnownLookupResponse.create(), jsonDecode(v.body)),
       );
     });
   }
@@ -186,7 +186,7 @@ abstract class known {
         )
         .then((v) {
           return Future.value(
-            KnownCreateResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(KnownCreateResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -226,7 +226,7 @@ abstract class known {
         )
         .then((v) {
           return Future.value(
-            KnownLatestResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(KnownLatestResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -262,7 +262,7 @@ abstract class recommendations {
         )
         .then((v) {
           return Future.value(
-            RecommendationSearchResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(RecommendationSearchResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -291,7 +291,7 @@ abstract class recommendations {
   }) async {
     return httpx.get(Uri.https(httpx.host(), "/r/${id}", {}), options: options).then((v) {
       return Future.value(
-        RecommendationFindResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+        httpx.fromProto3JsonSafe(RecommendationFindResponse.create(), jsonDecode(v.body)),
       );
     });
   }
@@ -302,7 +302,7 @@ abstract class recommendations {
   }) async {
     return httpx.get(Uri.https(httpx.host(), "/r/content/${id}", {}), options: options).then((v) {
       return Future.value(
-        RecommendationFindResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+        httpx.fromProto3JsonSafe(RecommendationFindResponse.create(), jsonDecode(v.body)),
       );
     });
   }
@@ -322,7 +322,7 @@ abstract class recommendations {
         )
         .then((v) {
           return Future.value(
-            RecommendationDeleteResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(RecommendationDeleteResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -338,7 +338,7 @@ abstract class recommendations {
         )
         .then((v) {
           return Future.value(
-            RecommendationSearchResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(RecommendationSearchResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -371,7 +371,7 @@ abstract class recent {
         )
         .then((v) {
           return Future.value(
-            RecentSearchResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(RecentSearchResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -388,7 +388,7 @@ abstract class recent {
         )
         .then((v) {
           return Future.value(
-            RecentRecordResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(RecentRecordResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -404,7 +404,7 @@ abstract class recent {
         )
         .then((v) {
           return Future.value(
-            RecentDeleteResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(RecentDeleteResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -429,7 +429,7 @@ abstract class releases {
         )
         .then((v) {
           return Future.value(
-            KnownLatestResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(KnownLatestResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -456,7 +456,7 @@ abstract class locate {
         )
         .then((v) {
           return Future.value(
-            LocateSearchResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(LocateSearchResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -467,7 +467,7 @@ abstract class locate {
   }) async {
     return httpx.get(Uri.https(httpx.host(), "/l/${id}", {}), options: options).then((v) {
       return Future.value(
-        LocateLookupResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+        httpx.fromProto3JsonSafe(LocateLookupResponse.create(), jsonDecode(v.body)),
       );
     });
   }
@@ -484,7 +484,7 @@ abstract class locate {
         )
         .then((v) {
           return Future.value(
-            LocateCreateResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(LocateCreateResponse.create(), jsonDecode(v.body)),
           );
         });
   }

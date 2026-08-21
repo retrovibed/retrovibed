@@ -36,13 +36,13 @@ Future<T> cached<T extends pb.GeneratedMessage>(
 
 Future<BillingLookupResponse> lookup({List<httpx.Option> options = const []}) {
   return httpx.get(Uri.https(httpx.metaendpoint(), "/m/b/"), options: options).then((v) {
-    return BillingLookupResponse.create()..mergeFromProto3Json(jsonDecode(v.body));
+    return httpx.fromProto3JsonSafe(BillingLookupResponse.create(), jsonDecode(v.body));
   });
 }
 
 Future<BillingCreateResponse> create({List<httpx.Option> options = const []}) {
   return httpx.post(Uri.https(httpx.metaendpoint(), "/m/b/new"), options: options).then((v) {
-    return BillingCreateResponse.create()..mergeFromProto3Json(jsonDecode(v.body));
+    return httpx.fromProto3JsonSafe(BillingCreateResponse.create(), jsonDecode(v.body));
   });
 }
 
@@ -62,19 +62,19 @@ Future<BillingSessionResponse> session(
         options: options,
       )
       .then((v) {
-        return BillingSessionResponse.create()..mergeFromProto3Json(jsonDecode(v.body));
+        return httpx.fromProto3JsonSafe(BillingSessionResponse.create(), jsonDecode(v.body));
       });
 }
 
 Future<BillingPlansResponse> plans({List<httpx.Option> options = const []}) {
   return httpx.get(Uri.https(httpx.metaendpoint(), "/m/b/plans"), options: options).then((v) {
-    return BillingPlansResponse.create()..mergeFromProto3Json(jsonDecode(v.body));
+    return httpx.fromProto3JsonSafe(BillingPlansResponse.create(), jsonDecode(v.body));
   });
 }
 
 Future<AttributionTokenResponse> attribution({List<httpx.Option> options = const []}) {
   return httpx.get(Uri.https(httpx.metaendpoint(), "/m/b/attribution"), options: options).then((v) {
-    return AttributionTokenResponse.create()..mergeFromProto3Json(jsonDecode(v.body));
+    return httpx.fromProto3JsonSafe(AttributionTokenResponse.create(), jsonDecode(v.body));
   });
 }
 
@@ -90,7 +90,7 @@ Future<AttributionConsumeResponse> consumeAttribution(
         options: [httpx.Content.json, ...options],
       )
       .then((v) {
-        return AttributionConsumeResponse.create()..mergeFromProto3Json(jsonDecode(v.body));
+        return httpx.fromProto3JsonSafe(AttributionConsumeResponse.create(), jsonDecode(v.body));
       });
 }
 
@@ -110,6 +110,6 @@ Future<BillingSubscribeResponse> subscribe(String plan) {
         ),
       )
       .then((v) {
-        return BillingSubscribeResponse.create()..mergeFromProto3Json(jsonDecode(v.body));
+        return httpx.fromProto3JsonSafe(BillingSubscribeResponse.create(), jsonDecode(v.body));
       });
 }

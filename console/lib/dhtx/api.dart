@@ -16,6 +16,6 @@ abstract class diagnostics {
           Uri.https(httpx.host(), "/diagnostics/dht/"),
           options: [httpx.Accept.json, ...options],
         )
-        .then((v) => DHTMetricsResponse()..mergeFromProto3Json(jsonDecode(v.body)));
+        .then((v) => httpx.fromProto3JsonSafe(DHTMetricsResponse(), jsonDecode(v.body)));
   }
 }

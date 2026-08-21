@@ -12,6 +12,6 @@ Future<http.Response> healthz() {
 
 Future<AuthzResponse> authz({List<Future<httpx.Request> Function(httpx.Request)> options = const []}) {
   return httpx.get(Uri.https(httpx.metaendpoint(), "/m/authz/"), options: options).then((r) {
-    return AuthzResponse.create()..mergeFromProto3Json(jsonDecode(r.body));
+    return httpx.fromProto3JsonSafe(AuthzResponse.create(), jsonDecode(r.body));
   });
 }

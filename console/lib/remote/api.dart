@@ -50,7 +50,7 @@ class _WebSocketRemoteControlSocket implements RemoteControlSocket {
     StreamTransformer.fromHandlers(
       handleData: (data, sink) {
         if (data is List<int>) {
-          final msg = rc.Stream.create()..mergeFromProto3Json(jsonDecode(utf8.decode(data)));
+          final msg = httpx.fromProto3JsonSafe(rc.Stream.create(), jsonDecode(utf8.decode(data)));
           sink.add(msg);
         } else {
           sink.addError('deserialization failed data: $data');

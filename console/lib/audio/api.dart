@@ -14,7 +14,7 @@ abstract class sinks {
         StreamTransformer.fromHandlers(
           handleData: (data, sink) {
             if (data is List<int>) {
-              final resp = AudioSinkSearchResponse.create()..mergeFromProto3Json(jsonDecode(utf8.decode(data)));
+              final resp = httpx.fromProto3JsonSafe(AudioSinkSearchResponse.create(), jsonDecode(utf8.decode(data)));
               resp.items.forEach(sink.add);
             } else {
               sink.addError('deserialization failed data: $data');
@@ -30,7 +30,7 @@ abstract class sinks {
   }) async {
     return httpx.get(Uri.https(httpx.host(), "/audio/sinks/", {}), options: options).then((v) {
       return Future.value(
-        AudioSinkCurrentResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+        httpx.fromProto3JsonSafe(AudioSinkCurrentResponse.create(), jsonDecode(v.body)),
       );
     });
   }
@@ -47,7 +47,7 @@ abstract class sinks {
         )
         .then((v) {
           return Future.value(
-            AudioSinkTouchResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(AudioSinkTouchResponse.create(), jsonDecode(v.body)),
           );
         });
   }

@@ -37,7 +37,7 @@ abstract class wireguard {
         .then(httpx.auto_error)
         .then((v) {
           return Future.value(
-            WireguardSearchResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(WireguardSearchResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -52,7 +52,7 @@ abstract class wireguard {
         .then(httpx.auto_error)
         .then((v) {
           return Future.value(
-            WireguardDeleteResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(WireguardDeleteResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -76,7 +76,7 @@ abstract class wireguard {
     return client.send(req).then(httpx.auto_error).then((v) {
       return v.stream.bytesToString().then((s) {
         return Future.value(
-          WireguardUploadResponse.create()..mergeFromProto3Json(jsonDecode(s)),
+          httpx.fromProto3JsonSafe(WireguardUploadResponse.create(), jsonDecode(s)),
         );
       });
     });
@@ -95,7 +95,7 @@ abstract class wireguard {
           options: options,
         )
         .then(
-          (v) => WireguardUpdateResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+          (v) => httpx.fromProto3JsonSafe(WireguardUpdateResponse.create(), jsonDecode(v.body)),
         );
   }
 
@@ -106,7 +106,7 @@ abstract class wireguard {
   }) async {
     return httpx.put(Uri.https(httpx.host(), "/wireguard/${id}"), options: options).then(httpx.auto_error).then((v) {
       return Future.value(
-        WireguardTouchResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+        httpx.fromProto3JsonSafe(WireguardTouchResponse.create(), jsonDecode(v.body)),
       );
     });
   }
@@ -121,7 +121,7 @@ abstract class wireguard {
         .then(httpx.auto_error)
         .then((v) {
           return Future.value(
-            WireguardCurrentResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(WireguardCurrentResponse.create(), jsonDecode(v.body)),
           );
         });
   }
