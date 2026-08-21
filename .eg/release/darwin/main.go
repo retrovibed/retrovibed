@@ -61,13 +61,39 @@ func main() {
 			),
 			egbug.DebugFailure(
 				console.BuildDarwin,
-				egbug.Log("flutter failed to build app"),
+				eg.Sequential(
+					egbug.Log("flutter failed to build app debug initiated"),
+					egbug.DirectoryTree(egenv.CacheDirectory("dev.native.libs")),
+					// tarballapp doesn't exist yet at this point (created later by the
+					// mkdir+cp step below); the flutter build's own output directory is
+					// what's actually populated here.
+					egbug.DirectoryTree(egenv.WorkingDirectory("console", "build", "macos", "Build", "Products", "Release")),
+					// architectures of every native lib in play, to catch lipo/universal-binary
+					// mismatches (e.g. a single-arch dylib handed to lipo for multiple slots).
+					shell.Op(
+						shell.Newf(
+							"find %s %s -name '*.dylib' -o -name '*.a' | xargs -I{} sh -c 'echo {}: $(lipo -info {} 2>&1)'",
+							egenv.CacheDirectory("dev.native.libs"),
+							egenv.WorkingDirectory("console", "build", "macos"),
+						).Lenient(true),
+						shell.Newf(
+							"xcodebuild -workspace %s -scheme Runner -configuration Release -showBuildSettings | grep -E 'ARCHS|EXCLUDED_ARCHS'",
+							egenv.WorkingDirectory("console", "macos", "Runner.xcworkspace"),
+						).Lenient(true),
+					),
+					egbug.DirectoryTree(tarballapp),
+					egbug.Log("flutter failed to build app debug completed"),
+				),
 			),
-			egbug.DirectoryTree(tarballapp),
+			egbug.DirectoryTree(egenv.WorkingDirectory("console", "build", "macos", "Build", "Products", "Release", "retrovibed.app")),
 			// Copy the built .app bundle to the staging workspace directory
 			shell.Op(
 				shell.Newf("mkdir -p %s", tarballapp),
-				shell.Newf("cp -R console/build/macos/Build/Products/Release/retrovibed.app/ %s/", tarballapp),
+				shell.Newf(
+					"cp -R %s/ %s/",
+					egenv.WorkingDirectory("console", "build", "macos", "Build", "Products", "Release", "retrovibed.app"),
+					tarballapp,
+				),
 			),
 			egbug.DirectoryTree(tarballapp),
 			release.KeychainPEM(
