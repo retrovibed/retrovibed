@@ -44,8 +44,8 @@ github.com/cespare/xxhash/v2 v2.3.0/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XL
 github.com/cncf/xds/go v0.0.0-20260202195803-dba9d589def2 h1:aBangftG7EVZoUb69Os8IaYg++6uMOdKK83QtkkvJik=
 github.com/dustin/go-humanize v1.0.1 h1:GzkhY7T5VNhEkwH0PVJgjz+fX1rhBrR7pRT3mDkpeCY=
 github.com/dustin/go-humanize v1.0.1/go.mod h1:Mu1zIs6XwVuF/gI1OepvI0qD18qycQx+mFykh5fBlto=
-github.com/egdaemon/eg v0.0.0-20260821121507-3e65904f00e7 h1:ys+N3bYgaXwH3psYMaPXbeyqFg1YWxAosMa18ZauIsw=
-github.com/egdaemon/eg v0.0.0-20260821121507-3e65904f00e7/go.mod h1:raRnhZRRKpRt0XRc1bKHNnHPaAenO1KQICcUUM5FQx0=
+github.com/egdaemon/eg v0.0.0-20260821135455-493e0ea65420 h1:HDFnbVVU/AHMSc1Hk0QcLZoftFnlfEpedbug6CJVRbI=
+github.com/egdaemon/eg v0.0.0-20260821135455-493e0ea65420/go.mod h1:raRnhZRRKpRt0XRc1bKHNnHPaAenO1KQICcUUM5FQx0=
 github.com/egdaemon/wasinet/wasinet v0.0.0-20260714114633-11ce19bcbeeb h1:ImKjoO3D0C7bEY+iopzwK16Be+2TF8O85XpdeKEpS94=
 github.com/egdaemon/wasinet/wasinet v0.0.0-20260714114633-11ce19bcbeeb/go.mod h1:cjnQxCq4L+ZxasldxabXzQojFttfeniF1CNx95Qu/3c=
 github.com/envoyproxy/go-control-plane v0.14.0 h1:hbG2kr4RuFj222B6+7T83thSPqLjwBIfQawTkC++2HA=
