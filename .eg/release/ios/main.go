@@ -4,8 +4,8 @@ import (
 	"context"
 	"eg/compute/console"
 	"eg/compute/debuild/duckdb"
+	"eg/compute/egapplex"
 	"eg/compute/neurals"
-	"eg/compute/release"
 	"log"
 	"time"
 
@@ -19,6 +19,9 @@ func main() {
 	log.SetFlags(log.Flags() | log.Lshortfile)
 	ctx, done := context.WithTimeout(context.Background(), egenv.TTL())
 	defer done()
+
+	apikey := egenv.String("", "RETROVIBED_APPLE_API_KEY")
+	issuerid := egenv.String("", "RETROVIBED_APPLE_ISSUER_ID")
 
 	flutter := shell.Runtime().Directory(egenv.WorkingDirectory("console"))
 	err := eg.Perform(
@@ -43,27 +46,25 @@ func main() {
 				console.BuildIOS,
 				egbug.Log("flutter failed to build iOS app"),
 			),
-			release.Keychain(
-				egenv.String("", "RETROVIBED_APPLE_SIGNING_KEY"),
+			egapplex.KeychainP12(
+				egenv.Base64(nil, "RETROVIBED_APPLE_SIGNING_KEY"),
 				egenv.String("", "RETROVIBED_APPLE_SIGNING_PASSWORD"),
 			),
-			release.ProvisioningProfile(
-				egenv.String("", "RETROVIBED_APPLE_PROFILE"),
+			egapplex.Provision(
+				egenv.Base64(nil, "RETROVIBED_APPLE_PROFILE"),
 			),
-			release.AuthKey(
-				egenv.String("", "RETROVIBED_APPLE_API_KEY"),
-				egenv.String("", "RETROVIBED_APPLE_AUTH_KEY"),
+			egapplex.AuthKey(
+				apikey,
+				egenv.Base64(nil, "RETROVIBED_APPLE_AUTH_KEY"),
 			),
+			egapplex.UnlockKeychain(egenv.WorkspaceDirectory("apple.signing.keychain")),
 			shell.Op(
-				shell.Newf("security unlock-keychain -p %s %s", egenv.RunID(), egenv.WorkspaceDirectory("apple.signing.keychain")),
 				flutter.Newf(
 					"xcodebuild -exportArchive -archivePath build/ios/archive/Runner.xcarchive -exportPath build/ios/ipa -exportOptionsPlist ios/ExportOptions.plist OTHER_CODE_SIGN_FLAGS=\"--keychain %s\"",
 					egenv.WorkspaceDirectory("apple.signing.keychain"),
 				).Timeout(10*time.Minute),
-				flutter.New("xcrun altool --upload-app --type ios -f build/ios/ipa/*.ipa --apiKey ${RETROVIBED_APPLE_API_KEY} --apiIssuer ${RETROVIBED_APPLE_ISSUER_ID}").
-					Environ("RETROVIBED_APPLE_ISSUER_ID", egenv.String("", "RETROVIBED_APPLE_ISSUER_ID")).
-					Environ("RETROVIBED_APPLE_API_KEY", egenv.String("", "RETROVIBED_APPLE_API_KEY")),
 			),
+			egapplex.Upload(apikey, issuerid, egenv.WorkingDirectory("console", "build/ios/ipa/*.ipa"), "ios"),
 		),
 	)
 
