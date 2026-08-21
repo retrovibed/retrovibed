@@ -83,7 +83,7 @@ func main() {
 			),
 			egapplex.AuthKey(
 				apikey,
-				egenv.Base64(nil, "RETROVIBED_APPLE_AUTH_KEY"),
+				egapplex.Base64(nil, "RETROVIBED_APPLE_AUTH_KEY"),
 			),
 			egapplex.Sign("Developer ID Application", keychainPath, tarballapp, egapplex.SignDeep(), egapplex.SignRuntime()),
 			release.DarwinDmg(tarinfo()),
@@ -93,7 +93,7 @@ func main() {
 				shell.Newf("rm -rf %s && cp -R %s %s", appstoreapp, tarballapp, appstoreapp),
 			),
 			egapplex.Provision(
-				egenv.Base64(nil, "APPLE_MACOS_APPSTORE_PROFILE"),
+				egapplex.Base64(nil, "APPLE_MACOS_APPSTORE_PROFILE"),
 				filepath.Join(appstoreapp, "Contents", "embedded.provisionprofile"),
 			),
 			shell.Op(
