@@ -4,6 +4,7 @@ import (
 	"context"
 	"eg/compute/console"
 	"eg/compute/debuild/duckdb"
+	"eg/compute/egapplex"
 	"eg/compute/neurals"
 	"eg/compute/release"
 	"eg/compute/tarballs"
@@ -53,24 +54,19 @@ func main() {
 				),
 				neurals.CompileDarwin(egenv.CacheDirectory("dev.native.libs")),
 			),
-			egbug.DirectoryTree(egenv.CacheDirectory("dev.native.libs")),
 			console.GenerateFlutter,
-			egbug.DebugFailure(
-				console.CompileDarwinBinding,
-				egbug.Log("flutter failed to build binding"),
-			),
-			egbug.DebugFailure(
-				console.BuildDarwin,
-				egbug.Log("flutter failed to build app"),
+			console.CompileDarwinBinding,
+			console.BuildDarwin,
+			// Copy the built .app bundle to the staging workspace directory
+			shell.Op(
+				shell.Newf("mkdir -p %s", tarballapp),
+				shell.Newf(
+					"cp -R %s/ %s/",
+					egenv.WorkingDirectory("console", "build", "macos", "Build", "Products", "Release", "retrovibed.app"),
+					tarballapp,
+				),
 			),
 			egbug.DirectoryTree(tarballapp),
-			// shell.Op(
-			// 	shallows.Newf(
-			// 		"CGO_LDFLAGS=\"%s %s -Wl,-rpath,@executable_path/../Frameworks\" go install --tags duckdb_use_static_lib,retrovibed,neural ./cmd/...",
-			// 		duckdbldflags, neuralsldflags,
-			// 	).Environ("GOBIN", filepath.Join(tarballapp, "Contents", "Helpers")),
-			// 	shell.Newf("cp %s/libpredicttext.dylib %s/Contents/Frameworks/", neuralsdir, tarballapp),
-			// ),
 			release.KeychainPEM(
 				egenv.String("", "APPLE_SIGNING_KEY"),
 				egenv.String("", "APPLE_SIGNING_CER"),
@@ -85,28 +81,19 @@ func main() {
 				egenv.String("", "APPLE_MACOS_APPSTORE_KEY"),
 				egenv.String("", "APPLE_MACOS_APPSTORE_CERT"),
 			),
-			release.AuthKey(
+			egapplex.AuthKey(
 				apikey,
-				egenv.String("", "RETROVIBED_APPLE_AUTH_KEY"),
+				egapplex.Base64(nil, "RETROVIBED_APPLE_AUTH_KEY"),
 			),
-			shell.Op(
-				shell.Newf("security unlock-keychain -p %s %s", egenv.RunID(), keychainPath),
-				shell.Newf("codesign --deep --force --options runtime --sign \"Developer ID Application\" --keychain %s %s", keychainPath, tarballapp),
-			),
+			egapplex.Sign("Developer ID Application", keychainPath, tarballapp, egapplex.SignDeep(), egapplex.SignRuntime()),
 			release.DarwinDmg(tarinfo()),
-			shell.Op(
-				shell.Newf("security unlock-keychain -p %s %s", egenv.RunID(), keychainPath),
-				shell.Newf("codesign --force --sign \"Developer ID Application\" --keychain %s %s", keychainPath, dmgpath),
-				shell.Newf("xcrun notarytool submit %s --key ~/.private_keys/AuthKey_${APPLE_API_KEY}.p8 --key-id ${APPLE_API_KEY} --issuer ${APPLE_ISSUER_ID} --wait", dmgpath).
-					Environ("APPLE_API_KEY", apikey).
-					Environ("APPLE_ISSUER_ID", issuerid),
-				shell.Newf("xcrun stapler staple %s", dmgpath),
-			),
+			egapplex.Sign("Developer ID Application", keychainPath, dmgpath),
+			egapplex.Notarize(apikey, issuerid, dmgpath),
 			shell.Op(
 				shell.Newf("rm -rf %s && cp -R %s %s", appstoreapp, tarballapp, appstoreapp),
 			),
-			release.EmbedProvisioningProfile(
-				egenv.String("", "APPLE_MACOS_APPSTORE_PROFILE"),
+			egapplex.Provision(
+				egapplex.Base64(nil, "APPLE_MACOS_APPSTORE_PROFILE"),
 				filepath.Join(appstoreapp, "Contents", "embedded.provisionprofile"),
 			),
 			shell.Op(
@@ -114,12 +101,12 @@ func main() {
 				shell.Newf("chmod -R a+rX %s", appstoreapp),
 				shell.Newf("security unlock-keychain -p %s %s", egenv.RunID(), keychainPath),
 				shell.Newf("find %s/Contents/Frameworks -depth -name '*.framework' -o -name '*.dylib' | xargs -I{} codesign --force --options runtime --sign \"Apple Distribution\" --keychain %s {}", appstoreapp, keychainPath),
-				shell.Newf("codesign --force --options runtime --sign \"Apple Distribution\" --entitlements %s --keychain %s %s", entitlements, keychainPath, appstoreapp),
-				shell.Newf("productbuild --component %s /Applications --sign \"3rd Party Mac Developer Installer\" --keychain %s %s", appstoreapp, keychainPath, pkgpath),
-				shell.Newf("xcrun altool --upload-app --type macos -f %s --apiKey ${APPLE_API_KEY} --apiIssuer ${APPLE_ISSUER_ID} 2>&1 | tee /tmp/altool.log && ! grep -q 'UPLOAD FAILED' /tmp/altool.log", pkgpath).
-					Environ("APPLE_API_KEY", apikey).
-					Environ("APPLE_ISSUER_ID", issuerid),
 			),
+			egapplex.Sign("Apple Distribution", keychainPath, appstoreapp, egapplex.SignRuntime(), egapplex.SignEntitlements(entitlements)),
+			shell.Op(
+				shell.Newf("productbuild --component %s /Applications --sign \"3rd Party Mac Developer Installer\" --keychain %s %s", appstoreapp, keychainPath, pkgpath),
+			),
+			egapplex.Upload(apikey, issuerid, pkgpath, "macos"),
 			eggithub.Release(dmgpath),
 		),
 	)
