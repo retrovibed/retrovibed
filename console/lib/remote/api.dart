@@ -20,6 +20,8 @@ abstract class SeekOffset {
 }
 
 abstract class RemoteControlSocket {
+  // placeholder used when we'll no longer be attempting to connect to the socket.
+  static final RemoteControlSocket disabled = _NoopRemoteControlSocket();
   // placeholder used before a real connection exists, so callers never need
   // to null-check (e.g. `_socket!`) while waiting to connect.
   static final RemoteControlSocket noop = _NoopRemoteControlSocket();

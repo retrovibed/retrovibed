@@ -109,6 +109,16 @@ extension WidgetTesterExtensions on WidgetTester {
     }
   }
 
+  /// Pumps [count] frames in sequence, advancing time by [duration] each
+  /// pump. Useful in place of [pumpAndSettle] when a widget under test keeps
+  /// an animation (e.g. a CircularProgressIndicator) perpetually running, so
+  /// pumpAndSettle would never settle.
+  Future<void> pumpN(int count, [Duration duration = const Duration(milliseconds: 16)]) async {
+    for (var i = 0; i < count; i++) {
+      await pump(duration);
+    }
+  }
+
   /// Pumps frames until a widget matching [finder] satisfies [condition].
   Future<void> pumpUntil(
     Finder finder,
