@@ -83,5 +83,12 @@ formatter:
 analyzer:
   exclude:
     - ".eg.cache/**"
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**
   errors:
     library_private_types_in_public_api: ignore
