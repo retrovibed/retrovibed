@@ -81,7 +81,7 @@ class _HomeState extends State<Home> {
               leading: [
                 ds.CompactingMenu.pinned(
                   DropdownUpload(
-                    icon: const Icon(Icons.apps),
+                    icon: const Icon(Icons.download),
                     help: ds.Hint(const Text("switch to library or discover mode")),
                     items: [
                       media.SearchModeToggle(
