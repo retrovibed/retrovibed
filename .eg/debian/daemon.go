@@ -14,6 +14,7 @@ import (
 	"github.com/egdaemon/eg/runtime/wasi/shell"
 	"github.com/egdaemon/eg/runtime/x/wasi/egdebuild"
 	"github.com/egdaemon/eg/runtime/x/wasi/eggolang"
+	"github.com/egdaemon/eg/runtime/x/wasi/eggpg"
 )
 
 //go:embed .debskel
@@ -67,6 +68,10 @@ func Runner() eg.ContainerRunner {
 
 func Build(ctx context.Context, o eg.Op) error {
 	return eg.Sequential(
+		// override eg compute local's setting of the home directory.
+		// ideally we should default to this except when performing local
+		// compute workloads.
+		eggpg.Seed(eggpg.Options().Home("/home/egd/.gnupg")...),
 		egdebuild.Build(gcfg, egdebuild.Option.Distro(egdebuild.UbuntuLatestCodename), egdebuild.Option.NoLint()), // resolute
 		egdebuild.Build(
 			gcfg,
