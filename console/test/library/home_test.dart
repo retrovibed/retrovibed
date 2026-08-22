@@ -90,6 +90,12 @@ void main() {
       await tester.ensureVisible(find.text('Discover'));
       await tester.tap(find.text('Discover'));
       await tester.pumpAndSettle();
+
+      // Selecting the mode item closes the menu; reopen it to confirm the
+      // check icon now reflects discovery mode.
+      await tester.tap(find.byType(DropdownUpload));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Discover'));
       expect(_searchMenuItemIcon(tester), equals(Icons.check));
 
       // Switching mimetype filters doesn't close the menu; the Discover item's
@@ -99,10 +105,14 @@ void main() {
       await tester.pumpAndSettle();
       expect(_searchMenuItemIcon(tester), equals(Icons.check));
 
-      // Selecting the mode item again doesn't close the menu either; keep
-      // interacting with the same open session rather than reopening it.
+      // Selecting the mode item again switches back to library mode and
+      // closes the menu; reopen it to confirm the icon reverted.
       await tester.tap(find.text('Discover'));
       await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(DropdownUpload));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Discover'));
       expect(_searchMenuItemIcon(tester), equals(Icons.travel_explore));
     }, variant: _resolutions);
 
@@ -175,11 +185,6 @@ void main() {
       await tester.pumpAndSettle();
       await tester.ensureVisible(find.text('Discover'));
       await tester.tap(find.text('Discover'));
-      await tester.pumpAndSettle();
-
-      // Selecting the mode item doesn't close the menu; dismiss it explicitly
-      // so it doesn't intercept later taps on the (now different) screen.
-      await tester.tapAt(const Offset(1, 1));
       await tester.pumpAndSettle();
 
       // On compact layouts unpinned trailing widgets collapse into the
