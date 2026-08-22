@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:retrovibed/community/community.pb.dart';
+import 'package:retrovibed/httpx.dart' as httpx;
 
 String encodeQRPayload(Community community, {String attribution = ''}) {
   return jsonEncode(<String, dynamic>{
@@ -14,11 +15,11 @@ String encodeQRPayload(Community community, {String attribution = ''}) {
     final payload = jsonDecode(data);
     if (payload is! Map<String, dynamic>) return (null, '');
     if (payload.containsKey('community')) {
-      final community = Community.create()..mergeFromProto3Json(payload['community']);
+      final community = httpx.fromProto3JsonSafe(Community.create(), payload['community']);
       final attribution = payload['attribution'] as String? ?? '';
       return (community, attribution);
     }
-    final community = Community.create()..mergeFromProto3Json(payload);
+    final community = httpx.fromProto3JsonSafe(Community.create(), payload);
     return (community, '');
   } catch (e, s) {
     debugPrint('decodeQRPayload failed: $e\n$s');

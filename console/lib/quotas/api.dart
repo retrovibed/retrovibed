@@ -11,7 +11,7 @@ abstract class api {
   }) async {
     return httpx.get(Uri.https(httpx.metaendpoint(), "/q/", {}), options: options).then((v) {
       return Future.value(
-        QuotaSearchResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+        httpx.fromProto3JsonSafe(QuotaSearchResponse.create(), jsonDecode(v.body)),
       );
     });
   }
@@ -27,7 +27,7 @@ abstract class api {
         )
         .then((v) {
           return Future.value(
-            QuotaFindResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(QuotaFindResponse.create(), jsonDecode(v.body)),
           );
         });
   }

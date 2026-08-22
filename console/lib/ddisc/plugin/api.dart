@@ -22,7 +22,7 @@ abstract class plugins {
         )
         .then((v) {
           return Future.value(
-            PluginSearchResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(PluginSearchResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -33,7 +33,7 @@ abstract class plugins {
   }) async {
     return httpx.get(Uri.https(httpx.host(), "/ddisc/plugin/${id}"), options: options).then((v) {
       return Future.value(
-        PluginFindResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+        httpx.fromProto3JsonSafe(PluginFindResponse.create(), jsonDecode(v.body)),
       );
     });
   }
@@ -62,7 +62,7 @@ abstract class plugins {
       return client.send(r0).then(httpx.auto_error).then((v) {
         return v.stream.bytesToString().then((s) {
           return Future.value(
-            PluginCreateResponse.create()..mergeFromProto3Json(jsonDecode(s)),
+            httpx.fromProto3JsonSafe(PluginCreateResponse.create(), jsonDecode(s)),
           );
         });
       });
@@ -75,7 +75,7 @@ abstract class plugins {
   }) async {
     return httpx.delete(Uri.https(httpx.host(), "/ddisc/plugin/${id}"), options: options).then((v) {
       return Future.value(
-        PluginDeleteResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+        httpx.fromProto3JsonSafe(PluginDeleteResponse.create(), jsonDecode(v.body)),
       );
     });
   }

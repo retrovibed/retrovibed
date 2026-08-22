@@ -10,7 +10,7 @@ abstract class configuration {
   }) async {
     return httpx.get(Uri.https(httpx.host(), "/s/discovery/", {}), options: options).then((v) {
       return Future.value(
-        DiscoverySettings.create()..mergeFromProto3Json(jsonDecode(v.body)),
+        httpx.fromProto3JsonSafe(DiscoverySettings.create(), jsonDecode(v.body)),
       );
     });
   }
@@ -27,7 +27,7 @@ abstract class configuration {
         )
         .then((v) {
           return Future.value(
-            DiscoverySettings.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(DiscoverySettings.create(), jsonDecode(v.body)),
           );
         });
   }

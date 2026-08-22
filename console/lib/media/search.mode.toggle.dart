@@ -11,19 +11,14 @@ PopupMenuItem<String> SearchModeToggle({
   required String label,
   required void Function(SearchMode) onSelect,
 }) {
+  final selected = mode == current.value;
   return PopupMenuItem<String>(
-    child: ValueListenableBuilder<SearchMode>(
-      valueListenable: current,
-      builder: (context, currentMode, _) {
-        final selected = mode == currentMode;
-        return ListTile(
-          leading: Icon(selected ? Icons.check : icon),
-          title: Text(label),
-          selected: selected,
-          hoverColor: Colors.transparent,
-          onTap: () => onSelect(selected ? SearchMode.library : mode),
-        );
-      },
+    onTap: () => onSelect(selected ? SearchMode.library : mode),
+    child: ListTile(
+      leading: Icon(selected ? Icons.check : icon),
+      title: Text(label),
+      selected: selected,
+      hoverColor: Colors.transparent,
     ),
   );
 }

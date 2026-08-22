@@ -14,7 +14,7 @@ class YouTube {
           Uri.https(httpx.host(), "/integrations/youtube/status"),
           options: [httpx.Accept.json, ...options],
         )
-        .then((v) => YouTubeStatus()..mergeFromProto3Json(jsonDecode(v.body)));
+        .then((v) => httpx.fromProto3JsonSafe(YouTubeStatus(), jsonDecode(v.body)));
   }
 
   static Future<void> unlink({

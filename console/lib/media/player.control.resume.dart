@@ -19,6 +19,7 @@ class PlayerControlResume extends StatelessWidget {
         return Material(
           color: theme.colorScheme.surface,
           child: InkWell(
+            mouseCursor: SystemMouseCursors.click,
             onTap: () => player.play(),
             child: Padding(
               padding: defaults.padding / 2,
@@ -26,7 +27,11 @@ class PlayerControlResume extends StatelessWidget {
                 spacing: defaults.spacing,
                 children: [
                   Icon(Icons.play_circle_outline_rounded),
-                  player.state.playing ? Text(current.description) : Text("Resume ${current.description}"),
+                  Flexible(
+                    child: player.state.playing
+                        ? Text(current.description, maxLines: 1, overflow: TextOverflow.ellipsis)
+                        : Text("Resume ${current.description}", maxLines: 1, overflow: TextOverflow.ellipsis),
+                  ),
                 ],
               ),
             ),

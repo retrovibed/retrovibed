@@ -16,6 +16,6 @@ abstract class network {
           Uri.https(httpx.host(), "/diagnostics/network/"),
           options: [httpx.Accept.json, ...options],
         )
-        .then((v) => NetworkMetricsResponse()..mergeFromProto3Json(jsonDecode(v.body)));
+        .then((v) => httpx.fromProto3JsonSafe(NetworkMetricsResponse(), jsonDecode(v.body)));
   }
 }

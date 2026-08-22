@@ -10,7 +10,7 @@ abstract class api {
   }) async {
     return httpx.get(Uri.https(httpx.host(), "/s/torrents/", {}), options: options).then((v) {
       return Future.value(
-        TorrentSettings.create()..mergeFromProto3Json(jsonDecode(v.body)),
+        httpx.fromProto3JsonSafe(TorrentSettings.create(), jsonDecode(v.body)),
       );
     });
   }
@@ -27,7 +27,7 @@ abstract class api {
         )
         .then((v) {
           return Future.value(
-            TorrentSettings.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(TorrentSettings.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -42,7 +42,7 @@ abstract class api {
         )
         .then((v) {
           return Future.value(
-            TorrentSettings.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(TorrentSettings.create(), jsonDecode(v.body)),
           );
         });
   }

@@ -45,7 +45,7 @@ Future<Authn> current({String? host}) {
           httpx.Request.authorization(httpx.auto_bearer_host(host: hostport)),
         ],
       )
-      .then((v) => Authn.create()..mergeFromProto3Json(jsonDecode(v.body)));
+      .then((v) => httpx.fromProto3JsonSafe(Authn.create(), jsonDecode(v.body)));
 }
 
 Future<Session> register(Identity iden, {String? host}) {
@@ -63,7 +63,7 @@ Future<Session> register(Identity iden, {String? host}) {
           ),
         ],
       )
-      .then((r) => Session.create()..mergeFromProto3Json(jsonDecode(r.body)));
+      .then((r) => httpx.fromProto3JsonSafe(Session.create(), jsonDecode(r.body)));
 }
 
 abstract class daemons {
@@ -84,7 +84,7 @@ abstract class daemons {
         )
         .then(httpx.auto_error)
         .then((v) {
-          return DaemonSearchResponse.create()..mergeFromProto3Json(jsonDecode(v.body));
+          return httpx.fromProto3JsonSafe(DaemonSearchResponse.create(), jsonDecode(v.body));
         });
   }
 
@@ -98,7 +98,7 @@ abstract class daemons {
         .then(httpx.auto_error)
         .then((v) {
           return Future.value(
-            DaemonCreateResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(DaemonCreateResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -116,7 +116,7 @@ abstract class daemons {
         .then((v) {
           print("SIH ${v.body}");
           return Future.value(
-            DaemonUpdateResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(DaemonUpdateResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -135,7 +135,7 @@ abstract class daemons {
         .then(httpx.dart_io_auto_error)
         .then((r) {
           return r.transform(utf8.decoder).join().then((body) {
-            return DaemonDisableResponse.create()..mergeFromProto3Json(jsonDecode(body));
+            return httpx.fromProto3JsonSafe(DaemonDisableResponse.create(), jsonDecode(body));
           });
         });
   }
@@ -156,7 +156,7 @@ abstract class daemons {
         .then(httpx.auto_error)
         .then((v) {
           return Future.value(
-            DaemonDisableResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(DaemonDisableResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -176,7 +176,7 @@ abstract class daemons {
             StreamTransformer.fromHandlers(
               handleData: (data, sink) {
                 if (data is List<int>) {
-                  sink.add(Daemon.create()..mergeFromProto3Json(jsonDecode(utf8.decode(data))));
+                  sink.add(httpx.fromProto3JsonSafe(Daemon.create(), jsonDecode(utf8.decode(data))));
                 } else {
                   sink.addError('deserialization failed data: $data');
                 }
@@ -195,7 +195,7 @@ abstract class daemons {
         .then(httpx.auto_error)
         .then((v) {
           return Future.value(
-            DaemonLookupResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(DaemonLookupResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -227,7 +227,7 @@ abstract class profiles {
           options: options,
         )
         .then(
-          (v) => ProfileSearchResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+          (v) => httpx.fromProto3JsonSafe(ProfileSearchResponse.create(), jsonDecode(v.body)),
         );
   }
 
@@ -242,7 +242,7 @@ abstract class profiles {
           options: options,
         )
         .then(
-          (v) => ProfileCreateResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+          (v) => httpx.fromProto3JsonSafe(ProfileCreateResponse.create(), jsonDecode(v.body)),
         );
   }
 
@@ -253,7 +253,7 @@ abstract class profiles {
     return httpx
         .get(Uri.https(httpx.host(), "/meta/u12t/${id}"), options: options)
         .then(
-          (v) => ProfileLookupResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+          (v) => httpx.fromProto3JsonSafe(ProfileLookupResponse.create(), jsonDecode(v.body)),
         );
   }
 
@@ -272,7 +272,7 @@ abstract class profiles {
           options: options,
         )
         .then(
-          (v) => ProfileUpdateResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+          (v) => httpx.fromProto3JsonSafe(ProfileUpdateResponse.create(), jsonDecode(v.body)),
         );
   }
 
@@ -287,7 +287,7 @@ abstract class profiles {
           options: options,
         )
         .then(
-          (v) => ProfileUpdateResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+          (v) => httpx.fromProto3JsonSafe(ProfileUpdateResponse.create(), jsonDecode(v.body)),
         );
   }
 
@@ -298,7 +298,7 @@ abstract class profiles {
     return httpx
         .delete(Uri.https(httpx.host(), "/meta/u12t/${id}"), options: options)
         .then(
-          (v) => ProfileDisableResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+          (v) => httpx.fromProto3JsonSafe(ProfileDisableResponse.create(), jsonDecode(v.body)),
         );
   }
 }
@@ -323,7 +323,7 @@ abstract class authz {
         .then(httpx.dart_io_auto_error)
         .then((r) {
           return r.transform(utf8.decoder).join().then((body) {
-            return AuthzResponse.create()..mergeFromProto3Json(jsonDecode(body));
+            return httpx.fromProto3JsonSafe(AuthzResponse.create(), jsonDecode(body));
           });
         });
   }
@@ -335,7 +335,7 @@ abstract class authz {
     return httpx
         .get(Uri.https(httpx.host(), "/meta/authz/${id}"), options: options)
         .then(
-          (v) => AuthzProfileResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+          (v) => httpx.fromProto3JsonSafe(AuthzProfileResponse.create(), jsonDecode(v.body)),
         );
   }
 
@@ -351,7 +351,7 @@ abstract class authz {
           options: options,
         )
         .then(
-          (v) => AuthzGrantResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+          (v) => httpx.fromProto3JsonSafe(AuthzGrantResponse.create(), jsonDecode(v.body)),
         );
   }
 
@@ -362,7 +362,7 @@ abstract class authz {
     return httpx
         .delete(Uri.https(httpx.host(), "/meta/authz/${id}"), options: options)
         .then(
-          (v) => AuthzRevokeResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+          (v) => httpx.fromProto3JsonSafe(AuthzRevokeResponse.create(), jsonDecode(v.body)),
         );
   }
 }

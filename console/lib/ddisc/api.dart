@@ -35,7 +35,7 @@ abstract class api {
         )
         .then((v) {
           return Future.value(
-            DiscoveryDownloadResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(DiscoveryDownloadResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -57,7 +57,7 @@ abstract class api {
             StreamTransformer.fromHandlers(
               handleData: (data, sink) {
                 if (data is List<int>) {
-                  sink.add(Discovery.create()..mergeFromProto3Json(jsonDecode(utf8.decode(data))));
+                  sink.add(httpx.fromProto3JsonSafe(Discovery.create(), jsonDecode(utf8.decode(data))));
                 } else {
                   sink.addError('deserialization failed data: $data');
                 }
@@ -77,6 +77,6 @@ abstract class diagnostics {
           Uri.https(httpx.host(), "/diagnostics/discovery/"),
           options: [httpx.Accept.json, ...options],
         )
-        .then((v) => DiscoveryMetricsResponse()..mergeFromProto3Json(jsonDecode(v.body)));
+        .then((v) => httpx.fromProto3JsonSafe(DiscoveryMetricsResponse(), jsonDecode(v.body)));
   }
 }

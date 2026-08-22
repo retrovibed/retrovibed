@@ -12,7 +12,7 @@ Future<Session> current(String token) async {
         options: [httpx.Request.authorization(httpx.bearer(token))],
       )
       .then((v) {
-        return Session.create()..mergeFromProto3Json(jsonDecode(v.body));
+        return httpx.fromProto3JsonSafe(Session.create(), jsonDecode(v.body));
       });
 }
 
@@ -23,7 +23,7 @@ Future<Session> otp({List<httpx.Option> options = const []}) async {
         options: options,
       )
       .then((v) {
-        return Session.create()..mergeFromProto3Json(jsonDecode(v.body));
+        return httpx.fromProto3JsonSafe(Session.create(), jsonDecode(v.body));
       });
 }
 
@@ -35,7 +35,7 @@ Future<Authed> ssh() async {
         options: [httpx.Request.authorization(token)],
       )
       .then((v) {
-        return Authed.create()..mergeFromProto3Json(jsonDecode(v.body));
+        return httpx.fromProto3JsonSafe(Authed.create(), jsonDecode(v.body));
       });
 }
 
@@ -46,7 +46,7 @@ Future<Session> signup() {
         options: [httpx.Request.authorization(httpx.deeppool_oauth2_bearer())],
       )
       .then((v) {
-        return Session.create()..mergeFromProto3Json(jsonDecode(v.body));
+        return httpx.fromProto3JsonSafe(Session.create(), jsonDecode(v.body));
       });
 }
 

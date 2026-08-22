@@ -44,7 +44,7 @@ class publishing {
         )
         .then((v) {
           return Future.value(
-            PublishContentResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(PublishContentResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -69,7 +69,7 @@ class publishing {
         )
         .then((v) {
           return Future.value(
-            PublishedContentSearchResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(PublishedContentSearchResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -88,7 +88,7 @@ class publishing {
         )
         .then((v) {
           return Future.value(
-            PublishContentDeleteResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(PublishContentDeleteResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -113,7 +113,7 @@ class metrics {
         )
         .then((v) {
           return Future.value(
-            CommunityMetricsResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(CommunityMetricsResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -129,7 +129,7 @@ class metrics {
         )
         .then((v) {
           return Future.value(
-            MetricsSyncProgress.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(MetricsSyncProgress.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -151,7 +151,7 @@ class API {
         )
         .then((v) {
           return Future.value(
-            CommunitySearchResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(CommunitySearchResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -168,7 +168,7 @@ class API {
         )
         .then((v) {
           return Future.value(
-            CommunityCreateResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(CommunityCreateResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -185,7 +185,7 @@ class API {
         )
         .then((v) {
           return Future.value(
-            CommunityDeleteResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(CommunityDeleteResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -203,7 +203,7 @@ class API {
         )
         .then((v) {
           return Future.value(
-            CommunityUpdateResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(CommunityUpdateResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -229,7 +229,7 @@ class API {
         )
         .then((v) {
           return Future.value(
-            PublishedContentSearchResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(PublishedContentSearchResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -245,7 +245,7 @@ class API {
         )
         .then((v) {
           return Future.value(
-            CommunitySubscribeResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(CommunitySubscribeResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -262,7 +262,7 @@ class API {
         )
         .then((v) {
           return Future.value(
-            PublishedContentSearchResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(PublishedContentSearchResponse.create(), jsonDecode(v.body)),
           );
         });
   }

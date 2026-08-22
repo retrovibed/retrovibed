@@ -9,7 +9,7 @@ abstract class api {
   }) async {
     return httpx.get(Uri.https(httpx.host(), "/s/storage/", {}), options: options).then((v) {
       return Future.value(
-        StorageSettingsResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+        httpx.fromProto3JsonSafe(StorageSettingsResponse.create(), jsonDecode(v.body)),
       );
     });
   }
@@ -26,7 +26,7 @@ abstract class api {
         )
         .then((v) {
           return Future.value(
-            StorageSettingsResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(StorageSettingsResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -41,7 +41,7 @@ abstract class api {
         )
         .then((v) {
           return Future.value(
-            StorageSettingsResponse.create()..mergeFromProto3Json(jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(StorageSettingsResponse.create(), jsonDecode(v.body)),
           );
         });
   }

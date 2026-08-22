@@ -6,34 +6,34 @@ import 'dart:ui' show lerpDouble;
 class Defaults extends ThemeExtension<Defaults> {
   static const defaults = Defaults();
 
-  static final _defaultDesktop = Platform.isLinux || Platform.isWindows || Platform.isMacOS;
-  static final _defaultMobile = Platform.isAndroid || Platform.isIOS;
-  static final _defaultBorderRadius = BorderRadius.circular(10.0);
-  static const _defaultSpacing = 10.0;
-  static const _defaultPadding = EdgeInsets.all(16.0);
-  static const _defaultMargin = EdgeInsets.all(5.0);
-  static const _defaultDanger = Color.fromRGBO(110, 1, 1, 0.75);
-  static const _defaultSuccess = Color.fromARGB(255, 0, 255, 17);
-  static const _defaultOpaque = Color.fromRGBO(0, 0, 0, 0.80);
-  static const _defaultHighlight = Color.fromRGBO(140, 120, 220, 0.25);
-  static const _defaultDangerTint = [
+  static final kDesktop = Platform.isLinux || Platform.isWindows || Platform.isMacOS;
+  static final kMobile = Platform.isAndroid || Platform.isIOS;
+  static final kBorderRadius = BorderRadius.circular(10.0);
+  static const kSpacing = 10.0;
+  static const kPadding = EdgeInsets.all(16.0);
+  static const kMargin = EdgeInsets.all(5.0);
+  static const kDanger = Color.fromRGBO(110, 1, 1, 0.75);
+  static const kSuccess = Color.fromARGB(255, 0, 255, 17);
+  static const kOpaque = Color.fromRGBO(0, 0, 0, 0.80);
+  static const kHighlight = Color.fromRGBO(140, 120, 220, 0.25);
+  static const kDangerTint = [
     BoxShadow(
       color: Color.fromRGBO(110, 1, 1, 0.4),
       spreadRadius: 1,
       blurRadius: 10,
     ),
   ];
-  static const _defaultHighlightTint = [
+  static const kHighlightTint = [
     BoxShadow(
       color: Color.fromRGBO(140, 120, 220, 0.4),
       spreadRadius: 1,
       blurRadius: 10,
     ),
   ];
-  static const _defaultBorder = Border.fromBorderSide(
+  static const kBorder = Border.fromBorderSide(
     BorderSide(color: Color(0xFF000000)),
   );
-  static const _defaultCompact = 400.0;
+  static const kCompact = 400.0;
 
   final bool? _desktop;
   final bool? _mobile;
@@ -51,20 +51,20 @@ class Defaults extends ThemeExtension<Defaults> {
   final double? _compact;
   final bool? _isCompact;
 
-  bool get desktop => _desktop ?? _defaultDesktop;
-  bool get mobile => _mobile ?? _defaultMobile;
-  double get spacing => _spacing ?? _defaultSpacing;
-  EdgeInsets get padding => _padding ?? _defaultPadding;
-  EdgeInsets get margin => _margin ?? _defaultMargin;
-  Border get border => _border ?? _defaultBorder;
-  BorderRadius get borderRadius => _borderRadius ?? _defaultBorderRadius;
-  Color get danger => _danger ?? _defaultDanger;
-  Color get success => _success ?? _defaultSuccess;
-  Color get opaque => _opaque ?? _defaultOpaque;
-  Color get highlight => _highlight ?? _defaultHighlight;
-  List<BoxShadow> get dangerTint => _dangerTint ?? _defaultDangerTint;
-  List<BoxShadow> get highlightTint => _highlightTint ?? _defaultHighlightTint;
-  double get compact => _compact ?? _defaultCompact;
+  bool get desktop => _desktop ?? kDesktop;
+  bool get mobile => _mobile ?? kMobile;
+  double get spacing => _spacing ?? kSpacing;
+  EdgeInsets get padding => _padding ?? kPadding;
+  EdgeInsets get margin => _margin ?? kMargin;
+  Border get border => _border ?? kBorder;
+  BorderRadius get borderRadius => _borderRadius ?? kBorderRadius;
+  Color get danger => _danger ?? kDanger;
+  Color get success => _success ?? kSuccess;
+  Color get opaque => _opaque ?? kOpaque;
+  Color get highlight => _highlight ?? kHighlight;
+  List<BoxShadow> get dangerTint => _dangerTint ?? kDangerTint;
+  List<BoxShadow> get highlightTint => _highlightTint ?? kHighlightTint;
+  double get compact => _compact ?? kCompact;
   bool get isCompact => _isCompact ?? false;
 
   // The constructor accepts nullable values to create partial instances.
@@ -161,13 +161,13 @@ class Defaults extends ThemeExtension<Defaults> {
       opaque: Color.lerp(_opaque, other._opaque, t),
       highlight: Color.lerp(_highlight, other._highlight, t),
       dangerTint: BoxShadow.lerpList(
-        _dangerTint ?? _defaultDangerTint,
-        other._dangerTint ?? _defaultDangerTint,
+        _dangerTint ?? kDangerTint,
+        other._dangerTint ?? kDangerTint,
         t,
       ),
       highlightTint: BoxShadow.lerpList(
-        _highlightTint ?? _defaultHighlightTint,
-        other._highlightTint ?? _defaultHighlightTint,
+        _highlightTint ?? kHighlightTint,
+        other._highlightTint ?? kHighlightTint,
         t,
       ),
       desktop: other._desktop ?? _desktop,

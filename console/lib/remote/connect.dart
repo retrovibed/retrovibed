@@ -24,17 +24,19 @@ import 'playlist.queue.dart';
 class Connect extends StatelessWidget {
   final ValueNotifier<media.MediaSearchState> search;
   final Future<Stream<meta.Daemon>> Function({List<httpx.Option> options}) daemonDiscover;
+  final Future<remote.RemoteControlSocket> Function({required String host, List<httpx.Option> options}) connect;
 
   const Connect({
     super.key,
     required this.search,
     this.daemonDiscover = meta.daemons.discover,
+    this.connect = remote.remotecontrol.connect,
   });
 
   @override
   Widget build(BuildContext context) {
     return authn.AuthedEndpoint(
-      _Connect(search: search, daemonDiscover: daemonDiscover),
+      _Connect(search: search, daemonDiscover: daemonDiscover, connect: connect),
     );
   }
 }
@@ -42,8 +44,9 @@ class Connect extends StatelessWidget {
 class _Connect extends StatefulWidget {
   final ValueNotifier<media.MediaSearchState> search;
   final Future<Stream<meta.Daemon>> Function({List<httpx.Option> options}) daemonDiscover;
+  final Future<remote.RemoteControlSocket> Function({required String host, List<httpx.Option> options}) connect;
 
-  const _Connect({required this.search, required this.daemonDiscover});
+  const _Connect({required this.search, required this.daemonDiscover, required this.connect});
 
   @override
   State<_Connect> createState() => _State();
@@ -145,6 +148,7 @@ class _State extends State<_Connect> with LoadingState {
       _latest = remote.Stream(sid: uuidx.min());
       _focused = PlaylistQueue(<media.Media>[], remote.RemoteControlSocket.noop, key: const ValueKey("queue"));
     });
+
     _connect();
   }
 
@@ -158,10 +162,21 @@ class _State extends State<_Connect> with LoadingState {
   void _connect() {
     if (!mounted) return;
     if (_endpoint.value.hostname.isEmpty) return;
+    if (meta.daemons.isLocalDevice(_endpoint.value)) {
+      setState(() {
+        loading = false;
+        _socket = remote.RemoteControlSocket.disabled;
+        cause = ds.Error.text(
+          "you do not have permission to remotely control this device",
+          decoration: ds.ErrorDecorations.info,
+        );
+      });
+      return;
+    }
 
     setState(() => loading = true);
 
-    remote.remotecontrol
+    widget
         .connect(host: _endpoint.value.hostname, options: [authn.request(authn.AuthedEndpoint.token(context))])
         .then((socket) {
           final c = Completer();
@@ -194,11 +209,22 @@ class _State extends State<_Connect> with LoadingState {
             _socket = remote.RemoteControlSocket.noop;
             cause = ds.Error.unauthorized(
               error,
-              message: const Text("remote control is disabled on this daemon"),
-              onTap: resetCause,
+              message: const Text("remote control is disabled on this device"),
+              decoration: ds.ErrorDecorations.info,
             );
           });
         }, test: httpx.ErrorsTest.forbidden)
+        .catchError((error) {
+          setState(() {
+            loading = false;
+            _socket = remote.RemoteControlSocket.noop;
+            cause = ds.Error.unauthorized(
+              error,
+              message: const Text("you do not have permission to remotely control this device"),
+              decoration: ds.ErrorDecorations.info,
+            );
+          });
+        }, test: httpx.ErrorsTest.unauthorized)
         .catchError((error) {
           setState(() {
             loading = false;
@@ -268,6 +294,7 @@ class _State extends State<_Connect> with LoadingState {
             child: ds.Container(
               padding: defaults.padding,
               ds.Loading(
+                cause: cause,
                 loading: _socket == remote.RemoteControlSocket.noop,
                 _focused ??
                     Column(

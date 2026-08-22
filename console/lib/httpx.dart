@@ -6,6 +6,7 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
+import 'package:protobuf/protobuf.dart';
 import 'package:retrovibed/retrovibed.dart' as retro;
 
 var _host = localhost();
@@ -551,4 +552,17 @@ Future<T> withRetry<T>(
       await Future.delayed(delay);
     }
   }
+}
+
+T fromProto3JsonSafe<T extends GeneratedMessage>(
+  T instance,
+  Object? json, {
+  TypeRegistry typeRegistry = const TypeRegistry.empty(),
+  bool ignoreUnknownFields = true,
+}) {
+  return instance..mergeFromProto3Json(
+    json,
+    typeRegistry: typeRegistry,
+    ignoreUnknownFields: ignoreUnknownFields,
+  );
 }

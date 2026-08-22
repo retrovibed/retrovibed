@@ -83,8 +83,8 @@ class ErrorBoundaryState extends State<ErrorBoundary> {
 }
 
 abstract class ErrorDecorations {
-  static const error = BoxDecoration(color: Color.fromRGBO(110, 1, 1, 0.75));
-  static const info = BoxDecoration(color: Colors.transparent);
+  static const error = BoxDecoration(color: theming.Defaults.kDanger);
+  static const info = BoxDecoration(color: theming.Defaults.kOpaque);
 }
 
 class Error extends StatelessWidget {
@@ -126,10 +126,30 @@ class Error extends StatelessWidget {
     return super.createElement();
   }
 
-  static Error text(String text, {StackTrace? trace, void Function()? onTap, Color? color}) =>
-      Error(child: Text(text), trace: trace ?? StackTrace.current, onTap: onTap, color: color);
+  static Error text(
+    String text, {
+    StackTrace? trace,
+    void Function()? onTap,
+    Color? color,
+    BoxDecoration decoration = ErrorDecorations.error,
+    BorderRadius? borderRadius,
+  }) => Error(
+    child: Text(text),
+    trace: trace ?? StackTrace.current,
+    onTap: onTap,
+    color: color,
+    decoration: decoration,
+    borderRadius: borderRadius,
+  );
 
-  static Error unknown(Object obj, {StackTrace? trace, void Function()? onTap}) {
+  static Error unknown(
+    Object obj, {
+    StackTrace? trace,
+    void Function()? onTap,
+    Color? color,
+    BoxDecoration decoration = ErrorDecorations.error,
+    BorderRadius? borderRadius,
+  }) {
     return Error(
       child: Text(
         "an unexpected problem has occurred",
@@ -138,6 +158,9 @@ class Error extends StatelessWidget {
       cause: obj,
       trace: trace ?? StackTrace.current,
       onTap: onTap,
+      color: color,
+      decoration: decoration,
+      borderRadius: borderRadius,
     );
   }
 
@@ -167,7 +190,14 @@ class Error extends StatelessWidget {
     return unknown(obj, trace: trace ?? StackTrace.current, onTap: onTap);
   }
 
-  static Error offline(SocketException obj, {StackTrace? trace, void Function()? onTap}) {
+  static Error offline(
+    SocketException obj, {
+    StackTrace? trace,
+    void Function()? onTap,
+    Color? color,
+    BoxDecoration decoration = ErrorDecorations.error,
+    BorderRadius? borderRadius,
+  }) {
     return Error(
       child: SelectableText(
         "unable to connect to daemon, is it running? check ${obj.address?.address}:${obj.port}.",
@@ -175,10 +205,20 @@ class Error extends StatelessWidget {
       cause: obj,
       trace: trace ?? StackTrace.current,
       onTap: onTap,
+      color: color,
+      decoration: decoration,
+      borderRadius: borderRadius,
     );
   }
 
-  static Error connectivity(Object obj, {StackTrace? trace, void Function()? onTap}) {
+  static Error connectivity(
+    Object obj, {
+    StackTrace? trace,
+    void Function()? onTap,
+    Color? color,
+    BoxDecoration decoration = ErrorDecorations.error,
+    BorderRadius? borderRadius,
+  }) {
     return Error(
       child: SelectableText(
         "unable to connect, seems like there is a general connectivity issue impacting the destination.",
@@ -186,10 +226,20 @@ class Error extends StatelessWidget {
       cause: obj,
       trace: trace ?? StackTrace.current,
       onTap: onTap,
+      color: color,
+      decoration: decoration,
+      borderRadius: borderRadius,
     );
   }
 
-  static Error timeout(Object obj, {StackTrace? trace, void Function()? onTap}) {
+  static Error timeout(
+    Object obj, {
+    StackTrace? trace,
+    void Function()? onTap,
+    Color? color,
+    BoxDecoration decoration = ErrorDecorations.error,
+    BorderRadius? borderRadius,
+  }) {
     return Error(
       child: Text(
         "timeout error: unable to complete within the expected timeframe",
@@ -197,6 +247,9 @@ class Error extends StatelessWidget {
       cause: obj,
       trace: trace ?? StackTrace.current,
       onTap: onTap,
+      color: color,
+      decoration: decoration,
+      borderRadius: borderRadius,
     );
   }
 
