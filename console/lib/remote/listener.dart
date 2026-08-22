@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:retrovibed/authn.dart' as authn;
@@ -39,6 +40,15 @@ class _State extends State<RemoteControlListener> {
   Future<void> _echoSync() async {
     final queue = _queue;
     final library = _library.value;
+    // temporary hack fix until we fix the listener.
+    // problem was when the device was serving its own content it sent localhost
+    // as the library over the sync protocol. resulting in the wrong token used
+    // against the wrong host. the longterm fix is to have golang ffi return the proper hostname.
+    // see DaemonFromHost.
+    library
+      ..hostname = meta.daemons.isLocalDevice(library)
+          ? library.hostname.replaceFirst("localhost", Platform.localHostname)
+          : library.hostname;
     final cached = authn.AuthzCache.meta(context);
     // forces a refresh if expired, so token is never blank
     return cached.auto().then((bearer) {

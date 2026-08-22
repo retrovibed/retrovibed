@@ -76,13 +76,20 @@ class _State extends State<_Connect> with LoadingState {
   // completes.
   bool _filling = false;
 
+  // temporary hack fix until we fix the listener.
+  // problem was when the device was serving its own content it sent localhost
+  // as the library over the sync protocol. resulting in the wrong token used
+  // against the wrong host. the longterm fix is to have golang ffi return the proper hostname.
+  // see DaemonFromHost.
+  String get _hostname =>
+      meta.daemons.isLocalDevice(_latest.sync.library) ? _endpoint.value.hostname : _latest.sync.library.hostname;
   // resolved fresh on every access (not cached) since _latest changes over
   // the widget's lifetime and these must always target whatever
   // daemon/hostname/token is current, whether read from build() or later
   // from _onPlay/_fillQueue.
   List<httpx.Option> get _bearerOptions => [httpx.Request.bearer(() => Future.value(_latest.sync.token))];
-  media.FnMediaSearch get _apisearch => media.media.searchendpoint(_latest.sync.library.hostname, _bearerOptions);
-  media.FnMediaFind get _apirandom => media.media.randomendpoint(_latest.sync.library.hostname, _bearerOptions);
+  media.FnMediaSearch get _apisearch => media.media.searchendpoint(_hostname, _bearerOptions);
+  media.FnMediaFind get _apirandom => media.media.randomendpoint(_hostname, _bearerOptions);
 
   // Mirrors media.PlayAction's shape but queues the media on the connected
   // remote daemon's playlist instead of this device's local Playlist, since
@@ -311,9 +318,9 @@ class _State extends State<_Connect> with LoadingState {
                             PlayerControlSeek.next(socket: _socket),
                             ds.LoadingIconButton.search(
                               toggled: _focused?.key == search.key,
-                              onPressed: ds.LoadingIconButton.convert(
-                                () => setState(() => _focused = _focused?.key == search.key ? ds.Empty : search),
-                              ),
+                              onPressed: ds.LoadingIconButton.convert(() {
+                                setState(() => _focused = _focused?.key == search.key ? ds.Empty : search);
+                              }),
                               tooltip: "search the remote device's library",
                               help: ds.Hint(const Text("search the remote device's library to queue media on it")),
                             ),
