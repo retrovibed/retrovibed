@@ -59,10 +59,6 @@ class _State extends State<_Connect> with LoadingState {
   Stream<remote.Stream> _messages = Stream.empty();
   // nil-sid sentinel; unset oneof -> _latest.sync reads as a zero Sync.
   remote.Stream _latest = remote.Stream(sid: uuidx.min());
-  // last volume level echoed by the daemon; Volume is reported out-of-band
-  // from Sync, but the listener always echoes one right after every sync
-  // response, so this is populated as soon as the initial sync completes.
-  double _volume = 0;
   // which widget occupies the focused slot below the transport controls,
   // defaulting to the pending-queue view. Kept in sync with the live
   // search/queue widgets at the top of build() (matched by key, since
@@ -166,7 +162,7 @@ class _State extends State<_Connect> with LoadingState {
   }
 
   void _volumeAdjust(double delta) {
-    _socket.send(remote.messages.volume((_volume + delta).clamp(0.0, 100.0)));
+    _socket.send(remote.messages.volume((_latest.volume.level + delta).clamp(0.0, 100.0)));
   }
 
   void _volumeMute() {
@@ -209,14 +205,13 @@ class _State extends State<_Connect> with LoadingState {
             _messages.listen(
               (msg) {
                 if (msg.whichCommand() == remote.Stream_Command.volume) {
-                  setState(() => _volume = msg.volume.level);
+                  setState(() => _latest.volume.level = msg.volume.level);
                   return;
                 }
                 if (msg.whichCommand() != remote.Stream_Command.sync) return;
                 if (msg.sid.compareTo(_latest.sid) <= 0) return;
                 setState(() {
                   _latest = msg;
-                  _volume = msg.sync.volume;
                 });
                 _fillQueue();
               },
@@ -371,7 +366,7 @@ class _State extends State<_Connect> with LoadingState {
                             ),
                             if (authn.developer(context).debug) PlayerControlSync(socket: _socket),
                           ]),
-                          PlayerControlVolume(socket: _socket, current: _volume),
+                          PlayerControlVolume(socket: _socket, current: _latest.volume.level),
                           PlaylistCurrent(_latest.sync.current),
                           Expanded(child: queue),
                         ],

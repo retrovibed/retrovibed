@@ -242,15 +242,17 @@ class Seek extends $pb.GeneratedMessage {
   void clearOffset() => $_clearField(1);
 }
 
-/// Volume - adjust the audio volume by the given number of percentage points
-/// (0-100 scale), relative to the current level. offset == int32 min is a
-/// sentinel meaning "toggle mute" rather than a literal adjustment.
+/// Volume sets (sent by a connect client) or reports (echoed by the listener
+/// whenever its local volume changes, independent of Sync) the audio volume,
+/// 0-100 scale.
 class Volume extends $pb.GeneratedMessage {
   factory Volume({
-    $core.int? offset,
+    $core.bool? muted,
+    $core.double? level,
   }) {
     final result = create();
-    if (offset != null) result.offset = offset;
+    if (muted != null) result.muted = muted;
+    if (level != null) result.level = level;
     return result;
   }
 
@@ -267,7 +269,8 @@ class Volume extends $pb.GeneratedMessage {
       _omitMessageNames ? '' : 'Volume',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
       createEmptyInstance: create)
-    ..aI(1, _omitFieldNames ? '' : 'offset')
+    ..aOB(1, _omitFieldNames ? '' : 'muted')
+    ..aD(2, _omitFieldNames ? '' : 'level', fieldType: $pb.PbFieldType.OF)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -289,13 +292,22 @@ class Volume extends $pb.GeneratedMessage {
   static Volume? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.int get offset => $_getIZ(0);
+  $core.bool get muted => $_getBF(0);
   @$pb.TagNumber(1)
-  set offset($core.int value) => $_setSignedInt32(0, value);
+  set muted($core.bool value) => $_setBool(0, value);
   @$pb.TagNumber(1)
-  $core.bool hasOffset() => $_has(0);
+  $core.bool hasMuted() => $_has(0);
   @$pb.TagNumber(1)
-  void clearOffset() => $_clearField(1);
+  void clearMuted() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.double get level => $_getN(1);
+  @$pb.TagNumber(2)
+  set level($core.double value) => $_setFloat(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasLevel() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearLevel() => $_clearField(2);
 }
 
 /// Sync requests (when sent with no fields set) or reports (when sent
@@ -309,6 +321,7 @@ class Sync extends $pb.GeneratedMessage {
     $0.Media? current,
     $core.String? token,
     $fixnum.Int64? expiration,
+    $core.double? volume,
     $core.Iterable<$0.Media>? queue,
   }) {
     final result = create();
@@ -317,6 +330,7 @@ class Sync extends $pb.GeneratedMessage {
     if (current != null) result.current = current;
     if (token != null) result.token = token;
     if (expiration != null) result.expiration = expiration;
+    if (volume != null) result.volume = volume;
     if (queue != null) result.queue.addAll(queue);
     return result;
   }
@@ -341,6 +355,7 @@ class Sync extends $pb.GeneratedMessage {
         subBuilder: $0.Media.create)
     ..aOS(4, _omitFieldNames ? '' : 'token')
     ..aInt64(5, _omitFieldNames ? '' : 'expiration')
+    ..aD(6, _omitFieldNames ? '' : 'volume', fieldType: $pb.PbFieldType.OF)
     ..pPM<$0.Media>(1000, _omitFieldNames ? '' : 'queue',
         subBuilder: $0.Media.create)
     ..hasRequiredFields = false;
@@ -412,8 +427,17 @@ class Sync extends $pb.GeneratedMessage {
   @$pb.TagNumber(5)
   void clearExpiration() => $_clearField(5);
 
+  @$pb.TagNumber(6)
+  $core.double get volume => $_getN(5);
+  @$pb.TagNumber(6)
+  set volume($core.double value) => $_setFloat(5, value);
+  @$pb.TagNumber(6)
+  $core.bool hasVolume() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearVolume() => $_clearField(6);
+
   @$pb.TagNumber(1000)
-  $pb.PbList<$0.Media> get queue => $_getList(5);
+  $pb.PbList<$0.Media> get queue => $_getList(6);
 }
 
 enum Stream_Command { queue, dequeue, playpause, seek, sync, volume, notSet }

@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:ffi';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/authz.dart' as authz;
 import 'package:retrovibed/httpx.dart' as httpx;
+import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/media/play.queue.dart' as playqueue;
 import 'package:retrovibed/meta.dart' as meta;
@@ -26,6 +28,7 @@ class RemoteControlListener extends StatefulWidget {
 }
 
 class _State extends State<RemoteControlListener> {
+  String _sid = uuidx.min();
   remote.RemoteControlSocket _socket = remote.RemoteControlSocket.noop;
   StreamSubscription<remote.Stream>? _rcSubscription;
   StreamSubscription<bool>? _playingSubscription;
@@ -33,6 +36,7 @@ class _State extends State<RemoteControlListener> {
   ValueNotifier<meta.Daemon> _library = ValueNotifier(meta.Daemon());
   ValueNotifier<authz.Bearer<meta.Token>> _authz = ValueNotifier(authz.Bearer(meta.Token(), ""));
   playqueue.PlayQueue _queue = playqueue.PlayQueue();
+  remote.Volume _volume = remote.Volume(muted: false, level: 0.0);
 
   // proactively (not just in reply to a request) reports the listener's
   // current library, playback queue, and a token valid against this device -
@@ -46,17 +50,34 @@ class _State extends State<RemoteControlListener> {
     // forces a refresh if expired, so token is never blank
     return cached.auto().then((bearer) {
       if (!mounted) return;
-      _socket.send(
-        remote.messages.sync(
-          library: library,
-          token: httpx.bearer(bearer.bearer),
-          expiration: bearer.token.expires,
-          capacity: queue.capacity,
-          current: queue.current.value?.current,
-          queue: queue.queued.map((m) => m.current).toList(),
-          volume: media.Playlist.of(context)?.player.state.volume ?? 0.0,
-        ),
+      final sync = remote.messages.sync(
+        library: library,
+        token: httpx.bearer(bearer.bearer),
+        expiration: bearer.token.expires,
+        capacity: queue.capacity,
+        current: queue.current.value?.current,
+        queue: queue.queued.map((m) => m.current).toList(),
+        volume: media.Playlist.of(context)?.player.state.volume ?? 0.0,
       );
+      _socket.send(
+        sync,
+      );
+      setState(() {
+        _sid = sync.sid;
+      });
+    });
+  }
+
+  _echoVolume() {
+    final sync = remote.messages.volume(
+      media.Playlist.of(context)?.player.state.volume ?? _volume.level,
+      _volume.muted,
+    );
+    _socket.send(
+      sync,
+    );
+    setState(() {
+      _sid = sync.sid;
     });
   }
 
@@ -127,7 +148,20 @@ class _State extends State<RemoteControlListener> {
         }
         break;
       case remote.Stream_Command.volume:
-        playlist.player.setVolume(msg.volume.level);
+        if (_sid.compareTo(msg.sid) >= 0) {
+          _echoVolume();
+          break;
+        }
+
+        setState(() {
+          _sid = msg.sid;
+          _volume = msg.volume;
+        });
+
+        final v = msg.volume.muted ? 0.0 : msg.volume.level;
+        playlist.player.setVolume(v).then((_) {
+          _echoVolume();
+        });
         break;
       case remote.Stream_Command.sync:
       case remote.Stream_Command.notSet:
@@ -140,6 +174,8 @@ class _State extends State<RemoteControlListener> {
     super.initState();
 
     final _player = media.Playlist.of(context)?.player;
+
+    _volume = Volume(muted: false, level: _player?.state.volume ?? 0.0);
     // echo local state back over the listen socket so any /rc/connect
     // observers can see what this device is doing.
     _playingSubscription = _player?.stream.playing.listen((playing) {
@@ -147,7 +183,7 @@ class _State extends State<RemoteControlListener> {
     });
 
     _volumeSubscription = _player?.stream.volume.listen((volume) {
-      _socket.send(remote.messages.volume(volume));
+      _socket.send(remote.messages.volume(volume, _volume.muted));
     });
 
     _queue = media.Playlist.of(context)?.queue ?? _queue;

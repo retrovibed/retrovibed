@@ -21,7 +21,10 @@ message Seek { int32 offset = 1 [ json_name = "offset" ]; }
 // Volume sets (sent by a connect client) or reports (echoed by the listener
 // whenever its local volume changes, independent of Sync) the audio volume,
 // 0-100 scale.
-message Volume { float level = 1 [ json_name = "level" ]; }
+message Volume {
+  bool muted = 1 [ json_name = "muted" ];
+  float level = 2 [ json_name = "level" ];
+}
 
 // Sync requests (when sent with no fields set) or reports (when sent
 // populated) the listener's current library and playback queue. A connect

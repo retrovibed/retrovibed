@@ -206,12 +206,13 @@ func (x *Seek) GetOffset() int32 {
 	return 0
 }
 
-// Volume - adjust the audio volume by the given number of percentage points
-// (0-100 scale), relative to the current level. offset == int32 min is a
-// sentinel meaning "toggle mute" rather than a literal adjustment.
+// Volume sets (sent by a connect client) or reports (echoed by the listener
+// whenever its local volume changes, independent of Sync) the audio volume,
+// 0-100 scale.
 type Volume struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Offset        int32                  `protobuf:"varint,1,opt,name=offset,proto3" json:"offset,omitempty"`
+	Muted         bool                   `protobuf:"varint,1,opt,name=muted,proto3" json:"muted,omitempty"`
+	Level         float32                `protobuf:"fixed32,2,opt,name=level,proto3" json:"level,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -246,9 +247,16 @@ func (*Volume) Descriptor() ([]byte, []int) {
 	return file_media_media_remote_control_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *Volume) GetOffset() int32 {
+func (x *Volume) GetMuted() bool {
 	if x != nil {
-		return x.Offset
+		return x.Muted
+	}
+	return false
+}
+
+func (x *Volume) GetLevel() float32 {
+	if x != nil {
+		return x.Level
 	}
 	return 0
 }
@@ -264,6 +272,7 @@ type Sync struct {
 	Current       *media.Media           `protobuf:"bytes,3,opt,name=current,proto3" json:"current,omitempty"`
 	Token         string                 `protobuf:"bytes,4,opt,name=token,proto3" json:"token,omitempty"`
 	Expiration    int64                  `protobuf:"varint,5,opt,name=expiration,proto3" json:"expiration,omitempty"`
+	Volume        float32                `protobuf:"fixed32,6,opt,name=volume,proto3" json:"volume,omitempty"`
 	Queue         []*media.Media         `protobuf:"bytes,1000,rep,name=queue,proto3" json:"queue,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -330,6 +339,13 @@ func (x *Sync) GetToken() string {
 func (x *Sync) GetExpiration() int64 {
 	if x != nil {
 		return x.Expiration
+	}
+	return 0
+}
+
+func (x *Sync) GetVolume() float32 {
+	if x != nil {
+		return x.Volume
 	}
 	return 0
 }
@@ -510,9 +526,10 @@ const file_media_media_remote_control_proto_rawDesc = "" +
 	"\tPlayPause\x12\x16\n" +
 	"\x06paused\x18\x01 \x01(\bR\x06paused\"\x1e\n" +
 	"\x04Seek\x12\x16\n" +
-	"\x06offset\x18\x01 \x01(\x05R\x06offset\" \n" +
-	"\x06Volume\x12\x16\n" +
-	"\x06offset\x18\x01 \x01(\x05R\x06offset\"\xd4\x01\n" +
+	"\x06offset\x18\x01 \x01(\x05R\x06offset\"4\n" +
+	"\x06Volume\x12\x14\n" +
+	"\x05muted\x18\x01 \x01(\bR\x05muted\x12\x14\n" +
+	"\x05level\x18\x02 \x01(\x02R\x05level\"\xec\x01\n" +
 	"\x04Sync\x12&\n" +
 	"\alibrary\x18\x01 \x01(\v2\f.meta.DaemonR\alibrary\x12\x1a\n" +
 	"\bcapacity\x18\x02 \x01(\rR\bcapacity\x12&\n" +
@@ -520,8 +537,9 @@ const file_media_media_remote_control_proto_rawDesc = "" +
 	"\x05token\x18\x04 \x01(\tR\x05token\x12\x1e\n" +
 	"\n" +
 	"expiration\x18\x05 \x01(\x03R\n" +
-	"expiration\x12#\n" +
-	"\x05queue\x18\xe8\a \x03(\v2\f.media.MediaR\x05queueJ\x05\b\x06\x10\xe8\a\"\x9e\x02\n" +
+	"expiration\x12\x16\n" +
+	"\x06volume\x18\x06 \x01(\x02R\x06volume\x12#\n" +
+	"\x05queue\x18\xe8\a \x03(\v2\f.media.MediaR\x05queueJ\x05\b\a\x10\xe8\a\"\x9e\x02\n" +
 	"\x06Stream\x12\x10\n" +
 	"\x03sid\x18\x01 \x01(\tR\x03sid\x12%\n" +
 	"\x05queue\x18\xe8\a \x01(\v2\f.media.QueueH\x00R\x05queue\x12+\n" +

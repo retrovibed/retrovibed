@@ -7,7 +7,7 @@ import 'api.dart' as remote;
 // controls.
 class PlayerControlVolume extends StatefulWidget {
   final remote.RemoteControlSocket socket;
-  final double current;
+  final remote.Volume current;
 
   const PlayerControlVolume({Key? key, required this.socket, required this.current}) : super(key: key);
 
@@ -23,17 +23,16 @@ class _State extends State<PlayerControlVolume> {
 
   @override
   Widget build(BuildContext context) {
-    final value = (_dragging ?? widget.current).clamp(0.0, 100.0);
-    final muted = value <= 0;
-    final help = muted ? "unmute the remote device" : "mute the remote device";
+    final value = (_dragging ?? widget.current.level).clamp(0.0, 100.0);
+    final help = widget.current.muted ? "unmute the remote device" : "mute the remote device";
 
     return Row(
       children: [
         ds.LoadingIconButton(
           onPressed: ds.LoadingIconButton.convert(
-            () => widget.socket.send(remote.messages.volume(muted ? 100.0 : 0.0)),
+            () => widget.socket.send(remote.messages.volume(widget.current.level, !widget.current.muted)),
           ),
-          icon: Icon(muted ? Icons.volume_off_rounded : Icons.volume_up_rounded),
+          icon: Icon(widget.current.muted ? Icons.volume_off_rounded : Icons.volume_up_rounded),
           tooltip: help,
           help: ds.Hint(Text(help)),
         ),
@@ -45,8 +44,11 @@ class _State extends State<PlayerControlVolume> {
             label: "${value.round()}%",
             onChanged: (v) => setState(() => _dragging = v),
             onChangeEnd: (v) {
-              widget.socket.send(remote.messages.volume(v));
-              setState(() => _dragging = null);
+              widget.socket.send(remote.messages.volume(v, widget.current.muted));
+              Future.delayed(const Duration(milliseconds: 1000), () {
+                if (!mounted) return;
+                setState(() => _dragging = null);
+              });
             },
           ),
         ),

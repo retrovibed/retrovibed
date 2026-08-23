@@ -111,10 +111,10 @@ abstract class messages {
     return seek(SeekOffset.next);
   }
 
-  static rc.Stream volume(double level) {
+  static rc.Stream volume(double level, bool muted) {
     return rc.Stream(
       sid: uuidx.v7(),
-      volume: rc.Volume(level: level),
+      volume: rc.Volume(level: level, muted: muted),
     );
   }
 

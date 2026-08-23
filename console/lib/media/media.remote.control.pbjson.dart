@@ -67,13 +67,14 @@ final $typed_data.Uint8List seekDescriptor =
 const Volume$json = {
   '1': 'Volume',
   '2': [
-    {'1': 'offset', '3': 1, '4': 1, '5': 5, '10': 'offset'},
+    {'1': 'muted', '3': 1, '4': 1, '5': 8, '10': 'muted'},
+    {'1': 'level', '3': 2, '4': 1, '5': 2, '10': 'level'},
   ],
 };
 
 /// Descriptor for `Volume`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List volumeDescriptor =
-    $convert.base64Decode('CgZWb2x1bWUSFgoGb2Zmc2V0GAEgASgFUgZvZmZzZXQ=');
+final $typed_data.Uint8List volumeDescriptor = $convert.base64Decode(
+    'CgZWb2x1bWUSFAoFbXV0ZWQYASABKAhSBW11dGVkEhQKBWxldmVsGAIgASgCUgVsZXZlbA==');
 
 @$core.Deprecated('Use syncDescriptor instead')
 const Sync$json = {
@@ -98,6 +99,7 @@ const Sync$json = {
     },
     {'1': 'token', '3': 4, '4': 1, '5': 9, '10': 'token'},
     {'1': 'expiration', '3': 5, '4': 1, '5': 3, '10': 'expiration'},
+    {'1': 'volume', '3': 6, '4': 1, '5': 2, '10': 'volume'},
     {
       '1': 'queue',
       '3': 1000,
@@ -108,7 +110,7 @@ const Sync$json = {
     },
   ],
   '9': [
-    {'1': 6, '2': 1000},
+    {'1': 7, '2': 1000},
   ],
 };
 
@@ -117,7 +119,8 @@ final $typed_data.Uint8List syncDescriptor = $convert.base64Decode(
     'CgRTeW5jEiYKB2xpYnJhcnkYASABKAsyDC5tZXRhLkRhZW1vblIHbGlicmFyeRIaCghjYXBhY2'
     'l0eRgCIAEoDVIIY2FwYWNpdHkSJgoHY3VycmVudBgDIAEoCzIMLm1lZGlhLk1lZGlhUgdjdXJy'
     'ZW50EhQKBXRva2VuGAQgASgJUgV0b2tlbhIeCgpleHBpcmF0aW9uGAUgASgDUgpleHBpcmF0aW'
-    '9uEiMKBXF1ZXVlGOgHIAMoCzIMLm1lZGlhLk1lZGlhUgVxdWV1ZUoFCAYQ6Ac=');
+    '9uEhYKBnZvbHVtZRgGIAEoAlIGdm9sdW1lEiMKBXF1ZXVlGOgHIAMoCzIMLm1lZGlhLk1lZGlh'
+    'UgVxdWV1ZUoFCAcQ6Ac=');
 
 @$core.Deprecated('Use streamDescriptor instead')
 const Stream$json = {
