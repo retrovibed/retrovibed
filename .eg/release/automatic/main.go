@@ -20,12 +20,14 @@ func main() {
 	err := eg.Perform(
 		ctx,
 		eggit.AutoClone,
-		shell.Parallel(
+		shell.Op(
+			shell.Env().New("eg login --seed=\"${RETROVIBED_EG_LOGIN_SEED}\""),
+			// ),
+			// shell.Parallel(
 			// environment propagation messed up -e {NAME} should be sufficient to copy values in.
 			// TODO: Revisit once darwin is working again.
 			shell.Env().New("gh workflow run release.ios.yml --ref main").Attempts(3),
 			shell.Env().New("gh workflow run release.macosx.yml --ref main").Attempts(3),
-			shell.Env().New("eg login --seed=\"${RETROVIBED_EG_LOGIN_SEED}\""),
 			shell.Env().New("eg compute upload --ttl=1h --arch=amd64 release/linux").Attempts(3),
 			shell.Env().New("eg compute upload --ttl=3h --arch=arm64 --cores=3 --memory=2g release/linux").Attempts(3),
 			shell.Env().New("eg compute upload --arch=amd64 -e EG_SSH_KEY_SEED=${EG_SSH_KEY_SEED} release/archlinux").Attempts(3),
