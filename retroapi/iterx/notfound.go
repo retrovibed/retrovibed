@@ -4,7 +4,7 @@ import (
 	"context"
 	"iter"
 
-	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 )
 
 // ErrNotFound is returned by a NotFound-wrapped Seq's Err() when Each never

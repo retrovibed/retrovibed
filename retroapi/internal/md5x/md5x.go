@@ -8,7 +8,7 @@ import (
 	"hash"
 
 	"github.com/gofrs/uuid/v5"
-	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 )
 
 // digest the provided contents and return the resulting hash.

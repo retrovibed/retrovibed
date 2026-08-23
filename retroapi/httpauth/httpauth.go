@@ -6,7 +6,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/retrovibed/retrovibed/retroapi/authn"
-	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 )

@@ -7,7 +7,7 @@ import (
 	"strconv"
 
 	"github.com/retrovibed/retrovibed/retroapi/bytesx"
-	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/fsx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/langx"
 )

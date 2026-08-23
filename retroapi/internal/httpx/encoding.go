@@ -6,7 +6,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 )
 
 // EncodeJSON encode data into the http.Request body.

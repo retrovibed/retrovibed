@@ -7,7 +7,7 @@ import (
 	"net/textproto"
 	"strings"
 
-	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 )
 
 func escapeQuotes(s string) string {

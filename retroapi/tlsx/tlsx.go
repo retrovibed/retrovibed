@@ -19,7 +19,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 )
 
 type privatekey interface {

@@ -14,7 +14,7 @@ import (
 	"sync"
 
 	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
-	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/langx"
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
 	"github.com/tetratelabs/wazero"

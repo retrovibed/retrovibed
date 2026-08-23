@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"os"
 
-	"github.com/retrovibed/retrovibed/retroapi/internal/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 )
 
 // wasmMagic is the 4-byte binary header every valid wasm module begins with
