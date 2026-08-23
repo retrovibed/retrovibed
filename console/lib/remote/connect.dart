@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/design.kit/stateful.dart';
@@ -15,6 +16,7 @@ import 'api.dart' as remote;
 import 'player.control.seek.dart';
 import 'player.control.playpause.dart';
 import 'player.control.sync.dart';
+import 'player.control.volume.dart';
 import 'playlist.current.dart';
 import 'playlist.queue.dart';
 
@@ -57,6 +59,10 @@ class _State extends State<_Connect> with LoadingState {
   Stream<remote.Stream> _messages = Stream.empty();
   // nil-sid sentinel; unset oneof -> _latest.sync reads as a zero Sync.
   remote.Stream _latest = remote.Stream(sid: uuidx.min());
+  // last volume level echoed by the daemon; Volume is reported out-of-band
+  // from Sync, but the listener always echoes one right after every sync
+  // response, so this is populated as soon as the initial sync completes.
+  double _volume = 0;
   // which widget occupies the focused slot below the transport controls,
   // defaulting to the pending-queue view. Kept in sync with the live
   // search/queue widgets at the top of build() (matched by key, since
@@ -159,6 +165,14 @@ class _State extends State<_Connect> with LoadingState {
     _connect();
   }
 
+  void _volumeAdjust(double delta) {
+    _socket.send(remote.messages.volume((_volume + delta).clamp(0.0, 100.0)));
+  }
+
+  void _volumeMute() {
+    _socket.send(remote.messages.volume(0.0));
+  }
+
   void _reconnect() {
     if (!mounted) return;
     print("reconnecting");
@@ -194,9 +208,16 @@ class _State extends State<_Connect> with LoadingState {
             _messages = socket.messages.asBroadcastStream();
             _messages.listen(
               (msg) {
+                if (msg.whichCommand() == remote.Stream_Command.volume) {
+                  setState(() => _volume = msg.volume.level);
+                  return;
+                }
                 if (msg.whichCommand() != remote.Stream_Command.sync) return;
                 if (msg.sid.compareTo(_latest.sid) <= 0) return;
-                setState(() => _latest = msg);
+                setState(() {
+                  _latest = msg;
+                  _volume = msg.sync.volume;
+                });
                 _fillQueue();
               },
               cancelOnError: true,
@@ -276,72 +297,90 @@ class _State extends State<_Connect> with LoadingState {
       apisearch: _apisearch,
     );
     final queue = PlaylistQueue(_latest.sync.queue, _socket, key: const ValueKey("queue"));
-    return ds.Container(
-      Column(
-        verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
-        children: [
-          meta.DaemonDropdown(
-            library: _endpoint,
-            discover: widget.daemonDiscover,
-            onSelect: meta.DaemonDropdown.local,
-            remoteonly: true,
-            readonly: true,
-            trailing: [
-              _focused == null
-                  ? ds.Empty
-                  : ds.LoadingIconButton.close(
-                      onPressed: () {
-                        setState(() => _focused = null);
-                        return Future.value(null);
-                      },
-                    ),
-            ],
-          ),
+    return ds.Shortcuts(
+      bindings: {
+        const SingleActivator(LogicalKeyboardKey.audioVolumeUp): (
+          const Text("increase volume on the remote device"),
+          () {
+            _volumeAdjust(5);
+            return KeyEventResult.handled;
+          },
+        ),
+        const SingleActivator(LogicalKeyboardKey.audioVolumeDown): (
+          const Text("decrease volume on the remote device"),
+          () {
+            _volumeAdjust(-5);
+            return KeyEventResult.handled;
+          },
+        ),
+        const SingleActivator(LogicalKeyboardKey.audioVolumeMute): (
+          const Text("mute the remote device"),
+          () {
+            _volumeMute();
+            return KeyEventResult.handled;
+          },
+        ),
+      },
+      ds.Container(
+        Column(
+          verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
+          children: [
+            meta.DaemonDropdown(
+              library: _endpoint,
+              discover: widget.daemonDiscover,
+              onSelect: meta.DaemonDropdown.local,
+              remoteonly: true,
+              readonly: true,
+              trailing: [
+                _focused == null
+                    ? ds.Empty
+                    : ds.LoadingIconButton.close(
+                        onPressed: () {
+                          setState(() => _focused = null);
+                          return Future.value(null);
+                        },
+                      ),
+              ],
+            ),
 
-          Expanded(
-            child: ds.Container(
-              padding: defaults.padding,
-              ds.Loading(
-                cause: cause,
-                loading: _socket == remote.RemoteControlSocket.noop,
-                _focused ??
-                    Column(
-                      verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
-                      children: [
-                        ds.CompactingMenu([
-                          ds.CompactingMenu.pinned(
-                            Row(
-                              spacing: defaults.spacing,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                ds.CompactingMenu.pinned(PlayerControlSeek.prev(socket: _socket)),
-                                ds.CompactingMenu.pinned(PlayerControlSeek.backward(socket: _socket)),
-                                ds.CompactingMenu.pinned(PlayerControlPlayPause(socket: _socket, status: _messages)),
-                                ds.CompactingMenu.pinned(PlayerControlSeek.forward(socket: _socket)),
-                                ds.CompactingMenu.pinned(PlayerControlSeek.next(socket: _socket)),
-                                ds.CompactingMenu.pinned(
-                                  ds.LoadingIconButton.search(
-                                    toggled: _focused?.key == search.key,
-                                    onPressed: ds.LoadingIconButton.convert(() {
-                                      setState(() => _focused = _focused?.key == search.key ? ds.Empty : search);
-                                    }),
-                                    tooltip: "search the remote device's library",
-                                    help: ds.Hint(const Text("search the remote device's library to queue media on it")),
-                                  ),
-                                ),
-                                if (authn.developer(context).debug) PlayerControlSync(socket: _socket),
-                              ],
+            Expanded(
+              child: ds.Container(
+                padding: defaults.padding,
+                ds.Loading(
+                  cause: cause,
+                  loading: _socket == remote.RemoteControlSocket.noop,
+                  _focused ??
+                      Column(
+                        verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
+                        children: [
+                          ds.CompactingMenu([
+                            ds.CompactingMenu.pinned(PlayerControlSeek.prev(socket: _socket)),
+                            ds.CompactingMenu.pinned(PlayerControlSeek.backward(socket: _socket)),
+                            ds.CompactingMenu.pinned(PlayerControlPlayPause(socket: _socket, status: _messages)),
+                            ds.CompactingMenu.pinned(PlayerControlSeek.forward(socket: _socket)),
+                            ds.CompactingMenu.pinned(PlayerControlSeek.next(socket: _socket)),
+                            ds.CompactingMenu.pinned(
+                              ds.LoadingIconButton.search(
+                                toggled: _focused?.key == search.key,
+                                onPressed: ds.LoadingIconButton.convert(() {
+                                  setState(() => _focused = _focused?.key == search.key ? ds.Empty : search);
+                                }),
+                                tooltip: "search the remote device's library",
+                                help: ds.Hint(const Text("search the remote device's library to queue media on it")),
+                              ),
                             ),
-                          ),
-                        ]),
-                        PlaylistCurrent(_latest.sync.current),
-                        Expanded(child: queue),
-                      ],
-                    ),
+                            if (authn.developer(context).debug) PlayerControlSync(socket: _socket),
+                          ]),
+                          PlayerControlVolume(socket: _socket, current: _volume),
+                          PlaylistCurrent(_latest.sync.current),
+                          Expanded(child: queue),
+                        ],
+                      ),
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

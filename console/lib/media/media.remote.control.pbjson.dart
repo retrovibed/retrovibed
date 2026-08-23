@@ -63,6 +63,18 @@ const Seek$json = {
 final $typed_data.Uint8List seekDescriptor =
     $convert.base64Decode('CgRTZWVrEhYKBm9mZnNldBgBIAEoBVIGb2Zmc2V0');
 
+@$core.Deprecated('Use volumeDescriptor instead')
+const Volume$json = {
+  '1': 'Volume',
+  '2': [
+    {'1': 'offset', '3': 1, '4': 1, '5': 5, '10': 'offset'},
+  ],
+};
+
+/// Descriptor for `Volume`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List volumeDescriptor =
+    $convert.base64Decode('CgZWb2x1bWUSFgoGb2Zmc2V0GAEgASgFUgZvZmZzZXQ=');
+
 @$core.Deprecated('Use syncDescriptor instead')
 const Sync$json = {
   '1': 'Sync',
@@ -157,6 +169,15 @@ const Stream$json = {
       '9': 0,
       '10': 'sync'
     },
+    {
+      '1': 'volume',
+      '3': 1006,
+      '4': 1,
+      '5': 11,
+      '6': '.media.Volume',
+      '9': 0,
+      '10': 'volume'
+    },
   ],
   '8': [
     {'1': 'Command'},
@@ -169,4 +190,5 @@ final $typed_data.Uint8List streamDescriptor = $convert.base64Decode(
     'VIAFIFcXVldWUSKwoHZGVxdWV1ZRjqByABKAsyDi5tZWRpYS5EZXF1ZXVlSABSB2RlcXVldWUS'
     'MQoJcGxheXBhdXNlGOsHIAEoCzIQLm1lZGlhLlBsYXlQYXVzZUgAUglwbGF5cGF1c2USIgoEc2'
     'VlaxjsByABKAsyCy5tZWRpYS5TZWVrSABSBHNlZWsSIgoEc3luYxjtByABKAsyCy5tZWRpYS5T'
-    'eW5jSABSBHN5bmNCCQoHQ29tbWFuZA==');
+    'eW5jSABSBHN5bmMSKAoGdm9sdW1lGO4HIAEoCzINLm1lZGlhLlZvbHVtZUgAUgZ2b2x1bWVCCQ'
+    'oHQ29tbWFuZA==');

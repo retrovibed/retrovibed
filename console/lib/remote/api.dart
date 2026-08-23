@@ -111,6 +111,13 @@ abstract class messages {
     return seek(SeekOffset.next);
   }
 
+  static rc.Stream volume(double level) {
+    return rc.Stream(
+      sid: uuidx.v7(),
+      volume: rc.Volume(level: level),
+    );
+  }
+
   // sync with no fields set requests the listener's current library and
   // playback queue; with fields set it reports the listener's current
   // library and playback queue, unsolicited or in reply to a request.
@@ -121,6 +128,7 @@ abstract class messages {
     int capacity = 0,
     media.Media? current,
     List<media.Media> queue = const [],
+    double volume = 0,
   }) {
     return rc.Stream(
       sid: uuidx.v7(),
@@ -131,6 +139,7 @@ abstract class messages {
         capacity: capacity,
         current: current,
         queue: queue,
+        volume: volume,
       ),
     );
   }

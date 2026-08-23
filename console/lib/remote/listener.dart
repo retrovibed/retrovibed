@@ -29,6 +29,7 @@ class _State extends State<RemoteControlListener> {
   remote.RemoteControlSocket _socket = remote.RemoteControlSocket.noop;
   StreamSubscription<remote.Stream>? _rcSubscription;
   StreamSubscription<bool>? _playingSubscription;
+  StreamSubscription<double>? _volumeSubscription;
   ValueNotifier<meta.Daemon> _library = ValueNotifier(meta.Daemon());
   ValueNotifier<authz.Bearer<meta.Token>> _authz = ValueNotifier(authz.Bearer(meta.Token(), ""));
   playqueue.PlayQueue _queue = playqueue.PlayQueue();
@@ -53,6 +54,7 @@ class _State extends State<RemoteControlListener> {
           capacity: queue.capacity,
           current: queue.current.value?.current,
           queue: queue.queued.map((m) => m.current).toList(),
+          volume: media.Playlist.of(context)?.player.state.volume ?? 0.0,
         ),
       );
     });
@@ -124,6 +126,9 @@ class _State extends State<RemoteControlListener> {
           playlist.player.seek(playlist.player.state.position + Duration(milliseconds: offset));
         }
         break;
+      case remote.Stream_Command.volume:
+        playlist.player.setVolume(msg.volume.level);
+        break;
       case remote.Stream_Command.sync:
       case remote.Stream_Command.notSet:
         break;
@@ -134,10 +139,15 @@ class _State extends State<RemoteControlListener> {
   void initState() {
     super.initState();
 
+    final _player = media.Playlist.of(context)?.player;
     // echo local state back over the listen socket so any /rc/connect
     // observers can see what this device is doing.
-    _playingSubscription = media.Playlist.of(context)?.player.stream.playing.listen((playing) {
+    _playingSubscription = _player?.stream.playing.listen((playing) {
       _socket.send(remote.messages.playpause(!playing));
+    });
+
+    _volumeSubscription = _player?.stream.volume.listen((volume) {
+      _socket.send(remote.messages.volume(volume));
     });
 
     _queue = media.Playlist.of(context)?.queue ?? _queue;
@@ -161,6 +171,7 @@ class _State extends State<RemoteControlListener> {
     _library.removeListener(_echoSync);
     _authz.removeListener(_echoSync);
     _playingSubscription?.cancel();
+    _volumeSubscription?.cancel();
     _rcSubscription?.cancel();
     _socket.close();
   }

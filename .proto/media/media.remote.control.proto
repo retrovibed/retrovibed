@@ -18,10 +18,10 @@ message PlayPause { bool paused = 1 [ json_name = "paused" ]; }
 // "skip to next/previous track" rather than a literal seek.
 message Seek { int32 offset = 1 [ json_name = "offset" ]; }
 
-// Volume - adjust the audio volume by the given number of percentage points
-// (0-100 scale), relative to the current level. offset == int32 min is a
-// sentinel meaning "toggle mute" rather than a literal adjustment.
-message Volume { int32 offset = 1 [ json_name = "offset" ]; }
+// Volume sets (sent by a connect client) or reports (echoed by the listener
+// whenever its local volume changes, independent of Sync) the audio volume,
+// 0-100 scale.
+message Volume { float level = 1 [ json_name = "level" ]; }
 
 // Sync requests (when sent with no fields set) or reports (when sent
 // populated) the listener's current library and playback queue. A connect
@@ -33,7 +33,8 @@ message Sync {
   Media current = 3 [ json_name = "current" ];
   string token = 4 [ json_name = "token" ];
   int64 expiration = 5 [ json_name = "expiration" ];
-  reserved 6 to 999;
+  float volume = 6 [ json_name = "volume" ];
+  reserved 7 to 999;
   repeated Media queue = 1000 [ json_name = "queue" ];
 }
 
