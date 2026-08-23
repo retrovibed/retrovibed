@@ -108,7 +108,7 @@ func main() {
 				shell.Newf("productbuild --component %s /Applications --sign \"3rd Party Mac Developer Installer\" --keychain %s %s", appstoreapp, keychainPath, pkgpath),
 			),
 			egapplex.Upload(apikey, issuerid, pkgpath, "macos"),
-			eggithub.Release(dmgpath),
+			eggithub.Draft(dmgpath),
 		),
 	)
 
