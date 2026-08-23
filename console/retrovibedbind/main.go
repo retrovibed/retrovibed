@@ -14,6 +14,7 @@ import (
 
 	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/retroapi/envfile"
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/netmonx"
 	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdglobalmain"
@@ -21,8 +22,10 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/meta/identityssh"
 	"golang.org/x/oauth2"
+
+	"github.com/retrovibed/retrovibed/shallows/meta"
+	"github.com/retrovibed/retrovibed/shallows/retrovibedbindx"
 )
-import "github.com/retrovibed/retrovibed/shallows/retrovibedbindx"
 
 func envOrDefault(key, fallback string) string {
 	if v := os.Getenv(key); v != "" {
@@ -372,6 +375,12 @@ func parsable(query *C.char) C.int {
 		return 1
 	}
 	return 0
+}
+
+//export local_device
+func local_device() *C.char {
+	encoded := errorsx.Zero(json.Marshal(meta.DaemonFromHost()))
+	return C.CString(string(encoded))
 }
 
 func main() {}

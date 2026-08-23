@@ -46,7 +46,7 @@ func DaemonSearchBuilder() squirrel.SelectBuilder {
 func DaemonFromHost() Daemon {
 	return Daemon{
 		CreatedAt:   time.Now(),
-		Description: "",
+		Description: "local device",
 		Hostname:    stringsx.FirstNonBlank(errorsx.Zero(os.Hostname()), "localhost"),
 		ID:          uuid.Max.String(),
 		UpdatedAt:   time.Now(),
