@@ -33,25 +33,23 @@ class ManagementListDisplayItem extends StatelessWidget {
 
     return ds.TableRow.single(
       key: ValueKey(community.id),
-      ds.CompactingMenu(
-        CommunityDetail(community: community),
-        trailing: [
-          ds.CompactingMenu.pinned(
-            SubscribeButton(
-              community: community,
-              onChanged: onChanged,
-              subscribe: subscribe,
-            ),
-          ),
-          ShareButton(community: community),
-          PublishButton(community: community),
-          ResyncButton(community: community, onResynced: onChanged),
-          DeleteButton(
+      ds.CompactingMenu([
+        ds.CompactingMenu.expanded(CommunityDetail(community: community)),
+        ds.CompactingMenu.pinned(
+          SubscribeButton(
             community: community,
-            onDeleted: onChanged,
+            onChanged: onChanged,
+            subscribe: subscribe,
           ),
-        ],
-      ),
+        ),
+        ShareButton(community: community),
+        PublishButton(community: community),
+        ResyncButton(community: community, onResynced: onChanged),
+        DeleteButton(
+          community: community,
+          onDeleted: onChanged,
+        ),
+      ]),
       expanded: ds.Container(
         padding: defaults.padding,
         decoration: BoxDecoration(

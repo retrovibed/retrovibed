@@ -4,9 +4,7 @@ import 'flutterx.dart';
 import 'theme.defaults.dart';
 
 class CompactingMenu extends StatefulWidget {
-  final Widget child;
-  final List<Widget> leading;
-  final List<Widget> trailing;
+  final List<Widget> children;
   final MainAxisAlignment mainAxisAlignment;
   final MainAxisSize mainAxisSize;
   final CrossAxisAlignment crossAxisAlignment;
@@ -14,19 +12,22 @@ class CompactingMenu extends StatefulWidget {
   final Widget icon;
 
   const CompactingMenu(
-    this.child, {
+    this.children, {
     super.key,
-    this.leading = const [],
-    this.trailing = const [],
-    this.mainAxisAlignment = MainAxisAlignment.start,
+    this.mainAxisAlignment = MainAxisAlignment.center,
     this.mainAxisSize = MainAxisSize.min,
     this.crossAxisAlignment = CrossAxisAlignment.center,
     this.icon = const Icon(Icons.more_vert),
   });
 
-  /// Wraps [child] so it stays pinned in the leading/trailing row
+  /// Wraps [child] so it stays pinned in the visible row
   /// rather than being moved into the overflow menu when compact.
   static Widget pinned(Widget child, {Key? key}) => _Pinned(key: key, child: child);
+
+  /// Wraps [child] so it stays pinned in the visible row and expands
+  /// to fill the remaining space, rather than being moved into the
+  /// overflow menu when compact.
+  static Widget expanded(Widget child, {Key? key}) => _Expanded(key: key, child: child);
 
   @override
   State<CompactingMenu> createState() => _CompactingMenuState();
@@ -34,6 +35,10 @@ class CompactingMenu extends StatefulWidget {
 
 class _CompactingMenuState extends State<CompactingMenu> {
   bool _open = false;
+
+  List<Widget> _renderRow(List<Widget> items) => [
+    for (final w in items) w is _Expanded ? Expanded(child: w.child) : w,
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -50,23 +55,14 @@ class _CompactingMenuState extends State<CompactingMenu> {
             mainAxisSize: widget.mainAxisSize,
             crossAxisAlignment: widget.crossAxisAlignment,
             children: [
-              Row(
-                spacing: spacing,
-                children: [
-                  ...widget.leading,
-                  Expanded(child: widget.child),
-                  ...widget.trailing,
-                ],
-              ),
+              Row(spacing: spacing, children: _renderRow(widget.children)),
             ],
           );
         }
 
-        final leadingGroups = groupBy(widget.leading, (w) => w is _Pinned);
-        final trailingGroups = groupBy(widget.trailing, (w) => w is _Pinned);
-        final pinnedLeading = leadingGroups[true] ?? [];
-        final pinnedTrailing = trailingGroups[true] ?? [];
-        final menuItems = [...?leadingGroups[false], ...?trailingGroups[false]];
+        final groups = groupBy(widget.children, (w) => w is _Pinned || w is _Expanded);
+        final visible = groups[true] ?? [];
+        final menuItems = groups[false] ?? [];
 
         if (menuItems.isEmpty) {
           return Column(
@@ -74,14 +70,7 @@ class _CompactingMenuState extends State<CompactingMenu> {
             mainAxisSize: widget.mainAxisSize,
             crossAxisAlignment: widget.crossAxisAlignment,
             children: [
-              Row(
-                spacing: spacing,
-                children: [
-                  ...widget.leading,
-                  Expanded(child: widget.child),
-                  ...widget.trailing,
-                ],
-              ),
+              Row(mainAxisAlignment: MainAxisAlignment.center, spacing: spacing, children: _renderRow(widget.children)),
             ],
           );
         }
@@ -92,11 +81,11 @@ class _CompactingMenuState extends State<CompactingMenu> {
           crossAxisAlignment: widget.crossAxisAlignment,
           children: [
             Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.center,
               spacing: spacing,
               children: [
-                ...pinnedLeading,
-                Expanded(child: widget.child),
-                ...pinnedTrailing,
+                ..._renderRow(visible),
                 if (menuItems.isNotEmpty)
                   IconButton(
                     onPressed: () {
@@ -108,12 +97,14 @@ class _CompactingMenuState extends State<CompactingMenu> {
               ],
             ),
             if (_open && menuItems.isNotEmpty)
-              Row(
-                mainAxisSize: MainAxisSize.max,
-                spacing: spacing,
-                children: [
-                  for (final w in menuItems) Expanded(child: w),
-                ],
+              Padding(
+                padding: EdgeInsetsGeometry.symmetric(vertical: defaults.padding.vertical / 4),
+                child: Row(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  spacing: spacing,
+                  children: menuItems,
+                ),
               ),
           ],
         );
@@ -122,12 +113,24 @@ class _CompactingMenuState extends State<CompactingMenu> {
   }
 }
 
-/// Wraps a widget to keep it pinned in the leading/trailing row of a [CompactingMenu]
+/// Wraps a widget to keep it pinned in the visible row of a [CompactingMenu]
 /// widget rather than being moved into the overflow menu when compact.
 class _Pinned extends StatelessWidget {
   final Widget child;
 
   const _Pinned({super.key, required this.child});
+
+  @override
+  Widget build(BuildContext context) => child;
+}
+
+/// Wraps a widget to keep it pinned in the visible row of a [CompactingMenu]
+/// and expand to fill the remaining space, rather than being moved into
+/// the overflow menu when compact.
+class _Expanded extends StatelessWidget {
+  final Widget child;
+
+  const _Expanded({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) => child;

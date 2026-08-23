@@ -297,6 +297,7 @@ class _State extends State<_Connect> with LoadingState {
                     ),
             ],
           ),
+
           Expanded(
             child: ds.Container(
               padding: defaults.padding,
@@ -307,26 +308,32 @@ class _State extends State<_Connect> with LoadingState {
                     Column(
                       verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
                       children: [
-                        Row(
-                          spacing: defaults.spacing,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            PlayerControlSeek.prev(socket: _socket),
-                            PlayerControlSeek.backward(socket: _socket),
-                            PlayerControlPlayPause(socket: _socket, status: _messages),
-                            PlayerControlSeek.forward(socket: _socket),
-                            PlayerControlSeek.next(socket: _socket),
-                            ds.LoadingIconButton.search(
-                              toggled: _focused?.key == search.key,
-                              onPressed: ds.LoadingIconButton.convert(() {
-                                setState(() => _focused = _focused?.key == search.key ? ds.Empty : search);
-                              }),
-                              tooltip: "search the remote device's library",
-                              help: ds.Hint(const Text("search the remote device's library to queue media on it")),
+                        ds.CompactingMenu([
+                          ds.CompactingMenu.pinned(
+                            Row(
+                              spacing: defaults.spacing,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                ds.CompactingMenu.pinned(PlayerControlSeek.prev(socket: _socket)),
+                                ds.CompactingMenu.pinned(PlayerControlSeek.backward(socket: _socket)),
+                                ds.CompactingMenu.pinned(PlayerControlPlayPause(socket: _socket, status: _messages)),
+                                ds.CompactingMenu.pinned(PlayerControlSeek.forward(socket: _socket)),
+                                ds.CompactingMenu.pinned(PlayerControlSeek.next(socket: _socket)),
+                                ds.CompactingMenu.pinned(
+                                  ds.LoadingIconButton.search(
+                                    toggled: _focused?.key == search.key,
+                                    onPressed: ds.LoadingIconButton.convert(() {
+                                      setState(() => _focused = _focused?.key == search.key ? ds.Empty : search);
+                                    }),
+                                    tooltip: "search the remote device's library",
+                                    help: ds.Hint(const Text("search the remote device's library to queue media on it")),
+                                  ),
+                                ),
+                                if (authn.developer(context).debug) PlayerControlSync(socket: _socket),
+                              ],
                             ),
-                            if (authn.developer(context).debug) PlayerControlSync(socket: _socket),
-                          ],
-                        ),
+                          ),
+                        ]),
                         PlaylistCurrent(_latest.sync.current),
                         Expanded(child: queue),
                       ],

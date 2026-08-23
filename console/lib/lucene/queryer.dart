@@ -249,35 +249,35 @@ class _QueryerState extends State<Queryer> {
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: defaults.spacing / 2,
         children: [
-          ds.CompactingMenu(
-            leading: [
-              if (_mode != ParserResult.close)
-                ds.CompactingMenu.pinned(
-                  GestureDetector(
-                    onLongPress: _resetMode,
-                    child: QueryerMode(mode: _mode, focus: _modeFocusNode),
-                  ),
+          ds.CompactingMenu([
+            if (_mode != ParserResult.close)
+              ds.CompactingMenu.pinned(
+                GestureDetector(
+                  onLongPress: _resetMode,
+                  child: QueryerMode(mode: _mode, focus: _modeFocusNode),
                 ),
-              ...widget.leading,
-            ],
-            ds.Help(
-              TextField(
-                controller: _ctrl,
-                enabled: !widget.disabled,
-                autofocus: widget.autofocus,
-                focusNode: widget.focusNode,
-                decoration: widget.decoration,
-                onSubmitted: (v) {
-                  if (_partialParse()) return;
-                  widget.onQuery(v);
-                  widget.focusNode?.requestFocus();
-                  ds.textediting.refocus(_ctrl);
-                },
               ),
-              widget.help,
+            ...widget.leading,
+            ds.CompactingMenu.expanded(
+              ds.Help(
+                TextField(
+                  controller: _ctrl,
+                  enabled: !widget.disabled,
+                  autofocus: widget.autofocus,
+                  focusNode: widget.focusNode,
+                  decoration: widget.decoration,
+                  onSubmitted: (v) {
+                    if (_partialParse()) return;
+                    widget.onQuery(v);
+                    widget.focusNode?.requestFocus();
+                    ds.textediting.refocus(_ctrl);
+                  },
+                ),
+                widget.help,
+              ),
             ),
-            trailing: widget.trailing,
-          ),
+            ...widget.trailing,
+          ]),
           TextFieldTapRegion(
             child: _updating ?? _parser.current,
           ),

@@ -37,13 +37,14 @@ class _FeedRowState extends State<FeedRow> {
 
     return ds.ErrorScreen(
       ds.CompactingMenu(
-        Text(
-          widget.current.description,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        icon: Icon(Icons.expand_more_rounded),
-        trailing: [
+        [
+          ds.CompactingMenu.expanded(
+            Text(
+              widget.current.description,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
           if (widget.current.hasNextCheck())
             ds.CompactingMenu.pinned(ds.Duration.untilISO8601(widget.current.nextCheck)),
           widget.current.autodownload ? Icon(Icons.downloading_rounded) : placeholder,
@@ -121,6 +122,7 @@ class _FeedRowState extends State<FeedRow> {
             },
           ),
         ],
+        icon: Icon(Icons.expand_more_rounded),
       ),
       cause: _cause,
       tint: defaults.dangerTint,

@@ -8,11 +8,11 @@ Widget buildMenu({
   List<Widget> trailing = const [],
   Widget child = const Text('child'),
 }) {
-  return ds.CompactingMenu(
-    child,
-    leading: leading,
-    trailing: trailing,
-  );
+  return ds.CompactingMenu([
+    ...leading,
+    ds.CompactingMenu.expanded(child),
+    ...trailing,
+  ]);
 }
 
 void main() {
