@@ -163,12 +163,7 @@ class _EditState extends State<Edit> with LoadingState {
             forms.Presets<api.Wireguard>(
               current: current,
               presets: [
-                (
-                  label: 'ProtonVPN',
-                  apply: (w) => w
-                    ..outboundRateLimit = 4
-                    ..maximumConnections = ds.Int64(32),
-                ),
+                (label: 'ProtonVPN', apply: (w) => w..outboundRateLimit = 2),
               ],
               onSelected: _onChange,
             ),
