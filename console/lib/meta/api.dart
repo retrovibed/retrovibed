@@ -71,6 +71,8 @@ abstract class daemons {
   static DaemonSearchResponse response({DaemonSearchRequest? next}) =>
       DaemonSearchResponse(next: next ?? request(limit: 128), items: []);
 
+  // temporary implementation. long term we should be using the ffi local_devoce() to determine the
+  // local deice information.
   static bool isLocalDevice(Daemon library) => library.hostname.startsWith("localhost:9998");
   static Future<DaemonSearchResponse> search(DaemonSearchRequest req) async {
     return http.Client()

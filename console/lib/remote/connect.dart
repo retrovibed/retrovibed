@@ -76,7 +76,7 @@ class _State extends State<_Connect> with LoadingState {
   // completes.
   bool _filling = false;
 
-  // temporary hack fix until we fix the listener.
+  // temporary hack fix until we fix the listener (and its deployed).
   // problem was when the device was serving its own content it sent localhost
   // as the library over the sync protocol. resulting in the wrong token used
   // against the wrong host. the longterm fix is to have golang ffi return the proper hostname.
