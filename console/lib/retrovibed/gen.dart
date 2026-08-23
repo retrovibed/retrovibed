@@ -309,6 +309,13 @@ class DaemonBridge {
 
   late final _parsablePtr = _lookup<ffi.NativeFunction<ffi.Int Function(ffi.Pointer<ffi.Char>)>>('parsable');
   late final _parsable = _parsablePtr.asFunction<int Function(ffi.Pointer<ffi.Char>)>();
+
+  ffi.Pointer<ffi.Char> local_device() {
+    return _local_device();
+  }
+
+  late final _local_devicePtr = _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function()>>('local_device');
+  late final _local_device = _local_devicePtr.asFunction<ffi.Pointer<ffi.Char> Function()>();
 }
 
 typedef ptrdiff_t = ffi.Long;
