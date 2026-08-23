@@ -162,11 +162,11 @@ class _State extends State<_Connect> with LoadingState {
   }
 
   void _volumeAdjust(double delta) {
-    _socket.send(remote.messages.volume((_latest.volume.level + delta).clamp(0.0, 100.0)));
+    _socket.send(remote.messages.volume((_latest.volume.level + delta).clamp(0.0, 100.0), _latest.volume.muted));
   }
 
   void _volumeMute() {
-    _socket.send(remote.messages.volume(0.0));
+    _socket.send(remote.messages.volume(_latest.volume.level, true));
   }
 
   void _reconnect() {
@@ -297,14 +297,14 @@ class _State extends State<_Connect> with LoadingState {
         const SingleActivator(LogicalKeyboardKey.audioVolumeUp): (
           const Text("increase volume on the remote device"),
           () {
-            _volumeAdjust(5);
+            _volumeAdjust(1);
             return KeyEventResult.handled;
           },
         ),
         const SingleActivator(LogicalKeyboardKey.audioVolumeDown): (
           const Text("decrease volume on the remote device"),
           () {
-            _volumeAdjust(-5);
+            _volumeAdjust(-1);
             return KeyEventResult.handled;
           },
         ),
@@ -366,7 +366,7 @@ class _State extends State<_Connect> with LoadingState {
                             ),
                             if (authn.developer(context).debug) PlayerControlSync(socket: _socket),
                           ]),
-                          PlayerControlVolume(socket: _socket, current: _latest.volume.level),
+                          PlayerControlVolume(socket: _socket, current: _latest.volume),
                           PlaylistCurrent(_latest.sync.current),
                           Expanded(child: queue),
                         ],
