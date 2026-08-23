@@ -18,6 +18,11 @@ message PlayPause { bool paused = 1 [ json_name = "paused" ]; }
 // "skip to next/previous track" rather than a literal seek.
 message Seek { int32 offset = 1 [ json_name = "offset" ]; }
 
+// Volume - adjust the audio volume by the given number of percentage points
+// (0-100 scale), relative to the current level. offset == int32 min is a
+// sentinel meaning "toggle mute" rather than a literal adjustment.
+message Volume { int32 offset = 1 [ json_name = "offset" ]; }
+
 // Sync requests (when sent with no fields set) or reports (when sent
 // populated) the listener's current library and playback queue. A connect
 // client sends an empty Sync to ask the listener to reply with its state;
@@ -43,5 +48,6 @@ message Stream {
     PlayPause playpause = 1003 [ json_name = "playpause" ];
     Seek seek = 1004 [ json_name = "seek" ];
     Sync sync = 1005 [ json_name = "sync" ];
+    Volume volume = 1006 [ json_name = "volume" ];
   }
 }
