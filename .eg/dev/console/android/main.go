@@ -7,6 +7,7 @@ import (
 	"eg/compute/debuild/duckdb"
 	"eg/compute/egx"
 	"eg/compute/maintainer"
+	"eg/compute/neurals"
 	"fmt"
 	"log"
 
@@ -104,6 +105,8 @@ func main() {
 						duckdb.CompileAndroid,
 						duckdb.CloneBuild,
 					),
+					neurals.CompileAndroid("x86_64", egenv.WorkingDirectory("console/android/app/src/main/jniLibs/x86_64")),
+					neurals.CompileAndroid("arm64-v8a", egenv.WorkingDirectory("console/android/app/src/main/jniLibs/arm64-v8a")),
 				),
 				console.Generate,
 				eg.Parallel(

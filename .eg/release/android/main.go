@@ -79,7 +79,7 @@ func main() {
 					egbug.Log("generated static libraries for duckdb"),
 					console.BuildAndroidAPK(androidruntime()),
 					console.BuildAndroidBundle(androidruntime()),
-					eggithub.Release(
+					eggithub.Draft(
 						egenv.WorkingDirectory("console/build/app/outputs/apk/release/retrovibed.apk"),
 						egenv.WorkingDirectory("console/build/app/outputs/bundle/release/retrovibed.aab"),
 					),
