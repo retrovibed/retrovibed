@@ -18,7 +18,6 @@ import (
 
 func flutterRuntimev2(v shell.Command) shell.Command {
 	return v.
-		Debug().
 		Directory(egenv.WorkingDirectory("console")).
 		EnvironFrom(eggolang.Env()...).
 		Environ("PUB_CACHE", egenv.CacheDirectory(".eg", "dart")).
@@ -95,18 +94,28 @@ func GenerateDevStaticBinding(rt shell.Command, outdir string, staticdirs ...str
 	}
 }
 
-func GenerateStaticBinding(dir string, rt shell.Command) eg.OpFn {
+// GenerateStaticBinding links the go static binding, searching staticdirs
+// for duckdb/predicttext's .a (and any .so byproduct) via CGO_LDFLAGS -L,
+// but writing the resulting libretrovibed.so to outdir. These are
+// deliberately separate: outdir is the jniLibs-visible directory gradle
+// packages every .so it finds in — duckdb and predicttext are statically
+// linked into the output (verify with `readelf -d libretrovibed.so`: no
+// libduckdb.so/libpredicttext.so NEEDED entries), so their intermediate
+// build artifacts must live in staticdirs instead, never in outdir.
+func GenerateStaticBinding(outdir string, rt shell.Command, staticdirs ...string) eg.OpFn {
 	return func(ctx context.Context, _ eg.Op) error {
 		var cgoFlags strings.Builder
-		fmt.Fprintf(&cgoFlags, "-L%s", dir)
-		fmt.Fprintf(&cgoFlags, " -static-libstdc++ -Wl,-z,max-page-size=16384")
+		for _, dir := range staticdirs {
+			fmt.Fprintf(&cgoFlags, "-L%s ", dir)
+		}
+		fmt.Fprintf(&cgoFlags, "-static-libstdc++ -Wl,-z,max-page-size=16384")
 
 		runtime := flutterRuntimev2(rt)
 		return shell.Run(
 			ctx,
 			runtime.Newf(
 				"go -C retrovibedbind build -trimpath -buildmode=c-shared -buildvcs=true --tags duckdb_use_static_lib,retrovibed,neural -o %s/libretrovibed.so .",
-				dir,
+				outdir,
 			).Environ("CGO_LDFLAGS", strings.TrimSpace(cgoFlags.String())),
 		)
 	}

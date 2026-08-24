@@ -2,8 +2,10 @@ package console
 
 import (
 	"context"
+	"eg/compute/android"
 	"eg/compute/tarballs"
 	"fmt"
+	"path/filepath"
 	"time"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
@@ -12,9 +14,24 @@ import (
 	"github.com/egdaemon/eg/runtime/wasi/shell"
 )
 
+// androidRuntime applies flutterRuntimev2's defaults and then re-asserts the
+// android-specific native-libs directory on top: flutterRuntimev2
+// unconditionally points RETROVIBED_SHARED_NATIVE_LIBS_DIRECTORY /
+// NIX_RETROVIBED_SHARED_NATIVE_LIBS at its own dev.native.libs default, so
+// applying it after the caller's runtime (as BuildAndroidAPK/Bundle do)
+// would otherwise silently clobber whatever android-specific value the
+// caller already set.
+func androidRuntime(runtime shell.Command) shell.Command {
+	runtime = flutterRuntimev2(runtime)
+	dir := android.JNILibRoot()
+	return runtime.
+		Environ("RETROVIBED_SHARED_NATIVE_LIBS_DIRECTORY", dir).
+		Environ("NIX_RETROVIBED_SHARED_NATIVE_LIBS", filepath.Join(dir, "example.so"))
+}
+
 func BuildAndroidAPK(runtime shell.Command) eg.OpFn {
 	return func(ctx context.Context, _ eg.Op) error {
-		runtime = flutterRuntimev2(runtime)
+		runtime = androidRuntime(runtime)
 
 		commit := eggit.EnvCommit()
 		return shell.Run(
@@ -29,7 +46,7 @@ func BuildAndroidAPK(runtime shell.Command) eg.OpFn {
 
 func BuildAndroidBundle(runtime shell.Command) eg.OpFn {
 	return func(ctx context.Context, _ eg.Op) error {
-		runtime = flutterRuntimev2(runtime)
+		runtime = androidRuntime(runtime)
 		commit := eggit.EnvCommit()
 
 		return shell.Run(

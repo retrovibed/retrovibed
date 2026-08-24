@@ -41,10 +41,14 @@ const (
 // Architecture.name ("arm64", "x64"), matching what build.dart's
 // input.config.code.targetArchitecture reports, not gradle's ABI folder
 // name ("arm64-v8a", "x86_64") — the committed jniLibs/{abi} symlinks
-// translate between the two. Native library builds (duckdb, predicttext,
-// the go static binding) write here directly so their output survives a
-// clean clone of the working directory; gradle sees the same files
-// through the committed symlink.
+// translate between the two.
+//
+// Gradle's jniLibs packaging bundles every .so it finds here into the APK,
+// so only the final go static binding's libretrovibed.so belongs here —
+// duckdb and predicttext are statically linked into it (verify with
+// `readelf -d libretrovibed.so`: no libduckdb.so/libpredicttext.so NEEDED
+// entries), so their intermediate .a/.so build artifacts belong in
+// JNIStagingDir instead, never here.
 func JNILibDir(arch string, paths ...string) string {
 	return egenv.CacheDirectory("android.lib", arch, filepath.Join(paths...))
 }
@@ -58,6 +62,16 @@ func JNILibDir(arch string, paths ...string) string {
 // directory up front.
 func JNILibRoot() string {
 	return egenv.CacheDirectory("android.lib")
+}
+
+// JNIStagingDir returns the persistent cache directory for intermediate
+// native dependency artifacts (duckdb, predicttext: both .a and whatever
+// .so byproduct their build produces) that the go static binding links
+// against via CGO_LDFLAGS -L, but that must never themselves end up in
+// JNILibDir — gradle's jniLibs packaging has no way to distinguish "linker
+// input" from "ship this," it bundles every .so it finds.
+func JNIStagingDir(arch string, paths ...string) string {
+	return egenv.CacheDirectory("android.lib.dev", arch, filepath.Join(paths...))
 }
 
 // SigningKey generates an Android upload signing key using keytool. The resulting

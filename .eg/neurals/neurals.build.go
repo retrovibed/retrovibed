@@ -20,7 +20,6 @@ import (
 // makes cargo-ndk undiscoverable ("no such command: `ndk`").
 func runtime() shell.Command {
 	return shell.Runtime().
-		Debug().
 		Directory(egenv.WorkingDirectory("neurals")).
 		Environ("CARGO_TARGET_DIR", egenv.CacheDirectory("neurals", "target"))
 }

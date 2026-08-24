@@ -9,7 +9,6 @@ import (
 	"eg/compute/maintainer"
 	"eg/compute/neurals"
 	"log"
-	"path/filepath"
 	"time"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
@@ -21,14 +20,16 @@ import (
 	"github.com/egdaemon/eg/runtime/x/wasi/egsecrets"
 )
 
+// androidruntime does not set the native-libs directory itself —
+// console.BuildAndroidAPK/BuildAndroidBundle apply that after
+// flutterRuntimev2, since flutterRuntimev2 unconditionally overrides it
+// with its own dev.native.libs default and would clobber it if set here
+// first.
 func androidruntime() shell.Command {
 	ctx, done := context.WithTimeout(context.Background(), time.Minute)
 	defer done()
 
-	dir := android.JNILibRoot()
 	return shell.Env().
-		Environ("RETROVIBED_SHARED_NATIVE_LIBS_DIRECTORY", dir).
-		Environ("NIX_RETROVIBED_SHARED_NATIVE_LIBS", filepath.Join(dir, "example.so")).
 		EnvironFrom(eggradlex.Env()...).
 		Environ("ANDROID_HOME", "/opt/android-sdk").
 		EnvironFrom(egsecrets.Env(ctx, "gcpsm://retrovibed-prod/android-keystore-prod-env")...).
@@ -56,19 +57,19 @@ func main() {
 					egbug.Log("generated console bindings"),
 					eg.Parallel(
 						duckdb.MaybeBuild(
-							android.JNILibDir("x64", "libduckdb.a"),
+							android.JNIStagingDir("x64", "libduckdb.a"),
 							duckdb.CompileAndroidRuntime("android_x86_64", "x86_64"),
 							duckdb.CompileAndroid,
 							duckdb.CloneStaticBuild,
 						),
 						duckdb.MaybeBuild(
-							android.JNILibDir("arm64", "libduckdb.a"),
+							android.JNIStagingDir("arm64", "libduckdb.a"),
 							duckdb.CompileAndroidRuntime("android_arm64", "arm64-v8a"),
 							duckdb.CompileAndroid,
 							duckdb.CloneStaticBuild,
 						),
-						neurals.CompileAndroid("x86_64", android.JNILibDir("x64")),
-						neurals.CompileAndroid("arm64-v8a", android.JNILibDir("arm64")),
+						neurals.CompileAndroid("x86_64", android.JNIStagingDir("x64")),
+						neurals.CompileAndroid("arm64-v8a", android.JNIStagingDir("arm64")),
 					),
 					egbug.Log("generated static libraries for android"),
 					eg.Parallel(
@@ -76,11 +77,13 @@ func main() {
 							android.JNILibDir("x64"),
 							console.AndroidRuntime("x86_64-none-linux-android31").
 								Environ("GOARCH", "amd64"),
+							android.JNIStagingDir("x64"),
 						),
 						console.GenerateStaticBinding(
 							android.JNILibDir("arm64"),
 							console.AndroidRuntime("aarch64-none-linux-android31").
 								Environ("GOARCH", "arm64"),
+							android.JNIStagingDir("arm64"),
 						),
 					),
 					egbug.Log("generated static libraries for duckdb"),
