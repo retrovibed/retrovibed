@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/authn.dart' as authn;
+import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/media/media.pb.dart';
 import 'package:retrovibed/mimex.dart' as mimex;
@@ -27,6 +28,8 @@ class KnownMediaIcon extends StatelessWidget {
       builder: (context, snapshot) {
         final image = snapshot.data?.image ?? "";
         if (image.isEmpty) return fallback;
+
+        ds.Image.precache(context, image, headers: _imageheaders(image));
 
         return ClipRRect(
           borderRadius: BorderRadius.circular(size / 4),
