@@ -25,9 +25,6 @@ func main() {
 	deb := eg.Container(maintainer.Container)
 	err := eg.Perform(
 		ctx,
-		shell.Op(
-			shell.Newf("echo 'derp derp %s | %s'", egarch.DartFrom(egarch.Host()), egarch.DartFrom("arm64")),
-		),
 		eggit.AutoClone,
 		eg.Build(deb.BuildFromFile(".eg/Containerfile")),
 		eg.Module(
