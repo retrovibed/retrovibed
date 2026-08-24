@@ -45,6 +45,7 @@ class Playlist extends StatefulWidget {
 
   static Future<void> file(BuildContext context, String path) {
     print("opening ${path}");
+
     return of(context)?.player.open(Media(path)).catchError((
           cause,
         ) {
@@ -67,7 +68,10 @@ class Playlist extends StatefulWidget {
         return debug.Lifecycle(
           message: "playlist shortcuts",
           ds.Shortcuts(
-            b(context, s),
+            ValueListenableBuilder<playqueue.PlayableMedia?>(
+              valueListenable: s.current,
+              builder: (context, _, __) => b(context, s),
+            ),
             enabled: defaults.desktop,
             bindings: {
               const SingleActivator(LogicalKeyboardKey.escape): (
@@ -350,24 +354,32 @@ class _PlaylistState extends State<Playlist> {
 
   Future<playqueue.PlayableMedia?> _reverse() {
     _transitioning = true;
-    return authn.bearer(authn.AuthzCache.meta(context)).then((auth) => _queue.reverse(auth, player)).then((m) {
-      if (m != null) setState(() {});
-      return m;
-    }).whenComplete(() {
-      _transitioning = false;
-      _applyPlaying(player.state.playing);
-    });
+    return authn
+        .bearer(authn.AuthzCache.meta(context))
+        .then((auth) => _queue.reverse(auth, player))
+        .then((m) {
+          if (m != null) setState(() {});
+          return m;
+        })
+        .whenComplete(() {
+          _transitioning = false;
+          _applyPlaying(player.state.playing);
+        });
   }
 
   Future<playqueue.PlayableMedia?> _advance() {
     _transitioning = true;
-    return authn.bearer(authn.AuthzCache.meta(context)).then((auth) => _queue.advance(auth, player)).then((m) {
-      if (m != null) setState(() {});
-      return m;
-    }).whenComplete(() {
-      _transitioning = false;
-      _applyPlaying(player.state.playing);
-    });
+    return authn
+        .bearer(authn.AuthzCache.meta(context))
+        .then((auth) => _queue.advance(auth, player))
+        .then((m) {
+          if (m != null) setState(() {});
+          return m;
+        })
+        .whenComplete(() {
+          _transitioning = false;
+          _applyPlaying(player.state.playing);
+        });
   }
 
   @override
