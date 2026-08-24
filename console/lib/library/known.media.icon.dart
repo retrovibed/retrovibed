@@ -29,18 +29,18 @@ class KnownMediaIcon extends StatelessWidget {
         final image = snapshot.data?.image ?? "";
         if (image.isEmpty) return fallback;
 
-        ds.Image.precache(context, image, headers: _imageheaders(image));
-
         return ClipRRect(
           borderRadius: BorderRadius.circular(size / 4),
-          child: Image.network(
-            image,
-            headers: _imageheaders(image),
-            width: size,
-            height: size,
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) => fallback,
-          ),
+          child: ds.Image.precache(
+                context,
+                image,
+                headers: _imageheaders(image),
+                width: size,
+                height: size,
+                fit: BoxFit.cover,
+                error: (context) => fallback,
+              ) ??
+              fallback,
         );
       },
     );

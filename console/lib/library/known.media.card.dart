@@ -136,14 +136,7 @@ class KnownMediaCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
-    ds.Image.precache(context, current.image, headers: _imageheaders(current.image));
-    final poster = current.image == ""
-        ? ds.Empty
-        : Image.network(
-            current.image,
-            headers: _imageheaders(current.image),
-            errorBuilder: (context, error, stackTrace) => const Icon(Icons.image_outlined),
-          );
+    final poster = ds.Image.precache(context, current.image, headers: _imageheaders(current.image)) ?? ds.Empty;
 
     return ConstrainedBox(
       constraints: constraints ?? const BoxConstraints(),
