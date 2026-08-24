@@ -197,6 +197,11 @@ class _PlaylistState extends State<Playlist> {
     ),
   );
   final ValueNotifier<bool> overlay = ValueNotifier<bool>(true);
+  // guards the player.stream.playing listener during _advance()/_reverse():
+  // both can still fall back to Player.open(), which emits a transient
+  // playing:false->true blip while (re)loading a track - suppress reacting
+  // to that noise and resync once from the real, settled state afterward.
+  bool _transitioning = false;
 
   Known get known => _queue.current.value.known;
   ValueNotifier<playqueue.PlayableMedia?> get current => _queue.current;
@@ -262,13 +267,23 @@ class _PlaylistState extends State<Playlist> {
       completed ? next() : player.pause();
     });
 
+    // _swap() (play.queue.dart) removes the blip for in-queue advances at the
+    // source; _transitioning (set around _advance()/_reverse()) suppresses the
+    // remaining open() call sites (reverse(), and the first track of a freshly
+    // reset queue) where stream.playing still emits a transient false->true
+    // pair while the track is being (re)loaded.
     player.stream.playing.listen((playing) {
-      final defaults = ds.Defaults.of(context);
-      final focus = playing || defaults.mobile ? playerfocus : searchfocus;
-      debugPrint("playlist.playing: ${playing} - ${focus}");
-      focus.requestFocus();
-      overlay.value = !playing;
+      if (_transitioning) return;
+      _applyPlaying(playing);
     });
+  }
+
+  void _applyPlaying(bool playing) {
+    final defaults = ds.Defaults.of(context);
+    final focus = playing || defaults.mobile ? playerfocus : searchfocus;
+    debugPrint("playlist.playing: ${playing} - ${focus}");
+    focus.requestFocus();
+    overlay.value = !playing;
   }
 
   void setPlaylist(
@@ -334,16 +349,24 @@ class _PlaylistState extends State<Playlist> {
   }
 
   Future<playqueue.PlayableMedia?> _reverse() {
+    _transitioning = true;
     return authn.bearer(authn.AuthzCache.meta(context)).then((auth) => _queue.reverse(auth, player)).then((m) {
       if (m != null) setState(() {});
       return m;
+    }).whenComplete(() {
+      _transitioning = false;
+      _applyPlaying(player.state.playing);
     });
   }
 
   Future<playqueue.PlayableMedia?> _advance() {
+    _transitioning = true;
     return authn.bearer(authn.AuthzCache.meta(context)).then((auth) => _queue.advance(auth, player)).then((m) {
       if (m != null) setState(() {});
       return m;
+    }).whenComplete(() {
+      _transitioning = false;
+      _applyPlaying(player.state.playing);
     });
   }
 

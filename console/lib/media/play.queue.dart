@@ -99,7 +99,7 @@ class PlayQueue {
     }
 
     try {
-      await player.open(m.playable(auth));
+      await _swap(player, m.playable(auth));
       // skips the push when the outgoing and incoming track are the same -
       // notably true for the very first advance after reset(), since the
       // seed media and the stream's first (re-fetched) item share an id.
@@ -112,6 +112,32 @@ class PlayQueue {
       print("unable to pull next media from playlist $cause");
       return null;
     }
+  }
+
+  // swaps the currently loaded track for [next], preferring mpv's own
+  // playlist over Player.open()'s stop()/reopen cycle - stop() unconditionally
+  // emits a playing:false->true blip on stream.playing that looks
+  // indistinguishable from a user pause, which is what flashes the search
+  // overlay back into view on every track change (see playlist.dart's
+  // player.stream.playing listener). add()+next() advance mpv's playlist in
+  // place instead, which never touches the pause state.
+  Future<void> _swap(mediakit.Player player, mediakit.Media next) async {
+    // mpv's playlist starts empty and only becomes non-empty once something's
+    // been opened into it - swapping against an empty playlist doesn't work
+    // (Player.next() no-ops when there's nothing to advance past), so the
+    // very first track goes through a full open().
+    if (player.state.playlist.medias.isEmpty) {
+      await player.open(next);
+      return;
+    }
+
+    final prev = player.state.playlist.index;
+    await player.add(next);
+    await player.next();
+    // keep mpv's own playlist bounded to just the current track - history is
+    // already tracked in [_previous]; letting mpv's internal playlist grow
+    // unbounded across a long-lived queue would leak memory.
+    await player.remove(prev);
   }
 
   void push(PlayableMedia media) {
@@ -127,6 +153,11 @@ class PlayQueue {
   Future<PlayableMedia?> reverse(String auth, mediakit.Player player) async {
     final prev = _previous.remove();
     if (prev == null) return null;
+    // unlike advance()'s _swap(), we can't reuse mpv's native
+    // playlist-previous here: _swap() prunes the outgoing track from mpv's
+    // own playlist as soon as we move off of it, so by the time the user
+    // goes back the previous entry no longer exists there and has to be
+    // reopened directly.
     await player.open(prev.playable(auth));
     _upcoming.insert(current.value);
     current.value = prev;
