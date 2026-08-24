@@ -488,7 +488,12 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	communityapi.NewHTTPYouTube(db, deepjwt).Bind(httpmux.PathPrefix("/integrations/youtube").Subrouter())
 
 	tlspem := envx.String(userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "tls.pem"), env.DaemonTLSPEM)
-	if err = tlsx.SelfSignedLocalHostTLSSeeded(cryptox.NewChaCha8(cmdopts.MachineID()), tlspem, tlsx.X509OptionHosts(t.SelfSignedHosts...)); err != nil {
+	if err = tlsx.SelfSignedLocalHostTLSSeeded(
+		cryptox.NewChaCha8(cmdopts.MachineID()),
+		tlspem,
+		tlsx.X509OptionHosts(t.SelfSignedHosts...),
+		tlsx.X509OptionAutoHosts(),
+	); err != nil {
 		return err
 	}
 

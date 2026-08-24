@@ -35,6 +35,20 @@ func expiredCert(t *testing.T) (*ecdsa.PrivateKey, []byte) {
 	return priv, der
 }
 
+func TestX509OptionAutoHosts(t *testing.T) {
+	cert := &x509.Certificate{}
+	tlsx.X509OptionAutoHosts()(cert)
+
+	hostname, err := os.Hostname()
+	require.NoError(t, err)
+	require.Contains(t, cert.DNSNames, hostname, "machine hostname should appear in cert SANs")
+
+	for _, ip := range cert.IPAddresses {
+		require.False(t, ip.IsLoopback(), "loopback address should not be added as a SAN: %s", ip)
+		require.False(t, ip.IsLinkLocalUnicast(), "link-local address should not be added as a SAN: %s", ip)
+	}
+}
+
 func TestSelfSignedLocalHostTLSSeeded(t *testing.T) {
 	t.Run("missing file", func(t *testing.T) {
 		path := filepath.Join(t.TempDir(), "tls.pem")
@@ -108,6 +122,20 @@ func TestSelfSignedLocalHostTLSSeeded(t *testing.T) {
 		cert, err := tlsx.DecodePEMCertificate(data)
 		require.NoError(t, err)
 		require.Contains(t, cert.DNSNames, "testhost.local", "extra host from options should appear in cert SANs")
+	})
+
+	t.Run("auto hosts forwarded", func(t *testing.T) {
+		path := filepath.Join(t.TempDir(), "tls.pem")
+		require.NoError(t, tlsx.SelfSignedLocalHostTLSSeeded(rand.Reader, path, tlsx.X509OptionAutoHosts()))
+
+		data, err := os.ReadFile(path)
+		require.NoError(t, err)
+		cert, err := tlsx.DecodePEMCertificate(data)
+		require.NoError(t, err)
+
+		hostname, err := os.Hostname()
+		require.NoError(t, err)
+		require.Contains(t, cert.DNSNames, hostname, "machine hostname should appear in cert SANs")
 	})
 
 	t.Run("private key stable across regeneration with same seed", func(t *testing.T) {

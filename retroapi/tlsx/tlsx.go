@@ -12,6 +12,7 @@ import (
 	"encoding/hex"
 	"encoding/pem"
 	"io"
+	"log"
 	"math/big"
 	"net"
 	"os"
@@ -55,6 +56,62 @@ func X509OptionHosts(names ...string) X509Option {
 			}
 		}
 	}
+}
+
+// X509OptionAutoHosts adds the machine's own OS hostname and the IPs of its
+// current non-loopback, non-link-local network interfaces as additional cert
+// SANs (LAN IPs, Tailscale CGNAT IPs, MagicDNS short names, etc). Additive —
+// compose alongside the existing localhost defaults and any operator-supplied
+// hosts. Enumeration failures are logged and degrade gracefully (X509Option
+// has no error return), never blocking cert generation.
+func X509OptionAutoHosts() X509Option {
+	return X509OptionHosts(autoHostNames()...)
+}
+
+func autoHostNames() []string {
+	var hosts []string
+
+	if name, err := os.Hostname(); err == nil && name != "" {
+		hosts = append(hosts, name)
+	} else if err != nil {
+		log.Println("tlsx: unable to determine hostname for self-signed cert SANs", err)
+	}
+
+	ifaces, err := net.Interfaces()
+	if err != nil {
+		log.Println("tlsx: unable to enumerate network interfaces for self-signed cert SANs", err)
+		return hosts
+	}
+
+	for _, iface := range ifaces {
+		if iface.Flags&net.FlagUp == 0 || iface.Flags&net.FlagLoopback != 0 {
+			continue
+		}
+
+		addrs, err := iface.Addrs()
+		if err != nil {
+			log.Println("tlsx: unable to read addresses for interface", iface.Name, err)
+			continue
+		}
+
+		for _, addr := range addrs {
+			var ip net.IP
+			switch v := addr.(type) {
+			case *net.IPNet:
+				ip = v.IP
+			case *net.IPAddr:
+				ip = v.IP
+			}
+
+			if ip == nil || ip.IsLoopback() || ip.IsLinkLocalUnicast() || ip.IsLinkLocalMulticast() {
+				continue
+			}
+
+			hosts = append(hosts, ip.String())
+		}
+	}
+
+	return hosts
 }
 
 // X509OptionUsage set the usage options for the certificate.
