@@ -21,7 +21,27 @@ void main(List<String> args) async {
       throw Exception('Directory does not exist: $dirPath');
     }
 
-    final files = dir.listSync().whereType<File>().where((file) => file.path.endsWith(ext));
+    // android's override of NIX_RETROVIBED_SHARED_NATIVE_LIBS points at
+    // android.JNILibRoot() (.eg/android/android.go), which nests one
+    // subdirectory per architecture since the build hook is invoked once
+    // per target architecture during a multi-abi release build. Recurse
+    // and prefer whichever candidates' path names this invocation's
+    // targetArchitecture, so each per-arch invocation only picks up its
+    // own .so instead of every arch's. Desktop dev builds are single-arch
+    // with libs sitting flat (no arch-named path segment), so nothing
+    // there ever matches and the plain fallback (every matching file)
+    // applies unchanged.
+    final candidates = dir
+        .listSync(recursive: true)
+        .whereType<File>()
+        .where((file) => file.path.endsWith(ext))
+        .toList();
+
+    final architecture = input.config.buildCodeAssets
+        ? input.config.code.targetArchitecture.name
+        : Architecture.x64.name;
+    final archMatches = candidates.where((file) => file.path.contains(architecture)).toList();
+    final files = archMatches.isNotEmpty ? archMatches : candidates;
 
     for (final libFile in files) {
       final filename = path.basename(libFile.path);
