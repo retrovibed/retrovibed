@@ -258,10 +258,6 @@ class _PlaylistState extends State<Playlist> {
       widget.tracing(context, pos, player.state.duration, search.value.next, id);
     });
 
-    player.stream.error.listen((err) {
-      print("error: ${err}");
-    });
-
     player.stream.completed.listen((completed) {
       if (!completed) return;
 

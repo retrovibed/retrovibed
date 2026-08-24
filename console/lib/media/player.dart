@@ -37,7 +37,10 @@ class _VideoState extends State<VideoScreen> {
     debugLabel: "focus.video.player.scope",
   );
   final controller;
-  late final StreamSubscription<Tracks> sub0;
+  late final StreamSubscription<Tracks> subtracks;
+  late final StreamSubscription<String> suberrors;
+  late final StreamSubscription<bool> subplaying;
+  final ValueNotifier<Widget> errors = ValueNotifier<Widget>(ds.Error.zero);
   // Stable list so MaterialDesktopVideoControlsThemeData identity doesn't
   // change on every setState, which would cause VideoControlsThemeDataInjector
   // to deactivate mid-frame and abort Impeller on macOS.
@@ -60,11 +63,23 @@ class _VideoState extends State<VideoScreen> {
   void initState() {
     super.initState();
 
-    sub0 = widget.player.stream.tracks.listen((state) {
+    subtracks = widget.player.stream.tracks.listen((state) {
       setState(() {});
     });
 
     widget.player.stream.log.listen((log) => print(log));
+
+    suberrors = widget.player.stream.error.listen((err) {
+      errors.value = ds.Error.unknown(
+        err,
+        onTap: () => errors.value = ds.Error.zero,
+        decoration: ds.ErrorDecorations.info,
+      );
+    });
+
+    subplaying = widget.player.stream.playing.listen((playing) {
+      if (playing) errors.value = ds.Error.zero;
+    });
   }
 
   @override
@@ -95,7 +110,9 @@ class _VideoState extends State<VideoScreen> {
 
   @override
   void dispose() {
-    sub0.cancel();
+    subtracks.cancel();
+    suberrors.cancel();
+    subplaying.cancel();
     super.dispose();
   }
 
@@ -105,71 +122,75 @@ class _VideoState extends State<VideoScreen> {
       message: "player lifecycle",
       Builder(
         builder: (context) {
-          final theme = Theme.of(context);
-          final defaults = ds.Defaults.of(context);
-          final plist = internal.Playlist.of(context)!;
-          final current = plist.known;
-          final compact = defaults.isCompact;
+            final theme = Theme.of(context);
+            final defaults = ds.Defaults.of(context);
+            final plist = internal.Playlist.of(context)!;
+            final current = plist.known;
+            final compact = defaults.isCompact;
 
-          return FocusScope(
-            node: _selffocus,
-            child: Stack(
-              fit: StackFit.passthrough,
-              children: [
-                debug.Lifecycle(
-                  message: "video controls theme",
-                  MaterialDesktopVideoControlsTheme(
-                    normal: MaterialDesktopVideoControlsThemeData(
-                      modifyVolumeOnScroll: false,
-                      bottomButtonBar: _controls,
-                      keyboardShortcuts: {},
+            return FocusScope(
+              node: _selffocus,
+              child: Stack(
+                fit: StackFit.passthrough,
+                children: [
+                  debug.Lifecycle(
+                    message: "video controls theme",
+                    MaterialDesktopVideoControlsTheme(
+                      normal: MaterialDesktopVideoControlsThemeData(
+                        modifyVolumeOnScroll: false,
+                        bottomButtonBar: _controls,
+                        keyboardShortcuts: {},
+                      ),
+                      fullscreen: MaterialDesktopVideoControlsThemeData(
+                        modifyVolumeOnScroll: false,
+                        bottomButtonBar: _controls,
+                        keyboardShortcuts: {},
+                      ),
+                      child: ValueListenableBuilder<Widget>(
+                        valueListenable: errors,
+                        builder: (context, error, child) => ds.Loading(cause: error, child!),
+                        child: Video(focusNode: widget.focus, controller: controller),
+                      ),
                     ),
-                    fullscreen: MaterialDesktopVideoControlsThemeData(
-                      modifyVolumeOnScroll: false,
-                      bottomButtonBar: _controls,
-                      keyboardShortcuts: {},
+                  ),
+                  ValueListenableBuilder<bool>(
+                    valueListenable: widget.overlay,
+                    builder: (context, overlay, child) => Visibility(
+                      maintainState: true,
+                      maintainFocusability: true,
+                      visible: overlay,
+                      child: child!,
                     ),
-                    child: Video(focusNode: widget.focus, controller: controller),
-                  ),
-                ),
-                ValueListenableBuilder<bool>(
-                  valueListenable: widget.overlay,
-                  builder: (context, overlay, child) => Visibility(
-                    maintainState: true,
-                    maintainFocusability: true,
-                    visible: overlay,
-                    child: child!,
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    verticalDirection: compact ? VerticalDirection.up : VerticalDirection.down,
-                    children: [
-                      Expanded(
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            color: theme.scaffoldBackgroundColor.withValues(
-                              // TODO: make opacity configurable because people have
-                              // personal preferences....
-                              // alpha: defaults.opaque.a,
-                              alpha: 1.0,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      verticalDirection: compact ? VerticalDirection.up : VerticalDirection.down,
+                      children: [
+                        Expanded(
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              color: theme.scaffoldBackgroundColor.withValues(
+                                // TODO: make opacity configurable because people have
+                                // personal preferences....
+                                // alpha: defaults.opaque.a,
+                                alpha: 1.0,
+                              ),
                             ),
+                            child: widget.child,
                           ),
-                          child: widget.child,
                         ),
-                      ),
-                      Visibility(
-                        visible: !uuidx.isMin(uuidx.fromString(current.id)),
-                        child: PlayerControlResume(widget.player, current, widget.overlay),
-                      ),
-                    ],
+                        Visibility(
+                          visible: !uuidx.isMin(uuidx.fromString(current.id)),
+                          child: PlayerControlResume(widget.player, current, widget.overlay),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
+                ],
+              ),
+            );
+          },
+        ),
+      );
   }
 }
