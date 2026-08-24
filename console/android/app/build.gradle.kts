@@ -30,6 +30,14 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        // Only arm64-v8a and x86_64 are actually built (see .eg/release/android/main.go,
+        // .eg/dev/console/android/main.go). Without this, Flutter's default third ABI
+        // (armeabi-v7a) still gets targeted with nothing real to back it, which is exactly
+        // what let a bogus arm64-v8a-sized armeabi-v7a copy of libretrovibed.so slip in.
+        ndk {
+            abiFilters += listOf("arm64-v8a", "x86_64")
+        }
     }
 
     buildTypes {
