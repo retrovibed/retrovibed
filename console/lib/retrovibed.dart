@@ -70,7 +70,7 @@ String bearer_token() {
 // remote control listen socket. never valid outside this process.
 meta.Daemon local_device() {
   final encoded = _convertstring(bridge.local_device());
-  return meta.Daemon.fromJson(encoded);
+  return meta.Daemon()..mergeFromProto3Json(jsonDecode(encoded));
 }
 
 // return a bearer authorized to connect to this process's own local
