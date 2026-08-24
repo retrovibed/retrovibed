@@ -64,6 +64,22 @@ func JNILibRoot() string {
 	return egenv.CacheDirectory("android.lib")
 }
 
+// NoNativeAssetsDir returns an ephemeral, per-run path never created by
+// anything. android's native libs are delivered via gradle's jniLibs
+// packaging (see JNILibDir), not Flutter's native-assets/code-assets
+// system — pointing console/hook/build.dart's
+// NIX_RETROVIBED_SHARED_NATIVE_LIBS here instead of at JNILibRoot means the
+// hook finds no directory and bundles nothing for android, without the
+// hook needing any platform-specific knowledge of its own. Deliberately
+// ephemeral and suffixed with the current run ID (not a persistent, fixed
+// cache path) so it can never end up accidentally populated by an
+// unrelated run: android must never see a directory another platform's
+// build populated (the original dev.native.libs collision this whole
+// scheme replaced), and a run-unique temp path guarantees that.
+func NoNativeAssetsDir() string {
+	return egenv.EphemeralDirectory(fmt.Sprintf("android.lib.none.%s", egenv.RunID()))
+}
+
 // JNIStagingDir returns the persistent cache directory for intermediate
 // native dependency artifacts (duckdb, predicttext: both .a and whatever
 // .so byproduct their build produces) that the go static binding links

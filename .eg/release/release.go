@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
@@ -17,6 +18,16 @@ import (
 	"github.com/egdaemon/eg/runtime/x/wasi/eggithub"
 	"github.com/egdaemon/eg/runtime/x/wasi/egtarball"
 )
+
+// Dist rsyncs files into the persistent .dist cache directory
+// (egenv.CacheDirectory(".dist")), creating it if necessary. Useful for
+// leaving a locally-inspectable copy of build outputs (e.g. release
+// APK/AAB) alongside the other packaging artifacts already dropped there.
+func Dist(files ...string) eg.OpFn {
+	return shell.Op(
+		shell.Newf("rsync --mkpath -av %s %s/", strings.Join(files, " "), egenv.CacheDirectory(".dist")),
+	)
+}
 
 func Release(b *tarballs.Build) eg.OpFn {
 	return eg.Sequential(

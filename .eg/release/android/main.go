@@ -8,6 +8,7 @@ import (
 	"eg/compute/eggradlex"
 	"eg/compute/maintainer"
 	"eg/compute/neurals"
+	"eg/compute/release"
 	"log"
 	"time"
 
@@ -89,6 +90,10 @@ func main() {
 					egbug.Log("generated static libraries for duckdb"),
 					console.BuildAndroidAPK(androidruntime()),
 					console.BuildAndroidBundle(androidruntime()),
+					release.Dist(
+						egenv.WorkingDirectory("console/build/app/outputs/apk/release/retrovibed.apk"),
+						egenv.WorkingDirectory("console/build/app/outputs/bundle/release/retrovibed.aab"),
+					),
 					eggithub.Draft(
 						egenv.WorkingDirectory("console/build/app/outputs/apk/release/retrovibed.apk"),
 						egenv.WorkingDirectory("console/build/app/outputs/bundle/release/retrovibed.aab"),
