@@ -15,12 +15,11 @@ import (
 )
 
 // androidRuntime applies flutterRuntimev2's defaults and then re-asserts the
-// android-specific native-libs directory on top: flutterRuntimev2
-// unconditionally points RETROVIBED_SHARED_NATIVE_LIBS_DIRECTORY /
-// NIX_RETROVIBED_SHARED_NATIVE_LIBS at its own dev.native.libs default, so
-// applying it after the caller's runtime (as BuildAndroidAPK/Bundle do)
-// would otherwise silently clobber whatever android-specific value the
-// caller already set.
+// native-libs directory on top: flutterRuntimev2 unconditionally points
+// RETROVIBED_SHARED_NATIVE_LIBS_DIRECTORY / NIX_RETROVIBED_SHARED_NATIVE_LIBS
+// at its own dev.native.libs default, so applying it after the caller's
+// runtime (as BuildAndroidAPK/Bundle do) would otherwise silently clobber
+// whatever value the caller already set.
 func androidRuntime(runtime shell.Command) shell.Command {
 	runtime = flutterRuntimev2(runtime)
 	dir := android.JNILibRoot()

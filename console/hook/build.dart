@@ -56,7 +56,7 @@ void main(List<String> args) async {
       output.assets.code.add(
         CodeAsset(
           package: input.packageName,
-          name: filename,
+          name: "${architecture}.${filename}",
           linkMode: DynamicLoadingBundled(),
           file: libFile.uri,
         ),
