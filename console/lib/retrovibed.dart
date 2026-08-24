@@ -22,7 +22,7 @@ String _path({String name = "libretrovibed.so"}) {
       'LD_LIBRARY_PATH',
       'APPDIR_LIBRARY_PATH',
       'RETROVIBED_SHARED_NATIVE_LIBS_DIRECTORY',
-    ], fallback: '');
+    ], fallback: '../.eg.cache/dev.native.libs');
     return ldlibs.split(":").map((path) => File("${path}/${name}"));
   }();
 
