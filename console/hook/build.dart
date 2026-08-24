@@ -17,30 +17,37 @@ void main(List<String> args) async {
     final dirPath = path.dirname(pattern);
     final dir = Directory(dirPath);
 
+    // No directory means nothing to bundle, not an error: a platform whose
+    // native libs are delivered some other way (e.g. android's gradle
+    // jniLibs packaging, driven by the committed
+    // console/android/app/src/main/jniLibs/{abi} symlinks — see
+    // android.JNILibDir in .eg/android/android.go) simply never gets
+    // pointed at a populated directory here. This hook only handles
+    // platforms that actually need Flutter's own native-assets bundling;
+    // it has no platform knowledge of its own.
     if (!dir.existsSync()) {
-      throw Exception('Directory does not exist: $dirPath');
+      return;
     }
 
-    // android's override of NIX_RETROVIBED_SHARED_NATIVE_LIBS points at
-    // android.JNILibRoot() (.eg/android/android.go), which nests one
-    // subdirectory per architecture since the build hook is invoked once
-    // per target architecture during a multi-abi release build. Recurse
-    // and prefer whichever candidates' path names this invocation's
-    // targetArchitecture, so each per-arch invocation only picks up its
-    // own .so instead of every arch's. Desktop dev builds are single-arch
-    // with libs sitting flat (no arch-named path segment), so nothing
-    // there ever matches and the plain fallback (every matching file)
-    // applies unchanged.
+    // Recurse and prefer whichever candidates' path names this
+    // invocation's targetArchitecture (the build hook is invoked once per
+    // target architecture), so a multi-arch directory only contributes its
+    // own arch's file. Single-arch layouts (libs sitting flat, no
+    // arch-named path segment) never match and the plain fallback (every
+    // matching file) applies unchanged.
     final candidates = dir
         .listSync(recursive: true)
         .whereType<File>()
         .where((file) => file.path.endsWith(ext))
         .toList();
 
+    // Match architecture as a whole path segment, not a substring: "arm" is
+    // a substring of "arm64", so a plain .contains() would wrongly match
+    // an arm64 build for the (32-bit) Architecture.arm invocation too.
     final architecture = input.config.buildCodeAssets
         ? input.config.code.targetArchitecture.name
         : Architecture.x64.name;
-    final archMatches = candidates.where((file) => file.path.contains(architecture)).toList();
+    final archMatches = candidates.where((file) => path.split(file.path).contains(architecture)).toList();
     final files = archMatches.isNotEmpty ? archMatches : candidates;
 
     for (final libFile in files) {
