@@ -10,8 +10,14 @@ import (
 	"github.com/egdaemon/eg/runtime/x/wasi/egfs"
 )
 
-// runtime returns a shell.Command with CARGO_HOME and CARGO_TARGET_DIR set to
-// cache locations outside the source tree, rooted in the neurals source dir.
+// runtime returns a shell.Command with CARGO_TARGET_DIR set to a cache
+// location outside the source tree, rooted in the neurals source dir.
+//
+// Deliberately leaves CARGO_HOME at its container default rather than
+// pointing it at a persistent cache dir: CARGO_HOME/bin holds `cargo
+// install`ed tools (cargo-ndk, installed at container-image build time),
+// and cargo looks for subcommands there — pointing CARGO_HOME elsewhere
+// makes cargo-ndk undiscoverable ("no such command: `ndk`").
 func runtime() shell.Command {
 	return shell.Runtime().
 		Debug().

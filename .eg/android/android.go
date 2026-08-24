@@ -16,6 +16,7 @@ import (
 
 	_eg "github.com/egdaemon/eg"
 	"github.com/egdaemon/eg/runtime/wasi/eg"
+	"github.com/egdaemon/eg/runtime/wasi/egenv"
 	"github.com/egdaemon/eg/runtime/wasi/shell"
 	"github.com/egdaemon/eg/runtime/x/wasi/egfs"
 	"github.com/egdaemon/eg/runtime/x/wasi/egsecrets"
@@ -33,6 +34,31 @@ const (
 	Platform  = "android-31"
 	Container = "retrovibe.ubuntu.android"
 )
+
+// JNILibDir returns the persistent cache directory backing the
+// console/android/app/src/main/jniLibs/{abi} symlink checked into the repo,
+// joined with any additional path segments. arch is keyed by Dart's
+// Architecture.name ("arm64", "x64"), matching what build.dart's
+// input.config.code.targetArchitecture reports, not gradle's ABI folder
+// name ("arm64-v8a", "x86_64") — the committed jniLibs/{abi} symlinks
+// translate between the two. Native library builds (duckdb, predicttext,
+// the go static binding) write here directly so their output survives a
+// clean clone of the working directory; gradle sees the same files
+// through the committed symlink.
+func JNILibDir(arch string, paths ...string) string {
+	return egenv.CacheDirectory("android.lib", arch, filepath.Join(paths...))
+}
+
+// JNILibRoot returns the parent of every JNILibDir(arch), i.e. the cache
+// directory containing one subdirectory per architecture. Flutter's
+// native-assets build hook is invoked once per target architecture during
+// a build, so build.dart resolves the architecture-specific subdirectory
+// itself (from that invocation's targetArchitecture) rather than being
+// handed one architecture's
+// directory up front.
+func JNILibRoot() string {
+	return egenv.CacheDirectory("android.lib")
+}
 
 // SigningKey generates an Android upload signing key using keytool. The resulting
 // keystore is used to sign APKs/AABs before uploading to the Google Play Store.

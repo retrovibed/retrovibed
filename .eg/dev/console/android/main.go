@@ -5,11 +5,13 @@ import (
 	"eg/compute/android"
 	"eg/compute/console"
 	"eg/compute/debuild/duckdb"
+	"eg/compute/eggradlex"
 	"eg/compute/egx"
 	"eg/compute/maintainer"
 	"eg/compute/neurals"
 	"fmt"
 	"log"
+	"path/filepath"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
@@ -17,6 +19,22 @@ import (
 	"github.com/egdaemon/eg/runtime/wasi/shell"
 	"github.com/egdaemon/eg/runtime/x/wasi/egfs"
 )
+
+func androidNativeLibsEnv(runtime shell.Command) shell.Command {
+	dir := android.JNILibRoot()
+	return runtime.
+		Environ("RETROVIBED_SHARED_NATIVE_LIBS_DIRECTORY", dir).
+		Environ("NIX_RETROVIBED_SHARED_NATIVE_LIBS", filepath.Join(dir, "example.so"))
+}
+
+// gradleCacheEnv points gradle at the persistent cache directory (surviving
+// a clean clone of the working directory, same as android.JNILibRoot) and
+// turns on the Gradle build cache, so repeated `flutter run`/`flutter
+// build` invocations reuse downloaded dependencies and task outputs
+// instead of starting cold every time.
+func gradleCacheEnv(runtime shell.Command) shell.Command {
+	return runtime.EnvironFrom(eggradlex.Env()...)
+}
 
 // devKeystorePath is a throwaway signing key used only to produce locally
 // installable release (minified/R8) builds for reproducing release-only bugs.
@@ -47,7 +65,7 @@ func Device(ctx context.Context, o eg.Op) error {
 		shell.Op(shell.New("adb -d get-serialno")),
 		shell.Op(shell.New("adb -d wait-for-device shell 'while [ \"$(getprop sys.boot_completed)\" != \"1\" ]; do sleep 1; done'")),
 		eg.WhenFn(egfs.FileNotExistsFn(devKeystorePath()), ensureDevKeystore),
-		console.RunDev("flutter pub get && flutter run --release -d $(adb -d get-serialno)", devSigningEnv),
+		console.RunDev("flutter pub get && flutter run --release -d $(adb -d get-serialno)", devSigningEnv, androidNativeLibsEnv, gradleCacheEnv),
 	)(ctx, o)
 }
 
@@ -60,7 +78,7 @@ func Emulator(port int) eg.OpFn {
 			shell.Newf("adb -s emulator-%d wait-for-device shell 'while [ \"$(getprop sys.boot_completed)\" != \"1\" ]; do sleep 1; done'", port),
 		),
 		eg.WhenFn(egfs.FileNotExistsFn(devKeystorePath()), ensureDevKeystore),
-		console.RunDev(fmt.Sprintf("flutter pub get && flutter run --release -d emulator-%d", port), devSigningEnv),
+		console.RunDev(fmt.Sprintf("flutter pub get && flutter run --release -d emulator-%d", port), devSigningEnv, androidNativeLibsEnv, gradleCacheEnv),
 	)
 }
 
@@ -94,34 +112,33 @@ func main() {
 				duckdb.Download,
 				eg.Parallel(
 					duckdb.MaybeBuild(
-						egenv.WorkingDirectory("console/android/app/src/main/jniLibs/x86_64/libduckdb.a"),
+						android.JNILibDir("x64", "libduckdb.a"),
 						duckdb.CompileAndroidRuntime("android_x86_64", "x86_64"),
 						duckdb.CompileAndroid,
 						duckdb.CloneBuild,
 					),
 					duckdb.MaybeBuild(
-						egenv.WorkingDirectory("console/android/app/src/main/jniLibs/arm64-v8a/libduckdb.a"),
+						android.JNILibDir("arm64", "libduckdb.a"),
 						duckdb.CompileAndroidRuntime("android_arm64", "arm64-v8a"),
 						duckdb.CompileAndroid,
 						duckdb.CloneBuild,
 					),
-					neurals.CompileAndroid("x86_64", egenv.WorkingDirectory("console/android/app/src/main/jniLibs/x86_64")),
-					neurals.CompileAndroid("arm64-v8a", egenv.WorkingDirectory("console/android/app/src/main/jniLibs/arm64-v8a")),
+					neurals.CompileAndroid("x86_64", android.JNILibDir("x64")),
+					neurals.CompileAndroid("arm64-v8a", android.JNILibDir("arm64")),
 				),
 				console.Generate,
 				eg.Parallel(
 					console.GenerateDevStaticBinding(
 						console.AndroidRuntime("x86_64-none-linux-android31").Environ("GOARCH", "amd64"),
-						egenv.WorkingDirectory("console/android/app/src/main/jniLibs/x86_64"),
-						egenv.WorkingDirectory("console/android/app/src/main/jniLibs/x86_64"),
+						android.JNILibDir("x64"),
+						android.JNILibDir("x64"),
 					),
 					console.GenerateDevStaticBinding(
 						console.AndroidRuntime("aarch64-none-linux-android31").Environ("GOARCH", "arm64"),
-						egenv.WorkingDirectory("console/android/app/src/main/jniLibs/arm64-v8a"),
-						egenv.WorkingDirectory("console/android/app/src/main/jniLibs/arm64-v8a"),
+						android.JNILibDir("arm64"),
+						android.JNILibDir("arm64"),
 					),
 				),
-				console.BuildLinux,
 			),
 		),
 		egx.Fallback(

@@ -4,12 +4,9 @@ import (
 	"context"
 	"eg/compute/flatpakmods"
 	"eg/compute/tarballs"
-	"fmt"
-	"time"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
-	"github.com/egdaemon/eg/runtime/wasi/eggit"
 	"github.com/egdaemon/eg/runtime/wasi/shell"
 	"github.com/egdaemon/eg/runtime/x/wasi/egflatpak"
 	"github.com/egdaemon/eg/runtime/x/wasi/eggithub"
@@ -34,36 +31,6 @@ func BuildLinux(ctx context.Context, _ eg.Op) error {
 		ctx,
 		runtime.New("flutter build linux --release lib/main.dart").Timeout(egenv.TTL()),
 	)
-}
-
-func BuildAndroidAPK(runtime shell.Command) eg.OpFn {
-	return func(ctx context.Context, _ eg.Op) error {
-		runtime = flutterRuntimev2(runtime)
-
-		commit := eggit.EnvCommit()
-		return shell.Run(
-			ctx,
-			runtime.New(
-				fmt.Sprintf("flutter build apk --build-name=%s --build-number=%s --release lib/main.dart", tarballs.Version(), commit.StringReplace("%git.commit.unix%")),
-			).Timeout(20*time.Minute),
-			runtime.New("mv app-release.apk retrovibed.apk").Timeout(20*time.Minute).Directory(egenv.WorkingDirectory("console/build/app/outputs/apk/release")),
-		)
-	}
-}
-
-func BuildAndroidBundle(runtime shell.Command) eg.OpFn {
-	return func(ctx context.Context, _ eg.Op) error {
-		runtime = flutterRuntimev2(runtime)
-		commit := eggit.EnvCommit()
-
-		return shell.Run(
-			ctx,
-			runtime.New(
-				fmt.Sprintf("flutter build appbundle --build-name=%s --build-number=%s --release lib/main.dart", tarballs.Version(), commit.StringReplace("%git.commit.unix%")),
-			).Timeout(20*time.Minute),
-			runtime.New("mv app-release.aab retrovibed.aab").Timeout(20*time.Minute).Directory(egenv.WorkingDirectory("console/build/app/outputs/bundle/release")),
-		)
-	}
 }
 
 func flatpak(final egflatpak.Module) *egflatpak.Builder {

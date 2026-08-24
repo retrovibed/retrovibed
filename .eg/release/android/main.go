@@ -5,9 +5,11 @@ import (
 	"eg/compute/android"
 	"eg/compute/console"
 	"eg/compute/debuild/duckdb"
+	"eg/compute/eggradlex"
 	"eg/compute/maintainer"
 	"eg/compute/neurals"
 	"log"
+	"path/filepath"
 	"time"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
@@ -22,7 +24,12 @@ import (
 func androidruntime() shell.Command {
 	ctx, done := context.WithTimeout(context.Background(), time.Minute)
 	defer done()
+
+	dir := android.JNILibRoot()
 	return shell.Env().
+		Environ("RETROVIBED_SHARED_NATIVE_LIBS_DIRECTORY", dir).
+		Environ("NIX_RETROVIBED_SHARED_NATIVE_LIBS", filepath.Join(dir, "example.so")).
+		EnvironFrom(eggradlex.Env()...).
 		Environ("ANDROID_HOME", "/opt/android-sdk").
 		EnvironFrom(egsecrets.Env(ctx, "gcpsm://retrovibed-prod/android-keystore-prod-env")...).
 		Environ("RETROVIBED_ANDROID_KEY_STORE_PATH", egenv.CacheDirectory("android", "keystore"))
@@ -49,29 +56,29 @@ func main() {
 					egbug.Log("generated console bindings"),
 					eg.Parallel(
 						duckdb.MaybeBuild(
-							egenv.WorkingDirectory("console/android/app/src/main/jniLibs/x86_64/libduckdb.a"),
+							android.JNILibDir("x64", "libduckdb.a"),
 							duckdb.CompileAndroidRuntime("android_x86_64", "x86_64"),
 							duckdb.CompileAndroid,
 							duckdb.CloneStaticBuild,
 						),
 						duckdb.MaybeBuild(
-							egenv.WorkingDirectory("console/android/app/src/main/jniLibs/arm64-v8a/libduckdb.a"),
+							android.JNILibDir("arm64", "libduckdb.a"),
 							duckdb.CompileAndroidRuntime("android_arm64", "arm64-v8a"),
 							duckdb.CompileAndroid,
 							duckdb.CloneStaticBuild,
 						),
-						neurals.CompileAndroid("x86_64", egenv.WorkingDirectory("console/android/app/src/main/jniLibs/x86_64")),
-						neurals.CompileAndroid("arm64-v8a", egenv.WorkingDirectory("console/android/app/src/main/jniLibs/arm64-v8a")),
+						neurals.CompileAndroid("x86_64", android.JNILibDir("x64")),
+						neurals.CompileAndroid("arm64-v8a", android.JNILibDir("arm64")),
 					),
 					egbug.Log("generated static libraries for android"),
 					eg.Parallel(
 						console.GenerateStaticBinding(
-							egenv.WorkingDirectory("console/android/app/src/main/jniLibs/x86_64"),
+							android.JNILibDir("x64"),
 							console.AndroidRuntime("x86_64-none-linux-android31").
 								Environ("GOARCH", "amd64"),
 						),
 						console.GenerateStaticBinding(
-							egenv.WorkingDirectory("console/android/app/src/main/jniLibs/arm64-v8a"),
+							android.JNILibDir("arm64"),
 							console.AndroidRuntime("aarch64-none-linux-android31").
 								Environ("GOARCH", "arm64"),
 						),
