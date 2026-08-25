@@ -54,6 +54,30 @@ cloud.google.com/go/secretmanager/internal
 # github.com/Masterminds/squirrel v1.5.4
 ## explicit; go 1.14
 github.com/Masterminds/squirrel
+# github.com/ProtonMail/go-crypto v1.4.1
+## explicit; go 1.23.0
+github.com/ProtonMail/go-crypto/bitcurves
+github.com/ProtonMail/go-crypto/brainpool
+github.com/ProtonMail/go-crypto/eax
+github.com/ProtonMail/go-crypto/internal/byteutil
+github.com/ProtonMail/go-crypto/ocb
+github.com/ProtonMail/go-crypto/openpgp
+github.com/ProtonMail/go-crypto/openpgp/aes/keywrap
+github.com/ProtonMail/go-crypto/openpgp/armor
+github.com/ProtonMail/go-crypto/openpgp/ecdh
+github.com/ProtonMail/go-crypto/openpgp/ecdsa
+github.com/ProtonMail/go-crypto/openpgp/ed25519
+github.com/ProtonMail/go-crypto/openpgp/ed448
+github.com/ProtonMail/go-crypto/openpgp/eddsa
+github.com/ProtonMail/go-crypto/openpgp/elgamal
+github.com/ProtonMail/go-crypto/openpgp/errors
+github.com/ProtonMail/go-crypto/openpgp/internal/algorithm
+github.com/ProtonMail/go-crypto/openpgp/internal/ecc
+github.com/ProtonMail/go-crypto/openpgp/internal/encoding
+github.com/ProtonMail/go-crypto/openpgp/packet
+github.com/ProtonMail/go-crypto/openpgp/s2k
+github.com/ProtonMail/go-crypto/openpgp/x25519
+github.com/ProtonMail/go-crypto/openpgp/x448
 # github.com/RoaringBitmap/roaring/v2 v2.24.0
 ## explicit; go 1.24.0
 github.com/RoaringBitmap/roaring/v2
@@ -315,6 +339,20 @@ github.com/charmbracelet/x/term
 # github.com/clipperhouse/uax29/v2 v2.7.0
 ## explicit; go 1.18
 github.com/clipperhouse/uax29/v2/graphemes
+# github.com/cloudflare/circl v1.6.4
+## explicit; go 1.24.0
+github.com/cloudflare/circl/dh/x25519
+github.com/cloudflare/circl/dh/x448
+github.com/cloudflare/circl/ecc/goldilocks
+github.com/cloudflare/circl/internal/conv
+github.com/cloudflare/circl/internal/sha3
+github.com/cloudflare/circl/math
+github.com/cloudflare/circl/math/fp25519
+github.com/cloudflare/circl/math/fp448
+github.com/cloudflare/circl/math/mlsbset
+github.com/cloudflare/circl/sign
+github.com/cloudflare/circl/sign/ed25519
+github.com/cloudflare/circl/sign/ed448
 # github.com/coder/websocket v1.8.14
 ## explicit; go 1.23
 github.com/coder/websocket
@@ -387,7 +425,7 @@ github.com/ebitengine/purego/internal/xreflect
 # github.com/edsrzf/mmap-go v1.2.0
 ## explicit; go 1.17
 github.com/edsrzf/mmap-go
-# github.com/egdaemon/eg v0.0.0-20260825130255-e39bb6b05881
+# github.com/egdaemon/eg v0.0.0-20260825134242-d43435266423
 ## explicit; go 1.26.3
 github.com/egdaemon/eg
 github.com/egdaemon/eg/backoff
@@ -395,11 +433,13 @@ github.com/egdaemon/eg/internal/bytesx
 github.com/egdaemon/eg/internal/contextx
 github.com/egdaemon/eg/internal/coverage
 github.com/egdaemon/eg/internal/coverage/golangcov
+github.com/egdaemon/eg/internal/cryptox
 github.com/egdaemon/eg/internal/debugx
 github.com/egdaemon/eg/internal/envx
 github.com/egdaemon/eg/internal/errorsx
 github.com/egdaemon/eg/internal/execx
 github.com/egdaemon/eg/internal/fsx
+github.com/egdaemon/eg/internal/gpgx
 github.com/egdaemon/eg/internal/iox
 github.com/egdaemon/eg/internal/iterx
 github.com/egdaemon/eg/internal/langx
@@ -1015,6 +1055,7 @@ golang.org/x/crypto/argon2
 golang.org/x/crypto/blake2b
 golang.org/x/crypto/blake2s
 golang.org/x/crypto/blowfish
+golang.org/x/crypto/cast5
 golang.org/x/crypto/chacha20
 golang.org/x/crypto/chacha20poly1305
 golang.org/x/crypto/cryptobyte
@@ -1024,6 +1065,7 @@ golang.org/x/crypto/hkdf
 golang.org/x/crypto/internal/alias
 golang.org/x/crypto/internal/poly1305
 golang.org/x/crypto/poly1305
+golang.org/x/crypto/sha3
 golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
 # golang.org/x/exp v0.0.0-20260727155853-b88d891fe743
