@@ -42,6 +42,7 @@ func init() {
 		egdebuild.Option.Debian(errorsx.Must(fs.Sub(debskel, ".debskel"))),
 		egdebuild.Option.DependsBuild("golang-1.26", "cargo", "rustc", "tree", "dh-make", "debhelper", "pkg-config", "duckdb", "libavcodec-dev", "libavformat-dev", "libavutil-dev", "libswresample-dev", "libavfilter-dev", "libavdevice-dev", "libswscale-dev"),
 		egdebuild.Option.Depends("duckdb", "ffmpeg"),
+		egdebuild.Option.Environ("GNUPGHOME=/home/egd/.gnupg"),
 	)
 }
 
@@ -50,11 +51,6 @@ func Prepare(ctx context.Context, o eg.Op) error {
 	sruntime := shell.Runtime()
 	return eg.Sequential(
 		shell.Op(
-			sruntime.Newf("echo '-----------------------------------------'"),
-			sruntime.Newf("eg gpg keyring --name=\"${EG_GPG_KEYRING_NAME}\" --email=\"${EG_GPG_KEYRING_EMAIL}\" --seed=\"${EG_GPG_KEYRING_SEED}\""),
-			sruntime.Newf("echo '-----------------------------------------'"),
-			// sruntime.Newf("rm -rf %s", debdir),
-			// sruntime.Newf("mkdir -p %s", debdir),
 			sruntime.Newf("git worktree add %s HEAD", debdir),
 		),
 		egdebuild.Prepare(Runner(), errorsx.Must(fs.Sub(debskel, ".debskel"))),
