@@ -41,8 +41,12 @@ func init() {
 		egdebuild.Option.Debian(errorsx.Must(fs.Sub(debskel, ".debskel"))),
 		egdebuild.Option.DependsBuild("rsync", "tree"),
 		egdebuild.Option.Depends("cage", "kbd", "libfuse2", "retrozsync", "ssh"),
-		egdebuild.Option.Environ("GNUPGHOME=/home/egd/.gnupg"),
+		egdebuild.Option.Environ(eggpg.Env(gpgoptions()...)...),
 	)
+}
+
+func gpgoptions() []eggpg.Option {
+	return eggpg.Options().IgnoreLocalGNU()
 }
 
 func Prepare(ctx context.Context, o eg.Op) error {
@@ -66,8 +70,8 @@ func Build(ctx context.Context, o eg.Op) error {
 		// ideally we should default to this except when performing local
 		// compute workloads.
 		egbug.DebugFailure(
-			eggpg.Seed(eggpg.Options().Home("/home/egd/.gnupg")...),
-			eggpg.Debug(eggpg.Options().Home("/home/egd/.gnupg")...),
+			eggpg.Seed(gpgoptions()...),
+			eggpg.Debug(gpgoptions()...),
 		),
 		eg.Parallel(
 			egdebuild.Build(

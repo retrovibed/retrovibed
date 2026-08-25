@@ -25,6 +25,10 @@ func cachedir() string {
 	return egenv.WorkspaceDirectory(".git", "retrovibed")
 }
 
+func gpgoptions() []eggpg.Option {
+	return eggpg.Options().IgnoreLocalGNU()
+}
+
 var (
 	gcfg egdebuild.Config
 )
@@ -43,7 +47,7 @@ func init() {
 		egdebuild.Option.Debian(errorsx.Must(fs.Sub(debskel, ".debskel"))),
 		egdebuild.Option.DependsBuild("golang-1.26", "cargo", "rustc", "tree", "dh-make", "debhelper", "pkg-config", "duckdb", "libavcodec-dev", "libavformat-dev", "libavutil-dev", "libswresample-dev", "libavfilter-dev", "libavdevice-dev", "libswscale-dev"),
 		egdebuild.Option.Depends("duckdb", "ffmpeg"),
-		egdebuild.Option.Environ("GNUPGHOME=/home/egd/.gnupg"),
+		egdebuild.Option.Environ(eggpg.Env(gpgoptions()...)...),
 	)
 }
 
@@ -74,14 +78,14 @@ func Build(ctx context.Context, o eg.Op) error {
 			// seed gpg-agent.conf with debug logging before eggpg.Seed launches the
 			// agent, so a failed import leaves a log with the agent's actual reason
 			// instead of just gpg's generic client-side error.
-			shell.Env().Environ("GNUPGHOME", "/home/egd/.gnupg").New(
+			shell.Env().EnvironFrom(eggpg.Env(gpgoptions()...)...).Environ("GNUPGHOME", "/home/egd/.gnupg").New(
 				`mkdir -p -m 700 "${GNUPGHOME}" && printf 'debug-all\nlog-file %s/gpg-agent.debug.log\n' "${GNUPGHOME}" > "${GNUPGHOME}/gpg-agent.conf"`,
 			),
 		),
 		egbug.DebugFailure(
-			eggpg.Seed(eggpg.Options().Home("/home/egd/.gnupg")...),
+			eggpg.Seed(gpgoptions()...),
 			eg.Sequential(
-				eggpg.Debug(eggpg.Options().Home("/home/egd/.gnupg")...),
+				eggpg.Debug(gpgoptions()...),
 				shell.Op(
 					shell.Env().Environ("GNUPGHOME", "/home/egd/.gnupg").New(`cat "${GNUPGHOME}/gpg-agent.debug.log"`).Lenient(true),
 				),
