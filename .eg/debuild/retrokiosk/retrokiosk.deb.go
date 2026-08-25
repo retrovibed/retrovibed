@@ -42,11 +42,14 @@ func init() {
 		egdebuild.Option.DependsBuild("rsync", "tree"),
 		egdebuild.Option.Depends("cage", "kbd", "libfuse2", "retrozsync", "ssh"),
 		egdebuild.Option.Environ(eggpg.Env(gpgoptions()...)...),
+		egdebuild.Option.Runtime(func(r shell.Command) shell.Command {
+			return r.Privileged()
+		}),
 	)
 }
 
 func gpgoptions() []eggpg.Option {
-	return eggpg.Options().IgnoreLocalGNU()
+	return eggpg.Options().Privileged()
 }
 
 func Prepare(ctx context.Context, o eg.Op) error {

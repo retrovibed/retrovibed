@@ -26,7 +26,7 @@ func cachedir() string {
 }
 
 func gpgoptions() []eggpg.Option {
-	return eggpg.Options().IgnoreLocalGNU()
+	return eggpg.Options().Privileged()
 }
 
 var (
@@ -48,6 +48,9 @@ func init() {
 		egdebuild.Option.DependsBuild("golang-1.26", "cargo", "rustc", "tree", "dh-make", "debhelper", "pkg-config", "duckdb", "libavcodec-dev", "libavformat-dev", "libavutil-dev", "libswresample-dev", "libavfilter-dev", "libavdevice-dev", "libswscale-dev"),
 		egdebuild.Option.Depends("duckdb", "ffmpeg"),
 		egdebuild.Option.Environ(eggpg.Env(gpgoptions()...)...),
+		egdebuild.Option.Runtime(func(r shell.Command) shell.Command {
+			return r.Privileged()
+		}),
 	)
 }
 
