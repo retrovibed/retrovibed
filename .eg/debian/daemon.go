@@ -79,15 +79,14 @@ func Build(ctx context.Context, o eg.Op) error {
 			),
 		),
 		egbug.DebugFailure(
-			eggpg.Seed(eggpg.Options().Debug().Home("/home/egd/.gnupg")...),
+			eggpg.Seed(eggpg.Options().Home("/home/egd/.gnupg")...),
 			eg.Sequential(
-				eggpg.Debug(eggpg.Options().Debug().Home("/home/egd/.gnupg")...),
+				eggpg.Debug(eggpg.Options().Home("/home/egd/.gnupg")...),
 				shell.Op(
 					shell.Env().Environ("GNUPGHOME", "/home/egd/.gnupg").New(`cat "${GNUPGHOME}/gpg-agent.debug.log"`).Lenient(true),
 				),
 			),
 		),
-		egbug.Log("DERP DERP COMPLETED"),
 		egdebuild.Build(gcfg, egdebuild.Option.Distro(egdebuild.UbuntuLatestCodename), egdebuild.Option.NoLint()), // resolute
 		egdebuild.Build(
 			gcfg,

@@ -66,8 +66,8 @@ func Build(ctx context.Context, o eg.Op) error {
 		// ideally we should default to this except when performing local
 		// compute workloads.
 		egbug.DebugFailure(
-			eggpg.Seed(eggpg.Options().Debug().Home("/home/egd/.gnupg")...),
-			eggpg.Debug(eggpg.Options().Debug().Home("/home/egd/.gnupg")...),
+			eggpg.Seed(eggpg.Options().Home("/home/egd/.gnupg")...),
+			eggpg.Debug(eggpg.Options().Home("/home/egd/.gnupg")...),
 		),
 		eg.Parallel(
 			egdebuild.Build(
