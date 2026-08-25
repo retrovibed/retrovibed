@@ -18,7 +18,13 @@ import 'api.dart' as remote;
 class RemoteControlListener extends StatefulWidget {
   final Widget child;
   final Future<remote.RemoteControlSocket> Function({List<httpx.Option> options}) connect;
-  const RemoteControlListener(this.child, {super.key, this.connect = remote.remotecontrol.listen});
+  final meta.Daemon Function() localDevice;
+  const RemoteControlListener(
+    this.child, {
+    super.key,
+    this.connect = remote.remotecontrol.listen,
+    this.localDevice = retro.local_device,
+  });
 
   @override
   State<RemoteControlListener> createState() => _State();
@@ -42,7 +48,7 @@ class _State extends State<RemoteControlListener> {
   Future<void> _echoSync() async {
     final queue = _queue;
     final library = _library.value;
-    library..hostname = meta.daemons.isLocalDevice(library) ? retro.local_device().hostname : library.hostname;
+    library..hostname = meta.daemons.isLocalDevice(library) ? widget.localDevice().hostname : library.hostname;
     final cached = authn.AuthzCache.meta(context);
     // forces a refresh if expired, so token is never blank
     return cached.auto().then((bearer) {

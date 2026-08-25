@@ -85,6 +85,7 @@ void main() {
         media.Playlist(
           RemoteControlListener(
             connect: ({List<httpx.Option> options = const []}) async => fakeSocket,
+            localDevice: () => meta.Daemon(hostname: "localhost:9998"),
             const SizedBox(),
           ),
         ),
@@ -108,6 +109,7 @@ void main() {
         media.Playlist(
           RemoteControlListener(
             connect: ({List<httpx.Option> options = const []}) async => fakeSocket,
+            localDevice: () => meta.Daemon(hostname: "localhost:9998"),
             Builder(
               builder: (context) {
                 return ElevatedButton(
@@ -143,6 +145,7 @@ void main() {
         media.Playlist(
           RemoteControlListener(
             connect: ({List<httpx.Option> options = const []}) async => fakeSocket,
+            localDevice: () => meta.Daemon(hostname: "localhost:9998"),
             const SizedBox(),
           ),
         ),
@@ -172,6 +175,7 @@ void main() {
         media.Playlist(
           RemoteControlListener(
             connect: ({List<httpx.Option> options = const []}) async => fakeSocket,
+            localDevice: () => meta.Daemon(hostname: "localhost:9998"),
             Builder(
               builder: (context) {
                 capturedContext = context;
@@ -205,6 +209,7 @@ void main() {
         media.Playlist(
           RemoteControlListener(
             connect: ({List<httpx.Option> options = const []}) async => fakeSocket,
+            localDevice: () => meta.Daemon(hostname: "localhost:9998"),
             Builder(
               builder: (context) {
                 capturedContext = context;
@@ -242,6 +247,7 @@ void main() {
         media.Playlist(
           RemoteControlListener(
             connect: ({List<httpx.Option> options = const []}) async => fakeSocket,
+            localDevice: () => meta.Daemon(hostname: "localhost:9998"),
             Builder(
               builder: (context) {
                 capturedContext = context;

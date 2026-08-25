@@ -134,11 +134,13 @@ class Error extends StatelessWidget {
     BoxDecoration decoration = ErrorDecorations.error,
     BorderRadius? borderRadius,
   }) => Error(
-    child: SizedBox(
-      width: double.infinity,
-      child: Text(
-        text,
-        textAlign: TextAlign.center,
+    child: LayoutBuilder(
+      builder: (context, constraints) => SizedBox(
+        width: constraints.hasBoundedWidth ? double.infinity : null,
+        child: Text(
+          text,
+          textAlign: TextAlign.center,
+        ),
       ),
     ),
     trace: trace ?? StackTrace.current,
