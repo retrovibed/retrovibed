@@ -223,18 +223,19 @@ func WriteMapper(config Configuration, name string, m MappingConfig) error {
 		return err
 	}
 
-	path := filepath.Join(config.Location, filepath.Base(config.Database), m.Package.Name, m.Type, name)
-	if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
-		return err
-	}
-
-	tmp, err := os.MkdirTemp(filepath.Dir(path), "mkcache")
+	tmp, err := os.MkdirTemp(config.Location, "mkcache.*")
 	if err != nil {
 		return err
 	}
 	defer os.RemoveAll(tmp)
 
 	if err = os.WriteFile(filepath.Join(tmp, name), d, 0666); err != nil {
+		return err
+	}
+
+	path := filepath.Join(config.Location, filepath.Base(config.Database), m.Package.Name, m.Type, name)
+
+	if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
 		return err
 	}
 
