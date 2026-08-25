@@ -65,10 +65,29 @@ func Runner() eg.ContainerRunner {
 
 func Build(ctx context.Context, o eg.Op) error {
 	return eg.Sequential(
-		egbug.DebugFailure(
-			eggpg.Seed(eggpg.Options().Home("/home/egd/.gnupg")...),
-			eggpg.Debug(eggpg.Options().Home("/home/egd/.gnupg")...),
+		shell.Op(
+			// gpg-agent mlocks secret key memory; if RLIMIT_MEMLOCK is capped in
+			// this environment (e.g. a hardened shared runner) that can surface as
+			// import failures. surface it unconditionally so we can compare against
+			// a passing eg compute local run.
+			shell.New("ulimit -l"),
+			// seed gpg-agent.conf with debug logging before eggpg.Seed launches the
+			// agent, so a failed import leaves a log with the agent's actual reason
+			// instead of just gpg's generic client-side error.
+			shell.Env().Environ("GNUPGHOME", "/home/egd/.gnupg").New(
+				`mkdir -p -m 700 "${GNUPGHOME}" && printf 'debug-all\nlog-file %s/gpg-agent.debug.log\n' "${GNUPGHOME}" > "${GNUPGHOME}/gpg-agent.conf"`,
+			),
 		),
+		egbug.DebugFailure(
+			eggpg.Seed(eggpg.Options().Debug().Home("/home/egd/.gnupg")...),
+			eg.Sequential(
+				eggpg.Debug(eggpg.Options().Debug().Home("/home/egd/.gnupg")...),
+				shell.Op(
+					shell.Env().Environ("GNUPGHOME", "/home/egd/.gnupg").New(`cat "${GNUPGHOME}/gpg-agent.debug.log"`).Lenient(true),
+				),
+			),
+		),
+		egbug.Log("DERP DERP COMPLETED"),
 		egdebuild.Build(gcfg, egdebuild.Option.Distro(egdebuild.UbuntuLatestCodename), egdebuild.Option.NoLint()), // resolute
 		egdebuild.Build(
 			gcfg,

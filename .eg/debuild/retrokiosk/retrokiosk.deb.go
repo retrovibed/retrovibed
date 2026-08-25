@@ -15,6 +15,7 @@ import (
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
 	"github.com/egdaemon/eg/runtime/wasi/eggit"
 	"github.com/egdaemon/eg/runtime/wasi/shell"
+	"github.com/egdaemon/eg/runtime/x/wasi/egbug"
 	"github.com/egdaemon/eg/runtime/x/wasi/egdebuild"
 	"github.com/egdaemon/eg/runtime/x/wasi/eggpg"
 )
@@ -64,7 +65,10 @@ func Build(ctx context.Context, o eg.Op) error {
 		// override eg compute local's setting of the home directory.
 		// ideally we should default to this except when performing local
 		// compute workloads.
-		eggpg.Seed(eggpg.Options().Home("/home/egd/.gnupg")...),
+		egbug.DebugFailure(
+			eggpg.Seed(eggpg.Options().Debug().Home("/home/egd/.gnupg")...),
+			eggpg.Debug(eggpg.Options().Debug().Home("/home/egd/.gnupg")...),
+		),
 		eg.Parallel(
 			egdebuild.Build(
 				gcfg,
