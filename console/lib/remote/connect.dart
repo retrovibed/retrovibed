@@ -204,6 +204,7 @@ class _State extends State<_Connect> with LoadingState {
             _messages = socket.messages.asBroadcastStream();
             _messages.listen(
               (msg) {
+                print("derp derp ${msg}");
                 if (msg.whichCommand() == remote.Stream_Command.volume) {
                   setState(() => _latest.volume.level = msg.volume.level);
                   return;
@@ -348,13 +349,15 @@ class _State extends State<_Connect> with LoadingState {
                       Column(
                         verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
                         children: [
-                          ds.CompactingMenu([
-                            ds.CompactingMenu.pinned(PlayerControlSeek.prev(socket: _socket)),
-                            ds.CompactingMenu.pinned(PlayerControlSeek.backward(socket: _socket)),
-                            ds.CompactingMenu.pinned(PlayerControlPlayPause(socket: _socket, status: _messages)),
-                            ds.CompactingMenu.pinned(PlayerControlSeek.forward(socket: _socket)),
-                            ds.CompactingMenu.pinned(PlayerControlSeek.next(socket: _socket)),
-                            ds.CompactingMenu.pinned(
+                          Wrap(
+                            alignment: WrapAlignment.center,
+                            spacing: defaults.spacing,
+                            children: [
+                              PlayerControlSeek.prev(socket: _socket),
+                              PlayerControlSeek.backward(socket: _socket),
+                              PlayerControlPlayPause(socket: _socket, status: _messages),
+                              PlayerControlSeek.forward(socket: _socket),
+                              PlayerControlSeek.next(socket: _socket),
                               ds.LoadingIconButton.search(
                                 toggled: _focused?.key == search.key,
                                 onPressed: ds.LoadingIconButton.convert(() {
@@ -363,9 +366,9 @@ class _State extends State<_Connect> with LoadingState {
                                 tooltip: "search the remote device's library",
                                 help: ds.Hint(const Text("search the remote device's library to queue media on it")),
                               ),
-                            ),
-                            if (authn.developer(context).debug) PlayerControlSync(socket: _socket),
-                          ]),
+                              if (authn.developer(context).debug) PlayerControlSync(socket: _socket),
+                            ],
+                          ),
                           PlayerControlVolume(socket: _socket, current: _latest.volume),
                           PlaylistCurrent(_latest.sync.current),
                           Expanded(child: queue),
