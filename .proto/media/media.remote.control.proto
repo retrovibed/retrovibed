@@ -18,14 +18,6 @@ message PlayPause { bool paused = 1 [ json_name = "paused" ]; }
 // "skip to next/previous track" rather than a literal seek.
 message Seek { int32 offset = 1 [ json_name = "offset" ]; }
 
-// Volume sets (sent by a connect client) or reports (echoed by the listener
-// whenever its local volume changes, independent of Sync) the audio volume,
-// 0-100 scale.
-message Volume {
-  bool muted = 1 [ json_name = "muted" ];
-  float level = 2 [ json_name = "level" ];
-}
-
 // Sync requests (when sent with no fields set) or reports (when sent
 // populated) the listener's current library and playback queue. A connect
 // client sends an empty Sync to ask the listener to reply with its state;
@@ -37,8 +29,9 @@ message Sync {
   string token = 4 [ json_name = "token" ];
   int64 expiration = 5 [ json_name = "expiration" ];
   float volume = 6 [ json_name = "volume" ];
-  bool fullscreen = 7 [ json_name = "fullscreen" ];
-  reserved 8 to 999;
+  bool muted = 7 [ json_name = "muted" ];
+  bool fullscreen = 8 [ json_name = "fullscreen" ];
+  reserved 9 to 999;
   repeated Media queue = 1000 [ json_name = "queue" ];
 }
 
@@ -48,18 +41,26 @@ message Sync {
 // Stream.sid (a uuidv7) as a vector clock, same as Volume.
 message Fullscreen {}
 
+// Mute toggles the receiving device's audio between silent and its prior
+// level. No payload - same shape/ordering semantics as Fullscreen.
+message Mute {}
+
 // represents a stream of commands / responses for the remote control.
 // each command / response will contain a 'sid' representing the sequentialish
 // id.
 message Stream {
   string sid = 1 [ json_name = "sid" ];
+  uint64 vid = 2 [ json_name = "vid" ];
   oneof Command {
     Queue queue = 1000 [ json_name = "queue" ];
     Dequeue dequeue = 1002 [ json_name = "dequeue" ];
     PlayPause playpause = 1003 [ json_name = "playpause" ];
     Seek seek = 1004 [ json_name = "seek" ];
     Sync sync = 1005 [ json_name = "sync" ];
-    Volume volume = 1006 [ json_name = "volume" ];
+    // relative volume adjustment (offset applied to the current level,
+    // 0-100 scale), reusing Seek's shape rather than an absolute set.
+    Seek volume = 1006 [ json_name = "volume" ];
     Fullscreen fullscreen = 1007 [ json_name = "fullscreen" ];
+    Mute mute = 1008 [ json_name = "mute" ];
   }
 }
