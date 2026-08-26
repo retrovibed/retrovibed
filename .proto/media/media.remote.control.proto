@@ -37,9 +37,16 @@ message Sync {
   string token = 4 [ json_name = "token" ];
   int64 expiration = 5 [ json_name = "expiration" ];
   float volume = 6 [ json_name = "volume" ];
-  reserved 7 to 999;
+  bool fullscreen = 7 [ json_name = "fullscreen" ];
+  reserved 8 to 999;
   repeated Media queue = 1000 [ json_name = "queue" ];
 }
+
+// Fullscreen toggles fullscreen on the receiving device. No payload -
+// each Fullscreen command flips the device's current state; ordering
+// against concurrent/stale commands is resolved by the sender using
+// Stream.sid (a uuidv7) as a vector clock, same as Volume.
+message Fullscreen {}
 
 // represents a stream of commands / responses for the remote control.
 // each command / response will contain a 'sid' representing the sequentialish
@@ -53,5 +60,6 @@ message Stream {
     Seek seek = 1004 [ json_name = "seek" ];
     Sync sync = 1005 [ json_name = "sync" ];
     Volume volume = 1006 [ json_name = "volume" ];
+    Fullscreen fullscreen = 1007 [ json_name = "fullscreen" ];
   }
 }

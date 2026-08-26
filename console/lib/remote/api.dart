@@ -129,6 +129,7 @@ abstract class messages {
     media.Media? current,
     List<media.Media> queue = const [],
     double volume = 0,
+    bool fullscreen = false,
   }) {
     return rc.Stream(
       sid: uuidx.v7(),
@@ -140,7 +141,18 @@ abstract class messages {
         current: current,
         queue: queue,
         volume: volume,
+        fullscreen: fullscreen,
       ),
+    );
+  }
+
+  // fullscreen has no payload - each command flips the receiving device's
+  // current state; ordering against concurrent/stale commands is resolved
+  // by the receiver using sid as a vector clock.
+  static rc.Stream fullscreen() {
+    return rc.Stream(
+      sid: uuidx.v7(),
+      fullscreen: rc.Fullscreen(),
     );
   }
 }

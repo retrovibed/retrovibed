@@ -322,6 +322,7 @@ class Sync extends $pb.GeneratedMessage {
     $core.String? token,
     $fixnum.Int64? expiration,
     $core.double? volume,
+    $core.bool? fullscreen,
     $core.Iterable<$0.Media>? queue,
   }) {
     final result = create();
@@ -331,6 +332,7 @@ class Sync extends $pb.GeneratedMessage {
     if (token != null) result.token = token;
     if (expiration != null) result.expiration = expiration;
     if (volume != null) result.volume = volume;
+    if (fullscreen != null) result.fullscreen = fullscreen;
     if (queue != null) result.queue.addAll(queue);
     return result;
   }
@@ -356,6 +358,7 @@ class Sync extends $pb.GeneratedMessage {
     ..aOS(4, _omitFieldNames ? '' : 'token')
     ..aInt64(5, _omitFieldNames ? '' : 'expiration')
     ..aD(6, _omitFieldNames ? '' : 'volume', fieldType: $pb.PbFieldType.OF)
+    ..aOB(7, _omitFieldNames ? '' : 'fullscreen')
     ..pPM<$0.Media>(1000, _omitFieldNames ? '' : 'queue',
         subBuilder: $0.Media.create)
     ..hasRequiredFields = false;
@@ -436,11 +439,70 @@ class Sync extends $pb.GeneratedMessage {
   @$pb.TagNumber(6)
   void clearVolume() => $_clearField(6);
 
+  @$pb.TagNumber(7)
+  $core.bool get fullscreen => $_getBF(6);
+  @$pb.TagNumber(7)
+  set fullscreen($core.bool value) => $_setBool(6, value);
+  @$pb.TagNumber(7)
+  $core.bool hasFullscreen() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearFullscreen() => $_clearField(7);
+
   @$pb.TagNumber(1000)
-  $pb.PbList<$0.Media> get queue => $_getList(6);
+  $pb.PbList<$0.Media> get queue => $_getList(7);
 }
 
-enum Stream_Command { queue, dequeue, playpause, seek, sync, volume, notSet }
+/// Fullscreen toggles fullscreen on the receiving device. No payload -
+/// each Fullscreen command flips the device's current state; ordering
+/// against concurrent/stale commands is resolved by the sender using
+/// Stream.sid (a uuidv7) as a vector clock, same as Volume.
+class Fullscreen extends $pb.GeneratedMessage {
+  factory Fullscreen() => create();
+
+  Fullscreen._();
+
+  factory Fullscreen.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory Fullscreen.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'Fullscreen',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
+      createEmptyInstance: create)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  Fullscreen clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  Fullscreen copyWith(void Function(Fullscreen) updates) =>
+      super.copyWith((message) => updates(message as Fullscreen)) as Fullscreen;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static Fullscreen create() => Fullscreen._();
+  @$core.override
+  Fullscreen createEmptyInstance() => create();
+  @$core.pragma('dart2js:noInline')
+  static Fullscreen getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<Fullscreen>(create);
+  static Fullscreen? _defaultInstance;
+}
+
+enum Stream_Command {
+  queue,
+  dequeue,
+  playpause,
+  seek,
+  sync,
+  volume,
+  fullscreen,
+  notSet
+}
 
 /// represents a stream of commands / responses for the remote control.
 /// each command / response will contain a 'sid' representing the sequentialish
@@ -454,6 +516,7 @@ class Stream extends $pb.GeneratedMessage {
     Seek? seek,
     Sync? sync,
     Volume? volume,
+    Fullscreen? fullscreen,
   }) {
     final result = create();
     if (sid != null) result.sid = sid;
@@ -463,6 +526,7 @@ class Stream extends $pb.GeneratedMessage {
     if (seek != null) result.seek = seek;
     if (sync != null) result.sync = sync;
     if (volume != null) result.volume = volume;
+    if (fullscreen != null) result.fullscreen = fullscreen;
     return result;
   }
 
@@ -482,13 +546,14 @@ class Stream extends $pb.GeneratedMessage {
     1004: Stream_Command.seek,
     1005: Stream_Command.sync,
     1006: Stream_Command.volume,
+    1007: Stream_Command.fullscreen,
     0: Stream_Command.notSet
   };
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'Stream',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
       createEmptyInstance: create)
-    ..oo(0, [1000, 1002, 1003, 1004, 1005, 1006])
+    ..oo(0, [1000, 1002, 1003, 1004, 1005, 1006, 1007])
     ..aOS(1, _omitFieldNames ? '' : 'sid')
     ..aOM<Queue>(1000, _omitFieldNames ? '' : 'queue', subBuilder: Queue.create)
     ..aOM<Dequeue>(1002, _omitFieldNames ? '' : 'dequeue',
@@ -499,6 +564,8 @@ class Stream extends $pb.GeneratedMessage {
     ..aOM<Sync>(1005, _omitFieldNames ? '' : 'sync', subBuilder: Sync.create)
     ..aOM<Volume>(1006, _omitFieldNames ? '' : 'volume',
         subBuilder: Volume.create)
+    ..aOM<Fullscreen>(1007, _omitFieldNames ? '' : 'fullscreen',
+        subBuilder: Fullscreen.create)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -525,6 +592,7 @@ class Stream extends $pb.GeneratedMessage {
   @$pb.TagNumber(1004)
   @$pb.TagNumber(1005)
   @$pb.TagNumber(1006)
+  @$pb.TagNumber(1007)
   Stream_Command whichCommand() => _Stream_CommandByTag[$_whichOneof(0)]!;
   @$pb.TagNumber(1000)
   @$pb.TagNumber(1002)
@@ -532,6 +600,7 @@ class Stream extends $pb.GeneratedMessage {
   @$pb.TagNumber(1004)
   @$pb.TagNumber(1005)
   @$pb.TagNumber(1006)
+  @$pb.TagNumber(1007)
   void clearCommand() => $_clearField($_whichOneof(0));
 
   @$pb.TagNumber(1)
@@ -608,6 +677,17 @@ class Stream extends $pb.GeneratedMessage {
   void clearVolume() => $_clearField(1006);
   @$pb.TagNumber(1006)
   Volume ensureVolume() => $_ensure(6);
+
+  @$pb.TagNumber(1007)
+  Fullscreen get fullscreen => $_getN(7);
+  @$pb.TagNumber(1007)
+  set fullscreen(Fullscreen value) => $_setField(1007, value);
+  @$pb.TagNumber(1007)
+  $core.bool hasFullscreen() => $_has(7);
+  @$pb.TagNumber(1007)
+  void clearFullscreen() => $_clearField(1007);
+  @$pb.TagNumber(1007)
+  Fullscreen ensureFullscreen() => $_ensure(7);
 }
 
 const $core.bool _omitFieldNames =

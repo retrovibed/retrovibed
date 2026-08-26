@@ -14,6 +14,7 @@ import 'package:retrovibed/library/search.minimal.dart';
 import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'api.dart' as remote;
 import 'player.control.seek.dart';
+import 'player.control.fullscreen.dart';
 import 'player.control.playpause.dart';
 import 'player.control.sync.dart';
 import 'player.control.volume.dart';
@@ -358,6 +359,7 @@ class _State extends State<_Connect> with LoadingState {
                               PlayerControlPlayPause(socket: _socket, status: _messages),
                               PlayerControlSeek.forward(socket: _socket),
                               PlayerControlSeek.next(socket: _socket),
+                              PlayerControlFullscreen(socket: _socket, current: _latest.sync.fullscreen),
                               ds.LoadingIconButton.search(
                                 toggled: _focused?.key == search.key,
                                 onPressed: ds.LoadingIconButton.convert(() {

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/authz.dart' as authz;
+import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'package:retrovibed/media.dart' as media;
@@ -61,6 +62,7 @@ class _State extends State<RemoteControlListener> {
         current: queue.current.value?.current,
         queue: queue.queued.map((m) => m.current).toList(),
         volume: media.Playlist.of(context)?.player.state.volume ?? 0.0,
+        fullscreen: ds.Full.nochrome(context),
       );
       _socket.send(
         sync,
@@ -68,19 +70,6 @@ class _State extends State<RemoteControlListener> {
       setState(() {
         _sid = sync.sid;
       });
-    });
-  }
-
-  _echoVolume() {
-    final sync = remote.messages.volume(
-      media.Playlist.of(context)?.player.state.volume ?? _volume.level,
-      _volume.muted,
-    );
-    _socket.send(
-      sync,
-    );
-    setState(() {
-      _sid = sync.sid;
     });
   }
 
@@ -98,7 +87,7 @@ class _State extends State<RemoteControlListener> {
           final c = Completer();
 
           _rcSubscription = socket.messages.listen(
-            _applyRemoteCommand,
+            (msg) => _applyRemoteCommand(msg).whenComplete(_echoSync),
             cancelOnError: true,
             onError: c.completeError,
             onDone: c.complete,
@@ -120,56 +109,79 @@ class _State extends State<RemoteControlListener> {
         });
   }
 
-  void _applyRemoteCommand(remote.Stream msg) {
-    if (msg.whichCommand() == remote.Stream_Command.sync) {
-      _echoSync();
-      return;
-    }
-
-    final playlist = media.Playlist.of(context);
-    if (playlist == null) return;
+  Future<void> _applyRemoteCommand(remote.Stream msg) {
     print("executing remote command ${msg}");
 
     switch (msg.whichCommand()) {
       case remote.Stream_Command.queue:
-        playlist.maybeNext(playqueue.PlayableMedia(msg.queue.media));
-        break;
+        return _applyQueue(msg);
       case remote.Stream_Command.dequeue:
-        playlist.queue.remove(msg.dequeue.id);
-        break;
+        return _applyDequeue(msg);
       case remote.Stream_Command.playpause:
-        msg.playpause.paused ? playlist.player.pause() : playlist.player.play();
-        break;
+        return _applyPlayPause(msg);
       case remote.Stream_Command.seek:
-        final offset = msg.seek.offset;
-        if (offset == remote.SeekOffset.next) {
-          playlist.next();
-        } else if (offset == remote.SeekOffset.previous) {
-          playlist.previous();
-        } else {
-          playlist.player.seek(playlist.player.state.position + Duration(milliseconds: offset));
-        }
-        break;
+        return _applySeek(msg);
       case remote.Stream_Command.volume:
-        if (_sid.compareTo(msg.sid) >= 0) {
-          _echoVolume();
-          break;
-        }
-
-        setState(() {
-          _sid = msg.sid;
-          _volume = msg.volume;
-        });
-
-        final v = msg.volume.muted ? 0.0 : msg.volume.level;
-        playlist.player.setVolume(v).then((_) {
-          _echoVolume();
-        });
-        break;
+        return _applyVolume(msg);
+      case remote.Stream_Command.fullscreen:
+        return _applyFullscreen(msg);
       case remote.Stream_Command.sync:
       case remote.Stream_Command.notSet:
-        break;
+        return Future.value();
     }
+  }
+
+  Future<void> _applyQueue(remote.Stream msg) async {
+    final playlist = media.Playlist.of(context);
+    if (playlist == null) return;
+    playlist.maybeNext(playqueue.PlayableMedia(msg.queue.media));
+  }
+
+  Future<void> _applyDequeue(remote.Stream msg) async {
+    final playlist = media.Playlist.of(context);
+    if (playlist == null) return;
+    playlist.queue.remove(msg.dequeue.id);
+  }
+
+  Future<void> _applyPlayPause(remote.Stream msg) async {
+    if (_sid.compareTo(msg.sid) >= 0) return;
+    final playlist = media.Playlist.of(context);
+    if (playlist == null) return;
+    setState(() => _sid = msg.sid);
+    msg.playpause.paused ? playlist.player.pause() : playlist.player.play();
+  }
+
+  Future<void> _applySeek(remote.Stream msg) async {
+    if (_sid.compareTo(msg.sid) >= 0) return;
+    final playlist = media.Playlist.of(context);
+    if (playlist == null) return;
+    setState(() => _sid = msg.sid);
+    final offset = msg.seek.offset;
+    if (offset == remote.SeekOffset.next) {
+      playlist.next();
+    } else if (offset == remote.SeekOffset.previous) {
+      playlist.previous();
+    } else {
+      playlist.player.seek(playlist.player.state.position + Duration(milliseconds: offset));
+    }
+  }
+
+  Future<void> _applyVolume(remote.Stream msg) async {
+    if (_sid.compareTo(msg.sid) >= 0) return;
+    final playlist = media.Playlist.of(context);
+    if (playlist == null) return;
+    setState(() {
+      _sid = msg.sid;
+      _volume = msg.volume;
+    });
+    final v = msg.volume.muted ? 0.0 : msg.volume.level;
+    await playlist.player.setVolume(v);
+  }
+
+  Future<void> _applyFullscreen(remote.Stream msg) async {
+    if (_sid.compareTo(msg.sid) >= 0) return;
+    setState(() => _sid = msg.sid);
+    ds.Full.toggle(context);
   }
 
   @override

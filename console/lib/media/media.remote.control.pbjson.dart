@@ -100,6 +100,7 @@ const Sync$json = {
     {'1': 'token', '3': 4, '4': 1, '5': 9, '10': 'token'},
     {'1': 'expiration', '3': 5, '4': 1, '5': 3, '10': 'expiration'},
     {'1': 'volume', '3': 6, '4': 1, '5': 2, '10': 'volume'},
+    {'1': 'fullscreen', '3': 7, '4': 1, '5': 8, '10': 'fullscreen'},
     {
       '1': 'queue',
       '3': 1000,
@@ -110,7 +111,7 @@ const Sync$json = {
     },
   ],
   '9': [
-    {'1': 7, '2': 1000},
+    {'1': 8, '2': 1000},
   ],
 };
 
@@ -119,8 +120,17 @@ final $typed_data.Uint8List syncDescriptor = $convert.base64Decode(
     'CgRTeW5jEiYKB2xpYnJhcnkYASABKAsyDC5tZXRhLkRhZW1vblIHbGlicmFyeRIaCghjYXBhY2'
     'l0eRgCIAEoDVIIY2FwYWNpdHkSJgoHY3VycmVudBgDIAEoCzIMLm1lZGlhLk1lZGlhUgdjdXJy'
     'ZW50EhQKBXRva2VuGAQgASgJUgV0b2tlbhIeCgpleHBpcmF0aW9uGAUgASgDUgpleHBpcmF0aW'
-    '9uEhYKBnZvbHVtZRgGIAEoAlIGdm9sdW1lEiMKBXF1ZXVlGOgHIAMoCzIMLm1lZGlhLk1lZGlh'
-    'UgVxdWV1ZUoFCAcQ6Ac=');
+    '9uEhYKBnZvbHVtZRgGIAEoAlIGdm9sdW1lEh4KCmZ1bGxzY3JlZW4YByABKAhSCmZ1bGxzY3Jl'
+    'ZW4SIwoFcXVldWUY6AcgAygLMgwubWVkaWEuTWVkaWFSBXF1ZXVlSgUICBDoBw==');
+
+@$core.Deprecated('Use fullscreenDescriptor instead')
+const Fullscreen$json = {
+  '1': 'Fullscreen',
+};
+
+/// Descriptor for `Fullscreen`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List fullscreenDescriptor =
+    $convert.base64Decode('CgpGdWxsc2NyZWVu');
 
 @$core.Deprecated('Use streamDescriptor instead')
 const Stream$json = {
@@ -181,6 +191,15 @@ const Stream$json = {
       '9': 0,
       '10': 'volume'
     },
+    {
+      '1': 'fullscreen',
+      '3': 1007,
+      '4': 1,
+      '5': 11,
+      '6': '.media.Fullscreen',
+      '9': 0,
+      '10': 'fullscreen'
+    },
   ],
   '8': [
     {'1': 'Command'},
@@ -193,5 +212,6 @@ final $typed_data.Uint8List streamDescriptor = $convert.base64Decode(
     'VIAFIFcXVldWUSKwoHZGVxdWV1ZRjqByABKAsyDi5tZWRpYS5EZXF1ZXVlSABSB2RlcXVldWUS'
     'MQoJcGxheXBhdXNlGOsHIAEoCzIQLm1lZGlhLlBsYXlQYXVzZUgAUglwbGF5cGF1c2USIgoEc2'
     'VlaxjsByABKAsyCy5tZWRpYS5TZWVrSABSBHNlZWsSIgoEc3luYxjtByABKAsyCy5tZWRpYS5T'
-    'eW5jSABSBHN5bmMSKAoGdm9sdW1lGO4HIAEoCzINLm1lZGlhLlZvbHVtZUgAUgZ2b2x1bWVCCQ'
-    'oHQ29tbWFuZA==');
+    'eW5jSABSBHN5bmMSKAoGdm9sdW1lGO4HIAEoCzINLm1lZGlhLlZvbHVtZUgAUgZ2b2x1bWUSNA'
+    'oKZnVsbHNjcmVlbhjvByABKAsyES5tZWRpYS5GdWxsc2NyZWVuSABSCmZ1bGxzY3JlZW5CCQoH'
+    'Q29tbWFuZA==');
