@@ -13,6 +13,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
@@ -86,7 +87,7 @@ func TestHTTPRemoteControl(t *testing.T) {
 
 		reply, err := protojson.Marshal(&mediaapi.Stream{
 			Sid:     "reply-1",
-			Command: &mediaapi.Stream_Playpause{Playpause: &mediaapi.PlayPause{Paused: true}},
+			Command: &mediaapi.Stream_Pause{},
 		})
 		require.NoError(t, err)
 		require.NoError(t, listenconn.Write(ctx, websocket.MessageBinary, reply))
@@ -98,7 +99,7 @@ func TestHTTPRemoteControl(t *testing.T) {
 			var got mediaapi.Stream
 			require.NoError(t, protojson.Unmarshal(broadcast, &got))
 			require.Equal(t, "reply-1", got.Sid)
-			require.True(t, got.GetPlaypause().GetPaused())
+			require.True(t, proto.Equal(&mediaapi.Pause{}, got.GetPause()))
 		}
 	})
 
