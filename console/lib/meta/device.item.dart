@@ -78,11 +78,27 @@ class _DaemonDropdownItemState extends State<DaemonDropdownItem> {
           ],
         ),
         onTap: () {
-          widget.onSelect(context, widget.library).then((v) => widget.onTap(v)).catchError((e) {
-            setState(() {
-              _cause = ds.Error.unknown(e, onTap: reseterr);
-            });
-          });
+          widget
+              .onSelect(context, widget.library)
+              .then((v) => widget.onTap(v))
+              .catchError((cause) {
+                setState(() {
+                  _cause = ds.Errors.httpauto(cause, onTap: reseterr);
+                });
+              }, test: httpx.ErrorsTest.httpauto)
+              .catchError((cause) {
+                setState(() {
+                  _cause = ds.Error.offline(
+                    cause,
+                    onTap: reseterr,
+                  );
+                });
+              }, test: ds.ErrorTests.offline)
+              .catchError((e) {
+                setState(() {
+                  _cause = ds.Error.unknown(e, onTap: reseterr);
+                });
+              });
         },
       ),
     );

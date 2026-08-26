@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -9,6 +11,90 @@ import 'package:retrovibed/testing/widget_tester_extensions.dart';
 final _resolutions = Resolutions.variant();
 
 void main() {
+  group('ErrorTests.offline', () {
+    test('detects connection refused (endpoint is down)', () {
+      final obj = SocketException(
+        'Connection refused',
+        osError: OSError('Connection refused', 111),
+      );
+      expect(ds.ErrorTests.offline(obj), isTrue);
+    });
+
+    test('detects no route to host (endpoint does not exist)', () {
+      final obj = SocketException(
+        'No route to host',
+        osError: OSError('No route to host', 113),
+      );
+      expect(ds.ErrorTests.offline(obj), isTrue);
+    });
+
+    test('detects invalid argument (daemon socket unreachable)', () {
+      // matches the real-world crash: SocketException: Connection failed
+      // (OS Error: Invalid argument, errno = 22), address = eg, port = 9998
+      final obj = SocketException(
+        'Connection failed',
+        osError: OSError('Invalid argument', 22),
+        address: InternetAddress('eg', type: InternetAddressType.unix),
+        port: 9998,
+      );
+      expect(ds.ErrorTests.offline(obj), isTrue);
+    });
+
+    test('does not match unrelated os errors', () {
+      final obj = SocketException(
+        'Something else',
+        osError: OSError('Something else', 1),
+      );
+      expect(ds.ErrorTests.offline(obj), isFalse);
+    });
+
+    test('does not match SocketException without osError', () {
+      expect(ds.ErrorTests.offline(SocketException('no os error')), isFalse);
+    });
+
+    test('does not match non-SocketException errors', () {
+      expect(ds.ErrorTests.offline(Exception('unrelated')), isFalse);
+    });
+  });
+
+  group('ErrorTests.connectivity', () {
+    test('detects HandshakeException', () {
+      expect(ds.ErrorTests.connectivity(HandshakeException('tls failure')), isTrue);
+    });
+
+    test('does not match unrelated errors', () {
+      expect(ds.ErrorTests.connectivity(Exception('unrelated')), isFalse);
+    });
+  });
+
+  group('ErrorTests.dnsresolution', () {
+    test('detects dns resolution failure', () {
+      final obj = SocketException(
+        'Failed host lookup',
+        osError: OSError('nodename nor servname provided, or not known', -2),
+      );
+      expect(ds.ErrorTests.dnsresolution(obj), isTrue);
+    });
+
+    test('does not match connection refused', () {
+      final obj = SocketException(
+        'Connection refused',
+        osError: OSError('Connection refused', 111),
+      );
+      expect(ds.ErrorTests.dnsresolution(obj), isFalse);
+    });
+  });
+
+  group('ErrorTests.timeout', () {
+    test('detects TimeoutException', () {
+      expect(ds.ErrorTests.timeout(TimeoutException('timed out')), isTrue);
+    });
+
+    test('does not match unrelated errors', () {
+      expect(ds.ErrorTests.timeout(Exception('unrelated')), isFalse);
+    });
+  });
+
   group('Error widget finite constraints', () {
     testWidgets('Error.zero renders as SizedBox in finite container', (
       WidgetTester tester,

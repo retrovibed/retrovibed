@@ -10,10 +10,14 @@ import './typography/copyable.dart' show Copyable;
 final EDNSRESOLUTION = -2;
 final ECONNREFUSED = 111;
 final ENOROUTE = 113;
+final EINVAL = 22;
 
 class ErrorTests {
   static bool offline(Object obj) {
-    return obj is SocketException && (obj.osError?.errorCode == ECONNREFUSED || obj.osError?.errorCode == ENOROUTE);
+    return obj is SocketException &&
+        (obj.osError?.errorCode == ECONNREFUSED ||
+            obj.osError?.errorCode == ENOROUTE ||
+            obj.osError?.errorCode == EINVAL);
   }
 
   static bool connectivity(Object obj) {
@@ -203,7 +207,7 @@ class Error extends StatelessWidget {
     StackTrace? trace,
     void Function()? onTap,
     Color? color,
-    BoxDecoration decoration = ErrorDecorations.error,
+    BoxDecoration decoration = ErrorDecorations.info,
     BorderRadius? borderRadius,
   }) {
     return Error(
