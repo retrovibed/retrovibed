@@ -8,7 +8,7 @@ import (
 	"github.com/james-lawrence/torrent/bep0051"
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
-	"github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/daemons"
+	"github.com/retrovibed/retrovibed/shallows/cmd/retrovibed/daemons"
 	"github.com/retrovibed/retrovibed/shallows/internal/int160x"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/tracking"

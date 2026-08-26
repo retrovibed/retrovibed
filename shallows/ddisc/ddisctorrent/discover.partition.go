@@ -15,7 +15,7 @@ import (
 
 // closestPeersPerLookup bounds how many DHT routing-table nodes are asked
 // per partition lookup, mirroring DiscoverDHTBEP51Peers's existing usage
-// (shallows/cmd/retrovibe/daemons/torrent.sampling.go).
+// (shallows/cmd/retrovibed/daemons/torrent.sampling.go).
 const closestPeersPerLookup = 256
 
 // NewPartitionStrategy looks up peers on the DHT swarm for the partition a

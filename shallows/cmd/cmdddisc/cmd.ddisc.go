@@ -1,9 +1,9 @@
 package cmdddisc
 
 // peer command examples
-// go -C shallows run ./cmd/retrovibe/... discovery peers create --insecure --library="eg:9998" --name="derp" --peer="34363564353033612d643263352d363338332d30" --partition="033292b1-98c2-5e96-38a4-956548a40b55"
-// go -C shallows run ./cmd/retrovibe/... discovery peers delete --insecure --library="eg:9998" --peer="34363564353033612d643263352d363338332d30"
-// go -C shallows run ./cmd/retrovibe/... discovery peers list --insecure --library="eg:9998"
+// go -C shallows run ./cmd/retrovibed/... discovery peers create --insecure --library="eg:9998" --name="derp" --peer="34363564353033612d643263352d363338332d30" --partition="033292b1-98c2-5e96-38a4-956548a40b55"
+// go -C shallows run ./cmd/retrovibed/... discovery peers delete --insecure --library="eg:9998" --peer="34363564353033612d643263352d363338332d30"
+// go -C shallows run ./cmd/retrovibed/... discovery peers list --insecure --library="eg:9998"
 type peer struct {
 	Create cmdPeerCreate `cmd:"" help:"peer with another library for discovery"`
 	Delete cmdPeerDelete `cmd:"" help:"remove a peered library"`
@@ -11,10 +11,10 @@ type peer struct {
 }
 
 // discovery command examples
-// go -C shallows run ./cmd/retrovibe/... disc discovery ls --insecure --library="eg:9998"
-// go -C shallows run ./cmd/retrovibe/... disc discovery create --insecure --library="eg:9998" --infohash="<hex infohash>"
-// go -C shallows run ./cmd/retrovibe/... disc discovery delete --insecure --library="eg:9998" --id="<id from ls>"
-// go -C shallows run ./cmd/retrovibe/... disc discovery identify --insecure --library="eg:9998" --id="<id from ls>"
+// go -C shallows run ./cmd/retrovibed/... disc discovery ls --insecure --library="eg:9998"
+// go -C shallows run ./cmd/retrovibed/... disc discovery create --insecure --library="eg:9998" --infohash="<hex infohash>"
+// go -C shallows run ./cmd/retrovibed/... disc discovery delete --insecure --library="eg:9998" --id="<id from ls>"
+// go -C shallows run ./cmd/retrovibed/... disc discovery identify --insecure --library="eg:9998" --id="<id from ls>"
 type discovery struct {
 	Ls       cmdDiscoveryList        `cmd:"" help:"list infohashes currently being investigated by discovery"`
 	Import   cmdDiscoveryImportJSONL `cmd:"" help:"import a jsonl stream of magnet links into the index"`
@@ -24,11 +24,11 @@ type discovery struct {
 }
 
 // media command examples
-// go -C shallows run ./cmd/retrovibe/... disc media ls --insecure --library="eg:9998"
-// go -C shallows run ./cmd/retrovibe/... disc media create --insecure --library="eg:9998" --infohash="<hex infohash>" --title="derp"
-// go -C shallows run ./cmd/retrovibe/... disc media delete --insecure --library="eg:9998" --id="<id from ls>"
-// go -C shallows run ./cmd/retrovibe/... disc media query "<known media id>" "127.0.0.1:3196"
-// go -C shallows run ./cmd/retrovibe/... disc media discover "ubuntu" --mimetype=video --insecure --library="eg:9998"
+// go -C shallows run ./cmd/retrovibed/... disc media ls --insecure --library="eg:9998"
+// go -C shallows run ./cmd/retrovibed/... disc media create --insecure --library="eg:9998" --infohash="<hex infohash>" --title="derp"
+// go -C shallows run ./cmd/retrovibed/... disc media delete --insecure --library="eg:9998" --id="<id from ls>"
+// go -C shallows run ./cmd/retrovibed/... disc media query "<known media id>" "127.0.0.1:3196"
+// go -C shallows run ./cmd/retrovibed/... disc media discover "ubuntu" --mimetype=video --insecure --library="eg:9998"
 type media struct {
 	Ls          cmdMediaLs          `cmd:"" help:"list/search discovered media on a library"`
 	Create      cmdMediaCreate      `cmd:"" help:"create a discovered media record on a library"`
@@ -40,9 +40,9 @@ type media struct {
 }
 
 // search command examples
-// go -C shallows run ./cmd/retrovibe/... ddisc search plugin install ../myplugin
-// go -C shallows run ./cmd/retrovibe/... ddisc search plugin install https://example.com/myplugin.git --branch=main -e FOO=bar
-// go -C shallows run ./cmd/retrovibe/... ddisc search plugin config myplugin -e FOO=updated
+// go -C shallows run ./cmd/retrovibed/... ddisc search plugin install ../myplugin
+// go -C shallows run ./cmd/retrovibed/... ddisc search plugin install https://example.com/myplugin.git --branch=main -e FOO=bar
+// go -C shallows run ./cmd/retrovibed/... ddisc search plugin config myplugin -e FOO=updated
 type searchPlugin struct {
 	Install cmdSearchPluginInstall `cmd:"" help:"compile a searchplugin repository to wasm and install it into search.d"`
 	Config  cmdSearchPluginConfig  `cmd:"" help:"merge -e configuration into an installed plugin's .env file"`

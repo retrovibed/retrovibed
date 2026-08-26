@@ -10,7 +10,7 @@ import (
 )
 
 // diagnostics command examples
-// go -C shallows run ./cmd/retrovibe/... discovery diagnostics --endpoint="eg:9998"
+// go -C shallows run ./cmd/retrovibed/... discovery diagnostics --endpoint="eg:9998"
 type cmdDiagnostics struct {
 }
 

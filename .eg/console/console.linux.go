@@ -35,7 +35,7 @@ func BuildLinux(ctx context.Context, _ eg.Op) error {
 
 func flatpak(final egflatpak.Module) *egflatpak.Builder {
 	return egflatpak.New(
-		"space.retrovibe.Console", "retrovibe",
+		"space.retrovibe.Console", "retrovibed",
 		egflatpak.Option().SDK("org.gnome.Sdk", "50").Runtime("org.gnome.Platform", "50").
 			Modules(
 				flatpakmods.Libduckdb(),
@@ -94,7 +94,7 @@ func FlatpakManifest(b *tarballs.Build) eg.OpFn {
 
 func moduleTarball(url, sha256d string) egflatpak.Module {
 	return egflatpak.NewModule("retrovibed", "simple", egflatpak.ModuleOptions().Commands(
-		"sed 's|Exec=retrovibe console|Exec=/app/bin/retrovibe console|' usr/share/applications/space.retrovibe.Console.desktop > /app/share/applications/space.retrovibe.Console.desktop",
+		"sed 's|Exec=retrovibed console|Exec=/app/bin/retrovibed console|' usr/share/applications/space.retrovibe.Console.desktop > /app/share/applications/space.retrovibe.Console.desktop",
 		"mv usr/share/icons/hicolor/scalable/apps/space.retrovibe.Console.svg /app/share/icons/hicolor/scalable/apps/space.retrovibe.Console.svg",
 		"mv usr/share/metainfo/space.retrovibe.Console.metainfo.xml /app/share/metainfo/space.retrovibe.Console.metainfo.xml",
 		"mv usr/share/licenses/space.retrovibe.Console /app/share/licenses/space.retrovibe.Console",

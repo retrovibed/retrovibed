@@ -118,8 +118,8 @@ func GenerateProtocol(ctx context.Context, op eg.Op) error {
 		// the global protobuf registry in the same binary panics at init.
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mddisc/ddisc.import.proto=github.com/retrovibed/retrovibed/retroapi/ddiscapi --go_opt=paths=import --go_opt=module=github.com/retrovibed/retrovibed/retroapi --go_out=../retroapi ddisc/ddisc.import.proto"),
 		// settings
-		gruntime.New("protoc --proto_path=../.proto --go_opt=Mstorage/storage.proto=github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/daemons --go_opt=paths=import --go_opt=module=github.com/retrovibed/retrovibed/shallows --go_out=. storage/storage.proto"),
-		gruntime.New("protoc --proto_path=../.proto --go_opt=Mtorrents/torrent.proto=github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/daemons --go_opt=paths=import --go_opt=module=github.com/retrovibed/retrovibed/shallows --go_out=. torrents/torrent.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mstorage/storage.proto=github.com/retrovibed/retrovibed/shallows/cmd/retrovibed/daemons --go_opt=paths=import --go_opt=module=github.com/retrovibed/retrovibed/shallows --go_out=. storage/storage.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mtorrents/torrent.proto=github.com/retrovibed/retrovibed/shallows/cmd/retrovibed/daemons --go_opt=paths=import --go_opt=module=github.com/retrovibed/retrovibed/shallows --go_out=. torrents/torrent.proto"),
 	)
 }
 

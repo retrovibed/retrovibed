@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=Retrovibe
 Comment="A versatile application for data archival and media playback"
-Exec=retrovibe console
+Exec=retrovibed console
 Icon=space.retrovibe.Console
 Type=Application
 Categories=Player;Utility;Archiving;AudioVideo;

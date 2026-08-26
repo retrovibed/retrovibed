@@ -34,7 +34,7 @@ build() {
   CGO_LDFLAGS="-L${srcdir}/.dist/usr/lib/retrovibed -Wl,-rpath,/usr/lib/retrovibed" \
   GOBIN="${srcdir}/.dist/usr/bin" go build -C "${srcdir}/${pkgname}/shallows" \
     -buildmode=pie -trimpath -tags "duckdb_use_lib,retrovibed,neural" -buildvcs=false \
-    -o "${srcdir}/.dist/usr/bin" ./cmd/retrovibe/...
+    -o "${srcdir}/.dist/usr/bin" ./cmd/retrovibed/...
 }
 
 package() {
