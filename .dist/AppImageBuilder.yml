@@ -57,8 +57,8 @@ AppDir:
     name: retrovibed
     icon: space.retrovibe.Console
     version: !ENV "${VERSION}"
-    exec: usr/lib/retrovibed/retrovibed
-    exec_args: $@
+    exec: usr/lib/retrovibed/retrovibe
+    exec_args: console $@
 
   after_runtime: |
     # appimage-builder deploys the dynamic linker somewhere under runtime/compat/usr

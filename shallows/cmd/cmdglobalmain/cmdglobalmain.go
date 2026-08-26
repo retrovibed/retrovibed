@@ -77,7 +77,7 @@ func Main(args ...string) {
 	gdxpath := gdx.AutoSocket()
 	shellcli.Context, shellcli.Shutdown = context.WithCancel(context.Background())
 	shellcli.Cleanup = &sync.WaitGroup{}
-	shellcli.Console = cmdopts.NewCmdExec("retrovibe")
+	shellcli.Console = cmdopts.NewCmdExec("retroconsole")
 
 	log.SetFlags(log.Lshortfile | log.LUTC | log.Ltime)
 	log.SetPrefix(fmt.Sprintf("%d ", os.Getpid()))
