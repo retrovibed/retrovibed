@@ -6,6 +6,7 @@ import 'package:qs_dart/qs_dart.dart' as qs;
 import 'package:http/http.dart' as http;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/timex.dart' as timex;
+import 'package:retrovibed/retrovibed.dart' as retro;
 import './meta.authn.pb.dart';
 import './meta.daemon.pb.dart';
 import './meta.authz.pb.dart';
@@ -71,9 +72,8 @@ abstract class daemons {
   static DaemonSearchResponse response({DaemonSearchRequest? next}) =>
       DaemonSearchResponse(next: next ?? request(limit: 128), items: []);
 
-  // temporary implementation. long term we should be using the ffi local_devoce() to determine the
-  // local deice information.
-  static bool isLocalDevice(Daemon library) => library.hostname.startsWith("localhost:9998");
+  static bool isLocalDevice(Daemon library) =>
+      library.hostname.startsWith(retro.local_device().hostname) || library.hostname.startsWith("localhost:9998");
   static Future<DaemonSearchResponse> search(DaemonSearchRequest req) async {
     return http.Client()
         .get(

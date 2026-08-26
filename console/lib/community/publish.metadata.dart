@@ -195,9 +195,11 @@ class _PublishMetadataState extends State<PublishMetadata> {
     final theme = Theme.of(context);
     final defaults = ds.Defaults.of(context);
     final isLoading = _loadingMetadata;
-    final content = forms.Container(
+    return forms.Container(
       padding: EdgeInsets.zero,
       decoration: BoxDecoration(borderRadius: defaults.borderRadius),
+      cause: _cause,
+      loading: isLoading,
       Column(
         mainAxisSize: MainAxisSize.min,
         spacing: defaults.spacing,
@@ -274,7 +276,5 @@ class _PublishMetadataState extends State<PublishMetadata> {
         ],
       ),
     );
-
-    return ds.Loading(loading: isLoading, cause: _cause, content);
   }
 }

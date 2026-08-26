@@ -9,5 +9,13 @@ class Container extends ds.Container {
     super.padding,
     super.margin,
     super.alignment,
-  }) : super(FocusTraversalGroup(policy: WidgetOrderTraversalPolicy(), child: child));
+    Widget cause = ds.Error.zero,
+    bool loading = false,
+  }) : super(
+         ds.Loading(
+           FocusTraversalGroup(policy: WidgetOrderTraversalPolicy(), child: child),
+           cause: cause,
+           loading: loading,
+         ),
+       );
 }

@@ -97,6 +97,7 @@ class _DaemonDropdownState extends State<DaemonDropdown> {
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       spacing: defaults.spacing / 2,
@@ -125,7 +126,7 @@ class _DaemonDropdownState extends State<DaemonDropdown> {
                         : ds.Container(
                             padding: defaults.padding.copyWith(top: 0),
                             ManualConfiguration(
-                              connect: (daemon) {
+                              (daemon) {
                                 setState(() {
                                   _optional = null;
                                 });

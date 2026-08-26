@@ -12,6 +12,7 @@ class Confirmation extends StatelessWidget {
   final void Function(BuildContext)? onCancel;
   final EdgeInsets? padding;
   final EdgeInsets? margin;
+  final BoxConstraints? constraints;
 
   const Confirmation({
     super.key,
@@ -22,6 +23,7 @@ class Confirmation extends StatelessWidget {
     this.onCancel,
     this.padding,
     this.margin,
+    this.constraints,
   });
 
   // information display with no visual buttons.
@@ -31,6 +33,7 @@ class Confirmation extends StatelessWidget {
     void Function(BuildContext)? done,
     EdgeInsets? padding,
     EdgeInsets? margin,
+    BoxConstraints? constraints,
   }) {
     return Confirmation(
       key: key,
@@ -41,6 +44,7 @@ class Confirmation extends StatelessWidget {
       onCancel: done,
       padding: padding,
       margin: margin,
+      constraints: constraints,
     );
   }
 
@@ -51,6 +55,7 @@ class Confirmation extends StatelessWidget {
     void Function(BuildContext)? onCancel,
     EdgeInsets? padding,
     EdgeInsets? margin,
+    BoxConstraints? constraints,
   }) {
     return Confirmation(
       key: key,
@@ -61,6 +66,7 @@ class Confirmation extends StatelessWidget {
       onCancel: onCancel,
       padding: padding,
       margin: margin,
+      constraints: constraints,
     );
   }
 
@@ -71,6 +77,7 @@ class Confirmation extends StatelessWidget {
     void Function(BuildContext)? onCancel,
     EdgeInsets? padding,
     EdgeInsets? margin,
+    BoxConstraints? constraints,
   }) {
     return Confirmation(
       key: key,
@@ -81,6 +88,7 @@ class Confirmation extends StatelessWidget {
       onCancel: onCancel,
       padding: padding,
       margin: margin,
+      constraints: constraints,
     );
   }
 
@@ -91,6 +99,7 @@ class Confirmation extends StatelessWidget {
     void Function(BuildContext)? onCancel,
     EdgeInsets? padding,
     EdgeInsets? margin,
+    BoxConstraints? constraints,
   }) {
     return Confirmation(
       key: key,
@@ -101,6 +110,7 @@ class Confirmation extends StatelessWidget {
       onCancel: onCancel,
       padding: padding,
       margin: margin,
+      constraints: constraints,
     );
   }
 
@@ -109,6 +119,7 @@ class Confirmation extends StatelessWidget {
     required Future<void> Function(BuildContext) onConfirm,
     EdgeInsets? padding,
     EdgeInsets? margin,
+    BoxConstraints? constraints,
   }) {
     return (completion) => Confirmation.yesNo(
       content: content,
@@ -118,6 +129,7 @@ class Confirmation extends StatelessWidget {
       onCancel: (_) => completion.complete(),
       padding: padding,
       margin: margin,
+      constraints: constraints,
     );
   }
 
@@ -129,6 +141,7 @@ class Confirmation extends StatelessWidget {
     return _container.Container(
       padding: padding ?? defaults.padding,
       margin: margin,
+      constraints: constraints,
       Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -153,7 +166,7 @@ class Confirmation extends StatelessWidget {
                         borderRadius: defaults.borderRadius,
                       ),
                       child: DefaultTextStyle(
-                        style: theme.textTheme.labelLarge ?? TextStyle(),
+                        style: theme.textTheme.labelMedium ?? TextStyle(),
                         child: cancellation,
                       ),
                     ),
@@ -170,7 +183,7 @@ class Confirmation extends StatelessWidget {
                         borderRadius: defaults.borderRadius,
                       ),
                       child: DefaultTextStyle(
-                        style: (theme.textTheme.labelLarge ?? TextStyle()).copyWith(
+                        style: (theme.textTheme.labelMedium ?? TextStyle()).copyWith(
                           color: theme.colorScheme.onPrimary,
                         ),
                         child: confirmation,

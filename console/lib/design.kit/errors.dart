@@ -89,6 +89,7 @@ class ErrorBoundaryState extends State<ErrorBoundary> {
 abstract class ErrorDecorations {
   static const error = BoxDecoration(color: theming.Defaults.kDanger);
   static const info = BoxDecoration(color: theming.Defaults.kOpaque);
+  static const transparent = BoxDecoration(color: Colors.transparent);
 }
 
 class Error extends StatelessWidget {
@@ -100,6 +101,9 @@ class Error extends StatelessWidget {
   final Color? color;
   final BorderRadius? borderRadius;
   final BoxDecoration decoration;
+  final EdgeInsetsGeometry? padding;
+  final EdgeInsetsGeometry? margin;
+  final BoxConstraints? constraints;
 
   const Error({
     super.key,
@@ -110,6 +114,9 @@ class Error extends StatelessWidget {
     this.color,
     this.borderRadius,
     this.decoration = ErrorDecorations.error,
+    this.padding,
+    this.margin,
+    this.constraints,
   });
 
   @override
@@ -137,6 +144,9 @@ class Error extends StatelessWidget {
     Color? color,
     BoxDecoration decoration = ErrorDecorations.error,
     BorderRadius? borderRadius,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    BoxConstraints? constraints,
   }) => Error(
     child: LayoutBuilder(
       builder: (context, constraints) => SizedBox(
@@ -152,6 +162,9 @@ class Error extends StatelessWidget {
     color: color,
     decoration: decoration,
     borderRadius: borderRadius,
+    padding: padding,
+    margin: margin,
+    constraints: constraints,
   );
 
   static Error unknown(
@@ -161,6 +174,9 @@ class Error extends StatelessWidget {
     Color? color,
     BoxDecoration decoration = ErrorDecorations.error,
     BorderRadius? borderRadius,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    BoxConstraints? constraints,
   }) {
     return Error(
       child: Text(
@@ -173,6 +189,9 @@ class Error extends StatelessWidget {
       color: color,
       decoration: decoration,
       borderRadius: borderRadius,
+      padding: padding,
+      margin: margin,
+      constraints: constraints,
     );
   }
 
@@ -184,6 +203,9 @@ class Error extends StatelessWidget {
     Color? color,
     BoxDecoration decoration = ErrorDecorations.error,
     BorderRadius? borderRadius,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    BoxConstraints? constraints,
   }) {
     return Error(
       child: message ?? Text("you lack sufficient permissions"),
@@ -193,6 +215,9 @@ class Error extends StatelessWidget {
       color: color,
       decoration: decoration,
       borderRadius: borderRadius,
+      padding: padding,
+      margin: margin,
+      constraints: constraints,
     );
   }
 
@@ -209,10 +234,15 @@ class Error extends StatelessWidget {
     Color? color,
     BoxDecoration decoration = ErrorDecorations.info,
     BorderRadius? borderRadius,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    BoxConstraints? constraints,
   }) {
+    final _address = obj.address;
+    final address = _address == null ? "" : "check ${_address.host}:${obj.port}.";
     return Error(
       child: SelectableText(
-        "unable to connect to daemon, is it running? check ${obj.address?.address}:${obj.port}.",
+        "unable to connect to daemon, is it running? ${address}",
       ),
       cause: obj,
       trace: trace ?? StackTrace.current,
@@ -220,6 +250,36 @@ class Error extends StatelessWidget {
       color: color,
       decoration: decoration,
       borderRadius: borderRadius,
+      padding: padding,
+      margin: margin,
+      constraints: constraints,
+    );
+  }
+
+  static Error dnsresolution(
+    SocketException obj, {
+    StackTrace? trace,
+    void Function()? onTap,
+    Color? color,
+    BoxDecoration decoration = ErrorDecorations.info,
+    BorderRadius? borderRadius,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    BoxConstraints? constraints,
+  }) {
+    return Error(
+      child: SelectableText(
+        "unable to resolve hostname: ${obj.message}",
+      ),
+      cause: obj,
+      trace: trace ?? StackTrace.current,
+      onTap: onTap,
+      color: color,
+      decoration: decoration,
+      borderRadius: borderRadius,
+      padding: padding,
+      margin: margin,
+      constraints: constraints,
     );
   }
 
@@ -230,6 +290,9 @@ class Error extends StatelessWidget {
     Color? color,
     BoxDecoration decoration = ErrorDecorations.error,
     BorderRadius? borderRadius,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    BoxConstraints? constraints,
   }) {
     return Error(
       child: SelectableText(
@@ -241,6 +304,9 @@ class Error extends StatelessWidget {
       color: color,
       decoration: decoration,
       borderRadius: borderRadius,
+      padding: padding,
+      margin: margin,
+      constraints: constraints,
     );
   }
 
@@ -251,6 +317,9 @@ class Error extends StatelessWidget {
     Color? color,
     BoxDecoration decoration = ErrorDecorations.error,
     BorderRadius? borderRadius,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    BoxConstraints? constraints,
   }) {
     return Error(
       child: Text(
@@ -262,6 +331,9 @@ class Error extends StatelessWidget {
       color: color,
       decoration: decoration,
       borderRadius: borderRadius,
+      padding: padding,
+      margin: margin,
+      constraints: constraints,
     );
   }
 
@@ -273,6 +345,9 @@ class Error extends StatelessWidget {
     Color? color,
     BoxDecoration decoration = ErrorDecorations.error,
     BorderRadius? borderRadius,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    BoxConstraints? constraints,
   }) {
     return Error(
       child: message ?? Text("a conflict occurred, the resource may already exist"),
@@ -282,6 +357,9 @@ class Error extends StatelessWidget {
       color: color,
       decoration: decoration,
       borderRadius: borderRadius,
+      padding: padding,
+      margin: margin,
+      constraints: constraints,
     );
   }
 
@@ -293,6 +371,9 @@ class Error extends StatelessWidget {
     Color? color,
     BoxDecoration decoration = ErrorDecorations.error,
     BorderRadius? borderRadius,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    BoxConstraints? constraints,
   }) {
     return Error(
       child: message ?? Text("not supported on this device"),
@@ -302,6 +383,9 @@ class Error extends StatelessWidget {
       color: color,
       decoration: decoration,
       borderRadius: borderRadius,
+      padding: padding,
+      margin: margin,
+      constraints: constraints,
     );
   }
 
@@ -313,6 +397,9 @@ class Error extends StatelessWidget {
     Color? color,
     BoxDecoration decoration = ErrorDecorations.error,
     BorderRadius? borderRadius,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    BoxConstraints? constraints,
   }) {
     return Error(
       child: message ?? Text("you're currently rate limited try again later"),
@@ -322,6 +409,9 @@ class Error extends StatelessWidget {
       color: color,
       decoration: decoration,
       borderRadius: borderRadius,
+      padding: padding,
+      margin: margin,
+      constraints: constraints,
     );
   }
 
@@ -405,6 +495,9 @@ class Error extends StatelessWidget {
         onPointerUp: onTap != null ? (_) => onTap!() : null,
         child: Container(
           alignment: Alignment.center,
+          padding: padding,
+          margin: margin,
+          constraints: constraints,
           decoration: decoration.copyWith(
             color: color ?? decoration.color,
             borderRadius: borderRadius ?? decoration.borderRadius ?? defaults.borderRadius,

@@ -108,7 +108,7 @@ class _DaemonList extends State<DaemonList> {
                     _optional = _optional != null
                         ? null
                         : ManualConfiguration(
-                            connect: (daemon) {
+                            (daemon) {
                               setState(() {
                                 _optional = null;
                                 _res.next.offset = ds.Int64(0);

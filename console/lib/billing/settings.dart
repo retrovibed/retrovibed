@@ -95,54 +95,52 @@ class _Settings extends State<Settings> {
     final visible = _plans.where((p) {
       return !p.$1.hidden || p.$1.key == current.key;
     }).toList();
-    return ds.ErrorScreen(
+    return forms.Container(
+      alignment: widget.alignment,
+      margin: widget.margin,
+      padding: widget.padding,
       cause: _cause,
-      forms.Container(
-        alignment: widget.alignment,
-        margin: widget.margin,
-        padding: widget.padding,
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (authn.developer(context).subscription) ...[
-              forms.Field(
-                label: Text("plan"),
-                input: DropdownButton(
-                  borderRadius: defaults.borderRadius,
-                  alignment: Alignment.topLeft,
-                  isExpanded: true,
-                  value: desired.$1,
-                  items: [
-                    for (final p in visible) DropdownMenuItem(child: p.$1.description, value: p.$1),
-                  ],
-                  onChanged: (v) {
-                    setState(() {
-                      desired = visible.firstWhere((x) => x.$1.id == (v ?? current).id);
-                    });
-                  },
-                ),
-              ),
-              desired.$1,
-              Purchase(
-                current: current,
-                desired: desired.$2,
-                onChange: (pending) {
-                  return pending
-                      .then((v) {
-                        _billing?.replace(v);
-                      })
-                      .catchError((cause) {
-                        setState(() {
-                          _cause = ds.Error.unknown(cause, onTap: _reseterr);
-                        });
-                      });
+      Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (authn.developer(context).subscription) ...[
+            forms.Field(
+              label: Text("plan"),
+              input: DropdownButton(
+                borderRadius: defaults.borderRadius,
+                alignment: Alignment.topLeft,
+                isExpanded: true,
+                value: desired.$1,
+                items: [
+                  for (final p in visible) DropdownMenuItem(child: p.$1.description, value: p.$1),
+                ],
+                onChanged: (v) {
+                  setState(() {
+                    desired = visible.firstWhere((x) => x.$1.id == (v ?? current).id);
+                  });
                 },
               ),
-            ] else ...[
-              current,
-            ],
+            ),
+            desired.$1,
+            Purchase(
+              current: current,
+              desired: desired.$2,
+              onChange: (pending) {
+                return pending
+                    .then((v) {
+                      _billing?.replace(v);
+                    })
+                    .catchError((cause) {
+                      setState(() {
+                        _cause = ds.Error.unknown(cause, onTap: _reseterr);
+                      });
+                    });
+              },
+            ),
+          ] else ...[
+            current,
           ],
-        ),
+        ],
       ),
     );
   }

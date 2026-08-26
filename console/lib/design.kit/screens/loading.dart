@@ -6,6 +6,7 @@ import './overlay.dart' as s;
 class Loading extends StatelessWidget {
   static const Widget Icon = const Center(
     child: const CircularProgressIndicator(
+      padding: EdgeInsets.symmetric(vertical: 2),
       backgroundColor: Color.fromARGB(0, 0, 0, 0),
       semanticsLabel: 'Linear progress indicator',
     ),

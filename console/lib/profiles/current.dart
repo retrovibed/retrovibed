@@ -67,40 +67,38 @@ class _CurrentState extends State<Current> {
   Widget build(BuildContext context) {
     return forms.Container(
       padding: EdgeInsets.symmetric(horizontal: 10),
-      ds.Loading(
-        cause: _cause,
-        loading: _loading,
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            forms.Field(label: Text("id"), input: Text(current.account.id)),
-            forms.Field(
-              label: Text("name"),
-              input: Text(current.account.description),
-            ),
-            if (authn.developer(context).subscription)
-              TextButton(
-                child: Text("open web console"),
-                onPressed: () {
-                  httpx
-                      .withRetry(
-                        () => authn.otp(options: [authn.DeeppoolAuthzCache.bearer(context)]),
-                      )
-                      .then((r) {
-                        final Uri q = Uri.https(httpx.consoleendpoint(), "/", {
-                          "lt": r.token,
-                        });
-                        launchUrl(q);
-                      })
-                      .catchError((cause) {
-                        setState(() {
-                          _cause = ds.Error.unknown(cause, onTap: refresh);
-                        });
+      cause: _cause,
+      loading: _loading,
+      Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          forms.Field(label: Text("id"), input: Text(current.account.id)),
+          forms.Field(
+            label: Text("name"),
+            input: Text(current.account.description),
+          ),
+          if (authn.developer(context).subscription)
+            TextButton(
+              child: Text("open web console"),
+              onPressed: () {
+                httpx
+                    .withRetry(
+                      () => authn.otp(options: [authn.DeeppoolAuthzCache.bearer(context)]),
+                    )
+                    .then((r) {
+                      final Uri q = Uri.https(httpx.consoleendpoint(), "/", {
+                        "lt": r.token,
                       });
-                },
-              ),
-          ],
-        ),
+                      launchUrl(q);
+                    })
+                    .catchError((cause) {
+                      setState(() {
+                        _cause = ds.Error.unknown(cause, onTap: refresh);
+                      });
+                    });
+              },
+            ),
+        ],
       ),
     );
   }
