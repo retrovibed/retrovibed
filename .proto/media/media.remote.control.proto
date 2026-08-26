@@ -9,9 +9,8 @@ import "meta/meta.daemon.proto";
 message Queue { Media media = 1 [ json_name = "media" ]; }
 // dequeue the media with the given id.
 message Dequeue { string id = 1 [ json_name = "id" ]; }
-// playpause commands the device to toggle media playback.
-// the paused flag is to
-message PlayPause { bool paused = 1 [ json_name = "paused" ]; }
+// pause commands the device to toggle media playback.
+message Pause {}
 
 // Seek - move forward/back the given amount of time (milliseconds), relative
 // to the current position. offset == int32 max/min is a sentinel meaning
@@ -30,8 +29,9 @@ message Sync {
   int64 expiration = 5 [ json_name = "expiration" ];
   float volume = 6 [ json_name = "volume" ];
   bool muted = 7 [ json_name = "muted" ];
-  bool fullscreen = 8 [ json_name = "fullscreen" ];
-  reserved 9 to 999;
+  bool paused = 8 [ json_name = "paused" ];
+  bool fullscreen = 9 [ json_name = "fullscreen" ];
+  reserved 10 to 999;
   repeated Media queue = 1000 [ json_name = "queue" ];
 }
 
@@ -54,11 +54,9 @@ message Stream {
   oneof Command {
     Queue queue = 1000 [ json_name = "queue" ];
     Dequeue dequeue = 1002 [ json_name = "dequeue" ];
-    PlayPause playpause = 1003 [ json_name = "playpause" ];
+    Pause pause = 1003 [ json_name = "pause" ];
     Seek seek = 1004 [ json_name = "seek" ];
     Sync sync = 1005 [ json_name = "sync" ];
-    // relative volume adjustment (offset applied to the current level,
-    // 0-100 scale), reusing Seek's shape rather than an absolute set.
     Seek volume = 1006 [ json_name = "volume" ];
     Fullscreen fullscreen = 1007 [ json_name = "fullscreen" ];
     Mute mute = 1008 [ json_name = "mute" ];

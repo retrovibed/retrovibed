@@ -131,59 +131,42 @@ class Dequeue extends $pb.GeneratedMessage {
   void clearId() => $_clearField(1);
 }
 
-/// playpause commands the device to toggle media playback.
-/// the paused flag is to
-class PlayPause extends $pb.GeneratedMessage {
-  factory PlayPause({
-    $core.bool? paused,
-  }) {
-    final result = create();
-    if (paused != null) result.paused = paused;
-    return result;
-  }
+/// pause commands the device to toggle media playback.
+class Pause extends $pb.GeneratedMessage {
+  factory Pause() => create();
 
-  PlayPause._();
+  Pause._();
 
-  factory PlayPause.fromBuffer($core.List<$core.int> data,
+  factory Pause.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromBuffer(data, registry);
-  factory PlayPause.fromJson($core.String json,
+  factory Pause.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      _omitMessageNames ? '' : 'PlayPause',
+      _omitMessageNames ? '' : 'Pause',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
       createEmptyInstance: create)
-    ..aOB(1, _omitFieldNames ? '' : 'paused')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  PlayPause clone() => deepCopy();
+  Pause clone() => deepCopy();
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  PlayPause copyWith(void Function(PlayPause) updates) =>
-      super.copyWith((message) => updates(message as PlayPause)) as PlayPause;
+  Pause copyWith(void Function(Pause) updates) =>
+      super.copyWith((message) => updates(message as Pause)) as Pause;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  static PlayPause create() => PlayPause._();
+  static Pause create() => Pause._();
   @$core.override
-  PlayPause createEmptyInstance() => create();
+  Pause createEmptyInstance() => create();
   @$core.pragma('dart2js:noInline')
-  static PlayPause getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<PlayPause>(create);
-  static PlayPause? _defaultInstance;
-
-  @$pb.TagNumber(1)
-  $core.bool get paused => $_getBF(0);
-  @$pb.TagNumber(1)
-  set paused($core.bool value) => $_setBool(0, value);
-  @$pb.TagNumber(1)
-  $core.bool hasPaused() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearPaused() => $_clearField(1);
+  static Pause getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Pause>(create);
+  static Pause? _defaultInstance;
 }
 
 /// Seek - move forward/back the given amount of time (milliseconds), relative
@@ -242,74 +225,6 @@ class Seek extends $pb.GeneratedMessage {
   void clearOffset() => $_clearField(1);
 }
 
-/// Volume sets (sent by a connect client) or reports (echoed by the listener
-/// whenever its local volume changes, independent of Sync) the audio volume,
-/// 0-100 scale.
-class Volume extends $pb.GeneratedMessage {
-  factory Volume({
-    $core.bool? muted,
-    $core.double? level,
-  }) {
-    final result = create();
-    if (muted != null) result.muted = muted;
-    if (level != null) result.level = level;
-    return result;
-  }
-
-  Volume._();
-
-  factory Volume.fromBuffer($core.List<$core.int> data,
-          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
-  factory Volume.fromJson($core.String json,
-          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      _omitMessageNames ? '' : 'Volume',
-      package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
-    ..aOB(1, _omitFieldNames ? '' : 'muted')
-    ..aD(2, _omitFieldNames ? '' : 'level', fieldType: $pb.PbFieldType.OF)
-    ..hasRequiredFields = false;
-
-  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  Volume clone() => deepCopy();
-  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  Volume copyWith(void Function(Volume) updates) =>
-      super.copyWith((message) => updates(message as Volume)) as Volume;
-
-  @$core.override
-  $pb.BuilderInfo get info_ => _i;
-
-  @$core.pragma('dart2js:noInline')
-  static Volume create() => Volume._();
-  @$core.override
-  Volume createEmptyInstance() => create();
-  @$core.pragma('dart2js:noInline')
-  static Volume getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Volume>(create);
-  static Volume? _defaultInstance;
-
-  @$pb.TagNumber(1)
-  $core.bool get muted => $_getBF(0);
-  @$pb.TagNumber(1)
-  set muted($core.bool value) => $_setBool(0, value);
-  @$pb.TagNumber(1)
-  $core.bool hasMuted() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearMuted() => $_clearField(1);
-
-  @$pb.TagNumber(2)
-  $core.double get level => $_getN(1);
-  @$pb.TagNumber(2)
-  set level($core.double value) => $_setFloat(1, value);
-  @$pb.TagNumber(2)
-  $core.bool hasLevel() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearLevel() => $_clearField(2);
-}
-
 /// Sync requests (when sent with no fields set) or reports (when sent
 /// populated) the listener's current library and playback queue. A connect
 /// client sends an empty Sync to ask the listener to reply with its state;
@@ -322,6 +237,8 @@ class Sync extends $pb.GeneratedMessage {
     $core.String? token,
     $fixnum.Int64? expiration,
     $core.double? volume,
+    $core.bool? muted,
+    $core.bool? paused,
     $core.bool? fullscreen,
     $core.Iterable<$0.Media>? queue,
   }) {
@@ -332,6 +249,8 @@ class Sync extends $pb.GeneratedMessage {
     if (token != null) result.token = token;
     if (expiration != null) result.expiration = expiration;
     if (volume != null) result.volume = volume;
+    if (muted != null) result.muted = muted;
+    if (paused != null) result.paused = paused;
     if (fullscreen != null) result.fullscreen = fullscreen;
     if (queue != null) result.queue.addAll(queue);
     return result;
@@ -358,7 +277,9 @@ class Sync extends $pb.GeneratedMessage {
     ..aOS(4, _omitFieldNames ? '' : 'token')
     ..aInt64(5, _omitFieldNames ? '' : 'expiration')
     ..aD(6, _omitFieldNames ? '' : 'volume', fieldType: $pb.PbFieldType.OF)
-    ..aOB(7, _omitFieldNames ? '' : 'fullscreen')
+    ..aOB(7, _omitFieldNames ? '' : 'muted')
+    ..aOB(8, _omitFieldNames ? '' : 'paused')
+    ..aOB(9, _omitFieldNames ? '' : 'fullscreen')
     ..pPM<$0.Media>(1000, _omitFieldNames ? '' : 'queue',
         subBuilder: $0.Media.create)
     ..hasRequiredFields = false;
@@ -440,16 +361,34 @@ class Sync extends $pb.GeneratedMessage {
   void clearVolume() => $_clearField(6);
 
   @$pb.TagNumber(7)
-  $core.bool get fullscreen => $_getBF(6);
+  $core.bool get muted => $_getBF(6);
   @$pb.TagNumber(7)
-  set fullscreen($core.bool value) => $_setBool(6, value);
+  set muted($core.bool value) => $_setBool(6, value);
   @$pb.TagNumber(7)
-  $core.bool hasFullscreen() => $_has(6);
+  $core.bool hasMuted() => $_has(6);
   @$pb.TagNumber(7)
-  void clearFullscreen() => $_clearField(7);
+  void clearMuted() => $_clearField(7);
+
+  @$pb.TagNumber(8)
+  $core.bool get paused => $_getBF(7);
+  @$pb.TagNumber(8)
+  set paused($core.bool value) => $_setBool(7, value);
+  @$pb.TagNumber(8)
+  $core.bool hasPaused() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearPaused() => $_clearField(8);
+
+  @$pb.TagNumber(9)
+  $core.bool get fullscreen => $_getBF(8);
+  @$pb.TagNumber(9)
+  set fullscreen($core.bool value) => $_setBool(8, value);
+  @$pb.TagNumber(9)
+  $core.bool hasFullscreen() => $_has(8);
+  @$pb.TagNumber(9)
+  void clearFullscreen() => $_clearField(9);
 
   @$pb.TagNumber(1000)
-  $pb.PbList<$0.Media> get queue => $_getList(7);
+  $pb.PbList<$0.Media> get queue => $_getList(9);
 }
 
 /// Fullscreen toggles fullscreen on the receiving device. No payload -
@@ -493,14 +432,54 @@ class Fullscreen extends $pb.GeneratedMessage {
   static Fullscreen? _defaultInstance;
 }
 
+/// Mute toggles the receiving device's audio between silent and its prior
+/// level. No payload - same shape/ordering semantics as Fullscreen.
+class Mute extends $pb.GeneratedMessage {
+  factory Mute() => create();
+
+  Mute._();
+
+  factory Mute.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory Mute.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'Mute',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
+      createEmptyInstance: create)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  Mute clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  Mute copyWith(void Function(Mute) updates) =>
+      super.copyWith((message) => updates(message as Mute)) as Mute;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static Mute create() => Mute._();
+  @$core.override
+  Mute createEmptyInstance() => create();
+  @$core.pragma('dart2js:noInline')
+  static Mute getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Mute>(create);
+  static Mute? _defaultInstance;
+}
+
 enum Stream_Command {
   queue,
   dequeue,
-  playpause,
+  pause,
   seek,
   sync,
   volume,
   fullscreen,
+  mute,
   notSet
 }
 
@@ -510,23 +489,27 @@ enum Stream_Command {
 class Stream extends $pb.GeneratedMessage {
   factory Stream({
     $core.String? sid,
+    $fixnum.Int64? vid,
     Queue? queue,
     Dequeue? dequeue,
-    PlayPause? playpause,
+    Pause? pause,
     Seek? seek,
     Sync? sync,
-    Volume? volume,
+    Seek? volume,
     Fullscreen? fullscreen,
+    Mute? mute,
   }) {
     final result = create();
     if (sid != null) result.sid = sid;
+    if (vid != null) result.vid = vid;
     if (queue != null) result.queue = queue;
     if (dequeue != null) result.dequeue = dequeue;
-    if (playpause != null) result.playpause = playpause;
+    if (pause != null) result.pause = pause;
     if (seek != null) result.seek = seek;
     if (sync != null) result.sync = sync;
     if (volume != null) result.volume = volume;
     if (fullscreen != null) result.fullscreen = fullscreen;
+    if (mute != null) result.mute = mute;
     return result;
   }
 
@@ -542,30 +525,32 @@ class Stream extends $pb.GeneratedMessage {
   static const $core.Map<$core.int, Stream_Command> _Stream_CommandByTag = {
     1000: Stream_Command.queue,
     1002: Stream_Command.dequeue,
-    1003: Stream_Command.playpause,
+    1003: Stream_Command.pause,
     1004: Stream_Command.seek,
     1005: Stream_Command.sync,
     1006: Stream_Command.volume,
     1007: Stream_Command.fullscreen,
+    1008: Stream_Command.mute,
     0: Stream_Command.notSet
   };
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'Stream',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
       createEmptyInstance: create)
-    ..oo(0, [1000, 1002, 1003, 1004, 1005, 1006, 1007])
+    ..oo(0, [1000, 1002, 1003, 1004, 1005, 1006, 1007, 1008])
     ..aOS(1, _omitFieldNames ? '' : 'sid')
+    ..a<$fixnum.Int64>(2, _omitFieldNames ? '' : 'vid', $pb.PbFieldType.OU6,
+        defaultOrMaker: $fixnum.Int64.ZERO)
     ..aOM<Queue>(1000, _omitFieldNames ? '' : 'queue', subBuilder: Queue.create)
     ..aOM<Dequeue>(1002, _omitFieldNames ? '' : 'dequeue',
         subBuilder: Dequeue.create)
-    ..aOM<PlayPause>(1003, _omitFieldNames ? '' : 'playpause',
-        subBuilder: PlayPause.create)
+    ..aOM<Pause>(1003, _omitFieldNames ? '' : 'pause', subBuilder: Pause.create)
     ..aOM<Seek>(1004, _omitFieldNames ? '' : 'seek', subBuilder: Seek.create)
     ..aOM<Sync>(1005, _omitFieldNames ? '' : 'sync', subBuilder: Sync.create)
-    ..aOM<Volume>(1006, _omitFieldNames ? '' : 'volume',
-        subBuilder: Volume.create)
+    ..aOM<Seek>(1006, _omitFieldNames ? '' : 'volume', subBuilder: Seek.create)
     ..aOM<Fullscreen>(1007, _omitFieldNames ? '' : 'fullscreen',
         subBuilder: Fullscreen.create)
+    ..aOM<Mute>(1008, _omitFieldNames ? '' : 'mute', subBuilder: Mute.create)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -593,6 +578,7 @@ class Stream extends $pb.GeneratedMessage {
   @$pb.TagNumber(1005)
   @$pb.TagNumber(1006)
   @$pb.TagNumber(1007)
+  @$pb.TagNumber(1008)
   Stream_Command whichCommand() => _Stream_CommandByTag[$_whichOneof(0)]!;
   @$pb.TagNumber(1000)
   @$pb.TagNumber(1002)
@@ -601,6 +587,7 @@ class Stream extends $pb.GeneratedMessage {
   @$pb.TagNumber(1005)
   @$pb.TagNumber(1006)
   @$pb.TagNumber(1007)
+  @$pb.TagNumber(1008)
   void clearCommand() => $_clearField($_whichOneof(0));
 
   @$pb.TagNumber(1)
@@ -612,82 +599,102 @@ class Stream extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   void clearSid() => $_clearField(1);
 
+  @$pb.TagNumber(2)
+  $fixnum.Int64 get vid => $_getI64(1);
+  @$pb.TagNumber(2)
+  set vid($fixnum.Int64 value) => $_setInt64(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasVid() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearVid() => $_clearField(2);
+
   @$pb.TagNumber(1000)
-  Queue get queue => $_getN(1);
+  Queue get queue => $_getN(2);
   @$pb.TagNumber(1000)
   set queue(Queue value) => $_setField(1000, value);
   @$pb.TagNumber(1000)
-  $core.bool hasQueue() => $_has(1);
+  $core.bool hasQueue() => $_has(2);
   @$pb.TagNumber(1000)
   void clearQueue() => $_clearField(1000);
   @$pb.TagNumber(1000)
-  Queue ensureQueue() => $_ensure(1);
+  Queue ensureQueue() => $_ensure(2);
 
   @$pb.TagNumber(1002)
-  Dequeue get dequeue => $_getN(2);
+  Dequeue get dequeue => $_getN(3);
   @$pb.TagNumber(1002)
   set dequeue(Dequeue value) => $_setField(1002, value);
   @$pb.TagNumber(1002)
-  $core.bool hasDequeue() => $_has(2);
+  $core.bool hasDequeue() => $_has(3);
   @$pb.TagNumber(1002)
   void clearDequeue() => $_clearField(1002);
   @$pb.TagNumber(1002)
-  Dequeue ensureDequeue() => $_ensure(2);
+  Dequeue ensureDequeue() => $_ensure(3);
 
   @$pb.TagNumber(1003)
-  PlayPause get playpause => $_getN(3);
+  Pause get pause => $_getN(4);
   @$pb.TagNumber(1003)
-  set playpause(PlayPause value) => $_setField(1003, value);
+  set pause(Pause value) => $_setField(1003, value);
   @$pb.TagNumber(1003)
-  $core.bool hasPlaypause() => $_has(3);
+  $core.bool hasPause() => $_has(4);
   @$pb.TagNumber(1003)
-  void clearPlaypause() => $_clearField(1003);
+  void clearPause() => $_clearField(1003);
   @$pb.TagNumber(1003)
-  PlayPause ensurePlaypause() => $_ensure(3);
+  Pause ensurePause() => $_ensure(4);
 
   @$pb.TagNumber(1004)
-  Seek get seek => $_getN(4);
+  Seek get seek => $_getN(5);
   @$pb.TagNumber(1004)
   set seek(Seek value) => $_setField(1004, value);
   @$pb.TagNumber(1004)
-  $core.bool hasSeek() => $_has(4);
+  $core.bool hasSeek() => $_has(5);
   @$pb.TagNumber(1004)
   void clearSeek() => $_clearField(1004);
   @$pb.TagNumber(1004)
-  Seek ensureSeek() => $_ensure(4);
+  Seek ensureSeek() => $_ensure(5);
 
   @$pb.TagNumber(1005)
-  Sync get sync => $_getN(5);
+  Sync get sync => $_getN(6);
   @$pb.TagNumber(1005)
   set sync(Sync value) => $_setField(1005, value);
   @$pb.TagNumber(1005)
-  $core.bool hasSync() => $_has(5);
+  $core.bool hasSync() => $_has(6);
   @$pb.TagNumber(1005)
   void clearSync() => $_clearField(1005);
   @$pb.TagNumber(1005)
-  Sync ensureSync() => $_ensure(5);
+  Sync ensureSync() => $_ensure(6);
 
   @$pb.TagNumber(1006)
-  Volume get volume => $_getN(6);
+  Seek get volume => $_getN(7);
   @$pb.TagNumber(1006)
-  set volume(Volume value) => $_setField(1006, value);
+  set volume(Seek value) => $_setField(1006, value);
   @$pb.TagNumber(1006)
-  $core.bool hasVolume() => $_has(6);
+  $core.bool hasVolume() => $_has(7);
   @$pb.TagNumber(1006)
   void clearVolume() => $_clearField(1006);
   @$pb.TagNumber(1006)
-  Volume ensureVolume() => $_ensure(6);
+  Seek ensureVolume() => $_ensure(7);
 
   @$pb.TagNumber(1007)
-  Fullscreen get fullscreen => $_getN(7);
+  Fullscreen get fullscreen => $_getN(8);
   @$pb.TagNumber(1007)
   set fullscreen(Fullscreen value) => $_setField(1007, value);
   @$pb.TagNumber(1007)
-  $core.bool hasFullscreen() => $_has(7);
+  $core.bool hasFullscreen() => $_has(8);
   @$pb.TagNumber(1007)
   void clearFullscreen() => $_clearField(1007);
   @$pb.TagNumber(1007)
-  Fullscreen ensureFullscreen() => $_ensure(7);
+  Fullscreen ensureFullscreen() => $_ensure(8);
+
+  @$pb.TagNumber(1008)
+  Mute get mute => $_getN(9);
+  @$pb.TagNumber(1008)
+  set mute(Mute value) => $_setField(1008, value);
+  @$pb.TagNumber(1008)
+  $core.bool hasMute() => $_has(9);
+  @$pb.TagNumber(1008)
+  void clearMute() => $_clearField(1008);
+  @$pb.TagNumber(1008)
+  Mute ensureMute() => $_ensure(9);
 }
 
 const $core.bool _omitFieldNames =

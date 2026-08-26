@@ -163,11 +163,11 @@ class _State extends State<_Connect> with LoadingState {
   }
 
   void _volumeAdjust(double delta) {
-    _socket.send(remote.messages.volume((_latest.volume.level + delta).clamp(0.0, 100.0), _latest.volume.muted));
+    _socket.send(remote.messages.volume(delta.round()));
   }
 
   void _volumeMute() {
-    _socket.send(remote.messages.volume(_latest.volume.level, true));
+    _socket.send(remote.messages.mute());
   }
 
   void _reconnect() {
@@ -206,10 +206,6 @@ class _State extends State<_Connect> with LoadingState {
             _messages.listen(
               (msg) {
                 print("derp derp ${msg}");
-                if (msg.whichCommand() == remote.Stream_Command.volume) {
-                  setState(() => _latest.volume.level = msg.volume.level);
-                  return;
-                }
                 if (msg.whichCommand() != remote.Stream_Command.sync) return;
                 if (msg.sid.compareTo(_latest.sid) <= 0) return;
                 setState(() {
@@ -371,7 +367,7 @@ class _State extends State<_Connect> with LoadingState {
                               if (authn.developer(context).debug) PlayerControlSync(socket: _socket),
                             ],
                           ),
-                          PlayerControlVolume(socket: _socket, current: _latest.volume),
+                          PlayerControlVolume(socket: _socket, current: _latest.sync),
                           PlaylistCurrent(_latest.sync.current),
                           Expanded(child: queue),
                         ],

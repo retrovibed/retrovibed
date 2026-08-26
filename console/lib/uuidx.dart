@@ -3,6 +3,7 @@
 import 'dart:convert';
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:uuid/uuid.dart' as uuid;
+import 'package:uuid/data.dart' show V7Options;
 
 uuid.UuidValue fromString(String v) => v.isEmpty ? uuid.Namespace.nil.uuidValue : uuid.UuidValue.fromString(v);
 
@@ -22,7 +23,11 @@ T pattern<T>(String v, T min, T max, T value) {
   };
 }
 
-String v7() => uuid.Uuid().v7();
+// at, when given, pins the embedded timestamp instead of using the current
+// time - primarily for tests that need deterministically-ordered sids
+// without depending on real wall-clock timing between calls.
+String v7({DateTime? at}) =>
+    at == null ? uuid.Uuid().v7() : uuid.Uuid().v7(config: V7Options(at.millisecondsSinceEpoch, null));
 
 DateTime v7timestamp(String s) {
   final bytes = fromString(s).toBytes();

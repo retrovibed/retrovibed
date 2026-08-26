@@ -113,29 +113,27 @@ func (x *Dequeue) GetId() string {
 	return ""
 }
 
-// playpause commands the device to toggle media playback.
-// the paused flag is to
-type PlayPause struct {
+// pause commands the device to toggle media playback.
+type Pause struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Paused        bool                   `protobuf:"varint,1,opt,name=paused,proto3" json:"paused,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *PlayPause) Reset() {
-	*x = PlayPause{}
+func (x *Pause) Reset() {
+	*x = Pause{}
 	mi := &file_media_media_remote_control_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *PlayPause) String() string {
+func (x *Pause) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*PlayPause) ProtoMessage() {}
+func (*Pause) ProtoMessage() {}
 
-func (x *PlayPause) ProtoReflect() protoreflect.Message {
+func (x *Pause) ProtoReflect() protoreflect.Message {
 	mi := &file_media_media_remote_control_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -147,16 +145,9 @@ func (x *PlayPause) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use PlayPause.ProtoReflect.Descriptor instead.
-func (*PlayPause) Descriptor() ([]byte, []int) {
+// Deprecated: Use Pause.ProtoReflect.Descriptor instead.
+func (*Pause) Descriptor() ([]byte, []int) {
 	return file_media_media_remote_control_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *PlayPause) GetPaused() bool {
-	if x != nil {
-		return x.Paused
-	}
-	return false
 }
 
 // Seek - move forward/back the given amount of time (milliseconds), relative
@@ -206,61 +197,6 @@ func (x *Seek) GetOffset() int32 {
 	return 0
 }
 
-// Volume sets (sent by a connect client) or reports (echoed by the listener
-// whenever its local volume changes, independent of Sync) the audio volume,
-// 0-100 scale.
-type Volume struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Muted         bool                   `protobuf:"varint,1,opt,name=muted,proto3" json:"muted,omitempty"`
-	Level         float32                `protobuf:"fixed32,2,opt,name=level,proto3" json:"level,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *Volume) Reset() {
-	*x = Volume{}
-	mi := &file_media_media_remote_control_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Volume) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Volume) ProtoMessage() {}
-
-func (x *Volume) ProtoReflect() protoreflect.Message {
-	mi := &file_media_media_remote_control_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Volume.ProtoReflect.Descriptor instead.
-func (*Volume) Descriptor() ([]byte, []int) {
-	return file_media_media_remote_control_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *Volume) GetMuted() bool {
-	if x != nil {
-		return x.Muted
-	}
-	return false
-}
-
-func (x *Volume) GetLevel() float32 {
-	if x != nil {
-		return x.Level
-	}
-	return 0
-}
-
 // Sync requests (when sent with no fields set) or reports (when sent
 // populated) the listener's current library and playback queue. A connect
 // client sends an empty Sync to ask the listener to reply with its state;
@@ -273,7 +209,9 @@ type Sync struct {
 	Token         string                 `protobuf:"bytes,4,opt,name=token,proto3" json:"token,omitempty"`
 	Expiration    int64                  `protobuf:"varint,5,opt,name=expiration,proto3" json:"expiration,omitempty"`
 	Volume        float32                `protobuf:"fixed32,6,opt,name=volume,proto3" json:"volume,omitempty"`
-	Fullscreen    bool                   `protobuf:"varint,7,opt,name=fullscreen,proto3" json:"fullscreen,omitempty"`
+	Muted         bool                   `protobuf:"varint,7,opt,name=muted,proto3" json:"muted,omitempty"`
+	Paused        bool                   `protobuf:"varint,8,opt,name=paused,proto3" json:"paused,omitempty"`
+	Fullscreen    bool                   `protobuf:"varint,9,opt,name=fullscreen,proto3" json:"fullscreen,omitempty"`
 	Queue         []*media.Media         `protobuf:"bytes,1000,rep,name=queue,proto3" json:"queue,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -281,7 +219,7 @@ type Sync struct {
 
 func (x *Sync) Reset() {
 	*x = Sync{}
-	mi := &file_media_media_remote_control_proto_msgTypes[5]
+	mi := &file_media_media_remote_control_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -293,7 +231,7 @@ func (x *Sync) String() string {
 func (*Sync) ProtoMessage() {}
 
 func (x *Sync) ProtoReflect() protoreflect.Message {
-	mi := &file_media_media_remote_control_proto_msgTypes[5]
+	mi := &file_media_media_remote_control_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -306,7 +244,7 @@ func (x *Sync) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Sync.ProtoReflect.Descriptor instead.
 func (*Sync) Descriptor() ([]byte, []int) {
-	return file_media_media_remote_control_proto_rawDescGZIP(), []int{5}
+	return file_media_media_remote_control_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *Sync) GetLibrary() *metaapi.Daemon {
@@ -351,6 +289,20 @@ func (x *Sync) GetVolume() float32 {
 	return 0
 }
 
+func (x *Sync) GetMuted() bool {
+	if x != nil {
+		return x.Muted
+	}
+	return false
+}
+
+func (x *Sync) GetPaused() bool {
+	if x != nil {
+		return x.Paused
+	}
+	return false
+}
+
 func (x *Sync) GetFullscreen() bool {
 	if x != nil {
 		return x.Fullscreen
@@ -377,7 +329,7 @@ type Fullscreen struct {
 
 func (x *Fullscreen) Reset() {
 	*x = Fullscreen{}
-	mi := &file_media_media_remote_control_proto_msgTypes[6]
+	mi := &file_media_media_remote_control_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -389,7 +341,7 @@ func (x *Fullscreen) String() string {
 func (*Fullscreen) ProtoMessage() {}
 
 func (x *Fullscreen) ProtoReflect() protoreflect.Message {
-	mi := &file_media_media_remote_control_proto_msgTypes[6]
+	mi := &file_media_media_remote_control_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -402,6 +354,44 @@ func (x *Fullscreen) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Fullscreen.ProtoReflect.Descriptor instead.
 func (*Fullscreen) Descriptor() ([]byte, []int) {
+	return file_media_media_remote_control_proto_rawDescGZIP(), []int{5}
+}
+
+// Mute toggles the receiving device's audio between silent and its prior
+// level. No payload - same shape/ordering semantics as Fullscreen.
+type Mute struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Mute) Reset() {
+	*x = Mute{}
+	mi := &file_media_media_remote_control_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Mute) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Mute) ProtoMessage() {}
+
+func (x *Mute) ProtoReflect() protoreflect.Message {
+	mi := &file_media_media_remote_control_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Mute.ProtoReflect.Descriptor instead.
+func (*Mute) Descriptor() ([]byte, []int) {
 	return file_media_media_remote_control_proto_rawDescGZIP(), []int{6}
 }
 
@@ -411,15 +401,17 @@ func (*Fullscreen) Descriptor() ([]byte, []int) {
 type Stream struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	Sid   string                 `protobuf:"bytes,1,opt,name=sid,proto3" json:"sid,omitempty"`
+	Vid   uint64                 `protobuf:"varint,2,opt,name=vid,proto3" json:"vid,omitempty"`
 	// Types that are valid to be assigned to Command:
 	//
 	//	*Stream_Queue
 	//	*Stream_Dequeue
-	//	*Stream_Playpause
+	//	*Stream_Pause
 	//	*Stream_Seek
 	//	*Stream_Sync
 	//	*Stream_Volume
 	//	*Stream_Fullscreen
+	//	*Stream_Mute
 	Command       isStream_Command `protobuf_oneof:"Command"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -462,6 +454,13 @@ func (x *Stream) GetSid() string {
 	return ""
 }
 
+func (x *Stream) GetVid() uint64 {
+	if x != nil {
+		return x.Vid
+	}
+	return 0
+}
+
 func (x *Stream) GetCommand() isStream_Command {
 	if x != nil {
 		return x.Command
@@ -487,10 +486,10 @@ func (x *Stream) GetDequeue() *Dequeue {
 	return nil
 }
 
-func (x *Stream) GetPlaypause() *PlayPause {
+func (x *Stream) GetPause() *Pause {
 	if x != nil {
-		if x, ok := x.Command.(*Stream_Playpause); ok {
-			return x.Playpause
+		if x, ok := x.Command.(*Stream_Pause); ok {
+			return x.Pause
 		}
 	}
 	return nil
@@ -514,7 +513,7 @@ func (x *Stream) GetSync() *Sync {
 	return nil
 }
 
-func (x *Stream) GetVolume() *Volume {
+func (x *Stream) GetVolume() *Seek {
 	if x != nil {
 		if x, ok := x.Command.(*Stream_Volume); ok {
 			return x.Volume
@@ -532,6 +531,15 @@ func (x *Stream) GetFullscreen() *Fullscreen {
 	return nil
 }
 
+func (x *Stream) GetMute() *Mute {
+	if x != nil {
+		if x, ok := x.Command.(*Stream_Mute); ok {
+			return x.Mute
+		}
+	}
+	return nil
+}
+
 type isStream_Command interface {
 	isStream_Command()
 }
@@ -544,8 +552,8 @@ type Stream_Dequeue struct {
 	Dequeue *Dequeue `protobuf:"bytes,1002,opt,name=dequeue,proto3,oneof"`
 }
 
-type Stream_Playpause struct {
-	Playpause *PlayPause `protobuf:"bytes,1003,opt,name=playpause,proto3,oneof"`
+type Stream_Pause struct {
+	Pause *Pause `protobuf:"bytes,1003,opt,name=pause,proto3,oneof"`
 }
 
 type Stream_Seek struct {
@@ -557,18 +565,22 @@ type Stream_Sync struct {
 }
 
 type Stream_Volume struct {
-	Volume *Volume `protobuf:"bytes,1006,opt,name=volume,proto3,oneof"`
+	Volume *Seek `protobuf:"bytes,1006,opt,name=volume,proto3,oneof"`
 }
 
 type Stream_Fullscreen struct {
 	Fullscreen *Fullscreen `protobuf:"bytes,1007,opt,name=fullscreen,proto3,oneof"`
 }
 
+type Stream_Mute struct {
+	Mute *Mute `protobuf:"bytes,1008,opt,name=mute,proto3,oneof"`
+}
+
 func (*Stream_Queue) isStream_Command() {}
 
 func (*Stream_Dequeue) isStream_Command() {}
 
-func (*Stream_Playpause) isStream_Command() {}
+func (*Stream_Pause) isStream_Command() {}
 
 func (*Stream_Seek) isStream_Command() {}
 
@@ -578,6 +590,8 @@ func (*Stream_Volume) isStream_Command() {}
 
 func (*Stream_Fullscreen) isStream_Command() {}
 
+func (*Stream_Mute) isStream_Command() {}
+
 var File_media_media_remote_control_proto protoreflect.FileDescriptor
 
 const file_media_media_remote_control_proto_rawDesc = "" +
@@ -586,14 +600,10 @@ const file_media_media_remote_control_proto_rawDesc = "" +
 	"\x05Queue\x12\"\n" +
 	"\x05media\x18\x01 \x01(\v2\f.media.MediaR\x05media\"\x19\n" +
 	"\aDequeue\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\"#\n" +
-	"\tPlayPause\x12\x16\n" +
-	"\x06paused\x18\x01 \x01(\bR\x06paused\"\x1e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"\a\n" +
+	"\x05Pause\"\x1e\n" +
 	"\x04Seek\x12\x16\n" +
-	"\x06offset\x18\x01 \x01(\x05R\x06offset\"4\n" +
-	"\x06Volume\x12\x14\n" +
-	"\x05muted\x18\x01 \x01(\bR\x05muted\x12\x14\n" +
-	"\x05level\x18\x02 \x01(\x02R\x05level\"\x8c\x02\n" +
+	"\x06offset\x18\x01 \x01(\x05R\x06offset\"\xba\x02\n" +
 	"\x04Sync\x12&\n" +
 	"\alibrary\x18\x01 \x01(\v2\f.meta.DaemonR\alibrary\x12\x1a\n" +
 	"\bcapacity\x18\x02 \x01(\rR\bcapacity\x12&\n" +
@@ -602,24 +612,30 @@ const file_media_media_remote_control_proto_rawDesc = "" +
 	"\n" +
 	"expiration\x18\x05 \x01(\x03R\n" +
 	"expiration\x12\x16\n" +
-	"\x06volume\x18\x06 \x01(\x02R\x06volume\x12\x1e\n" +
+	"\x06volume\x18\x06 \x01(\x02R\x06volume\x12\x14\n" +
+	"\x05muted\x18\a \x01(\bR\x05muted\x12\x16\n" +
+	"\x06paused\x18\b \x01(\bR\x06paused\x12\x1e\n" +
 	"\n" +
-	"fullscreen\x18\a \x01(\bR\n" +
+	"fullscreen\x18\t \x01(\bR\n" +
 	"fullscreen\x12#\n" +
-	"\x05queue\x18\xe8\a \x03(\v2\f.media.MediaR\x05queueJ\x05\b\b\x10\xe8\a\"\f\n" +
+	"\x05queue\x18\xe8\a \x03(\v2\f.media.MediaR\x05queueJ\x05\b\n" +
+	"\x10\xe8\a\"\f\n" +
 	"\n" +
-	"Fullscreen\"\xd4\x02\n" +
+	"Fullscreen\"\x06\n" +
+	"\x04Mute\"\xfc\x02\n" +
 	"\x06Stream\x12\x10\n" +
-	"\x03sid\x18\x01 \x01(\tR\x03sid\x12%\n" +
+	"\x03sid\x18\x01 \x01(\tR\x03sid\x12\x10\n" +
+	"\x03vid\x18\x02 \x01(\x04R\x03vid\x12%\n" +
 	"\x05queue\x18\xe8\a \x01(\v2\f.media.QueueH\x00R\x05queue\x12+\n" +
-	"\adequeue\x18\xea\a \x01(\v2\x0e.media.DequeueH\x00R\adequeue\x121\n" +
-	"\tplaypause\x18\xeb\a \x01(\v2\x10.media.PlayPauseH\x00R\tplaypause\x12\"\n" +
+	"\adequeue\x18\xea\a \x01(\v2\x0e.media.DequeueH\x00R\adequeue\x12%\n" +
+	"\x05pause\x18\xeb\a \x01(\v2\f.media.PauseH\x00R\x05pause\x12\"\n" +
 	"\x04seek\x18\xec\a \x01(\v2\v.media.SeekH\x00R\x04seek\x12\"\n" +
-	"\x04sync\x18\xed\a \x01(\v2\v.media.SyncH\x00R\x04sync\x12(\n" +
-	"\x06volume\x18\xee\a \x01(\v2\r.media.VolumeH\x00R\x06volume\x124\n" +
+	"\x04sync\x18\xed\a \x01(\v2\v.media.SyncH\x00R\x04sync\x12&\n" +
+	"\x06volume\x18\xee\a \x01(\v2\v.media.SeekH\x00R\x06volume\x124\n" +
 	"\n" +
 	"fullscreen\x18\xef\a \x01(\v2\x11.media.FullscreenH\x00R\n" +
-	"fullscreenB\t\n" +
+	"fullscreen\x12\"\n" +
+	"\x04mute\x18\xf0\a \x01(\v2\v.media.MuteH\x00R\x04muteB\t\n" +
 	"\aCommandb\x06proto3"
 
 var (
@@ -638,11 +654,11 @@ var file_media_media_remote_control_proto_msgTypes = make([]protoimpl.MessageInf
 var file_media_media_remote_control_proto_goTypes = []any{
 	(*Queue)(nil),          // 0: media.Queue
 	(*Dequeue)(nil),        // 1: media.Dequeue
-	(*PlayPause)(nil),      // 2: media.PlayPause
+	(*Pause)(nil),          // 2: media.Pause
 	(*Seek)(nil),           // 3: media.Seek
-	(*Volume)(nil),         // 4: media.Volume
-	(*Sync)(nil),           // 5: media.Sync
-	(*Fullscreen)(nil),     // 6: media.Fullscreen
+	(*Sync)(nil),           // 4: media.Sync
+	(*Fullscreen)(nil),     // 5: media.Fullscreen
+	(*Mute)(nil),           // 6: media.Mute
 	(*Stream)(nil),         // 7: media.Stream
 	(*media.Media)(nil),    // 8: media.Media
 	(*metaapi.Daemon)(nil), // 9: meta.Daemon
@@ -654,16 +670,17 @@ var file_media_media_remote_control_proto_depIdxs = []int32{
 	8,  // 3: media.Sync.queue:type_name -> media.Media
 	0,  // 4: media.Stream.queue:type_name -> media.Queue
 	1,  // 5: media.Stream.dequeue:type_name -> media.Dequeue
-	2,  // 6: media.Stream.playpause:type_name -> media.PlayPause
+	2,  // 6: media.Stream.pause:type_name -> media.Pause
 	3,  // 7: media.Stream.seek:type_name -> media.Seek
-	5,  // 8: media.Stream.sync:type_name -> media.Sync
-	4,  // 9: media.Stream.volume:type_name -> media.Volume
-	6,  // 10: media.Stream.fullscreen:type_name -> media.Fullscreen
-	11, // [11:11] is the sub-list for method output_type
-	11, // [11:11] is the sub-list for method input_type
-	11, // [11:11] is the sub-list for extension type_name
-	11, // [11:11] is the sub-list for extension extendee
-	0,  // [0:11] is the sub-list for field type_name
+	4,  // 8: media.Stream.sync:type_name -> media.Sync
+	3,  // 9: media.Stream.volume:type_name -> media.Seek
+	5,  // 10: media.Stream.fullscreen:type_name -> media.Fullscreen
+	6,  // 11: media.Stream.mute:type_name -> media.Mute
+	12, // [12:12] is the sub-list for method output_type
+	12, // [12:12] is the sub-list for method input_type
+	12, // [12:12] is the sub-list for extension type_name
+	12, // [12:12] is the sub-list for extension extendee
+	0,  // [0:12] is the sub-list for field type_name
 }
 
 func init() { file_media_media_remote_control_proto_init() }
@@ -674,11 +691,12 @@ func file_media_media_remote_control_proto_init() {
 	file_media_media_remote_control_proto_msgTypes[7].OneofWrappers = []any{
 		(*Stream_Queue)(nil),
 		(*Stream_Dequeue)(nil),
-		(*Stream_Playpause)(nil),
+		(*Stream_Pause)(nil),
 		(*Stream_Seek)(nil),
 		(*Stream_Sync)(nil),
 		(*Stream_Volume)(nil),
 		(*Stream_Fullscreen)(nil),
+		(*Stream_Mute)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{

@@ -40,7 +40,14 @@ class _State extends State<RemoteControlListener> {
   ValueNotifier<meta.Daemon> _library = ValueNotifier(meta.Daemon());
   ValueNotifier<authz.Bearer<meta.Token>> _authz = ValueNotifier(authz.Bearer(meta.Token(), ""));
   playqueue.PlayQueue _queue = playqueue.PlayQueue();
-  remote.Volume _volume = remote.Volume(muted: false, level: 0.0);
+  // the underlying/desired volume + mute state, independent of what the
+  // player's actually outputting - what Sync.volume/Sync.muted report,
+  // since muting doesn't lose the level the user actually wants.
+  remote.Sync _previous = remote.Sync(volume: 0.0, muted: false);
+  // suppresses _volumeSubscription reacting to our own mute-driven
+  // setVolume(0.0)/restore calls, so they don't clobber _previous.volume -
+  // same pattern as playlist.dart's _transitioning guard.
+  bool _muting = false;
 
   // proactively (not just in reply to a request) reports the listener's
   // current library, playback queue, and a token valid against this device -
@@ -61,7 +68,8 @@ class _State extends State<RemoteControlListener> {
         capacity: queue.capacity,
         current: queue.current.value?.current,
         queue: queue.queued.map((m) => m.current).toList(),
-        volume: media.Playlist.of(context)?.player.state.volume ?? 0.0,
+        volume: _previous.volume,
+        muted: _previous.muted,
         fullscreen: ds.Full.nochrome(context),
       );
       _socket.send(
@@ -125,6 +133,8 @@ class _State extends State<RemoteControlListener> {
         return _applyVolume(msg);
       case remote.Stream_Command.fullscreen:
         return _applyFullscreen(msg);
+      case remote.Stream_Command.mute:
+        return _applyMute(msg);
       case remote.Stream_Command.sync:
       case remote.Stream_Command.notSet:
         return Future.value();
@@ -166,16 +176,37 @@ class _State extends State<RemoteControlListener> {
     }
   }
 
+  // relative adjustment against the remembered (not necessarily currently
+  // audible, if muted) level - touching volume is assumed to mean "I want
+  // sound," so this always unmutes.
   Future<void> _applyVolume(remote.Stream msg) async {
     if (_sid.compareTo(msg.sid) >= 0) return;
     final playlist = media.Playlist.of(context);
     if (playlist == null) return;
     setState(() {
       _sid = msg.sid;
-      _volume = msg.volume;
+      _previous = remote.Sync(
+        volume: (_previous.volume + msg.volume.offset).clamp(0.0, 100.0).toDouble(),
+        muted: false,
+      );
     });
-    final v = msg.volume.muted ? 0.0 : msg.volume.level;
-    await playlist.player.setVolume(v);
+    await playlist.player.setVolume(_previous.volume);
+  }
+
+  // toggles mute without losing the level to restore to - unlike the
+  // ctrl+M keyboard shortcut (playlist.dart), which just flips between 0
+  // and 100 with no memory of what it was before.
+  Future<void> _applyMute(remote.Stream msg) async {
+    if (_sid.compareTo(msg.sid) >= 0) return;
+    final playlist = media.Playlist.of(context);
+    if (playlist == null) return;
+    setState(() {
+      _sid = msg.sid;
+      _previous = remote.Sync(volume: _previous.volume, muted: !_previous.muted);
+    });
+    _muting = true;
+    await playlist.player.setVolume(_previous.muted ? 0.0 : _previous.volume);
+    _muting = false;
   }
 
   Future<void> _applyFullscreen(remote.Stream msg) async {
@@ -190,15 +221,22 @@ class _State extends State<RemoteControlListener> {
 
     final _player = media.Playlist.of(context)?.player;
 
-    _volume = Volume(muted: false, level: _player?.state.volume ?? 0.0);
+    _previous = remote.Sync(volume: _player?.state.volume ?? 0.0, muted: false);
     // echo local state back over the listen socket so any /rc/connect
     // observers can see what this device is doing.
     _playingSubscription = _player?.stream.playing.listen((playing) {
       _socket.send(remote.messages.playpause(!playing));
     });
 
+    // local (non-remote, e.g. keyboard-shortcut) volume changes still need
+    // tracking into _previous.volume and echoing - except our own
+    // mute-driven writes, which _muting suppresses so they don't clobber
+    // the level being remembered for restore-on-unmute.
     _volumeSubscription = _player?.stream.volume.listen((volume) {
-      _socket.send(remote.messages.volume(volume, _volume.muted));
+      if (!_muting) {
+        _previous = remote.Sync(volume: volume, muted: _previous.muted);
+      }
+      _echoSync();
     });
 
     _queue = media.Playlist.of(context)?.queue ?? _queue;

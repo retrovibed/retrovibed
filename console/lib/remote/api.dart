@@ -111,10 +111,24 @@ abstract class messages {
     return seek(SeekOffset.next);
   }
 
-  static rc.Stream volume(double level, bool muted) {
+  // relative volume adjustment (offset applied to the receiver's current
+  // level, 0-100 scale) - reuses Seek's shape rather than setting an
+  // absolute value.
+  static rc.Stream volume(int offset) {
     return rc.Stream(
       sid: uuidx.v7(),
-      volume: rc.Volume(level: level, muted: muted),
+      volume: rc.Seek(offset: offset),
+    );
+  }
+
+  // mute has no payload - each command toggles the receiving device's
+  // audio between silent and its prior level; ordering against
+  // concurrent/stale commands is resolved by the receiver using sid as a
+  // vector clock, same as Fullscreen.
+  static rc.Stream mute() {
+    return rc.Stream(
+      sid: uuidx.v7(),
+      mute: rc.Mute(),
     );
   }
 
@@ -129,6 +143,7 @@ abstract class messages {
     media.Media? current,
     List<media.Media> queue = const [],
     double volume = 0,
+    bool muted = false,
     bool fullscreen = false,
   }) {
     return rc.Stream(
@@ -141,6 +156,7 @@ abstract class messages {
         current: current,
         queue: queue,
         volume: volume,
+        muted: muted,
         fullscreen: fullscreen,
       ),
     );
