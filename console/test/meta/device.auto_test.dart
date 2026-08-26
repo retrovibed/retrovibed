@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/meta/api.dart' as api;
-import 'package:retrovibed/meta/daemon.auto.dart';
+import 'package:retrovibed/meta/device.auto.dart';
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
 

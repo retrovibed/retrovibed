@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:retrovibed/meta/daemon.manual.dart';
+import 'package:retrovibed/meta/device.manual.dart';
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
 
 void main() {

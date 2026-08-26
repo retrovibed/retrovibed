@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'api.dart' as api;
-import 'daemon.typography.dart';
+import 'device.typography.dart';
 
 typedef DaemonOnSelect = Future<api.Daemon> Function(BuildContext context, api.Daemon daemon);
 

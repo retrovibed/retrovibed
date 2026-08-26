@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:retrovibed/meta/daemon.item.dart';
+import 'package:retrovibed/meta/device.item.dart';
 import 'package:retrovibed/meta/api.dart' as api;
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
 

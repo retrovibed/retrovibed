@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/httpx.dart' as httpx;
 import './api.dart' as api;
-import './daemon.manual.dart';
+import 'device.manual.dart';
 
 class DaemonList extends StatefulWidget {
   final Future<api.Daemon> Function(api.Daemon v)? onDoubleTap;

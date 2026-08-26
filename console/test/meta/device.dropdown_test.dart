@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/meta/api.dart' as api;
-import 'package:retrovibed/meta/daemon.dropdown.dart';
+import 'package:retrovibed/meta/device.dropdown.dart';
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
 
 void main() {
@@ -84,7 +84,11 @@ void main() {
 
     testWidgets('refreshes an open dropdown as new peers stream in', (WidgetTester tester) async {
       final controller = StreamController<api.Daemon>();
-      final discovered = api.Daemon(id: 'discovered', hostname: 'discovered.local:9998', description: 'Discovered Library');
+      final discovered = api.Daemon(
+        id: 'discovered',
+        hostname: 'discovered.local:9998',
+        description: 'Discovered Library',
+      );
       bool includeDiscovered = false;
 
       Future<api.DaemonSearchResponse> search(api.DaemonSearchRequest req) {

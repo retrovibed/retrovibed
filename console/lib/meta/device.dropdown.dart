@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'api.dart' as api;
-import 'daemon.auto.dart';
-import 'daemon.item.dart';
-import 'daemon.manual.dart';
-import 'daemon.typography.dart';
+import 'device.auto.dart';
+import 'device.item.dart';
+import 'device.manual.dart';
+import 'device.typography.dart';
 
 class DaemonDropdown extends StatefulWidget {
   final ValueNotifier<api.Daemon> library;
