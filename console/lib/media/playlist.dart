@@ -15,6 +15,50 @@ import 'package:retrovibed/designkit.dart' as ds;
 import 'api.dart' as api;
 import 'play.queue.dart' as playqueue;
 
+// The surface RemoteControlListener needs from a Playlist, extracted so it
+// can depend on this instead of the real widget/native player directly -
+// tests substitute a plain-Dart fake instead of mounting a real Playlist.
+abstract class PlaylistControl {
+  // no-op sentinel for "no Playlist ancestor" - same null-object pattern
+  // remote.RemoteControlSocket.noop already establishes, so callers never
+  // need to null-check.
+  static final PlaylistControl zero = _ZeroPlaylistControl();
+
+  playqueue.PlayQueue get queue;
+  void maybeNext(playqueue.PlayableMedia m);
+  void next();
+  void previous();
+  void playOrPause();
+  Duration get position;
+  void seek(Duration position);
+  ValueNotifier<double> get volume;
+  Future<void> setVolume(double volume);
+  ValueNotifier<bool> get playing;
+}
+
+class _ZeroPlaylistControl implements PlaylistControl {
+  @override
+  final playqueue.PlayQueue queue = playqueue.PlayQueue();
+  @override
+  final ValueNotifier<double> volume = ValueNotifier(0.0);
+  @override
+  final ValueNotifier<bool> playing = ValueNotifier(false);
+  @override
+  Duration get position => Duration.zero;
+  @override
+  void maybeNext(playqueue.PlayableMedia m) {}
+  @override
+  void next() {}
+  @override
+  void previous() {}
+  @override
+  void playOrPause() {}
+  @override
+  void seek(Duration position) {}
+  @override
+  Future<void> setVolume(double volume) async {}
+}
+
 class Playlist extends StatefulWidget {
   static void _noop(
     BuildContext ctx,
@@ -180,9 +224,17 @@ class Playlist extends StatefulWidget {
   }
 }
 
-class _PlaylistState extends State<Playlist> {
+class _PlaylistState extends State<Playlist> implements PlaylistControl {
   final playqueue.PlayQueue _queue = playqueue.PlayQueue();
   final Player player = Player();
+  // PlaylistControl's view of volume/playing - kept in sync with the real
+  // player via the subscriptions set up in initState, exposed as
+  // ValueNotifiers (read via .value, observe via .addListener) to match how
+  // current/queue.revision are already exposed below.
+  @override
+  final ValueNotifier<double> volume = ValueNotifier(0.0);
+  @override
+  final ValueNotifier<bool> playing = ValueNotifier(false);
   playqueue.RangeFn autoqueue = playqueue.search;
   final TextEditingController controller = TextEditingController();
   final FocusNode playerfocus = FocusNode(
@@ -209,7 +261,16 @@ class _PlaylistState extends State<Playlist> {
 
   Known get known => _queue.current.value.known;
   ValueNotifier<playqueue.PlayableMedia?> get current => _queue.current;
+  @override
   playqueue.PlayQueue get queue => _queue;
+  @override
+  Duration get position => player.state.position;
+  @override
+  void seek(Duration position) => player.seek(position);
+  @override
+  void playOrPause() => player.playOrPause();
+  @override
+  Future<void> setVolume(double volume) => player.setVolume(volume);
 
   void setState(VoidCallback fn) {
     if (!mounted) return;
@@ -219,6 +280,12 @@ class _PlaylistState extends State<Playlist> {
   @override
   void initState() {
     super.initState();
+
+    volume.value = player.state.volume;
+    playing.value = player.state.playing;
+    player.stream.volume.listen((v) => volume.value = v);
+    player.stream.playing.listen((p) => playing.value = p);
+
     search.addListener(() {
       setState(() {
         autoqueue = switch (mimex.category(search.value.next.mimetypes)) {

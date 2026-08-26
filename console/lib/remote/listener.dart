@@ -12,19 +12,24 @@ import 'package:retrovibed/remote.dart';
 import 'package:retrovibed/retrovibed.dart' as retro;
 import 'api.dart' as remote;
 
+media.PlaylistControl _resolvePlaylist(BuildContext context) =>
+    media.Playlist.of(context) ?? media.PlaylistControl.zero;
+
 // Mounted as an ancestor of media.Playlist's UI-consuming subtree, drives the
 // same public Playlist surface the on-screen transport buttons use
-// (playlist.next()/.previous(), playlist.player, playlist.queue) rather than
+// (via the injectable playlist accessor's PlaylistControl) rather than
 // reaching into Playlist's private state directly.
 class RemoteControlListener extends StatefulWidget {
   final Widget child;
   final Future<remote.RemoteControlSocket> Function({List<httpx.Option> options}) connect;
   final meta.Daemon Function() localDevice;
+  final media.PlaylistControl Function(BuildContext) playlist;
   const RemoteControlListener(
     this.child, {
     super.key,
     this.connect = remote.remotecontrol.listen,
     this.localDevice = retro.local_device,
+    this.playlist = _resolvePlaylist,
   });
 
   @override
@@ -35,16 +40,15 @@ class _State extends State<RemoteControlListener> {
   String _sid = uuidx.min();
   remote.RemoteControlSocket _socket = remote.RemoteControlSocket.noop;
   StreamSubscription<remote.Stream>? _rcSubscription;
-  StreamSubscription<bool>? _playingSubscription;
-  StreamSubscription<double>? _volumeSubscription;
   ValueNotifier<meta.Daemon> _library = ValueNotifier(meta.Daemon());
   ValueNotifier<authz.Bearer<meta.Token>> _authz = ValueNotifier(authz.Bearer(meta.Token(), ""));
   playqueue.PlayQueue _queue = playqueue.PlayQueue();
+  late media.PlaylistControl _playlistControl;
   // the underlying/desired volume + mute state, independent of what the
   // player's actually outputting - what Sync.volume/Sync.muted report,
   // since muting doesn't lose the level the user actually wants.
   remote.Sync _previous = remote.Sync(volume: 0.0, muted: false);
-  // suppresses _volumeSubscription reacting to our own mute-driven
+  // suppresses _echoVolumeChanged reacting to our own mute-driven
   // setVolume(0.0)/restore calls, so they don't clobber _previous.volume -
   // same pattern as playlist.dart's _transitioning guard.
   bool _muting = false;
@@ -68,8 +72,9 @@ class _State extends State<RemoteControlListener> {
         capacity: queue.capacity,
         current: queue.current.value?.current,
         queue: queue.queued.map((m) => m.current).toList(),
-        volume: _previous.volume,
+        volume: _playlistControl.volume.value,
         muted: _previous.muted,
+        paused: !_playlistControl.playing.value,
         fullscreen: ds.Full.nochrome(context),
       );
       _socket.send(
@@ -79,6 +84,24 @@ class _State extends State<RemoteControlListener> {
         _sid = sync.sid;
       });
     });
+  }
+
+  // echoes local state back over the listen socket so any /rc/connect
+  // observers can see what this device is doing - via a full sync, same as
+  // volume/mute, rather than a bespoke pause-state message.
+  void _echoPlaying() {
+    _echoSync();
+  }
+
+  // local (non-remote, e.g. keyboard-shortcut) volume changes still need
+  // tracking into _previous.volume and echoing - except our own
+  // mute-driven writes, which _muting suppresses so they don't clobber
+  // the level being remembered for restore-on-unmute.
+  void _echoVolumeChanged() {
+    if (!_muting) {
+      _previous = remote.Sync(volume: _playlistControl.volume.value, muted: _previous.muted);
+    }
+    _echoSync();
   }
 
   void _rcReconnect() {
@@ -125,8 +148,8 @@ class _State extends State<RemoteControlListener> {
         return _applyQueue(msg);
       case remote.Stream_Command.dequeue:
         return _applyDequeue(msg);
-      case remote.Stream_Command.playpause:
-        return _applyPlayPause(msg);
+      case remote.Stream_Command.pause:
+        return _applyPause(msg);
       case remote.Stream_Command.seek:
         return _applySeek(msg);
       case remote.Stream_Command.volume:
@@ -142,37 +165,30 @@ class _State extends State<RemoteControlListener> {
   }
 
   Future<void> _applyQueue(remote.Stream msg) async {
-    final playlist = media.Playlist.of(context);
-    if (playlist == null) return;
-    playlist.maybeNext(playqueue.PlayableMedia(msg.queue.media));
+    _playlistControl.maybeNext(playqueue.PlayableMedia(msg.queue.media));
   }
 
   Future<void> _applyDequeue(remote.Stream msg) async {
-    final playlist = media.Playlist.of(context);
-    if (playlist == null) return;
-    playlist.queue.remove(msg.dequeue.id);
+    _playlistControl.queue.remove(msg.dequeue.id);
   }
 
-  Future<void> _applyPlayPause(remote.Stream msg) async {
+  // no payload - toggles between playing and paused, same shape as mute/fullscreen.
+  Future<void> _applyPause(remote.Stream msg) async {
     if (_sid.compareTo(msg.sid) >= 0) return;
-    final playlist = media.Playlist.of(context);
-    if (playlist == null) return;
     setState(() => _sid = msg.sid);
-    msg.playpause.paused ? playlist.player.pause() : playlist.player.play();
+    _playlistControl.playOrPause();
   }
 
   Future<void> _applySeek(remote.Stream msg) async {
     if (_sid.compareTo(msg.sid) >= 0) return;
-    final playlist = media.Playlist.of(context);
-    if (playlist == null) return;
     setState(() => _sid = msg.sid);
     final offset = msg.seek.offset;
     if (offset == remote.SeekOffset.next) {
-      playlist.next();
+      _playlistControl.next();
     } else if (offset == remote.SeekOffset.previous) {
-      playlist.previous();
+      _playlistControl.previous();
     } else {
-      playlist.player.seek(playlist.player.state.position + Duration(milliseconds: offset));
+      _playlistControl.seek(_playlistControl.position + Duration(milliseconds: offset));
     }
   }
 
@@ -181,8 +197,6 @@ class _State extends State<RemoteControlListener> {
   // sound," so this always unmutes.
   Future<void> _applyVolume(remote.Stream msg) async {
     if (_sid.compareTo(msg.sid) >= 0) return;
-    final playlist = media.Playlist.of(context);
-    if (playlist == null) return;
     setState(() {
       _sid = msg.sid;
       _previous = remote.Sync(
@@ -190,7 +204,7 @@ class _State extends State<RemoteControlListener> {
         muted: false,
       );
     });
-    await playlist.player.setVolume(_previous.volume);
+    await _playlistControl.setVolume(_previous.volume);
   }
 
   // toggles mute without losing the level to restore to - unlike the
@@ -198,14 +212,12 @@ class _State extends State<RemoteControlListener> {
   // and 100 with no memory of what it was before.
   Future<void> _applyMute(remote.Stream msg) async {
     if (_sid.compareTo(msg.sid) >= 0) return;
-    final playlist = media.Playlist.of(context);
-    if (playlist == null) return;
     setState(() {
       _sid = msg.sid;
       _previous = remote.Sync(volume: _previous.volume, muted: !_previous.muted);
     });
     _muting = true;
-    await playlist.player.setVolume(_previous.muted ? 0.0 : _previous.volume);
+    await _playlistControl.setVolume(_previous.muted ? 0.0 : _previous.volume);
     _muting = false;
   }
 
@@ -219,25 +231,11 @@ class _State extends State<RemoteControlListener> {
   void initState() {
     super.initState();
 
-    final _player = media.Playlist.of(context)?.player;
+    _playlistControl = widget.playlist(context);
 
-    _previous = remote.Sync(volume: _player?.state.volume ?? 0.0, muted: false);
-    // echo local state back over the listen socket so any /rc/connect
-    // observers can see what this device is doing.
-    _playingSubscription = _player?.stream.playing.listen((playing) {
-      _socket.send(remote.messages.playpause(!playing));
-    });
-
-    // local (non-remote, e.g. keyboard-shortcut) volume changes still need
-    // tracking into _previous.volume and echoing - except our own
-    // mute-driven writes, which _muting suppresses so they don't clobber
-    // the level being remembered for restore-on-unmute.
-    _volumeSubscription = _player?.stream.volume.listen((volume) {
-      if (!_muting) {
-        _previous = remote.Sync(volume: volume, muted: _previous.muted);
-      }
-      _echoSync();
-    });
+    _previous = remote.Sync(volume: _playlistControl.volume.value, muted: false);
+    _playlistControl.playing.addListener(_echoPlaying);
+    _playlistControl.volume.addListener(_echoVolumeChanged);
 
     _queue = media.Playlist.of(context)?.queue ?? _queue;
     _queue.current.addListener(_echoSync);
@@ -259,8 +257,8 @@ class _State extends State<RemoteControlListener> {
     _queue.revision.removeListener(_echoSync);
     _library.removeListener(_echoSync);
     _authz.removeListener(_echoSync);
-    _playingSubscription?.cancel();
-    _volumeSubscription?.cancel();
+    _playlistControl.playing.removeListener(_echoPlaying);
+    _playlistControl.volume.removeListener(_echoVolumeChanged);
     _rcSubscription?.cancel();
     _socket.close();
   }

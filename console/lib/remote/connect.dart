@@ -352,7 +352,7 @@ class _State extends State<_Connect> with LoadingState {
                             children: [
                               PlayerControlSeek.prev(socket: _socket),
                               PlayerControlSeek.backward(socket: _socket),
-                              PlayerControlPlayPause(socket: _socket, status: _messages),
+                              PlayerControlPlayPause(socket: _socket, paused: _latest.sync.paused),
                               PlayerControlSeek.forward(socket: _socket),
                               PlayerControlSeek.next(socket: _socket),
                               PlayerControlFullscreen(socket: _socket, current: _latest.sync.fullscreen),

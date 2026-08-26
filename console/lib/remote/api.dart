@@ -89,10 +89,13 @@ abstract class messages {
     );
   }
 
-  static rc.Stream playpause(bool paused) {
+  // pause has no payload - each command toggles the receiving device's
+  // play/pause state; ordering against concurrent/stale commands is
+  // resolved by the receiver using sid as a vector clock, same as Mute.
+  static rc.Stream pause() {
     return rc.Stream(
       sid: uuidx.v7(),
-      playpause: rc.PlayPause(paused: paused),
+      pause: rc.Pause(),
     );
   }
 
@@ -144,6 +147,7 @@ abstract class messages {
     List<media.Media> queue = const [],
     double volume = 0,
     bool muted = false,
+    bool paused = false,
     bool fullscreen = false,
   }) {
     return rc.Stream(
@@ -157,6 +161,7 @@ abstract class messages {
         queue: queue,
         volume: volume,
         muted: muted,
+        paused: paused,
         fullscreen: fullscreen,
       ),
     );
