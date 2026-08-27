@@ -135,7 +135,7 @@ class _DaemonList extends State<DaemonList> {
                 ? null
                 : () {
                     return api.daemons
-                        .connectable(v)
+                        .reachable(v)
                         .then((v) {
                           return widget.onDoubleTap!(v).then(replace);
                         })

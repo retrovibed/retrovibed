@@ -142,11 +142,20 @@ abstract class daemons {
         });
   }
 
-  // check if the daemon is connectable.
-  static Future<Daemon> connectable(Daemon v) {
+  // check if an already-persisted daemon is reachable, and touches it
+  // server-side to update its heartbeat/last-seen state.
+  static Future<Daemon> reachable(Daemon v) {
     return healthz(
       host: v.hostname,
     ).then((_) => authz.current(host: v.hostname)).then((_) => daemons.touch(v.id)).then((_) => v);
+  }
+
+  // check if a daemon is connectable, without touching any server-side
+  // state. safe to call on a daemon that hasn't been created yet (no id).
+  static Future<Daemon> connectable(Daemon v) {
+    return healthz(
+      host: v.hostname,
+    ).then((_) => authz.current(host: v.hostname)).then((_) => v);
   }
 
   static Future<DaemonDisableResponse> delete(String id) async {

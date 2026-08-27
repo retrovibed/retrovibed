@@ -33,7 +33,7 @@ class EndpointAuto extends StatefulWidget {
     this.latest = api.daemons.latest,
     this.onTap,
     this.create = api.daemons.create,
-    this.connectable = api.daemons.connectable,
+    this.connectable = api.daemons.reachable,
     this.register = api.register,
     this.backoff,
   });

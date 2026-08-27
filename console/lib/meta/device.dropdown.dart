@@ -35,9 +35,10 @@ class DaemonDropdown extends StatefulWidget {
     return (EndpointAuto.of(context)?.refreshNoErrHandling(Future.value(daemon)) ?? Future.value()).then((_) => daemon);
   }
 
-  // validates connectability only; never touches EndpointAuto/httpx globals.
+  // validates connectability of an already-known daemon and touches its
+  // server-side heartbeat; never touches EndpointAuto/httpx globals.
   static Future<api.Daemon> local(BuildContext context, api.Daemon daemon) {
-    return api.daemons.connectable(daemon);
+    return api.daemons.reachable(daemon);
   }
 
   @override
