@@ -15,7 +15,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/asynccompute"
 	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
-	"github.com/retrovibed/retrovibed/retroapi/internal/fsx"
+	"github.com/retrovibed/retrovibed/retroapi/fsx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/langx"
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
 	"github.com/retrovibed/retrovibed/retroapi/userx"

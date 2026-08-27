@@ -16,7 +16,7 @@ import (
 	"github.com/james-lawrence/torrent/torrenttest"
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
 	"github.com/retrovibed/retrovibed/retroapi/bytesx"
-	"github.com/retrovibed/retrovibed/retroapi/internal/fsx"
+	"github.com/retrovibed/retrovibed/retroapi/fsx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/md5x"
 	"github.com/retrovibed/retrovibed/retroapi/internal/torrenttestx"
 

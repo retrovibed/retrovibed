@@ -18,7 +18,7 @@ import (
 
 	"github.com/retrovibed/retrovibed/retroapi/cryptox"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
-	"github.com/retrovibed/retrovibed/retroapi/internal/fsx"
+	"github.com/retrovibed/retrovibed/retroapi/fsx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/langx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/md5x"
 	"golang.org/x/crypto/ssh"

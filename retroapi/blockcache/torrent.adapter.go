@@ -7,7 +7,7 @@ import (
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
 
-	"github.com/retrovibed/retrovibed/retroapi/internal/fsx"
+	"github.com/retrovibed/retrovibed/retroapi/fsx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/langx"
 )
 

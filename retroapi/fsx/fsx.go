@@ -282,3 +282,19 @@ func AppendTo(path string, perm os.FileMode, block []byte, blocks ...[]byte) err
 
 	return nil
 }
+
+func NewWriteErrCompact() *WriteErrCompact {
+	return &WriteErrCompact{errs: make([]error, 0, 128)}
+}
+
+type WriteErrCompact struct {
+	errs []error
+}
+
+func (t *WriteErrCompact) Compact(n int, err error) {
+	t.errs = append(t.errs, err)
+}
+
+func (t *WriteErrCompact) Err() error {
+	return errors.Join(t.errs...)
+}
