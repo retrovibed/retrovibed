@@ -18,13 +18,23 @@ const (
 
 // InfoFromPath reads the torrent info artifact stored on disk at path.
 func InfoFromPath(path string) (info *metainfo.Info, err error) {
-	return metainfo.NewFromPath(path + TorrentSuffix)
+	mi, err := metainfo.LoadFromFile(path + TorrentSuffix)
+	if err != nil {
+		return nil, err
+	}
+
+	i, err := mi.UnmarshalInfo()
+	if err != nil {
+		return nil, err
+	}
+
+	return &i, nil
 }
 
 // FileInfoFromOffset reads the torrent info artifact stored on disk at path and
 // returns the file entry whose offset matches zerooffset.
 func FileInfoFromOffset(path string, zerooffset uint64) (_z metainfo.File, err error) {
-	info, err := metainfo.NewFromPath(path + TorrentSuffix)
+	info, err := InfoFromPath(path)
 	if err != nil {
 		return _z, err
 	}

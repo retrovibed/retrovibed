@@ -13,6 +13,7 @@ import (
 
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/autobind"
+	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/james-lawrence/torrent/torrenttest"
@@ -729,5 +730,35 @@ func TestDownloadInto(t *testing.T) {
 		}
 
 		require.NoError(t, s.Err())
+	})
+
+	t.Run("InfoFromPath and FileInfoFromOffset resolve each file's real path after a download", func(t *testing.T) {
+		q := sqltestx.Metadatabase(t)
+
+		names := []string{"file1.mkv", "file2.mkv", "file3.mkv"}
+		lmd, _, leechdir := downloadTree(t, q, names)
+
+		p := fsx.DirVirtual(leechdir).Path(int160.FromBytes(lmd.Infohash).String())
+
+		info, err := tracking.InfoFromPath(p)
+		require.NoError(t, err)
+		require.EqualValues(t, lmd.Bytes, info.TotalLength())
+
+		scanner := sqlx.Scan(library.MetadataSearch(t.Context(), q, library.MetadataSearchBuilder().Where(
+			library.MetadataQueryByTorrentID(lmd.ID),
+		)))
+		libMDs := slices.Collect(scanner.Iter())
+		require.NoError(t, scanner.Err())
+		require.Len(t, libMDs, 3)
+
+		resolved := map[string]bool{}
+		for _, m := range libMDs {
+			fi, err := tracking.FileInfoFromOffset(p, m.DiskOffset)
+			require.NoError(t, err)
+			require.Contains(t, names, fi.Path)
+			require.EqualValues(t, m.Bytes, fi.Length)
+			resolved[fi.Path] = true
+		}
+		require.Len(t, resolved, 3, "each library.Metadata row should resolve to a distinct file")
 	})
 }

@@ -1,6 +1,7 @@
 package cmdmedia
 
 import (
+	"context"
 	"database/sql"
 	"log"
 	"os"
@@ -24,17 +25,20 @@ type reindex struct {
 }
 
 func (t reindex) Run(gctx *cmdopts.Global) (err error) {
-	var (
-		db      *sql.DB
-		missing squirrel.Sqlizer = squirrelx.Noop{}
-	)
+	var db *sql.DB
 
 	if db, err = cmdopts.DatabaseCustom(gctx.Context, t.Database); err != nil {
 		return err
 	}
 	defer db.Close()
 
-	mediastore := fsx.DirVirtual(env.MediaDir())
+	return t.run(gctx.Context, db, fsx.DirVirtual(env.MediaDir()))
+}
+
+func (t reindex) run(ctx context.Context, db *sql.DB, mediastore fsx.Virtual) (err error) {
+	var (
+		missing squirrel.Sqlizer = squirrelx.Noop{}
+	)
 
 	if t.Unindexed {
 		missing = library.MetadataQueryNotIndexed()
@@ -47,9 +51,9 @@ func (t reindex) Run(gctx *cmdopts.Global) (err error) {
 		},
 	)
 
-	log.Println("records", errorsx.Zero(sqlx.Count(gctx.Context, db, "SELECT COUNT(*) FROM library_metadata")))
+	log.Println("records", errorsx.Zero(sqlx.Count(ctx, db, "SELECT COUNT(*) FROM library_metadata")))
 
-	s := sqlx.Scan(library.MetadataSearch(gctx.Context, db, query))
+	s := sqlx.Scan(library.MetadataSearch(ctx, db, query))
 	for md := range s.Iter() {
 		if uuid.FromStringOrNil(md.TorrentID).IsNil() {
 			log.Println("unexpected nil torrent id on library.Metadata", md.ID)
@@ -58,7 +62,7 @@ func (t reindex) Run(gctx *cmdopts.Global) (err error) {
 
 		var tmd tracking.Metadata
 
-		if err = tracking.MetadataFindByID(gctx.Context, db, md.TorrentID).Scan(&tmd); sqlx.ErrNoRows(err) != nil {
+		if err = tracking.MetadataFindByID(ctx, db, md.TorrentID).Scan(&tmd); sqlx.ErrNoRows(err) != nil {
 			continue
 		} else if err != nil {
 			return err
@@ -83,11 +87,11 @@ func (t reindex) Run(gctx *cmdopts.Global) (err error) {
 			continue
 		}
 
-		if err = library.MetadataUpdateDescriptionByID(gctx.Context, db, md.ID, desc).Scan(&md); err != nil {
+		if err = library.MetadataUpdateDescriptionByID(ctx, db, md.ID, desc).Scan(&md); err != nil {
 			return err
 		}
 
-		if err = library.MetadataUpdateAutodescriptionByID(gctx.Context, db, md.ID, library.NormalizedDescription(md.Description)).Scan(&md); err != nil {
+		if err = library.MetadataUpdateAutodescriptionByID(ctx, db, md.ID, library.NormalizedDescription(md.Description)).Scan(&md); err != nil {
 			return err
 		}
 	}
