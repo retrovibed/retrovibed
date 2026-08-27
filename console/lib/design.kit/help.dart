@@ -11,6 +11,7 @@ export 'help.global.dart';
 export 'help.labelled.dart';
 export 'help.hint.dart';
 export 'help.scope.dart';
+export 'help.toggle.dart';
 
 class Help extends StatefulWidget {
   final Widget child;

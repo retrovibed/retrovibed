@@ -60,6 +60,7 @@ class Routes extends StatelessWidget {
                   child: tabbar,
                 ),
                 if (defaults.desktop) navbar.Hamburger(),
+                if (defaults.mobile) ds.HelpToggle(),
               ],
             ),
           ),
