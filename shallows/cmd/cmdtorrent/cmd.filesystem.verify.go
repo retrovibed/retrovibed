@@ -17,6 +17,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
+	"github.com/retrovibed/retrovibed/shallows/tracking"
 )
 
 type filesystemVerify struct{}
@@ -26,9 +27,6 @@ func (t filesystemVerify) Run(gctx *cmdopts.Global) (err error) {
 		id   int160.T
 		path string
 	}
-	const (
-		suffix = ".torrent"
-	)
 
 	tvfs := fsx.DirVirtual(env.TorrentDir())
 
@@ -91,11 +89,11 @@ func (t filesystemVerify) Run(gctx *cmdopts.Global) (err error) {
 	})
 
 	for path := range dir.Walk() {
-		if !strings.HasSuffix(path, suffix) {
+		if !strings.HasSuffix(path, tracking.TorrentSuffix) {
 			continue
 		}
 
-		id, err := int160.FromHexEncodedString(strings.TrimSuffix(path, suffix))
+		id, err := int160.FromHexEncodedString(strings.TrimSuffix(path, tracking.TorrentSuffix))
 		if err != nil {
 			log.Printf("unable to read id from %s - %v\n", path, err)
 			continue

@@ -17,7 +17,7 @@ import (
 func ValidateTorrent(ctx context.Context, q sqlx.Queryer, tvfs fsx.Virtual, tmd *tracking.Metadata) error {
 	infohashHex := int160.FromBytes(tmd.Infohash).String()
 
-	mi, err := metainfo.LoadFromFile(tvfs.Path(infohashHex + ".torrent"))
+	mi, err := metainfo.LoadFromFile(tvfs.Path(infohashHex + tracking.TorrentSuffix))
 	if err != nil {
 		return errorsx.Wrap(err, "unable to load torrent file")
 	}

@@ -24,6 +24,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/media"
 	"github.com/retrovibed/retrovibed/shallows/meta"
+	"github.com/retrovibed/retrovibed/shallows/tracking"
 )
 
 func NewDirectoryWatcher(ctx context.Context, c *tls.Config, q sqlx.Queryer) (d Directory, err error) {
@@ -40,7 +41,7 @@ func NewDirectoryWatcher(ctx context.Context, c *tls.Config, q sqlx.Queryer) (d 
 		w: w,
 		q: q,
 		ignore: func(s string) bool {
-			return !strings.HasSuffix(s, ".torrent")
+			return !strings.HasSuffix(s, tracking.TorrentSuffix)
 		},
 	}
 	d.pool = asynccompute.New(d.download)

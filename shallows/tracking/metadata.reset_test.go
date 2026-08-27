@@ -231,7 +231,7 @@ func TestReset(t *testing.T) {
 
 		torrentvfs := fsx.DirVirtual(vfs.Path("torrent"))
 		infohashStr := int160.FromBytes(lmd.Infohash).String()
-		torrentFile := torrentvfs.Path(infohashStr + ".torrent")
+		torrentFile := torrentvfs.Path(infohashStr + tracking.TorrentSuffix)
 		torrentDir := torrentvfs.Path(infohashStr)
 		require.NoError(t, os.WriteFile(torrentFile, []byte("torrent data"), 0600))
 		require.NoError(t, os.MkdirAll(torrentDir, 0700))

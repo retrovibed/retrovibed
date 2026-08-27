@@ -324,7 +324,7 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		)
 		require.NoError(t, tracking.MetadataInsertWithDefaults(ctx, q, tmd).Scan(&tmd))
 
-		torrentFile, err := os.Create(filepath.Join(torrentDir, ih.String()+".torrent"))
+		torrentFile, err := os.Create(filepath.Join(torrentDir, ih.String()+tracking.TorrentSuffix))
 		require.NoError(t, err)
 		mi := metainfo.MetaInfo{}
 		require.NoError(t, mi.Write(torrentFile))
@@ -427,7 +427,7 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		infohashHex := ih.String()
 
 		// write the .torrent file into tvfs
-		f, err := os.Create(tvfs.Path(infohashHex + ".torrent"))
+		f, err := os.Create(tvfs.Path(infohashHex + tracking.TorrentSuffix))
 		require.NoError(t, err)
 		require.NoError(t, mi.Write(f))
 		require.NoError(t, f.Close())

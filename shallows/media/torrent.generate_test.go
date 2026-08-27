@@ -18,6 +18,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/retrovibed/retrovibed/shallows/media"
+	"github.com/retrovibed/retrovibed/shallows/tracking"
 	"github.com/stretchr/testify/require"
 )
 
@@ -54,7 +55,7 @@ func TestGenerateTorrent(t *testing.T) {
 		require.Equal(t, timex.Inf(), tmd.InitiatedAt)
 		require.NotEqual(t, timex.Inf(), tmd.CompletedAt)
 
-		_, err = os.Stat(tvfs.Path(infohashHex + ".torrent"))
+		_, err = os.Stat(tvfs.Path(infohashHex + tracking.TorrentSuffix))
 		require.NoError(t, err)
 
 		link, err := os.Readlink(mvfs.Path(lmd.ID))

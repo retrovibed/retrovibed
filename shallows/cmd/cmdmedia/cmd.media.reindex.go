@@ -70,7 +70,13 @@ func (t reindex) Run(gctx *cmdopts.Global) (err error) {
 			continue
 		}
 
-		_, desc, auto := tracking.GenerateDescription(resolved, &tmd)
+		finfo, err := tracking.FileInfoFromOffset(resolved, md.DiskOffset)
+		if err != nil {
+			log.Println("failed to read file info", err)
+			continue
+		}
+
+		_, desc, auto := tracking.GenerateDescription(finfo.Path, &tmd)
 		log.Println("resetting description", md.ID, md.Description, "->", desc)
 		log.Println("resetting autodescription", md.ID, md.AutoDescription, "->", auto)
 		if t.DryRun {
