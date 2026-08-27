@@ -12,7 +12,7 @@ require (
 	github.com/gofrs/uuid/v5 v5.5.1
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/gorilla/schema v1.4.1
-	github.com/james-lawrence/torrent v0.0.0-20260810145001-03f67cc47e59
+	github.com/james-lawrence/torrent v0.0.0-20260827164208-39896974110a
 	github.com/justinas/alice v1.2.0
 	github.com/mattn/go-isatty v0.0.22
 	github.com/mdlayher/netlink v1.11.2
@@ -21,7 +21,7 @@ require (
 	github.com/stretchr/testify v1.12.1
 	github.com/tetratelabs/wazero v1.12.0
 	golang.org/x/crypto v0.55.0
-	golang.org/x/exp v0.0.0-20260727155853-b88d891fe743
+	golang.org/x/exp v0.0.0-20260824195058-e88cd73687aa
 	golang.org/x/net v0.58.0
 	golang.org/x/oauth2 v0.36.0
 	golang.org/x/sys v0.47.0
@@ -35,8 +35,7 @@ require (
 )
 
 require (
-	github.com/RoaringBitmap/roaring/v2 v2.24.0 // indirect
-	github.com/alecthomas/atomic v0.1.0-alpha2 // indirect
+	github.com/RoaringBitmap/roaring/v2 v2.26.0 // indirect
 	github.com/anacrolix/generics v0.2.0 // indirect
 	github.com/anacrolix/go-libutp v1.4.0 // indirect
 	github.com/anacrolix/log v0.17.0 // indirect
@@ -45,11 +44,11 @@ require (
 	github.com/anacrolix/missinggo/v2 v2.10.0 // indirect
 	github.com/anacrolix/mmsg v1.0.1 // indirect
 	github.com/anacrolix/multiless v0.4.0 // indirect
-	github.com/anacrolix/stm v0.5.0 // indirect
+	github.com/anacrolix/stm v0.6.0 // indirect
 	github.com/anacrolix/sync v0.5.4 // indirect
 	github.com/anacrolix/utp v0.2.0 // indirect
 	github.com/benbjohnson/immutable v0.4.3 // indirect
-	github.com/bits-and-blooms/bitset v1.24.6 // indirect
+	github.com/bits-and-blooms/bitset v1.25.0 // indirect
 	github.com/bits-and-blooms/bloom/v3 v3.7.1 // indirect
 	github.com/bradfitz/iter v0.0.0-20191230175014-e8f45d346db8 // indirect
 	github.com/edsrzf/mmap-go v1.2.0 // indirect

@@ -4,7 +4,7 @@ go 1.26.3
 
 require (
 	github.com/Masterminds/squirrel v1.5.4
-	github.com/RoaringBitmap/roaring/v2 v2.24.0
+	github.com/RoaringBitmap/roaring/v2 v2.26.0
 	github.com/alecthomas/kong v1.16.0
 	github.com/anacrolix/go-libutp v1.4.0
 	github.com/anacrolix/missinggo v1.3.0
@@ -29,7 +29,7 @@ require (
 	github.com/grindlemire/go-lucene v0.0.33
 	github.com/hashicorp/mdns v1.0.6
 	github.com/james-lawrence/genieql v0.0.0-20260821141941-92fda96aa606
-	github.com/james-lawrence/torrent v0.0.0-20260810145001-03f67cc47e59
+	github.com/james-lawrence/torrent v0.0.0-20260827164208-39896974110a
 	github.com/jfreymuth/pulse v0.1.2
 	github.com/justinas/alice v1.2.0
 	github.com/logrusorgru/aurora v2.0.3+incompatible
@@ -44,7 +44,7 @@ require (
 	github.com/things-go/go-socks5 v0.1.1
 	github.com/willabides/kongplete v0.4.0
 	golang.org/x/crypto v0.55.0
-	golang.org/x/exp v0.0.0-20260727155853-b88d891fe743
+	golang.org/x/exp v0.0.0-20260824195058-e88cd73687aa
 	golang.org/x/oauth2 v0.36.0
 	golang.org/x/text v0.41.0
 	golang.org/x/time v0.15.0
@@ -58,19 +58,18 @@ require (
 	cloud.google.com/go/auth v0.20.0 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.8 // indirect
 	cloud.google.com/go/compute/metadata v0.9.0 // indirect
-	github.com/alecthomas/atomic v0.1.0-alpha2 // indirect
 	github.com/anacrolix/generics v0.2.0 // indirect
 	github.com/anacrolix/log v0.17.0 // indirect
 	github.com/anacrolix/missinggo/perf v1.0.0 // indirect
 	github.com/anacrolix/missinggo/v2 v2.10.0 // indirect
 	github.com/anacrolix/mmsg v1.0.1 // indirect
 	github.com/anacrolix/multiless v0.4.0 // indirect
-	github.com/anacrolix/stm v0.5.0 // indirect
+	github.com/anacrolix/stm v0.6.0 // indirect
 	github.com/anacrolix/sync v0.5.4 // indirect
 	github.com/apache/arrow-go/v18 v18.5.1 // indirect
 	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
-	github.com/bits-and-blooms/bitset v1.24.6 // indirect
+	github.com/bits-and-blooms/bitset v1.25.0 // indirect
 	github.com/bits-and-blooms/bloom/v3 v3.7.1 // indirect
 	github.com/bradfitz/iter v0.0.0-20191230175014-e8f45d346db8 // indirect
 	github.com/brianvoe/gofakeit/v7 v7.15.0 // indirect
