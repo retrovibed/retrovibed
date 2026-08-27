@@ -429,7 +429,7 @@ func DownloadInto(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, mc libra
 		}
 
 		o, desc, auto := GenerateDescription(tx.Path, md)
-		log.Println("------------------------------------------- cleaned", md.Description, tx.Path, "->", o)
+		log.Println("------------------------------------------- cleaned", o, "->", md.Description, tx.Path)
 
 		lmd := library.NewMetadata(
 			md5x.FormatUUID(tx.MD5),
