@@ -154,11 +154,6 @@ class ErrorsTest {
     return const [401, 403, 404, 409, 429, 502].contains(code);
   }
 
-  static bool httpnotimplemented(Object obj) {
-    final code = statusCode(obj);
-    return const [404, 501].contains(code);
-  }
-
   static bool badrequest(Object obj) {
     const code = 400;
     return (obj is http.Response && obj.statusCode == code) || (obj is HttpClientResponse && obj.statusCode == code);

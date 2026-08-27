@@ -72,7 +72,7 @@ class _RecentState extends State<Recent> {
           setState(() {
             _loading = false;
           });
-        }, test: httpx.ErrorsTest.httpnotimplemented)
+        }, test: httpx.ErrorsTest.notimplemented)
         .catchError((cause) {
           setState(() {
             _cause = ds.Errors.httpauto(cause, onTap: reseterr);
