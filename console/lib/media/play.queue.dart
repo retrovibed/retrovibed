@@ -198,6 +198,12 @@ extension PlayableMediaNullable on PlayableMedia? {
       );
 }
 
+enum Signal {
+  Stop,
+  Delay,
+  Ok,
+}
+
 Stream<PlayableMedia> range(
   MediaSearchRequest req,
   PlayQueue queue, {
@@ -250,16 +256,26 @@ Stream<PlayableMedia> range(
     i.next.excluded
       ..clear()
       ..addAll(queue.recent.map((m) => m.current.id));
-    final v = await random(i.next, options: options())
-        .then<MediaFindResponse?>(
-          (v) => v,
+    final (v, signal) = await random(i.next, options: options())
+        .then<(api.MediaFindResponse, Signal)>(
+          (v) => (v, Signal.Ok),
+        )
+        .catchError(
+          (cause) => (api.MediaFindResponse(), Signal.Stop),
+          test: httpx.ErrorsTest.notimplemented,
         )
         .catchError((cause) {
           print("range(): fallback failed, retrying: $cause");
-          return Future.delayed(backoff).then((_) => null);
+          return Future.delayed(backoff).then((_) => (api.MediaFindResponse(), Signal.Delay));
         });
-    if (v == null) continue;
-    yield PlayableMedia(v.media);
+    switch (signal) {
+      case Signal.Ok:
+        yield PlayableMedia(v.media);
+      case Signal.Delay:
+        continue;
+      case Signal.Stop:
+        return;
+    }
   }
 }
 
