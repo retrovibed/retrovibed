@@ -7,7 +7,6 @@ class HelpToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (!HelpScope.visible(context)) return const SizedBox.shrink();
     return buttons.help(onPressed: () => HelpScope.of(context)?.toggle());
   }
 }
