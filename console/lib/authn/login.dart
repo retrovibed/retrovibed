@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' as foundation;
 import 'package:window_manager/window_manager.dart';
+import 'package:credential_manager/credential_manager.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/design.kit/forms.dart' as forms;
 import 'package:retrovibed/retrovibed.dart' as retro;
@@ -57,6 +58,7 @@ class _LoginCachedData extends InheritedWidget {
 }
 
 class _LoginState extends State<Login> {
+  final CredentialManager _credentialManager = CredentialManager();
   Widget _cause = ds.Error.zero;
   bool _isObscured = true;
   bool _hasKey = false;
@@ -77,7 +79,20 @@ class _LoginState extends State<Login> {
   void initState() {
     super.initState();
     _register = !widget.publicKey().isNotEmpty;
-    _checkKey();
+
+    if (_credentialManager.isSupportedPlatform) {
+      _credentialManager.getCredentials().then((creds) {
+        if (creds.passwordCredential != null) {
+          setState(() {
+            _username = creds.passwordCredential!.username ?? "";
+            _password = creds.passwordCredential!.password ?? "";
+          });
+          _checkKey();
+        }
+      });
+    } else {
+      _checkKey();
+    }
   }
 
   void setState(VoidCallback fn) {
@@ -125,14 +140,35 @@ class _LoginState extends State<Login> {
       });
       return;
     }
-    final err = widget.seed("${_username}:${_password}");
-    if (err.isNotEmpty) {
-      setState(() {
-        _cause = ds.Error.text("login failed", onTap: _reseterr);
-      });
-      return;
-    }
-    _checkKey();
+
+    return Future.microtask(() {
+          final err = widget.seed("${_username}:${_password}");
+          if (err.isNotEmpty) {
+            return Future.error(err);
+          }
+          return Future.value();
+        })
+        .then((_ignored) {
+          if (!_credentialManager.isSupportedPlatform) {
+            return _ignored;
+          }
+
+          return _credentialManager
+              .savePasswordCredentials(
+                PasswordCredential(
+                  username: _username,
+                  password: _password,
+                ),
+              )
+              .then((_) => _ignored);
+        })
+        .catchError((cause) {
+          print(cause);
+          setState(() {
+            _cause = ds.Error.text("login failed", onTap: _reseterr);
+          });
+        })
+        .then((_) => _checkKey());
   }
 
   Future<void> _guestLogin() async {
@@ -212,6 +248,7 @@ class _LoginState extends State<Login> {
                       ),
                       TextFormField(
                         initialValue: _username,
+                        autofillHints: const [AutofillHints.username],
                         decoration: InputDecoration(hintText: 'email'),
                         onChanged: (v) => setState(() => _username = v),
                         onFieldSubmitted: (_) => _seed(),
@@ -219,6 +256,7 @@ class _LoginState extends State<Login> {
                       TextFormField(
                         initialValue: _password,
                         obscureText: _isObscured,
+                        autofillHints: const [AutofillHints.password],
                         decoration: InputDecoration(
                           hintText: 'password',
                           suffixIcon: obscureicon,
@@ -230,6 +268,7 @@ class _LoginState extends State<Login> {
                         visible: _register,
                         child: TextFormField(
                           obscureText: _isObscured,
+                          autofillHints: const [AutofillHints.password],
                           decoration: InputDecoration(
                             hintText: 'confirm password',
                             suffixIcon: obscureicon,
