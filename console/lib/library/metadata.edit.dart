@@ -73,20 +73,19 @@ class MediaEdit extends StatelessWidget {
         display,
         Spacer(),
         ds.LoadingIconButton(
-          onPressed:
-              () => media.media
-                  .unarchive(
-                    current.archiveId,
-                    options: [authn.Authenticated.bearer(context)],
-                  )
-                  .then(
-                    (v) => media.media.update(
-                      current.id,
-                      current..archiveId = uuidx.min(),
-                      options: [authn.request(authn.AuthzCache.meta(context))],
-                    ),
-                  )
-                  .then((v) => onChange(Future.value(v.media))),
+          onPressed: () => media.media
+              .unarchive(
+                current.archiveId,
+                options: [authn.Authenticated.bearer(context)],
+              )
+              .then(
+                (v) => media.media.update(
+                  current.id,
+                  current..archiveId = uuidx.min(),
+                  options: [authn.request(authn.AuthzCache.meta(context))],
+                ),
+              )
+              .then((v) => onChange(Future.value(v.media))),
           icon: icon,
         ),
       ],

@@ -8,6 +8,7 @@ class KnownMediaTypography extends StatelessWidget {
   final GestureTapCallback? onDoubleTap;
   final List<Widget> leading;
   final List<Widget> trailing;
+  final BoxDecoration? decoration;
 
   const KnownMediaTypography(
     this.current, {
@@ -15,6 +16,7 @@ class KnownMediaTypography extends StatelessWidget {
     this.onDoubleTap,
     this.leading = const [],
     this.trailing = const [],
+    this.decoration,
   });
 
   static Widget removebtn(BuildContext context, String id, {VoidCallback? onPressed}) {
@@ -27,6 +29,7 @@ class KnownMediaTypography extends StatelessWidget {
     String id, {
     List<Widget> leading = const [],
     List<Widget> trailing = const [],
+    BoxDecoration? decoration,
   }) {
     return Builder(
       builder: (context) {
@@ -51,6 +54,7 @@ class KnownMediaTypography extends StatelessWidget {
                     snapshot.data!,
                     leading: leading,
                     trailing: trailing,
+                    decoration: decoration,
                   ),
             );
           },
@@ -65,6 +69,7 @@ class KnownMediaTypography extends StatelessWidget {
     final defaults = ds.Defaults.of(context);
     return ds.Container(
       padding: defaults.padding,
+      decoration: decoration ?? const BoxDecoration(),
       Row(
         spacing: defaults.spacing,
         children: [

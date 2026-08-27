@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/httpx.dart' as httpx;
+import 'package:retrovibed/authn.dart' as authn;
+import 'package:retrovibed/media/media.pb.dart';
+import 'package:retrovibed/uuidx.dart' as uuidx;
 import './api.dart' as api;
 
 class KnownMediaCard extends StatelessWidget {
@@ -43,6 +46,7 @@ class KnownMediaCard extends StatelessWidget {
     bool highlighted = false,
     IconData? icon = Icons.play_circle_filled,
     Widget help = ds.HelpScope.None,
+    Widget? overlay,
     BoxConstraints? constraints,
   }) {
     return FutureBuilder<api.Known>(
@@ -55,13 +59,49 @@ class KnownMediaCard extends StatelessWidget {
           onDoubleTap: onDoubleTap,
           onSecondaryTap: onSecondaryTap,
           onLongPress: onLongPress,
+          leading: leading,
           trailing: trailing,
           highlighted: highlighted,
           icon: icon,
           help: help,
+          overlay: overlay,
           constraints: constraints,
         );
       },
+    );
+  }
+
+  static Widget auto(
+    BuildContext context,
+    Media m, {
+    Key? key,
+    GestureTapCallback? onTap,
+    GestureTapCallback? onDoubleTap,
+    GestureTapCallback? onSecondaryTap,
+    GestureLongPressCallback? onLongPress,
+    List<Widget> leading = const [],
+    List<Widget> trailing = const [],
+    bool highlighted = false,
+    IconData? icon = Icons.play_circle_filled,
+    Widget help = ds.HelpScope.None,
+    Widget? overlay,
+    BoxConstraints? constraints,
+  }) {
+    final authz = authn.AuthzCache.meta(context);
+    return KnownMediaCard.future(
+      api.known.autodetect(m, options: [authn.request(authz)]),
+      key: key ?? ValueKey(uuidx.md5x("${m.id}.${m.updatedAt}")),
+      onTap: onTap,
+      onDoubleTap: onDoubleTap,
+      onSecondaryTap: onSecondaryTap,
+      onLongPress: onLongPress,
+      leading: leading,
+      trailing: trailing,
+      highlighted: highlighted,
+      icon: icon,
+      help: help,
+      overlay: overlay,
+      constraints: constraints,
     );
   }
 

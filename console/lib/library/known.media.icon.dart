@@ -31,7 +31,8 @@ class KnownMediaIcon extends StatelessWidget {
 
         return ClipRRect(
           borderRadius: BorderRadius.circular(size / 4),
-          child: ds.Image.precache(
+          child:
+              ds.Image.precache(
                 context,
                 image,
                 headers: _imageheaders(image),

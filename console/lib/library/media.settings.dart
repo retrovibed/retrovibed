@@ -6,6 +6,7 @@ import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'media.download.accordian.dart';
+import 'known.media.accordian.dart';
 import 'metadata.edit.dart';
 import 'api.dart' as api;
 
@@ -95,25 +96,24 @@ class _MediaSettingsState extends State<MediaSettings> {
               padding: defaults.padding,
               deletable: ds.LoadingIconButton(
                 icon: Icon(Icons.delete_forever_rounded),
-                onPressed:
-                    () => ds.modals.asyncfn(
-                      context,
-                      ds.Confirmation.dangerous(
-                        content: Text(
-                          "Are you sure you want to delete ${_modified.description}?",
-                        ),
-                        onConfirm: (ctx) => httpx
-                            .withRetry(
-                              () => widget.mediaDelete(
-                                _modified.id,
-                                options: [authn.request(authn.AuthzCache.meta(ctx))],
-                              ),
-                            )
-                            .then((_) {
-                              widget.onChange(Future.value(_modified), forced: true, autoclose: true);
-                            }),
-                      ),
+                onPressed: () => ds.modals.asyncfn(
+                  context,
+                  ds.Confirmation.dangerous(
+                    content: Text(
+                      "Are you sure you want to delete ${_modified.description}?",
                     ),
+                    onConfirm: (ctx) => httpx
+                        .withRetry(
+                          () => widget.mediaDelete(
+                            _modified.id,
+                            options: [authn.request(authn.AuthzCache.meta(ctx))],
+                          ),
+                        )
+                        .then((_) {
+                          widget.onChange(Future.value(_modified), forced: true, autoclose: true);
+                        }),
+                  ),
+                ),
               ),
               closable: ds.LoadingIconButton.close(
                 onPressed: () async => widget.onChange(Future.value(widget.current), autoclose: true),
@@ -126,6 +126,9 @@ class _MediaSettingsState extends State<MediaSettings> {
                   });
                 });
               },
+            ),
+            KnownMediaAccordian(
+              api.known.autodetect(_modified, options: [authn.request(authn.AuthzCache.meta(context))]),
             ),
             if (!uuidx.isMinMax(uuidx.fromString(_modified.torrentId)))
               MediaDownloadAccordian(

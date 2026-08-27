@@ -19,6 +19,7 @@ class KnownMediaDisplay extends StatefulWidget {
   final List<Widget> trailing;
   final bool highlighted;
   final Widget help;
+  final BoxConstraints? constraints;
 
   const KnownMediaDisplay(
     this.pending, {
@@ -30,6 +31,7 @@ class KnownMediaDisplay extends StatefulWidget {
     this.trailing = const [],
     this.highlighted = false,
     this.help = ds.HelpScope.None,
+    this.constraints,
     required this.media,
   });
 
@@ -43,6 +45,7 @@ class KnownMediaDisplay extends StatefulWidget {
     List<Widget> trailing = const [],
     bool highlighted = false,
     Widget help = ds.HelpScope.None,
+    BoxConstraints? constraints,
   }) {
     return KnownMediaDisplay(
       api.known.autodetect(m),
@@ -55,6 +58,7 @@ class KnownMediaDisplay extends StatefulWidget {
       trailing: trailing,
       highlighted: highlighted,
       help: help,
+      constraints: constraints,
     );
   }
 
@@ -69,6 +73,7 @@ class KnownMediaDisplay extends StatefulWidget {
     List<Widget> trailing = const [],
     bool highlighted = false,
     Widget help = ds.HelpScope.None,
+    BoxConstraints? constraints,
   }) {
     final resolvedKey = key ?? ValueKey(uuidx.md5x("${m.id}.${m.updatedAt}"));
 
@@ -83,6 +88,7 @@ class KnownMediaDisplay extends StatefulWidget {
         trailing: trailing,
         highlighted: highlighted,
         help: help,
+        constraints: constraints,
       );
     }
 
@@ -106,6 +112,7 @@ class KnownMediaDisplay extends StatefulWidget {
       trailing: trailing,
       highlighted: highlighted,
       help: help,
+      constraints: constraints,
     );
   }
 
@@ -231,6 +238,7 @@ class _KnownMediaDisplayState extends State<KnownMediaDisplay> {
       highlighted: widget.highlighted,
       hovered: hovered,
       help: widget.help,
+      constraints: widget.constraints,
       onTap: widget.onTap,
       onDoubleTap: widget.onDoubleTap,
       onLongPress: () {
