@@ -449,7 +449,7 @@ func DownloadInto(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, mc libra
 			return errorsx.Wrap(err, "unable to record library metadata")
 		}
 
-		log.Println("new library content", lmd.ID, lmd.Description)
+		log.Println("new library content", lmd.ID, lmd.Description, lmd.TorrentID)
 	}
 
 	if err != nil {
@@ -637,13 +637,25 @@ func ImportSymlink(id int160.T, srcvfs, vfs fsx.Virtual) library.ImportOp {
 }
 
 func GenerateDescription(path string, md *Metadata) (o string, desc string, auto string) {
+	pathdesc := DescriptionFromPath(md, path)
+	metadesc := md.Description
+
+	n := stringsx.FirstDiff(metadesc, pathdesc)
+	// small ratio to determine if the metadata desc is repeated within the filename.
+	// improvements to this should happen upstream in the cleaning functions.
+	if r := float64(float64(n) / float64(len(metadesc))); r > 0.4 {
+		desc = stringsx.CompactWhitespace(pathdesc)
+		auto = library.NormalizedDescription(desc)
+		return pathdesc, desc, auto
+	}
+
 	o = stringsx.Join(
 		" ",
 		md.Description,
 		DescriptionFromPath(md, path),
 	)
 
-	desc = strings.Join(strings.Fields(o), " ")
+	desc = stringsx.CompactWhitespace(o)
 	auto = library.NormalizedDescription(desc)
 	return o, desc, auto
 }

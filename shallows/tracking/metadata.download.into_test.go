@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"crypto/rand"
 	"fmt"
+	"maps"
 	"os"
 	"path/filepath"
 	"slices"
@@ -12,9 +13,11 @@ import (
 
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/autobind"
+	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/james-lawrence/torrent/torrenttest"
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
+	"github.com/retrovibed/retrovibed/retroapi/cryptox"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
@@ -28,6 +31,84 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+// provided a mapping of files to description, and returns the media and torrent directory.
+func downloadTree(t *testing.T, q sqlx.Queryer, m []string, options ...metainfo.Option) (tracking.Metadata, string, string) {
+	t.Helper()
+	var (
+		actual   = md5.New()
+		expected = md5.New()
+	)
+
+	ctx := t.Context()
+
+	seedir := t.TempDir()
+
+	mi, err := torrenttest.Tree(
+		seedir, cryptox.NewChaCha8(t.Name()), 64*bytesx.KiB, 128*bytesx.KiB,
+		m,
+		options...,
+	)
+	require.NoError(t, err)
+
+	seeder := torrenttestx.Client(
+		t,
+		autobind.NewLoopback(
+			autobind.EnableDHT(torrenttestx.QuickDHT(t)),
+		),
+		torrent.NewMetadataCache(seedir),
+		blockcache.NewTorrentFromVirtualFS(fsx.DirVirtual(seedir)),
+	)
+
+	md, err := torrent.NewFromInfo(mi, torrent.OptionStorage(storage.NewFile(filepath.Join(seedir))))
+	require.NoError(t, err)
+
+	seederTorrent, _, err := seeder.Start(md)
+	require.NoError(t, err)
+	defer seeder.Close()
+
+	require.NoError(t, torrent.Verify(ctx, seederTorrent))
+	n, err := torrent.DownloadInto(ctx, expected, seederTorrent, torrent.TuneSeeding)
+	require.NoError(t, err)
+	require.Equal(t, mi.TotalLength(), n)
+
+	root := fsx.DirVirtual(t.TempDir())
+
+	leechdir := root.Path("torrent")
+	mediadir := root.Path("media")
+	require.NoError(t, fsx.MkDirs(0700, leechdir, mediadir))
+
+	leecher := torrenttestx.Client(
+		t,
+		autobind.NewLoopback(
+			autobind.EnableDHT(torrenttestx.QuickDHT(t)),
+		),
+		torrent.NewMetadataCache(leechdir),
+		blockcache.NewTorrentFromVirtualFS(fsx.DirVirtual(leechdir)),
+	)
+	defer leecher.Close()
+
+	lmd := tracking.NewMetadata(
+		new(md.ID),
+		tracking.MetadataOptionFromInfo(mi),
+		tracking.MetadataOptionAutoDescription,
+	)
+
+	require.NoError(t, tracking.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
+
+	ltor, added, err := leecher.MaybeStart(
+		torrent.NewFromInfo(mi),
+	)
+	require.NoError(t, err)
+	assert.True(t, added)
+
+	require.NoError(t, ltor.Tune(torrent.TuneClientPeer(seeder)))
+
+	require.NoError(t, tracking.DownloadInto(t.Context(), q, root, library.QueryCleanerNoop(), &lmd, ltor, actual, asyncx.NewWakeup(t.Context())))
+	require.Equal(t, md5x.FormatUUID(expected), md5x.FormatUUID(actual))
+
+	return lmd, mediadir, leechdir
+}
 
 func TestDownloadInto(t *testing.T) {
 	t.Run("properly download a multitorrent", func(t *testing.T) {
@@ -595,5 +676,58 @@ func TestDownloadInto(t *testing.T) {
 		// QueryCleanerNoop returns md.Description unchanged; so the library entry carries
 		// the tracking metadata's description verbatim.
 		assert.Equal(t, lmd.Description, libMD.Description)
+	})
+
+	t.Run("properly extract descriptions for library content", func(t *testing.T) {
+		q := sqltestx.Metadatabase(t)
+
+		m := map[string]string{
+			"Star Trek The Next Generation (1987) S02E01 (1080p NF WEB-DL DDP5.1 AV1) - Vialle.mkv": "Star Trek The Next Generation 1987 S02E01 Vialle.mkv",
+			"Star Trek The Next Generation (1987) S02E02 (1080p NF WEB-DL DDP5.1 AV1) - Vialle.mkv": "Star Trek The Next Generation 1987 S02E02 Vialle.mkv",
+			"Star Trek The Next Generation (1987) S02E03 (1080p NF WEB-DL DDP5.1 AV1) - Vialle.mkv": "Star Trek The Next Generation 1987 S02E03 Vialle.mkv",
+			"Star Trek The Next Generation (1987) S02E04 (1080p NF WEB-DL DDP5.1 AV1) - Vialle.mkv": "Star Trek The Next Generation 1987 S02E04 Vialle.mkv",
+			"Star Trek The Next Generation (1987) S02E05 (1080p NF WEB-DL DDP5.1 AV1) - Vialle.mkv": "Star Trek The Next Generation 1987 S02E05 Vialle.mkv",
+			"Star Trek The Next Generation (1987) S02E06 (1080p NF WEB-DL DDP5.1 AV1) - Vialle.mkv": "Star Trek The Next Generation 1987 S02E06 Vialle.mkv",
+			"Star Trek The Next Generation (1987) S02E07 (1080p NF WEB-DL DDP5.1 AV1) - Vialle.mkv": "Star Trek The Next Generation 1987 S02E07 Vialle.mkv",
+			"Star Trek The Next Generation (1987) S02E08 (1080p NF WEB-DL DDP5.1 AV1) - Vialle.mkv": "Star Trek The Next Generation 1987 S02E08 Vialle.mkv",
+			"Star Trek The Next Generation (1987) S02E09 (1080p NF WEB-DL DDP5.1 AV1) - Vialle.mkv": "Star Trek The Next Generation 1987 S02E09 Vialle.mkv",
+			"Star Trek The Next Generation (1987) S02E10 (1080p NF WEB-DL DDP5.1 AV1) - Vialle.mkv": "Star Trek The Next Generation 1987 S02E10 Vialle.mkv",
+			"Star Trek The Next Generation (1987) S02E11 (1080p NF WEB-DL DDP5.1 AV1) - Vialle.mkv": "Star Trek The Next Generation 1987 S02E11 Vialle.mkv",
+			"Star Trek The Next Generation (1987) S02E12 (1080p NF WEB-DL DDP5.1 AV1) - Vialle.mkv": "Star Trek The Next Generation 1987 S02E12 Vialle.mkv",
+			"Star Trek The Next Generation (1987) S02E13 (1080p NF WEB-DL DDP5.1 AV1) - Vialle.mkv": "Star Trek The Next Generation 1987 S02E13 Vialle.mkv",
+			"Star Trek The Next Generation (1987) S02E14 (1080p NF WEB-DL DDP5.1 AV1) - Vialle.mkv": "Star Trek The Next Generation 1987 S02E14 Vialle.mkv",
+			"Star Trek The Next Generation (1987) S02E15 (1080p NF WEB-DL DDP5.1 AV1) - Vialle.mkv": "Star Trek The Next Generation 1987 S02E15 Vialle.mkv",
+			"Star Trek The Next Generation (1987) S02E16 (1080p NF WEB-DL DDP5.1 AV1) - Vialle.mkv": "Star Trek The Next Generation 1987 S02E16 Vialle.mkv",
+			"Star Trek The Next Generation (1987) S02E17 (1080p NF WEB-DL DDP5.1 AV1) - Vialle.mkv": "Star Trek The Next Generation 1987 S02E17 Vialle.mkv",
+			"Star Trek The Next Generation (1987) S02E18 (1080p NF WEB-DL DDP5.1 AV1) - Vialle.mkv": "Star Trek The Next Generation 1987 S02E18 Vialle.mkv",
+			"Star Trek The Next Generation (1987) S02E19 (1080p NF WEB-DL DDP5.1 AV1) - Vialle.mkv": "Star Trek The Next Generation 1987 S02E19 Vialle.mkv",
+			"Star Trek The Next Generation (1987) S02E20 (1080p NF WEB-DL DDP5.1 AV1) - Vialle.mkv": "Star Trek The Next Generation 1987 S02E20 Vialle.mkv",
+			"Star Trek The Next Generation (1987) S02E21 (1080p NF WEB-DL DDP5.1 AV1) - Vialle.mkv": "Star Trek The Next Generation 1987 S02E21 Vialle.mkv",
+			"Star Trek The Next Generation (1987) S02E22 (1080p NF WEB-DL DDP5.1 AV1) - Vialle.mkv": "Star Trek The Next Generation 1987 S02E22 Vialle.mkv",
+		}
+
+		lmd, mediadir, _ := downloadTree(t, q, slices.Collect(maps.Keys(m)), metainfo.OptionDisplayName("Star Trek The Next Generation (1987) S02 (1080p NF WEB-DL DDP5.1 AV1) - Vialle"))
+
+		// single file torrent: exactly one symlink in the media dir (dir + symlinks = 23 walk entries)
+		w1 := fsx.WalkDir(os.DirFS(mediadir))
+		require.EqualValues(t, 23, testx.Seq2Count(w1.Walk()))
+		require.NoError(t, w1.Err())
+
+		require.EqualValues(
+			t,
+			len(m),
+			sqltestx.Count(t, q, "SELECT COUNT(*) FROM library_metadata WHERE torrent_id = ?", lmd.ID),
+		)
+
+		s := sqlx.Scan(library.MetadataSearch(t.Context(), q, library.MetadataSearchBuilder().Where(
+			library.MetadataQueryByTorrentID(lmd.ID),
+		)))
+
+		for lmd := range s.Iter() {
+			_, ok := m[lmd.Description]
+			require.True(t, ok, "library description missing: %s", lmd.Description)
+		}
+
+		require.NoError(t, s.Err())
 	})
 }

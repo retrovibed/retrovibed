@@ -1,7 +1,6 @@
 package torrenttestx
 
 import (
-	"log"
 	"net/netip"
 	"testing"
 
@@ -61,8 +60,8 @@ func Client(t testing.TB, binder autobind.Autobind, mdcache torrent.MetadataStor
 				scache,
 				torrent.ClientConfigCacheDirectory(cdir),
 				torrent.ClientConfigSeed(true),
-				torrent.ClientConfigInfoLogger(log.New(log.Writer(), "[torrent] ", log.Flags())),
-				torrent.ClientConfigDebugLogger(log.New(log.Writer(), "[torrent] ", log.Flags())),
+				// torrent.ClientConfigInfoLogger(log.New(log.Writer(), "[torrent] ", log.Flags())),
+				// torrent.ClientConfigDebugLogger(log.New(log.Writer(), "[torrent] ", log.Flags())),
 				torrent.ClientConfigCompose(options...),
 				torrent.ClientConfigDialPoolSize(1),
 				torrent.ClientConfigUploadLimit(rate.NewLimiter(rate.Inf, 10)),

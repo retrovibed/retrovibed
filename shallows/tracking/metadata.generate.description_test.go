@@ -48,4 +48,12 @@ func TestResetDescription(t *testing.T) {
 		require.Equal(t, "movie.mkv", desc)
 		require.Equal(t, "movie mkv", auto)
 	})
+
+	t.Run("example 1", func(t *testing.T) {
+		md := &Metadata{Infohash: md5x.Digest("example5").Sum(nil), Description: "Star Trek The Next Generation (1987) S02 (1080p NF WEB-DL DDP5.1 AV1) - Vialle"}
+		o, desc, auto := GenerateDescription("Star Trek The Next Generation (1987) S02E11 (1080p NF WEB-DL DDP5.1 AV1) - Vialle.mkv", md)
+		require.Equal(t, "Star Trek The Next Generation (1987) S02E11 (1080p NF WEB-DL DDP5.1 AV1) - Vialle.mkv", o)
+		require.Equal(t, "Star Trek The Next Generation (1987) S02E11 (1080p NF WEB-DL DDP5.1 AV1) - Vialle.mkv", desc)
+		require.Equal(t, "Star Trek The Next Generation 1987 S02E11 1080p NF WEB DL DDP5 1 AV1 Vialle mkv", auto)
+	})
 }

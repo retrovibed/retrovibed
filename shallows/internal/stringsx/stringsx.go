@@ -60,3 +60,16 @@ var whitespace = regexp.MustCompile(`\s+`)
 func CompactWhitespace(s string) string {
 	return strings.TrimSpace(whitespace.ReplaceAllString(s, " "))
 }
+
+// returns the index where the strings differ.
+// or the len when they're identical
+func FirstDiff(a, b string) uint {
+	n := min(len(a), len(b))
+	for i := range n {
+		if a[i] != b[i] {
+			return uint(i)
+		}
+	}
+
+	return uint(n)
+}
