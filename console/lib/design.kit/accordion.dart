@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'theme.defaults.dart';
 
 class Accordion extends StatefulWidget {
   final Widget description;
@@ -32,19 +33,19 @@ class _AccordionState extends State<Accordion> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final borderRadius = Defaults.of(context).borderRadius;
     final isDisabled = widget.disabled != null;
     final onPressed = isDisabled ? null : toggle;
     final opacity = isDisabled ? 0.2 : 1.0;
     final icon = widget.disabled ?? Icon(hidden ? Icons.arrow_drop_up : Icons.arrow_drop_down);
     final cursor = isDisabled ? SystemMouseCursors.forbidden : SystemMouseCursors.click;
 
-    final content =
-        hidden
-            ? Container()
-            : Container(
-              padding: theme.buttonTheme.padding,
-              child: widget.content,
-            );
+    final content = hidden
+        ? Container()
+        : Container(
+            padding: theme.buttonTheme.padding,
+            child: widget.content,
+          );
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -54,6 +55,7 @@ class _AccordionState extends State<Accordion> {
           child: Material(
             color: Colors.transparent,
             child: ListTile(
+              shape: RoundedRectangleBorder(borderRadius: borderRadius),
               hoverColor: theme.hoverColor,
               mouseCursor: cursor,
               onTap: onPressed,
