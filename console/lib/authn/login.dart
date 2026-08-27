@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show TextInput;
 import 'package:flutter/foundation.dart' as foundation;
 import 'package:window_manager/window_manager.dart';
-import 'package:credential_manager/credential_manager.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/design.kit/forms.dart' as forms;
 import 'package:retrovibed/retrovibed.dart' as retro;
@@ -58,7 +58,6 @@ class _LoginCachedData extends InheritedWidget {
 }
 
 class _LoginState extends State<Login> {
-  final CredentialManager _credentialManager = CredentialManager();
   Widget _cause = ds.Error.zero;
   bool _isObscured = true;
   bool _hasKey = false;
@@ -79,20 +78,7 @@ class _LoginState extends State<Login> {
   void initState() {
     super.initState();
     _register = !widget.publicKey().isNotEmpty;
-
-    if (_credentialManager.isSupportedPlatform) {
-      _credentialManager.getCredentials().then((creds) {
-        if (creds.passwordCredential != null) {
-          setState(() {
-            _username = creds.passwordCredential!.username ?? "";
-            _password = creds.passwordCredential!.password ?? "";
-          });
-          _checkKey();
-        }
-      });
-    } else {
-      _checkKey();
-    }
+    _checkKey();
   }
 
   void setState(VoidCallback fn) {
@@ -149,18 +135,8 @@ class _LoginState extends State<Login> {
           return Future.value();
         })
         .then((_ignored) {
-          if (!_credentialManager.isSupportedPlatform) {
-            return _ignored;
-          }
-
-          return _credentialManager
-              .savePasswordCredentials(
-                PasswordCredential(
-                  username: _username,
-                  password: _password,
-                ),
-              )
-              .then((_) => _ignored);
+          TextInput.finishAutofillContext();
+          return _ignored;
         })
         .catchError((cause) {
           print(cause);
@@ -246,35 +222,43 @@ class _LoginState extends State<Login> {
                         'setup your device',
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
-                      TextFormField(
-                        initialValue: _username,
-                        autofillHints: const [AutofillHints.username],
-                        decoration: InputDecoration(hintText: 'email'),
-                        onChanged: (v) => setState(() => _username = v),
-                        onFieldSubmitted: (_) => _seed(),
-                      ),
-                      TextFormField(
-                        initialValue: _password,
-                        obscureText: _isObscured,
-                        autofillHints: const [AutofillHints.password],
-                        decoration: InputDecoration(
-                          hintText: 'password',
-                          suffixIcon: obscureicon,
-                        ),
-                        onChanged: (v) => setState(() => _password = v),
-                        onFieldSubmitted: (_) => _seed(),
-                      ),
-                      Visibility(
-                        visible: _register,
-                        child: TextFormField(
-                          obscureText: _isObscured,
-                          autofillHints: const [AutofillHints.password],
-                          decoration: InputDecoration(
-                            hintText: 'confirm password',
-                            suffixIcon: obscureicon,
-                          ),
-                          onChanged: (v) => setState(() => _confirm = v),
-                          onFieldSubmitted: (_) => _seed(),
+                      AutofillGroup(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          spacing: defaults.spacing,
+                          children: [
+                            TextFormField(
+                              initialValue: _username,
+                              autofillHints: const [AutofillHints.username, AutofillHints.email],
+                              decoration: InputDecoration(hintText: 'email'),
+                              onChanged: (v) => setState(() => _username = v),
+                              onFieldSubmitted: (_) => _seed(),
+                            ),
+                            TextFormField(
+                              initialValue: _password,
+                              obscureText: _isObscured,
+                              autofillHints: const [AutofillHints.password],
+                              decoration: InputDecoration(
+                                hintText: 'password',
+                                suffixIcon: obscureicon,
+                              ),
+                              onChanged: (v) => setState(() => _password = v),
+                              onFieldSubmitted: (_) => _seed(),
+                            ),
+                            Visibility(
+                              visible: _register,
+                              child: TextFormField(
+                                obscureText: _isObscured,
+                                autofillHints: const [AutofillHints.password],
+                                decoration: InputDecoration(
+                                  hintText: 'confirm password',
+                                  suffixIcon: obscureicon,
+                                ),
+                                onChanged: (v) => setState(() => _confirm = v),
+                                onFieldSubmitted: (_) => _seed(),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       forms.Checkbox(

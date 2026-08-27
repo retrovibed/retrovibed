@@ -6,6 +6,7 @@
 	<array>
 		<string>applinks:*.community.retrovibe.space</string>
 		<string>applinks:invite.retrovibe.space</string>
+		<string>webcredentials:login.retrovibe.space</string>
 	</array>
 </dict>
 </plist>

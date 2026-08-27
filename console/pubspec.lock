@@ -81,14 +81,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.2"
-  cbor:
-    dependency: transitive
-    description:
-      name: cbor
-      sha256: "2c5c37650f0a2d25149f03e748ab7b2857787bde338f95fe947738b80d713da2"
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.5.1"
   characters:
     dependency: transitive
     description:
@@ -161,54 +153,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.2"
-  credential_manager:
-    dependency: "direct main"
-    description:
-      name: credential_manager
-      sha256: "1fe20894f11c3f6f3c2cc6188876a109c8a779a8b48d343991a723132ee621be"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.3.0"
-  credential_manager_android:
-    dependency: transitive
-    description:
-      name: credential_manager_android
-      sha256: "69108f021ed3a383ae84c311aecda17d1b89aa177769614f77aebfb14965ec82"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.1.0"
-  credential_manager_ios:
-    dependency: transitive
-    description:
-      name: credential_manager_ios
-      sha256: "311368de1ef44b9eaa10bc62ced7bf4d4a7eba54c4f1b5d1992454be05e08a89"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.2.0"
-  credential_manager_platform_interface:
-    dependency: transitive
-    description:
-      name: credential_manager_platform_interface
-      sha256: "5a52d914b9797a3635632917b2558b9e3c54d8d56749064fb0af22788d45de4c"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.0"
-  credential_manager_web:
-    dependency: transitive
-    description:
-      name: credential_manager_web
-      sha256: "0406ad54158f1697ae8bc3074b97334fc8e7bd0450e01068c47ccb197d594e01"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.2.0"
-  credentials_manager:
-    dependency: "direct main"
-    description:
-      name: credentials_manager
-      sha256: "967af52b85b479841d1b22ee47bc0b8e678f6b63e361e3c4496dc6ba7c699012"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.3"
   cross_file:
     dependency: transitive
     description:
@@ -430,62 +374,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.0.0"
-  flutter_plugin_android_lifecycle:
-    dependency: transitive
-    description:
-      name: flutter_plugin_android_lifecycle
-      sha256: "3854fe5e3bff0b113c658f260b90c95dea17c92db0f2addeac2e343dd9969785"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.35"
-  flutter_secure_storage:
-    dependency: transitive
-    description:
-      name: flutter_secure_storage
-      sha256: "22dbf16f23a4bcf9d35e51be1c84ad5bb6f627750565edd70dab70f3ff5fff8f"
-      url: "https://pub.dev"
-    source: hosted
-    version: "8.1.0"
-  flutter_secure_storage_linux:
-    dependency: transitive
-    description:
-      name: flutter_secure_storage_linux
-      sha256: be76c1d24a97d0b98f8b54bce6b481a380a6590df992d0098f868ad54dc8f688
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.2.3"
-  flutter_secure_storage_macos:
-    dependency: transitive
-    description:
-      name: flutter_secure_storage_macos
-      sha256: "6c0a2795a2d1de26ae202a0d78527d163f4acbb11cde4c75c670f3a0fc064247"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.1.3"
-  flutter_secure_storage_platform_interface:
-    dependency: transitive
-    description:
-      name: flutter_secure_storage_platform_interface
-      sha256: cf91ad32ce5adef6fba4d736a542baca9daf3beac4db2d04be350b87f69ac4a8
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.2"
-  flutter_secure_storage_web:
-    dependency: transitive
-    description:
-      name: flutter_secure_storage_web
-      sha256: f4ebff989b4f07b2656fb16b47852c0aab9fed9b4ec1c70103368337bc1886a9
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.2.1"
-  flutter_secure_storage_windows:
-    dependency: transitive
-    description:
-      name: flutter_secure_storage_windows
-      sha256: "38f9501c7cb6f38961ef0e1eacacee2b2d4715c63cc83fe56449c4d3d0b47255"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.1.1"
   flutter_svg:
     dependency: "direct main"
     description:
@@ -520,14 +408,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.0"
-  hex:
-    dependency: transitive
-    description:
-      name: hex
-      sha256: "4e7cd54e4b59ba026432a6be2dd9d96e4c5205725194997193bf871703b82c4a"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.2.0"
   hooks:
     dependency: "direct dev"
     description:
@@ -600,14 +480,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.0"
-  js:
-    dependency: transitive
-    description:
-      name: js
-      sha256: f2c445dce49627136094980615a031419f7f3eb393237e4ecd97ac15dea343f3
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.6.7"
   json_annotation:
     dependency: transitive
     description:
@@ -656,46 +528,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.1.0"
-  local_auth:
-    dependency: transitive
-    description:
-      name: local_auth
-      sha256: "434d854cf478f17f12ab29a76a02b3067f86a63a6d6c4eb8fbfdcfe4879c1b7b"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.3.0"
-  local_auth_android:
-    dependency: transitive
-    description:
-      name: local_auth_android
-      sha256: a0bdfcc0607050a26ef5b31d6b4b254581c3d3ce3c1816ab4d4f4a9173e84467
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.56"
-  local_auth_darwin:
-    dependency: transitive
-    description:
-      name: local_auth_darwin
-      sha256: "699873970067a40ef2f2c09b4c72eb1cfef64224ef041b3df9fdc5c4c1f91f49"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.6.1"
-  local_auth_platform_interface:
-    dependency: transitive
-    description:
-      name: local_auth_platform_interface
-      sha256: f98b8e388588583d3f781f6806e4f4c9f9e189d898d27f0c249b93a1973dd122
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.0"
-  local_auth_windows:
-    dependency: transitive
-    description:
-      name: local_auth_windows
-      sha256: bc4e66a29b0fdf751aafbec923b5bed7ad6ed3614875d8151afe2578520b2ab5
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.11"
   logging:
     dependency: transitive
     description:
