@@ -230,6 +230,7 @@ class _LoginState extends State<Login> {
                             TextFormField(
                               initialValue: _username,
                               autofillHints: const [AutofillHints.username, AutofillHints.email],
+                              keyboardType: TextInputType.emailAddress,
                               decoration: InputDecoration(hintText: 'email'),
                               onChanged: (v) => setState(() => _username = v),
                               onFieldSubmitted: (_) => _seed(),
