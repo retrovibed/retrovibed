@@ -99,10 +99,10 @@ class _State extends State<Connect> with LoadingState {
   Widget? _focused;
   ValueNotifier<meta.Daemon> _endpoint = ValueNotifier(meta.Daemon());
 
-  StreamIterator<playqueue.PlayableMedia> _autoqueue = StreamIterator(const Stream.empty());
-  // serializes _fillQueue: sync echoes can arrive faster than a fill pass
-  // completes.
-  bool _filling = false;
+  playqueue.SafeStreamIterator<playqueue.PlayableMedia> _autoqueue = playqueue.SafeStreamIterator(
+    const Stream.empty(),
+  );
+
   // completed iff autoplay is switched on; reset to a fresh pending
   // Completer when switched off - and doubles as the flag itself, so there's
   // no separate bool to drift out of sync. lets the already-running
@@ -148,7 +148,7 @@ class _State extends State<Connect> with LoadingState {
         return () async {
           await _autoqueue.cancel();
           final anchor = playqueue.PlayQueue()..current.value = playqueue.PlayableMedia(current);
-          final queue = StreamIterator(
+          final queue = playqueue.SafeStreamIterator(
             playqueue.range(s.next, anchor, search: _apisearch, random: _apirandom),
           );
           setState(() {
@@ -162,40 +162,46 @@ class _State extends State<Connect> with LoadingState {
     }
   }
 
-  bool _casfilling(bool o) {
-    if (o) return o;
-    _filling = true;
-    return false;
-  }
-
   // tops the daemon's upcoming queue back up toward _autoqueueTarget by
   // pulling more results from _autoqueue - called after every tap and after
   // every sync that shows the daemon's queue has drained, which is what
   // makes this a long-lived queue rather than a one-shot burst.
-  // sync echoes can arrive faster than a fill pass completes (each queued
-  // item advancing the daemon triggers its own echo); a call that comes in
-  // while one's already running is just dropped - the next sync will
-  // trigger another pass anyway.
-  Future<void> _fillQueue(StreamIterator<playqueue.PlayableMedia> queue) async {
+  Future<void> _fillQueue(playqueue.SafeStreamIterator<playqueue.PlayableMedia> queue) async {
     final needed = widget.autoqueueTarget - _latest.sync.queue.length;
     if (needed <= 0) return;
-    if (_casfilling(_filling)) return;
-    try {
-      if (await queue.moveNext()) {
+    if (await queue.moveNext()) {
+      setState(() {
+        // _latest is often the sync message received straight off the
+        // socket - its nested queue list can come back read-only, and
+        // even copyWith's deep copy doesn't escape that for the nested
+        // oneof message. build fresh Sync/Stream messages via their
+        // normal factory constructors instead, which always produce a
+        // genuinely mutable queue list.
+        final sync = _latest.sync;
+        _latest = remote.Stream(
+          sid: _latest.sid,
+          sync: remote.Sync(
+            library: sync.library,
+            capacity: sync.capacity,
+            current: sync.current,
+            token: sync.token,
+            expiration: sync.expiration,
+            volume: sync.volume,
+            muted: sync.muted,
+            paused: sync.paused,
+            fullscreen: sync.fullscreen,
+            queue: [...sync.queue, queue.current.current],
+          ),
+        );
         _socket.send(remote.messages.queue(queue.current.current));
-        setState(() {
-          _latest.sync.queue.add(queue.current.current);
-        });
-      }
-    } finally {
-      _filling = false;
+      });
     }
   }
 
   void _onEndpointChanged() {
     _socket.close();
     _autoqueue.cancel();
-    _autoqueue = StreamIterator(const Stream.empty());
+    _autoqueue = playqueue.SafeStreamIterator(const Stream.empty());
     setState(() {
       _socket = remote.RemoteControlSocket.noop;
       _latest = remote.Stream(sid: uuidx.min());

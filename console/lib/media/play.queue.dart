@@ -8,6 +8,32 @@ import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'api.dart' as api;
 
+// StreamIterator.cancel() on an iterator whose stream never emitted any
+// item hangs a *later, unrelated* StreamIterator's moveNext() call under
+// flutter_test - see notes-streamiterator-cancel-bug.md at the repo root.
+// This wraps StreamIterator and skips the underlying cancel() unless at
+// least one item was actually emitted, sidestepping the poisoning while
+// behaving identically otherwise.
+class SafeStreamIterator<T> {
+  final StreamIterator<T> _it;
+  bool _hasData = false;
+
+  SafeStreamIterator(Stream<T> stream) : _it = StreamIterator(stream);
+
+  Future<bool> moveNext() async {
+    final has = await _it.moveNext();
+    if (has) _hasData = true;
+    return has;
+  }
+
+  T get current => _it.current;
+
+  Future<void> cancel() {
+    if (!_hasData) return Future.value();
+    return _it.cancel();
+  }
+}
+
 class RingBuffer<T> {
   final ListQueue<T> _queue;
   final int capacity;
