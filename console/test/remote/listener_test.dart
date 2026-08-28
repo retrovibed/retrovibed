@@ -495,6 +495,90 @@ void main() {
 
       expect(fake.queue.queued, isEmpty);
     });
+
+    // _echoSync reads the queue via an async token-cache lookup
+    // (AuthzCache.meta(context).auto()) whose latency is unbounded - if it
+    // reads queue.queued only once that lookup resolves rather than
+    // snapshotting it at the moment _echoSync was triggered, a second
+    // dequeue landing while the first echo is still waiting on the token
+    // makes the first echo report the queue as of the *second* dequeue
+    // instead of its own. Requires a real media.Playlist ancestor: the fake
+    // PlaylistControl used elsewhere in this group owns its own queue
+    // instance, separate from the one RemoteControlListener reads for sync.
+    testWidgets(
+      'a sync blocked on a slow token fetch still reports the queue as of its own trigger, not a later one',
+      (tester) async {
+        final fakeSocket = _FakeRemoteControlSocket();
+        final authCompleter = Completer<meta.AuthzResponse>();
+        // AuthzCache hides its child behind a loading placeholder until the
+        // very first current() call resolves, so that one has to succeed
+        // immediately (with an already-expired token, so every later auto()
+        // call is treated as stale and re-invokes current()) - every call
+        // after it shares the one pending completer below.
+        var authResolved = false;
+        Future<meta.AuthzResponse> delayedAuth({String? host}) {
+          if (!authResolved) {
+            authResolved = true;
+            return Future.value(
+              meta.AuthzResponse(bearer: "initial-bearer", token: meta.Token(expires: fixnum.Int64(0))),
+            );
+          }
+          return authCompleter.future;
+        }
+
+        late BuildContext capturedContext;
+
+        await tester.pumpApp(
+          authzCurrent: delayedAuth,
+          meta.EndpointAuto(
+            latest: mockLatest,
+            connectable: mockConnectable,
+            backoff: httpx.Backoff.constant(Duration.zero),
+            media.Playlist(
+              RemoteControlListener(
+                connect: ({List<httpx.Option> options = const []}) async => fakeSocket,
+                localDevice: () => meta.Daemon(hostname: "localhost:9998"),
+                Builder(
+                  builder: (context) {
+                    capturedContext = context;
+                    return const SizedBox();
+                  },
+                ),
+              ),
+            ),
+          ),
+        );
+        await _settle(tester);
+
+        final queue = media.Playlist.of(capturedContext)!.queue;
+        for (final id in ["m1", "m2", "m3", "m4", "m5"]) {
+          queue.push(playqueue.PlayableMedia(media.Media(id: id)));
+        }
+        await _settle(tester);
+
+        fakeSocket.emit(remote.Stream(sid: uuidx.v7(), dequeue: remote.Dequeue(id: "m1")));
+        await _settle(tester);
+        fakeSocket.emit(remote.Stream(sid: uuidx.v7(), dequeue: remote.Dequeue(id: "m2")));
+        await _settle(tester);
+
+        expect(fakeSocket.sent, isEmpty, reason: "every echo triggered so far is still waiting on the token fetch");
+
+        authCompleter.complete(
+          meta.AuthzResponse(
+            bearer: "test-bearer",
+            token: meta.Token(expires: fixnum.Int64((DateTime.now().millisecondsSinceEpoch ~/ 1000) + 3600)),
+          ),
+        );
+        await _settle(tester);
+
+        expect(
+          fakeSocket.sent.any((m) => m.whichCommand() == remote.Stream_Command.sync && m.sync.queue.length == 4),
+          isTrue,
+          reason: "the echo triggered by removing m1 (5 -> 4) must report 4, not whatever the queue has "
+              "dropped to (3) by the time the delayed token fetch resolves",
+        );
+      },
+    );
   });
 
   group('pause', () {
