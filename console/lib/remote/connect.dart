@@ -93,7 +93,6 @@ class _State extends State<Connect> with LoadingState {
       next: media.media.request(limit: 32, mimetypes: mimex.of(mimex.icoaudio)),
     ),
   );
-  final ValueNotifier<media.SearchMode> _mode = ValueNotifier(media.SearchMode.library);
   remote.RemoteControlSocket _socket = remote.RemoteControlSocket.noop;
   Stream<remote.Stream> _messages = Stream.empty();
   // nil-sid sentinel; unset oneof -> _latest.sync reads as a zero Sync.
