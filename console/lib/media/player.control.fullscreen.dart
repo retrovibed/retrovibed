@@ -8,12 +8,13 @@ class PlayerControlFullscreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final current = ds.Full.nochrome(context);
     return IconButton(
       onPressed: () => ds.Full.toggle(context),
       icon: Icon(
-        ds.Full.nochrome(context) ? Icons.fit_screen : Icons.crop_free,
+        current ? Icons.fit_screen : Icons.crop_free,
       ),
-      tooltip: ds.Full.nochrome(context) ? 'Exit Full Screen' : 'Full Screen',
+      tooltip: current ? 'Exit Full Screen' : 'Full Screen',
     );
   }
 }

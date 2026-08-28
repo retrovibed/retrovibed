@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/authn/login.dart' as login;
+import 'package:retrovibed/windowx.dart';
 
 class Hamburger extends StatefulWidget {
-  const Hamburger({super.key});
+  final WindowManagerX windowManager;
+  Hamburger({super.key, WindowManagerX? windowManager}) : windowManager = windowManager ?? windowx;
 
   @override
   State<Hamburger> createState() => _HamburgerState();
@@ -16,13 +18,15 @@ class _HamburgerState extends State<Hamburger> with WindowListener {
   @override
   void initState() {
     super.initState();
-    windowManager.addListener(this);
-    windowManager.isMaximized().then((v) => setState(() => _maximized = v));
+    widget.windowManager.addListener(this);
+    widget.windowManager.isMaximized().then((v) => setState(() => _maximized = v)).catchError((cause) {
+      print("failed to read initial maximized state ${cause}");
+    });
   }
 
   @override
   void dispose() {
-    windowManager.removeListener(this);
+    widget.windowManager.removeListener(this);
     super.dispose();
   }
 
@@ -51,7 +55,7 @@ class _HamburgerState extends State<Hamburger> with WindowListener {
                   Text(_maximized ? "Minimize" : "Maximize"),
                 ],
               ),
-              onTap: () => _maximized ? windowManager.unmaximize() : windowManager.maximize(),
+              onTap: () => _maximized ? widget.windowManager.unmaximize() : widget.windowManager.maximize(),
             ),
             PopupMenuItem(
               value: "help",
@@ -91,7 +95,7 @@ class _HamburgerState extends State<Hamburger> with WindowListener {
                   Text("Exit"),
                 ],
               ),
-              onTap: () => windowManager.close(),
+              onTap: () => widget.windowManager.close(),
             ),
           ],
     );

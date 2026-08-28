@@ -27,7 +27,18 @@ void _mockWindowManager() {
   TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
       .setMockMethodCallHandler(
     const MethodChannel('window_manager'),
-    (call) async => null,
+    (call) async {
+      switch (call.method) {
+        // waitUntilReadyToShow reads these as bool and casts the channel
+        // result directly - a null response (the default below) would throw.
+        case 'isFullScreen':
+        case 'isMaximized':
+        case 'isMinimized':
+          return false;
+        default:
+          return null;
+      }
+    },
   );
 }
 

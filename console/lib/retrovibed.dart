@@ -10,7 +10,8 @@ import 'package:retrovibed/caching.dart' as caching;
 import 'package:retrovibed/design.kit/theme.defaults.dart' as theming;
 import 'package:retrovibed/env.dart' as env;
 import 'package:retrovibed/meta.dart' as meta;
-import 'package:window_manager/window_manager.dart';
+import 'package:retrovibed/windowx.dart';
+import 'package:window_manager/window_manager.dart' show TitleBarStyle;
 
 File _defaultlib() {
   return File("libretrovibed.so");
@@ -226,10 +227,16 @@ Future<void> run(void Function() fn) async {
   checkpointdb();
   print("cp 5");
   if (theming.Defaults.defaults.desktop) {
-    await windowManager.ensureInitialized();
+    await windowx.ensureInitialized();
+    // waitUntilReadyToShow force-corrects isFullScreen/isMaximized/isMinimized
+    // to a known state before anything else reads them (see window_manager's
+    // own implementation) - without this, early reads of that state (e.g. in
+    // Full/Hamburger initState) can be unreliable, especially on Linux where
+    // isFullScreen reads live GDK window state that may not be settled yet.
+    await windowx.waitUntilReadyToShow();
     await Future.wait([
-      windowManager.setTitleBarStyle(TitleBarStyle.hidden),
-      windowManager.maximize(),
+      windowx.setTitleBarStyle(TitleBarStyle.hidden),
+      windowx.maximize(),
     ]);
   }
   print("cp 6");

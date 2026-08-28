@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:retrovibed/env.dart' as env;
+import 'package:retrovibed/windowx.dart';
 
 class Full extends StatefulWidget {
   final Widget? child;
-  const Full(this.child, {super.key});
+  final WindowManagerX windowManager;
+  Full(this.child, {super.key, WindowManagerX? windowManager}) : windowManager = windowManager ?? windowx;
 
   static _FullState? of(BuildContext context) {
     return context.findAncestorStateOfType<_FullState>();
@@ -24,7 +26,7 @@ class Full extends StatefulWidget {
   State<Full> createState() => _FullState();
 }
 
-class _FullState extends State<Full> {
+class _FullState extends State<Full> with WindowListener {
   bool chromeless = false;
 
   void toggle() {
@@ -35,7 +37,7 @@ class _FullState extends State<Full> {
       env.vars.WindowManagerNativeFullScreen,
       fallback: Platform.isLinux || Platform.isWindows || Platform.isMacOS,
     )) {
-      windowManager.setFullScreen(next).catchError((cause) {
+      widget.windowManager.setFullScreen(next).catchError((cause) {
         print("failed to toggle fullscreen mode ${next} ${cause}");
       });
     } else {
@@ -44,6 +46,34 @@ class _FullState extends State<Full> {
       );
     }
   }
+
+  @override
+  void initState() {
+    super.initState();
+    widget.windowManager.addListener(this);
+    widget.windowManager.isFullScreen().then((kFullscreen) {
+      setState(() {
+        chromeless = kFullscreen;
+      });
+    }).catchError((cause) {
+      print("failed to read initial fullscreen state ${cause}");
+    });
+  }
+
+  @override
+  void dispose() {
+    widget.windowManager.removeListener(this);
+    super.dispose();
+  }
+
+  // Keeps chromeless in sync with fullscreen changes that don't go through
+  // toggle() - an OS-level shortcut, another entry point, or a setFullScreen
+  // call above that failed silently (its catchError only logs).
+  @override
+  void onWindowEnterFullScreen() => setState(() => chromeless = true);
+
+  @override
+  void onWindowLeaveFullScreen() => setState(() => chromeless = false);
 
   @override
   Widget build(BuildContext context) {

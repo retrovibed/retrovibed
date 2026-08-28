@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show TextInput;
 import 'package:flutter/foundation.dart' as foundation;
-import 'package:window_manager/window_manager.dart';
+import 'package:retrovibed/windowx.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/design.kit/forms.dart' as forms;
 import 'package:retrovibed/retrovibed.dart' as retro;
@@ -15,15 +15,17 @@ class Login extends StatefulWidget {
   final String Function(String) seed;
   final bool Function() guest;
   final Future<void> Function() authenticated;
+  final WindowManagerX windowManager;
 
-  const Login(
+  Login(
     this.child, {
     super.key,
     this.publicKey = retro.public_key,
     this.seed = retro.seed,
     this.guest = retro.guest,
     this.authenticated = _noop,
-  });
+    WindowManagerX? windowManager,
+  }) : windowManager = windowManager ?? windowx;
 
   static Future<void> _noop() => Future.value();
 
@@ -212,7 +214,7 @@ class _LoginState extends State<Login> {
                               right: 0,
                               child: ds.LoadingIconButton.close(
                                 tooltip: "exit application",
-                                onPressed: windowManager.close,
+                                onPressed: widget.windowManager.close,
                               ),
                             ),
                           ],

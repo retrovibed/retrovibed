@@ -52,14 +52,14 @@ void main() {
 
   group('Hamburger rendering', () {
     testWidgets('renders menu icon', (WidgetTester tester) async {
-      await tester.pumpApp(const Hamburger());
+      await tester.pumpApp(Hamburger());
       await tester.pumpAndSettle();
       expect(find.byIcon(Icons.menu), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
     testWidgets('renders as PopupMenuButton', (WidgetTester tester) async {
-      await tester.pumpApp(const Hamburger());
+      await tester.pumpApp(Hamburger());
       await tester.pumpAndSettle();
       expect(find.byType(PopupMenuButton<String>), findsOneWidget);
       expect(tester.takeException(), isNull);
@@ -68,7 +68,7 @@ void main() {
 
   group('Hamburger menu items', () {
     testWidgets('shows three items when opened', (WidgetTester tester) async {
-      await tester.pumpApp(const Hamburger());
+      await tester.pumpApp(Hamburger());
       await tester.pumpAndSettle();
       await openMenu(tester);
 
@@ -79,7 +79,7 @@ void main() {
     });
 
     testWidgets('shows correct icons', (WidgetTester tester) async {
-      await tester.pumpApp(const Hamburger());
+      await tester.pumpApp(Hamburger());
       await tester.pumpAndSettle();
       await openMenu(tester);
 
@@ -91,7 +91,7 @@ void main() {
 
     testWidgets('shows Minimize when maximized', (WidgetTester tester) async {
       _maximized = true;
-      await tester.pumpApp(const Hamburger());
+      await tester.pumpApp(Hamburger());
       await tester.pumpAndSettle();
       await openMenu(tester);
 
@@ -105,7 +105,7 @@ void main() {
     testWidgets('maximize calls windowManager.maximize', (
       WidgetTester tester,
     ) async {
-      await tester.pumpApp(const Hamburger());
+      await tester.pumpApp(Hamburger());
       await tester.pumpAndSettle();
       _calls.clear();
       await openMenu(tester);
@@ -120,7 +120,7 @@ void main() {
       WidgetTester tester,
     ) async {
       _maximized = true;
-      await tester.pumpApp(const Hamburger());
+      await tester.pumpApp(Hamburger());
       await tester.pumpAndSettle();
       _calls.clear();
       await openMenu(tester);
@@ -134,7 +134,7 @@ void main() {
     testWidgets('exit calls windowManager.close', (
       WidgetTester tester,
     ) async {
-      await tester.pumpApp(const Hamburger());
+      await tester.pumpApp(Hamburger());
       await tester.pumpAndSettle();
       _calls.clear();
       await openMenu(tester);
