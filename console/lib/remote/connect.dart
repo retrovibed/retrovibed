@@ -193,7 +193,9 @@ class _State extends State<Connect> with LoadingState {
           _socket.send(remote.messages.queue(queue.current.current));
         });
 
-        ds.postframe(() => _fillQueue(_autoqueue));
+        if (needed > 1) {
+          ds.postframe(() => _socket.send(remote.messages.sync()));
+        }
       }
     } finally {
       _casfilling(-1);
