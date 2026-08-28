@@ -51,16 +51,6 @@ am icons retrovibed
 am update retrovibed
 ```
 
-#### install via flatpak
-
-generally not recommend at this time, requires flatpak-builder 1.4.2 or later to be installed.
-
-```bash
-flatpak remote-add --if-not-exists --user flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-curl -L -o space.retrovibe.Console.yml https://github.com/retrovibed/retrovibed/releases/latest/download/space.retrovibe.Console.yml
-flatpak-builder --user --install-deps-from=flathub --install --ccache --force-clean retrovibe space.retrovibe.Console.yml
-```
-
 #### install deb daemon
 
 ```bash
@@ -80,7 +70,7 @@ RETROVIBED_SELF_SIGNED_HOSTS=127.0.0.1
 EOF
 
 # generate an account. essentially used to create a static id for your account.
-retrovibed identity generate {secret}
+retrovibed identity generate '{username}:{password}'
 
 # authorize initial users using ssh keys. can be located by using `retrovibed identity show`
 retrovibed identity bootstrap public-key "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBEdpDo/fUPKK7OUuZ4VM6JeBJmyZ882tQYPBN6nQwIk"
@@ -95,8 +85,10 @@ systemctl enable --now retrovibed.service
 
 ```bash
 add-apt-repository ppa:jljatone/retrovibed
-apt-get update && apt-get install retrokiosk
+apt-get update && apt-get install retrovibed retrokiosk
 
+# bootstrap the device with your account
+retrovibed identity generate '{username}:{password}'
 reboot
 ```
 
