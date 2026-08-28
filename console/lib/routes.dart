@@ -100,7 +100,7 @@ class Routes extends StatelessWidget {
                 ),
                 modals.Node(
                   media.Playlist.wrap((ctx, s) {
-                    return remote.Connect(search: s.search, daemonDiscover: daemonDiscover);
+                    return remote.AutoConnect(search: s.search, daemonDiscover: daemonDiscover);
                   }),
                 ),
                 modals.Node(community.AutoHelp(community.Management())),

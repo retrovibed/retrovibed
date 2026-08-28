@@ -7,7 +7,10 @@ import 'api.dart' as remote;
 class PlaylistQueue extends StatelessWidget {
   final List<media.Media> queue;
   final remote.RemoteControlSocket socket;
-  const PlaylistQueue(this.queue, this.socket, {Key? key}) : super(key: key);
+  final void Function(media.Media queue) onChange;
+  const PlaylistQueue(this.queue, this.socket, {Key? key, this.onChange = _noop}) : super(key: key);
+
+  static void _noop(media.Media queue) {}
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +25,10 @@ class PlaylistQueue extends StatelessWidget {
               leading: const [Icon(Icons.queue_music)],
               trailing: [
                 ds.LoadingIconButton.delete(
-                  onPressed: () async => socket.send(remote.messages.dequeue(m.id)),
+                  onPressed: () async {
+                    socket.send(remote.messages.dequeue(m.id));
+                    onChange(m);
+                  },
                 ),
               ],
             ),

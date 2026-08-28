@@ -24,38 +24,69 @@ import 'playlist.queue.dart';
 // Public entrypoint: wraps _Connect in an authn.AuthedEndpoint so it can target a
 // user-selected remote daemon (via its DaemonDropdown) with a matching
 // scoped auth token, independent of the app-root EndpointAuto/AuthzCache.
-class Connect extends StatelessWidget {
+class AutoConnect extends StatelessWidget {
   final ValueNotifier<media.MediaSearchState> search;
   final Future<Stream<meta.Daemon>> Function({List<httpx.Option> options}) daemonDiscover;
   final Future<remote.RemoteControlSocket> Function({required String host, List<httpx.Option> options}) connect;
+  // endpoint factories for the remote daemon's search/random lookups,
+  // defaulting to the real hardwired HTTP endpoints - lets tests seed the
+  // autoqueue without a live network.
+  final media.FnMediaSearch Function(String host, List<httpx.Option> options) apisearch;
+  final media.FnMediaFind Function(String host, List<httpx.Option> options) apirandom;
+  // long-lived autoqueue: tapping a search result seeds this from the tapped
+  // item's search results, and _fillQueue tops it back up toward
+  // _autoqueueTarget every time the daemon echoes a sync showing its
+  // upcoming queue drained below that. Never null - starts as an empty
+  // stream (mirrors PlayQueue._stream) so _fillQueue needs no null check.
+  final int autoqueueTarget;
 
-  const Connect({
+  const AutoConnect({
     super.key,
     required this.search,
     this.daemonDiscover = meta.daemons.discover,
     this.connect = remote.remotecontrol.connect,
+    this.apisearch = media.media.searchendpoint,
+    this.apirandom = media.media.randomendpoint,
+    this.autoqueueTarget = 1,
   });
 
   @override
   Widget build(BuildContext context) {
     return authn.AuthedEndpoint(
-      _Connect(search: search, daemonDiscover: daemonDiscover, connect: connect),
+      Connect(
+        search: search,
+        daemonDiscover: daemonDiscover,
+        connect: connect,
+        apisearch: apisearch,
+        apirandom: apirandom,
+        autoqueueTarget: autoqueueTarget,
+      ),
     );
   }
 }
 
-class _Connect extends StatefulWidget {
+class Connect extends StatefulWidget {
   final ValueNotifier<media.MediaSearchState> search;
   final Future<Stream<meta.Daemon>> Function({List<httpx.Option> options}) daemonDiscover;
   final Future<remote.RemoteControlSocket> Function({required String host, List<httpx.Option> options}) connect;
+  final media.FnMediaSearch Function(String host, List<httpx.Option> options) apisearch;
+  final media.FnMediaFind Function(String host, List<httpx.Option> options) apirandom;
+  final int autoqueueTarget;
 
-  const _Connect({required this.search, required this.daemonDiscover, required this.connect});
+  const Connect({
+    required this.search,
+    required this.daemonDiscover,
+    required this.connect,
+    required this.apisearch,
+    required this.apirandom,
+    this.autoqueueTarget = 1,
+  });
 
   @override
-  State<_Connect> createState() => _State();
+  State<Connect> createState() => _State();
 }
 
-class _State extends State<_Connect> with LoadingState {
+class _State extends State<Connect> with LoadingState {
   remote.RemoteControlSocket _socket = remote.RemoteControlSocket.noop;
   Stream<remote.Stream> _messages = Stream.empty();
   // nil-sid sentinel; unset oneof -> _latest.sync reads as a zero Sync.
@@ -68,16 +99,26 @@ class _State extends State<_Connect> with LoadingState {
   Widget? _focused;
   ValueNotifier<meta.Daemon> _endpoint = ValueNotifier(meta.Daemon());
 
-  // long-lived autoqueue: tapping a search result seeds this from the tapped
-  // item's search results, and _fillQueue tops it back up toward
-  // _autoqueueTarget every time the daemon echoes a sync showing its
-  // upcoming queue drained below that. Never null - starts as an empty
-  // stream (mirrors PlayQueue._stream) so _fillQueue needs no null check.
-  static const int _autoqueueTarget = 5;
   StreamIterator<playqueue.PlayableMedia> _autoqueue = StreamIterator(const Stream.empty());
   // serializes _fillQueue: sync echoes can arrive faster than a fill pass
   // completes.
   bool _filling = false;
+  // completed iff autoplay is switched on; reset to a fresh pending
+  // Completer when switched off - and doubles as the flag itself, so there's
+  // no separate bool to drift out of sync. lets the already-running
+  // _apirandom call (inside range()'s while(true) loop) just wait on this
+  // instead of erroring/polling - the next toggle wakes it straight back up.
+  Completer<void> _autoplay = Completer<void>();
+
+  void _casautoplay(bool enabled) {
+    setState(() {
+      if (enabled) {
+        _autoplay.complete();
+      } else {
+        _autoplay = Completer<void>();
+      }
+    });
+  }
 
   // temporary hack fix until we fix the listener (and its deployed).
   // problem was when the device was serving its own content it sent localhost
@@ -91,8 +132,11 @@ class _State extends State<_Connect> with LoadingState {
   // daemon/hostname/token is current, whether read from build() or later
   // from _onPlay/_fillQueue.
   List<httpx.Option> get _bearerOptions => [httpx.Request.bearer(() => Future.value(_latest.sync.token))];
-  media.FnMediaSearch get _apisearch => media.media.searchendpoint(_hostname, _bearerOptions);
-  media.FnMediaFind get _apirandom => media.media.randomendpoint(_hostname, _bearerOptions);
+  media.FnMediaSearch get _apisearch => widget.apisearch(_hostname, _bearerOptions);
+  media.FnMediaFind get _apirandom => (req, {List<httpx.Option> options = const []}) async {
+    if (!_autoplay.isCompleted) await _autoplay.future;
+    return widget.apirandom(_hostname, _bearerOptions)(req, options: options);
+  };
 
   // Mirrors media.PlayAction's shape but queues the media on the connected
   // remote daemon's playlist instead of this device's local Playlist, since
@@ -104,12 +148,13 @@ class _State extends State<_Connect> with LoadingState {
         return () async {
           await _autoqueue.cancel();
           final anchor = playqueue.PlayQueue()..current.value = playqueue.PlayableMedia(current);
+          final queue = StreamIterator(
+            playqueue.range(s.next, anchor, search: _apisearch, random: _apirandom),
+          );
           setState(() {
-            _autoqueue = StreamIterator(
-              playqueue.range(s.next, anchor, search: _apisearch, random: _apirandom),
-            );
+            _autoqueue = queue;
           });
-          await _fillQueue();
+          await _fillQueue(queue);
           setState(() => _focused = null);
         };
       default:
@@ -131,18 +176,16 @@ class _State extends State<_Connect> with LoadingState {
   // item advancing the daemon triggers its own echo); a call that comes in
   // while one's already running is just dropped - the next sync will
   // trigger another pass anyway.
-  Future<void> _fillQueue() async {
-    // cache the queue while filling so a later _onPlay's new _autoqueue
-    // doesn't get spliced into an in-flight pass - _socket is read fresh at
-    // send time instead since it can be swapped/closed independently (e.g.
-    // by _onEndpointChanged) partway through a pass.
-    final needed = _autoqueueTarget - _latest.sync.queue.length;
-    final queue = _autoqueue;
+  Future<void> _fillQueue(StreamIterator<playqueue.PlayableMedia> queue) async {
+    final needed = widget.autoqueueTarget - _latest.sync.queue.length;
     if (needed <= 0) return;
     if (_casfilling(_filling)) return;
     try {
-      for (var sent = 0; sent < needed && await queue.moveNext(); sent++) {
+      if (await queue.moveNext()) {
         _socket.send(remote.messages.queue(queue.current.current));
+        setState(() {
+          _latest.sync.queue.add(queue.current.current);
+        });
       }
     } finally {
       _filling = false;
@@ -205,13 +248,15 @@ class _State extends State<_Connect> with LoadingState {
             _messages = socket.messages.asBroadcastStream();
             _messages.listen(
               (msg) {
-                print("derp derp ${msg}");
+                // print("sync ${msg.sid}");
                 if (msg.whichCommand() != remote.Stream_Command.sync) return;
+                print("sync received ${msg.sid}");
                 if (msg.sid.compareTo(_latest.sid) <= 0) return;
+                print("sync accepted ${msg.sid}");
                 setState(() {
                   _latest = msg;
                 });
-                _fillQueue();
+                _fillQueue(_autoqueue);
               },
               cancelOnError: true,
               onError: c.completeError,
@@ -289,7 +334,14 @@ class _State extends State<_Connect> with LoadingState {
       onPlay: _onPlay,
       apisearch: _apisearch,
     );
-    final queue = PlaylistQueue(_latest.sync.queue, _socket, key: const ValueKey("queue"));
+    final queue = PlaylistQueue(
+      _latest.sync.queue,
+      _socket,
+      key: const ValueKey("queue"),
+      onChange: (q) => setState(() {
+        _latest.sync.queue.remove(q);
+      }),
+    );
     return ds.Shortcuts(
       bindings: {
         const SingleActivator(LogicalKeyboardKey.audioVolumeUp): (
@@ -350,6 +402,19 @@ class _State extends State<_Connect> with LoadingState {
                             alignment: WrapAlignment.center,
                             spacing: defaults.spacing,
                             children: [
+                              ds.LoadingIconButton(
+                                icon: Icon(Icons.graphic_eq),
+                                toggled: _autoplay.isCompleted,
+                                onPressed: ds.LoadingIconButton.convert(() {
+                                  _casautoplay(!_autoplay.isCompleted);
+                                }),
+                                tooltip: "enable autoqueue playback",
+                                help: ds.Hint(
+                                  const Text(
+                                    "when the user has not queued any results, it will automatically queue up random content",
+                                  ),
+                                ),
+                              ),
                               PlayerControlSeek.prev(socket: _socket),
                               PlayerControlSeek.backward(socket: _socket),
                               PlayerControlPlayPause(socket: _socket, paused: _latest.sync.paused),
