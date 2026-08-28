@@ -98,12 +98,12 @@ func CompileIOSBinding(ctx context.Context, _ eg.Op) error {
 		ctx,
 		runtime.New("mkdir -p ${RETROVIBED_SHARED_NATIVE_LIBS_DIRECTORY}"),
 		runtime.New("go -C retrovibedbind build -trimpath -buildmode=c-archive --tags duckdb_use_static_lib,retrovibed,neural -o ${RETROVIBED_SHARED_NATIVE_LIBS_DIRECTORY}/libretrovibed.a ./...").
+			Timeout(egenv.TTL()).
 			Environ("GOOS", "ios").
 			Environ("GOARCH", "arm64").
 			Environ("CGO_ENABLED", "1").
 			Environ("CGO_CFLAGS", cflags).
-			Environ("CGO_LDFLAGS", ldflags).
-			Timeout(30*time.Minute),
+			Environ("CGO_LDFLAGS", ldflags),
 	)
 }
 

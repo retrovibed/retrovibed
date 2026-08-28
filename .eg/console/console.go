@@ -63,6 +63,7 @@ func GenerateDevBinding(runtime shell.Command, outdir string, staticdirs ...stri
 		return shell.Run(
 			ctx,
 			runtime.New("go -C retrovibedbind build -buildmode=c-shared -buildvcs=true --tags duckdb_use_lib,localdev,retrovibed,neural -o ${OUTDIR}/libretrovibed.so ./...").
+				Timeout(egenv.TTL()).
 				Environ("OUTDIR", outdir).
 				Environ("CGO_LDFLAGS", strings.TrimSpace(cgoFlags.String())),
 			runtime.New("dart run ffigen --config ffigen.yaml"),
