@@ -11,13 +11,11 @@ class AuthzMetaDisplay extends StatelessWidget {
   const AuthzMetaDisplay(this.token, {super.key});
 
   static Widget current() {
-    return Builder(
-      builder: (context) {
-        return AuthzMetaDisplay(
-          authn.AuthzCache.of(context).meta.current.token,
-        );
-      },
-    );
+    return ds.build((context) {
+      return AuthzMetaDisplay(
+        authn.AuthzCache.of(context).meta.current.token,
+      );
+    });
   }
 
   static FutureBuilder<meta.Token> future(Future<meta.Token> pending) {

@@ -65,39 +65,47 @@ class _CurrentState extends State<Current> {
 
   @override
   Widget build(BuildContext context) {
+    final defaults = ds.Defaults.of(context);
     return forms.Container(
-      padding: EdgeInsets.symmetric(horizontal: 10),
+      padding: defaults.padding,
       cause: _cause,
       loading: _loading,
       Column(
         mainAxisSize: MainAxisSize.min,
+        spacing: defaults.spacing,
         children: [
-          forms.Field(label: Text("id"), input: Text(current.account.id)),
+          forms.Field(
+            label: Text("id"),
+            input: Text(current.account.id),
+            trailing: [
+              if (authn.developer(context).subscription)
+                ds.LoadingIconButton(
+                  icon: Icon(Icons.public),
+                  tooltip: "open web console with this account",
+                  onPressed: () async {
+                    httpx
+                        .withRetry(
+                          () => authn.otp(options: [authn.DeeppoolAuthzCache.bearer(context)]),
+                        )
+                        .then((r) {
+                          final Uri q = Uri.https(httpx.consoleendpoint(), "/", {
+                            "lt": r.token,
+                          });
+                          launchUrl(q);
+                        })
+                        .catchError((cause) {
+                          setState(() {
+                            _cause = ds.Error.unknown(cause, onTap: refresh);
+                          });
+                        });
+                  },
+                ),
+            ],
+          ),
           forms.Field(
             label: Text("name"),
             input: Text(current.account.description),
           ),
-          if (authn.developer(context).subscription)
-            TextButton(
-              child: Text("open web console"),
-              onPressed: () {
-                httpx
-                    .withRetry(
-                      () => authn.otp(options: [authn.DeeppoolAuthzCache.bearer(context)]),
-                    )
-                    .then((r) {
-                      final Uri q = Uri.https(httpx.consoleendpoint(), "/", {
-                        "lt": r.token,
-                      });
-                      launchUrl(q);
-                    })
-                    .catchError((cause) {
-                      setState(() {
-                        _cause = ds.Error.unknown(cause, onTap: refresh);
-                      });
-                    });
-              },
-            ),
         ],
       ),
     );

@@ -10,15 +10,17 @@ class Overview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
-    return Column(
-      mainAxisSize: MainAxisSize.max,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      spacing: defaults.spacing,
-      children: [
-        ds.Card(Current()),
-        ds.Card(AuthzMetaDisplay.current()),
-        ds.Card(const AuthzDeeppool()),
-      ],
+    return ds.Container(
+      Column(
+        mainAxisSize: MainAxisSize.max,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        spacing: defaults.spacing,
+        children: [
+          Current(),
+          AuthzMetaDisplay.current(),
+          // const AuthzDeeppool(),
+        ],
+      ),
     );
   }
 }
