@@ -63,28 +63,27 @@ class _State extends State<RemoteControlListener> {
     final queue = _queue;
     final library = _library.value;
     library..hostname = meta.daemons.isLocalDevice(library) ? widget.localDevice().hostname : library.hostname;
+    final msg = remote.messages.sync(
+      library: library,
+      capacity: queue.capacity,
+      current: queue.current.value?.current,
+      queue: queue.queued.map((m) => m.current).toList(),
+      volume: _playlistControl.volume.value,
+      muted: _muted,
+      paused: !_playlistControl.playing.value,
+      fullscreen: ds.Full.nochrome(context),
+      vid: fixnum.Int64(++_vid),
+    );
     final cached = authn.AuthzCache.meta(context);
     // forces a refresh if expired, so token is never blank
     return cached.auto().then((bearer) {
       if (!mounted) return;
-      final sync = remote.messages.sync(
-        library: library,
-        token: httpx.bearer(bearer.bearer),
-        expiration: bearer.token.expires,
-        capacity: queue.capacity,
-        current: queue.current.value?.current,
-        queue: queue.queued.map((m) => m.current).toList(),
-        volume: _playlistControl.volume.value,
-        muted: _muted,
-        paused: !_playlistControl.playing.value,
-        fullscreen: ds.Full.nochrome(context),
-        vid: fixnum.Int64(++_vid),
-      );
-      _socket.send(
-        sync,
-      );
+      msg.sync
+        ..token = httpx.bearer(bearer.bearer)
+        ..expiration = bearer.token.expires;
+      _socket.send(msg);
       setState(() {
-        _sid = sync.sid;
+        _sid = msg.sid;
       });
     });
   }

@@ -23,7 +23,7 @@ class PlaylistQueue extends StatelessWidget {
               media: m,
               leading: const [Icon(Icons.queue_music)],
               trailing: [
-                ds.LoadingIconButton.delete(
+                ds.LoadingIconButton.remove(
                   onPressed: () async {
                     onChange(remote.syncmut.dequeue(m));
                     socket.send(remote.messages.dequeue(m.id));
