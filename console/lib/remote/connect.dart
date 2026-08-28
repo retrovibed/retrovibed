@@ -103,6 +103,9 @@ class _State extends State<Connect> with LoadingState {
   playqueue.SafeStreamIterator<playqueue.PlayableMedia> _autoqueue = playqueue.SafeStreamIterator(
     const Stream.empty(),
   );
+  // serializes _fillQueue: sync echoes can arrive faster than a fill pass
+  // completes.
+  int _filling = 0;
 
   // completed iff autoplay is switched on; reset to a fresh pending
   // Completer when switched off - and doubles as the flag itself, so there's
@@ -163,20 +166,37 @@ class _State extends State<Connect> with LoadingState {
     }
   }
 
+  bool _casfilling(int o) {
+    final ret = _filling > 0;
+    _filling += o;
+    return ret;
+  }
+
   // tops the daemon's upcoming queue back up toward _autoqueueTarget by
   // pulling more results from _autoqueue - called after every tap and after
   // every sync that shows the daemon's queue has drained, which is what
   // makes this a long-lived queue rather than a one-shot burst.
+  // sync echoes can arrive faster than a fill pass completes (each queued
+  // item advancing the daemon triggers its own echo); a call that comes in
+  // while one's already running is just dropped - the next sync will
+  // trigger another pass anyway.
   Future<void> _fillQueue(playqueue.SafeStreamIterator<playqueue.PlayableMedia> queue) async {
     final needed = widget.autoqueueTarget - _latest.sync.queue.length;
     if (needed <= 0) return;
-    if (await queue.moveNext()) {
-      final mut = remote.syncmut.queue(queue.current.current);
-      final update = _latest.deepCopy()..sync = mut(_latest.sync.deepCopy());
-      setState(() {
-        _latest = update;
-        _socket.send(remote.messages.queue(queue.current.current));
-      });
+    try {
+      if (_casfilling(1)) return;
+      if (await queue.moveNext()) {
+        final mut = remote.syncmut.queue(queue.current.current);
+        final update = _latest.deepCopy()..sync = mut(_latest.sync.deepCopy());
+        setState(() {
+          _latest = update;
+          _socket.send(remote.messages.queue(queue.current.current));
+        });
+
+        ds.postframe(() => _fillQueue(_autoqueue));
+      }
+    } finally {
+      _casfilling(-1);
     }
   }
 
