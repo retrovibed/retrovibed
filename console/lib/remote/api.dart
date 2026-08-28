@@ -74,6 +74,22 @@ class _WebSocketRemoteControlSocket implements RemoteControlSocket {
   Future<void> close() => _socket.close();
 }
 
+abstract class syncmut {
+  static rc.Sync Function(rc.Sync) queue(media.Media m) {
+    return (v) {
+      v.queue.add(m);
+      return v;
+    };
+  }
+
+  static rc.Sync Function(rc.Sync) dequeue(media.Media m) {
+    return (v) {
+      v.queue.remove(m);
+      return v;
+    };
+  }
+}
+
 abstract class messages {
   static rc.Stream queue(media.Media m) {
     return rc.Stream(

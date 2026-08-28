@@ -1,24 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
-import 'package:retrovibed/media/media.pb.dart' as media;
 import 'package:retrovibed/media/media.row.display.dart' as rowdisplay;
 import 'api.dart' as remote;
 
 class PlaylistQueue extends StatelessWidget {
-  final List<media.Media> queue;
+  final remote.Sync current;
   final remote.RemoteControlSocket socket;
-  final void Function(media.Media queue) onChange;
-  const PlaylistQueue(this.queue, this.socket, {Key? key, this.onChange = _noop}) : super(key: key);
+  final void Function(remote.Sync Function(remote.Sync c) mutated) onChange;
+  const PlaylistQueue(this.current, this.socket, {Key? key, this.onChange = _noop}) : super(key: key);
 
-  static void _noop(media.Media queue) {}
+  static void _noop(remote.Sync Function(remote.Sync q) mutated) {}
 
   @override
   Widget build(BuildContext context) {
-    if (queue.isEmpty) return const SizedBox.shrink();
+    if (current.queue.isEmpty) return const SizedBox.shrink();
     final defaults = ds.Defaults.of(context);
     return Column(
       verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
-      children: queue
+      children: current.queue
           .map(
             (m) => rowdisplay.RowDisplay(
               media: m,
@@ -26,8 +25,8 @@ class PlaylistQueue extends StatelessWidget {
               trailing: [
                 ds.LoadingIconButton.delete(
                   onPressed: () async {
+                    onChange(remote.syncmut.dequeue(m));
                     socket.send(remote.messages.dequeue(m.id));
-                    onChange(m);
                   },
                 ),
               ],

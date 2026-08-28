@@ -47,7 +47,7 @@ class AutoConnect extends StatelessWidget {
     this.connect = remote.remotecontrol.connect,
     this.apisearch = media.media.searchendpoint,
     this.apirandom = media.media.randomendpoint,
-    this.autoqueueTarget = 1,
+    this.autoqueueTarget = Connect._autoqueueTargetDefault,
   });
 
   @override
@@ -66,6 +66,7 @@ class AutoConnect extends StatelessWidget {
 }
 
 class Connect extends StatefulWidget {
+  static const _autoqueueTargetDefault = 5;
   final ValueNotifier<media.MediaSearchState> search;
   final Future<Stream<meta.Daemon>> Function({List<httpx.Option> options}) daemonDiscover;
   final Future<remote.RemoteControlSocket> Function({required String host, List<httpx.Option> options}) connect;
@@ -79,7 +80,7 @@ class Connect extends StatefulWidget {
     required this.connect,
     required this.apisearch,
     required this.apirandom,
-    this.autoqueueTarget = 1,
+    this.autoqueueTarget = _autoqueueTargetDefault,
   });
 
   @override
@@ -170,30 +171,10 @@ class _State extends State<Connect> with LoadingState {
     final needed = widget.autoqueueTarget - _latest.sync.queue.length;
     if (needed <= 0) return;
     if (await queue.moveNext()) {
+      final mut = remote.syncmut.queue(queue.current.current);
+      final update = _latest.deepCopy()..sync = mut(_latest.sync.deepCopy());
       setState(() {
-        // _latest is often the sync message received straight off the
-        // socket - its nested queue list can come back read-only, and
-        // even copyWith's deep copy doesn't escape that for the nested
-        // oneof message. build fresh Sync/Stream messages via their
-        // normal factory constructors instead, which always produce a
-        // genuinely mutable queue list.
-        final sync = _latest.sync;
-        _latest = remote.Stream(
-          sid: _latest.sid,
-          vid: _latest.vid,
-          sync: remote.Sync(
-            library: sync.library,
-            capacity: sync.capacity,
-            current: sync.current,
-            token: sync.token,
-            expiration: sync.expiration,
-            volume: sync.volume,
-            muted: sync.muted,
-            paused: sync.paused,
-            fullscreen: sync.fullscreen,
-            queue: [...sync.queue, queue.current.current],
-          ),
-        );
+        _latest = update;
         _socket.send(remote.messages.queue(queue.current.current));
       });
     }
@@ -206,7 +187,7 @@ class _State extends State<Connect> with LoadingState {
     setState(() {
       _socket = remote.RemoteControlSocket.noop;
       _latest = remote.Stream(sid: uuidx.min());
-      _focused = PlaylistQueue(<media.Media>[], remote.RemoteControlSocket.noop, key: const ValueKey("queue"));
+      _focused = PlaylistQueue(_latest.sync, remote.RemoteControlSocket.noop, key: const ValueKey("queue"));
     });
 
     _connect();
@@ -262,7 +243,7 @@ class _State extends State<Connect> with LoadingState {
                 // whose ordering isn't guaranteed for two ids minted within
                 // the same millisecond.
                 if (msg.vid <= _latest.vid) return;
-                print("sync accepted ${msg.sid}");
+                print("sync accepted ${msg.sid} ${msg.sync.queue.length}");
                 setState(() {
                   _latest = msg;
                 });
@@ -322,6 +303,7 @@ class _State extends State<Connect> with LoadingState {
   @override
   void initState() {
     super.initState();
+    _autoplay.complete(); // enable autoplay by default.
     _endpoint = authn.AuthedEndpoint.daemon(context);
     _endpoint.addListener(_onEndpointChanged);
     ds.postframe(_connect);
@@ -345,12 +327,15 @@ class _State extends State<Connect> with LoadingState {
       apisearch: _apisearch,
     );
     final queue = PlaylistQueue(
-      _latest.sync.queue,
+      _latest.sync,
       _socket,
       key: const ValueKey("queue"),
-      onChange: (q) => setState(() {
-        _latest.sync.queue.remove(q);
-      }),
+      onChange: (mut) {
+        final upd = _latest.deepCopy()..sync = mut(_latest.sync.deepCopy());
+        setState(() {
+          _latest = upd;
+        });
+      },
     );
     return ds.Shortcuts(
       bindings: {

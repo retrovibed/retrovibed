@@ -130,7 +130,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('autoqueue toggle starts off and uses a distinct icon from search', (tester) async {
+  testWidgets('autoqueue toggle starts on and uses a distinct icon from search', (tester) async {
     final socket = _FakeRemoteControlSocket();
 
     final daemon = ValueNotifier(meta.Daemon());
@@ -165,7 +165,7 @@ void main() {
       find.byWidgetPredicate((w) => w is ds.LoadingIconButton && w.tooltip == "search the remote device's library"),
     );
 
-    expect(queueButton.toggled, isFalse);
+    expect(queueButton.toggled, isTrue);
     expect((queueButton.icon as Icon).icon, isNot((searchButton.icon as Icon).icon));
     expect(tester.takeException(), isNull);
   });
@@ -201,15 +201,15 @@ void main() {
       (w) => w is ds.LoadingIconButton && w.tooltip == "enable autoqueue playback",
     );
 
-    expect(tester.widget<ds.LoadingIconButton>(queueButtonFinder).toggled, isFalse);
-
-    await tester.tap(queueButtonFinder);
-    await tester.pumpN(2);
     expect(tester.widget<ds.LoadingIconButton>(queueButtonFinder).toggled, isTrue);
 
     await tester.tap(queueButtonFinder);
     await tester.pumpN(2);
     expect(tester.widget<ds.LoadingIconButton>(queueButtonFinder).toggled, isFalse);
+
+    await tester.tap(queueButtonFinder);
+    await tester.pumpN(2);
+    expect(tester.widget<ds.LoadingIconButton>(queueButtonFinder).toggled, isTrue);
 
     expect(tester.takeException(), isNull);
   });
@@ -250,10 +250,16 @@ void main() {
     await tester.tap(find.byIcon(Icons.close));
     await tester.pumpN(2);
 
-    await tester.tap(
-      find.byWidgetPredicate((w) => w is ds.LoadingIconButton && w.tooltip == "enable autoqueue playback"),
+    // autoqueue is enabled by default (see initState) - no need to tap the
+    // toggle here, just confirm unmounting while it's on doesn't throw.
+    expect(
+      tester
+          .widget<ds.LoadingIconButton>(
+            find.byWidgetPredicate((w) => w is ds.LoadingIconButton && w.tooltip == "enable autoqueue playback"),
+          )
+          .toggled,
+      isTrue,
     );
-    await tester.pumpN(2);
 
     setLocalState(() => visible = false);
     await tester.pump();
