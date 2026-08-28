@@ -12,15 +12,24 @@
 // searchplugin.SearchPluginDir) to have Registry load and run it. A build
 // can also bake a default --source tag in at compile time via
 // `-ldflags "-X main.source=mysite"` (see the source var below).
+//
+// Two kong subcommands are exposed: "plugin", the only one
+// searchplugin.Registry ever invokes, and "recommendations", a second
+// worked example showing the same *ddiscapi.Import output shape used for
+// content a plugin recommends independent of any search query. Registry
+// has no contract for "recommendations" today - it's here purely to
+// demonstrate the shape a second plugin command could take.
 package main
 
 import (
+	"context"
 	"encoding/json"
-	"flag"
 	"fmt"
 	"os"
-	"strings"
+	"os/signal"
+	"syscall"
 
+	"github.com/alecthomas/kong"
 	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 
@@ -49,90 +58,120 @@ import (
 // CACHE_DIRECTORY. This noop plugin needs neither and doesn't read them, but
 // a real plugin typically does.
 
-// mimetypeFlag collects every --mimetype occurrence into a slice, since a
-// search request can carry several candidate discovery mimetypes (see
-// ddisc.Category) and stdlib flag has no built-in repeatable-flag type.
-type mimetypeFlag []string
-
-func (m *mimetypeFlag) String() string { return strings.Join(*m, ",") }
-func (m *mimetypeFlag) Set(v string) error {
-	*m = append(*m, v)
-	return nil
-}
-
 // source is this build's default provenance tag, baked in via
 // `go build -ldflags "-X main.source=mysite"`. This is the general pattern
 // for values a specific deployment of a plugin needs but that can't be a
 // literal constant in shared source - a site identifier, a default
 // category, an embedded API key. Blank (unconfigured) by default; a
 // --source flag at runtime still overrides whatever was baked in, same as
-// any other flag default.
+// any other kong default.
 var source = ""
 
-func main() {
-	// Registry.Search invokes every plugin as exactly:
-	//   <binary> plugin --mimetype <m> [--mimetype <m> ...] --query <query> [--adult]
-	// --adult is only ever present when the caller allows adult content -
-	// never passed as --adult=false - so a plugin that predates this flag
-	// keeps working for ordinary searches. argv[0] is the conventional
-	// program-name slot, discarded like any
-	// CLI; argv[1] is always the literal subcommand "plugin" (the registry
-	// has no other entrypoint), so flag parsing starts at argv[2:] rather
-	// than argv[1:] - a plugin that flag.Parse(os.Args[1:]) instead will
-	// see "plugin" as its first non-flag argument and stop parsing before
-	// it ever reaches --mimetype/--query.
-	if len(os.Args) < 2 || os.Args[1] != "plugin" {
-		fmt.Fprintln(os.Stderr, "searchplugin-noop: expected a \"plugin\" subcommand")
-		os.Exit(1)
-	}
+// cli is parsed straight from argv[1:] by kong.Parse. Registry.Search
+// always invokes a loaded plugin as exactly:
+//
+//	<binary> plugin --mimetype <m> [--mimetype <m> ...] --query <query> [--adult]
+//
+// (see retroapi/searchplugin/search.go's runSearchJob) - argv[1] is
+// literally the subcommand name "plugin", which kong resolves the same way
+// it resolves "recommendations" below. Unlike retrodscrape's real plugins
+// (unit3d, leetx, piratebay), this example has no separate bare-argument
+// dev mode to preserve alongside that contract, so there's no need to
+// hand-parse os.Args before handing off to kong.
+var cli struct {
+	Plugin          pluginCmd          `cmd:"" help:"invoked by searchplugin.Registry to run a search"`
+	Recommendations recommendationsCmd `cmd:"" help:"emit recommended content, independent of any search query"`
+}
 
-	fs := flag.NewFlagSet("plugin", flag.ExitOnError)
-	var mimetypes mimetypeFlag
-	fs.Var(&mimetypes, "mimetype", "discovery mimetype to search within (repeatable)")
-	query := fs.String("query", "", "search text to query")
-	sourceFlag := fs.String("source", source, "provenance tag for every result (bakeable via -ldflags -X main.source=...)")
-	fs.Bool("adult", false, "allow adult content in results (Registry passes this whenever the caller allows it)")
-	if err := fs.Parse(os.Args[2:]); err != nil {
-		fmt.Fprintln(os.Stderr, "searchplugin-noop:", err)
-		os.Exit(1)
-	}
+// pluginCmd's flags match Registry's invocation 1:1: repeatable --mimetype,
+// required --query, and --adult only ever appended when true (Registry
+// never passes --adult=false), so a plugin predating this flag still works
+// for ordinary searches.
+type pluginCmd struct {
+	Mimetype []string `flag:"" name:"mimetype" help:"discovery mimetype to search within (repeatable)"`
+	Query    string   `flag:"" name:"query" help:"search text to query" required:""`
+	Source   string   `flag:"" name:"source" help:"provenance tag for every result (bakeable via -ldflags -X main.source=...)" default:"${source}"`
+	Adult    bool     `flag:"" name:"adult" help:"allow adult content in results (Registry passes this whenever the caller allows it)"`
+}
 
-	if *query == "" {
-		fmt.Fprintln(os.Stderr, "searchplugin-noop: --query is required")
-		os.Exit(1)
-	}
-
-	// Registry.Search only parses stdout, so the mounted directories are
-	// reported on stderr - proof, when reading plugin logs, that the mounts
-	// and env vars described above actually reach the guest.
+// Run reports the mounted directories on stderr - proof, when reading
+// plugin logs, that the mounts and env vars documented above actually
+// reach the guest - then fabricates a single deterministic result, just to
+// prove the rest of the contract end to end. A real plugin fetches results
+// here instead, via net/http reaching the real network through the
+// autohijack wiring above, emitting one *ddiscapi.Import per result found.
+//
+// Registry.Search reads stdout as newline-delimited JSON, one
+// *ddiscapi.Import per line; anything written to stderr is logged, not
+// parsed. A plugin emitting many results should reuse a single
+// json.Encoder/writer across all of them rather than reopening one per
+// result.
+func (cmd *pluginCmd) Run(ctx context.Context) error {
 	fmt.Fprintln(os.Stderr, "searchplugin-noop: CONFIGURATION_DIRECTORY =", os.Getenv("CONFIGURATION_DIRECTORY"))
 	fmt.Fprintln(os.Stderr, "searchplugin-noop: CACHE_DIRECTORY =", os.Getenv("CACHE_DIRECTORY"))
 
 	var mimetype string
-	if len(mimetypes) > 0 {
-		mimetype = mimetypes[0]
+	if len(cmd.Mimetype) > 0 {
+		mimetype = cmd.Mimetype[0]
 	}
 
-	// A real plugin fetches results here - via net/http, reaching the real
-	// network through the autohijack wiring above - and emits one
-	// *ddiscapi.Import per result found. This noop plugin skips the request and
-	// fabricates a single deterministic result instead, just to prove the
-	// rest of the contract end to end.
 	imp := &ddiscapi.Import{
-		Uri:      "magnet:?xt=urn:btih:0000000000000000000000000000000000000000&dn=" + *query,
+		Uri:      "magnet:?xt=urn:btih:0000000000000000000000000000000000000000&dn=" + cmd.Query,
 		Uritype:  mimex.Magnet,
 		Health:   0,
 		Mimetype: mimetype,
-		Source:   *sourceFlag,
+		Source:   cmd.Source,
 	}
 
-	// Registry.Search reads stdout as newline-delimited JSON, one
-	// *ddiscapi.Import per line; anything written to stderr is logged, not
-	// parsed. A plugin emitting many results should reuse a single
-	// json.Encoder/writer across all of them rather than reopening one per
-	// result.
 	if err := json.NewEncoder(os.Stdout).Encode(imp); err != nil {
-		fmt.Fprintln(os.Stderr, "searchplugin-noop: failed to encode result:", err)
-		os.Exit(1)
+		return fmt.Errorf("failed to encode result: %w", err)
 	}
+
+	return nil
+}
+
+// recommendationsCmd has no Registry contract behind it - it's a second
+// worked example of the *ddiscapi.Import output shape, for content a
+// plugin recommends independent of any search query. Unlike pluginCmd
+// there's no --query: recommendations aren't search-driven by definition.
+type recommendationsCmd struct {
+	Mimetype []string `flag:"" name:"mimetype" help:"discovery mimetype to recommend content within (repeatable)"`
+	Limit    uint     `flag:"" name:"limit" help:"number of recommended results to emit" default:"5"`
+	Source   string   `flag:"" name:"source" help:"provenance tag for every result (bakeable via -ldflags -X main.source=...)" default:"${source}"`
+}
+
+// Run fabricates Limit deterministic results, descending Popularity to
+// look recommendation-like, and encodes them the same way pluginCmd does.
+func (cmd *recommendationsCmd) Run(ctx context.Context) error {
+	var mimetype string
+	if len(cmd.Mimetype) > 0 {
+		mimetype = cmd.Mimetype[0]
+	}
+
+	enc := json.NewEncoder(os.Stdout)
+	for i := uint(0); i < cmd.Limit; i++ {
+		imp := &ddiscapi.Import{
+			Uri:        fmt.Sprintf("magnet:?xt=urn:btih:%040d&dn=recommended-%d", i, i),
+			Uritype:    mimex.Magnet,
+			Health:     0,
+			Mimetype:   mimetype,
+			Source:     cmd.Source,
+			Title:      fmt.Sprintf("recommended #%d", i),
+			Popularity: float64(cmd.Limit - i),
+		}
+
+		if err := enc.Encode(imp); err != nil {
+			return fmt.Errorf("failed to encode result: %w", err)
+		}
+	}
+
+	return nil
+}
+
+func main() {
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer cancel()
+
+	kctx := kong.Parse(&cli, kong.BindTo(ctx, (*context.Context)(nil)), kong.Vars{"source": source})
+	kctx.FatalIfErrorf(kctx.Run())
 }
