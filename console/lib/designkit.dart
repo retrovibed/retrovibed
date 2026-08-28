@@ -45,6 +45,7 @@ export 'design.kit/search.tray.dart';
 export 'design.kit/tables.dart';
 export 'design.kit/theme.defaults.dart';
 export 'design.kit/typography.dart';
+export 'design.kit/stateful.dart';
 export 'design.kit/flutterx.dart' show postframe;
 
 abstract class modals {

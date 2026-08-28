@@ -11,7 +11,7 @@ mixin LoadingState<T extends StatefulWidget> on State<T> {
     super.setState(fn);
   }
 
-  void resetCause() {
+  void reseterr() {
     setState(() {
       cause = Error.zero;
     });

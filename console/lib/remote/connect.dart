@@ -10,7 +10,7 @@ import 'package:retrovibed/meta.dart' as meta;
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/media/play.queue.dart' as playqueue;
 import 'package:retrovibed/mimex.dart' as mimex;
-import 'package:retrovibed/library/search.minimal.dart';
+import 'package:retrovibed/library.dart' as lib;
 import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'api.dart' as remote;
 import 'player.control.seek.dart';
@@ -88,6 +88,12 @@ class Connect extends StatefulWidget {
 }
 
 class _State extends State<Connect> with LoadingState {
+  ValueNotifier<media.MediaSearchState> _search = ValueNotifier(
+    media.MediaSearchState(
+      next: media.media.request(limit: 32, mimetypes: mimex.of(mimex.icoaudio)),
+    ),
+  );
+  final ValueNotifier<media.SearchMode> _mode = ValueNotifier(media.SearchMode.library);
   remote.RemoteControlSocket _socket = remote.RemoteControlSocket.noop;
   Stream<remote.Stream> _messages = Stream.empty();
   // nil-sid sentinel; unset oneof -> _latest.sync reads as a zero Sync.
@@ -308,7 +314,7 @@ class _State extends State<Connect> with LoadingState {
           setState(() {
             loading = false;
             _socket = remote.RemoteControlSocket.noop;
-            cause = ds.Errors.httpauto(error, onTap: resetCause);
+            cause = ds.Errors.httpauto(error, onTap: reseterr);
           });
           _reconnect();
         }, test: httpx.ErrorsTest.httpauto)
@@ -316,7 +322,7 @@ class _State extends State<Connect> with LoadingState {
           setState(() {
             loading = false;
             _socket = remote.RemoteControlSocket.noop;
-            cause = ds.Error.unknown(error, onTap: resetCause);
+            cause = ds.Error.unknown(error, onTap: reseterr);
           });
           _reconnect();
         });
@@ -342,11 +348,12 @@ class _State extends State<Connect> with LoadingState {
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
-    final search = SearchMinimal(
+    final search = lib.SearchMinimal(
       key: const ValueKey("search"),
       empty: ds.Empty,
       onPlay: _onPlay,
       apisearch: _apisearch,
+      search: _search,
     );
     final queue = PlaylistQueue(
       _latest.sync,
@@ -393,6 +400,18 @@ class _State extends State<Connect> with LoadingState {
               onSelect: meta.DaemonDropdown.local,
               remoteonly: true,
               readonly: true,
+              leading: [
+                ds.CompactingMenu.pinned(
+                  ValueListenableBuilder<media.MediaSearchState>(
+                    valueListenable: _search,
+                    builder: (context, state, _) => lib.DropdownUpload(
+                      icon: lib.SearchMimetypeDropdown.icon(mimex.checksum(state.next.mimetypes)),
+                      help: ds.HelpScope.None,
+                      items: lib.SearchMimetypeDropdown.menuItems(_search),
+                    ),
+                  ),
+                ),
+              ],
               trailing: [
                 _focused == null
                     ? ds.Empty

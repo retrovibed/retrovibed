@@ -110,13 +110,13 @@ class _ManualConfigurationView extends State<ManualConfiguration> with LoadingSt
         .catchError((error) {
           setState(() {
             loading = false;
-            cause = ds.Errors.httpauto(error, onTap: resetCause);
+            cause = ds.Errors.httpauto(error, onTap: reseterr);
           });
         }, test: httpx.ErrorsTest.httpauto)
         .catchError((error) {
           setState(() {
             loading = false;
-            cause = ds.Error.unknown(error, onTap: resetCause);
+            cause = ds.Error.unknown(error, onTap: reseterr);
           });
         });
   }
@@ -133,7 +133,7 @@ class _ManualConfigurationView extends State<ManualConfiguration> with LoadingSt
         .catchError((error) {
           setState(() {
             loading = false;
-            cause = ds.Error.unknown(error, onTap: resetCause);
+            cause = ds.Error.unknown(error, onTap: reseterr);
           });
         });
   }

@@ -88,7 +88,7 @@ add-apt-repository ppa:jljatone/retrovibed
 apt-get update && apt-get install retrovibed retrokiosk
 
 # bootstrap the device with your account
-retrovibed identity generate '{username}:{password}'
+retrovibe identity generate '{username}:{password}'
 reboot
 ```
 
@@ -103,7 +103,7 @@ apt-get remove retrokiosk
 ### determine ssh public key for client side
 
 ```bash
-retrovibed identity show
+retrovibe identity show
 ```
 
 ### install daemon from source

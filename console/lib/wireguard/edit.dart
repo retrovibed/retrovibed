@@ -47,13 +47,13 @@ class _EditState extends State<Edit> with LoadingState {
         .catchError((error) {
           setState(() {
             loading = false;
-            cause = ds.Errors.httpauto(error, onTap: resetCause);
+            cause = ds.Errors.httpauto(error, onTap: reseterr);
           });
         }, test: httpx.ErrorsTest.httpauto)
         .catchError((error) {
           setState(() {
             loading = false;
-            cause = ds.Error.unknown(error, onTap: resetCause);
+            cause = ds.Error.unknown(error, onTap: reseterr);
           });
         });
   }
@@ -171,4 +171,3 @@ class _EditState extends State<Edit> with LoadingState {
     );
   }
 }
-

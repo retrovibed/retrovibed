@@ -45,7 +45,7 @@ class _SettingsAudioSinkState extends State<SettingsAudioSink> with LoadingState
             },
             onError: (cause) {
               setState(() {
-                this.cause = ds.Error.unknown(cause, onTap: resetCause);
+                this.cause = ds.Error.unknown(cause, onTap: reseterr);
               });
             },
           );
@@ -57,7 +57,7 @@ class _SettingsAudioSinkState extends State<SettingsAudioSink> with LoadingState
         }, test: httpx.ErrorsTest.unavailable)
         .catchError((cause) {
           setState(() {
-            this.cause = ds.Error.unknown(cause, onTap: resetCause);
+            this.cause = ds.Error.unknown(cause, onTap: reseterr);
           });
         });
 
@@ -77,7 +77,7 @@ class _SettingsAudioSinkState extends State<SettingsAudioSink> with LoadingState
         .catchError((cause) {
           setState(() {
             loading = false;
-            this.cause = ds.Error.unknown(cause, onTap: resetCause);
+            this.cause = ds.Error.unknown(cause, onTap: reseterr);
           });
         });
   }
@@ -96,7 +96,7 @@ class _SettingsAudioSinkState extends State<SettingsAudioSink> with LoadingState
         .catchError((cause) {
           setState(() {
             loading = false;
-            this.cause = ds.Error.unknown(cause, onTap: resetCause);
+            this.cause = ds.Error.unknown(cause, onTap: reseterr);
           });
         });
   }

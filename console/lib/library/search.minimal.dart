@@ -6,39 +6,38 @@ import 'package:retrovibed/authn.dart' as authn;
 import 'known.media.icon.dart';
 
 class SearchMinimal extends StatefulWidget {
+  final ValueNotifier<media.MediaSearchState> search;
   final int capacity;
   final media.FnMediaSearch apisearch;
   final Widget empty;
+  final Widget help;
   final Future<void> Function()? Function(BuildContext, media.Media, media.MediaSearchResponse) onPlay;
 
   const SearchMinimal({
     super.key,
     this.apisearch = media.media.search,
     this.empty = const Text("no results"),
+    this.help = ds.Empty,
     this.onPlay = media.PlayAction,
     this.capacity = 32,
+    required this.search,
   });
 
   @override
   State<StatefulWidget> createState() => _SearchMinimal();
 }
 
-class _SearchMinimal extends State<SearchMinimal> {
-  bool _loading = true;
-  Widget _cause = ds.Error.zero;
+class _SearchMinimal extends State<SearchMinimal> with ds.LoadingState {
   media.MediaSearchResponse _res = media.media.response(
     next: media.media.request(limit: 32),
   );
 
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
-
-  void reseterr() {
+  void _searchChanged() {
+    final freshNext = widget.search.value.next.clone()..offset = ds.Grid.int64(0);
     setState(() {
-      _cause = ds.Error.zero;
+      _res.next = freshNext;
     });
+    refresh(_res.next);
   }
 
   Future<void> refresh(media.MediaSearchRequest req) {
@@ -47,19 +46,19 @@ class _SearchMinimal extends State<SearchMinimal> {
         .then((v) {
           setState(() {
             _res = v;
-            _loading = false;
+            loading = false;
           });
         })
         .catchError((cause) {
           setState(() {
-            _cause = ds.Error.unauthorized(cause, onTap: reseterr);
-            _loading = false;
+            cause = ds.Error.unauthorized(cause, onTap: reseterr);
+            loading = false;
           });
         }, test: httpx.ErrorsTest.unauthorized)
         .catchError((e) {
           setState(() {
-            _cause = ds.Error.unknown(e, onTap: reseterr);
-            _loading = false;
+            cause = ds.Error.unknown(e, onTap: reseterr);
+            loading = false;
           });
         });
   }
@@ -69,19 +68,28 @@ class _SearchMinimal extends State<SearchMinimal> {
     super.initState();
     _res.next.limit = ds.Int64(widget.capacity);
     ds.postframe(() => refresh(_res.next));
+    widget.search.addListener(_searchChanged);
+  }
+
+  @override
+  void dispose() {
+    widget.search.removeListener(_searchChanged);
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return ds.Table<media.Media>(
-      loading: _loading,
-      cause: _cause,
+      loading: loading,
+      cause: cause,
       leading: ds.SearchTray(
         decoration: InputDecoration(hintText: "search ${httpx.host()}'s library"),
         onSubmitted: (v) {
+          final freshNext = widget.search.value.next.clone()
+            ..query = v
+            ..offset = ds.Grid.int64(0);
           setState(() {
-            _res.next.query = v;
-            _res.next.offset = ds.Int64(0);
+            _res.next = freshNext;
           });
           return refresh(_res.next);
         },
@@ -93,6 +101,7 @@ class _SearchMinimal extends State<SearchMinimal> {
         },
         current: _res.next.offset,
         empty: ds.Int64(_res.items.length) < _res.next.limit,
+        leading: [],
       ),
       children: _res.items,
       ds.Table.expanded<media.Media>(
