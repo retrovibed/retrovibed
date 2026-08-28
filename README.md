@@ -94,6 +94,8 @@ reboot
 
 on first boot, once the Console is on screen, pick the remote daemon to connect to from its daemon dropdown - that choice persists across reboots.
 
+or register it without the Console: `retrovibe device add otherhost.lan:9998 --description="..." --download --default`
+
 to remove the kiosk and get a normal login back:
 
 ```bash
