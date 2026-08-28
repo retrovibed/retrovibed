@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import './current.dart';
 import './authz.meta.display.dart';
-import './authz.deeppool.dart';
+// import './authz.deeppool.dart';
 
 class Overview extends StatelessWidget {
   const Overview({super.key});
