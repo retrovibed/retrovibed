@@ -31,13 +31,14 @@ class AuthedEndpoint extends StatefulWidget {
 }
 
 class _AuthedEndpoint extends State<AuthedEndpoint> {
-  late final ValueNotifier<_meta.Daemon> _daemon = ValueNotifier(
-    widget.initial ?? _meta.EndpointAuto.of(context)?.changed.value ?? _meta.Daemon(),
+  final ValueNotifier<_meta.Daemon> _daemon = ValueNotifier(
+    _meta.Daemon(),
   );
 
   @override
   void initState() {
     super.initState();
+    _daemon.value = widget.initial ?? _meta.EndpointAuto.of(context)?.changed.value ?? _daemon.value;
     _daemon.addListener(_onDaemonChanged);
   }
 
