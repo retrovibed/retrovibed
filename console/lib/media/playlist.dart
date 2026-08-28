@@ -226,7 +226,11 @@ class Playlist extends StatefulWidget {
 
 class _PlaylistState extends State<Playlist> implements PlaylistControl {
   final playqueue.PlayQueue _queue = playqueue.PlayQueue();
-  final Player player = Player();
+  final Player player = Player(
+    configuration: PlayerConfiguration(
+      title: 'retrovibed',
+    ),
+  );
   // PlaylistControl's view of volume/playing - kept in sync with the real
   // player via the subscriptions set up in initState, exposed as
   // ValueNotifiers (read via .value, observe via .addListener) to match how
@@ -280,6 +284,19 @@ class _PlaylistState extends State<Playlist> implements PlaylistControl {
   @override
   void initState() {
     super.initState();
+
+    if (player.platform is NativePlayer) {
+      final native = player.platform as NativePlayer;
+      // Instructs libmpv to drop late frames at VO layer to keep audio in sync
+      native
+          .setProperty('framedrop', 'vo')
+          .then((_) {
+            print("framedrop property set");
+          })
+          .catchError((cause) {
+            print("framedrop property failed to set ${cause}");
+          });
+    }
 
     volume.value = player.state.volume;
     playing.value = player.state.playing;
