@@ -40,7 +40,7 @@ func init() {
 		egdebuild.Option.Description("retrovibed console kiosk appliance", "boots a machine directly into a fullscreen retrovibed Console session, no desktop or login required"),
 		egdebuild.Option.Debian(errorsx.Must(fs.Sub(debskel, ".debskel"))),
 		egdebuild.Option.DependsBuild("rsync", "tree"),
-		egdebuild.Option.Depends("cage", "kbd", "libfuse2", "retrozsync", "ssh"),
+		egdebuild.Option.Depends("avahi-daemon", "cage", "kbd", "libfuse2", "pipewire-audio", "retrozsync", "ssh"),
 		egdebuild.Option.Environ(eggpg.Env(gpgoptions()...)...),
 		egdebuild.Option.Runtime(func(r shell.Command) shell.Command {
 			return r.Privileged()
