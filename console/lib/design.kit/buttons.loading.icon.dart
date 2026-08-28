@@ -172,6 +172,32 @@ class LoadingIconButton extends StatefulWidget {
     );
   }
 
+  // less harsh iconography than delete. primarily used
+  // for things like dequeue. implies a less than modification
+  // instead of destruction.
+  factory LoadingIconButton.remove({
+    required AsyncVoidCallback onPressed,
+    Key? key,
+    String? tooltip,
+    bool disabled = false,
+    bool? toggled,
+    double iconSize = _defaultIconSize,
+    double? value,
+    Widget help = HelpScope.None,
+  }) {
+    return LoadingIconButton(
+      key: key,
+      onPressed: onPressed,
+      icon: const Icon(Icons.playlist_remove_rounded),
+      tooltip: tooltip,
+      disabled: disabled,
+      toggled: toggled,
+      iconSize: iconSize,
+      value: value,
+      help: help,
+    );
+  }
+
   factory LoadingIconButton.delete({
     required AsyncVoidCallback onPressed,
     Key? key,
