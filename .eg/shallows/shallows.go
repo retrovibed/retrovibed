@@ -148,6 +148,7 @@ func Compile() eg.OpFn {
 					"CGO_LDFLAGS=-L"+egenv.CacheDirectory("neurals"),
 					"LD_LIBRARY_PATH="+egenv.CacheDirectory("neurals"),
 				),
+				eggolang.BuildOption.Timeout(egenv.TTL()),
 			),
 		),
 	)
