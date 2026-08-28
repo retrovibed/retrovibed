@@ -74,4 +74,8 @@ Future<({String configDir, String dataDir, String cacheDir, String downloadDir})
 class vars {
   static const AutoIdentifyMedia = "RETROVIBED_MEDIA_AUTO_IDENTIFY";
   static const WindowManagerNativeFullScreen = "RETROVIBED_WINDOW_MANAGER_NATIVE_FULL_SCREEN";
+  static const PlaybackHardwareAcceleration =
+      "RETROVIBED_PLAYBACK_HARDWARE_ACCELERATION"; // force enable/disable hardware acceleration
+  // HW decoding for Raspberry Pi: 'v4l2m2m-copy',
+  static const PlaybackHardwareDecodeMode = "RETROVIBED_PLAYBACK_HARDWARE_DECODE_MODE"; // MPV --hwdec mode.
 }

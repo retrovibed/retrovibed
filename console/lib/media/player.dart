@@ -7,6 +7,7 @@ import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/debug.dart' as debug;
 import 'package:retrovibed/media/player.control.shuffle.dart';
 import 'package:retrovibed/uuidx.dart' as uuidx;
+import 'package:retrovibed/env.dart' as env;
 import './playlist.dart' as internal;
 import './player.control.previous.dart';
 import './player.control.next.dart';
@@ -46,7 +47,15 @@ class _VideoState extends State<VideoScreen> {
   // to deactivate mid-frame and abort Impeller on macOS.
   List<Widget> _controls = const [];
 
-  _VideoState(Player player) : controller = VideoController(player);
+  _VideoState(Player player)
+    : controller = VideoController(
+        player,
+        configuration: VideoControllerConfiguration(
+          // allow environmental overrides.
+          hwdec: env.string([env.vars.PlaybackHardwareDecodeMode], fallback: ''),
+          enableHardwareAcceleration: env.boolean(env.vars.PlaybackHardwareAcceleration, fallback: true),
+        ),
+      );
 
   void setState(VoidCallback fn) {
     if (!mounted) return;
@@ -120,77 +129,77 @@ class _VideoState extends State<VideoScreen> {
   Widget build(BuildContext context) {
     return debug.Lifecycle(
       message: "player lifecycle",
-      Builder(
-        builder: (context) {
-            final theme = Theme.of(context);
-            final defaults = ds.Defaults.of(context);
-            final plist = internal.Playlist.of(context)!;
-            final current = plist.known;
-            final compact = defaults.isCompact;
+      ds.build(
+        (context) {
+          final theme = Theme.of(context);
+          final defaults = ds.Defaults.of(context);
+          final plist = internal.Playlist.of(context)!;
+          final current = plist.known;
+          final compact = defaults.isCompact;
 
-            return FocusScope(
-              node: _selffocus,
-              child: Stack(
-                fit: StackFit.passthrough,
-                children: [
-                  debug.Lifecycle(
-                    message: "video controls theme",
-                    MaterialDesktopVideoControlsTheme(
-                      normal: MaterialDesktopVideoControlsThemeData(
-                        modifyVolumeOnScroll: false,
-                        bottomButtonBar: _controls,
-                        keyboardShortcuts: {},
-                      ),
-                      fullscreen: MaterialDesktopVideoControlsThemeData(
-                        modifyVolumeOnScroll: false,
-                        bottomButtonBar: _controls,
-                        keyboardShortcuts: {},
-                      ),
-                      child: ValueListenableBuilder<Widget>(
-                        valueListenable: errors,
-                        builder: (context, error, child) => ds.Loading(cause: error, child!),
-                        child: Video(focusNode: widget.focus, controller: controller),
-                      ),
+          return FocusScope(
+            node: _selffocus,
+            child: Stack(
+              fit: StackFit.passthrough,
+              children: [
+                debug.Lifecycle(
+                  message: "video controls theme",
+                  MaterialDesktopVideoControlsTheme(
+                    normal: MaterialDesktopVideoControlsThemeData(
+                      modifyVolumeOnScroll: false,
+                      bottomButtonBar: _controls,
+                      keyboardShortcuts: {},
+                    ),
+                    fullscreen: MaterialDesktopVideoControlsThemeData(
+                      modifyVolumeOnScroll: false,
+                      bottomButtonBar: _controls,
+                      keyboardShortcuts: {},
+                    ),
+                    child: ValueListenableBuilder<Widget>(
+                      valueListenable: errors,
+                      builder: (context, error, child) => ds.Loading(cause: error, child!),
+                      child: Video(focusNode: widget.focus, controller: controller),
                     ),
                   ),
-                  ValueListenableBuilder<bool>(
-                    valueListenable: widget.overlay,
-                    builder: (context, overlay, child) => Visibility(
-                      maintainState: true,
-                      maintainFocusability: true,
-                      visible: overlay,
-                      child: child!,
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      verticalDirection: compact ? VerticalDirection.up : VerticalDirection.down,
-                      children: [
-                        Expanded(
-                          child: DecoratedBox(
-                            decoration: BoxDecoration(
-                              color: theme.scaffoldBackgroundColor.withValues(
-                                // TODO: make opacity configurable because people have
-                                // personal preferences....
-                                // alpha: defaults.opaque.a,
-                                alpha: 1.0,
-                              ),
+                ),
+                ValueListenableBuilder<bool>(
+                  valueListenable: widget.overlay,
+                  builder: (context, overlay, child) => Visibility(
+                    maintainState: true,
+                    maintainFocusability: true,
+                    visible: overlay,
+                    child: child!,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    verticalDirection: compact ? VerticalDirection.up : VerticalDirection.down,
+                    children: [
+                      Expanded(
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: theme.scaffoldBackgroundColor.withValues(
+                              // TODO: make opacity configurable because people have
+                              // personal preferences....
+                              // alpha: defaults.opaque.a,
+                              alpha: 1.0,
                             ),
-                            child: widget.child,
                           ),
+                          child: widget.child,
                         ),
-                        Visibility(
-                          visible: !uuidx.isMin(uuidx.fromString(current.id)),
-                          child: PlayerControlResume(widget.player, current, widget.overlay),
-                        ),
-                      ],
-                    ),
+                      ),
+                      Visibility(
+                        visible: !uuidx.isMin(uuidx.fromString(current.id)),
+                        child: PlayerControlResume(widget.player, current, widget.overlay),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            );
-          },
-        ),
-      );
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
   }
 }
