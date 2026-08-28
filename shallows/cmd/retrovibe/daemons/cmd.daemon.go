@@ -75,39 +75,40 @@ func DefaultResolver(d netx.Dialer) *net.Resolver {
 }
 
 type Command struct {
-	Alpha               bool             `flag:"" name:"alpha" help:"enable alpha functionality" default:"false" negatable:"" hidden:"true"`
-	MDNSAdvertise       bool             `flag:"" name:"mdns-advertise" help:"enable the multicast dns service" env:"${env_mdns_advertise}" default:"true" negatable:""`
-	MDNSDiscovery       bool             `flag:"" name:"mdns-discovery" help:"enable API-driven mDNS LAN peer discovery over websocket (experimental)" env:"${env_mdns_discovery}" default:"false" negatable:""`
-	AutoBootstrap       bool             `flag:"" name:"auto-bootstrap" help:"bootstrap from a predefined set of peers" env:"${env_auto_bootstrap}" default:"true" negatable:""`
-	AutoDiscovery       bool             `flag:"" name:"auto-discovery" help:"enable automatic discovery of content from peers" env:"${env_auto_discovery}" default:"true" negatable:""`
-	AutoPeerTube        bool             `flag:"" name:"auto-peertube" help:"enable the built-in PeerTube/SepiaSearch discovery strategy" env:"${env_auto_peertube}" default:"false" negatable:""`
-	PeerTubeDomain      string           `flag:"" name:"peertube-domain" help:"base url of the PeerTube/SepiaSearch instance to search" env:"${env_peertube_domain}" default:"https://sepiasearch.org"`
-	AutoIdentifyMedia   bool             `flag:"" name:"auto-identify-media" help:"enable automatically identifying media" env:"${env_auto_identify_media}" default:"true" negatable:""`
-	AutoLocateMedia     bool             `flag:"" name:"auto-locate-media" help:"enable automatically locating media from distributed index" env:"${env_auto_locate_media}" default:"true" negatable:""`
-	AutoArchive         bool             `flag:"" name:"auto-archive" help:"enable automatic archiving of eligible media" env:"${env_auto_archive}" negatable:"" default:"true"`
-	AutoReclaim         bool             `flag:"" name:"auto-reclaim" help:"EXPERIMENTAL: enable automatic reclaiming of disk space of archived media" negatable:"" env:"${env_auto_reclaim}"`
-	AutoRecommendations bool             `flag:"" name:"auto-recommendations" help:"enable automatic daily recommendations" default:"true" negatable:""`
-	AutoSocks5          bool             `flag:"" name:"auto-socks5" help:"enable the socks5 proxy service" default:"true" negatable:""`
-	AutoAcousticsIndex  bool             `flag:"" name:"auto-acoustics-index" help:"acoustic indexing for currently playing song" default:"true" negatable:""`
-	Socks5              cmdopts.Listener `flag:"" name:"socks5-address" help:"enable socks5 proxy, requires a vpn to be configured" default:"tcp://:9999"`
-	DHTLogging          bool             `flag:"" name:"dht-logging" help:"enable debug logging for the dht" default:"false" negatable:"" hidden:"true"`
-	RemoteControl       bool             `flag:"" name:"remote-control" help:"enable the remote control websocket relay" default:"false" negatable:""`
-	TorrentResume       bool             `flag:"" name:"torrent-resume" help:"enable announcing and resuming torrents" default:"true" negatable:""`
-	TorrentFirewalled   bool             `flag:"" name:"torrent-firewalled" help:"restrict torrent connections to private networks" env:"${env_torrent_private}"`
-	TorrentLogging      bool             `flag:"" name:"torrent-logging" help:"enable torrent logging" default:"false" negatable:"" env:"${env_torrent_logging}"`
-	TorrentDebug        bool             `flag:"" name:"torrent-debug" help:"enable torrent debug logging" default:"false" negatable:"" env:"${env_torrent_debug}"`
-	TorrentPort         uint16           `flag:"" name:"torrent-port" help:"port to use for torrenting" env:"${env_torrent_port}" default:"10000"`
-	TorrentPublicIP4    string           `flag:"" name:"torrent-ipv4" help:"public ipv4 address of the torrent" env:"${env_torrent_ipv4}"`
-	TorrentPublicIP6    string           `flag:"" name:"torrent-ipv6" help:"public ipv6 address of the torrent" env:"${env_torrent_ipv6}"`
-	TorrentMaxRequests  uint32           `flag:"" name:"torrent-max-outstanding" help:"maximum piece requests to allow" default:"1024"`
-	TorrentFolderWatch  []string         `flag:"" name:"torrent-watch" help:"monitor the provided directories for torrent files to automatically download" env:"${env_torrent_directory_watch}" default:"${vars_downloads_directory}"`
-	DiscoveryWorkloads  uint64           `flag:"" name:"discovery-workloads" help:"maximum number of infohashes to concurrently process while indexing" default:"1"`
-	DiscoveryRatio      uint8            `flag:"" name:"discovery-ratio" help:"percentage of infohashes to index, range from 0-100. 0 = off, 100 = attempt to index everything, 1-99 percentage of the designated partition to index" default:"0"  env:"${env_discovery_index_ratio}"`
-	DiscoveryPartitions uint8            `flag:"" name:"discovery-partition" help:"number of partitions to split the infohash space into, adjustments to this value are not recommended as it'll seperate you from identifying synchronization peers" default:"128"`
-	DiscoverySeed       string           `flag:"" name:"discovery-seed" help:"seed to generate partition spaces, adjustments to this value are not recommended as it'll seperate you from identifying synchronization peers" default:"retrovibed-ddisc"`
-	DiscoveryLocateP2P  bool             `flag:"" name:"discovery-locate-p2p" help:"enable discovering media with peers, since we can't control what media people share you are legally responsible for any media you download and share from index" default:"false" negatable:"" env:"${env_discovery_p2p_locate}"`
-	HTTP                cmdopts.Listener `flag:"" name:"http-address" help:"address to serve daemon api from" default:"tcp://:9998" env:"${env_daemon_socket}"`
-	SelfSignedHosts     []string         `flag:"" name:"self-signed-hosts" help:"comma seperated list of hosts to add to the sign signed certificate" env:"${env_self_signed_hosts}"`
+	Alpha                    bool             `flag:"" name:"alpha" help:"enable alpha functionality" default:"false" negatable:"" hidden:"true"`
+	MDNSAdvertise            bool             `flag:"" name:"mdns-advertise" help:"enable the multicast dns service" env:"${env_mdns_advertise}" default:"true" negatable:""`
+	MDNSDiscovery            bool             `flag:"" name:"mdns-discovery" help:"enable API-driven mDNS LAN peer discovery over websocket (experimental)" env:"${env_mdns_discovery}" default:"false" negatable:""`
+	AutoBootstrap            bool             `flag:"" name:"auto-bootstrap" help:"bootstrap from a predefined set of peers" env:"${env_auto_bootstrap}" default:"true" negatable:""`
+	AutoDiscovery            bool             `flag:"" name:"auto-discovery" help:"enable automatic discovery of content from peers" env:"${env_auto_discovery}" default:"true" negatable:""`
+	AutoPeerTube             bool             `flag:"" name:"auto-peertube" help:"enable the built-in PeerTube/SepiaSearch discovery strategy" env:"${env_auto_peertube}" default:"false" negatable:""`
+	AutoDefaultSubscriptions bool             `flag:"" name:"auto-subscriptions" help:"enables default subscriptions" env:"${env_auto_subscriptions}" default:"true" negatable:""`
+	PeerTubeDomain           string           `flag:"" name:"peertube-domain" help:"base url of the PeerTube/SepiaSearch instance to search" env:"${env_peertube_domain}" default:"https://sepiasearch.org"`
+	AutoIdentifyMedia        bool             `flag:"" name:"auto-identify-media" help:"enable automatically identifying media" env:"${env_auto_identify_media}" default:"true" negatable:""`
+	AutoLocateMedia          bool             `flag:"" name:"auto-locate-media" help:"enable automatically locating media from distributed index" env:"${env_auto_locate_media}" default:"true" negatable:""`
+	AutoArchive              bool             `flag:"" name:"auto-archive" help:"enable automatic archiving of eligible media" env:"${env_auto_archive}" negatable:"" default:"true"`
+	AutoReclaim              bool             `flag:"" name:"auto-reclaim" help:"EXPERIMENTAL: enable automatic reclaiming of disk space of archived media" negatable:"" env:"${env_auto_reclaim}"`
+	AutoRecommendations      bool             `flag:"" name:"auto-recommendations" help:"enable automatic daily recommendations" default:"true" negatable:""`
+	AutoSocks5               bool             `flag:"" name:"auto-socks5" help:"enable the socks5 proxy service" default:"true" negatable:""`
+	AutoAcousticsIndex       bool             `flag:"" name:"auto-acoustics-index" help:"acoustic indexing for currently playing song" default:"true" negatable:""`
+	Socks5                   cmdopts.Listener `flag:"" name:"socks5-address" help:"enable socks5 proxy, requires a vpn to be configured" default:"tcp://:9999"`
+	DHTLogging               bool             `flag:"" name:"dht-logging" help:"enable debug logging for the dht" default:"false" negatable:"" hidden:"true"`
+	RemoteControl            bool             `flag:"" name:"remote-control" help:"enable the remote control websocket relay" default:"false" negatable:""`
+	TorrentResume            bool             `flag:"" name:"torrent-resume" help:"enable announcing and resuming torrents" default:"true" negatable:""`
+	TorrentFirewalled        bool             `flag:"" name:"torrent-firewalled" help:"restrict torrent connections to private networks" env:"${env_torrent_private}"`
+	TorrentLogging           bool             `flag:"" name:"torrent-logging" help:"enable torrent logging" default:"false" negatable:"" env:"${env_torrent_logging}"`
+	TorrentDebug             bool             `flag:"" name:"torrent-debug" help:"enable torrent debug logging" default:"false" negatable:"" env:"${env_torrent_debug}"`
+	TorrentPort              uint16           `flag:"" name:"torrent-port" help:"port to use for torrenting" env:"${env_torrent_port}" default:"10000"`
+	TorrentPublicIP4         string           `flag:"" name:"torrent-ipv4" help:"public ipv4 address of the torrent" env:"${env_torrent_ipv4}"`
+	TorrentPublicIP6         string           `flag:"" name:"torrent-ipv6" help:"public ipv6 address of the torrent" env:"${env_torrent_ipv6}"`
+	TorrentMaxRequests       uint32           `flag:"" name:"torrent-max-outstanding" help:"maximum piece requests to allow" default:"1024"`
+	TorrentFolderWatch       []string         `flag:"" name:"torrent-watch" help:"monitor the provided directories for torrent files to automatically download" env:"${env_torrent_directory_watch}" default:"${vars_downloads_directory}"`
+	DiscoveryWorkloads       uint64           `flag:"" name:"discovery-workloads" help:"maximum number of infohashes to concurrently process while indexing" default:"1"`
+	DiscoveryRatio           uint8            `flag:"" name:"discovery-ratio" help:"percentage of infohashes to index, range from 0-100. 0 = off, 100 = attempt to index everything, 1-99 percentage of the designated partition to index" default:"0"  env:"${env_discovery_index_ratio}"`
+	DiscoveryPartitions      uint8            `flag:"" name:"discovery-partition" help:"number of partitions to split the infohash space into, adjustments to this value are not recommended as it'll seperate you from identifying synchronization peers" default:"128"`
+	DiscoverySeed            string           `flag:"" name:"discovery-seed" help:"seed to generate partition spaces, adjustments to this value are not recommended as it'll seperate you from identifying synchronization peers" default:"retrovibed-ddisc"`
+	DiscoveryLocateP2P       bool             `flag:"" name:"discovery-locate-p2p" help:"enable discovering media with peers, since we can't control what media people share you are legally responsible for any media you download and share from index" default:"false" negatable:"" env:"${env_discovery_p2p_locate}"`
+	HTTP                     cmdopts.Listener `flag:"" name:"http-address" help:"address to serve daemon api from" default:"tcp://:9998" env:"${env_daemon_socket}"`
+	SelfSignedHosts          []string         `flag:"" name:"self-signed-hosts" help:"comma seperated list of hosts to add to the sign signed certificate" env:"${env_self_signed_hosts}"`
 }
 
 func (t Command) torrentsettings() *TorrentSettings {
@@ -197,7 +198,9 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		return errorsx.Wrap(err, "unable to load authorization")
 	}
 
-	errorsx.Log(errorsx.Wrap(PrepareDefaultFeeds(gctx.Context, db), "unable to initialize default rss feeds"))
+	if t.AutoDefaultSubscriptions {
+		errorsx.Log(errorsx.Wrap(PrepareDefaultFeeds(gctx.Context, db), "unable to initialize default rss feeds"))
+	}
 
 	rootstore := fsx.DirVirtual(env.RootStorageDir())
 	mediastore := fsx.DirVirtual(env.MediaDir())

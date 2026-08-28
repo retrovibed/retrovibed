@@ -47,6 +47,7 @@ const (
 	AutoLocateMedia            = "RETROVIBED_MEDIA_AUTO_LOCATE"                // enable/disable automatically locate and download media.
 	AutoDiscovery              = "RETROVIBED_TORRENT_AUTO_DISCOVERY"           // enable/disable automatically discovering torrents from peers.
 	AutoPeerTube               = "RETROVIBED_AUTO_PEERTUBE"                    // enable/disable the built-in PeerTube/SepiaSearch discovery strategy.
+	AutoSubscriptions          = "RETROVIBED_AUTO_SUBSCRIPTIONS"               // enable/disable auto subscription setup, primarily used for retrokiosk since they are low powered devices
 	PeerTubeDomain             = "PEERTUBE_DOMAIN"                             // base url of the PeerTube/SepiaSearch instance to search.
 	AutoBootstrap              = "RETROVIBED_TORRENT_AUTO_BOOTSTRAP"           // enable/disable the predefined set of public swarms to bootstrap from.
 	TorrentPort                = "RETROVIBED_TORRENT_PORT"                     // specify the port to listen to torrents on
