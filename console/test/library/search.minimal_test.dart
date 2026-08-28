@@ -70,12 +70,16 @@ Future<media.MediaSearchResponse> _mockSearchWithLongNames(
 
 final _resolutions = Resolutions.variant();
 
+ValueNotifier<media.MediaSearchState> _search() => ValueNotifier(
+  media.MediaSearchState(next: media.media.request(limit: 32)),
+);
+
 void main() {
   group('SearchMinimal', () {
     testWidgets('renders empty without overflow', (WidgetTester tester) async {
       final entry = _resolutions.currentValue!;
       await tester.pumpApp(
-        SearchMinimal(apisearch: _mockSearchEmpty),
+        SearchMinimal(apisearch: _mockSearchEmpty, search: _search()),
         physicalSize: entry.value,
       );
       await tester.pumpAndSettle();
@@ -87,7 +91,7 @@ void main() {
     ) async {
       final entry = _resolutions.currentValue!;
       await tester.pumpApp(
-        SearchMinimal(apisearch: _mockSearchWithItems),
+        SearchMinimal(apisearch: _mockSearchWithItems, search: _search()),
         physicalSize: entry.value,
       );
       await tester.pumpAndSettle();
@@ -99,7 +103,7 @@ void main() {
     ) async {
       final entry = _resolutions.currentValue!;
       await tester.pumpApp(
-        SearchMinimal(apisearch: _mockSearchWithLongNames),
+        SearchMinimal(apisearch: _mockSearchWithLongNames, search: _search()),
         physicalSize: entry.value,
       );
       await tester.pumpAndSettle();
@@ -110,7 +114,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpApp(
-        SearchMinimal(apisearch: _mockSearchEmpty),
+        SearchMinimal(apisearch: _mockSearchEmpty, search: _search()),
         physicalSize: const Size(300, 600),
       );
       await tester.pumpAndSettle();
@@ -121,7 +125,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpApp(
-        SearchMinimal(apisearch: _mockSearchWithItems),
+        SearchMinimal(apisearch: _mockSearchWithItems, search: _search()),
         physicalSize: const Size(300, 600),
       );
       await tester.pumpAndSettle();
