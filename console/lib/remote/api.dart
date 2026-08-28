@@ -149,9 +149,11 @@ abstract class messages {
     bool muted = false,
     bool paused = false,
     bool fullscreen = false,
+    fixnum.Int64? vid,
   }) {
     return rc.Stream(
       sid: uuidx.v7(),
+      vid: vid,
       sync: rc.Sync(
         library: library,
         token: token,

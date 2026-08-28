@@ -180,6 +180,7 @@ class _State extends State<Connect> with LoadingState {
         final sync = _latest.sync;
         _latest = remote.Stream(
           sid: _latest.sid,
+          vid: _latest.vid,
           sync: remote.Sync(
             library: sync.library,
             capacity: sync.capacity,
@@ -257,7 +258,10 @@ class _State extends State<Connect> with LoadingState {
                 // print("sync ${msg.sid}");
                 if (msg.whichCommand() != remote.Stream_Command.sync) return;
                 print("sync received ${msg.sid}");
-                if (msg.sid.compareTo(_latest.sid) <= 0) return;
+                // vid is a monotonic sequence number, unlike sid (a uuidv7)
+                // whose ordering isn't guaranteed for two ids minted within
+                // the same millisecond.
+                if (msg.vid <= _latest.vid) return;
                 print("sync accepted ${msg.sid}");
                 setState(() {
                   _latest = msg;

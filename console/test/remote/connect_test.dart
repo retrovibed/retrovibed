@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:fixnum/fixnum.dart' as fixnum;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -26,11 +27,11 @@ class _FakeRemoteControlSocket implements remote.RemoteControlSocket {
   final StreamController<remote.Stream> _incoming = StreamController();
   final List<remote.Stream> sent = [];
   final List<media.Media> _acked = [];
-  // chains each response 1ms after the *previous response actually fired*,
-  // not 1ms after its own send() call - two sends arriving back-to-back
-  // would otherwise both schedule delays from nearly the same start time
-  // and could still land in the same millisecond.
-  Future<void> _lastResponse = Future.value();
+  // vid is a plain monotonic counter, unlike sid (a uuidv7) whose ordering
+  // isn't guaranteed for two ids minted within the same millisecond - which
+  // is exactly what this fake hits, firing echoes far faster than any real
+  // daemon would. no artificial delay needed once ordering is by counter.
+  int _vid = 0;
 
   @override
   Stream<remote.Stream> get messages => _incoming.stream;
@@ -42,18 +43,13 @@ class _FakeRemoteControlSocket implements remote.RemoteControlSocket {
     if (msg.whichCommand() == remote.Stream_Command.queue) {
       _acked.add(msg.queue.media);
       print("sync response");
-      // uuidx.v7() only guarantees chronological ordering at millisecond
-      // granularity - two ids minted within the same millisecond can sort
-      // either way, which the listener's sid.compareTo() freshness check
-      // then rejects. space echoes out so each sid lands in its own tick.
-      _lastResponse = _lastResponse.then((_) => Future.delayed(const Duration(milliseconds: 2))).then((_) {
-        _incoming.add(
-          remote.Stream(
-            sid: uuidx.v7(),
-            sync: remote.Sync(queue: List.of(_acked)),
-          ),
-        );
-      });
+      _incoming.add(
+        remote.Stream(
+          sid: uuidx.v7(),
+          vid: fixnum.Int64(++_vid),
+          sync: remote.Sync(queue: List.of(_acked)),
+        ),
+      );
     }
   }
 
@@ -335,11 +331,10 @@ void main() {
 
     final queued = socket.sent.where((m) => m.whichCommand() == remote.Stream_Command.queue).length;
 
-    // the autoqueue targets 5 upcoming items. _casfilling can silently drop
-    // a fill pass if a sync echo arrives while one's already in flight, with
-    // nothing retrying the drop - so this can currently land one short.
-    // TODO: tighten back to equals(5) once that drop is fixed.
-    expect(queued, inInclusiveRange(2, 5));
+    // the autoqueue targets 5 upcoming items - each sync echo the fake
+    // daemon sends back after a queue send re-triggers _fillQueue until the
+    // target is reached.
+    expect(queued, equals(5));
     expect(tester.takeException(), isNull);
   });
 }

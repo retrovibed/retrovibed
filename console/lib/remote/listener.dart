@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:fixnum/fixnum.dart' as fixnum;
 import 'package:flutter/material.dart';
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/authz.dart' as authz;
@@ -38,6 +39,11 @@ class RemoteControlListener extends StatefulWidget {
 
 class _State extends State<RemoteControlListener> {
   String _sid = uuidx.min();
+  // monotonic counter this listener stamps on every sync it sends - unlike
+  // sid (a uuidv7), which only guarantees chronological ordering at
+  // millisecond granularity and can sort either way for two ids minted
+  // within the same millisecond.
+  int _vid = 0;
   remote.RemoteControlSocket _socket = remote.RemoteControlSocket.noop;
   StreamSubscription<remote.Stream>? _rcSubscription;
   ValueNotifier<meta.Daemon> _library = ValueNotifier(meta.Daemon());
@@ -72,6 +78,7 @@ class _State extends State<RemoteControlListener> {
         muted: _muted,
         paused: !_playlistControl.playing.value,
         fullscreen: ds.Full.nochrome(context),
+        vid: fixnum.Int64(++_vid),
       );
       _socket.send(
         sync,
