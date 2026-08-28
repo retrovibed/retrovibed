@@ -73,4 +73,5 @@ Future<({String configDir, String dataDir, String cacheDir, String downloadDir})
 
 class vars {
   static const AutoIdentifyMedia = "RETROVIBED_MEDIA_AUTO_IDENTIFY";
+  static const WindowManagerNativeFullScreen = "RETROVIBED_WINDOW_MANAGER_NATIVE_FULL_SCREEN";
 }

@@ -18,6 +18,9 @@ TTYPath=/dev/tty%I
 TTYReset=yes
 TTYVTDisallocate=yes
 Environment=RETROVIBED_AUTO_SUBSCRIPTIONS=false
+# cage ignores wayland protocol fullscreen messages force the application
+# to use the flutter native mode.
+Environment=RETROVIBED_WINDOW_MANAGER_NATIVE_FULL_SCREEN=false
 ExecStartPre=+/usr/bin/chvt %I
 ExecStartPre=/usr/bin/retrozsync -o /usr/lib/retrokiosk/retrovibed.AppImage https://github.com/retrovibed/retrovibed/releases/latest/download/retrovibed.linux.@RETROKIOSK_ARCH@.AppImage.zsync
 ExecStartPre=/usr/bin/chmod +x /usr/lib/retrokiosk/retrovibed.AppImage

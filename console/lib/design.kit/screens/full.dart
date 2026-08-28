@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:retrovibed/env.dart' as env;
 
 class Full extends StatefulWidget {
   final Widget? child;
@@ -30,8 +31,13 @@ class _FullState extends State<Full> {
     final next = !chromeless;
     setState(() => chromeless = next);
 
-    if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
-      windowManager.setFullScreen(next);
+    if (env.boolean(
+      env.vars.WindowManagerNativeFullScreen,
+      fallback: Platform.isLinux || Platform.isWindows || Platform.isMacOS,
+    )) {
+      windowManager.setFullScreen(next).catchError((cause) {
+        print("failed to toggle fullscreen mode ${next} ${cause}");
+      });
     } else {
       SystemChrome.setEnabledSystemUIMode(
         next ? SystemUiMode.immersiveSticky : SystemUiMode.edgeToEdge,
