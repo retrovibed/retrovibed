@@ -15,24 +15,26 @@ class PlaylistQueue extends StatelessWidget {
   Widget build(BuildContext context) {
     if (current.queue.isEmpty) return const SizedBox.shrink();
     final defaults = ds.Defaults.of(context);
-    return Column(
-      verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
-      children: current.queue
-          .map(
-            (m) => rowdisplay.RowDisplay(
-              media: m,
-              leading: const [Icon(Icons.queue_music)],
-              trailing: [
-                ds.LoadingIconButton.remove(
-                  onPressed: () async {
-                    onChange(remote.syncmut.dequeue(m));
-                    socket.send(remote.messages.dequeue(m.id));
-                  },
-                ),
-              ],
-            ),
-          )
-          .toList(),
+    return SingleChildScrollView(
+      child: Column(
+        verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
+        children: current.queue
+            .map(
+              (m) => rowdisplay.RowDisplay(
+                media: m,
+                leading: const [Icon(Icons.queue_music)],
+                trailing: [
+                  ds.LoadingIconButton.remove(
+                    onPressed: () async {
+                      onChange(remote.syncmut.dequeue(m));
+                      socket.send(remote.messages.dequeue(m.id));
+                    },
+                  ),
+                ],
+              ),
+            )
+            .toList(),
+      ),
     );
   }
 }
