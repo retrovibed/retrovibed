@@ -288,6 +288,7 @@ class _PlaylistState extends State<Playlist> implements PlaylistControl {
     if (player.platform is NativePlayer) {
       final native = player.platform as NativePlayer;
       // Instructs libmpv to drop late frames at VO layer to keep audio in sync
+      // this is the default of the mpv cli application.
       native
           .setProperty('framedrop', 'vo')
           .then((_) {
