@@ -329,7 +329,7 @@ class _PlaylistState extends State<Playlist> implements PlaylistControl {
       if (!completed) return;
 
       debugPrint(
-        "advancing through playlist ${player.state.playlist.medias.length} ${player.state.playlist.medias}",
+        "advancing through playlist ${player.state.playlist.medias.length}",
       );
       completed ? next() : player.pause();
     });
