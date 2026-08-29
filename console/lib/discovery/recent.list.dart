@@ -7,7 +7,6 @@ import 'package:retrovibed/library.dart' as lib;
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:fixnum/fixnum.dart' as fixnum;
-import 'recent.edit.dart';
 
 class RecentList extends StatefulWidget {
   const RecentList(

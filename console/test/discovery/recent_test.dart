@@ -9,16 +9,19 @@ import 'package:retrovibed/testing/widget_tester_extensions.dart';
 
 Future<lib.RecentSearchResponse> _notimplemented(
   lib.RecentSearchRequest req, {
+  String? host,
   List<httpx.Option> options = const [],
 }) => Future.error(http.Response('', 501));
 
 Future<lib.RecentSearchResponse> _unauthorized(
   lib.RecentSearchRequest req, {
+  String? host,
   List<httpx.Option> options = const [],
 }) => Future.error(http.Response('', 401));
 
 Future<lib.RecentSearchResponse> _empty(
   lib.RecentSearchRequest req, {
+  String? host,
   List<httpx.Option> options = const [],
 }) => Future.value(lib.RecentSearchResponse(items: []));
 
