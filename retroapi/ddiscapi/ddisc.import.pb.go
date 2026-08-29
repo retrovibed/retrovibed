@@ -21,6 +21,60 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// Nested (rather than top-level like ddisc.AcquisitionState) so its
+// Unknown zero value is scoped to ddisc.Import, not the ddisc package -
+// proto3 scopes enum value names to their enclosing scope, and a
+// top-level LicenseStatus.Unknown here would collide with
+// ddisc.AcquisitionState's own top-level Unknown (ddisc.discovery.proto).
+type Import_LicenseStatus int32
+
+const (
+	Import_Unknown    Import_LicenseStatus = 0
+	Import_Unlicensed Import_LicenseStatus = 1
+	Import_Licensed   Import_LicenseStatus = 2
+)
+
+// Enum value maps for Import_LicenseStatus.
+var (
+	Import_LicenseStatus_name = map[int32]string{
+		0: "Unknown",
+		1: "Unlicensed",
+		2: "Licensed",
+	}
+	Import_LicenseStatus_value = map[string]int32{
+		"Unknown":    0,
+		"Unlicensed": 1,
+		"Licensed":   2,
+	}
+)
+
+func (x Import_LicenseStatus) Enum() *Import_LicenseStatus {
+	p := new(Import_LicenseStatus)
+	*p = x
+	return p
+}
+
+func (x Import_LicenseStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (Import_LicenseStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_ddisc_ddisc_import_proto_enumTypes[0].Descriptor()
+}
+
+func (Import_LicenseStatus) Type() protoreflect.EnumType {
+	return &file_ddisc_ddisc_import_proto_enumTypes[0]
+}
+
+func (x Import_LicenseStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use Import_LicenseStatus.Descriptor instead.
+func (Import_LicenseStatus) EnumDescriptor() ([]byte, []int) {
+	return file_ddisc_ddisc_import_proto_rawDescGZIP(), []int{0, 0}
+}
+
 type Import struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Uri           string                 `protobuf:"bytes,1,opt,name=uri,proto3" json:"uri,omitempty"`
@@ -34,6 +88,7 @@ type Import struct {
 	PosterPath    string                 `protobuf:"bytes,9,opt,name=poster_path,proto3" json:"poster_path,omitempty"`
 	Source        string                 `protobuf:"bytes,10,opt,name=source,proto3" json:"source,omitempty"`
 	Bytes         uint64                 `protobuf:"varint,11,opt,name=bytes,proto3" json:"bytes,omitempty"`
+	Licensed      Import_LicenseStatus   `protobuf:"varint,12,opt,name=licensed,proto3,enum=ddisc.Import_LicenseStatus" json:"licensed,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -145,11 +200,18 @@ func (x *Import) GetBytes() uint64 {
 	return 0
 }
 
+func (x *Import) GetLicensed() Import_LicenseStatus {
+	if x != nil {
+		return x.Licensed
+	}
+	return Import_Unknown
+}
+
 var File_ddisc_ddisc_import_proto protoreflect.FileDescriptor
 
 const file_ddisc_ddisc_import_proto_rawDesc = "" +
 	"\n" +
-	"\x18ddisc/ddisc.import.proto\x12\x05ddisc\"\xb2\x02\n" +
+	"\x18ddisc/ddisc.import.proto\x12\x05ddisc\"\xa7\x03\n" +
 	"\x06Import\x12\x10\n" +
 	"\x03uri\x18\x01 \x01(\tR\x03uri\x12\x16\n" +
 	"\x06health\x18\x02 \x01(\rR\x06health\x12\x1a\n" +
@@ -164,7 +226,13 @@ const file_ddisc_ddisc_import_proto_rawDesc = "" +
 	"\vposter_path\x18\t \x01(\tR\vposter_path\x12\x16\n" +
 	"\x06source\x18\n" +
 	" \x01(\tR\x06source\x12\x14\n" +
-	"\x05bytes\x18\v \x01(\x04R\x05bytesb\x06proto3"
+	"\x05bytes\x18\v \x01(\x04R\x05bytes\x127\n" +
+	"\blicensed\x18\f \x01(\x0e2\x1b.ddisc.Import.LicenseStatusR\blicensed\":\n" +
+	"\rLicenseStatus\x12\v\n" +
+	"\aUnknown\x10\x00\x12\x0e\n" +
+	"\n" +
+	"Unlicensed\x10\x01\x12\f\n" +
+	"\bLicensed\x10\x02b\x06proto3"
 
 var (
 	file_ddisc_ddisc_import_proto_rawDescOnce sync.Once
@@ -178,16 +246,19 @@ func file_ddisc_ddisc_import_proto_rawDescGZIP() []byte {
 	return file_ddisc_ddisc_import_proto_rawDescData
 }
 
+var file_ddisc_ddisc_import_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_ddisc_ddisc_import_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_ddisc_ddisc_import_proto_goTypes = []any{
-	(*Import)(nil), // 0: ddisc.Import
+	(Import_LicenseStatus)(0), // 0: ddisc.Import.LicenseStatus
+	(*Import)(nil),            // 1: ddisc.Import
 }
 var file_ddisc_ddisc_import_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	0, // 0: ddisc.Import.licensed:type_name -> ddisc.Import.LicenseStatus
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_ddisc_ddisc_import_proto_init() }
@@ -200,13 +271,14 @@ func file_ddisc_ddisc_import_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_ddisc_ddisc_import_proto_rawDesc), len(file_ddisc_ddisc_import_proto_rawDesc)),
-			NumEnums:      0,
+			NumEnums:      1,
 			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_ddisc_ddisc_import_proto_goTypes,
 		DependencyIndexes: file_ddisc_ddisc_import_proto_depIdxs,
+		EnumInfos:         file_ddisc_ddisc_import_proto_enumTypes,
 		MessageInfos:      file_ddisc_ddisc_import_proto_msgTypes,
 	}.Build()
 	File_ddisc_ddisc_import_proto = out.File

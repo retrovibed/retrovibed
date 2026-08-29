@@ -36,14 +36,17 @@ const guestPluginCacheDir = "/plugin/cache.d"
 
 // Search runs every loaded plugin as a WASI command with
 // --mimetype mimetypes[0] [--mimetype mimetypes[1] ...] --query query
-// [--adult], decoding each line of its stdout as a *ddiscapi.Import and
-// yielding it. --adult is only ever appended when adult is true (see
-// runSearchJob) so a plugin built before this flag existed keeps working for
-// ordinary (adult=false) searches. One plugin's failure is logged and
-// skipped, not fatal to the whole sequence. ctx alone governs how long this
-// may run — wrap it with context.WithTimeout for a deadline.
-func (r *Registry) Search(ctx context.Context, mimetypes []string, query string, adult bool) iterx.Seq[*ddiscapi.Import] {
-	return &searchSeq{r: r, mimetypes: mimetypes, query: query, adult: adult}
+// [--adult] [--public], decoding each line of its stdout as a
+// *ddiscapi.Import and yielding it. --adult/--public are only ever appended
+// when true (see runSearchJob) so a plugin built before either flag existed
+// keeps working for ordinary (adult=false, public=false) searches. public
+// asks a plugin backed by a private tracker to return zero results instead
+// of ignoring the request; a plugin already public treats it as a no-op.
+// One plugin's failure is logged and skipped, not fatal to the whole
+// sequence. ctx alone governs how long this may run — wrap it with
+// context.WithTimeout for a deadline.
+func (r *Registry) Search(ctx context.Context, mimetypes []string, query string, adult, public bool) iterx.Seq[*ddiscapi.Import] {
+	return &searchSeq{r: r, mimetypes: mimetypes, query: query, adult: adult, public: public}
 }
 
 type searchSeq struct {
@@ -51,6 +54,7 @@ type searchSeq struct {
 	mimetypes []string
 	query     string
 	adult     bool
+	public    bool
 	err       error
 }
 
@@ -64,6 +68,7 @@ type workload struct {
 	mimetypes []string
 	query     string
 	adult     bool
+	public    bool
 	results   chan<- *ddiscapi.Import
 	wg        *sync.WaitGroup
 }
@@ -89,9 +94,12 @@ func (r *Registry) runSearchJob(ctx context.Context, j workload) error {
 		args = append(args, "--mimetype", m)
 	}
 	// only ever appended when true - see Search's doc comment for why an
-	// explicit --adult=false is never emitted.
+	// explicit --adult=false/--public=false is never emitted.
 	if j.adult {
 		args = append(args, "--adult")
+	}
+	if j.public {
+		args = append(args, "--public")
 	}
 
 	hostConfigDir := r.PluginConfigDir(id)
@@ -222,6 +230,7 @@ func (t *searchSeq) Each(ctx context.Context) iter.Seq[*ddiscapi.Import] {
 					mimetypes: t.mimetypes,
 					query:     t.query,
 					adult:     t.adult,
+					public:    t.public,
 					results:   results,
 					wg:        &wg,
 				}

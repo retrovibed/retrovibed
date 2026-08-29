@@ -25,7 +25,7 @@ func TestRegistry(t *testing.T) {
 
 		var reg T = r
 
-		seq := reg.Search(ctx, []string{"video"}, "ubuntu", false)
+		seq := reg.Search(ctx, []string{"video"}, "ubuntu", false, false)
 		for range seq.Each(ctx) {
 		}
 		require.NoError(t, seq.Err())
@@ -46,7 +46,7 @@ func TestRegistry(t *testing.T) {
 		require.NoError(t, err)
 		require.NoError(t, r.Load(ctx, wasmPath))
 
-		seq := r.Search(ctx, []string{"video"}, "ubuntu", false)
+		seq := r.Search(ctx, []string{"video"}, "ubuntu", false, false)
 
 		var results []string
 		for imp := range seq.Each(ctx) {
@@ -82,7 +82,7 @@ func TestRegistry(t *testing.T) {
 		require.NoError(t, r.Load(ctx, echoPath))
 		require.NoError(t, r.Load(ctx, failPath))
 
-		seq := r.Search(ctx, []string{"video"}, "ubuntu", false)
+		seq := r.Search(ctx, []string{"video"}, "ubuntu", false, false)
 		var count int
 		for range seq.Each(ctx) {
 			count++
@@ -121,7 +121,7 @@ func TestRegistry(t *testing.T) {
 		require.NoError(t, err)
 		require.NoError(t, r.Load(ctx, wasmPath))
 
-		seq := r.Search(ctx, []string{"test"}, ln.Addr().String(), false)
+		seq := r.Search(ctx, []string{"test"}, ln.Addr().String(), false, false)
 
 		var results []string
 		for imp := range seq.Each(ctx) {
@@ -169,7 +169,7 @@ func TestPluginDirs(t *testing.T) {
 		r.cacheDir = t.TempDir()
 		require.NoError(t, r.Load(ctx, wasmPath))
 
-		seq := r.Search(ctx, []string{"video"}, "ubuntu", false)
+		seq := r.Search(ctx, []string{"video"}, "ubuntu", false, false)
 		for range seq.Each(ctx) {
 		}
 		require.NoError(t, seq.Err())
@@ -195,7 +195,7 @@ func TestPluginDirs(t *testing.T) {
 		r.cacheDir = t.TempDir()
 		require.NoError(t, r.Load(ctx, wasmPath))
 
-		seq := r.Search(ctx, []string{"video"}, "ubuntu", false)
+		seq := r.Search(ctx, []string{"video"}, "ubuntu", false, false)
 
 		var guestPaths []string
 		for imp := range seq.Each(ctx) {
@@ -215,7 +215,7 @@ func TestUnimplemented(t *testing.T) {
 	t.Run("search returns errUnsupported", func(t *testing.T) {
 		var reg T = Unimplemented{}
 
-		seq := reg.Search(context.Background(), []string{"video"}, "ubuntu", false)
+		seq := reg.Search(context.Background(), []string{"video"}, "ubuntu", false, false)
 
 		var count int
 		for range seq.Each(context.Background()) {

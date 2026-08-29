@@ -26,6 +26,7 @@ type DiscoverRequest struct {
 	Query        string   // optional; needed by the plugin strategy, empty means "skip it"
 	Mimetypes    []string // optional; discovery mimetypes, needed by the plugin strategy
 	Adult        bool     // optional; enable adult content.
+	Public       bool     // optional; only return results a public source could produce.
 }
 
 // DiscoverRequestFromKnown builds a DiscoverRequest from a library.Known

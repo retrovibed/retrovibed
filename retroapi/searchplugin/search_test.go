@@ -33,7 +33,7 @@ func TestRunSearchJobInjectsSiblingEnvFile(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, r.Load(ctx, wasmPath))
 
-	seq := r.Search(ctx, []string{"video"}, "ubuntu", false)
+	seq := r.Search(ctx, []string{"video"}, "ubuntu", false, false)
 
 	var results []string
 	for imp := range seq.Each(ctx) {
@@ -59,7 +59,7 @@ func TestRunSearchJobToleratesMissingEnvFile(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, r.Load(ctx, wasmPath))
 
-	seq := r.Search(ctx, []string{"video"}, "ubuntu", false)
+	seq := r.Search(ctx, []string{"video"}, "ubuntu", false, false)
 
 	var results []*ddiscapi.Import
 	for imp := range seq.Each(ctx) {

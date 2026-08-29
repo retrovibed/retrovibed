@@ -70,7 +70,7 @@ var source = ""
 // cli is parsed straight from argv[1:] by kong.Parse. Registry.Search
 // always invokes a loaded plugin as exactly:
 //
-//	<binary> plugin --mimetype <m> [--mimetype <m> ...] --query <query> [--adult]
+//	<binary> plugin --mimetype <m> [--mimetype <m> ...] --query <query> [--adult] [--public]
 //
 // (see retroapi/searchplugin/search.go's runSearchJob) - argv[1] is
 // literally the subcommand name "plugin", which kong resolves the same way
@@ -84,14 +84,15 @@ var cli struct {
 }
 
 // pluginCmd's flags match Registry's invocation 1:1: repeatable --mimetype,
-// required --query, and --adult only ever appended when true (Registry
-// never passes --adult=false), so a plugin predating this flag still works
-// for ordinary searches.
+// required --query, and --adult/--public only ever appended when true
+// (Registry never passes --adult=false/--public=false), so a plugin
+// predating either flag still works for ordinary searches.
 type pluginCmd struct {
 	Mimetype []string `flag:"" name:"mimetype" help:"discovery mimetype to search within (repeatable)"`
 	Query    string   `flag:"" name:"query" help:"search text to query" required:""`
 	Source   string   `flag:"" name:"source" help:"provenance tag for every result (bakeable via -ldflags -X main.source=...)" default:"${source}"`
 	Adult    bool     `flag:"" name:"adult" help:"allow adult content in results (Registry passes this whenever the caller allows it)"`
+	Public   bool     `flag:"" name:"public" help:"only return results a public source could produce (Registry passes this when the caller wants public-only results)"`
 }
 
 // Run reports the mounted directories on stderr - proof, when reading
@@ -101,6 +102,10 @@ type pluginCmd struct {
 // here instead, via net/http reaching the real network through the
 // autohijack wiring above, emitting one *ddiscapi.Import per result found.
 //
+// This noop plugin stands in for a private-tracker source, so Public true
+// means zero results - a plugin backed by an already-public source would
+// instead just ignore the flag and search normally.
+//
 // Registry.Search reads stdout as newline-delimited JSON, one
 // *ddiscapi.Import per line; anything written to stderr is logged, not
 // parsed. A plugin emitting many results should reuse a single
@@ -109,6 +114,11 @@ type pluginCmd struct {
 func (cmd *pluginCmd) Run(ctx context.Context) error {
 	fmt.Fprintln(os.Stderr, "searchplugin-noop: CONFIGURATION_DIRECTORY =", os.Getenv("CONFIGURATION_DIRECTORY"))
 	fmt.Fprintln(os.Stderr, "searchplugin-noop: CACHE_DIRECTORY =", os.Getenv("CACHE_DIRECTORY"))
+
+	if cmd.Public {
+		fmt.Fprintln(os.Stderr, "searchplugin-noop: standing in for a private-tracker source, --public requested - returning zero results")
+		return nil
+	}
 
 	var mimetype string
 	if len(cmd.Mimetype) > 0 {
@@ -138,11 +148,30 @@ type recommendationsCmd struct {
 	Mimetype []string `flag:"" name:"mimetype" help:"discovery mimetype to recommend content within (repeatable)"`
 	Limit    uint     `flag:"" name:"limit" help:"number of recommended results to emit" default:"5"`
 	Source   string   `flag:"" name:"source" help:"provenance tag for every result (bakeable via -ldflags -X main.source=...)" default:"${source}"`
+	Public   bool     `flag:"" name:"public" help:"only return results a public source could produce"`
+}
+
+// licenseCycle is the fixed order recommendationsCmd.Run cycles fabricated
+// entries' Licensed field through, so a worked example touches every value
+// of ddiscapi.Import_LicenseStatus rather than always leaving it at its
+// zero value the way pluginCmd's single fabricated result does.
+var licenseCycle = [...]ddiscapi.Import_LicenseStatus{
+	ddiscapi.Import_Unknown,
+	ddiscapi.Import_Unlicensed,
+	ddiscapi.Import_Licensed,
 }
 
 // Run fabricates Limit deterministic results, descending Popularity to
-// look recommendation-like, and encodes them the same way pluginCmd does.
+// look recommendation-like and cycling Licensed through every
+// ddiscapi.Import_LicenseStatus value, and encodes them the same way
+// pluginCmd does. Like pluginCmd, this noop stands in for a
+// private-tracker source, so Public true means zero results.
 func (cmd *recommendationsCmd) Run(ctx context.Context) error {
+	if cmd.Public {
+		fmt.Fprintln(os.Stderr, "searchplugin-noop: standing in for a private-tracker source, --public requested - returning zero results")
+		return nil
+	}
+
 	var mimetype string
 	if len(cmd.Mimetype) > 0 {
 		mimetype = cmd.Mimetype[0]
@@ -158,6 +187,7 @@ func (cmd *recommendationsCmd) Run(ctx context.Context) error {
 			Source:     cmd.Source,
 			Title:      fmt.Sprintf("recommended #%d", i),
 			Popularity: float64(cmd.Limit - i),
+			Licensed:   licenseCycle[i%uint(len(licenseCycle))],
 		}
 
 		if err := enc.Encode(imp); err != nil {

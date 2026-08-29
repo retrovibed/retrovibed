@@ -14,4 +14,16 @@ message Import {
   string poster_path = 9 [ json_name = "poster_path" ];
   string source = 10 [ json_name = "source" ];
   uint64 bytes = 11 [ json_name = "bytes" ];
+
+  // Nested (rather than top-level like ddisc.AcquisitionState) so its
+  // Unknown zero value is scoped to ddisc.Import, not the ddisc package -
+  // proto3 scopes enum value names to their enclosing scope, and a
+  // top-level LicenseStatus.Unknown here would collide with
+  // ddisc.AcquisitionState's own top-level Unknown (ddisc.discovery.proto).
+  enum LicenseStatus {
+    Unknown = 0;
+    Unlicensed = 1;
+    Licensed = 2;
+  }
+  LicenseStatus licensed = 12 [ json_name = "licensed" ];
 }

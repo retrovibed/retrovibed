@@ -27,7 +27,7 @@ import (
 // consumer of a search-plugin registry should depend on instead of the
 // concrete type, so tests can substitute a fake.
 type T interface {
-	Search(ctx context.Context, mimetypes []string, query string, adult bool) iterx.Seq[*ddiscapi.Import]
+	Search(ctx context.Context, mimetypes []string, query string, adult, public bool) iterx.Seq[*ddiscapi.Import]
 }
 
 // Unimplemented is a safe default T: every Search fails with
@@ -36,7 +36,7 @@ type T interface {
 // bare nil interface passed around.
 type Unimplemented struct{}
 
-func (Unimplemented) Search(ctx context.Context, mimetypes []string, query string, adult bool) iterx.Seq[*ddiscapi.Import] {
+func (Unimplemented) Search(ctx context.Context, mimetypes []string, query string, adult, public bool) iterx.Seq[*ddiscapi.Import] {
 	return unimplementedSeq{}
 }
 

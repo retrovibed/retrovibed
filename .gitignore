@@ -14,3 +14,4 @@ retrivobed.vibed
 dist/*
 # FVM Version Cache
 .fvm/
+retroapi/searchplugin-noop

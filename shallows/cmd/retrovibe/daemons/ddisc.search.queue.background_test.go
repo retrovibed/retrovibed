@@ -34,7 +34,7 @@ type fakeSearchPlugins struct {
 	results []*ddiscapi.Import
 }
 
-func (t fakeSearchPlugins) Search(ctx context.Context, mimetypes []string, query string, adult bool) iterx.Seq[*ddiscapi.Import] {
+func (t fakeSearchPlugins) Search(ctx context.Context, mimetypes []string, query string, adult, public bool) iterx.Seq[*ddiscapi.Import] {
 	return fakeResultSeq(t)
 }
 

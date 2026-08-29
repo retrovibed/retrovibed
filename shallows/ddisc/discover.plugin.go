@@ -40,7 +40,7 @@ func (t *pluginSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 			return
 		}
 
-		seq := t.cfg.plugins.Search(ctx, t.req.Mimetypes, t.req.Query, t.req.Adult)
+		seq := t.cfg.plugins.Search(ctx, t.req.Mimetypes, t.req.Query, t.req.Adult, t.req.Public)
 		for imp := range seq.Each(ctx) {
 			if imp.Uri == "" {
 				continue

@@ -106,7 +106,7 @@ func main() {
 		require.NoError(t, r.Load(ctx, filepath.Join(searchplugin.SearchPluginDir(userx.DefaultConfigDir(userx.DefaultRelRoot())), "baked.wasm")))
 
 		var results []*ddiscapi.Import
-		seq := r.Search(ctx, []string{"video"}, "ubuntu", false)
+		seq := r.Search(ctx, []string{"video"}, "ubuntu", false, false)
 		for imp := range seq.Each(ctx) {
 			results = append(results, imp)
 		}
