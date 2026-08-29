@@ -16,8 +16,8 @@ import (
 
 	"github.com/RoaringBitmap/roaring/v2"
 	"github.com/james-lawrence/torrent"
+	"github.com/retrovibed/retrovibed/retroapi/backoffx"
 	retronetx "github.com/retrovibed/retrovibed/retroapi/netx"
-	"github.com/retrovibed/retrovibed/shallows/internal/backoffx"
 	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/debugx"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"

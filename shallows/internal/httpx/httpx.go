@@ -21,7 +21,7 @@ import (
 	"time"
 
 	"github.com/justinas/alice"
-	"github.com/retrovibed/retrovibed/shallows/internal/backoffx"
+	"github.com/retrovibed/retrovibed/retroapi/backoffx"
 	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/debugx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"

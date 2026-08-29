@@ -11,8 +11,8 @@ import (
 
 	"github.com/michiwend/gomusicbrainz"
 
+	"github.com/retrovibed/retrovibed/retroapi/backoffx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
-	"github.com/retrovibed/retrovibed/shallows/internal/backoffx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/time/rate"

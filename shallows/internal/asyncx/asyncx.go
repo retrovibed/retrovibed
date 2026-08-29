@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/retrovibed/retrovibed/shallows/internal/backoffx"
+	"github.com/retrovibed/retrovibed/retroapi/backoffx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 )
 
