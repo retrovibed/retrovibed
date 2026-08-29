@@ -256,3 +256,32 @@ func Iter(d Strategy) iter.Seq2[int, time.Duration] {
 		}
 	}
 }
+
+func Frequency[T hashable](fq time.Duration, seed T) Strategy {
+	return frequency{
+		anchor: DynamicHashDuration(fq, seed),
+		fq:     fq,
+		c:      timex.WallClock{},
+	}
+}
+
+type frequency struct {
+	c      timex.Clock
+	anchor time.Duration
+	fq     time.Duration
+}
+
+func (t frequency) Backoff(attempt int) time.Duration {
+	ts := t.c.Now()
+	pos := ts.Truncate(t.fq) // truncate to the nearest window.
+	nts := pos.Add(t.anchor) // offset by the dynamic anchor into the window.
+	d := nts.Sub(ts)         // determine time remaining until the anchor.
+	if d >= 0 {              // if we havent passed the anchor position then return the remaining time.
+		return d
+	}
+
+	// otherwise recalculate against the next window
+	nts = pos.Add(t.fq)
+	d = nts.Sub(ts)
+	return d
+}

@@ -145,12 +145,6 @@ func SafeReset(t *time.Timer, d time.Duration) {
 	t.Reset(d)
 }
 
-type Clock struct{}
-
-func (t Clock) Now() time.Time {
-	return time.Now()
-}
-
 // RFC3339NanoMax truncate to the maximum value for RFC3339.
 func RFC3339NanoMax(t time.Time) time.Time {
 	ts := RFC3339Inf()
