@@ -12,6 +12,7 @@ import 'package:retrovibed/media/play.queue.dart' as playqueue;
 import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/library.dart' as lib;
 import 'package:retrovibed/uuidx.dart' as uuidx;
+import 'package:retrovibed/discovery.dart' as disc;
 import 'api.dart' as remote;
 import 'player.control.seek.dart';
 import 'player.control.fullscreen.dart';
@@ -72,6 +73,8 @@ class Connect extends StatefulWidget {
   final Future<remote.RemoteControlSocket> Function({required String host, List<httpx.Option> options}) connect;
   final media.FnMediaSearch Function(String host, List<httpx.Option> options) apisearch;
   final media.FnMediaFind Function(String host, List<httpx.Option> options) apirandom;
+  final lib.FnRecent apirecentlatest;
+  final lib.FnRecentTombstone apirecenttombstone;
   final int autoqueueTarget;
 
   const Connect({
@@ -80,6 +83,8 @@ class Connect extends StatefulWidget {
     required this.connect,
     required this.apisearch,
     required this.apirandom,
+    this.apirecentlatest = lib.recent.latest,
+    this.apirecenttombstone = lib.recent.delete,
     this.autoqueueTarget = _autoqueueTargetDefault,
   });
 
@@ -347,6 +352,7 @@ class _State extends State<Connect> with LoadingState {
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
+    final category = mimex.category(_search.value.next.mimetypes);
     final search = lib.SearchMinimal(
       key: const ValueKey("search"),
       empty: ds.Empty,
@@ -364,6 +370,14 @@ class _State extends State<Connect> with LoadingState {
           _latest = upd;
         });
       },
+      empty: disc.RecentList(
+        category,
+        latest: (req, {host, options = const []}) => widget.apirecentlatest(
+          req,
+          host: _endpoint.value.hostname,
+          options: [authn.request(authn.AuthedEndpoint.token(context))],
+        ),
+      ),
     );
     return ds.Shortcuts(
       bindings: {

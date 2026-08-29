@@ -34,12 +34,14 @@ typedef FnRecommendations =
 typedef FnRecent =
     Future<RecentSearchResponse> Function(
       RecentSearchRequest req, {
+      String? host,
       List<httpx.Option> options,
     });
 
 typedef FnRecentTombstone =
     Future<RecentDeleteResponse> Function(
       String id, {
+      String? host,
       List<httpx.Option> options,
     });
 
@@ -362,11 +364,12 @@ abstract class recent {
 
   static Future<RecentSearchResponse> latest(
     RecentSearchRequest req, {
+    String? host = null,
     List<httpx.Option> options = const [],
   }) async {
     return httpx
         .get(
-          Uri.https(httpx.host(), "/w/", httpx.params(req.toProto3Json())),
+          Uri.https(host ?? httpx.host(), "/w/", httpx.params(req.toProto3Json())),
           options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) {
@@ -395,6 +398,7 @@ abstract class recent {
 
   static Future<RecentDeleteResponse> delete(
     String id, {
+    String? host,
     List<httpx.Option> options = const [],
   }) {
     return httpx
