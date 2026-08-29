@@ -1,8 +1,8 @@
 package daemons
 
 import (
-	"bytes"
 	"context"
+	"errors"
 	"io"
 	"log"
 	"os"
@@ -14,17 +14,12 @@ import (
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/retrovibed/retrovibed/retroapi/asynccompute"
+	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 )
-
-// wasmMagic is the 4-byte binary header every valid wasm module begins with
-// ("\0asm"), used to verify a discovery-search-module payload before it's
-// dropped into search.d, rather than trusting the torrent's declared
-// mimetype/description.
-var wasmMagic = []byte{0x00, 0x61, 0x73, 0x6D}
 
 // SearchPluginImport finds completed, unimported RetrovibedDiscoverySearch
 // torrents, verifies their payload is a real wasm module via its magic
@@ -66,17 +61,11 @@ func SearchPluginImport(ctx context.Context, db sqlx.Queryer, plugindir string, 
 			return errorsx.Wrap(err, "unable to open torrent reader")
 		}
 
-		magic := make([]byte, len(wasmMagic))
-		if _, err := io.ReadFull(io.NewSectionReader(disk, 0, int64(_md.Bytes)), magic); errorsx.Ignore(err, io.EOF, io.ErrUnexpectedEOF) != nil {
-			return errorsx.Wrap(err, "unable to sniff wasm magic bytes")
-		}
-
-		if !bytes.Equal(magic, wasmMagic) {
+		if err := searchplugin.VerifyWasmMagic(io.NewSectionReader(disk, 0, int64(_md.Bytes))); errors.Is(err, searchplugin.ErrNotWasi) {
 			log.Println("rejecting search plugin, not a valid wasm module", _md.ID, _md.Description)
-			if err := tracking.MetadataTombstoneByID(ctx, db, _md.ID).Scan(&_md); err != nil {
-				return errorsx.Wrap(err, "unable to tombstone invalid search plugin")
-			}
-			return nil
+			return errorsx.Wrap(tracking.MetadataTombstoneByID(ctx, db, _md.ID).Scan(&_md), "unable to tombstone invalid search plugin")
+		} else if err != nil {
+			return errorsx.Wrap(err, "unable to sniff wasm magic bytes")
 		}
 
 		dstname := _md.Description

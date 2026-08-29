@@ -148,6 +148,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		_socks5             net.Listener
 		deepjwt             = httpx.NewFixedStatusClient(http.StatusMethodNotAllowed)
 		mediameta           = asyncx.NewWakeup(gctx.Context)
+		mediarecs           = asyncx.NewWakeup(gctx.Context)
 		archival            = asyncx.NewWakeup(gctx.Context)
 		publishing          = asyncx.NewWakeup(gctx.Context)
 		communitysync       = asyncx.NewWakeup(gctx.Context)
@@ -328,7 +329,12 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	asyncx.Background(gctx.Context, mediameta, func(ctx context.Context) error {
 		return errorsx.Wrap(SearchPluginImport(ctx, db, searchplugin.SearchPluginDir(userx.DefaultConfigDir(userx.DefaultRelRoot())), tvfs, tstore), "search plugin import failed")
 	})
-
+	asyncx.Background(gctx.Context, mediameta, func(ctx context.Context) error {
+		return errorsx.Wrap(
+			SearchPluginRecommendationsBackground(
+				ctx, db, "", mediarecs, plugins, peertube, mc,
+			), "search plugin recs failed")
+	})
 	go func() {
 		errorsx.Log(errorsx.Wrap(asyncx.WatchDirectories(gctx.Context, mediameta, asyncx.FileCreated, mediastore.Path()), "media metadata file watch failed"))
 	}()

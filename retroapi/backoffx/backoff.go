@@ -60,7 +60,7 @@ func Jitter(multiplier float64) Option {
 			d := math.Floor(float64(x) * multiplier)
 			return timex.DurationMax(
 				x,
-				x+time.Duration(rand.Intn(int(d))),
+				x+Random(time.Duration(d)),
 			)
 		})
 	}

@@ -55,7 +55,7 @@ func (t cmdSearchPluginInstall) Run(gctx *cmdopts.Global) (err error) {
 		return errorsx.Wrapf(err, "unable to compile search plugin: %s", t.Repository)
 	}
 
-	if err = searchplugin.VerifyWasmMagic(tmp); err != nil {
+	if err = searchplugin.VerifyWasmMagicPath(tmp); err != nil {
 		return err
 	}
 

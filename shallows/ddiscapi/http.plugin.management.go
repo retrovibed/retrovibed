@@ -266,7 +266,7 @@ func (t *HTTPPluginManagement) create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = searchplugin.VerifyWasmMagic(tmp.Name()); err != nil {
+	if err = searchplugin.VerifyWasmMagicPath(tmp.Name()); err != nil {
 		log.Println(errorsx.Wrap(err, "invalid wasm module"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return

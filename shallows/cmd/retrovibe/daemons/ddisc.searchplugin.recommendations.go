@@ -13,31 +13,25 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/library"
-	"github.com/retrovibed/retrovibed/shallows/tracking"
 )
 
-func SearchPluginRecommendationsRun(ctx context.Context, q sqlx.Queryer, importer tracking.URIImport, plugins searchplugin.T, peertube ddisc.DiscoverStrategy, mc library.QueryCleaner) error {
+func SearchPluginRecommendationsRun(ctx context.Context, q sqlx.Queryer, plugins searchplugin.T, peertube ddisc.DiscoverStrategy, mc library.QueryCleaner) error {
 	log.Println("recommendations from search plugins initiated")
 	defer log.Println("recommendations from search plugins completed")
 
 	return nil
 }
 
-func SearchPluginRecommendationsBackground(ctx context.Context, q sqlx.Queryer, seed string, importer tracking.URIImport, plugins searchplugin.T, peertube ddisc.DiscoverStrategy, mc library.QueryCleaner) error {
-	wakeup := asyncx.NewWakeup(ctx)
-	defer wakeup.Broadcast() // kick off an initial drain
+func SearchPluginRecommendationsBackground(ctx context.Context, q sqlx.Queryer, seed string, wakeup *asyncx.Wakeup, plugins searchplugin.T, peertube ddisc.DiscoverStrategy, mc library.QueryCleaner) error {
 	s := backoffx.New(
-		backoffx.Exponential(time.Second),
-		backoffx.Maximum(time.Hour),
-		backoffx.Jitter(0.1),
+		backoffx.Frequency(24*time.Hour, seed),
+		backoffx.JitterRandom(time.Minute),
 	)
 
-	// timex.StartOfDay(time.Now())
-	// backoffx.DynamicHashWindow()
-	go asyncx.Periodic(ctx, wakeup, s, "ddisc search queue drain")
+	go asyncx.Periodic(ctx, wakeup, s, "media recommendations")
 	contextx.Run(ctx, func() {
 		errorsx.Log(asyncx.Run(ctx, wakeup, func(ctx context.Context) error {
-			return SearchQueueBackgroundRun(ctx, q, importer, plugins, peertube, mc)
+			return SearchPluginRecommendationsRun(ctx, q, plugins, peertube, mc)
 		}))
 	})
 
