@@ -2,16 +2,17 @@ package daemons
 
 import (
 	"context"
-	"net/http"
+
+	"golang.org/x/crypto/ssh"
 
 	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/shallows/internal/contextx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 )
 
-func AutoRegistration(ctx context.Context, c *http.Client) {
+func AutoRegistration(ctx context.Context, signer ssh.Signer) {
 	contextx.Run(ctx, func() {
-		if _, err := authn.Register(ctx, c); err != nil {
+		if _, err := authn.AutoRegistration(ctx, signer); err != nil {
 			errorsx.Log(errorsx.Wrap(err, "unable to register with archival service"))
 		}
 	})

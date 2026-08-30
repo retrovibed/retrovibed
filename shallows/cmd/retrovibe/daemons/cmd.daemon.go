@@ -220,7 +220,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	if !authz.LocalOnly {
 		if c, err := authn.AutoJWTClient(gctx.Context, id); err == nil {
 			deepjwt = c
-			go AutoRegistration(gctx.Context, deepjwt)
+			go AutoRegistration(gctx.Context, id)
 		} else {
 			// we allow creation to fail the application should function even without the api.
 			// just warn that the api is unavailable.
