@@ -13,12 +13,11 @@
 // can also bake a default --source tag in at compile time via
 // `-ldflags "-X main.source=mysite"` (see the source var below).
 //
-// Two kong subcommands are exposed: "plugin", the only one
-// searchplugin.Registry ever invokes, and "recommendations", a second
-// worked example showing the same *ddiscapi.Import output shape used for
-// content a plugin recommends independent of any search query. Registry
-// has no contract for "recommendations" today - it's here purely to
-// demonstrate the shape a second plugin command could take.
+// Two kong subcommands are exposed, both of which searchplugin.Registry can
+// invoke (via Search and Recommend respectively): "search", the query-driven
+// command, and "recommendations", a query-less command emitting the same
+// *ddiscapi.Import output shape for content a plugin recommends independent
+// of any search term.
 package main
 
 import (
@@ -70,24 +69,28 @@ var source = ""
 // cli is parsed straight from argv[1:] by kong.Parse. Registry.Search
 // always invokes a loaded plugin as exactly:
 //
-//	<binary> plugin --mimetype <m> [--mimetype <m> ...] --query <query> [--adult] [--public]
+//	<binary> search --mimetype <m> [--mimetype <m> ...] --query <query> [--adult] [--public]
+//
+// and Registry.Recommend as:
+//
+//	<binary> recommendations --mimetype <m> [--mimetype <m> ...] [--limit <n>] [--lang <lang>] [--adult] [--public]
 //
 // (see retroapi/searchplugin/search.go's runSearchJob) - argv[1] is
-// literally the subcommand name "plugin", which kong resolves the same way
-// it resolves "recommendations" below. Unlike retrodscrape's real plugins
+// literally the subcommand name ("search" or "recommendations"), which kong
+// resolves from the field name below. Unlike retrodscrape's real plugins
 // (unit3d, leetx, piratebay), this example has no separate bare-argument
 // dev mode to preserve alongside that contract, so there's no need to
 // hand-parse os.Args before handing off to kong.
 var cli struct {
-	Plugin          pluginCmd          `cmd:"" help:"invoked by searchplugin.Registry to run a search"`
-	Recommendations recommendationsCmd `cmd:"" help:"emit recommended content, independent of any search query"`
+	Search          searchCmd          `cmd:"" help:"invoked by searchplugin.Registry to run a search"`
+	Recommendations recommendationsCmd `cmd:"" help:"invoked by searchplugin.Registry to emit recommended content, independent of any search query"`
 }
 
-// pluginCmd's flags match Registry's invocation 1:1: repeatable --mimetype,
+// searchCmd's flags match Registry's invocation 1:1: repeatable --mimetype,
 // required --query, and --adult/--public only ever appended when true
 // (Registry never passes --adult=false/--public=false), so a plugin
 // predating either flag still works for ordinary searches.
-type pluginCmd struct {
+type searchCmd struct {
 	Mimetype []string `flag:"" name:"mimetype" help:"discovery mimetype to search within (repeatable)"`
 	Query    string   `flag:"" name:"query" help:"search text to query" required:""`
 	Source   string   `flag:"" name:"source" help:"provenance tag for every result (bakeable via -ldflags -X main.source=...)" default:"${source}"`
@@ -111,7 +114,7 @@ type pluginCmd struct {
 // parsed. A plugin emitting many results should reuse a single
 // json.Encoder/writer across all of them rather than reopening one per
 // result.
-func (cmd *pluginCmd) Run(ctx context.Context) error {
+func (cmd *searchCmd) Run(ctx context.Context) error {
 	fmt.Fprintln(os.Stderr, "searchplugin-noop: CONFIGURATION_DIRECTORY =", os.Getenv("CONFIGURATION_DIRECTORY"))
 	fmt.Fprintln(os.Stderr, "searchplugin-noop: CACHE_DIRECTORY =", os.Getenv("CACHE_DIRECTORY"))
 
@@ -140,21 +143,26 @@ func (cmd *pluginCmd) Run(ctx context.Context) error {
 	return nil
 }
 
-// recommendationsCmd has no Registry contract behind it - it's a second
-// worked example of the *ddiscapi.Import output shape, for content a
-// plugin recommends independent of any search query. Unlike pluginCmd
-// there's no --query: recommendations aren't search-driven by definition.
+// recommendationsCmd is invoked by Registry.Recommend - a second worked
+// example of the *ddiscapi.Import output shape, for content a plugin
+// recommends independent of any search query. Unlike searchCmd there's no
+// --query: recommendations aren't search-driven by definition. --lang and
+// --adult mirror searchCmd's --adult - only ever appended when non-blank/
+// true (Registry never emits --lang ""/--adult=false), so a plugin
+// predating either flag still works for a lang-less, non-adult caller.
 type recommendationsCmd struct {
 	Mimetype []string `flag:"" name:"mimetype" help:"discovery mimetype to recommend content within (repeatable)"`
 	Limit    uint     `flag:"" name:"limit" help:"number of recommended results to emit" default:"5"`
 	Source   string   `flag:"" name:"source" help:"provenance tag for every result (bakeable via -ldflags -X main.source=...)" default:"${source}"`
+	Lang     string   `flag:"" name:"lang" help:"restrict recommended results to this language (Registry passes the caller's locale language)"`
+	Adult    bool     `flag:"" name:"adult" help:"allow adult content in recommended results (Registry passes this whenever the caller allows it)"`
 	Public   bool     `flag:"" name:"public" help:"only return results a public source could produce"`
 }
 
 // licenseCycle is the fixed order recommendationsCmd.Run cycles fabricated
 // entries' Licensed field through, so a worked example touches every value
 // of ddiscapi.Import_LicenseStatus rather than always leaving it at its
-// zero value the way pluginCmd's single fabricated result does.
+// zero value the way searchCmd's single fabricated result does.
 var licenseCycle = [...]ddiscapi.Import_LicenseStatus{
 	ddiscapi.Import_Unknown,
 	ddiscapi.Import_Unlicensed,
@@ -164,7 +172,7 @@ var licenseCycle = [...]ddiscapi.Import_LicenseStatus{
 // Run fabricates Limit deterministic results, descending Popularity to
 // look recommendation-like and cycling Licensed through every
 // ddiscapi.Import_LicenseStatus value, and encodes them the same way
-// pluginCmd does. Like pluginCmd, this noop stands in for a
+// searchCmd does. Like searchCmd, this noop stands in for a
 // private-tracker source, so Public true means zero results.
 func (cmd *recommendationsCmd) Run(ctx context.Context) error {
 	if cmd.Public {

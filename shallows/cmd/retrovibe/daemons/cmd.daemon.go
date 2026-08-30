@@ -335,9 +335,6 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	asyncx.Background(gctx.Context, mediameta, func(ctx context.Context) error {
 		return errorsx.Wrap(SearchPluginImport(ctx, db, searchplugin.SearchPluginDir(userx.DefaultConfigDir(userx.DefaultRelRoot())), tvfs, tstore), "search plugin import failed")
 	})
-	asyncx.Background(gctx.Context, mediameta, func(ctx context.Context) error {
-		return errorsx.Wrap(SearchPluginRecommendationsRun(ctx, mediarecs, db, plugins, peertube, mc), "recommended media queue")
-	})
 	go func() {
 		errorsx.Log(errorsx.Wrap(asyncx.WatchDirectories(gctx.Context, mediameta, asyncx.FileCreated, mediastore.Path()), "media metadata file watch failed"))
 	}()
@@ -388,7 +385,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	}
 
 	if t.AutoRecommendations {
-		errorsx.Log(RecommendationsBackground(gctx.Context, db))
+		errorsx.Log(RecommendationsBackground(gctx.Context, db, plugins, t.DiscoverySeed))
 	} else {
 		log.Println("auto recommendations is disabled")
 	}

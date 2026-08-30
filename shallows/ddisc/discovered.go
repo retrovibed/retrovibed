@@ -410,6 +410,10 @@ func DiscoveredQueryLanguage(v string) squirrel.Sqlizer {
 	return squirrel.Expr("ddisc_media.audio_default_locale = ?", v)
 }
 
+func DiscoveredQueryNotTombstoned() squirrel.Sqlizer {
+	return squirrel.Expr("ddisc_media.tombstoned_at > NOW()")
+}
+
 func DiscoveredQueryText(query string) squirrel.Sqlizer {
 	if query == "" {
 		return squirrelx.Noop{}

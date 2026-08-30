@@ -2,15 +2,16 @@ package ddisc
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
+	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
-	"github.com/retrovibed/retrovibed/shallows/internal/localex"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
-	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 )
 
@@ -25,6 +26,7 @@ func Recommendation(ctx context.Context, q sqlx.Queryer, mimetype string, lang s
 		DiscoveredQueryCategory(mimetype),
 		DiscoveredQueryExplicit(adult),
 		DiscoveredQueryLanguage(lang),
+		DiscoveredQueryNotTombstoned(),
 	}).OrderBy("random()").Limit(1))
 
 	if random, err = sqlx.ScanOne(scanner); err != nil {
@@ -35,20 +37,17 @@ func Recommendation(ctx context.Context, q sqlx.Queryer, mimetype string, lang s
 		return rec, err
 	}
 
-	if err = library.RecommendationInsertWithDefaults(ctx, q, library.Recommendation{
-		Source:       md5x.String(library.RecommendationSourceRandom),
-		ContentID:    random.KnownMediaID,
-		KnownMediaID: random.KnownMediaID,
-		Mimetype:     mimex.Category(random.Mimetype),
-		Language:     localex.FirstDefined(random.AudioDefaultLocale, known.OriginalLanguage),
-		Adult:        langx.FirstNonZero(random.Adult, known.Adult),
-		TombstoneAt:  time.Now().Add(library.RecommendationTTL),
-		Title:        known.Title,
-		Overview:     known.Overview,
-		Image:        stringsx.FirstNonBlank(known.PosterPath, known.BackdropPath),
-		Popularity:   known.Popularity,
-		Released:     known.Released,
-	}).Scan(&rec); err != nil {
+	err = library.RecommendationInsertWithDefaults(
+		ctx,
+		q,
+		RecommendationFromDiscovered(
+			random,
+			library.RecommendationOptionAutoKnown(known),
+			library.RecommendationOptionSourceRandom,
+		),
+	).Scan(&rec)
+
+	if err != nil {
 		return rec, err
 	}
 
@@ -59,8 +58,8 @@ func Recommendation(ctx context.Context, q sqlx.Queryer, mimetype string, lang s
 // library.Recommendation keyed on d's own ddisc_media row. Pure mapping -
 // does not touch the database; callers are responsible for persisting it
 // via library.RecommendationInsertWithDefaults.
-func RecommendationFromDiscovered(d Discovered) library.Recommendation {
-	return library.Recommendation{
+func RecommendationFromDiscovered(d Discovered, options ...library.RecommendationOption) library.Recommendation {
+	return langx.Clone(library.Recommendation{
 		Source:       md5x.String(library.RecommendationSourceDiscovered),
 		ContentID:    d.ID,
 		KnownMediaID: d.KnownMediaID,
@@ -70,6 +69,33 @@ func RecommendationFromDiscovered(d Discovered) library.Recommendation {
 		TombstoneAt:  time.Now().Add(library.RecommendationTTL),
 		Title:        d.Title,
 		Overview:     d.Description,
+		Image:        d.PosterURI,
 		Released:     d.ReleasedAt,
+	}, options...)
+}
+
+// RecommendationsFromPlugins asks every loaded search plugin for up to limit
+// recommended candidates for mimetype (via searchplugin.R.Recommend, which is
+// query-less by design), restricted to lang/adult the same way
+// ddisc.Recommendation restricts its own random pick, and persists each as a
+// library.Recommendation, deduplicated by content id through
+// RecommendationInsertWithDefaults's existing ON CONFLICT. A single plugin
+// failing is already logged and skipped inside Registry.Recommend, and no
+// registry being wired at all (searchplugin.Unimplemented's
+// errors.ErrUnsupported) is treated the same as zero plugins responding -
+// that's a searchplugin-layer detail callers of this pipeline shouldn't have
+// to know about.
+func RecommendationsFromPlugins(ctx context.Context, q sqlx.Queryer, plugins searchplugin.R, mimetype string, limit uint, lang string, adult bool) error {
+	seq := plugins.Recommend(ctx, []string{mimetype}, limit, lang, adult, false)
+
+	for imp := range seq.Each(ctx) {
+		d := NewDiscoveredFromImport(imp, DiscoveredOptionMimetype(imp.Mimetype))
+
+		var rec library.Recommendation
+		if err := library.RecommendationInsertWithDefaults(ctx, q, RecommendationFromDiscovered(d, library.RecommendationOptionSourceSearchPlugin)).Scan(&rec); err != nil {
+			return err
+		}
 	}
+
+	return errorsx.Ignore(seq.Err(), errors.ErrUnsupported)
 }

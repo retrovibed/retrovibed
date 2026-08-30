@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-	fs := flag.NewFlagSet("plugin", flag.ExitOnError)
+	fs := flag.NewFlagSet("search", flag.ExitOnError)
 	mimetype := fs.String("mimetype", "", "")
 	fs.String("query", "", "")
 	fs.Bool("adult", false, "")
