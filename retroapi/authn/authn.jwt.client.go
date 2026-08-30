@@ -16,6 +16,12 @@ import (
 	"golang.org/x/oauth2"
 )
 
+// AutoJWTClient returns a client authorized against /m/* endpoints via the
+// authz layer (requires the identity to already have a profile). Never pass
+// its result to Register — Register creates the first profile, but this
+// client's authz layer requires one to already exist to fetch a bearer at
+// all, including for Register's own /authn/ssh request. Use
+// RegistrationJWTClient for that instead.
 func AutoJWTClient(ctx context.Context, signer ssh.Signer) (c *http.Client, err error) {
 	c, err = Oauth2DeeppoolHTTPClient(ctx, signer)
 	if err != nil {
@@ -23,6 +29,20 @@ func AutoJWTClient(ctx context.Context, signer ssh.Signer) (c *http.Client, err 
 	}
 
 	return RetryClient(AuthzClient(JWTClientHostname(c, env.Deeppool()))), nil
+}
+
+// RegistrationJWTClient returns the client Register must be called with: the
+// layer-1 SSH-signed JWT client only, with no dependency on an existing
+// profile. See AutoJWTClient's doc comment for why that client can't be used
+// here.
+func RegistrationJWTClient(ctx context.Context, signer ssh.Signer) (*http.Client, error) {
+	return RegistrationJWTClientWithEndpoint(ctx, signer, DeeppoolEndpoint())
+}
+
+// RegistrationJWTClientWithEndpoint is RegistrationJWTClient with an explicit
+// endpoint instead of env.Deeppool(), for tests driving a fake server.
+func RegistrationJWTClientWithEndpoint(ctx context.Context, signer ssh.Signer, endpoint oauth2.Endpoint) (*http.Client, error) {
+	return Oauth2DeeppoolHTTPClientWithEndpoint(ctx, signer, endpoint)
 }
 
 func JWTClientHostname(oauth2c *http.Client, hostname string) *http.Client {
