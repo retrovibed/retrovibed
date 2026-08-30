@@ -148,7 +148,7 @@ class _ListDisplayState extends State<ListDisplay> {
                   _overlay = _overlay == ds.Empty ? communitycreation : ds.Empty;
                 });
               },
-              help: ds.Hint(const Text("create a new community with a domain and description")),
+              help: ds.Hint(const Text("create a new community with a url and description")),
             ),
           ),
         ],

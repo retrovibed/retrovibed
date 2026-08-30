@@ -30,6 +30,7 @@ void main() {
     group('confirmation', () {
       final community = Community(
         domain: 'testdomain',
+        url: 'https://testdomain.community.retrovibe.space',
         description: 'A test community',
         createdAt: '2024-01-15T14:30:00Z',
       );
@@ -75,7 +76,7 @@ void main() {
         capturedOnDetect(encodeQRPayload(community));
         await tester.pumpAndSettle();
 
-        expect(find.text('testdomain'), findsOneWidget);
+        expect(find.text('https://testdomain.community.retrovibe.space'), findsOneWidget);
         expect(tester.takeException(), isNull);
       });
 

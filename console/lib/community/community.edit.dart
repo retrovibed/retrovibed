@@ -34,16 +34,18 @@ class CommunityEdit extends StatelessWidget {
         spacing: defaults.spacing,
         children: [
           forms.Field(
-            label: Text('Domain'),
+            label: Text('URL'),
             input: TextFormField(
               readOnly: readOnly,
               autofocus: !readOnly && autofocus,
-              initialValue: community.domain,
-              onChanged: (v) => onChange(community..domain = v.trim()),
+              initialValue: community.url,
+              onChanged: (v) => onChange(community..url = v.trim()),
               decoration: InputDecoration(
-                hintText: 'example',
+                hintText: 'https://example.community.retrovibe.space',
                 helper: Text(
-                  'https://${community.domain.isEmpty ? 'example' : community.domain}.community.retrovibe.space',
+                  community.url.isEmpty
+                      ? 'leave blank to auto-generate a url'
+                      : community.url,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(color: Colors.grey, fontSize: 10),
@@ -52,7 +54,11 @@ class CommunityEdit extends StatelessWidget {
               ),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                  return 'Domain is required';
+                  return null;
+                }
+                final uri = Uri.tryParse(value.trim());
+                if (uri == null || !uri.isAbsolute) {
+                  return 'must be a valid url';
                 }
                 return null;
               },

@@ -17,7 +17,7 @@ class DeleteButton extends StatelessWidget {
         return AlertDialog(
           title: Text('Delete Community'),
           content: Text(
-            'Are you sure you want to delete "${community.domain}"? This action cannot be undone.',
+            'Are you sure you want to delete "${community.url}"? This action cannot be undone.',
           ),
           actions: [
             TextButton(
