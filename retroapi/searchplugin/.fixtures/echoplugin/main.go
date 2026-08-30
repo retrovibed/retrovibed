@@ -13,10 +13,10 @@ type result struct {
 }
 
 func main() {
-	// os.Args[0] is the program name; os.Args[1] is the "plugin"
+	// os.Args[0] is the program name; os.Args[1] is the "search"
 	// subcommand a real kong-based plugin would consume before parsing
 	// its own flags, so skip it here too.
-	fs := flag.NewFlagSet("plugin", flag.ExitOnError)
+	fs := flag.NewFlagSet("search", flag.ExitOnError)
 	mimetype := fs.String("mimetype", "", "")
 	query := fs.String("query", "", "")
 	fs.Bool("adult", false, "")

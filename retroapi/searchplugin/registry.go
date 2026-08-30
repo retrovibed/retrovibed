@@ -30,13 +30,24 @@ type T interface {
 	Search(ctx context.Context, mimetypes []string, query string, adult, public bool) iterx.Seq[*ddiscapi.Import]
 }
 
-// Unimplemented is a safe default T: every Search fails with
+// R is the interface *Registry satisfies for Recommend — kept separate from
+// T so a caller that only needs Search doesn't have to depend on Recommend,
+// and vice versa.
+type R interface {
+	Recommend(ctx context.Context, mimetypes []string, limit uint, lang string, adult, public bool) iterx.Seq[*ddiscapi.Import]
+}
+
+// Unimplemented is a safe default T and R: every Search/Recommend fails with
 // errors.ErrUnsupported instead of silently returning nothing, so callers
 // that haven't wired up a real registry get a clear signal rather than a
 // bare nil interface passed around.
 type Unimplemented struct{}
 
 func (Unimplemented) Search(ctx context.Context, mimetypes []string, query string, adult, public bool) iterx.Seq[*ddiscapi.Import] {
+	return unimplementedSeq{}
+}
+
+func (Unimplemented) Recommend(ctx context.Context, mimetypes []string, limit uint, lang string, adult, public bool) iterx.Seq[*ddiscapi.Import] {
 	return unimplementedSeq{}
 }
 

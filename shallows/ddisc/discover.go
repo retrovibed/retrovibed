@@ -5,9 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"iter"
-	"log"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
@@ -201,7 +199,6 @@ func (t *discoverSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 			seq = t.dynamicMedia(seq)
 
 			for d := range seq.Each(ctx) {
-				log.Println("DERP DERP 1", spew.Sdump(d))
 				if err := t.policy.Rank(&d); err != nil {
 					t.err = err
 					return

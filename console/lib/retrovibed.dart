@@ -14,6 +14,17 @@ import 'package:retrovibed/windowx.dart';
 import 'package:window_manager/window_manager.dart' show TitleBarStyle;
 
 File _defaultlib() {
+  if (Platform.isMacOS) {
+    // Flutter's native-assets build wraps the raw libretrovibed.dylib built
+    // by hook/build.dart into a versioned .framework and embeds it in
+    // Contents/Frameworks, stripping the "lib" prefix and ".dylib"
+    // extension along the way (see frameworkUri() in flutter_tools'
+    // native_assets_host.dart) - so the file that ends up on disk is
+    // retrovibed.framework/retrovibed, not libretrovibed.dylib.
+    final execDir = File(Platform.resolvedExecutable).parent.path;
+    return File("$execDir/../Frameworks/retrovibed.framework/retrovibed");
+  }
+
   return File("libretrovibed.so");
 }
 
@@ -38,14 +49,6 @@ String _path({String name = "libretrovibed.so"}) {
 }
 
 DynamicLibrary _loadLibrary() {
-  if (Platform.isAndroid || Platform.isLinux) {
-    return DynamicLibrary.open(_path());
-  }
-
-  if (Platform.isMacOS) {
-    return DynamicLibrary.open(_path(name: 'libretrovibed.dylib'));
-  }
-
   if (Platform.isIOS) {
     return DynamicLibrary.process();
   }

@@ -4,13 +4,11 @@ import (
 	"context"
 	"eg/compute/console"
 	"log"
-	"time"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
 	"github.com/egdaemon/eg/runtime/wasi/shell"
 	"github.com/egdaemon/eg/runtime/x/wasi/egbug"
-	"github.com/egdaemon/eg/runtime/x/wasi/eggolang"
 )
 
 func Debug(runtime shell.Command) eg.OpFn {
@@ -30,11 +28,7 @@ func main() {
 	ctx, done := context.WithTimeout(context.Background(), egenv.TTL())
 	defer done()
 
-	runtime := shell.Runtime().
-		EnvironFrom(eggolang.Env()...).
-		Environ("PUB_CACHE", egenv.CacheDirectory(".eg", "dart"))
-
-	flutter := runtime.Directory(egenv.WorkingDirectory("console"))
+	runtime := shell.Runtime()
 
 	err := eg.Perform(
 		ctx,
@@ -43,31 +37,13 @@ func main() {
 				shell.New("brew install go duckdb gpgme flutter ffmpeg@7 cocoapods"),
 			),
 			egbug.DebugFailure(
-				shell.Op(
-					flutter.New("mkdir -p build/nativelib"),
-					flutter.New("go -C retrovibedbind build -buildmode=c-shared --tags localdev -o ../build/nativelib/retrovibed.dylib ./...").Timeout(5*time.Minute),
-				),
+				console.GenerateDevDarwinBinding(runtime, egenv.CacheDirectory("dev.native.libs")),
 				eg.Sequential(
-					egbug.Log("failed to build native library"),
+					egbug.Log("failed to build native library / generate ffi bindings"),
 					Debug(runtime),
 				),
 			),
-			egbug.DebugFailure(
-				shell.Op(
-					flutter.New("cp build/nativelib/retrovibed.h build/nativelib/libretrovibed.h"),
-					flutter.New("dart run ffigen --config ffigen.yaml --compiler-opts \"-I$(clang --print-resource-dir)/include\""),
-				),
-				eg.Sequential(
-					egbug.Log("failed to generate ffi bindings"),
-					Debug(runtime),
-				),
-			),
-			shell.Op(
-				flutter.New("flutter pub get"),
-				flutter.New("flutter build macos --debug"),
-				flutter.New("cp build/nativelib/retrovibed.dylib build/macos/Build/Products/Debug/retrovibed.app/Contents/MacOS/retrovibed.dylib"),
-				flutter.New("codesign --force --sign - build/macos/Build/Products/Debug/retrovibed.app"),
-			),
+			console.BuildDevDarwin,
 			console.RunDev("flutter run -d macos --use-application-binary=build/macos/Build/Products/Debug/retrovibed.app"),
 		),
 	)

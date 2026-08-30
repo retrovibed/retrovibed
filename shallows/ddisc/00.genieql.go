@@ -205,3 +205,32 @@ func SearchQueuePurge(
 ) {
 	gql = gql.Query(`DELETE FROM ddisc_search_queue WHERE created_at <= NOW() - to_seconds(CAST({maxAge} AS BIGINT) / 1000000000) RETURNING ` + SearchQueueScannerStaticColumns)
 }
+
+func RecommendationDefaults(
+	gql genieql.Structure,
+) {
+	gql.From(
+		gql.Table("ddisc_recommendation_defaults"),
+	)
+}
+
+func RecommendationDefaultsScanner(
+	gql genieql.Scanner,
+	pattern func(i RecommendationDefaults),
+) {
+	gql.ColumnNamePrefix("ddisc_recommendation_defaults.")
+}
+
+func RecommendationDefaultsInsertWithDefaults(
+	gql genieql.Insert,
+	pattern func(ctx context.Context, q sqlx.Queryer, a RecommendationDefaults) NewRecommendationDefaultsScannerStaticRow,
+) {
+	gql.Into("ddisc_recommendation_defaults").Default("id", "created_at", "updated_at").Conflict("ON CONFLICT (profile_id) DO UPDATE SET language = EXCLUDED.language, adult = EXCLUDED.adult, rlimit = EXCLUDED.rlimit, updated_at = DEFAULT")
+}
+
+func RecommendationDefaultsFindByProfileID(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, pid string) NewRecommendationDefaultsScannerStaticRow,
+) {
+	gql = gql.Query(`SELECT ` + RecommendationDefaultsScannerStaticColumns + ` FROM ddisc_recommendation_defaults WHERE "profile_id" = {pid}`)
+}

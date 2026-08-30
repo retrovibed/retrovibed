@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestNoopPlugin(t *testing.T) {
+func TestNoopSearch(t *testing.T) {
 	t.Run("BakesSourceViaLdflags", func(t *testing.T) {
 		bin := filepath.Join(t.TempDir(), "noop")
 		build := exec.Command("go", "build", "-ldflags", "-X main.source=demo-site", "-o", bin, ".")
@@ -19,7 +19,7 @@ func TestNoopPlugin(t *testing.T) {
 		require.NoError(t, err, string(out))
 
 		var stdout bytes.Buffer
-		run := exec.Command(bin, "plugin", "--query", "ubuntu")
+		run := exec.Command(bin, "search", "--query", "ubuntu")
 		run.Stdout = &stdout
 		require.NoError(t, run.Run())
 
@@ -35,7 +35,7 @@ func TestNoopPlugin(t *testing.T) {
 		require.NoError(t, err, string(out))
 
 		var stdout bytes.Buffer
-		run := exec.Command(bin, "plugin", "--query", "ubuntu")
+		run := exec.Command(bin, "search", "--query", "ubuntu")
 		run.Stdout = &stdout
 		require.NoError(t, run.Run())
 
@@ -51,7 +51,7 @@ func TestNoopPlugin(t *testing.T) {
 		require.NoError(t, err, string(out))
 
 		var stdout bytes.Buffer
-		run := exec.Command(bin, "plugin", "--query", "ubuntu", "--source", "runtime-site")
+		run := exec.Command(bin, "search", "--query", "ubuntu", "--source", "runtime-site")
 		run.Stdout = &stdout
 		require.NoError(t, run.Run())
 
@@ -67,7 +67,7 @@ func TestNoopPlugin(t *testing.T) {
 		require.NoError(t, err, string(out))
 
 		var stdout bytes.Buffer
-		run := exec.Command(bin, "plugin", "--query", "ubuntu", "--public")
+		run := exec.Command(bin, "search", "--query", "ubuntu", "--public")
 		run.Stdout = &stdout
 		require.NoError(t, run.Run())
 

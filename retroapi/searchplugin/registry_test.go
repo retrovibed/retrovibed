@@ -12,6 +12,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/stretchr/testify/require"
 )
 
@@ -26,6 +27,21 @@ func TestRegistry(t *testing.T) {
 		var reg T = r
 
 		seq := reg.Search(ctx, []string{"video"}, "ubuntu", false, false)
+		for range seq.Each(ctx) {
+		}
+		require.NoError(t, seq.Err())
+	})
+
+	t.Run("satisfies R", func(t *testing.T) {
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+
+		r, err := newRegistry(ctx, defaultSocket())
+		require.NoError(t, err)
+
+		var reg R = r
+
+		seq := reg.Recommend(ctx, []string{"video"}, 5, "", false, false)
 		for range seq.Each(ctx) {
 		}
 		require.NoError(t, seq.Err())
@@ -89,6 +105,60 @@ func TestRegistry(t *testing.T) {
 		}
 		require.NoError(t, seq.Err())
 		require.Equal(t, 1, count)
+	})
+
+	t.Run("recommend decodes plugin output", func(t *testing.T) {
+		wasmPath := filepath.Join(t.TempDir(), "recommend.wasm")
+
+		build := exec.Command("go", "build", "-o", wasmPath, "./.fixtures/recommendplugin")
+		build.Env = append(build.Environ(), "GOOS=wasip1", "GOARCH=wasm")
+		out, err := build.CombinedOutput()
+		require.NoError(t, err, string(out))
+
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+
+		r, err := newRegistry(ctx, defaultSocket())
+		require.NoError(t, err)
+		require.NoError(t, r.Load(ctx, wasmPath))
+
+		seq := r.Recommend(ctx, []string{"video"}, 3, "", false, false)
+
+		var results []string
+		for imp := range seq.Each(ctx) {
+			results = append(results, imp.Uri)
+			require.Equal(t, "video", imp.Mimetype)
+			require.Equal(t, "limit=3", imp.Title)
+		}
+		require.NoError(t, seq.Err())
+		require.Len(t, results, 1)
+		require.Equal(t, "magnet:?xt=urn:btih:2222222222222222222222222222222222222222&dn=recommended", results[0])
+	})
+
+	t.Run("recommend omits --limit when zero", func(t *testing.T) {
+		wasmPath := filepath.Join(t.TempDir(), "recommend.wasm")
+
+		build := exec.Command("go", "build", "-o", wasmPath, "./.fixtures/recommendplugin")
+		build.Env = append(build.Environ(), "GOOS=wasip1", "GOARCH=wasm")
+		out, err := build.CombinedOutput()
+		require.NoError(t, err, string(out))
+
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+
+		r, err := newRegistry(ctx, defaultSocket())
+		require.NoError(t, err)
+		require.NoError(t, r.Load(ctx, wasmPath))
+
+		seq := r.Recommend(ctx, []string{"video"}, 0, "", false, false)
+
+		var results []*ddiscapi.Import
+		for imp := range seq.Each(ctx) {
+			results = append(results, imp)
+		}
+		require.NoError(t, seq.Err())
+		require.Len(t, results, 1)
+		require.Equal(t, "limit=", results[0].Title)
 	})
 
 	t.Run("blocks non-public connections", func(t *testing.T) {
@@ -216,6 +286,19 @@ func TestUnimplemented(t *testing.T) {
 		var reg T = Unimplemented{}
 
 		seq := reg.Search(context.Background(), []string{"video"}, "ubuntu", false, false)
+
+		var count int
+		for range seq.Each(context.Background()) {
+			count++
+		}
+		require.Equal(t, 0, count)
+		require.ErrorIs(t, seq.Err(), errors.ErrUnsupported)
+	})
+
+	t.Run("recommend returns errUnsupported", func(t *testing.T) {
+		var reg R = Unimplemented{}
+
+		seq := reg.Recommend(context.Background(), []string{"video"}, 5, "", false, false)
 
 		var count int
 		for range seq.Each(context.Background()) {

@@ -8,6 +8,8 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
+	"github.com/retrovibed/retrovibed/shallows/internal/localex"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/squirrelx"
@@ -18,14 +20,49 @@ import (
 type RecommendationSource string
 
 const (
-	RecommendationSourceRandom     = "random"
-	RecommendationSourceGenerative = "generative"
-	RecommendationSourceDiscovered = "discovered"
+	RecommendationSourceRandom       = "random"
+	RecommendationSourceGenerative   = "generative"
+	RecommendationSourceDiscovered   = "discovered"
+	RecommendationSourceSearchPlugin = "searchplugin"
 )
 
 const (
 	RecommendationTTL = 30 * 24 * time.Hour
 )
+
+type RecommendationOption func(*Recommendation)
+
+// backfills metadata information from a known record.
+// used when a recommendation source has identified itself.
+// and we want to use the data.
+func RecommendationOptionAutoKnown(v Known) RecommendationOption {
+	return func(r *Recommendation) {
+		r.KnownMediaID = v.UID
+		r.Language = localex.FirstDefined(r.Language, v.OriginalLanguage)
+		r.Adult = langx.FirstNonZero(r.Adult, v.Adult)
+		r.Image = langx.FirstNonZero(v.PosterPath, v.BackdropPath)
+		r.Title = v.Title
+		r.Overview = v.Overview
+		r.Popularity = v.Popularity
+		r.Released = v.Released
+	}
+}
+
+func RecommendationOptionSourceDiscovered(r *Recommendation) {
+	r.Source = md5x.String(RecommendationSourceDiscovered)
+}
+
+func RecommendationOptionSourceRandom(r *Recommendation) {
+	r.Source = md5x.String(RecommendationSourceRandom)
+}
+
+func RecommendationOptionSourceSearchPlugin(r *Recommendation) {
+	r.Source = md5x.String(RecommendationSourceSearchPlugin)
+}
+
+func RecommendationOptionRecommendationTTL(r *Recommendation) {
+	r.TombstoneAt = time.Now().Add(RecommendationTTL)
+}
 
 func RecommendationSearch(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilder) RecommendationScanner {
 	return NewRecommendationScannerStatic(b.RunWith(q).QueryContext(ctx))
@@ -53,18 +90,20 @@ func RecommendationSourceString(uid string) string {
 		return RecommendationSourceGenerative
 	case md5x.String(RecommendationSourceDiscovered):
 		return RecommendationSourceDiscovered
+	case md5x.String(RecommendationSourceSearchPlugin):
+		return RecommendationSourceSearchPlugin
 	default:
 		return ""
 	}
 }
 
-func RecommendationOptionID(id string) func(*Recommendation) {
+func RecommendationOptionID(id string) RecommendationOption {
 	return func(r *Recommendation) {
 		r.ID = id
 	}
 }
 
-func RecommendationOptionContentID(kid string) func(*Recommendation) {
+func RecommendationOptionContentID(kid string) RecommendationOption {
 	return func(r *Recommendation) {
 		r.ContentID = errorsx.Must(uuid.FromString(kid)).String()
 	}

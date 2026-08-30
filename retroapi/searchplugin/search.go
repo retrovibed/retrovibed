@@ -10,16 +10,37 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 
 	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/langx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/stringsx"
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
 	"github.com/tetratelabs/wazero"
 	"github.com/tetratelabs/wazero/sys"
 )
+
+// mode discriminates which subcommand a workload invokes: modeSearch runs
+// the query-driven "search" subcommand, modeRecommend runs the query-less
+// "recommendations" subcommand a plugin exposes independent of any search
+// term (see retroapi/examples/searchplugin-noop's recommendationsCmd).
+type mode uint8
+
+const (
+	modeSearch mode = iota
+	modeRecommend
+)
+
+// command is the literal argv[1] Registry invokes a plugin with for this mode.
+func (m mode) command() string {
+	if m == modeRecommend {
+		return "recommendations"
+	}
+	return "search"
+}
 
 // guestSSLCertDir is where each plugin invocation's TLS trust store is
 // mounted inside the guest — matched by the SSL_CERT_DIR env var so the
@@ -46,13 +67,33 @@ const guestPluginCacheDir = "/plugin/cache.d"
 // sequence. ctx alone governs how long this may run — wrap it with
 // context.WithTimeout for a deadline.
 func (r *Registry) Search(ctx context.Context, mimetypes []string, query string, adult, public bool) iterx.Seq[*ddiscapi.Import] {
-	return &searchSeq{r: r, mimetypes: mimetypes, query: query, adult: adult, public: public}
+	return &pluginSeq{r: r, mode: modeSearch, mimetypes: mimetypes, query: query, adult: adult, public: public}
 }
 
-type searchSeq struct {
+// Recommend runs every loaded plugin as a WASI command with
+// --mimetype mimetypes[0] [--mimetype mimetypes[1] ...] [--limit limit]
+// [--lang lang] [--adult] [--public], decoding each line of its stdout as a
+// *ddiscapi.Import and yielding it. Unlike Search this is query-less - it invokes the
+// "recommendations" subcommand, which a plugin exposes independent of any
+// search term (see retroapi/examples/searchplugin-noop's
+// recommendationsCmd). limit of 0 omits --limit entirely, and lang blank
+// omits --lang entirely, letting a plugin fall back to its own default,
+// same convention Search uses for --adult/--public. One plugin's failure is
+// logged and skipped, not fatal to the whole sequence.
+func (r *Registry) Recommend(ctx context.Context, mimetypes []string, limit uint, lang string, adult, public bool) iterx.Seq[*ddiscapi.Import] {
+	return &pluginSeq{r: r, mode: modeRecommend, mimetypes: mimetypes, limit: limit, lang: lang, adult: adult, public: public}
+}
+
+// pluginSeq is the shared iterx.Seq implementation backing both Search and
+// Recommend - mode picks which subcommand/flag set Each's per-plugin
+// workload ends up running.
+type pluginSeq struct {
 	r         *Registry
+	mode      mode
 	mimetypes []string
 	query     string
+	limit     uint
+	lang      string
 	adult     bool
 	public    bool
 	err       error
@@ -60,13 +101,16 @@ type searchSeq struct {
 
 // workload is one plugin invocation dispatched onto the registry's shared
 // asynccompute pool. results is unbuffered and shared by every job belonging
-// to a single searchSeq.Each call; wg lets the dispatcher know when it is
+// to a single pluginSeq.Each call; wg lets the dispatcher know when it is
 // safe to close that channel.
 type workload struct {
 	path      string
 	compiled  wazero.CompiledModule
+	mode      mode
 	mimetypes []string
 	query     string
+	limit     uint
+	lang      string
 	adult     bool
 	public    bool
 	results   chan<- *ddiscapi.Import
@@ -87,11 +131,20 @@ func (r *Registry) runSearchJob(ctx context.Context, j workload) error {
 	id := strings.TrimSuffix(filepath.Base(j.path), ".wasm")
 	stdoutr, stdoutw := io.Pipe()
 	// argv[0] is the conventional program-name slot every CLI parser
-	// (including kong.Parse, via os.Args[1:]) discards - "plugin" must come
-	// after it to be seen as the subcommand.
-	args := []string{j.path, "plugin", "--query", j.query}
+	// (including kong.Parse, via os.Args[1:]) discards - the subcommand name
+	// must come after it to be seen as the subcommand.
+	args := []string{j.path, j.mode.command()}
+	if stringsx.Present(j.query) {
+		args = append(args, "--query", j.query)
+	}
 	for _, m := range j.mimetypes {
 		args = append(args, "--mimetype", m)
+	}
+	if j.limit > 0 {
+		args = append(args, "--limit", strconv.FormatUint(uint64(j.limit), 10))
+	}
+	if stringsx.Present(j.lang) {
+		args = append(args, "--lang", j.lang)
 	}
 	// only ever appended when true - see Search's doc comment for why an
 	// explicit --adult=false/--public=false is never emitted.
@@ -201,7 +254,7 @@ func scanResults(ctx context.Context, id string, stdout io.Reader, j workload) (
 	return nil
 }
 
-func (t *searchSeq) Each(ctx context.Context) iter.Seq[*ddiscapi.Import] {
+func (t *pluginSeq) Each(ctx context.Context) iter.Seq[*ddiscapi.Import] {
 	return func(yield func(*ddiscapi.Import) bool) {
 		cctx, cancel := context.WithCancel(ctx)
 		defer cancel()
@@ -227,8 +280,11 @@ func (t *searchSeq) Each(ctx context.Context) iter.Seq[*ddiscapi.Import] {
 				job := workload{
 					path:      path,
 					compiled:  compiled,
+					mode:      t.mode,
 					mimetypes: t.mimetypes,
 					query:     t.query,
+					limit:     t.limit,
+					lang:      t.lang,
 					adult:     t.adult,
 					public:    t.public,
 					results:   results,
@@ -252,6 +308,6 @@ func (t *searchSeq) Each(ctx context.Context) iter.Seq[*ddiscapi.Import] {
 	}
 }
 
-func (t *searchSeq) Err() error {
+func (t *pluginSeq) Err() error {
 	return t.err
 }
