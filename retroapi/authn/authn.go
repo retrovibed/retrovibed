@@ -19,6 +19,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/env"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/debugx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/envx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/md5x"
 	"github.com/retrovibed/retrovibed/retroapi/internal/oauth2x"
@@ -29,6 +30,10 @@ import (
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/oauth2"
 )
+
+func InsecureSkipVerify() bool {
+	return envx.Boolean(insecureSkipVerify, env.InsecureSkipVerify)
+}
 
 func RetryClient(c *http.Client) *http.Client {
 	return httpx.BindRetryTransport(c, http.StatusTooManyRequests, http.StatusBadGateway, http.StatusInternalServerError, http.StatusRequestTimeout)

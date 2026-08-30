@@ -8,7 +8,8 @@ import (
 
 const (
 	// used for local dev to change default.
-	DeeppoolEndpoint = "RETROVIBED_META_ENDPOINT"
+	DeeppoolEndpoint   = "RETROVIBED_META_ENDPOINT"
+	InsecureSkipVerify = "RETROVIBED_META_INSECURE_SKIP_VERIFY"
 
 	// MediaDirName and TorrentDirName are the on-disk subdirectory names
 	// media files and .torrent files/caches are stored under, relative to

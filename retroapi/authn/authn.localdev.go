@@ -2,6 +2,4 @@
 
 package authn
 
-func InsecureSkipVerify() bool {
-	return true
-}
+const insecureSkipVerify = true
