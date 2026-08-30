@@ -32,6 +32,7 @@ require (
 	github.com/james-lawrence/torrent v0.0.0-20260827164208-39896974110a
 	github.com/jfreymuth/pulse v0.1.2
 	github.com/justinas/alice v1.2.0
+	github.com/linxGnu/pqueue v0.2.3
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/michiwend/gomusicbrainz v0.0.0-20181012083520-6c07e13dd396
 	github.com/mutablelogic/go-media v1.8.3

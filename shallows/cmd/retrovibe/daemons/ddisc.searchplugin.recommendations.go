@@ -5,6 +5,9 @@ import (
 	"log"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
+	"github.com/linxGnu/pqueue"
+	"github.com/linxGnu/pqueue/entry"
 	"github.com/retrovibed/retrovibed/retroapi/backoffx"
 	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
@@ -13,31 +16,46 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/library"
+	"github.com/retrovibed/retrovibed/shallows/media"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
+	"google.golang.org/protobuf/proto"
 )
 
-func SearchPluginRecommendationsRun(ctx context.Context, q sqlx.Queryer, importer tracking.URIImport, plugins searchplugin.T, peertube ddisc.DiscoverStrategy, mc library.QueryCleaner) error {
+func SearchPluginRecommendationsRun(ctx context.Context, wq pqueue.Queue, q sqlx.Queryer, plugins searchplugin.T, peertube ddisc.DiscoverStrategy, mc library.QueryCleaner) error {
 	log.Println("recommendations from search plugins initiated")
 	defer log.Println("recommendations from search plugins completed")
+
+	for ctx.Err() == nil {
+		var (
+			e      entry.Entry
+			recreq media.RecommendationSearchRequest
+		)
+
+		if ok := wq.Dequeue(&e); !ok {
+			return errorsx.New("failed to dequeue")
+		}
+
+		if err := proto.Unmarshal(e, &recreq); err != nil {
+			return errorsx.Wrap(err, "derp derp")
+		}
+
+		log.Println("recommendation request", spew.Sdump(&recreq))
+	}
 
 	return nil
 }
 
-func SearchPluginRecommendationsBackground(ctx context.Context, q sqlx.Queryer, seed string, importer tracking.URIImport, plugins searchplugin.T, peertube ddisc.DiscoverStrategy, mc library.QueryCleaner) error {
+func SearchPluginRecommendationsBackground(ctx context.Context, wq pqueue.Queue, q sqlx.Queryer, seed string, importer tracking.URIImport, plugins searchplugin.T, peertube ddisc.DiscoverStrategy, mc library.QueryCleaner) error {
 	wakeup := asyncx.NewWakeup(ctx)
-	defer wakeup.Broadcast() // kick off an initial drain
 	s := backoffx.New(
-		backoffx.Exponential(time.Second),
-		backoffx.Maximum(time.Hour),
-		backoffx.Jitter(0.1),
+		backoffx.Frequency(24*time.Hour, seed),
+		backoffx.JitterRandom(time.Minute),
 	)
 
-	// timex.StartOfDay(time.Now())
-	// backoffx.DynamicHashWindow()
 	go asyncx.Periodic(ctx, wakeup, s, "ddisc search queue drain")
 	contextx.Run(ctx, func() {
 		errorsx.Log(asyncx.Run(ctx, wakeup, func(ctx context.Context) error {
-			return SearchQueueBackgroundRun(ctx, q, importer, plugins, peertube, mc)
+			return nil
 		}))
 	})
 

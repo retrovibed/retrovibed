@@ -13,6 +13,7 @@ import (
 	"github.com/egdaemon/wasinet/wasinet/wnetruntime"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/justinas/alice"
+	"github.com/linxGnu/pqueue"
 	"golang.org/x/crypto/ssh"
 	"golang.zx2c4.com/wireguard/tun/netstack"
 
@@ -157,6 +158,12 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		vpncfgpath          = userx.DefaultConfigDir(userx.DefaultRelRoot(), "vpn.cfg")
 		storagecfgpath      = userx.DefaultConfigDir(userx.DefaultRelRoot(), "storage.cfg")
 	)
+
+	mediarecs, err := pqueue.New(userx.DefaultCacheDirectory("media.recs.d"), 32)
+	if err != nil {
+		return errorsx.Wrap(err, "unable to create media recs queue")
+	}
+	_ = mediarecs
 
 	gctx.Cleanup.Add(1)
 	defer gctx.Cleanup.Done()
@@ -328,7 +335,9 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	asyncx.Background(gctx.Context, mediameta, func(ctx context.Context) error {
 		return errorsx.Wrap(SearchPluginImport(ctx, db, searchplugin.SearchPluginDir(userx.DefaultConfigDir(userx.DefaultRelRoot())), tvfs, tstore), "search plugin import failed")
 	})
-
+	asyncx.Background(gctx.Context, mediameta, func(ctx context.Context) error {
+		return errorsx.Wrap(SearchPluginRecommendationsRun(ctx, mediarecs, db, plugins, peertube, mc), "recommended media queue")
+	})
 	go func() {
 		errorsx.Log(errorsx.Wrap(asyncx.WatchDirectories(gctx.Context, mediameta, asyncx.FileCreated, mediastore.Path()), "media metadata file watch failed"))
 	}()

@@ -808,6 +808,13 @@ github.com/lann/builder
 # github.com/lann/ps v0.0.0-20150810152359-62de8c46ede0
 ## explicit
 github.com/lann/ps
+# github.com/linxGnu/pqueue v0.2.3
+## explicit; go 1.17
+github.com/linxGnu/pqueue
+github.com/linxGnu/pqueue/common
+github.com/linxGnu/pqueue/entry
+github.com/linxGnu/pqueue/segment
+github.com/linxGnu/pqueue/segment/v1
 # github.com/logrusorgru/aurora v2.0.3+incompatible
 ## explicit
 github.com/logrusorgru/aurora
