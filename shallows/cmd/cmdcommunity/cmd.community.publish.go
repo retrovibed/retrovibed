@@ -13,6 +13,7 @@ import (
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
+	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/debugx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -56,7 +57,7 @@ func (t cmdCommunityPublish) items(c *communityapi.Community, r io.Reader) iter.
 				Title:       v.Description,
 				PublishDate: ts,
 				Expires:     timex.RFC3339NanoDecode(errorsx.Zero(grpcx.DecodeTime(v.ExpiresAt))),
-				Link:        langx.FirstNonZero(c.Url, fmt.Sprintf("https://%s.community.retrovibe.space/%s", c.Domain, v.Id)),
+				Link:        fmt.Sprintf("%s/%s", langx.FirstNonZero(c.Url, community.CommunityURLFromDomain(c.Domain)), v.Id),
 				Enclosures: []rss.Enclosure{
 					{URL: uri.String(), Mimetype: mimex.Bittorrent, Length: v.Bytes},
 				},
@@ -74,9 +75,7 @@ func (t cmdCommunityPublish) items(c *communityapi.Community, r io.Reader) iter.
 func (t cmdCommunityPublish) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClient) (err error) {
 	var (
 		buf bytes.Buffer
-		com = &communityapi.Community{
-			Domain: t.Name,
-		}
+		com = &communityapi.Community{}
 	)
 
 	c, err := dpc.HTTPClient(gctx.Context)
@@ -98,7 +97,7 @@ func (t cmdCommunityPublish) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClien
 	}
 
 	err = errorsx.Wrap(rss.Generator().Generate(io.MultiWriter(&buf), rss.Channel{
-		Link:          langx.FirstNonZero(com.Url, fmt.Sprintf("https://%s.community.retrovibe.space", com.Domain)),
+		Link:          langx.FirstNonZero(com.Url, community.CommunityURLFromDomain(com.Domain)),
 		TTL:           int(t.TTL.Minutes()),
 		Title:         com.Domain,
 		LastBuildDate: t.Timestamp,

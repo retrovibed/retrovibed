@@ -3,7 +3,6 @@ package communityapi
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"io"
 	"log"
 	"slices"
@@ -43,7 +42,7 @@ func RegenerateFeed(ctx context.Context, q sqlx.Queryer, published FeedPublisher
 	buf := new(bytes.Buffer)
 	channel := rss.Channel{
 		Title:         c.Domain,
-		Link:          langx.FirstNonZero(c.Url, fmt.Sprintf("https://%s.community.retrovibe.space", c.Domain)),
+		Link:          langx.FirstNonZero(c.Url, community.CommunityURLFromDomain(c.Domain)),
 		Description:   c.Description,
 		TTL:           langx.FirstNonZero(int(c.DefaultTtl), feedDefaultTTL),
 		LastBuildDate: time.Now().UTC(),

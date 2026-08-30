@@ -2,6 +2,8 @@ package communityapi
 
 import (
 	"bytes"
+	"context"
+	"io"
 	"slices"
 	"testing"
 	"time"
@@ -17,6 +19,73 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/rss"
 	"github.com/stretchr/testify/require"
 )
+
+type fakeFeedPublisher struct {
+	community *Community
+	uploaded  []byte
+}
+
+func (f *fakeFeedPublisher) Find(ctx context.Context, communityID string) (*Community, error) {
+	return f.community, nil
+}
+
+func (f *fakeFeedPublisher) UploadFeed(ctx context.Context, communityID string, feed io.Reader) error {
+	b, err := io.ReadAll(feed)
+	if err != nil {
+		return err
+	}
+	f.uploaded = b
+	return nil
+}
+
+func TestRegenerateFeed(t *testing.T) {
+	t.Run("uses domain as title and url as link when url is set", func(t *testing.T) {
+		var (
+			ctx, done   = testx.Context(t)
+			q           = sqltestx.Metadatabase(t)
+			communityID = uuid.Must(uuid.NewV7()).String()
+		)
+		defer done()
+
+		publisher := &fakeFeedPublisher{
+			community: &Community{
+				Id:          communityID,
+				Domain:      "mysite",
+				Url:         "https://mysite.example.com",
+				Description: "test",
+				Entropy:     "test-entropy",
+				Mimetype:    "video/*",
+			},
+		}
+
+		require.NoError(t, RegenerateFeed(ctx, q, publisher, communityID))
+		require.Contains(t, string(publisher.uploaded), "<title>mysite</title>")
+		require.Contains(t, string(publisher.uploaded), "<link>https://mysite.example.com</link>")
+	})
+
+	t.Run("falls back to the canonical hosted url when url is blank", func(t *testing.T) {
+		var (
+			ctx, done   = testx.Context(t)
+			q           = sqltestx.Metadatabase(t)
+			communityID = uuid.Must(uuid.NewV7()).String()
+		)
+		defer done()
+
+		publisher := &fakeFeedPublisher{
+			community: &Community{
+				Id:          communityID,
+				Domain:      "mysite",
+				Description: "test",
+				Entropy:     "test-entropy",
+				Mimetype:    "video/*",
+			},
+		}
+
+		require.NoError(t, RegenerateFeed(ctx, q, publisher, communityID))
+		require.Contains(t, string(publisher.uploaded), "<title>mysite</title>")
+		require.Contains(t, string(publisher.uploaded), "<link>https://mysite.community.retrovibe.space</link>")
+	})
+}
 
 func TestFeedGeneration(t *testing.T) {
 	t.Run("generates RSS feed XML", func(t *testing.T) {

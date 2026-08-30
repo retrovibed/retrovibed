@@ -157,9 +157,19 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		locatemedia         = asyncx.NewWakeup(gctx.Context)
 		vpncfgpath          = userx.DefaultConfigDir(userx.DefaultRelRoot(), "vpn.cfg")
 		storagecfgpath      = userx.DefaultConfigDir(userx.DefaultRelRoot(), "storage.cfg")
+		mediarecsdir        = userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "media.recs.d")
 	)
 
-	mediarecs, err := pqueue.New(userx.DefaultCacheDirectory("media.recs.d"), 32)
+	// initialize queue directories
+	err = fsx.MkDirs(
+		0700,
+		mediarecsdir,
+	)
+	if err != nil {
+		return errorsx.Wrap(err, "unable to create queues dir")
+	}
+
+	mediarecs, err := pqueue.New(mediarecsdir, 32)
 	if err != nil {
 		return errorsx.Wrap(err, "unable to create media recs queue")
 	}
