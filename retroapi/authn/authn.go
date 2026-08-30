@@ -113,8 +113,8 @@ func UserDisplayName() string {
 	return stringsx.FirstNonBlank(u.Name, u.Username)
 }
 
-func Oauth2DeeppoolHTTPClient(ctx context.Context, signer ssh.Signer) (*http.Client, error) {
-	cfg := oauth2SSHConfig(signer, "", DeeppoolEndpoint())
+func Oauth2DeeppoolHTTPClientWithEndpoint(ctx context.Context, signer ssh.Signer, endpoint oauth2.Endpoint) (*http.Client, error) {
+	cfg := oauth2SSHConfig(signer, "", endpoint)
 
 	c := HTTPClientDefaults()
 
@@ -124,6 +124,10 @@ func Oauth2DeeppoolHTTPClient(ctx context.Context, signer ssh.Signer) (*http.Cli
 	}
 
 	return cfg.Client(context.WithValue(ctx, oauth2.HTTPClient, c), token), nil
+}
+
+func Oauth2DeeppoolHTTPClient(ctx context.Context, signer ssh.Signer) (*http.Client, error) {
+	return Oauth2DeeppoolHTTPClientWithEndpoint(ctx, signer, DeeppoolEndpoint())
 }
 
 func SSHSigner() (ssh.Signer, error) {
