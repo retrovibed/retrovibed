@@ -3,6 +3,7 @@ package console
 import (
 	"context"
 	"eg/compute/tarballs"
+	"time"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
@@ -23,6 +24,40 @@ func CompileDarwinBinding(ctx context.Context, o eg.Op) error {
 		runtime.New("go -C retrovibedbind build -buildmode=c-shared -buildvcs=true --tags duckdb_use_static_lib,retrovibed,neural -o ${RETROVIBED_SHARED_NATIVE_LIBS_DIRECTORY}/libretrovibed.dylib ./...").
 			Timeout(egenv.TTL()).
 			Environ("CGO_LDFLAGS", neuralsflags+" "+duckdbldflags),
+	)
+}
+
+// GenerateDevDarwinBinding builds the native library for local macOS
+// development - Homebrew-linked duckdb, not statically bundled like
+// CompileDarwinBinding's release build - and regenerates the ffi bindings.
+// It writes libretrovibed.dylib into outdir so it lands exactly where
+// flutterRuntimev2's NIX_RETROVIBED_SHARED_NATIVE_LIBS /
+// RETROVIBED_SHARED_NATIVE_LIBS_DIRECTORY point, letting hook/build.dart
+// find it during `flutter build macos`.
+func GenerateDevDarwinBinding(rt shell.Command, outdir string) eg.OpFn {
+	return func(ctx context.Context, _ eg.Op) error {
+		runtime := flutterRuntimev2(rt)
+		return shell.Run(
+			ctx,
+			runtime.New("flutter pub get"),
+			runtime.New("mkdir -p ${OUTDIR}").Environ("OUTDIR", outdir),
+			runtime.New("go -C retrovibedbind build -buildmode=c-shared --tags localdev -o ${OUTDIR}/libretrovibed.dylib ./...").
+				Timeout(5*time.Minute).
+				Environ("OUTDIR", outdir),
+			runtime.New("dart run ffigen --config ffigen.yaml --compiler-opts \"-I$(clang --print-resource-dir)/include\""),
+		)
+	}
+}
+
+// BuildDevDarwin builds a debug macOS app for local iteration (BuildDarwin
+// always builds --release, with CI build numbers).
+func BuildDevDarwin(ctx context.Context, _ eg.Op) error {
+	runtime := flutterRuntimev2(shell.Runtime()).
+		Environ("NIX_RETROVIBED_SHARED_NATIVE_LIBS", egenv.CacheDirectory("dev.native.libs", "example.dylib"))
+	return shell.Run(
+		ctx,
+		runtime.New("flutter build macos --debug"),
+		runtime.New("codesign --force --sign - build/macos/Build/Products/Debug/retrovibed.app"),
 	)
 }
 
