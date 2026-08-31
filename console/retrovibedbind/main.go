@@ -276,7 +276,11 @@ func logging() {
 func checkpointdb() {
 	// this method is to force checkpoint the database on system initialization.
 	// this prevents a bunch of duckdb issues from impacting startup due to bad shutdowns.
-	ctx, done := context.WithTimeout(context.Background(), time.Second)
+	// DatabaseMeta also runs any pending goose migrations, which can take far longer than
+	// a plain checkpoint, so the deadline must cover that too - a short timeout here cuts a
+	// migration off mid-transaction, which duckdb surfaces as a compounded
+	// "context deadline exceeded; sql: transaction has already been committed or rolled back" error.
+	ctx, done := context.WithTimeout(context.Background(), 30*time.Second)
 	defer done()
 	db, err := cmdopts.DatabaseMeta(ctx)
 	if err != nil {

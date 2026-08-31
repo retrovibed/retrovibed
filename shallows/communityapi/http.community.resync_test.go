@@ -30,7 +30,6 @@ func newResyncMockClient(communityID string) *http.Client {
 			body, _ := json.Marshal(&communityapi.CommunityFindResponse{
 				Community: &communityapi.Community{
 					Id:          communityID,
-					Domain:      "resynced-community",
 					Description: communityID,
 					Entropy:     uuidx.WithSuffix(1),
 					Url:         "https://resynced.community.retrovibe.space",
@@ -97,13 +96,13 @@ func TestResyncEndpoint(t *testing.T) {
 		var result communityapi.PublishedContentSearchResponse
 		require.NoError(t, json.Unmarshal(resp.Body.Bytes(), &result))
 		require.Equal(t, communityID, result.Community.Id)
-		require.Equal(t, "resynced-community", result.Community.Domain)
+		require.Equal(t, "https://resynced.community.retrovibe.space", result.Community.Url)
 		require.Len(t, result.Items, 1)
 		require.Equal(t, pc.ID, result.Items[0].Id)
 
 		var updated community.Community
 		require.NoError(t, community.CommunityFindByID(ctx, q, communityID).Scan(&updated))
-		require.Equal(t, "resynced-community", updated.Domain)
+		require.Equal(t, "https://resynced.community.retrovibe.space", updated.URL)
 		require.True(t, updated.LastSyncAt.After(before))
 	})
 

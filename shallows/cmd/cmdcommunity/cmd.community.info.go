@@ -9,8 +9,8 @@ import (
 	"os"
 
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
+	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
-	"github.com/retrovibed/retrovibed/shallows/metaapi"
 )
 
 type cmdCommunityInfo struct {
@@ -39,7 +39,7 @@ func (t cmdCommunityInfo) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClient) 
 }
 
 func (t cmdCommunityInfo) run(ctx context.Context, c *http.Client, in io.Reader, out io.Writer) (err error) {
-	commresp, err := metaapi.CommunityInfo(ctx, c, t.Name)
+	commresp, err := communityapi.CommunityInfo(ctx, c, t.Name)
 	if err != nil {
 		return errorsx.Wrap(err, "failed to locate community")
 	}

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/downloads.dart' as downloads;
 import 'package:retrovibed/media.dart' as media;
@@ -49,6 +50,14 @@ class SearchUploadDropdown extends StatelessWidget {
             label: "Downloads",
             onSelect: onModeChanged,
           ),
+          if (authn.developer(context).alpha)
+            media.SearchModeToggle(
+              mode: media.SearchMode.social,
+              current: mode,
+              icon: Icons.share,
+              label: "Social",
+              onSelect: onModeChanged,
+            ),
           const PopupMenuDivider(),
           PopupMenuItem<String>(
             enabled: false,

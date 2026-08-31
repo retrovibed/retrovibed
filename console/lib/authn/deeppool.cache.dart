@@ -56,8 +56,11 @@ class _AuthzCache extends State<DeeppoolAuthzCache> {
 
   Future<authz.Bearer<_meta.Token>> Function(authz.Cached<_meta.Token>) _refresh() {
     return authz.refresh(
-      (c) => widget
-          .apideeppoolauthz(options: [Authenticated.bearer(context)])
+      (c) => httpx
+          .withRetry(
+            () => widget.apideeppoolauthz(options: [Authenticated.bearer(context)]),
+            checks: const [...httpx.RetryChecks.auto, httpx.RetryChecks.unauthorized],
+          )
           .then((v) {
             return authz.Bearer(v.token, v.bearer);
           })
@@ -72,7 +75,10 @@ class _AuthzCache extends State<DeeppoolAuthzCache> {
           })
           .catchError((e) {
             print("failed to refresh token cache ${e}");
-            return authz.Bearer(c, "");
+            // rethrow instead of caching an empty bearer: leave `current` (and
+            // its expiry) untouched so the next auto() call retries the fetch
+            // rather than handing callers a token that's guaranteed to fail.
+            throw e;
           }),
       (c, ts) {
         return DateTime.fromMillisecondsSinceEpoch(

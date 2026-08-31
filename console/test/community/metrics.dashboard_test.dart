@@ -48,7 +48,7 @@ Future<CommunityMetricsResponse> mockEmptyMetrics(
 Community testCommunity() {
   return Community(
     id: 'test-community-id',
-    domain: 'testdomain',
+    url: 'https://testdomain.community.retrovibe.space',
     description: 'A test community',
     createdAt: '2024-01-15T14:30:00Z',
   );

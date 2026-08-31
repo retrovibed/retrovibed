@@ -36,7 +36,6 @@ func CommunityFromDeeppool(c *Community) community.Community {
 		CreatedAt:          errorsx.Zero(grpcx.DecodeTime(c.CreatedAt)),
 		UpdatedAt:          errorsx.Zero(grpcx.DecodeTime(c.UpdatedAt)),
 		Mimetype:           c.Mimetype,
-		Domain:             c.Domain,
 		Description:        c.Description,
 		Entropy:            c.Entropy,
 		Bytes:              int64(c.Bytes),
@@ -59,7 +58,6 @@ func CommunityOptionFromDB(c community.Community) func(*Community) {
 		p.UpdatedAt = grpcx.EncodeTime(c.UpdatedAt)
 		p.SubscribedAt = grpcx.EncodeTime(c.SubscribedAt)
 		p.Mimetype = c.Mimetype
-		p.Domain = c.Domain
 		p.Description = c.Description
 		p.Entropy = c.Entropy
 		p.Bytes = uint64(c.Bytes)

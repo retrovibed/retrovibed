@@ -6,9 +6,8 @@ import 'package:retrovibed/community/community.pb.dart';
 
 void main() {
   group('CommunityDetail', () {
-    testWidgets('displays domain and URL', (WidgetTester tester) async {
+    testWidgets('displays url', (WidgetTester tester) async {
       final community = Community(
-        domain: 'testdomain',
         url: 'https://testdomain.community.retrovibe.space',
         description: '',
         createdAt: '2024-01-15T14:30:00Z',
@@ -17,7 +16,6 @@ void main() {
       await tester.pumpApp(CommunityDetail(community: community));
       await tester.pumpAndSettle();
 
-      expect(find.text('testdomain'), findsOneWidget);
       expect(
         find.text('https://testdomain.community.retrovibe.space'),
         findsOneWidget,
@@ -29,7 +27,7 @@ void main() {
       WidgetTester tester,
     ) async {
       final community = Community(
-        domain: 'example',
+        url: 'https://example.community.retrovibe.space',
         description: 'A test community',
         createdAt: '2024-01-15T14:30:00Z',
       );
@@ -43,7 +41,7 @@ void main() {
 
     testWidgets('hides description when empty', (WidgetTester tester) async {
       final community = Community(
-        domain: 'example',
+        url: 'https://example.community.retrovibe.space',
         description: '',
         createdAt: '2024-01-15T14:30:00Z',
       );
@@ -51,16 +49,16 @@ void main() {
       await tester.pumpApp(CommunityDetail(community: community));
       await tester.pumpAndSettle();
 
-      // Only domain, URL, and timestamp should be present — no description text
+      // Only the url Row and timestamp should be present — no description text
       final column = tester.widget<Column>(find.byType(Column).first);
-      // 3 children: domain Text, URL SelectableText, Timestamp
-      expect(column.children.length, equals(3));
+      // 2 children: url Row, Timestamp
+      expect(column.children.length, equals(2));
       expect(tester.takeException(), isNull);
     });
 
     testWidgets('displays created timestamp', (WidgetTester tester) async {
       final community = Community(
-        domain: 'example',
+        url: 'https://example.community.retrovibe.space',
         description: '',
         createdAt: '2024-01-15T14:30:00Z',
       );
@@ -74,7 +72,7 @@ void main() {
 
     testWidgets('shows lock icon when hidden', (WidgetTester tester) async {
       final community = Community(
-        domain: 'secret',
+        url: 'https://secret.community.retrovibe.space',
         description: '',
         createdAt: '2024-01-15T14:30:00Z',
         hidden: true,
@@ -89,7 +87,7 @@ void main() {
 
     testWidgets('hides lock icon when not hidden', (WidgetTester tester) async {
       final community = Community(
-        domain: 'public',
+        url: 'https://public.community.retrovibe.space',
         description: '',
         createdAt: '2024-01-15T14:30:00Z',
       );
@@ -105,7 +103,7 @@ void main() {
       WidgetTester tester,
     ) async {
       final community = Community(
-        domain: 'a-very-long-domain-name-that-might-overflow',
+        url: 'https://a-very-long-domain-name-that-might-overflow.community.retrovibe.space',
         description: 'A description that is also quite long and verbose',
         createdAt: '2024-01-15T14:30:00Z',
       );

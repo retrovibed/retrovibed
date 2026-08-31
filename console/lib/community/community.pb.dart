@@ -28,7 +28,6 @@ class Community extends $pb.GeneratedMessage {
     $core.String? createdAt,
     $core.String? updatedAt,
     $core.String? mimetype,
-    $core.String? domain,
     $core.String? description,
     $core.String? entropy,
     $fixnum.Int64? bytes,
@@ -47,7 +46,6 @@ class Community extends $pb.GeneratedMessage {
     if (createdAt != null) result.createdAt = createdAt;
     if (updatedAt != null) result.updatedAt = updatedAt;
     if (mimetype != null) result.mimetype = mimetype;
-    if (domain != null) result.domain = domain;
     if (description != null) result.description = description;
     if (entropy != null) result.entropy = entropy;
     if (bytes != null) result.bytes = bytes;
@@ -82,7 +80,6 @@ class Community extends $pb.GeneratedMessage {
     ..aOS(4, _omitFieldNames ? '' : 'created_at')
     ..aOS(5, _omitFieldNames ? '' : 'updated_at')
     ..aOS(6, _omitFieldNames ? '' : 'mimetype')
-    ..aOS(7, _omitFieldNames ? '' : 'domain')
     ..aOS(8, _omitFieldNames ? '' : 'description')
     ..aOS(9, _omitFieldNames ? '' : 'entropy')
     ..a<$fixnum.Int64>(10, _omitFieldNames ? '' : 'bytes', $pb.PbFieldType.OU6,
@@ -163,112 +160,103 @@ class Community extends $pb.GeneratedMessage {
   @$pb.TagNumber(6)
   void clearMimetype() => $_clearField(6);
 
-  @$pb.TagNumber(7)
-  $core.String get domain => $_getSZ(5);
-  @$pb.TagNumber(7)
-  set domain($core.String value) => $_setString(5, value);
-  @$pb.TagNumber(7)
-  $core.bool hasDomain() => $_has(5);
-  @$pb.TagNumber(7)
-  void clearDomain() => $_clearField(7);
-
   @$pb.TagNumber(8)
-  $core.String get description => $_getSZ(6);
+  $core.String get description => $_getSZ(5);
   @$pb.TagNumber(8)
-  set description($core.String value) => $_setString(6, value);
+  set description($core.String value) => $_setString(5, value);
   @$pb.TagNumber(8)
-  $core.bool hasDescription() => $_has(6);
+  $core.bool hasDescription() => $_has(5);
   @$pb.TagNumber(8)
   void clearDescription() => $_clearField(8);
 
   @$pb.TagNumber(9)
-  $core.String get entropy => $_getSZ(7);
+  $core.String get entropy => $_getSZ(6);
   @$pb.TagNumber(9)
-  set entropy($core.String value) => $_setString(7, value);
+  set entropy($core.String value) => $_setString(6, value);
   @$pb.TagNumber(9)
-  $core.bool hasEntropy() => $_has(7);
+  $core.bool hasEntropy() => $_has(6);
   @$pb.TagNumber(9)
   void clearEntropy() => $_clearField(9);
 
   @$pb.TagNumber(10)
-  $fixnum.Int64 get bytes => $_getI64(8);
+  $fixnum.Int64 get bytes => $_getI64(7);
   @$pb.TagNumber(10)
-  set bytes($fixnum.Int64 value) => $_setInt64(8, value);
+  set bytes($fixnum.Int64 value) => $_setInt64(7, value);
   @$pb.TagNumber(10)
-  $core.bool hasBytes() => $_has(8);
+  $core.bool hasBytes() => $_has(7);
   @$pb.TagNumber(10)
   void clearBytes() => $_clearField(10);
 
   @$pb.TagNumber(11)
-  $core.String get subscribedAt => $_getSZ(9);
+  $core.String get subscribedAt => $_getSZ(8);
   @$pb.TagNumber(11)
-  set subscribedAt($core.String value) => $_setString(9, value);
+  set subscribedAt($core.String value) => $_setString(8, value);
   @$pb.TagNumber(11)
-  $core.bool hasSubscribedAt() => $_has(9);
+  $core.bool hasSubscribedAt() => $_has(8);
   @$pb.TagNumber(11)
   void clearSubscribedAt() => $_clearField(11);
 
   @$pb.TagNumber(12)
-  PublishMode get defaultPublishMode => $_getN(10);
+  PublishMode get defaultPublishMode => $_getN(9);
   @$pb.TagNumber(12)
   set defaultPublishMode(PublishMode value) => $_setField(12, value);
   @$pb.TagNumber(12)
-  $core.bool hasDefaultPublishMode() => $_has(10);
+  $core.bool hasDefaultPublishMode() => $_has(9);
   @$pb.TagNumber(12)
   void clearDefaultPublishMode() => $_clearField(12);
 
   @$pb.TagNumber(13)
-  $core.bool get hidden => $_getBF(11);
+  $core.bool get hidden => $_getBF(10);
   @$pb.TagNumber(13)
-  set hidden($core.bool value) => $_setBool(11, value);
+  set hidden($core.bool value) => $_setBool(10, value);
   @$pb.TagNumber(13)
-  $core.bool hasHidden() => $_has(11);
+  $core.bool hasHidden() => $_has(10);
   @$pb.TagNumber(13)
   void clearHidden() => $_clearField(13);
 
   @$pb.TagNumber(14)
-  $core.String get url => $_getSZ(12);
+  $core.String get url => $_getSZ(11);
   @$pb.TagNumber(14)
-  set url($core.String value) => $_setString(12, value);
+  set url($core.String value) => $_setString(11, value);
   @$pb.TagNumber(14)
-  $core.bool hasUrl() => $_has(12);
+  $core.bool hasUrl() => $_has(11);
   @$pb.TagNumber(14)
   void clearUrl() => $_clearField(14);
 
   @$pb.TagNumber(15)
-  $core.bool get adult => $_getBF(13);
+  $core.bool get adult => $_getBF(12);
   @$pb.TagNumber(15)
-  set adult($core.bool value) => $_setBool(13, value);
+  set adult($core.bool value) => $_setBool(12, value);
   @$pb.TagNumber(15)
-  $core.bool hasAdult() => $_has(13);
+  $core.bool hasAdult() => $_has(12);
   @$pb.TagNumber(15)
   void clearAdult() => $_clearField(15);
 
   @$pb.TagNumber(16)
-  $fixnum.Int64 get defaultTtl => $_getI64(14);
+  $fixnum.Int64 get defaultTtl => $_getI64(13);
   @$pb.TagNumber(16)
-  set defaultTtl($fixnum.Int64 value) => $_setInt64(14, value);
+  set defaultTtl($fixnum.Int64 value) => $_setInt64(13, value);
   @$pb.TagNumber(16)
-  $core.bool hasDefaultTtl() => $_has(14);
+  $core.bool hasDefaultTtl() => $_has(13);
   @$pb.TagNumber(16)
   void clearDefaultTtl() => $_clearField(16);
 
   @$pb.TagNumber(17)
-  $core.String get defaultLanguage => $_getSZ(15);
+  $core.String get defaultLanguage => $_getSZ(14);
   @$pb.TagNumber(17)
-  set defaultLanguage($core.String value) => $_setString(15, value);
+  set defaultLanguage($core.String value) => $_setString(14, value);
   @$pb.TagNumber(17)
-  $core.bool hasDefaultLanguage() => $_has(15);
+  $core.bool hasDefaultLanguage() => $_has(14);
   @$pb.TagNumber(17)
   void clearDefaultLanguage() => $_clearField(17);
 
   /// private fields for retrovibed use only, not populated by clients.
   @$pb.TagNumber(1000)
-  $core.String get lastSyncAt => $_getSZ(16);
+  $core.String get lastSyncAt => $_getSZ(15);
   @$pb.TagNumber(1000)
-  set lastSyncAt($core.String value) => $_setString(16, value);
+  set lastSyncAt($core.String value) => $_setString(15, value);
   @$pb.TagNumber(1000)
-  $core.bool hasLastSyncAt() => $_has(16);
+  $core.bool hasLastSyncAt() => $_has(15);
   @$pb.TagNumber(1000)
   void clearLastSyncAt() => $_clearField(1000);
 }

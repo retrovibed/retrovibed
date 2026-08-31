@@ -30,7 +30,7 @@ Download _audioDownload() => Download(
   ),
 );
 
-Community _community() => Community(id: _communityId, domain: 'test.community');
+Community _community() => Community(id: _communityId, url: 'https://test.community');
 
 Future<YouTubeStatus> _noYouTube({List<httpx.Option> options = const []}) => Future.value(YouTubeStatus(id: ''));
 
@@ -63,7 +63,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('My Video'), findsOneWidget);
-      expect(find.text('test.community'), findsOneWidget);
+      expect(find.text('https://test.community'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 

@@ -5,8 +5,8 @@ import (
 	"os"
 
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
+	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
-	"github.com/retrovibed/retrovibed/shallows/metaapi"
 )
 
 type cmdCommunityDelete struct {
@@ -24,7 +24,7 @@ func (t cmdCommunityDelete) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClient
 		return err
 	}
 
-	commresp, err := metaapi.CommunityDelete(gctx.Context, c, t.Name)
+	commresp, err := communityapi.CommunityDelete(gctx.Context, c, t.Name)
 	if err != nil {
 		return errorsx.Wrap(err, "failed to delete community")
 	}

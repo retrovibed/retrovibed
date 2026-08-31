@@ -14,7 +14,7 @@ message Community {
   string created_at = 4 [ json_name = "created_at" ];
   string updated_at = 5 [ json_name = "updated_at" ];
   string mimetype = 6 [ json_name = "mimetype" ];
-  string domain = 7 [ json_name = "domain" ];
+  reserved 7;
   string description = 8 [ json_name = "description" ];
   string entropy = 9 [ json_name = "entropy" ];
   uint64 bytes = 10 [ json_name = "bytes" ];

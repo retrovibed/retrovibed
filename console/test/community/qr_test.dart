@@ -5,7 +5,7 @@ import 'package:retrovibed/community/community.pb.dart';
 import 'package:retrovibed/community/qr.dart';
 
 final _community = Community(
-  domain: 'testdomain',
+  url: 'https://testdomain.community.retrovibe.space',
   description: 'A test community',
   createdAt: '2024-01-15T14:30:00Z',
 );
@@ -18,7 +18,7 @@ void main() {
 
       expect(decoded.containsKey('community'), isTrue);
       expect(decoded['community'], isA<Map<String, dynamic>>());
-      expect((decoded['community'] as Map<String, dynamic>)['domain'], 'testdomain');
+      expect((decoded['community'] as Map<String, dynamic>)['url'], 'https://testdomain.community.retrovibe.space');
     });
 
     test('includes attribution when provided', () {
@@ -42,7 +42,7 @@ void main() {
       final (community, attribution) = decodeQRPayload(encoded);
 
       expect(community, isNotNull);
-      expect(community!.domain, 'testdomain');
+      expect(community!.url, 'https://testdomain.community.retrovibe.space');
       expect(attribution, 'eyJtoken');
     });
 
@@ -51,7 +51,7 @@ void main() {
       final (community, attribution) = decodeQRPayload(encoded);
 
       expect(community, isNotNull);
-      expect(community!.domain, 'testdomain');
+      expect(community!.url, 'https://testdomain.community.retrovibe.space');
       expect(attribution, isEmpty);
     });
 
@@ -66,7 +66,7 @@ void main() {
       final encoded = encodeQRPayload(_community, attribution: 'attr-tok');
       final (community, attribution) = decodeQRPayload(encoded);
 
-      expect(community!.domain, _community.domain);
+      expect(community!.url, _community.url);
       expect(community.description, _community.description);
       expect(attribution, 'attr-tok');
     });

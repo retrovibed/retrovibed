@@ -23,13 +23,13 @@ func TestCommunityUpdate(t *testing.T) {
 
 		current := &communityapi.Community{
 			Id:          "test-id",
-			Domain:      "test-community",
+			Url:         "https://test-community.community.retrovibe.space",
 			Description: "original description",
 			Mimetype:    "video/mp4",
 		}
 		updated := &communityapi.Community{
 			Id:          "test-id",
-			Domain:      "test-community",
+			Url:         "https://test-community.community.retrovibe.space",
 			Description: "updated description",
 			Mimetype:    "video/mp4",
 		}
@@ -96,7 +96,7 @@ func TestCommunityUpdate(t *testing.T) {
 		ctx, cancel := testx.Context(t)
 		defer cancel()
 
-		current := &communityapi.Community{Id: "test-id", Domain: "test-community"}
+		current := &communityapi.Community{Id: "test-id", Url: "https://test-community.community.retrovibe.space"}
 
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			switch r.Method {
@@ -132,7 +132,7 @@ func TestCommunityUpdate(t *testing.T) {
 
 		current := &communityapi.Community{
 			Id:                 "test-id",
-			Domain:             "test-community",
+			Url:                "https://test-community.community.retrovibe.space",
 			Description:        "original description",
 			Mimetype:           "video/mp4",
 			DefaultPublishMode: communityapi.PublishMode_LISTED,
@@ -188,7 +188,7 @@ func TestCommunityUpdate(t *testing.T) {
 
 		current := &communityapi.Community{
 			Id:                 "test-id",
-			Domain:             "test-community",
+			Url:                "https://test-community.community.retrovibe.space",
 			DefaultPublishMode: communityapi.PublishMode_UNLISTED,
 		}
 

@@ -5,6 +5,13 @@ import 'package:path/path.dart' as path;
 
 void main(List<String> args) async {
   await build(args, (input, output) async {
+    // Nothing to emit when this invocation isn't building code assets:
+    // adding a CodeAsset anyway makes the validator reject it as an
+    // unsupported asset type.
+    if (!input.config.buildCodeAssets) {
+      return;
+    }
+
     final pattern =
         Platform.environment['NIX_RETROVIBED_SHARED_NATIVE_LIBS'] ??
         path.normalize(path.absolute('../.eg.cache/dev.native.libs/example.so'));
@@ -44,9 +51,7 @@ void main(List<String> args) async {
     // Match architecture as a whole path segment, not a substring: "arm" is
     // a substring of "arm64", so a plain .contains() would wrongly match
     // an arm64 build for the (32-bit) Architecture.arm invocation too.
-    final architecture = input.config.buildCodeAssets
-        ? input.config.code.targetArchitecture.name
-        : Architecture.x64.name;
+    final architecture = input.config.code.targetArchitecture.name;
     final archMatches = candidates.where((file) => path.split(file.path).contains(architecture)).toList();
     final files = archMatches.isNotEmpty ? archMatches : candidates;
 

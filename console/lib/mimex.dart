@@ -165,7 +165,7 @@ class CategoryOptionsLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final category = text(mimetypes);
-    return Text("$category options", key: ValueKey(category));
+    return Text("${category} options", key: ValueKey(category));
   }
 }
 

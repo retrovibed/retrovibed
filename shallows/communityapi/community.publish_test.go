@@ -1,4 +1,4 @@
-package metaapi_test
+package communityapi_test
 
 import (
 	"encoding/json"
@@ -11,7 +11,6 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
-	"github.com/retrovibed/retrovibed/shallows/metaapi"
 	"github.com/stretchr/testify/require"
 )
 
@@ -32,7 +31,7 @@ func TestCommunityPublish(t *testing.T) {
 
 		c := &http.Client{}
 		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
-		_, err := metaapi.CommunityPublish(t.Context(), c, communityID, strings.NewReader(feedContent))
+		_, err := communityapi.CommunityPublish(t.Context(), c, communityID, strings.NewReader(feedContent))
 		require.NoError(t, err)
 	})
 
@@ -45,7 +44,7 @@ func TestCommunityPublish(t *testing.T) {
 
 		c := &http.Client{}
 		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
-		_, err := metaapi.CommunityPublish(t.Context(), c, "test-community", strings.NewReader(feedContent))
+		_, err := communityapi.CommunityPublish(t.Context(), c, "test-community", strings.NewReader(feedContent))
 		require.Error(t, err)
 	})
 }

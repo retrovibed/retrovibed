@@ -23,7 +23,7 @@ class ManagementListDisplayItem extends StatelessWidget {
     super.key,
     required this.community,
     this.onChanged,
-    this.subscribe = API.subscribe,
+    this.subscribe = communities.subscribe,
   });
 
   @override
@@ -72,7 +72,7 @@ class ManagementListDisplayItem extends StatelessWidget {
                 var auth = [authn.DeeppoolAuthzCache.bearer(context)];
                 return httpx.withRetry(
                   () {
-                    return API.update(
+                    return communities.update(
                       updated.id,
                       CommunityUpdateRequest(community: updated),
                       options: auth,

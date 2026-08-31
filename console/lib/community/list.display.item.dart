@@ -14,7 +14,7 @@ class ListDisplayItem extends StatelessWidget {
     super.key,
     required this.community,
     this.onChanged,
-    this.subscribe = API.subscribe,
+    this.subscribe = communities.subscribe,
   });
 
   @override

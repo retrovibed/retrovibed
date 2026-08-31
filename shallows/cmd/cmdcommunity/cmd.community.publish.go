@@ -13,16 +13,15 @@ import (
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
+	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/debugx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/grpcx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
-	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/media"
-	"github.com/retrovibed/retrovibed/shallows/metaapi"
 	"github.com/retrovibed/retrovibed/shallows/rss"
 )
 
@@ -56,7 +55,7 @@ func (t cmdCommunityPublish) items(c *communityapi.Community, r io.Reader) iter.
 				Title:       v.Description,
 				PublishDate: ts,
 				Expires:     timex.RFC3339NanoDecode(errorsx.Zero(grpcx.DecodeTime(v.ExpiresAt))),
-				Link:        langx.FirstNonZero(c.Url, fmt.Sprintf("https://%s.community.retrovibe.space/%s", c.Domain, v.Id)),
+				Link:        fmt.Sprintf("%s/%s", c.Url, v.Id),
 				Enclosures: []rss.Enclosure{
 					{URL: uri.String(), Mimetype: mimex.Bittorrent, Length: v.Bytes},
 				},
@@ -74,9 +73,7 @@ func (t cmdCommunityPublish) items(c *communityapi.Community, r io.Reader) iter.
 func (t cmdCommunityPublish) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClient) (err error) {
 	var (
 		buf bytes.Buffer
-		com = &communityapi.Community{
-			Domain: t.Name,
-		}
+		com = &communityapi.Community{}
 	)
 
 	c, err := dpc.HTTPClient(gctx.Context)
@@ -90,7 +87,7 @@ func (t cmdCommunityPublish) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClien
 			return err
 		}
 	} else {
-		info, err := metaapi.CommunityInfo(gctx.Context, c, t.Name)
+		info, err := communityapi.CommunityInfo(gctx.Context, c, t.Name)
 		if err != nil {
 			return errorsx.Wrap(err, "failed to retrieve community metadata")
 		}
@@ -98,9 +95,9 @@ func (t cmdCommunityPublish) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClien
 	}
 
 	err = errorsx.Wrap(rss.Generator().Generate(io.MultiWriter(&buf), rss.Channel{
-		Link:          langx.FirstNonZero(com.Url, fmt.Sprintf("https://%s.community.retrovibe.space", com.Domain)),
+		Link:          com.Url,
 		TTL:           int(t.TTL.Minutes()),
-		Title:         com.Domain,
+		Title:         community.CommunityDomainFromURL(com.Url),
 		LastBuildDate: t.Timestamp,
 		Language:      "en-us",
 		Description:   com.Description,
@@ -116,7 +113,7 @@ func (t cmdCommunityPublish) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClien
 		return err
 	}
 
-	uploaded, err := metaapi.CommunityPublish(gctx.Context, c, com.Id, &buf)
+	uploaded, err := communityapi.CommunityPublish(gctx.Context, c, com.Id, &buf)
 	if err != nil {
 		return err
 	}

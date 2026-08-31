@@ -4,9 +4,10 @@ import 'package:retrovibed/design.kit/forms.dart' as forms;
 import 'package:retrovibed/design.kit/inputs.dart' as inputs;
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/mimex.dart' as mimex;
-import 'package:retrovibed/community/community.pb.dart';
-import 'package:retrovibed/community/publish.mode.edit.dart';
-import 'package:retrovibed/community/visibility.selector.dart';
+import 'api.dart' as api;
+import 'community.pb.dart';
+import 'publish.mode.edit.dart';
+import 'visibility.selector.dart';
 
 class CommunityEdit extends StatelessWidget {
   final Community community;
@@ -34,26 +35,32 @@ class CommunityEdit extends StatelessWidget {
         spacing: defaults.spacing,
         children: [
           forms.Field(
-            label: Text('Domain'),
+            label: Text('URL'),
             input: TextFormField(
               readOnly: readOnly,
               autofocus: !readOnly && autofocus,
-              initialValue: community.domain,
-              onChanged: (v) => onChange(community..domain = v.trim()),
+              initialValue: community.url,
+              onChanged: (v) => onChange(community..url = api.communities.canonicaluri(v.trim())),
               decoration: InputDecoration(
-                hintText: 'example',
+                hintText: "example",
                 helper: Text(
-                  'https://${community.domain.isEmpty ? 'example' : community.domain}.community.retrovibe.space',
+                  api.communities.canonicaluri(community.url),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(color: Colors.grey, fontSize: 10),
                 ),
                 border: OutlineInputBorder(),
               ),
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return 'Domain is required';
+              validator: (v) {
+                if (v == null || v.trim().isEmpty) {
+                  return 'domain name is required';
                 }
+
+                final uri = Uri.tryParse(v.trim());
+                if (uri == null || !uri.isAbsolute) {
+                  return 'must be a valid url';
+                }
+
                 return null;
               },
             ),

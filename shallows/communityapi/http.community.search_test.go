@@ -61,7 +61,7 @@ func TestSearchEndpoint(t *testing.T) {
 			communityapi.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 			communityapi.HTTPOptionHTTPClient(newSearchMockClient(&communityapi.Community{
 				Id:          communityID,
-				Domain:      "testcommunity",
+				Url:         "https://testcommunity.community.retrovibe.space",
 				Description: "a test community",
 			})),
 		).Bind(routes.PathPrefix("/c").Subrouter())
@@ -80,7 +80,7 @@ func TestSearchEndpoint(t *testing.T) {
 		var found community.Community
 		require.NoError(t, community.CommunityFindByID(ctx, q, communityID).Scan(&found))
 		require.Equal(t, communityID, found.ID)
-		require.Equal(t, "testcommunity", found.Domain)
+		require.Equal(t, "https://testcommunity.community.retrovibe.space", found.URL)
 		require.Equal(t, "a test community", found.Description)
 	})
 
@@ -104,8 +104,8 @@ func TestSearchEndpoint(t *testing.T) {
 			q,
 			communityapi.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 			communityapi.HTTPOptionHTTPClient(newSearchMockClient(&communityapi.Community{
-				Id:     communityID,
-				Domain: "testcommunity",
+				Id:  communityID,
+				Url: "https://testcommunity.community.retrovibe.space",
 			})),
 		).Bind(routes.PathPrefix("/c").Subrouter())
 
@@ -124,7 +124,7 @@ func TestSearchEndpoint(t *testing.T) {
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&searchResp))
 		require.Len(t, searchResp.Items, 1)
 		require.Equal(t, communityID, searchResp.Items[0].Id)
-		require.Equal(t, "testcommunity", searchResp.Items[0].Domain)
+		require.Equal(t, "https://testcommunity.community.retrovibe.space", searchResp.Items[0].Url)
 		require.NotEmpty(t, searchResp.Items[0].SubscribedAt)
 	})
 }

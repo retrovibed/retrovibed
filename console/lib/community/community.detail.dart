@@ -19,18 +19,18 @@ class CommunityDetail extends StatelessWidget {
         Row(
           spacing: defaults.spacing,
           children: [
-            Flexible(child: Text(community.domain, style: theme.textTheme.titleLarge, overflow: TextOverflow.ellipsis)),
+            Flexible(
+              child: SelectableText(
+                community.url,
+                style: theme.textTheme.titleLarge,
+                maxLines: 1,
+              ),
+            ),
             Visibility(
               visible: community.hidden,
               child: Icon(Icons.lock, size: 16, color: theme.colorScheme.outline),
             ),
           ],
-        ),
-        SelectableText(
-          community.url,
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.primary,
-          ),
         ),
         if (community.description.isNotEmpty) Text(community.description, style: theme.textTheme.bodyMedium),
         ds.Timestamp.iso8601(community.createdAt, leading: Text('Created: ')),

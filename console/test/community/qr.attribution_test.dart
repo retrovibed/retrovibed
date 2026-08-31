@@ -5,7 +5,7 @@ import 'package:retrovibed/community/qr.attribution.dart';
 import 'package:retrovibed/community/community.pb.dart';
 
 final _community = Community(
-  domain: 'testdomain',
+  url: 'https://testdomain.community.retrovibe.space',
   description: 'A test community',
   createdAt: '2024-01-15T14:30:00Z',
 );

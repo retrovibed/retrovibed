@@ -14,7 +14,7 @@ void main() {
 			final community = Community(
 				id: 'c1',
 				accountId: uuidx.min(),
-				domain: 'owned',
+				url: 'https://owned.community.retrovibe.space',
 				description: 'my community',
 			);
 
@@ -30,7 +30,7 @@ void main() {
 			final community = Community(
 				id: 'c1',
 				accountId: 'other-account',
-				domain: 'notmine',
+				url: 'https://notmine.community.retrovibe.space',
 				description: 'someone else community',
 			);
 
@@ -46,7 +46,7 @@ void main() {
 			final community = Community(
 				id: 'c1',
 				accountId: uuidx.min(),
-				domain: 'owned',
+				url: 'https://owned.community.retrovibe.space',
 			);
 
 			await tester.pumpApp(SingleChildScrollView(child: ListDisplayItem(community: community)));
@@ -62,7 +62,7 @@ void main() {
 			final community = Community(
 				id: 'c1',
 				accountId: 'other-account',
-				domain: 'notmine',
+				url: 'https://notmine.community.retrovibe.space',
 			);
 
 			await tester.pumpApp(SingleChildScrollView(child: ListDisplayItem(community: community)));
@@ -78,7 +78,7 @@ void main() {
 			final community = Community(
 				id: 'c1',
 				accountId: 'other-account',
-				domain: 'notmine',
+				url: 'https://notmine.community.retrovibe.space',
 			);
 
 			await tester.pumpApp(ListDisplayItem(community: community));
@@ -92,7 +92,7 @@ void main() {
 			final community = Community(
 				id: 'c1',
 				accountId: 'other-account',
-				domain: 'notmine',
+				url: 'https://notmine.community.retrovibe.space',
 				subscribedAt: '2026-03-20T00:00:00Z',
 			);
 
@@ -108,7 +108,7 @@ void main() {
 			final community = Community(
 				id: 'c1',
 				accountId: uuidx.min(),
-				domain: 'owned',
+				url: 'https://owned.community.retrovibe.space',
 				subscribedAt: '2026-03-20T00:00:00Z',
 			);
 

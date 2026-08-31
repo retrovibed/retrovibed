@@ -57,7 +57,7 @@ class _CommunityCreateState extends State<CommunityCreate> {
             _cause = ds.Error.conflict(
               cause,
               onTap: _clearCause,
-              message: Text("a community with this domain already exists"),
+              message: Text("a community with this url already exists"),
             );
           });
         }, test: httpx.ErrorsTest.conflict)
@@ -113,7 +113,7 @@ class _CommunityCreateState extends State<CommunityCreate> {
                 child: Text('Cancel'),
               ),
               ElevatedButton(
-                onPressed: (_creating || _community.domain.isEmpty) ? null : _createCommunity,
+                onPressed: _creating ? null : _createCommunity,
                 child:
                     _creating
                         ? SizedBox(

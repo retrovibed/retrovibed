@@ -6,10 +6,10 @@ import (
 
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
+	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
-	"github.com/retrovibed/retrovibed/shallows/metaapi"
 )
 
 type cmdCommunityCreate struct {
@@ -24,8 +24,8 @@ func (t cmdCommunityCreate) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClient
 		return err
 	}
 
-	commresp, err := metaapi.CommunityCreate(gctx.Context, c, &communityapi.CommunityCreateRequest{Community: &communityapi.Community{
-		Domain:      t.Name,
+	commresp, err := communityapi.CommunityCreate(gctx.Context, c, &communityapi.CommunityCreateRequest{Community: &communityapi.Community{
+		Url:         community.CommunityURLFromDomain(t.Name),
 		Description: t.Description,
 		Mimetype:    langx.FirstNonZero(t.Mimetype, mimex.Binary),
 	}})

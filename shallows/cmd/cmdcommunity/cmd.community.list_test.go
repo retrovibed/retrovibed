@@ -53,7 +53,7 @@ func TestCommunityList(t *testing.T) {
 
 		expected := &communityapi.Community{
 			Id:          "00000000-0000-0000-0000-000000000001",
-			Domain:      "test-community",
+			Url:         "https://test-community.community.retrovibe.space",
 			Description: "test description",
 		}
 

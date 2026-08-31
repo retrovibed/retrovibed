@@ -7,7 +7,7 @@ import 'package:retrovibed/billing/api.dart' as billing;
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
 
 final _community = community.Community(
-  domain: 'testdomain',
+  url: 'https://testdomain.community.retrovibe.space',
   description: 'A test community',
   createdAt: '2024-01-15T14:30:00Z',
 );
@@ -39,7 +39,7 @@ void main() {
 
         expect(find.text('Yes'), findsOneWidget);
         expect(find.text('No'), findsOneWidget);
-        expect(find.text('testdomain'), findsOneWidget);
+        expect(find.text('https://testdomain.community.retrovibe.space'), findsOneWidget);
         expect(tester.takeException(), isNull);
 
         controller.close();
@@ -127,7 +127,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(subscribed, isNotNull);
-        expect(subscribed!.domain, equals('testdomain'));
+        expect(subscribed!.url, equals('https://testdomain.community.retrovibe.space'));
         expect(tester.takeException(), isNull);
 
         controller.close();
@@ -319,7 +319,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('testdomain'), findsOneWidget);
+      expect(find.text('https://testdomain.community.retrovibe.space'), findsOneWidget);
       expect(find.text('Yes'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });

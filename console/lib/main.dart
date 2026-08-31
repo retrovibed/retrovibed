@@ -146,8 +146,8 @@ class Retrovibed extends StatelessWidget {
                               ),
                             ),
                           ),
-                          (child) => authn.DeeppoolAuthzCache(
-                            authn.Authenticated(
+                          (child) => authn.Authenticated(
+                            authn.DeeppoolAuthzCache(
                               billing.Registered(child),
                             ),
                           ),

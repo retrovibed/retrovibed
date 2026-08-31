@@ -113,7 +113,10 @@ class _AuthzCache extends State<AuthzCache> {
                 setState(() {
                   _loading = false;
                 });
-                return authz.Bearer(c, "");
+                // rethrow instead of caching an empty bearer: leave
+                // `meta.current` untouched so the next fetch retries rather
+                // than handing callers a token that's guaranteed to fail.
+                throw e;
               }),
           (c, ts) {
             return DateTime.fromMillisecondsSinceEpoch(
@@ -131,7 +134,13 @@ class _AuthzCache extends State<AuthzCache> {
     super.initState();
     refresh();
     _meta.EndpointAuto.of(context)?.changed.addListener(refresh);
-    meta.refresh(meta);
+    // fire-and-forget kickoff: success/failure are both already handled via
+    // setState inside refresh()'s catchError/then, so just log and swallow
+    // the rejection here to avoid an unhandled-future warning.
+    meta.refresh(meta).catchError((e) {
+      print("failed to refresh token cache ${e}");
+      return authz.Bearer(_pendingToken(), "");
+    });
   }
 
   @override
