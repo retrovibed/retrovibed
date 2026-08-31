@@ -159,7 +159,14 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		storagecfgpath      = userx.DefaultConfigDir(userx.DefaultRelRoot(), "storage.cfg")
 	)
 
-	mediarecs, err := pqueue.New(userx.DefaultCacheDirectory("media.recs.d"), 32)
+	// pqueue opens the directory, it does not create it, so a first run on a machine that
+	// has never held the queue fails to boot the daemon entirely.
+	mediarecsdir := userx.DefaultCacheDirectory("media.recs.d")
+	if err = fsx.MkDirs(0700, mediarecsdir); err != nil {
+		return errorsx.Wrap(err, "unable to create media recs queue directory")
+	}
+
+	mediarecs, err := pqueue.New(mediarecsdir, 32)
 	if err != nil {
 		return errorsx.Wrap(err, "unable to create media recs queue")
 	}
