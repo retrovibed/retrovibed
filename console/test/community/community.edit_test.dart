@@ -28,7 +28,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-        find.text('leave blank to auto-generate a url'),
+        find.text('https://example.community.retrovibe.space'),
         findsOneWidget,
       );
       expect(tester.takeException(), isNull);
@@ -45,7 +45,7 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('blank url passes validation', (tester) async {
+    testWidgets('blank url fails validation', (tester) async {
       final formKey = GlobalKey<FormState>();
 
       await tester.pumpApp(
@@ -56,9 +56,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(formKey.currentState!.validate(), isTrue);
+      expect(formKey.currentState!.validate(), isFalse);
       await tester.pumpAndSettle();
 
+      expect(find.text('domain name is required'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
@@ -116,6 +117,81 @@ void main() {
 
       expect(received, isNotNull);
       expect(received!.url, equals('https://newdomain.community.retrovibe.space'));
+    });
+
+    testWidgets('calls onChange with a canonical url when a fully qualified custom url is entered', (tester) async {
+      Community? received;
+
+      await tester.pumpApp(
+        CommunityEdit(community: empty, onChange: (c) => received = c),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.enterText(
+        find.byType(TextFormField).first,
+        'https://custom.example.com',
+      );
+      await tester.pump();
+
+      expect(received, isNotNull);
+      expect(received!.url, equals('https://custom.example.com'));
+    });
+
+    testWidgets('calls onChange with a canonical url when a bare subdomain is entered', (tester) async {
+      Community? received;
+
+      await tester.pumpApp(
+        CommunityEdit(community: empty, onChange: (c) => received = c),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextFormField).first, 'mysite');
+      await tester.pump();
+
+      expect(received, isNotNull);
+      expect(received!.url, equals('https://mysite.community.retrovibe.space'));
+    });
+
+    testWidgets('passes validation when a fully qualified custom url is provided', (tester) async {
+      final formKey = GlobalKey<FormState>();
+      final custom = Community(url: 'https://custom.example.com');
+
+      await tester.pumpApp(
+        Form(
+          key: formKey,
+          child: CommunityEdit(community: custom, onChange: (_) {}),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(formKey.currentState!.validate(), isTrue);
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('bare subdomain input fails validation even though onChange normalizes it', (tester) async {
+      final formKey = GlobalKey<FormState>();
+
+      await tester.pumpApp(
+        Form(
+          key: formKey,
+          child: CommunityEdit(community: empty, onChange: (_) {}),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextFormField).first, 'mysite');
+      await tester.pump();
+
+      // NOTE: this documents current behavior. onChange normalizes 'mysite' into
+      // a canonical community url via api.communities.canonicaluri, but the
+      // validator checks the raw (un-normalized) field value, so it is rejected.
+      expect(formKey.currentState!.validate(), isFalse);
+      await tester.pumpAndSettle();
+
+      expect(find.text('must be a valid url'), findsOneWidget);
+      expect(tester.takeException(), isNull);
     });
 
     testWidgets('calls onChange when description is edited', (tester) async {

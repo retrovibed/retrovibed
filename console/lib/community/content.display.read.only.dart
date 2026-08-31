@@ -15,8 +15,8 @@ class ContentDisplayReadOnly extends StatefulWidget {
   const ContentDisplayReadOnly({
     super.key,
     required this.community,
-    this.apipublished = api.API.published,
-    this.apiresync = api.API.resync,
+    this.apipublished = api.communities.published,
+    this.apiresync = api.communities.resync,
     this.help = ds.HelpScope.None,
   });
 

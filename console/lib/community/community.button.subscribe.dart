@@ -10,7 +10,7 @@ class SubscribeButton extends StatelessWidget {
   final void Function(Community)? onChanged;
   final FnSubscribe subscribe;
 
-  const SubscribeButton({super.key, required this.community, this.onChanged, this.subscribe = API.subscribe});
+  const SubscribeButton({super.key, required this.community, this.onChanged, this.subscribe = communities.subscribe});
 
   @override
   Widget build(BuildContext context) {

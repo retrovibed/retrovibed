@@ -135,7 +135,22 @@ class metrics {
   }
 }
 
-class API {
+class communities {
+  static String canonicaluri(String v) {
+    if (v.startsWith("https")) {
+      return v;
+    }
+
+    return "https://${v.isEmpty ? 'example' : v}.community.retrovibe.space";
+  }
+
+  static String domain(String uri) {
+    final host = Uri.tryParse(uri.trim())?.host ?? "";
+    if (host.isEmpty) return uri;
+    if (!host.endsWith("community.retrovibe.space")) return uri;
+    return host.split(".").first;
+  }
+
   static Future<CommunitySearchResponse> search(
     CommunitySearchRequest req, {
     List<httpx.Option> options = const [],

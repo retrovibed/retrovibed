@@ -20,8 +20,8 @@ class ListDisplay extends StatefulWidget {
 
   const ListDisplay({
     super.key,
-    this.search = API.search,
-    this.subscribe = API.subscribe,
+    this.search = communities.search,
+    this.subscribe = communities.subscribe,
   });
 
   @override
@@ -98,7 +98,7 @@ class _ListDisplayState extends State<ListDisplay> {
           constraints: BoxConstraints(maxWidth: 512.0),
           create: (c) {
             return httpx.withRetry(
-              () => API.create(
+              () => communities.create(
                 CommunityCreateRequest(community: c),
                 options: [authn.DeeppoolAuthzCache.bearer(context)],
               ),

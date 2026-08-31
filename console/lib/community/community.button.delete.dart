@@ -35,7 +35,9 @@ class DeleteButton extends StatelessWidget {
     ).then((confirmed) {
       if (confirmed != true) return Future.value();
       final auth = [authn.DeeppoolAuthzCache.bearer(context)];
-      return httpx.withRetry(() => API.delete(community.id, options: auth)).then((v) => onDeleted?.call(v.community));
+      return httpx
+          .withRetry(() => communities.delete(community.id, options: auth))
+          .then((v) => onDeleted?.call(v.community));
     });
   }
 
