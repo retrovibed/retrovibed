@@ -7,7 +7,7 @@ import 'package:retrovibed/community/community.button.resync.dart';
 import 'package:retrovibed/community/community.pb.dart';
 import 'package:retrovibed/community/community.publish.pb.dart';
 
-final _community = Community(id: 'c1', domain: 'example-community');
+final _community = Community(id: 'c1', url: 'https://example-community.community.retrovibe.space');
 
 void main() {
   group('ResyncButton', () {
@@ -65,7 +65,7 @@ void main() {
 
     testWidgets('invokes onResynced with the refreshed community', (tester) async {
       Community? resynced;
-      final refreshed = Community(id: 'c1', domain: 'refreshed-domain');
+      final refreshed = Community(id: 'c1', url: 'https://refreshed-domain.community.retrovibe.space');
 
       await tester.pumpApp(
         ResyncButton(
@@ -79,7 +79,7 @@ void main() {
       await tester.tap(find.byIcon(Icons.refresh));
       await tester.pumpAndSettle();
 
-      expect(resynced?.domain, equals('refreshed-domain'));
+      expect(resynced?.url, equals('https://refreshed-domain.community.retrovibe.space'));
       expect(tester.takeException(), isNull);
     });
 

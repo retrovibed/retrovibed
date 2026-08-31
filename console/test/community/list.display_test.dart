@@ -27,8 +27,8 @@ Future<CommunitySearchResponse> _withCommunities(
 }) async {
   return CommunitySearchResponse(
     items: [
-      Community(id: '1', domain: 'alpha', description: 'Alpha community', url: 'https://alpha.community.retrovibe.space'),
-      Community(id: '2', domain: 'beta', description: 'Beta community', url: 'https://beta.community.retrovibe.space'),
+      Community(id: '1', description: 'Alpha community', url: 'https://alpha.community.retrovibe.space'),
+      Community(id: '2', description: 'Beta community', url: 'https://beta.community.retrovibe.space'),
     ],
   );
 }
@@ -39,8 +39,8 @@ Future<CommunitySearchResponse> _withSubscription(
 }) async {
   return CommunitySearchResponse(
     items: [
-      Community(id: '1', domain: 'alpha', accountId: 'other', subscribedAt: '2026-03-20T00:00:00Z'),
-      Community(id: '2', domain: 'beta', accountId: 'other'),
+      Community(id: '1', url: 'https://alpha.community.retrovibe.space', accountId: 'other', subscribedAt: '2026-03-20T00:00:00Z'),
+      Community(id: '2', url: 'https://beta.community.retrovibe.space', accountId: 'other'),
     ],
   );
 }
@@ -116,7 +116,7 @@ void main() {
             items: [
               Community(
                 id: '1',
-                domain: 'alpha',
+                url: 'https://alpha.community.retrovibe.space',
                 accountId: 'other',
                 subscribedAt: calls > 1 ? '2026-03-20T00:00:00Z' : '',
               ),

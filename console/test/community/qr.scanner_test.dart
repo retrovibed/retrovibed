@@ -29,7 +29,6 @@ void main() {
 
     group('confirmation', () {
       final community = Community(
-        domain: 'testdomain',
         url: 'https://testdomain.community.retrovibe.space',
         description: 'A test community',
         createdAt: '2024-01-15T14:30:00Z',
@@ -106,7 +105,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(scanned, isNotNull);
-        expect(scanned!.domain, 'testdomain');
+        expect(scanned!.url, 'https://testdomain.community.retrovibe.space');
         expect(tester.takeException(), isNull);
       });
 
