@@ -29,7 +29,7 @@ func Tests(ctx context.Context, _ eg.Op) error {
 	runtime := flutterRuntimev2(shell.Runtime())
 	return shell.Run(
 		ctx,
-		runtime.New("flutter test").Timeout(10*time.Minute),
+		runtime.New("flutter test --reporter failures-only").Timeout(10*time.Minute),
 	)
 }
 
