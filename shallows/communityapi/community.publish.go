@@ -1,4 +1,4 @@
-package metaapi
+package communityapi
 
 import (
 	"context"
@@ -10,12 +10,11 @@ import (
 
 	"github.com/retrovibed/retrovibed/retroapi/env"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
-	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 )
 
-func CommunityPublish(ctx context.Context, c *http.Client, id string, in io.Reader) (resp *communityapi.CommunityUploadResponse, err error) {
+func CommunityPublish(ctx context.Context, c *http.Client, id string, in io.Reader) (resp *CommunityUploadResponse, err error) {
 	boundary, reader, err := httpx.Multipart(func(w *multipart.Writer) error {
 		part, lerr := w.CreatePart(httpx.NewMultipartHeader(mimex.RSS, "feed", mimex.RSS))
 		if lerr != nil {
@@ -35,7 +34,7 @@ func CommunityPublish(ctx context.Context, c *http.Client, id string, in io.Read
 		return nil, err
 	}
 
-	resp = new(communityapi.CommunityUploadResponse)
+	resp = new(CommunityUploadResponse)
 
 	if err = json.NewDecoder(_resp.Body).Decode(resp); err != nil {
 		return nil, err

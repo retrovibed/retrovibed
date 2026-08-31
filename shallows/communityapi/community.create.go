@@ -1,4 +1,4 @@
-package metaapi
+package communityapi
 
 import (
 	"bytes"
@@ -9,11 +9,10 @@ import (
 
 	"github.com/retrovibed/retrovibed/retroapi/env"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
-	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 )
 
-func CommunityCreate(ctx context.Context, c *http.Client, com *communityapi.CommunityCreateRequest) (resp *communityapi.CommunityCreateResponse, err error) {
+func CommunityCreate(ctx context.Context, c *http.Client, com *CommunityCreateRequest) (resp *CommunityCreateResponse, err error) {
 	encoded, err := json.Marshal(com)
 	if err != nil {
 		return nil, err
@@ -23,7 +22,7 @@ func CommunityCreate(ctx context.Context, c *http.Client, com *communityapi.Comm
 		return nil, err
 	}
 
-	resp = new(communityapi.CommunityCreateResponse)
+	resp = new(CommunityCreateResponse)
 
 	if err = json.NewDecoder(_resp.Body).Decode(resp); err != nil {
 		return nil, err

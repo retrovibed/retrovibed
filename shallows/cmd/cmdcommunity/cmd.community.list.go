@@ -14,7 +14,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
-	"github.com/retrovibed/retrovibed/shallows/metaapi"
 )
 
 type cmdCommunityList struct {
@@ -32,7 +31,7 @@ func (t cmdCommunityList) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClient) 
 		return err
 	}
 
-	if commresp, err = metaapi.CommunityInfo(gctx.Context, c, t.Name); err != nil {
+	if commresp, err = communityapi.CommunityInfo(gctx.Context, c, t.Name); err != nil {
 		return errorsx.Wrap(err, "failed to locate community")
 	}
 

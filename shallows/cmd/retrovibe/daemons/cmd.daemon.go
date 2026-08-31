@@ -504,8 +504,8 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		communityapi.HTTPOptionCommunitySync(communitysync),
 	).Bind(httpmux.PathPrefix("/c").Subrouter())
 
-	communityapi.NewHTTPSocial(db).Bind(httpmux.PathPrefix("/c/social").Subrouter())
-	communityapi.NewHTTPCommunityPublisher(db).Bind(httpmux.PathPrefix("/c/publishers").Subrouter())
+	// communityapi.NewHTTPSocial(db).Bind(httpmux.PathPrefix("/c/social").Subrouter())
+	// communityapi.NewHTTPCommunityPublisher(db).Bind(httpmux.PathPrefix("/c/publishers").Subrouter())
 
 	communityapi.NewHTTPYouTube(db, deepjwt).Bind(httpmux.PathPrefix("/integrations/youtube").Subrouter())
 

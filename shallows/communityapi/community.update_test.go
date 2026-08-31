@@ -1,4 +1,4 @@
-package metaapi_test
+package communityapi_test
 
 import (
 	"encoding/json"
@@ -10,7 +10,6 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
-	"github.com/retrovibed/retrovibed/shallows/metaapi"
 	"github.com/stretchr/testify/require"
 )
 
@@ -27,7 +26,7 @@ func TestCommunityUpdate(t *testing.T) {
 
 		c := &http.Client{}
 		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
-		resp, err := metaapi.CommunityUpdate(t.Context(), c, "test-community", &expected)
+		resp, err := communityapi.CommunityUpdate(t.Context(), c, "test-community", &expected)
 		require.NoError(t, err)
 
 		require.Equal(t, expected.Community.Id, resp.Community.Id)
@@ -50,7 +49,7 @@ func TestCommunityUpdate(t *testing.T) {
 
 		c := &http.Client{}
 		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
-		resp, err := metaapi.CommunityUpdate(t.Context(), c, "test-community", &expected)
+		resp, err := communityapi.CommunityUpdate(t.Context(), c, "test-community", &expected)
 		require.NoError(t, err)
 		require.True(t, resp.Community.Hidden)
 	})
@@ -68,7 +67,7 @@ func TestCommunityUpdate(t *testing.T) {
 
 		c := &http.Client{}
 		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
-		_, err := metaapi.CommunityUpdate(t.Context(), c, domainOrId, &expected)
+		_, err := communityapi.CommunityUpdate(t.Context(), c, domainOrId, &expected)
 		require.NoError(t, err)
 	})
 
@@ -82,7 +81,7 @@ func TestCommunityUpdate(t *testing.T) {
 
 		c := &http.Client{}
 		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
-		_, err := metaapi.CommunityUpdate(t.Context(), c, "test-community", &expected)
+		_, err := communityapi.CommunityUpdate(t.Context(), c, "test-community", &expected)
 		require.Error(t, err)
 	})
 }

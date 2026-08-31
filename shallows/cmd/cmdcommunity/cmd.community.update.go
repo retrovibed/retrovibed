@@ -8,7 +8,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
-	"github.com/retrovibed/retrovibed/shallows/metaapi"
 )
 
 type cmdCommunityUpdate struct {
@@ -41,13 +40,13 @@ func (t cmdCommunityUpdate) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClient
 		return err
 	}
 
-	inforesp, err := metaapi.CommunityInfo(gctx.Context, c, t.Name)
+	inforesp, err := communityapi.CommunityInfo(gctx.Context, c, t.Name)
 	if err != nil {
 		return errorsx.Wrap(err, "failed to read community")
 	}
 	current := inforesp.Community
 
-	commresp, err := metaapi.CommunityUpdate(gctx.Context, c, t.Name, &communityapi.CommunityUpdateRequest{
+	commresp, err := communityapi.CommunityUpdate(gctx.Context, c, t.Name, &communityapi.CommunityUpdateRequest{
 		Community: &communityapi.Community{
 			Description:        *langx.FirstNonZero(t.Description, &current.Description),
 			Mimetype:           *langx.FirstNonZero(t.Mimetype, &current.Mimetype),

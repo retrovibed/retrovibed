@@ -1,4 +1,4 @@
-package metaapi_test
+package communityapi_test
 
 import (
 	"encoding/json"
@@ -10,7 +10,6 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
-	"github.com/retrovibed/retrovibed/shallows/metaapi"
 	"github.com/stretchr/testify/require"
 )
 
@@ -27,7 +26,7 @@ func TestCommunityDelete(t *testing.T) {
 
 		c := &http.Client{}
 		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
-		_, err := metaapi.CommunityDelete(t.Context(), c, "test-community")
+		_, err := communityapi.CommunityDelete(t.Context(), c, "test-community")
 		require.NoError(t, err)
 	})
 
@@ -44,7 +43,7 @@ func TestCommunityDelete(t *testing.T) {
 
 		c := &http.Client{}
 		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
-		_, err := metaapi.CommunityDelete(t.Context(), c, domainOrId)
+		_, err := communityapi.CommunityDelete(t.Context(), c, domainOrId)
 		require.NoError(t, err)
 	})
 
@@ -55,7 +54,7 @@ func TestCommunityDelete(t *testing.T) {
 
 		c := &http.Client{}
 		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
-		_, err := metaapi.CommunityDelete(t.Context(), c, "test-community")
+		_, err := communityapi.CommunityDelete(t.Context(), c, "test-community")
 		require.Error(t, err)
 	})
 }

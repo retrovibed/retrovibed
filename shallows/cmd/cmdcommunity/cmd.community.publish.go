@@ -22,7 +22,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/media"
-	"github.com/retrovibed/retrovibed/shallows/metaapi"
 	"github.com/retrovibed/retrovibed/shallows/rss"
 )
 
@@ -88,7 +87,7 @@ func (t cmdCommunityPublish) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClien
 			return err
 		}
 	} else {
-		info, err := metaapi.CommunityInfo(gctx.Context, c, t.Name)
+		info, err := communityapi.CommunityInfo(gctx.Context, c, t.Name)
 		if err != nil {
 			return errorsx.Wrap(err, "failed to retrieve community metadata")
 		}
@@ -114,7 +113,7 @@ func (t cmdCommunityPublish) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClien
 		return err
 	}
 
-	uploaded, err := metaapi.CommunityPublish(gctx.Context, c, com.Id, &buf)
+	uploaded, err := communityapi.CommunityPublish(gctx.Context, c, com.Id, &buf)
 	if err != nil {
 		return err
 	}
