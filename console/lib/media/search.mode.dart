@@ -1,1 +1,1 @@
-enum SearchMode { library, discovery, downloads, filesystem }
+enum SearchMode { library, discovery, downloads, social, filesystem }

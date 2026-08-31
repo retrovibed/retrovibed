@@ -5,9 +5,9 @@ import 'package:path/path.dart' as path;
 
 void main(List<String> args) async {
   await build(args, (input, output) async {
-    // nothing to contribute when the consumer is not collecting code assets. flutter run
-    // --use-application-binary reuses an already built .app and requests no asset types at
-    // all, and an asset emitted into that build is rejected outright rather than ignored.
+    // Nothing to emit when this invocation isn't building code assets:
+    // adding a CodeAsset anyway makes the validator reject it as an
+    // unsupported asset type.
     if (!input.config.buildCodeAssets) {
       return;
     }

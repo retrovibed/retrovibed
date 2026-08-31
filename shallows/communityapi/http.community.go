@@ -197,7 +197,7 @@ func (t *HTTP) subscribe(w http.ResponseWriter, r *http.Request) {
 		feed := tracking.NewFeedRSS(
 			"",
 			tracking.RSSOptionURL(existing.URL),
-			tracking.RSSOptionDescription(stringsx.Join(" - ", slicesx.Filter(stringsx.Present, com.Domain, com.Description)...)),
+			tracking.RSSOptionDescription(stringsx.Join(" - ", slicesx.Filter(stringsx.Present, community.CommunityDomainFromURL(com.Url), com.Description)...)),
 			tracking.RSSOptionEncryptionSeed(com.Entropy),
 			tracking.RSSOptionAutodownload(true),
 			tracking.RSSOptionAutoarchive(true),

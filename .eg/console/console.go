@@ -29,7 +29,7 @@ func Tests(ctx context.Context, _ eg.Op) error {
 	runtime := flutterRuntimev2(shell.Runtime())
 	return shell.Run(
 		ctx,
-		runtime.New("flutter test").Timeout(10*time.Minute),
+		runtime.New("flutter test --reporter failures-only").Timeout(10*time.Minute),
 	)
 }
 
@@ -180,6 +180,7 @@ func GenerateProtocol(ctx context.Context, _ eg.Op) error {
 		runtime.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib -I.proto .proto/community/community.proto"),
 		runtime.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib -I.proto .proto/community/community.proto .proto/community/community.metrics.proto"),
 		runtime.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib -I.proto .proto/community/community.proto .proto/community/community.publish.proto"),
+		runtime.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib -I.proto .proto/community/community.proto .proto/community/community.social.proto"),
 		// frontend exclusive
 		runtime.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib -I.proto .proto/storage/storage.proto"),
 		runtime.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib -I.proto .proto/torrents/torrent.proto"),

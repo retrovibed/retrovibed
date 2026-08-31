@@ -215,20 +215,20 @@ void fault(int errcode) {
 Future<void> run(void Function() fn) async {
   print("build version ${build_version()}");
   // env.printSystemEnv();
-  print("cp 0");
+  print("cp 0 ${DateTime.now()}");
   WidgetsFlutterBinding.ensureInitialized();
-  print("cp 1");
+  print("cp 1 ${DateTime.now()}");
   HttpOverrides.global = meta.DaemonHttpOverrides();
-  print("cp 2");
+  print("cp 2 ${DateTime.now()}");
   logging();
-  print("cp 3");
+  print("cp 3 ${DateTime.now()}");
   caching.setglobal(await caching.DirsWellKnown.xdg(await env.xdg()));
-  print("cp 4");
+  print("cp 4 ${DateTime.now()}");
   // checkpointing the database on initialization prevents
   // a significant number of issues due to hard shutdowns and state corruption
   // issues.
   checkpointdb();
-  print("cp 5");
+  print("cp 5 ${DateTime.now()}");
   if (theming.Defaults.defaults.desktop) {
     await windowx.ensureInitialized();
     // waitUntilReadyToShow force-corrects isFullScreen/isMaximized/isMinimized
@@ -242,9 +242,9 @@ Future<void> run(void Function() fn) async {
       windowx.maximize(),
     ]);
   }
-  print("cp 6");
+  print("cp 6 ${DateTime.now()}");
   MediaKit.ensureInitialized();
-  print("cp 7");
+  print("cp 7 ${DateTime.now()}");
 
   fn();
 }

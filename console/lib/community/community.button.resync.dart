@@ -13,7 +13,7 @@ class ResyncButton extends StatelessWidget {
     super.key,
     required this.community,
     this.onResynced,
-    this.apiresync = API.resync,
+    this.apiresync = communities.resync,
   });
 
   @override

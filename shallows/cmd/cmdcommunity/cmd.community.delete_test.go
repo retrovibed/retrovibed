@@ -50,8 +50,8 @@ func TestCommunityDelete(t *testing.T) {
 		defer cancel()
 
 		expected := &communityapi.Community{
-			Id:     "deleted-id",
-			Domain: "test-community",
+			Id:  "deleted-id",
+			Url: "https://test-community.community.retrovibe.space",
 		}
 
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

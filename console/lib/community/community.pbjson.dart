@@ -39,7 +39,6 @@ const Community$json = {
     {'1': 'created_at', '3': 4, '4': 1, '5': 9, '10': 'created_at'},
     {'1': 'updated_at', '3': 5, '4': 1, '5': 9, '10': 'updated_at'},
     {'1': 'mimetype', '3': 6, '4': 1, '5': 9, '10': 'mimetype'},
-    {'1': 'domain', '3': 7, '4': 1, '5': 9, '10': 'domain'},
     {'1': 'description', '3': 8, '4': 1, '5': 9, '10': 'description'},
     {'1': 'entropy', '3': 9, '4': 1, '5': 9, '10': 'entropy'},
     {'1': 'bytes', '3': 10, '4': 1, '5': 4, '10': 'bytes'},
@@ -66,6 +65,7 @@ const Community$json = {
     {'1': 'last_sync_at', '3': 1000, '4': 1, '5': 9, '10': 'last_sync_at'},
   ],
   '9': [
+    {'1': 7, '2': 8},
     {'1': 18, '2': 1000},
   ],
 };
@@ -74,15 +74,14 @@ const Community$json = {
 final $typed_data.Uint8List communityDescriptor = $convert.base64Decode(
     'CglDb21tdW5pdHkSDgoCaWQYASABKAlSAmlkEh4KCmFjY291bnRfaWQYAiABKAlSCmFjY291bn'
     'RfaWQSHgoKY3JlYXRlZF9hdBgEIAEoCVIKY3JlYXRlZF9hdBIeCgp1cGRhdGVkX2F0GAUgASgJ'
-    'Ugp1cGRhdGVkX2F0EhoKCG1pbWV0eXBlGAYgASgJUghtaW1ldHlwZRIWCgZkb21haW4YByABKA'
-    'lSBmRvbWFpbhIgCgtkZXNjcmlwdGlvbhgIIAEoCVILZGVzY3JpcHRpb24SGAoHZW50cm9weRgJ'
-    'IAEoCVIHZW50cm9weRIUCgVieXRlcxgKIAEoBFIFYnl0ZXMSJAoNc3Vic2NyaWJlZF9hdBgLIA'
-    'EoCVINc3Vic2NyaWJlZF9hdBJVChRkZWZhdWx0X3B1Ymxpc2hfbW9kZRgMIAEoDjIhLnJldHJv'
-    'dmliZWQuY29tbXVuaXR5LlB1Ymxpc2hNb2RlUhRkZWZhdWx0X3B1Ymxpc2hfbW9kZRIWCgZoaW'
-    'RkZW4YDSABKAhSBmhpZGRlbhIQCgN1cmwYDiABKAlSA3VybBIUCgVhZHVsdBgPIAEoCFIFYWR1'
-    'bHQSIAoLZGVmYXVsdF90dGwYECABKARSC2RlZmF1bHRfdHRsEioKEGRlZmF1bHRfbGFuZ3VhZ2'
-    'UYESABKAlSEGRlZmF1bHRfbGFuZ3VhZ2USIwoMbGFzdF9zeW5jX2F0GOgHIAEoCVIMbGFzdF9z'
-    'eW5jX2F0SgUIEhDoBw==');
+    'Ugp1cGRhdGVkX2F0EhoKCG1pbWV0eXBlGAYgASgJUghtaW1ldHlwZRIgCgtkZXNjcmlwdGlvbh'
+    'gIIAEoCVILZGVzY3JpcHRpb24SGAoHZW50cm9weRgJIAEoCVIHZW50cm9weRIUCgVieXRlcxgK'
+    'IAEoBFIFYnl0ZXMSJAoNc3Vic2NyaWJlZF9hdBgLIAEoCVINc3Vic2NyaWJlZF9hdBJVChRkZW'
+    'ZhdWx0X3B1Ymxpc2hfbW9kZRgMIAEoDjIhLnJldHJvdmliZWQuY29tbXVuaXR5LlB1Ymxpc2hN'
+    'b2RlUhRkZWZhdWx0X3B1Ymxpc2hfbW9kZRIWCgZoaWRkZW4YDSABKAhSBmhpZGRlbhIQCgN1cm'
+    'wYDiABKAlSA3VybBIUCgVhZHVsdBgPIAEoCFIFYWR1bHQSIAoLZGVmYXVsdF90dGwYECABKARS'
+    'C2RlZmF1bHRfdHRsEioKEGRlZmF1bHRfbGFuZ3VhZ2UYESABKAlSEGRlZmF1bHRfbGFuZ3VhZ2'
+    'USIwoMbGFzdF9zeW5jX2F0GOgHIAEoCVIMbGFzdF9zeW5jX2F0SgQIBxAISgUIEhDoBw==');
 
 @$core.Deprecated('Use communitySearchRequestDescriptor instead')
 const CommunitySearchRequest$json = {

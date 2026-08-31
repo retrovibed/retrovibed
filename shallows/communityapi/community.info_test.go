@@ -1,4 +1,4 @@
-package metaapi_test
+package communityapi_test
 
 import (
 	"encoding/json"
@@ -10,7 +10,6 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
-	"github.com/retrovibed/retrovibed/shallows/metaapi"
 	"github.com/stretchr/testify/require"
 )
 
@@ -28,11 +27,11 @@ func TestCommunityInfo(t *testing.T) {
 
 		c := &http.Client{}
 		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
-		resp, err := metaapi.CommunityInfo(t.Context(), c, "derp")
+		resp, err := communityapi.CommunityInfo(t.Context(), c, "derp")
 		require.NoError(t, err)
 
 		require.Equal(t, expected.Id, resp.Community.Id)
-		require.Equal(t, expected.Domain, resp.Community.Domain)
+		require.Equal(t, expected.Url, resp.Community.Url)
 		require.Equal(t, expected.Bytes, resp.Community.Bytes)
 		require.Equal(t, expected.Description, resp.Community.Description)
 		require.Equal(t, expected.Mimetype, resp.Community.Mimetype)

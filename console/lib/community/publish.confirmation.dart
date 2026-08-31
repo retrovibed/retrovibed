@@ -141,7 +141,7 @@ class _PublishConfirmationState extends State<PublishConfirmation> {
             ),
             ConfirmationRow(
               label: 'Community',
-              value: widget.community?.domain ?? 'Unknown',
+              value: widget.community?.url ?? 'Unknown',
             ),
             Visibility(
               visible: widget.knownMedia != null,

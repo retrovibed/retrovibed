@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:fixnum/fixnum.dart' as fixnum;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -97,6 +99,126 @@ void main() {
 
         expect(token.bearer, equals('cached-bearer'));
         expect(cache.meta.current.bearer, equals('cached-bearer'));
+        expect(tester.takeException(), isNull);
+      });
+    });
+
+    group('failed refresh', () {
+      testWidgets('propagates the underlying error instead of caching an empty bearer', (WidgetTester tester) async {
+        BuildContext? capturedCtx;
+        final failure = Exception('deeppool authz unavailable');
+
+        await tester.pumpApp(
+          DeeppoolAuthzCache(
+            Builder(
+              builder: (ctx) {
+                capturedCtx = ctx;
+                return const Text('child');
+              },
+            ),
+            apideeppoolauthz: ({options = const []}) => Future.error(failure),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final cache = DeeppoolAuthzCache.of(capturedCtx!);
+        await expectLater(cache.meta.auto(), throwsA(failure));
+        expect(cache.meta.current.bearer, isEmpty);
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('does not overwrite a previously cached bearer on a later failure', (WidgetTester tester) async {
+        var callCount = 0;
+        BuildContext? capturedCtx;
+
+        await tester.pumpApp(
+          DeeppoolAuthzCache(
+            Builder(
+              builder: (ctx) {
+                capturedCtx = ctx;
+                return const Text('child');
+              },
+            ),
+            apideeppoolauthz: ({options = const []}) {
+              callCount++;
+              if (callCount == 1) {
+                return Future.value(_response('good-bearer', _pastExpiry()));
+              }
+              return Future.error(Exception('deeppool authz unavailable'));
+            },
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final cache = DeeppoolAuthzCache.of(capturedCtx!);
+
+        final firstToken = await cache.meta.auto();
+        await tester.pumpAndSettle();
+        expect(firstToken.bearer, equals('good-bearer'));
+
+        await expectLater(cache.meta.auto(), throwsException);
+        await tester.pumpAndSettle();
+
+        expect(cache.meta.current.bearer, equals('good-bearer'));
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('bearer() rejects with the underlying error rather than MissingTokenError', (
+        WidgetTester tester,
+      ) async {
+        BuildContext? capturedCtx;
+        final failure = Exception('deeppool authz unavailable');
+
+        await tester.pumpApp(
+          DeeppoolAuthzCache(
+            Builder(
+              builder: (ctx) {
+                capturedCtx = ctx;
+                return const Text('child');
+              },
+            ),
+            apideeppoolauthz: ({options = const []}) => Future.error(failure),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final option = DeeppoolAuthzCache.bearer(capturedCtx!);
+        final request = httpx.Request();
+        await expectLater(option(request), throwsA(failure));
+        expect(request.headers['Authorization'], isNull);
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('retries a transient failure before giving up', (WidgetTester tester) async {
+        var callCount = 0;
+        BuildContext? capturedCtx;
+
+        await tester.pumpApp(
+          DeeppoolAuthzCache(
+            Builder(
+              builder: (ctx) {
+                capturedCtx = ctx;
+                return const Text('child');
+              },
+            ),
+            apideeppoolauthz: ({options = const []}) {
+              callCount++;
+              if (callCount == 1) {
+                return Future.error(const SocketException('connection reset'));
+              }
+              return Future.value(_response('recovered-bearer', _futureExpiry()));
+            },
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final cache = DeeppoolAuthzCache.of(capturedCtx!);
+        final tokenFuture = cache.meta.auto();
+        await tester.pump(const Duration(seconds: 2));
+        final token = await tokenFuture;
+
+        expect(callCount, equals(2));
+        expect(token.bearer, equals('recovered-bearer'));
         expect(tester.takeException(), isNull);
       });
     });

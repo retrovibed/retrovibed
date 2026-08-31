@@ -1,4 +1,4 @@
-package metaapi
+package communityapi
 
 import (
 	"context"
@@ -7,11 +7,10 @@ import (
 	"net/http"
 
 	"github.com/retrovibed/retrovibed/retroapi/env"
-	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 )
 
-func CommunityDelete(ctx context.Context, c *http.Client, domainOrId string) (resp *communityapi.CommunityDeleteResponse, err error) {
+func CommunityDelete(ctx context.Context, c *http.Client, domainOrId string) (resp *CommunityDeleteResponse, err error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, fmt.Sprintf("https://%s/c/%s", env.Deeppool(), domainOrId), nil)
 	if err != nil {
 		return nil, err
@@ -22,7 +21,7 @@ func CommunityDelete(ctx context.Context, c *http.Client, domainOrId string) (re
 		return nil, err
 	}
 
-	resp = new(communityapi.CommunityDeleteResponse)
+	resp = new(CommunityDeleteResponse)
 
 	if err = json.NewDecoder(_resp.Body).Decode(resp); err != nil {
 		return nil, err

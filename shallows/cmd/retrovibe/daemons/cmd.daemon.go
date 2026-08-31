@@ -157,13 +157,16 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		locatemedia         = asyncx.NewWakeup(gctx.Context)
 		vpncfgpath          = userx.DefaultConfigDir(userx.DefaultRelRoot(), "vpn.cfg")
 		storagecfgpath      = userx.DefaultConfigDir(userx.DefaultRelRoot(), "storage.cfg")
+		mediarecsdir        = userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "media.recs.d")
 	)
 
-	// pqueue opens the directory, it does not create it, so a first run on a machine that
-	// has never held the queue fails to boot the daemon entirely.
-	mediarecsdir := userx.DefaultCacheDirectory("media.recs.d")
-	if err = fsx.MkDirs(0700, mediarecsdir); err != nil {
-		return errorsx.Wrap(err, "unable to create media recs queue directory")
+	// initialize queue directories
+	err = fsx.MkDirs(
+		0700,
+		mediarecsdir,
+	)
+	if err != nil {
+		return errorsx.Wrap(err, "unable to create queues dir")
 	}
 
 	mediarecs, err := pqueue.New(mediarecsdir, 32)
@@ -227,7 +230,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	if !authz.LocalOnly {
 		if c, err := authn.AutoJWTClient(gctx.Context, id); err == nil {
 			deepjwt = c
-			go AutoRegistration(gctx.Context, deepjwt)
+			go AutoRegistration(gctx.Context, id)
 		} else {
 			// we allow creation to fail the application should function even without the api.
 			// just warn that the api is unavailable.
@@ -500,6 +503,9 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		envx.Toggle(communityapi.HTTPOptionNoop, communityapi.HTTPOptionHTTPClient(deepjwt), t.AutoArchive),
 		communityapi.HTTPOptionCommunitySync(communitysync),
 	).Bind(httpmux.PathPrefix("/c").Subrouter())
+
+	// communityapi.NewHTTPSocial(db).Bind(httpmux.PathPrefix("/c/social").Subrouter())
+	// communityapi.NewHTTPCommunityPublisher(db).Bind(httpmux.PathPrefix("/c/publishers").Subrouter())
 
 	communityapi.NewHTTPYouTube(db, deepjwt).Bind(httpmux.PathPrefix("/integrations/youtube").Subrouter())
 

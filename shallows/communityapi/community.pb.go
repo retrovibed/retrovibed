@@ -77,7 +77,6 @@ type Community struct {
 	CreatedAt          string                 `protobuf:"bytes,4,opt,name=created_at,proto3" json:"created_at,omitempty"`
 	UpdatedAt          string                 `protobuf:"bytes,5,opt,name=updated_at,proto3" json:"updated_at,omitempty"`
 	Mimetype           string                 `protobuf:"bytes,6,opt,name=mimetype,proto3" json:"mimetype,omitempty"`
-	Domain             string                 `protobuf:"bytes,7,opt,name=domain,proto3" json:"domain,omitempty"`
 	Description        string                 `protobuf:"bytes,8,opt,name=description,proto3" json:"description,omitempty"`
 	Entropy            string                 `protobuf:"bytes,9,opt,name=entropy,proto3" json:"entropy,omitempty"`
 	Bytes              uint64                 `protobuf:"varint,10,opt,name=bytes,proto3" json:"bytes,omitempty"`
@@ -155,13 +154,6 @@ func (x *Community) GetUpdatedAt() string {
 func (x *Community) GetMimetype() string {
 	if x != nil {
 		return x.Mimetype
-	}
-	return ""
-}
-
-func (x *Community) GetDomain() string {
-	if x != nil {
-		return x.Domain
 	}
 	return ""
 }
@@ -907,7 +899,7 @@ var File_community_community_proto protoreflect.FileDescriptor
 
 const file_community_community_proto_rawDesc = "" +
 	"\n" +
-	"\x19community/community.proto\x12\x14retrovibed.community\"\xb8\x04\n" +
+	"\x19community/community.proto\x12\x14retrovibed.community\"\xa6\x04\n" +
 	"\tCommunity\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1e\n" +
 	"\n" +
@@ -919,8 +911,7 @@ const file_community_community_proto_rawDesc = "" +
 	"\n" +
 	"updated_at\x18\x05 \x01(\tR\n" +
 	"updated_at\x12\x1a\n" +
-	"\bmimetype\x18\x06 \x01(\tR\bmimetype\x12\x16\n" +
-	"\x06domain\x18\a \x01(\tR\x06domain\x12 \n" +
+	"\bmimetype\x18\x06 \x01(\tR\bmimetype\x12 \n" +
 	"\vdescription\x18\b \x01(\tR\vdescription\x12\x18\n" +
 	"\aentropy\x18\t \x01(\tR\aentropy\x12\x14\n" +
 	"\x05bytes\x18\n" +
@@ -932,7 +923,7 @@ const file_community_community_proto_rawDesc = "" +
 	"\x05adult\x18\x0f \x01(\bR\x05adult\x12 \n" +
 	"\vdefault_ttl\x18\x10 \x01(\x04R\vdefault_ttl\x12*\n" +
 	"\x10default_language\x18\x11 \x01(\tR\x10default_language\x12#\n" +
-	"\flast_sync_at\x18\xe8\a \x01(\tR\flast_sync_atJ\x05\b\x12\x10\xe8\a\"c\n" +
+	"\flast_sync_at\x18\xe8\a \x01(\tR\flast_sync_atJ\x04\b\a\x10\bJ\x05\b\x12\x10\xe8\a\"c\n" +
 	"\x16CommunitySearchRequest\x12\x14\n" +
 	"\x05query\x18\x01 \x01(\tR\x05query\x12\x16\n" +
 	"\x06offset\x18\x02 \x01(\x04R\x06offset\x12\x14\n" +

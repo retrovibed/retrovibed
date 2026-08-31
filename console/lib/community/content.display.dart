@@ -18,7 +18,7 @@ class CommunityContentDisplay extends StatefulWidget {
     super.key,
     required this.community,
     this.apipublished = api.publishing.search,
-    this.apiresync = api.API.resync,
+    this.apiresync = api.communities.resync,
     this.apitombstone = api.publishing.tombstone,
     this.help = ds.HelpScope.None,
   });
@@ -112,18 +112,17 @@ class _CommunityContentDisplayState extends State<CommunityContentDisplay> {
         (item) => _ContentRow(
           community: widget.community,
           item: item,
-          onDelete:
-              owned
-                  ? (content) => httpx
-                      .withRetry(
-                        () => widget.apitombstone(content.id, options: [authn.request(authn.AuthzCache.meta(context))]),
-                      )
-                      .then((_) {
-                        setState(() {
-                          _resp.items.remove(content);
-                        });
-                      })
-                  : null,
+          onDelete: owned
+              ? (content) => httpx
+                    .withRetry(
+                      () => widget.apitombstone(content.id, options: [authn.request(authn.AuthzCache.meta(context))]),
+                    )
+                    .then((_) {
+                      setState(() {
+                        _resp.items.remove(content);
+                      });
+                    })
+              : null,
         ),
       ),
       loading: _loading,
@@ -133,10 +132,9 @@ class _CommunityContentDisplayState extends State<CommunityContentDisplay> {
         decoration: InputDecoration(hintText: "search content"),
         onSubmitted: (q) {
           setState(
-            () =>
-                _resp.next
-                  ..query = q
-                  ..offset = ds.Int64(0),
+            () => _resp.next
+              ..query = q
+              ..offset = ds.Int64(0),
           );
           return _refresh(_resp.next);
         },

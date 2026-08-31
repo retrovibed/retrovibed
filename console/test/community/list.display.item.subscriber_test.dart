@@ -6,7 +6,7 @@ import 'package:retrovibed/community/community.pb.dart';
 
 final _community = Community(
 	id: 'c1',
-	domain: 'lorem-ipsum-dolor-sit-amet-consectetur-adipiscing-elit-sed-do-eiusmod',
+	url: 'https://lorem-ipsum-dolor-sit-amet-consectetur-adipiscing-elit-sed-do-eiusmod.community.retrovibe.space',
 	description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.',
 );
 

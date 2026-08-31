@@ -33,7 +33,7 @@ class DeepLink extends StatefulWidget {
   const DeepLink(
     this.child, {
     super.key,
-    this.search = community.API.search,
+    this.search = community.communities.search,
     this.consumeAttribution = billing.consumeAttribution,
     this.subscribe = handleSubscribeAction,
     this.uriStream = _defaultUriStream,
@@ -110,45 +110,42 @@ class _DeepLinkState extends State<DeepLink> {
         .then((response) {
           if (response.items.isEmpty) {
             setState(
-              () =>
-                  _overlay = ds.Masked(
-                    alignment: Alignment.center,
-                    ds.Error.unknown('community not found', onTap: _dismiss),
-                  ),
+              () => _overlay = ds.Masked(
+                alignment: Alignment.center,
+                ds.Error.unknown('community not found', onTap: _dismiss),
+              ),
             );
             return;
           }
 
           final c = response.items.first;
           setState(
-            () =>
-                _overlay = ds.Masked(
-                  alignment: Alignment.center,
-                  ds.Confirmation.yesNo(
-                    content: Column(
-                      children: [CommunityDetail(community: c)],
-                    ),
-                    onConfirm: (context) {
-                      widget.subscribe(context, c, '').catchError((e, s) {
-                        setState(
-                          () => _overlay = ds.Error.unknown(e, onTap: _dismiss),
-                        );
-                        return Future.error(e);
-                      }).ignore();
-                      _dismiss();
-                    },
-                    onCancel: (_) => _dismiss(),
-                  ),
+            () => _overlay = ds.Masked(
+              alignment: Alignment.center,
+              ds.Confirmation.yesNo(
+                content: Column(
+                  children: [CommunityDetail(community: c)],
                 ),
+                onConfirm: (context) {
+                  widget.subscribe(context, c, '').catchError((e, s) {
+                    setState(
+                      () => _overlay = ds.Error.unknown(e, onTap: _dismiss),
+                    );
+                    return Future.error(e);
+                  }).ignore();
+                  _dismiss();
+                },
+                onCancel: (_) => _dismiss(),
+              ),
+            ),
           );
         })
         .catchError((e) {
           setState(
-            () =>
-                _overlay = ds.Masked(
-                  alignment: Alignment.center,
-                  ds.Error.unknown(e, onTap: _dismiss),
-                ),
+            () => _overlay = ds.Masked(
+              alignment: Alignment.center,
+              ds.Error.unknown(e, onTap: _dismiss),
+            ),
           );
         });
   }

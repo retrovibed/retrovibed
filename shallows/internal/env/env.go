@@ -65,6 +65,7 @@ const (
 	TorrentDirectoryWatch      = "RETROVIBED_TORRENT_DIRECTORY_WATCH"          // specify the list of directories to watch for torrent files.
 	TorrentVerifyFrequency     = "RETROVIBED_TORRENT_VERIFY_FREQUENCY"         // specify how frequently to check for torrents to verify.
 	DHTDebug                   = "RETROVIBED_DHT_DEBUG"                        // enable dht debug logging
+	CommunityHost              = "RETROVIBED_COMMUNITY_HOST"                   // fqdn suffix used to build/parse hosted community urls, e.g. "community.retrovibe.space"
 	SelfSignedHosts            = "RETROVIBED_SELF_SIGNED_HOSTS"                // list of hosts to add to the self signed certificate.
 	DDiscFrequency             = "RETROVIBED_DDISC_ANNOUNCE_FREQUENCY"         // how frequently to announce partitions frequency.
 	DDiscP2PLocate             = "RETROVIBED_DDISC_P2P_LOCATE"                 // enable the discovery of media from peers.

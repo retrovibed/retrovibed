@@ -19,7 +19,7 @@ final _resolutions = Resolutions.variant();
 Community _testCommunity({String? lastSyncAt}) => Community(
   id: 'community-1',
   accountId: uuidx.min(),
-  domain: 'testdomain',
+  url: 'https://testdomain.community.retrovibe.space',
   description: 'A test community',
   lastSyncAt: lastSyncAt ?? DateTime.now().toUtc().toIso8601String(),
 );

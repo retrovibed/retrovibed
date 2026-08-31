@@ -21,12 +21,7 @@ func (t CloudRegister) Run(gctx *cmdopts.Global) (err error) {
 		return err
 	}
 
-	c, err := authn.AutoJWTClient(gctx.Context, id)
-	if err != nil {
-		return errorsx.Wrap(err, "unable to create api client")
-	}
-
-	session, err := authn.Register(gctx.Context, c)
+	session, err := authn.AutoRegistration(gctx.Context, id)
 	if err != nil {
 		return errorsx.Wrap(err, "unable to register")
 	}

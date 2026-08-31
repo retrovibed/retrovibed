@@ -2,6 +2,8 @@ package communityapi
 
 import (
 	"bytes"
+	"context"
+	"io"
 	"slices"
 	"testing"
 	"time"
@@ -17,6 +19,75 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/rss"
 	"github.com/stretchr/testify/require"
 )
+
+type fakeFeedPublisher struct {
+	community *Community
+	uploaded  []byte
+}
+
+func (f *fakeFeedPublisher) Find(ctx context.Context, communityID string) (*Community, error) {
+	return f.community, nil
+}
+
+func (f *fakeFeedPublisher) UploadFeed(ctx context.Context, communityID string, feed io.Reader) error {
+	b, err := io.ReadAll(feed)
+	if err != nil {
+		return err
+	}
+	f.uploaded = b
+	return nil
+}
+
+func TestRegenerateFeed(t *testing.T) {
+	t.Run("uses the community subdomain label as title when url is hosted on our domain", func(t *testing.T) {
+		var (
+			ctx, done   = testx.Context(t)
+			q           = sqltestx.Metadatabase(t)
+			communityID = uuid.Must(uuid.NewV7()).String()
+		)
+		defer done()
+
+		publisher := &fakeFeedPublisher{
+			community: &Community{
+				Id:          communityID,
+				Url:         "https://mysite.community.retrovibe.space",
+				Description: "test",
+				Entropy:     "test-entropy",
+				Mimetype:    "video/*",
+			},
+		}
+
+		require.NoError(t, RegenerateFeed(ctx, q, publisher, communityID))
+		require.Contains(t, string(publisher.uploaded), "<title>mysite</title>")
+		require.Contains(t, string(publisher.uploaded), "<link>https://mysite.community.retrovibe.space</link>")
+	})
+
+	t.Run("uses the fqdn as title when it is a custom domain", func(t *testing.T) {
+		var (
+			ctx, done   = testx.Context(t)
+			q           = sqltestx.Metadatabase(t)
+			communityID = uuid.Must(uuid.NewV7()).String()
+		)
+		defer done()
+
+		publisher := &fakeFeedPublisher{
+			community: &Community{
+				Id:          communityID,
+				Url:         "https://mysite.example.com",
+				Description: "test",
+				Entropy:     "test-entropy",
+				Mimetype:    "video/*",
+			},
+		}
+
+		// CommunityDomainFromURL only extracts a short label for our own hosted
+		// subdomains; a custom domain has no reliable label to derive so its
+		// fqdn is used as the title instead.
+		require.NoError(t, RegenerateFeed(ctx, q, publisher, communityID))
+		require.Contains(t, string(publisher.uploaded), "<title>mysite.example.com</title>")
+		require.Contains(t, string(publisher.uploaded), "<link>https://mysite.example.com</link>")
+	})
+}
 
 func TestFeedGeneration(t *testing.T) {
 	t.Run("generates RSS feed XML", func(t *testing.T) {
@@ -80,7 +151,7 @@ func TestFeedGeneration(t *testing.T) {
 
 		community := &Community{
 			Id:          communityID,
-			Domain:      "testcommunity",
+			Url:         "https://testcommunity.community.retrovibe.space",
 			Description: "A test community for RSS feed generation",
 			Entropy:     "test-entropy-value",
 			Mimetype:    "video/*",
@@ -92,7 +163,7 @@ func TestFeedGeneration(t *testing.T) {
 
 		buf := new(bytes.Buffer)
 		channel := rss.Channel{
-			Title:         community.Domain,
+			Title:         "testcommunity",
 			Link:          "https://testcommunity.community.retrovibe.space",
 			Description:   community.Description,
 			TTL:           feedDefaultTTL,
@@ -153,7 +224,7 @@ func TestFeedGeneration(t *testing.T) {
 
 		community := &Community{
 			Id:          communityID,
-			Domain:      "testcommunity",
+			Url:         "https://testcommunity.community.retrovibe.space",
 			Description: "test",
 			Entropy:     "test-entropy",
 			Mimetype:    "video/*",
@@ -215,7 +286,7 @@ func TestFeedGeneration(t *testing.T) {
 
 		community := &Community{
 			Id:          communityID,
-			Domain:      "testcommunity",
+			Url:         "https://testcommunity.community.retrovibe.space",
 			Description: "test",
 			Entropy:     "test-entropy",
 			Mimetype:    "video/*",
@@ -277,7 +348,7 @@ func TestFeedGeneration(t *testing.T) {
 
 		community := &Community{
 			Id:          communityID,
-			Domain:      "testcommunity",
+			Url:         "https://testcommunity.community.retrovibe.space",
 			Description: "test",
 			Entropy:     "test-entropy",
 			Mimetype:    "video/*",
