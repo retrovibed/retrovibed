@@ -36,6 +36,7 @@ func MediaOptionFromLibraryMetadata(cc library.Metadata) MediaOption {
 		c.UpdatedAt = grpcx.EncodeTime(cc.UpdatedAt)
 		c.Mimetype = stringsx.FirstNonBlank(cc.Mimetype, mimex.Binary)
 		c.EncryptionSeed = cc.EncryptionSeed
+		c.ParentId = cc.ParentID
 	}
 }
 

@@ -1,10 +1,12 @@
 package daemons
 
 import (
+	"database/sql"
 	"testing"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
+	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
@@ -131,5 +133,42 @@ func TestPublishDiscoveredMediaOne(t *testing.T) {
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
 		require.Error(t, publishDiscoveredMediaOne(ctx, q, lmd))
+	})
+}
+
+func TestPublishDiscoveredMedia(t *testing.T) {
+	t.Run("never publishes a folder to the discovery network", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		q := sqltestx.Metadatabase(t)
+
+		var tmd tracking.Metadata
+		require.NoError(t, testx.Fake(&tmd, tracking.MetadataOptionTestDefaults))
+		require.NoError(t, tracking.MetadataInsertWithDefaults(ctx, q, tmd).Scan(&tmd))
+
+		var known library.Known
+		require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults))
+		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
+
+		// a folder acquires neither a known media id nor a torrent in normal operation, so
+		// this row is deliberately built to satisfy every other predicate in the query. the
+		// name of a user's folder must not reach peers.
+		var lmd library.Metadata
+		require.NoError(t, testx.Fake(
+			&lmd,
+			library.MetadataOptionTestDefaults,
+			library.MetadataOptionTestRandomID,
+			library.MetadataOptionMimetype(mimex.Directory),
+			library.MetadataOptionKnownMediaID(known.UID),
+			library.MetadataOptionTorrentID(tmd.ID),
+		))
+		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
+
+		require.NoError(t, PublishDiscoveredMedia(ctx, q))
+
+		expected := ddisc.NewDiscoveredFromKnown(int160.FromBytes(tmd.Infohash), known, ddisc.DiscoveredOptionAutoMagnet)
+		var disc ddisc.Discovered
+		require.ErrorIs(t, ddisc.DiscoveredFindByID(ctx, q, expected.ID).Scan(&disc), sql.ErrNoRows)
 	})
 }

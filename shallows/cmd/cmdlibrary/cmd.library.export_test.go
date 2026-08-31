@@ -8,6 +8,7 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
+	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/internal/cryptox"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
@@ -224,5 +225,31 @@ func TestExportJSONLRun(t *testing.T) {
 		trailers := decodeExportStream(t, &buf)
 		require.Len(t, trailers, 1)
 		require.NotEmpty(t, trailers[0].MD5)
+	})
+
+	t.Run("skips folders", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+		db := sqltestx.Metadatabase(t)
+		vfs := fsx.DirVirtual(t.TempDir())
+
+		var md, dir library.Metadata
+		require.NoError(t, testx.Fake(&md, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID))
+		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, md).Scan(&md))
+		writeBlockData(t, vfs, md)
+
+		require.NoError(t, testx.Fake(&dir, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID, library.MetadataOptionMimetype(mimex.Directory), library.MetadataOptionBytes(0)))
+		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, dir).Scan(&dir))
+
+		var buf bytes.Buffer
+		require.NoError(t, cmd.run(ctx, db, vfs, &buf))
+
+		trailers := decodeExportStream(t, &buf)
+		require.Len(t, trailers, 1)
+		require.Equal(t, md.ID, trailers[0].Metadata.ID)
+
+		// export opens a block cache per row, and that call creates the directory it is
+		// given, so a folder row leaves an empty tree behind on every export.
+		require.NoDirExists(t, vfs.Path(dir.ID))
 	})
 }

@@ -14,6 +14,7 @@ message Media {
   string known_media_id = 9 [ json_name = "known_media_id" ];
   string encryption_seed = 10 [ json_name = "encryption_seed" ];
   string uri = 11 [ json_name = "uri" ];
+  string parent_id = 12 [ json_name = "parent_id" ];
 }
 
 message MediaSearchRequest {
@@ -22,7 +23,10 @@ message MediaSearchRequest {
   bool adult = 3 [ json_name = "adult" ];
   bool hidden = 4 [ json_name = "hidden" ];
   repeated string excluded = 5 [ json_name = "excluded" ];
-  reserved 6 to 899;
+  // presence selects the view. absent lists the flat library and excludes directories,
+  // any uuid lists that one folder and includes them.
+  string parent_id = 6 [ json_name = "parent_id" ];
+  reserved 7 to 899;
   uint64 offset = 900 [ json_name = "offset" ];
   uint64 limit = 901 [ json_name = "limit" ];
   reserved 902 to 999;
@@ -31,6 +35,9 @@ message MediaSearchRequest {
 message MediaSearchResponse {
   MediaSearchRequest next = 1 [ json_name = "next" ];
   repeated Media items = 2 [ json_name = "items" ];
+  // the listed folder and its ancestors, root first. empty for the flat library. rides
+  // along with the listing so the breadcrumb costs no second round trip.
+  repeated Media breadcrumb = 3 [ json_name = "breadcrumb" ];
 }
 
 message MediaFindResponse { Media media = 1 [ json_name = "media" ]; }

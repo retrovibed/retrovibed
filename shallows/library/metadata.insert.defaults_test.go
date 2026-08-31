@@ -102,4 +102,39 @@ func TestMetadataInsertWithDefaults(t *testing.T) {
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, tmp).Scan(&tmp))
 		require.Equal(t, realID, tmp.KnownMediaID)
 	})
+
+	t.Run("upsert should file a row sitting at the root", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+		db := sqltestx.Metadatabase(t)
+		var tmp library.Metadata
+
+		require.NoError(t, testx.Fake(&tmp, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID))
+		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, tmp).Scan(&tmp))
+		require.Equal(t, uuid.Nil.String(), tmp.ParentID)
+
+		folderID := uuid.Must(uuid.NewV7()).String()
+		tmp = langx.Clone(tmp, library.MetadataOptionParentID(folderID))
+		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, tmp).Scan(&tmp))
+		require.Equal(t, folderID, tmp.ParentID)
+	})
+
+	t.Run("upsert should not overwrite a parent the user already chose", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+		db := sqltestx.Metadatabase(t)
+		var tmp library.Metadata
+
+		// id is the md5 of the content, so a torrent completion or a filesystem rescan
+		// re-inserts a row the user has already filed. an unguarded assignment here drags
+		// the whole library back into a flat pile.
+		folderID := uuid.Must(uuid.NewV7()).String()
+		require.NoError(t, testx.Fake(&tmp, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID, library.MetadataOptionParentID(folderID)))
+		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, tmp).Scan(&tmp))
+		require.Equal(t, folderID, tmp.ParentID)
+
+		tmp = langx.Clone(tmp, library.MetadataOptionParentID(uuid.Nil.String()))
+		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, tmp).Scan(&tmp))
+		require.Equal(t, folderID, tmp.ParentID)
+	})
 }
