@@ -39,7 +39,7 @@ func (f *fakeFeedPublisher) UploadFeed(ctx context.Context, communityID string, 
 }
 
 func TestRegenerateFeed(t *testing.T) {
-	t.Run("uses domain as title and url as link when url is set", func(t *testing.T) {
+	t.Run("uses the community subdomain label as title when url is hosted on our domain", func(t *testing.T) {
 		var (
 			ctx, done   = testx.Context(t)
 			q           = sqltestx.Metadatabase(t)
@@ -50,31 +50,7 @@ func TestRegenerateFeed(t *testing.T) {
 		publisher := &fakeFeedPublisher{
 			community: &Community{
 				Id:          communityID,
-				Domain:      "mysite",
-				Url:         "https://mysite.example.com",
-				Description: "test",
-				Entropy:     "test-entropy",
-				Mimetype:    "video/*",
-			},
-		}
-
-		require.NoError(t, RegenerateFeed(ctx, q, publisher, communityID))
-		require.Contains(t, string(publisher.uploaded), "<title>mysite</title>")
-		require.Contains(t, string(publisher.uploaded), "<link>https://mysite.example.com</link>")
-	})
-
-	t.Run("falls back to the canonical hosted url when url is blank", func(t *testing.T) {
-		var (
-			ctx, done   = testx.Context(t)
-			q           = sqltestx.Metadatabase(t)
-			communityID = uuid.Must(uuid.NewV7()).String()
-		)
-		defer done()
-
-		publisher := &fakeFeedPublisher{
-			community: &Community{
-				Id:          communityID,
-				Domain:      "mysite",
+				Url:         "https://mysite.community.retrovibe.space",
 				Description: "test",
 				Entropy:     "test-entropy",
 				Mimetype:    "video/*",
@@ -84,6 +60,32 @@ func TestRegenerateFeed(t *testing.T) {
 		require.NoError(t, RegenerateFeed(ctx, q, publisher, communityID))
 		require.Contains(t, string(publisher.uploaded), "<title>mysite</title>")
 		require.Contains(t, string(publisher.uploaded), "<link>https://mysite.community.retrovibe.space</link>")
+	})
+
+	t.Run("uses the fqdn as title when it is a custom domain", func(t *testing.T) {
+		var (
+			ctx, done   = testx.Context(t)
+			q           = sqltestx.Metadatabase(t)
+			communityID = uuid.Must(uuid.NewV7()).String()
+		)
+		defer done()
+
+		publisher := &fakeFeedPublisher{
+			community: &Community{
+				Id:          communityID,
+				Url:         "https://mysite.example.com",
+				Description: "test",
+				Entropy:     "test-entropy",
+				Mimetype:    "video/*",
+			},
+		}
+
+		// CommunityDomainFromURL only extracts a short label for our own hosted
+		// subdomains; a custom domain has no reliable label to derive so its
+		// fqdn is used as the title instead.
+		require.NoError(t, RegenerateFeed(ctx, q, publisher, communityID))
+		require.Contains(t, string(publisher.uploaded), "<title>mysite.example.com</title>")
+		require.Contains(t, string(publisher.uploaded), "<link>https://mysite.example.com</link>")
 	})
 }
 
@@ -149,7 +151,7 @@ func TestFeedGeneration(t *testing.T) {
 
 		community := &Community{
 			Id:          communityID,
-			Domain:      "testcommunity",
+			Url:         "https://testcommunity.community.retrovibe.space",
 			Description: "A test community for RSS feed generation",
 			Entropy:     "test-entropy-value",
 			Mimetype:    "video/*",
@@ -161,7 +163,7 @@ func TestFeedGeneration(t *testing.T) {
 
 		buf := new(bytes.Buffer)
 		channel := rss.Channel{
-			Title:         community.Domain,
+			Title:         "testcommunity",
 			Link:          "https://testcommunity.community.retrovibe.space",
 			Description:   community.Description,
 			TTL:           feedDefaultTTL,
@@ -222,7 +224,7 @@ func TestFeedGeneration(t *testing.T) {
 
 		community := &Community{
 			Id:          communityID,
-			Domain:      "testcommunity",
+			Url:         "https://testcommunity.community.retrovibe.space",
 			Description: "test",
 			Entropy:     "test-entropy",
 			Mimetype:    "video/*",
@@ -284,7 +286,7 @@ func TestFeedGeneration(t *testing.T) {
 
 		community := &Community{
 			Id:          communityID,
-			Domain:      "testcommunity",
+			Url:         "https://testcommunity.community.retrovibe.space",
 			Description: "test",
 			Entropy:     "test-entropy",
 			Mimetype:    "video/*",
@@ -346,7 +348,7 @@ func TestFeedGeneration(t *testing.T) {
 
 		community := &Community{
 			Id:          communityID,
-			Domain:      "testcommunity",
+			Url:         "https://testcommunity.community.retrovibe.space",
 			Description: "test",
 			Entropy:     "test-entropy",
 			Mimetype:    "video/*",

@@ -41,8 +41,8 @@ func RegenerateFeed(ctx context.Context, q sqlx.Queryer, published FeedPublisher
 
 	buf := new(bytes.Buffer)
 	channel := rss.Channel{
-		Title:         c.Domain,
-		Link:          langx.FirstNonZero(c.Url, community.CommunityURLFromDomain(c.Domain)),
+		Title:         community.CommunityDomainFromURL(c.Url),
+		Link:          c.Url,
 		Description:   c.Description,
 		TTL:           langx.FirstNonZero(int(c.DefaultTtl), feedDefaultTTL),
 		LastBuildDate: time.Now().UTC(),

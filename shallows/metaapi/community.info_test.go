@@ -32,7 +32,7 @@ func TestCommunityInfo(t *testing.T) {
 		require.NoError(t, err)
 
 		require.Equal(t, expected.Id, resp.Community.Id)
-		require.Equal(t, expected.Domain, resp.Community.Domain)
+		require.Equal(t, expected.Url, resp.Community.Url)
 		require.Equal(t, expected.Bytes, resp.Community.Bytes)
 		require.Equal(t, expected.Description, resp.Community.Description)
 		require.Equal(t, expected.Mimetype, resp.Community.Mimetype)

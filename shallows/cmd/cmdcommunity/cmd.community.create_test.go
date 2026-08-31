@@ -23,7 +23,7 @@ func TestCommunityCreate(t *testing.T) {
 
 		expected := &communityapi.Community{
 			Id:          "test-id",
-			Domain:      "test-community",
+			Url:         "https://test-community.community.retrovibe.space",
 			Description: "test description",
 			Mimetype:    "application/octet-stream",
 		}
@@ -91,7 +91,7 @@ func TestCommunityCreate(t *testing.T) {
 			assert.NoError(t, json.NewEncoder(w).Encode(&communityapi.CommunityCreateResponse{
 				Community: &communityapi.Community{
 					Id:          "created-id",
-					Domain:      receivedReq.Community.Domain,
+					Url:         receivedReq.Community.Url,
 					Description: receivedReq.Community.Description,
 					Mimetype:    receivedReq.Community.Mimetype,
 				},
@@ -117,7 +117,7 @@ func TestCommunityCreate(t *testing.T) {
 		err := cmd.Run(gctx, dpc)
 		require.NoError(t, err)
 
-		require.Equal(t, "my-community", receivedReq.Community.Domain)
+		require.Equal(t, "https://my-community.community.retrovibe.space", receivedReq.Community.Url)
 		require.Equal(t, "my description", receivedReq.Community.Description)
 		require.Equal(t, "video/mp4", receivedReq.Community.Mimetype)
 	})

@@ -26,7 +26,7 @@ func TestCommunityPublish(t *testing.T) {
 
 		communityInfo := &communityapi.Community{
 			Id:          "test-id",
-			Domain:      "test-community",
+			Url:         "https://test-community.community.retrovibe.space",
 			Description: "test description",
 			Mimetype:    "video/mp4",
 		}
@@ -64,7 +64,7 @@ func TestCommunityPublish(t *testing.T) {
 
 		communityInfo := &communityapi.Community{
 			Id:          "test-id",
-			Domain:      "test-community",
+			Url:         "https://test-community.community.retrovibe.space",
 			Description: "test description",
 			Mimetype:    "video/mp4",
 		}
@@ -102,63 +102,13 @@ func TestCommunityPublish(t *testing.T) {
 		require.True(t, uploaded, "should upload when dry run is false")
 	})
 
-	t.Run("uploaded feed uses domain as title and url as link when url is set", func(t *testing.T) {
+	t.Run("uploaded feed uses the community subdomain label as title when url is hosted on our domain", func(t *testing.T) {
 		ctx, cancel := testx.Context(t)
 		defer cancel()
 
 		communityInfo := &communityapi.Community{
 			Id:          "test-id",
-			Domain:      "mysite",
-			Url:         "https://mysite.example.com",
-			Description: "test description",
-			Mimetype:    "video/mp4",
-		}
-
-		var uploadedFeed []byte
-		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if r.Method == http.MethodGet {
-				assert.NoError(t, json.NewEncoder(w).Encode(&communityapi.CommunityFindResponse{Community: communityInfo}))
-				return
-			}
-			if r.Method == http.MethodPost {
-				reader, err := r.MultipartReader()
-				assert.NoError(t, err)
-				part, err := reader.NextPart()
-				assert.NoError(t, err)
-				uploadedFeed, err = io.ReadAll(part)
-				assert.NoError(t, err)
-				assert.NoError(t, json.NewEncoder(w).Encode(&communityapi.CommunityUploadResponse{Community: communityInfo}))
-				return
-			}
-		}))
-		defer srv.Close()
-
-		c := &http.Client{}
-		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
-
-		cmd := cmdCommunityPublish{
-			Name:   "mysite",
-			DryRun: false,
-		}
-		gctx := &cmdopts.Global{
-			Context:  ctx,
-			Shutdown: cancel,
-			Cleanup:  &sync.WaitGroup{},
-		}
-		dpc := cmdopts.DeeppoolClientTest{Client: c}
-
-		require.NoError(t, cmd.Run(gctx, dpc))
-		require.Contains(t, string(uploadedFeed), "<title>mysite</title>")
-		require.Contains(t, string(uploadedFeed), "<link>https://mysite.example.com</link>")
-	})
-
-	t.Run("uploaded feed falls back to the canonical hosted url when url is blank", func(t *testing.T) {
-		ctx, cancel := testx.Context(t)
-		defer cancel()
-
-		communityInfo := &communityapi.Community{
-			Id:          "test-id",
-			Domain:      "mysite",
+			Url:         "https://mysite.community.retrovibe.space",
 			Description: "test description",
 			Mimetype:    "video/mp4",
 		}
@@ -201,6 +151,55 @@ func TestCommunityPublish(t *testing.T) {
 		require.Contains(t, string(uploadedFeed), "<link>https://mysite.community.retrovibe.space</link>")
 	})
 
+	t.Run("uploaded feed uses the fqdn as title when it is a custom domain", func(t *testing.T) {
+		ctx, cancel := testx.Context(t)
+		defer cancel()
+
+		communityInfo := &communityapi.Community{
+			Id:          "test-id",
+			Url:         "https://mysite.example.com",
+			Description: "test description",
+			Mimetype:    "video/mp4",
+		}
+
+		var uploadedFeed []byte
+		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if r.Method == http.MethodGet {
+				assert.NoError(t, json.NewEncoder(w).Encode(&communityapi.CommunityFindResponse{Community: communityInfo}))
+				return
+			}
+			if r.Method == http.MethodPost {
+				reader, err := r.MultipartReader()
+				assert.NoError(t, err)
+				part, err := reader.NextPart()
+				assert.NoError(t, err)
+				uploadedFeed, err = io.ReadAll(part)
+				assert.NoError(t, err)
+				assert.NoError(t, json.NewEncoder(w).Encode(&communityapi.CommunityUploadResponse{Community: communityInfo}))
+				return
+			}
+		}))
+		defer srv.Close()
+
+		c := &http.Client{}
+		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
+
+		cmd := cmdCommunityPublish{
+			Name:   "mysite",
+			DryRun: false,
+		}
+		gctx := &cmdopts.Global{
+			Context:  ctx,
+			Shutdown: cancel,
+			Cleanup:  &sync.WaitGroup{},
+		}
+		dpc := cmdopts.DeeppoolClientTest{Client: c}
+
+		require.NoError(t, cmd.Run(gctx, dpc))
+		require.Contains(t, string(uploadedFeed), "<title>mysite.example.com</title>")
+		require.Contains(t, string(uploadedFeed), "<link>https://mysite.example.com</link>")
+	})
+
 	t.Run("returns error on community info failure", func(t *testing.T) {
 		ctx, cancel := testx.Context(t)
 		defer cancel()
@@ -235,8 +234,7 @@ func TestCommunityPublishItemsLink(t *testing.T) {
 	t.Run("uses the community url when set", func(t *testing.T) {
 		cmd := cmdCommunityPublish{}
 		c := &communityapi.Community{
-			Domain: "mysite",
-			Url:    "https://mysite.example.com",
+			Url: "https://mysite.example.com",
 		}
 
 		items := slices.Collect(cmd.items(c, strings.NewReader(infohash)))
@@ -244,14 +242,14 @@ func TestCommunityPublishItemsLink(t *testing.T) {
 		require.Equal(t, "https://mysite.example.com/0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33", items[0].Link)
 	})
 
-	t.Run("falls back to the canonical hosted url when url is blank", func(t *testing.T) {
+	t.Run("produces a rootless link when url is blank", func(t *testing.T) {
 		cmd := cmdCommunityPublish{}
-		c := &communityapi.Community{
-			Domain: "mysite",
-		}
+		c := &communityapi.Community{}
 
+		// url is required on communities today; a blank url has no canonical
+		// fallback to build a link from anymore.
 		items := slices.Collect(cmd.items(c, strings.NewReader(infohash)))
 		require.Len(t, items, 1)
-		require.Equal(t, "https://mysite.community.retrovibe.space/0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33", items[0].Link)
+		require.Equal(t, "/0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33", items[0].Link)
 	})
 }

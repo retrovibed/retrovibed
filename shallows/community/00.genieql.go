@@ -355,3 +355,79 @@ func OAuth2GoogleDeleteAll(
 ) {
 	gql = gql.Query(`DELETE FROM oauth2_google RETURNING ` + OAuth2GoogleScannerStaticColumns)
 }
+
+func PluginPublisher(gql genieql.Structure) {
+	gql.From(
+		gql.Table("plugin_publishers"),
+	)
+}
+
+func PluginPublisherScanner(gql genieql.Scanner, pattern func(i PluginPublisher)) {
+	gql.ColumnNamePrefix("plugin_publishers.")
+}
+
+func PluginPublisherInsertWithDefaults(
+	gql genieql.Insert,
+	pattern func(ctx context.Context, q sqlx.Queryer, a PluginPublisher) NewPluginPublisherScannerStaticRow,
+) {
+	gql.Into("plugin_publishers").Default("created_at", "updated_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, path = EXCLUDED.path, description = EXCLUDED.description, mimetype = EXCLUDED.mimetype")
+}
+
+func PluginPublisherFindByID(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewPluginPublisherScannerStaticRow,
+) {
+	gql = gql.Query(`SELECT ` + PluginPublisherScannerStaticColumns + ` FROM plugin_publishers WHERE "id" = {id}`)
+}
+
+func PluginPublisherFindAll(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer) NewPluginPublisherScannerStatic,
+) {
+	gql = gql.Query(`SELECT ` + PluginPublisherScannerStaticColumns + ` FROM plugin_publishers ORDER BY created_at DESC`)
+}
+
+func PluginPublisherDeleteByID(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewPluginPublisherScannerStaticRow,
+) {
+	gql = gql.Query(`DELETE FROM plugin_publishers WHERE "id" = {id} RETURNING ` + PluginPublisherScannerStaticColumns)
+}
+
+func CommunityPublisher(gql genieql.Structure) {
+	gql.From(
+		gql.Table("community_publisher"),
+	)
+}
+
+func CommunityPublisherScanner(gql genieql.Scanner, pattern func(i CommunityPublisher)) {
+	gql.ColumnNamePrefix("community_publisher.")
+}
+
+func CommunityPublisherInsertWithDefaults(
+	gql genieql.Insert,
+	pattern func(ctx context.Context, q sqlx.Queryer, a CommunityPublisher) NewCommunityPublisherScannerStaticRow,
+) {
+	gql.Into("community_publisher").Default("created_at", "updated_at").Conflict("ON CONFLICT (community_id, publisher_id) DO UPDATE SET updated_at = DEFAULT")
+}
+
+func CommunityPublisherFindByCommunityID(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, communityID string) NewCommunityPublisherScannerStatic,
+) {
+	gql = gql.Query(`SELECT ` + CommunityPublisherScannerStaticColumns + ` FROM community_publisher WHERE "community_id" = {communityID}`)
+}
+
+func CommunityPublisherDeleteByCommunityIDAndPublisherID(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, communityID string, publisherID string) NewCommunityPublisherScannerStaticRow,
+) {
+	gql = gql.Query(`DELETE FROM community_publisher WHERE "community_id" = {communityID} AND "publisher_id" = {publisherID} RETURNING ` + CommunityPublisherScannerStaticColumns)
+}
+
+func CommunityFindByAccountID(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, accountID string) NewCommunityScannerStatic,
+) {
+	gql = gql.Query(`SELECT ` + CommunityScannerStaticColumns + ` FROM community WHERE "account_id" = {accountID}`)
+}

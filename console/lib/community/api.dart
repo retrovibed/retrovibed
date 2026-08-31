@@ -6,10 +6,12 @@ import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'community.pb.dart';
 import 'community.metrics.pb.dart';
 import 'community.publish.pb.dart';
+import 'community.social.pb.dart';
 
 export 'community.pb.dart';
 export 'community.metrics.pb.dart';
 export 'community.publish.pb.dart';
+export 'community.social.pb.dart';
 
 bool isStale(Community c, {Duration threshold = const Duration(hours: 1)}) {
   return timex.now().difference(timex.iso8601(c.lastSyncAt)) > threshold;
@@ -130,6 +132,73 @@ class metrics {
         .then((v) {
           return Future.value(
             httpx.fromProto3JsonSafe(MetricsSyncProgress.create(), jsonDecode(v.body)),
+          );
+        });
+  }
+}
+
+typedef FnSocialsSearch = Future<SocialsSearchResponse> Function({List<httpx.Option> options});
+
+typedef FnSocialsEnable =
+    Future<CommunityPublisherEnableResponse> Function(
+      String communityId,
+      String publisherId, {
+      List<httpx.Option> options,
+    });
+
+typedef FnSocialsDisable =
+    Future<CommunityPublisherDisableResponse> Function(
+      String communityId,
+      String publisherId, {
+      List<httpx.Option> options,
+    });
+
+class socials {
+  static Future<SocialsSearchResponse> search({
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx
+        .get(
+          Uri.https(httpx.host(), "/c/social/"),
+          options: [httpx.Accept.json, ...options],
+        )
+        .then((v) {
+          return Future.value(
+            httpx.fromProto3JsonSafe(SocialsSearchResponse.create(), jsonDecode(v.body)),
+          );
+        });
+  }
+
+  static Future<CommunityPublisherEnableResponse> enable(
+    String communityId,
+    String publisherId, {
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx
+        .post(
+          Uri.https(httpx.host(), "/c/social/$communityId/publishers/$publisherId"),
+          options: [httpx.Accept.json, ...options],
+        )
+        .then((v) {
+          return Future.value(
+            httpx.fromProto3JsonSafe(CommunityPublisherEnableResponse.create(), jsonDecode(v.body)),
+          );
+        });
+  }
+
+  static Future<CommunityPublisherDisableResponse> disable(
+    String communityId,
+    String publisherId, {
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx
+        .delete(
+          Uri.https(httpx.host(), "/c/social/$communityId/publishers/$publisherId"),
+          options: [httpx.Accept.json, ...options],
+        )
+        .then((v) {
+          return Future.value(
+            httpx.fromProto3JsonSafe(CommunityPublisherDisableResponse.create(), jsonDecode(v.body)),
           );
         });
   }

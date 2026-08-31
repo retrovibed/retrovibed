@@ -3,6 +3,7 @@ import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/discovery.dart' as disc;
 import 'package:retrovibed/downloads.dart' as downloads;
+import 'package:retrovibed/community/social.home.dart' as social;
 import 'dropdown.upload.dart';
 import 'search.dart';
 
@@ -82,7 +83,7 @@ class _HomeState extends State<Home> {
                 ds.CompactingMenu.pinned(
                   DropdownUpload(
                     icon: const Icon(Icons.download),
-                    help: ds.Hint(const Text("switch to library or discover mode")),
+                    help: ds.Hint(const Text("switch to library, discover, or social mode")),
                     items: [
                       media.SearchModeToggle(
                         mode: media.SearchMode.library,
@@ -98,12 +99,23 @@ class _HomeState extends State<Home> {
                         label: "Discover",
                         onSelect: _switchToMode,
                       ),
+                      media.SearchModeToggle(
+                        mode: media.SearchMode.social,
+                        current: _mode,
+                        icon: Icons.share,
+                        label: "Social",
+                        onSelect: _switchToMode,
+                      ),
                     ],
                   ),
                 ),
               ],
             ),
           ),
+        ),
+        media.SearchMode.social => social.SocialHome(
+          mode: _mode,
+          onModeChanged: _switchToMode,
         ),
       },
     );

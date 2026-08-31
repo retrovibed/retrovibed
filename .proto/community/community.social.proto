@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package retrovibed.community;
+
+import "community/community.proto";
+
+message PluginPublisher {
+  string id = 1 [ json_name = "id" ];
+  string path = 2 [ json_name = "path" ];
+  string description = 3 [ json_name = "description" ];
+  string mimetype = 4 [ json_name = "mimetype" ];
+  string created_at = 5 [ json_name = "created_at" ];
+  string updated_at = 6 [ json_name = "updated_at" ];
+}
+
+message CommunityPublisher {
+  string id = 1 [ json_name = "id" ];
+  string community_id = 2 [ json_name = "community_id" ];
+  string publisher_id = 3 [ json_name = "publisher_id" ];
+  string created_at = 4 [ json_name = "created_at" ];
+  string updated_at = 5 [ json_name = "updated_at" ];
+}
+
+message CommunitySocial {
+  Community community = 1 [ json_name = "community" ];
+  repeated CommunityPublisher enabled = 2 [ json_name = "enabled" ];
+}
+
+message SocialsSearchRequest {
+  reserved 1 to 899;
+  uint64 offset = 900 [ json_name = "offset" ];
+  uint64 limit = 901 [ json_name = "limit" ];
+  reserved 902 to 999;
+}
+
+message SocialsSearchResponse {
+  SocialsSearchRequest next = 1 [ json_name = "next" ];
+  repeated CommunitySocial items = 2 [ json_name = "items" ];
+  repeated PluginPublisher catalog = 3 [ json_name = "catalog" ];
+}
+
+message PluginPublisherCreateResponse {
+  PluginPublisher publisher = 1 [ json_name = "publisher" ];
+}
+
+message PluginPublisherDeleteResponse {
+  PluginPublisher publisher = 1 [ json_name = "publisher" ];
+}
+
+message CommunityPublisherEnableResponse {
+  CommunityPublisher enabled = 1 [ json_name = "enabled" ];
+}
+
+message CommunityPublisherDisableResponse {
+  CommunityPublisher disabled = 1 [ json_name = "disabled" ];
+}

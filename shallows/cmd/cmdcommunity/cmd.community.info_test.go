@@ -23,7 +23,7 @@ func TestCommunityInfo(t *testing.T) {
 
 		expected := &communityapi.Community{
 			Id:          "test-id",
-			Domain:      "test-community",
+			Url:         "https://test-community.community.retrovibe.space",
 			Description: "test description",
 			Mimetype:    "video/mp4",
 		}

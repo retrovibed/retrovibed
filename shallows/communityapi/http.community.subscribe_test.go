@@ -32,7 +32,6 @@ func newCommunityMockClient(communityID string) *http.Client {
 			body, _ := json.Marshal(&communityapi.CommunityFindResponse{
 				Community: &communityapi.Community{
 					Id:          communityID,
-					Domain:      "community",
 					Description: communityID,
 					Entropy:     uuidx.WithSuffix(1),
 					Url:         "https://community.community.retrovibe.space",
