@@ -11,6 +11,7 @@ export 'media/download.watch.dart';
 export 'media/download.queue.dart';
 export 'media/player.dart';
 export 'media/button.play.dart';
+export 'media/preview.dart';
 export 'media/button.share.dart';
 export 'media/playlist.dart';
 export 'media/play.queue.dart' show range;

@@ -65,6 +65,14 @@ String auto_bearer_host({String? host}) {
 // formats an already-known token as a bearer credential, or "" if empty.
 String bearer(String token) => token.isEmpty ? "" : "bearer $token";
 
+// a url pointing at the current daemon needs the library's credentials attached; anything
+// else is somebody else's host and is left alone.
+Map<String, String>? localheaders(String uri) {
+  if (uri.isEmpty) return null;
+  if (!uri.startsWith("https://${host()}")) return null;
+  return <String, String>{"Authorization": auto_bearer_host()};
+}
+
 abstract class mimetypes {
   static MediaType parse(String s) {
     try {

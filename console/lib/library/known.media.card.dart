@@ -166,17 +166,10 @@ class KnownMediaCard extends StatelessWidget {
     );
   }
 
-  Map<String, String>? _imageheaders(String original) {
-    if (original.isEmpty) return null;
-    if (!original.startsWith("https://${httpx.host()}")) return null;
-    // when we hit a url that matches the current host library we need to add authentication to the request.
-    return <String, String>{"Authorization": httpx.auto_bearer_host()};
-  }
-
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
-    final poster = ds.Image.precache(context, current.image, headers: _imageheaders(current.image)) ?? ds.Empty;
+    final poster = ds.Image.precache(context, current.image, headers: httpx.localheaders(current.image)) ?? ds.Empty;
 
     return ConstrainedBox(
       constraints: constraints ?? const BoxConstraints(),
