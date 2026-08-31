@@ -4,6 +4,7 @@ import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/discovery.dart' as disc;
 import 'package:retrovibed/downloads.dart' as downloads;
 import 'dropdown.upload.dart';
+import 'filesystem/browser.dart';
 import 'search.dart';
 
 class Home extends StatefulWidget {
@@ -74,6 +75,13 @@ class _HomeState extends State<Home> {
           onModeChanged: _switchToMode,
           downloading: _downloading,
           onDownloadingChanged: (w) => setState(() => _downloading = w),
+        ),
+        media.SearchMode.filesystem => FilesystemBrowser(
+          upload: widget.apiupload,
+          controller: widget.controller,
+          focus: widget.focus,
+          mode: _mode,
+          onModeChanged: _switchToMode,
         ),
         media.SearchMode.downloads => downloads.AutoHelp(
           downloads.MeteredWarning(

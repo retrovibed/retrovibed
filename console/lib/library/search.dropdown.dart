@@ -49,6 +49,13 @@ class SearchUploadDropdown extends StatelessWidget {
             label: "Downloads",
             onSelect: onModeChanged,
           ),
+          media.SearchModeToggle(
+            mode: media.SearchMode.filesystem,
+            current: mode,
+            icon: mimex.icofolder,
+            label: "Folders",
+            onSelect: onModeChanged,
+          ),
           const PopupMenuDivider(),
           PopupMenuItem<String>(
             enabled: false,
