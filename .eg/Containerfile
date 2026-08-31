@@ -61,3 +61,8 @@ RUN apt-get update && apt-get install -y cargo rustc
 RUN systemd-tmpfiles --create
 RUN systemd-tmpfiles --clean
 RUN apt-get update && apt-get install -y wayland-utils waypipe
+
+#
+# pre-install duckdb extensions used by shallows migrations so codegen doesn't need network access at runtime.
+# and because genieql needs them to execute the migrations....
+RUN sudo -H -S -u egd -g egd duckdb -c "INSTALL icu; INSTALL inet; INSTALL vss;"
