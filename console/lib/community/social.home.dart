@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/authn.dart' as authn;
+import 'package:retrovibed/library.dart' as lib;
 import 'package:retrovibed/media.dart' as media;
 import 'api.dart';
 
@@ -28,37 +29,26 @@ class SocialHome extends StatefulWidget {
   State<SocialHome> createState() => _SocialHomeState();
 }
 
-class _SocialHomeState extends State<SocialHome> {
+class _SocialHomeState extends State<SocialHome> with ds.LoadingState {
   SocialsSearchResponse _resp = SocialsSearchResponse();
-  bool _loading = true;
-  Widget _cause = ds.Error.zero;
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
-
-  void _resetCause() {
-    setState(() => _cause = ds.Error.zero);
-  }
 
   Future<void> _refresh() {
-    setState(() => _loading = true);
+    setState(() => loading = true);
     return httpx
         .withRetry(() => widget.search(options: [authn.request(authn.AuthzCache.meta(context))]))
         .then((response) {
           setState(() {
             _resp = response;
-            _cause = ds.Error.zero;
+            cause = ds.Error.zero;
           });
         })
         .catchError((cause) {
-          setState(() => _cause = ds.Errors.httpauto(cause, onTap: _resetCause));
+          setState(() => this.cause = ds.Errors.httpauto(cause, onTap: reseterr));
         }, test: httpx.ErrorsTest.httpauto)
         .catchError((cause) {
-          setState(() => _cause = ds.Error.unknown(cause, onTap: _resetCause));
+          setState(() => this.cause = ds.Error.unknown(cause, onTap: reseterr));
         })
-        .whenComplete(() => setState(() => _loading = false));
+        .whenComplete(() => setState(() => loading = false));
   }
 
   @override
@@ -70,42 +60,37 @@ class _SocialHomeState extends State<SocialHome> {
   @override
   Widget build(BuildContext context) {
     return ds.Table<CommunitySocial>(
-      loading: _loading,
-      cause: _cause,
+      loading: loading,
+      cause: cause,
       children: _resp.items,
       empty: const Center(child: Text('No communities found')),
       leading: ds.CompactingMenu.pinned(
-        ds.Help(
-          PopupMenuButton<String>(
-            position: PopupMenuPosition.under,
-            color: Theme.of(context).colorScheme.surface,
-            surfaceTintColor: Theme.of(context).colorScheme.surface,
-            icon: const Icon(Icons.share),
-            itemBuilder: (context) => [
-              media.SearchModeToggle(
-                mode: media.SearchMode.library,
-                current: widget.mode,
-                icon: Icons.video_library,
-                label: "Library",
-                onSelect: widget.onModeChanged,
-              ),
-              media.SearchModeToggle(
-                mode: media.SearchMode.discovery,
-                current: widget.mode,
-                icon: Icons.travel_explore,
-                label: "Discover",
-                onSelect: widget.onModeChanged,
-              ),
-              media.SearchModeToggle(
-                mode: media.SearchMode.downloads,
-                current: widget.mode,
-                icon: Icons.download,
-                label: "Downloads",
-                onSelect: widget.onModeChanged,
-              ),
-            ],
-          ),
-          ds.Hint(const Text("switch to library, discover, or downloads mode")),
+        lib.DropdownUpload(
+          icon: const Icon(Icons.share),
+          help: ds.Hint(const Text("switch to library, discover, or downloads mode")),
+          items: [
+            media.SearchModeToggle(
+              mode: media.SearchMode.library,
+              current: widget.mode,
+              icon: Icons.video_library,
+              label: "Library",
+              onSelect: widget.onModeChanged,
+            ),
+            media.SearchModeToggle(
+              mode: media.SearchMode.discovery,
+              current: widget.mode,
+              icon: Icons.travel_explore,
+              label: "Discover",
+              onSelect: widget.onModeChanged,
+            ),
+            media.SearchModeToggle(
+              mode: media.SearchMode.downloads,
+              current: widget.mode,
+              icon: Icons.download,
+              label: "Downloads",
+              onSelect: widget.onModeChanged,
+            ),
+          ],
         ),
       ),
       ds.Table.expanded<CommunitySocial>(

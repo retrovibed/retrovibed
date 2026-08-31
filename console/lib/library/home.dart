@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/discovery.dart' as disc;
@@ -99,13 +100,14 @@ class _HomeState extends State<Home> {
                         label: "Discover",
                         onSelect: _switchToMode,
                       ),
-                      media.SearchModeToggle(
-                        mode: media.SearchMode.social,
-                        current: _mode,
-                        icon: Icons.share,
-                        label: "Social",
-                        onSelect: _switchToMode,
-                      ),
+                      if (authn.developer(context).alpha)
+                        media.SearchModeToggle(
+                          mode: media.SearchMode.social,
+                          current: _mode,
+                          icon: Icons.share,
+                          label: "Social",
+                          onSelect: _switchToMode,
+                        ),
                     ],
                   ),
                 ),
