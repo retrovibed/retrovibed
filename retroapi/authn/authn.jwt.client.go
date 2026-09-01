@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 
@@ -64,8 +63,6 @@ func (t *jwttokensource) Token() (*oauth2.Token, error) {
 	var (
 		authed Authed
 	)
-
-	defer log.Println("jwttokensource")
 
 	ctx, done := context.WithTimeout(context.Background(), 3*time.Second)
 	defer done()

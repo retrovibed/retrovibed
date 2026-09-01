@@ -39,14 +39,17 @@ class _QRAttributionState extends State<QRAttribution> {
     return ds.Help(
       ds.Container(
         clipBehavior: Clip.antiAlias,
-        constraints: BoxConstraints(maxHeight: defaults.compact + defaults.padding.vertical),
+        constraints: BoxConstraints(
+          maxWidth: defaults.compact + defaults.padding.horizontal + 58,
+          minHeight: defaults.compact + defaults.padding.vertical,
+        ),
         ClipRRect(
           borderRadius: defaults.borderRadius,
           child: QrImageView(
             data: qrData,
             version: QrVersions.auto,
             backgroundColor: Colors.white,
-            dataModuleStyle: QrDataModuleStyle(color: Colors.black),
+            dataModuleStyle: QrDataModuleStyle(dataModuleShape: QrDataModuleShape.square, color: Colors.black),
           ),
         ),
       ),

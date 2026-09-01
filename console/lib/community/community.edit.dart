@@ -39,7 +39,7 @@ class CommunityEdit extends StatelessWidget {
             input: TextFormField(
               readOnly: readOnly,
               autofocus: !readOnly && autofocus,
-              initialValue: community.url,
+              initialValue: api.communities.domain(community.url),
               onChanged: (v) => onChange(community..url = api.communities.canonicaluri(v.trim())),
               decoration: InputDecoration(
                 hintText: "example",
