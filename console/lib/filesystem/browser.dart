@@ -152,20 +152,14 @@ class _FilesystemBrowser extends State<FilesystemBrowser> {
     );
   }
 
-  // the modal node already centers and scrolls what it is handed, so the card only has to
-  // bound it: BoxFit.contain has nothing to fit into otherwise and the image renders at
-  // natural size.
   Future<void> Function() preview(media.Media v) {
-    final viewport = MediaQuery.sizeOf(context);
+    final constraints = ds.Defaults.of(context).modal(context);
 
     return () => Future.sync(
       () => ds.modals.push(
         context,
         ds.Card(
-          constraints: BoxConstraints(
-            maxWidth: viewport.width * 0.9,
-            maxHeight: viewport.height * 0.85,
-          ),
+          constraints: constraints,
           leading: [ds.Heading(Text(v.description))],
           trailing: [
             IconButton(icon: const Icon(Icons.close), onPressed: () => ds.modals.push(context, null)),
