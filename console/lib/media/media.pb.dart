@@ -30,7 +30,7 @@ class Media extends $pb.GeneratedMessage {
     $core.String? knownMediaId,
     $core.String? encryptionSeed,
     $core.String? uri,
-    $core.String? parentId,
+    $core.String? directoryId,
   }) {
     final result = create();
     if (id != null) result.id = id;
@@ -44,7 +44,7 @@ class Media extends $pb.GeneratedMessage {
     if (knownMediaId != null) result.knownMediaId = knownMediaId;
     if (encryptionSeed != null) result.encryptionSeed = encryptionSeed;
     if (uri != null) result.uri = uri;
-    if (parentId != null) result.parentId = parentId;
+    if (directoryId != null) result.directoryId = directoryId;
     return result;
   }
 
@@ -72,7 +72,7 @@ class Media extends $pb.GeneratedMessage {
     ..aOS(9, _omitFieldNames ? '' : 'known_media_id')
     ..aOS(10, _omitFieldNames ? '' : 'encryption_seed')
     ..aOS(11, _omitFieldNames ? '' : 'uri')
-    ..aOS(12, _omitFieldNames ? '' : 'parent_id')
+    ..aOS(12, _omitFieldNames ? '' : 'directory_id')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -193,13 +193,13 @@ class Media extends $pb.GeneratedMessage {
   void clearUri() => $_clearField(11);
 
   @$pb.TagNumber(12)
-  $core.String get parentId => $_getSZ(11);
+  $core.String get directoryId => $_getSZ(11);
   @$pb.TagNumber(12)
-  set parentId($core.String value) => $_setString(11, value);
+  set directoryId($core.String value) => $_setString(11, value);
   @$pb.TagNumber(12)
-  $core.bool hasParentId() => $_has(11);
+  $core.bool hasDirectoryId() => $_has(11);
   @$pb.TagNumber(12)
-  void clearParentId() => $_clearField(12);
+  void clearDirectoryId() => $_clearField(12);
 }
 
 class MediaSearchRequest extends $pb.GeneratedMessage {
@@ -209,7 +209,6 @@ class MediaSearchRequest extends $pb.GeneratedMessage {
     $core.bool? adult,
     $core.bool? hidden,
     $core.Iterable<$core.String>? excluded,
-    $core.String? parentId,
     $fixnum.Int64? offset,
     $fixnum.Int64? limit,
   }) {
@@ -219,7 +218,6 @@ class MediaSearchRequest extends $pb.GeneratedMessage {
     if (adult != null) result.adult = adult;
     if (hidden != null) result.hidden = hidden;
     if (excluded != null) result.excluded.addAll(excluded);
-    if (parentId != null) result.parentId = parentId;
     if (offset != null) result.offset = offset;
     if (limit != null) result.limit = limit;
     return result;
@@ -243,7 +241,6 @@ class MediaSearchRequest extends $pb.GeneratedMessage {
     ..aOB(3, _omitFieldNames ? '' : 'adult')
     ..aOB(4, _omitFieldNames ? '' : 'hidden')
     ..pPS(5, _omitFieldNames ? '' : 'excluded')
-    ..aOS(6, _omitFieldNames ? '' : 'parent_id')
     ..a<$fixnum.Int64>(
         900, _omitFieldNames ? '' : 'offset', $pb.PbFieldType.OU6,
         defaultOrMaker: $fixnum.Int64.ZERO)
@@ -303,32 +300,21 @@ class MediaSearchRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(5)
   $pb.PbList<$core.String> get excluded => $_getList(4);
 
-  /// presence selects the view. absent lists the flat library and excludes directories,
-  /// any uuid lists that one folder and includes them.
-  @$pb.TagNumber(6)
-  $core.String get parentId => $_getSZ(5);
-  @$pb.TagNumber(6)
-  set parentId($core.String value) => $_setString(5, value);
-  @$pb.TagNumber(6)
-  $core.bool hasParentId() => $_has(5);
-  @$pb.TagNumber(6)
-  void clearParentId() => $_clearField(6);
-
   @$pb.TagNumber(900)
-  $fixnum.Int64 get offset => $_getI64(6);
+  $fixnum.Int64 get offset => $_getI64(5);
   @$pb.TagNumber(900)
-  set offset($fixnum.Int64 value) => $_setInt64(6, value);
+  set offset($fixnum.Int64 value) => $_setInt64(5, value);
   @$pb.TagNumber(900)
-  $core.bool hasOffset() => $_has(6);
+  $core.bool hasOffset() => $_has(5);
   @$pb.TagNumber(900)
   void clearOffset() => $_clearField(900);
 
   @$pb.TagNumber(901)
-  $fixnum.Int64 get limit => $_getI64(7);
+  $fixnum.Int64 get limit => $_getI64(6);
   @$pb.TagNumber(901)
-  set limit($fixnum.Int64 value) => $_setInt64(7, value);
+  set limit($fixnum.Int64 value) => $_setInt64(6, value);
   @$pb.TagNumber(901)
-  $core.bool hasLimit() => $_has(7);
+  $core.bool hasLimit() => $_has(6);
   @$pb.TagNumber(901)
   void clearLimit() => $_clearField(901);
 }
@@ -337,12 +323,10 @@ class MediaSearchResponse extends $pb.GeneratedMessage {
   factory MediaSearchResponse({
     MediaSearchRequest? next,
     $core.Iterable<Media>? items,
-    $core.Iterable<Media>? breadcrumb,
   }) {
     final result = create();
     if (next != null) result.next = next;
     if (items != null) result.items.addAll(items);
-    if (breadcrumb != null) result.breadcrumb.addAll(breadcrumb);
     return result;
   }
 
@@ -362,8 +346,6 @@ class MediaSearchResponse extends $pb.GeneratedMessage {
     ..aOM<MediaSearchRequest>(1, _omitFieldNames ? '' : 'next',
         subBuilder: MediaSearchRequest.create)
     ..pPM<Media>(2, _omitFieldNames ? '' : 'items', subBuilder: Media.create)
-    ..pPM<Media>(3, _omitFieldNames ? '' : 'breadcrumb',
-        subBuilder: Media.create)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -398,11 +380,6 @@ class MediaSearchResponse extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(2)
   $pb.PbList<Media> get items => $_getList(1);
-
-  /// the listed folder and its ancestors, root first. empty for the flat library. rides
-  /// along with the listing so the breadcrumb costs no second round trip.
-  @$pb.TagNumber(3)
-  $pb.PbList<Media> get breadcrumb => $_getList(2);
 }
 
 class MediaFindResponse extends $pb.GeneratedMessage {

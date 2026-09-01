@@ -34,7 +34,7 @@ type Media struct {
 	KnownMediaId   string                 `protobuf:"bytes,9,opt,name=known_media_id,proto3" json:"known_media_id,omitempty"`
 	EncryptionSeed string                 `protobuf:"bytes,10,opt,name=encryption_seed,proto3" json:"encryption_seed,omitempty"`
 	Uri            string                 `protobuf:"bytes,11,opt,name=uri,proto3" json:"uri,omitempty"`
-	ParentId       string                 `protobuf:"bytes,12,opt,name=parent_id,proto3" json:"parent_id,omitempty"`
+	DirectoryId    string                 `protobuf:"bytes,12,opt,name=directory_id,proto3" json:"directory_id,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -146,25 +146,22 @@ func (x *Media) GetUri() string {
 	return ""
 }
 
-func (x *Media) GetParentId() string {
+func (x *Media) GetDirectoryId() string {
 	if x != nil {
-		return x.ParentId
+		return x.DirectoryId
 	}
 	return ""
 }
 
 type MediaSearchRequest struct {
-	state     protoimpl.MessageState `protogen:"open.v1"`
-	Query     string                 `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
-	Mimetypes []string               `protobuf:"bytes,2,rep,name=mimetypes,proto3" json:"mimetypes,omitempty"`
-	Adult     bool                   `protobuf:"varint,3,opt,name=adult,proto3" json:"adult,omitempty"`
-	Hidden    bool                   `protobuf:"varint,4,opt,name=hidden,proto3" json:"hidden,omitempty"`
-	Excluded  []string               `protobuf:"bytes,5,rep,name=excluded,proto3" json:"excluded,omitempty"`
-	// presence selects the view. absent lists the flat library and excludes directories,
-	// any uuid lists that one folder and includes them.
-	ParentId      string `protobuf:"bytes,6,opt,name=parent_id,proto3" json:"parent_id,omitempty"`
-	Offset        uint64 `protobuf:"varint,900,opt,name=offset,proto3" json:"offset,omitempty"`
-	Limit         uint64 `protobuf:"varint,901,opt,name=limit,proto3" json:"limit,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Query         string                 `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
+	Mimetypes     []string               `protobuf:"bytes,2,rep,name=mimetypes,proto3" json:"mimetypes,omitempty"`
+	Adult         bool                   `protobuf:"varint,3,opt,name=adult,proto3" json:"adult,omitempty"`
+	Hidden        bool                   `protobuf:"varint,4,opt,name=hidden,proto3" json:"hidden,omitempty"`
+	Excluded      []string               `protobuf:"bytes,5,rep,name=excluded,proto3" json:"excluded,omitempty"`
+	Offset        uint64                 `protobuf:"varint,900,opt,name=offset,proto3" json:"offset,omitempty"`
+	Limit         uint64                 `protobuf:"varint,901,opt,name=limit,proto3" json:"limit,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -234,13 +231,6 @@ func (x *MediaSearchRequest) GetExcluded() []string {
 	return nil
 }
 
-func (x *MediaSearchRequest) GetParentId() string {
-	if x != nil {
-		return x.ParentId
-	}
-	return ""
-}
-
 func (x *MediaSearchRequest) GetOffset() uint64 {
 	if x != nil {
 		return x.Offset
@@ -256,12 +246,9 @@ func (x *MediaSearchRequest) GetLimit() uint64 {
 }
 
 type MediaSearchResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	Next  *MediaSearchRequest    `protobuf:"bytes,1,opt,name=next,proto3" json:"next,omitempty"`
-	Items []*Media               `protobuf:"bytes,2,rep,name=items,proto3" json:"items,omitempty"`
-	// the listed folder and its ancestors, root first. empty for the flat library. rides
-	// along with the listing so the breadcrumb costs no second round trip.
-	Breadcrumb    []*Media `protobuf:"bytes,3,rep,name=breadcrumb,proto3" json:"breadcrumb,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Next          *MediaSearchRequest    `protobuf:"bytes,1,opt,name=next,proto3" json:"next,omitempty"`
+	Items         []*Media               `protobuf:"bytes,2,rep,name=items,proto3" json:"items,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -306,13 +293,6 @@ func (x *MediaSearchResponse) GetNext() *MediaSearchRequest {
 func (x *MediaSearchResponse) GetItems() []*Media {
 	if x != nil {
 		return x.Items
-	}
-	return nil
-}
-
-func (x *MediaSearchResponse) GetBreadcrumb() []*Media {
-	if x != nil {
-		return x.Breadcrumb
 	}
 	return nil
 }
@@ -1801,7 +1781,7 @@ var File_media_media_proto protoreflect.FileDescriptor
 
 const file_media_media_proto_rawDesc = "" +
 	"\n" +
-	"\x11media/media.proto\x12\x05media\"\xed\x02\n" +
+	"\x11media/media.proto\x12\x05media\"\xf3\x02\n" +
 	"\x05Media\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x12\x1a\n" +
@@ -1822,23 +1802,19 @@ const file_media_media_proto_rawDesc = "" +
 	"\x0eknown_media_id\x18\t \x01(\tR\x0eknown_media_id\x12(\n" +
 	"\x0fencryption_seed\x18\n" +
 	" \x01(\tR\x0fencryption_seed\x12\x10\n" +
-	"\x03uri\x18\v \x01(\tR\x03uri\x12\x1c\n" +
-	"\tparent_id\x18\f \x01(\tR\tparent_id\"\xef\x01\n" +
+	"\x03uri\x18\v \x01(\tR\x03uri\x12\"\n" +
+	"\fdirectory_id\x18\f \x01(\tR\fdirectory_id\"\xd1\x01\n" +
 	"\x12MediaSearchRequest\x12\x14\n" +
 	"\x05query\x18\x01 \x01(\tR\x05query\x12\x1c\n" +
 	"\tmimetypes\x18\x02 \x03(\tR\tmimetypes\x12\x14\n" +
 	"\x05adult\x18\x03 \x01(\bR\x05adult\x12\x16\n" +
 	"\x06hidden\x18\x04 \x01(\bR\x06hidden\x12\x1a\n" +
-	"\bexcluded\x18\x05 \x03(\tR\bexcluded\x12\x1c\n" +
-	"\tparent_id\x18\x06 \x01(\tR\tparent_id\x12\x17\n" +
+	"\bexcluded\x18\x05 \x03(\tR\bexcluded\x12\x17\n" +
 	"\x06offset\x18\x84\a \x01(\x04R\x06offset\x12\x15\n" +
-	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\a\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"\x96\x01\n" +
+	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\x06\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"h\n" +
 	"\x13MediaSearchResponse\x12-\n" +
 	"\x04next\x18\x01 \x01(\v2\x19.media.MediaSearchRequestR\x04next\x12\"\n" +
-	"\x05items\x18\x02 \x03(\v2\f.media.MediaR\x05items\x12,\n" +
-	"\n" +
-	"breadcrumb\x18\x03 \x03(\v2\f.media.MediaR\n" +
-	"breadcrumb\"7\n" +
+	"\x05items\x18\x02 \x03(\v2\f.media.MediaR\x05items\"7\n" +
 	"\x11MediaFindResponse\x12\"\n" +
 	"\x05media\x18\x01 \x01(\v2\f.media.MediaR\x05media\"8\n" +
 	"\x12MediaUpdateRequest\x12\"\n" +
@@ -1980,31 +1956,30 @@ var file_media_media_proto_goTypes = []any{
 var file_media_media_proto_depIdxs = []int32{
 	1,  // 0: media.MediaSearchResponse.next:type_name -> media.MediaSearchRequest
 	0,  // 1: media.MediaSearchResponse.items:type_name -> media.Media
-	0,  // 2: media.MediaSearchResponse.breadcrumb:type_name -> media.Media
-	0,  // 3: media.MediaFindResponse.media:type_name -> media.Media
-	0,  // 4: media.MediaUpdateRequest.media:type_name -> media.Media
-	0,  // 5: media.MediaUpdateResponse.media:type_name -> media.Media
-	0,  // 6: media.MediaDeleteResponse.media:type_name -> media.Media
-	0,  // 7: media.MediaUploadResponse.media:type_name -> media.Media
-	0,  // 8: media.Download.media:type_name -> media.Media
-	9,  // 9: media.MagnetCreateResponse.download:type_name -> media.Download
-	12, // 10: media.DownloadSearchResponse.next:type_name -> media.DownloadSearchRequest
-	9,  // 11: media.DownloadSearchResponse.items:type_name -> media.Download
-	9,  // 12: media.DownloadUpdateRequest.download:type_name -> media.Download
-	9,  // 13: media.DownloadUpdateResponse.download:type_name -> media.Download
-	9,  // 14: media.DownloadMetadataResponse.download:type_name -> media.Download
-	9,  // 15: media.DownloadBeginResponse.download:type_name -> media.Download
-	9,  // 16: media.DownloadPauseResponse.download:type_name -> media.Download
-	9,  // 17: media.DownloadDeleteResponse.download:type_name -> media.Download
-	26, // 18: media.PublishedUploadResponse.published:type_name -> media.Published
-	0,  // 19: media.MetadataSyncRequest.media:type_name -> media.Media
-	0,  // 20: media.MetadataSyncResponse.media:type_name -> media.Media
-	0,  // 21: media.PublishedResponse.media:type_name -> media.Media
-	22, // [22:22] is the sub-list for method output_type
-	22, // [22:22] is the sub-list for method input_type
-	22, // [22:22] is the sub-list for extension type_name
-	22, // [22:22] is the sub-list for extension extendee
-	0,  // [0:22] is the sub-list for field type_name
+	0,  // 2: media.MediaFindResponse.media:type_name -> media.Media
+	0,  // 3: media.MediaUpdateRequest.media:type_name -> media.Media
+	0,  // 4: media.MediaUpdateResponse.media:type_name -> media.Media
+	0,  // 5: media.MediaDeleteResponse.media:type_name -> media.Media
+	0,  // 6: media.MediaUploadResponse.media:type_name -> media.Media
+	0,  // 7: media.Download.media:type_name -> media.Media
+	9,  // 8: media.MagnetCreateResponse.download:type_name -> media.Download
+	12, // 9: media.DownloadSearchResponse.next:type_name -> media.DownloadSearchRequest
+	9,  // 10: media.DownloadSearchResponse.items:type_name -> media.Download
+	9,  // 11: media.DownloadUpdateRequest.download:type_name -> media.Download
+	9,  // 12: media.DownloadUpdateResponse.download:type_name -> media.Download
+	9,  // 13: media.DownloadMetadataResponse.download:type_name -> media.Download
+	9,  // 14: media.DownloadBeginResponse.download:type_name -> media.Download
+	9,  // 15: media.DownloadPauseResponse.download:type_name -> media.Download
+	9,  // 16: media.DownloadDeleteResponse.download:type_name -> media.Download
+	26, // 17: media.PublishedUploadResponse.published:type_name -> media.Published
+	0,  // 18: media.MetadataSyncRequest.media:type_name -> media.Media
+	0,  // 19: media.MetadataSyncResponse.media:type_name -> media.Media
+	0,  // 20: media.PublishedResponse.media:type_name -> media.Media
+	21, // [21:21] is the sub-list for method output_type
+	21, // [21:21] is the sub-list for method input_type
+	21, // [21:21] is the sub-list for extension type_name
+	21, // [21:21] is the sub-list for extension extendee
+	0,  // [0:21] is the sub-list for field type_name
 }
 
 func init() { file_media_media_proto_init() }

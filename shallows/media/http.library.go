@@ -21,7 +21,6 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
 	"github.com/retrovibed/retrovibed/retroapi/httpauth"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
-	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
@@ -146,24 +145,13 @@ func (t *HTTPLibrary) delete(w http.ResponseWriter, r *http.Request) {
 		id = mux.Vars(r)["id"]
 	)
 
-	// deleting a folder deletes what it holds. the response describes the row the client
-	// named; its descendants went with it.
-	tombstoned := sqlx.Scan(library.MetadataTombstoneSubtreeByID(r.Context(), t.q, id))
-	for v := range tombstoned.Iter() {
-		if v.ID == id {
-			md = v
-		}
-	}
-
-	if err := tombstoned.Err(); err != nil {
+	if err := library.MetadataTombstoneByID(r.Context(), t.q, id).Scan(&md); sqlx.ErrNoRows(err) != nil {
+		log.Println(errorsx.Wrap(err, "unable to tombstone metadata"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
+		return
+	} else if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to tombstone metadata"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
-		return
-	}
-
-	if stringsx.Blank(md.ID) {
-		log.Println("unable to tombstone metadata", id, "no such record")
-		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
 		return
 	}
 
@@ -210,20 +198,6 @@ func (t *HTTPLibrary) patch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// the update above has already accounted for a missing id, so the only row the move
-	// can fail to match is one whose requested parent sits inside its own subtree.
-	if stringsx.Present(req.Media.ParentId) {
-		if err := library.MetadataMoveByID(r.Context(), t.q, id, req.Media.ParentId).Scan(&md); sqlx.ErrNoRows(err) != nil {
-			log.Println("move rejected", id, "into", req.Media.ParentId, "would cycle")
-			errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
-			return
-		} else if err != nil {
-			log.Println(errorsx.Wrap(err, "unable to move metadata"))
-			errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
-			return
-		}
-	}
-
 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &MediaUpdateResponse{
 		Media: new(
 			langx.Clone(
@@ -250,15 +224,9 @@ func (t *HTTPLibrary) upload(w http.ResponseWriter, r *http.Request) {
 		buf    [bytesx.MiB]byte
 		copied = &iox.Copied{Result: new(uint64)}
 		mhash  = md5.New()
-		parent = stringsx.FirstNonBlank(r.FormValue("parent_id"), uuid.Nil.String())
+		// the filesystem endpoint names a destination when it uploads into a directory.
+		directory = stringsx.FirstNonBlank(r.FormValue("directory_id"), uuid.Nil.String())
 	)
-
-	// a folder shares this route because it shares the destination and the response shape,
-	// and skips everything downstream that exists to receive bytes.
-	if r.FormValue("mimetype") == mimex.Directory {
-		t.mkdir(w, r, parent)
-		return
-	}
 
 	if f, fh, err = r.FormFile("content"); err != nil {
 		log.Println(errorsx.Wrap(err, "content parameter required"))
@@ -302,7 +270,7 @@ func (t *HTTPLibrary) upload(w http.ResponseWriter, r *http.Request) {
 		library.MetadataOptionMimetype(fh.Header.Get("Content-Type")),
 		library.MetadataOptionKnownMediaID(uuid.Max.String()),
 		library.MetadataOptionAutoDescription(library.NormalizedDescription(fh.Filename)),
-		library.MetadataOptionParentID(parent),
+		library.MetadataOptionDirectoryID(directory),
 	)
 
 	if err = library.MetadataInsertWithDefaults(r.Context(), t.q, lmd).Scan(&lmd); err != nil {
@@ -312,11 +280,11 @@ func (t *HTTPLibrary) upload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// id is the md5 of the content, so re-uploading a file that already exists conflicts
-	// onto the filed row, and the conflict clause deliberately leaves an existing parent
-	// alone so a torrent completion or a filesystem rescan cannot flatten the library. a
+	// onto the filed row, and directory_id is absent from that conflict clause
+	// so so a torrent completion or a filesystem rescan cannot flatten the library. a
 	// client that named a destination meant it, which makes the move this call site's job.
-	if stringsx.Present(r.FormValue("parent_id")) {
-		if err = library.MetadataMoveByID(r.Context(), t.q, lmd.ID, parent).Scan(&lmd); err != nil {
+	if stringsx.Present(r.FormValue("directory_id")) {
+		if err = library.MetadataMoveByID(r.Context(), t.q, lmd.ID, directory).Scan(&lmd); err != nil {
 			log.Println(errorsx.Wrap(err, "unable to file uploaded media"))
 			errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 			return
@@ -351,49 +319,6 @@ func (t *HTTPLibrary) upload(w http.ResponseWriter, r *http.Request) {
 	t.identification.Broadcast()
 }
 
-// a folder is a library_metadata row with a name, a parent, and nothing on disk.
-func (t *HTTPLibrary) mkdir(w http.ResponseWriter, r *http.Request, parent string) {
-	var (
-		description = r.FormValue("description")
-	)
-
-	if stringsx.Blank(description) {
-		log.Println("description parameter required")
-		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
-		return
-	}
-
-	// every other row is keyed by the md5 of its content and a folder has none, so the id
-	// is generated; nothing in the schema or the scanners re-derives an id from bytes.
-	// known_media_id stays at the zero uuid, which is what keeps folders out of the
-	// identification daemon and, through it, off the discovery network.
-	lmd := library.NewMetadata(
-		uuid.Must(uuid.NewV7()).String(),
-		library.MetadataOptionDescription(description),
-		library.MetadataOptionAutoDescription(library.NormalizedDescription(description)),
-		library.MetadataOptionMimetype(mimex.Directory),
-		library.MetadataOptionParentID(parent),
-	)
-
-	if err := library.MetadataInsertWithDefaults(r.Context(), t.q, lmd).Scan(&lmd); err != nil {
-		log.Println(errorsx.Wrap(err, "unable to record library metadata record"))
-		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
-		return
-	}
-
-	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &MediaUploadResponse{
-		Media: new(
-			langx.Clone(
-				Media{},
-				MediaOptionFromLibraryMetadata(lmd),
-			),
-		),
-	}); err != nil {
-		log.Println(errorsx.Wrap(err, "unable to write response"))
-		return
-	}
-}
-
 func (t *HTTPLibrary) random(w http.ResponseWriter, r *http.Request) {
 	var (
 		err error
@@ -414,7 +339,7 @@ func (t *HTTPLibrary) random(w http.ResponseWriter, r *http.Request) {
 		q := library.MetadataSearchBuilder().Where(squirrel.And{
 			library.MetadataQueryHidden(req.Hidden),
 			library.MetadataQueryNotTombstoned(),
-			library.MetadataQueryDirectory(false),
+			library.MetadataQueryIsDirectory(false),
 			library.MetadataQueryMimetypes(req.Mimetypes...),
 		}).Limit(req.Limit)
 
@@ -471,28 +396,15 @@ func (t *HTTPLibrary) search(w http.ResponseWriter, r *http.Request) {
 		ordering = "description ASC"
 	}
 
-	// this handler serves both the flat media grid and the filesystem view. the
-	// presence of a parent is what separates them. absent, a folder row is an
-	// organizational artifact rather than media and has no place in the grid.
-	scope, orderargs := library.MetadataQueryDirectory(false), []any{}
-	if stringsx.Present(msg.Next.ParentId) {
-		scope = library.MetadataQueryParent(msg.Next.ParentId)
-		ordering, orderargs = "mimetype = ? DESC, description ASC", []any{mimex.Directory}
-	}
-
+	// a directory is organization rather than media and has no place in this grid; the
+	// filesystem endpoint is what lists them.
 	q := library.MetadataSearchBuilder().Where(squirrel.And{
 		library.MetadataQueryNotTombstoned(),
 		library.MetadataQueryHidden(msg.Next.Hidden),
 		library.MetadataQueryMimetypes(msg.Next.Mimetypes...),
-		scope,
+		library.MetadataQueryIsDirectory(false),
 		lucenex.Query(t.fts, msg.Next.Query, lucenex.WithDefaultField("auto_description")),
-	}).OrderByClause(ordering, orderargs...).Offset(msg.Next.Offset * msg.Next.Limit).Limit(msg.Next.Limit)
-
-	if err = t.breadcrumb(r, &msg); err != nil {
-		log.Println(errorsx.Wrap(err, "unable to resolve breadcrumb"))
-		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
-		return
-	}
+	}).OrderBy(ordering).Offset(msg.Next.Offset * msg.Next.Limit).Limit(msg.Next.Limit)
 
 	qi := sqlx.Scan(library.MetadataSearch(r.Context(), t.q, q))
 	for v := range qi.Iter() {
@@ -510,20 +422,4 @@ func (t *HTTPLibrary) search(w http.ResponseWriter, r *http.Request) {
 		log.Println(errorsx.Wrap(err, "unable to write response"))
 		return
 	}
-}
-
-// fills in the listed folder and its ancestors so the client renders a path without a
-// second round trip. the root sentinel is not itself a row and has no ancestors.
-func (t *HTTPLibrary) breadcrumb(r *http.Request, msg *MediaSearchResponse) error {
-	if uuid.FromStringOrNil(msg.Next.ParentId) == uuid.Nil {
-		return nil
-	}
-
-	ancestors := sqlx.Scan(library.MetadataAncestorsByID(r.Context(), t.q, msg.Next.ParentId))
-	for v := range ancestors.Iter() {
-		tmp := langx.Clone(Media{}, MediaOptionFromLibraryMetadata(langx.Clone(v, timex.JSONSafeEncodeOption)))
-		msg.Breadcrumb = append(msg.Breadcrumb, &tmp)
-	}
-
-	return ancestors.Err()
 }

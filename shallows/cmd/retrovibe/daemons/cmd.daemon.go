@@ -456,6 +456,8 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		deepjwt,
 		media.HTTPLibraryOptionTorrentStorage(tvfs),
 	).Bind(httpmux.PathPrefix("/m").Subrouter())
+
+	media.NewHTTPFilesystem(db).Bind(httpmux.PathPrefix("/fs").Subrouter())
 	media.NewHTTPDiscovered(
 		db,
 		torrenting._tclient,

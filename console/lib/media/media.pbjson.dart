@@ -30,7 +30,7 @@ const Media$json = {
     {'1': 'known_media_id', '3': 9, '4': 1, '5': 9, '10': 'known_media_id'},
     {'1': 'encryption_seed', '3': 10, '4': 1, '5': 9, '10': 'encryption_seed'},
     {'1': 'uri', '3': 11, '4': 1, '5': 9, '10': 'uri'},
-    {'1': 'parent_id', '3': 12, '4': 1, '5': 9, '10': 'parent_id'},
+    {'1': 'directory_id', '3': 12, '4': 1, '5': 9, '10': 'directory_id'},
   ],
 };
 
@@ -42,7 +42,7 @@ final $typed_data.Uint8List mediaDescriptor = $convert.base64Decode(
     '50X2lkEh4KCmNyZWF0ZWRfYXQYByABKAlSCmNyZWF0ZWRfYXQSHgoKdXBkYXRlZF9hdBgIIAEo'
     'CVIKdXBkYXRlZF9hdBImCg5rbm93bl9tZWRpYV9pZBgJIAEoCVIOa25vd25fbWVkaWFfaWQSKA'
     'oPZW5jcnlwdGlvbl9zZWVkGAogASgJUg9lbmNyeXB0aW9uX3NlZWQSEAoDdXJpGAsgASgJUgN1'
-    'cmkSHAoJcGFyZW50X2lkGAwgASgJUglwYXJlbnRfaWQ=');
+    'cmkSIgoMZGlyZWN0b3J5X2lkGAwgASgJUgxkaXJlY3RvcnlfaWQ=');
 
 @$core.Deprecated('Use mediaSearchRequestDescriptor instead')
 const MediaSearchRequest$json = {
@@ -53,12 +53,11 @@ const MediaSearchRequest$json = {
     {'1': 'adult', '3': 3, '4': 1, '5': 8, '10': 'adult'},
     {'1': 'hidden', '3': 4, '4': 1, '5': 8, '10': 'hidden'},
     {'1': 'excluded', '3': 5, '4': 3, '5': 9, '10': 'excluded'},
-    {'1': 'parent_id', '3': 6, '4': 1, '5': 9, '10': 'parent_id'},
     {'1': 'offset', '3': 900, '4': 1, '5': 4, '10': 'offset'},
     {'1': 'limit', '3': 901, '4': 1, '5': 4, '10': 'limit'},
   ],
   '9': [
-    {'1': 7, '2': 900},
+    {'1': 6, '2': 900},
     {'1': 902, '2': 1000},
   ],
 };
@@ -67,9 +66,8 @@ const MediaSearchRequest$json = {
 final $typed_data.Uint8List mediaSearchRequestDescriptor = $convert.base64Decode(
     'ChJNZWRpYVNlYXJjaFJlcXVlc3QSFAoFcXVlcnkYASABKAlSBXF1ZXJ5EhwKCW1pbWV0eXBlcx'
     'gCIAMoCVIJbWltZXR5cGVzEhQKBWFkdWx0GAMgASgIUgVhZHVsdBIWCgZoaWRkZW4YBCABKAhS'
-    'BmhpZGRlbhIaCghleGNsdWRlZBgFIAMoCVIIZXhjbHVkZWQSHAoJcGFyZW50X2lkGAYgASgJUg'
-    'lwYXJlbnRfaWQSFwoGb2Zmc2V0GIQHIAEoBFIGb2Zmc2V0EhUKBWxpbWl0GIUHIAEoBFIFbGlt'
-    'aXRKBQgHEIQHSgYIhgcQ6Ac=');
+    'BmhpZGRlbhIaCghleGNsdWRlZBgFIAMoCVIIZXhjbHVkZWQSFwoGb2Zmc2V0GIQHIAEoBFIGb2'
+    'Zmc2V0EhUKBWxpbWl0GIUHIAEoBFIFbGltaXRKBQgGEIQHSgYIhgcQ6Ac=');
 
 @$core.Deprecated('Use mediaSearchResponseDescriptor instead')
 const MediaSearchResponse$json = {
@@ -84,22 +82,13 @@ const MediaSearchResponse$json = {
       '10': 'next'
     },
     {'1': 'items', '3': 2, '4': 3, '5': 11, '6': '.media.Media', '10': 'items'},
-    {
-      '1': 'breadcrumb',
-      '3': 3,
-      '4': 3,
-      '5': 11,
-      '6': '.media.Media',
-      '10': 'breadcrumb'
-    },
   ],
 };
 
 /// Descriptor for `MediaSearchResponse`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List mediaSearchResponseDescriptor = $convert.base64Decode(
     'ChNNZWRpYVNlYXJjaFJlc3BvbnNlEi0KBG5leHQYASABKAsyGS5tZWRpYS5NZWRpYVNlYXJjaF'
-    'JlcXVlc3RSBG5leHQSIgoFaXRlbXMYAiADKAsyDC5tZWRpYS5NZWRpYVIFaXRlbXMSLAoKYnJl'
-    'YWRjcnVtYhgDIAMoCzIMLm1lZGlhLk1lZGlhUgpicmVhZGNydW1i');
+    'JlcXVlc3RSBG5leHQSIgoFaXRlbXMYAiADKAsyDC5tZWRpYS5NZWRpYVIFaXRlbXM=');
 
 @$core.Deprecated('Use mediaFindResponseDescriptor instead')
 const MediaFindResponse$json = {

@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
 	"testing"
 
 	"github.com/gofrs/uuid/v5"
@@ -27,20 +26,25 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// stands up the library routes behind an authorized admin, which every request here needs
-// before it reaches a handler.
-func testlibrary(t *testing.T, ctx context.Context) (*mux.Router, string, *sql.DB) {
+// an authorized admin, which every request here needs before it reaches a handler.
+func testauthz(t *testing.T, ctx context.Context, q sqlx.Queryer) string {
 	var (
 		p meta.Profile
 		v meta.Authz
 	)
 
-	q := sqltestx.Metadatabase(t)
-
 	require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
 	require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
 	require.NoError(t, testx.Fake(&v, meta.AuthzOptionProfileID(p.ID), meta.AuthzOptionAdmin))
 	require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
+
+	claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
+	return httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)
+}
+
+func testlibrary(t *testing.T, ctx context.Context) (*mux.Router, string, *sql.DB) {
+	q := sqltestx.Metadatabase(t)
+	token := testauthz(t, ctx, q)
 
 	routes := mux.NewRouter()
 	media.NewHTTPLibrary(
@@ -52,14 +56,25 @@ func testlibrary(t *testing.T, ctx context.Context) (*mux.Router, string, *sql.D
 		media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 	).Bind(routes.PathPrefix("/").Subrouter())
 
-	claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
-
-	return routes, httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource), q
+	return routes, token, q
 }
 
-// a directory row below parent. folders carry a generated id because they have no content
-// to hash.
-func testfolder(t *testing.T, ctx context.Context, q sqlx.Queryer, parent, description string) library.Metadata {
+func testfilesystem(t *testing.T, ctx context.Context) (*mux.Router, string, *sql.DB) {
+	q := sqltestx.Metadatabase(t)
+	token := testauthz(t, ctx, q)
+
+	routes := mux.NewRouter()
+	media.NewHTTPFilesystem(
+		q,
+		media.HTTPFilesystemOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+	).Bind(routes.PathPrefix("/").Subrouter())
+
+	return routes, token, q
+}
+
+// a directory row below parent. directories carry a generated id because they have no
+// content to hash.
+func testdirectory(t *testing.T, ctx context.Context, q sqlx.Queryer, parent, description string) library.Metadata {
 	var md library.Metadata
 	require.NoError(t, testx.Fake(
 		&md,
@@ -68,10 +83,10 @@ func testfolder(t *testing.T, ctx context.Context, q sqlx.Queryer, parent, descr
 		library.MetadataOptionMimetype(mimex.Directory),
 		library.MetadataOptionDescription(description),
 		library.MetadataOptionAutoDescription(description),
-		library.MetadataOptionParentID(parent),
+		library.MetadataOptionDirectoryID(parent),
 		library.MetadataOptionBytes(0),
 	))
-	require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, md).Scan(&md))
+	require.NoError(t, library.DirectoryUpsert(ctx, q, md).Scan(&md))
 	return md
 }
 
@@ -85,101 +100,82 @@ func testfile(t *testing.T, ctx context.Context, q sqlx.Queryer, parent, descrip
 		library.MetadataOptionMimetype(mimex.Binary),
 		library.MetadataOptionDescription(description),
 		library.MetadataOptionAutoDescription(description),
-		library.MetadataOptionParentID(parent),
+		library.MetadataOptionDirectoryID(parent),
 	))
 	require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, md).Scan(&md))
 	return md
 }
 
-func testmkdir(t *testing.T, token string, form url.Values) (*httptest.ResponseRecorder, *http.Request) {
+func testpost(t *testing.T, token, path string, body any) (*httptest.ResponseRecorder, *http.Request) {
+	encoded, err := json.Marshal(body)
+	require.NoError(t, err)
+
 	resp, req, err := httptestx.BuildRequestBytes(
 		http.MethodPost,
-		"/",
-		[]byte(form.Encode()),
+		path,
+		encoded,
 		httptestx.RequestOptionAuthorization(token),
-		httptestx.RequestOptionHeader("Content-Type", "application/x-www-form-urlencoded"),
 	)
 	require.NoError(t, err)
 	return resp, req
 }
 
-func TestLibraryMkdir(t *testing.T) {
-	t.Run("creates a folder at the root", func(t *testing.T) {
-		var result media.MediaUploadResponse
+func TestFilesystemCreate(t *testing.T) {
+	t.Run("creates a directory at the root", func(t *testing.T) {
+		var result media.FilesystemCreateResponse
 		ctx, done := testx.Context(t)
 		defer done()
 
-		routes, token, q := testlibrary(t, ctx)
+		routes, token, q := testfilesystem(t, ctx)
 
-		resp, req := testmkdir(t, token, url.Values{
-			"mimetype":    {mimex.Directory},
-			"description": {"photos"},
-		})
+		resp, req := testpost(t, token, "/", media.FilesystemCreateRequest{Name: "photos"})
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Code)
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 
 		require.Equal(t, mimex.Directory, result.Media.Mimetype)
 		require.Equal(t, "photos", result.Media.Description)
-		require.Equal(t, uuid.Nil.String(), result.Media.ParentId)
+		require.Equal(t, uuid.Nil.String(), result.Media.DirectoryId)
 
 		// the id cannot be the md5 of the content the way every other row's is, because a
-		// folder has no content.
+		// directory has no content.
 		require.NotEqual(t, uuid.Nil.String(), result.Media.Id)
 
 		var md library.Metadata
 		require.NoError(t, library.MetadataFindByID(ctx, q, result.Media.Id).Scan(&md))
 		require.Equal(t, uint64(0), md.Bytes)
 
-		// a folder that reached the identification daemon would be matched against known
-		// media and then published to the discovery network.
+		// a directory that reached the identification daemon would be matched against
+		// known media and then published to the discovery network.
 		require.Equal(t, uuid.Nil.String(), md.KnownMediaID)
 	})
 
-	t.Run("creates a folder inside another folder", func(t *testing.T) {
-		var parent, child media.MediaUploadResponse
+	t.Run("creates a directory inside another", func(t *testing.T) {
+		var parent, child media.FilesystemCreateResponse
 		ctx, done := testx.Context(t)
 		defer done()
 
-		routes, token, _ := testlibrary(t, ctx)
+		routes, token, _ := testfilesystem(t, ctx)
 
-		resp, req := testmkdir(t, token, url.Values{
-			"mimetype":    {mimex.Directory},
-			"description": {"photos"},
-		})
+		resp, req := testpost(t, token, "/", media.FilesystemCreateRequest{Name: "photos"})
 		routes.ServeHTTP(resp, req)
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&parent))
 
-		resp, req = testmkdir(t, token, url.Values{
-			"mimetype":    {mimex.Directory},
-			"description": {"2026"},
-			"parent_id":   {parent.Media.Id},
-		})
+		resp, req = testpost(t, token, "/", media.FilesystemCreateRequest{Name: "2026", DirectoryId: parent.Media.Id})
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Code)
 		require.NoError(t, json.NewDecoder(resp.Body).Decode(&child))
 
-		require.Equal(t, parent.Media.Id, child.Media.ParentId)
+		require.Equal(t, parent.Media.Id, child.Media.DirectoryId)
 	})
 
-	t.Run("rejects a folder with no name", func(t *testing.T) {
+	t.Run("rejects a directory with no name", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 
-		routes, token, _ := testlibrary(t, ctx)
+		routes, token, _ := testfilesystem(t, ctx)
 
-		resp, req := testmkdir(t, token, url.Values{"mimetype": {mimex.Directory}})
-		routes.ServeHTTP(resp, req)
-		require.Equal(t, http.StatusBadRequest, resp.Code)
-	})
-
-	t.Run("a request without the directory mimetype still requires content", func(t *testing.T) {
-		ctx, done := testx.Context(t)
-		defer done()
-
-		routes, token, _ := testlibrary(t, ctx)
-
-		resp, req := testmkdir(t, token, url.Values{"description": {"photos"}})
+		resp, req := testpost(t, token, "/", media.FilesystemCreateRequest{})
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusBadRequest, resp.Code)
 	})
