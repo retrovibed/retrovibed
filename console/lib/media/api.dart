@@ -7,7 +7,6 @@ import 'package:retrovibed/media/media.pb.dart';
 import 'package:retrovibed/media/content.addressable.storage.pb.dart' as cas;
 import 'package:http/http.dart' as http;
 import 'package:retrovibed/httpx.dart' as httpx;
-import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/timex.dart' as timex;
 
 export 'package:retrovibed/media/media.pb.dart';
@@ -35,13 +34,6 @@ typedef FnDownloadSearch =
 typedef FnDownloadWatch =
     Future<Stream<Download>> Function(
       String id, {
-      List<httpx.Option> options,
-    });
-
-typedef FnMkdir =
-    Future<MediaUploadResponse> Function(
-      String description,
-      String parent, {
       List<httpx.Option> options,
     });
 
@@ -245,31 +237,6 @@ abstract class media {
     ValueNotifier<int>? progress,
   }) {
     return httpx.uploadable(path, name, mimetype, progress: progress);
-  }
-
-  // a folder shares the upload endpoint because it shares the destination and the
-  // response shape. the directory mimetype is what tells the daemon there are no bytes
-  // coming.
-  static Future<MediaUploadResponse> mkdir(
-    String description,
-    String parent, {
-    List<httpx.Option> options = const [],
-  }) async {
-    return httpx
-        .post(
-          Uri.https(httpx.host(), "/m/"),
-          body: {
-            "mimetype": mimex.directory,
-            "description": description,
-            "parent_id": parent,
-          },
-          options: [httpx.Accept.json, httpx.Content.urlencoded, ...options],
-        )
-        .then((v) {
-          return Future.value(
-            httpx.fromProto3JsonSafe(MediaUploadResponse.create(), jsonDecode(v.body)),
-          );
-        });
   }
 
   static Future<MediaUploadResponse> upload(http.MultipartRequest Function(http.MultipartRequest req) mkreq) async {

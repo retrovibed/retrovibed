@@ -13,8 +13,6 @@ class AvailableListDisplay extends StatefulWidget {
   final TextEditingController? controller;
   final FocusNode? focus;
   final Widget Function(media.Media)? row;
-  final List<Widget> leading;
-  final InputDecoration? decoration;
   const AvailableListDisplay({
     super.key,
     this.search = media.media.search,
@@ -22,8 +20,6 @@ class AvailableListDisplay extends StatefulWidget {
     this.controller,
     this.focus,
     this.row,
-    this.leading = const [],
-    this.decoration,
   });
 
   @override
@@ -135,7 +131,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
       cause: _cause,
       leading: ds.SearchTray(
         autofocus: defaults.desktop,
-        decoration: widget.decoration ?? InputDecoration(hintText: "search the library"),
+        decoration: InputDecoration(hintText: "search the library"),
         controller: widget.controller,
         focus: widget.focus,
         onSubmitted: (v) {
@@ -170,7 +166,6 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
             mimetypes: _res.next.mimetypes,
             help: ds.Hint(const Text("drag and drop files onto the grid to add media to your library")),
           ),
-          ...widget.leading,
         ],
       ),
       children: _res.items,

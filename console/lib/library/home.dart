@@ -6,7 +6,7 @@ import 'package:retrovibed/discovery.dart' as disc;
 import 'package:retrovibed/downloads.dart' as downloads;
 import 'package:retrovibed/community/social.home.dart' as social;
 import 'dropdown.upload.dart';
-import 'filesystem/browser.dart';
+import 'package:retrovibed/filesystem.dart' as filesystem;
 import 'search.dart';
 
 class Home extends StatefulWidget {
@@ -78,7 +78,7 @@ class _HomeState extends State<Home> {
           downloading: _downloading,
           onDownloadingChanged: (w) => setState(() => _downloading = w),
         ),
-        media.SearchMode.filesystem => FilesystemBrowser(
+        media.SearchMode.filesystem => filesystem.FilesystemBrowser(
           upload: widget.apiupload,
           controller: widget.controller,
           focus: widget.focus,
