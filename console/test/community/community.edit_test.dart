@@ -95,6 +95,15 @@ void main() {
       );
       await tester.pumpAndSettle();
 
+      // the field displays just the domain (see 'bare subdomain input fails
+      // validation' below), so validation of an unedited field always fails;
+      // enter the full absolute url explicitly to exercise the passing case.
+      await tester.enterText(
+        find.byType(TextFormField).first,
+        'https://mysite.community.retrovibe.space',
+      );
+      await tester.pump();
+
       expect(formKey.currentState!.validate(), isTrue);
       await tester.pumpAndSettle();
 

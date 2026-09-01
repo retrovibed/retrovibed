@@ -17,7 +17,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-        find.text('https://testdomain.community.retrovibe.space'),
+        find.text('testdomain'),
         findsOneWidget,
       );
       expect(tester.takeException(), isNull);

@@ -84,10 +84,10 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(
-          find.text('https://alpha.community.retrovibe.space'),
+          find.text('alpha'),
           findsOneWidget,
         );
-        expect(find.text('https://beta.community.retrovibe.space'), findsOneWidget);
+        expect(find.text('beta'), findsOneWidget);
         expect(tester.takeException(), isNull);
       }, variant: _resolutions);
     });

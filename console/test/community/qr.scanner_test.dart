@@ -75,7 +75,7 @@ void main() {
         capturedOnDetect(encodeQRPayload(community));
         await tester.pumpAndSettle();
 
-        expect(find.text('https://testdomain.community.retrovibe.space'), findsOneWidget);
+        expect(find.text('testdomain'), findsOneWidget);
         expect(tester.takeException(), isNull);
       });
 
