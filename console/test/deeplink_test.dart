@@ -39,7 +39,7 @@ void main() {
 
         expect(find.text('Yes'), findsOneWidget);
         expect(find.text('No'), findsOneWidget);
-        expect(find.text('https://testdomain.community.retrovibe.space'), findsOneWidget);
+        expect(find.text('testdomain'), findsOneWidget);
         expect(tester.takeException(), isNull);
 
         controller.close();
@@ -319,7 +319,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('https://testdomain.community.retrovibe.space'), findsOneWidget);
+      expect(find.text('testdomain'), findsOneWidget);
       expect(find.text('Yes'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
