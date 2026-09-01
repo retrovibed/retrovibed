@@ -36,14 +36,17 @@ func MediaOptionFromLibraryMetadata(cc library.Metadata) MediaOption {
 		c.UpdatedAt = grpcx.EncodeTime(cc.UpdatedAt)
 		c.Mimetype = stringsx.FirstNonBlank(cc.Mimetype, mimex.Binary)
 		c.EncryptionSeed = cc.EncryptionSeed
-		c.ParentId = cc.ParentID
+		c.DirectoryId = cc.DirectoryID
 	}
 }
 
+// the bytes are served by the library regardless of which endpoint described the row, so
+// the url names that route rather than deriving it from the request. /m/random and
+// /similar/{id} otherwise publish an image url pointing back at themselves.
 func MediaOptionImageAuto(r *http.Request) MediaOption {
 	return func(c *Media) {
 		if strings.HasPrefix(c.Mimetype, mimex.Image) {
-			c.Image = fmt.Sprintf("%s%s%s", httpx.HTTPRequestURL(r), r.URL.Path, c.Id)
+			c.Image = fmt.Sprintf("%s/m/%s", httpx.HTTPRequestURL(r), c.Id)
 		}
 	}
 }
