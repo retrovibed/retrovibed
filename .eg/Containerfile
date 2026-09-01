@@ -61,3 +61,10 @@ RUN apt-get update && apt-get install -y cargo rustc
 RUN systemd-tmpfiles --create
 RUN systemd-tmpfiles --clean
 RUN apt-get update && apt-get install -y wayland-utils waypipe
+
+#TODO remove this hack
+RUN curl -sSfL -o /tmp/vss.duckdb_extension.gz http://extensions.duckdb.org/v1.5.5/linux_arm64/vss.duckdb_extension.gz \
+    && curl -sSfL -o /tmp/inet.duckdb_extension.gz http://extensions.duckdb.org/v1.5.5/linux_arm64/inet.duckdb_extension.gz \
+    && gunzip /tmp/vss.duckdb_extension.gz /tmp/inet.duckdb_extension.gz \
+    && sudo -H -u egd -g egd duckdb -c "INSTALL '/tmp/vss.duckdb_extension'; INSTALL '/tmp/inet.duckdb_extension';" \
+    && rm -f /tmp/vss.duckdb_extension /tmp/inet.duckdb_extension
