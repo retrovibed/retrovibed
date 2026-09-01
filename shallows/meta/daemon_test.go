@@ -1,6 +1,8 @@
 package meta_test
 
 import (
+	"net"
+	"os"
 	"testing"
 
 	"github.com/retrovibed/retrovibed/retroapi/testx"
@@ -8,6 +10,18 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/stretchr/testify/require"
 )
+
+func TestDaemonFromHostPort(t *testing.T) {
+	d := meta.DaemonFromHost()
+
+	host, port, err := net.SplitHostPort(d.Hostname)
+	require.NoError(t, err)
+	require.Equal(t, "9998", port)
+
+	hostname, err := os.Hostname()
+	require.NoError(t, err)
+	require.Equal(t, hostname, host)
+}
 
 func TestDaemonDownload(t *testing.T) {
 	ctx, done := testx.Context(t)
