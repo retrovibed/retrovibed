@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package retrovibed.ftux;
+
+import "community/community.proto";
+
+message CommunitySuggestions {
+  reserved 1 to 999;
+  repeated retrovibed.community.Community community = 1000 [ json_name = "community" ];
+}
+
+message SubscribeCommunitiesRequest {
+  repeated string community_id = 1 [ json_name = "community_id" ];
+  reserved 2 to 999;
+}
+
+message SubscribeCommunitiesResponse {}
