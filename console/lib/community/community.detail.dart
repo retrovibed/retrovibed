@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
-import 'package:retrovibed/community/community.pb.dart';
+import 'community.pb.dart';
+import 'api.dart' as api;
 
 class CommunityDetail extends StatelessWidget {
   final Community community;
@@ -21,7 +22,7 @@ class CommunityDetail extends StatelessWidget {
           children: [
             Flexible(
               child: SelectableText(
-                community.url,
+                api.communities.domain(community.url),
                 style: theme.textTheme.titleLarge,
                 maxLines: 1,
               ),
