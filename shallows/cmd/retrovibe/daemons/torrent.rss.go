@@ -18,8 +18,6 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/contextx"
-	"github.com/retrovibed/retrovibed/shallows/internal/env"
-	"github.com/retrovibed/retrovibed/shallows/internal/envx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
@@ -57,18 +55,6 @@ func PrepareDefaultFeeds(ctx context.Context, q sqlx.Queryer) error {
 				Description:  "Retrovibed - test data",
 				URL:          "https://vibed.community.retrovibe.space",
 				Contributing: true,
-			},
-			{
-				Description:  "Retrovibed - media metadata updates. posters, ratings, descriptions",
-				URL:          "https://media.community.retrovibe.space",
-				Contributing: true,
-				Autodownload: envx.Boolean(true, env.AutoDownloadMetadata),
-			},
-			{
-				Description:  "Retroneural - enables various small AI driven functionality for retrovibed",
-				URL:          "https://neurals.community.retrovibe.space",
-				Contributing: true,
-				Autodownload: envx.Boolean(false, env.AutoDownloadNeurals),
 			},
 		})
 	})

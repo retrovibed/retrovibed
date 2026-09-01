@@ -31,6 +31,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
 	"github.com/retrovibed/retrovibed/shallows/dnscache"
 	"github.com/retrovibed/retrovibed/shallows/downloads"
+	"github.com/retrovibed/retrovibed/shallows/ftuxapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/contextx"
 	"github.com/retrovibed/retrovibed/shallows/internal/cryptox"
@@ -508,6 +509,11 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	communityapi.NewHTTPCommunityPublisher(db).Bind(httpmux.PathPrefix("/c/publishers").Subrouter())
 
 	communityapi.NewHTTPYouTube(db, deepjwt).Bind(httpmux.PathPrefix("/integrations/youtube").Subrouter())
+
+	ftuxapi.NewHTTP(
+		db,
+		envx.Toggle(ftuxapi.HTTPOptionNoop, ftuxapi.HTTPOptionHTTPClient(deepjwt), t.AutoArchive),
+	).Bind(httpmux.PathPrefix("/ftux").Subrouter())
 
 	tlspem := envx.String(userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "tls.pem"), env.DaemonTLSPEM)
 	if err = tlsx.SelfSignedLocalHostTLSSeeded(

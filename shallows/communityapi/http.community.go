@@ -21,9 +21,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/lucenex"
 	"github.com/retrovibed/retrovibed/shallows/internal/numericx"
-	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
-	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 )
@@ -178,34 +176,8 @@ func (t *HTTP) subscribe(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		// not subscribed — subscribe
-		var sub = community.Community{
-			ID: cid,
-		}
-
-		if err = community.CommunityUpsertAutoDownload(r.Context(), t.q, sub).Scan(&sub); err != nil {
-			log.Println(errorsx.Wrap(err, "unable to upsert community"))
-			errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
-			return
-		}
-
-		if err = community.CommunitySubscribe(r.Context(), t.q, cid).Scan(&existing); err != nil {
-			log.Println(errorsx.Wrap(err, "unable to subscribe"))
-			errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
-			return
-		}
-
-		feed := tracking.NewFeedRSS(
-			"",
-			tracking.RSSOptionURL(existing.URL),
-			tracking.RSSOptionDescription(stringsx.Join(" - ", slicesx.Filter(stringsx.Present, community.CommunityDomainFromURL(com.Url), com.Description)...)),
-			tracking.RSSOptionEncryptionSeed(com.Entropy),
-			tracking.RSSOptionAutodownload(true),
-			tracking.RSSOptionAutoarchive(true),
-			tracking.RSSOptionAutoID,
-		)
-
-		if err = tracking.RSSInsertWithDefaults(r.Context(), t.q, feed).Scan(&feed); err != nil {
-			log.Println(errorsx.Wrap(err, "unable to register rss feed"))
+		if existing, err = SubscribeCommunity(r.Context(), t.q, t.httpc, cid); err != nil {
+			log.Println(errorsx.Wrap(err, "unable to subscribe to community"))
 			errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 			return
 		}
