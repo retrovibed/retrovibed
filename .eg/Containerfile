@@ -65,11 +65,4 @@ RUN apt-get update && apt-get install -y wayland-utils waypipe
 #
 # pre-install duckdb extensions used by shallows migrations so codegen doesn't need network access at runtime.
 # and because genieql needs them to execute the migrations....
-# duckdb's own downloader fails here where curl against the same url succeeds, so the
-# files are fetched with curl and installed from disk.
-RUN for e in icu inet vss; do \
-        curl -sSfL -o /tmp/$e.duckdb_extension.gz http://extensions.duckdb.org/v1.5.5/linux_arm64/$e.duckdb_extension.gz \
-        && gunzip /tmp/$e.duckdb_extension.gz; \
-    done \
-    && sudo -H -S -u egd -g egd duckdb -c "INSTALL '/tmp/icu.duckdb_extension'; INSTALL '/tmp/inet.duckdb_extension'; INSTALL '/tmp/vss.duckdb_extension';" \
-    && rm -f /tmp/*.duckdb_extension
+RUN sudo -H -S -u egd -g egd duckdb -c "INSTALL icu; INSTALL inet; INSTALL vss;"
