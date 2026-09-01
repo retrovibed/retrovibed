@@ -27,7 +27,7 @@ func PublishDiscoveredMedia(ctx context.Context, db sqlx.Queryer) error {
 			library.MetadataQueryHasKnownMedia(true),
 			library.MetadataQueryHasTorrent(true),
 			library.MetadataQueryNotTombstoned(),
-			library.MetadataQueryDirectory(false),
+			library.MetadataQueryIsDirectory(false),
 			library.MetadataQueryUpdatedBetween(timex.NewRangeDuration(48 * time.Hour)),
 		},
 	)

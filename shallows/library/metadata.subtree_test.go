@@ -14,9 +14,9 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// a directory row below parent. folders carry a generated id because they have no content
+// a directory row below parent. directories carry a generated id because they have no content
 // to hash.
-func testfolder(t *testing.T, ctx context.Context, q sqlx.Queryer, parent, description string) library.Metadata {
+func testdirectory(t *testing.T, ctx context.Context, q sqlx.Queryer, parent, description string) library.Metadata {
 	var md library.Metadata
 	require.NoError(t, testx.Fake(
 		&md,
@@ -24,7 +24,7 @@ func testfolder(t *testing.T, ctx context.Context, q sqlx.Queryer, parent, descr
 		library.MetadataOptionTestID(uuid.Must(uuid.NewV7()).String()),
 		library.MetadataOptionMimetype(mimex.Directory),
 		library.MetadataOptionDescription(description),
-		library.MetadataOptionParentID(parent),
+		library.MetadataOptionDirectoryID(parent),
 		library.MetadataOptionBytes(0),
 	))
 	require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, md).Scan(&md))
@@ -40,7 +40,7 @@ func testfile(t *testing.T, ctx context.Context, q sqlx.Queryer, parent, descrip
 		library.MetadataOptionTestRandomID,
 		library.MetadataOptionMimetype(mimex.Binary),
 		library.MetadataOptionDescription(description),
-		library.MetadataOptionParentID(parent),
+		library.MetadataOptionDirectoryID(parent),
 	))
 	require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, md).Scan(&md))
 	return md
@@ -58,8 +58,8 @@ func TestMetadataSubtreeByID(t *testing.T) {
 		defer done()
 		db := sqltestx.Metadatabase(t)
 
-		top := testfolder(t, ctx, db, uuid.Nil.String(), "top")
-		nested := testfolder(t, ctx, db, top.ID, "nested")
+		top := testdirectory(t, ctx, db, uuid.Nil.String(), "top")
+		nested := testdirectory(t, ctx, db, top.ID, "nested")
 		deep := testfile(t, ctx, db, nested.ID, "deep")
 		outside := testfile(t, ctx, db, uuid.Nil.String(), "outside")
 
@@ -93,8 +93,8 @@ func TestMetadataAncestorsByID(t *testing.T) {
 		defer done()
 		db := sqltestx.Metadatabase(t)
 
-		top := testfolder(t, ctx, db, uuid.Nil.String(), "top")
-		nested := testfolder(t, ctx, db, top.ID, "nested")
+		top := testdirectory(t, ctx, db, uuid.Nil.String(), "top")
+		nested := testdirectory(t, ctx, db, top.ID, "nested")
 		deep := testfile(t, ctx, db, nested.ID, "deep")
 
 		require.Equal(t, []string{top.ID, nested.ID, deep.ID}, testids(t, library.MetadataAncestorsByID(ctx, db, deep.ID)))
@@ -105,7 +105,7 @@ func TestMetadataAncestorsByID(t *testing.T) {
 		defer done()
 		db := sqltestx.Metadatabase(t)
 
-		top := testfolder(t, ctx, db, uuid.Nil.String(), "top")
+		top := testdirectory(t, ctx, db, uuid.Nil.String(), "top")
 
 		require.Equal(t, []string{top.ID}, testids(t, library.MetadataAncestorsByID(ctx, db, top.ID)))
 	})
@@ -117,8 +117,8 @@ func TestMetadataTombstoneSubtreeByID(t *testing.T) {
 		defer done()
 		db := sqltestx.Metadatabase(t)
 
-		top := testfolder(t, ctx, db, uuid.Nil.String(), "top")
-		nested := testfolder(t, ctx, db, top.ID, "nested")
+		top := testdirectory(t, ctx, db, uuid.Nil.String(), "top")
+		nested := testdirectory(t, ctx, db, top.ID, "nested")
 		deep := testfile(t, ctx, db, nested.ID, "deep")
 		outside := testfile(t, ctx, db, uuid.Nil.String(), "outside")
 

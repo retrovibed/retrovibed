@@ -25,7 +25,17 @@ func MetadataInsertWithDefaults(
 	gql genieql.Insert,
 	pattern func(ctx context.Context, q sqlx.Queryer, a Metadata) NewMetadataScannerStaticRow,
 ) {
-	gql.Into("library_metadata").Default("created_at", "updated_at", "tombstoned_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, tombstoned_at = DEFAULT, parent_id = CASE WHEN parent_id = '00000000-0000-0000-0000-000000000000' THEN EXCLUDED.parent_id ELSE parent_id END, auto_description = EXCLUDED.auto_description, description = EXCLUDED.description, archive_id = CASE WHEN archive_id IN ('ffffffff-ffff-ffff-ffff-ffffffffffff', '00000000-0000-0000-0000-000000000000') THEN EXCLUDED.archive_id ELSE archive_id END, known_media_id = CASE WHEN known_media_id IN ('ffffffff-ffff-ffff-ffff-ffffffffffff', '00000000-0000-0000-0000-000000000000') THEN EXCLUDED.known_media_id ELSE known_media_id END")
+	gql.Into("library_metadata").Default("created_at", "updated_at", "tombstoned_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, tombstoned_at = DEFAULT, auto_description = EXCLUDED.auto_description, description = EXCLUDED.description, archive_id = CASE WHEN archive_id IN ('ffffffff-ffff-ffff-ffff-ffffffffffff', '00000000-0000-0000-0000-000000000000') THEN EXCLUDED.archive_id ELSE archive_id END, known_media_id = CASE WHEN known_media_id IN ('ffffffff-ffff-ffff-ffff-ffffffffffff', '00000000-0000-0000-0000-000000000000') THEN EXCLUDED.known_media_id ELSE known_media_id END")
+}
+
+// directories are created here rather than through MetadataInsertWithDefaults so the
+// library's insert never has to reason about them. a directory carries no content, so the
+// only thing a conflict can mean is a rename.
+func DirectoryUpsert(
+	gql genieql.Insert,
+	pattern func(ctx context.Context, q sqlx.Queryer, a Metadata) NewMetadataScannerStaticRow,
+) {
+	gql.Into("library_metadata").Default("created_at", "updated_at", "tombstoned_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, description = EXCLUDED.description, auto_description = EXCLUDED.auto_description")
 }
 
 func MetadataDeleteByID(
@@ -77,7 +87,7 @@ func MetadataTombstoneByID(
 	gql = gql.Query(`UPDATE library_metadata SET tombstoned_at = NOW() WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
 }
 
-// tombstones the folder and everything below it. the migration adds parent_id without a
+// tombstones the folder and everything below it. the migration adds directory_id without a
 // cascade, so tombstoning a folder alone leaves its children pointing at a row
 // NewTombstonedCleanup is about to hard delete, listed by nothing and counted by
 // MetadataDiskStorageUsage.
@@ -85,7 +95,7 @@ func MetadataTombstoneSubtreeByID(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewMetadataScannerStatic,
 ) {
-	gql = gql.Query(`WITH RECURSIVE subtree(id) AS (SELECT id FROM library_metadata WHERE id = {id} UNION ALL SELECT lm.id FROM library_metadata AS lm INNER JOIN subtree ON lm.parent_id = subtree.id) UPDATE library_metadata SET tombstoned_at = NOW() WHERE library_metadata.id IN (SELECT id FROM subtree) RETURNING ` + MetadataScannerStaticColumns)
+	gql = gql.Query(`WITH RECURSIVE subtree(id) AS (SELECT id FROM library_metadata WHERE id = {id} UNION ALL SELECT lm.id FROM library_metadata AS lm INNER JOIN subtree ON lm.directory_id = subtree.id) UPDATE library_metadata SET tombstoned_at = NOW() WHERE library_metadata.id IN (SELECT id FROM subtree) RETURNING ` + MetadataScannerStaticColumns)
 }
 
 func MetadataTombstoneByTorrentID(
@@ -130,14 +140,14 @@ func MetadataUpdate(
 	gql = gql.Query(`UPDATE library_metadata SET description = {md.Description}, known_media_id = {md.KnownMediaID}, archive_id = {md.ArchiveID} WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
 }
 
-// a parent drawn from the row's own subtree builds a parent_id cycle, and every recursive
+// a parent drawn from the row's own subtree builds a directory_id cycle, and every recursive
 // descent here then runs until the process is killed. such a move matches no row. the root
 // sentinel is never itself a row, so moving to the top level always matches.
 func MetadataMoveByID(
 	gql genieql.Function,
-	pattern func(ctx context.Context, q sqlx.Queryer, id, parent string) NewMetadataScannerStaticRow,
+	pattern func(ctx context.Context, q sqlx.Queryer, id, directory string) NewMetadataScannerStaticRow,
 ) {
-	gql = gql.Query(`WITH RECURSIVE subtree(id) AS (SELECT id FROM library_metadata WHERE id = {id} UNION ALL SELECT lm.id FROM library_metadata AS lm INNER JOIN subtree ON lm.parent_id = subtree.id) UPDATE library_metadata SET updated_at = NOW(), parent_id = {parent} WHERE library_metadata.id = {id} AND {parent} NOT IN (SELECT id FROM subtree) RETURNING ` + MetadataScannerStaticColumns)
+	gql = gql.Query(`WITH RECURSIVE subtree(id) AS (SELECT id FROM library_metadata WHERE id = {id} UNION ALL SELECT lm.id FROM library_metadata AS lm INNER JOIN subtree ON lm.directory_id = subtree.id) UPDATE library_metadata SET updated_at = NOW(), directory_id = {directory} WHERE library_metadata.id = {id} AND {directory} NOT IN (SELECT id FROM subtree) RETURNING ` + MetadataScannerStaticColumns)
 }
 
 func MetadataSetTorrentID(
@@ -175,7 +185,7 @@ func MetadataSubtreeByID(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewMetadataScannerStatic,
 ) {
-	gql = gql.Query(`WITH RECURSIVE subtree(id) AS (SELECT id FROM library_metadata WHERE id = {id} UNION ALL SELECT lm.id FROM library_metadata AS lm INNER JOIN subtree ON lm.parent_id = subtree.id) SELECT ` + MetadataScannerStaticColumns + ` FROM library_metadata INNER JOIN subtree ON library_metadata.id = subtree.id`)
+	gql = gql.Query(`WITH RECURSIVE subtree(id) AS (SELECT id FROM library_metadata WHERE id = {id} UNION ALL SELECT lm.id FROM library_metadata AS lm INNER JOIN subtree ON lm.directory_id = subtree.id) SELECT ` + MetadataScannerStaticColumns + ` FROM library_metadata INNER JOIN subtree ON library_metadata.id = subtree.id`)
 }
 
 // the row and its ancestors, root first, which is the order a breadcrumb renders in.
@@ -185,7 +195,7 @@ func MetadataAncestorsByID(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewMetadataScannerStatic,
 ) {
-	gql = gql.Query(`WITH RECURSIVE ancestors(id, parent_id, depth) AS (SELECT id, parent_id, 0 FROM library_metadata WHERE id = {id} UNION ALL SELECT lm.id, lm.parent_id, ancestors.depth + 1 FROM library_metadata AS lm INNER JOIN ancestors ON ancestors.parent_id = lm.id) SELECT ` + MetadataScannerStaticColumns + ` FROM library_metadata INNER JOIN ancestors ON library_metadata.id = ancestors.id ORDER BY ancestors.depth DESC`)
+	gql = gql.Query(`WITH RECURSIVE ancestors(id, directory_id, depth) AS (SELECT id, directory_id, 0 FROM library_metadata WHERE id = {id} UNION ALL SELECT lm.id, lm.directory_id, ancestors.depth + 1 FROM library_metadata AS lm INNER JOIN ancestors ON ancestors.directory_id = lm.id) SELECT ` + MetadataScannerStaticColumns + ` FROM library_metadata INNER JOIN ancestors ON library_metadata.id = ancestors.id ORDER BY ancestors.depth DESC`)
 }
 
 func ScoredScanner(gql genieql.Scanner, pattern func(relevance float64)) {

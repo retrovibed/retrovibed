@@ -44,7 +44,7 @@ func NewAutoArchive(ctx context.Context, c *http.Client, dir fsx.Virtual, q sqlx
 	query := MetadataSearchBuilder().Where(squirrel.And{
 		MetadataQueryArchivable(),
 		MetadataQueryNotTombstoned(),
-		MetadataQueryDirectory(false),
+		MetadataQueryIsDirectory(false),
 	})
 
 	log.Println("auto archive initiated")

@@ -78,9 +78,9 @@ func MetadataOptionOffset(d uint64) MetadataOption {
 	}
 }
 
-func MetadataOptionParentID(id string) MetadataOption {
+func MetadataOptionDirectoryID(id string) MetadataOption {
 	return func(m *Metadata) {
-		m.ParentID = id
+		m.DirectoryID = id
 	}
 }
 
@@ -114,7 +114,7 @@ func MetadataOptionTestDefaults(p *Metadata) {
 	p.TorrentID = uuid.Nil.String()
 	p.KnownMediaID = uuid.Nil.String()
 	p.EncryptionSeed = uuid.Nil.String()
-	p.ParentID = uuid.Nil.String()
+	p.DirectoryID = uuid.Nil.String()
 	p.HiddenAt = timex.Inf()
 	p.Bytes = 16 * bytesx.KiB
 	p.Mimetype = mimex.Binary
@@ -138,7 +138,7 @@ func NewMetadata(id string, options ...func(*Metadata)) (m Metadata) {
 		ArchiveID:      uuid.Nil.String(),
 		KnownMediaID:   uuid.Nil.String(),
 		EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
-		ParentID:       uuid.Nil.String(),
+		DirectoryID:    uuid.Nil.String(),
 		HiddenAt:       timex.Inf(),
 	}, options...)
 
@@ -173,11 +173,13 @@ func MetadataQueryByTorrentID(tid string) squirrel.Sqlizer {
 	return squirrel.Expr("library_metadata.torrent_id = ?", tid)
 }
 
-func MetadataQueryParent(id string) squirrel.Sqlizer {
-	return squirrel.Expr("library_metadata.parent_id = ?", id)
+// scopes a listing to the contents of one directory.
+func MetadataQueryDirectoryID(id string) squirrel.Sqlizer {
+	return squirrel.Expr("library_metadata.directory_id = ?", id)
 }
 
-func MetadataQueryDirectory(b bool) squirrel.Sqlizer {
+// selects, or excludes, the rows that are directories rather than content.
+func MetadataQueryIsDirectory(b bool) squirrel.Sqlizer {
 	if b {
 		return squirrel.Expr("library_metadata.mimetype = ?", mimex.Directory)
 	}

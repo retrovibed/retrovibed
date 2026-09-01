@@ -10,17 +10,17 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestMetadataQueryParent(t *testing.T) {
+func TestMetadataQueryDirectoryID(t *testing.T) {
 	t.Run("scopes the listing to one folder", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 		db := sqltestx.Metadatabase(t)
 
-		top := testfolder(t, ctx, db, uuid.Nil.String(), "top")
+		top := testdirectory(t, ctx, db, uuid.Nil.String(), "top")
 		held := testfile(t, ctx, db, top.ID, "held")
 		testfile(t, ctx, db, uuid.Nil.String(), "loose")
 
-		found := testids(t, library.MetadataSearch(ctx, db, library.MetadataSearchBuilder().Where(library.MetadataQueryParent(top.ID))))
+		found := testids(t, library.MetadataSearch(ctx, db, library.MetadataSearchBuilder().Where(library.MetadataQueryDirectoryID(top.ID))))
 		require.Equal(t, []string{held.ID}, found)
 	})
 
@@ -29,11 +29,11 @@ func TestMetadataQueryParent(t *testing.T) {
 		defer done()
 		db := sqltestx.Metadatabase(t)
 
-		top := testfolder(t, ctx, db, uuid.Nil.String(), "top")
+		top := testdirectory(t, ctx, db, uuid.Nil.String(), "top")
 		testfile(t, ctx, db, top.ID, "held")
 		loose := testfile(t, ctx, db, uuid.Nil.String(), "loose")
 
-		found := testids(t, library.MetadataSearch(ctx, db, library.MetadataSearchBuilder().Where(library.MetadataQueryParent(uuid.Nil.String()))))
+		found := testids(t, library.MetadataSearch(ctx, db, library.MetadataSearchBuilder().Where(library.MetadataQueryDirectoryID(uuid.Nil.String()))))
 		require.ElementsMatch(t, []string{top.ID, loose.ID}, found)
 	})
 
@@ -42,23 +42,23 @@ func TestMetadataQueryParent(t *testing.T) {
 		defer done()
 		db := sqltestx.Metadatabase(t)
 
-		top := testfolder(t, ctx, db, uuid.Nil.String(), "top")
+		top := testdirectory(t, ctx, db, uuid.Nil.String(), "top")
 		testfile(t, ctx, db, uuid.Nil.String(), "loose")
 
-		require.Empty(t, testids(t, library.MetadataSearch(ctx, db, library.MetadataSearchBuilder().Where(library.MetadataQueryParent(top.ID)))))
+		require.Empty(t, testids(t, library.MetadataSearch(ctx, db, library.MetadataSearchBuilder().Where(library.MetadataQueryDirectoryID(top.ID)))))
 	})
 }
 
-func TestMetadataQueryDirectory(t *testing.T) {
+func TestMetadataQueryIsDirectory(t *testing.T) {
 	t.Run("true returns only folders", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 		db := sqltestx.Metadatabase(t)
 
-		top := testfolder(t, ctx, db, uuid.Nil.String(), "top")
+		top := testdirectory(t, ctx, db, uuid.Nil.String(), "top")
 		testfile(t, ctx, db, uuid.Nil.String(), "loose")
 
-		found := testids(t, library.MetadataSearch(ctx, db, library.MetadataSearchBuilder().Where(library.MetadataQueryDirectory(true))))
+		found := testids(t, library.MetadataSearch(ctx, db, library.MetadataSearchBuilder().Where(library.MetadataQueryIsDirectory(true))))
 		require.Equal(t, []string{top.ID}, found)
 	})
 
@@ -67,11 +67,11 @@ func TestMetadataQueryDirectory(t *testing.T) {
 		defer done()
 		db := sqltestx.Metadatabase(t)
 
-		top := testfolder(t, ctx, db, uuid.Nil.String(), "top")
+		top := testdirectory(t, ctx, db, uuid.Nil.String(), "top")
 		held := testfile(t, ctx, db, top.ID, "held")
 		loose := testfile(t, ctx, db, uuid.Nil.String(), "loose")
 
-		found := testids(t, library.MetadataSearch(ctx, db, library.MetadataSearchBuilder().Where(library.MetadataQueryDirectory(false))))
+		found := testids(t, library.MetadataSearch(ctx, db, library.MetadataSearchBuilder().Where(library.MetadataQueryIsDirectory(false))))
 		require.ElementsMatch(t, []string{held.ID, loose.ID}, found)
 	})
 }

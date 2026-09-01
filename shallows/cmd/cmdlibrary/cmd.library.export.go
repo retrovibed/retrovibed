@@ -49,7 +49,7 @@ func (t exportJSONL) run(ctx context.Context, db sqlx.Queryer, vfs fsx.Virtual, 
 	// folder row would leave junk on disk and emit a zero chunk entry.
 	q := library.MetadataSearchBuilder().Where(squirrel.And{
 		library.MetadataQueryNotTombstoned(),
-		library.MetadataQueryDirectory(false),
+		library.MetadataQueryIsDirectory(false),
 	}).OrderBy("id ASC")
 	if t.KnownMedia != nil {
 		q = q.Where(library.MetadataQueryHasKnownMedia(*t.KnownMedia))

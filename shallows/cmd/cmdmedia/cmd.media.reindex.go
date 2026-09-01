@@ -47,7 +47,7 @@ func (t reindex) run(ctx context.Context, db *sql.DB, mediastore fsx.Virtual) (e
 	query := library.MetadataSearchBuilder().Where(
 		squirrel.And{
 			squirrel.Expr("1=1"),
-			library.MetadataQueryDirectory(false),
+			library.MetadataQueryIsDirectory(false),
 			missing,
 		},
 	)

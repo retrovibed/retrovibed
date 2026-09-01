@@ -103,7 +103,7 @@ func TestMetadataInsertWithDefaults(t *testing.T) {
 		require.Equal(t, realID, tmp.KnownMediaID)
 	})
 
-	t.Run("upsert should file a row sitting at the root", func(t *testing.T) {
+	t.Run("upsert should not move a row into a directory", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 		db := sqltestx.Metadatabase(t)
@@ -111,15 +111,16 @@ func TestMetadataInsertWithDefaults(t *testing.T) {
 
 		require.NoError(t, testx.Fake(&tmp, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID))
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, tmp).Scan(&tmp))
-		require.Equal(t, uuid.Nil.String(), tmp.ParentID)
+		require.Equal(t, uuid.Nil.String(), tmp.DirectoryID)
 
-		folderID := uuid.Must(uuid.NewV7()).String()
-		tmp = langx.Clone(tmp, library.MetadataOptionParentID(folderID))
+		// directory_id is absent from the conflict clause, so organization is the
+		// filesystem's to change and never a side effect of re-inserting content.
+		tmp = langx.Clone(tmp, library.MetadataOptionDirectoryID(uuid.Must(uuid.NewV7()).String()))
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, tmp).Scan(&tmp))
-		require.Equal(t, folderID, tmp.ParentID)
+		require.Equal(t, uuid.Nil.String(), tmp.DirectoryID)
 	})
 
-	t.Run("upsert should not overwrite a parent the user already chose", func(t *testing.T) {
+	t.Run("upsert should not overwrite a directory the user already chose", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 		db := sqltestx.Metadatabase(t)
@@ -128,13 +129,13 @@ func TestMetadataInsertWithDefaults(t *testing.T) {
 		// id is the md5 of the content, so a torrent completion or a filesystem rescan
 		// re-inserts a row the user has already filed. an unguarded assignment here drags
 		// the whole library back into a flat pile.
-		folderID := uuid.Must(uuid.NewV7()).String()
-		require.NoError(t, testx.Fake(&tmp, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID, library.MetadataOptionParentID(folderID)))
+		directory := uuid.Must(uuid.NewV7()).String()
+		require.NoError(t, testx.Fake(&tmp, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID, library.MetadataOptionDirectoryID(directory)))
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, tmp).Scan(&tmp))
-		require.Equal(t, folderID, tmp.ParentID)
+		require.Equal(t, directory, tmp.DirectoryID)
 
-		tmp = langx.Clone(tmp, library.MetadataOptionParentID(uuid.Nil.String()))
+		tmp = langx.Clone(tmp, library.MetadataOptionDirectoryID(uuid.Nil.String()))
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, tmp).Scan(&tmp))
-		require.Equal(t, folderID, tmp.ParentID)
+		require.Equal(t, directory, tmp.DirectoryID)
 	})
 }
