@@ -47,7 +47,7 @@ func DaemonFromHost() Daemon {
 	return Daemon{
 		CreatedAt:   time.Now(),
 		Description: "local device",
-		Hostname:    stringsx.FirstNonBlank(errorsx.Zero(os.Hostname()), "localhost"),
+		Hostname:    stringsx.FirstNonBlank(fmt.Sprintf("%s:9998", errorsx.Zero(os.Hostname())), "localhost"),
 		ID:          uuid.Max.String(),
 		UpdatedAt:   time.Now(),
 	}
