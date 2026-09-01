@@ -76,11 +76,12 @@ class Defaults extends ThemeExtension<Defaults> {
   // the box a modal may occupy. content that has to fit, rather than scroll, needs a
   // bound: the modal node centers and scrolls whatever it is handed, so a child left
   // unbounded renders at its natural size.
-  BoxConstraints modal(BuildContext context) {
+  static BoxConstraints modal(BuildContext context) {
+    final defaults = Defaults.of(context);
     final viewport = MediaQuery.sizeOf(context);
     return BoxConstraints(
-      maxWidth: viewport.width * modalWidth,
-      maxHeight: viewport.height * modalHeight,
+      maxWidth: viewport.width * defaults.modalWidth,
+      maxHeight: viewport.height * defaults.modalHeight,
     );
   }
 

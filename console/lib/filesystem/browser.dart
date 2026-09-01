@@ -40,24 +40,11 @@ class FilesystemBrowser extends StatefulWidget {
   State<StatefulWidget> createState() => _FilesystemBrowser();
 }
 
-class _FilesystemBrowser extends State<FilesystemBrowser> {
-  bool _loading = true;
-  Widget _cause = ds.Error.zero;
+class _FilesystemBrowser extends State<FilesystemBrowser> with ds.LoadingState {
   String _highlighted = "";
   api.FilesystemSearchResponse _res = api.filesystem.response(
     next: api.filesystem.request(limit: 32),
   );
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
-
-  void reseterr() {
-    setState(() {
-      _cause = ds.Error.zero;
-    });
-  }
 
   String get directory => _res.next.directoryId;
 
@@ -79,29 +66,29 @@ class _FilesystemBrowser extends State<FilesystemBrowser> {
         .then((v) {
           setState(() {
             _res = v;
-            _loading = false;
+            loading = false;
           });
 
           widget.focus?.requestFocus();
           ds.textediting.refocus(widget.controller);
         })
-        .catchError((cause) {
+        .catchError((e) {
           setState(() {
-            _cause = ds.Error.unauthorized(cause, onTap: reseterr);
-            _loading = false;
+            cause = ds.Error.unauthorized(e, onTap: reseterr);
+            loading = false;
           });
         }, test: httpx.ErrorsTest.unauthorized)
-        .catchError((cause) {
+        .catchError((e) {
           setState(() {
-            _cause = ds.Error.unknown(cause, onTap: reseterr);
-            _loading = false;
+            cause = ds.Error.unknown(e, onTap: reseterr);
+            loading = false;
           });
         });
   }
 
   void navigate(String id) {
     setState(() {
-      _loading = true;
+      loading = true;
       _highlighted = "";
       _res.next
         ..directoryId = id
@@ -153,7 +140,7 @@ class _FilesystemBrowser extends State<FilesystemBrowser> {
   }
 
   Future<void> Function() preview(media.Media v) {
-    final constraints = ds.Defaults.of(context).modal(context);
+    final constraints = ds.Defaults.modal(context);
 
     return () => Future.sync(
       () => ds.modals.push(
@@ -183,7 +170,7 @@ class _FilesystemBrowser extends State<FilesystemBrowser> {
         onConfirm: (_) {
           modal.push(null);
           setState(() {
-            _loading = true;
+            loading = true;
           });
 
           httpx
@@ -191,10 +178,10 @@ class _FilesystemBrowser extends State<FilesystemBrowser> {
                 () => widget.remove(v.id, options: [authn.request(authn.AuthzCache.meta(context))]),
               )
               .then((_) => refresh(_res.next))
-              .catchError((cause) {
+              .catchError((e) {
                 setState(() {
-                  _cause = ds.Error.unknown(cause, onTap: reseterr);
-                  _loading = false;
+                  cause = ds.Error.unknown(e, onTap: reseterr);
+                  loading = false;
                 });
               });
         },
@@ -207,7 +194,7 @@ class _FilesystemBrowser extends State<FilesystemBrowser> {
     final defaults = ds.Defaults.of(context);
     final upload = (FilesEvent v, {ValueNotifier<int>? progress}) {
       setState(() {
-        _loading = true;
+        loading = true;
       });
 
       final multiparts = v.files.map((c) => media.media.uploadable(c.path, c.name, c.mimeType!));
@@ -227,13 +214,13 @@ class _FilesystemBrowser extends State<FilesystemBrowser> {
             )
             .then((_) => refresh(_res.next))
             .then((_) => ds.NullWidget)
-            .catchError((cause) => ds.Error.unknown(cause, onTap: reseterr));
-      }).whenComplete(() => setState(() => _loading = false));
+            .catchError((e) => ds.Error.unknown(e, onTap: reseterr));
+      }).whenComplete(() => setState(() => loading = false));
     };
 
     return ds.Table(
-      loading: _loading,
-      cause: _cause,
+      loading: loading,
+      cause: cause,
       leading: ds.SearchTray(
         autofocus: defaults.desktop,
         decoration: InputDecoration(hintText: location),
