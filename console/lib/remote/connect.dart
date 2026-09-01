@@ -28,6 +28,7 @@ import 'playlist.queue.dart';
 class AutoConnect extends StatelessWidget {
   final ValueNotifier<media.MediaSearchState> search;
   final Future<Stream<meta.Daemon>> Function({List<httpx.Option> options}) daemonDiscover;
+  final Future<meta.DaemonSearchResponse> Function(meta.DaemonSearchRequest) daemonSearch;
   final Future<remote.RemoteControlSocket> Function({required String host, List<httpx.Option> options}) connect;
   // endpoint factories for the remote daemon's search/random lookups,
   // defaulting to the real hardwired HTTP endpoints - lets tests seed the
@@ -45,6 +46,7 @@ class AutoConnect extends StatelessWidget {
     super.key,
     required this.search,
     this.daemonDiscover = meta.daemons.discover,
+    this.daemonSearch = meta.daemons.search,
     this.connect = remote.remotecontrol.connect,
     this.apisearch = media.media.searchendpoint,
     this.apirandom = media.media.randomendpoint,
@@ -57,6 +59,7 @@ class AutoConnect extends StatelessWidget {
       Connect(
         search: search,
         daemonDiscover: daemonDiscover,
+        daemonSearch: daemonSearch,
         connect: connect,
         apisearch: apisearch,
         apirandom: apirandom,
@@ -70,6 +73,7 @@ class Connect extends StatefulWidget {
   static const _autoqueueTargetDefault = 5;
   final ValueNotifier<media.MediaSearchState> search;
   final Future<Stream<meta.Daemon>> Function({List<httpx.Option> options}) daemonDiscover;
+  final Future<meta.DaemonSearchResponse> Function(meta.DaemonSearchRequest) daemonSearch;
   final Future<remote.RemoteControlSocket> Function({required String host, List<httpx.Option> options}) connect;
   final media.FnMediaSearch Function(String host, List<httpx.Option> options) apisearch;
   final media.FnMediaFind Function(String host, List<httpx.Option> options) apirandom;
@@ -80,6 +84,7 @@ class Connect extends StatefulWidget {
   const Connect({
     required this.search,
     required this.daemonDiscover,
+    required this.daemonSearch,
     required this.connect,
     required this.apisearch,
     required this.apirandom,
@@ -247,14 +252,23 @@ class _State extends State<Connect> with LoadingState {
       setState(() {
         loading = false;
         _socket = remote.RemoteControlSocket.disabled;
-        cause = ds.Error.text(
-          "you do not have permission to remotely control this device",
-          decoration: ds.ErrorDecorations.info,
+        cause = SizedBox.expand(
+          child: ds.Container(
+            decoration: BoxDecoration(border: ds.Defaults.of(context).border),
+            meta.DaemonList(
+              search: widget.daemonSearch,
+              remoteonly: true,
+              decoration: const InputDecoration(hintText: "search for device to control"),
+              onSelect: (v) => meta.DaemonDropdown.local(context, v).then((v) {
+                _endpoint.value = v;
+                return v;
+              }),
+            ),
+          ),
         );
       });
       return;
     }
-
     setState(() => loading = true);
 
     widget

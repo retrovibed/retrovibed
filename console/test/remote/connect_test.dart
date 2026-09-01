@@ -18,6 +18,10 @@ Future<Stream<meta.Daemon>> _noopDaemonDiscover({List<httpx.Option> options = co
   return const Stream<meta.Daemon>.empty();
 }
 
+Future<meta.DaemonSearchResponse> _noopDaemonSearch(meta.DaemonSearchRequest req) async {
+  return meta.DaemonSearchResponse(items: const [], next: req);
+}
+
 // never emits/closes on its own, so the _connect() future it's awaited
 // under stays pending and _socket never gets reset back to noop by
 // _reconnect(). echoes a sync (reflecting everything queued so far) right
@@ -86,11 +90,13 @@ void main() {
 
   testWidgets('selecting the local device is refused without calling connect', (tester) async {
     bool connectCalled = false;
+    final other = meta.Daemon(id: uuidx.v7(), description: "Living Room", hostname: "example.remote:1234");
 
     await tester.pumpApp(
       AutoConnect(
         search: ValueNotifier(media.MediaSearchState(next: media.MediaSearchRequest())),
         daemonDiscover: _noopDaemonDiscover,
+        daemonSearch: (req) async => meta.DaemonSearchResponse(items: [other], next: req),
         connect: ({required String host, List<httpx.Option> options = const []}) async {
           connectCalled = true;
           throw StateError('connect should not be called for the local device');
@@ -104,7 +110,7 @@ void main() {
     );
     await tester.pumpN(5);
 
-    expect(find.text("you do not have permission to remotely control this device"), findsOneWidget);
+    expect(find.text("Living Room"), findsOneWidget);
     expect(connectCalled, isFalse);
     expect(tester.takeException(), isNull);
   });
@@ -140,6 +146,7 @@ void main() {
         Connect(
           search: ValueNotifier(media.MediaSearchState(next: media.MediaSearchRequest())),
           daemonDiscover: _noopDaemonDiscover,
+          daemonSearch: _noopDaemonSearch,
           connect: ({required String host, List<httpx.Option> options = const []}) async => socket,
           apisearch: media.media.searchendpoint,
           apirandom: media.media.randomendpoint,
@@ -179,6 +186,7 @@ void main() {
         Connect(
           search: ValueNotifier(media.MediaSearchState(next: media.MediaSearchRequest())),
           daemonDiscover: _noopDaemonDiscover,
+          daemonSearch: _noopDaemonSearch,
           connect: ({required String host, List<httpx.Option> options = const []}) async => socket,
           apisearch: media.media.searchendpoint,
           apirandom: media.media.randomendpoint,
@@ -229,6 +237,7 @@ void main() {
                 ? Connect(
                     search: ValueNotifier(media.MediaSearchState(next: media.MediaSearchRequest())),
                     daemonDiscover: _noopDaemonDiscover,
+                    daemonSearch: _noopDaemonSearch,
                     connect: ({required String host, List<httpx.Option> options = const []}) async => socket,
                     apisearch: media.media.searchendpoint,
                     apirandom: media.media.randomendpoint,
@@ -300,6 +309,7 @@ void main() {
         Connect(
           search: ValueNotifier(media.MediaSearchState(next: media.MediaSearchRequest())),
           daemonDiscover: _noopDaemonDiscover,
+          daemonSearch: _noopDaemonSearch,
           connect: ({required String host, List<httpx.Option> options = const []}) async => socket,
           apisearch: (host, options) => fakeSearch,
           apirandom: media.media.randomendpoint,

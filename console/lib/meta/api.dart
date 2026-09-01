@@ -73,7 +73,8 @@ abstract class daemons {
       DaemonSearchResponse(next: next ?? request(limit: 128), items: []);
 
   static bool isLocalDevice(Daemon library) =>
-      library.hostname.startsWith(retro.local_device().hostname) || library.hostname.startsWith("localhost:9998");
+      library.hostname.startsWith(retro.local_device().hostname.split(":").first) ||
+      library.hostname.startsWith("localhost:9998");
   static Future<DaemonSearchResponse> search(DaemonSearchRequest req) async {
     return http.Client()
         .get(

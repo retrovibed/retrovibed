@@ -12,6 +12,7 @@ import 'package:retrovibed/meta.dart' as meta;
 import 'package:retrovibed/retrovibed.dart' as retro;
 import 'package:retrovibed/deeplink.dart';
 import 'package:retrovibed/design.kit/theme.defaults.dart' as theming;
+import 'package:retrovibed/ftux.dart' as ftux;
 import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/routes.dart' as routes;
 
@@ -142,7 +143,7 @@ class Retrovibed extends StatelessWidget {
                                     .ignore();
                               },
                               remote.RemoteControlListener(
-                                const routes.Routes(),
+                                ftux.AutoHelp(const routes.Routes()),
                               ),
                             ),
                           ),
