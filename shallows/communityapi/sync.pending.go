@@ -13,6 +13,8 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
+	"github.com/retrovibed/retrovibed/retroapi/blockcache"
+	"github.com/retrovibed/retrovibed/retroapi/publishplugin"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
@@ -50,8 +52,44 @@ func ensureTorrent(ctx context.Context, q sqlx.Queryer, mvfs, tvfs fsx.Virtual, 
 	return media.GenerateTorrent(ctx, q, mvfs, tvfs, lmd)
 }
 
+// publishToPlugin materializes lmd's byte range into a flat temp file - a
+// wasm guest has no way to interpret blockcache's internal block-file
+// layout directly, so the exact section YouTubeUpload would stream is
+// instead copied to disk once - and invokes the plugin installed at
+// pub.Path via publishers.Publish, removing the temp file once the call
+// returns.
+func publishToPlugin(ctx context.Context, mvfs fsx.Virtual, publishers publishplugin.T, pub community.PluginPublisher, pc community.PublishedContent, lmd library.Metadata, known library.Known) error {
+	cache, err := blockcache.NewDirectoryCache(mvfs.Path(lmd.ID))
+	if err != nil {
+		return errorsx.Wrap(err, "unable to open media for plugin publish")
+	}
+
+	tmp, err := os.CreateTemp("", "retrovibed.publish.*")
+	if err != nil {
+		return errorsx.Wrap(err, "unable to create temporary media file")
+	}
+	defer func() {
+		errorsx.Log(errorsx.Wrap(fsx.IgnoreIsNotExist(os.Remove(tmp.Name())), "unable to remove temporary media file"))
+	}()
+	defer tmp.Close()
+
+	if _, err := io.Copy(tmp, io.NewSectionReader(cache, int64(lmd.DiskOffset), int64(lmd.Bytes))); err != nil {
+		return errorsx.Wrap(err, "unable to materialize media for plugin publish")
+	}
+
+	_, err = publishers.Publish(ctx, pub.Path, publishplugin.Request{
+		Title:       stringsx.FirstNonBlank(known.Title, lmd.Description),
+		Description: known.Overview,
+		Mimetype:    stringsx.FirstNonBlank(known.Mimetype, lmd.Mimetype),
+		CommunityID: pc.CommunityID,
+		MediaPath:   tmp.Name(),
+	})
+
+	return err
+}
+
 // SyncPendingToDeeppool syncs pending published content to deeppool and regenerates affected feeds.
-func SyncPendingToDeeppool(ctx context.Context, q sqlx.Queryer, httpc *http.Client, metrics MetricsPublisher, publisher FeedPublisher, archiver library.Archiver, mvfs, tvfs fsx.Virtual) error {
+func SyncPendingToDeeppool(ctx context.Context, q sqlx.Queryer, httpc *http.Client, metrics MetricsPublisher, publisher FeedPublisher, publishers publishplugin.T, archiver library.Archiver, mvfs, tvfs fsx.Virtual) error {
 	pending := sqlx.Scan(community.PublishedContentFindByPendingSync(ctx, q))
 
 	for pc := range pending.Iter() {
@@ -87,6 +125,22 @@ func SyncPendingToDeeppool(ctx context.Context, q sqlx.Queryer, httpc *http.Clie
 			if uerr := community.YouTubeUpload(ctx, q, httpc, mvfs, pc.OAuthGoogleID, lmd, stringsx.FirstNonBlank(known.Title, lmd.Description), known.Overview); uerr != nil {
 				log.Println(errorsx.Wrap(uerr, "youtube cross-post failed"))
 			}
+		}
+
+		enabled := sqlx.Scan(community.CommunityPublisherFindByCommunityID(ctx, q, pc.CommunityID))
+		for cp := range enabled.Iter() {
+			var pub community.PluginPublisher
+			if err := community.PluginPublisherFindByID(ctx, q, cp.PublisherID).Scan(&pub); err != nil {
+				log.Println(errorsx.Wrap(err, "unable to find plugin publisher"))
+				continue
+			}
+
+			if err := publishToPlugin(ctx, mvfs, publishers, pub, pc, lmd, known); err != nil {
+				log.Println(errorsx.Wrap(err, "plugin publish failed"))
+			}
+		}
+		if err := enabled.Err(); err != nil {
+			log.Println(errorsx.Wrap(err, "unable to list enabled publishers"))
 		}
 
 		if pc.PublishMode == int32(PublishMode_UNLISTED) {

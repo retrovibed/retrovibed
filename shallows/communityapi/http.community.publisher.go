@@ -12,6 +12,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
+	"github.com/retrovibed/retrovibed/retroapi/publishplugin"
 	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
@@ -42,9 +43,10 @@ func HTTPCommunityPublisherOptionDir(dir string) HTTPCommunityPublisherOption {
 	}
 }
 
-func NewHTTPCommunityPublisher(q sqlx.Queryer, options ...HTTPCommunityPublisherOption) *HTTPCommunityPublisher {
+func NewHTTPCommunityPublisher(q sqlx.Queryer, reg *publishplugin.Registry, options ...HTTPCommunityPublisherOption) *HTTPCommunityPublisher {
 	svc := langx.Clone(HTTPCommunityPublisher{
 		q:         q,
+		reg:       reg,
 		dir:       fsx.DirVirtual(userx.DefaultConfigDir(userx.DefaultRelRoot(), "publish.d")),
 		jwtsecret: env.JWTSecret,
 	}, options...)
@@ -54,6 +56,7 @@ func NewHTTPCommunityPublisher(q sqlx.Queryer, options ...HTTPCommunityPublisher
 
 type HTTPCommunityPublisher struct {
 	q         sqlx.Queryer
+	reg       *publishplugin.Registry
 	dir       fsx.Virtual
 	jwtsecret jwtx.SecretSource
 }
@@ -151,10 +154,22 @@ func (t *HTTPCommunityPublisher) create(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	if err = publishplugin.VerifyWasmMagicPath(tmp.Name()); err != nil {
+		log.Println(errorsx.Wrap(err, "invalid wasm module"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		return
+	}
+
 	id := md5x.FormatUUID(digest)
-	dst := t.dir.Path(id)
+	dst := t.dir.Path(id + ".wasm")
 	if err = os.Rename(tmp.Name(), dst); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to install publisher plugin"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	if err = t.reg.Load(r.Context(), dst); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to load publisher plugin"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
@@ -194,6 +209,8 @@ func (t *HTTPCommunityPublisher) delete(w http.ResponseWriter, r *http.Request) 
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
+
+	t.reg.Unload(existing.Path)
 
 	errorsx.Log(errorsx.Wrap(fsx.IgnoreIsNotExist(os.Remove(existing.Path)), "unable to remove publisher plugin from disk"))
 
