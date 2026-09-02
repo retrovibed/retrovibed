@@ -22,6 +22,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/netmonx"
+	"github.com/retrovibed/retrovibed/retroapi/publishplugin"
 	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
 	"github.com/retrovibed/retrovibed/retroapi/tlsx"
 	"github.com/retrovibed/retrovibed/retroapi/userx"
@@ -241,10 +242,36 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 
 	var tstore storage.ClientImpl = blockcache.NewTorrentFromVirtualFS(tvfs)
 
+	// socialDialer/socialResolver back the "social ring" - publishing and
+	// (eventually) recommendations traffic - kept deliberately separate
+	// from privateDialer/privateResolver below, which back the
+	// "distribution ring" torrents and search plugins use. There's no
+	// wireguard tunnel of its own for the social ring yet (a planned
+	// follow-up, mirroring how _torrenting.Watch live-swaps
+	// privateDialer/privateResolver onto a tunnel when one is configured -
+	// see torrent.go), so it's stored once here with the same plain-host
+	// fallback DefaultDialer uses when no tunnel is present.
+	socialDialer := netx.NewDialerProxy()
+	socialResolver := dnscache.AutoProxyResolver()
+	socialDialer.Store(DefaultDialer(nil, socialResolver))
+
+	publishers, err := publishplugin.NewRegistryWithSocket(
+		gctx.Context,
+		wnetruntime.Virtual(
+			socialDialer,
+			netx.UnsupportedListenConfig{},
+			socialResolver,
+			wnetruntime.PublicFirewall(),
+		),
+	)
+	if err != nil {
+		return errorsx.Wrap(err, "unable to start publish plugin registry")
+	}
+
 	if t.AutoArchive && deepjwt != http.DefaultClient {
 		log.Println("automatic archival is enabled")
 		errorsx.Log(AutoArchival(gctx.Context, db, deepjwt, mediastore, archival, t.AutoArchive))
-		errorsx.Log(AutoPublishing(gctx.Context, db, deepjwt, mediastore, tvfs, publishing))
+		errorsx.Log(AutoPublishing(gctx.Context, db, deepjwt, mediastore, tvfs, publishing, publishers))
 		errorsx.Log(AutoFeedSync(gctx.Context, db, deepjwt, publishing))
 		errorsx.Log(SubscriptionSync(gctx.Context, db, deepjwt, communitysync))
 		tstore = library.NewTorrentStorageFromHTTP(db, deepjwt, tstore)
@@ -264,9 +291,12 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	// (NewRegistryWithSocket spins up a wazero runtime + WASI + a directory
 	// watcher - too expensive to rebuild every reload generation). It still
 	// needs to track the live wireguard-tunnel-or-host dialer the same way
-	// the torrent client's own dialer does, so privateDialer/pluginsResolver
+	// the torrent client's own dialer does, so privateDialer/privateResolver
 	// are handed into newTorrenting to become _torrenting's _dialer/
 	// _dnscache - Init's normal per-generation Store calls keep them live.
+	// This is the "distribution ring" - deliberately a separate
+	// dialer/resolver pair from socialDialer/socialResolver above, which
+	// back publishing/recommendations traffic instead.
 	privateDialer := netx.NewDialerProxy()
 	privateResolver := dnscache.AutoProxyResolver()
 	plugins, err := searchplugin.NewRegistryWithSocket(
@@ -508,7 +538,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	).Bind(httpmux.PathPrefix("/c").Subrouter())
 
 	communityapi.NewHTTPSocial(db).Bind(httpmux.PathPrefix("/c/social").Subrouter())
-	communityapi.NewHTTPCommunityPublisher(db).Bind(httpmux.PathPrefix("/c/publishers").Subrouter())
+	communityapi.NewHTTPCommunityPublisher(db, publishers).Bind(httpmux.PathPrefix("/c/publishers").Subrouter())
 
 	communityapi.NewHTTPYouTube(db, deepjwt).Bind(httpmux.PathPrefix("/integrations/youtube").Subrouter())
 

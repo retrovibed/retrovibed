@@ -8,6 +8,7 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
+	"github.com/retrovibed/retrovibed/retroapi/publishplugin"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
@@ -37,9 +38,12 @@ func TestHTTPCommunityPublisherSearch(t *testing.T) {
 		ID: uuid.Must(uuid.NewV7()).String(), Path: "/plugins/spotify", Description: "Spotify", Mimetype: "application/vnd.retrovibe.publisher.spotify",
 	}).Scan(&spotify))
 
+	reg := testx.Must(publishplugin.NewRegistry(ctx, publishplugin.OptionConfigDir(t.TempDir()), publishplugin.OptionCacheDir(t.TempDir())))(t)
+
 	routes := mux.NewRouter()
 	communityapi.NewHTTPCommunityPublisher(
 		q,
+		reg,
 		communityapi.HTTPCommunityPublisherOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 	).Bind(routes.PathPrefix("/").Subrouter())
 

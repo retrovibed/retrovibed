@@ -6,16 +6,19 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"testing"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
+	"github.com/retrovibed/retrovibed/retroapi/publishplugin"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
@@ -32,12 +35,22 @@ func TestHTTPCommunityPublisherCreate(t *testing.T) {
 	q := sqltestx.Metadatabase(t)
 	dir := t.TempDir()
 
+	reg := testx.Must(publishplugin.NewRegistry(ctx, publishplugin.OptionConfigDir(t.TempDir()), publishplugin.OptionCacheDir(t.TempDir())))(t)
+
 	routes := mux.NewRouter()
 	communityapi.NewHTTPCommunityPublisher(
 		q,
+		reg,
 		communityapi.HTTPCommunityPublisherOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		communityapi.HTTPCommunityPublisherOptionDir(dir),
 	).Bind(routes.PathPrefix("/").Subrouter())
+
+	wasmPath := filepath.Join(t.TempDir(), "noop.wasm")
+	build := exec.Command("go", "build", "-o", wasmPath, "./.fixtures/noopplugin")
+	build.Env = append(build.Environ(), "GOOS=wasip1", "GOARCH=wasm")
+	out, err := build.CombinedOutput()
+	require.NoError(t, err, string(out))
+	wasm := errorsx.Must(os.ReadFile(wasmPath))
 
 	var v meta.Authz
 	require.NoError(t, testx.Fake(&v, meta.AuthzOptionAdmin))
@@ -54,7 +67,7 @@ func TestHTTPCommunityPublisherCreate(t *testing.T) {
 			if content == nil {
 				return nil
 			}
-			part, err := w.CreateFormFile("content", "publisher.bin")
+			part, err := w.CreateFormFile("content", "publisher.wasm")
 			if err != nil {
 				return err
 			}
@@ -76,11 +89,10 @@ func TestHTTPCommunityPublisherCreate(t *testing.T) {
 		return resp, req
 	}
 
-	t.Run("valid upload is installed and registered", func(t *testing.T) {
-		content := []byte("youtube-publisher-binary")
-		expectedID := md5x.FormatUUID(md5x.Digest(content))
+	t.Run("valid upload is installed and loaded", func(t *testing.T) {
+		expectedID := md5x.FormatUUID(md5x.Digest(wasm))
 
-		resp, req := upload(t, token, map[string]string{"description": "YouTube", "mimetype": "application/vnd.retrovibe.publisher.youtube"}, content)
+		resp, req := upload(t, token, map[string]string{"description": "YouTube", "mimetype": "application/vnd.retrovibe.publisher.youtube"}, wasm)
 		routes.ServeHTTP(resp, req)
 		require.NoError(t, httpx.ErrorCode(resp.Result()))
 
@@ -90,24 +102,24 @@ func TestHTTPCommunityPublisherCreate(t *testing.T) {
 		require.Equal(t, "YouTube", result.Publisher.Description)
 		require.Equal(t, "application/vnd.retrovibe.publisher.youtube", result.Publisher.Mimetype)
 
-		installed := filepath.Join(dir, expectedID)
+		installed := filepath.Join(dir, expectedID+".wasm")
 		require.FileExists(t, installed)
 		got, err := os.ReadFile(installed)
 		require.NoError(t, err)
-		require.Equal(t, content, got)
+		require.Equal(t, wasm, got)
 
 		var row community.PluginPublisher
 		require.NoError(t, community.PluginPublisherFindByID(ctx, q, expectedID).Scan(&row))
 		require.Equal(t, "YouTube", row.Description)
+		require.Equal(t, installed, row.Path)
 	})
 
 	t.Run("re-uploading identical content upserts rather than duplicates", func(t *testing.T) {
-		content := []byte("spotify-publisher-binary")
-		expectedID := md5x.FormatUUID(md5x.Digest(content))
 		fields := map[string]string{"description": "Spotify", "mimetype": "application/vnd.retrovibe.publisher.spotify"}
+		expectedID := md5x.FormatUUID(md5x.Digest(wasm))
 
 		for range 2 {
-			resp, req := upload(t, token, fields, content)
+			resp, req := upload(t, token, fields, wasm)
 			routes.ServeHTTP(resp, req)
 			require.NoError(t, httpx.ErrorCode(resp.Result()))
 		}
@@ -115,8 +127,17 @@ func TestHTTPCommunityPublisherCreate(t *testing.T) {
 		require.Equal(t, 1, sqltestx.Count(t, q, "SELECT COUNT(*) FROM plugin_publishers WHERE id = '"+expectedID+"'"))
 	})
 
+	t.Run("invalid wasm magic rejected", func(t *testing.T) {
+		content := []byte("not a wasm module")
+
+		resp, req := upload(t, token, map[string]string{"description": "bogus", "mimetype": "application/vnd.retrovibe.publisher.bogus"}, content)
+		routes.ServeHTTP(resp, req)
+		require.Equal(t, http.StatusBadRequest, resp.Code)
+		require.NoFileExists(t, filepath.Join(dir, md5x.FormatUUID(md5x.Digest(content))+".wasm"))
+	})
+
 	t.Run("missing mimetype rejected", func(t *testing.T) {
-		resp, req := upload(t, token, map[string]string{"description": "no mimetype"}, []byte("content"))
+		resp, req := upload(t, token, map[string]string{"description": "no mimetype"}, wasm)
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusBadRequest, resp.Code)
 	})
@@ -135,6 +156,6 @@ func TestHTTPCommunityPublisherCreate(t *testing.T) {
 		resp, req := upload(t, unprivileged, map[string]string{"mimetype": "application/vnd.retrovibe.publisher.x"}, content)
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusUnauthorized, resp.Code)
-		require.NoFileExists(t, filepath.Join(dir, md5x.FormatUUID(md5x.Digest(content))))
+		require.NoFileExists(t, filepath.Join(dir, md5x.FormatUUID(md5x.Digest(content))+".wasm"))
 	})
 }
