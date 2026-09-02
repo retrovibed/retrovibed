@@ -90,7 +90,11 @@ message RecommendationDeleteResponse {
   Known recommendation = 1 [ json_name = "recomendation" ];
 }
 
-message RecommendationRefreshRequest {}
-message RecommendationRefreshResponse {
-  Known recommendation = 1 [ json_name = "recomendation" ];
+message RecommendationRefreshRequest {
+  string profile_id = 1 [ json_name = "profile_id" ];
+  uint64 limit = 2 [ json_name = "limit" ];
+  string mimetype = 3 [ json_name = "mimetype" ];
+  bool adult = 4 [ json_name = "adult" ];
+  string language = 5 [ json_name = "language" ];
 }
+message RecommendationRefreshResponse {}

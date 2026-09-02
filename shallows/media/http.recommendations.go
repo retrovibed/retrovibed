@@ -8,7 +8,9 @@ import (
 	"github.com/go-playground/form/v4"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
+	"github.com/linxGnu/pqueue"
 	"github.com/retrovibed/retrovibed/retroapi/httpauth"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -16,6 +18,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/numericx"
+	"github.com/retrovibed/retrovibed/shallows/internal/pqueuex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/library"
@@ -29,9 +32,10 @@ func HTTPRecommendationsOptionJWTSecret(j jwtx.SecretSource) HTTPRecommendations
 	}
 }
 
-func NewHTTPRecommendations(q sqlx.Queryer, options ...HTTPRecommendationsOption) *HTTPRecommendations {
+func NewHTTPRecommendations(q sqlx.Queryer, qw pqueue.Queue, options ...HTTPRecommendationsOption) *HTTPRecommendations {
 	return new(langx.Clone(HTTPRecommendations{
 		q:         q,
+		qw:        qw,
 		jwtsecret: env.JWTSecret,
 		decoder:   formx.NewDecoder(),
 	}, options...))
@@ -39,6 +43,7 @@ func NewHTTPRecommendations(q sqlx.Queryer, options ...HTTPRecommendationsOption
 
 type HTTPRecommendations struct {
 	q         sqlx.Queryer
+	qw        pqueue.Queue
 	jwtsecret jwtx.SecretSource
 	decoder   *form.Decoder
 }
@@ -232,27 +237,29 @@ func (t *HTTPRecommendations) random(w http.ResponseWriter, r *http.Request) {
 func (t *HTTPRecommendations) refresh(w http.ResponseWriter, r *http.Request) {
 	var (
 		err error
-		req RecommendationSearchRequest
-		rec library.Recommendation
+		pid string
+		req RecommendationRefreshRequest
 	)
 
-	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
+	if _, pid, err = httpauth.IssuerSubjectID(r.Context(), t.jwtsecret, r); err != nil {
+		httpx.ErrorHeader(w, http.StatusBadRequest, errorsx.Wrap(err, "failed to retrieve token"))
+		return
+	}
+
+	if err = jsonx.UnmarshalRead(r.Body, &req); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to decode request"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
 	}
+	req.ProfileId = pid
 
-	if rec, err = library.RecommendationFromRandomKnown(r.Context(), t.q, req.Mimetype, req.Language, req.Adult); sqlx.ErrNoRows(err) != nil {
-		// no known media available - nothing to do
-	} else if err != nil {
-		log.Println(errorsx.Wrap(err, "refresh failed"))
+	if err = pqueuex.Enqueue(r.Context(), t.qw, &req); err != nil {
+		log.Println(errorsx.Wrap(err, "enqueue failed"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 
-	if err = httpx.WriteJSON(w, httpx.GetBuffer(r), &RecommendationRefreshResponse{
-		Recommendation: new(langx.Clone(Known{}, KnownOptionFromRecommendation(langx.Clone(rec, timex.JSONSafeEncodeOption)))),
-	}); err != nil {
+	if err = httpx.WriteJSONCode(w, http.StatusAccepted, httpx.GetBuffer(r), &RecommendationRefreshResponse{}); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to write response"))
 		return
 	}

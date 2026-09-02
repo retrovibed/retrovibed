@@ -1,6 +1,6 @@
 module eg/compute
 
-go 1.26.3
+go 1.27.0
 
 require (
 	github.com/egdaemon/eg v0.0.0-20260828095718-c19fa49c0a10

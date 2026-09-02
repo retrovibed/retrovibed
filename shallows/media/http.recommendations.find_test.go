@@ -12,6 +12,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
+	"github.com/retrovibed/retrovibed/shallows/internal/pqueuetestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/retrovibed/retrovibed/shallows/media"
@@ -30,6 +31,7 @@ func TestRecommendationsFind(t *testing.T) {
 		defer done()
 
 		q := sqltestx.Metadatabase(t)
+		w := pqueuetestx.NewQueue()
 
 		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
 		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
@@ -45,7 +47,7 @@ func TestRecommendationsFind(t *testing.T) {
 		require.NoError(t, library.RecommendationInsertWithDefaults(ctx, q, rec).Scan(&rec))
 
 		routes := mux.NewRouter()
-		media.NewHTTPRecommendations(q, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
+		media.NewHTTPRecommendations(q, w, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
@@ -71,6 +73,7 @@ func TestRecommendationsFind(t *testing.T) {
 		defer done()
 
 		q := sqltestx.Metadatabase(t)
+		w := pqueuetestx.NewQueue()
 
 		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
 		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
@@ -78,7 +81,7 @@ func TestRecommendationsFind(t *testing.T) {
 		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, authz).Scan(&authz))
 
 		routes := mux.NewRouter()
-		media.NewHTTPRecommendations(q, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
+		media.NewHTTPRecommendations(q, w, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 

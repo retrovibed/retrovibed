@@ -1,4 +1,4 @@
-package ddisc_test
+package media_test
 
 import (
 	"context"
@@ -17,6 +17,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/library"
+	"github.com/retrovibed/retrovibed/shallows/media"
 	"github.com/stretchr/testify/require"
 )
 
@@ -58,7 +59,7 @@ func TestRecommendation(t *testing.T) {
 		d := ddisc.NewDiscovered(&id, ddisc.DiscoveredOptionKnownMedia(known.UID), ddisc.DiscoveredOptionAutoMagnet)
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
 
-		rec, err := ddisc.Recommendation(ctx, q, mimex.Application, "", false)
+		rec, err := media.Recommendation(ctx, q, mimex.Application, "", false)
 		require.NoError(t, err)
 		require.Equal(t, d.ID, rec.ContentID)
 		require.NotEmpty(t, rec.ID)
@@ -78,7 +79,7 @@ func TestRecommendation(t *testing.T) {
 		d := ddisc.NewDiscovered(&id, ddisc.DiscoveredOptionKnownMedia(known.UID), ddisc.DiscoveredOptionAutoMagnet)
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
 
-		rec, err := ddisc.Recommendation(ctx, q, mimex.Application, "", false)
+		rec, err := media.Recommendation(ctx, q, mimex.Application, "", false)
 		require.NoError(t, err)
 		require.NotEmpty(t, rec.Source)
 	})
@@ -89,7 +90,7 @@ func TestRecommendation(t *testing.T) {
 
 		q := sqltestx.Metadatabase(t)
 
-		_, err := ddisc.Recommendation(ctx, q, mimex.Application, "", false)
+		_, err := media.Recommendation(ctx, q, mimex.Application, "", false)
 		require.ErrorIs(t, err, sql.ErrNoRows)
 	})
 
@@ -108,7 +109,7 @@ func TestRecommendation(t *testing.T) {
 		d.Adult = true
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
 
-		_, err := ddisc.Recommendation(ctx, q, mimex.Application, "", false)
+		_, err := media.Recommendation(ctx, q, mimex.Application, "", false)
 		require.ErrorIs(t, err, sql.ErrNoRows)
 	})
 
@@ -127,7 +128,7 @@ func TestRecommendation(t *testing.T) {
 		d.Adult = true
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
 
-		rec, err := ddisc.Recommendation(ctx, q, mimex.Application, "", true)
+		rec, err := media.Recommendation(ctx, q, mimex.Application, "", true)
 		require.NoError(t, err)
 		require.Equal(t, d.ID, rec.ContentID)
 		require.True(t, rec.Adult)
@@ -153,7 +154,7 @@ func TestRecommendation(t *testing.T) {
 		da := ddisc.NewDiscovered(&aid, ddisc.DiscoveredOptionKnownMedia(audio.UID), ddisc.DiscoveredOptionMimetype("audio/mpeg"), ddisc.DiscoveredOptionAutoMagnet)
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, da).Scan(&da))
 
-		rec, err := ddisc.Recommendation(ctx, q, mimex.Video, "", false)
+		rec, err := media.Recommendation(ctx, q, mimex.Video, "", false)
 		require.NoError(t, err)
 		require.Equal(t, dv.ID, rec.ContentID)
 		require.Equal(t, mimex.Video, rec.Mimetype)
@@ -173,10 +174,10 @@ func TestRecommendation(t *testing.T) {
 		d := ddisc.NewDiscovered(&id, ddisc.DiscoveredOptionKnownMedia(known.UID), ddisc.DiscoveredOptionAutoMagnet)
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
 
-		_, err := ddisc.Recommendation(ctx, q, mimex.Application, "", false)
+		_, err := media.Recommendation(ctx, q, mimex.Application, "", false)
 		require.NoError(t, err)
 
-		rec, err := ddisc.Recommendation(ctx, q, mimex.Application, "", false)
+		rec, err := media.Recommendation(ctx, q, mimex.Application, "", false)
 		require.NoError(t, err)
 		require.EqualValues(t, 1, rec.Recommendations)
 	})
@@ -197,7 +198,7 @@ func TestRecommendation(t *testing.T) {
 		d.AudioDefaultLocale = "en"
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
 
-		rec, err := ddisc.Recommendation(ctx, q, mimex.Application, "", false)
+		rec, err := media.Recommendation(ctx, q, mimex.Application, "", false)
 		require.NoError(t, err)
 		require.Equal(t, "en", rec.Language)
 	})
@@ -217,7 +218,7 @@ func TestRecommendation(t *testing.T) {
 		d := ddisc.NewDiscovered(&id, ddisc.DiscoveredOptionKnownMedia(known.UID), ddisc.DiscoveredOptionAutoMagnet)
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
 
-		rec, err := ddisc.Recommendation(ctx, q, mimex.Application, "", false)
+		rec, err := media.Recommendation(ctx, q, mimex.Application, "", false)
 		require.NoError(t, err)
 		require.Equal(t, "fr", rec.Language)
 	})
@@ -249,7 +250,7 @@ func TestRecommendationsFromPlugins(t *testing.T) {
 			{Uri: "magnet:?xt=urn:btih:5555555555555555555555555555555555555555&dn=two", Mimetype: mimex.Video, Title: "two"},
 		}}
 
-		require.NoError(t, ddisc.RecommendationsFromPlugins(ctx, q, plugins, mimex.Video, 5, "", false))
+		require.NoError(t, media.RecommendationsFromPlugins(ctx, q, plugins, mimex.Video, 5, "", false))
 
 		count, err := sqlx.Count(ctx, q, "SELECT COUNT(*) FROM library_recommendations")
 		require.NoError(t, err)
@@ -266,7 +267,7 @@ func TestRecommendationsFromPlugins(t *testing.T) {
 			{Uri: "magnet:?xt=urn:btih:6666666666666666666666666666666666666666&dn=one", Mimetype: mimex.Video, Title: "one", PosterPath: "http://example.com/one.jpg"},
 		}}
 
-		require.NoError(t, ddisc.RecommendationsFromPlugins(ctx, q, plugins, mimex.Video, 5, "", false))
+		require.NoError(t, media.RecommendationsFromPlugins(ctx, q, plugins, mimex.Video, 5, "", false))
 
 		rec, err := sqlx.ScanOne(library.RecommendationSearch(ctx, q, library.RecommendationSearchBuilder()))
 		require.NoError(t, err)
@@ -285,8 +286,8 @@ func TestRecommendationsFromPlugins(t *testing.T) {
 			{Uri: "magnet:?xt=urn:btih:7777777777777777777777777777777777777777&dn=one", Mimetype: mimex.Video, Title: "one"},
 		}}
 
-		require.NoError(t, ddisc.RecommendationsFromPlugins(ctx, q, plugins, mimex.Video, 5, "", false))
-		require.NoError(t, ddisc.RecommendationsFromPlugins(ctx, q, plugins, mimex.Video, 5, "", false))
+		require.NoError(t, media.RecommendationsFromPlugins(ctx, q, plugins, mimex.Video, 5, "", false))
+		require.NoError(t, media.RecommendationsFromPlugins(ctx, q, plugins, mimex.Video, 5, "", false))
 
 		rec, err := sqlx.ScanOne(library.RecommendationSearch(ctx, q, library.RecommendationSearchBuilder()))
 		require.NoError(t, err)
@@ -299,7 +300,7 @@ func TestRecommendationsFromPlugins(t *testing.T) {
 
 		q := sqltestx.Metadatabase(t)
 
-		require.NoError(t, ddisc.RecommendationsFromPlugins(ctx, q, searchplugin.Unimplemented{}, mimex.Video, 5, "", false))
+		require.NoError(t, media.RecommendationsFromPlugins(ctx, q, searchplugin.Unimplemented{}, mimex.Video, 5, "", false))
 
 		count, err := sqlx.Count(ctx, q, "SELECT COUNT(*) FROM library_recommendations")
 		require.NoError(t, err)

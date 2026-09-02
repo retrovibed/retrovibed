@@ -1,6 +1,6 @@
 module github.com/retrovibed/retrovibed/shallows
 
-go 1.26.3
+go 1.27.0
 
 require (
 	github.com/Masterminds/squirrel v1.5.4

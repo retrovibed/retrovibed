@@ -13,7 +13,6 @@ import (
 	"github.com/egdaemon/wasinet/wasinet/wnetruntime"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/justinas/alice"
-	"github.com/linxGnu/pqueue"
 	"golang.org/x/crypto/ssh"
 	"golang.zx2c4.com/wireguard/tun/netstack"
 
@@ -41,6 +40,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/netx"
+	"github.com/retrovibed/retrovibed/shallows/internal/pqueuex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sshx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
@@ -162,18 +162,11 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	)
 
 	// initialize queue directories
-	err = fsx.MkDirs(
-		0700,
-		mediarecsdir,
-	)
+	mediarecs, err := pqueuex.New(mediarecsdir)
 	if err != nil {
-		return errorsx.Wrap(err, "unable to create queues dir")
+		return err
 	}
 
-	mediarecs, err := pqueue.New(mediarecsdir, 32)
-	if err != nil {
-		return errorsx.Wrap(err, "unable to create media recs queue")
-	}
 	_ = mediarecs
 
 	gctx.Cleanup.Add(1)
@@ -396,7 +389,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	}
 
 	if t.AutoRecommendations {
-		errorsx.Log(RecommendationsBackground(gctx.Context, db, plugins, t.DiscoverySeed))
+		errorsx.Log(media.RecommendationsBackground(gctx.Context, t.DiscoverySeed, db, mediarecs, plugins))
 	} else {
 		log.Println("auto recommendations is disabled")
 	}
@@ -467,7 +460,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		media.HTTPDiscoveredOptionRootStorage(rootstore),
 		media.HTTPDiscoveredOptionQueryCleaner(mc),
 	).Bind(httpmux.PathPrefix("/d").Subrouter())
-	media.NewHTTPRecommendations(db).Bind(httpmux.PathPrefix("/r").Subrouter())
+	media.NewHTTPRecommendations(db, mediarecs).Bind(httpmux.PathPrefix("/r").Subrouter())
 	media.NewHTTPSimilar(db).Bind(httpmux.PathPrefix("/similar").Subrouter())
 	media.NewHTTPRecent(db).Bind(httpmux.PathPrefix("/w").Subrouter())
 	mediaapi.NewHTTPRemoteControl(t.RemoteControl).Bind(httpmux.PathPrefix("/rc").Subrouter())

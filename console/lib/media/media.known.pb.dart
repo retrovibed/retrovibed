@@ -1311,7 +1311,21 @@ class RecommendationDeleteResponse extends $pb.GeneratedMessage {
 }
 
 class RecommendationRefreshRequest extends $pb.GeneratedMessage {
-  factory RecommendationRefreshRequest() => create();
+  factory RecommendationRefreshRequest({
+    $core.String? profileId,
+    $fixnum.Int64? limit,
+    $core.String? mimetype,
+    $core.bool? adult,
+    $core.String? language,
+  }) {
+    final result = create();
+    if (profileId != null) result.profileId = profileId;
+    if (limit != null) result.limit = limit;
+    if (mimetype != null) result.mimetype = mimetype;
+    if (adult != null) result.adult = adult;
+    if (language != null) result.language = language;
+    return result;
+  }
 
   RecommendationRefreshRequest._();
 
@@ -1326,6 +1340,12 @@ class RecommendationRefreshRequest extends $pb.GeneratedMessage {
       _omitMessageNames ? '' : 'RecommendationRefreshRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
       createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'profile_id')
+    ..a<$fixnum.Int64>(2, _omitFieldNames ? '' : 'limit', $pb.PbFieldType.OU6,
+        defaultOrMaker: $fixnum.Int64.ZERO)
+    ..aOS(3, _omitFieldNames ? '' : 'mimetype')
+    ..aOB(4, _omitFieldNames ? '' : 'adult')
+    ..aOS(5, _omitFieldNames ? '' : 'language')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1349,16 +1369,55 @@ class RecommendationRefreshRequest extends $pb.GeneratedMessage {
   static RecommendationRefreshRequest getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<RecommendationRefreshRequest>(create);
   static RecommendationRefreshRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get profileId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set profileId($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasProfileId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearProfileId() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $fixnum.Int64 get limit => $_getI64(1);
+  @$pb.TagNumber(2)
+  set limit($fixnum.Int64 value) => $_setInt64(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasLimit() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearLimit() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get mimetype => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set mimetype($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasMimetype() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearMimetype() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.bool get adult => $_getBF(3);
+  @$pb.TagNumber(4)
+  set adult($core.bool value) => $_setBool(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasAdult() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearAdult() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.String get language => $_getSZ(4);
+  @$pb.TagNumber(5)
+  set language($core.String value) => $_setString(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasLanguage() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearLanguage() => $_clearField(5);
 }
 
 class RecommendationRefreshResponse extends $pb.GeneratedMessage {
-  factory RecommendationRefreshResponse({
-    Known? recommendation,
-  }) {
-    final result = create();
-    if (recommendation != null) result.recommendation = recommendation;
-    return result;
-  }
+  factory RecommendationRefreshResponse() => create();
 
   RecommendationRefreshResponse._();
 
@@ -1373,8 +1432,6 @@ class RecommendationRefreshResponse extends $pb.GeneratedMessage {
       _omitMessageNames ? '' : 'RecommendationRefreshResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
       createEmptyInstance: create)
-    ..aOM<Known>(1, _omitFieldNames ? '' : 'recomendation',
-        protoName: 'recommendation', subBuilder: Known.create)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1398,17 +1455,6 @@ class RecommendationRefreshResponse extends $pb.GeneratedMessage {
   static RecommendationRefreshResponse getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<RecommendationRefreshResponse>(create);
   static RecommendationRefreshResponse? _defaultInstance;
-
-  @$pb.TagNumber(1)
-  Known get recommendation => $_getN(0);
-  @$pb.TagNumber(1)
-  set recommendation(Known value) => $_setField(1, value);
-  @$pb.TagNumber(1)
-  $core.bool hasRecommendation() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearRecommendation() => $_clearField(1);
-  @$pb.TagNumber(1)
-  Known ensureRecommendation() => $_ensure(0);
 }
 
 const $core.bool _omitFieldNames =

@@ -1,6 +1,6 @@
 module github.com/retrovibed/retrovibed/retroapi
 
-go 1.26.3
+go 1.27.0
 
 require (
 	github.com/alecthomas/kong v1.16.0
