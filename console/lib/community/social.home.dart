@@ -5,14 +5,20 @@ import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/library.dart' as lib;
 import 'package:retrovibed/media.dart' as media;
 import 'api.dart';
+import 'socials.row.dart';
 
-// Lists the account's communities with a toggle per catalog publisher
-// (YouTube/Spotify/Instagram/X/etc), so a community owner can pick which
+// Lists the account's communities, each with Photo/Video/Library/Info
+// buttons; Info expands a per-community toggle per catalog publisher
+// (YouTube/Spotify/Instagram/X/etc) so a community owner can pick which
 // platforms it publishes to. Actually publishing is not wired up yet.
+// The grid itself is driven by the general community search; the socials
+// search endpoint only supplies the catalog + enabled-publisher data shown
+// in the expanded Info details.
 class SocialHome extends StatefulWidget {
   final ValueNotifier<media.SearchMode> mode;
   final void Function(media.SearchMode) onModeChanged;
-  final FnSocialsSearch search;
+  final FnCommunitySearch search;
+  final FnSocialsSearch details;
   final FnSocialsEnable enable;
   final FnSocialsDisable disable;
 
@@ -20,7 +26,8 @@ class SocialHome extends StatefulWidget {
     super.key,
     required this.mode,
     required this.onModeChanged,
-    this.search = socials.search,
+    this.search = communities.search,
+    this.details = socials.search,
     this.enable = socials.enable,
     this.disable = socials.disable,
   });
@@ -30,12 +37,18 @@ class SocialHome extends StatefulWidget {
 }
 
 class _SocialHomeState extends State<SocialHome> with ds.LoadingState {
-  SocialsSearchResponse _resp = SocialsSearchResponse();
+  CommunitySearchResponse _resp = CommunitySearchResponse(
+    next: CommunitySearchRequest(
+      offset: ds.Int64(0),
+      limit: ds.Int64(20),
+    ),
+  );
+  String _focused = '';
 
   Future<void> _refresh() {
     setState(() => loading = true);
     return httpx
-        .withRetry(() => widget.search(options: [authn.request(authn.AuthzCache.meta(context))]))
+        .withRetry(() => widget.search(_resp.next, options: [authn.request(authn.AuthzCache.meta(context))]))
         .then((response) {
           setState(() {
             _resp = response;
@@ -59,104 +72,85 @@ class _SocialHomeState extends State<SocialHome> with ds.LoadingState {
 
   @override
   Widget build(BuildContext context) {
-    return ds.Table<CommunitySocial>(
-      loading: loading,
-      cause: cause,
-      children: _resp.items,
-      empty: const Center(child: Text('No communities found')),
-      leading: ds.CompactingMenu.pinned(
-        lib.DropdownUpload(
-          icon: const Icon(Icons.share),
-          help: ds.Hint(const Text("switch to library, discover, or downloads mode")),
-          items: [
-            media.SearchModeToggle(
-              mode: media.SearchMode.library,
-              current: widget.mode,
-              icon: Icons.video_library,
-              label: "Library",
-              onSelect: widget.onModeChanged,
-            ),
-            media.SearchModeToggle(
-              mode: media.SearchMode.discovery,
-              current: widget.mode,
-              icon: Icons.travel_explore,
-              label: "Discover",
-              onSelect: widget.onModeChanged,
-            ),
-            media.SearchModeToggle(
-              mode: media.SearchMode.downloads,
-              current: widget.mode,
-              icon: Icons.download,
-              label: "Downloads",
-              onSelect: widget.onModeChanged,
+    final defaults = ds.Defaults.of(context);
+
+    return Column(
+      verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
+      children: [
+        ds.SearchTray(
+          autoscroll: true,
+          autofocus: defaults.desktop,
+          decoration: const InputDecoration(hintText: "search communities"),
+          onSubmitted: (v) {
+            setState(() {
+              _resp.next
+                ..query = v
+                ..offset = ds.Int64(0);
+            });
+            return _refresh();
+          },
+          next: (i) {
+            setState(() {
+              _resp.next.offset = i;
+            });
+            _refresh();
+          },
+          current: _resp.next.offset,
+          empty: ds.Int64(_resp.items.length) < _resp.next.limit,
+          leading: [
+            ds.CompactingMenu.pinned(
+              lib.DropdownUpload(
+                icon: const Icon(Icons.share),
+                help: ds.Hint(const Text("switch to library, discover, or downloads mode")),
+                items: [
+                  media.SearchModeToggle(
+                    mode: media.SearchMode.library,
+                    current: widget.mode,
+                    icon: Icons.video_library,
+                    label: "Library",
+                    onSelect: widget.onModeChanged,
+                  ),
+                  media.SearchModeToggle(
+                    mode: media.SearchMode.discovery,
+                    current: widget.mode,
+                    icon: Icons.travel_explore,
+                    label: "Discover",
+                    onSelect: widget.onModeChanged,
+                  ),
+                  media.SearchModeToggle(
+                    mode: media.SearchMode.downloads,
+                    current: widget.mode,
+                    icon: Icons.download,
+                    label: "Downloads",
+                    onSelect: widget.onModeChanged,
+                  ),
+                ],
+              ),
             ),
           ],
+          help: ds.Hint(const Text("search for communities to publish to")),
         ),
-      ),
-      ds.Table.expanded<CommunitySocial>(
-        (v) => SocialCommunityRow(
-          social: v,
-          catalog: _resp.catalog,
-          enable: widget.enable,
-          disable: widget.disable,
-          onChanged: _refresh,
+        Expanded(
+          child: ds.Grid<Community>(
+            (context, v) => SocialCommunityRow(
+              community: v,
+              details: widget.details,
+              enable: widget.enable,
+              disable: widget.disable,
+              focused: v.id == _focused,
+              onInfo: () => setState(() {
+                _focused = _focused == v.id ? '' : v.id;
+              }),
+            ),
+            children: _resp.items,
+            loading: loading,
+            cause: cause,
+            aspectRatio: 3 / 2,
+            maxCrossAxisExtent: 420,
+            empty: const Center(child: Text('No communities found')),
+          ),
         ),
-      ),
-    );
-  }
-}
-
-class SocialCommunityRow extends StatelessWidget {
-  final CommunitySocial social;
-  final List<PluginPublisher> catalog;
-  final FnSocialsEnable enable;
-  final FnSocialsDisable disable;
-  final VoidCallback onChanged;
-
-  const SocialCommunityRow({
-    super.key,
-    required this.social,
-    required this.catalog,
-    required this.enable,
-    required this.disable,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final defaults = ds.Defaults.of(context);
-    final enabledIds = social.enabled.map((e) => e.publisherId).toSet();
-
-    return ds.Container(
-      padding: defaults.padding,
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            social.community.description.isNotEmpty ? social.community.description : social.community.url,
-            style: Theme.of(context).textTheme.titleSmall,
-          ),
-          const SizedBox(height: 4),
-          Wrap(
-            spacing: 8,
-            runSpacing: 4,
-            children: catalog.map((p) {
-              final enabled = enabledIds.contains(p.id);
-              return FilterChip(
-                label: Text(p.description.isNotEmpty ? p.description : p.mimetype),
-                selected: enabled,
-                onSelected: (v) {
-                  final auth = [authn.request(authn.AuthzCache.meta(context))];
-                  final fut = v
-                      ? enable(social.community.id, p.id, options: auth)
-                      : disable(social.community.id, p.id, options: auth);
-                  httpx.withRetry(() => fut).then((_) => onChanged());
-                },
-              );
-            }).toList(),
-          ),
-        ],
-      ),
+      ],
     );
   }
 }

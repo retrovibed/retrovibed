@@ -13,6 +13,7 @@ class Card extends material.StatelessWidget {
   final material.EdgeInsets margin;
   final material.EdgeInsets? padding;
   final material.FlexFit fit;
+  final material.MainAxisSize mainAxisSize;
   final List<material.BoxShadow> tint;
 
   final material.GestureTapCallback? onTap;
@@ -32,6 +33,7 @@ class Card extends material.StatelessWidget {
     this.padding,
     this.tint = const [],
     this.fit = material.FlexFit.loose,
+    this.mainAxisSize = material.MainAxisSize.min,
     this.alignment,
     this.constraints,
     this.help = ds.HelpScope.None,
@@ -61,7 +63,7 @@ class Card extends material.StatelessWidget {
               decoration: material.BoxDecoration(boxShadow: tint),
               child: material.Column(
                 spacing: defaults.spacing / 2.5,
-                mainAxisSize: material.MainAxisSize.min,
+                mainAxisSize: mainAxisSize,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   ...leading,

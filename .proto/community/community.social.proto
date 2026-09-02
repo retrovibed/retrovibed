@@ -27,7 +27,8 @@ message CommunitySocial {
 }
 
 message SocialsSearchRequest {
-  reserved 1 to 899;
+  string query = 1 [ json_name = "query" ];
+  reserved 2 to 899;
   uint64 offset = 900 [ json_name = "offset" ];
   uint64 limit = 901 [ json_name = "limit" ];
   reserved 902 to 999;

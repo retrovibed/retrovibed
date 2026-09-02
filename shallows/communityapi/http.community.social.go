@@ -1,21 +1,25 @@
 package communityapi
 
 import (
-	"database/sql"
-	"errors"
 	"log"
 	"net/http"
 
+	"github.com/Masterminds/squirrel"
+	"github.com/go-playground/form/v4"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
 	"github.com/retrovibed/retrovibed/retroapi/httpauth"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/community"
+	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/formx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
+	"github.com/retrovibed/retrovibed/shallows/internal/lucenex"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
+	"github.com/retrovibed/retrovibed/shallows/internal/numericx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 )
@@ -32,6 +36,8 @@ func NewHTTPSocial(q sqlx.Queryer, options ...HTTPSocialOption) *HTTPSocial {
 	svc := langx.Clone(HTTPSocial{
 		q:         q,
 		jwtsecret: env.JWTSecret,
+		decoder:   formx.NewDecoder(),
+		lucene:    duckdbx.NewLucene(),
 	}, options...)
 
 	return &svc
@@ -40,6 +46,8 @@ func NewHTTPSocial(q sqlx.Queryer, options ...HTTPSocialOption) *HTTPSocial {
 type HTTPSocial struct {
 	q         sqlx.Queryer
 	jwtsecret jwtx.SecretSource
+	decoder   *form.Decoder
+	lucene    lucenex.Driver
 }
 
 func (t *HTTPSocial) Bind(r *mux.Router) {
@@ -48,6 +56,7 @@ func (t *HTTPSocial) Bind(r *mux.Router) {
 	r.Path("/").Methods(http.MethodGet).Handler(alice.New(
 		httpx.RouteInvoked,
 		httpx.ContextBufferPool512(),
+		httpx.ParseForm,
 		httpauth.AuthenticateWithToken(t.jwtsecret),
 		httpx.Timeout2s(),
 	).ThenFunc(t.search))
@@ -70,6 +79,14 @@ func (t *HTTPSocial) Bind(r *mux.Router) {
 // console can render the available toggles.
 func (t *HTTPSocial) search(w http.ResponseWriter, r *http.Request) {
 	var resp SocialsSearchResponse
+	resp.Next = &SocialsSearchRequest{Limit: 100}
+
+	if err := t.decoder.Decode(resp.Next, r.Form); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to decode search request"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		return
+	}
+	resp.Next.Limit = numericx.Min(resp.Next.Limit, 100)
 
 	_, pid, err := httpauth.IssuerSubjectID(r.Context(), t.jwtsecret, r)
 	if err != nil {
@@ -89,7 +106,15 @@ func (t *HTTPSocial) search(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	communities := community.CommunityFindByAccountID(r.Context(), t.q, pid)
+	communities := community.CommunitySearch(r.Context(), t.q, community.CommunitySearchBuilder().
+		Distinct().
+		Join("community_publisher ON community_publisher.community_id = community.id").
+		Where(
+			squirrel.And{
+				squirrel.Eq{"community.account_id": pid},
+				lucenex.Query(t.lucene, resp.Next.Query, lucenex.WithDefaultField("description")),
+			},
+		).Offset(resp.Next.Offset*resp.Next.Limit).Limit(resp.Next.Limit))
 	qi := sqlx.Scan(communities)
 	for c := range qi.Iter() {
 		social := NewCommunitySocial(func(s *CommunitySocial) {
@@ -148,24 +173,24 @@ func (t *HTTPSocial) enable(w http.ResponseWriter, r *http.Request) {
 }
 
 func (t *HTTPSocial) disable(w http.ResponseWriter, r *http.Request) {
-	var existing community.CommunityPublisher
+	// var existing community.CommunityPublisher
 
-	vars := mux.Vars(r)
+	// vars := mux.Vars(r)
 
-	err := community.CommunityPublisherDeleteByCommunityIDAndPublisherID(r.Context(), t.q, vars["communityId"], vars["publisherId"]).Scan(&existing)
-	if errors.Is(err, sql.ErrNoRows) {
-		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
-		return
-	} else if err != nil {
-		log.Println(errorsx.Wrap(err, "unable to disable publisher"))
-		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
-		return
-	}
+	// err := community.CommunityPublisherDeleteByCommunityIDAndPublisherID(r.Context(), t.q, vars["communityId"], vars["publisherId"]).Scan(&existing)
+	// if errors.Is(err, sql.ErrNoRows) {
+	// 	errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
+	// 	return
+	// } else if err != nil {
+	// 	log.Println(errorsx.Wrap(err, "unable to disable publisher"))
+	// 	errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+	// 	return
+	// }
 
-	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &CommunityPublisherDisableResponse{
-		Disabled: NewCommunityPublisher(CommunityPublisherOptionFromDB(langx.Clone(existing, timex.JSONSafeEncodeOption))),
-	}); err != nil {
-		log.Println(errorsx.Wrap(err, "unable to write response"))
-		return
-	}
+	// if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &CommunityPublisherDisableResponse{
+	// 	Disabled: NewCommunityPublisher(CommunityPublisherOptionFromDB(langx.Clone(existing, timex.JSONSafeEncodeOption))),
+	// }); err != nil {
+	// 	log.Println(errorsx.Wrap(err, "unable to write response"))
+	// 	return
+	// }
 }

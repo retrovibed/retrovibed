@@ -418,11 +418,18 @@ func CommunityPublisherFindByCommunityID(
 	gql = gql.Query(`SELECT ` + CommunityPublisherScannerStaticColumns + ` FROM community_publisher WHERE "community_id" = {communityID}`)
 }
 
-func CommunityPublisherDeleteByCommunityIDAndPublisherID(
+func CommunityPublisherFindByID(
 	gql genieql.Function,
-	pattern func(ctx context.Context, q sqlx.Queryer, communityID string, publisherID string) NewCommunityPublisherScannerStaticRow,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewCommunityPublisherScannerStaticRow,
 ) {
-	gql = gql.Query(`DELETE FROM community_publisher WHERE "community_id" = {communityID} AND "publisher_id" = {publisherID} RETURNING ` + CommunityPublisherScannerStaticColumns)
+	gql = gql.Query(`SELECT ` + CommunityPublisherScannerStaticColumns + ` FROM community_publisher WHERE "id" = {id}`)
+}
+
+func CommunityPublisherDeleteByID(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewCommunityPublisherScannerStaticRow,
+) {
+	gql = gql.Query(`DELETE FROM community_publisher WHERE "id" = {id} RETURNING ` + CommunityPublisherScannerStaticColumns)
 }
 
 func CommunityFindByAccountID(

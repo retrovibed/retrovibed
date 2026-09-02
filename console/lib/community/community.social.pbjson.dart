@@ -87,19 +87,20 @@ final $typed_data.Uint8List communitySocialDescriptor = $convert.base64Decode(
 const SocialsSearchRequest$json = {
   '1': 'SocialsSearchRequest',
   '2': [
+    {'1': 'query', '3': 1, '4': 1, '5': 9, '10': 'query'},
     {'1': 'offset', '3': 900, '4': 1, '5': 4, '10': 'offset'},
     {'1': 'limit', '3': 901, '4': 1, '5': 4, '10': 'limit'},
   ],
   '9': [
-    {'1': 1, '2': 900},
+    {'1': 2, '2': 900},
     {'1': 902, '2': 1000},
   ],
 };
 
 /// Descriptor for `SocialsSearchRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List socialsSearchRequestDescriptor = $convert.base64Decode(
-    'ChRTb2NpYWxzU2VhcmNoUmVxdWVzdBIXCgZvZmZzZXQYhAcgASgEUgZvZmZzZXQSFQoFbGltaX'
-    'QYhQcgASgEUgVsaW1pdEoFCAEQhAdKBgiGBxDoBw==');
+    'ChRTb2NpYWxzU2VhcmNoUmVxdWVzdBIUCgVxdWVyeRgBIAEoCVIFcXVlcnkSFwoGb2Zmc2V0GI'
+    'QHIAEoBFIGb2Zmc2V0EhUKBWxpbWl0GIUHIAEoBFIFbGltaXRKBQgCEIQHSgYIhgcQ6Ac=');
 
 @$core.Deprecated('Use socialsSearchResponseDescriptor instead')
 const SocialsSearchResponse$json = {

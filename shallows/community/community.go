@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/Masterminds/squirrel"
+	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/envx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
@@ -48,4 +49,14 @@ func CommunitySearchBuilder() squirrel.SelectBuilder {
 
 func CommunityQueryNotTombstoned() squirrel.Sqlizer {
 	return squirrel.Expr("community.tombstoned_at = 'infinity'")
+}
+
+// CommunityQueryAccountID matches communities owned by accountID; uuid.Nil
+// (i.e. unset) matches every community, applying no filter.
+func CommunityQueryAccountID(accountID string) squirrel.Sqlizer {
+	if accountID == uuid.Nil.String() {
+		return squirrelx.Noop{}
+	}
+
+	return squirrel.Eq{"community.account_id": accountID}
 }

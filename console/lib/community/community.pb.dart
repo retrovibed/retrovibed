@@ -266,11 +266,13 @@ class CommunitySearchRequest extends $pb.GeneratedMessage {
     $core.String? query,
     $fixnum.Int64? offset,
     $fixnum.Int64? limit,
+    $core.String? accountId,
   }) {
     final result = create();
     if (query != null) result.query = query;
     if (offset != null) result.offset = offset;
     if (limit != null) result.limit = limit;
+    if (accountId != null) result.accountId = accountId;
     return result;
   }
 
@@ -293,6 +295,7 @@ class CommunitySearchRequest extends $pb.GeneratedMessage {
         defaultOrMaker: $fixnum.Int64.ZERO)
     ..a<$fixnum.Int64>(3, _omitFieldNames ? '' : 'limit', $pb.PbFieldType.OU6,
         defaultOrMaker: $fixnum.Int64.ZERO)
+    ..aOS(4, _omitFieldNames ? '' : 'account_id')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -341,6 +344,16 @@ class CommunitySearchRequest extends $pb.GeneratedMessage {
   $core.bool hasLimit() => $_has(2);
   @$pb.TagNumber(3)
   void clearLimit() => $_clearField(3);
+
+  /// account to scope results to; uuid.Nil (unset) applies no filter.
+  @$pb.TagNumber(4)
+  $core.String get accountId => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set accountId($core.String value) => $_setString(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasAccountId() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearAccountId() => $_clearField(4);
 }
 
 class CommunitySearchResponse extends $pb.GeneratedMessage {

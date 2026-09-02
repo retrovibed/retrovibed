@@ -235,6 +235,7 @@ func (x *CommunitySocial) GetEnabled() []*CommunityPublisher {
 
 type SocialsSearchRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	Query         string                 `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
 	Offset        uint64                 `protobuf:"varint,900,opt,name=offset,proto3" json:"offset,omitempty"`
 	Limit         uint64                 `protobuf:"varint,901,opt,name=limit,proto3" json:"limit,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -269,6 +270,13 @@ func (x *SocialsSearchRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use SocialsSearchRequest.ProtoReflect.Descriptor instead.
 func (*SocialsSearchRequest) Descriptor() ([]byte, []int) {
 	return file_community_community_social_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *SocialsSearchRequest) GetQuery() string {
+	if x != nil {
+		return x.Query
+	}
+	return ""
 }
 
 func (x *SocialsSearchRequest) GetOffset() uint64 {
@@ -549,10 +557,11 @@ const file_community_community_social_proto_rawDesc = "" +
 	"updated_at\"\x94\x01\n" +
 	"\x0fCommunitySocial\x12=\n" +
 	"\tcommunity\x18\x01 \x01(\v2\x1f.retrovibed.community.CommunityR\tcommunity\x12B\n" +
-	"\aenabled\x18\x02 \x03(\v2(.retrovibed.community.CommunityPublisherR\aenabled\"U\n" +
-	"\x14SocialsSearchRequest\x12\x17\n" +
+	"\aenabled\x18\x02 \x03(\v2(.retrovibed.community.CommunityPublisherR\aenabled\"k\n" +
+	"\x14SocialsSearchRequest\x12\x14\n" +
+	"\x05query\x18\x01 \x01(\tR\x05query\x12\x17\n" +
 	"\x06offset\x18\x84\a \x01(\x04R\x06offset\x12\x15\n" +
-	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\x01\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"\xd5\x01\n" +
+	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\x02\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"\xd5\x01\n" +
 	"\x15SocialsSearchResponse\x12>\n" +
 	"\x04next\x18\x01 \x01(\v2*.retrovibed.community.SocialsSearchRequestR\x04next\x12;\n" +
 	"\x05items\x18\x02 \x03(\v2%.retrovibed.community.CommunitySocialR\x05items\x12?\n" +

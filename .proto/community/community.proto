@@ -34,7 +34,9 @@ message CommunitySearchRequest {
   string query = 1 [ json_name = "query" ];
   uint64 offset = 2 [ json_name = "offset" ];
   uint64 limit = 3 [ json_name = "limit" ];
-  reserved 4 to 999;
+  // account to scope results to; uuid.Nil (unset) applies no filter.
+  string account_id = 4 [ json_name = "account_id" ];
+  reserved 5 to 999;
 }
 
 message CommunitySearchResponse {

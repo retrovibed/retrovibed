@@ -90,17 +90,18 @@ const CommunitySearchRequest$json = {
     {'1': 'query', '3': 1, '4': 1, '5': 9, '10': 'query'},
     {'1': 'offset', '3': 2, '4': 1, '5': 4, '10': 'offset'},
     {'1': 'limit', '3': 3, '4': 1, '5': 4, '10': 'limit'},
+    {'1': 'account_id', '3': 4, '4': 1, '5': 9, '10': 'account_id'},
   ],
   '9': [
-    {'1': 4, '2': 1000},
+    {'1': 5, '2': 1000},
   ],
 };
 
 /// Descriptor for `CommunitySearchRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List communitySearchRequestDescriptor =
-    $convert.base64Decode(
-        'ChZDb21tdW5pdHlTZWFyY2hSZXF1ZXN0EhQKBXF1ZXJ5GAEgASgJUgVxdWVyeRIWCgZvZmZzZX'
-        'QYAiABKARSBm9mZnNldBIUCgVsaW1pdBgDIAEoBFIFbGltaXRKBQgEEOgH');
+final $typed_data.Uint8List communitySearchRequestDescriptor = $convert.base64Decode(
+    'ChZDb21tdW5pdHlTZWFyY2hSZXF1ZXN0EhQKBXF1ZXJ5GAEgASgJUgVxdWVyeRIWCgZvZmZzZX'
+    'QYAiABKARSBm9mZnNldBIUCgVsaW1pdBgDIAEoBFIFbGltaXQSHgoKYWNjb3VudF9pZBgEIAEo'
+    'CVIKYWNjb3VudF9pZEoFCAUQ6Ac=');
 
 @$core.Deprecated('Use communitySearchResponseDescriptor instead')
 const CommunitySearchResponse$json = {

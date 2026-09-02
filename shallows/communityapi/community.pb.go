@@ -236,10 +236,12 @@ func (x *Community) GetLastSyncAt() string {
 }
 
 type CommunitySearchRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Query         string                 `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
-	Offset        uint64                 `protobuf:"varint,2,opt,name=offset,proto3" json:"offset,omitempty"`
-	Limit         uint64                 `protobuf:"varint,3,opt,name=limit,proto3" json:"limit,omitempty"`
+	state  protoimpl.MessageState `protogen:"open.v1"`
+	Query  string                 `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
+	Offset uint64                 `protobuf:"varint,2,opt,name=offset,proto3" json:"offset,omitempty"`
+	Limit  uint64                 `protobuf:"varint,3,opt,name=limit,proto3" json:"limit,omitempty"`
+	// account to scope results to; uuid.Nil (unset) applies no filter.
+	AccountId     string `protobuf:"bytes,4,opt,name=account_id,proto3" json:"account_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -293,6 +295,13 @@ func (x *CommunitySearchRequest) GetLimit() uint64 {
 		return x.Limit
 	}
 	return 0
+}
+
+func (x *CommunitySearchRequest) GetAccountId() string {
+	if x != nil {
+		return x.AccountId
+	}
+	return ""
 }
 
 type CommunitySearchResponse struct {
@@ -923,11 +932,14 @@ const file_community_community_proto_rawDesc = "" +
 	"\x05adult\x18\x0f \x01(\bR\x05adult\x12 \n" +
 	"\vdefault_ttl\x18\x10 \x01(\x04R\vdefault_ttl\x12*\n" +
 	"\x10default_language\x18\x11 \x01(\tR\x10default_language\x12#\n" +
-	"\flast_sync_at\x18\xe8\a \x01(\tR\flast_sync_atJ\x04\b\a\x10\bJ\x05\b\x12\x10\xe8\a\"c\n" +
+	"\flast_sync_at\x18\xe8\a \x01(\tR\flast_sync_atJ\x04\b\a\x10\bJ\x05\b\x12\x10\xe8\a\"\x83\x01\n" +
 	"\x16CommunitySearchRequest\x12\x14\n" +
 	"\x05query\x18\x01 \x01(\tR\x05query\x12\x16\n" +
 	"\x06offset\x18\x02 \x01(\x04R\x06offset\x12\x14\n" +
-	"\x05limit\x18\x03 \x01(\x04R\x05limitJ\x05\b\x04\x10\xe8\a\"\x92\x01\n" +
+	"\x05limit\x18\x03 \x01(\x04R\x05limit\x12\x1e\n" +
+	"\n" +
+	"account_id\x18\x04 \x01(\tR\n" +
+	"account_idJ\x05\b\x05\x10\xe8\a\"\x92\x01\n" +
 	"\x17CommunitySearchResponse\x12@\n" +
 	"\x04next\x18\x01 \x01(\v2,.retrovibed.community.CommunitySearchRequestR\x04next\x125\n" +
 	"\x05items\x18\x02 \x03(\v2\x1f.retrovibed.community.CommunityR\x05items\"W\n" +

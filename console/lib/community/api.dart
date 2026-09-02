@@ -19,6 +19,12 @@ bool isStale(Community c, {Duration threshold = const Duration(hours: 1)}) {
 
 typedef FnSubscribe = Future<CommunitySubscribeResponse> Function(String communityId, {List<httpx.Option> options});
 
+typedef FnCommunitySearch =
+    Future<CommunitySearchResponse> Function(
+      CommunitySearchRequest req, {
+      List<httpx.Option> options,
+    });
+
 typedef FnPublishingSearch =
     Future<PublishedContentSearchResponse> Function(
       String id, {
@@ -137,7 +143,11 @@ class metrics {
   }
 }
 
-typedef FnSocialsSearch = Future<SocialsSearchResponse> Function({List<httpx.Option> options});
+typedef FnSocialsSearch =
+    Future<SocialsSearchResponse> Function(
+      SocialsSearchRequest req, {
+      List<httpx.Option> options,
+    });
 
 typedef FnSocialsEnable =
     Future<CommunityPublisherEnableResponse> Function(
@@ -154,12 +164,15 @@ typedef FnSocialsDisable =
     });
 
 class socials {
-  static Future<SocialsSearchResponse> search({
+  static Future<SocialsSearchResponse> search(
+    SocialsSearchRequest req, {
     List<httpx.Option> options = const [],
   }) async {
+    if (req.limit.isZero) req.limit = fixnum.Int64(100);
+
     return httpx
         .get(
-          Uri.https(httpx.host(), "/c/social/"),
+          Uri.https(httpx.host(), "/c/social/", httpx.params(req.toProto3Json())),
           options: [httpx.Accept.json, ...options],
         )
         .then((v) {
