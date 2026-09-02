@@ -95,7 +95,9 @@ class Retrovibed extends StatelessWidget {
         inputDecorationTheme: InputDecorationTheme(
           focusColor: Colors.transparent,
         ),
-        popupMenuTheme: PopupMenuThemeData(),
+        popupMenuTheme: PopupMenuThemeData(
+          mouseCursor: WidgetStateProperty.all(SystemMouseCursors.click),
+        ),
       ),
       themeMode: ThemeMode.dark,
       builder: (context, child) {

@@ -14,11 +14,12 @@ PopupMenuItem<String> SearchModeToggle({
   final selected = mode == current.value;
   return PopupMenuItem<String>(
     onTap: () => onSelect(selected ? SearchMode.library : mode),
-    child: ListTile(
-      leading: Icon(selected ? Icons.check : icon),
-      title: Text(label),
-      selected: selected,
-      hoverColor: Colors.transparent,
+    child: Row(
+      children: [
+        Icon(selected ? Icons.check : icon),
+        const SizedBox(width: 12),
+        Text(label),
+      ],
     ),
   );
 }
