@@ -39,9 +39,12 @@ func NewTombstonedCleanup(ctx context.Context, dir fsx.Virtual, q sqlx.Queryer) 
 
 // Moves archivable data from disk to cloud storage.
 func NewAutoArchive(ctx context.Context, c *http.Client, dir fsx.Virtual, q sqlx.Queryer, async *asyncx.Wakeup, archivedisk bool) error {
+	// nothing yet knows how to archive a folder: it has no bytes to upload, and the CAS
+	// row it would produce is keyed on the md5 of a body it does not have.
 	query := MetadataSearchBuilder().Where(squirrel.And{
 		MetadataQueryArchivable(),
 		MetadataQueryNotTombstoned(),
+		MetadataQueryIsDirectory(false),
 	})
 
 	log.Println("auto archive initiated")

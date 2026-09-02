@@ -10,6 +10,7 @@ import (
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/torrenttest"
+	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
@@ -217,5 +218,26 @@ func TestReindexRun(t *testing.T) {
 		var got library.Metadata
 		require.NoError(t, library.MetadataFindByID(ctx, db, lmd.ID).Scan(&got))
 		require.Equal(t, "unreachable", got.Description)
+	})
+
+	t.Run("folders are not media and never reach the reindex loop", func(t *testing.T) {
+		ctx := t.Context()
+		db := sqltestx.Metadatabase(t)
+		mediastore := fsx.DirVirtual(t.TempDir())
+
+		// the loop treats a nil torrent id as an unexpected state and logs it. a folder has
+		// no torrent by construction, so every folder would report as a defect.
+		dir := library.NewMetadata(
+			uuid.Must(uuid.NewV7()).String(),
+			library.MetadataOptionDescription("photos"),
+			library.MetadataOptionMimetype(mimex.Directory),
+		)
+		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, dir).Scan(&dir))
+
+		require.NoError(t, reindex{DryRun: false}.run(ctx, db, mediastore))
+
+		var got library.Metadata
+		require.NoError(t, library.MetadataFindByID(ctx, db, dir.ID).Scan(&got))
+		require.Equal(t, "photos", got.Description)
 	})
 }

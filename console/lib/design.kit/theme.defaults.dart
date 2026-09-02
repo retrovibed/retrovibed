@@ -34,6 +34,8 @@ class Defaults extends ThemeExtension<Defaults> {
     BorderSide(color: Color(0xFF000000)),
   );
   static const kCompact = 400.0;
+  static const kModalWidth = 0.9;
+  static const kModalHeight = 0.85;
 
   final bool? _desktop;
   final bool? _mobile;
@@ -49,6 +51,8 @@ class Defaults extends ThemeExtension<Defaults> {
   final List<BoxShadow>? _dangerTint;
   final List<BoxShadow>? _highlightTint;
   final double? _compact;
+  final double? _modalWidth;
+  final double? _modalHeight;
   final bool? _isCompact;
 
   bool get desktop => _desktop ?? kDesktop;
@@ -65,7 +69,21 @@ class Defaults extends ThemeExtension<Defaults> {
   List<BoxShadow> get dangerTint => _dangerTint ?? kDangerTint;
   List<BoxShadow> get highlightTint => _highlightTint ?? kHighlightTint;
   double get compact => _compact ?? kCompact;
+  double get modalWidth => _modalWidth ?? kModalWidth;
+  double get modalHeight => _modalHeight ?? kModalHeight;
   bool get isCompact => _isCompact ?? false;
+
+  // the box a modal may occupy. content that has to fit, rather than scroll, needs a
+  // bound: the modal node centers and scrolls whatever it is handed, so a child left
+  // unbounded renders at its natural size.
+  static BoxConstraints modal(BuildContext context) {
+    final defaults = Defaults.of(context);
+    final viewport = MediaQuery.sizeOf(context);
+    return BoxConstraints(
+      maxWidth: viewport.width * defaults.modalWidth,
+      maxHeight: viewport.height * defaults.modalHeight,
+    );
+  }
 
   // The constructor accepts nullable values to create partial instances.
   const Defaults({
@@ -83,6 +101,8 @@ class Defaults extends ThemeExtension<Defaults> {
     List<BoxShadow>? dangerTint,
     List<BoxShadow>? highlightTint,
     double? compact,
+    double? modalWidth,
+    double? modalHeight,
     bool? isCompact,
   }) : _spacing = spacing,
        _padding = padding,
@@ -98,6 +118,8 @@ class Defaults extends ThemeExtension<Defaults> {
        _desktop = desktop,
        _mobile = mobile,
        _compact = compact,
+       _modalWidth = modalWidth,
+       _modalHeight = modalHeight,
        _isCompact = isCompact;
 
   static Defaults of(BuildContext context) {
@@ -120,6 +142,8 @@ class Defaults extends ThemeExtension<Defaults> {
     bool? desktop,
     bool? mobile,
     double? compact,
+    double? modalWidth,
+    double? modalHeight,
     bool? isCompact,
   }) {
     return Defaults(
@@ -137,6 +161,8 @@ class Defaults extends ThemeExtension<Defaults> {
       desktop: desktop ?? _desktop,
       mobile: mobile ?? _mobile,
       compact: compact ?? _compact,
+      modalWidth: modalWidth ?? _modalWidth,
+      modalHeight: modalHeight ?? _modalHeight,
       isCompact: isCompact ?? _isCompact,
     );
   }
@@ -173,6 +199,8 @@ class Defaults extends ThemeExtension<Defaults> {
       desktop: other._desktop ?? _desktop,
       mobile: other._mobile ?? _mobile,
       compact: lerpDouble(_compact, other._compact, t),
+      modalWidth: lerpDouble(_modalWidth, other._modalWidth, t),
+      modalHeight: lerpDouble(_modalHeight, other._modalHeight, t),
       isCompact: other._isCompact ?? _isCompact,
     );
   }

@@ -11,6 +11,8 @@ const neural = "application/vnd.retrovibed.neural";
 const search = "application/vnd.retrovibed.discovery.search.module";
 const bittorrent = "application/x-bittorrent";
 const binary = "application/octet-stream";
+const directory = "inode/directory";
+const pdf = "application/pdf";
 
 final resolver = mimetype.MimeTypeResolver()..addMagicNumber([0x4F, 0x67, 0x67, 0x53], "video/ogg");
 
@@ -29,14 +31,13 @@ const icoimage = Icons.image;
 const icobinary = Icons.file_open_outlined;
 const icometadataarchive = Icons.live_tv;
 const iconneural = Icons.psychology;
+const icofolder = Icons.folder_outlined;
 
 String ext(String mime) {
   return mimetype.extensionFromMime(mime) ?? ".bin";
 }
 
-const List<String> folders = [
-  "inode/directory",
-];
+const List<String> folders = [directory];
 
 const List<String> videos = [
   "video/mp4",
@@ -139,6 +140,19 @@ bool isVideo(String mimetype) => mimetype.startsWith('video');
 bool isAudio(String mimetype) => mimetype.startsWith('audio');
 bool isImage(String mimetype) => mimetype.startsWith('image');
 
+// text the reader can render directly. the structured formats below are text on the wire
+// even though their mimetype does not say so.
+bool isText(String mimetype) =>
+    mimetype.startsWith('text') ||
+    const [
+      "application/json",
+      "application/xml",
+      "application/javascript",
+      "application/x-yaml",
+      "application/yaml",
+      "application/toml",
+    ].contains(mimetype);
+
 String category(List<String> mimes) {
   final sum = checksum(mimes);
   return switch (sum) {
@@ -170,6 +184,10 @@ class CategoryOptionsLabel extends StatelessWidget {
 }
 
 IconData icon(String mimetype) {
+  if (mimetype == directory) {
+    return icofolder;
+  }
+
   if (isVideo(mimetype)) {
     return icomovie;
   }

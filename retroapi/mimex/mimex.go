@@ -11,6 +11,8 @@ const (
 	Text        = "text"
 	Application = "application"
 
+	Directory = "inode/directory"
+
 	JSON                      = "application/json"
 	Binary                    = "application/octet-stream"
 	Bittorrent                = "application/x-bittorrent"

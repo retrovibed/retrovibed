@@ -11,6 +11,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/Masterminds/squirrel"
 	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
@@ -44,7 +45,12 @@ func (t exportJSONL) Run(gctx *cmdopts.Global) (err error) {
 func (t exportJSONL) run(ctx context.Context, db sqlx.Queryer, vfs fsx.Virtual, w io.Writer) error {
 	enc := json.NewEncoder(w)
 
-	q := library.MetadataSearchBuilder().Where(library.MetadataQueryNotTombstoned()).OrderBy("id ASC")
+	// export opens a block cache per row, which creates the directory it is given, so a
+	// folder row would leave junk on disk and emit a zero chunk entry.
+	q := library.MetadataSearchBuilder().Where(squirrel.And{
+		library.MetadataQueryNotTombstoned(),
+		library.MetadataQueryIsDirectory(false),
+	}).OrderBy("id ASC")
 	if t.KnownMedia != nil {
 		q = q.Where(library.MetadataQueryHasKnownMedia(*t.KnownMedia))
 	}

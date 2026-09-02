@@ -14,6 +14,7 @@ message Media {
   string known_media_id = 9 [ json_name = "known_media_id" ];
   string encryption_seed = 10 [ json_name = "encryption_seed" ];
   string uri = 11 [ json_name = "uri" ];
+  string directory_id = 12 [ json_name = "directory_id" ];
 }
 
 message MediaSearchRequest {

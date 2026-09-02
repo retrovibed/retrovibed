@@ -78,6 +78,12 @@ func MetadataOptionOffset(d uint64) MetadataOption {
 	}
 }
 
+func MetadataOptionDirectoryID(id string) MetadataOption {
+	return func(m *Metadata) {
+		m.DirectoryID = id
+	}
+}
+
 func MetadataOptionMimetype(s string) MetadataOption {
 	return func(m *Metadata) {
 		m.Mimetype = s
@@ -108,6 +114,7 @@ func MetadataOptionTestDefaults(p *Metadata) {
 	p.TorrentID = uuid.Nil.String()
 	p.KnownMediaID = uuid.Nil.String()
 	p.EncryptionSeed = uuid.Nil.String()
+	p.DirectoryID = uuid.Nil.String()
 	p.HiddenAt = timex.Inf()
 	p.Bytes = 16 * bytesx.KiB
 	p.Mimetype = mimex.Binary
@@ -131,6 +138,7 @@ func NewMetadata(id string, options ...func(*Metadata)) (m Metadata) {
 		ArchiveID:      uuid.Nil.String(),
 		KnownMediaID:   uuid.Nil.String(),
 		EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+		DirectoryID:    uuid.Nil.String(),
 		HiddenAt:       timex.Inf(),
 	}, options...)
 
@@ -163,6 +171,20 @@ func MetadataQueryTombstoned() squirrel.Sqlizer {
 
 func MetadataQueryByTorrentID(tid string) squirrel.Sqlizer {
 	return squirrel.Expr("library_metadata.torrent_id = ?", tid)
+}
+
+// scopes a listing to the contents of one directory.
+func MetadataQueryDirectoryID(id string) squirrel.Sqlizer {
+	return squirrel.Expr("library_metadata.directory_id = ?", id)
+}
+
+// selects, or excludes, the rows that are directories rather than content.
+func MetadataQueryIsDirectory(b bool) squirrel.Sqlizer {
+	if b {
+		return squirrel.Expr("library_metadata.mimetype = ?", mimex.Directory)
+	}
+
+	return squirrel.Expr("library_metadata.mimetype != ?", mimex.Directory)
 }
 
 func MetadataQueryHidden(b bool) squirrel.Sqlizer {

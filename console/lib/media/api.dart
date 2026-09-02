@@ -37,6 +37,12 @@ typedef FnDownloadWatch =
       List<httpx.Option> options,
     });
 
+typedef FnMediaDownload =
+    Future<http.StreamedResponse> Function(
+      String id, {
+      List<httpx.Option> options,
+    });
+
 typedef FnUploadRequest =
     Future<MediaUploadResponse> Function(
       http.MultipartRequest Function(http.MultipartRequest req) mkreq,

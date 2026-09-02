@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
@@ -14,6 +15,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
+	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/retrovibed/retrovibed/shallows/media"
@@ -720,4 +722,43 @@ func TestLibrarySearch(t *testing.T) {
 			require.Contains(t, item.Description, "example")
 		}
 	})
+
+	t.Run("directories never appear in the media grid", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		routes, token, q := testlibrary(t, ctx)
+
+		top := testdirectory(t, ctx, q, uuid.Nil.String(), "photos")
+		held := testfile(t, ctx, q, top.ID, "held.bin")
+		loose := testfile(t, ctx, q, uuid.Nil.String(), "loose.bin")
+
+		// a directory is organization rather than media. its contents still are.
+		result := testsearch(t, routes, token, &media.MediaSearchRequest{Limit: 10})
+		require.ElementsMatch(t, []string{held.ID, loose.ID}, testresultids(result))
+	})
+}
+
+func testsearch(t *testing.T, routes *mux.Router, token string, req *media.MediaSearchRequest) (result *media.MediaSearchResponse) {
+	result = &media.MediaSearchResponse{}
+	query, err := formx.NewEncoder().Encode(req)
+	require.NoError(t, err)
+
+	resp, hreq, err := httptestx.BuildRequestBytes(
+		http.MethodGet,
+		"/?"+query.Encode(),
+		nil,
+		httptestx.RequestOptionAuthorization(token),
+	)
+	require.NoError(t, err)
+
+	routes.ServeHTTP(resp, hreq)
+	require.Equal(t, http.StatusOK, resp.Result().StatusCode)
+	require.NoError(t, json.NewDecoder(resp.Body).Decode(result))
+
+	return result
+}
+
+func testresultids(result *media.MediaSearchResponse) []string {
+	return slicesx.MapTransform(func(m *media.Media) string { return m.Id }, result.Items...)
 }

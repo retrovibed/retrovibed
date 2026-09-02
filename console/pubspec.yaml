@@ -57,6 +57,7 @@ dependencies:
   qr_flutter: ^4.1.0
   mobile_scanner: 7.2.0
   flutter_svg: ^2.2.3
+  pdfrx: ^2.1.5
   _fe_analyzer_shared: ^93.0.0
   iso_duration_parser: ^1.1.1
   stream_transform: ^2.1.1

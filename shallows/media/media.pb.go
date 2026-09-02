@@ -34,6 +34,7 @@ type Media struct {
 	KnownMediaId   string                 `protobuf:"bytes,9,opt,name=known_media_id,proto3" json:"known_media_id,omitempty"`
 	EncryptionSeed string                 `protobuf:"bytes,10,opt,name=encryption_seed,proto3" json:"encryption_seed,omitempty"`
 	Uri            string                 `protobuf:"bytes,11,opt,name=uri,proto3" json:"uri,omitempty"`
+	DirectoryId    string                 `protobuf:"bytes,12,opt,name=directory_id,proto3" json:"directory_id,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -141,6 +142,13 @@ func (x *Media) GetEncryptionSeed() string {
 func (x *Media) GetUri() string {
 	if x != nil {
 		return x.Uri
+	}
+	return ""
+}
+
+func (x *Media) GetDirectoryId() string {
+	if x != nil {
+		return x.DirectoryId
 	}
 	return ""
 }
@@ -1773,7 +1781,7 @@ var File_media_media_proto protoreflect.FileDescriptor
 
 const file_media_media_proto_rawDesc = "" +
 	"\n" +
-	"\x11media/media.proto\x12\x05media\"\xcf\x02\n" +
+	"\x11media/media.proto\x12\x05media\"\xf3\x02\n" +
 	"\x05Media\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x12\x1a\n" +
@@ -1794,7 +1802,8 @@ const file_media_media_proto_rawDesc = "" +
 	"\x0eknown_media_id\x18\t \x01(\tR\x0eknown_media_id\x12(\n" +
 	"\x0fencryption_seed\x18\n" +
 	" \x01(\tR\x0fencryption_seed\x12\x10\n" +
-	"\x03uri\x18\v \x01(\tR\x03uri\"\xd1\x01\n" +
+	"\x03uri\x18\v \x01(\tR\x03uri\x12\"\n" +
+	"\fdirectory_id\x18\f \x01(\tR\fdirectory_id\"\xd1\x01\n" +
 	"\x12MediaSearchRequest\x12\x14\n" +
 	"\x05query\x18\x01 \x01(\tR\x05query\x12\x1c\n" +
 	"\tmimetypes\x18\x02 \x03(\tR\tmimetypes\x12\x14\n" +

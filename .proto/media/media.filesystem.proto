@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package media;
+
+import "media/media.proto";
+
+// the filesystem is its own surface. it shares the Media message with the library because
+// a folder and a file are both rows in library_metadata, but nothing else: reusing
+// MediaSearchRequest meant one message whose meaning changed with the presence of a field,
+// and one handler that had to serve two views.
+message FilesystemSearchRequest {
+  string query = 1 [ json_name = "query" ];
+  repeated string mimetypes = 2 [ json_name = "mimetypes" ];
+  bool hidden = 3 [ json_name = "hidden" ];
+  // the directory being listed. the zero uuid is the root of the library.
+  string directory_id = 4 [ json_name = "directory_id" ];
+  reserved 5 to 899;
+  uint64 offset = 900 [ json_name = "offset" ];
+  uint64 limit = 901 [ json_name = "limit" ];
+  reserved 902 to 999;
+}
+
+message FilesystemSearchResponse {
+  FilesystemSearchRequest next = 1 [ json_name = "next" ];
+  repeated Media items = 2 [ json_name = "items" ];
+  // the listed directory and its ancestors, root first. rides along with the listing so
+  // the path costs no second round trip.
+  repeated Media breadcrumb = 3 [ json_name = "breadcrumb" ];
+}
+
+message FilesystemCreateRequest {
+  string directory_id = 1 [ json_name = "directory_id" ];
+  string name = 2 [ json_name = "name" ];
+}
+message FilesystemCreateResponse { Media media = 1 [ json_name = "media" ]; }
+
+message FilesystemMoveRequest { string directory_id = 1 [ json_name = "directory_id" ]; }
+message FilesystemMoveResponse { Media media = 1 [ json_name = "media" ]; }
+
+message FilesystemDeleteResponse {
+  Media media = 1 [ json_name = "media" ];
+  // everything below the deleted directory went with it.
+  uint64 removed = 2 [ json_name = "removed", jstype = JS_STRING ];
+}

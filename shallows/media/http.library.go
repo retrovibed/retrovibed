@@ -224,6 +224,8 @@ func (t *HTTPLibrary) upload(w http.ResponseWriter, r *http.Request) {
 		buf    [bytesx.MiB]byte
 		copied = &iox.Copied{Result: new(uint64)}
 		mhash  = md5.New()
+		// the filesystem endpoint names a destination when it uploads into a directory.
+		directory = stringsx.FirstNonBlank(r.FormValue("directory_id"), uuid.Nil.String())
 	)
 
 	if f, fh, err = r.FormFile("content"); err != nil {
@@ -268,12 +270,25 @@ func (t *HTTPLibrary) upload(w http.ResponseWriter, r *http.Request) {
 		library.MetadataOptionMimetype(fh.Header.Get("Content-Type")),
 		library.MetadataOptionKnownMediaID(uuid.Max.String()),
 		library.MetadataOptionAutoDescription(library.NormalizedDescription(fh.Filename)),
+		library.MetadataOptionDirectoryID(directory),
 	)
 
 	if err = library.MetadataInsertWithDefaults(r.Context(), t.q, lmd).Scan(&lmd); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to record library metadata record"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
+	}
+
+	// id is the md5 of the content, so re-uploading a file that already exists conflicts
+	// onto the filed row, and directory_id is absent from that conflict clause
+	// so so a torrent completion or a filesystem rescan cannot flatten the library. a
+	// client that named a destination meant it, which makes the move this call site's job.
+	if stringsx.Present(r.FormValue("directory_id")) {
+		if err = library.MetadataMoveByID(r.Context(), t.q, lmd.ID, directory).Scan(&lmd); err != nil {
+			log.Println(errorsx.Wrap(err, "unable to file uploaded media"))
+			errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+			return
+		}
 	}
 
 	if err = os.RemoveAll(t.mediastorage.Path(lmd.ID)); err != nil && !os.IsNotExist(err) {
@@ -324,6 +339,7 @@ func (t *HTTPLibrary) random(w http.ResponseWriter, r *http.Request) {
 		q := library.MetadataSearchBuilder().Where(squirrel.And{
 			library.MetadataQueryHidden(req.Hidden),
 			library.MetadataQueryNotTombstoned(),
+			library.MetadataQueryIsDirectory(false),
 			library.MetadataQueryMimetypes(req.Mimetypes...),
 		}).Limit(req.Limit)
 
@@ -380,10 +396,13 @@ func (t *HTTPLibrary) search(w http.ResponseWriter, r *http.Request) {
 		ordering = "description ASC"
 	}
 
+	// a directory is organization rather than media and has no place in this grid; the
+	// filesystem endpoint is what lists them.
 	q := library.MetadataSearchBuilder().Where(squirrel.And{
 		library.MetadataQueryNotTombstoned(),
 		library.MetadataQueryHidden(msg.Next.Hidden),
 		library.MetadataQueryMimetypes(msg.Next.Mimetypes...),
+		library.MetadataQueryIsDirectory(false),
 		lucenex.Query(t.fts, msg.Next.Query, lucenex.WithDefaultField("auto_description")),
 	}).OrderBy(ordering).Offset(msg.Next.Offset * msg.Next.Limit).Limit(msg.Next.Limit)
 

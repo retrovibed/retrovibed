@@ -3,6 +3,11 @@ description: Bindings to a local daemon.
 output: "lib/retrovibed/gen.dart"
 headers:
   entry-points:
+    # darwin stages into its own subdirectory so a linux .so never reaches a macOS
+    # build; see DarwinLibDir in .eg/console/console.darwin.go. missing entry-points
+    # are skipped, which is already how the two relative depths above coexist.
+    - "../../.eg.cache/dev.native.libs/darwin/libretrovibed.h"
+    - "../.eg.cache/dev.native.libs/darwin/libretrovibed.h"
     - "../../.eg.cache/dev.native.libs/libretrovibed.h"
     - "../.eg.cache/dev.native.libs/libretrovibed.h"
 compiler-opts:

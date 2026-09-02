@@ -102,4 +102,40 @@ func TestMetadataInsertWithDefaults(t *testing.T) {
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, tmp).Scan(&tmp))
 		require.Equal(t, realID, tmp.KnownMediaID)
 	})
+
+	t.Run("upsert should not move a row into a directory", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+		db := sqltestx.Metadatabase(t)
+		var tmp library.Metadata
+
+		require.NoError(t, testx.Fake(&tmp, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID))
+		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, tmp).Scan(&tmp))
+		require.Equal(t, uuid.Nil.String(), tmp.DirectoryID)
+
+		// directory_id is absent from the conflict clause, so organization is the
+		// filesystem's to change and never a side effect of re-inserting content.
+		tmp = langx.Clone(tmp, library.MetadataOptionDirectoryID(uuid.Must(uuid.NewV7()).String()))
+		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, tmp).Scan(&tmp))
+		require.Equal(t, uuid.Nil.String(), tmp.DirectoryID)
+	})
+
+	t.Run("upsert should not overwrite a directory the user already chose", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+		db := sqltestx.Metadatabase(t)
+		var tmp library.Metadata
+
+		// id is the md5 of the content, so a torrent completion or a filesystem rescan
+		// re-inserts a row the user has already filed. an unguarded assignment here drags
+		// the whole library back into a flat pile.
+		directory := uuid.Must(uuid.NewV7()).String()
+		require.NoError(t, testx.Fake(&tmp, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID, library.MetadataOptionDirectoryID(directory)))
+		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, tmp).Scan(&tmp))
+		require.Equal(t, directory, tmp.DirectoryID)
+
+		tmp = langx.Clone(tmp, library.MetadataOptionDirectoryID(uuid.Nil.String()))
+		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, tmp).Scan(&tmp))
+		require.Equal(t, directory, tmp.DirectoryID)
+	})
 }
