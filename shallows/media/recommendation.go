@@ -8,6 +8,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 )
@@ -66,7 +67,7 @@ func RecommendationsFromPlugins(ctx context.Context, q sqlx.Queryer, plugins sea
 	seq := plugins.Recommend(ctx, []string{mimetype}, limit, lang, adult, false)
 
 	for imp := range seq.Each(ctx) {
-		d := ddisc.NewDiscoveredFromImport(imp, ddisc.DiscoveredOptionMimetype(imp.Mimetype))
+		d := ddisc.NewDiscoveredFromImport(imp, ddisc.DiscoveredOptionMimetype(langx.FirstNonZero(imp.Mimetype, mimetype)))
 
 		var rec library.Recommendation
 		if err := library.RecommendationInsertWithDefaults(ctx, q, ddisc.RecommendationFromDiscovered(d, library.RecommendationOptionSourceSearchPlugin)).Scan(&rec); err != nil {

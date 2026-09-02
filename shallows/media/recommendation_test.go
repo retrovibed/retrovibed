@@ -276,6 +276,23 @@ func TestRecommendationsFromPlugins(t *testing.T) {
 		require.Equal(t, "http://example.com/one.jpg", rec.Image)
 	})
 
+	t.Run("falls back to the requested mimetype when the import omits one", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		q := sqltestx.Metadatabase(t)
+
+		plugins := fakeRecommendPlugins{results: []*ddiscapi.Import{
+			{Uri: "magnet:?xt=urn:btih:8888888888888888888888888888888888888888&dn=one", Title: "one"},
+		}}
+
+		require.NoError(t, media.RecommendationsFromPlugins(ctx, q, plugins, mimex.Video, 5, "", false))
+
+		rec, err := sqlx.ScanOne(library.RecommendationSearch(ctx, q, library.RecommendationSearchBuilder()))
+		require.NoError(t, err)
+		require.Equal(t, mimex.Video, rec.Mimetype)
+	})
+
 	t.Run("dedups repeat recommendations of the same content", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()

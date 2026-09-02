@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"log"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -36,7 +35,6 @@ func (t RecommendationBackgroundWorker) Message(ctx context.Context, m []byte) (
 	log.Println("recommendations", decoded.Mimetype, "generation initiated")
 	defer log.Println("recommendations", decoded.Mimetype, "generation completed")
 
-	log.Println("DERP DERP", spew.Sdump(&decoded))
 	if _, err := Recommendation(ctx, t.q, decoded.Mimetype, decoded.Language, decoded.Adult); errorsx.Ignore(err, sql.ErrNoRows) != nil {
 		return errorsx.Wrap(err, "recommendations audio background failed to generate recommendation")
 	}
