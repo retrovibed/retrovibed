@@ -17,6 +17,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
 	"github.com/retrovibed/retrovibed/retroapi/deeppool"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
+	"github.com/retrovibed/retrovibed/retroapi/publishplugin"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
@@ -94,7 +95,7 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}))
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
-		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, fsx.DirVirtual(t.TempDir()), fsx.DirVirtual(t.TempDir()))
+		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, publishplugin.Unimplemented{}, nil, fsx.DirVirtual(t.TempDir()), fsx.DirVirtual(t.TempDir()))
 		require.NoError(t, err)
 		require.Empty(t, feeds.feeds)
 		require.Empty(t, mock.published)
@@ -134,7 +135,7 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}))
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
-		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, fsx.DirVirtual(t.TempDir()), fsx.DirVirtual(t.TempDir()))
+		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, publishplugin.Unimplemented{}, nil, fsx.DirVirtual(t.TempDir()), fsx.DirVirtual(t.TempDir()))
 		require.NoError(t, err)
 		require.Contains(t, feeds.feeds, communityID)
 		require.Len(t, mock.published, 1)
@@ -181,7 +182,7 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 		require.NoError(t, community.PublishedContentUpdatePublishedAt(ctx, q, pc.ID, time.Now()).Scan(&pc))
 
-		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, fsx.DirVirtual(t.TempDir()), fsx.DirVirtual(t.TempDir()))
+		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, publishplugin.Unimplemented{}, nil, fsx.DirVirtual(t.TempDir()), fsx.DirVirtual(t.TempDir()))
 		require.NoError(t, err)
 		require.Empty(t, feeds.feeds)
 		require.Empty(t, mock.published)
@@ -228,7 +229,7 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}))
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
-		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, fsx.DirVirtual(mediaDir), fsx.DirVirtual(torrentDir))
+		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, publishplugin.Unimplemented{}, nil, fsx.DirVirtual(mediaDir), fsx.DirVirtual(torrentDir))
 		require.NoError(t, err)
 		require.Contains(t, feeds.feeds, communityID)
 		require.Len(t, mock.published, 1)
@@ -279,7 +280,7 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}))
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
-		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, fsx.DirVirtual(mediaDir), fsx.DirVirtual(torrentDir))
+		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, publishplugin.Unimplemented{}, nil, fsx.DirVirtual(mediaDir), fsx.DirVirtual(torrentDir))
 		require.NoError(t, err)
 		require.Empty(t, feeds.feeds)
 		require.Empty(t, mock.published)
@@ -291,7 +292,7 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		archiveID := uuid.Must(uuid.NewV7()).String()
 		require.NoError(t, library.MetadataArchivedByID(ctx, q, libraryID, archiveID, 0).Scan(&lmd))
 
-		err = SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, fsx.DirVirtual(mediaDir), fsx.DirVirtual(torrentDir))
+		err = SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, publishplugin.Unimplemented{}, nil, fsx.DirVirtual(mediaDir), fsx.DirVirtual(torrentDir))
 		require.NoError(t, err)
 		require.Contains(t, feeds.feeds, communityID)
 		require.Len(t, mock.published, 1)
@@ -358,7 +359,7 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}))
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
-		err = SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, fsx.DirVirtual(mediaDir), fsx.DirVirtual(torrentDir))
+		err = SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, publishplugin.Unimplemented{}, nil, fsx.DirVirtual(mediaDir), fsx.DirVirtual(torrentDir))
 		require.NoError(t, err)
 		require.Contains(t, feeds.feeds, communityID)
 		require.Len(t, mock.published, 1)
@@ -401,7 +402,7 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}))
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
-		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, fsx.DirVirtual(t.TempDir()), fsx.DirVirtual(t.TempDir()))
+		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, publishplugin.Unimplemented{}, nil, fsx.DirVirtual(t.TempDir()), fsx.DirVirtual(t.TempDir()))
 		require.NoError(t, err)
 		require.Empty(t, feeds.feeds)
 		require.Empty(t, mock.published)
@@ -477,7 +478,7 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}))
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
-		err = SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, mvfs, tvfs)
+		err = SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, publishplugin.Unimplemented{}, nil, mvfs, tvfs)
 		require.NoError(t, err)
 
 		var afterSync tracking.Metadata
@@ -529,14 +530,14 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		mvfs := fsx.DirVirtual(mediaDir)
 		tvfs := fsx.DirVirtual(torrentDir)
 
-		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, mvfs, tvfs)
+		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, publishplugin.Unimplemented{}, nil, mvfs, tvfs)
 		require.NoError(t, err)
 
 		var afterFirst community.PublishedContent
 		require.NoError(t, community.PublishedContentFindByID(ctx, q, pc.ID).Scan(&afterFirst))
 		require.NotEmpty(t, afterFirst.MagnetURI)
 
-		err = SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, mvfs, tvfs)
+		err = SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, publishplugin.Unimplemented{}, nil, mvfs, tvfs)
 		require.NoError(t, err)
 
 		var afterSecond community.PublishedContent
@@ -586,7 +587,7 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 
 		mvfs := fsx.DirVirtual(mediaDir)
 		tvfs := fsx.DirVirtual(torrentDir)
-		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, mvfs, tvfs)
+		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, publishplugin.Unimplemented{}, nil, mvfs, tvfs)
 		require.NoError(t, err)
 
 		require.Equal(t, 1, sqltestx.Count(t, q, "SELECT COUNT(*) FROM torrents_metadata"))
@@ -598,7 +599,7 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 
 		require.NoError(t, library.MetadataUpdateDescriptionByID(ctx, q, libraryID, "description beta").Scan(&lmd))
 
-		err = SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, mvfs, tvfs)
+		err = SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, publishplugin.Unimplemented{}, nil, mvfs, tvfs)
 		require.NoError(t, err)
 
 		require.Equal(t, 1, sqltestx.Count(t, q, "SELECT COUNT(*) FROM torrents_metadata"))
@@ -642,7 +643,7 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}))
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
-		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, fsx.DirVirtual(t.TempDir()), fsx.DirVirtual(t.TempDir()))
+		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, publishplugin.Unimplemented{}, nil, fsx.DirVirtual(t.TempDir()), fsx.DirVirtual(t.TempDir()))
 		require.NoError(t, err)
 		require.Contains(t, feeds.feeds, communityID)
 		require.Empty(t, mock.published)
@@ -692,7 +693,7 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}))
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
-		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, fsx.DirVirtual(t.TempDir()), fsx.DirVirtual(t.TempDir()))
+		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, publishplugin.Unimplemented{}, nil, fsx.DirVirtual(t.TempDir()), fsx.DirVirtual(t.TempDir()))
 		require.NoError(t, err)
 		require.Contains(t, feeds.feeds, communityID)
 		require.Len(t, mock.published, 1)
@@ -734,7 +735,7 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}))
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
-		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, fsx.DirVirtual(t.TempDir()), fsx.DirVirtual(t.TempDir()))
+		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, publishplugin.Unimplemented{}, nil, fsx.DirVirtual(t.TempDir()), fsx.DirVirtual(t.TempDir()))
 		require.NoError(t, err)
 		require.Contains(t, feeds.feeds, communityID)
 		require.Len(t, mock.published, 1)
@@ -773,7 +774,7 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}))
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
-		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, fsx.DirVirtual(t.TempDir()), fsx.DirVirtual(t.TempDir()))
+		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, publishplugin.Unimplemented{}, nil, fsx.DirVirtual(t.TempDir()), fsx.DirVirtual(t.TempDir()))
 		require.NoError(t, err)
 		require.Empty(t, feeds.feeds)
 		require.Empty(t, mock.published)
@@ -826,7 +827,7 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}))
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
 
-		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, archiver, fsx.DirVirtual(mediaDir), fsx.DirVirtual(torrentDir))
+		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, publishplugin.Unimplemented{}, archiver, fsx.DirVirtual(mediaDir), fsx.DirVirtual(torrentDir))
 		require.NoError(t, err)
 		require.Contains(t, feeds.feeds, communityID)
 		require.Len(t, mock.published, 1)
@@ -901,7 +902,7 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 		}))
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc2).Scan(&pc2))
 
-		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, nil, fsx.DirVirtual(mediaDir), fsx.DirVirtual(torrentDir))
+		err := SyncPendingToDeeppool(ctx, q, http.DefaultClient, mock, feeds, publishplugin.Unimplemented{}, nil, fsx.DirVirtual(mediaDir), fsx.DirVirtual(torrentDir))
 		require.NoError(t, err)
 		require.Contains(t, feeds.feeds, communityID)
 

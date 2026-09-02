@@ -10,6 +10,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
+	"github.com/retrovibed/retrovibed/retroapi/publishplugin"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
@@ -29,9 +30,12 @@ func TestHTTPCommunityPublisherDelete(t *testing.T) {
 	q := sqltestx.Metadatabase(t)
 	dir := t.TempDir()
 
+	reg := testx.Must(publishplugin.NewRegistry(ctx, publishplugin.OptionConfigDir(t.TempDir()), publishplugin.OptionCacheDir(t.TempDir())))(t)
+
 	routes := mux.NewRouter()
 	communityapi.NewHTTPCommunityPublisher(
 		q,
+		reg,
 		communityapi.HTTPCommunityPublisherOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		communityapi.HTTPCommunityPublisherOptionDir(dir),
 	).Bind(routes.PathPrefix("/").Subrouter())
