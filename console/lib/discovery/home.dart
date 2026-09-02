@@ -44,7 +44,7 @@ class Home extends StatelessWidget {
           verticalDirection: compact ? VerticalDirection.up : VerticalDirection.down,
           children: [
             Recent(mimetype),
-            if (authn.developer(context).recommendations) Recommendations(mimetype),
+            Recommendations(mimetype),
             if (authn.developer(context).releases) NewReleases(mimetype),
           ],
         ),
