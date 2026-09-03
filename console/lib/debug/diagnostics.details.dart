@@ -102,7 +102,10 @@ class _DiagnosticsDetailsState extends State<DiagnosticsDetails> {
                   icon: const Icon(Icons.flag_circle_outlined),
                   tooltip: "clear flag cache",
                   onPressed: () async {
+                    print("clearing ${ds.Disclaimer.defaultcachedir().dir.path}");
                     ds.Disclaimer.defaultcachedir().clear();
+                    print("clearing ${ds.HelpAuto.cache().dir.path}");
+                    ds.HelpAuto.cache().clear();
                   },
                 ),
                 ds.LoadingIconButton(
