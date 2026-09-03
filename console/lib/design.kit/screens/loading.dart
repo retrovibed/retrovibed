@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import './../errors.dart' as errors;
+import '../errors.dart' as errors;
+import '../empty.dart';
+import '../debug.dart';
 import 'error.dart';
-import './overlay.dart' as s;
+import 'overlay.dart' as s;
 
 class Loading extends StatelessWidget {
   static const Widget Icon = const Center(
     child: const CircularProgressIndicator(
-      padding: EdgeInsets.symmetric(vertical: 2),
+      padding: EdgeInsets.all(4),
       backgroundColor: Color.fromARGB(0, 0, 0, 0),
       semanticsLabel: 'Linear progress indicator',
     ),
@@ -35,14 +37,17 @@ class Loading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Widget _overlay = (loading ? overlay : null) ?? const SizedBox();
+    final Widget _overlay = loading ? overlay : Empty;
+
     return ErrorScreen(
       cause: cause,
       s.Overlay(
         Visibility(
           visible: !loading,
           maintainState: maintainState,
-          child: child ?? const SizedBox(),
+          maintainAnimation: maintainState,
+          maintainSize: maintainState,
+          child: child ?? Empty,
         ),
         overlay: _overlay,
         borderRadius: borderRadius,

@@ -76,6 +76,48 @@ void main() {
       await tester.pump();
       expect(_TrackedWidgetState.active, contains('child'));
     });
+
+    // Regression test: the overlay used to collapse to the spinner's own
+    // intrinsic size while loading because Visibility only maintained the
+    // child's *state*, not its layout size, so the Stack it sits in shrank
+    // down as if the child had been removed from the tree.
+    testWidgets('maintainState:true preserves child layout size while loading', (
+      WidgetTester tester,
+    ) async {
+      const contentWidth = 200.0;
+      const contentHeight = 120.0;
+      await tester.pumpApp(
+        UnconstrainedBox(
+          child: ds.Loading(
+            const SizedBox(width: contentWidth, height: contentHeight),
+            loading: true,
+            maintainState: true,
+          ),
+        ),
+      );
+      await tester.pump();
+
+      expect(tester.getSize(find.byType(ds.Loading)), const Size(contentWidth, contentHeight));
+    });
+
+    testWidgets('maintainState:false collapses child layout size while loading', (
+      WidgetTester tester,
+    ) async {
+      const contentWidth = 200.0;
+      const contentHeight = 120.0;
+      await tester.pumpApp(
+        UnconstrainedBox(
+          child: ds.Loading(
+            const SizedBox(width: contentWidth, height: contentHeight),
+            loading: true,
+            maintainState: false,
+          ),
+        ),
+      );
+      await tester.pump();
+
+      expect(tester.getSize(find.byType(ds.Loading)), isNot(const Size(contentWidth, contentHeight)));
+    });
   });
 
   testWidgets(
