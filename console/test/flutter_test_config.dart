@@ -7,8 +7,10 @@ Future<void> testExecutable(FutureOr<void> Function() testMain) {
   // Only silence output when stdout isn't a terminal (e.g. piped to a file/
   // log collector) or we're running under CI (which often still reports a
   // terminal). When run directly in an interactive shell, leave
-  // print/debugPrint alone so local debugging still works.
-  final isCI = Platform.environment['CI'] != null;
+  // print/debugPrint alone so local debugging still works. CI can be set
+  // but empty (e.g. forwarded from a host that doesn't have it set), so
+  // check for a non-empty value rather than just presence in the map.
+  final isCI = (Platform.environment['CI'] ?? '').isNotEmpty;
   if (!stdout.hasTerminal || isCI) {
     // Flutter's own logging function (used by framework code and anyone
     // calling debugPrint directly) routes through this hook, so replacing
