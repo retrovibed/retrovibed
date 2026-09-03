@@ -18,11 +18,6 @@ class AutoHelp extends StatefulWidget {
 class _AutoHelpState extends State<AutoHelp> {
   static const String _cacheid = 'ftux';
 
-  void _done() {
-    ds.Disclaimer.acknowledge(_cacheid);
-    setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
     return ds.Disclaimer(
@@ -31,7 +26,12 @@ class _AutoHelpState extends State<AutoHelp> {
       overlay: ds.Masked(
         Center(
           child: SingleChildScrollView(
-            child: CommunityPicker(onDone: _done),
+            child: CommunityPicker(
+              onDone: () {
+                ds.Disclaimer.acknowledge(_cacheid);
+                setState(() {});
+              },
+            ),
           ),
         ),
       ),

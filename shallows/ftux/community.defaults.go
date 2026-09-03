@@ -15,18 +15,13 @@ func PrepareDefaultCommunities() (_ []*communityapi.Community, err error) {
 	encoded, err := fsx.AutoCached(userx.DefaultConfigDir(userx.DefaultRelRoot(), "default.communities.json"), func() ([]byte, error) {
 		return json.Marshal([]*communityapi.Community{
 			{
-				Id:          "00000000-0000-0000-0000-000000000001",
-				Description: "Retrovibed - test data",
-				Url:         community.CommunityURLFromDomain("vibed"),
-			},
-			{
-				Id:          "00000000-0000-0000-0000-000000000002",
+				Id:          "4b43c380-89e5-44f0-a5a1-c4e0b52a4bef",
 				Description: "Retrovibed - media metadata. posters, ratings, descriptions. (~3 GiB)",
 				Url:         community.CommunityURLFromDomain("media"),
 			},
 			{
-				Id:          "00000000-0000-0000-0000-000000000003",
-				Description: "Retroneural - enables various small AI driven functionality for retrovibed",
+				Id:          "e54c2d7b-70f9-41fb-92f7-eeb0968f4be4",
+				Description: "Retrovibed - neurals enabling various small AI driven functionality for retrovibed",
 				Url:         community.CommunityURLFromDomain("neurals"),
 			},
 		})
@@ -36,6 +31,5 @@ func PrepareDefaultCommunities() (_ []*communityapi.Community, err error) {
 	}
 
 	var out []*communityapi.Community
-	err = json.Unmarshal(encoded, &out)
-	return out, err
+	return out, json.Unmarshal(encoded, &out)
 }
