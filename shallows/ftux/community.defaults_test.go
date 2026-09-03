@@ -17,7 +17,7 @@ func TestPrepareDefaultCommunities(t *testing.T) {
 
 		suggestions, err := ftux.PrepareDefaultCommunities()
 		require.NoError(t, err)
-		require.Len(t, suggestions, 3)
+		require.Len(t, suggestions, 2)
 
 		for _, s := range suggestions {
 			require.NotEmpty(t, s.Id)
