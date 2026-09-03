@@ -62,7 +62,7 @@ func TestDiscoveredDownloading(t *testing.T) {
 		))
 		require.NoError(t, tracking.MetadataInsertWithDefaults(ctx, q, md90).Scan(&md90))
 		require.NoError(t, tracking.MetadataDownloadByID(ctx, q, md90.ID).Scan(&md90))
-		require.NoError(t, tracking.MetadataProgressByID(ctx, q, md90.ID, 0, md90.Bytes, 900).Scan(&md90))
+		require.NoError(t, tracking.MetadataProgressByID(ctx, q, md90.ID, 0, md90.Bytes, 900, 900).Scan(&md90))
 
 		require.NoError(t, testx.Fake(&md70, tracking.MetadataOptionTestDefaults,
 			tracking.MetadataOptionBytes(100),
@@ -71,7 +71,7 @@ func TestDiscoveredDownloading(t *testing.T) {
 		))
 		require.NoError(t, tracking.MetadataInsertWithDefaults(ctx, q, md70).Scan(&md70))
 		require.NoError(t, tracking.MetadataDownloadByID(ctx, q, md70.ID).Scan(&md70))
-		require.NoError(t, tracking.MetadataProgressByID(ctx, q, md70.ID, 0, md70.Bytes, 70).Scan(&md70))
+		require.NoError(t, tracking.MetadataProgressByID(ctx, q, md70.ID, 0, md70.Bytes, 70, 70).Scan(&md70))
 
 		require.NoError(t,
 			testx.Fake(
@@ -86,7 +86,7 @@ func TestDiscoveredDownloading(t *testing.T) {
 			))
 		require.NoError(t, tracking.MetadataInsertWithDefaults(ctx, q, md50).Scan(&md50))
 		require.NoError(t, tracking.MetadataDownloadByID(ctx, q, md50.ID).Scan(&md50))
-		require.NoError(t, tracking.MetadataProgressByID(ctx, q, md50.ID, 0, md50.Bytes, 50).Scan(&md50))
+		require.NoError(t, tracking.MetadataProgressByID(ctx, q, md50.ID, 0, md50.Bytes, 50, 50).Scan(&md50))
 
 		require.NoError(t, testx.Fake(&md10, tracking.MetadataOptionTestDefaults,
 			tracking.MetadataOptionBytes(10),
@@ -106,7 +106,7 @@ func TestDiscoveredDownloading(t *testing.T) {
 		))
 		require.NoError(t, tracking.MetadataInsertWithDefaults(ctx, q, mdFull1).Scan(&mdFull1))
 		require.NoError(t, tracking.MetadataDownloadByID(ctx, q, mdFull1.ID).Scan(&mdFull1))
-		require.NoError(t, tracking.MetadataProgressByID(ctx, q, mdFull1.ID, 0, mdFull1.Bytes, 1234).Scan(&mdFull1))
+		require.NoError(t, tracking.MetadataProgressByID(ctx, q, mdFull1.ID, 0, mdFull1.Bytes, 1234, 1234).Scan(&mdFull1))
 
 		require.NoError(t, testx.Fake(&mdFull2, tracking.MetadataOptionTestDefaults,
 			tracking.MetadataOptionBytes(2000),
@@ -116,7 +116,7 @@ func TestDiscoveredDownloading(t *testing.T) {
 		))
 		require.NoError(t, tracking.MetadataInsertWithDefaults(ctx, q, mdFull2).Scan(&mdFull2))
 		require.NoError(t, tracking.MetadataDownloadByID(ctx, q, mdFull2.ID).Scan(&mdFull2))
-		require.NoError(t, tracking.MetadataProgressByID(ctx, q, mdFull2.ID, 0, mdFull2.Bytes, 2000).Scan(&mdFull2))
+		require.NoError(t, tracking.MetadataProgressByID(ctx, q, mdFull2.ID, 0, mdFull2.Bytes, 2000, 2000).Scan(&mdFull2))
 
 		vfs := fsx.DirVirtual(t.TempDir())
 		routes := mux.NewRouter()

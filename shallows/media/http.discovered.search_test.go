@@ -342,8 +342,9 @@ func TestDiscoveredSearch(t *testing.T) {
 			tracking.MetadataOptionBytes(100),
 		))
 		require.NoError(t, tracking.MetadataInsertWithDefaults(ctx, q, mdCompleted).Scan(&mdCompleted))
-		require.NoError(t, tracking.MetadataCompleteByID(ctx, q, mdCompleted.ID, 0, mdCompleted.Bytes, mdCompleted.Bytes, 0).Scan(&mdCompleted))
+		require.NoError(t, tracking.MetadataCompleteByID(ctx, q, mdCompleted.ID, 0, mdCompleted.Bytes, mdCompleted.Bytes, 0, mdCompleted.Bytes).Scan(&mdCompleted))
 		require.EqualValues(t, mdCompleted.Bytes, mdCompleted.Downloaded)
+		require.EqualValues(t, mdCompleted.Bytes, mdCompleted.Available)
 		require.WithinDuration(t, time.Now(), mdCompleted.CompletedAt, time.Second)
 
 		vfs := fsx.DirVirtual(t.TempDir())
