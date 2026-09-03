@@ -21,9 +21,9 @@ override_dh_auto_build:
 	# builder rejects packages shipping files under /usr/local entirely, so
 	# that's not an option here.
 	GOFLAGS="-mod=vendor" GOCACHE="$(CURDIR)/.gocache" CGO_ENABLED=0 \
-		/usr/lib/go-1.26/bin/go build -C src -buildvcs=false -o "$(CURDIR)/linux/usr/bin/retrozsync" ./cmd/zsync
+		/usr/lib/go-1.27/bin/go build -C src -buildvcs=false -o "$(CURDIR)/linux/usr/bin/retrozsync" ./cmd/zsync
 	GOFLAGS="-mod=vendor" GOCACHE="$(CURDIR)/.gocache" CGO_ENABLED=0 \
-		/usr/lib/go-1.26/bin/go build -C src -buildvcs=false -o "$(CURDIR)/linux/usr/bin/retrozsyncmake" ./cmd/zsyncmake
+		/usr/lib/go-1.27/bin/go build -C src -buildvcs=false -o "$(CURDIR)/linux/usr/bin/retrozsyncmake" ./cmd/zsyncmake
 	tree $(CURDIR)/linux
 
 override_dh_auto_test:

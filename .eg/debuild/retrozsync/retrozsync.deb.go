@@ -45,7 +45,7 @@ func init() {
 		egdebuild.Option.Version(fmt.Sprintf("%s.:autopatch:", version)),
 		egdebuild.Option.Description("Go rewrite of zsync with HTTPS support", "installs retrozsync and retrozsyncmake built from github.com/cph6/zsync to /usr/bin"),
 		egdebuild.Option.Debian(errorsx.Must(fs.Sub(debskel, ".debskel"))),
-		egdebuild.Option.DependsBuild("golang-1.26", "tree"),
+		egdebuild.Option.DependsBuild("golang-1.27", "tree"),
 	)
 }
 

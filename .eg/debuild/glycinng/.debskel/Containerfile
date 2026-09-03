@@ -9,6 +9,6 @@ RUN add-apt-repository -n ppa:egdaemon/eg
 RUN add-apt-repository -n ppa:egdaemon/duckdb
 
 RUN echo "cache buster 4f1c7a3e-9b0d-4a2e-8f3a-6c2e1d9b7a42"
-RUN apt-get update && apt-get -y install golang-1.26 egworkload cargo rustc lld
+RUN apt-get update && apt-get -y install golang-1.27 egworkload cargo rustc lld
 
-RUN ln -s /usr/lib/go-1.26/bin/go /usr/local/bin/go
+RUN ln -s /usr/lib/go-1.27/bin/go /usr/local/bin/go
