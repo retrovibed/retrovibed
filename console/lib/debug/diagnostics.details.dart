@@ -99,6 +99,13 @@ class _DiagnosticsDetailsState extends State<DiagnosticsDetails> {
               children: [
                 Expanded(child: Text("Diagnostics", style: theme.textTheme.titleMedium)),
                 ds.LoadingIconButton(
+                  icon: const Icon(Icons.flag_circle_outlined),
+                  tooltip: "clear flag cache",
+                  onPressed: () async {
+                    ds.Disclaimer.defaultcachedir().clear();
+                  },
+                ),
+                ds.LoadingIconButton(
                   icon: const Icon(Icons.bug_report),
                   tooltip: "throw a test error",
                   onPressed: () async {

@@ -4,6 +4,7 @@ import 'package:crypto/crypto.dart';
 import 'package:path/path.dart' as path;
 
 import 'caching.dart';
+import 'dirs.dart';
 
 /// Filesystem-backed cache with no TTL. Entries persist until [clear] is called.
 ///
@@ -12,6 +13,7 @@ import 'caching.dart';
 ///   final v = c.maybe<bool>('my-key', () => false);
 ///   c.clear();
 class Dir {
+  static Dir cacheroot = Dir(Directory(global().cache));
   final Directory dir;
   final Codec codec;
 
