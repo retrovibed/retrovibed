@@ -129,7 +129,18 @@ class _DisplayState extends State<Display> {
               color: theme.colorScheme.surface,
             ),
             // ensure the single child scroll view exposes maximum vertical space.
-            SizedBox.expand(child: SingleChildScrollView(child: w)),
+            SizedBox.expand(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints: constraints,
+                      child: w,
+                    ),
+                  );
+                },
+              ),
+            ),
           ),
         );
       }),
