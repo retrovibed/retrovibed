@@ -78,26 +78,19 @@ class KnownMediaLocator extends StatefulWidget {
   State<StatefulWidget> createState() => _KnownMediaLocator();
 }
 
-class _KnownMediaLocator extends State<KnownMediaLocator> {
+class _KnownMediaLocator extends State<KnownMediaLocator> with ds.LoadingState {
   bool _queued = false;
-  bool _loading = false;
-  Widget _cause = ds.Error.zero;
 
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
-
-  void reseterr() {
-    setState(() {
-      _cause = ds.Error.zero;
-    });
+  @override
+  void initState() {
+    super.initState();
+    loading = false;
   }
 
   void _onTap() async {
     setState(() {
-      _loading = true;
-      _cause = ds.Error.zero;
+      loading = true;
+      cause = ds.Error.zero;
     });
 
     final options = [authn.request(authn.AuthzCache.meta(context))];
@@ -107,7 +100,7 @@ class _KnownMediaLocator extends State<KnownMediaLocator> {
         .then((proceed) {
           if (!proceed) {
             setState(() {
-              _loading = false;
+              loading = false;
             });
             return null;
           }
@@ -129,7 +122,7 @@ class _KnownMediaLocator extends State<KnownMediaLocator> {
                       widget.onChange(null);
                       setState(() {
                         _queued = true;
-                        _loading = false;
+                        loading = false;
                       });
                     }),
               );
@@ -152,7 +145,7 @@ class _KnownMediaLocator extends State<KnownMediaLocator> {
                       widget.onChange(null);
                       setState(() {
                         _queued = true;
-                        _loading = false;
+                        loading = false;
                       });
                     }),
               );
@@ -160,22 +153,22 @@ class _KnownMediaLocator extends State<KnownMediaLocator> {
         })
         .catchError((e) {
           setState(() {
-            _loading = false;
-            _cause = ds.Errors.httpauto(e, onTap: reseterr);
+            loading = false;
+            cause = ds.Errors.httpauto(e, onTap: reseterr);
           });
         }, test: httpx.ErrorsTest.httpauto)
         .catchError((e) {
           setState(() {
-            _loading = false;
-            _cause = ds.Error.unknown(e, onTap: reseterr);
+            loading = false;
+            cause = ds.Error.unknown(e, onTap: reseterr);
           });
         });
   }
 
   void _onPress() async {
     setState(() {
-      _loading = true;
-      _cause = ds.Error.zero;
+      loading = true;
+      cause = ds.Error.zero;
     });
 
     final options = [authn.request(authn.AuthzCache.meta(context))];
@@ -190,25 +183,25 @@ class _KnownMediaLocator extends State<KnownMediaLocator> {
         .then((v) {
           widget.onChange(null);
           setState(() {
-            _loading = false;
+            loading = false;
           });
         })
         .catchError((e) {
           widget.onChange(null);
           setState(() {
-            _loading = false;
+            loading = false;
           });
         }, test: httpx.ErrorsTest.err404)
         .catchError((e) {
           setState(() {
-            _loading = false;
-            _cause = ds.Errors.httpauto(e, onTap: reseterr);
+            loading = false;
+            cause = ds.Errors.httpauto(e, onTap: reseterr);
           });
         }, test: httpx.ErrorsTest.httpauto)
         .catchError((e) {
           setState(() {
-            _loading = false;
-            _cause = ds.Error.unknown(e, onTap: reseterr);
+            loading = false;
+            cause = ds.Error.unknown(e, onTap: reseterr);
           });
         });
   }
@@ -216,14 +209,14 @@ class _KnownMediaLocator extends State<KnownMediaLocator> {
   @override
   Widget build(BuildContext context) {
     return ds.Loading(
-      loading: _loading,
-      cause: _cause,
+      loading: loading,
+      cause: cause,
       KnownMediaCard(
         widget.current,
         icon: _queued ? Icons.query_builder_rounded : widget.icon,
         help: widget.help,
-        onTap: _loading || _queued ? null : _onTap,
-        onLongPress: _loading ? null : _onPress,
+        onTap: loading || _queued ? null : _onTap,
+        onLongPress: loading ? null : _onPress,
         leading: widget.leading,
         trailing: widget.trailing,
       ),
