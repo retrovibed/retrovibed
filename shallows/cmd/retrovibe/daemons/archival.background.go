@@ -2,11 +2,13 @@ package daemons
 
 import (
 	"context"
+	"database/sql"
 	"log"
 	"net/http"
 	"time"
 
 	"github.com/retrovibed/retrovibed/retroapi/backoffx"
+	"github.com/retrovibed/retrovibed/shallows/backups"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/contextx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -24,6 +26,24 @@ func AutoArchival(ctx context.Context, q sqlx.Queryer, c *http.Client, mediastor
 	go asyncx.Periodic(ctx, async, s, "automatic archival initiated - next")
 	contextx.Run(ctx, func() {
 		errorsx.Log(library.NewAutoArchive(ctx, c, mediastore, q, async, archive))
+	})
+
+	return nil
+}
+
+func AutoBackup(ctx context.Context, db *sql.DB, c *http.Client, async *asyncx.Wakeup, device string, enabled bool) error {
+	s := backoffx.New(
+		backoffx.Constant(time.Hour),
+		backoffx.Jitter(0.1),
+	)
+
+	if !enabled {
+		log.Println("automatic backup is disabled - enabling dry-run")
+	}
+
+	go asyncx.Periodic(ctx, async, s, "automatic backup initiated - next")
+	contextx.Run(ctx, func() {
+		errorsx.Log(backups.NewAutoBackup(ctx, c, db, async, device, enabled))
 	})
 
 	return nil

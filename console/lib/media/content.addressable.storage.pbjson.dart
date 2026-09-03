@@ -265,3 +265,24 @@ const MediaDeleteResponse$json = {
 final $typed_data.Uint8List mediaDeleteResponseDescriptor = $convert.base64Decode(
     'ChNNZWRpYURlbGV0ZVJlc3BvbnNlEisKBW1lZGlhGAEgASgLMhUucmV0cm92aWJlZC5jYXMuTW'
     'VkaWFSBW1lZGlh');
+
+@$core.Deprecated('Use backupSeedRequestDescriptor instead')
+const BackupSeedRequest$json = {
+  '1': 'BackupSeedRequest',
+};
+
+/// Descriptor for `BackupSeedRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List backupSeedRequestDescriptor =
+    $convert.base64Decode('ChFCYWNrdXBTZWVkUmVxdWVzdA==');
+
+@$core.Deprecated('Use backupSeedResponseDescriptor instead')
+const BackupSeedResponse$json = {
+  '1': 'BackupSeedResponse',
+  '2': [
+    {'1': 'seed', '3': 1, '4': 1, '5': 9, '10': 'seed'},
+  ],
+};
+
+/// Descriptor for `BackupSeedResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List backupSeedResponseDescriptor = $convert
+    .base64Decode('ChJCYWNrdXBTZWVkUmVzcG9uc2USEgoEc2VlZBgBIAEoCVIEc2VlZA==');

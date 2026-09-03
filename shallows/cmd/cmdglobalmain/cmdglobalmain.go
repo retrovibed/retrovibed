@@ -127,6 +127,7 @@ func Main(args ...string) {
 			"env_auto_identify_media":           env.AutoIdentifyMedia,
 			"env_auto_locate_media":             env.AutoIdentifyMedia,
 			"env_auto_archive":                  env.AutoArchive,
+			"env_auto_backup":                   env.AutoBackup,
 			"env_auto_reclaim":                  env.AutoReclaim,
 			"vars_gdx_socket":                   gdxpath,
 			"vars_gdx_default_output":           "-",
