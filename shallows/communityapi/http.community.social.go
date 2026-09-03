@@ -173,24 +173,44 @@ func (t *HTTPSocial) enable(w http.ResponseWriter, r *http.Request) {
 }
 
 func (t *HTTPSocial) disable(w http.ResponseWriter, r *http.Request) {
-	// var existing community.CommunityPublisher
+	vars := mux.Vars(r)
+	communityID, publisherID := vars["communityId"], vars["publisherId"]
 
-	// vars := mux.Vars(r)
+	var (
+		existing community.CommunityPublisher
+		found    bool
+	)
 
-	// err := community.CommunityPublisherDeleteByCommunityIDAndPublisherID(r.Context(), t.q, vars["communityId"], vars["publisherId"]).Scan(&existing)
-	// if errors.Is(err, sql.ErrNoRows) {
-	// 	errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
-	// 	return
-	// } else if err != nil {
-	// 	log.Println(errorsx.Wrap(err, "unable to disable publisher"))
-	// 	errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
-	// 	return
-	// }
+	enabled := community.CommunityPublisherFindByCommunityID(r.Context(), t.q, communityID)
+	ei := sqlx.Scan(enabled)
+	for cp := range ei.Iter() {
+		if cp.PublisherID == publisherID {
+			existing = cp
+			found = true
+			break
+		}
+	}
+	if err := ei.Err(); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to disable publisher"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
 
-	// if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &CommunityPublisherDisableResponse{
-	// 	Disabled: NewCommunityPublisher(CommunityPublisherOptionFromDB(langx.Clone(existing, timex.JSONSafeEncodeOption))),
-	// }); err != nil {
-	// 	log.Println(errorsx.Wrap(err, "unable to write response"))
-	// 	return
-	// }
+	if !found {
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
+		return
+	}
+
+	if err := community.CommunityPublisherDeleteByID(r.Context(), t.q, existing.ID).Scan(&existing); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to disable publisher"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &CommunityPublisherDisableResponse{
+		Disabled: NewCommunityPublisher(CommunityPublisherOptionFromDB(langx.Clone(existing, timex.JSONSafeEncodeOption))),
+	}); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to write response"))
+		return
+	}
 }
