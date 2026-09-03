@@ -30,6 +30,7 @@ func TestLibraryMetadataIdentify(t *testing.T) {
 			TorrentID:      uuid.Nil.String(),
 			KnownMediaID:   uuid.Max.String(),
 			ArchiveID:      uuid.Nil.String(),
+			DirectoryID:    uuid.Nil.String(),
 			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
@@ -53,6 +54,7 @@ func TestLibraryMetadataIdentify(t *testing.T) {
 			TorrentID:      uuid.Nil.String(),
 			KnownMediaID:   uuid.Max.String(),
 			ArchiveID:      uuid.Nil.String(),
+			DirectoryID:    uuid.Nil.String(),
 			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
@@ -76,6 +78,7 @@ func TestLibraryMetadataIdentify(t *testing.T) {
 			TorrentID:      uuid.Nil.String(),
 			KnownMediaID:   uuid.Max.String(),
 			ArchiveID:      uuid.Nil.String(),
+			DirectoryID:    uuid.Nil.String(),
 			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
@@ -104,6 +107,7 @@ func TestLibraryMetadataIdentify(t *testing.T) {
 			TorrentID:      uuid.Nil.String(),
 			KnownMediaID:   uuid.Max.String(),
 			ArchiveID:      uuid.Nil.String(),
+			DirectoryID:    uuid.Nil.String(),
 			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))

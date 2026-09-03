@@ -49,6 +49,7 @@ func TestPublishedListEndpoint(t *testing.T) {
 			TorrentID:      uuid.Nil.String(),
 			KnownMediaID:   uuid.Nil.String(),
 			ArchiveID:      uuid.Nil.String(),
+			DirectoryID:    uuid.Nil.String(),
 			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd1).Scan(&lmd1))
@@ -60,6 +61,7 @@ func TestPublishedListEndpoint(t *testing.T) {
 			TorrentID:      uuid.Nil.String(),
 			KnownMediaID:   uuid.Nil.String(),
 			ArchiveID:      uuid.Nil.String(),
+			DirectoryID:    uuid.Nil.String(),
 			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd2).Scan(&lmd2))
@@ -143,6 +145,7 @@ func TestPublishedListEndpoint(t *testing.T) {
 			TorrentID:      uuid.Nil.String(),
 			KnownMediaID:   uuid.Nil.String(),
 			ArchiveID:      uuid.Nil.String(),
+			DirectoryID:    uuid.Nil.String(),
 			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd1).Scan(&lmd1))
@@ -154,6 +157,7 @@ func TestPublishedListEndpoint(t *testing.T) {
 			TorrentID:      uuid.Nil.String(),
 			KnownMediaID:   uuid.Nil.String(),
 			ArchiveID:      uuid.Nil.String(),
+			DirectoryID:    uuid.Nil.String(),
 			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd2).Scan(&lmd2))
@@ -229,6 +233,7 @@ func TestPublishedListEndpoint(t *testing.T) {
 			TorrentID:      uuid.Nil.String(),
 			KnownMediaID:   uuid.Nil.String(),
 			ArchiveID:      uuid.Nil.String(),
+			DirectoryID:    uuid.Nil.String(),
 			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd1).Scan(&lmd1))
@@ -239,6 +244,7 @@ func TestPublishedListEndpoint(t *testing.T) {
 			TorrentID:      uuid.Nil.String(),
 			KnownMediaID:   uuid.Nil.String(),
 			ArchiveID:      uuid.Nil.String(),
+			DirectoryID:    uuid.Nil.String(),
 			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd2).Scan(&lmd2))
@@ -318,6 +324,7 @@ func TestPublishedListEndpoint(t *testing.T) {
 			TorrentID:      uuid.Nil.String(),
 			KnownMediaID:   uuid.Nil.String(),
 			ArchiveID:      uuid.Nil.String(),
+			DirectoryID:    uuid.Nil.String(),
 			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd1).Scan(&lmd1))
@@ -328,6 +335,7 @@ func TestPublishedListEndpoint(t *testing.T) {
 			TorrentID:      uuid.Nil.String(),
 			KnownMediaID:   uuid.Nil.String(),
 			ArchiveID:      uuid.Nil.String(),
+			DirectoryID:    uuid.Nil.String(),
 			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd2).Scan(&lmd2))
@@ -411,6 +419,7 @@ func TestPublishedListEndpoint(t *testing.T) {
 			TorrentID:      uuid.Nil.String(),
 			KnownMediaID:   uuid.Nil.String(),
 			ArchiveID:      uuid.Nil.String(),
+			DirectoryID:    uuid.Nil.String(),
 			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd1).Scan(&lmd1))
@@ -534,6 +543,7 @@ func TestPublishedListEndpoint(t *testing.T) {
 				TorrentID:      uuid.Nil.String(),
 				KnownMediaID:   uuid.Nil.String(),
 				ArchiveID:      uuid.Nil.String(),
+				DirectoryID:    uuid.Nil.String(),
 				EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
 			}
 			require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmds[i]).Scan(&lmds[i]))

@@ -79,6 +79,7 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 			ArchiveID:      uuid.Max.String(),
 			TorrentID:      uuid.Nil.String(),
 			KnownMediaID:   uuid.Nil.String(),
+			DirectoryID:    uuid.Nil.String(),
 			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
@@ -118,6 +119,7 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 			Mimetype:       "video/mp4",
 			TorrentID:      uuid.Nil.String(),
 			KnownMediaID:   uuid.Nil.String(),
+			DirectoryID:    uuid.Nil.String(),
 			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
@@ -163,6 +165,7 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 			ArchiveID:      archiveID,
 			TorrentID:      uuid.Nil.String(),
 			KnownMediaID:   uuid.Nil.String(),
+			DirectoryID:    uuid.Nil.String(),
 			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
@@ -210,6 +213,7 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 			Bytes:          uint64(len(testContent)),
 			TorrentID:      uuid.Nil.String(),
 			KnownMediaID:   uuid.Nil.String(),
+			DirectoryID:    uuid.Nil.String(),
 			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
@@ -260,6 +264,7 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 			Bytes:          uint64(len(testContent)),
 			TorrentID:      uuid.Nil.String(),
 			KnownMediaID:   uuid.Nil.String(),
+			DirectoryID:    uuid.Nil.String(),
 			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
@@ -336,6 +341,7 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 			ArchiveID:      archiveID,
 			TorrentID:      tmd.ID,
 			KnownMediaID:   uuid.Nil.String(),
+			DirectoryID:    uuid.Nil.String(),
 			Bytes:          1024,
 			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
 		}
@@ -379,6 +385,7 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 			ArchiveID:      archiveID,
 			TorrentID:      uuid.Nil.String(),
 			KnownMediaID:   uuid.Nil.String(),
+			DirectoryID:    uuid.Nil.String(),
 			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
@@ -453,6 +460,7 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 			ArchiveID:      archiveID,
 			TorrentID:      tmd.ID,
 			KnownMediaID:   uuid.Nil.String(),
+			DirectoryID:    uuid.Nil.String(),
 			Bytes:          uint64(info.TotalLength()),
 			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
 		}
@@ -502,6 +510,7 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 			Bytes:          uint64(len(testContent)),
 			TorrentID:      uuid.Nil.String(),
 			KnownMediaID:   uuid.Nil.String(),
+			DirectoryID:    uuid.Nil.String(),
 			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
@@ -560,6 +569,7 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 			Bytes:          uint64(len(testContent)),
 			TorrentID:      uuid.Nil.String(),
 			KnownMediaID:   uuid.Nil.String(),
+			DirectoryID:    uuid.Nil.String(),
 			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
@@ -616,6 +626,7 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 			ArchiveID:      uuid.Nil.String(),
 			TorrentID:      uuid.Nil.String(),
 			KnownMediaID:   uuid.Nil.String(),
+			DirectoryID:    uuid.Nil.String(),
 			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
@@ -665,6 +676,7 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 			Mimetype:       "video/mp4",
 			TorrentID:      uuid.Nil.String(),
 			KnownMediaID:   known.UID,
+			DirectoryID:    uuid.Nil.String(),
 			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
@@ -706,6 +718,7 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 			Mimetype:       "video/mp4",
 			TorrentID:      uuid.Nil.String(),
 			KnownMediaID:   uuid.Nil.String(),
+			DirectoryID:    uuid.Nil.String(),
 			EncryptionSeed: encryptionSeed,
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
@@ -744,6 +757,7 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 			ArchiveID:      uuid.Max.String(),
 			TorrentID:      uuid.Nil.String(),
 			KnownMediaID:   uuid.Nil.String(),
+			DirectoryID:    uuid.Nil.String(),
 			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
@@ -796,6 +810,7 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 			Bytes:          uint64(len(testContent)),
 			TorrentID:      uuid.Nil.String(),
 			KnownMediaID:   uuid.Nil.String(),
+			DirectoryID:    uuid.Nil.String(),
 			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
