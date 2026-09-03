@@ -83,6 +83,7 @@ func TestDiscoveredDelete(t *testing.T) {
 		require.NoError(t, tracking.MetadataFindByID(t.Context(), q, tmd.ID).Scan(&latest))
 		assert.EqualValues(t, tmd.Bytes, latest.Bytes)
 		assert.EqualValues(t, 0, latest.Downloaded)
+		assert.EqualValues(t, 0, latest.Available)
 		assert.EqualValues(t, 0, latest.Uploaded)
 		assert.EqualValues(t, tmd.Archivable, tmd.Archivable)
 		assert.WithinDuration(t, tmd.CreatedAt, latest.CreatedAt, 0)

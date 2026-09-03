@@ -324,6 +324,7 @@ func TestSyncPendingToDeeppool(t *testing.T) {
 			tracking.MetadataOptionKnownMediaID(uuid.Nil.String()),
 			tracking.MetadataOptionBytes(1024),
 			tracking.MetadataOptionDownloaded(1024),
+			tracking.MetadataOptionAvailable(1024),
 			tracking.MetadataOptionCompleted,
 			tracking.MetadataOptionAutoSeeding,
 		)

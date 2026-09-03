@@ -39,6 +39,7 @@ func TestHTTPDiagnosticsTorrent(t *testing.T) {
 			new(int160.Random()),
 			tracking.MetadataOptionBytes(bytesx.MiB),
 			tracking.MetadataOptionDownloaded(bytesx.MiB),
+			tracking.MetadataOptionAvailable(bytesx.MiB),
 			tracking.MetadataOptionUploaded(bytesx.MiB),
 			tracking.MetadataOptionAutoSeeding,
 		)
