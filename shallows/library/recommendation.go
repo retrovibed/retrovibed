@@ -23,7 +23,7 @@ const (
 	RecommendationSourceRandom       = "random"
 	RecommendationSourceGenerative   = "generative"
 	RecommendationSourceDiscovered   = "discovered"
-	RecommendationSourceSearchPlugin = "searchplugin"
+	RecommendationSourceSearchPlugin = "plugin.search"
 )
 
 const (

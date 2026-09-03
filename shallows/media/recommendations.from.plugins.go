@@ -3,7 +3,10 @@ package media
 import (
 	"context"
 	"errors"
+	"log"
+	"strings"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -30,6 +33,14 @@ func RecommendationsFromPlugins(ctx context.Context, q sqlx.Queryer, plugins sea
 			imp,
 			ddisc.DiscoveredOptionMimetype(imp.Mimetype, mimetype),
 		)
+
+		if err := ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d); err != nil {
+			return err
+		}
+
+		if strings.Contains(d.Title, "Rocky") {
+			log.Println("ZERP ZERP", spew.Sdump(d))
+		}
 
 		var rec library.Recommendation
 		if err := library.RecommendationInsertWithDefaults(ctx, q, ddisc.RecommendationFromDiscovered(d, library.RecommendationOptionSourceSearchPlugin)).Scan(&rec); err != nil {

@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -14,6 +15,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 )
 
@@ -52,6 +54,9 @@ func (t URIImport) resolveMagnet(uri string, options ...func(*Metadata)) (meta M
 }
 
 func (t URIImport) resolveHTTP(ctx context.Context, uri string, options ...func(*Metadata)) (meta Metadata, err error) {
+	log.Println("DERP DERP initiated")
+	defer log.Println("DERP DERP completed")
+
 	if err := t.l.Wait(ctx); err != nil {
 		return meta, errorsx.Wrap(err, "rate limited")
 	}
@@ -61,22 +66,25 @@ func (t URIImport) resolveHTTP(ctx context.Context, uri string, options ...func(
 		return meta, err
 	}
 
-	resp, err := t.client.Do(req)
+	log.Println("checkpoint 0")
+	resp, err := httpx.AsError(t.client.Do(req))
 	if err != nil {
 		return meta, errorsx.Wrap(err, "unable to retrieve uri")
 	}
 	defer resp.Body.Close()
-
+	log.Println("checkpoint 1")
 	buf, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return meta, errorsx.Wrap(err, "unable to read response")
 	}
 
-	md, err := metainfo.Load(bytes.NewReader(buf))
+	log.Println("checkpoint 2")
+	md, err := metainfo.Load(bytes.NewBuffer(buf))
 	if err != nil {
+		log.Println("FAILURE", string(buf))
 		return meta, errorsx.Wrap(err, "unable to read metainfo from response")
 	}
-
+	log.Println("checkpoint 3")
 	mi, err := md.UnmarshalInfo()
 	if err != nil {
 		return meta, errorsx.Wrap(err, "unable to read info from metadata")
