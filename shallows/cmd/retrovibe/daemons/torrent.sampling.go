@@ -119,7 +119,7 @@ func DiscoverDHTBEP51Peers(ctx context.Context, q sqlx.Queryer, s *dht.Server, r
 		}
 	}
 
-	return err
+	return contextx.IgnoreCancelled(contextx.IgnoreDeadlineExceeded(err))
 }
 
 // request samples from the domain space.
