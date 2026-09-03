@@ -128,7 +128,8 @@ class _DisplayState extends State<Display> {
               borderRadius: defaults.borderRadius,
               color: theme.colorScheme.surface,
             ),
-            SingleChildScrollView(child: w),
+            // ensure the single child scroll view exposes maximum vertical space.
+            SizedBox.expand(child: SingleChildScrollView(child: w)),
           ),
         );
       }),
