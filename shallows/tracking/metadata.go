@@ -163,15 +163,25 @@ func MetadataOptionDownloaded[T constraints.Integer](b T) func(*Metadata) {
 	}
 }
 
+// MetadataOptionAvailable sets the number of bytes verified present on disk,
+// regardless of source (peer transfer, local authoring, resume
+// verification). Distinct from Downloaded, which counts only bytes actually
+// fetched from peers.
+func MetadataOptionAvailable[T constraints.Integer](b T) func(*Metadata) {
+	return func(m *Metadata) {
+		m.Available = uint64(b)
+	}
+}
+
 func MetadataOptionUploaded[T constraints.Integer](b T) func(*Metadata) {
 	return func(m *Metadata) {
 		m.Uploaded = uint64(b)
 	}
 }
 
-// mark the torrent as seeding if the downloaded field is == to the bytes.
+// mark the torrent as seeding if we have all the bytes available locally.
 func MetadataOptionAutoSeeding(m *Metadata) {
-	m.Seeding = m.Downloaded == m.Bytes
+	m.Seeding = m.Available == m.Bytes
 }
 
 func MetadataOptionTestDefaults(m *Metadata) {
@@ -179,6 +189,7 @@ func MetadataOptionTestDefaults(m *Metadata) {
 		new(int160.Random()),
 		MetadataOptionBytes(max(m.Bytes, 1)),
 		MetadataOptionDownloaded(max(m.Downloaded, 1)),
+		MetadataOptionAvailable(max(m.Available, 1)),
 		MetadataOptionUploaded(max(m.Uploaded, 1)),
 	)
 }
@@ -394,10 +405,6 @@ func Reset(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata) (
 }
 
 func DownloadInto(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, mc library.QueryCleaner, md *Metadata, t torrent.Torrent, dst io.Writer, pub *asyncx.Wakeup, options ...torrent.Tuner) (err error) {
-	var (
-		downloaded int64
-	)
-
 	pctx, done := context.WithCancel(ctx)
 	defer done()
 
@@ -412,7 +419,7 @@ func DownloadInto(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, mc libra
 	}
 
 	// just copying as we receive data to block until done.
-	if downloaded, err = torrent.DownloadInto(ctx, dst, t, torrent.TuneAnnounceUntilComplete, torrent.TuneNewConns, langx.ComposeErr(options...)); err != nil {
+	if _, err = torrent.DownloadInto(ctx, dst, t, torrent.TuneAnnounceUntilComplete, torrent.TuneNewConns, langx.ComposeErr(options...)); err != nil {
 		return errorsx.Wrap(err, "download failed")
 	}
 
@@ -462,7 +469,7 @@ func DownloadInto(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, mc libra
 		bytes = uint64(i.TotalLength())
 	}
 
-	if err := MetadataCompleteByID(ctx, q, md.ID, 0, bytes, uint64(downloaded), stats.BytesWrittenData.Uint64()).Scan(md); err != nil {
+	if err := MetadataCompleteByID(ctx, q, md.ID, 0, bytes, stats.BytesValidated.Uint64(), stats.BytesWrittenData.Uint64(), uint64(t.BytesCompleted())).Scan(md); err != nil {
 		return errorsx.Wrap(err, "unable to mark completed")
 	}
 
@@ -519,12 +526,12 @@ func DownloadProgress(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torr
 			}
 
 			current := uint64(dl.BytesCompleted())
-			if md.Downloaded == current || info == nil {
+			if md.Available == current || info == nil {
 				continue
 			}
 
 			uctx, done := context.WithTimeout(context.Background(), time.Second)
-			if err := MetadataProgressByID(uctx, q, md.ID, uint16(stats.ActivePeers), uint64(info.TotalLength()), current).Scan(md); err != nil {
+			if err := MetadataProgressByID(uctx, q, md.ID, uint16(stats.ActivePeers), uint64(info.TotalLength()), stats.BytesValidated.Uint64(), current).Scan(md); err != nil {
 				done()
 				log.Println("failed to update progress", err)
 			}
@@ -542,7 +549,7 @@ func DownloadProgress(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torr
 			stats := dl.Stats()
 			info := dl.Info()
 			current := uint64(dl.BytesCompleted())
-			if md.Downloaded == current || info == nil {
+			if md.Available == current || info == nil {
 				continue
 			}
 
@@ -552,7 +559,7 @@ func DownloadProgress(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torr
 				"%s - %s - %s: info(%t) %s\n", md.ID, hex.EncodeToString(md.Infohash), md.Description, true, stats,
 			)
 
-			if err := MetadataProgressByID(ctx, q, md.ID, uint16(stats.ActivePeers), uint64(info.TotalLength()), current).Scan(md); err != nil {
+			if err := MetadataProgressByID(ctx, q, md.ID, uint16(stats.ActivePeers), uint64(info.TotalLength()), stats.BytesValidated.Uint64(), current).Scan(md); err != nil {
 				log.Println("failed to update progress", err)
 			}
 		case <-ctx.Done():

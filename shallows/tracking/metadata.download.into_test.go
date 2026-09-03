@@ -290,6 +290,12 @@ func TestDownloadInto(t *testing.T) {
 		assert.EqualValues(t, mi.TotalLength(), lmd.Bytes)
 		assert.WithinDuration(t, time.Now(), lmd.CompletedAt, time.Second)
 
+		// a fresh leecher had nothing before this download, so every byte of
+		// the completed torrent came from peers: available and downloaded
+		// should both equal the full size.
+		assert.EqualValues(t, mi.TotalLength(), lmd.Available)
+		assert.EqualValues(t, mi.TotalLength(), lmd.Downloaded)
+
 		var libMDs []library.Metadata
 		require.NoError(t, sqlx.ScanInto(library.MetadataSearch(t.Context(), q, library.MetadataSearchBuilder().Where(
 			library.MetadataQueryByTorrentID(lmd.ID),

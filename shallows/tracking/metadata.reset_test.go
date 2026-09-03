@@ -80,6 +80,7 @@ func TestReset(t *testing.T) {
 		require.NoError(t, tracking.Reset(ctx, q, root, &lmd))
 
 		assert.EqualValues(t, 0, lmd.Downloaded)
+		assert.EqualValues(t, 0, lmd.Available)
 		assert.EqualValues(t, 0, lmd.Uploaded)
 		assert.False(t, lmd.Seeding)
 		assert.EqualValues(t, 0, lmd.Peers)

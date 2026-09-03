@@ -48,10 +48,10 @@ func (t *HTTPTorrentDiagnostics) Bind(r *mux.Router) {
 
 func (t *HTTPTorrentDiagnostics) get(w http.ResponseWriter, r *http.Request) {
 	var (
-		total, seeding, bytes, downloaded, uploaded, peers int64
+		total, seeding, bytes, downloaded, available, uploaded, peers int64
 	)
 
-	if err := tracking.MetadataDiagnostics(r.Context(), t.db).Scan(&total, &seeding, &bytes, &downloaded, &uploaded, &peers); err != nil {
+	if err := tracking.MetadataDiagnostics(r.Context(), t.db).Scan(&total, &seeding, &bytes, &downloaded, &available, &uploaded, &peers); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to read torrent metadata totals"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return

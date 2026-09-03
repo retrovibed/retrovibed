@@ -48,6 +48,8 @@ func TestValidateTorrent(t *testing.T) {
 		require.NoError(t, err)
 		require.True(t, tmd.Seeding)
 		require.NotEqual(t, timex.Inf(), tmd.CompletedAt)
+		require.EqualValues(t, tmd.Bytes, tmd.Available, "validation confirms all bytes are present on disk")
+		require.Zero(t, tmd.Downloaded, "local re-validation involves no peer transfer, so downloaded must be 0")
 	})
 
 	t.Run("returns error when piece hash does not match", func(t *testing.T) {

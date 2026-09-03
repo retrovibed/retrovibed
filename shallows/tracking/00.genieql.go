@@ -39,14 +39,14 @@ func MetadataBatchInsertWithDefaults(
 	gql genieql.InsertBatch,
 	pattern func(ctx context.Context, q sqlx.Queryer, p Metadata) NewMetadataScannerStatic,
 ) {
-	gql.Into("torrents_metadata").Batch(10).Default("created_at", "updated_at", "hidden_at", "initiated_at", "paused_at", "downloaded", "next_announce_at")
+	gql.Into("torrents_metadata").Batch(10).Default("created_at", "updated_at", "hidden_at", "initiated_at", "paused_at", "downloaded", "available", "next_announce_at")
 }
 
 func MetadataResetByID(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewMetadataScannerStaticRow,
 ) {
-	gql = gql.Query(`UPDATE torrents_metadata SET updated_at = DEFAULT, initiated_at = DEFAULT, completed_at = DEFAULT, paused_at = DEFAULT, next_announce_at = DEFAULT, seeding = DEFAULT, downloaded = DEFAULT, uploaded = DEFAULT, peers = DEFAULT WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
+	gql = gql.Query(`UPDATE torrents_metadata SET updated_at = DEFAULT, initiated_at = DEFAULT, completed_at = DEFAULT, paused_at = DEFAULT, next_announce_at = DEFAULT, seeding = DEFAULT, downloaded = DEFAULT, available = DEFAULT, uploaded = DEFAULT, peers = DEFAULT WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
 }
 
 func MetadataTombstoneByID(
@@ -107,9 +107,9 @@ func MetadataAutoDownloadByID(
 
 func MetadataProgressByID(
 	gql genieql.Function,
-	pattern func(ctx context.Context, q sqlx.Queryer, id string, peers uint16, bytes uint64, downloaded uint64) NewMetadataScannerStaticRow,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string, peers uint16, bytes uint64, downloaded uint64, available uint64) NewMetadataScannerStaticRow,
 ) {
-	gql = gql.Query(`UPDATE torrents_metadata SET updated_at = NOW(), bytes = {bytes}, downloaded = {downloaded}, peers = {peers}, seeding = (bytes == {downloaded}) WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
+	gql = gql.Query(`UPDATE torrents_metadata SET updated_at = NOW(), bytes = {bytes}, downloaded = {downloaded}, available = {available}, peers = {peers}, seeding = (bytes == {available}) WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
 }
 
 func MetadataImportedByID(
@@ -121,23 +121,23 @@ func MetadataImportedByID(
 
 func MetadataVerifyByID(
 	gql genieql.Function,
-	pattern func(ctx context.Context, q sqlx.Queryer, id string, peers uint16, downloaded uint64) NewMetadataScannerStaticRow,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string, peers uint16, downloaded uint64, available uint64) NewMetadataScannerStaticRow,
 ) {
-	gql = gql.Query(`UPDATE torrents_metadata SET updated_at = NOW(), verify_at = NOW(), downloaded = {downloaded}, peers = {peers}, seeding = (bytes == {downloaded}) WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
+	gql = gql.Query(`UPDATE torrents_metadata SET updated_at = NOW(), verify_at = NOW(), downloaded = {downloaded}, available = {available}, peers = {peers}, seeding = (bytes == {available}) WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
 }
 
 func MetadataVerifiedByID(
 	gql genieql.Function,
-	pattern func(ctx context.Context, q sqlx.Queryer, id string, peers uint16, downloaded uint64) NewMetadataScannerStaticRow,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string, peers uint16, downloaded uint64, available uint64) NewMetadataScannerStaticRow,
 ) {
-	gql = gql.Query(`UPDATE torrents_metadata SET updated_at = NOW(), verify_at = DEFAULT, downloaded = {downloaded}, peers = {peers}, seeding = (bytes == {downloaded}) WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
+	gql = gql.Query(`UPDATE torrents_metadata SET updated_at = NOW(), verify_at = DEFAULT, downloaded = {downloaded}, available = {available}, peers = {peers}, seeding = (bytes == {available}) WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
 }
 
 func MetadataCompleteByID(
 	gql genieql.Function,
-	pattern func(ctx context.Context, q sqlx.Queryer, id string, peers uint16, bytes uint64, downloaded uint64, uploaded uint64) NewMetadataScannerStaticRow,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string, peers uint16, bytes uint64, downloaded uint64, uploaded uint64, available uint64) NewMetadataScannerStaticRow,
 ) {
-	gql = gql.Query(`UPDATE torrents_metadata SET updated_at = NOW(), completed_at = NOW(), bytes = {bytes}, downloaded = {downloaded}, uploaded = {uploaded}, peers = {peers}, seeding = (bytes == {downloaded}), verify_at = 'infinity' WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
+	gql = gql.Query(`UPDATE torrents_metadata SET updated_at = NOW(), completed_at = NOW(), bytes = {bytes}, downloaded = {downloaded}, uploaded = {uploaded}, available = {available}, peers = {peers}, seeding = (bytes == {available}), verify_at = 'infinity' WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
 }
 
 func MetadataUploadedByID(
@@ -170,7 +170,7 @@ func MetadataAssignKnownMediaID(
 
 func MetadataDiagnosticsScanner(
 	gql genieql.Scanner,
-	pattern func(total int64, seeding int64, bytes int64, downloaded int64, uploaded int64, peers int64),
+	pattern func(total int64, seeding int64, bytes int64, downloaded int64, available int64, uploaded int64, peers int64),
 ) {
 }
 
@@ -178,7 +178,7 @@ func MetadataDiagnostics(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer) NewMetadataDiagnosticsScannerStaticRow,
 ) {
-	gql = gql.Query(`SELECT COUNT(*) AS total, COUNT(*) FILTER (WHERE seeding) AS seeding, COALESCE(SUM(bytes), 0) AS bytes, COALESCE(SUM(downloaded), 0) AS downloaded, COALESCE(SUM(uploaded), 0) AS uploaded, COALESCE(SUM(peers), 0) AS peers FROM torrents_metadata WHERE tombstoned_at = 'infinity'`)
+	gql = gql.Query(`SELECT COUNT(*) AS total, COUNT(*) FILTER (WHERE seeding) AS seeding, COALESCE(SUM(bytes), 0) AS bytes, COALESCE(SUM(downloaded), 0) AS downloaded, COALESCE(SUM(available), 0) AS available, COALESCE(SUM(uploaded), 0) AS uploaded, COALESCE(SUM(peers), 0) AS peers FROM torrents_metadata WHERE tombstoned_at = 'infinity'`)
 }
 
 func Peer(gql genieql.Structure) {
