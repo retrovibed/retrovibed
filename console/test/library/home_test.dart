@@ -12,7 +12,7 @@ import 'package:retrovibed/testing/widget_tester_extensions.dart';
 
 IconData _searchMenuItemIcon(WidgetTester tester) {
   final icon = find.descendant(
-    of: find.ancestor(of: find.text('Discover'), matching: find.byType(ListTile)),
+    of: find.ancestor(of: find.text('Discover'), matching: find.byType(Row)),
     matching: find.byType(Icon),
   );
   return tester.widget<Icon>(icon).icon!;
@@ -139,6 +139,7 @@ void main() {
       expect(find.widgetWithText(ElevatedButton, 'discover'), findsOneWidget);
       expect(find.byType(disc.DiscoveryGrid), findsNothing);
 
+      await tester.ensureVisible(find.widgetWithText(ElevatedButton, 'discover'));
       await tester.tap(find.widgetWithText(ElevatedButton, 'discover'));
       await tester.pumpAndSettle();
 
