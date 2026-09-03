@@ -193,8 +193,7 @@ class Table<T> extends StatelessWidget {
         builder: (context, constraints) {
           final defaults = Defaults.of(context);
           final compact = defaults.isCompact;
-          final bounded = constraints.hasTightHeight;
-
+          final bounded = constraints.hasTightHeight || constraints.hasBoundedHeight;
           return Padding(
             padding: padding,
             child: Column(
