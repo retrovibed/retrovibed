@@ -62,7 +62,7 @@ type HTTPSSO struct {
 func (t *HTTPSSO) Bind(r *mux.Router) {
 	r = r.StrictSlash(true)
 	r.Use(httpx.RouteInvoked)
-	r.Use(httpx.DebugRequest)
+	// r.Use(httpx.DebugRequest)
 
 	r.Methods(http.MethodGet).Path("/").Handler(alice.New(
 		httpx.ContextBufferPool512(),
