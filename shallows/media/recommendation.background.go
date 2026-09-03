@@ -28,9 +28,8 @@ func RecommendationsBackgroundRun(ctx context.Context, q sqlx.Queryer, wq pqueue
 		return nil
 	}
 
-	// TODO: recommendation settings to be loaded from database
 	lang := userx.LocaleLanguage()
-	reclimit := uint64(5)
+	reclimit := uint64(128)
 
 	reqaudio := RecommendationRefreshRequest{
 		ProfileId: uuid.Nil.String(),
@@ -51,27 +50,6 @@ func RecommendationsBackgroundRun(ctx context.Context, q sqlx.Queryer, wq pqueue
 		errorsx.Wrap(pqueuex.Enqueue(ctx, wq, &reqaudio), "failed to enqueue audio recommendation request"),
 		errorsx.Wrap(pqueuex.Enqueue(ctx, wq, &reqvideo), "failed to enqueue video recommendation request"),
 	)
-
-	// if _, err := Recommendation(ctx, q, mimex.Audio, lang, false); errorsx.Ignore(err, sql.ErrNoRows) != nil {
-	// 	return errorsx.Wrap(err, "recommendations audio background failed to generate recommendation")
-	// } else if err == nil {
-	// 	log.Println("recommendations background generated audio recommendation")
-	// }
-
-	// if _, err := Recommendation(ctx, q, mimex.Video, lang, false); errorsx.Ignore(err, sql.ErrNoRows) != nil {
-	// 	return errorsx.Wrap(err, "recommendations video background failed to generate recommendation")
-	// } else if err == nil {
-	// 	log.Println("recommendations background generated video recommendation")
-	// }
-
-	// for _, mimetype := range []string{mimex.Audio, mimex.Video} {
-	// 	if err := RecommendationsFromPlugins(ctx, q, plugins, mimetype, reclimit, lang, false); err != nil {
-	// 		return errorsx.Wrapf(err, "recommendations background failed to generate %s recommendations from search plugins", mimetype)
-	// 	}
-	// 	log.Println("recommendations background generated", mimetype, "recommendations from search plugins")
-	// }
-
-	// return nil
 }
 
 func RecommendationsBackground(ctx context.Context, seed string, q sqlx.Queryer, wq pqueue.Queue, p searchplugin.R) error {
