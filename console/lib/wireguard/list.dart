@@ -160,10 +160,20 @@ class _ListDisplay extends State<ListDisplay> with ds.LoadingState {
         },
         current: _res.next.offset,
         empty: _res.items.length < _res.next.limit.toInt(),
-        leading: [ds.FileDropWell.icon(upload, icon: Icons.add)],
+        leading: [
+          ds.FileDropWell.icon(
+            upload,
+            icon: Icons.add,
+          ),
+        ],
         autofocus: defaults.desktop,
       ),
       children: _res.items,
+      empty: ds.FileDropWell(
+        upload,
+        child: ds.FileDropWell.textual("drop a wireguard configuration file"),
+        shape: RoundedRectangleBorder(borderRadius: defaults.borderRadius),
+      ),
       ds.Table.expanded<api.Wireguard>((v) {
         final onTap = () {
           return api.wireguard
@@ -214,10 +224,6 @@ class _ListDisplay extends State<ListDisplay> with ds.LoadingState {
           },
         );
       }),
-      empty: ds.FileDropWell(
-        upload,
-        child: ds.FileDropWell.textual("drop a wireguard configuration file"),
-      ),
     );
   }
 }
