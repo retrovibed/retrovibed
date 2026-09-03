@@ -105,6 +105,67 @@ void main() {
       expect(onChangeCalled, isTrue);
     });
 
+    testWidgets('tapping a discovered known item calls download with the uid and skips locate', (tester) async {
+      String? downloadedId;
+      bool locateCalled = false;
+      final item =
+          api.Known(id: 'known-1', uid: 'known-1', description: 'Test', summary: 'summary', source: ddisc.sources.discovered);
+      await tester.pumpApp(
+        KnownMediaLocator(
+          item,
+          ensureP2P: (context, {options = const []}) async => true,
+          download: (id, {options = const []}) async {
+            downloadedId = id;
+            return ddisc.DiscoveryDownloadResponse.create();
+          },
+          locate: (req, {options = const []}) async {
+            locateCalled = true;
+            return api.LocateCreateResponse(locate: req);
+          },
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(KnownMediaCard));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      expect(downloadedId, equals(item.uid));
+      expect(locateCalled, isFalse);
+    });
+
+    testWidgets('tapping a searchplugin known item calls download with the uid and skips locate', (tester) async {
+      String? downloadedId;
+      bool locateCalled = false;
+      final item = api.Known(
+        id: 'known-1',
+        uid: 'known-1',
+        description: 'Test',
+        summary: 'summary',
+        source: ddisc.sources.searchplugin,
+      );
+      await tester.pumpApp(
+        KnownMediaLocator(
+          item,
+          ensureP2P: (context, {options = const []}) async => true,
+          download: (id, {options = const []}) async {
+            downloadedId = id;
+            return ddisc.DiscoveryDownloadResponse.create();
+          },
+          locate: (req, {options = const []}) async {
+            locateCalled = true;
+            return api.LocateCreateResponse(locate: req);
+          },
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(KnownMediaCard));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      expect(downloadedId, equals(item.uid));
+      expect(locateCalled, isFalse);
+    });
+
     testWidgets('a 404 deleting the recommendation after a successful download is treated as success', (tester) async {
       bool onChangeCalled = false;
       final item = api.Known(id: 'known-1', description: 'Test', summary: 'summary', source: ddisc.sources.discovered);

@@ -94,7 +94,6 @@ class _KnownMediaLocator extends State<KnownMediaLocator> with ds.LoadingState {
     });
 
     final options = [authn.request(authn.AuthzCache.meta(context))];
-
     widget
         .ensureP2P(context, options: options)
         .then((proceed) {
@@ -107,6 +106,7 @@ class _KnownMediaLocator extends State<KnownMediaLocator> with ds.LoadingState {
 
           switch (widget.current.source) {
             case ddisc.sources.discovered:
+            case ddisc.sources.searchplugin:
               return httpx.withRetry(
                 () => widget
                     .download(
