@@ -44,6 +44,8 @@ class LoadingGuardState extends State<LoadingGuard> {
     return Loading(
       widget.child,
       loading: loading,
+      maintainAnimation: false,
+      maintainSize: false,
       overlay: widget.overlay,
       borderRadius: widget.borderRadius,
     );

@@ -58,6 +58,8 @@ void main() {
           const _TrackedWidget(tag: 'child'),
           loading: true,
           maintainState: false,
+          maintainAnimation: false,
+          maintainSize: false,
         ),
       );
       await tester.pump();
@@ -111,6 +113,8 @@ void main() {
             const SizedBox(width: contentWidth, height: contentHeight),
             loading: true,
             maintainState: false,
+            maintainAnimation: false,
+            maintainSize: false,
           ),
         ),
       );

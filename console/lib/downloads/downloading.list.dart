@@ -89,6 +89,7 @@ class _DownloadingListState extends State<DownloadingListDisplay> {
         loading: _loading,
         cause: _cause,
         children: _res.items,
+        collapsable: true,
         ds.Table.inline<media.Download>(
           (v) => ds.ErrorBoundary(
             media.RefreshingDownload(

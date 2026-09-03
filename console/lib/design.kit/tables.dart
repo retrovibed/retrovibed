@@ -164,6 +164,8 @@ class Table<T> extends StatelessWidget {
   final bool loading;
   final Widget cause;
   final EdgeInsets padding;
+  final MainAxisSize? mainAxisSize;
+  final bool collapsable;
 
   const Table(
     this.render, {
@@ -177,6 +179,8 @@ class Table<T> extends StatelessWidget {
     this.cause = errors.Error.zero,
     this.help = HelpScope.None,
     this.padding = EdgeInsets.zero,
+    this.mainAxisSize,
+    this.collapsable = false,
   });
 
   @override
@@ -193,11 +197,11 @@ class Table<T> extends StatelessWidget {
         builder: (context, constraints) {
           final defaults = Defaults.of(context);
           final compact = defaults.isCompact;
-          final bounded = constraints.hasTightHeight || constraints.hasBoundedHeight;
+          final bounded = constraints.hasTightHeight || (!collapsable && constraints.hasBoundedHeight);
           return Padding(
             padding: padding,
             child: Column(
-              mainAxisSize: bounded ? MainAxisSize.max : MainAxisSize.min,
+              mainAxisSize: mainAxisSize ?? (bounded ? MainAxisSize.max : MainAxisSize.min),
               verticalDirection: compact ? VerticalDirection.up : VerticalDirection.down,
               children: [
                 leading,

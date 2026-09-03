@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../errors.dart' as errors;
 import '../empty.dart';
-import '../debug.dart';
 import 'error.dart';
 import 'overlay.dart' as s;
 
@@ -21,6 +20,8 @@ class Loading extends StatelessWidget {
   final Widget? child;
   final bool loading;
   final bool maintainState;
+  final bool maintainAnimation;
+  final bool maintainSize;
   final Widget overlay;
   final Widget cause;
   final BorderRadius borderRadius;
@@ -31,6 +32,8 @@ class Loading extends StatelessWidget {
     this.overlay = Loading.Icon,
     this.loading = false,
     this.maintainState = true,
+    this.maintainSize = true,
+    this.maintainAnimation = true,
     this.cause = errors.Error.zero,
     this.borderRadius = BorderRadius.zero,
   });
@@ -45,8 +48,8 @@ class Loading extends StatelessWidget {
         Visibility(
           visible: !loading,
           maintainState: maintainState,
-          maintainAnimation: maintainState,
-          maintainSize: maintainState,
+          maintainAnimation: maintainAnimation,
+          maintainSize: maintainSize,
           child: child ?? Empty,
         ),
         overlay: _overlay,
