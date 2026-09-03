@@ -43,9 +43,12 @@ func DiscoveredOptionIndex(b bool) DiscoveredOption {
 	return DiscoveredOptionNoop
 }
 
-func DiscoveredOptionMimetype(s string) DiscoveredOption {
+// Takes the first non-zero mimetype and fallsback to mimex.Binary
+// if all are zero.
+func DiscoveredOptionMimetype(s ...string) DiscoveredOption {
 	return func(d *Discovered) {
-		d.Mimetype = langx.FirstNonZero(s, string(mimex.Binary))
+		d.Mimetype = langx.FirstNonZero(s...)
+		d.Mimetype = langx.FirstNonZero(d.Mimetype, string(mimex.Binary))
 		d.Category = mimex.Category(d.Mimetype)
 	}
 }
@@ -144,6 +147,11 @@ func DiscoveredOptionTestDefaults(d *Discovered) {
 	d.SubtitlesDefaultLocale = localex.FirstDefined(userx.LocaleLanguage())
 }
 
+// automatically defaults released to timex.NegInf when zero.
+func DiscoveredOptionAutoReleased(d *Discovered) {
+	d.ReleasedAt = timex.FirstNonZero(d.ReleasedAt, timex.NegInf())
+}
+
 func DiscoveredOptionFromTorrentInfo(i *metainfo.Info) DiscoveredOption {
 	return func(d *Discovered) {
 		d.Title = i.Name
@@ -155,7 +163,9 @@ func DiscoveredOptionFromTorrentInfo(i *metainfo.Info) DiscoveredOption {
 // DiscoveredOptionDetectCorrupted detects torrent metadata that cannot be stored
 // as-is (e.g. a name that is not valid UTF8) and prevents it from propagating
 // to other nodes: the title is sanitized with the unicode replacement glyph and
-// the record is excluded from sync by zeroing its sync uid.
+// the record is excluded from sync by zeroing its sync uid. Note:
+// strings.ToValidUTF8 collapses each contiguous run of invalid bytes into a
+// single replacement glyph, not one glyph per invalid byte.
 func DiscoveredOptionDetectCorrupted(d *Discovered) {
 	if utf8.ValidString(d.Title) {
 		return
@@ -277,11 +287,13 @@ func NewDiscovered(md *int160.T, options ...DiscoveredOption) (m Discovered) {
 		CreatedAt:              timex.NegInf(),
 		UpdatedAt:              timex.NegInf(),
 		NextCheckAt:            timex.NegInf(),
+		ReleasedAt:             timex.NegInf(),
 		TombstonedAt:           timex.Inf(),
 		PolicyRank:             math.MaxUint16,
 	},
 		DiscoveredOptionAcquisitionState(AcquisitionStateEphemeral),
 		langx.Compose(options...),
+		DiscoveredOptionAutoReleased,
 	)
 	return r
 }
@@ -316,6 +328,7 @@ func NewDiscoveredFromKnown(md int160.T, known library.Known, options ...Discove
 	},
 		DiscoveredOptionAcquisitionState(AcquisitionStateEphemeral),
 		langx.Compose(options...),
+		DiscoveredOptionAutoReleased,
 	)
 	return r
 }
@@ -360,11 +373,13 @@ func NewDiscoveredFromImport(imp *ddiscapi.Import, options ...DiscoveredOption) 
 		CreatedAt:              timex.NegInf(),
 		UpdatedAt:              timex.NegInf(),
 		NextCheckAt:            timex.NegInf(),
+		ReleasedAt:             timex.NegInf(),
 		TombstonedAt:           time.Now().Add(3 * time.Hour),
 		PolicyRank:             math.MaxUint16,
 	},
 		DiscoveredOptionAcquisitionState(AcquisitionStateEphemeral),
 		langx.Compose(options...),
+		DiscoveredOptionAutoReleased,
 	)
 	return r
 }
