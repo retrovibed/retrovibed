@@ -78,7 +78,7 @@ github.com/ProtonMail/go-crypto/openpgp/packet
 github.com/ProtonMail/go-crypto/openpgp/s2k
 github.com/ProtonMail/go-crypto/openpgp/x25519
 github.com/ProtonMail/go-crypto/openpgp/x448
-# github.com/RoaringBitmap/roaring/v2 v2.26.0
+# github.com/RoaringBitmap/roaring/v2 v2.27.0
 ## explicit; go 1.24.0
 github.com/RoaringBitmap/roaring/v2
 github.com/RoaringBitmap/roaring/v2/internal
@@ -730,7 +730,7 @@ github.com/james-lawrence/genieql/internal/userx
 github.com/james-lawrence/genieql/internal/wasidialect
 github.com/james-lawrence/genieql/internal/wasix/ffierrors
 github.com/james-lawrence/genieql/internal/wasix/ffiguest
-# github.com/james-lawrence/torrent v0.0.0-20260827164208-39896974110a
+# github.com/james-lawrence/torrent v0.0.0-20260903205316-8394eb59f704
 ## explicit; go 1.25.0
 github.com/james-lawrence/torrent
 github.com/james-lawrence/torrent/autobind
@@ -912,7 +912,7 @@ github.com/pressly/goose/v3/lock
 github.com/pressly/goose/v3/lock/internal/store
 github.com/pressly/goose/v3/lock/internal/table
 # github.com/retrovibed/retrovibed/retroapi v0.0.0-20260804202116-1a4f850b87e4
-## explicit; go 1.26.3
+## explicit; go 1.27.0
 # github.com/rivo/uniseg v0.4.7
 ## explicit; go 1.18
 github.com/rivo/uniseg
