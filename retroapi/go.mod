@@ -13,7 +13,7 @@ require (
 	github.com/gofrs/uuid/v5 v5.5.1
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/gorilla/schema v1.4.1
-	github.com/james-lawrence/torrent v0.0.0-20260904132728-8b0de4dbd100
+	github.com/james-lawrence/torrent v0.0.0-20260904160005-ea272caebab6
 	github.com/justinas/alice v1.2.0
 	github.com/mattn/go-isatty v0.0.22
 	github.com/mdlayher/netlink v1.11.2
