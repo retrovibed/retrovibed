@@ -27,6 +27,21 @@ class jsoncodec implements Codec {
   }
 }
 
+// bytescodec is an identity codec for callers that already have raw bytes
+// (e.g. downloaded image data) and want to store them as-is, without the
+// base64 blowup jsoncodec would incur.
+class bytescodec implements Codec {
+  const bytescodec();
+
+  List<int> encode<T>(T v) {
+    return v as List<int>;
+  }
+
+  T decode<T>(List<int> v) {
+    return v as T;
+  }
+}
+
 class record<T> {
   final T data;
   final DateTime ttl;
