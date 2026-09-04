@@ -9,7 +9,6 @@ import (
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/daemons"
-	"github.com/retrovibed/retrovibed/shallows/internal/int160x"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 	"github.com/stretchr/testify/require"
@@ -73,7 +72,7 @@ func TestDiscoverDHTBEP51Peers(t *testing.T) {
 		relayID := relay.ID(relay.DynamicAddrPort())
 
 		go func() {
-			_ = daemons.DiscoverDHTBEP51Peers(ctx, q, a, int160x.NewRangeFixed(relayID))
+			_ = daemons.DiscoverDHTBEP51Peers(ctx, q, a, int160.NewRangeFixed(relayID))
 		}()
 
 		targetPeerID := tracking.PeerUID(target.ID(target.DynamicAddrPort()))
@@ -125,7 +124,7 @@ func TestDiscoverDHTBEP51Peers(t *testing.T) {
 		relayID := relay.ID(relay.DynamicAddrPort())
 
 		go func() {
-			_ = daemons.DiscoverDHTBEP51Peers(ctx, q, a, int160x.NewRangeFixed(relayID))
+			_ = daemons.DiscoverDHTBEP51Peers(ctx, q, a, int160.NewRangeFixed(relayID))
 		}()
 
 		targetPeerID := tracking.PeerUID(target.ID(target.DynamicAddrPort()))

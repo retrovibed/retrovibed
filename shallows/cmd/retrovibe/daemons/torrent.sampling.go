@@ -27,7 +27,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/contextx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/int160x"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
@@ -38,7 +37,7 @@ import (
 )
 
 // discover peers in the dht who support bep51.
-func DiscoverDHTBEP51Peers(ctx context.Context, q sqlx.Queryer, s *dht.Server, ranger int160x.Ranger) (err error) {
+func DiscoverDHTBEP51Peers(ctx context.Context, q sqlx.Queryer, s *dht.Server, ranger int160.Ranger) (err error) {
 	l := rate.NewLimiter(rate.Every(time.Hour), 1)
 
 	recordinterestingpeer := func(ctx context.Context, db sqlx.Queryer, s *dht.Server, n krpc.NodeInfo) (err error) {
@@ -428,7 +427,7 @@ func AutoDiscovery(ctx context.Context, q sqlx.Queryer, dhts *dht.Server, tstore
 	go func() {
 		log.Println("autodiscovery of samplable peers initiated")
 		defer log.Println("autodiscovery of samplable peers completed")
-		if err := DiscoverDHTBEP51Peers(ctx, q, dhts, int160x.NewRangeDynamic(dhts, 16)); err != nil {
+		if err := DiscoverDHTBEP51Peers(ctx, q, dhts, int160.NewRangeDynamic(dhts, 16)); err != nil {
 			log.Println("peer locating failed", err)
 		}
 	}()
