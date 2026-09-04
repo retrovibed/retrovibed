@@ -164,6 +164,7 @@ func Test() eg.OpFn {
 				eggolang.Build(
 					eggolang.BuildOption.Tags(testBuildTags()...),
 					eggolang.BuildOption.WorkingDirectory(rootdir()),
+					eggolang.BuildOption.Timeout(10*time.Minute),
 				),
 			),
 		),

@@ -12,7 +12,6 @@ import (
 
 	"github.com/Masterminds/squirrel"
 	"github.com/coder/websocket"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/go-playground/form/v4"
 	"github.com/gorilla/mux"
 	"github.com/james-lawrence/torrent/dht/int160"
@@ -119,8 +118,6 @@ func (t *HTTPDiscovery) download(w http.ResponseWriter, r *http.Request) {
 		msg DiscoveryDownloadRequest
 	)
 
-	defer log.Println("DERP DERP")
-
 	if err := json.NewDecoder(r.Body).Decode(&msg); err != nil && err != io.EOF {
 		log.Println(errorsx.Wrap(err, "unable to decode request"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
@@ -153,7 +150,6 @@ func (t *HTTPDiscovery) download(w http.ResponseWriter, r *http.Request) {
 		acquisition = ddisc.AcquisitionStateDownloading
 	}
 
-	log.Println("DERP DERP", spew.Sdump(disc))
 	disc, _, err := ddisc.DownloadDiscovered(r.Context(), t.q, t.importer, disc, acquisition)
 	if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to download discovered"))
