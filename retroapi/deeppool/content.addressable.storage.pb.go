@@ -693,6 +693,86 @@ func (x *MediaDeleteResponse) GetMedia() *Media {
 	return nil
 }
 
+type BackupSeedRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BackupSeedRequest) Reset() {
+	*x = BackupSeedRequest{}
+	mi := &file_content_addressable_storage_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BackupSeedRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BackupSeedRequest) ProtoMessage() {}
+
+func (x *BackupSeedRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_content_addressable_storage_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BackupSeedRequest.ProtoReflect.Descriptor instead.
+func (*BackupSeedRequest) Descriptor() ([]byte, []int) {
+	return file_content_addressable_storage_proto_rawDescGZIP(), []int{14}
+}
+
+type BackupSeedResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Seed          string                 `protobuf:"bytes,1,opt,name=seed,proto3" json:"seed,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *BackupSeedResponse) Reset() {
+	*x = BackupSeedResponse{}
+	mi := &file_content_addressable_storage_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *BackupSeedResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BackupSeedResponse) ProtoMessage() {}
+
+func (x *BackupSeedResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_content_addressable_storage_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BackupSeedResponse.ProtoReflect.Descriptor instead.
+func (*BackupSeedResponse) Descriptor() ([]byte, []int) {
+	return file_content_addressable_storage_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *BackupSeedResponse) GetSeed() string {
+	if x != nil {
+		return x.Seed
+	}
+	return ""
+}
+
 var File_content_addressable_storage_proto protoreflect.FileDescriptor
 
 const file_content_addressable_storage_proto_rawDesc = "" +
@@ -738,7 +818,10 @@ const file_content_addressable_storage_proto_rawDesc = "" +
 	"\x05media\x18\x01 \x01(\v2\x15.retrovibed.cas.MediaR\x05media\"\x14\n" +
 	"\x12MediaDeleteRequest\"B\n" +
 	"\x13MediaDeleteResponse\x12+\n" +
-	"\x05media\x18\x01 \x01(\v2\x15.retrovibed.cas.MediaR\x05mediab\x06proto3"
+	"\x05media\x18\x01 \x01(\v2\x15.retrovibed.cas.MediaR\x05media\"\x13\n" +
+	"\x11BackupSeedRequest\"(\n" +
+	"\x12BackupSeedResponse\x12\x12\n" +
+	"\x04seed\x18\x01 \x01(\tR\x04seedb\x06proto3"
 
 var (
 	file_content_addressable_storage_proto_rawDescOnce sync.Once
@@ -752,7 +835,7 @@ func file_content_addressable_storage_proto_rawDescGZIP() []byte {
 	return file_content_addressable_storage_proto_rawDescData
 }
 
-var file_content_addressable_storage_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_content_addressable_storage_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
 var file_content_addressable_storage_proto_goTypes = []any{
 	(*Media)(nil),                  // 0: retrovibed.cas.Media
 	(*MediaSearchRequest)(nil),     // 1: retrovibed.cas.MediaSearchRequest
@@ -768,6 +851,8 @@ var file_content_addressable_storage_proto_goTypes = []any{
 	(*MediaFindResponse)(nil),      // 11: retrovibed.cas.MediaFindResponse
 	(*MediaDeleteRequest)(nil),     // 12: retrovibed.cas.MediaDeleteRequest
 	(*MediaDeleteResponse)(nil),    // 13: retrovibed.cas.MediaDeleteResponse
+	(*BackupSeedRequest)(nil),      // 14: retrovibed.cas.BackupSeedRequest
+	(*BackupSeedResponse)(nil),     // 15: retrovibed.cas.BackupSeedResponse
 }
 var file_content_addressable_storage_proto_depIdxs = []int32{
 	1, // 0: retrovibed.cas.MediaSearchResponse.next:type_name -> retrovibed.cas.MediaSearchRequest
@@ -797,7 +882,7 @@ func file_content_addressable_storage_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_content_addressable_storage_proto_rawDesc), len(file_content_addressable_storage_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   14,
+			NumMessages:   16,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

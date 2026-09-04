@@ -42,6 +42,7 @@ const (
 	MDNSAdvertise              = "RETROVIBED_MDNS_ADVERTISE"                   // enable/disable multicast dns registration, allows for the frontend to automatically find daemons on the local network.
 	MDNSDiscovery              = "RETROVIBED_MDNS_DISCOVERY"                   // enable/disable api driven mdns lan peer discovery.
 	AutoArchive                = "RETROVIBED_MEDIA_AUTO_ARCHIVE"               // enable/disable automatic archiving of eligible media.
+	AutoBackup                 = "RETROVIBED_META_AUTO_BACKUP"                 // enable/disable automatic encrypted backups of the metadata database.
 	AutoReclaim                = "RETROVIBED_MEDIA_AUTO_RECLAIM"               // enable/disable automatic reclaiming of disk space for media that has been archived.
 	AutoIdentifyMedia          = "RETROVIBED_MEDIA_AUTO_IDENTIFY"              // enable/disable automatically identified media.
 	AutoLocateMedia            = "RETROVIBED_MEDIA_AUTO_LOCATE"                // enable/disable automatically locate and download media.
