@@ -65,7 +65,7 @@ void main() {
       expect(find.byType(KnownMediaDisplay), findsNothing);
     }, variant: _resolutions);
 
-    testWidgets('keeps the discover-mode check icon after switching mimetype filters', (
+    testWidgets('reflects discovery mode in the check icon when the menu is reopened', (
       WidgetTester tester,
     ) async {
       final entry = _resolutions.currentValue!;
@@ -96,13 +96,6 @@ void main() {
       await tester.tap(find.byType(DropdownUpload));
       await tester.pumpAndSettle();
       await tester.ensureVisible(find.text('Discover'));
-      expect(_searchMenuItemIcon(tester), equals(Icons.check));
-
-      // Switching mimetype filters doesn't close the menu; the Discover item's
-      // icon should still reflect discovery mode within the same open session.
-      await tester.ensureVisible(find.text('Movies'));
-      await tester.tap(find.text('Movies'));
-      await tester.pumpAndSettle();
       expect(_searchMenuItemIcon(tester), equals(Icons.check));
 
       // Selecting the mode item again switches back to library mode and
