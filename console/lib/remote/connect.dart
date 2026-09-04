@@ -434,7 +434,9 @@ class _State extends State<Connect> with LoadingState {
                     builder: (context, state, _) => lib.DropdownUpload(
                       icon: lib.SearchMimetypeDropdown.icon(mimex.checksum(state.next.mimetypes)),
                       help: ds.HelpScope.None,
-                      items: lib.SearchMimetypeDropdown.menuItems(_search),
+                      items: lib.SearchMimetypeDropdown.menuItems(_search.value, (upd) {
+                        _search.value = upd;
+                      }),
                     ),
                   ),
                 ),
