@@ -35,6 +35,7 @@ import (
 
 	"github.com/anacrolix/missinggo/pubsub"
 	"github.com/anacrolix/utp"
+	"github.com/james-lawrence/torrent/autobind"
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/dht/krpc"
@@ -96,20 +97,6 @@ func Peers(ctx context.Context, s *dht.Server, id int160.T) ([]dht.Peer, error) 
 	return nil, errorsx.Wrapf(seq.Err(), "failed to announce partition %s", id)
 }
 
-func localsocket(network string, port uint16) (s0 *utp.Socket, s1 net.Listener, err error) {
-	if s0, err = utp.NewSocket(network, fmt.Sprintf(":%d", port)); err != nil {
-		return nil, nil, errorsx.Wrap(err, "unable to open utp socket")
-	}
-
-	if addr, ok := s0.Addr().(*net.UDPAddr); ok {
-		if s1, err = net.Listen("tcp", fmt.Sprintf(":%d", addr.Port)); err != nil {
-			return nil, nil, errorsx.Wrap(langx.FirstNonZero(err, s0.Close()), "unable to open tcp socket")
-		}
-	}
-
-	return s0, s1, nil
-}
-
 func FileLargestRange(info *metainfo.Info) (m metainfo.FileInfo, offset, length int64) {
 	m = FileLargest(info)
 	return m, m.Offset(info), m.Length
@@ -165,12 +152,8 @@ func FileBitmap(info *metainfo.Info, c metainfo.FileInfo) (m roaring.Bitmap) {
 }
 
 func Autosocket(_dht *dht.Server, p uint16, cl *retronetx.ConnLimit) (_ torrent.Binder, err error) {
-	var (
-		s1 *utp.Socket
-		s2 net.Listener
-	)
-
-	if s1, s2, err = localsocket("udp", p); err != nil {
+	s1, s2, err := autobind.Local("udp", p)
+	if err != nil {
 		return nil, err
 	}
 

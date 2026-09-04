@@ -7,7 +7,6 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/james-lawrence/torrent"
-	"github.com/james-lawrence/torrent/autobind"
 	"github.com/james-lawrence/torrent/bencode"
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/int160"
@@ -24,7 +23,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
-	"github.com/retrovibed/retrovibed/shallows/internal/torrenttestx"
+	"github.com/james-lawrence/torrent/torrenttestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/torrentx"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 	"github.com/stretchr/testify/require"
@@ -83,10 +82,7 @@ func TestDiscoveryIdentify(t *testing.T) {
 		cmdtestx.Admin(t, ctx, q, keypath)
 
 		target := torrenttestx.QuickDHT(t, dht.OptionBootstrapNodesNone)
-		seeder := torrenttestx.QuickClientBinder(
-			t,
-			autobind.New(autobind.EnableDHT(target)),
-		)
+		seeder := torrenttestx.QuickClientWithDHT(t, target)
 		defer seeder.Close()
 
 		seedDir := t.TempDir()
@@ -122,21 +118,26 @@ func TestDiscoveryIdentify(t *testing.T) {
 			ddiscapi.HTTPMediaOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/ddisc/media").Subrouter())
 		srv := cmdtestx.NewTLSServer(t, q, routes)
-
-		seederAddrs := torrenttestx.ApprPorts(seeder)
+		seederAddrs := torrenttestx.AddrPorts(seeder)
 		require.NotEmpty(t, seederAddrs)
+		peers := []string{"--peer", seederAddrs[0].String()}
 
 		require.NoError(t, cmdtestx.Execute(
 			t,
-			cmdtestx.Genparser(cmdddisc.Commands{})(t), "command",
-			"discovery", "identify",
-			"--private-key-path", keypath,
-			"--endpoint", srv.URL,
-			"--id", uh.ID,
-			"--peer-timeout", "5s",
-			"--info-timeout", "10s",
-			"--dht-peers", target.DynamicAddrPort().String(),
-			"--peer", seederAddrs[0].String(),
+			cmdtestx.Genparser(cmdddisc.Commands{})(t),
+			append([]string{
+				"command",
+				"discovery",
+				"identify",
+				"--private-key-path", keypath,
+				"--endpoint", srv.URL,
+				"--id", uh.ID,
+				"--peer-timeout", "5s",
+				"--info-timeout", "10s",
+				"--dht-peers", target.DynamicAddrPort().String(),
+			},
+				peers...,
+			)...,
 		))
 
 		expected := ddisc.NewDiscovered(&id)

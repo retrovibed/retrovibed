@@ -730,7 +730,7 @@ github.com/james-lawrence/genieql/internal/userx
 github.com/james-lawrence/genieql/internal/wasidialect
 github.com/james-lawrence/genieql/internal/wasix/ffierrors
 github.com/james-lawrence/genieql/internal/wasix/ffiguest
-# github.com/james-lawrence/torrent v0.0.0-20260904160005-ea272caebab6
+# github.com/james-lawrence/torrent v0.0.0-20260904170011-54169c45e977
 ## explicit; go 1.27.0
 github.com/james-lawrence/torrent
 github.com/james-lawrence/torrent/autobind
@@ -771,6 +771,7 @@ github.com/james-lawrence/torrent/internal/rendezvous
 github.com/james-lawrence/torrent/internal/slicesx
 github.com/james-lawrence/torrent/internal/slogx
 github.com/james-lawrence/torrent/internal/stmutil
+github.com/james-lawrence/torrent/internal/testx
 github.com/james-lawrence/torrent/internal/timex
 github.com/james-lawrence/torrent/internal/userx
 github.com/james-lawrence/torrent/internal/utpx
@@ -782,6 +783,7 @@ github.com/james-lawrence/torrent/mse
 github.com/james-lawrence/torrent/sockets
 github.com/james-lawrence/torrent/storage
 github.com/james-lawrence/torrent/torrenttest
+github.com/james-lawrence/torrent/torrenttestx
 github.com/james-lawrence/torrent/tracker
 github.com/james-lawrence/torrent/upnp
 # github.com/jfreymuth/pulse v0.1.2

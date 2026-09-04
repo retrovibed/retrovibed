@@ -76,7 +76,7 @@ type HTTPDiscovery struct {
 func (t *HTTPDiscovery) Bind(r *mux.Router) {
 	r.StrictSlash(false)
 	r.Use(httpx.RouteInvoked)
-	r.Use(httpx.DebugRequest)
+	// r.Use(httpx.DebugRequest)
 
 	r.Path("/").Methods(http.MethodGet).Handler(alice.New(
 		httpx.ContextBufferPool512(),

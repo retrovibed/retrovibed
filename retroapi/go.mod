@@ -13,7 +13,7 @@ require (
 	github.com/gofrs/uuid/v5 v5.5.1
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/gorilla/schema v1.4.1
-	github.com/james-lawrence/torrent v0.0.0-20260904160005-ea272caebab6
+	github.com/james-lawrence/torrent v0.0.0-20260904170011-54169c45e977
 	github.com/justinas/alice v1.2.0
 	github.com/mattn/go-isatty v0.0.22
 	github.com/mdlayher/netlink v1.11.2
@@ -56,7 +56,6 @@ require (
 	github.com/huandu/xstrings v1.5.0 // indirect
 	github.com/mdlayher/socket v0.6.0 // indirect
 	github.com/mschoch/smat v0.2.0 // indirect
-	github.com/rogpeppe/go-internal v1.16.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
 	golang.org/x/sync v0.22.0 // indirect
