@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/authn.dart' as authn;
-import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'package:retrovibed/timex.dart' as timex;
 import 'api.dart' as api;
 import 'plan.summary.dart';
@@ -107,11 +106,6 @@ class RegisteredState extends State<Registered> {
   @override
   Widget build(BuildContext context) {
     return ds.LoadingBoundary(
-      key: ValueKey(
-        uuidx.md5x(
-          current.customerId + current.subscriptionId + current.planId,
-        ),
-      ),
       loading: _loading,
       origin: 'RegisteredState',
       ds.ErrorScreen(
