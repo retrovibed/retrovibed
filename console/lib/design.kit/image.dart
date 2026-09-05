@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart' as m;
+import 'package:retrovibed/design.kit/errors.dart' as errors;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'image.cache.dart' as imagecache;
 
@@ -72,6 +73,11 @@ class _CachedImage extends m.StatelessWidget {
     return m.FutureBuilder<File>(
       future: pending,
       builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          print("failed to load image ${snapshot.error}");
+          return missing;
+        }
+
         final file = snapshot.data;
         if (file == null) return missing;
 

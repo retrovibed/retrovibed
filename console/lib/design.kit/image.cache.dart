@@ -17,7 +17,8 @@ Future<File> cached(String url, Future<List<int>> Function() fetch) async {
   final file = _pathFor(key);
   if (file.existsSync()) return file;
 
-  final bytes = await fetch();
-  _images.write(key, bytes);
-  return file;
+  return fetch().then((bytes) {
+    _images.write(key, bytes);
+    return file;
+  });
 }
