@@ -198,18 +198,22 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	}
 	defer db.Close()
 
+	log.Println("checkpoint - database")
 	// block for first checkpoint
 	errorsx.Log(cmdopts.Checkpoint(gctx.Context, db))
 
+	log.Println("checkpoint - initialize admin")
 	if err = identityssh.InitializeAdmin(gctx.Context, db, id.PublicKey()); err != nil {
 		return errorsx.Wrap(err, "unable to import ssh identity")
 	}
 
+	log.Println("checkpoint - initialize authz")
 	if err = meta.AuthzFindByProfileID(gctx.Context, db, sqlx.NewNullString(sshx.FingerprintMD5(id.PublicKey()))).Scan(&authz); err != nil {
 		return errorsx.Wrap(err, "unable to load authorization")
 	}
 
 	if t.AutoDefaultSubscriptions {
+		log.Println("checkpoint - initialize default feeds")
 		errorsx.Log(errorsx.Wrap(PrepareDefaultFeeds(gctx.Context, db), "unable to initialize default rss feeds"))
 	}
 
@@ -253,6 +257,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		}
 	}
 
+	log.Println("checkpoint - initialize plugins")
 	// plugins is built once, up front, decoupled from _torrenting.Init/Reload
 	// (NewRegistryWithSocket spins up a wazero runtime + WASI + a directory
 	// watcher - too expensive to rebuild every reload generation). It still
@@ -305,6 +310,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		privateResolver,
 	)
 
+	log.Println("checkpoint - distribution")
 	if err = torrenting.Reload(gctx.Context, t.torrentsettings(), t.discoverysettings()); err != nil {
 		return errorsx.Wrap(err, "failed to reload torrent")
 	}
@@ -317,6 +323,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		return err
 	}
 
+	log.Println("checkpoint - network monitoring")
 	if netmon := netmonx.Global(); netmon != nil {
 		go func() {
 			for delta := range netmon.Each(gctx.Context) {
@@ -353,6 +360,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	})
 
 	if len(t.TorrentFolderWatch) > 0 {
+		log.Println("download folder monitoring enabled")
 		dwatcher, err := downloads.NewDirectoryWatcher(gctx.Context, tlsx.MustClone(tlscfg.Config(), tlsx.OptionInsecureSkipVerify), db)
 		if err != nil {
 			return errorsx.Wrap(err, "unable to setup directory monitoring for torrents")
@@ -375,6 +383,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	})
 
 	if t.AutoIdentifyMedia {
+		log.Println("auto identify media enabled")
 		b := backoffx.New(backoffx.Constant(15*time.Minute), backoffx.JitterRandom(time.Second))
 		go asyncx.Periodic(gctx.Context, mediaidentification, b, "automatic media identification - periodic")
 		asyncx.Background(gctx.Context, mediaidentification, func(ctx context.Context) error {
@@ -406,6 +415,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		log.Println("*************************************** acoustic indexing is disabled ***************************************")
 	}
 
+	log.Println("checkpoint - http service")
 	httpmux := mux.NewRouter()
 	httpmux.NotFoundHandler = httpx.NotFound(alice.New())
 	httpmux.Use(
