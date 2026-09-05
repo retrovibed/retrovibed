@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/authn.dart' as authn;
+import 'package:retrovibed/ddisc/plugin/environment.editor.dart';
 import 'api.dart';
 
 // Fetches its own catalog + enabled-publisher data for a single community —
@@ -58,6 +59,33 @@ class _SocialCommunityDetailsState extends State<SocialCommunityDetails> with ds
     ds.postframe(_refresh);
   }
 
+  // _configure opens the publisher's .env in the same editor the search
+  // plugin list uses; the endpoint hands back the plugin's declared
+  // variables with the configured values filled in, so the editor renders
+  // a populated form rather than an empty text box.
+  Future<void> _configure(BuildContext context, PluginPublisher p) async {
+    final modal = ds.modals.of(context);
+    if (modal == null) return;
+
+    final auth = [authn.request(authn.AuthzCache.meta(context))];
+
+    modal.push(
+      ds.Confirmation.info(
+        content: EnvironmentEditor.future(
+          p.id,
+          publisherenvironment.get(p.id, options: auth),
+          onChange: (content) {
+            httpx.withRetry(() => publisherenvironment.update(p.id, content, options: auth)).catchError((cause) {
+              print("failed to update publisher environment ${cause}");
+              return content;
+            });
+          },
+        ),
+        done: (_) => modal.push(null),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final social = _resp.items.where((v) => v.community.id == widget.communityId).firstOrNull;
@@ -71,16 +99,29 @@ class _SocialCommunityDetailsState extends State<SocialCommunityDetails> with ds
         runSpacing: 4,
         children: _resp.catalog.map((p) {
           final enabled = enabledIds.contains(p.id);
-          return FilterChip(
-            label: Text(p.description.isNotEmpty ? p.description : p.mimetype),
-            selected: enabled,
-            onSelected: (v) {
-              final auth = [authn.request(authn.AuthzCache.meta(context))];
-              final fut = v
-                  ? widget.enable(widget.communityId, p.id, options: auth)
-                  : widget.disable(widget.communityId, p.id, options: auth);
-              httpx.withRetry(() => fut).then((_) => _refresh());
-            },
+          return Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              FilterChip(
+                label: Text(p.description.isNotEmpty ? p.description : p.mimetype),
+                selected: enabled,
+                onSelected: (v) {
+                  final auth = [authn.request(authn.AuthzCache.meta(context))];
+                  final fut = v
+                      ? widget.enable(widget.communityId, p.id, options: auth)
+                      : widget.disable(widget.communityId, p.id, options: auth);
+                  httpx.withRetry(() => fut).then((_) => _refresh());
+                },
+              ),
+              // the form behind this button is generated from the plugin's
+              // own declaration of the variables it understands, so a
+              // publisher nobody wrote a settings screen for still gets one.
+              ds.LoadingIconButton.edit(
+                iconSize: 18.0,
+                help: ds.Hint(const Text("configure this publisher")),
+                onPressed: () => _configure(context, p),
+              ),
+            ],
           );
         }).toList(),
       ),

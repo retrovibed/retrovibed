@@ -364,3 +364,41 @@ class communities {
         });
   }
 }
+
+/// Configuration for one installed publisher plugin, proxied as the raw
+/// bytes of its .env sidecar - the same convention the search plugin
+/// endpoints use, and for the same reason: parsing and re-serializing is a
+/// client concern (see envfile.dart), the server never interprets it.
+///
+/// A GET returns the variables the plugin itself declares, with whatever
+/// has been configured filled in over the top, so the editor can render a
+/// form for a plugin the console knows nothing about.
+abstract class publisherenvironment {
+  static Future<String> get(
+    String id, {
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx.get(Uri.https(httpx.host(), "/c/publishers/environment/${id}"), options: options).then((v) => v.body);
+  }
+
+  static Future<String> update(
+    String id,
+    String content, {
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx
+        .post(
+          Uri.https(httpx.host(), "/c/publishers/environment/${id}"),
+          options: options,
+          body: content,
+        )
+        .then((v) => v.body);
+  }
+
+  static Future<void> delete(
+    String id, {
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx.delete(Uri.https(httpx.host(), "/c/publishers/environment/${id}"), options: options).then((_) {});
+  }
+}
