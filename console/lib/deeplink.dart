@@ -44,22 +44,26 @@ class DeepLink extends StatefulWidget {
   State<DeepLink> createState() => _DeepLinkState();
 }
 
-class _DeepLinkState extends State<DeepLink> {
+class _DeepLinkState extends State<DeepLink> with ds.LoadingState {
   StreamSubscription<Uri>? _sub;
-  Widget _overlay = const SizedBox();
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
+  Widget _overlay = ds.Empty;
 
   @override
   void initState() {
     super.initState();
+
     _sub = widget.uriStream().listen(_handleUri);
-    widget.initialUri().then((uri) {
-      if (uri != null) _handleUri(uri);
-    }).ignore();
+    widget
+        .initialUri()
+        .then((uri) {
+          if (uri != null) _handleUri(uri);
+        })
+        .whenComplete(
+          () => setState(() {
+            loading = false;
+          }),
+        )
+        .ignore();
   }
 
   @override
@@ -69,38 +73,37 @@ class _DeepLinkState extends State<DeepLink> {
   }
 
   void _dismiss() {
-    setState(() => _overlay = const SizedBox());
+    setState(() => _overlay = ds.Empty);
   }
 
-  void _handleUri(Uri uri) {
+  Future<void> _handleUri(Uri uri) {
     final host = uri.host;
     if (host == 'invite.retrovibe.space') {
-      _handleInvite(uri);
-      return;
+      return _handleInvite(uri);
     }
+
     if (host.endsWith('.community.retrovibe.space')) {
-      _handleCommunity(uri);
-      return;
+      return _handleCommunity(uri);
     }
+
+    return Future.sync(() {});
   }
 
-  void _handleInvite(Uri uri) {
+  Future<void> _handleInvite(Uri uri) {
     final attribution = uri.queryParameters['a'] ?? '';
-    if (attribution.isEmpty) return;
+    if (attribution.isEmpty) return Future.sync(() {});
 
-    widget
-        .consumeAttribution(
-          attribution,
-          options: [authn.Authenticated.bearer(context)],
-        )
-        .ignore();
+    return widget.consumeAttribution(
+      attribution,
+      options: [authn.Authenticated.bearer(context)],
+    );
   }
 
-  void _handleCommunity(Uri uri) {
+  Future<void> _handleCommunity(Uri uri) {
     final domain = uri.host.split('.').first;
-    if (domain.isEmpty) return;
+    if (domain.isEmpty) return Future.sync(() {});
 
-    httpx
+    return httpx
         .withRetry(
           () => widget.search(
             community.CommunitySearchRequest(query: domain),
@@ -109,13 +112,8 @@ class _DeepLinkState extends State<DeepLink> {
         )
         .then((response) {
           if (response.items.isEmpty) {
-            setState(
-              () => _overlay = ds.Masked(
-                alignment: Alignment.center,
-                ds.Error.unknown('community not found', onTap: _dismiss),
-              ),
-            );
-            return;
+            setState(() => cause = ds.Error.text('community not found', onTap: reseterr));
+            return Future.sync(() {});
           }
 
           final c = response.items.first;
@@ -127,34 +125,37 @@ class _DeepLinkState extends State<DeepLink> {
                   children: [CommunityDetail(community: c)],
                 ),
                 onConfirm: (context) {
-                  widget.subscribe(context, c, '').catchError((e, s) {
-                    setState(
-                      () => _overlay = ds.Error.unknown(e, onTap: _dismiss),
-                    );
-                    return Future.error(e);
-                  }).ignore();
-                  _dismiss();
+                  widget
+                      .subscribe(context, c, '')
+                      .catchError((e, s) {
+                        setState(() => cause = ds.Error.unknown(e, onTap: reseterr));
+                        return Future.error(e);
+                      })
+                      .whenComplete(_dismiss)
+                      .ignore();
                 },
                 onCancel: (_) => _dismiss(),
               ),
             ),
           );
+
+          return Future.sync(() {});
         })
         .catchError((e) {
-          setState(
-            () => _overlay = ds.Masked(
-              alignment: Alignment.center,
-              ds.Error.unknown(e, onTap: _dismiss),
-            ),
-          );
-        });
+          setState(() => cause = ds.Error.unknown(e, onTap: reseterr));
+        })
+        .whenComplete(() => setState(() => loading = false));
   }
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        widget.child,
+        ds.LoadingBoundary(
+          widget.child,
+          loading: loading,
+          cause: cause,
+        ),
         _overlay,
       ],
     );

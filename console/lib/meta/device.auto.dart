@@ -46,22 +46,14 @@ class EndpointAuto extends StatefulWidget {
   State<StatefulWidget> createState() => _EndpointAuto();
 }
 
-class _EndpointAuto extends State<EndpointAuto> with WidgetsBindingObserver {
+class _EndpointAuto extends State<EndpointAuto> with WidgetsBindingObserver, ds.LoadingState {
   final ValueNotifier<api.Daemon> changed = ValueNotifier<api.Daemon>(
     api.Daemon(),
   );
-  bool _loading = true;
-  Widget _cause = ds.Error.zero;
 
   Future<void> setdaemon(api.Daemon? d) {
     if (d == null) return Future.value(null);
     return refresh(Future.value(d));
-  }
-
-  reseterr() {
-    setState(() {
-      _cause = ds.Error.zero;
-    });
   }
 
   Future<api.Daemon> latest() {
@@ -94,8 +86,8 @@ class _EndpointAuto extends State<EndpointAuto> with WidgetsBindingObserver {
           return widget.connectable(v).catchError((e, _) {
             var c = Completer<api.Daemon>();
             setState(() {
-              _loading = false;
-              _cause = ds.Error.unauthorized(
+              loading = false;
+              cause = ds.Error.unauthorized(
                 e,
                 onTap: reseterr,
                 color: Color.fromRGBO(0, 0, 0, 0.80),
@@ -158,7 +150,7 @@ class _EndpointAuto extends State<EndpointAuto> with WidgetsBindingObserver {
 
   Future<void> refresh(Future<api.Daemon> pending) {
     setState(() {
-      _loading = true;
+      loading = true;
     });
     return refreshNoErrHandling(pending)
         .catchError((e) {
@@ -167,7 +159,7 @@ class _EndpointAuto extends State<EndpointAuto> with WidgetsBindingObserver {
         }, test: httpx.ErrorsTest.err404)
         .catchError((e) {
           setState(() {
-            _cause = ds.Error.unauthorized(
+            cause = ds.Error.unauthorized(
               e,
               onTap: reseterr,
               message: Text(
@@ -179,7 +171,7 @@ class _EndpointAuto extends State<EndpointAuto> with WidgetsBindingObserver {
         .catchError((e) {
           // profile is pending approval.
           setState(() {
-            _cause = ds.Error.unauthorized(
+            cause = ds.Error.unauthorized(
               e,
               onTap: reseterr,
               color: Color.fromRGBO(0, 0, 0, 0.80),
@@ -200,7 +192,7 @@ class _EndpointAuto extends State<EndpointAuto> with WidgetsBindingObserver {
         })
         .whenComplete(() {
           setState(() {
-            _loading = false;
+            loading = false;
           });
         });
   }
@@ -212,15 +204,11 @@ class _EndpointAuto extends State<EndpointAuto> with WidgetsBindingObserver {
   }
 
   @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return ds.LoadingBoundary(
-      ds.ErrorScreen(cause: _cause, widget.child),
-      loading: _loading,
+      widget.child,
+      loading: loading,
+      cause: cause,
     );
   }
 }

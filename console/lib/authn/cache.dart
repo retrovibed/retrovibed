@@ -12,7 +12,9 @@ typedef FnAuthzCurrent = Future<_meta.AuthzResponse> Function({String? host});
 // flight. Defaults local_only to true so anything reading the token before
 // the real one lands fails safe (assumes guest, makes no remote calls)
 // instead of fails open.
-_meta.Token _pendingToken() => _meta.Token()..localOnly = true;
+_meta.Token _pendingToken() => _meta.Token(
+  localOnly: true,
+);
 
 class AuthzCache extends StatefulWidget {
   final Widget child;
@@ -71,8 +73,7 @@ class AuthzTokenData extends InheritedWidget {
   bool updateShouldNotify(AuthzTokenData old) => meta != old.meta;
 }
 
-class _AuthzCache extends State<AuthzCache> {
-  bool _loading = true;
+class _AuthzCache extends State<AuthzCache> with ds.LoadingState {
   authz.Cached<_meta.Token> meta = authz.Cached(
     authz.Bearer(_pendingToken(), ""),
     authz.Cached.pending,
@@ -80,12 +81,6 @@ class _AuthzCache extends State<AuthzCache> {
   final ValueNotifier<authz.Bearer<_meta.Token>> changed = ValueNotifier<authz.Bearer<_meta.Token>>(
     authz.Bearer(_pendingToken(), ""),
   );
-
-  @override
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void refresh() {
     setState(() {
@@ -105,13 +100,15 @@ class _AuthzCache extends State<AuthzCache> {
                 setState(() {
                   meta.current = bearer;
                   changed.value = bearer;
-                  _loading = false;
+                  loading = false;
+                  cause = ds.Error.zero;
                 });
                 return bearer;
               })
               .catchError((e) {
                 setState(() {
-                  _loading = false;
+                  loading = false;
+                  cause = ds.Errors.httpauto(e, onTap: reseterr);
                 });
                 // rethrow instead of caching an empty bearer: leave
                 // `meta.current` untouched so the next fetch retries rather
@@ -160,8 +157,9 @@ class _AuthzCache extends State<AuthzCache> {
     return widget.publish(
       meta,
       ds.LoadingBoundary(
-        loading: _loading,
-        _loading ? SizedBox() : widget.child,
+        loading: loading,
+        cause: cause,
+        widget.child,
       ),
     );
   }

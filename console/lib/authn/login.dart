@@ -12,9 +12,10 @@ import 'developer.mode.dart';
 class Login extends StatefulWidget {
   final Widget child;
   final String Function() publicKey;
-  final String Function(String) seed;
-  final bool Function() guest;
+  final Future<void> Function(String, String) seed;
   final Future<void> Function() authenticated;
+  final Future<void> Function() unseed;
+  final Future<void> Function() guest;
   final WindowManagerX windowManager;
 
   Login(
@@ -22,6 +23,7 @@ class Login extends StatefulWidget {
     super.key,
     this.publicKey = retro.public_key,
     this.seed = retro.seed,
+    this.unseed = retro.unseed,
     this.guest = retro.guest,
     this.authenticated = _noop,
     WindowManagerX? windowManager,
@@ -59,12 +61,11 @@ class _LoginCachedData extends InheritedWidget {
   bool updateShouldNotify(_LoginCachedData old) => flags != old.flags;
 }
 
-class _LoginState extends State<Login> {
-  Widget _cause = ds.Error.zero;
+class _LoginState extends State<Login> with ds.LoadingState {
   bool _isObscured = true;
+  bool _register = false;
   bool _hasKey = false;
   bool _acceptedTos = false;
-  bool _register = false;
   String _username = '';
   String _password = '';
   String _confirm = '';
@@ -79,85 +80,90 @@ class _LoginState extends State<Login> {
   @override
   void initState() {
     super.initState();
-    _register = !widget.publicKey().isNotEmpty;
-    _checkKey();
-  }
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
-
-  void _logout() {
-    retro.unseed();
-    setState(() {
-      _hasKey = false;
+    _checkKey().then((_) {
+      setState(() {
+        loading = false;
+      });
     });
   }
 
-  void _reseterr() {
-    setState(() {
-      _cause = ds.Error.zero;
-    });
-  }
-
-  void _checkKey() {
-    if (!widget.publicKey().isNotEmpty) return;
-    if (_hasKey) return;
-
-    widget
-        .authenticated()
+  Future<void> _logout() {
+    return widget
+        .unseed()
         .then((_) {
           setState(() {
-            _hasKey = true;
+            loading = false;
+            _hasKey = false;
+            _username = '';
+            _password = '';
           });
         })
         .catchError((e) {
           setState(() {
-            _hasKey = false;
-            _cause = ds.Error.unknown(e, onTap: _reseterr);
+            cause = ds.Error.unknown(e, onTap: reseterr);
+          });
+        });
+  }
+
+  Future<void> _checkKey() {
+    if (widget.publicKey().isEmpty) return Future.sync(() {});
+    if (_hasKey) return Future.sync(() {});
+
+    return widget
+        .authenticated()
+        .then((_) {
+          setState(() {
+            loading = false;
+            _hasKey = widget.publicKey().isNotEmpty;
+          });
+        })
+        .catchError((e) {
+          _logout().then((_) {
+            setState(() {
+              loading = false;
+              _hasKey = widget.publicKey().isNotEmpty;
+              cause = ds.Error.unknown(e, onTap: reseterr);
+            });
           });
         });
   }
 
   Future<void> _seed() async {
-    _reseterr();
+    reseterr();
     if (_register && _password != _confirm) {
-      setState(() {
-        _cause = ds.Error.text("passwords do not match", onTap: _reseterr);
+      return setState(() {
+        cause = ds.Error.text("passwords do not match", onTap: reseterr);
       });
-      return;
     }
 
-    return Future.microtask(() {
-          final err = widget.seed("${_username}:${_password}");
-          if (err.isNotEmpty) {
-            return Future.error(err);
-          }
-          return Future.value();
-        })
+    return widget
+        .seed(_username, _password)
         .then((_ignored) {
           TextInput.finishAutofillContext();
           return _ignored;
         })
-        .catchError((cause) {
-          print(cause);
+        .catchError((e) {
+          print(e);
           setState(() {
-            _cause = ds.Error.text("login failed", onTap: _reseterr);
+            cause = ds.Error.text("login failed", onTap: reseterr);
           });
         })
         .then((_) => _checkKey());
   }
 
   Future<void> _guestLogin() async {
-    _reseterr();
-    if (!widget.guest()) {
-      setState(() {
-        _cause = ds.Error.text("guest login failed", onTap: _reseterr);
-      });
-      return;
-    }
-    _checkKey();
+    reseterr();
+    return widget
+        .guest()
+        .then((_) {
+          _checkKey();
+        })
+        .catchError((e) {
+          print(e);
+          setState(() {
+            cause = ds.Error.text("guest login failed", onTap: reseterr);
+          });
+        });
   }
 
   @override
@@ -181,44 +187,36 @@ class _LoginState extends State<Login> {
         alignment: Alignment.center,
         modals.Node(
           ds.HelpGlobal(
-            ds.Loading(
-              cause: _cause,
+            ds.LoadingBoundary(
+              loading: loading,
+              cause: cause,
               ds.Container(
                 padding: defaults.padding,
                 margin: defaults.margin,
                 constraints: BoxConstraints(maxWidth: 375),
-
                 SingleChildScrollView(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     spacing: defaults.spacing,
                     children: [
-                      SizedBox(
-                        width: double.infinity,
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            Text(
+                      Row(
+                        children: [
+                          ds.LoadingIconButton.guest(
+                            tooltip: "continue as guest",
+                            onPressed: _guestLogin,
+                          ),
+                          Expanded(
+                            child: Text(
                               'Welcome to Retrovibed',
                               style: Theme.of(context).textTheme.headlineSmall,
                               textAlign: TextAlign.center,
                             ),
-                            Positioned(
-                              left: 0,
-                              child: ds.LoadingIconButton.guest(
-                                tooltip: "continue as guest",
-                                onPressed: _guestLogin,
-                              ),
-                            ),
-                            Positioned(
-                              right: 0,
-                              child: ds.LoadingIconButton.close(
-                                tooltip: "exit application",
-                                onPressed: widget.windowManager.close,
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                          ds.LoadingIconButton.close(
+                            tooltip: "exit application",
+                            onPressed: widget.windowManager.close,
+                          ),
+                        ],
                       ),
                       Text(
                         'setup your device',
@@ -229,6 +227,7 @@ class _LoginState extends State<Login> {
                           mainAxisSize: MainAxisSize.min,
                           spacing: defaults.spacing,
                           children: [
+                            SizedBox.square(dimension: 32),
                             TextFormField(
                               initialValue: _username,
                               autofillHints: const [AutofillHints.username, AutofillHints.email],
@@ -250,6 +249,9 @@ class _LoginState extends State<Login> {
                             ),
                             Visibility(
                               visible: _register,
+                              maintainAnimation: true,
+                              maintainSize: true,
+                              maintainState: true,
                               child: TextFormField(
                                 obscureText: _isObscured,
                                 autofillHints: const [AutofillHints.password],
