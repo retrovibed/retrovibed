@@ -121,7 +121,6 @@ class _LoginState extends State<Login> with ds.LoadingState {
           _logout().then((_) {
             setState(() {
               loading = false;
-              _hasKey = widget.publicKey().isNotEmpty;
               cause = ds.Error.unknown(e, onTap: reseterr);
             });
           });
@@ -130,11 +129,12 @@ class _LoginState extends State<Login> with ds.LoadingState {
 
   Future<void> _seed() async {
     reseterr();
-    if (_register && _password != _confirm) {
-      return setState(() {
-        cause = ds.Error.text("passwords do not match", onTap: reseterr);
-      });
-    }
+
+    // prevent resubmissions while running
+    if (loading) return;
+    setState(() {
+      loading = true;
+    });
 
     return widget
         .seed(_username, _password)
@@ -148,7 +148,12 @@ class _LoginState extends State<Login> with ds.LoadingState {
             cause = ds.Error.text("login failed", onTap: reseterr);
           });
         })
-        .then((_) => _checkKey());
+        .then((_) => _checkKey())
+        .whenComplete(() {
+          setState(() {
+            loading = false;
+          });
+        });
   }
 
   Future<void> _guestLogin() async {
@@ -234,7 +239,7 @@ class _LoginState extends State<Login> with ds.LoadingState {
                               keyboardType: TextInputType.emailAddress,
                               decoration: InputDecoration(hintText: 'email'),
                               onChanged: (v) => setState(() => _username = v),
-                              onFieldSubmitted: (_) => _seed(),
+                              validator: (v) => (v ?? "").isEmpty ? "email cannot be empty" : null,
                             ),
                             TextFormField(
                               initialValue: _password,
@@ -245,7 +250,7 @@ class _LoginState extends State<Login> with ds.LoadingState {
                                 suffixIcon: obscureicon,
                               ),
                               onChanged: (v) => setState(() => _password = v),
-                              onFieldSubmitted: (_) => _seed(),
+                              validator: (v) => (v ?? "").isEmpty ? "password cannot be empty" : null,
                             ),
                             Visibility(
                               visible: _register,
@@ -260,7 +265,7 @@ class _LoginState extends State<Login> with ds.LoadingState {
                                   suffixIcon: obscureicon,
                                 ),
                                 onChanged: (v) => setState(() => _confirm = v),
-                                onFieldSubmitted: (_) => _seed(),
+                                validator: (v) => (v ?? "").isEmpty && v == _password ? "passwords must match" : null,
                               ),
                             ),
                           ],
@@ -289,7 +294,12 @@ class _LoginState extends State<Login> with ds.LoadingState {
                       ds.LoadingButton(
                         const Text('Login'),
                         onPressed: _seed,
-                        disabled: _username.isEmpty || _password.isEmpty || !_acceptedTos,
+                        disabled:
+                            loading ||
+                            _username.isEmpty ||
+                            _password.isEmpty ||
+                            (_register && (_password != _confirm)) ||
+                            !_acceptedTos,
                       ),
                     ],
                   ),
