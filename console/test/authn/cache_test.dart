@@ -18,6 +18,9 @@ meta.AuthzResponse _response(String bearer, fixnum.Int64 expires) =>
 fixnum.Int64 _pastExpiry() =>
     fixnum.Int64(DateTime.now().subtract(const Duration(hours: 1)).millisecondsSinceEpoch ~/ 1000);
 
+fixnum.Int64 _futureExpiry() =>
+    fixnum.Int64(DateTime.now().add(const Duration(hours: 1)).millisecondsSinceEpoch ~/ 1000);
+
 void main() {
   group('AuthzCache', () {
     testWidgets('does not render child until token resolves', (WidgetTester tester) async {
@@ -113,6 +116,68 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(cache.meta.current.bearer, equals('good-bearer'));
+        expect(tester.takeException(), isNull);
+      });
+    });
+
+    group('overlapping refresh', () {
+      testWidgets('a refresh triggered mid-fetch is queued behind it instead of racing it', (
+        WidgetTester tester,
+      ) async {
+        BuildContext? capturedCtx;
+        final completers = <Completer<meta.AuthzResponse>>[];
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Material(
+              child: ds.LoadingGuard(
+                AuthzCache(
+                  Builder(
+                    builder: (ctx) {
+                      capturedCtx = ctx;
+                      return const Text('protected content');
+                    },
+                  ),
+                  current: ({String? host}) {
+                    final c = Completer<meta.AuthzResponse>();
+                    completers.add(c);
+                    return c.future;
+                  },
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pump();
+        await tester.pump();
+
+        final cache = AuthzCache.of(capturedCtx!);
+
+        // trigger a second refresh before the first (session 1) fetch has
+        // resolved.
+        cache.refresh();
+        await tester.pump(); // let the new Cached reach AuthzTokenData before forcing a fetch on it
+        AuthzCache.meta(capturedCtx!).auto();
+
+        // the second refresh must not start its own fetch concurrently with
+        // the first — it queues behind the shared lock instead.
+        expect(completers.length, equals(1));
+
+        // session 1's fetch resolves, but with an already-expired token, so
+        // the queued session-2 refresh performs its own fetch next rather
+        // than treating this stale result as good enough.
+        completers[0].complete(_response('stale-bearer', _pastExpiry()));
+        await tester.pumpAndSettle();
+
+        expect(completers.length, equals(2));
+        expect(cache.meta.current.bearer, equals('stale-bearer'));
+
+        // session 2's fetch resolves last, deterministically winning because
+        // the two fetches are serialized rather than raced.
+        completers[1].complete(_response('new-correct-bearer', _futureExpiry()));
+        await tester.pumpAndSettle();
+
+        expect(cache.meta.current.bearer, equals('new-correct-bearer'));
         expect(tester.takeException(), isNull);
       });
     });

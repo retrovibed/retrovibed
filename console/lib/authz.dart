@@ -22,14 +22,19 @@ class Cached<T> {
 
   Cached(this.current, this.refresh);
 
-  // returns a refreshed (if necessary) bearer token.
+  // returns a refreshed (if necessary) bearer token. Serializes overlapping
+  // calls so a slower, superseded fetch can never resolve after (and clobber
+  // the result of) a fetch that started later: the whole fetch-and-write is
+  // one critical section, not just the write, so a queued call re-checks
+  // expiry against the value the prior call just installed instead of
+  // racing it.
   Future<Bearer<T>> auto() {
-    return refresh(this).then(
-      (v) => _m.synchronized(() {
+    return _m.synchronized(() {
+      return refresh(this).then((v) {
         this.current = v;
         return v;
-      }),
-    );
+      });
+    });
   }
 }
 

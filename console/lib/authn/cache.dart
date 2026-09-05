@@ -82,59 +82,67 @@ class _AuthzCache extends State<AuthzCache> with ds.LoadingState {
     authz.Bearer(_pendingToken(), ""),
   );
 
-  void refresh() {
+  // Mutates the existing Cached in place (current + refresh fn) rather than
+  // replacing the `meta` field with a new instance. `Cached.auto()`'s lock
+  // serializes overlapping fetches against this single shared object, so a
+  // stale fetch started before this call can never resolve later and
+  // clobber the newer result — there is no second object for it to miss.
+  Future<authz.Bearer<_meta.Token>> refresh() {
     setState(() {
-      meta = authz.Cached(
-        authz.Bearer(_pendingToken(), ""),
-        authz.refresh(
-          (c) => httpx
-              .withRetry(
-                widget.current,
-                checks: const [
-                  ...httpx.RetryChecks.auto,
-                  httpx.RetryChecks.unauthorized,
-                ],
-              )
-              .then((v) {
-                final bearer = authz.Bearer(v.token, v.bearer);
-                setState(() {
-                  meta.current = bearer;
-                  changed.value = bearer;
-                  loading = false;
-                  cause = ds.Error.zero;
-                });
-                return bearer;
-              })
-              .catchError((e) {
-                setState(() {
-                  loading = false;
-                  cause = ds.Errors.httpauto(e, onTap: reseterr);
-                });
-                // rethrow instead of caching an empty bearer: leave
-                // `meta.current` untouched so the next fetch retries rather
-                // than handing callers a token that's guaranteed to fail.
-                throw e;
-              }),
-          (c, ts) {
-            return DateTime.fromMillisecondsSinceEpoch(
-              c.expires.toInt() * 1000,
-              isUtc: true,
-            ).isBefore(ts);
-          },
-        ),
-      );
+      meta.current = authz.Bearer(_pendingToken(), "");
     });
+    return meta.auto();
   }
 
   @override
   void initState() {
     super.initState();
-    refresh();
+    meta.refresh = authz.refresh(
+      (c) => httpx
+          .withRetry(
+            widget.current,
+            checks: const [
+              ...httpx.RetryChecks.auto,
+              httpx.RetryChecks.unauthorized,
+            ],
+            // we're talking to the local instance cheap.
+            backoff: httpx.Backoff.constant(const Duration(milliseconds: 200)),
+          )
+          .then((v) {
+            final bearer = authz.Bearer(v.token, v.bearer);
+            setState(() {
+              meta.current = bearer;
+              changed.value = bearer;
+              loading = false;
+              cause = ds.Error.zero;
+            });
+            return bearer;
+          })
+          .catchError((e) {
+            setState(() {
+              loading = false;
+              cause = ds.Errors.httpauto(e, onTap: reseterr);
+            });
+            // rethrow instead of caching an empty bearer: leave
+            // `meta.current` untouched so the next fetch retries rather
+            // than handing callers a token that's guaranteed to fail.
+            throw e;
+          }),
+      (c, ts) {
+        return DateTime.fromMillisecondsSinceEpoch(
+          c.expires.toInt() * 1000,
+          isUtc: true,
+        ).isBefore(ts);
+      },
+    );
+
     _meta.EndpointAuto.of(context)?.changed.addListener(refresh);
-    // fire-and-forget kickoff: success/failure are both already handled via
-    // setState inside refresh()'s catchError/then, so just log and swallow
-    // the rejection here to avoid an unhandled-future warning.
-    meta.refresh(meta).catchError((e) {
+    // fire-and-forget kickoff, routed through auto() so it shares the same
+    // lock as every other caller instead of invoking the fetch directly:
+    // success/failure are both already handled via setState inside
+    // refresh()'s catchError/then, so just log and swallow the rejection
+    // here to avoid an unhandled-future warning.
+    meta.auto().catchError((e) {
       print("failed to refresh token cache ${e}");
       return authz.Bearer(_pendingToken(), "");
     });
@@ -159,6 +167,7 @@ class _AuthzCache extends State<AuthzCache> with ds.LoadingState {
       ds.LoadingBoundary(
         loading: loading,
         cause: cause,
+        origin: '_AuthzCache',
         widget.child,
       ),
     );
