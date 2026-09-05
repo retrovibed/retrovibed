@@ -514,10 +514,12 @@ void main() {
       expect(find.byType(DeeppoolAuthzCache), findsNothing);
 
       localOnly = false;
-      final ctx = tester.element(find.text('protected'));
-      AuthzCache.of(ctx).refresh();
+      AuthzCache.of(tester.element(find.text('protected'))).refresh();
       await tester.pump(); // let the new Cached reach AuthzTokenData before forcing a fetch on it
-      await AuthzCache.meta(ctx).auto();
+      // refresh() kicks off a fetch of its own, so the pump above already re-parents
+      // 'protected' under the guard. resolve a fresh element instead of reusing the
+      // one captured before it, which is deactivated by then.
+      await AuthzCache.meta(tester.element(find.text('protected'))).auto();
       await tester.pumpAndSettle();
 
       expect(find.byType(DeeppoolAuthzCache), findsOneWidget);
@@ -546,10 +548,12 @@ void main() {
       expect(find.byType(DeeppoolAuthzCache), findsOneWidget);
 
       localOnly = true;
-      final ctx = tester.element(find.text('protected'));
-      AuthzCache.of(ctx).refresh();
+      AuthzCache.of(tester.element(find.text('protected'))).refresh();
       await tester.pump(); // let the new Cached reach AuthzTokenData before forcing a fetch on it
-      await AuthzCache.meta(ctx).auto();
+      // refresh() kicks off a fetch of its own, so the pump above already re-parents
+      // 'protected' out of the guard. resolve a fresh element instead of reusing the
+      // one captured before it, which is deactivated by then.
+      await AuthzCache.meta(tester.element(find.text('protected'))).auto();
       await tester.pumpAndSettle();
 
       expect(find.byType(DeeppoolAuthzCache), findsNothing);

@@ -21,7 +21,7 @@ class Registered extends StatefulWidget {
   });
 
   static RegisteredState of(BuildContext context) {
-    return context.findAncestorStateOfType<RegisteredState>() ?? RegisteredState();
+    return context.dependOnInheritedWidgetOfExactType<RegisteredData>()?.state ?? RegisteredState();
   }
 
   @override
@@ -105,13 +105,41 @@ class RegisteredState extends State<Registered> {
 
   @override
   Widget build(BuildContext context) {
-    return ds.LoadingBoundary(
-      loading: _loading,
-      origin: 'RegisteredState',
-      ds.ErrorScreen(
-        cause: _cause,
-        widget.child,
+    return RegisteredData(
+      state: this,
+      child: ds.LoadingBoundary(
+        loading: _loading,
+        origin: 'RegisteredState',
+        ds.ErrorScreen(
+          cause: _cause,
+          widget.child,
+        ),
       ),
     );
   }
+}
+
+// Publishes the billing state to descendants. widget.child is a stable widget
+// instance, so a setState here short circuits at Element.updateChild and never
+// reaches the widgets reading Registered.of(context) - the dependency this
+// registers is what actually propagates a lookup landing to them.
+class RegisteredData extends InheritedWidget {
+  final RegisteredState state;
+  final api.Billing current;
+  final api.Plan plan;
+  final int attributionCount;
+  final int attributionRate;
+
+  RegisteredData({required this.state, required super.child})
+    : current = state.current,
+      plan = state.plan,
+      attributionCount = state.attributionCount,
+      attributionRate = state.attributionRate;
+
+  @override
+  bool updateShouldNotify(RegisteredData old) =>
+      current != old.current ||
+      plan != old.plan ||
+      attributionCount != old.attributionCount ||
+      attributionRate != old.attributionRate;
 }

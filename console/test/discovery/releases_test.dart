@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -6,6 +8,19 @@ import 'package:retrovibed/library.dart' as lib;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
+
+Future<lib.KnownLatestResponse> Function(
+  lib.KnownLatestRequest req, {
+  List<httpx.Option> options,
+})
+_loading(Future<lib.KnownLatestResponse> pending) {
+  return (
+    lib.KnownLatestRequest req, {
+    List<httpx.Option> options = const [],
+  }) {
+    return pending;
+  };
+}
 
 Future<lib.KnownLatestResponse> _notimplemented(
   lib.KnownLatestRequest req, {
@@ -41,9 +56,11 @@ Future<lib.KnownLatestResponse> _withItems(
 void main() {
   group('Releases', () {
     testWidgets('displays loading state initially', (tester) async {
-      await tester.pumpApp(NewReleases(mimex.video, latest:_notimplemented));
+      final c = Completer<lib.KnownLatestResponse>();
+      await tester.pumpApp(NewReleases(mimex.video, latest: _loading(c.future)));
       await tester.pump();
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      c.complete(lib.KnownLatestResponse(items: []));
       await tester.pumpAndSettle();
       expect(find.text('New Releases'), findsOneWidget);
     });

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -6,6 +8,19 @@ import 'package:retrovibed/library.dart' as lib;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
+
+Future<lib.RecommendationSearchResponse> Function(
+  lib.RecommendationSearchRequest req, {
+  List<httpx.Option> options,
+})
+_loading(Future<lib.RecommendationSearchResponse> pending) {
+  return (
+    lib.RecommendationSearchRequest req, {
+    List<httpx.Option> options = const [],
+  }) {
+    return pending;
+  };
+}
 
 Future<lib.RecommendationSearchResponse> _notimplemented(
   lib.RecommendationSearchRequest req, {
@@ -37,9 +52,12 @@ Future<lib.RecommendationSearchResponse> _withItems(
 void main() {
   group('Recommendations', () {
     testWidgets('displays loading state initially', (tester) async {
-      await tester.pumpApp(Recommendations(mimex.video, apilatest: _notimplemented));
+      final c = Completer<lib.RecommendationSearchResponse>();
+      await tester.pumpApp(Recommendations(mimex.video, apilatest: _loading(c.future)));
       await tester.pump();
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      c.complete(lib.RecommendationSearchResponse(items: []));
+      await tester.pumpAndSettle();
       expect(find.text('Recommendations'), findsOneWidget);
     });
 

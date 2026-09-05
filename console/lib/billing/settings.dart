@@ -78,9 +78,20 @@ class _Settings extends State<Settings> {
   @override
   void initState() {
     super.initState();
-    _billing = Registered.of(context);
-    _billing?.refresh.addListener(refresh);
     _loadPlans().then((_) => refresh());
+  }
+
+  // Registered.of registers an inherited dependency, which is illegal from
+  // initState; resolve it here instead. Same RegisteredState every time in
+  // practice, so the identity check keeps the listener registered once.
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final billing = Registered.of(context);
+    if (identical(_billing, billing)) return;
+    _billing?.refresh.removeListener(refresh);
+    _billing = billing;
+    _billing?.refresh.addListener(refresh);
   }
 
   @override

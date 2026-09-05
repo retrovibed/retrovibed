@@ -83,7 +83,7 @@ class _EndpointAuthzCache extends authn.AuthzCache {
 }
 
 class _ScopedAuthzTokenData extends authn.AuthzTokenData {
-  const _ScopedAuthzTokenData({required super.meta, required super.child});
+  _ScopedAuthzTokenData({required super.meta, required super.child});
 
   static final empty = _ScopedAuthzTokenData(
     meta: authz.Cached(authz.Bearer(_meta.Token(), ""), authz.Cached.pending),

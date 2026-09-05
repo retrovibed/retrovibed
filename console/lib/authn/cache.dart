@@ -62,7 +62,13 @@ class AuthzCache extends StatefulWidget {
 class AuthzTokenData extends InheritedWidget {
   final authz.Cached<_meta.Token> meta;
 
-  const AuthzTokenData({required this.meta, required super.child});
+  // Snapshot of meta.current taken when this widget was built. _AuthzCache
+  // mutates the Cached in place, so the old and the new AuthzTokenData always
+  // point at the same object: comparing `meta` alone can never observe a
+  // refresh, and dependents would keep rendering the pending token forever.
+  final authz.Bearer<_meta.Token> current;
+
+  AuthzTokenData({required this.meta, required super.child}) : current = meta.current;
 
   static final empty = AuthzTokenData(
     meta: authz.Cached(authz.Bearer(_pendingToken(), ""), authz.Cached.pending),
@@ -70,7 +76,7 @@ class AuthzTokenData extends InheritedWidget {
   );
 
   @override
-  bool updateShouldNotify(AuthzTokenData old) => meta != old.meta;
+  bool updateShouldNotify(AuthzTokenData old) => meta != old.meta || current != old.current;
 }
 
 class _AuthzCache extends State<AuthzCache> with ds.LoadingState {
