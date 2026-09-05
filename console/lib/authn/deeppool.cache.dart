@@ -82,7 +82,7 @@ class _AuthzCache extends State<DeeppoolAuthzCache> {
           }),
       (c, ts) {
         return DateTime.fromMillisecondsSinceEpoch(
-          c.expires.toInt() * 1000,
+          c.exp.toInt() * 1000,
           isUtc: true,
         ).isBefore(ts);
       },

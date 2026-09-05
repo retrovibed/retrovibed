@@ -9,11 +9,11 @@ import 'package:retrovibed/uuidx.dart' as uuidx;
 
 meta.AuthzResponse _makeResponse() => meta.AuthzResponse(
   bearer: uuidx.min(),
-  token: meta.Token()..expires = fixnum.Int64(DateTime.now().millisecondsSinceEpoch + 3600000),
+  token: meta.Token()..exp = fixnum.Int64(DateTime.now().millisecondsSinceEpoch + 3600000),
 );
 
 meta.AuthzResponse _response(String bearer, fixnum.Int64 expires) =>
-    meta.AuthzResponse(bearer: bearer, token: meta.Token()..expires = expires);
+    meta.AuthzResponse(bearer: bearer, token: meta.Token()..exp = expires);
 
 fixnum.Int64 _pastExpiry() =>
     fixnum.Int64(DateTime.now().subtract(const Duration(hours: 1)).millisecondsSinceEpoch ~/ 1000);

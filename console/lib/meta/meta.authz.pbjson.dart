@@ -19,33 +19,33 @@ import 'dart:typed_data' as $typed_data;
 const Bearer$json = {
   '1': 'Bearer',
   '2': [
-    {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'jti'},
-    {'1': 'issuer', '3': 2, '4': 1, '5': 9, '10': 'iss'},
-    {'1': 'profile_id', '3': 3, '4': 1, '5': 9, '10': 'sub'},
-    {'1': 'session_id', '3': 4, '4': 1, '5': 9, '10': 'sid'},
-    {'1': 'issued', '3': 5, '4': 1, '5': 3, '10': 'iat'},
-    {'1': 'expires', '3': 6, '4': 1, '5': 3, '10': 'exp'},
-    {'1': 'not_before', '3': 7, '4': 1, '5': 3, '10': 'nbf'},
+    {'1': 'jti', '3': 1, '4': 1, '5': 9, '10': 'jti'},
+    {'1': 'iss', '3': 2, '4': 1, '5': 9, '10': 'iss'},
+    {'1': 'sub', '3': 3, '4': 1, '5': 9, '10': 'sub'},
+    {'1': 'sid', '3': 4, '4': 1, '5': 9, '10': 'sid'},
+    {'1': 'iat', '3': 5, '4': 1, '5': 3, '10': 'iat'},
+    {'1': 'exp', '3': 6, '4': 1, '5': 3, '10': 'exp'},
+    {'1': 'nbf', '3': 7, '4': 1, '5': 3, '10': 'nbf'},
   ],
 };
 
 /// Descriptor for `Bearer`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List bearerDescriptor = $convert.base64Decode(
-    'CgZCZWFyZXISDwoCaWQYASABKAlSA2p0aRITCgZpc3N1ZXIYAiABKAlSA2lzcxIXCgpwcm9maW'
-    'xlX2lkGAMgASgJUgNzdWISFwoKc2Vzc2lvbl9pZBgEIAEoCVIDc2lkEhMKBmlzc3VlZBgFIAEo'
-    'A1IDaWF0EhQKB2V4cGlyZXMYBiABKANSA2V4cBIXCgpub3RfYmVmb3JlGAcgASgDUgNuYmY=');
+    'CgZCZWFyZXISEAoDanRpGAEgASgJUgNqdGkSEAoDaXNzGAIgASgJUgNpc3MSEAoDc3ViGAMgAS'
+    'gJUgNzdWISEAoDc2lkGAQgASgJUgNzaWQSEAoDaWF0GAUgASgDUgNpYXQSEAoDZXhwGAYgASgD'
+    'UgNleHASEAoDbmJmGAcgASgDUgNuYmY=');
 
 @$core.Deprecated('Use tokenDescriptor instead')
 const Token$json = {
   '1': 'Token',
   '2': [
-    {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'jti'},
-    {'1': 'issuer', '3': 2, '4': 1, '5': 9, '10': 'iss'},
-    {'1': 'profile_id', '3': 3, '4': 1, '5': 9, '10': 'sub'},
-    {'1': 'session_id', '3': 4, '4': 1, '5': 9, '10': 'sid'},
-    {'1': 'issued', '3': 5, '4': 1, '5': 3, '10': 'iat'},
-    {'1': 'expires', '3': 6, '4': 1, '5': 3, '10': 'exp'},
-    {'1': 'not_before', '3': 7, '4': 1, '5': 3, '10': 'nbf'},
+    {'1': 'jti', '3': 1, '4': 1, '5': 9, '10': 'jti'},
+    {'1': 'iss', '3': 2, '4': 1, '5': 9, '10': 'iss'},
+    {'1': 'sub', '3': 3, '4': 1, '5': 9, '10': 'sub'},
+    {'1': 'sid', '3': 4, '4': 1, '5': 9, '10': 'sid'},
+    {'1': 'iat', '3': 5, '4': 1, '5': 3, '10': 'iat'},
+    {'1': 'exp', '3': 6, '4': 1, '5': 3, '10': 'exp'},
+    {'1': 'nbf', '3': 7, '4': 1, '5': 3, '10': 'nbf'},
     {'1': 'usermanagement', '3': 1000, '4': 1, '5': 8, '10': 'usermanagement'},
     {'1': 'remote_control', '3': 1001, '4': 1, '5': 8, '10': 'remote_control'},
     {'1': 'billing_read', '3': 1002, '4': 1, '5': 8, '10': 'billing_read'},
@@ -69,27 +69,28 @@ const Token$json = {
     {'1': 'library_modify', '3': 1008, '4': 1, '5': 8, '10': 'library_modify'},
     {'1': 'archive_sync', '3': 1009, '4': 1, '5': 8, '10': 'archive_sync'},
     {'1': 'community_sync', '3': 1010, '4': 1, '5': 8, '10': 'community_sync'},
-    {'1': 'local_only', '3': 1011, '4': 1, '5': 8, '10': 'local_only'},
+    {'1': 'local_only', '3': 2000, '4': 1, '5': 8, '10': 'local_only'},
   ],
   '9': [
     {'1': 9, '2': 1000},
+    {'1': 1012, '2': 2000},
   ],
 };
 
 /// Descriptor for `Token`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List tokenDescriptor = $convert.base64Decode(
-    'CgVUb2tlbhIPCgJpZBgBIAEoCVIDanRpEhMKBmlzc3VlchgCIAEoCVIDaXNzEhcKCnByb2ZpbG'
-    'VfaWQYAyABKAlSA3N1YhIXCgpzZXNzaW9uX2lkGAQgASgJUgNzaWQSEwoGaXNzdWVkGAUgASgD'
-    'UgNpYXQSFAoHZXhwaXJlcxgGIAEoA1IDZXhwEhcKCm5vdF9iZWZvcmUYByABKANSA25iZhInCg'
-    '51c2VybWFuYWdlbWVudBjoByABKAhSDnVzZXJtYW5hZ2VtZW50EicKDnJlbW90ZV9jb250cm9s'
-    'GOkHIAEoCFIOcmVtb3RlX2NvbnRyb2wSIwoMYmlsbGluZ19yZWFkGOoHIAEoCFIMYmlsbGluZ1'
-    '9yZWFkEicKDmJpbGxpbmdfbW9kaWZ5GOsHIAEoCFIOYmlsbGluZ19tb2RpZnkSKwoQY29tbXVu'
-    'aXR5X21vZGlmeRjsByABKAhSEGNvbW11bml0eV9tb2RpZnkSJwoOYXJjaGl2ZV91cGxvYWQY7Q'
-    'cgASgEUg5hcmNoaXZlX3VwbG9hZBIrChBhcmNoaXZlX2Rvd25sb2FkGO4HIAEoBFIQYXJjaGl2'
-    'ZV9kb3dubG9hZBIjCgxsaWJyYXJ5X3JlYWQY7wcgASgIUgxsaWJyYXJ5X3JlYWQSJwoObGlicm'
-    'FyeV9tb2RpZnkY8AcgASgIUg5saWJyYXJ5X21vZGlmeRIjCgxhcmNoaXZlX3N5bmMY8QcgASgI'
-    'UgxhcmNoaXZlX3N5bmMSJwoOY29tbXVuaXR5X3N5bmMY8gcgASgIUg5jb21tdW5pdHlfc3luYx'
-    'IfCgpsb2NhbF9vbmx5GPMHIAEoCFIKbG9jYWxfb25seUoFCAkQ6Ac=');
+    'CgVUb2tlbhIQCgNqdGkYASABKAlSA2p0aRIQCgNpc3MYAiABKAlSA2lzcxIQCgNzdWIYAyABKA'
+    'lSA3N1YhIQCgNzaWQYBCABKAlSA3NpZBIQCgNpYXQYBSABKANSA2lhdBIQCgNleHAYBiABKANS'
+    'A2V4cBIQCgNuYmYYByABKANSA25iZhInCg51c2VybWFuYWdlbWVudBjoByABKAhSDnVzZXJtYW'
+    '5hZ2VtZW50EicKDnJlbW90ZV9jb250cm9sGOkHIAEoCFIOcmVtb3RlX2NvbnRyb2wSIwoMYmls'
+    'bGluZ19yZWFkGOoHIAEoCFIMYmlsbGluZ19yZWFkEicKDmJpbGxpbmdfbW9kaWZ5GOsHIAEoCF'
+    'IOYmlsbGluZ19tb2RpZnkSKwoQY29tbXVuaXR5X21vZGlmeRjsByABKAhSEGNvbW11bml0eV9t'
+    'b2RpZnkSJwoOYXJjaGl2ZV91cGxvYWQY7QcgASgEUg5hcmNoaXZlX3VwbG9hZBIrChBhcmNoaX'
+    'ZlX2Rvd25sb2FkGO4HIAEoBFIQYXJjaGl2ZV9kb3dubG9hZBIjCgxsaWJyYXJ5X3JlYWQY7wcg'
+    'ASgIUgxsaWJyYXJ5X3JlYWQSJwoObGlicmFyeV9tb2RpZnkY8AcgASgIUg5saWJyYXJ5X21vZG'
+    'lmeRIjCgxhcmNoaXZlX3N5bmMY8QcgASgIUgxhcmNoaXZlX3N5bmMSJwoOY29tbXVuaXR5X3N5'
+    'bmMY8gcgASgIUg5jb21tdW5pdHlfc3luYxIfCgpsb2NhbF9vbmx5GNAPIAEoCFIKbG9jYWxfb2'
+    '5seUoFCAkQ6AdKBgj0BxDQDw==');
 
 @$core.Deprecated('Use authzRequestDescriptor instead')
 const AuthzRequest$json = {

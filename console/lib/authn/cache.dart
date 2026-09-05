@@ -31,7 +31,7 @@ class AuthzCache extends StatefulWidget {
       return Future.value(
         _meta.AuthzResponse(
           bearer: uuidx.min(),
-          token: token..expires = fixnum.Int64(DateTime.now().millisecondsSinceEpoch + 3600000),
+          token: token..exp = fixnum.Int64(DateTime.now().millisecondsSinceEpoch + 3600000),
         ),
       );
     };
@@ -130,7 +130,7 @@ class _AuthzCache extends State<AuthzCache> with ds.LoadingState {
           }),
       (c, ts) {
         return DateTime.fromMillisecondsSinceEpoch(
-          c.expires.toInt() * 1000,
+          c.exp.toInt() * 1000,
           isUtc: true,
         ).isBefore(ts);
       },

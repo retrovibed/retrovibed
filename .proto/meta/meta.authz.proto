@@ -4,25 +4,25 @@ package meta;
 
 message Bearer {
   // START OF STANDARD FIELDS
-  string id = 1 [ json_name = "jti" ];
-  string issuer = 2 [ json_name = "iss" ];
-  string profile_id = 3 [ json_name = "sub" ];
-  string session_id = 4 [ json_name = "sid" ];
-  int64 issued = 5 [ json_name = "iat" ];
-  int64 expires = 6 [ json_name = "exp" ];
-  int64 not_before = 7 [ json_name = "nbf" ];
+  string jti = 1 [ json_name = "jti" ];
+  string iss = 2 [ json_name = "iss" ];
+  string sub = 3 [ json_name = "sub" ];
+  string sid = 4 [ json_name = "sid" ];
+  int64 iat = 5 [ json_name = "iat" ];
+  int64 exp = 6 [ json_name = "exp" ];
+  int64 nbf = 7 [ json_name = "nbf" ];
   // END OF STANDARD FIELDS
 }
 
 message Token {
   // START OF STANDARD FIELDS
-  string id = 1 [ json_name = "jti" ];
-  string issuer = 2 [ json_name = "iss" ];
-  string profile_id = 3 [ json_name = "sub" ];
-  string session_id = 4 [ json_name = "sid" ];
-  int64 issued = 5 [ json_name = "iat" ];
-  int64 expires = 6 [ json_name = "exp" ];
-  int64 not_before = 7 [ json_name = "nbf" ];
+  string jti = 1 [ json_name = "jti" ];
+  string iss = 2 [ json_name = "iss" ];
+  string sub = 3 [ json_name = "sub" ];
+  string sid = 4 [ json_name = "sid" ];
+  int64 iat = 5 [ json_name = "iat" ];
+  int64 exp = 6 [ json_name = "exp" ];
+  int64 nbf = 7 [ json_name = "nbf" ];
   // END OF STANDARD FIELDS
   reserved 9 to 999;
   bool usermanagement = 1000 [ json_name = "usermanagement" ];
@@ -36,7 +36,10 @@ message Token {
   bool library_modify = 1008 [ json_name = "library_modify" ];
   bool archive_sync = 1009 [ json_name = "archive_sync" ];
   bool community_sync = 1010 [ json_name = "community_sync" ];
-  bool local_only = 1011 [ json_name = "local_only" ];
+  // bool device_backup = 1011 [ json_name = "device_backup" ];
+  reserved 1012 to 1999;
+  // START OF RETROVIBE LOCAL FIELDS
+  bool local_only = 2000 [ json_name = "local_only" ];
 }
 
 message AuthzRequest {}

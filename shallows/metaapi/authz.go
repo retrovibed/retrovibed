@@ -123,15 +123,15 @@ type tokenclaims struct {
 }
 
 func (t *tokenclaims) GetExpirationTime() (*jwt.NumericDate, error) {
-	return jwt.NewNumericDate(time.Unix(t.Expires, 0)), nil
+	return jwt.NewNumericDate(time.Unix(t.Exp, 0)), nil
 }
 
 func (t *tokenclaims) GetIssuedAt() (*jwt.NumericDate, error) {
-	return jwt.NewNumericDate(time.Unix(t.Issued, 0)), nil
+	return jwt.NewNumericDate(time.Unix(t.Iat, 0)), nil
 }
 
 func (t *tokenclaims) GetNotBefore() (*jwt.NumericDate, error) {
-	return jwt.NewNumericDate(time.Unix(t.NotBefore, 0)), nil
+	return jwt.NewNumericDate(time.Unix(t.Nbf, 0)), nil
 }
 
 func (t *tokenclaims) GetIssuer() (string, error) {
@@ -139,7 +139,7 @@ func (t *tokenclaims) GetIssuer() (string, error) {
 }
 
 func (t *tokenclaims) GetSubject() (string, error) {
-	return t.ProfileId, nil
+	return t.Sub, nil
 }
 func (t *tokenclaims) GetAudience() (jwt.ClaimStrings, error) {
 	return nil, nil
@@ -160,14 +160,22 @@ func TokenOptionFromAuthz(a meta.Authz) TokenOption {
 	}
 }
 
+// TokenFromRegisterClaims maps jwt.RegisteredClaims onto Token's standard
+// fields. Token's Jti/Iss/Sub/Iat/Exp/Nbf fields are named after the JWT
+// registered claim abbreviations (RFC 7519) rather than their Go-idiomatic
+// long forms (ID/Issuer/Subject/...) because those short names are what must
+// appear on the wire when Token is marshaled as JSON claims; the proto field
+// itself was renamed to match since protoc-gen-go derives both the Go field
+// name and the encoding/json struct tag from the proto field's own name,
+// with no option to control just the JSON wire name independently of it.
 func TokenFromRegisterClaims(claims jwt.RegisteredClaims, options ...TokenOption) *Token {
 	return new(langx.Clone(Token{
-		Id:        claims.ID,
-		Issuer:    claims.Issuer,
-		ProfileId: claims.Subject,
-		Issued:    claims.IssuedAt.Unix(),
-		Expires:   claims.ExpiresAt.Unix(),
-		NotBefore: claims.NotBefore.Unix(),
+		Jti: claims.ID,
+		Iss: claims.Issuer,
+		Sub: claims.Subject,
+		Iat: claims.IssuedAt.Unix(),
+		Exp: claims.ExpiresAt.Unix(),
+		Nbf: claims.NotBefore.Unix(),
 	}, options...))
 }
 

@@ -22,7 +22,7 @@ fixnum.Int64 _pastExpiry() =>
 deeppool.AuthzResponse _response(String bearer, fixnum.Int64 expires) {
   return deeppool.AuthzResponse(
     bearer: bearer,
-    token: deeppool.Token(expires: expires),
+    token: deeppool.Token(exp: expires),
   );
 }
 
@@ -447,7 +447,7 @@ void main() {
       bearer: 'meta-bearer',
       token: meta.Token()
         ..localOnly = localOnly
-        ..expires = _futureExpiry(),
+        ..exp = _futureExpiry(),
     );
 
     testWidgets('does not mount DeeppoolAuthzCache while the local identity is local_only', (

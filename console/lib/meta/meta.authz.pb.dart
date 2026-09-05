@@ -19,22 +19,22 @@ export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
 
 class Bearer extends $pb.GeneratedMessage {
   factory Bearer({
-    $core.String? id,
-    $core.String? issuer,
-    $core.String? profileId,
-    $core.String? sessionId,
-    $fixnum.Int64? issued,
-    $fixnum.Int64? expires,
-    $fixnum.Int64? notBefore,
+    $core.String? jti,
+    $core.String? iss,
+    $core.String? sub,
+    $core.String? sid,
+    $fixnum.Int64? iat,
+    $fixnum.Int64? exp,
+    $fixnum.Int64? nbf,
   }) {
     final result = create();
-    if (id != null) result.id = id;
-    if (issuer != null) result.issuer = issuer;
-    if (profileId != null) result.profileId = profileId;
-    if (sessionId != null) result.sessionId = sessionId;
-    if (issued != null) result.issued = issued;
-    if (expires != null) result.expires = expires;
-    if (notBefore != null) result.notBefore = notBefore;
+    if (jti != null) result.jti = jti;
+    if (iss != null) result.iss = iss;
+    if (sub != null) result.sub = sub;
+    if (sid != null) result.sid = sid;
+    if (iat != null) result.iat = iat;
+    if (exp != null) result.exp = exp;
+    if (nbf != null) result.nbf = nbf;
     return result;
   }
 
@@ -51,13 +51,13 @@ class Bearer extends $pb.GeneratedMessage {
       _omitMessageNames ? '' : 'Bearer',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
       createEmptyInstance: create)
-    ..aOS(1, _omitFieldNames ? '' : 'jti', protoName: 'id')
-    ..aOS(2, _omitFieldNames ? '' : 'iss', protoName: 'issuer')
-    ..aOS(3, _omitFieldNames ? '' : 'sub', protoName: 'profile_id')
-    ..aOS(4, _omitFieldNames ? '' : 'sid', protoName: 'session_id')
-    ..aInt64(5, _omitFieldNames ? '' : 'iat', protoName: 'issued')
-    ..aInt64(6, _omitFieldNames ? '' : 'exp', protoName: 'expires')
-    ..aInt64(7, _omitFieldNames ? '' : 'nbf', protoName: 'not_before')
+    ..aOS(1, _omitFieldNames ? '' : 'jti')
+    ..aOS(2, _omitFieldNames ? '' : 'iss')
+    ..aOS(3, _omitFieldNames ? '' : 'sub')
+    ..aOS(4, _omitFieldNames ? '' : 'sid')
+    ..aInt64(5, _omitFieldNames ? '' : 'iat')
+    ..aInt64(6, _omitFieldNames ? '' : 'exp')
+    ..aInt64(7, _omitFieldNames ? '' : 'nbf')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -80,78 +80,78 @@ class Bearer extends $pb.GeneratedMessage {
 
   /// START OF STANDARD FIELDS
   @$pb.TagNumber(1)
-  $core.String get id => $_getSZ(0);
+  $core.String get jti => $_getSZ(0);
   @$pb.TagNumber(1)
-  set id($core.String value) => $_setString(0, value);
+  set jti($core.String value) => $_setString(0, value);
   @$pb.TagNumber(1)
-  $core.bool hasId() => $_has(0);
+  $core.bool hasJti() => $_has(0);
   @$pb.TagNumber(1)
-  void clearId() => $_clearField(1);
+  void clearJti() => $_clearField(1);
 
   @$pb.TagNumber(2)
-  $core.String get issuer => $_getSZ(1);
+  $core.String get iss => $_getSZ(1);
   @$pb.TagNumber(2)
-  set issuer($core.String value) => $_setString(1, value);
+  set iss($core.String value) => $_setString(1, value);
   @$pb.TagNumber(2)
-  $core.bool hasIssuer() => $_has(1);
+  $core.bool hasIss() => $_has(1);
   @$pb.TagNumber(2)
-  void clearIssuer() => $_clearField(2);
+  void clearIss() => $_clearField(2);
 
   @$pb.TagNumber(3)
-  $core.String get profileId => $_getSZ(2);
+  $core.String get sub => $_getSZ(2);
   @$pb.TagNumber(3)
-  set profileId($core.String value) => $_setString(2, value);
+  set sub($core.String value) => $_setString(2, value);
   @$pb.TagNumber(3)
-  $core.bool hasProfileId() => $_has(2);
+  $core.bool hasSub() => $_has(2);
   @$pb.TagNumber(3)
-  void clearProfileId() => $_clearField(3);
+  void clearSub() => $_clearField(3);
 
   @$pb.TagNumber(4)
-  $core.String get sessionId => $_getSZ(3);
+  $core.String get sid => $_getSZ(3);
   @$pb.TagNumber(4)
-  set sessionId($core.String value) => $_setString(3, value);
+  set sid($core.String value) => $_setString(3, value);
   @$pb.TagNumber(4)
-  $core.bool hasSessionId() => $_has(3);
+  $core.bool hasSid() => $_has(3);
   @$pb.TagNumber(4)
-  void clearSessionId() => $_clearField(4);
+  void clearSid() => $_clearField(4);
 
   @$pb.TagNumber(5)
-  $fixnum.Int64 get issued => $_getI64(4);
+  $fixnum.Int64 get iat => $_getI64(4);
   @$pb.TagNumber(5)
-  set issued($fixnum.Int64 value) => $_setInt64(4, value);
+  set iat($fixnum.Int64 value) => $_setInt64(4, value);
   @$pb.TagNumber(5)
-  $core.bool hasIssued() => $_has(4);
+  $core.bool hasIat() => $_has(4);
   @$pb.TagNumber(5)
-  void clearIssued() => $_clearField(5);
+  void clearIat() => $_clearField(5);
 
   @$pb.TagNumber(6)
-  $fixnum.Int64 get expires => $_getI64(5);
+  $fixnum.Int64 get exp => $_getI64(5);
   @$pb.TagNumber(6)
-  set expires($fixnum.Int64 value) => $_setInt64(5, value);
+  set exp($fixnum.Int64 value) => $_setInt64(5, value);
   @$pb.TagNumber(6)
-  $core.bool hasExpires() => $_has(5);
+  $core.bool hasExp() => $_has(5);
   @$pb.TagNumber(6)
-  void clearExpires() => $_clearField(6);
+  void clearExp() => $_clearField(6);
 
   @$pb.TagNumber(7)
-  $fixnum.Int64 get notBefore => $_getI64(6);
+  $fixnum.Int64 get nbf => $_getI64(6);
   @$pb.TagNumber(7)
-  set notBefore($fixnum.Int64 value) => $_setInt64(6, value);
+  set nbf($fixnum.Int64 value) => $_setInt64(6, value);
   @$pb.TagNumber(7)
-  $core.bool hasNotBefore() => $_has(6);
+  $core.bool hasNbf() => $_has(6);
   @$pb.TagNumber(7)
-  void clearNotBefore() => $_clearField(7);
+  void clearNbf() => $_clearField(7);
 }
 
 class Token extends $pb.GeneratedMessage {
   factory Token({
-    $core.String? id,
-    $core.String? issuer,
-    $core.String? profileId,
-    $core.String? sessionId,
-    $fixnum.Int64? issued,
-    $fixnum.Int64? expires,
-    $fixnum.Int64? notBefore,
+    $core.String? jti,
+    $core.String? iss,
+    $core.String? sub,
+    $core.String? sid,
+    $fixnum.Int64? iat,
+    $fixnum.Int64? exp,
+    $fixnum.Int64? nbf,
     $core.bool? usermanagement,
     $core.bool? remoteControl,
     $core.bool? billingRead,
@@ -166,13 +166,13 @@ class Token extends $pb.GeneratedMessage {
     $core.bool? localOnly,
   }) {
     final result = create();
-    if (id != null) result.id = id;
-    if (issuer != null) result.issuer = issuer;
-    if (profileId != null) result.profileId = profileId;
-    if (sessionId != null) result.sessionId = sessionId;
-    if (issued != null) result.issued = issued;
-    if (expires != null) result.expires = expires;
-    if (notBefore != null) result.notBefore = notBefore;
+    if (jti != null) result.jti = jti;
+    if (iss != null) result.iss = iss;
+    if (sub != null) result.sub = sub;
+    if (sid != null) result.sid = sid;
+    if (iat != null) result.iat = iat;
+    if (exp != null) result.exp = exp;
+    if (nbf != null) result.nbf = nbf;
     if (usermanagement != null) result.usermanagement = usermanagement;
     if (remoteControl != null) result.remoteControl = remoteControl;
     if (billingRead != null) result.billingRead = billingRead;
@@ -201,13 +201,13 @@ class Token extends $pb.GeneratedMessage {
       _omitMessageNames ? '' : 'Token',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
       createEmptyInstance: create)
-    ..aOS(1, _omitFieldNames ? '' : 'jti', protoName: 'id')
-    ..aOS(2, _omitFieldNames ? '' : 'iss', protoName: 'issuer')
-    ..aOS(3, _omitFieldNames ? '' : 'sub', protoName: 'profile_id')
-    ..aOS(4, _omitFieldNames ? '' : 'sid', protoName: 'session_id')
-    ..aInt64(5, _omitFieldNames ? '' : 'iat', protoName: 'issued')
-    ..aInt64(6, _omitFieldNames ? '' : 'exp', protoName: 'expires')
-    ..aInt64(7, _omitFieldNames ? '' : 'nbf', protoName: 'not_before')
+    ..aOS(1, _omitFieldNames ? '' : 'jti')
+    ..aOS(2, _omitFieldNames ? '' : 'iss')
+    ..aOS(3, _omitFieldNames ? '' : 'sub')
+    ..aOS(4, _omitFieldNames ? '' : 'sid')
+    ..aInt64(5, _omitFieldNames ? '' : 'iat')
+    ..aInt64(6, _omitFieldNames ? '' : 'exp')
+    ..aInt64(7, _omitFieldNames ? '' : 'nbf')
     ..aOB(1000, _omitFieldNames ? '' : 'usermanagement')
     ..aOB(1001, _omitFieldNames ? '' : 'remote_control')
     ..aOB(1002, _omitFieldNames ? '' : 'billing_read')
@@ -223,7 +223,7 @@ class Token extends $pb.GeneratedMessage {
     ..aOB(1008, _omitFieldNames ? '' : 'library_modify')
     ..aOB(1009, _omitFieldNames ? '' : 'archive_sync')
     ..aOB(1010, _omitFieldNames ? '' : 'community_sync')
-    ..aOB(1011, _omitFieldNames ? '' : 'local_only')
+    ..aOB(2000, _omitFieldNames ? '' : 'local_only')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -246,67 +246,67 @@ class Token extends $pb.GeneratedMessage {
 
   /// START OF STANDARD FIELDS
   @$pb.TagNumber(1)
-  $core.String get id => $_getSZ(0);
+  $core.String get jti => $_getSZ(0);
   @$pb.TagNumber(1)
-  set id($core.String value) => $_setString(0, value);
+  set jti($core.String value) => $_setString(0, value);
   @$pb.TagNumber(1)
-  $core.bool hasId() => $_has(0);
+  $core.bool hasJti() => $_has(0);
   @$pb.TagNumber(1)
-  void clearId() => $_clearField(1);
+  void clearJti() => $_clearField(1);
 
   @$pb.TagNumber(2)
-  $core.String get issuer => $_getSZ(1);
+  $core.String get iss => $_getSZ(1);
   @$pb.TagNumber(2)
-  set issuer($core.String value) => $_setString(1, value);
+  set iss($core.String value) => $_setString(1, value);
   @$pb.TagNumber(2)
-  $core.bool hasIssuer() => $_has(1);
+  $core.bool hasIss() => $_has(1);
   @$pb.TagNumber(2)
-  void clearIssuer() => $_clearField(2);
+  void clearIss() => $_clearField(2);
 
   @$pb.TagNumber(3)
-  $core.String get profileId => $_getSZ(2);
+  $core.String get sub => $_getSZ(2);
   @$pb.TagNumber(3)
-  set profileId($core.String value) => $_setString(2, value);
+  set sub($core.String value) => $_setString(2, value);
   @$pb.TagNumber(3)
-  $core.bool hasProfileId() => $_has(2);
+  $core.bool hasSub() => $_has(2);
   @$pb.TagNumber(3)
-  void clearProfileId() => $_clearField(3);
+  void clearSub() => $_clearField(3);
 
   @$pb.TagNumber(4)
-  $core.String get sessionId => $_getSZ(3);
+  $core.String get sid => $_getSZ(3);
   @$pb.TagNumber(4)
-  set sessionId($core.String value) => $_setString(3, value);
+  set sid($core.String value) => $_setString(3, value);
   @$pb.TagNumber(4)
-  $core.bool hasSessionId() => $_has(3);
+  $core.bool hasSid() => $_has(3);
   @$pb.TagNumber(4)
-  void clearSessionId() => $_clearField(4);
+  void clearSid() => $_clearField(4);
 
   @$pb.TagNumber(5)
-  $fixnum.Int64 get issued => $_getI64(4);
+  $fixnum.Int64 get iat => $_getI64(4);
   @$pb.TagNumber(5)
-  set issued($fixnum.Int64 value) => $_setInt64(4, value);
+  set iat($fixnum.Int64 value) => $_setInt64(4, value);
   @$pb.TagNumber(5)
-  $core.bool hasIssued() => $_has(4);
+  $core.bool hasIat() => $_has(4);
   @$pb.TagNumber(5)
-  void clearIssued() => $_clearField(5);
+  void clearIat() => $_clearField(5);
 
   @$pb.TagNumber(6)
-  $fixnum.Int64 get expires => $_getI64(5);
+  $fixnum.Int64 get exp => $_getI64(5);
   @$pb.TagNumber(6)
-  set expires($fixnum.Int64 value) => $_setInt64(5, value);
+  set exp($fixnum.Int64 value) => $_setInt64(5, value);
   @$pb.TagNumber(6)
-  $core.bool hasExpires() => $_has(5);
+  $core.bool hasExp() => $_has(5);
   @$pb.TagNumber(6)
-  void clearExpires() => $_clearField(6);
+  void clearExp() => $_clearField(6);
 
   @$pb.TagNumber(7)
-  $fixnum.Int64 get notBefore => $_getI64(6);
+  $fixnum.Int64 get nbf => $_getI64(6);
   @$pb.TagNumber(7)
-  set notBefore($fixnum.Int64 value) => $_setInt64(6, value);
+  set nbf($fixnum.Int64 value) => $_setInt64(6, value);
   @$pb.TagNumber(7)
-  $core.bool hasNotBefore() => $_has(6);
+  $core.bool hasNbf() => $_has(6);
   @$pb.TagNumber(7)
-  void clearNotBefore() => $_clearField(7);
+  void clearNbf() => $_clearField(7);
 
   @$pb.TagNumber(1000)
   $core.bool get usermanagement => $_getBF(7);
@@ -407,14 +407,15 @@ class Token extends $pb.GeneratedMessage {
   @$pb.TagNumber(1010)
   void clearCommunitySync() => $_clearField(1010);
 
-  @$pb.TagNumber(1011)
+  /// START OF RETROVIBE LOCAL FIELDS
+  @$pb.TagNumber(2000)
   $core.bool get localOnly => $_getBF(18);
-  @$pb.TagNumber(1011)
+  @$pb.TagNumber(2000)
   set localOnly($core.bool value) => $_setBool(18, value);
-  @$pb.TagNumber(1011)
+  @$pb.TagNumber(2000)
   $core.bool hasLocalOnly() => $_has(18);
-  @$pb.TagNumber(1011)
-  void clearLocalOnly() => $_clearField(1011);
+  @$pb.TagNumber(2000)
+  void clearLocalOnly() => $_clearField(2000);
 }
 
 class AuthzRequest extends $pb.GeneratedMessage {

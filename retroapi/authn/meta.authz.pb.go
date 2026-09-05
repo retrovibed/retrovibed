@@ -24,13 +24,13 @@ const (
 type Bearer struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// START OF STANDARD FIELDS
-	Id            string `protobuf:"bytes,1,opt,name=id,json=jti,proto3" json:"id,omitempty"`
-	Issuer        string `protobuf:"bytes,2,opt,name=issuer,json=iss,proto3" json:"issuer,omitempty"`
-	ProfileId     string `protobuf:"bytes,3,opt,name=profile_id,json=sub,proto3" json:"profile_id,omitempty"`
-	SessionId     string `protobuf:"bytes,4,opt,name=session_id,json=sid,proto3" json:"session_id,omitempty"`
-	Issued        int64  `protobuf:"varint,5,opt,name=issued,json=iat,proto3" json:"issued,omitempty"`
-	Expires       int64  `protobuf:"varint,6,opt,name=expires,json=exp,proto3" json:"expires,omitempty"`
-	NotBefore     int64  `protobuf:"varint,7,opt,name=not_before,json=nbf,proto3" json:"not_before,omitempty"` // END OF STANDARD FIELDS
+	Jti           string `protobuf:"bytes,1,opt,name=jti,proto3" json:"jti,omitempty"`
+	Iss           string `protobuf:"bytes,2,opt,name=iss,proto3" json:"iss,omitempty"`
+	Sub           string `protobuf:"bytes,3,opt,name=sub,proto3" json:"sub,omitempty"`
+	Sid           string `protobuf:"bytes,4,opt,name=sid,proto3" json:"sid,omitempty"`
+	Iat           int64  `protobuf:"varint,5,opt,name=iat,proto3" json:"iat,omitempty"`
+	Exp           int64  `protobuf:"varint,6,opt,name=exp,proto3" json:"exp,omitempty"`
+	Nbf           int64  `protobuf:"varint,7,opt,name=nbf,proto3" json:"nbf,omitempty"` // END OF STANDARD FIELDS
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -65,51 +65,51 @@ func (*Bearer) Descriptor() ([]byte, []int) {
 	return file_meta_meta_authz_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *Bearer) GetId() string {
+func (x *Bearer) GetJti() string {
 	if x != nil {
-		return x.Id
+		return x.Jti
 	}
 	return ""
 }
 
-func (x *Bearer) GetIssuer() string {
+func (x *Bearer) GetIss() string {
 	if x != nil {
-		return x.Issuer
+		return x.Iss
 	}
 	return ""
 }
 
-func (x *Bearer) GetProfileId() string {
+func (x *Bearer) GetSub() string {
 	if x != nil {
-		return x.ProfileId
+		return x.Sub
 	}
 	return ""
 }
 
-func (x *Bearer) GetSessionId() string {
+func (x *Bearer) GetSid() string {
 	if x != nil {
-		return x.SessionId
+		return x.Sid
 	}
 	return ""
 }
 
-func (x *Bearer) GetIssued() int64 {
+func (x *Bearer) GetIat() int64 {
 	if x != nil {
-		return x.Issued
+		return x.Iat
 	}
 	return 0
 }
 
-func (x *Bearer) GetExpires() int64 {
+func (x *Bearer) GetExp() int64 {
 	if x != nil {
-		return x.Expires
+		return x.Exp
 	}
 	return 0
 }
 
-func (x *Bearer) GetNotBefore() int64 {
+func (x *Bearer) GetNbf() int64 {
 	if x != nil {
-		return x.NotBefore
+		return x.Nbf
 	}
 	return 0
 }
@@ -117,13 +117,13 @@ func (x *Bearer) GetNotBefore() int64 {
 type Token struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// START OF STANDARD FIELDS
-	Id              string `protobuf:"bytes,1,opt,name=id,json=jti,proto3" json:"id,omitempty"`
-	Issuer          string `protobuf:"bytes,2,opt,name=issuer,json=iss,proto3" json:"issuer,omitempty"`
-	ProfileId       string `protobuf:"bytes,3,opt,name=profile_id,json=sub,proto3" json:"profile_id,omitempty"`
-	SessionId       string `protobuf:"bytes,4,opt,name=session_id,json=sid,proto3" json:"session_id,omitempty"`
-	Issued          int64  `protobuf:"varint,5,opt,name=issued,json=iat,proto3" json:"issued,omitempty"`
-	Expires         int64  `protobuf:"varint,6,opt,name=expires,json=exp,proto3" json:"expires,omitempty"`
-	NotBefore       int64  `protobuf:"varint,7,opt,name=not_before,json=nbf,proto3" json:"not_before,omitempty"`
+	Jti             string `protobuf:"bytes,1,opt,name=jti,proto3" json:"jti,omitempty"`
+	Iss             string `protobuf:"bytes,2,opt,name=iss,proto3" json:"iss,omitempty"`
+	Sub             string `protobuf:"bytes,3,opt,name=sub,proto3" json:"sub,omitempty"`
+	Sid             string `protobuf:"bytes,4,opt,name=sid,proto3" json:"sid,omitempty"`
+	Iat             int64  `protobuf:"varint,5,opt,name=iat,proto3" json:"iat,omitempty"`
+	Exp             int64  `protobuf:"varint,6,opt,name=exp,proto3" json:"exp,omitempty"`
+	Nbf             int64  `protobuf:"varint,7,opt,name=nbf,proto3" json:"nbf,omitempty"`
 	Usermanagement  bool   `protobuf:"varint,1000,opt,name=usermanagement,proto3" json:"usermanagement,omitempty"`
 	RemoteControl   bool   `protobuf:"varint,1001,opt,name=remote_control,proto3" json:"remote_control,omitempty"`
 	BillingRead     bool   `protobuf:"varint,1002,opt,name=billing_read,proto3" json:"billing_read,omitempty"`
@@ -135,9 +135,10 @@ type Token struct {
 	LibraryModify   bool   `protobuf:"varint,1008,opt,name=library_modify,proto3" json:"library_modify,omitempty"`
 	ArchiveSync     bool   `protobuf:"varint,1009,opt,name=archive_sync,proto3" json:"archive_sync,omitempty"`
 	CommunitySync   bool   `protobuf:"varint,1010,opt,name=community_sync,proto3" json:"community_sync,omitempty"`
-	LocalOnly       bool   `protobuf:"varint,1011,opt,name=local_only,proto3" json:"local_only,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	// START OF RETROVIBE LOCAL FIELDS
+	LocalOnly     bool `protobuf:"varint,2000,opt,name=local_only,proto3" json:"local_only,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Token) Reset() {
@@ -170,51 +171,51 @@ func (*Token) Descriptor() ([]byte, []int) {
 	return file_meta_meta_authz_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *Token) GetId() string {
+func (x *Token) GetJti() string {
 	if x != nil {
-		return x.Id
+		return x.Jti
 	}
 	return ""
 }
 
-func (x *Token) GetIssuer() string {
+func (x *Token) GetIss() string {
 	if x != nil {
-		return x.Issuer
+		return x.Iss
 	}
 	return ""
 }
 
-func (x *Token) GetProfileId() string {
+func (x *Token) GetSub() string {
 	if x != nil {
-		return x.ProfileId
+		return x.Sub
 	}
 	return ""
 }
 
-func (x *Token) GetSessionId() string {
+func (x *Token) GetSid() string {
 	if x != nil {
-		return x.SessionId
+		return x.Sid
 	}
 	return ""
 }
 
-func (x *Token) GetIssued() int64 {
+func (x *Token) GetIat() int64 {
 	if x != nil {
-		return x.Issued
+		return x.Iat
 	}
 	return 0
 }
 
-func (x *Token) GetExpires() int64 {
+func (x *Token) GetExp() int64 {
 	if x != nil {
-		return x.Expires
+		return x.Exp
 	}
 	return 0
 }
 
-func (x *Token) GetNotBefore() int64 {
+func (x *Token) GetNbf() int64 {
 	if x != nil {
-		return x.NotBefore
+		return x.Nbf
 	}
 	return 0
 }
@@ -659,29 +660,23 @@ var File_meta_meta_authz_proto protoreflect.FileDescriptor
 
 const file_meta_meta_authz_proto_rawDesc = "" +
 	"\n" +
-	"\x15meta/meta.authz.proto\x12\x04meta\"\xa4\x01\n" +
-	"\x06Bearer\x12\x0f\n" +
-	"\x02id\x18\x01 \x01(\tR\x03jti\x12\x13\n" +
-	"\x06issuer\x18\x02 \x01(\tR\x03iss\x12\x17\n" +
-	"\n" +
-	"profile_id\x18\x03 \x01(\tR\x03sub\x12\x17\n" +
-	"\n" +
-	"session_id\x18\x04 \x01(\tR\x03sid\x12\x13\n" +
-	"\x06issued\x18\x05 \x01(\x03R\x03iat\x12\x14\n" +
-	"\aexpires\x18\x06 \x01(\x03R\x03exp\x12\x17\n" +
-	"\n" +
-	"not_before\x18\a \x01(\x03R\x03nbf\"\x8a\x05\n" +
-	"\x05Token\x12\x0f\n" +
-	"\x02id\x18\x01 \x01(\tR\x03jti\x12\x13\n" +
-	"\x06issuer\x18\x02 \x01(\tR\x03iss\x12\x17\n" +
-	"\n" +
-	"profile_id\x18\x03 \x01(\tR\x03sub\x12\x17\n" +
-	"\n" +
-	"session_id\x18\x04 \x01(\tR\x03sid\x12\x13\n" +
-	"\x06issued\x18\x05 \x01(\x03R\x03iat\x12\x14\n" +
-	"\aexpires\x18\x06 \x01(\x03R\x03exp\x12\x17\n" +
-	"\n" +
-	"not_before\x18\a \x01(\x03R\x03nbf\x12'\n" +
+	"\x15meta/meta.authz.proto\x12\x04meta\"\x86\x01\n" +
+	"\x06Bearer\x12\x10\n" +
+	"\x03jti\x18\x01 \x01(\tR\x03jti\x12\x10\n" +
+	"\x03iss\x18\x02 \x01(\tR\x03iss\x12\x10\n" +
+	"\x03sub\x18\x03 \x01(\tR\x03sub\x12\x10\n" +
+	"\x03sid\x18\x04 \x01(\tR\x03sid\x12\x10\n" +
+	"\x03iat\x18\x05 \x01(\x03R\x03iat\x12\x10\n" +
+	"\x03exp\x18\x06 \x01(\x03R\x03exp\x12\x10\n" +
+	"\x03nbf\x18\a \x01(\x03R\x03nbf\"\xf4\x04\n" +
+	"\x05Token\x12\x10\n" +
+	"\x03jti\x18\x01 \x01(\tR\x03jti\x12\x10\n" +
+	"\x03iss\x18\x02 \x01(\tR\x03iss\x12\x10\n" +
+	"\x03sub\x18\x03 \x01(\tR\x03sub\x12\x10\n" +
+	"\x03sid\x18\x04 \x01(\tR\x03sid\x12\x10\n" +
+	"\x03iat\x18\x05 \x01(\x03R\x03iat\x12\x10\n" +
+	"\x03exp\x18\x06 \x01(\x03R\x03exp\x12\x10\n" +
+	"\x03nbf\x18\a \x01(\x03R\x03nbf\x12'\n" +
 	"\x0eusermanagement\x18\xe8\a \x01(\bR\x0eusermanagement\x12'\n" +
 	"\x0eremote_control\x18\xe9\a \x01(\bR\x0eremote_control\x12#\n" +
 	"\fbilling_read\x18\xea\a \x01(\bR\fbilling_read\x12'\n" +
@@ -694,8 +689,8 @@ const file_meta_meta_authz_proto_rawDesc = "" +
 	"\farchive_sync\x18\xf1\a \x01(\bR\farchive_sync\x12'\n" +
 	"\x0ecommunity_sync\x18\xf2\a \x01(\bR\x0ecommunity_sync\x12\x1f\n" +
 	"\n" +
-	"local_only\x18\xf3\a \x01(\bR\n" +
-	"local_onlyJ\x05\b\t\x10\xe8\a\"\x0e\n" +
+	"local_only\x18\xd0\x0f \x01(\bR\n" +
+	"local_onlyJ\x05\b\t\x10\xe8\aJ\x06\b\xf4\a\x10\xd0\x0f\"\x0e\n" +
 	"\fAuthzRequest\"J\n" +
 	"\rAuthzResponse\x12\x16\n" +
 	"\x06bearer\x18\x01 \x01(\tR\x06bearer\x12!\n" +

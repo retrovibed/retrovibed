@@ -3,7 +3,6 @@ package authn
 import (
 	"context"
 	"crypto/tls"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
@@ -11,6 +10,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/env"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/httpx"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/oauth2"
 )
@@ -78,7 +78,7 @@ func (t *jwttokensource) Token() (*oauth2.Token, error) {
 	}
 	defer resp.Body.Close()
 
-	if err = json.NewDecoder(resp.Body).Decode(&authed); err != nil {
+	if err = jsonx.UnmarshalRead(resp.Body, &authed); err != nil {
 		return nil, err
 	}
 
@@ -136,13 +136,13 @@ func (t *metatokensource) Token() (*oauth2.Token, error) {
 	}
 	defer resp.Body.Close()
 
-	if err = json.NewDecoder(resp.Body).Decode(&authed); err != nil {
+	if err = jsonx.UnmarshalRead(resp.Body, &authed); err != nil {
 		return nil, err
 	}
 
 	return &oauth2.Token{
 		AccessToken: authed.Bearer,
-		Expiry:      time.UnixMilli(authed.Token.Expires * 1000),
-		ExpiresIn:   authed.Token.Expires,
+		Expiry:      time.UnixMilli(authed.Token.Exp * 1000),
+		ExpiresIn:   authed.Token.Exp,
 	}, err
 }

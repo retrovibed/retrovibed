@@ -80,7 +80,7 @@ class _State extends State<RemoteControlListener> {
       if (!mounted) return;
       msg.sync
         ..token = httpx.bearer(bearer.bearer)
-        ..expiration = bearer.token.expires;
+        ..expiration = bearer.token.exp;
       _socket.send(msg);
       setState(() {
         _sid = msg.sid;
