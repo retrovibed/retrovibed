@@ -12,9 +12,9 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/websocketx"
@@ -70,7 +70,7 @@ func TestHTTPRemoteControl(t *testing.T) {
 		ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
 		defer cancel()
 
-		cmd, err := jsonx.Marshal(&mediaapi.Stream{
+		cmd, err := protojson.Marshal(&mediaapi.Stream{
 			Sid:     "cmd-1",
 			Command: &mediaapi.Stream_Queue{Queue: &mediaapi.Queue{}},
 		})
@@ -81,11 +81,11 @@ func TestHTTPRemoteControl(t *testing.T) {
 		require.NoError(t, err)
 
 		var relayed mediaapi.Stream
-		require.NoError(t, jsonx.Unmarshal(received, &relayed))
+		require.NoError(t, protojson.Unmarshal(received, &relayed))
 		require.Equal(t, "cmd-1", relayed.Sid)
 		require.NotNil(t, relayed.GetQueue())
 
-		reply, err := jsonx.Marshal(&mediaapi.Stream{
+		reply, err := protojson.Marshal(&mediaapi.Stream{
 			Sid:     "reply-1",
 			Command: &mediaapi.Stream_Pause{},
 		})
@@ -97,7 +97,7 @@ func TestHTTPRemoteControl(t *testing.T) {
 			require.NoError(t, err)
 
 			var got mediaapi.Stream
-			require.NoError(t, jsonx.Unmarshal(broadcast, &got))
+			require.NoError(t, protojson.Unmarshal(broadcast, &got))
 			require.Equal(t, "reply-1", got.Sid)
 			require.True(t, proto.Equal(&mediaapi.Pause{}, got.GetPause()))
 		}
@@ -150,7 +150,7 @@ func TestHTTPRemoteControl(t *testing.T) {
 		ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
 		defer cancel()
 
-		cmd, err := jsonx.Marshal(&mediaapi.Stream{
+		cmd, err := protojson.Marshal(&mediaapi.Stream{
 			Sid:     "cmd-no-listener",
 			Command: &mediaapi.Stream_Queue{Queue: &mediaapi.Queue{}},
 		})
