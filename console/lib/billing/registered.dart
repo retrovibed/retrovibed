@@ -113,6 +113,7 @@ class RegisteredState extends State<Registered> {
         ),
       ),
       loading: _loading,
+      origin: 'RegisteredState',
       ds.ErrorScreen(
         cause: _cause,
         widget.child,

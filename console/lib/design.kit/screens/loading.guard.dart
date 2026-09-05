@@ -34,7 +34,7 @@ class LoadingGuardState extends State<LoadingGuard> {
   }
 
   void delta(int d, [String origin = 'unknown']) {
-    debugPrint('LoadingGuard.delta: delta=$d count=$_count -> ${_count + d} origin=$origin');
+    debugPrint('LoadingGuard.delta: origin=$origin delta=$d count=$_count -> ${_count + d}');
     _count += d;
     assert(_count >= 0, 'LoadingGuard: decrement() called without a matching increment()');
     postframe(() => setState(() {}));

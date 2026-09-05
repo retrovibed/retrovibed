@@ -122,6 +122,7 @@ class _AuthenticatedState extends State<Authenticated> {
       widget.child,
       loading: _loading,
       cause: _cause,
+      origin: '_AuthenticatedState',
     );
   }
 }

@@ -209,6 +209,7 @@ class _EndpointAuto extends State<EndpointAuto> with WidgetsBindingObserver, ds.
       widget.child,
       loading: loading,
       cause: cause,
+      origin: '_EndpointAuto',
     );
   }
 }

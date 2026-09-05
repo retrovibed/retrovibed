@@ -155,6 +155,7 @@ class _DeepLinkState extends State<DeepLink> with ds.LoadingState {
           widget.child,
           loading: loading,
           cause: cause,
+          origin: '_DeepLinkState',
         ),
         _overlay,
       ],
