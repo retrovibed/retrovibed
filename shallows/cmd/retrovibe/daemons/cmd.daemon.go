@@ -265,6 +265,14 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		return errorsx.Wrap(err, "unable to start publish plugin registry")
 	}
 
+	// the registry loads publish.d on its own; recording what it found in
+	// the catalog is what makes a plugin selectable for a community, and
+	// is the only way a hand-installed or symlinked plugin ever gets a row.
+	errorsx.Log(errorsx.Wrap(
+		PublishPluginImport(gctx.Context, db, publishplugin.PublishPluginDir(userx.DefaultConfigDir(userx.DefaultRelRoot()))),
+		"publish plugin import failed",
+	))
+
 	if t.AutoArchive && deepjwt != http.DefaultClient {
 		log.Println("automatic archival is enabled")
 		errorsx.Log(AutoArchival(gctx.Context, db, deepjwt, mediastore, archival, t.AutoArchive))
@@ -541,6 +549,10 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	).Bind(httpmux.PathPrefix("/c").Subrouter())
 
 	communityapi.NewHTTPSocial(db).Bind(httpmux.PathPrefix("/c/social").Subrouter())
+	// bound ahead of /c/publishers so the more specific prefix wins - the
+	// publisher service's own /{id} route would otherwise be the first
+	// thing offered a match under that prefix.
+	communityapi.NewHTTPPublisherEnvironment(db, publishers).Bind(httpmux.PathPrefix("/c/publishers/environment").Subrouter())
 	communityapi.NewHTTPCommunityPublisher(db, publishers).Bind(httpmux.PathPrefix("/c/publishers").Subrouter())
 
 	communityapi.NewHTTPYouTube(db, deepjwt).Bind(httpmux.PathPrefix("/integrations/youtube").Subrouter())

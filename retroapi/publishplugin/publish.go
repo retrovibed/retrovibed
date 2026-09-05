@@ -38,12 +38,16 @@ const guestMediaDir = "/plugin/media.d"
 // responsible for materializing the relevant byte range of whatever storage
 // backs the content into one file, since a wasm guest has no way to
 // interpret block-cache internals) mounted read-only into the guest.
+// Link, when non-empty, is the publicly reachable URI for the content -
+// in practice the magnet URI, the same link the RSS feed advertises - so a
+// plugin's post can point back at what was published.
 type Request struct {
 	Title       string
 	Description string
 	Mimetype    string
 	CommunityID string
 	MediaPath   string
+	Link        string
 }
 
 // Result is what a plugin reports back on stdout as a single JSON object
@@ -72,7 +76,7 @@ type publishOutcome struct {
 
 // Publish invokes the plugin installed at path - a WASI command run as:
 //
-//	<path> publish --title <t> --description <d> --mimetype <m> [--media <mounted-path>] [--community-id <id>]
+//	<path> publish --title <t> --description <d> --mimetype <m> [--media <mounted-path>] [--community-id <id>] [--link <uri>]
 //
 // - decoding a single JSON object from its stdout as the *Result. Unlike
 // searchplugin.T.Search, which fans a query out to every loaded plugin, this
@@ -104,22 +108,89 @@ func (r *Registry) Publish(ctx context.Context, path string, req Request) (*Resu
 	}
 }
 
+// Environment invokes the plugin installed at path as:
+//
+//	<path> env
+//
+// returning, verbatim, the .env document it writes to stdout - the
+// variables that plugin understands, with a comment per variable describing
+// it (see retroapi/envfile for the exact convention). It is what lets a
+// configuration UI render a form for a plugin nobody wrote a form for:
+// the plugin itself is the schema.
+//
+// Unlike Publish this bypasses the shared worker pool. The call is short,
+// rare, and interactive - queueing it behind however many multi-minute
+// uploads are in flight would make the configuration screen appear hung.
+func (r *Registry) Environment(ctx context.Context, path string) ([]byte, error) {
+	compiled, ok := r.lookup(path)
+	if !ok {
+		return nil, errorsx.Wrapf(ErrNotLoaded, "path: %s", path)
+	}
+
+	// deliberately anonymous, unlike the publish invocation below: an
+	// environment read can land while a publish of the same plugin is
+	// mid-flight, and wazero refuses to instantiate a second module under a
+	// name that is already live.
+	return r.invoke(ctx, path, compiled, invocation{args: []string{"env"}})
+}
+
 // runPublishJob instantiates a single plugin, decodes its stdout as a single
 // JSON object, and sends the outcome on j.result. A non-zero exit is
 // reported through the outcome, not swallowed.
 func (r *Registry) runPublishJob(ctx context.Context, j publishWorkload) error {
-	out, err := r.invoke(ctx, j.path, j.compiled, j.req)
+	out, err := r.publish(ctx, j.path, j.compiled, j.req)
 	j.result <- publishOutcome{result: out, err: err}
 	return err
 }
 
-func (r *Registry) invoke(ctx context.Context, path string, compiled wazero.CompiledModule, req Request) (*Result, error) {
-	id := strings.TrimSuffix(filepath.Base(path), ".wasm")
+// invocation is one command dispatched at a plugin: argv (after the binary
+// path itself), the wazero module name to run it under - empty runs it
+// anonymously, which is what lets concurrent invocations of the same plugin
+// coexist - and the host-side media file to mount, when the command takes
+// one.
+type invocation struct {
+	name  string
+	args  []string
+	media string
+}
 
-	args := []string{path, "publish", "--title", req.Title, "--description", req.Description, "--mimetype", req.Mimetype}
+// publish runs a plugin's publish command and decodes its stdout as the
+// single JSON object documented on Result.
+func (r *Registry) publish(ctx context.Context, path string, compiled wazero.CompiledModule, req Request) (*Result, error) {
+	args := []string{"publish", "--title", req.Title, "--description", req.Description, "--mimetype", req.Mimetype}
 	if req.CommunityID != "" {
 		args = append(args, "--community-id", req.CommunityID)
 	}
+	if req.Link != "" {
+		args = append(args, "--link", req.Link)
+	}
+	if req.MediaPath != "" {
+		args = append(args, "--media", guestMediaDir+"/"+filepath.Base(req.MediaPath))
+	}
+
+	stdout, err := r.invoke(ctx, path, compiled, invocation{name: path, args: args, media: req.MediaPath})
+	if err != nil {
+		return nil, err
+	}
+
+	var result Result
+	if err := json.Unmarshal(stdout, &result); err != nil {
+		return nil, errorsx.Wrapf(err, "publish plugin emitted invalid json: %s", path)
+	}
+
+	return &result, nil
+}
+
+// invoke runs a single command against an already-compiled plugin and
+// returns whatever it wrote to stdout. Every command a plugin exposes -
+// publish and env alike - reaches the guest through here, so the sandbox
+// they see is identical: the host TLS trust store, the per-plugin config
+// and cache directories, and the .env sidecar's variables. A non-zero exit
+// is returned as an error rather than swallowed.
+func (r *Registry) invoke(ctx context.Context, path string, compiled wazero.CompiledModule, inv invocation) ([]byte, error) {
+	id := strings.TrimSuffix(filepath.Base(path), ".wasm")
+
+	args := append([]string{path}, inv.args...)
 
 	hostConfigDir := r.PluginConfigDir(id)
 	hostCacheDir := r.PluginCacheDir(id)
@@ -135,14 +206,13 @@ func (r *Registry) invoke(ctx context.Context, path string, compiled wazero.Comp
 		WithDirMount(hostConfigDir, guestPluginConfigDir).
 		WithDirMount(hostCacheDir, guestPluginCacheDir)
 
-	if req.MediaPath != "" {
-		wazerofs = wazerofs.WithDirMount(filepath.Dir(req.MediaPath), guestMediaDir)
-		args = append(args, "--media", guestMediaDir+"/"+filepath.Base(req.MediaPath))
+	if inv.media != "" {
+		wazerofs = wazerofs.WithDirMount(filepath.Dir(inv.media), guestMediaDir)
 	}
 
 	var stdout bytes.Buffer
 	cfg := wazero.NewModuleConfig().
-		WithName(path).
+		WithName(inv.name).
 		WithArgs(args...).
 		WithEnv("SSL_CERT_DIR", guestSSLCertDir).
 		WithEnv("CONFIGURATION_DIRECTORY", guestPluginConfigDir).
@@ -153,7 +223,7 @@ func (r *Registry) invoke(ctx context.Context, path string, compiled wazero.Comp
 		WithSysWalltime().
 		WithSysNanotime()
 
-	envpath := strings.TrimSuffix(path, ".wasm") + ".env"
+	envpath := EnvPath(path)
 	envpairs, err := readEnvFile(envpath)
 	if err != nil {
 		log.Println("unable to read publish plugin configuration", envpath, err)
@@ -163,7 +233,7 @@ func (r *Registry) invoke(ctx context.Context, path string, compiled wazero.Comp
 		cfg = cfg.WithEnv(k, v)
 	}
 
-	log.Println("running publish plugin", path)
+	log.Println("running publish plugin", path, strings.Join(inv.args, " "))
 
 	mod, runErr := r.runtime.InstantiateModule(ctx, compiled, cfg)
 	if mod != nil {
@@ -178,10 +248,5 @@ func (r *Registry) invoke(ctx context.Context, path string, compiled wazero.Comp
 		return nil, errorsx.Wrapf(runErr, "unable to run publish plugin: %s", path)
 	}
 
-	var result Result
-	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
-		return nil, errorsx.Wrapf(err, "publish plugin emitted invalid json: %s", path)
-	}
-
-	return &result, nil
+	return stdout.Bytes(), nil
 }

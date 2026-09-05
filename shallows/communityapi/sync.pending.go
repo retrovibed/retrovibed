@@ -83,6 +83,7 @@ func publishToPlugin(ctx context.Context, mvfs fsx.Virtual, publishers publishpl
 		Mimetype:    stringsx.FirstNonBlank(known.Mimetype, lmd.Mimetype),
 		CommunityID: pc.CommunityID,
 		MediaPath:   tmp.Name(),
+		Link:        pc.MagnetURI,
 	})
 
 	return err

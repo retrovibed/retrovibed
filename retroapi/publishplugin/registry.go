@@ -12,6 +12,7 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 
 	"github.com/egdaemon/wasinet/wasinet/wnetruntime"
@@ -32,13 +33,26 @@ type T interface {
 	Publish(ctx context.Context, path string, req Request) (*Result, error)
 }
 
-// Unimplemented is a safe default T: every Publish fails with
+// E is the interface *Registry satisfies for Environment, kept separate
+// from T because the two have disjoint consumers: the publishing daemon
+// only ever publishes, while the configuration API and CLI only ever read a
+// plugin's declared variables. Depending on the narrower of the two keeps a
+// fake down to the one method its caller actually exercises.
+type E interface {
+	Environment(ctx context.Context, path string) ([]byte, error)
+}
+
+// Unimplemented is a safe default T and E: every call fails with
 // errors.ErrUnsupported instead of silently succeeding, so callers that
 // haven't wired up a real registry get a clear signal rather than a bare nil
 // interface passed around.
 type Unimplemented struct{}
 
 func (Unimplemented) Publish(ctx context.Context, path string, req Request) (*Result, error) {
+	return nil, errors.ErrUnsupported
+}
+
+func (Unimplemented) Environment(ctx context.Context, path string) ([]byte, error) {
 	return nil, errors.ErrUnsupported
 }
 
@@ -129,7 +143,24 @@ func defaultSocket() wnetruntime.Socket {
 // without starting the publish.d directory watch, so tests can Load plugins
 // directly without touching the real, hardcoded plugin directory.
 func newRegistry(ctx context.Context, sock wnetruntime.Socket, options ...Option) (*Registry, error) {
-	runtime := wazero.NewRuntime(ctx)
+	cachedir := userx.DefaultCacheDirectory(userx.DefaultRelRoot())
+
+	// Plugins are large (tens of MB) wasm binaries; without a persistent
+	// compilation cache wazero AOT-compiles every one of them from scratch
+	// on every daemon start, which can add tens of seconds to startup.
+	// Caching compiled code here means only new/changed plugins pay that
+	// cost.
+	compiledir := filepath.Join(cachedir, "wazero.compiled")
+	if err := os.MkdirAll(compiledir, 0700); err != nil {
+		return nil, errorsx.Wrap(err, "unable to create wazero compilation cache directory")
+	}
+
+	cache, err := wazero.NewCompilationCacheWithDir(compiledir)
+	if err != nil {
+		return nil, errorsx.Wrap(err, "unable to open wazero compilation cache")
+	}
+
+	runtime := wazero.NewRuntimeWithConfig(ctx, wazero.NewRuntimeConfig().WithCompilationCache(cache))
 
 	if _, err := wasi_snapshot_preview1.Instantiate(ctx, runtime); err != nil {
 		return nil, errorsx.Wrap(err, "unable to instantiate wasi")
@@ -150,7 +181,7 @@ func newRegistry(ctx context.Context, sock wnetruntime.Socket, options ...Option
 			"/etc/ssl/certs",
 		),
 		configDir: userx.DefaultConfigDir(userx.DefaultRelRoot()),
-		cacheDir:  userx.DefaultCacheDirectory(userx.DefaultRelRoot()),
+		cacheDir:  cachedir,
 		modules:   map[string]wazero.CompiledModule{},
 	}
 	for _, opt := range options {
@@ -168,6 +199,17 @@ func newRegistry(ctx context.Context, sock wnetruntime.Socket, options ...Option
 // cache-side analogue.
 func PublishPluginDir(root string) string {
 	return filepath.Join(root, "publish.d")
+}
+
+// EnvPath is the .env sidecar belonging to the plugin installed at wasm - a
+// sibling file with the .wasm suffix swapped for .env. Every consumer of a
+// plugin's configuration (the runner in publish.go, the HTTP environment
+// service, the install/config CLI) resolves it through here so the rule
+// cannot drift between them. Because it is derived from the path rather
+// than the file's contents, each symlink to a shared module gets its own
+// configuration.
+func EnvPath(wasm string) string {
+	return strings.TrimSuffix(wasm, ".wasm") + ".env"
 }
 
 // PluginConfigDir is the well-known per-plugin configuration directory,
