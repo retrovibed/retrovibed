@@ -593,7 +593,7 @@ github.com/google/go-cmp/cmp/internal/diff
 github.com/google/go-cmp/cmp/internal/flags
 github.com/google/go-cmp/cmp/internal/function
 github.com/google/go-cmp/cmp/internal/value
-# github.com/google/pprof v0.0.0-20260825171938-4d453200e7d9
+# github.com/google/pprof v0.0.0-20260903180319-d6c3cb2f37ec
 ## explicit; go 1.25.0
 github.com/google/pprof/profile
 # github.com/google/s2a-go v0.1.9
@@ -698,7 +698,7 @@ github.com/jackc/pgx/v5/stdlib
 ## explicit; go 1.19
 github.com/jackc/puddle/v2
 github.com/jackc/puddle/v2/internal/genstack
-# github.com/james-lawrence/genieql v0.0.0-20260821141941-92fda96aa606
+# github.com/james-lawrence/genieql v0.0.0-20260904213219-acc6235faffb
 ## explicit; go 1.25.0
 github.com/james-lawrence/genieql
 github.com/james-lawrence/genieql/astbuild

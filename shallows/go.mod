@@ -29,7 +29,7 @@ require (
 	github.com/gorilla/schema v1.4.1
 	github.com/grindlemire/go-lucene v0.0.33
 	github.com/hashicorp/mdns v1.0.6
-	github.com/james-lawrence/genieql v0.0.0-20260821141941-92fda96aa606
+	github.com/james-lawrence/genieql v0.0.0-20260904213219-acc6235faffb
 	github.com/james-lawrence/torrent v0.0.0-20260904173349-c4c80b11177e
 	github.com/jfreymuth/pulse v0.1.2
 	github.com/justinas/alice v1.2.0
@@ -115,7 +115,7 @@ require (
 	github.com/google/btree v1.1.3 // indirect
 	github.com/google/flatbuffers v25.12.19+incompatible // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
-	github.com/google/pprof v0.0.0-20260825171938-4d453200e7d9 // indirect
+	github.com/google/pprof v0.0.0-20260903180319-d6c3cb2f37ec // indirect
 	github.com/google/s2a-go v0.1.9 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.15 // indirect
 	github.com/googleapis/gax-go/v2 v2.22.0 // indirect

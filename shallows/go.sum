@@ -321,8 +321,8 @@ github.com/google/go-cmp v0.7.0/go.mod h1:pXiqmnSA92OHEEa9HXL2W4E7lf9JzCmGVUdgjX
 github.com/google/gofuzz v1.0.0/go.mod h1:dBl0BpW6vV/+mYPU4Po3pmUjxk6FQPldtuIdl/M65Eg=
 github.com/google/pprof v0.0.0-20211214055906-6f57359322fd/go.mod h1:KgnwoLYCZ8IQu3XUZ8Nc/bM9CCZFOyjUNOSygVozoDg=
 github.com/google/pprof v0.0.0-20240227163752-401108e1b7e7/go.mod h1:czg5+yv1E0ZGTi6S6vVK1mke0fV+FaUhNGcd6VRS9Ik=
-github.com/google/pprof v0.0.0-20260825171938-4d453200e7d9 h1:dl4UZiszMU+NKHirOiCKTC+hRuNAQ0moHPxSg6WcU1o=
-github.com/google/pprof v0.0.0-20260825171938-4d453200e7d9/go.mod h1:jl5iWTm0/hd5PjEYEOuwAJ57L/CibdZfrqZ5XA5GrCk=
+github.com/google/pprof v0.0.0-20260903180319-d6c3cb2f37ec h1:ZhR4jlKRUmzPEPd2RLiJRUi25rUrdKBrhQNVIbqpTNE=
+github.com/google/pprof v0.0.0-20260903180319-d6c3cb2f37ec/go.mod h1:jl5iWTm0/hd5PjEYEOuwAJ57L/CibdZfrqZ5XA5GrCk=
 github.com/google/renameio v0.1.0/go.mod h1:KWCgfxg9yswjAJkECMjeO8J8rahYeXnNhOm40UhjYkI=
 github.com/google/s2a-go v0.1.9 h1:LGD7gtMgezd8a/Xak7mEWL0PjoTQFvpRudN895yqKW0=
 github.com/google/s2a-go v0.1.9/go.mod h1:YA0Ei2ZQL3acow2O62kdp9UlnvMmU7kA6Eutn0dXayM=
@@ -426,8 +426,8 @@ github.com/jackc/puddle v1.1.3/go.mod h1:m4B5Dj62Y0fbyuIc15OsIqK0+JU8nkqQjsgx7dv
 github.com/jackc/puddle v1.3.0/go.mod h1:m4B5Dj62Y0fbyuIc15OsIqK0+JU8nkqQjsgx7dvjSWk=
 github.com/jackc/puddle/v2 v2.2.2 h1:PR8nw+E/1w0GLuRFSmiioY6UooMp6KJv0/61nB7icHo=
 github.com/jackc/puddle/v2 v2.2.2/go.mod h1:vriiEXHvEE654aYKXXjOvZM39qJ0q+azkZFrfEOc3H4=
-github.com/james-lawrence/genieql v0.0.0-20260821141941-92fda96aa606 h1:Xhqz/iaQPjD0HXXqh2u2KeW2LSBEN9gvhrlWFHf2eQM=
-github.com/james-lawrence/genieql v0.0.0-20260821141941-92fda96aa606/go.mod h1:eNV3HN1XFnmhwx+o53UyV8hiyVlpZqUPlqTxPzoCO2U=
+github.com/james-lawrence/genieql v0.0.0-20260904213219-acc6235faffb h1:H2d7cRpZvUMQBzClG/xGWBP5Qfnwq70jK8V8KwoYWX8=
+github.com/james-lawrence/genieql v0.0.0-20260904213219-acc6235faffb/go.mod h1:eNV3HN1XFnmhwx+o53UyV8hiyVlpZqUPlqTxPzoCO2U=
 github.com/james-lawrence/torrent v0.0.0-20260904173349-c4c80b11177e h1:1i9uTTp/UEI94t6Nf9DbZwTrvPN5EBJ049hF9AfmQUY=
 github.com/james-lawrence/torrent v0.0.0-20260904173349-c4c80b11177e/go.mod h1:o3EeglQ25tirZ2VKMvxzl1BOU2nOONCBBd0/5fON+CI=
 github.com/jfreymuth/pulse v0.1.2 h1:t4+ItUuWLlQnulVDOL2eAotKk+utKJzK8ol0iybYAmQ=
