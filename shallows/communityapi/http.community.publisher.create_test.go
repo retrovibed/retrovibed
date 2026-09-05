@@ -1,7 +1,6 @@
 package communityapi_test
 
 import (
-	"encoding/json"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
@@ -11,6 +10,7 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/community"
@@ -85,7 +85,7 @@ func TestHTTPCommunityPublisherCreate(t *testing.T) {
 		require.NoError(t, httpx.ErrorCode(resp.Result()))
 
 		var result communityapi.PluginPublisherCreateResponse
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Equal(t, expectedID, result.Publisher.Id)
 		require.Equal(t, "YouTube", result.Publisher.Description)
 		require.Equal(t, "application/vnd.retrovibe.publisher.youtube", result.Publisher.Mimetype)

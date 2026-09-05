@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/retrovibed/retrovibed/retroapi/asynccompute"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
@@ -133,7 +134,7 @@ func (t cmdCompletion) run(gctx *cmdopts.Global, in io.Reader, out io.Writer, er
 
 		defer resp.Body.Close()
 		var decoded LLMResponse
-		if err := json.NewDecoder(resp.Body).Decode(&decoded); err != nil {
+		if err := jsonx.UnmarshalRead(resp.Body, &decoded); err != nil {
 			return insert.Run(ctx, insertpayload{record: rec, err: errorsx.Wrap(err, "failed to decode response")})
 		}
 		content := ""

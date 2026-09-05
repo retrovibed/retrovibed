@@ -11,6 +11,7 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
@@ -87,7 +88,7 @@ func TestCommunityLibraryPublish(t *testing.T) {
 
 		require.False(t, called, "endpoint must not be called during dry run")
 		var decoded library.Metadata
-		require.NoError(t, json.NewDecoder(&output).Decode(&decoded))
+		require.NoError(t, jsonx.UnmarshalRead(&output, &decoded))
 		require.Equal(t, libraryID, decoded.ID)
 		require.Equal(t, mimex.RetrovibedMediaArchive, decoded.Mimetype)
 	})
@@ -140,7 +141,7 @@ func TestCommunityLibraryPublish(t *testing.T) {
 		require.NoError(t, cmd.run(ctx, srv.URL, jsonl.NewEncoder(&output), &input, c))
 
 		var result communityapi.PublishedContent
-		require.NoError(t, json.NewDecoder(&output).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(&output, &result))
 		require.NotEmpty(t, result.Id)
 		require.Equal(t, libraryID, result.LibraryId)
 		require.Equal(t, communityID, result.CommunityId)
@@ -272,7 +273,7 @@ func TestCommunityLibraryPublish(t *testing.T) {
 		require.NoError(t, cmd.run(ctx, srv.URL, jsonl.NewEncoder(&output), &input, c))
 
 		var result communityapi.PublishedContent
-		require.NoError(t, json.NewDecoder(&output).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(&output, &result))
 
 		var pc community.PublishedContent
 		require.NoError(t, community.PublishedContentFindByID(ctx, q, result.Id).Scan(&pc))

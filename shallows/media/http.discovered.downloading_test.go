@@ -1,7 +1,6 @@
 package media_test
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"testing"
@@ -10,6 +9,8 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/gorilla/mux"
 	"github.com/james-lawrence/torrent/storage"
+	"github.com/james-lawrence/torrent/torrenttestx"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
@@ -21,7 +22,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
-	"github.com/james-lawrence/torrent/torrenttestx"
 	"github.com/retrovibed/retrovibed/shallows/media"
 	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/retrovibed/retrovibed/shallows/metaapi"
@@ -151,7 +151,7 @@ func TestDiscoveredDownloading(t *testing.T) {
 
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
 
-		err = json.NewDecoder(resp.Result().Body).Decode(&result)
+		err = jsonx.UnmarshalRead(resp.Result().Body, &result)
 		require.NoError(t, err)
 		require.Len(t, result.Items, 5, "Expected 5 metadata items in the search results")
 

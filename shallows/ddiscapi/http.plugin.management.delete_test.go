@@ -1,7 +1,6 @@
 package ddiscapi_test
 
 import (
-	"encoding/json"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -9,6 +8,7 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
@@ -54,7 +54,7 @@ func TestHTTPPluginManagementDelete(t *testing.T) {
 		require.NoError(t, httpx.ErrorCode(resp.Result()))
 
 		var result ddiscapi.PluginDeleteResponse
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Equal(t, "foo", result.Plugin.Name)
 		require.EqualValues(t, len("foocontent"), result.Plugin.Size)
 		require.NoFileExists(t, path)

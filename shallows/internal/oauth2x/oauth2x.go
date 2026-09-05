@@ -2,12 +2,12 @@ package oauth2x
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
 
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"golang.org/x/oauth2"
 )
@@ -88,7 +88,7 @@ func RetrieveAuthCode(ctx context.Context, chttp *http.Client, uri string) (r Au
 	}
 	defer httpx.TryClose(resp)
 
-	if err = json.NewDecoder(resp.Body).Decode(&r); err != nil {
+	if err = jsonx.UnmarshalRead(resp.Body, &r); err != nil {
 		return r, err
 	}
 

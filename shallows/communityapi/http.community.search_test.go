@@ -9,6 +9,7 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/community"
@@ -121,7 +122,7 @@ func TestSearchEndpoint(t *testing.T) {
 		require.Equal(t, http.StatusOK, resp.Code)
 
 		var searchResp communityapi.CommunitySearchResponse
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&searchResp))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &searchResp))
 		require.Len(t, searchResp.Items, 1)
 		require.Equal(t, communityID, searchResp.Items[0].Id)
 		require.Equal(t, "https://testcommunity.community.retrovibe.space", searchResp.Items[0].Url)

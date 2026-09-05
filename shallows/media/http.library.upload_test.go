@@ -1,7 +1,6 @@
 package media_test
 
 import (
-	"encoding/json"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -10,6 +9,7 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
@@ -92,7 +92,7 @@ func TestLibraryUploadFile(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 		var md library.Metadata
 		require.NoError(t, library.MetadataFindByID(ctx, q, result.Media.Id).Scan(&md))
@@ -162,7 +162,7 @@ func TestLibraryUploadFile(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 		var dbMD library.Metadata
 		require.NoError(t, library.MetadataFindByID(ctx, q, result.Media.Id).Scan(&dbMD))
@@ -229,7 +229,7 @@ func TestLibraryUploadFile(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 		var dbMD library.Metadata
 		require.NoError(t, library.MetadataFindByID(ctx, q, result.Media.Id).Scan(&dbMD))
@@ -296,7 +296,7 @@ func TestLibraryUploadFile(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 		var dbMD library.Metadata
 		require.NoError(t, library.MetadataFindByID(ctx, q, result.Media.Id).Scan(&dbMD))
@@ -363,7 +363,7 @@ func TestLibraryUploadFile(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 		var dbMD library.Metadata
 		require.NoError(t, library.MetadataFindByID(ctx, q, result.Media.Id).Scan(&dbMD))
@@ -430,7 +430,7 @@ func TestLibraryUploadFile(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 		var dbMD library.Metadata
 		require.NoError(t, library.MetadataFindByID(ctx, q, result.Media.Id).Scan(&dbMD))
@@ -497,7 +497,7 @@ func TestLibraryUploadFile(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 		var dbMD library.Metadata
 		require.NoError(t, library.MetadataFindByID(ctx, q, result.Media.Id).Scan(&dbMD))
@@ -564,7 +564,7 @@ func TestLibraryUploadFile(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 		var dbMD library.Metadata
 		require.NoError(t, library.MetadataFindByID(ctx, q, result.Media.Id).Scan(&dbMD))
@@ -631,7 +631,7 @@ func TestLibraryUploadFile(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 		var md library.Metadata
 		require.NoError(t, library.MetadataFindByID(ctx, q, result.Media.Id).Scan(&md))
@@ -719,7 +719,7 @@ func TestLibraryUploadFile(t *testing.T) {
 		routes.ServeHTTP(resp1, req1)
 
 		require.Equal(t, http.StatusOK, resp1.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp1.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp1.Body, &result))
 
 		resp2, req2, err := httptestx.BuildRequestBytes(
 			http.MethodPost,
@@ -732,7 +732,7 @@ func TestLibraryUploadFile(t *testing.T) {
 		routes.ServeHTTP(resp2, req2)
 
 		require.Equal(t, http.StatusOK, resp2.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp2.Body).Decode(&result2))
+		require.NoError(t, jsonx.UnmarshalRead(resp2.Body, &result2))
 		require.Equal(t, result.Media.Id, result2.Media.Id)
 
 		count := testx.Must(sqlx.Count(ctx, q, "SELECT COUNT(*) FROM library_metadata WHERE id = ?", result.Media.Id))(t)
@@ -809,7 +809,7 @@ func TestLibraryUploadFile(t *testing.T) {
 		require.NoError(t, err)
 		routes.ServeHTTP(resp1, req1)
 		require.Equal(t, http.StatusOK, resp1.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp1.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp1.Body, &result))
 
 		var md library.Metadata
 		require.NoError(t, library.MetadataTombstoneByID(ctx, q, result.Media.Id).Scan(&md))
@@ -962,7 +962,7 @@ func TestLibraryUploadFile(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 		var md library.Metadata
 		require.NoError(t, library.MetadataFindByID(ctx, q, result.Media.Id).Scan(&md))
@@ -1028,7 +1028,7 @@ func TestLibraryUploadFile(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 		var md library.Metadata
 		require.NoError(t, library.MetadataFindByID(ctx, q, result.Media.Id).Scan(&md))
@@ -1094,7 +1094,7 @@ func TestLibraryUploadFile(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 		var md library.Metadata
 		require.NoError(t, library.MetadataFindByID(ctx, q, result.Media.Id).Scan(&md))
@@ -1160,7 +1160,7 @@ func TestLibraryUploadFile(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 		var md library.Metadata
 		require.NoError(t, library.MetadataFindByID(ctx, q, result.Media.Id).Scan(&md))

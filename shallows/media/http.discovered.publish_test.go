@@ -1,7 +1,6 @@
 package media_test
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"testing"
@@ -13,6 +12,8 @@ import (
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/james-lawrence/torrent/torrenttest"
+	"github.com/james-lawrence/torrent/torrenttestx"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
@@ -29,7 +30,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
-	"github.com/james-lawrence/torrent/torrenttestx"
 	"github.com/retrovibed/retrovibed/shallows/media"
 	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/retrovibed/retrovibed/shallows/metaapi"
@@ -100,7 +100,7 @@ func TestDiscoveredPublishTorrent(t *testing.T) {
 		require.NoError(t, buf.Close())
 
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&r))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &r))
 		require.Equal(t, info.Name, r.Published.Description)
 		require.Equal(t, md.ID.String(), r.Published.Id)
 		require.Equal(t, grpcx.EncodeTime(langx.Autoderef(timex.JSONSafeEncode(new(timex.Inf())))), r.Published.ExpiresAt)
@@ -190,7 +190,7 @@ func TestDiscoveredPublishTorrent(t *testing.T) {
 		require.NoError(t, buf.Close())
 
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&r))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &r))
 		require.Equal(t, info.Name, r.Published.Description)
 		require.Equal(t, md.ID.String(), r.Published.Id)
 		require.NotEqual(t, grpcx.EncodeTime(langx.Autoderef(timex.JSONSafeEncode(new(timex.Inf())))), r.Published.ExpiresAt)
@@ -237,7 +237,7 @@ func TestDiscoveredPublishTorrent(t *testing.T) {
 		require.NoError(t, buf.Close())
 
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&r))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &r))
 
 		require.NoError(t, tracking.MetadataFindByInfohash(t.Context(), q, r.Published.Id).Scan(&found))
 		require.True(t, found.Seeding)

@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/gorilla/mux"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
@@ -55,7 +56,7 @@ func TestHTTPUserManagementCreate(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.NoError(t, httpx.ErrorCode(resp.Result()))
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.NotEmpty(t, result.Profile.Id)
 
 		var created meta.Profile
@@ -170,7 +171,7 @@ func TestHTTPUserManagementCreate(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.NoError(t, httpx.ErrorCode(resp.Result()))
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 		var created meta.Profile
 		require.NoError(t, meta.ProfileFindByID(ctx, q, result.Profile.Id).Scan(&created))
@@ -209,7 +210,7 @@ func TestHTTPUserManagementCreate(t *testing.T) {
 			require.NoError(t, err)
 			routes.ServeHTTP(resp, req)
 			require.NoError(t, httpx.ErrorCode(resp.Result()))
-			require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+			require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		}
 
 		require.Equal(t, 2, testx.Must(sqlx.Count(ctx, q, "SELECT COUNT(*) FROM meta_profiles"))(t))
@@ -249,7 +250,7 @@ func TestHTTPUserManagementCreate(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.NoError(t, httpx.ErrorCode(resp.Result()))
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 		var created meta.Profile
 		require.NoError(t, meta.ProfileFindByID(ctx, q, result.Profile.Id).Scan(&created))

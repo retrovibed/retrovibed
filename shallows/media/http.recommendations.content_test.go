@@ -1,12 +1,12 @@
 package media_test
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"testing"
 
 	"github.com/gorilla/mux"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/retroapi/uuidx"
@@ -60,7 +60,7 @@ func TestRecommendationsContent(t *testing.T) {
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
 
 		var result media.RecommendationFindResponse
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Equal(t, known.UID, result.Recommendation.Uid)
 	})
 

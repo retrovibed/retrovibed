@@ -1,13 +1,13 @@
 package ftuxapi
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
 	"github.com/retrovibed/retrovibed/retroapi/httpauth"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/ftux"
@@ -76,7 +76,7 @@ func (t *HTTP) defaults(w http.ResponseWriter, r *http.Request) {
 
 func (t *HTTP) subscribe(w http.ResponseWriter, r *http.Request) {
 	var req SubscribeCommunitiesRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	if err := jsonx.UnmarshalRead(r.Body, &req); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to decode subscribe request"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return

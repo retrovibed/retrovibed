@@ -10,6 +10,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
@@ -60,7 +61,7 @@ func TestHTTPDiscoveryDownload(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.NoError(t, httpx.ErrorCode(resp.Result()))
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 		require.Equal(t, disc.ID, result.Discovery.Id)
 		require.Equal(t, 1, testx.Must(sqlx.Count(ctx, q, "SELECT COUNT(*) FROM torrents_metadata WHERE initiated_at <= NOW()"))(t))
@@ -97,7 +98,7 @@ func TestHTTPDiscoveryDownload(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.NoError(t, httpx.ErrorCode(resp.Result()))
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 		require.Equal(t, disc.ID, result.Discovery.Id)
 	})
@@ -139,7 +140,7 @@ func TestHTTPDiscoveryDownload(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.NoError(t, httpx.ErrorCode(resp.Result()))
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 		var disc ddisc.Discovered
 		require.NoError(t, ddisc.DiscoveredFindByID(ctx, q, ephemeralID).Scan(&disc))

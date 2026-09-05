@@ -13,6 +13,7 @@ import (
 	"os"
 
 	"github.com/retrovibed/retrovibed/retroapi/authn"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
@@ -108,7 +109,7 @@ func (t importJSONL) importItem(ctx context.Context, c *http.Client, endpoint st
 	defer resp.Body.Close()
 
 	var uploadResp media.MediaUploadResponse
-	if err := json.NewDecoder(resp.Body).Decode(&uploadResp); err != nil {
+	if err := jsonx.UnmarshalRead(resp.Body, &uploadResp); err != nil {
 		return errorsx.Wrap(err, "decode upload response")
 	}
 

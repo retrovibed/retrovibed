@@ -1,7 +1,6 @@
 package media_test
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"testing"
@@ -9,6 +8,7 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
@@ -80,7 +80,7 @@ func TestRecentTombstone(t *testing.T) {
 		require.Equal(t, http.StatusOK, resp3.Result().StatusCode)
 
 		var result media.RecentSearchResponse
-		require.NoError(t, json.NewDecoder(resp3.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp3.Body, &result))
 		require.Empty(t, result.Items)
 	})
 

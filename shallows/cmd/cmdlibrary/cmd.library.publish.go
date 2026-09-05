@@ -10,6 +10,7 @@ import (
 	"os"
 
 	"github.com/retrovibed/retrovibed/retroapi/authn"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
@@ -93,7 +94,7 @@ func (t cmdPublish) publishItem(ctx context.Context, endpoint string, c *http.Cl
 	}
 	defer resp.Body.Close()
 
-	if err = json.NewDecoder(resp.Body).Decode(&msg); err != nil {
+	if err = jsonx.UnmarshalRead(resp.Body, &msg); err != nil {
 		return nil, errorsx.Wrap(err, "failed to decode response")
 	}
 

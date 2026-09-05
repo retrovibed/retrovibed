@@ -9,6 +9,7 @@ import (
 	"net/url"
 
 	"github.com/retrovibed/retrovibed/retroapi/env"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
@@ -51,7 +52,7 @@ func (t DeeppoolPublished) Sync(ctx context.Context, cursor string) (*PublishedC
 	}
 	defer resp.Body.Close()
 
-	if err = json.NewDecoder(resp.Body).Decode(&msg); err != nil {
+	if err = jsonx.UnmarshalRead(resp.Body, &msg); err != nil {
 		return nil, err
 	}
 
@@ -83,7 +84,7 @@ func (t DeeppoolPublished) List(ctx context.Context, communityID string, req *Pu
 	}
 	defer resp.Body.Close()
 
-	if err = json.NewDecoder(resp.Body).Decode(&msg); err != nil {
+	if err = jsonx.UnmarshalRead(resp.Body, &msg); err != nil {
 		return nil, err
 	}
 
@@ -115,7 +116,7 @@ func (t DeeppoolPublished) Publish(ctx context.Context, communityID string, pc *
 	}
 	defer resp.Body.Close()
 
-	if err = json.NewDecoder(resp.Body).Decode(&msg); err != nil {
+	if err = jsonx.UnmarshalRead(resp.Body, &msg); err != nil {
 		return nil, err
 	}
 

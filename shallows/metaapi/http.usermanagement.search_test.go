@@ -1,13 +1,13 @@
 package metaapi_test
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"testing"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
@@ -57,7 +57,7 @@ func TestHTTPUserManagementSearch(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.NoError(t, httpx.ErrorCode(resp.Result()))
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 		encoded := testx.Must(metaapi.NewProfileFromMetaProfile(p))(t)
 		require.Equal(t, p.Display, encoded.Display)
@@ -100,7 +100,7 @@ func TestHTTPUserManagementSearch(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.NoError(t, httpx.ErrorCode(resp.Result()))
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 		encoded := testx.Must(metaapi.NewProfileFromMetaProfile(p))(t)
 		require.Equal(t, result.Next.Offset, uint64(0))
@@ -136,7 +136,7 @@ func TestHTTPUserManagementFind(t *testing.T) {
 	routes.ServeHTTP(resp, req)
 
 	require.NoError(t, httpx.ErrorCode(resp.Result()))
-	require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+	require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 	require.Equal(t, result.Profile.Id, p.ID)
 }

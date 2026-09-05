@@ -8,6 +8,7 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
@@ -88,7 +89,7 @@ func TestCommunityAdd(t *testing.T) {
 		var receivedReq communityapi.PublishContentRequest
 
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			assert.NoError(t, json.NewDecoder(r.Body).Decode(&receivedReq))
+			assert.NoError(t, jsonx.UnmarshalRead(r.Body, &receivedReq))
 			assert.NoError(t, json.NewEncoder(w).Encode(&communityapi.PublishContentResponse{
 				PublishedContent: &communityapi.PublishedContent{
 					Id: "created-id",

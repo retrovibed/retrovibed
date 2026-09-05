@@ -1,10 +1,11 @@
 package communityapi
 
 import (
-	"github.com/retrovibed/retrovibed/shallows/community"
 	"net/http"
 	"testing"
 	"time"
+
+	"github.com/retrovibed/retrovibed/shallows/community"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/testx"

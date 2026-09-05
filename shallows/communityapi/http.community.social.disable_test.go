@@ -1,12 +1,12 @@
 package communityapi_test
 
 import (
-	"encoding/json"
 	"net/http"
 	"testing"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
@@ -59,7 +59,7 @@ func TestHTTPSocialDisable(t *testing.T) {
 		require.NoError(t, httpx.ErrorCode(resp.Result()))
 
 		var result communityapi.CommunityPublisherDisableResponse
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Equal(t, com.ID, result.Disabled.CommunityId)
 		require.Equal(t, publisher.ID, result.Disabled.PublisherId)
 

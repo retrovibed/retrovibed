@@ -1,12 +1,12 @@
 package communityapi_test
 
 import (
-	"encoding/json"
 	"net/http"
 	"testing"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/community"
@@ -73,7 +73,7 @@ func TestHTTPSocialSearch(t *testing.T) {
 		require.NoError(t, httpx.ErrorCode(resp.Result()))
 
 		var result communityapi.SocialsSearchResponse
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 		require.Len(t, result.Items, 1)
 		require.Equal(t, owned.ID, result.Items[0].Community.Id)

@@ -17,6 +17,7 @@ import (
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/justinas/alice"
 	"github.com/retrovibed/retrovibed/retroapi/httpauth"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
@@ -118,7 +119,7 @@ func (t *HTTPDiscovery) download(w http.ResponseWriter, r *http.Request) {
 		msg DiscoveryDownloadRequest
 	)
 
-	if err := json.NewDecoder(r.Body).Decode(&msg); err != nil && err != io.EOF {
+	if err := jsonx.UnmarshalRead(r.Body, &msg); err != nil && err != io.EOF {
 		log.Println(errorsx.Wrap(err, "unable to decode request"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
@@ -314,7 +315,7 @@ func (t *HTTPDiscovery) create(w http.ResponseWriter, r *http.Request) {
 		uh  tracking.UnknownHash
 	)
 
-	if err = json.NewDecoder(r.Body).Decode(&msg); err != nil {
+	if err = jsonx.UnmarshalRead(r.Body, &msg); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to decode request"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return

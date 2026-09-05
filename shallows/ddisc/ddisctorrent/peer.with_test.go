@@ -7,9 +7,9 @@ import (
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/krpc"
+	"github.com/james-lawrence/torrent/torrenttestx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc/ddisctorrent"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
-	"github.com/james-lawrence/torrent/torrenttestx"
 	"github.com/stretchr/testify/require"
 )
 

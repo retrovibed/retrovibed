@@ -1,7 +1,6 @@
 package media
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 
@@ -207,7 +206,7 @@ func (t *HTTPRecommendations) delete(w http.ResponseWriter, r *http.Request) {
 
 func (t *HTTPRecommendations) random(w http.ResponseWriter, r *http.Request) {
 	var req RecommendationSearchRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	if err := jsonx.UnmarshalRead(r.Body, &req); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to decode request"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return

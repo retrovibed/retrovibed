@@ -13,6 +13,7 @@ import (
 
 	"github.com/retrovibed/retrovibed/retroapi/httpauth"
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/internal/audiox"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
@@ -166,7 +167,7 @@ func (t *HTTPAudioSink) current(w http.ResponseWriter, r *http.Request) {
 func (t *HTTPAudioSink) activate(w http.ResponseWriter, r *http.Request) {
 	var msg AudioSinkTouchRequest
 
-	if err := json.NewDecoder(r.Body).Decode(&msg); err != nil {
+	if err := jsonx.UnmarshalRead(r.Body, &msg); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to decode request"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
@@ -64,7 +65,7 @@ func TestHTTPUserManagementDisable(t *testing.T) {
 
 		routes.ServeHTTP(resp, req)
 		require.NoError(t, httpx.ErrorCode(resp.Result()))
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 		require.NotEqualValues(t, timex.Inf(), result.Profile.DisabledManuallyAt)
 		encoded.UpdatedAt = result.Profile.UpdatedAt

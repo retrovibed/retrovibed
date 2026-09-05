@@ -11,6 +11,7 @@ import (
 	"github.com/james-lawrence/torrent/autobind"
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/int160"
+	"github.com/james-lawrence/torrent/torrenttestx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdddisc"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx"
@@ -18,7 +19,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/ddisc/ddisctorrent"
 	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
-	"github.com/james-lawrence/torrent/torrenttestx"
 	"github.com/stretchr/testify/require"
 )
 

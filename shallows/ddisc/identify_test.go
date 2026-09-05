@@ -11,10 +11,10 @@ import (
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/james-lawrence/torrent/torrenttest"
+	"github.com/james-lawrence/torrent/torrenttestx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
-	"github.com/james-lawrence/torrent/torrenttestx"
 	"github.com/stretchr/testify/require"
 )
 

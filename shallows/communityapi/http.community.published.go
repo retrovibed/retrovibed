@@ -3,7 +3,6 @@ package communityapi
 import (
 	"context"
 	"database/sql"
-	"encoding/json"
 	"errors"
 	"log"
 	"net/http"
@@ -14,6 +13,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
 	"github.com/retrovibed/retrovibed/retroapi/httpauth"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
@@ -165,7 +165,7 @@ func (t *HTTPPublished) publish(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
+	if err = jsonx.UnmarshalRead(r.Body, &req); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to decode publish request"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return

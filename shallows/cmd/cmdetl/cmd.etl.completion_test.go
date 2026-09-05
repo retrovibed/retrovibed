@@ -10,6 +10,7 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
@@ -47,7 +48,7 @@ func TestCmdCompletion(t *testing.T) {
 	t.Run("sends record to server and emits output", func(t *testing.T) {
 		var received request
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			require.NoError(t, json.NewDecoder(r.Body).Decode(&received))
+			require.NoError(t, jsonx.UnmarshalRead(r.Body, &received))
 			require.NoError(t, json.NewEncoder(w).Encode(newLlamaResponse(`{"output":"result"}`)))
 		}))
 		defer srv.Close()
@@ -79,7 +80,7 @@ func TestCmdCompletion(t *testing.T) {
 		var receivedPrompt string
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			var req request
-			require.NoError(t, json.NewDecoder(r.Body).Decode(&req))
+			require.NoError(t, jsonx.UnmarshalRead(r.Body, &req))
 			for _, m := range req.Messages {
 				if m.Role == "user" {
 					receivedPrompt = m.Content

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
@@ -74,7 +75,7 @@ func TestRecentRecord(t *testing.T) {
 
 		var result media.RecentSearchResponse
 		require.Equal(t, http.StatusOK, resp2.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp2.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp2.Body, &result))
 		require.Len(t, result.Items, 1)
 		require.Equal(t, md.ID, result.Items[0].Media.Id)
 	})
@@ -131,7 +132,7 @@ func TestRecentRecord(t *testing.T) {
 
 		var result media.RecentSearchResponse
 		require.Equal(t, http.StatusOK, resp2.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp2.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp2.Body, &result))
 		require.Len(t, result.Items, 1)
 		require.EqualValues(t, 7500, result.Items[0].Duration)
 	})
@@ -188,7 +189,7 @@ func TestRecentRecord(t *testing.T) {
 
 		var result media.RecentSearchResponse
 		require.Equal(t, http.StatusOK, resp2.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp2.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp2.Body, &result))
 		require.Len(t, result.Items, 1)
 		require.EqualValues(t, 4200, result.Items[0].Position)
 	})
@@ -244,7 +245,7 @@ func TestRecentRecord(t *testing.T) {
 
 		var result media.RecentSearchResponse
 		require.Equal(t, http.StatusOK, resp2.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp2.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp2.Body, &result))
 		require.Len(t, result.Items, 1)
 		require.Equal(t, "blues", result.Items[0].Query.Query)
 		require.EqualValues(t, 50, result.Items[0].Query.Limit)
@@ -301,7 +302,7 @@ func TestRecentRecord(t *testing.T) {
 
 		var result media.RecentSearchResponse
 		require.Equal(t, http.StatusOK, resp2.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp2.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp2.Body, &result))
 		require.Len(t, result.Items, 1)
 		require.NotEmpty(t, result.Items[0].Id)
 	})
@@ -358,7 +359,7 @@ func TestRecentRecord(t *testing.T) {
 
 		var result media.RecentSearchResponse
 		require.Equal(t, http.StatusOK, resp2.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp2.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp2.Body, &result))
 		require.Len(t, result.Items, 1)
 		require.Equal(t, mimex.Audio, result.Items[0].Mimetype)
 	})

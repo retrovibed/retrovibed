@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/gorilla/mux"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
@@ -125,7 +126,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 
 		var result media.RecommendationSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Len(t, result.Items, 1)
 	})
 
@@ -164,7 +165,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 
 		var result media.RecommendationSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Len(t, result.Items, 1)
 	})
 
@@ -207,7 +208,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 
 		var result media.RecommendationSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Len(t, result.Items, 1)
 		require.Equal(t, mimex.Video, result.Items[0].Mimetype)
 	})
@@ -253,7 +254,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 
 		var result media.RecommendationSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Len(t, result.Items, 1)
 		require.Equal(t, en.UID, result.Items[0].Uid)
 	})
@@ -296,7 +297,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 
 		var result media.RecommendationSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Len(t, result.Items, 1)
 		require.Equal(t, known.UID, result.Items[0].Uid)
 		require.True(t, result.Items[0].Adult)
@@ -339,7 +340,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 
 		var result media.RecommendationSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Len(t, result.Items, 1)
 		require.Equal(t, known.UID, result.Items[0].Uid)
 	})
@@ -378,7 +379,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 
 		var result media.RecommendationSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Len(t, result.Items, 1)
 		require.False(t, result.Items[0].Adult)
 		require.NotEmpty(t, result.Items[0].Description)
@@ -424,7 +425,7 @@ func TestRecommendationsRandom(t *testing.T) {
 
 		var result media.RecommendationSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Equal(t, known.UID, result.Items[0].Uid)
 	})
 

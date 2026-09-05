@@ -1,12 +1,12 @@
 package media_test
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"testing"
 
 	"github.com/gorilla/mux"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
@@ -59,7 +59,7 @@ func TestKnownFind(t *testing.T) {
 	routes.ServeHTTP(resp, req)
 
 	require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-	require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+	require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 	require.Equal(t, known.UID, result.Known.Uid)
 	require.Equal(t, grpcx.EncodeTime(known.Released), result.Known.Released)
 }

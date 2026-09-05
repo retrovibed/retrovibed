@@ -2,7 +2,6 @@ package cmdtorrent
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io/fs"
 	"net/http"
@@ -15,6 +14,7 @@ import (
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/retrovibed/retrovibed/retroapi/asynccompute"
 	"github.com/retrovibed/retrovibed/retroapi/authn"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/debugx"
@@ -47,7 +47,7 @@ func (t importDirectory) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig) error
 
 	if cmdopts.Readable(os.Stdin) {
 		debugx.Println("reading community from stdin")
-		if err := json.NewDecoder(os.Stdin).Decode(&com); err != nil {
+		if err := jsonx.UnmarshalRead(os.Stdin, &com); err != nil {
 			return err
 		}
 
@@ -100,7 +100,7 @@ func (t importDirectory) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig) error
 		}
 		defer resp.Body.Close()
 
-		if err := json.NewDecoder(resp.Body).Decode(m); err != nil {
+		if err := jsonx.UnmarshalRead(resp.Body, m); err != nil {
 			return err
 		}
 

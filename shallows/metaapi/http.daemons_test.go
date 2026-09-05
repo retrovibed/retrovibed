@@ -10,6 +10,7 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
@@ -58,7 +59,7 @@ func TestHTTPDaemonSearch(t *testing.T) {
 	routes.ServeHTTP(resp, req)
 
 	require.NoError(t, httpx.ErrorCode(resp.Result()))
-	require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+	require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 	encoded := testx.Must(metaapi.NewDaemonFromMetaDaemon(p))(t)
 	require.Equal(t, result.Next.Offset, uint64(1))
@@ -95,7 +96,7 @@ func TestHTTPDaemonCreateNew(t *testing.T) {
 	routes.ServeHTTP(resp, req)
 
 	require.NoError(t, httpx.ErrorCode(resp.Result()))
-	require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+	require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 	// a id should ge automatically generated.
 	require.NotEqual(t, v.ID, result.Daemon.Id)
@@ -139,7 +140,7 @@ func TestHTTPDaemonCreateUpdate(t *testing.T) {
 	routes.ServeHTTP(resp, req)
 
 	require.NoError(t, httpx.ErrorCode(resp.Result()))
-	require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+	require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 	// only timestamp updated should change.
 	require.Equal(t, v.ID, result.Daemon.Id)
@@ -187,7 +188,7 @@ func TestHTTPDaemonUpdate(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.NoError(t, httpx.ErrorCode(resp.Result()))
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 		require.Equal(t, v.ID, result.Daemon.Id)
 		require.EqualValues(t, u.Hostname, result.Daemon.Hostname)
@@ -229,7 +230,7 @@ func TestHTTPDaemonTouch(t *testing.T) {
 	routes.ServeHTTP(resp, req)
 
 	require.NoError(t, httpx.ErrorCode(resp.Result()))
-	require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+	require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 	require.Equal(t, v.ID, result.Daemon.Id)
 	require.Equal(t, v.Hostname, result.Daemon.Hostname)
@@ -270,7 +271,7 @@ func TestHTTPDaemonDelete(t *testing.T) {
 	routes.ServeHTTP(resp, req)
 
 	require.NoError(t, httpx.ErrorCode(resp.Result()))
-	require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+	require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 	require.Equal(t, v.ID, result.Daemon.Id)
 	require.Equal(t, v.Hostname, result.Daemon.Hostname)
@@ -321,7 +322,7 @@ func TestHTTPDaemonLatest(t *testing.T) {
 	routes.ServeHTTP(resp, req)
 
 	require.NoError(t, httpx.ErrorCode(resp.Result()))
-	require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+	require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 	require.Equal(t, v.ID, result.Daemon.Id)
 	require.Equal(t, v.Hostname, result.Daemon.Hostname)

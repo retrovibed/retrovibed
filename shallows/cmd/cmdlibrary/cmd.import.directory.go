@@ -2,7 +2,6 @@ package cmdlibrary
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"io/fs"
@@ -16,6 +15,7 @@ import (
 
 	"github.com/retrovibed/retrovibed/retroapi/asynccompute"
 	"github.com/retrovibed/retrovibed/retroapi/authn"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -99,7 +99,7 @@ func (t importDirectory) run(ctx context.Context, endpoint string, enc *jsonl.En
 		}
 		defer resp.Body.Close()
 
-		if err := json.NewDecoder(resp.Body).Decode(m); err != nil {
+		if err := jsonx.UnmarshalRead(resp.Body, m); err != nil {
 			return err
 		}
 

@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
@@ -42,7 +43,7 @@ func TestCommunityUpdate(t *testing.T) {
 
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			var received communityapi.CommunityUpdateRequest
-			require.NoError(t, json.NewDecoder(r.Body).Decode(&received))
+			require.NoError(t, jsonx.UnmarshalRead(r.Body, &received))
 			require.True(t, received.Community.Hidden)
 			require.NoError(t, json.NewEncoder(w).Encode(&communityapi.CommunityUpdateResponse{Community: expected.Community}))
 		}))

@@ -10,6 +10,7 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
@@ -131,7 +132,7 @@ func TestFilesystemCreate(t *testing.T) {
 		resp, req := testpost(t, token, "/", media.FilesystemCreateRequest{Name: "photos"})
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Code)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 		require.Equal(t, mimex.Directory, result.Media.Mimetype)
 		require.Equal(t, "photos", result.Media.Description)
@@ -159,12 +160,12 @@ func TestFilesystemCreate(t *testing.T) {
 
 		resp, req := testpost(t, token, "/", media.FilesystemCreateRequest{Name: "photos"})
 		routes.ServeHTTP(resp, req)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&parent))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &parent))
 
 		resp, req = testpost(t, token, "/", media.FilesystemCreateRequest{Name: "2026", DirectoryId: parent.Media.Id})
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Code)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&child))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &child))
 
 		require.Equal(t, parent.Media.Id, child.Media.DirectoryId)
 	})

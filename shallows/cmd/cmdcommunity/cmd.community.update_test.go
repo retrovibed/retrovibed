@@ -8,6 +8,7 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
@@ -149,7 +150,7 @@ func TestCommunityUpdate(t *testing.T) {
 			case http.MethodGet:
 				assert.NoError(t, json.NewEncoder(w).Encode(&communityapi.CommunityFindResponse{Community: current}))
 			case http.MethodPut:
-				assert.NoError(t, json.NewDecoder(r.Body).Decode(&receivedReq))
+				assert.NoError(t, jsonx.UnmarshalRead(r.Body, &receivedReq))
 				assert.NoError(t, json.NewEncoder(w).Encode(&communityapi.CommunityUpdateResponse{Community: &communityapi.Community{}}))
 			}
 		}))
@@ -199,7 +200,7 @@ func TestCommunityUpdate(t *testing.T) {
 			case http.MethodGet:
 				assert.NoError(t, json.NewEncoder(w).Encode(&communityapi.CommunityFindResponse{Community: current}))
 			case http.MethodPut:
-				assert.NoError(t, json.NewDecoder(r.Body).Decode(&receivedReq))
+				assert.NoError(t, jsonx.UnmarshalRead(r.Body, &receivedReq))
 				assert.NoError(t, json.NewEncoder(w).Encode(&communityapi.CommunityUpdateResponse{Community: &communityapi.Community{}}))
 			}
 		}))

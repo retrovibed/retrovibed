@@ -7,13 +7,14 @@
 package mediaapi
 
 import (
+	reflect "reflect"
+	sync "sync"
+	unsafe "unsafe"
+
 	media "github.com/retrovibed/retrovibed/shallows/media"
 	metaapi "github.com/retrovibed/retrovibed/shallows/metaapi"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
 )
 
 const (
