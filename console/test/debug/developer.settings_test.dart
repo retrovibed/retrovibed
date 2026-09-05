@@ -10,7 +10,7 @@ Widget _authenticated(Widget child) {
   return authn.Login(
     child,
     publicKey: () => 'ssh-ed25519 AAAA...',
-    seed: (_) => '',
+    seed: (_, __) => Future.value(),
   );
 }
 
