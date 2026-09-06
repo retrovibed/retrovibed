@@ -4,10 +4,9 @@ import 'package:retrovibed/designkit.dart' as ds;
 import 'api.dart';
 import 'socials.publishers.dart';
 
-// Fetches its own catalog + enabled-publisher data for a single community —
-// the socials search endpoint backs this expanded details view only, not
-// the SocialHome grid itself.
-class SocialCommunityDetails extends StatefulWidget {
+// The expanded Info panel for a single community: what it is, and the
+// publishers it publishes through.
+class SocialCommunityDetails extends StatelessWidget {
   final Community community;
   final FnSocialsSearch search;
   final FnSocialsEnable enable;
@@ -22,16 +21,6 @@ class SocialCommunityDetails extends StatefulWidget {
   });
 
   @override
-  State<SocialCommunityDetails> createState() => _SocialCommunityDetailsState();
-}
-
-class _SocialCommunityDetailsState extends State<SocialCommunityDetails> with ds.LoadingState {
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
     final theme = Theme.of(context);
@@ -43,15 +32,16 @@ class _SocialCommunityDetailsState extends State<SocialCommunityDetails> with ds
         border: defaults.border,
         borderRadius: defaults.borderRadius,
       ),
-      ds.Loading(
-        loading: loading,
-        cause: cause,
-        Column(
-          children: [
-            CommunityDetail(community: widget.community),
-            SocialsPublishers(widget.community),
-          ],
-        ),
+      Column(
+        children: [
+          CommunityDetail(community: community),
+          SocialsPublishers(
+            community,
+            search: search,
+            enable: enable,
+            disable: disable,
+          ),
+        ],
       ),
     );
   }

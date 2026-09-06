@@ -90,7 +90,7 @@ const SocialsSearchRequest$json = {
     {'1': 'query', '3': 1, '4': 1, '5': 9, '10': 'query'},
     {'1': 'offset', '3': 900, '4': 1, '5': 4, '10': 'offset'},
     {'1': 'limit', '3': 901, '4': 1, '5': 4, '10': 'limit'},
-    {'1': 'communities', '3': 1000, '4': 3, '5': 9, '10': 'cid'},
+    {'1': 'communities', '3': 1000, '4': 3, '5': 9, '10': 'communities'},
   ],
   '9': [
     {'1': 3, '2': 900},
@@ -101,8 +101,8 @@ const SocialsSearchRequest$json = {
 /// Descriptor for `SocialsSearchRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List socialsSearchRequestDescriptor = $convert.base64Decode(
     'ChRTb2NpYWxzU2VhcmNoUmVxdWVzdBIUCgVxdWVyeRgBIAEoCVIFcXVlcnkSFwoGb2Zmc2V0GI'
-    'QHIAEoBFIGb2Zmc2V0EhUKBWxpbWl0GIUHIAEoBFIFbGltaXQSGQoLY29tbXVuaXRpZXMY6Acg'
-    'AygJUgNjaWRKBQgDEIQHSgYIhgcQ6Ac=');
+    'QHIAEoBFIGb2Zmc2V0EhUKBWxpbWl0GIUHIAEoBFIFbGltaXQSIQoLY29tbXVuaXRpZXMY6Acg'
+    'AygJUgtjb21tdW5pdGllc0oFCAMQhAdKBgiGBxDoBw==');
 
 @$core.Deprecated('Use socialsSearchResponseDescriptor instead')
 const SocialsSearchResponse$json = {
@@ -140,6 +140,7 @@ const PluginPublisherSearchRequest$json = {
     {'1': 'query', '3': 1, '4': 1, '5': 9, '10': 'query'},
     {'1': 'offset', '3': 900, '4': 1, '5': 4, '10': 'offset'},
     {'1': 'limit', '3': 901, '4': 1, '5': 4, '10': 'limit'},
+    {'1': 'excluded', '3': 1000, '4': 3, '5': 9, '10': 'excluded'},
   ],
   '9': [
     {'1': 2, '2': 900},
@@ -151,8 +152,8 @@ const PluginPublisherSearchRequest$json = {
 final $typed_data.Uint8List pluginPublisherSearchRequestDescriptor =
     $convert.base64Decode(
         'ChxQbHVnaW5QdWJsaXNoZXJTZWFyY2hSZXF1ZXN0EhQKBXF1ZXJ5GAEgASgJUgVxdWVyeRIXCg'
-        'ZvZmZzZXQYhAcgASgEUgZvZmZzZXQSFQoFbGltaXQYhQcgASgEUgVsaW1pdEoFCAIQhAdKBgiG'
-        'BxDoBw==');
+        'ZvZmZzZXQYhAcgASgEUgZvZmZzZXQSFQoFbGltaXQYhQcgASgEUgVsaW1pdBIbCghleGNsdWRl'
+        'ZBjoByADKAlSCGV4Y2x1ZGVkSgUIAhCEB0oGCIYHEOgH');
 
 @$core.Deprecated('Use pluginPublisherSearchResponseDescriptor instead')
 const PluginPublisherSearchResponse$json = {
@@ -224,6 +225,69 @@ final $typed_data.Uint8List pluginPublisherFindResponseDescriptor =
     $convert.base64Decode(
         'ChtQbHVnaW5QdWJsaXNoZXJGaW5kUmVzcG9uc2USQwoJcHVibGlzaGVyGAEgASgLMiUucmV0cm'
         '92aWJlZC5jb21tdW5pdHkuUGx1Z2luUHVibGlzaGVyUglwdWJsaXNoZXI=');
+
+@$core.Deprecated('Use pluginPublisherUpdateRequestDescriptor instead')
+const PluginPublisherUpdateRequest$json = {
+  '1': 'PluginPublisherUpdateRequest',
+  '2': [
+    {
+      '1': 'publisher',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.retrovibed.community.PluginPublisher',
+      '10': 'publisher'
+    },
+  ],
+};
+
+/// Descriptor for `PluginPublisherUpdateRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List pluginPublisherUpdateRequestDescriptor =
+    $convert.base64Decode(
+        'ChxQbHVnaW5QdWJsaXNoZXJVcGRhdGVSZXF1ZXN0EkMKCXB1Ymxpc2hlchgBIAEoCzIlLnJldH'
+        'JvdmliZWQuY29tbXVuaXR5LlBsdWdpblB1Ymxpc2hlclIJcHVibGlzaGVy');
+
+@$core.Deprecated('Use pluginPublisherUpdateResponseDescriptor instead')
+const PluginPublisherUpdateResponse$json = {
+  '1': 'PluginPublisherUpdateResponse',
+  '2': [
+    {
+      '1': 'publisher',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.retrovibed.community.PluginPublisher',
+      '10': 'publisher'
+    },
+  ],
+};
+
+/// Descriptor for `PluginPublisherUpdateResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List pluginPublisherUpdateResponseDescriptor =
+    $convert.base64Decode(
+        'Ch1QbHVnaW5QdWJsaXNoZXJVcGRhdGVSZXNwb25zZRJDCglwdWJsaXNoZXIYASABKAsyJS5yZX'
+        'Ryb3ZpYmVkLmNvbW11bml0eS5QbHVnaW5QdWJsaXNoZXJSCXB1Ymxpc2hlcg==');
+
+@$core.Deprecated('Use pluginPublisherCloneResponseDescriptor instead')
+const PluginPublisherCloneResponse$json = {
+  '1': 'PluginPublisherCloneResponse',
+  '2': [
+    {
+      '1': 'publisher',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.retrovibed.community.PluginPublisher',
+      '10': 'publisher'
+    },
+  ],
+};
+
+/// Descriptor for `PluginPublisherCloneResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List pluginPublisherCloneResponseDescriptor =
+    $convert.base64Decode(
+        'ChxQbHVnaW5QdWJsaXNoZXJDbG9uZVJlc3BvbnNlEkMKCXB1Ymxpc2hlchgBIAEoCzIlLnJldH'
+        'JvdmliZWQuY29tbXVuaXR5LlBsdWdpblB1Ymxpc2hlclIJcHVibGlzaGVy');
 
 @$core.Deprecated('Use pluginPublisherDeleteResponseDescriptor instead')
 const PluginPublisherDeleteResponse$json = {

@@ -4,18 +4,12 @@ import 'api.dart';
 
 class SocialCommunityRow extends StatelessWidget {
   final Community community;
-  final FnSocialsSearch details;
-  final FnSocialsEnable enable;
-  final FnSocialsDisable disable;
   final bool focused;
   final VoidCallback onInfo;
 
   const SocialCommunityRow({
     super.key,
     required this.community,
-    required this.details,
-    required this.enable,
-    required this.disable,
     required this.focused,
     required this.onInfo,
   });

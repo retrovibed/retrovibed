@@ -290,16 +290,22 @@ Future<Request> request(List<Option> options) {
   });
 }
 
-// convert dynamic objects to a map<String, String>, flattening nested maps
+// convert dynamic objects to query parameters, flattening nested maps
 // using bracket notation (e.g. {"created": {"newest": "..."}} → {"created[newest]": "..."})
-Map<String, String> params(Object? m) {
+//
+// a list becomes a repeated parameter rather than a single stringified value -
+// Uri's queryParameters takes an Iterable<String> for exactly that, and a
+// repeated proto field is otherwise sent as the literal "[a, b]".
+Map<String, dynamic> params(Object? m) {
   final decoded = jsonDecode(jsonEncode(m)) as Map<String, dynamic>;
-  final result = <String, String>{};
+  final result = <String, dynamic>{};
   void flatten(Map<String, dynamic> map, String prefix) {
     for (final entry in map.entries) {
       final key = prefix.isEmpty ? entry.key : '$prefix[${entry.key}]';
       if (entry.value is Map<String, dynamic>) {
         flatten(entry.value as Map<String, dynamic>, key);
+      } else if (entry.value is List) {
+        result[key] = (entry.value as List).map((v) => v.toString()).toList();
       } else {
         result[key] = entry.value.toString();
       }

@@ -1,9 +1,6 @@
 package communityapi
 
 import (
-	"log"
-
-	"github.com/davecgh/go-spew/spew"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/internal/grpcx"
 )
@@ -27,8 +24,6 @@ func PluginPublisherOptionFromDB(p community.PluginPublisher) func(*PluginPublis
 		dst.Mimetype = p.Mimetype
 		dst.CreatedAt = grpcx.EncodeTime(p.CreatedAt)
 		dst.UpdatedAt = grpcx.EncodeTime(p.UpdatedAt)
-		log.Println("DERP DERP 0", spew.Sdump(p))
-		log.Println("DERP DERP 1", spew.Sdump(dst))
 	}
 }
 

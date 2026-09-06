@@ -81,6 +81,38 @@ func TestHTTPSocialSearch(t *testing.T) {
 		require.Equal(t, publisher.ID, result.Items[0].Publishers[0].PublisherId)
 	})
 
+	// a community with nothing enabled is exactly the one an operator is about
+	// to attach a publisher to, so it cannot be joined out of existence.
+	t.Run("returns a community with no publishers", func(t *testing.T) {
+		var unconfigured community.Community
+		require.NoError(t, community.CommunityInsertWithDefaults(ctx, q, community.Community{
+			ID: uuid.Must(uuid.NewV7()).String(), AccountID: p.ID, Description: "nothing enabled yet",
+		}).Scan(&unconfigured))
+
+		resp, req, err := httptestx.BuildRequestBytes(
+			http.MethodGet,
+			"/",
+			nil,
+			httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)),
+		)
+		require.NoError(t, err)
+
+		routes.ServeHTTP(resp, req)
+		require.NoError(t, httpx.ErrorCode(resp.Result()))
+
+		var result communityapi.SocialsSearchResponse
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
+
+		found := make(map[string]*communityapi.CommunitySocial, len(result.Items))
+		for _, item := range result.Items {
+			found[item.Community.Id] = item
+		}
+		require.Contains(t, found, unconfigured.ID)
+		require.Empty(t, found[unconfigured.ID].Publishers)
+		require.Contains(t, found, owned.ID)
+		require.NotContains(t, found, other.ID)
+	})
+
 	t.Run("requires authentication", func(t *testing.T) {
 		resp, req, err := httptestx.BuildRequestBytes(http.MethodGet, "/", nil)
 		require.NoError(t, err)

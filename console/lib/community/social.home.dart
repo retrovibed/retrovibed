@@ -9,12 +9,8 @@ import 'socials.row.dart';
 import 'socials.details.dart';
 
 // Lists the account's communities, each with Photo/Video/Library/Info
-// buttons; Info expands a per-community toggle per catalog publisher
-// (YouTube/Spotify/Instagram/X/etc) so a community owner can pick which
-// platforms it publishes to. Actually publishing is not wired up yet.
-// The grid itself is driven by the general community search; the socials
-// search endpoint only supplies the catalog + enabled-publisher data shown
-// in the expanded Info details.
+// buttons; Info expands the set of publish plugins the community publishes
+// through, which is where they are attached and detached.
 class SocialHome extends StatefulWidget {
   final ValueNotifier<media.SearchMode> mode;
   final void Function(media.SearchMode) onModeChanged;
@@ -136,9 +132,6 @@ class _SocialHomeState extends State<SocialHome> with ds.LoadingState {
           child: ds.Grid<Community>(
             (context, v) => SocialCommunityRow(
               community: v,
-              details: widget.details,
-              enable: widget.enable,
-              disable: widget.disable,
               focused: ValueKey(v.id) == _focused.key,
               onInfo: () => setState(() {
                 final key = ValueKey(v.id);

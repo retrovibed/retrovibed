@@ -372,10 +372,13 @@ typedef FnPublishersSearch =
       List<httpx.Option> options,
     });
 
-/// The catalog of installed publisher plugins. The search endpoint hands
-/// back a SocialsSearchResponse whose catalog is the whole install list -
-/// PluginPublisherFindAll ignores query/offset/limit, so there is nothing
-/// to page through and no request to build.
+typedef FnPublishersFind =
+    Future<PluginPublisherFindResponse> Function(
+      String id, {
+      List<httpx.Option> options,
+    });
+
+/// The catalog of installed publisher plugins.
 abstract class publishers {
   static Future<PluginPublisherSearchResponse> search(
     PluginPublisherSearchRequest req, {
@@ -383,12 +386,31 @@ abstract class publishers {
   }) async {
     return httpx
         .get(
-          Uri.https(httpx.host(), "/c/publishers/"),
+          Uri.https(httpx.host(), "/c/publishers/", httpx.params(req.toProto3Json())),
           options: [httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
             httpx.fromProto3JsonSafe(PluginPublisherSearchResponse.create(), jsonDecode(v.body)),
+          );
+        });
+  }
+
+  /// Resolves a single plugin. What a community publishes through is recorded
+  /// as a publisher id, so the social screen reads each attached row this way
+  /// rather than searching the catalog for rows it already knows the ids of.
+  static Future<PluginPublisherFindResponse> find(
+    String id, {
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx
+        .get(
+          Uri.https(httpx.host(), "/c/publishers/${id}"),
+          options: [httpx.Accept.json, ...options],
+        )
+        .then((v) {
+          return Future.value(
+            httpx.fromProto3JsonSafe(PluginPublisherFindResponse.create(), jsonDecode(v.body)),
           );
         });
   }
@@ -426,6 +448,45 @@ abstract class publishers {
         });
       });
     });
+  }
+
+  /// Records the fields an operator owns. The whole publisher goes over the
+  /// wire and the endpoint decides what it is allowed to change - id and path
+  /// describe what is installed on disk - so a caller edits a field on the row
+  /// it already holds and posts it back.
+  static Future<PluginPublisherUpdateResponse> update(
+    PluginPublisher publisher, {
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx
+        .post(
+          Uri.https(httpx.host(), "/c/publishers/${publisher.id}"),
+          options: [httpx.Accept.json, ...options],
+          body: jsonEncode(PluginPublisherUpdateRequest(publisher: publisher).toProto3Json()),
+        )
+        .then((v) {
+          return Future.value(
+            httpx.fromProto3JsonSafe(PluginPublisherUpdateResponse.create(), jsonDecode(v.body)),
+          );
+        });
+  }
+
+  /// Installs a second identity for an already installed module: same plugin,
+  /// its own configuration. There is nothing to send beyond the id.
+  static Future<PluginPublisherCloneResponse> clone(
+    String id, {
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx
+        .post(
+          Uri.https(httpx.host(), "/c/publishers/${id}/clone"),
+          options: [httpx.Accept.json, ...options],
+        )
+        .then((v) {
+          return Future.value(
+            httpx.fromProto3JsonSafe(PluginPublisherCloneResponse.create(), jsonDecode(v.body)),
+          );
+        });
   }
 
   static Future<PluginPublisherDeleteResponse> delete(

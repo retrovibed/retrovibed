@@ -43,6 +43,38 @@ void main() {
         equals({'enabled': 'true', 'count': '0'}),
       );
     });
+
+    // a repeated field is one parameter per value, not one stringified list -
+    // Uri.queryParameters takes an Iterable<String> for exactly this.
+    test('list becomes a repeated parameter', () {
+      expect(
+        httpx.params({
+          'community': ['a', 'b'],
+          'limit': 100,
+        }),
+        equals({
+          'community': ['a', 'b'],
+          'limit': '100',
+        }),
+      );
+
+      expect(
+        Uri.https('example.com', '/c/publishers/', httpx.params({
+          'community': ['a', 'b'],
+        })).query,
+        equals('community=a&community=b'),
+      );
+    });
+
+    test('empty list carries no value', () {
+      expect(
+        Uri.https('example.com', '/c/publishers/', httpx.params({
+          'community': <String>[],
+          'limit': 100,
+        })).query,
+        equals('limit=100'),
+      );
+    });
   });
 
   group('withRetry', () {

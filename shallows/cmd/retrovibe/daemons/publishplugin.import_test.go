@@ -170,6 +170,48 @@ func TestPublishPluginImport(t *testing.T) {
 		require.Equal(t, "uploaded", found[0].Description)
 	})
 
+	t.Run("leaves a renamed publisher named", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		q := sqltestx.Metadatabase(t)
+		plugindir := filepath.Join(t.TempDir(), "publish.d")
+		require.NoError(t, os.MkdirAll(plugindir, 0o700))
+		require.NoError(t, os.WriteFile(filepath.Join(plugindir, "lemmy.wasm"), wasm, 0o600))
+		// the shape a clone takes: a symlink under a stem of its own, which can
+		// never equal the id derived from it, so every pass has a label to
+		// offer for it.
+		require.NoError(t, os.Symlink("lemmy.wasm", filepath.Join(plugindir, uuid.Must(uuid.NewV7()).String()+".wasm")))
+
+		require.NoError(t, daemons.PublishPluginImport(ctx, q, plugindir))
+
+		renamed := make([]community.PluginPublisher, 0, 2)
+		rows := sqlx.Scan(community.PluginPublisherFindAll(ctx, q))
+		for pub := range rows.Iter() {
+			renamed = append(renamed, pub)
+		}
+		require.NoError(t, rows.Err())
+		require.Len(t, renamed, 2)
+
+		for _, pub := range renamed {
+			var updated community.PluginPublisher
+			require.NoError(t, community.PluginPublisherUpdateByID(ctx, q, pub.ID, community.PluginPublisher{
+				Description: "lemmy - " + pub.ID,
+				Mimetype:    pub.Mimetype,
+			}).Scan(&updated))
+		}
+
+		// the reconcile runs on every daemon pass; a name an operator typed is
+		// the catalog's, not the filesystem's, so it has to outlast that.
+		require.NoError(t, daemons.PublishPluginImport(ctx, q, plugindir))
+
+		for _, pub := range renamed {
+			var after community.PluginPublisher
+			require.NoError(t, community.PluginPublisherFindByID(ctx, q, pub.ID).Scan(&after))
+			require.Equal(t, "lemmy - "+pub.ID, after.Description)
+		}
+	})
+
 	t.Run("forgets a plugin whose module is gone", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()

@@ -62,7 +62,7 @@ func TestDefaultsEndpoint(t *testing.T) {
 
 		var out ftuxapi.CommunitySuggestions
 		require.NoError(t, json.Unmarshal(resp.Body.Bytes(), &out))
-		require.Len(t, out.Community, 2)
+		require.Len(t, out.Community, 3)
 	})
 }
 
