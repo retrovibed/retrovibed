@@ -152,7 +152,20 @@ func FileBitmap(info *metainfo.Info, c metainfo.FileInfo) (m roaring.Bitmap) {
 }
 
 func Autosocket(_dht *dht.Server, p uint16, cl *retronetx.ConnLimit) (_ torrent.Binder, err error) {
-	s1, s2, err := autobind.Local("udp", p)
+	var (
+		s1 sockets.PacketSocket
+		s2 net.Listener
+	)
+
+	// autobind.Local derives the tcp port from the udp socket it opened, when we're
+	// requesting an ephemeral port that tcp port may already be in use by something
+	// else on the host. retry a few times before giving up.
+	for range 8 {
+		if s1, s2, err = autobind.Local("udp", p); err == nil {
+			break
+		}
+	}
+
 	if err != nil {
 		return nil, err
 	}
