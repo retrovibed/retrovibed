@@ -7,13 +7,12 @@
 package ddiscapi
 
 import (
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
-
 	meta "github.com/retrovibed/retrovibed/shallows/meta"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	reflect "reflect"
+	sync "sync"
+	unsafe "unsafe"
 )
 
 const (

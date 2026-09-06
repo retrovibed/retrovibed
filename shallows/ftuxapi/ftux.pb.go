@@ -7,13 +7,12 @@
 package ftuxapi
 
 import (
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
-
 	communityapi "github.com/retrovibed/retrovibed/shallows/communityapi"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	reflect "reflect"
+	sync "sync"
+	unsafe "unsafe"
 )
 
 const (
