@@ -384,6 +384,19 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	asyncx.Background(gctx.Context, mediameta, func(ctx context.Context) error {
 		return errorsx.Wrap(SearchPluginImport(ctx, db, searchplugin.SearchPluginDir(userx.DefaultConfigDir(userx.DefaultRelRoot())), tvfs, tstore), "search plugin import failed")
 	})
+	asyncx.Background(gctx.Context, mediameta, func(ctx context.Context) error {
+		plugindir := publishplugin.PublishPluginDir(userx.DefaultConfigDir(userx.DefaultRelRoot()))
+
+		if err := PublishPluginTorrentImport(ctx, db, plugindir, tvfs, tstore); err != nil {
+			return errorsx.Wrap(err, "publish plugin torrent import failed")
+		}
+
+		// copying into publish.d is enough for the registry watch to load the
+		// module, but publishing fans out over the catalog, so a plugin with no
+		// row is never invoked - reconcile here as well so a plugin installed
+		// from a community is usable without waiting for a restart.
+		return errorsx.Wrap(PublishPluginImport(ctx, db, plugindir), "publish plugin import failed")
+	})
 	go func() {
 		errorsx.Log(errorsx.Wrap(asyncx.WatchDirectories(gctx.Context, mediameta, asyncx.FileCreated, mediastore.Path()), "media metadata file watch failed"))
 	}()

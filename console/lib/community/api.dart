@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:fixnum/fixnum.dart' as fixnum;
+import 'package:http/http.dart' as http;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/timex.dart' as timex;
 import 'package:retrovibed/uuidx.dart' as uuidx;
@@ -360,6 +361,78 @@ class communities {
         .then((v) {
           return Future.value(
             httpx.fromProto3JsonSafe(PublishedContentSearchResponse.create(), jsonDecode(v.body)),
+          );
+        });
+  }
+}
+
+/// The catalog of installed publisher plugins. The search endpoint hands
+/// back a SocialsSearchResponse whose catalog is the whole install list -
+/// PluginPublisherFindAll ignores query/offset/limit, so there is nothing
+/// to page through and no request to build.
+abstract class publishers {
+  static Future<SocialsSearchResponse> search({
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx
+        .get(
+          Uri.https(httpx.host(), "/c/publishers/"),
+          options: [httpx.Accept.json, ...options],
+        )
+        .then((v) {
+          return Future.value(
+            httpx.fromProto3JsonSafe(SocialsSearchResponse.create(), jsonDecode(v.body)),
+          );
+        });
+  }
+
+  static Future<http.MultipartFile> uploadable(
+    String path,
+    String name,
+    String mimetype,
+  ) {
+    return httpx.uploadable(path, name, mimetype);
+  }
+
+  /// mimetype is rejected when blank, and description is what the community
+  /// publisher chips label themselves with, so both are always sent.
+  static Future<PluginPublisherCreateResponse> upload(
+    String description,
+    String mimetype,
+    http.MultipartRequest Function(http.MultipartRequest req) mkreq, {
+    List<httpx.Option> options = const [],
+  }) async {
+    final client = http.Client();
+    final r0 = mkreq(
+      http.MultipartRequest("POST", Uri.https(httpx.host(), "/c/publishers/")),
+    );
+    r0.fields["description"] = description;
+    r0.fields["mimetype"] = mimetype;
+
+    return httpx.request(options).then((r) {
+      r0.headers.addAll(r.headers);
+      return client.send(r0).then(httpx.auto_error).then((v) {
+        return v.stream.bytesToString().then((s) {
+          return Future.value(
+            httpx.fromProto3JsonSafe(PluginPublisherCreateResponse.create(), jsonDecode(s)),
+          );
+        });
+      });
+    });
+  }
+
+  static Future<PluginPublisherDeleteResponse> delete(
+    String id, {
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx
+        .delete(
+          Uri.https(httpx.host(), "/c/publishers/${id}"),
+          options: [httpx.Accept.json, ...options],
+        )
+        .then((v) {
+          return Future.value(
+            httpx.fromProto3JsonSafe(PluginPublisherDeleteResponse.create(), jsonDecode(v.body)),
           );
         });
   }

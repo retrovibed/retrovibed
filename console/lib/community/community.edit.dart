@@ -84,6 +84,7 @@ class CommunityEdit extends StatelessWidget {
               presets: [
                 (label: Text('binary (default)') as Widget, value: mimex.binary),
                 (label: Text('search plugin') as Widget, value: mimex.search),
+                (label: Text('publish plugin') as Widget, value: mimex.publish),
                 if (authn.developer(context).alpha) ...[
                   (label: Text('metadata archive') as Widget, value: mimex.mediaarchive),
                   (label: Text('neural') as Widget, value: mimex.neural),

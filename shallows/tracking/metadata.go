@@ -201,7 +201,7 @@ func MetadataOptionAutoDescription(m *Metadata) {
 func MetadataOptionAutoHidden(m *Metadata) {
 	_, ok := slicesx.Find(func(mime string) bool {
 		return m.Mimetype == mime
-	}, mimex.RetrovibedMediaArchive, mimex.RetrovibedNeural, mimex.RetrovibedDiscoverySearch)
+	}, mimex.RetrovibedMediaArchive, mimex.RetrovibedNeural, mimex.RetrovibedDiscoverySearch, mimex.RetrovibedPublishModule)
 
 	if !ok {
 		return
@@ -333,6 +333,14 @@ func MetadataQueryDiscoverySearch() squirrel.Sqlizer {
 
 func MetadataQueryNotDiscoverySearch() squirrel.Sqlizer {
 	return squirrel.Expr("torrents_metadata.mimetype != ?", mimex.RetrovibedDiscoverySearch)
+}
+
+func MetadataQueryPublishModule() squirrel.Sqlizer {
+	return squirrel.Expr("torrents_metadata.mimetype = ?", mimex.RetrovibedPublishModule)
+}
+
+func MetadataQueryNotPublishModule() squirrel.Sqlizer {
+	return squirrel.Expr("torrents_metadata.mimetype != ?", mimex.RetrovibedPublishModule)
 }
 
 func MetadataQueryCreatedAfter(ts time.Time) squirrel.Sqlizer {

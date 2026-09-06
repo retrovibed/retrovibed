@@ -9,6 +9,7 @@ const metadataarchive = "application/vnd";
 const mediaarchive = "application/vnd.retrovibed.media.archive";
 const neural = "application/vnd.retrovibed.neural";
 const search = "application/vnd.retrovibed.discovery.search.module";
+const publish = "application/vnd.retrovibed.publish.module";
 const bittorrent = "application/x-bittorrent";
 const binary = "application/octet-stream";
 const directory = "inode/directory";
