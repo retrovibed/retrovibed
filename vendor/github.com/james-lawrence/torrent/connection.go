@@ -132,9 +132,7 @@ type connection struct {
 	Choked *atomic.Bool // we have prevented the peer from making requests
 	// requests (the requests we've made of the peer) lives on *writerstate,
 	// guarded by its own mutex (writerstate.mu / mutate / view) - mainReadLoop
-	// writes to it via ws.mutate. requestcount mirrors its length atomically
-	// so any goroutine can read the count cheaply without taking that lock.
-	requestcount atomic.Int32
+	// writes to it via ws.mutate, and reads its length via ws.requestsLen.
 
 	// sentHaves is exclusively writer-owned: set once during the pre-spawn
 	// handshake (ConnExtensions -> connexfast, which runs synchronously
@@ -344,13 +342,6 @@ func (cn *connection) peerRequestsLen() int {
 	return len(cn.PeerRequests)
 }
 
-// requestsLen returns the number of requests we currently have outstanding
-// to the peer. Backed by requestcount rather than the (writer-owned)
-// requests map itself, so it's cheap to read from any goroutine.
-func (cn *connection) requestsLen() int {
-	return int(cn.requestcount.Load())
-}
-
 func (cn *connection) onPeerSentCancel(r request, ws *writerstate) {
 	cn._mu.RLock()
 	_, ok := cn.PeerRequests[r]
@@ -450,7 +441,7 @@ func (cn *connection) peerPiecesChanged() {
 		return
 	}
 
-	cn.refreshrequestable.Store(langx.Autoptr(time.Now()))
+	cn.refreshrequestable.Store(new(time.Now()))
 	if cn.needsresponse.CompareAndSwap(false, true) {
 		cn.request.Broadcast()
 	}
@@ -718,7 +709,7 @@ func (cn *connection) ReadOne(ctx context.Context, decoder *pp.Decoder, ws *writ
 	}
 
 	cn.readMsg(&msg)
-	cn.lastMessageReceived.Store(langx.Autoptr(time.Now()))
+	cn.lastMessageReceived.Store(new(time.Now()))
 
 	if msg.Keepalive {
 		dc := cn.t.chunks.Read(copDebugSnapshot)
@@ -730,8 +721,11 @@ func (cn *connection) ReadOne(ctx context.Context, decoder *pp.Decoder, ws *writ
 		return msg, fmt.Errorf("received fast extension message (type=%v) but extension is disabled", msg.Type)
 	}
 
-	dc := cn.t.chunks.Read(copDebugSnapshot)
-	cn.cfg.debug().Printf("(%d) c(%p) id(%s) seed(%t) remote(%s) claimed(%d) - RECEIVED MESSAGE: %s - pending(%d) - missing(%d) - failed(%d) - outstanding(%d) - unverified(%d) - completed(%d)\n", os.Getpid(), cn, cn.t.md.ID, cn.cfg.Seed, cn.conn.RemoteAddr(), cn.claimed.GetCardinality(), msg.Type, cn.requestsLen(), dc.missing, dc.failed, dc.outstanding, dc.unverified, dc.completed)
+	// runs for every message received, and its arguments are evaluated whether
+	// or not debug logging is enabled - a chunks snapshot and two bitmap
+	// cardinalities, each behind a lock. uncomment when tracing a connection.
+	// dc := cn.t.chunks.Read(copDebugSnapshot)
+	// cn.cfg.debug().Printf("(%d) c(%p) id(%s) seed(%t) remote(%s) claimed(%d) - RECEIVED MESSAGE: %s - pending(%d) - missing(%d) - failed(%d) - outstanding(%d) - unverified(%d) - completed(%d)\n", os.Getpid(), cn, cn.t.md.ID, cn.cfg.Seed, cn.conn.RemoteAddr(), cn.claimed.GetCardinality(), msg.Type, ws.requestsLen(), dc.missing, dc.failed, dc.outstanding, dc.unverified, dc.completed)
 
 	switch msg.Type {
 	case pp.Choke:
@@ -973,7 +967,7 @@ func (t *torrent) gotMetadataExtensionMsg(payload []byte, c *connection, ws *wri
 		// defer log.Printf("c(%p) seed(%t) METADATA SAVED %s\n", c, t.seeding(), spew.Sdump(d))
 
 		t.saveMetadataPiece(d.Index, payload[begin:])
-		c.lastUsefulChunkReceived.Store(langx.Autoptr(time.Now()))
+		c.lastUsefulChunkReceived.Store(new(time.Now()))
 		return t.maybeCompleteMetadata(c)
 	case pp.RejectMetadataExtensionMsgType:
 		return nil
@@ -1013,7 +1007,7 @@ func (cn *connection) receiveChunk(msg *pp.Message, ws *writerstate) error {
 
 	cn.allStats(add(1, func(cs *ConnStats) *count { return &cs.ChunksReadUseful }))
 	cn.allStats(add(int64(len(msg.Piece)), func(cs *ConnStats) *count { return &cs.BytesReadUsefulData }))
-	cn.lastUsefulChunkReceived.Store(langx.Autoptr(time.Now()))
+	cn.lastUsefulChunkReceived.Store(new(time.Now()))
 	cn.chunksReceived.Add(1)
 
 	// cn.cfg.debug().Printf("c(%p) - received chunk d(%020d) r(%d,%d,%d)\n", cn, req.Digest, req.Index, req.Begin, req.Length)
