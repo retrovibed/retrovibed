@@ -22,6 +22,24 @@ class DeveloperSettings extends StatelessWidget {
         children: [
           Text("Developer Settings", textAlign: TextAlign.center, style: theme.textTheme.titleMedium),
           forms.Checkbox(
+            const Text('Alpha'),
+            description: const Text('Enable alpha functionality'),
+            value: flags.alpha,
+            onChanged: (v) {
+              final s = Login.of(context);
+              s?.setState(() => s.flags = flags.copyWith(alpha: v ?? false));
+            },
+          ),
+          forms.Checkbox(
+            const Text('Debug'),
+            description: const Text('Enable debug functionality'),
+            value: flags.debug,
+            onChanged: (v) {
+              final s = Login.of(context);
+              s?.setState(() => s.flags = flags.copyWith(debug: v ?? false));
+            },
+          ),
+          forms.Checkbox(
             const Text('Networking'),
             description: const Text('Enable networking functionality UX'),
             value: flags.networking,

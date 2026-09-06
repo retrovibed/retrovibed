@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/design.kit/file.drop.well.dart';
 import 'package:retrovibed/designkit.dart' as ds;
@@ -11,8 +12,13 @@ import 'package:retrovibed/mimex.dart' as mimex;
 import 'api.dart';
 
 typedef FnCapturePhoto = Future<XFile?> Function();
+typedef FnCameraPermission = Future<bool> Function();
 
 Future<XFile?> _camera() => ImagePicker().pickImage(source: ImageSource.camera);
+
+// the manifest declares android.permission.CAMERA, so the capture intent needs the
+// grant before it will hand anything back.
+Future<bool> _cameraPermission() => Permission.camera.request().then((status) => status.isGranted);
 
 // The photo action on a community card: uploads an image into the library and
 // immediately publishes it to the community using that community's default
@@ -26,6 +32,7 @@ class SocialActionPhoto extends StatelessWidget {
   final media.FnUploadRequest apiupload;
   final FnPublishingPublish apipublish;
   final FnCapturePhoto capture;
+  final FnCameraPermission permission;
 
   const SocialActionPhoto(
     this.community, {
@@ -33,6 +40,7 @@ class SocialActionPhoto extends StatelessWidget {
     this.apiupload = media.media.upload,
     this.apipublish = publishing.publish,
     this.capture = _camera,
+    this.permission = _cameraPermission,
   });
 
   // the camera hands back a bare path, so sniff the mimetype the same way
@@ -80,12 +88,24 @@ class SocialActionPhoto extends StatelessWidget {
         icon: const Icon(_icon),
         tooltip: _tooltip,
         onPressed: () {
-          return capture().then<void>((photo) {
-            // the user backed out of the camera without taking anything.
-            if (photo == null) return null;
-            return _mimetype(photo).then(
-              (mimetype) => _publish([authn.request(authn.AuthzCache.meta(context))], photo.path, photo.name, mimetype),
-            );
+          final messenger = ScaffoldMessenger.of(context);
+
+          return permission().then<void>((granted) {
+            if (!granted) {
+              messenger.showSnackBar(
+                const SnackBar(content: Text("camera access is required to publish a photo")),
+              );
+              return null;
+            }
+
+            return capture().then<void>((photo) {
+              // the user backed out of the camera without taking anything.
+              if (photo == null) return null;
+              return _mimetype(photo).then(
+                (mimetype) =>
+                    _publish([authn.request(authn.AuthzCache.meta(context))], photo.path, photo.name, mimetype),
+              );
+            });
           });
         },
       );

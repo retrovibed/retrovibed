@@ -70,10 +70,10 @@ class _LoginState extends State<Login> with ds.LoadingState {
   String _password = '';
   String _confirm = '';
   DeveloperMode flags = DeveloperMode(
+    debug: foundation.kDebugMode,
     alpha: foundation.kDebugMode,
     recommendations: true,
     releases: true,
-    debug: foundation.kDebugMode,
     subscription: !(Platform.isAndroid || Platform.isIOS),
   );
 

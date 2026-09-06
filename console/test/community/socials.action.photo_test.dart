@@ -28,6 +28,7 @@ void main() {
           apiupload: (mkreq) async => throw UnimplementedError(),
           apipublish: (cid, req, {options = const []}) async => throw UnimplementedError(),
           capture: () async => throw UnimplementedError(),
+          permission: () async => throw UnimplementedError(),
         ),
         theme: ThemeData().copyWith(extensions: [Defaults(mobile: false)]),
       );
@@ -60,6 +61,7 @@ void main() {
             return PublishContentResponse();
           },
           capture: () async => XFile(photo.path),
+          permission: () async => true,
         ),
         theme: ThemeData().copyWith(extensions: [Defaults(mobile: true)]),
       );
@@ -97,6 +99,7 @@ void main() {
             return PublishContentResponse();
           },
           capture: () async => null,
+          permission: () async => true,
         ),
         theme: ThemeData().copyWith(extensions: [Defaults(mobile: true)]),
       );
@@ -107,6 +110,35 @@ void main() {
 
       expect(uploaded, equals(0));
       expect(publishes, equals(0));
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('mobile never opens the camera when access is denied', (tester) async {
+      var captures = 0;
+
+      // the denial is reported as a snackbar, which needs a Scaffold to land in.
+      await tester.pumpApp(
+        Scaffold(
+          body: SocialActionPhoto(
+            _community,
+            apiupload: (mkreq) async => throw UnimplementedError(),
+            apipublish: (cid, req, {options = const []}) async => throw UnimplementedError(),
+            capture: () async {
+              captures++;
+              return null;
+            },
+            permission: () async => false,
+          ),
+        ),
+        theme: ThemeData().copyWith(extensions: [Defaults(mobile: true)]),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.add_a_photo_outlined));
+      await tester.pumpAndSettle();
+
+      expect(captures, equals(0));
+      expect(find.text("camera access is required to publish a photo"), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
@@ -128,6 +160,7 @@ void main() {
               throw Exception('boom');
             },
             capture: () async => XFile(photo.path),
+            permission: () async => true,
           ),
         ),
         theme: ThemeData().copyWith(extensions: [Defaults(mobile: true)]),
