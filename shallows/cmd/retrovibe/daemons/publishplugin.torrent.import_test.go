@@ -11,9 +11,12 @@ import (
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
+	"github.com/retrovibed/retrovibed/retroapi/publishplugin"
 	"github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/daemons"
+	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
@@ -72,59 +75,65 @@ func TestPublishPluginTorrentImport(t *testing.T) {
 		return q, tvfs, tstore, plugindir, lmd
 	}
 
-	t.Run("imports a valid wasm module and marks it imported", func(t *testing.T) {
+	t.Run("installs under its digest, records the row, and marks it imported", func(t *testing.T) {
 		content := wasmModule(t, 4096)
 		q, tvfs, tstore, plugindir, lmd := setup(t, "lemmy", content, tracking.MetadataOptionCompleted)
 
 		require.NoError(t, daemons.PublishPluginTorrentImport(t.Context(), q, plugindir, tvfs, tstore))
 
-		written, err := os.ReadFile(filepath.Join(plugindir, "lemmy.wasm"))
+		// the same content addressed name the upload endpoint writes, so the
+		// community's description never reaches the filesystem.
+		id := md5x.FormatUUID(md5x.Digest(string(content)))
+		written, err := os.ReadFile(filepath.Join(plugindir, id+".wasm"))
 		require.NoError(t, err)
 		require.Equal(t, content, written)
+
+		var row community.PluginPublisher
+		require.NoError(t, community.PluginPublisherFindByID(t.Context(), q, id).Scan(&row))
+		require.Equal(t, filepath.Join(plugindir, id+".wasm"), row.Path)
+		require.Equal(t, "lemmy", row.Description)
+		require.Equal(t, mimex.RetrovibedPublishModule, row.Mimetype)
+
+		// the reconcile has to agree with what was just recorded.
+		identity, err := publishplugin.Identity(row.Path)
+		require.NoError(t, err)
+		require.Equal(t, id, identity)
 
 		var updated tracking.Metadata
 		require.NoError(t, tracking.MetadataFindByID(t.Context(), q, lmd.ID).Scan(&updated))
 		require.NotEqual(t, timex.Inf(), updated.ImportedAt)
 	})
 
-	t.Run("sanitizes a name that would escape the plugin directory", func(t *testing.T) {
+	t.Run("the reconcile leaves an imported module alone", func(t *testing.T) {
 		content := wasmModule(t, 4096)
-		q, tvfs, tstore, plugindir, _ := setup(t, "../../escape", content, tracking.MetadataOptionCompleted)
+		q, tvfs, tstore, plugindir, _ := setup(t, "lemmy", content, tracking.MetadataOptionCompleted)
 
 		require.NoError(t, daemons.PublishPluginTorrentImport(t.Context(), q, plugindir, tvfs, tstore))
+		// the daemon runs both back to back; the reconcile must not retire the
+		// row the importer just wrote, nor overwrite its label with the digest
+		// the module is named after.
+		require.NoError(t, daemons.PublishPluginImport(t.Context(), q, plugindir))
 
-		_, err := os.Stat(filepath.Join(filepath.Dir(filepath.Dir(plugindir)), "escape.wasm"))
-		require.ErrorIs(t, err, os.ErrNotExist)
-
-		written, err := os.ReadFile(filepath.Join(plugindir, "escape.wasm"))
-		require.NoError(t, err)
-		require.Equal(t, content, written)
+		rows := sqlx.Scan(community.PluginPublisherFindAll(t.Context(), q))
+		found := make([]community.PluginPublisher, 0, 1)
+		for pub := range rows.Iter() {
+			found = append(found, pub)
+		}
+		require.NoError(t, rows.Err())
+		require.Len(t, found, 1)
+		require.Equal(t, md5x.FormatUUID(md5x.Digest(string(content))), found[0].ID)
+		require.Equal(t, "lemmy", found[0].Description)
 	})
 
-	t.Run("tombstones a name with nothing usable left in it", func(t *testing.T) {
-		content := wasmModule(t, 4096)
-		q, tvfs, tstore, plugindir, lmd := setup(t, "../..", content, tracking.MetadataOptionCompleted)
+	t.Run("tombstones and does not install a payload that isn't a valid wasm module", func(t *testing.T) {
+		content := notWasm(t, 4096)
+		q, tvfs, tstore, plugindir, lmd := setup(t, "lemmy", content, tracking.MetadataOptionCompleted)
 
 		require.NoError(t, daemons.PublishPluginTorrentImport(t.Context(), q, plugindir, tvfs, tstore))
 
 		entries, err := os.ReadDir(plugindir)
 		require.NoError(t, err)
 		require.Empty(t, entries)
-
-		var updated tracking.Metadata
-		require.NoError(t, tracking.MetadataFindByID(t.Context(), q, lmd.ID).Scan(&updated))
-		require.NotEqual(t, timex.Inf(), updated.TombstonedAt)
-		require.Equal(t, timex.Inf(), updated.ImportedAt)
-	})
-
-	t.Run("tombstones and does not copy a payload that isn't a valid wasm module", func(t *testing.T) {
-		content := notWasm(t, 4096)
-		q, tvfs, tstore, plugindir, lmd := setup(t, "lemmy", content, tracking.MetadataOptionCompleted)
-
-		require.NoError(t, daemons.PublishPluginTorrentImport(t.Context(), q, plugindir, tvfs, tstore))
-
-		_, err := os.Stat(filepath.Join(plugindir, "lemmy.wasm"))
-		require.ErrorIs(t, err, os.ErrNotExist)
 
 		var updated tracking.Metadata
 		require.NoError(t, tracking.MetadataFindByID(t.Context(), q, lmd.ID).Scan(&updated))

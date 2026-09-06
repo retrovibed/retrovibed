@@ -370,7 +370,14 @@ func PluginPublisherInsertWithDefaults(
 	gql genieql.Insert,
 	pattern func(ctx context.Context, q sqlx.Queryer, a PluginPublisher) NewPluginPublisherScannerStaticRow,
 ) {
-	gql.Into("plugin_publishers").Default("created_at", "updated_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, path = EXCLUDED.path, description = EXCLUDED.description, mimetype = EXCLUDED.mimetype")
+	// description and mimetype fall back to what is already stored when the
+	// incoming value is blank: the reconcile in PublishPluginImport upserts
+	// every installed module on every pass and has no label to offer for one
+	// named after its own digest, which is exactly the form the upload endpoint
+	// and the community importer write - both of which do record a label.
+	// NULLIF only steers the COALESCE; both columns are NOT NULL and the fallback
+	// is the stored row, so what actually lands is never null.
+	gql.Into("plugin_publishers").Default("created_at", "updated_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, path = EXCLUDED.path, description = COALESCE(NULLIF(EXCLUDED.description, ''), plugin_publishers.description), mimetype = COALESCE(NULLIF(EXCLUDED.mimetype, ''), plugin_publishers.mimetype)")
 }
 
 func PluginPublisherFindByID(
