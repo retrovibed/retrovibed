@@ -32,7 +32,7 @@ class DeveloperSettings extends StatelessWidget {
           ),
           forms.Checkbox(
             const Text('Debug'),
-            description: const Text('Enable debug functionality'),
+            description: const Text('Enable debug-only UX and tuning panels'),
             value: flags.debug,
             onChanged: (v) {
               final s = Login.of(context);
@@ -73,15 +73,6 @@ class DeveloperSettings extends StatelessWidget {
             onChanged: (v) {
               final s = Login.of(context);
               s?.setState(() => s.flags = flags.copyWith(releases: v ?? false));
-            },
-          ),
-          forms.Checkbox(
-            const Text('Debug'),
-            description: const Text('Enable debug-only UX and tuning panels'),
-            value: flags.debug,
-            onChanged: (v) {
-              final s = Login.of(context);
-              s?.setState(() => s.flags = flags.copyWith(debug: v ?? false));
             },
           ),
         ],
