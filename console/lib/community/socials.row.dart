@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'api.dart';
-import 'socials.details.dart';
 
 class SocialCommunityRow extends StatelessWidget {
   final Community community;

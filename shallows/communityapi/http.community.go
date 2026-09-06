@@ -205,7 +205,7 @@ func (t *HTTP) resync(w http.ResponseWriter, r *http.Request) {
 
 	var msg PublishedContentSearchResponse
 	msg.Community = new(langx.Clone(Community{}, CommunityOptionFromDB(langx.Clone(*existing, timex.JSONSafeEncodeOption))))
-	msg.Next = &PublishedContentSearchRequest{CommunityId: cid, Offset: 1, Limit: 128}
+	msg.Next = &PublishedContentSearchRequest{CommunityId: cid, Offset: 0, Limit: 128}
 
 	q := community.PublishedContentSearch(r.Context(), t.q, community.PublishedContentSearchBuilder().Where(
 		squirrel.And{

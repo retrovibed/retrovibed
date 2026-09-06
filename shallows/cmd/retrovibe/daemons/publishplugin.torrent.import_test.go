@@ -2,10 +2,12 @@ package daemons_test
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
 
+	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
@@ -14,12 +16,14 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/publishplugin"
 	"github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/daemons"
 	"github.com/retrovibed/retrovibed/shallows/community"
+	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
+	"github.com/retrovibed/retrovibed/shallows/internal/torrentx"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 	"github.com/stretchr/testify/require"
 )
@@ -123,6 +127,59 @@ func TestPublishPluginTorrentImport(t *testing.T) {
 		require.Len(t, found, 1)
 		require.Equal(t, md5x.FormatUUID(md5x.Digest(string(content))), found[0].ID)
 		require.Equal(t, "lemmy", found[0].Description)
+	})
+
+	t.Run("installs a module recorded by the community sync", func(t *testing.T) {
+		content := wasmModule(t, 4096)
+
+		q := sqltestx.Metadatabase(t)
+
+		seedir := t.TempDir()
+		tvfs := fsx.DirVirtual(seedir)
+		tstore := blockcache.NewTorrentFromVirtualFS(tvfs)
+		mdcache := torrent.NewMetadataCache(seedir)
+		plugindir := t.TempDir()
+
+		contentdir := t.TempDir()
+		require.NoError(t, os.WriteFile(filepath.Join(contentdir, "plugin.wasm"), content, 0600))
+
+		info, err := metainfo.NewFromPath(contentdir)
+		require.NoError(t, err)
+
+		md, err := torrent.NewFromInfo(info, torrent.OptionStorage(storage.NewFile(contentdir)))
+		require.NoError(t, err)
+		require.NoError(t, mdcache.Write(md))
+
+		storedir := storage.InfoHashPathMaker(seedir, md.ID, info, nil)
+		cache, err := blockcache.NewDirectoryCache(storedir)
+		require.NoError(t, err)
+		_, err = cache.WriteAt(content, 0)
+		require.NoError(t, err)
+
+		// the torrent row a community subscription writes, rather than one built
+		// here with the mimetype already set - that is the difference between a
+		// module that installs itself and one that downloads and then sits there.
+		require.NoError(t, communityapi.SyncPublishedContentItem(t.Context(), q, &communityapi.PublishedContent{
+			Id:          uuid.Must(uuid.NewV7()).String(),
+			CommunityId: uuid.Must(uuid.NewV7()).String(),
+			MagnetUri:   fmt.Sprintf("magnet:?xt=urn:btih:%s&dn=plugin.wasm", md.ID.String()),
+			Title:       "plugin.wasm",
+			Mimetype:    mimex.RetrovibedPublishModule,
+		}, false))
+
+		var lmd tracking.Metadata
+		require.NoError(t, tracking.MetadataCompleteByID(t.Context(), q, torrentx.HashUID(new(md.ID)), 0, uint64(len(content)), uint64(len(content)), 0, uint64(len(content))).Scan(&lmd))
+
+		require.NoError(t, daemons.PublishPluginTorrentImport(t.Context(), q, plugindir, tvfs, tstore))
+
+		id := md5x.FormatUUID(md5x.Digest(string(content)))
+		written, err := os.ReadFile(filepath.Join(plugindir, id+".wasm"))
+		require.NoError(t, err)
+		require.Equal(t, content, written)
+
+		var row community.PluginPublisher
+		require.NoError(t, community.PluginPublisherFindByID(t.Context(), q, id).Scan(&row))
+		require.Equal(t, mimex.RetrovibedPublishModule, row.Mimetype)
 	})
 
 	t.Run("tombstones and does not install a payload that isn't a valid wasm module", func(t *testing.T) {

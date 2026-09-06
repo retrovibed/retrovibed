@@ -4,7 +4,7 @@ import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/ddisc/plugin/environment.editor.dart';
-import './api.dart' as api;
+import 'api.dart' as api;
 
 class PublisherRow extends StatelessWidget {
   final api.PluginPublisher current;
