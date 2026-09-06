@@ -3,7 +3,6 @@ package communityapi
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -100,7 +99,7 @@ func (t DeeppoolPublished) Publish(ctx context.Context, communityID string, pc *
 		msg  PublishContentResponse
 	)
 
-	body, err := json.Marshal(&PublishContentRequest{PublishedContent: pc})
+	body, err := jsonx.Marshal(&PublishContentRequest{PublishedContent: pc})
 	if err != nil {
 		return nil, err
 	}

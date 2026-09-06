@@ -21,6 +21,27 @@ func TestUnmarshal(t *testing.T) {
 		require.Equal(t, payload{Name: "kept", ID: 42}, out)
 	})
 
+	t.Run("matches field names case insensitively", func(t *testing.T) {
+		const doc = `{"name":"kept","id":42}`
+
+		var out payload
+		require.NoError(t, jsonx.Unmarshal([]byte(doc), &out))
+		require.Equal(t, payload{Name: "kept", ID: 42}, out)
+	})
+
+	t.Run("prefers the exactly matching field over a case insensitive one", func(t *testing.T) {
+		type tagged struct {
+			Lower string `json:"name"`
+			Upper string `json:"Name"`
+		}
+
+		const doc = `{"name":"lower","Name":"upper"}`
+
+		var out tagged
+		require.NoError(t, jsonx.Unmarshal([]byte(doc), &out))
+		require.Equal(t, tagged{Lower: "lower", Upper: "upper"}, out)
+	})
+
 	t.Run("accepts string-encoded uint64", func(t *testing.T) {
 		type uintPayload struct {
 			ID uint64

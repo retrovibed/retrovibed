@@ -3,7 +3,6 @@ package communityapi
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -14,7 +13,7 @@ import (
 )
 
 func CommunityCreate(ctx context.Context, c *http.Client, com *CommunityCreateRequest) (resp *CommunityCreateResponse, err error) {
-	encoded, err := json.Marshal(com)
+	encoded, err := jsonx.Marshal(com)
 	if err != nil {
 		return nil, err
 	}

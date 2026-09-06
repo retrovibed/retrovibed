@@ -2,7 +2,6 @@ package daemons
 
 import (
 	"context"
-	"encoding/json"
 	"iter"
 	"log"
 	"net/http"
@@ -13,6 +12,7 @@ import (
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/retrovibed/retrovibed/retroapi/backoffx"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/retrovibed/retrovibed/retroapi/uuidx"
@@ -40,29 +40,26 @@ func PrepareDefaultFeeds(ctx context.Context, q sqlx.Queryer) error {
 	defer log.Println("syncing default rss feeds completed")
 
 	encoded, err := fsx.AutoCached(userx.DefaultConfigDir(userx.DefaultRelRoot(), "default.feeds.json"), func() (_ []byte, _ error) {
-		return json.Marshal([]tracking.RSS{
+		return jsonx.Marshal([]tracking.RSS{
 			{
 				Description:  "Arch Linux - iso",
 				URL:          "https://archlinux.org/feeds/releases/",
 				Contributing: true,
 			},
-			// {
-			// 	Description:  "A generalized feed for linux distribution iso images",
-			// 	URL:          "https://fosstorrents.com/feed/torrents.xml",
-			// 	Contributing: true,
-			// },
+
 			{
 				Description:  "Retrovibed - test data",
 				URL:          "https://vibed.community.retrovibe.space",
 				Contributing: true,
 			},
 		})
+
 	})
 	if err != nil {
 		return err
 	}
 
-	if err = json.Unmarshal(encoded, &feeds); err != nil {
+	if err = jsonx.Unmarshal(encoded, &feeds); err != nil {
 		return err
 	}
 

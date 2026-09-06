@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"crypto/md5"
-	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -750,7 +749,6 @@ func (t *HTTPDiscovered) websocket(w http.ResponseWriter, r *http.Request) {
 		sub pubsub.Subscription
 		dl  torrent.Torrent
 		buf = bytes.NewBuffer(nil)
-		enc = json.NewEncoder(buf)
 		id  = mux.Vars(r)["id"]
 	)
 
@@ -802,7 +800,7 @@ func (t *HTTPDiscovered) websocket(w http.ResponseWriter, r *http.Request) {
 			),
 		)
 
-		if err = enc.Encode(msg); err != nil {
+		if err = jsonx.MarshalWrite(buf, msg); err != nil {
 			return errorsx.Wrap(err, "unable to encode status")
 		}
 

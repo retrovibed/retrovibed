@@ -3,11 +3,11 @@ package cmdcommunity
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"io"
 	"net/http"
 	"os"
 
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -44,7 +44,7 @@ func (t cmdCommunityInfo) run(ctx context.Context, c *http.Client, in io.Reader,
 		return errorsx.Wrap(err, "failed to locate community")
 	}
 
-	if err = json.NewEncoder(out).Encode(commresp.Community); err != nil {
+	if err = jsonx.MarshalWrite(out, commresp.Community); err != nil {
 		return errorsx.Wrap(err, "unable to write to encoder")
 	}
 

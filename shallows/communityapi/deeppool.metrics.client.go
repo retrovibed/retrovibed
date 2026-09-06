@@ -2,7 +2,6 @@ package communityapi
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -65,7 +64,7 @@ func (t Metrics) Publish(ctx context.Context, content *PublishContentRequest, to
 			return lerr
 		}
 
-		if lerr = json.NewEncoder(metadata).Encode(content); lerr != nil {
+		if lerr = jsonx.MarshalWrite(metadata, content); lerr != nil {
 			return lerr
 		}
 

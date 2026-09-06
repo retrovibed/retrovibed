@@ -2,13 +2,13 @@ package cmdtorrent
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"net/url"
 
 	"github.com/retrovibed/retrovibed/retroapi/authn"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
@@ -32,7 +32,7 @@ func (t cmdMagnet) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig) error {
 			magnet  media.MagnetCreateResponse
 		)
 
-		if encoded, err = json.Marshal(&media.MagnetCreateRequest{Uri: uri.String()}); err != nil {
+		if encoded, err = jsonx.Marshal(&media.MagnetCreateRequest{Uri: uri.String()}); err != nil {
 			return errorsx.Wrap(err, "unable to encode magnet request")
 		}
 

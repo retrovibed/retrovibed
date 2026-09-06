@@ -3,7 +3,6 @@ package ddiscapi
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"io"
 	"log"
 	"math"
@@ -221,14 +220,13 @@ func (t *HTTPDiscovery) websocket(w http.ResponseWriter, r *http.Request) {
 
 	var (
 		buf   = bytes.NewBuffer(nil)
-		enc   = json.NewEncoder(buf)
 		best  = ddisc.Worst()
 		found bool
 	)
 
 	write := func(d ddisc.Discovered) error {
 		buf.Reset()
-		if err := enc.Encode(NewDiscoveryFromDiscovered(d)); err != nil {
+		if err := jsonx.MarshalWrite(buf, NewDiscoveryFromDiscovered(d)); err != nil {
 			return errorsx.Wrap(err, "unable to encode discovery")
 		}
 		return c.Write(ctx, websocket.MessageBinary, buf.Bytes())

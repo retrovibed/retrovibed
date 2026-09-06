@@ -1,7 +1,6 @@
 package metaapi
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 
@@ -137,7 +136,7 @@ func (t *HTTPDaemons) discover(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		data, err := json.Marshal(encoded)
+		data, err := jsonx.Marshal(encoded)
 		if err != nil {
 			log.Println(errorsx.Wrap(err, "unable to encode discovered peer"))
 			errorsx.Log(c.Close(websocketx.PrivateStatus(http.StatusInternalServerError), "internal service error"))

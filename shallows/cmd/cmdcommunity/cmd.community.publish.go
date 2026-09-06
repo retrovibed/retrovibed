@@ -2,7 +2,6 @@ package cmdcommunity
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"io"
 	"iter"
@@ -119,7 +118,7 @@ func (t cmdCommunityPublish) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClien
 		return err
 	}
 
-	if err = json.NewEncoder(os.Stdout).Encode(uploaded.Community); err != nil {
+	if err = jsonx.MarshalWrite(os.Stdout, uploaded.Community); err != nil {
 		return errorsx.Wrap(err, "unable to write to uploaded")
 	}
 

@@ -116,7 +116,7 @@ func (t cmdCompletion) run(gctx *cmdopts.Global, in io.Reader, out io.Writer, er
 				"enable_thinking": t.Thinking,
 			},
 		}
-		body, err := json.Marshal(req)
+		body, err := jsonx.Marshal(req)
 		if err != nil {
 			return errorsx.Wrap(err, "failed to marshal request")
 		}

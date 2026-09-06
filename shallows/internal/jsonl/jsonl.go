@@ -3,25 +3,25 @@ package jsonl
 import (
 	"bufio"
 	"context"
-	"encoding/json"
 	"io"
 	"iter"
 
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 )
 
 type Encoder struct {
-	encoder *json.Encoder // The standard JSON encoder
+	out io.Writer // The stream each encoded value is written to
 }
 
 // NewEncoder returns a new Encoder that writes to w.
-// The underlying json.Encoder automatically adds a newline after each
-// encoded value, making it suitable for JSONL.
+// jsonx.MarshalWrite does not terminate a value with a newline, so Encode
+// appends the delimiter itself to make the output suitable for JSONL.
 func NewEncoder(w io.Writer) *Encoder {
 	return &Encoder{
-		encoder: json.NewEncoder(w),
+		out: w,
 	}
 }
 
@@ -29,7 +29,11 @@ func NewEncoder(w io.Writer) *Encoder {
 // Any error during JSON marshaling or writing to the underlying writer is returned.
 func (e *Encoder) Encode(vs ...any) error {
 	for _, v := range vs {
-		if err := e.encoder.Encode(v); err != nil {
+		if err := jsonx.MarshalWrite(e.out, v); err != nil {
+			return err
+		}
+
+		if _, err := io.WriteString(e.out, "\n"); err != nil {
 			return err
 		}
 	}
@@ -113,7 +117,7 @@ func (d *Decoder) Decode(v any) error {
 		return errorsx.Errorf("encountered empty line, expected JSON object")
 	}
 
-	if err := json.Unmarshal(line, v); err != nil {
+	if err := jsonx.Unmarshal(line, v); err != nil {
 		return errorsx.Wrapf(err, "unable to decode '%s'", string(line))
 	}
 

@@ -2,7 +2,6 @@ package cmdmedia
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -12,6 +11,7 @@ import (
 
 	"github.com/retrovibed/retrovibed/retroapi/asynccompute"
 	"github.com/retrovibed/retrovibed/retroapi/backoffx"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
@@ -96,7 +96,7 @@ func (t knownarchive) Run(gctx *cmdopts.Global) (err error) {
 
 	for derr = d.Decode(&v); derr == nil; derr = d.Decode(&v) {
 		v.AutoDescription = stringsx.Join("\n", v.Title, v.OriginalTitle, v.Overview)
-		encoded, err := json.Marshal(v)
+		encoded, err := jsonx.Marshal(v)
 		if err != nil {
 			return errorsx.Wrapf(err, "unable to encode record %s", v.UID)
 		}

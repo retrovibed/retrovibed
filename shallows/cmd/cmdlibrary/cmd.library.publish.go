@@ -3,7 +3,6 @@ package cmdlibrary
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -72,13 +71,14 @@ func (t cmdPublish) publishItem(ctx context.Context, endpoint string, c *http.Cl
 		msg  communityapi.PublishContentResponse
 	)
 
-	body, err := json.Marshal(&communityapi.PublishContentRequest{
+	body, err := jsonx.Marshal(&communityapi.PublishContentRequest{
 		PublishedContent: &communityapi.PublishedContent{
 			LibraryId:   libraryID,
 			CommunityId: com.Id,
 		},
 		PublishMode: com.DefaultPublishMode,
 	})
+
 	if err != nil {
 		return nil, err
 	}

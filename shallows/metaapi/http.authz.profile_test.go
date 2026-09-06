@@ -88,6 +88,9 @@ func TestHTTPAuthzProfile(t *testing.T) {
 
 		require.True(t, result.Token.Usermanagement)
 
+		// reset for next pass.
+		result = metaapi.AuthzResponse{}
+
 		resp, req, err = httptestx.BuildRequestBytes(http.MethodGet, fmt.Sprintf("/%s", p2.ID), nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)))
 		require.NoError(t, err)
 

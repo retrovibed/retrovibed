@@ -2,7 +2,6 @@ package metaapi
 
 import (
 	"context"
-	"encoding/json"
 	"log"
 	"net/http"
 	"strings"
@@ -132,7 +131,7 @@ func (t *HTTPAudioSink) listen(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	encoded, err := json.Marshal(&resp)
+	encoded, err := jsonx.Marshal(&resp)
 	if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to encode sinks"))
 		errorsx.Log(c.Close(websocketx.PrivateStatus(http.StatusInternalServerError), "internal service error"))

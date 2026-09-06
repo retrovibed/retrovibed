@@ -113,13 +113,14 @@ func (t importJSONL) importItem(ctx context.Context, c *http.Client, endpoint st
 		return errorsx.Wrap(err, "decode upload response")
 	}
 
-	patch, err := json.Marshal(&media.MediaUpdateRequest{
+	patch, err := jsonx.Marshal(&media.MediaUpdateRequest{
 		Media: &media.Media{
 			Description:  trailer.Metadata.Description,
 			KnownMediaId: trailer.Metadata.KnownMediaID,
 			ArchiveId:    trailer.Metadata.ArchiveID,
 		},
 	})
+
 	if err != nil {
 		return err
 	}

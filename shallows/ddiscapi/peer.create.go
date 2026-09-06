@@ -3,17 +3,17 @@ package ddiscapi
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 )
 
 // PeerCreate creates a peer on the given library endpoint.
 func PeerCreate(ctx context.Context, c *http.Client, endpoint string, req *PeerCreateRequest) (resp *PeerCreateResponse, err error) {
-	encoded, err := json.Marshal(req)
+	encoded, err := jsonx.Marshal(req)
 	if err != nil {
 		return nil, errorsx.Wrap(err, "unable to encode request")
 	}

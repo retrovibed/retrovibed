@@ -156,6 +156,9 @@ func TestHTTPAuthzGrant(t *testing.T) {
 		require.True(t, result.Token.Usermanagement)
 		require.True(t, result.Token.RemoteControl)
 
+		// reset for next pass.
+		result = metaapi.AuthzGrantResponse{}
+
 		// second grant against the same profile: takes the ON CONFLICT DO UPDATE
 		// path. Every field granted above must actually flip, not silently keep
 		// its prior value.

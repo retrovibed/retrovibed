@@ -2,11 +2,11 @@ package ducktype
 
 import (
 	"database/sql/driver"
-	"encoding/json"
 	"fmt"
 	"strconv"
 	"time"
 
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 )
 
@@ -56,12 +56,12 @@ func (n *NullDuration) Scan(src any) error {
 		)
 		n.Valid = false
 
-		encoded, err := json.Marshal(v)
+		encoded, err := jsonx.Marshal(v)
 		if err != nil {
 			return errorsx.Wrapf(err, "nullduration: cannot scan type %T into NullDuration", src)
 		}
 
-		if err = json.Unmarshal(encoded, &decoded); err != nil {
+		if err = jsonx.Unmarshal(encoded, &decoded); err != nil {
 			return errorsx.Wrapf(err, "nullduration: cannot scan type %T into NullDuration", src)
 		}
 
