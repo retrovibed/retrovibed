@@ -43,7 +43,7 @@ class _SocialHomeState extends State<SocialHome> with ds.LoadingState {
       limit: ds.Int64(20),
     ),
   );
-  String _focused = '';
+  Community _focused = Community();
 
   Future<void> _refresh() {
     setState(() => loading = true);
@@ -137,9 +137,9 @@ class _SocialHomeState extends State<SocialHome> with ds.LoadingState {
               details: widget.details,
               enable: widget.enable,
               disable: widget.disable,
-              focused: v.id == _focused,
+              focused: v.id == _focused.id,
               onInfo: () => setState(() {
-                _focused = _focused == v.id ? '' : v.id;
+                _focused = _focused.id == v.id ? Community() : v;
               }),
             ),
             children: _resp.items,

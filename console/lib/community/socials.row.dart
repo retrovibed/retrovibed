@@ -48,13 +48,16 @@ class SocialCommunityRow extends StatelessWidget {
             community.description.isNotEmpty ? community.description : community.url,
             style: Theme.of(context).textTheme.titleSmall,
           ),
-          if (focused)
-            SocialCommunityDetails(
-              communityId: community.id,
+          Visibility(
+            child: SocialCommunityDetails(
+              community,
               search: details,
               enable: enable,
               disable: disable,
             ),
+            visible: focused,
+            maintainState: true,
+          ),
         ],
       ),
       trailing: [

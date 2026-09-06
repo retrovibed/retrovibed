@@ -122,14 +122,6 @@ const SocialsSearchResponse$json = {
       '6': '.retrovibed.community.CommunitySocial',
       '10': 'items'
     },
-    {
-      '1': 'catalog',
-      '3': 3,
-      '4': 3,
-      '5': 11,
-      '6': '.retrovibed.community.PluginPublisher',
-      '10': 'catalog'
-    },
   ],
 };
 
@@ -137,8 +129,57 @@ const SocialsSearchResponse$json = {
 final $typed_data.Uint8List socialsSearchResponseDescriptor = $convert.base64Decode(
     'ChVTb2NpYWxzU2VhcmNoUmVzcG9uc2USPgoEbmV4dBgBIAEoCzIqLnJldHJvdmliZWQuY29tbX'
     'VuaXR5LlNvY2lhbHNTZWFyY2hSZXF1ZXN0UgRuZXh0EjsKBWl0ZW1zGAIgAygLMiUucmV0cm92'
-    'aWJlZC5jb21tdW5pdHkuQ29tbXVuaXR5U29jaWFsUgVpdGVtcxI/CgdjYXRhbG9nGAMgAygLMi'
-    'UucmV0cm92aWJlZC5jb21tdW5pdHkuUGx1Z2luUHVibGlzaGVyUgdjYXRhbG9n');
+    'aWJlZC5jb21tdW5pdHkuQ29tbXVuaXR5U29jaWFsUgVpdGVtcw==');
+
+@$core.Deprecated('Use pluginPublisherSearchRequestDescriptor instead')
+const PluginPublisherSearchRequest$json = {
+  '1': 'PluginPublisherSearchRequest',
+  '2': [
+    {'1': 'query', '3': 1, '4': 1, '5': 9, '10': 'query'},
+    {'1': 'offset', '3': 900, '4': 1, '5': 4, '10': 'offset'},
+    {'1': 'limit', '3': 901, '4': 1, '5': 4, '10': 'limit'},
+  ],
+  '9': [
+    {'1': 2, '2': 900},
+    {'1': 902, '2': 1000},
+  ],
+};
+
+/// Descriptor for `PluginPublisherSearchRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List pluginPublisherSearchRequestDescriptor =
+    $convert.base64Decode(
+        'ChxQbHVnaW5QdWJsaXNoZXJTZWFyY2hSZXF1ZXN0EhQKBXF1ZXJ5GAEgASgJUgVxdWVyeRIXCg'
+        'ZvZmZzZXQYhAcgASgEUgZvZmZzZXQSFQoFbGltaXQYhQcgASgEUgVsaW1pdEoFCAIQhAdKBgiG'
+        'BxDoBw==');
+
+@$core.Deprecated('Use pluginPublisherSearchResponseDescriptor instead')
+const PluginPublisherSearchResponse$json = {
+  '1': 'PluginPublisherSearchResponse',
+  '2': [
+    {
+      '1': 'next',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.retrovibed.community.PluginPublisherSearchRequest',
+      '10': 'next'
+    },
+    {
+      '1': 'items',
+      '3': 2,
+      '4': 3,
+      '5': 11,
+      '6': '.retrovibed.community.PluginPublisher',
+      '10': 'items'
+    },
+  ],
+};
+
+/// Descriptor for `PluginPublisherSearchResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List pluginPublisherSearchResponseDescriptor = $convert.base64Decode(
+    'Ch1QbHVnaW5QdWJsaXNoZXJTZWFyY2hSZXNwb25zZRJGCgRuZXh0GAEgASgLMjIucmV0cm92aW'
+    'JlZC5jb21tdW5pdHkuUGx1Z2luUHVibGlzaGVyU2VhcmNoUmVxdWVzdFIEbmV4dBI7CgVpdGVt'
+    'cxgCIAMoCzIlLnJldHJvdmliZWQuY29tbXVuaXR5LlBsdWdpblB1Ymxpc2hlclIFaXRlbXM=');
 
 @$core.Deprecated('Use pluginPublisherCreateResponseDescriptor instead')
 const PluginPublisherCreateResponse$json = {

@@ -297,7 +297,6 @@ type SocialsSearchResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Next          *SocialsSearchRequest  `protobuf:"bytes,1,opt,name=next,proto3" json:"next,omitempty"`
 	Items         []*CommunitySocial     `protobuf:"bytes,2,rep,name=items,proto3" json:"items,omitempty"`
-	Catalog       []*PluginPublisher     `protobuf:"bytes,3,rep,name=catalog,proto3" json:"catalog,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -346,9 +345,114 @@ func (x *SocialsSearchResponse) GetItems() []*CommunitySocial {
 	return nil
 }
 
-func (x *SocialsSearchResponse) GetCatalog() []*PluginPublisher {
+type PluginPublisherSearchRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Query         string                 `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
+	Offset        uint64                 `protobuf:"varint,900,opt,name=offset,proto3" json:"offset,omitempty"`
+	Limit         uint64                 `protobuf:"varint,901,opt,name=limit,proto3" json:"limit,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PluginPublisherSearchRequest) Reset() {
+	*x = PluginPublisherSearchRequest{}
+	mi := &file_community_community_social_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PluginPublisherSearchRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PluginPublisherSearchRequest) ProtoMessage() {}
+
+func (x *PluginPublisherSearchRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_community_community_social_proto_msgTypes[5]
 	if x != nil {
-		return x.Catalog
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PluginPublisherSearchRequest.ProtoReflect.Descriptor instead.
+func (*PluginPublisherSearchRequest) Descriptor() ([]byte, []int) {
+	return file_community_community_social_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *PluginPublisherSearchRequest) GetQuery() string {
+	if x != nil {
+		return x.Query
+	}
+	return ""
+}
+
+func (x *PluginPublisherSearchRequest) GetOffset() uint64 {
+	if x != nil {
+		return x.Offset
+	}
+	return 0
+}
+
+func (x *PluginPublisherSearchRequest) GetLimit() uint64 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
+type PluginPublisherSearchResponse struct {
+	state         protoimpl.MessageState        `protogen:"open.v1"`
+	Next          *PluginPublisherSearchRequest `protobuf:"bytes,1,opt,name=next,proto3" json:"next,omitempty"`
+	Items         []*PluginPublisher            `protobuf:"bytes,2,rep,name=items,proto3" json:"items,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PluginPublisherSearchResponse) Reset() {
+	*x = PluginPublisherSearchResponse{}
+	mi := &file_community_community_social_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PluginPublisherSearchResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PluginPublisherSearchResponse) ProtoMessage() {}
+
+func (x *PluginPublisherSearchResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_community_community_social_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PluginPublisherSearchResponse.ProtoReflect.Descriptor instead.
+func (*PluginPublisherSearchResponse) Descriptor() ([]byte, []int) {
+	return file_community_community_social_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *PluginPublisherSearchResponse) GetNext() *PluginPublisherSearchRequest {
+	if x != nil {
+		return x.Next
+	}
+	return nil
+}
+
+func (x *PluginPublisherSearchResponse) GetItems() []*PluginPublisher {
+	if x != nil {
+		return x.Items
 	}
 	return nil
 }
@@ -362,7 +466,7 @@ type PluginPublisherCreateResponse struct {
 
 func (x *PluginPublisherCreateResponse) Reset() {
 	*x = PluginPublisherCreateResponse{}
-	mi := &file_community_community_social_proto_msgTypes[5]
+	mi := &file_community_community_social_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -374,7 +478,7 @@ func (x *PluginPublisherCreateResponse) String() string {
 func (*PluginPublisherCreateResponse) ProtoMessage() {}
 
 func (x *PluginPublisherCreateResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_community_community_social_proto_msgTypes[5]
+	mi := &file_community_community_social_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -387,7 +491,7 @@ func (x *PluginPublisherCreateResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PluginPublisherCreateResponse.ProtoReflect.Descriptor instead.
 func (*PluginPublisherCreateResponse) Descriptor() ([]byte, []int) {
-	return file_community_community_social_proto_rawDescGZIP(), []int{5}
+	return file_community_community_social_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *PluginPublisherCreateResponse) GetPublisher() *PluginPublisher {
@@ -406,7 +510,7 @@ type PluginPublisherDeleteResponse struct {
 
 func (x *PluginPublisherDeleteResponse) Reset() {
 	*x = PluginPublisherDeleteResponse{}
-	mi := &file_community_community_social_proto_msgTypes[6]
+	mi := &file_community_community_social_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -418,7 +522,7 @@ func (x *PluginPublisherDeleteResponse) String() string {
 func (*PluginPublisherDeleteResponse) ProtoMessage() {}
 
 func (x *PluginPublisherDeleteResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_community_community_social_proto_msgTypes[6]
+	mi := &file_community_community_social_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -431,7 +535,7 @@ func (x *PluginPublisherDeleteResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PluginPublisherDeleteResponse.ProtoReflect.Descriptor instead.
 func (*PluginPublisherDeleteResponse) Descriptor() ([]byte, []int) {
-	return file_community_community_social_proto_rawDescGZIP(), []int{6}
+	return file_community_community_social_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *PluginPublisherDeleteResponse) GetPublisher() *PluginPublisher {
@@ -450,7 +554,7 @@ type CommunityPublisherEnableResponse struct {
 
 func (x *CommunityPublisherEnableResponse) Reset() {
 	*x = CommunityPublisherEnableResponse{}
-	mi := &file_community_community_social_proto_msgTypes[7]
+	mi := &file_community_community_social_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -462,7 +566,7 @@ func (x *CommunityPublisherEnableResponse) String() string {
 func (*CommunityPublisherEnableResponse) ProtoMessage() {}
 
 func (x *CommunityPublisherEnableResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_community_community_social_proto_msgTypes[7]
+	mi := &file_community_community_social_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -475,7 +579,7 @@ func (x *CommunityPublisherEnableResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CommunityPublisherEnableResponse.ProtoReflect.Descriptor instead.
 func (*CommunityPublisherEnableResponse) Descriptor() ([]byte, []int) {
-	return file_community_community_social_proto_rawDescGZIP(), []int{7}
+	return file_community_community_social_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *CommunityPublisherEnableResponse) GetEnabled() *CommunityPublisher {
@@ -494,7 +598,7 @@ type CommunityPublisherDisableResponse struct {
 
 func (x *CommunityPublisherDisableResponse) Reset() {
 	*x = CommunityPublisherDisableResponse{}
-	mi := &file_community_community_social_proto_msgTypes[8]
+	mi := &file_community_community_social_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -506,7 +610,7 @@ func (x *CommunityPublisherDisableResponse) String() string {
 func (*CommunityPublisherDisableResponse) ProtoMessage() {}
 
 func (x *CommunityPublisherDisableResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_community_community_social_proto_msgTypes[8]
+	mi := &file_community_community_social_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -519,7 +623,7 @@ func (x *CommunityPublisherDisableResponse) ProtoReflect() protoreflect.Message 
 
 // Deprecated: Use CommunityPublisherDisableResponse.ProtoReflect.Descriptor instead.
 func (*CommunityPublisherDisableResponse) Descriptor() ([]byte, []int) {
-	return file_community_community_social_proto_rawDescGZIP(), []int{8}
+	return file_community_community_social_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *CommunityPublisherDisableResponse) GetDisabled() *CommunityPublisher {
@@ -561,11 +665,17 @@ const file_community_community_social_proto_rawDesc = "" +
 	"\x14SocialsSearchRequest\x12\x14\n" +
 	"\x05query\x18\x01 \x01(\tR\x05query\x12\x17\n" +
 	"\x06offset\x18\x84\a \x01(\x04R\x06offset\x12\x15\n" +
-	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\x02\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"\xd5\x01\n" +
+	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\x02\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"\x94\x01\n" +
 	"\x15SocialsSearchResponse\x12>\n" +
 	"\x04next\x18\x01 \x01(\v2*.retrovibed.community.SocialsSearchRequestR\x04next\x12;\n" +
-	"\x05items\x18\x02 \x03(\v2%.retrovibed.community.CommunitySocialR\x05items\x12?\n" +
-	"\acatalog\x18\x03 \x03(\v2%.retrovibed.community.PluginPublisherR\acatalog\"d\n" +
+	"\x05items\x18\x02 \x03(\v2%.retrovibed.community.CommunitySocialR\x05items\"s\n" +
+	"\x1cPluginPublisherSearchRequest\x12\x14\n" +
+	"\x05query\x18\x01 \x01(\tR\x05query\x12\x17\n" +
+	"\x06offset\x18\x84\a \x01(\x04R\x06offset\x12\x15\n" +
+	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\x02\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"\xa4\x01\n" +
+	"\x1dPluginPublisherSearchResponse\x12F\n" +
+	"\x04next\x18\x01 \x01(\v22.retrovibed.community.PluginPublisherSearchRequestR\x04next\x12;\n" +
+	"\x05items\x18\x02 \x03(\v2%.retrovibed.community.PluginPublisherR\x05items\"d\n" +
 	"\x1dPluginPublisherCreateResponse\x12C\n" +
 	"\tpublisher\x18\x01 \x01(\v2%.retrovibed.community.PluginPublisherR\tpublisher\"d\n" +
 	"\x1dPluginPublisherDeleteResponse\x12C\n" +
@@ -587,34 +697,37 @@ func file_community_community_social_proto_rawDescGZIP() []byte {
 	return file_community_community_social_proto_rawDescData
 }
 
-var file_community_community_social_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_community_community_social_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_community_community_social_proto_goTypes = []any{
 	(*PluginPublisher)(nil),                   // 0: retrovibed.community.PluginPublisher
 	(*CommunityPublisher)(nil),                // 1: retrovibed.community.CommunityPublisher
 	(*CommunitySocial)(nil),                   // 2: retrovibed.community.CommunitySocial
 	(*SocialsSearchRequest)(nil),              // 3: retrovibed.community.SocialsSearchRequest
 	(*SocialsSearchResponse)(nil),             // 4: retrovibed.community.SocialsSearchResponse
-	(*PluginPublisherCreateResponse)(nil),     // 5: retrovibed.community.PluginPublisherCreateResponse
-	(*PluginPublisherDeleteResponse)(nil),     // 6: retrovibed.community.PluginPublisherDeleteResponse
-	(*CommunityPublisherEnableResponse)(nil),  // 7: retrovibed.community.CommunityPublisherEnableResponse
-	(*CommunityPublisherDisableResponse)(nil), // 8: retrovibed.community.CommunityPublisherDisableResponse
-	(*Community)(nil),                         // 9: retrovibed.community.Community
+	(*PluginPublisherSearchRequest)(nil),      // 5: retrovibed.community.PluginPublisherSearchRequest
+	(*PluginPublisherSearchResponse)(nil),     // 6: retrovibed.community.PluginPublisherSearchResponse
+	(*PluginPublisherCreateResponse)(nil),     // 7: retrovibed.community.PluginPublisherCreateResponse
+	(*PluginPublisherDeleteResponse)(nil),     // 8: retrovibed.community.PluginPublisherDeleteResponse
+	(*CommunityPublisherEnableResponse)(nil),  // 9: retrovibed.community.CommunityPublisherEnableResponse
+	(*CommunityPublisherDisableResponse)(nil), // 10: retrovibed.community.CommunityPublisherDisableResponse
+	(*Community)(nil),                         // 11: retrovibed.community.Community
 }
 var file_community_community_social_proto_depIdxs = []int32{
-	9, // 0: retrovibed.community.CommunitySocial.community:type_name -> retrovibed.community.Community
-	1, // 1: retrovibed.community.CommunitySocial.enabled:type_name -> retrovibed.community.CommunityPublisher
-	3, // 2: retrovibed.community.SocialsSearchResponse.next:type_name -> retrovibed.community.SocialsSearchRequest
-	2, // 3: retrovibed.community.SocialsSearchResponse.items:type_name -> retrovibed.community.CommunitySocial
-	0, // 4: retrovibed.community.SocialsSearchResponse.catalog:type_name -> retrovibed.community.PluginPublisher
-	0, // 5: retrovibed.community.PluginPublisherCreateResponse.publisher:type_name -> retrovibed.community.PluginPublisher
-	0, // 6: retrovibed.community.PluginPublisherDeleteResponse.publisher:type_name -> retrovibed.community.PluginPublisher
-	1, // 7: retrovibed.community.CommunityPublisherEnableResponse.enabled:type_name -> retrovibed.community.CommunityPublisher
-	1, // 8: retrovibed.community.CommunityPublisherDisableResponse.disabled:type_name -> retrovibed.community.CommunityPublisher
-	9, // [9:9] is the sub-list for method output_type
-	9, // [9:9] is the sub-list for method input_type
-	9, // [9:9] is the sub-list for extension type_name
-	9, // [9:9] is the sub-list for extension extendee
-	0, // [0:9] is the sub-list for field type_name
+	11, // 0: retrovibed.community.CommunitySocial.community:type_name -> retrovibed.community.Community
+	1,  // 1: retrovibed.community.CommunitySocial.enabled:type_name -> retrovibed.community.CommunityPublisher
+	3,  // 2: retrovibed.community.SocialsSearchResponse.next:type_name -> retrovibed.community.SocialsSearchRequest
+	2,  // 3: retrovibed.community.SocialsSearchResponse.items:type_name -> retrovibed.community.CommunitySocial
+	5,  // 4: retrovibed.community.PluginPublisherSearchResponse.next:type_name -> retrovibed.community.PluginPublisherSearchRequest
+	0,  // 5: retrovibed.community.PluginPublisherSearchResponse.items:type_name -> retrovibed.community.PluginPublisher
+	0,  // 6: retrovibed.community.PluginPublisherCreateResponse.publisher:type_name -> retrovibed.community.PluginPublisher
+	0,  // 7: retrovibed.community.PluginPublisherDeleteResponse.publisher:type_name -> retrovibed.community.PluginPublisher
+	1,  // 8: retrovibed.community.CommunityPublisherEnableResponse.enabled:type_name -> retrovibed.community.CommunityPublisher
+	1,  // 9: retrovibed.community.CommunityPublisherDisableResponse.disabled:type_name -> retrovibed.community.CommunityPublisher
+	10, // [10:10] is the sub-list for method output_type
+	10, // [10:10] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_community_community_social_proto_init() }
@@ -629,7 +742,7 @@ func file_community_community_social_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_community_community_social_proto_rawDesc), len(file_community_community_social_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   9,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

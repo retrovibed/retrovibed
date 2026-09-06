@@ -388,12 +388,10 @@ class SocialsSearchResponse extends $pb.GeneratedMessage {
   factory SocialsSearchResponse({
     SocialsSearchRequest? next,
     $core.Iterable<CommunitySocial>? items,
-    $core.Iterable<PluginPublisher>? catalog,
   }) {
     final result = create();
     if (next != null) result.next = next;
     if (items != null) result.items.addAll(items);
-    if (catalog != null) result.catalog.addAll(catalog);
     return result;
   }
 
@@ -415,8 +413,6 @@ class SocialsSearchResponse extends $pb.GeneratedMessage {
         subBuilder: SocialsSearchRequest.create)
     ..pPM<CommunitySocial>(2, _omitFieldNames ? '' : 'items',
         subBuilder: CommunitySocial.create)
-    ..pPM<PluginPublisher>(3, _omitFieldNames ? '' : 'catalog',
-        subBuilder: PluginPublisher.create)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -452,9 +448,159 @@ class SocialsSearchResponse extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(2)
   $pb.PbList<CommunitySocial> get items => $_getList(1);
+}
 
-  @$pb.TagNumber(3)
-  $pb.PbList<PluginPublisher> get catalog => $_getList(2);
+class PluginPublisherSearchRequest extends $pb.GeneratedMessage {
+  factory PluginPublisherSearchRequest({
+    $core.String? query,
+    $fixnum.Int64? offset,
+    $fixnum.Int64? limit,
+  }) {
+    final result = create();
+    if (query != null) result.query = query;
+    if (offset != null) result.offset = offset;
+    if (limit != null) result.limit = limit;
+    return result;
+  }
+
+  PluginPublisherSearchRequest._();
+
+  factory PluginPublisherSearchRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory PluginPublisherSearchRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'PluginPublisherSearchRequest',
+      package: const $pb.PackageName(
+          _omitMessageNames ? '' : 'retrovibed.community'),
+      createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'query')
+    ..a<$fixnum.Int64>(
+        900, _omitFieldNames ? '' : 'offset', $pb.PbFieldType.OU6,
+        defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(901, _omitFieldNames ? '' : 'limit', $pb.PbFieldType.OU6,
+        defaultOrMaker: $fixnum.Int64.ZERO)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  PluginPublisherSearchRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  PluginPublisherSearchRequest copyWith(
+          void Function(PluginPublisherSearchRequest) updates) =>
+      super.copyWith(
+              (message) => updates(message as PluginPublisherSearchRequest))
+          as PluginPublisherSearchRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static PluginPublisherSearchRequest create() =>
+      PluginPublisherSearchRequest._();
+  @$core.override
+  PluginPublisherSearchRequest createEmptyInstance() => create();
+  @$core.pragma('dart2js:noInline')
+  static PluginPublisherSearchRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<PluginPublisherSearchRequest>(create);
+  static PluginPublisherSearchRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get query => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set query($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasQuery() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearQuery() => $_clearField(1);
+
+  @$pb.TagNumber(900)
+  $fixnum.Int64 get offset => $_getI64(1);
+  @$pb.TagNumber(900)
+  set offset($fixnum.Int64 value) => $_setInt64(1, value);
+  @$pb.TagNumber(900)
+  $core.bool hasOffset() => $_has(1);
+  @$pb.TagNumber(900)
+  void clearOffset() => $_clearField(900);
+
+  @$pb.TagNumber(901)
+  $fixnum.Int64 get limit => $_getI64(2);
+  @$pb.TagNumber(901)
+  set limit($fixnum.Int64 value) => $_setInt64(2, value);
+  @$pb.TagNumber(901)
+  $core.bool hasLimit() => $_has(2);
+  @$pb.TagNumber(901)
+  void clearLimit() => $_clearField(901);
+}
+
+class PluginPublisherSearchResponse extends $pb.GeneratedMessage {
+  factory PluginPublisherSearchResponse({
+    PluginPublisherSearchRequest? next,
+    $core.Iterable<PluginPublisher>? items,
+  }) {
+    final result = create();
+    if (next != null) result.next = next;
+    if (items != null) result.items.addAll(items);
+    return result;
+  }
+
+  PluginPublisherSearchResponse._();
+
+  factory PluginPublisherSearchResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory PluginPublisherSearchResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'PluginPublisherSearchResponse',
+      package: const $pb.PackageName(
+          _omitMessageNames ? '' : 'retrovibed.community'),
+      createEmptyInstance: create)
+    ..aOM<PluginPublisherSearchRequest>(1, _omitFieldNames ? '' : 'next',
+        subBuilder: PluginPublisherSearchRequest.create)
+    ..pPM<PluginPublisher>(2, _omitFieldNames ? '' : 'items',
+        subBuilder: PluginPublisher.create)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  PluginPublisherSearchResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  PluginPublisherSearchResponse copyWith(
+          void Function(PluginPublisherSearchResponse) updates) =>
+      super.copyWith(
+              (message) => updates(message as PluginPublisherSearchResponse))
+          as PluginPublisherSearchResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static PluginPublisherSearchResponse create() =>
+      PluginPublisherSearchResponse._();
+  @$core.override
+  PluginPublisherSearchResponse createEmptyInstance() => create();
+  @$core.pragma('dart2js:noInline')
+  static PluginPublisherSearchResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<PluginPublisherSearchResponse>(create);
+  static PluginPublisherSearchResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  PluginPublisherSearchRequest get next => $_getN(0);
+  @$pb.TagNumber(1)
+  set next(PluginPublisherSearchRequest value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasNext() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearNext() => $_clearField(1);
+  @$pb.TagNumber(1)
+  PluginPublisherSearchRequest ensureNext() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  $pb.PbList<PluginPublisher> get items => $_getList(1);
 }
 
 class PluginPublisherCreateResponse extends $pb.GeneratedMessage {

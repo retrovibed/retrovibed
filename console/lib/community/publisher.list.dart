@@ -16,12 +16,12 @@ class ListDisplay extends StatefulWidget {
 }
 
 class _ListDisplay extends State<ListDisplay> with ds.LoadingState {
-  api.SocialsSearchResponse _res = api.SocialsSearchResponse();
+  api.PluginPublisherSearchResponse _res = api.PluginPublisherSearchResponse();
 
   Future<void> refresh() {
     setState(() => loading = true);
     return api.publishers
-        .search(options: [authn.request(authn.AuthzCache.meta(context))])
+        .search(_res.next, options: [authn.request(authn.AuthzCache.meta(context))])
         .then((v) {
           setState(() {
             _res = v;
@@ -81,7 +81,7 @@ class _ListDisplay extends State<ListDisplay> with ds.LoadingState {
                           )
                           .then((created) {
                             setState(() {
-                              _res.catalog.add(created.publisher);
+                              _res.items.add(created.publisher);
                             });
                           })
                           .catchError((cause) {
@@ -107,25 +107,25 @@ class _ListDisplay extends State<ListDisplay> with ds.LoadingState {
     return ds.Table(
       loading: loading,
       cause: cause,
-      leading: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          ds.FileDropWell.icon(
-            upload,
-            icon: Icons.add,
-            extensions: const ['wasm'],
-            help: ds.Hint(const Text("install a publishing plugin")),
-          ),
-        ],
-      ),
-      children: _res.catalog,
+      // leading: Row(
+      //   mainAxisAlignment: MainAxisAlignment.end,
+      //   children: [
+      //     ds.FileDropWell.icon(
+      //       upload,
+      //       icon: Icons.add,
+      //       extensions: const ['wasm'],
+      //       help: ds.Hint(const Text("install a publishing plugin")),
+      //     ),
+      //   ],
+      // ),
+      children: _res.items,
       ds.Table.expanded<api.PluginPublisher>((v) {
         return PublisherRow(
           v,
           key: ValueKey(v.id),
           onDelete: (deleted) {
             setState(() {
-              _res.catalog.removeWhere((p) => p.id == deleted.id);
+              _res.items.removeWhere((p) => p.id == deleted.id);
             });
           },
         );

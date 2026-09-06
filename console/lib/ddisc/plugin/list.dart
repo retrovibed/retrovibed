@@ -66,6 +66,7 @@ class _ListDisplay extends State<ListDisplay> {
 
   @override
   Widget build(BuildContext context) {
+    final defaults = ds.Defaults.of(context);
     final upload =
         (
           ds.FilesEvent v, {
@@ -130,7 +131,9 @@ class _ListDisplay extends State<ListDisplay> {
         },
         current: _res.next.offset,
         empty: _res.items.length < _res.next.limit.toInt(),
-        leading: [ds.FileDropWell.icon(upload, icon: Icons.add, extensions: const ['wasm'])],
+        leading: [
+          ds.FileDropWell.icon(upload, icon: Icons.add, extensions: const ['wasm']),
+        ],
       ),
       children: _res.items,
       ds.Table.expanded<api.Plugin>((v) {
@@ -146,6 +149,7 @@ class _ListDisplay extends State<ListDisplay> {
       }),
       empty: ds.FileDropWell(
         upload,
+        shape: RoundedRectangleBorder(borderRadius: defaults.borderRadius),
         extensions: const ['wasm'],
         child: ds.FileDropWell.textual("drop a compiled .wasm plugin"),
       ),

@@ -9,18 +9,24 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/Masterminds/squirrel"
+	"github.com/go-playground/form/v4"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/publishplugin"
 	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/retrovibed/retrovibed/shallows/community"
+	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/formx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
+	"github.com/retrovibed/retrovibed/shallows/internal/lucenex"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
+	"github.com/retrovibed/retrovibed/shallows/internal/numericx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/metaapi"
@@ -49,6 +55,8 @@ func NewHTTPCommunityPublisher(q sqlx.Queryer, reg *publishplugin.Registry, opti
 		reg:       reg,
 		dir:       fsx.DirVirtual(userx.DefaultConfigDir(userx.DefaultRelRoot(), "publish.d")),
 		jwtsecret: env.JWTSecret,
+		decoder:   formx.NewDecoder(),
+		lucene:    duckdbx.NewLucene(),
 	}, options...)
 
 	return &svc
@@ -59,6 +67,8 @@ type HTTPCommunityPublisher struct {
 	reg       *publishplugin.Registry
 	dir       fsx.Virtual
 	jwtsecret jwtx.SecretSource
+	decoder   *form.Decoder
+	lucene    lucenex.Driver
 }
 
 func (t *HTTPCommunityPublisher) Bind(r *mux.Router) {
@@ -67,6 +77,7 @@ func (t *HTTPCommunityPublisher) Bind(r *mux.Router) {
 	r.Path("/").Methods(http.MethodGet).Handler(alice.New(
 		httpx.RouteInvoked,
 		httpx.ContextBufferPool512(),
+		httpx.ParseForm,
 		metaapi.AuthzTokenHTTP(t.jwtsecret, metaapi.AuthzPermUsermanagement),
 		httpx.Timeout2s(),
 	).ThenFunc(t.search))
@@ -85,12 +96,27 @@ func (t *HTTPCommunityPublisher) Bind(r *mux.Router) {
 }
 
 func (t *HTTPCommunityPublisher) search(w http.ResponseWriter, r *http.Request) {
-	var resp SocialsSearchResponse
+	var resp = PluginPublisherSearchResponse{
+		Next: &PluginPublisherSearchRequest{Limit: 100},
+	}
 
-	q := community.PluginPublisherFindAll(r.Context(), t.q)
+	if err := t.decoder.Decode(resp.Next, r.Form); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to decode search request"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		return
+	}
+	resp.Next.Limit = numericx.Min(resp.Next.Limit, 100)
+
+	q := community.PluginPublisherSearch(r.Context(), t.q, community.PluginPublisherSearchBuilder().
+		Where(
+			squirrel.And{
+				squirrel.Expr("1=1"),
+				lucenex.Query(t.lucene, resp.Next.Query, lucenex.WithDefaultField("description")),
+			},
+		).OrderBy("created_at DESC").Offset(resp.Next.Offset*resp.Next.Limit).Limit(resp.Next.Limit))
 	qi := sqlx.Scan(q)
 	for p := range qi.Iter() {
-		resp.Catalog = append(resp.Catalog, NewPluginPublisher(PluginPublisherOptionFromDB(langx.Clone(p, timex.JSONSafeEncodeOption))))
+		resp.Items = append(resp.Items, NewPluginPublisher(PluginPublisherOptionFromDB(langx.Clone(p, timex.JSONSafeEncodeOption))))
 	}
 	if err := qi.Err(); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to list plugin publishers"))

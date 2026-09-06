@@ -63,11 +63,11 @@ func TestHTTPCommunityPublisherSearch(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 		require.NoError(t, httpx.ErrorCode(resp.Result()))
 
-		var result communityapi.SocialsSearchResponse
+		var result communityapi.PluginPublisherSearchResponse
 		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 		bymimetype := map[string]*communityapi.PluginPublisher{}
-		for _, p := range result.Catalog {
+		for _, p := range result.Items {
 			bymimetype[p.Mimetype] = p
 		}
 		require.Contains(t, bymimetype, youtube.Mimetype)

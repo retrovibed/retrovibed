@@ -95,17 +95,6 @@ func (t *HTTPSocial) search(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	catalog := community.PluginPublisherFindAll(r.Context(), t.q)
-	ci := sqlx.Scan(catalog)
-	for p := range ci.Iter() {
-		resp.Catalog = append(resp.Catalog, NewPluginPublisher(PluginPublisherOptionFromDB(langx.Clone(p, timex.JSONSafeEncodeOption))))
-	}
-	if err := ci.Err(); err != nil {
-		log.Println(errorsx.Wrap(err, "unable to list plugin publishers"))
-		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
-		return
-	}
-
 	communities := community.CommunitySearch(r.Context(), t.q, community.CommunitySearchBuilder().
 		Distinct().
 		Join("community_publisher ON community_publisher.community_id = community.id").
@@ -115,6 +104,7 @@ func (t *HTTPSocial) search(w http.ResponseWriter, r *http.Request) {
 				lucenex.Query(t.lucene, resp.Next.Query, lucenex.WithDefaultField("description")),
 			},
 		).Offset(resp.Next.Offset*resp.Next.Limit).Limit(resp.Next.Limit))
+
 	qi := sqlx.Scan(communities)
 	for c := range qi.Iter() {
 		social := NewCommunitySocial(func(s *CommunitySocial) {

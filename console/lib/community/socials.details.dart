@@ -9,14 +9,14 @@ import 'api.dart';
 // the socials search endpoint backs this expanded details view only, not
 // the SocialHome grid itself.
 class SocialCommunityDetails extends StatefulWidget {
-  final String communityId;
+  final Community community;
   final FnSocialsSearch search;
   final FnSocialsEnable enable;
   final FnSocialsDisable disable;
 
-  const SocialCommunityDetails({
+  const SocialCommunityDetails(
+    this.community, {
     super.key,
-    required this.communityId,
     required this.search,
     required this.enable,
     required this.disable,
@@ -38,9 +38,9 @@ class _SocialCommunityDetailsState extends State<SocialCommunityDetails> with ds
             options: [authn.request(authn.AuthzCache.meta(context))],
           ),
         )
-        .then((response) {
+        .then((r) {
           setState(() {
-            _resp = response;
+            _resp = r;
             cause = ds.Error.zero;
           });
         })
@@ -88,8 +88,7 @@ class _SocialCommunityDetailsState extends State<SocialCommunityDetails> with ds
 
   @override
   Widget build(BuildContext context) {
-    final social = _resp.items.where((v) => v.community.id == widget.communityId).firstOrNull;
-    final enabledIds = (social?.enabled ?? const []).map((e) => e.publisherId).toSet();
+    final social = _resp.items.where((v) => v.community == widget.community).firstOrNull;
 
     return ds.Loading(
       loading: loading,
@@ -97,19 +96,18 @@ class _SocialCommunityDetailsState extends State<SocialCommunityDetails> with ds
       Wrap(
         spacing: 8,
         runSpacing: 4,
-        children: _resp.catalog.map((p) {
-          final enabled = enabledIds.contains(p.id);
+        children: (social?.enabled ?? []).map((s) {
           return Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               FilterChip(
-                label: Text(p.description.isNotEmpty ? p.description : p.mimetype),
-                selected: enabled,
+                label: Text(s.description.isNotEmpty ? s.description : s.mimetype),
+                selected: false,
                 onSelected: (v) {
                   final auth = [authn.request(authn.AuthzCache.meta(context))];
                   final fut = v
-                      ? widget.enable(widget.communityId, p.id, options: auth)
-                      : widget.disable(widget.communityId, p.id, options: auth);
+                      ? widget.enable(widget.community.id, s.id, options: auth)
+                      : widget.disable(widget.community.id, s.id, options: auth);
                   httpx.withRetry(() => fut).then((_) => _refresh());
                 },
               ),
@@ -119,7 +117,7 @@ class _SocialCommunityDetailsState extends State<SocialCommunityDetails> with ds
               ds.LoadingIconButton.edit(
                 iconSize: 18.0,
                 help: ds.Hint(const Text("configure this publisher")),
-                onPressed: () => _configure(context, p),
+                onPressed: () => _configure(context, s),
               ),
             ],
           );

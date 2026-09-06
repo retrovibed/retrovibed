@@ -366,12 +366,19 @@ class communities {
   }
 }
 
+typedef FnPublishersSearch =
+    Future<PluginPublisherSearchResponse> Function(
+      PluginPublisherSearchRequest req, {
+      List<httpx.Option> options,
+    });
+
 /// The catalog of installed publisher plugins. The search endpoint hands
 /// back a SocialsSearchResponse whose catalog is the whole install list -
 /// PluginPublisherFindAll ignores query/offset/limit, so there is nothing
 /// to page through and no request to build.
 abstract class publishers {
-  static Future<SocialsSearchResponse> search({
+  static Future<PluginPublisherSearchResponse> search(
+    PluginPublisherSearchRequest req, {
     List<httpx.Option> options = const [],
   }) async {
     return httpx
@@ -381,7 +388,7 @@ abstract class publishers {
         )
         .then((v) {
           return Future.value(
-            httpx.fromProto3JsonSafe(SocialsSearchResponse.create(), jsonDecode(v.body)),
+            httpx.fromProto3JsonSafe(PluginPublisherSearchResponse.create(), jsonDecode(v.body)),
           );
         });
   }
