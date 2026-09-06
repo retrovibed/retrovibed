@@ -97,6 +97,30 @@ void main() {
     });
   });
 
+  group('pathFor', () {
+    test('resolves to md5 of the key under the cache dir', () {
+      expect(cache.pathFor('key').path, equals('${tmp.path}/${_md5('key')}'));
+    });
+
+    test('agrees with the file write actually creates', () {
+      cache.write<int>('key', 42);
+
+      expect(cache.pathFor('key').existsSync(), isTrue);
+      expect(
+        cache.pathFor('key').readAsBytesSync(),
+        equals(File('${tmp.path}/${_md5('key')}').readAsBytesSync()),
+      );
+    });
+
+    test('returns a path for a key that was never written', () {
+      expect(cache.pathFor('absent').existsSync(), isFalse);
+    });
+
+    test('distinct keys resolve to distinct files', () {
+      expect(cache.pathFor('a').path, isNot(equals(cache.pathFor('b').path)));
+    });
+  });
+
   group('clear', () {
     test('causes next maybe to call fn again', () {
       cache.maybe<bool>('key', () => true);

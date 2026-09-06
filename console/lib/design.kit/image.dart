@@ -81,7 +81,14 @@ class _CachedImage extends m.StatelessWidget {
         if (file == null) return missing;
 
         final provider = m.FileImage(file);
-        m.precacheImage(provider, context, onError: (exception, stackTrace) {});
+        m.precacheImage(
+          provider,
+          context,
+          onError: (exception, stackTrace) {
+            print("unable to cache image ${exception}");
+          },
+        );
+
         return m.Image(
           image: provider,
           width: width,
