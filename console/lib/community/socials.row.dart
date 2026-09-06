@@ -41,22 +41,13 @@ class SocialCommunityRow extends StatelessWidget {
         Spacer(),
       ],
       Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisSize: MainAxisSize.max,
         children: [
           Text(
             community.description.isNotEmpty ? community.description : community.url,
             style: Theme.of(context).textTheme.titleSmall,
-          ),
-          Visibility(
-            child: SocialCommunityDetails(
-              community,
-              search: details,
-              enable: enable,
-              disable: disable,
-            ),
-            visible: focused,
-            maintainState: true,
+            textAlign: TextAlign.center,
           ),
         ],
       ),

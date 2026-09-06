@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:retrovibed/community/community.detail.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/authn.dart' as authn;
@@ -34,7 +35,7 @@ class _SocialCommunityDetailsState extends State<SocialCommunityDetails> with ds
     httpx
         .withRetry(
           () => widget.search(
-            SocialsSearchRequest(limit: ds.Int64(100)),
+            SocialsSearchRequest(limit: ds.Int64(100), communities: [widget.community.id]),
             options: [authn.request(authn.AuthzCache.meta(context))],
           ),
         )
@@ -88,40 +89,55 @@ class _SocialCommunityDetailsState extends State<SocialCommunityDetails> with ds
 
   @override
   Widget build(BuildContext context) {
-    final social = _resp.items.where((v) => v.community == widget.community).firstOrNull;
+    final defaults = ds.Defaults.of(context);
+    final theme = Theme.of(context);
+    final social = _resp.items.firstOrNull;
 
-    return ds.Loading(
-      loading: loading,
-      cause: cause,
-      Wrap(
-        spacing: 8,
-        runSpacing: 4,
-        children: (social?.publishers ?? []).map((s) {
-          return Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              FilterChip(
-                label: Text(s.description.isNotEmpty ? s.description : s.mimetype),
-                selected: false,
-                onSelected: (v) {
-                  final auth = [authn.request(authn.AuthzCache.meta(context))];
-                  final fut = v
-                      ? widget.enable(widget.community.id, s.id, options: auth)
-                      : widget.disable(widget.community.id, s.id, options: auth);
-                  httpx.withRetry(() => fut).then((_) => _refresh());
-                },
-              ),
-              // the form behind this button is generated from the plugin's
-              // own declaration of the variables it understands, so a
-              // publisher nobody wrote a settings screen for still gets one.
-              ds.LoadingIconButton.edit(
-                iconSize: 18.0,
-                help: ds.Hint(const Text("configure this publisher")),
-                onPressed: () => _configure(context, s),
-              ),
-            ],
-          );
-        }).toList(),
+    return ds.Container(
+      padding: defaults.padding,
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerLow,
+        border: defaults.border,
+        borderRadius: defaults.borderRadius,
+      ),
+      ds.Loading(
+        loading: loading,
+        cause: cause,
+        Column(
+          children: [
+            CommunityDetail(community: widget.community),
+          ],
+        ),
+        // Wrap(
+        //   spacing: defaults.spacing,
+        //   runSpacing: 4,
+        //   children: (social?.publishers ?? []).map((s) {
+        //     return Row(
+        //       mainAxisSize: MainAxisSize.min,
+        //       children: [
+        //         FilterChip(
+        //           label: Text(s.description.isNotEmpty ? s.description : s.id),
+        //           selected: false,
+        //           onSelected: (v) {
+        //             final auth = [authn.request(authn.AuthzCache.meta(context))];
+        //             final fut = v
+        //                 ? widget.enable(widget.community.id, s.id, options: auth)
+        //                 : widget.disable(widget.community.id, s.id, options: auth);
+        //             httpx.withRetry(() => fut).then((_) => _refresh());
+        //           },
+        //         ),
+        //         // the form behind this button is generated from the plugin's
+        //         // own declaration of the variables it understands, so a
+        //         // publisher nobody wrote a settings screen for still gets one.
+        //         ds.LoadingIconButton.edit(
+        //           iconSize: 18.0,
+        //           help: ds.Hint(const Text("configure this publisher")),
+        //           onPressed: () => _configure(context, s),
+        //         ),
+        //       ],
+        //     );
+        //   }).toList(),
+        // ),
       ),
     );
   }

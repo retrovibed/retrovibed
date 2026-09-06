@@ -6,6 +6,7 @@ import 'package:retrovibed/library.dart' as lib;
 import 'package:retrovibed/media.dart' as media;
 import 'api.dart';
 import 'socials.row.dart';
+import 'socials.details.dart';
 
 // Lists the account's communities, each with Photo/Video/Library/Info
 // buttons; Info expands a per-community toggle per catalog publisher
@@ -43,7 +44,7 @@ class _SocialHomeState extends State<SocialHome> with ds.LoadingState {
       limit: ds.Int64(20),
     ),
   );
-  Community _focused = Community();
+  Widget _focused = ds.Empty;
 
   Future<void> _refresh() {
     setState(() => loading = true);
@@ -130,6 +131,7 @@ class _SocialHomeState extends State<SocialHome> with ds.LoadingState {
           ],
           help: ds.Hint(const Text("search for communities to publish to")),
         ),
+        _focused,
         Expanded(
           child: ds.Grid<Community>(
             (context, v) => SocialCommunityRow(
@@ -137,9 +139,21 @@ class _SocialHomeState extends State<SocialHome> with ds.LoadingState {
               details: widget.details,
               enable: widget.enable,
               disable: widget.disable,
-              focused: v.id == _focused.id,
+              focused: ValueKey(v.id) == _focused.key,
               onInfo: () => setState(() {
-                _focused = _focused.id == v.id ? Community() : v;
+                final key = ValueKey(v.id);
+                _focused = key == _focused.key
+                    ? ds.Empty
+                    : ds.Container(
+                        key: key,
+                        padding: defaults.padding.copyWith(top: 0, bottom: 0),
+                        SocialCommunityDetails(
+                          v,
+                          search: widget.details,
+                          enable: widget.enable,
+                          disable: widget.disable,
+                        ),
+                      );
               }),
             ),
             children: _resp.items,
