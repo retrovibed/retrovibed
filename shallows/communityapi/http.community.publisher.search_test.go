@@ -75,6 +75,45 @@ func TestHTTPCommunityPublisherSearch(t *testing.T) {
 		require.Contains(t, bymimetype, spotify.Mimetype)
 	})
 
+	// what the add dropdown asks of the catalog: everything except what this
+	// community has already attached.
+	t.Run("excludes publishers by id", func(t *testing.T) {
+		ids := func(t *testing.T, query string) []string {
+			resp, req, err := httptestx.BuildRequestBytes(
+				http.MethodGet,
+				"/"+query,
+				nil,
+				httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)),
+			)
+			require.NoError(t, err)
+
+			routes.ServeHTTP(resp, req)
+			require.NoError(t, httpx.ErrorCode(resp.Result()))
+
+			var result communityapi.PluginPublisherSearchResponse
+			require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
+
+			found := make([]string, 0, len(result.Items))
+			for _, p := range result.Items {
+				found = append(found, p.Id)
+			}
+			return found
+		}
+
+		require.ElementsMatch(t, []string{youtube.ID, spotify.ID}, ids(t, ""))
+		require.Equal(t, []string{spotify.ID}, ids(t, "?excluded="+youtube.ID))
+
+		// repeated, so an exclusion accumulates rather than replaces.
+		require.Empty(t, ids(t, "?excluded="+youtube.ID+"&excluded="+spotify.ID))
+
+		// an id nobody installed leaves the catalog alone.
+		require.ElementsMatch(t, []string{youtube.ID, spotify.ID}, ids(t, "?excluded="+uuid.Must(uuid.NewV7()).String()))
+
+		// and it composes with the text query.
+		require.Equal(t, []string{spotify.ID}, ids(t, "?excluded="+youtube.ID+"&query=Spotify"))
+		require.Empty(t, ids(t, "?excluded="+youtube.ID+"&query=YouTube"))
+	})
+
 	t.Run("requires a privileged token", func(t *testing.T) {
 		claims := jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
 		unprivileged := httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)

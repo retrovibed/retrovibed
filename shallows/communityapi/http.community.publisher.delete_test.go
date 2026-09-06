@@ -75,6 +75,44 @@ func TestHTTPCommunityPublisherDelete(t *testing.T) {
 		require.Error(t, community.PluginPublisherFindByID(ctx, q, id).Scan(&row))
 	})
 
+	// a selection pointing at a module that is gone only ever surfaces as a
+	// failed lookup on the next publish, so uninstalling detaches it.
+	t.Run("detaches the publisher from every community", func(t *testing.T) {
+		id := uuid.Must(uuid.NewV7()).String()
+		seed(t, id, []byte("removeme"))
+
+		attached := make([]community.CommunityPublisher, 0, 2)
+		for range 2 {
+			var cp community.CommunityPublisher
+			require.NoError(t, community.CommunityPublisherInsertWithDefaults(ctx, q, community.CommunityPublisher{
+				ID: uuid.Must(uuid.NewV7()).String(), CommunityID: uuid.Must(uuid.NewV7()).String(), PublisherID: id,
+			}).Scan(&cp))
+			attached = append(attached, cp)
+		}
+
+		// a selection of a different plugin has nothing to do with this one.
+		other := uuid.Must(uuid.NewV7()).String()
+		seed(t, other, []byte("keepme"))
+		var untouched community.CommunityPublisher
+		require.NoError(t, community.CommunityPublisherInsertWithDefaults(ctx, q, community.CommunityPublisher{
+			ID: uuid.Must(uuid.NewV7()).String(), CommunityID: attached[0].CommunityID, PublisherID: other,
+		}).Scan(&untouched))
+
+		resp, req, err := httptestx.BuildRequestBytes(http.MethodDelete, "/"+id, nil, httptestx.RequestOptionAuthorization(token))
+		require.NoError(t, err)
+
+		routes.ServeHTTP(resp, req)
+		require.NoError(t, httpx.ErrorCode(resp.Result()))
+
+		for _, cp := range attached {
+			var row community.CommunityPublisher
+			require.Error(t, community.CommunityPublisherFindByID(ctx, q, cp.ID).Scan(&row))
+		}
+
+		var row community.CommunityPublisher
+		require.NoError(t, community.CommunityPublisherFindByID(ctx, q, untouched.ID).Scan(&row))
+	})
+
 	t.Run("missing publisher returns 404", func(t *testing.T) {
 		resp, req, err := httptestx.BuildRequestBytes(http.MethodDelete, "/"+uuid.Must(uuid.NewV7()).String(), nil, httptestx.RequestOptionAuthorization(token))
 		require.NoError(t, err)

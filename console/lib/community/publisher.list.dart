@@ -128,6 +128,20 @@ class _ListDisplay extends State<ListDisplay> with ds.LoadingState {
               _res.items.removeWhere((p) => p.id == deleted.id);
             });
           },
+          // a clone is a plugin in its own right - its own id, its own
+          // configuration - so it lands as its own row.
+          onClone: (cloned) {
+            setState(() {
+              _res.items.add(cloned);
+            });
+          },
+          onChange: (updated) {
+            setState(() {
+              final i = _res.items.indexWhere((p) => p.id == updated.id);
+              if (i < 0) return;
+              _res.items[i] = updated;
+            });
+          },
         );
       }),
       empty: ds.FileDropWell(

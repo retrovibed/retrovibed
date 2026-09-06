@@ -32,7 +32,8 @@ message SocialsSearchRequest {
   uint64 offset = 900 [ json_name = "offset" ];
   uint64 limit = 901 [ json_name = "limit" ];
   reserved 902 to 999;
-  repeated string communities = 1000 [ json_name = "cid" ]; // empty for all.
+  repeated string communities = 1000
+      [ json_name = "communities" ]; // empty for all.
 }
 
 message SocialsSearchResponse {
@@ -46,6 +47,8 @@ message PluginPublisherSearchRequest {
   uint64 offset = 900 [ json_name = "offset" ];
   uint64 limit = 901 [ json_name = "limit" ];
   reserved 902 to 999;
+  // publishers to leave out - what a community has already attached.
+  repeated string excluded = 1000 [ json_name = "excluded" ];
 }
 
 message PluginPublisherSearchResponse {
@@ -58,6 +61,20 @@ message PluginPublisherCreateResponse {
 }
 
 message PluginPublisherFindResponse {
+  PluginPublisher publisher = 1 [ json_name = "publisher" ];
+}
+
+message PluginPublisherUpdateRequest {
+  PluginPublisher publisher = 1 [ json_name = "publisher" ];
+}
+
+message PluginPublisherUpdateResponse {
+  PluginPublisher publisher = 1 [ json_name = "publisher" ];
+}
+
+// the clone of a publisher is the same module under a second identity, so the
+// request carries nothing beyond the id in the path.
+message PluginPublisherCloneResponse {
   PluginPublisher publisher = 1 [ json_name = "publisher" ];
 }
 

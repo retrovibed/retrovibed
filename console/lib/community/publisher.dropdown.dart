@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'api.dart' as api;
 import 'publisher.typography.dart';
-import 'publisher.list.row.dart';
 
 class PublisherDropdown extends StatefulWidget {
   final ValueNotifier<api.PluginPublisher> current;
@@ -11,6 +10,7 @@ class PublisherDropdown extends StatefulWidget {
   final Widget help;
   final bool readonly;
   final Future<api.PluginPublisherSearchResponse> Function(api.PluginPublisherSearchRequest) search;
+  final void Function(api.PluginPublisher selected) onSelected;
   const PublisherDropdown({
     super.key,
     required this.current,
@@ -19,6 +19,7 @@ class PublisherDropdown extends StatefulWidget {
     this.help = const ds.Hint(const Text("select from known social media platforms")),
     this.readonly = false,
     this.search = api.publishers.search,
+    this.onSelected = ds.fnNoop,
   });
 
   @override
@@ -75,7 +76,7 @@ class _PublisherDropdownState extends State<PublisherDropdown> with ds.LoadingSt
           trailing: widget.trailing,
           onSearch: (query, onClick) {
             return widget.search(api.PluginPublisherSearchRequest()..query = query).then((response) {
-              if (response.items.length <= 1) return ds.Empty;
+              if (response.items.isEmpty) return ds.Empty;
               return Container(
                 constraints: BoxConstraints(maxHeight: 400),
                 child: ListView.builder(
@@ -88,8 +89,19 @@ class _PublisherDropdownState extends State<PublisherDropdown> with ds.LoadingSt
                       return ds.Empty;
                     }
 
-                    return PublisherRow(
-                      current,
+                    // the label, not the settings row: this is a picker, and a
+                    // publisher's configuration, clone and delete belong to the
+                    // catalog screen.
+                    return InkWell(
+                      onTap: () {
+                        widget.current.value = current;
+                        widget.onSelected(current);
+                        onClick();
+                      },
+                      child: Padding(
+                        padding: defaults.padding,
+                        child: PublisherTypography(current),
+                      ),
                     );
                   },
                 ),

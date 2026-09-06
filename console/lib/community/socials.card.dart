@@ -1,21 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'api.dart';
+import 'socials.action.photo.dart';
 
-class SocialCommunityRow extends StatelessWidget {
+class SocialCard extends StatelessWidget {
   final Community community;
-  final FnSocialsSearch details;
-  final FnSocialsEnable enable;
-  final FnSocialsDisable disable;
   final bool focused;
   final VoidCallback onInfo;
 
-  const SocialCommunityRow({
+  const SocialCard({
     super.key,
     required this.community,
-    required this.details,
-    required this.enable,
-    required this.disable,
     required this.focused,
     required this.onInfo,
   });
@@ -55,11 +50,7 @@ class SocialCommunityRow extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            const IconButton(
-              icon: Icon(Icons.add_a_photo_outlined),
-              onPressed: null,
-              tooltip: "Photo",
-            ),
+            SocialActionPhoto(community),
             const IconButton(
               icon: Icon(Icons.videocam_outlined),
               onPressed: null,

@@ -33,7 +33,7 @@
 		<key>NSMicrophoneUsageDescription</key>
 		<string>Retrovibed may access the microphone during media playback for audio routing.</string>
 		<key>NSCameraUsageDescription</key>
-		<string>Retrovibed uses your camera to scan QR codes when joining communities shared by friends.</string>
+		<string>Retrovibed uses your camera to publish photos to your communities/social media, and to scan QR codes when joining communities shared by friends.</string>
 		<key>NSLocalNetworkUsageDescription</key>
 		<string>Retrovibed searches your local network to find and connect to your personal media server.</string>
 		<key>UIApplicationSceneManifest</key>
