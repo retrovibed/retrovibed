@@ -88,6 +88,12 @@ func (t *HTTPCommunityPublisher) Bind(r *mux.Router) {
 		httpx.Timeout10s(),
 	).ThenFunc(t.create))
 
+	r.Path("/{id}").Methods(http.MethodGet).Handler(alice.New(
+		httpx.ContextBufferPool1024(),
+		metaapi.AuthzTokenHTTP(t.jwtsecret, metaapi.AuthzPermUsermanagement),
+		httpx.Timeout10s(),
+	).ThenFunc(t.find))
+
 	r.Path("/{id}").Methods(http.MethodDelete).Handler(alice.New(
 		httpx.ContextBufferPool512(),
 		metaapi.AuthzTokenHTTP(t.jwtsecret, metaapi.AuthzPermUsermanagement),
@@ -215,6 +221,31 @@ func (t *HTTPCommunityPublisher) create(w http.ResponseWriter, r *http.Request) 
 
 	if err = httpx.WriteJSON(w, httpx.GetBuffer(r), &PluginPublisherCreateResponse{
 		Publisher: NewPluginPublisher(PluginPublisherOptionFromDB(langx.Clone(existing, timex.JSONSafeEncodeOption))),
+	}); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to write response"))
+		return
+	}
+}
+
+func (t *HTTPCommunityPublisher) find(w http.ResponseWriter, r *http.Request) {
+	var (
+		pub community.PluginPublisher
+	)
+
+	id := mux.Vars(r)["id"]
+
+	if err := community.PluginPublisherFindByID(r.Context(), t.q, id).Scan(&pub); errors.Is(err, sql.ErrNoRows) {
+		log.Println(errorsx.Wrap(err, "unable to locate plugin publisher"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
+		return
+	} else if err != nil {
+		log.Println(errorsx.Wrap(err, "unable to locate plugin publisher"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &PluginPublisherFindResponse{
+		Publisher: NewPluginPublisher(PluginPublisherOptionFromDB(langx.Clone(pub, timex.JSONSafeEncodeOption))),
 	}); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to write response"))
 		return

@@ -67,12 +67,12 @@ const CommunitySocial$json = {
       '10': 'community'
     },
     {
-      '1': 'enabled',
-      '3': 2,
+      '1': 'publishers',
+      '3': 1000,
       '4': 3,
       '5': 11,
       '6': '.retrovibed.community.CommunityPublisher',
-      '10': 'enabled'
+      '10': 'publishers'
     },
   ],
 };
@@ -80,8 +80,8 @@ const CommunitySocial$json = {
 /// Descriptor for `CommunitySocial`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List communitySocialDescriptor = $convert.base64Decode(
     'Cg9Db21tdW5pdHlTb2NpYWwSPQoJY29tbXVuaXR5GAEgASgLMh8ucmV0cm92aWJlZC5jb21tdW'
-    '5pdHkuQ29tbXVuaXR5Ugljb21tdW5pdHkSQgoHZW5hYmxlZBgCIAMoCzIoLnJldHJvdmliZWQu'
-    'Y29tbXVuaXR5LkNvbW11bml0eVB1Ymxpc2hlclIHZW5hYmxlZA==');
+    '5pdHkuQ29tbXVuaXR5Ugljb21tdW5pdHkSSQoKcHVibGlzaGVycxjoByADKAsyKC5yZXRyb3Zp'
+    'YmVkLmNvbW11bml0eS5Db21tdW5pdHlQdWJsaXNoZXJSCnB1Ymxpc2hlcnM=');
 
 @$core.Deprecated('Use socialsSearchRequestDescriptor instead')
 const SocialsSearchRequest$json = {
@@ -90,9 +90,10 @@ const SocialsSearchRequest$json = {
     {'1': 'query', '3': 1, '4': 1, '5': 9, '10': 'query'},
     {'1': 'offset', '3': 900, '4': 1, '5': 4, '10': 'offset'},
     {'1': 'limit', '3': 901, '4': 1, '5': 4, '10': 'limit'},
+    {'1': 'communities', '3': 1000, '4': 3, '5': 9, '10': 'cid'},
   ],
   '9': [
-    {'1': 2, '2': 900},
+    {'1': 3, '2': 900},
     {'1': 902, '2': 1000},
   ],
 };
@@ -100,7 +101,8 @@ const SocialsSearchRequest$json = {
 /// Descriptor for `SocialsSearchRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List socialsSearchRequestDescriptor = $convert.base64Decode(
     'ChRTb2NpYWxzU2VhcmNoUmVxdWVzdBIUCgVxdWVyeRgBIAEoCVIFcXVlcnkSFwoGb2Zmc2V0GI'
-    'QHIAEoBFIGb2Zmc2V0EhUKBWxpbWl0GIUHIAEoBFIFbGltaXRKBQgCEIQHSgYIhgcQ6Ac=');
+    'QHIAEoBFIGb2Zmc2V0EhUKBWxpbWl0GIUHIAEoBFIFbGltaXQSGQoLY29tbXVuaXRpZXMY6Acg'
+    'AygJUgNjaWRKBQgDEIQHSgYIhgcQ6Ac=');
 
 @$core.Deprecated('Use socialsSearchResponseDescriptor instead')
 const SocialsSearchResponse$json = {
@@ -201,6 +203,27 @@ final $typed_data.Uint8List pluginPublisherCreateResponseDescriptor =
     $convert.base64Decode(
         'Ch1QbHVnaW5QdWJsaXNoZXJDcmVhdGVSZXNwb25zZRJDCglwdWJsaXNoZXIYASABKAsyJS5yZX'
         'Ryb3ZpYmVkLmNvbW11bml0eS5QbHVnaW5QdWJsaXNoZXJSCXB1Ymxpc2hlcg==');
+
+@$core.Deprecated('Use pluginPublisherFindResponseDescriptor instead')
+const PluginPublisherFindResponse$json = {
+  '1': 'PluginPublisherFindResponse',
+  '2': [
+    {
+      '1': 'publisher',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.retrovibed.community.PluginPublisher',
+      '10': 'publisher'
+    },
+  ],
+};
+
+/// Descriptor for `PluginPublisherFindResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List pluginPublisherFindResponseDescriptor =
+    $convert.base64Decode(
+        'ChtQbHVnaW5QdWJsaXNoZXJGaW5kUmVzcG9uc2USQwoJcHVibGlzaGVyGAEgASgLMiUucmV0cm'
+        '92aWJlZC5jb21tdW5pdHkuUGx1Z2luUHVibGlzaGVyUglwdWJsaXNoZXI=');
 
 @$core.Deprecated('Use pluginPublisherDeleteResponseDescriptor instead')
 const PluginPublisherDeleteResponse$json = {

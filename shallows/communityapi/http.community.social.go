@@ -88,7 +88,7 @@ func (t *HTTPSocial) search(w http.ResponseWriter, r *http.Request) {
 	}
 	resp.Next.Limit = numericx.Min(resp.Next.Limit, 100)
 
-	_, pid, err := httpauth.IssuerSubjectID(r.Context(), t.jwtsecret, r)
+	aid, _, err := httpauth.IssuerSubjectID(r.Context(), t.jwtsecret, r)
 	if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to retrieve token"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
@@ -100,7 +100,9 @@ func (t *HTTPSocial) search(w http.ResponseWriter, r *http.Request) {
 		Join("community_publisher ON community_publisher.community_id = community.id").
 		Where(
 			squirrel.And{
-				squirrel.Eq{"community.account_id": pid},
+				squirrel.Expr("1=1"),
+				community.CommunityQueryID(resp.Next.Communities...),
+				community.CommunityQueryAccountID(aid),
 				lucenex.Query(t.lucene, resp.Next.Query, lucenex.WithDefaultField("description")),
 			},
 		).Offset(resp.Next.Offset*resp.Next.Limit).Limit(resp.Next.Limit))
@@ -111,12 +113,12 @@ func (t *HTTPSocial) search(w http.ResponseWriter, r *http.Request) {
 			s.Community = NewCommunity(CommunityOptionFromDB(langx.Clone(c, timex.JSONSafeEncodeOption)))
 		})
 
-		enabled := community.CommunityPublisherFindByCommunityID(r.Context(), t.q, c.ID)
-		ei := sqlx.Scan(enabled)
-		for cp := range ei.Iter() {
-			social.Enabled = append(social.Enabled, NewCommunityPublisher(CommunityPublisherOptionFromDB(langx.Clone(cp, timex.JSONSafeEncodeOption))))
+		pubs := sqlx.Scan(community.CommunityPublisherFindByCommunityID(r.Context(), t.q, c.ID))
+		for cp := range pubs.Iter() {
+			social.Publishers = append(social.Publishers, NewCommunityPublisher(CommunityPublisherOptionFromDB(langx.Clone(cp, timex.JSONSafeEncodeOption))))
 		}
-		if err := ei.Err(); err != nil {
+
+		if err := pubs.Err(); err != nil {
 			log.Println(errorsx.Wrap(err, "unable to list enabled publishers"))
 			errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 			return
@@ -124,6 +126,7 @@ func (t *HTTPSocial) search(w http.ResponseWriter, r *http.Request) {
 
 		resp.Items = append(resp.Items, social)
 	}
+
 	if err := qi.Err(); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to list communities"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))

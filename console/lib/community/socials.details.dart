@@ -96,7 +96,7 @@ class _SocialCommunityDetailsState extends State<SocialCommunityDetails> with ds
       Wrap(
         spacing: 8,
         runSpacing: 4,
-        children: (social?.enabled ?? []).map((s) {
+        children: (social?.publishers ?? []).map((s) {
           return Row(
             mainAxisSize: MainAxisSize.min,
             children: [

@@ -23,15 +23,16 @@ message CommunityPublisher {
 
 message CommunitySocial {
   Community community = 1 [ json_name = "community" ];
-  repeated CommunityPublisher enabled = 2 [ json_name = "enabled" ];
+  repeated CommunityPublisher publishers = 1000 [ json_name = "publishers" ];
 }
 
 message SocialsSearchRequest {
   string query = 1 [ json_name = "query" ];
-  reserved 2 to 899;
+  reserved 3 to 899;
   uint64 offset = 900 [ json_name = "offset" ];
   uint64 limit = 901 [ json_name = "limit" ];
   reserved 902 to 999;
+  repeated string communities = 1000 [ json_name = "cid" ]; // empty for all.
 }
 
 message SocialsSearchResponse {
@@ -53,6 +54,10 @@ message PluginPublisherSearchResponse {
 }
 
 message PluginPublisherCreateResponse {
+  PluginPublisher publisher = 1 [ json_name = "publisher" ];
+}
+
+message PluginPublisherFindResponse {
   PluginPublisher publisher = 1 [ json_name = "publisher" ];
 }
 

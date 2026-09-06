@@ -240,11 +240,11 @@ class CommunityPublisher extends $pb.GeneratedMessage {
 class CommunitySocial extends $pb.GeneratedMessage {
   factory CommunitySocial({
     $0.Community? community,
-    $core.Iterable<CommunityPublisher>? enabled,
+    $core.Iterable<CommunityPublisher>? publishers,
   }) {
     final result = create();
     if (community != null) result.community = community;
-    if (enabled != null) result.enabled.addAll(enabled);
+    if (publishers != null) result.publishers.addAll(publishers);
     return result;
   }
 
@@ -264,7 +264,7 @@ class CommunitySocial extends $pb.GeneratedMessage {
       createEmptyInstance: create)
     ..aOM<$0.Community>(1, _omitFieldNames ? '' : 'community',
         subBuilder: $0.Community.create)
-    ..pPM<CommunityPublisher>(2, _omitFieldNames ? '' : 'enabled',
+    ..pPM<CommunityPublisher>(1000, _omitFieldNames ? '' : 'publishers',
         subBuilder: CommunityPublisher.create)
     ..hasRequiredFields = false;
 
@@ -298,8 +298,8 @@ class CommunitySocial extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $0.Community ensureCommunity() => $_ensure(0);
 
-  @$pb.TagNumber(2)
-  $pb.PbList<CommunityPublisher> get enabled => $_getList(1);
+  @$pb.TagNumber(1000)
+  $pb.PbList<CommunityPublisher> get publishers => $_getList(1);
 }
 
 class SocialsSearchRequest extends $pb.GeneratedMessage {
@@ -307,11 +307,13 @@ class SocialsSearchRequest extends $pb.GeneratedMessage {
     $core.String? query,
     $fixnum.Int64? offset,
     $fixnum.Int64? limit,
+    $core.Iterable<$core.String>? communities,
   }) {
     final result = create();
     if (query != null) result.query = query;
     if (offset != null) result.offset = offset;
     if (limit != null) result.limit = limit;
+    if (communities != null) result.communities.addAll(communities);
     return result;
   }
 
@@ -335,6 +337,7 @@ class SocialsSearchRequest extends $pb.GeneratedMessage {
         defaultOrMaker: $fixnum.Int64.ZERO)
     ..a<$fixnum.Int64>(901, _omitFieldNames ? '' : 'limit', $pb.PbFieldType.OU6,
         defaultOrMaker: $fixnum.Int64.ZERO)
+    ..pPS(1000, _omitFieldNames ? '' : 'cid', protoName: 'communities')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -382,6 +385,9 @@ class SocialsSearchRequest extends $pb.GeneratedMessage {
   $core.bool hasLimit() => $_has(2);
   @$pb.TagNumber(901)
   void clearLimit() => $_clearField(901);
+
+  @$pb.TagNumber(1000)
+  $pb.PbList<$core.String> get communities => $_getList(3);
 }
 
 class SocialsSearchResponse extends $pb.GeneratedMessage {
@@ -651,6 +657,67 @@ class PluginPublisherCreateResponse extends $pb.GeneratedMessage {
   static PluginPublisherCreateResponse getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<PluginPublisherCreateResponse>(create);
   static PluginPublisherCreateResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  PluginPublisher get publisher => $_getN(0);
+  @$pb.TagNumber(1)
+  set publisher(PluginPublisher value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasPublisher() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearPublisher() => $_clearField(1);
+  @$pb.TagNumber(1)
+  PluginPublisher ensurePublisher() => $_ensure(0);
+}
+
+class PluginPublisherFindResponse extends $pb.GeneratedMessage {
+  factory PluginPublisherFindResponse({
+    PluginPublisher? publisher,
+  }) {
+    final result = create();
+    if (publisher != null) result.publisher = publisher;
+    return result;
+  }
+
+  PluginPublisherFindResponse._();
+
+  factory PluginPublisherFindResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory PluginPublisherFindResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'PluginPublisherFindResponse',
+      package: const $pb.PackageName(
+          _omitMessageNames ? '' : 'retrovibed.community'),
+      createEmptyInstance: create)
+    ..aOM<PluginPublisher>(1, _omitFieldNames ? '' : 'publisher',
+        subBuilder: PluginPublisher.create)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  PluginPublisherFindResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  PluginPublisherFindResponse copyWith(
+          void Function(PluginPublisherFindResponse) updates) =>
+      super.copyWith(
+              (message) => updates(message as PluginPublisherFindResponse))
+          as PluginPublisherFindResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static PluginPublisherFindResponse create() =>
+      PluginPublisherFindResponse._();
+  @$core.override
+  PluginPublisherFindResponse createEmptyInstance() => create();
+  @$core.pragma('dart2js:noInline')
+  static PluginPublisherFindResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<PluginPublisherFindResponse>(create);
+  static PluginPublisherFindResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
   PluginPublisher get publisher => $_getN(0);

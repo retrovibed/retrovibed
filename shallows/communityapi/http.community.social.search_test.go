@@ -77,14 +77,8 @@ func TestHTTPSocialSearch(t *testing.T) {
 
 		require.Len(t, result.Items, 1)
 		require.Equal(t, owned.ID, result.Items[0].Community.Id)
-		require.Len(t, result.Items[0].Enabled, 1)
-		require.Equal(t, publisher.ID, result.Items[0].Enabled[0].PublisherId)
-
-		// bymimetype := map[string]*communityapi.PluginPublisher{}
-		// for _, p := range result.Catalog {
-		// 	bymimetype[p.Mimetype] = p
-		// }
-		// require.Contains(t, bymimetype, publisher.Mimetype)
+		require.Len(t, result.Items[0].Publishers, 1)
+		require.Equal(t, publisher.ID, result.Items[0].Publishers[0].PublisherId)
 	})
 
 	t.Run("requires authentication", func(t *testing.T) {
