@@ -163,6 +163,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		storagecfgpath      = userx.DefaultConfigDir(userx.DefaultRelRoot(), "storage.cfg")
 		mediarecsdir        = userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "media.recs.d")
 		mediapubsdir        = userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "media.pud.d")
+		metabackupsdir      = userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "meta.backups.d")
 	)
 
 	// initialize queue directories
@@ -172,6 +173,11 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	}
 
 	mediapub, err := pqueuex.New(mediapubsdir)
+	if err != nil {
+		return err
+	}
+
+	metabackups, err := pqueuex.New(metabackupsdir)
 	if err != nil {
 		return err
 	}
@@ -282,7 +288,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	if t.AutoArchive && deepjwt != http.DefaultClient {
 		log.Println("automatic archival is enabled")
 		errorsx.Log(AutoArchival(gctx.Context, db, deepjwt, mediastore, archival, t.AutoArchive))
-		errorsx.Log(AutoBackup(gctx.Context, db, deepjwt, backup, cmdopts.MachineID(), t.AutoBackup))
+		errorsx.Log(AutoBackup(gctx.Context, db, deepjwt, backup, metabackups, cmdopts.MachineID(), t.AutoBackup))
 		errorsx.Log(AutoPublishing(gctx.Context, db, deepjwt, mediastore, tvfs, publishing, mediapub, publishers))
 		errorsx.Log(AutoFeedSync(gctx.Context, db, deepjwt, publishing))
 		errorsx.Log(SubscriptionSync(gctx.Context, db, deepjwt, communitysync))

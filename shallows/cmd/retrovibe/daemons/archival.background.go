@@ -7,12 +7,14 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/linxGnu/pqueue"
 	"github.com/retrovibed/retrovibed/retroapi/backoffx"
 	"github.com/retrovibed/retrovibed/shallows/backups"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/contextx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/pqueuex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 )
@@ -31,19 +33,27 @@ func AutoArchival(ctx context.Context, q sqlx.Queryer, c *http.Client, mediastor
 	return nil
 }
 
-func AutoBackup(ctx context.Context, db *sql.DB, c *http.Client, async *asyncx.Wakeup, device string, enabled bool) error {
+func AutoBackup(ctx context.Context, db *sql.DB, c *http.Client, async *asyncx.Wakeup, wq pqueue.Queue, device string, enabled bool) error {
+	if !enabled {
+		log.Println("automatic backup is disabled")
+		return nil
+	}
+
 	s := backoffx.New(
 		backoffx.Constant(time.Hour),
 		backoffx.Jitter(0.1),
 	)
 
-	if !enabled {
-		log.Println("automatic backup is disabled - enabling dry-run")
-	}
-
+	go contextx.RunContext(ctx, pqueuex.NewWorker(wq, backups.NewWorker(c, db)).Consume)
 	go asyncx.Periodic(ctx, async, s, "automatic backup initiated - next")
 	contextx.Run(ctx, func() {
-		errorsx.Log(backups.NewAutoBackup(ctx, c, db, async, device, enabled))
+		errorsx.Log(asyncx.Run(ctx, async, func(ctx context.Context) error {
+			if err := backups.Enqueue(ctx, wq, device); err != nil {
+				log.Println(errorsx.Wrap(err, "backup request failed"))
+			}
+
+			return nil
+		}))
 	})
 
 	return nil
