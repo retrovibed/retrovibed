@@ -111,6 +111,9 @@ func OptionCacheDir(dir string) Option {
 // dial/lookup goes through the host's *net.Dialer/*net.Resolver instead).
 // See NewRegistryWithSocket to substitute a different wnetruntime.Socket.
 func NewRegistry(ctx context.Context, options ...Option) (*Registry, error) {
+	if err := fsx.MkDirs(0700, userx.DefaultRuntimeDirectory(userx.DefaultRelRoot())); err != nil {
+		return nil, errorsx.Wrap(err, "unable to ensure runtime directory exist")
+	}
 	return NewRegistryWithSocket(ctx, defaultSocket(), options...)
 }
 

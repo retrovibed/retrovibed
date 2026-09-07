@@ -29,7 +29,10 @@
 // Two kong subcommands are exposed. "publish", invoked by
 // publishplugin.Registry.Publish as:
 //
-//	<binary> publish --title <t> --description <d> --mimetype <m> [--media <path>] [--community-id <id>] [--link <uri>]
+//	<binary> publish --title <t> --description <d> --mimetype <m> [--media <filename>] [--community-id <id>] [--magnet <uri>] [--adult]
+//
+// where --media names a file in the runtime directory the registry mounts the
+// publish directory at, not a path.
 //
 // and "env", invoked by publishplugin.Registry.Environment as:
 //
@@ -53,6 +56,7 @@ import (
 	"github.com/alecthomas/kong"
 	"github.com/retrovibed/retrovibed/retroapi/bytesx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
+	"github.com/retrovibed/retrovibed/retroapi/userx"
 
 	// autohijack points net.DefaultResolver and http.DefaultTransport at
 	// wasinet's virtual sockets when this is built for wasip1 (a no-op on
@@ -74,20 +78,19 @@ var cli struct {
 // installation's .env (kong reads them straight out of the process
 // environment the registry populates from the sidecar file).
 type publishCmd struct {
-	Title       string `flag:"" name:"title" help:"title of the content being published"`
-	Description string `flag:"" name:"description" help:"description of the content being published"`
-	Mimetype    string `flag:"" name:"mimetype" help:"mimetype of the content being published"`
-	Media       string `flag:"" name:"media" help:"guest path to the mounted media file, when the caller provided one"`
-	CommunityID string `flag:"" name:"community-id" help:"id of the retrovibed community the content is being published on behalf of"`
-	Link        string `flag:"" name:"link" help:"publicly reachable uri for the content, when it has one"`
-
+	Title        string `flag:"" name:"title" help:"title of the content being published"`
+	Description  string `flag:"" name:"description" help:"description of the content being published"`
+	Mimetype     string `flag:"" name:"mimetype" help:"mimetype of the content being published"`
+	Media        string `flag:"" name:"media" help:"filename of the mounted media within the runtime directory, when the caller provided one"`
+	CommunityID  string `flag:"" name:"community-id" help:"id of the retrovibed community the content is being published on behalf of"`
+	Magnet       string `flag:"" name:"magnet" help:"publicly reachable magnet uri for the content, when it has one"`
+	Adult        bool   `flag:"" name:"adult" help:"mark the post as nsfw"`
 	Instance     string `flag:"" name:"instance" help:"base url of the lemmy instance to post to" required:"" env:"LEMMY_INSTANCE"`
 	Community    string `flag:"" name:"community" help:"lemmy community to post into" required:"" env:"LEMMY_COMMUNITY"`
 	Username     string `flag:"" name:"username" help:"lemmy account to post as" env:"LEMMY_USERNAME"`
 	Password     string `flag:"" name:"password" help:"password for that account" env:"LEMMY_PASSWORD"`
 	Token        string `flag:"" name:"token" help:"pre-issued jwt, used instead of logging in" env:"LEMMY_TOKEN"`
 	TOTP         string `flag:"" name:"totp" help:"one time code, when the account has 2fa enabled" env:"LEMMY_TOTP"`
-	NSFW         bool   `flag:"" name:"nsfw" help:"mark every post from this installation as nsfw" env:"LEMMY_NSFW"`
 	LanguageID   int64  `flag:"" name:"language-id" help:"lemmy language id to tag posts with; 0 leaves it unset" env:"LEMMY_LANGUAGE_ID"`
 	ThumbnailMax string `flag:"" name:"thumbnail-max" help:"largest image to upload as a post thumbnail" default:"8 MB" env:"LEMMY_THUMBNAIL_MAX"`
 }
@@ -113,8 +116,6 @@ LEMMY_PASSWORD=""
 LEMMY_TOKEN=""
 # one time code, only when the account has 2fa enabled
 LEMMY_TOTP=""
-# mark every post from this installation as nsfw
-LEMMY_NSFW="false"
 # lemmy language id to tag posts with; 0 leaves it unset
 LEMMY_LANGUAGE_ID="0"
 # largest image to upload as a post thumbnail; larger content is posted as
@@ -209,12 +210,18 @@ func (cmd *publishCmd) post(ctx context.Context, client *Client) (*Post, error) 
 	return client.CreatePost(ctx, CreatePost{
 		Name:            cmd.Title,
 		CommunityID:     community,
-		URL:             cmd.Link,
 		Body:            cmd.Description,
-		NSFW:            cmd.NSFW,
+		NSFW:            cmd.Adult,
 		LanguageID:      cmd.LanguageID,
 		CustomThumbnail: cmd.thumbnail(ctx, client),
 	})
+}
+
+// media resolves --media, a bare filename, against the runtime directory the
+// registry mounts the publish directory at. Only meaningful once cmd.Media is
+// known to be non-empty - an empty one resolves to the directory itself.
+func (cmd *publishCmd) media() string {
+	return userx.DefaultRuntimeDirectory(cmd.Media)
 }
 
 // thumbnail uploads the mounted media as a post thumbnail when it is an
@@ -240,7 +247,7 @@ func (cmd *publishCmd) thumbnail(ctx context.Context, client *Client) string {
 		return ""
 	}
 
-	info, err := os.Stat(cmd.Media)
+	info, err := os.Stat(cmd.media())
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "publishplugin-activitypub: unable to stat media, skipping thumbnail:", err)
 		return ""
@@ -251,7 +258,7 @@ func (cmd *publishCmd) thumbnail(ctx context.Context, client *Client) string {
 		return ""
 	}
 
-	uploaded, err := client.UploadImage(ctx, cmd.Media)
+	uploaded, err := client.UploadImage(ctx, cmd.media())
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "publishplugin-activitypub: thumbnail upload failed, posting without one:", err)
 		return ""

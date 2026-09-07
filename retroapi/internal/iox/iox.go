@@ -2,7 +2,6 @@ package iox
 
 import (
 	"context"
-	"errors"
 	"io"
 	"os"
 	"sync/atomic"
@@ -11,18 +10,17 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 )
 
-// IgnoreEOF returns nil if err is io.EOF
-func IgnoreEOF(err error) error {
-	if !errors.Is(err, io.EOF) {
-		return err
-	}
-
-	return nil
-}
-
 // Error return just the error from an IO call ignoring the number of bytes.
 func Error(_ int64, err error) error {
 	return err
+}
+
+func Maybe(r io.Reader, err error) io.Reader {
+	if err != nil {
+		return ErrReader(err)
+	}
+
+	return r
 }
 
 type errReader struct {

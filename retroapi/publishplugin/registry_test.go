@@ -3,12 +3,14 @@ package publishplugin
 import (
 	"context"
 	"errors"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"testing"
 	"time"
 
 	"github.com/retrovibed/retrovibed/retroapi/envfile"
+	"github.com/retrovibed/retrovibed/retroapi/internal/md5x"
 	"github.com/stretchr/testify/require"
 )
 
@@ -40,10 +42,13 @@ func TestRegistry(t *testing.T) {
 		require.NoError(t, err)
 		require.NoError(t, r.Load(ctx, wasmPath))
 
-		result, err := r.Publish(ctx, wasmPath, Request{Title: "hello", Mimetype: "video/mp4"})
+		mediadir := t.TempDir()
+		require.NoError(t, os.WriteFile(filepath.Join(mediadir, "media.bin"), []byte("decodes plugin output"), 0600))
+
+		result, err := r.Publish(ctx, wasmPath, Request{Title: "hello", Mimetype: "video/mp4", Directory: mediadir, MediaPath: "media.bin"})
 		require.NoError(t, err)
 		require.Equal(t, "https://example.invalid/echo/hello", result.URL)
-		require.Equal(t, "echo", result.ExternalID)
+		require.Equal(t, md5x.FormatUUID(md5x.Digest("decodes plugin output")), result.ExternalID)
 		require.Equal(t, "published", result.Status)
 	})
 
@@ -62,9 +67,15 @@ func TestRegistry(t *testing.T) {
 		require.NoError(t, err)
 		require.NoError(t, r.Load(ctx, wasmPath))
 
-		result, err := r.Publish(ctx, wasmPath, Request{Title: "hello", Link: "magnet:?xt=urn:btih:0123456789abcdef"})
+		mediadir := t.TempDir()
+		require.NoError(t, os.WriteFile(filepath.Join(mediadir, "media.bin"), []byte("forwards the magnet"), 0600))
+
+		// the fixture exits non-zero when every one of description, mimetype,
+		// community id and magnet arrives blank, so a decoded result is proof
+		// the magnet reached the guest.
+		result, err := r.Publish(ctx, wasmPath, Request{Title: "hello", Magnet: "magnet:?xt=urn:btih:0123456789abcdef", Directory: mediadir, MediaPath: "media.bin"})
 		require.NoError(t, err)
-		require.Equal(t, "magnet:?xt=urn:btih:0123456789abcdef", result.ExternalID)
+		require.Equal(t, md5x.FormatUUID(md5x.Digest("forwards the magnet")), result.ExternalID)
 	})
 
 	t.Run("environment returns the plugin's declaration", func(t *testing.T) {
@@ -116,7 +127,7 @@ func TestRegistry(t *testing.T) {
 		require.NoError(t, err)
 		require.NoError(t, r.Load(ctx, wasmPath))
 
-		_, err = r.Publish(ctx, wasmPath, Request{Title: "hello"})
+		_, err = r.Publish(ctx, wasmPath, Request{Title: "hello", Directory: t.TempDir()})
 		require.Error(t, err)
 	})
 

@@ -6,10 +6,23 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"hash"
+	"io"
+	"log"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 )
+
+func IO(s io.Reader) hash.Hash {
+	v := md5.New()
+
+	if _, err := io.Copy(v, s); err != nil {
+		log.Println("failed to digest reader", err)
+		return nil
+	}
+
+	return v
+}
 
 // digest the provided contents and return the resulting hash.
 // if an error occurs during hashing then a nil value is returned.

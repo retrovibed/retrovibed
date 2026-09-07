@@ -44,9 +44,9 @@ type Post struct {
 // CommunityID are required; everything else is omitted when empty so Lemmy
 // applies its own defaults rather than receiving explicit zero values.
 //
-// URL accepts a magnet link: Lemmy's post url validation allows exactly
-// the http, https and magnet schemes, so the content's magnet URI goes in
-// here directly rather than being buried in the body.
+// URL accepts only the http, https and magnet schemes - that is the whole
+// of Lemmy's post url validation - and is left unset here: the content's
+// magnet URI is deliberately not published in the post.
 type CreatePost struct {
 	Name            string `json:"name"`
 	CommunityID     int64  `json:"community_id"`

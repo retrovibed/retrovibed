@@ -3,7 +3,16 @@ package main
 import (
 	"encoding/json"
 	"flag"
+	"fmt"
+	"log"
 	"os"
+	"strings"
+
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/langx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/md5x"
+	"github.com/retrovibed/retrovibed/retroapi/internal/stringsx"
+	"github.com/retrovibed/retrovibed/retroapi/userx"
 )
 
 type result struct {
@@ -21,6 +30,10 @@ ECHO_STATUS="published" # status reported for every echo publish
 `
 
 func main() {
+	// stderr, never stdout: the registry decodes stdout as the single
+	// result object, so anything else written there breaks the publish.
+	fmt.Fprintln(os.Stderr, "echopublisher:", strings.Join(os.Args[1:], " "))
+
 	// os.Args[0] is the program name; os.Args[1] is the subcommand a real
 	// kong-based plugin would consume before parsing its own flags, so
 	// dispatch on it here too.
@@ -31,25 +44,36 @@ func main() {
 
 	fs := flag.NewFlagSet("publish", flag.ExitOnError)
 	title := fs.String("title", "", "")
-	fs.String("description", "", "")
-	fs.String("mimetype", "", "")
-	fs.String("media", "", "")
-	fs.String("community-id", "", "")
-	link := fs.String("link", "", "")
+	media := fs.String("media", "", "")
+	description := fs.String("description", "", "")
+	mimetype := fs.String("mimetype", "", "")
+	cid := fs.String("community-id", "", "")
+	magnet := fs.String("magnet", "", "")
+	fs.Bool("adult", false, "")
 	fs.Parse(os.Args[2:])
 
-	// the link is echoed back as the external id when the caller supplied
-	// one, so a test can prove Request.Link actually reaches the guest;
-	// with no link this stays "echo" and the flag is invisible.
-	external := "echo"
-	if *link != "" {
-		external = *link
-	}
+	contentpath := userx.DefaultRuntimeDirectory(langx.Zero(media))
 
+	content, err := os.Open(contentpath)
+	if err != nil {
+		log.Fatalln(errorsx.Wrap(err, "content missing"))
+	}
+	defer content.Close()
+
+	if stringsx.Blank(langx.FirstNonZero(*description, *mimetype, *cid, *magnet)) {
+		log.Println("description", description)
+		log.Println("mimetype", mimetype)
+		log.Println("community id", cid)
+		log.Println("magnet", magnet)
+		log.Fatalln("missing cli arguments")
+	}
 	enc := json.NewEncoder(os.Stdout)
+
+	// the content is digested as the external id when the caller supplied
+	// one, so a test can prove the content actually reaches the guest;
 	enc.Encode(result{
 		URL:        "https://example.invalid/echo/" + *title,
-		ExternalID: external,
+		ExternalID: md5x.FormatUUID(md5x.IO(content)),
 		Status:     "published",
 	})
 }

@@ -3,14 +3,17 @@ package publishplugin
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"errors"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/fsx"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
+	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/tetratelabs/wazero"
 	"github.com/tetratelabs/wazero/sys"
 )
@@ -23,31 +26,37 @@ const guestSSLCertDir = "/etc/ssl/certs"
 // guestPluginConfigDir and guestPluginCacheDir are where each plugin
 // invocation's per-plugin config/cache directories are mounted inside the
 // guest - matched by the CONFIGURATION_DIRECTORY/CACHE_DIRECTORY env vars
-// (systemd's ConfigurationDirectory=/CacheDirectory= convention) so the
-// plugin can find them without hardcoding the mount point.
-const guestPluginConfigDir = "/plugin/config.d"
-const guestPluginCacheDir = "/plugin/cache.d"
+const guestPluginConfigDir = "/etc/retrovibed"
+const guestPluginCacheDir = "/var/cache/retrovibed"
 
-// guestMediaDir is where the host directory containing Request.MediaPath is
-// mounted inside the guest for a Publish invocation - the media's basename
-// under this directory is what --media points a plugin at.
-const guestMediaDir = "/plugin/media.d"
+// guestPluginRuntimeDir is the runtime directory containing files for publishing.
+const guestPluginRuntimeDir = "/run/retrovibed"
+
+// guestHomeDir and guestUser are the HOME/USER the guest sees. nothing is
+// mounted at the home directory - it exists so a plugin resolving one gets
+// a scratch path instead of an empty string.
+const guestHomeDir = "/tmp"
+const guestUser = "retrovibed"
 
 // Request is what a caller hands Publish to invoke a single named plugin.
 // MediaPath, when non-empty, is a host-side flat file (the caller is
 // responsible for materializing the relevant byte range of whatever storage
 // backs the content into one file, since a wasm guest has no way to
 // interpret block-cache internals) mounted read-only into the guest.
-// Link, when non-empty, is the publicly reachable URI for the content -
-// in practice the magnet URI, the same link the RSS feed advertises - so a
-// plugin's post can point back at what was published.
+// Magnet, when non-empty, is the publicly reachable URI for the content -
+// the magnet URI, the same link the RSS feed advertises - so a
+// plugin's post can point back at what was published. Adult marks the
+// content as adult, letting a plugin flag the post however its destination
+// expects.
 type Request struct {
+	Directory   string
 	Title       string
 	Description string
 	Mimetype    string
 	CommunityID string
 	MediaPath   string
-	Link        string
+	Magnet      string
+	Adult       bool
 }
 
 // Result is what a plugin reports back on stdout as a single JSON object
@@ -76,7 +85,7 @@ type publishOutcome struct {
 
 // Publish invokes the plugin installed at path - a WASI command run as:
 //
-//	<path> publish --title <t> --description <d> --mimetype <m> [--media <mounted-path>] [--community-id <id>] [--link <uri>]
+//	<path> publish --title <t> --description <d> --mimetype <m> [--media <mounted-path>] [--community-id <id>] [--magnet <uri>] [--adult]
 //
 // - decoding a single JSON object from its stdout as the *Result. Unlike
 // searchplugin.T.Search, which fans a query out to every loaded plugin, this
@@ -127,11 +136,19 @@ func (r *Registry) Environment(ctx context.Context, path string) ([]byte, error)
 		return nil, errorsx.Wrapf(ErrNotLoaded, "path: %s", path)
 	}
 
+	dir, err := os.MkdirTemp(userx.DefaultRuntimeDirectory(userx.DefaultRelRoot()), "retrovibed.publish.environ.*")
+	if err != nil {
+		return nil, errorsx.Wrap(err, "unable to create temporary directory")
+	}
+	defer func() {
+		errorsx.Log(errorsx.Wrap(fsx.IgnoreIsNotExist(os.RemoveAll(dir)), "unable to delete publishing directory"))
+	}()
+
 	// deliberately anonymous, unlike the publish invocation below: an
 	// environment read can land while a publish of the same plugin is
 	// mid-flight, and wazero refuses to instantiate a second module under a
 	// name that is already live.
-	return r.invoke(ctx, path, compiled, invocation{args: []string{"env"}})
+	return r.invoke(ctx, path, compiled, invocation{directory: dir, args: []string{"env"}})
 }
 
 // runPublishJob instantiates a single plugin, decodes its stdout as a single
@@ -149,32 +166,38 @@ func (r *Registry) runPublishJob(ctx context.Context, j publishWorkload) error {
 // coexist - and the host-side media file to mount, when the command takes
 // one.
 type invocation struct {
-	name  string
-	args  []string
-	media string
+	directory string
+	media     string
+	name      string
+	args      []string
 }
 
 // publish runs a plugin's publish command and decodes its stdout as the
 // single JSON object documented on Result.
 func (r *Registry) publish(ctx context.Context, path string, compiled wazero.CompiledModule, req Request) (*Result, error) {
+	log.Println("publishing", spew.Sdump(req))
+
 	args := []string{"publish", "--title", req.Title, "--description", req.Description, "--mimetype", req.Mimetype}
 	if req.CommunityID != "" {
 		args = append(args, "--community-id", req.CommunityID)
 	}
-	if req.Link != "" {
-		args = append(args, "--link", req.Link)
+	if req.Magnet != "" {
+		args = append(args, "--magnet", req.Magnet)
 	}
 	if req.MediaPath != "" {
-		args = append(args, "--media", guestMediaDir+"/"+filepath.Base(req.MediaPath))
+		args = append(args, "--media", req.MediaPath)
+	}
+	if req.Adult {
+		args = append(args, "--adult")
 	}
 
-	stdout, err := r.invoke(ctx, path, compiled, invocation{name: path, args: args, media: req.MediaPath})
+	stdout, err := r.invoke(ctx, path, compiled, invocation{directory: req.Directory, name: path, args: args, media: req.MediaPath})
 	if err != nil {
 		return nil, err
 	}
 
 	var result Result
-	if err := json.Unmarshal(stdout, &result); err != nil {
+	if err := jsonx.Unmarshal(stdout, &result); err != nil {
 		return nil, errorsx.Wrapf(err, "publish plugin emitted invalid json: %s", path)
 	}
 
@@ -194,29 +217,39 @@ func (r *Registry) invoke(ctx context.Context, path string, compiled wazero.Comp
 
 	hostConfigDir := r.PluginConfigDir(id)
 	hostCacheDir := r.PluginCacheDir(id)
-	if err := os.MkdirAll(hostConfigDir, 0700); err != nil {
-		return nil, errorsx.Wrapf(err, "unable to create plugin config directory: %s", hostConfigDir)
-	}
-	if err := os.MkdirAll(hostCacheDir, 0700); err != nil {
-		return nil, errorsx.Wrapf(err, "unable to create plugin cache directory: %s", hostCacheDir)
+
+	if err := fsx.MkDirs(0700, hostConfigDir, hostCacheDir); err != nil {
+		return nil, err
 	}
 
 	wazerofs := wazero.NewFSConfig().
 		WithDirMount(r.sslCertDir, guestSSLCertDir).
 		WithDirMount(hostConfigDir, guestPluginConfigDir).
-		WithDirMount(hostCacheDir, guestPluginCacheDir)
+		WithDirMount(hostCacheDir, guestPluginCacheDir).
+		WithDirMount(inv.directory, guestPluginRuntimeDir)
 
-	if inv.media != "" {
-		wazerofs = wazerofs.WithDirMount(filepath.Dir(inv.media), guestMediaDir)
-	}
+	// log.Println("mounted", hostConfigDir, "at", guestPluginConfigDir)
+	// log.Println("mounted", hostCacheDir, "at", guestPluginCacheDir)
+	// log.Println("mounted", inv.directory, "at", guestPluginRuntimeDir)
 
 	var stdout bytes.Buffer
 	cfg := wazero.NewModuleConfig().
 		WithName(inv.name).
 		WithArgs(args...).
 		WithEnv("SSL_CERT_DIR", guestSSLCertDir).
+		// the guest has no passwd database to look an account up in, so
+		// anything resolving a home directory falls back to these.
+		WithEnv("HOME", guestHomeDir).
+		WithEnv("USER", guestUser).
+		// the systemd variables name the directories themselves, the xdg
+		// ones their parents - a plugin that resolves either convention
+		// (userx does both) lands on the same mounts.
 		WithEnv("CONFIGURATION_DIRECTORY", guestPluginConfigDir).
 		WithEnv("CACHE_DIRECTORY", guestPluginCacheDir).
+		WithEnv("RUNTIME_DIRECTORY", guestPluginRuntimeDir).
+		WithEnv("XDG_CONFIG_HOME", filepath.Dir(guestPluginConfigDir)).
+		WithEnv("XDG_CACHE_HOME", filepath.Dir(guestPluginCacheDir)).
+		WithEnv("XDG_RUNTIME_DIR", filepath.Dir(guestPluginRuntimeDir)).
 		WithFSConfig(wazerofs).
 		WithStdout(&stdout).
 		WithStderr(os.Stderr).

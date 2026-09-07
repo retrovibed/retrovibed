@@ -15,7 +15,7 @@
 // Two kong subcommands are exposed. "publish", invoked by
 // publishplugin.Registry.Publish as:
 //
-//	<binary> publish --title <t> --description <d> --mimetype <m> [--media <path>] [--community-id <id>] [--link <uri>]
+//	<binary> publish --title <t> --description <d> --mimetype <m> [--media <path>] [--community-id <id>] [--magnet <uri>] [--adult]
 //
 // and "env", invoked by publishplugin.Registry.Environment as:
 //
@@ -33,6 +33,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	"github.com/alecthomas/kong"
@@ -52,7 +53,7 @@ import (
 // cli is parsed straight from argv[1:] by kong.Parse. Registry.Publish
 // always invokes a loaded plugin as exactly:
 //
-//	<binary> publish --title <t> --description <d> --mimetype <m> [--media <mounted-path>] [--community-id <id>] [--link <uri>]
+//	<binary> publish --title <t> --description <d> --mimetype <m> [--media <mounted-path>] [--community-id <id>] [--magnet <uri>] [--adult]
 //
 // (see retroapi/publishplugin/publish.go's invoke) - argv[1] is literally
 // the subcommand name ("publish"), which kong resolves from the field name
@@ -64,15 +65,16 @@ var cli struct {
 
 // publishCmd's flags match Registry's invocation 1:1: Media is only ever
 // passed when the caller supplied Request.MediaPath, so a plugin that
-// doesn't need the file can simply not read it, and Link only when the
-// content has a publicly reachable URI (in practice its magnet link).
+// doesn't need the file can simply not read it, and Magnet only when the
+// content has a publicly reachable magnet URI.
 type publishCmd struct {
 	Title       string `flag:"" name:"title" help:"title of the content being published"`
 	Description string `flag:"" name:"description" help:"description of the content being published"`
 	Mimetype    string `flag:"" name:"mimetype" help:"mimetype of the content being published"`
 	Media       string `flag:"" name:"media" help:"guest path to the mounted media file, when the caller provided one"`
 	CommunityID string `flag:"" name:"community-id" help:"id of the community the content is being published on behalf of"`
-	Link        string `flag:"" name:"link" help:"publicly reachable uri for the content, when it has one"`
+	Magnet      string `flag:"" name:"magnet" help:"publicly reachable magnet uri for the content, when it has one"`
+	Adult       bool   `flag:"" name:"adult" help:"the content is marked adult"`
 }
 
 // envCmd takes no flags - it is a pure declaration of what this plugin can
@@ -112,7 +114,7 @@ func (cmd *publishCmd) Run(ctx context.Context) error {
 	fmt.Fprintln(os.Stderr, "publishplugin-noop: CONFIGURATION_DIRECTORY =", os.Getenv("CONFIGURATION_DIRECTORY"))
 	fmt.Fprintln(os.Stderr, "publishplugin-noop: CACHE_DIRECTORY =", os.Getenv("CACHE_DIRECTORY"))
 
-	fmt.Fprintln(os.Stderr, "publishplugin-noop: link =", cmd.Link)
+	fmt.Fprintln(os.Stderr, "publishplugin-noop: magnet =", cmd.Magnet)
 
 	if cmd.Media != "" {
 		info, err := os.Stat(cmd.Media)
@@ -142,6 +144,11 @@ func (cmd *publishCmd) Run(ctx context.Context) error {
 func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
+
+	// stderr, never stdout: both subcommands hand stdout to the registry -
+	// the result object for publish, the declaration for env - so the argv
+	// echo goes where the registry logs it instead.
+	fmt.Fprintln(os.Stderr, "publishplugin-noop:", strings.Join(os.Args[1:], " "))
 
 	kctx := kong.Parse(&cli, kong.BindTo(ctx, (*context.Context)(nil)))
 	kctx.FatalIfErrorf(kctx.Run())

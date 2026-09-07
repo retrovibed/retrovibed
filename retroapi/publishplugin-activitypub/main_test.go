@@ -38,7 +38,6 @@ func TestEnvironment(t *testing.T) {
 			"LEMMY_PASSWORD",
 			"LEMMY_TOKEN",
 			"LEMMY_TOTP",
-			"LEMMY_NSFW",
 			"LEMMY_LANGUAGE_ID",
 			"LEMMY_THUMBNAIL_MAX",
 		}, keys)
@@ -79,35 +78,38 @@ func TestThumbnail(t *testing.T) {
 		}))
 		defer srv.Close()
 
-		media := filepath.Join(t.TempDir(), "poster.png")
-		require.NoError(t, os.WriteFile(media, []byte("not really a png"), 0600))
+		dir := t.TempDir()
+		t.Setenv("RUNTIME_DIRECTORY", dir)
+		require.NoError(t, os.WriteFile(filepath.Join(dir, "poster.png"), []byte("not really a png"), 0600))
 
 		client, err := NewClient(srv.URL, OptionHTTPClient(srv.Client()))
 		require.NoError(t, err)
 
-		cmd := publishCmd{Media: media, Mimetype: "image/png", ThumbnailMax: "8 MB"}
+		cmd := publishCmd{Media: "poster.png", Mimetype: "image/png", ThumbnailMax: "8 MB"}
 		require.Equal(t, srv.URL+"/pictrs/image/abc123.png", cmd.thumbnail(context.Background(), client))
 	})
 
 	t.Run("skips video, the common case for torrented media", func(t *testing.T) {
-		media := filepath.Join(t.TempDir(), "movie.mkv")
-		require.NoError(t, os.WriteFile(media, []byte("not really a movie"), 0600))
+		dir := t.TempDir()
+		t.Setenv("RUNTIME_DIRECTORY", dir)
+		require.NoError(t, os.WriteFile(filepath.Join(dir, "movie.mkv"), []byte("not really a movie"), 0600))
 
 		client, err := NewClient("https://lemmy.invalid")
 		require.NoError(t, err)
 
-		cmd := publishCmd{Media: media, Mimetype: "video/x-matroska", ThumbnailMax: "8 MB"}
+		cmd := publishCmd{Media: "movie.mkv", Mimetype: "video/x-matroska", ThumbnailMax: "8 MB"}
 		require.Equal(t, "", cmd.thumbnail(context.Background(), client))
 	})
 
 	t.Run("skips an image over the limit", func(t *testing.T) {
-		media := filepath.Join(t.TempDir(), "poster.png")
-		require.NoError(t, os.WriteFile(media, make([]byte, 2048), 0600))
+		dir := t.TempDir()
+		t.Setenv("RUNTIME_DIRECTORY", dir)
+		require.NoError(t, os.WriteFile(filepath.Join(dir, "poster.png"), make([]byte, 2048), 0600))
 
 		client, err := NewClient("https://lemmy.invalid")
 		require.NoError(t, err)
 
-		cmd := publishCmd{Media: media, Mimetype: "image/png", ThumbnailMax: "1 KB"}
+		cmd := publishCmd{Media: "poster.png", Mimetype: "image/png", ThumbnailMax: "1 KB"}
 		require.Equal(t, "", cmd.thumbnail(context.Background(), client))
 	})
 
@@ -125,13 +127,14 @@ func TestThumbnail(t *testing.T) {
 		}))
 		defer srv.Close()
 
-		media := filepath.Join(t.TempDir(), "poster.png")
-		require.NoError(t, os.WriteFile(media, []byte("not really a png"), 0600))
+		dir := t.TempDir()
+		t.Setenv("RUNTIME_DIRECTORY", dir)
+		require.NoError(t, os.WriteFile(filepath.Join(dir, "poster.png"), []byte("not really a png"), 0600))
 
 		client, err := NewClient(srv.URL, OptionHTTPClient(srv.Client()))
 		require.NoError(t, err)
 
-		cmd := publishCmd{Media: media, Mimetype: "image/png", ThumbnailMax: "8 MB"}
+		cmd := publishCmd{Media: "poster.png", Mimetype: "image/png", ThumbnailMax: "8 MB"}
 		require.Equal(t, "", cmd.thumbnail(context.Background(), client))
 	})
 }

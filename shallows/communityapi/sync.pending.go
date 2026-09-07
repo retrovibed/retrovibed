@@ -8,13 +8,14 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
-	"github.com/retrovibed/retrovibed/retroapi/blockcache"
 	"github.com/retrovibed/retrovibed/retroapi/publishplugin"
+	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
@@ -59,31 +60,27 @@ func ensureTorrent(ctx context.Context, q sqlx.Queryer, mvfs, tvfs fsx.Virtual, 
 // pub.Path via publishers.Publish, removing the temp file once the call
 // returns.
 func publishToPlugin(ctx context.Context, mvfs fsx.Virtual, publishers publishplugin.T, pub community.PluginPublisher, pc community.PublishedContent, lmd library.Metadata, known library.Known) error {
-	cache, err := blockcache.NewDirectoryCache(mvfs.Path(lmd.ID))
-	if err != nil {
-		return errorsx.Wrap(err, "unable to open media for plugin publish")
-	}
-
-	tmp, err := os.CreateTemp("", "retrovibed.publish.*")
+	dir, err := os.MkdirTemp(userx.DefaultRuntimeDirectory(userx.DefaultRelRoot()), "retrovibed.publish.*")
 	if err != nil {
 		return errorsx.Wrap(err, "unable to create temporary media file")
 	}
 	defer func() {
-		errorsx.Log(errorsx.Wrap(fsx.IgnoreIsNotExist(os.Remove(tmp.Name())), "unable to remove temporary media file"))
+		errorsx.Log(errorsx.Wrap(fsx.IgnoreIsNotExist(os.RemoveAll(dir)), "unable to publishing directory"))
 	}()
-	defer tmp.Close()
 
-	if _, err := io.Copy(tmp, io.NewSectionReader(cache, int64(lmd.DiskOffset), int64(lmd.Bytes))); err != nil {
-		return errorsx.Wrap(err, "unable to materialize media for plugin publish")
+	if err := os.Symlink(mvfs.Path(lmd.ID), filepath.Join(dir, mvfs.Path(lmd.ID))); err != nil {
+		return errorsx.Wrap(err, "failed to symlink media into publishing directory")
 	}
 
 	_, err = publishers.Publish(ctx, pub.Path, publishplugin.Request{
+		Directory:   dir,
+		MediaPath:   lmd.ID,
 		Title:       stringsx.FirstNonBlank(known.Title, lmd.Description),
 		Description: known.Overview,
 		Mimetype:    stringsx.FirstNonBlank(known.Mimetype, lmd.Mimetype),
 		CommunityID: pc.CommunityID,
-		MediaPath:   tmp.Name(),
-		Link:        pc.MagnetURI,
+		Magnet:      pc.MagnetURI,
+		Adult:       known.Adult,
 	})
 
 	return err
