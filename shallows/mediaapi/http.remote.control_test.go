@@ -70,20 +70,29 @@ func TestHTTPRemoteControl(t *testing.T) {
 		ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
 		defer cancel()
 
-		cmd, err := protojson.Marshal(&mediaapi.Stream{
-			Sid:     "cmd-1",
-			Command: &mediaapi.Stream_Queue{Queue: &mediaapi.Queue{}},
-		})
-		require.NoError(t, err)
-		require.NoError(t, connect1.Write(ctx, websocket.MessageBinary, cmd))
+		// dialing only proves the handshake completed, the server registers the
+		// socket afterwards. each relay round trip doubles as a barrier: the frame
+		// can only reach listen once both the listener and that connect are
+		// registered, so the broadcast below can't race a connect that the server
+		// hasn't added to its set yet.
+		for i, conn := range []*websocket.Conn{connect1, connect2} {
+			sid := fmt.Sprintf("cmd-%d", i+1)
 
-		_, received, err := listenconn.Read(ctx)
-		require.NoError(t, err)
+			cmd, err := protojson.Marshal(&mediaapi.Stream{
+				Sid:     sid,
+				Command: &mediaapi.Stream_Queue{Queue: &mediaapi.Queue{}},
+			})
+			require.NoError(t, err)
+			require.NoError(t, conn.Write(ctx, websocket.MessageBinary, cmd))
 
-		var relayed mediaapi.Stream
-		require.NoError(t, protojson.Unmarshal(received, &relayed))
-		require.Equal(t, "cmd-1", relayed.Sid)
-		require.NotNil(t, relayed.GetQueue())
+			_, received, err := listenconn.Read(ctx)
+			require.NoError(t, err)
+
+			var relayed mediaapi.Stream
+			require.NoError(t, protojson.Unmarshal(received, &relayed))
+			require.Equal(t, sid, relayed.Sid)
+			require.NotNil(t, relayed.GetQueue())
+		}
 
 		reply, err := protojson.Marshal(&mediaapi.Stream{
 			Sid:     "reply-1",
