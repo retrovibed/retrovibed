@@ -116,7 +116,6 @@ class _SocialsPublisherRow extends State<SocialsPublisherRow> {
               // back to the id - which is the only thing the row knows anyway.
               PublisherTypography(
                 publisher.id.isEmpty ? (api.PluginPublisher()..id = widget.current.publisherId) : publisher,
-                trailing: [Text(publisher.mimetype)],
               ),
               cause: snapshot.hasError ? ds.Error.unknown(snapshot.error!) : ds.Error.zero,
             );

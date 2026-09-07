@@ -66,13 +66,13 @@ class _PublisherDropdownState extends State<PublisherDropdown> with ds.LoadingSt
         ds.SearchDropdown.text(
           PublisherTypography.description(widget.current.value),
           decoration: InputDecoration(
-            errorText: "No Publishing Plugins Available",
+            labelText: "pick plugin to attach",
           ),
           padding: EdgeInsets.zero,
           key: ValueKey(widget.current.value.id),
           controller: _search,
           textAlign: TextAlign.center,
-          margin: EdgeInsets.zero,
+          margin: widget.margin,
           help: widget.help,
           refresh: _discovered,
           leading: widget.leading,
@@ -82,7 +82,6 @@ class _PublisherDropdownState extends State<PublisherDropdown> with ds.LoadingSt
               if (response.items.isEmpty) return ds.Empty;
               return ds.Container(
                 constraints: BoxConstraints(maxHeight: 400),
-                decoration: BoxDecoration(color: Colors.blue),
                 ListView.builder(
                   shrinkWrap: true,
                   itemCount: response.items.length,
@@ -96,16 +95,13 @@ class _PublisherDropdownState extends State<PublisherDropdown> with ds.LoadingSt
                     // the label, not the settings row: this is a picker, and a
                     // publisher's configuration, clone and delete belong to the
                     // catalog screen.
-                    return InkWell(
+                    return ds.TableRow.single(
+                      padding: defaults.padding,
+                      PublisherTypography(current),
                       onTap: () {
-                        widget.current.value = current;
                         widget.onSelected(current);
                         onClick();
                       },
-                      child: Padding(
-                        padding: defaults.padding,
-                        child: PublisherTypography(current),
-                      ),
                     );
                   },
                 ),
