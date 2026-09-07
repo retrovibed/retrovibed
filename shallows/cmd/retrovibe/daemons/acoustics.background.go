@@ -63,10 +63,6 @@ func acousticsIndexOne(ctx context.Context, q sqlx.Queryer, media fs.FS, id stri
 // AcousticsBackground drains the index, then polls for new media on an
 // exponential backoff that maxes out at an hour.
 func AcousticsBackground(ctx context.Context, q sqlx.Queryer, media fs.FS) error {
-	if err := acoustics.EnsureIndex(ctx, q); err != nil {
-		return err
-	}
-
 	wakeup := asyncx.NewWakeup(ctx)
 	defer wakeup.Broadcast() // kick off an initial indexing process
 	s := backoffx.New(

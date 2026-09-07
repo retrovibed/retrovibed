@@ -1,6 +1,9 @@
 package backups_test
 
 import (
+	"bytes"
+	"io"
+	"strings"
 	"testing"
 
 	"github.com/retrovibed/retrovibed/shallows/backups"
@@ -8,38 +11,52 @@ import (
 )
 
 func TestKey(t *testing.T) {
-	seed := "5c6d3f2e-1a0b-4c9d-8e7f-0123456789ab"
-	privatekey := []byte("-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEIA==\n-----END PRIVATE KEY-----\n")
+	const plaintext = "the metadata database, in the clear"
 
-	t.Run("is deterministic", func(t *testing.T) {
-		a, err := backups.Key(seed, privatekey)
+	encrypt := func(t *testing.T, key backups.Key) []byte {
+		r, err := key.Encrypt(strings.NewReader(plaintext))
 		require.NoError(t, err)
-		b, err := backups.Key(seed, privatekey)
+		ciphertext, err := io.ReadAll(r)
 		require.NoError(t, err)
-		require.Equal(t, a, b)
-		require.Len(t, a, 64)
+		require.NotContains(t, string(ciphertext), plaintext)
+		return ciphertext
+	}
+
+	decrypt := func(t *testing.T, key backups.Key, ciphertext []byte) string {
+		r, err := key.Decrypt(bytes.NewReader(ciphertext))
+		require.NoError(t, err)
+		decrypted, err := io.ReadAll(r)
+		require.NoError(t, err)
+		return string(decrypted)
+	}
+
+	key, err := backups.NewKey("seed", []byte("identity"))
+	require.NoError(t, err)
+
+	t.Run("decrypts what it encrypted", func(t *testing.T) {
+		require.Equal(t, plaintext, decrypt(t, key, encrypt(t, key)))
 	})
 
-	t.Run("changes with the seed", func(t *testing.T) {
-		a, err := backups.Key(seed, privatekey)
+	t.Run("a different identity cannot read it", func(t *testing.T) {
+		other, err := backups.NewKey("seed", []byte("a different identity"))
 		require.NoError(t, err)
-		b, err := backups.Key("another-seed", privatekey)
-		require.NoError(t, err)
-		require.NotEqual(t, a, b)
+		require.NotEqual(t, plaintext, decrypt(t, other, encrypt(t, key)))
 	})
 
-	t.Run("changes with the private key", func(t *testing.T) {
-		a, err := backups.Key(seed, privatekey)
+	t.Run("a different seed cannot read it", func(t *testing.T) {
+		other, err := backups.NewKey("another-seed", []byte("identity"))
 		require.NoError(t, err)
-		b, err := backups.Key(seed, []byte("a different identity"))
-		require.NoError(t, err)
-		require.NotEqual(t, a, b)
+		require.NotEqual(t, plaintext, decrypt(t, other, encrypt(t, key)))
+	})
+
+	t.Run("every backup runs under its own keystream", func(t *testing.T) {
+		require.NotEqual(t, encrypt(t, key), encrypt(t, key))
 	})
 
 	t.Run("requires both inputs", func(t *testing.T) {
-		_, err := backups.Key("", privatekey)
+		_, err := backups.NewKey("", []byte("identity"))
 		require.Error(t, err)
-		_, err = backups.Key(seed, nil)
+		_, err = backups.NewKey("seed", nil)
 		require.Error(t, err)
 	})
 }

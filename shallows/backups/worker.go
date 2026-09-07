@@ -17,10 +17,9 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/pqueuex"
 )
 
-// Run takes one encrypted snapshot and uploads it for the device. the snapshot lands in a
-// temporary file that is ciphertext from the first byte, and is removed whether or not the
-// upload succeeds.
-func Run(ctx context.Context, c *http.Client, db *sql.DB, device string, key string) (m *deeppool.Media, err error) {
+// Run snapshots the database and uploads it encrypted for the device. the plain copy lives
+// in a private temporary directory only as long as the upload, whether or not it succeeds.
+func Run(ctx context.Context, c *http.Client, db *sql.DB, device string, key Key) (m *deeppool.Media, err error) {
 	dir, err := os.MkdirTemp("", "retrovibed.backup.*")
 	if err != nil {
 		return nil, errorsx.Wrap(err, "unable to create backup directory")
@@ -28,7 +27,7 @@ func Run(ctx context.Context, c *http.Client, db *sql.DB, device string, key str
 	defer os.RemoveAll(dir)
 
 	path := filepath.Join(dir, "meta.db")
-	if err = Snapshot(ctx, db, path, key); err != nil {
+	if err = Snapshot(ctx, db, path); err != nil {
 		return nil, err
 	}
 
@@ -38,7 +37,12 @@ func Run(ctx context.Context, c *http.Client, db *sql.DB, device string, key str
 	}
 	defer f.Close()
 
-	return deeppool.NewBackups(c).Upload(ctx, device, mimex.RetrovibedMetaBackup, f)
+	encrypted, err := key.Encrypt(f)
+	if err != nil {
+		return nil, err
+	}
+
+	return deeppool.NewBackups(c).Upload(ctx, device, mimex.RetrovibedMetaBackup, encrypted)
 }
 
 // Request is a queued backup of the current database for a device.
@@ -74,7 +78,7 @@ type Worker struct {
 func (t Worker) Message(ctx context.Context, m []byte) (err error) {
 	var (
 		req      Request
-		key      string
+		key      Key
 		uploaded *deeppool.Media
 	)
 

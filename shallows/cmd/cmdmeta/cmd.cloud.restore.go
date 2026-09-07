@@ -74,20 +74,24 @@ func (t CloudRestore) Run(gctx *cmdopts.Global) (err error) {
 	}
 
 	// the restored database is built beside the target and moved into place only once it
-	// is complete, so an interrupted restore leaves whatever was there untouched.
+	// opens, so an interrupted restore or a wrong key leaves whatever was there untouched.
 	restored := filepath.Join(dir, "meta.db")
-	db, err := sql.Open("duckdb", restored)
-	if err != nil {
-		return errorsx.Wrap(err, "unable to open restore target")
-	}
-
-	if err = backups.Restore(gctx.Context, db, encrypted, key); err != nil {
-		errorsx.Log(db.Close())
+	if err = backups.Restore(key, encrypted, restored); err != nil {
 		return err
 	}
 
+	db, err := sql.Open("duckdb", restored)
+	if err != nil {
+		return errorsx.Wrap(err, "unable to open restored database")
+	}
+
+	if err = db.PingContext(gctx.Context); err != nil {
+		errorsx.Log(db.Close())
+		return errorsx.Wrap(err, "unable to open restored database")
+	}
+
 	if err = db.Close(); err != nil {
-		return errorsx.Wrap(err, "unable to close restore target")
+		return errorsx.Wrap(err, "unable to close restored database")
 	}
 
 	if fsx.Exists(t.Database) {
