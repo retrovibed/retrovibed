@@ -65,7 +65,7 @@ void main() {
 
         expect(find.text('networking:false'), findsOneWidget);
 
-        await tester.tap(find.byType(Checkbox).first);
+        await tester.tap(find.byType(Checkbox).at(2));
         await tester.pumpAndSettle();
 
         expect(find.text('networking:true'), findsOneWidget);
@@ -94,7 +94,7 @@ void main() {
 
         expect(find.text('subscription:true'), findsOneWidget);
 
-        await tester.tap(find.byType(Checkbox).at(1));
+        await tester.tap(find.byType(Checkbox).at(3));
         await tester.pumpAndSettle();
 
         expect(find.text('subscription:false'), findsOneWidget);
@@ -122,7 +122,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        await tester.tap(find.byType(Checkbox).first);
+        await tester.tap(find.byType(Checkbox).at(2));
         await tester.pumpAndSettle();
 
         expect(find.text('networking:true'), findsOneWidget);
@@ -152,7 +152,7 @@ void main() {
 
         expect(find.text('recommendations:true'), findsOneWidget);
 
-        await tester.tap(find.byType(Checkbox).at(2));
+        await tester.tap(find.byType(Checkbox).at(4));
         await tester.pumpAndSettle();
 
         expect(find.text('recommendations:false'), findsOneWidget);
@@ -181,7 +181,7 @@ void main() {
 
         expect(find.text('releases:true'), findsOneWidget);
 
-        await tester.tap(find.byType(Checkbox).at(3));
+        await tester.tap(find.byType(Checkbox).at(5));
         await tester.pumpAndSettle();
 
         expect(find.text('releases:false'), findsOneWidget);
@@ -210,7 +210,7 @@ void main() {
 
         expect(find.text('debug:true'), findsOneWidget);
 
-        await tester.tap(find.byType(Checkbox).at(4));
+        await tester.tap(find.byType(Checkbox).at(1));
         await tester.pumpAndSettle();
 
         expect(find.text('debug:false'), findsOneWidget);
