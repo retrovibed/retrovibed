@@ -23,81 +23,86 @@ class PublisherRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final defaults = ds.Defaults.of(context);
 
     return ds.TableRow(
       key: ValueKey(current.id),
-      expanded: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        spacing: defaults.spacing,
-        children: [
-          PublisherDetails(
-            current,
-            onChange: onChange,
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.copy_outlined),
-                tooltip: 'clone this plugin into a second configuration',
-                onPressed: () {
-                  api.publishers
-                      .clone(
-                        current.id,
-                        options: [authn.request(authn.AuthzCache.meta(context))],
-                      )
-                      .then((created) => onClone(created.publisher));
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.delete_outline),
-                onPressed: () {
-                  final modal = ds.modals.of(context);
-                  modal?.push(
-                    ds.Confirmation.yesNo(
-                      content: Text('Delete ${p.basename(current.path)}?'),
-                      onCancel: (_) => modal.push(null),
-                      onConfirm: (_) {
-                        api.publishers
-                            .delete(
-                              current.id,
-                              options: [authn.request(authn.AuthzCache.meta(context))],
-                            )
-                            .then((_) {
-                              modal.push(null);
-                              onDelete(current);
-                            });
-                      },
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
-          // the same editor the search plugin list uses; the endpoint merges the
-          // plugin's own declaration of the variables it understands over the
-          // saved values, so a publisher nobody wrote a settings screen for
-          // still renders a populated form.
-          EnvironmentEditor.future(
-            current.id,
-            api.publisherenvironment.get(
-              current.id,
-              options: [authn.request(authn.AuthzCache.meta(context))],
+      expanded: ds.Container(
+        padding: defaults.padding,
+        decoration: BoxDecoration(color: theme.colorScheme.surfaceContainerLow),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          spacing: defaults.spacing,
+          children: [
+            PublisherDetails(
+              current,
+              onChange: onChange,
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.copy_outlined),
+                  tooltip: 'clone this plugin into a second configuration',
+                  onPressed: () {
+                    api.publishers
+                        .clone(
+                          current.id,
+                          options: [authn.request(authn.AuthzCache.meta(context))],
+                        )
+                        .then((created) => onClone(created.publisher));
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete_outline),
+                  onPressed: () {
+                    final modal = ds.modals.of(context);
+                    modal?.push(
+                      ds.Confirmation.yesNo(
+                        content: Text('Delete ${p.basename(current.path)}?'),
+                        onCancel: (_) => modal.push(null),
+                        onConfirm: (_) {
+                          api.publishers
+                              .delete(
+                                current.id,
+                                options: [authn.request(authn.AuthzCache.meta(context))],
+                              )
+                              .then((_) {
+                                modal.push(null);
+                                onDelete(current);
+                              });
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
-            onChange: (content) {
-              httpx
-                  .withRetry(
-                    () => api.publisherenvironment.update(
-                      current.id,
-                      content,
-                      options: [authn.request(authn.AuthzCache.meta(context))],
-                    ),
-                  )
-                  .catchError((cause) {
-                    print("failed to update publisher environment ${cause}");
-                    return content;
-                  });
-            },
-          ),
-        ],
+            // the same editor the search plugin list uses; the endpoint merges the
+            // plugin's own declaration of the variables it understands over the
+            // saved values, so a publisher nobody wrote a settings screen for
+            // still renders a populated form.
+            EnvironmentEditor.future(
+              current.id,
+              api.publisherenvironment.get(
+                current.id,
+                options: [authn.request(authn.AuthzCache.meta(context))],
+              ),
+              onChange: (content) {
+                httpx
+                    .withRetry(
+                      () => api.publisherenvironment.update(
+                        current.id,
+                        content,
+                        options: [authn.request(authn.AuthzCache.meta(context))],
+                      ),
+                    )
+                    .catchError((cause) {
+                      print("failed to update publisher environment ${cause}");
+                      return content;
+                    });
+              },
+            ),
+          ],
+        ),
       ),
       [
         Expanded(
@@ -107,7 +112,6 @@ class PublisherRow extends StatelessWidget {
             maxLines: 1,
           ),
         ),
-        Text(current.mimetype),
       ],
     );
   }

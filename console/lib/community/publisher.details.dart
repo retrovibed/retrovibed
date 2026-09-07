@@ -5,6 +5,7 @@ import 'package:retrovibed/design.kit/inputs.dart' as inputs;
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/mimex.dart' as mimex;
+import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'api.dart' as api;
 
 /// What an installed publisher actually is: the identity the catalog and every
@@ -32,15 +33,10 @@ class PublisherDetails extends StatefulWidget {
 }
 
 class _PublisherDetails extends State<PublisherDetails> with ds.LoadingState {
-  // the endpoint takes the whole publisher, so edits accumulate here and are
-  // saved as one row rather than a field at a time.
-  late api.PluginPublisher _pending = widget.current.deepCopy();
-  late api.PluginPublisher _saved = widget.current.deepCopy();
+  api.PluginPublisher _pending = api.PluginPublisher();
 
   Future<void> save() {
-    // typing then tapping away, tapping away again, and submitting are all the
-    // same edit; only an actual change is worth a round trip.
-    if (_pending.description == _saved.description && _pending.mimetype == _saved.mimetype) {
+    if (uuidx.md5x(_pending.writeToJson()) == uuidx.md5x(widget.current.writeToJson())) {
       return Future.value();
     }
 
@@ -50,7 +46,6 @@ class _PublisherDetails extends State<PublisherDetails> with ds.LoadingState {
         .then((v) {
           setState(() {
             _pending = v.publisher.deepCopy();
-            _saved = v.publisher.deepCopy();
             cause = ds.Error.zero;
           });
           widget.onChange(v.publisher);
@@ -65,6 +60,13 @@ class _PublisherDetails extends State<PublisherDetails> with ds.LoadingState {
   }
 
   @override
+  void initState() {
+    super.initState();
+    loading = false;
+    _pending = widget.current.deepCopy();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final defaults = ds.Defaults.of(context);
@@ -72,7 +74,6 @@ class _PublisherDetails extends State<PublisherDetails> with ds.LoadingState {
     return ds.Container(
       padding: defaults.padding,
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerLow,
         border: defaults.border,
         borderRadius: defaults.borderRadius,
       ),
@@ -85,7 +86,7 @@ class _PublisherDetails extends State<PublisherDetails> with ds.LoadingState {
           children: [
             Row(
               mainAxisSize: MainAxisSize.max,
-              spacing: defaults.spacing,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Flexible(
                   child: SelectableText(
@@ -94,7 +95,10 @@ class _PublisherDetails extends State<PublisherDetails> with ds.LoadingState {
                     maxLines: 1,
                   ),
                 ),
-                ...widget.actions,
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: widget.actions,
+                ),
               ],
             ),
             forms.Field(
