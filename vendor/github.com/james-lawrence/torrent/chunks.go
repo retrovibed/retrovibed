@@ -19,10 +19,11 @@ import (
 type empty struct {
 	Outstanding int
 	Missing     int
+	Failed      int
 }
 
 func (t empty) Error() string {
-	return fmt.Sprintf("empty queue: outstanding requests(%d) - missing requests(%d)", t.Outstanding, t.Missing)
+	return fmt.Sprintf("empty queue: outstanding requests(%d) - missing requests(%d) - failed requests(%d)", t.Outstanding, t.Missing, t.Failed)
 }
 
 func chunksPerPiece(plength, clength int64) int64 {
@@ -90,7 +91,7 @@ func newChunks(clength uint64, m *metainfo.Info, options ...chunkopt) *chunks {
 		panic("chunksize cannot be zero")
 	}
 
-	p := langx.Autoptr(langx.Clone(chunks{
+	p := new(langx.Clone(chunks{
 		chunkstate: chunkstate{
 			meta:        m,
 			pieces:      uint64(m.NumPieces()),
@@ -113,7 +114,6 @@ func newChunks(clength uint64, m *metainfo.Info, options ...chunkopt) *chunks {
 		mu:   &sync.RWMutex{},
 	}, options...))
 
-	// log.Printf("%p - TOTAL LENGTH %d LENGTH %d NUMCHUNKS %d - CHUNK LENGTH %d - PIECE LEGNTH %d\n", p, p.meta.TotalLength(), p.meta.Length, p.cmaximum, p.clength, p.meta.PieceLength)
 	return p
 }
 
@@ -298,7 +298,7 @@ func (t *chunks) peekn(available *roaring.Bitmap, dst []peeked) (int, error) {
 	union.And(t.missing)
 
 	if union.IsEmpty() {
-		return 0, empty{Outstanding: len(t.outstanding), Missing: int(t.missing.GetCardinality())}
+		return 0, empty{Outstanding: len(t.outstanding), Missing: int(t.missing.GetCardinality()), Failed: int(t.failed.GetCardinality())}
 	}
 
 	it := union.Iterator()
@@ -322,7 +322,7 @@ func (t *chunks) peek(available *roaring.Bitmap) (cidx int, req request, err err
 		return -1, request{}, err
 	}
 	if n == 0 {
-		return -1, request{}, empty{Outstanding: len(t.outstanding), Missing: int(t.missing.GetCardinality())}
+		return -1, request{}, empty{Outstanding: len(t.outstanding), Missing: int(t.missing.GetCardinality()), Failed: int(t.failed.GetCardinality())}
 	}
 	return int(buf[0].cidx), buf[0].req, nil
 }
@@ -549,9 +549,15 @@ func (t *chunks) Pop(n int, available *roaring.Bitmap) (reqs []request, err erro
 		return nil, err
 	}
 
+	// stamp the reservation as the chunk becomes outstanding - this is what
+	// reap measures the grace period from. left unset it defaults to the zero
+	// time, which makes every request expired the moment it is created.
+	ts := time.Now()
+
 	reqs = make([]request, filled)
 	for i := range filled {
 		p := dst[i]
+		p.req.Reserved = ts
 		t.outstanding[p.req.Digest] = p.req
 		t.missing.Remove(uint32(p.cidx))
 		reqs[i] = p.req
@@ -575,8 +581,8 @@ func (t *chunks) retry(r request) {
 	cidx := t.requestCID(r)
 
 	delete(t.outstanding, r.Digest)
+	t.unverified.Remove(uint32(cidx))
 	t.missing.AddInt(cidx)
-
 }
 
 func (t *chunks) release(r request) bool {
@@ -599,10 +605,30 @@ func (t *chunks) pend(r request) (changed bool) {
 	return changed
 }
 
+// ChunkOp is a read-only operation against chunks' internal state, run
+// while chunks' lock is held - lets a call site read multiple related
+// fields (e.g. several bitmaps, or a bitmap plus the outstanding map) as
+// one consistent, safely-locked snapshot instead of chaining separate
+// locked accessor calls, or reading a field directly with no lock at all.
+type ChunkOp[T any] func(*chunks) T
+
+func (t *chunks) Read[T any](op ChunkOp[T]) T {
+	t.mu.RLock()
+	defer t.mu.RUnlock()
+	return op(t)
+}
+
 func (t *chunks) Cardinality(a *roaring.Bitmap) int {
 	t.mu.RLock()
 	defer t.mu.RUnlock()
 	return int(a.GetCardinality())
+}
+
+// FailedEmpty reports whether there are currently no known failed chunks.
+func (t *chunks) FailedEmpty() bool {
+	t.mu.RLock()
+	defer t.mu.RUnlock()
+	return t.failed.IsEmpty()
 }
 
 // returns number of pieces that are readable.
@@ -741,17 +767,18 @@ func (t *chunks) Validate(pid uint64) {
 	t.unverified.AddRange(t.Range(pid))
 }
 
-func (t *chunks) Hashed(pid uint64, cause error) {
+func (t *chunks) Hashed(pid uint64, cause error) (completed bool) {
 	if t == nil {
 		panic("chunks should never be nil for hashed function call")
 	}
 
 	if cause == nil {
-		t.Complete(pid)
-		return
+		return t.Complete(pid)
 	}
 
 	t.ChunksFailed(pid)
+
+	return false
 }
 
 func (t *chunks) Complete(pid uint64) (changed bool) {
@@ -768,13 +795,11 @@ func (t *chunks) Complete(pid uint64) (changed bool) {
 		cidx := t.requestCID(r)
 		delete(t.outstanding, r.Digest)
 
-		tmp := t.missing.CheckedRemove(uint32(cidx))
-		tmp = tmp || t.unverified.CheckedRemove(uint32(cidx))
-		changed = changed || tmp
+		t.missing.Remove(uint32(cidx))
+		t.unverified.Remove(uint32(cidx))
 	}
 
-	t.completed.AddInt(int(pid))
-	return changed
+	return t.completed.CheckedAdd(uint32(pid))
 }
 
 // Failed returns the union of the current failures and the provided completed mapping.
@@ -807,7 +832,10 @@ func (t *chunks) ChunksFailed(pid uint64) {
 
 	t.mu.Lock()
 	defer t.mu.Unlock()
-	t.failed.AddRange(t.Range(pid))
+
+	min, max := t.Range(pid)
+	t.unverified.RemoveRange(min, max)
+	t.failed.AddRange(min, max)
 }
 
 func (t *chunks) String() string {
@@ -824,4 +852,24 @@ func (t *chunks) String() string {
 		t.completed.GetCardinality(),
 		t.pieces,
 	)
+}
+
+type copCompletedOutstanding struct{ completed, outstanding int }
+
+func copCompletedOutstandingDebugSnapshot(c *chunks) copCompletedOutstanding {
+	return copCompletedOutstanding{completed: int(c.completed.GetCardinality()), outstanding: len(c.outstanding)}
+}
+
+type copDebugCounts struct {
+	missing, failed, outstanding, unverified, completed int
+}
+
+func copDebugSnapshot(c *chunks) copDebugCounts {
+	return copDebugCounts{
+		missing:     int(c.missing.GetCardinality()),
+		failed:      int(c.failed.GetCardinality()),
+		outstanding: len(c.outstanding),
+		unverified:  int(c.unverified.GetCardinality()),
+		completed:   int(c.completed.GetCardinality()),
+	}
 }

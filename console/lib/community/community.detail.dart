@@ -18,7 +18,7 @@ class CommunityDetail extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
-          spacing: defaults.spacing,
+          mainAxisSize: MainAxisSize.max,
           children: [
             Flexible(
               child: SelectableText(
@@ -34,7 +34,10 @@ class CommunityDetail extends StatelessWidget {
           ],
         ),
         if (community.description.isNotEmpty) Text(community.description, style: theme.textTheme.bodyMedium),
-        ds.Timestamp.iso8601(community.createdAt, leading: Text('Created: ')),
+        ds.Timestamp.iso8601(
+          community.createdAt,
+          leading: Text('Created: ', style: theme.textTheme.bodySmall),
+        ),
       ],
     );
   }

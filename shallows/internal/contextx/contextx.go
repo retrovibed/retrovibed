@@ -64,9 +64,13 @@ func IsCancelled(err error) bool {
 }
 
 func Run(ctx context.Context, op func()) {
+	RunContext(ctx, func(ctx context.Context) { op() })
+}
+
+func RunContext(ctx context.Context, op func(context.Context)) {
 	WaitGroupAdd(ctx, 1)
 	go func() {
 		defer WaitGroupDone(ctx)
-		op()
+		op(ctx)
 	}()
 }

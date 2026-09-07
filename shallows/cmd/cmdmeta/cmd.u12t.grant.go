@@ -3,12 +3,12 @@ package cmdmeta
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/retrovibed/retrovibed/retroapi/authn"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/grpcx"
@@ -62,7 +62,7 @@ func (t U12TGrant) run(ctx context.Context, endpoint string, c *http.Client) (er
 
 	// enable the profile by setting disabled_pending_approval_at to RFC3339 infinity
 	lookup.Profile.DisabledPendingApprovalAt = grpcx.EncodeTime(timex.RFC3339NanoEncode(timex.Inf()))
-	encoded, err := json.Marshal(&metaapi.ProfileUpdateRequest{Profile: lookup.Profile})
+	encoded, err := jsonx.Marshal(&metaapi.ProfileUpdateRequest{Profile: lookup.Profile})
 	if err != nil {
 		return errorsx.Wrap(err, "unable to encode profile update")
 	}
@@ -82,7 +82,7 @@ func (t U12TGrant) run(ctx context.Context, endpoint string, c *http.Client) (er
 		return err
 	}
 
-	encoded, err = json.Marshal(&metaapi.AuthzGrantRequest{
+	encoded, err = jsonx.Marshal(&metaapi.AuthzGrantRequest{
 		Token: &metaapi.Token{
 			LibraryRead:     t.LibraryRead,
 			LibraryModify:   t.LibraryModify,
@@ -93,6 +93,7 @@ func (t U12TGrant) run(ctx context.Context, endpoint string, c *http.Client) (er
 			Usermanagement:  t.Usermanagement,
 		},
 	})
+
 	if err != nil {
 		return errorsx.Wrap(err, "unable to encode authz request")
 	}

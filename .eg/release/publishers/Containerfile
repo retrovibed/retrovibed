@@ -1,0 +1,17 @@
+FROM ubuntu:resolute
+ARG DEBIAN_FRONTEND=noninteractive
+ARG GOBIN=/usr/local/bin
+
+RUN echo "cache buster 53d9b81f-60c7-433c-9b69-687e2a780c22"
+
+RUN apt-get update
+RUN apt-get -y install software-properties-common build-essential ca-certificates curl apt-transport-https git tree
+RUN add-apt-repository -n ppa:longsleep/golang-backports
+RUN add-apt-repository -n ppa:egdaemon/eg
+RUN add-apt-repository -n ppa:jljatone/retrovibed
+
+RUN apt-get update
+RUN apt-get -y install golang-1.27 egworkload retrovibed
+RUN ln -s /usr/lib/go-1.27/bin/go /usr/local/bin/go
+
+CMD /usr/sbin/init

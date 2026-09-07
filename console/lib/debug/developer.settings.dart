@@ -18,55 +18,67 @@ class DeveloperSettings extends StatelessWidget {
       margin: margin,
       constraints: constraints,
       help: ds.Hint(const Text("developer-only feature flags")),
-      Column(
-        children: [
-          Text("Developer Settings", textAlign: TextAlign.center, style: theme.textTheme.titleMedium),
-          forms.Checkbox(
-            const Text('Networking'),
-            description: const Text('Enable networking functionality UX'),
-            value: flags.networking,
-            onChanged: (v) {
-              final s = Login.of(context);
-              s?.setState(() => s.flags = flags.copyWith(networking: v ?? false));
-            },
-          ),
-          forms.Checkbox(
-            const Text('Subscription'),
-            description: const Text('Force enable subscription management UX'),
-            value: flags.subscription,
-            onChanged: (v) {
-              final s = Login.of(context);
-              s?.setState(() => s.flags = flags.copyWith(subscription: v ?? false));
-            },
-          ),
-          forms.Checkbox(
-            const Text('Recommendations'),
-            description: const Text('Toggle recommendations panel'),
-            value: flags.recommendations,
-            onChanged: (v) {
-              final s = Login.of(context);
-              s?.setState(() => s.flags = flags.copyWith(recommendations: v ?? false));
-            },
-          ),
-          forms.Checkbox(
-            const Text('Releases'),
-            description: const Text('Toggle releases panel'),
-            value: flags.releases,
-            onChanged: (v) {
-              final s = Login.of(context);
-              s?.setState(() => s.flags = flags.copyWith(releases: v ?? false));
-            },
-          ),
-          forms.Checkbox(
-            const Text('Debug'),
-            description: const Text('Enable debug-only UX and tuning panels'),
-            value: flags.debug,
-            onChanged: (v) {
-              final s = Login.of(context);
-              s?.setState(() => s.flags = flags.copyWith(debug: v ?? false));
-            },
-          ),
-        ],
+      SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text("Developer Settings", textAlign: TextAlign.center, style: theme.textTheme.titleMedium),
+            forms.Checkbox(
+              const Text('Alpha'),
+              description: const Text('Enable alpha functionality'),
+              value: flags.alpha,
+              onChanged: (v) {
+                final s = Login.of(context);
+                s?.setState(() => s.flags = flags.copyWith(alpha: v ?? false));
+              },
+            ),
+            forms.Checkbox(
+              const Text('Debug'),
+              description: const Text('Enable debug-only UX and tuning panels'),
+              value: flags.debug,
+              onChanged: (v) {
+                final s = Login.of(context);
+                s?.setState(() => s.flags = flags.copyWith(debug: v ?? false));
+              },
+            ),
+            forms.Checkbox(
+              const Text('Networking'),
+              description: const Text('Enable networking functionality UX'),
+              value: flags.networking,
+              onChanged: (v) {
+                final s = Login.of(context);
+                s?.setState(() => s.flags = flags.copyWith(networking: v ?? false));
+              },
+            ),
+            forms.Checkbox(
+              const Text('Subscription'),
+              description: const Text('Force enable subscription management UX'),
+              value: flags.subscription,
+              onChanged: (v) {
+                final s = Login.of(context);
+                s?.setState(() => s.flags = flags.copyWith(subscription: v ?? false));
+              },
+            ),
+            forms.Checkbox(
+              const Text('Recommendations'),
+              description: const Text('Toggle recommendations panel'),
+              value: flags.recommendations,
+              onChanged: (v) {
+                final s = Login.of(context);
+                s?.setState(() => s.flags = flags.copyWith(recommendations: v ?? false));
+              },
+            ),
+            forms.Checkbox(
+              const Text('Releases'),
+              description: const Text('Toggle releases panel'),
+              value: flags.releases,
+              onChanged: (v) {
+                final s = Login.of(context);
+                s?.setState(() => s.flags = flags.copyWith(releases: v ?? false));
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

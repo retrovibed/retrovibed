@@ -1,7 +1,6 @@
 package metaapi_test
 
 import (
-	"encoding/json"
 	"errors"
 	"net/http"
 	"testing"
@@ -10,6 +9,7 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
@@ -51,7 +51,7 @@ func TestHTTPDiagnosticsNetwork(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.NoError(t, httpx.ErrorCode(resp.Result()))
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Equal(t, "Healthy", result.Wireguard.Status)
 		require.Equal(t, "abc123", result.Wireguard.PeerKey)
 		require.NotNil(t, result.Network)
@@ -79,7 +79,7 @@ func TestHTTPDiagnosticsNetwork(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.NoError(t, httpx.ErrorCode(resp.Result()))
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Equal(t, "Inactive", result.Wireguard.Status)
 	})
 
@@ -105,7 +105,7 @@ func TestHTTPDiagnosticsNetwork(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.NoError(t, httpx.ErrorCode(resp.Result()))
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Equal(t, "Inactive", result.Wireguard.Status)
 	})
 
@@ -133,7 +133,7 @@ func TestHTTPDiagnosticsNetwork(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.NoError(t, httpx.ErrorCode(resp.Result()))
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Equal(t, "No Handshake", result.Wireguard.Status)
 	})
 
@@ -166,7 +166,7 @@ func TestHTTPDiagnosticsNetwork(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.NoError(t, httpx.ErrorCode(resp.Result()))
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Equal(t, "Stale Handshake", result.Wireguard.Status)
 	})
 
@@ -199,7 +199,7 @@ func TestHTTPDiagnosticsNetwork(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.NoError(t, httpx.ErrorCode(resp.Result()))
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Equal(t, "Unbalanced Pipe", result.Wireguard.Status)
 	})
 

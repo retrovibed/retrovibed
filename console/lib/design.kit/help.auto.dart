@@ -14,6 +14,12 @@ import 'theme.defaults.dart';
 /// first time this widget is mounted. The [cacheid] key is persisted to disk
 /// so the overlay is never shown again after the first dismissal.
 class HelpAuto extends StatefulWidget {
+  static String _prefix = 'help';
+
+  static fscache.Dir cache() {
+    return fscache.Dir(Directory(p.join(fscache.global().cache, _prefix)));
+  }
+
   final Widget child;
   final Widget title;
   final Widget content;
@@ -34,7 +40,7 @@ class _HelpAutoState extends State<HelpAuto> {
   }
 
   Future<void> _activate() async {
-    final cache = fscache.Dir(Directory(p.join(fscache.global().cache, 'help')));
+    final cache = HelpAuto.cache();
     final alreadyActivated = cache.maybe<bool>(widget.cacheid, () => false);
     if (!alreadyActivated) {
       cache.write<bool>(widget.cacheid, true);

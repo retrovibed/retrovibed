@@ -2,7 +2,6 @@ package ddisc
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -18,6 +17,7 @@ import (
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/retrovibed/retrovibed/retroapi/asynccompute"
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"golang.org/x/time/rate"
@@ -358,7 +358,7 @@ func (t *peerTubeStrategy) search(ctx context.Context, category, query string, a
 		}
 
 		var resp peerTubeSearchResponse
-		if err := json.Unmarshal(body, &resp); err != nil {
+		if err := jsonx.Unmarshal(body, &resp); err != nil {
 			return fmt.Errorf("failed to parse search results: %w", err)
 		}
 
@@ -391,7 +391,7 @@ func (t *peerTubeStrategy) resolveRow(ctx context.Context, category string, row 
 	}
 
 	var video peerTubeVideoResponse
-	if err := json.Unmarshal(body, &video); err != nil {
+	if err := jsonx.Unmarshal(body, &video); err != nil {
 		return Discovered{}, false, err
 	}
 

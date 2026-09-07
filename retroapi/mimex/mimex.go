@@ -24,6 +24,7 @@ const (
 	RetrovibedNeural          = "application/vnd.retrovibed.neural"
 	RetrovibedMetaBackup      = "application/vnd.retrovibed.meta.backup"             // an encrypted duckdb snapshot of meta.db.
 	RetrovibedDiscoverySearch = "application/vnd.retrovibed.discovery.search.module" // a discovery search module.
+	RetrovibedPublishModule   = "application/vnd.retrovibed.publish.module"          // a social publishing module.
 	RetrovibedDiscoveryAudio  = "application/vnd.retrovibed.discovery.audio"         // generic audio only mimetype, contextually similar to music + podcasts + audio only formats.
 	RetrovibedDiscoveryVideo  = "application/vnd.retrovibed.discovery.video"         // generic video mimetype, contextually similar to combined movies + tv and other video formats.
 	RetrovibedDiscoveryMusic  = "application/vnd.retrovibed.discovery.music"

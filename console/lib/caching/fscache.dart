@@ -4,6 +4,7 @@ import 'package:crypto/crypto.dart';
 import 'package:path/path.dart' as path;
 
 import 'caching.dart';
+import 'dirs.dart';
 
 /// Filesystem-backed cache with no TTL. Entries persist until [clear] is called.
 ///
@@ -12,6 +13,7 @@ import 'caching.dart';
 ///   final v = c.maybe<bool>('my-key', () => false);
 ///   c.clear();
 class Dir {
+  static Dir cacheroot = Dir(Directory(global().cache));
   final Directory dir;
   final Codec codec;
 
@@ -20,7 +22,7 @@ class Dir {
   /// Returns the cached value for [key] if present, otherwise calls [fn],
   /// persists the result to disk, and returns it.
   T maybe<T>(String key, T Function() fn) {
-    final file = File(path.join(dir.path, _keyfile(key)));
+    final file = pathFor(key);
 
     if (file.existsSync()) {
       try {
@@ -44,11 +46,17 @@ class Dir {
 
   /// Writes [v] to the cache under [key], overwriting any existing entry.
   T write<T>(String key, T v) {
-    final file = File(path.join(dir.path, _keyfile(key)));
+    final file = pathFor(key);
     dir.createSync(recursive: true);
     file.writeAsBytesSync(codec.encode(v));
     return v;
   }
+
+  /// Returns the file backing [key], whether or not it has been written yet.
+  /// Callers that need the raw file instead of a decoded value should derive
+  /// it from here; reimplementing the key derivation lets the read and write
+  /// paths drift onto different files.
+  File pathFor(String key) => File(path.join(dir.path, _keyfile(key)));
 
   /// Removes all cached entries by deleting and recreating the cache directory.
   void clear() {

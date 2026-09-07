@@ -7,6 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/james-lawrence/torrent/storage"
+	"github.com/james-lawrence/torrent/torrenttestx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
@@ -16,7 +17,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
-	"github.com/retrovibed/retrovibed/shallows/internal/torrenttestx"
 	"github.com/retrovibed/retrovibed/shallows/media"
 	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/retrovibed/retrovibed/shallows/metaapi"
@@ -83,6 +83,7 @@ func TestDiscoveredDelete(t *testing.T) {
 		require.NoError(t, tracking.MetadataFindByID(t.Context(), q, tmd.ID).Scan(&latest))
 		assert.EqualValues(t, tmd.Bytes, latest.Bytes)
 		assert.EqualValues(t, 0, latest.Downloaded)
+		assert.EqualValues(t, 0, latest.Available)
 		assert.EqualValues(t, 0, latest.Uploaded)
 		assert.EqualValues(t, tmd.Archivable, tmd.Archivable)
 		assert.WithinDuration(t, tmd.CreatedAt, latest.CreatedAt, 0)

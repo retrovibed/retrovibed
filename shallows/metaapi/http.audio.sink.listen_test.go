@@ -16,7 +16,9 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/audiox"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
+	"github.com/retrovibed/retrovibed/shallows/internal/websocketx"
 	"github.com/retrovibed/retrovibed/shallows/metaapi"
 	"github.com/stretchr/testify/require"
 )
@@ -114,5 +116,37 @@ func TestHTTPAudioSinkListen(t *testing.T) {
 
 		_, _, err = c.Read(ctx)
 		require.Error(t, err)
+	})
+
+	t.Run("unrecoverable list error", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		routes := mux.NewRouter()
+		metaapi.NewHTTPAudioSink(
+			metaapi.HTTPAudioSinkOptionSinker(&fakeAudioSinker{
+				sinksErr: errorsx.NewUnrecoverable(errors.New("pulseaudio unreachable")),
+			}),
+			metaapi.HTTPAudioSinkOptionSupported(true),
+			metaapi.HTTPAudioSinkOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+		).Bind(routes.PathPrefix("/").Subrouter())
+
+		claims := jwtx.NewJWTClaims(testx.Must(uuid.NewV4())(t).String(), jwtx.ClaimsOptionAuthnExpiration())
+		token := httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)
+
+		server := httptest.NewServer(routes)
+		defer server.Close()
+
+		wsURL := fmt.Sprintf("ws://%s/", server.Listener.Addr().String())
+		c, _, err := websocket.Dial(ctx, wsURL, &websocket.DialOptions{
+			HTTPHeader: http.Header{
+				"Authorization": []string{fmt.Sprintf("Bearer %s", token)},
+			},
+		})
+		require.NoError(t, err)
+		defer c.Close(websocket.StatusNormalClosure, "") //nolint: errcheck
+
+		_, _, err = c.Read(ctx)
+		require.Equal(t, websocketx.PrivateStatus(http.StatusServiceUnavailable), websocket.CloseStatus(err))
 	})
 }

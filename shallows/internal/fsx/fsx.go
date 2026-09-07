@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/retrovibed/retrovibed/shallows/internal/debugx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -207,6 +208,87 @@ func PrintFS(d fs.FS) {
 	})
 	if err != nil {
 		errorsx.Log(log.Output(2, fmt.Sprintln("fs walk failed", err)))
+	}
+}
+
+// PrintPath prints the details of the file at the provided path. symlinks are
+// described by the link itself and by whatever it resolves to.
+func PrintPath(path string) {
+	log.Println("file info", path)
+	printpath(2, maxsymlinkdepth, path, "")
+}
+
+// maxsymlinkdepth caps how many symlinks PrintPath will follow.
+const maxsymlinkdepth = 8
+
+func printpath(depth int, remaining int, path string, prefix string) {
+	printf := func(format string, args ...any) {
+		errorsx.Log(log.Output(depth+2, prefix+fmt.Sprintf(format, args...)))
+	}
+
+	info, err := os.Lstat(path)
+	if os.IsNotExist(err) {
+		printf("%s: does not exist\n", path)
+		return
+	}
+	if err != nil {
+		printf("%s: unable to stat: %v\n", path, err)
+		return
+	}
+
+	m := info.Mode()
+	printf("%s: %s\n", path, describe(m))
+	printf("\tmode: %v (%#o)\n", m, m.Perm())
+	printf("\tsize: %d\n", info.Size())
+	printf("\tmodified: %s\n", info.ModTime().Format(time.RFC3339Nano))
+
+	if created, ok := ctime(info); ok {
+		printf("\tchanged: %s\n", created.Format(time.RFC3339Nano))
+	}
+
+	if m&os.ModeSymlink == 0 {
+		return
+	}
+
+	dst, err := os.Readlink(path)
+	if err != nil {
+		printf("\tlink: unable to read: %v\n", err)
+		return
+	}
+
+	printf("\tlink: -> %s\n", dst)
+
+	if remaining <= 0 {
+		printf("\tlink: not followed, exceeded %d symlinks\n", maxsymlinkdepth)
+		return
+	}
+
+	if !filepath.IsAbs(dst) {
+		dst = filepath.Join(filepath.Dir(path), dst)
+	}
+
+	printpath(depth+1, remaining-1, dst, prefix+"\t")
+}
+
+// describe returns a human readable description of the file type.
+func describe(m fs.FileMode) string {
+	switch {
+	case m&os.ModeSymlink != 0:
+		return "symlink"
+	case m.IsDir():
+		return "directory"
+	case m&os.ModeNamedPipe != 0:
+		return "named pipe"
+	case m&os.ModeSocket != 0:
+		return "socket"
+	case m&os.ModeDevice != 0:
+		return "device"
+	case m&os.ModeCharDevice != 0:
+		return "character device"
+	case m.IsRegular():
+		return "regular file"
+	default:
+		return "irregular file"
 	}
 }
 

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -6,6 +8,21 @@ import 'package:retrovibed/library.dart' as lib;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
+
+Future<lib.RecentSearchResponse> Function(
+  lib.RecentSearchRequest req, {
+  String? host,
+  List<httpx.Option> options,
+})
+_loading(Future<lib.RecentSearchResponse> pending) {
+  return (
+    lib.RecentSearchRequest req, {
+    String? host,
+    List<httpx.Option> options = const [],
+  }) {
+    return pending;
+  };
+}
 
 Future<lib.RecentSearchResponse> _notimplemented(
   lib.RecentSearchRequest req, {
@@ -28,9 +45,11 @@ Future<lib.RecentSearchResponse> _empty(
 void main() {
   group('Recent', () {
     testWidgets('displays loading state initially', (tester) async {
-      await tester.pumpApp(Recent(mimex.video, latest: _notimplemented));
+      final c = Completer<lib.RecentSearchResponse>();
+      await tester.pumpApp(Recent(mimex.video, latest: _loading(c.future)));
       await tester.pump();
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      c.complete(lib.RecentSearchResponse(items: []));
       await tester.pumpAndSettle();
       expect(find.text('Continue'), findsOneWidget);
     });

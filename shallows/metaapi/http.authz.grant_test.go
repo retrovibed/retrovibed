@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/gorilla/mux"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
@@ -91,7 +92,7 @@ func TestHTTPAuthzGrant(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.NoError(t, httpx.ErrorCode(resp.Result()))
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.False(t, result.Token.Usermanagement)
 		require.False(t, result.Token.RemoteControl)
 
@@ -101,7 +102,7 @@ func TestHTTPAuthzGrant(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.NoError(t, httpx.ErrorCode(resp.Result()))
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.True(t, result.Token.Usermanagement)
 		require.True(t, result.Token.RemoteControl)
 	})
@@ -151,9 +152,12 @@ func TestHTTPAuthzGrant(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.NoError(t, httpx.ErrorCode(resp.Result()))
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.True(t, result.Token.Usermanagement)
 		require.True(t, result.Token.RemoteControl)
+
+		// reset for next pass.
+		result = metaapi.AuthzGrantResponse{}
 
 		// second grant against the same profile: takes the ON CONFLICT DO UPDATE
 		// path. Every field granted above must actually flip, not silently keep
@@ -171,7 +175,7 @@ func TestHTTPAuthzGrant(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.NoError(t, httpx.ErrorCode(resp.Result()))
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.False(t, result.Token.Usermanagement)
 		require.False(t, result.Token.RemoteControl)
 	})

@@ -1,7 +1,6 @@
 package media
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 
@@ -10,6 +9,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
 	"github.com/retrovibed/retrovibed/retroapi/httpauth"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
@@ -126,7 +126,7 @@ func (t *HTTPRSSFeed) create(w http.ResponseWriter, r *http.Request) {
 		req = rss.FeedCreateRequest{}
 	)
 
-	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
+	if err = jsonx.UnmarshalRead(r.Body, &req); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to decode request"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return

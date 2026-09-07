@@ -9,6 +9,7 @@ import 'package:retrovibed/profiles.dart' as profiles;
 import 'package:retrovibed/rss.dart' as rss;
 import 'package:retrovibed/wireguard.dart' as wireguard;
 import 'package:retrovibed/ddisc/plugin.dart' as ddiscplugin;
+import 'package:retrovibed/community/publisher.dart' as publishplugin;
 import 'package:retrovibed/google.dart' as google;
 import 'package:retrovibed/usermanagement.dart' as usermanagement;
 import 'package:retrovibed/debug.dart' as debug;
@@ -128,7 +129,19 @@ class _DisplayState extends State<Display> {
               borderRadius: defaults.borderRadius,
               color: theme.colorScheme.surface,
             ),
-            SingleChildScrollView(child: w),
+            // ensure the single child scroll view exposes maximum vertical space.
+            SizedBox.expand(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints: constraints,
+                      child: w,
+                    ),
+                  );
+                },
+              ),
+            ),
           ),
         );
       }),
@@ -224,6 +237,10 @@ class _DisplayState extends State<Display> {
                               margin: EdgeInsets.zero,
                             ),
                             ddiscplugin.Card(
+                              onPressed: full,
+                              margin: EdgeInsets.zero,
+                            ),
+                            publishplugin.Card(
                               onPressed: full,
                               margin: EdgeInsets.zero,
                             ),

@@ -3,17 +3,17 @@ package ddiscapi
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 )
 
 // LocateCreate submits a locate request on the given library endpoint.
 func LocateCreate(ctx context.Context, c *http.Client, endpoint string, req *LocateCreateRequest) (resp *LocateCreateResponse, err error) {
-	encoded, err := json.Marshal(req)
+	encoded, err := jsonx.Marshal(req)
 	if err != nil {
 		return nil, errorsx.Wrap(err, "unable to encode request")
 	}

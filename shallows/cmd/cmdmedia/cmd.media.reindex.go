@@ -32,10 +32,12 @@ func (t reindex) Run(gctx *cmdopts.Global) (err error) {
 	}
 	defer db.Close()
 
-	return t.run(gctx.Context, db, fsx.DirVirtual(env.MediaDir()))
+	cleaner := library.NewQueryerCleanerAuto()
+
+	return t.run(gctx.Context, db, cleaner, fsx.DirVirtual(env.MediaDir()))
 }
 
-func (t reindex) run(ctx context.Context, db *sql.DB, mediastore fsx.Virtual) (err error) {
+func (t reindex) run(ctx context.Context, db *sql.DB, c library.QueryCleaner, mediastore fsx.Virtual) (err error) {
 	var (
 		missing squirrel.Sqlizer = squirrelx.Noop{}
 	)
@@ -84,6 +86,8 @@ func (t reindex) run(ctx context.Context, db *sql.DB, mediastore fsx.Virtual) (e
 		_, desc, auto := tracking.GenerateDescription(finfo.Path, &tmd)
 		log.Println("resetting description", md.ID, md.Description, "->", desc)
 		log.Println("resetting autodescription", md.ID, md.AutoDescription, "->", auto)
+		log.Println("neural result", desc, "->", errorsx.Zero(c.Clean(ctx, desc)))
+
 		if t.DryRun {
 			continue
 		}

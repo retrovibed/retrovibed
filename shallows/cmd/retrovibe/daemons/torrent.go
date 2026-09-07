@@ -3,7 +3,6 @@ package daemons
 import (
 	"context"
 	"database/sql"
-	"encoding/json"
 	"log"
 	"math"
 	"net"
@@ -26,6 +25,7 @@ import (
 	"github.com/james-lawrence/torrent/dht/krpc"
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/retrovibed/retrovibed/retroapi/backoffx"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/netmonx"
 	retronetx "github.com/retrovibed/retrovibed/retroapi/netx"
 	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
@@ -147,7 +147,7 @@ type _torrenting struct {
 
 func (t _torrenting) loadcfg(path string, v proto.Message) error {
 	encoded, err := fsx.AutoCached(path, func() ([]byte, error) {
-		return json.Marshal(v)
+		return jsonx.Marshal(v)
 	})
 	if err != nil {
 		return err
@@ -157,7 +157,7 @@ func (t _torrenting) loadcfg(path string, v proto.Message) error {
 		d = proto.Clone(v)
 	)
 
-	if err = json.Unmarshal(encoded, d); err != nil {
+	if err = jsonx.Unmarshal(encoded, d); err != nil {
 		return err
 	}
 

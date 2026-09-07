@@ -1,7 +1,6 @@
 package metaapi_test
 
 import (
-	"encoding/json"
 	"net/http"
 	"net/url"
 	"testing"
@@ -11,6 +10,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/authn"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
@@ -87,7 +87,7 @@ func TestHTTPSSORegister(t *testing.T) {
 		routes.ServeHTTP(w, r)
 
 		require.NoError(t, httpx.ErrorCode(w.Result()))
-		require.NoError(t, json.NewDecoder(w.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(w.Body, &result))
 
 		_, err = jwt.ParseWithClaims(result.AccessToken, &claims, func(t *jwt.Token) (interface{}, error) {
 			return authn.JWTRegistrationSecretFromEnv(env.JWTSecret)(), nil

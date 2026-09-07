@@ -23,24 +23,58 @@ message CommunityPublisher {
 
 message CommunitySocial {
   Community community = 1 [ json_name = "community" ];
-  repeated CommunityPublisher enabled = 2 [ json_name = "enabled" ];
+  repeated CommunityPublisher publishers = 1000 [ json_name = "publishers" ];
 }
 
 message SocialsSearchRequest {
   string query = 1 [ json_name = "query" ];
-  reserved 2 to 899;
+  reserved 3 to 899;
   uint64 offset = 900 [ json_name = "offset" ];
   uint64 limit = 901 [ json_name = "limit" ];
   reserved 902 to 999;
+  repeated string communities = 1000
+      [ json_name = "communities" ]; // empty for all.
 }
 
 message SocialsSearchResponse {
   SocialsSearchRequest next = 1 [ json_name = "next" ];
   repeated CommunitySocial items = 2 [ json_name = "items" ];
-  repeated PluginPublisher catalog = 3 [ json_name = "catalog" ];
+}
+
+message PluginPublisherSearchRequest {
+  string query = 1 [ json_name = "query" ];
+  reserved 2 to 899;
+  uint64 offset = 900 [ json_name = "offset" ];
+  uint64 limit = 901 [ json_name = "limit" ];
+  reserved 902 to 999;
+  // publishers to leave out - what a community has already attached.
+  repeated string excluded = 1000 [ json_name = "excluded" ];
+}
+
+message PluginPublisherSearchResponse {
+  PluginPublisherSearchRequest next = 1 [ json_name = "next" ];
+  repeated PluginPublisher items = 2 [ json_name = "items" ];
 }
 
 message PluginPublisherCreateResponse {
+  PluginPublisher publisher = 1 [ json_name = "publisher" ];
+}
+
+message PluginPublisherFindResponse {
+  PluginPublisher publisher = 1 [ json_name = "publisher" ];
+}
+
+message PluginPublisherUpdateRequest {
+  PluginPublisher publisher = 1 [ json_name = "publisher" ];
+}
+
+message PluginPublisherUpdateResponse {
+  PluginPublisher publisher = 1 [ json_name = "publisher" ];
+}
+
+// the clone of a publisher is the same module under a second identity, so the
+// request carries nothing beyond the id in the path.
+message PluginPublisherCloneResponse {
   PluginPublisher publisher = 1 [ json_name = "publisher" ];
 }
 

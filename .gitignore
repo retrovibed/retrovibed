@@ -15,3 +15,4 @@ dist/*
 # FVM Version Cache
 .fvm/
 retroapi/searchplugin-noop
+console/coverage/lcov.info

@@ -2,7 +2,6 @@ package cmdcommunity
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"io"
 	"iter"
@@ -11,6 +10,7 @@ import (
 
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/community"
@@ -83,7 +83,7 @@ func (t cmdCommunityPublish) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClien
 
 	if stringsx.Blank(t.Name) {
 		debugx.Println("reading community from stdin")
-		if err := json.NewDecoder(os.Stdin).Decode(&com); err != nil {
+		if err := jsonx.UnmarshalRead(os.Stdin, &com); err != nil {
 			return err
 		}
 	} else {
@@ -118,7 +118,7 @@ func (t cmdCommunityPublish) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClien
 		return err
 	}
 
-	if err = json.NewEncoder(os.Stdout).Encode(uploaded.Community); err != nil {
+	if err = jsonx.MarshalWrite(os.Stdout, uploaded.Community); err != nil {
 		return errorsx.Wrap(err, "unable to write to uploaded")
 	}
 

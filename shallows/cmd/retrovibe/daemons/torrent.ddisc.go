@@ -130,5 +130,19 @@ func DiscoverMedia(ctx context.Context, db sqlx.Queryer, dhts *dht.Server, tclie
 		}
 	}
 
-	return asynccompute.Shutdown(ctx, identifyone)
+	// the loop above only ever exits because ctx was cancelled, and Shutdown
+	// gives up the moment the context it is handed is done - so draining with
+	// ctx here returns instantly and leaves in flight identifications running,
+	// still stopping torrents (and writing their bitmaps into the client's
+	// cache directory) well after DiscoverMedia reported itself finished.
+	// drain against a live context instead so a caller waiting on this
+	// function actually observes quiesced workers, bounded so a wedged
+	// identification can't hold shutdown open forever. individual workload
+	// failures are already logged and pushed into cooldown by newIdentifyOne,
+	// so they aren't reported as a daemon failure on a routine shutdown.
+	dctx, done := context.WithTimeout(context.Background(), time.Minute)
+	defer done()
+	errorsx.Log(asynccompute.Shutdown(dctx, identifyone))
+
+	return nil
 }

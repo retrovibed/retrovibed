@@ -1,7 +1,6 @@
 package media_test
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"testing"
@@ -9,6 +8,8 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/james-lawrence/torrent/storage"
+	"github.com/james-lawrence/torrent/torrenttestx"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
@@ -20,7 +21,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
-	"github.com/retrovibed/retrovibed/shallows/internal/torrenttestx"
 	"github.com/retrovibed/retrovibed/shallows/media"
 	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/retrovibed/retrovibed/shallows/metaapi"
@@ -162,7 +162,7 @@ func TestDiscoveredSearch(t *testing.T) {
 
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
 
-		err = json.NewDecoder(resp.Result().Body).Decode(&result)
+		err = jsonx.UnmarshalRead(resp.Result().Body, &result)
 		require.NoError(t, err)
 
 		require.Len(t, result.Items, 1, "Expected 1 items in the search results")
@@ -231,7 +231,7 @@ func TestDiscoveredSearch(t *testing.T) {
 
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
 
-		err = json.NewDecoder(resp.Result().Body).Decode(&result)
+		err = jsonx.UnmarshalRead(resp.Result().Body, &result)
 		require.NoError(t, err)
 
 		require.Len(t, result.Items, 1, "Expected only 1 incomplete metadata item in the search results")
@@ -302,7 +302,7 @@ func TestDiscoveredSearch(t *testing.T) {
 
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
 
-		err = json.NewDecoder(resp.Result().Body).Decode(&result)
+		err = jsonx.UnmarshalRead(resp.Result().Body, &result)
 		require.NoError(t, err)
 
 		require.Len(t, result.Items, 1, "Expected only the visible item in search results")
@@ -342,8 +342,9 @@ func TestDiscoveredSearch(t *testing.T) {
 			tracking.MetadataOptionBytes(100),
 		))
 		require.NoError(t, tracking.MetadataInsertWithDefaults(ctx, q, mdCompleted).Scan(&mdCompleted))
-		require.NoError(t, tracking.MetadataCompleteByID(ctx, q, mdCompleted.ID, 0, mdCompleted.Bytes, mdCompleted.Bytes, 0).Scan(&mdCompleted))
+		require.NoError(t, tracking.MetadataCompleteByID(ctx, q, mdCompleted.ID, 0, mdCompleted.Bytes, mdCompleted.Bytes, 0, mdCompleted.Bytes).Scan(&mdCompleted))
 		require.EqualValues(t, mdCompleted.Bytes, mdCompleted.Downloaded)
+		require.EqualValues(t, mdCompleted.Bytes, mdCompleted.Available)
 		require.WithinDuration(t, time.Now(), mdCompleted.CompletedAt, time.Second)
 
 		vfs := fsx.DirVirtual(t.TempDir())
@@ -379,7 +380,7 @@ func TestDiscoveredSearch(t *testing.T) {
 
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
 
-		err = json.NewDecoder(resp.Result().Body).Decode(&result)
+		err = jsonx.UnmarshalRead(resp.Result().Body, &result)
 		require.NoError(t, err)
 
 		require.Len(t, result.Items, 1, "Expected only 1 incomplete metadata item in the search results")
@@ -449,7 +450,7 @@ func TestDiscoveredSearch(t *testing.T) {
 
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
 
-		err = json.NewDecoder(resp.Result().Body).Decode(&result)
+		err = jsonx.UnmarshalRead(resp.Result().Body, &result)
 		require.NoError(t, err)
 
 		require.Len(t, result.Items, 1, "Expected only the hidden item in search results")

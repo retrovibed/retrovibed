@@ -7,30 +7,23 @@ import 'package:retrovibed/langcodex.dart' as langcodex;
 import '../media/media.known.pb.dart' as known;
 
 class Recommendations extends StatefulWidget {
-  const Recommendations(this.mimetype, {super.key, this.latest = lib.recommendations.latest});
+  const Recommendations(
+    this.mimetype, {
+    super.key,
+    this.apilatest = lib.recommendations.latest,
+    this.apirefresh = lib.recommendations.refresh,
+  });
 
   final String mimetype;
-  final lib.FnRecommendations latest;
+  final lib.FnRecommendations apilatest;
+  final lib.FnRecommendationsRequest apirefresh;
 
   @override
   State<Recommendations> createState() => _RecommendationsState();
 }
 
-class _RecommendationsState extends State<Recommendations> {
-  Widget _cause = ds.Error.zero;
-  bool _loading = true;
+class _RecommendationsState extends State<Recommendations> with ds.LoadingState {
   List<known.Known> _items = [];
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
-
-  void reseterr() {
-    setState(() {
-      _cause = ds.Error.zero;
-    });
-  }
 
   @override
   void initState() {
@@ -47,11 +40,11 @@ class _RecommendationsState extends State<Recommendations> {
   }
 
   Future<void> _load() async {
-    setState(() => _loading = true);
+    setState(() => loading = true);
     final auth = authn.request(authn.AuthzCache.meta(context));
     return httpx
         .withRetry(
-          () => widget.latest(
+          () => widget.apilatest(
             lib.recommendations.request(
               mimetype: widget.mimetype,
               language: langcodex.locale().languageCode,
@@ -63,24 +56,24 @@ class _RecommendationsState extends State<Recommendations> {
         .then(
           (resp) => setState(() {
             _items = resp.items.toList();
-            _loading = false;
+            loading = false;
           }),
         )
         .catchError((cause) {
           setState(() {
-            _loading = false;
+            loading = false;
           });
         }, test: httpx.ErrorsTest.notimplemented)
         .catchError((cause) {
           setState(() {
-            _cause = ds.Errors.httpauto(cause, onTap: reseterr);
-            _loading = false;
+            this.cause = ds.Errors.httpauto(cause, onTap: reseterr);
+            loading = false;
           });
         }, test: httpx.ErrorsTest.httpauto)
         .catchError((e) {
           setState(() {
-            _cause = ds.Error.unknown(e, onTap: reseterr);
-            _loading = false;
+            this.cause = ds.Error.unknown(e, onTap: reseterr);
+            loading = false;
           });
         });
   }
@@ -94,25 +87,26 @@ class _RecommendationsState extends State<Recommendations> {
             const Text('Recommendations'),
             Spacer(),
             ds.LoadingIconButton.refresh(
-              help: ds.Hint(const Text("generate a new (random) recommendation")),
+              help: ds.Hint(const Text("kick off a new recommendation cycle")),
               onPressed: () {
                 return httpx
                     .withRetry(
-                      () => lib.recommendations.random(
-                        lib.RecommendationSearchRequest(
+                      () => widget.apirefresh(
+                        lib.RecommendationRefreshRequest(
                           mimetype: widget.mimetype,
                           language: langcodex.locale().languageCode,
                           adult: false,
+                          limit: ds.Int64(5),
                         ),
                         options: [authn.request(authn.AuthzCache.meta(context))],
                       ),
                     )
+                    .then((_) => _load())
                     .catchError((cause) {
                       setState(() {
-                        _cause = ds.Errors.httpauto(cause, onTap: reseterr);
+                        this.cause = ds.Errors.httpauto(cause, onTap: reseterr);
                       });
-                    }, test: httpx.ErrorsTest.httpauto)
-                    .then((_) => _load());
+                    }, test: httpx.ErrorsTest.httpauto);
               },
             ),
           ],
@@ -161,8 +155,8 @@ class _RecommendationsState extends State<Recommendations> {
               ),
             )
             .toList(),
-        loading: _loading,
-        cause: _cause,
+        loading: loading,
+        cause: cause,
       ),
       onPress: _load,
     );

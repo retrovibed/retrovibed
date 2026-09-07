@@ -3,12 +3,12 @@ package cmdmeta
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/retrovibed/retrovibed/retroapi/authn"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
@@ -75,7 +75,7 @@ func (t DeviceAdd) checkReachable(ctx context.Context, tls *cmdopts.TLSConfig, s
 }
 
 func (t DeviceAdd) run(ctx context.Context, endpoint string, c *http.Client) (err error) {
-	encoded, err := json.Marshal(&metaapi.DaemonCreateRequest{
+	encoded, err := jsonx.Marshal(&metaapi.DaemonCreateRequest{
 		Daemon: &metaapi.Daemon{
 			Hostname:    t.Hostname,
 			Description: t.Description,
@@ -83,6 +83,7 @@ func (t DeviceAdd) run(ctx context.Context, endpoint string, c *http.Client) (er
 			Downloads:   t.Downloads,
 		},
 	})
+
 	if err != nil {
 		return errorsx.Wrap(err, "unable to encode request")
 	}

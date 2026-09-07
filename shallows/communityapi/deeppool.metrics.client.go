@@ -2,13 +2,13 @@ package communityapi
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http"
 
 	"github.com/retrovibed/retrovibed/retroapi/env"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 )
 
@@ -42,7 +42,7 @@ func (t Metrics) Sync(ctx context.Context, communityID string) (*MetricsSyncResp
 	}
 	defer resp.Body.Close()
 
-	if err = json.NewDecoder(resp.Body).Decode(&msg); err != nil {
+	if err = jsonx.UnmarshalRead(resp.Body, &msg); err != nil {
 		return nil, err
 	}
 
@@ -64,7 +64,7 @@ func (t Metrics) Publish(ctx context.Context, content *PublishContentRequest, to
 			return lerr
 		}
 
-		if lerr = json.NewEncoder(metadata).Encode(content); lerr != nil {
+		if lerr = jsonx.MarshalWrite(metadata, content); lerr != nil {
 			return lerr
 		}
 
@@ -95,7 +95,7 @@ func (t Metrics) Publish(ctx context.Context, content *PublishContentRequest, to
 	}
 	defer resp.Body.Close()
 
-	if err = json.NewDecoder(resp.Body).Decode(&msg); err != nil {
+	if err = jsonx.UnmarshalRead(resp.Body, &msg); err != nil {
 		return nil, err
 	}
 

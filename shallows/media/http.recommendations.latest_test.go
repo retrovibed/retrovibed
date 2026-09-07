@@ -1,13 +1,13 @@
 package media_test
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"testing"
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
@@ -15,6 +15,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
+	"github.com/retrovibed/retrovibed/shallows/internal/pqueuetestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/retrovibed/retrovibed/shallows/media"
@@ -33,6 +34,7 @@ func TestRecommendationsLatest(t *testing.T) {
 		defer done()
 
 		q := sqltestx.Metadatabase(t)
+		w := pqueuetestx.NewQueue()
 
 		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
 		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
@@ -40,7 +42,7 @@ func TestRecommendationsLatest(t *testing.T) {
 		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, authz).Scan(&authz))
 
 		routes := mux.NewRouter()
-		media.NewHTTPRecommendations(q, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
+		media.NewHTTPRecommendations(q, w, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
@@ -53,7 +55,7 @@ func TestRecommendationsLatest(t *testing.T) {
 
 		var result media.RecommendationSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Empty(t, result.Items)
 	})
 
@@ -66,6 +68,7 @@ func TestRecommendationsLatest(t *testing.T) {
 		defer done()
 
 		q := sqltestx.Metadatabase(t)
+		w := pqueuetestx.NewQueue()
 
 		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
 		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
@@ -83,7 +86,7 @@ func TestRecommendationsLatest(t *testing.T) {
 		}
 
 		routes := mux.NewRouter()
-		media.NewHTTPRecommendations(q, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
+		media.NewHTTPRecommendations(q, w, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
@@ -96,7 +99,7 @@ func TestRecommendationsLatest(t *testing.T) {
 
 		var result media.RecommendationSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Len(t, result.Items, 3)
 	})
 
@@ -109,6 +112,7 @@ func TestRecommendationsLatest(t *testing.T) {
 		defer done()
 
 		q := sqltestx.Metadatabase(t)
+		w := pqueuetestx.NewQueue()
 
 		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
 		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
@@ -126,7 +130,7 @@ func TestRecommendationsLatest(t *testing.T) {
 		require.NoError(t, library.RecommendationInsertWithDefaults(ctx, q, rec).Scan(&rec))
 
 		routes := mux.NewRouter()
-		media.NewHTTPRecommendations(q, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
+		media.NewHTTPRecommendations(q, w, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
@@ -139,7 +143,7 @@ func TestRecommendationsLatest(t *testing.T) {
 
 		var result media.RecommendationSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Len(t, result.Items, 1)
 	})
 
@@ -152,6 +156,7 @@ func TestRecommendationsLatest(t *testing.T) {
 		defer done()
 
 		q := sqltestx.Metadatabase(t)
+		w := pqueuetestx.NewQueue()
 
 		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
 		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
@@ -169,7 +174,7 @@ func TestRecommendationsLatest(t *testing.T) {
 		require.NoError(t, library.RecommendationInsertWithDefaults(ctx, q, rec).Scan(&rec))
 
 		routes := mux.NewRouter()
-		media.NewHTTPRecommendations(q, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
+		media.NewHTTPRecommendations(q, w, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
@@ -182,7 +187,7 @@ func TestRecommendationsLatest(t *testing.T) {
 
 		var result media.RecommendationSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Empty(t, result.Items)
 	})
 
@@ -195,6 +200,7 @@ func TestRecommendationsLatest(t *testing.T) {
 		defer done()
 
 		q := sqltestx.Metadatabase(t)
+		w := pqueuetestx.NewQueue()
 
 		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
 		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
@@ -226,7 +232,7 @@ func TestRecommendationsLatest(t *testing.T) {
 		}
 
 		routes := mux.NewRouter()
-		media.NewHTTPRecommendations(q, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
+		media.NewHTTPRecommendations(q, w, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
@@ -245,7 +251,7 @@ func TestRecommendationsLatest(t *testing.T) {
 
 		var result media.RecommendationSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Len(t, result.Items, 3)
 		for _, item := range result.Items {
 			require.Equal(t, mimex.Video, item.Mimetype)
@@ -261,6 +267,7 @@ func TestRecommendationsLatest(t *testing.T) {
 		defer done()
 
 		q := sqltestx.Metadatabase(t)
+		w := pqueuetestx.NewQueue()
 
 		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
 		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
@@ -292,7 +299,7 @@ func TestRecommendationsLatest(t *testing.T) {
 		}
 
 		routes := mux.NewRouter()
-		media.NewHTTPRecommendations(q, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
+		media.NewHTTPRecommendations(q, w, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
@@ -305,7 +312,7 @@ func TestRecommendationsLatest(t *testing.T) {
 
 		var result media.RecommendationSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Len(t, result.Items, 4)
 	})
 }

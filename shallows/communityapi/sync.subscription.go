@@ -51,6 +51,7 @@ func SyncPublishedContentItem(ctx context.Context, q sqlx.Queryer, pc *Published
 		tracking.MetadataOptionDescription(md.DisplayName),
 		tracking.MetadataOptionKnownMediaID(stringsx.FirstNonBlank(pc.KnownMediaId, uuid.Max.String())),
 		tracking.MetadataOptionEntropySeed(md.InfoHash.Bytes()),
+		tracking.MetadataOptionMimetype(pc.Mimetype),
 		tracking.MetadataOptionAutoDescription,
 		tracking.MetadataOptionAutoHidden,
 	)

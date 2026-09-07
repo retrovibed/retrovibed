@@ -1,14 +1,15 @@
 package communityapi_test
 
 import (
-	"encoding/json"
 	"net/http"
 	"testing"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
@@ -26,7 +27,10 @@ func TestHTTPSocialSearch(t *testing.T) {
 
 	q := sqltestx.Metadatabase(t)
 
-	var p meta.Profile
+	var (
+		p   meta.Profile
+		aid = uuidx.WithSuffix(1)
+	)
 	require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
 	require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
 
@@ -36,7 +40,7 @@ func TestHTTPSocialSearch(t *testing.T) {
 
 	var owned, other community.Community
 	require.NoError(t, community.CommunityInsertWithDefaults(ctx, q, community.Community{
-		ID: uuid.Must(uuid.NewV7()).String(), AccountID: p.ID, Description: "owned by profile",
+		ID: uuid.Must(uuid.NewV7()).String(), AccountID: aid, Description: "owned by profile",
 	}).Scan(&owned))
 	require.NoError(t, community.CommunityInsertWithDefaults(ctx, q, community.Community{
 		ID: uuid.Must(uuid.NewV7()).String(), AccountID: uuid.Must(uuid.NewV7()).String(), Description: "owned by someone else",
@@ -58,7 +62,7 @@ func TestHTTPSocialSearch(t *testing.T) {
 		communityapi.HTTPSocialOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 	).Bind(routes.PathPrefix("/").Subrouter())
 
-	claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
+	claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration(), jwtx.ClaimsOptionIssuer(aid)), metaapi.TokenOptionFromAuthz(v)))
 
 	t.Run("returns only the account's communities with their enabled publishers and the full catalog", func(t *testing.T) {
 		resp, req, err := httptestx.BuildRequestBytes(
@@ -73,18 +77,44 @@ func TestHTTPSocialSearch(t *testing.T) {
 		require.NoError(t, httpx.ErrorCode(resp.Result()))
 
 		var result communityapi.SocialsSearchResponse
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 		require.Len(t, result.Items, 1)
 		require.Equal(t, owned.ID, result.Items[0].Community.Id)
-		require.Len(t, result.Items[0].Enabled, 1)
-		require.Equal(t, publisher.ID, result.Items[0].Enabled[0].PublisherId)
+		require.Len(t, result.Items[0].Publishers, 1)
+		require.Equal(t, publisher.ID, result.Items[0].Publishers[0].PublisherId)
+	})
 
-		bymimetype := map[string]*communityapi.PluginPublisher{}
-		for _, p := range result.Catalog {
-			bymimetype[p.Mimetype] = p
+	// a community with nothing enabled is exactly the one an operator is about
+	// to attach a publisher to, so it cannot be joined out of existence.
+	t.Run("returns a community with no publishers", func(t *testing.T) {
+		var unconfigured community.Community
+		require.NoError(t, community.CommunityInsertWithDefaults(ctx, q, community.Community{
+			ID: uuid.Must(uuid.NewV7()).String(), AccountID: aid, Description: "nothing enabled yet",
+		}).Scan(&unconfigured))
+
+		resp, req, err := httptestx.BuildRequestBytes(
+			http.MethodGet,
+			"/",
+			nil,
+			httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)),
+		)
+		require.NoError(t, err)
+
+		routes.ServeHTTP(resp, req)
+		require.NoError(t, httpx.ErrorCode(resp.Result()))
+
+		var result communityapi.SocialsSearchResponse
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
+
+		found := make(map[string]*communityapi.CommunitySocial, len(result.Items))
+		for _, item := range result.Items {
+			found[item.Community.Id] = item
 		}
-		require.Contains(t, bymimetype, publisher.Mimetype)
+		require.Contains(t, found, unconfigured.ID)
+		require.Empty(t, found[unconfigured.ID].Publishers)
+		require.Contains(t, found, owned.ID)
+		require.NotContains(t, found, other.ID)
 	})
 
 	t.Run("requires authentication", func(t *testing.T) {

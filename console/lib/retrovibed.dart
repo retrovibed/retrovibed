@@ -118,19 +118,20 @@ String xdg_relroot() {
 }
 
 // returns an empty string on success, non empty contains the error.
-String seed(String passphrase) {
-  return _convertstring(bridge.seed(passphrase.toNativeUtf8().cast<Char>()));
+Future<void> seed(String username, String password) {
+  final _err = _convertstring(bridge.seed("${username}:${password}".toNativeUtf8().cast<Char>()));
+  return _err == "" ? Future.sync(() {}) : Future.error(_err);
 }
 
-// returns an empty string on success, non empty contains the error.
-String unseed() {
-  return _convertstring(bridge.unseed());
+Future<void> unseed() {
+  final _err = _convertstring(bridge.unseed());
+  return _err == "" ? Future.sync(() {}) : Future.error(_err);
 }
 
 // bootstraps a local-only guest identity derived from this device's hostname
 // and machine id. returns true on success.
-bool guest() {
-  return bridge.guest() == 0;
+Future<void> guest() {
+  return bridge.guest() == 0 ? Future.sync(() {}) : Future.error("failed to bootstrap guest");
 }
 
 List<String> ips() {

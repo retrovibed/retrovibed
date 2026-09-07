@@ -26,6 +26,10 @@ func Digest[T string | ~[]byte](bs ...T) hash.Hash {
 	return v
 }
 
+// deliberately still on encoding/json rather than jsonx: these digests content
+// address records that are already stored, and json/v2 marshals differently
+// (no html escaping, a nil slice as [] instead of null), which would silently
+// rekey every one of them.
 func JSON(v any) hash.Hash {
 	return Digest(errorsx.Must(json.Marshal(v)))
 }

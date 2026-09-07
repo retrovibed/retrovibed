@@ -78,9 +78,20 @@ class _Settings extends State<Settings> {
   @override
   void initState() {
     super.initState();
-    _billing = Registered.of(context);
-    _billing?.refresh.addListener(refresh);
     _loadPlans().then((_) => refresh());
+  }
+
+  // Registered.of registers an inherited dependency, which is illegal from
+  // initState; resolve it here instead. Same RegisteredState every time in
+  // practice, so the identity check keeps the listener registered once.
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final billing = Registered.of(context);
+    if (identical(_billing, billing)) return;
+    _billing?.refresh.removeListener(refresh);
+    _billing = billing;
+    _billing?.refresh.addListener(refresh);
   }
 
   @override
@@ -91,6 +102,7 @@ class _Settings extends State<Settings> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final defaults = ds.Defaults.of(context);
     final visible = _plans.where((p) {
       return !p.$1.hidden || p.$1.key == current.key;
@@ -99,6 +111,7 @@ class _Settings extends State<Settings> {
       alignment: widget.alignment,
       margin: widget.margin,
       padding: widget.padding,
+      decoration: BoxDecoration(color: theme.colorScheme.surfaceContainerLow),
       cause: _cause,
       Column(
         mainAxisSize: MainAxisSize.min,

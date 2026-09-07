@@ -14,6 +14,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 )
 
@@ -61,7 +62,7 @@ func (t URIImport) resolveHTTP(ctx context.Context, uri string, options ...func(
 		return meta, err
 	}
 
-	resp, err := t.client.Do(req)
+	resp, err := httpx.AsError(t.client.Do(req))
 	if err != nil {
 		return meta, errorsx.Wrap(err, "unable to retrieve uri")
 	}
@@ -72,7 +73,7 @@ func (t URIImport) resolveHTTP(ctx context.Context, uri string, options ...func(
 		return meta, errorsx.Wrap(err, "unable to read response")
 	}
 
-	md, err := metainfo.Load(bytes.NewReader(buf))
+	md, err := metainfo.Load(bytes.NewBuffer(buf))
 	if err != nil {
 		return meta, errorsx.Wrap(err, "unable to read metainfo from response")
 	}

@@ -2,7 +2,7 @@ package metaapi
 
 import (
 	"context"
-	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"strings"
@@ -13,6 +13,7 @@ import (
 
 	"github.com/retrovibed/retrovibed/retroapi/httpauth"
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/internal/audiox"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
@@ -125,13 +126,17 @@ func (t *HTTPAudioSink) listen(w http.ResponseWriter, r *http.Request) {
 		resp.Items = append(resp.Items, newAudioSink(s))
 	}
 
-	if err := seq.Err(); err != nil {
+	if err := seq.Err(); errors.Is(err, errorsx.Unrecoverable{}) {
+		log.Println(errorsx.Wrap(err, "unable to list sinks"))
+		errorsx.Log(c.Close(websocketx.PrivateStatus(http.StatusServiceUnavailable), "audio service unavailable"))
+		return
+	} else if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to list sinks"))
 		errorsx.Log(c.Close(websocketx.PrivateStatus(http.StatusInternalServerError), "internal service error"))
 		return
 	}
 
-	encoded, err := json.Marshal(&resp)
+	encoded, err := jsonx.Marshal(&resp)
 	if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to encode sinks"))
 		errorsx.Log(c.Close(websocketx.PrivateStatus(http.StatusInternalServerError), "internal service error"))
@@ -149,7 +154,11 @@ func (t *HTTPAudioSink) listen(w http.ResponseWriter, r *http.Request) {
 
 func (t *HTTPAudioSink) current(w http.ResponseWriter, r *http.Request) {
 	sink, err := t.sink.Current()
-	if err != nil {
+	if errors.Is(err, errorsx.Unrecoverable{}) {
+		log.Println(errorsx.Wrap(err, "unable to determine current sink"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusServiceUnavailable))
+		return
+	} else if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to determine current sink"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
@@ -166,20 +175,28 @@ func (t *HTTPAudioSink) current(w http.ResponseWriter, r *http.Request) {
 func (t *HTTPAudioSink) activate(w http.ResponseWriter, r *http.Request) {
 	var msg AudioSinkTouchRequest
 
-	if err := json.NewDecoder(r.Body).Decode(&msg); err != nil {
+	if err := jsonx.UnmarshalRead(r.Body, &msg); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to decode request"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
 	}
 
-	if err := t.sink.Activate(msg.Id); err != nil {
+	if err := t.sink.Activate(msg.Id); errors.Is(err, errorsx.Unrecoverable{}) {
+		log.Println(errorsx.Wrap(err, "unable to activate sink"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusServiceUnavailable))
+		return
+	} else if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to activate sink"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
 	}
 
 	sink, err := t.sink.Current()
-	if err != nil {
+	if errors.Is(err, errorsx.Unrecoverable{}) {
+		log.Println(errorsx.Wrap(err, "unable to determine current sink"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusServiceUnavailable))
+		return
+	} else if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to determine current sink"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return

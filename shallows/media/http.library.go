@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/md5"
 	"database/sql"
-	"encoding/json"
 	"io"
 	"log"
 	"mime/multipart"
@@ -20,6 +19,7 @@ import (
 	"github.com/justinas/alice"
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
 	"github.com/retrovibed/retrovibed/retroapi/httpauth"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
@@ -175,7 +175,7 @@ func (t *HTTPLibrary) patch(w http.ResponseWriter, r *http.Request) {
 		id  = mux.Vars(r)["id"]
 	)
 
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	if err := jsonx.UnmarshalRead(r.Body, &req); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to decoded update"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return

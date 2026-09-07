@@ -17,6 +17,7 @@ import (
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/james-lawrence/torrent/torrenttest"
+	"github.com/james-lawrence/torrent/torrenttestx"
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
 	"github.com/retrovibed/retrovibed/retroapi/cryptox"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
@@ -26,7 +27,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
-	"github.com/retrovibed/retrovibed/shallows/internal/torrenttestx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 	"github.com/stretchr/testify/assert"
@@ -289,6 +289,12 @@ func TestDownloadInto(t *testing.T) {
 		require.NoError(t, tracking.MetadataFindByID(t.Context(), q, lmd.ID).Scan(&lmd))
 		assert.EqualValues(t, mi.TotalLength(), lmd.Bytes)
 		assert.WithinDuration(t, time.Now(), lmd.CompletedAt, time.Second)
+
+		// a fresh leecher had nothing before this download, so every byte of
+		// the completed torrent came from peers: available and downloaded
+		// should both equal the full size.
+		assert.EqualValues(t, mi.TotalLength(), lmd.Available)
+		assert.EqualValues(t, mi.TotalLength(), lmd.Downloaded)
 
 		var libMDs []library.Metadata
 		require.NoError(t, sqlx.ScanInto(library.MetadataSearch(t.Context(), q, library.MetadataSearchBuilder().Where(

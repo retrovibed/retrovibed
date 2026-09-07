@@ -12,7 +12,10 @@ export 'package:retrovibed/meta/meta.discovery.pb.dart';
 typedef FnDiscoveryDiagnostics = Future<DiscoveryMetricsResponse> Function({List<httpx.Option> options});
 
 abstract class sources {
+  static const String random = "7ddf32e1-7a6a-c5ce-04a8-ecbf782ca509"; // md5 of RecommendationSourceRandom
   static const String discovered = "538416cf-3bc5-9332-670a-f4cae9485ebe"; // md5 of RecommendationSourceDiscovered
+  static const String generative = "e15ee067-d8b5-a64b-ffd9-617121fa925b"; // md5 of RecommendationSourceGenerative
+  static const String searchplugin = "ab1c952c-a77a-0bc1-3e23-68588d7a0c6e"; // md5 of RecommendationSourceSearch
 }
 
 abstract class api {

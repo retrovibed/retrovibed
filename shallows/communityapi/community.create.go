@@ -3,17 +3,17 @@ package communityapi
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 
 	"github.com/retrovibed/retrovibed/retroapi/env"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 )
 
 func CommunityCreate(ctx context.Context, c *http.Client, com *CommunityCreateRequest) (resp *CommunityCreateResponse, err error) {
-	encoded, err := json.Marshal(com)
+	encoded, err := jsonx.Marshal(com)
 	if err != nil {
 		return nil, err
 	}
@@ -24,7 +24,7 @@ func CommunityCreate(ctx context.Context, c *http.Client, com *CommunityCreateRe
 
 	resp = new(CommunityCreateResponse)
 
-	if err = json.NewDecoder(_resp.Body).Decode(resp); err != nil {
+	if err = jsonx.UnmarshalRead(_resp.Body, resp); err != nil {
 		return nil, err
 	}
 

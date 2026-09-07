@@ -3,6 +3,8 @@ import 'flutterx.dart';
 import 'theme.defaults.dart';
 import 'empty.dart';
 import 'help.dart';
+import 'stateful.dart';
+import 'container.dart' as c;
 
 class SearchDropdown extends StatefulWidget {
   static const InputDecoration defaultDecoration = const InputDecoration(
@@ -14,6 +16,7 @@ class SearchDropdown extends StatefulWidget {
   final InputDecoration decoration;
   final TextAlign textAlign;
   final EdgeInsets? padding;
+  final EdgeInsets margin;
   final List<Widget> leading;
   final List<Widget> trailing;
   final TextEditingController? controller;
@@ -30,6 +33,7 @@ class SearchDropdown extends StatefulWidget {
     this.decoration = SearchDropdown.defaultDecoration,
     this.textAlign = TextAlign.left,
     this.padding,
+    this.margin = EdgeInsets.zero,
     this.leading = const [],
     this.trailing = const [],
     this.controller,
@@ -43,19 +47,22 @@ class SearchDropdown extends StatefulWidget {
     required Future<Widget> Function(String query, Function() onClick) onSearch,
     TextAlign textAlign = TextAlign.left,
     EdgeInsets? padding,
+    EdgeInsets margin = EdgeInsets.zero,
     List<Widget> leading = const [],
     List<Widget> trailing = const [],
     TextEditingController? controller,
+    InputDecoration? decoration,
     Widget help = HelpScope.None,
     Listenable? refresh,
   }) {
     return SearchDropdown(
       key: key,
       padding: padding,
+      margin: margin,
       controller: controller,
       onSearch: onSearch,
       textAlign: textAlign,
-      decoration: SearchDropdown.defaultDecoration.copyWith(hintText: text),
+      decoration: (decoration ?? SearchDropdown.defaultDecoration).copyWith(hintText: text),
       leading: leading,
       trailing: trailing,
       help: help,
@@ -67,22 +74,16 @@ class SearchDropdown extends StatefulWidget {
   State<SearchDropdown> createState() => _SearchDropdownState(controller: controller ?? TextEditingController());
 }
 
-class _SearchDropdownState extends State<SearchDropdown> {
+class _SearchDropdownState extends State<SearchDropdown> with LoadingState {
   Widget _results = Empty;
-  bool _loading = false;
   final TextEditingController controller;
   final FocusNode _focus = FocusNode(debugLabel: 'SearchDropdown');
   _SearchDropdownState({required this.controller});
 
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
-
   void _closed() {
     setState(() {
       _results = Empty;
-      _loading = false;
+      loading = false;
     });
   }
 
@@ -116,7 +117,7 @@ class _SearchDropdownState extends State<SearchDropdown> {
 
   void _query(String q) {
     setState(() {
-      _loading = true;
+      loading = true;
     });
 
     widget
@@ -124,18 +125,19 @@ class _SearchDropdownState extends State<SearchDropdown> {
         .then((results) {
           setState(() {
             _results = results;
-            _loading = false;
+            loading = false;
           });
         })
         .catchError((e) {
           setState(() {
-            _loading = false;
+            loading = false;
           });
         });
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final defaults = Defaults.of(context);
     final open = _results != Empty;
 
@@ -148,21 +150,23 @@ class _SearchDropdownState extends State<SearchDropdown> {
         focusNode: _focus,
         child: Container(
           padding: widget.padding ?? defaults.padding,
+          margin: widget.margin,
           child: Column(
             verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
             mainAxisSize: MainAxisSize.min,
             children: [
               Help(
-                Container(
+                c.Container(
                   padding: EdgeInsets.symmetric(
                     horizontal: defaults.spacing,
-                    vertical: defaults.spacing / 2,
+                    vertical: defaults.spacing,
                   ),
                   decoration: BoxDecoration(
+                    color: theme.colorScheme.surfaceContainerLow,
                     border: defaults.border,
                     borderRadius: defaults.borderRadius,
                   ),
-                  child: Row(
+                  Row(
                     children: [
                       ...widget.leading,
                       Expanded(
@@ -180,21 +184,14 @@ class _SearchDropdownState extends State<SearchDropdown> {
                 widget.help,
               ),
               Visibility(
-                visible: open,
-                child: Visibility(
-                  visible: _loading,
-                  replacement: Container(
-                    margin: EdgeInsets.only(top: defaults.spacing / 2),
-                    decoration: BoxDecoration(
-                      border: defaults.border,
-                      borderRadius: defaults.borderRadius,
-                    ),
-                    child: _results,
+                visible: open && _results != Empty,
+                child: Container(
+                  margin: EdgeInsets.only(top: defaults.spacing / 2),
+                  decoration: BoxDecoration(
+                    border: defaults.border,
+                    borderRadius: defaults.borderRadius,
                   ),
-                  child: Padding(
-                    padding: defaults.padding,
-                    child: CircularProgressIndicator(),
-                  ),
+                  child: _results,
                 ),
               ),
             ],

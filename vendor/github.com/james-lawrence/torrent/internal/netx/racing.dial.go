@@ -22,11 +22,18 @@ func NewRacing(n uint16) *RacingDialer {
 
 			c, err := w.network.Dial(dctx, w.address)
 			if err == nil {
-				select {
-				case <-ctx.Done():
-					errorsx.Log(c.Close())
-				case w.fastest <- c:
+				// fastest is buffered (cap 1) and only ever drained once by
+				// Dial, so a losing racer that completes after the winner
+				// has already been consumed can still find the buffer
+				// empty and race a select on <-ctx.Done() vs w.fastest<-c -
+				// Go picks pseudo-randomly between ready cases, so without
+				// this CAS a losing connection can silently land in the
+				// buffer instead of being closed, leaking it.
+				if w.claimed.CompareAndSwap(false, true) {
+					w.fastest <- c
 					w.done(nil)
+				} else {
+					errorsx.Log(c.Close())
 				}
 
 				if w.outstanding.Add(^uint32(0)) == 0 {
@@ -37,7 +44,7 @@ func NewRacing(n uint16) *RacingDialer {
 				return nil
 			}
 
-			w.failure.CompareAndSwap(nil, langx.Autoptr(err))
+			w.failure.CompareAndSwap(nil, new(err))
 			if w.outstanding.Add(^uint32(0)) == 0 {
 				w.done(err)
 				close(w.fastest)
@@ -60,6 +67,7 @@ func initRacingDial(address string, d time.Duration, n uint64, done context.Canc
 		failure:     atomicx.Pointer[error](nil),
 		done:        done,
 		outstanding: atomicx.Uint32(n),
+		claimed:     atomicx.Bool(false),
 	}
 }
 
@@ -71,6 +79,7 @@ type racingdialworkload struct {
 	failure     *atomic.Pointer[error]
 	fastest     chan net.Conn
 	outstanding *atomic.Uint32
+	claimed     *atomic.Bool
 }
 
 type RacingDialer struct {
@@ -93,9 +102,13 @@ func (t RacingDialer) Dial(ctx context.Context, timeout time.Duration, address s
 		dup := w
 		dup.network = n
 
+		// Run fails once __ctx is already done - most commonly because an
+		// earlier racer already won and canceled it. Stop submitting and
+		// fall through to the select below rather than returning here: it
+		// already knows how to prefer a winning connection sitting in
+		// w.fastest over a bare context.Canceled.
 		if err := t.arena.Run(__ctx, dup); err != nil {
-			cancel(errorsx.Wrapf(err, "timeout: %d", timeout))
-			return nil, err
+			break
 		}
 	}
 

@@ -14,12 +14,12 @@ class Card extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final defaults = ds.Defaults.of(context);
     final billing = Registered.of(context);
     final plan = PlanSummary.fromID(billing.plan.id);
-    final defaults = ds.Defaults.of(context);
     final tappable = authn.developer(context).subscription;
     final tap = () => onPressed(
-      Settings(margin: EdgeInsets.zero, padding: EdgeInsets.zero),
+      Settings(margin: EdgeInsets.zero, padding: defaults.padding),
     );
 
     return ds.Card(

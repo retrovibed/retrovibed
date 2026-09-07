@@ -8,6 +8,7 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/retroapi/uuidx"
@@ -67,7 +68,7 @@ func TestRSSFeedSearch(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Len(t, result.Items, 1)
 		require.NotEmpty(t, result.Items[0].EncryptionSeed)
 	})
@@ -121,7 +122,7 @@ func TestRSSFeedCreate(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Equal(t, "d81f2387-d17a-cb19-cfb5-a1f3830589bd", result.Feed.Id)
 		require.Equal(t, "hello world", result.Feed.Description)
 		require.WithinDuration(t, time.Now(), errorsx.Must(grpcx.DecodeTime(result.Feed.NextCheck)), time.Second)
@@ -178,7 +179,7 @@ func TestRSSFeedCreate(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Equal(t, "d81f2387-d17a-cb19-cfb5-a1f3830589bd", result.Feed.Id)
 		require.Equal(t, "hello world", result.Feed.Description)
 		require.True(t, result.Feed.Autodownload)
@@ -207,7 +208,7 @@ func TestRSSFeedCreate(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Equal(t, "d81f2387-d17a-cb19-cfb5-a1f3830589bd", result.Feed.Id)
 		require.Equal(t, "hello world 2", result.Feed.Description)
 		require.Equal(t, tmp.Feed.NextCheck, result.Feed.NextCheck)
@@ -265,7 +266,7 @@ func TestRSSFeedCreate(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Equal(t, "d81f2387-d17a-cb19-cfb5-a1f3830589bd", result.Feed.Id)
 		require.Equal(t, "hello world", result.Feed.Description)
 		require.True(t, result.Feed.Autodownload)
@@ -324,7 +325,7 @@ func TestRSSFeedCreate(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Equal(t, "d81f2387-d17a-cb19-cfb5-a1f3830589bd", result.Feed.Id)
 		require.Equal(t, "hello world", result.Feed.Description)
 		require.True(t, result.Feed.Autodownload)

@@ -11,16 +11,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
-	"google.golang.org/protobuf/encoding/protojson"
 )
-
-func (t *MediaSearchRequest) MarshalJSON() ([]byte, error) {
-	return protojson.Marshal(t)
-}
-
-func (t *MediaSearchRequest) UnmarshalJSON(b []byte) error {
-	return protojson.Unmarshal(b, t)
-}
 
 type MediaOption func(*Media)
 

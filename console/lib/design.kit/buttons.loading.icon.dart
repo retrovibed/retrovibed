@@ -18,6 +18,7 @@ class LoadingIconButton extends StatefulWidget {
   final double? value;
   final double iconSize;
   final FocusNode? focusNode;
+  final OutlinedBorder? shape;
 
   final bool? toggled;
 
@@ -32,6 +33,7 @@ class LoadingIconButton extends StatefulWidget {
     this.toggled,
     this.help = HelpScope.None,
     this.focusNode,
+    this.shape,
   });
 
   factory LoadingIconButton.create({
@@ -380,6 +382,7 @@ class _LoadingIconButtonState extends State<LoadingIconButton> {
           padding: EdgeInsets.all(widget.iconSize * 0.25),
           minimumSize: Size.zero,
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          shape: widget.shape,
         ),
         color: color,
         icon: _isLoading

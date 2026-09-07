@@ -22,7 +22,14 @@ func newDigestsFromTorrent(t *torrent) digests {
 		func(idx int, cause error) func() {
 			// log.Printf("hashed %d - %v\n", idx, cause)
 			// log.Printf("hashed %p %d / %d - %v", t.chunks, idx+1, t.chunks.pieces, cause)
-			t.chunks.Hashed(uint64(idx), cause)
+
+			if t.chunks.Hashed(uint64(idx), cause) {
+				if p := t.piece(idx); p != nil {
+					n := p.Length()
+					t.stats.BytesValidated.Add(n)
+					t.cln.stats.BytesValidated.Add(n)
+				}
+			}
 
 			t.pieceStateChanges.Publish(idx)
 
@@ -59,11 +66,36 @@ type digests struct {
 	retrieve func(int) *metainfo.Piece
 	complete func(int, error) func()
 	// marks whether digest is actively processing.
-	reaping int64
+	reaping atomic.Int64
 	// cache of the pieces that need to be verified.
 	pending   *bitQueue
 	c         *sync.Cond
 	completed atomic.Uint64
+}
+
+// rebind points the digests at storage that only became available later - an
+// info-less torrent opens its storage when it learns its info. Only the reader
+// goes stale across that transition: retrieve is a method value bound to the
+// torrent and complete closes over it, so both already track it.
+//
+// Replacing the whole struct instead would reset reaping and swap pending and
+// c out from under workers already running against them, and an in-flight
+// worker's decrement would then drive a freshly zeroed counter negative -
+// which never satisfies the remaining==0 broadcast, parking Wait forever.
+func (t *digests) rebind(iora io.ReaderAt) {
+	t.c.L.Lock()
+	defer t.c.L.Unlock()
+
+	t.ReaderAt = iora
+}
+
+// reader returns the current storage. taking the lock once per piece is
+// nothing next to hashing it.
+func (t *digests) reader() io.ReaderAt {
+	t.c.L.Lock()
+	defer t.c.L.Unlock()
+
+	return t.ReaderAt
 }
 
 // Enqueue a piece to check its completed digest.
@@ -77,19 +109,25 @@ func (t *digests) EnqueueBitmap(o *roaring.Bitmap) {
 	t.verify()
 }
 
-// wait for the digests to be complete
+// wait for the digests to be complete. pending.Count() alone is not a valid
+// completion signal - bitQueue is backed by a roaring.Bitmap (a set), so
+// Count() drops to 0 the instant an item is popped for processing, well
+// before its check() (real file I/O + hashing) actually finishes. reaping
+// tracks dispatched-but-not-yet-finished work and only reaches 0 once every
+// popped item's check() has returned, so it - not queue occupancy - is the
+// real "nothing outstanding" signal.
 func (t *digests) Wait() {
 	t.c.L.Lock()
 	defer t.c.L.Unlock()
 
-	for c := t.pending.Count(); c > 0; c = t.pending.Count() {
+	for t.reaping.Load() > 0 || t.pending.Count() > 0 {
 		t.c.Wait()
 	}
 }
 
 func (t *digests) verify() {
-	if atomic.AddInt64(&t.reaping, 1) > int64(runtime.NumCPU()) {
-		atomic.AddInt64(&t.reaping, -1)
+	if t.reaping.Add(1) > int64(runtime.NumCPU()) {
+		t.reaping.Add(-1)
 		return
 	}
 
@@ -98,7 +136,24 @@ func (t *digests) verify() {
 			t.check(idx)
 		}
 
-		if remaining := atomic.AddInt64(&t.reaping, -1); remaining == 0 {
+		// Held across the terminal decrement so Wait's check-then-Wait
+		// sequence (guarded by the same t.c.L) can't observe reaping>0,
+		// then miss this Broadcast because it fired in the gap before
+		// Wait() actually registered: synchronize the state
+		// transition through the Cond's own lock.
+		t.c.L.Lock()
+		remaining := t.reaping.Add(-1)
+		t.c.L.Unlock()
+
+		// there is a chance for work to be queued between the for loop
+		// and the lock acquisition. recheck here to ensure we never exit
+		// while there is work remaining.
+		if t.pending.Count() > 0 {
+			t.verify()
+			return
+		}
+
+		if remaining == 0 {
 			t.c.Broadcast()
 		}
 	}()
@@ -141,7 +196,7 @@ func (t *digests) compute(p *metainfo.Piece) (ret metainfo.Hash, err error) {
 	c := sha1.New()
 	plen := p.Length()
 
-	n, err := io.CopyBuffer(c, io.NewSectionReader(t.ReaderAt, p.Offset(), plen), buf[:])
+	n, err := io.CopyBuffer(c, io.NewSectionReader(t.reader(), p.Offset(), plen), buf[:])
 	if err != nil {
 		return ret, errorsx.Wrapf(err, "piece %d digest failed", p.Offset())
 	}

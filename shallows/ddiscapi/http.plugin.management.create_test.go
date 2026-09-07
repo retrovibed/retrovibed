@@ -1,7 +1,6 @@
 package ddiscapi_test
 
 import (
-	"encoding/json"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -12,6 +11,7 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
@@ -84,7 +84,7 @@ func TestHTTPPluginManagementCreate(t *testing.T) {
 		require.NoError(t, httpx.ErrorCode(resp.Result()))
 
 		var result ddiscapi.PluginCreateResponse
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Equal(t, "noop", result.Plugin.Name)
 		require.Equal(t, md5x.String("noop"), result.Plugin.Id)
 		require.EqualValues(t, len(wasm), result.Plugin.Size)

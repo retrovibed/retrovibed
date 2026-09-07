@@ -47,8 +47,10 @@ class _CommunityPickerState extends State<CommunityPicker> {
   }
 
   void _subscribe() {
+    final c = _selected.toList();
+    if (c.length == 0) return widget.onDone();
     final auth = [authn.request(authn.AuthzCache.meta(context))];
-    ftux.subscribe(_selected.toList(), options: auth).then((_) => widget.onDone());
+    ftux.subscribe(c, options: auth).then((_) => widget.onDone());
   }
 
   @override
@@ -91,7 +93,6 @@ class _CommunityPickerState extends State<CommunityPicker> {
               mainAxisAlignment: MainAxisAlignment.end,
               spacing: defaults.spacing,
               children: [
-                TextButton(onPressed: widget.onDone, child: const Text('Skip')),
                 ds.LoadingButton(const Text('Continue'), onPressed: () async => _subscribe()),
               ],
             ),

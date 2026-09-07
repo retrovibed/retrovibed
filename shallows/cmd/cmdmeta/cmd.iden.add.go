@@ -3,13 +3,13 @@ package cmdmeta
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/retrovibed/retrovibed/retroapi/authn"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
@@ -51,10 +51,11 @@ func (t IdenAdd) run(ctx context.Context, endpoint string, c *http.Client) (err 
 
 	var result metaapi.ProfileCreateResponse
 
-	encoded, err := json.Marshal(&metaapi.ProfileCreateRequest{
+	encoded, err := jsonx.Marshal(&metaapi.ProfileCreateRequest{
 		Profile:   &metaapi.Profile{Display: langx.FirstNonZero(t.Username, comment)},
 		PublicKey: strings.TrimSpace(string(ssh.MarshalAuthorizedKey(pubkey))),
 	})
+
 	if err != nil {
 		return errorsx.Wrap(err, "unable to encode request")
 	}
@@ -78,11 +79,12 @@ func (t IdenAdd) run(ctx context.Context, endpoint string, c *http.Client) (err 
 		return err
 	}
 
-	encoded, err = json.Marshal(&metaapi.AuthzGrantRequest{
+	encoded, err = jsonx.Marshal(&metaapi.AuthzGrantRequest{
 		Token: &metaapi.Token{
 			LibraryRead: true,
 		},
 	})
+
 	if err != nil {
 		return errorsx.Wrap(err, "unable to encode authz request")
 	}

@@ -1,13 +1,13 @@
 package media_test
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"testing"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
@@ -81,7 +81,7 @@ func TestLibrarySearch(t *testing.T) {
 		router.ServeHTTP(resp, req)
 
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Equal(t, 3, len(result.Items))
 		require.NotNil(t, result.Next)
 		require.Equal(t, uint64(0), result.Next.Offset)
@@ -132,7 +132,7 @@ func TestLibrarySearch(t *testing.T) {
 
 		var result media.MediaSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Equal(t, 0, len(result.Items))
 		require.NotNil(t, result.Next)
 		require.Equal(t, uint64(0), result.Next.Offset)
@@ -190,7 +190,7 @@ func TestLibrarySearch(t *testing.T) {
 
 		var result media.MediaSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Equal(t, 100, len(result.Items))
 		require.NotNil(t, result.Next)
 		require.Equal(t, uint64(0), result.Next.Offset)
@@ -251,7 +251,7 @@ func TestLibrarySearch(t *testing.T) {
 
 		var result media.MediaSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Equal(t, 2, len(result.Items))
 		for _, item := range result.Items {
 			require.Equal(t, mimex.RetrovibedMediaArchive, item.Mimetype)
@@ -310,7 +310,7 @@ func TestLibrarySearch(t *testing.T) {
 
 		var result media.MediaSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Equal(t, 1, len(result.Items))
 		require.Equal(t, visible.ID, result.Items[0].Id)
 	})
@@ -370,7 +370,7 @@ func TestLibrarySearch(t *testing.T) {
 
 		var result media.MediaSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Equal(t, 1, len(result.Items))
 		require.Equal(t, active.ID, result.Items[0].Id)
 	})
@@ -477,7 +477,7 @@ func TestLibrarySearch(t *testing.T) {
 
 		var result media.MediaSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		// Should only return items matching "Matrix"
 		require.Equal(t, 2, len(result.Items))
 		for _, item := range result.Items {
@@ -537,7 +537,7 @@ func TestLibrarySearch(t *testing.T) {
 
 		var result media.MediaSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		// With query, should order by description ASC
 		require.Equal(t, 4, len(result.Items))
 		for idx, i := range result.Items {
@@ -590,7 +590,7 @@ func TestLibrarySearch(t *testing.T) {
 
 		var result media.MediaSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		// Without query, should order by created_at DESC, description ASC
 		require.NotNil(t, result.Next)
 	})
@@ -647,7 +647,7 @@ func TestLibrarySearch(t *testing.T) {
 
 		var result media.MediaSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Equal(t, 2, len(result.Items))
 
 		byID := make(map[string]*media.Media, len(result.Items))
@@ -715,7 +715,7 @@ func TestLibrarySearch(t *testing.T) {
 
 		var result media.MediaSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 		require.Equal(t, 9, len(result.Items))
 		for _, item := range result.Items {
@@ -754,7 +754,7 @@ func testsearch(t *testing.T, routes *mux.Router, token string, req *media.Media
 
 	routes.ServeHTTP(resp, hreq)
 	require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-	require.NoError(t, json.NewDecoder(resp.Body).Decode(result))
+	require.NoError(t, jsonx.UnmarshalRead(resp.Body, result))
 
 	return result
 }

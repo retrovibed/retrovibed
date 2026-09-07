@@ -7,6 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/james-lawrence/torrent/dht/int160"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
@@ -64,7 +65,7 @@ func TestHTTPMediaCreate(t *testing.T) {
 	routes.ServeHTTP(resp, req)
 
 	require.NoError(t, httpx.ErrorCode(resp.Result()))
-	require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+	require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 	require.Equal(t, "test title", result.Media.GetTitle())
 	require.Equal(t, "test description", result.Media.GetDescription())

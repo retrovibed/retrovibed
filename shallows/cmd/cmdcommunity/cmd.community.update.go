@@ -1,9 +1,9 @@
 package cmdcommunity
 
 import (
-	"encoding/json"
 	"os"
 
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -61,7 +61,7 @@ func (t cmdCommunityUpdate) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClient
 		return errorsx.Wrap(err, "failed to update community")
 	}
 
-	if err = json.NewEncoder(os.Stdout).Encode(commresp.Community); err != nil {
+	if err = jsonx.MarshalWrite(os.Stdout, commresp.Community); err != nil {
 		return errorsx.Wrap(err, "unable to write to encoder")
 	}
 

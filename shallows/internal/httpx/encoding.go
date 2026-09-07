@@ -2,10 +2,10 @@ package httpx
 
 import (
 	"bytes"
-	"encoding/json"
 	"io"
 	"net/http"
 
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 )
 
@@ -15,7 +15,7 @@ func EncodeJSON(req *http.Request, body interface{}) (err error) {
 		encoded []byte
 	)
 
-	if encoded, err = json.Marshal(body); err != nil {
+	if encoded, err = jsonx.Marshal(body); err != nil {
 		return errorsx.WithStack(err)
 	}
 

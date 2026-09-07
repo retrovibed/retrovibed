@@ -1,13 +1,13 @@
 package ddiscapi_test
 
 import (
-	"encoding/json"
 	"net/http"
 	"testing"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
@@ -64,7 +64,7 @@ func TestHTTPDiscoverySearch(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.NoError(t, httpx.ErrorCode(resp.Result()))
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 		require.Equal(t, result.Next.Offset, uint64(0))
 		require.Len(t, result.Items, 1)
@@ -114,7 +114,7 @@ func TestHTTPDiscoverySearch(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.NoError(t, httpx.ErrorCode(resp.Result()))
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 		require.Len(t, result.Items, 1)
 		require.EqualValues(t, prototext.Format(result.Items[0]), prototext.Format(ddiscapi.NewDiscoveryFromTrackingUnknownHash(due)))
@@ -161,7 +161,7 @@ func TestHTTPDiscoverySearch(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.NoError(t, httpx.ErrorCode(resp.Result()))
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 		encodeddue := ddiscapi.NewDiscoveryFromTrackingUnknownHash(due)
 		encodedfuture := ddiscapi.NewDiscoveryFromTrackingUnknownHash(future)

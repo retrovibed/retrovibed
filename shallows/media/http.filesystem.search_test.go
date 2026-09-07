@@ -1,12 +1,12 @@
 package media_test
 
 import (
-	"encoding/json"
 	"net/http"
 	"testing"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
@@ -30,7 +30,7 @@ func testfssearch(t *testing.T, routes *mux.Router, token string, req *media.Fil
 
 	routes.ServeHTTP(resp, hreq)
 	require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-	require.NoError(t, json.NewDecoder(resp.Body).Decode(result))
+	require.NoError(t, jsonx.UnmarshalRead(resp.Body, result))
 
 	return result
 }
@@ -122,7 +122,7 @@ func TestFilesystemDelete(t *testing.T) {
 		require.NoError(t, err)
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Code)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, result))
 
 		require.Equal(t, top.ID, result.Media.Id)
 		// the client is told how much went with it, which is what the console warns about.

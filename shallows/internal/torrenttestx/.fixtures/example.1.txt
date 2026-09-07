@@ -1,3 +1,0 @@
-example private torrent with a single announce url.
-
-initially added to ensure we properly extract the proper tracker announce url.

@@ -8,32 +8,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/grpcx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
-	"google.golang.org/protobuf/encoding/protojson"
 )
-
-func (t *Discovery) MarshalJSON() ([]byte, error) {
-	return protojson.Marshal(t)
-}
-
-func (t *Discovery) UnmarshalJSON(b []byte) error {
-	return protojson.Unmarshal(b, t)
-}
-
-func (t *DiscoveryDownloadRequest) MarshalJSON() ([]byte, error) {
-	return protojson.Marshal(t)
-}
-
-func (t *DiscoveryDownloadRequest) UnmarshalJSON(b []byte) error {
-	return protojson.Unmarshal(b, t)
-}
-
-func (t *DiscoveryDownloadResponse) MarshalJSON() ([]byte, error) {
-	return protojson.Marshal(t)
-}
-
-func (t *DiscoveryDownloadResponse) UnmarshalJSON(b []byte) error {
-	return protojson.Unmarshal(b, t)
-}
 
 func NewDiscoveryFromTrackingUnknownHash(mu tracking.UnknownHash) *Discovery {
 	mg := metainfo.NewMagnetFromInfohash(mu.Infohash)

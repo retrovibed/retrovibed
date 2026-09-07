@@ -6,11 +6,13 @@ import (
 	"testing"
 
 	"github.com/gorilla/mux"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
+	"github.com/retrovibed/retrovibed/shallows/internal/pqueuetestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/retrovibed/retrovibed/shallows/media"
@@ -29,6 +31,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 		defer done()
 
 		q := sqltestx.Metadatabase(t)
+		w := pqueuetestx.NewQueue()
 
 		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
 		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
@@ -41,7 +44,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 
 		routes := mux.NewRouter()
-		media.NewHTTPRecommendations(q, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
+		media.NewHTTPRecommendations(q, w, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
@@ -63,6 +66,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 		defer done()
 
 		q := sqltestx.Metadatabase(t)
+		w := pqueuetestx.NewQueue()
 
 		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
 		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
@@ -74,7 +78,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 
 		routes := mux.NewRouter()
-		media.NewHTTPRecommendations(q, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
+		media.NewHTTPRecommendations(q, w, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
@@ -96,6 +100,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 		defer done()
 
 		q := sqltestx.Metadatabase(t)
+		w := pqueuetestx.NewQueue()
 
 		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
 		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
@@ -108,7 +113,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 
 		routes := mux.NewRouter()
-		media.NewHTTPRecommendations(q, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
+		media.NewHTTPRecommendations(q, w, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
@@ -121,7 +126,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 
 		var result media.RecommendationSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Len(t, result.Items, 1)
 	})
 
@@ -134,6 +139,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 		defer done()
 
 		q := sqltestx.Metadatabase(t)
+		w := pqueuetestx.NewQueue()
 
 		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
 		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
@@ -146,7 +152,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 
 		routes := mux.NewRouter()
-		media.NewHTTPRecommendations(q, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
+		media.NewHTTPRecommendations(q, w, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
@@ -159,7 +165,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 
 		var result media.RecommendationSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Len(t, result.Items, 1)
 	})
 
@@ -172,6 +178,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 		defer done()
 
 		q := sqltestx.Metadatabase(t)
+		w := pqueuetestx.NewQueue()
 
 		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
 		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
@@ -185,7 +192,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, audio).Scan(&audio))
 
 		routes := mux.NewRouter()
-		media.NewHTTPRecommendations(q, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
+		media.NewHTTPRecommendations(q, w, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
@@ -201,7 +208,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 
 		var result media.RecommendationSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Len(t, result.Items, 1)
 		require.Equal(t, mimex.Video, result.Items[0].Mimetype)
 	})
@@ -215,6 +222,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 		defer done()
 
 		q := sqltestx.Metadatabase(t)
+		w := pqueuetestx.NewQueue()
 
 		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
 		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
@@ -230,7 +238,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, fr).Scan(&fr))
 
 		routes := mux.NewRouter()
-		media.NewHTTPRecommendations(q, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
+		media.NewHTTPRecommendations(q, w, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
@@ -246,7 +254,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 
 		var result media.RecommendationSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Len(t, result.Items, 1)
 		require.Equal(t, en.UID, result.Items[0].Uid)
 	})
@@ -260,6 +268,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 		defer done()
 
 		q := sqltestx.Metadatabase(t)
+		w := pqueuetestx.NewQueue()
 
 		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
 		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
@@ -272,7 +281,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 
 		routes := mux.NewRouter()
-		media.NewHTTPRecommendations(q, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
+		media.NewHTTPRecommendations(q, w, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
@@ -288,7 +297,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 
 		var result media.RecommendationSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Len(t, result.Items, 1)
 		require.Equal(t, known.UID, result.Items[0].Uid)
 		require.True(t, result.Items[0].Adult)
@@ -303,6 +312,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 		defer done()
 
 		q := sqltestx.Metadatabase(t)
+		w := pqueuetestx.NewQueue()
 
 		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
 		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
@@ -314,7 +324,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 
 		routes := mux.NewRouter()
-		media.NewHTTPRecommendations(q, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
+		media.NewHTTPRecommendations(q, w, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
@@ -330,7 +340,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 
 		var result media.RecommendationSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Len(t, result.Items, 1)
 		require.Equal(t, known.UID, result.Items[0].Uid)
 	})
@@ -344,6 +354,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 		defer done()
 
 		q := sqltestx.Metadatabase(t)
+		w := pqueuetestx.NewQueue()
 
 		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
 		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
@@ -355,7 +366,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 
 		routes := mux.NewRouter()
-		media.NewHTTPRecommendations(q, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
+		media.NewHTTPRecommendations(q, w, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
@@ -368,7 +379,7 @@ func TestRecommendationsRandomFiltering(t *testing.T) {
 
 		var result media.RecommendationSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Len(t, result.Items, 1)
 		require.False(t, result.Items[0].Adult)
 		require.NotEmpty(t, result.Items[0].Description)
@@ -386,6 +397,7 @@ func TestRecommendationsRandom(t *testing.T) {
 		defer done()
 
 		q := sqltestx.Metadatabase(t)
+		w := pqueuetestx.NewQueue()
 
 		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
 		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
@@ -397,7 +409,7 @@ func TestRecommendationsRandom(t *testing.T) {
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 
 		routes := mux.NewRouter()
-		media.NewHTTPRecommendations(q, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
+		media.NewHTTPRecommendations(q, w, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
@@ -413,7 +425,7 @@ func TestRecommendationsRandom(t *testing.T) {
 
 		var result media.RecommendationSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Equal(t, known.UID, result.Items[0].Uid)
 	})
 
@@ -426,6 +438,7 @@ func TestRecommendationsRandom(t *testing.T) {
 		defer done()
 
 		q := sqltestx.Metadatabase(t)
+		w := pqueuetestx.NewQueue()
 
 		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
 		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
@@ -433,7 +446,7 @@ func TestRecommendationsRandom(t *testing.T) {
 		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, authz).Scan(&authz))
 
 		routes := mux.NewRouter()
-		media.NewHTTPRecommendations(q, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
+		media.NewHTTPRecommendations(q, w, media.HTTPRecommendationsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 

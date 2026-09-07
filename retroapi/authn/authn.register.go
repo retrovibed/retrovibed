@@ -3,7 +3,6 @@ package authn
 import (
 	"context"
 	"encoding/base64"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -17,6 +16,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/md5x"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -59,7 +59,7 @@ func Register(ctx context.Context, c *http.Client) (*Session, error) {
 			return nil, err
 		}
 
-		if err = json.NewDecoder(resp.Body).Decode(&authed); err != nil {
+		if err = jsonx.UnmarshalRead(resp.Body, &authed); err != nil {
 			return nil, err
 		}
 
@@ -88,7 +88,7 @@ func Register(ctx context.Context, c *http.Client) (*Session, error) {
 			return nil, err
 		}
 
-		if err = json.NewDecoder(resp.Body).Decode(&session); err != nil {
+		if err = jsonx.UnmarshalRead(resp.Body, &session); err != nil {
 			return nil, err
 		}
 
@@ -118,7 +118,7 @@ func AwaitAuthorized(ctx context.Context, c *http.Client, granted func(*Token) b
 		}
 		defer resp.Body.Close()
 
-		if err = json.NewDecoder(resp.Body).Decode(&authed); err != nil {
+		if err = jsonx.UnmarshalRead(resp.Body, &authed); err != nil {
 			return err
 		}
 

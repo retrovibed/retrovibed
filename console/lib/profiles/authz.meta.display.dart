@@ -33,7 +33,7 @@ class AuthzMetaDisplay extends StatelessWidget {
     return Wrap(
       spacing: defaults.spacing,
       runSpacing: defaults.spacing,
-      alignment: WrapAlignment.start,
+      alignment: WrapAlignment.spaceBetween,
       children: [
         AuthzPermissionRow(
           "User Management",

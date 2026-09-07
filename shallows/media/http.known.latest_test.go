@@ -1,13 +1,13 @@
 package media_test
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"testing"
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
@@ -64,7 +64,7 @@ func TestKnownLatest(t *testing.T) {
 
 		var result media.KnownLatestResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Empty(t, result.Items)
 	})
 
@@ -112,7 +112,7 @@ func TestKnownLatest(t *testing.T) {
 
 		var result media.KnownLatestResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Len(t, result.Items, 10)
 	})
 
@@ -168,7 +168,7 @@ func TestKnownLatest(t *testing.T) {
 
 		var result media.KnownLatestResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Len(t, result.Items, 5)
 	})
 
@@ -222,7 +222,7 @@ func TestKnownLatest(t *testing.T) {
 
 		var result media.KnownLatestResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Len(t, result.Items, 5)
 		for _, item := range result.Items {
 			require.Equal(t, mimex.Video, item.Mimetype)
@@ -279,7 +279,7 @@ func TestKnownLatest(t *testing.T) {
 
 		var result media.KnownLatestResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Len(t, result.Items, 5)
 	})
 
@@ -331,7 +331,7 @@ func TestKnownLatest(t *testing.T) {
 
 		var result media.KnownLatestResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Len(t, result.Items, 1)
 		require.Equal(t, match.UID, result.Items[0].Uid)
 	})
@@ -386,7 +386,7 @@ func TestKnownLatest(t *testing.T) {
 
 		var result media.KnownLatestResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Len(t, result.Items, 3)
 		require.Equal(t, newest.UID, result.Items[0].Uid)
 		require.Equal(t, grpcx.EncodeTime(newest.Released), result.Items[0].Released)

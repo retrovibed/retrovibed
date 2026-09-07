@@ -11,4 +11,6 @@ type Commands struct {
 	List    cmdCommunityList    `cmd:"" help:"list published content for a community"`
 	Import  cmdCommunityImport  `cmd:"" help:"import published content to local database from stdin"`
 	Sync    cmdCommunitySync    `cmd:"" help:"sync published content from deeppool to local database"`
+
+	Publisher publisher `cmd:"" help:"manage the publish plugins content is cross-posted through"`
 }

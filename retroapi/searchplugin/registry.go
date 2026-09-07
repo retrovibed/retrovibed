@@ -143,7 +143,24 @@ func defaultSocket() wnetruntime.Socket {
 // without starting the search.d directory watch, so tests can Load plugins
 // directly without touching the real, hardcoded plugin directory.
 func newRegistry(ctx context.Context, sock wnetruntime.Socket, options ...Option) (*Registry, error) {
-	runtime := wazero.NewRuntime(ctx)
+	cachedir := userx.DefaultCacheDirectory(userx.DefaultRelRoot())
+
+	// Plugins are large (tens of MB) wasm binaries; without a persistent
+	// compilation cache wazero AOT-compiles every one of them from scratch
+	// on every daemon start, which can add tens of seconds to startup.
+	// Caching compiled code here means only new/changed plugins pay that
+	// cost.
+	compiledir := filepath.Join(cachedir, "wazero.compiled")
+	if err := os.MkdirAll(compiledir, 0700); err != nil {
+		return nil, errorsx.Wrap(err, "unable to create wazero compilation cache directory")
+	}
+
+	cache, err := wazero.NewCompilationCacheWithDir(compiledir)
+	if err != nil {
+		return nil, errorsx.Wrap(err, "unable to open wazero compilation cache")
+	}
+
+	runtime := wazero.NewRuntimeWithConfig(ctx, wazero.NewRuntimeConfig().WithCompilationCache(cache))
 
 	if _, err := wasi_snapshot_preview1.Instantiate(ctx, runtime); err != nil {
 		return nil, errorsx.Wrap(err, "unable to instantiate wasi")
@@ -164,7 +181,7 @@ func newRegistry(ctx context.Context, sock wnetruntime.Socket, options ...Option
 			"/etc/ssl/certs",
 		),
 		configDir: userx.DefaultConfigDir(userx.DefaultRelRoot()),
-		cacheDir:  userx.DefaultCacheDirectory(userx.DefaultRelRoot()),
+		cacheDir:  cachedir,
 		modules:   map[string]wazero.CompiledModule{},
 	}
 	for _, opt := range options {

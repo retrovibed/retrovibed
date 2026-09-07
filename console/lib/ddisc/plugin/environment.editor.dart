@@ -105,6 +105,7 @@ class _EnvironmentEditorState extends State<EnvironmentEditor> {
     final defaults = ds.Defaults.of(context);
 
     return forms.Container(
+      padding: defaults.padding,
       Column(
         mainAxisSize: MainAxisSize.min,
         spacing: defaults.spacing,

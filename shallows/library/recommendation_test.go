@@ -6,11 +6,23 @@ import (
 
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/library"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+func TestRecommendationSourceMD5(t *testing.T) {
+	t.Run("fixed md5 sums", func(t *testing.T) {
+		// any changes to these will require downstream changes in the ui.
+		assert.Equal(t, "7ddf32e1-7a6a-c5ce-04a8-ecbf782ca509", md5x.String(library.RecommendationSourceRandom), "mismatched md5 for source random")
+		assert.Equal(t, "538416cf-3bc5-9332-670a-f4cae9485ebe", md5x.String(library.RecommendationSourceDiscovered), "mismatched md5 for source discovered")
+		assert.Equal(t, "e15ee067-d8b5-a64b-ffd9-617121fa925b", md5x.String(library.RecommendationSourceGenerative), "mismatched md5 for source generative")
+		assert.Equal(t, "ab1c952c-a77a-0bc1-3e23-68588d7a0c6e", md5x.String(library.RecommendationSourceSearchPlugin), "mismatched md5 for source search plugin")
+	})
+}
 
 func TestRecommendationLastGeneratedAt(t *testing.T) {
 	t.Run("returns neg infinity when no recommendations exist", func(t *testing.T) {

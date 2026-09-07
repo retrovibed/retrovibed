@@ -3,7 +3,6 @@ package httpx
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -22,6 +21,7 @@ import (
 
 	"github.com/justinas/alice"
 	"github.com/retrovibed/retrovibed/retroapi/backoffx"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/debugx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -232,7 +232,7 @@ func WriteJSON(resp http.ResponseWriter, buffer *bytes.Buffer, context any) erro
 	buffer.Reset()
 	resp.Header().Set("Content-Type", "application/json")
 
-	if err = json.NewEncoder(buffer).Encode(context); err != nil {
+	if err = jsonx.MarshalWrite(buffer, context); err != nil {
 		resp.WriteHeader(http.StatusInternalServerError)
 		return err
 	}
@@ -248,7 +248,7 @@ func WriteJSONCode(resp http.ResponseWriter, code int, buffer *bytes.Buffer, con
 	resp.WriteHeader(code)
 	resp.Header().Set("Content-Type", "application/json")
 
-	if err = json.NewEncoder(buffer).Encode(context); err != nil {
+	if err = jsonx.MarshalWrite(buffer, context); err != nil {
 		resp.WriteHeader(http.StatusInternalServerError)
 		return err
 	}

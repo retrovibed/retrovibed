@@ -31,6 +31,12 @@ typedef FnRecommendations =
       List<httpx.Option> options,
     });
 
+typedef FnRecommendationsRequest =
+    Future<RecommendationRefreshResponse> Function(
+      RecommendationRefreshRequest req, {
+      List<httpx.Option> options,
+    });
+
 typedef FnRecent =
     Future<RecentSearchResponse> Function(
       RecentSearchRequest req, {
@@ -287,6 +293,23 @@ abstract class recommendations {
         });
   }
 
+  static Future<RecommendationRefreshResponse> refresh(
+    RecommendationRefreshRequest req, {
+    List<httpx.Option> options = const [],
+  }) {
+    return httpx
+        .post(
+          Uri.https(httpx.host(), "/r/"),
+          options: options,
+          body: jsonEncode(req.toProto3Json()),
+        )
+        .then((v) {
+          return Future.value(
+            httpx.fromProto3JsonSafe(RecommendationRefreshResponse.create(), jsonDecode(v.body)),
+          );
+        });
+  }
+
   static Future<RecommendationFindResponse> find(
     String id, {
     List<httpx.Option> options = const [],
@@ -325,22 +348,6 @@ abstract class recommendations {
         .then((v) {
           return Future.value(
             httpx.fromProto3JsonSafe(RecommendationDeleteResponse.create(), jsonDecode(v.body)),
-          );
-        });
-  }
-
-  static Future<RecommendationSearchResponse> refresh({
-    List<httpx.Option> options = const [],
-  }) {
-    return httpx
-        .post(
-          Uri.https(httpx.host(), "/r/"),
-          options: options,
-          body: jsonEncode(RecommendationSearchResponse.create().toProto3Json()),
-        )
-        .then((v) {
-          return Future.value(
-            httpx.fromProto3JsonSafe(RecommendationSearchResponse.create(), jsonDecode(v.body)),
           );
         });
   }

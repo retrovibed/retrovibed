@@ -23,7 +23,7 @@ class AuthzPermissionRow extends StatelessWidget {
         Text(label),
         description: Text(
           description,
-          maxLines: 2,
+          maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
         value: value,

@@ -39,7 +39,7 @@ class KnownMediaIcon extends StatelessWidget {
                 width: size,
                 height: size,
                 fit: BoxFit.cover,
-                error: (context) => fallback,
+                missing: fallback,
               ) ??
               fallback,
         );

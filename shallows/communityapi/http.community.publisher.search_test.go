@@ -1,13 +1,14 @@
 package communityapi_test
 
 import (
-	"encoding/json"
 	"net/http"
 	"testing"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
+	"github.com/retrovibed/retrovibed/retroapi/publishplugin"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
@@ -37,9 +38,12 @@ func TestHTTPCommunityPublisherSearch(t *testing.T) {
 		ID: uuid.Must(uuid.NewV7()).String(), Path: "/plugins/spotify", Description: "Spotify", Mimetype: "application/vnd.retrovibe.publisher.spotify",
 	}).Scan(&spotify))
 
+	reg := testx.Must(publishplugin.NewRegistry(ctx, publishplugin.OptionConfigDir(t.TempDir()), publishplugin.OptionCacheDir(t.TempDir())))(t)
+
 	routes := mux.NewRouter()
 	communityapi.NewHTTPCommunityPublisher(
 		q,
+		reg,
 		communityapi.HTTPCommunityPublisherOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 	).Bind(routes.PathPrefix("/").Subrouter())
 
@@ -59,16 +63,55 @@ func TestHTTPCommunityPublisherSearch(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 		require.NoError(t, httpx.ErrorCode(resp.Result()))
 
-		var result communityapi.SocialsSearchResponse
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		var result communityapi.PluginPublisherSearchResponse
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 		bymimetype := map[string]*communityapi.PluginPublisher{}
-		for _, p := range result.Catalog {
+		for _, p := range result.Items {
 			bymimetype[p.Mimetype] = p
 		}
 		require.Contains(t, bymimetype, youtube.Mimetype)
 		require.Equal(t, youtube.ID, bymimetype[youtube.Mimetype].Id)
 		require.Contains(t, bymimetype, spotify.Mimetype)
+	})
+
+	// what the add dropdown asks of the catalog: everything except what this
+	// community has already attached.
+	t.Run("excludes publishers by id", func(t *testing.T) {
+		ids := func(t *testing.T, query string) []string {
+			resp, req, err := httptestx.BuildRequestBytes(
+				http.MethodGet,
+				"/"+query,
+				nil,
+				httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)),
+			)
+			require.NoError(t, err)
+
+			routes.ServeHTTP(resp, req)
+			require.NoError(t, httpx.ErrorCode(resp.Result()))
+
+			var result communityapi.PluginPublisherSearchResponse
+			require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
+
+			found := make([]string, 0, len(result.Items))
+			for _, p := range result.Items {
+				found = append(found, p.Id)
+			}
+			return found
+		}
+
+		require.ElementsMatch(t, []string{youtube.ID, spotify.ID}, ids(t, ""))
+		require.Equal(t, []string{spotify.ID}, ids(t, "?excluded="+youtube.ID))
+
+		// repeated, so an exclusion accumulates rather than replaces.
+		require.Empty(t, ids(t, "?excluded="+youtube.ID+"&excluded="+spotify.ID))
+
+		// an id nobody installed leaves the catalog alone.
+		require.ElementsMatch(t, []string{youtube.ID, spotify.ID}, ids(t, "?excluded="+uuid.Must(uuid.NewV7()).String()))
+
+		// and it composes with the text query.
+		require.Equal(t, []string{spotify.ID}, ids(t, "?excluded="+youtube.ID+"&query=Spotify"))
+		require.Empty(t, ids(t, "?excluded="+youtube.ID+"&query=YouTube"))
 	})
 
 	t.Run("requires a privileged token", func(t *testing.T) {

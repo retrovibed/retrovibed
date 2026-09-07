@@ -78,7 +78,7 @@ github.com/ProtonMail/go-crypto/openpgp/packet
 github.com/ProtonMail/go-crypto/openpgp/s2k
 github.com/ProtonMail/go-crypto/openpgp/x25519
 github.com/ProtonMail/go-crypto/openpgp/x448
-# github.com/RoaringBitmap/roaring/v2 v2.26.0
+# github.com/RoaringBitmap/roaring/v2 v2.27.0
 ## explicit; go 1.24.0
 github.com/RoaringBitmap/roaring/v2
 github.com/RoaringBitmap/roaring/v2/internal
@@ -593,7 +593,7 @@ github.com/google/go-cmp/cmp/internal/diff
 github.com/google/go-cmp/cmp/internal/flags
 github.com/google/go-cmp/cmp/internal/function
 github.com/google/go-cmp/cmp/internal/value
-# github.com/google/pprof v0.0.0-20260825171938-4d453200e7d9
+# github.com/google/pprof v0.0.0-20260903180319-d6c3cb2f37ec
 ## explicit; go 1.25.0
 github.com/google/pprof/profile
 # github.com/google/s2a-go v0.1.9
@@ -698,7 +698,7 @@ github.com/jackc/pgx/v5/stdlib
 ## explicit; go 1.19
 github.com/jackc/puddle/v2
 github.com/jackc/puddle/v2/internal/genstack
-# github.com/james-lawrence/genieql v0.0.0-20260821141941-92fda96aa606
+# github.com/james-lawrence/genieql v0.0.0-20260904213219-acc6235faffb
 ## explicit; go 1.25.0
 github.com/james-lawrence/genieql
 github.com/james-lawrence/genieql/astbuild
@@ -730,8 +730,8 @@ github.com/james-lawrence/genieql/internal/userx
 github.com/james-lawrence/genieql/internal/wasidialect
 github.com/james-lawrence/genieql/internal/wasix/ffierrors
 github.com/james-lawrence/genieql/internal/wasix/ffiguest
-# github.com/james-lawrence/torrent v0.0.0-20260827164208-39896974110a
-## explicit; go 1.25.0
+# github.com/james-lawrence/torrent v0.0.0-20260906234647-25e304071dd5
+## explicit; go 1.27.0
 github.com/james-lawrence/torrent
 github.com/james-lawrence/torrent/autobind
 github.com/james-lawrence/torrent/bencode
@@ -758,6 +758,7 @@ github.com/james-lawrence/torrent/internal/backoffx
 github.com/james-lawrence/torrent/internal/bitmapx
 github.com/james-lawrence/torrent/internal/bytesx
 github.com/james-lawrence/torrent/internal/chansync
+github.com/james-lawrence/torrent/internal/cryptox
 github.com/james-lawrence/torrent/internal/envx
 github.com/james-lawrence/torrent/internal/errorsx
 github.com/james-lawrence/torrent/internal/fnvx
@@ -766,9 +767,11 @@ github.com/james-lawrence/torrent/internal/iterx
 github.com/james-lawrence/torrent/internal/langx
 github.com/james-lawrence/torrent/internal/multiless
 github.com/james-lawrence/torrent/internal/netx
+github.com/james-lawrence/torrent/internal/rendezvous
 github.com/james-lawrence/torrent/internal/slicesx
 github.com/james-lawrence/torrent/internal/slogx
 github.com/james-lawrence/torrent/internal/stmutil
+github.com/james-lawrence/torrent/internal/testx
 github.com/james-lawrence/torrent/internal/timex
 github.com/james-lawrence/torrent/internal/userx
 github.com/james-lawrence/torrent/internal/utpx
@@ -780,6 +783,7 @@ github.com/james-lawrence/torrent/mse
 github.com/james-lawrence/torrent/sockets
 github.com/james-lawrence/torrent/storage
 github.com/james-lawrence/torrent/torrenttest
+github.com/james-lawrence/torrent/torrenttestx
 github.com/james-lawrence/torrent/tracker
 github.com/james-lawrence/torrent/upnp
 # github.com/jfreymuth/pulse v0.1.2
@@ -912,7 +916,7 @@ github.com/pressly/goose/v3/lock
 github.com/pressly/goose/v3/lock/internal/store
 github.com/pressly/goose/v3/lock/internal/table
 # github.com/retrovibed/retrovibed/retroapi v0.0.0-20260804202116-1a4f850b87e4
-## explicit; go 1.26.3
+## explicit; go 1.27.0
 # github.com/rivo/uniseg v0.4.7
 ## explicit; go 1.18
 github.com/rivo/uniseg

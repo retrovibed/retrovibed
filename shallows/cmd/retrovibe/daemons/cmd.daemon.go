@@ -13,7 +13,6 @@ import (
 	"github.com/egdaemon/wasinet/wasinet/wnetruntime"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/justinas/alice"
-	"github.com/linxGnu/pqueue"
 	"golang.org/x/crypto/ssh"
 	"golang.zx2c4.com/wireguard/tun/netstack"
 
@@ -22,6 +21,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/netmonx"
+	"github.com/retrovibed/retrovibed/retroapi/publishplugin"
 	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
 	"github.com/retrovibed/retrovibed/retroapi/tlsx"
 	"github.com/retrovibed/retrovibed/retroapi/userx"
@@ -41,6 +41,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/netx"
+	"github.com/retrovibed/retrovibed/shallows/internal/pqueuex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sshx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
@@ -161,22 +162,19 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		vpncfgpath          = userx.DefaultConfigDir(userx.DefaultRelRoot(), "vpn.cfg")
 		storagecfgpath      = userx.DefaultConfigDir(userx.DefaultRelRoot(), "storage.cfg")
 		mediarecsdir        = userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "media.recs.d")
+		mediapubsdir        = userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "media.pud.d")
 	)
 
 	// initialize queue directories
-	err = fsx.MkDirs(
-		0700,
-		mediarecsdir,
-	)
+	mediarecs, err := pqueuex.New(mediarecsdir)
 	if err != nil {
-		return errorsx.Wrap(err, "unable to create queues dir")
+		return err
 	}
 
-	mediarecs, err := pqueue.New(mediarecsdir, 32)
+	mediapub, err := pqueuex.New(mediapubsdir)
 	if err != nil {
-		return errorsx.Wrap(err, "unable to create media recs queue")
+		return err
 	}
-	_ = mediarecs
 
 	gctx.Cleanup.Add(1)
 	defer gctx.Cleanup.Done()
@@ -207,18 +205,22 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	}
 	defer db.Close()
 
+	log.Println("checkpoint - database")
 	// block for first checkpoint
 	errorsx.Log(cmdopts.Checkpoint(gctx.Context, db))
 
+	log.Println("checkpoint - initialize admin")
 	if err = identityssh.InitializeAdmin(gctx.Context, db, id.PublicKey()); err != nil {
 		return errorsx.Wrap(err, "unable to import ssh identity")
 	}
 
+	log.Println("checkpoint - initialize authz")
 	if err = meta.AuthzFindByProfileID(gctx.Context, db, sqlx.NewNullString(sshx.FingerprintMD5(id.PublicKey()))).Scan(&authz); err != nil {
 		return errorsx.Wrap(err, "unable to load authorization")
 	}
 
 	if t.AutoDefaultSubscriptions {
+		log.Println("checkpoint - initialize default feeds")
 		errorsx.Log(errorsx.Wrap(PrepareDefaultFeeds(gctx.Context, db), "unable to initialize default rss feeds"))
 	}
 
@@ -243,11 +245,45 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 
 	var tstore storage.ClientImpl = blockcache.NewTorrentFromVirtualFS(tvfs)
 
+	// socialDialer/socialResolver back the "social ring" - publishing and
+	// (eventually) recommendations traffic - kept deliberately separate
+	// from privateDialer/privateResolver below, which back the
+	// "distribution ring" torrents and search plugins use. There's no
+	// wireguard tunnel of its own for the social ring yet (a planned
+	// follow-up, mirroring how _torrenting.Watch live-swaps
+	// privateDialer/privateResolver onto a tunnel when one is configured -
+	// see torrent.go), so it's stored once here with the same plain-host
+	// fallback DefaultDialer uses when no tunnel is present.
+	socialDialer := netx.NewDialerProxy()
+	socialResolver := dnscache.AutoProxyResolver()
+	socialDialer.Store(DefaultDialer(nil, socialResolver))
+
+	publishers, err := publishplugin.NewRegistryWithSocket(
+		gctx.Context,
+		wnetruntime.Virtual(
+			socialDialer,
+			netx.UnsupportedListenConfig{},
+			socialResolver,
+			wnetruntime.PublicFirewall(),
+		),
+	)
+	if err != nil {
+		return errorsx.Wrap(err, "unable to start publish plugin registry")
+	}
+
+	// the registry loads publish.d on its own; recording what it found in
+	// the catalog is what makes a plugin selectable for a community, and
+	// is the only way a hand-installed or symlinked plugin ever gets a row.
+	errorsx.Log(errorsx.Wrap(
+		PublishPluginImport(gctx.Context, db, publishplugin.PublishPluginDir(userx.DefaultConfigDir(userx.DefaultRelRoot()))),
+		"publish plugin import failed",
+	))
+
 	if t.AutoArchive && deepjwt != http.DefaultClient {
 		log.Println("automatic archival is enabled")
 		errorsx.Log(AutoArchival(gctx.Context, db, deepjwt, mediastore, archival, t.AutoArchive))
 		errorsx.Log(AutoBackup(gctx.Context, db, deepjwt, backup, cmdopts.MachineID(), t.AutoBackup))
-		errorsx.Log(AutoPublishing(gctx.Context, db, deepjwt, mediastore, tvfs, publishing))
+		errorsx.Log(AutoPublishing(gctx.Context, db, deepjwt, mediastore, tvfs, publishing, mediapub, publishers))
 		errorsx.Log(AutoFeedSync(gctx.Context, db, deepjwt, publishing))
 		errorsx.Log(SubscriptionSync(gctx.Context, db, deepjwt, communitysync))
 		tstore = library.NewTorrentStorageFromHTTP(db, deepjwt, tstore)
@@ -263,13 +299,17 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		}
 	}
 
+	log.Println("checkpoint - initialize plugins")
 	// plugins is built once, up front, decoupled from _torrenting.Init/Reload
 	// (NewRegistryWithSocket spins up a wazero runtime + WASI + a directory
 	// watcher - too expensive to rebuild every reload generation). It still
 	// needs to track the live wireguard-tunnel-or-host dialer the same way
-	// the torrent client's own dialer does, so privateDialer/pluginsResolver
+	// the torrent client's own dialer does, so privateDialer/privateResolver
 	// are handed into newTorrenting to become _torrenting's _dialer/
 	// _dnscache - Init's normal per-generation Store calls keep them live.
+	// This is the "distribution ring" - deliberately a separate
+	// dialer/resolver pair from socialDialer/socialResolver above, which
+	// back publishing/recommendations traffic instead.
 	privateDialer := netx.NewDialerProxy()
 	privateResolver := dnscache.AutoProxyResolver()
 	plugins, err := searchplugin.NewRegistryWithSocket(
@@ -315,6 +355,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		privateResolver,
 	)
 
+	log.Println("checkpoint - distribution")
 	if err = torrenting.Reload(gctx.Context, t.torrentsettings(), t.discoverysettings()); err != nil {
 		return errorsx.Wrap(err, "failed to reload torrent")
 	}
@@ -327,6 +368,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		return err
 	}
 
+	log.Println("checkpoint - network monitoring")
 	if netmon := netmonx.Global(); netmon != nil {
 		go func() {
 			for delta := range netmon.Each(gctx.Context) {
@@ -349,6 +391,19 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	asyncx.Background(gctx.Context, mediameta, func(ctx context.Context) error {
 		return errorsx.Wrap(SearchPluginImport(ctx, db, searchplugin.SearchPluginDir(userx.DefaultConfigDir(userx.DefaultRelRoot())), tvfs, tstore), "search plugin import failed")
 	})
+	asyncx.Background(gctx.Context, mediameta, func(ctx context.Context) error {
+		plugindir := publishplugin.PublishPluginDir(userx.DefaultConfigDir(userx.DefaultRelRoot()))
+
+		if err := PublishPluginTorrentImport(ctx, db, plugindir, tvfs, tstore); err != nil {
+			return errorsx.Wrap(err, "publish plugin torrent import failed")
+		}
+
+		// copying into publish.d is enough for the registry watch to load the
+		// module, but publishing fans out over the catalog, so a plugin with no
+		// row is never invoked - reconcile here as well so a plugin installed
+		// from a community is usable without waiting for a restart.
+		return errorsx.Wrap(PublishPluginImport(ctx, db, plugindir), "publish plugin import failed")
+	})
 	go func() {
 		errorsx.Log(errorsx.Wrap(asyncx.WatchDirectories(gctx.Context, mediameta, asyncx.FileCreated, mediastore.Path()), "media metadata file watch failed"))
 	}()
@@ -363,6 +418,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	})
 
 	if len(t.TorrentFolderWatch) > 0 {
+		log.Println("download folder monitoring enabled")
 		dwatcher, err := downloads.NewDirectoryWatcher(gctx.Context, tlsx.MustClone(tlscfg.Config(), tlsx.OptionInsecureSkipVerify), db)
 		if err != nil {
 			return errorsx.Wrap(err, "unable to setup directory monitoring for torrents")
@@ -385,6 +441,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	})
 
 	if t.AutoIdentifyMedia {
+		log.Println("auto identify media enabled")
 		b := backoffx.New(backoffx.Constant(15*time.Minute), backoffx.JitterRandom(time.Second))
 		go asyncx.Periodic(gctx.Context, mediaidentification, b, "automatic media identification - periodic")
 		asyncx.Background(gctx.Context, mediaidentification, func(ctx context.Context) error {
@@ -399,7 +456,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	}
 
 	if t.AutoRecommendations {
-		errorsx.Log(RecommendationsBackground(gctx.Context, db, plugins, t.DiscoverySeed))
+		errorsx.Log(media.RecommendationsBackground(gctx.Context, t.DiscoverySeed, db, mediarecs, plugins))
 	} else {
 		log.Println("auto recommendations is disabled")
 	}
@@ -416,6 +473,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		log.Println("*************************************** acoustic indexing is disabled ***************************************")
 	}
 
+	log.Println("checkpoint - http service")
 	httpmux := mux.NewRouter()
 	httpmux.NotFoundHandler = httpx.NotFound(alice.New())
 	httpmux.Use(
@@ -470,7 +528,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		media.HTTPDiscoveredOptionRootStorage(rootstore),
 		media.HTTPDiscoveredOptionQueryCleaner(mc),
 	).Bind(httpmux.PathPrefix("/d").Subrouter())
-	media.NewHTTPRecommendations(db).Bind(httpmux.PathPrefix("/r").Subrouter())
+	media.NewHTTPRecommendations(db, mediarecs).Bind(httpmux.PathPrefix("/r").Subrouter())
 	media.NewHTTPSimilar(db).Bind(httpmux.PathPrefix("/similar").Subrouter())
 	media.NewHTTPRecent(db).Bind(httpmux.PathPrefix("/w").Subrouter())
 	mediaapi.NewHTTPRemoteControl(t.RemoteControl).Bind(httpmux.PathPrefix("/rc").Subrouter())
@@ -499,6 +557,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	communityapi.NewHTTPPublished(
 		db,
 		envx.Toggle(communityapi.HTTPPublishedOptionNoop, communityapi.HTTPPublishedOptionHTTPClient(deepjwt), t.AutoArchive),
+		communityapi.HTTPPublishedOptionPublishQueue(mediapub),
 		communityapi.HTTPPublishedOptionPublishing(publishing),
 		communityapi.HTTPPublishedOptionMediaStorage(mediastore),
 		communityapi.HTTPPublishedOptionTorrentStorage(tvfs),
@@ -511,7 +570,11 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	).Bind(httpmux.PathPrefix("/c").Subrouter())
 
 	communityapi.NewHTTPSocial(db).Bind(httpmux.PathPrefix("/c/social").Subrouter())
-	communityapi.NewHTTPCommunityPublisher(db).Bind(httpmux.PathPrefix("/c/publishers").Subrouter())
+	// bound ahead of /c/publishers so the more specific prefix wins - the
+	// publisher service's own /{id} route would otherwise be the first
+	// thing offered a match under that prefix.
+	communityapi.NewHTTPPublisherEnvironment(db, publishers).Bind(httpmux.PathPrefix("/c/publishers/environment").Subrouter())
+	communityapi.NewHTTPCommunityPublisher(db, publishers).Bind(httpmux.PathPrefix("/c/publishers").Subrouter())
 
 	communityapi.NewHTTPYouTube(db, deepjwt).Bind(httpmux.PathPrefix("/integrations/youtube").Subrouter())
 

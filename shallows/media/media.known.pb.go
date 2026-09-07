@@ -1032,6 +1032,11 @@ func (x *RecommendationDeleteResponse) GetRecommendation() *Known {
 
 type RecommendationRefreshRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	ProfileId     string                 `protobuf:"bytes,1,opt,name=profile_id,proto3" json:"profile_id,omitempty"`
+	Limit         uint64                 `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
+	Mimetype      string                 `protobuf:"bytes,3,opt,name=mimetype,proto3" json:"mimetype,omitempty"`
+	Adult         bool                   `protobuf:"varint,4,opt,name=adult,proto3" json:"adult,omitempty"`
+	Language      string                 `protobuf:"bytes,5,opt,name=language,proto3" json:"language,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1066,11 +1071,45 @@ func (*RecommendationRefreshRequest) Descriptor() ([]byte, []int) {
 	return file_media_media_known_proto_rawDescGZIP(), []int{18}
 }
 
+func (x *RecommendationRefreshRequest) GetProfileId() string {
+	if x != nil {
+		return x.ProfileId
+	}
+	return ""
+}
+
+func (x *RecommendationRefreshRequest) GetLimit() uint64 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
+func (x *RecommendationRefreshRequest) GetMimetype() string {
+	if x != nil {
+		return x.Mimetype
+	}
+	return ""
+}
+
+func (x *RecommendationRefreshRequest) GetAdult() bool {
+	if x != nil {
+		return x.Adult
+	}
+	return false
+}
+
+func (x *RecommendationRefreshRequest) GetLanguage() string {
+	if x != nil {
+		return x.Language
+	}
+	return ""
+}
+
 type RecommendationRefreshResponse struct {
-	state          protoimpl.MessageState `protogen:"open.v1"`
-	Recommendation *Known                 `protobuf:"bytes,1,opt,name=recommendation,json=recomendation,proto3" json:"recommendation,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *RecommendationRefreshResponse) Reset() {
@@ -1101,13 +1140,6 @@ func (x *RecommendationRefreshResponse) ProtoReflect() protoreflect.Message {
 // Deprecated: Use RecommendationRefreshResponse.ProtoReflect.Descriptor instead.
 func (*RecommendationRefreshResponse) Descriptor() ([]byte, []int) {
 	return file_media_media_known_proto_rawDescGZIP(), []int{19}
-}
-
-func (x *RecommendationRefreshResponse) GetRecommendation() *Known {
-	if x != nil {
-		return x.Recommendation
-	}
-	return nil
 }
 
 var File_media_media_known_proto protoreflect.FileDescriptor
@@ -1178,10 +1210,16 @@ const file_media_media_known_proto_rawDesc = "" +
 	"\x0erecommendation\x18\x01 \x01(\v2\f.media.KnownR\rrecomendation\"\x1d\n" +
 	"\x1bRecommendationDeleteRequest\"S\n" +
 	"\x1cRecommendationDeleteResponse\x123\n" +
-	"\x0erecommendation\x18\x01 \x01(\v2\f.media.KnownR\rrecomendation\"\x1e\n" +
-	"\x1cRecommendationRefreshRequest\"T\n" +
-	"\x1dRecommendationRefreshResponse\x123\n" +
-	"\x0erecommendation\x18\x01 \x01(\v2\f.media.KnownR\rrecomendationb\x06proto3"
+	"\x0erecommendation\x18\x01 \x01(\v2\f.media.KnownR\rrecomendation\"\xa2\x01\n" +
+	"\x1cRecommendationRefreshRequest\x12\x1e\n" +
+	"\n" +
+	"profile_id\x18\x01 \x01(\tR\n" +
+	"profile_id\x12\x14\n" +
+	"\x05limit\x18\x02 \x01(\x04R\x05limit\x12\x1a\n" +
+	"\bmimetype\x18\x03 \x01(\tR\bmimetype\x12\x14\n" +
+	"\x05adult\x18\x04 \x01(\bR\x05adult\x12\x1a\n" +
+	"\blanguage\x18\x05 \x01(\tR\blanguage\"\x1f\n" +
+	"\x1dRecommendationRefreshResponseb\x06proto3"
 
 var (
 	file_media_media_known_proto_rawDescOnce sync.Once
@@ -1234,12 +1272,11 @@ var file_media_media_known_proto_depIdxs = []int32{
 	0,  // 11: media.RecommendationSearchResponse.items:type_name -> media.Known
 	0,  // 12: media.RecommendationFindResponse.recommendation:type_name -> media.Known
 	0,  // 13: media.RecommendationDeleteResponse.recommendation:type_name -> media.Known
-	0,  // 14: media.RecommendationRefreshResponse.recommendation:type_name -> media.Known
-	15, // [15:15] is the sub-list for method output_type
-	15, // [15:15] is the sub-list for method input_type
-	15, // [15:15] is the sub-list for extension type_name
-	15, // [15:15] is the sub-list for extension extendee
-	0,  // [0:15] is the sub-list for field type_name
+	14, // [14:14] is the sub-list for method output_type
+	14, // [14:14] is the sub-list for method input_type
+	14, // [14:14] is the sub-list for extension type_name
+	14, // [14:14] is the sub-list for extension extendee
+	0,  // [0:14] is the sub-list for field type_name
 }
 
 func init() { file_media_media_known_proto_init() }

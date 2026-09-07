@@ -1,7 +1,6 @@
 package metaapi
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 
@@ -9,6 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
 	"github.com/retrovibed/retrovibed/retroapi/httpauth"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -61,7 +61,6 @@ func (t *HTTPAuthz) Bind(r *mux.Router) {
 	).ThenFunc(t.profile))
 
 	r.Path("/{id}").Methods(http.MethodPost).Handler(alice.New(
-		httpx.DebugRequest,
 		httpx.ContextBufferPool512(),
 		AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
 		httpx.ParseForm,
@@ -150,7 +149,7 @@ func (t *HTTPAuthz) grant(w http.ResponseWriter, r *http.Request) {
 		pid, _ = mux.Vars(r)["id"]
 	)
 
-	if err = json.NewDecoder(r.Body).Decode(&msg); err != nil {
+	if err = jsonx.UnmarshalRead(r.Body, &msg); err != nil {
 		log.Println("unable to decode request", err)
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return

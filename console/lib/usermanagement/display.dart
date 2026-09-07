@@ -34,12 +34,7 @@ class _DisplayState extends State<Display> {
     return ds.Container(
       padding: widget.padding ?? defaults.padding,
       margin: widget.margin ?? defaults.margin,
-      Column(
-        spacing: defaults.spacing,
-        children: [
-          profiles.ListDisplay(controller: controller, events: events),
-        ],
-      ),
+      profiles.ListDisplay(controller: controller, events: events),
     );
   }
 }

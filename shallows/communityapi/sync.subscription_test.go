@@ -9,12 +9,18 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid/v5"
+	"github.com/james-lawrence/torrent/dht/int160"
+	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/retrovibed/retrovibed/retroapi/bytesx"
+	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
+	"github.com/retrovibed/retrovibed/shallows/internal/timex"
+	"github.com/retrovibed/retrovibed/shallows/internal/torrentx"
+	"github.com/retrovibed/retrovibed/shallows/tracking"
 	"github.com/stretchr/testify/require"
 )
 
@@ -101,6 +107,93 @@ func TestSyncPublishedContentItem(t *testing.T) {
 		var stored []community.PublishedContent
 		require.NoError(t, sqlx.ScanInto(community.PublishedContentSearch(ctx, q, community.PublishedContentSearchBuilder().Where(community.PublishedContentQueryCommunityID(communityID))), &stored))
 		require.Len(t, stored, 2, "items with distinct magnet URIs should be stored separately even without a local library association")
+	})
+
+	t.Run("carries the published mimetype onto the torrent row", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		q := sqltestx.Metadatabase(t)
+
+		pc := &PublishedContent{
+			Id:          uuid.Must(uuid.NewV7()).String(),
+			CommunityId: uuid.Must(uuid.NewV7()).String(),
+			MagnetUri:   "magnet:?xt=urn:btih:5beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a38&dn=lemmy.wasm",
+			Title:       "lemmy.wasm",
+			Mimetype:    mimex.RetrovibedPublishModule,
+		}
+
+		require.NoError(t, SyncPublishedContentItem(ctx, q, pc, false))
+
+		// resolved the same way SyncPublishedContentItem derives the row's identity.
+		magnet, err := metainfo.ParseMagnetURI(pc.MagnetUri)
+		require.NoError(t, err)
+
+		var tmd tracking.Metadata
+		require.NoError(t, tracking.MetadataFindByID(ctx, q, torrentx.HashUID(new(int160.FromByteArray(magnet.InfoHash)))).Scan(&tmd))
+
+		require.Equal(t, mimex.RetrovibedPublishModule, tmd.Mimetype)
+		// a publish module is machinery, not media; MetadataOptionAutoHidden keeps it
+		// out of the media listings, but only when it can see the real mimetype.
+		require.NotEqual(t, timex.Inf(), tmd.HiddenAt)
+	})
+
+	t.Run("is visible to the publish module import selector", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		q := sqltestx.Metadatabase(t)
+
+		pc := &PublishedContent{
+			Id:          uuid.Must(uuid.NewV7()).String(),
+			CommunityId: uuid.Must(uuid.NewV7()).String(),
+			MagnetUri:   "magnet:?xt=urn:btih:6beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a39&dn=lemmy.wasm",
+			Title:       "lemmy.wasm",
+			Mimetype:    mimex.RetrovibedPublishModule,
+		}
+
+		require.NoError(t, SyncPublishedContentItem(ctx, q, pc, false))
+
+		// the predicate PublishPluginTorrentImport selects on; a synced module that
+		// misses it never reaches publish.d.
+		var stored []tracking.Metadata
+		require.NoError(t, sqlx.ScanInto(tracking.MetadataSearch(ctx, q, tracking.MetadataSearchBuilder().Where(tracking.MetadataQueryPublishModule())), &stored))
+		require.Len(t, stored, 1)
+	})
+
+	t.Run("repairs the mimetype of a row recorded before the mimetype was carried", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		q := sqltestx.Metadatabase(t)
+
+		pc := &PublishedContent{
+			Id:          uuid.Must(uuid.NewV7()).String(),
+			CommunityId: uuid.Must(uuid.NewV7()).String(),
+			MagnetUri:   "magnet:?xt=urn:btih:7beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a40&dn=noop.wasm",
+			Title:       "noop.wasm",
+			Mimetype:    mimex.RetrovibedPublishModule,
+		}
+
+		magnet, err := metainfo.ParseMagnetURI(pc.MagnetUri)
+		require.NoError(t, err)
+
+		// the row an earlier sync left behind, before the published mimetype was
+		// carried onto it. resyncing is the only repair path a user has, so the
+		// insert has to correct the existing row rather than leave it as media.
+		stale := tracking.NewMetadata(new(int160.FromByteArray(magnet.InfoHash)), tracking.MetadataOptionFromMagnet(&magnet))
+		require.NoError(t, tracking.MetadataInsertWithDefaults(ctx, q, stale).Scan(&stale))
+		require.Equal(t, mimex.Bittorrent, stale.Mimetype)
+		require.Equal(t, timex.Inf(), stale.HiddenAt)
+
+		require.NoError(t, SyncPublishedContentItem(ctx, q, pc, false))
+
+		var updated tracking.Metadata
+		require.NoError(t, tracking.MetadataFindByID(ctx, q, stale.ID).Scan(&updated))
+		require.Equal(t, mimex.RetrovibedPublishModule, updated.Mimetype)
+		// a stale row is unhidden too, so the repair has to take the module out of
+		// the media listings, not just make it installable.
+		require.NotEqual(t, timex.Inf(), updated.HiddenAt)
 	})
 }
 

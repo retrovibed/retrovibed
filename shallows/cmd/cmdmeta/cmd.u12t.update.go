@@ -3,12 +3,12 @@ package cmdmeta
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/retrovibed/retrovibed/retroapi/authn"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
@@ -55,7 +55,7 @@ func (t U12TUpdate) run(ctx context.Context, endpoint string, c *http.Client) (e
 
 	lookup.Profile.Display = *langx.FirstNonZero(t.Display, &lookup.Profile.Display)
 
-	encoded, err := json.Marshal(&metaapi.ProfileUpdateRequest{Profile: lookup.Profile})
+	encoded, err := jsonx.Marshal(&metaapi.ProfileUpdateRequest{Profile: lookup.Profile})
 	if err != nil {
 		return errorsx.Wrap(err, "unable to encode profile update")
 	}

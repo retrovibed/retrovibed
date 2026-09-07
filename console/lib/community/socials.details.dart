@@ -1,88 +1,47 @@
 import 'package:flutter/material.dart';
+import 'package:retrovibed/community/community.detail.dart';
 import 'package:retrovibed/designkit.dart' as ds;
-import 'package:retrovibed/httpx.dart' as httpx;
-import 'package:retrovibed/authn.dart' as authn;
 import 'api.dart';
+import 'socials.publishers.dart';
 
-// Fetches its own catalog + enabled-publisher data for a single community —
-// the socials search endpoint backs this expanded details view only, not
-// the SocialHome grid itself.
-class SocialCommunityDetails extends StatefulWidget {
-  final String communityId;
+// The expanded Info panel for a single community: what it is, and the
+// publishers it publishes through.
+class SocialCommunityDetails extends StatelessWidget {
+  final Community community;
   final FnSocialsSearch search;
   final FnSocialsEnable enable;
   final FnSocialsDisable disable;
 
-  const SocialCommunityDetails({
+  const SocialCommunityDetails(
+    this.community, {
     super.key,
-    required this.communityId,
     required this.search,
     required this.enable,
     required this.disable,
   });
 
   @override
-  State<SocialCommunityDetails> createState() => _SocialCommunityDetailsState();
-}
-
-class _SocialCommunityDetailsState extends State<SocialCommunityDetails> with ds.LoadingState {
-  SocialsSearchResponse _resp = SocialsSearchResponse();
-
-  void _refresh() {
-    setState(() => loading = true);
-    httpx
-        .withRetry(
-          () => widget.search(
-            SocialsSearchRequest(limit: ds.Int64(100)),
-            options: [authn.request(authn.AuthzCache.meta(context))],
-          ),
-        )
-        .then((response) {
-          setState(() {
-            _resp = response;
-            cause = ds.Error.zero;
-          });
-        })
-        .catchError((cause) {
-          setState(() => this.cause = ds.Errors.httpauto(cause, onTap: reseterr));
-        }, test: httpx.ErrorsTest.httpauto)
-        .catchError((cause) {
-          setState(() => this.cause = ds.Error.unknown(cause, onTap: reseterr));
-        })
-        .whenComplete(() => setState(() => loading = false));
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    ds.postframe(_refresh);
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final social = _resp.items.where((v) => v.community.id == widget.communityId).firstOrNull;
-    final enabledIds = (social?.enabled ?? const []).map((e) => e.publisherId).toSet();
+    final defaults = ds.Defaults.of(context);
+    final theme = Theme.of(context);
 
-    return ds.Loading(
-      loading: loading,
-      cause: cause,
-      Wrap(
-        spacing: 8,
-        runSpacing: 4,
-        children: _resp.catalog.map((p) {
-          final enabled = enabledIds.contains(p.id);
-          return FilterChip(
-            label: Text(p.description.isNotEmpty ? p.description : p.mimetype),
-            selected: enabled,
-            onSelected: (v) {
-              final auth = [authn.request(authn.AuthzCache.meta(context))];
-              final fut = v
-                  ? widget.enable(widget.communityId, p.id, options: auth)
-                  : widget.disable(widget.communityId, p.id, options: auth);
-              httpx.withRetry(() => fut).then((_) => _refresh());
-            },
-          );
-        }).toList(),
+    return ds.Container(
+      padding: defaults.padding,
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerLow,
+        border: defaults.border,
+        borderRadius: defaults.borderRadius,
+      ),
+      Column(
+        children: [
+          CommunityDetail(community: community),
+          SocialsPublishers(
+            community,
+            search: search,
+            enable: enable,
+            disable: disable,
+          ),
+        ],
       ),
     );
   }

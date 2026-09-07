@@ -124,7 +124,7 @@ void main() {
   Future<meta.AuthzResponse> fixedAuth({String? host}) async {
     return meta.AuthzResponse(
       bearer: "test-bearer",
-      token: meta.Token(expires: fixnum.Int64((DateTime.now().millisecondsSinceEpoch ~/ 1000) + 3600)),
+      token: meta.Token(exp: fixnum.Int64((DateTime.now().millisecondsSinceEpoch ~/ 1000) + 3600)),
     );
   }
 
@@ -314,7 +314,7 @@ void main() {
       final before = fakeSocket.sent.length;
 
       authn.AuthzCache.of(capturedContext).changed.value = authz.Bearer(
-        meta.Token(expires: fixnum.Int64(9876543210)),
+        meta.Token(exp: fixnum.Int64(9876543210)),
         "refreshed-bearer",
       );
       await tester.pump();
@@ -520,7 +520,7 @@ void main() {
           if (!authResolved) {
             authResolved = true;
             return Future.value(
-              meta.AuthzResponse(bearer: "initial-bearer", token: meta.Token(expires: fixnum.Int64(0))),
+              meta.AuthzResponse(bearer: "initial-bearer", token: meta.Token(exp: fixnum.Int64(0))),
             );
           }
           return authCompleter.future;
@@ -566,7 +566,7 @@ void main() {
         authCompleter.complete(
           meta.AuthzResponse(
             bearer: "test-bearer",
-            token: meta.Token(expires: fixnum.Int64((DateTime.now().millisecondsSinceEpoch ~/ 1000) + 3600)),
+            token: meta.Token(exp: fixnum.Int64((DateTime.now().millisecondsSinceEpoch ~/ 1000) + 3600)),
           ),
         );
         await _settle(tester);

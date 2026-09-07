@@ -11,6 +11,8 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
+	"github.com/linxGnu/pqueue"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
@@ -21,6 +23,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
+	"github.com/retrovibed/retrovibed/shallows/internal/pqueuetestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/library"
@@ -29,7 +32,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func communityLibraryPublishServer(t *testing.T, q *sql.DB) *mux.Router {
+func communityLibraryPublishServer(t *testing.T, q *sql.DB, wq pqueue.Queue) *mux.Router {
 	t.Helper()
 
 	routes := mux.NewRouter()
@@ -37,6 +40,7 @@ func communityLibraryPublishServer(t *testing.T, q *sql.DB) *mux.Router {
 		q,
 		communityapi.HTTPPublishedOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		communityapi.HTTPPublishedOptionHTTPClient(&http.Client{}),
+		communityapi.HTTPPublishedOptionPublishQueue(wq),
 		communityapi.HTTPPublishedOptionMediaStorage(fsx.DirVirtual(t.TempDir())),
 		communityapi.HTTPPublishedOptionTorrentStorage(fsx.DirVirtual(t.TempDir())),
 	).Bind(routes.PathPrefix("/c/p").Subrouter())
@@ -60,6 +64,7 @@ func TestCommunityLibraryPublish(t *testing.T) {
 			TorrentID:      uuid.Nil.String(),
 			KnownMediaID:   uuid.Nil.String(),
 			ArchiveID:      uuid.Nil.String(),
+			DirectoryID:    uuid.Nil.String(),
 			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
 			Mimetype:       mimex.RetrovibedMediaArchive,
 		}
@@ -86,7 +91,7 @@ func TestCommunityLibraryPublish(t *testing.T) {
 
 		require.False(t, called, "endpoint must not be called during dry run")
 		var decoded library.Metadata
-		require.NoError(t, json.NewDecoder(&output).Decode(&decoded))
+		require.NoError(t, jsonx.UnmarshalRead(&output, &decoded))
 		require.Equal(t, libraryID, decoded.ID)
 		require.Equal(t, mimex.RetrovibedMediaArchive, decoded.Mimetype)
 	})
@@ -115,12 +120,13 @@ func TestCommunityLibraryPublish(t *testing.T) {
 			TorrentID:      uuid.Nil.String(),
 			KnownMediaID:   uuid.Nil.String(),
 			ArchiveID:      uuid.Nil.String(),
+			DirectoryID:    uuid.Nil.String(),
 			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
 			Mimetype:       mimex.RetrovibedMediaArchive,
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
-		srv := httptest.NewServer(communityLibraryPublishServer(t, q))
+		srv := httptest.NewServer(communityLibraryPublishServer(t, q, pqueuetestx.NewDisk(t)))
 		defer srv.Close()
 
 		com := &communityapi.Community{Id: communityID}
@@ -138,7 +144,7 @@ func TestCommunityLibraryPublish(t *testing.T) {
 		require.NoError(t, cmd.run(ctx, srv.URL, jsonl.NewEncoder(&output), &input, c))
 
 		var result communityapi.PublishedContent
-		require.NoError(t, json.NewDecoder(&output).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(&output, &result))
 		require.NotEmpty(t, result.Id)
 		require.Equal(t, libraryID, result.LibraryId)
 		require.Equal(t, communityID, result.CommunityId)
@@ -184,6 +190,7 @@ func TestCommunityLibraryPublish(t *testing.T) {
 				TorrentID:      uuid.Nil.String(),
 				KnownMediaID:   uuid.Nil.String(),
 				ArchiveID:      uuid.Nil.String(),
+				DirectoryID:    uuid.Nil.String(),
 				EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
 				Mimetype:       mimex.RetrovibedMediaArchive,
 			}
@@ -191,7 +198,7 @@ func TestCommunityLibraryPublish(t *testing.T) {
 			require.NoError(t, enc.Encode(langx.Clone(lmd, timex.JSONSafeEncodeOption)))
 		}
 
-		srv := httptest.NewServer(communityLibraryPublishServer(t, q))
+		srv := httptest.NewServer(communityLibraryPublishServer(t, q, pqueuetestx.NewDisk(t)))
 		defer srv.Close()
 
 		var output bytes.Buffer
@@ -245,11 +252,12 @@ func TestCommunityLibraryPublish(t *testing.T) {
 			TorrentID:      uuid.Nil.String(),
 			KnownMediaID:   uuid.Nil.String(),
 			ArchiveID:      uuid.Nil.String(),
+			DirectoryID:    uuid.Nil.String(),
 			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
-		srv := httptest.NewServer(communityLibraryPublishServer(t, q))
+		srv := httptest.NewServer(communityLibraryPublishServer(t, q, pqueuetestx.NewDisk(t)))
 		defer srv.Close()
 
 		com := &communityapi.Community{Id: communityID, DefaultPublishMode: communityapi.PublishMode_LISTED}
@@ -268,7 +276,7 @@ func TestCommunityLibraryPublish(t *testing.T) {
 		require.NoError(t, cmd.run(ctx, srv.URL, jsonl.NewEncoder(&output), &input, c))
 
 		var result communityapi.PublishedContent
-		require.NoError(t, json.NewDecoder(&output).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(&output, &result))
 
 		var pc community.PublishedContent
 		require.NoError(t, community.PublishedContentFindByID(ctx, q, result.Id).Scan(&pc))
@@ -294,7 +302,7 @@ func TestCommunityLibraryPublish(t *testing.T) {
 		communityID := uuid.Must(uuid.NewV7()).String()
 		libraryID := uuid.Must(uuid.NewV7()).String()
 
-		srv := httptest.NewServer(communityLibraryPublishServer(t, q))
+		srv := httptest.NewServer(communityLibraryPublishServer(t, q, pqueuetestx.NewDisk(t)))
 		defer srv.Close()
 
 		// library item not inserted — endpoint returns an error status

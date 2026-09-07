@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
@@ -65,7 +66,7 @@ func TestRecentLatest(t *testing.T) {
 
 		var result media.RecentSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Empty(t, result.Items)
 	})
 
@@ -119,7 +120,7 @@ func TestRecentLatest(t *testing.T) {
 
 		var result media.RecentSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Len(t, result.Items, 3)
 	})
 
@@ -176,7 +177,7 @@ func TestRecentLatest(t *testing.T) {
 
 		var result media.RecentSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Len(t, result.Items, 1)
 		require.Equal(t, md.ID, result.Items[0].Media.Id)
 		require.EqualValues(t, 5000, result.Items[0].Duration)
@@ -247,7 +248,7 @@ func TestRecentLatest(t *testing.T) {
 
 		var result media.RecentSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Len(t, result.Items, 1)
 		require.Equal(t, "rock", result.Items[0].Query.Query)
 
@@ -318,7 +319,7 @@ func TestRecentLatest(t *testing.T) {
 
 		var result media.RecentSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Len(t, result.Items, 3)
 		for _, item := range result.Items {
 			require.Equal(t, mimex.Video, item.Mimetype)
@@ -386,7 +387,7 @@ func TestRecentLatest(t *testing.T) {
 
 		var result media.RecentSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Len(t, result.Items, 6)
 	})
 
@@ -443,7 +444,7 @@ func TestRecentLatest(t *testing.T) {
 
 		var result media.RecentSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Len(t, result.Items, 1)
 		require.Equal(t, alive.ID, result.Items[0].Media.Id)
 	})

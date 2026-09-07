@@ -2,14 +2,72 @@ package pqueuex
 
 import (
 	"context"
+	"errors"
 	"log"
 	"time"
 
 	"github.com/linxGnu/pqueue"
 	"github.com/linxGnu/pqueue/entry"
 	"github.com/retrovibed/retrovibed/retroapi/backoffx"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 )
+
+type errq struct {
+	err error
+}
+
+// Close implements [pqueue.Queue].
+func (e errq) Close() error {
+	return e.err
+}
+
+// Dequeue implements [pqueue.Queue].
+func (e errq) Dequeue(*entry.Entry) bool {
+	return false
+}
+
+// Enqueue implements [pqueue.Queue].
+func (e errq) Enqueue(entry.Entry) error {
+	return e.err
+}
+
+// EnqueueBatch implements [pqueue.Queue].
+func (e errq) EnqueueBatch(entry.Batch) error {
+	return e.err
+}
+
+// Peek implements [pqueue.Queue].
+func (e errq) Peek(*entry.Entry) bool {
+	return false
+}
+
+func Uninitialized() pqueue.Queue {
+	return errq{err: errors.ErrUnsupported}
+}
+
+func New(dir string) (q pqueue.Queue, err error) {
+	if err := fsx.MkDirs(0700, dir); err != nil {
+		return nil, errorsx.Wrapf(err, "unable to create queues dir: %s", dir)
+	}
+
+	if q, err = pqueue.New(dir, 32); err != nil {
+		return nil, errorsx.Wrapf(err, "unable to create queue: %s", dir)
+	}
+
+	return q, nil
+}
+
+func Enqueue(ctx context.Context, q pqueue.Queue, v any) error {
+	encoded, err := jsonx.Marshal(v)
+	if err != nil {
+		return errorsx.Wrap(err, "failed to encode")
+	}
+
+	return errorsx.Wrap(q.Enqueue(entry.Entry(encoded)), "failed to enqueue")
+}
 
 type Handler interface {
 	Message(ctx context.Context, m []byte) error

@@ -1,11 +1,11 @@
 package cmdcommunity
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 	"os"
 
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -44,7 +44,7 @@ func (t cmdCommunityAdd) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClient) (
 
 	log.Println("published content", resp.PublishedContent.Id)
 
-	if err = json.NewEncoder(os.Stdout).Encode(resp.PublishedContent); err != nil {
+	if err = jsonx.MarshalWrite(os.Stdout, resp.PublishedContent); err != nil {
 		return errorsx.Wrap(err, "unable to encode response")
 	}
 

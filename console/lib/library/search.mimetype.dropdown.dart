@@ -32,34 +32,45 @@ class SearchMimetypeDropdown extends StatelessWidget {
       ..addAll(mimetypesFor(checksum));
   }
 
-  static List<PopupMenuEntry<String>> menuItems(ValueNotifier<media.MediaSearchState> search) {
+  static List<PopupMenuEntry<String>> menuItems(
+    media.MediaSearchState search,
+    Function(media.MediaSearchState) onChange,
+  ) {
     return [
-      _menuOption(search, mimex.checksumfor(mimex.icoaudio)),
-      _menuOption(search, mimex.checksumfor(mimex.icomovie)),
-      _menuOption(search, mimex.checksumfor(mimex.icobinary)),
+      _menuOption(search, mimex.checksumfor(mimex.icoaudio), onChange),
+      _menuOption(search, mimex.checksumfor(mimex.icomovie), onChange),
+      _menuOption(search, mimex.checksumfor(mimex.icobinary), onChange),
     ];
   }
 
-  static PopupMenuItem<String> _menuOption(ValueNotifier<media.MediaSearchState> search, int checksum) {
+  static PopupMenuItem<String> _menuOption(
+    media.MediaSearchState search,
+    int checksum,
+    Function(media.MediaSearchState) onChange,
+  ) {
+    final selected = mimex.checksum(search.next.mimetypes) == checksum;
     return PopupMenuItem<String>(
-      child: ValueListenableBuilder<media.MediaSearchState>(
-        valueListenable: search,
-        builder: (context, state, _) {
-          final selected = mimex.checksum(state.next.mimetypes) == checksum;
-          return ListTile(
-            leading: icon(checksum),
-            title: Text(label(checksum)),
-            selected: selected,
-            enabled: !selected,
-            hoverColor: Colors.transparent,
-            onTap: () {
-              final current = state.next;
-              select(current, checksum);
-              search.value = media.MediaSearchState(next: current.clone(), count: search.value.count);
-            },
-          );
-        },
-      ),
+      enabled: !selected,
+      mouseCursor: selected ? SystemMouseCursors.basic : SystemMouseCursors.click,
+      onTap: () {
+        final current = search.next;
+        select(current, checksum);
+        onChange(media.MediaSearchState(next: current.clone(), count: search.count));
+      },
+      child: ds.build((context) {
+        final defaults = ds.Defaults.of(context);
+        return Row(
+          spacing: defaults.spacing,
+          children: [
+            icon(checksum),
+            Text(
+              label(checksum),
+              style: TextStyle(fontWeight: selected ? FontWeight.bold : FontWeight.normal),
+            ),
+            const Spacer(),
+          ],
+        );
+      }),
     );
   }
 
@@ -78,27 +89,26 @@ class SearchMimetypeDropdown extends StatelessWidget {
           select(current, v);
           onChange(current);
         },
-        itemBuilder:
-            (context) => [
-              PopupMenuItem(
-                value: mimex.checksumfor(mimex.icoaudio),
-                child: Tooltip(message: "Music", child: Icon(Icons.music_note)),
-              ),
-              PopupMenuItem(
-                value: mimex.checksumfor(mimex.icomovie),
-                child: Tooltip(
-                  message: "Movies",
-                  child: Icon(Icons.movie_filter),
-                ),
-              ),
-              PopupMenuItem(
-                value: mimex.checksumfor(mimex.icobinary),
-                child: Tooltip(
-                  message: "Files",
-                  child: Icon(Icons.file_open_rounded),
-                ),
-              ),
-            ],
+        itemBuilder: (context) => [
+          PopupMenuItem(
+            value: mimex.checksumfor(mimex.icoaudio),
+            child: Tooltip(message: "Music", child: Icon(Icons.music_note)),
+          ),
+          PopupMenuItem(
+            value: mimex.checksumfor(mimex.icomovie),
+            child: Tooltip(
+              message: "Movies",
+              child: Icon(Icons.movie_filter),
+            ),
+          ),
+          PopupMenuItem(
+            value: mimex.checksumfor(mimex.icobinary),
+            child: Tooltip(
+              message: "Files",
+              child: Icon(Icons.file_open_rounded),
+            ),
+          ),
+        ],
       ),
       ds.Hint(const Text("dropdown to filter by movies, audio, documents, or images")),
     );

@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"crypto/md5"
-	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -28,6 +27,7 @@ import (
 	"github.com/justinas/alice"
 	rootenv "github.com/retrovibed/retrovibed/retroapi/env"
 	"github.com/retrovibed/retrovibed/retroapi/httpauth"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
@@ -199,7 +199,7 @@ func (t *HTTPDiscovered) magnet(w http.ResponseWriter, r *http.Request) {
 		dl  torrent.Torrent
 	)
 
-	if err := json.NewDecoder(r.Body).Decode(&msg); err != nil {
+	if err := jsonx.UnmarshalRead(r.Body, &msg); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to parse magnet link request"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
@@ -341,7 +341,7 @@ func (t *HTTPDiscovered) publish(w http.ResponseWriter, r *http.Request) {
 	}
 	defer metadata.Close()
 
-	if err = json.NewDecoder(metadata).Decode(&decoded); err != nil {
+	if err = jsonx.UnmarshalRead(metadata, &decoded); err != nil {
 		log.Println(errorsx.Wrap(err, "invalid metadata"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
@@ -350,7 +350,7 @@ func (t *HTTPDiscovered) publish(w http.ResponseWriter, r *http.Request) {
 	lmd := tracking.NewMetadata(
 		new(int160.FromByteArray(meta.HashInfoBytes())),
 		tracking.MetadataOptionFromInfo(&info),
-		tracking.MetadataOptionDownloaded(n),
+		tracking.MetadataOptionAvailable(n),
 		tracking.MetadataOptionTrackers(slicesx.Flatten(meta.UpvertedAnnounceList()...)...),
 		tracking.MetadataOptionEntropySeed(meta.ID().Bytes(), uuid.FromStringOrNil(decoded.Entropy).Bytes()),
 		tracking.MetadataOptionMimetype(decoded.Mimetype),
@@ -618,7 +618,7 @@ func (t *HTTPDiscovered) tune(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := json.NewDecoder(r.Body).Decode(&msg); err != nil {
+	if err := jsonx.UnmarshalRead(r.Body, &msg); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to find metadata"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
@@ -749,7 +749,6 @@ func (t *HTTPDiscovered) websocket(w http.ResponseWriter, r *http.Request) {
 		sub pubsub.Subscription
 		dl  torrent.Torrent
 		buf = bytes.NewBuffer(nil)
-		enc = json.NewEncoder(buf)
 		id  = mux.Vars(r)["id"]
 	)
 
@@ -801,7 +800,7 @@ func (t *HTTPDiscovered) websocket(w http.ResponseWriter, r *http.Request) {
 			),
 		)
 
-		if err = enc.Encode(msg); err != nil {
+		if err = jsonx.MarshalWrite(buf, msg); err != nil {
 			return errorsx.Wrap(err, "unable to encode status")
 		}
 
@@ -841,7 +840,7 @@ func (t *HTTPDiscovered) update(w http.ResponseWriter, r *http.Request) {
 		id  = mux.Vars(r)["id"]
 	)
 
-	if err := json.NewDecoder(r.Body).Decode(&msg); err != nil {
+	if err := jsonx.UnmarshalRead(r.Body, &msg); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to decode update request"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
@@ -908,7 +907,7 @@ func (t *HTTPDiscovered) metadatasync(w http.ResponseWriter, r *http.Request) {
 		id  = mux.Vars(r)["id"]
 	)
 
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	if err := jsonx.UnmarshalRead(r.Body, &req); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to decoded update"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return

@@ -3,12 +3,12 @@ package media
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"io"
 	"mime/multipart"
 
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/metainfo"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
@@ -16,7 +16,7 @@ import (
 
 // PublishRequest a torrent to an http endpoint in its entirety
 func PublishRequest(ctx context.Context, md torrent.Metadata, req *PublishedUploadRequest) (boundary string, _ io.ReadCloser, err error) {
-	encodedreq, err := json.Marshal(req)
+	encodedreq, err := jsonx.Marshal(req)
 	if err != nil {
 		return "", nil, errorsx.Wrap(err, "unable to encode publish metadata")
 	}

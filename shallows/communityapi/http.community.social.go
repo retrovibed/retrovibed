@@ -78,8 +78,11 @@ func (t *HTTPSocial) Bind(r *mux.Router) {
 // currently-enabled publishers, plus the full publisher catalog so the
 // console can render the available toggles.
 func (t *HTTPSocial) search(w http.ResponseWriter, r *http.Request) {
-	var resp SocialsSearchResponse
-	resp.Next = &SocialsSearchRequest{Limit: 100}
+	var (
+		resp = &SocialsSearchResponse{
+			Next: &SocialsSearchRequest{Limit: 100},
+		}
+	)
 
 	if err := t.decoder.Decode(resp.Next, r.Form); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to decode search request"))
@@ -88,45 +91,35 @@ func (t *HTTPSocial) search(w http.ResponseWriter, r *http.Request) {
 	}
 	resp.Next.Limit = numericx.Min(resp.Next.Limit, 100)
 
-	_, pid, err := httpauth.IssuerSubjectID(r.Context(), t.jwtsecret, r)
+	aid, _, err := httpauth.IssuerSubjectID(r.Context(), t.jwtsecret, r)
 	if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to retrieve token"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
 	}
 
-	catalog := community.PluginPublisherFindAll(r.Context(), t.q)
-	ci := sqlx.Scan(catalog)
-	for p := range ci.Iter() {
-		resp.Catalog = append(resp.Catalog, NewPluginPublisher(PluginPublisherOptionFromDB(langx.Clone(p, timex.JSONSafeEncodeOption))))
-	}
-	if err := ci.Err(); err != nil {
-		log.Println(errorsx.Wrap(err, "unable to list plugin publishers"))
-		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
-		return
-	}
-
 	communities := community.CommunitySearch(r.Context(), t.q, community.CommunitySearchBuilder().
-		Distinct().
-		Join("community_publisher ON community_publisher.community_id = community.id").
 		Where(
 			squirrel.And{
-				squirrel.Eq{"community.account_id": pid},
+				squirrel.Expr("1=1"),
+				community.CommunityQueryID(resp.Next.Communities...),
+				community.CommunityQueryAccountID(aid),
 				lucenex.Query(t.lucene, resp.Next.Query, lucenex.WithDefaultField("description")),
 			},
 		).Offset(resp.Next.Offset*resp.Next.Limit).Limit(resp.Next.Limit))
+
 	qi := sqlx.Scan(communities)
 	for c := range qi.Iter() {
 		social := NewCommunitySocial(func(s *CommunitySocial) {
 			s.Community = NewCommunity(CommunityOptionFromDB(langx.Clone(c, timex.JSONSafeEncodeOption)))
 		})
 
-		enabled := community.CommunityPublisherFindByCommunityID(r.Context(), t.q, c.ID)
-		ei := sqlx.Scan(enabled)
-		for cp := range ei.Iter() {
-			social.Enabled = append(social.Enabled, NewCommunityPublisher(CommunityPublisherOptionFromDB(langx.Clone(cp, timex.JSONSafeEncodeOption))))
+		pubs := sqlx.Scan(community.CommunityPublisherFindByCommunityID(r.Context(), t.q, c.ID))
+		for cp := range pubs.Iter() {
+			social.Publishers = append(social.Publishers, NewCommunityPublisher(CommunityPublisherOptionFromDB(langx.Clone(cp, timex.JSONSafeEncodeOption))))
 		}
-		if err := ei.Err(); err != nil {
+
+		if err := pubs.Err(); err != nil {
 			log.Println(errorsx.Wrap(err, "unable to list enabled publishers"))
 			errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 			return
@@ -134,6 +127,7 @@ func (t *HTTPSocial) search(w http.ResponseWriter, r *http.Request) {
 
 		resp.Items = append(resp.Items, social)
 	}
+
 	if err := qi.Err(); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to list communities"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
@@ -173,24 +167,44 @@ func (t *HTTPSocial) enable(w http.ResponseWriter, r *http.Request) {
 }
 
 func (t *HTTPSocial) disable(w http.ResponseWriter, r *http.Request) {
-	// var existing community.CommunityPublisher
+	vars := mux.Vars(r)
+	communityID, publisherID := vars["communityId"], vars["publisherId"]
 
-	// vars := mux.Vars(r)
+	var (
+		existing community.CommunityPublisher
+		found    bool
+	)
 
-	// err := community.CommunityPublisherDeleteByCommunityIDAndPublisherID(r.Context(), t.q, vars["communityId"], vars["publisherId"]).Scan(&existing)
-	// if errors.Is(err, sql.ErrNoRows) {
-	// 	errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
-	// 	return
-	// } else if err != nil {
-	// 	log.Println(errorsx.Wrap(err, "unable to disable publisher"))
-	// 	errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
-	// 	return
-	// }
+	enabled := community.CommunityPublisherFindByCommunityID(r.Context(), t.q, communityID)
+	ei := sqlx.Scan(enabled)
+	for cp := range ei.Iter() {
+		if cp.PublisherID == publisherID {
+			existing = cp
+			found = true
+			break
+		}
+	}
+	if err := ei.Err(); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to disable publisher"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
 
-	// if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &CommunityPublisherDisableResponse{
-	// 	Disabled: NewCommunityPublisher(CommunityPublisherOptionFromDB(langx.Clone(existing, timex.JSONSafeEncodeOption))),
-	// }); err != nil {
-	// 	log.Println(errorsx.Wrap(err, "unable to write response"))
-	// 	return
-	// }
+	if !found {
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
+		return
+	}
+
+	if err := community.CommunityPublisherDeleteByID(r.Context(), t.q, existing.ID).Scan(&existing); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to disable publisher"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &CommunityPublisherDisableResponse{
+		Disabled: NewCommunityPublisher(CommunityPublisherOptionFromDB(langx.Clone(existing, timex.JSONSafeEncodeOption))),
+	}); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to write response"))
+		return
+	}
 }

@@ -1,7 +1,6 @@
 package metaapi_test
 
 import (
-	"encoding/json"
 	"errors"
 	"net/http"
 	"testing"
@@ -10,6 +9,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
 	"github.com/james-lawrence/torrent/dht"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
@@ -51,7 +51,7 @@ func TestHTTPDiagnosticsDHT(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.NoError(t, httpx.ErrorCode(resp.Result()))
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Equal(t, int32(12), result.Dht.GoodNodes)
 		require.Equal(t, int32(34), result.Dht.Nodes)
 		require.Equal(t, int32(2), result.Dht.OutstandingTransactions)

@@ -185,6 +185,63 @@ void main() {
 
         controller.close();
       });
+
+      testWidgets('shows error when search fails', (tester) async {
+        final controller = StreamController<Uri>();
+
+        await tester.pumpApp(
+          DeepLink(
+            const Text('child'),
+            uriStream: () => controller.stream,
+            initialUri: _noInitial,
+            search: (req, {options = const []}) => Future.error(Exception('boom')),
+            consumeAttribution: (token, {options = const []}) => Future.value(billing.AttributionConsumeResponse()),
+            subscribe: (ctx, c, a) => Future.value(),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        controller.add(Uri.parse('https://testdomain.community.retrovibe.space'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('an unexpected problem has occurred'), findsOneWidget);
+        expect(find.text('Yes'), findsNothing);
+        expect(tester.takeException(), isNull);
+
+        await tester.tap(find.text('an unexpected problem has occurred'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('an unexpected problem has occurred'), findsNothing);
+
+        controller.close();
+      });
+
+      testWidgets('shows error when subscribe fails', (tester) async {
+        final controller = StreamController<Uri>();
+
+        await tester.pumpApp(
+          DeepLink(
+            const Text('child'),
+            uriStream: () => controller.stream,
+            initialUri: _noInitial,
+            search: (req, {options = const []}) => Future.value(_searchResponse),
+            consumeAttribution: (token, {options = const []}) => Future.value(billing.AttributionConsumeResponse()),
+            subscribe: (ctx, c, a) => Future.error(Exception('boom')),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        controller.add(Uri.parse('https://testdomain.community.retrovibe.space'));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('Yes'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('an unexpected problem has occurred'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+
+        controller.close();
+      });
     });
 
     group('invite URL', () {

@@ -35,7 +35,9 @@ class SearchUploadDropdown extends StatelessWidget {
         icon: SearchMimetypeDropdown.icon(mimex.checksum(state.next.mimetypes)),
         help: help,
         items: [
-          ...SearchMimetypeDropdown.menuItems(search),
+          ...SearchMimetypeDropdown.menuItems(state, (upd) {
+            search.value = upd;
+          }),
           media.SearchModeToggle(
             mode: media.SearchMode.discovery,
             current: mode,

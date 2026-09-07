@@ -1,13 +1,13 @@
 package media_test
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"testing"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
@@ -70,7 +70,7 @@ func TestRandom(t *testing.T) {
 		var result media.MediaFindResponse
 
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.NotNil(t, result.Media)
 		require.Equal(t, md.ID, result.Media.Id)
 	})
@@ -169,7 +169,7 @@ func TestRandom(t *testing.T) {
 
 		var result media.MediaFindResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.NotNil(t, result.Media)
 	})
 
@@ -273,7 +273,7 @@ func TestRandom(t *testing.T) {
 		var result media.MediaFindResponse
 
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.NotNil(t, result.Media)
 		require.Equal(t, md2.ID, result.Media.Id)
 		require.Equal(t, md2.Description, result.Media.Description)

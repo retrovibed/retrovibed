@@ -64,7 +64,7 @@ func TestReindexRun(t *testing.T) {
 		)
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, lmd1).Scan(&lmd1))
 
-		require.NoError(t, reindex{DryRun: false}.run(ctx, db, mediastore))
+		require.NoError(t, reindex{DryRun: false}.run(ctx, db, library.QueryCleanerNoop(), mediastore))
 
 		var got0, got1 library.Metadata
 		require.NoError(t, library.MetadataFindByID(ctx, db, lmd0.ID).Scan(&got0))
@@ -108,7 +108,7 @@ func TestReindexRun(t *testing.T) {
 		)
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, lmd).Scan(&lmd))
 
-		require.NoError(t, reindex{DryRun: true}.run(ctx, db, mediastore))
+		require.NoError(t, reindex{DryRun: true}.run(ctx, db, library.QueryCleanerNoop(), mediastore))
 
 		var got library.Metadata
 		require.NoError(t, library.MetadataFindByID(ctx, db, lmd.ID).Scan(&got))
@@ -159,7 +159,7 @@ func TestReindexRun(t *testing.T) {
 		)
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, unindexed).Scan(&unindexed))
 
-		require.NoError(t, reindex{Unindexed: true, DryRun: false}.run(ctx, db, mediastore))
+		require.NoError(t, reindex{Unindexed: true, DryRun: false}.run(ctx, db, library.QueryCleanerNoop(), mediastore))
 
 		var gotIndexed, gotUnindexed library.Metadata
 		require.NoError(t, library.MetadataFindByID(ctx, db, indexed.ID).Scan(&gotIndexed))
@@ -183,7 +183,7 @@ func TestReindexRun(t *testing.T) {
 		)
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, lmd).Scan(&lmd))
 
-		require.NoError(t, reindex{DryRun: false}.run(ctx, db, mediastore))
+		require.NoError(t, reindex{DryRun: false}.run(ctx, db, library.QueryCleanerNoop(), mediastore))
 
 		var got library.Metadata
 		require.NoError(t, library.MetadataFindByID(ctx, db, lmd.ID).Scan(&got))
@@ -213,7 +213,7 @@ func TestReindexRun(t *testing.T) {
 		)
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, lmd).Scan(&lmd))
 
-		require.NoError(t, reindex{DryRun: false}.run(ctx, db, mediastore))
+		require.NoError(t, reindex{DryRun: false}.run(ctx, db, library.QueryCleanerNoop(), mediastore))
 
 		var got library.Metadata
 		require.NoError(t, library.MetadataFindByID(ctx, db, lmd.ID).Scan(&got))
@@ -234,7 +234,7 @@ func TestReindexRun(t *testing.T) {
 		)
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, dir).Scan(&dir))
 
-		require.NoError(t, reindex{DryRun: false}.run(ctx, db, mediastore))
+		require.NoError(t, reindex{DryRun: false}.run(ctx, db, library.QueryCleanerNoop(), mediastore))
 
 		var got library.Metadata
 		require.NoError(t, library.MetadataFindByID(ctx, db, dir.ID).Scan(&got))

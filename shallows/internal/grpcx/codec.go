@@ -1,9 +1,9 @@
 package grpcx
 
 import (
-	"encoding/json"
 	"time"
 
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -20,11 +20,11 @@ func JSONEncode[X proto.Message, Y any](from X, to *Y) (err error) {
 		encoded []byte
 	)
 
-	if encoded, err = json.Marshal(from); err != nil {
+	if encoded, err = jsonx.Marshal(from); err != nil {
 		return err
 	}
 
-	return json.Unmarshal(encoded, to)
+	return jsonx.Unmarshal(encoded, to)
 }
 
 func JSONDecode[X proto.Message, Y any](from Y, to X) (err error) {
@@ -32,9 +32,9 @@ func JSONDecode[X proto.Message, Y any](from Y, to X) (err error) {
 		encoded []byte
 	)
 
-	if encoded, err = json.Marshal(from); err != nil {
+	if encoded, err = jsonx.Marshal(from); err != nil {
 		return err
 	}
 
-	return json.Unmarshal(encoded, to)
+	return jsonx.Unmarshal(encoded, to)
 }

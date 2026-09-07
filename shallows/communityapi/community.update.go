@@ -2,11 +2,11 @@ package communityapi
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 
 	"github.com/retrovibed/retrovibed/retroapi/env"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 )
 
@@ -27,7 +27,7 @@ func CommunityUpdate(ctx context.Context, c *http.Client, domainOrId string, com
 
 	resp = new(CommunityUpdateResponse)
 
-	if err = json.NewDecoder(_resp.Body).Decode(resp); err != nil {
+	if err = jsonx.UnmarshalRead(_resp.Body, resp); err != nil {
 		return nil, err
 	}
 

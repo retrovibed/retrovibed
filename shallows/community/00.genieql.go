@@ -83,7 +83,7 @@ func PublishedContentFindByPendingSync(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer) NewPublishedContentScannerStatic,
 ) {
-	gql = gql.Query(`SELECT ` + PublishedContentScannerStaticColumns + ` FROM published_content WHERE published_at >= 'infinity' AND tombstoned_at = 'infinity' AND (publish_mode > 0 OR oauth_google_id != '00000000-0000-0000-0000-000000000000')`)
+	gql = gql.Query(`SELECT ` + PublishedContentScannerStaticColumns + ` FROM published_content WHERE published_at >= 'infinity' AND tombstoned_at = 'infinity'`)
 }
 
 func PublishedContentFindByCommunityIDForFeed(
@@ -370,7 +370,14 @@ func PluginPublisherInsertWithDefaults(
 	gql genieql.Insert,
 	pattern func(ctx context.Context, q sqlx.Queryer, a PluginPublisher) NewPluginPublisherScannerStaticRow,
 ) {
-	gql.Into("plugin_publishers").Default("created_at", "updated_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, path = EXCLUDED.path, description = EXCLUDED.description, mimetype = EXCLUDED.mimetype")
+	// on conflict the stored description and mimetype win outright: an insert
+	// only ever labels a row it creates, and PluginPublisherUpdateByID is the
+	// single path that relabels one afterwards. the reconcile in
+	// PublishPluginImport upserts every installed module on every pass and
+	// derives its label from the filename - a clone is a symlink under a stem
+	// that can never equal its own id, so anything else here would overwrite
+	// what an operator typed with that stem on the very next pass.
+	gql.Into("plugin_publishers").Default("created_at", "updated_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, path = EXCLUDED.path, description = plugin_publishers.description, mimetype = plugin_publishers.mimetype")
 }
 
 func PluginPublisherFindByID(
@@ -385,6 +392,16 @@ func PluginPublisherFindAll(
 	pattern func(ctx context.Context, q sqlx.Queryer) NewPluginPublisherScannerStatic,
 ) {
 	gql = gql.Query(`SELECT ` + PluginPublisherScannerStaticColumns + ` FROM plugin_publishers ORDER BY created_at DESC`)
+}
+
+// PluginPublisherUpdateByID records the columns an operator owns. id and path
+// describe what is installed on disk and are derived from it, so they are not
+// among them - the catalog follows the filesystem, never the other way around.
+func PluginPublisherUpdateByID(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string, a PluginPublisher) NewPluginPublisherScannerStaticRow,
+) {
+	gql = gql.Query(`UPDATE plugin_publishers SET updated_at = NOW(), description = {a.Description}, mimetype = {a.Mimetype} WHERE id = {id} RETURNING ` + PluginPublisherScannerStaticColumns)
 }
 
 func PluginPublisherDeleteByID(
@@ -430,6 +447,17 @@ func CommunityPublisherDeleteByID(
 	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewCommunityPublisherScannerStaticRow,
 ) {
 	gql = gql.Query(`DELETE FROM community_publisher WHERE "id" = {id} RETURNING ` + CommunityPublisherScannerStaticColumns)
+}
+
+// CommunityPublisherDeleteByPublisherID forgets a plugin everywhere it was
+// enabled. uninstalling a module leaves nothing to publish through, and a
+// selection pointing at a plugin that is gone only surfaces as a failed lookup
+// on every subsequent publish.
+func CommunityPublisherDeleteByPublisherID(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, publisherID string) NewCommunityPublisherScannerStatic,
+) {
+	gql = gql.Query(`DELETE FROM community_publisher WHERE "publisher_id" = {publisherID} RETURNING ` + CommunityPublisherScannerStaticColumns)
 }
 
 func CommunityFindByAccountID(

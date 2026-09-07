@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:fixnum/fixnum.dart' as fixnum;
+import 'package:http/http.dart' as http;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/timex.dart' as timex;
 import 'package:retrovibed/uuidx.dart' as uuidx;
@@ -35,6 +36,13 @@ typedef FnPublishingSearch =
 typedef FnPublishingTombstone =
     Future<PublishContentDeleteResponse> Function(
       String id, {
+      List<httpx.Option> options,
+    });
+
+typedef FnPublishingPublish =
+    Future<PublishContentResponse> Function(
+      String cid,
+      PublishContentRequest req, {
       List<httpx.Option> options,
     });
 
@@ -362,5 +370,183 @@ class communities {
             httpx.fromProto3JsonSafe(PublishedContentSearchResponse.create(), jsonDecode(v.body)),
           );
         });
+  }
+}
+
+typedef FnPublishersSearch =
+    Future<PluginPublisherSearchResponse> Function(
+      PluginPublisherSearchRequest req, {
+      List<httpx.Option> options,
+    });
+
+typedef FnPublishersFind =
+    Future<PluginPublisherFindResponse> Function(
+      String id, {
+      List<httpx.Option> options,
+    });
+
+/// The catalog of installed publisher plugins.
+abstract class publishers {
+  static Future<PluginPublisherSearchResponse> search(
+    PluginPublisherSearchRequest req, {
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx
+        .get(
+          Uri.https(httpx.host(), "/c/publishers/", httpx.params(req.toProto3Json())),
+          options: [httpx.Accept.json, ...options],
+        )
+        .then((v) {
+          return Future.value(
+            httpx.fromProto3JsonSafe(PluginPublisherSearchResponse.create(), jsonDecode(v.body)),
+          );
+        });
+  }
+
+  /// Resolves a single plugin. What a community publishes through is recorded
+  /// as a publisher id, so the social screen reads each attached row this way
+  /// rather than searching the catalog for rows it already knows the ids of.
+  static Future<PluginPublisherFindResponse> find(
+    String id, {
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx
+        .get(
+          Uri.https(httpx.host(), "/c/publishers/${id}"),
+          options: [httpx.Accept.json, ...options],
+        )
+        .then((v) {
+          return Future.value(
+            httpx.fromProto3JsonSafe(PluginPublisherFindResponse.create(), jsonDecode(v.body)),
+          );
+        });
+  }
+
+  static Future<http.MultipartFile> uploadable(
+    String path,
+    String name,
+    String mimetype,
+  ) {
+    return httpx.uploadable(path, name, mimetype);
+  }
+
+  /// mimetype is rejected when blank, and description is what the community
+  /// publisher chips label themselves with, so both are always sent.
+  static Future<PluginPublisherCreateResponse> upload(
+    String description,
+    String mimetype,
+    http.MultipartRequest Function(http.MultipartRequest req) mkreq, {
+    List<httpx.Option> options = const [],
+  }) async {
+    final client = http.Client();
+    final r0 = mkreq(
+      http.MultipartRequest("POST", Uri.https(httpx.host(), "/c/publishers/")),
+    );
+    r0.fields["description"] = description;
+    r0.fields["mimetype"] = mimetype;
+
+    return httpx.request(options).then((r) {
+      r0.headers.addAll(r.headers);
+      return client.send(r0).then(httpx.auto_error).then((v) {
+        return v.stream.bytesToString().then((s) {
+          return Future.value(
+            httpx.fromProto3JsonSafe(PluginPublisherCreateResponse.create(), jsonDecode(s)),
+          );
+        });
+      });
+    });
+  }
+
+  /// Records the fields an operator owns. The whole publisher goes over the
+  /// wire and the endpoint decides what it is allowed to change - id and path
+  /// describe what is installed on disk - so a caller edits a field on the row
+  /// it already holds and posts it back.
+  static Future<PluginPublisherUpdateResponse> update(
+    PluginPublisher publisher, {
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx
+        .post(
+          Uri.https(httpx.host(), "/c/publishers/${publisher.id}"),
+          options: [httpx.Accept.json, ...options],
+          body: jsonEncode(PluginPublisherUpdateRequest(publisher: publisher).toProto3Json()),
+        )
+        .then((v) {
+          return Future.value(
+            httpx.fromProto3JsonSafe(PluginPublisherUpdateResponse.create(), jsonDecode(v.body)),
+          );
+        });
+  }
+
+  /// Installs a second identity for an already installed module: same plugin,
+  /// its own configuration. There is nothing to send beyond the id.
+  static Future<PluginPublisherCloneResponse> clone(
+    String id, {
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx
+        .post(
+          Uri.https(httpx.host(), "/c/publishers/${id}/clone"),
+          options: [httpx.Accept.json, ...options],
+        )
+        .then((v) {
+          return Future.value(
+            httpx.fromProto3JsonSafe(PluginPublisherCloneResponse.create(), jsonDecode(v.body)),
+          );
+        });
+  }
+
+  static Future<PluginPublisherDeleteResponse> delete(
+    String id, {
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx
+        .delete(
+          Uri.https(httpx.host(), "/c/publishers/${id}"),
+          options: [httpx.Accept.json, ...options],
+        )
+        .then((v) {
+          return Future.value(
+            httpx.fromProto3JsonSafe(PluginPublisherDeleteResponse.create(), jsonDecode(v.body)),
+          );
+        });
+  }
+}
+
+/// Configuration for one installed publisher plugin, proxied as the raw
+/// bytes of its .env sidecar - the same convention the search plugin
+/// endpoints use, and for the same reason: parsing and re-serializing is a
+/// client concern (see envfile.dart), the server never interprets it.
+///
+/// A GET returns the variables the plugin itself declares, with whatever
+/// has been configured filled in over the top, so the editor can render a
+/// form for a plugin the console knows nothing about.
+abstract class publisherenvironment {
+  static Future<String> get(
+    String id, {
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx.get(Uri.https(httpx.host(), "/c/publishers/environment/${id}"), options: options).then((v) => v.body);
+  }
+
+  static Future<String> update(
+    String id,
+    String content, {
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx
+        .post(
+          Uri.https(httpx.host(), "/c/publishers/environment/${id}"),
+          options: options,
+          body: content,
+        )
+        .then((v) => v.body);
+  }
+
+  static Future<void> delete(
+    String id, {
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx.delete(Uri.https(httpx.host(), "/c/publishers/environment/${id}"), options: options).then((_) {});
   }
 }

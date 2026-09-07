@@ -6,16 +6,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/grpcx"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
-	"google.golang.org/protobuf/encoding/protojson"
 )
-
-func (t *PublishContentRequest) MarshalJSON() ([]byte, error) {
-	return protojson.Marshal(t)
-}
-
-func (t *PublishContentRequest) UnmarshalJSON(b []byte) error {
-	return protojson.Unmarshal(b, t)
-}
 
 func NewCommunity(opts ...func(*Community)) *Community {
 	var c Community

@@ -4,11 +4,14 @@ package audiox
 
 import (
 	"context"
+	"errors"
 	"iter"
+	"syscall"
 
 	"github.com/jfreymuth/pulse"
 	"github.com/jfreymuth/pulse/proto"
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 )
 
 // Supported reports whether this build can talk to PulseAudio.
@@ -26,7 +29,7 @@ func (s *pulseSinkSeq) Each(_ context.Context) iter.Seq[Sink] {
 	return func(yield func(Sink) bool) {
 		c, err := pulse.NewClient()
 		if err != nil {
-			s.err = err
+			s.err = unavailable(err)
 			return
 		}
 		defer c.Close()
@@ -49,10 +52,20 @@ func (s *pulseSinkSeq) Err() error {
 	return s.err
 }
 
+// unavailable marks the failure to reach the pulseaudio server as unrecoverable;
+// without a daemon listening on its socket retrying will never succeed.
+func unavailable(err error) error {
+	if errors.Is(err, syscall.ENOENT) || errors.Is(err, syscall.ECONNREFUSED) {
+		return errorsx.NewUnrecoverable(err)
+	}
+
+	return err
+}
+
 func current() (Sink, error) {
 	c, err := pulse.NewClient()
 	if err != nil {
-		return Sink{}, err
+		return Sink{}, unavailable(err)
 	}
 	defer c.Close()
 
@@ -67,7 +80,7 @@ func current() (Sink, error) {
 func activate(id string) error {
 	c, err := pulse.NewClient()
 	if err != nil {
-		return err
+		return unavailable(err)
 	}
 	defer c.Close()
 

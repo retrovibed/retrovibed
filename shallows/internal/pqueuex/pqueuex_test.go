@@ -8,90 +8,16 @@ import (
 	"testing"
 	"time"
 
-	"github.com/linxGnu/pqueue"
 	"github.com/linxGnu/pqueue/entry"
 	"github.com/retrovibed/retrovibed/retroapi/backoffx"
+	"github.com/retrovibed/retrovibed/shallows/internal/pqueuetestx"
 	"github.com/stretchr/testify/require"
 )
 
-var _ pqueue.Queue = (*fakeQueue)(nil)
-
-// fakeQueue is an in-memory pqueue.Queue for tests; the real pqueue.New is
-// file-backed and has no in-memory constructor, but worker.wq is typed as the
-// interface so a hand-rolled fake is enough.
-type fakeQueue struct {
-	mu    sync.Mutex
-	items [][]byte
-}
-
-func (f *fakeQueue) Close() error { return nil }
-
-func (f *fakeQueue) Enqueue(e entry.Entry) error {
-	f.mu.Lock()
-	defer f.mu.Unlock()
-	f.items = append(f.items, append([]byte(nil), e...))
-	return nil
-}
-
-func (f *fakeQueue) EnqueueBatch(_ entry.Batch) error { return nil }
-
-func (f *fakeQueue) Dequeue(e *entry.Entry) bool {
-	f.mu.Lock()
-	defer f.mu.Unlock()
-	if len(f.items) == 0 {
-		return false
-	}
-	*e = entry.Entry(f.items[0])
-	f.items = f.items[1:]
-	return true
-}
-
-func (f *fakeQueue) Peek(e *entry.Entry) bool {
-	f.mu.Lock()
-	defer f.mu.Unlock()
-	if len(f.items) == 0 {
-		return false
-	}
-	*e = entry.Entry(f.items[0])
-	return true
-}
-
-var _ Handler = (*fakeHandler)(nil)
-
-// fakeHandler records every payload passed to Message and can be configured
-// to fail on specific (0-indexed) calls.
-type fakeHandler struct {
-	mu       sync.Mutex
-	received [][]byte
-	errAt    map[int]error
-}
-
-func (f *fakeHandler) Message(_ context.Context, m []byte) error {
-	f.mu.Lock()
-	defer f.mu.Unlock()
-	idx := len(f.received)
-	f.received = append(f.received, append([]byte(nil), m...))
-	return f.errAt[idx]
-}
-
-func (f *fakeHandler) count() int {
-	f.mu.Lock()
-	defer f.mu.Unlock()
-	return len(f.received)
-}
-
-func (f *fakeHandler) snapshot() [][]byte {
-	f.mu.Lock()
-	defer f.mu.Unlock()
-	out := make([][]byte, len(f.received))
-	copy(out, f.received)
-	return out
-}
-
 func TestConsumeDequeuesAndDispatches(t *testing.T) {
-	q := &fakeQueue{}
+	q := pqueuetestx.NewQueue()
 	require.NoError(t, q.Enqueue(entry.Entry("hello")))
-	h := &fakeHandler{}
+	h := pqueuetestx.NewHandler()
 	w := worker{wq: q, s: backoffx.Constant(time.Millisecond), fn: h}
 
 	ctx, cancel := context.WithCancel(t.Context())
@@ -102,9 +28,9 @@ func TestConsumeDequeuesAndDispatches(t *testing.T) {
 	}()
 
 	require.Eventually(t, func() bool {
-		return h.count() == 1
+		return h.Count() == 1
 	}, time.Second, time.Millisecond)
-	require.Equal(t, [][]byte{[]byte("hello")}, h.snapshot())
+	require.Equal(t, [][]byte{[]byte("hello")}, h.Snapshot())
 
 	cancel()
 	require.NoError(t, q.Enqueue(entry.Entry("unblock")))
@@ -116,11 +42,11 @@ func TestConsumeDequeuesAndDispatches(t *testing.T) {
 }
 
 func TestConsumeProcessesMultipleMessagesInOrder(t *testing.T) {
-	q := &fakeQueue{}
+	q := pqueuetestx.NewQueue()
 	require.NoError(t, q.Enqueue(entry.Entry("first")))
 	require.NoError(t, q.Enqueue(entry.Entry("second")))
 	require.NoError(t, q.Enqueue(entry.Entry("third")))
-	h := &fakeHandler{}
+	h := pqueuetestx.NewHandler()
 	w := worker{wq: q, s: backoffx.Constant(time.Millisecond), fn: h}
 
 	ctx, cancel := context.WithCancel(t.Context())
@@ -131,9 +57,9 @@ func TestConsumeProcessesMultipleMessagesInOrder(t *testing.T) {
 	}()
 
 	require.Eventually(t, func() bool {
-		return h.count() == 3
+		return h.Count() == 3
 	}, time.Second, time.Millisecond)
-	require.Equal(t, [][]byte{[]byte("first"), []byte("second"), []byte("third")}, h.snapshot())
+	require.Equal(t, [][]byte{[]byte("first"), []byte("second"), []byte("third")}, h.Snapshot())
 
 	cancel()
 	require.NoError(t, q.Enqueue(entry.Entry("unblock")))
@@ -145,10 +71,10 @@ func TestConsumeProcessesMultipleMessagesInOrder(t *testing.T) {
 }
 
 func TestConsumeContinuesAfterHandlerError(t *testing.T) {
-	q := &fakeQueue{}
+	q := pqueuetestx.NewQueue()
 	require.NoError(t, q.Enqueue(entry.Entry("bad")))
 	require.NoError(t, q.Enqueue(entry.Entry("good")))
-	h := &fakeHandler{errAt: map[int]error{0: errors.New("boom")}}
+	h := pqueuetestx.NewHandler(pqueuetestx.HandlerOptionErrorAt(0, errors.New("boom")))
 	w := worker{wq: q, s: backoffx.Constant(time.Millisecond), fn: h}
 
 	ctx, cancel := context.WithCancel(t.Context())
@@ -162,9 +88,9 @@ func TestConsumeContinuesAfterHandlerError(t *testing.T) {
 	// failed: a handler error is logged and the loop moves on, it does not
 	// retry or re-enqueue the failed message.
 	require.Eventually(t, func() bool {
-		return h.count() == 2
+		return h.Count() == 2
 	}, time.Second, time.Millisecond)
-	require.Equal(t, [][]byte{[]byte("bad"), []byte("good")}, h.snapshot())
+	require.Equal(t, [][]byte{[]byte("bad"), []byte("good")}, h.Snapshot())
 
 	cancel()
 	require.NoError(t, q.Enqueue(entry.Entry("unblock")))
@@ -176,8 +102,8 @@ func TestConsumeContinuesAfterHandlerError(t *testing.T) {
 }
 
 func TestConsumeRetriesUntilMessageAvailable(t *testing.T) {
-	q := &fakeQueue{}
-	h := &fakeHandler{}
+	q := pqueuetestx.NewQueue()
+	h := pqueuetestx.NewHandler()
 
 	var (
 		mu       sync.Mutex
@@ -215,9 +141,9 @@ func TestConsumeRetriesUntilMessageAvailable(t *testing.T) {
 
 	require.NoError(t, q.Enqueue(entry.Entry("delayed")))
 	require.Eventually(t, func() bool {
-		return h.count() == 1
+		return h.Count() == 1
 	}, time.Second, time.Millisecond)
-	require.Equal(t, [][]byte{[]byte("delayed")}, h.snapshot())
+	require.Equal(t, [][]byte{[]byte("delayed")}, h.Snapshot())
 
 	cancel()
 	require.NoError(t, q.Enqueue(entry.Entry("unblock")))
@@ -234,8 +160,8 @@ func TestConsumeRetriesUntilMessageAvailable(t *testing.T) {
 // cancellation is only observed between successfully dequeued messages. This
 // is not desired long-term behavior, just the current one.
 func TestConsumeIgnoresContextCancellationWhileQueueEmpty(t *testing.T) {
-	q := &fakeQueue{}
-	h := &fakeHandler{}
+	q := pqueuetestx.NewQueue()
+	h := pqueuetestx.NewHandler()
 
 	// Wait for the first Backoff call before cancelling, so cancellation
 	// happens once Consume is provably inside the inner wait loop rather than
@@ -279,9 +205,9 @@ func TestConsumeIgnoresContextCancellationWhileQueueEmpty(t *testing.T) {
 }
 
 func TestNewWorkerWiresDefaults(t *testing.T) {
-	q := &fakeQueue{}
+	q := pqueuetestx.NewQueue()
 	require.NoError(t, q.Enqueue(entry.Entry("hello")))
-	h := &fakeHandler{}
+	h := pqueuetestx.NewHandler()
 	w := NewWorker(q, h)
 
 	ctx, cancel := context.WithCancel(t.Context())
@@ -292,9 +218,9 @@ func TestNewWorkerWiresDefaults(t *testing.T) {
 	}()
 
 	require.Eventually(t, func() bool {
-		return h.count() == 1
+		return h.Count() == 1
 	}, time.Second, time.Millisecond)
-	require.Equal(t, [][]byte{[]byte("hello")}, h.snapshot())
+	require.Equal(t, [][]byte{[]byte("hello")}, h.Snapshot())
 
 	cancel()
 	require.NoError(t, q.Enqueue(entry.Entry("unblock")))

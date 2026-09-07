@@ -3,7 +3,6 @@ package metaapi_test
 import (
 	"crypto/md5"
 	"crypto/rand"
-	"encoding/json"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -12,6 +11,7 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
@@ -134,7 +134,7 @@ func TestHTTPWireguardCreate(t *testing.T) {
 	require.Equal(t, 1, sqltestx.Count(t, q, "SELECT COUNT(*) FROM meta_wireguard"))
 
 	require.NoError(t, httpx.ErrorCode(resp.Result()))
-	require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+	require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 	require.Equal(t, md5x.FormatUUID(d), result.Wireguard.Id)
 	require.Equal(t, "example.bin", result.Wireguard.Description)

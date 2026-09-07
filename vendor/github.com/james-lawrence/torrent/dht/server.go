@@ -187,7 +187,7 @@ func (t discard) Print(v ...any) {
 
 // NewServer initializes a new DHT node server.
 func NewServer(k int, options ...Option) (s *Server, err error) {
-	s = langx.Autoptr(langx.Clone(Server{
+	s = new(langx.Clone(Server{
 		k:           k,
 		id:          atomicx.Pointer(int160.Random()),
 		dynamicaddr: atomicx.Pointer(netip.AddrPortFrom(netip.IPv6Unspecified(), 0)),
@@ -322,15 +322,40 @@ func (s *Server) serveBinding(ctx context.Context, pc net.PacketConn, bestaddr n
 }
 
 func (s *Server) Serve(ctx context.Context, pc net.PacketConn) error {
-	bestaddr := s.computeBestAddr(pc.LocalAddr())
-	if _, err := s.ServeBinding(ctx, pc, bestaddr); err != nil {
+	bound := pc.LocalAddr()
+
+	ap, err := netx.AddrPort(bound)
+	if err != nil {
+		return errorsx.Wrap(err, "unable to determine bound address")
+	}
+
+	if !netx.Wildcard(ap) {
+		_, err := s.ServeBinding(ctx, pc, s.computeBestAddr(bound))
 		return err
 	}
 
-	// TODO: dualstack socket check instead of just assuming all ip6 is dual stack.
-	if bestaddr.Addr().Unmap().Is6() {
-		_, err := s.serveBinding(ctx, pc, netx.ComputeBestAddr4(pc.LocalAddr()), false)
-		errorsx.Log(errorsx.Wrap(err, "failed to bind ip4 for an dual stack ipv6 socket binding"))
+	// A wildcard bind is reachable at every local scope (loopback, link-local,
+	// routed) simultaneously, on every family it covers (assumed dual-stack for
+	// IPv6) - register a binding per scope actually present, rather than
+	// collapsing to a single routed-scope "best" pick that can never include
+	// loopback or link-local. serveBinding blocks until its address is
+	// resolved (e.g. real UPnP discovery/port-mapping I/O), so these run
+	// concurrently - otherwise Serve's latency would be the sum of every
+	// group's resolution cost instead of the slowest one.
+	addrs := netx.ComputeReachableAddrs(bound)
+	errs := make([]error, len(addrs))
+	var wg sync.WaitGroup
+	for i, addr := range addrs {
+		wg.Add(1)
+		go func(i int, addr netip.AddrPort) {
+			defer wg.Done()
+			_, errs[i] = s.serveBinding(ctx, pc, addr, false)
+		}(i, addr)
+	}
+	wg.Wait()
+
+	if err := errors.Join(errs...); err != nil {
+		return err
 	}
 
 	return nil

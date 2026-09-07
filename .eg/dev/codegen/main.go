@@ -38,7 +38,7 @@ func main() {
 			),
 		),
 		shell.Op(
-			shell.New("git apply ${PATCH}").Environ("PATCH", egenv.CacheDirectory("codegen.patch")),
+			shell.New("git apply --allow-empty ${PATCH}").Environ("PATCH", egenv.CacheDirectory("codegen.patch")),
 		),
 	)
 

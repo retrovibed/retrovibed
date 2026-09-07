@@ -3,12 +3,12 @@ package cmdmeta
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/retrovibed/retrovibed/retroapi/authn"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
@@ -101,7 +101,7 @@ func (t DeviceEdit) patch(ctx context.Context, endpoint string, c *http.Client) 
 		Downloads:   existing.Downloads || t.Downloads,
 	}
 
-	encoded, err := json.Marshal(&metaapi.DaemonUpdateRequest{Daemon: patched})
+	encoded, err := jsonx.Marshal(&metaapi.DaemonUpdateRequest{Daemon: patched})
 	if err != nil {
 		return nil, errorsx.Wrap(err, "unable to encode request")
 	}

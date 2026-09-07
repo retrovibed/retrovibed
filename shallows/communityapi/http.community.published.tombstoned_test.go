@@ -82,6 +82,7 @@ func TestTombstonedEndpoint(t *testing.T) {
 			TorrentID:      uuid.Nil.String(),
 			KnownMediaID:   uuid.Nil.String(),
 			ArchiveID:      uuid.Nil.String(),
+			DirectoryID:    uuid.Nil.String(),
 			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
@@ -149,6 +150,7 @@ func TestTombstonedEndpoint(t *testing.T) {
 				TorrentID:      uuid.Nil.String(),
 				KnownMediaID:   uuid.Nil.String(),
 				ArchiveID:      uuid.Nil.String(),
+				DirectoryID:    uuid.Nil.String(),
 				EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
 			}
 			require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))

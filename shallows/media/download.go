@@ -8,16 +8,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/grpcx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
-	"google.golang.org/protobuf/encoding/protojson"
 )
-
-func (t *DownloadUpdateRequest) MarshalJSON() ([]byte, error) {
-	return protojson.Marshal(t)
-}
-
-func (t *DownloadUpdateRequest) UnmarshalJSON(b []byte) error {
-	return protojson.Unmarshal(b, t)
-}
 
 type DownloadOption func(*Download)
 

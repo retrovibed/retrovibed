@@ -5,15 +5,12 @@ import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/library.dart' as lib;
 import 'package:retrovibed/media.dart' as media;
 import 'api.dart';
-import 'socials.row.dart';
+import 'socials.card.dart';
+import 'socials.details.dart';
 
 // Lists the account's communities, each with Photo/Video/Library/Info
-// buttons; Info expands a per-community toggle per catalog publisher
-// (YouTube/Spotify/Instagram/X/etc) so a community owner can pick which
-// platforms it publishes to. Actually publishing is not wired up yet.
-// The grid itself is driven by the general community search; the socials
-// search endpoint only supplies the catalog + enabled-publisher data shown
-// in the expanded Info details.
+// buttons; Info expands the set of publish plugins the community publishes
+// through, which is where they are attached and detached.
 class SocialHome extends StatefulWidget {
   final ValueNotifier<media.SearchMode> mode;
   final void Function(media.SearchMode) onModeChanged;
@@ -43,7 +40,7 @@ class _SocialHomeState extends State<SocialHome> with ds.LoadingState {
       limit: ds.Int64(20),
     ),
   );
-  String _focused = '';
+  Widget _focused = ds.Empty;
 
   Future<void> _refresh() {
     setState(() => loading = true);
@@ -132,16 +129,27 @@ class _SocialHomeState extends State<SocialHome> with ds.LoadingState {
         ),
         Expanded(
           child: ds.Grid<Community>(
-            (context, v) => SocialCommunityRow(
+            (context, v) => SocialCard(
               community: v,
-              details: widget.details,
-              enable: widget.enable,
-              disable: widget.disable,
-              focused: v.id == _focused,
+              focused: ValueKey(v.id) == _focused.key,
               onInfo: () => setState(() {
-                _focused = _focused == v.id ? '' : v.id;
+                final key = ValueKey(v.id);
+                _focused = key == _focused.key
+                    ? ds.Empty
+                    : ds.Container(
+                        key: key,
+                        padding: defaults.padding.copyWith(top: 0, bottom: 0),
+                        SocialCommunityDetails(
+                          v,
+                          search: widget.details,
+                          enable: widget.enable,
+                          disable: widget.disable,
+                        ),
+                      );
               }),
             ),
+            leading: [_focused],
+            physics: const AlwaysScrollableScrollPhysics(),
             children: _resp.items,
             loading: loading,
             cause: cause,

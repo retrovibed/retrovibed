@@ -1,13 +1,13 @@
 package media_test
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"testing"
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
@@ -66,7 +66,7 @@ func TestKnownSearch(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Equal(t, 10, len(result.Items))
 	})
 
@@ -112,7 +112,7 @@ func TestKnownSearch(t *testing.T) {
 
 		var result media.KnownSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Len(t, result.Items, 5)
 		for _, item := range result.Items {
 			require.Equal(t, mimex.Video, item.Mimetype)
@@ -168,7 +168,7 @@ func TestKnownSearch(t *testing.T) {
 
 		var result media.KnownSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Len(t, result.Items, 5)
 	})
 
@@ -219,7 +219,7 @@ func TestKnownSearch(t *testing.T) {
 
 		var result media.KnownSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Len(t, result.Items, 1)
 		require.Equal(t, match.UID, result.Items[0].Uid)
 	})
@@ -271,7 +271,7 @@ func TestKnownSearch(t *testing.T) {
 
 		var result media.KnownSearchResponse
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 		require.Len(t, result.Items, 1)
 		require.Equal(t, inrange.UID, result.Items[0].Uid)
 		require.Equal(t, grpcx.EncodeTime(inrange.Released), result.Items[0].Released)

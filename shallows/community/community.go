@@ -13,6 +13,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/squirrelx"
+	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 )
 
 // CommunityURLFromDomain builds the standard hosted community url for the given
@@ -54,9 +55,13 @@ func CommunityQueryNotTombstoned() squirrel.Sqlizer {
 // CommunityQueryAccountID matches communities owned by accountID; uuid.Nil
 // (i.e. unset) matches every community, applying no filter.
 func CommunityQueryAccountID(accountID string) squirrel.Sqlizer {
-	if accountID == uuid.Nil.String() {
+	if stringsx.Blank(accountID) || accountID == uuid.Nil.String() {
 		return squirrelx.Noop{}
 	}
 
 	return squirrel.Eq{"community.account_id": accountID}
+}
+
+func CommunityQueryID(id ...string) squirrel.Sqlizer {
+	return squirrelx.In("community.id", id...)
 }

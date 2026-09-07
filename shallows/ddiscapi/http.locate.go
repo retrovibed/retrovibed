@@ -1,7 +1,6 @@
 package ddiscapi
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 
@@ -10,6 +9,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
 	"github.com/retrovibed/retrovibed/retroapi/httpauth"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
@@ -149,7 +149,7 @@ func (t *HTTPLocate) create(w http.ResponseWriter, r *http.Request) {
 		msg LocateCreateRequest
 	)
 
-	if err := json.NewDecoder(r.Body).Decode(&msg); err != nil {
+	if err := jsonx.UnmarshalRead(r.Body, &msg); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to decode request"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return

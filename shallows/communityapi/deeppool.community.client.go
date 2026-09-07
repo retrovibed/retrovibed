@@ -2,13 +2,13 @@ package communityapi
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http"
 
 	"github.com/retrovibed/retrovibed/retroapi/env"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
@@ -52,7 +52,7 @@ func (t DeeppoolCommunity) Search(ctx context.Context, query string, offset, lim
 	}
 	defer resp.Body.Close()
 
-	if err = json.NewDecoder(resp.Body).Decode(&msg); err != nil {
+	if err = jsonx.UnmarshalRead(resp.Body, &msg); err != nil {
 		return nil, err
 	}
 
@@ -78,7 +78,7 @@ func (t DeeppoolCommunity) Find(ctx context.Context, communityID string) (*Commu
 	}
 	defer resp.Body.Close()
 
-	if err = json.NewDecoder(resp.Body).Decode(&msg); err != nil {
+	if err = jsonx.UnmarshalRead(resp.Body, &msg); err != nil {
 		return nil, err
 	}
 

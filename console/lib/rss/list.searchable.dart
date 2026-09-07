@@ -118,6 +118,7 @@ class SearchableView extends State<ListSearchable> {
     return ds.Table(
       loading: _loading,
       cause: _cause,
+      padding: defaults.padding / 2,
       leading: ds.SearchTray(
         autofocus: defaults.desktop,
         decoration: InputDecoration(hintText: "search feeds"),

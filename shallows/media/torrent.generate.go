@@ -60,7 +60,7 @@ func GenerateTorrent(ctx context.Context, q sqlx.Queryer, mvfs, tvfs fsx.Virtual
 		new(int160.FromByteArray(infohash)),
 		tracking.MetadataOptionFromInfo(info),
 		tracking.MetadataOptionBytes(lmd.Bytes),
-		tracking.MetadataOptionDownloaded(lmd.Bytes),
+		tracking.MetadataOptionAvailable(lmd.Bytes),
 		tracking.MetadataOptionEntropySeed(infohash[:], []byte(lmd.EncryptionSeed)), // TODO: this should be passed in. we want to pull the community seed.
 		tracking.MetadataOptionKnownMediaID(lmd.KnownMediaID),
 		tracking.MetadataOptionAutoSeeding,

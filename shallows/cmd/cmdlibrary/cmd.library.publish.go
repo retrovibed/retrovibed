@@ -3,13 +3,13 @@ package cmdlibrary
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
 
 	"github.com/retrovibed/retrovibed/retroapi/authn"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
@@ -71,13 +71,14 @@ func (t cmdPublish) publishItem(ctx context.Context, endpoint string, c *http.Cl
 		msg  communityapi.PublishContentResponse
 	)
 
-	body, err := json.Marshal(&communityapi.PublishContentRequest{
+	body, err := jsonx.Marshal(&communityapi.PublishContentRequest{
 		PublishedContent: &communityapi.PublishedContent{
 			LibraryId:   libraryID,
 			CommunityId: com.Id,
 		},
 		PublishMode: com.DefaultPublishMode,
 	})
+
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +94,7 @@ func (t cmdPublish) publishItem(ctx context.Context, endpoint string, c *http.Cl
 	}
 	defer resp.Body.Close()
 
-	if err = json.NewDecoder(resp.Body).Decode(&msg); err != nil {
+	if err = jsonx.UnmarshalRead(resp.Body, &msg); err != nil {
 		return nil, errorsx.Wrap(err, "failed to decode response")
 	}
 

@@ -34,6 +34,7 @@ class FileDropWell extends StatefulWidget {
   final List<String> extensions;
   final Widget help;
   final String? tooltip;
+  final OutlinedBorder? shape;
 
   const FileDropWell(
     this.onDropped, {
@@ -55,6 +56,7 @@ class FileDropWell extends StatefulWidget {
     this.margin,
     this.help = ds.HelpScope.None,
     this.tooltip,
+    this.shape,
   });
 
   static Future<FilesEvent> files({
@@ -96,6 +98,7 @@ class FileDropWell extends StatefulWidget {
     Function()? onTap,
     Widget help = ds.HelpScope.None,
     String? tooltip,
+    OutlinedBorder? shape,
   }) {
     return FileDropWell(
       onDropped,
@@ -107,6 +110,7 @@ class FileDropWell extends StatefulWidget {
       extensions: extensions,
       help: help,
       tooltip: tooltip,
+      shape: shape,
     );
   }
 
@@ -169,7 +173,9 @@ class _FileDropWell extends State<FileDropWell> {
             });
             Future.wait(
                   evt.files.map((c) {
-                    return c.openRead(0, mimex.defaultMagicNumbersMaxLength).first.then((v) => v.toList()).then((bits) {
+                    return c.openRead(0, mimex.defaultMagicNumbersMaxLength).first.then((v) => v.toList()).then((
+                      bits,
+                    ) {
                       return new DropItemFile(
                         c.path,
                         name: c.name,
@@ -209,6 +215,7 @@ class _FileDropWell extends State<FileDropWell> {
               disabled: _loading,
               tooltip: widget.tooltip,
               value: _progress.value / _total,
+              shape: widget.shape,
             ),
           ),
         ),

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
 
 import 'package:retrovibed/billing.dart' as billing;
@@ -36,6 +37,11 @@ void main(List<String> args) async {
   // instead of presenting the UI. Used by the AppImage smoke test to verify
   // the shipped artifact starts cleanly.
   final smoke = args.contains('--smoke');
+
+  final rawDebugPrint = foundation.debugPrint;
+  foundation.debugPrint = (String? message, {int? wrapWidth}) {
+    rawDebugPrint('${DateTime.now()} $message', wrapWidth: wrapWidth);
+  };
 
   await retro.run(() {
     if (smoke) {

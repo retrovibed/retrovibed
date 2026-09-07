@@ -112,7 +112,7 @@ class Typography extends StatelessWidget {
                 ),
               Expanded(
                 child: Text(
-                  authzmd.profileId == current.id ? "you" : defaultDisplay,
+                  authzmd.sub == current.id ? "you" : defaultDisplay,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),

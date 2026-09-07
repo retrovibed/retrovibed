@@ -36,7 +36,10 @@ func ValidateTorrent(ctx context.Context, q sqlx.Queryer, tvfs fsx.Virtual, tmd 
 		return err
 	}
 
-	if err = tracking.MetadataCompleteByID(ctx, q, tmd.ID, 0, uint64(info.TotalLength()), uint64(info.TotalLength()), 0).Scan(tmd); err != nil {
+	// downloaded stays 0: verifying already-present on-disk data involves no
+	// peer transfer. available becomes the full size, since we just confirmed
+	// every piece is present and hashes correctly.
+	if err = tracking.MetadataCompleteByID(ctx, q, tmd.ID, 0, uint64(info.TotalLength()), 0, 0, uint64(info.TotalLength())).Scan(tmd); err != nil {
 		return errorsx.Wrap(err, "unable to mark torrent as completed")
 	}
 

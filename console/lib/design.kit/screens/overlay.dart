@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../empty.dart';
 
 class Overlay extends StatelessWidget {
   final Widget child;
@@ -17,7 +18,7 @@ class Overlay extends StatelessWidget {
   factory Overlay.tappable(
     Widget child, {
     Key? key,
-    Widget overlay = const SizedBox(),
+    Widget overlay = Empty,
     AlignmentGeometry alignment = Alignment.center,
     BorderRadius borderRadius = BorderRadius.zero,
     required Function()? onTap,
