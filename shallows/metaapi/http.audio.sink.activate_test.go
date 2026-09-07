@@ -14,6 +14,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/audiox"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/metaapi"
@@ -97,6 +98,30 @@ func TestHTTPAudioSinkActivate(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.Equal(t, http.StatusBadRequest, resp.Code)
+	})
+
+	t.Run("unrecoverable error", func(t *testing.T) {
+		routes := mux.NewRouter()
+		metaapi.NewHTTPAudioSink(
+			metaapi.HTTPAudioSinkOptionSinker(&fakeAudioSinker{
+				activateErr: errorsx.NewUnrecoverable(errors.New("pulseaudio unreachable")),
+			}),
+			metaapi.HTTPAudioSinkOptionSupported(true),
+			metaapi.HTTPAudioSinkOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+		).Bind(routes.PathPrefix("/").Subrouter())
+
+		claims := jwtx.NewJWTClaims(testx.Must(uuid.NewV4())(t).String(), jwtx.ClaimsOptionAuthnExpiration())
+		token := httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)
+
+		body, err := json.Marshal(&metaapi.AudioSinkTouchRequest{Id: "sink-1"})
+		require.NoError(t, err)
+
+		resp, req, err := httptestx.BuildRequestContextBytes(context.Background(), http.MethodPost, "/", body, httptestx.RequestOptionAuthorization(token))
+		require.NoError(t, err)
+
+		routes.ServeHTTP(resp, req)
+
+		require.Equal(t, http.StatusServiceUnavailable, resp.Code)
 	})
 
 	t.Run("decode error", func(t *testing.T) {

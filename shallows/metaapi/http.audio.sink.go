@@ -2,6 +2,7 @@ package metaapi
 
 import (
 	"context"
+	"errors"
 	"log"
 	"net/http"
 	"strings"
@@ -125,7 +126,11 @@ func (t *HTTPAudioSink) listen(w http.ResponseWriter, r *http.Request) {
 		resp.Items = append(resp.Items, newAudioSink(s))
 	}
 
-	if err := seq.Err(); err != nil {
+	if err := seq.Err(); errors.Is(err, errorsx.Unrecoverable{}) {
+		log.Println(errorsx.Wrap(err, "unable to list sinks"))
+		errorsx.Log(c.Close(websocketx.PrivateStatus(http.StatusServiceUnavailable), "audio service unavailable"))
+		return
+	} else if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to list sinks"))
 		errorsx.Log(c.Close(websocketx.PrivateStatus(http.StatusInternalServerError), "internal service error"))
 		return
@@ -149,7 +154,11 @@ func (t *HTTPAudioSink) listen(w http.ResponseWriter, r *http.Request) {
 
 func (t *HTTPAudioSink) current(w http.ResponseWriter, r *http.Request) {
 	sink, err := t.sink.Current()
-	if err != nil {
+	if errors.Is(err, errorsx.Unrecoverable{}) {
+		log.Println(errorsx.Wrap(err, "unable to determine current sink"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusServiceUnavailable))
+		return
+	} else if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to determine current sink"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
@@ -172,14 +181,22 @@ func (t *HTTPAudioSink) activate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := t.sink.Activate(msg.Id); err != nil {
+	if err := t.sink.Activate(msg.Id); errors.Is(err, errorsx.Unrecoverable{}) {
+		log.Println(errorsx.Wrap(err, "unable to activate sink"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusServiceUnavailable))
+		return
+	} else if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to activate sink"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
 	}
 
 	sink, err := t.sink.Current()
-	if err != nil {
+	if errors.Is(err, errorsx.Unrecoverable{}) {
+		log.Println(errorsx.Wrap(err, "unable to determine current sink"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusServiceUnavailable))
+		return
+	} else if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to determine current sink"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
