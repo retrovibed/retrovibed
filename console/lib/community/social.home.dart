@@ -127,7 +127,6 @@ class _SocialHomeState extends State<SocialHome> with ds.LoadingState {
           ],
           help: ds.Hint(const Text("search for communities to publish to")),
         ),
-        _focused,
         Expanded(
           child: ds.Grid<Community>(
             (context, v) => SocialCard(
@@ -149,6 +148,8 @@ class _SocialHomeState extends State<SocialHome> with ds.LoadingState {
                       );
               }),
             ),
+            leading: [_focused],
+            physics: const AlwaysScrollableScrollPhysics(),
             children: _resp.items,
             loading: loading,
             cause: cause,

@@ -9,6 +9,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
@@ -26,7 +27,10 @@ func TestHTTPSocialSearch(t *testing.T) {
 
 	q := sqltestx.Metadatabase(t)
 
-	var p meta.Profile
+	var (
+		p   meta.Profile
+		aid = uuidx.WithSuffix(1)
+	)
 	require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
 	require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
 
@@ -36,7 +40,7 @@ func TestHTTPSocialSearch(t *testing.T) {
 
 	var owned, other community.Community
 	require.NoError(t, community.CommunityInsertWithDefaults(ctx, q, community.Community{
-		ID: uuid.Must(uuid.NewV7()).String(), AccountID: p.ID, Description: "owned by profile",
+		ID: uuid.Must(uuid.NewV7()).String(), AccountID: aid, Description: "owned by profile",
 	}).Scan(&owned))
 	require.NoError(t, community.CommunityInsertWithDefaults(ctx, q, community.Community{
 		ID: uuid.Must(uuid.NewV7()).String(), AccountID: uuid.Must(uuid.NewV7()).String(), Description: "owned by someone else",
@@ -58,7 +62,7 @@ func TestHTTPSocialSearch(t *testing.T) {
 		communityapi.HTTPSocialOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 	).Bind(routes.PathPrefix("/").Subrouter())
 
-	claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
+	claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration(), jwtx.ClaimsOptionIssuer(aid)), metaapi.TokenOptionFromAuthz(v)))
 
 	t.Run("returns only the account's communities with their enabled publishers and the full catalog", func(t *testing.T) {
 		resp, req, err := httptestx.BuildRequestBytes(
@@ -86,7 +90,7 @@ func TestHTTPSocialSearch(t *testing.T) {
 	t.Run("returns a community with no publishers", func(t *testing.T) {
 		var unconfigured community.Community
 		require.NoError(t, community.CommunityInsertWithDefaults(ctx, q, community.Community{
-			ID: uuid.Must(uuid.NewV7()).String(), AccountID: p.ID, Description: "nothing enabled yet",
+			ID: uuid.Must(uuid.NewV7()).String(), AccountID: aid, Description: "nothing enabled yet",
 		}).Scan(&unconfigured))
 
 		resp, req, err := httptestx.BuildRequestBytes(

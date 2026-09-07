@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/linxGnu/pqueue"
 	"github.com/retrovibed/retrovibed/retroapi/backoffx"
 	"github.com/retrovibed/retrovibed/retroapi/deeppool"
 	"github.com/retrovibed/retrovibed/retroapi/publishplugin"
@@ -14,10 +15,11 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/contextx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/pqueuex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 )
 
-func AutoPublishing(ctx context.Context, q sqlx.Queryer, c *http.Client, mvfs, tvfs fsx.Virtual, async *asyncx.Wakeup, publishers publishplugin.T) error {
+func AutoPublishing(ctx context.Context, q sqlx.Queryer, c *http.Client, mvfs, tvfs fsx.Virtual, async *asyncx.Wakeup, wq pqueue.Queue, publishers publishplugin.T) error {
 	metrics := communityapi.NewMetrics(c)
 	published := communityapi.NewDeeppoolCommunity(c)
 
@@ -26,10 +28,17 @@ func AutoPublishing(ctx context.Context, q sqlx.Queryer, c *http.Client, mvfs, t
 		backoffx.Jitter(0.1),
 	)
 
+	go contextx.RunContext(
+		ctx,
+		pqueuex.NewWorker(
+			wq,
+			communityapi.NewSyncPublishedBackgroundWorker(q, c, metrics, published, publishers, deeppool.NewArchiver(c), mvfs, tvfs),
+		).Consume,
+	)
 	go asyncx.Periodic(ctx, async, s, "automatic publishing initiated")
 	contextx.Run(ctx, func() {
 		errorsx.Log(asyncx.Run(ctx, async, func(ctx context.Context) error {
-			if err := communityapi.SyncPendingToDeeppool(ctx, q, c, metrics, published, publishers, deeppool.NewArchiver(c), mvfs, tvfs); err != nil {
+			if err := communityapi.SyncPendingToDeeppool(ctx, q, wq); err != nil {
 				log.Println(errorsx.Wrap(err, "publishing sync failed"))
 				return nil
 			}

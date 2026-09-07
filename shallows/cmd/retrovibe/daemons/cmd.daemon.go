@@ -160,6 +160,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		vpncfgpath          = userx.DefaultConfigDir(userx.DefaultRelRoot(), "vpn.cfg")
 		storagecfgpath      = userx.DefaultConfigDir(userx.DefaultRelRoot(), "storage.cfg")
 		mediarecsdir        = userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "media.recs.d")
+		mediapubsdir        = userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "media.pud.d")
 	)
 
 	// initialize queue directories
@@ -168,7 +169,10 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		return err
 	}
 
-	_ = mediarecs
+	mediapub, err := pqueuex.New(mediapubsdir)
+	if err != nil {
+		return err
+	}
 
 	gctx.Cleanup.Add(1)
 	defer gctx.Cleanup.Done()
@@ -276,7 +280,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	if t.AutoArchive && deepjwt != http.DefaultClient {
 		log.Println("automatic archival is enabled")
 		errorsx.Log(AutoArchival(gctx.Context, db, deepjwt, mediastore, archival, t.AutoArchive))
-		errorsx.Log(AutoPublishing(gctx.Context, db, deepjwt, mediastore, tvfs, publishing, publishers))
+		errorsx.Log(AutoPublishing(gctx.Context, db, deepjwt, mediastore, tvfs, publishing, mediapub, publishers))
 		errorsx.Log(AutoFeedSync(gctx.Context, db, deepjwt, publishing))
 		errorsx.Log(SubscriptionSync(gctx.Context, db, deepjwt, communitysync))
 		tstore = library.NewTorrentStorageFromHTTP(db, deepjwt, tstore)
@@ -550,6 +554,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	communityapi.NewHTTPPublished(
 		db,
 		envx.Toggle(communityapi.HTTPPublishedOptionNoop, communityapi.HTTPPublishedOptionHTTPClient(deepjwt), t.AutoArchive),
+		communityapi.HTTPPublishedOptionPublishQueue(mediapub),
 		communityapi.HTTPPublishedOptionPublishing(publishing),
 		communityapi.HTTPPublishedOptionMediaStorage(mediastore),
 		communityapi.HTTPPublishedOptionTorrentStorage(tvfs),

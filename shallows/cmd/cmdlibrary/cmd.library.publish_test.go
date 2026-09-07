@@ -11,6 +11,7 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
+	"github.com/linxGnu/pqueue"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
@@ -22,6 +23,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
+	"github.com/retrovibed/retrovibed/shallows/internal/pqueuetestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/library"
@@ -30,7 +32,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func communityLibraryPublishServer(t *testing.T, q *sql.DB) *mux.Router {
+func communityLibraryPublishServer(t *testing.T, q *sql.DB, wq pqueue.Queue) *mux.Router {
 	t.Helper()
 
 	routes := mux.NewRouter()
@@ -38,6 +40,7 @@ func communityLibraryPublishServer(t *testing.T, q *sql.DB) *mux.Router {
 		q,
 		communityapi.HTTPPublishedOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		communityapi.HTTPPublishedOptionHTTPClient(&http.Client{}),
+		communityapi.HTTPPublishedOptionPublishQueue(wq),
 		communityapi.HTTPPublishedOptionMediaStorage(fsx.DirVirtual(t.TempDir())),
 		communityapi.HTTPPublishedOptionTorrentStorage(fsx.DirVirtual(t.TempDir())),
 	).Bind(routes.PathPrefix("/c/p").Subrouter())
@@ -123,7 +126,7 @@ func TestCommunityLibraryPublish(t *testing.T) {
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
-		srv := httptest.NewServer(communityLibraryPublishServer(t, q))
+		srv := httptest.NewServer(communityLibraryPublishServer(t, q, pqueuetestx.NewDisk(t)))
 		defer srv.Close()
 
 		com := &communityapi.Community{Id: communityID}
@@ -195,7 +198,7 @@ func TestCommunityLibraryPublish(t *testing.T) {
 			require.NoError(t, enc.Encode(langx.Clone(lmd, timex.JSONSafeEncodeOption)))
 		}
 
-		srv := httptest.NewServer(communityLibraryPublishServer(t, q))
+		srv := httptest.NewServer(communityLibraryPublishServer(t, q, pqueuetestx.NewDisk(t)))
 		defer srv.Close()
 
 		var output bytes.Buffer
@@ -254,7 +257,7 @@ func TestCommunityLibraryPublish(t *testing.T) {
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
-		srv := httptest.NewServer(communityLibraryPublishServer(t, q))
+		srv := httptest.NewServer(communityLibraryPublishServer(t, q, pqueuetestx.NewDisk(t)))
 		defer srv.Close()
 
 		com := &communityapi.Community{Id: communityID, DefaultPublishMode: communityapi.PublishMode_LISTED}
@@ -299,7 +302,7 @@ func TestCommunityLibraryPublish(t *testing.T) {
 		communityID := uuid.Must(uuid.NewV7()).String()
 		libraryID := uuid.Must(uuid.NewV7()).String()
 
-		srv := httptest.NewServer(communityLibraryPublishServer(t, q))
+		srv := httptest.NewServer(communityLibraryPublishServer(t, q, pqueuetestx.NewDisk(t)))
 		defer srv.Close()
 
 		// library item not inserted — endpoint returns an error status

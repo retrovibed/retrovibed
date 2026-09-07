@@ -78,8 +78,11 @@ func (t *HTTPSocial) Bind(r *mux.Router) {
 // currently-enabled publishers, plus the full publisher catalog so the
 // console can render the available toggles.
 func (t *HTTPSocial) search(w http.ResponseWriter, r *http.Request) {
-	var resp SocialsSearchResponse
-	resp.Next = &SocialsSearchRequest{Limit: 100}
+	var (
+		resp = &SocialsSearchResponse{
+			Next: &SocialsSearchRequest{Limit: 100},
+		}
+	)
 
 	if err := t.decoder.Decode(resp.Next, r.Form); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to decode search request"))
@@ -88,20 +91,13 @@ func (t *HTTPSocial) search(w http.ResponseWriter, r *http.Request) {
 	}
 	resp.Next.Limit = numericx.Min(resp.Next.Limit, 100)
 
-	// the subject, not the issuer: the account filter silently applies to
-	// nothing when handed a blank id, so taking the wrong one returns every
-	// community rather than the caller's.
-	_, aid, err := httpauth.IssuerSubjectID(r.Context(), t.jwtsecret, r)
+	aid, _, err := httpauth.IssuerSubjectID(r.Context(), t.jwtsecret, r)
 	if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to retrieve token"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
 	}
 
-	// no join against community_publisher: the account id and the requested
-	// ids already say which communities these are, and the enabled publishers
-	// are read per community below. joining only ever hid the communities that
-	// have none - which are the ones about to have one attached.
 	communities := community.CommunitySearch(r.Context(), t.q, community.CommunitySearchBuilder().
 		Where(
 			squirrel.And{

@@ -2,6 +2,7 @@ package pqueuex
 
 import (
 	"context"
+	"errors"
 	"log"
 	"time"
 
@@ -13,6 +14,39 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 )
+
+type errq struct {
+	err error
+}
+
+// Close implements [pqueue.Queue].
+func (e errq) Close() error {
+	return e.err
+}
+
+// Dequeue implements [pqueue.Queue].
+func (e errq) Dequeue(*entry.Entry) bool {
+	return false
+}
+
+// Enqueue implements [pqueue.Queue].
+func (e errq) Enqueue(entry.Entry) error {
+	return e.err
+}
+
+// EnqueueBatch implements [pqueue.Queue].
+func (e errq) EnqueueBatch(entry.Batch) error {
+	return e.err
+}
+
+// Peek implements [pqueue.Queue].
+func (e errq) Peek(*entry.Entry) bool {
+	return false
+}
+
+func Uninitialized() pqueue.Queue {
+	return errq{err: errors.ErrUnsupported}
+}
 
 func New(dir string) (q pqueue.Queue, err error) {
 	if err := fsx.MkDirs(0700, dir); err != nil {

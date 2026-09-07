@@ -46,14 +46,12 @@ func PrepareDefaultFeeds(ctx context.Context, q sqlx.Queryer) error {
 				URL:          "https://archlinux.org/feeds/releases/",
 				Contributing: true,
 			},
-
 			{
 				Description:  "Retrovibed - test data",
 				URL:          "https://vibed.community.retrovibe.space",
 				Contributing: true,
 			},
 		})
-
 	})
 	if err != nil {
 		return err

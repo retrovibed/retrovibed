@@ -12,6 +12,7 @@ import (
 	"github.com/go-playground/form/v4"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
+	"github.com/linxGnu/pqueue"
 	"github.com/retrovibed/retrovibed/retroapi/httpauth"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
@@ -26,6 +27,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/lucenex"
 	"github.com/retrovibed/retrovibed/shallows/internal/numericx"
+	"github.com/retrovibed/retrovibed/shallows/internal/pqueuex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
@@ -45,6 +47,12 @@ func HTTPPublishedOptionJWTSecret(j jwtx.SecretSource) HTTPPublishedOption {
 func HTTPPublishedOptionHTTPClient(c *http.Client) HTTPPublishedOption {
 	return func(t *HTTPPublished) {
 		t.httpc = c
+	}
+}
+
+func HTTPPublishedOptionPublishQueue(pq pqueue.Queue) HTTPPublishedOption {
+	return func(t *HTTPPublished) {
+		t.publishq = pq
 	}
 }
 
@@ -71,6 +79,7 @@ func NewHTTPPublished(q sqlx.Queryer, options ...HTTPPublishedOption) *HTTPPubli
 		q:          q,
 		jwtsecret:  env.JWTSecret,
 		decoder:    formx.NewDecoder(),
+		publishq:   pqueuex.Uninitialized(),
 		publishing: asyncx.NewWakeup(context.Background()),
 		lucene:     duckdbx.NewLucene(),
 	}, options...)
@@ -81,6 +90,7 @@ type HTTPPublished struct {
 	q              sqlx.Queryer
 	jwtsecret      jwtx.SecretSource
 	httpc          *http.Client
+	publishq       pqueue.Queue
 	publishing     *asyncx.Wakeup
 	decoder        *form.Decoder
 	lucene         lucenex.Driver
@@ -100,6 +110,7 @@ func (t *HTTPPublished) Bind(r *mux.Router) {
 
 	r.Path("/{cid}").Methods(http.MethodPost).Handler(alice.New(
 		httpx.RouteInvoked,
+		httpx.DebugRequest,
 		httpx.ContextBufferPool512(),
 		httpauth.AuthenticateWithToken(t.jwtsecret),
 		httpx.Timeout2s(),
@@ -210,20 +221,24 @@ func (t *HTTPPublished) publish(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	pc = langx.Clone(pc, timex.JSONSafeEncodeOption)
+
+	if err = pqueuex.Enqueue(r.Context(), t.publishq, pc); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to queue published content"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
 	if err = httpx.WriteJSON(w, httpx.GetBuffer(r), &PublishContentResponse{
 		PublishedContent: new(
 			langx.Clone(
 				PublishedContent{},
-				PublishedContentOptionFromDB(langx.Clone(pc, timex.JSONSafeEncodeOption)),
+				PublishedContentOptionFromDB(pc),
 			),
 		),
 	}); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to write response"))
 		return
-	}
-
-	if req.PublishMode > PublishMode_UNLISTED {
-		t.publishing.Broadcast()
 	}
 }
 

@@ -16,6 +16,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/grpcx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
+	"github.com/retrovibed/retrovibed/shallows/internal/pqueuetestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/library"
@@ -64,6 +65,7 @@ func TestPublishEndpoint(t *testing.T) {
 			q,
 			communityapi.HTTPPublishedOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 			communityapi.HTTPPublishedOptionHTTPClient(&http.Client{}),
+			communityapi.HTTPPublishedOptionPublishQueue(pqueuetestx.NewDisk(t)),
 			communityapi.HTTPPublishedOptionMediaStorage(fsx.DirVirtual(mediaDir)),
 			communityapi.HTTPPublishedOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
 		).Bind(routes.PathPrefix("/c").Subrouter())
@@ -143,6 +145,7 @@ func TestPublishEndpoint(t *testing.T) {
 			q,
 			communityapi.HTTPPublishedOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 			communityapi.HTTPPublishedOptionHTTPClient(&http.Client{}),
+			communityapi.HTTPPublishedOptionPublishQueue(pqueuetestx.NewDisk(t)),
 			communityapi.HTTPPublishedOptionMediaStorage(fsx.DirVirtual(mediaDir)),
 			communityapi.HTTPPublishedOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
 		).Bind(routes.PathPrefix("/c").Subrouter())
@@ -221,6 +224,7 @@ func TestPublishEndpoint(t *testing.T) {
 			q,
 			communityapi.HTTPPublishedOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 			communityapi.HTTPPublishedOptionHTTPClient(&http.Client{}),
+			communityapi.HTTPPublishedOptionPublishQueue(pqueuetestx.NewDisk(t)),
 			communityapi.HTTPPublishedOptionMediaStorage(fsx.DirVirtual(mediaDir)),
 			communityapi.HTTPPublishedOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
 		).Bind(routes.PathPrefix("/c").Subrouter())
@@ -299,6 +303,7 @@ func TestPublishEndpoint(t *testing.T) {
 			q,
 			communityapi.HTTPPublishedOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 			communityapi.HTTPPublishedOptionHTTPClient(&http.Client{}),
+			communityapi.HTTPPublishedOptionPublishQueue(pqueuetestx.NewDisk(t)),
 			communityapi.HTTPPublishedOptionMediaStorage(fsx.DirVirtual(mediaDir)),
 			communityapi.HTTPPublishedOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
 		).Bind(routes.PathPrefix("/c").Subrouter())
@@ -374,6 +379,7 @@ func TestPublishEndpoint(t *testing.T) {
 			q,
 			communityapi.HTTPPublishedOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 			communityapi.HTTPPublishedOptionHTTPClient(&http.Client{}),
+			communityapi.HTTPPublishedOptionPublishQueue(pqueuetestx.NewDisk(t)),
 			communityapi.HTTPPublishedOptionMediaStorage(fsx.DirVirtual(mediaDir)),
 			communityapi.HTTPPublishedOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
 		).Bind(routes.PathPrefix("/c").Subrouter())
@@ -461,6 +467,7 @@ func TestPublishEndpoint(t *testing.T) {
 			q,
 			communityapi.HTTPPublishedOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 			communityapi.HTTPPublishedOptionHTTPClient(&http.Client{}),
+			communityapi.HTTPPublishedOptionPublishQueue(pqueuetestx.NewDisk(t)),
 			communityapi.HTTPPublishedOptionMediaStorage(fsx.DirVirtual(mediaDir)),
 			communityapi.HTTPPublishedOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
 		).Bind(routes.PathPrefix("/c").Subrouter())
@@ -540,6 +547,7 @@ func TestPublishEndpoint(t *testing.T) {
 			q,
 			communityapi.HTTPPublishedOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 			communityapi.HTTPPublishedOptionHTTPClient(&http.Client{}),
+			communityapi.HTTPPublishedOptionPublishQueue(pqueuetestx.NewDisk(t)),
 			communityapi.HTTPPublishedOptionMediaStorage(fsx.DirVirtual(mediaDir)),
 			communityapi.HTTPPublishedOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
 		).Bind(routes.PathPrefix("/c").Subrouter())
@@ -612,6 +620,7 @@ func TestPublishEndpoint(t *testing.T) {
 			q,
 			communityapi.HTTPPublishedOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 			communityapi.HTTPPublishedOptionHTTPClient(&http.Client{}),
+			communityapi.HTTPPublishedOptionPublishQueue(pqueuetestx.NewDisk(t)),
 			communityapi.HTTPPublishedOptionMediaStorage(fsx.DirVirtual(mediaDir)),
 			communityapi.HTTPPublishedOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
 		).Bind(routes.PathPrefix("/c").Subrouter())
@@ -682,6 +691,7 @@ func TestPublishEndpoint(t *testing.T) {
 			q,
 			communityapi.HTTPPublishedOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 			communityapi.HTTPPublishedOptionHTTPClient(&http.Client{}),
+			communityapi.HTTPPublishedOptionPublishQueue(pqueuetestx.NewDisk(t)),
 			communityapi.HTTPPublishedOptionMediaStorage(fsx.DirVirtual(mediaDir)),
 			communityapi.HTTPPublishedOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
 		).Bind(routes.PathPrefix("/c").Subrouter())
@@ -754,6 +764,7 @@ func TestPublishEndpoint(t *testing.T) {
 			q,
 			communityapi.HTTPPublishedOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 			communityapi.HTTPPublishedOptionHTTPClient(&http.Client{}),
+			communityapi.HTTPPublishedOptionPublishQueue(pqueuetestx.NewDisk(t)),
 			communityapi.HTTPPublishedOptionMediaStorage(fsx.DirVirtual(mediaDir)),
 			communityapi.HTTPPublishedOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
 		).Bind(routes.PathPrefix("/c").Subrouter())
@@ -831,6 +842,7 @@ func TestPublishEndpoint(t *testing.T) {
 			q,
 			communityapi.HTTPPublishedOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 			communityapi.HTTPPublishedOptionHTTPClient(&http.Client{}),
+			communityapi.HTTPPublishedOptionPublishQueue(pqueuetestx.NewDisk(t)),
 			communityapi.HTTPPublishedOptionMediaStorage(fsx.DirVirtual(mediaDir)),
 			communityapi.HTTPPublishedOptionTorrentStorage(fsx.DirVirtual(torrentDir)),
 		).Bind(routes.PathPrefix("/c").Subrouter())

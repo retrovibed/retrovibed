@@ -83,7 +83,7 @@ func PublishedContentFindByPendingSync(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer) NewPublishedContentScannerStatic,
 ) {
-	gql = gql.Query(`SELECT ` + PublishedContentScannerStaticColumns + ` FROM published_content WHERE published_at >= 'infinity' AND tombstoned_at = 'infinity' AND (publish_mode > 0 OR oauth_google_id != '00000000-0000-0000-0000-000000000000')`)
+	gql = gql.Query(`SELECT ` + PublishedContentScannerStaticColumns + ` FROM published_content WHERE published_at >= 'infinity' AND tombstoned_at = 'infinity'`)
 }
 
 func PublishedContentFindByCommunityIDForFeed(
