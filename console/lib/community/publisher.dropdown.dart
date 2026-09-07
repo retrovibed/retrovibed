@@ -7,6 +7,7 @@ class PublisherDropdown extends StatefulWidget {
   final ValueNotifier<api.PluginPublisher> current;
   final List<Widget> trailing;
   final List<Widget> leading;
+  final EdgeInsets margin;
   final Widget help;
   final bool readonly;
   final Future<api.PluginPublisherSearchResponse> Function(api.PluginPublisherSearchRequest) search;
@@ -20,6 +21,7 @@ class PublisherDropdown extends StatefulWidget {
     this.readonly = false,
     this.search = api.publishers.search,
     this.onSelected = ds.fnNoop,
+    this.margin = EdgeInsets.zero,
   });
 
   @override
@@ -63,13 +65,14 @@ class _PublisherDropdownState extends State<PublisherDropdown> with ds.LoadingSt
       children: [
         ds.SearchDropdown.text(
           PublisherTypography.description(widget.current.value),
-          padding: defaults.padding.copyWith(
-            top: defaults.padding.left / 4,
-            bottom: defaults.padding.right / 4,
+          decoration: InputDecoration(
+            errorText: "No Publishing Plugins Available",
           ),
+          padding: EdgeInsets.zero,
           key: ValueKey(widget.current.value.id),
           controller: _search,
           textAlign: TextAlign.center,
+          margin: EdgeInsets.zero,
           help: widget.help,
           refresh: _discovered,
           leading: widget.leading,
@@ -77,15 +80,16 @@ class _PublisherDropdownState extends State<PublisherDropdown> with ds.LoadingSt
           onSearch: (query, onClick) {
             return widget.search(api.PluginPublisherSearchRequest()..query = query).then((response) {
               if (response.items.isEmpty) return ds.Empty;
-              return Container(
+              return ds.Container(
                 constraints: BoxConstraints(maxHeight: 400),
-                child: ListView.builder(
+                decoration: BoxDecoration(color: Colors.blue),
+                ListView.builder(
                   shrinkWrap: true,
                   itemCount: response.items.length,
                   itemBuilder: (context, index) {
                     final current = response.items[index];
                     if (current.id == widget.current.value.id) {
-                      // no need to display the current item in the list.
+                      // dont display the current item in the list.
                       return ds.Empty;
                     }
 

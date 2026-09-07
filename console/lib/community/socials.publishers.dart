@@ -100,38 +100,29 @@ class _ListDisplay extends State<SocialsPublishers> with ds.LoadingState {
 
   @override
   Widget build(BuildContext context) {
+    final defaults = ds.Defaults.of(context);
     return ds.Table(
       loading: loading,
       cause: cause,
       children: _attached,
       overlay: _overlay,
-      empty: const Center(child: Text('No publishers attached to this community')),
-      leading: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          IconButton(
-            tooltip: 'attach a publish plugin to this community',
-            onPressed: () {
-              setState(() {
-                _overlay = _overlay == ds.Empty
-                    ? PublisherDropdown(
-                        current: _dropdown,
-                        readonly: true,
-                        help: const ds.Hint(Text("search the plugins this community does not publish through yet")),
-                        // the exclusion is the whole point: what is already
-                        // attached is in the table below, not in the picker.
-                        search: (req) => widget.publishers(
-                          req..excluded.addAll(_attached.map((cp) => cp.publisherId)),
-                          options: [authn.request(authn.AuthzCache.meta(context))],
-                        ),
-                        onSelected: _attach,
-                      )
-                    : ds.Empty;
-              });
-            },
-            icon: Icon(_overlay == ds.Empty ? Icons.add : Icons.remove),
-          ),
-        ],
+      empty: ds.Container(
+        padding: defaults.padding,
+        decoration: BoxDecoration(color: Colors.transparent, border: defaults.border),
+        Center(
+          child: Text('No publishers attached to this community'),
+        ),
+      ),
+      leading: PublisherDropdown(
+        current: _dropdown,
+        readonly: true,
+        help: const ds.Hint(Text("search the plugins this community does not publish through yet")),
+        margin: EdgeInsets.only(bottom: defaults.margin.bottom),
+        search: (req) => widget.publishers(
+          req..excluded.addAll(_attached.map((cp) => cp.publisherId)),
+          options: [authn.request(authn.AuthzCache.meta(context))],
+        ),
+        onSelected: _attach,
       ),
       ds.Table.expanded<api.CommunityPublisher>((v) {
         return SocialsPublisherRow(

@@ -3,6 +3,7 @@ import 'flutterx.dart';
 import 'theme.defaults.dart';
 import 'empty.dart';
 import 'help.dart';
+import 'container.dart' as c;
 
 class SearchDropdown extends StatefulWidget {
   static const InputDecoration defaultDecoration = const InputDecoration(
@@ -14,6 +15,7 @@ class SearchDropdown extends StatefulWidget {
   final InputDecoration decoration;
   final TextAlign textAlign;
   final EdgeInsets? padding;
+  final EdgeInsets margin;
   final List<Widget> leading;
   final List<Widget> trailing;
   final TextEditingController? controller;
@@ -30,6 +32,7 @@ class SearchDropdown extends StatefulWidget {
     this.decoration = SearchDropdown.defaultDecoration,
     this.textAlign = TextAlign.left,
     this.padding,
+    this.margin = EdgeInsets.zero,
     this.leading = const [],
     this.trailing = const [],
     this.controller,
@@ -43,19 +46,22 @@ class SearchDropdown extends StatefulWidget {
     required Future<Widget> Function(String query, Function() onClick) onSearch,
     TextAlign textAlign = TextAlign.left,
     EdgeInsets? padding,
+    EdgeInsets margin = EdgeInsets.zero,
     List<Widget> leading = const [],
     List<Widget> trailing = const [],
     TextEditingController? controller,
+    InputDecoration? decoration,
     Widget help = HelpScope.None,
     Listenable? refresh,
   }) {
     return SearchDropdown(
       key: key,
       padding: padding,
+      margin: margin,
       controller: controller,
       onSearch: onSearch,
       textAlign: textAlign,
-      decoration: SearchDropdown.defaultDecoration.copyWith(hintText: text),
+      decoration: (decoration ?? SearchDropdown.defaultDecoration).copyWith(hintText: text),
       leading: leading,
       trailing: trailing,
       help: help,
@@ -136,6 +142,7 @@ class _SearchDropdownState extends State<SearchDropdown> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final defaults = Defaults.of(context);
     final open = _results != Empty;
 
@@ -148,27 +155,31 @@ class _SearchDropdownState extends State<SearchDropdown> {
         focusNode: _focus,
         child: Container(
           padding: widget.padding ?? defaults.padding,
+          margin: widget.margin,
           child: Column(
             verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
             mainAxisSize: MainAxisSize.min,
             children: [
               Help(
-                Container(
+                c.Container(
                   padding: EdgeInsets.symmetric(
                     horizontal: defaults.spacing,
                     vertical: defaults.spacing / 2,
                   ),
                   decoration: BoxDecoration(
+                    color: theme.colorScheme.surfaceContainerLow,
                     border: defaults.border,
                     borderRadius: defaults.borderRadius,
                   ),
-                  child: Row(
+                  Row(
                     children: [
                       ...widget.leading,
                       Expanded(
                         child: TextField(
                           controller: controller,
-                          decoration: widget.decoration,
+                          decoration: widget.decoration.copyWith(
+                            errorText: _results == Empty ? widget.decoration.errorText : null,
+                          ),
                           textAlign: widget.textAlign,
                           onChanged: _query,
                         ),
