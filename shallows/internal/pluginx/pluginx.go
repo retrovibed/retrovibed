@@ -47,7 +47,7 @@ func Compile(ctx context.Context, dir, pkg, output string, bake []string) error 
 
 	cmd := exec.CommandContext(ctx, "go", "build", "-trimpath", "-ldflags", strings.Join(xflags, " "), "-o", output, pkg)
 	cmd.Dir = dir
-	cmd.Env = append(os.Environ(), "GOOS=wasip1", "GOARCH=wasm", "GOWORK=off")
+	cmd.Env = append(os.Environ(), "GOOS=wasip1", "GOARCH=wasm")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
