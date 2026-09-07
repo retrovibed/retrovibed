@@ -7,6 +7,7 @@ import (
 
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/backups"
+	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/stretchr/testify/require"
@@ -36,6 +37,16 @@ func TestSnapshot(t *testing.T) {
 		n, err := sqlx.Count(ctx, dst, "SELECT COUNT(*) FROM fixture")
 		require.NoError(t, err)
 		require.Equal(t, 1000, n)
+
+		// hnsw indexes cannot be written to an encrypted database; the owning package
+		// recreates them on start, so the restored copy has none and the source keeps its own.
+		n, err = sqlx.Count(ctx, dst, "SELECT COUNT(*) FROM duckdb_indexes() WHERE sql ILIKE '%USING HNSW%'")
+		require.NoError(t, err)
+		require.Equal(t, 0, n)
+		n, err = sqlx.Count(ctx, src, "SELECT COUNT(*) FROM duckdb_indexes() WHERE sql ILIKE '%USING HNSW%'")
+		require.NoError(t, err)
+		require.Equal(t, 1, n)
+		require.False(t, fsx.Exists(encrypted+".staging"), "the plain staging copy is removed")
 	})
 
 	t.Run("the wrong key cannot open a snapshot", func(t *testing.T) {

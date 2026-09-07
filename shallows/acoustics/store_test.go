@@ -7,6 +7,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/acoustics"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
+	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/stretchr/testify/require"
 )
 
@@ -38,5 +39,34 @@ func TestStoreFailed(t *testing.T) {
 		require.NoError(t, err)
 		require.Contains(t, ids, good)
 		require.NotContains(t, ids, bad)
+	})
+}
+
+func TestEnsureIndex(t *testing.T) {
+	const indexed = "SELECT COUNT(*) FROM duckdb_indexes() WHERE index_name = 'audio_features_hnsw'"
+
+	t.Run("recreates a missing index", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+		db := sqltestx.Metadatabase(t)
+
+		_, err := db.ExecContext(ctx, "DROP INDEX audio_features_hnsw")
+		require.NoError(t, err)
+
+		require.NoError(t, acoustics.EnsureIndex(ctx, db))
+		n, err := sqlx.Count(ctx, db, indexed)
+		require.NoError(t, err)
+		require.Equal(t, 1, n)
+	})
+
+	t.Run("leaves an existing index alone", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+		db := sqltestx.Metadatabase(t)
+
+		require.NoError(t, acoustics.EnsureIndex(ctx, db))
+		n, err := sqlx.Count(ctx, db, indexed)
+		require.NoError(t, err)
+		require.Equal(t, 1, n)
 	})
 }

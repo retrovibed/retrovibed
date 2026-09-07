@@ -4,8 +4,16 @@ import (
 	"context"
 
 	"github.com/gofrs/uuid/v5"
+	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 )
+
+// EnsureIndex creates the similarity index when it is missing. an encrypted backup cannot
+// carry an hnsw index, so a restored database arrives without one.
+func EnsureIndex(ctx context.Context, q sqlx.Queryer) error {
+	_, err := q.ExecContext(ctx, "CREATE INDEX IF NOT EXISTS audio_features_hnsw ON audio_features USING HNSW (features) WITH (metric = 'cosine')")
+	return errorsx.Wrap(err, "acoustics: ensure index")
+}
 
 // StoreFeatures persists a feature vector. The HNSW index updates automatically.
 // HNSW does not support UPDATEs on the indexed column, so callers reindexing a
