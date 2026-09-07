@@ -113,23 +113,21 @@ class PlanSummary extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
-    return forms.Container(
-      Column(
-        mainAxisSize: MainAxisSize.min,
-        spacing: defaults.spacing,
-        children: [
-          forms.Field(label: Text("Price"), input: price),
-          forms.Field(label: Text("storage"), input: storage),
-          forms.Field(
-            label: Text("bandwidth"),
-            input: Tooltip(
-              message: "only related to downloading of archived data, accumulates monthly with a cap of 120 TB.",
-              child: bandwidth,
-            ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      spacing: defaults.spacing,
+      children: [
+        forms.Field(label: Text("Price"), input: price),
+        forms.Field(label: Text("storage"), input: storage),
+        forms.Field(
+          label: Text("bandwidth"),
+          input: Tooltip(
+            message: "only related to downloading of archived data, accumulates monthly with a cap of 120 TB.",
+            child: bandwidth,
           ),
-          forms.Field(label: Text("mobile support"), input: mobile),
-        ],
-      ),
+        ),
+        forms.Field(label: Text("mobile support"), input: mobile),
+      ],
     );
   }
 }

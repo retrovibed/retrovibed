@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fixnum/fixnum.dart' as fixnum;
 import 'errors.dart' as errors;
+import 'container.dart' as c;
 import 'empty.dart';
 import 'help.dart';
 import 'lazy.visible.dart';
@@ -164,6 +165,7 @@ class Table<T> extends StatelessWidget {
   final bool loading;
   final Widget cause;
   final EdgeInsets padding;
+  final BoxDecoration decoration;
   final MainAxisSize? mainAxisSize;
   final bool collapsable;
 
@@ -181,6 +183,7 @@ class Table<T> extends StatelessWidget {
     this.padding = EdgeInsets.zero,
     this.mainAxisSize,
     this.collapsable = false,
+    this.decoration = const BoxDecoration(),
   });
 
   @override
@@ -195,12 +198,14 @@ class Table<T> extends StatelessWidget {
     return Help(
       LayoutBuilder(
         builder: (context, constraints) {
+          final theme = Theme.of(context);
           final defaults = Defaults.of(context);
           final compact = defaults.isCompact;
           final bounded = constraints.hasTightHeight || (!collapsable && constraints.hasBoundedHeight);
-          return Padding(
+          return c.Container(
             padding: padding,
-            child: Column(
+            decoration: decoration.copyWith(color: decoration.color ?? theme.colorScheme.surfaceContainerLow),
+            Column(
               mainAxisSize: mainAxisSize ?? (bounded ? MainAxisSize.max : MainAxisSize.min),
               verticalDirection: compact ? VerticalDirection.up : VerticalDirection.down,
               children: [

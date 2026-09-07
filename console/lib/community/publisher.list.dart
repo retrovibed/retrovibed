@@ -107,18 +107,13 @@ class _ListDisplay extends State<ListDisplay> with ds.LoadingState {
     return ds.Table(
       loading: loading,
       cause: cause,
-      // leading: Row(
-      //   mainAxisAlignment: MainAxisAlignment.end,
-      //   children: [
-      //     ds.FileDropWell.icon(
-      //       upload,
-      //       icon: Icons.add,
-      //       extensions: const ['wasm'],
-      //       help: ds.Hint(const Text("install a publishing plugin")),
-      //     ),
-      //   ],
-      // ),
       children: _res.items,
+      empty: ds.FileDropWell(
+        upload,
+        extensions: const ['wasm'],
+        child: ds.FileDropWell.textual("drop a compiled .wasm publisher"),
+        shape: RoundedRectangleBorder(borderRadius: defaults.borderRadius),
+      ),
       ds.Table.expanded<api.PluginPublisher>((v) {
         return PublisherRow(
           v,
@@ -144,12 +139,6 @@ class _ListDisplay extends State<ListDisplay> with ds.LoadingState {
           },
         );
       }),
-      empty: ds.FileDropWell(
-        upload,
-        extensions: const ['wasm'],
-        child: ds.FileDropWell.textual("drop a compiled .wasm publisher"),
-        shape: RoundedRectangleBorder(borderRadius: defaults.borderRadius),
-      ),
     );
   }
 }

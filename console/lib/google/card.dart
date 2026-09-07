@@ -18,7 +18,7 @@ class Card extends StatelessWidget {
 
     final tap = () => onPressed(
       ds.Container(
-        padding: defaults.padding,
+        decoration: BoxDecoration(color: theme.colorScheme.surfaceContainerLow),
         margin: EdgeInsets.zero,
         Settings(),
       ),

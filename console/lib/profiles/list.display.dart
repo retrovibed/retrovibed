@@ -110,7 +110,7 @@ class _ListDisplay extends State<ListDisplay> {
     };
 
     return ds.Table(
-      padding: defaults.padding.copyWith(top: 0, bottom: 0),
+      padding: defaults.padding.copyWith(top: 0, bottom: 0) / 2,
       loading: _loading,
       cause: _cause,
       children: _res.items,

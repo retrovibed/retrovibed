@@ -102,6 +102,7 @@ class _Settings extends State<Settings> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final defaults = ds.Defaults.of(context);
     final visible = _plans.where((p) {
       return !p.$1.hidden || p.$1.key == current.key;
@@ -110,6 +111,7 @@ class _Settings extends State<Settings> {
       alignment: widget.alignment,
       margin: widget.margin,
       padding: widget.padding,
+      decoration: BoxDecoration(color: theme.colorScheme.surfaceContainerLow),
       cause: _cause,
       Column(
         mainAxisSize: MainAxisSize.min,

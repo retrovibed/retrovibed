@@ -121,6 +121,7 @@ class _ListDisplay extends State<ListDisplay> {
     return ds.Table(
       loading: _loading,
       cause: _cause,
+      padding: defaults.padding / 2,
       leading: ds.SearchTray(
         onSubmitted: (v) => refresh(context, _res.next),
         next: (i) {

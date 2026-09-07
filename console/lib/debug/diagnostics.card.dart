@@ -14,8 +14,6 @@ class DiagnosticsCard extends StatelessWidget {
 
     final tap = () => onPressed(
       ds.Container(
-        alignment: Alignment.topCenter,
-        padding: defaults.padding,
         margin: EdgeInsets.zero,
         const DiagnosticsDetails(),
       ),

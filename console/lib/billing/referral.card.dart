@@ -16,10 +16,9 @@ class ReferralCard extends StatelessWidget {
     final count = billing.attributionCount;
     final rate = billing.attributionRate;
     final revenue = (count * rate / 100).toStringAsFixed(2);
-    final tap =
-        () => onPressed(
-          ReferralDetail(margin: EdgeInsets.zero, padding: EdgeInsets.zero),
-        );
+    final tap = () => onPressed(
+      ReferralDetail(margin: EdgeInsets.zero, padding: defaults.padding),
+    );
     return ds.Card(
       alignment: Alignment.center,
       margin: margin ?? defaults.margin,

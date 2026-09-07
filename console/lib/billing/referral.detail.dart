@@ -16,6 +16,7 @@ class ReferralDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final billing = Registered.of(context);
     final count = billing.attributionCount;
     final rate = billing.attributionRate;
@@ -25,6 +26,7 @@ class ReferralDetail extends StatelessWidget {
       alignment: alignment,
       margin: margin,
       padding: padding,
+      decoration: BoxDecoration(color: theme.colorScheme.surfaceContainerLow),
       Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
