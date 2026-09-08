@@ -10,6 +10,7 @@ import (
 
 type Cloud struct {
 	Register CloudRegister `cmd:"" help:"register the current identity with the cloud service"`
+	Backup   CloudBackup   `cmd:"" help:"encrypted backups of the metadata database"`
 }
 
 func Hostnames(ctx context.Context, q sqlx.Queryer) (res []string, _ error) {

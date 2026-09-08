@@ -857,6 +857,98 @@ class MediaDeleteResponse extends $pb.GeneratedMessage {
   Media ensureMedia() => $_ensure(0);
 }
 
+class BackupSeedRequest extends $pb.GeneratedMessage {
+  factory BackupSeedRequest() => create();
+
+  BackupSeedRequest._();
+
+  factory BackupSeedRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory BackupSeedRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'BackupSeedRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'retrovibed.cas'),
+      createEmptyInstance: create)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  BackupSeedRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  BackupSeedRequest copyWith(void Function(BackupSeedRequest) updates) =>
+      super.copyWith((message) => updates(message as BackupSeedRequest))
+          as BackupSeedRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static BackupSeedRequest create() => BackupSeedRequest._();
+  @$core.override
+  BackupSeedRequest createEmptyInstance() => create();
+  @$core.pragma('dart2js:noInline')
+  static BackupSeedRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<BackupSeedRequest>(create);
+  static BackupSeedRequest? _defaultInstance;
+}
+
+class BackupSeedResponse extends $pb.GeneratedMessage {
+  factory BackupSeedResponse({
+    $core.String? seed,
+  }) {
+    final result = create();
+    if (seed != null) result.seed = seed;
+    return result;
+  }
+
+  BackupSeedResponse._();
+
+  factory BackupSeedResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory BackupSeedResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'BackupSeedResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'retrovibed.cas'),
+      createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'seed')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  BackupSeedResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  BackupSeedResponse copyWith(void Function(BackupSeedResponse) updates) =>
+      super.copyWith((message) => updates(message as BackupSeedResponse))
+          as BackupSeedResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static BackupSeedResponse create() => BackupSeedResponse._();
+  @$core.override
+  BackupSeedResponse createEmptyInstance() => create();
+  @$core.pragma('dart2js:noInline')
+  static BackupSeedResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<BackupSeedResponse>(create);
+  static BackupSeedResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get seed => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set seed($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasSeed() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearSeed() => $_clearField(1);
+}
+
 const $core.bool _omitFieldNames =
     $core.bool.fromEnvironment('protobuf.omit_field_names');
 const $core.bool _omitMessageNames =

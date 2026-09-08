@@ -57,3 +57,8 @@ message MediaDeleteRequest { }
 message MediaDeleteResponse {
   Media media = 1 [ json_name = "media" ];
 }
+
+message BackupSeedRequest { }
+message BackupSeedResponse {
+  string seed = 1 [ json_name = "seed" ];
+}
