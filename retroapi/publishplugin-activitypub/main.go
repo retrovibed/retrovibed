@@ -210,7 +210,7 @@ func (cmd *publishCmd) post(ctx context.Context, client *Client) (*Post, error) 
 	return client.CreatePost(ctx, CreatePost{
 		Name:        cmd.Title,
 		CommunityID: community,
-		Body:        cmd.Description,
+		Body:        cmd.Description, // overridde here?
 		NSFW:        cmd.Adult,
 		LanguageID:  cmd.LanguageID,
 		// CustomThumbnail: cmd.thumbnail(ctx, client),

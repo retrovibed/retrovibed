@@ -49,7 +49,6 @@ func TestRegistry(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, "https://example.invalid/echo/hello", result.URL)
 		require.Equal(t, md5x.FormatUUID(md5x.Digest("decodes plugin output")), result.ExternalID)
-		require.Equal(t, "published", result.Status)
 	})
 
 	t.Run("publish forwards the link to the plugin", func(t *testing.T) {

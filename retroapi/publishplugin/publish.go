@@ -64,7 +64,6 @@ type Request struct {
 type Result struct {
 	URL        string `json:"url"`
 	ExternalID string `json:"external_id"`
-	Status     string `json:"status"`
 }
 
 // publishWorkload is one plugin invocation dispatched onto the registry's

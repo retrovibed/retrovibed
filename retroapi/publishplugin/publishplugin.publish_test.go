@@ -54,7 +54,6 @@ func TestPublish(t *testing.T) {
 		require.Equal(t, &Result{
 			URL:        "https://example.invalid/echo/hello",
 			ExternalID: externalID,
-			Status:     "published",
 		}, result)
 	})
 }
