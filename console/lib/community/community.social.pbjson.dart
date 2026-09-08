@@ -319,13 +319,63 @@ final $typed_data.Uint8List pluginPublisherDeleteResponseDescriptor =
         'Ch1QbHVnaW5QdWJsaXNoZXJEZWxldGVSZXNwb25zZRJDCglwdWJsaXNoZXIYASABKAsyJS5yZX'
         'Ryb3ZpYmVkLmNvbW11bml0eS5QbHVnaW5QdWJsaXNoZXJSCXB1Ymxpc2hlcg==');
 
+@$core.Deprecated('Use communityPublisherUpdateRequestDescriptor instead')
+const CommunityPublisherUpdateRequest$json = {
+  '1': 'CommunityPublisherUpdateRequest',
+  '2': [
+    {
+      '1': 'compub',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.retrovibed.community.CommunityPublisher',
+      '10': 'compub'
+    },
+  ],
+};
+
+/// Descriptor for `CommunityPublisherUpdateRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List communityPublisherUpdateRequestDescriptor =
+    $convert.base64Decode(
+        'Ch9Db21tdW5pdHlQdWJsaXNoZXJVcGRhdGVSZXF1ZXN0EkAKBmNvbXB1YhgBIAEoCzIoLnJldH'
+        'JvdmliZWQuY29tbXVuaXR5LkNvbW11bml0eVB1Ymxpc2hlclIGY29tcHVi');
+
+@$core.Deprecated('Use communityPublisherUpdateResponseDescriptor instead')
+const CommunityPublisherUpdateResponse$json = {
+  '1': 'CommunityPublisherUpdateResponse',
+  '2': [
+    {
+      '1': 'compub',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.retrovibed.community.CommunityPublisher',
+      '10': 'compub'
+    },
+  ],
+};
+
+/// Descriptor for `CommunityPublisherUpdateResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List communityPublisherUpdateResponseDescriptor =
+    $convert.base64Decode(
+        'CiBDb21tdW5pdHlQdWJsaXNoZXJVcGRhdGVSZXNwb25zZRJACgZjb21wdWIYASABKAsyKC5yZX'
+        'Ryb3ZpYmVkLmNvbW11bml0eS5Db21tdW5pdHlQdWJsaXNoZXJSBmNvbXB1Yg==');
+
 @$core.Deprecated('Use communityPublisherEnableResponseDescriptor instead')
 const CommunityPublisherEnableResponse$json = {
   '1': 'CommunityPublisherEnableResponse',
   '2': [
     {
-      '1': 'enabled',
+      '1': 'compub',
       '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.retrovibed.community.CommunityPublisher',
+      '10': 'compub'
+    },
+    {
+      '1': 'enabled',
+      '3': 2,
       '4': 1,
       '5': 11,
       '6': '.retrovibed.community.CommunityPublisher',
@@ -337,16 +387,26 @@ const CommunityPublisherEnableResponse$json = {
 /// Descriptor for `CommunityPublisherEnableResponse`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List communityPublisherEnableResponseDescriptor =
     $convert.base64Decode(
-        'CiBDb21tdW5pdHlQdWJsaXNoZXJFbmFibGVSZXNwb25zZRJCCgdlbmFibGVkGAEgASgLMigucm'
-        'V0cm92aWJlZC5jb21tdW5pdHkuQ29tbXVuaXR5UHVibGlzaGVyUgdlbmFibGVk');
+        'CiBDb21tdW5pdHlQdWJsaXNoZXJFbmFibGVSZXNwb25zZRJACgZjb21wdWIYASABKAsyKC5yZX'
+        'Ryb3ZpYmVkLmNvbW11bml0eS5Db21tdW5pdHlQdWJsaXNoZXJSBmNvbXB1YhJCCgdlbmFibGVk'
+        'GAIgASgLMigucmV0cm92aWJlZC5jb21tdW5pdHkuQ29tbXVuaXR5UHVibGlzaGVyUgdlbmFibG'
+        'Vk');
 
 @$core.Deprecated('Use communityPublisherDisableResponseDescriptor instead')
 const CommunityPublisherDisableResponse$json = {
   '1': 'CommunityPublisherDisableResponse',
   '2': [
     {
-      '1': 'disabled',
+      '1': 'compub',
       '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.retrovibed.community.CommunityPublisher',
+      '10': 'compub'
+    },
+    {
+      '1': 'disabled',
+      '3': 2,
       '4': 1,
       '5': 11,
       '6': '.retrovibed.community.CommunityPublisher',
@@ -358,5 +418,7 @@ const CommunityPublisherDisableResponse$json = {
 /// Descriptor for `CommunityPublisherDisableResponse`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List communityPublisherDisableResponseDescriptor =
     $convert.base64Decode(
-        'CiFDb21tdW5pdHlQdWJsaXNoZXJEaXNhYmxlUmVzcG9uc2USRAoIZGlzYWJsZWQYASABKAsyKC'
-        '5yZXRyb3ZpYmVkLmNvbW11bml0eS5Db21tdW5pdHlQdWJsaXNoZXJSCGRpc2FibGVk');
+        'CiFDb21tdW5pdHlQdWJsaXNoZXJEaXNhYmxlUmVzcG9uc2USQAoGY29tcHViGAEgASgLMigucm'
+        'V0cm92aWJlZC5jb21tdW5pdHkuQ29tbXVuaXR5UHVibGlzaGVyUgZjb21wdWISRAoIZGlzYWJs'
+        'ZWQYAiABKAsyKC5yZXRyb3ZpYmVkLmNvbW11bml0eS5Db21tdW5pdHlQdWJsaXNoZXJSCGRpc2'
+        'FibGVk');

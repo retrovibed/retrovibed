@@ -82,7 +82,7 @@ class _ListDisplay extends State<SocialsPublishers> with ds.LoadingState {
         .then((v) {
           setState(() {
             _overlay = ds.Empty;
-            _attached.add(v.enabled);
+            _attached.add(v.compub);
             cause = ds.Error.zero;
           });
         })

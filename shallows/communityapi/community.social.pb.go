@@ -756,16 +756,105 @@ func (x *PluginPublisherDeleteResponse) GetPublisher() *PluginPublisher {
 	return nil
 }
 
+type CommunityPublisherUpdateRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Compub        *CommunityPublisher    `protobuf:"bytes,1,opt,name=compub,proto3" json:"compub,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CommunityPublisherUpdateRequest) Reset() {
+	*x = CommunityPublisherUpdateRequest{}
+	mi := &file_community_community_social_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CommunityPublisherUpdateRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CommunityPublisherUpdateRequest) ProtoMessage() {}
+
+func (x *CommunityPublisherUpdateRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_community_community_social_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CommunityPublisherUpdateRequest.ProtoReflect.Descriptor instead.
+func (*CommunityPublisherUpdateRequest) Descriptor() ([]byte, []int) {
+	return file_community_community_social_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *CommunityPublisherUpdateRequest) GetCompub() *CommunityPublisher {
+	if x != nil {
+		return x.Compub
+	}
+	return nil
+}
+
+type CommunityPublisherUpdateResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Compub        *CommunityPublisher    `protobuf:"bytes,1,opt,name=compub,proto3" json:"compub,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CommunityPublisherUpdateResponse) Reset() {
+	*x = CommunityPublisherUpdateResponse{}
+	mi := &file_community_community_social_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CommunityPublisherUpdateResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CommunityPublisherUpdateResponse) ProtoMessage() {}
+
+func (x *CommunityPublisherUpdateResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_community_community_social_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CommunityPublisherUpdateResponse.ProtoReflect.Descriptor instead.
+func (*CommunityPublisherUpdateResponse) Descriptor() ([]byte, []int) {
+	return file_community_community_social_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *CommunityPublisherUpdateResponse) GetCompub() *CommunityPublisher {
+	if x != nil {
+		return x.Compub
+	}
+	return nil
+}
+
 type CommunityPublisherEnableResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Enabled       *CommunityPublisher    `protobuf:"bytes,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	Compub        *CommunityPublisher    `protobuf:"bytes,1,opt,name=compub,proto3" json:"compub,omitempty"`
+	Enabled       *CommunityPublisher    `protobuf:"bytes,2,opt,name=enabled,proto3" json:"enabled,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *CommunityPublisherEnableResponse) Reset() {
 	*x = CommunityPublisherEnableResponse{}
-	mi := &file_community_community_social_proto_msgTypes[13]
+	mi := &file_community_community_social_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -777,7 +866,7 @@ func (x *CommunityPublisherEnableResponse) String() string {
 func (*CommunityPublisherEnableResponse) ProtoMessage() {}
 
 func (x *CommunityPublisherEnableResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_community_community_social_proto_msgTypes[13]
+	mi := &file_community_community_social_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -790,7 +879,14 @@ func (x *CommunityPublisherEnableResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CommunityPublisherEnableResponse.ProtoReflect.Descriptor instead.
 func (*CommunityPublisherEnableResponse) Descriptor() ([]byte, []int) {
-	return file_community_community_social_proto_rawDescGZIP(), []int{13}
+	return file_community_community_social_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *CommunityPublisherEnableResponse) GetCompub() *CommunityPublisher {
+	if x != nil {
+		return x.Compub
+	}
+	return nil
 }
 
 func (x *CommunityPublisherEnableResponse) GetEnabled() *CommunityPublisher {
@@ -802,14 +898,15 @@ func (x *CommunityPublisherEnableResponse) GetEnabled() *CommunityPublisher {
 
 type CommunityPublisherDisableResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Disabled      *CommunityPublisher    `protobuf:"bytes,1,opt,name=disabled,proto3" json:"disabled,omitempty"`
+	Compub        *CommunityPublisher    `protobuf:"bytes,1,opt,name=compub,proto3" json:"compub,omitempty"`
+	Disabled      *CommunityPublisher    `protobuf:"bytes,2,opt,name=disabled,proto3" json:"disabled,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *CommunityPublisherDisableResponse) Reset() {
 	*x = CommunityPublisherDisableResponse{}
-	mi := &file_community_community_social_proto_msgTypes[14]
+	mi := &file_community_community_social_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -821,7 +918,7 @@ func (x *CommunityPublisherDisableResponse) String() string {
 func (*CommunityPublisherDisableResponse) ProtoMessage() {}
 
 func (x *CommunityPublisherDisableResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_community_community_social_proto_msgTypes[14]
+	mi := &file_community_community_social_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -834,7 +931,14 @@ func (x *CommunityPublisherDisableResponse) ProtoReflect() protoreflect.Message 
 
 // Deprecated: Use CommunityPublisherDisableResponse.ProtoReflect.Descriptor instead.
 func (*CommunityPublisherDisableResponse) Descriptor() ([]byte, []int) {
-	return file_community_community_social_proto_rawDescGZIP(), []int{14}
+	return file_community_community_social_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *CommunityPublisherDisableResponse) GetCompub() *CommunityPublisher {
+	if x != nil {
+		return x.Compub
+	}
+	return nil
 }
 
 func (x *CommunityPublisherDisableResponse) GetDisabled() *CommunityPublisher {
@@ -904,11 +1008,17 @@ const file_community_community_social_proto_rawDesc = "" +
 	"\x1cPluginPublisherCloneResponse\x12C\n" +
 	"\tpublisher\x18\x01 \x01(\v2%.retrovibed.community.PluginPublisherR\tpublisher\"d\n" +
 	"\x1dPluginPublisherDeleteResponse\x12C\n" +
-	"\tpublisher\x18\x01 \x01(\v2%.retrovibed.community.PluginPublisherR\tpublisher\"f\n" +
-	" CommunityPublisherEnableResponse\x12B\n" +
-	"\aenabled\x18\x01 \x01(\v2(.retrovibed.community.CommunityPublisherR\aenabled\"i\n" +
-	"!CommunityPublisherDisableResponse\x12D\n" +
-	"\bdisabled\x18\x01 \x01(\v2(.retrovibed.community.CommunityPublisherR\bdisabledb\x06proto3"
+	"\tpublisher\x18\x01 \x01(\v2%.retrovibed.community.PluginPublisherR\tpublisher\"c\n" +
+	"\x1fCommunityPublisherUpdateRequest\x12@\n" +
+	"\x06compub\x18\x01 \x01(\v2(.retrovibed.community.CommunityPublisherR\x06compub\"d\n" +
+	" CommunityPublisherUpdateResponse\x12@\n" +
+	"\x06compub\x18\x01 \x01(\v2(.retrovibed.community.CommunityPublisherR\x06compub\"\xa8\x01\n" +
+	" CommunityPublisherEnableResponse\x12@\n" +
+	"\x06compub\x18\x01 \x01(\v2(.retrovibed.community.CommunityPublisherR\x06compub\x12B\n" +
+	"\aenabled\x18\x02 \x01(\v2(.retrovibed.community.CommunityPublisherR\aenabled\"\xab\x01\n" +
+	"!CommunityPublisherDisableResponse\x12@\n" +
+	"\x06compub\x18\x01 \x01(\v2(.retrovibed.community.CommunityPublisherR\x06compub\x12D\n" +
+	"\bdisabled\x18\x02 \x01(\v2(.retrovibed.community.CommunityPublisherR\bdisabledb\x06proto3"
 
 var (
 	file_community_community_social_proto_rawDescOnce sync.Once
@@ -922,7 +1032,7 @@ func file_community_community_social_proto_rawDescGZIP() []byte {
 	return file_community_community_social_proto_rawDescData
 }
 
-var file_community_community_social_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
+var file_community_community_social_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
 var file_community_community_social_proto_goTypes = []any{
 	(*PluginPublisher)(nil),                   // 0: retrovibed.community.PluginPublisher
 	(*CommunityPublisher)(nil),                // 1: retrovibed.community.CommunityPublisher
@@ -937,12 +1047,14 @@ var file_community_community_social_proto_goTypes = []any{
 	(*PluginPublisherUpdateResponse)(nil),     // 10: retrovibed.community.PluginPublisherUpdateResponse
 	(*PluginPublisherCloneResponse)(nil),      // 11: retrovibed.community.PluginPublisherCloneResponse
 	(*PluginPublisherDeleteResponse)(nil),     // 12: retrovibed.community.PluginPublisherDeleteResponse
-	(*CommunityPublisherEnableResponse)(nil),  // 13: retrovibed.community.CommunityPublisherEnableResponse
-	(*CommunityPublisherDisableResponse)(nil), // 14: retrovibed.community.CommunityPublisherDisableResponse
-	(*Community)(nil),                         // 15: retrovibed.community.Community
+	(*CommunityPublisherUpdateRequest)(nil),   // 13: retrovibed.community.CommunityPublisherUpdateRequest
+	(*CommunityPublisherUpdateResponse)(nil),  // 14: retrovibed.community.CommunityPublisherUpdateResponse
+	(*CommunityPublisherEnableResponse)(nil),  // 15: retrovibed.community.CommunityPublisherEnableResponse
+	(*CommunityPublisherDisableResponse)(nil), // 16: retrovibed.community.CommunityPublisherDisableResponse
+	(*Community)(nil),                         // 17: retrovibed.community.Community
 }
 var file_community_community_social_proto_depIdxs = []int32{
-	15, // 0: retrovibed.community.CommunitySocial.community:type_name -> retrovibed.community.Community
+	17, // 0: retrovibed.community.CommunitySocial.community:type_name -> retrovibed.community.Community
 	1,  // 1: retrovibed.community.CommunitySocial.publishers:type_name -> retrovibed.community.CommunityPublisher
 	3,  // 2: retrovibed.community.SocialsSearchResponse.next:type_name -> retrovibed.community.SocialsSearchRequest
 	2,  // 3: retrovibed.community.SocialsSearchResponse.items:type_name -> retrovibed.community.CommunitySocial
@@ -954,13 +1066,17 @@ var file_community_community_social_proto_depIdxs = []int32{
 	0,  // 9: retrovibed.community.PluginPublisherUpdateResponse.publisher:type_name -> retrovibed.community.PluginPublisher
 	0,  // 10: retrovibed.community.PluginPublisherCloneResponse.publisher:type_name -> retrovibed.community.PluginPublisher
 	0,  // 11: retrovibed.community.PluginPublisherDeleteResponse.publisher:type_name -> retrovibed.community.PluginPublisher
-	1,  // 12: retrovibed.community.CommunityPublisherEnableResponse.enabled:type_name -> retrovibed.community.CommunityPublisher
-	1,  // 13: retrovibed.community.CommunityPublisherDisableResponse.disabled:type_name -> retrovibed.community.CommunityPublisher
-	14, // [14:14] is the sub-list for method output_type
-	14, // [14:14] is the sub-list for method input_type
-	14, // [14:14] is the sub-list for extension type_name
-	14, // [14:14] is the sub-list for extension extendee
-	0,  // [0:14] is the sub-list for field type_name
+	1,  // 12: retrovibed.community.CommunityPublisherUpdateRequest.compub:type_name -> retrovibed.community.CommunityPublisher
+	1,  // 13: retrovibed.community.CommunityPublisherUpdateResponse.compub:type_name -> retrovibed.community.CommunityPublisher
+	1,  // 14: retrovibed.community.CommunityPublisherEnableResponse.compub:type_name -> retrovibed.community.CommunityPublisher
+	1,  // 15: retrovibed.community.CommunityPublisherEnableResponse.enabled:type_name -> retrovibed.community.CommunityPublisher
+	1,  // 16: retrovibed.community.CommunityPublisherDisableResponse.compub:type_name -> retrovibed.community.CommunityPublisher
+	1,  // 17: retrovibed.community.CommunityPublisherDisableResponse.disabled:type_name -> retrovibed.community.CommunityPublisher
+	18, // [18:18] is the sub-list for method output_type
+	18, // [18:18] is the sub-list for method input_type
+	18, // [18:18] is the sub-list for extension type_name
+	18, // [18:18] is the sub-list for extension extendee
+	0,  // [0:18] is the sub-list for field type_name
 }
 
 func init() { file_community_community_social_proto_init() }
@@ -975,7 +1091,7 @@ func file_community_community_social_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_community_community_social_proto_rawDesc), len(file_community_community_social_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   15,
+			NumMessages:   17,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

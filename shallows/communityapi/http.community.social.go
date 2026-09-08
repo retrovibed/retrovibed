@@ -1,6 +1,8 @@
 package communityapi
 
 import (
+	"database/sql"
+	"errors"
 	"log"
 	"net/http"
 
@@ -9,6 +11,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
 	"github.com/retrovibed/retrovibed/retroapi/httpauth"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
@@ -22,6 +25,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/numericx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
+	"github.com/retrovibed/retrovibed/shallows/metaapi"
 )
 
 type HTTPSocialOption func(*HTTPSocial)
@@ -52,6 +56,7 @@ type HTTPSocial struct {
 
 func (t *HTTPSocial) Bind(r *mux.Router) {
 	r.StrictSlash(false)
+	// r.Use(httpx.DebugRequest)
 
 	r.Path("/").Methods(http.MethodGet).Handler(alice.New(
 		httpx.RouteInvoked,
@@ -63,15 +68,21 @@ func (t *HTTPSocial) Bind(r *mux.Router) {
 
 	r.Path("/{communityId}/publishers/{publisherId}").Methods(http.MethodPost).Handler(alice.New(
 		httpx.ContextBufferPool512(),
-		httpauth.AuthenticateWithToken(t.jwtsecret),
+		metaapi.AuthzTokenHTTP(t.jwtsecret, metaapi.AuthzPermUsermanagement),
 		httpx.Timeout2s(),
 	).ThenFunc(t.enable))
 
 	r.Path("/{communityId}/publishers/{publisherId}").Methods(http.MethodDelete).Handler(alice.New(
 		httpx.ContextBufferPool512(),
-		httpauth.AuthenticateWithToken(t.jwtsecret),
+		metaapi.AuthzTokenHTTP(t.jwtsecret, metaapi.AuthzPermUsermanagement),
 		httpx.Timeout2s(),
 	).ThenFunc(t.disable))
+
+	r.Path("/{id}").Methods(http.MethodPost).Handler(alice.New(
+		httpx.ContextBufferPool512(),
+		metaapi.AuthzTokenHTTP(t.jwtsecret, metaapi.AuthzPermUsermanagement),
+		httpx.Timeout2s(),
+	).ThenFunc(t.update))
 }
 
 // search returns the authenticated account's communities, each with its
@@ -140,6 +151,38 @@ func (t *HTTPSocial) search(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (t *HTTPSocial) update(w http.ResponseWriter, r *http.Request) {
+	var decoded CommunityPublisherUpdateRequest
+
+	id := mux.Vars(r)["id"]
+
+	if err := jsonx.UnmarshalRead(r.Body, &decoded); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to decode request"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		return
+	}
+
+	decoded.Compub.Id = id
+	d := langx.Clone(community.CommunityPublisher{}, CommunityPublisherOptionFromProto(decoded.Compub))
+
+	if err := community.CommunityPublisherInsertWithDefaults(r.Context(), t.q, d).Scan(&d); errors.Is(err, sql.ErrNoRows) {
+		log.Println(errorsx.Wrap(err, "record does not exist"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
+		return
+	} else if err != nil {
+		log.Println(errorsx.Wrap(err, "unable to update record"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		return
+	}
+
+	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &CommunityPublisherUpdateResponse{
+		Compub: NewCommunityPublisher(CommunityPublisherOptionFromDB(langx.Clone(d, timex.JSONSafeEncodeOption))),
+	}); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to write response"))
+		return
+	}
+}
+
 func (t *HTTPSocial) enable(w http.ResponseWriter, r *http.Request) {
 	var existing community.CommunityPublisher
 
@@ -159,7 +202,7 @@ func (t *HTTPSocial) enable(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &CommunityPublisherEnableResponse{
-		Enabled: NewCommunityPublisher(CommunityPublisherOptionFromDB(langx.Clone(existing, timex.JSONSafeEncodeOption))),
+		Compub: NewCommunityPublisher(CommunityPublisherOptionFromDB(langx.Clone(existing, timex.JSONSafeEncodeOption))),
 	}); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to write response"))
 		return
@@ -202,7 +245,7 @@ func (t *HTTPSocial) disable(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &CommunityPublisherDisableResponse{
-		Disabled: NewCommunityPublisher(CommunityPublisherOptionFromDB(langx.Clone(existing, timex.JSONSafeEncodeOption))),
+		Compub: NewCommunityPublisher(CommunityPublisherOptionFromDB(langx.Clone(existing, timex.JSONSafeEncodeOption))),
 	}); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to write response"))
 		return

@@ -1009,11 +1009,138 @@ class PluginPublisherDeleteResponse extends $pb.GeneratedMessage {
   PluginPublisher ensurePublisher() => $_ensure(0);
 }
 
+class CommunityPublisherUpdateRequest extends $pb.GeneratedMessage {
+  factory CommunityPublisherUpdateRequest({
+    CommunityPublisher? compub,
+  }) {
+    final result = create();
+    if (compub != null) result.compub = compub;
+    return result;
+  }
+
+  CommunityPublisherUpdateRequest._();
+
+  factory CommunityPublisherUpdateRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory CommunityPublisherUpdateRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'CommunityPublisherUpdateRequest',
+      package: const $pb.PackageName(
+          _omitMessageNames ? '' : 'retrovibed.community'),
+      createEmptyInstance: create)
+    ..aOM<CommunityPublisher>(1, _omitFieldNames ? '' : 'compub',
+        subBuilder: CommunityPublisher.create)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CommunityPublisherUpdateRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CommunityPublisherUpdateRequest copyWith(
+          void Function(CommunityPublisherUpdateRequest) updates) =>
+      super.copyWith(
+              (message) => updates(message as CommunityPublisherUpdateRequest))
+          as CommunityPublisherUpdateRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static CommunityPublisherUpdateRequest create() =>
+      CommunityPublisherUpdateRequest._();
+  @$core.override
+  CommunityPublisherUpdateRequest createEmptyInstance() => create();
+  @$core.pragma('dart2js:noInline')
+  static CommunityPublisherUpdateRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<CommunityPublisherUpdateRequest>(
+          create);
+  static CommunityPublisherUpdateRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  CommunityPublisher get compub => $_getN(0);
+  @$pb.TagNumber(1)
+  set compub(CommunityPublisher value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasCompub() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearCompub() => $_clearField(1);
+  @$pb.TagNumber(1)
+  CommunityPublisher ensureCompub() => $_ensure(0);
+}
+
+class CommunityPublisherUpdateResponse extends $pb.GeneratedMessage {
+  factory CommunityPublisherUpdateResponse({
+    CommunityPublisher? compub,
+  }) {
+    final result = create();
+    if (compub != null) result.compub = compub;
+    return result;
+  }
+
+  CommunityPublisherUpdateResponse._();
+
+  factory CommunityPublisherUpdateResponse.fromBuffer(
+          $core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(data, registry);
+  factory CommunityPublisherUpdateResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'CommunityPublisherUpdateResponse',
+      package: const $pb.PackageName(
+          _omitMessageNames ? '' : 'retrovibed.community'),
+      createEmptyInstance: create)
+    ..aOM<CommunityPublisher>(1, _omitFieldNames ? '' : 'compub',
+        subBuilder: CommunityPublisher.create)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CommunityPublisherUpdateResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  CommunityPublisherUpdateResponse copyWith(
+          void Function(CommunityPublisherUpdateResponse) updates) =>
+      super.copyWith(
+              (message) => updates(message as CommunityPublisherUpdateResponse))
+          as CommunityPublisherUpdateResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static CommunityPublisherUpdateResponse create() =>
+      CommunityPublisherUpdateResponse._();
+  @$core.override
+  CommunityPublisherUpdateResponse createEmptyInstance() => create();
+  @$core.pragma('dart2js:noInline')
+  static CommunityPublisherUpdateResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<CommunityPublisherUpdateResponse>(
+          create);
+  static CommunityPublisherUpdateResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  CommunityPublisher get compub => $_getN(0);
+  @$pb.TagNumber(1)
+  set compub(CommunityPublisher value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasCompub() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearCompub() => $_clearField(1);
+  @$pb.TagNumber(1)
+  CommunityPublisher ensureCompub() => $_ensure(0);
+}
+
 class CommunityPublisherEnableResponse extends $pb.GeneratedMessage {
   factory CommunityPublisherEnableResponse({
+    CommunityPublisher? compub,
     CommunityPublisher? enabled,
   }) {
     final result = create();
+    if (compub != null) result.compub = compub;
     if (enabled != null) result.enabled = enabled;
     return result;
   }
@@ -1033,7 +1160,9 @@ class CommunityPublisherEnableResponse extends $pb.GeneratedMessage {
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
       createEmptyInstance: create)
-    ..aOM<CommunityPublisher>(1, _omitFieldNames ? '' : 'enabled',
+    ..aOM<CommunityPublisher>(1, _omitFieldNames ? '' : 'compub',
+        subBuilder: CommunityPublisher.create)
+    ..aOM<CommunityPublisher>(2, _omitFieldNames ? '' : 'enabled',
         subBuilder: CommunityPublisher.create)
     ..hasRequiredFields = false;
 
@@ -1061,22 +1190,35 @@ class CommunityPublisherEnableResponse extends $pb.GeneratedMessage {
   static CommunityPublisherEnableResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
-  CommunityPublisher get enabled => $_getN(0);
+  CommunityPublisher get compub => $_getN(0);
   @$pb.TagNumber(1)
-  set enabled(CommunityPublisher value) => $_setField(1, value);
+  set compub(CommunityPublisher value) => $_setField(1, value);
   @$pb.TagNumber(1)
-  $core.bool hasEnabled() => $_has(0);
+  $core.bool hasCompub() => $_has(0);
   @$pb.TagNumber(1)
-  void clearEnabled() => $_clearField(1);
+  void clearCompub() => $_clearField(1);
   @$pb.TagNumber(1)
-  CommunityPublisher ensureEnabled() => $_ensure(0);
+  CommunityPublisher ensureCompub() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  CommunityPublisher get enabled => $_getN(1);
+  @$pb.TagNumber(2)
+  set enabled(CommunityPublisher value) => $_setField(2, value);
+  @$pb.TagNumber(2)
+  $core.bool hasEnabled() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearEnabled() => $_clearField(2);
+  @$pb.TagNumber(2)
+  CommunityPublisher ensureEnabled() => $_ensure(1);
 }
 
 class CommunityPublisherDisableResponse extends $pb.GeneratedMessage {
   factory CommunityPublisherDisableResponse({
+    CommunityPublisher? compub,
     CommunityPublisher? disabled,
   }) {
     final result = create();
+    if (compub != null) result.compub = compub;
     if (disabled != null) result.disabled = disabled;
     return result;
   }
@@ -1096,7 +1238,9 @@ class CommunityPublisherDisableResponse extends $pb.GeneratedMessage {
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
       createEmptyInstance: create)
-    ..aOM<CommunityPublisher>(1, _omitFieldNames ? '' : 'disabled',
+    ..aOM<CommunityPublisher>(1, _omitFieldNames ? '' : 'compub',
+        subBuilder: CommunityPublisher.create)
+    ..aOM<CommunityPublisher>(2, _omitFieldNames ? '' : 'disabled',
         subBuilder: CommunityPublisher.create)
     ..hasRequiredFields = false;
 
@@ -1124,15 +1268,26 @@ class CommunityPublisherDisableResponse extends $pb.GeneratedMessage {
   static CommunityPublisherDisableResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
-  CommunityPublisher get disabled => $_getN(0);
+  CommunityPublisher get compub => $_getN(0);
   @$pb.TagNumber(1)
-  set disabled(CommunityPublisher value) => $_setField(1, value);
+  set compub(CommunityPublisher value) => $_setField(1, value);
   @$pb.TagNumber(1)
-  $core.bool hasDisabled() => $_has(0);
+  $core.bool hasCompub() => $_has(0);
   @$pb.TagNumber(1)
-  void clearDisabled() => $_clearField(1);
+  void clearCompub() => $_clearField(1);
   @$pb.TagNumber(1)
-  CommunityPublisher ensureDisabled() => $_ensure(0);
+  CommunityPublisher ensureCompub() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  CommunityPublisher get disabled => $_getN(1);
+  @$pb.TagNumber(2)
+  set disabled(CommunityPublisher value) => $_setField(2, value);
+  @$pb.TagNumber(2)
+  $core.bool hasDisabled() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearDisabled() => $_clearField(2);
+  @$pb.TagNumber(2)
+  CommunityPublisher ensureDisabled() => $_ensure(1);
 }
 
 const $core.bool _omitFieldNames =

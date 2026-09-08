@@ -3,7 +3,6 @@ package communityapi
 import (
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/internal/grpcx"
-	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 )
 
 func NewPluginPublisher(opts ...func(*PluginPublisher)) *PluginPublisher {
@@ -26,31 +25,4 @@ func PluginPublisherOptionFromDB(p community.PluginPublisher) func(*PluginPublis
 		dst.CreatedAt = grpcx.EncodeTime(p.CreatedAt)
 		dst.UpdatedAt = grpcx.EncodeTime(p.UpdatedAt)
 	}
-}
-
-func NewCommunityPublisher(opts ...func(*CommunityPublisher)) *CommunityPublisher {
-	var p CommunityPublisher
-	for _, opt := range opts {
-		opt(&p)
-	}
-
-	return &p
-}
-
-// CommunityPublisherOptionFromDB converts a local DB community publisher to proto options.
-// Call site should apply timex.JSONSafeEncodeOption before passing the DB value.
-func CommunityPublisherOptionFromDB(p community.CommunityPublisher) func(*CommunityPublisher) {
-	return func(dst *CommunityPublisher) {
-		dst.Id = p.ID
-		dst.CommunityId = p.CommunityID
-		dst.PublisherId = p.PublisherID
-		dst.CreatedAt = grpcx.EncodeTime(p.CreatedAt)
-		dst.UpdatedAt = grpcx.EncodeTime(p.UpdatedAt)
-		dst.TemplateTitle = p.TemplateTitle
-		dst.TemplateDescription = p.TemplateDescription
-	}
-}
-
-func NewCommunitySocial(opts ...func(*CommunitySocial)) *CommunitySocial {
-	return new(langx.Clone(CommunitySocial{}, opts...))
 }

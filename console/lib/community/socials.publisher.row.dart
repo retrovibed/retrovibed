@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:retrovibed/community/social.update.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/httpx.dart' as httpx;
@@ -63,17 +64,20 @@ class _SocialsPublisherRow extends State<SocialsPublisherRow> {
     return ds.TableRow(
       key: ValueKey(widget.current.id),
       expanded: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: defaults.spacing,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              IconButton(
+          SocialUpdate(
+            compub: widget.current,
+            update: (v) {
+              return api.socials.update(v.id, v, options: [authn.request(authn.AuthzCache.meta(context))]);
+            },
+            onUpdate: ds.fnNoop,
+            actions: [
+              ds.LoadingIconButton(
                 icon: const Icon(Icons.link_off),
                 tooltip: 'stop publishing this community through this plugin',
                 onPressed: () {
-                  widget
+                  return widget
                       .disable(
                         widget.current.communityId,
                         widget.current.publisherId,

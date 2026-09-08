@@ -425,7 +425,7 @@ func CommunityPublisherInsertWithDefaults(
 	gql genieql.Insert,
 	pattern func(ctx context.Context, q sqlx.Queryer, a CommunityPublisher) NewCommunityPublisherScannerStaticRow,
 ) {
-	gql.Into("community_publisher").Default("created_at", "updated_at").Conflict("ON CONFLICT (community_id, publisher_id) DO UPDATE SET updated_at = DEFAULT")
+	gql.Into("community_publisher").Default("created_at", "updated_at").Conflict("ON CONFLICT (community_id, publisher_id) DO UPDATE SET updated_at = DEFAULT, template_title = EXCLUDED.template_title, template_description = EXCLUDED.template_description")
 }
 
 func CommunityPublisherFindByCommunityID(

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"html/template"
 	"io"
 	"log"
 	"net/http"
@@ -53,6 +54,37 @@ type SyncPublishedBackgroundWorker struct {
 	archiver   library.Archiver
 	mvfs       fsx.Virtual
 	tvfs       fsx.Virtual
+}
+
+func (t SyncPublishedBackgroundWorker) render(
+	tmp string,
+	published community.PublishedContent,
+	known library.Known,
+	md library.Metadata,
+) string {
+	tmpl, err := template.New("title").Parse(tmp)
+	if err != nil {
+		log.Println(errorsx.Wrap(err, "unable to parse title template"))
+		return ""
+	}
+
+	var buf bytes.Buffer
+	data := struct {
+		Published community.PublishedContent
+		Known     library.Known
+		Metadata  library.Metadata
+	}{
+		Published: published,
+		Known:     known,
+		Metadata:  md,
+	}
+
+	if err := tmpl.Execute(&buf, data); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to execute title template"))
+		return ""
+	}
+
+	return buf.String()
 }
 
 func (t SyncPublishedBackgroundWorker) Message(ctx context.Context, m []byte) (err error) {
@@ -105,8 +137,8 @@ func (t SyncPublishedBackgroundWorker) Message(ctx context.Context, m []byte) (e
 
 		req := publishplugin.Request{
 			MediaPath:   lmd.ID,
-			Title:       stringsx.FirstNonBlank(decoded.Title, known.Title, lmd.Description),
-			Description: stringsx.FirstNonBlank(decoded.Description, known.Overview),
+			Title:       stringsx.FirstNonBlank(t.render(cp.TemplateTitle, decoded, known, lmd), decoded.Title, known.Title, lmd.Description),
+			Description: stringsx.FirstNonBlank(t.render(cp.TemplateDescription, decoded, known, lmd), decoded.Title, known.Title, lmd.Description),
 			Mimetype:    stringsx.FirstNonBlank(decoded.Mimetype, known.Mimetype, lmd.Mimetype),
 			CommunityID: decoded.CommunityID,
 			Magnet:      decoded.MagnetURI,

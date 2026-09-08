@@ -84,10 +84,18 @@ message PluginPublisherDeleteResponse {
   PluginPublisher publisher = 1 [ json_name = "publisher" ];
 }
 
+message CommunityPublisherUpdateRequest {
+  CommunityPublisher compub = 1 [ json_name = "compub" ];
+}
+
+message CommunityPublisherUpdateResponse {
+  CommunityPublisher compub = 1 [ json_name = "compub" ];
+}
+
 message CommunityPublisherEnableResponse {
-  CommunityPublisher enabled = 1 [ json_name = "enabled" ];
+  CommunityPublisher compub = 1 [ json_name = "compub" ];
 }
 
 message CommunityPublisherDisableResponse {
-  CommunityPublisher disabled = 1 [ json_name = "disabled" ];
+  CommunityPublisher compub = 1 [ json_name = "compub" ];
 }

@@ -190,6 +190,24 @@ class socials {
         });
   }
 
+  static Future<CommunityPublisherUpdateResponse> update(
+    String id,
+    CommunityPublisher compub, {
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx
+        .post(
+          Uri.https(httpx.host(), "/c/social/${id}"),
+          body: jsonEncode(CommunityPublisherUpdateRequest(compub: compub).toProto3Json()),
+          options: [httpx.Accept.json, httpx.Content.json, ...options],
+        )
+        .then((v) {
+          return Future.value(
+            httpx.fromProto3JsonSafe(CommunityPublisherUpdateResponse.create(), jsonDecode(v.body)),
+          );
+        });
+  }
+
   static Future<CommunityPublisherEnableResponse> enable(
     String communityId,
     String publisherId, {
