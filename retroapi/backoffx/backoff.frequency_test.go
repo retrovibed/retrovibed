@@ -12,15 +12,15 @@ func TestFrequency(t *testing.T) {
 	t.Run("before the anchor returns the time remaining until it", func(t *testing.T) {
 		const fq = time.Hour
 		now := time.Date(2024, time.January, 1, 10, 15, 0, 0, time.UTC)
+		expected := time.Date(2024, time.January, 1, 10, 20, 0, 0, time.UTC)
 		clk := timex.NewAdjustableClock(now)
-		pos := now.Truncate(fq)
-		anchor := now.Sub(pos) + 5*time.Minute
-		s := frequency{anchor: anchor, fq: fq, c: clk}
+
+		// anchor at 20 mins past the hour. means this setup will run at X:20 every hour.
+		s := frequency{anchor: 20 * time.Minute, fq: fq, c: clk}
 
 		d := s.Backoff(0)
 
-		expected := pos.Add(anchor).Sub(now)
-		require.Equal(t, expected, d)
+		require.Equal(t, expected, now.Add(d))
 	})
 
 	t.Run("after the anchor falls back to the window boundary", func(t *testing.T) {
