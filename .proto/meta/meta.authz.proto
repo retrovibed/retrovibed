@@ -26,7 +26,6 @@ message Token {
   // END OF STANDARD FIELDS
   reserved 9 to 999;
   bool usermanagement = 1000 [ json_name = "usermanagement" ];
-  bool remote_control = 1001 [ json_name = "remote_control" ];
   bool billing_read = 1002 [ json_name = "billing_read" ];
   bool billing_modify = 1003 [ json_name = "billing_modify" ];
   bool community_modify = 1004 [ json_name = "community_modify" ];
@@ -36,10 +35,11 @@ message Token {
   bool library_modify = 1008 [ json_name = "library_modify" ];
   bool archive_sync = 1009 [ json_name = "archive_sync" ];
   bool community_sync = 1010 [ json_name = "community_sync" ];
-  // bool device_backup = 1011 [ json_name = "device_backup" ];
+  bool device_backup = 1011 [ json_name = "device_backup" ];
   reserved 1012 to 1999;
   // START OF RETROVIBE LOCAL FIELDS
-  bool local_only = 2000 [ json_name = "local_only" ];
+  bool remote_control = 2000 [ json_name = "remote_control" ];
+  bool local_only = 2001 [ json_name = "local_only" ];
 }
 
 message AuthzRequest {}
