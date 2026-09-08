@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"html/template"
 	"io"
 	"log"
 	"net/http"
 	"os"
+	"text/template"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
