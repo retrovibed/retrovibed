@@ -141,6 +141,8 @@ class CommunityPublisher extends $pb.GeneratedMessage {
     $core.String? publisherId,
     $core.String? createdAt,
     $core.String? updatedAt,
+    $core.String? templateTitle,
+    $core.String? templateDescription,
   }) {
     final result = create();
     if (id != null) result.id = id;
@@ -148,6 +150,9 @@ class CommunityPublisher extends $pb.GeneratedMessage {
     if (publisherId != null) result.publisherId = publisherId;
     if (createdAt != null) result.createdAt = createdAt;
     if (updatedAt != null) result.updatedAt = updatedAt;
+    if (templateTitle != null) result.templateTitle = templateTitle;
+    if (templateDescription != null)
+      result.templateDescription = templateDescription;
     return result;
   }
 
@@ -170,6 +175,8 @@ class CommunityPublisher extends $pb.GeneratedMessage {
     ..aOS(3, _omitFieldNames ? '' : 'publisher_id')
     ..aOS(4, _omitFieldNames ? '' : 'created_at')
     ..aOS(5, _omitFieldNames ? '' : 'updated_at')
+    ..aOS(6, _omitFieldNames ? '' : 'template_title')
+    ..aOS(7, _omitFieldNames ? '' : 'template_description')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -235,6 +242,24 @@ class CommunityPublisher extends $pb.GeneratedMessage {
   $core.bool hasUpdatedAt() => $_has(4);
   @$pb.TagNumber(5)
   void clearUpdatedAt() => $_clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.String get templateTitle => $_getSZ(5);
+  @$pb.TagNumber(6)
+  set templateTitle($core.String value) => $_setString(5, value);
+  @$pb.TagNumber(6)
+  $core.bool hasTemplateTitle() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearTemplateTitle() => $_clearField(6);
+
+  @$pb.TagNumber(7)
+  $core.String get templateDescription => $_getSZ(6);
+  @$pb.TagNumber(7)
+  set templateDescription($core.String value) => $_setString(6, value);
+  @$pb.TagNumber(7)
+  $core.bool hasTemplateDescription() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearTemplateDescription() => $_clearField(7);
 }
 
 class CommunitySocial extends $pb.GeneratedMessage {

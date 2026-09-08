@@ -18,7 +18,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/pqueuex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
-	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/retrovibed/retrovibed/shallows/media"
@@ -51,38 +50,25 @@ func ensureTorrent(ctx context.Context, q sqlx.Queryer, mvfs, tvfs fsx.Virtual, 
 	return media.GenerateTorrent(ctx, q, mvfs, tvfs, lmd)
 }
 
-// publishToPlugin materializes lmd's byte range into a flat temp file - a
-// wasm guest has no way to interpret blockcache's internal block-file
-// layout directly, so the exact section YouTubeUpload would stream is
-// instead copied to disk once - and invokes the plugin installed at
-// pub.Path via publishers.Publish, removing the temp file once the call
-// returns.
-func publishToPlugin(ctx context.Context, mvfs fsx.Virtual, publishers publishplugin.T, pub community.PluginPublisher, pc community.PublishedContent, lmd library.Metadata, known library.Known) error {
-	dir, err := os.MkdirTemp(userx.DefaultRuntimeDirectory(userx.DefaultRelRoot()), "retrovibed.publish.*")
-	if err != nil {
+func publishToPlugin(ctx context.Context, mvfs fsx.Virtual, publishers publishplugin.T, pub community.PluginPublisher, req publishplugin.Request) (err error) {
+	if req.Directory, err = os.MkdirTemp(userx.DefaultRuntimeDirectory(userx.DefaultRelRoot()), "retrovibed.publish.*"); err != nil {
 		return errorsx.Wrap(err, "unable to create temporary media file")
 	}
 	defer func() {
-		errorsx.Log(errorsx.Wrap(fsx.IgnoreIsNotExist(os.RemoveAll(dir)), "unable to publishing directory"))
+		errorsx.Log(errorsx.Wrap(fsx.IgnoreIsNotExist(os.RemoveAll(req.Directory)), "unable to publishing directory"))
 	}()
 
-	if err := os.Symlink(mvfs.Path(lmd.ID), filepath.Join(dir, lmd.ID)); err != nil {
-		fsx.PrintPath(mvfs.Path(lmd.ID))
-		fsx.PrintPath(dir)
-		fsx.PrintPath(filepath.Join(dir, lmd.ID))
+	diskpath := mvfs.Path(req.MediaPath)
+	if err := os.Symlink(diskpath, filepath.Join(req.Directory, req.MediaPath)); err != nil {
+		fsx.PrintPath(diskpath)
+		fsx.PrintPath(req.Directory)
+		fsx.PrintPath(filepath.Join(req.Directory, req.MediaPath))
 		return errorsx.Wrap(err, "failed to symlink media into publishing directory")
 	}
 
-	_, err = publishers.Publish(ctx, pub.Path, publishplugin.Request{
-		Directory:   dir,
-		MediaPath:   lmd.ID,
-		Title:       stringsx.FirstNonBlank(known.Title, lmd.Description),
-		Description: known.Overview,
-		Mimetype:    stringsx.FirstNonBlank(known.Mimetype, lmd.Mimetype),
-		CommunityID: pc.CommunityID,
-		Magnet:      pc.MagnetURI,
-		Adult:       known.Adult,
-	})
+	if _, err = publishers.Publish(ctx, pub.Path, req); err != nil {
+		return errorsx.Wrapf(err, "failed to publish using %s", pub.Path)
+	}
 
 	return err
 }

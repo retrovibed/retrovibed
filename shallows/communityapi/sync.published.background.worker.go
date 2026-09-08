@@ -103,7 +103,17 @@ func (t SyncPublishedBackgroundWorker) Message(ctx context.Context, m []byte) (e
 			continue
 		}
 
-		if err := publishToPlugin(ctx, t.mvfs, t.publishers, pub, decoded, lmd, known); err != nil {
+		req := publishplugin.Request{
+			MediaPath:   lmd.ID,
+			Title:       stringsx.FirstNonBlank(decoded.Title, known.Title, lmd.Description),
+			Description: stringsx.FirstNonBlank(decoded.Description, known.Overview),
+			Mimetype:    stringsx.FirstNonBlank(decoded.Mimetype, known.Mimetype, lmd.Mimetype),
+			CommunityID: decoded.CommunityID,
+			Magnet:      decoded.MagnetURI,
+			Adult:       known.Adult,
+		}
+
+		if err := publishToPlugin(ctx, t.mvfs, t.publishers, pub, req); err != nil {
 			log.Println(errorsx.Wrap(err, "plugin publish failed"))
 		}
 	}

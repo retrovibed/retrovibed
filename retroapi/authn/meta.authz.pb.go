@@ -125,7 +125,6 @@ type Token struct {
 	Exp             int64  `protobuf:"varint,6,opt,name=exp,proto3" json:"exp,omitempty"`
 	Nbf             int64  `protobuf:"varint,7,opt,name=nbf,proto3" json:"nbf,omitempty"`
 	Usermanagement  bool   `protobuf:"varint,1000,opt,name=usermanagement,proto3" json:"usermanagement,omitempty"`
-	RemoteControl   bool   `protobuf:"varint,1001,opt,name=remote_control,proto3" json:"remote_control,omitempty"`
 	BillingRead     bool   `protobuf:"varint,1002,opt,name=billing_read,proto3" json:"billing_read,omitempty"`
 	BillingModify   bool   `protobuf:"varint,1003,opt,name=billing_modify,proto3" json:"billing_modify,omitempty"`
 	CommunityModify bool   `protobuf:"varint,1004,opt,name=community_modify,proto3" json:"community_modify,omitempty"`
@@ -135,8 +134,10 @@ type Token struct {
 	LibraryModify   bool   `protobuf:"varint,1008,opt,name=library_modify,proto3" json:"library_modify,omitempty"`
 	ArchiveSync     bool   `protobuf:"varint,1009,opt,name=archive_sync,proto3" json:"archive_sync,omitempty"`
 	CommunitySync   bool   `protobuf:"varint,1010,opt,name=community_sync,proto3" json:"community_sync,omitempty"`
+	DeviceBackup    bool   `protobuf:"varint,1011,opt,name=device_backup,proto3" json:"device_backup,omitempty"`
 	// START OF RETROVIBE LOCAL FIELDS
-	LocalOnly     bool `protobuf:"varint,2000,opt,name=local_only,proto3" json:"local_only,omitempty"`
+	RemoteControl bool `protobuf:"varint,2000,opt,name=remote_control,proto3" json:"remote_control,omitempty"`
+	LocalOnly     bool `protobuf:"varint,2001,opt,name=local_only,proto3" json:"local_only,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -227,13 +228,6 @@ func (x *Token) GetUsermanagement() bool {
 	return false
 }
 
-func (x *Token) GetRemoteControl() bool {
-	if x != nil {
-		return x.RemoteControl
-	}
-	return false
-}
-
 func (x *Token) GetBillingRead() bool {
 	if x != nil {
 		return x.BillingRead
@@ -293,6 +287,20 @@ func (x *Token) GetArchiveSync() bool {
 func (x *Token) GetCommunitySync() bool {
 	if x != nil {
 		return x.CommunitySync
+	}
+	return false
+}
+
+func (x *Token) GetDeviceBackup() bool {
+	if x != nil {
+		return x.DeviceBackup
+	}
+	return false
+}
+
+func (x *Token) GetRemoteControl() bool {
+	if x != nil {
+		return x.RemoteControl
 	}
 	return false
 }
@@ -668,7 +676,7 @@ const file_meta_meta_authz_proto_rawDesc = "" +
 	"\x03sid\x18\x04 \x01(\tR\x03sid\x12\x10\n" +
 	"\x03iat\x18\x05 \x01(\x03R\x03iat\x12\x10\n" +
 	"\x03exp\x18\x06 \x01(\x03R\x03exp\x12\x10\n" +
-	"\x03nbf\x18\a \x01(\x03R\x03nbf\"\xf4\x04\n" +
+	"\x03nbf\x18\a \x01(\x03R\x03nbf\"\x9b\x05\n" +
 	"\x05Token\x12\x10\n" +
 	"\x03jti\x18\x01 \x01(\tR\x03jti\x12\x10\n" +
 	"\x03iss\x18\x02 \x01(\tR\x03iss\x12\x10\n" +
@@ -677,8 +685,7 @@ const file_meta_meta_authz_proto_rawDesc = "" +
 	"\x03iat\x18\x05 \x01(\x03R\x03iat\x12\x10\n" +
 	"\x03exp\x18\x06 \x01(\x03R\x03exp\x12\x10\n" +
 	"\x03nbf\x18\a \x01(\x03R\x03nbf\x12'\n" +
-	"\x0eusermanagement\x18\xe8\a \x01(\bR\x0eusermanagement\x12'\n" +
-	"\x0eremote_control\x18\xe9\a \x01(\bR\x0eremote_control\x12#\n" +
+	"\x0eusermanagement\x18\xe8\a \x01(\bR\x0eusermanagement\x12#\n" +
 	"\fbilling_read\x18\xea\a \x01(\bR\fbilling_read\x12'\n" +
 	"\x0ebilling_modify\x18\xeb\a \x01(\bR\x0ebilling_modify\x12+\n" +
 	"\x10community_modify\x18\xec\a \x01(\bR\x10community_modify\x12'\n" +
@@ -687,9 +694,11 @@ const file_meta_meta_authz_proto_rawDesc = "" +
 	"\flibrary_read\x18\xef\a \x01(\bR\flibrary_read\x12'\n" +
 	"\x0elibrary_modify\x18\xf0\a \x01(\bR\x0elibrary_modify\x12#\n" +
 	"\farchive_sync\x18\xf1\a \x01(\bR\farchive_sync\x12'\n" +
-	"\x0ecommunity_sync\x18\xf2\a \x01(\bR\x0ecommunity_sync\x12\x1f\n" +
+	"\x0ecommunity_sync\x18\xf2\a \x01(\bR\x0ecommunity_sync\x12%\n" +
+	"\rdevice_backup\x18\xf3\a \x01(\bR\rdevice_backup\x12'\n" +
+	"\x0eremote_control\x18\xd0\x0f \x01(\bR\x0eremote_control\x12\x1f\n" +
 	"\n" +
-	"local_only\x18\xd0\x0f \x01(\bR\n" +
+	"local_only\x18\xd1\x0f \x01(\bR\n" +
 	"local_onlyJ\x05\b\t\x10\xe8\aJ\x06\b\xf4\a\x10\xd0\x0f\"\x0e\n" +
 	"\fAuthzRequest\"J\n" +
 	"\rAuthzResponse\x12\x16\n" +

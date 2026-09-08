@@ -47,7 +47,6 @@ const Token$json = {
     {'1': 'exp', '3': 6, '4': 1, '5': 3, '10': 'exp'},
     {'1': 'nbf', '3': 7, '4': 1, '5': 3, '10': 'nbf'},
     {'1': 'usermanagement', '3': 1000, '4': 1, '5': 8, '10': 'usermanagement'},
-    {'1': 'remote_control', '3': 1001, '4': 1, '5': 8, '10': 'remote_control'},
     {'1': 'billing_read', '3': 1002, '4': 1, '5': 8, '10': 'billing_read'},
     {'1': 'billing_modify', '3': 1003, '4': 1, '5': 8, '10': 'billing_modify'},
     {
@@ -69,7 +68,9 @@ const Token$json = {
     {'1': 'library_modify', '3': 1008, '4': 1, '5': 8, '10': 'library_modify'},
     {'1': 'archive_sync', '3': 1009, '4': 1, '5': 8, '10': 'archive_sync'},
     {'1': 'community_sync', '3': 1010, '4': 1, '5': 8, '10': 'community_sync'},
-    {'1': 'local_only', '3': 2000, '4': 1, '5': 8, '10': 'local_only'},
+    {'1': 'device_backup', '3': 1011, '4': 1, '5': 8, '10': 'device_backup'},
+    {'1': 'remote_control', '3': 2000, '4': 1, '5': 8, '10': 'remote_control'},
+    {'1': 'local_only', '3': 2001, '4': 1, '5': 8, '10': 'local_only'},
   ],
   '9': [
     {'1': 9, '2': 1000},
@@ -82,15 +83,16 @@ final $typed_data.Uint8List tokenDescriptor = $convert.base64Decode(
     'CgVUb2tlbhIQCgNqdGkYASABKAlSA2p0aRIQCgNpc3MYAiABKAlSA2lzcxIQCgNzdWIYAyABKA'
     'lSA3N1YhIQCgNzaWQYBCABKAlSA3NpZBIQCgNpYXQYBSABKANSA2lhdBIQCgNleHAYBiABKANS'
     'A2V4cBIQCgNuYmYYByABKANSA25iZhInCg51c2VybWFuYWdlbWVudBjoByABKAhSDnVzZXJtYW'
-    '5hZ2VtZW50EicKDnJlbW90ZV9jb250cm9sGOkHIAEoCFIOcmVtb3RlX2NvbnRyb2wSIwoMYmls'
-    'bGluZ19yZWFkGOoHIAEoCFIMYmlsbGluZ19yZWFkEicKDmJpbGxpbmdfbW9kaWZ5GOsHIAEoCF'
-    'IOYmlsbGluZ19tb2RpZnkSKwoQY29tbXVuaXR5X21vZGlmeRjsByABKAhSEGNvbW11bml0eV9t'
-    'b2RpZnkSJwoOYXJjaGl2ZV91cGxvYWQY7QcgASgEUg5hcmNoaXZlX3VwbG9hZBIrChBhcmNoaX'
-    'ZlX2Rvd25sb2FkGO4HIAEoBFIQYXJjaGl2ZV9kb3dubG9hZBIjCgxsaWJyYXJ5X3JlYWQY7wcg'
-    'ASgIUgxsaWJyYXJ5X3JlYWQSJwoObGlicmFyeV9tb2RpZnkY8AcgASgIUg5saWJyYXJ5X21vZG'
-    'lmeRIjCgxhcmNoaXZlX3N5bmMY8QcgASgIUgxhcmNoaXZlX3N5bmMSJwoOY29tbXVuaXR5X3N5'
-    'bmMY8gcgASgIUg5jb21tdW5pdHlfc3luYxIfCgpsb2NhbF9vbmx5GNAPIAEoCFIKbG9jYWxfb2'
-    '5seUoFCAkQ6AdKBgj0BxDQDw==');
+    '5hZ2VtZW50EiMKDGJpbGxpbmdfcmVhZBjqByABKAhSDGJpbGxpbmdfcmVhZBInCg5iaWxsaW5n'
+    'X21vZGlmeRjrByABKAhSDmJpbGxpbmdfbW9kaWZ5EisKEGNvbW11bml0eV9tb2RpZnkY7AcgAS'
+    'gIUhBjb21tdW5pdHlfbW9kaWZ5EicKDmFyY2hpdmVfdXBsb2FkGO0HIAEoBFIOYXJjaGl2ZV91'
+    'cGxvYWQSKwoQYXJjaGl2ZV9kb3dubG9hZBjuByABKARSEGFyY2hpdmVfZG93bmxvYWQSIwoMbG'
+    'licmFyeV9yZWFkGO8HIAEoCFIMbGlicmFyeV9yZWFkEicKDmxpYnJhcnlfbW9kaWZ5GPAHIAEo'
+    'CFIObGlicmFyeV9tb2RpZnkSIwoMYXJjaGl2ZV9zeW5jGPEHIAEoCFIMYXJjaGl2ZV9zeW5jEi'
+    'cKDmNvbW11bml0eV9zeW5jGPIHIAEoCFIOY29tbXVuaXR5X3N5bmMSJQoNZGV2aWNlX2JhY2t1'
+    'cBjzByABKAhSDWRldmljZV9iYWNrdXASJwoOcmVtb3RlX2NvbnRyb2wY0A8gASgIUg5yZW1vdG'
+    'VfY29udHJvbBIfCgpsb2NhbF9vbmx5GNEPIAEoCFIKbG9jYWxfb25seUoFCAkQ6AdKBgj0BxDQ'
+    'Dw==');
 
 @$core.Deprecated('Use authzRequestDescriptor instead')
 const AuthzRequest$json = {

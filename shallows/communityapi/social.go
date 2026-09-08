@@ -3,6 +3,7 @@ package communityapi
 import (
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/internal/grpcx"
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 )
 
 func NewPluginPublisher(opts ...func(*PluginPublisher)) *PluginPublisher {
@@ -45,14 +46,11 @@ func CommunityPublisherOptionFromDB(p community.CommunityPublisher) func(*Commun
 		dst.PublisherId = p.PublisherID
 		dst.CreatedAt = grpcx.EncodeTime(p.CreatedAt)
 		dst.UpdatedAt = grpcx.EncodeTime(p.UpdatedAt)
+		dst.TemplateTitle = p.TemplateTitle
+		dst.TemplateDescription = p.TemplateDescription
 	}
 }
 
 func NewCommunitySocial(opts ...func(*CommunitySocial)) *CommunitySocial {
-	var s CommunitySocial
-	for _, opt := range opts {
-		opt(&s)
-	}
-
-	return &s
+	return new(langx.Clone(CommunitySocial{}, opts...))
 }

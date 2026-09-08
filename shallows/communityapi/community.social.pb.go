@@ -106,14 +106,16 @@ func (x *PluginPublisher) GetUpdatedAt() string {
 }
 
 type CommunityPublisher struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	CommunityId   string                 `protobuf:"bytes,2,opt,name=community_id,proto3" json:"community_id,omitempty"`
-	PublisherId   string                 `protobuf:"bytes,3,opt,name=publisher_id,proto3" json:"publisher_id,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,4,opt,name=created_at,proto3" json:"created_at,omitempty"`
-	UpdatedAt     string                 `protobuf:"bytes,5,opt,name=updated_at,proto3" json:"updated_at,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state               protoimpl.MessageState `protogen:"open.v1"`
+	Id                  string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	CommunityId         string                 `protobuf:"bytes,2,opt,name=community_id,proto3" json:"community_id,omitempty"`
+	PublisherId         string                 `protobuf:"bytes,3,opt,name=publisher_id,proto3" json:"publisher_id,omitempty"`
+	CreatedAt           string                 `protobuf:"bytes,4,opt,name=created_at,proto3" json:"created_at,omitempty"`
+	UpdatedAt           string                 `protobuf:"bytes,5,opt,name=updated_at,proto3" json:"updated_at,omitempty"`
+	TemplateTitle       string                 `protobuf:"bytes,6,opt,name=template_title,proto3" json:"template_title,omitempty"`
+	TemplateDescription string                 `protobuf:"bytes,7,opt,name=template_description,proto3" json:"template_description,omitempty"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
 }
 
 func (x *CommunityPublisher) Reset() {
@@ -177,6 +179,20 @@ func (x *CommunityPublisher) GetCreatedAt() string {
 func (x *CommunityPublisher) GetUpdatedAt() string {
 	if x != nil {
 		return x.UpdatedAt
+	}
+	return ""
+}
+
+func (x *CommunityPublisher) GetTemplateTitle() string {
+	if x != nil {
+		return x.TemplateTitle
+	}
+	return ""
+}
+
+func (x *CommunityPublisher) GetTemplateDescription() string {
+	if x != nil {
+		return x.TemplateDescription
 	}
 	return ""
 }
@@ -843,7 +859,7 @@ const file_community_community_social_proto_rawDesc = "" +
 	"created_at\x12\x1e\n" +
 	"\n" +
 	"updated_at\x18\x06 \x01(\tR\n" +
-	"updated_at\"\xac\x01\n" +
+	"updated_at\"\x88\x02\n" +
 	"\x12CommunityPublisher\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\"\n" +
 	"\fcommunity_id\x18\x02 \x01(\tR\fcommunity_id\x12\"\n" +
@@ -853,7 +869,9 @@ const file_community_community_social_proto_rawDesc = "" +
 	"created_at\x12\x1e\n" +
 	"\n" +
 	"updated_at\x18\x05 \x01(\tR\n" +
-	"updated_at\"\x9b\x01\n" +
+	"updated_at\x12&\n" +
+	"\x0etemplate_title\x18\x06 \x01(\tR\x0etemplate_title\x122\n" +
+	"\x14template_description\x18\a \x01(\tR\x14template_description\"\x9b\x01\n" +
 	"\x0fCommunitySocial\x12=\n" +
 	"\tcommunity\x18\x01 \x01(\v2\x1f.retrovibed.community.CommunityR\tcommunity\x12I\n" +
 	"\n" +

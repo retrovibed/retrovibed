@@ -110,7 +110,7 @@ func (t *HTTPPublished) Bind(r *mux.Router) {
 
 	r.Path("/{cid}").Methods(http.MethodPost).Handler(alice.New(
 		httpx.RouteInvoked,
-		httpx.DebugRequest,
+		// httpx.DebugRequest,
 		httpx.ContextBufferPool512(),
 		httpauth.AuthenticateWithToken(t.jwtsecret),
 		httpx.Timeout2s(),

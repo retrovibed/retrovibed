@@ -44,6 +44,14 @@ const CommunityPublisher$json = {
     {'1': 'publisher_id', '3': 3, '4': 1, '5': 9, '10': 'publisher_id'},
     {'1': 'created_at', '3': 4, '4': 1, '5': 9, '10': 'created_at'},
     {'1': 'updated_at', '3': 5, '4': 1, '5': 9, '10': 'updated_at'},
+    {'1': 'template_title', '3': 6, '4': 1, '5': 9, '10': 'template_title'},
+    {
+      '1': 'template_description',
+      '3': 7,
+      '4': 1,
+      '5': 9,
+      '10': 'template_description'
+    },
   ],
 };
 
@@ -52,7 +60,8 @@ final $typed_data.Uint8List communityPublisherDescriptor = $convert.base64Decode
     'ChJDb21tdW5pdHlQdWJsaXNoZXISDgoCaWQYASABKAlSAmlkEiIKDGNvbW11bml0eV9pZBgCIA'
     'EoCVIMY29tbXVuaXR5X2lkEiIKDHB1Ymxpc2hlcl9pZBgDIAEoCVIMcHVibGlzaGVyX2lkEh4K'
     'CmNyZWF0ZWRfYXQYBCABKAlSCmNyZWF0ZWRfYXQSHgoKdXBkYXRlZF9hdBgFIAEoCVIKdXBkYX'
-    'RlZF9hdA==');
+    'RlZF9hdBImCg50ZW1wbGF0ZV90aXRsZRgGIAEoCVIOdGVtcGxhdGVfdGl0bGUSMgoUdGVtcGxh'
+    'dGVfZGVzY3JpcHRpb24YByABKAlSFHRlbXBsYXRlX2Rlc2NyaXB0aW9u');
 
 @$core.Deprecated('Use communitySocialDescriptor instead')
 const CommunitySocial$json = {

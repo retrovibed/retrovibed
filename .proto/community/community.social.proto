@@ -19,6 +19,8 @@ message CommunityPublisher {
   string publisher_id = 3 [ json_name = "publisher_id" ];
   string created_at = 4 [ json_name = "created_at" ];
   string updated_at = 5 [ json_name = "updated_at" ];
+  string template_title = 6 [ json_name = "template_title" ];
+  string template_description = 7 [ json_name = "template_description" ];
 }
 
 message CommunitySocial {

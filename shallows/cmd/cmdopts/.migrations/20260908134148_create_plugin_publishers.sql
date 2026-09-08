@@ -18,8 +18,13 @@ CREATE TABLE community_publisher (
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     community_id UUID NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000',
-    publisher_id UUID NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'
+    publisher_id UUID NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000',
+    template_title TEXT NOT NULL DEFAULT '',
+    template_description TEXT NOT NULL DEFAULT '',
 );
+
+COMMENT ON COLUMN community_publisher.template_title IS 'optional template that is used for titles';
+COMMENT ON COLUMN community_publisher.template_description IS 'optional template that is used for descriptions';
 
 CREATE UNIQUE INDEX IF NOT EXISTS idx_community_publisher_community_publisher ON community_publisher(community_id, publisher_id);
 CREATE INDEX IF NOT EXISTS idx_community_publisher_community_id ON community_publisher(community_id);
