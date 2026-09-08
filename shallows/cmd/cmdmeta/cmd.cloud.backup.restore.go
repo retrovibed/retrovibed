@@ -2,6 +2,7 @@ package cmdmeta
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -18,7 +19,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/sshx"
 )
 
-type CloudRestore struct {
+type CloudBackupRestore struct {
 	Database string `flag:"" name:"database" help:"database to restore into" default:"${vars_user_configuration_directory}/meta.db"`
 	Force    bool   `flag:"" name:"force" help:"replace an existing database, keeping a timestamped copy beside it" default:"false"`
 }
@@ -26,7 +27,7 @@ type CloudRestore struct {
 // fetches the latest encrypted backup and decrypts it into a fresh database file. the
 // daemon must not be running against the target: duckdb allows one writer, and a database
 // swapped out from under a live process is a corrupted database.
-func (t CloudRestore) Run(gctx *cmdopts.Global) (err error) {
+func (t CloudBackupRestore) Run(gctx *cmdopts.Global) (err error) {
 	if fsx.Exists(t.Database) && !t.Force {
 		return errorsx.String(fmt.Sprintf("%s already exists, pass --force to replace it", t.Database))
 	}
@@ -63,14 +64,12 @@ func (t CloudRestore) Run(gctx *cmdopts.Global) (err error) {
 	if err != nil {
 		return errorsx.Wrap(err, "unable to create download")
 	}
+	defer func() {
+		err = errors.Join(err, errorsx.Wrap(f.Close(), "unable to close backup file"))
+	}()
 
 	if err = client.Download(gctx.Context, latest.Id, f); err != nil {
-		errorsx.Log(f.Close())
 		return errorsx.Wrap(err, "unable to download backup")
-	}
-
-	if err = f.Close(); err != nil {
-		return errorsx.Wrap(err, "unable to finish download")
 	}
 
 	// the restored database is built beside the target and moved into place only once it

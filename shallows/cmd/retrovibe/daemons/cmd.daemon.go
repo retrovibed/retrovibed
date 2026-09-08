@@ -90,6 +90,7 @@ type Command struct {
 	AutoLocateMedia          bool             `flag:"" name:"auto-locate-media" help:"enable automatically locating media from distributed index" env:"${env_auto_locate_media}" default:"true" negatable:""`
 	AutoArchive              bool             `flag:"" name:"auto-archive" help:"enable automatic archiving of eligible media" env:"${env_auto_archive}" negatable:"" default:"true"`
 	AutoBackup               bool             `flag:"" name:"auto-backup" help:"enable automatic encrypted backups of the metadata database" env:"${env_auto_backup}" negatable:"" default:"true"`
+	BackupFrequency          time.Duration    `flag:"" name:"backup-freq" help:"how often the metadata database is backed up" env:"${env_backup_frequency}" default:"168h"`
 	AutoReclaim              bool             `flag:"" name:"auto-reclaim" help:"EXPERIMENTAL: enable automatic reclaiming of disk space of archived media" negatable:"" env:"${env_auto_reclaim}"`
 	AutoRecommendations      bool             `flag:"" name:"auto-recommendations" help:"enable automatic daily recommendations" default:"true" negatable:""`
 	AutoSocks5               bool             `flag:"" name:"auto-socks5" help:"enable the socks5 proxy service" default:"true" negatable:""`
@@ -288,7 +289,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	if t.AutoArchive && deepjwt != http.DefaultClient {
 		log.Println("automatic archival is enabled")
 		errorsx.Log(AutoArchival(gctx.Context, db, deepjwt, mediastore, archival, t.AutoArchive))
-		errorsx.Log(AutoBackup(gctx.Context, db, deepjwt, backup, metabackups, cmdopts.MachineID(), t.AutoBackup))
+		errorsx.Log(AutoBackup(gctx.Context, db, deepjwt, backup, metabackups, cmdopts.MachineID(), t.BackupFrequency, t.AutoBackup))
 		errorsx.Log(AutoPublishing(gctx.Context, db, deepjwt, mediastore, tvfs, publishing, mediapub, publishers))
 		errorsx.Log(AutoFeedSync(gctx.Context, db, deepjwt, publishing))
 		errorsx.Log(SubscriptionSync(gctx.Context, db, deepjwt, communitysync))

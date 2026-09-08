@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 
 	"github.com/linxGnu/pqueue"
-	"github.com/linxGnu/pqueue/entry"
 	"github.com/retrovibed/retrovibed/retroapi/deeppool"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
@@ -50,17 +49,8 @@ type Request struct {
 	Device string `json:"device"`
 }
 
-// Enqueue requests a backup unless one is already waiting, so a device that was offline
-// for a day uploads one backup when it returns rather than a day of them.
+// Enqueue requests a backup of the current database for the device.
 func Enqueue(ctx context.Context, wq pqueue.Queue, device string) error {
-	var (
-		pending entry.Entry
-	)
-
-	if wq.Peek(&pending) {
-		return nil
-	}
-
 	return pqueuex.Enqueue(ctx, wq, Request{Device: device})
 }
 

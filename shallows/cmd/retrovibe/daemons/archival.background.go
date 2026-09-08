@@ -33,15 +33,15 @@ func AutoArchival(ctx context.Context, q sqlx.Queryer, c *http.Client, mediastor
 	return nil
 }
 
-func AutoBackup(ctx context.Context, db *sql.DB, c *http.Client, async *asyncx.Wakeup, wq pqueue.Queue, device string, enabled bool) error {
+func AutoBackup(ctx context.Context, db *sql.DB, c *http.Client, async *asyncx.Wakeup, wq pqueue.Queue, device string, frequency time.Duration, enabled bool) error {
 	if !enabled {
 		log.Println("automatic backup is disabled")
 		return nil
 	}
 
 	s := backoffx.New(
-		backoffx.Constant(time.Hour),
-		backoffx.Jitter(0.1),
+		backoffx.Frequency(frequency, device),
+		backoffx.JitterRandom(time.Minute),
 	)
 
 	go contextx.RunContext(ctx, pqueuex.NewWorker(wq, backups.NewWorker(c, db)).Consume)

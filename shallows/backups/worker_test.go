@@ -17,11 +17,11 @@ func TestEnqueue(t *testing.T) {
 		require.JSONEq(t, `{"device":"device-1"}`, string(wq.Snapshot()[0]))
 	})
 
-	t.Run("does not queue another request while one is waiting", func(t *testing.T) {
+	t.Run("queues every request", func(t *testing.T) {
 		wq := pqueuetestx.NewQueue()
 
 		require.NoError(t, backups.Enqueue(t.Context(), wq, "device-1"))
 		require.NoError(t, backups.Enqueue(t.Context(), wq, "device-1"))
-		require.Equal(t, 1, wq.Len())
+		require.Equal(t, 2, wq.Len())
 	})
 }
