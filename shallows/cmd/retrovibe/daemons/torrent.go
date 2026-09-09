@@ -402,7 +402,7 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 		bootstrap = langx.Compose(bootstrap, dht.OptionBootstrapGlobal)
 	}
 
-	if err = meta.WireguardCurrent(dctx, t.db).Scan(&wgcfg); errorsx.Ignore(err, sql.ErrNoRows) != nil {
+	if err = meta.WireguardCurrent(dctx, t.db, 0).Scan(&wgcfg); errorsx.Ignore(err, sql.ErrNoRows) != nil {
 		return errorsx.Wrap(err, "failed to read wireguard config")
 	}
 
@@ -432,7 +432,7 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 		t._dnscache.Store(
 			dnscache.New(
 				wireguardx.HostLookupAdapter(wgnet),
-				dnscache.CacheOptionRateLimit(wgcfg.DNSRateLimit),
+				dnscache.CacheOptionRateLimit(wgcfg.RateLimitDNS),
 			),
 		)
 
@@ -526,7 +526,7 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 		torrent.ClientConfigDialTimeouts(time.Second, 4*time.Second),
 		torrent.ClientConfigHandshakeTimeout(30*time.Second),
 		torrent.ClientConfigDialPoolSize(128*runtime.NumCPU()),
-		torrent.ClientConfigDialRateLimit(rate.NewLimiter(rate.Limit(langx.FirstNonZero(wgcfg.OutboundRateLimit, cfg.Outbound.Rate, math.MaxUint32)), int(cfg.Outbound.Burst))),
+		torrent.ClientConfigDialRateLimit(rate.NewLimiter(rate.Limit(langx.FirstNonZero(wgcfg.RateLimitOutbound, cfg.Outbound.Rate, math.MaxUint32)), int(cfg.Outbound.Burst))),
 		torrent.ClientConfigAcceptLimit(rate.NewLimiter(rate.Limit(cfg.Inbound.Rate), int(cfg.Inbound.Burst))),
 		torrent.ClientConfigMaxOutstandingRequests(int(cfg.MaximumRequests)),
 		torrent.ClientConfigPeerLimits(cfg.Peers.Min, cfg.Peers.Max),

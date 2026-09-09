@@ -1137,11 +1137,9 @@ class CommunityPublisherUpdateResponse extends $pb.GeneratedMessage {
 class CommunityPublisherEnableResponse extends $pb.GeneratedMessage {
   factory CommunityPublisherEnableResponse({
     CommunityPublisher? compub,
-    CommunityPublisher? enabled,
   }) {
     final result = create();
     if (compub != null) result.compub = compub;
-    if (enabled != null) result.enabled = enabled;
     return result;
   }
 
@@ -1161,8 +1159,6 @@ class CommunityPublisherEnableResponse extends $pb.GeneratedMessage {
           _omitMessageNames ? '' : 'retrovibed.community'),
       createEmptyInstance: create)
     ..aOM<CommunityPublisher>(1, _omitFieldNames ? '' : 'compub',
-        subBuilder: CommunityPublisher.create)
-    ..aOM<CommunityPublisher>(2, _omitFieldNames ? '' : 'enabled',
         subBuilder: CommunityPublisher.create)
     ..hasRequiredFields = false;
 
@@ -1199,27 +1195,14 @@ class CommunityPublisherEnableResponse extends $pb.GeneratedMessage {
   void clearCompub() => $_clearField(1);
   @$pb.TagNumber(1)
   CommunityPublisher ensureCompub() => $_ensure(0);
-
-  @$pb.TagNumber(2)
-  CommunityPublisher get enabled => $_getN(1);
-  @$pb.TagNumber(2)
-  set enabled(CommunityPublisher value) => $_setField(2, value);
-  @$pb.TagNumber(2)
-  $core.bool hasEnabled() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearEnabled() => $_clearField(2);
-  @$pb.TagNumber(2)
-  CommunityPublisher ensureEnabled() => $_ensure(1);
 }
 
 class CommunityPublisherDisableResponse extends $pb.GeneratedMessage {
   factory CommunityPublisherDisableResponse({
     CommunityPublisher? compub,
-    CommunityPublisher? disabled,
   }) {
     final result = create();
     if (compub != null) result.compub = compub;
-    if (disabled != null) result.disabled = disabled;
     return result;
   }
 
@@ -1239,8 +1222,6 @@ class CommunityPublisherDisableResponse extends $pb.GeneratedMessage {
           _omitMessageNames ? '' : 'retrovibed.community'),
       createEmptyInstance: create)
     ..aOM<CommunityPublisher>(1, _omitFieldNames ? '' : 'compub',
-        subBuilder: CommunityPublisher.create)
-    ..aOM<CommunityPublisher>(2, _omitFieldNames ? '' : 'disabled',
         subBuilder: CommunityPublisher.create)
     ..hasRequiredFields = false;
 
@@ -1277,17 +1258,6 @@ class CommunityPublisherDisableResponse extends $pb.GeneratedMessage {
   void clearCompub() => $_clearField(1);
   @$pb.TagNumber(1)
   CommunityPublisher ensureCompub() => $_ensure(0);
-
-  @$pb.TagNumber(2)
-  CommunityPublisher get disabled => $_getN(1);
-  @$pb.TagNumber(2)
-  set disabled(CommunityPublisher value) => $_setField(2, value);
-  @$pb.TagNumber(2)
-  $core.bool hasDisabled() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearDisabled() => $_clearField(2);
-  @$pb.TagNumber(2)
-  CommunityPublisher ensureDisabled() => $_ensure(1);
 }
 
 const $core.bool _omitFieldNames =

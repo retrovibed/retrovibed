@@ -94,6 +94,7 @@ VoidCallback once(VoidCallback action) {
 
 // The target non-nullable asynchronous function type
 typedef AsyncVoidCallback = Future<void> Function();
+typedef AsyncCallback<T> = Future<T> Function();
 
 AsyncVoidCallback toasync(VoidCallback fn) {
   return () async {

@@ -15,7 +15,11 @@ import 'dart:core' as $core;
 import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
 
+import 'meta.wireguard.pbenum.dart';
+
 export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
+
+export 'meta.wireguard.pbenum.dart';
 
 class Wireguard extends $pb.GeneratedMessage {
   factory Wireguard({
@@ -23,23 +27,23 @@ class Wireguard extends $pb.GeneratedMessage {
     $core.String? createdAt,
     $core.String? updatedAt,
     $core.String? description,
-    $core.bool? default_5,
+    WireguardNettype? nettype,
     $core.int? port,
-    $core.int? dnsRateLimit,
+    $core.int? rateLimitDns,
     $fixnum.Int64? maximumConnections,
-    $core.int? outboundRateLimit,
+    $core.int? rateLimitOutbound,
   }) {
     final result = create();
     if (id != null) result.id = id;
     if (createdAt != null) result.createdAt = createdAt;
     if (updatedAt != null) result.updatedAt = updatedAt;
     if (description != null) result.description = description;
-    if (default_5 != null) result.default_5 = default_5;
+    if (nettype != null) result.nettype = nettype;
     if (port != null) result.port = port;
-    if (dnsRateLimit != null) result.dnsRateLimit = dnsRateLimit;
+    if (rateLimitDns != null) result.rateLimitDns = rateLimitDns;
     if (maximumConnections != null)
       result.maximumConnections = maximumConnections;
-    if (outboundRateLimit != null) result.outboundRateLimit = outboundRateLimit;
+    if (rateLimitOutbound != null) result.rateLimitOutbound = rateLimitOutbound;
     return result;
   }
 
@@ -60,14 +64,15 @@ class Wireguard extends $pb.GeneratedMessage {
     ..aOS(2, _omitFieldNames ? '' : 'created_at')
     ..aOS(3, _omitFieldNames ? '' : 'updated_at')
     ..aOS(4, _omitFieldNames ? '' : 'description')
-    ..aOB(5, _omitFieldNames ? '' : 'default')
+    ..aE<WireguardNettype>(5, _omitFieldNames ? '' : 'nettype',
+        enumValues: WireguardNettype.values)
     ..aI(6, _omitFieldNames ? '' : 'port', fieldType: $pb.PbFieldType.OU3)
-    ..aI(7, _omitFieldNames ? '' : 'dns_rate_limit',
+    ..aI(7, _omitFieldNames ? '' : 'rate_limit_dns',
         fieldType: $pb.PbFieldType.OU3)
     ..a<$fixnum.Int64>(
         8, _omitFieldNames ? '' : 'maximum_connections', $pb.PbFieldType.OU6,
         defaultOrMaker: $fixnum.Int64.ZERO)
-    ..aI(9, _omitFieldNames ? '' : 'outbound_rate_limit',
+    ..aI(9, _omitFieldNames ? '' : 'rate_limit_outbound',
         fieldType: $pb.PbFieldType.OU3)
     ..hasRequiredFields = false;
 
@@ -126,13 +131,13 @@ class Wireguard extends $pb.GeneratedMessage {
   void clearDescription() => $_clearField(4);
 
   @$pb.TagNumber(5)
-  $core.bool get default_5 => $_getBF(4);
+  WireguardNettype get nettype => $_getN(4);
   @$pb.TagNumber(5)
-  set default_5($core.bool value) => $_setBool(4, value);
+  set nettype(WireguardNettype value) => $_setField(5, value);
   @$pb.TagNumber(5)
-  $core.bool hasDefault_5() => $_has(4);
+  $core.bool hasNettype() => $_has(4);
   @$pb.TagNumber(5)
-  void clearDefault_5() => $_clearField(5);
+  void clearNettype() => $_clearField(5);
 
   @$pb.TagNumber(6)
   $core.int get port => $_getIZ(5);
@@ -144,13 +149,13 @@ class Wireguard extends $pb.GeneratedMessage {
   void clearPort() => $_clearField(6);
 
   @$pb.TagNumber(7)
-  $core.int get dnsRateLimit => $_getIZ(6);
+  $core.int get rateLimitDns => $_getIZ(6);
   @$pb.TagNumber(7)
-  set dnsRateLimit($core.int value) => $_setUnsignedInt32(6, value);
+  set rateLimitDns($core.int value) => $_setUnsignedInt32(6, value);
   @$pb.TagNumber(7)
-  $core.bool hasDnsRateLimit() => $_has(6);
+  $core.bool hasRateLimitDns() => $_has(6);
   @$pb.TagNumber(7)
-  void clearDnsRateLimit() => $_clearField(7);
+  void clearRateLimitDns() => $_clearField(7);
 
   @$pb.TagNumber(8)
   $fixnum.Int64 get maximumConnections => $_getI64(7);
@@ -162,13 +167,13 @@ class Wireguard extends $pb.GeneratedMessage {
   void clearMaximumConnections() => $_clearField(8);
 
   @$pb.TagNumber(9)
-  $core.int get outboundRateLimit => $_getIZ(8);
+  $core.int get rateLimitOutbound => $_getIZ(8);
   @$pb.TagNumber(9)
-  set outboundRateLimit($core.int value) => $_setUnsignedInt32(8, value);
+  set rateLimitOutbound($core.int value) => $_setUnsignedInt32(8, value);
   @$pb.TagNumber(9)
-  $core.bool hasOutboundRateLimit() => $_has(8);
+  $core.bool hasRateLimitOutbound() => $_has(8);
   @$pb.TagNumber(9)
-  void clearOutboundRateLimit() => $_clearField(9);
+  void clearRateLimitOutbound() => $_clearField(9);
 }
 
 class WireguardSearchRequest extends $pb.GeneratedMessage {
@@ -434,7 +439,13 @@ class WireguardUpdateResponse extends $pb.GeneratedMessage {
 }
 
 class WireguardTouchRequest extends $pb.GeneratedMessage {
-  factory WireguardTouchRequest() => create();
+  factory WireguardTouchRequest({
+    WireguardNettype? nettype,
+  }) {
+    final result = create();
+    if (nettype != null) result.nettype = nettype;
+    return result;
+  }
 
   WireguardTouchRequest._();
 
@@ -449,6 +460,8 @@ class WireguardTouchRequest extends $pb.GeneratedMessage {
       _omitMessageNames ? '' : 'WireguardTouchRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
       createEmptyInstance: create)
+    ..aE<WireguardNettype>(1, _omitFieldNames ? '' : 'nettype',
+        enumValues: WireguardNettype.values)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -470,6 +483,15 @@ class WireguardTouchRequest extends $pb.GeneratedMessage {
   static WireguardTouchRequest getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<WireguardTouchRequest>(create);
   static WireguardTouchRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  WireguardNettype get nettype => $_getN(0);
+  @$pb.TagNumber(1)
+  set nettype(WireguardNettype value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasNettype() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearNettype() => $_clearField(1);
 }
 
 class WireguardTouchResponse extends $pb.GeneratedMessage {
@@ -628,7 +650,13 @@ class WireguardUploadResponse extends $pb.GeneratedMessage {
 }
 
 class WireguardCurrentRequest extends $pb.GeneratedMessage {
-  factory WireguardCurrentRequest() => create();
+  factory WireguardCurrentRequest({
+    WireguardNettype? nettype,
+  }) {
+    final result = create();
+    if (nettype != null) result.nettype = nettype;
+    return result;
+  }
 
   WireguardCurrentRequest._();
 
@@ -643,6 +671,8 @@ class WireguardCurrentRequest extends $pb.GeneratedMessage {
       _omitMessageNames ? '' : 'WireguardCurrentRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
       createEmptyInstance: create)
+    ..aE<WireguardNettype>(1, _omitFieldNames ? '' : 'nettype',
+        enumValues: WireguardNettype.values)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -664,6 +694,15 @@ class WireguardCurrentRequest extends $pb.GeneratedMessage {
   static WireguardCurrentRequest getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<WireguardCurrentRequest>(create);
   static WireguardCurrentRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  WireguardNettype get nettype => $_getN(0);
+  @$pb.TagNumber(1)
+  set nettype(WireguardNettype value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasNettype() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearNettype() => $_clearField(1);
 }
 
 class WireguardCurrentResponse extends $pb.GeneratedMessage {

@@ -847,7 +847,6 @@ func (x *CommunityPublisherUpdateResponse) GetCompub() *CommunityPublisher {
 type CommunityPublisherEnableResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Compub        *CommunityPublisher    `protobuf:"bytes,1,opt,name=compub,proto3" json:"compub,omitempty"`
-	Enabled       *CommunityPublisher    `protobuf:"bytes,2,opt,name=enabled,proto3" json:"enabled,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -889,17 +888,9 @@ func (x *CommunityPublisherEnableResponse) GetCompub() *CommunityPublisher {
 	return nil
 }
 
-func (x *CommunityPublisherEnableResponse) GetEnabled() *CommunityPublisher {
-	if x != nil {
-		return x.Enabled
-	}
-	return nil
-}
-
 type CommunityPublisherDisableResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Compub        *CommunityPublisher    `protobuf:"bytes,1,opt,name=compub,proto3" json:"compub,omitempty"`
-	Disabled      *CommunityPublisher    `protobuf:"bytes,2,opt,name=disabled,proto3" json:"disabled,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -937,13 +928,6 @@ func (*CommunityPublisherDisableResponse) Descriptor() ([]byte, []int) {
 func (x *CommunityPublisherDisableResponse) GetCompub() *CommunityPublisher {
 	if x != nil {
 		return x.Compub
-	}
-	return nil
-}
-
-func (x *CommunityPublisherDisableResponse) GetDisabled() *CommunityPublisher {
-	if x != nil {
-		return x.Disabled
 	}
 	return nil
 }
@@ -1012,13 +996,11 @@ const file_community_community_social_proto_rawDesc = "" +
 	"\x1fCommunityPublisherUpdateRequest\x12@\n" +
 	"\x06compub\x18\x01 \x01(\v2(.retrovibed.community.CommunityPublisherR\x06compub\"d\n" +
 	" CommunityPublisherUpdateResponse\x12@\n" +
-	"\x06compub\x18\x01 \x01(\v2(.retrovibed.community.CommunityPublisherR\x06compub\"\xa8\x01\n" +
+	"\x06compub\x18\x01 \x01(\v2(.retrovibed.community.CommunityPublisherR\x06compub\"d\n" +
 	" CommunityPublisherEnableResponse\x12@\n" +
-	"\x06compub\x18\x01 \x01(\v2(.retrovibed.community.CommunityPublisherR\x06compub\x12B\n" +
-	"\aenabled\x18\x02 \x01(\v2(.retrovibed.community.CommunityPublisherR\aenabled\"\xab\x01\n" +
+	"\x06compub\x18\x01 \x01(\v2(.retrovibed.community.CommunityPublisherR\x06compub\"e\n" +
 	"!CommunityPublisherDisableResponse\x12@\n" +
-	"\x06compub\x18\x01 \x01(\v2(.retrovibed.community.CommunityPublisherR\x06compub\x12D\n" +
-	"\bdisabled\x18\x02 \x01(\v2(.retrovibed.community.CommunityPublisherR\bdisabledb\x06proto3"
+	"\x06compub\x18\x01 \x01(\v2(.retrovibed.community.CommunityPublisherR\x06compubb\x06proto3"
 
 var (
 	file_community_community_social_proto_rawDescOnce sync.Once
@@ -1069,14 +1051,12 @@ var file_community_community_social_proto_depIdxs = []int32{
 	1,  // 12: retrovibed.community.CommunityPublisherUpdateRequest.compub:type_name -> retrovibed.community.CommunityPublisher
 	1,  // 13: retrovibed.community.CommunityPublisherUpdateResponse.compub:type_name -> retrovibed.community.CommunityPublisher
 	1,  // 14: retrovibed.community.CommunityPublisherEnableResponse.compub:type_name -> retrovibed.community.CommunityPublisher
-	1,  // 15: retrovibed.community.CommunityPublisherEnableResponse.enabled:type_name -> retrovibed.community.CommunityPublisher
-	1,  // 16: retrovibed.community.CommunityPublisherDisableResponse.compub:type_name -> retrovibed.community.CommunityPublisher
-	1,  // 17: retrovibed.community.CommunityPublisherDisableResponse.disabled:type_name -> retrovibed.community.CommunityPublisher
-	18, // [18:18] is the sub-list for method output_type
-	18, // [18:18] is the sub-list for method input_type
-	18, // [18:18] is the sub-list for extension type_name
-	18, // [18:18] is the sub-list for extension extendee
-	0,  // [0:18] is the sub-list for field type_name
+	1,  // 15: retrovibed.community.CommunityPublisherDisableResponse.compub:type_name -> retrovibed.community.CommunityPublisher
+	16, // [16:16] is the sub-list for method output_type
+	16, // [16:16] is the sub-list for method input_type
+	16, // [16:16] is the sub-list for extension type_name
+	16, // [16:16] is the sub-list for extension extendee
+	0,  // [0:16] is the sub-list for field type_name
 }
 
 func init() { file_community_community_social_proto_init() }

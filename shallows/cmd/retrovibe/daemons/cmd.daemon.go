@@ -167,6 +167,25 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		metabackupsdir      = userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "meta.backups.d")
 	)
 
+	// socialnetDialer/socialResolver back the "social ring" - the deeppool
+	// api (deepjwt) client, publishing and (eventually) recommendations
+	// traffic - kept deliberately separate from
+	// distributionnetDialer/distributionnetResolver below, which back the
+	// "distribution ring" torrents and search plugins use. There's no
+	// wireguard tunnel of its own for the social ring yet (a planned
+	// follow-up, mirroring how _torrenting.Watch live-swaps
+	// distributionnetDialer/distributionnetResolver onto a tunnel when one
+	// is configured - see torrent.go), so it's stored once here with the
+	// same plain-host fallback DefaultDialer uses when no tunnel is present.
+	socialnetResolver := dnscache.AutoProxyResolver()
+	socialnetDialer := netx.NewDialerProxy(DefaultDialer(nil, socialnetResolver))
+
+	// distributionnet is the network used for accessing distributing content.
+	// since content distribution is sensitive data (privacy) we isolate it
+	// from general (socialnet) traffic.
+	distributionnetResolver := dnscache.AutoProxyResolver()
+	distributionnetDialer := netx.NewDialerProxy(DefaultDialer(nil, distributionnetResolver))
+
 	// initialize queue directories
 	mediarecs, err := pqueuex.New(mediarecsdir)
 	if err != nil {
@@ -240,7 +259,13 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	}
 
 	if !authz.LocalOnly {
-		if c, err := authn.AutoJWTClient(gctx.Context, id); err == nil {
+		if c, err := authn.AutoJWTClient(
+			gctx.Context,
+			id,
+			// its important that the dialer option is the first in the list.
+			// that way we ensure the dialer doesnt cause a panic or we leak connections.
+			authn.ClientOptionDialer(socialnetDialer),
+		); err == nil {
 			deepjwt = c
 			go AutoRegistration(gctx.Context, id)
 		} else {
@@ -252,25 +277,12 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 
 	var tstore storage.ClientImpl = blockcache.NewTorrentFromVirtualFS(tvfs)
 
-	// socialDialer/socialResolver back the "social ring" - publishing and
-	// (eventually) recommendations traffic - kept deliberately separate
-	// from privateDialer/privateResolver below, which back the
-	// "distribution ring" torrents and search plugins use. There's no
-	// wireguard tunnel of its own for the social ring yet (a planned
-	// follow-up, mirroring how _torrenting.Watch live-swaps
-	// privateDialer/privateResolver onto a tunnel when one is configured -
-	// see torrent.go), so it's stored once here with the same plain-host
-	// fallback DefaultDialer uses when no tunnel is present.
-	socialDialer := netx.NewDialerProxy()
-	socialResolver := dnscache.AutoProxyResolver()
-	socialDialer.Store(DefaultDialer(nil, socialResolver))
-
 	publishers, err := publishplugin.NewRegistryWithSocket(
 		gctx.Context,
 		wnetruntime.Virtual(
-			socialDialer,
+			socialnetDialer,
 			netx.UnsupportedListenConfig{},
-			socialResolver,
+			socialnetResolver,
 			wnetruntime.PublicFirewall(),
 		),
 	)
@@ -286,8 +298,8 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		"publish plugin import failed",
 	))
 
-	if t.AutoArchive && deepjwt != http.DefaultClient {
-		log.Println("automatic archival is enabled")
+	if deepjwt != http.DefaultClient {
+		log.Println("cloud functionality is enabled")
 		errorsx.Log(AutoArchival(gctx.Context, db, deepjwt, mediastore, archival, t.AutoArchive))
 		errorsx.Log(AutoBackup(gctx.Context, db, deepjwt, backup, metabackups, cmdopts.MachineID(), t.BackupFrequency, t.AutoBackup))
 		errorsx.Log(AutoPublishing(gctx.Context, db, deepjwt, mediastore, tvfs, publishing, mediapub, publishers))
@@ -295,7 +307,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		errorsx.Log(SubscriptionSync(gctx.Context, db, deepjwt, communitysync))
 		tstore = library.NewTorrentStorageFromHTTP(db, deepjwt, tstore)
 	} else {
-		log.Println("automatic archival is disabled")
+		log.Println("cloud functionality is disabled")
 	}
 
 	errorsx.Log(AutoReclaim(gctx.Context, db, mediastore, asyncx.NewWakeup(gctx.Context), t.AutoReclaim))
@@ -307,24 +319,12 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	}
 
 	log.Println("checkpoint - initialize plugins")
-	// plugins is built once, up front, decoupled from _torrenting.Init/Reload
-	// (NewRegistryWithSocket spins up a wazero runtime + WASI + a directory
-	// watcher - too expensive to rebuild every reload generation). It still
-	// needs to track the live wireguard-tunnel-or-host dialer the same way
-	// the torrent client's own dialer does, so privateDialer/privateResolver
-	// are handed into newTorrenting to become _torrenting's _dialer/
-	// _dnscache - Init's normal per-generation Store calls keep them live.
-	// This is the "distribution ring" - deliberately a separate
-	// dialer/resolver pair from socialDialer/socialResolver above, which
-	// back publishing/recommendations traffic instead.
-	privateDialer := netx.NewDialerProxy()
-	privateResolver := dnscache.AutoProxyResolver()
 	plugins, err := searchplugin.NewRegistryWithSocket(
 		gctx.Context,
 		wnetruntime.Virtual(
-			privateDialer,
+			distributionnetDialer,
 			netx.UnsupportedListenConfig{},
-			privateResolver,
+			distributionnetResolver,
 			wnetruntime.PublicFirewall(),
 		),
 	)
@@ -334,14 +334,15 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 
 	// peertube, unlike plugins, is trusted first-party code that runs
 	// in-process (no wasm sandbox) - see ddisc.PeerTubeStrategy. It still
-	// dials through privateDialer, the same live wireguard-tunnel-or-host
-	// proxy dialer plugins' virtual socket uses, so PeerTube search traffic
-	// never bypasses the tunnel the user configured.
+	// dials through distributionnetDialer, the same live
+	// wireguard-tunnel-or-host proxy dialer plugins' virtual socket uses,
+	// so PeerTube search traffic never bypasses the tunnel the user
+	// configured.
 	peertube := ddisc.DiscoverStrategy(ddisc.UnimplementedStrategy{})
 	if t.AutoPeerTube {
 		peertube = ddisc.PeerTubeStrategy(&http.Client{
 			Timeout:   30 * time.Second,
-			Transport: &http.Transport{DialContext: privateDialer.DialContext},
+			Transport: &http.Transport{DialContext: distributionnetDialer.DialContext},
 		}, t.PeerTubeDomain)
 	}
 
@@ -358,8 +359,8 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		locatemedia,
 		plugins,
 		peertube,
-		privateDialer,
-		privateResolver,
+		distributionnetDialer,
+		distributionnetResolver,
 	)
 
 	log.Println("checkpoint - distribution")
@@ -541,7 +542,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	mediaapi.NewHTTPRemoteControl(t.RemoteControl).Bind(httpmux.PathPrefix("/rc").Subrouter())
 	ddiscapi.NewHTTPPeerManagement(db).Bind(httpmux.PathPrefix("/ddisc").Subrouter())
 	discoveryimporter := tracking.NewURIImport(db, httpx.BindRetryTransport(&http.Client{
-		Transport: &http.Transport{DialContext: privateDialer.DialContext},
+		Transport: &http.Transport{DialContext: distributionnetDialer.DialContext},
 	}, http.StatusTooManyRequests, http.StatusBadGateway), rootstore)
 	ddiscapi.NewHTTPDiscovery(db, plugins, peertube, discoveryimporter, ddiscapi.HTTPDiscoveryOptionQueryCleaner(mc)).Bind(httpmux.PathPrefix("/ddisc/discovery").Subrouter())
 	ddiscapi.NewHTTPMedia(db).Bind(httpmux.PathPrefix("/ddisc/media").Subrouter())

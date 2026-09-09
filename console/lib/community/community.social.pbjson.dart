@@ -373,14 +373,6 @@ const CommunityPublisherEnableResponse$json = {
       '6': '.retrovibed.community.CommunityPublisher',
       '10': 'compub'
     },
-    {
-      '1': 'enabled',
-      '3': 2,
-      '4': 1,
-      '5': 11,
-      '6': '.retrovibed.community.CommunityPublisher',
-      '10': 'enabled'
-    },
   ],
 };
 
@@ -388,9 +380,7 @@ const CommunityPublisherEnableResponse$json = {
 final $typed_data.Uint8List communityPublisherEnableResponseDescriptor =
     $convert.base64Decode(
         'CiBDb21tdW5pdHlQdWJsaXNoZXJFbmFibGVSZXNwb25zZRJACgZjb21wdWIYASABKAsyKC5yZX'
-        'Ryb3ZpYmVkLmNvbW11bml0eS5Db21tdW5pdHlQdWJsaXNoZXJSBmNvbXB1YhJCCgdlbmFibGVk'
-        'GAIgASgLMigucmV0cm92aWJlZC5jb21tdW5pdHkuQ29tbXVuaXR5UHVibGlzaGVyUgdlbmFibG'
-        'Vk');
+        'Ryb3ZpYmVkLmNvbW11bml0eS5Db21tdW5pdHlQdWJsaXNoZXJSBmNvbXB1Yg==');
 
 @$core.Deprecated('Use communityPublisherDisableResponseDescriptor instead')
 const CommunityPublisherDisableResponse$json = {
@@ -404,14 +394,6 @@ const CommunityPublisherDisableResponse$json = {
       '6': '.retrovibed.community.CommunityPublisher',
       '10': 'compub'
     },
-    {
-      '1': 'disabled',
-      '3': 2,
-      '4': 1,
-      '5': 11,
-      '6': '.retrovibed.community.CommunityPublisher',
-      '10': 'disabled'
-    },
   ],
 };
 
@@ -419,6 +401,4 @@ const CommunityPublisherDisableResponse$json = {
 final $typed_data.Uint8List communityPublisherDisableResponseDescriptor =
     $convert.base64Decode(
         'CiFDb21tdW5pdHlQdWJsaXNoZXJEaXNhYmxlUmVzcG9uc2USQAoGY29tcHViGAEgASgLMigucm'
-        'V0cm92aWJlZC5jb21tdW5pdHkuQ29tbXVuaXR5UHVibGlzaGVyUgZjb21wdWISRAoIZGlzYWJs'
-        'ZWQYAiABKAsyKC5yZXRyb3ZpYmVkLmNvbW11bml0eS5Db21tdW5pdHlQdWJsaXNoZXJSCGRpc2'
-        'FibGVk');
+        'V0cm92aWJlZC5jb21tdW5pdHkuQ29tbXVuaXR5UHVibGlzaGVyUgZjb21wdWI=');

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
-import './list.dart';
+import 'list.dart';
 
 class Card extends StatelessWidget {
   final EdgeInsets? margin;

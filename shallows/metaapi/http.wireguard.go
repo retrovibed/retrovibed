@@ -84,6 +84,7 @@ func (t *HTTPWireguard) Bind(r *mux.Router) {
 		httpx.ContextBufferPool512(),
 		httpauth.AuthenticateWithToken(t.jwtsecret),
 		httpx.Timeout2s(),
+		httpx.ParseForm,
 	).ThenFunc(t.current))
 
 	r.Path("/{id}").Methods(http.MethodPatch).Handler(alice.New(
@@ -246,10 +247,17 @@ func (t *HTTPWireguard) current(w http.ResponseWriter, r *http.Request) {
 	var (
 		err      error
 		wg       meta.Wireguard
+		msg      WireguardCurrentRequest
 		realpath = errorsx.Zero(filepath.EvalSymlinks(t.dir.Path(wireguardx.Current)))
 	)
 
-	if err = meta.WireguardCurrent(r.Context(), t.q).Scan(&wg); errors.Is(err, sql.ErrNoRows) {
+	if err = t.decoder.Decode(&msg, r.Form); err != nil {
+		log.Println("unable to decode request", err)
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		return
+	}
+
+	if err = meta.WireguardCurrent(r.Context(), t.q, uint32(msg.Nettype)).Scan(&wg); errors.Is(err, sql.ErrNoRows) {
 		log.Println("no wireguard configuration activated")
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
 		return
@@ -334,8 +342,15 @@ func (t *HTTPWireguard) touch(w http.ResponseWriter, r *http.Request) {
 	var (
 		err error
 		id  = mux.Vars(r)["id"]
+		msg WireguardTouchRequest
 		wg  meta.Wireguard
 	)
+
+	if err = jsonx.UnmarshalRead(r.Body, &msg); err != nil {
+		log.Println("unable to decode request", err)
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		return
+	}
 
 	if err = os.RemoveAll(t.dir.Path(wireguardx.Current)); fsx.IgnoreIsNotExist(err) != nil {
 		log.Println(errorsx.Wrap(err, "failed to remove old config"))
@@ -349,7 +364,7 @@ func (t *HTTPWireguard) touch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = meta.WireguardTouch(r.Context(), t.q, id).Scan(&wg); err != nil {
+	if err = meta.WireguardTouch(r.Context(), t.q, id, uint32(msg.Nettype)).Scan(&wg); err != nil {
 		log.Println(errorsx.Wrap(err, "failed to update"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
@@ -357,7 +372,7 @@ func (t *HTTPWireguard) touch(w http.ResponseWriter, r *http.Request) {
 
 	// this shouldnt be necessary, we *should* be able to use a CTE or UPDATE followed by a select.
 	// unfortunately duckdb does not support either case.
-	if err = meta.WireguardCurrent(r.Context(), t.q).Scan(&wg); errors.Is(err, sql.ErrNoRows) {
+	if err = meta.WireguardCurrent(r.Context(), t.q, uint32(msg.Nettype)).Scan(&wg); errors.Is(err, sql.ErrNoRows) {
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
 		return
 	} else if err != nil {

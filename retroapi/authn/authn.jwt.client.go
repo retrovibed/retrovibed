@@ -21,8 +21,8 @@ import (
 // client's authz layer requires one to already exist to fetch a bearer at
 // all, including for Register's own /authn/ssh request. Use
 // RegistrationJWTClient for that instead.
-func AutoJWTClient(ctx context.Context, signer ssh.Signer) (c *http.Client, err error) {
-	c, err = Oauth2DeeppoolHTTPClient(ctx, signer)
+func AutoJWTClient(ctx context.Context, signer ssh.Signer, options ...httpx.ClientOption) (c *http.Client, err error) {
+	c, err = Oauth2DeeppoolHTTPClient(ctx, signer, options...)
 	if err != nil {
 		return nil, errorsx.Wrap(err, "failed to create oauth2 http client")
 	}

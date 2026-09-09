@@ -15,6 +15,21 @@ import 'dart:convert' as $convert;
 import 'dart:core' as $core;
 import 'dart:typed_data' as $typed_data;
 
+@$core.Deprecated('Use wireguardNettypeDescriptor instead')
+const WireguardNettype$json = {
+  '1': 'WireguardNettype',
+  '2': [
+    {'1': 'UNSPECIFIED', '2': 0},
+    {'1': 'DISTRIBUTION', '2': 1},
+    {'1': 'SOCIAL', '2': 2},
+  ],
+};
+
+/// Descriptor for `WireguardNettype`. Decode as a `google.protobuf.EnumDescriptorProto`.
+final $typed_data.Uint8List wireguardNettypeDescriptor = $convert.base64Decode(
+    'ChBXaXJlZ3VhcmROZXR0eXBlEg8KC1VOU1BFQ0lGSUVEEAASEAoMRElTVFJJQlVUSU9OEAESCg'
+    'oGU09DSUFMEAI=');
+
 @$core.Deprecated('Use wireguardDescriptor instead')
 const Wireguard$json = {
   '1': 'Wireguard',
@@ -23,9 +38,16 @@ const Wireguard$json = {
     {'1': 'created_at', '3': 2, '4': 1, '5': 9, '10': 'created_at'},
     {'1': 'updated_at', '3': 3, '4': 1, '5': 9, '10': 'updated_at'},
     {'1': 'description', '3': 4, '4': 1, '5': 9, '10': 'description'},
-    {'1': 'default', '3': 5, '4': 1, '5': 8, '10': 'default'},
+    {
+      '1': 'nettype',
+      '3': 5,
+      '4': 1,
+      '5': 14,
+      '6': '.meta.WireguardNettype',
+      '10': 'nettype'
+    },
     {'1': 'port', '3': 6, '4': 1, '5': 13, '10': 'port'},
-    {'1': 'dns_rate_limit', '3': 7, '4': 1, '5': 13, '10': 'dns_rate_limit'},
+    {'1': 'rate_limit_dns', '3': 7, '4': 1, '5': 13, '10': 'rate_limit_dns'},
     {
       '1': 'maximum_connections',
       '3': 8,
@@ -34,11 +56,11 @@ const Wireguard$json = {
       '10': 'maximum_connections'
     },
     {
-      '1': 'outbound_rate_limit',
+      '1': 'rate_limit_outbound',
       '3': 9,
       '4': 1,
       '5': 13,
-      '10': 'outbound_rate_limit'
+      '10': 'rate_limit_outbound'
     },
   ],
 };
@@ -47,10 +69,11 @@ const Wireguard$json = {
 final $typed_data.Uint8List wireguardDescriptor = $convert.base64Decode(
     'CglXaXJlZ3VhcmQSDgoCaWQYASABKAlSAmlkEh4KCmNyZWF0ZWRfYXQYAiABKAlSCmNyZWF0ZW'
     'RfYXQSHgoKdXBkYXRlZF9hdBgDIAEoCVIKdXBkYXRlZF9hdBIgCgtkZXNjcmlwdGlvbhgEIAEo'
-    'CVILZGVzY3JpcHRpb24SGAoHZGVmYXVsdBgFIAEoCFIHZGVmYXVsdBISCgRwb3J0GAYgASgNUg'
-    'Rwb3J0EiYKDmRuc19yYXRlX2xpbWl0GAcgASgNUg5kbnNfcmF0ZV9saW1pdBIwChNtYXhpbXVt'
-    'X2Nvbm5lY3Rpb25zGAggASgEUhNtYXhpbXVtX2Nvbm5lY3Rpb25zEjAKE291dGJvdW5kX3JhdG'
-    'VfbGltaXQYCSABKA1SE291dGJvdW5kX3JhdGVfbGltaXQ=');
+    'CVILZGVzY3JpcHRpb24SMAoHbmV0dHlwZRgFIAEoDjIWLm1ldGEuV2lyZWd1YXJkTmV0dHlwZV'
+    'IHbmV0dHlwZRISCgRwb3J0GAYgASgNUgRwb3J0EiYKDnJhdGVfbGltaXRfZG5zGAcgASgNUg5y'
+    'YXRlX2xpbWl0X2RucxIwChNtYXhpbXVtX2Nvbm5lY3Rpb25zGAggASgEUhNtYXhpbXVtX2Nvbm'
+    '5lY3Rpb25zEjAKE3JhdGVfbGltaXRfb3V0Ym91bmQYCSABKA1SE3JhdGVfbGltaXRfb3V0Ym91'
+    'bmQ=');
 
 @$core.Deprecated('Use wireguardSearchRequestDescriptor instead')
 const WireguardSearchRequest$json = {
@@ -142,11 +165,22 @@ final $typed_data.Uint8List wireguardUpdateResponseDescriptor =
 @$core.Deprecated('Use wireguardTouchRequestDescriptor instead')
 const WireguardTouchRequest$json = {
   '1': 'WireguardTouchRequest',
+  '2': [
+    {
+      '1': 'nettype',
+      '3': 1,
+      '4': 1,
+      '5': 14,
+      '6': '.meta.WireguardNettype',
+      '10': 'nettype'
+    },
+  ],
 };
 
 /// Descriptor for `WireguardTouchRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List wireguardTouchRequestDescriptor =
-    $convert.base64Decode('ChVXaXJlZ3VhcmRUb3VjaFJlcXVlc3Q=');
+final $typed_data.Uint8List wireguardTouchRequestDescriptor = $convert.base64Decode(
+    'ChVXaXJlZ3VhcmRUb3VjaFJlcXVlc3QSMAoHbmV0dHlwZRgBIAEoDjIWLm1ldGEuV2lyZWd1YX'
+    'JkTmV0dHlwZVIHbmV0dHlwZQ==');
 
 @$core.Deprecated('Use wireguardTouchResponseDescriptor instead')
 const WireguardTouchResponse$json = {
@@ -202,11 +236,23 @@ final $typed_data.Uint8List wireguardUploadResponseDescriptor =
 @$core.Deprecated('Use wireguardCurrentRequestDescriptor instead')
 const WireguardCurrentRequest$json = {
   '1': 'WireguardCurrentRequest',
+  '2': [
+    {
+      '1': 'nettype',
+      '3': 1,
+      '4': 1,
+      '5': 14,
+      '6': '.meta.WireguardNettype',
+      '10': 'nettype'
+    },
+  ],
 };
 
 /// Descriptor for `WireguardCurrentRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List wireguardCurrentRequestDescriptor =
-    $convert.base64Decode('ChdXaXJlZ3VhcmRDdXJyZW50UmVxdWVzdA==');
+    $convert.base64Decode(
+        'ChdXaXJlZ3VhcmRDdXJyZW50UmVxdWVzdBIwCgduZXR0eXBlGAEgASgOMhYubWV0YS5XaXJlZ3'
+        'VhcmROZXR0eXBlUgduZXR0eXBl');
 
 @$core.Deprecated('Use wireguardCurrentResponseDescriptor instead')
 const WireguardCurrentResponse$json = {

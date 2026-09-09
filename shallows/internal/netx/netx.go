@@ -11,6 +11,7 @@ import (
 	"sync/atomic"
 
 	"github.com/retrovibed/retrovibed/shallows/internal/atomicx"
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 )
 
 // Dialer missing interface from the net package.
@@ -34,8 +35,8 @@ type DialerProxy struct {
 	ptr *atomic.Pointer[Dialer]
 }
 
-func NewDialerProxy() DialerProxy {
-	var d Dialer = &ErrDialer{}
+func NewDialerProxy(d Dialer) DialerProxy {
+	d = langx.FirstNonNil[Dialer](d, &ErrDialer{})
 	return DialerProxy{ptr: atomicx.PointerPtr(&d)}
 }
 

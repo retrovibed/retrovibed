@@ -17,7 +17,7 @@ void main() {
         GridSettings(
           torrents: ({options = const []}) => Future.value(torrents.TorrentSettings()),
           storage: ({options = const []}) => Future.value(storage.StorageSettingsResponse()),
-          wgcurrent: () => Future.value(wireguard.WireguardCurrentResponse(wireguard: wireguard.Wireguard())),
+          wgcurrent: (nettype) => Future.value(wireguard.WireguardCurrentResponse(wireguard: wireguard.Wireguard())),
           wgupdate:
               (v, {options = const []}) =>
                   Future.value(wireguard.WireguardUpdateResponse(wireguard: wireguard.Wireguard())),
@@ -92,7 +92,7 @@ void main() {
               GridSettings(
                 torrents: ({options = const []}) => Future.value(torrents.TorrentSettings()),
                 storage: ({options = const []}) => Future.value(storage.StorageSettingsResponse()),
-                wgcurrent: () => Future.value(wireguard.WireguardCurrentResponse(wireguard: wireguard.Wireguard())),
+                wgcurrent: (nettype) => Future.value(wireguard.WireguardCurrentResponse(wireguard: wireguard.Wireguard())),
                 wgupdate:
                     (v, {options = const []}) =>
                         Future.value(wireguard.WireguardUpdateResponse(wireguard: wireguard.Wireguard())),
@@ -118,7 +118,7 @@ void main() {
             GridSettings(
               torrents: ({options = const []}) => Future.value(torrents.TorrentSettings()),
               storage: ({options = const []}) => Future.value(storage.StorageSettingsResponse()),
-              wgcurrent: () => Future.value(wireguard.WireguardCurrentResponse(wireguard: wireguard.Wireguard())),
+              wgcurrent: (nettype) => Future.value(wireguard.WireguardCurrentResponse(wireguard: wireguard.Wireguard())),
               wgupdate:
                   (v, {options = const []}) =>
                       Future.value(wireguard.WireguardUpdateResponse(wireguard: wireguard.Wireguard())),

@@ -24,14 +24,14 @@ void main() {
     testWidgets('onChange replaces the matching peer in place', (
       WidgetTester tester,
     ) async {
-      await tester.pumpApp(ListDisplay(search: _mockSearch));
+      await tester.pumpApp(ListDisplay(apisearch: _mockSearch));
       await tester.pumpAndSettle();
 
       final rows = tester.widgetList<ListRow>(find.byType(ListRow)).toList();
       expect(rows.length, 2);
       final target = rows.firstWhere((r) => r.current.id == 'wg-1');
 
-      target.onChange(_wireguard(id: 'wg-1', description: 'Config One Updated'));
+      target.onChange(target.current, _wireguard(id: 'wg-1', description: 'Config One Updated'));
       await tester.pump();
 
       expect(find.text('Config One Updated'), findsOneWidget);
@@ -41,7 +41,7 @@ void main() {
     });
 
     testWidgets('onDelete removes the matching peer', (WidgetTester tester) async {
-      await tester.pumpApp(ListDisplay(search: _mockSearch));
+      await tester.pumpApp(ListDisplay(apisearch: _mockSearch));
       await tester.pumpAndSettle();
 
       final rows = tester.widgetList<ListRow>(find.byType(ListRow)).toList();

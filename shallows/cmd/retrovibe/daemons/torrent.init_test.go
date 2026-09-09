@@ -62,7 +62,7 @@ func newTestTorrenting(t *testing.T, q *sql.DB) _torrenting {
 		_wgdev:           &atomic.Pointer[device.Device]{},
 		_dhts:            &atomic.Pointer[dht.Server]{},
 		_discovery:       &atomic.Pointer[ddisc.Snapshot]{},
-		_dialer:          netx.NewDialerProxy(),
+		_dialer:          netx.NewDialerProxy(nil),
 	}
 }
 
@@ -123,7 +123,7 @@ func TestInit(t *testing.T) {
 			_wgdev:        &atomic.Pointer[device.Device]{},
 			_dhts:         &atomic.Pointer[dht.Server]{},
 			_discovery:    &atomic.Pointer[ddisc.Snapshot]{},
-			_dialer:       netx.NewDialerProxy(),
+			_dialer:       netx.NewDialerProxy(nil),
 		}
 
 		cfg := AutoTorrentSettings(&TorrentSettings{

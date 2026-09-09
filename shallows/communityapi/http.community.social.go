@@ -214,38 +214,27 @@ func (t *HTTPSocial) disable(w http.ResponseWriter, r *http.Request) {
 	communityID, publisherID := vars["communityId"], vars["publisherId"]
 
 	var (
-		existing community.CommunityPublisher
-		found    bool
+		found community.CommunityPublisher
 	)
 
-	enabled := community.CommunityPublisherFindByCommunityID(r.Context(), t.q, communityID)
-	ei := sqlx.Scan(enabled)
-	for cp := range ei.Iter() {
-		if cp.PublisherID == publisherID {
-			existing = cp
-			found = true
-			break
-		}
-	}
-	if err := ei.Err(); err != nil {
+	if err := community.CommunityPublisherFindByCommunityAndPublisherID(r.Context(), t.q, communityID, publisherID).Scan(&found); errors.Is(err, sql.ErrNoRows) {
+		log.Println(errorsx.Wrap(err, "unable to local record"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
+		return
+	} else if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to disable publisher"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 
-	if !found {
-		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
-		return
-	}
-
-	if err := community.CommunityPublisherDeleteByID(r.Context(), t.q, existing.ID).Scan(&existing); err != nil {
+	if err := community.CommunityPublisherDeleteByID(r.Context(), t.q, found.ID).Scan(&found); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to disable publisher"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 
 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &CommunityPublisherDisableResponse{
-		Compub: NewCommunityPublisher(CommunityPublisherOptionFromDB(langx.Clone(existing, timex.JSONSafeEncodeOption))),
+		Compub: NewCommunityPublisher(CommunityPublisherOptionFromDB(langx.Clone(found, timex.JSONSafeEncodeOption))),
 	}); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to write response"))
 		return
