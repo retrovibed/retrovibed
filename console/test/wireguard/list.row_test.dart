@@ -48,29 +48,13 @@ void main() {
         expect(find.text('my vpn'), findsOneWidget);
       });
 
-      testWidgets('shows checkmark when active', (WidgetTester tester) async {
-        await tester.pumpApp(ListRow(_wireguard(), active: true));
-        await tester.pumpAndSettle();
-
-        final opacity = tester.widget<Opacity>(find.byType(Opacity));
-        expect(opacity.opacity, 1.0);
-      });
-
-      testWidgets('hides checkmark when inactive', (WidgetTester tester) async {
-        await tester.pumpApp(ListRow(_wireguard(), active: false));
-        await tester.pumpAndSettle();
-
-        final opacity = tester.widget<Opacity>(find.byType(Opacity));
-        expect(opacity.opacity, 0.1);
-      });
-
-      testWidgets('renders leading widget between checkmark and text', (
+      testWidgets('renders leading widget before text', (
         WidgetTester tester,
       ) async {
         await tester.pumpApp(
           ListRow(
             _wireguard(),
-            leading: Icon(Icons.vpn_key, key: Key('leading')),
+            leading: [Icon(Icons.vpn_key, key: Key('leading'))],
           ),
         );
         await tester.pumpAndSettle();
@@ -84,7 +68,7 @@ void main() {
         await tester.pumpApp(
           ListRow(
             _wireguard(),
-            trailing: Icon(Icons.info, key: Key('trailing')),
+            trailing: [Icon(Icons.info, key: Key('trailing'))],
           ),
         );
         await tester.pumpAndSettle();

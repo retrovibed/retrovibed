@@ -104,6 +104,9 @@ class Retrovibed extends StatelessWidget {
         popupMenuTheme: PopupMenuThemeData(
           mouseCursor: WidgetStateProperty.all(SystemMouseCursors.click),
         ),
+        listTileTheme: ListTileThemeData(
+          mouseCursor: WidgetStateProperty.all(SystemMouseCursors.click),
+        ),
       ),
       themeMode: ThemeMode.dark,
       builder: (context, child) {

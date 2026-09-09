@@ -227,21 +227,21 @@ func WireguardDeleteByID(
 
 func WireguardCurrent(
 	gql genieql.Function,
-	pattern func(ctx context.Context, q sqlx.Queryer) NewWireguardScannerStaticRow,
+	pattern func(ctx context.Context, q sqlx.Queryer, nettype uint32) NewWireguardScannerStaticRow,
 ) {
-	gql = gql.Query(`SELECT ` + WireguardScannerStaticColumns + ` FROM meta_wireguard WHERE "default" LIMIT 1`)
+	gql = gql.Query(`SELECT ` + WireguardScannerStaticColumns + ` FROM meta_wireguard WHERE nettype = {nettype} LIMIT 1`)
 }
 
 func WireguardTouch(
 	gql genieql.Function,
-	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewWireguardScannerStaticRow,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string, nettype uint32) NewWireguardScannerStaticRow,
 ) {
-	gql = gql.Query(`UPDATE meta_wireguard SET "default" = (id = {id}) WHERE "default" OR id = {id} RETURNING ` + WireguardScannerStaticColumns)
+	gql = gql.Query(`UPDATE meta_wireguard SET nettype = CASE WHEN id = {id} THEN {nettype} ELSE 0 END WHERE nettype = {nettype} OR id = {id} RETURNING ` + WireguardScannerStaticColumns)
 }
 
 func WireguardUpdate(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer, a Wireguard) NewWireguardScannerStaticRow,
 ) {
-	gql = gql.Query(`UPDATE meta_wireguard SET description = {a.Description}, port = {a.Port}, dns_rate_limit = {a.DNSRateLimit}, maximum_connections = {a.MaximumConnections}, outbound_rate_limit = {a.OutboundRateLimit} WHERE id = {a.ID} RETURNING ` + WireguardScannerStaticColumns)
+	gql = gql.Query(`UPDATE meta_wireguard SET description = {a.Description}, port = {a.Port}, rate_limit_dns = {a.RateLimitDNS}, maximum_connections = {a.MaximumConnections}, rate_limit_outbound = {a.RateLimitOutbound} WHERE id = {a.ID} RETURNING ` + WireguardScannerStaticColumns)
 }

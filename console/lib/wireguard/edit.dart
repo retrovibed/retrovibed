@@ -9,9 +9,15 @@ import './icons.dart' as wgicons;
 
 class Edit extends StatefulWidget {
   final api.Wireguard current;
-  final Function(api.Wireguard)? onChange;
+  final Future<void> Function(api.Wireguard o, api.Wireguard upd) onChange;
+  final Future<void> Function(api.Wireguard o) onDelete;
 
-  const Edit(this.current, {super.key, this.onChange});
+  const Edit(
+    this.current, {
+    super.key,
+    this.onChange = ds.fnAsyncNoopOnChangeV2,
+    this.onDelete = ds.fnAsyncNoopOnDelete,
+  });
 
   @override
   State<Edit> createState() => _EditState();
@@ -36,12 +42,12 @@ class _EditState extends State<Edit> with LoadingState {
 
   void _onChange(api.Wireguard updated) {
     setState(() {
-      _current = updated;
       loading = true;
     });
 
-    Future.sync(() => widget.onChange?.call(updated))
+    Future.sync(() => widget.onChange(_current, updated))
         .then((_) {
+          _current = updated;
           setState(() => loading = false);
         })
         .catchError((error) {
@@ -64,40 +70,51 @@ class _EditState extends State<Edit> with LoadingState {
     final current = _current;
     return forms.Container(
       cause: cause,
+      padding: defaults.padding,
+      margin: defaults.margin,
       Column(
         mainAxisSize: MainAxisSize.min,
         spacing: defaults.spacing,
         children: [
           forms.Field(
             label: Text("description"),
-            input: Row(
-              children: [
-                Expanded(
-                  child: TextFormField(
-                    initialValue: current.description,
-                    maxLines: 1,
-                    onChanged: (v) => _onChange(current..description = v),
-                  ),
-                ),
-                wgicons.Icons.delete(
-                  current,
-                  onPressed: () async {
-                    final modal = ds.modals.of(context);
-                    modal?.push(
-                      ds.Confirmation.yesNo(
-                        content: Text('Delete ${current.description}?'),
-                        onCancel: (_) => modal.push(null),
-                        onConfirm: (_) {
-                          api.wireguard.delete(current.id).then((_) {
-                            modal.push(null);
-                          });
-                        },
-                      ),
-                    );
-                  },
-                ),
-              ],
+            input: TextFormField(
+              initialValue: current.description,
+              maxLines: 1,
+              onChanged: (v) => _onChange(current..description = v),
             ),
+            trailing: [
+              wgicons.Icons.delete(
+                current,
+                onPressed: () async {
+                  ds.modals.asyncfn(context, (c) {
+                    return ds.Confirmation.yesNo(
+                      content: Text('Delete ${current.description}?'),
+                      onCancel: (_) => c.complete(),
+                      onConfirm: (_) {
+                        api.wireguard
+                            .delete(current.id)
+                            .then((_) {
+                              widget.onDelete(current).then(c.complete);
+                            })
+                            .catchError((error) {
+                              setState(() {
+                                loading = false;
+                                cause = ds.Errors.httpauto(error, onTap: reseterr);
+                              });
+                            }, test: httpx.ErrorsTest.httpauto)
+                            .catchError((error) {
+                              setState(() {
+                                loading = false;
+                                cause = ds.Error.unknown(error, onTap: reseterr);
+                              });
+                            });
+                      },
+                    );
+                  });
+                },
+              ),
+            ],
           ),
           forms.Field(
             label: Text("port"),
@@ -118,28 +135,28 @@ class _EditState extends State<Edit> with LoadingState {
           forms.Field(
             label: Text("dns rate limit"),
             input: inputs.RateLimit(
-              value: current.dnsRateLimit,
+              value: current.rateLimitDns,
               presets: const [
                 (label: '10/sec', value: 10, unit: 'sec'),
                 (label: '100/sec', value: 100, unit: 'sec'),
                 (label: '1000/sec', value: 1000, unit: 'sec'),
               ],
               onChanged: (v) {
-                _onChange(current..dnsRateLimit = v);
+                _onChange(current..rateLimitDns = v);
               },
             ),
           ),
           forms.Field(
             label: Text("outbound rate limit"),
             input: inputs.RateLimit(
-              value: current.outboundRateLimit,
+              value: current.rateLimitOutbound,
               presets: const [
                 (label: '4/sec', value: 4, unit: 'sec'),
                 (label: '10/sec', value: 10, unit: 'sec'),
                 (label: '100/sec', value: 100, unit: 'sec'),
               ],
               onChanged: (v) {
-                _onChange(current..outboundRateLimit = v);
+                _onChange(current..rateLimitOutbound = v);
               },
             ),
           ),
@@ -162,7 +179,7 @@ class _EditState extends State<Edit> with LoadingState {
           forms.Presets<api.Wireguard>(
             current: current,
             presets: [
-              (label: 'ProtonVPN', apply: (w) => w..outboundRateLimit = 2),
+              (label: 'ProtonVPN', apply: (w) => w..rateLimitOutbound = 2),
             ],
             onSelected: _onChange,
           ),

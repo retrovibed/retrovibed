@@ -3,19 +3,23 @@ import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'package:retrovibed/authn.dart' as authn;
-import './meta.wireguard.pb.dart';
-import './api.dart' as api;
-import './list.row.dart';
+import 'package:retrovibed/mimex.dart' as mimex;
+import 'nettype.icon.dart';
+import 'meta.wireguard.pb.dart';
+import 'api.dart' as api;
+import 'list.row.dart';
 
 class ListDisplay extends StatefulWidget {
-  final api.FnWireguardSearch search;
-  final api.FnUploadRequest upload;
+  final api.FnWireguardSearch apisearch;
+  final api.FnUploadRequest apiupload;
+  final api.FnWireguardCurrent apicurrent;
   final TextEditingController? controller;
   final FocusNode? focus;
   const ListDisplay({
     super.key,
-    this.search = api.wireguard.get,
-    this.upload = api.wireguard.upload,
+    this.apisearch = api.wireguard.get,
+    this.apiupload = api.wireguard.upload,
+    this.apicurrent = api.wireguard.current,
     this.controller,
     this.focus,
   });
@@ -25,14 +29,14 @@ class ListDisplay extends StatefulWidget {
 }
 
 class _ListDisplay extends State<ListDisplay> with ds.LoadingState {
-  Wireguard _current = Wireguard();
+  Wireguard _distribution = Wireguard();
   api.WireguardSearchResponse _res = api.wireguard.response(
     next: api.wireguard.request(limit: 32),
   );
 
   Future<void> refresh(api.WireguardSearchRequest req) {
     return widget
-        .search(req)
+        .apisearch(req)
         .then((v) {
           setState(() {
             _res = v;
@@ -67,10 +71,10 @@ class _ListDisplay extends State<ListDisplay> with ds.LoadingState {
     _res.next..query = widget.controller?.text ?? "";
     refresh(_res.next);
     api.wireguard
-        .current()
+        .current(api.WireguardNettype.DISTRIBUTION)
         .then(
           (r) => setState(() {
-            _current = r.wireguard;
+            _distribution = r.wireguard;
           }),
         )
         .catchError((cause) {}, test: httpx.ErrorsTest.err404)
@@ -82,6 +86,7 @@ class _ListDisplay extends State<ListDisplay> with ds.LoadingState {
 
   @override
   Widget build(BuildContext context) {
+    const mimetypes = [mimex.text.plain];
     final defaults = ds.Defaults.of(context);
     final upload =
         (
@@ -101,7 +106,7 @@ class _ListDisplay extends State<ListDisplay> with ds.LoadingState {
                   multiparts.map((fv) {
                     return fv.then((v) {
                       return widget
-                          .upload((req) {
+                          .apiupload((req) {
                             req..files.add(v);
                             return req;
                           })
@@ -109,6 +114,7 @@ class _ListDisplay extends State<ListDisplay> with ds.LoadingState {
                             (v) => api.wireguard
                                 .touch(
                                   v.wireguard.id,
+                                  v.wireguard.nettype,
                                   options: [authn.request(authn.AuthzCache.meta(context))],
                                 )
                                 .then((_) => v),
@@ -116,12 +122,12 @@ class _ListDisplay extends State<ListDisplay> with ds.LoadingState {
                           .then((uploaded) {
                             setState(() {
                               _res.items.add(uploaded.wireguard);
-                              _current = uploaded.wireguard;
+                              _distribution = uploaded.wireguard;
                             });
                           })
-                          .catchError((cause) {
+                          .catchError((c) {
                             setState(() {
-                              cause = ds.Error.unknown(cause, onTap: reseterr);
+                              cause = ds.Error.unknown(c, onTap: reseterr);
                             });
                           });
                     });
@@ -163,6 +169,7 @@ class _ListDisplay extends State<ListDisplay> with ds.LoadingState {
         leading: [
           ds.FileDropWell.icon(
             upload,
+            mimetypes: mimetypes,
             icon: Icons.add,
           ),
         ],
@@ -171,39 +178,41 @@ class _ListDisplay extends State<ListDisplay> with ds.LoadingState {
       children: _res.items,
       empty: ds.FileDropWell(
         upload,
+        margin: defaults.margin,
+        mimetypes: mimetypes,
         child: ds.FileDropWell.textual("drop a wireguard configuration file"),
         shape: RoundedRectangleBorder(borderRadius: defaults.borderRadius),
       ),
       ds.Table.expanded<api.Wireguard>((v) {
-        final onTap = () {
+        final onNettype = (api.WireguardNettype nettype) {
           return api.wireguard
               .touch(
-                _current.id == v.id ? uuidx.max() : v.id,
+                _distribution.id == v.id ? uuidx.max() : v.id,
+                nettype,
                 options: [authn.request(authn.AuthzCache.meta(context))],
               )
               .then((r) {
                 setState(() {
-                  _current = r.wireguard;
+                  _distribution = r.wireguard;
                 });
               })
               .catchError((cause) {
                 setState(() {
-                  _current = Wireguard();
+                  _distribution = Wireguard();
                 });
               }, test: httpx.ErrorsTest.err404)
               .catchError((cause) {
                 print("unexpected wireguard failure ${cause}");
                 setState(() {
-                  _current = Wireguard();
+                  _distribution = Wireguard();
                 });
               });
         };
         return ListRow(
           v,
           key: ValueKey(v.id),
-          active: _current.id == v.id,
-          onTap: onTap,
-          onChange: (upd) {
+          onChange: (_, upd) async {
+            print("DERP DERP ${upd}");
             final updated = api.WireguardSearchResponse(
               items: ds.fnOnChange(_res.items, upd, (wg) => wg.id == upd.id),
               next: _res.next,
@@ -213,7 +222,7 @@ class _ListDisplay extends State<ListDisplay> with ds.LoadingState {
               _res = updated;
             });
           },
-          onDelete: (deleted) {
+          onDelete: (deleted) async {
             final updated = api.WireguardSearchResponse(
               items: ds.fnOnChange(_res.items, null, (wg) => wg.id == deleted.id),
               next: _res.next,
@@ -222,6 +231,9 @@ class _ListDisplay extends State<ListDisplay> with ds.LoadingState {
               _res = updated;
             });
           },
+          leading: [
+            NettypeIcon(v, onTap: onNettype),
+          ],
         );
       }),
     );

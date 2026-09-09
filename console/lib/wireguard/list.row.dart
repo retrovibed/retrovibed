@@ -2,27 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/authn.dart' as authn;
-import './api.dart' as api;
-import './edit.dart';
-import './icon.checkmark.dart';
+import 'api.dart' as api;
+import 'edit.dart';
 
 class ListRow extends StatelessWidget {
   final api.Wireguard current;
-  final bool active;
-  final Widget leading;
-  final Widget trailing;
+  final List<Widget> leading;
+  final List<Widget> trailing;
 
   final Future<void> Function()? onTap;
-  final void Function(api.Wireguard upd) onChange;
-  final void Function(api.Wireguard upd) onDelete;
+  final Future<void> Function(api.Wireguard o, api.Wireguard upd) onChange;
+  final Future<void> Function(api.Wireguard o) onDelete;
   const ListRow(
     this.current, {
     super.key,
-    this.active = false,
-    this.leading = const SizedBox.shrink(),
-    this.trailing = const SizedBox.shrink(),
-    this.onChange = ds.fnNoop,
-    this.onDelete = ds.fnNoop,
+    this.leading = const [],
+    this.trailing = const [],
+    this.onChange = ds.fnAsyncNoopOnChangeV2,
+    this.onDelete = ds.fnAsyncNoopOnDelete,
     this.onTap,
   });
 
@@ -32,7 +29,7 @@ class ListRow extends StatelessWidget {
       key: ValueKey(current.id),
       expanded: Edit(
         current,
-        onChange: (upd) {
+        onChange: (o, upd) {
           return httpx
               .withRetry(
                 () => api.wireguard.update(
@@ -41,27 +38,28 @@ class ListRow extends StatelessWidget {
                 ),
               )
               .then((resp) {
-                if (resp.wireguard.default_5) {
-                  return httpx.withRetry(
-                    () => api.wireguard
-                        .touch(
-                          resp.wireguard.id,
-                          options: [authn.request(authn.AuthzCache.meta(context))],
-                        )
-                        .then((_) => resp),
-                  );
+                if (resp.wireguard.nettype == api.WireguardNettype.UNSPECIFIED) {
+                  return Future.value(resp);
                 }
 
-                return Future.value(resp);
+                return httpx.withRetry(
+                  () => api.wireguard
+                      .touch(
+                        resp.wireguard.id,
+                        resp.wireguard.nettype,
+                        options: [authn.request(authn.AuthzCache.meta(context))],
+                      )
+                      .then((_) => resp),
+                );
               })
               .then((resp) {
-                onChange(resp.wireguard);
+                onChange(current, resp.wireguard);
               });
         },
+        onDelete: onDelete,
       ),
       [
-        IconCheckmark(active, onTap: onTap),
-        leading,
+        ...leading,
         Expanded(
           child: Text(
             current.description,
@@ -69,7 +67,7 @@ class ListRow extends StatelessWidget {
             maxLines: 1,
           ),
         ),
-        trailing,
+        ...trailing,
       ],
     );
   }

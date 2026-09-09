@@ -21,6 +21,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/internal/debugx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/envx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/httpx"
+	"github.com/retrovibed/retrovibed/retroapi/internal/langx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/md5x"
 	"github.com/retrovibed/retrovibed/retroapi/internal/oauth2x"
 	"github.com/retrovibed/retrovibed/retroapi/internal/sshx"
@@ -50,8 +51,18 @@ func NoRedirectFn(req *http.Request, via []*http.Request) error {
 	return nil
 }
 
-func HTTPClientDefaults() *http.Client {
-	return &http.Client{
+// ClientOption customizes the http.Client returned by AutoJWTClient and
+// friends.
+type ClientOption = httpx.ClientOption
+
+// ClientOptionDialer routes the client's traffic through the provided
+// dialer, e.g. a proxy dialer that later swaps onto a wireguard tunnel.
+func ClientOptionDialer(d httpx.Dialer) ClientOption {
+	return httpx.ClientOptionDialer(d)
+}
+
+func HTTPClientDefaults(options ...httpx.ClientOption) *http.Client {
+	c := langx.Clone(http.Client{
 		Transport: &http.Transport{
 			Proxy:                 http.ProxyFromEnvironment,
 			ForceAttemptHTTP2:     true,
@@ -62,7 +73,8 @@ func HTTPClientDefaults() *http.Client {
 			TLSClientConfig:       &tls.Config{ServerName: env.Deeppool(), InsecureSkipVerify: InsecureSkipVerify()},
 		},
 		CheckRedirect: NoRedirectFn,
-	}
+	}, options...)
+	return &c
 }
 
 func HTTPClientLocalDefaults(cfg *tls.Config) *http.Client {
@@ -118,10 +130,10 @@ func UserDisplayName() string {
 	return stringsx.FirstNonBlank(u.Name, u.Username)
 }
 
-func Oauth2DeeppoolHTTPClientWithEndpoint(ctx context.Context, signer ssh.Signer, endpoint oauth2.Endpoint) (*http.Client, error) {
+func Oauth2DeeppoolHTTPClientWithEndpoint(ctx context.Context, signer ssh.Signer, endpoint oauth2.Endpoint, options ...httpx.ClientOption) (*http.Client, error) {
 	cfg := oauth2SSHConfig(signer, "", endpoint)
 
-	c := HTTPClientDefaults()
+	c := HTTPClientDefaults(options...)
 
 	token, err := oauth2Bearer(ctx, signer, c, cfg, "", "")
 	if err != nil {
@@ -131,8 +143,8 @@ func Oauth2DeeppoolHTTPClientWithEndpoint(ctx context.Context, signer ssh.Signer
 	return cfg.Client(context.WithValue(ctx, oauth2.HTTPClient, c), token), nil
 }
 
-func Oauth2DeeppoolHTTPClient(ctx context.Context, signer ssh.Signer) (*http.Client, error) {
-	return Oauth2DeeppoolHTTPClientWithEndpoint(ctx, signer, DeeppoolEndpoint())
+func Oauth2DeeppoolHTTPClient(ctx context.Context, signer ssh.Signer, options ...httpx.ClientOption) (*http.Client, error) {
+	return Oauth2DeeppoolHTTPClientWithEndpoint(ctx, signer, DeeppoolEndpoint(), options...)
 }
 
 func SSHSigner() (ssh.Signer, error) {

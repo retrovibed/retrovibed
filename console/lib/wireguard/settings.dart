@@ -75,14 +75,14 @@ class _SettingsState extends State<Settings> {
           forms.Field(
             label: Text("dns rate limit"),
             input: inputs.RateLimit(
-              value: current.dnsRateLimit,
+              value: current.rateLimitDns,
               presets: [
                 (label: '10/sec', value: 10, unit: 'sec'),
                 (label: '100/sec', value: 100, unit: 'sec'),
                 (label: '1000/sec', value: 1000, unit: 'sec'),
               ],
               onChanged: (v) {
-                final updated = current..dnsRateLimit = v;
+                final updated = current..rateLimitDns = v;
                 setState(() => current = updated);
                 widget.onChange?.call(updated);
               },

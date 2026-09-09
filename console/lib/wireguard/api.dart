@@ -13,7 +13,7 @@ typedef FnUploadRequest =
       http.MultipartRequest Function(http.MultipartRequest req) mkreq,
     );
 
-typedef FnWireguardCurrent = Future<WireguardCurrentResponse> Function();
+typedef FnWireguardCurrent = Future<WireguardCurrentResponse> Function(WireguardNettype nettype);
 typedef FnWireguardUpdate = Future<WireguardUpdateResponse> Function(Wireguard wg, {List<httpx.Option> options});
 
 abstract class wireguard {
@@ -101,21 +101,33 @@ abstract class wireguard {
 
   // activate the specified wireguard configuration.
   static Future<WireguardTouchResponse> touch(
-    String id, {
+    String id,
+    WireguardNettype nettype, {
     List<httpx.Option> options = const [],
   }) async {
-    return httpx.put(Uri.https(httpx.host(), "/wireguard/${id}"), options: options).then(httpx.auto_error).then((v) {
-      return Future.value(
-        httpx.fromProto3JsonSafe(WireguardTouchResponse.create(), jsonDecode(v.body)),
-      );
-    });
+    return httpx
+        .put(
+          Uri.https(httpx.host(), "/wireguard/${id}"),
+          body: jsonEncode(WireguardTouchRequest(nettype: nettype).toProto3Json()),
+          options: options,
+        )
+        .then(httpx.auto_error)
+        .then((v) {
+          return Future.value(
+            httpx.fromProto3JsonSafe(WireguardTouchResponse.create(), jsonDecode(v.body)),
+          );
+        });
   }
 
-  static Future<WireguardCurrentResponse> current() async {
+  static Future<WireguardCurrentResponse> current(WireguardNettype nettype) async {
     final client = http.Client();
     return client
         .get(
-          Uri.https(httpx.host(), "/wireguard/current"),
+          Uri.https(
+            httpx.host(),
+            "/wireguard/current",
+            jsonDecode(jsonEncode(WireguardCurrentRequest(nettype: nettype).toProto3Json())),
+          ),
           headers: {"Authorization": httpx.auto_bearer_host()},
         )
         .then(httpx.auto_error)

@@ -73,7 +73,7 @@ void main() {
           Scaffold(
             body: Edit(
               _wireguard(),
-              onChange: (wg) => changed = wg,
+              onChange: (o, wg) async => changed = wg,
             ),
           ),
         );
@@ -95,7 +95,7 @@ void main() {
           Scaffold(
             body: Edit(
               _wireguard(),
-              onChange: (wg) => changed = wg,
+              onChange: (o, wg) async => changed = wg,
             ),
           ),
         );
@@ -117,7 +117,7 @@ void main() {
           Scaffold(
             body: Edit(
               _wireguard(),
-              onChange: (wg) => changed = wg,
+              onChange: (o, wg) async => changed = wg,
             ),
           ),
         );
@@ -129,7 +129,7 @@ void main() {
         expect(changed, isNull);
       });
 
-      testWidgets('handles onChange being null', (WidgetTester tester) async {
+      testWidgets('handles default onChange', (WidgetTester tester) async {
         await tester.pumpApp(
           Scaffold(body: Edit(_wireguard())),
         );

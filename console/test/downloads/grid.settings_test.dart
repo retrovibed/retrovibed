@@ -14,7 +14,7 @@ void main() {
         GridSettings(
           media.discoveredsearch.request(limit: 32),
           onChange: (_) {},
-          wgcurrent: () async {
+          wgcurrent: (nettype) async {
             return wireguard_api.WireguardCurrentResponse.create()
               ..wireguard = wireguard_api.Wireguard();
           },

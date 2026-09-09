@@ -15,6 +15,10 @@ const binary = "application/octet-stream";
 const directory = "inode/directory";
 const pdf = "application/pdf";
 
+abstract class text {
+  static const String plain = "text/plain";
+}
+
 final resolver = mimetype.MimeTypeResolver()..addMagicNumber([0x4F, 0x67, 0x67, 0x53], "video/ogg");
 
 String fromFile(String s, {List<int>? magicbits}) {

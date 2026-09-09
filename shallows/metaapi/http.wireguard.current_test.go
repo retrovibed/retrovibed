@@ -42,7 +42,7 @@ func TestHTTPWireguardCurrent(t *testing.T) {
 				meta.NewWireguard(
 					testx.Must(uuid.NewV4())(t).String(),
 					meta.WireguardOptionDescription("test"),
-					meta.WireguardOptionDefault,
+					meta.WireguardOptionDistribution,
 				),
 			).Scan(&wg),
 		)
@@ -50,7 +50,6 @@ func TestHTTPWireguardCurrent(t *testing.T) {
 		tmpdir := fsx.DirVirtual(t.TempDir())
 		path := wg.ID
 		require.NoError(t, os.WriteFile(tmpdir.Path(path), testx.IOBytes(testx.Read(testx.Fixture("wireguard", "example.1.conf"))), 0600))
-		// require.NoError(t, os.Symlink(tmpdir.Path(path), tmpdir.Path(wireguardx.Current)))
 
 		routes := mux.NewRouter()
 
@@ -62,7 +61,7 @@ func TestHTTPWireguardCurrent(t *testing.T) {
 
 		claims = jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
 
-		resp, req, err := httptestx.BuildRequestContextBytes(ctx, http.MethodGet, "/current", nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
+		resp, req, err := httptestx.BuildRequestContextBytes(ctx, http.MethodGet, "/current?nettype=1", nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
 		require.NoError(t, err)
 
 		routes.ServeHTTP(resp, req)
@@ -95,6 +94,49 @@ func TestHTTPWireguardCurrent(t *testing.T) {
 
 		claims = jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
 
+		resp, req, err := httptestx.BuildRequestContextBytes(ctx, http.MethodGet, "/current?nettype=1", nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
+		require.NoError(t, err)
+
+		routes.ServeHTTP(resp, req)
+
+		require.Error(t, httpx.ErrorCode(resp.Result()))
+		require.Equal(t, http.StatusNotFound, resp.Code)
+	})
+
+	t.Run("noncurrent nettype", func(t *testing.T) {
+		var (
+			claims jwt.RegisteredClaims
+			wg     meta.Wireguard
+		)
+
+		ctx, done := testx.Context(t)
+		defer done()
+
+		q := sqltestx.Metadatabase(t)
+
+		wg = meta.NewWireguard(
+			testx.Must(uuid.NewV4())(t).String(),
+			meta.WireguardOptionDescription("test"),
+		)
+		wg.Nettype = meta.WireguardNetworkRingDistribution
+
+		require.NoError(
+			t,
+			meta.WireguardInsertWithDefaults(ctx, q, wg).Scan(&wg),
+		)
+
+		tmpdir := fsx.DirVirtual(t.TempDir())
+
+		routes := mux.NewRouter()
+
+		metaapi.NewHTTPWireguard(
+			tmpdir.Path(),
+			q,
+			metaapi.HTTPWireguardOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+		).Bind(routes.PathPrefix("/").Subrouter())
+
+		claims = jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
+
 		resp, req, err := httptestx.BuildRequestContextBytes(ctx, http.MethodGet, "/current", nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
 		require.NoError(t, err)
 
@@ -102,5 +144,120 @@ func TestHTTPWireguardCurrent(t *testing.T) {
 
 		require.Error(t, httpx.ErrorCode(resp.Result()))
 		require.Equal(t, http.StatusNotFound, resp.Code)
+	})
+
+	t.Run("missing configuration", func(t *testing.T) {
+		var (
+			claims jwt.RegisteredClaims
+			wg     meta.Wireguard
+		)
+
+		ctx, done := testx.Context(t)
+		defer done()
+
+		q := sqltestx.Metadatabase(t)
+
+		require.NoError(
+			t,
+			meta.WireguardInsertWithDefaults(
+				ctx,
+				q,
+				meta.NewWireguard(
+					testx.Must(uuid.NewV4())(t).String(),
+					meta.WireguardOptionDescription("test"),
+					meta.WireguardOptionDistribution,
+				),
+			).Scan(&wg),
+		)
+
+		tmpdir := fsx.DirVirtual(t.TempDir())
+
+		routes := mux.NewRouter()
+
+		metaapi.NewHTTPWireguard(
+			tmpdir.Path(),
+			q,
+			metaapi.HTTPWireguardOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+		).Bind(routes.PathPrefix("/").Subrouter())
+
+		claims = jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
+
+		resp, req, err := httptestx.BuildRequestContextBytes(ctx, http.MethodGet, "/current?nettype=1", nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
+		require.NoError(t, err)
+
+		routes.ServeHTTP(resp, req)
+
+		require.Error(t, httpx.ErrorCode(resp.Result()))
+		require.Equal(t, http.StatusBadRequest, resp.Code)
+	})
+
+	t.Run("invalid configuration", func(t *testing.T) {
+		var (
+			claims jwt.RegisteredClaims
+			wg     meta.Wireguard
+		)
+
+		ctx, done := testx.Context(t)
+		defer done()
+
+		q := sqltestx.Metadatabase(t)
+
+		require.NoError(
+			t,
+			meta.WireguardInsertWithDefaults(
+				ctx,
+				q,
+				meta.NewWireguard(
+					testx.Must(uuid.NewV4())(t).String(),
+					meta.WireguardOptionDescription("test"),
+					meta.WireguardOptionDistribution,
+				),
+			).Scan(&wg),
+		)
+
+		tmpdir := fsx.DirVirtual(t.TempDir())
+		require.NoError(t, os.WriteFile(tmpdir.Path(wg.ID), []byte("garbage\n"), 0600))
+
+		routes := mux.NewRouter()
+
+		metaapi.NewHTTPWireguard(
+			tmpdir.Path(),
+			q,
+			metaapi.HTTPWireguardOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+		).Bind(routes.PathPrefix("/").Subrouter())
+
+		claims = jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
+
+		resp, req, err := httptestx.BuildRequestContextBytes(ctx, http.MethodGet, "/current?nettype=1", nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
+		require.NoError(t, err)
+
+		routes.ServeHTTP(resp, req)
+
+		require.Error(t, httpx.ErrorCode(resp.Result()))
+		require.Equal(t, http.StatusBadRequest, resp.Code)
+	})
+
+	t.Run("unauthorized", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		q := sqltestx.Metadatabase(t)
+
+		tmpdir := fsx.DirVirtual(t.TempDir())
+
+		routes := mux.NewRouter()
+
+		metaapi.NewHTTPWireguard(
+			tmpdir.Path(),
+			q,
+			metaapi.HTTPWireguardOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+		).Bind(routes.PathPrefix("/").Subrouter())
+
+		resp, req, err := httptestx.BuildRequestContextBytes(ctx, http.MethodGet, "/current?nettype=1", nil)
+		require.NoError(t, err)
+
+		routes.ServeHTTP(resp, req)
+
+		require.Equal(t, http.StatusUnauthorized, resp.Code)
 	})
 }

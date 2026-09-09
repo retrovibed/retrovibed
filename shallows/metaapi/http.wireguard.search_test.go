@@ -19,6 +19,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/retrovibed/retrovibed/shallows/metaapi"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -35,12 +36,13 @@ func TestHTTPWireguardSearch(t *testing.T) {
 
 		q := sqltestx.Metadatabase(t)
 
+		require.NoError(t, testx.Fake(&wg, meta.WireguardOptionTestDefauts, meta.WireguardOptionDescription("test")))
 		require.NoError(
 			t,
 			meta.WireguardInsertWithDefaults(
 				ctx,
 				q,
-				meta.NewWireguard(testx.Must(uuid.NewV4())(t).String(), meta.WireguardOptionDescription("test")),
+				wg,
 			).Scan(&wg),
 		)
 
@@ -73,9 +75,12 @@ func TestHTTPWireguardSearch(t *testing.T) {
 		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
 		require.Equal(t, len(result.Items), 1)
-		require.Equal(t, result.Items[0].Id, wg.ID)
-		require.False(t, result.Items[0].Default)
-		require.Equal(t, result.Items[0].Description, wg.Description)
+		assert.EqualValues(t, result.Items[0].Id, wg.ID)
+		assert.EqualValues(t, result.Items[0].Nettype, wg.Nettype)
+		assert.EqualValues(t, result.Items[0].Description, wg.Description)
+		assert.EqualValues(t, result.Items[0].MaximumConnections, wg.MaximumConnections)
+		assert.EqualValues(t, result.Items[0].RateLimitDns, wg.RateLimitDNS)
+		assert.EqualValues(t, result.Items[0].RateLimitOutbound, wg.RateLimitOutbound)
 	})
 
 	t.Run("zero state", func(t *testing.T) {

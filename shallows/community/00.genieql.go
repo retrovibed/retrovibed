@@ -435,6 +435,13 @@ func CommunityPublisherFindByCommunityID(
 	gql = gql.Query(`SELECT ` + CommunityPublisherScannerStaticColumns + ` FROM community_publisher WHERE "community_id" = {communityID}`)
 }
 
+func CommunityPublisherFindByCommunityAndPublisherID(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, cid, pid string) NewCommunityPublisherScannerStaticRow,
+) {
+	gql = gql.Query(`SELECT ` + CommunityPublisherScannerStaticColumns + ` FROM community_publisher WHERE "community_id" = {cid} AND "publisher_id" = {pid}`)
+}
+
 func CommunityPublisherFindByID(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewCommunityPublisherScannerStaticRow,

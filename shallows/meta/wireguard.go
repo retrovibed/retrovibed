@@ -4,9 +4,19 @@ import (
 	"context"
 
 	"github.com/Masterminds/squirrel"
+	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/squirrelx"
+)
+
+type WireguardNetworkRing uint32
+
+const (
+	WireguardNetworkRingUnspecified uint32 = iota
+	WireguardNetworkRingDistribution
+	WireguardNetworkRingSocial
+	WireguardNetworkRingMax
 )
 
 func WireguardSearch(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilder) WireguardScanner {
@@ -23,26 +33,35 @@ func WireguardOptionDescription(s string) func(*Wireguard) {
 	}
 }
 
-func WireguardOptionDefault(w *Wireguard) {
-	w.Default = true
+func WireguardOptionAutoID(w *Wireguard) {
+	w.ID = uuid.Must(uuid.NewV4()).String()
+}
+
+func WireguardOptionDistribution(w *Wireguard) {
+	w.Nettype = WireguardNetworkRingDistribution
 }
 
 func WireguardOptionDNSRateLimit(n uint32) func(*Wireguard) {
 	return func(w *Wireguard) {
-		w.DNSRateLimit = n
+		w.RateLimitDNS = n
 	}
 }
 
 func WireguardOptionOutboundRateLimit(n uint32) func(*Wireguard) {
 	return func(w *Wireguard) {
-		w.OutboundRateLimit = n
+		w.RateLimitOutbound = n
 	}
+}
+
+func WireguardOptionTestDefauts(w *Wireguard) {
+	w.ID = uuid.Must(uuid.NewV4()).String()
+	w.Nettype = w.Nettype % (WireguardNetworkRingMax)
 }
 
 func NewWireguard(uid string, options ...func(*Wireguard)) Wireguard {
 	return langx.Clone(Wireguard{
 		ID:          uid,
 		Description: "",
-		Default:     false,
+		Nettype:     WireguardNetworkRingUnspecified,
 	}, options...)
 }

@@ -24,7 +24,8 @@ class FileDropWell extends StatefulWidget {
   final Widget child;
   final Widget? loading;
   final Function()? onTap;
-  final EdgeInsets? margin;
+  final EdgeInsets margin;
+  final EdgeInsets padding;
   final Future<Widget?> Function(
     FilesEvent i, {
     ValueNotifier<int>? progress,
@@ -53,7 +54,8 @@ class FileDropWell extends StatefulWidget {
     this.extensions = const [],
     this.onTap,
     this.loading,
-    this.margin,
+    this.margin = EdgeInsets.zero,
+    this.padding = EdgeInsets.zero,
     this.help = ds.HelpScope.None,
     this.tooltip,
     this.shape,
@@ -209,6 +211,7 @@ class _FileDropWell extends State<FileDropWell> {
           child: Container(
             color: _dragging ? theme.highlightColor : null,
             margin: widget.margin,
+            padding: widget.padding,
             child: ds.LoadingIconButton(
               onPressed: onPress,
               icon: widget.child,
