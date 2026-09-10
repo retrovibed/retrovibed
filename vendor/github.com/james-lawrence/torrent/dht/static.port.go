@@ -49,18 +49,6 @@ func AutoDetectIP(ctx context.Context, sc *Server, b Binding, id int160.T, besta
 			return m, errorsx.Ignore(detect.Err(), context.DeadlineExceeded)
 		}
 
-		sleep := func(d time.Duration) bool {
-			t := time.NewTimer(d)
-			defer t.Stop()
-
-			select {
-			case <-t.C:
-				return true
-			case <-ctx.Done():
-				return false
-			}
-		}
-
 		for {
 			if ctx.Err() != nil {
 				return
@@ -71,7 +59,9 @@ func AutoDetectIP(ctx context.Context, sc *Server, b Binding, id int160.T, besta
 					return
 				}
 
-				if !sleep(time.Second) {
+				select {
+				case <-time.After(time.Second):
+				case <-ctx.Done():
 					return
 				}
 				continue
@@ -90,13 +80,17 @@ func AutoDetectIP(ctx context.Context, sc *Server, b Binding, id int160.T, besta
 			}
 
 			if len(m) == 0 {
-				if !sleep(shortretry) {
+				select {
+				case <-time.After(shortretry):
+				case <-ctx.Done():
 					return
 				}
 				continue
 			}
 
-			if !sleep(lease) {
+			select {
+			case <-time.After(lease):
+			case <-ctx.Done():
 				return
 			}
 		}

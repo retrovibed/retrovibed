@@ -99,6 +99,7 @@ func (t SyncPublishedBackgroundWorker) Message(ctx context.Context, m []byte) (e
 		known library.Known
 	)
 
+	log.Println("DERP DERP 1", string(m))
 	if err = jsonx.Unmarshal(m, &decoded); err != nil {
 		return err
 	}

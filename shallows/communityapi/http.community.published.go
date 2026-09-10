@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/Masterminds/squirrel"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/go-playground/form/v4"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
@@ -147,6 +148,7 @@ func (t *HTTPPublished) tombstoned(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Println("DERP DERP 0", spew.Sdump(pc))
 	if err := pqueuex.Enqueue(r.Context(), t.publishq, langx.Clone(pc, timex.JSONSafeEncodeOption)); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to queue published content deletion"))
 	}
