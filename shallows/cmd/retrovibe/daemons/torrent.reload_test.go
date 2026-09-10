@@ -15,12 +15,15 @@ func TestReload(t *testing.T) {
 		tr := newTestTorrenting(t, q)
 
 		ctx, cancel := context.WithCancel(t.Context())
-		defer cancel()
 
 		cfg := AutoTorrentSettings(&TorrentSettings{})
 		disc := &DiscoverySettings{}
 
 		require.NoError(t, tr.Reload(ctx, cfg, disc))
+		defer func() {
+			cancel()
+			<-tr.Stopped()
+		}()
 	})
 
 	t.Run("initializes client asynchronously", func(t *testing.T) {
@@ -28,12 +31,15 @@ func TestReload(t *testing.T) {
 		tr := newTestTorrenting(t, q)
 
 		ctx, cancel := context.WithCancel(t.Context())
-		defer cancel()
 
 		cfg := AutoTorrentSettings(&TorrentSettings{})
 		disc := &DiscoverySettings{}
 
 		require.NoError(t, tr.Reload(ctx, cfg, disc))
+		defer func() {
+			cancel()
+			<-tr.Stopped()
+		}()
 
 		require.Eventually(t, func() bool {
 			return tr._tclient.Load() != nil
@@ -45,12 +51,15 @@ func TestReload(t *testing.T) {
 		tr := newTestTorrenting(t, q)
 
 		ctx, cancel := context.WithCancel(t.Context())
-		defer cancel()
 
 		cfg := AutoTorrentSettings(&TorrentSettings{})
 		disc := &DiscoverySettings{}
 
 		require.NoError(t, tr.Reload(ctx, cfg, disc))
+		defer func() {
+			cancel()
+			<-tr.Stopped()
+		}()
 
 		// wait for first init to complete
 		require.Eventually(t, func() bool {
@@ -92,5 +101,7 @@ func TestReload(t *testing.T) {
 			tr.cond.Broadcast()
 			return tr._tclient.Load() != first
 		}, time.Second, 50*time.Millisecond)
+
+		<-tr.Stopped()
 	})
 }

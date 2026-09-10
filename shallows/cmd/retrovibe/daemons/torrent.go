@@ -140,6 +140,7 @@ type _torrenting struct {
 	_discovery       *atomic.Pointer[ddisc.Snapshot]
 	_dialer          netx.DialerProxy
 	cond             *sync.Cond
+	_reloadStopped   chan struct{}
 }
 
 func (t _torrenting) loadcfg(path string, v proto.Message) error {
@@ -198,7 +199,17 @@ func (t *_torrenting) DiscoverySnapshot() (ddisc.Snapshot, error) {
 }
 
 func (t *_torrenting) Reload(ctx context.Context, cfg *TorrentSettings, disc *DiscoverySettings) error {
+	t._reloadStopped = make(chan struct{})
+
+	// wake the blocked cond.Wait() below when ctx is cancelled, so the
+	// loop's existing ctx.Done() check (after Wait returns) can fire.
 	go func() {
+		<-ctx.Done()
+		t.cond.Broadcast()
+	}()
+
+	go func() {
+		defer close(t._reloadStopped)
 		limiter := rate.NewLimiter(rate.Every(5*time.Second), 1)
 		for {
 			var (
@@ -267,6 +278,13 @@ func (t *_torrenting) Reload(ctx context.Context, cfg *TorrentSettings, disc *Di
 	}()
 
 	return nil
+}
+
+// Stopped reports when the reload loop goroutine has exited (e.g. after
+// the context passed to Reload is cancelled). Callers that need
+// deterministic shutdown — tests in particular — should wait on it.
+func (t *_torrenting) Stopped() <-chan struct{} {
+	return t._reloadStopped
 }
 
 func (t *_torrenting) Broadcast() {
