@@ -49,13 +49,31 @@ func AutoDetectIP(ctx context.Context, sc *Server, b Binding, id int160.T, besta
 			return m, errorsx.Ignore(detect.Err(), context.DeadlineExceeded)
 		}
 
+		sleep := func(d time.Duration) bool {
+			t := time.NewTimer(d)
+			defer t.Stop()
+
+			select {
+			case <-t.C:
+				return true
+			case <-ctx.Done():
+				return false
+			}
+		}
+
 		for {
+			if ctx.Err() != nil {
+				return
+			}
+
 			if gnodes := sc.numGoodNodes(); gnodes < minK {
 				if !yield(b.AddrPort()) {
 					return
 				}
 
-				time.Sleep(time.Second)
+				if !sleep(time.Second) {
+					return
+				}
 				continue
 			}
 
@@ -72,11 +90,15 @@ func AutoDetectIP(ctx context.Context, sc *Server, b Binding, id int160.T, besta
 			}
 
 			if len(m) == 0 {
-				time.Sleep(shortretry)
+				if !sleep(shortretry) {
+					return
+				}
 				continue
 			}
 
-			time.Sleep(lease)
+			if !sleep(lease) {
+				return
+			}
 		}
 	}, nil
 }

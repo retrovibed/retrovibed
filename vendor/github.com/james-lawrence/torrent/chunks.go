@@ -810,7 +810,7 @@ func copRequestPool(c *chunks) *roaring.Bitmap {
 		return c.missing
 	}
 
-	if float64(c.pieces-c.completed.GetCardinality())/float64(c.pieces) > 0.15 {
+	if float64(c.pieces-c.completed.GetCardinality())/float64(c.pieces) > 0.05 {
 		return c.missing
 	}
 
