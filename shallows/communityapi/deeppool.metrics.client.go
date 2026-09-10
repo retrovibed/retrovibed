@@ -49,6 +49,31 @@ func (t Metrics) Sync(ctx context.Context, communityID string) (*MetricsSyncResp
 	return &msg, nil
 }
 
+func (t Metrics) Delete(ctx context.Context, id string) (*PublishContentDeleteResponse, error) {
+	var (
+		err  error
+		req  *http.Request
+		resp *http.Response
+		msg  PublishContentDeleteResponse
+	)
+
+	uri := fmt.Sprintf("https://%s/p/%s", t.endpoint, id)
+	if req, err = http.NewRequestWithContext(ctx, http.MethodDelete, uri, nil); err != nil {
+		return nil, err
+	}
+
+	if resp, err = httpx.AsError(t.c.Do(req)); err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if err = jsonx.UnmarshalRead(resp.Body, &msg); err != nil {
+		return nil, err
+	}
+
+	return &msg, nil
+}
+
 func (t Metrics) Publish(ctx context.Context, content *PublishContentRequest, torrent io.Reader) (*PublishContentResponse, error) {
 	var (
 		err  error

@@ -24,8 +24,9 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 )
 
-type MetricsPublisher interface {
+type Publisher interface {
 	Publish(ctx context.Context, req *PublishContentRequest, torrent io.Reader) (*PublishContentResponse, error)
+	Delete(ctx context.Context, id string) (*PublishContentDeleteResponse, error)
 }
 
 func magnetURI(tmd tracking.Metadata, name string) string {

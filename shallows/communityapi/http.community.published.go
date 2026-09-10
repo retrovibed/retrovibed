@@ -147,6 +147,10 @@ func (t *HTTPPublished) tombstoned(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if err := pqueuex.Enqueue(r.Context(), t.publishq, langx.Clone(pc, timex.JSONSafeEncodeOption)); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to queue published content deletion"))
+	}
+
 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &PublishContentDeleteResponse{
 		PublishedContent: new(
 			langx.Clone(

@@ -18,15 +18,17 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/library"
 )
 
 func NewSyncPublishedBackgroundWorker(
 	q sqlx.Queryer,
 	httpc *http.Client,
-	metrics MetricsPublisher,
+	metrics Publisher,
 	publisher FeedPublisher,
 	publishers publishplugin.T,
 	archiver library.Archiver,
@@ -48,7 +50,7 @@ func NewSyncPublishedBackgroundWorker(
 type SyncPublishedBackgroundWorker struct {
 	q          sqlx.Queryer
 	httpc      *http.Client
-	metrics    MetricsPublisher
+	metrics    Publisher
 	publisher  FeedPublisher
 	publishers publishplugin.T
 	archiver   library.Archiver
@@ -99,6 +101,15 @@ func (t SyncPublishedBackgroundWorker) Message(ctx context.Context, m []byte) (e
 
 	if err = jsonx.Unmarshal(m, &decoded); err != nil {
 		return err
+	}
+	decoded = langx.Clone(decoded, timex.JSONSafeDecodeOption)
+
+	if !decoded.TombstonedAt.Equal(timex.Inf()) {
+		if _, err := t.metrics.Delete(ctx, decoded.ID); err != nil {
+			return errorsx.Wrap(err, "failed to delete from deeppool")
+		}
+		log.Printf("deleted published content %s from deeppool", decoded.ID)
+		return nil
 	}
 
 	if err := library.MetadataFindByID(ctx, t.q, decoded.LibraryID).Scan(&lmd); err != nil {

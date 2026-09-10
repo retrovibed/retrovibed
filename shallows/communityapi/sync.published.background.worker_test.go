@@ -33,11 +33,17 @@ import (
 
 type mockMetrics struct {
 	published []*PublishContentRequest
+	deleted   []string
 }
 
 func (m *mockMetrics) Publish(ctx context.Context, req *PublishContentRequest, torrent io.Reader) (*PublishContentResponse, error) {
 	m.published = append(m.published, req)
 	return &PublishContentResponse{}, nil
+}
+
+func (m *mockMetrics) Delete(ctx context.Context, id string) (*PublishContentDeleteResponse, error) {
+	m.deleted = append(m.deleted, id)
+	return &PublishContentDeleteResponse{}, nil
 }
 
 type mockFeedPublisher struct {

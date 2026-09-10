@@ -34,9 +34,7 @@ message PublishContentResponse {
   PublishedContent published_content = 1 [ json_name = "published_content" ];
 }
 
-message PublishContentDeleteRequest {
-  PublishedContent published_content = 1 [ json_name = "published_content" ];
-}
+message PublishContentDeleteRequest {}
 
 message PublishContentDeleteResponse {
   PublishedContent published_content = 1 [ json_name = "published_content" ];
