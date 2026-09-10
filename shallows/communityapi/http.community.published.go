@@ -133,7 +133,7 @@ func (t *HTTPPublished) tombstoned(w http.ResponseWriter, r *http.Request) {
 		pc community.PublishedContent
 	)
 
-	if err := community.PublishedContentDeleteByID(r.Context(), t.q, pid).Scan(&pc); errors.Is(err, sql.ErrNoRows) {
+	if err := community.PublishedContentTombstone(r.Context(), t.q, pid).Scan(&pc); errors.Is(err, sql.ErrNoRows) {
 		log.Println(errorsx.Wrap(err, "unable to tombstone missing record"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
 		return
