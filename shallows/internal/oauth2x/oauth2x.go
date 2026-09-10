@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
-	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"golang.org/x/oauth2"
 )
 

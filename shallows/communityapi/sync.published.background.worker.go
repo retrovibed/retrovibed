@@ -13,6 +13,7 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
+	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/publishplugin"
 	"github.com/retrovibed/retrovibed/shallows/community"
@@ -99,14 +100,13 @@ func (t SyncPublishedBackgroundWorker) Message(ctx context.Context, m []byte) (e
 		known library.Known
 	)
 
-	log.Println("DERP DERP 1", string(m))
 	if err = jsonx.Unmarshal(m, &decoded); err != nil {
 		return err
 	}
 	decoded = langx.Clone(decoded, timex.JSONSafeDecodeOption)
 
 	if !decoded.TombstonedAt.Equal(timex.Inf()) {
-		if _, err := t.metrics.Delete(ctx, decoded.ID); err != nil {
+		if _, err := t.metrics.Delete(ctx, decoded.ID); err != nil && !httpx.IgnoreError(err, http.StatusNotFound) {
 			return errorsx.Wrap(err, "failed to delete from deeppool")
 		}
 		log.Printf("deleted published content %s from deeppool", decoded.ID)

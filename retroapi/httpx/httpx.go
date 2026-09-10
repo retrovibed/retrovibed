@@ -3,7 +3,7 @@ package httpx
 import (
 	"bytes"
 	"context"
-	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -14,6 +14,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"os"
+	"strconv"
 	"strings"
 	"sync/atomic"
 	"time"
@@ -25,6 +26,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/internal/debugx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/langx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/stringsx"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/netx"
 	"golang.org/x/time/rate"
 )
@@ -230,7 +232,7 @@ func WriteJSON(resp http.ResponseWriter, buffer *bytes.Buffer, context any) erro
 	buffer.Reset()
 	resp.Header().Set("Content-Type", "application/json")
 
-	if err = json.NewEncoder(buffer).Encode(context); err != nil {
+	if err = jsonx.MarshalWrite(buffer, context); err != nil {
 		resp.WriteHeader(http.StatusInternalServerError)
 		return err
 	}
@@ -246,7 +248,7 @@ func WriteJSONCode(resp http.ResponseWriter, code int, buffer *bytes.Buffer, con
 	resp.WriteHeader(code)
 	resp.Header().Set("Content-Type", "application/json")
 
-	if err = json.NewEncoder(buffer).Encode(context); err != nil {
+	if err = jsonx.MarshalWrite(buffer, context); err != nil {
 		resp.WriteHeader(http.StatusInternalServerError)
 		return err
 	}
@@ -281,6 +283,12 @@ func WriteEmptyJSON(resp http.ResponseWriter, code int) (err error) {
 	return err
 }
 
+// WriteRetryJSON emits a 503 with a Retry-After header set to the provided duration.
+func WriteRetryJSON(resp http.ResponseWriter, after time.Duration) error {
+	resp.Header().Set("Retry-After", fmt.Sprintf("%d", int(after/time.Second)))
+	return WriteEmptyJSON(resp, http.StatusServiceUnavailable)
+}
+
 // RedirectHTTPRequest generates a url to redirect to from the provided
 // request and destination node
 func RedirectHTTPRequest(req *http.Request, dst string, defaultPort string) *url.URL {
@@ -305,10 +313,22 @@ func AsError(r *http.Response, err error) (*http.Response, error) {
 	}
 
 	if r.StatusCode >= 400 {
-		return r, &Error{Code: r.StatusCode, cause: errorsx.New(r.Status)}
+		return r, retryAfterError(r.Header, &Error{Code: r.StatusCode, cause: errorsx.New(r.Status)})
 	}
 
 	return r, nil
+}
+
+// retryAfterError wraps cause with errorsx.RetryAfter when h carries a
+// parseable Retry-After header (integer seconds - the only form this
+// codebase ever emits), otherwise returns cause unwrapped.
+func retryAfterError(h http.Header, cause error) error {
+	seconds, err := strconv.Atoi(h.Get("Retry-After"))
+	if err != nil {
+		return cause
+	}
+
+	return errorsx.RetryAfter(cause, time.Duration(seconds)*time.Second)
 }
 
 // TryClose attempts to close the response body if it exists.
@@ -326,7 +346,7 @@ func ErrorCode(resp *http.Response) error {
 		return nil
 	}
 
-	return &Error{Code: resp.StatusCode, cause: errorsx.New(resp.Status)}
+	return retryAfterError(resp.Header, &Error{Code: resp.StatusCode, cause: errorsx.New(resp.Status)})
 }
 
 // Error ...
@@ -339,18 +359,46 @@ func (t Error) Error() string {
 	return t.cause.Error()
 }
 
-// IgnoreError ...
-func IgnoreError(err error, code ...int) bool {
-	var (
-		cause Error
-		ok    bool
-	)
-
-	if cause, ok = errorsx.Cause(err).(Error); !ok {
-		return false
+// ErrorWithCode reports whether err is (or wraps) an *Error whose Code
+// matches one of codes, returning that *Error when it does.
+func ErrorWithCode(err error, codes ...int) (*Error, bool) {
+	if err == nil {
+		return nil, false
 	}
 
-	return CheckStatusCode(cause.Code, code...)
+	cause, ok := errors.AsType[*Error](err)
+	if !ok || !CheckStatusCode(cause.Code, codes...) {
+		return nil, false
+	}
+
+	return cause, true
+}
+
+// IgnoreError reports whether err is (or wraps) an *Error whose Code matches
+// one of the given codes.
+func IgnoreError(err error, code ...int) bool {
+	_, ok := ErrorWithCode(err, code...)
+	return ok
+}
+
+// WriteRetryError writes code to the response, and if err carries a
+// Backoff hint, sets Retry-After accordingly.
+func WriteRetryError(w http.ResponseWriter, err error, code int) error {
+	backoff, ok := errors.AsType[errorsx.Backoff](err)
+	if !ok {
+		return WriteEmptyJSON(w, code)
+	}
+
+	when, ok := backoff.When()
+	if !ok {
+		return WriteEmptyJSON(w, code)
+	}
+
+	if d := time.Until(when); d > 0 {
+		w.Header().Set("Retry-After", strconv.Itoa(int(d/time.Second)))
+	}
+
+	return WriteEmptyJSON(w, code)
 }
 
 // MimeType extracts mimetype from request, defaults to application/

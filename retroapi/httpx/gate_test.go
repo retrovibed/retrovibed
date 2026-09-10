@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/justinas/alice"
-	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
+	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/stretchr/testify/require"
 )
 

@@ -7,9 +7,9 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
-	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/encoding/prototext"
 )

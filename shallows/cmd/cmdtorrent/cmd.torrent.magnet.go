@@ -8,10 +8,10 @@ import (
 	"net/url"
 
 	"github.com/retrovibed/retrovibed/retroapi/authn"
+	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/media"
 )
 

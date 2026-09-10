@@ -7,9 +7,9 @@ import (
 	"net/http"
 
 	"github.com/retrovibed/retrovibed/retroapi/env"
+	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
-	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 )
 
 func CommunityCreate(ctx context.Context, c *http.Client, com *CommunityCreateRequest) (resp *CommunityCreateResponse, err error) {

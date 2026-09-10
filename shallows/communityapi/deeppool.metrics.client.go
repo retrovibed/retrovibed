@@ -8,8 +8,8 @@ import (
 	"net/http"
 
 	"github.com/retrovibed/retrovibed/retroapi/env"
+	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
-	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 )
 
 func NewMetrics(c *http.Client) Metrics {

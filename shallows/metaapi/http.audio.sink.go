@@ -12,13 +12,13 @@ import (
 	"github.com/justinas/alice"
 
 	"github.com/retrovibed/retrovibed/retroapi/httpauth"
+	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/internal/audiox"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/websocketx"
 )

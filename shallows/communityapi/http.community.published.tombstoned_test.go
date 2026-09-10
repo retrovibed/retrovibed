@@ -4,9 +4,12 @@ import (
 	"encoding/json"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
+	"github.com/linxGnu/pqueue/entry"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/community"
@@ -14,7 +17,9 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
+	"github.com/retrovibed/retrovibed/shallows/internal/pqueuex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
+	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/retrovibed/retrovibed/shallows/metaapi"
@@ -114,6 +119,7 @@ func TestTombstonedEndpoint(t *testing.T) {
 		)
 		require.NoError(t, err)
 
+		before := time.Now()
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Code)
 
@@ -123,8 +129,10 @@ func TestTombstonedEndpoint(t *testing.T) {
 		require.Equal(t, pc.ID, result.PublishedContent.Id)
 		require.Equal(t, lmd.ID, result.PublishedContent.LibraryId)
 
-		var deleted community.PublishedContent
-		require.Error(t, community.PublishedContentFindByID(ctx, q, pc.ID).Scan(&deleted))
+		var tombstoned community.PublishedContent
+		require.NoError(t, community.PublishedContentFindByID(ctx, q, pc.ID).Scan(&tombstoned))
+		require.False(t, tombstoned.TombstonedAt.Before(before))
+		require.NotEqual(t, timex.Inf(), tombstoned.TombstonedAt)
 	})
 
 	t.Run("deletes one of multiple published content items leaving others intact", func(t *testing.T) {
@@ -188,14 +196,89 @@ func TestTombstonedEndpoint(t *testing.T) {
 		)
 		require.NoError(t, err)
 
+		before := time.Now()
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Code)
 
-		var deleted community.PublishedContent
-		require.Error(t, community.PublishedContentFindByID(ctx, q, pc1.ID).Scan(&deleted))
+		var tombstoned community.PublishedContent
+		require.NoError(t, community.PublishedContentFindByID(ctx, q, pc1.ID).Scan(&tombstoned))
+		require.False(t, tombstoned.TombstonedAt.Before(before))
+		require.NotEqual(t, timex.Inf(), tombstoned.TombstonedAt)
 
 		var remaining community.PublishedContent
 		require.NoError(t, community.PublishedContentFindByID(ctx, q, pc2.ID).Scan(&remaining))
 		require.Equal(t, pc2.ID, remaining.ID)
+		require.Equal(t, pc2.TombstonedAt, remaining.TombstonedAt)
+	})
+
+	t.Run("queues the tombstoned content for deeppool deletion", func(t *testing.T) {
+		var (
+			ctx, done   = testx.Context(t)
+			q           = sqltestx.Metadatabase(t)
+			p           meta.Profile
+			v           meta.Authz
+			communityID = uuid.Must(uuid.NewV7()).String()
+		)
+		defer done()
+
+		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
+		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
+		require.NoError(t, testx.Fake(&v, meta.AuthzOptionProfileID(p.ID), meta.AuthzOptionAdmin))
+		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
+
+		lmd := library.Metadata{
+			ID:             uuid.Must(uuid.NewV7()).String(),
+			Description:    "test media",
+			Bytes:          1024,
+			TorrentID:      uuid.Nil.String(),
+			KnownMediaID:   uuid.Nil.String(),
+			ArchiveID:      uuid.Nil.String(),
+			DirectoryID:    uuid.Nil.String(),
+			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+		}
+		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
+
+		var pc community.PublishedContent
+		require.NoError(t, testx.Fake(&pc, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
+			p.CommunityID = communityID
+			p.LibraryID = lmd.ID
+			p.Bytes = lmd.Bytes
+		}))
+		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
+
+		pq, err := pqueuex.New(t.TempDir())
+		require.NoError(t, err)
+		defer pq.Close()
+
+		routes := mux.NewRouter()
+		communityapi.NewHTTPPublished(
+			q,
+			communityapi.HTTPPublishedOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			communityapi.HTTPPublishedOptionMediaStorage(fsx.DirVirtual(t.TempDir())),
+			communityapi.HTTPPublishedOptionTorrentStorage(fsx.DirVirtual(t.TempDir())),
+			communityapi.HTTPPublishedOptionPublishQueue(pq),
+		).Bind(routes.PathPrefix("/c").Subrouter())
+
+		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
+		resp, req, err := httptestx.BuildRequestContextBytes(
+			ctx,
+			http.MethodDelete,
+			"/c/"+pc.ID,
+			nil,
+			httptestx.RequestOptionAuthorization("Bearer "+httpauthtest.UnsafeToken(claims, httpauthtest.UnsafeJWTSecretSource)),
+			httptestx.RequestOptionContent("application/json"),
+		)
+		require.NoError(t, err)
+
+		routes.ServeHTTP(resp, req)
+		require.Equal(t, http.StatusOK, resp.Code)
+
+		var queued entry.Entry
+		require.True(t, pq.Dequeue(&queued))
+
+		var decoded community.PublishedContent
+		require.NoError(t, jsonx.Unmarshal(queued, &decoded))
+		require.Equal(t, pc.ID, decoded.ID)
+		require.NotEqual(t, timex.Inf(), decoded.TombstonedAt)
 	})
 }

@@ -11,12 +11,12 @@ import (
 	"github.com/justinas/alice"
 	"github.com/retrovibed/retrovibed/retroapi/deeppool"
 	"github.com/retrovibed/retrovibed/retroapi/httpauth"
+	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
-	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 )

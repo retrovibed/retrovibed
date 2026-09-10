@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	"github.com/james-lawrence/torrent/dht/int160"
+	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 )
 

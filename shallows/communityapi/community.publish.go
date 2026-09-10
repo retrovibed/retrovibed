@@ -8,10 +8,10 @@ import (
 	"net/http"
 
 	"github.com/retrovibed/retrovibed/retroapi/env"
+	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 )
 
 func CommunityPublish(ctx context.Context, c *http.Client, id string, in io.Reader) (resp *CommunityUploadResponse, err error) {

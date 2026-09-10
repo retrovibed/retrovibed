@@ -7,6 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/james-lawrence/torrent/dht/int160"
+	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
@@ -14,7 +15,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
-	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/meta"

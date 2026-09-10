@@ -8,10 +8,10 @@ import (
 
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/metainfo"
+	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 )
 
 // PublishRequest a torrent to an http endpoint in its entirety

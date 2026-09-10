@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 )
 
 // DiscoveryCreate creates a discovery entry on the given library endpoint.

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 )
 
 // MediaDelete removes a media entry, identified by id, on the given library endpoint.

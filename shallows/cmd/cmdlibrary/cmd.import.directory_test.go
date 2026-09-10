@@ -12,11 +12,11 @@ import (
 	"testing"
 
 	"github.com/gorilla/mux"
+	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"

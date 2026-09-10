@@ -9,12 +9,12 @@ import (
 	"time"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/go-playground/form/v4"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
 	"github.com/linxGnu/pqueue"
 	"github.com/retrovibed/retrovibed/retroapi/httpauth"
+	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/community"
@@ -24,7 +24,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/lucenex"
 	"github.com/retrovibed/retrovibed/shallows/internal/numericx"
@@ -148,7 +147,6 @@ func (t *HTTPPublished) tombstoned(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println("DERP DERP 0", spew.Sdump(pc))
 	if err := pqueuex.Enqueue(r.Context(), t.publishq, langx.Clone(pc, timex.JSONSafeEncodeOption)); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to queue published content deletion"))
 	}

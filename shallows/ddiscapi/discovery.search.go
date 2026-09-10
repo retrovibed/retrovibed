@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
-	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 )
 
 // DiscoverySearch searches discovery entries on the given library endpoint.

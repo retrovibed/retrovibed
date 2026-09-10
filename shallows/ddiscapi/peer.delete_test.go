@@ -8,9 +8,9 @@ import (
 	"testing"
 
 	"github.com/james-lawrence/torrent/dht/int160"
+	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
-	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 	"github.com/stretchr/testify/require"
 )

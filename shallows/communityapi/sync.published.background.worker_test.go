@@ -16,6 +16,7 @@ import (
 	"github.com/james-lawrence/torrent/torrenttest"
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
 	"github.com/retrovibed/retrovibed/retroapi/deeppool"
+	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/publishplugin"
@@ -939,5 +940,25 @@ func TestSyncPublishedBackgroundWorker(t *testing.T) {
 		require.NoError(t, err)
 		require.Len(t, items, 1)
 		require.Equal(t, pc1.ID, items[0].Guid)
+	})
+
+	t.Run("treats 404 from deeppool delete as success", func(t *testing.T) {
+		var (
+			ctx, done = testx.Context(t)
+			q         = sqltestx.Metadatabase(t)
+			metrics   = NewMetrics(httpx.NewFixedStatusClient(http.StatusNotFound))
+			feeds     = &mockFeedPublisher{}
+		)
+		defer done()
+
+		var pc community.PublishedContent
+		require.NoError(t, testx.Fake(&pc, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
+			p.TombstonedAt = time.Now()
+		}))
+
+		worker := NewSyncPublishedBackgroundWorker(q, http.DefaultClient, metrics, feeds, publishplugin.Unimplemented{}, nil, fsx.DirVirtual(t.TempDir()), fsx.DirVirtual(t.TempDir()))
+		encoded, err := jsonx.Marshal(langx.Clone(pc, timex.JSONSafeEncodeOption))
+		require.NoError(t, err)
+		require.NoError(t, worker.Message(ctx, encoded))
 	})
 }

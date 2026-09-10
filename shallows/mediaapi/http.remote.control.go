@@ -13,10 +13,10 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 
 	"github.com/retrovibed/retrovibed/retroapi/httpauth"
+	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/websocketx"
 	"github.com/retrovibed/retrovibed/shallows/metaapi"
 )

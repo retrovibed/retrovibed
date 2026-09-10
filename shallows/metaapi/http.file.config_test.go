@@ -9,9 +9,9 @@ import (
 	"testing"
 
 	"github.com/gorilla/mux"
+	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
-	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/metaapi"
 	"github.com/stretchr/testify/require"
 )
