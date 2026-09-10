@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'package:crypto/crypto.dart' as crypto;
+import 'package:protobuf/protobuf.dart';
 import 'package:uuid/uuid.dart' as uuid;
 import 'package:uuid/data.dart' show V7Options;
 
@@ -31,12 +32,7 @@ String v7({DateTime? at}) =>
 
 DateTime v7timestamp(String s) {
   final bytes = fromString(s).toBytes();
-  final ms = (bytes[0] << 40) |
-      (bytes[1] << 32) |
-      (bytes[2] << 24) |
-      (bytes[3] << 16) |
-      (bytes[4] << 8) |
-      bytes[5];
+  final ms = (bytes[0] << 40) | (bytes[1] << 32) | (bytes[2] << 24) | (bytes[3] << 16) | (bytes[4] << 8) | bytes[5];
   return DateTime.fromMillisecondsSinceEpoch(ms, isUtc: true);
 }
 
@@ -47,3 +43,5 @@ String withSuffix(int v) => '00000000-0000-0000-0000-${v.toString().padLeft(12, 
 bool prefix(String p, v) => v.startsWith(p);
 
 String md5x(String s) => crypto.md5.convert(utf8.encode(s)).toString();
+
+String protobuf(GeneratedMessage s) => md5x(s.writeToJson());

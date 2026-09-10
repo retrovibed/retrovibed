@@ -117,8 +117,8 @@ func TestHTTPWireguardCurrent(t *testing.T) {
 		wg = meta.NewWireguard(
 			testx.Must(uuid.NewV4())(t).String(),
 			meta.WireguardOptionDescription("test"),
+			meta.WireguardOptionDistribution,
 		)
-		wg.Nettype = meta.WireguardNetworkRingDistribution
 
 		require.NoError(
 			t,

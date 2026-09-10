@@ -21,6 +21,10 @@ func Codec() []json.Options {
 		// encoding/json, and without it any payload whose casing differs from
 		// the field name (or its tag) silently decodes to the zero value.
 		json.MatchCaseInsensitiveNames(true),
+		// v2 has no default representation for time.Duration and errors
+		// instead of guessing; v1 always encoded it as its raw nanosecond
+		// count, so match that.
+		stdjson.FormatDurationAsNano(true),
 		json.WithUnmarshalers(json.JoinUnmarshalers(lenientInt64(), lenientUint64(), protoEnumUnmarshal())),
 	}
 }

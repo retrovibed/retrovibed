@@ -102,13 +102,17 @@ abstract class wireguard {
   // activate the specified wireguard configuration.
   static Future<WireguardTouchResponse> touch(
     String id,
-    WireguardNettype nettype, {
+    int nettype, {
     List<httpx.Option> options = const [],
   }) async {
     return httpx
         .put(
           Uri.https(httpx.host(), "/wireguard/${id}"),
-          body: jsonEncode(WireguardTouchRequest(nettype: nettype).toProto3Json()),
+          body: jsonEncode(
+            WireguardTouchRequest(
+              nettype: nettype,
+            ).toProto3Json(),
+          ),
           options: options,
         )
         .then(httpx.auto_error)
@@ -126,7 +130,7 @@ abstract class wireguard {
           Uri.https(
             httpx.host(),
             "/wireguard/current",
-            jsonDecode(jsonEncode(WireguardCurrentRequest(nettype: nettype).toProto3Json())),
+            jsonDecode(jsonEncode(WireguardCurrentRequest(nettype: nettype.value).toProto3Json())),
           ),
           headers: {"Authorization": httpx.auto_bearer_host()},
         )

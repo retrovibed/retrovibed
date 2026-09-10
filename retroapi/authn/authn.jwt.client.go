@@ -9,7 +9,7 @@ import (
 
 	"github.com/retrovibed/retrovibed/retroapi/env"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
-	"github.com/retrovibed/retrovibed/retroapi/internal/httpx"
+	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/oauth2"
@@ -34,14 +34,14 @@ func AutoJWTClient(ctx context.Context, signer ssh.Signer, options ...httpx.Clie
 // layer-1 SSH-signed JWT client only, with no dependency on an existing
 // profile. See AutoJWTClient's doc comment for why that client can't be used
 // here.
-func RegistrationJWTClient(ctx context.Context, signer ssh.Signer) (*http.Client, error) {
-	return RegistrationJWTClientWithEndpoint(ctx, signer, DeeppoolEndpoint())
+func RegistrationJWTClient(ctx context.Context, signer ssh.Signer, options ...httpx.ClientOption) (*http.Client, error) {
+	return RegistrationJWTClientWithEndpoint(ctx, signer, DeeppoolEndpoint(), options...)
 }
 
 // RegistrationJWTClientWithEndpoint is RegistrationJWTClient with an explicit
 // endpoint instead of env.Deeppool(), for tests driving a fake server.
-func RegistrationJWTClientWithEndpoint(ctx context.Context, signer ssh.Signer, endpoint oauth2.Endpoint) (*http.Client, error) {
-	return Oauth2DeeppoolHTTPClientWithEndpoint(ctx, signer, endpoint)
+func RegistrationJWTClientWithEndpoint(ctx context.Context, signer ssh.Signer, endpoint oauth2.Endpoint, options ...httpx.ClientOption) (*http.Client, error) {
+	return Oauth2DeeppoolHTTPClientWithEndpoint(ctx, signer, endpoint, options...)
 }
 
 func JWTClientHostname(oauth2c *http.Client, hostname string) *http.Client {

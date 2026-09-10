@@ -2,6 +2,7 @@ package jsonx_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/stretchr/testify/require"
@@ -88,5 +89,17 @@ func TestUnmarshal(t *testing.T) {
 		var out intPayload
 		require.NoError(t, jsonx.Unmarshal([]byte(doc), &out))
 		require.Equal(t, intPayload{ID: -9223372036854775808}, out)
+	})
+
+	t.Run("accepts nanosecond-encoded time.Duration", func(t *testing.T) {
+		type record struct {
+			TTL time.Duration
+		}
+
+		const doc = `{"TTL":60000000000}`
+
+		var out record
+		require.NoError(t, jsonx.Unmarshal([]byte(doc), &out))
+		require.Equal(t, record{TTL: time.Minute}, out)
 	})
 }

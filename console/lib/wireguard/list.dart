@@ -5,7 +5,6 @@ import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/mimex.dart' as mimex;
 import 'nettype.icon.dart';
-import 'meta.wireguard.pb.dart';
 import 'api.dart' as api;
 import 'list.row.dart';
 
@@ -29,7 +28,6 @@ class ListDisplay extends StatefulWidget {
 }
 
 class _ListDisplay extends State<ListDisplay> with ds.LoadingState {
-  Wireguard _distribution = Wireguard();
   api.WireguardSearchResponse _res = api.wireguard.response(
     next: api.wireguard.request(limit: 32),
   );
@@ -70,18 +68,6 @@ class _ListDisplay extends State<ListDisplay> with ds.LoadingState {
     super.initState();
     _res.next..query = widget.controller?.text ?? "";
     refresh(_res.next);
-    api.wireguard
-        .current(api.WireguardNettype.DISTRIBUTION)
-        .then(
-          (r) => setState(() {
-            _distribution = r.wireguard;
-          }),
-        )
-        .catchError((cause) {}, test: httpx.ErrorsTest.err404)
-        .catchError((cause) {
-          print("failed to load current vpn settings ${cause}");
-        })
-        .ignore();
   }
 
   @override
@@ -122,7 +108,6 @@ class _ListDisplay extends State<ListDisplay> with ds.LoadingState {
                           .then((uploaded) {
                             setState(() {
                               _res.items.add(uploaded.wireguard);
-                              _distribution = uploaded.wireguard;
                             });
                           })
                           .catchError((c) {
@@ -187,32 +172,42 @@ class _ListDisplay extends State<ListDisplay> with ds.LoadingState {
         final onNettype = (api.WireguardNettype nettype) {
           return api.wireguard
               .touch(
-                _distribution.id == v.id ? uuidx.max() : v.id,
-                nettype,
+                v.id,
+                nettype.value,
                 options: [authn.request(authn.AuthzCache.meta(context))],
               )
               .then((r) {
+                final reset = (api.Wireguard v) {
+                  if (v.nettype != nettype.value) return v;
+                  return v..nettype = api.WireguardNettype.UNSPECIFIED.value;
+                };
+
+                final updated = api.WireguardSearchResponse(
+                  items: ds.fnOnChange(_res.items.map(reset), r.wireguard, (wg) => wg.id == v.id),
+                  next: _res.next,
+                );
                 setState(() {
-                  _distribution = r.wireguard;
+                  _res = updated;
                 });
               })
-              .catchError((cause) {
+              .catchError((cause) {}, test: httpx.ErrorsTest.err404)
+              .catchError((c) {
+                print("unexpected wireguard failure ${c}");
                 setState(() {
-                  _distribution = Wireguard();
+                  cause = ds.Errors.httpauto(c, onTap: reseterr);
                 });
-              }, test: httpx.ErrorsTest.err404)
-              .catchError((cause) {
-                print("unexpected wireguard failure ${cause}");
+              }, test: httpx.ErrorsTest.httpauto)
+              .catchError((c) {
+                print("unexpected wireguard failure ${c}");
                 setState(() {
-                  _distribution = Wireguard();
+                  cause = ds.Error.unknown(c, onTap: reseterr);
                 });
               });
         };
         return ListRow(
           v,
-          key: ValueKey(v.id),
+          key: ValueKey(uuidx.protobuf(v)),
           onChange: (_, upd) async {
-            print("DERP DERP ${upd}");
             final updated = api.WireguardSearchResponse(
               items: ds.fnOnChange(_res.items, upd, (wg) => wg.id == upd.id),
               next: _res.next,

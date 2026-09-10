@@ -3,6 +3,7 @@ package jsonx_test
 import (
 	"math"
 	"testing"
+	"time"
 
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/stretchr/testify/require"
@@ -46,5 +47,18 @@ func TestMarshal(t *testing.T) {
 		encoded, err := jsonx.Marshal(&empty{unexported: "derp"})
 		require.NoError(t, err)
 		require.Equal(t, `{}`, string(encoded))
+	})
+
+	// v2 has no default representation for time.Duration and errors instead
+	// of guessing, so this package configures it to encode as its raw
+	// nanosecond count, matching v1's behavior.
+	t.Run("time.Duration encodes as nanoseconds", func(t *testing.T) {
+		type record struct {
+			TTL time.Duration
+		}
+
+		encoded, err := jsonx.Marshal(&record{TTL: time.Minute})
+		require.NoError(t, err)
+		require.Equal(t, `{"TTL":60000000000}`, string(encoded))
 	})
 }

@@ -38,14 +38,7 @@ const Wireguard$json = {
     {'1': 'created_at', '3': 2, '4': 1, '5': 9, '10': 'created_at'},
     {'1': 'updated_at', '3': 3, '4': 1, '5': 9, '10': 'updated_at'},
     {'1': 'description', '3': 4, '4': 1, '5': 9, '10': 'description'},
-    {
-      '1': 'nettype',
-      '3': 5,
-      '4': 1,
-      '5': 14,
-      '6': '.meta.WireguardNettype',
-      '10': 'nettype'
-    },
+    {'1': 'nettype', '3': 5, '4': 1, '5': 13, '10': 'nettype'},
     {'1': 'port', '3': 6, '4': 1, '5': 13, '10': 'port'},
     {'1': 'rate_limit_dns', '3': 7, '4': 1, '5': 13, '10': 'rate_limit_dns'},
     {
@@ -69,11 +62,10 @@ const Wireguard$json = {
 final $typed_data.Uint8List wireguardDescriptor = $convert.base64Decode(
     'CglXaXJlZ3VhcmQSDgoCaWQYASABKAlSAmlkEh4KCmNyZWF0ZWRfYXQYAiABKAlSCmNyZWF0ZW'
     'RfYXQSHgoKdXBkYXRlZF9hdBgDIAEoCVIKdXBkYXRlZF9hdBIgCgtkZXNjcmlwdGlvbhgEIAEo'
-    'CVILZGVzY3JpcHRpb24SMAoHbmV0dHlwZRgFIAEoDjIWLm1ldGEuV2lyZWd1YXJkTmV0dHlwZV'
-    'IHbmV0dHlwZRISCgRwb3J0GAYgASgNUgRwb3J0EiYKDnJhdGVfbGltaXRfZG5zGAcgASgNUg5y'
-    'YXRlX2xpbWl0X2RucxIwChNtYXhpbXVtX2Nvbm5lY3Rpb25zGAggASgEUhNtYXhpbXVtX2Nvbm'
-    '5lY3Rpb25zEjAKE3JhdGVfbGltaXRfb3V0Ym91bmQYCSABKA1SE3JhdGVfbGltaXRfb3V0Ym91'
-    'bmQ=');
+    'CVILZGVzY3JpcHRpb24SGAoHbmV0dHlwZRgFIAEoDVIHbmV0dHlwZRISCgRwb3J0GAYgASgNUg'
+    'Rwb3J0EiYKDnJhdGVfbGltaXRfZG5zGAcgASgNUg5yYXRlX2xpbWl0X2RucxIwChNtYXhpbXVt'
+    'X2Nvbm5lY3Rpb25zGAggASgEUhNtYXhpbXVtX2Nvbm5lY3Rpb25zEjAKE3JhdGVfbGltaXRfb3'
+    'V0Ym91bmQYCSABKA1SE3JhdGVfbGltaXRfb3V0Ym91bmQ=');
 
 @$core.Deprecated('Use wireguardSearchRequestDescriptor instead')
 const WireguardSearchRequest$json = {
@@ -166,21 +158,14 @@ final $typed_data.Uint8List wireguardUpdateResponseDescriptor =
 const WireguardTouchRequest$json = {
   '1': 'WireguardTouchRequest',
   '2': [
-    {
-      '1': 'nettype',
-      '3': 1,
-      '4': 1,
-      '5': 14,
-      '6': '.meta.WireguardNettype',
-      '10': 'nettype'
-    },
+    {'1': 'nettype', '3': 1, '4': 1, '5': 13, '10': 'nettype'},
   ],
 };
 
 /// Descriptor for `WireguardTouchRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List wireguardTouchRequestDescriptor = $convert.base64Decode(
-    'ChVXaXJlZ3VhcmRUb3VjaFJlcXVlc3QSMAoHbmV0dHlwZRgBIAEoDjIWLm1ldGEuV2lyZWd1YX'
-    'JkTmV0dHlwZVIHbmV0dHlwZQ==');
+final $typed_data.Uint8List wireguardTouchRequestDescriptor =
+    $convert.base64Decode(
+        'ChVXaXJlZ3VhcmRUb3VjaFJlcXVlc3QSGAoHbmV0dHlwZRgBIAEoDVIHbmV0dHlwZQ==');
 
 @$core.Deprecated('Use wireguardTouchResponseDescriptor instead')
 const WireguardTouchResponse$json = {
@@ -237,22 +222,14 @@ final $typed_data.Uint8List wireguardUploadResponseDescriptor =
 const WireguardCurrentRequest$json = {
   '1': 'WireguardCurrentRequest',
   '2': [
-    {
-      '1': 'nettype',
-      '3': 1,
-      '4': 1,
-      '5': 14,
-      '6': '.meta.WireguardNettype',
-      '10': 'nettype'
-    },
+    {'1': 'nettype', '3': 1, '4': 1, '5': 13, '10': 'nettype'},
   ],
 };
 
 /// Descriptor for `WireguardCurrentRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List wireguardCurrentRequestDescriptor =
     $convert.base64Decode(
-        'ChdXaXJlZ3VhcmRDdXJyZW50UmVxdWVzdBIwCgduZXR0eXBlGAEgASgOMhYubWV0YS5XaXJlZ3'
-        'VhcmROZXR0eXBlUgduZXR0eXBl');
+        'ChdXaXJlZ3VhcmRDdXJyZW50UmVxdWVzdBIYCgduZXR0eXBlGAEgASgNUgduZXR0eXBl');
 
 @$core.Deprecated('Use wireguardCurrentResponseDescriptor instead')
 const WireguardCurrentResponse$json = {

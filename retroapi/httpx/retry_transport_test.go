@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/httptestx"
-	"github.com/retrovibed/retrovibed/retroapi/internal/httpx"
 	"github.com/stretchr/testify/require"
 )
 

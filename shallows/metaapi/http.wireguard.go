@@ -9,7 +9,6 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
-	"path/filepath"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/go-playground/form/v4"
@@ -245,10 +244,9 @@ func (t *HTTPWireguard) create(w http.ResponseWriter, r *http.Request) {
 
 func (t *HTTPWireguard) current(w http.ResponseWriter, r *http.Request) {
 	var (
-		err      error
-		wg       meta.Wireguard
-		msg      WireguardCurrentRequest
-		realpath = errorsx.Zero(filepath.EvalSymlinks(t.dir.Path(wireguardx.Current)))
+		err error
+		wg  meta.Wireguard
+		msg WireguardCurrentRequest
 	)
 
 	if err = t.decoder.Decode(&msg, r.Form); err != nil {
@@ -262,14 +260,14 @@ func (t *HTTPWireguard) current(w http.ResponseWriter, r *http.Request) {
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
 		return
 	} else if err != nil {
-		log.Println(errorsx.Wrapf(err, "failed to read configuration: %s", realpath))
+		log.Println(errorsx.Wrapf(err, "failed to read configuration: %s", t.dir.Path(wg.ID)))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
 	}
 
 	encoded, err := os.ReadFile(t.dir.Path(wg.ID))
 	if err != nil {
-		log.Println(errorsx.Wrapf(err, "failed to read configuration: %s", realpath))
+		log.Println(errorsx.Wrapf(err, "failed to read configuration: %s", t.dir.Path(wg.ID)))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
 	}
@@ -352,27 +350,23 @@ func (t *HTTPWireguard) touch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = os.RemoveAll(t.dir.Path(wireguardx.Current)); fsx.IgnoreIsNotExist(err) != nil {
-		log.Println(errorsx.Wrap(err, "failed to remove old config"))
-		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+	if err = meta.WireguardTouch(r.Context(), t.q, id, uint32(msg.Nettype)).Scan(&wg); errors.Is(err, sql.ErrNoRows) {
+		log.Println(errorsx.Wrapf(err, "failed to update: %s", id))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
 		return
-	}
-
-	if err = os.Symlink(t.dir.Path(id), t.dir.Path(wireguardx.Current)); err != nil {
-		log.Println(errorsx.Wrap(err, "failed to symlink"))
-		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
-		return
-	}
-
-	if err = meta.WireguardTouch(r.Context(), t.q, id, uint32(msg.Nettype)).Scan(&wg); err != nil {
+	} else if err != nil {
 		log.Println(errorsx.Wrap(err, "failed to update"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
 	}
 
+	log.Println("touching", wireguardx.ConfigDirectory(id))
+	errorsx.Log(errorsx.Wrap(fsx.Touch(0600, wireguardx.ConfigDirectory(id)), "failed to touch wireguard configuration"))
+
 	// this shouldnt be necessary, we *should* be able to use a CTE or UPDATE followed by a select.
 	// unfortunately duckdb does not support either case.
 	if err = meta.WireguardCurrent(r.Context(), t.q, uint32(msg.Nettype)).Scan(&wg); errors.Is(err, sql.ErrNoRows) {
+		log.Println(errorsx.Wrap(err, "wireguard setup does not exist"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
 		return
 	} else if err != nil {

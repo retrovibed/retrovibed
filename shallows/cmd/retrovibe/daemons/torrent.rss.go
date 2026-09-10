@@ -5,6 +5,7 @@ import (
 	"iter"
 	"log"
 	"net/http"
+	"path/filepath"
 	"time"
 
 	"github.com/Masterminds/squirrel"
@@ -31,7 +32,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 )
 
-func PrepareDefaultFeeds(ctx context.Context, q sqlx.Queryer) error {
+func PrepareDefaultFeeds(ctx context.Context, q sqlx.Queryer, dir string) error {
 	var (
 		feeds []tracking.RSS
 	)
@@ -39,7 +40,7 @@ func PrepareDefaultFeeds(ctx context.Context, q sqlx.Queryer) error {
 	log.Println("syncing default rss feeds initialized")
 	defer log.Println("syncing default rss feeds completed")
 
-	encoded, err := fsx.AutoCached(userx.DefaultConfigDir(userx.DefaultRelRoot(), "default.feeds.json"), func() (_ []byte, _ error) {
+	encoded, err := fsx.AutoCached(filepath.Join(dir, "default.feeds.json"), func() (_ []byte, _ error) {
 		return jsonx.Marshal([]tracking.RSS{
 			{
 				Description:  "Arch Linux - iso",
@@ -54,11 +55,11 @@ func PrepareDefaultFeeds(ctx context.Context, q sqlx.Queryer) error {
 		})
 	})
 	if err != nil {
-		return err
+		return errorsx.Wrap(err, "failed to encode defaults")
 	}
 
 	if err = jsonx.Unmarshal(encoded, &feeds); err != nil {
-		return err
+		return errorsx.Wrap(err, "failed to decode data")
 	}
 
 	for _, feed := range feeds {
@@ -69,6 +70,10 @@ func PrepareDefaultFeeds(ctx context.Context, q sqlx.Queryer) error {
 	}
 
 	return nil
+}
+
+func PrepareDefaultFeedsAuto(ctx context.Context, q sqlx.Queryer) error {
+	return PrepareDefaultFeeds(ctx, q, userx.DefaultConfigDir(userx.DefaultRelRoot()))
 }
 
 func DiscoverFromRSSFeedsOnce(
