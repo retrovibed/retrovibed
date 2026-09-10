@@ -76,7 +76,7 @@ type Wireguard struct {
 	CreatedAt          string                 `protobuf:"bytes,2,opt,name=created_at,proto3" json:"created_at,omitempty"`
 	UpdatedAt          string                 `protobuf:"bytes,3,opt,name=updated_at,proto3" json:"updated_at,omitempty"`
 	Description        string                 `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
-	Nettype            WireguardNettype       `protobuf:"varint,5,opt,name=nettype,proto3,enum=meta.WireguardNettype" json:"nettype,omitempty"`
+	Nettype            uint32                 `protobuf:"varint,5,opt,name=nettype,proto3" json:"nettype,omitempty"`
 	Port               uint32                 `protobuf:"varint,6,opt,name=port,proto3" json:"port,omitempty"`
 	RateLimitDns       uint32                 `protobuf:"varint,7,opt,name=rate_limit_dns,proto3" json:"rate_limit_dns,omitempty"`
 	MaximumConnections uint64                 `protobuf:"varint,8,opt,name=maximum_connections,proto3" json:"maximum_connections,omitempty"`
@@ -143,11 +143,11 @@ func (x *Wireguard) GetDescription() string {
 	return ""
 }
 
-func (x *Wireguard) GetNettype() WireguardNettype {
+func (x *Wireguard) GetNettype() uint32 {
 	if x != nil {
 		return x.Nettype
 	}
-	return WireguardNettype_UNSPECIFIED
+	return 0
 }
 
 func (x *Wireguard) GetPort() uint32 {
@@ -380,7 +380,7 @@ func (x *WireguardUpdateResponse) GetWireguard() *Wireguard {
 
 type WireguardTouchRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Nettype       WireguardNettype       `protobuf:"varint,1,opt,name=nettype,proto3,enum=meta.WireguardNettype" json:"nettype,omitempty"`
+	Nettype       uint32                 `protobuf:"varint,1,opt,name=nettype,proto3" json:"nettype,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -415,11 +415,11 @@ func (*WireguardTouchRequest) Descriptor() ([]byte, []int) {
 	return file_wireguard_meta_wireguard_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *WireguardTouchRequest) GetNettype() WireguardNettype {
+func (x *WireguardTouchRequest) GetNettype() uint32 {
 	if x != nil {
 		return x.Nettype
 	}
-	return WireguardNettype_UNSPECIFIED
+	return 0
 }
 
 type WireguardTouchResponse struct {
@@ -548,7 +548,7 @@ func (x *WireguardUploadResponse) GetWireguard() *Wireguard {
 
 type WireguardCurrentRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Nettype       WireguardNettype       `protobuf:"varint,1,opt,name=nettype,proto3,enum=meta.WireguardNettype" json:"nettype,omitempty"`
+	Nettype       uint32                 `protobuf:"varint,1,opt,name=nettype,proto3" json:"nettype,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -583,11 +583,11 @@ func (*WireguardCurrentRequest) Descriptor() ([]byte, []int) {
 	return file_wireguard_meta_wireguard_proto_rawDescGZIP(), []int{9}
 }
 
-func (x *WireguardCurrentRequest) GetNettype() WireguardNettype {
+func (x *WireguardCurrentRequest) GetNettype() uint32 {
 	if x != nil {
 		return x.Nettype
 	}
-	return WireguardNettype_UNSPECIFIED
+	return 0
 }
 
 type WireguardCurrentResponse struct {
@@ -742,7 +742,7 @@ var File_wireguard_meta_wireguard_proto protoreflect.FileDescriptor
 
 const file_wireguard_meta_wireguard_proto_rawDesc = "" +
 	"\n" +
-	"\x1ewireguard/meta.wireguard.proto\x12\x04meta\"\xcf\x02\n" +
+	"\x1ewireguard/meta.wireguard.proto\x12\x04meta\"\xb7\x02\n" +
 	"\tWireguard\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1e\n" +
 	"\n" +
@@ -751,8 +751,8 @@ const file_wireguard_meta_wireguard_proto_rawDesc = "" +
 	"\n" +
 	"updated_at\x18\x03 \x01(\tR\n" +
 	"updated_at\x12 \n" +
-	"\vdescription\x18\x04 \x01(\tR\vdescription\x120\n" +
-	"\anettype\x18\x05 \x01(\x0e2\x16.meta.WireguardNettypeR\anettype\x12\x12\n" +
+	"\vdescription\x18\x04 \x01(\tR\vdescription\x12\x18\n" +
+	"\anettype\x18\x05 \x01(\rR\anettype\x12\x12\n" +
 	"\x04port\x18\x06 \x01(\rR\x04port\x12&\n" +
 	"\x0erate_limit_dns\x18\a \x01(\rR\x0erate_limit_dns\x120\n" +
 	"\x13maximum_connections\x18\b \x01(\x04R\x13maximum_connections\x120\n" +
@@ -767,16 +767,16 @@ const file_wireguard_meta_wireguard_proto_rawDesc = "" +
 	"\x16WireguardUpdateRequest\x12-\n" +
 	"\tWireguard\x18\x01 \x01(\v2\x0f.meta.WireguardR\twireguard\"H\n" +
 	"\x17WireguardUpdateResponse\x12-\n" +
-	"\tWireguard\x18\x01 \x01(\v2\x0f.meta.WireguardR\twireguard\"I\n" +
-	"\x15WireguardTouchRequest\x120\n" +
-	"\anettype\x18\x01 \x01(\x0e2\x16.meta.WireguardNettypeR\anettype\"G\n" +
+	"\tWireguard\x18\x01 \x01(\v2\x0f.meta.WireguardR\twireguard\"1\n" +
+	"\x15WireguardTouchRequest\x12\x18\n" +
+	"\anettype\x18\x01 \x01(\rR\anettype\"G\n" +
 	"\x16WireguardTouchResponse\x12-\n" +
 	"\tWireguard\x18\x01 \x01(\v2\x0f.meta.WireguardR\twireguard\"\x18\n" +
 	"\x16WireguardUploadRequest\"H\n" +
 	"\x17WireguardUploadResponse\x12-\n" +
-	"\tWireguard\x18\x01 \x01(\v2\x0f.meta.WireguardR\twireguard\"K\n" +
-	"\x17WireguardCurrentRequest\x120\n" +
-	"\anettype\x18\x01 \x01(\x0e2\x16.meta.WireguardNettypeR\anettype\"\x83\x01\n" +
+	"\tWireguard\x18\x01 \x01(\v2\x0f.meta.WireguardR\twireguard\"3\n" +
+	"\x17WireguardCurrentRequest\x12\x18\n" +
+	"\anettype\x18\x01 \x01(\rR\anettype\"\x83\x01\n" +
 	"\x18WireguardCurrentResponse\x12-\n" +
 	"\tWireguard\x18\x01 \x01(\v2\x0f.meta.WireguardR\twireguard\x12\x16\n" +
 	"\x06online\x18\x02 \x01(\bR\x06online\x12\x0e\n" +
@@ -822,22 +822,19 @@ var file_wireguard_meta_wireguard_proto_goTypes = []any{
 	(*WireguardDeleteResponse)(nil),  // 13: meta.WireguardDeleteResponse
 }
 var file_wireguard_meta_wireguard_proto_depIdxs = []int32{
-	0,  // 0: meta.Wireguard.nettype:type_name -> meta.WireguardNettype
-	2,  // 1: meta.WireguardSearchResponse.next:type_name -> meta.WireguardSearchRequest
-	1,  // 2: meta.WireguardSearchResponse.items:type_name -> meta.Wireguard
-	1,  // 3: meta.WireguardUpdateRequest.Wireguard:type_name -> meta.Wireguard
-	1,  // 4: meta.WireguardUpdateResponse.Wireguard:type_name -> meta.Wireguard
-	0,  // 5: meta.WireguardTouchRequest.nettype:type_name -> meta.WireguardNettype
-	1,  // 6: meta.WireguardTouchResponse.Wireguard:type_name -> meta.Wireguard
-	1,  // 7: meta.WireguardUploadResponse.Wireguard:type_name -> meta.Wireguard
-	0,  // 8: meta.WireguardCurrentRequest.nettype:type_name -> meta.WireguardNettype
-	1,  // 9: meta.WireguardCurrentResponse.Wireguard:type_name -> meta.Wireguard
-	1,  // 10: meta.WireguardDeleteResponse.Wireguard:type_name -> meta.Wireguard
-	11, // [11:11] is the sub-list for method output_type
-	11, // [11:11] is the sub-list for method input_type
-	11, // [11:11] is the sub-list for extension type_name
-	11, // [11:11] is the sub-list for extension extendee
-	0,  // [0:11] is the sub-list for field type_name
+	2, // 0: meta.WireguardSearchResponse.next:type_name -> meta.WireguardSearchRequest
+	1, // 1: meta.WireguardSearchResponse.items:type_name -> meta.Wireguard
+	1, // 2: meta.WireguardUpdateRequest.Wireguard:type_name -> meta.Wireguard
+	1, // 3: meta.WireguardUpdateResponse.Wireguard:type_name -> meta.Wireguard
+	1, // 4: meta.WireguardTouchResponse.Wireguard:type_name -> meta.Wireguard
+	1, // 5: meta.WireguardUploadResponse.Wireguard:type_name -> meta.Wireguard
+	1, // 6: meta.WireguardCurrentResponse.Wireguard:type_name -> meta.Wireguard
+	1, // 7: meta.WireguardDeleteResponse.Wireguard:type_name -> meta.Wireguard
+	8, // [8:8] is the sub-list for method output_type
+	8, // [8:8] is the sub-list for method input_type
+	8, // [8:8] is the sub-list for extension type_name
+	8, // [8:8] is the sub-list for extension extendee
+	0, // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_wireguard_meta_wireguard_proto_init() }

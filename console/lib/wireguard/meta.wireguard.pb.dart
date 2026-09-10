@@ -15,8 +15,6 @@ import 'dart:core' as $core;
 import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
 
-import 'meta.wireguard.pbenum.dart';
-
 export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
 
 export 'meta.wireguard.pbenum.dart';
@@ -27,7 +25,7 @@ class Wireguard extends $pb.GeneratedMessage {
     $core.String? createdAt,
     $core.String? updatedAt,
     $core.String? description,
-    WireguardNettype? nettype,
+    $core.int? nettype,
     $core.int? port,
     $core.int? rateLimitDns,
     $fixnum.Int64? maximumConnections,
@@ -64,8 +62,7 @@ class Wireguard extends $pb.GeneratedMessage {
     ..aOS(2, _omitFieldNames ? '' : 'created_at')
     ..aOS(3, _omitFieldNames ? '' : 'updated_at')
     ..aOS(4, _omitFieldNames ? '' : 'description')
-    ..aE<WireguardNettype>(5, _omitFieldNames ? '' : 'nettype',
-        enumValues: WireguardNettype.values)
+    ..aI(5, _omitFieldNames ? '' : 'nettype', fieldType: $pb.PbFieldType.OU3)
     ..aI(6, _omitFieldNames ? '' : 'port', fieldType: $pb.PbFieldType.OU3)
     ..aI(7, _omitFieldNames ? '' : 'rate_limit_dns',
         fieldType: $pb.PbFieldType.OU3)
@@ -131,9 +128,9 @@ class Wireguard extends $pb.GeneratedMessage {
   void clearDescription() => $_clearField(4);
 
   @$pb.TagNumber(5)
-  WireguardNettype get nettype => $_getN(4);
+  $core.int get nettype => $_getIZ(4);
   @$pb.TagNumber(5)
-  set nettype(WireguardNettype value) => $_setField(5, value);
+  set nettype($core.int value) => $_setUnsignedInt32(4, value);
   @$pb.TagNumber(5)
   $core.bool hasNettype() => $_has(4);
   @$pb.TagNumber(5)
@@ -440,7 +437,7 @@ class WireguardUpdateResponse extends $pb.GeneratedMessage {
 
 class WireguardTouchRequest extends $pb.GeneratedMessage {
   factory WireguardTouchRequest({
-    WireguardNettype? nettype,
+    $core.int? nettype,
   }) {
     final result = create();
     if (nettype != null) result.nettype = nettype;
@@ -460,8 +457,7 @@ class WireguardTouchRequest extends $pb.GeneratedMessage {
       _omitMessageNames ? '' : 'WireguardTouchRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
       createEmptyInstance: create)
-    ..aE<WireguardNettype>(1, _omitFieldNames ? '' : 'nettype',
-        enumValues: WireguardNettype.values)
+    ..aI(1, _omitFieldNames ? '' : 'nettype', fieldType: $pb.PbFieldType.OU3)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -485,9 +481,9 @@ class WireguardTouchRequest extends $pb.GeneratedMessage {
   static WireguardTouchRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
-  WireguardNettype get nettype => $_getN(0);
+  $core.int get nettype => $_getIZ(0);
   @$pb.TagNumber(1)
-  set nettype(WireguardNettype value) => $_setField(1, value);
+  set nettype($core.int value) => $_setUnsignedInt32(0, value);
   @$pb.TagNumber(1)
   $core.bool hasNettype() => $_has(0);
   @$pb.TagNumber(1)
@@ -651,7 +647,7 @@ class WireguardUploadResponse extends $pb.GeneratedMessage {
 
 class WireguardCurrentRequest extends $pb.GeneratedMessage {
   factory WireguardCurrentRequest({
-    WireguardNettype? nettype,
+    $core.int? nettype,
   }) {
     final result = create();
     if (nettype != null) result.nettype = nettype;
@@ -671,8 +667,7 @@ class WireguardCurrentRequest extends $pb.GeneratedMessage {
       _omitMessageNames ? '' : 'WireguardCurrentRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
       createEmptyInstance: create)
-    ..aE<WireguardNettype>(1, _omitFieldNames ? '' : 'nettype',
-        enumValues: WireguardNettype.values)
+    ..aI(1, _omitFieldNames ? '' : 'nettype', fieldType: $pb.PbFieldType.OU3)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -696,9 +691,9 @@ class WireguardCurrentRequest extends $pb.GeneratedMessage {
   static WireguardCurrentRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
-  WireguardNettype get nettype => $_getN(0);
+  $core.int get nettype => $_getIZ(0);
   @$pb.TagNumber(1)
-  set nettype(WireguardNettype value) => $_setField(1, value);
+  set nettype($core.int value) => $_setUnsignedInt32(0, value);
   @$pb.TagNumber(1)
   $core.bool hasNettype() => $_has(0);
   @$pb.TagNumber(1)

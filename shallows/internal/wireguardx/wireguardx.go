@@ -17,8 +17,10 @@ import (
 
 	"github.com/retrovibed/retrovibed/retroapi/backoffx"
 	"github.com/retrovibed/retrovibed/retroapi/userx"
+	"github.com/retrovibed/retrovibed/shallows/dnscache"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
+	"github.com/retrovibed/retrovibed/shallows/internal/netx"
 	"golang.org/x/text/encoding/unicode"
 	"golang.zx2c4.com/wireguard/device"
 	"golang.zx2c4.com/wireguard/tun/netstack"
@@ -26,8 +28,22 @@ import (
 
 const (
 	DefaultMTU = 1420
-	Current    = "_current"
 )
+
+func DefaultDialer(wgnet *netstack.Net, cache dnscache.Resolver) netx.Dialer {
+	if wgnet != nil {
+		return dnscache.NewDialer(cache, wgnet)
+	}
+
+	return dnscache.NewDialer(cache, &net.Dialer{})
+}
+
+func DefaultResolver(d netx.Dialer) *net.Resolver {
+	return &net.Resolver{
+		PreferGo: true,
+		Dial:     d.DialContext,
+	}
+}
 
 type ParseError struct {
 	why      string
@@ -371,10 +387,6 @@ func FormatIPCSet(wcfg *Config) (ipcsets []string) {
 
 func ConfigDirectory(rels ...string) string {
 	return userx.DefaultConfigDir(userx.DefaultRelRoot(), "wireguard.d", filepath.Join(rels...))
-}
-
-func Latest() string {
-	return ConfigDirectory(Current)
 }
 
 func Parse(path string) (*Config, error) {

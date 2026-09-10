@@ -14,7 +14,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/backoffx"
 	"github.com/retrovibed/retrovibed/retroapi/env"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
-	"github.com/retrovibed/retrovibed/retroapi/internal/httpx"
+	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/md5x"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"golang.org/x/crypto/ssh"
@@ -22,8 +22,8 @@ import (
 
 // AutoRegistration builds the client Register needs from signer and
 // registers in one call.
-func AutoRegistration(ctx context.Context, signer ssh.Signer) (*Session, error) {
-	c, err := RegistrationJWTClient(ctx, signer)
+func AutoRegistration(ctx context.Context, signer ssh.Signer, options ...httpx.ClientOption) (*Session, error) {
+	c, err := RegistrationJWTClient(ctx, signer, options...)
 	if err != nil {
 		return nil, err
 	}

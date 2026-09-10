@@ -15,7 +15,6 @@ import (
 	"time"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/fsnotify/fsnotify"
 	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/bep0051"
@@ -25,6 +24,7 @@ import (
 	"github.com/james-lawrence/torrent/dht/krpc"
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/retrovibed/retrovibed/retroapi/backoffx"
+	"github.com/retrovibed/retrovibed/retroapi/fsx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/netmonx"
 	retronetx "github.com/retrovibed/retrovibed/retroapi/netx"
@@ -42,7 +42,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/envx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
@@ -95,7 +94,6 @@ func newTorrenting(db *sql.DB, id ssh.Signer, root, media, tvfs fsx.Virtual, mc 
 		samplecachepath:  userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "torrent.bep51.samples"),
 		machineid:        cmdopts.MachineID(),
 		wgconfigdir:      wireguardx.ConfigDirectory(),
-		wglatest:         wireguardx.Latest(),
 		db:               db,
 		id:               id,
 		rootstore:        root,
@@ -125,7 +123,6 @@ type _torrenting struct {
 	samplecachepath  string
 	machineid        string
 	wgconfigdir      string
-	wglatest         string
 	db               *sql.DB
 	id               ssh.Signer
 	rootstore        fsx.Virtual
@@ -277,14 +274,7 @@ func (t *_torrenting) Broadcast() {
 }
 
 func (t *_torrenting) Watch(ctx context.Context, paths ...string) error {
-	if err := fsx.Touch(0600, paths...); err != nil {
-		return err
-	}
-
-	if err := fsx.Touch(0600, t.wglatest); err != nil {
-		return err
-	}
-
+	defer log.Println("WAKA WAKA")
 	if err := t.loadcfg(t.cfgpath, &TorrentSettings{}); err != nil {
 		return err
 	}
@@ -293,42 +283,17 @@ func (t *_torrenting) Watch(ctx context.Context, paths ...string) error {
 		return err
 	}
 
-	w, err := fsnotify.NewWatcher()
-	if err != nil {
+	if err := fsx.Touch(0600, paths...); err != nil {
 		return err
 	}
 
-	addpath := func(path string) {
-		if err = w.Add(path); err != nil {
-			errorsx.Log(errorsx.Wrapf(err, "unable to watch %s", path))
-			return
-		}
+	watch := make([]string, 0, 2*len(paths))
+	watch = append(watch, paths...)
+	watch = append(watch, t.cfgpath, t.discoverycfgpath, t.wgconfigdir)
+
+	if err := fsx.Watch(ctx, t.cond, watch...); err != nil {
+		return err
 	}
-
-	addpath(t.cfgpath)
-	addpath(t.discoverycfgpath)
-	addpath(t.wgconfigdir)
-
-	for _, path := range paths {
-		addpath(path)
-	}
-
-	go func() {
-		defer log.Println("torrent file watch done")
-		defer w.Close()
-		for {
-			select {
-			case evt := <-w.Events:
-				log.Println("resetting torrent client due to filesystem event", evt.Op, evt.Name)
-				t.cond.Broadcast()
-			case err := <-w.Errors:
-				log.Println("watch error", err)
-			case <-ctx.Done():
-				log.Println("context completed", ctx.Err())
-				return
-			}
-		}
-	}()
 
 	return nil
 }
@@ -513,8 +478,7 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 
 	log.Printf("USING STORAGE %T - %s\n", t.tstore, t.tvfs.Path())
 
-	dialer := DefaultDialer(wgnet, t._dnscache)
-	t._dialer.Store(dialer)
+	t._dialer.Store(wireguardx.DefaultDialer(wgnet, t._dnscache))
 
 	torconfig := torrent.NewDefaultClientConfig(
 		torrent.NewMetadataCache(t.tvfs.Path()),
@@ -522,7 +486,7 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 		torrent.ClientConfigCacheDirectory(t.tvfs.Path()),
 		torrent.ClientConfigPEX(cfg.Pex),
 		torrent.ClientConfigSeed(cfg.Seed),
-		torrent.ClientConfigDialer(dialer),
+		torrent.ClientConfigDialer(t._dialer),
 		torrent.ClientConfigDialTimeouts(time.Second, 4*time.Second),
 		torrent.ClientConfigHandshakeTimeout(30*time.Second),
 		torrent.ClientConfigDialPoolSize(128*runtime.NumCPU()),
@@ -559,7 +523,7 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 
 	c := httpx.BindRetryTransport(&http.Client{
 		Transport: &http.Transport{
-			DialContext: dialer.DialContext,
+			DialContext: t._dialer.DialContext,
 		},
 	}, http.StatusTooManyRequests, http.StatusBadGateway)
 

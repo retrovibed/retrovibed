@@ -8,13 +8,11 @@ void main() {
     });
 
     test('nil UUID string returns nil UUID', () {
-      expect(uuidx.isMin(uuidx.fromString('00000000-0000-0000-0000-000000000000')),
-          isTrue);
+      expect(uuidx.isMin(uuidx.fromString('00000000-0000-0000-0000-000000000000')), isTrue);
     });
 
     test('max UUID string returns max UUID', () {
-      expect(uuidx.isMax(uuidx.fromString('ffffffff-ffff-ffff-ffff-ffffffffffff')),
-          isTrue);
+      expect(uuidx.isMax(uuidx.fromString('ffffffff-ffff-ffff-ffff-ffffffffffff')), isTrue);
     });
 
     test('valid UUID string is neither min nor max', () {
@@ -37,8 +35,7 @@ void main() {
     });
 
     test('regular UUID is not min or max', () {
-      expect(uuidx.isMinMax(uuidx.fromString('550e8400-e29b-41d4-a716-446655440000')),
-          isFalse);
+      expect(uuidx.isMinMax(uuidx.fromString('550e8400-e29b-41d4-a716-446655440000')), isFalse);
     });
   });
 

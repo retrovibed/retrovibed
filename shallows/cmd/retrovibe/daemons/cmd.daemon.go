@@ -14,7 +14,6 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/justinas/alice"
 	"golang.org/x/crypto/ssh"
-	"golang.zx2c4.com/wireguard/tun/netstack"
 
 	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/retroapi/backoffx"
@@ -61,21 +60,6 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/logrusorgru/aurora"
 )
-
-func DefaultDialer(wgnet *netstack.Net, cache dnscache.Resolver) netx.Dialer {
-	if wgnet != nil {
-		return dnscache.NewDialer(cache, wgnet)
-	}
-
-	return dnscache.NewDialer(cache, &net.Dialer{})
-}
-
-func DefaultResolver(d netx.Dialer) *net.Resolver {
-	return &net.Resolver{
-		PreferGo: true,
-		Dial:     d.DialContext,
-	}
-}
 
 type Command struct {
 	Alpha                    bool             `flag:"" name:"alpha" help:"enable alpha functionality" default:"false" negatable:"" hidden:"true"`
@@ -168,23 +152,25 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	)
 
 	// socialnetDialer/socialResolver back the "social ring" - the deeppool
-	// api (deepjwt) client, publishing and (eventually) recommendations
-	// traffic - kept deliberately separate from
-	// distributionnetDialer/distributionnetResolver below, which back the
-	// "distribution ring" torrents and search plugins use. There's no
-	// wireguard tunnel of its own for the social ring yet (a planned
-	// follow-up, mirroring how _torrenting.Watch live-swaps
-	// distributionnetDialer/distributionnetResolver onto a tunnel when one
-	// is configured - see torrent.go), so it's stored once here with the
-	// same plain-host fallback DefaultDialer uses when no tunnel is present.
+	// api (deepjwt) client, publishing and recommendations traffic - kept
+	// deliberately separate from distributionnetDialer/distributionnetResolver
+	// below, which back the distribution ring torrents and search plugins use.
 	socialnetResolver := dnscache.AutoProxyResolver()
-	socialnetDialer := netx.NewDialerProxy(DefaultDialer(nil, socialnetResolver))
+	socialringDialer := netx.NewDialerProxy(wireguardx.DefaultDialer(nil, socialnetResolver))
 
 	// distributionnet is the network used for accessing distributing content.
 	// since content distribution is sensitive data (privacy) we isolate it
 	// from general (socialnet) traffic.
-	distributionnetResolver := dnscache.AutoProxyResolver()
-	distributionnetDialer := netx.NewDialerProxy(DefaultDialer(nil, distributionnetResolver))
+	distributionringResolver := dnscache.AutoProxyResolver()
+	distributionringDialer := netx.NewDialerProxy(wireguardx.DefaultDialer(nil, distributionringResolver))
+
+	rootstore := fsx.DirVirtual(env.RootStorageDir())
+	mediastore := fsx.DirVirtual(env.MediaDir())
+	tvfs := fsx.DirVirtual(env.TorrentDir())
+
+	if err := fsx.MkDirs(0700, rootstore.Path(), mediastore.Path(), tvfs.Path(), wireguardx.ConfigDirectory()); err != nil {
+		return err
+	}
 
 	// initialize queue directories
 	mediarecs, err := pqueuex.New(mediarecsdir)
@@ -245,17 +231,16 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		return errorsx.Wrap(err, "unable to load authorization")
 	}
 
+	// background management of networks.
+	errorsx.Log(errorsx.Wrap(meta.NewWireguardNetworkBackgroundAuto(gctx.Context, wireguardx.ConfigDirectory(), meta.WireguardRingSocial, db, socialringDialer, socialnetResolver), "social ring failed"))
+	// too tied up in torrent.go to generalize this yet.
+	// errorsx.Log(errorsx.Wrap(meta.NewWireguardNetworkBackgroundAuto(gctx.Context, wireguardx.ConfigDirectory(), meta.WireguardRingDistribution, db, distributionringDialer), "distribution ring failed"))
+
 	if t.AutoDefaultSubscriptions {
 		log.Println("checkpoint - initialize default feeds")
 		errorsx.Log(errorsx.Wrap(PrepareDefaultFeeds(gctx.Context, db), "unable to initialize default rss feeds"))
-	}
-
-	rootstore := fsx.DirVirtual(env.RootStorageDir())
-	mediastore := fsx.DirVirtual(env.MediaDir())
-	tvfs := fsx.DirVirtual(env.TorrentDir())
-
-	if err := fsx.MkDirs(0700, rootstore.Path(), mediastore.Path(), tvfs.Path(), wireguardx.ConfigDirectory()); err != nil {
-		return err
+	} else {
+		log.Println("initialize default feeds disabled")
 	}
 
 	if !authz.LocalOnly {
@@ -264,14 +249,20 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 			id,
 			// its important that the dialer option is the first in the list.
 			// that way we ensure the dialer doesnt cause a panic or we leak connections.
-			authn.ClientOptionDialer(socialnetDialer),
+			authn.ClientOptionDialer(socialringDialer),
 		); err == nil {
 			deepjwt = c
-			go AutoRegistration(gctx.Context, id)
+			go AutoRegistration(
+				gctx.Context,
+				id,
+				// its important that the dialer option is the first in the list.
+				// that way we ensure the dialer doesnt cause a panic or we leak connections.
+				authn.ClientOptionDialer(socialringDialer),
+			)
 		} else {
 			// we allow creation to fail the application should function even without the api.
 			// just warn that the api is unavailable.
-			errorsx.Log(errorsx.Wrap(err, "failed to create oauth2, api will fail"))
+			errorsx.Log(errorsx.Wrap(err, "failed to setup oauth2, api will fail"))
 		}
 	}
 
@@ -280,7 +271,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	publishers, err := publishplugin.NewRegistryWithSocket(
 		gctx.Context,
 		wnetruntime.Virtual(
-			socialnetDialer,
+			socialringDialer,
 			netx.UnsupportedListenConfig{},
 			socialnetResolver,
 			wnetruntime.PublicFirewall(),
@@ -322,9 +313,9 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	plugins, err := searchplugin.NewRegistryWithSocket(
 		gctx.Context,
 		wnetruntime.Virtual(
-			distributionnetDialer,
+			distributionringDialer,
 			netx.UnsupportedListenConfig{},
-			distributionnetResolver,
+			distributionringResolver,
 			wnetruntime.PublicFirewall(),
 		),
 	)
@@ -342,7 +333,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	if t.AutoPeerTube {
 		peertube = ddisc.PeerTubeStrategy(&http.Client{
 			Timeout:   30 * time.Second,
-			Transport: &http.Transport{DialContext: distributionnetDialer.DialContext},
+			Transport: &http.Transport{DialContext: distributionringDialer.DialContext},
 		}, t.PeerTubeDomain)
 	}
 
@@ -359,8 +350,8 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		locatemedia,
 		plugins,
 		peertube,
-		distributionnetDialer,
-		distributionnetResolver,
+		distributionringDialer,
+		distributionringResolver,
 	)
 
 	log.Println("checkpoint - distribution")
@@ -373,7 +364,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		vpncfgpath,
 		storagecfgpath,
 	); err != nil {
-		return err
+		return errorsx.Wrap(err, "failed to setup torrent watch")
 	}
 
 	log.Println("checkpoint - network monitoring")
@@ -542,7 +533,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	mediaapi.NewHTTPRemoteControl(t.RemoteControl).Bind(httpmux.PathPrefix("/rc").Subrouter())
 	ddiscapi.NewHTTPPeerManagement(db).Bind(httpmux.PathPrefix("/ddisc").Subrouter())
 	discoveryimporter := tracking.NewURIImport(db, httpx.BindRetryTransport(&http.Client{
-		Transport: &http.Transport{DialContext: distributionnetDialer.DialContext},
+		Transport: &http.Transport{DialContext: distributionringDialer.DialContext},
 	}, http.StatusTooManyRequests, http.StatusBadGateway), rootstore)
 	ddiscapi.NewHTTPDiscovery(db, plugins, peertube, discoveryimporter, ddiscapi.HTTPDiscoveryOptionQueryCleaner(mc)).Bind(httpmux.PathPrefix("/ddisc/discovery").Subrouter())
 	ddiscapi.NewHTTPMedia(db).Bind(httpmux.PathPrefix("/ddisc/media").Subrouter())

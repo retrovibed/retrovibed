@@ -61,19 +61,19 @@ func TestHTTPWireguardTouch(t *testing.T) {
 
 		claims = jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
 
-		encoded, err := jsonx.Marshal(metaapi.WireguardTouchRequest{Nettype: metaapi.WireguardNettype_DISTRIBUTION})
+		encoded, err := jsonx.Marshal(metaapi.WireguardTouchRequest{Nettype: uint32(metaapi.WireguardNettype_DISTRIBUTION.Number())})
 		require.NoError(t, err)
 
 		resp, req, err := httptestx.BuildRequestContextBytes(ctx, http.MethodPut, fmt.Sprintf("/%s", path1), encoded, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
 		require.NoError(t, err)
 
-		require.Equal(t, 0, sqltestx.Count(t, q, "SELECT COUNT(*) FROM meta_wireguard WHERE nettype = ?", meta.WireguardNetworkRingDistribution))
+		require.Equal(t, 0, sqltestx.Count(t, q, "SELECT COUNT(*) FROM meta_wireguard WHERE nettype = ?", meta.WireguardRingDistribution))
 
 		routes.ServeHTTP(resp, req)
 
 		require.NoError(t, httpx.ErrorCode(resp.Result()))
 
-		require.Equal(t, 1, sqltestx.Count(t, q, "SELECT COUNT(*) FROM meta_wireguard WHERE nettype = ?", meta.WireguardNetworkRingDistribution))
+		require.Equal(t, 1, sqltestx.Count(t, q, "SELECT COUNT(*) FROM meta_wireguard WHERE nettype = ?", meta.WireguardRingDistribution))
 
 		resp, req, err = httptestx.BuildRequestContextBytes(ctx, http.MethodPut, fmt.Sprintf("/%s", path1), encoded, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
 		require.NoError(t, err)
@@ -82,7 +82,7 @@ func TestHTTPWireguardTouch(t *testing.T) {
 		require.NoError(t, httpx.ErrorCode(resp.Result()))
 		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
 
-		require.Equal(t, 1, sqltestx.Count(t, q, "SELECT COUNT(*) FROM meta_wireguard WHERE nettype = ?", meta.WireguardNetworkRingDistribution))
+		require.Equal(t, 1, sqltestx.Count(t, q, "SELECT COUNT(*) FROM meta_wireguard WHERE nettype = ?", meta.WireguardRingDistribution))
 		require.Equal(t, wg.ID, result.Wireguard.Id)
 	})
 
@@ -127,9 +127,9 @@ func TestHTTPWireguardTouch(t *testing.T) {
 
 		claims = jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
 
-		require.Equal(t, 1, sqltestx.Count(t, q, "SELECT COUNT(*) FROM meta_wireguard WHERE nettype = ?", meta.WireguardNetworkRingDistribution))
+		require.Equal(t, 1, sqltestx.Count(t, q, "SELECT COUNT(*) FROM meta_wireguard WHERE nettype = ?", meta.WireguardRingDistribution))
 
-		encoded, err := jsonx.Marshal(metaapi.WireguardTouchRequest{Nettype: metaapi.WireguardNettype_DISTRIBUTION})
+		encoded, err := jsonx.Marshal(metaapi.WireguardTouchRequest{Nettype: uint32(metaapi.WireguardNettype_DISTRIBUTION.Number())})
 		require.NoError(t, err)
 
 		resp, req, err := httptestx.BuildRequestContextBytes(ctx, http.MethodPut, fmt.Sprintf("/%s", uuid.Max.String()), encoded, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
@@ -138,6 +138,6 @@ func TestHTTPWireguardTouch(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 		require.EqualValues(t, http.StatusNotFound, resp.Code)
 
-		require.Equal(t, 0, sqltestx.Count(t, q, "SELECT COUNT(*) FROM meta_wireguard WHERE nettype = ?", meta.WireguardNetworkRingDistribution))
+		require.Equal(t, 0, sqltestx.Count(t, q, "SELECT COUNT(*) FROM meta_wireguard WHERE nettype = ?", meta.WireguardRingDistribution))
 	})
 }

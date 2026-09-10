@@ -16,7 +16,7 @@ Future<void> fnAsyncNoopOnChange<T>(T v) {
   return Future.value();
 }
 
-List<T> fnOnChange<T>(List<T> s, T? v, bool Function(T a) cmp) {
+List<T> fnOnChange<T>(Iterable<T> s, T? v, bool Function(T a) cmp) {
   if (v == null) {
     return s.where((o) => !cmp(o)).toList();
   }

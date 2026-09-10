@@ -10,13 +10,13 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/squirrelx"
 )
 
-type WireguardNetworkRing uint32
+type WireguardRing uint32
 
 const (
-	WireguardNetworkRingUnspecified uint32 = iota
-	WireguardNetworkRingDistribution
-	WireguardNetworkRingSocial
-	WireguardNetworkRingMax
+	WireguardRingUnspecified WireguardRing = iota
+	WireguardRingDistribution
+	WireguardRingSocial
+	WireguardRingMax
 )
 
 func WireguardSearch(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilder) WireguardScanner {
@@ -38,7 +38,7 @@ func WireguardOptionAutoID(w *Wireguard) {
 }
 
 func WireguardOptionDistribution(w *Wireguard) {
-	w.Nettype = WireguardNetworkRingDistribution
+	w.Nettype = uint32(WireguardRingDistribution)
 }
 
 func WireguardOptionDNSRateLimit(n uint32) func(*Wireguard) {
@@ -55,13 +55,13 @@ func WireguardOptionOutboundRateLimit(n uint32) func(*Wireguard) {
 
 func WireguardOptionTestDefauts(w *Wireguard) {
 	w.ID = uuid.Must(uuid.NewV4()).String()
-	w.Nettype = w.Nettype % (WireguardNetworkRingMax)
+	w.Nettype = w.Nettype % uint32(WireguardRingMax)
 }
 
 func NewWireguard(uid string, options ...func(*Wireguard)) Wireguard {
 	return langx.Clone(Wireguard{
 		ID:          uid,
 		Description: "",
-		Nettype:     WireguardNetworkRingUnspecified,
+		Nettype:     uint32(WireguardRingUnspecified),
 	}, options...)
 }

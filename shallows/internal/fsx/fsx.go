@@ -182,11 +182,15 @@ func Touch(perm fs.FileMode, paths ...string) (err error) {
 	for _, p := range paths {
 		touched, cause := os.OpenFile(p, os.O_CREATE|os.O_RDONLY, perm)
 		if cause != nil {
-			err = errorsx.Compact(err, errorsx.Wrapf(cause, "unable to create directory: %s", p))
+			err = errorsx.Compact(err, errorsx.Wrapf(cause, "unable to create: %s", p))
 			continue
 		}
 
-		err = errorsx.Compact(err, errorsx.Wrapf(touched.Close(), "unable to create directory: %s", p))
+		err = errorsx.Compact(
+			err,
+			errorsx.Wrapf(touched.Chmod(perm), "unable to chmod: %s", p),
+			errorsx.Wrapf(touched.Close(), "unable to close: %s", p),
+		)
 	}
 
 	return err

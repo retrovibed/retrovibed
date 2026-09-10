@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/retrovibed/retrovibed/retroapi/internal/httpx"
+	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/stretchr/testify/require"
 )
 

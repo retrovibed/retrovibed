@@ -10,7 +10,7 @@ import (
 
 	"github.com/retrovibed/retrovibed/retroapi/env"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
-	"github.com/retrovibed/retrovibed/retroapi/internal/httpx"
+	"github.com/retrovibed/retrovibed/retroapi/httpx"
 )
 
 func NewArchiver(c *http.Client) Archiver {

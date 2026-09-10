@@ -27,48 +27,36 @@ class CommunityCreate extends StatefulWidget {
   _CommunityCreateState createState() => _CommunityCreateState();
 }
 
-class _CommunityCreateState extends State<CommunityCreate> {
+class _CommunityCreateState extends State<CommunityCreate> with ds.LoadingState {
   Community _community = Community(mimetype: mimex.binary);
   bool _creating = false;
-  Widget _cause = ds.Error.zero;
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
-
-  void _clearCause() {
-    setState(() {
-      _cause = ds.Error.zero;
-    });
-  }
 
   void _createCommunity() {
     setState(() {
       _creating = true;
-      _cause = ds.Error.zero;
+      cause = ds.Error.zero;
     });
 
     widget
         .create(_community)
         .then((response) => widget.onCreate(response.community))
-        .catchError((cause) {
+        .catchError((c) {
           setState(() {
-            _cause = ds.Error.conflict(
-              cause,
-              onTap: _clearCause,
+            cause = ds.Error.conflict(
+              c,
+              onTap: reseterr,
               message: Text("a community with this url already exists"),
             );
           });
         }, test: httpx.ErrorsTest.conflict)
-        .catchError((cause) {
+        .catchError((c) {
           setState(() {
-            _cause = ds.Errors.httpauto(cause, onTap: _clearCause);
+            cause = ds.Errors.httpauto(c, onTap: reseterr);
           });
         }, test: httpx.ErrorsTest.httpauto)
-        .catchError((cause) {
+        .catchError((c) {
           setState(() {
-            _cause = ds.Error.unknown(cause, onTap: _clearCause);
+            cause = ds.Error.unknown(c, onTap: reseterr);
           });
         })
         .whenComplete(() {
@@ -98,7 +86,7 @@ class _CommunityCreateState extends State<CommunityCreate> {
             textAlign: TextAlign.center,
           ),
           ds.Loading(
-            cause: _cause,
+            cause: cause,
             CommunityEdit(
               community: _community,
               onChange: (c) => setState(() => _community = c),
@@ -114,14 +102,13 @@ class _CommunityCreateState extends State<CommunityCreate> {
               ),
               ElevatedButton(
                 onPressed: _creating ? null : _createCommunity,
-                child:
-                    _creating
-                        ? SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                        : Text('Create'),
+                child: _creating
+                    ? SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : Text('Create'),
               ),
             ],
           ),

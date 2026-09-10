@@ -22,14 +22,14 @@ class _NettypeIconState extends State<NettypeIcon> {
   @override
   void initState() {
     super.initState();
-    _nettype = widget.current.nettype;
+    _nettype = api.WireguardNettype.valueOf(widget.current.nettype) ?? api.WireguardNettype.UNSPECIFIED;
   }
 
   @override
   void didUpdateWidget(covariant NettypeIcon oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.current.nettype != widget.current.nettype) {
-      _nettype = widget.current.nettype;
+      _nettype = api.WireguardNettype.valueOf(widget.current.nettype) ?? api.WireguardNettype.UNSPECIFIED;
     }
   }
 
