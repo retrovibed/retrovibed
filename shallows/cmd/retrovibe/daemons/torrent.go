@@ -175,6 +175,10 @@ func (t *_torrenting) resetPrevious() {
 		dev.Close()
 		<-dev.Wait()
 	}
+
+	if d := t._dhts.Load(); d != nil {
+		d.Close()
+	}
 }
 
 func (t *_torrenting) WireguardSnapshot() (wireguardx.Statistics, error) {

@@ -65,7 +65,11 @@ func WaitForMinimumNodes(ctx context.Context, min int, dhts *dht.Server, do func
 		}
 
 		log.Printf("minimum nodes not available, waiting %p %d\n", dhts, dhts.NumNodes())
-		time.Sleep(b.Backoff(attempts))
+		select {
+		case <-ctx.Done():
+			return
+		case <-time.After(b.Backoff(attempts)):
+		}
 	}
 
 	do()
