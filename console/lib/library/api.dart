@@ -148,7 +148,7 @@ abstract class known {
             "/k/",
             httpx.params(req.toProto3Json()),
           ),
-          options: options,
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) {
           final resp = httpx.fromProto3JsonSafe(KnownSearchResponse.create(), jsonDecode(v.body));
@@ -175,11 +175,16 @@ abstract class known {
     String id, {
     List<httpx.Option> options = const [],
   }) async {
-    return httpx.get(Uri.https(httpx.host(), "/k/${id}", {}), options: options).then((v) {
-      return Future.value(
-        httpx.fromProto3JsonSafe(KnownLookupResponse.create(), jsonDecode(v.body)),
-      );
-    });
+    return httpx
+        .get(
+          Uri.https(httpx.host(), "/k/${id}", {}),
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
+        )
+        .then((v) {
+          return Future.value(
+            httpx.fromProto3JsonSafe(KnownLookupResponse.create(), jsonDecode(v.body)),
+          );
+        });
   }
 
   static Future<KnownCreateResponse> create(
@@ -189,7 +194,7 @@ abstract class known {
     return httpx
         .post(
           Uri.https(httpx.host(), "/k/", {}),
-          options: options,
+          options: [httpx.Content.json, httpx.Accept.json, ...options],
           body: jsonEncode(req.toProto3Json()),
         )
         .then((v) {
@@ -300,7 +305,7 @@ abstract class recommendations {
     return httpx
         .post(
           Uri.https(httpx.host(), "/r/"),
-          options: options,
+          options: [httpx.Content.json, httpx.Accept.json, ...options],
           body: jsonEncode(req.toProto3Json()),
         )
         .then((v) {
@@ -314,22 +319,32 @@ abstract class recommendations {
     String id, {
     List<httpx.Option> options = const [],
   }) async {
-    return httpx.get(Uri.https(httpx.host(), "/r/${id}", {}), options: options).then((v) {
-      return Future.value(
-        httpx.fromProto3JsonSafe(RecommendationFindResponse.create(), jsonDecode(v.body)),
-      );
-    });
+    return httpx
+        .get(
+          Uri.https(httpx.host(), "/r/${id}", {}),
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
+        )
+        .then((v) {
+          return Future.value(
+            httpx.fromProto3JsonSafe(RecommendationFindResponse.create(), jsonDecode(v.body)),
+          );
+        });
   }
 
   static Future<RecommendationFindResponse> content(
     String id, {
     List<httpx.Option> options = const [],
   }) async {
-    return httpx.get(Uri.https(httpx.host(), "/r/content/${id}", {}), options: options).then((v) {
-      return Future.value(
-        httpx.fromProto3JsonSafe(RecommendationFindResponse.create(), jsonDecode(v.body)),
-      );
-    });
+    return httpx
+        .get(
+          Uri.https(httpx.host(), "/r/content/${id}", {}),
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
+        )
+        .then((v) {
+          return Future.value(
+            httpx.fromProto3JsonSafe(RecommendationFindResponse.create(), jsonDecode(v.body)),
+          );
+        });
   }
 
   static Future<RecommendationDeleteResponse> delete(
@@ -394,7 +409,7 @@ abstract class recent {
         .post(
           Uri.https(httpx.host(), "/w/"),
           body: jsonEncode(req.toProto3Json()),
-          options: options,
+          options: [httpx.Content.json, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
@@ -411,7 +426,7 @@ abstract class recent {
     return httpx
         .delete(
           Uri.https(httpx.host(), "/w/$id"),
-          options: options,
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
@@ -436,7 +451,7 @@ abstract class releases {
             "/k/latest",
             jsonDecode(jsonEncode(req.toProto3Json())),
           ),
-          options: options,
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
@@ -463,7 +478,7 @@ abstract class locate {
             "/l/",
             jsonDecode(jsonEncode(req.toProto3Json())),
           ),
-          options: options,
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
@@ -476,11 +491,16 @@ abstract class locate {
     String id, {
     List<httpx.Option> options = const [],
   }) async {
-    return httpx.get(Uri.https(httpx.host(), "/l/${id}", {}), options: options).then((v) {
-      return Future.value(
-        httpx.fromProto3JsonSafe(LocateLookupResponse.create(), jsonDecode(v.body)),
-      );
-    });
+    return httpx
+        .get(
+          Uri.https(httpx.host(), "/l/${id}", {}),
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
+        )
+        .then((v) {
+          return Future.value(
+            httpx.fromProto3JsonSafe(LocateLookupResponse.create(), jsonDecode(v.body)),
+          );
+        });
   }
 
   static Future<LocateCreateResponse> create(
@@ -490,7 +510,7 @@ abstract class locate {
     return httpx
         .post(
           Uri.https(httpx.host(), "/l/", {}),
-          options: options,
+          options: [httpx.Content.json, httpx.Accept.json, ...options],
           body: jsonEncode(LocateCreateRequest(locate: req).toProto3Json()),
         )
         .then((v) {

@@ -28,7 +28,7 @@ abstract class api {
     return httpx
         .post(
           Uri.https(httpx.host(), "/ddisc/discovery/download", {}),
-          options: options,
+          options: [httpx.Content.json, httpx.Accept.json, ...options],
           body: jsonEncode(
             DiscoveryDownloadRequest(
               discovery: discovery ?? (Discovery.create()..id = id),
@@ -78,7 +78,7 @@ abstract class diagnostics {
     return httpx
         .get(
           Uri.https(httpx.host(), "/diagnostics/discovery/"),
-          options: [httpx.Accept.json, ...options],
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) => httpx.fromProto3JsonSafe(DiscoveryMetricsResponse(), jsonDecode(v.body)));
   }

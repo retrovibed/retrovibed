@@ -28,11 +28,16 @@ abstract class sinks {
   static Future<AudioSinkCurrentResponse> current({
     List<httpx.Option> options = const [],
   }) async {
-    return httpx.get(Uri.https(httpx.host(), "/audio/sinks/", {}), options: options).then((v) {
-      return Future.value(
-        httpx.fromProto3JsonSafe(AudioSinkCurrentResponse.create(), jsonDecode(v.body)),
-      );
-    });
+    return httpx
+        .get(
+          Uri.https(httpx.host(), "/audio/sinks/", {}),
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
+        )
+        .then((v) {
+          return Future.value(
+            httpx.fromProto3JsonSafe(AudioSinkCurrentResponse.create(), jsonDecode(v.body)),
+          );
+        });
   }
 
   static Future<AudioSinkTouchResponse> activate(
@@ -42,7 +47,7 @@ abstract class sinks {
     return httpx
         .post(
           Uri.https(httpx.host(), "/audio/sinks/", {}),
-          options: options,
+          options: [httpx.Content.json, httpx.Accept.json, ...options],
           body: jsonEncode(AudioSinkTouchRequest(id: id).toProto3Json()),
         )
         .then((v) {

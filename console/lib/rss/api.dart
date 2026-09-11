@@ -18,7 +18,7 @@ Future<FeedSearchResponse> search(
           "/rss/",
           jsonDecode(jsonEncode(req.toProto3Json())),
         ),
-        options: options,
+        options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
       )
       .then((v) {
         return Future.value(
@@ -35,7 +35,7 @@ Future<FeedCreateResponse> create(
       .post(
         Uri.https(httpx.host(), "/rss/", null),
         body: jsonEncode(req.toProto3Json()),
-        options: options,
+        options: [httpx.Content.json, httpx.Accept.json, ...options],
       )
       .then((v) {
         return httpx.fromProto3JsonSafe(FeedCreateResponse.create(), jsonDecode(v.body));
@@ -52,7 +52,7 @@ Future<FeedCreateResponse> refresh(
       .post(
         Uri.https(httpx.host(), "/rss/", null),
         body: jsonEncode(req.toProto3Json()),
-        options: options,
+        options: [httpx.Content.json, httpx.Accept.json, ...options],
       )
       .then((v) {
         return httpx.fromProto3JsonSafe(FeedCreateResponse.create(), jsonDecode(v.body));
@@ -63,7 +63,12 @@ Future<FeedDeleteResponse> delete(
   String id, {
   List<httpx.Option> options = const [],
 }) async {
-  return httpx.delete(Uri.https(httpx.host(), "/rss/${id}"), options: options).then((v) {
-    return httpx.fromProto3JsonSafe(FeedDeleteResponse.create(), jsonDecode(v.body));
-  });
+  return httpx
+      .delete(
+        Uri.https(httpx.host(), "/rss/${id}"),
+        options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
+      )
+      .then((v) {
+        return httpx.fromProto3JsonSafe(FeedDeleteResponse.create(), jsonDecode(v.body));
+      });
 }

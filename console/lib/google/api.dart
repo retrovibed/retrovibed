@@ -12,7 +12,7 @@ class YouTube {
     return httpx
         .get(
           Uri.https(httpx.host(), "/integrations/youtube/status"),
-          options: [httpx.Accept.json, ...options],
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) => httpx.fromProto3JsonSafe(YouTubeStatus(), jsonDecode(v.body)));
   }
@@ -23,7 +23,7 @@ class YouTube {
     return httpx
         .delete(
           Uri.https(httpx.host(), "/integrations/youtube/token"),
-          options: [httpx.Accept.json, ...options],
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((_) {});
   }

@@ -14,7 +14,7 @@ abstract class network {
     return httpx
         .get(
           Uri.https(httpx.host(), "/diagnostics/network/"),
-          options: [httpx.Accept.json, ...options],
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) => httpx.fromProto3JsonSafe(NetworkMetricsResponse(), jsonDecode(v.body)));
   }

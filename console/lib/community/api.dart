@@ -56,7 +56,7 @@ class publishing {
         .post(
           Uri.https(httpx.host(), "/c/p/$cid"),
           body: jsonEncode(req.toProto3Json()),
-          options: [httpx.Accept.json, httpx.Content.json, ...options],
+          options: [httpx.Content.json, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
@@ -81,7 +81,7 @@ class publishing {
             "/c/p/$cid",
             httpx.params(req.toProto3Json()),
           ),
-          options: [httpx.Accept.json, ...options],
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
@@ -100,7 +100,7 @@ class publishing {
             httpx.host(),
             "/c/p/$pid",
           ),
-          options: [httpx.Accept.json, ...options],
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
@@ -125,7 +125,7 @@ class metrics {
     return httpx
         .get(
           Uri.https(httpx.host(), "/c/m/$id", httpx.params(req.toProto3Json())),
-          options: [httpx.Accept.json, ...options],
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
@@ -141,7 +141,7 @@ class metrics {
     return httpx
         .post(
           Uri.https(httpx.host(), "/c/m/$id"),
-          options: [httpx.Accept.json, ...options],
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
@@ -181,7 +181,7 @@ class socials {
     return httpx
         .get(
           Uri.https(httpx.host(), "/c/social/", httpx.params(req.toProto3Json())),
-          options: [httpx.Accept.json, ...options],
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
@@ -199,7 +199,7 @@ class socials {
         .post(
           Uri.https(httpx.host(), "/c/social/${id}"),
           body: jsonEncode(CommunityPublisherUpdateRequest(compub: compub).toProto3Json()),
-          options: [httpx.Accept.json, httpx.Content.json, ...options],
+          options: [httpx.Content.json, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
@@ -216,7 +216,7 @@ class socials {
     return httpx
         .post(
           Uri.https(httpx.host(), "/c/social/$communityId/publishers/$publisherId"),
-          options: [httpx.Accept.json, ...options],
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
@@ -233,7 +233,7 @@ class socials {
     return httpx
         .delete(
           Uri.https(httpx.host(), "/c/social/$communityId/publishers/$publisherId"),
-          options: [httpx.Accept.json, ...options],
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
@@ -270,7 +270,7 @@ class communities {
             "/c/",
             jsonDecode(jsonEncode(req.toProto3Json())),
           ),
-          options: [httpx.Accept.json, ...options],
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
@@ -286,7 +286,7 @@ class communities {
     return httpx
         .post(
           Uri.https(httpx.metaendpoint(), "/c/"),
-          options: [httpx.Accept.json, httpx.Content.json, ...options],
+          options: [httpx.Content.json, httpx.Accept.json, ...options],
           body: jsonEncode(req.toProto3Json()),
         )
         .then((v) {
@@ -303,7 +303,7 @@ class communities {
     return httpx
         .delete(
           Uri.https(httpx.metaendpoint(), "/c/$id"),
-          options: [httpx.Accept.json, httpx.Content.json, ...options],
+          options: [httpx.Content.json, httpx.Accept.json, ...options],
           body: jsonEncode(CommunityDeleteRequest.create().toProto3Json()),
         )
         .then((v) {
@@ -321,7 +321,7 @@ class communities {
     return httpx
         .put(
           Uri.https(httpx.metaendpoint(), "/c/$id"),
-          options: [httpx.Accept.json, httpx.Content.json, ...options],
+          options: [httpx.Content.json, httpx.Accept.json, ...options],
           body: jsonEncode(req.toProto3Json()),
         )
         .then((v) {
@@ -348,7 +348,7 @@ class communities {
             "/p/sync",
             httpx.params(req.toProto3Json()),
           ),
-          options: [httpx.Accept.json, ...options],
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
@@ -364,7 +364,7 @@ class communities {
     return httpx
         .post(
           Uri.https(httpx.host(), "/c/${id}/subscribe"),
-          options: [httpx.Accept.json, ...options],
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
@@ -381,7 +381,7 @@ class communities {
     return httpx
         .post(
           Uri.https(httpx.host(), "/c/$id/resync"),
-          options: [httpx.Accept.json, ...options],
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
@@ -412,7 +412,7 @@ abstract class publishers {
     return httpx
         .get(
           Uri.https(httpx.host(), "/c/publishers/", httpx.params(req.toProto3Json())),
-          options: [httpx.Accept.json, ...options],
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
@@ -431,7 +431,7 @@ abstract class publishers {
     return httpx
         .get(
           Uri.https(httpx.host(), "/c/publishers/${id}"),
-          options: [httpx.Accept.json, ...options],
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
@@ -486,7 +486,7 @@ abstract class publishers {
     return httpx
         .post(
           Uri.https(httpx.host(), "/c/publishers/${publisher.id}"),
-          options: [httpx.Accept.json, ...options],
+          options: [httpx.Content.json, httpx.Accept.json, ...options],
           body: jsonEncode(PluginPublisherUpdateRequest(publisher: publisher).toProto3Json()),
         )
         .then((v) {
@@ -505,7 +505,7 @@ abstract class publishers {
     return httpx
         .post(
           Uri.https(httpx.host(), "/c/publishers/${id}/clone"),
-          options: [httpx.Accept.json, ...options],
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
@@ -521,7 +521,7 @@ abstract class publishers {
     return httpx
         .delete(
           Uri.https(httpx.host(), "/c/publishers/${id}"),
-          options: [httpx.Accept.json, ...options],
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(

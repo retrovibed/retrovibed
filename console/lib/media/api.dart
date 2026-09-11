@@ -110,7 +110,7 @@ abstract class media {
         .post(
           Uri.https(httpx.host(), "/m/${id}/metadatasync"),
           body: jsonEncode(MediaUpdateRequest(media: upd).toProto3Json()),
-          options: [httpx.Accept.json, httpx.Content.json, ...options],
+          options: [httpx.Content.json, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
@@ -130,7 +130,7 @@ abstract class media {
             host ?? httpx.host(),
             "/m/random",
           ).replace(query: qs.encode(req.toProto3Json())),
-          options: options,
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
@@ -147,7 +147,7 @@ abstract class media {
     return httpx
         .get(
           Uri.https(httpx.host(), "/similar/$mediaId").replace(query: qs.encode(req.toProto3Json())),
-          options: options,
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
@@ -178,7 +178,10 @@ abstract class media {
     String id, {
     List<httpx.Option> options = const [],
   }) async {
-    return httpx.send(Uri.https(httpx.host(), "/m/${id}"), options: options);
+    return httpx.send(
+      Uri.https(httpx.host(), "/m/${id}"),
+      options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
+    );
   }
 
   static String download_uri(String id) {
@@ -192,7 +195,7 @@ abstract class media {
     return httpx
         .delete(
           Uri.https(httpx.host(), "/m/${id}"),
-          options: [httpx.Accept.json, ...options],
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
@@ -209,7 +212,7 @@ abstract class media {
     return httpx
         .post(
           Uri.https(httpx.host(), "/m/${id}"),
-          options: options,
+          options: [httpx.Content.json, httpx.Accept.json, ...options],
           body: jsonEncode(MediaUpdateRequest(media: upd).toProto3Json()),
         )
         .then((v) {
@@ -223,11 +226,16 @@ abstract class media {
     String id, {
     List<httpx.Option> options = const [],
   }) async {
-    return httpx.delete(Uri.https(httpx.metaendpoint(), "/m/${id}"), options: options).then((v) {
-      return Future.value(
-        httpx.fromProto3JsonSafe(cas.MediaDeleteResponse.create(), jsonDecode(v.body)),
-      );
-    });
+    return httpx
+        .delete(
+          Uri.https(httpx.metaendpoint(), "/m/${id}"),
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
+        )
+        .then((v) {
+          return Future.value(
+            httpx.fromProto3JsonSafe(cas.MediaDeleteResponse.create(), jsonDecode(v.body)),
+          );
+        });
   }
 
   static Future<http.MultipartFile> uploadable(
@@ -278,7 +286,7 @@ abstract class discovered {
             "/d/available",
             httpx.params(req.toProto3Json()),
           ),
-          options: options,
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
@@ -298,7 +306,7 @@ abstract class discovered {
             "/d/downloading",
             httpx.params(req.toProto3Json()),
           ),
-          options: options,
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
@@ -315,7 +323,7 @@ abstract class discovered {
         .post(
           Uri.https(httpx.host(), "/d/magnet"),
           body: jsonEncode(req.toProto3Json()),
-          options: options,
+          options: [httpx.Content.json, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
@@ -350,7 +358,7 @@ abstract class discovered {
         .post(
           Uri.https(httpx.host(), "/d/${id}", null),
           body: jsonEncode({}),
-          options: options,
+          options: [httpx.Content.json, httpx.Accept.json, ...options],
         )
         .then(httpx.auto_error)
         .then((v) {
@@ -367,7 +375,7 @@ abstract class discovered {
         .post(
           Uri.https(httpx.host(), "/d/${id}/metadatasync"),
           body: jsonEncode(MetadataSyncRequest(media: upd).toProto3Json()),
-          options: [httpx.Accept.json, httpx.Content.json, ...options],
+          options: [httpx.Content.json, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
@@ -407,9 +415,14 @@ abstract class discovered {
     String id, {
     List<httpx.Option> options = const [],
   }) async {
-    return httpx.get(Uri.https(httpx.host(), "/d/${id}", null), options: options).then((v) {
-      return httpx.fromProto3JsonSafe(DownloadMetadataResponse.create(), jsonDecode(v.body));
-    });
+    return httpx
+        .get(
+          Uri.https(httpx.host(), "/d/${id}", null),
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
+        )
+        .then((v) {
+          return httpx.fromProto3JsonSafe(DownloadMetadataResponse.create(), jsonDecode(v.body));
+        });
   }
 
   static Future<DownloadUpdateResponse> update(
@@ -421,7 +434,7 @@ abstract class discovered {
         .put(
           Uri.https(httpx.host(), "/d/${id}"),
           body: jsonEncode(DownloadUpdateRequest(download: upd).toProto3Json()),
-          options: [httpx.Accept.json, httpx.Content.json, ...options],
+          options: [httpx.Content.json, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
@@ -438,7 +451,7 @@ abstract class discovered {
         .delete(
           Uri.https(httpx.host(), "/d/${id}/pause", null),
           body: jsonEncode({}),
-          options: options,
+          options: [httpx.Content.json, httpx.Accept.json, ...options],
         )
         .then(httpx.auto_error)
         .then((v) {
@@ -457,7 +470,7 @@ abstract class discovered {
         .post(
           Uri.https(httpx.host(), "/d/${id}/tune", null),
           body: jsonEncode(req.toProto3Json()),
-          options: options,
+          options: [httpx.Content.json, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
@@ -474,7 +487,7 @@ abstract class discovered {
         .delete(
           Uri.https(httpx.host(), "/d/${id}"),
           body: jsonEncode({}),
-          options: options,
+          options: [httpx.Content.json, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(

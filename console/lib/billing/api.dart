@@ -27,23 +27,33 @@ Future<T> cached<T extends pb.GeneratedMessage>(
     final c = _cache[id];
     return c == null
         ? fetch().then((v) {
-          _cache[id] = v.writeToBuffer();
-          return v;
-        })
+            _cache[id] = v.writeToBuffer();
+            return v;
+          })
         : Future.value(factory(c));
   });
 }
 
 Future<BillingLookupResponse> lookup({List<httpx.Option> options = const []}) {
-  return httpx.get(Uri.https(httpx.metaendpoint(), "/m/b/"), options: options).then((v) {
-    return httpx.fromProto3JsonSafe(BillingLookupResponse.create(), jsonDecode(v.body));
-  });
+  return httpx
+      .get(
+        Uri.https(httpx.metaendpoint(), "/m/b/"),
+        options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
+      )
+      .then((v) {
+        return httpx.fromProto3JsonSafe(BillingLookupResponse.create(), jsonDecode(v.body));
+      });
 }
 
 Future<BillingCreateResponse> create({List<httpx.Option> options = const []}) {
-  return httpx.post(Uri.https(httpx.metaendpoint(), "/m/b/new"), options: options).then((v) {
-    return httpx.fromProto3JsonSafe(BillingCreateResponse.create(), jsonDecode(v.body));
-  });
+  return httpx
+      .post(
+        Uri.https(httpx.metaendpoint(), "/m/b/new"),
+        options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
+      )
+      .then((v) {
+        return httpx.fromProto3JsonSafe(BillingCreateResponse.create(), jsonDecode(v.body));
+      });
 }
 
 Future<BillingSessionResponse> session(
@@ -59,7 +69,7 @@ Future<BillingSessionResponse> session(
             qs.encode(BillingSessionRequest(plan: plan).toProto3Json()),
           ),
         ),
-        options: options,
+        options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
       )
       .then((v) {
         return httpx.fromProto3JsonSafe(BillingSessionResponse.create(), jsonDecode(v.body));
@@ -67,15 +77,25 @@ Future<BillingSessionResponse> session(
 }
 
 Future<BillingPlansResponse> plans({List<httpx.Option> options = const []}) {
-  return httpx.get(Uri.https(httpx.metaendpoint(), "/m/b/plans"), options: options).then((v) {
-    return httpx.fromProto3JsonSafe(BillingPlansResponse.create(), jsonDecode(v.body));
-  });
+  return httpx
+      .get(
+        Uri.https(httpx.metaendpoint(), "/m/b/plans"),
+        options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
+      )
+      .then((v) {
+        return httpx.fromProto3JsonSafe(BillingPlansResponse.create(), jsonDecode(v.body));
+      });
 }
 
 Future<AttributionTokenResponse> attribution({List<httpx.Option> options = const []}) {
-  return httpx.get(Uri.https(httpx.metaendpoint(), "/m/b/attribution"), options: options).then((v) {
-    return httpx.fromProto3JsonSafe(AttributionTokenResponse.create(), jsonDecode(v.body));
-  });
+  return httpx
+      .get(
+        Uri.https(httpx.metaendpoint(), "/m/b/attribution"),
+        options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
+      )
+      .then((v) {
+        return httpx.fromProto3JsonSafe(AttributionTokenResponse.create(), jsonDecode(v.body));
+      });
 }
 
 Future<AttributionConsumeResponse> consumeAttribution(
@@ -87,7 +107,7 @@ Future<AttributionConsumeResponse> consumeAttribution(
       .post(
         Uri.https(httpx.metaendpoint(), "/m/b/attribution"),
         body: jsonEncode({'token': token}),
-        options: [httpx.Content.json, ...options],
+        options: [httpx.Content.json, httpx.Accept.json, ...options],
       )
       .then((v) {
         return httpx.fromProto3JsonSafe(AttributionConsumeResponse.create(), jsonDecode(v.body));
@@ -95,7 +115,12 @@ Future<AttributionConsumeResponse> consumeAttribution(
 }
 
 Future<void> delete({List<httpx.Option> options = const []}) {
-  return httpx.delete(Uri.https(httpx.metaendpoint(), "/m/b/"), options: options).then((_) {});
+  return httpx
+      .delete(
+        Uri.https(httpx.metaendpoint(), "/m/b/"),
+        options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
+      )
+      .then((_) {});
 }
 
 Future<BillingSubscribeResponse> subscribe(String plan) {
@@ -108,6 +133,7 @@ Future<BillingSubscribeResponse> subscribe(String plan) {
             qs.encode(BillingSubscribeRequest(plan: plan).toProto3Json()),
           ),
         ),
+        options: [httpx.Content.urlencoded, httpx.Accept.json],
       )
       .then((v) {
         return httpx.fromProto3JsonSafe(BillingSubscribeResponse.create(), jsonDecode(v.body));

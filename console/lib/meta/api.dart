@@ -43,6 +43,8 @@ Future<Authn> current({String? host}) {
       .get(
         Uri.https(hostport, "/sso/"),
         options: [
+          httpx.Content.urlencoded,
+          httpx.Accept.json,
           httpx.Request.authorization(httpx.auto_bearer_host(host: hostport)),
         ],
       )
@@ -59,6 +61,8 @@ Future<Session> register(Identity iden, {String? host}) {
           qs.decode(qs.encode(iden.toProto3Json())),
         ),
         options: [
+          httpx.Content.urlencoded,
+          httpx.Accept.json,
           httpx.Request.bearer(
             () => Future.value(httpx.auto_bearer_host(host: host)),
           ),
@@ -236,7 +240,7 @@ abstract class profiles {
             "/meta/u12t/",
             qs.decode(qs.encode(req.toProto3Json())),
           ),
-          options: options,
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then(
           (v) => httpx.fromProto3JsonSafe(ProfileSearchResponse.create(), jsonDecode(v.body)),
@@ -251,7 +255,7 @@ abstract class profiles {
         .post(
           Uri.https(httpx.host(), "/meta/u12t/"),
           body: jsonEncode(req.toProto3Json()),
-          options: options,
+          options: [httpx.Content.json, httpx.Accept.json, ...options],
         )
         .then(
           (v) => httpx.fromProto3JsonSafe(ProfileCreateResponse.create(), jsonDecode(v.body)),
@@ -263,7 +267,10 @@ abstract class profiles {
     List<httpx.Option> options = const [],
   }) async {
     return httpx
-        .get(Uri.https(httpx.host(), "/meta/u12t/${id}"), options: options)
+        .get(
+          Uri.https(httpx.host(), "/meta/u12t/${id}"),
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
+        )
         .then(
           (v) => httpx.fromProto3JsonSafe(ProfileLookupResponse.create(), jsonDecode(v.body)),
         );
@@ -281,7 +288,7 @@ abstract class profiles {
         .patch(
           Uri.https(httpx.host(), "/meta/u12t/${current.id}"),
           body: jsonEncode(ProfileUpdateRequest(profile: upd).toProto3Json()),
-          options: options,
+          options: [httpx.Content.json, httpx.Accept.json, ...options],
         )
         .then(
           (v) => httpx.fromProto3JsonSafe(ProfileUpdateResponse.create(), jsonDecode(v.body)),
@@ -296,7 +303,7 @@ abstract class profiles {
         .patch(
           Uri.https(httpx.host(), "/meta/u12t/${req.profile.id}"),
           body: jsonEncode(req.toProto3Json()),
-          options: options,
+          options: [httpx.Content.json, httpx.Accept.json, ...options],
         )
         .then(
           (v) => httpx.fromProto3JsonSafe(ProfileUpdateResponse.create(), jsonDecode(v.body)),
@@ -308,7 +315,10 @@ abstract class profiles {
     List<httpx.Option> options = const [],
   }) async {
     return httpx
-        .delete(Uri.https(httpx.host(), "/meta/u12t/${id}"), options: options)
+        .delete(
+          Uri.https(httpx.host(), "/meta/u12t/${id}"),
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
+        )
         .then(
           (v) => httpx.fromProto3JsonSafe(ProfileDisableResponse.create(), jsonDecode(v.body)),
         );
@@ -345,7 +355,10 @@ abstract class authz {
     List<httpx.Option> options = const [],
   }) async {
     return httpx
-        .get(Uri.https(httpx.host(), "/meta/authz/${id}"), options: options)
+        .get(
+          Uri.https(httpx.host(), "/meta/authz/${id}"),
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
+        )
         .then(
           (v) => httpx.fromProto3JsonSafe(AuthzProfileResponse.create(), jsonDecode(v.body)),
         );
@@ -360,7 +373,7 @@ abstract class authz {
         .post(
           Uri.https(httpx.host(), "/meta/authz/${id}"),
           body: jsonEncode(AuthzGrantRequest(token: token).toProto3Json()),
-          options: options,
+          options: [httpx.Content.json, httpx.Accept.json, ...options],
         )
         .then(
           (v) => httpx.fromProto3JsonSafe(AuthzGrantResponse.create(), jsonDecode(v.body)),
@@ -372,7 +385,10 @@ abstract class authz {
     List<httpx.Option> options = const [],
   }) async {
     return httpx
-        .delete(Uri.https(httpx.host(), "/meta/authz/${id}"), options: options)
+        .delete(
+          Uri.https(httpx.host(), "/meta/authz/${id}"),
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
+        )
         .then(
           (v) => httpx.fromProto3JsonSafe(AuthzRevokeResponse.create(), jsonDecode(v.body)),
         );

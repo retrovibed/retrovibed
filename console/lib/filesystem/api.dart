@@ -82,7 +82,7 @@ abstract class filesystem {
         .post(
           Uri.https(httpx.host(), "/fs/"),
           body: jsonEncode(req.toProto3Json()),
-          options: [httpx.Accept.json, httpx.Content.json, ...options],
+          options: [httpx.Content.json, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
@@ -100,7 +100,7 @@ abstract class filesystem {
         .post(
           Uri.https(httpx.host(), "/fs/${id}"),
           body: jsonEncode(req.toProto3Json()),
-          options: [httpx.Accept.json, httpx.Content.json, ...options],
+          options: [httpx.Content.json, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
@@ -116,7 +116,7 @@ abstract class filesystem {
     return httpx
         .delete(
           Uri.https(httpx.host(), "/fs/${id}"),
-          options: [httpx.Accept.json, ...options],
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(

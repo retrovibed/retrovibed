@@ -9,11 +9,16 @@ abstract class api {
   static Future<QuotaSearchResponse> search({
     List<httpx.Option> options = const [],
   }) async {
-    return httpx.get(Uri.https(httpx.metaendpoint(), "/q/", {}), options: options).then((v) {
-      return Future.value(
-        httpx.fromProto3JsonSafe(QuotaSearchResponse.create(), jsonDecode(v.body)),
-      );
-    });
+    return httpx
+        .get(
+          Uri.https(httpx.metaendpoint(), "/q/", {}),
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
+        )
+        .then((v) {
+          return Future.value(
+            httpx.fromProto3JsonSafe(QuotaSearchResponse.create(), jsonDecode(v.body)),
+          );
+        });
   }
 
   static Future<QuotaFindResponse> get(
@@ -23,7 +28,7 @@ abstract class api {
     return httpx
         .get(
           Uri.https(httpx.metaendpoint(), "/q/${id}", {}),
-          options: options,
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(

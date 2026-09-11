@@ -92,7 +92,7 @@ abstract class wireguard {
           body: jsonEncode(
             WireguardUpdateRequest(wireguard: wg).toProto3Json(),
           ),
-          options: options,
+          options: [httpx.Content.json, httpx.Accept.json, ...options],
         )
         .then(
           (v) => httpx.fromProto3JsonSafe(WireguardUpdateResponse.create(), jsonDecode(v.body)),
@@ -113,7 +113,7 @@ abstract class wireguard {
               nettype: nettype,
             ).toProto3Json(),
           ),
-          options: options,
+          options: [httpx.Content.json, httpx.Accept.json, ...options],
         )
         .then(httpx.auto_error)
         .then((v) {

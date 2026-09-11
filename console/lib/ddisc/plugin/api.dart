@@ -18,7 +18,7 @@ abstract class plugins {
     return httpx
         .get(
           Uri.https(httpx.host(), "/ddisc/plugin/", httpx.params(req.toProto3Json())),
-          options: options,
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(
@@ -31,11 +31,16 @@ abstract class plugins {
     String id, {
     List<httpx.Option> options = const [],
   }) async {
-    return httpx.get(Uri.https(httpx.host(), "/ddisc/plugin/${id}"), options: options).then((v) {
-      return Future.value(
-        httpx.fromProto3JsonSafe(PluginFindResponse.create(), jsonDecode(v.body)),
-      );
-    });
+    return httpx
+        .get(
+          Uri.https(httpx.host(), "/ddisc/plugin/${id}"),
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
+        )
+        .then((v) {
+          return Future.value(
+            httpx.fromProto3JsonSafe(PluginFindResponse.create(), jsonDecode(v.body)),
+          );
+        });
   }
 
   static Future<http.MultipartFile> uploadable(
@@ -73,11 +78,16 @@ abstract class plugins {
     String id, {
     List<httpx.Option> options = const [],
   }) async {
-    return httpx.delete(Uri.https(httpx.host(), "/ddisc/plugin/${id}"), options: options).then((v) {
-      return Future.value(
-        httpx.fromProto3JsonSafe(PluginDeleteResponse.create(), jsonDecode(v.body)),
-      );
-    });
+    return httpx
+        .delete(
+          Uri.https(httpx.host(), "/ddisc/plugin/${id}"),
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
+        )
+        .then((v) {
+          return Future.value(
+            httpx.fromProto3JsonSafe(PluginDeleteResponse.create(), jsonDecode(v.body)),
+          );
+        });
   }
 }
 

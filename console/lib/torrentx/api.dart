@@ -14,7 +14,7 @@ abstract class diagnostics {
     return httpx
         .get(
           Uri.https(httpx.host(), "/diagnostics/torrent/"),
-          options: [httpx.Accept.json, ...options],
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) => httpx.fromProto3JsonSafe(TorrentMetricsResponse(), jsonDecode(v.body)));
   }

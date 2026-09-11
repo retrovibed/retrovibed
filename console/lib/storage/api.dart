@@ -7,11 +7,16 @@ abstract class api {
   static Future<StorageSettingsResponse> get({
     List<httpx.Option> options = const [],
   }) async {
-    return httpx.get(Uri.https(httpx.host(), "/s/storage/", {}), options: options).then((v) {
-      return Future.value(
-        httpx.fromProto3JsonSafe(StorageSettingsResponse.create(), jsonDecode(v.body)),
-      );
-    });
+    return httpx
+        .get(
+          Uri.https(httpx.host(), "/s/storage/", {}),
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
+        )
+        .then((v) {
+          return Future.value(
+            httpx.fromProto3JsonSafe(StorageSettingsResponse.create(), jsonDecode(v.body)),
+          );
+        });
   }
 
   static Future<StorageSettingsResponse> create(
@@ -21,7 +26,7 @@ abstract class api {
     return httpx
         .post(
           Uri.https(httpx.host(), "/s/storage/", {}),
-          options: options,
+          options: [httpx.Content.json, httpx.Accept.json, ...options],
           body: jsonEncode(req.toProto3Json()),
         )
         .then((v) {
@@ -37,7 +42,7 @@ abstract class api {
     return httpx
         .delete(
           Uri.https(httpx.host(), "/s/storage/", {}),
-          options: options,
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) {
           return Future.value(

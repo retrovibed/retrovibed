@@ -8,11 +8,16 @@ abstract class configuration {
   static Future<DiscoverySettings> get({
     List<httpx.Option> options = const [],
   }) async {
-    return httpx.get(Uri.https(httpx.host(), "/s/discovery/", {}), options: options).then((v) {
-      return Future.value(
-        httpx.fromProto3JsonSafe(DiscoverySettings.create(), jsonDecode(v.body)),
-      );
-    });
+    return httpx
+        .get(
+          Uri.https(httpx.host(), "/s/discovery/", {}),
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
+        )
+        .then((v) {
+          return Future.value(
+            httpx.fromProto3JsonSafe(DiscoverySettings.create(), jsonDecode(v.body)),
+          );
+        });
   }
 
   static Future<DiscoverySettings> create(
@@ -22,7 +27,7 @@ abstract class configuration {
     return httpx
         .post(
           Uri.https(httpx.host(), "/s/discovery/", {}),
-          options: options,
+          options: [httpx.Content.json, httpx.Accept.json, ...options],
           body: jsonEncode(req.toProto3Json()),
         )
         .then((v) {
