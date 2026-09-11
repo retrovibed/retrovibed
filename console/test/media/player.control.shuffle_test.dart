@@ -5,8 +5,10 @@ import 'package:retrovibed/media/play.queue.dart';
 import 'package:retrovibed/media/media.row.display.dart';
 import 'package:retrovibed/media/api.dart' as api;
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
+import 'package:retrovibed/uuidx.dart' as uuidx;
 
-PlayableMedia _media(String id, String title) => PlayableMedia(api.Media(id: id, description: title));
+PlayableMedia _media(String id, String title) =>
+    PlayableMedia(api.Media(id: id, description: title), profileId: uuidx.min(), sessionId: uuidx.min());
 
 Finder _strategyIcon(String tooltip) => find.byWidgetPredicate((w) => w is IconButton && w.tooltip == tooltip);
 

@@ -108,7 +108,7 @@ class PlayQueue {
     _stream = StreamIterator(stream);
     _upcoming.clear();
     _previous.clear();
-    current.value = PlayableMedia(media, pos: pos);
+    current.value = PlayableMedia(media, pos: pos, profileId: uuidx.min(), sessionId: uuidx.min());
     revision.value++;
   }
 
@@ -194,8 +194,18 @@ class PlayQueue {
 class PlayableMedia {
   final Media current;
   final Duration pos;
+  // provenance carried through from a remote enqueue (Stream.profile_id /
+  // Stream.session_id) - uuidx.min() (nil sentinel) at call sites with no
+  // remote-control provenance (search taps, autoqueue/range() fills).
+  final String profileId;
+  final String sessionId;
 
-  const PlayableMedia(this.current, {this.pos = const Duration(milliseconds: 0)});
+  const PlayableMedia(
+    this.current, {
+    this.pos = const Duration(milliseconds: 0),
+    required this.profileId,
+    required this.sessionId,
+  });
 
   Known get known => Known(
     id: current.id,
@@ -254,17 +264,19 @@ Stream<PlayableMedia> range(
     yield PlayableMedia(
       playable.current,
       pos: queue.pos,
+      profileId: uuidx.min(),
+      sessionId: uuidx.min(),
     );
   }
 
   for (var m in initial) {
-    yield PlayableMedia(m);
+    yield PlayableMedia(m, profileId: uuidx.min(), sessionId: uuidx.min());
   }
 
   while (i.items.length == i.next.limit.toInt()) {
     i = await search(i.next, options: options());
     for (var m in i.items) {
-      yield PlayableMedia(m);
+      yield PlayableMedia(m, profileId: uuidx.min(), sessionId: uuidx.min());
     }
     i.next..offset += 1;
   }
@@ -296,7 +308,7 @@ Stream<PlayableMedia> range(
         });
     switch (signal) {
       case Signal.Ok:
-        yield PlayableMedia(v.media);
+        yield PlayableMedia(v.media, profileId: uuidx.min(), sessionId: uuidx.min());
       case Signal.Delay:
         continue;
       case Signal.Stop:

@@ -230,6 +230,109 @@ func TestHTTPRemoteControl(t *testing.T) {
 		require.Equal(t, websocketx.PrivateStatus(http.StatusConflict), websocket.CloseStatus(err))
 	})
 
+	t.Run("connect overwrites a forged profile_id with the authenticated caller's own", func(t *testing.T) {
+		routes := mux.NewRouter()
+		mediaapi.NewHTTPRemoteControl(
+			true,
+			mediaapi.HTTPRemoteControlOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+		).Bind(routes.PathPrefix("/rc").Subrouter())
+		server := httptest.NewServer(routes)
+		defer server.Close()
+
+		listentoken, err := mediaapi.RemoteControlListenToken()
+		require.NoError(t, err)
+		listenconn, _, err := websocket.Dial(t.Context(), fmt.Sprintf("ws://%s/rc/listen", server.Listener.Addr().String()), &websocket.DialOptions{
+			HTTPHeader: http.Header{"Authorization": []string{fmt.Sprintf("Bearer %s", listentoken)}},
+		})
+		require.NoError(t, err)
+		defer listenconn.Close(websocket.StatusNormalClosure, "") //nolint: errcheck
+
+		// token genuinely authenticates as "profile-real" - the payload below
+		// tries (and must fail) to claim "profile-forged" instead.
+		connecttoken := httpauthtest.UnsafeClaimsToken(
+			metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(
+				jwtx.NewJWTClaims("profile-real", jwtx.ClaimsOptionAuthnExpiration()),
+				func(t *metaapi.Token) { t.RemoteControl = true },
+			)),
+			httpauthtest.UnsafeJWTSecretSource,
+		)
+		conn, _, err := websocket.Dial(t.Context(), fmt.Sprintf("ws://%s/rc/connect", server.Listener.Addr().String()), &websocket.DialOptions{
+			HTTPHeader: http.Header{"Authorization": []string{fmt.Sprintf("Bearer %s", connecttoken)}},
+		})
+		require.NoError(t, err)
+		defer conn.Close(websocket.StatusNormalClosure, "") //nolint: errcheck
+
+		ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
+		defer cancel()
+
+		cmd, err := protojson.Marshal(&mediaapi.Stream{
+			Sid:       "forge-attempt",
+			ProfileId: "profile-forged", // attacker-controlled, must not survive the relay
+			SessionId: "session-abc",    // untouched by design - passes through
+			Command:   &mediaapi.Stream_Queue{Queue: &mediaapi.Queue{}},
+		})
+		require.NoError(t, err)
+		require.NoError(t, conn.Write(ctx, websocket.MessageBinary, cmd))
+
+		_, received, err := listenconn.Read(ctx)
+		require.NoError(t, err)
+
+		var relayed mediaapi.Stream
+		require.NoError(t, protojson.Unmarshal(received, &relayed))
+		require.Equal(t, "profile-real", relayed.ProfileId, "forged profile_id must be replaced with the authenticated caller's own")
+		require.Equal(t, "session-abc", relayed.SessionId, "session_id is not a trust boundary - passes through untouched")
+	})
+
+	t.Run("profile_id stamping applies to every command type, not just queue", func(t *testing.T) {
+		routes := mux.NewRouter()
+		mediaapi.NewHTTPRemoteControl(
+			true,
+			mediaapi.HTTPRemoteControlOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+		).Bind(routes.PathPrefix("/rc").Subrouter())
+		server := httptest.NewServer(routes)
+		defer server.Close()
+
+		listentoken, err := mediaapi.RemoteControlListenToken()
+		require.NoError(t, err)
+		listenconn, _, err := websocket.Dial(t.Context(), fmt.Sprintf("ws://%s/rc/listen", server.Listener.Addr().String()), &websocket.DialOptions{
+			HTTPHeader: http.Header{"Authorization": []string{fmt.Sprintf("Bearer %s", listentoken)}},
+		})
+		require.NoError(t, err)
+		defer listenconn.Close(websocket.StatusNormalClosure, "") //nolint: errcheck
+
+		connecttoken := httpauthtest.UnsafeClaimsToken(
+			metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(
+				jwtx.NewJWTClaims("profile-real", jwtx.ClaimsOptionAuthnExpiration()),
+				func(t *metaapi.Token) { t.RemoteControl = true },
+			)),
+			httpauthtest.UnsafeJWTSecretSource,
+		)
+		conn, _, err := websocket.Dial(t.Context(), fmt.Sprintf("ws://%s/rc/connect", server.Listener.Addr().String()), &websocket.DialOptions{
+			HTTPHeader: http.Header{"Authorization": []string{fmt.Sprintf("Bearer %s", connecttoken)}},
+		})
+		require.NoError(t, err)
+		defer conn.Close(websocket.StatusNormalClosure, "") //nolint: errcheck
+
+		ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
+		defer cancel()
+
+		cmd, err := protojson.Marshal(&mediaapi.Stream{
+			Sid:       "forge-attempt-2",
+			ProfileId: "profile-forged",
+			Command:   &mediaapi.Stream_Pause{},
+		})
+		require.NoError(t, err)
+		require.NoError(t, conn.Write(ctx, websocket.MessageBinary, cmd))
+
+		_, received, err := listenconn.Read(ctx)
+		require.NoError(t, err)
+
+		var relayed mediaapi.Stream
+		require.NoError(t, protojson.Unmarshal(received, &relayed))
+		require.Equal(t, "profile-real", relayed.ProfileId)
+		require.NotNil(t, relayed.GetPause())
+	})
+
 	t.Run("disabled rejects listen and connect with forbidden", func(t *testing.T) {
 		routes := mux.NewRouter()
 		mediaapi.NewHTTPRemoteControl(

@@ -8,10 +8,12 @@ class PlaylistQueue extends StatelessWidget {
   final remote.RemoteControlSocket socket;
   final void Function(remote.Sync Function(remote.Sync c) mutated) onChange;
   final Widget empty;
+  final String sessionId;
   const PlaylistQueue(
     this.current,
     this.socket, {
     Key? key,
+    required this.sessionId,
     this.onChange = _noop,
     this.empty = ds.Empty,
   }) : super(key: key);
@@ -27,14 +29,14 @@ class PlaylistQueue extends StatelessWidget {
         verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
         children: current.queue
             .map(
-              (m) => media.RowDisplay(
-                media: m,
+              (s) => media.RowDisplay(
+                media: s.asMedia,
                 leading: const [Icon(Icons.queue_music)],
                 trailing: [
                   ds.LoadingIconButton.remove(
                     onPressed: () async {
-                      onChange(remote.syncmut.dequeue(m));
-                      socket.send(remote.messages.dequeue(m.id));
+                      onChange(remote.syncmut.dequeue(s.asMedia));
+                      socket.send(remote.messages.dequeue(s.asMedia.id, sessionId: sessionId));
                     },
                   ),
                 ],

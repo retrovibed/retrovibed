@@ -150,6 +150,18 @@ func (t *HTTPRemoteControl) listen(w http.ResponseWriter, r *http.Request) {
 }
 
 func (t *HTTPRemoteControl) connect(w http.ResponseWriter, r *http.Request) {
+	// AuthzTokenHTTP (see Bind) already validated the caller's JWT and
+	// stashed the resulting token in the request context before this
+	// handler ran - token.Sub below is the only identity ever attributed
+	// to frames from this socket, regardless of what a frame's own
+	// profile_id field claims.
+	token, err := metaapi.FromContext(r.Context())
+	if err != nil {
+		log.Println(errorsx.Wrap(err, "remote control connect: missing authorization context"))
+		httpx.Unauthorized(w, err)
+		return
+	}
+
 	c, err := websocket.Accept(w, r, nil)
 	if err != nil {
 		log.Println("failed to accept remote control connect websocket", err)
@@ -181,10 +193,24 @@ func (t *HTTPRemoteControl) connect(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
+		// never trust a client-supplied profile_id: overwrite it with the
+		// identity established by this socket's own authenticated
+		// connection, for every command type - not just queue - so no
+		// frame from this socket can ever claim to have been issued by a
+		// different profile. session_id is left untouched: it's an
+		// unauthenticated client-chosen correlation id, not an identity
+		// claim.
+		msg.ProfileId = token.Sub
+		corrected, err := protojson.Marshal(&msg)
+		if err != nil {
+			log.Println(errorsx.Wrap(err, "unable to re-encode remote control command"))
+			continue
+		}
+
 		t.mu.Lock()
 		listener := t.listener
 		if listener != nil {
-			err = listener.Write(ctx, websocket.MessageBinary, data)
+			err = listener.Write(ctx, websocket.MessageBinary, corrected)
 		}
 		t.mu.Unlock()
 

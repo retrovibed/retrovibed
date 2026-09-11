@@ -6,7 +6,10 @@ import "media/media.proto";
 import "meta/meta.daemon.proto";
 
 // enqueue a bit of media for playback.
-message Queue { Media media = 1 [ json_name = "media" ]; }
+message Queue {
+  Media media = 1 [ json_name = "media" ];
+}
+
 // dequeue the media with the given id.
 message Dequeue { string id = 1 [ json_name = "id" ]; }
 // pause commands the device to toggle media playback.
@@ -24,7 +27,7 @@ message Seek { int32 offset = 1 [ json_name = "offset" ]; }
 message Sync {
   meta.Daemon library = 1 [ json_name = "library" ];
   uint32 capacity = 2 [ json_name = "capacity" ];
-  Media current = 3 [ json_name = "current" ];
+  Stream current = 3 [ json_name = "current" ];
   string token = 4 [ json_name = "token" ];
   int64 expiration = 5 [ json_name = "expiration" ];
   float volume = 6 [ json_name = "volume" ];
@@ -32,7 +35,7 @@ message Sync {
   bool paused = 8 [ json_name = "paused" ];
   bool fullscreen = 9 [ json_name = "fullscreen" ];
   reserved 10 to 999;
-  repeated Media queue = 1000 [ json_name = "queue" ];
+  repeated Stream queue = 1000 [ json_name = "queue" ];
 }
 
 // Fullscreen toggles fullscreen on the receiving device. No payload -
@@ -51,6 +54,16 @@ message Mute {}
 message Stream {
   string sid = 1 [ json_name = "sid" ];
   uint64 vid = 2 [ json_name = "vid" ];
+  // who issued this frame - server-stamped by
+  // shallows/mediaapi/http.remote.control.go from the authenticated
+  // connect() caller's JWT `sub` claim, for every inbound frame regardless
+  // of command type. Any client-supplied value is discarded and
+  // overwritten. Never trust this field's value as sent by a client.
+  string profile_id = 3 [ json_name = "profile_id" ];
+  // client-chosen opaque correlation id (uuidv7), identifying which
+  // Connect session issued this frame. Not authenticated, not a security
+  // claim - a self-tag only.
+  string session_id = 4 [ json_name = "session_id" ];
   oneof Command {
     Queue queue = 1000 [ json_name = "queue" ];
     Dequeue dequeue = 1002 [ json_name = "dequeue" ];

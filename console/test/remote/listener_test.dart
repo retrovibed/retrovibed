@@ -251,7 +251,7 @@ void main() {
                 builder: (context) {
                   return ElevatedButton(
                     onPressed: () {
-                      media.Playlist.of(context)!.queue.push(playqueue.PlayableMedia(media.Media(id: "m1")));
+                      media.Playlist.of(context)!.queue.push(playqueue.PlayableMedia(media.Media(id: "m1"), profileId: uuidx.min(), sessionId: uuidx.min()));
                     },
                     child: const SizedBox(),
                   );
@@ -267,7 +267,7 @@ void main() {
       await tester.pump();
 
       expectFullyPopulatedSync(fakeSocket.sent.last, library: meta.Daemon(hostname: "localhost:9998"), queueLength: 1);
-      expect(fakeSocket.sent.last.sync.queue.single.id, "m1");
+      expect(fakeSocket.sent.last.sync.queue.single.asMedia.id, "m1");
     });
 
     testWidgets('an incoming sync request triggers a fully populated response', (tester) async {
@@ -328,11 +328,13 @@ void main() {
 
       media.Playlist.of(capturedContext)!.queue.current.value = playqueue.PlayableMedia(
         media.Media(id: "now-playing"),
+        profileId: uuidx.min(),
+        sessionId: uuidx.min(),
       );
       await tester.pump();
 
       expectFullyPopulatedSync(fakeSocket.sent.last, library: meta.Daemon(hostname: "localhost:9998"));
-      expect(fakeSocket.sent.last.sync.current.id, "now-playing");
+      expect(fakeSocket.sent.last.sync.current.asMedia.id, "now-playing");
     });
   });
 
@@ -351,6 +353,27 @@ void main() {
       await _settle(tester);
 
       expect(fake.queue.queued.map((m) => m.current.id), contains("m1"));
+    });
+
+    testWidgets('an inbound queue command carries profile_id/session_id through to the echoed sync', (tester) async {
+      final fake = _FakePlaylistControl();
+      final (fakeSocket, _) = await mount(tester, withPlaylist: false, fakePlaylist: fake);
+
+      fakeSocket.emit(
+        remote.Stream(
+          sid: uuidx.v7(),
+          profileId: "profile-1",
+          sessionId: "session-1",
+          queue: remote.Queue(media: media.Media(id: "m1")),
+        ),
+      );
+      await _settle(tester);
+
+      expect(fake.maybeNextCalls.single.profileId, "profile-1");
+      expect(fake.maybeNextCalls.single.sessionId, "session-1");
+      expect(fakeSocket.sent.last.sync.queue.single.profileId, "profile-1");
+      expect(fakeSocket.sent.last.sync.queue.single.sessionId, "session-1");
+      expect(fakeSocket.sent.last.sync.queue.single.asMedia.id, "m1");
     });
 
     testWidgets('two inbound queue commands both land, in delivery order', (tester) async {
@@ -421,7 +444,7 @@ void main() {
   group('dequeue', () {
     testWidgets('removes a previously queued id', (tester) async {
       final fake = _FakePlaylistControl();
-      fake.queue.push(playqueue.PlayableMedia(media.Media(id: "m1")));
+      fake.queue.push(playqueue.PlayableMedia(media.Media(id: "m1"), profileId: uuidx.min(), sessionId: uuidx.min()));
       final (fakeSocket, _) = await mount(tester, withPlaylist: false, fakePlaylist: fake);
 
       fakeSocket.emit(
@@ -437,7 +460,7 @@ void main() {
 
     testWidgets('dequeuing an absent id is a no-op', (tester) async {
       final fake = _FakePlaylistControl();
-      fake.queue.push(playqueue.PlayableMedia(media.Media(id: "m1")));
+      fake.queue.push(playqueue.PlayableMedia(media.Media(id: "m1"), profileId: uuidx.min(), sessionId: uuidx.min()));
       final (fakeSocket, _) = await mount(tester, withPlaylist: false, fakePlaylist: fake);
 
       fakeSocket.emit(
@@ -475,7 +498,7 @@ void main() {
 
     testWidgets('duplicate/replayed dequeues for the same id are idempotent', (tester) async {
       final fake = _FakePlaylistControl();
-      fake.queue.push(playqueue.PlayableMedia(media.Media(id: "m1")));
+      fake.queue.push(playqueue.PlayableMedia(media.Media(id: "m1"), profileId: uuidx.min(), sessionId: uuidx.min()));
       final (fakeSocket, _) = await mount(tester, withPlaylist: false, fakePlaylist: fake);
 
       fakeSocket.emit(
@@ -552,7 +575,7 @@ void main() {
 
         final queue = media.Playlist.of(capturedContext)!.queue;
         for (final id in ["m1", "m2", "m3", "m4", "m5"]) {
-          queue.push(playqueue.PlayableMedia(media.Media(id: id)));
+          queue.push(playqueue.PlayableMedia(media.Media(id: id), profileId: uuidx.min(), sessionId: uuidx.min()));
         }
         await _settle(tester);
 

@@ -233,14 +233,14 @@ class Sync extends $pb.GeneratedMessage {
   factory Sync({
     $1.Daemon? library,
     $core.int? capacity,
-    $0.Media? current,
+    Stream? current,
     $core.String? token,
     $fixnum.Int64? expiration,
     $core.double? volume,
     $core.bool? muted,
     $core.bool? paused,
     $core.bool? fullscreen,
-    $core.Iterable<$0.Media>? queue,
+    $core.Iterable<Stream>? queue,
   }) {
     final result = create();
     if (library != null) result.library = library;
@@ -272,16 +272,16 @@ class Sync extends $pb.GeneratedMessage {
     ..aOM<$1.Daemon>(1, _omitFieldNames ? '' : 'library',
         subBuilder: $1.Daemon.create)
     ..aI(2, _omitFieldNames ? '' : 'capacity', fieldType: $pb.PbFieldType.OU3)
-    ..aOM<$0.Media>(3, _omitFieldNames ? '' : 'current',
-        subBuilder: $0.Media.create)
+    ..aOM<Stream>(3, _omitFieldNames ? '' : 'current',
+        subBuilder: Stream.create)
     ..aOS(4, _omitFieldNames ? '' : 'token')
     ..aInt64(5, _omitFieldNames ? '' : 'expiration')
     ..aD(6, _omitFieldNames ? '' : 'volume', fieldType: $pb.PbFieldType.OF)
     ..aOB(7, _omitFieldNames ? '' : 'muted')
     ..aOB(8, _omitFieldNames ? '' : 'paused')
     ..aOB(9, _omitFieldNames ? '' : 'fullscreen')
-    ..pPM<$0.Media>(1000, _omitFieldNames ? '' : 'queue',
-        subBuilder: $0.Media.create)
+    ..pPM<Stream>(1000, _omitFieldNames ? '' : 'queue',
+        subBuilder: Stream.create)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -323,15 +323,15 @@ class Sync extends $pb.GeneratedMessage {
   void clearCapacity() => $_clearField(2);
 
   @$pb.TagNumber(3)
-  $0.Media get current => $_getN(2);
+  Stream get current => $_getN(2);
   @$pb.TagNumber(3)
-  set current($0.Media value) => $_setField(3, value);
+  set current(Stream value) => $_setField(3, value);
   @$pb.TagNumber(3)
   $core.bool hasCurrent() => $_has(2);
   @$pb.TagNumber(3)
   void clearCurrent() => $_clearField(3);
   @$pb.TagNumber(3)
-  $0.Media ensureCurrent() => $_ensure(2);
+  Stream ensureCurrent() => $_ensure(2);
 
   @$pb.TagNumber(4)
   $core.String get token => $_getSZ(3);
@@ -388,7 +388,7 @@ class Sync extends $pb.GeneratedMessage {
   void clearFullscreen() => $_clearField(9);
 
   @$pb.TagNumber(1000)
-  $pb.PbList<$0.Media> get queue => $_getList(9);
+  $pb.PbList<Stream> get queue => $_getList(9);
 }
 
 /// Fullscreen toggles fullscreen on the receiving device. No payload -
@@ -490,6 +490,8 @@ class Stream extends $pb.GeneratedMessage {
   factory Stream({
     $core.String? sid,
     $fixnum.Int64? vid,
+    $core.String? profileId,
+    $core.String? sessionId,
     Queue? queue,
     Dequeue? dequeue,
     Pause? pause,
@@ -502,6 +504,8 @@ class Stream extends $pb.GeneratedMessage {
     final result = create();
     if (sid != null) result.sid = sid;
     if (vid != null) result.vid = vid;
+    if (profileId != null) result.profileId = profileId;
+    if (sessionId != null) result.sessionId = sessionId;
     if (queue != null) result.queue = queue;
     if (dequeue != null) result.dequeue = dequeue;
     if (pause != null) result.pause = pause;
@@ -541,6 +545,8 @@ class Stream extends $pb.GeneratedMessage {
     ..aOS(1, _omitFieldNames ? '' : 'sid')
     ..a<$fixnum.Int64>(2, _omitFieldNames ? '' : 'vid', $pb.PbFieldType.OU6,
         defaultOrMaker: $fixnum.Int64.ZERO)
+    ..aOS(3, _omitFieldNames ? '' : 'profile_id')
+    ..aOS(4, _omitFieldNames ? '' : 'session_id')
     ..aOM<Queue>(1000, _omitFieldNames ? '' : 'queue', subBuilder: Queue.create)
     ..aOM<Dequeue>(1002, _omitFieldNames ? '' : 'dequeue',
         subBuilder: Dequeue.create)
@@ -608,93 +614,119 @@ class Stream extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   void clearVid() => $_clearField(2);
 
+  /// who issued this frame - server-stamped by
+  /// shallows/mediaapi/http.remote.control.go from the authenticated
+  /// connect() caller's JWT `sub` claim, for every inbound frame regardless
+  /// of command type. Any client-supplied value is discarded and
+  /// overwritten. Never trust this field's value as sent by a client.
+  @$pb.TagNumber(3)
+  $core.String get profileId => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set profileId($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasProfileId() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearProfileId() => $_clearField(3);
+
+  /// client-chosen opaque correlation id (uuidv7), identifying which
+  /// Connect session issued this frame. Not authenticated, not a security
+  /// claim - a self-tag only.
+  @$pb.TagNumber(4)
+  $core.String get sessionId => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set sessionId($core.String value) => $_setString(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasSessionId() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearSessionId() => $_clearField(4);
+
   @$pb.TagNumber(1000)
-  Queue get queue => $_getN(2);
+  Queue get queue => $_getN(4);
   @$pb.TagNumber(1000)
   set queue(Queue value) => $_setField(1000, value);
   @$pb.TagNumber(1000)
-  $core.bool hasQueue() => $_has(2);
+  $core.bool hasQueue() => $_has(4);
   @$pb.TagNumber(1000)
   void clearQueue() => $_clearField(1000);
   @$pb.TagNumber(1000)
-  Queue ensureQueue() => $_ensure(2);
+  Queue ensureQueue() => $_ensure(4);
 
   @$pb.TagNumber(1002)
-  Dequeue get dequeue => $_getN(3);
+  Dequeue get dequeue => $_getN(5);
   @$pb.TagNumber(1002)
   set dequeue(Dequeue value) => $_setField(1002, value);
   @$pb.TagNumber(1002)
-  $core.bool hasDequeue() => $_has(3);
+  $core.bool hasDequeue() => $_has(5);
   @$pb.TagNumber(1002)
   void clearDequeue() => $_clearField(1002);
   @$pb.TagNumber(1002)
-  Dequeue ensureDequeue() => $_ensure(3);
+  Dequeue ensureDequeue() => $_ensure(5);
 
   @$pb.TagNumber(1003)
-  Pause get pause => $_getN(4);
+  Pause get pause => $_getN(6);
   @$pb.TagNumber(1003)
   set pause(Pause value) => $_setField(1003, value);
   @$pb.TagNumber(1003)
-  $core.bool hasPause() => $_has(4);
+  $core.bool hasPause() => $_has(6);
   @$pb.TagNumber(1003)
   void clearPause() => $_clearField(1003);
   @$pb.TagNumber(1003)
-  Pause ensurePause() => $_ensure(4);
+  Pause ensurePause() => $_ensure(6);
 
   @$pb.TagNumber(1004)
-  Seek get seek => $_getN(5);
+  Seek get seek => $_getN(7);
   @$pb.TagNumber(1004)
   set seek(Seek value) => $_setField(1004, value);
   @$pb.TagNumber(1004)
-  $core.bool hasSeek() => $_has(5);
+  $core.bool hasSeek() => $_has(7);
   @$pb.TagNumber(1004)
   void clearSeek() => $_clearField(1004);
   @$pb.TagNumber(1004)
-  Seek ensureSeek() => $_ensure(5);
+  Seek ensureSeek() => $_ensure(7);
 
   @$pb.TagNumber(1005)
-  Sync get sync => $_getN(6);
+  Sync get sync => $_getN(8);
   @$pb.TagNumber(1005)
   set sync(Sync value) => $_setField(1005, value);
   @$pb.TagNumber(1005)
-  $core.bool hasSync() => $_has(6);
+  $core.bool hasSync() => $_has(8);
   @$pb.TagNumber(1005)
   void clearSync() => $_clearField(1005);
   @$pb.TagNumber(1005)
-  Sync ensureSync() => $_ensure(6);
+  Sync ensureSync() => $_ensure(8);
 
   @$pb.TagNumber(1006)
-  Seek get volume => $_getN(7);
+  Seek get volume => $_getN(9);
   @$pb.TagNumber(1006)
   set volume(Seek value) => $_setField(1006, value);
   @$pb.TagNumber(1006)
-  $core.bool hasVolume() => $_has(7);
+  $core.bool hasVolume() => $_has(9);
   @$pb.TagNumber(1006)
   void clearVolume() => $_clearField(1006);
   @$pb.TagNumber(1006)
-  Seek ensureVolume() => $_ensure(7);
+  Seek ensureVolume() => $_ensure(9);
 
   @$pb.TagNumber(1007)
-  Fullscreen get fullscreen => $_getN(8);
+  Fullscreen get fullscreen => $_getN(10);
   @$pb.TagNumber(1007)
   set fullscreen(Fullscreen value) => $_setField(1007, value);
   @$pb.TagNumber(1007)
-  $core.bool hasFullscreen() => $_has(8);
+  $core.bool hasFullscreen() => $_has(10);
   @$pb.TagNumber(1007)
   void clearFullscreen() => $_clearField(1007);
   @$pb.TagNumber(1007)
-  Fullscreen ensureFullscreen() => $_ensure(8);
+  Fullscreen ensureFullscreen() => $_ensure(10);
 
   @$pb.TagNumber(1008)
-  Mute get mute => $_getN(9);
+  Mute get mute => $_getN(11);
   @$pb.TagNumber(1008)
   set mute(Mute value) => $_setField(1008, value);
   @$pb.TagNumber(1008)
-  $core.bool hasMute() => $_has(9);
+  $core.bool hasMute() => $_has(11);
   @$pb.TagNumber(1008)
   void clearMute() => $_clearField(1008);
   @$pb.TagNumber(1008)
-  Mute ensureMute() => $_ensure(9);
+  Mute ensureMute() => $_ensure(11);
 }
 
 const $core.bool _omitFieldNames =

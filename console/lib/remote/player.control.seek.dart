@@ -4,6 +4,7 @@ import 'api.dart' as remote;
 
 class PlayerControlSeek extends StatelessWidget {
   final remote.RemoteControlSocket socket;
+  final String sessionId;
   final int offset;
   final IconData icon;
   final String help;
@@ -11,6 +12,7 @@ class PlayerControlSeek extends StatelessWidget {
   const PlayerControlSeek._({
     Key? key,
     required this.socket,
+    required this.sessionId,
     required this.offset,
     required this.icon,
     required this.help,
@@ -19,11 +21,13 @@ class PlayerControlSeek extends StatelessWidget {
   factory PlayerControlSeek.forward({
     Key? key,
     required remote.RemoteControlSocket socket,
+    required String sessionId,
     Duration step = const Duration(seconds: 10),
   }) {
     return PlayerControlSeek._(
       key: key,
       socket: socket,
+      sessionId: sessionId,
       offset: step.inMilliseconds,
       icon: Icons.fast_forward_rounded,
       help: "seek forward ${step.inSeconds}s on the remote device",
@@ -33,31 +37,43 @@ class PlayerControlSeek extends StatelessWidget {
   factory PlayerControlSeek.backward({
     Key? key,
     required remote.RemoteControlSocket socket,
+    required String sessionId,
     Duration step = const Duration(seconds: 10),
   }) {
     return PlayerControlSeek._(
       key: key,
       socket: socket,
+      sessionId: sessionId,
       offset: -step.inMilliseconds,
       icon: Icons.fast_rewind_rounded,
       help: "seek backward ${step.inSeconds}s on the remote device",
     );
   }
 
-  factory PlayerControlSeek.next({Key? key, required remote.RemoteControlSocket socket}) {
+  factory PlayerControlSeek.next({
+    Key? key,
+    required remote.RemoteControlSocket socket,
+    required String sessionId,
+  }) {
     return PlayerControlSeek._(
       key: key,
       socket: socket,
+      sessionId: sessionId,
       offset: remote.SeekOffset.next,
       icon: Icons.skip_next_rounded,
       help: "skip to the next track on the remote device",
     );
   }
 
-  factory PlayerControlSeek.prev({Key? key, required remote.RemoteControlSocket socket}) {
+  factory PlayerControlSeek.prev({
+    Key? key,
+    required remote.RemoteControlSocket socket,
+    required String sessionId,
+  }) {
     return PlayerControlSeek._(
       key: key,
       socket: socket,
+      sessionId: sessionId,
       offset: remote.SeekOffset.previous,
       icon: Icons.skip_previous_rounded,
       help: "skip to the previous track on the remote device",
@@ -67,7 +83,9 @@ class PlayerControlSeek extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ds.LoadingIconButton(
-      onPressed: ds.LoadingIconButton.convert(() => socket.send(remote.messages.seek(offset))),
+      onPressed: ds.LoadingIconButton.convert(
+        () => socket.send(remote.messages.seek(offset, sessionId: sessionId)),
+      ),
       icon: Icon(icon),
       tooltip: help,
       help: ds.Hint(Text(help)),

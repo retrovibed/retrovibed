@@ -30,7 +30,9 @@ Future<meta.DaemonSearchResponse> _noopDaemonSearch(meta.DaemonSearchRequest req
 class _FakeRemoteControlSocket implements remote.RemoteControlSocket {
   final StreamController<remote.Stream> _incoming = StreamController();
   final List<remote.Stream> sent = [];
-  final List<media.Media> _acked = [];
+  // Sync.queue entries are now the whole enqueue Stream frame (carrying
+  // sid/profile_id/session_id alongside the media), not bare Media.
+  final List<remote.Stream> _acked = [];
   // vid is a plain monotonic counter, unlike sid (a uuidv7) whose ordering
   // isn't guaranteed for two ids minted within the same millisecond - which
   // is exactly what this fake hits, firing echoes far faster than any real
@@ -45,7 +47,7 @@ class _FakeRemoteControlSocket implements remote.RemoteControlSocket {
     print("sending ${msg.sid} ${msg.whichCommand()}");
     sent.add(msg);
     if (msg.whichCommand() == remote.Stream_Command.queue) {
-      _acked.add(msg.queue.media);
+      _acked.add(msg);
       print("sync response");
       _incoming.add(
         remote.Stream(
@@ -351,6 +353,75 @@ void main() {
     // daemon sends back after a queue send re-triggers _fillQueue until the
     // target is reached.
     expect(queued, equals(5));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('every enqueued item carries the same non-empty session id', (tester) async {
+    final socket = _FakeRemoteControlSocket();
+
+    Future<media.MediaSearchResponse> fakeSearch(
+      media.MediaSearchRequest req, {
+      String? host,
+      List<httpx.Option> options = const [],
+    }) async {
+      return media.MediaSearchResponse(
+        items: List.generate(
+          10,
+          (i) => media.Media(
+            id: uuidx.withSuffix(i + 1),
+            description: 'Track $i',
+            mimetype: 'audio/mp3',
+            createdAt: '2025-01-01T00:00:00Z',
+            archiveId: uuidx.min(),
+            torrentId: uuidx.min(),
+            knownMediaId: uuidx.min(),
+          ),
+        ),
+        next: media.media.request(limit: 32),
+      );
+    }
+
+    final daemon = ValueNotifier(meta.Daemon());
+
+    await tester.pumpApp(
+      authn.Endpoint(
+        Connect(
+          search: ValueNotifier(media.MediaSearchState(next: media.MediaSearchRequest())),
+          daemonDiscover: _noopDaemonDiscover,
+          daemonSearch: _noopDaemonSearch,
+          connect: ({required String host, List<httpx.Option> options = const []}) async => socket,
+          apisearch: (host, options) => fakeSearch,
+          apirandom: media.media.randomendpoint,
+          autoqueueTarget: 5,
+        ),
+        daemon: daemon,
+      ),
+    );
+    await tester.pumpN(5);
+
+    daemon.value = meta.Daemon(hostname: "example.remote:1234");
+    await tester.pumpN(5);
+
+    await tester.tap(find.byIcon(Icons.close));
+    await tester.pumpN(2);
+    await tester.tap(
+      find.byWidgetPredicate((w) => w is ds.LoadingIconButton && w.tooltip == "search the remote device's library"),
+    );
+    await tester.pumpN(5);
+
+    final row = tester.widget<media.RowDisplay>(
+      find.ancestor(of: find.text('Track 0').first, matching: find.byType(media.RowDisplay)),
+    );
+
+    await row.onTap!();
+    await tester.pumpN(30);
+
+    final queued = socket.sent.where((m) => m.whichCommand() == remote.Stream_Command.queue).toList();
+    final sessionIds = queued.map((m) => m.sessionId).toSet();
+
+    expect(sessionIds, hasLength(1), reason: 'every send from one Connect mount should share one session id');
+    expect(sessionIds.single, isNotEmpty);
+    expect(sessionIds.single, isNot(uuidx.min()));
     expect(tester.takeException(), isNull);
   });
 }

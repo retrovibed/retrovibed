@@ -114,6 +114,10 @@ class _State extends State<Connect> with LoadingState {
   // _socket/_latest - so a stale reference here would stop updating).
   Widget? _focused;
   ValueNotifier<meta.Daemon> _endpoint = ValueNotifier(meta.Daemon());
+  // identifies this specific open Connect widget for the lifetime of its
+  // mount - stable across reconnects, minted once, never reissued - so
+  // enqueued items can be matched back against what this session sent.
+  final String _sessionID = uuidx.v7();
 
   playqueue.SafeStreamIterator<playqueue.PlayableMedia> _autoqueue = playqueue.SafeStreamIterator(
     const Stream.empty(),
@@ -166,7 +170,8 @@ class _State extends State<Connect> with LoadingState {
       case mimex.icoaudio:
         return () async {
           await _autoqueue.cancel();
-          final anchor = playqueue.PlayQueue()..current.value = playqueue.PlayableMedia(current);
+          final anchor = playqueue.PlayQueue()
+            ..current.value = playqueue.PlayableMedia(current, profileId: uuidx.min(), sessionId: uuidx.min());
           final queue = playqueue.SafeStreamIterator(
             playqueue.range(s.next, anchor, search: _apisearch, random: _apirandom),
           );
@@ -201,15 +206,15 @@ class _State extends State<Connect> with LoadingState {
     try {
       if (_casfilling(1)) return;
       if (await queue.moveNext()) {
-        final mut = remote.syncmut.queue(queue.current.current);
+        final mut = remote.syncmut.queue(queue.current.current, sessionId: _sessionID);
         final update = _latest.deepCopy()..sync = mut(_latest.sync.deepCopy());
         setState(() {
           _latest = update;
-          _socket.send(remote.messages.queue(queue.current.current));
+          _socket.send(remote.messages.queue(queue.current.current, sessionId: _sessionID));
         });
 
         if (needed > 1) {
-          ds.postframe(() => _socket.send(remote.messages.sync()));
+          ds.postframe(() => _socket.send(remote.messages.sync(sessionId: _sessionID)));
         }
       }
     } finally {
@@ -224,18 +229,23 @@ class _State extends State<Connect> with LoadingState {
     setState(() {
       _socket = remote.RemoteControlSocket.noop;
       _latest = remote.Stream(sid: uuidx.min());
-      _focused = PlaylistQueue(_latest.sync, remote.RemoteControlSocket.noop, key: const ValueKey("queue"));
+      _focused = PlaylistQueue(
+        _latest.sync,
+        remote.RemoteControlSocket.noop,
+        sessionId: _sessionID,
+        key: const ValueKey("queue"),
+      );
     });
 
     _connect();
   }
 
   void _volumeAdjust(double delta) {
-    _socket.send(remote.messages.volume(delta.round()));
+    _socket.send(remote.messages.volume(delta.round(), sessionId: _sessionID));
   }
 
   void _volumeMute() {
-    _socket.send(remote.messages.mute());
+    _socket.send(remote.messages.mute(sessionId: _sessionID));
   }
 
   void _reconnect() {
@@ -301,7 +311,7 @@ class _State extends State<Connect> with LoadingState {
             );
           });
 
-          socket.send(remote.messages.sync());
+          socket.send(remote.messages.sync(sessionId: _sessionID));
 
           return c.future;
         })
@@ -378,6 +388,7 @@ class _State extends State<Connect> with LoadingState {
       _latest.sync,
       _socket,
       key: const ValueKey("queue"),
+      sessionId: _sessionID,
       onChange: (mut) {
         final upd = _latest.deepCopy()..sync = mut(_latest.sync.deepCopy());
         setState(() {
@@ -480,12 +491,20 @@ class _State extends State<Connect> with LoadingState {
                                   ),
                                 ),
                               ),
-                              PlayerControlSeek.prev(socket: _socket),
-                              PlayerControlSeek.backward(socket: _socket),
-                              PlayerControlPlayPause(socket: _socket, paused: _latest.sync.paused),
-                              PlayerControlSeek.forward(socket: _socket),
-                              PlayerControlSeek.next(socket: _socket),
-                              PlayerControlFullscreen(socket: _socket, current: _latest.sync.fullscreen),
+                              PlayerControlSeek.prev(socket: _socket, sessionId: _sessionID),
+                              PlayerControlSeek.backward(socket: _socket, sessionId: _sessionID),
+                              PlayerControlPlayPause(
+                                socket: _socket,
+                                sessionId: _sessionID,
+                                paused: _latest.sync.paused,
+                              ),
+                              PlayerControlSeek.forward(socket: _socket, sessionId: _sessionID),
+                              PlayerControlSeek.next(socket: _socket, sessionId: _sessionID),
+                              PlayerControlFullscreen(
+                                socket: _socket,
+                                sessionId: _sessionID,
+                                current: _latest.sync.fullscreen,
+                              ),
                               ds.LoadingIconButton.search(
                                 toggled: _focused?.key == search.key,
                                 onPressed: ds.LoadingIconButton.convert(() {
@@ -494,11 +513,12 @@ class _State extends State<Connect> with LoadingState {
                                 tooltip: "search the remote device's library",
                                 help: ds.Hint(const Text("search the remote device's library to queue media on it")),
                               ),
-                              if (authn.developer(context).debug) PlayerControlSync(socket: _socket),
+                              if (authn.developer(context).debug)
+                                PlayerControlSync(socket: _socket, sessionId: _sessionID),
                             ],
                           ),
-                          PlayerControlVolume(socket: _socket, current: _latest.sync),
-                          PlaylistCurrent(_latest.sync.current),
+                          PlayerControlVolume(socket: _socket, sessionId: _sessionID, current: _latest.sync),
+                          PlaylistCurrent(_latest.sync.current, mySessionId: _sessionID),
                           Expanded(child: queue),
                         ],
                       ),

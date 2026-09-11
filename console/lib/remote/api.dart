@@ -74,33 +74,53 @@ class _WebSocketRemoteControlSocket implements RemoteControlSocket {
   Future<void> close() => _socket.close();
 }
 
+// Stream.asMedia unwraps the media a Sync current/queue entry carries -
+// current/queue are now the original enqueue Stream frame (carrying
+// sid/profile_id/session_id alongside the media), not bare Media, so every
+// reader needs this one extra hop. Named asMedia (not media) since a
+// getter named media would collide with this file's own `media` import
+// prefix.
+extension StreamMediaX on rc.Stream {
+  media.Media get asMedia => queue.media;
+}
+
 abstract class syncmut {
-  static rc.Sync Function(rc.Sync) queue(media.Media m) {
+  // profileId is deliberately not a param here - it's server-authoritative
+  // (stamped by shallows/mediaapi/http.remote.control.go from the caller's
+  // JWT), never client-set. This optimistic local entry leaves it unset
+  // until the real echoed Sync arrives with the server-stamped value.
+  static rc.Sync Function(rc.Sync) queue(media.Media m, {required String sessionId}) {
     return (v) {
-      v.queue.add(m);
+      v.queue.add(rc.Stream(sid: uuidx.v7(), sessionId: sessionId, queue: rc.Queue(media: m)));
       return v;
     };
   }
 
   static rc.Sync Function(rc.Sync) dequeue(media.Media m) {
     return (v) {
-      v.queue.remove(m);
+      v.queue.removeWhere((s) => s.asMedia.id == m.id);
       return v;
     };
   }
 }
 
 abstract class messages {
-  static rc.Stream queue(media.Media m) {
+  static rc.Stream queue(media.Media m, {required String sessionId}) {
     return rc.Stream(
       sid: uuidx.v7(),
+      sessionId: sessionId,
       queue: rc.Queue(media: m),
     );
   }
 
-  static rc.Stream dequeue(String id) {
+  // ambiguous once the same media can be queued twice by different
+  // sessions/profiles (dequeue targets every queue entry with this media
+  // id) - each Sync.queue entry now carries its own sid, so a future fix
+  // could dequeue by that instead. Not addressed here.
+  static rc.Stream dequeue(String id, {required String sessionId}) {
     return rc.Stream(
       sid: uuidx.v7(),
+      sessionId: sessionId,
       dequeue: rc.Dequeue(id: id),
     );
   }
@@ -108,34 +128,37 @@ abstract class messages {
   // pause has no payload - each command toggles the receiving device's
   // play/pause state; ordering against concurrent/stale commands is
   // resolved by the receiver using sid as a vector clock, same as Mute.
-  static rc.Stream pause() {
+  static rc.Stream pause({required String sessionId}) {
     return rc.Stream(
       sid: uuidx.v7(),
+      sessionId: sessionId,
       pause: rc.Pause(),
     );
   }
 
-  static rc.Stream seek(int offset) {
+  static rc.Stream seek(int offset, {required String sessionId}) {
     return rc.Stream(
       sid: uuidx.v7(),
+      sessionId: sessionId,
       seek: rc.Seek(offset: offset),
     );
   }
 
-  static rc.Stream previous() {
-    return seek(SeekOffset.previous);
+  static rc.Stream previous({required String sessionId}) {
+    return seek(SeekOffset.previous, sessionId: sessionId);
   }
 
-  static rc.Stream next() {
-    return seek(SeekOffset.next);
+  static rc.Stream next({required String sessionId}) {
+    return seek(SeekOffset.next, sessionId: sessionId);
   }
 
   // relative volume adjustment (offset applied to the receiver's current
   // level, 0-100 scale) - reuses Seek's shape rather than setting an
   // absolute value.
-  static rc.Stream volume(int offset) {
+  static rc.Stream volume(int offset, {required String sessionId}) {
     return rc.Stream(
       sid: uuidx.v7(),
+      sessionId: sessionId,
       volume: rc.Seek(offset: offset),
     );
   }
@@ -144,9 +167,10 @@ abstract class messages {
   // audio between silent and its prior level; ordering against
   // concurrent/stale commands is resolved by the receiver using sid as a
   // vector clock, same as Fullscreen.
-  static rc.Stream mute() {
+  static rc.Stream mute({required String sessionId}) {
     return rc.Stream(
       sid: uuidx.v7(),
+      sessionId: sessionId,
       mute: rc.Mute(),
     );
   }
@@ -154,13 +178,16 @@ abstract class messages {
   // sync with no fields set requests the listener's current library and
   // playback queue; with fields set it reports the listener's current
   // library and playback queue, unsolicited or in reply to a request.
+  // current/queue are Stream (not bare Media) so provenance survives the
+  // round trip - see rc.Sync's proto comment.
   static rc.Stream sync({
+    required String sessionId,
     meta.Daemon? library,
     String token = "",
     fixnum.Int64? expiration,
     int capacity = 0,
-    media.Media? current,
-    List<media.Media> queue = const [],
+    rc.Stream? current,
+    List<rc.Stream> queue = const [],
     double volume = 0,
     bool muted = false,
     bool paused = false,
@@ -169,6 +196,7 @@ abstract class messages {
   }) {
     return rc.Stream(
       sid: uuidx.v7(),
+      sessionId: sessionId,
       vid: vid,
       sync: rc.Sync(
         library: library,
@@ -188,9 +216,10 @@ abstract class messages {
   // fullscreen has no payload - each command flips the receiving device's
   // current state; ordering against concurrent/stale commands is resolved
   // by the receiver using sid as a vector clock.
-  static rc.Stream fullscreen() {
+  static rc.Stream fullscreen({required String sessionId}) {
     return rc.Stream(
       sid: uuidx.v7(),
+      sessionId: sessionId,
       fullscreen: rc.Fullscreen(),
     );
   }

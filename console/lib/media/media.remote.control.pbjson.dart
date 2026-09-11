@@ -78,7 +78,7 @@ const Sync$json = {
       '3': 3,
       '4': 1,
       '5': 11,
-      '6': '.media.Media',
+      '6': '.media.Stream',
       '10': 'current'
     },
     {'1': 'token', '3': 4, '4': 1, '5': 9, '10': 'token'},
@@ -92,7 +92,7 @@ const Sync$json = {
       '3': 1000,
       '4': 3,
       '5': 11,
-      '6': '.media.Media',
+      '6': '.media.Stream',
       '10': 'queue'
     },
   ],
@@ -104,11 +104,11 @@ const Sync$json = {
 /// Descriptor for `Sync`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List syncDescriptor = $convert.base64Decode(
     'CgRTeW5jEiYKB2xpYnJhcnkYASABKAsyDC5tZXRhLkRhZW1vblIHbGlicmFyeRIaCghjYXBhY2'
-    'l0eRgCIAEoDVIIY2FwYWNpdHkSJgoHY3VycmVudBgDIAEoCzIMLm1lZGlhLk1lZGlhUgdjdXJy'
-    'ZW50EhQKBXRva2VuGAQgASgJUgV0b2tlbhIeCgpleHBpcmF0aW9uGAUgASgDUgpleHBpcmF0aW'
-    '9uEhYKBnZvbHVtZRgGIAEoAlIGdm9sdW1lEhQKBW11dGVkGAcgASgIUgVtdXRlZBIWCgZwYXVz'
-    'ZWQYCCABKAhSBnBhdXNlZBIeCgpmdWxsc2NyZWVuGAkgASgIUgpmdWxsc2NyZWVuEiMKBXF1ZX'
-    'VlGOgHIAMoCzIMLm1lZGlhLk1lZGlhUgVxdWV1ZUoFCAoQ6Ac=');
+    'l0eRgCIAEoDVIIY2FwYWNpdHkSJwoHY3VycmVudBgDIAEoCzINLm1lZGlhLlN0cmVhbVIHY3Vy'
+    'cmVudBIUCgV0b2tlbhgEIAEoCVIFdG9rZW4SHgoKZXhwaXJhdGlvbhgFIAEoA1IKZXhwaXJhdG'
+    'lvbhIWCgZ2b2x1bWUYBiABKAJSBnZvbHVtZRIUCgVtdXRlZBgHIAEoCFIFbXV0ZWQSFgoGcGF1'
+    'c2VkGAggASgIUgZwYXVzZWQSHgoKZnVsbHNjcmVlbhgJIAEoCFIKZnVsbHNjcmVlbhIkCgVxdW'
+    'V1ZRjoByADKAsyDS5tZWRpYS5TdHJlYW1SBXF1ZXVlSgUIChDoBw==');
 
 @$core.Deprecated('Use fullscreenDescriptor instead')
 const Fullscreen$json = {
@@ -133,6 +133,8 @@ const Stream$json = {
   '2': [
     {'1': 'sid', '3': 1, '4': 1, '5': 9, '10': 'sid'},
     {'1': 'vid', '3': 2, '4': 1, '5': 4, '10': 'vid'},
+    {'1': 'profile_id', '3': 3, '4': 1, '5': 9, '10': 'profile_id'},
+    {'1': 'session_id', '3': 4, '4': 1, '5': 9, '10': 'session_id'},
     {
       '1': 'queue',
       '3': 1000,
@@ -213,10 +215,11 @@ const Stream$json = {
 
 /// Descriptor for `Stream`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List streamDescriptor = $convert.base64Decode(
-    'CgZTdHJlYW0SEAoDc2lkGAEgASgJUgNzaWQSEAoDdmlkGAIgASgEUgN2aWQSJQoFcXVldWUY6A'
-    'cgASgLMgwubWVkaWEuUXVldWVIAFIFcXVldWUSKwoHZGVxdWV1ZRjqByABKAsyDi5tZWRpYS5E'
-    'ZXF1ZXVlSABSB2RlcXVldWUSJQoFcGF1c2UY6wcgASgLMgwubWVkaWEuUGF1c2VIAFIFcGF1c2'
-    'USIgoEc2VlaxjsByABKAsyCy5tZWRpYS5TZWVrSABSBHNlZWsSIgoEc3luYxjtByABKAsyCy5t'
-    'ZWRpYS5TeW5jSABSBHN5bmMSJgoGdm9sdW1lGO4HIAEoCzILLm1lZGlhLlNlZWtIAFIGdm9sdW'
-    '1lEjQKCmZ1bGxzY3JlZW4Y7wcgASgLMhEubWVkaWEuRnVsbHNjcmVlbkgAUgpmdWxsc2NyZWVu'
-    'EiIKBG11dGUY8AcgASgLMgsubWVkaWEuTXV0ZUgAUgRtdXRlQgkKB0NvbW1hbmQ=');
+    'CgZTdHJlYW0SEAoDc2lkGAEgASgJUgNzaWQSEAoDdmlkGAIgASgEUgN2aWQSHgoKcHJvZmlsZV'
+    '9pZBgDIAEoCVIKcHJvZmlsZV9pZBIeCgpzZXNzaW9uX2lkGAQgASgJUgpzZXNzaW9uX2lkEiUK'
+    'BXF1ZXVlGOgHIAEoCzIMLm1lZGlhLlF1ZXVlSABSBXF1ZXVlEisKB2RlcXVldWUY6gcgASgLMg'
+    '4ubWVkaWEuRGVxdWV1ZUgAUgdkZXF1ZXVlEiUKBXBhdXNlGOsHIAEoCzIMLm1lZGlhLlBhdXNl'
+    'SABSBXBhdXNlEiIKBHNlZWsY7AcgASgLMgsubWVkaWEuU2Vla0gAUgRzZWVrEiIKBHN5bmMY7Q'
+    'cgASgLMgsubWVkaWEuU3luY0gAUgRzeW5jEiYKBnZvbHVtZRjuByABKAsyCy5tZWRpYS5TZWVr'
+    'SABSBnZvbHVtZRI0CgpmdWxsc2NyZWVuGO8HIAEoCzIRLm1lZGlhLkZ1bGxzY3JlZW5IAFIKZn'
+    'VsbHNjcmVlbhIiCgRtdXRlGPAHIAEoCzILLm1lZGlhLk11dGVIAFIEbXV0ZUIJCgdDb21tYW5k');

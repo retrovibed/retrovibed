@@ -64,10 +64,30 @@ class _State extends State<RemoteControlListener> {
     final library = _library.value;
     library..hostname = meta.daemons.isLocalDevice(library) ? widget.localDevice().hostname : library.hostname;
     final msg = remote.messages.sync(
+      // this envelope isn't issued on behalf of any particular Connect
+      // session - it's the listener's own unsolicited/replied report - so
+      // sessionId is the nil sentinel here, not a real session.
+      sessionId: uuidx.min(),
       library: library,
       capacity: queue.capacity,
-      current: queue.current.value?.current,
-      queue: queue.queued.map((m) => m.current).toList(),
+      current: queue.current.value == null
+          ? null
+          : remote.Stream(
+              sid: uuidx.v7(),
+              profileId: queue.current.value!.profileId,
+              sessionId: queue.current.value!.sessionId,
+              queue: remote.Queue(media: queue.current.value!.current),
+            ),
+      queue: queue.queued
+          .map(
+            (m) => remote.Stream(
+              sid: uuidx.v7(),
+              profileId: m.profileId,
+              sessionId: m.sessionId,
+              queue: remote.Queue(media: m.current),
+            ),
+          )
+          .toList(),
       volume: _playlistControl.volume.value,
       muted: _muted,
       paused: !_playlistControl.playing.value,
@@ -156,7 +176,9 @@ class _State extends State<RemoteControlListener> {
   }
 
   Future<void> _applyQueue(remote.Stream msg) async {
-    _playlistControl.maybeNext(playqueue.PlayableMedia(msg.queue.media));
+    _playlistControl.maybeNext(
+      playqueue.PlayableMedia(msg.queue.media, profileId: msg.profileId, sessionId: msg.sessionId),
+    );
   }
 
   Future<void> _applyDequeue(remote.Stream msg) async {

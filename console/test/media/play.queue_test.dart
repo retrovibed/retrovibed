@@ -17,7 +17,8 @@ class _FakePlatformPlayer extends PlatformPlayer {
 
 Player _fakePlayer() => Player(platformPlayer: _FakePlatformPlayer());
 
-PlayableMedia _media(String id, String title) => PlayableMedia(api.Media(id: id, description: title));
+PlayableMedia _media(String id, String title) =>
+    PlayableMedia(api.Media(id: id, description: title), profileId: uuidx.min(), sessionId: uuidx.min());
 
 void main() {
   group('PlayQueue.current', () {

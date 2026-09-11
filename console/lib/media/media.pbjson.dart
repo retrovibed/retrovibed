@@ -32,6 +32,9 @@ const Media$json = {
     {'1': 'uri', '3': 11, '4': 1, '5': 9, '10': 'uri'},
     {'1': 'directory_id', '3': 12, '4': 1, '5': 9, '10': 'directory_id'},
   ],
+  '9': [
+    {'1': 13, '2': 14},
+  ],
 };
 
 /// Descriptor for `Media`. Decode as a `google.protobuf.DescriptorProto`.
@@ -42,7 +45,7 @@ final $typed_data.Uint8List mediaDescriptor = $convert.base64Decode(
     '50X2lkEh4KCmNyZWF0ZWRfYXQYByABKAlSCmNyZWF0ZWRfYXQSHgoKdXBkYXRlZF9hdBgIIAEo'
     'CVIKdXBkYXRlZF9hdBImCg5rbm93bl9tZWRpYV9pZBgJIAEoCVIOa25vd25fbWVkaWFfaWQSKA'
     'oPZW5jcnlwdGlvbl9zZWVkGAogASgJUg9lbmNyeXB0aW9uX3NlZWQSEAoDdXJpGAsgASgJUgN1'
-    'cmkSIgoMZGlyZWN0b3J5X2lkGAwgASgJUgxkaXJlY3RvcnlfaWQ=');
+    'cmkSIgoMZGlyZWN0b3J5X2lkGAwgASgJUgxkaXJlY3RvcnlfaWRKBAgNEA4=');
 
 @$core.Deprecated('Use mediaSearchRequestDescriptor instead')
 const MediaSearchRequest$json = {
