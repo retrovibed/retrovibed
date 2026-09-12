@@ -34,9 +34,6 @@ message Sync {
   bool muted = 7 [ json_name = "muted" ];
   bool paused = 8 [ json_name = "paused" ];
   bool fullscreen = 9 [ json_name = "fullscreen" ];
-  // live position/duration for `current`, mirrored from the same periodic
-  // Playback tick the standalone command below sends - present here too so
-  // a full-state Sync snapshot is self-complete.
   Playback playback = 10 [ json_name = "playback" ];
   reserved 11 to 999;
   repeated Stream queue = 1000 [ json_name = "queue" ];

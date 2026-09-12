@@ -51,6 +51,13 @@ typedef FnRecentTombstone =
       List<httpx.Option> options,
     });
 
+typedef FnRecentRecord =
+    Future<RecentRecordResponse> Function(
+      RecentRecordRequest req, {
+      String? host,
+      List<httpx.Option> options,
+    });
+
 typedef FnLibraryMetadataSync =
     Future<MediaUpdateResponse> Function(
       String id,
@@ -403,11 +410,12 @@ abstract class recent {
 
   static Future<RecentRecordResponse> record(
     RecentRecordRequest req, {
+    String? host,
     List<httpx.Option> options = const [],
   }) {
     return httpx
         .post(
-          Uri.https(httpx.host(), "/w/"),
+          Uri.https(host ?? httpx.host(), "/w/"),
           body: jsonEncode(req.toProto3Json()),
           options: [httpx.Content.json, httpx.Accept.json, ...options],
         )

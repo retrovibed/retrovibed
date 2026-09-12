@@ -193,6 +193,7 @@ abstract class messages {
     bool paused = false,
     bool fullscreen = false,
     fixnum.Int64? vid,
+    rc.Playback? playback,
   }) {
     return rc.Stream(
       sid: uuidx.v7(),
@@ -209,7 +210,26 @@ abstract class messages {
         muted: muted,
         paused: paused,
         fullscreen: fullscreen,
+        playback: playback,
       ),
+    );
+  }
+
+  // reports live position/duration for the session's current pick - a
+  // lighter frame than sync (no queue/library/token), sent periodically
+  // while something is playing.
+  static rc.Stream playback({
+    required String sessionId,
+    required String profileId,
+    required media.Media media,
+    required fixnum.Int64 position,
+    required fixnum.Int64 duration,
+  }) {
+    return rc.Stream(
+      sid: uuidx.v7(),
+      sessionId: sessionId,
+      profileId: profileId,
+      playback: rc.Playback(media: media, position: position, duration: duration),
     );
   }
 

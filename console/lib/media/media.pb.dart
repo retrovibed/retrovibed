@@ -32,7 +32,7 @@ class Media extends $pb.GeneratedMessage {
     $core.String? uri,
     $core.String? directoryId,
   }) {
-    final result = create();
+    final result = Media._();
     if (id != null) result.id = id;
     if (description != null) result.description = description;
     if (mimetype != null) result.mimetype = mimetype;
@@ -52,15 +52,15 @@ class Media extends $pb.GeneratedMessage {
 
   factory Media.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      Media()..mergeFromBuffer(data, registry);
   factory Media.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      Media()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'Media',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: Media.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'id')
     ..aOS(2, _omitFieldNames ? '' : 'description')
     ..aOS(3, _omitFieldNames ? '' : 'mimetype')
@@ -85,12 +85,14 @@ class Media extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use Media() / Media.new instead')
   static Media create() => Media._();
+  static $pb.GeneratedMessage $_createMessage() => Media._();
   @$core.override
-  Media createEmptyInstance() => create();
+  Media createEmptyInstance() => Media._();
   @$core.pragma('dart2js:noInline')
-  static Media getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Media>(create);
+  static Media getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<Media>(Media.$_createMessage);
   static Media? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -212,7 +214,7 @@ class MediaSearchRequest extends $pb.GeneratedMessage {
     $fixnum.Int64? offset,
     $fixnum.Int64? limit,
   }) {
-    final result = create();
+    final result = MediaSearchRequest._();
     if (query != null) result.query = query;
     if (mimetypes != null) result.mimetypes.addAll(mimetypes);
     if (adult != null) result.adult = adult;
@@ -227,15 +229,15 @@ class MediaSearchRequest extends $pb.GeneratedMessage {
 
   factory MediaSearchRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      MediaSearchRequest()..mergeFromBuffer(data, registry);
   factory MediaSearchRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      MediaSearchRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'MediaSearchRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: MediaSearchRequest.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'query')
     ..pPS(2, _omitFieldNames ? '' : 'mimetypes')
     ..aOB(3, _omitFieldNames ? '' : 'adult')
@@ -259,12 +261,15 @@ class MediaSearchRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use MediaSearchRequest() / MediaSearchRequest.new instead')
   static MediaSearchRequest create() => MediaSearchRequest._();
+  static $pb.GeneratedMessage $_createMessage() => MediaSearchRequest._();
   @$core.override
-  MediaSearchRequest createEmptyInstance() => create();
+  MediaSearchRequest createEmptyInstance() => MediaSearchRequest._();
   @$core.pragma('dart2js:noInline')
   static MediaSearchRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<MediaSearchRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<MediaSearchRequest>(
+          MediaSearchRequest.$_createMessage);
   static MediaSearchRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -324,7 +329,7 @@ class MediaSearchResponse extends $pb.GeneratedMessage {
     MediaSearchRequest? next,
     $core.Iterable<Media>? items,
   }) {
-    final result = create();
+    final result = MediaSearchResponse._();
     if (next != null) result.next = next;
     if (items != null) result.items.addAll(items);
     return result;
@@ -334,18 +339,19 @@ class MediaSearchResponse extends $pb.GeneratedMessage {
 
   factory MediaSearchResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      MediaSearchResponse()..mergeFromBuffer(data, registry);
   factory MediaSearchResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      MediaSearchResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'MediaSearchResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: MediaSearchResponse.$_createMessage)
     ..aOM<MediaSearchRequest>(1, _omitFieldNames ? '' : 'next',
-        subBuilder: MediaSearchRequest.create)
-    ..pPM<Media>(2, _omitFieldNames ? '' : 'items', subBuilder: Media.create)
+        subBuilder: MediaSearchRequest.$_createMessage)
+    ..pPM<Media>(2, _omitFieldNames ? '' : 'items',
+        subBuilder: Media.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -359,12 +365,16 @@ class MediaSearchResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use MediaSearchResponse() / MediaSearchResponse.new instead')
   static MediaSearchResponse create() => MediaSearchResponse._();
+  static $pb.GeneratedMessage $_createMessage() => MediaSearchResponse._();
   @$core.override
-  MediaSearchResponse createEmptyInstance() => create();
+  MediaSearchResponse createEmptyInstance() => MediaSearchResponse._();
   @$core.pragma('dart2js:noInline')
   static MediaSearchResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<MediaSearchResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<MediaSearchResponse>(
+          MediaSearchResponse.$_createMessage);
   static MediaSearchResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -386,7 +396,7 @@ class MediaFindResponse extends $pb.GeneratedMessage {
   factory MediaFindResponse({
     Media? media,
   }) {
-    final result = create();
+    final result = MediaFindResponse._();
     if (media != null) result.media = media;
     return result;
   }
@@ -395,16 +405,17 @@ class MediaFindResponse extends $pb.GeneratedMessage {
 
   factory MediaFindResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      MediaFindResponse()..mergeFromBuffer(data, registry);
   factory MediaFindResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      MediaFindResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'MediaFindResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
-    ..aOM<Media>(1, _omitFieldNames ? '' : 'media', subBuilder: Media.create)
+      createEmptyInstance: MediaFindResponse.$_createMessage)
+    ..aOM<Media>(1, _omitFieldNames ? '' : 'media',
+        subBuilder: Media.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -418,12 +429,15 @@ class MediaFindResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use MediaFindResponse() / MediaFindResponse.new instead')
   static MediaFindResponse create() => MediaFindResponse._();
+  static $pb.GeneratedMessage $_createMessage() => MediaFindResponse._();
   @$core.override
-  MediaFindResponse createEmptyInstance() => create();
+  MediaFindResponse createEmptyInstance() => MediaFindResponse._();
   @$core.pragma('dart2js:noInline')
-  static MediaFindResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<MediaFindResponse>(create);
+  static MediaFindResponse getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<MediaFindResponse>(
+          MediaFindResponse.$_createMessage);
   static MediaFindResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -442,7 +456,7 @@ class MediaUpdateRequest extends $pb.GeneratedMessage {
   factory MediaUpdateRequest({
     Media? media,
   }) {
-    final result = create();
+    final result = MediaUpdateRequest._();
     if (media != null) result.media = media;
     return result;
   }
@@ -451,16 +465,17 @@ class MediaUpdateRequest extends $pb.GeneratedMessage {
 
   factory MediaUpdateRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      MediaUpdateRequest()..mergeFromBuffer(data, registry);
   factory MediaUpdateRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      MediaUpdateRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'MediaUpdateRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
-    ..aOM<Media>(1, _omitFieldNames ? '' : 'media', subBuilder: Media.create)
+      createEmptyInstance: MediaUpdateRequest.$_createMessage)
+    ..aOM<Media>(1, _omitFieldNames ? '' : 'media',
+        subBuilder: Media.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -474,12 +489,15 @@ class MediaUpdateRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use MediaUpdateRequest() / MediaUpdateRequest.new instead')
   static MediaUpdateRequest create() => MediaUpdateRequest._();
+  static $pb.GeneratedMessage $_createMessage() => MediaUpdateRequest._();
   @$core.override
-  MediaUpdateRequest createEmptyInstance() => create();
+  MediaUpdateRequest createEmptyInstance() => MediaUpdateRequest._();
   @$core.pragma('dart2js:noInline')
   static MediaUpdateRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<MediaUpdateRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<MediaUpdateRequest>(
+          MediaUpdateRequest.$_createMessage);
   static MediaUpdateRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -498,7 +516,7 @@ class MediaUpdateResponse extends $pb.GeneratedMessage {
   factory MediaUpdateResponse({
     Media? media,
   }) {
-    final result = create();
+    final result = MediaUpdateResponse._();
     if (media != null) result.media = media;
     return result;
   }
@@ -507,16 +525,17 @@ class MediaUpdateResponse extends $pb.GeneratedMessage {
 
   factory MediaUpdateResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      MediaUpdateResponse()..mergeFromBuffer(data, registry);
   factory MediaUpdateResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      MediaUpdateResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'MediaUpdateResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
-    ..aOM<Media>(1, _omitFieldNames ? '' : 'media', subBuilder: Media.create)
+      createEmptyInstance: MediaUpdateResponse.$_createMessage)
+    ..aOM<Media>(1, _omitFieldNames ? '' : 'media',
+        subBuilder: Media.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -530,12 +549,16 @@ class MediaUpdateResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use MediaUpdateResponse() / MediaUpdateResponse.new instead')
   static MediaUpdateResponse create() => MediaUpdateResponse._();
+  static $pb.GeneratedMessage $_createMessage() => MediaUpdateResponse._();
   @$core.override
-  MediaUpdateResponse createEmptyInstance() => create();
+  MediaUpdateResponse createEmptyInstance() => MediaUpdateResponse._();
   @$core.pragma('dart2js:noInline')
   static MediaUpdateResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<MediaUpdateResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<MediaUpdateResponse>(
+          MediaUpdateResponse.$_createMessage);
   static MediaUpdateResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -551,21 +574,21 @@ class MediaUpdateResponse extends $pb.GeneratedMessage {
 }
 
 class MediaDeleteRequest extends $pb.GeneratedMessage {
-  factory MediaDeleteRequest() => create();
+  factory MediaDeleteRequest() => MediaDeleteRequest._();
 
   MediaDeleteRequest._();
 
   factory MediaDeleteRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      MediaDeleteRequest()..mergeFromBuffer(data, registry);
   factory MediaDeleteRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      MediaDeleteRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'MediaDeleteRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: MediaDeleteRequest.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -579,12 +602,15 @@ class MediaDeleteRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use MediaDeleteRequest() / MediaDeleteRequest.new instead')
   static MediaDeleteRequest create() => MediaDeleteRequest._();
+  static $pb.GeneratedMessage $_createMessage() => MediaDeleteRequest._();
   @$core.override
-  MediaDeleteRequest createEmptyInstance() => create();
+  MediaDeleteRequest createEmptyInstance() => MediaDeleteRequest._();
   @$core.pragma('dart2js:noInline')
   static MediaDeleteRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<MediaDeleteRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<MediaDeleteRequest>(
+          MediaDeleteRequest.$_createMessage);
   static MediaDeleteRequest? _defaultInstance;
 }
 
@@ -592,7 +618,7 @@ class MediaDeleteResponse extends $pb.GeneratedMessage {
   factory MediaDeleteResponse({
     Media? media,
   }) {
-    final result = create();
+    final result = MediaDeleteResponse._();
     if (media != null) result.media = media;
     return result;
   }
@@ -601,16 +627,17 @@ class MediaDeleteResponse extends $pb.GeneratedMessage {
 
   factory MediaDeleteResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      MediaDeleteResponse()..mergeFromBuffer(data, registry);
   factory MediaDeleteResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      MediaDeleteResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'MediaDeleteResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
-    ..aOM<Media>(1, _omitFieldNames ? '' : 'media', subBuilder: Media.create)
+      createEmptyInstance: MediaDeleteResponse.$_createMessage)
+    ..aOM<Media>(1, _omitFieldNames ? '' : 'media',
+        subBuilder: Media.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -624,12 +651,16 @@ class MediaDeleteResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use MediaDeleteResponse() / MediaDeleteResponse.new instead')
   static MediaDeleteResponse create() => MediaDeleteResponse._();
+  static $pb.GeneratedMessage $_createMessage() => MediaDeleteResponse._();
   @$core.override
-  MediaDeleteResponse createEmptyInstance() => create();
+  MediaDeleteResponse createEmptyInstance() => MediaDeleteResponse._();
   @$core.pragma('dart2js:noInline')
   static MediaDeleteResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<MediaDeleteResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<MediaDeleteResponse>(
+          MediaDeleteResponse.$_createMessage);
   static MediaDeleteResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -648,7 +679,7 @@ class MediaUploadResponse extends $pb.GeneratedMessage {
   factory MediaUploadResponse({
     Media? media,
   }) {
-    final result = create();
+    final result = MediaUploadResponse._();
     if (media != null) result.media = media;
     return result;
   }
@@ -657,16 +688,17 @@ class MediaUploadResponse extends $pb.GeneratedMessage {
 
   factory MediaUploadResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      MediaUploadResponse()..mergeFromBuffer(data, registry);
   factory MediaUploadResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      MediaUploadResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'MediaUploadResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
-    ..aOM<Media>(1, _omitFieldNames ? '' : 'media', subBuilder: Media.create)
+      createEmptyInstance: MediaUploadResponse.$_createMessage)
+    ..aOM<Media>(1, _omitFieldNames ? '' : 'media',
+        subBuilder: Media.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -680,12 +712,16 @@ class MediaUploadResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use MediaUploadResponse() / MediaUploadResponse.new instead')
   static MediaUploadResponse create() => MediaUploadResponse._();
+  static $pb.GeneratedMessage $_createMessage() => MediaUploadResponse._();
   @$core.override
-  MediaUploadResponse createEmptyInstance() => create();
+  MediaUploadResponse createEmptyInstance() => MediaUploadResponse._();
   @$core.pragma('dart2js:noInline')
   static MediaUploadResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<MediaUploadResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<MediaUploadResponse>(
+          MediaUploadResponse.$_createMessage);
   static MediaUploadResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -716,7 +752,7 @@ class Download extends $pb.GeneratedMessage {
     $core.String? completedAt,
     $core.String? verifyAt,
   }) {
-    final result = create();
+    final result = Download._();
     if (media != null) result.media = media;
     if (bytes != null) result.bytes = bytes;
     if (downloaded != null) result.downloaded = downloaded;
@@ -737,16 +773,17 @@ class Download extends $pb.GeneratedMessage {
 
   factory Download.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      Download()..mergeFromBuffer(data, registry);
   factory Download.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      Download()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'Download',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
-    ..aOM<Media>(1, _omitFieldNames ? '' : 'media', subBuilder: Media.create)
+      createEmptyInstance: Download.$_createMessage)
+    ..aOM<Media>(1, _omitFieldNames ? '' : 'media',
+        subBuilder: Media.$_createMessage)
     ..a<$fixnum.Int64>(2, _omitFieldNames ? '' : 'bytes', $pb.PbFieldType.OU6,
         defaultOrMaker: $fixnum.Int64.ZERO)
     ..a<$fixnum.Int64>(
@@ -777,12 +814,14 @@ class Download extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use Download() / Download.new instead')
   static Download create() => Download._();
+  static $pb.GeneratedMessage $_createMessage() => Download._();
   @$core.override
-  Download createEmptyInstance() => create();
+  Download createEmptyInstance() => Download._();
   @$core.pragma('dart2js:noInline')
-  static Download getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Download>(create);
+  static Download getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<Download>(Download.$_createMessage);
   static Download? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -909,7 +948,7 @@ class MagnetCreateRequest extends $pb.GeneratedMessage {
   factory MagnetCreateRequest({
     $core.String? uri,
   }) {
-    final result = create();
+    final result = MagnetCreateRequest._();
     if (uri != null) result.uri = uri;
     return result;
   }
@@ -918,15 +957,15 @@ class MagnetCreateRequest extends $pb.GeneratedMessage {
 
   factory MagnetCreateRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      MagnetCreateRequest()..mergeFromBuffer(data, registry);
   factory MagnetCreateRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      MagnetCreateRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'MagnetCreateRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: MagnetCreateRequest.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'uri')
     ..hasRequiredFields = false;
 
@@ -941,12 +980,16 @@ class MagnetCreateRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use MagnetCreateRequest() / MagnetCreateRequest.new instead')
   static MagnetCreateRequest create() => MagnetCreateRequest._();
+  static $pb.GeneratedMessage $_createMessage() => MagnetCreateRequest._();
   @$core.override
-  MagnetCreateRequest createEmptyInstance() => create();
+  MagnetCreateRequest createEmptyInstance() => MagnetCreateRequest._();
   @$core.pragma('dart2js:noInline')
   static MagnetCreateRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<MagnetCreateRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<MagnetCreateRequest>(
+          MagnetCreateRequest.$_createMessage);
   static MagnetCreateRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -963,7 +1006,7 @@ class MagnetCreateResponse extends $pb.GeneratedMessage {
   factory MagnetCreateResponse({
     Download? download,
   }) {
-    final result = create();
+    final result = MagnetCreateResponse._();
     if (download != null) result.download = download;
     return result;
   }
@@ -972,17 +1015,17 @@ class MagnetCreateResponse extends $pb.GeneratedMessage {
 
   factory MagnetCreateResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      MagnetCreateResponse()..mergeFromBuffer(data, registry);
   factory MagnetCreateResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      MagnetCreateResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'MagnetCreateResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: MagnetCreateResponse.$_createMessage)
     ..aOM<Download>(1, _omitFieldNames ? '' : 'download',
-        subBuilder: Download.create)
+        subBuilder: Download.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -996,12 +1039,16 @@ class MagnetCreateResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use MagnetCreateResponse() / MagnetCreateResponse.new instead')
   static MagnetCreateResponse create() => MagnetCreateResponse._();
+  static $pb.GeneratedMessage $_createMessage() => MagnetCreateResponse._();
   @$core.override
-  MagnetCreateResponse createEmptyInstance() => create();
+  MagnetCreateResponse createEmptyInstance() => MagnetCreateResponse._();
   @$core.pragma('dart2js:noInline')
   static MagnetCreateResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<MagnetCreateResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<MagnetCreateResponse>(
+          MagnetCreateResponse.$_createMessage);
   static MagnetCreateResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -1025,7 +1072,7 @@ class DownloadSearchRequest extends $pb.GeneratedMessage {
     $fixnum.Int64? offset,
     $fixnum.Int64? limit,
   }) {
-    final result = create();
+    final result = DownloadSearchRequest._();
     if (query != null) result.query = query;
     if (mimetypes != null) result.mimetypes.addAll(mimetypes);
     if (completed != null) result.completed = completed;
@@ -1039,15 +1086,15 @@ class DownloadSearchRequest extends $pb.GeneratedMessage {
 
   factory DownloadSearchRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      DownloadSearchRequest()..mergeFromBuffer(data, registry);
   factory DownloadSearchRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      DownloadSearchRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'DownloadSearchRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: DownloadSearchRequest.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'query')
     ..pPS(2, _omitFieldNames ? '' : 'mimetypes')
     ..aOB(3, _omitFieldNames ? '' : 'completed')
@@ -1071,12 +1118,16 @@ class DownloadSearchRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use DownloadSearchRequest() / DownloadSearchRequest.new instead')
   static DownloadSearchRequest create() => DownloadSearchRequest._();
+  static $pb.GeneratedMessage $_createMessage() => DownloadSearchRequest._();
   @$core.override
-  DownloadSearchRequest createEmptyInstance() => create();
+  DownloadSearchRequest createEmptyInstance() => DownloadSearchRequest._();
   @$core.pragma('dart2js:noInline')
   static DownloadSearchRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DownloadSearchRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<DownloadSearchRequest>(
+          DownloadSearchRequest.$_createMessage);
   static DownloadSearchRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -1133,7 +1184,7 @@ class DownloadSearchResponse extends $pb.GeneratedMessage {
     DownloadSearchRequest? next,
     $core.Iterable<Download>? items,
   }) {
-    final result = create();
+    final result = DownloadSearchResponse._();
     if (next != null) result.next = next;
     if (items != null) result.items.addAll(items);
     return result;
@@ -1143,19 +1194,19 @@ class DownloadSearchResponse extends $pb.GeneratedMessage {
 
   factory DownloadSearchResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      DownloadSearchResponse()..mergeFromBuffer(data, registry);
   factory DownloadSearchResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      DownloadSearchResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'DownloadSearchResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: DownloadSearchResponse.$_createMessage)
     ..aOM<DownloadSearchRequest>(1, _omitFieldNames ? '' : 'next',
-        subBuilder: DownloadSearchRequest.create)
+        subBuilder: DownloadSearchRequest.$_createMessage)
     ..pPM<Download>(2, _omitFieldNames ? '' : 'items',
-        subBuilder: Download.create)
+        subBuilder: Download.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1170,12 +1221,16 @@ class DownloadSearchResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use DownloadSearchResponse() / DownloadSearchResponse.new instead')
   static DownloadSearchResponse create() => DownloadSearchResponse._();
+  static $pb.GeneratedMessage $_createMessage() => DownloadSearchResponse._();
   @$core.override
-  DownloadSearchResponse createEmptyInstance() => create();
+  DownloadSearchResponse createEmptyInstance() => DownloadSearchResponse._();
   @$core.pragma('dart2js:noInline')
   static DownloadSearchResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DownloadSearchResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<DownloadSearchResponse>(
+          DownloadSearchResponse.$_createMessage);
   static DownloadSearchResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -1197,7 +1252,7 @@ class DownloadUpdateRequest extends $pb.GeneratedMessage {
   factory DownloadUpdateRequest({
     Download? download,
   }) {
-    final result = create();
+    final result = DownloadUpdateRequest._();
     if (download != null) result.download = download;
     return result;
   }
@@ -1206,17 +1261,17 @@ class DownloadUpdateRequest extends $pb.GeneratedMessage {
 
   factory DownloadUpdateRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      DownloadUpdateRequest()..mergeFromBuffer(data, registry);
   factory DownloadUpdateRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      DownloadUpdateRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'DownloadUpdateRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: DownloadUpdateRequest.$_createMessage)
     ..aOM<Download>(1, _omitFieldNames ? '' : 'download',
-        subBuilder: Download.create)
+        subBuilder: Download.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1231,12 +1286,16 @@ class DownloadUpdateRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use DownloadUpdateRequest() / DownloadUpdateRequest.new instead')
   static DownloadUpdateRequest create() => DownloadUpdateRequest._();
+  static $pb.GeneratedMessage $_createMessage() => DownloadUpdateRequest._();
   @$core.override
-  DownloadUpdateRequest createEmptyInstance() => create();
+  DownloadUpdateRequest createEmptyInstance() => DownloadUpdateRequest._();
   @$core.pragma('dart2js:noInline')
   static DownloadUpdateRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DownloadUpdateRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<DownloadUpdateRequest>(
+          DownloadUpdateRequest.$_createMessage);
   static DownloadUpdateRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -1255,7 +1314,7 @@ class DownloadUpdateResponse extends $pb.GeneratedMessage {
   factory DownloadUpdateResponse({
     Download? download,
   }) {
-    final result = create();
+    final result = DownloadUpdateResponse._();
     if (download != null) result.download = download;
     return result;
   }
@@ -1264,17 +1323,17 @@ class DownloadUpdateResponse extends $pb.GeneratedMessage {
 
   factory DownloadUpdateResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      DownloadUpdateResponse()..mergeFromBuffer(data, registry);
   factory DownloadUpdateResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      DownloadUpdateResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'DownloadUpdateResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: DownloadUpdateResponse.$_createMessage)
     ..aOM<Download>(1, _omitFieldNames ? '' : 'download',
-        subBuilder: Download.create)
+        subBuilder: Download.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1289,12 +1348,16 @@ class DownloadUpdateResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use DownloadUpdateResponse() / DownloadUpdateResponse.new instead')
   static DownloadUpdateResponse create() => DownloadUpdateResponse._();
+  static $pb.GeneratedMessage $_createMessage() => DownloadUpdateResponse._();
   @$core.override
-  DownloadUpdateResponse createEmptyInstance() => create();
+  DownloadUpdateResponse createEmptyInstance() => DownloadUpdateResponse._();
   @$core.pragma('dart2js:noInline')
   static DownloadUpdateResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DownloadUpdateResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<DownloadUpdateResponse>(
+          DownloadUpdateResponse.$_createMessage);
   static DownloadUpdateResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -1310,21 +1373,21 @@ class DownloadUpdateResponse extends $pb.GeneratedMessage {
 }
 
 class DownloadMetadataRequest extends $pb.GeneratedMessage {
-  factory DownloadMetadataRequest() => create();
+  factory DownloadMetadataRequest() => DownloadMetadataRequest._();
 
   DownloadMetadataRequest._();
 
   factory DownloadMetadataRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      DownloadMetadataRequest()..mergeFromBuffer(data, registry);
   factory DownloadMetadataRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      DownloadMetadataRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'DownloadMetadataRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: DownloadMetadataRequest.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1339,12 +1402,16 @@ class DownloadMetadataRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use DownloadMetadataRequest() / DownloadMetadataRequest.new instead')
   static DownloadMetadataRequest create() => DownloadMetadataRequest._();
+  static $pb.GeneratedMessage $_createMessage() => DownloadMetadataRequest._();
   @$core.override
-  DownloadMetadataRequest createEmptyInstance() => create();
+  DownloadMetadataRequest createEmptyInstance() => DownloadMetadataRequest._();
   @$core.pragma('dart2js:noInline')
   static DownloadMetadataRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DownloadMetadataRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<DownloadMetadataRequest>(
+          DownloadMetadataRequest.$_createMessage);
   static DownloadMetadataRequest? _defaultInstance;
 }
 
@@ -1352,7 +1419,7 @@ class DownloadMetadataResponse extends $pb.GeneratedMessage {
   factory DownloadMetadataResponse({
     Download? download,
   }) {
-    final result = create();
+    final result = DownloadMetadataResponse._();
     if (download != null) result.download = download;
     return result;
   }
@@ -1361,17 +1428,17 @@ class DownloadMetadataResponse extends $pb.GeneratedMessage {
 
   factory DownloadMetadataResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      DownloadMetadataResponse()..mergeFromBuffer(data, registry);
   factory DownloadMetadataResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      DownloadMetadataResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'DownloadMetadataResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: DownloadMetadataResponse.$_createMessage)
     ..aOM<Download>(1, _omitFieldNames ? '' : 'download',
-        subBuilder: Download.create)
+        subBuilder: Download.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1386,12 +1453,17 @@ class DownloadMetadataResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use DownloadMetadataResponse() / DownloadMetadataResponse.new instead')
   static DownloadMetadataResponse create() => DownloadMetadataResponse._();
+  static $pb.GeneratedMessage $_createMessage() => DownloadMetadataResponse._();
   @$core.override
-  DownloadMetadataResponse createEmptyInstance() => create();
+  DownloadMetadataResponse createEmptyInstance() =>
+      DownloadMetadataResponse._();
   @$core.pragma('dart2js:noInline')
   static DownloadMetadataResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DownloadMetadataResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<DownloadMetadataResponse>(
+          DownloadMetadataResponse.$_createMessage);
   static DownloadMetadataResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -1407,21 +1479,21 @@ class DownloadMetadataResponse extends $pb.GeneratedMessage {
 }
 
 class DownloadBeginRequest extends $pb.GeneratedMessage {
-  factory DownloadBeginRequest() => create();
+  factory DownloadBeginRequest() => DownloadBeginRequest._();
 
   DownloadBeginRequest._();
 
   factory DownloadBeginRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      DownloadBeginRequest()..mergeFromBuffer(data, registry);
   factory DownloadBeginRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      DownloadBeginRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'DownloadBeginRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: DownloadBeginRequest.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1435,12 +1507,16 @@ class DownloadBeginRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use DownloadBeginRequest() / DownloadBeginRequest.new instead')
   static DownloadBeginRequest create() => DownloadBeginRequest._();
+  static $pb.GeneratedMessage $_createMessage() => DownloadBeginRequest._();
   @$core.override
-  DownloadBeginRequest createEmptyInstance() => create();
+  DownloadBeginRequest createEmptyInstance() => DownloadBeginRequest._();
   @$core.pragma('dart2js:noInline')
   static DownloadBeginRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DownloadBeginRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<DownloadBeginRequest>(
+          DownloadBeginRequest.$_createMessage);
   static DownloadBeginRequest? _defaultInstance;
 }
 
@@ -1448,7 +1524,7 @@ class DownloadBeginResponse extends $pb.GeneratedMessage {
   factory DownloadBeginResponse({
     Download? download,
   }) {
-    final result = create();
+    final result = DownloadBeginResponse._();
     if (download != null) result.download = download;
     return result;
   }
@@ -1457,17 +1533,17 @@ class DownloadBeginResponse extends $pb.GeneratedMessage {
 
   factory DownloadBeginResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      DownloadBeginResponse()..mergeFromBuffer(data, registry);
   factory DownloadBeginResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      DownloadBeginResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'DownloadBeginResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: DownloadBeginResponse.$_createMessage)
     ..aOM<Download>(1, _omitFieldNames ? '' : 'download',
-        subBuilder: Download.create)
+        subBuilder: Download.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1482,12 +1558,16 @@ class DownloadBeginResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use DownloadBeginResponse() / DownloadBeginResponse.new instead')
   static DownloadBeginResponse create() => DownloadBeginResponse._();
+  static $pb.GeneratedMessage $_createMessage() => DownloadBeginResponse._();
   @$core.override
-  DownloadBeginResponse createEmptyInstance() => create();
+  DownloadBeginResponse createEmptyInstance() => DownloadBeginResponse._();
   @$core.pragma('dart2js:noInline')
   static DownloadBeginResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DownloadBeginResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<DownloadBeginResponse>(
+          DownloadBeginResponse.$_createMessage);
   static DownloadBeginResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -1503,21 +1583,21 @@ class DownloadBeginResponse extends $pb.GeneratedMessage {
 }
 
 class DownloadPauseRequest extends $pb.GeneratedMessage {
-  factory DownloadPauseRequest() => create();
+  factory DownloadPauseRequest() => DownloadPauseRequest._();
 
   DownloadPauseRequest._();
 
   factory DownloadPauseRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      DownloadPauseRequest()..mergeFromBuffer(data, registry);
   factory DownloadPauseRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      DownloadPauseRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'DownloadPauseRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: DownloadPauseRequest.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1531,12 +1611,16 @@ class DownloadPauseRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use DownloadPauseRequest() / DownloadPauseRequest.new instead')
   static DownloadPauseRequest create() => DownloadPauseRequest._();
+  static $pb.GeneratedMessage $_createMessage() => DownloadPauseRequest._();
   @$core.override
-  DownloadPauseRequest createEmptyInstance() => create();
+  DownloadPauseRequest createEmptyInstance() => DownloadPauseRequest._();
   @$core.pragma('dart2js:noInline')
   static DownloadPauseRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DownloadPauseRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<DownloadPauseRequest>(
+          DownloadPauseRequest.$_createMessage);
   static DownloadPauseRequest? _defaultInstance;
 }
 
@@ -1544,7 +1628,7 @@ class DownloadPauseResponse extends $pb.GeneratedMessage {
   factory DownloadPauseResponse({
     Download? download,
   }) {
-    final result = create();
+    final result = DownloadPauseResponse._();
     if (download != null) result.download = download;
     return result;
   }
@@ -1553,17 +1637,17 @@ class DownloadPauseResponse extends $pb.GeneratedMessage {
 
   factory DownloadPauseResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      DownloadPauseResponse()..mergeFromBuffer(data, registry);
   factory DownloadPauseResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      DownloadPauseResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'DownloadPauseResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: DownloadPauseResponse.$_createMessage)
     ..aOM<Download>(1, _omitFieldNames ? '' : 'download',
-        subBuilder: Download.create)
+        subBuilder: Download.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1578,12 +1662,16 @@ class DownloadPauseResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use DownloadPauseResponse() / DownloadPauseResponse.new instead')
   static DownloadPauseResponse create() => DownloadPauseResponse._();
+  static $pb.GeneratedMessage $_createMessage() => DownloadPauseResponse._();
   @$core.override
-  DownloadPauseResponse createEmptyInstance() => create();
+  DownloadPauseResponse createEmptyInstance() => DownloadPauseResponse._();
   @$core.pragma('dart2js:noInline')
   static DownloadPauseResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DownloadPauseResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<DownloadPauseResponse>(
+          DownloadPauseResponse.$_createMessage);
   static DownloadPauseResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -1602,7 +1690,7 @@ class DownloadTuneRequest extends $pb.GeneratedMessage {
   factory DownloadTuneRequest({
     $core.Iterable<$core.String>? peers,
   }) {
-    final result = create();
+    final result = DownloadTuneRequest._();
     if (peers != null) result.peers.addAll(peers);
     return result;
   }
@@ -1611,15 +1699,15 @@ class DownloadTuneRequest extends $pb.GeneratedMessage {
 
   factory DownloadTuneRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      DownloadTuneRequest()..mergeFromBuffer(data, registry);
   factory DownloadTuneRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      DownloadTuneRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'DownloadTuneRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: DownloadTuneRequest.$_createMessage)
     ..pPS(1, _omitFieldNames ? '' : 'peers')
     ..hasRequiredFields = false;
 
@@ -1634,12 +1722,16 @@ class DownloadTuneRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use DownloadTuneRequest() / DownloadTuneRequest.new instead')
   static DownloadTuneRequest create() => DownloadTuneRequest._();
+  static $pb.GeneratedMessage $_createMessage() => DownloadTuneRequest._();
   @$core.override
-  DownloadTuneRequest createEmptyInstance() => create();
+  DownloadTuneRequest createEmptyInstance() => DownloadTuneRequest._();
   @$core.pragma('dart2js:noInline')
   static DownloadTuneRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DownloadTuneRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<DownloadTuneRequest>(
+          DownloadTuneRequest.$_createMessage);
   static DownloadTuneRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -1647,21 +1739,21 @@ class DownloadTuneRequest extends $pb.GeneratedMessage {
 }
 
 class DownloadTuneResponse extends $pb.GeneratedMessage {
-  factory DownloadTuneResponse() => create();
+  factory DownloadTuneResponse() => DownloadTuneResponse._();
 
   DownloadTuneResponse._();
 
   factory DownloadTuneResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      DownloadTuneResponse()..mergeFromBuffer(data, registry);
   factory DownloadTuneResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      DownloadTuneResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'DownloadTuneResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: DownloadTuneResponse.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1675,31 +1767,35 @@ class DownloadTuneResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use DownloadTuneResponse() / DownloadTuneResponse.new instead')
   static DownloadTuneResponse create() => DownloadTuneResponse._();
+  static $pb.GeneratedMessage $_createMessage() => DownloadTuneResponse._();
   @$core.override
-  DownloadTuneResponse createEmptyInstance() => create();
+  DownloadTuneResponse createEmptyInstance() => DownloadTuneResponse._();
   @$core.pragma('dart2js:noInline')
   static DownloadTuneResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DownloadTuneResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<DownloadTuneResponse>(
+          DownloadTuneResponse.$_createMessage);
   static DownloadTuneResponse? _defaultInstance;
 }
 
 class DownloadDeleteRequest extends $pb.GeneratedMessage {
-  factory DownloadDeleteRequest() => create();
+  factory DownloadDeleteRequest() => DownloadDeleteRequest._();
 
   DownloadDeleteRequest._();
 
   factory DownloadDeleteRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      DownloadDeleteRequest()..mergeFromBuffer(data, registry);
   factory DownloadDeleteRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      DownloadDeleteRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'DownloadDeleteRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: DownloadDeleteRequest.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1714,12 +1810,16 @@ class DownloadDeleteRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use DownloadDeleteRequest() / DownloadDeleteRequest.new instead')
   static DownloadDeleteRequest create() => DownloadDeleteRequest._();
+  static $pb.GeneratedMessage $_createMessage() => DownloadDeleteRequest._();
   @$core.override
-  DownloadDeleteRequest createEmptyInstance() => create();
+  DownloadDeleteRequest createEmptyInstance() => DownloadDeleteRequest._();
   @$core.pragma('dart2js:noInline')
   static DownloadDeleteRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DownloadDeleteRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<DownloadDeleteRequest>(
+          DownloadDeleteRequest.$_createMessage);
   static DownloadDeleteRequest? _defaultInstance;
 }
 
@@ -1727,7 +1827,7 @@ class DownloadDeleteResponse extends $pb.GeneratedMessage {
   factory DownloadDeleteResponse({
     Download? download,
   }) {
-    final result = create();
+    final result = DownloadDeleteResponse._();
     if (download != null) result.download = download;
     return result;
   }
@@ -1736,17 +1836,17 @@ class DownloadDeleteResponse extends $pb.GeneratedMessage {
 
   factory DownloadDeleteResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      DownloadDeleteResponse()..mergeFromBuffer(data, registry);
   factory DownloadDeleteResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      DownloadDeleteResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'DownloadDeleteResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: DownloadDeleteResponse.$_createMessage)
     ..aOM<Download>(1, _omitFieldNames ? '' : 'download',
-        subBuilder: Download.create)
+        subBuilder: Download.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1761,12 +1861,16 @@ class DownloadDeleteResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use DownloadDeleteResponse() / DownloadDeleteResponse.new instead')
   static DownloadDeleteResponse create() => DownloadDeleteResponse._();
+  static $pb.GeneratedMessage $_createMessage() => DownloadDeleteResponse._();
   @$core.override
-  DownloadDeleteResponse createEmptyInstance() => create();
+  DownloadDeleteResponse createEmptyInstance() => DownloadDeleteResponse._();
   @$core.pragma('dart2js:noInline')
   static DownloadDeleteResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DownloadDeleteResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<DownloadDeleteResponse>(
+          DownloadDeleteResponse.$_createMessage);
   static DownloadDeleteResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -1790,7 +1894,7 @@ class Published extends $pb.GeneratedMessage {
     $core.String? entropy,
     $core.String? expiresAt,
   }) {
-    final result = create();
+    final result = Published._();
     if (id != null) result.id = id;
     if (mimetype != null) result.mimetype = mimetype;
     if (description != null) result.description = description;
@@ -1804,15 +1908,15 @@ class Published extends $pb.GeneratedMessage {
 
   factory Published.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      Published()..mergeFromBuffer(data, registry);
   factory Published.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      Published()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'Published',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: Published.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'id')
     ..aOS(2, _omitFieldNames ? '' : 'mimetype')
     ..aOS(3, _omitFieldNames ? '' : 'description')
@@ -1832,12 +1936,14 @@ class Published extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use Published() / Published.new instead')
   static Published create() => Published._();
+  static $pb.GeneratedMessage $_createMessage() => Published._();
   @$core.override
-  Published createEmptyInstance() => create();
+  Published createEmptyInstance() => Published._();
   @$core.pragma('dart2js:noInline')
-  static Published getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Published>(create);
+  static Published getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<Published>(Published.$_createMessage);
   static Published? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -1901,7 +2007,7 @@ class PublishedUploadRequest extends $pb.GeneratedMessage {
     $core.String? mimetype,
     $fixnum.Int64? ttl,
   }) {
-    final result = create();
+    final result = PublishedUploadRequest._();
     if (entropy != null) result.entropy = entropy;
     if (mimetype != null) result.mimetype = mimetype;
     if (ttl != null) result.ttl = ttl;
@@ -1912,15 +2018,15 @@ class PublishedUploadRequest extends $pb.GeneratedMessage {
 
   factory PublishedUploadRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      PublishedUploadRequest()..mergeFromBuffer(data, registry);
   factory PublishedUploadRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      PublishedUploadRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'PublishedUploadRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: PublishedUploadRequest.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'entropy')
     ..aOS(2, _omitFieldNames ? '' : 'mimetype')
     ..a<$fixnum.Int64>(3, _omitFieldNames ? '' : 'ttl', $pb.PbFieldType.OU6,
@@ -1939,12 +2045,16 @@ class PublishedUploadRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use PublishedUploadRequest() / PublishedUploadRequest.new instead')
   static PublishedUploadRequest create() => PublishedUploadRequest._();
+  static $pb.GeneratedMessage $_createMessage() => PublishedUploadRequest._();
   @$core.override
-  PublishedUploadRequest createEmptyInstance() => create();
+  PublishedUploadRequest createEmptyInstance() => PublishedUploadRequest._();
   @$core.pragma('dart2js:noInline')
   static PublishedUploadRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<PublishedUploadRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<PublishedUploadRequest>(
+          PublishedUploadRequest.$_createMessage);
   static PublishedUploadRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -1979,7 +2089,7 @@ class PublishedUploadResponse extends $pb.GeneratedMessage {
   factory PublishedUploadResponse({
     Published? published,
   }) {
-    final result = create();
+    final result = PublishedUploadResponse._();
     if (published != null) result.published = published;
     return result;
   }
@@ -1988,17 +2098,17 @@ class PublishedUploadResponse extends $pb.GeneratedMessage {
 
   factory PublishedUploadResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      PublishedUploadResponse()..mergeFromBuffer(data, registry);
   factory PublishedUploadResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      PublishedUploadResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'PublishedUploadResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: PublishedUploadResponse.$_createMessage)
     ..aOM<Published>(1, _omitFieldNames ? '' : 'published',
-        subBuilder: Published.create)
+        subBuilder: Published.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -2013,12 +2123,16 @@ class PublishedUploadResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use PublishedUploadResponse() / PublishedUploadResponse.new instead')
   static PublishedUploadResponse create() => PublishedUploadResponse._();
+  static $pb.GeneratedMessage $_createMessage() => PublishedUploadResponse._();
   @$core.override
-  PublishedUploadResponse createEmptyInstance() => create();
+  PublishedUploadResponse createEmptyInstance() => PublishedUploadResponse._();
   @$core.pragma('dart2js:noInline')
   static PublishedUploadResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<PublishedUploadResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<PublishedUploadResponse>(
+          PublishedUploadResponse.$_createMessage);
   static PublishedUploadResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -2037,7 +2151,7 @@ class MetadataSyncRequest extends $pb.GeneratedMessage {
   factory MetadataSyncRequest({
     Media? media,
   }) {
-    final result = create();
+    final result = MetadataSyncRequest._();
     if (media != null) result.media = media;
     return result;
   }
@@ -2046,16 +2160,17 @@ class MetadataSyncRequest extends $pb.GeneratedMessage {
 
   factory MetadataSyncRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      MetadataSyncRequest()..mergeFromBuffer(data, registry);
   factory MetadataSyncRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      MetadataSyncRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'MetadataSyncRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
-    ..aOM<Media>(1, _omitFieldNames ? '' : 'media', subBuilder: Media.create)
+      createEmptyInstance: MetadataSyncRequest.$_createMessage)
+    ..aOM<Media>(1, _omitFieldNames ? '' : 'media',
+        subBuilder: Media.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -2069,12 +2184,16 @@ class MetadataSyncRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use MetadataSyncRequest() / MetadataSyncRequest.new instead')
   static MetadataSyncRequest create() => MetadataSyncRequest._();
+  static $pb.GeneratedMessage $_createMessage() => MetadataSyncRequest._();
   @$core.override
-  MetadataSyncRequest createEmptyInstance() => create();
+  MetadataSyncRequest createEmptyInstance() => MetadataSyncRequest._();
   @$core.pragma('dart2js:noInline')
   static MetadataSyncRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<MetadataSyncRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<MetadataSyncRequest>(
+          MetadataSyncRequest.$_createMessage);
   static MetadataSyncRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -2093,7 +2212,7 @@ class MetadataSyncResponse extends $pb.GeneratedMessage {
   factory MetadataSyncResponse({
     Media? media,
   }) {
-    final result = create();
+    final result = MetadataSyncResponse._();
     if (media != null) result.media = media;
     return result;
   }
@@ -2102,16 +2221,17 @@ class MetadataSyncResponse extends $pb.GeneratedMessage {
 
   factory MetadataSyncResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      MetadataSyncResponse()..mergeFromBuffer(data, registry);
   factory MetadataSyncResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      MetadataSyncResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'MetadataSyncResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
-    ..aOM<Media>(1, _omitFieldNames ? '' : 'media', subBuilder: Media.create)
+      createEmptyInstance: MetadataSyncResponse.$_createMessage)
+    ..aOM<Media>(1, _omitFieldNames ? '' : 'media',
+        subBuilder: Media.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -2125,12 +2245,16 @@ class MetadataSyncResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use MetadataSyncResponse() / MetadataSyncResponse.new instead')
   static MetadataSyncResponse create() => MetadataSyncResponse._();
+  static $pb.GeneratedMessage $_createMessage() => MetadataSyncResponse._();
   @$core.override
-  MetadataSyncResponse createEmptyInstance() => create();
+  MetadataSyncResponse createEmptyInstance() => MetadataSyncResponse._();
   @$core.pragma('dart2js:noInline')
   static MetadataSyncResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<MetadataSyncResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<MetadataSyncResponse>(
+          MetadataSyncResponse.$_createMessage);
   static MetadataSyncResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -2149,7 +2273,7 @@ class PublishedRequest extends $pb.GeneratedMessage {
   factory PublishedRequest({
     $core.String? knownMediaId,
   }) {
-    final result = create();
+    final result = PublishedRequest._();
     if (knownMediaId != null) result.knownMediaId = knownMediaId;
     return result;
   }
@@ -2158,15 +2282,15 @@ class PublishedRequest extends $pb.GeneratedMessage {
 
   factory PublishedRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      PublishedRequest()..mergeFromBuffer(data, registry);
   factory PublishedRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      PublishedRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'PublishedRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: PublishedRequest.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'known_media_id')
     ..hasRequiredFields = false;
 
@@ -2181,12 +2305,15 @@ class PublishedRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use PublishedRequest() / PublishedRequest.new instead')
   static PublishedRequest create() => PublishedRequest._();
+  static $pb.GeneratedMessage $_createMessage() => PublishedRequest._();
   @$core.override
-  PublishedRequest createEmptyInstance() => create();
+  PublishedRequest createEmptyInstance() => PublishedRequest._();
   @$core.pragma('dart2js:noInline')
-  static PublishedRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<PublishedRequest>(create);
+  static PublishedRequest getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<PublishedRequest>(
+          PublishedRequest.$_createMessage);
   static PublishedRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -2204,7 +2331,7 @@ class PublishedResponse extends $pb.GeneratedMessage {
     Media? media,
     $core.String? magnetUri,
   }) {
-    final result = create();
+    final result = PublishedResponse._();
     if (media != null) result.media = media;
     if (magnetUri != null) result.magnetUri = magnetUri;
     return result;
@@ -2214,16 +2341,17 @@ class PublishedResponse extends $pb.GeneratedMessage {
 
   factory PublishedResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      PublishedResponse()..mergeFromBuffer(data, registry);
   factory PublishedResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      PublishedResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'PublishedResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
-    ..aOM<Media>(1, _omitFieldNames ? '' : 'media', subBuilder: Media.create)
+      createEmptyInstance: PublishedResponse.$_createMessage)
+    ..aOM<Media>(1, _omitFieldNames ? '' : 'media',
+        subBuilder: Media.$_createMessage)
     ..aOS(2, _omitFieldNames ? '' : 'magnet_uri')
     ..hasRequiredFields = false;
 
@@ -2238,12 +2366,15 @@ class PublishedResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use PublishedResponse() / PublishedResponse.new instead')
   static PublishedResponse create() => PublishedResponse._();
+  static $pb.GeneratedMessage $_createMessage() => PublishedResponse._();
   @$core.override
-  PublishedResponse createEmptyInstance() => create();
+  PublishedResponse createEmptyInstance() => PublishedResponse._();
   @$core.pragma('dart2js:noInline')
-  static PublishedResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<PublishedResponse>(create);
+  static PublishedResponse getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<PublishedResponse>(
+          PublishedResponse.$_createMessage);
   static PublishedResponse? _defaultInstance;
 
   @$pb.TagNumber(1)

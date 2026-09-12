@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:fixnum/fixnum.dart' as fixnum;
 import 'package:flutter/material.dart';
+import 'package:stream_transform/stream_transform.dart';
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/authz.dart' as authz;
 import 'package:retrovibed/designkit.dart' as ds;
@@ -25,12 +26,17 @@ class RemoteControlListener extends StatefulWidget {
   final Future<remote.RemoteControlSocket> Function({List<httpx.Option> options}) connect;
   final meta.Daemon Function() localDevice;
   final media.PlaylistControl Function(BuildContext) playlist;
+  // test seam: the window a test passes to tester.pump() to deterministically
+  // control when the throttled position-stream echo (see _State._echoPlayback)
+  // fires.
+  final Duration playbackThrottle;
   const RemoteControlListener(
     this.child, {
     super.key,
     this.connect = remote.remotecontrol.listen,
     this.localDevice = retro.local_device,
     this.playlist = _resolvePlaylist,
+    this.playbackThrottle = const Duration(seconds: 3),
   });
 
   @override
@@ -46,6 +52,7 @@ class _State extends State<RemoteControlListener> {
   int _vid = 0;
   remote.RemoteControlSocket _socket = remote.RemoteControlSocket.noop;
   StreamSubscription<remote.Stream>? _rcSubscription;
+  StreamSubscription<Duration>? _positionSubscription;
   ValueNotifier<meta.Daemon> _library = ValueNotifier(meta.Daemon());
   ValueNotifier<authz.Bearer<meta.Token>> _authz = ValueNotifier(authz.Bearer(meta.Token(), ""));
   playqueue.PlayQueue _queue = playqueue.PlayQueue();
@@ -93,6 +100,7 @@ class _State extends State<RemoteControlListener> {
       paused: !_playlistControl.playing.value,
       fullscreen: ds.Full.nochrome(context),
       vid: fixnum.Int64(++_vid),
+      playback: _buildPlayback(),
     );
     final cached = authn.AuthzCache.meta(context);
     // forces a refresh if expired, so token is never blank
@@ -113,6 +121,33 @@ class _State extends State<RemoteControlListener> {
   // this device is doing - via a full sync, same as every remote command.
   void _echo() {
     _echoSync();
+  }
+
+  remote.Playback? _buildPlayback() {
+    final current = _queue.current.value;
+    if (current == null) return null;
+    return remote.Playback(
+      media: current.current,
+      position: fixnum.Int64(_playlistControl.position.inMilliseconds),
+      duration: fixnum.Int64(_playlistControl.duration.inMilliseconds),
+    );
+  }
+
+  // periodic, lighter-weight companion to _echoSync - reports just the
+  // live position/duration ticking while something plays, without paying
+  // for the rest of Sync's payload (queue/library/token) on every tick.
+  void _echoPlayback() {
+    final current = _queue.current.value;
+    if (current == null) return;
+    _socket.send(
+      remote.messages.playback(
+        sessionId: current.sessionId,
+        profileId: current.profileId,
+        media: current.current,
+        position: fixnum.Int64(_playlistControl.position.inMilliseconds),
+        duration: fixnum.Int64(_playlistControl.duration.inMilliseconds),
+      ),
+    );
   }
 
   void _rcReconnect() {
@@ -170,6 +205,7 @@ class _State extends State<RemoteControlListener> {
       case remote.Stream_Command.mute:
         return _applyMute(msg);
       case remote.Stream_Command.sync:
+      case remote.Stream_Command.playback:
       case remote.Stream_Command.notSet:
         return Future.value();
     }
@@ -248,6 +284,9 @@ class _State extends State<RemoteControlListener> {
 
     _playlistControl.playing.addListener(_echo);
     _playlistControl.volume.addListener(_echo);
+    _positionSubscription = _playlistControl.positionStream
+        .throttle(widget.playbackThrottle, trailing: true)
+        .listen((_) => _echoPlayback());
 
     _queue = media.Playlist.of(context)?.queue ?? _queue;
     _queue.current.addListener(_echoSync);
@@ -271,6 +310,7 @@ class _State extends State<RemoteControlListener> {
     _authz.removeListener(_echoSync);
     _playlistControl.playing.removeListener(_echo);
     _playlistControl.volume.removeListener(_echo);
+    _positionSubscription?.cancel();
     _rcSubscription?.cancel();
     _socket.close();
   }

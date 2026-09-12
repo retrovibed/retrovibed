@@ -87,8 +87,14 @@ const Sync$json = {
     {'1': 'muted', '3': 7, '4': 1, '5': 8, '10': 'muted'},
     {'1': 'paused', '3': 8, '4': 1, '5': 8, '10': 'paused'},
     {'1': 'fullscreen', '3': 9, '4': 1, '5': 8, '10': 'fullscreen'},
-    {'1': 'position', '3': 10, '4': 1, '5': 4, '10': 'position'},
-    {'1': 'duration', '3': 11, '4': 1, '5': 4, '10': 'duration'},
+    {
+      '1': 'playback',
+      '3': 10,
+      '4': 1,
+      '5': 11,
+      '6': '.media.Playback',
+      '10': 'playback'
+    },
     {
       '1': 'queue',
       '3': 1000,
@@ -99,7 +105,7 @@ const Sync$json = {
     },
   ],
   '9': [
-    {'1': 12, '2': 1000},
+    {'1': 11, '2': 1000},
   ],
 };
 
@@ -109,9 +115,24 @@ final $typed_data.Uint8List syncDescriptor = $convert.base64Decode(
     'l0eRgCIAEoDVIIY2FwYWNpdHkSJwoHY3VycmVudBgDIAEoCzINLm1lZGlhLlN0cmVhbVIHY3Vy'
     'cmVudBIUCgV0b2tlbhgEIAEoCVIFdG9rZW4SHgoKZXhwaXJhdGlvbhgFIAEoA1IKZXhwaXJhdG'
     'lvbhIWCgZ2b2x1bWUYBiABKAJSBnZvbHVtZRIUCgVtdXRlZBgHIAEoCFIFbXV0ZWQSFgoGcGF1'
-    'c2VkGAggASgIUgZwYXVzZWQSHgoKZnVsbHNjcmVlbhgJIAEoCFIKZnVsbHNjcmVlbhIaCghwb3'
-    'NpdGlvbhgKIAEoBFIIcG9zaXRpb24SGgoIZHVyYXRpb24YCyABKARSCGR1cmF0aW9uEiQKBXF1'
-    'ZXVlGOgHIAMoCzINLm1lZGlhLlN0cmVhbVIFcXVldWVKBQgMEOgH');
+    'c2VkGAggASgIUgZwYXVzZWQSHgoKZnVsbHNjcmVlbhgJIAEoCFIKZnVsbHNjcmVlbhIrCghwbG'
+    'F5YmFjaxgKIAEoCzIPLm1lZGlhLlBsYXliYWNrUghwbGF5YmFjaxIkCgVxdWV1ZRjoByADKAsy'
+    'DS5tZWRpYS5TdHJlYW1SBXF1ZXVlSgUICxDoBw==');
+
+@$core.Deprecated('Use playbackDescriptor instead')
+const Playback$json = {
+  '1': 'Playback',
+  '2': [
+    {'1': 'media', '3': 1, '4': 1, '5': 11, '6': '.media.Media', '10': 'media'},
+    {'1': 'position', '3': 10, '4': 1, '5': 4, '10': 'position'},
+    {'1': 'duration', '3': 11, '4': 1, '5': 4, '10': 'duration'},
+  ],
+};
+
+/// Descriptor for `Playback`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List playbackDescriptor = $convert.base64Decode(
+    'CghQbGF5YmFjaxIiCgVtZWRpYRgBIAEoCzIMLm1lZGlhLk1lZGlhUgVtZWRpYRIaCghwb3NpdG'
+    'lvbhgKIAEoBFIIcG9zaXRpb24SGgoIZHVyYXRpb24YCyABKARSCGR1cmF0aW9u');
 
 @$core.Deprecated('Use fullscreenDescriptor instead')
 const Fullscreen$json = {
@@ -210,6 +231,15 @@ const Stream$json = {
       '9': 0,
       '10': 'mute'
     },
+    {
+      '1': 'playback',
+      '3': 1009,
+      '4': 1,
+      '5': 11,
+      '6': '.media.Playback',
+      '9': 0,
+      '10': 'playback'
+    },
   ],
   '8': [
     {'1': 'Command'},
@@ -225,4 +255,5 @@ final $typed_data.Uint8List streamDescriptor = $convert.base64Decode(
     'SABSBXBhdXNlEiIKBHNlZWsY7AcgASgLMgsubWVkaWEuU2Vla0gAUgRzZWVrEiIKBHN5bmMY7Q'
     'cgASgLMgsubWVkaWEuU3luY0gAUgRzeW5jEiYKBnZvbHVtZRjuByABKAsyCy5tZWRpYS5TZWVr'
     'SABSBnZvbHVtZRI0CgpmdWxsc2NyZWVuGO8HIAEoCzIRLm1lZGlhLkZ1bGxzY3JlZW5IAFIKZn'
-    'VsbHNjcmVlbhIiCgRtdXRlGPAHIAEoCzILLm1lZGlhLk11dGVIAFIEbXV0ZUIJCgdDb21tYW5k');
+    'VsbHNjcmVlbhIiCgRtdXRlGPAHIAEoCzILLm1lZGlhLk11dGVIAFIEbXV0ZRIuCghwbGF5YmFj'
+    'axjxByABKAsyDy5tZWRpYS5QbGF5YmFja0gAUghwbGF5YmFja0IJCgdDb21tYW5k');

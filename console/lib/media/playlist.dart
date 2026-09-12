@@ -30,6 +30,10 @@ abstract class PlaylistControl {
   void previous();
   void playOrPause();
   Duration get position;
+  Duration get duration;
+  // live position ticks, same stream a local tracer would listen to -
+  // lets RemoteControlListener echo position/duration without polling.
+  Stream<Duration> get positionStream;
   void seek(Duration position);
   ValueNotifier<double> get volume;
   Future<void> setVolume(double volume);
@@ -45,6 +49,10 @@ class _ZeroPlaylistControl implements PlaylistControl {
   final ValueNotifier<bool> playing = ValueNotifier(false);
   @override
   Duration get position => Duration.zero;
+  @override
+  Duration get duration => Duration.zero;
+  @override
+  Stream<Duration> get positionStream => const Stream.empty();
   @override
   void maybeNext(playqueue.PlayableMedia m) {}
   @override
@@ -269,6 +277,10 @@ class _PlaylistState extends State<Playlist> implements PlaylistControl {
   playqueue.PlayQueue get queue => _queue;
   @override
   Duration get position => player.state.position;
+  @override
+  Duration get duration => player.state.duration;
+  @override
+  Stream<Duration> get positionStream => player.stream.position;
   @override
   void seek(Duration position) => player.seek(position);
   @override

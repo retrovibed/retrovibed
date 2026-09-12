@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:stream_transform/stream_transform.dart';
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/design.kit/stateful.dart';
@@ -79,6 +80,11 @@ class Connect extends StatefulWidget {
   final media.FnMediaFind Function(String host, List<httpx.Option> options) apirandom;
   final lib.FnRecent apirecentlatest;
   final lib.FnRecentTombstone apirecenttombstone;
+  final lib.FnRecentRecord apirecentrecord;
+  // test seam: the window a test passes to tester.pump() to deterministically
+  // control when the throttled recent-watch recording (see _State._record)
+  // fires, mirroring RemoteControlListener's own position-echo throttle test.
+  final Duration recentRecordThrottle;
   final int autoqueueTarget;
 
   const Connect({
@@ -90,6 +96,8 @@ class Connect extends StatefulWidget {
     required this.apirandom,
     this.apirecentlatest = lib.recent.latest,
     this.apirecenttombstone = lib.recent.delete,
+    this.apirecentrecord = lib.recent.record,
+    this.recentRecordThrottle = const Duration(seconds: 3),
     this.autoqueueTarget = _autoqueueTargetDefault,
   });
 
@@ -114,10 +122,13 @@ class _State extends State<Connect> with LoadingState {
   // _socket/_latest - so a stale reference here would stop updating).
   Widget? _focused;
   ValueNotifier<meta.Daemon> _endpoint = ValueNotifier(meta.Daemon());
-  // identifies this specific open Connect widget for the lifetime of its
-  // mount - stable across reconnects, minted once, never reissued - so
-  // enqueued items can be matched back against what this session sent.
-  final String _sessionID = uuidx.v7();
+  // identifies the current "pick session" - stable across reconnects and
+  // repeated taps under the same query, but reminted (_onPlay) whenever the
+  // active search query changes, so a Sync.current whose session_id matches
+  // can be attributed back to _sessionQuery for both PlaylistCurrent's
+  // highlight and _record's recent-watch write.
+  String _sessionID = uuidx.v7();
+  media.MediaSearchRequest _sessionQuery = media.MediaSearchRequest();
 
   playqueue.SafeStreamIterator<playqueue.PlayableMedia> _autoqueue = playqueue.SafeStreamIterator(
     const Stream.empty(),
@@ -176,6 +187,10 @@ class _State extends State<Connect> with LoadingState {
             playqueue.range(s.next, anchor, search: _apisearch, random: _apirandom),
           );
           setState(() {
+            if (s.next.query != _sessionQuery.query) {
+              _sessionID = uuidx.v7();
+              _sessionQuery = s.next;
+            }
             _autoqueue = queue;
           });
           await _fillQueue(queue);
@@ -220,6 +235,37 @@ class _State extends State<Connect> with LoadingState {
     } finally {
       _casfilling(-1);
     }
+  }
+
+  // records a recent-watch event for the daemon's current pick, but only
+  // when this session is the one that enqueued it (msg.sessionId ==
+  // _sessionID - the same comparison PlaylistCurrent uses to highlight it)
+  // and a non-empty query is known for it. Called off a throttled stream
+  // (see _connect), so this itself fires on every qualifying tick - no
+  // dedupe/staleness bookkeeping needed here.
+  void _record(remote.Stream msg) {
+    if (!mounted) return;
+    if (!msg.playback.media.hasId()) return;
+    if (msg.sessionId != _sessionID) return;
+    if (_sessionQuery.query.trim().isEmpty) return;
+    final playback = msg.playback;
+    widget
+        .apirecentrecord(
+          lib.RecentRecordRequest(
+            media: playback.media,
+            query: _sessionQuery,
+            mimetype: mimex.category(_sessionQuery.mimetypes),
+            position: playback.position,
+            duration: playback.duration,
+          ),
+          host: _endpoint.value.hostname,
+          options: [authn.request(authn.AuthedEndpoint.token(context))],
+        )
+        .then((v) {})
+        .catchError((cause) {
+          print("failed to record remote watch event - $cause");
+        })
+        .ignore();
   }
 
   void _onEndpointChanged() {
@@ -309,6 +355,10 @@ class _State extends State<Connect> with LoadingState {
               onError: c.completeError,
               onDone: c.complete,
             );
+            _messages
+                .where((msg) => msg.whichCommand() == remote.Stream_Command.playback)
+                .throttle(widget.recentRecordThrottle, trailing: true)
+                .listen(_record);
           });
 
           socket.send(remote.messages.sync(sessionId: _sessionID));
