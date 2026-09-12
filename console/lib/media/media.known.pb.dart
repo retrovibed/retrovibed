@@ -32,7 +32,7 @@ class Known extends $pb.GeneratedMessage {
     $core.String? source,
     $core.String? uid,
   }) {
-    final result = create();
+    final result = Known._();
     if (id != null) result.id = id;
     if (rating != null) result.rating = rating;
     if (adult != null) result.adult = adult;
@@ -50,15 +50,15 @@ class Known extends $pb.GeneratedMessage {
 
   factory Known.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      Known()..mergeFromBuffer(data, registry);
   factory Known.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      Known()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'Known',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: Known.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'id')
     ..aD(2, _omitFieldNames ? '' : 'rating', fieldType: $pb.PbFieldType.OF)
     ..aOB(3, _omitFieldNames ? '' : 'adult')
@@ -81,12 +81,14 @@ class Known extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use Known() / Known.new instead')
   static Known create() => Known._();
+  static $pb.GeneratedMessage $_createMessage() => Known._();
   @$core.override
-  Known createEmptyInstance() => create();
+  Known createEmptyInstance() => Known._();
   @$core.pragma('dart2js:noInline')
-  static Known getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Known>(create);
+  static Known getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<Known>(Known.$_createMessage);
   static Known? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -192,7 +194,7 @@ class KnownSearchRequest extends $pb.GeneratedMessage {
     $fixnum.Int64? offset,
     $fixnum.Int64? limit,
   }) {
-    final result = create();
+    final result = KnownSearchRequest._();
     if (query != null) result.query = query;
     if (adult != null) result.adult = adult;
     if (language != null) result.language = language;
@@ -209,21 +211,21 @@ class KnownSearchRequest extends $pb.GeneratedMessage {
 
   factory KnownSearchRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      KnownSearchRequest()..mergeFromBuffer(data, registry);
   factory KnownSearchRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      KnownSearchRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'KnownSearchRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: KnownSearchRequest.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'query')
     ..aOB(2, _omitFieldNames ? '' : 'adult')
     ..aOS(3, _omitFieldNames ? '' : 'language')
     ..aOS(4, _omitFieldNames ? '' : 'mimetype')
     ..aOM<$0.DateRange>(5, _omitFieldNames ? '' : 'released',
-        subBuilder: $0.DateRange.create)
+        subBuilder: $0.DateRange.$_createMessage)
     ..pPS(6, _omitFieldNames ? '' : 'source')
     ..pPS(7, _omitFieldNames ? '' : 'id')
     ..a<$fixnum.Int64>(
@@ -244,12 +246,15 @@ class KnownSearchRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use KnownSearchRequest() / KnownSearchRequest.new instead')
   static KnownSearchRequest create() => KnownSearchRequest._();
+  static $pb.GeneratedMessage $_createMessage() => KnownSearchRequest._();
   @$core.override
-  KnownSearchRequest createEmptyInstance() => create();
+  KnownSearchRequest createEmptyInstance() => KnownSearchRequest._();
   @$core.pragma('dart2js:noInline')
   static KnownSearchRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<KnownSearchRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<KnownSearchRequest>(
+          KnownSearchRequest.$_createMessage);
   static KnownSearchRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -329,7 +334,7 @@ class KnownSearchResponse extends $pb.GeneratedMessage {
     KnownSearchRequest? next,
     $core.Iterable<Known>? items,
   }) {
-    final result = create();
+    final result = KnownSearchResponse._();
     if (next != null) result.next = next;
     if (items != null) result.items.addAll(items);
     return result;
@@ -339,18 +344,19 @@ class KnownSearchResponse extends $pb.GeneratedMessage {
 
   factory KnownSearchResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      KnownSearchResponse()..mergeFromBuffer(data, registry);
   factory KnownSearchResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      KnownSearchResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'KnownSearchResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: KnownSearchResponse.$_createMessage)
     ..aOM<KnownSearchRequest>(1, _omitFieldNames ? '' : 'next',
-        subBuilder: KnownSearchRequest.create)
-    ..pPM<Known>(2, _omitFieldNames ? '' : 'items', subBuilder: Known.create)
+        subBuilder: KnownSearchRequest.$_createMessage)
+    ..pPM<Known>(2, _omitFieldNames ? '' : 'items',
+        subBuilder: Known.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -364,12 +370,16 @@ class KnownSearchResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use KnownSearchResponse() / KnownSearchResponse.new instead')
   static KnownSearchResponse create() => KnownSearchResponse._();
+  static $pb.GeneratedMessage $_createMessage() => KnownSearchResponse._();
   @$core.override
-  KnownSearchResponse createEmptyInstance() => create();
+  KnownSearchResponse createEmptyInstance() => KnownSearchResponse._();
   @$core.pragma('dart2js:noInline')
   static KnownSearchResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<KnownSearchResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<KnownSearchResponse>(
+          KnownSearchResponse.$_createMessage);
   static KnownSearchResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -391,7 +401,7 @@ class KnownMatchRequest extends $pb.GeneratedMessage {
   factory KnownMatchRequest({
     $core.String? query,
   }) {
-    final result = create();
+    final result = KnownMatchRequest._();
     if (query != null) result.query = query;
     return result;
   }
@@ -400,15 +410,15 @@ class KnownMatchRequest extends $pb.GeneratedMessage {
 
   factory KnownMatchRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      KnownMatchRequest()..mergeFromBuffer(data, registry);
   factory KnownMatchRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      KnownMatchRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'KnownMatchRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: KnownMatchRequest.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'query')
     ..hasRequiredFields = false;
 
@@ -423,12 +433,15 @@ class KnownMatchRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use KnownMatchRequest() / KnownMatchRequest.new instead')
   static KnownMatchRequest create() => KnownMatchRequest._();
+  static $pb.GeneratedMessage $_createMessage() => KnownMatchRequest._();
   @$core.override
-  KnownMatchRequest createEmptyInstance() => create();
+  KnownMatchRequest createEmptyInstance() => KnownMatchRequest._();
   @$core.pragma('dart2js:noInline')
-  static KnownMatchRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<KnownMatchRequest>(create);
+  static KnownMatchRequest getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<KnownMatchRequest>(
+          KnownMatchRequest.$_createMessage);
   static KnownMatchRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -442,21 +455,21 @@ class KnownMatchRequest extends $pb.GeneratedMessage {
 }
 
 class KnownLookupRequest extends $pb.GeneratedMessage {
-  factory KnownLookupRequest() => create();
+  factory KnownLookupRequest() => KnownLookupRequest._();
 
   KnownLookupRequest._();
 
   factory KnownLookupRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      KnownLookupRequest()..mergeFromBuffer(data, registry);
   factory KnownLookupRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      KnownLookupRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'KnownLookupRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: KnownLookupRequest.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -470,12 +483,15 @@ class KnownLookupRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use KnownLookupRequest() / KnownLookupRequest.new instead')
   static KnownLookupRequest create() => KnownLookupRequest._();
+  static $pb.GeneratedMessage $_createMessage() => KnownLookupRequest._();
   @$core.override
-  KnownLookupRequest createEmptyInstance() => create();
+  KnownLookupRequest createEmptyInstance() => KnownLookupRequest._();
   @$core.pragma('dart2js:noInline')
   static KnownLookupRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<KnownLookupRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<KnownLookupRequest>(
+          KnownLookupRequest.$_createMessage);
   static KnownLookupRequest? _defaultInstance;
 }
 
@@ -483,7 +499,7 @@ class KnownLookupResponse extends $pb.GeneratedMessage {
   factory KnownLookupResponse({
     Known? known,
   }) {
-    final result = create();
+    final result = KnownLookupResponse._();
     if (known != null) result.known = known;
     return result;
   }
@@ -492,16 +508,17 @@ class KnownLookupResponse extends $pb.GeneratedMessage {
 
   factory KnownLookupResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      KnownLookupResponse()..mergeFromBuffer(data, registry);
   factory KnownLookupResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      KnownLookupResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'KnownLookupResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
-    ..aOM<Known>(1, _omitFieldNames ? '' : 'known', subBuilder: Known.create)
+      createEmptyInstance: KnownLookupResponse.$_createMessage)
+    ..aOM<Known>(1, _omitFieldNames ? '' : 'known',
+        subBuilder: Known.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -515,12 +532,16 @@ class KnownLookupResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use KnownLookupResponse() / KnownLookupResponse.new instead')
   static KnownLookupResponse create() => KnownLookupResponse._();
+  static $pb.GeneratedMessage $_createMessage() => KnownLookupResponse._();
   @$core.override
-  KnownLookupResponse createEmptyInstance() => create();
+  KnownLookupResponse createEmptyInstance() => KnownLookupResponse._();
   @$core.pragma('dart2js:noInline')
   static KnownLookupResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<KnownLookupResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<KnownLookupResponse>(
+          KnownLookupResponse.$_createMessage);
   static KnownLookupResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -536,21 +557,21 @@ class KnownLookupResponse extends $pb.GeneratedMessage {
 }
 
 class KnownDownloadRequest extends $pb.GeneratedMessage {
-  factory KnownDownloadRequest() => create();
+  factory KnownDownloadRequest() => KnownDownloadRequest._();
 
   KnownDownloadRequest._();
 
   factory KnownDownloadRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      KnownDownloadRequest()..mergeFromBuffer(data, registry);
   factory KnownDownloadRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      KnownDownloadRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'KnownDownloadRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: KnownDownloadRequest.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -564,12 +585,16 @@ class KnownDownloadRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use KnownDownloadRequest() / KnownDownloadRequest.new instead')
   static KnownDownloadRequest create() => KnownDownloadRequest._();
+  static $pb.GeneratedMessage $_createMessage() => KnownDownloadRequest._();
   @$core.override
-  KnownDownloadRequest createEmptyInstance() => create();
+  KnownDownloadRequest createEmptyInstance() => KnownDownloadRequest._();
   @$core.pragma('dart2js:noInline')
   static KnownDownloadRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<KnownDownloadRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<KnownDownloadRequest>(
+          KnownDownloadRequest.$_createMessage);
   static KnownDownloadRequest? _defaultInstance;
 }
 
@@ -577,7 +602,7 @@ class KnownDownloadResponse extends $pb.GeneratedMessage {
   factory KnownDownloadResponse({
     Known? known,
   }) {
-    final result = create();
+    final result = KnownDownloadResponse._();
     if (known != null) result.known = known;
     return result;
   }
@@ -586,16 +611,17 @@ class KnownDownloadResponse extends $pb.GeneratedMessage {
 
   factory KnownDownloadResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      KnownDownloadResponse()..mergeFromBuffer(data, registry);
   factory KnownDownloadResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      KnownDownloadResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'KnownDownloadResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
-    ..aOM<Known>(1, _omitFieldNames ? '' : 'known', subBuilder: Known.create)
+      createEmptyInstance: KnownDownloadResponse.$_createMessage)
+    ..aOM<Known>(1, _omitFieldNames ? '' : 'known',
+        subBuilder: Known.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -610,12 +636,16 @@ class KnownDownloadResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use KnownDownloadResponse() / KnownDownloadResponse.new instead')
   static KnownDownloadResponse create() => KnownDownloadResponse._();
+  static $pb.GeneratedMessage $_createMessage() => KnownDownloadResponse._();
   @$core.override
-  KnownDownloadResponse createEmptyInstance() => create();
+  KnownDownloadResponse createEmptyInstance() => KnownDownloadResponse._();
   @$core.pragma('dart2js:noInline')
   static KnownDownloadResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<KnownDownloadResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<KnownDownloadResponse>(
+          KnownDownloadResponse.$_createMessage);
   static KnownDownloadResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -634,7 +664,7 @@ class KnownCreateRequest extends $pb.GeneratedMessage {
   factory KnownCreateRequest({
     Known? known,
   }) {
-    final result = create();
+    final result = KnownCreateRequest._();
     if (known != null) result.known = known;
     return result;
   }
@@ -643,16 +673,17 @@ class KnownCreateRequest extends $pb.GeneratedMessage {
 
   factory KnownCreateRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      KnownCreateRequest()..mergeFromBuffer(data, registry);
   factory KnownCreateRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      KnownCreateRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'KnownCreateRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
-    ..aOM<Known>(1, _omitFieldNames ? '' : 'known', subBuilder: Known.create)
+      createEmptyInstance: KnownCreateRequest.$_createMessage)
+    ..aOM<Known>(1, _omitFieldNames ? '' : 'known',
+        subBuilder: Known.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -666,12 +697,15 @@ class KnownCreateRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use KnownCreateRequest() / KnownCreateRequest.new instead')
   static KnownCreateRequest create() => KnownCreateRequest._();
+  static $pb.GeneratedMessage $_createMessage() => KnownCreateRequest._();
   @$core.override
-  KnownCreateRequest createEmptyInstance() => create();
+  KnownCreateRequest createEmptyInstance() => KnownCreateRequest._();
   @$core.pragma('dart2js:noInline')
   static KnownCreateRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<KnownCreateRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<KnownCreateRequest>(
+          KnownCreateRequest.$_createMessage);
   static KnownCreateRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -690,7 +724,7 @@ class KnownCreateResponse extends $pb.GeneratedMessage {
   factory KnownCreateResponse({
     Known? known,
   }) {
-    final result = create();
+    final result = KnownCreateResponse._();
     if (known != null) result.known = known;
     return result;
   }
@@ -699,16 +733,17 @@ class KnownCreateResponse extends $pb.GeneratedMessage {
 
   factory KnownCreateResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      KnownCreateResponse()..mergeFromBuffer(data, registry);
   factory KnownCreateResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      KnownCreateResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'KnownCreateResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
-    ..aOM<Known>(1, _omitFieldNames ? '' : 'known', subBuilder: Known.create)
+      createEmptyInstance: KnownCreateResponse.$_createMessage)
+    ..aOM<Known>(1, _omitFieldNames ? '' : 'known',
+        subBuilder: Known.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -722,12 +757,16 @@ class KnownCreateResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use KnownCreateResponse() / KnownCreateResponse.new instead')
   static KnownCreateResponse create() => KnownCreateResponse._();
+  static $pb.GeneratedMessage $_createMessage() => KnownCreateResponse._();
   @$core.override
-  KnownCreateResponse createEmptyInstance() => create();
+  KnownCreateResponse createEmptyInstance() => KnownCreateResponse._();
   @$core.pragma('dart2js:noInline')
   static KnownCreateResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<KnownCreateResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<KnownCreateResponse>(
+          KnownCreateResponse.$_createMessage);
   static KnownCreateResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -753,7 +792,7 @@ class KnownLatestRequest extends $pb.GeneratedMessage {
     $fixnum.Int64? offset,
     $fixnum.Int64? limit,
   }) {
-    final result = create();
+    final result = KnownLatestRequest._();
     if (released != null) result.released = released;
     if (adult != null) result.adult = adult;
     if (language != null) result.language = language;
@@ -769,17 +808,17 @@ class KnownLatestRequest extends $pb.GeneratedMessage {
 
   factory KnownLatestRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      KnownLatestRequest()..mergeFromBuffer(data, registry);
   factory KnownLatestRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      KnownLatestRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'KnownLatestRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: KnownLatestRequest.$_createMessage)
     ..aOM<$0.DateRange>(1, _omitFieldNames ? '' : 'released',
-        subBuilder: $0.DateRange.create)
+        subBuilder: $0.DateRange.$_createMessage)
     ..aOB(2, _omitFieldNames ? '' : 'adult')
     ..aOS(3, _omitFieldNames ? '' : 'language')
     ..aOS(4, _omitFieldNames ? '' : 'mimetype')
@@ -803,12 +842,15 @@ class KnownLatestRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use KnownLatestRequest() / KnownLatestRequest.new instead')
   static KnownLatestRequest create() => KnownLatestRequest._();
+  static $pb.GeneratedMessage $_createMessage() => KnownLatestRequest._();
   @$core.override
-  KnownLatestRequest createEmptyInstance() => create();
+  KnownLatestRequest createEmptyInstance() => KnownLatestRequest._();
   @$core.pragma('dart2js:noInline')
   static KnownLatestRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<KnownLatestRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<KnownLatestRequest>(
+          KnownLatestRequest.$_createMessage);
   static KnownLatestRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -879,7 +921,7 @@ class KnownLatestResponse extends $pb.GeneratedMessage {
     KnownLatestRequest? next,
     $core.Iterable<Known>? items,
   }) {
-    final result = create();
+    final result = KnownLatestResponse._();
     if (next != null) result.next = next;
     if (items != null) result.items.addAll(items);
     return result;
@@ -889,18 +931,19 @@ class KnownLatestResponse extends $pb.GeneratedMessage {
 
   factory KnownLatestResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      KnownLatestResponse()..mergeFromBuffer(data, registry);
   factory KnownLatestResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      KnownLatestResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'KnownLatestResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: KnownLatestResponse.$_createMessage)
     ..aOM<KnownLatestRequest>(1, _omitFieldNames ? '' : 'next',
-        subBuilder: KnownLatestRequest.create)
-    ..pPM<Known>(2, _omitFieldNames ? '' : 'items', subBuilder: Known.create)
+        subBuilder: KnownLatestRequest.$_createMessage)
+    ..pPM<Known>(2, _omitFieldNames ? '' : 'items',
+        subBuilder: Known.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -914,12 +957,16 @@ class KnownLatestResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use KnownLatestResponse() / KnownLatestResponse.new instead')
   static KnownLatestResponse create() => KnownLatestResponse._();
+  static $pb.GeneratedMessage $_createMessage() => KnownLatestResponse._();
   @$core.override
-  KnownLatestResponse createEmptyInstance() => create();
+  KnownLatestResponse createEmptyInstance() => KnownLatestResponse._();
   @$core.pragma('dart2js:noInline')
   static KnownLatestResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<KnownLatestResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<KnownLatestResponse>(
+          KnownLatestResponse.$_createMessage);
   static KnownLatestResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -945,7 +992,7 @@ class RecommendationSearchRequest extends $pb.GeneratedMessage {
     $fixnum.Int64? offset,
     $fixnum.Int64? limit,
   }) {
-    final result = create();
+    final result = RecommendationSearchRequest._();
     if (mimetype != null) result.mimetype = mimetype;
     if (adult != null) result.adult = adult;
     if (language != null) result.language = language;
@@ -958,15 +1005,15 @@ class RecommendationSearchRequest extends $pb.GeneratedMessage {
 
   factory RecommendationSearchRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      RecommendationSearchRequest()..mergeFromBuffer(data, registry);
   factory RecommendationSearchRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      RecommendationSearchRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'RecommendationSearchRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: RecommendationSearchRequest.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'mimetype')
     ..aOB(2, _omitFieldNames ? '' : 'adult')
     ..aOS(3, _omitFieldNames ? '' : 'language')
@@ -990,13 +1037,19 @@ class RecommendationSearchRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use RecommendationSearchRequest() / RecommendationSearchRequest.new instead')
   static RecommendationSearchRequest create() =>
       RecommendationSearchRequest._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      RecommendationSearchRequest._();
   @$core.override
-  RecommendationSearchRequest createEmptyInstance() => create();
+  RecommendationSearchRequest createEmptyInstance() =>
+      RecommendationSearchRequest._();
   @$core.pragma('dart2js:noInline')
   static RecommendationSearchRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<RecommendationSearchRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<RecommendationSearchRequest>(
+          RecommendationSearchRequest.$_createMessage);
   static RecommendationSearchRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -1050,7 +1103,7 @@ class RecommendationSearchResponse extends $pb.GeneratedMessage {
     RecommendationSearchRequest? next,
     $core.Iterable<Known>? items,
   }) {
-    final result = create();
+    final result = RecommendationSearchResponse._();
     if (next != null) result.next = next;
     if (items != null) result.items.addAll(items);
     return result;
@@ -1060,18 +1113,19 @@ class RecommendationSearchResponse extends $pb.GeneratedMessage {
 
   factory RecommendationSearchResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      RecommendationSearchResponse()..mergeFromBuffer(data, registry);
   factory RecommendationSearchResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      RecommendationSearchResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'RecommendationSearchResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: RecommendationSearchResponse.$_createMessage)
     ..aOM<RecommendationSearchRequest>(1, _omitFieldNames ? '' : 'next',
-        subBuilder: RecommendationSearchRequest.create)
-    ..pPM<Known>(2, _omitFieldNames ? '' : 'items', subBuilder: Known.create)
+        subBuilder: RecommendationSearchRequest.$_createMessage)
+    ..pPM<Known>(2, _omitFieldNames ? '' : 'items',
+        subBuilder: Known.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1087,13 +1141,19 @@ class RecommendationSearchResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use RecommendationSearchResponse() / RecommendationSearchResponse.new instead')
   static RecommendationSearchResponse create() =>
       RecommendationSearchResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      RecommendationSearchResponse._();
   @$core.override
-  RecommendationSearchResponse createEmptyInstance() => create();
+  RecommendationSearchResponse createEmptyInstance() =>
+      RecommendationSearchResponse._();
   @$core.pragma('dart2js:noInline')
   static RecommendationSearchResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<RecommendationSearchResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<RecommendationSearchResponse>(
+          RecommendationSearchResponse.$_createMessage);
   static RecommendationSearchResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -1112,21 +1172,21 @@ class RecommendationSearchResponse extends $pb.GeneratedMessage {
 }
 
 class RecommendationFindRequest extends $pb.GeneratedMessage {
-  factory RecommendationFindRequest() => create();
+  factory RecommendationFindRequest() => RecommendationFindRequest._();
 
   RecommendationFindRequest._();
 
   factory RecommendationFindRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      RecommendationFindRequest()..mergeFromBuffer(data, registry);
   factory RecommendationFindRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      RecommendationFindRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'RecommendationFindRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: RecommendationFindRequest.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1141,12 +1201,18 @@ class RecommendationFindRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use RecommendationFindRequest() / RecommendationFindRequest.new instead')
   static RecommendationFindRequest create() => RecommendationFindRequest._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      RecommendationFindRequest._();
   @$core.override
-  RecommendationFindRequest createEmptyInstance() => create();
+  RecommendationFindRequest createEmptyInstance() =>
+      RecommendationFindRequest._();
   @$core.pragma('dart2js:noInline')
   static RecommendationFindRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<RecommendationFindRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<RecommendationFindRequest>(
+          RecommendationFindRequest.$_createMessage);
   static RecommendationFindRequest? _defaultInstance;
 }
 
@@ -1154,7 +1220,7 @@ class RecommendationFindResponse extends $pb.GeneratedMessage {
   factory RecommendationFindResponse({
     Known? recommendation,
   }) {
-    final result = create();
+    final result = RecommendationFindResponse._();
     if (recommendation != null) result.recommendation = recommendation;
     return result;
   }
@@ -1163,17 +1229,17 @@ class RecommendationFindResponse extends $pb.GeneratedMessage {
 
   factory RecommendationFindResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      RecommendationFindResponse()..mergeFromBuffer(data, registry);
   factory RecommendationFindResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      RecommendationFindResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'RecommendationFindResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: RecommendationFindResponse.$_createMessage)
     ..aOM<Known>(1, _omitFieldNames ? '' : 'recomendation',
-        protoName: 'recommendation', subBuilder: Known.create)
+        protoName: 'recommendation', subBuilder: Known.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1189,12 +1255,18 @@ class RecommendationFindResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use RecommendationFindResponse() / RecommendationFindResponse.new instead')
   static RecommendationFindResponse create() => RecommendationFindResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      RecommendationFindResponse._();
   @$core.override
-  RecommendationFindResponse createEmptyInstance() => create();
+  RecommendationFindResponse createEmptyInstance() =>
+      RecommendationFindResponse._();
   @$core.pragma('dart2js:noInline')
   static RecommendationFindResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<RecommendationFindResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<RecommendationFindResponse>(
+          RecommendationFindResponse.$_createMessage);
   static RecommendationFindResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -1210,21 +1282,21 @@ class RecommendationFindResponse extends $pb.GeneratedMessage {
 }
 
 class RecommendationDeleteRequest extends $pb.GeneratedMessage {
-  factory RecommendationDeleteRequest() => create();
+  factory RecommendationDeleteRequest() => RecommendationDeleteRequest._();
 
   RecommendationDeleteRequest._();
 
   factory RecommendationDeleteRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      RecommendationDeleteRequest()..mergeFromBuffer(data, registry);
   factory RecommendationDeleteRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      RecommendationDeleteRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'RecommendationDeleteRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: RecommendationDeleteRequest.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1240,13 +1312,19 @@ class RecommendationDeleteRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use RecommendationDeleteRequest() / RecommendationDeleteRequest.new instead')
   static RecommendationDeleteRequest create() =>
       RecommendationDeleteRequest._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      RecommendationDeleteRequest._();
   @$core.override
-  RecommendationDeleteRequest createEmptyInstance() => create();
+  RecommendationDeleteRequest createEmptyInstance() =>
+      RecommendationDeleteRequest._();
   @$core.pragma('dart2js:noInline')
   static RecommendationDeleteRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<RecommendationDeleteRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<RecommendationDeleteRequest>(
+          RecommendationDeleteRequest.$_createMessage);
   static RecommendationDeleteRequest? _defaultInstance;
 }
 
@@ -1254,7 +1332,7 @@ class RecommendationDeleteResponse extends $pb.GeneratedMessage {
   factory RecommendationDeleteResponse({
     Known? recommendation,
   }) {
-    final result = create();
+    final result = RecommendationDeleteResponse._();
     if (recommendation != null) result.recommendation = recommendation;
     return result;
   }
@@ -1263,17 +1341,17 @@ class RecommendationDeleteResponse extends $pb.GeneratedMessage {
 
   factory RecommendationDeleteResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      RecommendationDeleteResponse()..mergeFromBuffer(data, registry);
   factory RecommendationDeleteResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      RecommendationDeleteResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'RecommendationDeleteResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: RecommendationDeleteResponse.$_createMessage)
     ..aOM<Known>(1, _omitFieldNames ? '' : 'recomendation',
-        protoName: 'recommendation', subBuilder: Known.create)
+        protoName: 'recommendation', subBuilder: Known.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1289,13 +1367,19 @@ class RecommendationDeleteResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use RecommendationDeleteResponse() / RecommendationDeleteResponse.new instead')
   static RecommendationDeleteResponse create() =>
       RecommendationDeleteResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      RecommendationDeleteResponse._();
   @$core.override
-  RecommendationDeleteResponse createEmptyInstance() => create();
+  RecommendationDeleteResponse createEmptyInstance() =>
+      RecommendationDeleteResponse._();
   @$core.pragma('dart2js:noInline')
   static RecommendationDeleteResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<RecommendationDeleteResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<RecommendationDeleteResponse>(
+          RecommendationDeleteResponse.$_createMessage);
   static RecommendationDeleteResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -1318,7 +1402,7 @@ class RecommendationRefreshRequest extends $pb.GeneratedMessage {
     $core.bool? adult,
     $core.String? language,
   }) {
-    final result = create();
+    final result = RecommendationRefreshRequest._();
     if (profileId != null) result.profileId = profileId;
     if (limit != null) result.limit = limit;
     if (mimetype != null) result.mimetype = mimetype;
@@ -1331,15 +1415,15 @@ class RecommendationRefreshRequest extends $pb.GeneratedMessage {
 
   factory RecommendationRefreshRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      RecommendationRefreshRequest()..mergeFromBuffer(data, registry);
   factory RecommendationRefreshRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      RecommendationRefreshRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'RecommendationRefreshRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: RecommendationRefreshRequest.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'profile_id')
     ..a<$fixnum.Int64>(2, _omitFieldNames ? '' : 'limit', $pb.PbFieldType.OU6,
         defaultOrMaker: $fixnum.Int64.ZERO)
@@ -1361,13 +1445,19 @@ class RecommendationRefreshRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use RecommendationRefreshRequest() / RecommendationRefreshRequest.new instead')
   static RecommendationRefreshRequest create() =>
       RecommendationRefreshRequest._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      RecommendationRefreshRequest._();
   @$core.override
-  RecommendationRefreshRequest createEmptyInstance() => create();
+  RecommendationRefreshRequest createEmptyInstance() =>
+      RecommendationRefreshRequest._();
   @$core.pragma('dart2js:noInline')
   static RecommendationRefreshRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<RecommendationRefreshRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<RecommendationRefreshRequest>(
+          RecommendationRefreshRequest.$_createMessage);
   static RecommendationRefreshRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -1417,21 +1507,21 @@ class RecommendationRefreshRequest extends $pb.GeneratedMessage {
 }
 
 class RecommendationRefreshResponse extends $pb.GeneratedMessage {
-  factory RecommendationRefreshResponse() => create();
+  factory RecommendationRefreshResponse() => RecommendationRefreshResponse._();
 
   RecommendationRefreshResponse._();
 
   factory RecommendationRefreshResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      RecommendationRefreshResponse()..mergeFromBuffer(data, registry);
   factory RecommendationRefreshResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      RecommendationRefreshResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'RecommendationRefreshResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: RecommendationRefreshResponse.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1447,13 +1537,19 @@ class RecommendationRefreshResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use RecommendationRefreshResponse() / RecommendationRefreshResponse.new instead')
   static RecommendationRefreshResponse create() =>
       RecommendationRefreshResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      RecommendationRefreshResponse._();
   @$core.override
-  RecommendationRefreshResponse createEmptyInstance() => create();
+  RecommendationRefreshResponse createEmptyInstance() =>
+      RecommendationRefreshResponse._();
   @$core.pragma('dart2js:noInline')
   static RecommendationRefreshResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<RecommendationRefreshResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<RecommendationRefreshResponse>(
+          RecommendationRefreshResponse.$_createMessage);
   static RecommendationRefreshResponse? _defaultInstance;
 }
 

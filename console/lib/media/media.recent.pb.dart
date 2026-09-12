@@ -27,7 +27,7 @@ class RecentSearchRequest extends $pb.GeneratedMessage {
     $fixnum.Int64? offset,
     $fixnum.Int64? limit,
   }) {
-    final result = create();
+    final result = RecentSearchRequest._();
     if (created != null) result.created = created;
     if (mimetype != null) result.mimetype = mimetype;
     if (offset != null) result.offset = offset;
@@ -39,17 +39,17 @@ class RecentSearchRequest extends $pb.GeneratedMessage {
 
   factory RecentSearchRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      RecentSearchRequest()..mergeFromBuffer(data, registry);
   factory RecentSearchRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      RecentSearchRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'RecentSearchRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: RecentSearchRequest.$_createMessage)
     ..aOM<$0.DateRange>(1, _omitFieldNames ? '' : 'created',
-        subBuilder: $0.DateRange.create)
+        subBuilder: $0.DateRange.$_createMessage)
     ..aOS(2, _omitFieldNames ? '' : 'mimetype')
     ..a<$fixnum.Int64>(
         900, _omitFieldNames ? '' : 'offset', $pb.PbFieldType.OU6,
@@ -69,12 +69,16 @@ class RecentSearchRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use RecentSearchRequest() / RecentSearchRequest.new instead')
   static RecentSearchRequest create() => RecentSearchRequest._();
+  static $pb.GeneratedMessage $_createMessage() => RecentSearchRequest._();
   @$core.override
-  RecentSearchRequest createEmptyInstance() => create();
+  RecentSearchRequest createEmptyInstance() => RecentSearchRequest._();
   @$core.pragma('dart2js:noInline')
   static RecentSearchRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<RecentSearchRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<RecentSearchRequest>(
+          RecentSearchRequest.$_createMessage);
   static RecentSearchRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -121,7 +125,7 @@ class RecentSearchResponse extends $pb.GeneratedMessage {
     RecentSearchRequest? next,
     $core.Iterable<RecentRecordRequest>? items,
   }) {
-    final result = create();
+    final result = RecentSearchResponse._();
     if (next != null) result.next = next;
     if (items != null) result.items.addAll(items);
     return result;
@@ -131,19 +135,19 @@ class RecentSearchResponse extends $pb.GeneratedMessage {
 
   factory RecentSearchResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      RecentSearchResponse()..mergeFromBuffer(data, registry);
   factory RecentSearchResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      RecentSearchResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'RecentSearchResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: RecentSearchResponse.$_createMessage)
     ..aOM<RecentSearchRequest>(1, _omitFieldNames ? '' : 'next',
-        subBuilder: RecentSearchRequest.create)
+        subBuilder: RecentSearchRequest.$_createMessage)
     ..pPM<RecentRecordRequest>(2, _omitFieldNames ? '' : 'items',
-        subBuilder: RecentRecordRequest.create)
+        subBuilder: RecentRecordRequest.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -157,12 +161,16 @@ class RecentSearchResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use RecentSearchResponse() / RecentSearchResponse.new instead')
   static RecentSearchResponse create() => RecentSearchResponse._();
+  static $pb.GeneratedMessage $_createMessage() => RecentSearchResponse._();
   @$core.override
-  RecentSearchResponse createEmptyInstance() => create();
+  RecentSearchResponse createEmptyInstance() => RecentSearchResponse._();
   @$core.pragma('dart2js:noInline')
   static RecentSearchResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<RecentSearchResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<RecentSearchResponse>(
+          RecentSearchResponse.$_createMessage);
   static RecentSearchResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -189,7 +197,7 @@ class RecentRecordRequest extends $pb.GeneratedMessage {
     $core.String? mimetype,
     $1.MediaSearchRequest? query,
   }) {
-    final result = create();
+    final result = RecentRecordRequest._();
     if (id != null) result.id = id;
     if (media != null) result.media = media;
     if (duration != null) result.duration = duration;
@@ -203,18 +211,18 @@ class RecentRecordRequest extends $pb.GeneratedMessage {
 
   factory RecentRecordRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      RecentRecordRequest()..mergeFromBuffer(data, registry);
   factory RecentRecordRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      RecentRecordRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'RecentRecordRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: RecentRecordRequest.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'id')
     ..aOM<$1.Media>(2, _omitFieldNames ? '' : 'media',
-        subBuilder: $1.Media.create)
+        subBuilder: $1.Media.$_createMessage)
     ..a<$fixnum.Int64>(
         3, _omitFieldNames ? '' : 'duration', $pb.PbFieldType.OU6,
         defaultOrMaker: $fixnum.Int64.ZERO)
@@ -223,7 +231,7 @@ class RecentRecordRequest extends $pb.GeneratedMessage {
         defaultOrMaker: $fixnum.Int64.ZERO)
     ..aOS(5, _omitFieldNames ? '' : 'mimetype')
     ..aOM<$1.MediaSearchRequest>(6, _omitFieldNames ? '' : 'query',
-        subBuilder: $1.MediaSearchRequest.create)
+        subBuilder: $1.MediaSearchRequest.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -237,12 +245,16 @@ class RecentRecordRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use RecentRecordRequest() / RecentRecordRequest.new instead')
   static RecentRecordRequest create() => RecentRecordRequest._();
+  static $pb.GeneratedMessage $_createMessage() => RecentRecordRequest._();
   @$core.override
-  RecentRecordRequest createEmptyInstance() => create();
+  RecentRecordRequest createEmptyInstance() => RecentRecordRequest._();
   @$core.pragma('dart2js:noInline')
   static RecentRecordRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<RecentRecordRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<RecentRecordRequest>(
+          RecentRecordRequest.$_createMessage);
   static RecentRecordRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -305,21 +317,21 @@ class RecentRecordRequest extends $pb.GeneratedMessage {
 }
 
 class RecentRecordResponse extends $pb.GeneratedMessage {
-  factory RecentRecordResponse() => create();
+  factory RecentRecordResponse() => RecentRecordResponse._();
 
   RecentRecordResponse._();
 
   factory RecentRecordResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      RecentRecordResponse()..mergeFromBuffer(data, registry);
   factory RecentRecordResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      RecentRecordResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'RecentRecordResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: RecentRecordResponse.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -333,31 +345,35 @@ class RecentRecordResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use RecentRecordResponse() / RecentRecordResponse.new instead')
   static RecentRecordResponse create() => RecentRecordResponse._();
+  static $pb.GeneratedMessage $_createMessage() => RecentRecordResponse._();
   @$core.override
-  RecentRecordResponse createEmptyInstance() => create();
+  RecentRecordResponse createEmptyInstance() => RecentRecordResponse._();
   @$core.pragma('dart2js:noInline')
   static RecentRecordResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<RecentRecordResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<RecentRecordResponse>(
+          RecentRecordResponse.$_createMessage);
   static RecentRecordResponse? _defaultInstance;
 }
 
 class RecentDeleteRequest extends $pb.GeneratedMessage {
-  factory RecentDeleteRequest() => create();
+  factory RecentDeleteRequest() => RecentDeleteRequest._();
 
   RecentDeleteRequest._();
 
   factory RecentDeleteRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      RecentDeleteRequest()..mergeFromBuffer(data, registry);
   factory RecentDeleteRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      RecentDeleteRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'RecentDeleteRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: RecentDeleteRequest.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -371,31 +387,35 @@ class RecentDeleteRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use RecentDeleteRequest() / RecentDeleteRequest.new instead')
   static RecentDeleteRequest create() => RecentDeleteRequest._();
+  static $pb.GeneratedMessage $_createMessage() => RecentDeleteRequest._();
   @$core.override
-  RecentDeleteRequest createEmptyInstance() => create();
+  RecentDeleteRequest createEmptyInstance() => RecentDeleteRequest._();
   @$core.pragma('dart2js:noInline')
   static RecentDeleteRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<RecentDeleteRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<RecentDeleteRequest>(
+          RecentDeleteRequest.$_createMessage);
   static RecentDeleteRequest? _defaultInstance;
 }
 
 class RecentDeleteResponse extends $pb.GeneratedMessage {
-  factory RecentDeleteResponse() => create();
+  factory RecentDeleteResponse() => RecentDeleteResponse._();
 
   RecentDeleteResponse._();
 
   factory RecentDeleteResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      RecentDeleteResponse()..mergeFromBuffer(data, registry);
   factory RecentDeleteResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      RecentDeleteResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'RecentDeleteResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: RecentDeleteResponse.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -409,12 +429,16 @@ class RecentDeleteResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use RecentDeleteResponse() / RecentDeleteResponse.new instead')
   static RecentDeleteResponse create() => RecentDeleteResponse._();
+  static $pb.GeneratedMessage $_createMessage() => RecentDeleteResponse._();
   @$core.override
-  RecentDeleteResponse createEmptyInstance() => create();
+  RecentDeleteResponse createEmptyInstance() => RecentDeleteResponse._();
   @$core.pragma('dart2js:noInline')
   static RecentDeleteResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<RecentDeleteResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<RecentDeleteResponse>(
+          RecentDeleteResponse.$_createMessage);
   static RecentDeleteResponse? _defaultInstance;
 }
 

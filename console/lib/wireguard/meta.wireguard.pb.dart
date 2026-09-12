@@ -31,7 +31,7 @@ class Wireguard extends $pb.GeneratedMessage {
     $fixnum.Int64? maximumConnections,
     $core.int? rateLimitOutbound,
   }) {
-    final result = create();
+    final result = Wireguard._();
     if (id != null) result.id = id;
     if (createdAt != null) result.createdAt = createdAt;
     if (updatedAt != null) result.updatedAt = updatedAt;
@@ -49,15 +49,15 @@ class Wireguard extends $pb.GeneratedMessage {
 
   factory Wireguard.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      Wireguard()..mergeFromBuffer(data, registry);
   factory Wireguard.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      Wireguard()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'Wireguard',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: Wireguard.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'id')
     ..aOS(2, _omitFieldNames ? '' : 'created_at')
     ..aOS(3, _omitFieldNames ? '' : 'updated_at')
@@ -83,12 +83,14 @@ class Wireguard extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use Wireguard() / Wireguard.new instead')
   static Wireguard create() => Wireguard._();
+  static $pb.GeneratedMessage $_createMessage() => Wireguard._();
   @$core.override
-  Wireguard createEmptyInstance() => create();
+  Wireguard createEmptyInstance() => Wireguard._();
   @$core.pragma('dart2js:noInline')
-  static Wireguard getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Wireguard>(create);
+  static Wireguard getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<Wireguard>(Wireguard.$_createMessage);
   static Wireguard? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -179,7 +181,7 @@ class WireguardSearchRequest extends $pb.GeneratedMessage {
     $fixnum.Int64? offset,
     $fixnum.Int64? limit,
   }) {
-    final result = create();
+    final result = WireguardSearchRequest._();
     if (query != null) result.query = query;
     if (offset != null) result.offset = offset;
     if (limit != null) result.limit = limit;
@@ -190,15 +192,15 @@ class WireguardSearchRequest extends $pb.GeneratedMessage {
 
   factory WireguardSearchRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      WireguardSearchRequest()..mergeFromBuffer(data, registry);
   factory WireguardSearchRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      WireguardSearchRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'WireguardSearchRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: WireguardSearchRequest.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'query')
     ..a<$fixnum.Int64>(2, _omitFieldNames ? '' : 'offset', $pb.PbFieldType.OU6,
         defaultOrMaker: $fixnum.Int64.ZERO)
@@ -218,12 +220,16 @@ class WireguardSearchRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use WireguardSearchRequest() / WireguardSearchRequest.new instead')
   static WireguardSearchRequest create() => WireguardSearchRequest._();
+  static $pb.GeneratedMessage $_createMessage() => WireguardSearchRequest._();
   @$core.override
-  WireguardSearchRequest createEmptyInstance() => create();
+  WireguardSearchRequest createEmptyInstance() => WireguardSearchRequest._();
   @$core.pragma('dart2js:noInline')
   static WireguardSearchRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<WireguardSearchRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<WireguardSearchRequest>(
+          WireguardSearchRequest.$_createMessage);
   static WireguardSearchRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -259,7 +265,7 @@ class WireguardSearchResponse extends $pb.GeneratedMessage {
     WireguardSearchRequest? next,
     $core.Iterable<Wireguard>? items,
   }) {
-    final result = create();
+    final result = WireguardSearchResponse._();
     if (next != null) result.next = next;
     if (items != null) result.items.addAll(items);
     return result;
@@ -269,19 +275,19 @@ class WireguardSearchResponse extends $pb.GeneratedMessage {
 
   factory WireguardSearchResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      WireguardSearchResponse()..mergeFromBuffer(data, registry);
   factory WireguardSearchResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      WireguardSearchResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'WireguardSearchResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: WireguardSearchResponse.$_createMessage)
     ..aOM<WireguardSearchRequest>(1, _omitFieldNames ? '' : 'next',
-        subBuilder: WireguardSearchRequest.create)
+        subBuilder: WireguardSearchRequest.$_createMessage)
     ..pPM<Wireguard>(2, _omitFieldNames ? '' : 'items',
-        subBuilder: Wireguard.create)
+        subBuilder: Wireguard.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -296,12 +302,16 @@ class WireguardSearchResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use WireguardSearchResponse() / WireguardSearchResponse.new instead')
   static WireguardSearchResponse create() => WireguardSearchResponse._();
+  static $pb.GeneratedMessage $_createMessage() => WireguardSearchResponse._();
   @$core.override
-  WireguardSearchResponse createEmptyInstance() => create();
+  WireguardSearchResponse createEmptyInstance() => WireguardSearchResponse._();
   @$core.pragma('dart2js:noInline')
   static WireguardSearchResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<WireguardSearchResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<WireguardSearchResponse>(
+          WireguardSearchResponse.$_createMessage);
   static WireguardSearchResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -323,7 +333,7 @@ class WireguardUpdateRequest extends $pb.GeneratedMessage {
   factory WireguardUpdateRequest({
     Wireguard? wireguard,
   }) {
-    final result = create();
+    final result = WireguardUpdateRequest._();
     if (wireguard != null) result.wireguard = wireguard;
     return result;
   }
@@ -332,17 +342,17 @@ class WireguardUpdateRequest extends $pb.GeneratedMessage {
 
   factory WireguardUpdateRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      WireguardUpdateRequest()..mergeFromBuffer(data, registry);
   factory WireguardUpdateRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      WireguardUpdateRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'WireguardUpdateRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: WireguardUpdateRequest.$_createMessage)
     ..aOM<Wireguard>(1, _omitFieldNames ? '' : 'wireguard',
-        protoName: 'Wireguard', subBuilder: Wireguard.create)
+        protoName: 'Wireguard', subBuilder: Wireguard.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -357,12 +367,16 @@ class WireguardUpdateRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use WireguardUpdateRequest() / WireguardUpdateRequest.new instead')
   static WireguardUpdateRequest create() => WireguardUpdateRequest._();
+  static $pb.GeneratedMessage $_createMessage() => WireguardUpdateRequest._();
   @$core.override
-  WireguardUpdateRequest createEmptyInstance() => create();
+  WireguardUpdateRequest createEmptyInstance() => WireguardUpdateRequest._();
   @$core.pragma('dart2js:noInline')
   static WireguardUpdateRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<WireguardUpdateRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<WireguardUpdateRequest>(
+          WireguardUpdateRequest.$_createMessage);
   static WireguardUpdateRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -381,7 +395,7 @@ class WireguardUpdateResponse extends $pb.GeneratedMessage {
   factory WireguardUpdateResponse({
     Wireguard? wireguard,
   }) {
-    final result = create();
+    final result = WireguardUpdateResponse._();
     if (wireguard != null) result.wireguard = wireguard;
     return result;
   }
@@ -390,17 +404,17 @@ class WireguardUpdateResponse extends $pb.GeneratedMessage {
 
   factory WireguardUpdateResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      WireguardUpdateResponse()..mergeFromBuffer(data, registry);
   factory WireguardUpdateResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      WireguardUpdateResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'WireguardUpdateResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: WireguardUpdateResponse.$_createMessage)
     ..aOM<Wireguard>(1, _omitFieldNames ? '' : 'wireguard',
-        protoName: 'Wireguard', subBuilder: Wireguard.create)
+        protoName: 'Wireguard', subBuilder: Wireguard.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -415,12 +429,16 @@ class WireguardUpdateResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use WireguardUpdateResponse() / WireguardUpdateResponse.new instead')
   static WireguardUpdateResponse create() => WireguardUpdateResponse._();
+  static $pb.GeneratedMessage $_createMessage() => WireguardUpdateResponse._();
   @$core.override
-  WireguardUpdateResponse createEmptyInstance() => create();
+  WireguardUpdateResponse createEmptyInstance() => WireguardUpdateResponse._();
   @$core.pragma('dart2js:noInline')
   static WireguardUpdateResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<WireguardUpdateResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<WireguardUpdateResponse>(
+          WireguardUpdateResponse.$_createMessage);
   static WireguardUpdateResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -439,7 +457,7 @@ class WireguardTouchRequest extends $pb.GeneratedMessage {
   factory WireguardTouchRequest({
     $core.int? nettype,
   }) {
-    final result = create();
+    final result = WireguardTouchRequest._();
     if (nettype != null) result.nettype = nettype;
     return result;
   }
@@ -448,15 +466,15 @@ class WireguardTouchRequest extends $pb.GeneratedMessage {
 
   factory WireguardTouchRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      WireguardTouchRequest()..mergeFromBuffer(data, registry);
   factory WireguardTouchRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      WireguardTouchRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'WireguardTouchRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: WireguardTouchRequest.$_createMessage)
     ..aI(1, _omitFieldNames ? '' : 'nettype', fieldType: $pb.PbFieldType.OU3)
     ..hasRequiredFields = false;
 
@@ -472,12 +490,16 @@ class WireguardTouchRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use WireguardTouchRequest() / WireguardTouchRequest.new instead')
   static WireguardTouchRequest create() => WireguardTouchRequest._();
+  static $pb.GeneratedMessage $_createMessage() => WireguardTouchRequest._();
   @$core.override
-  WireguardTouchRequest createEmptyInstance() => create();
+  WireguardTouchRequest createEmptyInstance() => WireguardTouchRequest._();
   @$core.pragma('dart2js:noInline')
   static WireguardTouchRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<WireguardTouchRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<WireguardTouchRequest>(
+          WireguardTouchRequest.$_createMessage);
   static WireguardTouchRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -494,7 +516,7 @@ class WireguardTouchResponse extends $pb.GeneratedMessage {
   factory WireguardTouchResponse({
     Wireguard? wireguard,
   }) {
-    final result = create();
+    final result = WireguardTouchResponse._();
     if (wireguard != null) result.wireguard = wireguard;
     return result;
   }
@@ -503,17 +525,17 @@ class WireguardTouchResponse extends $pb.GeneratedMessage {
 
   factory WireguardTouchResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      WireguardTouchResponse()..mergeFromBuffer(data, registry);
   factory WireguardTouchResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      WireguardTouchResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'WireguardTouchResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: WireguardTouchResponse.$_createMessage)
     ..aOM<Wireguard>(1, _omitFieldNames ? '' : 'wireguard',
-        protoName: 'Wireguard', subBuilder: Wireguard.create)
+        protoName: 'Wireguard', subBuilder: Wireguard.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -528,12 +550,16 @@ class WireguardTouchResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use WireguardTouchResponse() / WireguardTouchResponse.new instead')
   static WireguardTouchResponse create() => WireguardTouchResponse._();
+  static $pb.GeneratedMessage $_createMessage() => WireguardTouchResponse._();
   @$core.override
-  WireguardTouchResponse createEmptyInstance() => create();
+  WireguardTouchResponse createEmptyInstance() => WireguardTouchResponse._();
   @$core.pragma('dart2js:noInline')
   static WireguardTouchResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<WireguardTouchResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<WireguardTouchResponse>(
+          WireguardTouchResponse.$_createMessage);
   static WireguardTouchResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -549,21 +575,21 @@ class WireguardTouchResponse extends $pb.GeneratedMessage {
 }
 
 class WireguardUploadRequest extends $pb.GeneratedMessage {
-  factory WireguardUploadRequest() => create();
+  factory WireguardUploadRequest() => WireguardUploadRequest._();
 
   WireguardUploadRequest._();
 
   factory WireguardUploadRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      WireguardUploadRequest()..mergeFromBuffer(data, registry);
   factory WireguardUploadRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      WireguardUploadRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'WireguardUploadRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: WireguardUploadRequest.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -578,12 +604,16 @@ class WireguardUploadRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use WireguardUploadRequest() / WireguardUploadRequest.new instead')
   static WireguardUploadRequest create() => WireguardUploadRequest._();
+  static $pb.GeneratedMessage $_createMessage() => WireguardUploadRequest._();
   @$core.override
-  WireguardUploadRequest createEmptyInstance() => create();
+  WireguardUploadRequest createEmptyInstance() => WireguardUploadRequest._();
   @$core.pragma('dart2js:noInline')
   static WireguardUploadRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<WireguardUploadRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<WireguardUploadRequest>(
+          WireguardUploadRequest.$_createMessage);
   static WireguardUploadRequest? _defaultInstance;
 }
 
@@ -591,7 +621,7 @@ class WireguardUploadResponse extends $pb.GeneratedMessage {
   factory WireguardUploadResponse({
     Wireguard? wireguard,
   }) {
-    final result = create();
+    final result = WireguardUploadResponse._();
     if (wireguard != null) result.wireguard = wireguard;
     return result;
   }
@@ -600,17 +630,17 @@ class WireguardUploadResponse extends $pb.GeneratedMessage {
 
   factory WireguardUploadResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      WireguardUploadResponse()..mergeFromBuffer(data, registry);
   factory WireguardUploadResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      WireguardUploadResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'WireguardUploadResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: WireguardUploadResponse.$_createMessage)
     ..aOM<Wireguard>(1, _omitFieldNames ? '' : 'wireguard',
-        protoName: 'Wireguard', subBuilder: Wireguard.create)
+        protoName: 'Wireguard', subBuilder: Wireguard.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -625,12 +655,16 @@ class WireguardUploadResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use WireguardUploadResponse() / WireguardUploadResponse.new instead')
   static WireguardUploadResponse create() => WireguardUploadResponse._();
+  static $pb.GeneratedMessage $_createMessage() => WireguardUploadResponse._();
   @$core.override
-  WireguardUploadResponse createEmptyInstance() => create();
+  WireguardUploadResponse createEmptyInstance() => WireguardUploadResponse._();
   @$core.pragma('dart2js:noInline')
   static WireguardUploadResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<WireguardUploadResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<WireguardUploadResponse>(
+          WireguardUploadResponse.$_createMessage);
   static WireguardUploadResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -649,7 +683,7 @@ class WireguardCurrentRequest extends $pb.GeneratedMessage {
   factory WireguardCurrentRequest({
     $core.int? nettype,
   }) {
-    final result = create();
+    final result = WireguardCurrentRequest._();
     if (nettype != null) result.nettype = nettype;
     return result;
   }
@@ -658,15 +692,15 @@ class WireguardCurrentRequest extends $pb.GeneratedMessage {
 
   factory WireguardCurrentRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      WireguardCurrentRequest()..mergeFromBuffer(data, registry);
   factory WireguardCurrentRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      WireguardCurrentRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'WireguardCurrentRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: WireguardCurrentRequest.$_createMessage)
     ..aI(1, _omitFieldNames ? '' : 'nettype', fieldType: $pb.PbFieldType.OU3)
     ..hasRequiredFields = false;
 
@@ -682,12 +716,16 @@ class WireguardCurrentRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use WireguardCurrentRequest() / WireguardCurrentRequest.new instead')
   static WireguardCurrentRequest create() => WireguardCurrentRequest._();
+  static $pb.GeneratedMessage $_createMessage() => WireguardCurrentRequest._();
   @$core.override
-  WireguardCurrentRequest createEmptyInstance() => create();
+  WireguardCurrentRequest createEmptyInstance() => WireguardCurrentRequest._();
   @$core.pragma('dart2js:noInline')
   static WireguardCurrentRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<WireguardCurrentRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<WireguardCurrentRequest>(
+          WireguardCurrentRequest.$_createMessage);
   static WireguardCurrentRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -707,7 +745,7 @@ class WireguardCurrentResponse extends $pb.GeneratedMessage {
     $core.String? ip,
     $core.String? ip4,
   }) {
-    final result = create();
+    final result = WireguardCurrentResponse._();
     if (wireguard != null) result.wireguard = wireguard;
     if (online != null) result.online = online;
     if (ip != null) result.ip = ip;
@@ -719,17 +757,17 @@ class WireguardCurrentResponse extends $pb.GeneratedMessage {
 
   factory WireguardCurrentResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      WireguardCurrentResponse()..mergeFromBuffer(data, registry);
   factory WireguardCurrentResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      WireguardCurrentResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'WireguardCurrentResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: WireguardCurrentResponse.$_createMessage)
     ..aOM<Wireguard>(1, _omitFieldNames ? '' : 'wireguard',
-        protoName: 'Wireguard', subBuilder: Wireguard.create)
+        protoName: 'Wireguard', subBuilder: Wireguard.$_createMessage)
     ..aOB(2, _omitFieldNames ? '' : 'online')
     ..aOS(3, _omitFieldNames ? '' : 'ip')
     ..aOS(4, _omitFieldNames ? '' : 'ip4')
@@ -747,12 +785,17 @@ class WireguardCurrentResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use WireguardCurrentResponse() / WireguardCurrentResponse.new instead')
   static WireguardCurrentResponse create() => WireguardCurrentResponse._();
+  static $pb.GeneratedMessage $_createMessage() => WireguardCurrentResponse._();
   @$core.override
-  WireguardCurrentResponse createEmptyInstance() => create();
+  WireguardCurrentResponse createEmptyInstance() =>
+      WireguardCurrentResponse._();
   @$core.pragma('dart2js:noInline')
   static WireguardCurrentResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<WireguardCurrentResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<WireguardCurrentResponse>(
+          WireguardCurrentResponse.$_createMessage);
   static WireguardCurrentResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -795,21 +838,21 @@ class WireguardCurrentResponse extends $pb.GeneratedMessage {
 }
 
 class WireguardDeleteRequest extends $pb.GeneratedMessage {
-  factory WireguardDeleteRequest() => create();
+  factory WireguardDeleteRequest() => WireguardDeleteRequest._();
 
   WireguardDeleteRequest._();
 
   factory WireguardDeleteRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      WireguardDeleteRequest()..mergeFromBuffer(data, registry);
   factory WireguardDeleteRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      WireguardDeleteRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'WireguardDeleteRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: WireguardDeleteRequest.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -824,12 +867,16 @@ class WireguardDeleteRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use WireguardDeleteRequest() / WireguardDeleteRequest.new instead')
   static WireguardDeleteRequest create() => WireguardDeleteRequest._();
+  static $pb.GeneratedMessage $_createMessage() => WireguardDeleteRequest._();
   @$core.override
-  WireguardDeleteRequest createEmptyInstance() => create();
+  WireguardDeleteRequest createEmptyInstance() => WireguardDeleteRequest._();
   @$core.pragma('dart2js:noInline')
   static WireguardDeleteRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<WireguardDeleteRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<WireguardDeleteRequest>(
+          WireguardDeleteRequest.$_createMessage);
   static WireguardDeleteRequest? _defaultInstance;
 }
 
@@ -837,7 +884,7 @@ class WireguardDeleteResponse extends $pb.GeneratedMessage {
   factory WireguardDeleteResponse({
     Wireguard? wireguard,
   }) {
-    final result = create();
+    final result = WireguardDeleteResponse._();
     if (wireguard != null) result.wireguard = wireguard;
     return result;
   }
@@ -846,17 +893,17 @@ class WireguardDeleteResponse extends $pb.GeneratedMessage {
 
   factory WireguardDeleteResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      WireguardDeleteResponse()..mergeFromBuffer(data, registry);
   factory WireguardDeleteResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      WireguardDeleteResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'WireguardDeleteResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: WireguardDeleteResponse.$_createMessage)
     ..aOM<Wireguard>(1, _omitFieldNames ? '' : 'wireguard',
-        protoName: 'Wireguard', subBuilder: Wireguard.create)
+        protoName: 'Wireguard', subBuilder: Wireguard.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -871,12 +918,16 @@ class WireguardDeleteResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use WireguardDeleteResponse() / WireguardDeleteResponse.new instead')
   static WireguardDeleteResponse create() => WireguardDeleteResponse._();
+  static $pb.GeneratedMessage $_createMessage() => WireguardDeleteResponse._();
   @$core.override
-  WireguardDeleteResponse createEmptyInstance() => create();
+  WireguardDeleteResponse createEmptyInstance() => WireguardDeleteResponse._();
   @$core.pragma('dart2js:noInline')
   static WireguardDeleteResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<WireguardDeleteResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<WireguardDeleteResponse>(
+          WireguardDeleteResponse.$_createMessage);
   static WireguardDeleteResponse? _defaultInstance;
 
   @$pb.TagNumber(1)

@@ -22,7 +22,7 @@ class CommunitySuggestions extends $pb.GeneratedMessage {
   factory CommunitySuggestions({
     $core.Iterable<$0.Community>? community,
   }) {
-    final result = create();
+    final result = CommunitySuggestions._();
     if (community != null) result.community.addAll(community);
     return result;
   }
@@ -31,18 +31,18 @@ class CommunitySuggestions extends $pb.GeneratedMessage {
 
   factory CommunitySuggestions.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      CommunitySuggestions()..mergeFromBuffer(data, registry);
   factory CommunitySuggestions.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      CommunitySuggestions()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'CommunitySuggestions',
       package:
           const $pb.PackageName(_omitMessageNames ? '' : 'retrovibed.ftux'),
-      createEmptyInstance: create)
+      createEmptyInstance: CommunitySuggestions.$_createMessage)
     ..pPM<$0.Community>(1000, _omitFieldNames ? '' : 'community',
-        subBuilder: $0.Community.create)
+        subBuilder: $0.Community.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -56,12 +56,16 @@ class CommunitySuggestions extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use CommunitySuggestions() / CommunitySuggestions.new instead')
   static CommunitySuggestions create() => CommunitySuggestions._();
+  static $pb.GeneratedMessage $_createMessage() => CommunitySuggestions._();
   @$core.override
-  CommunitySuggestions createEmptyInstance() => create();
+  CommunitySuggestions createEmptyInstance() => CommunitySuggestions._();
   @$core.pragma('dart2js:noInline')
   static CommunitySuggestions getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<CommunitySuggestions>(create);
+      $pb.GeneratedMessage.$_defaultFor<CommunitySuggestions>(
+          CommunitySuggestions.$_createMessage);
   static CommunitySuggestions? _defaultInstance;
 
   @$pb.TagNumber(1000)
@@ -72,7 +76,7 @@ class SubscribeCommunitiesRequest extends $pb.GeneratedMessage {
   factory SubscribeCommunitiesRequest({
     $core.Iterable<$core.String>? communityId,
   }) {
-    final result = create();
+    final result = SubscribeCommunitiesRequest._();
     if (communityId != null) result.communityId.addAll(communityId);
     return result;
   }
@@ -81,16 +85,16 @@ class SubscribeCommunitiesRequest extends $pb.GeneratedMessage {
 
   factory SubscribeCommunitiesRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      SubscribeCommunitiesRequest()..mergeFromBuffer(data, registry);
   factory SubscribeCommunitiesRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      SubscribeCommunitiesRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'SubscribeCommunitiesRequest',
       package:
           const $pb.PackageName(_omitMessageNames ? '' : 'retrovibed.ftux'),
-      createEmptyInstance: create)
+      createEmptyInstance: SubscribeCommunitiesRequest.$_createMessage)
     ..pPS(1, _omitFieldNames ? '' : 'community_id')
     ..hasRequiredFields = false;
 
@@ -107,13 +111,19 @@ class SubscribeCommunitiesRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use SubscribeCommunitiesRequest() / SubscribeCommunitiesRequest.new instead')
   static SubscribeCommunitiesRequest create() =>
       SubscribeCommunitiesRequest._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      SubscribeCommunitiesRequest._();
   @$core.override
-  SubscribeCommunitiesRequest createEmptyInstance() => create();
+  SubscribeCommunitiesRequest createEmptyInstance() =>
+      SubscribeCommunitiesRequest._();
   @$core.pragma('dart2js:noInline')
   static SubscribeCommunitiesRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<SubscribeCommunitiesRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<SubscribeCommunitiesRequest>(
+          SubscribeCommunitiesRequest.$_createMessage);
   static SubscribeCommunitiesRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -121,22 +131,22 @@ class SubscribeCommunitiesRequest extends $pb.GeneratedMessage {
 }
 
 class SubscribeCommunitiesResponse extends $pb.GeneratedMessage {
-  factory SubscribeCommunitiesResponse() => create();
+  factory SubscribeCommunitiesResponse() => SubscribeCommunitiesResponse._();
 
   SubscribeCommunitiesResponse._();
 
   factory SubscribeCommunitiesResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      SubscribeCommunitiesResponse()..mergeFromBuffer(data, registry);
   factory SubscribeCommunitiesResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      SubscribeCommunitiesResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'SubscribeCommunitiesResponse',
       package:
           const $pb.PackageName(_omitMessageNames ? '' : 'retrovibed.ftux'),
-      createEmptyInstance: create)
+      createEmptyInstance: SubscribeCommunitiesResponse.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -152,13 +162,19 @@ class SubscribeCommunitiesResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use SubscribeCommunitiesResponse() / SubscribeCommunitiesResponse.new instead')
   static SubscribeCommunitiesResponse create() =>
       SubscribeCommunitiesResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      SubscribeCommunitiesResponse._();
   @$core.override
-  SubscribeCommunitiesResponse createEmptyInstance() => create();
+  SubscribeCommunitiesResponse createEmptyInstance() =>
+      SubscribeCommunitiesResponse._();
   @$core.pragma('dart2js:noInline')
   static SubscribeCommunitiesResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<SubscribeCommunitiesResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<SubscribeCommunitiesResponse>(
+          SubscribeCommunitiesResponse.$_createMessage);
   static SubscribeCommunitiesResponse? _defaultInstance;
 }
 

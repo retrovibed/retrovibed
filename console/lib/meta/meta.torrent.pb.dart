@@ -26,7 +26,7 @@ class TorrentDiagnostics extends $pb.GeneratedMessage {
     $fixnum.Int64? uploaded,
     $fixnum.Int64? peers,
   }) {
-    final result = create();
+    final result = TorrentDiagnostics._();
     if (total != null) result.total = total;
     if (seeding != null) result.seeding = seeding;
     if (bytes != null) result.bytes = bytes;
@@ -40,15 +40,15 @@ class TorrentDiagnostics extends $pb.GeneratedMessage {
 
   factory TorrentDiagnostics.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      TorrentDiagnostics()..mergeFromBuffer(data, registry);
   factory TorrentDiagnostics.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      TorrentDiagnostics()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'TorrentDiagnostics',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: TorrentDiagnostics.$_createMessage)
     ..a<$fixnum.Int64>(1, _omitFieldNames ? '' : 'total', $pb.PbFieldType.OU6,
         defaultOrMaker: $fixnum.Int64.ZERO)
     ..a<$fixnum.Int64>(2, _omitFieldNames ? '' : 'seeding', $pb.PbFieldType.OU6,
@@ -76,12 +76,15 @@ class TorrentDiagnostics extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use TorrentDiagnostics() / TorrentDiagnostics.new instead')
   static TorrentDiagnostics create() => TorrentDiagnostics._();
+  static $pb.GeneratedMessage $_createMessage() => TorrentDiagnostics._();
   @$core.override
-  TorrentDiagnostics createEmptyInstance() => create();
+  TorrentDiagnostics createEmptyInstance() => TorrentDiagnostics._();
   @$core.pragma('dart2js:noInline')
   static TorrentDiagnostics getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<TorrentDiagnostics>(create);
+      $pb.GeneratedMessage.$_defaultFor<TorrentDiagnostics>(
+          TorrentDiagnostics.$_createMessage);
   static TorrentDiagnostics? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -143,7 +146,7 @@ class TorrentMetricsResponse extends $pb.GeneratedMessage {
   factory TorrentMetricsResponse({
     TorrentDiagnostics? torrent,
   }) {
-    final result = create();
+    final result = TorrentMetricsResponse._();
     if (torrent != null) result.torrent = torrent;
     return result;
   }
@@ -152,17 +155,17 @@ class TorrentMetricsResponse extends $pb.GeneratedMessage {
 
   factory TorrentMetricsResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      TorrentMetricsResponse()..mergeFromBuffer(data, registry);
   factory TorrentMetricsResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      TorrentMetricsResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'TorrentMetricsResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: TorrentMetricsResponse.$_createMessage)
     ..aOM<TorrentDiagnostics>(1, _omitFieldNames ? '' : 'torrent',
-        subBuilder: TorrentDiagnostics.create)
+        subBuilder: TorrentDiagnostics.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -177,12 +180,16 @@ class TorrentMetricsResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use TorrentMetricsResponse() / TorrentMetricsResponse.new instead')
   static TorrentMetricsResponse create() => TorrentMetricsResponse._();
+  static $pb.GeneratedMessage $_createMessage() => TorrentMetricsResponse._();
   @$core.override
-  TorrentMetricsResponse createEmptyInstance() => create();
+  TorrentMetricsResponse createEmptyInstance() => TorrentMetricsResponse._();
   @$core.pragma('dart2js:noInline')
   static TorrentMetricsResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<TorrentMetricsResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<TorrentMetricsResponse>(
+          TorrentMetricsResponse.$_createMessage);
   static TorrentMetricsResponse? _defaultInstance;
 
   @$pb.TagNumber(1)

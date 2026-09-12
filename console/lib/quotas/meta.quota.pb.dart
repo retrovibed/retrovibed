@@ -33,7 +33,7 @@ class Quota extends $pb.GeneratedMessage {
     $fixnum.Int64? rollover,
     $fixnum.Int64? granted,
   }) {
-    final result = create();
+    final result = Quota._();
     if (sku != null) result.sku = sku;
     if (accountId != null) result.accountId = accountId;
     if (createdAt != null) result.createdAt = createdAt;
@@ -54,15 +54,15 @@ class Quota extends $pb.GeneratedMessage {
 
   factory Quota.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      Quota()..mergeFromBuffer(data, registry);
   factory Quota.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      Quota()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'Quota',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: Quota.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'id', protoName: 'sku')
     ..aOS(2, _omitFieldNames ? '' : 'account_id')
     ..aOS(3, _omitFieldNames ? '' : 'created_at')
@@ -90,12 +90,14 @@ class Quota extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use Quota() / Quota.new instead')
   static Quota create() => Quota._();
+  static $pb.GeneratedMessage $_createMessage() => Quota._();
   @$core.override
-  Quota createEmptyInstance() => create();
+  Quota createEmptyInstance() => Quota._();
   @$core.pragma('dart2js:noInline')
-  static Quota getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Quota>(create);
+  static Quota getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<Quota>(Quota.$_createMessage);
   static Quota? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -222,7 +224,7 @@ class QuotaSearchRequest extends $pb.GeneratedMessage {
     $fixnum.Int64? offset,
     $fixnum.Int64? limit,
   }) {
-    final result = create();
+    final result = QuotaSearchRequest._();
     if (query != null) result.query = query;
     if (offset != null) result.offset = offset;
     if (limit != null) result.limit = limit;
@@ -233,15 +235,15 @@ class QuotaSearchRequest extends $pb.GeneratedMessage {
 
   factory QuotaSearchRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      QuotaSearchRequest()..mergeFromBuffer(data, registry);
   factory QuotaSearchRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      QuotaSearchRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'QuotaSearchRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: QuotaSearchRequest.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'query')
     ..a<$fixnum.Int64>(2, _omitFieldNames ? '' : 'offset', $pb.PbFieldType.OU6,
         defaultOrMaker: $fixnum.Int64.ZERO)
@@ -260,12 +262,15 @@ class QuotaSearchRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use QuotaSearchRequest() / QuotaSearchRequest.new instead')
   static QuotaSearchRequest create() => QuotaSearchRequest._();
+  static $pb.GeneratedMessage $_createMessage() => QuotaSearchRequest._();
   @$core.override
-  QuotaSearchRequest createEmptyInstance() => create();
+  QuotaSearchRequest createEmptyInstance() => QuotaSearchRequest._();
   @$core.pragma('dart2js:noInline')
   static QuotaSearchRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<QuotaSearchRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<QuotaSearchRequest>(
+          QuotaSearchRequest.$_createMessage);
   static QuotaSearchRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -301,7 +306,7 @@ class QuotaSearchResponse extends $pb.GeneratedMessage {
     QuotaSearchRequest? next,
     $core.Iterable<Quota>? items,
   }) {
-    final result = create();
+    final result = QuotaSearchResponse._();
     if (next != null) result.next = next;
     if (items != null) result.items.addAll(items);
     return result;
@@ -311,18 +316,19 @@ class QuotaSearchResponse extends $pb.GeneratedMessage {
 
   factory QuotaSearchResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      QuotaSearchResponse()..mergeFromBuffer(data, registry);
   factory QuotaSearchResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      QuotaSearchResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'QuotaSearchResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: QuotaSearchResponse.$_createMessage)
     ..aOM<QuotaSearchRequest>(1, _omitFieldNames ? '' : 'next',
-        subBuilder: QuotaSearchRequest.create)
-    ..pPM<Quota>(2, _omitFieldNames ? '' : 'items', subBuilder: Quota.create)
+        subBuilder: QuotaSearchRequest.$_createMessage)
+    ..pPM<Quota>(2, _omitFieldNames ? '' : 'items',
+        subBuilder: Quota.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -336,12 +342,16 @@ class QuotaSearchResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use QuotaSearchResponse() / QuotaSearchResponse.new instead')
   static QuotaSearchResponse create() => QuotaSearchResponse._();
+  static $pb.GeneratedMessage $_createMessage() => QuotaSearchResponse._();
   @$core.override
-  QuotaSearchResponse createEmptyInstance() => create();
+  QuotaSearchResponse createEmptyInstance() => QuotaSearchResponse._();
   @$core.pragma('dart2js:noInline')
   static QuotaSearchResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<QuotaSearchResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<QuotaSearchResponse>(
+          QuotaSearchResponse.$_createMessage);
   static QuotaSearchResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -363,7 +373,7 @@ class QuotaUpdateRequest extends $pb.GeneratedMessage {
   factory QuotaUpdateRequest({
     Quota? quota,
   }) {
-    final result = create();
+    final result = QuotaUpdateRequest._();
     if (quota != null) result.quota = quota;
     return result;
   }
@@ -372,16 +382,17 @@ class QuotaUpdateRequest extends $pb.GeneratedMessage {
 
   factory QuotaUpdateRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      QuotaUpdateRequest()..mergeFromBuffer(data, registry);
   factory QuotaUpdateRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      QuotaUpdateRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'QuotaUpdateRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
-    ..aOM<Quota>(1, _omitFieldNames ? '' : 'quota', subBuilder: Quota.create)
+      createEmptyInstance: QuotaUpdateRequest.$_createMessage)
+    ..aOM<Quota>(1, _omitFieldNames ? '' : 'quota',
+        subBuilder: Quota.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -395,12 +406,15 @@ class QuotaUpdateRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use QuotaUpdateRequest() / QuotaUpdateRequest.new instead')
   static QuotaUpdateRequest create() => QuotaUpdateRequest._();
+  static $pb.GeneratedMessage $_createMessage() => QuotaUpdateRequest._();
   @$core.override
-  QuotaUpdateRequest createEmptyInstance() => create();
+  QuotaUpdateRequest createEmptyInstance() => QuotaUpdateRequest._();
   @$core.pragma('dart2js:noInline')
   static QuotaUpdateRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<QuotaUpdateRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<QuotaUpdateRequest>(
+          QuotaUpdateRequest.$_createMessage);
   static QuotaUpdateRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -419,7 +433,7 @@ class QuotaUpdateResponse extends $pb.GeneratedMessage {
   factory QuotaUpdateResponse({
     Quota? quota,
   }) {
-    final result = create();
+    final result = QuotaUpdateResponse._();
     if (quota != null) result.quota = quota;
     return result;
   }
@@ -428,16 +442,17 @@ class QuotaUpdateResponse extends $pb.GeneratedMessage {
 
   factory QuotaUpdateResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      QuotaUpdateResponse()..mergeFromBuffer(data, registry);
   factory QuotaUpdateResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      QuotaUpdateResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'QuotaUpdateResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
-    ..aOM<Quota>(1, _omitFieldNames ? '' : 'quota', subBuilder: Quota.create)
+      createEmptyInstance: QuotaUpdateResponse.$_createMessage)
+    ..aOM<Quota>(1, _omitFieldNames ? '' : 'quota',
+        subBuilder: Quota.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -451,12 +466,16 @@ class QuotaUpdateResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use QuotaUpdateResponse() / QuotaUpdateResponse.new instead')
   static QuotaUpdateResponse create() => QuotaUpdateResponse._();
+  static $pb.GeneratedMessage $_createMessage() => QuotaUpdateResponse._();
   @$core.override
-  QuotaUpdateResponse createEmptyInstance() => create();
+  QuotaUpdateResponse createEmptyInstance() => QuotaUpdateResponse._();
   @$core.pragma('dart2js:noInline')
   static QuotaUpdateResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<QuotaUpdateResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<QuotaUpdateResponse>(
+          QuotaUpdateResponse.$_createMessage);
   static QuotaUpdateResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -472,21 +491,21 @@ class QuotaUpdateResponse extends $pb.GeneratedMessage {
 }
 
 class QuotaFindRequest extends $pb.GeneratedMessage {
-  factory QuotaFindRequest() => create();
+  factory QuotaFindRequest() => QuotaFindRequest._();
 
   QuotaFindRequest._();
 
   factory QuotaFindRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      QuotaFindRequest()..mergeFromBuffer(data, registry);
   factory QuotaFindRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      QuotaFindRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'QuotaFindRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: QuotaFindRequest.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -500,12 +519,15 @@ class QuotaFindRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use QuotaFindRequest() / QuotaFindRequest.new instead')
   static QuotaFindRequest create() => QuotaFindRequest._();
+  static $pb.GeneratedMessage $_createMessage() => QuotaFindRequest._();
   @$core.override
-  QuotaFindRequest createEmptyInstance() => create();
+  QuotaFindRequest createEmptyInstance() => QuotaFindRequest._();
   @$core.pragma('dart2js:noInline')
-  static QuotaFindRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<QuotaFindRequest>(create);
+  static QuotaFindRequest getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<QuotaFindRequest>(
+          QuotaFindRequest.$_createMessage);
   static QuotaFindRequest? _defaultInstance;
 }
 
@@ -513,7 +535,7 @@ class QuotaFindResponse extends $pb.GeneratedMessage {
   factory QuotaFindResponse({
     Quota? quota,
   }) {
-    final result = create();
+    final result = QuotaFindResponse._();
     if (quota != null) result.quota = quota;
     return result;
   }
@@ -522,16 +544,17 @@ class QuotaFindResponse extends $pb.GeneratedMessage {
 
   factory QuotaFindResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      QuotaFindResponse()..mergeFromBuffer(data, registry);
   factory QuotaFindResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      QuotaFindResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'QuotaFindResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
-    ..aOM<Quota>(1, _omitFieldNames ? '' : 'quota', subBuilder: Quota.create)
+      createEmptyInstance: QuotaFindResponse.$_createMessage)
+    ..aOM<Quota>(1, _omitFieldNames ? '' : 'quota',
+        subBuilder: Quota.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -545,12 +568,15 @@ class QuotaFindResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use QuotaFindResponse() / QuotaFindResponse.new instead')
   static QuotaFindResponse create() => QuotaFindResponse._();
+  static $pb.GeneratedMessage $_createMessage() => QuotaFindResponse._();
   @$core.override
-  QuotaFindResponse createEmptyInstance() => create();
+  QuotaFindResponse createEmptyInstance() => QuotaFindResponse._();
   @$core.pragma('dart2js:noInline')
-  static QuotaFindResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<QuotaFindResponse>(create);
+  static QuotaFindResponse getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<QuotaFindResponse>(
+          QuotaFindResponse.$_createMessage);
   static QuotaFindResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -570,7 +596,7 @@ class Adjustment extends $pb.GeneratedMessage {
     $core.String? sku,
     $fixnum.Int64? limit,
   }) {
-    final result = create();
+    final result = Adjustment._();
     if (sku != null) result.sku = sku;
     if (limit != null) result.limit = limit;
     return result;
@@ -580,15 +606,15 @@ class Adjustment extends $pb.GeneratedMessage {
 
   factory Adjustment.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      Adjustment()..mergeFromBuffer(data, registry);
   factory Adjustment.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      Adjustment()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'Adjustment',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: Adjustment.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'sku')
     ..aInt64(2, _omitFieldNames ? '' : 'limit')
     ..hasRequiredFields = false;
@@ -603,12 +629,14 @@ class Adjustment extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use Adjustment() / Adjustment.new instead')
   static Adjustment create() => Adjustment._();
+  static $pb.GeneratedMessage $_createMessage() => Adjustment._();
   @$core.override
-  Adjustment createEmptyInstance() => create();
+  Adjustment createEmptyInstance() => Adjustment._();
   @$core.pragma('dart2js:noInline')
   static Adjustment getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<Adjustment>(create);
+      $pb.GeneratedMessage.$_defaultFor<Adjustment>(Adjustment.$_createMessage);
   static Adjustment? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -635,7 +663,7 @@ class QuotaAdjustmentRequest extends $pb.GeneratedMessage {
     $core.Iterable<Adjustment>? adjustments,
     $core.String? expiresAt,
   }) {
-    final result = create();
+    final result = QuotaAdjustmentRequest._();
     if (adjustments != null) result.adjustments.addAll(adjustments);
     if (expiresAt != null) result.expiresAt = expiresAt;
     return result;
@@ -645,17 +673,17 @@ class QuotaAdjustmentRequest extends $pb.GeneratedMessage {
 
   factory QuotaAdjustmentRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      QuotaAdjustmentRequest()..mergeFromBuffer(data, registry);
   factory QuotaAdjustmentRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      QuotaAdjustmentRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'QuotaAdjustmentRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: QuotaAdjustmentRequest.$_createMessage)
     ..pPM<Adjustment>(1, _omitFieldNames ? '' : 'adjustments',
-        subBuilder: Adjustment.create)
+        subBuilder: Adjustment.$_createMessage)
     ..aOS(2, _omitFieldNames ? '' : 'expires_at')
     ..hasRequiredFields = false;
 
@@ -671,12 +699,16 @@ class QuotaAdjustmentRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use QuotaAdjustmentRequest() / QuotaAdjustmentRequest.new instead')
   static QuotaAdjustmentRequest create() => QuotaAdjustmentRequest._();
+  static $pb.GeneratedMessage $_createMessage() => QuotaAdjustmentRequest._();
   @$core.override
-  QuotaAdjustmentRequest createEmptyInstance() => create();
+  QuotaAdjustmentRequest createEmptyInstance() => QuotaAdjustmentRequest._();
   @$core.pragma('dart2js:noInline')
   static QuotaAdjustmentRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<QuotaAdjustmentRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<QuotaAdjustmentRequest>(
+          QuotaAdjustmentRequest.$_createMessage);
   static QuotaAdjustmentRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -693,21 +725,21 @@ class QuotaAdjustmentRequest extends $pb.GeneratedMessage {
 }
 
 class QuotaAdjustmentResponse extends $pb.GeneratedMessage {
-  factory QuotaAdjustmentResponse() => create();
+  factory QuotaAdjustmentResponse() => QuotaAdjustmentResponse._();
 
   QuotaAdjustmentResponse._();
 
   factory QuotaAdjustmentResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      QuotaAdjustmentResponse()..mergeFromBuffer(data, registry);
   factory QuotaAdjustmentResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      QuotaAdjustmentResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'QuotaAdjustmentResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: QuotaAdjustmentResponse.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -722,12 +754,16 @@ class QuotaAdjustmentResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use QuotaAdjustmentResponse() / QuotaAdjustmentResponse.new instead')
   static QuotaAdjustmentResponse create() => QuotaAdjustmentResponse._();
+  static $pb.GeneratedMessage $_createMessage() => QuotaAdjustmentResponse._();
   @$core.override
-  QuotaAdjustmentResponse createEmptyInstance() => create();
+  QuotaAdjustmentResponse createEmptyInstance() => QuotaAdjustmentResponse._();
   @$core.pragma('dart2js:noInline')
   static QuotaAdjustmentResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<QuotaAdjustmentResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<QuotaAdjustmentResponse>(
+          QuotaAdjustmentResponse.$_createMessage);
   static QuotaAdjustmentResponse? _defaultInstance;
 }
 

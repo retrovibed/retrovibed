@@ -26,7 +26,7 @@ class Account extends $pb.GeneratedMessage {
     $core.String? email,
     $core.String? phone,
   }) {
-    final result = create();
+    final result = Account._();
     if (id != null) result.id = id;
     if (description != null) result.description = description;
     if (createdAt != null) result.createdAt = createdAt;
@@ -41,15 +41,15 @@ class Account extends $pb.GeneratedMessage {
 
   factory Account.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      Account()..mergeFromBuffer(data, registry);
   factory Account.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      Account()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'Account',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: Account.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'id')
     ..aOS(2, _omitFieldNames ? '' : 'description')
     ..aOS(3, _omitFieldNames ? '' : 'created_at')
@@ -69,12 +69,14 @@ class Account extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use Account() / Account.new instead')
   static Account create() => Account._();
+  static $pb.GeneratedMessage $_createMessage() => Account._();
   @$core.override
-  Account createEmptyInstance() => create();
+  Account createEmptyInstance() => Account._();
   @$core.pragma('dart2js:noInline')
-  static Account getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Account>(create);
+  static Account getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<Account>(Account.$_createMessage);
   static Account? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -142,21 +144,21 @@ class Account extends $pb.GeneratedMessage {
 }
 
 class AccountLookupRequest extends $pb.GeneratedMessage {
-  factory AccountLookupRequest() => create();
+  factory AccountLookupRequest() => AccountLookupRequest._();
 
   AccountLookupRequest._();
 
   factory AccountLookupRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      AccountLookupRequest()..mergeFromBuffer(data, registry);
   factory AccountLookupRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      AccountLookupRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'AccountLookupRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: AccountLookupRequest.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -170,12 +172,16 @@ class AccountLookupRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use AccountLookupRequest() / AccountLookupRequest.new instead')
   static AccountLookupRequest create() => AccountLookupRequest._();
+  static $pb.GeneratedMessage $_createMessage() => AccountLookupRequest._();
   @$core.override
-  AccountLookupRequest createEmptyInstance() => create();
+  AccountLookupRequest createEmptyInstance() => AccountLookupRequest._();
   @$core.pragma('dart2js:noInline')
   static AccountLookupRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<AccountLookupRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<AccountLookupRequest>(
+          AccountLookupRequest.$_createMessage);
   static AccountLookupRequest? _defaultInstance;
 }
 
@@ -183,7 +189,7 @@ class AccountLookupResponse extends $pb.GeneratedMessage {
   factory AccountLookupResponse({
     Account? account,
   }) {
-    final result = create();
+    final result = AccountLookupResponse._();
     if (account != null) result.account = account;
     return result;
   }
@@ -192,17 +198,17 @@ class AccountLookupResponse extends $pb.GeneratedMessage {
 
   factory AccountLookupResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      AccountLookupResponse()..mergeFromBuffer(data, registry);
   factory AccountLookupResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      AccountLookupResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'AccountLookupResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: AccountLookupResponse.$_createMessage)
     ..aOM<Account>(1, _omitFieldNames ? '' : 'account',
-        subBuilder: Account.create)
+        subBuilder: Account.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -217,12 +223,16 @@ class AccountLookupResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use AccountLookupResponse() / AccountLookupResponse.new instead')
   static AccountLookupResponse create() => AccountLookupResponse._();
+  static $pb.GeneratedMessage $_createMessage() => AccountLookupResponse._();
   @$core.override
-  AccountLookupResponse createEmptyInstance() => create();
+  AccountLookupResponse createEmptyInstance() => AccountLookupResponse._();
   @$core.pragma('dart2js:noInline')
   static AccountLookupResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<AccountLookupResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<AccountLookupResponse>(
+          AccountLookupResponse.$_createMessage);
   static AccountLookupResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -241,7 +251,7 @@ class AccountUpdateRequest extends $pb.GeneratedMessage {
   factory AccountUpdateRequest({
     Account? account,
   }) {
-    final result = create();
+    final result = AccountUpdateRequest._();
     if (account != null) result.account = account;
     return result;
   }
@@ -250,17 +260,17 @@ class AccountUpdateRequest extends $pb.GeneratedMessage {
 
   factory AccountUpdateRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      AccountUpdateRequest()..mergeFromBuffer(data, registry);
   factory AccountUpdateRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      AccountUpdateRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'AccountUpdateRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: AccountUpdateRequest.$_createMessage)
     ..aOM<Account>(1, _omitFieldNames ? '' : 'account',
-        subBuilder: Account.create)
+        subBuilder: Account.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -274,12 +284,16 @@ class AccountUpdateRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use AccountUpdateRequest() / AccountUpdateRequest.new instead')
   static AccountUpdateRequest create() => AccountUpdateRequest._();
+  static $pb.GeneratedMessage $_createMessage() => AccountUpdateRequest._();
   @$core.override
-  AccountUpdateRequest createEmptyInstance() => create();
+  AccountUpdateRequest createEmptyInstance() => AccountUpdateRequest._();
   @$core.pragma('dart2js:noInline')
   static AccountUpdateRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<AccountUpdateRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<AccountUpdateRequest>(
+          AccountUpdateRequest.$_createMessage);
   static AccountUpdateRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -298,7 +312,7 @@ class AccountUpdateResponse extends $pb.GeneratedMessage {
   factory AccountUpdateResponse({
     Account? account,
   }) {
-    final result = create();
+    final result = AccountUpdateResponse._();
     if (account != null) result.account = account;
     return result;
   }
@@ -307,17 +321,17 @@ class AccountUpdateResponse extends $pb.GeneratedMessage {
 
   factory AccountUpdateResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      AccountUpdateResponse()..mergeFromBuffer(data, registry);
   factory AccountUpdateResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      AccountUpdateResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'AccountUpdateResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: AccountUpdateResponse.$_createMessage)
     ..aOM<Account>(1, _omitFieldNames ? '' : 'account',
-        subBuilder: Account.create)
+        subBuilder: Account.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -332,12 +346,16 @@ class AccountUpdateResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use AccountUpdateResponse() / AccountUpdateResponse.new instead')
   static AccountUpdateResponse create() => AccountUpdateResponse._();
+  static $pb.GeneratedMessage $_createMessage() => AccountUpdateResponse._();
   @$core.override
-  AccountUpdateResponse createEmptyInstance() => create();
+  AccountUpdateResponse createEmptyInstance() => AccountUpdateResponse._();
   @$core.pragma('dart2js:noInline')
   static AccountUpdateResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<AccountUpdateResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<AccountUpdateResponse>(
+          AccountUpdateResponse.$_createMessage);
   static AccountUpdateResponse? _defaultInstance;
 
   @$pb.TagNumber(1)

@@ -22,7 +22,7 @@ class Peers extends $pb.GeneratedMessage {
     $core.int? min,
     $core.int? max,
   }) {
-    final result = create();
+    final result = Peers._();
     if (min != null) result.min = min;
     if (max != null) result.max = max;
     return result;
@@ -32,15 +32,15 @@ class Peers extends $pb.GeneratedMessage {
 
   factory Peers.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      Peers()..mergeFromBuffer(data, registry);
   factory Peers.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      Peers()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'Peers',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'torrents'),
-      createEmptyInstance: create)
+      createEmptyInstance: Peers.$_createMessage)
     ..aI(1, _omitFieldNames ? '' : 'min', fieldType: $pb.PbFieldType.OU3)
     ..aI(2, _omitFieldNames ? '' : 'max', fieldType: $pb.PbFieldType.OU3)
     ..hasRequiredFields = false;
@@ -55,12 +55,14 @@ class Peers extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use Peers() / Peers.new instead')
   static Peers create() => Peers._();
+  static $pb.GeneratedMessage $_createMessage() => Peers._();
   @$core.override
-  Peers createEmptyInstance() => create();
+  Peers createEmptyInstance() => Peers._();
   @$core.pragma('dart2js:noInline')
-  static Peers getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Peers>(create);
+  static Peers getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<Peers>(Peers.$_createMessage);
   static Peers? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -87,7 +89,7 @@ class Limit extends $pb.GeneratedMessage {
     $core.int? rate,
     $core.int? burst,
   }) {
-    final result = create();
+    final result = Limit._();
     if (rate != null) result.rate = rate;
     if (burst != null) result.burst = burst;
     return result;
@@ -97,15 +99,15 @@ class Limit extends $pb.GeneratedMessage {
 
   factory Limit.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      Limit()..mergeFromBuffer(data, registry);
   factory Limit.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      Limit()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'Limit',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'torrents'),
-      createEmptyInstance: create)
+      createEmptyInstance: Limit.$_createMessage)
     ..aI(1, _omitFieldNames ? '' : 'rate', fieldType: $pb.PbFieldType.OU3)
     ..aI(2, _omitFieldNames ? '' : 'burst', fieldType: $pb.PbFieldType.OU3)
     ..hasRequiredFields = false;
@@ -120,12 +122,14 @@ class Limit extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use Limit() / Limit.new instead')
   static Limit create() => Limit._();
+  static $pb.GeneratedMessage $_createMessage() => Limit._();
   @$core.override
-  Limit createEmptyInstance() => create();
+  Limit createEmptyInstance() => Limit._();
   @$core.pragma('dart2js:noInline')
-  static Limit getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Limit>(create);
+  static Limit getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<Limit>(Limit.$_createMessage);
   static Limit? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -167,7 +171,7 @@ class TorrentSettings extends $pb.GeneratedMessage {
     Peers? peers,
     $fixnum.Int64? maximumRequests,
   }) {
-    final result = create();
+    final result = TorrentSettings._();
     if (seed != null) result.seed = seed;
     if (pex != null) result.pex = pex;
     if (autoBootstrap != null) result.autoBootstrap = autoBootstrap;
@@ -192,15 +196,15 @@ class TorrentSettings extends $pb.GeneratedMessage {
 
   factory TorrentSettings.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      TorrentSettings()..mergeFromBuffer(data, registry);
   factory TorrentSettings.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      TorrentSettings()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'TorrentSettings',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'torrents'),
-      createEmptyInstance: create)
+      createEmptyInstance: TorrentSettings.$_createMessage)
     ..aOB(1, _omitFieldNames ? '' : 'seed')
     ..aOB(2, _omitFieldNames ? '' : 'pex')
     ..aOB(3, _omitFieldNames ? '' : 'auto_bootstrap')
@@ -213,14 +217,15 @@ class TorrentSettings extends $pb.GeneratedMessage {
     ..aOB(998, _omitFieldNames ? '' : 'log')
     ..aOB(999, _omitFieldNames ? '' : 'debug')
     ..aOM<Limit>(1000, _omitFieldNames ? '' : 'download',
-        subBuilder: Limit.create)
+        subBuilder: Limit.$_createMessage)
     ..aOM<Limit>(1001, _omitFieldNames ? '' : 'upload',
-        subBuilder: Limit.create)
+        subBuilder: Limit.$_createMessage)
     ..aOM<Limit>(1002, _omitFieldNames ? '' : 'inbound',
-        subBuilder: Limit.create)
+        subBuilder: Limit.$_createMessage)
     ..aOM<Limit>(1003, _omitFieldNames ? '' : 'outbound',
-        subBuilder: Limit.create)
-    ..aOM<Peers>(1004, _omitFieldNames ? '' : 'peers', subBuilder: Peers.create)
+        subBuilder: Limit.$_createMessage)
+    ..aOM<Peers>(1004, _omitFieldNames ? '' : 'peers',
+        subBuilder: Peers.$_createMessage)
     ..a<$fixnum.Int64>(
         1005, _omitFieldNames ? '' : 'maximum_requests', $pb.PbFieldType.OU6,
         defaultOrMaker: $fixnum.Int64.ZERO)
@@ -237,12 +242,15 @@ class TorrentSettings extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use TorrentSettings() / TorrentSettings.new instead')
   static TorrentSettings create() => TorrentSettings._();
+  static $pb.GeneratedMessage $_createMessage() => TorrentSettings._();
   @$core.override
-  TorrentSettings createEmptyInstance() => create();
+  TorrentSettings createEmptyInstance() => TorrentSettings._();
   @$core.pragma('dart2js:noInline')
-  static TorrentSettings getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<TorrentSettings>(create);
+  static TorrentSettings getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<TorrentSettings>(
+          TorrentSettings.$_createMessage);
   static TorrentSettings? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -418,7 +426,7 @@ class DiscoverySettings extends $pb.GeneratedMessage {
     $core.String? seed,
     $core.bool? locateP2p,
   }) {
-    final result = create();
+    final result = DiscoverySettings._();
     if (enabled != null) result.enabled = enabled;
     if (ratio != null) result.ratio = ratio;
     if (partitions != null) result.partitions = partitions;
@@ -432,15 +440,15 @@ class DiscoverySettings extends $pb.GeneratedMessage {
 
   factory DiscoverySettings.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      DiscoverySettings()..mergeFromBuffer(data, registry);
   factory DiscoverySettings.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      DiscoverySettings()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'DiscoverySettings',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'torrents'),
-      createEmptyInstance: create)
+      createEmptyInstance: DiscoverySettings.$_createMessage)
     ..aOB(1, _omitFieldNames ? '' : 'enabled')
     ..aI(2, _omitFieldNames ? '' : 'ratio', fieldType: $pb.PbFieldType.OU3)
     ..aI(3, _omitFieldNames ? '' : 'partitions', fieldType: $pb.PbFieldType.OU3)
@@ -460,12 +468,15 @@ class DiscoverySettings extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use DiscoverySettings() / DiscoverySettings.new instead')
   static DiscoverySettings create() => DiscoverySettings._();
+  static $pb.GeneratedMessage $_createMessage() => DiscoverySettings._();
   @$core.override
-  DiscoverySettings createEmptyInstance() => create();
+  DiscoverySettings createEmptyInstance() => DiscoverySettings._();
   @$core.pragma('dart2js:noInline')
-  static DiscoverySettings getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DiscoverySettings>(create);
+  static DiscoverySettings getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DiscoverySettings>(
+          DiscoverySettings.$_createMessage);
   static DiscoverySettings? _defaultInstance;
 
   @$pb.TagNumber(1)

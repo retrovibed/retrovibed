@@ -40,7 +40,7 @@ class Discovery extends $pb.GeneratedMessage {
     $core.String? uri,
     AcquisitionState? acquisitionState,
   }) {
-    final result = create();
+    final result = Discovery._();
     if (id != null) result.id = id;
     if (infohash != null) result.infohash = infohash;
     if (attempts != null) result.attempts = attempts;
@@ -63,15 +63,15 @@ class Discovery extends $pb.GeneratedMessage {
 
   factory Discovery.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      Discovery()..mergeFromBuffer(data, registry);
   factory Discovery.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      Discovery()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'Discovery',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'ddisc'),
-      createEmptyInstance: create)
+      createEmptyInstance: Discovery.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'id')
     ..a<$core.List<$core.int>>(
         2, _omitFieldNames ? '' : 'infohash', $pb.PbFieldType.OY)
@@ -103,12 +103,14 @@ class Discovery extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use Discovery() / Discovery.new instead')
   static Discovery create() => Discovery._();
+  static $pb.GeneratedMessage $_createMessage() => Discovery._();
   @$core.override
-  Discovery createEmptyInstance() => create();
+  Discovery createEmptyInstance() => Discovery._();
   @$core.pragma('dart2js:noInline')
-  static Discovery getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Discovery>(create);
+  static Discovery getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<Discovery>(Discovery.$_createMessage);
   static Discovery? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -256,7 +258,7 @@ class DiscoverySearchRequest extends $pb.GeneratedMessage {
     $fixnum.Int64? offset,
     $fixnum.Int64? limit,
   }) {
-    final result = create();
+    final result = DiscoverySearchRequest._();
     if (nextCheck != null) result.nextCheck = nextCheck;
     if (id != null) result.id.addAll(id);
     if (attemptsMin != null) result.attemptsMin = attemptsMin;
@@ -270,17 +272,17 @@ class DiscoverySearchRequest extends $pb.GeneratedMessage {
 
   factory DiscoverySearchRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      DiscoverySearchRequest()..mergeFromBuffer(data, registry);
   factory DiscoverySearchRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      DiscoverySearchRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'DiscoverySearchRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'ddisc'),
-      createEmptyInstance: create)
+      createEmptyInstance: DiscoverySearchRequest.$_createMessage)
     ..aOM<$0.DateRange>(1, _omitFieldNames ? '' : 'next_check',
-        subBuilder: $0.DateRange.create)
+        subBuilder: $0.DateRange.$_createMessage)
     ..pPS(2, _omitFieldNames ? '' : 'id')
     ..a<$fixnum.Int64>(
         3, _omitFieldNames ? '' : 'attempts_min', $pb.PbFieldType.OU6,
@@ -308,12 +310,16 @@ class DiscoverySearchRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use DiscoverySearchRequest() / DiscoverySearchRequest.new instead')
   static DiscoverySearchRequest create() => DiscoverySearchRequest._();
+  static $pb.GeneratedMessage $_createMessage() => DiscoverySearchRequest._();
   @$core.override
-  DiscoverySearchRequest createEmptyInstance() => create();
+  DiscoverySearchRequest createEmptyInstance() => DiscoverySearchRequest._();
   @$core.pragma('dart2js:noInline')
   static DiscoverySearchRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DiscoverySearchRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<DiscoverySearchRequest>(
+          DiscoverySearchRequest.$_createMessage);
   static DiscoverySearchRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -372,7 +378,7 @@ class DiscoverySearchResponse extends $pb.GeneratedMessage {
     DiscoverySearchRequest? next,
     $core.Iterable<Discovery>? items,
   }) {
-    final result = create();
+    final result = DiscoverySearchResponse._();
     if (next != null) result.next = next;
     if (items != null) result.items.addAll(items);
     return result;
@@ -382,19 +388,19 @@ class DiscoverySearchResponse extends $pb.GeneratedMessage {
 
   factory DiscoverySearchResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      DiscoverySearchResponse()..mergeFromBuffer(data, registry);
   factory DiscoverySearchResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      DiscoverySearchResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'DiscoverySearchResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'ddisc'),
-      createEmptyInstance: create)
+      createEmptyInstance: DiscoverySearchResponse.$_createMessage)
     ..aOM<DiscoverySearchRequest>(1, _omitFieldNames ? '' : 'next',
-        subBuilder: DiscoverySearchRequest.create)
+        subBuilder: DiscoverySearchRequest.$_createMessage)
     ..pPM<Discovery>(2, _omitFieldNames ? '' : 'items',
-        subBuilder: Discovery.create)
+        subBuilder: Discovery.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -409,12 +415,16 @@ class DiscoverySearchResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use DiscoverySearchResponse() / DiscoverySearchResponse.new instead')
   static DiscoverySearchResponse create() => DiscoverySearchResponse._();
+  static $pb.GeneratedMessage $_createMessage() => DiscoverySearchResponse._();
   @$core.override
-  DiscoverySearchResponse createEmptyInstance() => create();
+  DiscoverySearchResponse createEmptyInstance() => DiscoverySearchResponse._();
   @$core.pragma('dart2js:noInline')
   static DiscoverySearchResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DiscoverySearchResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<DiscoverySearchResponse>(
+          DiscoverySearchResponse.$_createMessage);
   static DiscoverySearchResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -436,7 +446,7 @@ class DiscoveryCreateRequest extends $pb.GeneratedMessage {
   factory DiscoveryCreateRequest({
     Discovery? discovery,
   }) {
-    final result = create();
+    final result = DiscoveryCreateRequest._();
     if (discovery != null) result.discovery = discovery;
     return result;
   }
@@ -445,17 +455,17 @@ class DiscoveryCreateRequest extends $pb.GeneratedMessage {
 
   factory DiscoveryCreateRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      DiscoveryCreateRequest()..mergeFromBuffer(data, registry);
   factory DiscoveryCreateRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      DiscoveryCreateRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'DiscoveryCreateRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'ddisc'),
-      createEmptyInstance: create)
+      createEmptyInstance: DiscoveryCreateRequest.$_createMessage)
     ..aOM<Discovery>(1, _omitFieldNames ? '' : 'discovery',
-        subBuilder: Discovery.create)
+        subBuilder: Discovery.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -470,12 +480,16 @@ class DiscoveryCreateRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use DiscoveryCreateRequest() / DiscoveryCreateRequest.new instead')
   static DiscoveryCreateRequest create() => DiscoveryCreateRequest._();
+  static $pb.GeneratedMessage $_createMessage() => DiscoveryCreateRequest._();
   @$core.override
-  DiscoveryCreateRequest createEmptyInstance() => create();
+  DiscoveryCreateRequest createEmptyInstance() => DiscoveryCreateRequest._();
   @$core.pragma('dart2js:noInline')
   static DiscoveryCreateRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DiscoveryCreateRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<DiscoveryCreateRequest>(
+          DiscoveryCreateRequest.$_createMessage);
   static DiscoveryCreateRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -494,7 +508,7 @@ class DiscoveryCreateResponse extends $pb.GeneratedMessage {
   factory DiscoveryCreateResponse({
     Discovery? discovery,
   }) {
-    final result = create();
+    final result = DiscoveryCreateResponse._();
     if (discovery != null) result.discovery = discovery;
     return result;
   }
@@ -503,17 +517,17 @@ class DiscoveryCreateResponse extends $pb.GeneratedMessage {
 
   factory DiscoveryCreateResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      DiscoveryCreateResponse()..mergeFromBuffer(data, registry);
   factory DiscoveryCreateResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      DiscoveryCreateResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'DiscoveryCreateResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'ddisc'),
-      createEmptyInstance: create)
+      createEmptyInstance: DiscoveryCreateResponse.$_createMessage)
     ..aOM<Discovery>(1, _omitFieldNames ? '' : 'discovery',
-        subBuilder: Discovery.create)
+        subBuilder: Discovery.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -528,12 +542,16 @@ class DiscoveryCreateResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use DiscoveryCreateResponse() / DiscoveryCreateResponse.new instead')
   static DiscoveryCreateResponse create() => DiscoveryCreateResponse._();
+  static $pb.GeneratedMessage $_createMessage() => DiscoveryCreateResponse._();
   @$core.override
-  DiscoveryCreateResponse createEmptyInstance() => create();
+  DiscoveryCreateResponse createEmptyInstance() => DiscoveryCreateResponse._();
   @$core.pragma('dart2js:noInline')
   static DiscoveryCreateResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DiscoveryCreateResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<DiscoveryCreateResponse>(
+          DiscoveryCreateResponse.$_createMessage);
   static DiscoveryCreateResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -553,7 +571,7 @@ class DiscoveryDownloadRequest extends $pb.GeneratedMessage {
     Discovery? discovery,
     $core.bool? autodownload,
   }) {
-    final result = create();
+    final result = DiscoveryDownloadRequest._();
     if (discovery != null) result.discovery = discovery;
     if (autodownload != null) result.autodownload = autodownload;
     return result;
@@ -563,17 +581,17 @@ class DiscoveryDownloadRequest extends $pb.GeneratedMessage {
 
   factory DiscoveryDownloadRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      DiscoveryDownloadRequest()..mergeFromBuffer(data, registry);
   factory DiscoveryDownloadRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      DiscoveryDownloadRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'DiscoveryDownloadRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'ddisc'),
-      createEmptyInstance: create)
+      createEmptyInstance: DiscoveryDownloadRequest.$_createMessage)
     ..aOM<Discovery>(1, _omitFieldNames ? '' : 'discovery',
-        subBuilder: Discovery.create)
+        subBuilder: Discovery.$_createMessage)
     ..aOB(2, _omitFieldNames ? '' : 'autodownload')
     ..hasRequiredFields = false;
 
@@ -589,12 +607,17 @@ class DiscoveryDownloadRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use DiscoveryDownloadRequest() / DiscoveryDownloadRequest.new instead')
   static DiscoveryDownloadRequest create() => DiscoveryDownloadRequest._();
+  static $pb.GeneratedMessage $_createMessage() => DiscoveryDownloadRequest._();
   @$core.override
-  DiscoveryDownloadRequest createEmptyInstance() => create();
+  DiscoveryDownloadRequest createEmptyInstance() =>
+      DiscoveryDownloadRequest._();
   @$core.pragma('dart2js:noInline')
   static DiscoveryDownloadRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DiscoveryDownloadRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<DiscoveryDownloadRequest>(
+          DiscoveryDownloadRequest.$_createMessage);
   static DiscoveryDownloadRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -622,7 +645,7 @@ class DiscoveryDownloadResponse extends $pb.GeneratedMessage {
   factory DiscoveryDownloadResponse({
     Discovery? discovery,
   }) {
-    final result = create();
+    final result = DiscoveryDownloadResponse._();
     if (discovery != null) result.discovery = discovery;
     return result;
   }
@@ -631,17 +654,17 @@ class DiscoveryDownloadResponse extends $pb.GeneratedMessage {
 
   factory DiscoveryDownloadResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      DiscoveryDownloadResponse()..mergeFromBuffer(data, registry);
   factory DiscoveryDownloadResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      DiscoveryDownloadResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'DiscoveryDownloadResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'ddisc'),
-      createEmptyInstance: create)
+      createEmptyInstance: DiscoveryDownloadResponse.$_createMessage)
     ..aOM<Discovery>(1, _omitFieldNames ? '' : 'discovery',
-        subBuilder: Discovery.create)
+        subBuilder: Discovery.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -656,12 +679,18 @@ class DiscoveryDownloadResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use DiscoveryDownloadResponse() / DiscoveryDownloadResponse.new instead')
   static DiscoveryDownloadResponse create() => DiscoveryDownloadResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      DiscoveryDownloadResponse._();
   @$core.override
-  DiscoveryDownloadResponse createEmptyInstance() => create();
+  DiscoveryDownloadResponse createEmptyInstance() =>
+      DiscoveryDownloadResponse._();
   @$core.pragma('dart2js:noInline')
   static DiscoveryDownloadResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DiscoveryDownloadResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<DiscoveryDownloadResponse>(
+          DiscoveryDownloadResponse.$_createMessage);
   static DiscoveryDownloadResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -677,21 +706,21 @@ class DiscoveryDownloadResponse extends $pb.GeneratedMessage {
 }
 
 class DiscoveryDeleteRequest extends $pb.GeneratedMessage {
-  factory DiscoveryDeleteRequest() => create();
+  factory DiscoveryDeleteRequest() => DiscoveryDeleteRequest._();
 
   DiscoveryDeleteRequest._();
 
   factory DiscoveryDeleteRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      DiscoveryDeleteRequest()..mergeFromBuffer(data, registry);
   factory DiscoveryDeleteRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      DiscoveryDeleteRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'DiscoveryDeleteRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'ddisc'),
-      createEmptyInstance: create)
+      createEmptyInstance: DiscoveryDeleteRequest.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -706,12 +735,16 @@ class DiscoveryDeleteRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use DiscoveryDeleteRequest() / DiscoveryDeleteRequest.new instead')
   static DiscoveryDeleteRequest create() => DiscoveryDeleteRequest._();
+  static $pb.GeneratedMessage $_createMessage() => DiscoveryDeleteRequest._();
   @$core.override
-  DiscoveryDeleteRequest createEmptyInstance() => create();
+  DiscoveryDeleteRequest createEmptyInstance() => DiscoveryDeleteRequest._();
   @$core.pragma('dart2js:noInline')
   static DiscoveryDeleteRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DiscoveryDeleteRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<DiscoveryDeleteRequest>(
+          DiscoveryDeleteRequest.$_createMessage);
   static DiscoveryDeleteRequest? _defaultInstance;
 }
 
@@ -719,7 +752,7 @@ class DiscoveryDeleteResponse extends $pb.GeneratedMessage {
   factory DiscoveryDeleteResponse({
     Discovery? discovery,
   }) {
-    final result = create();
+    final result = DiscoveryDeleteResponse._();
     if (discovery != null) result.discovery = discovery;
     return result;
   }
@@ -728,17 +761,17 @@ class DiscoveryDeleteResponse extends $pb.GeneratedMessage {
 
   factory DiscoveryDeleteResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      DiscoveryDeleteResponse()..mergeFromBuffer(data, registry);
   factory DiscoveryDeleteResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      DiscoveryDeleteResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'DiscoveryDeleteResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'ddisc'),
-      createEmptyInstance: create)
+      createEmptyInstance: DiscoveryDeleteResponse.$_createMessage)
     ..aOM<Discovery>(1, _omitFieldNames ? '' : 'discovery',
-        subBuilder: Discovery.create)
+        subBuilder: Discovery.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -753,12 +786,16 @@ class DiscoveryDeleteResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use DiscoveryDeleteResponse() / DiscoveryDeleteResponse.new instead')
   static DiscoveryDeleteResponse create() => DiscoveryDeleteResponse._();
+  static $pb.GeneratedMessage $_createMessage() => DiscoveryDeleteResponse._();
   @$core.override
-  DiscoveryDeleteResponse createEmptyInstance() => create();
+  DiscoveryDeleteResponse createEmptyInstance() => DiscoveryDeleteResponse._();
   @$core.pragma('dart2js:noInline')
   static DiscoveryDeleteResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DiscoveryDeleteResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<DiscoveryDeleteResponse>(
+          DiscoveryDeleteResponse.$_createMessage);
   static DiscoveryDeleteResponse? _defaultInstance;
 
   @$pb.TagNumber(1)

@@ -32,7 +32,7 @@ class Profile extends $pb.GeneratedMessage {
     $core.String? display,
     $core.String? email,
   }) {
-    final result = create();
+    final result = Profile._();
     if (id != null) result.id = id;
     if (accountId != null) result.accountId = accountId;
     if (sessionWatermark != null) result.sessionWatermark = sessionWatermark;
@@ -52,15 +52,15 @@ class Profile extends $pb.GeneratedMessage {
 
   factory Profile.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      Profile()..mergeFromBuffer(data, registry);
   factory Profile.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      Profile()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'Profile',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: Profile.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'id')
     ..aOS(2, _omitFieldNames ? '' : 'account_id')
     ..aOS(3, _omitFieldNames ? '' : 'session_watermark')
@@ -83,12 +83,14 @@ class Profile extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use Profile() / Profile.new instead')
   static Profile create() => Profile._();
+  static $pb.GeneratedMessage $_createMessage() => Profile._();
   @$core.override
-  Profile createEmptyInstance() => create();
+  Profile createEmptyInstance() => Profile._();
   @$core.pragma('dart2js:noInline')
-  static Profile getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Profile>(create);
+  static Profile getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<Profile>(Profile.$_createMessage);
   static Profile? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -189,7 +191,7 @@ class ProfileSearchRequest extends $pb.GeneratedMessage {
     $fixnum.Int64? limit,
     $core.int? status,
   }) {
-    final result = create();
+    final result = ProfileSearchRequest._();
     if (query != null) result.query = query;
     if (offset != null) result.offset = offset;
     if (limit != null) result.limit = limit;
@@ -201,15 +203,15 @@ class ProfileSearchRequest extends $pb.GeneratedMessage {
 
   factory ProfileSearchRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      ProfileSearchRequest()..mergeFromBuffer(data, registry);
   factory ProfileSearchRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      ProfileSearchRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'ProfileSearchRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: ProfileSearchRequest.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'query')
     ..a<$fixnum.Int64>(2, _omitFieldNames ? '' : 'offset', $pb.PbFieldType.OU6,
         defaultOrMaker: $fixnum.Int64.ZERO)
@@ -229,12 +231,16 @@ class ProfileSearchRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ProfileSearchRequest() / ProfileSearchRequest.new instead')
   static ProfileSearchRequest create() => ProfileSearchRequest._();
+  static $pb.GeneratedMessage $_createMessage() => ProfileSearchRequest._();
   @$core.override
-  ProfileSearchRequest createEmptyInstance() => create();
+  ProfileSearchRequest createEmptyInstance() => ProfileSearchRequest._();
   @$core.pragma('dart2js:noInline')
   static ProfileSearchRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<ProfileSearchRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<ProfileSearchRequest>(
+          ProfileSearchRequest.$_createMessage);
   static ProfileSearchRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -279,7 +285,7 @@ class ProfileSearchResponse extends $pb.GeneratedMessage {
     ProfileSearchRequest? next,
     $core.Iterable<Profile>? items,
   }) {
-    final result = create();
+    final result = ProfileSearchResponse._();
     if (next != null) result.next = next;
     if (items != null) result.items.addAll(items);
     return result;
@@ -289,19 +295,19 @@ class ProfileSearchResponse extends $pb.GeneratedMessage {
 
   factory ProfileSearchResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      ProfileSearchResponse()..mergeFromBuffer(data, registry);
   factory ProfileSearchResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      ProfileSearchResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'ProfileSearchResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: ProfileSearchResponse.$_createMessage)
     ..aOM<ProfileSearchRequest>(1, _omitFieldNames ? '' : 'next',
-        subBuilder: ProfileSearchRequest.create)
+        subBuilder: ProfileSearchRequest.$_createMessage)
     ..pPM<Profile>(2, _omitFieldNames ? '' : 'items',
-        subBuilder: Profile.create)
+        subBuilder: Profile.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -316,12 +322,16 @@ class ProfileSearchResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ProfileSearchResponse() / ProfileSearchResponse.new instead')
   static ProfileSearchResponse create() => ProfileSearchResponse._();
+  static $pb.GeneratedMessage $_createMessage() => ProfileSearchResponse._();
   @$core.override
-  ProfileSearchResponse createEmptyInstance() => create();
+  ProfileSearchResponse createEmptyInstance() => ProfileSearchResponse._();
   @$core.pragma('dart2js:noInline')
   static ProfileSearchResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<ProfileSearchResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<ProfileSearchResponse>(
+          ProfileSearchResponse.$_createMessage);
   static ProfileSearchResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -340,21 +350,21 @@ class ProfileSearchResponse extends $pb.GeneratedMessage {
 }
 
 class ProfileLookupRequest extends $pb.GeneratedMessage {
-  factory ProfileLookupRequest() => create();
+  factory ProfileLookupRequest() => ProfileLookupRequest._();
 
   ProfileLookupRequest._();
 
   factory ProfileLookupRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      ProfileLookupRequest()..mergeFromBuffer(data, registry);
   factory ProfileLookupRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      ProfileLookupRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'ProfileLookupRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: ProfileLookupRequest.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -368,12 +378,16 @@ class ProfileLookupRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ProfileLookupRequest() / ProfileLookupRequest.new instead')
   static ProfileLookupRequest create() => ProfileLookupRequest._();
+  static $pb.GeneratedMessage $_createMessage() => ProfileLookupRequest._();
   @$core.override
-  ProfileLookupRequest createEmptyInstance() => create();
+  ProfileLookupRequest createEmptyInstance() => ProfileLookupRequest._();
   @$core.pragma('dart2js:noInline')
   static ProfileLookupRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<ProfileLookupRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<ProfileLookupRequest>(
+          ProfileLookupRequest.$_createMessage);
   static ProfileLookupRequest? _defaultInstance;
 }
 
@@ -381,7 +395,7 @@ class ProfileLookupResponse extends $pb.GeneratedMessage {
   factory ProfileLookupResponse({
     Profile? profile,
   }) {
-    final result = create();
+    final result = ProfileLookupResponse._();
     if (profile != null) result.profile = profile;
     return result;
   }
@@ -390,17 +404,17 @@ class ProfileLookupResponse extends $pb.GeneratedMessage {
 
   factory ProfileLookupResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      ProfileLookupResponse()..mergeFromBuffer(data, registry);
   factory ProfileLookupResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      ProfileLookupResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'ProfileLookupResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: ProfileLookupResponse.$_createMessage)
     ..aOM<Profile>(1, _omitFieldNames ? '' : 'profile',
-        subBuilder: Profile.create)
+        subBuilder: Profile.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -415,12 +429,16 @@ class ProfileLookupResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ProfileLookupResponse() / ProfileLookupResponse.new instead')
   static ProfileLookupResponse create() => ProfileLookupResponse._();
+  static $pb.GeneratedMessage $_createMessage() => ProfileLookupResponse._();
   @$core.override
-  ProfileLookupResponse createEmptyInstance() => create();
+  ProfileLookupResponse createEmptyInstance() => ProfileLookupResponse._();
   @$core.pragma('dart2js:noInline')
   static ProfileLookupResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<ProfileLookupResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<ProfileLookupResponse>(
+          ProfileLookupResponse.$_createMessage);
   static ProfileLookupResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -439,7 +457,7 @@ class ProfileUpdateRequest extends $pb.GeneratedMessage {
   factory ProfileUpdateRequest({
     Profile? profile,
   }) {
-    final result = create();
+    final result = ProfileUpdateRequest._();
     if (profile != null) result.profile = profile;
     return result;
   }
@@ -448,17 +466,17 @@ class ProfileUpdateRequest extends $pb.GeneratedMessage {
 
   factory ProfileUpdateRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      ProfileUpdateRequest()..mergeFromBuffer(data, registry);
   factory ProfileUpdateRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      ProfileUpdateRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'ProfileUpdateRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: ProfileUpdateRequest.$_createMessage)
     ..aOM<Profile>(1, _omitFieldNames ? '' : 'profile',
-        subBuilder: Profile.create)
+        subBuilder: Profile.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -472,12 +490,16 @@ class ProfileUpdateRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ProfileUpdateRequest() / ProfileUpdateRequest.new instead')
   static ProfileUpdateRequest create() => ProfileUpdateRequest._();
+  static $pb.GeneratedMessage $_createMessage() => ProfileUpdateRequest._();
   @$core.override
-  ProfileUpdateRequest createEmptyInstance() => create();
+  ProfileUpdateRequest createEmptyInstance() => ProfileUpdateRequest._();
   @$core.pragma('dart2js:noInline')
   static ProfileUpdateRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<ProfileUpdateRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<ProfileUpdateRequest>(
+          ProfileUpdateRequest.$_createMessage);
   static ProfileUpdateRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -496,7 +518,7 @@ class ProfileUpdateResponse extends $pb.GeneratedMessage {
   factory ProfileUpdateResponse({
     Profile? profile,
   }) {
-    final result = create();
+    final result = ProfileUpdateResponse._();
     if (profile != null) result.profile = profile;
     return result;
   }
@@ -505,17 +527,17 @@ class ProfileUpdateResponse extends $pb.GeneratedMessage {
 
   factory ProfileUpdateResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      ProfileUpdateResponse()..mergeFromBuffer(data, registry);
   factory ProfileUpdateResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      ProfileUpdateResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'ProfileUpdateResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: ProfileUpdateResponse.$_createMessage)
     ..aOM<Profile>(1, _omitFieldNames ? '' : 'profile',
-        subBuilder: Profile.create)
+        subBuilder: Profile.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -530,12 +552,16 @@ class ProfileUpdateResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ProfileUpdateResponse() / ProfileUpdateResponse.new instead')
   static ProfileUpdateResponse create() => ProfileUpdateResponse._();
+  static $pb.GeneratedMessage $_createMessage() => ProfileUpdateResponse._();
   @$core.override
-  ProfileUpdateResponse createEmptyInstance() => create();
+  ProfileUpdateResponse createEmptyInstance() => ProfileUpdateResponse._();
   @$core.pragma('dart2js:noInline')
   static ProfileUpdateResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<ProfileUpdateResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<ProfileUpdateResponse>(
+          ProfileUpdateResponse.$_createMessage);
   static ProfileUpdateResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -554,7 +580,7 @@ class ProfileDisableRequest extends $pb.GeneratedMessage {
   factory ProfileDisableRequest({
     Profile? profile,
   }) {
-    final result = create();
+    final result = ProfileDisableRequest._();
     if (profile != null) result.profile = profile;
     return result;
   }
@@ -563,17 +589,17 @@ class ProfileDisableRequest extends $pb.GeneratedMessage {
 
   factory ProfileDisableRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      ProfileDisableRequest()..mergeFromBuffer(data, registry);
   factory ProfileDisableRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      ProfileDisableRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'ProfileDisableRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: ProfileDisableRequest.$_createMessage)
     ..aOM<Profile>(1, _omitFieldNames ? '' : 'profile',
-        subBuilder: Profile.create)
+        subBuilder: Profile.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -588,12 +614,16 @@ class ProfileDisableRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ProfileDisableRequest() / ProfileDisableRequest.new instead')
   static ProfileDisableRequest create() => ProfileDisableRequest._();
+  static $pb.GeneratedMessage $_createMessage() => ProfileDisableRequest._();
   @$core.override
-  ProfileDisableRequest createEmptyInstance() => create();
+  ProfileDisableRequest createEmptyInstance() => ProfileDisableRequest._();
   @$core.pragma('dart2js:noInline')
   static ProfileDisableRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<ProfileDisableRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<ProfileDisableRequest>(
+          ProfileDisableRequest.$_createMessage);
   static ProfileDisableRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -612,7 +642,7 @@ class ProfileDisableResponse extends $pb.GeneratedMessage {
   factory ProfileDisableResponse({
     Profile? profile,
   }) {
-    final result = create();
+    final result = ProfileDisableResponse._();
     if (profile != null) result.profile = profile;
     return result;
   }
@@ -621,17 +651,17 @@ class ProfileDisableResponse extends $pb.GeneratedMessage {
 
   factory ProfileDisableResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      ProfileDisableResponse()..mergeFromBuffer(data, registry);
   factory ProfileDisableResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      ProfileDisableResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'ProfileDisableResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: ProfileDisableResponse.$_createMessage)
     ..aOM<Profile>(1, _omitFieldNames ? '' : 'profile',
-        subBuilder: Profile.create)
+        subBuilder: Profile.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -646,12 +676,16 @@ class ProfileDisableResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ProfileDisableResponse() / ProfileDisableResponse.new instead')
   static ProfileDisableResponse create() => ProfileDisableResponse._();
+  static $pb.GeneratedMessage $_createMessage() => ProfileDisableResponse._();
   @$core.override
-  ProfileDisableResponse createEmptyInstance() => create();
+  ProfileDisableResponse createEmptyInstance() => ProfileDisableResponse._();
   @$core.pragma('dart2js:noInline')
   static ProfileDisableResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<ProfileDisableResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<ProfileDisableResponse>(
+          ProfileDisableResponse.$_createMessage);
   static ProfileDisableResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -671,7 +705,7 @@ class ProfileCreateRequest extends $pb.GeneratedMessage {
     Profile? profile,
     $core.String? publicKey,
   }) {
-    final result = create();
+    final result = ProfileCreateRequest._();
     if (profile != null) result.profile = profile;
     if (publicKey != null) result.publicKey = publicKey;
     return result;
@@ -681,17 +715,17 @@ class ProfileCreateRequest extends $pb.GeneratedMessage {
 
   factory ProfileCreateRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      ProfileCreateRequest()..mergeFromBuffer(data, registry);
   factory ProfileCreateRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      ProfileCreateRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'ProfileCreateRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: ProfileCreateRequest.$_createMessage)
     ..aOM<Profile>(1, _omitFieldNames ? '' : 'profile',
-        subBuilder: Profile.create)
+        subBuilder: Profile.$_createMessage)
     ..aOS(2, _omitFieldNames ? '' : 'public_key')
     ..hasRequiredFields = false;
 
@@ -706,12 +740,16 @@ class ProfileCreateRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ProfileCreateRequest() / ProfileCreateRequest.new instead')
   static ProfileCreateRequest create() => ProfileCreateRequest._();
+  static $pb.GeneratedMessage $_createMessage() => ProfileCreateRequest._();
   @$core.override
-  ProfileCreateRequest createEmptyInstance() => create();
+  ProfileCreateRequest createEmptyInstance() => ProfileCreateRequest._();
   @$core.pragma('dart2js:noInline')
   static ProfileCreateRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<ProfileCreateRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<ProfileCreateRequest>(
+          ProfileCreateRequest.$_createMessage);
   static ProfileCreateRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -739,7 +777,7 @@ class ProfileCreateResponse extends $pb.GeneratedMessage {
   factory ProfileCreateResponse({
     Profile? profile,
   }) {
-    final result = create();
+    final result = ProfileCreateResponse._();
     if (profile != null) result.profile = profile;
     return result;
   }
@@ -748,17 +786,17 @@ class ProfileCreateResponse extends $pb.GeneratedMessage {
 
   factory ProfileCreateResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      ProfileCreateResponse()..mergeFromBuffer(data, registry);
   factory ProfileCreateResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      ProfileCreateResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'ProfileCreateResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: ProfileCreateResponse.$_createMessage)
     ..aOM<Profile>(1, _omitFieldNames ? '' : 'profile',
-        subBuilder: Profile.create)
+        subBuilder: Profile.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -773,12 +811,16 @@ class ProfileCreateResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use ProfileCreateResponse() / ProfileCreateResponse.new instead')
   static ProfileCreateResponse create() => ProfileCreateResponse._();
+  static $pb.GeneratedMessage $_createMessage() => ProfileCreateResponse._();
   @$core.override
-  ProfileCreateResponse createEmptyInstance() => create();
+  ProfileCreateResponse createEmptyInstance() => ProfileCreateResponse._();
   @$core.pragma('dart2js:noInline')
   static ProfileCreateResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<ProfileCreateResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<ProfileCreateResponse>(
+          ProfileCreateResponse.$_createMessage);
   static ProfileCreateResponse? _defaultInstance;
 
   @$pb.TagNumber(1)

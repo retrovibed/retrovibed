@@ -275,10 +275,9 @@ func (x *PublishContentResponse) GetPublishedContent() *PublishedContent {
 }
 
 type PublishContentDeleteRequest struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	PublishedContent *PublishedContent      `protobuf:"bytes,1,opt,name=published_content,proto3" json:"published_content,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *PublishContentDeleteRequest) Reset() {
@@ -309,13 +308,6 @@ func (x *PublishContentDeleteRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use PublishContentDeleteRequest.ProtoReflect.Descriptor instead.
 func (*PublishContentDeleteRequest) Descriptor() ([]byte, []int) {
 	return file_community_community_publish_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *PublishContentDeleteRequest) GetPublishedContent() *PublishedContent {
-	if x != nil {
-		return x.PublishedContent
-	}
-	return nil
 }
 
 type PublishContentDeleteResponse struct {
@@ -532,9 +524,8 @@ const file_community_community_publish_proto_rawDesc = "" +
 	"\x11published_content\x18\x01 \x01(\v2&.retrovibed.community.PublishedContentR\x11published_content\x12E\n" +
 	"\fpublish_mode\x18\x02 \x01(\x0e2!.retrovibed.community.PublishModeR\fpublish_modeJ\x04\b\x03\x10\x04\"n\n" +
 	"\x16PublishContentResponse\x12T\n" +
-	"\x11published_content\x18\x01 \x01(\v2&.retrovibed.community.PublishedContentR\x11published_content\"s\n" +
-	"\x1bPublishContentDeleteRequest\x12T\n" +
-	"\x11published_content\x18\x01 \x01(\v2&.retrovibed.community.PublishedContentR\x11published_content\"t\n" +
+	"\x11published_content\x18\x01 \x01(\v2&.retrovibed.community.PublishedContentR\x11published_content\"\x1d\n" +
+	"\x1bPublishContentDeleteRequest\"t\n" +
 	"\x1cPublishContentDeleteResponse\x12T\n" +
 	"\x11published_content\x18\x01 \x01(\v2&.retrovibed.community.PublishedContentR\x11published_content\"\xac\x01\n" +
 	"\x1dPublishedContentSearchRequest\x12\"\n" +
@@ -576,16 +567,15 @@ var file_community_community_publish_proto_depIdxs = []int32{
 	0, // 0: retrovibed.community.PublishContentRequest.published_content:type_name -> retrovibed.community.PublishedContent
 	7, // 1: retrovibed.community.PublishContentRequest.publish_mode:type_name -> retrovibed.community.PublishMode
 	0, // 2: retrovibed.community.PublishContentResponse.published_content:type_name -> retrovibed.community.PublishedContent
-	0, // 3: retrovibed.community.PublishContentDeleteRequest.published_content:type_name -> retrovibed.community.PublishedContent
-	0, // 4: retrovibed.community.PublishContentDeleteResponse.published_content:type_name -> retrovibed.community.PublishedContent
-	8, // 5: retrovibed.community.PublishedContentSearchResponse.community:type_name -> retrovibed.community.Community
-	5, // 6: retrovibed.community.PublishedContentSearchResponse.next:type_name -> retrovibed.community.PublishedContentSearchRequest
-	0, // 7: retrovibed.community.PublishedContentSearchResponse.items:type_name -> retrovibed.community.PublishedContent
-	8, // [8:8] is the sub-list for method output_type
-	8, // [8:8] is the sub-list for method input_type
-	8, // [8:8] is the sub-list for extension type_name
-	8, // [8:8] is the sub-list for extension extendee
-	0, // [0:8] is the sub-list for field type_name
+	0, // 3: retrovibed.community.PublishContentDeleteResponse.published_content:type_name -> retrovibed.community.PublishedContent
+	8, // 4: retrovibed.community.PublishedContentSearchResponse.community:type_name -> retrovibed.community.Community
+	5, // 5: retrovibed.community.PublishedContentSearchResponse.next:type_name -> retrovibed.community.PublishedContentSearchRequest
+	0, // 6: retrovibed.community.PublishedContentSearchResponse.items:type_name -> retrovibed.community.PublishedContent
+	7, // [7:7] is the sub-list for method output_type
+	7, // [7:7] is the sub-list for method input_type
+	7, // [7:7] is the sub-list for extension type_name
+	7, // [7:7] is the sub-list for extension extendee
+	0, // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_community_community_publish_proto_init() }

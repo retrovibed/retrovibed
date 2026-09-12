@@ -21,7 +21,7 @@ class DateRange extends $pb.GeneratedMessage {
     $core.String? oldest,
     $core.String? newest,
   }) {
-    final result = create();
+    final result = DateRange._();
     if (oldest != null) result.oldest = oldest;
     if (newest != null) result.newest = newest;
     return result;
@@ -31,15 +31,15 @@ class DateRange extends $pb.GeneratedMessage {
 
   factory DateRange.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      DateRange()..mergeFromBuffer(data, registry);
   factory DateRange.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      DateRange()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'DateRange',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: DateRange.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'oldest')
     ..aOS(2, _omitFieldNames ? '' : 'newest')
     ..hasRequiredFields = false;
@@ -54,12 +54,14 @@ class DateRange extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use DateRange() / DateRange.new instead')
   static DateRange create() => DateRange._();
+  static $pb.GeneratedMessage $_createMessage() => DateRange._();
   @$core.override
-  DateRange createEmptyInstance() => create();
+  DateRange createEmptyInstance() => DateRange._();
   @$core.pragma('dart2js:noInline')
-  static DateRange getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DateRange>(create);
+  static DateRange getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<DateRange>(DateRange.$_createMessage);
   static DateRange? _defaultInstance;
 
   @$pb.TagNumber(1)

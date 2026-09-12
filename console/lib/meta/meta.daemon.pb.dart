@@ -27,7 +27,7 @@ class Daemon extends $pb.GeneratedMessage {
     $core.bool? default_100,
     $core.bool? downloads,
   }) {
-    final result = create();
+    final result = Daemon._();
     if (id != null) result.id = id;
     if (createdAt != null) result.createdAt = createdAt;
     if (updatedAt != null) result.updatedAt = updatedAt;
@@ -42,15 +42,15 @@ class Daemon extends $pb.GeneratedMessage {
 
   factory Daemon.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      Daemon()..mergeFromBuffer(data, registry);
   factory Daemon.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      Daemon()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'Daemon',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: Daemon.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'id')
     ..aOS(2, _omitFieldNames ? '' : 'created_at')
     ..aOS(3, _omitFieldNames ? '' : 'updated_at')
@@ -70,12 +70,14 @@ class Daemon extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use Daemon() / Daemon.new instead')
   static Daemon create() => Daemon._();
+  static $pb.GeneratedMessage $_createMessage() => Daemon._();
   @$core.override
-  Daemon createEmptyInstance() => create();
+  Daemon createEmptyInstance() => Daemon._();
   @$core.pragma('dart2js:noInline')
-  static Daemon getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Daemon>(create);
+  static Daemon getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<Daemon>(Daemon.$_createMessage);
   static Daemon? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -148,7 +150,7 @@ class DaemonSearchRequest extends $pb.GeneratedMessage {
     $fixnum.Int64? offset,
     $fixnum.Int64? limit,
   }) {
-    final result = create();
+    final result = DaemonSearchRequest._();
     if (query != null) result.query = query;
     if (offset != null) result.offset = offset;
     if (limit != null) result.limit = limit;
@@ -159,15 +161,15 @@ class DaemonSearchRequest extends $pb.GeneratedMessage {
 
   factory DaemonSearchRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      DaemonSearchRequest()..mergeFromBuffer(data, registry);
   factory DaemonSearchRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      DaemonSearchRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'DaemonSearchRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: DaemonSearchRequest.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'query')
     ..a<$fixnum.Int64>(2, _omitFieldNames ? '' : 'offset', $pb.PbFieldType.OU6,
         defaultOrMaker: $fixnum.Int64.ZERO)
@@ -186,12 +188,16 @@ class DaemonSearchRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use DaemonSearchRequest() / DaemonSearchRequest.new instead')
   static DaemonSearchRequest create() => DaemonSearchRequest._();
+  static $pb.GeneratedMessage $_createMessage() => DaemonSearchRequest._();
   @$core.override
-  DaemonSearchRequest createEmptyInstance() => create();
+  DaemonSearchRequest createEmptyInstance() => DaemonSearchRequest._();
   @$core.pragma('dart2js:noInline')
   static DaemonSearchRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DaemonSearchRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<DaemonSearchRequest>(
+          DaemonSearchRequest.$_createMessage);
   static DaemonSearchRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -227,7 +233,7 @@ class DaemonSearchResponse extends $pb.GeneratedMessage {
     DaemonSearchRequest? next,
     $core.Iterable<Daemon>? items,
   }) {
-    final result = create();
+    final result = DaemonSearchResponse._();
     if (next != null) result.next = next;
     if (items != null) result.items.addAll(items);
     return result;
@@ -237,18 +243,19 @@ class DaemonSearchResponse extends $pb.GeneratedMessage {
 
   factory DaemonSearchResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      DaemonSearchResponse()..mergeFromBuffer(data, registry);
   factory DaemonSearchResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      DaemonSearchResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'DaemonSearchResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: DaemonSearchResponse.$_createMessage)
     ..aOM<DaemonSearchRequest>(1, _omitFieldNames ? '' : 'next',
-        subBuilder: DaemonSearchRequest.create)
-    ..pPM<Daemon>(2, _omitFieldNames ? '' : 'items', subBuilder: Daemon.create)
+        subBuilder: DaemonSearchRequest.$_createMessage)
+    ..pPM<Daemon>(2, _omitFieldNames ? '' : 'items',
+        subBuilder: Daemon.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -262,12 +269,16 @@ class DaemonSearchResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use DaemonSearchResponse() / DaemonSearchResponse.new instead')
   static DaemonSearchResponse create() => DaemonSearchResponse._();
+  static $pb.GeneratedMessage $_createMessage() => DaemonSearchResponse._();
   @$core.override
-  DaemonSearchResponse createEmptyInstance() => create();
+  DaemonSearchResponse createEmptyInstance() => DaemonSearchResponse._();
   @$core.pragma('dart2js:noInline')
   static DaemonSearchResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DaemonSearchResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<DaemonSearchResponse>(
+          DaemonSearchResponse.$_createMessage);
   static DaemonSearchResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -289,7 +300,7 @@ class DaemonCreateRequest extends $pb.GeneratedMessage {
   factory DaemonCreateRequest({
     Daemon? daemon,
   }) {
-    final result = create();
+    final result = DaemonCreateRequest._();
     if (daemon != null) result.daemon = daemon;
     return result;
   }
@@ -298,16 +309,17 @@ class DaemonCreateRequest extends $pb.GeneratedMessage {
 
   factory DaemonCreateRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      DaemonCreateRequest()..mergeFromBuffer(data, registry);
   factory DaemonCreateRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      DaemonCreateRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'DaemonCreateRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
-    ..aOM<Daemon>(1, _omitFieldNames ? '' : 'daemon', subBuilder: Daemon.create)
+      createEmptyInstance: DaemonCreateRequest.$_createMessage)
+    ..aOM<Daemon>(1, _omitFieldNames ? '' : 'daemon',
+        subBuilder: Daemon.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -321,12 +333,16 @@ class DaemonCreateRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use DaemonCreateRequest() / DaemonCreateRequest.new instead')
   static DaemonCreateRequest create() => DaemonCreateRequest._();
+  static $pb.GeneratedMessage $_createMessage() => DaemonCreateRequest._();
   @$core.override
-  DaemonCreateRequest createEmptyInstance() => create();
+  DaemonCreateRequest createEmptyInstance() => DaemonCreateRequest._();
   @$core.pragma('dart2js:noInline')
   static DaemonCreateRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DaemonCreateRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<DaemonCreateRequest>(
+          DaemonCreateRequest.$_createMessage);
   static DaemonCreateRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -345,7 +361,7 @@ class DaemonCreateResponse extends $pb.GeneratedMessage {
   factory DaemonCreateResponse({
     Daemon? daemon,
   }) {
-    final result = create();
+    final result = DaemonCreateResponse._();
     if (daemon != null) result.daemon = daemon;
     return result;
   }
@@ -354,16 +370,17 @@ class DaemonCreateResponse extends $pb.GeneratedMessage {
 
   factory DaemonCreateResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      DaemonCreateResponse()..mergeFromBuffer(data, registry);
   factory DaemonCreateResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      DaemonCreateResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'DaemonCreateResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
-    ..aOM<Daemon>(1, _omitFieldNames ? '' : 'daemon', subBuilder: Daemon.create)
+      createEmptyInstance: DaemonCreateResponse.$_createMessage)
+    ..aOM<Daemon>(1, _omitFieldNames ? '' : 'daemon',
+        subBuilder: Daemon.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -377,12 +394,16 @@ class DaemonCreateResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use DaemonCreateResponse() / DaemonCreateResponse.new instead')
   static DaemonCreateResponse create() => DaemonCreateResponse._();
+  static $pb.GeneratedMessage $_createMessage() => DaemonCreateResponse._();
   @$core.override
-  DaemonCreateResponse createEmptyInstance() => create();
+  DaemonCreateResponse createEmptyInstance() => DaemonCreateResponse._();
   @$core.pragma('dart2js:noInline')
   static DaemonCreateResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DaemonCreateResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<DaemonCreateResponse>(
+          DaemonCreateResponse.$_createMessage);
   static DaemonCreateResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -398,21 +419,21 @@ class DaemonCreateResponse extends $pb.GeneratedMessage {
 }
 
 class DaemonDeleteRequest extends $pb.GeneratedMessage {
-  factory DaemonDeleteRequest() => create();
+  factory DaemonDeleteRequest() => DaemonDeleteRequest._();
 
   DaemonDeleteRequest._();
 
   factory DaemonDeleteRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      DaemonDeleteRequest()..mergeFromBuffer(data, registry);
   factory DaemonDeleteRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      DaemonDeleteRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'DaemonDeleteRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: DaemonDeleteRequest.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -426,12 +447,16 @@ class DaemonDeleteRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use DaemonDeleteRequest() / DaemonDeleteRequest.new instead')
   static DaemonDeleteRequest create() => DaemonDeleteRequest._();
+  static $pb.GeneratedMessage $_createMessage() => DaemonDeleteRequest._();
   @$core.override
-  DaemonDeleteRequest createEmptyInstance() => create();
+  DaemonDeleteRequest createEmptyInstance() => DaemonDeleteRequest._();
   @$core.pragma('dart2js:noInline')
   static DaemonDeleteRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DaemonDeleteRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<DaemonDeleteRequest>(
+          DaemonDeleteRequest.$_createMessage);
   static DaemonDeleteRequest? _defaultInstance;
 }
 
@@ -439,7 +464,7 @@ class DaemonDeleteResponse extends $pb.GeneratedMessage {
   factory DaemonDeleteResponse({
     Daemon? daemon,
   }) {
-    final result = create();
+    final result = DaemonDeleteResponse._();
     if (daemon != null) result.daemon = daemon;
     return result;
   }
@@ -448,16 +473,17 @@ class DaemonDeleteResponse extends $pb.GeneratedMessage {
 
   factory DaemonDeleteResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      DaemonDeleteResponse()..mergeFromBuffer(data, registry);
   factory DaemonDeleteResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      DaemonDeleteResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'DaemonDeleteResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
-    ..aOM<Daemon>(1, _omitFieldNames ? '' : 'daemon', subBuilder: Daemon.create)
+      createEmptyInstance: DaemonDeleteResponse.$_createMessage)
+    ..aOM<Daemon>(1, _omitFieldNames ? '' : 'daemon',
+        subBuilder: Daemon.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -471,12 +497,16 @@ class DaemonDeleteResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use DaemonDeleteResponse() / DaemonDeleteResponse.new instead')
   static DaemonDeleteResponse create() => DaemonDeleteResponse._();
+  static $pb.GeneratedMessage $_createMessage() => DaemonDeleteResponse._();
   @$core.override
-  DaemonDeleteResponse createEmptyInstance() => create();
+  DaemonDeleteResponse createEmptyInstance() => DaemonDeleteResponse._();
   @$core.pragma('dart2js:noInline')
   static DaemonDeleteResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DaemonDeleteResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<DaemonDeleteResponse>(
+          DaemonDeleteResponse.$_createMessage);
   static DaemonDeleteResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -492,21 +522,21 @@ class DaemonDeleteResponse extends $pb.GeneratedMessage {
 }
 
 class DaemonLookupRequest extends $pb.GeneratedMessage {
-  factory DaemonLookupRequest() => create();
+  factory DaemonLookupRequest() => DaemonLookupRequest._();
 
   DaemonLookupRequest._();
 
   factory DaemonLookupRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      DaemonLookupRequest()..mergeFromBuffer(data, registry);
   factory DaemonLookupRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      DaemonLookupRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'DaemonLookupRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: DaemonLookupRequest.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -520,12 +550,16 @@ class DaemonLookupRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use DaemonLookupRequest() / DaemonLookupRequest.new instead')
   static DaemonLookupRequest create() => DaemonLookupRequest._();
+  static $pb.GeneratedMessage $_createMessage() => DaemonLookupRequest._();
   @$core.override
-  DaemonLookupRequest createEmptyInstance() => create();
+  DaemonLookupRequest createEmptyInstance() => DaemonLookupRequest._();
   @$core.pragma('dart2js:noInline')
   static DaemonLookupRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DaemonLookupRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<DaemonLookupRequest>(
+          DaemonLookupRequest.$_createMessage);
   static DaemonLookupRequest? _defaultInstance;
 }
 
@@ -533,7 +567,7 @@ class DaemonLookupResponse extends $pb.GeneratedMessage {
   factory DaemonLookupResponse({
     Daemon? daemon,
   }) {
-    final result = create();
+    final result = DaemonLookupResponse._();
     if (daemon != null) result.daemon = daemon;
     return result;
   }
@@ -542,16 +576,17 @@ class DaemonLookupResponse extends $pb.GeneratedMessage {
 
   factory DaemonLookupResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      DaemonLookupResponse()..mergeFromBuffer(data, registry);
   factory DaemonLookupResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      DaemonLookupResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'DaemonLookupResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
-    ..aOM<Daemon>(1, _omitFieldNames ? '' : 'daemon', subBuilder: Daemon.create)
+      createEmptyInstance: DaemonLookupResponse.$_createMessage)
+    ..aOM<Daemon>(1, _omitFieldNames ? '' : 'daemon',
+        subBuilder: Daemon.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -565,12 +600,16 @@ class DaemonLookupResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use DaemonLookupResponse() / DaemonLookupResponse.new instead')
   static DaemonLookupResponse create() => DaemonLookupResponse._();
+  static $pb.GeneratedMessage $_createMessage() => DaemonLookupResponse._();
   @$core.override
-  DaemonLookupResponse createEmptyInstance() => create();
+  DaemonLookupResponse createEmptyInstance() => DaemonLookupResponse._();
   @$core.pragma('dart2js:noInline')
   static DaemonLookupResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DaemonLookupResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<DaemonLookupResponse>(
+          DaemonLookupResponse.$_createMessage);
   static DaemonLookupResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -589,7 +628,7 @@ class DaemonUpdateRequest extends $pb.GeneratedMessage {
   factory DaemonUpdateRequest({
     Daemon? daemon,
   }) {
-    final result = create();
+    final result = DaemonUpdateRequest._();
     if (daemon != null) result.daemon = daemon;
     return result;
   }
@@ -598,16 +637,17 @@ class DaemonUpdateRequest extends $pb.GeneratedMessage {
 
   factory DaemonUpdateRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      DaemonUpdateRequest()..mergeFromBuffer(data, registry);
   factory DaemonUpdateRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      DaemonUpdateRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'DaemonUpdateRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
-    ..aOM<Daemon>(1, _omitFieldNames ? '' : 'daemon', subBuilder: Daemon.create)
+      createEmptyInstance: DaemonUpdateRequest.$_createMessage)
+    ..aOM<Daemon>(1, _omitFieldNames ? '' : 'daemon',
+        subBuilder: Daemon.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -621,12 +661,16 @@ class DaemonUpdateRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use DaemonUpdateRequest() / DaemonUpdateRequest.new instead')
   static DaemonUpdateRequest create() => DaemonUpdateRequest._();
+  static $pb.GeneratedMessage $_createMessage() => DaemonUpdateRequest._();
   @$core.override
-  DaemonUpdateRequest createEmptyInstance() => create();
+  DaemonUpdateRequest createEmptyInstance() => DaemonUpdateRequest._();
   @$core.pragma('dart2js:noInline')
   static DaemonUpdateRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DaemonUpdateRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<DaemonUpdateRequest>(
+          DaemonUpdateRequest.$_createMessage);
   static DaemonUpdateRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -645,7 +689,7 @@ class DaemonUpdateResponse extends $pb.GeneratedMessage {
   factory DaemonUpdateResponse({
     Daemon? daemon,
   }) {
-    final result = create();
+    final result = DaemonUpdateResponse._();
     if (daemon != null) result.daemon = daemon;
     return result;
   }
@@ -654,16 +698,17 @@ class DaemonUpdateResponse extends $pb.GeneratedMessage {
 
   factory DaemonUpdateResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      DaemonUpdateResponse()..mergeFromBuffer(data, registry);
   factory DaemonUpdateResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      DaemonUpdateResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'DaemonUpdateResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
-    ..aOM<Daemon>(1, _omitFieldNames ? '' : 'daemon', subBuilder: Daemon.create)
+      createEmptyInstance: DaemonUpdateResponse.$_createMessage)
+    ..aOM<Daemon>(1, _omitFieldNames ? '' : 'daemon',
+        subBuilder: Daemon.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -677,12 +722,16 @@ class DaemonUpdateResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use DaemonUpdateResponse() / DaemonUpdateResponse.new instead')
   static DaemonUpdateResponse create() => DaemonUpdateResponse._();
+  static $pb.GeneratedMessage $_createMessage() => DaemonUpdateResponse._();
   @$core.override
-  DaemonUpdateResponse createEmptyInstance() => create();
+  DaemonUpdateResponse createEmptyInstance() => DaemonUpdateResponse._();
   @$core.pragma('dart2js:noInline')
   static DaemonUpdateResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DaemonUpdateResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<DaemonUpdateResponse>(
+          DaemonUpdateResponse.$_createMessage);
   static DaemonUpdateResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -701,7 +750,7 @@ class DaemonDisableRequest extends $pb.GeneratedMessage {
   factory DaemonDisableRequest({
     Daemon? daemon,
   }) {
-    final result = create();
+    final result = DaemonDisableRequest._();
     if (daemon != null) result.daemon = daemon;
     return result;
   }
@@ -710,16 +759,17 @@ class DaemonDisableRequest extends $pb.GeneratedMessage {
 
   factory DaemonDisableRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      DaemonDisableRequest()..mergeFromBuffer(data, registry);
   factory DaemonDisableRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      DaemonDisableRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'DaemonDisableRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
-    ..aOM<Daemon>(1, _omitFieldNames ? '' : 'daemon', subBuilder: Daemon.create)
+      createEmptyInstance: DaemonDisableRequest.$_createMessage)
+    ..aOM<Daemon>(1, _omitFieldNames ? '' : 'daemon',
+        subBuilder: Daemon.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -733,12 +783,16 @@ class DaemonDisableRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use DaemonDisableRequest() / DaemonDisableRequest.new instead')
   static DaemonDisableRequest create() => DaemonDisableRequest._();
+  static $pb.GeneratedMessage $_createMessage() => DaemonDisableRequest._();
   @$core.override
-  DaemonDisableRequest createEmptyInstance() => create();
+  DaemonDisableRequest createEmptyInstance() => DaemonDisableRequest._();
   @$core.pragma('dart2js:noInline')
   static DaemonDisableRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DaemonDisableRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<DaemonDisableRequest>(
+          DaemonDisableRequest.$_createMessage);
   static DaemonDisableRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -757,7 +811,7 @@ class DaemonDisableResponse extends $pb.GeneratedMessage {
   factory DaemonDisableResponse({
     Daemon? daemon,
   }) {
-    final result = create();
+    final result = DaemonDisableResponse._();
     if (daemon != null) result.daemon = daemon;
     return result;
   }
@@ -766,16 +820,17 @@ class DaemonDisableResponse extends $pb.GeneratedMessage {
 
   factory DaemonDisableResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      DaemonDisableResponse()..mergeFromBuffer(data, registry);
   factory DaemonDisableResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      DaemonDisableResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'DaemonDisableResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
-    ..aOM<Daemon>(1, _omitFieldNames ? '' : 'daemon', subBuilder: Daemon.create)
+      createEmptyInstance: DaemonDisableResponse.$_createMessage)
+    ..aOM<Daemon>(1, _omitFieldNames ? '' : 'daemon',
+        subBuilder: Daemon.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -790,12 +845,16 @@ class DaemonDisableResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use DaemonDisableResponse() / DaemonDisableResponse.new instead')
   static DaemonDisableResponse create() => DaemonDisableResponse._();
+  static $pb.GeneratedMessage $_createMessage() => DaemonDisableResponse._();
   @$core.override
-  DaemonDisableResponse createEmptyInstance() => create();
+  DaemonDisableResponse createEmptyInstance() => DaemonDisableResponse._();
   @$core.pragma('dart2js:noInline')
   static DaemonDisableResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DaemonDisableResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<DaemonDisableResponse>(
+          DaemonDisableResponse.$_createMessage);
   static DaemonDisableResponse? _defaultInstance;
 
   @$pb.TagNumber(1)

@@ -26,7 +26,7 @@ class WireguardDiagnostics extends $pb.GeneratedMessage {
     $fixnum.Int64? lastHandshakeSec,
     $core.String? status,
   }) {
-    final result = create();
+    final result = WireguardDiagnostics._();
     if (peerKey != null) result.peerKey = peerKey;
     if (keepaliveInterval != null) result.keepaliveInterval = keepaliveInterval;
     if (txBytes != null) result.txBytes = txBytes;
@@ -40,15 +40,15 @@ class WireguardDiagnostics extends $pb.GeneratedMessage {
 
   factory WireguardDiagnostics.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      WireguardDiagnostics()..mergeFromBuffer(data, registry);
   factory WireguardDiagnostics.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      WireguardDiagnostics()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'WireguardDiagnostics',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: WireguardDiagnostics.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'peer_key')
     ..a<$fixnum.Int64>(
         2, _omitFieldNames ? '' : 'keepalive_interval', $pb.PbFieldType.OU6,
@@ -74,12 +74,16 @@ class WireguardDiagnostics extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use WireguardDiagnostics() / WireguardDiagnostics.new instead')
   static WireguardDiagnostics create() => WireguardDiagnostics._();
+  static $pb.GeneratedMessage $_createMessage() => WireguardDiagnostics._();
   @$core.override
-  WireguardDiagnostics createEmptyInstance() => create();
+  WireguardDiagnostics createEmptyInstance() => WireguardDiagnostics._();
   @$core.pragma('dart2js:noInline')
   static WireguardDiagnostics getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<WireguardDiagnostics>(create);
+      $pb.GeneratedMessage.$_defaultFor<WireguardDiagnostics>(
+          WireguardDiagnostics.$_createMessage);
   static WireguardDiagnostics? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -143,7 +147,7 @@ class NetworkInterface extends $pb.GeneratedMessage {
     $core.String? ip,
     $core.bool? metered,
   }) {
-    final result = create();
+    final result = NetworkInterface._();
     if (name != null) result.name = name;
     if (ip != null) result.ip = ip;
     if (metered != null) result.metered = metered;
@@ -154,15 +158,15 @@ class NetworkInterface extends $pb.GeneratedMessage {
 
   factory NetworkInterface.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      NetworkInterface()..mergeFromBuffer(data, registry);
   factory NetworkInterface.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      NetworkInterface()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'NetworkInterface',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: NetworkInterface.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'name')
     ..aOS(2, _omitFieldNames ? '' : 'ip')
     ..aOB(3, _omitFieldNames ? '' : 'metered')
@@ -179,12 +183,15 @@ class NetworkInterface extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use NetworkInterface() / NetworkInterface.new instead')
   static NetworkInterface create() => NetworkInterface._();
+  static $pb.GeneratedMessage $_createMessage() => NetworkInterface._();
   @$core.override
-  NetworkInterface createEmptyInstance() => create();
+  NetworkInterface createEmptyInstance() => NetworkInterface._();
   @$core.pragma('dart2js:noInline')
-  static NetworkInterface getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<NetworkInterface>(create);
+  static NetworkInterface getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<NetworkInterface>(
+          NetworkInterface.$_createMessage);
   static NetworkInterface? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -222,7 +229,7 @@ class Network extends $pb.GeneratedMessage {
     $core.bool? haveV6,
     $core.String? defaultInterface,
   }) {
-    final result = create();
+    final result = Network._();
     if (interfaces != null) result.interfaces.addAll(interfaces);
     if (haveV4 != null) result.haveV4 = haveV4;
     if (haveV6 != null) result.haveV6 = haveV6;
@@ -234,17 +241,17 @@ class Network extends $pb.GeneratedMessage {
 
   factory Network.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      Network()..mergeFromBuffer(data, registry);
   factory Network.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      Network()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'Network',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: Network.$_createMessage)
     ..pPM<NetworkInterface>(1, _omitFieldNames ? '' : 'interfaces',
-        subBuilder: NetworkInterface.create)
+        subBuilder: NetworkInterface.$_createMessage)
     ..aOB(2, _omitFieldNames ? '' : 'have_v4')
     ..aOB(3, _omitFieldNames ? '' : 'have_v6')
     ..aOS(4, _omitFieldNames ? '' : 'default_interface')
@@ -260,12 +267,14 @@ class Network extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use Network() / Network.new instead')
   static Network create() => Network._();
+  static $pb.GeneratedMessage $_createMessage() => Network._();
   @$core.override
-  Network createEmptyInstance() => create();
+  Network createEmptyInstance() => Network._();
   @$core.pragma('dart2js:noInline')
-  static Network getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Network>(create);
+  static Network getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<Network>(Network.$_createMessage);
   static Network? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -304,7 +313,7 @@ class NetworkMetricsResponse extends $pb.GeneratedMessage {
     WireguardDiagnostics? wireguard,
     Network? network,
   }) {
-    final result = create();
+    final result = NetworkMetricsResponse._();
     if (wireguard != null) result.wireguard = wireguard;
     if (network != null) result.network = network;
     return result;
@@ -314,19 +323,19 @@ class NetworkMetricsResponse extends $pb.GeneratedMessage {
 
   factory NetworkMetricsResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      NetworkMetricsResponse()..mergeFromBuffer(data, registry);
   factory NetworkMetricsResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      NetworkMetricsResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'NetworkMetricsResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: NetworkMetricsResponse.$_createMessage)
     ..aOM<WireguardDiagnostics>(1, _omitFieldNames ? '' : 'wireguard',
-        subBuilder: WireguardDiagnostics.create)
+        subBuilder: WireguardDiagnostics.$_createMessage)
     ..aOM<Network>(2, _omitFieldNames ? '' : 'network',
-        subBuilder: Network.create)
+        subBuilder: Network.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -341,12 +350,16 @@ class NetworkMetricsResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use NetworkMetricsResponse() / NetworkMetricsResponse.new instead')
   static NetworkMetricsResponse create() => NetworkMetricsResponse._();
+  static $pb.GeneratedMessage $_createMessage() => NetworkMetricsResponse._();
   @$core.override
-  NetworkMetricsResponse createEmptyInstance() => create();
+  NetworkMetricsResponse createEmptyInstance() => NetworkMetricsResponse._();
   @$core.pragma('dart2js:noInline')
   static NetworkMetricsResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<NetworkMetricsResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<NetworkMetricsResponse>(
+          NetworkMetricsResponse.$_createMessage);
   static NetworkMetricsResponse? _defaultInstance;
 
   @$pb.TagNumber(1)

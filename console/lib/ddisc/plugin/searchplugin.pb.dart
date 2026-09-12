@@ -24,7 +24,7 @@ class Plugin extends $pb.GeneratedMessage {
     $fixnum.Int64? size,
     $core.String? installedAt,
   }) {
-    final result = create();
+    final result = Plugin._();
     if (id != null) result.id = id;
     if (name != null) result.name = name;
     if (size != null) result.size = size;
@@ -36,15 +36,15 @@ class Plugin extends $pb.GeneratedMessage {
 
   factory Plugin.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      Plugin()..mergeFromBuffer(data, registry);
   factory Plugin.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      Plugin()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'Plugin',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'searchplugin'),
-      createEmptyInstance: create)
+      createEmptyInstance: Plugin.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'id')
     ..aOS(2, _omitFieldNames ? '' : 'name')
     ..a<$fixnum.Int64>(3, _omitFieldNames ? '' : 'size', $pb.PbFieldType.OU6,
@@ -62,12 +62,14 @@ class Plugin extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use Plugin() / Plugin.new instead')
   static Plugin create() => Plugin._();
+  static $pb.GeneratedMessage $_createMessage() => Plugin._();
   @$core.override
-  Plugin createEmptyInstance() => create();
+  Plugin createEmptyInstance() => Plugin._();
   @$core.pragma('dart2js:noInline')
-  static Plugin getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Plugin>(create);
+  static Plugin getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<Plugin>(Plugin.$_createMessage);
   static Plugin? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -112,7 +114,7 @@ class PluginSearchRequest extends $pb.GeneratedMessage {
     $fixnum.Int64? offset,
     $fixnum.Int64? limit,
   }) {
-    final result = create();
+    final result = PluginSearchRequest._();
     if (offset != null) result.offset = offset;
     if (limit != null) result.limit = limit;
     return result;
@@ -122,15 +124,15 @@ class PluginSearchRequest extends $pb.GeneratedMessage {
 
   factory PluginSearchRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      PluginSearchRequest()..mergeFromBuffer(data, registry);
   factory PluginSearchRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      PluginSearchRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'PluginSearchRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'searchplugin'),
-      createEmptyInstance: create)
+      createEmptyInstance: PluginSearchRequest.$_createMessage)
     ..a<$fixnum.Int64>(1, _omitFieldNames ? '' : 'offset', $pb.PbFieldType.OU6,
         defaultOrMaker: $fixnum.Int64.ZERO)
     ..a<$fixnum.Int64>(2, _omitFieldNames ? '' : 'limit', $pb.PbFieldType.OU6,
@@ -148,12 +150,16 @@ class PluginSearchRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use PluginSearchRequest() / PluginSearchRequest.new instead')
   static PluginSearchRequest create() => PluginSearchRequest._();
+  static $pb.GeneratedMessage $_createMessage() => PluginSearchRequest._();
   @$core.override
-  PluginSearchRequest createEmptyInstance() => create();
+  PluginSearchRequest createEmptyInstance() => PluginSearchRequest._();
   @$core.pragma('dart2js:noInline')
   static PluginSearchRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<PluginSearchRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<PluginSearchRequest>(
+          PluginSearchRequest.$_createMessage);
   static PluginSearchRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -180,7 +186,7 @@ class PluginSearchResponse extends $pb.GeneratedMessage {
     PluginSearchRequest? next,
     $core.Iterable<Plugin>? items,
   }) {
-    final result = create();
+    final result = PluginSearchResponse._();
     if (next != null) result.next = next;
     if (items != null) result.items.addAll(items);
     return result;
@@ -190,18 +196,19 @@ class PluginSearchResponse extends $pb.GeneratedMessage {
 
   factory PluginSearchResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      PluginSearchResponse()..mergeFromBuffer(data, registry);
   factory PluginSearchResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      PluginSearchResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'PluginSearchResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'searchplugin'),
-      createEmptyInstance: create)
+      createEmptyInstance: PluginSearchResponse.$_createMessage)
     ..aOM<PluginSearchRequest>(1, _omitFieldNames ? '' : 'next',
-        subBuilder: PluginSearchRequest.create)
-    ..pPM<Plugin>(2, _omitFieldNames ? '' : 'items', subBuilder: Plugin.create)
+        subBuilder: PluginSearchRequest.$_createMessage)
+    ..pPM<Plugin>(2, _omitFieldNames ? '' : 'items',
+        subBuilder: Plugin.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -215,12 +222,16 @@ class PluginSearchResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use PluginSearchResponse() / PluginSearchResponse.new instead')
   static PluginSearchResponse create() => PluginSearchResponse._();
+  static $pb.GeneratedMessage $_createMessage() => PluginSearchResponse._();
   @$core.override
-  PluginSearchResponse createEmptyInstance() => create();
+  PluginSearchResponse createEmptyInstance() => PluginSearchResponse._();
   @$core.pragma('dart2js:noInline')
   static PluginSearchResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<PluginSearchResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<PluginSearchResponse>(
+          PluginSearchResponse.$_createMessage);
   static PluginSearchResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -239,21 +250,21 @@ class PluginSearchResponse extends $pb.GeneratedMessage {
 }
 
 class PluginCreateRequest extends $pb.GeneratedMessage {
-  factory PluginCreateRequest() => create();
+  factory PluginCreateRequest() => PluginCreateRequest._();
 
   PluginCreateRequest._();
 
   factory PluginCreateRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      PluginCreateRequest()..mergeFromBuffer(data, registry);
   factory PluginCreateRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      PluginCreateRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'PluginCreateRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'searchplugin'),
-      createEmptyInstance: create)
+      createEmptyInstance: PluginCreateRequest.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -267,12 +278,16 @@ class PluginCreateRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use PluginCreateRequest() / PluginCreateRequest.new instead')
   static PluginCreateRequest create() => PluginCreateRequest._();
+  static $pb.GeneratedMessage $_createMessage() => PluginCreateRequest._();
   @$core.override
-  PluginCreateRequest createEmptyInstance() => create();
+  PluginCreateRequest createEmptyInstance() => PluginCreateRequest._();
   @$core.pragma('dart2js:noInline')
   static PluginCreateRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<PluginCreateRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<PluginCreateRequest>(
+          PluginCreateRequest.$_createMessage);
   static PluginCreateRequest? _defaultInstance;
 }
 
@@ -280,7 +295,7 @@ class PluginCreateResponse extends $pb.GeneratedMessage {
   factory PluginCreateResponse({
     Plugin? plugin,
   }) {
-    final result = create();
+    final result = PluginCreateResponse._();
     if (plugin != null) result.plugin = plugin;
     return result;
   }
@@ -289,16 +304,17 @@ class PluginCreateResponse extends $pb.GeneratedMessage {
 
   factory PluginCreateResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      PluginCreateResponse()..mergeFromBuffer(data, registry);
   factory PluginCreateResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      PluginCreateResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'PluginCreateResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'searchplugin'),
-      createEmptyInstance: create)
-    ..aOM<Plugin>(1, _omitFieldNames ? '' : 'plugin', subBuilder: Plugin.create)
+      createEmptyInstance: PluginCreateResponse.$_createMessage)
+    ..aOM<Plugin>(1, _omitFieldNames ? '' : 'plugin',
+        subBuilder: Plugin.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -312,12 +328,16 @@ class PluginCreateResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use PluginCreateResponse() / PluginCreateResponse.new instead')
   static PluginCreateResponse create() => PluginCreateResponse._();
+  static $pb.GeneratedMessage $_createMessage() => PluginCreateResponse._();
   @$core.override
-  PluginCreateResponse createEmptyInstance() => create();
+  PluginCreateResponse createEmptyInstance() => PluginCreateResponse._();
   @$core.pragma('dart2js:noInline')
   static PluginCreateResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<PluginCreateResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<PluginCreateResponse>(
+          PluginCreateResponse.$_createMessage);
   static PluginCreateResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -333,21 +353,21 @@ class PluginCreateResponse extends $pb.GeneratedMessage {
 }
 
 class PluginFindRequest extends $pb.GeneratedMessage {
-  factory PluginFindRequest() => create();
+  factory PluginFindRequest() => PluginFindRequest._();
 
   PluginFindRequest._();
 
   factory PluginFindRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      PluginFindRequest()..mergeFromBuffer(data, registry);
   factory PluginFindRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      PluginFindRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'PluginFindRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'searchplugin'),
-      createEmptyInstance: create)
+      createEmptyInstance: PluginFindRequest.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -361,12 +381,15 @@ class PluginFindRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use PluginFindRequest() / PluginFindRequest.new instead')
   static PluginFindRequest create() => PluginFindRequest._();
+  static $pb.GeneratedMessage $_createMessage() => PluginFindRequest._();
   @$core.override
-  PluginFindRequest createEmptyInstance() => create();
+  PluginFindRequest createEmptyInstance() => PluginFindRequest._();
   @$core.pragma('dart2js:noInline')
-  static PluginFindRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<PluginFindRequest>(create);
+  static PluginFindRequest getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<PluginFindRequest>(
+          PluginFindRequest.$_createMessage);
   static PluginFindRequest? _defaultInstance;
 }
 
@@ -374,7 +397,7 @@ class PluginFindResponse extends $pb.GeneratedMessage {
   factory PluginFindResponse({
     Plugin? plugin,
   }) {
-    final result = create();
+    final result = PluginFindResponse._();
     if (plugin != null) result.plugin = plugin;
     return result;
   }
@@ -383,16 +406,17 @@ class PluginFindResponse extends $pb.GeneratedMessage {
 
   factory PluginFindResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      PluginFindResponse()..mergeFromBuffer(data, registry);
   factory PluginFindResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      PluginFindResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'PluginFindResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'searchplugin'),
-      createEmptyInstance: create)
-    ..aOM<Plugin>(1, _omitFieldNames ? '' : 'plugin', subBuilder: Plugin.create)
+      createEmptyInstance: PluginFindResponse.$_createMessage)
+    ..aOM<Plugin>(1, _omitFieldNames ? '' : 'plugin',
+        subBuilder: Plugin.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -406,12 +430,15 @@ class PluginFindResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use PluginFindResponse() / PluginFindResponse.new instead')
   static PluginFindResponse create() => PluginFindResponse._();
+  static $pb.GeneratedMessage $_createMessage() => PluginFindResponse._();
   @$core.override
-  PluginFindResponse createEmptyInstance() => create();
+  PluginFindResponse createEmptyInstance() => PluginFindResponse._();
   @$core.pragma('dart2js:noInline')
   static PluginFindResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<PluginFindResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<PluginFindResponse>(
+          PluginFindResponse.$_createMessage);
   static PluginFindResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -427,21 +454,21 @@ class PluginFindResponse extends $pb.GeneratedMessage {
 }
 
 class PluginDeleteRequest extends $pb.GeneratedMessage {
-  factory PluginDeleteRequest() => create();
+  factory PluginDeleteRequest() => PluginDeleteRequest._();
 
   PluginDeleteRequest._();
 
   factory PluginDeleteRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      PluginDeleteRequest()..mergeFromBuffer(data, registry);
   factory PluginDeleteRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      PluginDeleteRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'PluginDeleteRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'searchplugin'),
-      createEmptyInstance: create)
+      createEmptyInstance: PluginDeleteRequest.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -455,12 +482,16 @@ class PluginDeleteRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use PluginDeleteRequest() / PluginDeleteRequest.new instead')
   static PluginDeleteRequest create() => PluginDeleteRequest._();
+  static $pb.GeneratedMessage $_createMessage() => PluginDeleteRequest._();
   @$core.override
-  PluginDeleteRequest createEmptyInstance() => create();
+  PluginDeleteRequest createEmptyInstance() => PluginDeleteRequest._();
   @$core.pragma('dart2js:noInline')
   static PluginDeleteRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<PluginDeleteRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<PluginDeleteRequest>(
+          PluginDeleteRequest.$_createMessage);
   static PluginDeleteRequest? _defaultInstance;
 }
 
@@ -468,7 +499,7 @@ class PluginDeleteResponse extends $pb.GeneratedMessage {
   factory PluginDeleteResponse({
     Plugin? plugin,
   }) {
-    final result = create();
+    final result = PluginDeleteResponse._();
     if (plugin != null) result.plugin = plugin;
     return result;
   }
@@ -477,16 +508,17 @@ class PluginDeleteResponse extends $pb.GeneratedMessage {
 
   factory PluginDeleteResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      PluginDeleteResponse()..mergeFromBuffer(data, registry);
   factory PluginDeleteResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      PluginDeleteResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'PluginDeleteResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'searchplugin'),
-      createEmptyInstance: create)
-    ..aOM<Plugin>(1, _omitFieldNames ? '' : 'plugin', subBuilder: Plugin.create)
+      createEmptyInstance: PluginDeleteResponse.$_createMessage)
+    ..aOM<Plugin>(1, _omitFieldNames ? '' : 'plugin',
+        subBuilder: Plugin.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -500,12 +532,16 @@ class PluginDeleteResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use PluginDeleteResponse() / PluginDeleteResponse.new instead')
   static PluginDeleteResponse create() => PluginDeleteResponse._();
+  static $pb.GeneratedMessage $_createMessage() => PluginDeleteResponse._();
   @$core.override
-  PluginDeleteResponse createEmptyInstance() => create();
+  PluginDeleteResponse createEmptyInstance() => PluginDeleteResponse._();
   @$core.pragma('dart2js:noInline')
   static PluginDeleteResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<PluginDeleteResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<PluginDeleteResponse>(
+          PluginDeleteResponse.$_createMessage);
   static PluginDeleteResponse? _defaultInstance;
 
   @$pb.TagNumber(1)

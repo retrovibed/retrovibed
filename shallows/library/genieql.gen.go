@@ -70,6 +70,7 @@ type RecentSession struct {
 	MediaID      string        `json:"media_id"`
 	Mimetype     string        `json:"mimetype"`
 	Position     time.Duration `json:"position"`
+	ProfileID    string        `json:"profile_id"`
 	Query        []byte        `json:"query"`
 	UpdatedAt    time.Time     `json:"updated_at"`
 }
@@ -1558,29 +1559,30 @@ func (t recentSessionLibraryScannerStatic) Scan(i *RecentSession, md *Metadata) 
 		c4  sql.NullString
 		c5  sql.NullString
 		c6  ducktype.NullDuration
-		c7  []byte
-		c8  ducktype.NullTime
-		c9  sql.NullString
+		c7  sql.NullString
+		c8  []byte
+		c9  ducktype.NullTime
 		c10 sql.NullString
-		c11 ducktype.NullUint64
-		c12 ducktype.NullTime
-		c13 sql.NullString
+		c11 sql.NullString
+		c12 ducktype.NullUint64
+		c13 ducktype.NullTime
 		c14 sql.NullString
-		c15 ducktype.NullUint64
+		c15 sql.NullString
 		c16 ducktype.NullUint64
-		c17 sql.NullString
-		c18 ducktype.NullTime
-		c19 sql.NullString
+		c17 ducktype.NullUint64
+		c18 sql.NullString
+		c19 ducktype.NullTime
 		c20 sql.NullString
 		c21 sql.NullString
 		c22 sql.NullString
-		c23 ducktype.NullUint64
-		c24 ducktype.NullTime
-		c25 sql.NullString
-		c26 ducktype.NullTime
+		c23 sql.NullString
+		c24 ducktype.NullUint64
+		c25 ducktype.NullTime
+		c26 sql.NullString
+		c27 ducktype.NullTime
 	)
 
-	if err := t.Rows.Scan(&c0, &c1, &c2, &c3, &c4, &c5, &c6, &c7, &c8, &c9, &c10, &c11, &c12, &c13, &c14, &c15, &c16, &c17, &c18, &c19, &c20, &c21, &c22, &c23, &c24, &c25, &c26); err != nil {
+	if err := t.Rows.Scan(&c0, &c1, &c2, &c3, &c4, &c5, &c6, &c7, &c8, &c9, &c10, &c11, &c12, &c13, &c14, &c15, &c16, &c17, &c18, &c19, &c20, &c21, &c22, &c23, &c24, &c25, &c26, &c27); err != nil {
 		return err
 	}
 
@@ -1641,9 +1643,18 @@ func (t recentSessionLibraryScannerStatic) Scan(i *RecentSession, md *Metadata) 
 		i.Position = tmp
 	}
 
-	i.Query = c7
+	if c7.Valid {
+		if uid, err := uuid.FromBytes([]byte(c7.String)); err != nil {
+			return err
+		} else {
+			tmp := uid.String()
+			i.ProfileID = tmp
+		}
+	}
 
-	switch c8.InfinityModifier {
+	i.Query = c8
+
+	switch c9.InfinityModifier {
 	case ducktype.Infinity:
 		tmp := time.Unix(math.MaxInt64-62135596800, 999999999)
 		i.UpdatedAt = tmp
@@ -1651,12 +1662,12 @@ func (t recentSessionLibraryScannerStatic) Scan(i *RecentSession, md *Metadata) 
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		tmp := c8.Time
+		tmp := c9.Time
 		i.UpdatedAt = tmp
 	}
 
-	if c9.Valid {
-		if uid, err := uuid.FromBytes([]byte(c9.String)); err != nil {
+	if c10.Valid {
+		if uid, err := uuid.FromBytes([]byte(c10.String)); err != nil {
 			return err
 		} else {
 			tmp := uid.String()
@@ -1664,17 +1675,17 @@ func (t recentSessionLibraryScannerStatic) Scan(i *RecentSession, md *Metadata) 
 		}
 	}
 
-	if c10.Valid {
-		tmp := string(c10.String)
+	if c11.Valid {
+		tmp := string(c11.String)
 		md.AutoDescription = tmp
 	}
 
-	if c11.Valid {
-		tmp := c11.V
+	if c12.Valid {
+		tmp := c12.V
 		md.Bytes = tmp
 	}
 
-	switch c12.InfinityModifier {
+	switch c13.InfinityModifier {
 	case ducktype.Infinity:
 		tmp := time.Unix(math.MaxInt64-62135596800, 999999999)
 		md.CreatedAt = tmp
@@ -1682,17 +1693,17 @@ func (t recentSessionLibraryScannerStatic) Scan(i *RecentSession, md *Metadata) 
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		md.CreatedAt = tmp
 	default:
-		tmp := c12.Time
+		tmp := c13.Time
 		md.CreatedAt = tmp
 	}
 
-	if c13.Valid {
-		tmp := string(c13.String)
+	if c14.Valid {
+		tmp := string(c14.String)
 		md.Description = tmp
 	}
 
-	if c14.Valid {
-		if uid, err := uuid.FromBytes([]byte(c14.String)); err != nil {
+	if c15.Valid {
+		if uid, err := uuid.FromBytes([]byte(c15.String)); err != nil {
 			return err
 		} else {
 			tmp := uid.String()
@@ -1700,18 +1711,18 @@ func (t recentSessionLibraryScannerStatic) Scan(i *RecentSession, md *Metadata) 
 		}
 	}
 
-	if c15.Valid {
-		tmp := c15.V
+	if c16.Valid {
+		tmp := c16.V
 		md.DiskOffset = tmp
 	}
 
-	if c16.Valid {
-		tmp := c16.V
+	if c17.Valid {
+		tmp := c17.V
 		md.DiskUsage = tmp
 	}
 
-	if c17.Valid {
-		if uid, err := uuid.FromBytes([]byte(c17.String)); err != nil {
+	if c18.Valid {
+		if uid, err := uuid.FromBytes([]byte(c18.String)); err != nil {
 			return err
 		} else {
 			tmp := uid.String()
@@ -1719,7 +1730,7 @@ func (t recentSessionLibraryScannerStatic) Scan(i *RecentSession, md *Metadata) 
 		}
 	}
 
-	switch c18.InfinityModifier {
+	switch c19.InfinityModifier {
 	case ducktype.Infinity:
 		tmp := time.Unix(math.MaxInt64-62135596800, 999999999)
 		md.HiddenAt = tmp
@@ -1727,12 +1738,12 @@ func (t recentSessionLibraryScannerStatic) Scan(i *RecentSession, md *Metadata) 
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		md.HiddenAt = tmp
 	default:
-		tmp := c18.Time
+		tmp := c19.Time
 		md.HiddenAt = tmp
 	}
 
-	if c19.Valid {
-		if uid, err := uuid.FromBytes([]byte(c19.String)); err != nil {
+	if c20.Valid {
+		if uid, err := uuid.FromBytes([]byte(c20.String)); err != nil {
 			return err
 		} else {
 			tmp := uid.String()
@@ -1740,13 +1751,13 @@ func (t recentSessionLibraryScannerStatic) Scan(i *RecentSession, md *Metadata) 
 		}
 	}
 
-	if c20.Valid {
-		tmp := string(c20.String)
+	if c21.Valid {
+		tmp := string(c21.String)
 		md.Image = tmp
 	}
 
-	if c21.Valid {
-		if uid, err := uuid.FromBytes([]byte(c21.String)); err != nil {
+	if c22.Valid {
+		if uid, err := uuid.FromBytes([]byte(c22.String)); err != nil {
 			return err
 		} else {
 			tmp := uid.String()
@@ -1754,17 +1765,17 @@ func (t recentSessionLibraryScannerStatic) Scan(i *RecentSession, md *Metadata) 
 		}
 	}
 
-	if c22.Valid {
-		tmp := string(c22.String)
+	if c23.Valid {
+		tmp := string(c23.String)
 		md.Mimetype = tmp
 	}
 
-	if c23.Valid {
-		tmp := c23.V
+	if c24.Valid {
+		tmp := c24.V
 		md.QuotaUsage = tmp
 	}
 
-	switch c24.InfinityModifier {
+	switch c25.InfinityModifier {
 	case ducktype.Infinity:
 		tmp := time.Unix(math.MaxInt64-62135596800, 999999999)
 		md.TombstonedAt = tmp
@@ -1772,12 +1783,12 @@ func (t recentSessionLibraryScannerStatic) Scan(i *RecentSession, md *Metadata) 
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		md.TombstonedAt = tmp
 	default:
-		tmp := c24.Time
+		tmp := c25.Time
 		md.TombstonedAt = tmp
 	}
 
-	if c25.Valid {
-		if uid, err := uuid.FromBytes([]byte(c25.String)); err != nil {
+	if c26.Valid {
+		if uid, err := uuid.FromBytes([]byte(c26.String)); err != nil {
 			return err
 		} else {
 			tmp := uid.String()
@@ -1785,7 +1796,7 @@ func (t recentSessionLibraryScannerStatic) Scan(i *RecentSession, md *Metadata) 
 		}
 	}
 
-	switch c26.InfinityModifier {
+	switch c27.InfinityModifier {
 	case ducktype.Infinity:
 		tmp := time.Unix(math.MaxInt64-62135596800, 999999999)
 		md.UpdatedAt = tmp
@@ -1793,7 +1804,7 @@ func (t recentSessionLibraryScannerStatic) Scan(i *RecentSession, md *Metadata) 
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		md.UpdatedAt = tmp
 	default:
-		tmp := c26.Time
+		tmp := c27.Time
 		md.UpdatedAt = tmp
 	}
 
@@ -1842,33 +1853,34 @@ func (t RecentSessionLibraryScannerStaticRow) Scan(i *RecentSession, md *Metadat
 		c4  sql.NullString
 		c5  sql.NullString
 		c6  ducktype.NullDuration
-		c7  []byte
-		c8  ducktype.NullTime
-		c9  sql.NullString
+		c7  sql.NullString
+		c8  []byte
+		c9  ducktype.NullTime
 		c10 sql.NullString
-		c11 ducktype.NullUint64
-		c12 ducktype.NullTime
-		c13 sql.NullString
+		c11 sql.NullString
+		c12 ducktype.NullUint64
+		c13 ducktype.NullTime
 		c14 sql.NullString
-		c15 ducktype.NullUint64
+		c15 sql.NullString
 		c16 ducktype.NullUint64
-		c17 sql.NullString
-		c18 ducktype.NullTime
-		c19 sql.NullString
+		c17 ducktype.NullUint64
+		c18 sql.NullString
+		c19 ducktype.NullTime
 		c20 sql.NullString
 		c21 sql.NullString
 		c22 sql.NullString
-		c23 ducktype.NullUint64
-		c24 ducktype.NullTime
-		c25 sql.NullString
-		c26 ducktype.NullTime
+		c23 sql.NullString
+		c24 ducktype.NullUint64
+		c25 ducktype.NullTime
+		c26 sql.NullString
+		c27 ducktype.NullTime
 	)
 
 	if t.err != nil {
 		return t.err
 	}
 
-	if err := t.row.Scan(&c0, &c1, &c2, &c3, &c4, &c5, &c6, &c7, &c8, &c9, &c10, &c11, &c12, &c13, &c14, &c15, &c16, &c17, &c18, &c19, &c20, &c21, &c22, &c23, &c24, &c25, &c26); err != nil {
+	if err := t.row.Scan(&c0, &c1, &c2, &c3, &c4, &c5, &c6, &c7, &c8, &c9, &c10, &c11, &c12, &c13, &c14, &c15, &c16, &c17, &c18, &c19, &c20, &c21, &c22, &c23, &c24, &c25, &c26, &c27); err != nil {
 		return err
 	}
 
@@ -1929,9 +1941,18 @@ func (t RecentSessionLibraryScannerStaticRow) Scan(i *RecentSession, md *Metadat
 		i.Position = tmp
 	}
 
-	i.Query = c7
+	if c7.Valid {
+		if uid, err := uuid.FromBytes([]byte(c7.String)); err != nil {
+			return err
+		} else {
+			tmp := uid.String()
+			i.ProfileID = tmp
+		}
+	}
 
-	switch c8.InfinityModifier {
+	i.Query = c8
+
+	switch c9.InfinityModifier {
 	case ducktype.Infinity:
 		tmp := time.Unix(math.MaxInt64-62135596800, 999999999)
 		i.UpdatedAt = tmp
@@ -1939,12 +1960,12 @@ func (t RecentSessionLibraryScannerStaticRow) Scan(i *RecentSession, md *Metadat
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		tmp := c8.Time
+		tmp := c9.Time
 		i.UpdatedAt = tmp
 	}
 
-	if c9.Valid {
-		if uid, err := uuid.FromBytes([]byte(c9.String)); err != nil {
+	if c10.Valid {
+		if uid, err := uuid.FromBytes([]byte(c10.String)); err != nil {
 			return err
 		} else {
 			tmp := uid.String()
@@ -1952,17 +1973,17 @@ func (t RecentSessionLibraryScannerStaticRow) Scan(i *RecentSession, md *Metadat
 		}
 	}
 
-	if c10.Valid {
-		tmp := string(c10.String)
+	if c11.Valid {
+		tmp := string(c11.String)
 		md.AutoDescription = tmp
 	}
 
-	if c11.Valid {
-		tmp := c11.V
+	if c12.Valid {
+		tmp := c12.V
 		md.Bytes = tmp
 	}
 
-	switch c12.InfinityModifier {
+	switch c13.InfinityModifier {
 	case ducktype.Infinity:
 		tmp := time.Unix(math.MaxInt64-62135596800, 999999999)
 		md.CreatedAt = tmp
@@ -1970,17 +1991,17 @@ func (t RecentSessionLibraryScannerStaticRow) Scan(i *RecentSession, md *Metadat
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		md.CreatedAt = tmp
 	default:
-		tmp := c12.Time
+		tmp := c13.Time
 		md.CreatedAt = tmp
 	}
 
-	if c13.Valid {
-		tmp := string(c13.String)
+	if c14.Valid {
+		tmp := string(c14.String)
 		md.Description = tmp
 	}
 
-	if c14.Valid {
-		if uid, err := uuid.FromBytes([]byte(c14.String)); err != nil {
+	if c15.Valid {
+		if uid, err := uuid.FromBytes([]byte(c15.String)); err != nil {
 			return err
 		} else {
 			tmp := uid.String()
@@ -1988,18 +2009,18 @@ func (t RecentSessionLibraryScannerStaticRow) Scan(i *RecentSession, md *Metadat
 		}
 	}
 
-	if c15.Valid {
-		tmp := c15.V
+	if c16.Valid {
+		tmp := c16.V
 		md.DiskOffset = tmp
 	}
 
-	if c16.Valid {
-		tmp := c16.V
+	if c17.Valid {
+		tmp := c17.V
 		md.DiskUsage = tmp
 	}
 
-	if c17.Valid {
-		if uid, err := uuid.FromBytes([]byte(c17.String)); err != nil {
+	if c18.Valid {
+		if uid, err := uuid.FromBytes([]byte(c18.String)); err != nil {
 			return err
 		} else {
 			tmp := uid.String()
@@ -2007,7 +2028,7 @@ func (t RecentSessionLibraryScannerStaticRow) Scan(i *RecentSession, md *Metadat
 		}
 	}
 
-	switch c18.InfinityModifier {
+	switch c19.InfinityModifier {
 	case ducktype.Infinity:
 		tmp := time.Unix(math.MaxInt64-62135596800, 999999999)
 		md.HiddenAt = tmp
@@ -2015,12 +2036,12 @@ func (t RecentSessionLibraryScannerStaticRow) Scan(i *RecentSession, md *Metadat
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		md.HiddenAt = tmp
 	default:
-		tmp := c18.Time
+		tmp := c19.Time
 		md.HiddenAt = tmp
 	}
 
-	if c19.Valid {
-		if uid, err := uuid.FromBytes([]byte(c19.String)); err != nil {
+	if c20.Valid {
+		if uid, err := uuid.FromBytes([]byte(c20.String)); err != nil {
 			return err
 		} else {
 			tmp := uid.String()
@@ -2028,13 +2049,13 @@ func (t RecentSessionLibraryScannerStaticRow) Scan(i *RecentSession, md *Metadat
 		}
 	}
 
-	if c20.Valid {
-		tmp := string(c20.String)
+	if c21.Valid {
+		tmp := string(c21.String)
 		md.Image = tmp
 	}
 
-	if c21.Valid {
-		if uid, err := uuid.FromBytes([]byte(c21.String)); err != nil {
+	if c22.Valid {
+		if uid, err := uuid.FromBytes([]byte(c22.String)); err != nil {
 			return err
 		} else {
 			tmp := uid.String()
@@ -2042,17 +2063,17 @@ func (t RecentSessionLibraryScannerStaticRow) Scan(i *RecentSession, md *Metadat
 		}
 	}
 
-	if c22.Valid {
-		tmp := string(c22.String)
+	if c23.Valid {
+		tmp := string(c23.String)
 		md.Mimetype = tmp
 	}
 
-	if c23.Valid {
-		tmp := c23.V
+	if c24.Valid {
+		tmp := c24.V
 		md.QuotaUsage = tmp
 	}
 
-	switch c24.InfinityModifier {
+	switch c25.InfinityModifier {
 	case ducktype.Infinity:
 		tmp := time.Unix(math.MaxInt64-62135596800, 999999999)
 		md.TombstonedAt = tmp
@@ -2060,12 +2081,12 @@ func (t RecentSessionLibraryScannerStaticRow) Scan(i *RecentSession, md *Metadat
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		md.TombstonedAt = tmp
 	default:
-		tmp := c24.Time
+		tmp := c25.Time
 		md.TombstonedAt = tmp
 	}
 
-	if c25.Valid {
-		if uid, err := uuid.FromBytes([]byte(c25.String)); err != nil {
+	if c26.Valid {
+		if uid, err := uuid.FromBytes([]byte(c26.String)); err != nil {
 			return err
 		} else {
 			tmp := uid.String()
@@ -2073,7 +2094,7 @@ func (t RecentSessionLibraryScannerStaticRow) Scan(i *RecentSession, md *Metadat
 		}
 	}
 
-	switch c26.InfinityModifier {
+	switch c27.InfinityModifier {
 	case ducktype.Infinity:
 		tmp := time.Unix(math.MaxInt64-62135596800, 999999999)
 		md.UpdatedAt = tmp
@@ -2081,7 +2102,7 @@ func (t RecentSessionLibraryScannerStaticRow) Scan(i *RecentSession, md *Metadat
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		md.UpdatedAt = tmp
 	default:
-		tmp := c26.Time
+		tmp := c27.Time
 		md.UpdatedAt = tmp
 	}
 
@@ -2123,7 +2144,7 @@ func (t errRecentSessionScanner) Close() error {
 }
 
 // RecentSessionScannerStaticColumns generated by genieql
-const RecentSessionScannerStaticColumns = `library_recent_sessions."created_at",library_recent_sessions."duration",library_recent_sessions."id",library_recent_sessions."last_played_at",library_recent_sessions."media_id",library_recent_sessions."mimetype",library_recent_sessions."position",library_recent_sessions."query",library_recent_sessions."updated_at"`
+const RecentSessionScannerStaticColumns = `library_recent_sessions."created_at",library_recent_sessions."duration",library_recent_sessions."id",library_recent_sessions."last_played_at",library_recent_sessions."media_id",library_recent_sessions."mimetype",library_recent_sessions."position",library_recent_sessions."profile_id",library_recent_sessions."query",library_recent_sessions."updated_at"`
 
 // NewRecentSessionScannerStatic creates a scanner that operates on a static
 // set of columns that are always returned in the same order.
@@ -2152,11 +2173,12 @@ func (t recentSessionScannerStatic) Scan(i *RecentSession) error {
 		c4 sql.NullString
 		c5 sql.NullString
 		c6 ducktype.NullDuration
-		c7 []byte
-		c8 ducktype.NullTime
+		c7 sql.NullString
+		c8 []byte
+		c9 ducktype.NullTime
 	)
 
-	if err := t.Rows.Scan(&c0, &c1, &c2, &c3, &c4, &c5, &c6, &c7, &c8); err != nil {
+	if err := t.Rows.Scan(&c0, &c1, &c2, &c3, &c4, &c5, &c6, &c7, &c8, &c9); err != nil {
 		return err
 	}
 
@@ -2217,9 +2239,18 @@ func (t recentSessionScannerStatic) Scan(i *RecentSession) error {
 		i.Position = tmp
 	}
 
-	i.Query = c7
+	if c7.Valid {
+		if uid, err := uuid.FromBytes([]byte(c7.String)); err != nil {
+			return err
+		} else {
+			tmp := uid.String()
+			i.ProfileID = tmp
+		}
+	}
 
-	switch c8.InfinityModifier {
+	i.Query = c8
+
+	switch c9.InfinityModifier {
 	case ducktype.Infinity:
 		tmp := time.Unix(math.MaxInt64-62135596800, 999999999)
 		i.UpdatedAt = tmp
@@ -2227,7 +2258,7 @@ func (t recentSessionScannerStatic) Scan(i *RecentSession) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		tmp := c8.Time
+		tmp := c9.Time
 		i.UpdatedAt = tmp
 	}
 
@@ -2276,15 +2307,16 @@ func (t RecentSessionScannerStaticRow) Scan(i *RecentSession) error {
 		c4 sql.NullString
 		c5 sql.NullString
 		c6 ducktype.NullDuration
-		c7 []byte
-		c8 ducktype.NullTime
+		c7 sql.NullString
+		c8 []byte
+		c9 ducktype.NullTime
 	)
 
 	if t.err != nil {
 		return t.err
 	}
 
-	if err := t.row.Scan(&c0, &c1, &c2, &c3, &c4, &c5, &c6, &c7, &c8); err != nil {
+	if err := t.row.Scan(&c0, &c1, &c2, &c3, &c4, &c5, &c6, &c7, &c8, &c9); err != nil {
 		return err
 	}
 
@@ -2345,9 +2377,18 @@ func (t RecentSessionScannerStaticRow) Scan(i *RecentSession) error {
 		i.Position = tmp
 	}
 
-	i.Query = c7
+	if c7.Valid {
+		if uid, err := uuid.FromBytes([]byte(c7.String)); err != nil {
+			return err
+		} else {
+			tmp := uid.String()
+			i.ProfileID = tmp
+		}
+	}
 
-	switch c8.InfinityModifier {
+	i.Query = c8
+
+	switch c9.InfinityModifier {
 	case ducktype.Infinity:
 		tmp := time.Unix(math.MaxInt64-62135596800, 999999999)
 		i.UpdatedAt = tmp
@@ -2355,7 +2396,7 @@ func (t RecentSessionScannerStaticRow) Scan(i *RecentSession) error {
 		tmp := time.Unix(math.MinInt64, math.MinInt64)
 		i.UpdatedAt = tmp
 	default:
-		tmp := c8.Time
+		tmp := c9.Time
 		i.UpdatedAt = tmp
 	}
 
@@ -2395,8 +2436,9 @@ func (t recentSessionScannerDynamic) Scan(i *RecentSession) error {
 		cn4 = "media_id"
 		cn5 = "mimetype"
 		cn6 = "position"
-		cn7 = "query"
-		cn8 = "updated_at"
+		cn7 = "profile_id"
+		cn8 = "query"
+		cn9 = "updated_at"
 	)
 	var (
 		ignored sql.RawBytes
@@ -2410,8 +2452,9 @@ func (t recentSessionScannerDynamic) Scan(i *RecentSession) error {
 		c4      sql.NullString
 		c5      sql.NullString
 		c6      ducktype.NullDuration
-		c7      []byte
-		c8      ducktype.NullTime
+		c7      sql.NullString
+		c8      []byte
+		c9      ducktype.NullTime
 	)
 
 	if columns, err = t.Rows.Columns(); err != nil {
@@ -2440,6 +2483,8 @@ func (t recentSessionScannerDynamic) Scan(i *RecentSession) error {
 			dst = append(dst, &c7)
 		case cn8:
 			dst = append(dst, &c8)
+		case cn9:
+			dst = append(dst, &c9)
 		default:
 			dst = append(dst, &ignored)
 		}
@@ -2516,10 +2561,20 @@ func (t recentSessionScannerDynamic) Scan(i *RecentSession) error {
 			}
 
 		case cn7:
-			i.Query = c7
+			if c7.Valid {
+				if uid, err := uuid.FromBytes([]byte(c7.String)); err != nil {
+					return err
+				} else {
+					tmp := uid.String()
+					i.ProfileID = tmp
+				}
+			}
 
 		case cn8:
-			switch c8.InfinityModifier {
+			i.Query = c8
+
+		case cn9:
+			switch c9.InfinityModifier {
 			case ducktype.Infinity:
 				tmp := time.Unix(math.MaxInt64-62135596800, 999999999)
 				i.UpdatedAt = tmp
@@ -2527,7 +2582,7 @@ func (t recentSessionScannerDynamic) Scan(i *RecentSession) error {
 				tmp := time.Unix(math.MinInt64, math.MinInt64)
 				i.UpdatedAt = tmp
 			default:
-				tmp := c8.Time
+				tmp := c9.Time
 				i.UpdatedAt = tmp
 			}
 
@@ -3651,7 +3706,7 @@ func MetadataTombstoneByTorrentID(ctx context.Context, q sqlx.Queryer, tid strin
 
 // RecentSessionDeleteByID generated by genieql
 func RecentSessionDeleteByID(ctx context.Context, q sqlx.Queryer, id string) RecentSessionScannerStaticRow {
-	const query = `DELETE FROM library_recent_sessions WHERE "id" = $1 RETURNING library_recent_sessions."created_at",library_recent_sessions."duration",library_recent_sessions."id",library_recent_sessions."last_played_at",library_recent_sessions."media_id",library_recent_sessions."mimetype",library_recent_sessions."position",library_recent_sessions."query",library_recent_sessions."updated_at"`
+	const query = `DELETE FROM library_recent_sessions WHERE "id" = $1 RETURNING library_recent_sessions."created_at",library_recent_sessions."duration",library_recent_sessions."id",library_recent_sessions."last_played_at",library_recent_sessions."media_id",library_recent_sessions."mimetype",library_recent_sessions."position",library_recent_sessions."profile_id",library_recent_sessions."query",library_recent_sessions."updated_at"`
 	var c0 sql.NullString // id
 	c0.Valid = true
 	c0.String = id
@@ -4207,7 +4262,7 @@ func MetadataDeleteByID(ctx context.Context, q sqlx.Queryer, id string) Metadata
 }
 
 // RecentSessionInsertWithDefaultsStaticColumns generated by genieql
-const RecentSessionInsertWithDefaultsStaticColumns = `DEFAULT,$1,$2,DEFAULT,$3,$4,$5,$6,DEFAULT`
+const RecentSessionInsertWithDefaultsStaticColumns = `DEFAULT,$1,$2,DEFAULT,$3,$4,$5,$6,$7,DEFAULT`
 
 // RecentSessionInsertWithDefaultsExplode generated by genieql
 func RecentSessionInsertWithDefaultsExplode(a *RecentSession) ([]interface{}, error) {
@@ -4217,7 +4272,8 @@ func RecentSessionInsertWithDefaultsExplode(a *RecentSession) ([]interface{}, er
 		c2 sql.NullString        // media_id
 		c3 sql.NullString        // mimetype
 		c4 ducktype.NullDuration // position
-		c5 []byte                // query
+		c5 sql.NullString        // profile_id
+		c6 []byte                // query
 	)
 
 	c0.Valid = true
@@ -4235,21 +4291,25 @@ func RecentSessionInsertWithDefaultsExplode(a *RecentSession) ([]interface{}, er
 	c4.Valid = true
 	c4.V = a.Position
 
-	c5 = a.Query
+	c5.Valid = true
+	c5.String = a.ProfileID
 
-	return []interface{}{c0, c1, c2, c3, c4, c5}, nil
+	c6 = a.Query
+
+	return []interface{}{c0, c1, c2, c3, c4, c5, c6}, nil
 }
 
 // RecentSessionInsertWithDefaults generated by genieql
 func RecentSessionInsertWithDefaults(ctx context.Context, q sqlx.Queryer, a RecentSession) RecentSessionScannerStaticRow {
-	const query = `INSERT INTO "library_recent_sessions" ("created_at","duration","id","last_played_at","media_id","mimetype","position","query","updated_at") VALUES (DEFAULT,$1,$2,DEFAULT,$3,$4,$5,$6,DEFAULT) ON CONFLICT (id) DO UPDATE SET position = EXCLUDED.position, duration = EXCLUDED.duration, query = EXCLUDED.query, updated_at = DEFAULT, last_played_at = DEFAULT RETURNING "created_at","duration","id","last_played_at","media_id","mimetype","position","query","updated_at"`
+	const query = `INSERT INTO "library_recent_sessions" ("created_at","duration","id","last_played_at","media_id","mimetype","position","profile_id","query","updated_at") VALUES (DEFAULT,$1,$2,DEFAULT,$3,$4,$5,$6,$7,DEFAULT) ON CONFLICT (id) DO UPDATE SET position = EXCLUDED.position, duration = EXCLUDED.duration, query = EXCLUDED.query, updated_at = DEFAULT, last_played_at = DEFAULT RETURNING "created_at","duration","id","last_played_at","media_id","mimetype","position","profile_id","query","updated_at"`
 	var (
 		c0 ducktype.NullDuration // duration
 		c1 sql.NullString        // id
 		c2 sql.NullString        // media_id
 		c3 sql.NullString        // mimetype
 		c4 ducktype.NullDuration // position
-		c5 []byte
+		c5 sql.NullString        // profile_id
+		c6 []byte
 	)
 	c0.Valid = true
 	c0.V = a.Duration
@@ -4261,8 +4321,10 @@ func RecentSessionInsertWithDefaults(ctx context.Context, q sqlx.Queryer, a Rece
 	c3.String = a.Mimetype
 	c4.Valid = true
 	c4.V = a.Position
-	c5 = a.Query // query
-	return NewRecentSessionScannerStaticRow(q.QueryRowContext(ctx, query, c0, c1, c2, c3, c4, c5))
+	c5.Valid = true
+	c5.String = a.ProfileID
+	c6 = a.Query // query
+	return NewRecentSessionScannerStaticRow(q.QueryRowContext(ctx, query, c0, c1, c2, c3, c4, c5, c6))
 }
 
 // DirectoryUpsertStaticColumns generated by genieql

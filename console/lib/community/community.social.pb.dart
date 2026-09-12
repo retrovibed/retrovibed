@@ -28,7 +28,7 @@ class PluginPublisher extends $pb.GeneratedMessage {
     $core.String? createdAt,
     $core.String? updatedAt,
   }) {
-    final result = create();
+    final result = PluginPublisher._();
     if (id != null) result.id = id;
     if (path != null) result.path = path;
     if (description != null) result.description = description;
@@ -42,16 +42,16 @@ class PluginPublisher extends $pb.GeneratedMessage {
 
   factory PluginPublisher.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      PluginPublisher()..mergeFromBuffer(data, registry);
   factory PluginPublisher.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      PluginPublisher()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'PluginPublisher',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: PluginPublisher.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'id')
     ..aOS(2, _omitFieldNames ? '' : 'path')
     ..aOS(3, _omitFieldNames ? '' : 'description')
@@ -71,12 +71,15 @@ class PluginPublisher extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use PluginPublisher() / PluginPublisher.new instead')
   static PluginPublisher create() => PluginPublisher._();
+  static $pb.GeneratedMessage $_createMessage() => PluginPublisher._();
   @$core.override
-  PluginPublisher createEmptyInstance() => create();
+  PluginPublisher createEmptyInstance() => PluginPublisher._();
   @$core.pragma('dart2js:noInline')
-  static PluginPublisher getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<PluginPublisher>(create);
+  static PluginPublisher getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<PluginPublisher>(
+          PluginPublisher.$_createMessage);
   static PluginPublisher? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -144,7 +147,7 @@ class CommunityPublisher extends $pb.GeneratedMessage {
     $core.String? templateTitle,
     $core.String? templateDescription,
   }) {
-    final result = create();
+    final result = CommunityPublisher._();
     if (id != null) result.id = id;
     if (communityId != null) result.communityId = communityId;
     if (publisherId != null) result.publisherId = publisherId;
@@ -160,16 +163,16 @@ class CommunityPublisher extends $pb.GeneratedMessage {
 
   factory CommunityPublisher.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      CommunityPublisher()..mergeFromBuffer(data, registry);
   factory CommunityPublisher.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      CommunityPublisher()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'CommunityPublisher',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: CommunityPublisher.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'id')
     ..aOS(2, _omitFieldNames ? '' : 'community_id')
     ..aOS(3, _omitFieldNames ? '' : 'publisher_id')
@@ -190,12 +193,15 @@ class CommunityPublisher extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use CommunityPublisher() / CommunityPublisher.new instead')
   static CommunityPublisher create() => CommunityPublisher._();
+  static $pb.GeneratedMessage $_createMessage() => CommunityPublisher._();
   @$core.override
-  CommunityPublisher createEmptyInstance() => create();
+  CommunityPublisher createEmptyInstance() => CommunityPublisher._();
   @$core.pragma('dart2js:noInline')
   static CommunityPublisher getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<CommunityPublisher>(create);
+      $pb.GeneratedMessage.$_defaultFor<CommunityPublisher>(
+          CommunityPublisher.$_createMessage);
   static CommunityPublisher? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -267,7 +273,7 @@ class CommunitySocial extends $pb.GeneratedMessage {
     $0.Community? community,
     $core.Iterable<CommunityPublisher>? publishers,
   }) {
-    final result = create();
+    final result = CommunitySocial._();
     if (community != null) result.community = community;
     if (publishers != null) result.publishers.addAll(publishers);
     return result;
@@ -277,20 +283,20 @@ class CommunitySocial extends $pb.GeneratedMessage {
 
   factory CommunitySocial.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      CommunitySocial()..mergeFromBuffer(data, registry);
   factory CommunitySocial.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      CommunitySocial()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'CommunitySocial',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: CommunitySocial.$_createMessage)
     ..aOM<$0.Community>(1, _omitFieldNames ? '' : 'community',
-        subBuilder: $0.Community.create)
+        subBuilder: $0.Community.$_createMessage)
     ..pPM<CommunityPublisher>(1000, _omitFieldNames ? '' : 'publishers',
-        subBuilder: CommunityPublisher.create)
+        subBuilder: CommunityPublisher.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -304,12 +310,15 @@ class CommunitySocial extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use CommunitySocial() / CommunitySocial.new instead')
   static CommunitySocial create() => CommunitySocial._();
+  static $pb.GeneratedMessage $_createMessage() => CommunitySocial._();
   @$core.override
-  CommunitySocial createEmptyInstance() => create();
+  CommunitySocial createEmptyInstance() => CommunitySocial._();
   @$core.pragma('dart2js:noInline')
-  static CommunitySocial getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<CommunitySocial>(create);
+  static CommunitySocial getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<CommunitySocial>(
+          CommunitySocial.$_createMessage);
   static CommunitySocial? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -334,7 +343,7 @@ class SocialsSearchRequest extends $pb.GeneratedMessage {
     $fixnum.Int64? limit,
     $core.Iterable<$core.String>? communities,
   }) {
-    final result = create();
+    final result = SocialsSearchRequest._();
     if (query != null) result.query = query;
     if (offset != null) result.offset = offset;
     if (limit != null) result.limit = limit;
@@ -346,16 +355,16 @@ class SocialsSearchRequest extends $pb.GeneratedMessage {
 
   factory SocialsSearchRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      SocialsSearchRequest()..mergeFromBuffer(data, registry);
   factory SocialsSearchRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      SocialsSearchRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'SocialsSearchRequest',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: SocialsSearchRequest.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'query')
     ..a<$fixnum.Int64>(
         900, _omitFieldNames ? '' : 'offset', $pb.PbFieldType.OU6,
@@ -376,12 +385,16 @@ class SocialsSearchRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use SocialsSearchRequest() / SocialsSearchRequest.new instead')
   static SocialsSearchRequest create() => SocialsSearchRequest._();
+  static $pb.GeneratedMessage $_createMessage() => SocialsSearchRequest._();
   @$core.override
-  SocialsSearchRequest createEmptyInstance() => create();
+  SocialsSearchRequest createEmptyInstance() => SocialsSearchRequest._();
   @$core.pragma('dart2js:noInline')
   static SocialsSearchRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<SocialsSearchRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<SocialsSearchRequest>(
+          SocialsSearchRequest.$_createMessage);
   static SocialsSearchRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -420,7 +433,7 @@ class SocialsSearchResponse extends $pb.GeneratedMessage {
     SocialsSearchRequest? next,
     $core.Iterable<CommunitySocial>? items,
   }) {
-    final result = create();
+    final result = SocialsSearchResponse._();
     if (next != null) result.next = next;
     if (items != null) result.items.addAll(items);
     return result;
@@ -430,20 +443,20 @@ class SocialsSearchResponse extends $pb.GeneratedMessage {
 
   factory SocialsSearchResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      SocialsSearchResponse()..mergeFromBuffer(data, registry);
   factory SocialsSearchResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      SocialsSearchResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'SocialsSearchResponse',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: SocialsSearchResponse.$_createMessage)
     ..aOM<SocialsSearchRequest>(1, _omitFieldNames ? '' : 'next',
-        subBuilder: SocialsSearchRequest.create)
+        subBuilder: SocialsSearchRequest.$_createMessage)
     ..pPM<CommunitySocial>(2, _omitFieldNames ? '' : 'items',
-        subBuilder: CommunitySocial.create)
+        subBuilder: CommunitySocial.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -458,12 +471,16 @@ class SocialsSearchResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use SocialsSearchResponse() / SocialsSearchResponse.new instead')
   static SocialsSearchResponse create() => SocialsSearchResponse._();
+  static $pb.GeneratedMessage $_createMessage() => SocialsSearchResponse._();
   @$core.override
-  SocialsSearchResponse createEmptyInstance() => create();
+  SocialsSearchResponse createEmptyInstance() => SocialsSearchResponse._();
   @$core.pragma('dart2js:noInline')
   static SocialsSearchResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<SocialsSearchResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<SocialsSearchResponse>(
+          SocialsSearchResponse.$_createMessage);
   static SocialsSearchResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -488,7 +505,7 @@ class PluginPublisherSearchRequest extends $pb.GeneratedMessage {
     $fixnum.Int64? limit,
     $core.Iterable<$core.String>? excluded,
   }) {
-    final result = create();
+    final result = PluginPublisherSearchRequest._();
     if (query != null) result.query = query;
     if (offset != null) result.offset = offset;
     if (limit != null) result.limit = limit;
@@ -500,16 +517,16 @@ class PluginPublisherSearchRequest extends $pb.GeneratedMessage {
 
   factory PluginPublisherSearchRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      PluginPublisherSearchRequest()..mergeFromBuffer(data, registry);
   factory PluginPublisherSearchRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      PluginPublisherSearchRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'PluginPublisherSearchRequest',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: PluginPublisherSearchRequest.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'query')
     ..a<$fixnum.Int64>(
         900, _omitFieldNames ? '' : 'offset', $pb.PbFieldType.OU6,
@@ -532,13 +549,19 @@ class PluginPublisherSearchRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use PluginPublisherSearchRequest() / PluginPublisherSearchRequest.new instead')
   static PluginPublisherSearchRequest create() =>
       PluginPublisherSearchRequest._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      PluginPublisherSearchRequest._();
   @$core.override
-  PluginPublisherSearchRequest createEmptyInstance() => create();
+  PluginPublisherSearchRequest createEmptyInstance() =>
+      PluginPublisherSearchRequest._();
   @$core.pragma('dart2js:noInline')
   static PluginPublisherSearchRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<PluginPublisherSearchRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<PluginPublisherSearchRequest>(
+          PluginPublisherSearchRequest.$_createMessage);
   static PluginPublisherSearchRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -578,7 +601,7 @@ class PluginPublisherSearchResponse extends $pb.GeneratedMessage {
     PluginPublisherSearchRequest? next,
     $core.Iterable<PluginPublisher>? items,
   }) {
-    final result = create();
+    final result = PluginPublisherSearchResponse._();
     if (next != null) result.next = next;
     if (items != null) result.items.addAll(items);
     return result;
@@ -588,20 +611,20 @@ class PluginPublisherSearchResponse extends $pb.GeneratedMessage {
 
   factory PluginPublisherSearchResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      PluginPublisherSearchResponse()..mergeFromBuffer(data, registry);
   factory PluginPublisherSearchResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      PluginPublisherSearchResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'PluginPublisherSearchResponse',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: PluginPublisherSearchResponse.$_createMessage)
     ..aOM<PluginPublisherSearchRequest>(1, _omitFieldNames ? '' : 'next',
-        subBuilder: PluginPublisherSearchRequest.create)
+        subBuilder: PluginPublisherSearchRequest.$_createMessage)
     ..pPM<PluginPublisher>(2, _omitFieldNames ? '' : 'items',
-        subBuilder: PluginPublisher.create)
+        subBuilder: PluginPublisher.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -617,13 +640,19 @@ class PluginPublisherSearchResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use PluginPublisherSearchResponse() / PluginPublisherSearchResponse.new instead')
   static PluginPublisherSearchResponse create() =>
       PluginPublisherSearchResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      PluginPublisherSearchResponse._();
   @$core.override
-  PluginPublisherSearchResponse createEmptyInstance() => create();
+  PluginPublisherSearchResponse createEmptyInstance() =>
+      PluginPublisherSearchResponse._();
   @$core.pragma('dart2js:noInline')
   static PluginPublisherSearchResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<PluginPublisherSearchResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<PluginPublisherSearchResponse>(
+          PluginPublisherSearchResponse.$_createMessage);
   static PluginPublisherSearchResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -645,7 +674,7 @@ class PluginPublisherCreateResponse extends $pb.GeneratedMessage {
   factory PluginPublisherCreateResponse({
     PluginPublisher? publisher,
   }) {
-    final result = create();
+    final result = PluginPublisherCreateResponse._();
     if (publisher != null) result.publisher = publisher;
     return result;
   }
@@ -654,18 +683,18 @@ class PluginPublisherCreateResponse extends $pb.GeneratedMessage {
 
   factory PluginPublisherCreateResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      PluginPublisherCreateResponse()..mergeFromBuffer(data, registry);
   factory PluginPublisherCreateResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      PluginPublisherCreateResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'PluginPublisherCreateResponse',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: PluginPublisherCreateResponse.$_createMessage)
     ..aOM<PluginPublisher>(1, _omitFieldNames ? '' : 'publisher',
-        subBuilder: PluginPublisher.create)
+        subBuilder: PluginPublisher.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -681,13 +710,19 @@ class PluginPublisherCreateResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use PluginPublisherCreateResponse() / PluginPublisherCreateResponse.new instead')
   static PluginPublisherCreateResponse create() =>
       PluginPublisherCreateResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      PluginPublisherCreateResponse._();
   @$core.override
-  PluginPublisherCreateResponse createEmptyInstance() => create();
+  PluginPublisherCreateResponse createEmptyInstance() =>
+      PluginPublisherCreateResponse._();
   @$core.pragma('dart2js:noInline')
   static PluginPublisherCreateResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<PluginPublisherCreateResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<PluginPublisherCreateResponse>(
+          PluginPublisherCreateResponse.$_createMessage);
   static PluginPublisherCreateResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -706,7 +741,7 @@ class PluginPublisherFindResponse extends $pb.GeneratedMessage {
   factory PluginPublisherFindResponse({
     PluginPublisher? publisher,
   }) {
-    final result = create();
+    final result = PluginPublisherFindResponse._();
     if (publisher != null) result.publisher = publisher;
     return result;
   }
@@ -715,18 +750,18 @@ class PluginPublisherFindResponse extends $pb.GeneratedMessage {
 
   factory PluginPublisherFindResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      PluginPublisherFindResponse()..mergeFromBuffer(data, registry);
   factory PluginPublisherFindResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      PluginPublisherFindResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'PluginPublisherFindResponse',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: PluginPublisherFindResponse.$_createMessage)
     ..aOM<PluginPublisher>(1, _omitFieldNames ? '' : 'publisher',
-        subBuilder: PluginPublisher.create)
+        subBuilder: PluginPublisher.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -742,13 +777,19 @@ class PluginPublisherFindResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use PluginPublisherFindResponse() / PluginPublisherFindResponse.new instead')
   static PluginPublisherFindResponse create() =>
       PluginPublisherFindResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      PluginPublisherFindResponse._();
   @$core.override
-  PluginPublisherFindResponse createEmptyInstance() => create();
+  PluginPublisherFindResponse createEmptyInstance() =>
+      PluginPublisherFindResponse._();
   @$core.pragma('dart2js:noInline')
   static PluginPublisherFindResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<PluginPublisherFindResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<PluginPublisherFindResponse>(
+          PluginPublisherFindResponse.$_createMessage);
   static PluginPublisherFindResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -767,7 +808,7 @@ class PluginPublisherUpdateRequest extends $pb.GeneratedMessage {
   factory PluginPublisherUpdateRequest({
     PluginPublisher? publisher,
   }) {
-    final result = create();
+    final result = PluginPublisherUpdateRequest._();
     if (publisher != null) result.publisher = publisher;
     return result;
   }
@@ -776,18 +817,18 @@ class PluginPublisherUpdateRequest extends $pb.GeneratedMessage {
 
   factory PluginPublisherUpdateRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      PluginPublisherUpdateRequest()..mergeFromBuffer(data, registry);
   factory PluginPublisherUpdateRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      PluginPublisherUpdateRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'PluginPublisherUpdateRequest',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: PluginPublisherUpdateRequest.$_createMessage)
     ..aOM<PluginPublisher>(1, _omitFieldNames ? '' : 'publisher',
-        subBuilder: PluginPublisher.create)
+        subBuilder: PluginPublisher.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -803,13 +844,19 @@ class PluginPublisherUpdateRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use PluginPublisherUpdateRequest() / PluginPublisherUpdateRequest.new instead')
   static PluginPublisherUpdateRequest create() =>
       PluginPublisherUpdateRequest._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      PluginPublisherUpdateRequest._();
   @$core.override
-  PluginPublisherUpdateRequest createEmptyInstance() => create();
+  PluginPublisherUpdateRequest createEmptyInstance() =>
+      PluginPublisherUpdateRequest._();
   @$core.pragma('dart2js:noInline')
   static PluginPublisherUpdateRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<PluginPublisherUpdateRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<PluginPublisherUpdateRequest>(
+          PluginPublisherUpdateRequest.$_createMessage);
   static PluginPublisherUpdateRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -828,7 +875,7 @@ class PluginPublisherUpdateResponse extends $pb.GeneratedMessage {
   factory PluginPublisherUpdateResponse({
     PluginPublisher? publisher,
   }) {
-    final result = create();
+    final result = PluginPublisherUpdateResponse._();
     if (publisher != null) result.publisher = publisher;
     return result;
   }
@@ -837,18 +884,18 @@ class PluginPublisherUpdateResponse extends $pb.GeneratedMessage {
 
   factory PluginPublisherUpdateResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      PluginPublisherUpdateResponse()..mergeFromBuffer(data, registry);
   factory PluginPublisherUpdateResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      PluginPublisherUpdateResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'PluginPublisherUpdateResponse',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: PluginPublisherUpdateResponse.$_createMessage)
     ..aOM<PluginPublisher>(1, _omitFieldNames ? '' : 'publisher',
-        subBuilder: PluginPublisher.create)
+        subBuilder: PluginPublisher.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -864,13 +911,19 @@ class PluginPublisherUpdateResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use PluginPublisherUpdateResponse() / PluginPublisherUpdateResponse.new instead')
   static PluginPublisherUpdateResponse create() =>
       PluginPublisherUpdateResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      PluginPublisherUpdateResponse._();
   @$core.override
-  PluginPublisherUpdateResponse createEmptyInstance() => create();
+  PluginPublisherUpdateResponse createEmptyInstance() =>
+      PluginPublisherUpdateResponse._();
   @$core.pragma('dart2js:noInline')
   static PluginPublisherUpdateResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<PluginPublisherUpdateResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<PluginPublisherUpdateResponse>(
+          PluginPublisherUpdateResponse.$_createMessage);
   static PluginPublisherUpdateResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -891,7 +944,7 @@ class PluginPublisherCloneResponse extends $pb.GeneratedMessage {
   factory PluginPublisherCloneResponse({
     PluginPublisher? publisher,
   }) {
-    final result = create();
+    final result = PluginPublisherCloneResponse._();
     if (publisher != null) result.publisher = publisher;
     return result;
   }
@@ -900,18 +953,18 @@ class PluginPublisherCloneResponse extends $pb.GeneratedMessage {
 
   factory PluginPublisherCloneResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      PluginPublisherCloneResponse()..mergeFromBuffer(data, registry);
   factory PluginPublisherCloneResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      PluginPublisherCloneResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'PluginPublisherCloneResponse',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: PluginPublisherCloneResponse.$_createMessage)
     ..aOM<PluginPublisher>(1, _omitFieldNames ? '' : 'publisher',
-        subBuilder: PluginPublisher.create)
+        subBuilder: PluginPublisher.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -927,13 +980,19 @@ class PluginPublisherCloneResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use PluginPublisherCloneResponse() / PluginPublisherCloneResponse.new instead')
   static PluginPublisherCloneResponse create() =>
       PluginPublisherCloneResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      PluginPublisherCloneResponse._();
   @$core.override
-  PluginPublisherCloneResponse createEmptyInstance() => create();
+  PluginPublisherCloneResponse createEmptyInstance() =>
+      PluginPublisherCloneResponse._();
   @$core.pragma('dart2js:noInline')
   static PluginPublisherCloneResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<PluginPublisherCloneResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<PluginPublisherCloneResponse>(
+          PluginPublisherCloneResponse.$_createMessage);
   static PluginPublisherCloneResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -952,7 +1011,7 @@ class PluginPublisherDeleteResponse extends $pb.GeneratedMessage {
   factory PluginPublisherDeleteResponse({
     PluginPublisher? publisher,
   }) {
-    final result = create();
+    final result = PluginPublisherDeleteResponse._();
     if (publisher != null) result.publisher = publisher;
     return result;
   }
@@ -961,18 +1020,18 @@ class PluginPublisherDeleteResponse extends $pb.GeneratedMessage {
 
   factory PluginPublisherDeleteResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      PluginPublisherDeleteResponse()..mergeFromBuffer(data, registry);
   factory PluginPublisherDeleteResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      PluginPublisherDeleteResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'PluginPublisherDeleteResponse',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: PluginPublisherDeleteResponse.$_createMessage)
     ..aOM<PluginPublisher>(1, _omitFieldNames ? '' : 'publisher',
-        subBuilder: PluginPublisher.create)
+        subBuilder: PluginPublisher.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -988,13 +1047,19 @@ class PluginPublisherDeleteResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use PluginPublisherDeleteResponse() / PluginPublisherDeleteResponse.new instead')
   static PluginPublisherDeleteResponse create() =>
       PluginPublisherDeleteResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      PluginPublisherDeleteResponse._();
   @$core.override
-  PluginPublisherDeleteResponse createEmptyInstance() => create();
+  PluginPublisherDeleteResponse createEmptyInstance() =>
+      PluginPublisherDeleteResponse._();
   @$core.pragma('dart2js:noInline')
   static PluginPublisherDeleteResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<PluginPublisherDeleteResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<PluginPublisherDeleteResponse>(
+          PluginPublisherDeleteResponse.$_createMessage);
   static PluginPublisherDeleteResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -1013,7 +1078,7 @@ class CommunityPublisherUpdateRequest extends $pb.GeneratedMessage {
   factory CommunityPublisherUpdateRequest({
     CommunityPublisher? compub,
   }) {
-    final result = create();
+    final result = CommunityPublisherUpdateRequest._();
     if (compub != null) result.compub = compub;
     return result;
   }
@@ -1022,18 +1087,18 @@ class CommunityPublisherUpdateRequest extends $pb.GeneratedMessage {
 
   factory CommunityPublisherUpdateRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      CommunityPublisherUpdateRequest()..mergeFromBuffer(data, registry);
   factory CommunityPublisherUpdateRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      CommunityPublisherUpdateRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'CommunityPublisherUpdateRequest',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: CommunityPublisherUpdateRequest.$_createMessage)
     ..aOM<CommunityPublisher>(1, _omitFieldNames ? '' : 'compub',
-        subBuilder: CommunityPublisher.create)
+        subBuilder: CommunityPublisher.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1049,14 +1114,19 @@ class CommunityPublisherUpdateRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use CommunityPublisherUpdateRequest() / CommunityPublisherUpdateRequest.new instead')
   static CommunityPublisherUpdateRequest create() =>
       CommunityPublisherUpdateRequest._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      CommunityPublisherUpdateRequest._();
   @$core.override
-  CommunityPublisherUpdateRequest createEmptyInstance() => create();
+  CommunityPublisherUpdateRequest createEmptyInstance() =>
+      CommunityPublisherUpdateRequest._();
   @$core.pragma('dart2js:noInline')
   static CommunityPublisherUpdateRequest getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<CommunityPublisherUpdateRequest>(
-          create);
+          CommunityPublisherUpdateRequest.$_createMessage);
   static CommunityPublisherUpdateRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -1075,7 +1145,7 @@ class CommunityPublisherUpdateResponse extends $pb.GeneratedMessage {
   factory CommunityPublisherUpdateResponse({
     CommunityPublisher? compub,
   }) {
-    final result = create();
+    final result = CommunityPublisherUpdateResponse._();
     if (compub != null) result.compub = compub;
     return result;
   }
@@ -1085,18 +1155,18 @@ class CommunityPublisherUpdateResponse extends $pb.GeneratedMessage {
   factory CommunityPublisherUpdateResponse.fromBuffer(
           $core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      CommunityPublisherUpdateResponse()..mergeFromBuffer(data, registry);
   factory CommunityPublisherUpdateResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      CommunityPublisherUpdateResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'CommunityPublisherUpdateResponse',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: CommunityPublisherUpdateResponse.$_createMessage)
     ..aOM<CommunityPublisher>(1, _omitFieldNames ? '' : 'compub',
-        subBuilder: CommunityPublisher.create)
+        subBuilder: CommunityPublisher.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1112,14 +1182,19 @@ class CommunityPublisherUpdateResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use CommunityPublisherUpdateResponse() / CommunityPublisherUpdateResponse.new instead')
   static CommunityPublisherUpdateResponse create() =>
       CommunityPublisherUpdateResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      CommunityPublisherUpdateResponse._();
   @$core.override
-  CommunityPublisherUpdateResponse createEmptyInstance() => create();
+  CommunityPublisherUpdateResponse createEmptyInstance() =>
+      CommunityPublisherUpdateResponse._();
   @$core.pragma('dart2js:noInline')
   static CommunityPublisherUpdateResponse getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<CommunityPublisherUpdateResponse>(
-          create);
+          CommunityPublisherUpdateResponse.$_createMessage);
   static CommunityPublisherUpdateResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -1138,7 +1213,7 @@ class CommunityPublisherEnableResponse extends $pb.GeneratedMessage {
   factory CommunityPublisherEnableResponse({
     CommunityPublisher? compub,
   }) {
-    final result = create();
+    final result = CommunityPublisherEnableResponse._();
     if (compub != null) result.compub = compub;
     return result;
   }
@@ -1148,18 +1223,18 @@ class CommunityPublisherEnableResponse extends $pb.GeneratedMessage {
   factory CommunityPublisherEnableResponse.fromBuffer(
           $core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      CommunityPublisherEnableResponse()..mergeFromBuffer(data, registry);
   factory CommunityPublisherEnableResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      CommunityPublisherEnableResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'CommunityPublisherEnableResponse',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: CommunityPublisherEnableResponse.$_createMessage)
     ..aOM<CommunityPublisher>(1, _omitFieldNames ? '' : 'compub',
-        subBuilder: CommunityPublisher.create)
+        subBuilder: CommunityPublisher.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1175,14 +1250,19 @@ class CommunityPublisherEnableResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use CommunityPublisherEnableResponse() / CommunityPublisherEnableResponse.new instead')
   static CommunityPublisherEnableResponse create() =>
       CommunityPublisherEnableResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      CommunityPublisherEnableResponse._();
   @$core.override
-  CommunityPublisherEnableResponse createEmptyInstance() => create();
+  CommunityPublisherEnableResponse createEmptyInstance() =>
+      CommunityPublisherEnableResponse._();
   @$core.pragma('dart2js:noInline')
   static CommunityPublisherEnableResponse getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<CommunityPublisherEnableResponse>(
-          create);
+          CommunityPublisherEnableResponse.$_createMessage);
   static CommunityPublisherEnableResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -1201,7 +1281,7 @@ class CommunityPublisherDisableResponse extends $pb.GeneratedMessage {
   factory CommunityPublisherDisableResponse({
     CommunityPublisher? compub,
   }) {
-    final result = create();
+    final result = CommunityPublisherDisableResponse._();
     if (compub != null) result.compub = compub;
     return result;
   }
@@ -1211,18 +1291,18 @@ class CommunityPublisherDisableResponse extends $pb.GeneratedMessage {
   factory CommunityPublisherDisableResponse.fromBuffer(
           $core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      CommunityPublisherDisableResponse()..mergeFromBuffer(data, registry);
   factory CommunityPublisherDisableResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      CommunityPublisherDisableResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'CommunityPublisherDisableResponse',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: CommunityPublisherDisableResponse.$_createMessage)
     ..aOM<CommunityPublisher>(1, _omitFieldNames ? '' : 'compub',
-        subBuilder: CommunityPublisher.create)
+        subBuilder: CommunityPublisher.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1238,14 +1318,19 @@ class CommunityPublisherDisableResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use CommunityPublisherDisableResponse() / CommunityPublisherDisableResponse.new instead')
   static CommunityPublisherDisableResponse create() =>
       CommunityPublisherDisableResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      CommunityPublisherDisableResponse._();
   @$core.override
-  CommunityPublisherDisableResponse createEmptyInstance() => create();
+  CommunityPublisherDisableResponse createEmptyInstance() =>
+      CommunityPublisherDisableResponse._();
   @$core.pragma('dart2js:noInline')
   static CommunityPublisherDisableResponse getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<CommunityPublisherDisableResponse>(
-          create);
+          CommunityPublisherDisableResponse.$_createMessage);
   static CommunityPublisherDisableResponse? _defaultInstance;
 
   @$pb.TagNumber(1)

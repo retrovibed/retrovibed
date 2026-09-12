@@ -29,7 +29,7 @@ class LoginOptions extends $pb.GeneratedMessage {
     $core.String? redirect,
     $core.bool? autologin,
   }) {
-    final result = create();
+    final result = LoginOptions._();
     if (id != null) result.id = id;
     if (accountId != null) result.accountId = accountId;
     if (profileId != null) result.profileId = profileId;
@@ -42,15 +42,15 @@ class LoginOptions extends $pb.GeneratedMessage {
 
   factory LoginOptions.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      LoginOptions()..mergeFromBuffer(data, registry);
   factory LoginOptions.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      LoginOptions()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'LoginOptions',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: LoginOptions.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'id')
     ..aOS(2, _omitFieldNames ? '' : 'account_id')
     ..aOS(3, _omitFieldNames ? '' : 'profile_id')
@@ -69,12 +69,15 @@ class LoginOptions extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use LoginOptions() / LoginOptions.new instead')
   static LoginOptions create() => LoginOptions._();
+  static $pb.GeneratedMessage $_createMessage() => LoginOptions._();
   @$core.override
-  LoginOptions createEmptyInstance() => create();
+  LoginOptions createEmptyInstance() => LoginOptions._();
   @$core.pragma('dart2js:noInline')
-  static LoginOptions getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<LoginOptions>(create);
+  static LoginOptions getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<LoginOptions>(
+          LoginOptions.$_createMessage);
   static LoginOptions? _defaultInstance;
 
   /// lock in the id of the login options.
@@ -134,7 +137,7 @@ class LoginOptionsResponse extends $pb.GeneratedMessage {
   factory LoginOptionsResponse({
     $core.String? token,
   }) {
-    final result = create();
+    final result = LoginOptionsResponse._();
     if (token != null) result.token = token;
     return result;
   }
@@ -143,15 +146,15 @@ class LoginOptionsResponse extends $pb.GeneratedMessage {
 
   factory LoginOptionsResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      LoginOptionsResponse()..mergeFromBuffer(data, registry);
   factory LoginOptionsResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      LoginOptionsResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'LoginOptionsResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: LoginOptionsResponse.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'token')
     ..hasRequiredFields = false;
 
@@ -166,12 +169,16 @@ class LoginOptionsResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use LoginOptionsResponse() / LoginOptionsResponse.new instead')
   static LoginOptionsResponse create() => LoginOptionsResponse._();
+  static $pb.GeneratedMessage $_createMessage() => LoginOptionsResponse._();
   @$core.override
-  LoginOptionsResponse createEmptyInstance() => create();
+  LoginOptionsResponse createEmptyInstance() => LoginOptionsResponse._();
   @$core.pragma('dart2js:noInline')
   static LoginOptionsResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<LoginOptionsResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<LoginOptionsResponse>(
+          LoginOptionsResponse.$_createMessage);
   static LoginOptionsResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -192,7 +199,7 @@ class Identity extends $pb.GeneratedMessage {
     $core.String? uid,
     $core.String? uidraw,
   }) {
-    final result = create();
+    final result = Identity._();
     if (id != null) result.id = id;
     if (display != null) result.display = display;
     if (email != null) result.email = email;
@@ -205,15 +212,15 @@ class Identity extends $pb.GeneratedMessage {
 
   factory Identity.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      Identity()..mergeFromBuffer(data, registry);
   factory Identity.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      Identity()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'Identity',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: Identity.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'id')
     ..aOS(2, _omitFieldNames ? '' : 'display')
     ..aOS(4, _omitFieldNames ? '' : 'email')
@@ -231,12 +238,14 @@ class Identity extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use Identity() / Identity.new instead')
   static Identity create() => Identity._();
+  static $pb.GeneratedMessage $_createMessage() => Identity._();
   @$core.override
-  Identity createEmptyInstance() => create();
+  Identity createEmptyInstance() => Identity._();
   @$core.pragma('dart2js:noInline')
-  static Identity getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Identity>(create);
+  static Identity getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<Identity>(Identity.$_createMessage);
   static Identity? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -291,7 +300,7 @@ class Authn extends $pb.GeneratedMessage {
     $0.Profile? profile,
     $1.Account? account,
   }) {
-    final result = create();
+    final result = Authn._();
     if (token != null) result.token = token;
     if (profile != null) result.profile = profile;
     if (account != null) result.account = account;
@@ -302,20 +311,20 @@ class Authn extends $pb.GeneratedMessage {
 
   factory Authn.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      Authn()..mergeFromBuffer(data, registry);
   factory Authn.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      Authn()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'Authn',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: Authn.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'token')
     ..aOM<$0.Profile>(2, _omitFieldNames ? '' : 'profile',
-        subBuilder: $0.Profile.create)
+        subBuilder: $0.Profile.$_createMessage)
     ..aOM<$1.Account>(3, _omitFieldNames ? '' : 'account',
-        subBuilder: $1.Account.create)
+        subBuilder: $1.Account.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -328,12 +337,14 @@ class Authn extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use Authn() / Authn.new instead')
   static Authn create() => Authn._();
+  static $pb.GeneratedMessage $_createMessage() => Authn._();
   @$core.override
-  Authn createEmptyInstance() => create();
+  Authn createEmptyInstance() => Authn._();
   @$core.pragma('dart2js:noInline')
-  static Authn getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Authn>(create);
+  static Authn getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<Authn>(Authn.$_createMessage);
   static Authn? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -375,7 +386,7 @@ class Authed extends $pb.GeneratedMessage {
     $core.Iterable<Authn>? profiles,
     LoginOptions? options,
   }) {
-    final result = create();
+    final result = Authed._();
     if (signupToken != null) result.signupToken = signupToken;
     if (identity != null) result.identity = identity;
     if (profiles != null) result.profiles.addAll(profiles);
@@ -387,21 +398,22 @@ class Authed extends $pb.GeneratedMessage {
 
   factory Authed.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      Authed()..mergeFromBuffer(data, registry);
   factory Authed.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      Authed()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'Authed',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: Authed.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'signup_token')
     ..aOM<Identity>(3, _omitFieldNames ? '' : 'identity',
-        subBuilder: Identity.create)
-    ..pPM<Authn>(4, _omitFieldNames ? '' : 'profiles', subBuilder: Authn.create)
+        subBuilder: Identity.$_createMessage)
+    ..pPM<Authn>(4, _omitFieldNames ? '' : 'profiles',
+        subBuilder: Authn.$_createMessage)
     ..aOM<LoginOptions>(5, _omitFieldNames ? '' : 'opts',
-        protoName: 'options', subBuilder: LoginOptions.create)
+        protoName: 'options', subBuilder: LoginOptions.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -414,12 +426,14 @@ class Authed extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use Authed() / Authed.new instead')
   static Authed create() => Authed._();
+  static $pb.GeneratedMessage $_createMessage() => Authed._();
   @$core.override
-  Authed createEmptyInstance() => create();
+  Authed createEmptyInstance() => Authed._();
   @$core.pragma('dart2js:noInline')
-  static Authed getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Authed>(create);
+  static Authed getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<Authed>(Authed.$_createMessage);
   static Authed? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -465,7 +479,7 @@ class Session extends $pb.GeneratedMessage {
     $fixnum.Int64? expires,
     $core.String? redirect,
   }) {
-    final result = create();
+    final result = Session._();
     if (token != null) result.token = token;
     if (profile != null) result.profile = profile;
     if (account != null) result.account = account;
@@ -478,20 +492,20 @@ class Session extends $pb.GeneratedMessage {
 
   factory Session.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      Session()..mergeFromBuffer(data, registry);
   factory Session.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      Session()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'Session',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: Session.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'token')
     ..aOM<$0.Profile>(2, _omitFieldNames ? '' : 'profile',
-        subBuilder: $0.Profile.create)
+        subBuilder: $0.Profile.$_createMessage)
     ..aOM<$1.Account>(3, _omitFieldNames ? '' : 'account',
-        subBuilder: $1.Account.create)
+        subBuilder: $1.Account.$_createMessage)
     ..aInt64(4, _omitFieldNames ? '' : 'expires')
     ..aOS(5, _omitFieldNames ? '' : 'redirect')
     ..hasRequiredFields = false;
@@ -506,12 +520,14 @@ class Session extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use Session() / Session.new instead')
   static Session create() => Session._();
+  static $pb.GeneratedMessage $_createMessage() => Session._();
   @$core.override
-  Session createEmptyInstance() => create();
+  Session createEmptyInstance() => Session._();
   @$core.pragma('dart2js:noInline')
-  static Session getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Session>(create);
+  static Session getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<Session>(Session.$_createMessage);
   static Session? _defaultInstance;
 
   @$pb.TagNumber(1)

@@ -37,7 +37,7 @@ class PublishedContent extends $pb.GeneratedMessage {
     $core.String? libraryId,
     $core.String? oauthGoogleId,
   }) {
-    final result = create();
+    final result = PublishedContent._();
     if (id != null) result.id = id;
     if (communityId != null) result.communityId = communityId;
     if (knownMediaId != null) result.knownMediaId = knownMediaId;
@@ -60,16 +60,16 @@ class PublishedContent extends $pb.GeneratedMessage {
 
   factory PublishedContent.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      PublishedContent()..mergeFromBuffer(data, registry);
   factory PublishedContent.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      PublishedContent()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'PublishedContent',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: PublishedContent.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'id')
     ..aOS(2, _omitFieldNames ? '' : 'community_id')
     ..aOS(3, _omitFieldNames ? '' : 'known_media_id')
@@ -99,12 +99,15 @@ class PublishedContent extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use PublishedContent() / PublishedContent.new instead')
   static PublishedContent create() => PublishedContent._();
+  static $pb.GeneratedMessage $_createMessage() => PublishedContent._();
   @$core.override
-  PublishedContent createEmptyInstance() => create();
+  PublishedContent createEmptyInstance() => PublishedContent._();
   @$core.pragma('dart2js:noInline')
-  static PublishedContent getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<PublishedContent>(create);
+  static PublishedContent getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<PublishedContent>(
+          PublishedContent.$_createMessage);
   static PublishedContent? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -249,7 +252,7 @@ class PublishContentRequest extends $pb.GeneratedMessage {
     PublishedContent? publishedContent,
     $0.PublishMode? publishMode,
   }) {
-    final result = create();
+    final result = PublishContentRequest._();
     if (publishedContent != null) result.publishedContent = publishedContent;
     if (publishMode != null) result.publishMode = publishMode;
     return result;
@@ -259,18 +262,18 @@ class PublishContentRequest extends $pb.GeneratedMessage {
 
   factory PublishContentRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      PublishContentRequest()..mergeFromBuffer(data, registry);
   factory PublishContentRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      PublishContentRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'PublishContentRequest',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: PublishContentRequest.$_createMessage)
     ..aOM<PublishedContent>(1, _omitFieldNames ? '' : 'published_content',
-        subBuilder: PublishedContent.create)
+        subBuilder: PublishedContent.$_createMessage)
     ..aE<$0.PublishMode>(2, _omitFieldNames ? '' : 'publish_mode',
         enumValues: $0.PublishMode.values)
     ..hasRequiredFields = false;
@@ -287,12 +290,16 @@ class PublishContentRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use PublishContentRequest() / PublishContentRequest.new instead')
   static PublishContentRequest create() => PublishContentRequest._();
+  static $pb.GeneratedMessage $_createMessage() => PublishContentRequest._();
   @$core.override
-  PublishContentRequest createEmptyInstance() => create();
+  PublishContentRequest createEmptyInstance() => PublishContentRequest._();
   @$core.pragma('dart2js:noInline')
   static PublishContentRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<PublishContentRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<PublishContentRequest>(
+          PublishContentRequest.$_createMessage);
   static PublishContentRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -320,7 +327,7 @@ class PublishContentResponse extends $pb.GeneratedMessage {
   factory PublishContentResponse({
     PublishedContent? publishedContent,
   }) {
-    final result = create();
+    final result = PublishContentResponse._();
     if (publishedContent != null) result.publishedContent = publishedContent;
     return result;
   }
@@ -329,18 +336,18 @@ class PublishContentResponse extends $pb.GeneratedMessage {
 
   factory PublishContentResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      PublishContentResponse()..mergeFromBuffer(data, registry);
   factory PublishContentResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      PublishContentResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'PublishContentResponse',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: PublishContentResponse.$_createMessage)
     ..aOM<PublishedContent>(1, _omitFieldNames ? '' : 'published_content',
-        subBuilder: PublishedContent.create)
+        subBuilder: PublishedContent.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -355,12 +362,16 @@ class PublishContentResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use PublishContentResponse() / PublishContentResponse.new instead')
   static PublishContentResponse create() => PublishContentResponse._();
+  static $pb.GeneratedMessage $_createMessage() => PublishContentResponse._();
   @$core.override
-  PublishContentResponse createEmptyInstance() => create();
+  PublishContentResponse createEmptyInstance() => PublishContentResponse._();
   @$core.pragma('dart2js:noInline')
   static PublishContentResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<PublishContentResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<PublishContentResponse>(
+          PublishContentResponse.$_createMessage);
   static PublishContentResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -376,30 +387,22 @@ class PublishContentResponse extends $pb.GeneratedMessage {
 }
 
 class PublishContentDeleteRequest extends $pb.GeneratedMessage {
-  factory PublishContentDeleteRequest({
-    PublishedContent? publishedContent,
-  }) {
-    final result = create();
-    if (publishedContent != null) result.publishedContent = publishedContent;
-    return result;
-  }
+  factory PublishContentDeleteRequest() => PublishContentDeleteRequest._();
 
   PublishContentDeleteRequest._();
 
   factory PublishContentDeleteRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      PublishContentDeleteRequest()..mergeFromBuffer(data, registry);
   factory PublishContentDeleteRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      PublishContentDeleteRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'PublishContentDeleteRequest',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
-    ..aOM<PublishedContent>(1, _omitFieldNames ? '' : 'published_content',
-        subBuilder: PublishedContent.create)
+      createEmptyInstance: PublishContentDeleteRequest.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -415,32 +418,27 @@ class PublishContentDeleteRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use PublishContentDeleteRequest() / PublishContentDeleteRequest.new instead')
   static PublishContentDeleteRequest create() =>
       PublishContentDeleteRequest._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      PublishContentDeleteRequest._();
   @$core.override
-  PublishContentDeleteRequest createEmptyInstance() => create();
+  PublishContentDeleteRequest createEmptyInstance() =>
+      PublishContentDeleteRequest._();
   @$core.pragma('dart2js:noInline')
   static PublishContentDeleteRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<PublishContentDeleteRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<PublishContentDeleteRequest>(
+          PublishContentDeleteRequest.$_createMessage);
   static PublishContentDeleteRequest? _defaultInstance;
-
-  @$pb.TagNumber(1)
-  PublishedContent get publishedContent => $_getN(0);
-  @$pb.TagNumber(1)
-  set publishedContent(PublishedContent value) => $_setField(1, value);
-  @$pb.TagNumber(1)
-  $core.bool hasPublishedContent() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearPublishedContent() => $_clearField(1);
-  @$pb.TagNumber(1)
-  PublishedContent ensurePublishedContent() => $_ensure(0);
 }
 
 class PublishContentDeleteResponse extends $pb.GeneratedMessage {
   factory PublishContentDeleteResponse({
     PublishedContent? publishedContent,
   }) {
-    final result = create();
+    final result = PublishContentDeleteResponse._();
     if (publishedContent != null) result.publishedContent = publishedContent;
     return result;
   }
@@ -449,18 +447,18 @@ class PublishContentDeleteResponse extends $pb.GeneratedMessage {
 
   factory PublishContentDeleteResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      PublishContentDeleteResponse()..mergeFromBuffer(data, registry);
   factory PublishContentDeleteResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      PublishContentDeleteResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'PublishContentDeleteResponse',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: PublishContentDeleteResponse.$_createMessage)
     ..aOM<PublishedContent>(1, _omitFieldNames ? '' : 'published_content',
-        subBuilder: PublishedContent.create)
+        subBuilder: PublishedContent.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -476,13 +474,19 @@ class PublishContentDeleteResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use PublishContentDeleteResponse() / PublishContentDeleteResponse.new instead')
   static PublishContentDeleteResponse create() =>
       PublishContentDeleteResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      PublishContentDeleteResponse._();
   @$core.override
-  PublishContentDeleteResponse createEmptyInstance() => create();
+  PublishContentDeleteResponse createEmptyInstance() =>
+      PublishContentDeleteResponse._();
   @$core.pragma('dart2js:noInline')
   static PublishContentDeleteResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<PublishContentDeleteResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<PublishContentDeleteResponse>(
+          PublishContentDeleteResponse.$_createMessage);
   static PublishContentDeleteResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -505,7 +509,7 @@ class PublishedContentSearchRequest extends $pb.GeneratedMessage {
     $fixnum.Int64? offset,
     $fixnum.Int64? limit,
   }) {
-    final result = create();
+    final result = PublishedContentSearchRequest._();
     if (communityId != null) result.communityId = communityId;
     if (query != null) result.query = query;
     if (sync != null) result.sync = sync;
@@ -518,16 +522,16 @@ class PublishedContentSearchRequest extends $pb.GeneratedMessage {
 
   factory PublishedContentSearchRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      PublishedContentSearchRequest()..mergeFromBuffer(data, registry);
   factory PublishedContentSearchRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      PublishedContentSearchRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'PublishedContentSearchRequest',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: PublishedContentSearchRequest.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'community_id')
     ..aOS(2, _omitFieldNames ? '' : 'query')
     ..aOS(3, _omitFieldNames ? '' : 'sync')
@@ -551,13 +555,19 @@ class PublishedContentSearchRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use PublishedContentSearchRequest() / PublishedContentSearchRequest.new instead')
   static PublishedContentSearchRequest create() =>
       PublishedContentSearchRequest._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      PublishedContentSearchRequest._();
   @$core.override
-  PublishedContentSearchRequest createEmptyInstance() => create();
+  PublishedContentSearchRequest createEmptyInstance() =>
+      PublishedContentSearchRequest._();
   @$core.pragma('dart2js:noInline')
   static PublishedContentSearchRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<PublishedContentSearchRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<PublishedContentSearchRequest>(
+          PublishedContentSearchRequest.$_createMessage);
   static PublishedContentSearchRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -612,7 +622,7 @@ class PublishedContentSearchResponse extends $pb.GeneratedMessage {
     PublishedContentSearchRequest? next,
     $core.Iterable<PublishedContent>? items,
   }) {
-    final result = create();
+    final result = PublishedContentSearchResponse._();
     if (community != null) result.community = community;
     if (next != null) result.next = next;
     if (items != null) result.items.addAll(items);
@@ -623,22 +633,22 @@ class PublishedContentSearchResponse extends $pb.GeneratedMessage {
 
   factory PublishedContentSearchResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      PublishedContentSearchResponse()..mergeFromBuffer(data, registry);
   factory PublishedContentSearchResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      PublishedContentSearchResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'PublishedContentSearchResponse',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: PublishedContentSearchResponse.$_createMessage)
     ..aOM<$0.Community>(1, _omitFieldNames ? '' : 'community',
-        subBuilder: $0.Community.create)
+        subBuilder: $0.Community.$_createMessage)
     ..aOM<PublishedContentSearchRequest>(2, _omitFieldNames ? '' : 'next',
-        subBuilder: PublishedContentSearchRequest.create)
+        subBuilder: PublishedContentSearchRequest.$_createMessage)
     ..pPM<PublishedContent>(3, _omitFieldNames ? '' : 'items',
-        subBuilder: PublishedContent.create)
+        subBuilder: PublishedContent.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -654,13 +664,19 @@ class PublishedContentSearchResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use PublishedContentSearchResponse() / PublishedContentSearchResponse.new instead')
   static PublishedContentSearchResponse create() =>
       PublishedContentSearchResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      PublishedContentSearchResponse._();
   @$core.override
-  PublishedContentSearchResponse createEmptyInstance() => create();
+  PublishedContentSearchResponse createEmptyInstance() =>
+      PublishedContentSearchResponse._();
   @$core.pragma('dart2js:noInline')
   static PublishedContentSearchResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<PublishedContentSearchResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<PublishedContentSearchResponse>(
+          PublishedContentSearchResponse.$_createMessage);
   static PublishedContentSearchResponse? _defaultInstance;
 
   @$pb.TagNumber(1)

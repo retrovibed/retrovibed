@@ -40,7 +40,7 @@ class Community extends $pb.GeneratedMessage {
     $core.String? defaultLanguage,
     $core.String? lastSyncAt,
   }) {
-    final result = create();
+    final result = Community._();
     if (id != null) result.id = id;
     if (accountId != null) result.accountId = accountId;
     if (createdAt != null) result.createdAt = createdAt;
@@ -65,16 +65,16 @@ class Community extends $pb.GeneratedMessage {
 
   factory Community.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      Community()..mergeFromBuffer(data, registry);
   factory Community.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      Community()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'Community',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: Community.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'id')
     ..aOS(2, _omitFieldNames ? '' : 'account_id')
     ..aOS(4, _omitFieldNames ? '' : 'created_at')
@@ -107,12 +107,14 @@ class Community extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use Community() / Community.new instead')
   static Community create() => Community._();
+  static $pb.GeneratedMessage $_createMessage() => Community._();
   @$core.override
-  Community createEmptyInstance() => create();
+  Community createEmptyInstance() => Community._();
   @$core.pragma('dart2js:noInline')
-  static Community getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Community>(create);
+  static Community getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<Community>(Community.$_createMessage);
   static Community? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -268,7 +270,7 @@ class CommunitySearchRequest extends $pb.GeneratedMessage {
     $fixnum.Int64? limit,
     $core.String? accountId,
   }) {
-    final result = create();
+    final result = CommunitySearchRequest._();
     if (query != null) result.query = query;
     if (offset != null) result.offset = offset;
     if (limit != null) result.limit = limit;
@@ -280,16 +282,16 @@ class CommunitySearchRequest extends $pb.GeneratedMessage {
 
   factory CommunitySearchRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      CommunitySearchRequest()..mergeFromBuffer(data, registry);
   factory CommunitySearchRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      CommunitySearchRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'CommunitySearchRequest',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: CommunitySearchRequest.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'query')
     ..a<$fixnum.Int64>(2, _omitFieldNames ? '' : 'offset', $pb.PbFieldType.OU6,
         defaultOrMaker: $fixnum.Int64.ZERO)
@@ -310,12 +312,16 @@ class CommunitySearchRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use CommunitySearchRequest() / CommunitySearchRequest.new instead')
   static CommunitySearchRequest create() => CommunitySearchRequest._();
+  static $pb.GeneratedMessage $_createMessage() => CommunitySearchRequest._();
   @$core.override
-  CommunitySearchRequest createEmptyInstance() => create();
+  CommunitySearchRequest createEmptyInstance() => CommunitySearchRequest._();
   @$core.pragma('dart2js:noInline')
   static CommunitySearchRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<CommunitySearchRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<CommunitySearchRequest>(
+          CommunitySearchRequest.$_createMessage);
   static CommunitySearchRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -361,7 +367,7 @@ class CommunitySearchResponse extends $pb.GeneratedMessage {
     CommunitySearchRequest? next,
     $core.Iterable<Community>? items,
   }) {
-    final result = create();
+    final result = CommunitySearchResponse._();
     if (next != null) result.next = next;
     if (items != null) result.items.addAll(items);
     return result;
@@ -371,20 +377,20 @@ class CommunitySearchResponse extends $pb.GeneratedMessage {
 
   factory CommunitySearchResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      CommunitySearchResponse()..mergeFromBuffer(data, registry);
   factory CommunitySearchResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      CommunitySearchResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'CommunitySearchResponse',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: CommunitySearchResponse.$_createMessage)
     ..aOM<CommunitySearchRequest>(1, _omitFieldNames ? '' : 'next',
-        subBuilder: CommunitySearchRequest.create)
+        subBuilder: CommunitySearchRequest.$_createMessage)
     ..pPM<Community>(2, _omitFieldNames ? '' : 'items',
-        subBuilder: Community.create)
+        subBuilder: Community.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -399,12 +405,16 @@ class CommunitySearchResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use CommunitySearchResponse() / CommunitySearchResponse.new instead')
   static CommunitySearchResponse create() => CommunitySearchResponse._();
+  static $pb.GeneratedMessage $_createMessage() => CommunitySearchResponse._();
   @$core.override
-  CommunitySearchResponse createEmptyInstance() => create();
+  CommunitySearchResponse createEmptyInstance() => CommunitySearchResponse._();
   @$core.pragma('dart2js:noInline')
   static CommunitySearchResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<CommunitySearchResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<CommunitySearchResponse>(
+          CommunitySearchResponse.$_createMessage);
   static CommunitySearchResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -426,7 +436,7 @@ class CommunityCreateRequest extends $pb.GeneratedMessage {
   factory CommunityCreateRequest({
     Community? community,
   }) {
-    final result = create();
+    final result = CommunityCreateRequest._();
     if (community != null) result.community = community;
     return result;
   }
@@ -435,18 +445,18 @@ class CommunityCreateRequest extends $pb.GeneratedMessage {
 
   factory CommunityCreateRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      CommunityCreateRequest()..mergeFromBuffer(data, registry);
   factory CommunityCreateRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      CommunityCreateRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'CommunityCreateRequest',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: CommunityCreateRequest.$_createMessage)
     ..aOM<Community>(1, _omitFieldNames ? '' : 'community',
-        subBuilder: Community.create)
+        subBuilder: Community.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -461,12 +471,16 @@ class CommunityCreateRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use CommunityCreateRequest() / CommunityCreateRequest.new instead')
   static CommunityCreateRequest create() => CommunityCreateRequest._();
+  static $pb.GeneratedMessage $_createMessage() => CommunityCreateRequest._();
   @$core.override
-  CommunityCreateRequest createEmptyInstance() => create();
+  CommunityCreateRequest createEmptyInstance() => CommunityCreateRequest._();
   @$core.pragma('dart2js:noInline')
   static CommunityCreateRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<CommunityCreateRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<CommunityCreateRequest>(
+          CommunityCreateRequest.$_createMessage);
   static CommunityCreateRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -485,7 +499,7 @@ class CommunityCreateResponse extends $pb.GeneratedMessage {
   factory CommunityCreateResponse({
     Community? community,
   }) {
-    final result = create();
+    final result = CommunityCreateResponse._();
     if (community != null) result.community = community;
     return result;
   }
@@ -494,18 +508,18 @@ class CommunityCreateResponse extends $pb.GeneratedMessage {
 
   factory CommunityCreateResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      CommunityCreateResponse()..mergeFromBuffer(data, registry);
   factory CommunityCreateResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      CommunityCreateResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'CommunityCreateResponse',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: CommunityCreateResponse.$_createMessage)
     ..aOM<Community>(1, _omitFieldNames ? '' : 'community',
-        subBuilder: Community.create)
+        subBuilder: Community.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -520,12 +534,16 @@ class CommunityCreateResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use CommunityCreateResponse() / CommunityCreateResponse.new instead')
   static CommunityCreateResponse create() => CommunityCreateResponse._();
+  static $pb.GeneratedMessage $_createMessage() => CommunityCreateResponse._();
   @$core.override
-  CommunityCreateResponse createEmptyInstance() => create();
+  CommunityCreateResponse createEmptyInstance() => CommunityCreateResponse._();
   @$core.pragma('dart2js:noInline')
   static CommunityCreateResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<CommunityCreateResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<CommunityCreateResponse>(
+          CommunityCreateResponse.$_createMessage);
   static CommunityCreateResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -541,22 +559,22 @@ class CommunityCreateResponse extends $pb.GeneratedMessage {
 }
 
 class CommunityFindRequest extends $pb.GeneratedMessage {
-  factory CommunityFindRequest() => create();
+  factory CommunityFindRequest() => CommunityFindRequest._();
 
   CommunityFindRequest._();
 
   factory CommunityFindRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      CommunityFindRequest()..mergeFromBuffer(data, registry);
   factory CommunityFindRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      CommunityFindRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'CommunityFindRequest',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: CommunityFindRequest.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -570,12 +588,16 @@ class CommunityFindRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use CommunityFindRequest() / CommunityFindRequest.new instead')
   static CommunityFindRequest create() => CommunityFindRequest._();
+  static $pb.GeneratedMessage $_createMessage() => CommunityFindRequest._();
   @$core.override
-  CommunityFindRequest createEmptyInstance() => create();
+  CommunityFindRequest createEmptyInstance() => CommunityFindRequest._();
   @$core.pragma('dart2js:noInline')
   static CommunityFindRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<CommunityFindRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<CommunityFindRequest>(
+          CommunityFindRequest.$_createMessage);
   static CommunityFindRequest? _defaultInstance;
 }
 
@@ -583,7 +605,7 @@ class CommunityFindResponse extends $pb.GeneratedMessage {
   factory CommunityFindResponse({
     Community? community,
   }) {
-    final result = create();
+    final result = CommunityFindResponse._();
     if (community != null) result.community = community;
     return result;
   }
@@ -592,18 +614,18 @@ class CommunityFindResponse extends $pb.GeneratedMessage {
 
   factory CommunityFindResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      CommunityFindResponse()..mergeFromBuffer(data, registry);
   factory CommunityFindResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      CommunityFindResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'CommunityFindResponse',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: CommunityFindResponse.$_createMessage)
     ..aOM<Community>(1, _omitFieldNames ? '' : 'community',
-        subBuilder: Community.create)
+        subBuilder: Community.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -618,12 +640,16 @@ class CommunityFindResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use CommunityFindResponse() / CommunityFindResponse.new instead')
   static CommunityFindResponse create() => CommunityFindResponse._();
+  static $pb.GeneratedMessage $_createMessage() => CommunityFindResponse._();
   @$core.override
-  CommunityFindResponse createEmptyInstance() => create();
+  CommunityFindResponse createEmptyInstance() => CommunityFindResponse._();
   @$core.pragma('dart2js:noInline')
   static CommunityFindResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<CommunityFindResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<CommunityFindResponse>(
+          CommunityFindResponse.$_createMessage);
   static CommunityFindResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -642,7 +668,7 @@ class CommunityUploadRequest extends $pb.GeneratedMessage {
   factory CommunityUploadRequest({
     Community? community,
   }) {
-    final result = create();
+    final result = CommunityUploadRequest._();
     if (community != null) result.community = community;
     return result;
   }
@@ -651,18 +677,18 @@ class CommunityUploadRequest extends $pb.GeneratedMessage {
 
   factory CommunityUploadRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      CommunityUploadRequest()..mergeFromBuffer(data, registry);
   factory CommunityUploadRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      CommunityUploadRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'CommunityUploadRequest',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: CommunityUploadRequest.$_createMessage)
     ..aOM<Community>(1, _omitFieldNames ? '' : 'community',
-        subBuilder: Community.create)
+        subBuilder: Community.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -677,12 +703,16 @@ class CommunityUploadRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use CommunityUploadRequest() / CommunityUploadRequest.new instead')
   static CommunityUploadRequest create() => CommunityUploadRequest._();
+  static $pb.GeneratedMessage $_createMessage() => CommunityUploadRequest._();
   @$core.override
-  CommunityUploadRequest createEmptyInstance() => create();
+  CommunityUploadRequest createEmptyInstance() => CommunityUploadRequest._();
   @$core.pragma('dart2js:noInline')
   static CommunityUploadRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<CommunityUploadRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<CommunityUploadRequest>(
+          CommunityUploadRequest.$_createMessage);
   static CommunityUploadRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -701,7 +731,7 @@ class CommunityUploadResponse extends $pb.GeneratedMessage {
   factory CommunityUploadResponse({
     Community? community,
   }) {
-    final result = create();
+    final result = CommunityUploadResponse._();
     if (community != null) result.community = community;
     return result;
   }
@@ -710,18 +740,18 @@ class CommunityUploadResponse extends $pb.GeneratedMessage {
 
   factory CommunityUploadResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      CommunityUploadResponse()..mergeFromBuffer(data, registry);
   factory CommunityUploadResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      CommunityUploadResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'CommunityUploadResponse',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: CommunityUploadResponse.$_createMessage)
     ..aOM<Community>(1, _omitFieldNames ? '' : 'community',
-        subBuilder: Community.create)
+        subBuilder: Community.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -736,12 +766,16 @@ class CommunityUploadResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use CommunityUploadResponse() / CommunityUploadResponse.new instead')
   static CommunityUploadResponse create() => CommunityUploadResponse._();
+  static $pb.GeneratedMessage $_createMessage() => CommunityUploadResponse._();
   @$core.override
-  CommunityUploadResponse createEmptyInstance() => create();
+  CommunityUploadResponse createEmptyInstance() => CommunityUploadResponse._();
   @$core.pragma('dart2js:noInline')
   static CommunityUploadResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<CommunityUploadResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<CommunityUploadResponse>(
+          CommunityUploadResponse.$_createMessage);
   static CommunityUploadResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -757,22 +791,22 @@ class CommunityUploadResponse extends $pb.GeneratedMessage {
 }
 
 class CommunityDeleteRequest extends $pb.GeneratedMessage {
-  factory CommunityDeleteRequest() => create();
+  factory CommunityDeleteRequest() => CommunityDeleteRequest._();
 
   CommunityDeleteRequest._();
 
   factory CommunityDeleteRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      CommunityDeleteRequest()..mergeFromBuffer(data, registry);
   factory CommunityDeleteRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      CommunityDeleteRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'CommunityDeleteRequest',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: CommunityDeleteRequest.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -787,12 +821,16 @@ class CommunityDeleteRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use CommunityDeleteRequest() / CommunityDeleteRequest.new instead')
   static CommunityDeleteRequest create() => CommunityDeleteRequest._();
+  static $pb.GeneratedMessage $_createMessage() => CommunityDeleteRequest._();
   @$core.override
-  CommunityDeleteRequest createEmptyInstance() => create();
+  CommunityDeleteRequest createEmptyInstance() => CommunityDeleteRequest._();
   @$core.pragma('dart2js:noInline')
   static CommunityDeleteRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<CommunityDeleteRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<CommunityDeleteRequest>(
+          CommunityDeleteRequest.$_createMessage);
   static CommunityDeleteRequest? _defaultInstance;
 }
 
@@ -800,7 +838,7 @@ class CommunityDeleteResponse extends $pb.GeneratedMessage {
   factory CommunityDeleteResponse({
     Community? community,
   }) {
-    final result = create();
+    final result = CommunityDeleteResponse._();
     if (community != null) result.community = community;
     return result;
   }
@@ -809,18 +847,18 @@ class CommunityDeleteResponse extends $pb.GeneratedMessage {
 
   factory CommunityDeleteResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      CommunityDeleteResponse()..mergeFromBuffer(data, registry);
   factory CommunityDeleteResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      CommunityDeleteResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'CommunityDeleteResponse',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: CommunityDeleteResponse.$_createMessage)
     ..aOM<Community>(1, _omitFieldNames ? '' : 'community',
-        subBuilder: Community.create)
+        subBuilder: Community.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -835,12 +873,16 @@ class CommunityDeleteResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use CommunityDeleteResponse() / CommunityDeleteResponse.new instead')
   static CommunityDeleteResponse create() => CommunityDeleteResponse._();
+  static $pb.GeneratedMessage $_createMessage() => CommunityDeleteResponse._();
   @$core.override
-  CommunityDeleteResponse createEmptyInstance() => create();
+  CommunityDeleteResponse createEmptyInstance() => CommunityDeleteResponse._();
   @$core.pragma('dart2js:noInline')
   static CommunityDeleteResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<CommunityDeleteResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<CommunityDeleteResponse>(
+          CommunityDeleteResponse.$_createMessage);
   static CommunityDeleteResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -859,7 +901,7 @@ class CommunityUpdateRequest extends $pb.GeneratedMessage {
   factory CommunityUpdateRequest({
     Community? community,
   }) {
-    final result = create();
+    final result = CommunityUpdateRequest._();
     if (community != null) result.community = community;
     return result;
   }
@@ -868,18 +910,18 @@ class CommunityUpdateRequest extends $pb.GeneratedMessage {
 
   factory CommunityUpdateRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      CommunityUpdateRequest()..mergeFromBuffer(data, registry);
   factory CommunityUpdateRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      CommunityUpdateRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'CommunityUpdateRequest',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: CommunityUpdateRequest.$_createMessage)
     ..aOM<Community>(1, _omitFieldNames ? '' : 'community',
-        subBuilder: Community.create)
+        subBuilder: Community.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -894,12 +936,16 @@ class CommunityUpdateRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use CommunityUpdateRequest() / CommunityUpdateRequest.new instead')
   static CommunityUpdateRequest create() => CommunityUpdateRequest._();
+  static $pb.GeneratedMessage $_createMessage() => CommunityUpdateRequest._();
   @$core.override
-  CommunityUpdateRequest createEmptyInstance() => create();
+  CommunityUpdateRequest createEmptyInstance() => CommunityUpdateRequest._();
   @$core.pragma('dart2js:noInline')
   static CommunityUpdateRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<CommunityUpdateRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<CommunityUpdateRequest>(
+          CommunityUpdateRequest.$_createMessage);
   static CommunityUpdateRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -918,7 +964,7 @@ class CommunityUpdateResponse extends $pb.GeneratedMessage {
   factory CommunityUpdateResponse({
     Community? community,
   }) {
-    final result = create();
+    final result = CommunityUpdateResponse._();
     if (community != null) result.community = community;
     return result;
   }
@@ -927,18 +973,18 @@ class CommunityUpdateResponse extends $pb.GeneratedMessage {
 
   factory CommunityUpdateResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      CommunityUpdateResponse()..mergeFromBuffer(data, registry);
   factory CommunityUpdateResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      CommunityUpdateResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'CommunityUpdateResponse',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: CommunityUpdateResponse.$_createMessage)
     ..aOM<Community>(1, _omitFieldNames ? '' : 'community',
-        subBuilder: Community.create)
+        subBuilder: Community.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -953,12 +999,16 @@ class CommunityUpdateResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use CommunityUpdateResponse() / CommunityUpdateResponse.new instead')
   static CommunityUpdateResponse create() => CommunityUpdateResponse._();
+  static $pb.GeneratedMessage $_createMessage() => CommunityUpdateResponse._();
   @$core.override
-  CommunityUpdateResponse createEmptyInstance() => create();
+  CommunityUpdateResponse createEmptyInstance() => CommunityUpdateResponse._();
   @$core.pragma('dart2js:noInline')
   static CommunityUpdateResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<CommunityUpdateResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<CommunityUpdateResponse>(
+          CommunityUpdateResponse.$_createMessage);
   static CommunityUpdateResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -974,22 +1024,22 @@ class CommunityUpdateResponse extends $pb.GeneratedMessage {
 }
 
 class CommunitySubscribeRequest extends $pb.GeneratedMessage {
-  factory CommunitySubscribeRequest() => create();
+  factory CommunitySubscribeRequest() => CommunitySubscribeRequest._();
 
   CommunitySubscribeRequest._();
 
   factory CommunitySubscribeRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      CommunitySubscribeRequest()..mergeFromBuffer(data, registry);
   factory CommunitySubscribeRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      CommunitySubscribeRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'CommunitySubscribeRequest',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: CommunitySubscribeRequest.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1004,32 +1054,38 @@ class CommunitySubscribeRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use CommunitySubscribeRequest() / CommunitySubscribeRequest.new instead')
   static CommunitySubscribeRequest create() => CommunitySubscribeRequest._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      CommunitySubscribeRequest._();
   @$core.override
-  CommunitySubscribeRequest createEmptyInstance() => create();
+  CommunitySubscribeRequest createEmptyInstance() =>
+      CommunitySubscribeRequest._();
   @$core.pragma('dart2js:noInline')
   static CommunitySubscribeRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<CommunitySubscribeRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<CommunitySubscribeRequest>(
+          CommunitySubscribeRequest.$_createMessage);
   static CommunitySubscribeRequest? _defaultInstance;
 }
 
 class CommunitySubscribeResponse extends $pb.GeneratedMessage {
-  factory CommunitySubscribeResponse() => create();
+  factory CommunitySubscribeResponse() => CommunitySubscribeResponse._();
 
   CommunitySubscribeResponse._();
 
   factory CommunitySubscribeResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      CommunitySubscribeResponse()..mergeFromBuffer(data, registry);
   factory CommunitySubscribeResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      CommunitySubscribeResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'CommunitySubscribeResponse',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: CommunitySubscribeResponse.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1045,12 +1101,18 @@ class CommunitySubscribeResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use CommunitySubscribeResponse() / CommunitySubscribeResponse.new instead')
   static CommunitySubscribeResponse create() => CommunitySubscribeResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      CommunitySubscribeResponse._();
   @$core.override
-  CommunitySubscribeResponse createEmptyInstance() => create();
+  CommunitySubscribeResponse createEmptyInstance() =>
+      CommunitySubscribeResponse._();
   @$core.pragma('dart2js:noInline')
   static CommunitySubscribeResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<CommunitySubscribeResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<CommunitySubscribeResponse>(
+          CommunitySubscribeResponse.$_createMessage);
   static CommunitySubscribeResponse? _defaultInstance;
 }
 
@@ -1059,7 +1121,7 @@ class YouTubeStatus extends $pb.GeneratedMessage {
     $core.bool? linked,
     $core.String? id,
   }) {
-    final result = create();
+    final result = YouTubeStatus._();
     if (linked != null) result.linked = linked;
     if (id != null) result.id = id;
     return result;
@@ -1069,16 +1131,16 @@ class YouTubeStatus extends $pb.GeneratedMessage {
 
   factory YouTubeStatus.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      YouTubeStatus()..mergeFromBuffer(data, registry);
   factory YouTubeStatus.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      YouTubeStatus()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'YouTubeStatus',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: YouTubeStatus.$_createMessage)
     ..aOB(1, _omitFieldNames ? '' : 'linked')
     ..aOS(2, _omitFieldNames ? '' : 'id')
     ..hasRequiredFields = false;
@@ -1094,12 +1156,15 @@ class YouTubeStatus extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use YouTubeStatus() / YouTubeStatus.new instead')
   static YouTubeStatus create() => YouTubeStatus._();
+  static $pb.GeneratedMessage $_createMessage() => YouTubeStatus._();
   @$core.override
-  YouTubeStatus createEmptyInstance() => create();
+  YouTubeStatus createEmptyInstance() => YouTubeStatus._();
   @$core.pragma('dart2js:noInline')
-  static YouTubeStatus getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<YouTubeStatus>(create);
+  static YouTubeStatus getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<YouTubeStatus>(
+          YouTubeStatus.$_createMessage);
   static YouTubeStatus? _defaultInstance;
 
   @$pb.TagNumber(1)

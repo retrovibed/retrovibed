@@ -115,24 +115,11 @@ final $typed_data.Uint8List publishContentResponseDescriptor = $convert.base64De
 @$core.Deprecated('Use publishContentDeleteRequestDescriptor instead')
 const PublishContentDeleteRequest$json = {
   '1': 'PublishContentDeleteRequest',
-  '2': [
-    {
-      '1': 'published_content',
-      '3': 1,
-      '4': 1,
-      '5': 11,
-      '6': '.retrovibed.community.PublishedContent',
-      '10': 'published_content'
-    },
-  ],
 };
 
 /// Descriptor for `PublishContentDeleteRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List publishContentDeleteRequestDescriptor =
-    $convert.base64Decode(
-        'ChtQdWJsaXNoQ29udGVudERlbGV0ZVJlcXVlc3QSVAoRcHVibGlzaGVkX2NvbnRlbnQYASABKA'
-        'syJi5yZXRyb3ZpYmVkLmNvbW11bml0eS5QdWJsaXNoZWRDb250ZW50UhFwdWJsaXNoZWRfY29u'
-        'dGVudA==');
+    $convert.base64Decode('ChtQdWJsaXNoQ29udGVudERlbGV0ZVJlcXVlc3Q=');
 
 @$core.Deprecated('Use publishContentDeleteResponseDescriptor instead')
 const PublishContentDeleteResponse$json = {

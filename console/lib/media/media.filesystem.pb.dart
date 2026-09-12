@@ -32,7 +32,7 @@ class FilesystemSearchRequest extends $pb.GeneratedMessage {
     $fixnum.Int64? offset,
     $fixnum.Int64? limit,
   }) {
-    final result = create();
+    final result = FilesystemSearchRequest._();
     if (query != null) result.query = query;
     if (mimetypes != null) result.mimetypes.addAll(mimetypes);
     if (hidden != null) result.hidden = hidden;
@@ -46,15 +46,15 @@ class FilesystemSearchRequest extends $pb.GeneratedMessage {
 
   factory FilesystemSearchRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      FilesystemSearchRequest()..mergeFromBuffer(data, registry);
   factory FilesystemSearchRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      FilesystemSearchRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'FilesystemSearchRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: FilesystemSearchRequest.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'query')
     ..pPS(2, _omitFieldNames ? '' : 'mimetypes')
     ..aOB(3, _omitFieldNames ? '' : 'hidden')
@@ -78,12 +78,16 @@ class FilesystemSearchRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use FilesystemSearchRequest() / FilesystemSearchRequest.new instead')
   static FilesystemSearchRequest create() => FilesystemSearchRequest._();
+  static $pb.GeneratedMessage $_createMessage() => FilesystemSearchRequest._();
   @$core.override
-  FilesystemSearchRequest createEmptyInstance() => create();
+  FilesystemSearchRequest createEmptyInstance() => FilesystemSearchRequest._();
   @$core.pragma('dart2js:noInline')
   static FilesystemSearchRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<FilesystemSearchRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<FilesystemSearchRequest>(
+          FilesystemSearchRequest.$_createMessage);
   static FilesystemSearchRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -142,7 +146,7 @@ class FilesystemSearchResponse extends $pb.GeneratedMessage {
     $core.Iterable<$0.Media>? items,
     $core.Iterable<$0.Media>? breadcrumb,
   }) {
-    final result = create();
+    final result = FilesystemSearchResponse._();
     if (next != null) result.next = next;
     if (items != null) result.items.addAll(items);
     if (breadcrumb != null) result.breadcrumb.addAll(breadcrumb);
@@ -153,21 +157,21 @@ class FilesystemSearchResponse extends $pb.GeneratedMessage {
 
   factory FilesystemSearchResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      FilesystemSearchResponse()..mergeFromBuffer(data, registry);
   factory FilesystemSearchResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      FilesystemSearchResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'FilesystemSearchResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: FilesystemSearchResponse.$_createMessage)
     ..aOM<FilesystemSearchRequest>(1, _omitFieldNames ? '' : 'next',
-        subBuilder: FilesystemSearchRequest.create)
+        subBuilder: FilesystemSearchRequest.$_createMessage)
     ..pPM<$0.Media>(2, _omitFieldNames ? '' : 'items',
-        subBuilder: $0.Media.create)
+        subBuilder: $0.Media.$_createMessage)
     ..pPM<$0.Media>(3, _omitFieldNames ? '' : 'breadcrumb',
-        subBuilder: $0.Media.create)
+        subBuilder: $0.Media.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -182,12 +186,17 @@ class FilesystemSearchResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use FilesystemSearchResponse() / FilesystemSearchResponse.new instead')
   static FilesystemSearchResponse create() => FilesystemSearchResponse._();
+  static $pb.GeneratedMessage $_createMessage() => FilesystemSearchResponse._();
   @$core.override
-  FilesystemSearchResponse createEmptyInstance() => create();
+  FilesystemSearchResponse createEmptyInstance() =>
+      FilesystemSearchResponse._();
   @$core.pragma('dart2js:noInline')
   static FilesystemSearchResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<FilesystemSearchResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<FilesystemSearchResponse>(
+          FilesystemSearchResponse.$_createMessage);
   static FilesystemSearchResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -215,7 +224,7 @@ class FilesystemCreateRequest extends $pb.GeneratedMessage {
     $core.String? directoryId,
     $core.String? name,
   }) {
-    final result = create();
+    final result = FilesystemCreateRequest._();
     if (directoryId != null) result.directoryId = directoryId;
     if (name != null) result.name = name;
     return result;
@@ -225,15 +234,15 @@ class FilesystemCreateRequest extends $pb.GeneratedMessage {
 
   factory FilesystemCreateRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      FilesystemCreateRequest()..mergeFromBuffer(data, registry);
   factory FilesystemCreateRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      FilesystemCreateRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'FilesystemCreateRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: FilesystemCreateRequest.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'directory_id')
     ..aOS(2, _omitFieldNames ? '' : 'name')
     ..hasRequiredFields = false;
@@ -250,12 +259,16 @@ class FilesystemCreateRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use FilesystemCreateRequest() / FilesystemCreateRequest.new instead')
   static FilesystemCreateRequest create() => FilesystemCreateRequest._();
+  static $pb.GeneratedMessage $_createMessage() => FilesystemCreateRequest._();
   @$core.override
-  FilesystemCreateRequest createEmptyInstance() => create();
+  FilesystemCreateRequest createEmptyInstance() => FilesystemCreateRequest._();
   @$core.pragma('dart2js:noInline')
   static FilesystemCreateRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<FilesystemCreateRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<FilesystemCreateRequest>(
+          FilesystemCreateRequest.$_createMessage);
   static FilesystemCreateRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -281,7 +294,7 @@ class FilesystemCreateResponse extends $pb.GeneratedMessage {
   factory FilesystemCreateResponse({
     $0.Media? media,
   }) {
-    final result = create();
+    final result = FilesystemCreateResponse._();
     if (media != null) result.media = media;
     return result;
   }
@@ -290,17 +303,17 @@ class FilesystemCreateResponse extends $pb.GeneratedMessage {
 
   factory FilesystemCreateResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      FilesystemCreateResponse()..mergeFromBuffer(data, registry);
   factory FilesystemCreateResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      FilesystemCreateResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'FilesystemCreateResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: FilesystemCreateResponse.$_createMessage)
     ..aOM<$0.Media>(1, _omitFieldNames ? '' : 'media',
-        subBuilder: $0.Media.create)
+        subBuilder: $0.Media.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -315,12 +328,17 @@ class FilesystemCreateResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use FilesystemCreateResponse() / FilesystemCreateResponse.new instead')
   static FilesystemCreateResponse create() => FilesystemCreateResponse._();
+  static $pb.GeneratedMessage $_createMessage() => FilesystemCreateResponse._();
   @$core.override
-  FilesystemCreateResponse createEmptyInstance() => create();
+  FilesystemCreateResponse createEmptyInstance() =>
+      FilesystemCreateResponse._();
   @$core.pragma('dart2js:noInline')
   static FilesystemCreateResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<FilesystemCreateResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<FilesystemCreateResponse>(
+          FilesystemCreateResponse.$_createMessage);
   static FilesystemCreateResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -339,7 +357,7 @@ class FilesystemMoveRequest extends $pb.GeneratedMessage {
   factory FilesystemMoveRequest({
     $core.String? directoryId,
   }) {
-    final result = create();
+    final result = FilesystemMoveRequest._();
     if (directoryId != null) result.directoryId = directoryId;
     return result;
   }
@@ -348,15 +366,15 @@ class FilesystemMoveRequest extends $pb.GeneratedMessage {
 
   factory FilesystemMoveRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      FilesystemMoveRequest()..mergeFromBuffer(data, registry);
   factory FilesystemMoveRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      FilesystemMoveRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'FilesystemMoveRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: FilesystemMoveRequest.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'directory_id')
     ..hasRequiredFields = false;
 
@@ -372,12 +390,16 @@ class FilesystemMoveRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use FilesystemMoveRequest() / FilesystemMoveRequest.new instead')
   static FilesystemMoveRequest create() => FilesystemMoveRequest._();
+  static $pb.GeneratedMessage $_createMessage() => FilesystemMoveRequest._();
   @$core.override
-  FilesystemMoveRequest createEmptyInstance() => create();
+  FilesystemMoveRequest createEmptyInstance() => FilesystemMoveRequest._();
   @$core.pragma('dart2js:noInline')
   static FilesystemMoveRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<FilesystemMoveRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<FilesystemMoveRequest>(
+          FilesystemMoveRequest.$_createMessage);
   static FilesystemMoveRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -394,7 +416,7 @@ class FilesystemMoveResponse extends $pb.GeneratedMessage {
   factory FilesystemMoveResponse({
     $0.Media? media,
   }) {
-    final result = create();
+    final result = FilesystemMoveResponse._();
     if (media != null) result.media = media;
     return result;
   }
@@ -403,17 +425,17 @@ class FilesystemMoveResponse extends $pb.GeneratedMessage {
 
   factory FilesystemMoveResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      FilesystemMoveResponse()..mergeFromBuffer(data, registry);
   factory FilesystemMoveResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      FilesystemMoveResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'FilesystemMoveResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: FilesystemMoveResponse.$_createMessage)
     ..aOM<$0.Media>(1, _omitFieldNames ? '' : 'media',
-        subBuilder: $0.Media.create)
+        subBuilder: $0.Media.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -428,12 +450,16 @@ class FilesystemMoveResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use FilesystemMoveResponse() / FilesystemMoveResponse.new instead')
   static FilesystemMoveResponse create() => FilesystemMoveResponse._();
+  static $pb.GeneratedMessage $_createMessage() => FilesystemMoveResponse._();
   @$core.override
-  FilesystemMoveResponse createEmptyInstance() => create();
+  FilesystemMoveResponse createEmptyInstance() => FilesystemMoveResponse._();
   @$core.pragma('dart2js:noInline')
   static FilesystemMoveResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<FilesystemMoveResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<FilesystemMoveResponse>(
+          FilesystemMoveResponse.$_createMessage);
   static FilesystemMoveResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -453,7 +479,7 @@ class FilesystemDeleteResponse extends $pb.GeneratedMessage {
     $0.Media? media,
     $fixnum.Int64? removed,
   }) {
-    final result = create();
+    final result = FilesystemDeleteResponse._();
     if (media != null) result.media = media;
     if (removed != null) result.removed = removed;
     return result;
@@ -463,17 +489,17 @@ class FilesystemDeleteResponse extends $pb.GeneratedMessage {
 
   factory FilesystemDeleteResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      FilesystemDeleteResponse()..mergeFromBuffer(data, registry);
   factory FilesystemDeleteResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      FilesystemDeleteResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'FilesystemDeleteResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: create)
+      createEmptyInstance: FilesystemDeleteResponse.$_createMessage)
     ..aOM<$0.Media>(1, _omitFieldNames ? '' : 'media',
-        subBuilder: $0.Media.create)
+        subBuilder: $0.Media.$_createMessage)
     ..a<$fixnum.Int64>(2, _omitFieldNames ? '' : 'removed', $pb.PbFieldType.OU6,
         defaultOrMaker: $fixnum.Int64.ZERO)
     ..hasRequiredFields = false;
@@ -490,12 +516,17 @@ class FilesystemDeleteResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use FilesystemDeleteResponse() / FilesystemDeleteResponse.new instead')
   static FilesystemDeleteResponse create() => FilesystemDeleteResponse._();
+  static $pb.GeneratedMessage $_createMessage() => FilesystemDeleteResponse._();
   @$core.override
-  FilesystemDeleteResponse createEmptyInstance() => create();
+  FilesystemDeleteResponse createEmptyInstance() =>
+      FilesystemDeleteResponse._();
   @$core.pragma('dart2js:noInline')
   static FilesystemDeleteResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<FilesystemDeleteResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<FilesystemDeleteResponse>(
+          FilesystemDeleteResponse.$_createMessage);
   static FilesystemDeleteResponse? _defaultInstance;
 
   @$pb.TagNumber(1)

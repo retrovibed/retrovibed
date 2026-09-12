@@ -27,7 +27,7 @@ class DHTDiagnostics extends $pb.GeneratedMessage {
     $core.int? badNodes,
     $fixnum.Int64? outboundQueriesAttempted,
   }) {
-    final result = create();
+    final result = DHTDiagnostics._();
     if (nodeId != null) result.nodeId = nodeId;
     if (goodNodes != null) result.goodNodes = goodNodes;
     if (nodes != null) result.nodes = nodes;
@@ -46,15 +46,15 @@ class DHTDiagnostics extends $pb.GeneratedMessage {
 
   factory DHTDiagnostics.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      DHTDiagnostics()..mergeFromBuffer(data, registry);
   factory DHTDiagnostics.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      DHTDiagnostics()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'DHTDiagnostics',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: DHTDiagnostics.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'node_id')
     ..aI(2, _omitFieldNames ? '' : 'good_nodes')
     ..aI(3, _omitFieldNames ? '' : 'nodes')
@@ -76,12 +76,15 @@ class DHTDiagnostics extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use DHTDiagnostics() / DHTDiagnostics.new instead')
   static DHTDiagnostics create() => DHTDiagnostics._();
+  static $pb.GeneratedMessage $_createMessage() => DHTDiagnostics._();
   @$core.override
-  DHTDiagnostics createEmptyInstance() => create();
+  DHTDiagnostics createEmptyInstance() => DHTDiagnostics._();
   @$core.pragma('dart2js:noInline')
-  static DHTDiagnostics getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DHTDiagnostics>(create);
+  static DHTDiagnostics getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DHTDiagnostics>(
+          DHTDiagnostics.$_createMessage);
   static DHTDiagnostics? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -153,7 +156,7 @@ class DHTMetricsResponse extends $pb.GeneratedMessage {
   factory DHTMetricsResponse({
     DHTDiagnostics? dht,
   }) {
-    final result = create();
+    final result = DHTMetricsResponse._();
     if (dht != null) result.dht = dht;
     return result;
   }
@@ -162,17 +165,17 @@ class DHTMetricsResponse extends $pb.GeneratedMessage {
 
   factory DHTMetricsResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      DHTMetricsResponse()..mergeFromBuffer(data, registry);
   factory DHTMetricsResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      DHTMetricsResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'DHTMetricsResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: DHTMetricsResponse.$_createMessage)
     ..aOM<DHTDiagnostics>(1, _omitFieldNames ? '' : 'dht',
-        subBuilder: DHTDiagnostics.create)
+        subBuilder: DHTDiagnostics.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -186,12 +189,15 @@ class DHTMetricsResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use DHTMetricsResponse() / DHTMetricsResponse.new instead')
   static DHTMetricsResponse create() => DHTMetricsResponse._();
+  static $pb.GeneratedMessage $_createMessage() => DHTMetricsResponse._();
   @$core.override
-  DHTMetricsResponse createEmptyInstance() => create();
+  DHTMetricsResponse createEmptyInstance() => DHTMetricsResponse._();
   @$core.pragma('dart2js:noInline')
   static DHTMetricsResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DHTMetricsResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<DHTMetricsResponse>(
+          DHTMetricsResponse.$_createMessage);
   static DHTMetricsResponse? _defaultInstance;
 
   @$pb.TagNumber(1)

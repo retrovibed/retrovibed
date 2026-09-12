@@ -27,7 +27,7 @@ class Bearer extends $pb.GeneratedMessage {
     $fixnum.Int64? exp,
     $fixnum.Int64? nbf,
   }) {
-    final result = create();
+    final result = Bearer._();
     if (jti != null) result.jti = jti;
     if (iss != null) result.iss = iss;
     if (sub != null) result.sub = sub;
@@ -42,15 +42,15 @@ class Bearer extends $pb.GeneratedMessage {
 
   factory Bearer.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      Bearer()..mergeFromBuffer(data, registry);
   factory Bearer.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      Bearer()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'Bearer',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: Bearer.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'jti')
     ..aOS(2, _omitFieldNames ? '' : 'iss')
     ..aOS(3, _omitFieldNames ? '' : 'sub')
@@ -70,12 +70,14 @@ class Bearer extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use Bearer() / Bearer.new instead')
   static Bearer create() => Bearer._();
+  static $pb.GeneratedMessage $_createMessage() => Bearer._();
   @$core.override
-  Bearer createEmptyInstance() => create();
+  Bearer createEmptyInstance() => Bearer._();
   @$core.pragma('dart2js:noInline')
-  static Bearer getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Bearer>(create);
+  static Bearer getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<Bearer>(Bearer.$_createMessage);
   static Bearer? _defaultInstance;
 
   /// START OF STANDARD FIELDS
@@ -166,7 +168,7 @@ class Token extends $pb.GeneratedMessage {
     $core.bool? remoteControl,
     $core.bool? localOnly,
   }) {
-    final result = create();
+    final result = Token._();
     if (jti != null) result.jti = jti;
     if (iss != null) result.iss = iss;
     if (sub != null) result.sub = sub;
@@ -194,15 +196,15 @@ class Token extends $pb.GeneratedMessage {
 
   factory Token.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      Token()..mergeFromBuffer(data, registry);
   factory Token.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      Token()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'Token',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: Token.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'jti')
     ..aOS(2, _omitFieldNames ? '' : 'iss')
     ..aOS(3, _omitFieldNames ? '' : 'sub')
@@ -239,12 +241,14 @@ class Token extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use Token() / Token.new instead')
   static Token create() => Token._();
+  static $pb.GeneratedMessage $_createMessage() => Token._();
   @$core.override
-  Token createEmptyInstance() => create();
+  Token createEmptyInstance() => Token._();
   @$core.pragma('dart2js:noInline')
-  static Token getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Token>(create);
+  static Token getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<Token>(Token.$_createMessage);
   static Token? _defaultInstance;
 
   /// START OF STANDARD FIELDS
@@ -431,21 +435,21 @@ class Token extends $pb.GeneratedMessage {
 }
 
 class AuthzRequest extends $pb.GeneratedMessage {
-  factory AuthzRequest() => create();
+  factory AuthzRequest() => AuthzRequest._();
 
   AuthzRequest._();
 
   factory AuthzRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      AuthzRequest()..mergeFromBuffer(data, registry);
   factory AuthzRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      AuthzRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'AuthzRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: AuthzRequest.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -459,12 +463,15 @@ class AuthzRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use AuthzRequest() / AuthzRequest.new instead')
   static AuthzRequest create() => AuthzRequest._();
+  static $pb.GeneratedMessage $_createMessage() => AuthzRequest._();
   @$core.override
-  AuthzRequest createEmptyInstance() => create();
+  AuthzRequest createEmptyInstance() => AuthzRequest._();
   @$core.pragma('dart2js:noInline')
-  static AuthzRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<AuthzRequest>(create);
+  static AuthzRequest getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<AuthzRequest>(
+          AuthzRequest.$_createMessage);
   static AuthzRequest? _defaultInstance;
 }
 
@@ -473,7 +480,7 @@ class AuthzResponse extends $pb.GeneratedMessage {
     $core.String? bearer,
     Token? token,
   }) {
-    final result = create();
+    final result = AuthzResponse._();
     if (bearer != null) result.bearer = bearer;
     if (token != null) result.token = token;
     return result;
@@ -483,17 +490,18 @@ class AuthzResponse extends $pb.GeneratedMessage {
 
   factory AuthzResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      AuthzResponse()..mergeFromBuffer(data, registry);
   factory AuthzResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      AuthzResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'AuthzResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: AuthzResponse.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'bearer')
-    ..aOM<Token>(2, _omitFieldNames ? '' : 'token', subBuilder: Token.create)
+    ..aOM<Token>(2, _omitFieldNames ? '' : 'token',
+        subBuilder: Token.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -507,12 +515,15 @@ class AuthzResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use AuthzResponse() / AuthzResponse.new instead')
   static AuthzResponse create() => AuthzResponse._();
+  static $pb.GeneratedMessage $_createMessage() => AuthzResponse._();
   @$core.override
-  AuthzResponse createEmptyInstance() => create();
+  AuthzResponse createEmptyInstance() => AuthzResponse._();
   @$core.pragma('dart2js:noInline')
-  static AuthzResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<AuthzResponse>(create);
+  static AuthzResponse getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<AuthzResponse>(
+          AuthzResponse.$_createMessage);
   static AuthzResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -540,7 +551,7 @@ class AuthzGrantRequest extends $pb.GeneratedMessage {
   factory AuthzGrantRequest({
     Token? token,
   }) {
-    final result = create();
+    final result = AuthzGrantRequest._();
     if (token != null) result.token = token;
     return result;
   }
@@ -549,16 +560,17 @@ class AuthzGrantRequest extends $pb.GeneratedMessage {
 
   factory AuthzGrantRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      AuthzGrantRequest()..mergeFromBuffer(data, registry);
   factory AuthzGrantRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      AuthzGrantRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'AuthzGrantRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
-    ..aOM<Token>(1, _omitFieldNames ? '' : 'token', subBuilder: Token.create)
+      createEmptyInstance: AuthzGrantRequest.$_createMessage)
+    ..aOM<Token>(1, _omitFieldNames ? '' : 'token',
+        subBuilder: Token.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -572,12 +584,15 @@ class AuthzGrantRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use AuthzGrantRequest() / AuthzGrantRequest.new instead')
   static AuthzGrantRequest create() => AuthzGrantRequest._();
+  static $pb.GeneratedMessage $_createMessage() => AuthzGrantRequest._();
   @$core.override
-  AuthzGrantRequest createEmptyInstance() => create();
+  AuthzGrantRequest createEmptyInstance() => AuthzGrantRequest._();
   @$core.pragma('dart2js:noInline')
-  static AuthzGrantRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<AuthzGrantRequest>(create);
+  static AuthzGrantRequest getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<AuthzGrantRequest>(
+          AuthzGrantRequest.$_createMessage);
   static AuthzGrantRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -596,7 +611,7 @@ class AuthzGrantResponse extends $pb.GeneratedMessage {
   factory AuthzGrantResponse({
     Token? token,
   }) {
-    final result = create();
+    final result = AuthzGrantResponse._();
     if (token != null) result.token = token;
     return result;
   }
@@ -605,16 +620,17 @@ class AuthzGrantResponse extends $pb.GeneratedMessage {
 
   factory AuthzGrantResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      AuthzGrantResponse()..mergeFromBuffer(data, registry);
   factory AuthzGrantResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      AuthzGrantResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'AuthzGrantResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
-    ..aOM<Token>(1, _omitFieldNames ? '' : 'token', subBuilder: Token.create)
+      createEmptyInstance: AuthzGrantResponse.$_createMessage)
+    ..aOM<Token>(1, _omitFieldNames ? '' : 'token',
+        subBuilder: Token.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -628,12 +644,15 @@ class AuthzGrantResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use AuthzGrantResponse() / AuthzGrantResponse.new instead')
   static AuthzGrantResponse create() => AuthzGrantResponse._();
+  static $pb.GeneratedMessage $_createMessage() => AuthzGrantResponse._();
   @$core.override
-  AuthzGrantResponse createEmptyInstance() => create();
+  AuthzGrantResponse createEmptyInstance() => AuthzGrantResponse._();
   @$core.pragma('dart2js:noInline')
   static AuthzGrantResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<AuthzGrantResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<AuthzGrantResponse>(
+          AuthzGrantResponse.$_createMessage);
   static AuthzGrantResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -652,7 +671,7 @@ class AuthzRevokeRequest extends $pb.GeneratedMessage {
   factory AuthzRevokeRequest({
     Token? token,
   }) {
-    final result = create();
+    final result = AuthzRevokeRequest._();
     if (token != null) result.token = token;
     return result;
   }
@@ -661,16 +680,17 @@ class AuthzRevokeRequest extends $pb.GeneratedMessage {
 
   factory AuthzRevokeRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      AuthzRevokeRequest()..mergeFromBuffer(data, registry);
   factory AuthzRevokeRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      AuthzRevokeRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'AuthzRevokeRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
-    ..aOM<Token>(1, _omitFieldNames ? '' : 'token', subBuilder: Token.create)
+      createEmptyInstance: AuthzRevokeRequest.$_createMessage)
+    ..aOM<Token>(1, _omitFieldNames ? '' : 'token',
+        subBuilder: Token.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -684,12 +704,15 @@ class AuthzRevokeRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use AuthzRevokeRequest() / AuthzRevokeRequest.new instead')
   static AuthzRevokeRequest create() => AuthzRevokeRequest._();
+  static $pb.GeneratedMessage $_createMessage() => AuthzRevokeRequest._();
   @$core.override
-  AuthzRevokeRequest createEmptyInstance() => create();
+  AuthzRevokeRequest createEmptyInstance() => AuthzRevokeRequest._();
   @$core.pragma('dart2js:noInline')
   static AuthzRevokeRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<AuthzRevokeRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<AuthzRevokeRequest>(
+          AuthzRevokeRequest.$_createMessage);
   static AuthzRevokeRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -708,7 +731,7 @@ class AuthzRevokeResponse extends $pb.GeneratedMessage {
   factory AuthzRevokeResponse({
     Token? token,
   }) {
-    final result = create();
+    final result = AuthzRevokeResponse._();
     if (token != null) result.token = token;
     return result;
   }
@@ -717,16 +740,17 @@ class AuthzRevokeResponse extends $pb.GeneratedMessage {
 
   factory AuthzRevokeResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      AuthzRevokeResponse()..mergeFromBuffer(data, registry);
   factory AuthzRevokeResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      AuthzRevokeResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'AuthzRevokeResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
-    ..aOM<Token>(1, _omitFieldNames ? '' : 'token', subBuilder: Token.create)
+      createEmptyInstance: AuthzRevokeResponse.$_createMessage)
+    ..aOM<Token>(1, _omitFieldNames ? '' : 'token',
+        subBuilder: Token.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -740,12 +764,16 @@ class AuthzRevokeResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use AuthzRevokeResponse() / AuthzRevokeResponse.new instead')
   static AuthzRevokeResponse create() => AuthzRevokeResponse._();
+  static $pb.GeneratedMessage $_createMessage() => AuthzRevokeResponse._();
   @$core.override
-  AuthzRevokeResponse createEmptyInstance() => create();
+  AuthzRevokeResponse createEmptyInstance() => AuthzRevokeResponse._();
   @$core.pragma('dart2js:noInline')
   static AuthzRevokeResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<AuthzRevokeResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<AuthzRevokeResponse>(
+          AuthzRevokeResponse.$_createMessage);
   static AuthzRevokeResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -764,7 +792,7 @@ class AuthzProfileRequest extends $pb.GeneratedMessage {
   factory AuthzProfileRequest({
     $core.String? profileId,
   }) {
-    final result = create();
+    final result = AuthzProfileRequest._();
     if (profileId != null) result.profileId = profileId;
     return result;
   }
@@ -773,15 +801,15 @@ class AuthzProfileRequest extends $pb.GeneratedMessage {
 
   factory AuthzProfileRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      AuthzProfileRequest()..mergeFromBuffer(data, registry);
   factory AuthzProfileRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      AuthzProfileRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'AuthzProfileRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: AuthzProfileRequest.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'profile_id')
     ..hasRequiredFields = false;
 
@@ -796,12 +824,16 @@ class AuthzProfileRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use AuthzProfileRequest() / AuthzProfileRequest.new instead')
   static AuthzProfileRequest create() => AuthzProfileRequest._();
+  static $pb.GeneratedMessage $_createMessage() => AuthzProfileRequest._();
   @$core.override
-  AuthzProfileRequest createEmptyInstance() => create();
+  AuthzProfileRequest createEmptyInstance() => AuthzProfileRequest._();
   @$core.pragma('dart2js:noInline')
   static AuthzProfileRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<AuthzProfileRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<AuthzProfileRequest>(
+          AuthzProfileRequest.$_createMessage);
   static AuthzProfileRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -818,7 +850,7 @@ class AuthzProfileResponse extends $pb.GeneratedMessage {
   factory AuthzProfileResponse({
     Token? token,
   }) {
-    final result = create();
+    final result = AuthzProfileResponse._();
     if (token != null) result.token = token;
     return result;
   }
@@ -827,16 +859,17 @@ class AuthzProfileResponse extends $pb.GeneratedMessage {
 
   factory AuthzProfileResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      AuthzProfileResponse()..mergeFromBuffer(data, registry);
   factory AuthzProfileResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      AuthzProfileResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'AuthzProfileResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
-    ..aOM<Token>(1, _omitFieldNames ? '' : 'token', subBuilder: Token.create)
+      createEmptyInstance: AuthzProfileResponse.$_createMessage)
+    ..aOM<Token>(1, _omitFieldNames ? '' : 'token',
+        subBuilder: Token.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -850,12 +883,16 @@ class AuthzProfileResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use AuthzProfileResponse() / AuthzProfileResponse.new instead')
   static AuthzProfileResponse create() => AuthzProfileResponse._();
+  static $pb.GeneratedMessage $_createMessage() => AuthzProfileResponse._();
   @$core.override
-  AuthzProfileResponse createEmptyInstance() => create();
+  AuthzProfileResponse createEmptyInstance() => AuthzProfileResponse._();
   @$core.pragma('dart2js:noInline')
   static AuthzProfileResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<AuthzProfileResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<AuthzProfileResponse>(
+          AuthzProfileResponse.$_createMessage);
   static AuthzProfileResponse? _defaultInstance;
 
   @$pb.TagNumber(1)

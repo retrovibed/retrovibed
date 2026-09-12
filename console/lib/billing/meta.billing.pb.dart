@@ -24,7 +24,7 @@ class Billing extends $pb.GeneratedMessage {
     $core.String? subscriptionId,
     $core.String? subscriptionEndedAt,
   }) {
-    final result = create();
+    final result = Billing._();
     if (customerId != null) result.customerId = customerId;
     if (planId != null) result.planId = planId;
     if (subscriptionId != null) result.subscriptionId = subscriptionId;
@@ -37,15 +37,15 @@ class Billing extends $pb.GeneratedMessage {
 
   factory Billing.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      Billing()..mergeFromBuffer(data, registry);
   factory Billing.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      Billing()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'Billing',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: Billing.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'customer_id')
     ..aOS(2, _omitFieldNames ? '' : 'plan_id')
     ..aOS(3, _omitFieldNames ? '' : 'subscription_id')
@@ -62,12 +62,14 @@ class Billing extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use Billing() / Billing.new instead')
   static Billing create() => Billing._();
+  static $pb.GeneratedMessage $_createMessage() => Billing._();
   @$core.override
-  Billing createEmptyInstance() => create();
+  Billing createEmptyInstance() => Billing._();
   @$core.pragma('dart2js:noInline')
-  static Billing getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Billing>(create);
+  static Billing getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<Billing>(Billing.$_createMessage);
   static Billing? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -119,7 +121,7 @@ class Plan extends $pb.GeneratedMessage {
     $core.bool? mobile,
     $core.String? stripeId,
   }) {
-    final result = create();
+    final result = Plan._();
     if (token != null) result.token = token;
     if (id != null) result.id = id;
     if (legacy != null) result.legacy = legacy;
@@ -136,15 +138,15 @@ class Plan extends $pb.GeneratedMessage {
 
   factory Plan.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      Plan()..mergeFromBuffer(data, registry);
   factory Plan.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      Plan()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'Plan',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: Plan.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'token')
     ..aOS(2, _omitFieldNames ? '' : 'id')
     ..aOB(3, _omitFieldNames ? '' : 'legacy')
@@ -166,12 +168,14 @@ class Plan extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use Plan() / Plan.new instead')
   static Plan create() => Plan._();
+  static $pb.GeneratedMessage $_createMessage() => Plan._();
   @$core.override
-  Plan createEmptyInstance() => create();
+  Plan createEmptyInstance() => Plan._();
   @$core.pragma('dart2js:noInline')
-  static Plan getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Plan>(create);
+  static Plan getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<Plan>(Plan.$_createMessage);
   static Plan? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -257,21 +261,21 @@ class Plan extends $pb.GeneratedMessage {
 }
 
 class BillingCreateRequest extends $pb.GeneratedMessage {
-  factory BillingCreateRequest() => create();
+  factory BillingCreateRequest() => BillingCreateRequest._();
 
   BillingCreateRequest._();
 
   factory BillingCreateRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      BillingCreateRequest()..mergeFromBuffer(data, registry);
   factory BillingCreateRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      BillingCreateRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'BillingCreateRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: BillingCreateRequest.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -285,12 +289,16 @@ class BillingCreateRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use BillingCreateRequest() / BillingCreateRequest.new instead')
   static BillingCreateRequest create() => BillingCreateRequest._();
+  static $pb.GeneratedMessage $_createMessage() => BillingCreateRequest._();
   @$core.override
-  BillingCreateRequest createEmptyInstance() => create();
+  BillingCreateRequest createEmptyInstance() => BillingCreateRequest._();
   @$core.pragma('dart2js:noInline')
   static BillingCreateRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<BillingCreateRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<BillingCreateRequest>(
+          BillingCreateRequest.$_createMessage);
   static BillingCreateRequest? _defaultInstance;
 }
 
@@ -298,7 +306,7 @@ class BillingCreateResponse extends $pb.GeneratedMessage {
   factory BillingCreateResponse({
     Billing? billing,
   }) {
-    final result = create();
+    final result = BillingCreateResponse._();
     if (billing != null) result.billing = billing;
     return result;
   }
@@ -307,17 +315,17 @@ class BillingCreateResponse extends $pb.GeneratedMessage {
 
   factory BillingCreateResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      BillingCreateResponse()..mergeFromBuffer(data, registry);
   factory BillingCreateResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      BillingCreateResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'BillingCreateResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: BillingCreateResponse.$_createMessage)
     ..aOM<Billing>(1, _omitFieldNames ? '' : 'billing',
-        subBuilder: Billing.create)
+        subBuilder: Billing.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -332,12 +340,16 @@ class BillingCreateResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use BillingCreateResponse() / BillingCreateResponse.new instead')
   static BillingCreateResponse create() => BillingCreateResponse._();
+  static $pb.GeneratedMessage $_createMessage() => BillingCreateResponse._();
   @$core.override
-  BillingCreateResponse createEmptyInstance() => create();
+  BillingCreateResponse createEmptyInstance() => BillingCreateResponse._();
   @$core.pragma('dart2js:noInline')
   static BillingCreateResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<BillingCreateResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<BillingCreateResponse>(
+          BillingCreateResponse.$_createMessage);
   static BillingCreateResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -353,21 +365,21 @@ class BillingCreateResponse extends $pb.GeneratedMessage {
 }
 
 class BillingLookupRequest extends $pb.GeneratedMessage {
-  factory BillingLookupRequest() => create();
+  factory BillingLookupRequest() => BillingLookupRequest._();
 
   BillingLookupRequest._();
 
   factory BillingLookupRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      BillingLookupRequest()..mergeFromBuffer(data, registry);
   factory BillingLookupRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      BillingLookupRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'BillingLookupRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: BillingLookupRequest.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -381,12 +393,16 @@ class BillingLookupRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use BillingLookupRequest() / BillingLookupRequest.new instead')
   static BillingLookupRequest create() => BillingLookupRequest._();
+  static $pb.GeneratedMessage $_createMessage() => BillingLookupRequest._();
   @$core.override
-  BillingLookupRequest createEmptyInstance() => create();
+  BillingLookupRequest createEmptyInstance() => BillingLookupRequest._();
   @$core.pragma('dart2js:noInline')
   static BillingLookupRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<BillingLookupRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<BillingLookupRequest>(
+          BillingLookupRequest.$_createMessage);
   static BillingLookupRequest? _defaultInstance;
 }
 
@@ -397,7 +413,7 @@ class BillingLookupResponse extends $pb.GeneratedMessage {
     $core.int? attributionRate,
     Plan? plan,
   }) {
-    final result = create();
+    final result = BillingLookupResponse._();
     if (billing != null) result.billing = billing;
     if (attributionCount != null) result.attributionCount = attributionCount;
     if (attributionRate != null) result.attributionRate = attributionRate;
@@ -409,20 +425,21 @@ class BillingLookupResponse extends $pb.GeneratedMessage {
 
   factory BillingLookupResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      BillingLookupResponse()..mergeFromBuffer(data, registry);
   factory BillingLookupResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      BillingLookupResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'BillingLookupResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: BillingLookupResponse.$_createMessage)
     ..aOM<Billing>(1, _omitFieldNames ? '' : 'billing',
-        subBuilder: Billing.create)
+        subBuilder: Billing.$_createMessage)
     ..aInt64(2, _omitFieldNames ? '' : 'attribution_count')
     ..aI(3, _omitFieldNames ? '' : 'attribution_rate')
-    ..aOM<Plan>(4, _omitFieldNames ? '' : 'plan', subBuilder: Plan.create)
+    ..aOM<Plan>(4, _omitFieldNames ? '' : 'plan',
+        subBuilder: Plan.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -437,12 +454,16 @@ class BillingLookupResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use BillingLookupResponse() / BillingLookupResponse.new instead')
   static BillingLookupResponse create() => BillingLookupResponse._();
+  static $pb.GeneratedMessage $_createMessage() => BillingLookupResponse._();
   @$core.override
-  BillingLookupResponse createEmptyInstance() => create();
+  BillingLookupResponse createEmptyInstance() => BillingLookupResponse._();
   @$core.pragma('dart2js:noInline')
   static BillingLookupResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<BillingLookupResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<BillingLookupResponse>(
+          BillingLookupResponse.$_createMessage);
   static BillingLookupResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -490,7 +511,7 @@ class BillingSubscribeRequest extends $pb.GeneratedMessage {
   factory BillingSubscribeRequest({
     $core.String? plan,
   }) {
-    final result = create();
+    final result = BillingSubscribeRequest._();
     if (plan != null) result.plan = plan;
     return result;
   }
@@ -499,15 +520,15 @@ class BillingSubscribeRequest extends $pb.GeneratedMessage {
 
   factory BillingSubscribeRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      BillingSubscribeRequest()..mergeFromBuffer(data, registry);
   factory BillingSubscribeRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      BillingSubscribeRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'BillingSubscribeRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: BillingSubscribeRequest.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'plan')
     ..hasRequiredFields = false;
 
@@ -523,12 +544,16 @@ class BillingSubscribeRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use BillingSubscribeRequest() / BillingSubscribeRequest.new instead')
   static BillingSubscribeRequest create() => BillingSubscribeRequest._();
+  static $pb.GeneratedMessage $_createMessage() => BillingSubscribeRequest._();
   @$core.override
-  BillingSubscribeRequest createEmptyInstance() => create();
+  BillingSubscribeRequest createEmptyInstance() => BillingSubscribeRequest._();
   @$core.pragma('dart2js:noInline')
   static BillingSubscribeRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<BillingSubscribeRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<BillingSubscribeRequest>(
+          BillingSubscribeRequest.$_createMessage);
   static BillingSubscribeRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -545,7 +570,7 @@ class BillingSubscribeResponse extends $pb.GeneratedMessage {
   factory BillingSubscribeResponse({
     Billing? billing,
   }) {
-    final result = create();
+    final result = BillingSubscribeResponse._();
     if (billing != null) result.billing = billing;
     return result;
   }
@@ -554,17 +579,17 @@ class BillingSubscribeResponse extends $pb.GeneratedMessage {
 
   factory BillingSubscribeResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      BillingSubscribeResponse()..mergeFromBuffer(data, registry);
   factory BillingSubscribeResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      BillingSubscribeResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'BillingSubscribeResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: BillingSubscribeResponse.$_createMessage)
     ..aOM<Billing>(1, _omitFieldNames ? '' : 'billing',
-        subBuilder: Billing.create)
+        subBuilder: Billing.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -579,12 +604,17 @@ class BillingSubscribeResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use BillingSubscribeResponse() / BillingSubscribeResponse.new instead')
   static BillingSubscribeResponse create() => BillingSubscribeResponse._();
+  static $pb.GeneratedMessage $_createMessage() => BillingSubscribeResponse._();
   @$core.override
-  BillingSubscribeResponse createEmptyInstance() => create();
+  BillingSubscribeResponse createEmptyInstance() =>
+      BillingSubscribeResponse._();
   @$core.pragma('dart2js:noInline')
   static BillingSubscribeResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<BillingSubscribeResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<BillingSubscribeResponse>(
+          BillingSubscribeResponse.$_createMessage);
   static BillingSubscribeResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -603,7 +633,7 @@ class BillingSessionRequest extends $pb.GeneratedMessage {
   factory BillingSessionRequest({
     $core.String? plan,
   }) {
-    final result = create();
+    final result = BillingSessionRequest._();
     if (plan != null) result.plan = plan;
     return result;
   }
@@ -612,15 +642,15 @@ class BillingSessionRequest extends $pb.GeneratedMessage {
 
   factory BillingSessionRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      BillingSessionRequest()..mergeFromBuffer(data, registry);
   factory BillingSessionRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      BillingSessionRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'BillingSessionRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: BillingSessionRequest.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'plan')
     ..hasRequiredFields = false;
 
@@ -636,12 +666,16 @@ class BillingSessionRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use BillingSessionRequest() / BillingSessionRequest.new instead')
   static BillingSessionRequest create() => BillingSessionRequest._();
+  static $pb.GeneratedMessage $_createMessage() => BillingSessionRequest._();
   @$core.override
-  BillingSessionRequest createEmptyInstance() => create();
+  BillingSessionRequest createEmptyInstance() => BillingSessionRequest._();
   @$core.pragma('dart2js:noInline')
   static BillingSessionRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<BillingSessionRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<BillingSessionRequest>(
+          BillingSessionRequest.$_createMessage);
   static BillingSessionRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -658,7 +692,7 @@ class BillingSessionResponse extends $pb.GeneratedMessage {
   factory BillingSessionResponse({
     $core.String? redirect,
   }) {
-    final result = create();
+    final result = BillingSessionResponse._();
     if (redirect != null) result.redirect = redirect;
     return result;
   }
@@ -667,15 +701,15 @@ class BillingSessionResponse extends $pb.GeneratedMessage {
 
   factory BillingSessionResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      BillingSessionResponse()..mergeFromBuffer(data, registry);
   factory BillingSessionResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      BillingSessionResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'BillingSessionResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: BillingSessionResponse.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'redirect')
     ..hasRequiredFields = false;
 
@@ -691,12 +725,16 @@ class BillingSessionResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use BillingSessionResponse() / BillingSessionResponse.new instead')
   static BillingSessionResponse create() => BillingSessionResponse._();
+  static $pb.GeneratedMessage $_createMessage() => BillingSessionResponse._();
   @$core.override
-  BillingSessionResponse createEmptyInstance() => create();
+  BillingSessionResponse createEmptyInstance() => BillingSessionResponse._();
   @$core.pragma('dart2js:noInline')
   static BillingSessionResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<BillingSessionResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<BillingSessionResponse>(
+          BillingSessionResponse.$_createMessage);
   static BillingSessionResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -710,21 +748,21 @@ class BillingSessionResponse extends $pb.GeneratedMessage {
 }
 
 class BillingPlansRequest extends $pb.GeneratedMessage {
-  factory BillingPlansRequest() => create();
+  factory BillingPlansRequest() => BillingPlansRequest._();
 
   BillingPlansRequest._();
 
   factory BillingPlansRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      BillingPlansRequest()..mergeFromBuffer(data, registry);
   factory BillingPlansRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      BillingPlansRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'BillingPlansRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: BillingPlansRequest.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -738,12 +776,16 @@ class BillingPlansRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use BillingPlansRequest() / BillingPlansRequest.new instead')
   static BillingPlansRequest create() => BillingPlansRequest._();
+  static $pb.GeneratedMessage $_createMessage() => BillingPlansRequest._();
   @$core.override
-  BillingPlansRequest createEmptyInstance() => create();
+  BillingPlansRequest createEmptyInstance() => BillingPlansRequest._();
   @$core.pragma('dart2js:noInline')
   static BillingPlansRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<BillingPlansRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<BillingPlansRequest>(
+          BillingPlansRequest.$_createMessage);
   static BillingPlansRequest? _defaultInstance;
 }
 
@@ -751,7 +793,7 @@ class BillingPlansResponse extends $pb.GeneratedMessage {
   factory BillingPlansResponse({
     $core.Iterable<Plan>? plans,
   }) {
-    final result = create();
+    final result = BillingPlansResponse._();
     if (plans != null) result.plans.addAll(plans);
     return result;
   }
@@ -760,16 +802,17 @@ class BillingPlansResponse extends $pb.GeneratedMessage {
 
   factory BillingPlansResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      BillingPlansResponse()..mergeFromBuffer(data, registry);
   factory BillingPlansResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      BillingPlansResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'BillingPlansResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
-    ..pPM<Plan>(1, _omitFieldNames ? '' : 'plans', subBuilder: Plan.create)
+      createEmptyInstance: BillingPlansResponse.$_createMessage)
+    ..pPM<Plan>(1, _omitFieldNames ? '' : 'plans',
+        subBuilder: Plan.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -783,12 +826,16 @@ class BillingPlansResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use BillingPlansResponse() / BillingPlansResponse.new instead')
   static BillingPlansResponse create() => BillingPlansResponse._();
+  static $pb.GeneratedMessage $_createMessage() => BillingPlansResponse._();
   @$core.override
-  BillingPlansResponse createEmptyInstance() => create();
+  BillingPlansResponse createEmptyInstance() => BillingPlansResponse._();
   @$core.pragma('dart2js:noInline')
   static BillingPlansResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<BillingPlansResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<BillingPlansResponse>(
+          BillingPlansResponse.$_createMessage);
   static BillingPlansResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -799,7 +846,7 @@ class AttributionTokenResponse extends $pb.GeneratedMessage {
   factory AttributionTokenResponse({
     $core.String? token,
   }) {
-    final result = create();
+    final result = AttributionTokenResponse._();
     if (token != null) result.token = token;
     return result;
   }
@@ -808,15 +855,15 @@ class AttributionTokenResponse extends $pb.GeneratedMessage {
 
   factory AttributionTokenResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      AttributionTokenResponse()..mergeFromBuffer(data, registry);
   factory AttributionTokenResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      AttributionTokenResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'AttributionTokenResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: AttributionTokenResponse.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'token')
     ..hasRequiredFields = false;
 
@@ -832,12 +879,17 @@ class AttributionTokenResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use AttributionTokenResponse() / AttributionTokenResponse.new instead')
   static AttributionTokenResponse create() => AttributionTokenResponse._();
+  static $pb.GeneratedMessage $_createMessage() => AttributionTokenResponse._();
   @$core.override
-  AttributionTokenResponse createEmptyInstance() => create();
+  AttributionTokenResponse createEmptyInstance() =>
+      AttributionTokenResponse._();
   @$core.pragma('dart2js:noInline')
   static AttributionTokenResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<AttributionTokenResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<AttributionTokenResponse>(
+          AttributionTokenResponse.$_createMessage);
   static AttributionTokenResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -854,7 +906,7 @@ class AttributionConsumeRequest extends $pb.GeneratedMessage {
   factory AttributionConsumeRequest({
     $core.String? token,
   }) {
-    final result = create();
+    final result = AttributionConsumeRequest._();
     if (token != null) result.token = token;
     return result;
   }
@@ -863,15 +915,15 @@ class AttributionConsumeRequest extends $pb.GeneratedMessage {
 
   factory AttributionConsumeRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      AttributionConsumeRequest()..mergeFromBuffer(data, registry);
   factory AttributionConsumeRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      AttributionConsumeRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'AttributionConsumeRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: AttributionConsumeRequest.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'token')
     ..hasRequiredFields = false;
 
@@ -887,12 +939,18 @@ class AttributionConsumeRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use AttributionConsumeRequest() / AttributionConsumeRequest.new instead')
   static AttributionConsumeRequest create() => AttributionConsumeRequest._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      AttributionConsumeRequest._();
   @$core.override
-  AttributionConsumeRequest createEmptyInstance() => create();
+  AttributionConsumeRequest createEmptyInstance() =>
+      AttributionConsumeRequest._();
   @$core.pragma('dart2js:noInline')
   static AttributionConsumeRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<AttributionConsumeRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<AttributionConsumeRequest>(
+          AttributionConsumeRequest.$_createMessage);
   static AttributionConsumeRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -909,7 +967,7 @@ class AttributionConsumeResponse extends $pb.GeneratedMessage {
   factory AttributionConsumeResponse({
     $core.String? attributionId,
   }) {
-    final result = create();
+    final result = AttributionConsumeResponse._();
     if (attributionId != null) result.attributionId = attributionId;
     return result;
   }
@@ -918,15 +976,15 @@ class AttributionConsumeResponse extends $pb.GeneratedMessage {
 
   factory AttributionConsumeResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      AttributionConsumeResponse()..mergeFromBuffer(data, registry);
   factory AttributionConsumeResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      AttributionConsumeResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'AttributionConsumeResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: AttributionConsumeResponse.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'attribution_id')
     ..hasRequiredFields = false;
 
@@ -943,12 +1001,18 @@ class AttributionConsumeResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use AttributionConsumeResponse() / AttributionConsumeResponse.new instead')
   static AttributionConsumeResponse create() => AttributionConsumeResponse._();
+  static $pb.GeneratedMessage $_createMessage() =>
+      AttributionConsumeResponse._();
   @$core.override
-  AttributionConsumeResponse createEmptyInstance() => create();
+  AttributionConsumeResponse createEmptyInstance() =>
+      AttributionConsumeResponse._();
   @$core.pragma('dart2js:noInline')
   static AttributionConsumeResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<AttributionConsumeResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<AttributionConsumeResponse>(
+          AttributionConsumeResponse.$_createMessage);
   static AttributionConsumeResponse? _defaultInstance;
 
   @$pb.TagNumber(1)

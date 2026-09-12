@@ -25,7 +25,7 @@ class CommunityMetric extends $pb.GeneratedMessage {
     $core.String? periodEnd,
     $core.int? subscribers,
   }) {
-    final result = create();
+    final result = CommunityMetric._();
     if (id != null) result.id = id;
     if (communityId != null) result.communityId = communityId;
     if (periodStart != null) result.periodStart = periodStart;
@@ -38,16 +38,16 @@ class CommunityMetric extends $pb.GeneratedMessage {
 
   factory CommunityMetric.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      CommunityMetric()..mergeFromBuffer(data, registry);
   factory CommunityMetric.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      CommunityMetric()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'CommunityMetric',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: CommunityMetric.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'id')
     ..aOS(2, _omitFieldNames ? '' : 'community_id')
     ..aOS(3, _omitFieldNames ? '' : 'period_start')
@@ -67,12 +67,15 @@ class CommunityMetric extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use CommunityMetric() / CommunityMetric.new instead')
   static CommunityMetric create() => CommunityMetric._();
+  static $pb.GeneratedMessage $_createMessage() => CommunityMetric._();
   @$core.override
-  CommunityMetric createEmptyInstance() => create();
+  CommunityMetric createEmptyInstance() => CommunityMetric._();
   @$core.pragma('dart2js:noInline')
-  static CommunityMetric getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<CommunityMetric>(create);
+  static CommunityMetric getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<CommunityMetric>(
+          CommunityMetric.$_createMessage);
   static CommunityMetric? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -131,7 +134,7 @@ class PublishedContentMetric extends $pb.GeneratedMessage {
     $fixnum.Int64? bytes,
     $fixnum.Int64? revenue,
   }) {
-    final result = create();
+    final result = PublishedContentMetric._();
     if (id != null) result.id = id;
     if (publishedContentId != null)
       result.publishedContentId = publishedContentId;
@@ -147,16 +150,16 @@ class PublishedContentMetric extends $pb.GeneratedMessage {
 
   factory PublishedContentMetric.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      PublishedContentMetric()..mergeFromBuffer(data, registry);
   factory PublishedContentMetric.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      PublishedContentMetric()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'PublishedContentMetric',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: PublishedContentMetric.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'id')
     ..aOS(2, _omitFieldNames ? '' : 'published_content_id')
     ..aOS(3, _omitFieldNames ? '' : 'period_start')
@@ -178,12 +181,16 @@ class PublishedContentMetric extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use PublishedContentMetric() / PublishedContentMetric.new instead')
   static PublishedContentMetric create() => PublishedContentMetric._();
+  static $pb.GeneratedMessage $_createMessage() => PublishedContentMetric._();
   @$core.override
-  PublishedContentMetric createEmptyInstance() => create();
+  PublishedContentMetric createEmptyInstance() => PublishedContentMetric._();
   @$core.pragma('dart2js:noInline')
   static PublishedContentMetric getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<PublishedContentMetric>(create);
+      $pb.GeneratedMessage.$_defaultFor<PublishedContentMetric>(
+          PublishedContentMetric.$_createMessage);
   static PublishedContentMetric? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -257,7 +264,7 @@ class CommunityMetricsRequest extends $pb.GeneratedMessage {
     $core.String? startDate,
     $core.String? endDate,
   }) {
-    final result = create();
+    final result = CommunityMetricsRequest._();
     if (communityId != null) result.communityId = communityId;
     if (period != null) result.period = period;
     if (startDate != null) result.startDate = startDate;
@@ -269,16 +276,16 @@ class CommunityMetricsRequest extends $pb.GeneratedMessage {
 
   factory CommunityMetricsRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      CommunityMetricsRequest()..mergeFromBuffer(data, registry);
   factory CommunityMetricsRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      CommunityMetricsRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'CommunityMetricsRequest',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: CommunityMetricsRequest.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'community_id')
     ..aOS(2, _omitFieldNames ? '' : 'period')
     ..aOS(3, _omitFieldNames ? '' : 'start_date')
@@ -297,12 +304,16 @@ class CommunityMetricsRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use CommunityMetricsRequest() / CommunityMetricsRequest.new instead')
   static CommunityMetricsRequest create() => CommunityMetricsRequest._();
+  static $pb.GeneratedMessage $_createMessage() => CommunityMetricsRequest._();
   @$core.override
-  CommunityMetricsRequest createEmptyInstance() => create();
+  CommunityMetricsRequest createEmptyInstance() => CommunityMetricsRequest._();
   @$core.pragma('dart2js:noInline')
   static CommunityMetricsRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<CommunityMetricsRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<CommunityMetricsRequest>(
+          CommunityMetricsRequest.$_createMessage);
   static CommunityMetricsRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -348,7 +359,7 @@ class CommunityMetricsResponse extends $pb.GeneratedMessage {
     $core.int? totalArchivers,
     $core.Iterable<PublishedContentMetric>? items,
   }) {
-    final result = create();
+    final result = CommunityMetricsResponse._();
     if (summary != null) result.summary = summary;
     if (totalArchivers != null) result.totalArchivers = totalArchivers;
     if (items != null) result.items.addAll(items);
@@ -359,21 +370,21 @@ class CommunityMetricsResponse extends $pb.GeneratedMessage {
 
   factory CommunityMetricsResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      CommunityMetricsResponse()..mergeFromBuffer(data, registry);
   factory CommunityMetricsResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      CommunityMetricsResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'CommunityMetricsResponse',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: CommunityMetricsResponse.$_createMessage)
     ..aOM<CommunityMetric>(1, _omitFieldNames ? '' : 'summary',
-        subBuilder: CommunityMetric.create)
+        subBuilder: CommunityMetric.$_createMessage)
     ..aI(2, _omitFieldNames ? '' : 'total_archivers')
     ..pPM<PublishedContentMetric>(3, _omitFieldNames ? '' : 'items',
-        subBuilder: PublishedContentMetric.create)
+        subBuilder: PublishedContentMetric.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -388,12 +399,17 @@ class CommunityMetricsResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use CommunityMetricsResponse() / CommunityMetricsResponse.new instead')
   static CommunityMetricsResponse create() => CommunityMetricsResponse._();
+  static $pb.GeneratedMessage $_createMessage() => CommunityMetricsResponse._();
   @$core.override
-  CommunityMetricsResponse createEmptyInstance() => create();
+  CommunityMetricsResponse createEmptyInstance() =>
+      CommunityMetricsResponse._();
   @$core.pragma('dart2js:noInline')
   static CommunityMetricsResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<CommunityMetricsResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<CommunityMetricsResponse>(
+          CommunityMetricsResponse.$_createMessage);
   static CommunityMetricsResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -425,7 +441,7 @@ class MetricsSyncRequest extends $pb.GeneratedMessage {
     $core.String? communityId,
     $core.String? since,
   }) {
-    final result = create();
+    final result = MetricsSyncRequest._();
     if (communityId != null) result.communityId = communityId;
     if (since != null) result.since = since;
     return result;
@@ -435,16 +451,16 @@ class MetricsSyncRequest extends $pb.GeneratedMessage {
 
   factory MetricsSyncRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      MetricsSyncRequest()..mergeFromBuffer(data, registry);
   factory MetricsSyncRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      MetricsSyncRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'MetricsSyncRequest',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: MetricsSyncRequest.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'community_id')
     ..aOS(2, _omitFieldNames ? '' : 'since')
     ..hasRequiredFields = false;
@@ -460,12 +476,15 @@ class MetricsSyncRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use MetricsSyncRequest() / MetricsSyncRequest.new instead')
   static MetricsSyncRequest create() => MetricsSyncRequest._();
+  static $pb.GeneratedMessage $_createMessage() => MetricsSyncRequest._();
   @$core.override
-  MetricsSyncRequest createEmptyInstance() => create();
+  MetricsSyncRequest createEmptyInstance() => MetricsSyncRequest._();
   @$core.pragma('dart2js:noInline')
   static MetricsSyncRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<MetricsSyncRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<MetricsSyncRequest>(
+          MetricsSyncRequest.$_createMessage);
   static MetricsSyncRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -494,7 +513,7 @@ class MetricsSyncResponse extends $pb.GeneratedMessage {
     $core.String? syncedAt,
     $core.bool? complete,
   }) {
-    final result = create();
+    final result = MetricsSyncResponse._();
     if (communityMetrics != null)
       result.communityMetrics.addAll(communityMetrics);
     if (contentMetrics != null) result.contentMetrics.addAll(contentMetrics);
@@ -507,20 +526,20 @@ class MetricsSyncResponse extends $pb.GeneratedMessage {
 
   factory MetricsSyncResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      MetricsSyncResponse()..mergeFromBuffer(data, registry);
   factory MetricsSyncResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      MetricsSyncResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'MetricsSyncResponse',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: MetricsSyncResponse.$_createMessage)
     ..pPM<CommunityMetric>(1, _omitFieldNames ? '' : 'community_metrics',
-        subBuilder: CommunityMetric.create)
+        subBuilder: CommunityMetric.$_createMessage)
     ..pPM<PublishedContentMetric>(2, _omitFieldNames ? '' : 'content_metrics',
-        subBuilder: PublishedContentMetric.create)
+        subBuilder: PublishedContentMetric.$_createMessage)
     ..aOS(3, _omitFieldNames ? '' : 'synced_at')
     ..aOB(4, _omitFieldNames ? '' : 'complete')
     ..hasRequiredFields = false;
@@ -536,12 +555,16 @@ class MetricsSyncResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use MetricsSyncResponse() / MetricsSyncResponse.new instead')
   static MetricsSyncResponse create() => MetricsSyncResponse._();
+  static $pb.GeneratedMessage $_createMessage() => MetricsSyncResponse._();
   @$core.override
-  MetricsSyncResponse createEmptyInstance() => create();
+  MetricsSyncResponse createEmptyInstance() => MetricsSyncResponse._();
   @$core.pragma('dart2js:noInline')
   static MetricsSyncResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<MetricsSyncResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<MetricsSyncResponse>(
+          MetricsSyncResponse.$_createMessage);
   static MetricsSyncResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -576,7 +599,7 @@ class MetricsSyncProgress extends $pb.GeneratedMessage {
     $core.int? contentMetricsCount,
     $core.String? error,
   }) {
-    final result = create();
+    final result = MetricsSyncProgress._();
     if (status != null) result.status = status;
     if (communityMetricsCount != null)
       result.communityMetricsCount = communityMetricsCount;
@@ -590,16 +613,16 @@ class MetricsSyncProgress extends $pb.GeneratedMessage {
 
   factory MetricsSyncProgress.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      MetricsSyncProgress()..mergeFromBuffer(data, registry);
   factory MetricsSyncProgress.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      MetricsSyncProgress()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'MetricsSyncProgress',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
-      createEmptyInstance: create)
+      createEmptyInstance: MetricsSyncProgress.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'status')
     ..aI(2, _omitFieldNames ? '' : 'community_metrics_count')
     ..aI(3, _omitFieldNames ? '' : 'content_metrics_count')
@@ -617,12 +640,16 @@ class MetricsSyncProgress extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use MetricsSyncProgress() / MetricsSyncProgress.new instead')
   static MetricsSyncProgress create() => MetricsSyncProgress._();
+  static $pb.GeneratedMessage $_createMessage() => MetricsSyncProgress._();
   @$core.override
-  MetricsSyncProgress createEmptyInstance() => create();
+  MetricsSyncProgress createEmptyInstance() => MetricsSyncProgress._();
   @$core.pragma('dart2js:noInline')
   static MetricsSyncProgress getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<MetricsSyncProgress>(create);
+      $pb.GeneratedMessage.$_defaultFor<MetricsSyncProgress>(
+          MetricsSyncProgress.$_createMessage);
   static MetricsSyncProgress? _defaultInstance;
 
   @$pb.TagNumber(1)

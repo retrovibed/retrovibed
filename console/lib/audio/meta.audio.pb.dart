@@ -21,7 +21,7 @@ class AudioSink extends $pb.GeneratedMessage {
     $core.String? id,
     $core.String? name,
   }) {
-    final result = create();
+    final result = AudioSink._();
     if (id != null) result.id = id;
     if (name != null) result.name = name;
     return result;
@@ -31,15 +31,15 @@ class AudioSink extends $pb.GeneratedMessage {
 
   factory AudioSink.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      AudioSink()..mergeFromBuffer(data, registry);
   factory AudioSink.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      AudioSink()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'AudioSink',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: AudioSink.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'id')
     ..aOS(2, _omitFieldNames ? '' : 'name')
     ..hasRequiredFields = false;
@@ -54,12 +54,14 @@ class AudioSink extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use AudioSink() / AudioSink.new instead')
   static AudioSink create() => AudioSink._();
+  static $pb.GeneratedMessage $_createMessage() => AudioSink._();
   @$core.override
-  AudioSink createEmptyInstance() => create();
+  AudioSink createEmptyInstance() => AudioSink._();
   @$core.pragma('dart2js:noInline')
-  static AudioSink getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<AudioSink>(create);
+  static AudioSink getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<AudioSink>(AudioSink.$_createMessage);
   static AudioSink? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -85,7 +87,7 @@ class AudioSinkSearchResponse extends $pb.GeneratedMessage {
   factory AudioSinkSearchResponse({
     $core.Iterable<AudioSink>? items,
   }) {
-    final result = create();
+    final result = AudioSinkSearchResponse._();
     if (items != null) result.items.addAll(items);
     return result;
   }
@@ -94,17 +96,17 @@ class AudioSinkSearchResponse extends $pb.GeneratedMessage {
 
   factory AudioSinkSearchResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      AudioSinkSearchResponse()..mergeFromBuffer(data, registry);
   factory AudioSinkSearchResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      AudioSinkSearchResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'AudioSinkSearchResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: AudioSinkSearchResponse.$_createMessage)
     ..pPM<AudioSink>(1, _omitFieldNames ? '' : 'items',
-        subBuilder: AudioSink.create)
+        subBuilder: AudioSink.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -119,12 +121,16 @@ class AudioSinkSearchResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use AudioSinkSearchResponse() / AudioSinkSearchResponse.new instead')
   static AudioSinkSearchResponse create() => AudioSinkSearchResponse._();
+  static $pb.GeneratedMessage $_createMessage() => AudioSinkSearchResponse._();
   @$core.override
-  AudioSinkSearchResponse createEmptyInstance() => create();
+  AudioSinkSearchResponse createEmptyInstance() => AudioSinkSearchResponse._();
   @$core.pragma('dart2js:noInline')
   static AudioSinkSearchResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<AudioSinkSearchResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<AudioSinkSearchResponse>(
+          AudioSinkSearchResponse.$_createMessage);
   static AudioSinkSearchResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -135,7 +141,7 @@ class AudioSinkCurrentResponse extends $pb.GeneratedMessage {
   factory AudioSinkCurrentResponse({
     AudioSink? sink,
   }) {
-    final result = create();
+    final result = AudioSinkCurrentResponse._();
     if (sink != null) result.sink = sink;
     return result;
   }
@@ -144,17 +150,17 @@ class AudioSinkCurrentResponse extends $pb.GeneratedMessage {
 
   factory AudioSinkCurrentResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      AudioSinkCurrentResponse()..mergeFromBuffer(data, registry);
   factory AudioSinkCurrentResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      AudioSinkCurrentResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'AudioSinkCurrentResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: AudioSinkCurrentResponse.$_createMessage)
     ..aOM<AudioSink>(1, _omitFieldNames ? '' : 'sink',
-        subBuilder: AudioSink.create)
+        subBuilder: AudioSink.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -169,12 +175,17 @@ class AudioSinkCurrentResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use AudioSinkCurrentResponse() / AudioSinkCurrentResponse.new instead')
   static AudioSinkCurrentResponse create() => AudioSinkCurrentResponse._();
+  static $pb.GeneratedMessage $_createMessage() => AudioSinkCurrentResponse._();
   @$core.override
-  AudioSinkCurrentResponse createEmptyInstance() => create();
+  AudioSinkCurrentResponse createEmptyInstance() =>
+      AudioSinkCurrentResponse._();
   @$core.pragma('dart2js:noInline')
   static AudioSinkCurrentResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<AudioSinkCurrentResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<AudioSinkCurrentResponse>(
+          AudioSinkCurrentResponse.$_createMessage);
   static AudioSinkCurrentResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -193,7 +204,7 @@ class AudioSinkTouchRequest extends $pb.GeneratedMessage {
   factory AudioSinkTouchRequest({
     $core.String? id,
   }) {
-    final result = create();
+    final result = AudioSinkTouchRequest._();
     if (id != null) result.id = id;
     return result;
   }
@@ -202,15 +213,15 @@ class AudioSinkTouchRequest extends $pb.GeneratedMessage {
 
   factory AudioSinkTouchRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      AudioSinkTouchRequest()..mergeFromBuffer(data, registry);
   factory AudioSinkTouchRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      AudioSinkTouchRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'AudioSinkTouchRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: AudioSinkTouchRequest.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'id')
     ..hasRequiredFields = false;
 
@@ -226,12 +237,16 @@ class AudioSinkTouchRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use AudioSinkTouchRequest() / AudioSinkTouchRequest.new instead')
   static AudioSinkTouchRequest create() => AudioSinkTouchRequest._();
+  static $pb.GeneratedMessage $_createMessage() => AudioSinkTouchRequest._();
   @$core.override
-  AudioSinkTouchRequest createEmptyInstance() => create();
+  AudioSinkTouchRequest createEmptyInstance() => AudioSinkTouchRequest._();
   @$core.pragma('dart2js:noInline')
   static AudioSinkTouchRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<AudioSinkTouchRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<AudioSinkTouchRequest>(
+          AudioSinkTouchRequest.$_createMessage);
   static AudioSinkTouchRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -248,7 +263,7 @@ class AudioSinkTouchResponse extends $pb.GeneratedMessage {
   factory AudioSinkTouchResponse({
     AudioSink? sink,
   }) {
-    final result = create();
+    final result = AudioSinkTouchResponse._();
     if (sink != null) result.sink = sink;
     return result;
   }
@@ -257,17 +272,17 @@ class AudioSinkTouchResponse extends $pb.GeneratedMessage {
 
   factory AudioSinkTouchResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      AudioSinkTouchResponse()..mergeFromBuffer(data, registry);
   factory AudioSinkTouchResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      AudioSinkTouchResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'AudioSinkTouchResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: AudioSinkTouchResponse.$_createMessage)
     ..aOM<AudioSink>(1, _omitFieldNames ? '' : 'sink',
-        subBuilder: AudioSink.create)
+        subBuilder: AudioSink.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -282,12 +297,16 @@ class AudioSinkTouchResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use AudioSinkTouchResponse() / AudioSinkTouchResponse.new instead')
   static AudioSinkTouchResponse create() => AudioSinkTouchResponse._();
+  static $pb.GeneratedMessage $_createMessage() => AudioSinkTouchResponse._();
   @$core.override
-  AudioSinkTouchResponse createEmptyInstance() => create();
+  AudioSinkTouchResponse createEmptyInstance() => AudioSinkTouchResponse._();
   @$core.pragma('dart2js:noInline')
   static AudioSinkTouchResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<AudioSinkTouchResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<AudioSinkTouchResponse>(
+          AudioSinkTouchResponse.$_createMessage);
   static AudioSinkTouchResponse? _defaultInstance;
 
   @$pb.TagNumber(1)

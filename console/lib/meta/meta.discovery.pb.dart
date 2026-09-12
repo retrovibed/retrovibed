@@ -33,7 +33,7 @@ class DiscoveryDiagnostics extends $pb.GeneratedMessage {
     $fixnum.Int64? offload,
     $fixnum.Int64? indexed,
   }) {
-    final result = create();
+    final result = DiscoveryDiagnostics._();
     if (enabled != null) result.enabled = enabled;
     if (ratio != null) result.ratio = ratio;
     if (partitions != null) result.partitions = partitions;
@@ -54,15 +54,15 @@ class DiscoveryDiagnostics extends $pb.GeneratedMessage {
 
   factory DiscoveryDiagnostics.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      DiscoveryDiagnostics()..mergeFromBuffer(data, registry);
   factory DiscoveryDiagnostics.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      DiscoveryDiagnostics()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'DiscoveryDiagnostics',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: DiscoveryDiagnostics.$_createMessage)
     ..aOB(1, _omitFieldNames ? '' : 'enabled')
     ..aI(2, _omitFieldNames ? '' : 'ratio', fieldType: $pb.PbFieldType.OU3)
     ..aI(3, _omitFieldNames ? '' : 'partitions', fieldType: $pb.PbFieldType.OU3)
@@ -103,12 +103,16 @@ class DiscoveryDiagnostics extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use DiscoveryDiagnostics() / DiscoveryDiagnostics.new instead')
   static DiscoveryDiagnostics create() => DiscoveryDiagnostics._();
+  static $pb.GeneratedMessage $_createMessage() => DiscoveryDiagnostics._();
   @$core.override
-  DiscoveryDiagnostics createEmptyInstance() => create();
+  DiscoveryDiagnostics createEmptyInstance() => DiscoveryDiagnostics._();
   @$core.pragma('dart2js:noInline')
   static DiscoveryDiagnostics getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DiscoveryDiagnostics>(create);
+      $pb.GeneratedMessage.$_defaultFor<DiscoveryDiagnostics>(
+          DiscoveryDiagnostics.$_createMessage);
   static DiscoveryDiagnostics? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -233,7 +237,7 @@ class DiscoveryMetricsResponse extends $pb.GeneratedMessage {
   factory DiscoveryMetricsResponse({
     DiscoveryDiagnostics? discovery,
   }) {
-    final result = create();
+    final result = DiscoveryMetricsResponse._();
     if (discovery != null) result.discovery = discovery;
     return result;
   }
@@ -242,17 +246,17 @@ class DiscoveryMetricsResponse extends $pb.GeneratedMessage {
 
   factory DiscoveryMetricsResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      DiscoveryMetricsResponse()..mergeFromBuffer(data, registry);
   factory DiscoveryMetricsResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      DiscoveryMetricsResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'DiscoveryMetricsResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
-      createEmptyInstance: create)
+      createEmptyInstance: DiscoveryMetricsResponse.$_createMessage)
     ..aOM<DiscoveryDiagnostics>(1, _omitFieldNames ? '' : 'discovery',
-        subBuilder: DiscoveryDiagnostics.create)
+        subBuilder: DiscoveryDiagnostics.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -267,12 +271,17 @@ class DiscoveryMetricsResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use DiscoveryMetricsResponse() / DiscoveryMetricsResponse.new instead')
   static DiscoveryMetricsResponse create() => DiscoveryMetricsResponse._();
+  static $pb.GeneratedMessage $_createMessage() => DiscoveryMetricsResponse._();
   @$core.override
-  DiscoveryMetricsResponse createEmptyInstance() => create();
+  DiscoveryMetricsResponse createEmptyInstance() =>
+      DiscoveryMetricsResponse._();
   @$core.pragma('dart2js:noInline')
   static DiscoveryMetricsResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<DiscoveryMetricsResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<DiscoveryMetricsResponse>(
+          DiscoveryMetricsResponse.$_createMessage);
   static DiscoveryMetricsResponse? _defaultInstance;
 
   @$pb.TagNumber(1)

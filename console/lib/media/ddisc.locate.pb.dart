@@ -30,7 +30,7 @@ class Locate extends $pb.GeneratedMessage {
     $core.bool? autodownload,
     $core.bool? adult,
   }) {
-    final result = create();
+    final result = Locate._();
     if (id != null) result.id = id;
     if (createdAt != null) result.createdAt = createdAt;
     if (updatedAt != null) result.updatedAt = updatedAt;
@@ -48,15 +48,15 @@ class Locate extends $pb.GeneratedMessage {
 
   factory Locate.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      Locate()..mergeFromBuffer(data, registry);
   factory Locate.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      Locate()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'Locate',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'ddisc'),
-      createEmptyInstance: create)
+      createEmptyInstance: Locate.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'id')
     ..aOS(2, _omitFieldNames ? '' : 'created_at')
     ..aOS(3, _omitFieldNames ? '' : 'updated_at')
@@ -79,12 +79,14 @@ class Locate extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use Locate() / Locate.new instead')
   static Locate create() => Locate._();
+  static $pb.GeneratedMessage $_createMessage() => Locate._();
   @$core.override
-  Locate createEmptyInstance() => create();
+  Locate createEmptyInstance() => Locate._();
   @$core.pragma('dart2js:noInline')
-  static Locate getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Locate>(create);
+  static Locate getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<Locate>(Locate.$_createMessage);
   static Locate? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -184,7 +186,7 @@ class LocateSearchRequest extends $pb.GeneratedMessage {
     $fixnum.Int64? offset,
     $fixnum.Int64? limit,
   }) {
-    final result = create();
+    final result = LocateSearchRequest._();
     if (query != null) result.query = query;
     if (offset != null) result.offset = offset;
     if (limit != null) result.limit = limit;
@@ -195,15 +197,15 @@ class LocateSearchRequest extends $pb.GeneratedMessage {
 
   factory LocateSearchRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      LocateSearchRequest()..mergeFromBuffer(data, registry);
   factory LocateSearchRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      LocateSearchRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'LocateSearchRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'ddisc'),
-      createEmptyInstance: create)
+      createEmptyInstance: LocateSearchRequest.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'query')
     ..a<$fixnum.Int64>(
         900, _omitFieldNames ? '' : 'offset', $pb.PbFieldType.OU6,
@@ -223,12 +225,16 @@ class LocateSearchRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use LocateSearchRequest() / LocateSearchRequest.new instead')
   static LocateSearchRequest create() => LocateSearchRequest._();
+  static $pb.GeneratedMessage $_createMessage() => LocateSearchRequest._();
   @$core.override
-  LocateSearchRequest createEmptyInstance() => create();
+  LocateSearchRequest createEmptyInstance() => LocateSearchRequest._();
   @$core.pragma('dart2js:noInline')
   static LocateSearchRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<LocateSearchRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<LocateSearchRequest>(
+          LocateSearchRequest.$_createMessage);
   static LocateSearchRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -264,7 +270,7 @@ class LocateSearchResponse extends $pb.GeneratedMessage {
     LocateSearchRequest? next,
     $core.Iterable<Locate>? items,
   }) {
-    final result = create();
+    final result = LocateSearchResponse._();
     if (next != null) result.next = next;
     if (items != null) result.items.addAll(items);
     return result;
@@ -274,18 +280,19 @@ class LocateSearchResponse extends $pb.GeneratedMessage {
 
   factory LocateSearchResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      LocateSearchResponse()..mergeFromBuffer(data, registry);
   factory LocateSearchResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      LocateSearchResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'LocateSearchResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'ddisc'),
-      createEmptyInstance: create)
+      createEmptyInstance: LocateSearchResponse.$_createMessage)
     ..aOM<LocateSearchRequest>(1, _omitFieldNames ? '' : 'next',
-        subBuilder: LocateSearchRequest.create)
-    ..pPM<Locate>(2, _omitFieldNames ? '' : 'items', subBuilder: Locate.create)
+        subBuilder: LocateSearchRequest.$_createMessage)
+    ..pPM<Locate>(2, _omitFieldNames ? '' : 'items',
+        subBuilder: Locate.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -299,12 +306,16 @@ class LocateSearchResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use LocateSearchResponse() / LocateSearchResponse.new instead')
   static LocateSearchResponse create() => LocateSearchResponse._();
+  static $pb.GeneratedMessage $_createMessage() => LocateSearchResponse._();
   @$core.override
-  LocateSearchResponse createEmptyInstance() => create();
+  LocateSearchResponse createEmptyInstance() => LocateSearchResponse._();
   @$core.pragma('dart2js:noInline')
   static LocateSearchResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<LocateSearchResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<LocateSearchResponse>(
+          LocateSearchResponse.$_createMessage);
   static LocateSearchResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -323,21 +334,21 @@ class LocateSearchResponse extends $pb.GeneratedMessage {
 }
 
 class LocateLookupRequest extends $pb.GeneratedMessage {
-  factory LocateLookupRequest() => create();
+  factory LocateLookupRequest() => LocateLookupRequest._();
 
   LocateLookupRequest._();
 
   factory LocateLookupRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      LocateLookupRequest()..mergeFromBuffer(data, registry);
   factory LocateLookupRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      LocateLookupRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'LocateLookupRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'ddisc'),
-      createEmptyInstance: create)
+      createEmptyInstance: LocateLookupRequest.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -351,12 +362,16 @@ class LocateLookupRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use LocateLookupRequest() / LocateLookupRequest.new instead')
   static LocateLookupRequest create() => LocateLookupRequest._();
+  static $pb.GeneratedMessage $_createMessage() => LocateLookupRequest._();
   @$core.override
-  LocateLookupRequest createEmptyInstance() => create();
+  LocateLookupRequest createEmptyInstance() => LocateLookupRequest._();
   @$core.pragma('dart2js:noInline')
   static LocateLookupRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<LocateLookupRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<LocateLookupRequest>(
+          LocateLookupRequest.$_createMessage);
   static LocateLookupRequest? _defaultInstance;
 }
 
@@ -364,7 +379,7 @@ class LocateLookupResponse extends $pb.GeneratedMessage {
   factory LocateLookupResponse({
     Locate? locate,
   }) {
-    final result = create();
+    final result = LocateLookupResponse._();
     if (locate != null) result.locate = locate;
     return result;
   }
@@ -373,16 +388,17 @@ class LocateLookupResponse extends $pb.GeneratedMessage {
 
   factory LocateLookupResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      LocateLookupResponse()..mergeFromBuffer(data, registry);
   factory LocateLookupResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      LocateLookupResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'LocateLookupResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'ddisc'),
-      createEmptyInstance: create)
-    ..aOM<Locate>(1, _omitFieldNames ? '' : 'locate', subBuilder: Locate.create)
+      createEmptyInstance: LocateLookupResponse.$_createMessage)
+    ..aOM<Locate>(1, _omitFieldNames ? '' : 'locate',
+        subBuilder: Locate.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -396,12 +412,16 @@ class LocateLookupResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use LocateLookupResponse() / LocateLookupResponse.new instead')
   static LocateLookupResponse create() => LocateLookupResponse._();
+  static $pb.GeneratedMessage $_createMessage() => LocateLookupResponse._();
   @$core.override
-  LocateLookupResponse createEmptyInstance() => create();
+  LocateLookupResponse createEmptyInstance() => LocateLookupResponse._();
   @$core.pragma('dart2js:noInline')
   static LocateLookupResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<LocateLookupResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<LocateLookupResponse>(
+          LocateLookupResponse.$_createMessage);
   static LocateLookupResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -420,7 +440,7 @@ class LocateCreateRequest extends $pb.GeneratedMessage {
   factory LocateCreateRequest({
     Locate? locate,
   }) {
-    final result = create();
+    final result = LocateCreateRequest._();
     if (locate != null) result.locate = locate;
     return result;
   }
@@ -429,16 +449,17 @@ class LocateCreateRequest extends $pb.GeneratedMessage {
 
   factory LocateCreateRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      LocateCreateRequest()..mergeFromBuffer(data, registry);
   factory LocateCreateRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      LocateCreateRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'LocateCreateRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'ddisc'),
-      createEmptyInstance: create)
-    ..aOM<Locate>(1, _omitFieldNames ? '' : 'locate', subBuilder: Locate.create)
+      createEmptyInstance: LocateCreateRequest.$_createMessage)
+    ..aOM<Locate>(1, _omitFieldNames ? '' : 'locate',
+        subBuilder: Locate.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -452,12 +473,16 @@ class LocateCreateRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use LocateCreateRequest() / LocateCreateRequest.new instead')
   static LocateCreateRequest create() => LocateCreateRequest._();
+  static $pb.GeneratedMessage $_createMessage() => LocateCreateRequest._();
   @$core.override
-  LocateCreateRequest createEmptyInstance() => create();
+  LocateCreateRequest createEmptyInstance() => LocateCreateRequest._();
   @$core.pragma('dart2js:noInline')
   static LocateCreateRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<LocateCreateRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<LocateCreateRequest>(
+          LocateCreateRequest.$_createMessage);
   static LocateCreateRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -476,7 +501,7 @@ class LocateCreateResponse extends $pb.GeneratedMessage {
   factory LocateCreateResponse({
     Locate? locate,
   }) {
-    final result = create();
+    final result = LocateCreateResponse._();
     if (locate != null) result.locate = locate;
     return result;
   }
@@ -485,16 +510,17 @@ class LocateCreateResponse extends $pb.GeneratedMessage {
 
   factory LocateCreateResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      LocateCreateResponse()..mergeFromBuffer(data, registry);
   factory LocateCreateResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      LocateCreateResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'LocateCreateResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'ddisc'),
-      createEmptyInstance: create)
-    ..aOM<Locate>(1, _omitFieldNames ? '' : 'locate', subBuilder: Locate.create)
+      createEmptyInstance: LocateCreateResponse.$_createMessage)
+    ..aOM<Locate>(1, _omitFieldNames ? '' : 'locate',
+        subBuilder: Locate.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -508,12 +534,16 @@ class LocateCreateResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use LocateCreateResponse() / LocateCreateResponse.new instead')
   static LocateCreateResponse create() => LocateCreateResponse._();
+  static $pb.GeneratedMessage $_createMessage() => LocateCreateResponse._();
   @$core.override
-  LocateCreateResponse createEmptyInstance() => create();
+  LocateCreateResponse createEmptyInstance() => LocateCreateResponse._();
   @$core.pragma('dart2js:noInline')
   static LocateCreateResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<LocateCreateResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<LocateCreateResponse>(
+          LocateCreateResponse.$_createMessage);
   static LocateCreateResponse? _defaultInstance;
 
   @$pb.TagNumber(1)

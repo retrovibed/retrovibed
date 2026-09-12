@@ -22,7 +22,7 @@ class Local extends $pb.GeneratedMessage {
     $core.bool? reclaim,
     $fixnum.Int64? maximum,
   }) {
-    final result = create();
+    final result = Local._();
     if (reclaim != null) result.reclaim = reclaim;
     if (maximum != null) result.maximum = maximum;
     return result;
@@ -32,15 +32,15 @@ class Local extends $pb.GeneratedMessage {
 
   factory Local.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      Local()..mergeFromBuffer(data, registry);
   factory Local.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      Local()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'Local',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'storage'),
-      createEmptyInstance: create)
+      createEmptyInstance: Local.$_createMessage)
     ..aOB(1, _omitFieldNames ? '' : 'reclaim')
     ..a<$fixnum.Int64>(2, _omitFieldNames ? '' : 'maximum', $pb.PbFieldType.OU6,
         defaultOrMaker: $fixnum.Int64.ZERO)
@@ -56,12 +56,14 @@ class Local extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use Local() / Local.new instead')
   static Local create() => Local._();
+  static $pb.GeneratedMessage $_createMessage() => Local._();
   @$core.override
-  Local createEmptyInstance() => create();
+  Local createEmptyInstance() => Local._();
   @$core.pragma('dart2js:noInline')
-  static Local getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Local>(create);
+  static Local getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<Local>(Local.$_createMessage);
   static Local? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -87,7 +89,7 @@ class StorageSettingsRequest extends $pb.GeneratedMessage {
   factory StorageSettingsRequest({
     Local? local,
   }) {
-    final result = create();
+    final result = StorageSettingsRequest._();
     if (local != null) result.local = local;
     return result;
   }
@@ -96,16 +98,17 @@ class StorageSettingsRequest extends $pb.GeneratedMessage {
 
   factory StorageSettingsRequest.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      StorageSettingsRequest()..mergeFromBuffer(data, registry);
   factory StorageSettingsRequest.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      StorageSettingsRequest()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'StorageSettingsRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'storage'),
-      createEmptyInstance: create)
-    ..aOM<Local>(1, _omitFieldNames ? '' : 'local', subBuilder: Local.create)
+      createEmptyInstance: StorageSettingsRequest.$_createMessage)
+    ..aOM<Local>(1, _omitFieldNames ? '' : 'local',
+        subBuilder: Local.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -120,12 +123,16 @@ class StorageSettingsRequest extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use StorageSettingsRequest() / StorageSettingsRequest.new instead')
   static StorageSettingsRequest create() => StorageSettingsRequest._();
+  static $pb.GeneratedMessage $_createMessage() => StorageSettingsRequest._();
   @$core.override
-  StorageSettingsRequest createEmptyInstance() => create();
+  StorageSettingsRequest createEmptyInstance() => StorageSettingsRequest._();
   @$core.pragma('dart2js:noInline')
   static StorageSettingsRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<StorageSettingsRequest>(create);
+      $pb.GeneratedMessage.$_defaultFor<StorageSettingsRequest>(
+          StorageSettingsRequest.$_createMessage);
   static StorageSettingsRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -144,7 +151,7 @@ class StorageSettingsResponse extends $pb.GeneratedMessage {
   factory StorageSettingsResponse({
     Local? local,
   }) {
-    final result = create();
+    final result = StorageSettingsResponse._();
     if (local != null) result.local = local;
     return result;
   }
@@ -153,16 +160,17 @@ class StorageSettingsResponse extends $pb.GeneratedMessage {
 
   factory StorageSettingsResponse.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(data, registry);
+      StorageSettingsResponse()..mergeFromBuffer(data, registry);
   factory StorageSettingsResponse.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(json, registry);
+      StorageSettingsResponse()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'StorageSettingsResponse',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'storage'),
-      createEmptyInstance: create)
-    ..aOM<Local>(1, _omitFieldNames ? '' : 'local', subBuilder: Local.create)
+      createEmptyInstance: StorageSettingsResponse.$_createMessage)
+    ..aOM<Local>(1, _omitFieldNames ? '' : 'local',
+        subBuilder: Local.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -177,12 +185,16 @@ class StorageSettingsResponse extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use StorageSettingsResponse() / StorageSettingsResponse.new instead')
   static StorageSettingsResponse create() => StorageSettingsResponse._();
+  static $pb.GeneratedMessage $_createMessage() => StorageSettingsResponse._();
   @$core.override
-  StorageSettingsResponse createEmptyInstance() => create();
+  StorageSettingsResponse createEmptyInstance() => StorageSettingsResponse._();
   @$core.pragma('dart2js:noInline')
   static StorageSettingsResponse getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<StorageSettingsResponse>(create);
+      $pb.GeneratedMessage.$_defaultFor<StorageSettingsResponse>(
+          StorageSettingsResponse.$_createMessage);
   static StorageSettingsResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
