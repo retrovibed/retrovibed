@@ -51,12 +51,24 @@ class _FakePlaylistControl implements media.PlaylistControl {
   @override
   final ValueNotifier<double> volume;
   Duration position;
+  Duration duration;
+  final StreamController<Duration> _positionController = StreamController<Duration>.broadcast();
   final List<playqueue.PlayableMedia> maybeNextCalls = [];
   int nextCalls = 0;
   int previousCalls = 0;
   final List<Duration> seekCalls = [];
 
-  _FakePlaylistControl({double volume = 100.0, this.position = Duration.zero}) : volume = ValueNotifier(volume);
+  _FakePlaylistControl({double volume = 100.0, this.position = Duration.zero, this.duration = Duration.zero})
+    : volume = ValueNotifier(volume);
+
+  @override
+  Stream<Duration> get positionStream => _positionController.stream;
+
+  // test helper: simulates a position tick from the underlying player.
+  void emitPosition(Duration d) {
+    position = d;
+    _positionController.add(d);
+  }
 
   @override
   void maybeNext(playqueue.PlayableMedia m) {
@@ -251,7 +263,13 @@ void main() {
                 builder: (context) {
                   return ElevatedButton(
                     onPressed: () {
-                      media.Playlist.of(context)!.queue.push(playqueue.PlayableMedia(media.Media(id: "m1"), profileId: uuidx.min(), sessionId: uuidx.min()));
+                      media.Playlist.of(context)!.queue.push(
+                        playqueue.PlayableMedia(
+                          media.Media(id: "m1"),
+                          profileId: uuidx.min(),
+                          sessionId: uuidx.min(),
+                        ),
+                      );
                     },
                     child: const SizedBox(),
                   );
@@ -268,6 +286,64 @@ void main() {
 
       expectFullyPopulatedSync(fakeSocket.sent.last, library: meta.Daemon(hostname: "localhost:9998"), queueLength: 1);
       expect(fakeSocket.sent.last.sync.queue.single.asMedia.id, "m1");
+    });
+
+    testWidgets('echoes position/duration, throttled, as the position stream ticks', (tester) async {
+      final fake = _FakePlaylistControl(position: Duration.zero, duration: const Duration(minutes: 3));
+      final (fakeSocket, context) = await mount(tester, fakePlaylist: fake);
+      media.Playlist.of(context)!.queue.push(
+        playqueue.PlayableMedia(
+          media.Media(id: "m1"),
+          profileId: uuidx.min(),
+          sessionId: uuidx.min(),
+        ),
+      );
+      await _settle(tester);
+
+      fake.emitPosition(const Duration(seconds: 1));
+      await tester.pump(const Duration(seconds: 3));
+      expect(fakeSocket.sent.last.whichCommand(), remote.Stream_Command.playback);
+      expect(fakeSocket.sent.last.playback.position.toInt(), const Duration(seconds: 1).inMilliseconds);
+      expect(fakeSocket.sent.last.playback.duration.toInt(), const Duration(minutes: 3).inMilliseconds);
+
+      fake.emitPosition(const Duration(seconds: 2));
+      await tester.pump(const Duration(seconds: 3));
+      expect(fakeSocket.sent.last.playback.position.toInt(), const Duration(seconds: 2).inMilliseconds);
+    });
+
+    testWidgets('no position echo fires when the position stream never emits', (tester) async {
+      final fake = _FakePlaylistControl(position: Duration.zero, duration: const Duration(minutes: 3));
+      final (fakeSocket, context) = await mount(tester, fakePlaylist: fake);
+      media.Playlist.of(context)!.queue.push(
+        playqueue.PlayableMedia(
+          media.Media(id: "m1"),
+          profileId: uuidx.min(),
+          sessionId: uuidx.min(),
+        ),
+      );
+      await _settle(tester);
+      final before = fakeSocket.sent.length;
+
+      await tester.pump(const Duration(seconds: 10));
+
+      expect(fakeSocket.sent.length, before);
+    });
+
+    testWidgets('a regular Sync echo also carries the current playback snapshot', (tester) async {
+      final fake = _FakePlaylistControl(position: const Duration(seconds: 5), duration: const Duration(minutes: 3));
+      final (fakeSocket, context) = await mount(tester, fakePlaylist: fake);
+
+      media.Playlist.of(context)!.queue.push(
+        playqueue.PlayableMedia(
+          media.Media(id: "m1"),
+          profileId: uuidx.min(),
+          sessionId: uuidx.min(),
+        ),
+      );
+      await _settle(tester);
+
+      expect(fakeSocket.sent.last.sync.playback.position.toInt(), const Duration(seconds: 5).inMilliseconds);
+      expect(fakeSocket.sent.last.sync.playback.duration.toInt(), const Duration(minutes: 3).inMilliseconds);
     });
 
     testWidgets('an incoming sync request triggers a fully populated response', (tester) async {
@@ -444,7 +520,13 @@ void main() {
   group('dequeue', () {
     testWidgets('removes a previously queued id', (tester) async {
       final fake = _FakePlaylistControl();
-      fake.queue.push(playqueue.PlayableMedia(media.Media(id: "m1"), profileId: uuidx.min(), sessionId: uuidx.min()));
+      fake.queue.push(
+        playqueue.PlayableMedia(
+          media.Media(id: "m1"),
+          profileId: uuidx.min(),
+          sessionId: uuidx.min(),
+        ),
+      );
       final (fakeSocket, _) = await mount(tester, withPlaylist: false, fakePlaylist: fake);
 
       fakeSocket.emit(
@@ -460,7 +542,13 @@ void main() {
 
     testWidgets('dequeuing an absent id is a no-op', (tester) async {
       final fake = _FakePlaylistControl();
-      fake.queue.push(playqueue.PlayableMedia(media.Media(id: "m1"), profileId: uuidx.min(), sessionId: uuidx.min()));
+      fake.queue.push(
+        playqueue.PlayableMedia(
+          media.Media(id: "m1"),
+          profileId: uuidx.min(),
+          sessionId: uuidx.min(),
+        ),
+      );
       final (fakeSocket, _) = await mount(tester, withPlaylist: false, fakePlaylist: fake);
 
       fakeSocket.emit(
@@ -498,7 +586,13 @@ void main() {
 
     testWidgets('duplicate/replayed dequeues for the same id are idempotent', (tester) async {
       final fake = _FakePlaylistControl();
-      fake.queue.push(playqueue.PlayableMedia(media.Media(id: "m1"), profileId: uuidx.min(), sessionId: uuidx.min()));
+      fake.queue.push(
+        playqueue.PlayableMedia(
+          media.Media(id: "m1"),
+          profileId: uuidx.min(),
+          sessionId: uuidx.min(),
+        ),
+      );
       final (fakeSocket, _) = await mount(tester, withPlaylist: false, fakePlaylist: fake);
 
       fakeSocket.emit(
@@ -543,7 +637,10 @@ void main() {
           if (!authResolved) {
             authResolved = true;
             return Future.value(
-              meta.AuthzResponse(bearer: "initial-bearer", token: meta.Token(exp: fixnum.Int64(0))),
+              meta.AuthzResponse(
+                bearer: "initial-bearer",
+                token: meta.Token(exp: fixnum.Int64(0)),
+              ),
             );
           }
           return authCompleter.future;
@@ -575,13 +672,29 @@ void main() {
 
         final queue = media.Playlist.of(capturedContext)!.queue;
         for (final id in ["m1", "m2", "m3", "m4", "m5"]) {
-          queue.push(playqueue.PlayableMedia(media.Media(id: id), profileId: uuidx.min(), sessionId: uuidx.min()));
+          queue.push(
+            playqueue.PlayableMedia(
+              media.Media(id: id),
+              profileId: uuidx.min(),
+              sessionId: uuidx.min(),
+            ),
+          );
         }
         await _settle(tester);
 
-        fakeSocket.emit(remote.Stream(sid: uuidx.v7(), dequeue: remote.Dequeue(id: "m1")));
+        fakeSocket.emit(
+          remote.Stream(
+            sid: uuidx.v7(),
+            dequeue: remote.Dequeue(id: "m1"),
+          ),
+        );
         await _settle(tester);
-        fakeSocket.emit(remote.Stream(sid: uuidx.v7(), dequeue: remote.Dequeue(id: "m2")));
+        fakeSocket.emit(
+          remote.Stream(
+            sid: uuidx.v7(),
+            dequeue: remote.Dequeue(id: "m2"),
+          ),
+        );
         await _settle(tester);
 
         expect(fakeSocket.sent, isEmpty, reason: "every echo triggered so far is still waiting on the token fetch");
@@ -597,7 +710,8 @@ void main() {
         expect(
           fakeSocket.sent.any((m) => m.whichCommand() == remote.Stream_Command.sync && m.sync.queue.length == 4),
           isTrue,
-          reason: "the echo triggered by removing m1 (5 -> 4) must report 4, not whatever the queue has "
+          reason:
+              "the echo triggered by removing m1 (5 -> 4) must report 4, not whatever the queue has "
               "dropped to (3) by the time the delayed token fetch resolves",
         );
       },

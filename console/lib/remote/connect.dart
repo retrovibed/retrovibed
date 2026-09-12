@@ -568,7 +568,7 @@ class _State extends State<Connect> with LoadingState {
                             ],
                           ),
                           PlayerControlVolume(socket: _socket, sessionId: _sessionID, current: _latest.sync),
-                          PlaylistCurrent(_latest.sync.current, mySessionId: _sessionID),
+                          PlaylistCurrent(_latest.sync.current, sessionId: _sessionID),
                           Expanded(child: queue),
                         ],
                       ),

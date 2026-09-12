@@ -6,8 +6,8 @@ class PlaylistCurrent extends StatelessWidget {
   final remote.Stream current;
   // when set, rows this Connect session itself enqueued (session_id
   // matches) are visually highlighted.
-  final String? mySessionId;
-  const PlaylistCurrent(this.current, {this.mySessionId, Key? key}) : super(key: key);
+  final String sessionId;
+  const PlaylistCurrent(this.current, {this.sessionId = "", Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +15,7 @@ class PlaylistCurrent extends StatelessWidget {
     return rowdisplay.RowDisplay(
       media: current.asMedia,
       leading: const [Icon(Icons.play_arrow_rounded)],
-      highlighted: mySessionId != null && current.sessionId == mySessionId,
+      highlighted: current.sessionId == sessionId,
     );
   }
 }
