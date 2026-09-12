@@ -87,6 +87,8 @@ const Sync$json = {
     {'1': 'muted', '3': 7, '4': 1, '5': 8, '10': 'muted'},
     {'1': 'paused', '3': 8, '4': 1, '5': 8, '10': 'paused'},
     {'1': 'fullscreen', '3': 9, '4': 1, '5': 8, '10': 'fullscreen'},
+    {'1': 'position', '3': 10, '4': 1, '5': 4, '10': 'position'},
+    {'1': 'duration', '3': 11, '4': 1, '5': 4, '10': 'duration'},
     {
       '1': 'queue',
       '3': 1000,
@@ -97,7 +99,7 @@ const Sync$json = {
     },
   ],
   '9': [
-    {'1': 10, '2': 1000},
+    {'1': 12, '2': 1000},
   ],
 };
 
@@ -107,8 +109,9 @@ final $typed_data.Uint8List syncDescriptor = $convert.base64Decode(
     'l0eRgCIAEoDVIIY2FwYWNpdHkSJwoHY3VycmVudBgDIAEoCzINLm1lZGlhLlN0cmVhbVIHY3Vy'
     'cmVudBIUCgV0b2tlbhgEIAEoCVIFdG9rZW4SHgoKZXhwaXJhdGlvbhgFIAEoA1IKZXhwaXJhdG'
     'lvbhIWCgZ2b2x1bWUYBiABKAJSBnZvbHVtZRIUCgVtdXRlZBgHIAEoCFIFbXV0ZWQSFgoGcGF1'
-    'c2VkGAggASgIUgZwYXVzZWQSHgoKZnVsbHNjcmVlbhgJIAEoCFIKZnVsbHNjcmVlbhIkCgVxdW'
-    'V1ZRjoByADKAsyDS5tZWRpYS5TdHJlYW1SBXF1ZXVlSgUIChDoBw==');
+    'c2VkGAggASgIUgZwYXVzZWQSHgoKZnVsbHNjcmVlbhgJIAEoCFIKZnVsbHNjcmVlbhIaCghwb3'
+    'NpdGlvbhgKIAEoBFIIcG9zaXRpb24SGgoIZHVyYXRpb24YCyABKARSCGR1cmF0aW9uEiQKBXF1'
+    'ZXVlGOgHIAMoCzINLm1lZGlhLlN0cmVhbVIFcXVldWVKBQgMEOgH');
 
 @$core.Deprecated('Use fullscreenDescriptor instead')
 const Fullscreen$json = {

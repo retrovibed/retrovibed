@@ -34,8 +34,25 @@ message Sync {
   bool muted = 7 [ json_name = "muted" ];
   bool paused = 8 [ json_name = "paused" ];
   bool fullscreen = 9 [ json_name = "fullscreen" ];
-  reserved 10 to 999;
+  // live position/duration for `current`, mirrored from the same periodic
+  // Playback tick the standalone command below sends - present here too so
+  // a full-state Sync snapshot is self-complete.
+  Playback playback = 10 [ json_name = "playback" ];
+  reserved 11 to 999;
   repeated Stream queue = 1000 [ json_name = "queue" ];
+}
+
+// Playback reports live position/duration for whatever's currently playing
+// - a lighter frame than Sync (no queue/library/token), sent periodically
+// (throttled) while something is playing so the tick stays cheap. As its
+// own Stream command, session_id/profile_id (who's playing it) ride the
+// envelope, not this message; embedded on Sync.playback above, there's no
+// separate envelope, so it's paired with Sync.current by position alone
+// (both describe the listener's one "current" item).
+message Playback {
+  Media media = 1 [ json_name = "media" ];
+  uint64 position = 10 [ json_name = "position" ];  // milliseconds - matches RecentRecordRequest.position's type
+  uint64 duration = 11 [ json_name = "duration" ];  // milliseconds - matches RecentRecordRequest.duration's type
 }
 
 // Fullscreen toggles fullscreen on the receiving device. No payload -
@@ -73,5 +90,6 @@ message Stream {
     Seek volume = 1006 [ json_name = "volume" ];
     Fullscreen fullscreen = 1007 [ json_name = "fullscreen" ];
     Mute mute = 1008 [ json_name = "mute" ];
+    Playback playback = 1009 [ json_name = "playback" ];
   }
 }

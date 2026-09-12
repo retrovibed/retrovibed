@@ -25,7 +25,7 @@ class Queue extends $pb.GeneratedMessage {
   factory Queue({
     $0.Media? media,
   }) {
-    final result = Queue._();
+    final result = create();
     if (media != null) result.media = media;
     return result;
   }
@@ -34,17 +34,17 @@ class Queue extends $pb.GeneratedMessage {
 
   factory Queue.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      Queue()..mergeFromBuffer(data, registry);
+      create()..mergeFromBuffer(data, registry);
   factory Queue.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      Queue()..mergeFromJson(json, registry);
+      create()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'Queue',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: Queue.$_createMessage)
+      createEmptyInstance: create)
     ..aOM<$0.Media>(1, _omitFieldNames ? '' : 'media',
-        subBuilder: $0.Media.$_createMessage)
+        subBuilder: $0.Media.create)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -57,14 +57,12 @@ class Queue extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  @$core.Deprecated('Use Queue() / Queue.new instead')
   static Queue create() => Queue._();
-  static $pb.GeneratedMessage $_createMessage() => Queue._();
   @$core.override
-  Queue createEmptyInstance() => Queue._();
+  Queue createEmptyInstance() => create();
   @$core.pragma('dart2js:noInline')
-  static Queue getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<Queue>(Queue.$_createMessage);
+  static Queue getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Queue>(create);
   static Queue? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -84,7 +82,7 @@ class Dequeue extends $pb.GeneratedMessage {
   factory Dequeue({
     $core.String? id,
   }) {
-    final result = Dequeue._();
+    final result = create();
     if (id != null) result.id = id;
     return result;
   }
@@ -93,15 +91,15 @@ class Dequeue extends $pb.GeneratedMessage {
 
   factory Dequeue.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      Dequeue()..mergeFromBuffer(data, registry);
+      create()..mergeFromBuffer(data, registry);
   factory Dequeue.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      Dequeue()..mergeFromJson(json, registry);
+      create()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'Dequeue',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: Dequeue.$_createMessage)
+      createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'id')
     ..hasRequiredFields = false;
 
@@ -115,14 +113,12 @@ class Dequeue extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  @$core.Deprecated('Use Dequeue() / Dequeue.new instead')
   static Dequeue create() => Dequeue._();
-  static $pb.GeneratedMessage $_createMessage() => Dequeue._();
   @$core.override
-  Dequeue createEmptyInstance() => Dequeue._();
+  Dequeue createEmptyInstance() => create();
   @$core.pragma('dart2js:noInline')
-  static Dequeue getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<Dequeue>(Dequeue.$_createMessage);
+  static Dequeue getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Dequeue>(create);
   static Dequeue? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -137,21 +133,21 @@ class Dequeue extends $pb.GeneratedMessage {
 
 /// pause commands the device to toggle media playback.
 class Pause extends $pb.GeneratedMessage {
-  factory Pause() => Pause._();
+  factory Pause() => create();
 
   Pause._();
 
   factory Pause.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      Pause()..mergeFromBuffer(data, registry);
+      create()..mergeFromBuffer(data, registry);
   factory Pause.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      Pause()..mergeFromJson(json, registry);
+      create()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'Pause',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: Pause.$_createMessage)
+      createEmptyInstance: create)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -164,14 +160,12 @@ class Pause extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  @$core.Deprecated('Use Pause() / Pause.new instead')
   static Pause create() => Pause._();
-  static $pb.GeneratedMessage $_createMessage() => Pause._();
   @$core.override
-  Pause createEmptyInstance() => Pause._();
+  Pause createEmptyInstance() => create();
   @$core.pragma('dart2js:noInline')
-  static Pause getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<Pause>(Pause.$_createMessage);
+  static Pause getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Pause>(create);
   static Pause? _defaultInstance;
 }
 
@@ -182,7 +176,7 @@ class Seek extends $pb.GeneratedMessage {
   factory Seek({
     $core.int? offset,
   }) {
-    final result = Seek._();
+    final result = create();
     if (offset != null) result.offset = offset;
     return result;
   }
@@ -191,15 +185,15 @@ class Seek extends $pb.GeneratedMessage {
 
   factory Seek.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      Seek()..mergeFromBuffer(data, registry);
+      create()..mergeFromBuffer(data, registry);
   factory Seek.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      Seek()..mergeFromJson(json, registry);
+      create()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'Seek',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: Seek.$_createMessage)
+      createEmptyInstance: create)
     ..aI(1, _omitFieldNames ? '' : 'offset')
     ..hasRequiredFields = false;
 
@@ -213,14 +207,12 @@ class Seek extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  @$core.Deprecated('Use Seek() / Seek.new instead')
   static Seek create() => Seek._();
-  static $pb.GeneratedMessage $_createMessage() => Seek._();
   @$core.override
-  Seek createEmptyInstance() => Seek._();
+  Seek createEmptyInstance() => create();
   @$core.pragma('dart2js:noInline')
-  static Seek getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<Seek>(Seek.$_createMessage);
+  static Seek getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Seek>(create);
   static Seek? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -248,9 +240,11 @@ class Sync extends $pb.GeneratedMessage {
     $core.bool? muted,
     $core.bool? paused,
     $core.bool? fullscreen,
+    $fixnum.Int64? position,
+    $fixnum.Int64? duration,
     $core.Iterable<Stream>? queue,
   }) {
-    final result = Sync._();
+    final result = create();
     if (library != null) result.library = library;
     if (capacity != null) result.capacity = capacity;
     if (current != null) result.current = current;
@@ -260,6 +254,8 @@ class Sync extends $pb.GeneratedMessage {
     if (muted != null) result.muted = muted;
     if (paused != null) result.paused = paused;
     if (fullscreen != null) result.fullscreen = fullscreen;
+    if (position != null) result.position = position;
+    if (duration != null) result.duration = duration;
     if (queue != null) result.queue.addAll(queue);
     return result;
   }
@@ -268,28 +264,34 @@ class Sync extends $pb.GeneratedMessage {
 
   factory Sync.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      Sync()..mergeFromBuffer(data, registry);
+      create()..mergeFromBuffer(data, registry);
   factory Sync.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      Sync()..mergeFromJson(json, registry);
+      create()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'Sync',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: Sync.$_createMessage)
+      createEmptyInstance: create)
     ..aOM<$1.Daemon>(1, _omitFieldNames ? '' : 'library',
-        subBuilder: $1.Daemon.$_createMessage)
+        subBuilder: $1.Daemon.create)
     ..aI(2, _omitFieldNames ? '' : 'capacity', fieldType: $pb.PbFieldType.OU3)
     ..aOM<Stream>(3, _omitFieldNames ? '' : 'current',
-        subBuilder: Stream.$_createMessage)
+        subBuilder: Stream.create)
     ..aOS(4, _omitFieldNames ? '' : 'token')
     ..aInt64(5, _omitFieldNames ? '' : 'expiration')
     ..aD(6, _omitFieldNames ? '' : 'volume', fieldType: $pb.PbFieldType.OF)
     ..aOB(7, _omitFieldNames ? '' : 'muted')
     ..aOB(8, _omitFieldNames ? '' : 'paused')
     ..aOB(9, _omitFieldNames ? '' : 'fullscreen')
+    ..a<$fixnum.Int64>(
+        10, _omitFieldNames ? '' : 'position', $pb.PbFieldType.OU6,
+        defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(
+        11, _omitFieldNames ? '' : 'duration', $pb.PbFieldType.OU6,
+        defaultOrMaker: $fixnum.Int64.ZERO)
     ..pPM<Stream>(1000, _omitFieldNames ? '' : 'queue',
-        subBuilder: Stream.$_createMessage)
+        subBuilder: Stream.create)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -302,14 +304,12 @@ class Sync extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  @$core.Deprecated('Use Sync() / Sync.new instead')
   static Sync create() => Sync._();
-  static $pb.GeneratedMessage $_createMessage() => Sync._();
   @$core.override
-  Sync createEmptyInstance() => Sync._();
+  Sync createEmptyInstance() => create();
   @$core.pragma('dart2js:noInline')
-  static Sync getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<Sync>(Sync.$_createMessage);
+  static Sync getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Sync>(create);
   static Sync? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -397,8 +397,29 @@ class Sync extends $pb.GeneratedMessage {
   @$pb.TagNumber(9)
   void clearFullscreen() => $_clearField(9);
 
+  /// playback position/duration of `current`, milliseconds - matches
+  /// media.RecentRecordRequest's position/duration field types. Reported by
+  /// the listener; not otherwise meaningful on a request.
+  @$pb.TagNumber(10)
+  $fixnum.Int64 get position => $_getI64(9);
+  @$pb.TagNumber(10)
+  set position($fixnum.Int64 value) => $_setInt64(9, value);
+  @$pb.TagNumber(10)
+  $core.bool hasPosition() => $_has(9);
+  @$pb.TagNumber(10)
+  void clearPosition() => $_clearField(10);
+
+  @$pb.TagNumber(11)
+  $fixnum.Int64 get duration => $_getI64(10);
+  @$pb.TagNumber(11)
+  set duration($fixnum.Int64 value) => $_setInt64(10, value);
+  @$pb.TagNumber(11)
+  $core.bool hasDuration() => $_has(10);
+  @$pb.TagNumber(11)
+  void clearDuration() => $_clearField(11);
+
   @$pb.TagNumber(1000)
-  $pb.PbList<Stream> get queue => $_getList(9);
+  $pb.PbList<Stream> get queue => $_getList(11);
 }
 
 /// Fullscreen toggles fullscreen on the receiving device. No payload -
@@ -406,21 +427,21 @@ class Sync extends $pb.GeneratedMessage {
 /// against concurrent/stale commands is resolved by the sender using
 /// Stream.sid (a uuidv7) as a vector clock, same as Volume.
 class Fullscreen extends $pb.GeneratedMessage {
-  factory Fullscreen() => Fullscreen._();
+  factory Fullscreen() => create();
 
   Fullscreen._();
 
   factory Fullscreen.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      Fullscreen()..mergeFromBuffer(data, registry);
+      create()..mergeFromBuffer(data, registry);
   factory Fullscreen.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      Fullscreen()..mergeFromJson(json, registry);
+      create()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'Fullscreen',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: Fullscreen.$_createMessage)
+      createEmptyInstance: create)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -433,35 +454,33 @@ class Fullscreen extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  @$core.Deprecated('Use Fullscreen() / Fullscreen.new instead')
   static Fullscreen create() => Fullscreen._();
-  static $pb.GeneratedMessage $_createMessage() => Fullscreen._();
   @$core.override
-  Fullscreen createEmptyInstance() => Fullscreen._();
+  Fullscreen createEmptyInstance() => create();
   @$core.pragma('dart2js:noInline')
   static Fullscreen getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<Fullscreen>(Fullscreen.$_createMessage);
+      $pb.GeneratedMessage.$_defaultFor<Fullscreen>(create);
   static Fullscreen? _defaultInstance;
 }
 
 /// Mute toggles the receiving device's audio between silent and its prior
 /// level. No payload - same shape/ordering semantics as Fullscreen.
 class Mute extends $pb.GeneratedMessage {
-  factory Mute() => Mute._();
+  factory Mute() => create();
 
   Mute._();
 
   factory Mute.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      Mute()..mergeFromBuffer(data, registry);
+      create()..mergeFromBuffer(data, registry);
   factory Mute.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      Mute()..mergeFromJson(json, registry);
+      create()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'Mute',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: Mute.$_createMessage)
+      createEmptyInstance: create)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -474,14 +493,12 @@ class Mute extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  @$core.Deprecated('Use Mute() / Mute.new instead')
   static Mute create() => Mute._();
-  static $pb.GeneratedMessage $_createMessage() => Mute._();
   @$core.override
-  Mute createEmptyInstance() => Mute._();
+  Mute createEmptyInstance() => create();
   @$core.pragma('dart2js:noInline')
-  static Mute getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<Mute>(Mute.$_createMessage);
+  static Mute getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Mute>(create);
   static Mute? _defaultInstance;
 }
 
@@ -515,7 +532,7 @@ class Stream extends $pb.GeneratedMessage {
     Fullscreen? fullscreen,
     Mute? mute,
   }) {
-    final result = Stream._();
+    final result = create();
     if (sid != null) result.sid = sid;
     if (vid != null) result.vid = vid;
     if (profileId != null) result.profileId = profileId;
@@ -535,10 +552,10 @@ class Stream extends $pb.GeneratedMessage {
 
   factory Stream.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      Stream()..mergeFromBuffer(data, registry);
+      create()..mergeFromBuffer(data, registry);
   factory Stream.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
-      Stream()..mergeFromJson(json, registry);
+      create()..mergeFromJson(json, registry);
 
   static const $core.Map<$core.int, Stream_Command> _Stream_CommandByTag = {
     1000: Stream_Command.queue,
@@ -554,29 +571,23 @@ class Stream extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'Stream',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'media'),
-      createEmptyInstance: Stream.$_createMessage)
+      createEmptyInstance: create)
     ..oo(0, [1000, 1002, 1003, 1004, 1005, 1006, 1007, 1008])
     ..aOS(1, _omitFieldNames ? '' : 'sid')
     ..a<$fixnum.Int64>(2, _omitFieldNames ? '' : 'vid', $pb.PbFieldType.OU6,
         defaultOrMaker: $fixnum.Int64.ZERO)
     ..aOS(3, _omitFieldNames ? '' : 'profile_id')
     ..aOS(4, _omitFieldNames ? '' : 'session_id')
-    ..aOM<Queue>(1000, _omitFieldNames ? '' : 'queue',
-        subBuilder: Queue.$_createMessage)
+    ..aOM<Queue>(1000, _omitFieldNames ? '' : 'queue', subBuilder: Queue.create)
     ..aOM<Dequeue>(1002, _omitFieldNames ? '' : 'dequeue',
-        subBuilder: Dequeue.$_createMessage)
-    ..aOM<Pause>(1003, _omitFieldNames ? '' : 'pause',
-        subBuilder: Pause.$_createMessage)
-    ..aOM<Seek>(1004, _omitFieldNames ? '' : 'seek',
-        subBuilder: Seek.$_createMessage)
-    ..aOM<Sync>(1005, _omitFieldNames ? '' : 'sync',
-        subBuilder: Sync.$_createMessage)
-    ..aOM<Seek>(1006, _omitFieldNames ? '' : 'volume',
-        subBuilder: Seek.$_createMessage)
+        subBuilder: Dequeue.create)
+    ..aOM<Pause>(1003, _omitFieldNames ? '' : 'pause', subBuilder: Pause.create)
+    ..aOM<Seek>(1004, _omitFieldNames ? '' : 'seek', subBuilder: Seek.create)
+    ..aOM<Sync>(1005, _omitFieldNames ? '' : 'sync', subBuilder: Sync.create)
+    ..aOM<Seek>(1006, _omitFieldNames ? '' : 'volume', subBuilder: Seek.create)
     ..aOM<Fullscreen>(1007, _omitFieldNames ? '' : 'fullscreen',
-        subBuilder: Fullscreen.$_createMessage)
-    ..aOM<Mute>(1008, _omitFieldNames ? '' : 'mute',
-        subBuilder: Mute.$_createMessage)
+        subBuilder: Fullscreen.create)
+    ..aOM<Mute>(1008, _omitFieldNames ? '' : 'mute', subBuilder: Mute.create)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -589,14 +600,12 @@ class Stream extends $pb.GeneratedMessage {
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  @$core.Deprecated('Use Stream() / Stream.new instead')
   static Stream create() => Stream._();
-  static $pb.GeneratedMessage $_createMessage() => Stream._();
   @$core.override
-  Stream createEmptyInstance() => Stream._();
+  Stream createEmptyInstance() => create();
   @$core.pragma('dart2js:noInline')
-  static Stream getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<Stream>(Stream.$_createMessage);
+  static Stream getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Stream>(create);
   static Stream? _defaultInstance;
 
   @$pb.TagNumber(1000)
