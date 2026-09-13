@@ -74,6 +74,7 @@ func (t *HTTPRecent) Bind(r *mux.Router) {
 func (t *HTTPRecent) latest(w http.ResponseWriter, r *http.Request) {
 	var (
 		err     error
+		pid     string
 		created timex.Range
 		msg     = RecentSearchResponse{
 			Next: &RecentSearchRequest{
@@ -95,11 +96,18 @@ func (t *HTTPRecent) latest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if _, pid, err = httpauth.IssuerSubjectID(r.Context(), t.jwtsecret, r); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to retrieve profile id"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		return
+	}
+
 	query := library.RecentSessionLibrarySearchBuilder().Where(
 		squirrel.And{
 			library.MetadataQueryNotTombstoned(),
 			library.RecentSessionQueryCreated(created),
 			library.RecentSessionQueryMimetype(msg.Next.Mimetype),
+			library.RecentSessionQueryProfileID(pid),
 		},
 	).OrderBy("library_recent_sessions.last_played_at DESC").Limit(msg.Next.Limit)
 
@@ -164,10 +172,17 @@ func (t *HTTPRecent) record(w http.ResponseWriter, r *http.Request) {
 		err error
 		rs  library.RecentSession
 		msg RecentRecordRequest
+		pid string
 	)
 
 	if err = jsonx.UnmarshalRead(r.Body, &msg); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to decode request"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		return
+	}
+
+	if _, pid, err = httpauth.IssuerSubjectID(r.Context(), t.jwtsecret, r); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to retrieve profile id"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
 	}
@@ -180,12 +195,13 @@ func (t *HTTPRecent) record(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err = library.RecentSessionInsertWithDefaults(r.Context(), t.q, library.RecentSession{
-		ID:       md5x.FormatUUID(md5x.Digest(encoded)),
-		Mimetype: msg.Mimetype,
-		MediaID:  msg.Media.Id,
-		Duration: time.Duration(msg.Duration) * time.Millisecond,
-		Position: time.Duration(msg.Position) * time.Millisecond,
-		Query:    encoded,
+		ProfileID: pid,
+		ID:        md5x.FormatUUID(md5x.Digest(encoded)),
+		Mimetype:  msg.Mimetype,
+		MediaID:   msg.Media.Id,
+		Duration:  time.Duration(msg.Duration) * time.Millisecond,
+		Position:  time.Duration(msg.Position) * time.Millisecond,
+		Query:     encoded,
 	}).Scan(&rs); err != nil {
 		log.Println(errorsx.Wrap(err, "upsert failed"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))

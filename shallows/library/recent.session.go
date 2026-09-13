@@ -35,6 +35,10 @@ func RecentSessionQueryMimetype(v string) squirrel.Sqlizer {
 	return squirrel.Expr("library_recent_sessions.mimetype = ?", v)
 }
 
+func RecentSessionQueryProfileID(v string) squirrel.Sqlizer {
+	return squirrel.Expr("library_recent_sessions.profile_id = ?", v)
+}
+
 type RecentSessionOption func(*RecentSession)
 
 func RecentSessionOptionID(id string) RecentSessionOption {
@@ -46,6 +50,12 @@ func RecentSessionOptionID(id string) RecentSessionOption {
 func RecentSessionOptionMediaID(id string) RecentSessionOption {
 	return func(s *RecentSession) {
 		s.MediaID = id
+	}
+}
+
+func RecentSessionOptionProfileID(id string) RecentSessionOption {
+	return func(s *RecentSession) {
+		s.ProfileID = id
 	}
 }
 

@@ -308,7 +308,7 @@ func RecentSessionInsertWithDefaults(
 	gql genieql.Insert,
 	pattern func(ctx context.Context, q sqlx.Queryer, a RecentSession) NewRecentSessionScannerStaticRow,
 ) {
-	gql.Into("library_recent_sessions").Default("created_at", "updated_at", "last_played_at").Conflict("ON CONFLICT (id) DO UPDATE SET position = EXCLUDED.position, duration = EXCLUDED.duration, query = EXCLUDED.query, updated_at = DEFAULT, last_played_at = DEFAULT")
+	gql.Into("library_recent_sessions").Default("created_at", "updated_at", "last_played_at").Conflict("ON CONFLICT (profile_id, id) DO UPDATE SET position = EXCLUDED.position, duration = EXCLUDED.duration, query = EXCLUDED.query, updated_at = DEFAULT, last_played_at = DEFAULT")
 }
 
 func Recommendation(gql genieql.Structure) {

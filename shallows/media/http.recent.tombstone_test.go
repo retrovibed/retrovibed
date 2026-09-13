@@ -54,9 +54,10 @@ func TestRecentTombstone(t *testing.T) {
 
 		var rs library.RecentSession
 		require.NoError(t, library.RecentSessionInsertWithDefaults(ctx, q, library.RecentSession{
-			ID:      uuid.Must(uuid.NewV4()).String(),
-			MediaID: md.ID,
-			Query:   encoded,
+			ID:        uuid.Must(uuid.NewV4()).String(),
+			ProfileID: p.ID,
+			MediaID:   md.ID,
+			Query:     encoded,
 		}).Scan(&rs))
 
 		resp2, req2, err := httptestx.BuildRequestBytes(

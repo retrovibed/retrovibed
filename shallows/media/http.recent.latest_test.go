@@ -92,7 +92,7 @@ func TestRecentLatest(t *testing.T) {
 			require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, md).Scan(&md))
 
 			var session library.RecentSession
-			require.NoError(t, testx.Fake(&session, library.RecentSessionOptionTestDefaults, library.RecentSessionOptionID(uuidx.WithSuffix(idx)), library.RecentSessionOptionMediaID(md.ID)))
+			require.NoError(t, testx.Fake(&session, library.RecentSessionOptionTestDefaults, library.RecentSessionOptionID(uuidx.WithSuffix(idx)), library.RecentSessionOptionMediaID(md.ID), library.RecentSessionOptionProfileID(p.ID)))
 			require.NoError(t, library.RecentSessionInsertWithDefaults(ctx, q, session).Scan(&session))
 		}
 
@@ -124,6 +124,66 @@ func TestRecentLatest(t *testing.T) {
 		require.Len(t, result.Items, 3)
 	})
 
+	t.Run("excludes other profiles sessions", func(t *testing.T) {
+		var (
+			p     meta.Profile
+			authz meta.Authz
+			other meta.Profile
+		)
+		ctx, done := testx.Context(t)
+		defer done()
+
+		q := sqltestx.Metadatabase(t)
+
+		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
+		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
+		require.NoError(t, testx.Fake(&authz, meta.AuthzOptionProfileID(p.ID), meta.AuthzOptionAdmin))
+		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, authz).Scan(&authz))
+
+		require.NoError(t, testx.Fake(&other, meta.ProfileOptionTestDefaults))
+		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, other).Scan(&other))
+
+		var mine, theirs library.Metadata
+		require.NoError(t, testx.Fake(&mine, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID))
+		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, mine).Scan(&mine))
+		require.NoError(t, testx.Fake(&theirs, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID))
+		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, theirs).Scan(&theirs))
+
+		var mySession, theirSession library.RecentSession
+		require.NoError(t, testx.Fake(&mySession, library.RecentSessionOptionTestDefaults, library.RecentSessionOptionMediaID(mine.ID), library.RecentSessionOptionProfileID(p.ID)))
+		require.NoError(t, library.RecentSessionInsertWithDefaults(ctx, q, mySession).Scan(&mySession))
+		require.NoError(t, testx.Fake(&theirSession, library.RecentSessionOptionTestDefaults, library.RecentSessionOptionMediaID(theirs.ID), library.RecentSessionOptionProfileID(other.ID)))
+		require.NoError(t, library.RecentSessionInsertWithDefaults(ctx, q, theirSession).Scan(&theirSession))
+
+		routes := mux.NewRouter()
+		media.NewHTTPRecent(q, media.HTTPRecentOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource)).Bind(routes.PathPrefix("/").Subrouter())
+
+		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
+
+		searchreq := &media.RecentSearchRequest{
+			Created: meta.NewDateRange(timex.NewRangeDuration(24 * time.Hour)),
+			Limit:   100,
+		}
+		encoded, err := formx.NewEncoder().Encode(&searchreq)
+		require.NoError(t, err)
+
+		resp, req, err := httptestx.BuildRequestBytes(
+			http.MethodGet,
+			"/?"+encoded.Encode(),
+			nil,
+			httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)),
+		)
+		require.NoError(t, err)
+
+		routes.ServeHTTP(resp, req)
+
+		var result media.RecentSearchResponse
+		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
+		require.Len(t, result.Items, 1)
+		require.Equal(t, mine.ID, result.Items[0].Media.Id)
+	})
+
 	t.Run("returns Duration Position Query", func(t *testing.T) {
 		var (
 			p     meta.Profile
@@ -147,7 +207,7 @@ func TestRecentLatest(t *testing.T) {
 		require.NoError(t, err)
 
 		var session library.RecentSession
-		require.NoError(t, testx.Fake(&session, library.RecentSessionOptionTestDefaults, library.RecentSessionOptionMediaID(md.ID)))
+		require.NoError(t, testx.Fake(&session, library.RecentSessionOptionTestDefaults, library.RecentSessionOptionMediaID(md.ID), library.RecentSessionOptionProfileID(p.ID)))
 		session.Duration = 5000 * time.Millisecond
 		session.Position = 3000 * time.Millisecond
 		session.Query = encodedQuery
@@ -278,7 +338,7 @@ func TestRecentLatest(t *testing.T) {
 			require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, md).Scan(&md))
 
 			var session library.RecentSession
-			require.NoError(t, testx.Fake(&session, library.RecentSessionOptionTestDefaults, library.RecentSessionOptionID(uuidx.WithSuffix(idx)), library.RecentSessionOptionMediaID(md.ID)))
+			require.NoError(t, testx.Fake(&session, library.RecentSessionOptionTestDefaults, library.RecentSessionOptionID(uuidx.WithSuffix(idx)), library.RecentSessionOptionMediaID(md.ID), library.RecentSessionOptionProfileID(p.ID)))
 			session.Mimetype = mimex.Video
 			require.NoError(t, library.RecentSessionInsertWithDefaults(ctx, q, session).Scan(&session))
 		}
@@ -289,7 +349,7 @@ func TestRecentLatest(t *testing.T) {
 			require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, md).Scan(&md))
 
 			var session library.RecentSession
-			require.NoError(t, testx.Fake(&session, library.RecentSessionOptionTestDefaults, library.RecentSessionOptionID(uuidx.WithSuffix(10+idx)), library.RecentSessionOptionMediaID(md.ID)))
+			require.NoError(t, testx.Fake(&session, library.RecentSessionOptionTestDefaults, library.RecentSessionOptionID(uuidx.WithSuffix(10+idx)), library.RecentSessionOptionMediaID(md.ID), library.RecentSessionOptionProfileID(p.ID)))
 			session.Mimetype = mimex.Audio
 			require.NoError(t, library.RecentSessionInsertWithDefaults(ctx, q, session).Scan(&session))
 		}
@@ -347,7 +407,7 @@ func TestRecentLatest(t *testing.T) {
 			require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, md).Scan(&md))
 
 			var session library.RecentSession
-			require.NoError(t, testx.Fake(&session, library.RecentSessionOptionTestDefaults, library.RecentSessionOptionID(uuidx.WithSuffix(idx)), library.RecentSessionOptionMediaID(md.ID)))
+			require.NoError(t, testx.Fake(&session, library.RecentSessionOptionTestDefaults, library.RecentSessionOptionID(uuidx.WithSuffix(idx)), library.RecentSessionOptionMediaID(md.ID), library.RecentSessionOptionProfileID(p.ID)))
 			session.Mimetype = mimex.Video
 			require.NoError(t, library.RecentSessionInsertWithDefaults(ctx, q, session).Scan(&session))
 		}
@@ -358,7 +418,7 @@ func TestRecentLatest(t *testing.T) {
 			require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, md).Scan(&md))
 
 			var session library.RecentSession
-			require.NoError(t, testx.Fake(&session, library.RecentSessionOptionTestDefaults, library.RecentSessionOptionID(uuidx.WithSuffix(10+idx)), library.RecentSessionOptionMediaID(md.ID)))
+			require.NoError(t, testx.Fake(&session, library.RecentSessionOptionTestDefaults, library.RecentSessionOptionID(uuidx.WithSuffix(10+idx)), library.RecentSessionOptionMediaID(md.ID), library.RecentSessionOptionProfileID(p.ID)))
 			session.Mimetype = mimex.Audio
 			require.NoError(t, library.RecentSessionInsertWithDefaults(ctx, q, session).Scan(&session))
 		}
@@ -410,13 +470,13 @@ func TestRecentLatest(t *testing.T) {
 		require.NoError(t, testx.Fake(&alive, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID))
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, alive).Scan(&alive))
 		var aliveSession library.RecentSession
-		require.NoError(t, testx.Fake(&aliveSession, library.RecentSessionOptionTestDefaults, library.RecentSessionOptionMediaID(alive.ID)))
+		require.NoError(t, testx.Fake(&aliveSession, library.RecentSessionOptionTestDefaults, library.RecentSessionOptionMediaID(alive.ID), library.RecentSessionOptionProfileID(p.ID)))
 		require.NoError(t, library.RecentSessionInsertWithDefaults(ctx, q, aliveSession).Scan(new(library.RecentSession)))
 
 		require.NoError(t, testx.Fake(&tombstoned, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID))
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, tombstoned).Scan(&tombstoned))
 		var tombstonedSession library.RecentSession
-		require.NoError(t, testx.Fake(&tombstonedSession, library.RecentSessionOptionTestDefaults, library.RecentSessionOptionMediaID(tombstoned.ID)))
+		require.NoError(t, testx.Fake(&tombstonedSession, library.RecentSessionOptionTestDefaults, library.RecentSessionOptionMediaID(tombstoned.ID), library.RecentSessionOptionProfileID(p.ID)))
 		require.NoError(t, library.RecentSessionInsertWithDefaults(ctx, q, tombstonedSession).Scan(new(library.RecentSession)))
 		require.NoError(t, library.MetadataTombstoneByID(ctx, q, tombstoned.ID).Scan(&tombstoned))
 
