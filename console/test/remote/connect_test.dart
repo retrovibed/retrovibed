@@ -636,7 +636,7 @@ void main() {
         // the widget tree, via mySessionId. A second real queue send isn't
         // guaranteed here - _fillQueue only sends when the daemon's last-known
         // queue depth is below autoqueueTarget, which the first tap already fills.
-        final sessionIdA = tester.widget<PlaylistCurrent>(find.byType(PlaylistCurrent)).sessionId!;
+        final sessionIdA = tester.widget<PlaylistCurrent>(find.byType(PlaylistCurrent)).sessionId;
 
         socket.emit(
           remote.Stream(
@@ -668,7 +668,7 @@ void main() {
         await rowB.onTap!();
         await tester.pumpN(10);
 
-        final sessionIdB = tester.widget<PlaylistCurrent>(find.byType(PlaylistCurrent)).sessionId!;
+        final sessionIdB = tester.widget<PlaylistCurrent>(find.byType(PlaylistCurrent)).sessionId;
         expect(sessionIdA, isNot(sessionIdB));
 
         socket.emit(

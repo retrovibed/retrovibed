@@ -165,11 +165,11 @@ class _State extends State<Connect> with LoadingState {
   // the widget's lifetime and these must always target whatever
   // daemon/hostname/token is current, whether read from build() or later
   // from _onPlay/_fillQueue.
-  List<httpx.Option> get _bearerOptions => [httpx.Request.bearer(() => Future.value(_latest.sync.token))];
-  media.FnMediaSearch get _apisearch => widget.apisearch(_hostname, _bearerOptions);
+  List<httpx.Option> get _reqoptions => [httpx.Request.bearer(() => Future.value(_latest.sync.token))];
+  media.FnMediaSearch get _apisearch => widget.apisearch(_hostname, _reqoptions);
   media.FnMediaFind get _apirandom => (req, {List<httpx.Option> options = const []}) async {
     if (!_autoplay.isCompleted) await _autoplay.future;
-    return widget.apirandom(_hostname, _bearerOptions)(req, options: options);
+    return widget.apirandom(_hostname, _reqoptions)(req, options: options);
   };
 
   // Mirrors media.PlayAction's shape but queues the media on the connected
