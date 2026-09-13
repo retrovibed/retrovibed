@@ -25,7 +25,7 @@ class _FakeRemoteControlSocket implements remote.RemoteControlSocket {
 
 void main() {
   group('PlayerControlPlayback', () {
-    testWidgets('slider is disabled when there is no remaining duration', (tester) async {
+    testWidgets('slider is disabled when there is no duration', (tester) async {
       await tester.pumpApp(
         PlayerControlPlayback(
           socket: _FakeRemoteControlSocket(),
@@ -44,7 +44,7 @@ void main() {
       expect(slider.onChangeEnd, isNull);
     });
 
-    testWidgets('slider value/max reflect the remaining playback time', (tester) async {
+    testWidgets('slider value/max reflect the full track, independent of position', (tester) async {
       await tester.pumpApp(
         PlayerControlPlayback(
           socket: _FakeRemoteControlSocket(),
@@ -59,9 +59,26 @@ void main() {
       );
 
       final slider = tester.widget<Slider>(find.byType(Slider));
-      // remainingMs = duration - position = 165000
-      expect(slider.max, 165000);
+      expect(slider.max, 180000);
       expect(slider.value, 15000);
+    });
+
+    testWidgets('the trailing label shows remaining time, not total duration', (tester) async {
+      await tester.pumpApp(
+        PlayerControlPlayback(
+          socket: _FakeRemoteControlSocket(),
+          sessionId: 's1',
+          current: remote.Sync(
+            playback: remote.Playback(
+              position: fixnum.Int64(15000),
+              duration: fixnum.Int64(180000),
+            ),
+          ),
+        ),
+      );
+
+      // ds.Duration.elapsed renders HH:MM:SS - remaining = 180000 - 15000 = 165000ms = 00:02:45
+      expect(find.text('00:02:45'), findsOneWidget);
     });
 
     testWidgets('releasing the slider at the end sends a seek message', (tester) async {
@@ -83,14 +100,14 @@ void main() {
       // since onChangeEnd is a plain ValueChanged<double> field - this
       // tests the delta computation without depending on drag/layout
       // geometry.
-      tester.widget<Slider>(find.byType(Slider)).onChangeEnd!(165000); // slider's max
+      tester.widget<Slider>(find.byType(Slider)).onChangeEnd!(180000); // slider's max (full duration)
       await tester.pump(const Duration(seconds: 1)); // settle the drag-reset timer
 
       expect(socket.sent, hasLength(1));
       final sent = socket.sent.single;
       expect(sent.hasSeek(), isTrue);
       expect(sent.sessionId, 's1');
-      expect(sent.seek.offset, 150000); // remainingMs (165000, the slider's max) - position (15000)
+      expect(sent.seek.offset, 165000); // duration (180000, the slider's max) - position (15000)
     });
 
     testWidgets('releasing the slider at the start sends a negative seek message', (tester) async {

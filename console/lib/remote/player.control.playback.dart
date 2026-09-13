@@ -33,11 +33,11 @@ class _State extends State<PlayerControlPlayback> with ds.LoadingState {
 
   @override
   Widget build(BuildContext context) {
-    final remainingMs = (widget.current.playback.duration - widget.current.playback.position).toInt();
-    final hasDuration = remainingMs > 0;
+    final durationMs = widget.current.playback.duration.toInt();
+    final hasDuration = durationMs > 0;
     final position = (_dragging ?? widget.current.playback.position.toDouble()).clamp(
       0.0,
-      hasDuration ? remainingMs.toDouble() : 0.0,
+      hasDuration ? durationMs.toDouble() : 0.0,
     );
 
     return Row(
@@ -46,7 +46,7 @@ class _State extends State<PlayerControlPlayback> with ds.LoadingState {
           child: Slider(
             value: position,
             min: 0,
-            max: hasDuration ? remainingMs.toDouble() : 1.0,
+            max: hasDuration ? durationMs.toDouble() : 1.0,
             onChanged: !hasDuration ? null : (v) => setState(() => _dragging = v),
             onChangeEnd: !hasDuration
                 ? null
@@ -59,7 +59,7 @@ class _State extends State<PlayerControlPlayback> with ds.LoadingState {
                   },
           ),
         ),
-        ds.Duration.elapsed(Duration(milliseconds: remainingMs)),
+        ds.Duration.elapsed(Duration(milliseconds: (durationMs - position).round())),
       ],
     );
   }
