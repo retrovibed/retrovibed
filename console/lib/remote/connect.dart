@@ -15,6 +15,7 @@ import 'package:retrovibed/library.dart' as lib;
 import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'package:retrovibed/discovery.dart' as disc;
 import 'api.dart' as remote;
+import 'player.control.playback.dart';
 import 'player.control.seek.dart';
 import 'player.control.fullscreen.dart';
 import 'player.control.playpause.dart';
@@ -117,9 +118,7 @@ class _State extends State<Connect> with LoadingState {
   remote.Stream _latest = remote.Stream(sid: uuidx.min());
   // which widget occupies the focused slot below the transport controls,
   // defaulting to the pending-queue view. Kept in sync with the live
-  // search/queue widgets at the top of build() (matched by key, since
-  // search/queue are rebuilt fresh every build() - they close over live
-  // _socket/_latest - so a stale reference here would stop updating).
+  // search/queue widgets at the top of build()
   Widget? _focused;
   ValueNotifier<meta.Daemon> _endpoint = ValueNotifier(meta.Daemon());
   // identifies the current "pick session" - stable across reconnects and
@@ -161,15 +160,14 @@ class _State extends State<Connect> with LoadingState {
   // see DaemonFromHost.
   String get _hostname =>
       meta.daemons.isLocalDevice(_latest.sync.library) ? _endpoint.value.hostname : _latest.sync.library.hostname;
-  // resolved fresh on every access (not cached) since _latest changes over
-  // the widget's lifetime and these must always target whatever
-  // daemon/hostname/token is current, whether read from build() or later
-  // from _onPlay/_fillQueue.
-  List<httpx.Option> get _reqoptions => [httpx.Request.bearer(() => Future.value(_latest.sync.token))];
-  media.FnMediaSearch get _apisearch => widget.apisearch(_hostname, _reqoptions);
+  media.FnMediaSearch get _apisearch =>
+      widget.apisearch(_hostname, [httpx.Request.bearer(() => Future.value(_latest.sync.token))]);
   media.FnMediaFind get _apirandom => (req, {List<httpx.Option> options = const []}) async {
     if (!_autoplay.isCompleted) await _autoplay.future;
-    return widget.apirandom(_hostname, _reqoptions)(req, options: options);
+    return widget.apirandom(_hostname, [httpx.Request.bearer(() => Future.value(_latest.sync.token))])(
+      req,
+      options: options,
+    );
   };
 
   // Mirrors media.PlayAction's shape but queues the media on the connected
@@ -524,6 +522,7 @@ class _State extends State<Connect> with LoadingState {
                       Column(
                         verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
                         children: [
+                          PlayerControlPlayback(socket: _socket, sessionId: _sessionID, current: _latest.sync),
                           Wrap(
                             alignment: WrapAlignment.center,
                             spacing: defaults.spacing,
@@ -541,6 +540,7 @@ class _State extends State<Connect> with LoadingState {
                                   ),
                                 ),
                               ),
+                              PlayerControlVolume(socket: _socket, sessionId: _sessionID, current: _latest.sync),
                               PlayerControlSeek.prev(socket: _socket, sessionId: _sessionID),
                               PlayerControlSeek.backward(socket: _socket, sessionId: _sessionID),
                               PlayerControlPlayPause(
@@ -567,7 +567,6 @@ class _State extends State<Connect> with LoadingState {
                                 PlayerControlSync(socket: _socket, sessionId: _sessionID),
                             ],
                           ),
-                          PlayerControlVolume(socket: _socket, sessionId: _sessionID, current: _latest.sync),
                           PlaylistCurrent(_latest.sync.current, sessionId: _sessionID),
                           Expanded(child: queue),
                         ],
