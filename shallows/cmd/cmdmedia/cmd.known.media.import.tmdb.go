@@ -194,7 +194,7 @@ func (t *tmdbimport) series(ctx context.Context, c *tmdb.Client) iter.Seq[librar
 					return
 				}
 
-				for e := range t.episodes(ctx, c, mr.ID, mr.Name, v.UID) {
+				for e := range t.episodes(ctx, c, mr.ID, v) {
 					if !yield(e) {
 						return
 					}
@@ -215,7 +215,7 @@ func (t *tmdbimport) series(ctx context.Context, c *tmdb.Client) iter.Seq[librar
 	}
 }
 
-func (t *tmdbimport) episodes(ctx context.Context, c *tmdb.Client, showID int64, showTitle string, showUID string) iter.Seq[library.Known] {
+func (t *tmdbimport) episodes(ctx context.Context, c *tmdb.Client, showID int64, parent library.Known) iter.Seq[library.Known] {
 	return func(yield func(library.Known) bool) {
 		bs := backoffx.New(backoffx.Exponential(time.Second), backoffx.Maximum(time.Minute))
 
@@ -253,17 +253,21 @@ func (t *tmdbimport) episodes(ctx context.Context, c *tmdb.Client, showID int64,
 			for _, ep := range sdetails.Episodes {
 				_md5 := md5x.JSON(ep)
 				uidmd5 := uuid.FromBytesOrNil(_md5.Sum(nil))
-
+				imgpath := t.imgpath(ep.StillPath)
 				v := library.Known{
 					Source:           t.Source,
 					UID:              ddiscapi.ImportedMediaUintID(t.Source, uint64(ep.ID)),
 					Md5:              uidmd5.String(),
 					Md5Lower:         binary.LittleEndian.Uint64(uuidx.LowN(uidmd5, 64)),
 					ID:               strconv.FormatInt(ep.ID, 10),
+					OriginalLanguage: parent.OriginalLanguage,
+					OriginalTitle:    parent.OriginalTitle,
 					Overview:         ep.Overview,
-					Title:            showTitle,
+					Title:            parent.Title,
 					Subtitle:         ep.Name,
-					ParentUID:        showUID,
+					ParentUID:        parent.UID,
+					PosterPath:       stringsx.FirstNonBlank(imgpath, parent.PosterPath),
+					BackdropPath:     stringsx.FirstNonBlank(imgpath, parent.BackdropPath),
 					Collation:        library.KnownCollationEpisode(uint16(ep.SeasonNumber), uint16(ep.EpisodeNumber)),
 					Released:         errorsx.Zero(time.Parse(time.DateOnly, ep.AirDate)),
 					Mimetype:         mimex.Video,
@@ -286,15 +290,15 @@ func (t tmdbimport) Run(gctx *cmdopts.Global) (err error) {
 
 	encoder := jsonl.NewEncoder(os.Stdout)
 
-	// for v := range t.movies(gctx.Context, c) {
-	// 	if err := encoder.Encode(v); err != nil {
-	// 		return errorsx.Wrap(err, "unable to encode media")
-	// 	}
-	// }
+	for v := range t.movies(gctx.Context, c) {
+		if err := encoder.Encode(v); err != nil {
+			return errorsx.Wrap(err, "unable to encode media")
+		}
+	}
 
-	// if t.cause != nil {
-	// 	return t.cause
-	// }
+	if t.cause != nil {
+		return t.cause
+	}
 
 	for v := range t.series(gctx.Context, c) {
 		if err := encoder.Encode(v); err != nil {

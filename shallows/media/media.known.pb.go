@@ -34,6 +34,9 @@ type Known struct {
 	Mimetype      string                 `protobuf:"bytes,8,opt,name=mimetype,proto3" json:"mimetype,omitempty"`
 	Source        string                 `protobuf:"bytes,9,opt,name=source,proto3" json:"source,omitempty"`
 	Uid           string                 `protobuf:"bytes,10,opt,name=uid,proto3" json:"uid,omitempty"`
+	Subtitle      string                 `protobuf:"bytes,11,opt,name=subtitle,proto3" json:"subtitle,omitempty"`
+	Collation     uint32                 `protobuf:"varint,12,opt,name=collation,proto3" json:"collation,omitempty"`
+	ParentUid     string                 `protobuf:"bytes,13,opt,name=parent_uid,proto3" json:"parent_uid,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -134,6 +137,27 @@ func (x *Known) GetSource() string {
 func (x *Known) GetUid() string {
 	if x != nil {
 		return x.Uid
+	}
+	return ""
+}
+
+func (x *Known) GetSubtitle() string {
+	if x != nil {
+		return x.Subtitle
+	}
+	return ""
+}
+
+func (x *Known) GetCollation() uint32 {
+	if x != nil {
+		return x.Collation
+	}
+	return 0
+}
+
+func (x *Known) GetParentUid() string {
+	if x != nil {
+		return x.ParentUid
 	}
 	return ""
 }
@@ -1146,7 +1170,7 @@ var File_media_media_known_proto protoreflect.FileDescriptor
 
 const file_media_media_known_proto_rawDesc = "" +
 	"\n" +
-	"\x17media/media.known.proto\x12\x05media\x1a\x16meta/meta.search.proto\"\xf9\x01\n" +
+	"\x17media/media.known.proto\x12\x05media\x1a\x16meta/meta.search.proto\"\xd3\x02\n" +
 	"\x05Known\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x16\n" +
 	"\x06rating\x18\x02 \x01(\x02R\x06rating\x12\x14\n" +
@@ -1158,7 +1182,12 @@ const file_media_media_known_proto_rawDesc = "" +
 	"\bmimetype\x18\b \x01(\tR\bmimetype\x12\x16\n" +
 	"\x06source\x18\t \x01(\tR\x06source\x12\x10\n" +
 	"\x03uid\x18\n" +
-	" \x01(\tR\x03uid\"\x8c\x02\n" +
+	" \x01(\tR\x03uid\x12\x1a\n" +
+	"\bsubtitle\x18\v \x01(\tR\bsubtitle\x12\x1c\n" +
+	"\tcollation\x18\f \x01(\rR\tcollation\x12\x1e\n" +
+	"\n" +
+	"parent_uid\x18\r \x01(\tR\n" +
+	"parent_uid\"\x8c\x02\n" +
 	"\x12KnownSearchRequest\x12\x14\n" +
 	"\x05query\x18\x01 \x01(\tR\x05query\x12\x14\n" +
 	"\x05adult\x18\x02 \x01(\bR\x05adult\x12\x1a\n" +

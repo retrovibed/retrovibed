@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/Masterminds/squirrel"
+	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -76,6 +77,9 @@ func (t knownquery) run(ctx context.Context, in io.Reader, db *sql.DB, cleaner l
 			q := library.KnownSearchBuilder().Where(squirrel.And{
 				library.KnownQueryExplicit(t.Explicit),
 				lucenex.Query(duckdbx.NewLucene(), query, lucenex.WithDefaultField("auto_description")),
+				// TEMPORARY: exclude episode rows (they share their show's
+				// title) until real episode-aware matching exists.
+				library.KnownQueryParentUID(uuid.Nil.String()),
 			}).OrderBy("title DESC").Limit(1028)
 
 			scanner := sqlx.Scan(library.KnownSearch(ctx, db, q))
@@ -109,6 +113,9 @@ func (t knownquery) run(ctx context.Context, in io.Reader, db *sql.DB, cleaner l
 			q := library.KnownSearchBuilder().Where(squirrel.And{
 				library.KnownQueryExplicit(t.Explicit),
 				lucenex.Query(duckdbx.NewLucene(), terms, lucenex.WithDefaultField("title")),
+				// TEMPORARY: exclude episode rows (they share their show's
+				// title) until real episode-aware matching exists.
+				library.KnownQueryParentUID(uuid.Nil.String()),
 			}).Limit(1028)
 
 			scanner := sqlx.Scan(library.KnownSearch(ctx, db, q))

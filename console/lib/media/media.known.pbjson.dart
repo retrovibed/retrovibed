@@ -29,6 +29,9 @@ const Known$json = {
     {'1': 'mimetype', '3': 8, '4': 1, '5': 9, '10': 'mimetype'},
     {'1': 'source', '3': 9, '4': 1, '5': 9, '10': 'source'},
     {'1': 'uid', '3': 10, '4': 1, '5': 9, '10': 'uid'},
+    {'1': 'subtitle', '3': 11, '4': 1, '5': 9, '10': 'subtitle'},
+    {'1': 'collation', '3': 12, '4': 1, '5': 13, '10': 'collation'},
+    {'1': 'parent_uid', '3': 13, '4': 1, '5': 9, '10': 'parent_uid'},
   ],
 };
 
@@ -38,7 +41,9 @@ final $typed_data.Uint8List knownDescriptor = $convert.base64Decode(
     'QYAyABKAhSBWFkdWx0EiAKC2Rlc2NyaXB0aW9uGAQgASgJUgtkZXNjcmlwdGlvbhIYCgdzdW1t'
     'YXJ5GAUgASgJUgdzdW1tYXJ5EhQKBWltYWdlGAYgASgJUgVpbWFnZRIaCghyZWxlYXNlZBgHIA'
     'EoCVIIcmVsZWFzZWQSGgoIbWltZXR5cGUYCCABKAlSCG1pbWV0eXBlEhYKBnNvdXJjZRgJIAEo'
-    'CVIGc291cmNlEhAKA3VpZBgKIAEoCVIDdWlk');
+    'CVIGc291cmNlEhAKA3VpZBgKIAEoCVIDdWlkEhoKCHN1YnRpdGxlGAsgASgJUghzdWJ0aXRsZR'
+    'IcCgljb2xsYXRpb24YDCABKA1SCWNvbGxhdGlvbhIeCgpwYXJlbnRfdWlkGA0gASgJUgpwYXJl'
+    'bnRfdWlk');
 
 @$core.Deprecated('Use knownSearchRequestDescriptor instead')
 const KnownSearchRequest$json = {

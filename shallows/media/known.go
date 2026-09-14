@@ -20,6 +20,9 @@ func KnownOptionFromLibraryKnown(cc library.Known) KnownOption {
 		c.Released = grpcx.EncodeTime(cc.Released)
 		c.Mimetype = cc.Mimetype
 		c.Source = cc.Source
+		c.Subtitle = cc.Subtitle
+		c.Collation = cc.Collation
+		c.ParentUid = cc.ParentUID
 	}
 }
 

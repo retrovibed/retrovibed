@@ -76,6 +76,10 @@ func (t *knownSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 			library.KnownQueryExplicit(t.req.Adult),
 			squirrelx.In("library_known_media.mimetype", mimetypes...),
 			library.KnownQuerySimilarity(t.req.Query, knownSimilarityCutoff),
+			// TEMPORARY: exclude episode rows (they share their show's
+			// title) until real episode-aware matching exists; otherwise
+			// a popular show's episodes crowd out its own row here.
+			library.KnownQueryParentUID(uuid.Nil.String()),
 		}).Limit(knownStrategyLimit)
 
 		s := sqlx.Scan(library.KnownSearch(ctx, t.q, qq))

@@ -31,6 +31,9 @@ class Known extends $pb.GeneratedMessage {
     $core.String? mimetype,
     $core.String? source,
     $core.String? uid,
+    $core.String? subtitle,
+    $core.int? collation,
+    $core.String? parentUid,
   }) {
     final result = Known._();
     if (id != null) result.id = id;
@@ -43,6 +46,9 @@ class Known extends $pb.GeneratedMessage {
     if (mimetype != null) result.mimetype = mimetype;
     if (source != null) result.source = source;
     if (uid != null) result.uid = uid;
+    if (subtitle != null) result.subtitle = subtitle;
+    if (collation != null) result.collation = collation;
+    if (parentUid != null) result.parentUid = parentUid;
     return result;
   }
 
@@ -69,6 +75,9 @@ class Known extends $pb.GeneratedMessage {
     ..aOS(8, _omitFieldNames ? '' : 'mimetype')
     ..aOS(9, _omitFieldNames ? '' : 'source')
     ..aOS(10, _omitFieldNames ? '' : 'uid')
+    ..aOS(11, _omitFieldNames ? '' : 'subtitle')
+    ..aI(12, _omitFieldNames ? '' : 'collation', fieldType: $pb.PbFieldType.OU3)
+    ..aOS(13, _omitFieldNames ? '' : 'parent_uid')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -180,6 +189,33 @@ class Known extends $pb.GeneratedMessage {
   $core.bool hasUid() => $_has(9);
   @$pb.TagNumber(10)
   void clearUid() => $_clearField(10);
+
+  @$pb.TagNumber(11)
+  $core.String get subtitle => $_getSZ(10);
+  @$pb.TagNumber(11)
+  set subtitle($core.String value) => $_setString(10, value);
+  @$pb.TagNumber(11)
+  $core.bool hasSubtitle() => $_has(10);
+  @$pb.TagNumber(11)
+  void clearSubtitle() => $_clearField(11);
+
+  @$pb.TagNumber(12)
+  $core.int get collation => $_getIZ(11);
+  @$pb.TagNumber(12)
+  set collation($core.int value) => $_setUnsignedInt32(11, value);
+  @$pb.TagNumber(12)
+  $core.bool hasCollation() => $_has(11);
+  @$pb.TagNumber(12)
+  void clearCollation() => $_clearField(12);
+
+  @$pb.TagNumber(13)
+  $core.String get parentUid => $_getSZ(12);
+  @$pb.TagNumber(13)
+  set parentUid($core.String value) => $_setString(12, value);
+  @$pb.TagNumber(13)
+  $core.bool hasParentUid() => $_has(12);
+  @$pb.TagNumber(13)
+  void clearParentUid() => $_clearField(13);
 }
 
 class KnownSearchRequest extends $pb.GeneratedMessage {

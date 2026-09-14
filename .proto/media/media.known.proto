@@ -15,6 +15,9 @@ message Known {
   string mimetype = 8 [ json_name = "mimetype" ];
   string source = 9 [ json_name = "source" ];
   string uid = 10 [ json_name = "uid" ];
+  string subtitle = 11 [ json_name = "subtitle" ];
+  uint32 collation = 12 [ json_name = "collation" ];
+  string parent_uid = 13 [ json_name = "parent_uid" ];
 }
 
 message KnownSearchRequest {
