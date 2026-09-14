@@ -3,6 +3,7 @@ package cmdmedia
 import (
 	"context"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"iter"
 	"log"
@@ -44,6 +45,14 @@ func (t tmdbimport) imgpath(s string) string {
 	}
 
 	return fmt.Sprintf("%s%s", t.URL, s)
+}
+
+// tmdbNotFound reports whether err is TMDB's permanent "resource not found"
+// response (status_code 34), e.g. a season TVDetails lists that has no
+// actual season-details page.
+func tmdbNotFound(err error) bool {
+	var terr tmdb.Error
+	return errors.As(err, &terr) && terr.StatusCode == 34
 }
 
 func (t *tmdbimport) movies(ctx context.Context, c *tmdb.Client) iter.Seq[library.Known] {
@@ -241,8 +250,18 @@ func (t *tmdbimport) episodes(ctx context.Context, c *tmdb.Client, showID int64,
 					return nil, backoffx.ErrStopAttempts
 				}
 
-				return c.GetTVSeasonDetails(int(showID), season.SeasonNumber, nil)
+				d, err := c.GetTVSeasonDetails(int(showID), season.SeasonNumber, nil)
+				if tmdbNotFound(err) {
+					return nil, errors.Join(backoffx.ErrStopAttempts, err)
+				}
+
+				return d, err
 			})
+
+			if tmdbNotFound(err) {
+				log.Println("season not found, skipping", showID, season.SeasonNumber)
+				continue
+			}
 
 			if err != nil {
 				errorsx.Debug(err)
