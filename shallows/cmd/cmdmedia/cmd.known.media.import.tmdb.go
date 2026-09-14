@@ -193,6 +193,12 @@ func (t *tmdbimport) series(ctx context.Context, c *tmdb.Client) iter.Seq[librar
 				if !yield(v) {
 					return
 				}
+
+				for e := range t.episodes(ctx, c, mr.ID, mr.Name, v.UID) {
+					if !yield(e) {
+						return
+					}
+				}
 			}
 
 			year = slicesx.LastOrDefault(year, slicesx.MapTransform(func(mr tmdb.TVShowResult) time.Time {
@@ -209,6 +215,68 @@ func (t *tmdbimport) series(ctx context.Context, c *tmdb.Client) iter.Seq[librar
 	}
 }
 
+func (t *tmdbimport) episodes(ctx context.Context, c *tmdb.Client, showID int64, showTitle string, showUID string) iter.Seq[library.Known] {
+	return func(yield func(library.Known) bool) {
+		bs := backoffx.New(backoffx.Exponential(time.Second), backoffx.Maximum(time.Minute))
+
+		details, err := backoffx.AttemptV(ctx, bs, func(ctx context.Context, attempts uint) (*tmdb.TVDetails, error) {
+			log.Println("retrieving tv details", attempts, showID)
+			if attempts > t.Attempts {
+				return nil, backoffx.ErrStopAttempts
+			}
+
+			return c.GetTVDetails(int(showID), nil)
+		})
+
+		if err != nil {
+			errorsx.Debug(err)
+			t.cause = errorsx.Wrapf(err, "failed to retrieve tv details %d", showID)
+			return
+		}
+
+		for _, season := range details.Seasons {
+			sdetails, err := backoffx.AttemptV(ctx, bs, func(ctx context.Context, attempts uint) (*tmdb.TVSeasonDetails, error) {
+				log.Println("retrieving season details", attempts, showID, season.SeasonNumber)
+				if attempts > t.Attempts {
+					return nil, backoffx.ErrStopAttempts
+				}
+
+				return c.GetTVSeasonDetails(int(showID), season.SeasonNumber, nil)
+			})
+
+			if err != nil {
+				errorsx.Debug(err)
+				t.cause = errorsx.Wrapf(err, "failed to retrieve season details %d - %d", showID, season.SeasonNumber)
+				return
+			}
+
+			for _, ep := range sdetails.Episodes {
+				_md5 := md5x.JSON(ep)
+				uidmd5 := uuid.FromBytesOrNil(_md5.Sum(nil))
+
+				v := library.Known{
+					Source:           t.Source,
+					UID:              ddiscapi.ImportedMediaUintID(t.Source, uint64(ep.ID)),
+					Md5:              uidmd5.String(),
+					Md5Lower:         binary.LittleEndian.Uint64(uuidx.LowN(uidmd5, 64)),
+					ID:               strconv.FormatInt(ep.ID, 10),
+					Overview:         ep.Overview,
+					Title:            showTitle,
+					Subtitle:         ep.Name,
+					ParentUID:        showUID,
+					Collation:        library.KnownCollationEpisode(uint16(ep.SeasonNumber), uint16(ep.EpisodeNumber)),
+					Released:         errorsx.Zero(time.Parse(time.DateOnly, ep.AirDate)),
+					Mimetype:         mimex.Video,
+				}
+
+				if !yield(v) {
+					return
+				}
+			}
+		}
+	}
+}
+
 func (t tmdbimport) Run(gctx *cmdopts.Global) (err error) {
 	c, err := tmdb.Init(t.APIKey)
 	if err != nil {
@@ -218,15 +286,15 @@ func (t tmdbimport) Run(gctx *cmdopts.Global) (err error) {
 
 	encoder := jsonl.NewEncoder(os.Stdout)
 
-	for v := range t.movies(gctx.Context, c) {
-		if err := encoder.Encode(v); err != nil {
-			return errorsx.Wrap(err, "unable to encode media")
-		}
-	}
+	// for v := range t.movies(gctx.Context, c) {
+	// 	if err := encoder.Encode(v); err != nil {
+	// 		return errorsx.Wrap(err, "unable to encode media")
+	// 	}
+	// }
 
-	if t.cause != nil {
-		return t.cause
-	}
+	// if t.cause != nil {
+	// 	return t.cause
+	// }
 
 	for v := range t.series(gctx.Context, c) {
 		if err := encoder.Encode(v); err != nil {

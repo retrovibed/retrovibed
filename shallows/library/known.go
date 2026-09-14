@@ -67,6 +67,41 @@ func KnownOptionSource(v string) func(*Known) {
 	}
 }
 
+func KnownOptionCollation(v uint32) func(*Known) {
+	return func(t *Known) {
+		t.Collation = v
+	}
+}
+
+func KnownOptionSubtitle(v string) func(*Known) {
+	return func(t *Known) {
+		t.Subtitle = v
+	}
+}
+
+func KnownOptionParentUID(v string) func(*Known) {
+	return func(t *Known) {
+		t.ParentUID = v
+	}
+}
+
+// KnownCollationSpecialsSeason marks TMDB "Specials" (season_number == 0)
+// in the high 16 bits of Collation, instead of 0, so a specials episode
+// never collides with Collation == 0 (the standalone/overall item marker).
+const KnownCollationSpecialsSeason uint16 = 0xFFFF
+
+// KnownCollationEpisode packs a season/episode pair into a single ordering
+// value: high 16 bits season, low 16 bits episode. Collation == 0 is
+// reserved for the standalone/overall item (e.g. a TV show's own row).
+// TMDB's "Specials" season (season_number == 0) is remapped to
+// KnownCollationSpecialsSeason so it doesn't collide with that marker.
+func KnownCollationEpisode(season, episode uint16) uint32 {
+	if season == 0 {
+		season = KnownCollationSpecialsSeason
+	}
+	return uint32(season)<<16 | uint32(episode)
+}
+
 func KnownOptionTestNoPoster(t *Known) {
 	t.PosterPath = ""
 	t.BackdropPath = ""
@@ -110,6 +145,10 @@ func KnownQueryExplicit(allow bool) squirrel.Sqlizer {
 
 func KnownQueryUID(ids ...string) squirrel.Sqlizer {
 	return squirrelx.In("library_known_media.uid", ids...)
+}
+
+func KnownQueryParentUID(uid string) squirrel.Sqlizer {
+	return squirrel.Expr("library_known_media.parent_uid = ?", uid)
 }
 
 func KnownQueryLanguage(v string) squirrel.Sqlizer {

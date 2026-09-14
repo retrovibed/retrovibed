@@ -35,7 +35,7 @@ func TestHTTPTorrentInfo(t *testing.T) {
 		q := sqltestx.Metadatabase(t)
 		vfs := fsx.DirVirtual(t.TempDir())
 
-		fixture := testx.Fixture(".fixtures", "example.1.torrent")
+		fixture := testx.Fixture("example.1.torrent")
 		mi, err := metainfo.LoadFromFile(fixture)
 		require.NoError(t, err)
 		hash := mi.HashInfoBytes()
