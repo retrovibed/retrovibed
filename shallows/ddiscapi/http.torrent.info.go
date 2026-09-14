@@ -51,6 +51,8 @@ func NewHTTPTorrentInfo(db *sql.DB, options ...HTTPTorrentInfoOption) *HTTPTorre
 
 func (t *HTTPTorrentInfo) Bind(r *mux.Router) {
 	r.StrictSlash(false)
+	r.Use(httpx.RouteInvoked)
+
 	r.Path("/{id}/").Methods(http.MethodGet).Handler(alice.New(
 		httpx.ContextBufferPool512(),
 		httpx.ParseForm,
@@ -76,6 +78,7 @@ func (t *HTTPTorrentInfo) get(w http.ResponseWriter, r *http.Request) {
 	}
 
 	path := t.rootstorage.Path(rootenv.TorrentDirName, metainfo.Hash(meta.Infohash).String())
+	log.Println("DERP DERPz", path)
 	mi, err := metainfo.LoadFromFile(path + tracking.TorrentSuffix)
 	if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to load torrent file"))
