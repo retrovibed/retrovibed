@@ -104,7 +104,7 @@ func (t *tmdbimport) movies(ctx context.Context, c *tmdb.Client) iter.Seq[librar
 					Popularity:       float64(mr.Popularity),
 					PosterPath:       t.imgpath(mr.PosterPath),
 					Title:            mr.Title,
-					Released:         errorsx.Zero(time.Parse(time.DateOnly, mr.ReleaseDate)),
+					Released:         errorsx.ZeroSilent(time.Parse(time.DateOnly, mr.ReleaseDate)),
 					Mimetype:         mimex.Video,
 				}
 
@@ -114,7 +114,7 @@ func (t *tmdbimport) movies(ctx context.Context, c *tmdb.Client) iter.Seq[librar
 			}
 
 			year = slicesx.LastOrDefault(year, slicesx.MapTransform(func(mr tmdb.MovieResult) time.Time {
-				return timex.Max(errorsx.Zero(time.Parse(time.DateOnly, mr.ReleaseDate)), year)
+				return timex.Max(errorsx.ZeroSilent(time.Parse(time.DateOnly, mr.ReleaseDate)), year)
 			}, resp.Results...)...)
 
 			if page >= resp.TotalPages {
@@ -186,7 +186,7 @@ func (t *tmdbimport) series(ctx context.Context, c *tmdb.Client) iter.Seq[librar
 					PosterPath:       t.imgpath(mr.PosterPath),
 					Title:            mr.Name,
 					Adult:            mr.Adult,
-					Released:         errorsx.Zero(time.Parse(time.DateOnly, mr.FirstAirDate)),
+					Released:         errorsx.ZeroSilent(time.Parse(time.DateOnly, mr.FirstAirDate)),
 					Mimetype:         mimex.Video,
 				}
 
@@ -202,7 +202,7 @@ func (t *tmdbimport) series(ctx context.Context, c *tmdb.Client) iter.Seq[librar
 			}
 
 			year = slicesx.LastOrDefault(year, slicesx.MapTransform(func(mr tmdb.TVShowResult) time.Time {
-				return timex.Max(errorsx.Zero(time.Parse(time.DateOnly, mr.FirstAirDate)), year)
+				return timex.Max(errorsx.ZeroSilent(time.Parse(time.DateOnly, mr.FirstAirDate)), year)
 			}, resp.Results...)...)
 
 			if page >= resp.TotalPages {
@@ -247,7 +247,7 @@ func (t *tmdbimport) episodes(ctx context.Context, c *tmdb.Client, showID int64,
 			if err != nil {
 				errorsx.Debug(err)
 				t.cause = errorsx.Wrapf(err, "failed to retrieve season details %d - %d", showID, season.SeasonNumber)
-				return
+				continue
 			}
 
 			for _, ep := range sdetails.Episodes {
@@ -262,14 +262,14 @@ func (t *tmdbimport) episodes(ctx context.Context, c *tmdb.Client, showID int64,
 					ID:               strconv.FormatInt(ep.ID, 10),
 					OriginalLanguage: parent.OriginalLanguage,
 					OriginalTitle:    parent.OriginalTitle,
-					Overview:         ep.Overview,
 					Title:            parent.Title,
+					Overview:         ep.Overview,
 					Subtitle:         ep.Name,
 					ParentUID:        parent.UID,
 					PosterPath:       stringsx.FirstNonBlank(imgpath, parent.PosterPath),
 					BackdropPath:     stringsx.FirstNonBlank(imgpath, parent.BackdropPath),
 					Collation:        library.KnownCollationEpisode(uint16(ep.SeasonNumber), uint16(ep.EpisodeNumber)),
-					Released:         errorsx.Zero(time.Parse(time.DateOnly, ep.AirDate)),
+					Released:         errorsx.ZeroSilent(time.Parse(time.DateOnly, ep.AirDate)),
 					Mimetype:         mimex.Video,
 				}
 
