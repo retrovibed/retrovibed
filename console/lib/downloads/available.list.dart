@@ -7,6 +7,7 @@ import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/lucene.dart' as lucene;
 import 'package:retrovibed/timex.dart' as timex;
+import 'package:retrovibed/torrentx/display.dart' as torrentx;
 import './grid.settings.dart';
 import './magnet.links.dart';
 
@@ -344,7 +345,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                         onCancel: (_) => completion.complete(),
                       ),
                     ),
-                    trailing: [],
+                    trailing: [torrentx.TorrentDisplay.fromID(v.media.id)],
                   ),
               ],
             ),

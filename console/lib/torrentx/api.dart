@@ -19,3 +19,19 @@ abstract class diagnostics {
         .then((v) => httpx.fromProto3JsonSafe(TorrentMetricsResponse(), jsonDecode(v.body)));
   }
 }
+
+typedef FnTorrentInfo = Future<TorrentInfoResponse> Function(String id, {List<httpx.Option> options});
+
+abstract class info {
+  static Future<TorrentInfoResponse> get(
+    String id, {
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx
+        .get(
+          Uri.https(httpx.host(), "/t/${id}/", null),
+          options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
+        )
+        .then((v) => httpx.fromProto3JsonSafe(TorrentInfoResponse(), jsonDecode(v.body)));
+  }
+}
