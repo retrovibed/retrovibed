@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -69,10 +70,10 @@ func TestTmdbImportSeries(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 
-		requests := 0
+		var requests atomic.Int64
 		routes := mux.NewRouter()
 		routes.HandleFunc("/discover/tv", func(w http.ResponseWriter, r *http.Request) {
-			requests++
+			requests.Add(1)
 			page := r.URL.Query().Get("page")
 			switch page {
 			case "1":
@@ -84,10 +85,10 @@ func TestTmdbImportSeries(t *testing.T) {
 			}
 		})
 		routes.HandleFunc("/tv/{id}", func(w http.ResponseWriter, r *http.Request) {
-			requests++
-			// series yields each show's episodes inline via t.episodes,
-			// which fetches show details before any season/episode lookups -
-			// a show with no seasons ends that fetch here.
+			requests.Add(1)
+			// series fetches each show's episodes concurrently via a pool of
+			// workers, which fetches show details before any season/episode
+			// lookups - a show with no seasons ends that fetch here.
 			_ = errorsx.Zero(fmt.Fprint(w, `{"id":`+mux.Vars(r)["id"]+`,"seasons":[]}`))
 		})
 		srv := httptest.NewServer(routes)
@@ -102,8 +103,8 @@ func TestTmdbImportSeries(t *testing.T) {
 		}
 
 		require.NoError(t, tm.cause)
-		require.Equal(t, []string{"Show One", "Show Two"}, titles)
-		require.Equal(t, 4, requests, "2 discover pages plus 1 tv-details fetch per discovered show")
+		require.ElementsMatch(t, []string{"Show One", "Show Two"}, titles, "shows may arrive in any order once episode fetches run concurrently")
+		require.Equal(t, int64(4), requests.Load(), "2 discover pages plus 1 tv-details fetch per discovered show")
 	})
 
 	t.Run("maps tv show fields onto the known record", func(t *testing.T) {
@@ -183,15 +184,15 @@ func TestTmdbImportSeries(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 
-		requests := 0
+		var requests atomic.Int64
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			requests++
+			requests.Add(1)
 			errorsx.Zero(fmt.Fprint(w, `{"page":1,"total_results":2,"total_pages":2,"results":[{"id":1,"name":"Show One"},{"id":2,"name":"Show Two"}]}`))
 		}))
 		defer srv.Close()
 
 		day := time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)
-		tm := &tmdbimport{StartAt: day, EndAt: day, Attempts: 1}
+		tm := &tmdbimport{StartAt: day, EndAt: day, Attempts: 1, Concurrency: 8}
 
 		count := 0
 		for range tm.series(ctx, newTmdbTestClient(t, srv)) {
@@ -200,7 +201,11 @@ func TestTmdbImportSeries(t *testing.T) {
 		}
 
 		require.Equal(t, 1, count)
-		require.Equal(t, 1, requests, "should not request additional pages once the consumer stops iterating")
+		// series() fetches episode details concurrently across a bounded pool
+		// of workers, so some requests already in flight for shows near the
+		// front of the backlog complete even after the consumer stops - this
+		// bounds that prefetch instead of requiring exactly zero extra work.
+		require.LessOrEqual(t, requests.Load(), int64(1+int(tm.Concurrency)), "should not issue unbounded additional requests once the consumer stops iterating")
 	})
 }
 
