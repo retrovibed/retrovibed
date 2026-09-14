@@ -54,6 +54,20 @@ func (t *tmdbimport) imgpath(s string) string {
 	return fmt.Sprintf("%s%s", t.URL, s)
 }
 
+// tmdbLanguageOptions returns urlOptions requesting lang from TMDB, or nil
+// when lang is blank (TMDB then falls back to its default, en-US). Season
+// and episode detail requests pass the show's own OriginalLanguage here so
+// TMDB returns names in that language instead - it sometimes has an episode
+// title when the English translation is missing and falls back to a
+// generic "Episode N" placeholder.
+func tmdbLanguageOptions(lang string) map[string]string {
+	if stringsx.Blank(lang) {
+		return nil
+	}
+
+	return map[string]string{"language": lang}
+}
+
 // tmdbNotFound reports whether err is TMDB's permanent "resource not found"
 // response (status_code 34), e.g. a season TVDetails lists that has no
 // actual season-details page.
@@ -122,6 +136,7 @@ func (t *tmdbimport) movies(ctx context.Context, c *tmdb.Client) iter.Seq[librar
 					Title:            mr.Title,
 					Released:         errorsx.ZeroSilent(time.Parse(time.DateOnly, mr.ReleaseDate)),
 					Mimetype:         mimex.Video,
+					ParentUID:        uuid.Nil.String(),
 				}
 
 				if !yield(v) {
@@ -244,7 +259,7 @@ func (t *tmdbimport) series(ctx context.Context, c *tmdb.Client) iter.Seq[librar
 					return nil, backoffx.ErrStopAttempts
 				}
 
-				d, err := c.GetTVSeasonDetails(int(job.showID), job.season.SeasonNumber, nil)
+				d, err := c.GetTVSeasonDetails(int(job.showID), job.season.SeasonNumber, tmdbLanguageOptions(job.parent.OriginalLanguage))
 				if tmdbNotFound(err) {
 					return nil, errors.Join(backoffx.ErrStopAttempts, err)
 				}

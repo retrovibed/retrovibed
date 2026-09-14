@@ -35,6 +35,9 @@ func TestDeeppoolImportKnownFromPublished(t *testing.T) {
 		require.Equal(t, mimex.Video, known.Mimetype)
 		require.Equal(t, "deeppool", known.Source)
 		require.Equal(t, pc.Id, known.ID)
+		// parent_uid is a NOT NULL UUID column; a deeppool item is never
+		// anyone's child, so this must be the nil UUID, not Go's zero-value "".
+		require.Equal(t, uuid.Nil.String(), known.ParentUID)
 	})
 
 	t.Run("prefers known_media_id as uid when present", func(t *testing.T) {

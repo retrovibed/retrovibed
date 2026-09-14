@@ -73,13 +73,14 @@ func (t deeppoolimport) knownFromPublished(pc *communityapi.PublishedContent) li
 	uid := stringsx.FirstNonBlank(pc.KnownMediaId, ddiscapi.ImportedMediaUUID(t.Source, uuid.FromStringOrNil(pc.Id)).String())
 
 	return library.Known{
-		Source:   t.Source,
-		UID:      uid,
-		Md5:      uidmd5.String(),
-		Md5Lower: binary.LittleEndian.Uint64(uuidx.LowN(uidmd5, 64)),
-		ID:       pc.Id,
-		Title:    pc.Title,
-		Overview: pc.Description,
-		Mimetype: stringsx.FirstNonBlank(pc.Mimetype, mimex.Video),
+		Source:    t.Source,
+		UID:       uid,
+		Md5:       uidmd5.String(),
+		Md5Lower:  binary.LittleEndian.Uint64(uuidx.LowN(uidmd5, 64)),
+		ID:        pc.Id,
+		Title:     pc.Title,
+		Overview:  pc.Description,
+		Mimetype:  stringsx.FirstNonBlank(pc.Mimetype, mimex.Video),
+		ParentUID: uuid.Nil.String(),
 	}
 }

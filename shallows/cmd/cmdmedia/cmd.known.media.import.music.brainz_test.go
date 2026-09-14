@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gofrs/uuid/v5"
 	"github.com/michiwend/gomusicbrainz"
 
 	"github.com/retrovibed/retrovibed/retroapi/backoffx"
@@ -85,17 +86,19 @@ func TestMBImportReleases(t *testing.T) {
 		}
 
 		type result struct {
-			title, originalTitle, lang, posterPath string
+			title, originalTitle, lang, posterPath, parentUID string
 		}
 		var results []result
 		for known := range m.releases(ctx, c, unlimited, immediate) {
-			results = append(results, result{known.Title, known.OriginalTitle, known.OriginalLanguage, known.PosterPath})
+			results = append(results, result{known.Title, known.OriginalTitle, known.OriginalLanguage, known.PosterPath, known.ParentUID})
 		}
 
 		require.NoError(t, m.cause)
+		// parent_uid is a NOT NULL UUID column; a release is never anyone's
+		// child, so this must be the nil UUID, not Go's zero-value "".
 		require.Equal(t, []result{
-			{"Album One", "Album One", "en", "https://coverartarchive.org/release-group/8f6a4a2b-e29b-41d4-a716-446655440001/front-500"},
-			{"Album Two", "Album Two", "fr", "https://coverartarchive.org/release-group/8f6a4a2b-e29b-41d4-a716-446655440002/front-500"},
+			{"Album One", "Album One", "en", "https://coverartarchive.org/release-group/8f6a4a2b-e29b-41d4-a716-446655440001/front-500", uuid.Nil.String()},
+			{"Album Two", "Album Two", "fr", "https://coverartarchive.org/release-group/8f6a4a2b-e29b-41d4-a716-446655440002/front-500", uuid.Nil.String()},
 		}, results)
 	})
 

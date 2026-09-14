@@ -95,6 +95,7 @@ func (t *tvdbimport) records(c *tvdb.Client) iter.Seq[library.Known] {
 					PosterPath:       t.imgpath(langx.Autoderef(mr.Image)),
 					Released:         errorsx.Zero(time.Parse(time.DateOnly, langx.FirstNonZero(langx.Autoderef(mr.FirstAired), epochts))),
 					Mimetype:         mimex.Video,
+					ParentUID:        uuid.Nil.String(),
 					// Popularity:       max(langx.Autoderef(mr.Score)/100000, 1.0), // essentially a useless field, they only include it for sorting.
 				}
 

@@ -94,6 +94,7 @@ func (t *mbjsonlimport) releases(ctx context.Context, r io.Reader) iter.Seq[libr
 				PosterPath:       fmt.Sprintf("https://coverartarchive.org/release-group/%s/front-500", id),
 				OriginalLanguage: lang.String(),
 				Mimetype:         mimex.Audio,
+				ParentUID:        uuid.Nil.String(),
 			}
 
 			if !yield(v) {

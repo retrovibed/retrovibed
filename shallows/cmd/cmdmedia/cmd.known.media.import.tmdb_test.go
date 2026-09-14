@@ -9,6 +9,7 @@ import (
 	"time"
 
 	tmdb "github.com/cyruzin/golang-tmdb"
+	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
@@ -107,6 +108,35 @@ func TestTmdbImportSeries(t *testing.T) {
 		require.Equal(t, int64(4), requests.Load(), "2 discover pages plus 1 tv-details fetch per discovered show")
 	})
 
+	t.Run("requests season details in the show's original language", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		var seasonLanguage string
+		routes := mux.NewRouter()
+		routes.HandleFunc("/discover/tv", func(w http.ResponseWriter, r *http.Request) {
+			_ = errorsx.Zero(fmt.Fprint(w, `{"page":1,"total_results":1,"total_pages":1,"results":[{"id":1,"name":"Show One","original_language":"ja"}]}`))
+		})
+		routes.HandleFunc("/tv/{id}", func(w http.ResponseWriter, r *http.Request) {
+			_ = errorsx.Zero(fmt.Fprint(w, `{"id":`+mux.Vars(r)["id"]+`,"seasons":[{"season_number":1}]}`))
+		})
+		routes.HandleFunc("/tv/{id}/season/{season}", func(w http.ResponseWriter, r *http.Request) {
+			seasonLanguage = r.URL.Query().Get("language")
+			_ = errorsx.Zero(fmt.Fprint(w, `{"episodes":[]}`))
+		})
+		srv := httptest.NewServer(routes)
+		defer srv.Close()
+
+		day := time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)
+		tm := &tmdbimport{StartAt: day, EndAt: day, Attempts: 1}
+
+		for range tm.series(ctx, newTmdbTestClient(t, srv)) {
+		}
+
+		require.NoError(t, tm.cause)
+		require.Equal(t, "ja", seasonLanguage, "season details should be requested in the show's original_language so TMDB can return an episode title it lacks in English")
+	})
+
 	t.Run("maps tv show fields onto the known record", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
@@ -152,6 +182,9 @@ func TestTmdbImportSeries(t *testing.T) {
 		require.Equal(t, day, got.Released)
 		require.NotEmpty(t, got.UID)
 		require.NotEmpty(t, got.Md5)
+		// parent_uid is a NOT NULL UUID column; a show is never anyone's
+		// child, so this must be the nil UUID, not Go's zero-value "".
+		require.Equal(t, uuid.Nil.String(), got.ParentUID)
 	})
 
 	t.Run("records the cause and stops once tmdb persistently errors", func(t *testing.T) {
@@ -314,6 +347,9 @@ func TestTmdbImportMovies(t *testing.T) {
 		require.Equal(t, day, got.Released)
 		require.NotEmpty(t, got.UID)
 		require.NotEmpty(t, got.Md5)
+		// parent_uid is a NOT NULL UUID column; a movie is never anyone's
+		// child, so this must be the nil UUID, not Go's zero-value "".
+		require.Equal(t, uuid.Nil.String(), got.ParentUID)
 	})
 
 	t.Run("records the cause and stops once tmdb persistently errors", func(t *testing.T) {

@@ -108,6 +108,7 @@ func (t *mbimport) releases(ctx context.Context, c *gomusicbrainz.WS2Client, l *
 						PosterPath:       fmt.Sprintf("https://coverartarchive.org/release-group/%s/front-500", id),
 						OriginalLanguage: lang.String(),
 						Mimetype:         mimex.Audio,
+						ParentUID:        uuid.Nil.String(),
 					}
 
 					if !yield(v) {
