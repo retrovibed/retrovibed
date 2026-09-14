@@ -8,6 +8,7 @@ import (
 	"time"
 
 	tmdb "github.com/cyruzin/golang-tmdb"
+	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -69,7 +70,8 @@ func TestTmdbImportSeries(t *testing.T) {
 		defer done()
 
 		requests := 0
-		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		routes := mux.NewRouter()
+		routes.HandleFunc("/discover/tv", func(w http.ResponseWriter, r *http.Request) {
 			requests++
 			page := r.URL.Query().Get("page")
 			switch page {
@@ -80,7 +82,15 @@ func TestTmdbImportSeries(t *testing.T) {
 			default:
 				t.Fatalf("unexpected page requested: %s", page)
 			}
-		}))
+		})
+		routes.HandleFunc("/tv/{id}", func(w http.ResponseWriter, r *http.Request) {
+			requests++
+			// series yields each show's episodes inline via t.episodes,
+			// which fetches show details before any season/episode lookups -
+			// a show with no seasons ends that fetch here.
+			_ = errorsx.Zero(fmt.Fprint(w, `{"id":`+mux.Vars(r)["id"]+`,"seasons":[]}`))
+		})
+		srv := httptest.NewServer(routes)
 		defer srv.Close()
 
 		day := time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)
@@ -93,7 +103,7 @@ func TestTmdbImportSeries(t *testing.T) {
 
 		require.NoError(t, tm.cause)
 		require.Equal(t, []string{"Show One", "Show Two"}, titles)
-		require.Equal(t, 2, requests)
+		require.Equal(t, 4, requests, "2 discover pages plus 1 tv-details fetch per discovered show")
 	})
 
 	t.Run("maps tv show fields onto the known record", func(t *testing.T) {

@@ -115,6 +115,7 @@ func KnownOptionTestDefaults(t *Known) {
 	t.Mimetype = mimex.Application
 	t.Duplicates = 0
 	t.Popularity = 0
+	t.ParentUID = uuid.Nil.String()
 	t.OriginalLanguage = userx.LocaleLanguage()
 }
 

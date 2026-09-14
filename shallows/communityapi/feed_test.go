@@ -106,6 +106,7 @@ func TestFeedGeneration(t *testing.T) {
 			Title:         "Test Movie",
 			OriginalTitle: "Test Movie Original",
 			Overview:      "A test movie for feed generation",
+			ParentUID:     uuid.Nil.String(),
 		}
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 

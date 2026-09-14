@@ -9,6 +9,7 @@ class RowDisplay extends StatelessWidget {
   final Future<void> Function()? onTap;
   final Future<void> Function()? onDoubleTap;
   final Widget help;
+  final Widget expanded;
   final bool highlighted;
   const RowDisplay({
     super.key,
@@ -18,6 +19,7 @@ class RowDisplay extends StatelessWidget {
     this.onTap,
     this.onDoubleTap,
     this.help = ds.HelpScope.None,
+    this.expanded = ds.Empty,
     this.highlighted = false,
   });
 
@@ -29,6 +31,7 @@ class RowDisplay extends StatelessWidget {
         padding: defaults.padding,
         onTap: onTap,
         tint: highlighted ? defaults.highlightTint : [],
+        expanded: expanded,
         [
           ...leading,
           Expanded(child: Text(media.description, overflow: TextOverflow.ellipsis)),

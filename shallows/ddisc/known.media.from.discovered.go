@@ -39,6 +39,7 @@ func KnownMediaFromDiscovered(kid uuid.UUID, d Discovered) library.Known {
 		Mimetype:        Generalize(d.Mimetype),
 		Released:        timex.Inf(), // no release date available from the wire format
 		AutoDescription: d.Title,
+		ParentUID:       uuid.Nil.String(), // standalone entry - discovery never yields episodes/children directly
 		TombstonedAt:    time.Now().Add(knownMediaTOFUTTL),
 	}
 }

@@ -406,7 +406,9 @@ void main() {
         String id, {
         List<httpx.Option> options = const [],
       }) async {
-        return media.DownloadMetadataResponse(download: media.Download.create());
+        return media.DownloadMetadataResponse(
+          download: media.Download(media: media.Media(id: id)),
+        );
       }
 
       Widget buildWithTorrent({
@@ -666,7 +668,9 @@ void main() {
         String id, {
         List<httpx.Option> options = const [],
       }) async {
-        return media.DownloadMetadataResponse(download: media.Download.create());
+        return media.DownloadMetadataResponse(
+          download: media.Download(media: media.Media(id: id)),
+        );
       }
 
       Widget buildWithTorrent({
