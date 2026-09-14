@@ -18,7 +18,7 @@ func TestAttempt(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Millisecond)
 		defer cancel()
 		attempt := 0
-		doFunc := func(context.Context) error {
+		doFunc := func(context.Context, uint) error {
 			attempt++
 			return errors.ErrUnsupported
 		}
@@ -31,7 +31,7 @@ func TestAttempt(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), 8*time.Millisecond)
 		defer cancel()
 		attempt := 0
-		doFunc := func(context.Context) error {
+		doFunc := func(context.Context, uint) error {
 			attempt++
 			return errors.ErrUnsupported
 		}
@@ -53,7 +53,7 @@ func TestAttempt(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), targetTimeout)
 		defer cancel()
 		attempt := 0
-		doFunc := func(context.Context) error {
+		doFunc := func(context.Context, uint) error {
 			attempt++
 			return errors.ErrUnsupported
 		}

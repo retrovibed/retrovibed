@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
 	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
@@ -88,6 +89,42 @@ func TestKnownImportRun(t *testing.T) {
 		require.NoError(t, jsonl.NewEncoder(&input).Encode(items...))
 		require.NoError(t, knownimport{Workers: 8, Batch: 1, Backlog: 150}.run(ctx, db, &input))
 		require.Equal(t, 150, sqltestx.Count(t, db, `SELECT COUNT(*) FROM library_known_media`))
+	})
+
+	t.Run("defaults a blank ParentUID to the nil UUID", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+		db := sqltestx.Metadatabase(t)
+
+		// movies()/seriesKnown() in cmd.known.media.import.tmdb.go (and every
+		// other non-episode producer) never set ParentUID, so it arrives here
+		// as Go's zero-value "" - the parent_uid column is a NOT NULL UUID,
+		// and the driver can't convert "" into one.
+		var known library.Known
+		require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults))
+		known.ParentUID = ""
+
+		var input bytes.Buffer
+		require.NoError(t, jsonl.NewEncoder(&input).Encode(known))
+		require.NoError(t, knownimport{Workers: 1}.run(ctx, db, &input))
+		require.Equal(t, uuid.Nil.String(), sqltestx.String(t, db, `SELECT parent_uid FROM library_known_media LIMIT 1`))
+	})
+
+	t.Run("bounds retries and returns an error instead of hanging forever when every insert fails", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+		db := sqltestx.Metadatabase(t)
+		require.NoError(t, db.Close())
+
+		var known library.Known
+		require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults))
+
+		var input bytes.Buffer
+		require.NoError(t, jsonl.NewEncoder(&input).Encode(known))
+
+		// Attempts:0 still allows one retry after the initial failure - see
+		// the equivalent note in cmd.known.media.import.tmdb_test.go.
+		require.Error(t, knownimport{Workers: 1, Attempts: 0}.run(ctx, db, &input))
 	})
 
 	t.Run("upserts on conflict", func(t *testing.T) {

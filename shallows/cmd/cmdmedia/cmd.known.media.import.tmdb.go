@@ -197,6 +197,7 @@ func (t *tmdbimport) seriesKnown(mr tmdb.TVShowResult) library.Known {
 		Adult:            mr.Adult,
 		Released:         errorsx.ZeroSilent(time.Parse(time.DateOnly, mr.FirstAirDate)),
 		Mimetype:         mimex.Video,
+		ParentUID:        uuid.Nil.String(),
 	}
 }
 

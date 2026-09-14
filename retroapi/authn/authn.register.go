@@ -103,7 +103,7 @@ func AwaitAuthorized(ctx context.Context, c *http.Client, granted func(*Token) b
 	endpoint := fmt.Sprintf("https://%s/m/authz/", env.Deeppool())
 	bs := backoffx.New(backoffx.Exponential(500*time.Millisecond), backoffx.Maximum(30*time.Second))
 
-	err := backoffx.Attempt(ctx, bs, func(ctx context.Context) error {
+	err := backoffx.Attempt(ctx, bs, func(ctx context.Context, attempts uint) error {
 		var authed AuthzResponse
 
 		req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)

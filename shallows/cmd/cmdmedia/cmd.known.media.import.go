@@ -25,6 +25,7 @@ type knownimport struct {
 	Batch    int    `flag:"" name:"batch" help:"number of records to insert per batch" default:"8192"`
 	Backlog  uint16 `flag:"" name:"backlog" help:"number of batches to allowed to queue up" default:"128"`
 	Workers  uint16 `flag:"" name:"workers" help:"number of async database workers to run" default:"1"`
+	Attempts uint   `flag:"" name:"attempts" help:"set maximum number of attempts per batch insert" default:"5"`
 }
 
 func (t knownimport) Run(gctx *cmdopts.Global) (err error) {
@@ -45,7 +46,11 @@ func (t knownimport) run(ctx context.Context, db *sql.DB, r io.Reader) (err erro
 			backoffx.Constant(time.Second),
 			backoffx.JitterRandom(200*time.Millisecond),
 		)
-		return backoffx.Attempt(ctx, bs, func(ctx context.Context) error {
+		return backoffx.Attempt(ctx, bs, func(ctx context.Context, attempts uint) error {
+			if attempts > t.Attempts {
+				return backoffx.ErrStopAttempts
+			}
+
 			ts := time.Now()
 			s := library.NewKnownBatchInsertWithDefaults(ctx, db, chunk...)
 

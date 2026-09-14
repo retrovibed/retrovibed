@@ -6,6 +6,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"path/filepath"
 	"reflect"
 	"runtime"
 	"strconv"
@@ -75,10 +76,15 @@ func Main(args ...string) {
 		ctx *kong.Context
 	)
 
-	gdxpath := gdx.AutoSocket()
+	gdxpath := filepath.Join(filepath.Dir(gdx.AutoSocket()), fmt.Sprintf("gdx.%d.socket", os.Getpid()))
 	shellcli.Context, shellcli.Shutdown = context.WithCancel(context.Background())
 	shellcli.Cleanup = &sync.WaitGroup{}
 	shellcli.Console = cmdopts.NewCmdExec("retrovibe")
+
+	go gdx.UnixServe(shellcli.Context, gdxpath, gdx.Options().FromEnv()...)
+	defer func() {
+		os.Remove(gdxpath)
+	}()
 
 	log.SetFlags(log.Lshortfile | log.LUTC | log.Ltime)
 	log.SetPrefix(fmt.Sprintf("%d ", os.Getpid()))

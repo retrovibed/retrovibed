@@ -177,10 +177,15 @@ func AttemptV[T any](ctx context.Context, d Strategy, do func(ctx context.Contex
 	}
 }
 
-// Attempt with a backoff strategy.
-func Attempt(ctx context.Context, d Strategy, do func(context.Context) error) error {
-	if err := do(ctx); err == nil {
+// Attempt with a backoff strategy. do is given the attempt count (0 on the
+// first call), so callers can bound retries the same way AttemptV does: return
+// ErrStopAttempts once attempts exceeds their own limit, and Attempt returns
+// the last error observed before that instead of retrying forever.
+func Attempt(ctx context.Context, d Strategy, do func(ctx context.Context, attempts uint) error) (previous error) {
+	if err := do(ctx, 0); err == nil {
 		return nil
+	} else {
+		previous = err
 	}
 
 	for i := uint(1); ; i++ {
@@ -190,10 +195,13 @@ func Attempt(ctx context.Context, d Strategy, do func(context.Context) error) er
 			return ctx.Err()
 		}
 
-		if err := do(ctx); err == nil {
+		if err := do(ctx, i); err == nil {
 			return nil
+		} else if errors.Is(err, ErrStopAttempts) {
+			return previous
+		} else {
+			previous = err
 		}
-
 	}
 }
 
