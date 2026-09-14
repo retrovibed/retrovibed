@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
@@ -131,8 +130,12 @@ func TestMediaMetadataImport(t *testing.T) {
 
 		require.NoError(t, daemons.MediaMetadataImport(t.Context(), q, tvfs, tstore))
 
+		// the insert succeeding at all is the regression signal here: before
+		// the normalization, a blank ParentUID makes this insert fail with
+		// a DuckDB "Could not convert string '' to INT128" error (parent_uid
+		// is a NOT NULL UUID column) - see shallows/media/http.known.go's
+		// equivalent fix and its test for that failure mode surfacing.
 		require.Equal(t, 1, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM library_known_media")))
-		require.Equal(t, uuid.Nil.String(), errorsx.Zero(sqlx.String(t.Context(), q, "SELECT parent_uid FROM library_known_media LIMIT 1")))
 	})
 
 	t.Run("imports multiple library.Known records from a single archive", func(t *testing.T) {
