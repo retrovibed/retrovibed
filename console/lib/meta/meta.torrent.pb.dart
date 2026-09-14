@@ -204,6 +204,372 @@ class TorrentMetricsResponse extends $pb.GeneratedMessage {
   TorrentDiagnostics ensureTorrent() => $_ensure(0);
 }
 
+class TorrentInfoResponse extends $pb.GeneratedMessage {
+  factory TorrentInfoResponse({
+    TorrentMeta? meta,
+    TorrentDetails? details,
+    $core.Iterable<TorrentFile>? files,
+  }) {
+    final result = TorrentInfoResponse._();
+    if (meta != null) result.meta = meta;
+    if (details != null) result.details = details;
+    if (files != null) result.files.addAll(files);
+    return result;
+  }
+
+  TorrentInfoResponse._();
+
+  factory TorrentInfoResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      TorrentInfoResponse()..mergeFromBuffer(data, registry);
+  factory TorrentInfoResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      TorrentInfoResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'TorrentInfoResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
+      createEmptyInstance: TorrentInfoResponse.$_createMessage)
+    ..aOM<TorrentMeta>(1, _omitFieldNames ? '' : 'meta',
+        subBuilder: TorrentMeta.$_createMessage)
+    ..aOM<TorrentDetails>(2, _omitFieldNames ? '' : 'details',
+        subBuilder: TorrentDetails.$_createMessage)
+    ..pPM<TorrentFile>(1000, _omitFieldNames ? '' : 'files',
+        subBuilder: TorrentFile.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  TorrentInfoResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  TorrentInfoResponse copyWith(void Function(TorrentInfoResponse) updates) =>
+      super.copyWith((message) => updates(message as TorrentInfoResponse))
+          as TorrentInfoResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use TorrentInfoResponse() / TorrentInfoResponse.new instead')
+  static TorrentInfoResponse create() => TorrentInfoResponse._();
+  static $pb.GeneratedMessage $_createMessage() => TorrentInfoResponse._();
+  @$core.override
+  TorrentInfoResponse createEmptyInstance() => TorrentInfoResponse._();
+  @$core.pragma('dart2js:noInline')
+  static TorrentInfoResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<TorrentInfoResponse>(
+          TorrentInfoResponse.$_createMessage);
+  static TorrentInfoResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  TorrentMeta get meta => $_getN(0);
+  @$pb.TagNumber(1)
+  set meta(TorrentMeta value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasMeta() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearMeta() => $_clearField(1);
+  @$pb.TagNumber(1)
+  TorrentMeta ensureMeta() => $_ensure(0);
+
+  @$pb.TagNumber(2)
+  TorrentDetails get details => $_getN(1);
+  @$pb.TagNumber(2)
+  set details(TorrentDetails value) => $_setField(2, value);
+  @$pb.TagNumber(2)
+  $core.bool hasDetails() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearDetails() => $_clearField(2);
+  @$pb.TagNumber(2)
+  TorrentDetails ensureDetails() => $_ensure(1);
+
+  @$pb.TagNumber(1000)
+  $pb.PbList<TorrentFile> get files => $_getList(2);
+}
+
+class TorrentFile extends $pb.GeneratedMessage {
+  factory TorrentFile({
+    $core.String? name,
+    $fixnum.Int64? length,
+    $core.String? path,
+  }) {
+    final result = TorrentFile._();
+    if (name != null) result.name = name;
+    if (length != null) result.length = length;
+    if (path != null) result.path = path;
+    return result;
+  }
+
+  TorrentFile._();
+
+  factory TorrentFile.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      TorrentFile()..mergeFromBuffer(data, registry);
+  factory TorrentFile.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      TorrentFile()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'TorrentFile',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
+      createEmptyInstance: TorrentFile.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'name')
+    ..a<$fixnum.Int64>(2, _omitFieldNames ? '' : 'length', $pb.PbFieldType.OU6,
+        defaultOrMaker: $fixnum.Int64.ZERO)
+    ..aOS(3, _omitFieldNames ? '' : 'path')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  TorrentFile clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  TorrentFile copyWith(void Function(TorrentFile) updates) =>
+      super.copyWith((message) => updates(message as TorrentFile))
+          as TorrentFile;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use TorrentFile() / TorrentFile.new instead')
+  static TorrentFile create() => TorrentFile._();
+  static $pb.GeneratedMessage $_createMessage() => TorrentFile._();
+  @$core.override
+  TorrentFile createEmptyInstance() => TorrentFile._();
+  @$core.pragma('dart2js:noInline')
+  static TorrentFile getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<TorrentFile>(
+          TorrentFile.$_createMessage);
+  static TorrentFile? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get name => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set name($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasName() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearName() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $fixnum.Int64 get length => $_getI64(1);
+  @$pb.TagNumber(2)
+  set length($fixnum.Int64 value) => $_setInt64(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasLength() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearLength() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get path => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set path($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasPath() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearPath() => $_clearField(3);
+}
+
+class TorrentMeta extends $pb.GeneratedMessage {
+  factory TorrentMeta({
+    $core.String? comment,
+    $core.String? encoding,
+    $core.String? createdBy,
+    $fixnum.Int64? creationDate,
+    $core.Iterable<$core.String>? announceList,
+    $core.Iterable<$core.String>? urlList,
+  }) {
+    final result = TorrentMeta._();
+    if (comment != null) result.comment = comment;
+    if (encoding != null) result.encoding = encoding;
+    if (createdBy != null) result.createdBy = createdBy;
+    if (creationDate != null) result.creationDate = creationDate;
+    if (announceList != null) result.announceList.addAll(announceList);
+    if (urlList != null) result.urlList.addAll(urlList);
+    return result;
+  }
+
+  TorrentMeta._();
+
+  factory TorrentMeta.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      TorrentMeta()..mergeFromBuffer(data, registry);
+  factory TorrentMeta.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      TorrentMeta()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'TorrentMeta',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
+      createEmptyInstance: TorrentMeta.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'comment')
+    ..aOS(2, _omitFieldNames ? '' : 'encoding')
+    ..aOS(3, _omitFieldNames ? '' : 'created_by')
+    ..a<$fixnum.Int64>(
+        4, _omitFieldNames ? '' : 'creation_date', $pb.PbFieldType.OU6,
+        defaultOrMaker: $fixnum.Int64.ZERO)
+    ..pPS(1000, _omitFieldNames ? '' : 'announce_list')
+    ..pPS(1001, _omitFieldNames ? '' : 'url_list')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  TorrentMeta clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  TorrentMeta copyWith(void Function(TorrentMeta) updates) =>
+      super.copyWith((message) => updates(message as TorrentMeta))
+          as TorrentMeta;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use TorrentMeta() / TorrentMeta.new instead')
+  static TorrentMeta create() => TorrentMeta._();
+  static $pb.GeneratedMessage $_createMessage() => TorrentMeta._();
+  @$core.override
+  TorrentMeta createEmptyInstance() => TorrentMeta._();
+  @$core.pragma('dart2js:noInline')
+  static TorrentMeta getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<TorrentMeta>(
+          TorrentMeta.$_createMessage);
+  static TorrentMeta? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get comment => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set comment($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasComment() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearComment() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get encoding => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set encoding($core.String value) => $_setString(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasEncoding() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearEncoding() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get createdBy => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set createdBy($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasCreatedBy() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearCreatedBy() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $fixnum.Int64 get creationDate => $_getI64(3);
+  @$pb.TagNumber(4)
+  set creationDate($fixnum.Int64 value) => $_setInt64(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasCreationDate() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearCreationDate() => $_clearField(4);
+
+  @$pb.TagNumber(1000)
+  $pb.PbList<$core.String> get announceList => $_getList(4);
+
+  @$pb.TagNumber(1001)
+  $pb.PbList<$core.String> get urlList => $_getList(5);
+}
+
+class TorrentDetails extends $pb.GeneratedMessage {
+  factory TorrentDetails({
+    $core.String? name,
+    $fixnum.Int64? length,
+    $core.String? source,
+    $core.bool? private,
+  }) {
+    final result = TorrentDetails._();
+    if (name != null) result.name = name;
+    if (length != null) result.length = length;
+    if (source != null) result.source = source;
+    if (private != null) result.private = private;
+    return result;
+  }
+
+  TorrentDetails._();
+
+  factory TorrentDetails.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      TorrentDetails()..mergeFromBuffer(data, registry);
+  factory TorrentDetails.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      TorrentDetails()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'TorrentDetails',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'meta'),
+      createEmptyInstance: TorrentDetails.$_createMessage)
+    ..aOS(1, _omitFieldNames ? '' : 'name')
+    ..a<$fixnum.Int64>(2, _omitFieldNames ? '' : 'length', $pb.PbFieldType.OU6,
+        defaultOrMaker: $fixnum.Int64.ZERO)
+    ..aOS(3, _omitFieldNames ? '' : 'source')
+    ..aOB(4, _omitFieldNames ? '' : 'private')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  TorrentDetails clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  TorrentDetails copyWith(void Function(TorrentDetails) updates) =>
+      super.copyWith((message) => updates(message as TorrentDetails))
+          as TorrentDetails;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use TorrentDetails() / TorrentDetails.new instead')
+  static TorrentDetails create() => TorrentDetails._();
+  static $pb.GeneratedMessage $_createMessage() => TorrentDetails._();
+  @$core.override
+  TorrentDetails createEmptyInstance() => TorrentDetails._();
+  @$core.pragma('dart2js:noInline')
+  static TorrentDetails getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<TorrentDetails>(
+          TorrentDetails.$_createMessage);
+  static TorrentDetails? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get name => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set name($core.String value) => $_setString(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasName() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearName() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $fixnum.Int64 get length => $_getI64(1);
+  @$pb.TagNumber(2)
+  set length($fixnum.Int64 value) => $_setInt64(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasLength() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearLength() => $_clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get source => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set source($core.String value) => $_setString(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasSource() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearSource() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.bool get private => $_getBF(3);
+  @$pb.TagNumber(4)
+  set private($core.bool value) => $_setBool(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasPrivate() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearPrivate() => $_clearField(4);
+}
+
 const $core.bool _omitFieldNames =
     $core.bool.fromEnvironment('protobuf.omit_field_names');
 const $core.bool _omitMessageNames =

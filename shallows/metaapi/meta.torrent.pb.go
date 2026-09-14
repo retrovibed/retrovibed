@@ -149,6 +149,278 @@ func (x *TorrentMetricsResponse) GetTorrent() *TorrentDiagnostics {
 	return nil
 }
 
+type TorrentInfoResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Meta          *TorrentMeta           `protobuf:"bytes,1,opt,name=meta,proto3" json:"meta,omitempty"`
+	Details       *TorrentDetails        `protobuf:"bytes,2,opt,name=details,proto3" json:"details,omitempty"`
+	Files         []*TorrentFile         `protobuf:"bytes,1000,rep,name=files,proto3" json:"files,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TorrentInfoResponse) Reset() {
+	*x = TorrentInfoResponse{}
+	mi := &file_meta_meta_torrent_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TorrentInfoResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TorrentInfoResponse) ProtoMessage() {}
+
+func (x *TorrentInfoResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_meta_meta_torrent_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TorrentInfoResponse.ProtoReflect.Descriptor instead.
+func (*TorrentInfoResponse) Descriptor() ([]byte, []int) {
+	return file_meta_meta_torrent_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *TorrentInfoResponse) GetMeta() *TorrentMeta {
+	if x != nil {
+		return x.Meta
+	}
+	return nil
+}
+
+func (x *TorrentInfoResponse) GetDetails() *TorrentDetails {
+	if x != nil {
+		return x.Details
+	}
+	return nil
+}
+
+func (x *TorrentInfoResponse) GetFiles() []*TorrentFile {
+	if x != nil {
+		return x.Files
+	}
+	return nil
+}
+
+type TorrentFile struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Length        uint64                 `protobuf:"varint,2,opt,name=length,proto3" json:"length,omitempty"`
+	Path          string                 `protobuf:"bytes,3,opt,name=path,proto3" json:"path,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TorrentFile) Reset() {
+	*x = TorrentFile{}
+	mi := &file_meta_meta_torrent_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TorrentFile) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TorrentFile) ProtoMessage() {}
+
+func (x *TorrentFile) ProtoReflect() protoreflect.Message {
+	mi := &file_meta_meta_torrent_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TorrentFile.ProtoReflect.Descriptor instead.
+func (*TorrentFile) Descriptor() ([]byte, []int) {
+	return file_meta_meta_torrent_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *TorrentFile) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *TorrentFile) GetLength() uint64 {
+	if x != nil {
+		return x.Length
+	}
+	return 0
+}
+
+func (x *TorrentFile) GetPath() string {
+	if x != nil {
+		return x.Path
+	}
+	return ""
+}
+
+type TorrentMeta struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Comment       string                 `protobuf:"bytes,1,opt,name=comment,proto3" json:"comment,omitempty"`
+	Encoding      string                 `protobuf:"bytes,2,opt,name=encoding,proto3" json:"encoding,omitempty"`
+	CreatedBy     string                 `protobuf:"bytes,3,opt,name=created_by,proto3" json:"created_by,omitempty"`
+	CreationDate  uint64                 `protobuf:"varint,4,opt,name=creation_date,proto3" json:"creation_date,omitempty"`
+	AnnounceList  []string               `protobuf:"bytes,1000,rep,name=announce_list,proto3" json:"announce_list,omitempty"`
+	UrlList       []string               `protobuf:"bytes,1001,rep,name=url_list,proto3" json:"url_list,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TorrentMeta) Reset() {
+	*x = TorrentMeta{}
+	mi := &file_meta_meta_torrent_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TorrentMeta) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TorrentMeta) ProtoMessage() {}
+
+func (x *TorrentMeta) ProtoReflect() protoreflect.Message {
+	mi := &file_meta_meta_torrent_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TorrentMeta.ProtoReflect.Descriptor instead.
+func (*TorrentMeta) Descriptor() ([]byte, []int) {
+	return file_meta_meta_torrent_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *TorrentMeta) GetComment() string {
+	if x != nil {
+		return x.Comment
+	}
+	return ""
+}
+
+func (x *TorrentMeta) GetEncoding() string {
+	if x != nil {
+		return x.Encoding
+	}
+	return ""
+}
+
+func (x *TorrentMeta) GetCreatedBy() string {
+	if x != nil {
+		return x.CreatedBy
+	}
+	return ""
+}
+
+func (x *TorrentMeta) GetCreationDate() uint64 {
+	if x != nil {
+		return x.CreationDate
+	}
+	return 0
+}
+
+func (x *TorrentMeta) GetAnnounceList() []string {
+	if x != nil {
+		return x.AnnounceList
+	}
+	return nil
+}
+
+func (x *TorrentMeta) GetUrlList() []string {
+	if x != nil {
+		return x.UrlList
+	}
+	return nil
+}
+
+type TorrentDetails struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Length        uint64                 `protobuf:"varint,2,opt,name=length,proto3" json:"length,omitempty"`
+	Source        string                 `protobuf:"bytes,3,opt,name=source,proto3" json:"source,omitempty"`
+	Private       bool                   `protobuf:"varint,4,opt,name=private,proto3" json:"private,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TorrentDetails) Reset() {
+	*x = TorrentDetails{}
+	mi := &file_meta_meta_torrent_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TorrentDetails) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TorrentDetails) ProtoMessage() {}
+
+func (x *TorrentDetails) ProtoReflect() protoreflect.Message {
+	mi := &file_meta_meta_torrent_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TorrentDetails.ProtoReflect.Descriptor instead.
+func (*TorrentDetails) Descriptor() ([]byte, []int) {
+	return file_meta_meta_torrent_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *TorrentDetails) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *TorrentDetails) GetLength() uint64 {
+	if x != nil {
+		return x.Length
+	}
+	return 0
+}
+
+func (x *TorrentDetails) GetSource() string {
+	if x != nil {
+		return x.Source
+	}
+	return ""
+}
+
+func (x *TorrentDetails) GetPrivate() bool {
+	if x != nil {
+		return x.Private
+	}
+	return false
+}
+
 var File_meta_meta_torrent_proto protoreflect.FileDescriptor
 
 const file_meta_meta_torrent_proto_rawDesc = "" +
@@ -164,7 +436,29 @@ const file_meta_meta_torrent_proto_rawDesc = "" +
 	"\buploaded\x18\x05 \x01(\x04R\buploaded\x12\x14\n" +
 	"\x05peers\x18\x06 \x01(\x04R\x05peers\"L\n" +
 	"\x16TorrentMetricsResponse\x122\n" +
-	"\atorrent\x18\x01 \x01(\v2\x18.meta.TorrentDiagnosticsR\atorrentb\x06proto3"
+	"\atorrent\x18\x01 \x01(\v2\x18.meta.TorrentDiagnosticsR\atorrent\"\x96\x01\n" +
+	"\x13TorrentInfoResponse\x12%\n" +
+	"\x04meta\x18\x01 \x01(\v2\x11.meta.TorrentMetaR\x04meta\x12.\n" +
+	"\adetails\x18\x02 \x01(\v2\x14.meta.TorrentDetailsR\adetails\x12(\n" +
+	"\x05files\x18\xe8\a \x03(\v2\x11.meta.TorrentFileR\x05files\"M\n" +
+	"\vTorrentFile\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x16\n" +
+	"\x06length\x18\x02 \x01(\x04R\x06length\x12\x12\n" +
+	"\x04path\x18\x03 \x01(\tR\x04path\"\xcd\x01\n" +
+	"\vTorrentMeta\x12\x18\n" +
+	"\acomment\x18\x01 \x01(\tR\acomment\x12\x1a\n" +
+	"\bencoding\x18\x02 \x01(\tR\bencoding\x12\x1e\n" +
+	"\n" +
+	"created_by\x18\x03 \x01(\tR\n" +
+	"created_by\x12$\n" +
+	"\rcreation_date\x18\x04 \x01(\x04R\rcreation_date\x12%\n" +
+	"\rannounce_list\x18\xe8\a \x03(\tR\rannounce_list\x12\x1b\n" +
+	"\burl_list\x18\xe9\a \x03(\tR\burl_list\"n\n" +
+	"\x0eTorrentDetails\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x16\n" +
+	"\x06length\x18\x02 \x01(\x04R\x06length\x12\x16\n" +
+	"\x06source\x18\x03 \x01(\tR\x06source\x12\x18\n" +
+	"\aprivate\x18\x04 \x01(\bR\aprivateb\x06proto3"
 
 var (
 	file_meta_meta_torrent_proto_rawDescOnce sync.Once
@@ -178,18 +472,25 @@ func file_meta_meta_torrent_proto_rawDescGZIP() []byte {
 	return file_meta_meta_torrent_proto_rawDescData
 }
 
-var file_meta_meta_torrent_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_meta_meta_torrent_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_meta_meta_torrent_proto_goTypes = []any{
 	(*TorrentDiagnostics)(nil),     // 0: meta.TorrentDiagnostics
 	(*TorrentMetricsResponse)(nil), // 1: meta.TorrentMetricsResponse
+	(*TorrentInfoResponse)(nil),    // 2: meta.TorrentInfoResponse
+	(*TorrentFile)(nil),            // 3: meta.TorrentFile
+	(*TorrentMeta)(nil),            // 4: meta.TorrentMeta
+	(*TorrentDetails)(nil),         // 5: meta.TorrentDetails
 }
 var file_meta_meta_torrent_proto_depIdxs = []int32{
 	0, // 0: meta.TorrentMetricsResponse.torrent:type_name -> meta.TorrentDiagnostics
-	1, // [1:1] is the sub-list for method output_type
-	1, // [1:1] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	4, // 1: meta.TorrentInfoResponse.meta:type_name -> meta.TorrentMeta
+	5, // 2: meta.TorrentInfoResponse.details:type_name -> meta.TorrentDetails
+	3, // 3: meta.TorrentInfoResponse.files:type_name -> meta.TorrentFile
+	4, // [4:4] is the sub-list for method output_type
+	4, // [4:4] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_meta_meta_torrent_proto_init() }
@@ -203,7 +504,7 @@ func file_meta_meta_torrent_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_meta_meta_torrent_proto_rawDesc), len(file_meta_meta_torrent_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

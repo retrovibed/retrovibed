@@ -472,6 +472,10 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		log.Println("*************************************** acoustic indexing is disabled ***************************************")
 	}
 
+	discoveryimporter := tracking.NewURIImport(db, httpx.BindRetryTransport(&http.Client{
+		Transport: &http.Transport{DialContext: distributionringDialer.DialContext},
+	}, http.StatusTooManyRequests, http.StatusBadGateway), rootstore)
+
 	log.Println("checkpoint - http service")
 	httpmux := mux.NewRouter()
 	httpmux.NotFoundHandler = httpx.NotFound(alice.New())
@@ -532,10 +536,14 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	media.NewHTTPRecent(db).Bind(httpmux.PathPrefix("/w").Subrouter())
 	mediaapi.NewHTTPRemoteControl(t.RemoteControl).Bind(httpmux.PathPrefix("/rc").Subrouter())
 	ddiscapi.NewHTTPPeerManagement(db).Bind(httpmux.PathPrefix("/ddisc").Subrouter())
-	discoveryimporter := tracking.NewURIImport(db, httpx.BindRetryTransport(&http.Client{
-		Transport: &http.Transport{DialContext: distributionringDialer.DialContext},
-	}, http.StatusTooManyRequests, http.StatusBadGateway), rootstore)
-	ddiscapi.NewHTTPDiscovery(db, plugins, peertube, discoveryimporter, ddiscapi.HTTPDiscoveryOptionQueryCleaner(mc)).Bind(httpmux.PathPrefix("/ddisc/discovery").Subrouter())
+
+	ddiscapi.NewHTTPDiscovery(
+		db,
+		plugins,
+		peertube,
+		discoveryimporter,
+		ddiscapi.HTTPDiscoveryOptionQueryCleaner(mc),
+	).Bind(httpmux.PathPrefix("/ddisc/discovery").Subrouter())
 	ddiscapi.NewHTTPMedia(db).Bind(httpmux.PathPrefix("/ddisc/media").Subrouter())
 	ddiscapi.NewHTTPPluginEnvironment().Bind(httpmux.PathPrefix("/ddisc/plugin/environment").Subrouter())
 	ddiscapi.NewHTTPPluginManagement(plugins).Bind(httpmux.PathPrefix("/ddisc/plugin").Subrouter())

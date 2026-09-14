@@ -47,6 +47,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/torrentx"
 	"github.com/retrovibed/retrovibed/shallows/internal/websocketx"
 	"github.com/retrovibed/retrovibed/shallows/library"
+	"github.com/retrovibed/retrovibed/shallows/metaapi"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 )
 
@@ -149,6 +150,13 @@ func (t *HTTPDiscovered) Bind(r *mux.Router) {
 		httpauth.AuthenticateWithToken(t.jwtsecret),
 		httpx.Timeout2s(),
 	).ThenFunc(t.websocket))
+
+	r.Path("/{id}/torrent").Methods(http.MethodGet).Handler(alice.New(
+		httpx.ContextBufferPool512(),
+		httpx.ParseForm,
+		httpauth.AuthenticateWithToken(t.jwtsecret),
+		httpx.Timeout2s(),
+	).ThenFunc(t.torrent))
 
 	r.Path("/{id}").Methods(http.MethodGet).Handler(alice.New(
 		httpx.ContextBufferPool512(),
@@ -897,6 +905,74 @@ func (t *HTTPDiscovered) metadata(w http.ResponseWriter, r *http.Request) {
 	}); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to write response"))
 		return
+	}
+}
+
+func (t *HTTPDiscovered) torrent(w http.ResponseWriter, r *http.Request) {
+	var (
+		meta tracking.Metadata
+		id   = mux.Vars(r)["id"]
+	)
+
+	if err := tracking.MetadataFindByID(r.Context(), t.q, id).Scan(&meta); sqlx.ErrNoRows(err) != nil {
+		log.Println(errorsx.Wrap(err, "unable to find metadata"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
+		return
+	} else if err != nil {
+		log.Println(errorsx.Wrap(err, "unable to find metadata"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	path := t.rootstorage.Path(rootenv.TorrentDirName, metainfo.Hash(meta.Infohash).String())
+	mi, err := metainfo.LoadFromFile(path + tracking.TorrentSuffix)
+	if err != nil {
+		log.Println(errorsx.Wrap(err, "unable to load torrent file"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
+		return
+	}
+
+	info, err := mi.UnmarshalInfo()
+	if err != nil {
+		log.Println(errorsx.Wrap(err, "unable to unmarshal torrent info"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	announceList := make([]string, 0, len(mi.UpvertedAnnounceList()))
+	for tracker := range mi.UpvertedAnnounceList().DistinctValues() {
+		announceList = append(announceList, tracker)
+	}
+
+	files := make([]*metaapi.TorrentFile, 0, len(info.Files))
+	for f := range metainfo.Files(&info) {
+		files = append(files, &metaapi.TorrentFile{
+			Name:   f.Path,
+			Length: f.Length,
+			Path:   f.Path,
+		})
+	}
+
+	resp := metaapi.TorrentInfoResponse{
+		Meta: &metaapi.TorrentMeta{
+			Comment:      mi.Comment,
+			Encoding:     mi.Encoding,
+			CreatedBy:    mi.CreatedBy,
+			CreationDate: uint64(mi.CreationDate),
+			AnnounceList: announceList,
+			UrlList:      []string(mi.UrlList),
+		},
+		Details: &metaapi.TorrentDetails{
+			Name:    info.Name,
+			Length:  uint64(info.TotalLength()),
+			Source:  info.Source,
+			Private: info.Private != nil && *info.Private,
+		},
+		Files: files,
+	}
+
+	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &resp); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to write response"))
 	}
 }
 

@@ -14,3 +14,31 @@ message TorrentDiagnostics {
 message TorrentMetricsResponse {
   TorrentDiagnostics torrent = 1 [ json_name = "torrent" ];
 }
+
+message TorrentInfoResponse {
+  TorrentMeta meta = 1 [json_name = "meta"];
+  TorrentDetails details = 2 [json_name = "details"];
+  repeated TorrentFile files = 1000 [json_name = "files"];
+}
+
+message TorrentFile {
+  string name = 1 [ json_name = "name" ];
+  uint64 length = 2 [json_name = "length"];
+  string path = 3 [ json_name = "path" ];
+}
+
+message TorrentMeta {
+  string comment = 1 [ json_name = "comment" ];
+  string encoding = 2 [ json_name = "encoding" ];
+  string created_by = 3 [ json_name = "created_by" ];
+  uint64 creation_date = 4 [json_name = "creation_date"];
+  repeated string announce_list = 1000 [json_name = "announce_list"];
+  repeated string url_list = 1001 [json_name = "url_list"];
+}
+
+message TorrentDetails {
+  string name = 1 [ json_name = "name" ];
+  uint64 length = 2 [json_name = "length"];
+  string source = 3 [json_name = "source"];
+  bool private = 4 [json_name = "private"];
+}

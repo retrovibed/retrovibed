@@ -122,13 +122,11 @@ func (t *HTTPLibrary) Bind(r *mux.Router) {
 		httpx.ContextBufferPool512(),
 		httpx.ParseForm,
 		httpauth.AuthenticateWithToken(t.jwtsecret),
-		// AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
 		httpx.Timeout2s(),
 	).ThenFunc(t.delete))
 
 	r.Path("/{id}").Methods(http.MethodGet).Handler(alice.New(
 		httpauth.AuthenticateWithToken(t.jwtsecret),
-		// AuthzTokenHTTP(t.jwtsecret, AuthzPermUsermanagement),
 		httpx.Timeout10s(),
 	).Then(http.FileServerFS(library.New(t.deeppool, t.mediastorage, func(ctx context.Context, s string) (*library.Metadata, error) {
 		var (
