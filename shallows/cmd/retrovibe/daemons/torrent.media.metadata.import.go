@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/Masterminds/squirrel"
+	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/storage"
@@ -101,6 +102,10 @@ func MediaMetadataImport(ctx context.Context, db sqlx.Queryer, tvfs fsx.Virtual,
 			for chunk := range iterx.Chunk(d.Each(ctx), 8192) {
 				chunk = slicesx.Map(func(v library.Known) library.Known {
 					v.AutoDescription = stringsx.Join("\n", v.Title, v.OriginalTitle, v.Overview)
+					// parent_uid is a NOT NULL UUID column; archives built
+					// before every producer set ParentUID still carry Go's
+					// zero-value "" here, which the driver can't convert.
+					v.ParentUID = stringsx.FirstNonBlank(v.ParentUID, uuid.Nil.String())
 					return v
 				}, chunk...)
 

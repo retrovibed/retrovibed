@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
@@ -85,6 +86,53 @@ func TestMediaMetadataImport(t *testing.T) {
 
 		require.Equal(t, 1, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM library_known_media")))
 		require.Equal(t, 1, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM torrents_metadata WHERE imported_at < NOW()")))
+	})
+
+	t.Run("normalizes a blank ParentUID from an archive built before every producer set it", func(t *testing.T) {
+		q := sqltestx.Metadatabase(t)
+
+		seedir := t.TempDir()
+		tvfs := fsx.DirVirtual(seedir)
+		tstore := blockcache.NewTorrentFromVirtualFS(tvfs)
+		mdcache := torrent.NewMetadataCache(seedir)
+
+		var known library.Known
+		require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults))
+		// simulates a record encoded by an archive predating every producer
+		// setting ParentUID - parent_uid is a NOT NULL UUID column, and the
+		// driver can't convert Go's zero-value "" into one.
+		known.ParentUID = ""
+
+		archiveBytes := knownArchive(t, known)
+
+		contentdir := t.TempDir()
+		require.NoError(t, os.WriteFile(filepath.Join(contentdir, "archive.jsonl.tar.gz"), archiveBytes, 0600))
+
+		info, err := metainfo.NewFromPath(contentdir)
+		require.NoError(t, err)
+
+		md, err := torrent.NewFromInfo(info, torrent.OptionStorage(storage.NewFile(contentdir)))
+		require.NoError(t, err)
+		require.NoError(t, mdcache.Write(md))
+
+		storedir := storage.InfoHashPathMaker(seedir, md.ID, info, nil)
+		cache, err := blockcache.NewDirectoryCache(storedir)
+		require.NoError(t, err)
+		_, err = cache.WriteAt(archiveBytes, 0)
+		require.NoError(t, err)
+
+		lmd := tracking.NewMetadata(
+			new(md.ID),
+			tracking.MetadataOptionFromInfo(info),
+			tracking.MetadataOptionCompleted,
+			tracking.MetadataOptionMimetype(mimex.RetrovibedMediaArchive),
+		)
+		require.NoError(t, tracking.MetadataInsertWithDefaults(t.Context(), q, lmd).Scan(&lmd))
+
+		require.NoError(t, daemons.MediaMetadataImport(t.Context(), q, tvfs, tstore))
+
+		require.Equal(t, 1, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM library_known_media")))
+		require.Equal(t, uuid.Nil.String(), errorsx.Zero(sqlx.String(t.Context(), q, "SELECT parent_uid FROM library_known_media LIMIT 1")))
 	})
 
 	t.Run("imports multiple library.Known records from a single archive", func(t *testing.T) {
