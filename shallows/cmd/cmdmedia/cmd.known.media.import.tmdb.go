@@ -41,7 +41,12 @@ type tmdbimport struct {
 	cause       error
 }
 
-func (t tmdbimport) imgpath(s string) string {
+// imgpath takes a pointer receiver, not a value one, so calling it doesn't
+// copy the whole tmdbimport struct - series() calls it concurrently from
+// multiple pool workers while its own dispatcher goroutine writes t.cause,
+// and a value-receiver copy would read that field as part of copying every
+// field, racing with those writes even though imgpath itself only uses URL.
+func (t *tmdbimport) imgpath(s string) string {
 	if stringsx.Blank(s) {
 		return ""
 	}
@@ -397,10 +402,22 @@ func (t *tmdbimport) series(ctx context.Context, c *tmdb.Client) iter.Seq[librar
 			}
 		}()
 
+		stopped := false
 		for v := range results {
+			if stopped {
+				// drain without yielding: cancel() only asks the pools to
+				// stop, it doesn't happen instantly, and results only
+				// closes once the dispatcher goroutine's Shutdown call
+				// above has fully drained them. Returning before that
+				// would leave their goroutines running detached from this
+				// call - e.g. still holding and using c after the caller
+				// has moved on and possibly reused or discarded it.
+				continue
+			}
+
 			if !yield(v) {
 				cancel()
-				return
+				stopped = true
 			}
 		}
 	}
