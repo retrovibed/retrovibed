@@ -280,6 +280,7 @@ func (t *HTTPKnown) create(w http.ResponseWriter, r *http.Request) {
 		Adult:           known.Adult,
 		Source:          "retrovibed",
 		AutoDescription: known.Description,
+		ParentUID:       uuid.Nil.String(),
 	}
 
 	if err := library.KnownInsertWithDefaults(r.Context(), t.q, meta).Scan(&meta); err != nil {
