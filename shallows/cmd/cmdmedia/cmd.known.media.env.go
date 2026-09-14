@@ -17,6 +17,7 @@ import (
 type knownenv struct {
 	Database      string   `flag:"" name:"database" help:"database to read" default:"${vars_user_configuration_directory}/meta.db"`
 	ExcludeSource []string `flag:"" name:"exclude-source" help:"exclude the specified source(s) from the calculation" optional:""`
+	IncludeSource []string `flag:"" name:"include-source" help:"limit the calculation to the specified source(s)" optional:""`
 }
 
 func (t knownenv) Run(gctx *cmdopts.Global) (err error) {
@@ -36,6 +37,7 @@ func (t knownenv) run(ctx context.Context, db *sql.DB, w io.Writer) (err error) 
 		From("library_known_media").
 		Where("released < NOW()").
 		Where(library.KnownQueryExcludeSource(t.ExcludeSource...)).
+		Where(library.KnownQuerySource(t.IncludeSource...)).
 		ToSql()
 	if err != nil {
 		return err
