@@ -28,6 +28,10 @@ type knownarchive struct {
 }
 
 func (t knownarchive) Run(gctx *cmdopts.Global) (err error) {
+	return t.run(gctx.Context, os.Stdin)
+}
+
+func (t knownarchive) run(ctx context.Context, in io.Reader) (err error) {
 	var (
 		dir  string
 		v    library.Known
@@ -37,7 +41,7 @@ func (t knownarchive) Run(gctx *cmdopts.Global) (err error) {
 	log.Println("archive generation initiated")
 	defer log.Println("archive generation completed")
 
-	d := jsonl.NewDecoder(os.Stdin)
+	d := jsonl.NewDecoder(in)
 
 	if strings.Contains(t.Pattern, "*") {
 		dir, err = os.MkdirTemp(t.Directory, t.Pattern)
@@ -143,10 +147,10 @@ func (t knownarchive) Run(gctx *cmdopts.Global) (err error) {
 			continue
 		}
 
-		if err := compressors.Run(gctx.Context, filepath.Join(dir, path)); err != nil {
+		if err := compressors.Run(ctx, filepath.Join(dir, path)); err != nil {
 			return err
 		}
 	}
 
-	return errorsx.Compact(w.Err(), asynccompute.Shutdown(gctx.Context, compressors))
+	return errorsx.Compact(w.Err(), asynccompute.Shutdown(ctx, compressors))
 }
