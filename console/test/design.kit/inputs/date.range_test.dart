@@ -441,6 +441,98 @@ void main() {
     });
   });
 
+  group('DateRangeInput focus retention across begin/end swap', () {
+    bool focusIsWithin(WidgetTester tester, Finder finder) {
+      final focused = tester.binding.focusManager.primaryFocus?.context;
+      final target = tester.element(finder);
+      bool found = focused == target;
+      focused?.visitAncestorElements((el) {
+        if (el == target) {
+          found = true;
+          return false;
+        }
+        return true;
+      });
+      return found;
+    }
+
+    testWidgets('switching from begin to end picker keeps focus inside the calendar', (tester) async {
+      await tester.pumpApp(
+        Scaffold(
+          body: SingleChildScrollView(
+            child: DateRangeInput(
+              value: timex.Range(begin, end),
+              onChanged: (_) {},
+              autofocus: true,
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Sanity check: begin picker starts with focus inside the calendar.
+      expect(focusIsWithin(tester, calendarFocusWrapper()), isTrue);
+
+      // Switch from the begin picker to the end picker, exactly as a user
+      // clicking the end-date button would.
+      await tester.tap(endButton(end));
+      await tester.pumpAndSettle();
+
+      // Regression: the calendar Focus wrapper is reused across the swap (its
+      // `autofocus` only fires once, on first attach), so focus can drift
+      // outside DateRangeInput's own FocusScope once the begin picker's
+      // CalendarDatePicker (and its internal focus node) is torn down and
+      // replaced by the end picker's.
+      expect(
+        focusIsWithin(tester, calendarFocusWrapper()),
+        isTrue,
+        reason: 'focus should stay inside the calendar after switching from the begin to the end picker',
+      );
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('pressing enter after switching to the end picker and choosing a date commits the pending range', (
+      tester,
+    ) async {
+      timex.Range? captured;
+      await tester.pumpApp(
+        Scaffold(
+          body: SingleChildScrollView(
+            child: DateRangeInput(
+              value: timex.Range(begin, end),
+              onChanged: (r) => captured = r,
+              autofocus: true,
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Manually pick a begin date.
+      final pickedBegin = DateTime(2027, 2, 1);
+      tester.widget<CalendarDatePicker>(find.byType(CalendarDatePicker)).onDateChanged(pickedBegin);
+      await tester.pumpAndSettle();
+
+      // Switch to the end picker and manually pick an end date.
+      await tester.tap(endButton(end));
+      await tester.pumpAndSettle();
+      final pickedEnd = DateTime(2027, 4, 10);
+      tester.widget<CalendarDatePicker>(find.byType(CalendarDatePicker)).onDateChanged(pickedEnd);
+      await tester.pumpAndSettle();
+
+      // Commit via Enter, as a user would after finishing their manual pick —
+      // this should be intercepted by DateRangeInput's own FocusScope, not
+      // fall through to some outer handler.
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+
+      expect(captured, isNotNull);
+      expect(captured!.begin, equals(pickedBegin.toUtc()));
+      expect(captured!.end, equals(pickedEnd.toUtc()));
+      expect(tester.takeException(), isNull);
+    });
+  });
+
   group('DateRangeInput month navigation', () {
     testWidgets('pressing next month arrow does not call onChanged', (tester) async {
       timex.Range? captured;

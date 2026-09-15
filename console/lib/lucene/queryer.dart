@@ -250,7 +250,12 @@ class _QueryerState extends State<Queryer> {
         const SingleActivator(LogicalKeyboardKey.enter): (
           const Text('select suggestion'),
           () {
-            if (_suggestionKey.currentState?.hasItems ?? false) {
+            // Scoped to the search box itself, matching arrowDown/arrowUp
+            // above — otherwise Enter would select a suggestion (e.g. the
+            // first DateRange preset) even while focus is elsewhere, such as
+            // inside an open field editor's own calendar/picker, which has
+            // its own Enter handling for committing a manual selection.
+            if (_searchFieldMarker.hasFocus && (_suggestionKey.currentState?.hasItems ?? false)) {
               print("queryer: enter -> select suggestion");
               _suggestionKey.currentState?.select();
               return KeyEventResult.handled;

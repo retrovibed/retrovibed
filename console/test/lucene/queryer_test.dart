@@ -5,6 +5,7 @@ import 'package:retrovibed/testing/widget_tester_extensions.dart';
 import 'package:retrovibed/design.kit/inputs/date.dart';
 import 'package:retrovibed/design.kit/inputs/date.range.dart';
 import 'package:retrovibed/lucene.dart' as lucene;
+import 'package:retrovibed/lucene/parser.results.dart';
 import 'package:retrovibed/timex.dart' as timex;
 
 void main() {
@@ -1118,6 +1119,73 @@ void main() {
     // Note: arrow keys continuing to cycle field-name suggestions while the
     // search box has focus is already covered by the 'Queryer keyboard
     // navigation' group above (e.g. 'arrow down cycles to next suggestion').
+
+    testWidgets(
+      'pressing enter after manually picking begin and end dates commits the picked range, not the first preset',
+      (tester) async {
+        await tester.pumpApp(
+          lucene.Queryer((_) {}, [
+            lucene.DateRange.auto('released', timex.Range.everything(), (_) {}),
+          ]),
+          physicalSize: const Size(800, 900),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.enterText(find.byType(TextField), '@released:');
+        await tester.pumpAndSettle();
+        // Presets are shown alongside the calendar while editing.
+        expect(find.text('last 7 days'), findsOneWidget);
+
+        // Manually pick a begin date via a real tap on a day cell — unlike
+        // calling onDateChanged directly, this moves actual keyboard focus
+        // onto the calendar, matching what a real user interaction does.
+        await tester.tap(
+          find.descendant(of: find.byType(CalendarDatePicker), matching: find.text('15')),
+        );
+        await tester.pumpAndSettle();
+
+        // Switch to the end picker and manually pick an end date, again via
+        // a real tap.
+        final endButton = find.descendant(
+          of: find.byType(DateRangeInput),
+          matching: find.byType(TextButton),
+        ).at(1);
+        await tester.tap(endButton);
+        await tester.pumpAndSettle();
+        await tester.tap(
+          find.descendant(of: find.byType(CalendarDatePicker), matching: find.text('20')),
+        );
+        await tester.pumpAndSettle();
+
+        // Commit via Enter, as a user would after finishing a manual pick.
+        await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+        await tester.pumpAndSettle();
+
+        expect(find.byType(lucene.QueryerFilterChip), findsOneWidget);
+
+        // Inspect the committed field state directly rather than re-tapping
+        // into the UI, so a wrong/duplicate commit is reported as itself
+        // rather than masked by a follow-up interaction.
+        final chip = tester.widget<lucene.QueryerFilterChip>(find.byType(lucene.QueryerFilterChip));
+        final range = chip.filter as ParserResultRange<DateTime>;
+
+        // The exact begin/end month/year aren't controlled (both calendars
+        // open on "now"), but the picked days (15th and 20th, 5 days apart)
+        // distinguish a manual pick from any preset ("last 7/30/365 days",
+        // all of which end "now" and span a different number of days).
+        expect(
+          range.field.current.min.day,
+          equals(15),
+          reason: 'expected the committed begin date to reflect the manually-picked day, not a preset',
+        );
+        expect(
+          range.field.current.max.day,
+          equals(20),
+          reason: 'expected the committed end date to reflect the manually-picked day, not a preset',
+        );
+        expect(tester.takeException(), isNull);
+      },
+    );
 
     testWidgets('opening a Boolean chip requests no focus and does not throw', (tester) async {
       await tester.pumpApp(

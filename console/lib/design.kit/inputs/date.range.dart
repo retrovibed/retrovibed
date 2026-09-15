@@ -31,6 +31,15 @@ class _DateRangeInputState extends State<DateRangeInput> {
   DateTime _current = timex.epoch;
   timex.Range _pending;
 
+  // The range last handed to widget.onChanged (via _apply, e.g. pressing
+  // Enter). Since widget.value doesn't update until the caller rebuilds this
+  // widget with the new value — and a caller that treats onChanged as "this
+  // filter is now committed" may instead tear this widget down entirely —
+  // deactivate() must not compare _pending against widget.value alone, or it
+  // re-fires onChanged with a range it already reported, racing the caller's
+  // own in-flight handling of the first call.
+  timex.Range? _applied;
+
   // parentScope (rather than the default closedLoop) lets Tab/Shift+Tab
   // escape to whatever's next outside this widget — e.g. a field's preset
   // suggestion list shown alongside the picker — instead of endlessly
@@ -55,7 +64,7 @@ class _DateRangeInputState extends State<DateRangeInput> {
 
   @override
   void deactivate() {
-    if (_pending != widget.value) {
+    if (_pending != widget.value && _pending != _applied) {
       postframe(() => widget.onChanged(_pending));
     }
     super.deactivate();
@@ -63,6 +72,7 @@ class _DateRangeInputState extends State<DateRangeInput> {
 
   void _apply() {
     widget.onChanged(_pending);
+    _applied = _pending;
     setState(() {
       _picker = ds.Empty;
       _current = timex.epoch;
