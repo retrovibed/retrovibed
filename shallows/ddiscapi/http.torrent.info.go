@@ -78,7 +78,6 @@ func (t *HTTPTorrentInfo) get(w http.ResponseWriter, r *http.Request) {
 	}
 
 	path := t.rootstorage.Path(rootenv.TorrentDirName, metainfo.Hash(meta.Infohash).String())
-	log.Println("DERP DERPz", path)
 	mi, err := metainfo.LoadFromFile(path + tracking.TorrentSuffix)
 	if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to load torrent file"))
