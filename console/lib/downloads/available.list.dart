@@ -137,11 +137,11 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
             decoration: InputDecoration(hintText: "search downloadable content"),
             controller: widget.controller,
             filters: [
-              lucene.Mode.auto('completed', false, (v) {
+              lucene.Boolean.auto('completed', false, (v) {
                 setState(() => _res.next.completed = v);
                 refresh(_res.next);
               }),
-              lucene.Mode.auto('hidden', false, (v) {
+              lucene.Boolean.auto('hidden', false, (v) {
                 setState(() => _res.next.hidden = v);
                 refresh(_res.next);
               }),
