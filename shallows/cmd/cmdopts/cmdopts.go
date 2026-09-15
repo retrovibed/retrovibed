@@ -99,6 +99,8 @@ type SSHID struct {
 }
 
 func (t *SSHID) Signer() (signer ssh.Signer, err error) {
+	log.Println("debugging key path", t.KeyPath)
+	fsx.PrintPath(t.KeyPath)
 	signer, err = sshx.Load(t.KeyPath)
 	return signer, errors.Wrapf(err, "failed to generate signer: %s", t.KeyPath)
 }

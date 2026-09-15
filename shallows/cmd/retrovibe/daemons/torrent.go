@@ -296,7 +296,6 @@ func (t *_torrenting) Broadcast() {
 }
 
 func (t *_torrenting) Watch(ctx context.Context, paths ...string) error {
-	defer log.Println("WAKA WAKA")
 	if err := t.loadcfg(t.cfgpath, &TorrentSettings{}); err != nil {
 		return err
 	}

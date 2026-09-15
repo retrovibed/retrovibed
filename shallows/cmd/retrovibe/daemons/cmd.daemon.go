@@ -219,7 +219,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	// block for first checkpoint
 	errorsx.Log(cmdopts.Checkpoint(gctx.Context, db))
 
-	log.Println("checkpoint - initialize admin")
+	log.Println("checkpoint - initialize admin", sshx.FingerprintMD5(id.PublicKey()))
 	if err = identityssh.InitializeAdmin(gctx.Context, db, id.PublicKey()); err != nil {
 		return errorsx.Wrap(err, "unable to import ssh identity")
 	}

@@ -244,11 +244,10 @@ func printpath(depth int, remaining int, path string, prefix string) {
 	printf("%s: %s\n", path, describe(m))
 	printf("\tmode: %v (%#o)\n", m, m.Perm())
 	printf("\tsize: %d\n", info.Size())
-	printf("\tmodified: %s\n", info.ModTime().Format(time.RFC3339Nano))
-
 	if created, ok := ctime(info); ok {
-		printf("\tchanged: %s\n", created.Format(time.RFC3339Nano))
+		printf("\tcreated: %s\n", created.Format(time.RFC3339Nano))
 	}
+	printf("\tmodified: %s\n", info.ModTime().Format(time.RFC3339Nano))
 
 	if m&os.ModeSymlink == 0 {
 		return
