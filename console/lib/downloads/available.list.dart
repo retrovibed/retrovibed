@@ -248,6 +248,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                       description: Text("remove the item"),
                     ),
                   ]),
+                  highlighted: _focused == v.media.id,
                   onTap: () async {
                     setState(() {
                       _focused = _focused == v.media.id ? '' : v.media.id;
@@ -285,73 +286,71 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                           }),
                     ),
                   ],
-                  expanded: _focused != v.media.id
-                      ? ds.Empty
-                      : Column(
-                          spacing: defaults.spacing / 2,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            media.DownloadDisplay(
-                              v,
-                              onVerify: (download) => ds.modals.asyncfn(
-                                context,
-                                (completion) => ds.Confirmation.yesNo(
-                                  content: Text(
-                                    "Are you sure you want to verify ${v.media.description}?",
-                                  ),
-                                  onConfirm: (context) {
-                                    media.discovered
-                                        .update(
-                                          v.media.torrentId,
-                                          download..verifyAt = DateTime.now().toUtc().toIso8601String(),
-                                          options: [authn.request(authn.AuthzCache.meta(context))],
-                                        )
-                                        .then((_) => completion.complete())
-                                        .catchError((cause) {
-                                          completion.completeError(cause);
-                                        });
-                                  },
-                                  onCancel: (_) => completion.complete(),
-                                ),
-                              ),
-                              onTap: () => ds.modals.asyncfn(
-                                context,
-                                (completion) => ds.Confirmation.yesNo(
-                                  content: Text(
-                                    "Are you sure you want to reset ${v.media.description}?",
-                                  ),
-                                  onConfirm: (context) {
-                                    httpx
-                                        .withRetry(
-                                          () => media.discovered.reset(
-                                            v.media.id,
-                                            options: [
-                                              authn.request(authn.AuthzCache.meta(context)),
-                                            ],
-                                          ),
-                                        )
-                                        .then((__v) {
-                                          setState(() {
-                                            _res = media.DownloadSearchResponse(
-                                              items: ds.fnOnChange(_res.items, null, (d) => d.media.id == v.media.id),
-                                              next: _res.next,
-                                            );
-                                          });
-                                          completion.complete();
-                                        })
-                                        .catchError((cause) {
-                                          completion.completeError(cause);
-                                        });
-                                  },
-                                  onCancel: (_) => completion.complete(),
-                                ),
-                              ),
+                  expanded: Column(
+                    spacing: defaults.spacing / 2,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      media.DownloadDisplay(
+                        v,
+                        onVerify: (download) => ds.modals.asyncfn(
+                          context,
+                          (completion) => ds.Confirmation.yesNo(
+                            content: Text(
+                              "Are you sure you want to verify ${v.media.description}?",
                             ),
-                            torrentx.TorrentDisplay.fromID(
-                              v.media.torrentId,
-                            ),
-                          ],
+                            onConfirm: (context) {
+                              media.discovered
+                                  .update(
+                                    v.media.torrentId,
+                                    download..verifyAt = DateTime.now().toUtc().toIso8601String(),
+                                    options: [authn.request(authn.AuthzCache.meta(context))],
+                                  )
+                                  .then((_) => completion.complete())
+                                  .catchError((cause) {
+                                    completion.completeError(cause);
+                                  });
+                            },
+                            onCancel: (_) => completion.complete(),
+                          ),
                         ),
+                        onTap: () => ds.modals.asyncfn(
+                          context,
+                          (completion) => ds.Confirmation.yesNo(
+                            content: Text(
+                              "Are you sure you want to reset ${v.media.description}?",
+                            ),
+                            onConfirm: (context) {
+                              httpx
+                                  .withRetry(
+                                    () => media.discovered.reset(
+                                      v.media.id,
+                                      options: [
+                                        authn.request(authn.AuthzCache.meta(context)),
+                                      ],
+                                    ),
+                                  )
+                                  .then((__v) {
+                                    setState(() {
+                                      _res = media.DownloadSearchResponse(
+                                        items: ds.fnOnChange(_res.items, null, (d) => d.media.id == v.media.id),
+                                        next: _res.next,
+                                      );
+                                    });
+                                    completion.complete();
+                                  })
+                                  .catchError((cause) {
+                                    completion.completeError(cause);
+                                  });
+                            },
+                            onCancel: (_) => completion.complete(),
+                          ),
+                        ),
+                      ),
+                      torrentx.TorrentDisplay.fromID(
+                        v.media.torrentId,
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),

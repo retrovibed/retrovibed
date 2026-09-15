@@ -16,6 +16,7 @@ class TableRow extends StatefulWidget {
   final Widget expanded;
   final bool maintainState;
   final List<BoxShadow> tint;
+  final bool autoexpand;
 
   const TableRow(
     this.children, {
@@ -25,6 +26,7 @@ class TableRow extends StatefulWidget {
     this.expanded = Empty,
     this.maintainState = true,
     this.tint = const [],
+    this.autoexpand = false,
   });
 
   factory TableRow.single(
@@ -35,6 +37,7 @@ class TableRow extends StatefulWidget {
     Widget expanded = Empty,
     bool maintainState = true,
     List<BoxShadow> tint = const [],
+    bool autoexpand = false,
   }) {
     return TableRow(
       [Expanded(child: child)],
@@ -44,6 +47,7 @@ class TableRow extends StatefulWidget {
       expanded: expanded,
       maintainState: maintainState,
       tint: tint,
+      autoexpand: autoexpand,
     );
   }
 
@@ -56,6 +60,12 @@ class _TableRowState extends State<TableRow> {
 
   void _toggle() {
     setState(() => _expanded = !_expanded);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _expanded = widget.autoexpand;
   }
 
   @override

@@ -31,7 +31,8 @@ class RowDisplay extends StatelessWidget {
         padding: defaults.padding,
         onTap: onTap,
         tint: highlighted ? defaults.highlightTint : [],
-        expanded: expanded,
+        expanded: highlighted ? expanded : ds.Empty,
+        autoexpand: true,
         [
           ...leading,
           Expanded(child: Text(media.description, overflow: TextOverflow.ellipsis)),
