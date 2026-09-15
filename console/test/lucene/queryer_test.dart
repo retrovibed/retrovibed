@@ -1032,6 +1032,93 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
+    testWidgets('arrow keys still cycle the suggestion highlight once focus has tabbed into the list', (tester) async {
+      await tester.pumpApp(
+        lucene.Queryer((_) {}, [
+          lucene.DateRange.auto('released', timex.Range.everything(), (_) {}),
+        ]),
+        physicalSize: const Size(800, 900),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextField), '@released:');
+      await tester.pumpAndSettle();
+
+      bool focusIsWithinListTile() {
+        final ctx = tester.binding.focusManager.primaryFocus?.context;
+        if (ctx == null) return false;
+        bool found = ctx.widget.runtimeType == ListTile;
+        ctx.visitAncestorElements((el) {
+          if (el.widget.runtimeType == ListTile) {
+            found = true;
+            return false;
+          }
+          return true;
+        });
+        return found;
+      }
+
+      // Tab past the calendar (closed-loop within it, then escapes via
+      // parentScope) until focus lands on a suggestion list item.
+      bool reachedSuggestion = false;
+      for (var i = 0; i < 8 && !reachedSuggestion; i++) {
+        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+        await tester.pumpAndSettle();
+        reachedSuggestion = focusIsWithinListTile();
+      }
+      expect(reachedSuggestion, isTrue);
+
+      final selectedBefore = tester.widgetList<ListTile>(find.byType(ListTile)).map((t) => t.selected).toList();
+
+      // Arrow keys must still cycle the highlight here — the search-box-only
+      // guard shouldn't block cycling once focus is inside the list itself.
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pumpAndSettle();
+
+      final selectedAfter = tester.widgetList<ListTile>(find.byType(ListTile)).map((t) => t.selected).toList();
+      expect(selectedAfter, isNot(equals(selectedBefore)));
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('arrow keys navigate the calendar day grid once focus has left the search box', (tester) async {
+      await tester.pumpApp(
+        lucene.Queryer((_) {}, [
+          lucene.DateRange.auto('released', timex.Range.everything(), (_) {}),
+        ]),
+        physicalSize: const Size(800, 900),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextField), '@released:');
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('last 7 days'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(lucene.QueryerFilterChip));
+      await tester.pumpAndSettle();
+
+      // Tab from the autofocused calendar into the day grid.
+      for (var i = 0; i < 4; i++) {
+        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+        await tester.pumpAndSettle();
+      }
+      final startLabel = tester.binding.focusManager.primaryFocus?.debugLabel ?? '';
+      expect(startLabel, startsWith('Day'));
+
+      // ArrowRight must move within the day grid — not get swallowed as a
+      // suggestion-list-cycle key (there's no suggestion dropdown open here).
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      await tester.pumpAndSettle();
+
+      final afterLabel = tester.binding.focusManager.primaryFocus?.debugLabel ?? '';
+      expect(afterLabel, startsWith('Day'));
+      expect(afterLabel, isNot(equals(startLabel)));
+      expect(tester.takeException(), isNull);
+    });
+
+    // Note: arrow keys continuing to cycle field-name suggestions while the
+    // search box has focus is already covered by the 'Queryer keyboard
+    // navigation' group above (e.g. 'arrow down cycles to next suggestion').
+
     testWidgets('opening a Boolean chip requests no focus and does not throw', (tester) async {
       await tester.pumpApp(
         lucene.Queryer((_) {}, [lucene.Boolean('hd', false, false, (_) {})]),

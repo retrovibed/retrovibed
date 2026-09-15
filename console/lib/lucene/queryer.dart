@@ -53,6 +53,13 @@ class _QueryerState extends State<Queryer> {
   final GlobalKey<SuggestionListState> _suggestionKey = GlobalKey();
   ParserResult _mode = ParserResult.close;
   final FocusNode _modeFocusNode = FocusNode();
+  // Marker wrapping the search TextField (canRequestFocus:false so it never
+  // becomes the focused node itself) — .hasFocus reports true whenever the
+  // TextField or a descendant of it holds focus. Used to scope arrow-key
+  // suggestion-cycling to only when the user is actually typing in the
+  // search box, not when focus has moved into an open field editor (e.g. a
+  // calendar), where arrows should drive normal focus navigation instead.
+  final FocusNode _searchFieldMarker = FocusNode(canRequestFocus: false, skipTraversal: true);
   List<ParserResult> _filters = [];
   Widget? _updating;
   bool _editing = false;
@@ -73,6 +80,7 @@ class _QueryerState extends State<Queryer> {
     _ctrl.removeListener(_onText);
     if (widget.controller == null) _ctrl.dispose();
     _modeFocusNode.dispose();
+    _searchFieldMarker.dispose();
     super.dispose();
   }
 
@@ -162,6 +170,28 @@ class _QueryerState extends State<Queryer> {
     });
   }
 
+  // Arrow keys should cycle the suggestion list highlight while focus is on
+  // the search box itself *or* already inside the suggestion list (reached
+  // via Tab) — but not once focus has moved into an open field editor (e.g.
+  // a calendar), where arrows should drive that widget's own navigation
+  // instead.
+  bool _arrowKeysShouldCycleSuggestions() {
+    if (_searchFieldMarker.hasFocus) return true;
+    final suggestionListContext = _suggestionKey.currentContext;
+    if (suggestionListContext == null) return false;
+    var focused = FocusManager.instance.primaryFocus?.context;
+    if (focused == suggestionListContext) return true;
+    var found = false;
+    focused?.visitAncestorElements((el) {
+      if (el == suggestionListContext) {
+        found = true;
+        return false;
+      }
+      return true;
+    });
+    return found;
+  }
+
   void _resetMode() {
     if (_mode == ParserResult.close) return;
     final current = _mode;
@@ -215,6 +245,14 @@ class _QueryerState extends State<Queryer> {
         const SingleActivator(LogicalKeyboardKey.arrowDown): (
           const Text('next suggestion'),
           () {
+            // Only cycle suggestions while focus is on the search box or the
+            // suggestion list itself — once focus has moved into an open
+            // field editor (e.g. a calendar), arrows should drive normal
+            // focus navigation there instead of silently hijacking
+            // suggestion-list bookkeeping.
+            if (!_arrowKeysShouldCycleSuggestions() || !(_suggestionKey.currentState?.hasItems ?? false)) {
+              return KeyEventResult.ignored;
+            }
             print("queryer: arrowDown");
             _suggestionKey.currentState?.cycle();
             return KeyEventResult.handled;
@@ -223,6 +261,9 @@ class _QueryerState extends State<Queryer> {
         const SingleActivator(LogicalKeyboardKey.arrowUp): (
           const Text('previous suggestion'),
           () {
+            if (!_arrowKeysShouldCycleSuggestions() || !(_suggestionKey.currentState?.hasItems ?? false)) {
+              return KeyEventResult.ignored;
+            }
             print("queryer: arrowUp");
             _suggestionKey.currentState?.cycle(-1);
             return KeyEventResult.handled;
@@ -276,18 +317,23 @@ class _QueryerState extends State<Queryer> {
                 ...widget.leading,
                 ds.CompactingMenu.expanded(
                   ds.Help(
-                    TextField(
-                      controller: _ctrl,
-                      enabled: !widget.disabled,
-                      autofocus: widget.autofocus,
-                      focusNode: widget.focusNode,
-                      decoration: widget.decoration,
-                      onSubmitted: (v) {
-                        if (_partialParse()) return;
-                        widget.onQuery(v);
-                        widget.focusNode?.requestFocus();
-                        ds.textediting.refocus(_ctrl);
-                      },
+                    Focus(
+                      focusNode: _searchFieldMarker,
+                      canRequestFocus: false,
+                      skipTraversal: true,
+                      child: TextField(
+                        controller: _ctrl,
+                        enabled: !widget.disabled,
+                        autofocus: widget.autofocus,
+                        focusNode: widget.focusNode,
+                        decoration: widget.decoration,
+                        onSubmitted: (v) {
+                          if (_partialParse()) return;
+                          widget.onQuery(v);
+                          widget.focusNode?.requestFocus();
+                          ds.textediting.refocus(_ctrl);
+                        },
+                      ),
                     ),
                     widget.help,
                   ),
