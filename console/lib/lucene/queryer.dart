@@ -133,11 +133,14 @@ class _QueryerState extends State<Queryer> {
         });
         onChanged(upd);
       });
-      final focusNode = FocusNode();
+      // Wrap in a FocusScope (rather than requesting focus for an unrelated
+      // leaf node) so the field's own autofocus descendant — the begin-date
+      // button, the calendar day grid, etc. — is what ends up focused.
+      final focusNode = FocusScopeNode();
       _updating = _w == null
           ? null
-          : Focus(
-              focusNode: focusNode,
+          : FocusScope(
+              node: focusNode,
               onKeyEvent: (node, event) {
                 if (event.logicalKey != LogicalKeyboardKey.enter) return KeyEventResult.ignored;
                 if (event is! KeyDownEvent) return KeyEventResult.ignored;
@@ -147,7 +150,10 @@ class _QueryerState extends State<Queryer> {
               },
               child: _w,
             );
-      if (_w != null) focusNode.requestFocus();
+      // Deferred until after the child (and its autofocus descendant) has
+      // attached — requesting focus on the scope then delegates to whichever
+      // descendant already registered itself via autofocus.
+      if (_w != null) ds.postframe(() => focusNode.requestFocus());
     });
   }
 

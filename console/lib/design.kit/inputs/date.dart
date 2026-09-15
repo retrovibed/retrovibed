@@ -6,6 +6,7 @@ class DateInput extends StatefulWidget {
   final ValueChanged<DateTime> onChanged;
   final DateTime? firstDate;
   final DateTime? lastDate;
+  final bool autofocus;
 
   const DateInput({
     super.key,
@@ -13,6 +14,7 @@ class DateInput extends StatefulWidget {
     this.value,
     this.firstDate,
     this.lastDate,
+    this.autofocus = true,
   });
 
   @override
@@ -30,14 +32,17 @@ class _DateInputState extends State<DateInput> {
 
   @override
   Widget build(BuildContext context) {
-    return CalendarDatePicker(
-      initialDate: _pending,
-      firstDate: (widget.firstDate ?? timex.epoch).toLocal(),
-      lastDate: (widget.lastDate ?? timex.inf).toLocal(),
-      onDateChanged: (picked) {
-        setState(() => _pending = picked);
-        widget.onChanged(picked.toUtc());
-      },
+    return Focus(
+      autofocus: widget.autofocus,
+      child: CalendarDatePicker(
+        initialDate: _pending,
+        firstDate: (widget.firstDate ?? timex.epoch).toLocal(),
+        lastDate: (widget.lastDate ?? timex.inf).toLocal(),
+        onDateChanged: (picked) {
+          setState(() => _pending = picked);
+          widget.onChanged(picked.toUtc());
+        },
+      ),
     );
   }
 }

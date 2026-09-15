@@ -18,7 +18,7 @@ class DateRangeInput extends StatefulWidget {
     required this.onChanged,
     DateTime? firstDate,
     DateTime? lastDate,
-    this.autofocus = false,
+    this.autofocus = true,
   }) : firstDate = firstDate ?? timex.neginf,
        lastDate = lastDate ?? timex.inf;
 
