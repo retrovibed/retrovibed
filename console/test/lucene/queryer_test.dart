@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
+import 'package:retrovibed/design.kit/inputs/date.dart';
+import 'package:retrovibed/design.kit/inputs/date.range.dart';
 import 'package:retrovibed/lucene.dart' as lucene;
 import 'package:retrovibed/timex.dart' as timex;
 
@@ -844,6 +846,211 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.tab);
       await tester.pumpAndSettle();
 
+      expect(tester.takeException(), isNull);
+    });
+  });
+
+  group('Queryer chip editing focus', () {
+    testWidgets('opening a Timestamp chip focuses the DateInput editor, not a dead wrapper node', (tester) async {
+      await tester.pumpApp(
+        lucene.Queryer((_) {}, [
+          lucene.Timestamp.auto('published', timex.epoch, (_) {}),
+        ]),
+      );
+      await tester.pumpAndSettle();
+
+      // Commit a Timestamp chip.
+      await tester.enterText(find.byType(TextField), '@published:');
+      await tester.pumpAndSettle();
+      tester.widget<CalendarDatePicker>(find.byType(CalendarDatePicker)).onDateChanged.call(DateTime(2025, 6, 1));
+      await tester.pump();
+      final ctrl = tester.widget<TextField>(find.byType(TextField)).controller!;
+      ctrl.selection = const TextSelection.collapsed(offset: 0);
+      await tester.pumpAndSettle();
+      expect(find.byType(lucene.QueryerFilterChip), findsOneWidget);
+
+      // Open the edit panel via chip press.
+      await tester.tap(find.byType(lucene.QueryerFilterChip));
+      await tester.pumpAndSettle();
+      expect(find.byType(CalendarDatePicker), findsOneWidget);
+
+      // Focus must land somewhere inside the DateInput editor (its wrapping
+      // Focus(autofocus: true)) — not on the Queryer-level FocusScope wrapper
+      // that has no interactive content of its own. CalendarDatePicker's
+      // internal day grid only becomes reachable once real focus is anchored
+      // inside the editor and the user tabs into it.
+      final dateInputElement = tester.element(find.byType(DateInput));
+      final focusedContext = tester.binding.focusManager.primaryFocus?.context;
+      bool isFocusWithinDateInput = false;
+      focusedContext?.visitAncestorElements((el) {
+        if (el == dateInputElement) {
+          isFocusWithinDateInput = true;
+          return false;
+        }
+        return true;
+      });
+
+      expect(isFocusWithinDateInput, isTrue);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('opening a DateRange chip focuses the calendar, not the begin-date button', (tester) async {
+      await tester.pumpApp(
+        lucene.Queryer((_) {}, [
+          lucene.DateRange.auto('released', timex.Range.everything(), (_) {}),
+        ]),
+        physicalSize: const Size(800, 900),
+      );
+      await tester.pumpAndSettle();
+
+      // Commit a DateRange chip via a preset suggestion, mirroring the
+      // Boolean-suggestion commit flow above.
+      await tester.enterText(find.byType(TextField), '@released:');
+      await tester.pumpAndSettle();
+      expect(find.text('last 7 days'), findsOneWidget);
+      await tester.tap(find.text('last 7 days'));
+      await tester.pumpAndSettle();
+      expect(find.byType(lucene.QueryerFilterChip), findsOneWidget);
+
+      // Open the edit panel via chip press.
+      await tester.tap(find.byType(lucene.QueryerFilterChip));
+      await tester.pumpAndSettle();
+      expect(find.byType(DateRangeInput), findsOneWidget);
+
+      // The calendar itself — not the begin-date button — is the autofocus
+      // target (DateRangeInput wraps its picker in Focus(autofocus: true)).
+      final calendarWrapper = find.ancestor(
+        of: find.byType(CalendarDatePicker),
+        matching: find.descendant(
+          of: find.byType(DateRangeInput),
+          matching: find.byType(Focus),
+        ),
+      ).last;
+      final calendarWrapperElement = tester.element(calendarWrapper);
+      final focusedContext = tester.binding.focusManager.primaryFocus?.context;
+      bool isFocusWithinCalendar = focusedContext == calendarWrapperElement;
+      focusedContext?.visitAncestorElements((el) {
+        if (el == calendarWrapperElement) {
+          isFocusWithinCalendar = true;
+          return false;
+        }
+        return true;
+      });
+
+      expect(isFocusWithinCalendar, isTrue);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('tab/shift+tab move focus through an open DateRange chip editor', (tester) async {
+      await tester.pumpApp(
+        lucene.Queryer((_) {}, [
+          lucene.DateRange.auto('released', timex.Range.everything(), (_) {}),
+        ]),
+        physicalSize: const Size(800, 900),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextField), '@released:');
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('last 7 days'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(lucene.QueryerFilterChip));
+      await tester.pumpAndSettle();
+
+      String? tooltip() =>
+          tester.binding.focusManager.primaryFocus?.context?.findAncestorWidgetOfExactType<Tooltip>()?.message;
+      String? debugLabel() => tester.binding.focusManager.primaryFocus?.debugLabel;
+
+      // calendar (autofocus) → month/year header → prev month → next month → day grid
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      expect(tooltip(), isNull, reason: 'month/year header has no tooltip');
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      expect(tooltip(), 'Previous month');
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      expect(tooltip(), 'Next month');
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      final label = debugLabel() ?? '';
+      expect(label.startsWith('Day') || label == 'Day Grid', isTrue, reason: 'expected day grid, got $label');
+
+      // Shift+Tab back to "Next month" — Tab must not be a dead end in
+      // either direction once inside an open field editor.
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.shiftLeft);
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.shiftLeft);
+      await tester.pumpAndSettle();
+      expect(tooltip(), 'Next month');
+
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('tab escapes the picker to reach preset suggestions while typing a DateRange value', (tester) async {
+      await tester.pumpApp(
+        lucene.Queryer((_) {}, [
+          lucene.DateRange.auto('released', timex.Range.everything(), (_) {}),
+        ]),
+        physicalSize: const Size(800, 900),
+      );
+      await tester.pumpAndSettle();
+
+      // Typing "@released:" shows the calendar *and* the preset suggestion
+      // list at once (DateRange always has presets) — Tab must be able to
+      // leave the calendar's own closed-loop traversal to reach them rather
+      // than cycling begin/end/header/day-grid forever.
+      await tester.enterText(find.byType(TextField), '@released:');
+      await tester.pumpAndSettle();
+      expect(find.text('last 7 days'), findsOneWidget);
+
+      bool focusIsWithinListTile() {
+        final ctx = tester.binding.focusManager.primaryFocus?.context;
+        if (ctx == null) return false;
+        bool found = ctx.widget.runtimeType == ListTile;
+        ctx.visitAncestorElements((el) {
+          if (el.widget.runtimeType == ListTile) {
+            found = true;
+            return false;
+          }
+          return true;
+        });
+        return found;
+      }
+
+      bool reachedSuggestion = false;
+      for (var i = 0; i < 8 && !reachedSuggestion; i++) {
+        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+        await tester.pumpAndSettle();
+        reachedSuggestion = focusIsWithinListTile();
+      }
+
+      expect(reachedSuggestion, isTrue, reason: 'Tab never reached a suggestion list item');
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('opening a Boolean chip requests no focus and does not throw', (tester) async {
+      await tester.pumpApp(
+        lucene.Queryer((_) {}, [lucene.Boolean('hd', false, false, (_) {})]),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextField), '@');
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('hd'));
+      await tester.pumpAndSettle();
+      expect(find.byType(lucene.QueryerFilterChip), findsOneWidget);
+
+      final focusBefore = tester.binding.focusManager.primaryFocus;
+
+      // Boolean fields have no editor — tapping the chip must be a no-op.
+      await tester.tap(find.byType(lucene.QueryerFilterChip));
+      await tester.pumpAndSettle();
+
+      expect(tester.binding.focusManager.primaryFocus, equals(focusBefore));
       expect(tester.takeException(), isNull);
     });
   });

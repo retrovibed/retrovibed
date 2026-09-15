@@ -31,12 +31,26 @@ class _DateRangeInputState extends State<DateRangeInput> {
   DateTime _current = timex.epoch;
   timex.Range _pending;
 
+  // parentScope (rather than the default closedLoop) lets Tab/Shift+Tab
+  // escape to whatever's next outside this widget — e.g. a field's preset
+  // suggestion list shown alongside the picker — instead of endlessly
+  // cycling begin/end/calendar in place.
+  final FocusScopeNode _focusScopeNode = FocusScopeNode(
+    traversalEdgeBehavior: TraversalEdgeBehavior.parentScope,
+  );
+
   _DateRangeInputState(this._pending);
 
   @override
   void initState() {
     super.initState();
     postframe(() => _showBegin());
+  }
+
+  @override
+  void dispose() {
+    _focusScopeNode.dispose();
+    super.dispose();
   }
 
   @override
@@ -103,6 +117,7 @@ class _DateRangeInputState extends State<DateRangeInput> {
     );
 
     return FocusScope(
+      node: _focusScopeNode,
       onFocusChange: (hasFocus) {
         if (!hasFocus && _pending != widget.value) {
           _apply();
@@ -123,7 +138,6 @@ class _DateRangeInputState extends State<DateRangeInput> {
             children: [
               Expanded(
                 child: TextButton(
-                  autofocus: widget.autofocus,
                   onPressed: _showBegin,
                   style: timex.neginf != _current && _current == _pending.begin ? activestyle : null,
                   child: typography.Timestamp(_pending.begin, neginf: Text("")),
@@ -139,7 +153,7 @@ class _DateRangeInputState extends State<DateRangeInput> {
               ),
             ],
           ),
-          _picker,
+          Focus(autofocus: widget.autofocus, child: _picker),
         ],
       ),
     );

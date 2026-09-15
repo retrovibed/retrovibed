@@ -133,14 +133,16 @@ class _QueryerState extends State<Queryer> {
         });
         onChanged(upd);
       });
-      // Wrap in a FocusScope (rather than requesting focus for an unrelated
-      // leaf node) so the field's own autofocus descendant — the begin-date
-      // button, the calendar day grid, etc. — is what ends up focused.
-      final focusNode = FocusScopeNode();
+      // Wrap in a plain Focus — NOT a FocusScope — purely to intercept the
+      // Enter key. A FocusScope here would introduce a new focus-traversal
+      // boundary nested inside Queryer's own FocusTraversalGroup, which traps
+      // Tab/Shift+Tab: FocusTraversalPolicy.next()/previous() only searches
+      // within the *nearest* enclosing scope, so Tab could never move past
+      // this wrapper to reach sibling chips/fields. A plain Focus doesn't
+      // create a scope boundary, so traversal continues normally.
       _updating = _w == null
           ? null
-          : FocusScope(
-              node: focusNode,
+          : Focus(
               onKeyEvent: (node, event) {
                 if (event.logicalKey != LogicalKeyboardKey.enter) return KeyEventResult.ignored;
                 if (event is! KeyDownEvent) return KeyEventResult.ignored;
@@ -150,10 +152,13 @@ class _QueryerState extends State<Queryer> {
               },
               child: _w,
             );
-      // Deferred until after the child (and its autofocus descendant) has
-      // attached — requesting focus on the scope then delegates to whichever
-      // descendant already registered itself via autofocus.
-      if (_w != null) ds.postframe(() => focusNode.requestFocus());
+      // The chip itself keeps keyboard focus after being tapped (Material's
+      // tap-to-focus), and autofocus only claims focus for a newly-attached
+      // widget when nothing else in its scope already has it — so without
+      // this, the field's own autofocus descendant (begin-date button,
+      // calendar, etc.) would never actually take over. Clearing focus here
+      // (not on a new node we own) lets that autofocus succeed on attach.
+      if (_w != null) FocusManager.instance.primaryFocus?.unfocus();
     });
   }
 

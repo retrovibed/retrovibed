@@ -30,6 +30,18 @@ void main() {
     matching: find.byType(TextButton),
   );
 
+  // The Focus wrapper DateRangeInput itself adds around the calendar picker
+  // (autofocus target) — restricted to descendants of DateRangeInput so it
+  // can't accidentally match an unrelated Focus widget further up the tree
+  // (e.g. the app/route's own focus scope).
+  Finder calendarFocusWrapper() => find.ancestor(
+    of: find.byType(CalendarDatePicker),
+    matching: find.descendant(
+      of: find.byType(DateRangeInput),
+      matching: find.byType(Focus),
+    ),
+  ).last;
+
   group('DateRangeInput renders', () {
     testWidgets('shows Timestamp widgets for begin and end', (tester) async {
       await tester.pumpApp(app(timex.Range(begin, end), (_) {}));
@@ -68,7 +80,7 @@ void main() {
   });
 
   group('DateRangeInput autofocus', () {
-    testWidgets('begin button receives focus when autofocus is true', (tester) async {
+    testWidgets('calendar picker receives focus when autofocus is true', (tester) async {
       await tester.pumpApp(
         Scaffold(
           body: SingleChildScrollView(
@@ -83,21 +95,21 @@ void main() {
       await tester.pumpAndSettle();
 
       final focusedContext = tester.binding.focusManager.primaryFocus?.context;
-      final beginBtnElement = tester.element(beginButton());
-      bool isFocusWithinBeginBtn = false;
+      final calendarWrapperElement = tester.element(calendarFocusWrapper());
+      bool isFocusWithinCalendar = focusedContext == calendarWrapperElement;
       focusedContext?.visitAncestorElements((el) {
-        if (el == beginBtnElement) {
-          isFocusWithinBeginBtn = true;
+        if (el == calendarWrapperElement) {
+          isFocusWithinCalendar = true;
           return false;
         }
         return true;
       });
 
-      expect(isFocusWithinBeginBtn, isTrue);
+      expect(isFocusWithinCalendar, isTrue);
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('begin button does not steal focus when autofocus is false', (tester) async {
+    testWidgets('calendar picker does not steal focus when autofocus is false', (tester) async {
       await tester.pumpApp(
         Scaffold(
           body: SingleChildScrollView(
@@ -112,17 +124,17 @@ void main() {
       await tester.pumpAndSettle();
 
       final focusedContext = tester.binding.focusManager.primaryFocus?.context;
-      final beginBtnElement = tester.element(beginButton());
-      bool isFocusWithinBeginBtn = false;
+      final calendarWrapperElement = tester.element(calendarFocusWrapper());
+      bool isFocusWithinCalendar = false;
       focusedContext?.visitAncestorElements((el) {
-        if (el == beginBtnElement) {
-          isFocusWithinBeginBtn = true;
+        if (el == calendarWrapperElement) {
+          isFocusWithinCalendar = true;
           return false;
         }
         return true;
       });
 
-      expect(isFocusWithinBeginBtn, isFalse);
+      expect(isFocusWithinCalendar, isFalse);
       expect(tester.takeException(), isNull);
     });
   });
@@ -134,7 +146,7 @@ void main() {
     bool _focusIsWithin(WidgetTester tester, Finder finder) {
       final focused = tester.binding.focusManager.primaryFocus?.context;
       final target = tester.element(finder);
-      bool found = false;
+      bool found = focused == target;
       focused?.visitAncestorElements((el) {
         if (el == target) {
           found = true;
@@ -145,7 +157,7 @@ void main() {
       return found;
     }
 
-    testWidgets('tab from begin button moves focus to end button', (tester) async {
+    testWidgets('tab from calendar (autofocused) moves focus to month/year header', (tester) async {
       await tester.pumpApp(
         Scaffold(
           body: SingleChildScrollView(
@@ -159,18 +171,21 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Start: begin button has focus.
-      expect(_focusIsWithin(tester, beginButton()), isTrue);
+      // Start: the calendar itself has focus (autofocus target).
+      expect(_focusIsWithin(tester, calendarFocusWrapper()), isTrue);
 
       await tester.sendKeyEvent(LogicalKeyboardKey.tab);
       await tester.pump();
 
-      expect(_focusIsWithin(tester, endButton(end)), isTrue);
+      // Not the calendar's own top-level wrapper anymore — moved into its
+      // first internal control (the month/year header, no Tooltip).
+      final tt = tester.binding.focusManager.primaryFocus?.context?.findAncestorWidgetOfExactType<Tooltip>();
+      expect(tt, isNull);
       expect(tester.takeException(), isNull);
     });
 
-    // Full tab order: begin → end → month/year header → prev month → next month → day grid → (wrap)
-    testWidgets('tab from end button moves focus to prev month arrow', (tester) async {
+    // Full tab order: calendar (autofocus) → month/year header → prev month → next month → day grid → begin → end → (wrap)
+    testWidgets('tab from month/year header moves focus to prev month arrow', (tester) async {
       await tester.pumpApp(
         Scaffold(
           body: SingleChildScrollView(
@@ -184,8 +199,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // begin → end → month/year header → prev month
-      for (int i = 0; i < 3; i++) {
+      // calendar → month/year header → prev month
+      for (int i = 0; i < 2; i++) {
         await tester.sendKeyEvent(LogicalKeyboardKey.tab);
         await tester.pump();
       }
@@ -210,8 +225,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // begin → end → month/year header → prev month → next month
-      for (int i = 0; i < 4; i++) {
+      // calendar → month/year header → prev month → next month
+      for (int i = 0; i < 3; i++) {
         await tester.sendKeyEvent(LogicalKeyboardKey.tab);
         await tester.pump();
       }
@@ -236,8 +251,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // begin → end → month/year header → prev month → next month → day grid
-      for (int i = 0; i < 5; i++) {
+      // calendar → month/year header → prev month → next month → day grid
+      for (int i = 0; i < 4; i++) {
         await tester.sendKeyEvent(LogicalKeyboardKey.tab);
         await tester.pump();
       }
