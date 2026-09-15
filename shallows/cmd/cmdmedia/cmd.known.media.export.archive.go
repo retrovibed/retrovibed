@@ -8,13 +8,15 @@ import (
 	"os"
 	"strings"
 
+	"github.com/alecthomas/kong"
 	"github.com/retrovibed/retrovibed/retroapi/asynccompute"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
-	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/tarx"
+	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/library"
 )
 
@@ -23,8 +25,12 @@ type tarchiveexport struct {
 	Pattern   string `flag:"" name:"pattern" help:"name of the archive directory to import" default:"retrovibed.media.archive.d"`
 }
 
-func (t tarchiveexport) Run(gctx *cmdopts.Global) (err error) {
-	encoder := jsonl.NewEncoder(os.Stdout)
+func (t tarchiveexport) Run(kctx *kong.Context, gctx *cmdopts.Global) (err error) {
+	return t.run(gctx.Context, kctx.Stdout)
+}
+
+func (t tarchiveexport) run(ctx context.Context, out io.Writer) (err error) {
+	encoder := jsonl.NewEncoder(out)
 
 	insert := asynccompute.New(func(ctx context.Context, v library.Known) error {
 		return encoder.Encode(v)
@@ -52,8 +58,16 @@ func (t tarchiveexport) Run(gctx *cmdopts.Global) (err error) {
 			d := jsonl.NewDecoder(content)
 
 			for derr = d.Decode(&v); derr == nil; i, derr = i+1, d.Decode(&v) {
-				v.AutoDescription = stringsx.Join("\n", v.Title, v.OriginalTitle, v.Overview)
-				return insert.Run(ctx, v)
+				if err := insert.Run(
+					ctx,
+					langx.Clone(
+						v,
+						timex.JSONSafeDecodeOption,
+						library.KnownOptionAutoDescription,
+					),
+				); err != nil {
+					return err
+				}
 			}
 
 			if err := errorsx.Ignore(derr, io.EOF); err != nil {
@@ -81,7 +95,7 @@ func (t tarchiveexport) Run(gctx *cmdopts.Global) (err error) {
 			continue
 		}
 
-		if err := pool.Run(gctx.Context, path); err != nil {
+		if err := pool.Run(ctx, path); err != nil {
 			return err
 		}
 	}
@@ -90,9 +104,5 @@ func (t tarchiveexport) Run(gctx *cmdopts.Global) (err error) {
 		return errorsx.Wrap(err, "unable to walk directory")
 	}
 
-	if err := asynccompute.Shutdown(gctx.Context, pool); err != nil {
-		return err
-	}
-
-	return asynccompute.Shutdown(gctx.Context, insert)
+	return asynccompute.Shutdown(ctx, pool, insert)
 }

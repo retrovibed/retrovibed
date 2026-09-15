@@ -69,7 +69,6 @@ func (t knownimport) run(ctx context.Context, db *sql.DB, r io.Reader) (err erro
 	for chunk := range iterx.Chunk(d.Each(ctx), t.Batch) {
 		owned := slicesx.Map(func(v library.Known) library.Known {
 			v = langx.Clone(v, timex.JSONSafeDecodeOption, library.KnownOptionAutoDescription)
-
 			return v
 		}, append(batch{}, chunk...)...)
 
