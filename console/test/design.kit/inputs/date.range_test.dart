@@ -267,8 +267,11 @@ void main() {
     });
   });
 
-  group('DateRangeInput focus loss submits', () {
-    testWidgets('losing focus calls onChanged with pending range', (tester) async {
+  group('DateRangeInput focus loss', () {
+    testWidgets('losing focus after only a begin pick does not submit', (tester) async {
+      // Picking begin alone advances to the end picker (see 'DateRangeInput
+      // picker' below) — it doesn't submit anything itself, so losing focus
+      // at that point shouldn't either.
       timex.Range? captured;
       await tester.pumpApp(
         Scaffold(
@@ -286,7 +289,6 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Pick a new begin date.
       final picked = DateTime(2027, 2, 1);
       tester.widget<CalendarDatePicker>(find.byType(CalendarDatePicker)).onDateChanged(picked);
       await tester.pump();
@@ -295,8 +297,7 @@ void main() {
       await tester.tap(find.byKey(const ValueKey('other')));
       await tester.pump();
 
-      expect(captured, isNotNull);
-      expect(captured!.begin, equals(picked.toUtc()));
+      expect(captured, isNull);
       expect(tester.takeException(), isNull);
     });
   });
@@ -336,7 +337,7 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('selecting a begin date updates pending but does not call onChanged', (tester) async {
+    testWidgets('selecting a begin date advances to the end picker without calling onChanged', (tester) async {
       timex.Range? captured;
       await tester.pumpApp(
         app(timex.Range(begin, end), (r) => captured = r),
@@ -349,10 +350,13 @@ void main() {
 
       expect(captured, isNull);
       expect(find.byType(CalendarDatePicker), findsOneWidget);
+      expect(tester.widget<CalendarDatePicker>(find.byType(CalendarDatePicker)).key, equals(const ValueKey('end')));
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('onChanged is called with pending range on deactivate', (tester) async {
+    testWidgets('selecting a begin date, then losing focus without picking an end date, does not submit', (
+      tester,
+    ) async {
       timex.Range? captured;
       await tester.pumpApp(
         app(timex.Range(begin, end), (r) => captured = r),
@@ -365,12 +369,11 @@ void main() {
 
       await tester.pumpWidget(const SizedBox());
 
-      expect(captured!.begin, equals(picked.toUtc()));
-      expect(captured!.end, equals(end));
+      expect(captured, isNull);
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('selecting an end date updates pending but does not call onChanged', (tester) async {
+    testWidgets('selecting an end date immediately calls onChanged with the full range', (tester) async {
       timex.Range? captured;
       await tester.pumpApp(
         app(timex.Range(begin, end), (r) => captured = r),
@@ -384,60 +387,86 @@ void main() {
       tester.widget<CalendarDatePicker>(find.byType(CalendarDatePicker)).onDateChanged(picked);
       await tester.pump();
 
-      expect(captured, isNull);
+      expect(captured, isNotNull);
+      expect(captured!.begin, equals(begin));
+      expect(captured!.end, equals(picked.toUtc()));
       expect(find.byType(CalendarDatePicker), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   });
 
-  group('DateRangeInput deactivate during build', () {
-    testWidgets('onChanged via deactivate during a build pass does not throw', (tester) async {
-      // Regression: deactivate was calling onChanged synchronously, which
-      // triggered setState on an ancestor that was mid-build (e.g. Queryer
-      // rebuilding its Value parser state). The fix defers onChanged to a
-      // post-frame callback so it never fires during a build pass.
-      timex.Range? captured;
-      bool built = false;
-
-      late StateSetter outerSetState;
-      await tester.pumpWidget(
-        MaterialApp(
-          home: StatefulBuilder(
-            builder: (context, setState) {
-              outerSetState = setState;
-              return Scaffold(
-                body:
-                    built
-                        ? const SizedBox()
-                        : DateRangeInput(
-                          value: timex.Range(begin, end),
-                          onChanged: (r) {
-                            captured = r;
-                            // Simulate what Queryer does: call setState on a
-                            // parent that may be building.
-                            outerSetState(() {});
-                          },
-                        ),
-              );
-            },
+  group('DateRangeInput Enter reaches focused controls', () {
+    testWidgets('pressing enter on the focused next-month chevron navigates the month', (tester) async {
+      bool changed = false;
+      await tester.pumpApp(
+        Scaffold(
+          body: SingleChildScrollView(
+            child: DateRangeInput(
+              value: timex.Range(begin, end),
+              onChanged: (_) => changed = true,
+              autofocus: true,
+            ),
           ),
         ),
       );
       await tester.pumpAndSettle();
 
-      // Select a new date so _pending != widget.value.
-      final picked = DateTime(2027, 2, 1);
-      tester.widget<CalendarDatePicker>(find.byType(CalendarDatePicker)).onDateChanged(picked);
-      await tester.pump();
+      // Tab: calendar -> month/year header -> prev month -> next month
+      for (int i = 0; i < 3; i++) {
+        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+        await tester.pump();
+      }
+      final focusedTooltip =
+          tester.binding.focusManager.primaryFocus?.context?.findAncestorWidgetOfExactType<Tooltip>()?.message;
+      expect(focusedTooltip, 'Next month');
 
-      // Trigger a rebuild that deactivates DateRangeInput mid-build.
-      outerSetState(() => built = true);
-      await tester.pump(); // must not throw
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
 
+      expect(changed, isFalse, reason: 'Enter on the chevron should navigate the month, not submit anything');
+      expect(find.byType(CalendarDatePicker), findsOneWidget);
       expect(tester.takeException(), isNull);
-      await tester.pump(); // post-frame: deferred onChanged fires
-      expect(captured, isNotNull);
-      expect(captured!.begin, equals(picked.toUtc()));
+    });
+
+    testWidgets('pressing enter on a focused day cell selects it', (
+      tester,
+    ) async {
+      await tester.pumpApp(
+        Scaffold(
+          body: SingleChildScrollView(
+            child: DateRangeInput(
+              value: timex.Range(begin, end),
+              onChanged: (_) {},
+              autofocus: true,
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Tab: calendar -> month/year header -> prev month -> next month -> day grid
+      for (int i = 0; i < 4; i++) {
+        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+        await tester.pump();
+      }
+      final label = tester.binding.focusManager.primaryFocus?.debugLabel ?? '';
+      expect(label, startsWith('Day'));
+
+      final beginBefore = tester.widget<typography.Timestamp>(find.byWidgetPredicate(
+        (w) => w is typography.Timestamp && w.timestamp == begin,
+      )).timestamp;
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+
+      final beginAfter = tester.widgetList<typography.Timestamp>(find.byType(typography.Timestamp)).first.timestamp;
+      expect(beginAfter, isNot(equals(beginBefore)), reason: 'Enter on the focused day cell should select it');
+      expect(
+        find.byType(CalendarDatePicker),
+        findsOneWidget,
+        reason: 'selecting the begin day should advance to the end picker, not disappear',
+      );
+      expect(tester.takeException(), isNull);
     });
   });
 
@@ -491,9 +520,40 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('pressing enter after switching to the end picker and choosing a date commits the pending range', (
+    testWidgets('switching from begin to end picker re-focuses the end calendar for keyboard navigation', (
       tester,
     ) async {
+      await tester.pumpApp(
+        Scaffold(
+          body: SingleChildScrollView(
+            child: DateRangeInput(
+              value: timex.Range(begin, end),
+              onChanged: (_) {},
+              autofocus: true,
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(endButton(end));
+      await tester.pumpAndSettle();
+
+      // Same tab sequence the initial (autofocused) begin picker responds
+      // to — calendar -> month/year header -> prev month -> next month ->
+      // day grid — proving the end picker is genuinely focused (not just
+      // some ancestor of it), not merely that a Tab press happens to land
+      // somewhere inside the calendar eventually.
+      for (int i = 0; i < 4; i++) {
+        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+        await tester.pump();
+      }
+      final label = tester.binding.focusManager.primaryFocus?.debugLabel ?? '';
+      expect(label, startsWith('Day'), reason: 'expected 4 tabs from the re-focused end picker to reach its day grid');
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('picking a begin then an end date commits the full picked range', (tester) async {
       timex.Range? captured;
       await tester.pumpApp(
         Scaffold(
@@ -508,22 +568,15 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Manually pick a begin date.
+      // Picking begin advances to the end picker automatically.
       final pickedBegin = DateTime(2027, 2, 1);
       tester.widget<CalendarDatePicker>(find.byType(CalendarDatePicker)).onDateChanged(pickedBegin);
       await tester.pumpAndSettle();
+      expect(captured, isNull);
 
-      // Switch to the end picker and manually pick an end date.
-      await tester.tap(endButton(end));
-      await tester.pumpAndSettle();
+      // Picking end commits the range immediately.
       final pickedEnd = DateTime(2027, 4, 10);
       tester.widget<CalendarDatePicker>(find.byType(CalendarDatePicker)).onDateChanged(pickedEnd);
-      await tester.pumpAndSettle();
-
-      // Commit via Enter, as a user would after finishing their manual pick —
-      // this should be intercepted by DateRangeInput's own FocusScope, not
-      // fall through to some outer handler.
-      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
       await tester.pumpAndSettle();
 
       expect(captured, isNotNull);
@@ -573,7 +626,9 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('selecting a date after navigating months submits the navigated date on deactivate', (tester) async {
+    testWidgets('selecting a begin date after navigating months advances to the end picker without submitting', (
+      tester,
+    ) async {
       timex.Range? captured;
       await tester.pumpApp(
         app(timex.Range(begin, end), (r) => captured = r),
@@ -587,10 +642,9 @@ void main() {
       tester.widget<CalendarDatePicker>(find.byType(CalendarDatePicker)).onDateChanged(picked);
       await tester.pump();
 
-      await tester.pumpWidget(const SizedBox());
-
-      expect(captured!.begin, equals(picked.toUtc()));
-      expect(captured!.end, equals(end));
+      expect(captured, isNull);
+      expect(find.byType(CalendarDatePicker), findsOneWidget);
+      expect(tester.widget<CalendarDatePicker>(find.byType(CalendarDatePicker)).key, equals(const ValueKey('end')));
       expect(tester.takeException(), isNull);
     });
   });

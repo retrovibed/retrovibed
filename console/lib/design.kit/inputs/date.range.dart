@@ -31,20 +31,19 @@ class _DateRangeInputState extends State<DateRangeInput> {
   DateTime _current = timex.epoch;
   timex.Range _pending;
 
-  // The range last handed to widget.onChanged (via _apply, e.g. pressing
-  // Enter). Since widget.value doesn't update until the caller rebuilds this
-  // widget with the new value — and a caller that treats onChanged as "this
-  // filter is now committed" may instead tear this widget down entirely —
-  // deactivate() must not compare _pending against widget.value alone, or it
-  // re-fires onChanged with a range it already reported, racing the caller's
-  // own in-flight handling of the first call.
-  timex.Range? _applied;
+  // Owned explicitly (rather than relying on Focus(autofocus:)) because
+  // _picker is swapped for a differently-keyed CalendarDatePicker every time
+  // _showBegin/_showEnd runs — autofocus only fires once, on the wrapping
+  // Focus widget's first attach, so it would never re-claim focus for a
+  // picker shown by a later tap on the begin/end buttons (or by the
+  // begin-pick auto-advancing to the end picker).
+  final FocusNode _node = FocusNode(debugLabel: 'DateRangeInput picker');
 
   // parentScope (rather than the default closedLoop) lets Tab/Shift+Tab
   // escape to whatever's next outside this widget — e.g. a field's preset
   // suggestion list shown alongside the picker — instead of endlessly
   // cycling begin/end/calendar in place.
-  final FocusScopeNode _focusScopeNode = FocusScopeNode(
+  final FocusScopeNode _focusScope = FocusScopeNode(
     traversalEdgeBehavior: TraversalEdgeBehavior.parentScope,
   );
 
@@ -53,33 +52,17 @@ class _DateRangeInputState extends State<DateRangeInput> {
   @override
   void initState() {
     super.initState();
-    postframe(() => _showBegin());
+    postframe(() => _showBegin(focus: widget.autofocus));
   }
 
   @override
   void dispose() {
-    _focusScopeNode.dispose();
+    _focusScope.dispose();
+    _node.dispose();
     super.dispose();
   }
 
-  @override
-  void deactivate() {
-    if (_pending != widget.value && _pending != _applied) {
-      postframe(() => widget.onChanged(_pending));
-    }
-    super.deactivate();
-  }
-
-  void _apply() {
-    widget.onChanged(_pending);
-    _applied = _pending;
-    setState(() {
-      _picker = ds.Empty;
-      _current = timex.epoch;
-    });
-  }
-
-  void _showBegin() {
+  void _showBegin({bool focus = true}) {
     final firstDate = timex.min([widget.firstDate, _pending.begin]);
     final lastDate = timex.max([widget.lastDate, _pending.end]);
 
@@ -94,12 +77,14 @@ class _DateRangeInputState extends State<DateRangeInput> {
           setState(() {
             _pending = timex.Range(d.toUtc(), _pending.end);
           });
+          _showEnd();
         },
       );
     });
+    if (focus) postframe(() => _node.requestFocus());
   }
 
-  void _showEnd() {
+  void _showEnd({bool focus = true}) {
     final firstDate = timex.min([widget.firstDate, _pending.begin]);
     final lastDate = timex.max([widget.lastDate, _pending.end]);
     setState(() {
@@ -110,12 +95,13 @@ class _DateRangeInputState extends State<DateRangeInput> {
         firstDate: firstDate.toLocal(),
         lastDate: lastDate.toLocal(),
         onDateChanged: (d) {
-          setState(() {
-            _pending = timex.Range(_pending.begin, d.toUtc());
-          });
+          final next = timex.Range(_pending.begin, d.toUtc());
+          setState(() => _pending = next);
+          widget.onChanged(next);
         },
       );
     });
+    if (focus) postframe(() => _node.requestFocus());
   }
 
   @override
@@ -127,19 +113,7 @@ class _DateRangeInputState extends State<DateRangeInput> {
     );
 
     return FocusScope(
-      node: _focusScopeNode,
-      onFocusChange: (hasFocus) {
-        if (!hasFocus && _pending != widget.value) {
-          _apply();
-        }
-      },
-      onKeyEvent: (node, event) {
-        if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.enter && _pending != widget.value) {
-          _apply();
-          return KeyEventResult.handled;
-        }
-        return KeyEventResult.ignored;
-      },
+      node: _focusScope,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -163,7 +137,7 @@ class _DateRangeInputState extends State<DateRangeInput> {
               ),
             ],
           ),
-          Focus(autofocus: widget.autofocus, child: _picker),
+          Focus(focusNode: _node, autofocus: widget.autofocus, child: _picker),
         ],
       ),
     );

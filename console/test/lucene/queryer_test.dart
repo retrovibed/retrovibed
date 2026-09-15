@@ -1116,6 +1116,58 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
+    testWidgets(
+      'pressing enter on a focused chevron while editing a committed DateRange chip navigates, not closes',
+      (tester) async {
+        await tester.pumpApp(
+          lucene.Queryer((_) {}, [
+            lucene.DateRange.auto('released', timex.Range.everything(), (_) {}),
+          ]),
+          physicalSize: const Size(800, 900),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.enterText(find.byType(TextField), '@released:');
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('last 7 days'));
+        await tester.pumpAndSettle();
+
+        // Open the already-committed chip's editor.
+        await tester.tap(find.byType(lucene.QueryerFilterChip));
+        await tester.pumpAndSettle();
+        expect(find.byType(CalendarDatePicker), findsOneWidget);
+
+        // A pending change is required to reach _editFilter's own
+        // Enter-closes-the-editor handling at all.
+        tester.widget<CalendarDatePicker>(find.byType(CalendarDatePicker)).onDateChanged(DateTime(2025, 6, 1));
+        await tester.pumpAndSettle();
+
+        // Tab: calendar -> month/year header -> prev month -> next month
+        for (int i = 0; i < 3; i++) {
+          await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+          await tester.pump();
+        }
+        final focusedTooltip =
+            tester.binding.focusManager.primaryFocus?.context?.findAncestorWidgetOfExactType<Tooltip>()?.message;
+        expect(focusedTooltip, 'Next month');
+
+        await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+        await tester.pumpAndSettle();
+
+        expect(
+          find.byType(CalendarDatePicker),
+          findsOneWidget,
+          reason: 'Enter on the chevron should navigate the month, not close the editor',
+        );
+
+        // Close the editor before the test ends so a stray postframe commit
+        // isn't left pending.
+        await tester.tap(find.byType(lucene.QueryerFilterChip));
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+      },
+    );
+
     // Note: arrow keys continuing to cycle field-name suggestions while the
     // search box has focus is already covered by the 'Queryer keyboard
     // navigation' group above (e.g. 'arrow down cycles to next suggestion').

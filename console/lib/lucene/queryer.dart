@@ -158,7 +158,23 @@ class _QueryerState extends State<Queryer> {
                 closeChip();
                 return KeyEventResult.handled;
               },
-              child: _w,
+              // Reinstates, closer to _w than our own onKeyEvent above, the
+              // Enter/Space -> ActivateIntent binding Flutter otherwise only
+              // registers once near the app root. Without this, a focused
+              // control inside _w (a calendar chevron, a day cell, a year
+              // selector) never gets to handle its own Enter press — our
+              // onKeyEvent above is closer to it than that root-level
+              // binding, so it always wins the race and closes the editor
+              // instead. This lets _w's own focused control consume Enter
+              // first when it has one.
+              child: Shortcuts(
+                shortcuts: const <ShortcutActivator, Intent>{
+                  SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
+                  SingleActivator(LogicalKeyboardKey.numpadEnter): ActivateIntent(),
+                  SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
+                },
+                child: _w,
+              ),
             );
       // The chip itself keeps keyboard focus after being tapped (Material's
       // tap-to-focus), and autofocus only claims focus for a newly-attached
