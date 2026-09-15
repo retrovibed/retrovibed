@@ -78,46 +78,12 @@ func tmdbNotFound(err error) bool {
 
 func (t *tmdbimport) movies(ctx context.Context, c *tmdb.Client) iter.Seq[library.Known] {
 	return func(yield func(library.Known) bool) {
-		var (
-			resp = &tmdb.DiscoverMovie{
-				PaginatedResultsMeta: tmdb.PaginatedResultsMeta{
-					TotalResults: math.MaxInt64,
-					TotalPages:   math.MaxInt64,
-				},
-			}
-		)
+		cctx, cancel := context.WithCancel(ctx)
+		defer cancel()
 
-		bs := backoffx.New(backoffx.Exponential(time.Second), backoffx.Maximum(time.Minute))
-		year := t.StartAt
-		cyear := t.EndAt.Add(24 * time.Hour)
-
-		for page := int64(1); cyear.After(year); {
-			var (
-				err error
-			)
-
-			resp, err = backoffx.AttemptV(ctx, bs, func(ctx context.Context, attempts uint) (*tmdb.DiscoverMovie, error) {
-				log.Println("retrieving movies", attempts, year, page)
-				if attempts > t.Attempts {
-					return nil, backoffx.ErrStopAttempts
-				}
-
-				return c.GetDiscoverMovie(map[string]string{
-					"include_adult":            "true",
-					"page":                     strconv.FormatInt(page, 10),
-					"primary_release_date.gte": year.Format(time.DateOnly),
-					"primary_release_date.lte": year.Format(time.DateOnly),
-					"sort_by":                  "primary_release_date.asc",
-				})
-			})
-
-			if err != nil {
-				errorsx.Debug(err)
-				t.cause = errorsx.Wrapf(err, "failed to discover movies %v - %d", year, page)
-				return
-			}
-
-			for _, mr := range resp.Results {
+		rmedia := make(chan library.Known, 128)
+		media := asynccompute.New(func(ctx context.Context, results []tmdb.MovieResult) error {
+			for _, mr := range results {
 				_md5 := md5x.JSON(mr)
 				uidmd5 := uuid.FromBytesOrNil(_md5.Sum(nil))
 				v := library.Known{
@@ -139,20 +105,75 @@ func (t *tmdbimport) movies(ctx context.Context, c *tmdb.Client) iter.Seq[librar
 					ParentUID:        uuid.Nil.String(),
 				}
 
-				if !yield(v) {
-					return
+				if !sendResult(ctx, rmedia, v) {
+					return context.Cause(ctx)
+				}
+			}
+			return nil
+		}, asynccompute.Workers[[]tmdb.MovieResult](t.Concurrency), asynccompute.Backlog[[]tmdb.MovieResult](t.Concurrency))
+		dates := asynccompute.New(func(ctx context.Context, year time.Time) (err error) {
+			var (
+				resp = &tmdb.DiscoverMovie{
+					PaginatedResultsMeta: tmdb.PaginatedResultsMeta{
+						TotalResults: math.MaxInt64,
+						TotalPages:   math.MaxInt64,
+					},
+				}
+			)
+
+			bs := backoffx.New(backoffx.Exponential(time.Second), backoffx.Maximum(time.Minute))
+			for page := int64(1); page <= resp.TotalPages; page = resp.Page + 1 {
+				resp, err = backoffx.AttemptV(ctx, bs, func(ctx context.Context, attempts uint) (*tmdb.DiscoverMovie, error) {
+					log.Println("retrieving movies", attempts, year, page)
+					if attempts > t.Attempts {
+						return nil, backoffx.ErrStopAttempts
+					}
+
+					return c.GetDiscoverMovie(map[string]string{
+						"include_adult":            "true",
+						"page":                     strconv.FormatInt(page, 10),
+						"primary_release_date.gte": year.Format(time.DateOnly),
+						"primary_release_date.lte": year.Format(time.DateOnly),
+						"sort_by":                  "primary_release_date.asc",
+					})
+				})
+
+				if err != nil {
+					return errorsx.Wrapf(err, "failed to discover movies %v - %d", year, page)
+				}
+
+				if err = media.Run(ctx, resp.Results); err != nil {
+					return errorsx.Wrap(err, "failed to push results")
 				}
 			}
 
-			year = slicesx.LastOrDefault(year, slicesx.MapTransform(func(mr tmdb.MovieResult) time.Time {
-				return timex.Max(errorsx.ZeroSilent(time.Parse(time.DateOnly, mr.ReleaseDate)), year)
-			}, resp.Results...)...)
+			return nil
+		}, asynccompute.Workers[time.Time](t.Concurrency), asynccompute.Backlog[time.Time](t.Concurrency))
+		go func() {
+			defer func() {
+				if err := asynccompute.Shutdown(context.WithoutCancel(ctx), dates, media); err != nil && t.cause == nil {
+					t.cause = err
+				}
+				close(rmedia)
+			}()
 
-			if page >= resp.TotalPages {
-				year = year.Add(24 * time.Hour)
-				page = 1
-			} else {
-				page = resp.Page + 1
+			for date, edate := t.StartAt, t.EndAt.Add(24*time.Hour); date.Before(edate); date = date.Add(24 * time.Hour) {
+				if err := dates.Run(cctx, date); err != nil {
+					t.cause = err
+					return
+				}
+			}
+		}()
+
+		stopped := false
+		for v := range rmedia {
+			if stopped {
+				continue
+			}
+
+			if !yield(v) {
+				cancel()
+				stopped = true
 			}
 		}
 	}
