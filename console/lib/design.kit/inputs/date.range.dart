@@ -63,7 +63,7 @@ class _DateRangeInputState extends State<DateRangeInput> {
       _current = _pending.begin;
       _picker = CalendarDatePicker(
         key: const ValueKey('begin'),
-        initialDate: _pending.begin.toLocal(),
+        initialDate: timex.max([_pending.begin.toLocal(), timex.now()]),
         firstDate: firstDate.toLocal(),
         lastDate: lastDate.toLocal(),
         onDateChanged: (d) {
@@ -125,15 +125,15 @@ class _DateRangeInputState extends State<DateRangeInput> {
                 child: TextButton(
                   autofocus: widget.autofocus,
                   onPressed: _showBegin,
-                  style: _current == _pending.begin ? activestyle : null,
-                  child: typography.Timestamp(_pending.begin),
+                  style: timex.neginf != _current && _current == _pending.begin ? activestyle : null,
+                  child: typography.Timestamp(_pending.begin, neginf: Text("")),
                 ),
               ),
               const Text('–'),
               Expanded(
                 child: TextButton(
                   onPressed: _showEnd,
-                  style: _current == _pending.end ? activestyle : null,
+                  style: timex.inf != _current && _current == _pending.end ? activestyle : null,
                   child: typography.Timestamp(_pending.end),
                 ),
               ),
