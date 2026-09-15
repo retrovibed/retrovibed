@@ -241,6 +241,13 @@ class _KnownMediaDropdown extends State<KnownMediaDropdown> {
                 });
                 refresh(_res.next);
               }),
+              lucene.Boolean.auto('adult', false, (v) {
+                setState(() {
+                  _res.next.adult = v;
+                  _res.next.offset = ds.Grid.int64(0);
+                });
+                refresh(_res.next);
+              }),
             ],
             onSubmitted: (v) {
               setState(() {
