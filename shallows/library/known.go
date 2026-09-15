@@ -85,6 +85,10 @@ func KnownOptionParentUID(v string) func(*Known) {
 	}
 }
 
+func KnownOptionAutoDescription(t *Known) {
+	t.AutoDescription = stringsx.Join("\n", t.Title, t.OriginalTitle, t.Overview)
+}
+
 // KnownCollationSpecialsSeason marks TMDB "Specials" (season_number == 0)
 // in the high 16 bits of Collation, instead of 0, so a specials episode
 // never collides with Collation == 0 (the standalone/overall item marker).

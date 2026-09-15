@@ -14,9 +14,10 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
-	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/library"
 )
 
@@ -67,7 +68,8 @@ func (t knownimport) run(ctx context.Context, db *sql.DB, r io.Reader) (err erro
 
 	for chunk := range iterx.Chunk(d.Each(ctx), t.Batch) {
 		owned := slicesx.Map(func(v library.Known) library.Known {
-			v.AutoDescription = stringsx.Join("\n", v.Title, v.OriginalTitle, v.Overview)
+			v = langx.Clone(v, timex.JSONSafeDecodeOption, library.KnownOptionAutoDescription)
+
 			return v
 		}, append(batch{}, chunk...)...)
 

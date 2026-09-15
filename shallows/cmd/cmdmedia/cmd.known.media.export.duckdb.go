@@ -1,15 +1,20 @@
 package cmdmedia
 
 import (
+	"context"
 	"database/sql"
+	"io"
 	"log"
-	"os"
+	"math"
 	"sync/atomic"
 
 	"github.com/Masterminds/squirrel"
+	"github.com/alecthomas/kong"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
+	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/library"
 )
 
@@ -24,18 +29,22 @@ type duckdbexport struct {
 	Limit    uint64   `flag:"" name:"limit" help:"maximum number of records to export (0 = unlimited)" default:"0"`
 }
 
-func (t duckdbexport) Run(gctx *cmdopts.Global) (err error) {
-	var (
-		db       *sql.DB
-		progress uint64
-	)
-
-	if db, err = cmdopts.DatabaseCustom(gctx.Context, t.Database); err != nil {
+func (t duckdbexport) Run(kctx *kong.Context, gctx *cmdopts.Global) (err error) {
+	db, err := cmdopts.DatabaseCustom(gctx.Context, t.Database)
+	if err != nil {
 		return err
 	}
 	defer db.Close()
 
-	d := jsonl.NewEncoder(os.Stdout)
+	return t.run(gctx.Context, db, kctx.Stdout)
+}
+
+func (t duckdbexport) run(ctx context.Context, db *sql.DB, out io.Writer) (err error) {
+	var progress uint64
+
+	t.Limit = langx.FirstNonZero(t.Limit, math.MaxInt64)
+
+	d := jsonl.NewEncoder(out)
 
 	b := library.KnownSearchBuilder().OrderBy("uid ASC").Where(squirrel.And{
 		library.KnownQueryUIDGreaterThan(t.Offset),
@@ -46,10 +55,10 @@ func (t duckdbexport) Run(gctx *cmdopts.Global) (err error) {
 		library.KnownQueryExplicit(t.Explicit),
 	}).Limit(t.Limit)
 
-	q := sqlx.Scan(library.KnownSearch(gctx.Context, db, b))
+	q := sqlx.Scan(library.KnownSearch(ctx, db, b))
 
 	for v := range q.Iter() {
-		if err := d.Encode(v); err != nil {
+		if err := d.Encode(langx.Clone(v, timex.JSONSafeEncodeOption)); err != nil {
 			return err
 		}
 
