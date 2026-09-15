@@ -41,6 +41,7 @@ class QueryerFilterChipState extends State<QueryerFilterChip> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final defaults = ds.Defaults.of(context);
     final chipTheme = theme.chipTheme;
     final bgColor = _open
         ? (chipTheme.selectedColor ?? theme.colorScheme.secondaryContainer)
@@ -53,33 +54,34 @@ class QueryerFilterChipState extends State<QueryerFilterChip> {
       },
       child: Tooltip(
         message: _open ? 'Press Enter to accept' : '',
-        child: InkWell(
-          mouseCursor: SystemMouseCursors.click,
-          onTap: _toggle,
-          borderRadius: BorderRadius.circular(8),
-          child: ds.Help(
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: bgColor,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  widget.filter,
-                  const SizedBox(width: 4),
-                  GestureDetector(
-                    onTap: _open ? accept : widget.onRemove,
-                    child: Tooltip(
-                      message: _open ? 'Accept' : 'Remove',
-                      child: Icon(_open ? Icons.check : Icons.close, size: 18),
+        child: Material(
+          color: bgColor,
+          borderRadius: defaults.borderRadius,
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            mouseCursor: SystemMouseCursors.click,
+            onTap: _toggle,
+            borderRadius: defaults.borderRadius,
+            child: ds.Help(
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    widget.filter,
+                    const SizedBox(width: 4),
+                    GestureDetector(
+                      onTap: _open ? accept : widget.onRemove,
+                      child: Tooltip(
+                        message: _open ? 'Accept' : 'Remove',
+                        child: Icon(_open ? Icons.check : Icons.close, size: 18),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
+              widget.filter.help,
             ),
-            widget.filter.help,
           ),
         ),
       ),

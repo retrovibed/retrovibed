@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:retrovibed/designkit.dart' as ds;
 
 class SuggestionList extends StatefulWidget {
   final List<(Widget label, VoidCallback onSelect)> items;
@@ -35,30 +36,29 @@ class SuggestionListState extends State<SuggestionList> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.items.isEmpty) return const SizedBox.shrink();
-    final theme = Theme.of(context);
-    return Material(
-      elevation: 4,
-      color: theme.colorScheme.surface,
-      borderRadius: BorderRadius.circular(4),
-      clipBehavior: Clip.antiAlias,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: widget.items.indexed.map(
-          (entry) {
-            final (i, item) = entry;
-            return SizedBox(
-              height: 32,
-              child: ListTile(
+    if (widget.items.isEmpty) return ds.Empty;
+    final defaults = ds.Defaults.of(context);
+    return ds.Container(
+      padding: defaults.padding / 8,
+      Material(
+        elevation: 4,
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: widget.items.indexed.map(
+            (entry) {
+              final (i, item) = entry;
+              return ListTile(
                 dense: true,
                 selected: i == _selected,
+                selectedTileColor: defaults.highlight,
                 title: item.$1,
                 trailing: const Icon(Icons.chevron_right, size: 16),
                 onTap: item.$2,
-              ),
-            );
-          },
-        ).toList(),
+              );
+            },
+          ).toList(),
+        ),
       ),
     );
   }
