@@ -360,12 +360,7 @@ func (t *tmdbimport) series(ctx context.Context, c *tmdb.Client) iter.Seq[librar
 			}()
 
 			var (
-				resp = &tmdb.DiscoverTV{
-					PaginatedResultsMeta: tmdb.PaginatedResultsMeta{
-						TotalResults: math.MaxInt64,
-						TotalPages:   math.MaxInt64,
-					},
-				}
+				resp *tmdb.DiscoverTV
 			)
 
 			bs := backoffx.New(backoffx.Exponential(time.Second), backoffx.Maximum(time.Minute))
