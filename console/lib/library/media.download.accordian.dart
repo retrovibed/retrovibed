@@ -4,6 +4,7 @@ import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/httpx.dart' as httpx;
+import 'package:retrovibed/torrentx/display.dart' as torrentx;
 
 class MediaDownloadAccordian extends StatelessWidget {
   final String torrentId;
@@ -12,15 +13,18 @@ class MediaDownloadAccordian extends StatelessWidget {
     String id,
     media.Download download, {
     List<httpx.Option> options,
-  }) discoveredUpdate;
+  })
+  discoveredUpdate;
   final Future<media.DownloadDeleteResponse> Function(
     String id, {
     List<httpx.Option> options,
-  }) discoveredReset;
+  })
+  discoveredReset;
   final Future<media.DownloadMetadataResponse> Function(
     String id, {
     List<httpx.Option> options,
-  }) discoveredGet;
+  })
+  discoveredGet;
   final void Function()? onReset;
 
   const MediaDownloadAccordian({
@@ -47,49 +51,48 @@ class MediaDownloadAccordian extends StatelessWidget {
             media.DownloadDisplay.fromID(
               torrentId,
               get: discoveredGet,
-              onVerify:
-                  (download) => ds.modals.asyncfn(
-                    context,
-                    (completion) => ds.Confirmation.yesNo(
-                      content: Text(
-                        "Are you sure you want to verify $description?",
-                      ),
-                      onConfirm: (ctx) {
-                        discoveredUpdate(
-                          torrentId,
-                          download..verifyAt = DateTime.now().toUtc().toIso8601String(),
-                          options: [authn.request(authn.AuthzCache.meta(ctx))],
-                        )
-                            .then((_) => completion.complete())
-                            .catchError((cause) {
-                              completion.completeError(cause);
-                            });
-                      },
-                      onCancel: (_) => completion.complete(),
-                    ),
+              onVerify: (download) => ds.modals.asyncfn(
+                context,
+                (completion) => ds.Confirmation.yesNo(
+                  content: Text(
+                    "Are you sure you want to verify $description?",
                   ),
-              onTap:
-                  () => ds.modals.asyncfn(context, (completion) {
-                    return ds.Confirmation.yesNo(
-                      content: Text(
-                        "Are you sure you want to reset $description?",
-                      ),
-                      onConfirm: (ctx) {
-                        discoveredReset(
+                  onConfirm: (ctx) {
+                    discoveredUpdate(
+                      torrentId,
+                      download..verifyAt = DateTime.now().toUtc().toIso8601String(),
+                      options: [authn.request(authn.AuthzCache.meta(ctx))],
+                    ).then((_) => completion.complete()).catchError((cause) {
+                      completion.completeError(cause);
+                    });
+                  },
+                  onCancel: (_) => completion.complete(),
+                ),
+              ),
+              onTap: () => ds.modals.asyncfn(context, (completion) {
+                return ds.Confirmation.yesNo(
+                  content: Text(
+                    "Are you sure you want to reset $description?",
+                  ),
+                  onConfirm: (ctx) {
+                    discoveredReset(
                           torrentId,
                           options: [authn.request(authn.AuthzCache.meta(ctx))],
                         )
-                            .then((_) {
-                              onReset?.call();
-                              completion.complete();
-                            })
-                            .catchError((cause) {
-                              completion.completeError(cause);
-                            });
-                      },
-                      onCancel: (_) => completion.complete(),
-                    );
-                  }),
+                        .then((_) {
+                          onReset?.call();
+                          completion.complete();
+                        })
+                        .catchError((cause) {
+                          completion.completeError(cause);
+                        });
+                  },
+                  onCancel: (_) => completion.complete(),
+                );
+              }),
+            ),
+            torrentx.TorrentDisplay.fromID(
+              torrentId,
             ),
           ],
         ),
