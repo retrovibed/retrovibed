@@ -4,7 +4,10 @@ import 'package:retrovibed/design.kit/forms.dart' as forms;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'package:retrovibed/authn.dart' as authn;
+import 'package:retrovibed/lucene.dart' as lucene;
 import 'package:retrovibed/media.dart' as _media;
+import 'package:retrovibed/meta/meta.search.pb.dart' as meta;
+import 'package:retrovibed/timex.dart' as timex;
 import 'known.media.card.dart';
 import 'known.media.typography.dart';
 import './api.dart' as api;
@@ -227,6 +230,18 @@ class _KnownMediaDropdown extends State<KnownMediaDropdown> {
             decoration: InputDecoration(hintText: "search known media"),
             controller: widget.controller,
             focus: widget.focus,
+            filters: [
+              lucene.DateRange.auto('released', timex.Range.everything(), (r) {
+                setState(() {
+                  _res.next.released = meta.DateRange(
+                    oldest: timex.formatISO8601(r.begin),
+                    newest: timex.formatISO8601(r.end),
+                  );
+                  _res.next.offset = ds.Grid.int64(0);
+                });
+                refresh(_res.next);
+              }),
+            ],
             onSubmitted: (v) {
               setState(() {
                 _res.next.query = v;
