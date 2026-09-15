@@ -33,6 +33,7 @@ class _State extends State<PlayerControlPlayback> with ds.LoadingState {
 
   @override
   Widget build(BuildContext context) {
+    final defaults = ds.Defaults.of(context);
     final durationMs = widget.current.playback.duration.toInt();
     final hasDuration = durationMs > 0;
     final position = (_dragging ?? widget.current.playback.position.toDouble()).clamp(
@@ -40,27 +41,30 @@ class _State extends State<PlayerControlPlayback> with ds.LoadingState {
       hasDuration ? durationMs.toDouble() : 0.0,
     );
 
-    return Row(
-      children: [
-        Expanded(
-          child: Slider(
-            value: position,
-            min: 0,
-            max: hasDuration ? durationMs.toDouble() : 1.0,
-            onChanged: !hasDuration ? null : (v) => setState(() => _dragging = v),
-            onChangeEnd: !hasDuration
-                ? null
-                : (v) {
-                    final delta = (v - widget.current.playback.position.toDouble()).round();
-                    widget.socket.send(remote.messages.seek(delta, sessionId: widget.sessionId));
-                    Future.delayed(const Duration(milliseconds: 1000), () {
-                      setState(() => _dragging = null);
-                    });
-                  },
+    return Padding(
+      padding: defaults.padding,
+      child: Row(
+        children: [
+          Expanded(
+            child: Slider(
+              value: position,
+              min: 0,
+              max: hasDuration ? durationMs.toDouble() : 1.0,
+              onChanged: !hasDuration ? null : (v) => setState(() => _dragging = v),
+              onChangeEnd: !hasDuration
+                  ? null
+                  : (v) {
+                      final delta = (v - widget.current.playback.position.toDouble()).round();
+                      widget.socket.send(remote.messages.seek(delta, sessionId: widget.sessionId));
+                      Future.delayed(const Duration(milliseconds: 1000), () {
+                        setState(() => _dragging = null);
+                      });
+                    },
+            ),
           ),
-        ),
-        ds.Duration.elapsed(Duration(milliseconds: (durationMs - position).round())),
-      ],
+          ds.Duration.elapsed(Duration(milliseconds: (durationMs - position).round())),
+        ],
+      ),
     );
   }
 }

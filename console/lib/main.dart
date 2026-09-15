@@ -107,6 +107,9 @@ class Retrovibed extends StatelessWidget {
         listTileTheme: ListTileThemeData(
           mouseCursor: WidgetStateProperty.all(SystemMouseCursors.click),
         ),
+        sliderTheme: SliderThemeData(
+          overlayShape: SliderComponentShape.noOverlay,
+        ),
       ),
       themeMode: ThemeMode.dark,
       builder: (context, child) {
