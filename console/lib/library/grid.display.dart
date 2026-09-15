@@ -159,7 +159,10 @@ class _GridState extends State<Grid> {
                   onPressed: KnownMediaDropdown.modal(
                     context,
                     _media,
-                    onChange: _replace,
+                    onChange: (v) {
+                      _replace(v);
+                      refresh();
+                    },
                     mimetype: category,
                   ),
                 ),

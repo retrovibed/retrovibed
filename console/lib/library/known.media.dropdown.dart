@@ -57,7 +57,7 @@ class KnownMediaDropdown extends StatefulWidget {
     BuildContext context,
     _media.Media current, {
     String mimetype = "",
-    void Function(_media.Media)? onChange,
+    void Function(_media.Media) onChange = ds.fnNoop,
   }) {
     return () {
       // Capture auth while the caller's context is still valid (modal opening).
@@ -70,12 +70,11 @@ class KnownMediaDropdown extends StatefulWidget {
             current: current.knownMediaId,
             mimetype: mimetype,
             onChange: (known) {
-              _sync(authOptions, current, known)
-                  .then<void>((v) {
-                    onChange?.call(v);
-                    completion.complete();
-                  })
-                  .catchError(completion.completeError);
+              _sync(
+                authOptions,
+                current,
+                known,
+              ).then<void>(onChange).then(completion.complete).catchError(completion.completeError);
             },
           ),
         ),
@@ -210,10 +209,9 @@ class _KnownMediaDropdown extends State<KnownMediaDropdown> {
           KnownMediaTypography.removebtn(
             context,
             widget.current,
-            onPressed:
-                () => setState(() {
-                  current = null;
-                }),
+            onPressed: () => setState(() {
+              current = null;
+            }),
           ),
         ],
       );
@@ -280,15 +278,14 @@ class _KnownMediaDropdown extends State<KnownMediaDropdown> {
                 return KnownMediaCard(
                   v,
                   icon: Icons.search,
-                  onDoubleTap:
-                      widget.onChange == null
-                          ? null
-                          : () {
-                            setState(() {
-                              current = v;
-                            });
-                            widget.onChange!(v);
-                          },
+                  onTap: widget.onChange == null
+                      ? null
+                      : () {
+                          setState(() {
+                            current = v;
+                          });
+                          widget.onChange!(v);
+                        },
                 );
               },
             ),
