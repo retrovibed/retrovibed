@@ -170,28 +170,6 @@ class _QueryerState extends State<Queryer> {
     });
   }
 
-  // Arrow keys should cycle the suggestion list highlight while focus is on
-  // the search box itself *or* already inside the suggestion list (reached
-  // via Tab) — but not once focus has moved into an open field editor (e.g.
-  // a calendar), where arrows should drive that widget's own navigation
-  // instead.
-  bool _arrowKeysShouldCycleSuggestions() {
-    if (_searchFieldMarker.hasFocus) return true;
-    final suggestionListContext = _suggestionKey.currentContext;
-    if (suggestionListContext == null) return false;
-    var focused = FocusManager.instance.primaryFocus?.context;
-    if (focused == suggestionListContext) return true;
-    var found = false;
-    focused?.visitAncestorElements((el) {
-      if (el == suggestionListContext) {
-        found = true;
-        return false;
-      }
-      return true;
-    });
-    return found;
-  }
-
   void _resetMode() {
     if (_mode == ParserResult.close) return;
     final current = _mode;
@@ -245,12 +223,12 @@ class _QueryerState extends State<Queryer> {
         const SingleActivator(LogicalKeyboardKey.arrowDown): (
           const Text('next suggestion'),
           () {
-            // Only cycle suggestions while focus is on the search box or the
-            // suggestion list itself — once focus has moved into an open
-            // field editor (e.g. a calendar), arrows should drive normal
-            // focus navigation there instead of silently hijacking
-            // suggestion-list bookkeeping.
-            if (!_arrowKeysShouldCycleSuggestions() || !(_suggestionKey.currentState?.hasItems ?? false)) {
+            // Only cycle suggestions while focus is on the search box —
+            // once focus has moved into the suggestion list itself,
+            // SuggestionList's own Focus.onKeyEvent handles it directly;
+            // once it's moved into an open field editor (e.g. a calendar),
+            // arrows should drive normal focus navigation there instead.
+            if (!_searchFieldMarker.hasFocus || !(_suggestionKey.currentState?.hasItems ?? false)) {
               return KeyEventResult.ignored;
             }
             print("queryer: arrowDown");
@@ -261,7 +239,7 @@ class _QueryerState extends State<Queryer> {
         const SingleActivator(LogicalKeyboardKey.arrowUp): (
           const Text('previous suggestion'),
           () {
-            if (!_arrowKeysShouldCycleSuggestions() || !(_suggestionKey.currentState?.hasItems ?? false)) {
+            if (!_searchFieldMarker.hasFocus || !(_suggestionKey.currentState?.hasItems ?? false)) {
               return KeyEventResult.ignored;
             }
             print("queryer: arrowUp");

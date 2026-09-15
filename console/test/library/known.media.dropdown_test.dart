@@ -186,5 +186,50 @@ void main() {
         expect(tester.takeException(), isNull);
       });
     });
+
+    group('search failure handling', () {
+      testWidgets('search error surfaces as an unknown-error state instead of crashing', (tester) async {
+        api.KnownSearchRequest? capturedReq;
+
+        final current = media.Media(
+          id: uuidx.withSuffix(1),
+          description: 'Test',
+          mimetype: 'video/mp4',
+          createdAt: DateTime.now().toIso8601String(),
+          archiveId: uuidx.min(),
+          torrentId: uuidx.min(),
+          knownMediaId: uuidx.min(),
+        );
+
+        await tester.pumpApp(
+          _wrap(
+            (ctx) => KnownMediaDropdown.inline(
+              ctx,
+              current,
+              search: (req, {options = const []}) async {
+                capturedReq = req;
+                throw Exception('boom');
+              },
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Reproduces the reported crash report: the user starts a `released`
+        // date-range filter but leaves it unfinished ("@released:"), then hits
+        // the search button before completing it. SearchTray's search button
+        // forwards this raw, unfinished text straight to KnownMediaDropdown's
+        // onSubmitted, which sends it on as the search query.
+        await tester.enterText(find.byType(TextField), '@released:');
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byIcon(Icons.search_rounded));
+        await tester.pumpAndSettle();
+
+        expect(capturedReq?.query, equals('@released:'));
+        expect(find.text('an unexpected problem has occurred'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
+    });
   });
 }
