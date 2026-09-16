@@ -314,6 +314,23 @@ func RecentSessionInsertWithDefaults(
 	gql.Into("library_recent_sessions").Default("created_at", "updated_at", "last_played_at").Conflict("ON CONFLICT (profile_id, id) DO UPDATE SET position = EXCLUDED.position, duration = EXCLUDED.duration, query = EXCLUDED.query, updated_at = DEFAULT, last_played_at = DEFAULT")
 }
 
+func WatchHistory(gql genieql.Structure) {
+	gql.From(
+		gql.Table("library_watch_history"),
+	)
+}
+
+func WatchHistoryScanner(gql genieql.Scanner, pattern func(i WatchHistory)) {
+	gql.ColumnNamePrefix("library_watch_history.")
+}
+
+func WatchHistoryInsertWithDefaults(
+	gql genieql.Insert,
+	pattern func(ctx context.Context, q sqlx.Queryer, a WatchHistory) NewWatchHistoryScannerStaticRow,
+) {
+	gql.Into("library_watch_history").Default("created_at", "updated_at").Conflict("ON CONFLICT (id) DO UPDATE SET duration = EXCLUDED.duration, updated_at = DEFAULT")
+}
+
 func Recommendation(gql genieql.Structure) {
 	gql.From(
 		gql.Table("library_recommendations"),

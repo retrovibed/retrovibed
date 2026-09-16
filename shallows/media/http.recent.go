@@ -69,6 +69,12 @@ func (t *HTTPRecent) Bind(r *mux.Router) {
 		httpauth.AuthenticateWithToken(t.jwtsecret),
 		httpx.Timeout2s(),
 	).ThenFunc(t.tombstone))
+
+	r.Path("/history").Methods(http.MethodPost).Handler(alice.New(
+		httpx.ContextBufferPool512(),
+		httpauth.AuthenticateWithToken(t.jwtsecret),
+		httpx.Timeout2s(),
+	).ThenFunc(t.history))
 }
 
 func (t *HTTPRecent) latest(w http.ResponseWriter, r *http.Request) {
@@ -209,6 +215,43 @@ func (t *HTTPRecent) record(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err = httpx.WriteJSON(w, httpx.GetBuffer(r), &RecentRecordResponse{}); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to write response"))
+		return
+	}
+}
+
+func (t *HTTPRecent) history(w http.ResponseWriter, r *http.Request) {
+	var (
+		err error
+		wh  library.WatchHistory
+		msg library.WatchHistoryRecordRequest
+		pid string
+	)
+
+	if err = jsonx.UnmarshalRead(r.Body, &msg); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to decode request"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		return
+	}
+
+	if _, pid, err = httpauth.IssuerSubjectID(r.Context(), t.jwtsecret, r); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to retrieve profile id"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		return
+	}
+
+	if err = library.WatchHistoryInsertWithDefaults(r.Context(), t.q, library.WatchHistory{
+		ID:        msg.Record.Id,
+		ProfileID: pid,
+		MediaID:   msg.Record.MediaId,
+		Duration:  time.Duration(msg.Record.Duration) * time.Millisecond,
+	}).Scan(&wh); err != nil {
+		log.Println(errorsx.Wrap(err, "upsert failed"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	if err = httpx.WriteJSON(w, httpx.GetBuffer(r), &library.WatchHistoryRecordResponse{}); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to write response"))
 		return
 	}
