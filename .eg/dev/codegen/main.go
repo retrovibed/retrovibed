@@ -33,7 +33,7 @@ func main() {
 				),
 				console.GenerateBinding,
 				shell.Op(
-					shell.New("git diff > ${PATCH}").Environ("PATCH", egenv.CacheDirectory("codegen.patch")),
+					shell.New("git add -A && git diff --cached > $PATCH").Environ("PATCH", egenv.CacheDirectory("codegen.patch")),
 				),
 			),
 		),
