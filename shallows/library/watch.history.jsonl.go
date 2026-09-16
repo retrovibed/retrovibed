@@ -2,6 +2,7 @@ package library
 
 import (
 	"context"
+	"errors"
 	"io"
 
 	"github.com/Masterminds/squirrel"
@@ -10,9 +11,11 @@ import (
 )
 
 // WatchHistoryJSONLEncode streams library_watch_history rows matching b as JSONL to w.
-func WatchHistoryJSONLEncode(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilder, w io.Writer) error {
+func WatchHistoryJSONLEncode(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilder, w io.Writer) (err error) {
 	scanner := WatchHistorySearch(ctx, q, b)
-	defer scanner.Close()
+	defer func() {
+		err = errors.Join(err, scanner.Close())
+	}()
 
 	enc := jsonl.NewEncoder(w)
 	for scanner.Next() {
