@@ -21,6 +21,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
@@ -78,6 +79,7 @@ func tmdbNotFound(err error) bool {
 
 func (t *tmdbimport) movies(ctx context.Context, c *tmdb.Client) iter.Seq[library.Known] {
 	return func(yield func(library.Known) bool) {
+		const pagelimit = 500 // tmdb limits the maximum number of pages to 500.
 		cctx, cancel := context.WithCancel(ctx)
 		defer cancel()
 
@@ -124,8 +126,8 @@ func (t *tmdbimport) movies(ctx context.Context, c *tmdb.Client) iter.Seq[librar
 			bs := backoffx.New(backoffx.Exponential(time.Second), backoffx.Maximum(time.Minute))
 			for page := int64(1); page <= resp.TotalPages; page = resp.Page + 1 {
 				resp, err = backoffx.AttemptV(ctx, bs, func(ctx context.Context, attempts uint) (*tmdb.DiscoverMovie, error) {
-					log.Println("retrieving movies", attempts, year, page)
-					if attempts > t.Attempts {
+					log.Println("retrieving movies", attempts, year, len(langx.Zero(resp.DiscoverMovieResults).Results), page, "/", resp.TotalPages)
+					if attempts > t.Attempts || page > pagelimit {
 						return nil, backoffx.ErrStopAttempts
 					}
 
@@ -140,6 +142,10 @@ func (t *tmdbimport) movies(ctx context.Context, c *tmdb.Client) iter.Seq[librar
 
 				if err != nil {
 					return errorsx.Wrapf(err, "failed to discover movies %v - %d", year, page)
+				}
+
+				if len(resp.Results) == 0 {
+					break
 				}
 
 				if err = media.Run(ctx, resp.Results); err != nil {
@@ -260,18 +266,19 @@ func (t *tmdbimport) seriesKnown(mr tmdb.TVShowResult) library.Known {
 // episode's siblings emitted in order).
 func (t *tmdbimport) series(ctx context.Context, c *tmdb.Client) iter.Seq[library.Known] {
 	return func(yield func(library.Known) bool) {
+		const pagelimit = 500 // tmdb limits the maximum number of pages to 500.
 		cctx, cancel := context.WithCancel(ctx)
 		defer cancel()
 
 		results := make(chan library.Known, 128)
 
 		var (
-			poolEpisodes *asynccompute.Pool[retrieveEpisodesJob]
-			poolProcess  *asynccompute.Pool[processSeriesJob]
-			poolSeries   *asynccompute.Pool[retrieveSeriesJob]
+			episodes   *asynccompute.Pool[retrieveEpisodesJob]
+			series     *asynccompute.Pool[processSeriesJob]
+			poolSeries *asynccompute.Pool[retrieveSeriesJob]
 		)
 
-		poolEpisodes = asynccompute.New(func(ctx context.Context, job retrieveEpisodesJob) error {
+		episodes = asynccompute.New(func(ctx context.Context, job retrieveEpisodesJob) error {
 			bs := backoffx.New(backoffx.Exponential(time.Second), backoffx.Maximum(time.Minute))
 
 			sdetails, err := backoffx.AttemptV(ctx, bs, func(ctx context.Context, attempts uint) (*tmdb.TVSeasonDetails, error) {
@@ -329,14 +336,14 @@ func (t *tmdbimport) series(ctx context.Context, c *tmdb.Client) iter.Seq[librar
 			return nil
 		}, asynccompute.Workers[retrieveEpisodesJob](t.Concurrency), asynccompute.Backlog[retrieveEpisodesJob](t.Concurrency))
 
-		poolProcess = asynccompute.New(func(ctx context.Context, job processSeriesJob) error {
+		series = asynccompute.New(func(ctx context.Context, job processSeriesJob) error {
 			v := t.seriesKnown(job.mr)
 			if !sendResult(ctx, results, v) {
 				return context.Cause(ctx)
 			}
 
 			for _, season := range job.details.Seasons {
-				if err := poolEpisodes.Run(ctx, retrieveEpisodesJob{showID: job.mr.ID, season: season, parent: v}); err != nil {
+				if err := episodes.Run(ctx, retrieveEpisodesJob{showID: job.mr.ID, season: season, parent: v}); err != nil {
 					return err
 				}
 			}
@@ -361,7 +368,7 @@ func (t *tmdbimport) series(ctx context.Context, c *tmdb.Client) iter.Seq[librar
 				return errorsx.Wrapf(err, "failed to retrieve tv details %d", job.mr.ID)
 			}
 
-			return poolProcess.Run(ctx, processSeriesJob{mr: job.mr, details: details})
+			return series.Run(ctx, processSeriesJob{mr: job.mr, details: details})
 		}, asynccompute.Workers[retrieveSeriesJob](t.Concurrency), asynccompute.Backlog[retrieveSeriesJob](t.Concurrency))
 
 		go func() {
@@ -374,7 +381,7 @@ func (t *tmdbimport) series(ctx context.Context, c *tmdb.Client) iter.Seq[librar
 				// next, and the same holds one level further down for
 				// poolEpisodes. So by the time Shutdown returns, nothing
 				// can still be sending to results.
-				if err := asynccompute.Shutdown(context.WithoutCancel(ctx), poolSeries, poolProcess, poolEpisodes); err != nil && t.cause == nil {
+				if err := asynccompute.Shutdown(context.WithoutCancel(ctx), poolSeries, series, episodes); err != nil && t.cause == nil {
 					t.cause = err
 				}
 				close(results)
@@ -395,7 +402,7 @@ func (t *tmdbimport) series(ctx context.Context, c *tmdb.Client) iter.Seq[librar
 
 				resp, err = backoffx.AttemptV(cctx, bs, func(ctx context.Context, attempts uint) (*tmdb.DiscoverTV, error) {
 					log.Println("retrieving series", attempts, year, page)
-					if attempts > t.Attempts {
+					if attempts > t.Attempts || page > pagelimit {
 						return nil, backoffx.ErrStopAttempts
 					}
 

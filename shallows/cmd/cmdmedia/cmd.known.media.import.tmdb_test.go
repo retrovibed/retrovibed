@@ -291,6 +291,50 @@ func TestTmdbImportSeries(t *testing.T) {
 		// bounds that prefetch instead of requiring exactly zero extra work.
 		require.LessOrEqual(t, requests.Load(), int64(1+int(tm.Concurrency)), "should not issue unbounded additional requests once the consumer stops iterating")
 	})
+
+	t.Run("requests the next page without checking whether the previous page's results were empty", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		// Same junk-date pocket TMDB behavior as the movies discovery: a day
+		// can report a large total_pages up front while the actual results
+		// dry up well before that count.
+		var discoverRequests atomic.Int64
+		routes := mux.NewRouter()
+		routes.HandleFunc("/discover/tv", func(w http.ResponseWriter, r *http.Request) {
+			discoverRequests.Add(1)
+			day := r.URL.Query().Get("first_air_date.gte")
+			page := r.URL.Query().Get("page")
+			switch {
+			case day == "1700-02-09" && page == "1":
+				errorsx.Zero(fmt.Fprint(w, `{"page":1,"total_results":1,"total_pages":500,"results":[{"id":1,"name":"Show One"}]}`))
+			case day == "1700-02-09" && page == "2":
+				errorsx.Zero(fmt.Fprint(w, `{"page":2,"total_results":1,"total_pages":500,"results":[]}`))
+			case day == "1700-02-10" && page == "1":
+				errorsx.Zero(fmt.Fprint(w, `{"page":1,"total_results":0,"total_pages":0,"results":[]}`))
+			default:
+				t.Fatalf("unexpected request: day=%s page=%s", day, page)
+			}
+		})
+		routes.HandleFunc("/tv/{id}", func(w http.ResponseWriter, r *http.Request) {
+			errorsx.Zero(fmt.Fprint(w, `{"id":`+mux.Vars(r)["id"]+`,"seasons":[]}`))
+		})
+		srv := httptest.NewServer(routes)
+		defer srv.Close()
+
+		start := time.Date(1700, 2, 9, 0, 0, 0, 0, time.UTC)
+		end := time.Date(1700, 2, 10, 0, 0, 0, 0, time.UTC)
+		tm := &tmdbimport{StartAt: start, EndAt: end, Attempts: 1}
+
+		var titles []string
+		for v := range tm.series(ctx, newTmdbTestClient(t, srv)) {
+			titles = append(titles, v.Title)
+		}
+
+		require.NoError(t, tm.cause)
+		require.Equal(t, []string{"Show One"}, titles)
+		require.Equal(t, int64(3), discoverRequests.Load(), "should advance to the next day after the first empty page instead of paginating all the way to a bogus total_pages")
+	})
 }
 
 func TestTmdbImportMovies(t *testing.T) {
@@ -422,5 +466,43 @@ func TestTmdbImportMovies(t *testing.T) {
 
 		require.Error(t, tm.cause)
 		require.Contains(t, tm.cause.Error(), "failed to discover movies")
+	})
+
+	t.Run("requests the next page without checking whether the previous page's results were empty", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		// TMDB has junk movie entries sharing a single placeholder
+		// release_date (e.g. 1700-xx-xx). Discovering one of those dates can
+		// report a large total_pages up front, but the actual results dry up
+		// well before that count - production saw this drive a single date
+		// through 70+ page requests because nothing checks for an empty
+		// results page before requesting the next one.
+		var requests atomic.Int64
+		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			requests.Add(1)
+			page := r.URL.Query().Get("page")
+			switch page {
+			case "1":
+				errorsx.Zero(fmt.Fprint(w, `{"page":1,"total_results":1,"total_pages":500,"results":[{"id":1,"title":"Movie One"}]}`))
+			case "2":
+				errorsx.Zero(fmt.Fprint(w, `{"page":2,"total_results":1,"total_pages":500,"results":[]}`))
+			default:
+				t.Fatalf("unexpected page requested: %s", page)
+			}
+		}))
+		defer srv.Close()
+
+		day := time.Date(1700, 2, 9, 0, 0, 0, 0, time.UTC)
+		tm := &tmdbimport{StartAt: day, EndAt: day, Attempts: 1}
+
+		var titles []string
+		for v := range tm.movies(ctx, newTmdbTestClient(t, srv)) {
+			titles = append(titles, v.Title)
+		}
+
+		require.NoError(t, tm.cause)
+		require.Equal(t, []string{"Movie One"}, titles)
+		require.Equal(t, int64(2), requests.Load(), "should stop at the first empty page instead of paginating all the way to a bogus total_pages")
 	})
 }
