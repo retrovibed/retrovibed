@@ -456,6 +456,12 @@ void main() {
         (w) => w is typography.Timestamp && w.timestamp == begin,
       )).timestamp;
 
+      // The day grid focuses the already-selected day (begin) by default, so
+      // move focus to an adjacent day first — otherwise Enter would just
+      // reselect begin and never change it.
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      await tester.pump();
+
       await tester.sendKeyEvent(LogicalKeyboardKey.enter);
       await tester.pumpAndSettle();
 

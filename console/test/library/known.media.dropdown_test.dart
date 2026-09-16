@@ -89,7 +89,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        await tester.doubleTap(find.byType(KnownMediaCard).first);
+        await tester.tap(find.byType(KnownMediaCard).first);
         await tester.pumpAndSettle();
 
         expect(libraryCalled, isTrue);
@@ -135,7 +135,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        await tester.doubleTap(find.byType(KnownMediaCard).first);
+        await tester.tap(find.byType(KnownMediaCard).first);
         await tester.pumpAndSettle();
 
         expect(discoveredCalled, isTrue);
