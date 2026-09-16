@@ -187,6 +187,57 @@ func TestTmdbImportSeries(t *testing.T) {
 		require.Equal(t, uuid.Nil.String(), got.ParentUID)
 	})
 
+	t.Run("a movie, a show, and an episode sharing the same tmdb numeric id never collide into the same UID", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		// TMDB movie ids, tv show ids, and tv episode ids are independent
+		// numeric sequences - real-world example: tmdb movie 4271 is "Life
+		// Is a Long Quiet River" while tmdb tv show 4271 is Farscape. Using
+		// the same id (4271) for all three here reproduces that collision.
+		routes := mux.NewRouter()
+		routes.HandleFunc("/discover/movie", func(w http.ResponseWriter, r *http.Request) {
+			_ = errorsx.Zero(fmt.Fprint(w, `{"page":1,"total_results":1,"total_pages":1,"results":[{"id":4271,"title":"Life Is a Long Quiet River"}]}`))
+		})
+		routes.HandleFunc("/discover/tv", func(w http.ResponseWriter, r *http.Request) {
+			_ = errorsx.Zero(fmt.Fprint(w, `{"page":1,"total_results":1,"total_pages":1,"results":[{"id":4271,"name":"Farscape"}]}`))
+		})
+		routes.HandleFunc("/tv/4271", func(w http.ResponseWriter, r *http.Request) {
+			_ = errorsx.Zero(fmt.Fprint(w, `{"id":4271,"seasons":[{"season_number":1}]}`))
+		})
+		routes.HandleFunc("/tv/4271/season/1", func(w http.ResponseWriter, r *http.Request) {
+			_ = errorsx.Zero(fmt.Fprint(w, `{"episodes":[{"id":4271,"season_number":1,"episode_number":1,"name":"Mind the Baby"}]}`))
+		})
+		srv := httptest.NewServer(routes)
+		defer srv.Close()
+
+		day := time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)
+		tm := &tmdbimport{Source: "tmdb", StartAt: day, EndAt: day, Attempts: 1}
+		client := newTmdbTestClient(t, srv)
+
+		var movieUID, showUID, episodeUID string
+		for v := range tm.movies(ctx, client) {
+			movieUID = v.UID
+		}
+		require.NoError(t, tm.cause)
+		require.NotEmpty(t, movieUID)
+
+		for v := range tm.series(ctx, client) {
+			if v.ParentUID == uuid.Nil.String() {
+				showUID = v.UID
+			} else {
+				episodeUID = v.UID
+			}
+		}
+		require.NoError(t, tm.cause)
+		require.NotEmpty(t, showUID)
+		require.NotEmpty(t, episodeUID)
+
+		require.NotEqual(t, movieUID, showUID, "a movie and a tv show sharing the same tmdb id must not collide")
+		require.NotEqual(t, movieUID, episodeUID, "a movie and a tv episode sharing the same tmdb id must not collide")
+		require.NotEqual(t, showUID, episodeUID, "a tv show and a tv episode sharing the same tmdb id must not collide")
+	})
+
 	t.Run("records the cause and stops once tmdb persistently errors", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()

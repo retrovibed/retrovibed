@@ -98,7 +98,7 @@ func (t *mbimport) releases(ctx context.Context, c *gomusicbrainz.WS2Client, l *
 					// To get songs, a separate Lookup call per release is required.
 					v := library.Known{
 						Source:           t.Source,
-						UID:              ddiscapi.ImportedMediaUintID(t.Source, uint64(binary.BigEndian.Uint64(id.Bytes()[:8]))),
+						UID:              ddiscapi.ImportedMediaUintID(t.Source, uint64(binary.BigEndian.Uint64(id.Bytes()[:8])), ddiscapi.KindRelease),
 						Md5:              uidmd5.String(),
 						Md5Lower:         binary.LittleEndian.Uint64(uuidx.LowN(uidmd5, 64)),
 						ID:               id.String(),

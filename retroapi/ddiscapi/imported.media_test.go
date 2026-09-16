@@ -11,31 +11,41 @@ import (
 
 func TestImportedMediaUintID(t *testing.T) {
 	t.Run("zero ID and simple prefix", func(t *testing.T) {
-		require.Equal(t, "61626381-0000-0000-0000-000000000000", ddiscapi.ImportedMediaUintID("abc", 0))
+		require.Equal(t, "61626381-b9de-7321-0000-000000000000", ddiscapi.ImportedMediaUintID("abc", 0))
 	})
 
 	t.Run("excessively long prefix", func(t *testing.T) {
-		require.Equal(t, "6c6f6e67-0000-0000-0000-000000000000", ddiscapi.ImportedMediaUintID("long-prefix-for-id", 0))
+		require.Equal(t, "6c6f6e67-662b-2bf0-0000-000000000000", ddiscapi.ImportedMediaUintID("long-prefix-for-id", 0))
 	})
 
 	t.Run("single digit ID", func(t *testing.T) {
-		require.Equal(t, "746d6462-0000-0000-0000-000000000007", ddiscapi.ImportedMediaUintID("tmdb", 7))
+		require.Equal(t, "746d6462-877d-cf81-0000-000000000007", ddiscapi.ImportedMediaUintID("tmdb", 7))
 	})
 
 	t.Run("maximum uint64", func(t *testing.T) {
-		require.Equal(t, "811c9dc5-0000-0000-00ff-ffffffffffff", ddiscapi.ImportedMediaUintID("", math.MaxUint64))
+		require.Equal(t, "811c9dc5-2f63-ed12-00ff-ffffffffffff", ddiscapi.ImportedMediaUintID("", math.MaxUint64))
 	})
 
 	t.Run("highest byte all 1", func(t *testing.T) {
-		require.Equal(t, "811c9dc5-0000-0000-00ff-000000000000", ddiscapi.ImportedMediaUintID("", 0xFFFF000000000000))
+		require.Equal(t, "811c9dc5-151e-209d-00ff-000000000000", ddiscapi.ImportedMediaUintID("", 0xFFFF000000000000))
 	})
 
 	t.Run("empty prefix", func(t *testing.T) {
-		require.Equal(t, "811c9dc5-0000-0000-0000-000000000000", ddiscapi.ImportedMediaUintID("", 0))
+		require.Equal(t, "811c9dc5-050c-5d2f-0000-000000000000", ddiscapi.ImportedMediaUintID("", 0))
 	})
 
 	t.Run("prefix with special characters", func(t *testing.T) {
-		require.Equal(t, "41214023-0000-0000-0000-000000000001", ddiscapi.ImportedMediaUintID("A!@#$", 1))
+		require.Equal(t, "41214023-e5e1-d16d-0000-000000000001", ddiscapi.ImportedMediaUintID("A!@#$", 1))
+	})
+
+	t.Run("same prefix and id, different kind namespaces, never collide", func(t *testing.T) {
+		movie := ddiscapi.ImportedMediaUintID(ddiscapi.SourceTMDB, 4271, ddiscapi.KindMovie)
+		series := ddiscapi.ImportedMediaUintID(ddiscapi.SourceTMDB, 4271, ddiscapi.KindSeries)
+		episode := ddiscapi.ImportedMediaUintID(ddiscapi.SourceTMDB, 4271, ddiscapi.KindEpisode)
+
+		require.NotEqual(t, movie, series)
+		require.NotEqual(t, movie, episode)
+		require.NotEqual(t, series, episode)
 	})
 }
 

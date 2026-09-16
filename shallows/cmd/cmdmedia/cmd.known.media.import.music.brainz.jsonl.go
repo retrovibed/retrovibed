@@ -84,7 +84,7 @@ func (t *mbjsonlimport) releases(ctx context.Context, r io.Reader) iter.Seq[libr
 
 			v := library.Known{
 				Source:           t.Source,
-				UID:              ddiscapi.ImportedMediaUintID(t.Source, uint64(binary.BigEndian.Uint64(id.Bytes()[:8]))),
+				UID:              ddiscapi.ImportedMediaUintID(t.Source, uint64(binary.BigEndian.Uint64(id.Bytes()[:8])), ddiscapi.KindRelease),
 				Md5:              uidmd5.String(),
 				Md5Lower:         binary.LittleEndian.Uint64(uuidx.LowN(uidmd5, 64)),
 				ID:               id.String(),

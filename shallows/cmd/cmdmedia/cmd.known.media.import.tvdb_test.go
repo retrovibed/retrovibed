@@ -333,6 +333,6 @@ func TestTvdbImportRecords(t *testing.T) {
 		require.Equal(t, a.Md5, b.Md5)
 		require.Equal(t, a.Md5Lower, b.Md5Lower)
 		require.Equal(t, a.UID, b.UID)
-		require.Equal(t, ddiscapi.ImportedMediaUintID(ddiscapi.SourceTVDB, uint64(121361)), a.UID)
+		require.Equal(t, ddiscapi.ImportedMediaUintID(ddiscapi.SourceTVDB, uint64(121361), ddiscapi.KindSeries), a.UID)
 	})
 }

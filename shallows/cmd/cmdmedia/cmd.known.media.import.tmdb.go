@@ -88,7 +88,7 @@ func (t *tmdbimport) movies(ctx context.Context, c *tmdb.Client) iter.Seq[librar
 				uidmd5 := uuid.FromBytesOrNil(_md5.Sum(nil))
 				v := library.Known{
 					Source:           t.Source,
-					UID:              ddiscapi.ImportedMediaUintID(t.Source, uint64(mr.ID)),
+					UID:              ddiscapi.ImportedMediaUintID(t.Source, uint64(mr.ID), ddiscapi.KindMovie),
 					Md5:              uidmd5.String(),
 					Md5Lower:         binary.LittleEndian.Uint64(uuidx.LowN(uidmd5, 64)),
 					ID:               strconv.FormatInt(mr.ID, 10),
@@ -218,7 +218,7 @@ func (t *tmdbimport) seriesKnown(mr tmdb.TVShowResult) library.Known {
 	uidmd5 := uuid.FromBytesOrNil(_md5.Sum(nil))
 
 	return library.Known{
-		UID:              ddiscapi.ImportedMediaUintID(t.Source, uint64(mr.ID)),
+		UID:              ddiscapi.ImportedMediaUintID(t.Source, uint64(mr.ID), ddiscapi.KindSeries),
 		Source:           t.Source,
 		Md5:              uidmd5.String(),
 		Md5Lower:         binary.LittleEndian.Uint64(uuidx.LowN(uidmd5, 64)),
@@ -304,7 +304,7 @@ func (t *tmdbimport) series(ctx context.Context, c *tmdb.Client) iter.Seq[librar
 				imgpath := t.imgpath(ep.StillPath)
 				v := library.Known{
 					Source:           t.Source,
-					UID:              ddiscapi.ImportedMediaUintID(t.Source, uint64(ep.ID)),
+					UID:              ddiscapi.ImportedMediaUintID(t.Source, uint64(ep.ID), ddiscapi.KindEpisode, job.parent.UID),
 					Md5:              uidmd5.String(),
 					Md5Lower:         binary.LittleEndian.Uint64(uuidx.LowN(uidmd5, 64)),
 					ID:               strconv.FormatInt(ep.ID, 10),

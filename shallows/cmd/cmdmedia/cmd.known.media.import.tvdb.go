@@ -84,7 +84,7 @@ func (t *tvdbimport) records(c *tvdb.Client) iter.Seq[library.Known] {
 
 				v := library.Known{
 					Source:           t.Source,
-					UID:              ddiscapi.ImportedMediaUintID(t.Source, uint64(langx.Autoderef(mr.ID))),
+					UID:              ddiscapi.ImportedMediaUintID(t.Source, uint64(langx.Autoderef(mr.ID)), ddiscapi.KindSeries),
 					Md5:              uidmd5.String(),
 					Md5Lower:         binary.LittleEndian.Uint64(uuidx.LowN(uidmd5, 64)),
 					ID:               strconv.FormatInt(int64(langx.Autoderef(mr.ID)), 10),
