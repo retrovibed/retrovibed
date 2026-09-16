@@ -388,7 +388,7 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 		bootstrap = langx.Compose(bootstrap, dht.OptionBootstrapGlobal)
 	}
 
-	if err = meta.WireguardCurrent(dctx, t.db, 0).Scan(&wgcfg); errorsx.Ignore(err, sql.ErrNoRows) != nil {
+	if err = meta.WireguardCurrent(dctx, t.db, uint32(meta.WireguardRingDistribution)).Scan(&wgcfg); errorsx.Ignore(err, sql.ErrNoRows) != nil {
 		return errorsx.Wrap(err, "failed to read wireguard config")
 	}
 
