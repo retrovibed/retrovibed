@@ -7,10 +7,10 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
 )
 
 type cmdCommunityInfo struct {
@@ -44,7 +44,7 @@ func (t cmdCommunityInfo) run(ctx context.Context, c *http.Client, in io.Reader,
 		return errorsx.Wrap(err, "failed to locate community")
 	}
 
-	if err = jsonx.MarshalWrite(out, commresp.Community); err != nil {
+	if err = jsonl.NewEncoder(out).Encode(commresp.Community); err != nil {
 		return errorsx.Wrap(err, "unable to write to encoder")
 	}
 

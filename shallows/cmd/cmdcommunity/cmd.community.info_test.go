@@ -103,4 +103,33 @@ func TestCommunityInfo(t *testing.T) {
 		require.NoError(t, cmd.run(ctx, c, strings.NewReader(stdinContent), &out))
 		require.Contains(t, out.String(), stdinContent)
 	})
+
+	t.Run("separates community json from piped stdin with a newline", func(t *testing.T) {
+		ctx, cancel := testx.Context(t)
+		defer cancel()
+
+		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			assert.NoError(t, json.NewEncoder(w).Encode(&communityapi.CommunityFindResponse{
+				Community: &communityapi.Community{Id: "test-id"},
+			}))
+		}))
+		defer srv.Close()
+
+		c := &http.Client{}
+		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
+
+		const stdinContent = `{"id":"media-id"}` + "\n"
+		var out bytes.Buffer
+
+		cmd := cmdCommunityInfo{Name: "test-community"}
+		require.NoError(t, cmd.run(ctx, c, strings.NewReader(stdinContent), &out))
+
+		lines := strings.SplitN(out.String(), "\n", 2)
+		require.Len(t, lines, 2, "expected community json to be newline-terminated before the piped stdin content")
+
+		var decoded communityapi.Community
+		require.NoError(t, json.Unmarshal([]byte(lines[0]), &decoded))
+		assert.Equal(t, "test-id", decoded.Id)
+		assert.Equal(t, stdinContent, lines[1])
+	})
 }
