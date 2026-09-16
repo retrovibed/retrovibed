@@ -136,7 +136,7 @@ class Retrovibed extends StatelessWidget {
                         authn.LocalOnlyGuard(
                           DeepLink(
                             media.Playlist(
-                              tracing: (ctx, pos, dur, q, id) {
+                              tracing: (ctx, q, hid, id, watched, pos, dur) {
                                 medialib.recent
                                     .record(
                                       medialib.RecentRecordRequest(
@@ -152,6 +152,29 @@ class Retrovibed extends StatelessWidget {
                                     .catchError((cause) {
                                       print(
                                         "failed to record watch event ${pos}/${dur} - ${q} - ${cause}",
+                                      );
+                                    })
+                                    .ignore();
+
+                                medialib.recent
+                                    .history(
+                                      medialib.WatchHistoryRecordRequest(
+                                        record: medialib.WatchHistoryRecord(
+                                          id: hid,
+                                          mediaId: id,
+                                          duration: ds.Int64(watched.inMilliseconds),
+                                        ),
+                                      ),
+                                      options: [authn.request(authn.AuthzCache.meta(ctx))],
+                                    )
+                                    .then((v) {
+                                      print(
+                                        "recorded watch history ${hid}/${id}/${watched}",
+                                      );
+                                    })
+                                    .catchError((cause) {
+                                      print(
+                                        "failed to record watch history ${hid}/${id}/${watched} - ${cause}",
                                       );
                                     })
                                     .ignore();

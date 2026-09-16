@@ -10,8 +10,10 @@ import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/timex.dart' as timex;
 import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'package:retrovibed/design.kit/bytesx.dart';
+import 'package:retrovibed/library/library.watch.pb.dart';
 
 export 'package:retrovibed/media.dart';
+export 'package:retrovibed/library/library.watch.pb.dart';
 
 typedef FnKnownSearch =
     Future<KnownSearchResponse> Function(
@@ -439,6 +441,24 @@ abstract class recent {
         .then((v) {
           return Future.value(
             httpx.fromProto3JsonSafe(RecentDeleteResponse.create(), jsonDecode(v.body)),
+          );
+        });
+  }
+
+  static Future<WatchHistoryRecordResponse> history(
+    WatchHistoryRecordRequest req, {
+    String? host,
+    List<httpx.Option> options = const [],
+  }) {
+    return httpx
+        .post(
+          Uri.https(host ?? httpx.host(), "/w/history"),
+          body: jsonEncode(req.toProto3Json()),
+          options: [httpx.Content.json, httpx.Accept.json, ...options],
+        )
+        .then((v) {
+          return Future.value(
+            httpx.fromProto3JsonSafe(WatchHistoryRecordResponse.create(), jsonDecode(v.body)),
           );
         });
   }
