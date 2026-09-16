@@ -215,7 +215,7 @@ func KnownInsertWithDefaults(
 	gql genieql.Insert,
 	pattern func(ctx context.Context, q sqlx.Queryer, a Known) NewKnownScannerStaticRow,
 ) {
-	gql.Into("library_known_media").Default("created_at", "tombstoned_at").Conflict(`ON CONFLICT (uid) DO UPDATE SET title = EXCLUDED.title, original_language = EXCLUDED.original_language, original_title = EXCLUDED.original_title, popularity = EXCLUDED.popularity, overview = EXCLUDED.overview, source = EXCLUDED.source, poster_path = EXCLUDED.poster_path, backdrop_path = EXCLUDED.backdrop_path, mimetype = EXCLUDED.mimetype, "collation" = EXCLUDED."collation", subtitle = EXCLUDED.subtitle, parent_uid = EXCLUDED.parent_uid, duplicates = duplicates + 1`)
+	gql.Into("library_known_media").Default("created_at", "tombstoned_at").Conflict(`ON CONFLICT (uid) DO UPDATE SET title = EXCLUDED.title, original_language = EXCLUDED.original_language, original_title = EXCLUDED.original_title, popularity = EXCLUDED.popularity, overview = EXCLUDED.overview, source = EXCLUDED.source, poster_path = EXCLUDED.poster_path, backdrop_path = EXCLUDED.backdrop_path, mimetype = EXCLUDED.mimetype, "collation" = EXCLUDED."collation", subtitle = EXCLUDED.subtitle, parent_uid = EXCLUDED.parent_uid, released = EXCLUDED.released, adult = EXCLUDED.adult, md5 = EXCLUDED.md5, md5_lower = EXCLUDED.md5_lower, auto_description = EXCLUDED.auto_description, duplicates = duplicates + 1`)
 }
 
 // KnownInsertWithDefaultsTOFU writes a discovery-pipeline placeholder row.
@@ -233,7 +233,7 @@ func KnownBatchInsertWithDefaults(
 	gql genieql.InsertBatch,
 	pattern func(ctx context.Context, q sqlx.Queryer, p Known) NewKnownScannerStatic,
 ) {
-	gql.Into("library_known_media").Batch(64).Default("created_at", "tombstoned_at").Conflict(`ON CONFLICT (uid) DO UPDATE SET title = EXCLUDED.title, original_language = EXCLUDED.original_language, original_title = EXCLUDED.original_title, popularity = EXCLUDED.popularity, overview = EXCLUDED.overview, source = EXCLUDED.source, poster_path = EXCLUDED.poster_path, backdrop_path = EXCLUDED.backdrop_path, mimetype = EXCLUDED.mimetype, "collation" = EXCLUDED."collation", subtitle = EXCLUDED.subtitle, parent_uid = EXCLUDED.parent_uid, duplicates = duplicates + 1`)
+	gql.Into("library_known_media").Batch(64).Default("created_at", "tombstoned_at").Conflict(`ON CONFLICT (uid) DO UPDATE SET title = EXCLUDED.title, original_language = EXCLUDED.original_language, original_title = EXCLUDED.original_title, popularity = EXCLUDED.popularity, overview = EXCLUDED.overview, source = EXCLUDED.source, poster_path = EXCLUDED.poster_path, backdrop_path = EXCLUDED.backdrop_path, mimetype = EXCLUDED.mimetype, "collation" = EXCLUDED."collation", subtitle = EXCLUDED.subtitle, parent_uid = EXCLUDED.parent_uid, released = EXCLUDED.released, adult = EXCLUDED.adult, md5 = EXCLUDED.md5, md5_lower = EXCLUDED.md5_lower, auto_description = EXCLUDED.auto_description, duplicates = duplicates + 1`)
 }
 
 func KnownFindByID(
