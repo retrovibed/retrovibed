@@ -479,6 +479,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	httpmux.NotFoundHandler = httpx.NotFound(alice.New())
 	httpmux.Use(
 		httpx.RouteInvoked,
+		// httpx.DebugRequest,
 		httpx.Chaos(
 			envx.Float64(0.0, env.ChaosRate),
 			httpx.ChaosStatusCodes(http.StatusBadGateway),
