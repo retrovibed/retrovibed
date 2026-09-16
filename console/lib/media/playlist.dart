@@ -9,7 +9,6 @@ import 'package:language_code/language_code.dart';
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/langcodex.dart' as langcodex;
 import 'package:retrovibed/uuidx.dart' as uuidx;
-import 'package:retrovibed/timex.dart' as timex;
 import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/debug.dart' as debug;
 import 'package:retrovibed/designkit.dart' as ds;
@@ -280,15 +279,9 @@ class _PlaylistState extends State<Playlist> implements PlaylistControl {
   // to that noise and resync once from the real, settled state afterward.
   bool _transitioning = false;
 
-  // watch history heartbeat state: _historyId is a fresh uuidx.v7() minted
-  // each time known.id changes, so a rewatch of the same content later gets
-  // its own history row instead of overwriting the last one. _historyWatched
-  // is the client-accumulated wall-clock time actually played (not derived
-  // from player position, so seeking/pausing doesn't distort it).
-  String _historyId = uuidx.min();
-  String _historyMediaId = uuidx.min();
-  Duration _historyWatched = Duration.zero;
-  DateTime _historyLastTick = timex.neginf;
+  // watch history heartbeat state, shared with remote/connect.dart via
+  // WatchHistoryTracker.
+  final WatchHistoryTracker _history = WatchHistoryTracker();
 
   Known get known => _queue.current.value.known;
   ValueNotifier<playqueue.PlayableMedia?> get current => _queue.current;
@@ -371,21 +364,9 @@ class _PlaylistState extends State<Playlist> implements PlaylistControl {
       final id = known.id;
       if (id == uuidx.min()) return;
 
-      // watch history bookkeeping: kept unconditional on the query gate
-      // below so accumulated watched time isn't lost while the query is
-      // blank, even though the call itself only fires alongside tracing.
-      final now = DateTime.now();
-      if (id != _historyMediaId) {
-        _historyMediaId = id;
-        _historyId = uuidx.v7();
-        _historyWatched = Duration.zero;
-      } else if (_historyLastTick != timex.neginf && player.state.playing) {
-        _historyWatched += now.difference(_historyLastTick);
-      }
-      _historyLastTick = now;
+      final record = _history.tick(id, playing: player.state.playing);
 
-      if (search.value.next.query.trim().isEmpty) return;
-      widget.tracing(context, search.value.next, _historyId, id, _historyWatched, pos, player.state.duration);
+      widget.tracing(context, search.value.next, record.id, id, _history.watched, pos, player.state.duration);
     });
 
     player.stream.completed.listen((completed) {

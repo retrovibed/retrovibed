@@ -72,7 +72,7 @@ class _SearchState extends State<Search> with ds.LoadingState {
             ),
             onSubmitted: (v) {
               final freshNext = widget.search.value.next.clone()
-                ..query = v
+                ..query = v.trim()
                 ..offset = ds.Grid.int64(0);
               widget.search.value = media.MediaSearchState(
                 next: freshNext,

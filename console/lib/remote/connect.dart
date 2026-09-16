@@ -82,6 +82,7 @@ class Connect extends StatefulWidget {
   final lib.FnRecent apirecentlatest;
   final lib.FnRecentTombstone apirecenttombstone;
   final lib.FnRecentRecord apirecentrecord;
+  final lib.FnRecentHistory apirecenthistory;
   // test seam: the window a test passes to tester.pump() to deterministically
   // control when the throttled recent-watch recording (see _State._record)
   // fires, mirroring RemoteControlListener's own position-echo throttle test.
@@ -98,6 +99,7 @@ class Connect extends StatefulWidget {
     this.apirecentlatest = lib.recent.latest,
     this.apirecenttombstone = lib.recent.delete,
     this.apirecentrecord = lib.recent.record,
+    this.apirecenthistory = lib.recent.history,
     this.recentRecordThrottle = const Duration(seconds: 3),
     this.autoqueueTarget = _autoqueueTargetDefault,
   });
@@ -128,6 +130,12 @@ class _State extends State<Connect> with LoadingState {
   // highlight and _record's recent-watch write.
   String _sessionID = uuidx.v7();
   media.MediaSearchRequest _sessionQuery = media.MediaSearchRequest();
+
+  // watch history heartbeat state, shared with media/playlist.dart via
+  // lib.WatchHistoryTracker. Unlike the local player, Playback messages are
+  // only sent while something is actually playing (see Playback's doc
+  // comment), so ticks are never marked playing: false here.
+  final lib.WatchHistoryTracker _history = lib.WatchHistoryTracker();
 
   playqueue.SafeStreamIterator<playqueue.PlayableMedia> _autoqueue = playqueue.SafeStreamIterator(
     const Stream.empty(),
@@ -262,6 +270,22 @@ class _State extends State<Connect> with LoadingState {
         .then((v) {})
         .catchError((cause) {
           print("failed to record remote watch event - $cause");
+        })
+        .ignore();
+
+    final record = _history.tick(playback.media.id);
+
+    widget
+        .apirecenthistory(
+          lib.WatchHistoryRecordRequest(record: record),
+          host: _endpoint.value.hostname,
+          options: [authn.request(authn.AuthedEndpoint.token(context))],
+        )
+        .then((v) {
+          print("recorded remote watch history ${_history.id}/${_history.mediaId}/${_history.watched}");
+        })
+        .catchError((cause) {
+          print("failed to record remote watch history - $cause");
         })
         .ignore();
   }

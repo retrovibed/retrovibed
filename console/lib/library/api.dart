@@ -60,6 +60,13 @@ typedef FnRecentRecord =
       List<httpx.Option> options,
     });
 
+typedef FnRecentHistory =
+    Future<WatchHistoryRecordResponse> Function(
+      WatchHistoryRecordRequest req, {
+      String? host,
+      List<httpx.Option> options,
+    });
+
 typedef FnLibraryMetadataSync =
     Future<MediaUpdateResponse> Function(
       String id,

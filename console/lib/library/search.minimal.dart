@@ -86,7 +86,7 @@ class _SearchMinimal extends State<SearchMinimal> with ds.LoadingState {
         decoration: InputDecoration(hintText: "search ${httpx.host()}'s library"),
         onSubmitted: (v) {
           final freshNext = widget.search.value.next.clone()
-            ..query = v
+            ..query = v.trim()
             ..offset = ds.Grid.int64(0);
           setState(() {
             _res.next = freshNext;

@@ -80,51 +80,52 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
-    final upload = (
-      FilesEvent v, {
-      ValueNotifier<int>? progress,
-    }) {
-      setState(() {
-        _loading = true;
-      });
+    final upload =
+        (
+          FilesEvent v, {
+          ValueNotifier<int>? progress,
+        }) {
+          setState(() {
+            _loading = true;
+          });
 
-      final multiparts = v.files.map((c) {
-        return media.media.uploadable(c.path, c.name, c.mimeType!);
-      });
+          final multiparts = v.files.map((c) {
+            return media.media.uploadable(c.path, c.name, c.mimeType!);
+          });
 
-      return Future.microtask(() {
-        return Future.wait(
-              multiparts.map((fv) {
-                return fv.then((v) {
-                  return widget
-                      .upload((req) {
-                        req..files.add(v);
-                        return req;
-                      })
-                      .then((uploaded) {
-                        setState(() {
-                          _res.items.add(uploaded.media);
-                        });
-                      })
-                      .catchError((cause) {
-                        setState(() {
-                          _cause = ds.Error.unknown(cause, onTap: reseterr);
-                        });
-                      });
-                });
-              }),
-            )
-            .then((v) => ds.NullWidget)
-            .catchError((cause) {
-              return ds.Error.unknown(cause, onTap: reseterr);
-            })
-            .whenComplete(
-              () => setState(() {
-                _loading = false;
-              }),
-            );
-      });
-    };
+          return Future.microtask(() {
+            return Future.wait(
+                  multiparts.map((fv) {
+                    return fv.then((v) {
+                      return widget
+                          .upload((req) {
+                            req..files.add(v);
+                            return req;
+                          })
+                          .then((uploaded) {
+                            setState(() {
+                              _res.items.add(uploaded.media);
+                            });
+                          })
+                          .catchError((cause) {
+                            setState(() {
+                              _cause = ds.Error.unknown(cause, onTap: reseterr);
+                            });
+                          });
+                    });
+                  }),
+                )
+                .then((v) => ds.NullWidget)
+                .catchError((cause) {
+                  return ds.Error.unknown(cause, onTap: reseterr);
+                })
+                .whenComplete(
+                  () => setState(() {
+                    _loading = false;
+                  }),
+                );
+          });
+        };
 
     return ds.Table(
       loading: _loading,
@@ -136,7 +137,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
         focus: widget.focus,
         onSubmitted: (v) {
           setState(() {
-            _res.next.query = v;
+            _res.next.query = v.trim();
             _res.next.offset = ds.Int64(0);
           });
           return refresh(_res.next);
