@@ -22,7 +22,7 @@ RUN ln -s /usr/lib/go-1.27/bin/go /usr/local/bin/go
 # install genieql and golang's protocol buffers and other dev tooling.
 RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 RUN go install github.com/fatih/gomodifytags@latest
-RUN echo "cache buster 159a9a06-1686-4f49-9a7f-a30535786d59"
+RUN echo "cache buster e4c1f2a7-9b3d-4e6a-8f1c-2d7a5b9e0c31"
 RUN GOPROXY=direct go install -tags duckdb_use_lib github.com/james-lawrence/genieql/...@latest
 RUN curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b /usr/local/bin v2.13.2
 
