@@ -21,7 +21,36 @@ import (
 )
 
 //go:embed .migrations/*.sql
-var embedsqlite embed.FS
+var embedmigrations embed.FS
+
+func DatabaseMeta(ctx context.Context) (db *sql.DB, err error) {
+	return DatabaseCustom(ctx, userx.DefaultConfigDir(userx.DefaultRelRoot(), "meta.db"))
+}
+
+func DatabaseCustom(ctx context.Context, path string) (db *sql.DB, err error) {
+	log.Println("database path", path)
+
+	if err := os.MkdirAll(filepath.Dir(path), 0700); err != nil {
+		return nil, err
+	}
+
+	if db, err = sql.Open("duckdb", path); err != nil {
+		return nil, errorsx.Wrap(err, "unable to open db")
+	}
+	defer func() {
+		if err == nil {
+			return
+		}
+		debugx.Println("closing database due to error during initialization", err)
+		errorsx.Log(db.Close())
+	}()
+
+	return db, InitializeDatabase(ctx, db)
+}
+
+func InitializeDatabase(ctx context.Context, db *sql.DB) (err error) {
+	return goosex.InitializeDatabase(ctx, db, errorsx.Must(fs.Sub(embedmigrations, ".migrations")))
+}
 
 // .migrations.cache holds the schema for cache.db: data that is rebuildable
 // from external sources (tmdb/tvdb/musicbrainz/deeppool imports, ddisc
@@ -29,11 +58,7 @@ var embedsqlite embed.FS
 // meta.db's backup/restore flow.
 //
 //go:embed .migrations.cache/*.sql
-var embedsqlitecache embed.FS
-
-func DatabaseMeta(ctx context.Context) (db *sql.DB, err error) {
-	return DatabaseCacheDatabase(ctx, userx.DefaultConfigDir(userx.DefaultRelRoot(), "meta.db"))
-}
+var embedmigrationscache embed.FS
 
 // DatabaseCacheDatabase opens path and attaches its sibling cache.db (see
 // .migrations.cache) under the "cache" catalog, so genieql-generated queries
@@ -123,32 +148,7 @@ func migrateCacheDatabase(ctx context.Context, path string) (err error) {
 	}
 	defer func() { errorsx.Log(db.Close()) }()
 
-	return goosex.InitializeDatabase(ctx, db, errorsx.Must(fs.Sub(embedsqlitecache, ".migrations.cache")))
-}
-
-func DatabaseCustom(ctx context.Context, path string) (db *sql.DB, err error) {
-	log.Println("database path", path)
-
-	if err := os.MkdirAll(filepath.Dir(path), 0700); err != nil {
-		return nil, err
-	}
-
-	if db, err = sql.Open("duckdb", path); err != nil {
-		return nil, errorsx.Wrap(err, "unable to open db")
-	}
-	defer func() {
-		if err == nil {
-			return
-		}
-		debugx.Println("closing database due to error during initialization", err)
-		errorsx.Log(db.Close())
-	}()
-
-	return db, InitializeDatabase(ctx, db)
-}
-
-func InitializeDatabase(ctx context.Context, db *sql.DB) (err error) {
-	return goosex.InitializeDatabase(ctx, db, errorsx.Must(fs.Sub(embedsqlite, ".migrations")))
+	return goosex.InitializeDatabase(ctx, db, errorsx.Must(fs.Sub(embedmigrationscache, ".migrations.cache")))
 }
 
 func Checkpoint(ctx context.Context, db *sql.DB) (err error) {

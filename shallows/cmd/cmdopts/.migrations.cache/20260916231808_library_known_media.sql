@@ -17,8 +17,7 @@ CREATE TABLE library_known_media (
     original_language VARCHAR NOT NULL DEFAULT '',
     original_title VARCHAR NOT NULL DEFAULT '',
     overview VARCHAR NOT NULL DEFAULT '',
-    auto_description VARCHAR NOT NULL DEFAULT '' -- application managed for full text search
-    ,
+    auto_description VARCHAR NOT NULL DEFAULT '', -- application managed for full text search
     mimetype TEXT NOT NULL DEFAULT 'application/octet-stream', -- content category classification using MIME type prefixes (video, audio, image)
     tombstoned_at TIMESTAMPTZ NOT NULL DEFAULT 'infinity',
     "collation" UINTEGER NOT NULL DEFAULT 0, -- ordering key: 0 = standalone/overall item; TV episode = season(hi 16 bits, 0xFFFF for specials)/episode(lo 16 bits); album = plain track sequence
