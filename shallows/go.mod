@@ -28,7 +28,7 @@ require (
 	github.com/gorilla/mux v1.8.1
 	github.com/grindlemire/go-lucene v0.0.33
 	github.com/hashicorp/mdns v1.0.6
-	github.com/james-lawrence/genieql v0.0.0-20260904213219-acc6235faffb
+	github.com/james-lawrence/genieql v0.0.0-20260917171911-8038e3e1d315
 	github.com/james-lawrence/torrent v0.0.0-20260911003355-3ce4d6010877
 	github.com/jfreymuth/pulse v0.1.2
 	github.com/justinas/alice v1.2.0

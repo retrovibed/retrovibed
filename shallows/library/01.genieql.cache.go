@@ -31,26 +31,11 @@ func KnownScanner(gql genieql.Scanner, pattern func(i Known)) {
 	gql.ColumnNamePrefix("cache.library_known_media.")
 }
 
-// The Into() argument below is a deliberate escape trick, not a typo: the
-// dialect's Insert() template quotes whatever string Into() is given as one
-// unit — quotedString(s) = `"` + s + `"` — so a bare "cache.library_known_media"
-// would render as the single (nonexistent) identifier "cache.library_known_media"
-// instead of the catalog-qualified "cache"."library_known_media". Passing
-// `cache"."library_known_media` (with the embedded, unescaped quote-dot-quote)
-// makes that same wrapping produce exactly "cache"."library_known_media" —
-// the correct two-part quoted reference — without any change to genieql
-// itself. Verified directly against duckdb before relying on it here.
-//
-// It's repeated as a literal in each call below (rather than factored into a
-// shared const) because genieql's codegen extracts only the specific named
-// function declarations it recognizes out of this file's AST — a
-// package-level const referenced from within them is not carried along, and
-// is silently undefined in the generator's compiled output.
 func KnownInsertWithDefaults(
 	gql genieql.Insert,
 	pattern func(ctx context.Context, q sqlx.Queryer, a Known) NewKnownScannerStaticRow,
 ) {
-	gql.Into(`cache"."library_known_media`).Default("created_at", "tombstoned_at").Conflict(`ON CONFLICT (uid) DO UPDATE SET title = EXCLUDED.title, original_language = EXCLUDED.original_language, original_title = EXCLUDED.original_title, popularity = EXCLUDED.popularity, overview = EXCLUDED.overview, source = EXCLUDED.source, poster_path = EXCLUDED.poster_path, backdrop_path = EXCLUDED.backdrop_path, mimetype = EXCLUDED.mimetype, "collation" = EXCLUDED."collation", subtitle = EXCLUDED.subtitle, parent_uid = EXCLUDED.parent_uid, released = EXCLUDED.released, adult = EXCLUDED.adult, md5 = EXCLUDED.md5, md5_lower = EXCLUDED.md5_lower, auto_description = EXCLUDED.auto_description, duplicates = duplicates + 1`)
+	gql.Into("cache", "library_known_media").Default("created_at", "tombstoned_at").Conflict(`ON CONFLICT (uid) DO UPDATE SET title = EXCLUDED.title, original_language = EXCLUDED.original_language, original_title = EXCLUDED.original_title, popularity = EXCLUDED.popularity, overview = EXCLUDED.overview, source = EXCLUDED.source, poster_path = EXCLUDED.poster_path, backdrop_path = EXCLUDED.backdrop_path, mimetype = EXCLUDED.mimetype, "collation" = EXCLUDED."collation", subtitle = EXCLUDED.subtitle, parent_uid = EXCLUDED.parent_uid, released = EXCLUDED.released, adult = EXCLUDED.adult, md5 = EXCLUDED.md5, md5_lower = EXCLUDED.md5_lower, auto_description = EXCLUDED.auto_description, duplicates = duplicates + 1`)
 }
 
 // KnownInsertWithDefaultsTOFU writes a discovery-pipeline placeholder row.
