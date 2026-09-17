@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/media/media.row.display.dart' as rowdisplay;
+import 'package:retrovibed/designkit.dart' as ds;
 import 'api.dart' as remote;
 
 class PlaylistCurrent extends StatelessWidget {
@@ -12,10 +13,12 @@ class PlaylistCurrent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!current.asMedia.hasId()) return const SizedBox.shrink();
-    return rowdisplay.RowDisplay(
-      media: current.asMedia,
-      leading: const [Icon(Icons.play_arrow_rounded)],
-      highlighted: current.sessionId == sessionId,
+    return ds.Container(
+      rowdisplay.RowDisplay(
+        media: current.asMedia,
+        leading: const [Icon(Icons.play_arrow_rounded)],
+        highlighted: current.sessionId == sessionId,
+      ),
     );
   }
 }

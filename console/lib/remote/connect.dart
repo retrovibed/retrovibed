@@ -586,6 +586,7 @@ class _State extends State<Connect> with LoadingState {
                         decoration: BoxDecoration(color: theme.colorScheme.surfaceContainerLow),
                         Column(
                           verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
+                          spacing: defaults.spacing,
                           children: [
                             PlayerControlPlayback(socket: _socket, sessionId: _sessionID, current: _latest.sync),
                             Wrap(
