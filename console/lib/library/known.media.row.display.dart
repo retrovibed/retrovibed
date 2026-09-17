@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
+import 'package:retrovibed/httpx.dart' as httpx;
 import './api.dart' as api;
 
 class KnownMediaRowDisplay extends StatelessWidget {
@@ -51,6 +52,20 @@ class KnownMediaRowDisplay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
+    final poster = ClipRRect(
+      borderRadius: defaults.borderRadius,
+      child:
+          ds.Image.precache(
+            context,
+            current.image,
+            headers: httpx.localheaders(current.image),
+            width: 32,
+            height: 48,
+            fit: BoxFit.cover,
+            missing: const SizedBox(width: 32, height: 48),
+          ) ??
+          const SizedBox(width: 32, height: 48),
+    );
     return ds.Help(
       ds.TableRow(
         padding: defaults.padding,
@@ -58,6 +73,7 @@ class KnownMediaRowDisplay extends StatelessWidget {
         tint: highlighted ? defaults.highlightTint : [],
         [
           ...leading,
+          poster,
           Expanded(child: Text(current.description, overflow: TextOverflow.ellipsis)),
           ...trailing,
         ],
