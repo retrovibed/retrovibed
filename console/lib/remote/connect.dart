@@ -144,6 +144,15 @@ class _State extends State<Connect> with LoadingState {
   // completes.
   int _filling = 0;
 
+  // media dispatched via _fillQueue for the current autoqueue session that
+  // no real daemon echo has confirmed yet - removed once a confirmed sync's
+  // queue shows that media's id. Needed because _latest gets wholesale
+  // overwritten by any newer-vid sync (see the message listener in
+  // _connect), which would otherwise silently erase _fillQueue's own
+  // optimistic bump to _latest.sync.queue before the daemon's real echo
+  // catches up, reopening the "needed" gate and causing repeated over-fills.
+  final Set<media.Media> _unconfirmed = {};
+
   // completed iff autoplay is switched on; reset to a fresh pending
   // Completer when switched off - and doubles as the flag itself, so there's
   // no separate bool to drift out of sync. lets the already-running
@@ -198,6 +207,7 @@ class _State extends State<Connect> with LoadingState {
               _sessionQuery = s.next;
             }
             _autoqueue = queue;
+            _unconfirmed.clear();
           });
           await _fillQueue(queue);
           setState(() => _focused = null);
@@ -205,6 +215,10 @@ class _State extends State<Connect> with LoadingState {
       default:
         return null;
     }
+  }
+
+  Future<void> _onRecentTap(BuildContext context, media.RecentRecordRequest item) async {
+    return (_onPlay(context, item.media, media.MediaSearchResponse(next: item.query)) ?? () async {})();
   }
 
   bool _casfilling(int o) {
@@ -222,16 +236,18 @@ class _State extends State<Connect> with LoadingState {
   // while one's already running is just dropped - the next sync will
   // trigger another pass anyway.
   Future<void> _fillQueue(playqueue.SafeStreamIterator<playqueue.PlayableMedia> queue) async {
-    final needed = widget.autoqueueTarget - _latest.sync.queue.length;
+    final needed = widget.autoqueueTarget - _latest.sync.queue.length - _unconfirmed.length;
     if (needed <= 0) return;
     try {
       if (_casfilling(1)) return;
       if (await queue.moveNext()) {
-        final mut = remote.syncmut.queue(queue.current.current, sessionId: _sessionID);
+        final next = queue.current.current;
+        final mut = remote.syncmut.queue(next, sessionId: _sessionID);
         final update = _latest.deepCopy()..sync = mut(_latest.sync.deepCopy());
         setState(() {
           _latest = update;
-          _socket.send(remote.messages.queue(queue.current.current, sessionId: _sessionID));
+          _unconfirmed.add(next);
+          _socket.send(remote.messages.queue(next, sessionId: _sessionID));
         });
 
         if (needed > 1) {
@@ -297,6 +313,7 @@ class _State extends State<Connect> with LoadingState {
     setState(() {
       _socket = remote.RemoteControlSocket.noop;
       _latest = remote.Stream(sid: uuidx.min());
+      _unconfirmed.clear();
       _focused = PlaylistQueue(
         _latest.sync,
         remote.RemoteControlSocket.noop,
@@ -361,13 +378,14 @@ class _State extends State<Connect> with LoadingState {
               (msg) {
                 // print("sync ${msg.sid}");
                 if (msg.whichCommand() != remote.Stream_Command.sync) return;
-                print("sync received ${msg.sid}");
+                print("sync received ${msg.sid} ${_latest.sync.queue.length}");
                 // vid is a monotonic sequence number, unlike sid (a uuidv7)
                 // whose ordering isn't guaranteed for two ids minted within
                 // the same millisecond.
                 if (msg.vid <= _latest.vid) return;
                 print("sync accepted ${msg.sid} ${msg.sync.queue.length}");
                 setState(() {
+                  _unconfirmed.removeWhere((m) => msg.sync.queue.any((s) => s.asMedia.id == m.id));
                   _latest = msg;
                 });
                 _fillQueue(_autoqueue);
@@ -430,6 +448,7 @@ class _State extends State<Connect> with LoadingState {
   @override
   void initState() {
     super.initState();
+    _search = widget.search;
     _autoplay.complete(); // enable autoplay by default.
     _endpoint = authn.AuthedEndpoint.daemon(context);
     _endpoint.addListener(_onEndpointChanged);
@@ -448,7 +467,6 @@ class _State extends State<Connect> with LoadingState {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final defaults = ds.Defaults.of(context);
-    final category = mimex.category(_search.value.next.mimetypes);
     final search = lib.SearchMinimal(
       key: const ValueKey("search"),
       empty: ds.Empty,
@@ -456,25 +474,45 @@ class _State extends State<Connect> with LoadingState {
       apisearch: _apisearch,
       search: _search,
     );
-    final queue = PlaylistQueue(
-      _latest.sync,
-      _socket,
-      key: const ValueKey("queue"),
-      sessionId: _sessionID,
-      onChange: (mut) {
-        final upd = _latest.deepCopy()..sync = mut(_latest.sync.deepCopy());
-        setState(() {
-          _latest = upd;
-        });
+
+    final queue = ValueListenableBuilder<media.MediaSearchState>(
+      valueListenable: _search,
+      builder: (context, state, _) {
+        final category = mimex.category(state.next.mimetypes);
+        return PlaylistQueue(
+          _latest.sync,
+          _socket,
+          key: const ValueKey("queue"),
+          sessionId: _sessionID,
+          onChange: (mut) {
+            final upd = _latest.deepCopy()..sync = mut(_latest.sync.deepCopy());
+            setState(() {
+              _latest = upd;
+            });
+          },
+          empty: ds.Loading(
+            loading: _latest.sync.token.isEmpty,
+            maintainState: false,
+            maintainAnimation: false,
+            maintainSize: false,
+            Column(
+              children: [
+                Text("Continue"),
+                Expanded(
+                  child: disc.RecentList(
+                    margin: defaults.margin.copyWith(left: 0, right: 0),
+                    category,
+                    latest: widget.apirecentlatest,
+                    host: _latest.sync.library.hostname,
+                    authz: httpx.Request.bearer(() => Future.value(_latest.sync.token)),
+                    onTap: _onRecentTap,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
       },
-      empty: disc.RecentList(
-        category,
-        latest: (req, {host, options = const []}) => widget.apirecentlatest(
-          req,
-          host: _endpoint.value.hostname,
-          options: [authn.request(authn.AuthedEndpoint.token(context))],
-        ),
-      ),
     );
     return ds.Shortcuts(
       bindings: {
