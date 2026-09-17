@@ -17,7 +17,8 @@ import (
 )
 
 type cmdCommunityList struct {
-	Name string `arg:"" name:"name" help:"name of the community" required:"true"`
+	Database string `flag:"" name:"database" help:"database to read" default:"${vars_user_configuration_directory}/meta.db"`
+	Name     string `arg:"" name:"name" help:"name of the community" required:"true"`
 }
 
 func (t cmdCommunityList) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClient) (err error) {
@@ -35,7 +36,7 @@ func (t cmdCommunityList) Run(gctx *cmdopts.Global, dpc cmdopts.DeeppoolClient) 
 		return errorsx.Wrap(err, "failed to locate community")
 	}
 
-	if db, err = cmdopts.DatabaseMeta(gctx.Context); err != nil {
+	if db, err = cmdopts.DatabaseCustom(gctx.Context, t.Database); err != nil {
 		return err
 	}
 	defer db.Close()

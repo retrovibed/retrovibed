@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"path/filepath"
 	"sync"
 	"testing"
 
@@ -12,7 +13,6 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
-	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -49,8 +49,6 @@ func TestCommunityList(t *testing.T) {
 		ctx, cancel := testx.Context(t)
 		defer cancel()
 
-		_ = sqltestx.Metadatabase(t)
-
 		expected := &communityapi.Community{
 			Id:          "00000000-0000-0000-0000-000000000001",
 			Url:         "https://test-community.community.retrovibe.space",
@@ -67,7 +65,8 @@ func TestCommunityList(t *testing.T) {
 		c.Transport = httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), c.Transport)
 
 		cmd := cmdCommunityList{
-			Name: "test-community",
+			Database: filepath.Join(t.TempDir(), "meta.db"),
+			Name:     "test-community",
 		}
 		gctx := &cmdopts.Global{
 			Context:  ctx,

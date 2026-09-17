@@ -16,9 +16,10 @@ import (
 )
 
 type cmdCommunityImport struct {
-	DryRun bool   `flag:"" name:"dry-run" help:"validate and show what would be imported without making changes"`
-	Input  string `flag:"" name:"input" help:"input file path" required:"true"`
-	Output string `flag:"" name:"output" help:"output file path" required:"true"`
+	Database string `flag:"" name:"database" help:"database to write" default:"${vars_user_configuration_directory}/meta.db"`
+	DryRun   bool   `flag:"" name:"dry-run" help:"validate and show what would be imported without making changes"`
+	Input    string `flag:"" name:"input" help:"input file path" required:"true"`
+	Output   string `flag:"" name:"output" help:"output file path" required:"true"`
 }
 
 func (t cmdCommunityImport) Run(gctx *cmdopts.Global) (err error) {
@@ -46,7 +47,7 @@ func (t cmdCommunityImport) Run(gctx *cmdopts.Global) (err error) {
 		return errorsx.Wrap(err, "failed to decode community")
 	}
 
-	if db, err = cmdopts.DatabaseMeta(gctx.Context); err != nil {
+	if db, err = cmdopts.DatabaseCustom(gctx.Context, t.Database); err != nil {
 		return err
 	}
 	defer db.Close()

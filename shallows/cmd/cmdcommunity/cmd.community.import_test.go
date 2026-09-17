@@ -28,9 +28,10 @@ func TestCommunityImport(t *testing.T) {
 		require.NoError(t, os.WriteFile(inputPath, []byte(input), 0644))
 
 		cmd := cmdCommunityImport{
-			DryRun: true,
-			Input:  inputPath,
-			Output: outputPath,
+			Database: filepath.Join(tmpdir, "meta.db"),
+			DryRun:   true,
+			Input:    inputPath,
+			Output:   outputPath,
 		}
 		gctx := &cmdopts.Global{
 			Context:  ctx,

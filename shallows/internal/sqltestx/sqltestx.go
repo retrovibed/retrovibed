@@ -2,6 +2,7 @@ package sqltestx
 
 import (
 	"database/sql"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -12,10 +13,9 @@ import (
 )
 
 func Metadatabase(t testing.TB) *sql.DB {
-	db, err := sql.Open("duckdb", "")
+	db, err := cmdopts.DatabaseCacheDatabaseCustom(t.Context(), "", filepath.Join(t.TempDir(), "cache.db"))
 	require.NoError(t, err)
 	t.Cleanup(func() { db.Close() })
-	require.NoError(t, cmdopts.InitializeDatabase(t.Context(), db))
 	return db
 }
 
