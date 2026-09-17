@@ -116,6 +116,7 @@ abstract class known {
 
   static Future<Known> autodetect(
     Media m, {
+    String? host,
     List<httpx.Option> options = const [],
   }) async {
     if (mimex.icon(m.mimetype) == mimex.icoimage) {
@@ -136,6 +137,7 @@ abstract class known {
             m.knownMediaId,
             () => known.get(
               m.knownMediaId,
+              host: host,
               options: options,
             ),
           )
@@ -189,11 +191,12 @@ abstract class known {
 
   static Future<KnownLookupResponse> get(
     String id, {
+    String? host,
     List<httpx.Option> options = const [],
   }) async {
     return httpx
         .get(
-          Uri.https(httpx.host(), "/k/${id}", {}),
+          Uri.https(host ?? httpx.host(), "/k/${id}", {}),
           options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) {
@@ -442,7 +445,7 @@ abstract class recent {
   }) {
     return httpx
         .delete(
-          Uri.https(httpx.host(), "/w/$id"),
+          Uri.https(host ?? httpx.host(), "/w/$id"),
           options: [httpx.Content.urlencoded, httpx.Accept.json, ...options],
         )
         .then((v) {

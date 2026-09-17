@@ -8,38 +8,50 @@ import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:fixnum/fixnum.dart' as fixnum;
 
+typedef FnRecentTap = Future<void> Function(BuildContext context, media.RecentRecordRequest item);
+
 class RecentList extends StatefulWidget {
   const RecentList(
     this.mimetype, {
     super.key,
     this.latest = lib.recent.latest,
     this.tombstone = lib.recent.delete,
+    this.onTap = defaultOnTap,
+    this.padding,
+    this.margin,
+    this.host,
+    this.authz,
   });
 
   final String mimetype;
   final lib.FnRecent latest;
   final lib.FnRecentTombstone tombstone;
+  final FnRecentTap onTap;
+  final EdgeInsets? padding;
+  final EdgeInsets? margin;
+  final String? host;
+  final httpx.Option? authz;
+
+  static Future<void> defaultOnTap(BuildContext context, media.RecentRecordRequest item) async {
+    final pos = Duration(milliseconds: item.position.toInt());
+    final dur = Duration(milliseconds: item.duration.toInt());
+    final delta = (dur - pos).compareTo(Duration(seconds: 1));
+    final playlist = media.Playlist.of(context);
+
+    playlist?.setPlaylist(
+      item.query,
+      item.media,
+      playlist.autoqueue,
+      pos: delta < 0 ? Duration(milliseconds: 0) : Duration(milliseconds: item.position.toInt()),
+    );
+  }
 
   @override
   State<RecentList> createState() => _RecentListState();
 }
 
-class _RecentListState extends State<RecentList> {
-  Widget _cause = ds.Error.zero;
-  bool _loading = true;
-
+class _RecentListState extends State<RecentList> with ds.LoadingState {
   media.RecentSearchResponse _result = media.RecentSearchResponse();
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
-
-  void reseterr() {
-    setState(() {
-      _cause = ds.Error.zero;
-    });
-  }
 
   @override
   void initState() {
@@ -56,35 +68,36 @@ class _RecentListState extends State<RecentList> {
   }
 
   Future<void> _load(BuildContext context) async {
-    setState(() => _loading = true);
+    setState(() => loading = true);
     return httpx
         .withRetry(
           () => widget.latest(
             lib.recent.request(mimetype: widget.mimetype),
-            options: [authn.request(authn.AuthzCache.meta(context))],
+            host: widget.host,
+            options: [widget.authz ?? authn.request(authn.AuthzCache.meta(context))],
           ),
         )
         .then(
           (resp) => setState(() {
             _result = resp;
-            _loading = false;
+            loading = false;
           }),
         )
         .catchError((cause) {
           setState(() {
-            _loading = false;
+            loading = false;
           });
         }, test: httpx.ErrorsTest.notimplemented)
         .catchError((cause) {
           setState(() {
-            _cause = ds.Errors.httpauto(cause, onTap: reseterr);
-            _loading = false;
+            this.cause = ds.Errors.httpauto(cause, onTap: reseterr);
+            loading = false;
           });
         }, test: httpx.ErrorsTest.httpauto)
         .catchError((cause) {
           setState(() {
-            _cause = ds.Error.unknown(cause, onTap: reseterr);
-            _loading = false;
+            this.cause = ds.Error.unknown(cause, onTap: reseterr);
+            loading = false;
           });
         });
   }
@@ -92,40 +105,32 @@ class _RecentListState extends State<RecentList> {
   @override
   Widget build(BuildContext context) {
     return ds.Container(
+      padding: widget.padding,
+      margin: widget.margin,
       ds.Loading(
-        loading: _loading,
-        cause: _cause,
+        loading: loading,
+        cause: cause,
         Column(
           children: _result.items.map((item) {
             final deletion = () {
               return httpx.withRetry(
                 () => widget
-                    .tombstone(item.id, options: [authn.request(authn.AuthzCache.meta(context))])
+                    .tombstone(
+                      item.id,
+                      host: widget.host,
+                      options: [widget.authz ?? authn.request(authn.AuthzCache.meta(context))],
+                    )
                     .then((_) => _load(context)),
               );
             };
             return lib.KnownMediaRowDisplay.future(
-              lib.known.autodetect(item.media, options: [authn.request(authn.AuthzCache.meta(context))]),
-              onTap: () async {
-                final pos = Duration(milliseconds: item.position.toInt());
-                final dur = Duration(milliseconds: item.duration.toInt());
-                final delta = (dur - pos).compareTo(Duration(seconds: 1));
-                final playlist = media.Playlist.of(context);
-
-                playlist?.setPlaylist(
-                  item.query,
-                  item.media,
-                  playlist.autoqueue,
-                  pos: delta < 0 ? Duration(milliseconds: 0) : Duration(milliseconds: item.position.toInt()),
-                );
-              },
+              lib.known.autodetect(
+                item.media,
+                host: widget.host,
+                options: [widget.authz ?? authn.request(authn.AuthzCache.meta(context))],
+              ),
+              onTap: () async => widget.onTap(context, item),
               trailing: [
-                // ds.LoadingIconButton.edit(
-                //   onPressed: () async => ds.modals.push(
-                //     context,
-                //     RecentEdit(item, constraints: const BoxConstraints(maxWidth: 400)),
-                //   ),
-                // ),
                 ds.LoadingIconButton.remove(onPressed: deletion),
               ],
             );
