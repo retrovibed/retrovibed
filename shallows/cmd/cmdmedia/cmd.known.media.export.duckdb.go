@@ -19,7 +19,7 @@ import (
 )
 
 type duckdbexport struct {
-	Database string   `flag:"" name:"database" help:"database to read" default:"${vars_user_configuration_directory}/meta.db"`
+	Database string   `flag:"" name:"database" help:"cache database to read" default:"${vars_user_cache_directory}/cache.db"`
 	Offset   string   `flag:"" name:"offset" help:"uid offset to start export from" default:"00000000-0000-0000-0000-000000000000"`
 	ID       []string `flag:"" name:"id" help:"restrict export to the specified known id(s)" optional:""`
 	Language string   `flag:"" name:"language" help:"restrict export to the specified language" optional:""`

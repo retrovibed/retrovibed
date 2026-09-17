@@ -18,7 +18,7 @@ import (
 )
 
 type knowndetect struct {
-	Database string `flag:"" name:"database" help:"database to read" default:"${vars_user_configuration_directory}/meta.db"`
+	Database string `flag:"" name:"database" help:"cache database to read" default:"${vars_user_cache_directory}/cache.db"`
 }
 
 func (t knowndetect) Run(gctx *cmdopts.Global) (err error) {

@@ -15,7 +15,7 @@ import (
 )
 
 type knownenv struct {
-	Database      string   `flag:"" name:"database" help:"database to read" default:"${vars_user_configuration_directory}/meta.db"`
+	Database      string   `flag:"" name:"database" help:"cache database to read" default:"${vars_user_cache_directory}/cache.db"`
 	ExcludeSource []string `flag:"" name:"exclude-source" help:"exclude the specified source(s) from the calculation" optional:""`
 	IncludeSource []string `flag:"" name:"include-source" help:"limit the calculation to the specified source(s)" optional:""`
 }

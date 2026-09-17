@@ -22,7 +22,7 @@ import (
 )
 
 type knownimport struct {
-	Database string `flag:"" name:"database" help:"database to read" default:"${vars_user_configuration_directory}/meta.db"`
+	Database string `flag:"" name:"database" help:"cache database to read/write" default:"${vars_user_cache_directory}/cache.db"`
 	Batch    int    `flag:"" name:"batch" help:"number of records to insert per batch" default:"8192"`
 	Backlog  uint16 `flag:"" name:"backlog" help:"number of batches to allowed to queue up" default:"128"`
 	Workers  uint16 `flag:"" name:"workers" help:"number of async database workers to run" default:"1"`

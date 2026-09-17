@@ -44,6 +44,7 @@ func Genparser[T any](cmd T, opts ...kong.Option) func(t *testing.T) *kong.Kong 
 				kong.Vars{
 					"vars_private_key":                  env.PrivateKeyPath(),
 					"vars_user_configuration_directory": t.TempDir(),
+					"vars_user_cache_directory":         t.TempDir(),
 					"env_http_endpoint":                 env.Endpoint,
 				},
 				kong.NamedMapper("durationinf", kong.MapperFunc(cmdopts.ParseDurationInf)),

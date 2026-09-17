@@ -1,5 +1,6 @@
 -- +goose Up
 -- +goose StatementBegin
+DROP TABLE IF EXISTS library_known_media;
 CREATE TABLE library_known_media (
     uid UUID PRIMARY KEY NOT NULL,
     md5 UUID UNIQUE NOT NULL,

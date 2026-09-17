@@ -38,13 +38,13 @@ func Database(ctx context.Context) (db *sql.DB, err error) {
 
 // DatabaseCustom opens metapath, opens and migrates cachepath, and attaches
 // cachepath onto the metapath connection under the "cache" catalog. See
-// AttachCache and DatabaseCacheCustom.
+// AttachCache and DatabaseCache.
 func DatabaseCustom(ctx context.Context, metapath, cachepath string) (db *sql.DB, err error) {
 	if db, err = DatabaseMetaCustom(ctx, metapath); err != nil {
 		return nil, err
 	}
 
-	cachedb, err := DatabaseCacheCustom(ctx, cachepath)
+	cachedb, err := DatabaseCache(ctx, cachepath)
 	if err != nil {
 		return nil, err
 	}
@@ -97,21 +97,13 @@ func InitializeDatabase(ctx context.Context, path string, migrations fs.FS) (db 
 //go:embed .migrations.cache/*.sql
 var embedmigrationscache embed.FS
 
-// DatabaseCache opens and migrates path's sibling cache.db (see
-// .migrations.cache) as its own standalone database, with path resolved the
-// same way DatabaseMeta resolves meta.db's sibling cache path. Cache-resident
+// DatabaseCache opens and migrates path (see .migrations.cache) as its own
+// standalone database, with no dependency on a meta database. Cache-resident
 // tables (e.g. library_known_media) are referenced fully qualified as
 // cache.<table> (or "cache"."<table>" for INSERT/UPDATE/DELETE targets)
 // throughout the genieql-generated code, so callers must AttachCache this
 // onto a meta connection before those queries will resolve.
 func DatabaseCache(ctx context.Context, path string) (db *sql.DB, err error) {
-	return DatabaseCacheCustom(ctx, filepath.Join(filepath.Dir(path), "cache.db"))
-}
-
-// DatabaseCacheCustom opens and migrates cachepath (see .migrations.cache) as its
-// own standalone database, with no dependency on a meta database. Use
-// AttachCache to wire it onto a meta connection under the "cache" catalog.
-func DatabaseCacheCustom(ctx context.Context, path string) (db *sql.DB, err error) {
 	return InitializeDatabase(ctx, path, errorsx.Must(fs.Sub(embedmigrationscache, ".migrations.cache")))
 }
 

@@ -22,7 +22,7 @@ import (
 )
 
 type knownquery struct {
-	Database     string  `flag:"" name:"database" help:"database to read" default:"${vars_user_configuration_directory}/meta.db"`
+	Database     string  `flag:"" name:"database" help:"cache database to read" default:"${vars_user_cache_directory}/cache.db"`
 	Explicit     bool    `flag:"" name:"explicit" help:"include explicit content in results" default:"false"`
 	Cutoff       float32 `flag:"" name:"cutoff" help:"similarity cutoff for scoring" default:"0.7"`
 	MinRelevance float64 `flag:"" name:"min-relevance" help:"minimum relevance score" default:"0.85"`
