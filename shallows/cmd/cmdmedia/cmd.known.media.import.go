@@ -32,7 +32,7 @@ type knownimport struct {
 func (t knownimport) Run(gctx *cmdopts.Global) (err error) {
 	var db *sql.DB
 
-	if db, err = cmdopts.DatabaseCacheDatabase(gctx.Context, t.Database); err != nil {
+	if db, err = cmdopts.DatabaseCache(gctx.Context, t.Database); err != nil {
 		return err
 	}
 	defer db.Close()

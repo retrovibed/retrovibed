@@ -134,7 +134,7 @@ func KnownSearch(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilder) 
 }
 
 func KnownQueryUIDGreaterThan(uid string) squirrel.Sqlizer {
-	return squirrel.Expr("library_known_media.uid > ?", uid)
+	return squirrel.Expr("cache.library_known_media.uid > ?", uid)
 }
 
 // KnownQueryExplicit toggles whether adult content is allowed in results.
@@ -145,15 +145,15 @@ func KnownQueryExplicit(allow bool) squirrel.Sqlizer {
 		return squirrelx.Noop{}
 	}
 
-	return squirrel.Expr("library_known_media.adult = ?", false)
+	return squirrel.Expr("cache.library_known_media.adult = ?", false)
 }
 
 func KnownQueryUID(ids ...string) squirrel.Sqlizer {
-	return squirrelx.In("library_known_media.uid", ids...)
+	return squirrelx.In("cache.library_known_media.uid", ids...)
 }
 
 func KnownQueryParentUID(uid string) squirrel.Sqlizer {
-	return squirrel.Expr("library_known_media.parent_uid = ?", uid)
+	return squirrel.Expr("cache.library_known_media.parent_uid = ?", uid)
 }
 
 func KnownQueryLanguage(v string) squirrel.Sqlizer {
@@ -161,7 +161,7 @@ func KnownQueryLanguage(v string) squirrel.Sqlizer {
 		return squirrelx.Noop{}
 	}
 
-	return squirrel.Expr("library_known_media.original_language = ?", v)
+	return squirrel.Expr("cache.library_known_media.original_language = ?", v)
 }
 
 func KnownQueryMimetype(v string) squirrel.Sqlizer {
@@ -169,15 +169,15 @@ func KnownQueryMimetype(v string) squirrel.Sqlizer {
 		return squirrelx.Noop{}
 	}
 
-	return squirrel.Expr("library_known_media.mimetype = ?", v)
+	return squirrel.Expr("cache.library_known_media.mimetype = ?", v)
 }
 
 func KnownQuerySource(sources ...string) squirrel.Sqlizer {
-	return squirrelx.In("library_known_media.source", sources...)
+	return squirrelx.In("cache.library_known_media.source", sources...)
 }
 
 func KnownQueryExcludeSource(sources ...string) squirrel.Sqlizer {
-	return squirrelx.NotIn("library_known_media.source", sources...)
+	return squirrelx.NotIn("cache.library_known_media.source", sources...)
 }
 
 func KnownQueryDetectLanguage(v string) squirrel.Sqlizer {
@@ -186,15 +186,15 @@ func KnownQueryDetectLanguage(v string) squirrel.Sqlizer {
 		return squirrelx.Noop{}
 	}
 
-	return squirrelx.Between("unicode(library_known_media.auto_description)", min, max)
+	return squirrelx.Between("unicode(cache.library_known_media.auto_description)", min, max)
 }
 
 func KnownQueryReleased(r timex.Range) squirrel.Sqlizer {
-	return squirrelx.Between("library_known_media.released", ducktype.NewNullTime(r.Start), ducktype.NewNullTime(r.End))
+	return squirrelx.Between("cache.library_known_media.released", ducktype.NewNullTime(r.Start), ducktype.NewNullTime(r.End))
 }
 
 func KnownQueryWithPoster() squirrel.Sqlizer {
-	return squirrel.Expr("(library_known_media.poster_path != '' OR library_known_media.backdrop_path != '')")
+	return squirrel.Expr("(cache.library_known_media.poster_path != '' OR cache.library_known_media.backdrop_path != '')")
 }
 
 // KnownMatchCutoff is the default minimum combined jaro-winkler/jaro
@@ -204,19 +204,19 @@ func KnownQueryWithPoster() squirrel.Sqlizer {
 const KnownMatchCutoff float32 = 0.85
 
 func KnownQuerySimilarity(q string, cutoff float32) squirrel.Sqlizer {
-	return squirrel.Expr("((jaro_winkler_similarity(library_known_media.title, ?, ?) + jaro_similarity(library_known_media.title, ?, ?)) / 2) > ?", q, cutoff, q, cutoff, cutoff)
+	return squirrel.Expr("((jaro_winkler_similarity(cache.library_known_media.title, ?, ?) + jaro_similarity(cache.library_known_media.title, ?, ?)) / 2) > ?", q, cutoff, q, cutoff, cutoff)
 }
 
 func KnownSearchBuilder() squirrel.SelectBuilder {
-	return squirrelx.PSQL.Select(sqlx.Columns(KnownScannerStaticColumns)...).From("library_known_media")
+	return squirrelx.PSQL.Select(sqlx.Columns(KnownScannerStaticColumns)...).From("cache.library_known_media")
 }
 
 func KnownQueryNotTombstoned() squirrel.Sqlizer {
-	return squirrel.Expr("library_known_media.tombstoned_at = 'infinity'")
+	return squirrel.Expr("cache.library_known_media.tombstoned_at = 'infinity'")
 }
 
 func KnownQueryTombstoned() squirrel.Sqlizer {
-	return squirrel.Expr("library_known_media.tombstoned_at < 'infinity'")
+	return squirrel.Expr("cache.library_known_media.tombstoned_at < 'infinity'")
 }
 
 func DetectKnownMedia(ctx context.Context, db sqlx.Queryer, mimecat string, query string, similarity float32) (k Known, err error) {

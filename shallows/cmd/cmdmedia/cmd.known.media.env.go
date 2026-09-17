@@ -23,7 +23,7 @@ type knownenv struct {
 func (t knownenv) Run(gctx *cmdopts.Global) (err error) {
 	var db *sql.DB
 
-	if db, err = cmdopts.DatabaseCacheDatabase(gctx.Context, t.Database); err != nil {
+	if db, err = cmdopts.DatabaseCache(gctx.Context, t.Database); err != nil {
 		return err
 	}
 	defer db.Close()
@@ -34,7 +34,7 @@ func (t knownenv) Run(gctx *cmdopts.Global) (err error) {
 func (t knownenv) run(ctx context.Context, db *sql.DB, w io.Writer) (err error) {
 	query, args, err := squirrelx.PSQL.
 		Select("COALESCE(MAX(released), '1700-01-01'::TIMESTAMP) AS start").
-		From("library_known_media").
+		From("cache.library_known_media").
 		Where("released < NOW()").
 		Where(library.KnownQueryExcludeSource(t.ExcludeSource...)).
 		Where(library.KnownQuerySource(t.IncludeSource...)).

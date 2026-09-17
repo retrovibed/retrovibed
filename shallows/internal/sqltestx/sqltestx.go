@@ -13,9 +13,10 @@ import (
 )
 
 func Metadatabase(t testing.TB) *sql.DB {
-	db, err := cmdopts.DatabaseCacheDatabaseCustom(t.Context(), "", filepath.Join(t.TempDir(), "cache.db"))
+	db, err := cmdopts.DatabaseCustom(t.Context(), "", filepath.Join(t.TempDir(), "cache.db"))
 	require.NoError(t, err)
 	t.Cleanup(func() { db.Close() })
+
 	return db
 }
 

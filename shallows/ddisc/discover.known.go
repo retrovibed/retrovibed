@@ -74,7 +74,7 @@ func (t *knownSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 
 		qq := library.KnownSearchBuilder().Where(squirrel.And{
 			library.KnownQueryExplicit(t.req.Adult),
-			squirrelx.In("library_known_media.mimetype", mimetypes...),
+			squirrelx.In("cache.library_known_media.mimetype", mimetypes...),
 			library.KnownQuerySimilarity(t.req.Query, knownSimilarityCutoff),
 			// TEMPORARY: exclude episode rows (they share their show's
 			// title) until real episode-aware matching exists; otherwise

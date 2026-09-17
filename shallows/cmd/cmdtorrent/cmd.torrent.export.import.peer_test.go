@@ -69,7 +69,7 @@ func TestExportImportPeer(t *testing.T) {
 
 		const knownSeed = "550e8400-e29b-41d4-a716-446655440000"
 		dbPath := xdgDBPath(xdgConfig)
-		db, err := cmdopts.DatabaseCustom(ctx, dbPath)
+		db, err := cmdopts.DatabaseMetaCustom(ctx, dbPath)
 		require.NoError(t, err)
 		lmd := tracking.NewMetadata(new(md.ID), tracking.MetadataOptionEncryptionSeed(knownSeed))
 		require.NoError(t, tracking.MetadataInsertWithDefaults(ctx, db, lmd).Scan(&lmd))

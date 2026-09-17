@@ -83,7 +83,7 @@ func TestMediaMetadataImport(t *testing.T) {
 
 		require.NoError(t, daemons.MediaMetadataImport(t.Context(), q, tvfs, tstore))
 
-		require.Equal(t, 1, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM library_known_media")))
+		require.Equal(t, 1, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM cache.library_known_media")))
 		require.Equal(t, 1, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM torrents_metadata WHERE imported_at < NOW()")))
 	})
 
@@ -135,7 +135,7 @@ func TestMediaMetadataImport(t *testing.T) {
 		// a DuckDB "Could not convert string '' to INT128" error (parent_uid
 		// is a NOT NULL UUID column) - see shallows/media/http.known.go's
 		// equivalent fix and its test for that failure mode surfacing.
-		require.Equal(t, 1, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM library_known_media")))
+		require.Equal(t, 1, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM cache.library_known_media")))
 	})
 
 	t.Run("imports multiple library.Known records from a single archive", func(t *testing.T) {
@@ -178,7 +178,7 @@ func TestMediaMetadataImport(t *testing.T) {
 
 		require.NoError(t, daemons.MediaMetadataImport(t.Context(), q, tvfs, tstore))
 
-		require.Equal(t, 2, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM library_known_media")))
+		require.Equal(t, 2, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM cache.library_known_media")))
 	})
 
 	t.Run("skips archives not yet completed", func(t *testing.T) {
@@ -197,7 +197,7 @@ func TestMediaMetadataImport(t *testing.T) {
 
 		require.NoError(t, daemons.MediaMetadataImport(t.Context(), q, tvfs, tstore))
 
-		require.Equal(t, 0, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM library_known_media")))
+		require.Equal(t, 0, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM cache.library_known_media")))
 	})
 
 	t.Run("skips archives already imported", func(t *testing.T) {
@@ -217,7 +217,7 @@ func TestMediaMetadataImport(t *testing.T) {
 
 		require.NoError(t, daemons.MediaMetadataImport(t.Context(), q, tvfs, tstore))
 
-		require.Equal(t, 0, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM library_known_media")))
+		require.Equal(t, 0, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM cache.library_known_media")))
 	})
 
 	t.Run("no archive metadata returns no error", func(t *testing.T) {

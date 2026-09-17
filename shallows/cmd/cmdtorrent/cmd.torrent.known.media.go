@@ -23,7 +23,7 @@ func (t cmdKnownMedia) Run(ctx *cmdopts.Global) (err error) {
 		db *sql.DB
 	)
 
-	if db, err = cmdopts.DatabaseMeta(ctx.Context); err != nil {
+	if db, err = cmdopts.Database(ctx.Context); err != nil {
 		return err
 	}
 	defer db.Close()

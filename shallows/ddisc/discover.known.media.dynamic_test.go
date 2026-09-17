@@ -82,7 +82,7 @@ func TestDiscoverKnownMediaDynamic(t *testing.T) {
 		require.NoError(t, seq.Err())
 		require.Len(t, got, 1)
 		require.Equal(t, kid, got[0].KnownMediaID, "an already-resolved candidate must not be re-stamped")
-		require.Equal(t, 0, sqltestx.Count(t, q, "SELECT COUNT(*) FROM library_known_media"), "must not mint a duplicate catalog entry for an already-resolved candidate")
+		require.Equal(t, 0, sqltestx.Count(t, q, "SELECT COUNT(*) FROM cache.library_known_media"), "must not mint a duplicate catalog entry for an already-resolved candidate")
 	})
 
 	t.Run("skips a candidate missing a title", func(t *testing.T) {
@@ -109,7 +109,7 @@ func TestDiscoverKnownMediaDynamic(t *testing.T) {
 		require.NoError(t, seq.Err())
 		require.Len(t, got, 1)
 		require.Equal(t, uuid.Nil.String(), got[0].KnownMediaID)
-		require.Equal(t, 0, sqltestx.Count(t, q, "SELECT COUNT(*) FROM library_known_media"), "a candidate with no title isn't worth cataloging")
+		require.Equal(t, 0, sqltestx.Count(t, q, "SELECT COUNT(*) FROM cache.library_known_media"), "a candidate with no title isn't worth cataloging")
 	})
 
 	t.Run("skips a candidate missing a poster uri", func(t *testing.T) {
@@ -136,7 +136,7 @@ func TestDiscoverKnownMediaDynamic(t *testing.T) {
 		require.NoError(t, seq.Err())
 		require.Len(t, got, 1)
 		require.Equal(t, uuid.Nil.String(), got[0].KnownMediaID)
-		require.Equal(t, 0, sqltestx.Count(t, q, "SELECT COUNT(*) FROM library_known_media"), "a candidate with nothing to show in the UI isn't worth cataloging")
+		require.Equal(t, 0, sqltestx.Count(t, q, "SELECT COUNT(*) FROM cache.library_known_media"), "a candidate with nothing to show in the UI isn't worth cataloging")
 	})
 
 	t.Run("does nothing when the option is omitted", func(t *testing.T) {

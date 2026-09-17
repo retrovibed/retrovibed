@@ -33,7 +33,7 @@ type exportJSONL struct {
 }
 
 func (t exportJSONL) Run(gctx *cmdopts.Global) (err error) {
-	db, err := cmdopts.DatabaseCustom(gctx.Context, t.Database)
+	db, err := cmdopts.DatabaseMetaCustom(gctx.Context, t.Database)
 	if err != nil {
 		return err
 	}

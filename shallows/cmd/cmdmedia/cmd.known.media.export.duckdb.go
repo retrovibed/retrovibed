@@ -30,7 +30,7 @@ type duckdbexport struct {
 }
 
 func (t duckdbexport) Run(kctx *kong.Context, gctx *cmdopts.Global) (err error) {
-	db, err := cmdopts.DatabaseCacheDatabase(gctx.Context, t.Database)
+	db, err := cmdopts.DatabaseCache(gctx.Context, t.Database)
 	if err != nil {
 		return err
 	}

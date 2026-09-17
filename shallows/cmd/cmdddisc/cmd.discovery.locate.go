@@ -42,22 +42,23 @@ import (
 var errLocateFound = errorsx.String("locate: candidate found")
 
 type cmdMediaLocate struct {
-	Database     string        `flag:"" name:"database" help:"database to read/write" default:"${vars_user_configuration_directory}/meta.db"`
-	Query        string        `arg:"" name:"query" help:"title or free-text search to locate media for"`
-	Mimetype     string        `flag:"" name:"mimetype" help:"mimetype/category (video, audio, image, text, application) to search for" required:""`
-	KnownMediaID string        `flag:"" name:"known-media-id" help:"known media id, if already resolved from a catalog search" optional:""`
-	Partitions   uint8         `flag:"" name:"discovery-partition" help:"number of partitions to split the infohash space into, must match the swarm's configuration" default:"128"`
-	Seed         string        `flag:"" name:"discovery-seed" help:"seed to generate partition spaces, must match the swarm's configuration" default:"retrovibed-ddisc"`
-	Interval     time.Duration `flag:"" name:"interval" help:"how often to re-run the discover/rank pass while waiting on async DHT responses" default:"20s"`
-	Timeout      time.Duration `flag:"" name:"timeout" type:"durationinf" help:"give up waiting for a candidate after this long, use 'infinity' to wait forever; the locate request itself remains queued for a running daemon to pick up later" default:"infinity"`
-	Bootstrap    bool          `flag:"" name:"dht-bootstrap" help:"bootstrap the DHT using well-known trackers" negatable:"" default:"true"`
-	Adult        bool          `flag:"" name:"adult" help:"allow adult content in search plugin results" negatable:"" default:"false"`
-	Download     bool          `flag:"" name:"download" help:"automatically download the located torrent instead of just recording it as a recommendation" negatable:"" default:"false"`
-	DHTPeers     []string      `flag:"" name:"dht-peers" help:"use these dht peers as the sole bootstrap nodes instead of the public network" hidden:"true"`
+	Database      string        `flag:"" name:"database" help:"database to read/write" default:"${vars_user_configuration_directory}/meta.db"`
+	CacheDatabase string        `flag:"" name:"cache-database" help:"cache database to read/write" default:"${vars_user_cache_directory}/cache.db"`
+	Query         string        `arg:"" name:"query" help:"title or free-text search to locate media for"`
+	Mimetype      string        `flag:"" name:"mimetype" help:"mimetype/category (video, audio, image, text, application) to search for" required:""`
+	KnownMediaID  string        `flag:"" name:"known-media-id" help:"known media id, if already resolved from a catalog search" optional:""`
+	Partitions    uint8         `flag:"" name:"discovery-partition" help:"number of partitions to split the infohash space into, must match the swarm's configuration" default:"128"`
+	Seed          string        `flag:"" name:"discovery-seed" help:"seed to generate partition spaces, must match the swarm's configuration" default:"retrovibed-ddisc"`
+	Interval      time.Duration `flag:"" name:"interval" help:"how often to re-run the discover/rank pass while waiting on async DHT responses" default:"20s"`
+	Timeout       time.Duration `flag:"" name:"timeout" type:"durationinf" help:"give up waiting for a candidate after this long, use 'infinity' to wait forever; the locate request itself remains queued for a running daemon to pick up later" default:"infinity"`
+	Bootstrap     bool          `flag:"" name:"dht-bootstrap" help:"bootstrap the DHT using well-known trackers" negatable:"" default:"true"`
+	Adult         bool          `flag:"" name:"adult" help:"allow adult content in search plugin results" negatable:"" default:"false"`
+	Download      bool          `flag:"" name:"download" help:"automatically download the located torrent instead of just recording it as a recommendation" negatable:"" default:"false"`
+	DHTPeers      []string      `flag:"" name:"dht-peers" help:"use these dht peers as the sole bootstrap nodes instead of the public network" hidden:"true"`
 }
 
 func (t cmdMediaLocate) Run(gctx *cmdopts.Global) (err error) {
-	db, err := cmdopts.DatabaseCustom(gctx.Context, t.Database)
+	db, err := cmdopts.DatabaseCustom(gctx.Context, t.Database, t.CacheDatabase)
 	if err != nil {
 		return err
 	}

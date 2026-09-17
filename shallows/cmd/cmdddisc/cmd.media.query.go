@@ -43,7 +43,7 @@ func (t cmdMediaQuery) Run(kctx *kong.Context, gctx *cmdopts.Global) (err error)
 		errorsx.Log(errorsx.Wrap(os.RemoveAll(tmpdir), "failed to cleanup temporary directory"))
 	}()
 
-	db, err := cmdopts.DatabaseCustom(gctx.Context, filepath.Join(tmpdir, "meta.db"))
+	db, err := cmdopts.DatabaseMetaCustom(gctx.Context, filepath.Join(tmpdir, "meta.db"))
 	if err != nil {
 		return errorsx.Wrap(err, "unable to open temporary database")
 	}

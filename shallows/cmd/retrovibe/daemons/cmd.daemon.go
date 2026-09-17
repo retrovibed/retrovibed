@@ -210,7 +210,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		errorsx.Log(errorsx.Wrap(httpbind.Close(), "http server shutdown failed"))
 	}()
 
-	if db, err = cmdopts.DatabaseMeta(gctx.Context); err != nil {
+	if db, err = cmdopts.Database(gctx.Context); err != nil {
 		return err
 	}
 	defer db.Close()

@@ -27,7 +27,7 @@ type reindex struct {
 func (t reindex) Run(gctx *cmdopts.Global) (err error) {
 	var db *sql.DB
 
-	if db, err = cmdopts.DatabaseCustom(gctx.Context, t.Database); err != nil {
+	if db, err = cmdopts.DatabaseMetaCustom(gctx.Context, t.Database); err != nil {
 		return err
 	}
 	defer db.Close()

@@ -64,7 +64,7 @@ func TestPluginStrategyNoopsWithoutTitle(t *testing.T) {
 	}
 	require.NoError(t, seq.Err())
 	require.Equal(t, 0, count)
-	require.Equal(t, 0, sqltestx.Count(t, q, "SELECT COUNT(*) FROM library_known_media"))
+	require.Equal(t, 0, sqltestx.Count(t, q, "SELECT COUNT(*) FROM cache.library_known_media"))
 }
 
 func TestPluginStrategyResolvesNonMagnetURI(t *testing.T) {
