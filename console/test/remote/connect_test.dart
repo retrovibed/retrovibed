@@ -12,6 +12,7 @@ import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/meta.dart' as meta;
 import 'package:retrovibed/remote/api.dart' as remote;
 import 'package:retrovibed/remote/connect.dart';
+import 'package:retrovibed/remote/player.control.playback.dart';
 import 'package:retrovibed/remote/playlist.current.dart';
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
 import 'package:retrovibed/uuidx.dart' as uuidx;
@@ -519,6 +520,24 @@ void main() {
     expect(sessionIds, hasLength(1), reason: 'every send from one Connect mount should share one session id');
     expect(sessionIds.single, isNotEmpty);
     expect(sessionIds.single, isNot(uuidx.min()));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('a standalone playback echo updates the position/duration gauge', (tester) async {
+    final item = _remoteTrack('m1', 'Track A');
+    final (socket, _, sessionId) = await _mountAndPlayUnderQuery(tester, query: 'my query', item: item);
+
+    socket.emit(
+      remote.Stream(
+        sessionId: sessionId,
+        playback: remote.Playback(media: item, position: fixnum.Int64(15000), duration: fixnum.Int64(180000)),
+      ),
+    );
+    await tester.pumpN(2);
+
+    final playback = tester.widget<PlayerControlPlayback>(find.byType(PlayerControlPlayback));
+    expect(playback.current.playback.position, fixnum.Int64(15000));
+    expect(playback.current.playback.duration, fixnum.Int64(180000));
     expect(tester.takeException(), isNull);
   });
 

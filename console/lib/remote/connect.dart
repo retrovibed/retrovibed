@@ -376,19 +376,33 @@ class _State extends State<Connect> with LoadingState {
             _messages = socket.messages.asBroadcastStream();
             _messages.listen(
               (msg) {
-                // print("sync ${msg.sid}");
-                if (msg.whichCommand() != remote.Stream_Command.sync) return;
-                print("sync received ${msg.sid} ${_latest.sync.queue.length}");
-                // vid is a monotonic sequence number, unlike sid (a uuidv7)
-                // whose ordering isn't guaranteed for two ids minted within
-                // the same millisecond.
-                if (msg.vid <= _latest.vid) return;
-                print("sync accepted ${msg.sid} ${msg.sync.queue.length}");
-                setState(() {
-                  _unconfirmed.removeWhere((m) => msg.sync.queue.any((s) => s.asMedia.id == m.id));
-                  _latest = msg;
-                });
-                _fillQueue(_autoqueue);
+                switch (msg.whichCommand()) {
+                  case remote.Stream_Command.sync:
+                    // print("sync ${msg.sid}");
+                    print("sync received ${msg.sid} ${_latest.sync.queue.length}");
+                    // vid is a monotonic sequence number, unlike sid (a uuidv7)
+                    // whose ordering isn't guaranteed for two ids minted within
+                    // the same millisecond.
+                    if (msg.vid <= _latest.vid) return;
+                    print("sync accepted ${msg.sid} ${msg.sync.queue.length}");
+                    setState(() {
+                      _unconfirmed.removeWhere((m) => msg.sync.queue.any((s) => s.asMedia.id == m.id));
+                      _latest = msg;
+                    });
+                    _fillQueue(_autoqueue);
+                    break;
+                  case remote.Stream_Command.playback:
+                    // a standalone playback frame reports live
+                    // position/duration for _latest.sync.current - pair it
+                    // onto _latest.sync.playback in place rather than
+                    // waiting on the next full sync echo.
+                    setState(() {
+                      _latest = _latest.deepCopy()..sync = (_latest.sync.deepCopy()..playback = msg.playback);
+                    });
+                    break;
+                  default:
+                    break;
+                }
               },
               cancelOnError: true,
               onError: c.completeError,
