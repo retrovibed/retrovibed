@@ -432,7 +432,7 @@ func (t *tmdbimport) series(ctx context.Context, c *tmdb.Client) iter.Seq[librar
 					return timex.Max(errorsx.ZeroSilent(time.Parse(time.DateOnly, mr.FirstAirDate)), year)
 				}, resp.Results...)...)
 
-				if page >= resp.TotalPages {
+				if len(resp.Results) == 0 || page >= resp.TotalPages {
 					year = year.Add(24 * time.Hour)
 					page = 1
 				} else {
