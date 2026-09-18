@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/james-lawrence/torrent/torrenttestx"
-	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
@@ -17,20 +17,21 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
+	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/media"
 	"github.com/retrovibed/retrovibed/shallows/meta"
 	"github.com/retrovibed/retrovibed/shallows/metaapi"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func TestDiscoveredDelete(t *testing.T) {
-	t.Run("should delete an existing download", func(t *testing.T) {
+func TestDiscoveredPause(t *testing.T) {
+	t.Run("successful pause - stops the torrent", func(t *testing.T) {
 		var (
-			p      meta.Profile
-			authz  meta.Authz
-			tmd    tracking.Metadata
-			result media.DownloadDeleteResponse
+			p     meta.Profile
+			authz meta.Authz
+			tmd   tracking.Metadata
 		)
 		ctx, done := testx.Context(t)
 		defer done()
@@ -45,6 +46,9 @@ func TestDiscoveredDelete(t *testing.T) {
 
 		require.NoError(t, testx.Fake(&tmd, tracking.MetadataOptionTestDefaults))
 		require.NoError(t, tracking.MetadataInsertWithDefaults(ctx, q, tmd).Scan(&tmd))
+		require.Greater(t, tmd.Bytes, uint64(0))
+		require.Greater(t, tmd.Downloaded, uint64(0))
+		require.Greater(t, tmd.Uploaded, uint64(0))
 
 		vfs := fsx.DirVirtual(t.TempDir())
 
@@ -63,7 +67,7 @@ func TestDiscoveredDelete(t *testing.T) {
 
 		resp, req, err := httptestx.BuildRequestBytes(
 			http.MethodDelete,
-			fmt.Sprintf("/%s", tmd.ID),
+			fmt.Sprintf("/%s/pause", tmd.ID),
 			nil,
 			httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)),
 		)
@@ -72,15 +76,23 @@ func TestDiscoveredDelete(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.Equal(t, http.StatusOK, resp.Result().StatusCode)
-		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
-		require.Equal(t, tmd.ID, result.Download.Media.Id)
 
-		// confirm the download is no longer in the database
-		var deleted tracking.Metadata
-		require.Error(t, tracking.MetadataFindByID(ctx, q, tmd.ID).Scan(&deleted))
+		var (
+			latest tracking.Metadata
+		)
+
+		require.NoError(t, tracking.MetadataFindByID(t.Context(), q, tmd.ID).Scan(&latest))
+		assert.EqualValues(t, tmd.Bytes, latest.Bytes)
+		assert.EqualValues(t, tmd.Downloaded, latest.Downloaded)
+		assert.EqualValues(t, tmd.Available, latest.Available)
+		assert.EqualValues(t, tmd.Uploaded, latest.Uploaded)
+		assert.WithinDuration(t, tmd.CreatedAt, latest.CreatedAt, 0)
+		assert.LessOrEqual(t, tmd.UpdatedAt, latest.UpdatedAt)
+		assert.WithinDuration(t, timex.Inf(), latest.InitiatedAt, 0)
+		assert.WithinDuration(t, time.Now(), latest.PausedAt, 5*time.Second)
 	})
 
-	t.Run("should return 404 when download does not exist", func(t *testing.T) {
+	t.Run("pause non-existent returns not found", func(t *testing.T) {
 		var (
 			p     meta.Profile
 			authz meta.Authz
@@ -113,7 +125,7 @@ func TestDiscoveredDelete(t *testing.T) {
 
 		resp, req, err := httptestx.BuildRequestBytes(
 			http.MethodDelete,
-			"/00000000-0000-0000-0000-000000000000",
+			"/non-existent-id/pause",
 			nil,
 			httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)),
 		)
@@ -156,7 +168,7 @@ func TestDiscoveredDelete(t *testing.T) {
 
 		resp, req, err := httptestx.BuildRequestBytes(
 			http.MethodDelete,
-			fmt.Sprintf("/%s", tmd.ID),
+			fmt.Sprintf("/%s/pause", tmd.ID),
 			nil,
 		)
 		require.NoError(t, err)

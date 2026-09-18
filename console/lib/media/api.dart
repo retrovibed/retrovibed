@@ -501,6 +501,23 @@ abstract class discovered {
   }) async {
     return httpx
         .delete(
+          Uri.https(httpx.host(), "/d/${id}/reset"),
+          body: jsonEncode({}),
+          options: [httpx.Content.json, httpx.Accept.json, ...options],
+        )
+        .then((v) {
+          return Future.value(
+            httpx.fromProto3JsonSafe(DownloadDeleteResponse.create(), jsonDecode(v.body)),
+          );
+        });
+  }
+
+  static Future<DownloadDeleteResponse> delete(
+    String id, {
+    List<httpx.Option> options = const [],
+  }) async {
+    return httpx
+        .delete(
           Uri.https(httpx.host(), "/d/${id}"),
           body: jsonEncode({}),
           options: [httpx.Content.json, httpx.Accept.json, ...options],

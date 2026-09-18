@@ -8,10 +8,9 @@ import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/lucene.dart' as lucene;
-import 'package:retrovibed/timex.dart' as timex;
 import 'package:retrovibed/torrentx/display.dart' as torrentx;
-import './grid.settings.dart';
-import './magnet.links.dart';
+import 'grid.settings.dart';
+import 'magnet.links.dart';
 
 class AvailableListDisplay extends StatefulWidget {
   final media.FnDownloadSearch search;
@@ -349,7 +348,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                             ),
                             onConfirm: (ctx) => httpx
                                 .withRetry(
-                                  () => media.media.delete(
+                                  () => media.discovered.delete(
                                     v.media.id,
                                     options: [authn.request(authn.AuthzCache.meta(ctx))],
                                   ),

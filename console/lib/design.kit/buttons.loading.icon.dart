@@ -19,6 +19,7 @@ class LoadingIconButton extends StatefulWidget {
   final double iconSize;
   final FocusNode? focusNode;
   final OutlinedBorder? shape;
+  final Color? color;
 
   final bool? toggled;
 
@@ -34,6 +35,7 @@ class LoadingIconButton extends StatefulWidget {
     this.help = HelpScope.None,
     this.focusNode,
     this.shape,
+    this.color,
   });
 
   factory LoadingIconButton.create({
@@ -45,6 +47,7 @@ class LoadingIconButton extends StatefulWidget {
     double iconSize = _defaultIconSize,
     double? value,
     Widget help = HelpScope.None,
+    Color? color,
   }) {
     return LoadingIconButton(
       key: key,
@@ -56,6 +59,7 @@ class LoadingIconButton extends StatefulWidget {
       iconSize: iconSize,
       value: value,
       help: help,
+      color: color,
     );
   }
 
@@ -68,6 +72,7 @@ class LoadingIconButton extends StatefulWidget {
     double iconSize = _defaultIconSize,
     double? value,
     Widget help = HelpScope.None,
+    Color? color,
   }) {
     return LoadingIconButton(
       key: key,
@@ -79,6 +84,7 @@ class LoadingIconButton extends StatefulWidget {
       iconSize: iconSize,
       value: value,
       help: help,
+      color: color,
     );
   }
 
@@ -91,6 +97,7 @@ class LoadingIconButton extends StatefulWidget {
     double iconSize = _defaultIconSize,
     double? value,
     Widget help = HelpScope.None,
+    Color? color,
   }) {
     return LoadingIconButton(
       key: key,
@@ -102,6 +109,7 @@ class LoadingIconButton extends StatefulWidget {
       iconSize: iconSize,
       value: value,
       help: help,
+      color: color,
     );
   }
 
@@ -114,6 +122,7 @@ class LoadingIconButton extends StatefulWidget {
     double iconSize = _defaultIconSize,
     double? value,
     Widget help = HelpScope.None,
+    Color? color,
   }) {
     return LoadingIconButton(
       key: key,
@@ -125,6 +134,7 @@ class LoadingIconButton extends StatefulWidget {
       iconSize: iconSize,
       value: value,
       help: help,
+      color: color,
     );
   }
 
@@ -137,6 +147,7 @@ class LoadingIconButton extends StatefulWidget {
     double iconSize = _defaultIconSize,
     double? value,
     Widget help = HelpScope.None,
+    Color? color,
   }) {
     return LoadingIconButton(
       key: key,
@@ -148,6 +159,7 @@ class LoadingIconButton extends StatefulWidget {
       iconSize: iconSize,
       value: value,
       help: help,
+      color: color,
     );
   }
 
@@ -160,6 +172,7 @@ class LoadingIconButton extends StatefulWidget {
     double iconSize = _defaultIconSize,
     double? value,
     Widget help = HelpScope.None,
+    Color? color,
   }) {
     return LoadingIconButton(
       key: key,
@@ -171,6 +184,7 @@ class LoadingIconButton extends StatefulWidget {
       iconSize: iconSize,
       value: value,
       help: help,
+      color: color,
     );
   }
 
@@ -186,6 +200,7 @@ class LoadingIconButton extends StatefulWidget {
     double iconSize = _defaultIconSize,
     double? value,
     Widget help = HelpScope.None,
+    Color? color,
   }) {
     return LoadingIconButton(
       key: key,
@@ -197,6 +212,7 @@ class LoadingIconButton extends StatefulWidget {
       iconSize: iconSize,
       value: value,
       help: help,
+      color: color,
     );
   }
 
@@ -209,6 +225,7 @@ class LoadingIconButton extends StatefulWidget {
     double iconSize = _defaultIconSize,
     double? value,
     Widget help = HelpScope.None,
+    Color? color,
   }) {
     return LoadingIconButton(
       key: key,
@@ -220,6 +237,7 @@ class LoadingIconButton extends StatefulWidget {
       iconSize: iconSize,
       value: value,
       help: help,
+      color: color,
     );
   }
 
@@ -232,6 +250,7 @@ class LoadingIconButton extends StatefulWidget {
     double iconSize = _defaultIconSize,
     double? value,
     Widget help = HelpScope.None,
+    Color? color,
   }) {
     return LoadingIconButton(
       key: key,
@@ -243,6 +262,7 @@ class LoadingIconButton extends StatefulWidget {
       iconSize: iconSize,
       value: value,
       help: help,
+      color: color,
     );
   }
 
@@ -255,6 +275,7 @@ class LoadingIconButton extends StatefulWidget {
     double iconSize = _defaultIconSize,
     double? value,
     Widget help = HelpScope.None,
+    Color? color,
   }) {
     return LoadingIconButton(
       key: key,
@@ -266,6 +287,7 @@ class LoadingIconButton extends StatefulWidget {
       iconSize: iconSize,
       value: value,
       help: help,
+      color: color,
     );
   }
 
@@ -278,6 +300,7 @@ class LoadingIconButton extends StatefulWidget {
     double iconSize = _defaultIconSize,
     double? value,
     Widget help = HelpScope.None,
+    Color? color,
   }) {
     return LoadingIconButton(
       key: key,
@@ -289,6 +312,7 @@ class LoadingIconButton extends StatefulWidget {
       iconSize: iconSize,
       value: value,
       help: help,
+      color: color,
     );
   }
 
@@ -301,6 +325,7 @@ class LoadingIconButton extends StatefulWidget {
     double iconSize = _defaultIconSize,
     double? value,
     Widget help = HelpScope.None,
+    Color? color,
   }) {
     return LoadingIconButton(
       key: key,
@@ -312,6 +337,7 @@ class LoadingIconButton extends StatefulWidget {
       iconSize: iconSize,
       value: value,
       help: help,
+      color: color,
     );
   }
 
@@ -370,7 +396,7 @@ class _LoadingIconButtonState extends State<LoadingIconButton> {
   @override
   Widget build(BuildContext context) {
     final isOn = widget.toggled == true;
-    final color = isOn ? Theme.of(context).colorScheme.primary : null;
+    final color = widget.color ?? (isOn ? Theme.of(context).colorScheme.primary : null);
     return Help(
       IconButton(
         tooltip: widget.tooltip,
@@ -383,6 +409,7 @@ class _LoadingIconButtonState extends State<LoadingIconButton> {
           minimumSize: Size.zero,
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           shape: widget.shape,
+          overlayColor: Theme.of(context).colorScheme.onSurfaceVariant,
         ),
         color: color,
         icon: _isLoading

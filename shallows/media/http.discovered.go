@@ -185,12 +185,19 @@ func (t *HTTPDiscovered) Bind(r *mux.Router) {
 		httpx.Timeout2s(),
 	).ThenFunc(t.pause))
 
-	r.Path("/{id}").Methods(http.MethodDelete).Handler(alice.New(
+	r.Path("/{id}/reset").Methods(http.MethodDelete).Handler(alice.New(
 		httpx.ContextBufferPool512(),
 		httpx.ParseForm,
 		httpauth.AuthenticateWithToken(t.jwtsecret),
 		httpx.Timeout2s(),
 	).ThenFunc(t.reset))
+
+	r.Path("/{id}").Methods(http.MethodDelete).Handler(alice.New(
+		httpx.ContextBufferPool512(),
+		httpx.ParseForm,
+		httpauth.AuthenticateWithToken(t.jwtsecret),
+		httpx.Timeout2s(),
+	).ThenFunc(t.delete))
 }
 
 func (t *HTTPDiscovered) magnet(w http.ResponseWriter, r *http.Request) {
@@ -1016,6 +1023,31 @@ func (t *HTTPDiscovered) search(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err = httpx.WriteJSON(w, httpx.GetBuffer(r), &msg); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to write response"))
+		return
+	}
+}
+
+func (t *HTTPDiscovered) delete(w http.ResponseWriter, r *http.Request) {
+	var (
+		err  error
+		vars = mux.Vars(r)
+		uh   tracking.Metadata
+	)
+
+	if err := tracking.MetadataDeleteByID(r.Context(), t.q, vars["id"]).Scan(&uh); sqlx.ErrNoRows(err) != nil {
+		log.Println(errorsx.Wrap(err, "delete failed: not found"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
+		return
+	} else if err != nil {
+		log.Println(errorsx.Wrap(err, "delete failed"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	if err = httpx.WriteJSON(w, httpx.GetBuffer(r), &DownloadDeleteResponse{
+		Download: new(langx.Clone(Download{}, DownloadOptionFromTorrentMetadata(langx.Clone(uh, timex.JSONSafeEncodeOption)))),
+	}); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to write response"))
 		return
 	}

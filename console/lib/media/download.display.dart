@@ -6,7 +6,7 @@ import 'package:retrovibed/httpx.dart' as httpx;
 
 import './api.dart' as api;
 
-class DownloadDisplay extends StatelessWidget {
+class DownloadDisplay extends StatefulWidget {
   final api.Download current;
   final List<Widget> trailing;
   final Future<void> Function()? onReset;
@@ -61,16 +61,23 @@ class DownloadDisplay extends StatelessWidget {
   }
 
   @override
+  State<DownloadDisplay> createState() => _DownloadDisplayState();
+}
+
+class _DownloadDisplayState extends State<DownloadDisplay> with ds.LoadingState<DownloadDisplay> {
+  @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
+    final current = widget.current;
 
     return Opacity(
       opacity: current.hasMedia() ? 1.0 : 0.4,
       child: IgnorePointer(
         ignoring: !current.hasMedia(),
-        child: ds.Container(
+        child: forms.Container(
           padding: defaults.padding,
           margin: defaults.margin.copyWith(bottom: 0),
+          cause: cause,
           Column(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.start,
@@ -84,16 +91,35 @@ class DownloadDisplay extends StatelessWidget {
                   maxLines: 1,
                 ),
                 trailing: [
-                  if (onVerify != null)
+                  if (widget.onVerify != null)
                     ds.LoadingIconButton(
-                      onPressed: () => onVerify!(current),
+                      onPressed: () => widget.onVerify!(current).catchError((c) {
+                        setState(() {
+                          cause = ds.Error.unknown(c, onTap: reseterr);
+                        });
+                      }),
                       tooltip: "verify data",
                       icon: Icon(Icons.fact_check),
                     ),
-                  if (onReset != null)
-                    ds.LoadingIconButton.refresh(onPressed: onReset!, tooltip: "clear data from disk keeps metadata"),
-                  if (onDelete != null)
-                    ds.LoadingIconButton.delete(onPressed: onDelete!, tooltip: "permanently delete this media"),
+                  if (widget.onReset != null)
+                    ds.LoadingIconButton.refresh(
+                      onPressed: () => widget.onReset!().catchError((c) {
+                        setState(() {
+                          cause = ds.Error.unknown(c, onTap: reseterr);
+                        });
+                      }),
+                      tooltip: "clear data from disk keeps metadata",
+                    ),
+                  if (widget.onDelete != null)
+                    ds.LoadingIconButton.delete(
+                      color: defaults.danger,
+                      onPressed: () => widget.onDelete!().catchError((c) {
+                        setState(() {
+                          cause = ds.Error.unknown(c, onTap: reseterr);
+                        });
+                      }),
+                      tooltip: "permanently delete this media",
+                    ),
                 ],
               ),
               forms.Field(
@@ -113,7 +139,7 @@ class DownloadDisplay extends StatelessWidget {
                 ),
                 offset: Offset(-10.0, 0.0),
               ),
-              ...trailing,
+              ...widget.trailing,
             ],
           ),
         ),
