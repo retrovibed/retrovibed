@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/downloads.dart' as downloads;
 import 'package:retrovibed/media.dart' as media;
