@@ -61,33 +61,35 @@ extension WidgetTesterExtensions on WidgetTester {
     );
 
     return pumpWidget(
-      MaterialApp(
-        theme: merged,
-        home: Material(
-          child: Align(
-            alignment: alignment,
-            child: Flex(
-              direction: Axis.vertical,
-              children: [
-                Flexible(
-                  fit: fit,
-                  child: authn.AuthzCache(
-                    LayoutBuilder(
-                      builder: (context, constraints) {
-                        final defaults = ds.Defaults.of(context);
-                        final isCompact = constraints.maxWidth < defaults.compact;
-                        return Theme(
-                          data: Theme.of(context).copyWith(
-                            extensions: [defaults.copyWith(isCompact: isCompact)],
-                          ),
-                          child: child,
-                        );
-                      },
+      meta.UploadNode(
+        MaterialApp(
+          theme: merged,
+          home: Material(
+            child: Align(
+              alignment: alignment,
+              child: Flex(
+                direction: Axis.vertical,
+                children: [
+                  Flexible(
+                    fit: fit,
+                    child: authn.AuthzCache(
+                      LayoutBuilder(
+                        builder: (context, constraints) {
+                          final defaults = ds.Defaults.of(context);
+                          final isCompact = constraints.maxWidth < defaults.compact;
+                          return Theme(
+                            data: Theme.of(context).copyWith(
+                              extensions: [defaults.copyWith(isCompact: isCompact)],
+                            ),
+                            child: child,
+                          );
+                        },
+                      ),
+                      current: authzCurrent,
                     ),
-                    current: authzCurrent,
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

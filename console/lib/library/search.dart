@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/media.dart' as media;
+import 'package:retrovibed/meta.dart' as meta;
 import 'package:retrovibed/lucene.dart' as lucene;
 import 'grid.display.dart';
 import 'grid.setting.dart';
@@ -110,7 +111,7 @@ class _SearchState extends State<Search> with ds.LoadingState {
             help: ds.Hint(const Text("search your library, use @ to access advanced filtering")),
           ),
         ),
-        media.UploadsRow(margin: defaults.margin.copyWith(top: 0, bottom: 0) * 2),
+        meta.UploadsRow(margin: defaults.margin.copyWith(top: 0, bottom: 0) * 2),
         Expanded(
           child: Grid(
             apisearch: widget.apisearch,

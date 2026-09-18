@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/design.kit/file.drop.well.dart';
 import 'package:retrovibed/designkit.dart' as ds;
-import 'package:retrovibed/media.dart' as media;
+import 'package:retrovibed/meta.dart' as meta;
 import 'package:retrovibed/mimex.dart' as mimex;
-import 'uploads.node.dart';
+import 'api.dart' as api;
+import 'search.state.dart' show MediaSearchState;
 
 Future<void> uploadfiles(
   BuildContext context,
-  ValueNotifier<media.MediaSearchState> search, {
-  media.FnUploadRequest apiupload = media.media.upload,
+  ValueNotifier<MediaSearchState> search, {
+  api.FnUploadRequest apiupload = api.media.upload,
   List<String> mimetypes = const [],
 }) {
-  final progress = UploadNode.of(context).progress;
+  final progress = meta.UploadNode.of(context).progress;
   return FileDropWell.files(mimetypes: mimetypes).then((evt) {
     return Future.wait(
       evt.files.map((c) {
-        return media.media.uploadable(c.path, c.name, c.mimeType!, progress: progress).then((v) {
+        return api.media.uploadable(c.path, c.name, c.mimeType!, progress: progress).then((v) {
           return apiupload((req) {
             req..files.add(v);
             return req;
@@ -24,18 +25,18 @@ Future<void> uploadfiles(
       }),
     ).then((_) {
       final freshNext = search.value.next.clone();
-      search.value = media.MediaSearchState(next: freshNext, count: search.value.count);
+      search.value = MediaSearchState(next: freshNext, count: search.value.count);
     });
   });
 }
 
 PopupMenuEntry<String> MenuItemUploadFiles(
   BuildContext context,
-  ValueNotifier<media.MediaSearchState> search, {
-  media.FnUploadRequest apiupload = media.media.upload,
+  ValueNotifier<MediaSearchState> search, {
+  api.FnUploadRequest apiupload = api.media.upload,
 }) {
   return PopupMenuItem<String>(
-    child: ValueListenableBuilder<media.MediaSearchState>(
+    child: ValueListenableBuilder<MediaSearchState>(
       valueListenable: search,
       builder: (context, state, _) => ds.LoadingListTile(
         leading: const Icon(Icons.file_upload_outlined),

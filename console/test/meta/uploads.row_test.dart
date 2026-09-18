@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:retrovibed/httpx.dart' as httpx;
-import 'package:retrovibed/media/uploads.node.dart';
-import 'package:retrovibed/media/uploads.row.dart';
+import 'package:retrovibed/meta/uploads.node.dart';
+import 'package:retrovibed/meta/uploads.row.dart';
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
 
 const _removalDelay = Duration(milliseconds: 50);

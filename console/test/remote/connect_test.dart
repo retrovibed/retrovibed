@@ -13,7 +13,6 @@ import 'package:retrovibed/meta.dart' as meta;
 import 'package:retrovibed/remote/api.dart' as remote;
 import 'package:retrovibed/remote/connect.dart';
 import 'package:retrovibed/remote/player.control.playback.dart';
-import 'package:retrovibed/remote/playlist.current.dart';
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
 import 'package:retrovibed/uuidx.dart' as uuidx;
 
@@ -650,12 +649,15 @@ void main() {
         await rowA.onTap!();
         await tester.pumpN(10);
 
-        // _sessionID is private state - PlaylistCurrent (rendered unconditionally
-        // once _onPlay resets _focused to null) is the one place it's exposed to
-        // the widget tree, via mySessionId. A second real queue send isn't
-        // guaranteed here - _fillQueue only sends when the daemon's last-known
-        // queue depth is below autoqueueTarget, which the first tap already fills.
-        final sessionIdA = tester.widget<PlaylistCurrent>(find.byType(PlaylistCurrent)).sessionId;
+        // _sessionID is private state - PlayerControlPlayback (rendered
+        // unconditionally once _onPlay resets _focused to null) is the one
+        // place it's exposed to the widget tree. PlaylistCurrent would be a
+        // more natural pick but only mounts once Sync.current has an id,
+        // which the fake socket's queue-echo never sets. A second real queue
+        // send isn't guaranteed either - _fillQueue only sends when the
+        // daemon's last-known queue depth is below autoqueueTarget, which the
+        // first tap already fills - so socket.sent can't be relied on here.
+        final sessionIdA = tester.widget<PlayerControlPlayback>(find.byType(PlayerControlPlayback)).sessionId;
 
         socket.emit(
           remote.Stream(
@@ -687,7 +689,7 @@ void main() {
         await rowB.onTap!();
         await tester.pumpN(10);
 
-        final sessionIdB = tester.widget<PlaylistCurrent>(find.byType(PlaylistCurrent)).sessionId;
+        final sessionIdB = tester.widget<PlayerControlPlayback>(find.byType(PlayerControlPlayback)).sessionId;
         expect(sessionIdA, isNot(sessionIdB));
 
         socket.emit(
