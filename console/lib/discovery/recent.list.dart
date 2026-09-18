@@ -104,6 +104,7 @@ class _RecentListState extends State<RecentList> with ds.LoadingState {
 
   @override
   Widget build(BuildContext context) {
+    final defaults = ds.Defaults.of(context);
     return ds.Container(
       padding: widget.padding,
       margin: widget.margin,
@@ -111,6 +112,7 @@ class _RecentListState extends State<RecentList> with ds.LoadingState {
         loading: loading,
         cause: cause,
         Column(
+          verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
           children: _result.items.map((item) {
             final deletion = () {
               return httpx.withRetry(

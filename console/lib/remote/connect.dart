@@ -510,6 +510,7 @@ class _State extends State<Connect> with LoadingState {
             maintainAnimation: false,
             maintainSize: false,
             Column(
+              verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
               children: [
                 Text("Continue"),
                 Expanded(
