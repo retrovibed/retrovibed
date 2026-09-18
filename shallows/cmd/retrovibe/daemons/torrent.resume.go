@@ -222,7 +222,7 @@ func AnnounceSeeded(ctx context.Context, q sqlx.Queryer, dhts *dht.Server, roots
 				tracking.MetadataQuerySeeding(),
 				tracking.MetadataQueryNeedsAnnounce(),
 			},
-		)
+		).OrderBy("created_at DESC") // prioritize recent torrents first.
 
 		s := sqlx.Scan(tracking.MetadataSearch(ctx, q, query))
 		for i := range s.Iter() {
