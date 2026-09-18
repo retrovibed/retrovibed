@@ -175,6 +175,12 @@ class _SearchDropdownState extends State<SearchDropdown> with LoadingState {
                           decoration: widget.decoration,
                           textAlign: widget.textAlign,
                           onChanged: _query,
+                          onTap: () {
+                            if (open) {
+                              _focus.unfocus();
+                              _closed();
+                            }
+                          },
                         ),
                       ),
                       ...widget.trailing,
