@@ -511,6 +511,7 @@ class _State extends State<Connect> with LoadingState {
             maintainSize: false,
             Column(
               verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 ds.Heading(Text("Continue"), padding: defaults.padding / 2),
                 Expanded(
@@ -605,7 +606,8 @@ class _State extends State<Connect> with LoadingState {
                         spacing: defaults.spacing / 2,
                         children: [
                           PlayerControlPlayback(socket: _socket, sessionId: _sessionID, current: _latest.sync),
-                          ds.Heading(
+                          ds.Container(
+                            constraints: const BoxConstraints(minWidth: double.infinity),
                             Wrap(
                               alignment: WrapAlignment.center,
                               spacing: defaults.spacing,
