@@ -6,7 +6,6 @@ import 'package:retrovibed/design.kit/screens.dart' as screens;
 import 'package:retrovibed/design.kit/theme.defaults.dart';
 import 'package:retrovibed/design.kit/help.labelled.dart';
 import 'buttons.dart';
-import 'shake.dart';
 
 class _HelpVisibility extends InheritedWidget {
   final bool visible;
