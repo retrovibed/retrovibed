@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:retrovibed/designkit.dart' as ds;
+import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/mimex.dart' as mimex;
 import './playlist.dart' as internal;
 
@@ -16,7 +19,7 @@ class PlayerControlFiledrop extends StatelessWidget {
       ...mimex.videos,
       "application/x-iso9660-image", // sometimes bluray/dvd are iso images.
     ];
-    final playfile = (ds.FilesEvent evt, {ValueNotifier<int>? progress}) {
+    final playfile = (ds.FilesEvent evt, {StreamSink<httpx.UploadProgress>? progress}) {
       print("play file checkpoint 0 ${evt.files.length}");
       if (evt.files.isEmpty) return Future.value(ds.NullWidget);
       final file = evt.files.firstWhere((v) {

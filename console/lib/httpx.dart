@@ -3,11 +3,11 @@ import 'dart:io';
 import 'dart:core';
 import 'dart:convert';
 import 'dart:math';
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:protobuf/protobuf.dart';
 import 'package:retrovibed/retrovibed.dart' as retro;
+import 'package:retrovibed/uuidx.dart' as uuidx;
 
 var _host = localhost();
 
@@ -91,21 +91,30 @@ abstract class mimetypes {
   }
 }
 
+// (id, name, mimetype, uploaded, total) emitted per chunk read for a single upload.
+typedef UploadProgress = (String id, String name, String mimetype, int uploaded, int total);
+
+// max uint64 bit pattern (stored as -1 in Dart's signed 64-bit int); pass this as `total`
+// when the caller cannot determine the file's size ahead of time.
+const int unknownFileSize = 0xFFFFFFFFFFFFFFFF;
+
 Future<http.MultipartFile> uploadable(
   String path,
   String name,
-  String mimetype, {
+  String mimetype,
+  int total, {
   String field = 'content',
-  ValueNotifier<int>? progress,
+  StreamSink<UploadProgress>? progress,
 }) async {
-  // Read file size
-  final fileLength = await File(path).length();
+  final id = uuidx.md5x(path);
+  var uploaded = 0;
 
   // Create a stream with progress tracking
   final fileStream = File(path).openRead().transform(
     StreamTransformer<List<int>, List<int>>.fromHandlers(
       handleData: (chunk, sink) {
-        progress?.value += chunk.length;
+        uploaded += chunk.length;
+        progress?.add((id, name, mimetype, uploaded, total));
         sink.add(chunk.cast<int>());
       },
     ),
@@ -115,7 +124,7 @@ Future<http.MultipartFile> uploadable(
   return http.MultipartFile(
     field,
     fileStream,
-    fileLength,
+    total,
     filename: name,
     contentType: mimetypes.parse(mimetype),
   );

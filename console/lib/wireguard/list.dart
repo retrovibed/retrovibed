@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/httpx.dart' as httpx;
@@ -77,7 +79,7 @@ class _ListDisplay extends State<ListDisplay> with ds.LoadingState {
     final upload =
         (
           ds.FilesEvent v, {
-          ValueNotifier<int>? progress,
+          StreamSink<httpx.UploadProgress>? progress,
         }) {
           setState(() {
             loading = true;

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:http/http.dart' as http;
 import 'package:retrovibed/httpx.dart' as httpx;
@@ -62,7 +63,7 @@ abstract class wireguard {
     String name,
     String mimetype,
   ) {
-    return httpx.uploadable(path, name, mimetype);
+    return File(path).length().then((total) => httpx.uploadable(path, name, mimetype, total));
   }
 
   static Future<WireguardUploadResponse> upload(

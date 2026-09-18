@@ -19,3 +19,5 @@ export 'media/autohelp.dart';
 export 'media/menu.upload.files.dart';
 export 'media/search.mode.dart';
 export 'media/search.mode.toggle.dart';
+export 'media/uploads.node.dart';
+export 'media/uploads.row.dart';

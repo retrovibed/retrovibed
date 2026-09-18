@@ -53,13 +53,13 @@ void main(List<String> args) async {
       FlutterError.dumpErrorToConsole(details);
       return Material(
         child: InkWell(
-          onTap: () => ds.postframe(() => runApp(Retrovibed())),
+          onTap: () => ds.postframe(() => runApp(media.UploadNode(Retrovibed()))),
           child: const Center(child: Text('Something went wrong. Tap to restart.')),
         ),
       );
     };
 
-    runApp(Retrovibed());
+    runApp(media.UploadNode(Retrovibed()));
   });
 }
 

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:retrovibed/design.kit/file.drop.well.dart';
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
@@ -85,7 +87,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
     final upload =
         (
           FilesEvent v, {
-          ValueNotifier<int>? progress,
+          StreamSink<httpx.UploadProgress>? progress,
         }) {
           setState(() {
             _loading = true;

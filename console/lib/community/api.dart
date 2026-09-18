@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:fixnum/fixnum.dart' as fixnum;
 import 'package:http/http.dart' as http;
 import 'package:retrovibed/httpx.dart' as httpx;
@@ -445,7 +446,7 @@ abstract class publishers {
     String name,
     String mimetype,
   ) {
-    return httpx.uploadable(path, name, mimetype);
+    return File(path).length().then((total) => httpx.uploadable(path, name, mimetype, total));
   }
 
   /// mimetype is rejected when blank, and description is what the community

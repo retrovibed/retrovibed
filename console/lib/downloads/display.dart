@@ -34,26 +34,20 @@ class _DisplayState extends State<Display> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final defaults = ds.Defaults.of(context);
-        return Container(
-          padding: defaults.padding,
-          child: AvailableListDisplay(
-            search: widget.apiavailablesearch,
-            controller: controller,
+    return ds.Container(
+      AvailableListDisplay(
+        search: widget.apiavailablesearch,
+        controller: controller,
+        events: refresh,
+        leading: widget.leading,
+        trailing: [
+          DownloadingListDisplay(
+            search: widget.downloadingSearch,
+            watch: widget.downloadWatch,
             events: refresh,
-            leading: widget.leading,
-            trailing: [
-              DownloadingListDisplay(
-                search: widget.downloadingSearch,
-                watch: widget.downloadWatch,
-                events: refresh,
-              ),
-            ],
           ),
-        );
-      },
+        ],
+      ),
     );
   }
 }

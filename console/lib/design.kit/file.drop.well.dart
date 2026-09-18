@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
+import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:file_selector/file_selector.dart';
@@ -28,7 +30,7 @@ class FileDropWell extends StatefulWidget {
   final EdgeInsets padding;
   final Future<Widget?> Function(
     FilesEvent i, {
-    ValueNotifier<int>? progress,
+    StreamSink<httpx.UploadProgress>? progress,
   })
   onDropped;
   final List<String> mimetypes;
@@ -90,7 +92,7 @@ class FileDropWell extends StatefulWidget {
   factory FileDropWell.icon(
     Future<Widget?> Function(
       FilesEvent i, {
-      ValueNotifier<int>? progress,
+      StreamSink<httpx.UploadProgress>? progress,
     })
     onDropped, {
     Key? key,
@@ -121,7 +123,8 @@ class FileDropWell extends StatefulWidget {
 }
 
 class _FileDropWell extends State<FileDropWell> {
-  final ValueNotifier<int> _progress = ValueNotifier(0);
+  final StreamController<httpx.UploadProgress> _progress = StreamController<httpx.UploadProgress>();
+  final Map<String, int> _uploaded = {};
   int _total = 0;
   bool _dragging = false;
   bool _loading = false;
@@ -129,14 +132,16 @@ class _FileDropWell extends State<FileDropWell> {
   @override
   void initState() {
     super.initState();
-    _progress.addListener(() {
-      setState(() {});
+    _progress.stream.listen((event) {
+      setState(() {
+        _uploaded[event.$1] = event.$4;
+      });
     });
   }
 
   @override
   void dispose() {
-    _progress.dispose();
+    _progress.close();
     super.dispose();
   }
 
@@ -154,10 +159,10 @@ class _FileDropWell extends State<FileDropWell> {
           .then((resolved) {
             final total = resolved.files.fold<int>(0, (acc, f) => acc + File(f.path).lengthSync());
             setState(() {
-              _progress.value = 0;
+              _uploaded.clear();
               _total = total;
             });
-            return widget.onDropped(resolved, progress: _progress);
+            return widget.onDropped(resolved, progress: _progress.sink);
           })
           .catchError((cause) {
             return ds.Error.unknown(cause);
@@ -217,7 +222,7 @@ class _FileDropWell extends State<FileDropWell> {
               icon: widget.child,
               disabled: _loading,
               tooltip: widget.tooltip,
-              value: _progress.value / _total,
+              value: _uploaded.values.fold<int>(0, (a, b) => a + b) / _total,
               shape: widget.shape,
             ),
           ),

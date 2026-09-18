@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:retrovibed/designkit.dart' as ds;
+import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
 
 void main() {
@@ -12,7 +15,7 @@ void main() {
             width: 200,
             height: 200,
             child: ds.FileDropWell(
-              (_, {ValueNotifier<int>? progress}) async => null,
+              (_, {StreamSink<httpx.UploadProgress>? progress}) async => null,
             ),
           ),
         );
@@ -28,7 +31,7 @@ void main() {
             width: 300,
             height: 150,
             child: ds.FileDropWell(
-              (_, {ValueNotifier<int>? progress}) async => null,
+              (_, {StreamSink<httpx.UploadProgress>? progress}) async => null,
               child: const Text('Drop here'),
             ),
           ),
@@ -47,7 +50,7 @@ void main() {
               const Text('Header'),
               Expanded(
                 child: ds.FileDropWell(
-                  (_, {ValueNotifier<int>? progress}) async => null,
+                  (_, {StreamSink<httpx.UploadProgress>? progress}) async => null,
                   child: const Text('Drop zone'),
                 ),
               ),
@@ -69,7 +72,7 @@ void main() {
               width: 100,
               height: 100,
               child: ds.FileDropWell(
-                (_, {ValueNotifier<int>? progress}) async => null,
+                (_, {StreamSink<httpx.UploadProgress>? progress}) async => null,
                 child: const Icon(Icons.upload),
               ),
             ),
@@ -87,7 +90,7 @@ void main() {
             width: 48,
             height: 48,
             child: ds.FileDropWell.icon(
-              (_, {ValueNotifier<int>? progress}) async => null,
+              (_, {StreamSink<httpx.UploadProgress>? progress}) async => null,
             ),
           ),
         );
@@ -107,7 +110,7 @@ void main() {
               SizedBox(
                 height: 200,
                 child: ds.FileDropWell(
-                  (_, {ValueNotifier<int>? progress}) async => null,
+                  (_, {StreamSink<httpx.UploadProgress>? progress}) async => null,
                   child: const Text('Drop zone'),
                 ),
               ),
@@ -131,7 +134,7 @@ void main() {
                 SizedBox(
                   height: 150,
                   child: ds.FileDropWell(
-                    (_, {ValueNotifier<int>? progress}) async => null,
+                    (_, {StreamSink<httpx.UploadProgress>? progress}) async => null,
                     child: const Text('Scrollable drop zone'),
                   ),
                 ),
@@ -156,7 +159,7 @@ void main() {
                 width: 100,
                 height: 100,
                 child: ds.FileDropWell(
-                  (_, {ValueNotifier<int>? progress}) async => null,
+                  (_, {StreamSink<httpx.UploadProgress>? progress}) async => null,
                   child: const Icon(Icons.add),
                 ),
               ),
@@ -182,7 +185,7 @@ void main() {
                 SizedBox(
                   width: 100,
                   child: ds.FileDropWell(
-                    (_, {ValueNotifier<int>? progress}) async => null,
+                    (_, {StreamSink<httpx.UploadProgress>? progress}) async => null,
                     child: const Text('Drop'),
                   ),
                 ),
@@ -206,7 +209,7 @@ void main() {
                 height: 48,
                 width: 48,
                 child: ds.FileDropWell.icon(
-                  (_, {ValueNotifier<int>? progress}) async => null,
+                  (_, {StreamSink<httpx.UploadProgress>? progress}) async => null,
                 ),
               ),
             ],
@@ -223,7 +226,7 @@ void main() {
       testWidgets('default child renders in full-screen constrained context', (WidgetTester tester) async {
         await tester.pumpApp(
           ds.FileDropWell(
-            (_, {ValueNotifier<int>? progress}) async => null,
+            (_, {StreamSink<httpx.UploadProgress>? progress}) async => null,
           ),
         );
         await tester.pumpAndSettle();
@@ -240,7 +243,7 @@ void main() {
             children: [
               Expanded(
                 child: ds.FileDropWell(
-                  (_, {ValueNotifier<int>? progress}) async => null,
+                  (_, {StreamSink<httpx.UploadProgress>? progress}) async => null,
                 ),
               ),
             ],
@@ -258,7 +261,7 @@ void main() {
             child: Column(
               children: [
                 ds.FileDropWell(
-                  (_, {ValueNotifier<int>? progress}) async => null,
+                  (_, {StreamSink<httpx.UploadProgress>? progress}) async => null,
                   child: const Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -288,7 +291,7 @@ void main() {
             width: 200,
             height: 200,
             child: ds.FileDropWell(
-              (_, {ValueNotifier<int>? progress}) async => null,
+              (_, {StreamSink<httpx.UploadProgress>? progress}) async => null,
               margin: testMargin,
               child: const Text('Margined'),
             ),
@@ -312,7 +315,7 @@ void main() {
               SizedBox(height: 50, child: const Text('Fixed')),
               Expanded(
                 child: ds.FileDropWell(
-                  (_, {ValueNotifier<int>? progress}) async => null,
+                  (_, {StreamSink<httpx.UploadProgress>? progress}) async => null,
                   child: const Text('Fills space'),
                 ),
               ),
@@ -336,7 +339,7 @@ void main() {
               width: tightSize.width,
               height: tightSize.height,
               child: ds.FileDropWell.icon(
-                (_, {ValueNotifier<int>? progress}) async => null,
+                (_, {StreamSink<httpx.UploadProgress>? progress}) async => null,
               ),
             ),
           ),
@@ -358,7 +361,7 @@ void main() {
             childAspectRatio: 1.0,
             children: [
               ds.FileDropWell(
-                (_, {ValueNotifier<int>? progress}) async => null,
+                (_, {StreamSink<httpx.UploadProgress>? progress}) async => null,
                 child: const Icon(Icons.upload),
               ),
               Container(color: Colors.blue),
@@ -383,7 +386,7 @@ void main() {
                 width: 200,
                 height: 200,
                 child: ds.FileDropWell(
-                  (_, {ValueNotifier<int>? progress}) async => null,
+                  (_, {StreamSink<httpx.UploadProgress>? progress}) async => null,
                   child: const Text('Stacked'),
                 ),
               ),
@@ -404,7 +407,7 @@ void main() {
             children: [
               Flexible(
                 child: ds.FileDropWell(
-                  (_, {ValueNotifier<int>? progress}) async => null,
+                  (_, {StreamSink<httpx.UploadProgress>? progress}) async => null,
                   child: const Text('Flex child'),
                 ),
               ),

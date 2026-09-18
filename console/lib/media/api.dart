@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:async';
-import 'package:flutter/foundation.dart';
+import 'dart:io';
 import 'package:qs_dart/qs_dart.dart' as qs;
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/media/media.pb.dart';
@@ -242,9 +242,9 @@ abstract class media {
     String path,
     String name,
     String mimetype, {
-    ValueNotifier<int>? progress,
+    StreamSink<httpx.UploadProgress>? progress,
   }) {
-    return httpx.uploadable(path, name, mimetype, progress: progress);
+    return File(path).length().then((total) => httpx.uploadable(path, name, mimetype, total, progress: progress));
   }
 
   static Future<MediaUploadResponse> upload(http.MultipartRequest Function(http.MultipartRequest req) mkreq) async {

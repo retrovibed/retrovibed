@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -58,7 +59,7 @@ class SocialActionPhoto extends StatelessWidget {
     String path,
     String name,
     String mimetype, {
-    ValueNotifier<int>? progress,
+    StreamSink<httpx.UploadProgress>? progress,
   }) {
     return media.media
         .uploadable(path, name, mimetype, progress: progress)

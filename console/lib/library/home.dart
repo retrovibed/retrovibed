@@ -31,14 +31,9 @@ class Home extends StatefulWidget {
   State<StatefulWidget> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeState extends State<Home> with ds.LoadingState {
   Widget _downloading = ds.Empty;
   final ValueNotifier<media.SearchMode> _mode = ValueNotifier(media.SearchMode.library);
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void _switchToMode(media.SearchMode m) {
     _mode.value = m;

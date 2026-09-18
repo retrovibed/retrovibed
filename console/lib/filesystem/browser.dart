@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/design.kit/file.drop.well.dart';
@@ -192,7 +194,7 @@ class _FilesystemBrowser extends State<FilesystemBrowser> with ds.LoadingState {
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
-    final upload = (FilesEvent v, {ValueNotifier<int>? progress}) {
+    final upload = (FilesEvent v, {StreamSink<httpx.UploadProgress>? progress}) {
       setState(() {
         loading = true;
       });

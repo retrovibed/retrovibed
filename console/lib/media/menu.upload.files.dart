@@ -3,6 +3,7 @@ import 'package:retrovibed/design.kit/file.drop.well.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/mimex.dart' as mimex;
+import 'uploads.node.dart';
 
 Future<void> uploadfiles(
   BuildContext context,
@@ -10,10 +11,11 @@ Future<void> uploadfiles(
   media.FnUploadRequest apiupload = media.media.upload,
   List<String> mimetypes = const [],
 }) {
+  final progress = UploadNode.of(context).progress;
   return FileDropWell.files(mimetypes: mimetypes).then((evt) {
     return Future.wait(
       evt.files.map((c) {
-        return media.media.uploadable(c.path, c.name, c.mimeType!).then((v) {
+        return media.media.uploadable(c.path, c.name, c.mimeType!, progress: progress).then((v) {
           return apiupload((req) {
             req..files.add(v);
             return req;
