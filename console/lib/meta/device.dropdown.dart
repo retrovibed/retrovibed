@@ -14,6 +14,7 @@ class DaemonDropdown extends StatefulWidget {
   final Widget help;
   final bool readonly;
   final bool remoteonly;
+  final EdgeInsets? padding;
   final Future<api.DaemonSearchResponse> Function(api.DaemonSearchRequest) search;
   final Future<Stream<api.Daemon>> Function({List<httpx.Option> options}) discover;
   final DaemonOnSelect onSelect;
@@ -25,6 +26,7 @@ class DaemonDropdown extends StatefulWidget {
     this.help = const ds.Hint(const Text("select which daemon instance to configure from the dropdown")),
     this.remoteonly = false,
     this.readonly = false,
+    this.padding,
     this.search = api.daemons.search,
     this.discover = api.daemons.discover,
     this.onSelect = global,
@@ -45,20 +47,14 @@ class DaemonDropdown extends StatefulWidget {
   State<DaemonDropdown> createState() => _DaemonDropdownState();
 }
 
-class _DaemonDropdownState extends State<DaemonDropdown> {
+class _DaemonDropdownState extends State<DaemonDropdown> with ds.LoadingState<DaemonDropdown> {
   final TextEditingController _search = TextEditingController();
   // canRequestFocus is false so this button never leaves the FocusScope with
   // a focused descendant, which would otherwise block ManualConfiguration's
   // autofocus when it opens.
   final FocusNode _addFocus = FocusNode(canRequestFocus: false, skipTraversal: true);
   final ValueNotifier<int> _discovered = ValueNotifier<int>(0);
-  bool _scanning = false;
   Widget? _optional;
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void _refresh() {
     _search.clear();
@@ -73,7 +69,7 @@ class _DaemonDropdownState extends State<DaemonDropdown> {
   }
 
   Future<void> _scanForPeers() async {
-    setState(() => _scanning = true);
+    setState(() => loading = true);
     widget
         .discover()
         .then((s) {
@@ -81,7 +77,7 @@ class _DaemonDropdownState extends State<DaemonDropdown> {
             _discovered.value++;
           });
         })
-        .whenComplete(() => setState(() => _scanning = false))
+        .whenComplete(() => setState(() => loading = false))
         .catchError((cause) {
           debugPrint(cause.toString());
         });
@@ -105,10 +101,12 @@ class _DaemonDropdownState extends State<DaemonDropdown> {
       children: [
         ds.SearchDropdown.text(
           DaemonTypography.description(widget.library.value),
-          padding: defaults.padding.copyWith(
-            top: defaults.padding.left / 4,
-            bottom: defaults.padding.right / 4,
-          ),
+          padding:
+              widget.padding ??
+              defaults.padding.copyWith(
+                top: defaults.padding.left / 4,
+                bottom: defaults.padding.right / 4,
+              ),
           key: ValueKey(widget.library.value.id),
           controller: _search,
           textAlign: TextAlign.center,
@@ -143,7 +141,7 @@ class _DaemonDropdownState extends State<DaemonDropdown> {
               ),
           ],
           trailing: [
-            if (_scanning)
+            if (loading)
               Padding(
                 padding: const EdgeInsets.all(4),
                 child: SizedBox(
