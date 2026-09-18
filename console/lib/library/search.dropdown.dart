@@ -52,14 +52,13 @@ class SearchUploadDropdown extends StatelessWidget {
             label: "Downloads",
             onSelect: onModeChanged,
           ),
-          if (authn.developer(context).alpha)
-            media.SearchModeToggle(
-              mode: media.SearchMode.social,
-              current: mode,
-              icon: Icons.share,
-              label: "Social",
-              onSelect: onModeChanged,
-            ),
+          media.SearchModeToggle(
+            mode: media.SearchMode.social,
+            current: mode,
+            icon: Icons.share,
+            label: "Social",
+            onSelect: onModeChanged,
+          ),
           media.SearchModeToggle(
             mode: media.SearchMode.filesystem,
             current: mode,
