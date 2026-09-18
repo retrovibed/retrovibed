@@ -114,14 +114,10 @@ class HelpScopeState extends State<HelpScope> {
 
   @override
   Widget build(BuildContext context) {
-    final defaults = Defaults.of(context);
     return _HelpVisibility(
       visible: visibility.value,
       child: screens.Overlay(
-        ShakeDetector(
-          onShake: defaults.mobile ? this.toggle : null,
-          child: widget.child,
-        ),
+        widget.child,
         overlay: _GlobalsOverlay(
           visibility: visibility,
           globals: _globals,

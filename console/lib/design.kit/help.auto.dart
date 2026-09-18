@@ -56,7 +56,7 @@ class _HelpAutoState extends State<HelpAuto> {
   Widget build(BuildContext context) {
     final defaults = Defaults.of(context);
     final activate = defaults.mobile
-        ? "Shake the phone to activate/deactivate help"
+        ? "click the ? on the navigation bar to activate/deactivate help"
         : "Press Alt+? at any time to activate/deactivate help overlay";
     return screens.Overlay(
       widget.child,
