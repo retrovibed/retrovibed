@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:qs_dart/qs_dart.dart' as qs;
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/media/media.pb.dart';
@@ -265,7 +266,22 @@ abstract class media {
 }
 
 abstract class download {
+  static bool paused(Download d) => timex.iso8601(d.pausedAt).isBefore(timex.inf);
+  static bool ongoing(Download d) => timex.iso8601(d.initiatedAt).isBefore(timex.inf);
   static bool completed(Download d) => timex.iso8601(d.completedAt).isBefore(timex.inf);
+  static IconData icon(Download d) {
+    if (download.completed(d)) return Icons.check;
+    if (download.ongoing(d)) return Icons.downloading;
+    if (download.paused(d)) return Icons.pause;
+    return Icons.download;
+  }
+
+  static String typography(Download d) {
+    if (download.completed(d)) return "Download is completed.";
+    if (download.ongoing(d)) return "Download is in progress.";
+    if (download.paused(d)) return "Resume the download for this item.";
+    return "Start downloading this item.";
+  }
 }
 
 abstract class discoveredsearch {

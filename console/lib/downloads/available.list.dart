@@ -216,8 +216,6 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
       ),
       ds.Table.expanded<media.Download>(
         (v) {
-          final downloading = timex.iso8601(v.initiatedAt).isBefore(timex.inf);
-          final paused = timex.iso8601(v.pausedAt).isBefore(timex.inf);
           return ds.KeyPressAware.delete(
             onPress: () {
               return media.discovered
@@ -228,7 +226,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                   })
                   .catchError((cause) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Failed to delete: ${cause}")),
+                      SnackBar(content: Text("Failed to reset: ${cause}")),
                     );
                     return null;
                   });
@@ -258,15 +256,11 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                   },
                   trailing: [
                     ds.LoadingIconButton(
-                      icon: Icon(downloading ? Icons.downloading : Icons.download),
-                      disabled: downloading && !paused,
+                      icon: Icon(media.download.icon(v)),
+                      disabled: media.download.ongoing(v) && !media.download.paused(v),
                       help: ds.Hint(
                         Text(
-                          downloading && !paused
-                              ? "Download is in progress."
-                              : paused
-                              ? "Resume the download for this item."
-                              : "Start downloading this item.",
+                          media.download.typography(v),
                         ),
                       ),
                       onPressed: () => media.discovered
