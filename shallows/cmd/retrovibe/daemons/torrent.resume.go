@@ -226,6 +226,13 @@ func AnnounceSeeded(ctx context.Context, q sqlx.Queryer, dhts *dht.Server, roots
 
 		s := sqlx.Scan(tracking.MetadataSearch(ctx, q, query))
 		for i := range s.Iter() {
+			// optimistically claim the torrent so a slow in-flight announce can't be
+			// re-selected by the next pass before it actually completes.
+			if err := tracking.MetadataAnnounced(ctx, q, i.ID, time.Now().Add(defaultDelay)).Scan(&i); err != nil {
+				log.Println(errorsx.Wrap(err, "failed to claim torrent for announcement"))
+				continue
+			}
+
 			if err := pool.Run(ctx, i); err != nil {
 				log.Println(err)
 				continue
