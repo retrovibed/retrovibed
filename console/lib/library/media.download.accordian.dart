@@ -69,7 +69,7 @@ class MediaDownloadAccordian extends StatelessWidget {
                   onCancel: (_) => completion.complete(),
                 ),
               ),
-              onTap: () => ds.modals.asyncfn(context, (completion) {
+              onReset: () => ds.modals.asyncfn(context, (completion) {
                 return ds.Confirmation.yesNo(
                   content: Text(
                     "Are you sure you want to reset $description?",

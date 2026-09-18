@@ -309,7 +309,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                             onCancel: (_) => completion.complete(),
                           ),
                         ),
-                        onTap: () => ds.modals.asyncfn(
+                        onReset: () => ds.modals.asyncfn(
                           context,
                           (completion) => ds.Confirmation.yesNo(
                             content: Text(
@@ -339,6 +339,29 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                                   });
                             },
                             onCancel: (_) => completion.complete(),
+                          ),
+                        ),
+                        onDelete: () => ds.modals.asyncfn(
+                          context,
+                          ds.Confirmation.dangerous(
+                            content: Text(
+                              "Are you sure you want to permanently delete ${v.media.description}?",
+                            ),
+                            onConfirm: (ctx) => httpx
+                                .withRetry(
+                                  () => media.media.delete(
+                                    v.media.id,
+                                    options: [authn.request(authn.AuthzCache.meta(ctx))],
+                                  ),
+                                )
+                                .then((_) {
+                                  setState(() {
+                                    _res = media.DownloadSearchResponse(
+                                      items: ds.fnOnChange(_res.items, null, (d) => d.media.id == v.media.id),
+                                      next: _res.next,
+                                    );
+                                  });
+                                }),
                           ),
                         ),
                       ),

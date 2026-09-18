@@ -63,7 +63,7 @@ void main() {
       await tester.pumpApp(
         DownloadDisplay(
           _download(),
-          onTap: () async {},
+          onReset: () async {},
           onVerify: (_) async {},
         ),
         physicalSize: entry.value,

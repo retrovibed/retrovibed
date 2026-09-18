@@ -9,12 +9,14 @@ import './api.dart' as api;
 class DownloadDisplay extends StatelessWidget {
   final api.Download current;
   final List<Widget> trailing;
-  final Future<void> Function()? onTap;
+  final Future<void> Function()? onReset;
+  final Future<void> Function()? onDelete;
   final Future<void> Function(api.Download)? onVerify;
   const DownloadDisplay(
     this.current, {
     super.key,
-    this.onTap,
+    this.onReset,
+    this.onDelete,
     this.onVerify,
     this.trailing = const [],
   });
@@ -23,7 +25,8 @@ class DownloadDisplay extends StatelessWidget {
     String id, {
     Key? key,
     List<Widget> trailing = const [],
-    Future<void> Function()? onTap,
+    Future<void> Function()? onReset,
+    Future<void> Function()? onDelete,
     Future<void> Function(api.Download)? onVerify,
     Future<api.DownloadMetadataResponse> Function(String id, {List<httpx.Option> options}) get = api.discovered.get,
   }) {
@@ -46,7 +49,8 @@ class DownloadDisplay extends StatelessWidget {
               DownloadDisplay(
                 snapshot.data ?? api.Download(),
                 trailing: trailing,
-                onTap: onTap,
+                onReset: onReset,
+                onDelete: onDelete,
                 onVerify: onVerify,
               ),
             );
@@ -86,8 +90,10 @@ class DownloadDisplay extends StatelessWidget {
                       tooltip: "verify data",
                       icon: Icon(Icons.fact_check),
                     ),
-                  if (onTap != null)
-                    ds.LoadingIconButton.delete(onPressed: onTap!, tooltip: "clear data from disk keeps metadata"),
+                  if (onReset != null)
+                    ds.LoadingIconButton.refresh(onPressed: onReset!, tooltip: "clear data from disk keeps metadata"),
+                  if (onDelete != null)
+                    ds.LoadingIconButton.delete(onPressed: onDelete!, tooltip: "permanently delete this media"),
                 ],
               ),
               forms.Field(
