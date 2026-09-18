@@ -12,12 +12,10 @@ class PlaylistCurrent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (!current.asMedia.hasId()) return const SizedBox.shrink();
     return ds.Container(
       rowdisplay.RowDisplay(
         media: current.asMedia,
         leading: const [Icon(Icons.play_arrow_rounded)],
-        highlighted: current.sessionId == sessionId,
       ),
     );
   }

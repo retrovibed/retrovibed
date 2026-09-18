@@ -512,10 +512,11 @@ class _State extends State<Connect> with LoadingState {
             Column(
               verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
               children: [
-                Text("Continue"),
+                ds.Heading(Text("Continue"), padding: defaults.padding / 2),
                 Expanded(
                   child: disc.RecentList(
                     margin: defaults.margin.copyWith(left: 0, right: 0),
+                    padding: defaults.padding / 2,
                     category,
                     latest: widget.apirecentlatest,
                     host: _latest.sync.library.hostname,
@@ -601,54 +602,59 @@ class _State extends State<Connect> with LoadingState {
                         decoration: BoxDecoration(color: theme.colorScheme.surfaceContainerLow),
                         Column(
                           verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
-                          spacing: defaults.spacing,
+                          spacing: defaults.spacing / 2,
                           children: [
                             PlayerControlPlayback(socket: _socket, sessionId: _sessionID, current: _latest.sync),
-                            Wrap(
-                              alignment: WrapAlignment.center,
-                              spacing: defaults.spacing,
-                              children: [
-                                ds.LoadingIconButton(
-                                  icon: Icon(Icons.graphic_eq),
-                                  toggled: _autoplay.isCompleted,
-                                  onPressed: ds.LoadingIconButton.convert(() {
-                                    _casautoplay(!_autoplay.isCompleted);
-                                  }),
-                                  tooltip: "enable autoqueue playback",
-                                  help: ds.Hint(
-                                    const Text(
-                                      "when the user has not queued any results, it will automatically queue up random content",
+                            ds.Heading(
+                              Wrap(
+                                alignment: WrapAlignment.center,
+                                spacing: defaults.spacing,
+                                children: [
+                                  ds.LoadingIconButton(
+                                    icon: Icon(Icons.graphic_eq),
+                                    toggled: _autoplay.isCompleted,
+                                    onPressed: ds.LoadingIconButton.convert(() {
+                                      _casautoplay(!_autoplay.isCompleted);
+                                    }),
+                                    tooltip: "enable autoqueue playback",
+                                    help: ds.Hint(
+                                      const Text(
+                                        "when the user has not queued any results, it will automatically queue up random content",
+                                      ),
                                     ),
                                   ),
-                                ),
-                                PlayerControlVolume(socket: _socket, sessionId: _sessionID, current: _latest.sync),
-                                PlayerControlSeek.prev(socket: _socket, sessionId: _sessionID),
-                                PlayerControlSeek.backward(socket: _socket, sessionId: _sessionID),
-                                PlayerControlPlayPause(
-                                  socket: _socket,
-                                  sessionId: _sessionID,
-                                  paused: _latest.sync.paused,
-                                ),
-                                PlayerControlSeek.forward(socket: _socket, sessionId: _sessionID),
-                                PlayerControlSeek.next(socket: _socket, sessionId: _sessionID),
-                                PlayerControlFullscreen(
-                                  socket: _socket,
-                                  sessionId: _sessionID,
-                                  current: _latest.sync.fullscreen,
-                                ),
-                                ds.LoadingIconButton.search(
-                                  toggled: _focused?.key == search.key,
-                                  onPressed: ds.LoadingIconButton.convert(() {
-                                    setState(() => _focused = _focused?.key == search.key ? ds.Empty : search);
-                                  }),
-                                  tooltip: "search the remote device's library",
-                                  help: ds.Hint(const Text("search the remote device's library to queue media on it")),
-                                ),
-                                if (authn.developer(context).debug)
-                                  PlayerControlSync(socket: _socket, sessionId: _sessionID),
-                              ],
+                                  PlayerControlVolume(socket: _socket, sessionId: _sessionID, current: _latest.sync),
+                                  PlayerControlSeek.prev(socket: _socket, sessionId: _sessionID),
+                                  PlayerControlSeek.backward(socket: _socket, sessionId: _sessionID),
+                                  PlayerControlPlayPause(
+                                    socket: _socket,
+                                    sessionId: _sessionID,
+                                    paused: _latest.sync.paused,
+                                  ),
+                                  PlayerControlSeek.forward(socket: _socket, sessionId: _sessionID),
+                                  PlayerControlSeek.next(socket: _socket, sessionId: _sessionID),
+                                  PlayerControlFullscreen(
+                                    socket: _socket,
+                                    sessionId: _sessionID,
+                                    current: _latest.sync.fullscreen,
+                                  ),
+                                  ds.LoadingIconButton.search(
+                                    toggled: _focused?.key == search.key,
+                                    onPressed: ds.LoadingIconButton.convert(() {
+                                      setState(() => _focused = _focused?.key == search.key ? ds.Empty : search);
+                                    }),
+                                    tooltip: "search the remote device's library",
+                                    help: ds.Hint(
+                                      const Text("search the remote device's library to queue media on it"),
+                                    ),
+                                  ),
+                                  if (authn.developer(context).debug)
+                                    PlayerControlSync(socket: _socket, sessionId: _sessionID),
+                                ],
+                              ),
                             ),
-                            PlaylistCurrent(_latest.sync.current, sessionId: _sessionID),
+                            if (_latest.sync.current.asMedia.hasId())
+                              PlaylistCurrent(_latest.sync.current, sessionId: _sessionID),
                             Expanded(child: queue),
                           ],
                         ),

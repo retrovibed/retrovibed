@@ -41,9 +41,9 @@ class _State extends State<PlayerControlPlayback> with ds.LoadingState {
       hasDuration ? durationMs.toDouble() : 0.0,
     );
 
-    return Padding(
+    return ds.Container(
       padding: defaults.padding,
-      child: Row(
+      Row(
         children: [
           Expanded(
             child: Slider(
