@@ -612,6 +612,24 @@ class _State extends State<Connect> with LoadingState {
                               alignment: WrapAlignment.center,
                               spacing: defaults.spacing,
                               children: [
+                                PlayerControlSeek.prev(socket: _socket, sessionId: _sessionID),
+                                PlayerControlSeek.backward(socket: _socket, sessionId: _sessionID),
+                                PlayerControlPlayPause(
+                                  socket: _socket,
+                                  sessionId: _sessionID,
+                                  paused: _latest.sync.paused,
+                                ),
+                                PlayerControlSeek.forward(socket: _socket, sessionId: _sessionID),
+                                PlayerControlSeek.next(socket: _socket, sessionId: _sessionID),
+                              ],
+                            ),
+                          ),
+                          ds.Container(
+                            constraints: const BoxConstraints(minWidth: double.infinity),
+                            Wrap(
+                              alignment: WrapAlignment.center,
+                              spacing: defaults.spacing,
+                              children: [
                                 ds.LoadingIconButton(
                                   icon: Icon(Icons.graphic_eq),
                                   toggled: _autoplay.isCompleted,
@@ -626,15 +644,6 @@ class _State extends State<Connect> with LoadingState {
                                   ),
                                 ),
                                 PlayerControlVolume(socket: _socket, sessionId: _sessionID, current: _latest.sync),
-                                PlayerControlSeek.prev(socket: _socket, sessionId: _sessionID),
-                                PlayerControlSeek.backward(socket: _socket, sessionId: _sessionID),
-                                PlayerControlPlayPause(
-                                  socket: _socket,
-                                  sessionId: _sessionID,
-                                  paused: _latest.sync.paused,
-                                ),
-                                PlayerControlSeek.forward(socket: _socket, sessionId: _sessionID),
-                                PlayerControlSeek.next(socket: _socket, sessionId: _sessionID),
                                 PlayerControlFullscreen(
                                   socket: _socket,
                                   sessionId: _sessionID,
