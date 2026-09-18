@@ -1,6 +1,7 @@
 package communityapi_test
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"testing"
@@ -63,6 +64,71 @@ func TestTombstonedEndpoint(t *testing.T) {
 
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusNotFound, resp.Code)
+	})
+
+	t.Run("returns error instead of masking it when the tombstone query fails for a reason other than no rows", func(t *testing.T) {
+		var (
+			ctx, done   = testx.Context(t)
+			q           = sqltestx.Metadatabase(t)
+			p           meta.Profile
+			v           meta.Authz
+			communityID = uuid.Must(uuid.NewV7()).String()
+		)
+		defer done()
+
+		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
+		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
+		require.NoError(t, testx.Fake(&v, meta.AuthzOptionProfileID(p.ID), meta.AuthzOptionAdmin))
+		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
+
+		lmd := library.Metadata{
+			ID:             uuid.Must(uuid.NewV7()).String(),
+			Description:    "test media",
+			Bytes:          1024,
+			TorrentID:      uuid.Nil.String(),
+			KnownMediaID:   uuid.Nil.String(),
+			ArchiveID:      uuid.Nil.String(),
+			DirectoryID:    uuid.Nil.String(),
+			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+		}
+		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
+
+		var pc community.PublishedContent
+		require.NoError(t, testx.Fake(&pc, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
+			p.CommunityID = communityID
+			p.LibraryID = lmd.ID
+			p.Bytes = lmd.Bytes
+		}))
+		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
+
+		routes := mux.NewRouter()
+		communityapi.NewHTTPPublished(
+			q,
+			communityapi.HTTPPublishedOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			communityapi.HTTPPublishedOptionMediaStorage(fsx.DirVirtual(t.TempDir())),
+			communityapi.HTTPPublishedOptionTorrentStorage(fsx.DirVirtual(t.TempDir())),
+		).Bind(routes.PathPrefix("/c").Subrouter())
+
+		// a canceled request context causes the tombstone query to fail with
+		// context.Canceled rather than sql.ErrNoRows, exercising the same
+		// "Scan failed but wasn't ErrNoRows" path that leaves PublishedContent
+		// zero-valued in production when the underlying query errors.
+		reqCtx, cancel := context.WithCancel(ctx)
+		cancel()
+
+		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
+		resp, req, err := httptestx.BuildRequestContextBytes(
+			reqCtx,
+			http.MethodDelete,
+			"/c/"+pc.ID,
+			nil,
+			httptestx.RequestOptionAuthorization("Bearer "+httpauthtest.UnsafeToken(claims, httpauthtest.UnsafeJWTSecretSource)),
+			httptestx.RequestOptionContent("application/json"),
+		)
+		require.NoError(t, err)
+
+		routes.ServeHTTP(resp, req)
+		require.Equal(t, http.StatusInternalServerError, resp.Code)
 	})
 
 	t.Run("deletes published content and returns it in response", func(t *testing.T) {

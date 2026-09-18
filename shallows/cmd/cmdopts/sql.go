@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"time"
 
 	_ "github.com/duckdb/duckdb-go/v2"
 
@@ -78,6 +79,15 @@ func InitializeDatabase(ctx context.Context, path string, migrations fs.FS) (db 
 	if db, err = sql.Open("duckdb", path); err != nil {
 		return nil, errorsx.Wrap(err, "unable to open db")
 	}
+
+	// duckdb-go caches returned connections as idle rather than actually closing
+	// them, which leaves their underlying DuckDB session (and whatever MVCC/index
+	// state it's still pinning) alive indefinitely. disable idle caching so every
+	// connection is genuinely closed once returned, and bound how long any single
+	// connection may be reused as defense in depth against the same staleness.
+	db.SetMaxIdleConns(0)
+	db.SetConnMaxLifetime(time.Minute)
+
 	defer func() {
 		if err == nil {
 			return

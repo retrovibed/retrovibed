@@ -2,14 +2,11 @@ package communityapi
 
 import (
 	"context"
-	"database/sql"
-	"errors"
 	"log"
 	"net/http"
 	"time"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/go-playground/form/v4"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
@@ -101,7 +98,7 @@ type HTTPPublished struct {
 
 func (t *HTTPPublished) Bind(r *mux.Router) {
 	r.StrictSlash(false)
-	r.Use(httpx.DebugRequest)
+	// r.Use(httpx.DebugRequest)
 
 	r.Path("/{cid}").Methods(http.MethodGet).Handler(alice.New(
 		httpx.ContextBufferPool512(),
@@ -134,9 +131,13 @@ func (t *HTTPPublished) tombstoned(w http.ResponseWriter, r *http.Request) {
 		pc community.PublishedContent
 	)
 
-	if err := community.PublishedContentTombstone(r.Context(), t.q, pid).Scan(&pc); errors.Is(err, sql.ErrNoRows) {
+	if err := community.PublishedContentTombstone(r.Context(), t.q, pid).Scan(&pc); sqlx.ErrNoRows(err) != nil {
 		log.Println(errorsx.Wrap(err, "unable to tombstone missing record"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
+		return
+	} else if err != nil {
+		log.Println(errorsx.Wrap(err, "unable to tombstone published content"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 
@@ -144,7 +145,6 @@ func (t *HTTPPublished) tombstoned(w http.ResponseWriter, r *http.Request) {
 		ID:         pc.CommunityID,
 		SyncFeedAt: time.Now(),
 	}).Scan(&cs); err != nil {
-		log.Println("DERP DERP", spew.Sdump(pc))
 		log.Println(errorsx.Wrap(err, "unable to request feed sync for community"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
 		return
