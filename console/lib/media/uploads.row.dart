@@ -14,7 +14,7 @@ class UploadsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final uploads = UploadNode.of(context).uploading.values.toList();
-    if (uploads.isEmpty) return ds.Debug.pink(ds.Empty);
+    if (uploads.isEmpty) return ds.Empty;
     final defaults = ds.Defaults.of(context);
 
     return ds.Container(
