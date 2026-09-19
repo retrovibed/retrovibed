@@ -359,6 +359,8 @@ type TorrentDetails struct {
 	Length        uint64                 `protobuf:"varint,2,opt,name=length,proto3" json:"length,omitempty"`
 	Source        string                 `protobuf:"bytes,3,opt,name=source,proto3" json:"source,omitempty"`
 	Private       bool                   `protobuf:"varint,4,opt,name=private,proto3" json:"private,omitempty"`
+	Downloaded    uint64                 `protobuf:"varint,5,opt,name=downloaded,proto3" json:"downloaded,omitempty"`
+	Uploaded      uint64                 `protobuf:"varint,6,opt,name=uploaded,proto3" json:"uploaded,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -421,6 +423,20 @@ func (x *TorrentDetails) GetPrivate() bool {
 	return false
 }
 
+func (x *TorrentDetails) GetDownloaded() uint64 {
+	if x != nil {
+		return x.Downloaded
+	}
+	return 0
+}
+
+func (x *TorrentDetails) GetUploaded() uint64 {
+	if x != nil {
+		return x.Uploaded
+	}
+	return 0
+}
+
 var File_meta_meta_torrent_proto protoreflect.FileDescriptor
 
 const file_meta_meta_torrent_proto_rawDesc = "" +
@@ -453,12 +469,16 @@ const file_meta_meta_torrent_proto_rawDesc = "" +
 	"created_by\x12$\n" +
 	"\rcreation_date\x18\x04 \x01(\x04R\rcreation_date\x12%\n" +
 	"\rannounce_list\x18\xe8\a \x03(\tR\rannounce_list\x12\x1b\n" +
-	"\burl_list\x18\xe9\a \x03(\tR\burl_list\"n\n" +
+	"\burl_list\x18\xe9\a \x03(\tR\burl_list\"\xaa\x01\n" +
 	"\x0eTorrentDetails\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x16\n" +
 	"\x06length\x18\x02 \x01(\x04R\x06length\x12\x16\n" +
 	"\x06source\x18\x03 \x01(\tR\x06source\x12\x18\n" +
-	"\aprivate\x18\x04 \x01(\bR\aprivateb\x06proto3"
+	"\aprivate\x18\x04 \x01(\bR\aprivate\x12\x1e\n" +
+	"\n" +
+	"downloaded\x18\x05 \x01(\x04R\n" +
+	"downloaded\x12\x1a\n" +
+	"\buploaded\x18\x06 \x01(\x04R\buploadedb\x06proto3"
 
 var (
 	file_meta_meta_torrent_proto_rawDescOnce sync.Once

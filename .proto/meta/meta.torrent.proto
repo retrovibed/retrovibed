@@ -41,4 +41,6 @@ message TorrentDetails {
   uint64 length = 2 [json_name = "length"];
   string source = 3 [json_name = "source"];
   bool private = 4 [json_name = "private"];
+  uint64 downloaded = 5 [json_name = "downloaded"];
+  uint64 uploaded = 6 [json_name = "uploaded"];
 }

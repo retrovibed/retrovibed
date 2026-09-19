@@ -13,9 +13,9 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
+	"github.com/retrovibed/retrovibed/retroapi/bytesx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/retroapi/uuidx"
-	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/cryptox"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"

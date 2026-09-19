@@ -71,6 +71,33 @@ void main() {
       expect(tester.takeException(), isNull);
     }, variant: _resolutions);
 
+    testWidgets('renders transfer ratio', (WidgetTester tester) async {
+      await tester.pumpApp(
+        SingleChildScrollView(
+          child: TorrentDisplay(
+            api.TorrentInfoResponse(
+              details: api.TorrentDetails(downloaded: Int64(1024 * 1024), uploaded: Int64(1024 * 1024 * 3)),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('ratio'), findsOneWidget);
+      expect(find.text('3.00'), findsOneWidget);
+    });
+
+    testWidgets('renders placeholder ratio when nothing downloaded', (WidgetTester tester) async {
+      await tester.pumpApp(
+        SingleChildScrollView(
+          child: TorrentDisplay(
+            api.TorrentInfoResponse(details: api.TorrentDetails(uploaded: Int64(1024 * 1024))),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('-'), findsOneWidget);
+    });
+
     testWidgets('renders empty response without overflow', (WidgetTester tester) async {
       final entry = _resolutions.currentValue!;
       await tester.pumpApp(

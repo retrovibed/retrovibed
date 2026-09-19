@@ -6,9 +6,9 @@ import (
 	"io"
 	"testing"
 
+	"github.com/retrovibed/retrovibed/retroapi/bytesx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
-	"github.com/retrovibed/retrovibed/shallows/internal/bytesx"
 	"github.com/stretchr/testify/require"
 )
 

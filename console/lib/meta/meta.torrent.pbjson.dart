@@ -136,10 +136,14 @@ const TorrentDetails$json = {
     {'1': 'length', '3': 2, '4': 1, '5': 4, '10': 'length'},
     {'1': 'source', '3': 3, '4': 1, '5': 9, '10': 'source'},
     {'1': 'private', '3': 4, '4': 1, '5': 8, '10': 'private'},
+    {'1': 'downloaded', '3': 5, '4': 1, '5': 4, '10': 'downloaded'},
+    {'1': 'uploaded', '3': 6, '4': 1, '5': 4, '10': 'uploaded'},
   ],
 };
 
 /// Descriptor for `TorrentDetails`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List torrentDetailsDescriptor = $convert.base64Decode(
     'Cg5Ub3JyZW50RGV0YWlscxISCgRuYW1lGAEgASgJUgRuYW1lEhYKBmxlbmd0aBgCIAEoBFIGbG'
-    'VuZ3RoEhYKBnNvdXJjZRgDIAEoCVIGc291cmNlEhgKB3ByaXZhdGUYBCABKAhSB3ByaXZhdGU=');
+    'VuZ3RoEhYKBnNvdXJjZRgDIAEoCVIGc291cmNlEhgKB3ByaXZhdGUYBCABKAhSB3ByaXZhdGUS'
+    'HgoKZG93bmxvYWRlZBgFIAEoBFIKZG93bmxvYWRlZBIaCgh1cGxvYWRlZBgGIAEoBFIIdXBsb2'
+    'FkZWQ=');

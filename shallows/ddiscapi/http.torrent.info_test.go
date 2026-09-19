@@ -9,6 +9,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
+	"github.com/retrovibed/retrovibed/retroapi/bytesx"
 	rootenv "github.com/retrovibed/retrovibed/retroapi/env"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
@@ -40,7 +41,12 @@ func TestHTTPTorrentInfo(t *testing.T) {
 		require.NoError(t, err)
 		hash := mi.HashInfoBytes()
 
-		md = tracking.NewMetadata(new(int160.FromByteArray(hash)), tracking.MetadataOptionAutoDescription)
+		md = tracking.NewMetadata(
+			new(int160.FromByteArray(hash)),
+			tracking.MetadataOptionAutoDescription,
+			tracking.MetadataOptionDownloaded(bytesx.KiB),
+			tracking.MetadataOptionUploaded(2*bytesx.KiB),
+		)
 		require.NoError(t, tracking.MetadataInsertWithDefaults(ctx, q, md).Scan(&md))
 
 		require.NoError(t, fsx.MkDirs(0700, vfs.Path(rootenv.TorrentDirName)))
@@ -69,6 +75,8 @@ func TestHTTPTorrentInfo(t *testing.T) {
 		require.Equal(t, "example.1", resp.Details.Name)
 		require.EqualValues(t, 132, resp.Details.Length)
 		require.True(t, resp.Details.Private)
+		require.EqualValues(t, bytesx.KiB, resp.Details.Downloaded)
+		require.EqualValues(t, 2*bytesx.KiB, resp.Details.Uploaded)
 		require.Equal(t, "mktorrent 1.1", resp.Meta.CreatedBy)
 		require.Equal(t, []string{"https://example.com/announce"}, resp.Meta.AnnounceList)
 		require.Len(t, resp.Files, 1)

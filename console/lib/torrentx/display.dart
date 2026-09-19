@@ -1,3 +1,4 @@
+import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/design.kit/forms.dart' as forms;
@@ -50,6 +51,9 @@ class TorrentDisplay extends StatelessWidget {
     final defaults = ds.Defaults.of(context);
     final meta = current.meta;
     final details = current.details;
+    final ratio = details.downloaded == Int64.ZERO
+        ? "-"
+        : (details.uploaded.toInt() / details.downloaded.toInt()).toStringAsFixed(2);
 
     return Opacity(
       opacity: current.hasDetails() ? 1.0 : 0.4,
@@ -67,6 +71,9 @@ class TorrentDisplay extends StatelessWidget {
               input: Text(details.name, overflow: TextOverflow.ellipsis, maxLines: 1),
             ),
             forms.Field(label: Text("length"), input: ds.Bytes(details.length)),
+            forms.Field(label: Text("downloaded"), input: ds.Bytes(details.downloaded)),
+            forms.Field(label: Text("uploaded"), input: ds.Bytes(details.uploaded)),
+            forms.Field(label: Text("ratio"), input: Text(ratio)),
             forms.Field(label: Text("source"), input: Text(details.source)),
             Transform.translate(
               child: forms.Checkbox(Text("private"), value: details.private),

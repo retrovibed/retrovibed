@@ -482,12 +482,16 @@ class TorrentDetails extends $pb.GeneratedMessage {
     $fixnum.Int64? length,
     $core.String? source,
     $core.bool? private,
+    $fixnum.Int64? downloaded,
+    $fixnum.Int64? uploaded,
   }) {
     final result = TorrentDetails._();
     if (name != null) result.name = name;
     if (length != null) result.length = length;
     if (source != null) result.source = source;
     if (private != null) result.private = private;
+    if (downloaded != null) result.downloaded = downloaded;
+    if (uploaded != null) result.uploaded = uploaded;
     return result;
   }
 
@@ -509,6 +513,12 @@ class TorrentDetails extends $pb.GeneratedMessage {
         defaultOrMaker: $fixnum.Int64.ZERO)
     ..aOS(3, _omitFieldNames ? '' : 'source')
     ..aOB(4, _omitFieldNames ? '' : 'private')
+    ..a<$fixnum.Int64>(
+        5, _omitFieldNames ? '' : 'downloaded', $pb.PbFieldType.OU6,
+        defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(
+        6, _omitFieldNames ? '' : 'uploaded', $pb.PbFieldType.OU6,
+        defaultOrMaker: $fixnum.Int64.ZERO)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -568,6 +578,24 @@ class TorrentDetails extends $pb.GeneratedMessage {
   $core.bool hasPrivate() => $_has(3);
   @$pb.TagNumber(4)
   void clearPrivate() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $fixnum.Int64 get downloaded => $_getI64(4);
+  @$pb.TagNumber(5)
+  set downloaded($fixnum.Int64 value) => $_setInt64(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasDownloaded() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearDownloaded() => $_clearField(5);
+
+  @$pb.TagNumber(6)
+  $fixnum.Int64 get uploaded => $_getI64(5);
+  @$pb.TagNumber(6)
+  set uploaded($fixnum.Int64 value) => $_setInt64(5, value);
+  @$pb.TagNumber(6)
+  $core.bool hasUploaded() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearUploaded() => $_clearField(6);
 }
 
 const $core.bool _omitFieldNames =

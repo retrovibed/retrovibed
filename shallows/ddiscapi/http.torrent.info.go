@@ -116,10 +116,12 @@ func (t *HTTPTorrentInfo) get(w http.ResponseWriter, r *http.Request) {
 			UrlList:      []string(mi.UrlList),
 		},
 		Details: &metaapi.TorrentDetails{
-			Name:    info.Name,
-			Length:  uint64(info.TotalLength()),
-			Source:  info.Source,
-			Private: info.Private != nil && *info.Private,
+			Name:       info.Name,
+			Length:     uint64(info.TotalLength()),
+			Source:     info.Source,
+			Private:    info.Private != nil && *info.Private,
+			Downloaded: meta.Downloaded,
+			Uploaded:   meta.Uploaded,
 		},
 		Files: files,
 	}
