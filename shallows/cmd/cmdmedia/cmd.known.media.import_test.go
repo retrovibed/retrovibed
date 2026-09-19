@@ -2,10 +2,14 @@ package cmdmedia
 
 import (
 	"bytes"
+	"path/filepath"
 	"strings"
 	"testing"
 
+	"github.com/alecthomas/kong"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
+	"github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
 	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
@@ -123,5 +127,32 @@ func TestKnownImportRun(t *testing.T) {
 		require.NoError(t, cmd.run(ctx, db, &second))
 		require.Equal(t, 1, sqltestx.Count(t, db, `SELECT COUNT(*) FROM cache.library_known_media`))
 		require.Equal(t, 1, sqltestx.Count(t, db, `SELECT duplicates FROM cache.library_known_media WHERE uid = ?`, known.UID))
+	})
+}
+
+func TestKnownImportRunWithGlobal(t *testing.T) {
+	t.Run("imports records from stdin into the database at the given path", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		// --database can be any path, the generated cache.library_known_media
+		// queries must resolve regardless of the file name.
+		path := filepath.Join(t.TempDir(), "derp.db")
+
+		var a, b library.Known
+		require.NoError(t, testx.Fake(&a, library.KnownOptionTestDefaults, library.KnownOptionRandomID))
+		require.NoError(t, testx.Fake(&b, library.KnownOptionTestDefaults, library.KnownOptionRandomID))
+
+		var input bytes.Buffer
+		require.NoError(t, jsonl.NewEncoder(&input).Encode(a, b))
+
+		genparser := cmdtestx.Genparser(knownimport{}, kong.BindTo(&input, (*cmdopts.Stdin)(nil)))
+		require.NoError(t, cmdtestx.Execute(t, genparser(t), "command", "--database", path))
+
+		db, err := cmdopts.DatabaseCache(ctx, path)
+		require.NoError(t, err)
+		defer db.Close()
+
+		require.Equal(t, 2, sqltestx.Count(t, db, `SELECT COUNT(*) FROM cache.library_known_media`))
 	})
 }

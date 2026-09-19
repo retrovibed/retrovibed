@@ -45,7 +45,7 @@ func DatabaseCustom(ctx context.Context, metapath, cachepath string) (db *sql.DB
 		return nil, err
 	}
 
-	cachedb, err := DatabaseCache(ctx, cachepath)
+	cachedb, err := migrateCache(ctx, cachepath)
 	if err != nil {
 		return nil, err
 	}
@@ -107,13 +107,21 @@ func InitializeDatabase(ctx context.Context, path string, migrations fs.FS) (db 
 //go:embed .migrations.cache/*.sql
 var embedmigrationscache embed.FS
 
-// DatabaseCache opens and migrates path (see .migrations.cache) as its own
-// standalone database, with no dependency on a meta database. Cache-resident
-// tables (e.g. library_known_media) are referenced fully qualified as
-// cache.<table> (or "cache"."<table>" for INSERT/UPDATE/DELETE targets)
-// throughout the genieql-generated code, so callers must AttachCache this
-// onto a meta connection before those queries will resolve.
+// DatabaseCache opens and migrates path (see .migrations.cache) and attaches it
+// under the "cache" catalog of an otherwise empty in-memory database, with no
+// dependency on a meta database. Cache-resident tables (e.g.
+// library_known_media) are referenced fully qualified as cache.<table> (or
+// "cache"."<table>" for INSERT/UPDATE/DELETE targets) throughout the
+// genieql-generated code. A database's catalog is named after its file, so
+// attaching from a separate instance is what makes those queries resolve for
+// any path rather than only one named cache.db.
 func DatabaseCache(ctx context.Context, path string) (db *sql.DB, err error) {
+	return DatabaseCustom(ctx, "", path)
+}
+
+// migrateCache opens and migrates path (see .migrations.cache) as its own
+// standalone database, whose catalog is named after its file.
+func migrateCache(ctx context.Context, path string) (db *sql.DB, err error) {
 	return InitializeDatabase(ctx, path, errorsx.Must(fs.Sub(embedmigrationscache, ".migrations.cache")))
 }
 

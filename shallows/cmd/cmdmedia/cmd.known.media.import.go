@@ -8,6 +8,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/alecthomas/kong"
 	"github.com/retrovibed/retrovibed/retroapi/asynccompute"
 	"github.com/retrovibed/retrovibed/retroapi/backoffx"
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
@@ -29,7 +30,7 @@ type knownimport struct {
 	Attempts uint   `flag:"" name:"attempts" help:"set maximum number of attempts per batch insert" default:"5"`
 }
 
-func (t knownimport) Run(gctx *cmdopts.Global) (err error) {
+func (t knownimport) Run(kctx *kong.Context, gctx *cmdopts.Global, stdin cmdopts.Stdin) (err error) {
 	var db *sql.DB
 
 	if db, err = cmdopts.DatabaseCache(gctx.Context, t.Database); err != nil {
@@ -37,7 +38,7 @@ func (t knownimport) Run(gctx *cmdopts.Global) (err error) {
 	}
 	defer db.Close()
 
-	return t.run(gctx.Context, db, os.Stdin)
+	return t.run(gctx.Context, db, langx.FirstNonNil[io.Reader](stdin, os.Stdin))
 }
 
 func (t knownimport) run(ctx context.Context, db *sql.DB, r io.Reader) (err error) {
@@ -81,7 +82,7 @@ func (t knownimport) run(ctx context.Context, db *sql.DB, r io.Reader) (err erro
 		return err
 	}
 
-	if _, err := db.ExecContext(ctx, "CHECKPOINT"); err != nil {
+	if _, err := db.ExecContext(ctx, "CHECKPOINT cache"); err != nil {
 		return errorsx.Wrap(err, "failed to checkpoint database")
 	}
 
