@@ -54,6 +54,9 @@ func SearchQueueBackgroundRun(ctx context.Context, q sqlx.Queryer, importer trac
 				continue
 			} else {
 				d.Infohash = resolved.Infohash
+				// private torrents stay usable to this node but must never be
+				// served to other peers (see ddisc.FindMedia and the sync queries).
+				d.Private = d.Private || resolved.Private
 			}
 
 			if err := ddisc.DiscoveredInsertWithDefaults(sctx, q, d).Scan(&d); err != nil {

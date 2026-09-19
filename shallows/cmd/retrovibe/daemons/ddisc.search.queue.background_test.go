@@ -1,19 +1,23 @@
 package daemons
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"iter"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/james-lawrence/torrent/dht/int160"
+	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
@@ -32,10 +36,15 @@ func (t fakeResultSeq) Err() error { return nil }
 
 type fakeSearchPlugins struct {
 	results []*ddiscapi.Import
+	// public, when set, records the public argument of the last Search call.
+	public *bool
 }
 
 func (t fakeSearchPlugins) Search(ctx context.Context, mimetypes []string, query string, adult, public bool) iterx.Seq[*ddiscapi.Import] {
-	return fakeResultSeq(t)
+	if t.public != nil {
+		*t.public = public
+	}
+	return fakeResultSeq{results: t.results}
 }
 
 func TestSearchQueueBackgroundRun(t *testing.T) {
@@ -80,5 +89,69 @@ func TestSearchQueueBackgroundRun(t *testing.T) {
 
 		require.EqualValues(t, 0, sqltestx.Count(t, q, "SELECT COUNT(*) FROM ddisc_media WHERE known_media_id = ?", known.UID))
 		require.EqualValues(t, 1, sqltestx.Count(t, q, "SELECT COUNT(*) FROM ddisc_search_queue WHERE known_media_id = ? AND attempts = 1", known.UID))
+	})
+
+	t.Run("should only ask search plugins for public results", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		q := sqltestx.Metadatabase(t)
+
+		var known library.Known
+		require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults, library.KnownOptionMimetype(mimex.Video)))
+		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
+
+		require.NoError(t, ddisc.SearchQueueEnqueue(ctx, q, ddisc.SearchQueue{KnownMediaID: known.UID}).Scan(&ddisc.SearchQueue{}))
+
+		var public bool
+		importer := tracking.NewURIImport(q, http.DefaultClient, fsx.DirVirtual(t.TempDir()))
+		require.NoError(t, SearchQueueBackgroundRun(ctx, q, importer, fakeSearchPlugins{public: &public}, ddisc.UnimplementedStrategy{}, library.QueryCleanerNoop()))
+		require.True(t, public)
+	})
+
+	t.Run("should never expose private torrents to ddisc search results", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		q := sqltestx.Metadatabase(t)
+
+		var known library.Known
+		require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults, library.KnownOptionMimetype(mimex.Video)))
+		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
+
+		require.NoError(t, ddisc.SearchQueueEnqueue(ctx, q, ddisc.SearchQueue{KnownMediaID: known.UID}).Scan(&ddisc.SearchQueue{}))
+
+		info := testx.Must(metainfo.NewFromPath(testx.Fixture()))(t)
+		pubmd := metainfo.MetaInfo{InfoBytes: testx.Must(metainfo.Encode(info))(t)}
+		info.Private = new(true)
+		privmd := metainfo.MetaInfo{InfoBytes: testx.Must(metainfo.Encode(info))(t)}
+		require.NotEqual(t, pubmd.ID().Bytes(), privmd.ID().Bytes())
+
+		mux := http.NewServeMux()
+		mux.HandleFunc("/public.torrent", httptestx.HandleIO(bytes.NewReader(testx.Must(metainfo.Encode(pubmd))(t))))
+		mux.HandleFunc("/private.torrent", httptestx.HandleIO(bytes.NewReader(testx.Must(metainfo.Encode(privmd))(t))))
+		srv := httptest.NewServer(mux)
+		defer srv.Close()
+
+		plugins := fakeSearchPlugins{results: []*ddiscapi.Import{
+			{Uri: srv.URL + "/public.torrent", Uritype: mimex.Bittorrent, Health: 10, Mimetype: mimex.Video, Title: known.Title},
+			{Uri: srv.URL + "/private.torrent", Uritype: mimex.Bittorrent, Health: 10, Mimetype: mimex.Video, Title: known.Title},
+		}}
+		importer := tracking.NewURIImport(q, http.DefaultClient, fsx.DirVirtual(t.TempDir()))
+		require.NoError(t, SearchQueueBackgroundRun(ctx, q, importer, plugins, ddisc.UnimplementedStrategy{}, library.QueryCleanerNoop()))
+
+		// both candidates are persisted locally, the private one stays usable to this node.
+		require.EqualValues(t, 2, sqltestx.Count(t, q, "SELECT COUNT(*) FROM ddisc_media WHERE known_media_id = ?", known.UID))
+		require.EqualValues(t, 1, sqltestx.Count(t, q, "SELECT COUNT(*) FROM ddisc_media WHERE known_media_id = ? AND infohash = ? AND private = true", known.UID, privmd.ID().Bytes()), "private torrent must be flagged private")
+
+		// but only the public one is what a MethodSearch request can find.
+		var found []ddisc.Discovered
+		seq := ddisc.FindMedia(q, known.UID)
+		for d := range seq.Each(ctx) {
+			found = append(found, d)
+		}
+		require.NoError(t, seq.Err())
+		require.Len(t, found, 1)
+		require.Equal(t, pubmd.ID().Bytes(), found[0].Infohash)
 	})
 }

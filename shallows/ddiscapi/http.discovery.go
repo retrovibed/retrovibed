@@ -196,12 +196,12 @@ func (t *HTTPDiscovery) websocket(w http.ResponseWriter, r *http.Request) {
 
 	ctx := c.CloseRead(context.Background())
 
-	discreq := ddisc.DiscoverRequest{
+	discreq := ddisc.DiscoverRequestFromLocate(ddisc.Locate{
 		KnownMediaID: req.KnownMediaId,
 		Query:        req.Query,
-		Mimetypes:    ddisc.Category(req.Mimetype),
+		Mimetype:     req.Mimetype,
 		Adult:        req.Adult,
-	}
+	})
 
 	strategies := ddisc.SyncStrategies(t.q, t.plugins, t.peertube, discreq.KnownMediaID)
 	seq := ddisc.Discover(

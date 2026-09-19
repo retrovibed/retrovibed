@@ -85,4 +85,90 @@ func TestSearchProtocol(t *testing.T) {
 			return sqltestx.Count(t, cdb, "SELECT COUNT(*) FROM ddisc_media") == records
 		}, time.Second, 100*time.Millisecond)
 	})
+
+	t.Run("should never send private torrents in the results of a search", func(t *testing.T) {
+		const (
+			public  = 4
+			private = 3
+		)
+		pdb := sqltestx.Metadatabase(t)
+		defer pdb.Close()
+
+		ptm := dht.DefaultMuxer().
+			Method(ddisctorrent.MethodSearch, ddisctorrent.NewSearch(pdb))
+		pdht, err := dht.NewServer(
+			32,
+			dht.OptionMuxer(ptm),
+		)
+		require.NoError(t, err)
+		tpeer := torrenttestx.QuickClientWithDHT(
+			t,
+			pdht,
+			torrent.ClientConfigExtension(ddisctorrent.ExtensionName),
+		)
+		defer tpeer.Close()
+
+		cdb := sqltestx.Metadatabase(t)
+		defer cdb.Close()
+
+		ctm := dht.DefaultMuxer().
+			Method(ddisctorrent.MethodMedia, ddisctorrent.NewMediaRecorder(cdb))
+		cdht, err := dht.NewServer(
+			32,
+			dht.OptionMuxer(ctm),
+		)
+		require.NoError(t, err)
+		tclient := torrenttestx.QuickClientWithDHT(
+			t,
+			cdht,
+			torrent.ClientConfigExtension(ddisctorrent.ExtensionName),
+		)
+		defer tclient.Close()
+
+		knownmedia := ddiscapi.ImportedMediaUUID(t.Name(), uuid.Must(uuid.NewV7()))
+		for range public {
+			id := int160.Random()
+			d := ddisc.NewDiscovered(
+				&id,
+				ddisc.DiscoveredOptionKnownMedia(knownmedia.String()),
+				ddisc.DiscoveredOptionMimetype(mimex.Binary),
+				ddisc.DiscoveredOptionAutoMagnet,
+			)
+			require.NoError(t, ddisc.DiscoveredInsertWithDefaults(t.Context(), pdb, d).Scan(&d))
+		}
+
+		privateids := make([][]byte, 0, private)
+		for range private {
+			id := int160.Random()
+			d := ddisc.NewDiscovered(
+				&id,
+				ddisc.DiscoveredOptionKnownMedia(knownmedia.String()),
+				ddisc.DiscoveredOptionMimetype(mimex.Binary),
+				ddisc.DiscoveredOptionAutoMagnet,
+				ddisc.DiscoveredOptionPrivate(true),
+			)
+			require.NoError(t, ddisc.DiscoveredInsertWithDefaults(t.Context(), pdb, d).Scan(&d))
+			require.True(t, d.Private)
+			privateids = append(privateids, id.Bytes())
+		}
+		require.EqualValues(t, public+private, sqltestx.Count(t, pdb, "SELECT COUNT(*) FROM ddisc_media WHERE known_media_id = ?", knownmedia.String()))
+
+		req, err := ddisctorrent.NewSearchRequest(cdht.ID(cdht.DynamicAddrPort()), knownmedia.String())
+		require.NoError(t, err)
+
+		ret := cdht.Query(t.Context(), dht.NewAddr(pdht.DynamicAddrPort()), req)
+		require.NoError(t, ret.Err)
+
+		require.Eventually(t, func() bool {
+			return sqltestx.Count(t, cdb, "SELECT COUNT(*) FROM ddisc_media") == public
+		}, time.Second, 100*time.Millisecond)
+
+		require.Never(t, func() bool {
+			return sqltestx.Count(t, cdb, "SELECT COUNT(*) FROM ddisc_media") > public
+		}, 500*time.Millisecond, 100*time.Millisecond)
+
+		for _, id := range privateids {
+			require.EqualValues(t, 0, sqltestx.Count(t, cdb, "SELECT COUNT(*) FROM ddisc_media WHERE infohash = ?", id))
+		}
+	})
 }

@@ -12,6 +12,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
 	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/lucenex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/library"
@@ -30,13 +31,59 @@ type DiscoverRequest struct {
 // DiscoverRequestFromKnown builds a DiscoverRequest from a library.Known
 // catalog entry, deriving Mimetypes from its Mimetype — the shape every
 // caller that already has a Known row needs, so the field mapping lives in
-// one place.
-func DiscoverRequestFromKnown(known library.Known) DiscoverRequest {
-	return DiscoverRequest{
+// one place. Options are applied after the derived defaults.
+func DiscoverRequestFromKnown(known library.Known, options ...DiscoverRequestOption) DiscoverRequest {
+	return langx.Clone(DiscoverRequest{
 		KnownMediaID: known.UID,
 		Query:        known.Title,
 		Mimetypes:    Category(known.Mimetype),
 		Adult:        known.Adult,
+		Public:       true, // by default we want to only results that are public.
+	}, options...)
+}
+
+// DiscoverRequestFromLocate builds a DiscoverRequest from a Locate row,
+// deriving Mimetypes from its Mimetype. Options are applied after the
+// derived defaults.
+func DiscoverRequestFromLocate(loc Locate, options ...DiscoverRequestOption) DiscoverRequest {
+	return langx.Clone(DiscoverRequest{
+		KnownMediaID: loc.KnownMediaID,
+		Query:        loc.Query,
+		Mimetypes:    Category(loc.Mimetype),
+		Adult:        loc.Adult,
+	}, options...)
+}
+
+// DiscoverRequestOption customizes a DiscoverRequest after a builder has
+// derived its defaults.
+type DiscoverRequestOption func(*DiscoverRequest)
+
+// DiscoverRequestOptionAdult overrides whether adult content is enabled.
+func DiscoverRequestOptionAdult(adult bool) DiscoverRequestOption {
+	return func(t *DiscoverRequest) {
+		t.Adult = adult
+	}
+}
+
+// DiscoverRequestOptionPublic overrides whether results are restricted to
+// those a public source could produce.
+func DiscoverRequestOptionPublic(public bool) DiscoverRequestOption {
+	return func(t *DiscoverRequest) {
+		t.Public = public
+	}
+}
+
+// DiscoverRequestOptionQuery overrides the free-text query.
+func DiscoverRequestOptionQuery(query string) DiscoverRequestOption {
+	return func(t *DiscoverRequest) {
+		t.Query = query
+	}
+}
+
+// DiscoverRequestOptionMimetypes overrides the discovery mimetypes.
+func DiscoverRequestOptionMimetypes(mimetypes ...string) DiscoverRequestOption {
+	return func(t *DiscoverRequest) {
+		t.Mimetypes = mimetypes
 	}
 }
 

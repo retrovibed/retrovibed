@@ -46,12 +46,7 @@ func Locate(ctx context.Context, db sqlx.Queryer, disc *DiscoverySettings, dhts 
 	}
 	strategies = append(strategies, ddisc.SyncStrategies(db, plugins, peertube, loc.KnownMediaID)...)
 
-	req := ddisc.DiscoverRequest{
-		KnownMediaID: loc.KnownMediaID,
-		Query:        loc.Query,
-		Mimetypes:    ddisc.Category(loc.Mimetype),
-		Adult:        loc.Adult,
-	}
+	req := ddisc.DiscoverRequestFromLocate(loc)
 
 	options := []ddisc.DiscoverOption{
 		ddisc.DiscoverOptionFilter(ddisc.NewTitleFilter(db, req).Match),
