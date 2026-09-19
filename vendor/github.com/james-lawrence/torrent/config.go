@@ -38,6 +38,14 @@ type ClientConfig struct {
 	// Upload even after there's nothing in it for us.
 	Seed bool `long:"seed"`
 
+	// how long a torrent may go without activity before it is unloaded from memory.
+	// zero disables idle unloading.
+	idleTimeout time.Duration
+
+	// how often connections send keepalives. a connection that has sent nothing for two intervals
+	// is dropped.
+	keepAliveTimeout time.Duration
+
 	// Only applies to chunks uploaded to peers, to maintain responsiveness
 	// communicating local Client state to peers. Each limiter token
 	// represents one byte. The Limiter's burst must be large enough to fit a
@@ -194,6 +202,24 @@ func ClientConfigDebugLogger(l logging) ClientConfigOption {
 func ClientConfigSeed(b bool) ClientConfigOption {
 	return func(c *ClientConfig) {
 		c.Seed = b
+	}
+}
+
+// ClientConfigIdleTimeout unload torrents from memory once they have had no activity for
+// the given duration. a seeding torrent with connections is never idle. the torrent remains
+// on disk and is reloaded when a peer connects. zero disables idle unloading.
+func ClientConfigIdleTimeout(d time.Duration) ClientConfigOption {
+	return func(c *ClientConfig) {
+		c.idleTimeout = d
+	}
+}
+
+// ClientConfigKeepAlive how often connections send keepalives, a connection that has sent nothing
+// for two intervals is considered dead and dropped. peers should be configured to match, a peer with a
+// longer interval is dropped while quiet. defaults to 10 seconds.
+func ClientConfigKeepAlive(d time.Duration) ClientConfigOption {
+	return func(c *ClientConfig) {
+		c.keepAliveTimeout = d
 	}
 }
 
@@ -373,6 +399,7 @@ func NewDefaultClientConfig(mdstore MetadataStore, store storage.ClientImpl, opt
 		TorrentPeersHighWater:          64,
 		TorrentPeersLowWater:           16,
 		handshakesTimeout:              4 * time.Second,
+		keepAliveTimeout:               10 * time.Second,
 		UploadRateLimiter:              rate.NewLimiter(rate.Limit(128*bytesx.MiB), bytesx.MiB),
 		DownloadRateLimiter:            rate.NewLimiter(rate.Limit(256*bytesx.MiB), bytesx.MiB),
 		dialRateLimiter:                rate.NewLimiter(rate.Limit(32), 128),

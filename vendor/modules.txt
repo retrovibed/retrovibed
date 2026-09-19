@@ -78,7 +78,7 @@ github.com/ProtonMail/go-crypto/openpgp/packet
 github.com/ProtonMail/go-crypto/openpgp/s2k
 github.com/ProtonMail/go-crypto/openpgp/x25519
 github.com/ProtonMail/go-crypto/openpgp/x448
-# github.com/RoaringBitmap/roaring/v2 v2.27.0
+# github.com/RoaringBitmap/roaring/v2 v2.28.0
 ## explicit; go 1.24.0
 github.com/RoaringBitmap/roaring/v2
 github.com/RoaringBitmap/roaring/v2/internal
@@ -88,7 +88,7 @@ github.com/alecthomas/kong
 # github.com/anacrolix/generics v0.2.0
 ## explicit; go 1.18
 github.com/anacrolix/generics
-# github.com/anacrolix/go-libutp v1.4.0
+# github.com/anacrolix/go-libutp v1.5.1
 ## explicit; go 1.24.0
 github.com/anacrolix/go-libutp
 # github.com/anacrolix/log v0.17.0
@@ -730,7 +730,7 @@ github.com/james-lawrence/genieql/internal/userx
 github.com/james-lawrence/genieql/internal/wasidialect
 github.com/james-lawrence/genieql/internal/wasix/ffierrors
 github.com/james-lawrence/genieql/internal/wasix/ffiguest
-# github.com/james-lawrence/torrent v0.0.0-20260911003355-3ce4d6010877
+# github.com/james-lawrence/torrent v0.0.0-20260919171622-620c2b0c0464
 ## explicit; go 1.27.0
 github.com/james-lawrence/torrent
 github.com/james-lawrence/torrent/autobind

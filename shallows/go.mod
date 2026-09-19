@@ -4,9 +4,9 @@ go 1.27.0
 
 require (
 	github.com/Masterminds/squirrel v1.5.4
-	github.com/RoaringBitmap/roaring/v2 v2.27.0
+	github.com/RoaringBitmap/roaring/v2 v2.28.0
 	github.com/alecthomas/kong v1.16.0
-	github.com/anacrolix/go-libutp v1.4.0
+	github.com/anacrolix/go-libutp v1.5.1
 	github.com/anacrolix/missinggo v1.3.0
 	github.com/anacrolix/utp v0.2.0
 	github.com/benbjohnson/immutable v0.4.3
@@ -29,7 +29,7 @@ require (
 	github.com/grindlemire/go-lucene v0.0.33
 	github.com/hashicorp/mdns v1.0.6
 	github.com/james-lawrence/genieql v0.0.0-20260917171911-8038e3e1d315
-	github.com/james-lawrence/torrent v0.0.0-20260911003355-3ce4d6010877
+	github.com/james-lawrence/torrent v0.0.0-20260919171622-620c2b0c0464
 	github.com/jfreymuth/pulse v0.1.2
 	github.com/justinas/alice v1.2.0
 	github.com/linxGnu/pqueue v0.2.3

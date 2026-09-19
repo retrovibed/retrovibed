@@ -13,7 +13,7 @@ require (
 	github.com/gofrs/uuid/v5 v5.5.1
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/gorilla/schema v1.4.1
-	github.com/james-lawrence/torrent v0.0.0-20260911003355-3ce4d6010877
+	github.com/james-lawrence/torrent v0.0.0-20260919171622-620c2b0c0464
 	github.com/justinas/alice v1.2.0
 	github.com/mattn/go-isatty v0.0.22
 	github.com/mdlayher/netlink v1.11.2
@@ -32,9 +32,9 @@ require (
 )
 
 require (
-	github.com/RoaringBitmap/roaring/v2 v2.27.0 // indirect
+	github.com/RoaringBitmap/roaring/v2 v2.28.0 // indirect
 	github.com/anacrolix/generics v0.2.0 // indirect
-	github.com/anacrolix/go-libutp v1.4.0 // indirect
+	github.com/anacrolix/go-libutp v1.5.1 // indirect
 	github.com/anacrolix/log v0.17.0 // indirect
 	github.com/anacrolix/missinggo v1.3.0 // indirect
 	github.com/anacrolix/missinggo/perf v1.0.0 // indirect

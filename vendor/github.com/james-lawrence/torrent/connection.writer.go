@@ -31,6 +31,7 @@ import (
 
 func RunHandshookConn(c *connection, t *torrent) error {
 	const retrydelay = 10 * time.Second
+	keepalive := c.cfg.keepAliveTimeout
 
 	remotreaddr := c.conn.RemoteAddr()
 	c.setTorrent(t)
@@ -38,6 +39,7 @@ func RunHandshookConn(c *connection, t *torrent) error {
 	c.conn.SetWriteDeadline(time.Time{})
 	c.r = deadlineReader{c.conn, c.r}
 	t.lastConnection.Store(new(time.Now()))
+	t.touch()
 	completedHandshakeConnectionFlags.Add(c.connectionFlags(), 1)
 
 	defer t.dropConnection(c)
@@ -65,14 +67,14 @@ func RunHandshookConn(c *connection, t *torrent) error {
 	}
 
 	go func() {
-		err := connwriterinit(ctx, ws, 10*time.Second)
+		err := connwriterinit(ctx, ws, keepalive)
 		err = errorsx.StdlibTimeout(err, retrydelay, syscall.ECONNRESET)
 		cancel(err)
 		c.Close()
 	}()
 
 	go func() {
-		err := connreaderinit(ctx, c, ws, 10*time.Second)
+		err := connreaderinit(ctx, c, ws, keepalive)
 		err = errorsx.StdlibTimeout(err, retrydelay, syscall.ECONNRESET)
 		cancel(err)
 		c.Close()
@@ -800,6 +802,9 @@ func (t _connwriterRequests) request(r request, mw messageWriter) bool {
 }
 
 func (t _connwriterRequests) genrequests(available *roaring.Bitmap, msg messageWriter) {
+	// how long to wait before looking again when everything left is outstanding on other connections.
+	const nowork = 100 * time.Millisecond
+
 	var (
 		err         error
 		reqs        []request
@@ -841,7 +846,9 @@ func (t _connwriterRequests) genrequests(available *roaring.Bitmap, msg messageW
 			// mark out available set for refresh when we hit this state.
 			// this is because we remove chunks from our requestable set before we receive them.
 			// and when we run out of work and there is more things to request it means we missed some.
-			t.refreshrequestable.Store(new(time.Now()))
+			// chunks held by other connections are usually still outstanding on the next pass, a refresh due
+			// immediately keeps the writer from idling and it spins.
+			t.refreshrequestable.Store(new(time.Now().Add(nowork)))
 
 			t.t.chunks.MergeInto(t.t.chunks.missing, t.t.chunks.failed)
 			t.t.chunks.FailuresReset()
