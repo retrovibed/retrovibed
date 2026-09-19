@@ -280,6 +280,7 @@ func TuneResetBitmaps(t *torrent) error {
 		t.chunks.unverified.Clear()
 		t.chunks.failed.Clear()
 		t.chunks.completed.Clear()
+		t.chunks.credited.Clear()
 	})
 
 	return nil
@@ -363,12 +364,61 @@ func TuneVerifySample(n uint64) Tuner {
 	}
 }
 
-// lets randomly verify some of the data.
+// TuneVerifyBitmap initializes the chunks from a snapshot of the downloaded chunks (see
+// DownloadedSnapshotSave) and verifies n of the pieces that the snapshot says were downloaded.
+// the pieces are chosen at random from the pieces that have every chunk downloaded, plus the first
+// and last of them. partially downloaded pieces are never chosen, they stay unverified and are
+// verified once their remaining chunks arrive.
+//
+// if the sample is verified the bitmap is considered correct, the pieces that were not sampled
+// stay unverified until they are read, they are counted as validated immediately (and not again
+// when they are hashed) so the stats reflect what was downloaded before. if any of the sample fails the
+// bitmap is incorrect and the entire torrent is verified.
+//
+// an empty snapshot means nothing is known about the data, it may be a new torrent or the data may
+// be on disk without a snapshot (seeding from existing files). everything is assumed to be downloaded
+// and the sample finds out, if the sample fails the entire torrent is verified and whatever is not
+// there is marked missing.
 // will block until complete.
-func tuneVerifySample(unverified *roaring.Bitmap, n uint64) Tuner {
+func TuneVerifyBitmap(unverified *roaring.Bitmap, n uint64) Tuner {
 	return func(t *torrent) error {
-		t.chunks.InitFromUnverified(unverified)
-		return t.Tune(TuneVerifySample(n))
+		if unverified.IsEmpty() {
+			unverified = bitmapx.Fill(uint64(t.chunks.cmaximum))
+		}
+
+		t.chunks.Mut(DownloadedSnapshotRestore(unverified))
+
+		downloaded := t.chunks.Read(copCompletedPieces)
+		if downloaded.IsEmpty() {
+			return nil
+		}
+
+		sample := bitmapx.RandomSubset(downloaded, n)
+		sample.Add(downloaded.Minimum())
+		sample.Add(downloaded.Maximum())
+
+		t.digests.EnqueueBitmap(sample)
+		t.digests.Wait()
+
+		if !t.chunks.FailedEmpty() {
+			return TuneVerifyFull(t)
+		}
+
+		// the bitmap is correct, count the pieces that weren't sampled as validated now. they are
+		// credited so that hashing them later (when they are read) doesn't count them a second time.
+		unsampled := bitmapx.AndNot(downloaded, sample)
+		t.chunks.Mut(chunkoptCredit(unsampled))
+		unsampled.Iterate(func(pid uint32) bool {
+			if p := t.piece(int(pid)); p != nil {
+				n := p.Length()
+				t.stats.BytesValidated.Add(n)
+				t.cln.stats.BytesValidated.Add(n)
+			}
+
+			return true
+		})
+
+		return nil
 	}
 }
 
@@ -509,7 +559,7 @@ func VerifyStored(ctx context.Context, md *metainfo.MetaInfo, t io.ReaderAt) (mi
 	chunks.MergeInto(chunks.missing, chunks.failed)
 	chunks.FailuresReset()
 
-	return chunks.Clone(chunks.missing), chunks.ReadableBitmap(), nil
+	return chunks.Clone(chunks.missing), chunks.Read(DownloadedSnapshotSave), nil
 }
 
 func zeroTorrent(md Metadata, options ...Tuner) *torrent {
