@@ -19,25 +19,11 @@ class DownloadingListDisplay extends StatefulWidget {
   State<StatefulWidget> createState() => _DownloadingListState();
 }
 
-class _DownloadingListState extends State<DownloadingListDisplay> {
-  bool _loading = true;
-  Widget _cause = ds.Error.zero;
+class _DownloadingListState extends State<DownloadingListDisplay> with ds.LoadingState {
   Timer? period;
   media.DownloadSearchResponse _res = media.discoveredsearch.response(
     next: media.discoveredsearch.request(limit: 3),
   );
-
-  @override
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
-
-  void resetcause() {
-    setState(() {
-      _cause = ds.Error.zero;
-    });
-  }
 
   void refresh() {
     widget
@@ -48,13 +34,13 @@ class _DownloadingListState extends State<DownloadingListDisplay> {
         .then((v) {
           setState(() {
             _res = v;
-            _loading = false;
+            loading = false;
           });
         })
         .catchError((e) {
           setState(() {
-            _cause = ds.Error.unknown(e, onTap: resetcause);
-            _loading = false;
+            cause = ds.Error.unknown(e, onTap: reseterr);
+            loading = false;
           });
         });
   }
@@ -86,8 +72,8 @@ class _DownloadingListState extends State<DownloadingListDisplay> {
         widget.events?.value += 1;
       },
       ds.Table(
-        loading: _loading,
-        cause: _cause,
+        loading: loading,
+        cause: cause,
         children: _res.items,
         collapsable: true,
         ds.Table.inline<media.Download>(

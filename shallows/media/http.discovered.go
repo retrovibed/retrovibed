@@ -17,6 +17,7 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/anacrolix/missinggo/pubsub"
 	"github.com/coder/websocket"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/go-playground/form/v4"
 	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
@@ -769,6 +770,7 @@ func (t *HTTPDiscovered) websocket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Println("DERP DERP", spew.Sdump(md))
 	ctx := c.CloseRead(context.Background())
 
 	metadata, err := torrent.New(

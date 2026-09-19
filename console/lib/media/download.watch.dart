@@ -24,8 +24,7 @@ class RefreshingDownload extends StatefulWidget {
   State<RefreshingDownload> createState() => _DownloadingState();
 }
 
-class _DownloadingState extends State<RefreshingDownload> {
-  Widget _cause = ds.Error.zero;
+class _DownloadingState extends State<RefreshingDownload> with ds.LoadingState {
   api.Download current = api.Download();
   StreamSubscription<api.Download>? _subscription;
   bool _notifiedCompleted = false;
@@ -34,15 +33,6 @@ class _DownloadingState extends State<RefreshingDownload> {
     if (_notifiedCompleted || !api.download.completed(current)) return;
     _notifiedCompleted = true;
     widget.onCompleted(current);
-  }
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
-
-  void _resetcause() {
-    setState(() => _cause = ds.Error.zero);
   }
 
   void _reconnect() {
@@ -62,6 +52,7 @@ class _DownloadingState extends State<RefreshingDownload> {
 
           _subscription = socket.listen(
             (v) {
+              print("DERP DERP ${v}");
               setState(() {
                 current = v;
               });
@@ -89,7 +80,7 @@ class _DownloadingState extends State<RefreshingDownload> {
         }, test: ds.ErrorTests.websocketclosed)
         .catchError((cause) {
           setState(() {
-            _cause = ds.Error.unknown(cause, onTap: _resetcause);
+            this.cause = ds.Error.unknown(cause, onTap: reseterr);
           });
         });
   }
@@ -118,7 +109,7 @@ class _DownloadingState extends State<RefreshingDownload> {
   @override
   Widget build(BuildContext context) {
     return ds.ErrorScreen(
-      cause: _cause,
+      cause: cause,
       DownloadRowDisplay(
         current: current,
         help: ds.Hint.multiline([
