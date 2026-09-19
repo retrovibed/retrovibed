@@ -78,12 +78,13 @@ func TestDiscoverFromRSSFeeds(t *testing.T) {
 
 		require.NoError(t, tracking.MetadataFindByID(t.Context(), q, errorsx.Must(sqlx.String(t.Context(), q, "SELECT id::text FROM torrents_metadata"))).Scan(&actual))
 		// these values should all be generated consistently
-		require.Equal(t, "9f676b73-25ef-674d-6443-c90e562c28db", actual.ID)
-		require.Equal(t, "3ae42d96-ac70-58a7-c9f2-71ecb1c36232", actual.EncryptionSeed)
-		require.EqualValues(t, 0x50ea8000, actual.Bytes)
-		require.False(t, actual.Private)
-		require.False(t, actual.Archivable)
-		require.True(t, actual.InitiatedAt.Before(time.Now().Add(time.Millisecond)))
+		assert.EqualValues(t, "2025.07.01", actual.Description)
+		assert.Equal(t, "9f676b73-25ef-674d-6443-c90e562c28db", actual.ID)
+		assert.Equal(t, "3ae42d96-ac70-58a7-c9f2-71ecb1c36232", actual.EncryptionSeed)
+		assert.EqualValues(t, 0x50ea8000, actual.Bytes)
+		assert.False(t, actual.Private)
+		assert.False(t, actual.Archivable)
+		assert.True(t, actual.InitiatedAt.Before(time.Now().Add(time.Millisecond)))
 	})
 
 	t.Run("should continue processing remaining items when one item fails to resolve", func(t *testing.T) {
@@ -179,7 +180,8 @@ func TestDiscoverFromRSSFeeds(t *testing.T) {
 		require.NoError(t, tracking.MetadataFindByID(t.Context(), q, errorsx.Must(sqlx.String(t.Context(), q, "SELECT id::text FROM torrents_metadata"))).Scan(&actual))
 		// the real, downloaded torrent's size must win over the rss
 		// enclosure's declared (and here, deliberately wrong: 111) length.
-		require.EqualValues(t, 0x50ea8000, actual.Bytes)
+		assert.EqualValues(t, 0x50ea8000, actual.Bytes)
+		assert.EqualValues(t, "archlinux-2025.07.01-x86_64.iso", actual.Description)
 	})
 
 	t.Run("should download feeds when digests differ", func(t *testing.T) {
@@ -216,6 +218,7 @@ func TestDiscoverFromRSSFeeds(t *testing.T) {
 		require.NoError(t, daemons.DiscoverFromRSSFeedsOnce(t.Context(), q, http.DefaultClient, vfs, library.QueryCleanerNoop(), tclient, tstore, asyncx.NewWakeup(t.Context())))
 		require.Equal(t, 0, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT (*) FROM torrents_feed_rss WHERE next_check < NOW()")))
 		require.Equal(t, 1, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT (*) FROM torrents_metadata")))
+		assert.Equal(t, "archlinux-2025.07.01-x86_64.iso", sqltestx.String(t, q, "SELECT description FROM torrents_metadata"))
 	})
 
 	t.Run("should skip feeds with equal digests", func(t *testing.T) {
@@ -289,6 +292,7 @@ func TestDiscoverFromRSSFeeds(t *testing.T) {
 		require.Equal(t, 0, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT (*) FROM torrents_feed_rss WHERE next_check < NOW()")))
 		require.Equal(t, 1, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT (*) FROM torrents_metadata")))
 		require.True(t, sqltestx.Bool(t, q, "SELECT hidden_at == 'infinity' FROM torrents_metadata"))
+		assert.Equal(t, "archlinux-2025.07.01-x86_64.iso", sqltestx.String(t, q, "SELECT description FROM torrents_metadata"))
 	})
 
 	t.Run("should handle magnet uri", func(t *testing.T) {
@@ -322,6 +326,41 @@ func TestDiscoverFromRSSFeeds(t *testing.T) {
 		require.NoError(t, daemons.DiscoverFromRSSFeedsOnce(t.Context(), q, http.DefaultClient, vfs, library.QueryCleanerNoop(), tclient, tstore, asyncx.NewWakeup(t.Context())))
 		require.Equal(t, 0, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT (*) FROM torrents_feed_rss WHERE next_check < NOW()")))
 		require.Equal(t, 1, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT (*) FROM torrents_metadata")))
+		// the magnet's display name (dn) must win over the item's title
+		// ("Retrovibe Media Archive 00").
+		assert.Equal(t, "retrovibed.media.metadata.00.gz", sqltestx.String(t, q, "SELECT description FROM torrents_metadata"))
+	})
+
+	t.Run("should fall back to the item title when the magnet has no display name", func(t *testing.T) {
+		q := sqltestx.Metadatabase(t)
+
+		tclient := torrenttestx.QuickClient(t)
+		vfs := fsx.DirVirtual(t.TempDir())
+		tstore := blockcache.NewTorrentFromVirtualFS(vfs)
+
+		mux := http.NewServeMux()
+
+		mux.HandleFunc("/index.xml", func(w http.ResponseWriter, r *http.Request) {
+			httptestx.HandleIO(testx.Read(testx.Fixture("torrent.rss", "example.9", "index.xml")))(w, r)
+		})
+
+		srv := httptest.NewServer(mux)
+		defer srv.Close()
+
+		require.NoError(t, fsx.MkDirs(0700, vfs.Path("torrent")))
+
+		feed := langx.Clone(tracking.RSS{}, tracking.RSSOptionDefaultFeeds(tracking.RSS{
+			Description:  t.Name(),
+			URL:          fmt.Sprintf("%s/index.xml", srv.URL),
+			Contributing: true,
+			LastBuiltAt:  time.Date(2025, time.July, 01, 17, 0, 0, 0, time.UTC),
+		}), tracking.RSSOptionDefaultEncryptionSeed)
+
+		require.NoError(t, tracking.RSSInsertDefaultFeed(t.Context(), q, feed).Scan(&feed))
+
+		require.NoError(t, daemons.DiscoverFromRSSFeedsOnce(t.Context(), q, http.DefaultClient, vfs, library.QueryCleanerNoop(), tclient, tstore, asyncx.NewWakeup(t.Context())))
+		require.Equal(t, 1, errorsx.Zero(sqlx.Count(t.Context(), q, "SELECT COUNT (*) FROM torrents_metadata")))
+		assert.Equal(t, "Magnet Without Display Name", sqltestx.String(t, q, "SELECT description FROM torrents_metadata"))
 	})
 
 	t.Run("should handle an item with only a link", func(t *testing.T) {

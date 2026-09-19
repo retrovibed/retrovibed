@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>magnet without display name</title>
+		<link>https://example.com</link>
+		<description>feed item whose magnet link has no dn parameter, so the item title is the only name available</description>
+		<language>en-us</language>
+		<lastBuildDate>Tue, 22 Jul 2025 13:02:40 +0000</lastBuildDate>
+		<ttl>1440</ttl>
+		<item>
+			<guid isPermaLink="false">00000000-0000-0000-0000-000000000009</guid>
+			<title>Magnet Without Display Name</title>
+			<link>https://example.com/00000000-0000-0000-0000-000000000009</link>
+			<pubDate>Tue, 22 Jul 2025 13:02:40 +0000</pubDate>
+			<enclosure url="magnet:?xt=urn:btih:8665727372B28B0263690B82928399516641A1B4" type="application/x-bittorrent" length="1243643904"></enclosure>
+		</item>
+	</channel>
+</rss>
