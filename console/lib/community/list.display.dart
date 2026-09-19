@@ -180,7 +180,15 @@ class _ListDisplayState extends State<ListDisplay> {
       ds.Table.expanded<Community>(
         (v) => ListDisplayItem(
           community: v,
-          onChanged: (c) => _refresh(_resp.next),
+          onChanged: (c) {
+            final upd = ds.fnOnChange(_resp.items, c, (o) => o.id == v.id);
+            setState(() {
+              _resp = CommunitySearchResponse(
+                items: upd,
+                next: _resp.next,
+              );
+            });
+          },
           subscribe: widget.subscribe,
         ),
       ),

@@ -59,6 +59,7 @@ class ManagementListDisplayItem extends StatelessWidget {
           borderRadius: defaults.borderRadius,
         ),
         Wrap(
+          verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
           alignment: WrapAlignment.center,
           spacing: defaults.spacing,
           children: [
@@ -81,7 +82,6 @@ class ManagementListDisplayItem extends StatelessWidget {
                 );
               },
               onUpdate: (c) => onChanged?.call(c),
-              onCancel: () {},
             ),
             QRAttribution(community: community),
             Divider(height: 32),

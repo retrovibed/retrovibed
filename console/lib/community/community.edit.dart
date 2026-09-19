@@ -14,6 +14,7 @@ class CommunityEdit extends StatelessWidget {
   final void Function(Community) onChange;
   final bool autofocus;
   final bool readOnly;
+  final List<Widget> actions;
 
   const CommunityEdit({
     super.key,
@@ -21,6 +22,7 @@ class CommunityEdit extends StatelessWidget {
     required this.onChange,
     this.autofocus = false,
     this.readOnly = false,
+    this.actions = const [],
   });
 
   @override
@@ -35,20 +37,21 @@ class CommunityEdit extends StatelessWidget {
         spacing: defaults.spacing,
         children: [
           forms.Field(
-            label: Text('URL'),
+            label: Text(
+              "URL: ${api.communities.canonicaluri(community.url)}",
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: Colors.grey, fontSize: 10),
+            ),
             input: TextFormField(
               readOnly: readOnly,
               autofocus: !readOnly && autofocus,
               initialValue: api.communities.domain(community.url),
-              onChanged: (v) => onChange(community..url = api.communities.canonicaluri(v.trim())),
+              onChanged: (v) {
+                onChange(community..url = api.communities.canonicaluri(v.trim()));
+              },
               decoration: InputDecoration(
                 hintText: "example",
-                helper: Text(
-                  api.communities.canonicaluri(community.url),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(color: Colors.grey, fontSize: 10),
-                ),
                 border: OutlineInputBorder(),
               ),
               validator: (v) {
@@ -64,6 +67,7 @@ class CommunityEdit extends StatelessWidget {
                 return null;
               },
             ),
+            trailing: actions,
           ),
           forms.Field(
             label: Text('Description'),

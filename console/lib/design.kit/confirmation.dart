@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import './theme.defaults.dart';
+import 'theme.defaults.dart';
 import 'container.dart' as _container;
 import 'empty.dart';
 

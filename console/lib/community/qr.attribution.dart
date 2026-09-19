@@ -40,8 +40,8 @@ class _QRAttributionState extends State<QRAttribution> {
       ds.Container(
         clipBehavior: Clip.antiAlias,
         constraints: BoxConstraints(
-          maxWidth: defaults.compact + defaults.padding.horizontal + 58,
-          minHeight: defaults.compact + defaults.padding.vertical,
+          maxWidth: defaults.compact + defaults.padding.horizontal,
+          maxHeight: defaults.compact + defaults.padding.vertical,
         ),
         ClipRRect(
           borderRadius: defaults.borderRadius,
