@@ -157,7 +157,7 @@ func DiscoverFromRSSFeedsOnce(
 				fctx,
 				uri.URL,
 				tracking.MetadataOptionMimetype(stringsx.FirstNonBlank(channel.Retrovibed.Mimetype, uri.Mimetype)),
-				tracking.MetadataOptionDescription(item.Title),
+				tracking.MetadataOptionDescriptionDefault(item.Title),
 				tracking.MetadataOptionKnownMediaID(uuid.Max.String()),
 				tracking.MetadataOptionAutoEntropySeed(encryptionseed),
 				tracking.MetadataOptionAutoArchive(feed.Autoarchive),

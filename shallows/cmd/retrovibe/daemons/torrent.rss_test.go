@@ -78,7 +78,7 @@ func TestDiscoverFromRSSFeeds(t *testing.T) {
 
 		require.NoError(t, tracking.MetadataFindByID(t.Context(), q, errorsx.Must(sqlx.String(t.Context(), q, "SELECT id::text FROM torrents_metadata"))).Scan(&actual))
 		// these values should all be generated consistently
-		assert.EqualValues(t, "2025.07.01", actual.Description)
+		assert.Equal(t, "archlinux-2025.07.01-x86_64.iso", actual.Description)
 		assert.Equal(t, "9f676b73-25ef-674d-6443-c90e562c28db", actual.ID)
 		assert.Equal(t, "3ae42d96-ac70-58a7-c9f2-71ecb1c36232", actual.EncryptionSeed)
 		assert.EqualValues(t, 0x50ea8000, actual.Bytes)

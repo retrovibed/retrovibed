@@ -75,6 +75,15 @@ func MetadataOptionDescription(d string) func(*Metadata) {
 	}
 }
 
+// MetadataOptionDescriptionDefault only sets the description when nothing
+// has provided one yet (e.g. the torrent's info name or a magnet's display
+// name), so a caller's fallback never overrides a more authoritative name.
+func MetadataOptionDescriptionDefault(d string) func(*Metadata) {
+	return func(m *Metadata) {
+		m.Description = stringsx.FirstNonBlank(m.Description, d)
+	}
+}
+
 // trackerSchemePriority ranks tracker announce URLs by scheme so
 // MetadataOptionTrackers can prefer https over http over udp; wss is ranked
 // lowest since it's unsupported.
