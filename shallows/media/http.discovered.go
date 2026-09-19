@@ -702,32 +702,11 @@ func (t *HTTPDiscovered) download(w http.ResponseWriter, r *http.Request) {
 	}
 
 	go func(meta tracking.Metadata) {
-		var (
-			mhash = md5.New()
-			dl    torrent.Torrent
-			added bool
-		)
-
-		metadata, err := torrent.New(
-			metainfo.Hash(meta.Infohash),
-			torrent.OptionStorage(t.c),
-			torrent.OptionTrackers(meta.Tracker),
-			torrent.OptionPublicTrackers(meta.Private, tracking.PublicTrackers()...),
-		)
-		if err != nil {
-			log.Println(errorsx.Wrapf(err, "unable to create metadata from metadata %s", meta.ID))
-			return
-		}
-
-		if dl, added, err = cl.Start(metadata); err != nil {
+		if _, added, err := tracking.Resume(context.Background(), t.q, t.rootstorage, t.mediacleaner, cl, t.c, meta, t.pub); err != nil {
 			log.Println(errorsx.Wrap(err, "unable to start download"))
-			return
 		} else if !added {
 			log.Println("torrent", meta.ID, meta.Description, "already running")
-			return
 		}
-
-		errorsx.Log(tracking.DownloadInto(context.Background(), t.q, t.rootstorage, t.mediacleaner, &meta, dl, mhash, t.pub))
 	}(meta)
 
 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &DownloadBeginResponse{
@@ -760,6 +739,13 @@ func (t *HTTPDiscovered) websocket(w http.ResponseWriter, r *http.Request) {
 		id  = mux.Vars(r)["id"]
 	)
 
+	tclient := t.d.Load()
+	if tclient == nil {
+		log.Println("torrent client not initialized")
+		errorsx.Log(errorsx.Wrap(c.Close(websocketx.PrivateStatus(http.StatusServiceUnavailable), "torrent client not ready"), "failed to close websocket"))
+		return
+	}
+
 	if err := tracking.MetadataDownloadByID(r.Context(), t.q, id).Scan(&md); sqlx.ErrNoRows(err) != nil {
 		log.Println(errorsx.Wrap(err, "unable to find metadata"))
 		errorsx.Log(errorsx.Wrap(c.Close(websocketx.PrivateStatus(http.StatusNotFound), "not found"), "failed to close websocket"))
@@ -771,29 +757,12 @@ func (t *HTTPDiscovered) websocket(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Println("DERP DERP", spew.Sdump(md))
+
 	ctx := c.CloseRead(context.Background())
 
-	metadata, err := torrent.New(
-		metainfo.Hash(md.Infohash),
-		torrent.OptionStorage(t.c),
-		torrent.OptionTrackers(md.Tracker),
-		torrent.OptionPublicTrackers(md.Private, tracking.PublicTrackers()...),
-	)
-
-	if err != nil {
-		log.Println(errorsx.Wrapf(err, "unable to create metadata from %s", md.ID))
-		errorsx.Log(errorsx.Wrap(c.Close(websocketx.PrivateStatus(http.StatusInternalServerError), "internal service error"), "failed to close websocket"))
-		return
-	}
-
-	tclient := t.d.Load()
-	if tclient == nil {
-		log.Println("torrent client not initialized")
-		errorsx.Log(errorsx.Wrap(c.Close(websocketx.PrivateStatus(http.StatusServiceUnavailable), "torrent client not ready"), "failed to close websocket"))
-		return
-	}
-
-	if dl, _, err = tclient.Start(metadata, torrent.TuneSubscribe(&sub)); err != nil {
+	// this connection may be the first to add the torrent to the client, resume and begin skip
+	// torrents that are already running, so it must run the download to completion as well.
+	if dl, _, err = tracking.Resume(context.Background(), t.q, t.rootstorage, t.mediacleaner, tclient, t.c, md, t.pub, torrent.TuneSubscribe(&sub)); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to track download"))
 		errorsx.Log(errorsx.Wrap(c.Close(websocketx.PrivateStatus(http.StatusInternalServerError), "internal service error"), "failed to close websocket"))
 		return
@@ -808,6 +777,8 @@ func (t *HTTPDiscovered) websocket(w http.ResponseWriter, r *http.Request) {
 				DownloadOptionFromTorrent(dl),
 			),
 		)
+
+		log.Println("DERP DERP UG", spew.Sdump(msg))
 
 		if err = jsonx.MarshalWrite(buf, msg); err != nil {
 			return errorsx.Wrap(err, "unable to encode status")

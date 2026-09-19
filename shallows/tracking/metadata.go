@@ -2,8 +2,10 @@ package tracking
 
 import (
 	"context"
+	"crypto/md5"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"io"
 	"io/fs"
 	"log"
@@ -21,6 +23,7 @@ import (
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
+	"github.com/james-lawrence/torrent/storage"
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
 	rootenv "github.com/retrovibed/retrovibed/retroapi/env"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
@@ -419,6 +422,51 @@ func Reset(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, md *Metadata) (
 	}
 
 	return nil
+}
+
+// NewResumableMetadata builds the torrent metadata used to start the torrent for md.
+//
+// every place that starts a torrent must build its metadata with this function. the first
+// start of a torrent determines its info, later starts only merge the display name and
+// trackers, so any variance between callers changes the torrent depending on who won the race.
+func NewResumableMetadata(vfs fsx.Virtual, tstore storage.ClientImpl, md Metadata) (torrent.Metadata, error) {
+	id := metainfo.Hash(md.Infohash)
+
+	return torrent.New(
+		id,
+		torrent.OptionStorage(tstore),
+		torrentx.OptionTracker(md.Tracker),
+		torrentx.OptionInfoFromFile(vfs.Path(rootenv.TorrentDirName, fmt.Sprintf("%s.torrent", id))),
+		torrent.OptionPublicTrackers(md.Private, PublicTrackers()...),
+		torrent.OptionDisplayName(md.Description),
+	)
+}
+
+// Resume starts the torrent on the client and, when it was newly added, runs the download
+// to completion in the background. whoever adds a torrent to the client is responsible for
+// running DownloadInto (it is what marks the metadata completed), so callers that find the
+// torrent already running (added == false) must not start it again.
+func Resume(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, mc library.QueryCleaner, tclient *torrent.Client, tstore storage.ClientImpl, md Metadata, pub *asyncx.Wakeup, options ...torrent.Tuner) (dl torrent.Torrent, added bool, err error) {
+	t, err := NewResumableMetadata(vfs, tstore, md)
+	if err != nil {
+		return nil, false, errorsx.Wrapf(err, "unable to create metadata from %s - %s", md.ID, md.Description)
+	}
+
+	if dl, added, err = tclient.Start(t, options...); err != nil {
+		return nil, false, errorsx.Wrapf(err, "unable to start download %s - %s", md.ID, md.Description)
+	}
+
+	if !added {
+		return dl, false, nil
+	}
+
+	// DownloadInto updates the metadata as it makes progress, so it is given its own copy
+	// to avoid racing with the caller's use of md.
+	go func(md Metadata) {
+		errorsx.Log(errorsx.Wrap(DownloadInto(ctx, q, vfs, mc, &md, dl, md5.New(), pub), "download failed"))
+	}(md)
+
+	return dl, true, nil
 }
 
 func DownloadInto(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, mc library.QueryCleaner, md *Metadata, t torrent.Torrent, dst io.Writer, pub *asyncx.Wakeup, options ...torrent.Tuner) (err error) {

@@ -5,7 +5,6 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"errors"
-	"fmt"
 	"log"
 	"time"
 
@@ -13,12 +12,10 @@ import (
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/int160"
-	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/james-lawrence/torrent/tracker"
 	"github.com/retrovibed/retrovibed/retroapi/asynccompute"
 	"github.com/retrovibed/retrovibed/retroapi/backoffx"
-	"github.com/retrovibed/retrovibed/retroapi/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
@@ -42,41 +39,15 @@ func ResumeDownloads(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual
 	iter := sqlx.Scan(tracking.MetadataSearch(ctx, db, q))
 
 	for md := range iter.Iter() {
-		id := metainfo.Hash(md.Infohash)
-		infopath := rootstore.Path(env.TorrentDirName, fmt.Sprintf("%s.torrent", id))
-		log.Println("resuming", md.ID, md.Description, md.Private, infopath)
+		log.Println("resuming", md.ID, md.Description, md.Private)
 
-		metadata, err := torrent.New(
-			metainfo.Hash(md.Infohash),
-			torrent.OptionStorage(tstore),
-			torrentx.OptionTracker(md.Tracker),
-			torrentx.OptionInfoFromFile(infopath),
-			torrent.OptionPublicTrackers(md.Private, tracking.PublicTrackers()...),
-			torrent.OptionDisplayName(md.Description),
-		)
-		if err != nil {
-			log.Println(errorsx.Wrapf(err, "unable to create metadata from %s - %s - %s", md.ID, md.Description, infopath))
-			return
-		}
-
-		t, added, err := tclient.Start(metadata)
-		if err != nil {
-			log.Println(errorsx.Wrapf(err, "unable to start download %s - %s - %s", md.ID, md.Description, infopath))
+		if _, added, err := tracking.Resume(ctx, db, rootstore, mc, tclient, tstore, md, pub); err != nil {
+			log.Println(errorsx.Wrap(err, "unable to resume download"))
+			continue
+		} else if !added {
+			log.Printf("torrent already running %s - %s\n", md.ID, md.Description)
 			continue
 		}
-
-		if !added {
-			log.Printf("torrent already running %s - %s\n", md.ID, infopath)
-			continue
-		}
-
-		go func(infopath string, md tracking.Metadata, dl torrent.Torrent) {
-			var (
-				mhash = md5.New()
-			)
-
-			errorsx.Log(errorsx.Wrap(tracking.DownloadInto(ctx, db, rootstore, mc, &md, dl, mhash, pub), "resume failed"))
-		}(infopath, md, t)
 
 		log.Println("resumed", md.ID, hex.EncodeToString(md.Infohash), md.Description)
 	}
@@ -96,27 +67,18 @@ func VerifyTorrents(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual,
 	iter := sqlx.Scan(tracking.MetadataSearch(ctx, db, q))
 
 	for md := range iter.Iter() {
-		id := metainfo.Hash(md.Infohash)
-		infopath := rootstore.Path(env.TorrentDirName, fmt.Sprintf("%s.torrent", id))
-		log.Println("verifying", md.ID, md.Description, md.Private, infopath)
+		log.Println("verifying", md.ID, md.Description, md.Private)
 
-		metadata, err := torrent.New(
-			metainfo.Hash(md.Infohash),
-			torrent.OptionStorage(tstore),
-			torrentx.OptionTracker(md.Tracker),
-			torrentx.OptionInfoFromFile(infopath),
-			torrent.OptionPublicTrackers(md.Private, tracking.PublicTrackers()...),
-			torrent.OptionDisplayName(md.Description),
-		)
+		metadata, err := tracking.NewResumableMetadata(rootstore, tstore, md)
 		if err != nil {
-			log.Println(errorsx.Wrapf(err, "unable to create metadata from %s - %s", md.ID, infopath))
+			log.Println(errorsx.Wrapf(err, "unable to create metadata from %s - %s", md.ID, md.Description))
 			return
 		}
 
 		log.Println("verification initiated", md.ID, int160.FromBytes(md.Infohash), md.Description)
 		t, _, err := tclient.Start(metadata, torrent.TuneVerifySample(32))
 		if err != nil {
-			log.Println(errorsx.Wrapf(err, "unable to start download %s - %s", md.ID, infopath))
+			log.Println(errorsx.Wrapf(err, "unable to start download %s - %s", md.ID, md.Description))
 			continue
 		}
 
@@ -127,12 +89,12 @@ func VerifyTorrents(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual,
 		}
 
 		if err = sqlx.Discard(sqlx.Scan(library.MetadataDeleteByTorrentID(ctx, db, md.ID))); err != nil {
-			log.Println(errorsx.Wrapf(err, "unable reset media for torrent %s - %s", md.ID, infopath))
+			log.Println(errorsx.Wrapf(err, "unable reset media for torrent %s - %s", md.ID, md.Description))
 			continue
 		}
 
 		if err = tracking.DownloadInto(ctx, db, rootstore, mc, &md, t, md5.New(), pub); err != nil {
-			log.Println(errorsx.Wrapf(err, "unable reimport torrent %s - %s", md.ID, infopath))
+			log.Println(errorsx.Wrapf(err, "unable reimport torrent %s - %s", md.ID, md.Description))
 			continue
 		}
 
@@ -140,7 +102,7 @@ func VerifyTorrents(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual,
 
 		stats := t.Stats()
 		if err := tracking.MetadataVerifiedByID(ctx, db, md.ID, 0, (&stats.BytesValidated).Uint64(), uint64(t.BytesCompleted())).Scan(&md); err != nil {
-			log.Println(errorsx.Wrapf(err, "unable to update bytes completed during verification %s - %s", md.ID, infopath))
+			log.Println(errorsx.Wrapf(err, "unable to update bytes completed during verification %s - %s", md.ID, md.Description))
 			continue
 		}
 	}
