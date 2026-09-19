@@ -206,27 +206,17 @@ class _ContentRow extends StatelessWidget {
         if (item.archivedId != uuidx.min()) Icon(Icons.archive, color: theme.colorScheme.primary),
         if (onDelete != null)
           ds.LoadingIconButton(
-            icon: Icon(Icons.delete, color: Colors.red),
+            icon: Icon(Icons.delete, color: defaults.danger),
             tooltip: 'remove content',
-            onPressed: () async {
-              ds.modals
-                  .of(context)
-                  ?.push(
-                    ds.Confirmation.yesNo(
-                      content: Text(
-                        'Are you sure you want to delist "${item.title.isNotEmpty ? item.title : item.id}"?',
-                      ),
-                      onConfirm: (context) {
-                        onDelete!(item).whenComplete(() {
-                          ds.modals.of(context)?.push(null);
-                        });
-                      },
-                      onCancel: (context) {
-                        ds.modals.of(context)?.push(null);
-                      },
-                    ),
-                  );
-            },
+            onPressed: () => ds.modals.asyncfn(
+              context,
+              ds.Confirmation.dangerous(
+                content: Text(
+                  'Are you sure you want to delist "${item.title.isNotEmpty ? item.title : item.id}"?',
+                ),
+                onConfirm: (_) => onDelete!(item),
+              ),
+            ),
           ),
       ],
       expanded: SizedBox(
