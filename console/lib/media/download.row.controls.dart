@@ -60,7 +60,7 @@ class _ControlState extends State<DownloadRowControls> {
     };
 
     final cursor = disabled ? SystemMouseCursors.forbidden : SystemMouseCursors.click;
-    final isCompleted = timex.iso8601(widget.current.completedAt).isBefore(timex.inf);
+    final isCompleted = api.download.completed(widget.current);
 
     final primaryicon = isCompleted ? Icon(Icons.check, color: defaults.success) : Icon(Icons.pause_circle_outline);
     final primarytap = isCompleted ? completed : pause;

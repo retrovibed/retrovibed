@@ -778,8 +778,6 @@ func (t *HTTPDiscovered) websocket(w http.ResponseWriter, r *http.Request) {
 			),
 		)
 
-		log.Println("DERP DERP UG", spew.Sdump(msg))
-
 		if err = jsonx.MarshalWrite(buf, msg); err != nil {
 			return errorsx.Wrap(err, "unable to encode status")
 		}

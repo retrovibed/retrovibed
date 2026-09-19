@@ -82,6 +82,9 @@ class _DownloadingListState extends State<DownloadingListDisplay> with ds.Loadin
               key: ValueKey(v.media.id),
               current: v,
               watch: widget.watch,
+              onCompleted: (d) {
+                refresh();
+              },
             ),
           ),
         ),

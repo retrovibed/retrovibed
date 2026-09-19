@@ -48,6 +48,18 @@ void main() {
       expect(find.byIcon(Icons.check), findsNothing);
     });
 
+    testWidgets('shows pause icon when completedAt is unset', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpApp(
+        DownloadRowControls(current: _download(completedAt: '')),
+      );
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      expect(find.byIcon(Icons.pause_circle_outline), findsOneWidget);
+      expect(find.byIcon(Icons.check), findsNothing);
+    });
+
     testWidgets('renders without overflow when completed', (
       WidgetTester tester,
     ) async {

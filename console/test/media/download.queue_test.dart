@@ -125,6 +125,35 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
+    testWidgets('does not treat a download with an unset completedAt as completed', (tester) async {
+      final watch = _FakeWatch();
+      final downloads = [
+        _download(id: 'a', description: 'First Download', completedAt: ''),
+        _download(id: 'b', description: 'Second Download', completedAt: _infString),
+      ];
+
+      await tester.pumpApp(
+        media.DownloadQueue(
+          Future.value(downloads),
+          watch: watch.call,
+          minCompletedDisplay: const Duration(milliseconds: 100),
+        ),
+      );
+      await tester.pump();
+      await tester.pump();
+      await tester.pump();
+
+      // well past the minimum display: an item wrongly treated as completed
+      // would have advanced by now.
+      await tester.pump(const Duration(milliseconds: 500));
+      await tester.pump();
+
+      expect(find.text('First Download'), findsOneWidget);
+      expect(find.text('1 of 2'), findsOneWidget);
+      expect(find.text('Second Download'), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('calls onQueueComplete and renders nothing once the last item finishes', (tester) async {
       final watch = _FakeWatch();
       final downloads = [_download(id: 'a', description: 'Only Download', completedAt: _infString)];

@@ -268,7 +268,7 @@ abstract class media {
 abstract class download {
   static bool paused(Download d) => timex.iso8601(d.pausedAt).isBefore(timex.inf);
   static bool ongoing(Download d) => timex.iso8601(d.initiatedAt).isBefore(timex.inf);
-  static bool completed(Download d) => timex.iso8601(d.completedAt).isBefore(timex.inf);
+  static bool completed(Download d) => timex.iso8601(d.completedAt, empty: timex.inf).isBefore(timex.inf);
   static IconData icon(Download d) {
     if (download.completed(d)) return Icons.check;
     if (download.ongoing(d)) return Icons.downloading;

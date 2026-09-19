@@ -65,7 +65,7 @@ class TorrentDisplay extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text("Torrent", style: theme.textTheme.titleSmall),
+            Text("Metadata", style: theme.textTheme.titleSmall),
             forms.Field(
               label: Text("name"),
               input: Text(details.name, overflow: TextOverflow.ellipsis, maxLines: 1),

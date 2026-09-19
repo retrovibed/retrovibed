@@ -63,7 +63,7 @@ func DownloadOptionFromTorrent(t torrent.Torrent) DownloadOption {
 
 		info := langx.Zero(t.Info())
 		c.Bytes = uint64(info.TotalLength())
-		c.Downloaded = uint64(t.BytesCompleted())
+		c.Downloaded = cc.BytesValidated.Uint64()
 		c.Peers = uint32(cc.ActivePeers)
 		c.PeersHalf = uint32(cc.HalfOpenPeers)
 		c.PeersAvailable = uint32(cc.TotalPeers)

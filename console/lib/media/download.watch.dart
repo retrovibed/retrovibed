@@ -30,7 +30,9 @@ class _DownloadingState extends State<RefreshingDownload> with ds.LoadingState {
   bool _notifiedCompleted = false;
 
   void _maybeNotifyCompleted() {
+    print("notified completed? ${_notifiedCompleted} ${api.download.completed(current)}");
     if (_notifiedCompleted || !api.download.completed(current)) return;
+    print("notified completed ${_notifiedCompleted} ${api.download.completed(current)}");
     _notifiedCompleted = true;
     widget.onCompleted(current);
   }
@@ -49,10 +51,8 @@ class _DownloadingState extends State<RefreshingDownload> with ds.LoadingState {
         )
         .then((socket) {
           final c = Completer();
-
           _subscription = socket.listen(
             (v) {
-              print("DERP DERP ${v}");
               setState(() {
                 current = v;
               });
@@ -65,7 +65,7 @@ class _DownloadingState extends State<RefreshingDownload> with ds.LoadingState {
 
           return c.future;
         })
-        .then((_) {
+        .then((x) {
           ds.RefreshBoundary.of(context)?.reset();
           debugPrint('download watch stream closed cleanly, reconnecting');
           _reconnect();
