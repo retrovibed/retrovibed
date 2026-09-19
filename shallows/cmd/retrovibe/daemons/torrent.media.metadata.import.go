@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/storage"
@@ -17,9 +16,9 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
-	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/tarx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
@@ -101,12 +100,7 @@ func MediaMetadataImport(ctx context.Context, db sqlx.Queryer, tvfs fsx.Virtual,
 			d := jsonl.Iter[library.Known](jsonl.NewDecoder(content))
 			for chunk := range iterx.Chunk(d.Each(ctx), 8192) {
 				chunk = slicesx.Map(func(v library.Known) library.Known {
-					v.AutoDescription = stringsx.Join("\n", v.Title, v.OriginalTitle, v.Overview)
-					// parent_uid is a NOT NULL UUID column; archives built
-					// before every producer set ParentUID still carry Go's
-					// zero-value "" here, which the driver can't convert.
-					v.ParentUID = stringsx.FirstNonBlank(v.ParentUID, uuid.Nil.String())
-					return v
+					return langx.Clone(v, library.KnownOptionAutoDescription, library.KnownOptionAutoParentUID)
 				}, chunk...)
 
 				if err := insert.Run(ctx, metadataImportBatch{metadata: _md, records: chunk}); err != nil {

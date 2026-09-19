@@ -89,6 +89,14 @@ func KnownOptionAutoDescription(t *Known) {
 	t.AutoDescription = stringsx.Join("\n", t.Title, t.OriginalTitle, t.Overview)
 }
 
+// KnownOptionAutoParentUID defaults a blank ParentUID to the nil UUID.
+// parent_uid is a NOT NULL UUID column; archives built before every producer
+// set ParentUID still carry Go's zero-value "" here, which the driver can't
+// convert.
+func KnownOptionAutoParentUID(t *Known) {
+	t.ParentUID = stringsx.FirstNonBlank(t.ParentUID, uuid.Nil.String())
+}
+
 // KnownCollationSpecialsSeason marks TMDB "Specials" (season_number == 0)
 // in the high 16 bits of Collation, instead of 0, so a specials episode
 // never collides with Collation == 0 (the standalone/overall item marker).

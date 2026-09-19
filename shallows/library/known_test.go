@@ -3,12 +3,28 @@ package library_test
 import (
 	"testing"
 
+	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/stretchr/testify/require"
 )
+
+func TestKnownOptionAutoParentUID(t *testing.T) {
+	t.Run("defaults blank parent uid to the nil uuid", func(t *testing.T) {
+		var known library.Known
+		library.KnownOptionAutoParentUID(&known)
+		require.Equal(t, uuid.Nil.String(), known.ParentUID)
+	})
+
+	t.Run("preserves an existing parent uid", func(t *testing.T) {
+		parent := uuid.Must(uuid.NewV4()).String()
+		known := library.Known{ParentUID: parent}
+		library.KnownOptionAutoParentUID(&known)
+		require.Equal(t, parent, known.ParentUID)
+	})
+}
 
 func TestKnownInsertWithDefaults(t *testing.T) {
 	t.Run("inserts known media with mimetype", func(t *testing.T) {
