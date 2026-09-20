@@ -3,6 +3,7 @@ package dht
 import (
 	"context"
 	"log"
+	"net/netip"
 
 	"github.com/james-lawrence/torrent/bencode"
 	"github.com/james-lawrence/torrent/dht/bep44"
@@ -80,10 +81,8 @@ func (t HandlerPeers) Handle(ctx context.Context, src Addr, srv *Server, b Bindi
 		return srv.sendError(ctx, b, src, msg.T, krpcErrMissingArguments)
 	}
 
-	if ps := srv.peers; ps != nil {
-		r.Values = filterPeers(src.IP(), msg.A.Want, ps.GetPeers(peer_store.InfoHash(msg.A.InfoHash)))
-		r.Token = new(srv.createToken(src))
-	}
+	r.Values = filterPeers(src.IP(), msg.A.Want, srv.peers.GetPeers(peer_store.InfoHash(msg.A.InfoHash)))
+	r.Token = new(srv.createToken(src))
 
 	if len(r.Values) == 0 {
 		if err := srv.setReturnNodes(b, &r, *msg, src); err != nil {
@@ -103,22 +102,25 @@ func (t HandlerAnnounce) Handle(ctx context.Context, source Addr, s *Server, b B
 	}
 
 	var port uint16
-	portOk := false
 	if m.A.Port != nil {
 		port = *m.A.Port
-		portOk = true
 	}
 	if m.A.ImpliedPort {
 		port = source.Port()
-		portOk = true
 	}
 
+	// a peer without a port cannot be connected to, the port is required unless it is implied.
+	portOk := port != 0
+
+	// hooks are told where the peer can be reached, which is the announced port and not the port
+	// the packet came from.
+	peer := netip.AddrPortFrom(source.AddrPort().Addr(), port)
 	for _, h := range s.announceto {
-		go h.Announced(int160.FromByteArray(m.A.InfoHash), source.AddrPort(), portOk)
+		go h.Announced(int160.FromByteArray(m.A.InfoHash), peer, portOk)
 	}
 
-	if ps := s.peers; ps != nil {
-		go ps.AddPeer(
+	if portOk {
+		s.peers.AddPeer(
 			peer_store.InfoHash(m.A.InfoHash),
 			krpc.NewNodeAddrFromIPPort(source.IP(), port),
 		)
