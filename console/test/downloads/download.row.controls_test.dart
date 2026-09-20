@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:retrovibed/media/download.row.controls.dart';
+import 'package:retrovibed/downloads/download.row.controls.dart';
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/timex.dart' as timex;
 import 'package:retrovibed/uuidx.dart' as uuidx;

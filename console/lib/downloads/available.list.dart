@@ -9,6 +9,7 @@ import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/lucene.dart' as lucene;
 import 'package:retrovibed/torrentx/display.dart' as torrentx;
+import 'download.display.dart';
 import 'grid.settings.dart';
 import 'magnet.links.dart';
 
@@ -16,15 +17,15 @@ class AvailableListDisplay extends StatefulWidget {
   final media.FnDownloadSearch search;
   final media.FnUploadRequest upload;
   final TextEditingController? controller;
-  final ValueNotifier<int>? events;
+  final StreamController<media.Download> events;
   final List<Widget> leading;
   final List<Widget> trailing;
-  const AvailableListDisplay({
+  const AvailableListDisplay(
+    this.events, {
     super.key,
     this.search = media.discovered.available,
     this.upload = media.discovered.upload,
     this.controller,
-    this.events,
     this.leading = const [],
     this.trailing = const [],
   });
@@ -33,26 +34,13 @@ class AvailableListDisplay extends StatefulWidget {
   State<StatefulWidget> createState() => _AvailableListDisplay();
 }
 
-class _AvailableListDisplay extends State<AvailableListDisplay> {
-  bool _loading = true;
+class _AvailableListDisplay extends State<AvailableListDisplay> with ds.LoadingState {
+  StreamSubscription<void>? subscription;
   String _focused = '';
-  Widget _cause = ds.Error.zero;
   Widget _tuning = ds.Empty;
   media.DownloadSearchResponse _res = media.discoveredsearch.response(
     next: media.discoveredsearch.request(limit: 32),
   );
-
-  @override
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
-
-  void resetcause() {
-    setState(() {
-      _cause = ds.Error.zero;
-    });
-  }
 
   Future<void> refresh(media.DownloadSearchRequest req) {
     return widget
@@ -60,13 +48,13 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
         .then((v) {
           setState(() {
             _res = v;
-            _loading = false;
+            loading = false;
           });
         })
         .catchError((e) {
           setState(() {
-            _cause = ds.Error.unknown(e, onTap: resetcause);
-            _loading = false;
+            cause = ds.Error.unknown(e, onTap: reseterr);
+            loading = false;
           });
         });
   }
@@ -74,10 +62,27 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
   @override
   void initState() {
     super.initState();
-    ds.postframe(() => refresh(_res.next));
-    widget.events?.addListener(() {
-      refresh(_res.next);
+    subscription = widget.events.stream.listen((v) {
+      // an empty download signals a full refresh instead of an in place update.
+      if (v.media.id == "") {
+        refresh(_res.next);
+        return;
+      }
+
+      setState(() {
+        _res = media.DownloadSearchResponse(
+          items: ds.fnOnChange(_res.items, v, (d) => d.media.id == v.media.id),
+          next: _res.next,
+        );
+      });
     });
+    ds.postframe(() => refresh(_res.next));
+  }
+
+  @override
+  void dispose() {
+    subscription?.cancel();
+    super.dispose();
   }
 
   @override
@@ -89,7 +94,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
           StreamSink<httpx.UploadProgress>? progress,
         }) {
           setState(() {
-            _loading = true;
+            loading = true;
           });
 
           return Future.microtask(() {
@@ -98,36 +103,29 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
             });
             return Future.wait(
                   multiparts.map((fv) {
-                    return fv
-                        .then((v) {
-                          return widget
-                              .upload((req) {
-                                req..files.add(v);
-                                return req;
-                              })
-                              .then((uploaded) {
-                                return media.discovered.download(uploaded.media.id);
-                              });
-                        })
-                        .whenComplete(() => widget.events?.value += 1);
+                    return fv.then((v) {
+                      return widget
+                          .upload((req) {
+                            req..files.add(v);
+                            return req;
+                          })
+                          .then((uploaded) {
+                            return media.discovered.download(uploaded.media.id);
+                          });
+                    });
                   }),
                 )
                 .then((v) => ds.NullWidget)
                 .catchError((cause) {
-                  return ds.Error.unknown(cause, onTap: resetcause);
+                  return ds.Error.unknown(cause, onTap: reseterr);
                 })
-                .whenComplete(() {
-                  setState(() {
-                    _loading = false;
-                    widget.events?.value += 1;
-                  });
-                });
+                .whenComplete(() => widget.events.add(media.Download()));
           });
         };
 
     return ds.Table(
-      loading: _loading,
-      cause: _cause,
+      loading: loading,
+      cause: cause,
       children: _res.items,
       leading: Column(
         verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
@@ -183,7 +181,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                           ),
                         );
                         return Future.wait(pending, eagerError: true).then((_) {
-                          widget.events?.value += 1;
+                          widget.events.add(media.Download());
                           ds.modals.of(context)?.reset();
                         });
                       },
@@ -219,9 +217,8 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
             onPress: () {
               return media.discovered
                   .reset(v.media.id, options: [authn.request(authn.AuthzCache.meta(context))])
-                  .then((v) {
-                    widget.events ?? refresh(_res.next);
-                    widget.events?.value += 1;
+                  .then((_) {
+                    widget.events.add(v);
                   })
                   .catchError((cause) {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -267,9 +264,8 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                             v.media.id,
                             options: [authn.request(authn.AuthzCache.meta(context))],
                           )
-                          .then((v) {
-                            widget.events ?? refresh(_res.next);
-                            widget.events?.value += 1;
+                          .then((d) {
+                            widget.events.add(d.download);
                           })
                           .catchError((cause) {
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -285,7 +281,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                     spacing: defaults.spacing / 2,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      media.DownloadDisplay(
+                      DownloadDisplay(
                         v,
                         onVerify: (download) => ds.modals.asyncfn(
                           context,

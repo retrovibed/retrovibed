@@ -80,7 +80,7 @@ class SearchUploadDropdown extends StatelessWidget {
           ),
           downloads.MenuItemDownloadTorrent(context, (d) {
             onDownloadingChanged(
-              media.DownloadQueue(
+              downloads.DownloadQueue(
                 d,
                 onQueueComplete: () => onDownloadingChanged(ds.Empty),
               ),
@@ -89,7 +89,7 @@ class SearchUploadDropdown extends StatelessWidget {
           }),
           downloads.MenuItemDownloadMagnet(context, (d) {
             onDownloadingChanged(
-              media.DownloadQueue(
+              downloads.DownloadQueue(
                 d,
                 onQueueComplete: () => onDownloadingChanged(ds.Empty),
               ),

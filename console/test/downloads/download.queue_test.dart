@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:retrovibed/httpx.dart' as httpx;
+import 'package:retrovibed/downloads/download.queue.dart';
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/timex.dart' as timex;
 import 'package:retrovibed/uuidx.dart' as uuidx;
@@ -44,7 +45,7 @@ void main() {
     testWidgets('shows nothing while the pending list is loading', (tester) async {
       final completer = Completer<List<media.Download>>();
 
-      await tester.pumpApp(media.DownloadQueue(completer.future));
+      await tester.pumpApp(DownloadQueue(completer.future));
       await tester.pump();
 
       expect(find.text('1 of 1'), findsNothing);
@@ -58,7 +59,7 @@ void main() {
         _download(id: 'b', description: 'Second Download', completedAt: _infString),
       ];
 
-      await tester.pumpApp(media.DownloadQueue(Future.value(downloads), watch: watch.call));
+      await tester.pumpApp(DownloadQueue(Future.value(downloads), watch: watch.call));
       await tester.pumpAndSettle();
 
       expect(find.text('First Download'), findsOneWidget);
@@ -73,7 +74,7 @@ void main() {
         _download(id: 'b', description: 'Second Download', completedAt: _infString),
       ];
 
-      await tester.pumpApp(media.DownloadQueue(Future.value(downloads), watch: watch.call));
+      await tester.pumpApp(DownloadQueue(Future.value(downloads), watch: watch.call));
       await tester.pumpAndSettle();
       expect(find.text('First Download'), findsOneWidget);
 
@@ -99,7 +100,7 @@ void main() {
       ];
 
       await tester.pumpApp(
-        media.DownloadQueue(
+        DownloadQueue(
           Future.value(downloads),
           watch: watch.call,
           minCompletedDisplay: const Duration(milliseconds: 200),
@@ -133,7 +134,7 @@ void main() {
       ];
 
       await tester.pumpApp(
-        media.DownloadQueue(
+        DownloadQueue(
           Future.value(downloads),
           watch: watch.call,
           minCompletedDisplay: const Duration(milliseconds: 100),
@@ -160,7 +161,7 @@ void main() {
       var completed = 0;
 
       await tester.pumpApp(
-        media.DownloadQueue(
+        DownloadQueue(
           Future.value(downloads),
           watch: watch.call,
           onQueueComplete: () => completed++,
@@ -183,7 +184,7 @@ void main() {
       var completed = 0;
 
       await tester.pumpApp(
-        media.DownloadQueue(
+        DownloadQueue(
           Future.value(const <media.Download>[]),
           onQueueComplete: () => completed++,
         ),
@@ -197,7 +198,7 @@ void main() {
     testWidgets('surfaces an error without throwing when the queue future fails', (tester) async {
       final completer = Completer<List<media.Download>>();
 
-      await tester.pumpApp(media.DownloadQueue(completer.future));
+      await tester.pumpApp(DownloadQueue(completer.future));
       await tester.pump(); // let AuthzCache settle and mount DownloadQueue before the future errors
       completer.completeError('boom');
       await tester.pumpAndSettle();

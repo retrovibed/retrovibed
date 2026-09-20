@@ -1,6 +1,6 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:retrovibed/media/download.display.dart';
+import 'package:retrovibed/downloads/download.display.dart';
 import 'package:retrovibed/media/api.dart' as api;
 import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'package:retrovibed/testing/widget_tester_extensions.dart';

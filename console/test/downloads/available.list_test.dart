@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:retrovibed/downloads/available.list.dart';
@@ -78,7 +79,7 @@ void main() {
     testWidgets('renders empty without overflow', (WidgetTester tester) async {
       final entry = _resolutions.currentValue!;
       await tester.pumpApp(
-        AvailableListDisplay(search: _mockSearchEmpty),
+        AvailableListDisplay(StreamController<media.Download>.broadcast(), search: _mockSearchEmpty),
         physicalSize: entry.value,
       );
       await tester.pumpAndSettle();
@@ -90,7 +91,7 @@ void main() {
     ) async {
       final entry = _resolutions.currentValue!;
       await tester.pumpApp(
-        AvailableListDisplay(search: _mockSearchWithItems),
+        AvailableListDisplay(StreamController<media.Download>.broadcast(), search: _mockSearchWithItems),
         physicalSize: entry.value,
       );
       await tester.pumpAndSettle();
@@ -102,7 +103,7 @@ void main() {
     ) async {
       final entry = _resolutions.currentValue!;
       await tester.pumpApp(
-        AvailableListDisplay(search: _mockSearchWithLongNames),
+        AvailableListDisplay(StreamController<media.Download>.broadcast(), search: _mockSearchWithLongNames),
         physicalSize: entry.value,
       );
       await tester.pumpAndSettle();
@@ -113,7 +114,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpApp(
-        AvailableListDisplay(search: _mockSearchEmpty),
+        AvailableListDisplay(StreamController<media.Download>.broadcast(), search: _mockSearchEmpty),
         physicalSize: const Size(300, 600),
       );
       await tester.pumpAndSettle();
@@ -124,7 +125,7 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpApp(
-        AvailableListDisplay(search: _mockSearchWithItems),
+        AvailableListDisplay(StreamController<media.Download>.broadcast(), search: _mockSearchWithItems),
         physicalSize: const Size(300, 600),
       );
       await tester.pumpAndSettle();

@@ -28,7 +28,7 @@ void main() {
           data: const MediaQueryData(
             padding: EdgeInsets.only(top: 24, bottom: 34),
           ),
-          child: DownloadingListDisplay(search: _mockSearchEmpty),
+          child: DownloadingListDisplay(StreamController<media.Download>.broadcast(), search: _mockSearchEmpty),
         ),
       );
       await tester.pumpAndSettle();
@@ -54,6 +54,7 @@ void main() {
 
       await tester.pumpApp(
         DownloadingListDisplay(
+          StreamController<media.Download>.broadcast(),
           search: (media.DownloadSearchRequest req, {List<httpx.Option> options = const []}) async {
             searches++;
             return media.discoveredsearch.response(next: req)..items.add(inprogress);
@@ -74,7 +75,7 @@ void main() {
     testWidgets('renders without overflow', (WidgetTester tester) async {
       final entry = _resolutions.currentValue!;
       await tester.pumpApp(
-        DownloadingListDisplay(search: _mockSearchEmpty),
+        DownloadingListDisplay(StreamController<media.Download>.broadcast(), search: _mockSearchEmpty),
         physicalSize: entry.value,
       );
       await tester.pumpAndSettle();

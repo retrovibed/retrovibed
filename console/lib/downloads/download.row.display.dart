@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
-import './api.dart' as api;
+import 'package:retrovibed/media/api.dart' as api;
 
 class DownloadRowDisplay extends StatelessWidget {
   final api.Download current;

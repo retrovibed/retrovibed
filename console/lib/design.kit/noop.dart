@@ -23,3 +23,17 @@ List<T> fnOnChange<T>(Iterable<T> s, T? v, bool Function(T a) cmp) {
 
   return s.map((o) => cmp(o) ? v : o).toList();
 }
+
+List<T> fnOnChangeOrInsert<T>(Iterable<T> s, T? v, bool Function(T a) cmp) {
+  if (v == null) {
+    return s.where((o) => !cmp(o)).toList();
+  }
+
+  final out = s.toList();
+  final idx = out.indexWhere(cmp);
+  if (idx < 0) {
+    return out..add(v);
+  }
+
+  return out..[idx] = v;
+}

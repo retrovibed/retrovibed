@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/media.dart' as media;
@@ -23,12 +24,12 @@ class Display extends StatefulWidget {
 
 class _DisplayState extends State<Display> {
   final TextEditingController controller = TextEditingController();
-  final ValueNotifier<int> refresh = ValueNotifier(0);
+  final StreamController<media.Download> refresh = StreamController<media.Download>.broadcast();
 
   @override
   void dispose() {
     controller.dispose();
-    refresh.dispose();
+    refresh.close();
     super.dispose();
   }
 
@@ -36,15 +37,15 @@ class _DisplayState extends State<Display> {
   Widget build(BuildContext context) {
     return ds.Container(
       AvailableListDisplay(
+        refresh,
         search: widget.apiavailablesearch,
         controller: controller,
-        events: refresh,
         leading: widget.leading,
         trailing: [
           DownloadingListDisplay(
+            refresh,
             search: widget.downloadingSearch,
             watch: widget.downloadWatch,
-            events: refresh,
           ),
         ],
       ),

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/authn.dart' as authn;
+import 'package:retrovibed/downloads.dart' as downloads;
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/torrentx/display.dart' as torrentx;
@@ -48,7 +49,7 @@ class MediaDownloadAccordian extends StatelessWidget {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            media.DownloadDisplay.fromID(
+            downloads.DownloadDisplay.fromID(
               torrentId,
               get: discoveredGet,
               onVerify: (download) => ds.modals.asyncfn(

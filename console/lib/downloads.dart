@@ -1,4 +1,9 @@
 export 'package:retrovibed/downloads/display.dart';
+export 'package:retrovibed/downloads/download.display.dart';
+export 'package:retrovibed/downloads/download.row.display.dart';
+export 'package:retrovibed/downloads/download.row.controls.dart';
+export 'package:retrovibed/downloads/download.watch.dart';
+export 'package:retrovibed/downloads/download.queue.dart';
 export 'package:retrovibed/downloads/autohelp.dart';
 export 'package:retrovibed/downloads/menu.download.torrent.dart';
 export 'package:retrovibed/downloads/menu.download.magnet.dart';

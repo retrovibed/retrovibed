@@ -1,6 +1,7 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
-import 'api.dart' as api;
+import 'package:retrovibed/media/api.dart' as api;
 import 'download.watch.dart';
 
 class DownloadQueue extends StatefulWidget {
@@ -27,6 +28,13 @@ class _DownloadQueue extends State<DownloadQueue> {
   Widget _cause = ds.Error.zero;
   List<api.Download> _pending = [];
   int _index = 0;
+  final StreamController<api.Download> _updates = StreamController<api.Download>.broadcast();
+
+  @override
+  void dispose() {
+    _updates.close();
+    super.dispose();
+  }
 
   void setState(VoidCallback fn) {
     if (!mounted) return;
@@ -102,6 +110,7 @@ class _DownloadQueue extends State<DownloadQueue> {
                           current: item,
                           interval: widget.interval,
                           watch: widget.watch,
+                          updates: _updates,
                           onCompleted: (_) => _onItemCompleted(_index, item),
                         ),
                       ],

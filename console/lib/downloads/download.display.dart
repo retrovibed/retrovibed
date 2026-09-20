@@ -4,7 +4,7 @@ import 'package:retrovibed/design.kit/forms.dart' as forms;
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/httpx.dart' as httpx;
 
-import './api.dart' as api;
+import 'package:retrovibed/media/api.dart' as api;
 
 class DownloadDisplay extends StatefulWidget {
   final api.Download current;

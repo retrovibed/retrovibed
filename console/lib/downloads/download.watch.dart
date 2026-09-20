@@ -2,22 +2,29 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/authn.dart' as authn;
-import 'api.dart' as api;
+import 'package:retrovibed/media/api.dart' as api;
 import 'download.row.controls.dart';
 import 'download.row.display.dart';
 
 class RefreshingDownload extends StatefulWidget {
-  static _noopOnCompleted(api.Download v) {}
   final api.Download current;
   final Duration interval;
   final api.FnDownloadWatch watch;
   final Function(api.Download) onCompleted;
+
+  /// receives the download each time it changes.
+  final StreamSink<api.Download> updates;
+
+  /// quiet period required before the latest update is pushed to updates.
+  final Duration debounce;
   const RefreshingDownload({
     super.key,
     required this.current,
     this.interval = const Duration(milliseconds: 5000),
     this.watch = api.discovered.watch,
-    this.onCompleted = RefreshingDownload._noopOnCompleted,
+    this.onCompleted = ds.fnNoop,
+    required this.updates,
+    this.debounce = const Duration(milliseconds: 250),
   });
 
   @override
@@ -26,13 +33,13 @@ class RefreshingDownload extends StatefulWidget {
 
 class _DownloadingState extends State<RefreshingDownload> with ds.LoadingState {
   api.Download current = api.Download();
-  StreamSubscription<api.Download>? _subscription;
+  StreamSubscription<api.Download> _subscription = const Stream<api.Download>.empty().listen(null);
+  Timer _debounce = Timer(Duration.zero, () {});
   bool _notifiedCompleted = false;
 
   void _maybeNotifyCompleted() {
-    print("notified completed? ${_notifiedCompleted} ${api.download.completed(current)}");
     if (_notifiedCompleted || !api.download.completed(current)) return;
-    print("notified completed ${_notifiedCompleted} ${api.download.completed(current)}");
+    print("notified completed ${_notifiedCompleted} ${api.download.completed(current)} ${current}");
     _notifiedCompleted = true;
     widget.onCompleted(current);
   }
@@ -43,7 +50,7 @@ class _DownloadingState extends State<RefreshingDownload> with ds.LoadingState {
   }
 
   void _connect() {
-    _subscription?.cancel();
+    _subscription.cancel();
     widget
         .watch(
           current.media.id,
@@ -56,6 +63,8 @@ class _DownloadingState extends State<RefreshingDownload> with ds.LoadingState {
               setState(() {
                 current = v;
               });
+              _debounce.cancel();
+              _debounce = Timer(widget.debounce, () => widget.updates.add(v));
               ds.postframe(_maybeNotifyCompleted);
             },
             cancelOnError: true,
@@ -95,14 +104,13 @@ class _DownloadingState extends State<RefreshingDownload> with ds.LoadingState {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (_subscription == null) {
-      _connect();
-    }
+    _connect();
   }
 
   @override
   void dispose() {
-    _subscription?.cancel();
+    _debounce.cancel();
+    _subscription.cancel();
     super.dispose();
   }
 
